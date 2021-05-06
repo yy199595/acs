@@ -18,7 +18,8 @@
         "TimerManager",
         "ListenerManager",
         "AddressManager",
-        "ActionManager"
+        "ActionManager",
+        "MysqlManager"
     ],
     "WhiteList":
     [

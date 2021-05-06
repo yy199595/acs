@@ -19,9 +19,6 @@
     <Filter Include="Script">
       <UniqueIdentifier>{0cd30628-85fa-458f-8c10-510b5cb97caa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="XCode">
-      <UniqueIdentifier>{044c8f36-1140-412d-842c-7e01b1dda3b9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Manager">
       <UniqueIdentifier>{b29cffe5-4b49-42dc-81bb-608aceb6e706}</UniqueIdentifier>
     </Filter>
@@ -31,17 +28,8 @@
     <Filter Include="Global">
       <UniqueIdentifier>{aab2a09a-940b-4ed6-8a42-fff6f25d2d29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script\Extension">
-      <UniqueIdentifier>{efd96f39-8b77-4529-ab0b-44cac11d3352}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Event">
-      <UniqueIdentifier>{29480bd7-79a7-4a53-b508-16bf00c7f91e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="NetWork">
       <UniqueIdentifier>{ce5e8987-edf0-44ba-9575-05e72d167f36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Protocol">
-      <UniqueIdentifier>{1a866165-f13c-49e7-a89a-a913da0be057}</UniqueIdentifier>
     </Filter>
     <Filter Include="Other">
       <UniqueIdentifier>{fca873e9-ee1b-437a-8d12-2dfbc87b5d65}</UniqueIdentifier>
@@ -54,478 +42,448 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommonModule\SayNoUdpSession.cpp">
-      <Filter>Module</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\LuaType\LuaFunction.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\LuaType\LuaTable.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\MD5.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\ClassNameProxy.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\LuaManager.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\luaExtension\luaExtension.cpp">
-      <Filter>Script\Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\luaExtension\LuaProtocExtension.cpp">
-      <Filter>Script\Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\luaExtension\BindLuaFunction.cpp">
-      <Filter>Script\Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\luaExtension\CoroutineExtension.cpp">
-      <Filter>Script\Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonProtocol\Common.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonProtocol\ServerCommon.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonCore\Applocation.cpp">
+    <ClCompile Include="Core\Applocation.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="CommonObject\Object.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonCore\TcpSessionListener.cpp">
+    <ClCompile Include="Core\ManagerFactory.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\Manager.cpp">
-      <Filter>Manager</Filter>
+    <ClCompile Include="Core\TcpSessionListener.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\ScriptManager.cpp">
-      <Filter>Manager</Filter>
+    <ClCompile Include="Coroutine\Coroutine.cpp">
+      <Filter>Coroutine</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\NetWorkManager.cpp">
-      <Filter>Manager</Filter>
+    <ClCompile Include="Coroutine\CoroutineEvent.cpp">
+      <Filter>Coroutine</Filter>
     </ClCompile>
-    <ClCompile Include="CommonModule\Component.cpp">
-      <Filter>Module</Filter>
+    <ClCompile Include="Coroutine\CoroutineManager.cpp">
+      <Filter>Coroutine</Filter>
     </ClCompile>
-    <ClCompile Include="CommonNetWork\TcpClientSession.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonObject\GameObject.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\TimeHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\Base64Helper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\StringHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\FileHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\ProtocHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\NumberHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\JsonHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonGlobal\ServerConfig.cpp">
+    <ClCompile Include="Global\LogHelper.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="CommonNetWork\NetWorkAction.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonNetWork\NetLuaAction.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\ClassProxyHelper.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonNetWork\NetLuaRetAction.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonNetWork\NetWorkRetAction.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonOther\ObjectFactory.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonScript\luaExtension\SystemExtension.cpp">
-      <Filter>Script\Extension</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonTimer\LuaSleepTimer.cpp">
-      <Filter>Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonManager\TimerManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonTimer\LuaActionTimer.cpp">
-      <Filter>Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonOther\TimeRecorder.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonUtil\DirectoryHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonManager\DownLoadManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonOther\AssestsFileInfo.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonManager\CommandManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonOther\Command.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonCoroutine\Coroutine.cpp">
-      <Filter>Coroutine</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonCoroutine\CoroutineEvent.cpp">
-      <Filter>Coroutine</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonCoroutine\CoroutineManager.cpp">
-      <Filter>Coroutine</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonTimer\CorSleepTimer.cpp">
-      <Filter>Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonManager\SessionManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonNetWork\RemoteScheduler.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonThread\TaskThread.cpp">
-      <Filter>Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonThread\ThreadTaskAction.cpp">
-      <Filter>Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonThread\ThreadPool.cpp">
-      <Filter>Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonGlobal\LogHelper.cpp">
+    <ClCompile Include="Global\ServerConfig.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\ListenerManager.cpp">
+    <ClCompile Include="Manager\ActionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\AddressManager.cpp">
+    <ClCompile Include="Manager\AddressManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="CommonManager\ActionManager.cpp">
+    <ClCompile Include="Manager\CommandManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="CommonOther\AreaActionTable.cpp">
+    <ClCompile Include="Manager\DownLoadManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\ListenerManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\Manager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\NetWorkManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\ScriptManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\SessionManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\TimerManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\Component.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\SayNoUdpSession.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\NetLuaAction.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\NetLuaRetAction.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\NetWorkAction.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\NetWorkRetAction.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\RemoteScheduler.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\TcpClientSession.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\GameObject.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Other\AreaActionTable.cpp">
       <Filter>Other</Filter>
     </ClCompile>
-    <ClCompile Include="CommonCore\ManagerFactory.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Other\AssestsFileInfo.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Other\Command.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Other\ObjectFactory.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Other\TimeRecorder.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\TaskThread.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\ThreadPool.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\ThreadTaskAction.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer\CorSleepTimer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer\LuaActionTimer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer\LuaSleepTimer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Base64Helper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\DirectoryHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\FileHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\JsonHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\MD5.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\NumberHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\ProtocHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\StringHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\TimeHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\ClassNameProxy.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\ClassProxyHelper.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaManager.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension\BindLuaFunction.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension\CoroutineExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension\luaExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension\LuaProtocExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension\SystemExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaType\LuaFunction.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaType\LuaTable.cpp">
+      <Filter>Script</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommonModule\SayNoUdpSession.h">
-      <Filter>Module</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonDefine\CommonDef.h">
-      <Filter>Define</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonDefine\CommonTypeDef.h">
-      <Filter>Define</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonDefine\include.h">
-      <Filter>Define</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaType\LuaFunction.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaType\LuaTable.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\Util\luadebug.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtil\MD5.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonXCode\XCode.h">
-      <Filter>XCode</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtil\NumberBuilder.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ClassMateProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ClassNameProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ClassProxyHelper.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\CommonParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ContainerParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\CtorFunction.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\FunctionParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaManager.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaScriptEvent.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\MemberFuncProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ParameterType.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\StaticFuncProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\UserDataParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\LuaInclude.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\ProtocParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\luaExtension\luaExtension.h">
-      <Filter>Script\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\luaExtension\LuaProtocExtension.h">
-      <Filter>Script\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\luaExtension\BindLuaFunction.h">
-      <Filter>Script\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonScript\luaExtension\CoroutineExtension.h">
-      <Filter>Script\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonUtil\ReflectionHelper.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonEvent\CommonEvent.h">
-      <Filter>Event</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonEvent\SayNoEventTrigger.h">
-      <Filter>Event</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonGlobal\SayNoDataField.h">
-      <Filter>Global</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonModule\SayNoFactory.h">
-      <Filter>Module</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonDefine\ClassStatement.h">
-      <Filter>Define</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonNetWork\NetWorkAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonProtocol\Common.pb.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonNetWork\NetWorkRetAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonProtocol\ServerCommon.pb.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonCore\Applocation.h">
+    <ClInclude Include="Core\Applocation.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CommonObject\Object.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonCore\TcpSessionListener.h">
+    <ClInclude Include="Core\ManagerFactory.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\Manager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Core\TcpSessionListener.h">
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\ScriptManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Coroutine\Coroutine.h">
+      <Filter>Coroutine</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\NetWorkManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Coroutine\CoroutineEvent.h">
+      <Filter>Coroutine</Filter>
     </ClInclude>
-    <ClInclude Include="CommonModule\Component.h">
-      <Filter>Module</Filter>
+    <ClInclude Include="Coroutine\CoroutineManager.h">
+      <Filter>Coroutine</Filter>
     </ClInclude>
-    <ClInclude Include="CommonNetWork\TcpClientSession.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonObject\GameObject.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonDefine\CommonStruct.h">
+    <ClInclude Include="Define\ClassStatement.h">
       <Filter>Define</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\TableWriter.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Define\CommonDef.h">
+      <Filter>Define</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\MathHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Define\CommonStruct.h">
+      <Filter>Define</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\TimeHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Define\CommonTypeDef.h">
+      <Filter>Define</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\Base64Helper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Define\ThreadQueue.h">
+      <Filter>Define</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\StringHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Global\LogHelper.h">
+      <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\FileHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Global\SayNoDataField.h">
+      <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\ProtocHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Global\ServerConfig.h">
+      <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\JsonHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Manager\ActionManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\StringStream.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Manager\AddressManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\NumberHelper.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Manager\CommandManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\MemoryPool.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Manager\DownLoadManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="CommonObject\MemoryObject.h">
+    <ClInclude Include="Manager\ListenerManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\Manager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\NetWorkManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ScriptManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\SessionManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\TimerManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\Component.h">
+      <Filter>Module</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\SayNoFactory.h">
+      <Filter>Module</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\SayNoUdpSession.h">
+      <Filter>Module</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\NetLuaAction.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\NetLuaRetAction.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\NetWorkAction.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\NetWorkRetAction.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\RemoteScheduler.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\TcpClientSession.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\GameObject.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="CommonGlobal\ServerConfig.h">
-      <Filter>Global</Filter>
+    <ClInclude Include="Object\MemoryObject.h">
+      <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="CommonScript\LuaDebugStack.h">
-      <Filter>Script</Filter>
+    <ClInclude Include="Object\Object.h">
+      <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="CommonNetWork\NetLuaAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonNetWork\NetLuaRetAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonOther\ObjectFactory.h">
+    <ClInclude Include="Other\AreaActionTable.h">
       <Filter>Other</Filter>
     </ClInclude>
-    <ClInclude Include="CommonScript\luaExtension\SystemExtension.h">
-      <Filter>Script\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonTimer\TimerBase.h">
-      <Filter>Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonTimer\LuaSleepTimer.h">
-      <Filter>Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonManager\TimerManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonTimer\LuaActionTimer.h">
-      <Filter>Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonOther\TimeRecorder.h">
+    <ClInclude Include="Other\AssestsFileInfo.h">
       <Filter>Other</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtil\DirectoryHelper.h">
+    <ClInclude Include="Other\Command.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Other\DoubleBufferQueue.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Other\ObjectFactory.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Other\TimeRecorder.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread\TaskThread.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread\ThreadPool.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread\ThreadTaskAction.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\CorSleepTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\LuaActionTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\LuaSleepTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\TimerBase.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Base64Helper.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\ServerRegisterInfo.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Util\DirectoryHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\DownLoadManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Util\FileHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\AssestsFileInfo.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Util\JsonHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\DoubleBufferQueue.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Util\MathHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\CommandManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Util\MD5.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\Command.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Util\NumberBuilder.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonCoroutine\Coroutine.h">
-      <Filter>Coroutine</Filter>
+    <ClInclude Include="Util\NumberHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonCoroutine\CoroutineEvent.h">
-      <Filter>Coroutine</Filter>
+    <ClInclude Include="Util\ProtocHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonCoroutine\CoroutineManager.h">
-      <Filter>Coroutine</Filter>
+    <ClInclude Include="Util\StringHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonTimer\CorSleepTimer.h">
-      <Filter>Timer</Filter>
+    <ClInclude Include="Util\StringStream.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\SessionManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Util\TableWriter.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonNetWork\RemoteScheduler.h">
-      <Filter>NetWork</Filter>
+    <ClInclude Include="Util\TimeHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="CommonThread\TaskThread.h">
-      <Filter>Thread</Filter>
+    <ClInclude Include="Script\ClassMateProxy.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonThread\ThreadTaskAction.h">
-      <Filter>Thread</Filter>
+    <ClInclude Include="Script\ClassNameProxy.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonThread\ThreadPool.h">
-      <Filter>Thread</Filter>
+    <ClInclude Include="Script\ClassProxyHelper.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonGlobal\LogHelper.h">
-      <Filter>Global</Filter>
+    <ClInclude Include="Script\CommonParameter.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\ListenerManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Script\ContainerParameter.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\AddressManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Script\CtorFunction.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonManager\ActionManager.h">
-      <Filter>Manager</Filter>
+    <ClInclude Include="Script\FunctionParameter.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonOther\AreaActionTable.h">
-      <Filter>Other</Filter>
+    <ClInclude Include="Script\LuaDebugStack.h">
+      <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="CommonCore\ManagerFactory.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Script\LuaInclude.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaManager.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaScriptEvent.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\MemberFuncProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ParameterType.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ProtocParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\StaticFuncProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\UserDataParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension\BindLuaFunction.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension\CoroutineExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension\luaExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension\LuaProtocExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension\SystemExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaType\LuaFunction.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaType\LuaTable.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\Util\luadebug.h">
+      <Filter>Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonScript\json.lua">
+    <None Include="cpp.hint" />
+    <None Include="Script\json.lua">
       <Filter>Script</Filter>
     </None>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
