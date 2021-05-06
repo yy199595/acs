@@ -1,15 +1,8 @@
 cmake_minimum_required(VERSION 3.1.3)
-PROJECT(Common)
+PROJECT(ServerData)
 
 AUX_SOURCE_DIRECTORY(./ SUPER_SRC)
-
 INCLUDE_DIRECTORIES(./)
-INCLUDE_DIRECTORIES(../ServerData)
-INCLUDE_DIRECTORIES(../Libs/include/rapidjson)
-INCLUDE_DIRECTORIES(../Libs/include/protobuf)
-INCLUDE_DIRECTORIES(../Libs/include/asio)
-INCLUDE_DIRECTORIES(../Libs/include/lua5.3)
-INCLUDE_DIRECTORIES(../Libs/include/spdlog)
 
 LINK_DIRECTORIES(.././Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
@@ -18,6 +11,6 @@ SET(CMAKE_CXX_COMPILER_ARG1 "g++")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 SET(CMAKE_BUILD_TYPE Debug)
 SET(LIBRARY_OUTPUT_PATH ../Libs/lib)
-ADD_LIBRARY(Common STATIC ${SUPER_SRC})
+ADD_LIBRARY(ServerData STATIC ${SUPER_SRC})
 
 #TARGET_LINK_LIBRARIES(Common protobuf ${MY_ADDLIB})
