@@ -91,6 +91,7 @@
     <ClInclude Include="CommonDefine\CommonDef.h" />
     <ClInclude Include="CommonDefine\CommonStruct.h" />
     <ClInclude Include="CommonDefine\CommonTypeDef.h" />
+    <ClInclude Include="CommonDefine\include.h" />
     <ClInclude Include="CommonEvent\CommonEvent.h" />
     <ClInclude Include="CommonEvent\SayNoEventTrigger.h" />
     <ClInclude Include="CommonGlobal\LogHelper.h" />

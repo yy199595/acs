@@ -1,9 +1,8 @@
 #pragma once
-#include<memory>
-#include<CommonCore/Applocation.h>
+#include<CommonDefine/CommonDef.h>
 #include<CommonDefine/CommonTypeDef.h>
-
-
+#include<CommonDefine/ClassStatement.h>
+#include<CommonCore/Applocation.h>
 namespace SoEasy
 {
 	class Object
@@ -12,25 +11,29 @@ namespace SoEasy
 		Object();
 		virtual ~Object();
 	public:
-		void Init(Applocation * app, std::string & typeName);
+		bool Init(Applocation * app, const std::string & name);
+	public:
 		inline bool IsActive() { return this->mIsActive; }
-		inline Applocation * GetApp() { return mAppLocation; }
+		inline long long GetIntanceID() { return mIntanceID; }
+		inline class Applocation * GetApp() { return mAppLocation; }
 		inline void SetActive(bool isActive) { this->mIsActive = isActive; }
 		inline const std::string & GetTypeName() { return this->mClassName; }
+		inline ServerConfig & GetConfig() { return mAppLocation->GetConfig(); }
+		class CoroutineManager * GetScheduler();
 	public:
-		shared_ptr<class CoroutineManager> GetScheduler() { return this->mCoroutineManager; }
+		template<typename T>
+		inline T * GetManager() { return mAppLocation->GetManager<T>(); }
 	public:
 		virtual bool IsManager() { return false; }
 		virtual bool IsComponent() { return false; }
 		virtual bool IsGameObejct() { return false; }
-	protected:
-		virtual void OnAwake() { }
 		virtual void OnDestory() { }
 	private:
 		bool mIsActive;
+		long long mIntanceID;
 		std::string mClassName;
-		Applocation * mAppLocation;
-		shared_ptr<class CoroutineManager> mCoroutineManager;
+		class Applocation * mAppLocation;
+		class CoroutineManager * mCoroutineManager;
 	};
 }
 

@@ -245,6 +245,9 @@
     <ClInclude Include="CommonDefine\CommonTypeDef.h">
       <Filter>Define</Filter>
     </ClInclude>
+    <ClInclude Include="CommonDefine\include.h">
+      <Filter>Define</Filter>
+    </ClInclude>
     <ClInclude Include="CommonScript\LuaType\LuaFunction.h">
       <Filter>Script</Filter>
     </ClInclude>

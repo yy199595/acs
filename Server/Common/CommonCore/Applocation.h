@@ -4,7 +4,9 @@
 #define ASIO_STANDALONE
 #endif
 #include<thread>
+#include<CommonUtil/TimeHelper.h>
 #include<CommonDefine/CommonDef.h>
+#include<CommonDefine/CommonTypeDef.h>
 #include<CommonGlobal/ServerConfig.h>
 #include<CommonDefine/ClassStatement.h>
 #include<CommonOther/TimeRecorder.h>
@@ -14,118 +16,95 @@ using namespace asio::ip;
 namespace SoEasy
 {
 	class Manager;
+	class ManagerFactory;
 	class Applocation
 	{
 	public:
-		Applocation(const std::string srvName, const std::string configDirectory = "./Config/");
+		Applocation(const std::string srvName, ManagerFactory & factory, const std::string configPath);
 		virtual ~Applocation() {};
 	public:
 		inline float GetFps() { return this->mFps; }
+		ServerConfig & GetConfig() { return this->mConfig; }
 		inline float GetDelaTime() { return this->mDelatime; }
 		inline long long GetLogicTime() { return this->mLogicTime; }
 		inline long long GetStartTime() { return this->mStartTime; }
-		inline AsioContext & GetContext() { return this->mAsioContext; }
-		inline ServerConfig & GetServerConfig() { return this->mConfig; }
-		inline const std::string & GetServerName() { return this->mConfig.GetServerName(); }
+		AsioContext & GetAsioContext() { return (*mAsioContext); }
+		long long GetRunTime() { return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 		inline const std::string & GetConfigDirectory() { return this->mSrvConfigDirectory; }
 	public:
 		static Applocation * Get() { return mApplocation; }
 	public:
-		template<typename T> 
-		shared_ptr<T> AddManager();
 		template<typename T>
-		shared_ptr<T> GetManager();
+		bool AddManager();
+		bool AddManager(const std::string & name);
 		template<typename T>
-		shared_ptr<T> GetOrAddManager();
-		shared_ptr<Manager> GetManagerByName(const std::string name);
-		std::vector<shared_ptr<Manager>> & GetAllManager() { return this->mSortManagerArray; }
-	public:
-		TimeRecorder & GetRecoder() { return this->mMainLogicTimeRecorder; }
+		inline T * GetManager();
+		template<typename T>
+		inline bool TryAddManager();
+	private:
+		bool LoadManager();
+		bool InitManager();
 	public:
 		int Run();
 		int Stop();
 		float GetMeanFps();
 	private:
-		bool InitMember();
-		bool InitManager();
-		int	 OnExit(int code);
 		void UpdateConsoleTitle();
 	private:
-		void OnSecondUpdate();
-		void OnFrameUpdate(float t);
-		void OnFrameUpdateAfter();
-	private:
 		int  LogicMainLoop();
+		void UpdateManager(float delatime);
+	private:
+		AsioWork * mAsioWork;
+		std::thread * mNetThread;
+		AsioContext * mAsioContext;
 	private:
 		float mFps;
 		bool mIsClose;
 		float mDelatime;
-		ServerConfig mConfig;
 		long long mLogicTime;
 		long long mStartTime;
-		AsioContext mAsioContext;	
+		ServerConfig mConfig;
 		long long mLastUpdateTime;
-		std::thread  * mNetWorkThread;
+		Manager * mCurrentManager;	
+		class LogHelper * mLogHelper;
 		std::string mSrvConfigDirectory;
-		asio::io_context::work mAsioWork;
-		TimeRecorder mMainLogicTimeRecorder;
-		std::vector<shared_ptr<Manager>> mSortManagerArray;
-		std::unordered_map<std::string, shared_ptr<Manager>> mManagerMap;
 	private:
+		ManagerFactory & mManagerFactory;
 		static Applocation * mApplocation;
+		std::vector<Manager *> mSortManagers;
+		std::unordered_map<std::string, Manager *> mManagerMap;
 	};
-
-
 	template<typename T>
-	inline shared_ptr<T> Applocation::AddManager()
+	inline bool Applocation::AddManager()
 	{
-		const char * name = TypeReflection<T>::Name;
-		Manager * pManager = this->GetManager<T>();
-		if (pManager != nullptr)
+		const std::string name = SoEasy::GetTypeName<T>();
+		return this->AddManager(name);
+	}
+	template<typename T>
+	inline T * Applocation::GetManager()
+	{
+		const std::string name = SoEasy::GetTypeName<T>();
+		auto iter = this->mManagerMap.find(name);
+		if (iter == this->mManagerMap.end())
 		{
-			throw std::string("Add Manager Repeat");
 			return nullptr;
 		}
-
-		Manager * pNewManager = make_shared<T>();
-		if (pNewManager != nullptr)
-		{
-			pNewManager->Init(name);
-			this->mSortManagerArray.push_back(pNewManager);
-			this->mManagerMap.insert(std::make_pair(name, pNewManager));
-			return static_cast<T *>(pNewManager);
-		}
-		return nullptr;
+		return dynamic_cast<T*>(iter->second);
 	}
 	template<typename T>
-	inline shared_ptr<T> Applocation::GetManager()
+	inline bool Applocation::TryAddManager()
 	{
-		const std::string name = TypeReflection<T>::Name;
+		const std::string name = SoEasy::GetTypeName<T>();
 		auto iter = this->mManagerMap.find(name);
-		if (iter != this->mManagerMap.end())
+		if (iter == this->mManagerMap.end())
 		{
-			Manager * pManager = iter->second;
-			return static_cast<T*>(pManager);
+			return this->AddManager(name);
 		}
-		auto iter1 = this->mManagerMap.begin();
-		for (; iter1 != this->mManagerMap.end(); iter1++)
-		{
-			T * pManager = dynamic_cast<T*>(iter1->second);
-			if (pManager != nullptr)
-			{
-				return pManager;
-			}
-		}
-		return nullptr;
+		return false;
 	}
+
+	inline Applocation * GetApp() { return Applocation::Get(); }
 	template<typename T>
-	inline shared_ptr<T> Applocation::GetOrAddManager()
-	{
-		shared_ptr<T> pManager = this->GetManager<T>();
-		if (pManager == nullptr)
-		{
-			pManager = this->AddManager<T>();
-		}
-		return pManager;
-	}
+	inline T * GetManager() { return Applocation::Get()->GetManager<T>(); }
+
 }

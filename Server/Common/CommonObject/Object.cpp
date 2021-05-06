@@ -1,24 +1,37 @@
 #include"Object.h"
 #include<CommonCore/Applocation.h>
+#include<CommonUtil/NumberHelper.h>
 #include<CommonCoroutine/CoroutineManager.h>
 namespace SoEasy
 {
 	Object::Object()
 	{
-		this->mIsActive = false;
-		this->mAppLocation = nullptr;
+		this->SetActive(false);
 		this->mCoroutineManager = nullptr;
 	}
 
 	Object::~Object()
 	{
-
+		
 	}
 
-	void Object::Init(Applocation * app, std::string & typeName)
+	bool Object::Init(Applocation * app, const std::string & name)
 	{
-		this->SetActive(true);
-		this->mAppLocation = app;
-		this->mCoroutineManager = app->GetManager<CoroutineManager>();
+		if (this->mIsActive == false)
+		{
+			this->SetActive(true);
+			this->mClassName = name;
+			this->mAppLocation = app;
+			this->mAppLocation = Applocation::Get();
+			this->mIntanceID = NumberHelper::Create();
+			return true;
+		}
+		return false;
+	}
+
+	CoroutineManager * Object::GetScheduler()
+	{
+		
+		return this->mCoroutineManager;
 	}
 }

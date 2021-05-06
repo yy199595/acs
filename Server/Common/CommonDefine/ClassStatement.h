@@ -18,8 +18,30 @@ namespace SoEasy
 	{												\
 	public:											\
 		static constexpr bool Value = true;		\
-		static constexpr char * Name = (char*)#T;		\
+		static constexpr char * Name = #T;		\
 		static constexpr size_t Size = sizeof(T);	\
 	}
 #define ChildType(type, base) typename std::enable_if<std::is_base_of<base,type>::value && TypeReflection<type>::Value, type>::type
+}
+
+namespace SoEasy
+{
+	template<typename T>
+	inline std::string GetTypeName() { return TypeReflection<T>::Name; }
+}
+
+namespace SoEasy
+{
+	class Object;
+	class Manager;
+	class NetWorkManager;
+	class ScriptManager;
+	class Component;
+	class RemoteScheduler;
+	class TcpClientSession;
+	class TcpSessionListener;
+	class GameObject;
+	class ActionManager;
+	class AddressManager;
+
 }
