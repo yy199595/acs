@@ -1,0 +1,104 @@
+
+#include"RemoteScheduler.h"
+
+#include<CommonCore/Applocation.h>
+#include<CommonUtil/ProtocHelper.h>
+#include<CommonScript/LuaParameter.h>
+#include<CommonOther/ObjectFactory.h>
+#include<CommonManager/ActionManager.h>
+namespace SoEasy
+{
+	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operaotrId)
+		: mOperatorId(operaotrId)
+	{
+		this->mBindSessionAdress = session->GetAddress();
+		Applocation * pApplocation = Applocation::Get();
+		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
+		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
+	}
+
+	bool RemoteScheduler::Call(std::string func)
+	{
+		return this->SendCallMessage(func);
+	}
+
+	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable)
+	{
+		return this->SendCallMessage(func, luaTable);
+	}
+
+	bool RemoteScheduler::Call(std::string func, Message * message)
+	{
+		return this->SendCallMessage(func, message);
+	}
+	bool RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkRetActionBox1(action, func);
+		return this->SendCallMessage(func, message, pAction);
+	}
+
+	bool RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkRetActionBox1(action, func);
+		return this->SendCallMessage(func, nullptr, pAction);
+	}
+}
+
+namespace SoEasy
+{
+	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkRetActionBoxLua(action, func);
+		return this->SendCallMessage(func, message, pAction);
+	}
+
+	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkRetActionBoxLua(action, func);
+		return this->SendCallMessage(func, luaTable, pAction);
+	}
+
+	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkWaitActionBoxLua(action, func);
+		return this->SendCallMessage(func, luaTable, pAction);
+	}
+
+	bool RemoteScheduler::SendCallMessage(std::string & func, Message * message, NetWorkRetActionBox * action)
+	{
+		mMessageBuffer.clear();
+		NetWorkPacket newCallData;
+		if (message != nullptr && message->SerializePartialToString(&mMessageBuffer))
+		{
+			newCallData.set_message_data(mMessageBuffer);
+			newCallData.set_protoc_name(message->GetTypeName());
+		}
+		long long id = this->mFunctionManager->AddCallback(action);
+		newCallData.set_func_name(func);
+		newCallData.set_callback_id(id);
+		newCallData.set_operator_id(mOperatorId);	
+		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
+	}
+
+	bool RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, NetWorkRetActionBox * action)
+	{
+		mMessageBuffer.clear();
+		NetWorkPacket newCallData;
+		
+		if (luaTable.Serialization(mMessageBuffer))
+		{
+			newCallData.set_message_data(mMessageBuffer);
+		}
+		long long id = this->mFunctionManager->AddCallback(action);
+		newCallData.set_func_name(func);
+		newCallData.set_callback_id(id);
+		newCallData.set_operator_id(mOperatorId);
+		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
+	}
+
+	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
+	{
+		NetWorkRetActionBox * pAction = new NetWorkWaitActionBoxLua(action, func);
+		return this->SendCallMessage(func, message, pAction);
+	}
+}

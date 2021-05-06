@@ -1,0 +1,57 @@
+
+syntax = "proto3";
+package PB;
+message NetWorkPacket
+{
+     string func_name = 1;
+     int32 error_code = 2;
+     uint64 operator_id = 3;
+     uint64 callback_id = 4;
+     bytes message_data = 5;
+     string protoc_name = 6;
+}
+
+message StringArray
+{
+     repeated string data_array = 1;
+}
+
+message Int32Array
+{
+     repeated int32 data_array = 1;
+}
+
+message Int64Array
+{
+     repeated int64 data_array = 1;
+}
+
+message StringData
+{
+     string data = 1;
+}
+
+message Int32Data
+{
+     int32 data = 1;
+}
+
+message Int64Data
+{
+     int64 data = 1;
+}
+
+message floatData
+{
+     float data = 1;
+}
+
+message DoubleData
+{
+     double data = 1;
+}
+
+message StringMap
+{
+     map<string, string> data = 1;
+}

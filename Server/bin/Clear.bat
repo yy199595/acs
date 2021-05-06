@@ -1,0 +1,2 @@
+
+del *.ilk *.pdb

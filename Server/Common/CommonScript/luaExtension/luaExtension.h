@@ -1,0 +1,27 @@
+#pragma once
+#include<CommonScript/LuaInclude.h>
+
+namespace LuaAPIExtension
+{
+	extern int TypeCast(lua_State * luaEnv);
+
+	extern int DebugLog(lua_State * luaEnv);
+
+	extern int DebugInfo(lua_State * luaEnv);
+
+	extern int DebugError(lua_State * luaEnv);
+
+	extern int DebugWarning(lua_State * luaEnv);
+
+	extern void GetLuaString(lua_State * luaEnv, std::string & outstring);
+
+	extern int GameObjectGetComponent(lua_State * lua);
+
+	extern int ComponentGetComponent(lua_State * lua);
+
+	extern int GetComponent(lua_State * lua);
+
+	extern int AddComponent(lua_State * lua);
+
+	extern std::map<int, std::string> GetLuaStackData(lua_State * lua);
+}

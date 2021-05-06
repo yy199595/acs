@@ -1,0 +1,64 @@
+
+syntax = "proto3";
+package PB;
+
+message LogicServerData
+{
+    int32 area_id = 1;
+    string server_name = 2;
+    string server_ip = 3;
+    int32 server_port = 4;
+    string server_token = 5;
+}
+
+message LogicServerListData
+{
+    LogicServerData server_data = 1;
+}
+
+message ServerRegisterBack
+{
+    repeated LogicServerData logic_srv_list = 1;
+}
+
+message AssestCompareList
+{
+    message AssestCompareInfo
+    {
+        string file_name = 1;   //文件名
+        string file_md5 = 2;    //文件md5
+    }
+    repeated AssestCompareInfo assestList = 1;
+}
+
+message TransferAssestInfo
+{
+    string file_name = 1;   //当前传输文件名字
+    bytes file_content = 2;     //本次传输的内容
+}
+
+message ServerRunInfo
+{
+    string server_name = 1; //名字
+    int32 server_areaId = 2;    //区服id
+    int64 server_run_time = 3;  //运行时间
+    float server_fps = 4;       //fps
+    float logic_time = 5;       //逻辑耗时
+}
+
+message ActionUpdateInfo
+{
+    string address = 1; //监听地址
+    repeated string action_names =2;    //函数名字
+}
+
+message AreaActionInfo
+{
+    int32 areaId = 1;   //区服id
+    message ActionInfo 
+    {
+        string action_name = 1; //名字
+        repeated string action_address =2;// 地址;
+    }
+    repeated ActionInfo action_infos = 2;   //所有方法地址
+}

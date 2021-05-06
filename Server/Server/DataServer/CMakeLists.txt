@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.1.3)
+PROJECT(DataSrv)
+
+AUX_SOURCE_DIRECTORY(./ SCENE_SRC)
+AUX_SOURCE_DIRECTORY(./Manager SCENE_SRC)
+AUX_SOURCE_DIRECTORY(./Module SCENE_SRC)
+AUX_SOURCE_DIRECTORY(./MysqlClient SCENE_SRC)
+
+
+INCLUDE_DIRECTORIES(./)
+INCLUDE_DIRECTORIES(./Manager)
+INCLUDE_DIRECTORIES(./Module)
+INCLUDE_DIRECTORIES(./MysqlClient)
+INCLUDE_DIRECTORIES(../../Libs/include/rapidjson)
+INCLUDE_DIRECTORIES(../../Libs/include/protobuf)
+INCLUDE_DIRECTORIES(../../Libs/include/asio)
+INCLUDE_DIRECTORIES(../../Libs/include/lua5.3)
+INCLUDE_DIRECTORIES(../../Libs/include/mysql)
+INCLUDE_DIRECTORIES(../../Libs/include/redis)
+INCLUDE_DIRECTORIES(../../Libs/include/spdlog)
+INCLUDE_DIRECTORIES(../../Common)
+
+
+LINK_DIRECTORIES(../../Libs/lib)
+SET(CMAKE_CXX_COMPILER "ccache")
+SET(CMAKE_CXX_COMPILER_ARG1 "g++") 
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
+SET(CMAKE_BUILD_TYPE Debug)
+
+ADD_EXECUTABLE(DataSrv ${SCENE_SRC})
+TARGET_LINK_LIBRARIES(DataSrv Common protobuf Lua53 pthread hiredis mysqlclient dl ${MY_ADDLIB})
+
+SET(EXECUTABLE_OUTPUT_PATH ../../bin/)
+
+
+

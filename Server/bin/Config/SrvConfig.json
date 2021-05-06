@@ -1,0 +1,23 @@
+{
+    "Fps": 30,
+    "AreaId": 0,
+    "FastUpdate": 10,
+    "ListenAddress":"127.0.0.1:7788",
+    "ActionQueryAddress":"127.0.0.1:7788",
+    "RecvBuffCount": 1024,
+    "SendBuffCount": 1024,
+    "IsOpenRecoder": true,
+    "LogLevel": 5,
+    "CommandPort": 1020,
+    "ScriptLoadPath": "Assests/Script",
+    "DownLoadAssetsPath": "DownLoadAssest",
+    "Managers": 
+    [
+        "ScriptManager",
+        "NetWorkManager",
+        "TimerManager",
+        "ListenerManager",
+        "AddressManager",
+        "ActionManager"
+    ]
+}
