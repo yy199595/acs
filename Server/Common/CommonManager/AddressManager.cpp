@@ -29,8 +29,6 @@ namespace SoEasy
 			SayNoDebugError("parse ActionQueryAddress fail");
 			return false;
 		}
-		REGISTER_FUNCTION_1(AddressManager::QueryActions, AreaActionInfo);
-		REGISTER_FUNCTION_2(AddressManager::QueryAction, StringData, StringArray);
 		REGISTER_FUNCTION_1(AddressManager::UpdateActionAddress, ActionUpdateInfo);
 
 		mTcpSessionListener = make_shared<TcpSessionListener>(this, mListenPort);
@@ -49,54 +47,7 @@ namespace SoEasy
 
 	void AddressManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-		SayNoDebugWarning("connect new session : " << tcpSession->GetAddress());
-		
-	}
-
-	XCode AddressManager::QueryAction(shared_ptr<TcpClientSession> session, long long id, const StringData & name, StringArray & returnData)
-	{
-		int areaId = (int)id;
-		auto iter = this->mAreaActionMap.find(areaId);
-		if (iter == this->mAreaActionMap.end())
-		{
-			return XCode::Failure;
-		}
-		std::vector<string> addressList;
-		AreaActionTable * actionTable = iter->second;
-		if (!actionTable->GetActionAddress(name.data(), addressList))
-		{
-			return XCode::Failure;
-		}
-		for (size_t index = 0; index < addressList.size(); index++)
-		{
-			const std::string & address = addressList[index];
-			returnData.add_data_array()->assign(address);
-		}
-		return XCode::Successful;
-	}
-
-	XCode AddressManager::QueryActions(shared_ptr<TcpClientSession> session, long long id, AreaActionInfo & returnData)
-	{
-		int areaId = (int)id;
-		auto iter = this->mAreaActionMap.find(areaId);
-		if (iter == this->mAreaActionMap.end())
-		{
-			return XCode::Failure;
-		}
-		AreaActionTable * actionTable = iter->second;
-		actionTable->ForeachActions([&returnData](const string & name, const std::set<std::string> & addressSet) ->bool
-		{
-			auto actionInfo = returnData.add_action_infos();
-			actionInfo->set_action_name(name);
-			for (auto iter = addressSet.begin(); iter != addressSet.end(); iter++)
-			{
-				const std::string & address = (*iter);
-				actionInfo->add_action_address()->assign(address);
-			}		
-			return true;
-		});
-
-		return XCode::Successful;
+		SayNoDebugWarning("connect new session : " << tcpSession->GetAddress());		
 	}
 
 	XCode AddressManager::UpdateActionAddress(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actions)
@@ -111,7 +62,7 @@ namespace SoEasy
 		}
 		const string & sessionAddress = session->GetAddress();
 		auto iter1 = this->mAddressAreaIdMap.find(sessionAddress);
-		if (iter1 != this->mAddressAreaIdMap.end())
+		if (iter1 == this->mAddressAreaIdMap.end())
 		{
 			this->mAddressAreaIdMap.emplace(sessionAddress, areaId);
 		}
@@ -128,6 +79,43 @@ namespace SoEasy
 				commonAreaTable->AddActionAddress(name, address);
 			}
 			SayNoDebugWarning(name << "  " << address);
+		}	
+		return this->SyncActionInfos(areaId);
+	}
+	XCode AddressManager::SyncActionInfos(int areaId)
+	{
+		auto iter1 = this->mAreaActionMap.find(areaId);
+		if (iter1 == this->mAreaActionMap.end())
+		{
+			return XCode::Failure;
+		}
+		AreaActionInfo returnData;
+		AreaActionTable * areaTable = this->mAreaActionMap[areaId];
+		areaTable->ForeachActions([&returnData](const std::string & name, const std::set<string> & addressList)->bool
+		{
+			AreaActionInfo_ActionInfo * actionInfo = returnData.add_action_infos();
+			if (actionInfo != nullptr)
+			{
+				actionInfo->set_action_name(name);
+				for (auto iter = addressList.begin(); iter != addressList.end(); iter++)
+				{
+					actionInfo->add_action_address()->assign(*iter);
+				}
+			}	
+			return true;
+		});
+		for (auto iter = this->mAddressAreaIdMap.begin(); iter != this->mAddressAreaIdMap.end(); iter++)
+		{
+			if (iter->second == areaId)
+			{
+				const string & address = iter->first;		
+				shared_ptr<TcpClientSession> tcpSession = this->mNetWorkManager->GetSessionByAdress(address);
+				if (tcpSession != nullptr)
+				{
+					RemoteScheduler remoteScheduler(tcpSession);
+					remoteScheduler.Call("NetWorkManager.UpdateAction", &returnData);
+				}
+			}		
 		}
 		return XCode::Successful;
 	}

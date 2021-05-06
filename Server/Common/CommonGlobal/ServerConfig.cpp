@@ -141,6 +141,25 @@ namespace SoEasy
 		return false;
 	}
 
+	bool ServerConfig::GetValue(const std::string k2, std::set<std::string>& data)
+	{
+		data.clear();
+		rapidjson::Value * value = this->GetJsonValue(k2);
+		if (value && value->IsArray())
+		{
+			for (auto iter = value->Begin(); iter != value->End(); iter++)
+			{
+				if (iter->IsString())
+				{
+					std::string str(iter->GetString(), iter->GetStringLength());
+					data.insert(str);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
 	bool ServerConfig::GetValue(const std::string k2, std::vector<std::string>& data)
 	{
 		rapidjson::Value * value = this->GetJsonValue(k2);

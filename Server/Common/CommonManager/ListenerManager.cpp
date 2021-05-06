@@ -1,6 +1,7 @@
 #include "ListenerManager.h"
 #include<CommonUtil/StringHelper.h>
 #include<CommonCore/Applocation.h>
+#include<CommonManager/NetWorkManager.h>
 #include<CommonCore/TcpSessionListener.h>
 namespace SoEasy
 {
@@ -11,6 +12,7 @@ namespace SoEasy
 			return false;
 		}
 		std::string listenAddress;
+		this->GetConfig().GetValue("WhiteList", this->mWhiteList);
 		if (!this->GetConfig().GetValue("ListenAddress", listenAddress))
 		{
 			SayNoDebugError("not find config field ListenAddress");
@@ -39,6 +41,17 @@ namespace SoEasy
 
 	void ListenerManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-
+		// 判断是否在白名单
+		if (!this->mWhiteList.empty())
+		{
+			const string & ip = tcpSession->GetIP();
+			auto iter = this->mWhiteList.find(ip);
+			if (iter == this->mWhiteList.end())
+			{
+				mNetWorkManager->RemoveTcpSession(tcpSession);
+				return;
+			}
+		}
 	}
+
 }

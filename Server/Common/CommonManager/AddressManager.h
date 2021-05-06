@@ -24,9 +24,9 @@ namespace SoEasy
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
 	private:
-		XCode QueryAction(shared_ptr<TcpClientSession> session, long long id, const StringData & name, StringArray & returnData);
-		XCode QueryActions(shared_ptr<TcpClientSession> session, long long id, AreaActionInfo & returnData);
 		XCode UpdateActionAddress(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actionInfo);
+	private:
+		XCode SyncActionInfos(int areaId);
 	private:
 		std::string mListenIp;
 		unsigned short mListenPort;

@@ -3,7 +3,7 @@
 #include"ActionManager.h"
 #include"CommandManager.h"
 #include<CommonCore/Applocation.h>
-
+#include<CommonUtil/StringHelper.h>
 #include<CommonNetWork/TcpClientSession.h>
 #include<CommonNetWork/RemoteScheduler.h>
 #include<CommonManager/ScriptManager.h>
@@ -11,13 +11,15 @@
 
 namespace SoEasy
 {
-	NetWorkManager::NetWorkManager() : Manager(0)
+	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
 	{
 		this->mBindLuaTalbe = nullptr;
 	}
 
 	bool NetWorkManager::OnInit()
 	{
+		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
+		REGISTER_FUNCTION_1(NetWorkManager::UpdateAction, PB::AreaActionInfo);
 		return true;
 	}
 
@@ -78,39 +80,88 @@ namespace SoEasy
 
 	void NetWorkManager::OnFrameUpdateAfter() 
 	{ 
-		while (!this->mSendMessageQueue.empty())
+		
+	}
+
+	void NetWorkManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	{
+
+	}
+
+	void NetWorkManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	{
+		const std::string & address = tcpSession->GetAddress();
+		auto iter = this->mWaitSendMessage.find(address);
+		if (iter != this->mWaitSendMessage.end())
 		{
-			SharedNetPacket sharedPacket = this->mSendMessageQueue.front();
-			this->mSendMessageQueue.pop();
-			const std::string & address = sharedPacket->mAddress;
-			const std::string & message = sharedPacket->mCommandMsg;
-			shared_ptr<TcpClientSession> tcpSession = this->GetSessionByAdress(address);
-			if (tcpSession != nullptr)
+			while (!iter->second.empty())
 			{
-				this->mSessionLock.lock();
-				tcpSession->SendPackage(message);
-				this->mSessionLock.unlock();
+				shared_ptr<NetWorkPacket> data = iter->second.front();
+				this->SendMessageByAdress(address, data);
+				iter->second.pop();
 			}
 		}
 	}
 
-	bool NetWorkManager::SendMessageByAdress(const std::string & address, const NetWorkPacket & returnPackage)
+	bool NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
 	{
 		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
-		SayNoAssertRetVal(pSession, "not find address : " << address, false);
 
-		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
-		if (!returnPackage.SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
+		if (pSession == nullptr)
 		{
-			SayNoDebugError("Serialize Fail : " << returnPackage.func_name());
+			SayNoDebugError("not find session " << address);
 			return false;
 		}
-		size_t size = returnPackage.ByteSizeLong();
+		
+		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
+		if (!returnPackage->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
+		{
+			SayNoDebugError("Serialize Fail : " << returnPackage->func_name());
+			return false;
+		}
+		size_t size = returnPackage->ByteSizeLong();
 		size_t length = size + sizeof(unsigned int);
 		memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
-		SharedNetPacket sharedPacket = std::make_shared<NetMessageBuffer>(address, this->mSendSharedBuffer, length);
-		this->mSendMessageQueue.push(sharedPacket);
+		shared_ptr<string> sendMessage = make_shared<string>(this->mSendSharedBuffer, length);
+		
+		this->mSessionContext->post([pSession, sendMessage]()
+		{
+			const char * data = sendMessage->c_str();
+			const size_t size = sendMessage->size();
+			pSession->SendPackage(data, size);
+		});
 		return true;
+	}
+
+	bool NetWorkManager::StartConnect(const std::string name, const std::string & address)
+	{
+		string ip;
+		unsigned short port;
+		if (!StringHelper::ParseIpAddress(address, ip, port))
+		{
+			return false;
+		}
+		shared_ptr<TcpClientSession> session = make_shared<TcpClientSession>(this, name, ip, port);
+		this->mOnConnectSessionMap.emplace(session->GetAddress(), session);
+		return session->StartConnect();
+	}
+
+	XCode NetWorkManager::UpdateAction(shared_ptr<TcpClientSession> session, long long id, const PB::AreaActionInfo & actionInfos)
+	{
+		this->mRemoteAddressMap.clear();
+		for (int index = 0; index < actionInfos.action_infos_size(); index++)
+		{
+			std::vector<std::string> addressVector;
+			const AreaActionInfo_ActionInfo & actionInfo = actionInfos.action_infos(index);
+			for (int i = 0; i < actionInfo.action_address_size(); i++)
+			{
+				const std::string & address = actionInfo.action_address(i);
+				addressVector.emplace_back(address);
+			}
+			const std::string & name = actionInfo.action_name();
+			this->mRemoteAddressMap.emplace(name, addressVector);
+		}
+		return XCode::Successful;
 	}
 
 	shared_ptr<TcpClientSession> NetWorkManager::GetSessionByAdress(const std::string & adress)
@@ -127,6 +178,42 @@ namespace SoEasy
 			return session;
 		}
 		return nullptr;
+	}
+
+	bool NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
+	{
+		auto iter = this->mRemoteAddressMap.find(func);
+		if (iter == this->mRemoteAddressMap.end())
+		{
+			SayNoDebugError(func << "method does not exist");
+			return false;
+		}
+		long long operId = returnPackage->operator_id();
+		std::vector<std::string> & addressVector = iter->second;
+		const std::string & address = addressVector[operId % addressVector.size()];
+
+		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
+		if (pSession != nullptr)
+		{
+			return this->SendMessageByAdress(address, returnPackage);	
+		}
+
+		auto iter1 = this->mOnConnectSessionMap.find(address);
+		if (iter1 == this->mOnConnectSessionMap.end())
+		{
+			std::string ip;
+			unsigned short port;
+			
+			auto iter2 = mWaitSendMessage.find(address);
+			if (iter2 == mWaitSendMessage.end())
+			{
+				std::queue<shared_ptr<NetWorkPacket>> sendQueue;
+				this->mWaitSendMessage.emplace(address, sendQueue);
+			}
+			this->mWaitSendMessage[address].push(returnPackage);
+			return this->StartConnect("ActionSession", address);
+		}
+		return true;
 	}
 
 	void NetWorkManager::OnLoadLuaComplete(lua_State * luaEnv)

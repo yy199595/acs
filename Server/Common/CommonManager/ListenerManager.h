@@ -21,10 +21,13 @@ namespace SoEasy
 	protected:
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
+		//void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size) override;
+
 	private:
 		std::string mListenerIp;	//监听的ip
 		std::string mListenAddress;	//地址
 		unsigned short mListenerPort; //监听的端口号
+		std::set<std::string> mWhiteList;	//白名单
 		shared_ptr<class TcpSessionListener> mTcpSessionListener;
 		std::unordered_map<std::string, ServerRegisterInfo> mRegisterServerMap;
 	};

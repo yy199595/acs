@@ -23,6 +23,7 @@ namespace SoEasy
 		bool GetValue(const std::string k2, unsigned int & data);
 		bool GetValue(const std::string k2, unsigned short & data);
 		bool GetValue(const std::string k2, unsigned long long & data);
+		bool GetValue(const std::string k2, std::set<std::string> & data);
 		bool GetValue(const std::string k2, std::vector<std::string> & data);
 	public:
 		inline int GetFps() { return this->mFps; }

@@ -8,6 +8,13 @@
 #include<CommonManager/ActionManager.h>
 namespace SoEasy
 {
+	RemoteScheduler::RemoteScheduler(long long operaotrId)
+	{
+		Applocation * pApplocation = Applocation::Get();
+		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
+		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
+	}
+
 	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operaotrId)
 		: mOperatorId(operaotrId)
 	{
@@ -67,32 +74,35 @@ namespace SoEasy
 	bool RemoteScheduler::SendCallMessage(std::string & func, Message * message, NetWorkRetActionBox * action)
 	{
 		mMessageBuffer.clear();
-		NetWorkPacket newCallData;
+		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
 		if (message != nullptr && message->SerializePartialToString(&mMessageBuffer))
 		{
-			newCallData.set_message_data(mMessageBuffer);
-			newCallData.set_protoc_name(message->GetTypeName());
+			newCallData->set_message_data(mMessageBuffer);
+			newCallData->set_protoc_name(message->GetTypeName());
 		}
 		long long id = this->mFunctionManager->AddCallback(action);
-		newCallData.set_func_name(func);
-		newCallData.set_callback_id(id);
-		newCallData.set_operator_id(mOperatorId);	
+		newCallData->set_func_name(func);
+		newCallData->set_callback_id(id);
+		newCallData->set_operator_id(mOperatorId);
+		if (this->mBindSessionAdress.empty())
+		{
+			return this->mNetWorkManager->SendMessageByName(func, newCallData);
+		}
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
 	bool RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, NetWorkRetActionBox * action)
 	{
 		mMessageBuffer.clear();
-		NetWorkPacket newCallData;
-		
+		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
 		if (luaTable.Serialization(mMessageBuffer))
 		{
-			newCallData.set_message_data(mMessageBuffer);
+			newCallData->set_message_data(mMessageBuffer);
 		}
 		long long id = this->mFunctionManager->AddCallback(action);
-		newCallData.set_func_name(func);
-		newCallData.set_callback_id(id);
-		newCallData.set_operator_id(mOperatorId);
+		newCallData->set_func_name(func);
+		newCallData->set_callback_id(id);
+		newCallData->set_operator_id(mOperatorId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 

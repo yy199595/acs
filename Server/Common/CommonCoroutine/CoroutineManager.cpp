@@ -288,22 +288,24 @@ namespace SoEasy
 		{
 			return XCode::SessionIsNull;
 		}
-		this->mNetWorkPacket.Clear();
+
+		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
+
 		if (message != nullptr)
 		{
 			if (!message->SerializePartialToString(&mMessageBuffer))
 			{
 				return XCode::SerializationFailure;
 			}
-			this->mNetWorkPacket.set_message_data(mMessageBuffer);
-			this->mNetWorkPacket.set_protoc_name(message->GetTypeName());
+			callData->set_message_data(mMessageBuffer);
+			callData->set_protoc_name(message->GetTypeName());
 		}
 		long long id = this->mFunctionManager->AddCallback(callBack);
-		this->mNetWorkPacket.set_func_name(func);
-		this->mNetWorkPacket.set_callback_id(id);
+		callData->set_func_name(func);
+		callData->set_callback_id(id);
 
 		const std::string & address = session->GetAddress();
-		if (!this->mNetWorkManager->SendMessageByAdress(address, this->mNetWorkPacket))
+		if (!this->mNetWorkManager->SendMessageByAdress(address, callData))
 		{
 			return XCode::SendMessageFail;
 		}

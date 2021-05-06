@@ -29,6 +29,7 @@ namespace SoEasy
 		inline long long GetLogicTime() { return this->mLogicTime; }
 		inline long long GetStartTime() { return this->mStartTime; }
 		AsioContext & GetAsioContext() { return (*mAsioContext); }
+		AsioContext * GetAsioContextPtr() { return mAsioContext; }
 		long long GetRunTime() { return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 		inline const std::string & GetConfigDirectory() { return this->mSrvConfigDirectory; }
 	public:

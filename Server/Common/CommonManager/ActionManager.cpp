@@ -71,6 +71,20 @@ namespace SoEasy
 		this->mRegisterLuaActions.clear();
 	}
 
+	void ActionManager::GetAllFunction(std::vector<std::string>& funcs)
+	{
+		funcs.clear();
+		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
+		{
+			funcs.emplace_back(iter->first);
+		}
+
+		for (auto iter = this->mRegisterLuaActions.begin(); iter != this->mRegisterLuaActions.end(); iter++)
+		{
+			funcs.emplace_back(iter->first);
+		}
+	}
+
 	bool ActionManager::BindFunction(NetWorkActionBox * actionBox)
 	{
 		if (actionBox == nullptr)
@@ -168,7 +182,7 @@ namespace SoEasy
 			returnData.set_error_code(code);
 			returnData.set_callback_id(callInfo.callback_id());
 			returnData.set_operator_id(callInfo.operator_id());
-			return mNetWorkManager->SendMessageByAdress(address, returnData);
+			return mNetWorkManager->SendMessageByAdress(address, make_shared<NetWorkPacket>(returnData));
 		}
 		return true;
 	}
@@ -264,7 +278,7 @@ namespace SoEasy
 		PB::ActionUpdateInfo actionInfo;
 		RemoteScheduler remoteScheduler(tcpSession, this->mAreaId);
 		const std::string & address = this->mListenerManager->GetAddress();
-
+		SayNoDebugWarning("connect address manager success " << tcpSession->GetAddress());
 		actionInfo.set_address(address);
 		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
 		{

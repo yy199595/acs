@@ -3,7 +3,7 @@
     "AreaId": 0,
     "FastUpdate": 10,
     "ListenAddress":"127.0.0.1:7788",
-    "ActionQueryAddress":"127.0.0.1:7788",
+    "ActionQueryAddress":"127.0.0.1:7799",
     "RecvBuffCount": 1024,
     "SendBuffCount": 1024,
     "IsOpenRecoder": true,
@@ -19,5 +19,9 @@
         "ListenerManager",
         "AddressManager",
         "ActionManager"
+    ],
+    "WhiteList":
+    [
+        "127.0.0.1"
     ]
 }

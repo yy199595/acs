@@ -14,6 +14,7 @@ namespace SoEasy
 		ActionManager();
 		virtual ~ActionManager() { }
 	public:
+		void GetAllFunction(std::vector<std::string> & funcs);
 		bool BindFunction(class NetWorkActionBox * actionBox);
 		long long AddCallback(class NetWorkRetActionBox * actionBox);
 	protected:

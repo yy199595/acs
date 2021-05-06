@@ -11,6 +11,7 @@ namespace SoEasy
 	class RemoteScheduler
 	{
 	public:
+		RemoteScheduler(long long operaotrId = 0);
 		RemoteScheduler(shared_ptr<TcpClientSession>, long long operaotrId = 0);
 		~RemoteScheduler() { }
 	public:

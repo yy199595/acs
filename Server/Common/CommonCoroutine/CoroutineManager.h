@@ -52,7 +52,6 @@ namespace SoEasy
 		void SaveStack(Coroutine *, char * top);
 	private:
 		std::string mMessageBuffer;
-		PB::NetWorkPacket mNetWorkPacket;
 		class TimerManager * mTimerManager;
 		class NetWorkManager * mNetWorkManager;
 		class ActionManager * mFunctionManager;		

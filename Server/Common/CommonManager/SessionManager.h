@@ -21,10 +21,11 @@ namespace SoEasy
 		virtual void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) = 0;
 		virtual void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size);
 	protected:
-		void OnSystemUpdate() final;	
-	private:
-		NetWorkPacket mNetWorkPacket;
+		void OnSystemUpdate() final;
+	protected:
 		class NetWorkManager * mNetWorkManager;
+	private:
+		NetWorkPacket mNetWorkPacket;	
 		class ActionManager * mFunctionManager;
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;
 		DoubleBufferQueue<shared_ptr<TcpClientSession>> mNewSessionQueue;
