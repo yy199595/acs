@@ -24,6 +24,9 @@ namespace SoEasy
 		this->mIsClose = false;
 		this->mThreadPool = nullptr;
 		this->mCurrentManager = nullptr;
+		this->mServerName = srvName;
+		this->mLogicRunCount = 0;
+		this->mSystemRunCount = 0;
 		this->mSrvConfigDirectory = configPath;
 		this->mAsioContext = new AsioContext();
 		this->mAsioWork = new AsioWork(*mAsioContext);
@@ -167,6 +170,7 @@ namespace SoEasy
 		long long secondTimer = TimeHelper::GetMilTimestamp();
 		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();	
 		this->mLastSystemTime = TimeHelper::GetMilTimestamp();
+		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
 		int logicFps = 30;
 		int systemFps = 100;
 		mConfig.GetValue("LogicFps", logicFps);
@@ -174,12 +178,12 @@ namespace SoEasy
 
 		const long long LogicUpdateInterval = 1000 / logicFps;
 		const long long systemUpdateInterval = 1000 / systemFps;
-
 		while (!this->mIsClose)
 		{
 			startTimer = TimeHelper::GetMilTimestamp();
 			if (startTimer - mLastSystemTime >= systemUpdateInterval)
 			{
+				this->mSystemRunCount++;
 				for (size_t index = 0; index < this->mSortManagers.size(); index++)
 				{
 					this->mCurrentManager = this->mSortManagers[index];
@@ -190,6 +194,7 @@ namespace SoEasy
 
 			if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
 			{
+				this->mLogicRunCount++;
 				for (size_t index = 0; index < this->mSortManagers.size(); index++)
 				{
 					this->mCurrentManager = this->mSortManagers[index];
@@ -215,8 +220,15 @@ namespace SoEasy
 
 	void Applocation::UpdateConsoleTitle()
 	{
+		long long nowTime = TimeHelper::GetMilTimestamp();
+		float seconds = (nowTime - this->mMainLoopStartTime) / 1000.0f;
+		this->mSystemFps = this->mSystemRunCount / seconds;
+		this->mLogicFps = this->mLogicRunCount / seconds;
 #ifdef _WIN32
-		
+		std::string contitle = this->mServerName + " system:" + 
+			std::to_string(this->mSystemFps)+ "  logic:" + std::to_string(this->mLogicFps);
+		SetConsoleTitle(contitle.c_str());
 #endif
+		
 	}
 }

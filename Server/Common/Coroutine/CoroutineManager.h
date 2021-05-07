@@ -25,8 +25,6 @@ namespace SoEasy
 		void YieldReturn();
 		void Sleep(long long ms);
 		void Resume(long long id);
-	private:
-		void WakeUpCoroutine(long long id);
 	public:
 		XCode Call(shared_ptr<TcpClientSession> session, const std::string func, Message & returnData);
 		XCode Call(shared_ptr<TcpClientSession> session, const std::string func, const Message * message = nullptr);
@@ -64,7 +62,6 @@ namespace SoEasy
 		std::queue<Coroutine *> mDestoryCoroutine;
 #endif
 		char mSharedStack[STACK_SIZE];
-		std::queue<long long> mResumeCoroutine;
 		std::list<CoroutineEvent *> mCorEventList;
 		std::unordered_map<long long, Coroutine *> mCoroutineMap;
 	};

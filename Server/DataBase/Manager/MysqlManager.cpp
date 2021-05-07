@@ -140,7 +140,10 @@ namespace DataBase
 		const std::string table = requestData.data_array(1);
 		sprintf_s(buffer, "select * from %s;", table.c_str());
 		long long t1 = TimeHelper::GetMilTimestamp();
-		XMysqlCode code = this->QueryData(db, buffer);
+
+		std::shared_ptr<MysqlQueryData> queryData;
+
+		XMysqlCode code = this->QueryData(db, buffer, queryData);
 		SayNoDebugFatal("query time = " << TimeHelper::GetMilTimestamp() - t1);
 
 		return XCode::Successful;

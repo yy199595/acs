@@ -67,12 +67,15 @@ namespace DataBase
 		{
 			return nullptr;
 		}
+		std::vector<std::string> & data = this->mContentVector[col];
 		std::shared_ptr<MysqlQueryLine> lineData = std::make_shared<MysqlQueryLine>();
 		for (auto iter = this->mFiledMap.begin(); iter != this->mFiledMap.end(); iter++)
 		{
 			const std::string & key = iter->first;
-			const std::string & value = this->mContentVector[col][iter->second];
-			lineData->AddMember(key, value);
+			if (iter->second < data.size())
+			{
+				lineData->AddMember(key, data[iter->second]);
+			}		
 		}
 		return lineData;
 	}

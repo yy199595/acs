@@ -13,6 +13,8 @@ namespace DataBase
 	protected:
 		bool OnInit() final;			//初始化管理器
 		void OnSecondUpdate() override;				//每秒调用
+		void OnFrameUpdate(float t) override;			//逻辑帧
+
 	private:
 		std::string mRedisIp;		//redis ip地址
 		unsigned short mRedisPort;	//端口号

@@ -144,16 +144,6 @@ namespace SoEasy
 		}
 	}
 
-	void ActionManager::OnFrameUpdateAfter()
-	{
-		while (!this->mWaitDestoryActions.empty())
-		{
-			NetWorkRetActionBox * action = this->mWaitDestoryActions.front();
-			this->mWaitDestoryActions.pop();
-			delete action;
-		}
-	}
-
 	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
 	{
 		auto iter = this->mRetActionMap.find(id);
@@ -170,8 +160,8 @@ namespace SoEasy
 		}
 
 		refActionBox->Invoke(tcpSession, callInfo);
-		this->mWaitDestoryActions.push(refActionBox);
 		this->mRetActionMap.erase(iter);
+		delete refActionBox;
 		return true;
 	}
 

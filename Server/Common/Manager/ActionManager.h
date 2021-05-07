@@ -22,7 +22,6 @@ namespace SoEasy
 		void OnDestory() override;
 		void OnSecondUpdate() override;
 		void OnInitComplete() override;
-		void OnFrameUpdateAfter() override;
 	public:
 		bool Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo);
 		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo);
@@ -49,7 +48,6 @@ namespace SoEasy
 		shared_ptr<TcpClientSession> mActionQuerySession;
 	private:
 		class ListenerManager * mListenerManager;
-		std::queue<NetWorkRetActionBox *> mWaitDestoryActions;
 		std::unordered_map<std::string, NetLuaAction *> mRegisterLuaActions;
 		std::unordered_map<std::string, NetWorkActionBox *> mRegisterActions;
 		std::unordered_map<long long, class NetWorkRetActionBox *> mRetActionMap;

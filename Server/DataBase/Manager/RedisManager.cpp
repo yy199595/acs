@@ -49,9 +49,9 @@ namespace DataBase
 		{
 			long long threadId = threadVector[index];
 			redisContext * pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
-			if (pRedisContext == nullptr)
+			if (pRedisContext->err != 0)
 			{
-				SayNoDebugFatal("connect redis fail " << mRedisIp << ":" << mRedisPort);
+				SayNoDebugFatal("connect redis fail " << mRedisIp << ":" << mRedisPort << " error:" << pRedisContext->errstr);
 				return false;
 			}
 			this->mRedisContextMap.emplace(threadId, pRedisContext);
@@ -62,10 +62,15 @@ namespace DataBase
 	void RedisManager::OnSecondUpdate()
 	{
 		
+		
+	}
+
+	void RedisManager::OnFrameUpdate(float t)
+	{
 		RemoteScheduler shceuder;
 		StringArray queryInfo;
-		queryInfo.add_data_array()->assign("shouhuzhemen299_db");
-		queryInfo.add_data_array()->assign("gang_gift");
+		queryInfo.add_data_array()->assign("shouhuzhemen_account");
+		queryInfo.add_data_array()->assign("spack_risk_season");
 		long long t1 = TimeHelper::GetMilTimestamp();
 		shceuder.Call("MysqlManager.QueryTable", &queryInfo, [t1](shared_ptr<TcpClientSession>, XCode code)
 		{

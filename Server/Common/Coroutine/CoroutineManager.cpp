@@ -105,12 +105,6 @@ namespace SoEasy
 				delete corEvent;
 			}
 		}
-		while (!this->mResumeCoroutine.empty())
-		{
-			long long id = this->mResumeCoroutine.front();
-			this->mResumeCoroutine.pop();
-			this->WakeUpCoroutine(id);
-		}
 	}
 
 
@@ -127,15 +121,7 @@ namespace SoEasy
 
 	void CoroutineManager::Resume(long long id)
 	{
-		Coroutine * pCoroutine = this->GetCoroutine(id);
-		if (pCoroutine != nullptr)
-		{
-			this->mResumeCoroutine.push(id);
-		}
-	}
-
-	void CoroutineManager::WakeUpCoroutine(long long id)
-	{
+		assert(this->mCurrentCorId == 0);
 		Coroutine * pCoroutine = this->GetCoroutine(id);
 		if (pCoroutine != nullptr)
 		{

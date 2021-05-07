@@ -63,6 +63,7 @@ namespace SoEasy
 		long long mLogicTime;
 		long long mStartTime;
 		ServerConfig mConfig;
+		std::string mServerName;
 		long long mLastUpdateTime;
 		long long mLastSystemTime;
 		Manager * mCurrentManager;	
@@ -72,8 +73,12 @@ namespace SoEasy
 		float mLogicFps;
 		float mDelatime;
 		float mSystemFps;
+	private:	
+		long long mLogicRunCount;
+		long long mSystemRunCount;
+		long long mMainLoopStartTime;
 	private:
-		ThreadPool * mThreadPool;
+		ThreadPool * mThreadPool;		
 		ManagerFactory & mManagerFactory;
 		static Applocation * mApplocation;
 		std::vector<Manager *> mSortManagers;
