@@ -3,15 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ACommon", "Common\Common.vcxproj", "{0178EB4E-3543-4C81-9B89-9A05C1EEED3F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{0178EB4E-3543-4C81-9B89-9A05C1EEED3F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AServerData", "ServerData\ServerData.vcxproj", "{FD812AE3-2FD7-4230-9977-29D7688A8644}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerData", "ServerData\ServerData.vcxproj", "{FD812AE3-2FD7-4230-9977-29D7688A8644}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataBase", "DataBase\DataBase.vcxproj", "{DA10827F-95A6-456E-9E26-23F3ED1AA218}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GM", "GM\GM.vcxproj", "{F76F19BD-DB02-48BF-A367-13E775108FD2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{244563F7-F95C-4E48-AAE4-BE171544AF5C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0178EB4E-3543-4C81-9B89-9A05C1EEED3F} = {0178EB4E-3543-4C81-9B89-9A05C1EEED3F}
+		{DA10827F-95A6-456E-9E26-23F3ED1AA218} = {DA10827F-95A6-456E-9E26-23F3ED1AA218}
+		{FD812AE3-2FD7-4230-9977-29D7688A8644} = {FD812AE3-2FD7-4230-9977-29D7688A8644}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

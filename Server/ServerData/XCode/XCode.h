@@ -8,7 +8,7 @@ enum XCode
 	TimeoutAutoCall = 4,		//超时自动调用
 	CallLuaFunctionFail = 5,	//调用lua方法失败
 	JsonCastProtocbuferFail = 6,	//json转protocbuf失败
-	FunctionNameFail=7,
+	FunctionNameFail = 7,
 	CreatePorotbufFail = 8,	//创建pb失败
 	SerializationFailure = 9, //序列化失败
 	ServerNotRegister = 10,		//服务器没注册

@@ -13,7 +13,6 @@ namespace SoEasy
 		char buffer[1024] = { 0 };
 		Applocation * app = Applocation::Get();
 		std::stringstream nStringBuffer;
-		nStringBuffer << "fps = " << app->GetFps() << "\n";
 		nStringBuffer << "logic time = " << app->GetLogicTime() << "\n";
 		nStringBuffer << "delatime = " << app->GetDelaTime();
 

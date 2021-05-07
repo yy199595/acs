@@ -1,15 +1,15 @@
 #include "MysqlTaskAction.h"
 #include<Manager/MysqlManager.h>
 
-namespace SoEasy
+namespace DataBase
 {
-	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, const char * db, const std::string & sql)
+	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
 		: ThreadTaskAction(mgr, id)
 	{
 		this->ResetTask(mgr, id, db, sql);
 	}
 
-	void MysqlTaskAction::ResetTask(MysqlManager * mgr, long long id, const char * db, const std::string & sql)
+	void MysqlTaskAction::ResetTask(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
 	{
 		this->mActionId = id;
 		this->mSqlCommand = sql;
@@ -68,10 +68,10 @@ namespace SoEasy
 		this->SetCode(MysqlSuccessful);
 	}
 
-	bool MysqlTaskAction::SetCode(XMysqlErrorCode code)
+	bool MysqlTaskAction::SetCode(XMysqlCode code)
 	{
 		this->mMysqlQueryData->SetErrorCode(code);
-		return code == XMysqlErrorCode::MysqlSuccessful;
+		return code == XMysqlCode::MysqlSuccessful;
 	}
 	
 }

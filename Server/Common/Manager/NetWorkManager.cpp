@@ -20,7 +20,7 @@ namespace SoEasy
 	{
 		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
 		REGISTER_FUNCTION_1(NetWorkManager::UpdateAction, PB::AreaActionInfo);
-		return true;
+		return SessionManager::OnInit();
 	}
 
 	bool NetWorkManager::RemoveTcpSession(const std::string & address)

@@ -24,11 +24,11 @@ namespace SoEasy
 		void OnInitComplete() override;
 		void OnFrameUpdateAfter() override;
 	public:
-		bool Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const NetWorkPacket & callInfo);
-		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const NetWorkPacket & callInfo);
-	private:
-		NetLuaAction * GetOrFindLuaFunction(const std::string & name);
-		XCode CallBindFunction(shared_ptr<TcpClientSession> tcpSession, const NetWorkPacket & callInfo, NetWorkPacket & returnData);
+		bool Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo);
+		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo);
+	private:		
+		NetLuaAction * GetLuaFunction(const std::string & name);
+		NetWorkActionBox * GetFunction(const std::string & name);
 	public:
 		virtual void OnLoadLuaComplete(lua_State * luaEnv) override;
 	protected:
@@ -41,6 +41,7 @@ namespace SoEasy
 		TimeRecorder mNetLatencyRecorder;
 		class ScriptManager * mScriptManager;
 		class NetWorkManager * mNetWorkManager;
+		class CoroutineManager * mCoroutineScheduler;
 	private:
 		int mAreaId;	//区服id
 		std::string mQueryIp;	//查询地址的ip

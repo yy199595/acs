@@ -129,7 +129,6 @@ namespace SoEasy
 		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetCenterServerPort", &ServerConfig::GetCenterServerPort);
 
 		ClassProxyHelper::BeginRegister<Applocation>(lua, "Applocation");
-		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetFps", &Applocation::GetFps);
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetRunTime", &Applocation::GetRunTime);
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetDelaTime", &Applocation::GetDelaTime);
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetLogicTime", &Applocation::GetLogicTime);

@@ -7,6 +7,7 @@
 #include<NetWork/RemoteScheduler.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Manager/ListenerManager.h>
+#include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
 	ActionManager::ActionManager()
@@ -40,9 +41,12 @@ namespace SoEasy
 		this->mScriptManager = this->GetManager<ScriptManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
 		this->mListenerManager = this->GetManager<ListenerManager>();
+		this->mCoroutineScheduler = this->GetManager<CoroutineManager>();
 
 		SayNoAssertRetFalse_F(this->mNetWorkManager);
 		SayNoAssertRetFalse_F(this->mListenerManager);
+		SayNoAssertRetFalse_F(this->mCoroutineScheduler);
+
 		
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
 		return this->mActionQuerySession->StartConnect();
@@ -150,7 +154,7 @@ namespace SoEasy
 		}
 	}
 
-	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const NetWorkPacket & callInfo)
+	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
@@ -171,71 +175,48 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const NetWorkPacket & callInfo)
+	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo)
 	{
-		NetWorkPacket returnData;
-		const long long nowTime = TimeHelper::GetMilTimestamp();
-		XCode code = this->CallBindFunction(tcpSession, callInfo, returnData);
-		if (callInfo.callback_id() != 0)
+		NetLuaAction * pNetLuaAction = GetLuaFunction(name);
+		if (pNetLuaAction != nullptr)
 		{
-			const std::string & address = tcpSession->GetAddress();
-			returnData.set_error_code(code);
-			returnData.set_callback_id(callInfo.callback_id());
-			returnData.set_operator_id(callInfo.operator_id());
-			return mNetWorkManager->SendMessageByAdress(address, make_shared<NetWorkPacket>(returnData));
+			shared_ptr<NetWorkPacket> returnData = make_shared<NetWorkPacket>();
+			pNetLuaAction->Invoke(tcpSession, callInfo, returnData);
+			return true;
 		}
+		NetWorkActionBox * pAction = GetFunction(name);
+		if (pAction == nullptr)
+		{
+			return false;
+		}
+
+		this->mCoroutineScheduler->Start([this, callInfo, pAction, tcpSession]()
+		{
+			shared_ptr<NetWorkPacket> returnData = make_shared<NetWorkPacket>();
+			const long long nowTime = TimeHelper::GetMilTimestamp();
+			XCode code = pAction->Invoke(tcpSession, callInfo, returnData);
+			if (callInfo->callback_id() != 0)
+			{
+				const std::string & address = tcpSession->GetAddress();
+				returnData->set_error_code(code);
+				returnData->set_callback_id(callInfo->callback_id());
+				returnData->set_operator_id(callInfo->operator_id());
+				return mNetWorkManager->SendMessageByAdress(address, returnData);
+			}
+		});
 		return true;
 	}
 
-	NetLuaAction * ActionManager::GetOrFindLuaFunction(const std::string & name)
+	NetLuaAction * ActionManager::GetLuaFunction(const std::string & name)
 	{
-		if (this->mScriptManager == nullptr)
-		{
-			return nullptr;
-		}
-
 		auto iter = this->mRegisterLuaActions.find(name);
-		if (iter != this->mRegisterLuaActions.end())
-		{
-			NetLuaAction * pLuaFunction = iter->second;
-			return pLuaFunction;
-		}
-
-		const size_t pos = name.find_first_of(".");
-		if (pos == std::string::npos)
-		{
-			return nullptr;
-		}
-		const std::string className = name.substr(0, pos);
-		const std::string funcName = name.substr(pos + 1, name.length());
-		lua_State * luaEnv = this->mScriptManager->GetLuaEnv();
-		NetLuaAction * pLuaFunction = NetLuaAction::Create(luaEnv, className, funcName);
-		if (pLuaFunction == nullptr)
-		{
-			return nullptr;
-		}
-		this->mRegisterLuaActions.insert(std::make_pair(name, pLuaFunction));
-		return pLuaFunction;
+		return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
 	}
 
-	XCode ActionManager::CallBindFunction(shared_ptr<TcpClientSession> tcpSession, const NetWorkPacket & callFunctionData, NetWorkPacket & returnData)
+	NetWorkActionBox * ActionManager::GetFunction(const std::string & name)
 	{
-		returnData.Clear();
-		const std::string & name = callFunctionData.func_name();
 		auto iter = this->mRegisterActions.find(name);
-		if (iter != this->mRegisterActions.end())
-		{
-			NetWorkActionBox * bindActionBox = iter->second;
-			return bindActionBox->Invoke(tcpSession, callFunctionData, returnData);
-		}
-
-		NetLuaAction * pLuaFunction = this->GetOrFindLuaFunction(name);
-		if (pLuaFunction == nullptr)
-		{
-			SayNoDebugError("Call Function " << name << " Not Exit");
-			return XCode::CallFunctionNotExist;
-		}
-		return pLuaFunction->Invoke(tcpSession, callFunctionData, returnData);
+		return iter != this->mRegisterActions.end() ? iter->second : nullptr;
 	}
 
 	void ActionManager::OnLoadLuaComplete(lua_State * luaEnv)

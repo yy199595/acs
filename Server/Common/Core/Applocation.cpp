@@ -2,6 +2,7 @@
 #include"Applocation.h"
 #include"ManagerFactory.h"
 #include<Util/FileHelper.h>
+#include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
@@ -18,10 +19,10 @@ namespace SoEasy
 	{
 		assert(!mApplocation);
 		mApplocation = this;
-		this->mFps = 0;
 		this->mDelatime = 0;
 		this->mLogicTime = 0;
 		this->mIsClose = false;
+		this->mThreadPool = nullptr;
 		this->mCurrentManager = nullptr;
 		this->mSrvConfigDirectory = configPath;
 		this->mAsioContext = new AsioContext();
@@ -57,6 +58,12 @@ namespace SoEasy
 			SayNoDebugError("not find field : Managers");
 			return false;
 		}
+		unsigned int count = 0;
+		if (mConfig.GetValue("ThreadCount", count))
+		{
+			this->mThreadPool = new ThreadPool(count);
+		}
+
 		for (size_t index = 0; index < managers.size(); index++)
 		{
 			const std::string & name = managers[index];
@@ -154,60 +161,58 @@ namespace SoEasy
 
 	int Applocation::LogicMainLoop()
 	{
-		long long sleepTime = 0;
 		long long interval = 1000 / 33;
 		long long fristTimer = TimeHelper::GetMilTimestamp();
 		long long startTimer = TimeHelper::GetMilTimestamp();
 		long long secondTimer = TimeHelper::GetMilTimestamp();
 		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();	
+		this->mLastSystemTime = TimeHelper::GetMilTimestamp();
+		int logicFps = 30;
+		int systemFps = 100;
+		mConfig.GetValue("LogicFps", logicFps);
+		mConfig.GetValue("SystemFps", systemFps);
+
+		const long long LogicUpdateInterval = 1000 / logicFps;
+		const long long systemUpdateInterval = 1000 / systemFps;
 
 		while (!this->mIsClose)
 		{
-			startTimer = TimeHelper::GetMilTimestamp();			
-			long long timeDiff = startTimer - this->mLastUpdateTime;			
-			this->mDelatime = (startTimer - mLastUpdateTime) / 1000.0f;	
-			if (timeDiff >= sleepTime)
+			startTimer = TimeHelper::GetMilTimestamp();
+			if (startTimer - mLastSystemTime >= systemUpdateInterval)
 			{
-				this->UpdateManager(mDelatime);
-				if (startTimer - secondTimer >= 1000)
+				for (size_t index = 0; index < this->mSortManagers.size(); index++)
 				{
-					for (size_t index = 0; index < this->mSortManagers.size(); index++)
-					{
-						this->mCurrentManager = this->mSortManagers[index];
-						this->mCurrentManager->OnSecondUpdate();
-					}
-					this->UpdateConsoleTitle();
-					secondTimer = startTimer;
+					this->mCurrentManager = this->mSortManagers[index];
+					this->mCurrentManager->OnSystemUpdate();
 				}
-
-				this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
-				this->mLogicTime = this->mLastUpdateTime - startTimer;
-				this->mFps = 1000.0f / (interval + this->mLogicTime);
-				sleepTime = interval - (this->mLastUpdateTime - startTimer);
-				std::this_thread::sleep_for(chrono::milliseconds(sleepTime));
+				startTimer = mLastSystemTime = TimeHelper::GetMilTimestamp();
 			}
-			
+
+			if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
+			{
+				for (size_t index = 0; index < this->mSortManagers.size(); index++)
+				{
+					this->mCurrentManager = this->mSortManagers[index];
+					this->mCurrentManager->OnFrameUpdate(this->mDelatime);
+				}
+				startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
+			}
+
+			if (startTimer - secondTimer >= 1000)
+			{
+				for (size_t index = 0; index < this->mSortManagers.size(); index++)
+				{
+					this->mCurrentManager = this->mSortManagers[index];
+					this->mCurrentManager->OnSecondUpdate();
+				}
+				this->UpdateConsoleTitle();
+				secondTimer = TimeHelper::GetMilTimestamp();
+			}
+			std::this_thread::sleep_for(chrono::milliseconds(1));
 		}
 		return this->Stop();
 	}
-	void Applocation::UpdateManager(float delatime)
-	{
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
-		{
-			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnSystemUpdate();
-		}
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
-		{
-			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnFrameUpdate(delatime);
-		}
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
-		{
-			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnFrameUpdateAfter();
-		}
-	}
+
 	void Applocation::UpdateConsoleTitle()
 	{
 #ifdef _WIN32

@@ -26,7 +26,7 @@ namespace SoEasy
 		template<typename T>
 		inline XCode Inovke4(shared_ptr<TcpClientSession>, long long id, T & t1);
 	public:
-		XCode Invoke(shared_ptr<TcpClientSession>, const NetWorkPacket & , NetWorkPacket &);
+		XCode Invoke(shared_ptr<TcpClientSession>, const shared_ptr<NetWorkPacket> , shared_ptr<NetWorkPacket>);
 	private:
 		int ref;
 		lua_State * luaEnv;

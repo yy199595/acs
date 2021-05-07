@@ -9,22 +9,26 @@
 #include<Manager/DownLoadManager.h>
 #include<Manager/ListenerManager.h>
 #include<Manager/MysqlManager.h>
+#include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
-{
-	TYPE_REFLECTION(MysqlManager);
-	TYPE_REFLECTION(TimerManager);
-	TYPE_REFLECTION(ScriptManager);
-	TYPE_REFLECTION(ActionManager);
-	TYPE_REFLECTION(AddressManager);
-	TYPE_REFLECTION(NetWorkManager);
-	TYPE_REFLECTION(CommandManager);
-	TYPE_REFLECTION(DownLoadManager);
-	TYPE_REFLECTION(ListenerManager);
-	TYPE_REFLECTION(CoroutineManager);
-}
 
 using namespace SoEasy;
+using namespace DataBase;
+
+TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
+TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
+TYPE_REFLECTION(SoEasy::ActionManager, "ActionManager");
+TYPE_REFLECTION(SoEasy::AddressManager, "AddressManager");
+TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
+TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
+TYPE_REFLECTION(SoEasy::DownLoadManager, "DownLoadManager");
+TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
+TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
+
+TYPE_REFLECTION(DataBase::RedisManager, "RedisManager");
+TYPE_REFLECTION(DataBase::MysqlManager, "MysqlManager");
+
+
 #ifdef _WIN32
 #pragma comment(lib,"lua53.lib")
 #pragma comment(lib,"Common.lib")
@@ -37,6 +41,7 @@ using namespace SoEasy;
 int main(int argc, char ** argv)
 {
 	ManagerFactory factory;
+	factory.RegisterManager<RedisManager>();
 	factory.RegisterManager<MysqlManager>();
 	factory.RegisterManager<TimerManager>();
 	factory.RegisterManager<ScriptManager>();

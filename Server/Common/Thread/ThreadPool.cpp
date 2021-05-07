@@ -2,58 +2,59 @@
 
 namespace SoEasy
 {
-	unsigned int ThreadPool::mThreadCount = 0;
-	std::vector<TaskThread *> ThreadPool::mTaskThreadList;
-	void ThreadPool::InitPool(unsigned int count)
+	ThreadPool::ThreadPool(unsigned int count)
 	{
-		mThreadCount = std::thread::hardware_concurrency();
-		mThreadCount = count == 0 ? mThreadCount : mThreadCount == 0 ? 2 : mThreadCount;
-		for (unsigned int index = 0; index < mThreadCount; index++)
+		unsigned int num = count == 0 ? std::thread::hardware_concurrency() : count;
+		for (unsigned int index = 0; index < num; index++)
 		{
 			TaskThread * taskThread = new TaskThread();
 			if (taskThread != nullptr)
 			{
 				SayNoDebugInfo("start thread id : " << taskThread->GetThreadId());
-				mTaskThreadList.push_back(taskThread);
+				this->mThreadMap.emplace(taskThread->GetThreadId(), taskThread);
 			}		
 		}
 	}
 
 	TaskThread * ThreadPool::GetTaskThread(long long id)
 	{
-		for (size_t index = 0; index < mTaskThreadList.size(); index++)
-		{
-			TaskThread * taskThread = mTaskThreadList[index];
-			if (taskThread->GetThreadId() == id)
-			{
-				return taskThread;
-			}
-		}
-		return nullptr;
+		auto iter = this->mThreadMap.find(id);
+		return iter != this->mThreadMap.end() ? iter->second : nullptr;
 	}
 
-	void ThreadPool::GetAllTaskThread(std::vector<TaskThread *> & threads)
+	void ThreadPool::GetAllTaskThread(std::vector<long long> & threads)
 	{
-		for (size_t index = 0; index < mTaskThreadList.size(); index++)
+		for (auto iter = this->mThreadMap.begin(); iter != this->mThreadMap.end(); iter++)
 		{
-			TaskThread * taskThread = mTaskThreadList[index];
-			threads.push_back(taskThread);
+			threads.push_back(iter->first);
 		}
 	}
 
 	bool ThreadPool::StartTaskAction(std::shared_ptr<ThreadTaskAction> taskAction)
 	{
-		std::sort(mTaskThreadList.begin(), mTaskThreadList.end(), [](TaskThread * t1, TaskThread * t2)
+		if (this->mThreadMap.empty())
 		{
-			return t1->GetTaskSize() < t2->GetTaskSize();
-		});
-		auto iter = mTaskThreadList.begin();
-		if (iter != mTaskThreadList.end())
-		{
-			TaskThread * taskThread = (*iter);
-			taskThread->AddTaskAction(taskAction);
-			return true;
+			return false;
 		}
-		return false;
+		auto iter = this->mThreadMap.begin();
+		size_t size = iter->second->GetTaskSize();
+		long long threadId = iter->second->GetThreadId();
+		for (; iter != this->mThreadMap.end(); iter++)
+		{
+			TaskThread * taskThread = iter->second;
+			if (taskThread->GetTaskSize() == 0)
+			{
+				taskThread->AddTaskAction(taskAction);
+				return true;
+			}
+			if (taskThread->GetTaskSize() < size)
+			{
+				size = taskThread->GetTaskSize();
+				threadId = taskThread->GetThreadId();
+			}
+		}
+		TaskThread * taskThread = this->GetTaskThread(threadId);
+		taskThread->AddTaskAction(taskAction);
+		return true;
 	}
 }

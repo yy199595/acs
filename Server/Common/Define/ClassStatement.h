@@ -13,12 +13,12 @@ namespace SoEasy
 
 	//template<typename T, typename Base>
 	
-#define TYPE_REFLECTION(T)					\
+#define TYPE_REFLECTION(T,name)					\
 	template<> struct TypeReflection<T>	\
 	{												\
 	public:											\
 		static constexpr bool Value = true;		\
-		static constexpr char * Name = (char*)#T;		\
+		static constexpr char * Name = (char*)name;		\
 		static constexpr size_t Size = sizeof(T);	\
 	}
 #define ChildType(type, base) typename std::enable_if<std::is_base_of<base,type>::value && TypeReflection<type>::Value, type>::type

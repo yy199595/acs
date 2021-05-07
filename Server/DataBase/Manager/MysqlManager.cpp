@@ -5,12 +5,48 @@
 #include<Coroutine/CoroutineManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlTaskAction.h>
-
-namespace SoEasy
+#include<Util/StringHelper.h>
+namespace DataBase
 {
 	MysqlManager::MysqlManager()
 	{
-		
+		this->mThreadPool = 0;
+		this->mMysqlPort = 0;
+	}
+
+	bool MysqlManager::OnInit()
+	{
+		this->mThreadPool = this->GetApp()->GetThreadPool();
+		SayNoAssertRetFalse_F(this->mThreadPool);
+		this->mCoroutineManager = this->GetManager<CoroutineManager>();
+		SayNoAssertRetFalse_F(this->mCoroutineManager);
+
+		std::string mysqlAddress;
+		if (!GetConfig().GetValue("MysqlAddress", mysqlAddress))
+		{
+			SayNoDebugError("not find field 'MysqlAddress'");
+			return false;
+		}
+
+		if (!StringHelper::ParseIpAddress(mysqlAddress, mMysqlIp, mMysqlPort))
+		{
+			SayNoDebugError("parse 'MysqlAddress' fail");
+			return false;
+		}
+
+		if (!GetConfig().GetValue("MysqlUserName", mDataBaseUser))
+		{
+			SayNoDebugError("not find field 'MysqlUserName'");
+			return false;
+		}
+
+		if (!GetConfig().GetValue("MysqlPassWord", mDataBasePasswd))
+		{
+			SayNoDebugError("not find field 'MysqlPassWord'");
+			return false;
+		}
+		REGISTER_FUNCTION_1(MysqlManager::QueryTable, StringArray);
+		return this->StartConnectMysql();
 	}
 
 	SayNoMysqlSocket * MysqlManager::GetMysqlSocket(long long threadId)
@@ -19,18 +55,19 @@ namespace SoEasy
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	XMysqlErrorCode MysqlManager::QueryData(const char * db, const std::string & sql)
+	XMysqlCode MysqlManager::QueryData(const std::string db, const std::string & sql)
 	{
 		long long id = this->mCoroutineManager->GetCurrentCorId();
 		if (id == 0)
 		{
-			return XMysqlErrorCode::MysqlNotInCoroutine;
+			return XMysqlCode::MysqlNotInCoroutine;
 		}
 		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
 
-		if (ThreadPool::StartTaskAction(taskAction) == false)
+		
+		if (!mThreadPool->StartTaskAction(taskAction))
 		{
-			return XMysqlErrorCode::MysqlStartTaskFail;
+			return XMysqlCode::MysqlStartTaskFail;
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
 
@@ -38,18 +75,19 @@ namespace SoEasy
 		return taskAction->GetQueryData()->GetErrorCode();
 	}
 
-	XMysqlErrorCode MysqlManager::QueryData(const char * db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData)
+	XMysqlCode MysqlManager::QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData)
 	{
 		long long id = this->mCoroutineManager->GetCurrentCorId();
 		if (id == 0)
 		{
-			return XMysqlErrorCode::MysqlNotInCoroutine;
+			return XMysqlCode::MysqlNotInCoroutine;
 		}
 		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
 		
-		if (ThreadPool::StartTaskAction(taskAction) == false)
+		
+		if (!mThreadPool->StartTaskAction(taskAction))
 		{
-			return XMysqlErrorCode::MysqlStartTaskFail;
+			return XMysqlCode::MysqlStartTaskFail;
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
 
@@ -58,36 +96,7 @@ namespace SoEasy
 		return queryData->GetErrorCode();
 	}
 
-	bool MysqlManager::OnInit()
-	{
-		this->mCoroutineManager = this->GetManager<CoroutineManager>();
-		SayNoAssertRetFalse_F(this->mCoroutineManager);
-		if (!GetConfig().GetValue("MysqlIp", this->mMysqlConfig.mIp))
-		{
-			SayNoDebugError("not find field 'MysqlIp'");
-			return false;
-		}
-
-		if (!GetConfig().GetValue("MysqlPort", this->mMysqlConfig.mPort))
-		{
-			SayNoDebugError("not find field 'MysqlPort'");
-			return false;
-		}
-
-		if (!GetConfig().GetValue("MysqlUserName", this->mMysqlConfig.mUserName))
-		{
-			SayNoDebugError("not find field 'MysqlUserName'");
-			return false;
-		}
-
-		if (!GetConfig().GetValue("MysqlPassWord", this->mMysqlConfig.mPassCode))
-		{
-			SayNoDebugError("not find field 'MysqlPassWord'");
-			return false;
-		}
-		
-		return true;
-	}
+	
 
 	void MysqlManager::OnTaskFinish(long long id)
 	{
@@ -102,61 +111,38 @@ namespace SoEasy
 
 	bool MysqlManager::StartConnectMysql()
 	{
-		const char * ip = this->mMysqlConfig.mIp.c_str();
-		const unsigned short port = this->mMysqlConfig.mPort;
-		const char * passWd = this->mMysqlConfig.mPassCode.c_str();
-		const char * userName = this->mMysqlConfig.mUserName.c_str();
-		SayNoDebugLog("start connect mysql " << this->mMysqlConfig.ToString());
-
-		std::vector<TaskThread *> taskThreads;
-		ThreadPool::GetAllTaskThread(taskThreads);
+		const char * ip = this->mMysqlIp.c_str();
+		const unsigned short port = this->mMysqlPort;
+		const char * passWd = this->mDataBasePasswd.c_str();
+		const char * userName = this->mDataBaseUser.c_str();
+		
+		std::vector<long long> taskThreads;
+		this->mThreadPool->GetAllTaskThread(taskThreads);
 		for (size_t index = 0; index < taskThreads.size(); index++)
 		{
-			TaskThread * taskThread = taskThreads[index];
+			long long threadId = taskThreads[index];
 			SayNoMysqlSocket * mysqlSocket1 = mysql_init((MYSQL*)0);
 			SayNoMysqlSocket * mysqlSocket = mysql_real_connect(mysqlSocket1, ip, userName, passWd, NULL, port, NULL, CLIENT_MULTI_STATEMENTS);
 			if (mysqlSocket == nullptr)
 			{
-				SayNoDebugError("connect mysql failure " << this->mMysqlConfig.ToString());
+				SayNoDebugError("connect mysql failure " << ip << ":" << port << "  " << userName << " " << passWd);
 				return false;
 			}
-			long long id = taskThread->GetThreadId();
-			this->mMysqlSocketMap.insert(std::make_pair(id, mysqlSocket));
+			this->mMysqlSocketMap.insert(std::make_pair(threadId, mysqlSocket));
+			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
-
-		SayNoDebugInfo("connect mysql successful " << this->mMysqlConfig.ToString());
-		
-			this->mCoroutineManager->Start([this]()
-			{
-				while (true)
-				{
-					std::shared_ptr<MysqlQueryData> queryData;
-					std::string sql = "select * from player_risk";
-					const long long t1 = TimeHelper::GetMilTimestamp();
-					XMysqlErrorCode code = this->QueryData("shouhuzhemen299_db", sql, queryData);
-					if (code == XMysqlErrorCode::MysqlSuccessful)
-					{
-						const long long t2 = TimeHelper::GetMilTimestamp();
-						SayNoDebugWarning("query data count " << queryData->GetColumnCount() << "  delay = " << t2 - t1);
-					}
-					this->mCoroutineManager->Sleep(1000);
-				}			
-			});
-		
-
 		return true;
 	}
-
-	bool MysqlManager::ConnectRedis()
+	XCode MysqlManager::QueryTable(shared_ptr<TcpClientSession> session, long long id, const StringArray & requestData)
 	{
-		/*timeval timeOut;
-		timeOut.tv_sec = 3000;
-		timeOut.tv_usec = 3000;
-		const char * ip = this->mRedisConfig.mIp.c_str();
-		const unsigned short port = this->mRedisConfig.mPort;
-		SayNoDebugLog("connect redis ip:" << ip << " port:" << port);
-		this->mRedisReaderSession = redisConnectWithTimeout(ip, port, timeOut);
-		this->mRedisWriterSession = redisConnectWithTimeout(ip, port, timeOut);*/
-		return true;
+		char buffer[100] = { 0 };
+		const std::string db = requestData.data_array(0);
+		const std::string table = requestData.data_array(1);
+		sprintf_s(buffer, "select * from %s;", table.c_str());
+		long long t1 = TimeHelper::GetMilTimestamp();
+		XMysqlCode code = this->QueryData(db, buffer);
+		SayNoDebugFatal("query time = " << TimeHelper::GetMilTimestamp() - t1);
+
+		return XCode::Successful;
 	}
 }

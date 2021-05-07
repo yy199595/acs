@@ -12,11 +12,11 @@ namespace SoEasy
 		
 	}
 
-	void NetWorkRetActionBoxLua::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData)
+	void NetWorkRetActionBoxLua::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData.error_code();
-		const std::string & name = backData.protoc_name();
-		const std::string & message = backData.message_data();
+		XCode code = (XCode)backData->error_code();
+		const std::string & name = backData->protoc_name();
+		const std::string & message = backData->message_data();
 		if (!message.empty())
 		{
 			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
@@ -36,9 +36,9 @@ namespace SoEasy
 		this->mFunctionName = name;
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
 	}
-	void NetWorkRetActionBox1::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData)
+	void NetWorkRetActionBox1::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData.error_code();
+		XCode code = (XCode)backData->error_code();
 		if (this->mBindLuaAction)
 		{
 			this->mBindLuaAction->Inovke(code);
@@ -52,11 +52,11 @@ namespace SoEasy
 
 	}
 
-	void NetWorkWaitActionBoxLua::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData)
+	void NetWorkWaitActionBoxLua::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData.error_code();
-		const std::string & name = backData.protoc_name();
-		const std::string & message = backData.message_data();
+		XCode code = (XCode)backData->error_code();
+		const std::string & name = backData->protoc_name();
+		const std::string & message = backData->message_data();
 		if (!message.empty())
 		{
 			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
@@ -77,10 +77,10 @@ namespace SoEasy
 		this->mCoroutineId = mgr->GetCurrentCorId();
 	}
 
-	void NetWorkWaitCorAction::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData)
+	void NetWorkWaitCorAction::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
-		this->mCode = (XCode)backData.error_code();
-		this->mMessage = backData.message_data();
+		this->mCode = (XCode)backData->error_code();
+		this->mMessage = backData->message_data();
 		this->mScheduler->Resume(mCoroutineId);
 	}
 }

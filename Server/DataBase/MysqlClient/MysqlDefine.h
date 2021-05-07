@@ -10,16 +10,17 @@
 #include<unordered_map>
 #include<Thread/ThreadTaskAction.h>
 using namespace std;
-namespace SoEasy
+using namespace SoEasy;
+namespace DataBase
 {
 	class MysqlManager;
 	typedef  MYSQL_RES MysqlQueryResult;
 	typedef MYSQL SayNoMysqlSocket;
 }
 
-namespace SoEasy
+namespace DataBase
 {
-	enum XMysqlErrorCode
+	enum XMysqlCode
 	{
 		MysqlSuccessful,		//成功
 		MysqlFailure,			//失败
@@ -31,7 +32,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace DataBase
 {
 	class MysqlQueryLine
 	{
@@ -48,7 +49,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace DataBase
 {
 	class MysqlQueryData
 	{
@@ -60,49 +61,18 @@ namespace SoEasy
 		friend class MysqlTaskAction;
 		size_t GetRowCount() { return mFiledMap.size(); }	//获取有多少个字段
 		size_t GetColumnCount() { return mContentVector.size(); }	//获取有多少行
-		XMysqlErrorCode GetErrorCode() { return this->mErrorCode; }
+		XMysqlCode GetErrorCode() { return this->mErrorCode; }
 		std::shared_ptr<MysqlQueryLine> GetLineData(size_t col = 0);	//获取一行数据
 		const std::string & GetErrorMessage() { return this->mErrorMessage; }	//获取错误消息
 	public:
 		bool AddFieldName(const char * name, size_t len, int pos);
 		void AddFieldContent(int row, const char * data, size_t len);
-		void SetErrorCode(XMysqlErrorCode code) { this->mErrorCode = code; }
+		void SetErrorCode(XMysqlCode code) { this->mErrorCode = code; }
 		void SetErrorMessage(const char * msg) { this->mErrorMessage = msg; }
 	private:
+		XMysqlCode mErrorCode;
 		std::string mErrorMessage;
-		XMysqlErrorCode mErrorCode;
 		std::unordered_map<std::string, int> mFiledMap;
 		std::vector<std::vector<std::string>> mContentVector;
-	};
-}
-
-namespace SoEasy
-{
-	struct SayNoMySqlConfig
-	{
-		SayNoMySqlConfig() : mPort(0) { }
-	public:
-		std::string mIp;
-		unsigned short mPort;
-		std::string mUserName;
-		std::string mPassCode;
-	public:
-		const std::string ToString()
-		{
-			std::stringstream buffer;
-			buffer << "ip:" << mIp << ",";
-			buffer << "port:" << mPort << ",";
-			buffer << "username:" << mUserName << ",";
-			return buffer.str();
-		}
-	};
-
-	struct SayNoRedisConfig
-	{
-	public:
-		SayNoRedisConfig() : mPort(0) {}
-	public:
-		std::string mIp;
-		unsigned short mPort;
 	};
 }

@@ -9,7 +9,7 @@ using namespace PB;
 namespace SoEasy
 {
 
-	using RegisterAction = std::function<XCode(const std::string &, NetWorkPacket &)>;
+	using RegisterAction = std::function<XCode(const std::string &, shared_ptr<NetWorkPacket>)>;
 
 	using NetWorkAction1 = std::function<XCode(shared_ptr<TcpClientSession>, long long)>;
 
@@ -31,7 +31,7 @@ namespace SoEasy
 		void BindLuaFunction(NetLuaAction * func);
 	public:
 		const std::string & GetName() { return this->mActionName; }
-		virtual XCode Invoke(shared_ptr<TcpClientSession>, const NetWorkPacket & requestData, NetWorkPacket &) = 0;
+		virtual XCode Invoke(shared_ptr<TcpClientSession>, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket>) = 0;
 	protected:
 		std::string mActionName;
 		NetLuaAction * mLuaFunction;
@@ -46,7 +46,7 @@ namespace SoEasy
 		NetWorkActionBox1(NetWorkAction1 action, std::string & name) 
 			: NetWorkActionBox(name), mBindAction(action) { }
 	public:
-		XCode Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & requestData, NetWorkPacket & returnData) override;
+		XCode Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
 	private:
 		NetWorkAction1 mBindAction;
 	};
@@ -59,19 +59,19 @@ namespace SoEasy
 	{
 	public:
 		NetWorkActionBox2(NetWorkAction2<T1> action, std::string & name) :NetWorkActionBox(name), mBindAction(action) { }
-		XCode Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & requestData, NetWorkPacket & returnData) override;
+		XCode Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
 	private:
 		T1 mRequestData;
 		NetWorkAction2<T1> mBindAction;
 
 	};
 	template<typename T1>
-	inline XCode NetWorkActionBox2<T1>::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & requestData, NetWorkPacket & returnData)
+	inline XCode NetWorkActionBox2<T1>::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{
 		mRequestData.Clear();
-		const long long operId = requestData.operator_id();
-		const std::string & name = requestData.protoc_name();
-		const std::string & message = requestData.message_data();
+		const long long operId = requestData->operator_id();
+		const std::string & name = requestData->protoc_name();
+		const std::string & message = requestData->message_data();
 		if (!mRequestData.ParseFromArray(message.c_str(), message.size()))
 		{
 			SayNoDebugError("parse proto fail : " << name);
@@ -97,7 +97,7 @@ namespace SoEasy
 		NetWorkActionBox3(NetWorkAction3<T1, T2> action, std::string & name) 
 			:NetWorkActionBox(name), mBindAction(action) { }
 	public:
-		XCode Invoke(shared_ptr<TcpClientSession>session, const NetWorkPacket & requestData, NetWorkPacket & returnData) override;
+		XCode Invoke(shared_ptr<TcpClientSession>session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
 	private:
 		T2 mReturnData;
 		T1 mRequestData;
@@ -105,13 +105,13 @@ namespace SoEasy
 		NetWorkAction3<T1, T2> mBindAction;
 	};
 	template<typename T1, typename T2>
-	inline XCode NetWorkActionBox3<T1, T2>::Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & requestData, NetWorkPacket & returnData)
+	inline XCode NetWorkActionBox3<T1, T2>::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{
 		mReturnData.Clear();
 		mRequestData.Clear();
-		const long long operId = requestData.operator_id();
-		const std::string & name = requestData.protoc_name();
-		const std::string & message = requestData.message_data();
+		const long long operId = requestData->operator_id();
+		const std::string & name = requestData->protoc_name();
+		const std::string & message = requestData->message_data();
 		if (!mRequestData.ParseFromArray(message.c_str(), message.size()))
 		{		
 			SayNoDebugError("parse proto fail : " << mRequestData.GetTypeName());
@@ -133,8 +133,8 @@ namespace SoEasy
 			SayNoDebugError("parse protobuf fail type : " << typeid(T2).name());
 			return XCode::ParseMessageError;
 		}
-		returnData.set_message_data(mMessageBuffer);
-		returnData.set_protoc_name(mReturnData.GetTypeName());
+		returnData->set_message_data(mMessageBuffer);
+		returnData->set_protoc_name(mReturnData.GetTypeName());
 		return code;
 	}
 }
@@ -146,10 +146,10 @@ namespace SoEasy
 	{
 	public:
 		NetWorkActionBox4(NetWorkAction4<T1> action, std::string & name) :NetWorkActionBox(name), mBindAction(action) { }
-		XCode Invoke(shared_ptr<TcpClientSession>session, const NetWorkPacket & requestData, NetWorkPacket & returnData) override
+		XCode Invoke(shared_ptr<TcpClientSession>session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override
 		{					
 			mReturnData.Clear();
-			const long long operId = requestData.operator_id();
+			const long long operId = requestData->operator_id();
 			XCode code = this->mLuaFunction == nullptr 
 				? this->mBindAction(session, operId, mReturnData)
 				: this->mLuaFunction->Inovke4(session, operId, mReturnData);
@@ -159,8 +159,8 @@ namespace SoEasy
 				SayNoDebugError("parse protobuf fail type : " << typeid(T1).name());
 				return XCode::ParseMessageError;
 			}
-			returnData.set_message_data(mMessageBuffer);
-			returnData.set_protoc_name(mReturnData.GetTypeName());
+			returnData->set_message_data(mMessageBuffer);
+			returnData->set_protoc_name(mReturnData.GetTypeName());
 			return code;
 		}
 	private:

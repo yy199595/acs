@@ -7,14 +7,14 @@ namespace SoEasy
 	class ThreadPool
 	{
 	public:	
-		static void InitPool(unsigned int count = 0);	//启动线程池数量
-		static TaskThread * GetTaskThread(long long id);
-		static void GetAllTaskThread(std::vector<TaskThread *> & threads);
-		static bool StartTaskAction(std::shared_ptr<ThreadTaskAction> taskAction);
-	public:
-		static unsigned int GetThreadCount() { return mThreadCount; }
+		ThreadPool(unsigned int count = 0);	//启动线程池数量
+		TaskThread * GetTaskThread(long long id);
+		void GetAllTaskThread(std::vector<long long> & threads);
+		bool StartTaskAction(std::shared_ptr<ThreadTaskAction> taskAction);
+	public:	
+		size_t GetThreadCount() { return mThreadMap.size(); }
+		static unsigned int GetConcurrencyCount() { return thread::hardware_concurrency(); }
 	private:
-		static unsigned int mThreadCount;
-		static std::vector<TaskThread *> mTaskThreadList;
+		std::unordered_map<long long, TaskThread *> mThreadMap;
 	};
 }

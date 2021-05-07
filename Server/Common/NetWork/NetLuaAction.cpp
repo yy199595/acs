@@ -36,7 +36,7 @@ namespace SoEasy
 		return XCode::CallLuaFunctionFail;
 	}
 
-	XCode NetLuaAction::Invoke(shared_ptr<TcpClientSession> tcpSession, const NetWorkPacket & requestData, NetWorkPacket & returnData)
+	XCode NetLuaAction::Invoke(shared_ptr<TcpClientSession> tcpSession, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
 		if (!lua_isfunction(this->luaEnv, -1))
@@ -44,9 +44,9 @@ namespace SoEasy
 			return XCode::CallLuaFunctionFail;
 		}
 		int argsCount = 2;
-		const long long operatorId = requestData.operator_id();
-		const std::string & name = requestData.protoc_name();
-		const std::string & message = requestData.message_data();
+		const long long operatorId = requestData->operator_id();
+		const std::string & name = requestData->protoc_name();
+		const std::string & message = requestData->message_data();
 		LuaParameter::Write<shared_ptr<TcpClientSession>>(this->luaEnv, tcpSession);
 		lua_pushinteger(this->luaEnv, operatorId);
 		if (!message.empty() && lua_getfunction(this->luaEnv, "JsonUtil", "ToObject"))
@@ -82,8 +82,8 @@ namespace SoEasy
 			Message * pRetMessage = (Message *)lua_touserdata(this->luaEnv, -1);
 			if (pRetMessage != nullptr && pRetMessage->SerializePartialToString(&messageBuffer))
 			{
-				returnData.set_message_data(messageBuffer);
-				returnData.set_protoc_name(pRetMessage->GetTypeName());
+				returnData->set_message_data(messageBuffer);
+				returnData->set_protoc_name(pRetMessage->GetTypeName());
 			}
 		}
 		else if (lua_istable(this->luaEnv, -1) && lua_getfunction(this->luaEnv, "JsonUtil", "ToString"))
@@ -96,7 +96,7 @@ namespace SoEasy
 			}
 			size_t size = 0;
 			const char * json = lua_tolstring(this->luaEnv, -1, &size);
-			returnData.set_message_data(json, size);
+			returnData->set_message_data(json, size);
 		}
 		return code;
 	}

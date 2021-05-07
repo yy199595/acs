@@ -79,29 +79,21 @@ namespace SoEasy
 		shared_ptr<TcpClientSession> pTcpSession = this->mNetWorkManager->GetSessionByAdress(address);
 		SayNoAssertRet(pTcpSession, "not find session : " << address << " size = " << size);
 
-		NetWorkPacket nNetMsgPackage;
-		if (!nNetMsgPackage.ParseFromArray(msg, size))
+		shared_ptr<NetWorkPacket> nNetMsgPackage = make_shared<NetWorkPacket>();
+		if (!nNetMsgPackage->ParseFromArray(msg, size))
 		{
 			SayNoDebugError("parse message pack fail : " << address << " size = " << size);
 			return;
 		}
-		if (!nNetMsgPackage.func_name().empty())
+		if (!nNetMsgPackage->func_name().empty())
 		{
-			const std::string & name = nNetMsgPackage.func_name();
+			const std::string & name = nNetMsgPackage->func_name();
 			this->mFunctionManager->Call(pTcpSession, name, nNetMsgPackage);
 		}
-		else if (nNetMsgPackage.callback_id() != 0)
+		else if (nNetMsgPackage->callback_id() != 0)
 		{
-			const long long id = nNetMsgPackage.callback_id();
+			const long long id = nNetMsgPackage->callback_id();
 			this->mFunctionManager->Call(pTcpSession, id, nNetMsgPackage);
-		}
-		else
-		{
-			std::string json;
-			if (ProtocHelper::GetJsonString(nNetMsgPackage, json))
-			{
-				SayNoDebugError("unknow message : " << json);
-			}
 		}
 	}
 

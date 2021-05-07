@@ -23,7 +23,7 @@ namespace SoEasy
 		long long GetCreateTime() { return this->mCreateTime; }
 		std::string & GetFunctionName() { return this->mFunctionName; }
 	public:
-		virtual void Invoke(shared_ptr<TcpClientSession>, const NetWorkPacket & backData) = 0;
+		virtual void Invoke(shared_ptr<TcpClientSession>, const shared_ptr<NetWorkPacket> backData) = 0;
 	private:
 		long long mActionKey;
 		long long mCreateTime;
@@ -48,7 +48,7 @@ namespace SoEasy
 		~NetWorkRetActionBox1() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData) override;
+		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;
 	private:
 		NetWorkRetAction1 mBindAction;
 		NetLuaRetAction * mBindLuaAction;
@@ -64,13 +64,13 @@ namespace SoEasy
 		~NetWorkRetActionBox2() { }
 
 	public:
-		void Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData) override
+		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override
 		{
 			mReturnData.Clear();
 			XCode code = (XCode)backData.error_code();
 			if (code != XCode::TimeoutAutoCall)
 			{
-				const std::string & message = backData.message_data();			
+				const std::string & message = backData->message_data();			
 				if (!mReturnData.ParseFromArray(message.c_str(), message.size()))
 				{
 					this->mBindAction(session, XCode::ParseMessageError, mReturnData);
@@ -94,7 +94,7 @@ namespace SoEasy
 		~NetWorkRetActionBoxLua() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData);
+		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData);
 	private:
 		NetLuaRetAction * mBindLuaAction;
 	};
@@ -107,7 +107,7 @@ namespace SoEasy
 		~NetWorkWaitActionBoxLua() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData) override;
+		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;
 	private:
 		NetLuaWaitAction * mBindLuaAction;
 	};
@@ -119,7 +119,7 @@ namespace SoEasy
 	public:
 		NetWorkWaitCorAction(std::string name, CoroutineManager *);
 	public:
-		void Invoke(shared_ptr<TcpClientSession> session, const NetWorkPacket & backData) override;
+		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;
 	public:
 		XCode GetCode() { return this->mCode; }
 		const std::string & GetMsgData() { return this->mMessage; }

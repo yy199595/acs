@@ -13,7 +13,7 @@ namespace SoEasy
 		void WaitToNextWake();
 		long long GetThreadId() { return mThreadId; }
 		void AddTaskAction(SharedThreadTask taskAction);
-		size_t GetTaskSize() { return this->mWaitInvokeTask.size() + this->mTaskBuffer.size(); }
+		size_t GetTaskSize() const { return this->mWaitInvokeTask.size() + this->mTaskBuffer.size(); }
 	private:
 		void Run();
 	private:

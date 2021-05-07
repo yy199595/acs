@@ -16,6 +16,7 @@ using namespace asio::ip;
 namespace SoEasy
 {
 	class Manager;
+	class ThreadPool;
 	class ManagerFactory;
 	class Applocation
 	{
@@ -23,7 +24,7 @@ namespace SoEasy
 		Applocation(const std::string srvName, ManagerFactory & factory, const std::string configPath);
 		virtual ~Applocation() {};
 	public:
-		inline float GetFps() { return this->mFps; }
+		ThreadPool * GetThreadPool() { return mThreadPool; }
 		ServerConfig & GetConfig() { return this->mConfig; }
 		inline float GetDelaTime() { return this->mDelatime; }
 		inline long long GetLogicTime() { return this->mLogicTime; }
@@ -53,23 +54,26 @@ namespace SoEasy
 		void UpdateConsoleTitle();
 	private:
 		int  LogicMainLoop();
-		void UpdateManager(float delatime);
 	private:
 		AsioWork * mAsioWork;
 		std::thread * mNetThread;
 		AsioContext * mAsioContext;
 	private:
-		float mFps;
 		bool mIsClose;
-		float mDelatime;
 		long long mLogicTime;
 		long long mStartTime;
 		ServerConfig mConfig;
 		long long mLastUpdateTime;
+		long long mLastSystemTime;
 		Manager * mCurrentManager;	
 		class LogHelper * mLogHelper;
 		std::string mSrvConfigDirectory;
 	private:
+		float mLogicFps;
+		float mDelatime;
+		float mSystemFps;
+	private:
+		ThreadPool * mThreadPool;
 		ManagerFactory & mManagerFactory;
 		static Applocation * mApplocation;
 		std::vector<Manager *> mSortManagers;
