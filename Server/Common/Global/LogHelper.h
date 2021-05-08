@@ -5,14 +5,7 @@
 #include<spdlog/sinks/stdout_color_sinks.h>
 namespace SoEasy
 {
-	enum ELogType
-	{
-		Info,
-		Debug,
-		Warning,
-		Error,
-		Fatal,
-	};
+	using ELogType = spdlog::level::level_enum;
 
 	class LogConsole
 	{

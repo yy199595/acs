@@ -84,7 +84,11 @@ namespace SoEasy
 		if (iter != mLogHelper->mLoggerMap.end())
 		{
 			iter->second->ShowMessage(log);
+			
+			mLogHelper->mLogger->log((spdlog::level::level_enum)type, log);
+			mLogHelper->mLogger->flush();
 		}
+		
 	}
 
 	LogHelper::LogHelper(const std::string path, const std::string name)
@@ -96,13 +100,12 @@ namespace SoEasy
 		mLogHelper = this;
 		std::stringstream pathStream;
 		this->mLogPath = path + "/" + name + "_" + TimeHelper::GetYearMonthDayString();
-		this->mLogger = spdlog::rotating_logger_mt(name, this->mLogPath, 100000, 100);
+		this->mLogger = spdlog::rotating_logger_mt(name, this->mLogPath + ".log", 100000, 100);
 
-		this->mLoggerMap.insert(std::make_pair(ELogType::Info, new LogInfoConsole()));
-		this->mLoggerMap.insert(std::make_pair(ELogType::Error, new LogErrorConsole()));
-		this->mLoggerMap.insert(std::make_pair(ELogType::Fatal, new LogFatalConsole()));
-		this->mLoggerMap.insert(std::make_pair(ELogType::Debug, new LogDebugConsole()));
-		this->mLoggerMap.insert(std::make_pair(ELogType::Warning, new LogWarningConsole()));
-
+		this->mLoggerMap.insert(std::make_pair(ELogType::info, new LogInfoConsole()));
+		this->mLoggerMap.insert(std::make_pair(ELogType::err, new LogErrorConsole()));
+		this->mLoggerMap.insert(std::make_pair(ELogType::critical, new LogFatalConsole()));
+		this->mLoggerMap.insert(std::make_pair(ELogType::debug, new LogDebugConsole()));
+		this->mLoggerMap.insert(std::make_pair(ELogType::warn, new LogWarningConsole()));
 	}
 }

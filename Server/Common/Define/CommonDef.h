@@ -41,17 +41,17 @@ inline std::string FromatFileLine(const char * file, const int line)
 
 #define TypeLimit(base,child) typename std::enable_if<std::is_base_of<base, child>::value, T>::type
 
-#define SayNoCommonLog(msg)		SAYNO_LOG(SoEasy::Debug, msg)
-#define SayNoCommonError(msg)	SAYNO_LOG(SoEasy::Error, msg)
-#define SayNoCommonWarning(msg) SAYNO_LOG(SoEasy::Warning, msg)
-#define SayNoCommonFatal(msg)	SAYNO_LOG(SoEasy::Fatal, msg)
-#define SayNoCommonInfo(msg)	SAYNO_LOG(SoEasy::Info, msg)
+#define SayNoCommonLog(msg)		SAYNO_LOG(SoEasy::ELogType::debug, msg)
+#define SayNoCommonError(msg)	SAYNO_LOG(SoEasy::ELogType::err, msg)
+#define SayNoCommonWarning(msg) SAYNO_LOG(SoEasy::ELogType::warn, msg)
+#define SayNoCommonFatal(msg)	SAYNO_LOG(SoEasy::ELogType::critical, msg)
+#define SayNoCommonInfo(msg)	SAYNO_LOG(SoEasy::ELogType::info, msg)
 
-#define SayNoDebugLog(msg)		SAYNO_LOG(SoEasy::Debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugWarning(msg)	SAYNO_LOG(SoEasy::Warning, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugError(msg)	SAYNO_LOG(SoEasy::Error, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugFatal(msg)	SAYNO_LOG(SoEasy::Fatal, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugInfo(msg)		SAYNO_LOG(SoEasy::Info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugLog(msg)		SAYNO_LOG(SoEasy::ELogType::debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugWarning(msg)	SAYNO_LOG(SoEasy::ELogType::warn, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugError(msg)	SAYNO_LOG(SoEasy::ELogType::err, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugFatal(msg)	SAYNO_LOG(SoEasy::ELogType::critical, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugInfo(msg)		SAYNO_LOG(SoEasy::ELogType::info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
 
 
 #define SayNoAssertError(obj, msg, val) { bool bCode = !(obj); if(bCode) { SayNoDebugError(#obj<< "  "  << msg); val; } }
