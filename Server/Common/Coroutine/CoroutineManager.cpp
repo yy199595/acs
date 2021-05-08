@@ -222,10 +222,10 @@ namespace SoEasy
 		memcpy(cor->mContextStack, &dummy, cor->mStackSize);
 	}
 
-	XCode CoroutineManager::Call(shared_ptr<TcpClientSession> session, const std::string func, Message & returnData)
+	XCode CoroutineManager::Call(const std::string func, Message & returnData)
 	{		
 		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(session, func, nullptr, callBack);
+		XCode code = this->SendCallMessage(func, nullptr, callBack);
 		if (code == XCode::Successful)
 		{
 			this->YieldReturn();
@@ -238,10 +238,10 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode CoroutineManager::Call(shared_ptr<TcpClientSession> session, const std::string func, const Message * message)
+	XCode CoroutineManager::Call(const std::string func, const Message * message)
 	{
 		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(session, func, message, callBack);
+		XCode code = this->SendCallMessage(func, message, callBack);
 		if (code == XCode::Successful)
 		{
 			this->YieldReturn();
@@ -250,10 +250,10 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode CoroutineManager::Call(shared_ptr<TcpClientSession> session, const std::string func, const Message * message, Message & returnData)
+	XCode CoroutineManager::Call(const std::string func, const Message * message, Message & returnData)
 	{
 		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(session, func, message, callBack);
+		XCode code = this->SendCallMessage(func, message, callBack);
 		if (code == XCode::Successful)
 		{
 			this->YieldReturn();
@@ -266,13 +266,8 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode CoroutineManager::SendCallMessage(shared_ptr<TcpClientSession> session, const std::string & func, const Message * message, NetWorkRetActionBox * callBack)
+	XCode CoroutineManager::SendCallMessage(const std::string & func, const Message * message, NetWorkRetActionBox * callBack)
 	{
-		if (session == nullptr)
-		{
-			return XCode::SessionIsNull;
-		}
-
 		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
 
 		if (message != nullptr)
@@ -288,8 +283,7 @@ namespace SoEasy
 		callData->set_func_name(func);
 		callData->set_callback_id(id);
 
-		const std::string & address = session->GetAddress();
-		if (!this->mNetWorkManager->SendMessageByAdress(address, callData))
+		if (!this->mNetWorkManager->SendMessageByName(func, callData))
 		{
 			return XCode::SendMessageFail;
 		}

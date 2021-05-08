@@ -72,9 +72,6 @@
     <ClCompile Include="Manager\CommandManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\DownLoadManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\ListenerManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -267,9 +264,6 @@
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CommandManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\DownLoadManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\ListenerManager.h">

@@ -6,7 +6,6 @@
 #include<Manager/ActionRegisterManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/CommandManager.h>
-#include<Manager/DownLoadManager.h>
 #include<Manager/ListenerManager.h>
 #include<Manager/ActionQueryManager.h>
 #include<Manager/MysqlManager.h>
@@ -21,7 +20,6 @@ TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
 TYPE_REFLECTION(SoEasy::ActionManager, "ActionManager");
 TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
 TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
-TYPE_REFLECTION(SoEasy::DownLoadManager, "DownLoadManager");
 TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
 TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
 TYPE_REFLECTION(SoEasy::ActionQueryManager, "ActionQueryManager");
@@ -50,7 +48,6 @@ int main(int argc, char ** argv)
 	factory.RegisterManager<ActionManager>();
 	factory.RegisterManager<NetWorkManager>();
 	factory.RegisterManager<CommandManager>();
-	factory.RegisterManager<DownLoadManager>();
 	factory.RegisterManager<ListenerManager>();
 	factory.RegisterManager<CoroutineManager>();
 	factory.RegisterManager<ActionQueryManager>();

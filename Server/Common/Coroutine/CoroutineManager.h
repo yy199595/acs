@@ -26,11 +26,11 @@ namespace SoEasy
 		void Sleep(long long ms);
 		void Resume(long long id);
 	public:
-		XCode Call(shared_ptr<TcpClientSession> session, const std::string func, Message & returnData);
-		XCode Call(shared_ptr<TcpClientSession> session, const std::string func, const Message * message = nullptr);
-		XCode Call(shared_ptr<TcpClientSession> session, const std::string func, const Message * message, Message & returnData);
+		XCode Call(const std::string func, Message & returnData);
+		XCode Call(const std::string func, const Message * message = nullptr);
+		XCode Call(const std::string func, const Message * message, Message & returnData);
 	private:
-		XCode SendCallMessage(shared_ptr<TcpClientSession> session, const std::string & func, const Message * message, class NetWorkRetActionBox * callBack);
+		XCode SendCallMessage(const std::string & func, const Message * message, class NetWorkRetActionBox * callBack);
 	protected:
 		bool OnInit() override;
 		void OnInitComplete() override;

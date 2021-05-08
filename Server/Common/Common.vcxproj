@@ -31,7 +31,6 @@
     <ClCompile Include="Manager\ActionQueryManager.cpp" />
     <ClCompile Include="Manager\ActionRegisterManager.cpp" />
     <ClCompile Include="Manager\CommandManager.cpp" />
-    <ClCompile Include="Manager\DownLoadManager.cpp" />
     <ClCompile Include="Manager\ListenerManager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\NetWorkManager.cpp" />
@@ -98,7 +97,6 @@
     <ClInclude Include="Manager\ActionQueryManager.h" />
     <ClInclude Include="Manager\ActionRegisterManager.h" />
     <ClInclude Include="Manager\CommandManager.h" />
-    <ClInclude Include="Manager\DownLoadManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="Manager\NetWorkManager.h" />
