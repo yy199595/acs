@@ -2,7 +2,7 @@
 #include<Core/Applocation.h>
 #include<Script/Util/luadebug.h>
 #include<Object/GameObject.h>
-#include<Manager/AddressManager.h>
+#include<Manager/ActionRegisterManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/TimerManager.h>
 
@@ -32,18 +32,32 @@ namespace SoEasy
 		{
 			this->mLuaEnv = luaL_newstate();
 			luaL_openlibs(mLuaEnv);
-			
-			this->ForeachManagers([this](Manager * pManager)->bool
-			{
-				pManager->PushClassToLua(this->mLuaEnv);
-				return true;
-			});
-
-			this->OnPushGlobalObject();
-			this->RegisterExtension(mLuaEnv);
-			REGISTER_FUNCTION_0(ScriptManager::OnHotfix);
 		}
-		return true;
+		if (!this->GetConfig().GetValue("ScriptMain", this->mMainLuaPath))
+		{
+			SayNoDebugFatal("not find field 'ScriptMain'");
+			return false;
+		}
+		if (!this->GetConfig().GetValue("ScriptInclude", this->mRequirePaths))
+		{
+			SayNoDebugFatal("not find field 'ScriptInclude'");
+			return false;
+		}
+		for (std::string & include : this->mRequirePaths)
+		{
+			this->AddRequirePath(include);
+		}
+
+		this->ForeachManagers([this](Manager * pManager)->bool
+		{
+			pManager->PushClassToLua(this->mLuaEnv);
+			return true;
+		});
+
+		this->OnPushGlobalObject();
+		this->RegisterExtension(mLuaEnv);
+		REGISTER_FUNCTION_0(ScriptManager::OnHotfix);
+		return this->LoadLuaScript(this->mMainLuaPath);
 	}
 
 	void ScriptManager::OnDestory()
@@ -63,8 +77,8 @@ namespace SoEasy
 		{
 			lua_pcall(mLuaEnv, 0, 1, errfunc);
 			SayNoDebugLog("load lua script success path :" << filePath);
-			lua_pop(mLuaEnv, 2);
-			return true;
+			lua_pop(mLuaEnv, 2);			
+			return this->LoadAllModule();
 		}
 		SayNoDebugError(lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
@@ -87,12 +101,6 @@ namespace SoEasy
 			}
 			mMainLuaTable->Action("Start");
 		}
-
-		this->ForeachManagers([this](Manager * manager)->bool
-		{
-			manager->OnLoadLuaComplete(mLuaEnv);
-			return true;
-		});
 		return true;
 	}
 

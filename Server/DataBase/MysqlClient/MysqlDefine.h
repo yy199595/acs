@@ -8,6 +8,7 @@
 #include"mysql.h"
 #include<memory>
 #include<unordered_map>
+#include<XCode/XCode.h>
 #include<Thread/ThreadTaskAction.h>
 using namespace std;
 using namespace SoEasy;
@@ -16,20 +17,6 @@ namespace DataBase
 	class MysqlManager;
 	typedef  MYSQL_RES MysqlQueryResult;
 	typedef MYSQL SayNoMysqlSocket;
-}
-
-namespace DataBase
-{
-	enum XMysqlCode
-	{
-		MysqlSuccessful,		//成功
-		MysqlFailure,			//失败
-		MysqlNotInCoroutine,	//不在协程中
-		MysqlStartTaskFail,		//启动失败
-		MysqlSocketIsNull,		//socket空
-		MysqlSelectDbFailure,	//选择db失败
-		MysqlInvokeFailure,		//执行sql语句失败
-	};
 }
 
 namespace DataBase
@@ -61,16 +48,18 @@ namespace DataBase
 		friend class MysqlTaskAction;
 		size_t GetRowCount() { return mFiledMap.size(); }	//获取有多少个字段
 		size_t GetColumnCount() { return mContentVector.size(); }	//获取有多少行
-		XMysqlCode GetErrorCode() { return this->mErrorCode; }
+		XCode GetErrorCode() { return this->mErrorCode; }
 		std::shared_ptr<MysqlQueryLine> GetLineData(size_t col = 0);	//获取一行数据
 		const std::string & GetErrorMessage() { return this->mErrorMessage; }	//获取错误消息
 	public:
 		bool AddFieldName(const char * name, size_t len, int pos);
 		void AddFieldContent(int row, const char * data, size_t len);
-		void SetErrorCode(XMysqlCode code) { this->mErrorCode = code; }
+		void SetErrorCode(XCode code) { this->mErrorCode = code; }
 		void SetErrorMessage(const char * msg) { this->mErrorMessage = msg; }
+	public:
+		void DebugPrint();
 	private:
-		XMysqlCode mErrorCode;
+		XCode mErrorCode;
 		std::string mErrorMessage;
 		std::unordered_map<std::string, int> mFiledMap;
 		std::vector<std::vector<std::string>> mContentVector;

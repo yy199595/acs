@@ -61,6 +61,27 @@ namespace DataBase
 		this->mContentVector[row].emplace_back(std::string(data, len));
 	}
 
+	void MysqlQueryData::DebugPrint()
+	{
+		std::stringstream ss;
+		for (auto iter = this->mFiledMap.begin(); iter != this->mFiledMap.end(); iter++)
+		{
+			ss << iter->first << "\t";
+		}
+		std::cout << ss.str() << std::endl;
+		
+		for (size_t x = 0; x < this->mContentVector.size(); x++)
+		{
+			ss.clear(); ss.str("");
+			for (size_t y = 0; y < this->mContentVector[x].size(); y++)
+			{
+				ss << this->mContentVector[x][y] << "\t";
+			}
+			std::cout << ss.str() << std::endl;
+		}
+
+	}
+
 	std::shared_ptr<MysqlQueryLine> MysqlQueryData::GetLineData(size_t col)
 	{
 		if (col < 0 || col > this->mContentVector.size())

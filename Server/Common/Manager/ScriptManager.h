@@ -34,6 +34,7 @@ namespace SoEasy
 		LuaTable * mMainLuaTable;
 		struct lua_State * mLuaEnv;
 		const static std::string mName;
+		std::vector<std::string> mRequirePaths;
 	};
 
 	template<typename T>

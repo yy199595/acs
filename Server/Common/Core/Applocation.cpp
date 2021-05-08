@@ -77,7 +77,6 @@ namespace SoEasy
 		}
 		this->TryAddManager<TimerManager>();
 		this->TryAddManager<ActionManager>();
-		this->TryAddManager<AddressManager>();
 		this->TryAddManager<NetWorkManager>();
 		this->TryAddManager<CoroutineManager>();
 

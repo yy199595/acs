@@ -10,6 +10,7 @@ namespace SoEasy
 	public:
 		friend TcpClientSession;
 		shared_ptr<TcpClientSession> CreateTcpSession(SharedTcpSocket socket);
+		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string address);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string ip, unsigned short port);
 	private:	//不要手动调用
 		bool AddNewSession(shared_ptr<TcpClientSession> tcpSession);

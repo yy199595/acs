@@ -55,19 +55,19 @@ namespace DataBase
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	XMysqlCode MysqlManager::QueryData(const std::string db, const std::string & sql)
+	XCode MysqlManager::QueryData(const std::string db, const std::string & sql)
 	{
 		long long id = this->mCoroutineManager->GetCurrentCorId();
 		if (id == 0)
 		{
-			return XMysqlCode::MysqlNotInCoroutine;
+			return XCode::MysqlNotInCoroutine;
 		}
 		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
 
 		
 		if (!mThreadPool->StartTaskAction(taskAction))
 		{
-			return XMysqlCode::MysqlStartTaskFail;
+			return XCode::MysqlStartTaskFail;
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
 
@@ -75,19 +75,19 @@ namespace DataBase
 		return taskAction->GetQueryData()->GetErrorCode();
 	}
 
-	XMysqlCode MysqlManager::QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData)
+	XCode MysqlManager::QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData)
 	{
 		long long id = this->mCoroutineManager->GetCurrentCorId();
 		if (id == 0)
 		{
-			return XMysqlCode::MysqlNotInCoroutine;
+			return XCode::MysqlNotInCoroutine;
 		}
 		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
 		
 		
 		if (!mThreadPool->StartTaskAction(taskAction))
 		{
-			return XMysqlCode::MysqlStartTaskFail;
+			return XCode::MysqlStartTaskFail;
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
 
@@ -143,9 +143,13 @@ namespace DataBase
 
 		std::shared_ptr<MysqlQueryData> queryData;
 
-		XMysqlCode code = this->QueryData(db, buffer, queryData);
-		SayNoDebugFatal("query time = " << TimeHelper::GetMilTimestamp() - t1);
-
-		return XCode::Successful;
+		XCode code = this->QueryData(db, buffer, queryData);
+		
+		SayNoDebugFatal("query time = " << TimeHelper::GetMilTimestamp() - t1 << "  count = " << queryData->GetColumnCount());
+		if (code != XCode::Successful)
+		{
+			SayNoDebugFatal("query error = " << queryData->GetErrorMessage());
+		}
+		return code;
 	}
 }

@@ -87,13 +87,23 @@ namespace SoEasy
 	template<typename T>
 	inline bool Applocation::AddManager()
 	{
-		const std::string name = SoEasy::GetTypeName<T>();
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return false;
+		}
 		return this->AddManager(name);
 	}
 	template<typename T>
 	inline T * Applocation::GetManager()
 	{
-		const std::string name = SoEasy::GetTypeName<T>();
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return nullptr;
+		}
 		auto iter = this->mManagerMap.find(name);
 		if (iter == this->mManagerMap.end())
 		{
@@ -104,7 +114,12 @@ namespace SoEasy
 	template<typename T>
 	inline bool Applocation::TryAddManager()
 	{
-		const std::string name = SoEasy::GetTypeName<T>();
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return false;
+		}
 		auto iter = this->mManagerMap.find(name);
 		if (iter == this->mManagerMap.end())
 		{

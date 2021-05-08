@@ -1,4 +1,4 @@
-#include"AddressManager.h"
+#include"ActionRegisterManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<Manager/NetWorkManager.h>
@@ -7,7 +7,7 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	void AddressManager::OnInitComplete()
+	void ActionRegisterManager::OnInitComplete()
 	{
 		SessionManager::OnInitComplete();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
@@ -15,7 +15,7 @@ namespace SoEasy
 		SayNoDebugInfo("start listen port : " << this->mTcpSessionListener->GetListenPort());
 	}
 
-	bool AddressManager::OnInit()
+	bool ActionRegisterManager::OnInit()
 	{
 		std::string listenAddress;
 		SayNoAssertRetFalse_F(SessionManager::OnInit());
@@ -29,28 +29,28 @@ namespace SoEasy
 			SayNoDebugError("parse ActionQueryAddress fail");
 			return false;
 		}
-		REGISTER_FUNCTION_1(AddressManager::UpdateActionAddress, ActionUpdateInfo);
+		REGISTER_FUNCTION_1(ActionRegisterManager::RegisterActions, ActionUpdateInfo);
 
 		mTcpSessionListener = make_shared<TcpSessionListener>(this, mListenPort);
 		return mTcpSessionListener->InitListener();
 	}
 
-	void AddressManager::OnSecondUpdate()
+	void ActionRegisterManager::OnSecondUpdate()
 	{
 		SessionManager::OnSecondUpdate();
 	}
 
-	void AddressManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ActionRegisterManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{		
 		
 	}
 
-	void AddressManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ActionRegisterManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
 		SayNoDebugWarning("connect new session : " << tcpSession->GetAddress());		
 	}
 
-	XCode AddressManager::UpdateActionAddress(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actions)
+	XCode ActionRegisterManager::RegisterActions(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actions)
 	{
 		int areaId = (int)id;
 		const string & address = actions.address();
@@ -82,7 +82,7 @@ namespace SoEasy
 		}	
 		return this->SyncActionInfos(areaId);
 	}
-	XCode AddressManager::SyncActionInfos(int areaId)
+	XCode ActionRegisterManager::SyncActionInfos(int areaId)
 	{
 		auto iter1 = this->mAreaActionMap.find(areaId);
 		if (iter1 == this->mAreaActionMap.end())
@@ -113,7 +113,7 @@ namespace SoEasy
 				if (tcpSession != nullptr)
 				{
 					RemoteScheduler remoteScheduler(tcpSession);
-					remoteScheduler.Call("NetWorkManager.UpdateAction", &returnData);
+					remoteScheduler.Call("ActionQueryManager.UpdateActions", &returnData);
 				}
 			}		
 		}

@@ -20,10 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{DA10827F-95A6-456E-9E26-23F3ED1AA218}</ProjectGuid>
-    <RootNamespace>DataBase</RootNamespace>
+    <ProjectGuid>{9CE23762-20CE-46FE-B826-1B647CEF4FCD}</ProjectGuid>
+    <RootNamespace>Server</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>ADataBase</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -71,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/redis;../Libs/include/mysql;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
-    <OutDir>../Libs/lib</OutDir>
-    <IntDir>../bin/debug/database</IntDir>
-    <TargetName>DataBase</TargetName>
+    <IncludePath>../DataBase;../Libs/include/spdlog;../Libs/include/rapidjson;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;../ServerData;../Common;$(IncludePath)</IncludePath>
+    <LibraryPath>../Libs/lib;$(LibraryPath)</LibraryPath>
+    <OutDir>..\bin</OutDir>
+    <IntDir>../bin/debug/client</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -130,19 +129,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Manager\MysqlManager.cpp" />
-    <ClCompile Include="Manager\RedisManager.cpp" />
-    <ClCompile Include="MysqlClient\MysqlDefine.cpp" />
-    <ClCompile Include="MysqlClient\MysqlTaskAction.cpp" />
-    <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Manager\ClientManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Manager\MysqlManager.h" />
-    <ClInclude Include="Manager\RedisManager.h" />
-    <ClInclude Include="MysqlClient\MysqlDefine.h" />
-    <ClInclude Include="MysqlClient\MysqlTaskAction.h" />
-    <ClInclude Include="RedisClient\RedisDefine.h" />
-    <ClInclude Include="RedisClient\RedisTaskAction.h" />
+    <ClInclude Include="Manager\ClientManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

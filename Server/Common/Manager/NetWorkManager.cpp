@@ -8,18 +8,21 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
 #include<Script/LuaType/LuaFunction.h>
-
+#include<Manager/ActionQueryManager.h>
 namespace SoEasy
 {
 	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
 	{
-		this->mBindLuaTalbe = nullptr;
+		
 	}
 
 	bool NetWorkManager::OnInit()
 	{
 		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
-		REGISTER_FUNCTION_1(NetWorkManager::UpdateAction, PB::AreaActionInfo);
+		this->mActionQueryManager = this->GetManager<ActionQueryManager>();
+
+		SayNoAssertRetFalse_F(this->mSessionContext);
+		//SayNoAssertRetFalse_F(this->mActionQueryManager);
 		return SessionManager::OnInit();
 	}
 
@@ -133,37 +136,6 @@ namespace SoEasy
 		return true;
 	}
 
-	bool NetWorkManager::StartConnect(const std::string name, const std::string & address)
-	{
-		string ip;
-		unsigned short port;
-		if (!StringHelper::ParseIpAddress(address, ip, port))
-		{
-			return false;
-		}
-		shared_ptr<TcpClientSession> session = make_shared<TcpClientSession>(this, name, ip, port);
-		this->mOnConnectSessionMap.emplace(session->GetAddress(), session);
-		return session->StartConnect();
-	}
-
-	XCode NetWorkManager::UpdateAction(shared_ptr<TcpClientSession> session, long long id, const PB::AreaActionInfo & actionInfos)
-	{
-		this->mRemoteAddressMap.clear();
-		for (int index = 0; index < actionInfos.action_infos_size(); index++)
-		{
-			std::vector<std::string> addressVector;
-			const AreaActionInfo_ActionInfo & actionInfo = actionInfos.action_infos(index);
-			for (int i = 0; i < actionInfo.action_address_size(); i++)
-			{
-				const std::string & address = actionInfo.action_address(i);
-				addressVector.emplace_back(address);
-			}
-			const std::string & name = actionInfo.action_name();
-			this->mRemoteAddressMap.emplace(name, addressVector);
-		}
-		return XCode::Successful;
-	}
-
 	shared_ptr<TcpClientSession> NetWorkManager::GetSessionByAdress(const std::string & adress)
 	{
 		auto iter = this->mSessionAdressMap.find(adress);
@@ -182,15 +154,13 @@ namespace SoEasy
 
 	bool NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		auto iter = this->mRemoteAddressMap.find(func);
-		if (iter == this->mRemoteAddressMap.end())
+		std::string address;
+		long long operId = returnPackage->operator_id();
+		if (!this->mActionQueryManager->GetActionAddress(func, operId, address))
 		{
-			SayNoDebugError(func << "method does not exist");
+			SayNoDebugError(func << "  method does not exist");
 			return false;
 		}
-		long long operId = returnPackage->operator_id();
-		std::vector<std::string> & addressVector = iter->second;
-		const std::string & address = addressVector[operId % addressVector.size()];
 
 		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
 		if (pSession != nullptr)
@@ -198,36 +168,26 @@ namespace SoEasy
 			return this->SendMessageByAdress(address, returnPackage);	
 		}
 
+		auto iter2 = mWaitSendMessage.find(address);
+		if (iter2 == mWaitSendMessage.end())
+		{
+			std::queue<shared_ptr<NetWorkPacket>> sendQueue;
+			this->mWaitSendMessage.emplace(address, sendQueue);
+		}
+		this->mWaitSendMessage[address].push(returnPackage);
+
 		auto iter1 = this->mOnConnectSessionMap.find(address);
 		if (iter1 == this->mOnConnectSessionMap.end())
-		{
-			std::string ip;
-			unsigned short port;
-			
-			auto iter2 = mWaitSendMessage.find(address);
-			if (iter2 == mWaitSendMessage.end())
+		{			
+			shared_ptr<TcpClientSession> tcpSession = this->CreateTcpSession("ActionSession", address);
+			if (tcpSession != nullptr)
 			{
-				std::queue<shared_ptr<NetWorkPacket>> sendQueue;
-				this->mWaitSendMessage.emplace(address, sendQueue);
+				this->mOnConnectSessionMap.insert(std::make_pair(address, tcpSession));
+				return true;
 			}
-			this->mWaitSendMessage[address].push(returnPackage);
-			return this->StartConnect("ActionSession", address);
+			return false;
 		}
 		return true;
-	}
-
-	void NetWorkManager::OnLoadLuaComplete(lua_State * luaEnv)
-	{
-		if (this->mBindLuaTalbe != nullptr)
-		{
-			delete this->mBindLuaTalbe;
-			this->mBindLuaTalbe = nullptr;
-		}
-		this->mBindLuaTalbe = LuaTable::Create(luaEnv, this->GetTypeName());
-		if (this->mBindLuaTalbe != nullptr)
-		{
-			SayNoDebugLog("reference lua table " << this->GetTypeName() << " successful");
-		}
 	}
 	
 	void NetWorkManager::OnDestory()

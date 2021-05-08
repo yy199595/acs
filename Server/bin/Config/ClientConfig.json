@@ -1,0 +1,19 @@
+{
+    "FastUpdate": 10,
+    "LogicFps": 30,
+    "SystemFps":100,
+    "RecvBuffCount": 1024,
+    "ListenAddress": "127.0.0.1:7788",
+    "ScriptMain":"./Script/LoginServer/Main.lua",
+    "ScriptInclude":
+    [
+        "./Script/Common",
+        "./Script/LoginServer"
+    ],
+    "Managers": [
+        "ClientManager"
+    ],
+    "WhiteList": [
+        "127.0.0.1"
+    ]
+}

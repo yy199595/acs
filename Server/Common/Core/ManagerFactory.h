@@ -17,7 +17,12 @@ namespace SoEasy
 	template<typename T>
 	inline bool ManagerFactory::RegisterManager()
 	{
-		const std::string name = SoEasy::GetTypeName<T>();
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return false;
+		}
 		auto iter = this->mCreateActions.find(name);
 		if (iter != this->mCreateActions.end())
 		{

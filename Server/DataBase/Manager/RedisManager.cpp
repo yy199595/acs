@@ -57,25 +57,11 @@ namespace DataBase
 			this->mRedisContextMap.emplace(threadId, pRedisContext);
 			SayNoDebugLog("connect redis successful " << mRedisIp << ":" << mRedisPort);
 		}
+		
 		return true;
 	}
-	void RedisManager::OnSecondUpdate()
+	void RedisManager::OnInitComplete()
 	{
 		
-		
-	}
-
-	void RedisManager::OnFrameUpdate(float t)
-	{
-		RemoteScheduler shceuder;
-		StringArray queryInfo;
-		queryInfo.add_data_array()->assign("shouhuzhemen_account");
-		queryInfo.add_data_array()->assign("spack_risk_season");
-		long long t1 = TimeHelper::GetMilTimestamp();
-		shceuder.Call("MysqlManager.QueryTable", &queryInfo, [t1](shared_ptr<TcpClientSession>, XCode code)
-		{
-			long long t2 = TimeHelper::GetMilTimestamp();
-			SayNoDebugWarning("cost time = " << t2 - t1);
-		});
 	}
 }

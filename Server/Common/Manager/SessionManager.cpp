@@ -2,6 +2,7 @@
 #include"NetWorkManager.h"
 #include"ActionManager.h"
 #include<Core/Applocation.h>
+#include<Util/StringHelper.h>
 namespace SoEasy
 {
 	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(SharedTcpSocket socket)
@@ -13,6 +14,18 @@ namespace SoEasy
 			return tcpSession;
 		}
 		return nullptr;
+	}
+
+	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(std::string name, std::string address)
+	{
+		std::string connectIp;
+		unsigned short connectPort;
+		if (!StringHelper::ParseIpAddress(address, connectIp, connectPort))
+		{
+			SayNoDebugError("parse " << address << " fail")
+			return false;
+		}
+		return this->CreateTcpSession(name, connectIp, connectPort);
 	}
 
 	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(std::string name, std::string ip, unsigned short port)

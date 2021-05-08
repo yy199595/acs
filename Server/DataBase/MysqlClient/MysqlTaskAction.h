@@ -18,7 +18,7 @@ namespace DataBase
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }
 		std::shared_ptr<MysqlQueryData> GetQueryData() { return mMysqlQueryData; }
 	private:
-		bool SetCode(XMysqlCode code);
+		bool SetCode(XCode code);
 	private:
 		long long mActionId;
 		std::string mSqlCommand;

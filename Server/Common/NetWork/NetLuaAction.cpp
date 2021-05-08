@@ -12,7 +12,8 @@ namespace SoEasy
 			if (lua_isfunction(luaEvn, -1))
 			{
 				int ref = luaL_ref(luaEvn, LUA_REGISTRYINDEX);
-				return new NetLuaAction(luaEvn, ref);
+				std::string name = table + "." + func;
+				return new NetLuaAction(luaEvn, ref, name);
 			}
 		}
 		return nullptr;

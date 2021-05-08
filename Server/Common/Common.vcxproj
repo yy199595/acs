@@ -28,7 +28,8 @@
     <ClCompile Include="Global\LogHelper.cpp" />
     <ClCompile Include="Global\ServerConfig.cpp" />
     <ClCompile Include="Manager\ActionManager.cpp" />
-    <ClCompile Include="Manager\AddressManager.cpp" />
+    <ClCompile Include="Manager\ActionQueryManager.cpp" />
+    <ClCompile Include="Manager\ActionRegisterManager.cpp" />
     <ClCompile Include="Manager\CommandManager.cpp" />
     <ClCompile Include="Manager\DownLoadManager.cpp" />
     <ClCompile Include="Manager\ListenerManager.cpp" />
@@ -94,7 +95,8 @@
     <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
     <ClInclude Include="Manager\ActionManager.h" />
-    <ClInclude Include="Manager\AddressManager.h" />
+    <ClInclude Include="Manager\ActionQueryManager.h" />
+    <ClInclude Include="Manager\ActionRegisterManager.h" />
     <ClInclude Include="Manager\CommandManager.h" />
     <ClInclude Include="Manager\DownLoadManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
@@ -176,7 +178,7 @@
     <ProjectGuid>{0178EB4E-3543-4C81-9B89-9A05C1EEED3F}</ProjectGuid>
     <RootNamespace>Server</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>Common</ProjectName>
+    <ProjectName>ACommon</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

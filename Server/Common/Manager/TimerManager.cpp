@@ -73,11 +73,11 @@ namespace SoEasy
 		if (iter != this->mTimerMap.end())
 		{
 			shared_ptr<TimerBase> timer = iter->second;
+			this->mTimerMap.erase(iter);
 			if (timer->Invoke() == false)
 			{
 				this->AddTimer(timer);
 			}
-			this->mTimerMap.erase(iter);
 		}
 	}
 

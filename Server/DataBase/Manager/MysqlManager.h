@@ -13,8 +13,8 @@ namespace DataBase
 	public:
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
 	public:
-		XMysqlCode QueryData(const std::string db, const std::string & sql);
-		XMysqlCode QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData);
+		XCode QueryData(const std::string db, const std::string & sql);
+		XCode QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData);
 	protected:
 		bool OnInit() override;
 		void OnTaskFinish(long long id) final;

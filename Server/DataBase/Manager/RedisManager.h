@@ -12,8 +12,7 @@ namespace DataBase
 		RedisSocket * GetRedisSocket(long long id);
 	protected:
 		bool OnInit() final;			//初始化管理器
-		void OnSecondUpdate() override;				//每秒调用
-		void OnFrameUpdate(float t) override;			//逻辑帧
+		void OnInitComplete() override;				//每秒调用
 
 	private:
 		std::string mRedisIp;		//redis ip地址

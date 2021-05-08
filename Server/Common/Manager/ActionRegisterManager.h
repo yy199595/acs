@@ -10,12 +10,12 @@ using namespace PB;
 
 namespace SoEasy
 {
-	// 查询 调用方法地址
-	class AddressManager : public SessionManager
+	// 所有方法都注册到这里(全局唯一)
+	class ActionRegisterManager : public SessionManager
 	{
 	public:
-		AddressManager() { }
-		~AddressManager() { }
+		ActionRegisterManager() { }
+		~ActionRegisterManager() { }
 	protected:
 		bool OnInit() override;
 		void OnSecondUpdate() override;
@@ -23,7 +23,7 @@ namespace SoEasy
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
 	private:
-		XCode UpdateActionAddress(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actionInfo);
+		XCode RegisterActions(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actionInfo);
 	private:
 		XCode SyncActionInfos(int areaId);
 	private:

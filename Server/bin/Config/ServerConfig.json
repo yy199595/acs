@@ -20,14 +20,14 @@
         "./Script/LoginServer"
     ],
     "Managers": [
-        "ScriptManager",
         "NetWorkManager",
         "TimerManager",
         "ListenerManager",
-        "AddressManager",
         "ActionManager",
         "MysqlManager",
-        "RedisManager"
+        "RedisManager",
+        "ActionQueryManager",
+        "ActionRegisterManager"
     ],
     "WhiteList": [
         "127.0.0.1"

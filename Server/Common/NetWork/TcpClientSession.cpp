@@ -65,6 +65,7 @@ namespace SoEasy
 			mCurrentSatte = SessionState::Connect;
 			this->mStartTime = TimeHelper::GetSecTimeStamp();
 			asio::ip::tcp::endpoint ep(asio::ip::address::from_string(mIp), mPort);
+			SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
 			this->mBinTcpSocket->async_connect(ep, [this](const asio::error_code & code)
 			{
 				if (code)

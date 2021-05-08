@@ -27,7 +27,15 @@ namespace SoEasy
 namespace SoEasy
 {
 	template<typename T>
-	inline std::string GetTypeName() { return TypeReflection<T>::Name; }
+	inline bool GetTypeName(std::string & name) 
+	{ 
+		if (TypeReflection<T>::Value)
+		{
+			name.assign(TypeReflection<T>::Name);
+			return true;
+		}
+		return false;
+	}
 }
 
 namespace SoEasy
@@ -42,6 +50,6 @@ namespace SoEasy
 	class TcpSessionListener;
 	class GameObject;
 	class ActionManager;
-	class AddressManager;
+	class ActionRegisterManager;
 
 }

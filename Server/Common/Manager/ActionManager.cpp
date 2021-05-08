@@ -4,9 +4,7 @@
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
-#include<NetWork/RemoteScheduler.h>
 #include<NetWork/NetWorkRetAction.h>
-#include<Manager/ListenerManager.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
@@ -18,38 +16,13 @@ namespace SoEasy
 
 	bool ActionManager::OnInit()
 	{
-		std::string connectAddress;
-		if (!SessionManager::OnInit())
-		{
-			return false;
-		}
-		if (!this->GetConfig().GetValue("AreaId", this->mAreaId))
-		{
-			SayNoDebugError("not find field AreaId");
-			return false;
-		}
-		if (!this->GetConfig().GetValue("ActionQueryAddress", connectAddress))
-		{
-			SayNoDebugError("not find field ActionQueryAddress");
-			return false;
-		}
-		if (!StringHelper::ParseIpAddress(connectAddress, mQueryIp, mQueryPort))
-		{
-			SayNoDebugFatal("parse ActionQueryAddress fail");
-			return false;
-		}
 		this->mScriptManager = this->GetManager<ScriptManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mListenerManager = this->GetManager<ListenerManager>();
 		this->mCoroutineScheduler = this->GetManager<CoroutineManager>();
 
 		SayNoAssertRetFalse_F(this->mNetWorkManager);
-		SayNoAssertRetFalse_F(this->mListenerManager);
 		SayNoAssertRetFalse_F(this->mCoroutineScheduler);
-
-		
-		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
-		return this->mActionQuerySession->StartConnect();
+		return true;
 	}
 
 	void ActionManager::OnDestory()
@@ -89,6 +62,23 @@ namespace SoEasy
 		}
 	}
 
+	bool ActionManager::BindFunction(NetLuaAction * actionBox)
+	{
+		if (actionBox == nullptr)
+		{
+			return false;
+		}
+		const std::string & name = actionBox->GetActionName();
+		if (this->mRegisterLuaActions.find(name) != this->mRegisterLuaActions.end())
+		{
+			SayNoDebugError("Repeated registration action : " << name);
+			return false;
+		}
+		SayNoDebugInfo("add lua action " << name << " successful");
+		this->mRegisterLuaActions.insert(std::make_pair(name, actionBox));
+		return true;
+	}
+
 	bool ActionManager::BindFunction(NetWorkActionBox * actionBox)
 	{
 		if (actionBox == nullptr)
@@ -101,6 +91,7 @@ namespace SoEasy
 			SayNoDebugError("Repeated registration action : " << name);
 			return false;
 		}
+		SayNoDebugInfo("add action " << name << " successful");
 		this->mRegisterActions.insert(std::make_pair(name, actionBox));
 		return true;
 	}
@@ -191,7 +182,7 @@ namespace SoEasy
 				returnData->set_error_code(code);
 				returnData->set_callback_id(callInfo->callback_id());
 				returnData->set_operator_id(callInfo->operator_id());
-				return mNetWorkManager->SendMessageByAdress(address, returnData);
+				mNetWorkManager->SendMessageByAdress(address, returnData);
 			}
 		});
 		return true;
@@ -207,58 +198,5 @@ namespace SoEasy
 	{
 		auto iter = this->mRegisterActions.find(name);
 		return iter != this->mRegisterActions.end() ? iter->second : nullptr;
-	}
-
-	void ActionManager::OnLoadLuaComplete(lua_State * luaEnv)
-	{
-		auto iter = this->mRegisterActions.begin();
-		for (; iter != this->mRegisterActions.end(); iter++)
-		{
-			NetWorkActionBox * pActionBox = iter->second;
-
-			const std::string & name = iter->first;
-			const size_t pos = name.find_first_of(".");
-			const std::string className = name.substr(0, pos);
-			const std::string funcName = name.substr(pos + 1, name.length());
-			NetLuaAction * pLuaFunction = NetLuaAction::Create(luaEnv, className, funcName);
-			if (pLuaFunction != nullptr)
-			{
-				pActionBox->BindLuaFunction(pLuaFunction);
-				SayNoDebugInfo("bind lua function " << name);
-			}
-		}
-		auto iter1 = this->mRegisterLuaActions.begin();
-		for (; iter1 != this->mRegisterLuaActions.end(); iter1++)
-		{
-			NetLuaAction * pLuaFunction = iter1->second;
-			if (pLuaFunction != nullptr)
-			{
-				delete pLuaFunction;
-			}
-		}
-		this->mRegisterLuaActions.clear();
-	}
-
-	void ActionManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
-	{
-
-	}
-
-	void ActionManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
-	{
-		PB::ActionUpdateInfo actionInfo;
-		RemoteScheduler remoteScheduler(tcpSession, this->mAreaId);
-		const std::string & address = this->mListenerManager->GetAddress();
-		SayNoDebugWarning("connect address manager success " << tcpSession->GetAddress());
-		actionInfo.set_address(address);
-		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
-		{
-			const std::string & actionName = iter->first;
-			actionInfo.add_action_names()->assign(actionName);
-		}
-		remoteScheduler.Call("AddressManager.UpdateActionAddress", &actionInfo, [](shared_ptr<TcpClientSession>, XCode code)
-		{
-
-		});
 	}
 }

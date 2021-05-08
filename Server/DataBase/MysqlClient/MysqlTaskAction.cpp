@@ -65,13 +65,13 @@ namespace DataBase
 			}
 			mysql_free_result(queryResult);
 		}
-		this->SetCode(MysqlSuccessful);
+		this->SetCode(XCode::Successful);
 	}
 
-	bool MysqlTaskAction::SetCode(XMysqlCode code)
+	bool MysqlTaskAction::SetCode(XCode code)
 	{
 		this->mMysqlQueryData->SetErrorCode(code);
-		return code == XMysqlCode::MysqlSuccessful;
+		return code == XCode::Successful;
 	}
 	
 }

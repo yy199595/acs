@@ -46,7 +46,6 @@ namespace SoEasy
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)
 	public:
 		virtual void PushClassToLua(lua_State * luaEnv) { }
-		virtual void OnLoadLuaComplete(lua_State * luaEnv) { }
 	private:
 		bool BindFunction(const std::string & name, class NetWorkActionBox * actionBox);
 	protected:

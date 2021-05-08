@@ -9,7 +9,6 @@ del /F /S /Q *.log
 del /F /S /Q *.ncb
 del /F /S /Q *.suo
 del /F /S /Q *.pch
-del /F /S /Q *.user
 del /F /S /Q *.res
 del /F /S /Q server\output_lib\*.lib
 del /F /S /Q output.txt

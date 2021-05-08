@@ -10,11 +10,12 @@ namespace SoEasy
 	class NetLuaAction
 	{
 	public:
-		NetLuaAction(lua_State * lua, int r) :ref(r), luaEnv(lua) { }
+		NetLuaAction(lua_State * lua, int r, const std::string name) :ref(r), luaEnv(lua), mFuncName(name) { }
 		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->ref); }
 	public:
 		static NetLuaAction * Create(lua_State * luaEvn, std::string table, std::string func);
 	public:
+		const std::string & GetActionName() { return mFuncName; }
 		XCode Invoke1(shared_ptr<TcpClientSession>, long long id);
 
 		template<typename T>
@@ -30,6 +31,7 @@ namespace SoEasy
 	private:
 		int ref;
 		lua_State * luaEnv;
+		std::string mFuncName;
 	};
 	template<typename T>
 	inline XCode NetLuaAction::Inovke2(shared_ptr<TcpClientSession> session, long long id, const T & t1)
