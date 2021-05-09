@@ -18,11 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Manager\ProxyManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Manager\ProxyManager.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{244563F7-F95C-4E48-AAE4-BE171544AF5C}</ProjectGuid>
-    <RootNamespace>Server</RootNamespace>
+    <ProjectGuid>{026AC17B-D089-47CF-B343-4F72A559B8A6}</ProjectGuid>
+    <RootNamespace>DataBase</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>ACoreLogic</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,7 +46,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -70,10 +77,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../CoreLogic;../DataBase;../Libs/include/spdlog;../Libs/include/redis;../Libs/include/rapidjson;../Libs/include/protobuf;../Libs/include/mysql;../Libs/include/lua5.3;../Libs/include/asio;../ServerData;../Common;$(IncludePath)</IncludePath>
-    <LibraryPath>../Libs/lib;$(LibraryPath)</LibraryPath>
-    <OutDir>..\bin</OutDir>
-    <IntDir>../bin/debug/server</IntDir>
+    <IncludePath>../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
+    <OutDir>../Libs/lib</OutDir>
+    <IntDir>../bin/debug/corelogic</IntDir>
+    <TargetName>CoreLogic</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -128,9 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

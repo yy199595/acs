@@ -3,6 +3,8 @@
 #include"ActionManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
+#include<NetWork/NetWorkRetAction.h>
+#include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
 	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(SharedTcpSocket socket)
@@ -80,10 +82,12 @@ namespace SoEasy
 
 	bool SessionManager::OnInit()
 	{
+		this->mActionManager = this->GetManager<ActionManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mFunctionManager = this->GetManager<ActionManager>();
+		this->mCoroutineSheduler = this->GetManager<CoroutineManager>();
+		SayNoAssertRetFalse_F(this->mActionManager);
 		SayNoAssertRetFalse_F(this->mNetWorkManager);
-		SayNoAssertRetFalse_F(this->mFunctionManager);
+		SayNoAssertRetFalse_F(this->mCoroutineSheduler);
 		return true;
 	}
 
@@ -93,21 +97,74 @@ namespace SoEasy
 		SayNoAssertRet(pTcpSession, "not find session : " << address << " size = " << size);
 
 		shared_ptr<NetWorkPacket> nNetMsgPackage = make_shared<NetWorkPacket>();
-		if (!nNetMsgPackage->ParseFromArray(msg, size))
-		{
-			SayNoDebugError("parse message pack fail : " << address << " size = " << size);
-			return;
-		}
+		SayNoAssertRet_F(nNetMsgPackage->ParseFromArray(msg, size));
+
+	
 		if (!nNetMsgPackage->func_name().empty())
 		{
 			const std::string & name = nNetMsgPackage->func_name();
-			this->mFunctionManager->Call(pTcpSession, name, nNetMsgPackage);
+	
+			NetLuaAction * luaAction = this->mActionManager->GetLuaAction(name);
+			if (luaAction != nullptr)	//lua 函数自己返回
+			{
+				shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+				XCode code = luaAction->Invoke(pTcpSession, nNetMsgPackage, returnPacket);
+			}
+			else  //在协程中执行
+			{
+				this->mCoroutineSheduler->Start([this, nNetMsgPackage, pTcpSession, address]()
+				{
+					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+					XCode code = this->InvokeAction(pTcpSession, nNetMsgPackage, returnPacket);
+					if (nNetMsgPackage->callback_id() != 0)
+					{
+						returnPacket->set_error_code(code);
+						returnPacket->set_callback_id(nNetMsgPackage->callback_id());
+						this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
+					}
+				});
+			}
 		}
 		else if (nNetMsgPackage->callback_id() != 0)
 		{
 			const long long id = nNetMsgPackage->callback_id();
-			this->mFunctionManager->Call(pTcpSession, id, nNetMsgPackage);
+			NetWorkRetActionBox * callback = this->mActionManager->GetCallback(id);
+			if (callback == nullptr)
+			{
+				SayNoDebugError("not find call back " << id);
+				return;
+			}
+			callback->Invoke(pTcpSession, nNetMsgPackage);
 		}
+	}
+
+	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, const shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)
+	{
+		const std::string & name = callInfo->func_name();
+		NetWorkActionBox * action = this->mActionManager->GetAction(name);
+		if (action == nullptr)
+		{
+			SayNoDebugError(name << " does not exist");
+			return XCode::CallFunctionNotExist;
+		}	
+		return action->Invoke(tcpSession, callInfo, returnData);
+	}
+
+	long long SessionManager::GetIdByAddress(const std::string & address)
+	{
+		return 0;
+	}
+
+	bool SessionManager::ParseAddress(const std::string & address, string & ip, unsigned short & port)
+	{
+		size_t pos = address.find(":");
+		if (pos == std::string::npos)
+		{
+			return false;
+		}
+		ip = address.substr(0, pos);
+		port = (unsigned short)std::stoul(address.substr(pos + 1));
+		return true;
 	}
 
 	void SessionManager::OnSystemUpdate()
@@ -135,6 +192,10 @@ namespace SoEasy
 				continue;
 			}
 			this->OnSessionConnectAfter(pTcpSession);
+			if (pTcpSession->IsContent())
+			{
+				pTcpSession->InvokeConnectCallback();
+			}
 			pTcpSession = nullptr;
 		}
 

@@ -3,6 +3,7 @@
     "FastUpdate": 10,
     "LogicFps": 30,
     "SystemFps":100,
+    "ProxyAddress":"127.0.0.1:1995",
     "ListenAddress": "127.0.0.1:7788",
     "ActionQueryAddress": "127.0.0.1:7799",
     "RecvBuffCount": 1024,
@@ -26,6 +27,7 @@
         "ActionManager",
         "MysqlManager",
         "RedisManager",
+        "ProxyManager",
         "ActionQueryManager",
         "ActionRegisterManager"
     ],

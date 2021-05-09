@@ -47,7 +47,7 @@ namespace Client
 					long long t2 = TimeHelper::GetMilTimestamp();
 					SayNoDebugWarning("cost time = " << t2 - t1);
 				});
-				this->mCoroutineManager->Sleep(10000);
+				this->mCoroutineManager->Sleep(3000);
 			}
 		});
 	}

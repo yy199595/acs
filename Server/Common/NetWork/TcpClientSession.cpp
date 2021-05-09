@@ -1,5 +1,6 @@
-#include "TcpClientSession.h"
+#include"TcpClientSession.h"
 #include<Core/Applocation.h>
+#include<Util/StringHelper.h>
 #include<Manager/SessionManager.h>
 namespace SoEasy
 {
@@ -10,13 +11,12 @@ namespace SoEasy
 		this->mBinTcpSocket = socket;
 		
 		if (this->mBinTcpSocket != nullptr)
-		{	
-			unsigned short port = mBinTcpSocket->remote_endpoint().port();
-			std::string ip = mBinTcpSocket->remote_endpoint().address().to_string();
-
-			this->InitMember(ip, port);
+		{
 			this->mDispatchManager = manager;
 			mCurrentSatte = SessionState::Normal;
+			this->mSocketEndPoint = socket->remote_endpoint();
+			this->InitMember(this->mSocketEndPoint.address().to_string(), this->mSocketEndPoint.port());
+			this->mSocketId = (long long)this->mSocketEndPoint.address().to_v4().to_uint() << 32 | this->mPort;
 		}
 	}
 
@@ -28,19 +28,20 @@ namespace SoEasy
 		this->InitMember(ip, port);
 		this->mDispatchManager = manager;
 		this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(mAsioContext);
+		this->mSocketEndPoint = asio::ip::tcp::endpoint(asio::ip::address::from_string(mIp), mPort);
+		this->mSocketId = (long long)this->mSocketEndPoint.address().to_v4().to_uint() << 32 | this->mPort;
 	}
 
 	void TcpClientSession::InitMember(const std::string & ip, unsigned short port)
 	{
 		this->mIp = ip;
 		this->mPort = port;
-		this->mConnectCount = 0;	
-		mStartTime = TimeHelper::GetSecTimeStamp();
-		
-
+		this->mConnectCount = 0;
 		this->mRecvBufferSize = 1024;
+		mStartTime = TimeHelper::GetSecTimeStamp();
 		this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
 		this->mAdress = this->mIp + ":" + std::to_string(this->mPort);
+		
 	}
 
 	TcpClientSession::~TcpClientSession()
@@ -53,40 +54,36 @@ namespace SoEasy
 		return this->mCurrentSatte == Normal;
 	}
 
-	bool TcpClientSession::StartConnect()
+	bool TcpClientSession::StartConnect(ConnectCallback action)
 	{
 		if (this->IsActive() || this->mIsContent == false)
 		{
 			return false;
 		}
-		try
+		this->mConnectCount++;
+		this->mConnectCallback = action;
+		mCurrentSatte = SessionState::Connect;
+		this->mStartTime = TimeHelper::GetSecTimeStamp();
+		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
+		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this, action](const asio::error_code & code)
 		{
-			this->mConnectCount++;
-			mCurrentSatte = SessionState::Connect;
-			this->mStartTime = TimeHelper::GetSecTimeStamp();
-			asio::ip::tcp::endpoint ep(asio::ip::address::from_string(mIp), mPort);
-			SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
-			this->mBinTcpSocket->async_connect(ep, [this](const asio::error_code & code)
+			if (code)
 			{
-				if (code)
-				{
-					this->CloseSocket();
-					SayNoDebugWarning("Connect " << this->GetSessionName() 
-						<< " fail count = " << this->mConnectCount << " error : "<< code.message());
-					return;
-				}
-				this->mConnectCount = 0;
-				mCurrentSatte = SessionState::Normal;
-				this->mDispatchManager->AddNewSession(shared_from_this());
-			});
-			return true;
-		}
-		catch (...)
-		{
-			SayNoDebugFatal("ip or port error" << this->mAdress);
-			mCurrentSatte = SessionState::ConnectError;
-		}
-		return false;
+				this->CloseSocket();
+				SayNoDebugWarning("Connect " << this->GetSessionName() << " fail count = " << this->mConnectCount << " error : " << code.message());
+				return;
+			}
+			this->mConnectCount = 0;
+			mCurrentSatte = SessionState::Normal;
+			this->mDispatchManager->AddNewSession(shared_from_this());
+		});
+		return true;
+	}
+
+	void TcpClientSession::InvokeConnectCallback()
+	{
+		bool hasError = mCurrentSatte != SessionState::Normal;
+		if (this->mConnectCallback) { this->mConnectCallback(shared_from_this(), hasError); }
 	}
 
 	void TcpClientSession::CloseSocket()

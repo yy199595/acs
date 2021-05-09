@@ -23,6 +23,7 @@ namespace SoEasy
 		const std::string mMessage;
 	};
 	class SessionManager;
+	typedef std::function<void(shared_ptr<TcpClientSession> session, bool hasError)> ConnectCallback;
 	class TcpClientSession : public std::enable_shared_from_this<TcpClientSession>
 	{
 	public:
@@ -33,6 +34,7 @@ namespace SoEasy
 		bool IsActive();	
 		inline const std::string & GetIP() { return mIp; }
 		inline unsigned short GetPort() { return mPort; }
+		inline long long GetSocketId() { return mSocketId; }
 		inline long long GetStartTime() { return mStartTime; }
 		inline SessionState GetState() { return mCurrentSatte; }
 		inline const bool IsContent() { return this->mIsContent; }
@@ -41,7 +43,8 @@ namespace SoEasy
 		inline const std::string & GetSessionName() { return mSessionName; }
 		inline void SetSessionName(const std::string & name) { mSessionName = name; }		
 	public:
-		bool StartConnect();
+		bool StartConnect(ConnectCallback action = nullptr);
+		void InvokeConnectCallback();
 	public:
 		void CloseSocket();
 		bool SendPackage(const std::string & message);
@@ -55,10 +58,13 @@ namespace SoEasy
 		void InitMember(const std::string & ip, unsigned short port);
 	private:
 		std::string mIp;
+		long long mSocketId;
 		std::string mAdress;
 		unsigned short mPort;
 		AsioContext & mAsioContext;
 		SharedTcpSocket mBinTcpSocket;
+		AsioTcpEndPoint mSocketEndPoint;
+		ConnectCallback mConnectCallback;
 	private:
 		bool mIsContent;
 		long long mStartTime;	

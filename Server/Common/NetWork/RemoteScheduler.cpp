@@ -79,9 +79,10 @@ namespace SoEasy
 			newCallData->set_message_data(mMessageBuffer);
 			newCallData->set_protoc_name(message->GetTypeName());
 		}
-		long long id = this->mFunctionManager->AddCallback(action);
+		long long callbackId = 0;
+		this->mFunctionManager->AddCallback(action, callbackId);
 		newCallData->set_func_name(func);
-		newCallData->set_callback_id(id);
+		newCallData->set_callback_id(callbackId);
 		newCallData->set_operator_id(mOperatorId);
 		if (this->mBindSessionAdress.empty())
 		{
@@ -98,9 +99,10 @@ namespace SoEasy
 		{
 			newCallData->set_message_data(mMessageBuffer);
 		}
-		long long id = this->mFunctionManager->AddCallback(action);
+		long long callbakcId = 0;
+		this->mFunctionManager->AddCallback(action, callbakcId);
 		newCallData->set_func_name(func);
-		newCallData->set_callback_id(id);
+		newCallData->set_callback_id(callbakcId);
 		newCallData->set_operator_id(mOperatorId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}

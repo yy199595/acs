@@ -40,7 +40,7 @@ namespace SoEasy
 		template<typename T1>
 		bool BindFunction(std::string name, NetWorkAction4<T1> action);
 	public:
-		void AddFinishTaskId(long long taskId);	//由线程池调用
+		void AddFinishTaskId(long long taskId);	//由其他线程调用
 		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
 	public:
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)

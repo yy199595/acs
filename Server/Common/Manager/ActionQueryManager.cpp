@@ -75,36 +75,47 @@ namespace SoEasy
 		});
 	}
 
-	bool ActionQueryManager::GetActionAddress(const std::string & action, long long id, std::string & address)
+	ActionAddressProxy * ActionQueryManager::GetActionProxy(const std::string & action, long long id)
 	{
 		auto iter = this->mActionAddressMap.find(action);
 		if (iter == this->mActionAddressMap.end())
 		{
-			return false;
+			return nullptr;
 		}
 		std::vector<std::string> & addressList = iter->second;
 		if (addressList.empty())
 		{
-			return false;
+			return nullptr;
 		}
-		address = addressList[id % addressList.size()];
-		return true;
+		std::string & address = addressList[id % addressList.size()];
+		auto iter1 = this->mActionProxyMap.find(address);
+		return iter1 != this->mActionProxyMap.end() ? iter1->second : nullptr;
 	}
 
 	XCode ActionQueryManager::UpdateActions(shared_ptr<TcpClientSession> session, long long id, const PB::AreaActionInfo & actionInfos)
 	{
+		std::set<std::string> allActionAddress;
 		for (int index = 0; index < actionInfos.action_infos_size(); index++)
 		{
-			std::vector<std::string> addressVector;
+			std::vector<std::string> actionAddressVector;
 			const AreaActionInfo_ActionInfo & actionInfo = actionInfos.action_infos(index);
+			const std::string & name = actionInfo.action_name();
 			for (int i = 0; i < actionInfo.action_address_size(); i++)
 			{
 				const std::string & address = actionInfo.action_address(i);
-				addressVector.emplace_back(address);
-			}
-			const std::string & name = actionInfo.action_name();
-			this->mActionAddressMap.emplace(name, addressVector);
+
+				allActionAddress.insert(address);
+				actionAddressVector.push_back(address);
+			}	
+			this->mActionAddressMap.emplace(name, actionAddressVector);
 		}
+
+		for (const std::string & address : allActionAddress)
+		{
+			ActionAddressProxy * actionProxy = new ActionAddressProxy(this->mNetWorkManager, this->mNetWorkManager, address);
+			this->mActionProxyMap.insert(std::make_pair(address, actionProxy));
+		}
+
 		return XCode::Successful;
 	}
 }

@@ -9,6 +9,7 @@
 #include<Manager/ScriptManager.h>
 #include<Script/LuaType/LuaFunction.h>
 #include<Manager/ActionQueryManager.h>
+#include<NetWork/ActionAddressProxy.h>
 namespace SoEasy
 {
 	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
@@ -93,17 +94,7 @@ namespace SoEasy
 
 	void NetWorkManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-		const std::string & address = tcpSession->GetAddress();
-		auto iter = this->mWaitSendMessage.find(address);
-		if (iter != this->mWaitSendMessage.end())
-		{
-			while (!iter->second.empty())
-			{
-				shared_ptr<NetWorkPacket> data = iter->second.front();
-				this->SendMessageByAdress(address, data);
-				iter->second.pop();
-			}
-		}
+		
 	}
 
 	bool NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
@@ -154,40 +145,14 @@ namespace SoEasy
 
 	bool NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		std::string address;
 		long long operId = returnPackage->operator_id();
-		if (!this->mActionQueryManager->GetActionAddress(func, operId, address))
+		ActionAddressProxy * actionProxy = this->mActionQueryManager->GetActionProxy(func, operId);
+		if (actionProxy == nullptr)
 		{
 			SayNoDebugError(func << "  method does not exist");
 			return false;
 		}
-
-		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
-		if (pSession != nullptr)
-		{
-			return this->SendMessageByAdress(address, returnPackage);	
-		}
-
-		auto iter2 = mWaitSendMessage.find(address);
-		if (iter2 == mWaitSendMessage.end())
-		{
-			std::queue<shared_ptr<NetWorkPacket>> sendQueue;
-			this->mWaitSendMessage.emplace(address, sendQueue);
-		}
-		this->mWaitSendMessage[address].push(returnPackage);
-
-		auto iter1 = this->mOnConnectSessionMap.find(address);
-		if (iter1 == this->mOnConnectSessionMap.end())
-		{			
-			shared_ptr<TcpClientSession> tcpSession = this->CreateTcpSession("ActionSession", address);
-			if (tcpSession != nullptr)
-			{
-				this->mOnConnectSessionMap.insert(std::make_pair(address, tcpSession));
-				return true;
-			}
-			return false;
-		}
-		return true;
+		return actionProxy->CallAction(returnPackage);
 	}
 	
 	void NetWorkManager::OnDestory()

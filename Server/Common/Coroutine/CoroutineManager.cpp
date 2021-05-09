@@ -279,7 +279,8 @@ namespace SoEasy
 			callData->set_message_data(mMessageBuffer);
 			callData->set_protoc_name(message->GetTypeName());
 		}
-		long long id = this->mFunctionManager->AddCallback(callBack);
+		long long id = 0;
+		this->mFunctionManager->AddCallback(callBack, id);
 		callData->set_func_name(func);
 		callData->set_callback_id(id);
 

@@ -21,13 +21,18 @@ namespace SoEasy
 		virtual void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) = 0;
 		virtual void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) = 0;
 		virtual void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size);
+	private:
+		XCode InvokeAction(shared_ptr<TcpClientSession> tcpSession, const shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData);
 	protected:
 		void OnSystemUpdate() final;
+		long long GetIdByAddress(const std::string & address);
+		bool ParseAddress(const std::string & address, string & ip, unsigned short & port);
 	protected:
 		class NetWorkManager * mNetWorkManager;
 	private:
 		NetWorkPacket mNetWorkPacket;	
-		class ActionManager * mFunctionManager;
+		class ActionManager * mActionManager;
+		class CoroutineManager * mCoroutineSheduler;
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;
 		DoubleBufferQueue<shared_ptr<TcpClientSession>> mNewSessionQueue;
 		DoubleBufferQueue<shared_ptr<TcpClientSession>> mErrorSessionQueue;

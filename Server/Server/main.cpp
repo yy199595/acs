@@ -11,10 +11,11 @@
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
-
+#include<Manager/ProxyManager.h>
 using namespace SoEasy;
 using namespace DataBase;
 
+TYPE_REFLECTION(SoEasy::ProxyManager, "ProxyManager");
 TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
 TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
 TYPE_REFLECTION(SoEasy::ActionManager, "ActionManager");
@@ -35,12 +36,14 @@ TYPE_REFLECTION(DataBase::MysqlManager, "MysqlManager");
 #pragma comment(lib,"hiredis.lib")
 #pragma comment(lib,"libmysql.lib")
 #pragma comment(lib,"DataBase.lib")
+#pragma comment(lib,"CoreLogic.lib")
 #pragma comment(lib,"ServerData.lib")
 #pragma comment(lib,"libprotobufd.lib")
 #endif
 int main(int argc, char ** argv)
 {
 	ManagerFactory factory;
+	factory.RegisterManager<ProxyManager>();
 	factory.RegisterManager<RedisManager>();
 	factory.RegisterManager<MysqlManager>();
 	factory.RegisterManager<TimerManager>();

@@ -5,7 +5,7 @@
 #include<Core/TcpSessionListener.h>
 #include<Script/LuaType/LuaTable.h>
 #include<Protocol/ServerCommon.pb.h>
-#define ASIO_TCP_SEND_MAX_COUNT 1024 * 1024
+
 namespace SoEasy
 {
 
@@ -37,7 +37,6 @@ namespace SoEasy
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
 		class ActionQueryManager * mActionQueryManager;
-		std::unordered_map<std::string, std::queue<shared_ptr<NetWorkPacket>>> mWaitSendMessage;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//ËùÓÐsession

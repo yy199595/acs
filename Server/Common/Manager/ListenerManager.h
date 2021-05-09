@@ -6,6 +6,7 @@ using namespace PB;
 namespace SoEasy
 {
 	// 处理外部连接进来的session
+	class TcpSessionListener;
 	class ListenerManager : public SessionManager
 	{
 	public:
@@ -26,6 +27,6 @@ namespace SoEasy
 		std::string mListenAddress;	//地址
 		unsigned short mListenerPort; //监听的端口号
 		std::set<std::string> mWhiteList;	//白名单
-		shared_ptr<class TcpSessionListener> mTcpSessionListener;
+		shared_ptr<TcpSessionListener> mTcpSessionListener;
 	};
 }

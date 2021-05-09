@@ -96,15 +96,43 @@ namespace SoEasy
 		return true;
 	}
 
-	long long ActionManager::AddCallback(NetWorkRetActionBox * actionBox)
+	bool ActionManager::DelCallback(long long callbackId)
 	{
-		if (actionBox != nullptr)
+		auto iter = this->mRetActionMap.find(callbackId);
+		if (iter != this->mRetActionMap.end())
 		{
-			long long id = NumberHelper::Create();
-			this->mRetActionMap.insert(std::make_pair(id, actionBox));
-			return id;
+			NetWorkRetActionBox * actionBox = iter->second;
+			this->mRetActionMap.erase(iter);
+			delete actionBox;
+			return true;
 		}
-		return 0;
+		return false;
+	}
+
+	NetWorkRetActionBox * ActionManager::GetCallback(long long callbackId, bool remove)
+	{
+		auto iter = this->mRetActionMap.find(callbackId);
+		if (iter != this->mRetActionMap.end())
+		{
+			NetWorkRetActionBox * actionBox = iter->second;
+			if (remove)
+			{
+				this->mRetActionMap.erase(iter);
+			}		
+			return actionBox;
+		}
+		return nullptr;
+	}
+
+	bool ActionManager::AddCallback(NetWorkRetActionBox * actionBox, long long & callbackId)
+	{
+		if (actionBox == nullptr)
+		{
+			return false;
+		}
+		long long id = NumberHelper::Create();
+		this->mRetActionMap.emplace(id, actionBox);
+		return true;
 	}
 
 	void ActionManager::OnSecondUpdate()
@@ -135,7 +163,7 @@ namespace SoEasy
 		}
 	}
 
-	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
+	/*bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
@@ -187,14 +215,14 @@ namespace SoEasy
 		});
 		return true;
 	}
-
-	NetLuaAction * ActionManager::GetLuaFunction(const std::string & name)
+*/
+	NetLuaAction * ActionManager::GetLuaAction(const std::string & name)
 	{
 		auto iter = this->mRegisterLuaActions.find(name);
 		return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
 	}
 
-	NetWorkActionBox * ActionManager::GetFunction(const std::string & name)
+	NetWorkActionBox * ActionManager::GetAction(const std::string & name)
 	{
 		auto iter = this->mRegisterActions.find(name);
 		return iter != this->mRegisterActions.end() ? iter->second : nullptr;
