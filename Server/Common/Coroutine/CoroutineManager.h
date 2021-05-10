@@ -45,7 +45,6 @@ namespace SoEasy
 #ifdef _WIN32
 		void LoopCheckDelCoroutine();
 #endif
-		void LoopCoroutineEvent();
 	private:
 		void SaveStack(Coroutine *, char * top);
 	private:
@@ -62,7 +61,6 @@ namespace SoEasy
 		std::queue<Coroutine *> mDestoryCoroutine;
 #endif
 		char mSharedStack[STACK_SIZE];
-		std::list<CoroutineEvent *> mCorEventList;
 		std::unordered_map<long long, Coroutine *> mCoroutineMap;
 	};
 }

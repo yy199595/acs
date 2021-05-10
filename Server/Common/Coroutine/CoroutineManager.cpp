@@ -84,29 +84,6 @@ namespace SoEasy
 		}
 	}
 #endif
-	void CoroutineManager::LoopCoroutineEvent()
-	{
-		if (!this->mCorEventList.empty())
-		{
-			for (auto iter = this->mCorEventList.begin(); iter != this->mCorEventList.end();)
-			{
-				CoroutineEvent * corEvent = (*iter);
-				long long id = corEvent->GetBindCoroutineID();
-				if (this->GetCoroutine(id) != nullptr)
-				{
-					if (corEvent->Invoke() == false)
-					{
-						iter++;
-						continue;
-					}
-				}
-				this->mCorEventList.erase(iter++);
-				this->Resume(corEvent->GetBindCoroutineID());
-				delete corEvent;
-			}
-		}
-	}
-
 
 	void CoroutineManager::Sleep(long long ms)
 	{
@@ -296,6 +273,5 @@ namespace SoEasy
 #ifdef _WIN32
 		this->LoopCheckDelCoroutine();
 #endif
-		this->LoopCoroutineEvent();
 	}
 }
