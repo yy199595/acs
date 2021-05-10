@@ -34,12 +34,7 @@ namespace SoEasy
 		if (!this->mCacheQueue.empty())
 		{
 			mLock.lock();
-			while (!this->mCacheQueue.empty())
-			{
-				T item = this->mCacheQueue.front();
-				this->mCacheQueue.pop();
-				mWorkQueue.push(item);
-			}
+			std::swap(this->mCacheQueue, this->mWorkQueue);
 			mLock.unlock();
 		}
 
