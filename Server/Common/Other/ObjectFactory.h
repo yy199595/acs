@@ -14,8 +14,7 @@ namespace SoEasy
 	private:
 		ObjectFactory(size_t size) :mQueueCount(size) { }
 	public:
-		static bool Init(size_t size = 10);
-		static ObjectFactory * Get() { return mObjectFactory; }
+		static ObjectFactory * Get();
 	public:
 		template<typename ... Args>
 		Object * CreateObjectByName(std::string name, Args &&... args);
@@ -32,8 +31,6 @@ namespace SoEasy
 		std::unordered_map<std::string, Message *> mMessageMap;
 	public:
 		std::unordered_map<std::string, CreateAction> mRegisterClassMap;
-	private:
-		static ObjectFactory * mObjectFactory;
 	};
 	template<typename ...Args>
 	inline Object * ObjectFactory::CreateObjectByName(std::string name, Args &&...args)

@@ -42,6 +42,7 @@ namespace SoEasy
 			return XCode::CallLuaFunctionFail;
 		}
 		LuaParameter::Write<shared_ptr<TcpClientSession>>(luaEnv, session);
+		lua_pushinteger(luaEnv, requestData->operator_id());
 		lua_pushinteger(luaEnv, requestData->callback_id());
 		const std::string & protocolName = requestData->protoc_name();
 		if (!protocolName.empty())
@@ -64,14 +65,11 @@ namespace SoEasy
 			lua_pushlstring(luaEnv, jsonString.c_str(), jsonString.size());
 		}
 
-		lua_State * luaCoroutine = lua_newthread(this->luaEnv);
-		lua_pushvalue(luaEnv, 1);
-		lua_xmove(luaEnv, luaCoroutine, 1);
-		lua_replace(luaEnv, 1);
-
-		const int size = lua_gettop(luaEnv);
-		lua_xmove(luaEnv, luaCoroutine, size - 1);
-		lua_resume(luaCoroutine, luaEnv, 1);
+		if (lua_pcall(luaEnv, 5, 0, 0) != 0)
+		{
+			SayNoDebugError(lua_tostring(luaEnv, -1));
+			return XCode::CallLuaFunctionFail;
+		}
 		return XCode::LuaCoroutineReturn;
 	}
 

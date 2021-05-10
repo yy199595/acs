@@ -219,6 +219,7 @@
     <ClCompile Include="NetWork\RemoteActionProxy.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="Timer\TimerBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">

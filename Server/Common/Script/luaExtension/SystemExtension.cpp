@@ -114,7 +114,7 @@ namespace SystemExtension
 		const std::string action = lua_tostring(luaEnv, 1);
 		lua_pushvalue(luaEnv, 2);
 		int action_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		if (!lua_getfunction(luaEnv, "CoroutineAction", "Invoke"))
+		if (!lua_getfunction(luaEnv, "Action", "Invoke"))
 		{
 			lua_pushboolean(luaEnv, false);
 			return 1;
@@ -132,16 +132,16 @@ namespace SystemExtension
 		NetWorkManager * manager = pApplocation->GetManager<NetWorkManager>();
 		shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 		const std::string address = lua_tostring(luaEnv, 1);
-		returnPacket->set_error_code(lua_tointeger(luaEnv, 3));
-		returnPacket->set_callback_id(lua_tointeger(luaEnv, 2));
-
-		if (lua_isstring(luaEnv, 4))
+		returnPacket->set_error_code(lua_tointeger(luaEnv, 4));
+		returnPacket->set_callback_id(lua_tointeger(luaEnv, 3));
+		returnPacket->set_operator_id(lua_tointeger(luaEnv, 2));
+		if (lua_isstring(luaEnv, 5))
 		{
 			size_t size = 0;
 			const char * json = lua_tolstring(luaEnv, 4, &size);
 			returnPacket->set_message_data(json, size);
 		}
-		else if (lua_isuserdata(luaEnv, 4))
+		else if (lua_isuserdata(luaEnv, 5))
 		{
 			Message * pMessage = (Message *)lua_touserdata(luaEnv, -4);
 			if (pMessage != nullptr)
@@ -256,16 +256,14 @@ namespace SystemExtension
 	int Sleep(lua_State * luaEnv)
 	{	
 		long long ms = lua_tointeger(luaEnv, 1);
-		lua_pushthread(luaEnv);
-		//TODO
-		TimerManager * pTimerManager = nullptr;
+		lua_pushthread(luaEnv);		
+		TimerManager * pTimerManager = Applocation::Get()->GetManager<TimerManager>();
 		if (pTimerManager != nullptr)
 		{
-			long long targetTime = TimeHelper::GetMilTimestamp() + ms;
-			shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, targetTime);
+			shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, ms);
 			pTimerManager->AddTimer(pTimer);
 		}
-		return lua_yield(luaEnv, 01);
+		return lua_yield(luaEnv, 1);
 	}
 
 	int WaitNetFrame(lua_State * luaEnv)

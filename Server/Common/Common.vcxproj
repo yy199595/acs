@@ -69,6 +69,7 @@
     <ClCompile Include="Timer\CorSleepTimer.cpp" />
     <ClCompile Include="Timer\LuaActionTimer.cpp" />
     <ClCompile Include="Timer\LuaSleepTimer.cpp" />
+    <ClCompile Include="Timer\TimerBase.cpp" />
     <ClCompile Include="Util\Base64Helper.cpp" />
     <ClCompile Include="Util\DirectoryHelper.cpp" />
     <ClCompile Include="Util\FileHelper.cpp" />

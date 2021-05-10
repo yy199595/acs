@@ -7,14 +7,17 @@ function Action.Invoke(action, session, operId, callbakcId, messageData)
         local json = require("Util.JsonUtil")
         messageData = json.ToObject(messageData)
     end
-    local code, data = action(session, operId, callbakcId, messageData) 
-    if callbakcId ~= 0 then
-        if type(data) == "table" then
-            local json = require("Util.JsonUtil")
-            data = json.ToString(data)
+    local cor = coroutine.create(function()
+        local code, data = action(session, operId, callbakcId, messageData) 
+        if callbakcId ~= 0 then
+            if type(data) == "table" then
+                local json = require("Util.JsonUtil")
+                data = json.ToString(data)
+            end
+            SoEasy.SendByAddress(address, operId, callbakcId, code, data)
         end
-        SoEasy.SendByAddress(address, callbakcId, code, data)
-    end
+    end)
+    coroutine.resume(cor) 
 end
 
 return Action

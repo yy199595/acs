@@ -3,23 +3,11 @@
 
 namespace SoEasy
 {
-	ObjectFactory * ObjectFactory::mObjectFactory = nullptr;
-
-
-	bool ObjectFactory::Init(size_t size)
+	ObjectFactory * ObjectFactory::Get()
 	{
-		if (mObjectFactory == nullptr)
-		{
-			mObjectFactory = new ObjectFactory(size);
-			if (mObjectFactory == nullptr)
-			{
-				return false;
-			}
-			return true;
-		}
-		return false;
+		static ObjectFactory factory(10);
+		return &factory;
 	}
-
 
 	Message * ObjectFactory::CreateMessage(const std::string & name)
 	{
