@@ -53,6 +53,16 @@ namespace SoEasy
 		return true;
 	}
 
+	void Applocation::GetManagers(std::vector<Manager*>& managers)
+	{
+		managers.clear();
+		for (size_t index = 0; index < this->mSortManagers.size(); index++)
+		{
+			Manager * manager = this->mSortManagers[index];
+			managers.push_back(manager);
+		}
+	}
+
 	bool Applocation::LoadManager()
 	{
 		std::vector<std::string> managers;

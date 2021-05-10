@@ -172,6 +172,10 @@ namespace SoEasy
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "GetManager", SystemExtension::GetManager);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CreateByTable", LuaProtocExtension::CreateByTable);
+
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "BindAction", SystemExtension::BindAction);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "SendByAddress", SystemExtension::SendByAddress);
+
 	}
 
 	XCode ScriptManager::OnHotfix(shared_ptr<TcpClientSession>, long long operId)

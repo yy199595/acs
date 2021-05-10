@@ -5,6 +5,9 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Timer/LuaActionTimer.h>
 #include<Timer/LuaSleepTimer.h>
+#include<Manager/NetWorkManager.h>
+#include<Manager/LocalActionManager.h>
+#include<NetWork/NetLuaAction.h>
 using namespace SoEasy;
 namespace SystemExtension
 {
@@ -85,6 +88,73 @@ namespace SystemExtension
 			}
 		}
 		return 0;
+	}
+
+	int BindAction(lua_State * luaEnv)
+	{
+
+		Applocation * pApplocation = Applocation::Get();
+		LocalActionManager * actionManager = pApplocation->GetManager<LocalActionManager>();
+		if (actionManager == nullptr)
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+
+		if (!lua_isstring(luaEnv, 1))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+		if (!lua_isfunction(luaEnv, 2))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+		const std::string action = lua_tostring(luaEnv, 1);
+		lua_pushvalue(luaEnv, 2);
+		int action_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
+		if (!lua_getfunction(luaEnv, "CoroutineAction", "Invoke"))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+	
+		int invoke_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);	
+		NetLuaAction * luaAction = new NetLuaAction(luaEnv, action, action_ref, invoke_ref);
+		lua_pushboolean(luaEnv, actionManager->BindFunction(luaAction));
+		return 1;
+	}
+
+	int SendByAddress(lua_State * luaEnv)
+	{
+		Applocation * pApplocation = Applocation::Get();
+		NetWorkManager * manager = pApplocation->GetManager<NetWorkManager>();
+		shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+		const std::string address = lua_tostring(luaEnv, 1);
+		returnPacket->set_error_code(lua_tointeger(luaEnv, 3));
+		returnPacket->set_callback_id(lua_tointeger(luaEnv, 2));
+
+		if (lua_isstring(luaEnv, 4))
+		{
+			size_t size = 0;
+			const char * json = lua_tolstring(luaEnv, 4, &size);
+			returnPacket->set_message_data(json, size);
+		}
+		else if (lua_isuserdata(luaEnv, 4))
+		{
+			Message * pMessage = (Message *)lua_touserdata(luaEnv, -4);
+			if (pMessage != nullptr)
+			{
+				std::string messageBuffer;
+				if (pMessage->SerializePartialToString(&messageBuffer))
+				{
+					returnPacket->set_message_data(messageBuffer);
+				}			
+			}
+		}
+		lua_pushboolean(luaEnv, manager->SendMessageByAdress(address, returnPacket));
+		return 1;
 	}
 
 	int CallWait(lua_State * luaEnv)

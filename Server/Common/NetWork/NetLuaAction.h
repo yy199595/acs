@@ -10,13 +10,11 @@ namespace SoEasy
 	class NetLuaAction
 	{
 	public:
-		NetLuaAction(lua_State * lua, int r, const std::string name) :ref(r), luaEnv(lua), mFuncName(name) { }
-		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->ref); }
+		NetLuaAction(lua_State * lua, const std::string name, int action_ref, int invoke_ref);
+		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mActionRef); }
 	public:
-		static NetLuaAction * Create(lua_State * luaEvn, std::string table, std::string func);
-	public:
-		const std::string & GetActionName() { return mFuncName; }
-		XCode Invoke1(shared_ptr<TcpClientSession>, long long id);
+		const std::string & GetActionName() { return mActionName; }
+		/*XCode Invoke1(shared_ptr<TcpClientSession>, long long id);
 
 		template<typename T>
 		inline XCode Inovke2(shared_ptr<TcpClientSession>, long long id, const T & t1);
@@ -25,15 +23,16 @@ namespace SoEasy
 		inline XCode Inovke3(shared_ptr<TcpClientSession>, long long id, const T1 & requestData, T2 & returnData);
 
 		template<typename T>
-		inline XCode Inovke4(shared_ptr<TcpClientSession>, long long id, T & t1);
+		inline XCode Inovke4(shared_ptr<TcpClientSession>, long long id, T & t1);*/
 	public:
-		XCode Invoke(shared_ptr<TcpClientSession>, const shared_ptr<NetWorkPacket> , shared_ptr<NetWorkPacket>);
+		XCode Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData);
 	private:
-		int ref;
+		int mActionRef;
+		int mInvokeRef;
 		lua_State * luaEnv;
-		std::string mFuncName;
+		std::string mActionName;
 	};
-	template<typename T>
+	/*template<typename T>
 	inline XCode NetLuaAction::Inovke2(shared_ptr<TcpClientSession> session, long long id, const T & t1)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
@@ -95,5 +94,5 @@ namespace SoEasy
 			return code;
 		}
 		return XCode::CallLuaFunctionFail;
-	}
+	}*/
 }

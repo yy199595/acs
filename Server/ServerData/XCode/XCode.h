@@ -7,7 +7,9 @@ enum XCode
 	CallFunctionNotExist,	//调用方法不存在
 	TimeoutAutoCall,		//超时自动调用
 	CallLuaFunctionFail,	//调用lua方法失败
-	JsonCastProtocbuferFail,	//json转protocbuf失败
+	JsonCastProtocbufFail,	//json转protocbuf失败
+	ProtocbufCastJsonFail,	//protocbuf转json失败
+	LuaCoroutineReturn,			//启动lua协程lua自己返回
 	FunctionNameFail,
 	CreatePorotbufFail,	//创建pb失败
 	SerializationFailure, //序列化失败

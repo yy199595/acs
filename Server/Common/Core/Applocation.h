@@ -43,6 +43,7 @@ namespace SoEasy
 		inline T * GetManager();
 		template<typename T>
 		inline bool TryAddManager();
+		void GetManagers(std::vector<Manager *> & managers);
 	private:
 		bool LoadManager();
 		bool InitManager();

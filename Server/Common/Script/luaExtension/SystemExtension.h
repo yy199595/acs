@@ -21,4 +21,8 @@ namespace SystemExtension
 	extern int GetApp(lua_State * luaEnv);
 
 	extern int GetManager(lua_State * luaEnv);
+
+	extern int SendByAddress(lua_State * luaEnv);
+
+	extern int BindAction(lua_State * luaEnv);
 }

@@ -27,6 +27,7 @@
         "MysqlManager",
         "RedisManager",
         "ProxyManager",
+        "ScriptManager",
         "LocalActionManager",
         "RemoteActionManager",
         "ActionRegisterManager"

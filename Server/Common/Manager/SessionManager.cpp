@@ -107,9 +107,16 @@ namespace SoEasy
 	
 			NetLuaAction * luaAction = this->mActionManager->GetLuaAction(name);
 			if (luaAction != nullptr)	//lua 函数自己返回
-			{
-				shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-				XCode code = luaAction->Invoke(pTcpSession, nNetMsgPackage, returnPacket);
+			{			
+				XCode code = luaAction->Invoke(pTcpSession, nNetMsgPackage);
+				if (code != XCode::LuaCoroutineReturn)
+				{
+					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+					returnPacket->set_error_code(code);
+					returnPacket->set_operator_id(nNetMsgPackage->operator_id());
+					returnPacket->set_callback_id(nNetMsgPackage->callback_id());
+					this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
+				}
 			}
 			else  //在协程中执行
 			{
