@@ -1,5 +1,5 @@
 #include"Manager.h"
-#include"ActionManager.h"
+#include"LocalActionManager.h"
 #include<Core/Applocation.h>
 namespace SoEasy
 {
@@ -7,7 +7,7 @@ namespace SoEasy
 	{
 
 	}
-	bool Manager::BindFunction(std::string name, NetWorkAction1 action)
+	bool Manager::BindFunction(std::string name, LocalAction1 action)
 	{
 		const size_t pos = name.find_first_of(".");
 		if (pos == std::string::npos)
@@ -15,7 +15,7 @@ namespace SoEasy
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		NetWorkActionBox * actionBox = new NetWorkActionBox1(action, name);
+		LocalActionProxy * actionBox = new LocalActionProxy1(action, name);
 		return this->BindFunction(name, actionBox);
 	}
 
@@ -26,9 +26,9 @@ namespace SoEasy
 
 
 
-	bool Manager::BindFunction(const std::string & name, NetWorkActionBox * actionBox)
+	bool Manager::BindFunction(const std::string & name, LocalActionProxy * actionBox)
 	{	
-		ActionManager * pFunctionManager = this->GetManager<ActionManager>();
+		LocalActionManager * pFunctionManager = this->GetManager<LocalActionManager>();
 		SayNoAssertRetFalse_F(pFunctionManager || actionBox);
 		const size_t pos = name.find_first_of(".");
 		const std::string className = name.substr(0, pos);

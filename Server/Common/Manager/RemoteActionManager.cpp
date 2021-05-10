@@ -1,21 +1,21 @@
-#include"ActionQueryManager.h"
+#include"RemoteActionManager.h"
 #include<Util/StringHelper.h>
 #include<NetWork/RemoteScheduler.h>
 
 #include<Coroutine/CoroutineManager.h>
 
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<Manager/ListenerManager.h>
 namespace SoEasy
 {
-	ActionQueryManager::ActionQueryManager()
+	RemoteActionManager::RemoteActionManager()
 	{
 		this->mActionManager = nullptr;
 		this->mListenerManager = nullptr;
 		this->mCoroutineManager = nullptr;
 	}
 
-	bool ActionQueryManager::OnInit()
+	bool RemoteActionManager::OnInit()
 	{
 		if (!SessionManager::OnInit())
 		{
@@ -37,22 +37,22 @@ namespace SoEasy
 			SayNoDebugFatal("parse ActionQueryAddress fail");
 			return false;
 		}
-		this->mActionManager = this->GetManager<ActionManager>();
+		this->mActionManager = this->GetManager<LocalActionManager>();
 		this->mListenerManager = this->GetManager<ListenerManager>();
 		SayNoAssertRetFalse_F(this->mActionManager);
 		SayNoAssertRetFalse_F(this->mListenerManager);
 
-		REGISTER_FUNCTION_1(ActionQueryManager::UpdateActions, PB::AreaActionInfo);
+		REGISTER_FUNCTION_1(RemoteActionManager::UpdateActions, PB::AreaActionInfo);
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
 		return this->mActionQuerySession->StartConnect();
 	}
 
-	void ActionQueryManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void RemoteActionManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
 
 	}
 
-	void ActionQueryManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	void RemoteActionManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
 		PB::ActionUpdateInfo actionInfo;
 		RemoteScheduler remoteScheduler(tcpSession, this->mAreaId);
@@ -75,7 +75,7 @@ namespace SoEasy
 		});
 	}
 
-	ActionAddressProxy * ActionQueryManager::GetActionProxy(const std::string & action, long long id)
+	RemoteActionProxy * RemoteActionManager::GetActionProxy(const std::string & action, long long id)
 	{
 		auto iter = this->mActionAddressMap.find(action);
 		if (iter == this->mActionAddressMap.end())
@@ -92,13 +92,13 @@ namespace SoEasy
 		return iter1 != this->mActionProxyMap.end() ? iter1->second : nullptr;
 	}
 
-	XCode ActionQueryManager::UpdateActions(shared_ptr<TcpClientSession> session, long long id, const PB::AreaActionInfo & actionInfos)
+	XCode RemoteActionManager::UpdateActions(shared_ptr<TcpClientSession> session, long long id, shared_ptr<PB::AreaActionInfo> actionInfos)
 	{
 		std::set<std::string> allActionAddress;
-		for (int index = 0; index < actionInfos.action_infos_size(); index++)
+		for (int index = 0; index < actionInfos->action_infos_size(); index++)
 		{
 			std::vector<std::string> actionAddressVector;
-			const AreaActionInfo_ActionInfo & actionInfo = actionInfos.action_infos(index);
+			const AreaActionInfo_ActionInfo & actionInfo = actionInfos->action_infos(index);
 			const std::string & name = actionInfo.action_name();
 			for (int i = 0; i < actionInfo.action_address_size(); i++)
 			{
@@ -112,7 +112,7 @@ namespace SoEasy
 
 		for (const std::string & address : allActionAddress)
 		{
-			ActionAddressProxy * actionProxy = new ActionAddressProxy(this->mNetWorkManager, this->mNetWorkManager, address);
+			RemoteActionProxy * actionProxy = new RemoteActionProxy(this->mNetWorkManager, address);
 			this->mActionProxyMap.insert(std::make_pair(address, actionProxy));
 		}
 

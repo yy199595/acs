@@ -11,6 +11,12 @@ namespace SoEasy
 
 	}
 
+	GameObject::GameObject(const long long id, const std::string & address)
+		: mGameObjectId(id)
+	{
+		mSessionAddress = address;
+	}
+
 	Component * GameObject::AddComponentByName(const std::string name)
 	{
 		Component * component = this->GetComponentByName(name);

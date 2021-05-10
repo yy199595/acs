@@ -3,7 +3,7 @@
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include"Manager/ClientManager.h"
 using namespace SoEasy;
@@ -11,7 +11,7 @@ using namespace Client;
 
 TYPE_REFLECTION(Client::ClientManager, "ClientManager");
 TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
-TYPE_REFLECTION(SoEasy::ActionManager, "ActionManager");
+TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
 TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
 TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
 TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
@@ -26,7 +26,7 @@ TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
 int main(int argc, char ** argv)
 {
 	ManagerFactory factory;
-	factory.RegisterManager<ActionManager>();
+	factory.RegisterManager<LocalActionManager>();
 	factory.RegisterManager<ClientManager>();
 	factory.RegisterManager<TimerManager>();
 	factory.RegisterManager<ScriptManager>();

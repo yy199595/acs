@@ -7,17 +7,15 @@ namespace SoEasy
 	class SessionManager;
 	class NetWorkManager;
 
-	class ActionAddressProxy
+	class RemoteActionProxy
 	{
 	public:
-		ActionAddressProxy(NetWorkManager * mgr, SessionManager * sMgr, const std::string & address);
+		RemoteActionProxy(NetWorkManager * mgr, const std::string & address);
 	public:
-		bool CallAction(shared_ptr<PB::NetWorkPacket> message);
+		bool StartConnect(SessionManager * sMgr);
+		XCode CallAction(shared_ptr<PB::NetWorkPacket> message);
 	private:
-		bool StartConnect();
 		void OnConnectBack(shared_ptr<TcpClientSession> session, bool hasError);
-	private:
-		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue;
 	private:
 		std::string mActionIp;
 		unsigned short mActionPort;
@@ -25,5 +23,6 @@ namespace SoEasy
 		SessionManager * mSessionManager;
 		NetWorkManager * mNetWorkManager;
 		shared_ptr<TcpClientSession> mActionSession;
+		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue;
 	};
 }

@@ -8,7 +8,7 @@
 #include<Timer/CorSleepTimer.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<NetWork/NetWorkRetAction.h>
 using namespace std::chrono;
 
@@ -46,7 +46,7 @@ namespace SoEasy
 	{		
 		this->mTimerManager = this->GetManager<TimerManager>(); 
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mFunctionManager = this->GetManager<ActionManager>();
+		this->mFunctionManager = this->GetManager<LocalActionManager>();
 		SayNoAssertRetFalse_F(this->mTimerManager);
 		SayNoAssertRetFalse_F(this->mNetWorkManager);
 		SayNoAssertRetFalse_F(this->mNetWorkManager);
@@ -266,7 +266,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode CoroutineManager::SendCallMessage(const std::string & func, const Message * message, NetWorkRetActionBox * callBack)
+	XCode CoroutineManager::SendCallMessage(const std::string & func, const Message * message, LocalRetActionProxy * callBack)
 	{
 		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
 

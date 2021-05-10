@@ -14,11 +14,11 @@ namespace SoEasy
 	template<typename T>
 	using NetWorkRetAction2 = std::function<void(shared_ptr<TcpClientSession>, XCode, const T &)>;
 
-	class NetWorkRetActionBox
+	class LocalRetActionProxy
 	{
 	public:
-		NetWorkRetActionBox(std::string & name);
-		virtual ~NetWorkRetActionBox() { }
+		LocalRetActionProxy(std::string & name);
+		virtual ~LocalRetActionProxy() { }
 	public:
 		long long GetCreateTime() { return this->mCreateTime; }
 		std::string & GetFunctionName() { return this->mFunctionName; }
@@ -36,14 +36,14 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	class NetWorkRetActionBox1 : public NetWorkRetActionBox
+	class NetWorkRetActionBox1 : public LocalRetActionProxy
 	{
 	public:
 		NetWorkRetActionBox1(NetWorkRetAction1 action, std::string & name)
-			: NetWorkRetActionBox(name), mBindAction(action),mBindLuaAction(nullptr) {}
+			: LocalRetActionProxy(name), mBindAction(action),mBindLuaAction(nullptr) {}
 
 		NetWorkRetActionBox1(NetLuaRetAction * action, std::string & name)
-			:NetWorkRetActionBox(name), mBindAction(nullptr), mBindLuaAction(action) { }
+			:LocalRetActionProxy(name), mBindAction(nullptr), mBindLuaAction(action) { }
 
 		~NetWorkRetActionBox1() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
@@ -55,11 +55,11 @@ namespace SoEasy
 	};
 
 	template<typename T>
-	class NetWorkRetActionBox2 : public NetWorkRetActionBox
+	class NetWorkRetActionBox2 : public LocalRetActionProxy
 	{
 	public:
 		NetWorkRetActionBox2(NetWorkRetAction2<T> action, std::string & name)
-			:NetWorkRetActionBox(name), mBindAction(action) { }
+			:LocalRetActionProxy(name), mBindAction(action) { }
 
 		~NetWorkRetActionBox2() { }
 
@@ -86,7 +86,7 @@ namespace SoEasy
 	};
 
 
-	class NetWorkRetActionBoxLua : public NetWorkRetActionBox
+	class NetWorkRetActionBoxLua : public LocalRetActionProxy
 	{
 	public:
 		NetWorkRetActionBoxLua(NetLuaRetAction * action, std::string name);
@@ -99,7 +99,7 @@ namespace SoEasy
 		NetLuaRetAction * mBindLuaAction;
 	};
 
-	class NetWorkWaitActionBoxLua : public NetWorkRetActionBox
+	class NetWorkWaitActionBoxLua : public LocalRetActionProxy
 	{
 	public:
 		NetWorkWaitActionBoxLua(NetLuaWaitAction * action, std::string name);
@@ -114,7 +114,7 @@ namespace SoEasy
 
 	class CoroutineManager;
 
-	class NetWorkWaitCorAction : public NetWorkRetActionBox
+	class NetWorkWaitCorAction : public LocalRetActionProxy
 	{
 	public:
 		NetWorkWaitCorAction(std::string name, CoroutineManager *);

@@ -4,14 +4,14 @@
 #include<Util/ProtocHelper.h>
 #include<Script/LuaParameter.h>
 #include<Other/ObjectFactory.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 namespace SoEasy
 {
 	RemoteScheduler::RemoteScheduler(long long operaotrId)
 	{
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
-		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
+		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
 	}
 
 	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operaotrId)
@@ -20,7 +20,7 @@ namespace SoEasy
 		this->mBindSessionAdress = session->GetAddress();
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
-		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
+		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
 	}
 
 	bool RemoteScheduler::Call(std::string func)
@@ -39,13 +39,13 @@ namespace SoEasy
 	}
 	bool RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBox1(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBox1(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBox1(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBox1(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 }
@@ -54,23 +54,23 @@ namespace SoEasy
 {
 	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBoxLua(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBoxLua(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBoxLua(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBoxLua(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkWaitActionBoxLua(action, func);
+		LocalRetActionProxy * pAction = new NetWorkWaitActionBoxLua(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
-	bool RemoteScheduler::SendCallMessage(std::string & func, Message * message, NetWorkRetActionBox * action)
+	bool RemoteScheduler::SendCallMessage(std::string & func, Message * message, LocalRetActionProxy * action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
@@ -91,7 +91,7 @@ namespace SoEasy
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
-	bool RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, NetWorkRetActionBox * action)
+	bool RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, LocalRetActionProxy * action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
@@ -109,7 +109,7 @@ namespace SoEasy
 
 	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkWaitActionBoxLua(action, func);
+		LocalRetActionProxy * pAction = new NetWorkWaitActionBoxLua(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 }

@@ -1,20 +1,21 @@
-#include"ActionManager.h"
+#include"LocalActionManager.h"
 #include"ScriptManager.h"
 #include"NetWorkManager.h"
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
+#include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	ActionManager::ActionManager()
+	LocalActionManager::LocalActionManager()
 	{
 		this->mScriptManager = nullptr;
 		this->mNetWorkManager = nullptr;
 	}
 
-	bool ActionManager::OnInit()
+	bool LocalActionManager::OnInit()
 	{
 		this->mScriptManager = this->GetManager<ScriptManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
@@ -25,17 +26,17 @@ namespace SoEasy
 		return true;
 	}
 
-	void ActionManager::OnDestory()
+	void LocalActionManager::OnDestory()
 	{	
 		for (auto iter = this->mRetActionMap.begin(); iter != this->mRetActionMap.end(); iter++)
 		{
-			NetWorkRetActionBox * pAction = iter->second;
+			LocalRetActionProxy * pAction = iter->second;
 			delete pAction;
 		}
 
 		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
 		{
-			NetWorkActionBox * pAction = iter->second;
+			LocalActionProxy * pAction = iter->second;
 			delete pAction;
 		}
 		for (auto iter = this->mRegisterLuaActions.begin(); iter != this->mRegisterLuaActions.end(); iter++)
@@ -48,7 +49,7 @@ namespace SoEasy
 		this->mRegisterLuaActions.clear();
 	}
 
-	void ActionManager::GetAllFunction(std::vector<std::string>& funcs)
+	void LocalActionManager::GetAllFunction(std::vector<std::string>& funcs)
 	{
 		funcs.clear();
 		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
@@ -62,7 +63,7 @@ namespace SoEasy
 		}
 	}
 
-	bool ActionManager::BindFunction(NetLuaAction * actionBox)
+	bool LocalActionManager::BindFunction(NetLuaAction * actionBox)
 	{
 		if (actionBox == nullptr)
 		{
@@ -79,7 +80,7 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ActionManager::BindFunction(NetWorkActionBox * actionBox)
+	bool LocalActionManager::BindFunction(LocalActionProxy * actionBox)
 	{
 		if (actionBox == nullptr)
 		{
@@ -96,12 +97,12 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ActionManager::DelCallback(long long callbackId)
+	bool LocalActionManager::DelCallback(long long callbackId)
 	{
 		auto iter = this->mRetActionMap.find(callbackId);
 		if (iter != this->mRetActionMap.end())
 		{
-			NetWorkRetActionBox * actionBox = iter->second;
+			LocalRetActionProxy * actionBox = iter->second;
 			this->mRetActionMap.erase(iter);
 			delete actionBox;
 			return true;
@@ -109,12 +110,12 @@ namespace SoEasy
 		return false;
 	}
 
-	NetWorkRetActionBox * ActionManager::GetCallback(long long callbackId, bool remove)
+	LocalRetActionProxy * LocalActionManager::GetCallback(long long callbackId, bool remove)
 	{
 		auto iter = this->mRetActionMap.find(callbackId);
 		if (iter != this->mRetActionMap.end())
 		{
-			NetWorkRetActionBox * actionBox = iter->second;
+			LocalRetActionProxy * actionBox = iter->second;
 			if (remove)
 			{
 				this->mRetActionMap.erase(iter);
@@ -124,23 +125,23 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	bool ActionManager::AddCallback(NetWorkRetActionBox * actionBox, long long & callbackId)
+	bool LocalActionManager::AddCallback(LocalRetActionProxy * actionBox, long long & callbackId)
 	{
 		if (actionBox == nullptr)
 		{
 			return false;
 		}
-		long long id = NumberHelper::Create();
-		this->mRetActionMap.emplace(id, actionBox);
+		callbackId = NumberHelper::Create();
+		this->mRetActionMap.emplace(callbackId, actionBox);
 		return true;
 	}
 
-	void ActionManager::OnSecondUpdate()
+	void LocalActionManager::OnSecondUpdate()
 	{
 		/*const long long nowTime = TimeHelper::GetSecTimeStamp();
 		for (auto iter = this->mRetActionMap.begin(); iter != this->mRetActionMap.end();)
 		{
-			NetWorkRetActionBox * retActionBox = iter->second;
+			LocalRetActionProxy * retActionBox = iter->second;
 			if (retActionBox != nullptr && nowTime >= retActionBox->GetInitiativeTime())
 			{
 				this->mRetActionMap.erase(iter++);
@@ -154,7 +155,7 @@ namespace SoEasy
 		}*/
 	}
 
-	void ActionManager::OnInitComplete()
+	void LocalActionManager::OnInitComplete()
 	{
 		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
 		{
@@ -163,7 +164,7 @@ namespace SoEasy
 		}
 	}
 
-	/*bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
+	/*bool LocalActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
@@ -171,7 +172,7 @@ namespace SoEasy
 			SayNoDebugError("No callback method found " << id);
 			return false;
 		}
-		NetWorkRetActionBox * refActionBox = iter->second;
+		LocalRetActionProxy * refActionBox = iter->second;
 		if (refActionBox == nullptr)
 		{
 			this->mRetActionMap.erase(iter);
@@ -184,7 +185,7 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo)
+	bool LocalActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo)
 	{
 		NetLuaAction * pNetLuaAction = GetLuaFunction(name);
 		if (pNetLuaAction != nullptr)
@@ -193,7 +194,7 @@ namespace SoEasy
 			pNetLuaAction->Invoke(tcpSession, callInfo, returnData);
 			return true;
 		}
-		NetWorkActionBox * pAction = GetFunction(name);
+		LocalActionProxy * pAction = GetFunction(name);
 		if (pAction == nullptr)
 		{
 			return false;
@@ -216,13 +217,13 @@ namespace SoEasy
 		return true;
 	}
 */
-	NetLuaAction * ActionManager::GetLuaAction(const std::string & name)
+	NetLuaAction * LocalActionManager::GetLuaAction(const std::string & name)
 	{
 		auto iter = this->mRegisterLuaActions.find(name);
 		return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
 	}
 
-	NetWorkActionBox * ActionManager::GetAction(const std::string & name)
+	LocalActionProxy * LocalActionManager::GetAction(const std::string & name)
 	{
 		auto iter = this->mRegisterActions.find(name);
 		return iter != this->mRegisterActions.end() ? iter->second : nullptr;

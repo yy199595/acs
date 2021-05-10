@@ -5,7 +5,7 @@
 #include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 using namespace SoEasy;
 using namespace std::chrono;
@@ -76,7 +76,7 @@ namespace SoEasy
 			}
 		}
 		this->TryAddManager<TimerManager>();
-		this->TryAddManager<ActionManager>();
+		this->TryAddManager<LocalActionManager>();
 		this->TryAddManager<NetWorkManager>();
 		this->TryAddManager<CoroutineManager>();
 

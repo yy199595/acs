@@ -40,12 +40,12 @@ namespace Client
 				StringArray queryInfo;
 				RemoteScheduler shceuder(tcpSession);
 				queryInfo.add_data_array()->assign("shouhuzhemen299_db");
-				queryInfo.add_data_array()->assign("player_space_risk");
+				queryInfo.add_data_array()->assign("player_risk");
 				long long t1 = TimeHelper::GetMilTimestamp();
 				shceuder.Call("MysqlManager.QueryTable", &queryInfo, [t1](shared_ptr<TcpClientSession>, XCode code)
 				{
 					long long t2 = TimeHelper::GetMilTimestamp();
-					SayNoDebugWarning("cost time = " << t2 - t1);
+					SayNoDebugWarning("cost time = " << t2 - t1 << "  code = " << code);
 				});
 				this->mCoroutineManager->Sleep(3000);
 			}

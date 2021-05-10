@@ -23,7 +23,7 @@ namespace SoEasy
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
 	private:
-		XCode RegisterActions(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actionInfo);
+		XCode RegisterActions(shared_ptr<TcpClientSession> session, long long id, shared_ptr<ActionUpdateInfo> actionInfo);
 	private:
 		XCode SyncActionInfos(int areaId);
 	private:

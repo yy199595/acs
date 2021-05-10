@@ -27,8 +27,8 @@
     <ClCompile Include="Coroutine\CoroutineManager.cpp" />
     <ClCompile Include="Global\LogHelper.cpp" />
     <ClCompile Include="Global\ServerConfig.cpp" />
-    <ClCompile Include="Manager\ActionManager.cpp" />
-    <ClCompile Include="Manager\ActionQueryManager.cpp" />
+    <ClCompile Include="Manager\LocalActionManager.cpp" />
+    <ClCompile Include="Manager\RemoteActionManager.cpp" />
     <ClCompile Include="Manager\ActionRegisterManager.cpp" />
     <ClCompile Include="Manager\CommandManager.cpp" />
     <ClCompile Include="Manager\ListenerManager.cpp" />
@@ -39,7 +39,7 @@
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
-    <ClCompile Include="NetWork\ActionAddressProxy.cpp" />
+    <ClCompile Include="NetWork\RemoteActionProxy.cpp" />
     <ClCompile Include="NetWork\NetLuaAction.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
@@ -94,8 +94,8 @@
     <ClInclude Include="Global\LogHelper.h" />
     <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
-    <ClInclude Include="Manager\ActionManager.h" />
-    <ClInclude Include="Manager\ActionQueryManager.h" />
+    <ClInclude Include="Manager\LocalActionManager.h" />
+    <ClInclude Include="Manager\RemoteActionManager.h" />
     <ClInclude Include="Manager\ActionRegisterManager.h" />
     <ClInclude Include="Manager\CommandManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
@@ -107,7 +107,7 @@
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />
-    <ClInclude Include="NetWork\ActionAddressProxy.h" />
+    <ClInclude Include="NetWork\RemoteActionProxy.h" />
     <ClInclude Include="NetWork\NetLuaAction.h" />
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />

@@ -7,6 +7,7 @@ namespace SoEasy
 	{
 	public:
 		GameObject(const long long id);
+		GameObject(const long long id, const std::string & address);
 		virtual ~GameObject() {};
 	public:
 		template<typename T>
@@ -31,11 +32,13 @@ namespace SoEasy
 	protected:
 		void OnDestory() override;
 	public:
+		inline const std::string & GetBindAddress() { return this->mSessionAddress; }
 		inline const long long GetGameObjectID() const { return this->mGameObjectId; }
 	private:
 		void PollComponent(float t);
 	private:
 		long long mGameObjectId;
+		std::string mSessionAddress;
 		SayNoQueue<Component *> mWaitStartComponents;
 		SayNoHashMap<std::string, Component *> mComponentMap;
 	private:

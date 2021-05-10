@@ -49,7 +49,7 @@ namespace SoEasy
 	class TcpClientSession;
 	class TcpSessionListener;
 	class GameObject;
-	class ActionManager;
+	class LocalActionManager;
 	class ActionRegisterManager;
 
 }

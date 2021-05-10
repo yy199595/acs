@@ -50,10 +50,10 @@ namespace SoEasy
 		SayNoDebugWarning("connect new session : " << tcpSession->GetAddress());		
 	}
 
-	XCode ActionRegisterManager::RegisterActions(shared_ptr<TcpClientSession> session, long long id, const ActionUpdateInfo & actions)
+	XCode ActionRegisterManager::RegisterActions(shared_ptr<TcpClientSession> session, long long id, shared_ptr<ActionUpdateInfo> actions)
 	{
 		int areaId = (int)id;
-		const string & address = actions.address();
+		const string & address = actions->address();
 		auto iter = this->mAreaActionMap.find(areaId);
 		if (iter == this->mAreaActionMap.end())
 		{
@@ -69,9 +69,9 @@ namespace SoEasy
 		
 		AreaActionTable * areaTable = this->mAreaActionMap[areaId];
 		
-		for (int index = 0; index < actions.action_names_size(); index++)
+		for (int index = 0; index < actions->action_names_size(); index++)
 		{
-			const std::string & name = actions.action_names(index);
+			const std::string & name = actions->action_names(index);
 			areaTable->AddActionAddress(name, address);
 			for (auto iter = this->mAreaActionMap.begin(); iter != this->mAreaActionMap.end() && areaId == 0; iter++)
 			{
@@ -113,7 +113,7 @@ namespace SoEasy
 				if (tcpSession != nullptr)
 				{
 					RemoteScheduler remoteScheduler(tcpSession);
-					remoteScheduler.Call("ActionQueryManager.UpdateActions", &returnData);
+					remoteScheduler.Call("RemoteActionManager.UpdateActions", &returnData);
 				}
 			}		
 		}

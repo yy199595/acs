@@ -24,11 +24,11 @@
         "NetWorkManager",
         "TimerManager",
         "ListenerManager",
-        "ActionManager",
         "MysqlManager",
         "RedisManager",
         "ProxyManager",
-        "ActionQueryManager",
+        "LocalActionManager",
+        "RemoteActionManager",
         "ActionRegisterManager"
     ],
     "WhiteList": [

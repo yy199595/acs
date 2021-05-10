@@ -30,7 +30,7 @@ namespace SoEasy
 		XCode Call(const std::string func, const Message * message = nullptr);
 		XCode Call(const std::string func, const Message * message, Message & returnData);
 	private:
-		XCode SendCallMessage(const std::string & func, const Message * message, class NetWorkRetActionBox * callBack);
+		XCode SendCallMessage(const std::string & func, const Message * message, class LocalRetActionProxy * callBack);
 	protected:
 		bool OnInit() override;
 		void OnInitComplete() override;
@@ -52,7 +52,7 @@ namespace SoEasy
 		std::string mMessageBuffer;
 		class TimerManager * mTimerManager;
 		class NetWorkManager * mNetWorkManager;
-		class ActionManager * mFunctionManager;		
+		class LocalActionManager * mFunctionManager;		
 	private:
 		long long mCurrentCorId;
 #ifndef _WIN32

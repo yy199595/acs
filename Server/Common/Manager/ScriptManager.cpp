@@ -150,7 +150,7 @@ namespace SoEasy
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "GetAddress", &TcpClientSession::GetAddress);
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "StartConnect", &TcpClientSession::StartConnect);
 		
-		ClassProxyHelper::BeginRegister<ActionManager>(lua, "ActionManager");
+		ClassProxyHelper::BeginRegister<LocalActionManager>(lua, "LocalActionManager");
 
 		ClassProxyHelper::BeginNewTalbe(lua, "TimeHelper");
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);

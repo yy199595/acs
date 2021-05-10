@@ -2,12 +2,12 @@
 #include<Core/ManagerFactory.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<Manager/ActionRegisterManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/CommandManager.h>
 #include<Manager/ListenerManager.h>
-#include<Manager/ActionQueryManager.h>
+#include<Manager/RemoteActionManager.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -18,12 +18,12 @@ using namespace DataBase;
 TYPE_REFLECTION(SoEasy::ProxyManager, "ProxyManager");
 TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
 TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
-TYPE_REFLECTION(SoEasy::ActionManager, "ActionManager");
+TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
 TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
 TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
 TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
 TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
-TYPE_REFLECTION(SoEasy::ActionQueryManager, "ActionQueryManager");
+TYPE_REFLECTION(SoEasy::RemoteActionManager, "RemoteActionManager");
 TYPE_REFLECTION(SoEasy::ActionRegisterManager, "ActionRegisterManager");
 
 TYPE_REFLECTION(DataBase::RedisManager, "RedisManager");
@@ -48,12 +48,12 @@ int main(int argc, char ** argv)
 	factory.RegisterManager<MysqlManager>();
 	factory.RegisterManager<TimerManager>();
 	factory.RegisterManager<ScriptManager>();
-	factory.RegisterManager<ActionManager>();
+	factory.RegisterManager<LocalActionManager>();
 	factory.RegisterManager<NetWorkManager>();
 	factory.RegisterManager<CommandManager>();
 	factory.RegisterManager<ListenerManager>();
 	factory.RegisterManager<CoroutineManager>();
-	factory.RegisterManager<ActionQueryManager>();
+	factory.RegisterManager<RemoteActionManager>();
 	factory.RegisterManager<ActionRegisterManager>();
 
 

@@ -1,41 +1,47 @@
-#include "ActionAddressProxy.h"
+#include "RemoteActionProxy.h"
 #include<Manager/NetWorkManager.h>
 #include<Manager/SessionManager.h>
 #include<Util/StringHelper.h>
 namespace SoEasy
 {
 
-	ActionAddressProxy::ActionAddressProxy(NetWorkManager * mgr, SessionManager * sMgr, const std::string & address)
+	RemoteActionProxy::RemoteActionProxy(NetWorkManager * mgr, const std::string & address)
 	{
 		this->mNetWorkManager = mgr;
-		this->mSessionManager = sMgr;
 		this->mActionAddress = address;
 		SayNoAssertRet_F(this->mSessionManager);
 		SayNoAssertRet_F(this->mNetWorkManager);
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mActionIp, this->mActionPort));
-		mActionSession = make_shared<TcpClientSession>(this->mSessionManager, "ActionSession", this->mActionIp, this->mActionPort);
 	}
 
-	bool ActionAddressProxy::CallAction(shared_ptr<PB::NetWorkPacket> message)
+	XCode RemoteActionProxy::CallAction(shared_ptr<PB::NetWorkPacket> message)
 	{
+		if (!this->mActionSession)
+		{
+			return XCode::SessionIsNull;
+		}
 		if (!this->mActionSession->IsActive())
 		{
 			this->mSendQueue.push(message);
-			return this->StartConnect();
+			return XCode::SessionIsNull;
 		}
 		return this->mNetWorkManager->SendMessageByAdress(mActionAddress, message);
 	}
 
-	bool ActionAddressProxy::StartConnect()
+	bool RemoteActionProxy::StartConnect(SessionManager * sMgr)
 	{
+		if (mActionSession == nullptr)
+		{
+			mActionSession = make_shared<TcpClientSession>(sMgr, "ActionSession", mActionIp, mActionPort);
+		}
 		if (mActionSession->GetState() == Connect)
 		{
 			return true;
 		}
-		return mActionSession->StartConnect(BIND_ACTION_2(ActionAddressProxy::OnConnectBack, this));
+		return mActionSession->StartConnect(BIND_ACTION_2(RemoteActionProxy::OnConnectBack, this));
 	}
 
-	void ActionAddressProxy::OnConnectBack(shared_ptr<TcpClientSession> session, bool hasError)
+	void RemoteActionProxy::OnConnectBack(shared_ptr<TcpClientSession> session, bool hasError)
 	{
 		if (hasError == false)
 		{

@@ -1,6 +1,6 @@
 #include"NetWorkManager.h"
 #include"ScriptManager.h"
-#include"ActionManager.h"
+#include"LocalActionManager.h"
 #include"Manager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
@@ -8,8 +8,8 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
 #include<Script/LuaType/LuaFunction.h>
-#include<Manager/ActionQueryManager.h>
-#include<NetWork/ActionAddressProxy.h>
+#include<Manager/RemoteActionManager.h>
+#include<NetWork/RemoteActionProxy.h>
 namespace SoEasy
 {
 	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
@@ -20,7 +20,7 @@ namespace SoEasy
 	bool NetWorkManager::OnInit()
 	{
 		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
-		this->mActionQueryManager = this->GetManager<ActionQueryManager>();
+		this->mActionQueryManager = this->GetManager<RemoteActionManager>();
 
 		SayNoAssertRetFalse_F(this->mSessionContext);
 		//SayNoAssertRetFalse_F(this->mActionQueryManager);
@@ -97,21 +97,21 @@ namespace SoEasy
 		
 	}
 
-	bool NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
+	XCode NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
 	{
 		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
 
 		if (pSession == nullptr)
 		{
 			SayNoDebugError("not find session " << address);
-			return false;
+			return XCode::SessionIsNull;
 		}
 		
 		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 		if (!returnPackage->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 		{
 			SayNoDebugError("Serialize Fail : " << returnPackage->func_name());
-			return false;
+			return XCode::SerializationFailure;
 		}
 		size_t size = returnPackage->ByteSizeLong();
 		size_t length = size + sizeof(unsigned int);
@@ -124,7 +124,7 @@ namespace SoEasy
 			const size_t size = sendMessage->size();
 			pSession->SendPackage(data, size);
 		});
-		return true;
+		return XCode::Successful;
 	}
 
 	shared_ptr<TcpClientSession> NetWorkManager::GetSessionByAdress(const std::string & adress)
@@ -143,16 +143,22 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	bool NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
+	XCode NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
 	{
 		long long operId = returnPackage->operator_id();
-		ActionAddressProxy * actionProxy = this->mActionQueryManager->GetActionProxy(func, operId);
+		RemoteActionProxy * actionProxy = this->mActionQueryManager->GetActionProxy(func, operId);
 		if (actionProxy == nullptr)
 		{
 			SayNoDebugError(func << "  method does not exist");
-			return false;
+			return XCode::CallFunctionNotExist;
 		}
-		return actionProxy->CallAction(returnPackage);
+		XCode code = actionProxy->CallAction(returnPackage);
+		if (code == XCode::SessionIsNull)
+		{
+			actionProxy->StartConnect(this);
+			return XCode::Successful;
+		}
+		return code;
 	}
 	
 	void NetWorkManager::OnDestory()

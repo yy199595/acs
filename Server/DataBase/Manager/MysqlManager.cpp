@@ -133,11 +133,11 @@ namespace DataBase
 		}
 		return true;
 	}
-	XCode MysqlManager::QueryTable(shared_ptr<TcpClientSession> session, long long id, const StringArray & requestData)
+	XCode MysqlManager::QueryTable(shared_ptr<TcpClientSession> session, long long id, shared_ptr<StringArray> requestData)
 	{
 		char buffer[100] = { 0 };
-		const std::string db = requestData.data_array(0);
-		const std::string table = requestData.data_array(1);
+		const std::string db = requestData->data_array(0);
+		const std::string table = requestData->data_array(1);
 		sprintf_s(buffer, "select * from %s;", table.c_str());
 		long long t1 = TimeHelper::GetMilTimestamp();
 

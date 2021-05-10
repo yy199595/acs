@@ -29,16 +29,14 @@ namespace SoEasy
 		virtual ~Manager() { }
 	protected:
 		friend Applocation;
-		bool BindFunction(std::string name, NetWorkAction1 action);
+		bool BindFunction(std::string name, LocalAction1 action);
 
 		template<typename T1>
-		bool BindFunction(std::string name, NetWorkAction2<T1> action);
+		bool BindFunction(std::string name, LocalAction2<T1> action);
 
 		template<typename T1, typename T2>
-		bool BindFunction(std::string name, NetWorkAction3<T1, T2> action);
+		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
-		template<typename T1>
-		bool BindFunction(std::string name, NetWorkAction4<T1> action);
 	public:
 		void AddFinishTaskId(long long taskId);	//由其他线程调用
 		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
@@ -47,7 +45,7 @@ namespace SoEasy
 	public:
 		virtual void PushClassToLua(lua_State * luaEnv) { }
 	private:
-		bool BindFunction(const std::string & name, class NetWorkActionBox * actionBox);
+		bool BindFunction(const std::string & name, class LocalActionProxy * actionBox);
 	protected:
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
@@ -64,7 +62,7 @@ namespace SoEasy
 	};
 	
 	template<typename T1>
-	inline bool Manager::BindFunction(std::string name, NetWorkAction2<T1> action)
+	inline bool Manager::BindFunction(std::string name, LocalAction2<T1> action)
 	{
 		const size_t pos = name.find_first_of(".");
 		if (pos == std::string::npos)
@@ -72,12 +70,12 @@ namespace SoEasy
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		NetWorkActionBox * actionBox = new NetWorkActionBox2<T1>(action, name);
+		LocalActionProxy * actionBox = new LocalActionProxy2<T1>(action, name);
 		return this->BindFunction(name, actionBox);
 	}
 
 	template<typename T1, typename T2>
-	inline bool Manager::BindFunction(std::string name, NetWorkAction3<T1, T2> action)
+	inline bool Manager::BindFunction(std::string name, LocalAction3<T1, T2> action)
 	{
 		const size_t pos = name.find_first_of(".");
 		if (pos == std::string::npos)
@@ -85,22 +83,10 @@ namespace SoEasy
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		NetWorkActionBox * actionBox = new NetWorkActionBox3<T1, T2>(action, name);
+		LocalActionProxy * actionBox = new LocalActionProxy3<T1, T2>(action, name);
 		return this->BindFunction(name, actionBox);
 	}
 
-	template<typename T1>
-	inline bool Manager::BindFunction(std::string name, NetWorkAction4<T1> action)
-	{
-		const size_t pos = name.find_first_of(".");
-		if (pos == std::string::npos)
-		{
-			SayNoDebugError("register error : " << name);
-			return false;
-		}
-		NetWorkActionBox * actionBox = new NetWorkActionBox4<T1>(action, name);
-		return this->BindFunction(name, actionBox);
-	}
 	inline std::string GetFunctionName(std::string func)
 	{
 		char buf[] = ".";

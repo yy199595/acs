@@ -25,8 +25,8 @@ namespace SoEasy
 		bool RemoveTcpSession(const std::string & tcpSession);
 		bool RemoveTcpSession(shared_ptr<TcpClientSession> tcpSession);
 		shared_ptr<TcpClientSession> GetSessionByAdress(const std::string & adress);
-		bool SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage);
-		bool SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage);
+		XCode SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage);
+		XCode SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage);
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;
@@ -36,7 +36,7 @@ namespace SoEasy
 	private:
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
-		class ActionQueryManager * mActionQueryManager;
+		class RemoteActionManager * mActionQueryManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//ËùÓÐsession

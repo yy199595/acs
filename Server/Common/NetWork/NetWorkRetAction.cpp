@@ -1,4 +1,4 @@
-#include "NetWorkRetAction.h"
+#include"NetWorkRetAction.h"
 #include<Util/TimeHelper.h>
 #include<Util/ProtocHelper.h>
 #include<Other/ObjectFactory.h>
@@ -7,7 +7,7 @@ namespace SoEasy
 {
 
 	NetWorkRetActionBoxLua::NetWorkRetActionBoxLua(NetLuaRetAction * action, std::string name)
-		: NetWorkRetActionBox(name), mBindLuaAction(action)
+		: LocalRetActionProxy(name), mBindLuaAction(action)
 	{
 		
 	}
@@ -31,7 +31,7 @@ namespace SoEasy
 		this->mBindLuaAction->Inovke(code);
 	}
 
-	NetWorkRetActionBox::NetWorkRetActionBox(std::string & name)
+	LocalRetActionProxy::LocalRetActionProxy(std::string & name)
 	{
 		this->mFunctionName = name;
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
@@ -47,7 +47,7 @@ namespace SoEasy
 		this->mBindAction(session, code);
 	}
 	NetWorkWaitActionBoxLua::NetWorkWaitActionBoxLua(NetLuaWaitAction * action, std::string name)
-		:NetWorkRetActionBox(name), mBindLuaAction(action)
+		:LocalRetActionProxy(name), mBindLuaAction(action)
 	{
 
 	}
@@ -71,7 +71,7 @@ namespace SoEasy
 		this->mBindLuaAction->Inovke(code);
 	}
 	NetWorkWaitCorAction::NetWorkWaitCorAction(std::string name, CoroutineManager * mgr)
-		: NetWorkRetActionBox(name)
+		: LocalRetActionProxy(name)
 	{
 		this->mScheduler = mgr;
 		this->mCoroutineId = mgr->GetCurrentCorId();

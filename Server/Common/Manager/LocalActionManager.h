@@ -6,22 +6,22 @@ namespace SoEasy
 {
 	// 注册本地服务， 推送本地服务到指定地址 管理远程回来的回调
 	class NetLuaAction;
-	class NetWorkActionBox;
-	class NetWorkRetActionBox;
+	class LocalActionProxy;
+	class LocalRetActionProxy;
 
-	class ActionManager : public Manager
+	class LocalActionManager : public Manager
 	{
 	public:
-		ActionManager();
-		virtual ~ActionManager() { }
+		LocalActionManager();
+		virtual ~LocalActionManager() { }
 	public:
 		bool BindFunction( NetLuaAction * actionBox);
-		bool BindFunction( NetWorkActionBox * actionBox);
+		bool BindFunction( LocalActionProxy * actionBox);
 		void GetAllFunction(std::vector<std::string> & funcs);
 	public:
 		bool DelCallback(long long callbackId);
-		NetWorkRetActionBox * GetCallback(long long callbackId, bool remove = true);
-		bool AddCallback(NetWorkRetActionBox * actionBox, long long & callbackId);
+		LocalRetActionProxy * GetCallback(long long callbackId, bool remove = true);
+		bool AddCallback(LocalRetActionProxy * actionBox, long long & callbackId);
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;
@@ -32,7 +32,7 @@ namespace SoEasy
 		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo);*/
 	public:		
 		NetLuaAction * GetLuaAction(const std::string & name);
-		NetWorkActionBox * GetAction(const std::string & name);
+		LocalActionProxy * GetAction(const std::string & name);
 	private:
 		std::string mMessageBuffer;
 		TimeRecorder mLogicTimeRecorder;
@@ -41,8 +41,8 @@ namespace SoEasy
 		class NetWorkManager * mNetWorkManager;
 		class CoroutineManager * mCoroutineScheduler;
 	private:
-		std::unordered_map<long long, NetWorkRetActionBox *> mRetActionMap;
+		std::unordered_map<long long, LocalRetActionProxy *> mRetActionMap;
 		std::unordered_map<std::string, NetLuaAction *> mRegisterLuaActions;
-		std::unordered_map<std::string, NetWorkActionBox *> mRegisterActions;
+		std::unordered_map<std::string, LocalActionProxy *> mRegisterActions;
 	};
 }

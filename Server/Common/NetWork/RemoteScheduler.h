@@ -3,7 +3,7 @@
 #include<Protocol/Common.pb.h>
 #include<NetWork/TcpClientSession.h>
 #include<NetWork/NetWorkRetAction.h>
-#include<Manager/ActionManager.h>
+#include<Manager/LocalActionManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Script/LuaType/LuaTable.h>
 namespace SoEasy
@@ -31,8 +31,8 @@ namespace SoEasy
 		template<typename T>
 		bool Call(std::string func, Message * message, NetWorkRetAction2<T> action);
 	private:	
-		bool SendCallMessage(std::string & func, LuaTable & message, NetWorkRetActionBox * action = nullptr);
-		bool SendCallMessage(std::string & func, Message * message = nullptr, NetWorkRetActionBox * action = nullptr);		
+		bool SendCallMessage(std::string & func, LuaTable & message, LocalRetActionProxy * action = nullptr);
+		bool SendCallMessage(std::string & func, Message * message = nullptr, LocalRetActionProxy * action = nullptr);		
 	public:
 		template<typename T, typename ... Args>
 		unsigned long long CreateCallback(Args &&... args);
@@ -41,20 +41,20 @@ namespace SoEasy
 		std::string mMessageBuffer;
 		std::string mBindSessionAdress;
 		NetWorkManager * mNetWorkManager;
-		ActionManager * mFunctionManager;
+		LocalActionManager * mFunctionManager;
 	};
 
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBox2<T>(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBox2<T>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
 	{
-		NetWorkRetActionBox * pAction = new NetWorkRetActionBox2<T>(action, func);
+		LocalRetActionProxy * pAction = new NetWorkRetActionBox2<T>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 	template<typename T, typename ...Args>

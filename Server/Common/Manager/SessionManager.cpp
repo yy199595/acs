@@ -1,8 +1,9 @@
 #include"SessionManager.h"
 #include"NetWorkManager.h"
-#include"ActionManager.h"
+#include"LocalActionManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
+#include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
@@ -82,7 +83,7 @@ namespace SoEasy
 
 	bool SessionManager::OnInit()
 	{
-		this->mActionManager = this->GetManager<ActionManager>();
+		this->mActionManager = this->GetManager<LocalActionManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
 		this->mCoroutineSheduler = this->GetManager<CoroutineManager>();
 		SayNoAssertRetFalse_F(this->mActionManager);
@@ -119,6 +120,7 @@ namespace SoEasy
 					if (nNetMsgPackage->callback_id() != 0)
 					{
 						returnPacket->set_error_code(code);
+						returnPacket->set_operator_id(nNetMsgPackage->operator_id());
 						returnPacket->set_callback_id(nNetMsgPackage->callback_id());
 						this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
 					}
@@ -128,7 +130,7 @@ namespace SoEasy
 		else if (nNetMsgPackage->callback_id() != 0)
 		{
 			const long long id = nNetMsgPackage->callback_id();
-			NetWorkRetActionBox * callback = this->mActionManager->GetCallback(id);
+			LocalRetActionProxy * callback = this->mActionManager->GetCallback(id);
 			if (callback == nullptr)
 			{
 				SayNoDebugError("not find call back " << id);
@@ -138,10 +140,10 @@ namespace SoEasy
 		}
 	}
 
-	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, const shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)
+	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)
 	{
 		const std::string & name = callInfo->func_name();
-		NetWorkActionBox * action = this->mActionManager->GetAction(name);
+		LocalActionProxy * action = this->mActionManager->GetAction(name);
 		if (action == nullptr)
 		{
 			SayNoDebugError(name << " does not exist");

@@ -66,9 +66,6 @@
     <ClCompile Include="Global\ServerConfig.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\ActionManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\CommandManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -213,10 +210,13 @@
     <ClCompile Include="Manager\ActionRegisterManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\ActionQueryManager.cpp">
+    <ClCompile Include="Manager\LocalActionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\ActionAddressProxy.cpp">
+    <ClCompile Include="Manager\RemoteActionManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\RemoteActionProxy.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
   </ItemGroup>
@@ -262,9 +262,6 @@
     </ClInclude>
     <ClInclude Include="Global\ServerConfig.h">
       <Filter>Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\ActionManager.h">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CommandManager.h">
       <Filter>Manager</Filter>
@@ -479,10 +476,13 @@
     <ClInclude Include="Manager\ActionRegisterManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\ActionQueryManager.h">
+    <ClInclude Include="Manager\LocalActionManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="NetWork\ActionAddressProxy.h">
+    <ClInclude Include="Manager\RemoteActionManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\RemoteActionProxy.h">
       <Filter>NetWork</Filter>
     </ClInclude>
   </ItemGroup>
