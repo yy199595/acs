@@ -9,14 +9,15 @@ namespace SoEasy
 {
 	RemoteScheduler::RemoteScheduler(long long operaotrId)
 	{
+		this->mOperatorId = operaotrId;
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
 		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
 	}
 
-	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session)
+	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operId)
 	{
-		this->mOperatorId = session->GetSocketId();
+		this->mOperatorId = operId;
 		this->mBindSessionAdress = session->GetAddress();
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();

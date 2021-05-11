@@ -29,6 +29,7 @@ namespace SoEasy
 	protected:
 		void OnSystemUpdate() final;
 		long long GetIdByAddress(const std::string & address);
+		shared_ptr<TcpClientSession> GetCurSession() { return this->mCurrentSession; }
 		bool ParseAddress(const std::string & address, string & ip, unsigned short & port);
 	protected:
 		class NetWorkManager * mNetWorkManager;
@@ -37,6 +38,7 @@ namespace SoEasy
 		RecvMsgCallback mRecvMsgCallback;
 		class LocalActionManager * mActionManager;
 		class CoroutineManager * mCoroutineSheduler;
+		shared_ptr<TcpClientSession> mCurrentSession;  //当前正在执行action的session
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;
 		DoubleBufferQueue<shared_ptr<TcpClientSession>> mNewSessionQueue;
 		DoubleBufferQueue<shared_ptr<TcpClientSession>> mErrorSessionQueue;

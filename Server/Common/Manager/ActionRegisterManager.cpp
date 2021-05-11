@@ -54,15 +54,16 @@ namespace SoEasy
 
 	XCode ActionRegisterManager::RegisterActions(long long operId, shared_ptr<ActionUpdateInfo> actions)
 	{
+		shared_ptr<TcpClientSession> currentSession = this->GetCurSession();
 		int areaId = actions->areaid();
 		const string & address = actions->address();
 		
 		for (int index = 0; index < actions->action_names_size(); index++)
 		{
 			ActionInfo actionInfo;
-			actionInfo.mOperId = operId;
 			actionInfo.mAreaId = actions->areaid();
 			actionInfo.mAddress = actions->address();
+			actionInfo.mOperId = currentSession->GetSocketId();
 			actionInfo.mActionName = actions->action_names(index);
 			this->AddActionInfo(actionInfo);
 		}

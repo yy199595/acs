@@ -12,7 +12,7 @@ namespace SoEasy
 	{
 	public:
 		RemoteScheduler(long long operaotrId = 0);
-		RemoteScheduler(shared_ptr<TcpClientSession>);
+		RemoteScheduler(shared_ptr<TcpClientSession>, long long operId = 0);
 		~RemoteScheduler() { }
 	public:
 		bool Call(std::string func);

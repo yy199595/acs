@@ -3,15 +3,16 @@
     "LogicFps": 30,
     "SystemFps":100,
     "RecvBuffCount": 1024,
-    "ListenAddress": "127.0.0.1:1995",
-    "ScriptMain":"./Script/LoginServer/Main.lua",
+    "ListenAddress": "127.0.0.1:7788",
+    "ScriptMain":"./Script/Client/Main.lua",
     "ScriptInclude":
     [
         "./Script/Common",
-        "./Script/LoginServer"
+        "./Script/Client"
     ],
     "Managers": [
-        "ClientManager"
+        "ClientManager",
+        "ScriptManager"
     ],
     "WhiteList": [
         "127.0.0.1"

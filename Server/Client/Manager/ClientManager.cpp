@@ -28,7 +28,7 @@ namespace Client
 
 	void ClientManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-
+		tcpSession->StartConnect();
 	}
 
 	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)

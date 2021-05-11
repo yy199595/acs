@@ -12,7 +12,7 @@ namespace SoEasy
 	{
 	public:
 		ActionScheduler(long long operId = 0);
-		ActionScheduler(shared_ptr<TcpClientSession> session);
+		ActionScheduler(shared_ptr<TcpClientSession> session, long long operId = 0);
 	public:
 		XCode Call(const std::string func, Message & returnData);
 		XCode Call(const std::string func, const Message * message = nullptr);

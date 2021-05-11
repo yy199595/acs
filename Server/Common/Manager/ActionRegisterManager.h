@@ -52,8 +52,5 @@ namespace SoEasy
 		class NetWorkManager * mNetWorkManager;
 		std::vector<ActionInfo> mActionRegisterList;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
-		
-		std::unordered_map<int, AreaActionTable *> mAreaActionMap;
-		
 	};
 }

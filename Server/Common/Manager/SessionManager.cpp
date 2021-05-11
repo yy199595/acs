@@ -94,15 +94,15 @@ namespace SoEasy
 
 	void SessionManager::OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size)
 	{
-		shared_ptr<TcpClientSession> pTcpSession = this->mNetWorkManager->GetTcpSession(address);
-		SayNoAssertRet(pTcpSession, "not find session : " << address << " size = " << size);
+		this->mCurrentSession = this->mNetWorkManager->GetTcpSession(address);
+		SayNoAssertRet(this->mCurrentSession, "not find session : " << address << " size = " << size);
 
 		shared_ptr<NetWorkPacket> nNetMsgPackage = make_shared<NetWorkPacket>();
 		SayNoAssertRet_F(nNetMsgPackage->ParseFromArray(msg, size));
 
 		if (this->mRecvMsgCallback != nullptr)
 		{
-			this->mRecvMsgCallback(pTcpSession, nNetMsgPackage);
+			this->mRecvMsgCallback(this->mCurrentSession, nNetMsgPackage);
 			return;
 		}
 	
@@ -125,10 +125,10 @@ namespace SoEasy
 			}
 			else  //在协程中执行
 			{
-				this->mCoroutineSheduler->Start([this, nNetMsgPackage, pTcpSession, address]()
+				this->mCoroutineSheduler->Start([this, nNetMsgPackage, address]()
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-					XCode code = this->InvokeAction(pTcpSession, nNetMsgPackage, returnPacket);
+					XCode code = this->InvokeAction(this->mCurrentSession, nNetMsgPackage, returnPacket);
 					if (nNetMsgPackage->callback_id() != 0)
 					{
 						returnPacket->set_error_code(code);
@@ -148,8 +148,9 @@ namespace SoEasy
 				SayNoDebugError("not find call back " << id);
 				return;
 			}
-			callback->Invoke(pTcpSession, nNetMsgPackage);
+			callback->Invoke(this->mCurrentSession, nNetMsgPackage);
 		}
+		this->mCurrentSession = nullptr;
 	}
 
 	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)

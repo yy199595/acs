@@ -14,11 +14,11 @@
     "MysqlUserName": "root",
     "ThreadCount":0,
     "MysqlPassWord": "ZupKXuUbnHoffpmu",
-    "ScriptMain":"./Script/LoginServer/Main.lua",
+    "ScriptMain":"./Script/Server/Main.lua",
     "ScriptInclude":
     [
         "./Script/Common",
-        "./Script/LoginServer"
+        "./Script/Server"
     ],
     "Managers": [
         "NetWorkManager",
@@ -26,7 +26,6 @@
         "ListenerManager",
         "MysqlManager",
         "RedisManager",
-        "ProxyManager",
         "ScriptManager",
         "LocalActionManager",
         "RemoteActionManager",

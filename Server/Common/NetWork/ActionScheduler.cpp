@@ -11,9 +11,10 @@ namespace SoEasy
 		this->mOperatorId = operId;
 	}
 
-	ActionScheduler::ActionScheduler(shared_ptr<TcpClientSession> session)
+	ActionScheduler::ActionScheduler(shared_ptr<TcpClientSession> session, long long operId)
 	{
 		this->InitScheduler();
+		this->mOperatorId = operId;
 		this->mOperatorId = session->GetSocketId();
 		this->mSessionAddress = session->GetAddress();
 	}
