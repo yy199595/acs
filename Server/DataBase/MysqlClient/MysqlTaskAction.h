@@ -1,7 +1,7 @@
 #pragma once
 #include"MysqlDefine.h"
 #include<Thread/ThreadTaskAction.h>
-namespace DataBase
+namespace SoEasy
 {
 	class MysqlTaskAction : public ThreadTaskAction
 	{

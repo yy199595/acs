@@ -2,7 +2,7 @@
 #include<Manager/Manager.h>
 #include<RedisClient/RedisTaskAction.h>
 using namespace SoEasy;
-namespace DataBase
+namespace SoEasy
 {
 	class RedisManager : public Manager
 	{

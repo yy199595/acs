@@ -60,6 +60,10 @@ namespace SoEasy
 			packet->set_error_code(XCode::CallFunctionNotExist);
 			this->mNetWorkManager->SendMessageByAdress(tcpSession->GetAddress(), packet);
 		}
+		else
+		{
+			SessionManager::OnRecvNewMessageAfter(tcpSession, packet);
+		}
 	}
 
 	shared_ptr<GameObject> ProxyManager::GetClientObject(const long long id)

@@ -11,6 +11,6 @@ namespace SoEasy
 	protected:
 		bool OnInit() override;
 	private:
-		XCode Register(shared_ptr<TcpClientSession>, long long operId, shared_ptr<PB::PlayerRegisterData> registerData, shared_ptr<PB::PlayerRegisterBack> backData);
+		XCode Register(long long operId, shared_ptr<PB::PlayerRegisterData> registerData, shared_ptr<PB::PlayerRegisterBack> backData);
 	};
 }

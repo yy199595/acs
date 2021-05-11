@@ -2,7 +2,7 @@
 #include<XCode/XCode.h>
 #include<Manager/Manager.h>
 #include<MysqlClient/MysqlDefine.h>
-namespace DataBase
+namespace SoEasy
 {
 	class MysqlTaskAction;
 	class MysqlManager : public SoEasy::Manager

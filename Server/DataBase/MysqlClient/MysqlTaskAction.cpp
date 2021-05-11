@@ -1,7 +1,7 @@
 #include "MysqlTaskAction.h"
 #include<Manager/MysqlManager.h>
 
-namespace DataBase
+namespace SoEasy
 {
 	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
 		: ThreadTaskAction(mgr, id)

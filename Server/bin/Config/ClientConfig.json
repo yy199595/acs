@@ -3,7 +3,7 @@
     "LogicFps": 30,
     "SystemFps":100,
     "RecvBuffCount": 1024,
-    "ListenAddress": "127.0.0.1:7791",
+    "ListenAddress": "127.0.0.1:7788",
     "ScriptMain":"./Script/Client/Main.lua",
     "ScriptInclude":
     [

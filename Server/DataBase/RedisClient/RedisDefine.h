@@ -3,13 +3,13 @@
 #include<Thread/ThreadTaskAction.h>
 
 using namespace SoEasy;
-namespace DataBase
+namespace SoEasy
 {
 	class RedisManager;
 	typedef redisContext RedisSocket;
 }
 
-namespace DataBase
+namespace SoEasy
 {
 
 }

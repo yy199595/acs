@@ -1,6 +1,6 @@
 #include "RedisTaskAction.h"
 #include<Manager/RedisManager.h>
-namespace DataBase
+namespace SoEasy
 {
 	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long id, const std::string & command)
 		:ThreadTaskAction(mgr, id)

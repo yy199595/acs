@@ -1,7 +1,7 @@
 #pragma once
 #include"RedisDefine.h"
 #include<Thread/ThreadTaskAction.h>
-namespace DataBase
+namespace SoEasy
 {
 	class RedisTaskAction : public ThreadTaskAction
 	{

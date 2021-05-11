@@ -1,5 +1,5 @@
 #include"MysqlDefine.h"
-namespace DataBase
+namespace SoEasy
 {
 	bool MysqlQueryLine::AddMember(const std::string & key, const std::string & value)
 	{

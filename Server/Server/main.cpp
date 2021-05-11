@@ -12,22 +12,26 @@
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/ProxyManager.h>
+#include<Manager/LoginManager.h>
+#include<Manager/UserDataManager.h>
 using namespace SoEasy;
-using namespace DataBase;
+using namespace SoEasy;
 
+TYPE_REFLECTION(SoEasy::LoginManager, "LoginManager");
 TYPE_REFLECTION(SoEasy::ProxyManager, "ProxyManager");
 TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
 TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
-TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
 TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
 TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
 TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
+TYPE_REFLECTION(SoEasy::UserDataManager, "UserDataManager");
 TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
+TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
 TYPE_REFLECTION(SoEasy::RemoteActionManager, "RemoteActionManager");
 TYPE_REFLECTION(SoEasy::ActionRegisterManager, "ActionRegisterManager");
 
-TYPE_REFLECTION(DataBase::RedisManager, "RedisManager");
-TYPE_REFLECTION(DataBase::MysqlManager, "MysqlManager");
+TYPE_REFLECTION(SoEasy::RedisManager, "RedisManager");
+TYPE_REFLECTION(SoEasy::MysqlManager, "MysqlManager");
 
 
 #ifdef _WIN32
@@ -43,16 +47,19 @@ TYPE_REFLECTION(DataBase::MysqlManager, "MysqlManager");
 int main(int argc, char ** argv)
 { 
 	ManagerFactory factory;
+	factory.RegisterManager<LoginManager>();
+	
 	factory.RegisterManager<ProxyManager>();
 	factory.RegisterManager<RedisManager>();
 	factory.RegisterManager<MysqlManager>();
 	factory.RegisterManager<TimerManager>();
 	factory.RegisterManager<ScriptManager>();
-	factory.RegisterManager<LocalActionManager>();
 	factory.RegisterManager<NetWorkManager>();
 	factory.RegisterManager<CommandManager>();
 	factory.RegisterManager<ListenerManager>();
 	factory.RegisterManager<CoroutineManager>();
+	factory.RegisterManager<UserDataManager>();
+	factory.RegisterManager<LocalActionManager>();
 	factory.RegisterManager<RemoteActionManager>();
 	factory.RegisterManager<ActionRegisterManager>();
 

@@ -1,6 +1,7 @@
 #include"ClientManager.h"
 #include<Util/StringHelper.h>
-#include<NetWork/RemoteScheduler.h>
+#include<Protocol/ServerCommon.pb.h>
+#include<NetWork/ActionScheduler.h>
 #include<Coroutine/CoroutineManager.h>
 namespace Client
 {
@@ -35,20 +36,21 @@ namespace Client
 	{
 		this->mCoroutineManager->Start([this, tcpSession]()
 		{
-			while (true)
+			this->mCoroutineManager->Sleep(5000);
+			long long t1 = TimeHelper::GetMilTimestamp();
+			for (size_t index = 0; index < 100; index++)
 			{
-				StringArray queryInfo;
-				RemoteScheduler shceuder(tcpSession);
-				queryInfo.add_data_array()->assign("shouhuzhemen299_db");
-				queryInfo.add_data_array()->assign("player_risk");
-				long long t1 = TimeHelper::GetMilTimestamp();
-				shceuder.Call("LoginManager.Login", &queryInfo, [t1](shared_ptr<TcpClientSession>, XCode code)
-				{
-					long long t2 = TimeHelper::GetMilTimestamp();
-					SayNoDebugWarning("cost time = " << t2 - t1 << "  code = " << code);
-				});
-				this->mCoroutineManager->Sleep(3000);
+				ActionScheduler shceuder(tcpSession);
+				shared_ptr<PlayerRegisterData> registerData = make_shared<PlayerRegisterData>();
+				registerData->set_account("646585122@qq.com");
+				registerData->set_password("199595yjz.");
+
+				long long t2 = TimeHelper::GetMilTimestamp();
+				XCode code = shceuder.Call("LoginManager.Register", registerData);	
+				SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2);
+
 			}
+			SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);
 		});
 	}
 }

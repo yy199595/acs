@@ -12,14 +12,14 @@
 #include<Thread/ThreadTaskAction.h>
 using namespace std;
 using namespace SoEasy;
-namespace DataBase
+namespace SoEasy
 {
 	class MysqlManager;
 	typedef  MYSQL_RES MysqlQueryResult;
 	typedef MYSQL SayNoMysqlSocket;
 }
 
-namespace DataBase
+namespace SoEasy
 {
 	class MysqlQueryLine
 	{
@@ -36,7 +36,7 @@ namespace DataBase
 	};
 }
 
-namespace DataBase
+namespace SoEasy
 {
 	class MysqlQueryData
 	{

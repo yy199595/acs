@@ -47,7 +47,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ActionScheduler::Call(const std::string func, const Message * message)
+	XCode ActionScheduler::Call(const std::string func, shared_ptr<Message> message)
 	{
 		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(func, this->mCoroutineScheduler);
 		if (callBack == nullptr)
@@ -63,7 +63,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ActionScheduler::Call(const std::string func, const Message * message, Message & returnData)
+	XCode ActionScheduler::Call(const std::string func, shared_ptr<Message> message, Message & returnData)
 	{
 		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(func, this->mCoroutineScheduler);
 		if (callBack == nullptr)
@@ -85,7 +85,7 @@ namespace SoEasy
 
 	
 
-	XCode ActionScheduler::SendCallMessage(const std::string & func, const Message * message, shared_ptr<LocalRetActionProxy> callBack)
+	XCode ActionScheduler::SendCallMessage(const std::string & func, shared_ptr<Message> message, shared_ptr<LocalRetActionProxy> callBack)
 	{
 		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
 		if (message != nullptr)
@@ -104,10 +104,7 @@ namespace SoEasy
 		callData->set_callback_id(id);
 		if (this->mSessionAddress.empty())
 		{
-			if (!this->mNetWorkManager->SendMessageByName(func, callData))
-			{
-				return XCode::SendMessageFail;
-			}
+			return this->mNetWorkManager->SendMessageByName(func, callData);
 		}	
 		return this->mNetWorkManager->SendMessageByAdress(mSessionAddress, callData);
 	}

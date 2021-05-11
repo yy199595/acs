@@ -4,7 +4,7 @@
 #include<NetWork/RemoteScheduler.h>
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
-namespace DataBase
+namespace SoEasy
 {
 	RedisManager::RedisManager()
 	{

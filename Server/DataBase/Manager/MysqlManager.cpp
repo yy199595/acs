@@ -6,7 +6,7 @@
 #include<Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlTaskAction.h>
 #include<Util/StringHelper.h>
-namespace DataBase
+namespace SoEasy
 {
 	MysqlManager::MysqlManager()
 	{

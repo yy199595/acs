@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClInclude Include="Manager\LoginManager.h" />
     <ClInclude Include="Manager\ProxyManager.h" />
+    <ClInclude Include="Manager\UserDataManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Manager\LoginManager.cpp" />
     <ClCompile Include="Manager\ProxyManager.cpp" />
+    <ClCompile Include="Manager\UserDataManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -79,7 +81,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
+    <IncludePath>../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/mysql;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
     <OutDir>../Libs/lib</OutDir>
     <IntDir>../bin/debug/corelogic</IntDir>
     <TargetName>CoreLogic</TargetName>
