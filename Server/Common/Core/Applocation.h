@@ -106,11 +106,20 @@ namespace SoEasy
 			return nullptr;
 		}
 		auto iter = this->mManagerMap.find(name);
-		if (iter == this->mManagerMap.end())
+		if (iter != this->mManagerMap.end())
 		{
-			return nullptr;
+			return dynamic_cast<T*>(iter->second);
 		}
-		return dynamic_cast<T*>(iter->second);
+		auto iter1 = this->mManagerMap.begin();
+		for (; iter1 != this->mManagerMap.end(); iter1++)
+		{
+			T * manager = dynamic_cast<T*>(iter1->second);
+			if (manager != nullptr)
+			{
+				return manager;
+			}
+		}
+		return nullptr;
 	}
 	template<typename T>
 	inline bool Applocation::TryAddManager()

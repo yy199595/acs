@@ -26,9 +26,9 @@ namespace SoEasy
 		bool CheckSessionIsLogin(shared_ptr<TcpClientSession>);
 		bool SendMessageByAddress(const std::string & address, RapidJsonWriter & jsonData);
 	protected:
-		void OnSessionErrorAfter(shared_ptr<TcpClientSession>) override;
-		void OnSessionConnectAfter(shared_ptr<TcpClientSession>) override;
-		void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size) override;
+		void OnSessionErrorAfter(SharedTcpSession) override;
+		void OnSessionConnectAfter(SharedTcpSession) override;
+		void OnRecvNewMessageAfter(SharedTcpSession, shared_ptr<NetWorkPacket>) override;
 	private:
 		std::set<std::string> mLoginUserList;
 		std::set<std::string> mLoginAddressList;

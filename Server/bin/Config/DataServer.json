@@ -3,8 +3,7 @@
     "FastUpdate": 10,
     "LogicFps": 30,
     "SystemFps":100,
-    "ProxyAddress":"127.0.0.1:1995",
-    "ListenAddress": "127.0.0.1:7788",
+    "ListenAddress": "127.0.0.1:7789",
     "ActionQueryAddress": "127.0.0.1:7799",
     "RecvBuffCount": 1024,
     "IsOpenRecoder": true,
@@ -26,11 +25,8 @@
         "ListenerManager",
         "MysqlManager",
         "RedisManager",
-        "ScriptManager",
-        "ProxyManager",
         "LocalActionManager",
-        "RemoteActionManager",
-        "ActionRegisterManager"
+        "RemoteActionManager"
     ],
     "WhiteList": [
         "127.0.0.1"

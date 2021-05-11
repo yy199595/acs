@@ -20,8 +20,6 @@ namespace SoEasy
 	protected:
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
-		//void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size) override;
-
 	private:
 		std::string mListenerIp;	//¼àÌýµÄip
 		std::string mListenAddress;	//µØÖ·

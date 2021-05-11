@@ -1,9 +1,9 @@
 #pragma once
 #include<Object/GameObject.h>
-#include<Manager/SessionManager.h>
+#include<Manager/ListenerManager.h>
 namespace SoEasy
 {
-	class ProxyManager : public SessionManager
+	class ProxyManager : public ListenerManager
 	{
 	public:
 		ProxyManager() { }
@@ -12,17 +12,14 @@ namespace SoEasy
 
 	protected:
 		bool OnInit() override;
-		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
-		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
-		void OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size) override;
+		void OnSessionErrorAfter(SharedTcpSession tcpSession) override;
+		void OnSessionConnectAfter(SharedTcpSession tcpSession) override;
+		void OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket>) override;
 	public:
 		shared_ptr<GameObject> GetClientObject(const long long id);
 	private:
-		void OnRecvServerMessage(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> msg);
+		bool OnRecvServerMessage(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> msg);
 	private:
-		std::string mListenIp;
-		unsigned short mListenPort;
-		shared_ptr<TcpSessionListener> mTpcListener;
 		class RemoteActionManager * mRemoteActionManager;
 		std::unordered_map<long long, shared_ptr<GameObject>> mClientObjectMap;	//¿Í»§¶Ësession
 	};

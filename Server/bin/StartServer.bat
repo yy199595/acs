@@ -1,4 +1,3 @@
-start ./CenterServer.exe
-start ./DataServer.exe
-start ./LoginServer.exe
-start ./ProxyServer.exe
+start Server.exe CenterServer ./Config/CenterServer.json
+start Server.exe DataServer ./Config/DataServer.json
+start Server.exe ProxyServer ./Config/ProxyServer.json

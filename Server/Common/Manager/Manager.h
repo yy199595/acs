@@ -12,14 +12,12 @@ namespace SoEasy
 	struct NetMessageBuffer
 	{
 	public:
-		NetMessageBuffer(const std::string & address, const std::string & msg)
-			: mAddress(address), mCommandMsg(msg) { }
-		NetMessageBuffer(const std::string & address, const char * msg, size_t size)
-			: mAddress(address), mCommandMsg(msg, size) { }
+		NetMessageBuffer(const std::string & address, const shared_ptr<NetWorkPacket> packet);
 	public:
 		const std::string mAddress;
-		const std::string mCommandMsg;
+		const shared_ptr<NetWorkPacket> mMessagePacket;
 	};
+
 	class LocalActionProxy;
 	typedef std::shared_ptr<NetMessageBuffer> SharedNetPacket;
 

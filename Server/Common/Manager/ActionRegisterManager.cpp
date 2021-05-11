@@ -97,6 +97,7 @@ namespace SoEasy
 			}
 		}
 		this->mActionRegisterList.push_back(actionInfo);
+		SayNoDebugLog(actionInfo.mAreaId << "  " << actionInfo.mAddress << "  " << actionInfo.mActionName);
 		std::sort(this->mActionRegisterList.begin(), this->mActionRegisterList.end(), []
 			(ActionInfo & a1, ActionInfo & a2)
 		{

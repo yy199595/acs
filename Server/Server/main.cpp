@@ -41,7 +41,7 @@ TYPE_REFLECTION(DataBase::MysqlManager, "MysqlManager");
 #pragma comment(lib,"libprotobufd.lib")
 #endif
 int main(int argc, char ** argv)
-{
+{ 
 	ManagerFactory factory;
 	factory.RegisterManager<ProxyManager>();
 	factory.RegisterManager<RedisManager>();
@@ -56,8 +56,10 @@ int main(int argc, char ** argv)
 	factory.RegisterManager<RemoteActionManager>();
 	factory.RegisterManager<ActionRegisterManager>();
 
-
-	Applocation app("Server", factory, "./Config/ServerConfig.json");
+	std::string serverName = argc == 3 ? argv[1] : "Server";
+	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
+	
+	Applocation app(serverName, factory, configPath);
 
 	return app.Run();
 }

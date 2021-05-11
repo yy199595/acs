@@ -76,4 +76,5 @@ namespace SoEasy
 		char * mRecvMsgBuffer;
 		unsigned int mRecvBufferSize;
 	};
+	typedef shared_ptr<TcpClientSession> SharedTcpSession;
 }

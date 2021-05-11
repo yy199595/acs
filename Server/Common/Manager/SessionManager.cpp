@@ -8,7 +8,7 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(SharedTcpSocket socket)
+	SharedTcpSession SessionManager::CreateTcpSession(SharedTcpSocket socket)
 	{
 		shared_ptr<TcpClientSession> tcpSession = std::make_shared<TcpClientSession>(this, socket);
 		if (tcpSession != nullptr)
@@ -19,7 +19,7 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(std::string name, std::string address)
+	SharedTcpSession SessionManager::CreateTcpSession(std::string name, std::string address)
 	{
 		std::string connectIp;
 		unsigned short connectPort;
@@ -31,9 +31,9 @@ namespace SoEasy
 		return this->CreateTcpSession(name, connectIp, connectPort);
 	}
 
-	shared_ptr<TcpClientSession> SessionManager::CreateTcpSession(std::string name, std::string ip, unsigned short port)
+	SharedTcpSession SessionManager::CreateTcpSession(std::string name, std::string ip, unsigned short port)
 	{
-		shared_ptr<TcpClientSession> tcpSession = std::make_shared<TcpClientSession>(this, name, ip, port);
+		SharedTcpSession tcpSession = std::make_shared<TcpClientSession>(this, name, ip, port);
 		if (tcpSession != nullptr)
 		{
 			tcpSession->StartConnect();
@@ -41,7 +41,7 @@ namespace SoEasy
 		return tcpSession;
 	}
 
-	bool SessionManager::AddNewSession(shared_ptr<TcpClientSession> tcpSession)
+	bool SessionManager::AddNewSession(SharedTcpSession tcpSession)
 	{
 		if (!tcpSession)
 		{
@@ -56,7 +56,7 @@ namespace SoEasy
 		return true;
 	}
 
-	bool SessionManager::AddErrorSession(shared_ptr<TcpClientSession> tcpSession)
+	bool SessionManager::AddErrorSession(SharedTcpSession tcpSession)
 	{
 		if (!tcpSession)
 		{
@@ -71,13 +71,16 @@ namespace SoEasy
 		return true;
 	}
 
-	void SessionManager::AddRecvMessage(shared_ptr<TcpClientSession> session, const char * message, size_t size)
+	void SessionManager::AddRecvMessage(SharedTcpSession session, const char * message, size_t size)
 	{
 		if (session != nullptr)
 		{
-			const std::string & address = session->GetAddress();
-			SharedNetPacket sharedPacket = std::make_shared<NetMessageBuffer>(address, message, size);
-			mRecvMessageQueue.AddItem(sharedPacket);
+			shared_ptr<NetWorkPacket> netPacket = make_shared<NetWorkPacket>();
+			if (netPacket->ParseFromArray(message, size))
+			{
+				const std::string & address = session->GetAddress();
+				mRecvMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, netPacket));
+			}
 		}
 	}
 
@@ -92,63 +95,60 @@ namespace SoEasy
 		return true;
 	}
 
-	void SessionManager::OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size)
+	void SessionManager::OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> packet)
 	{
-		this->mCurrentSession = this->mNetWorkManager->GetTcpSession(address);
-		SayNoAssertRet(this->mCurrentSession, "not find session : " << address << " size = " << size);
-
-		shared_ptr<NetWorkPacket> nNetMsgPackage = make_shared<NetWorkPacket>();
-		SayNoAssertRet_F(nNetMsgPackage->ParseFromArray(msg, size));
-
 		if (this->mRecvMsgCallback != nullptr)
 		{
-			this->mRecvMsgCallback(this->mCurrentSession, nNetMsgPackage);
-			return;
+			if (this->mRecvMsgCallback(tcpSession, packet))
+			{
+				return;
+			}
 		}
-	
-		if (!nNetMsgPackage->func_name().empty())
+		this->mCurrentSession = tcpSession;
+		const std::string & address = tcpSession->GetAddress();
+		if (!packet->func_name().empty())
 		{
-			const std::string & name = nNetMsgPackage->func_name();
+			const std::string & name = packet->func_name();
 	
 			shared_ptr<NetLuaAction> luaAction = this->mActionManager->GetLuaAction(name);
 			if (luaAction != nullptr)	//lua 函数自己返回
 			{			
-				XCode code = luaAction->Invoke(address, nNetMsgPackage);
+				XCode code = luaAction->Invoke(address, packet);
 				if (code != XCode::LuaCoroutineReturn)
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 					returnPacket->set_error_code(code);
-					returnPacket->set_operator_id(nNetMsgPackage->operator_id());
-					returnPacket->set_callback_id(nNetMsgPackage->callback_id());
+					returnPacket->set_operator_id(packet->operator_id());
+					returnPacket->set_callback_id(packet->callback_id());
 					this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
 				}
 			}
 			else  //在协程中执行
 			{
-				this->mCoroutineSheduler->Start([this, nNetMsgPackage, address]()
+				this->mCoroutineSheduler->Start([this, packet, address]()
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-					XCode code = this->InvokeAction(this->mCurrentSession, nNetMsgPackage, returnPacket);
-					if (nNetMsgPackage->callback_id() != 0)
+					XCode code = this->InvokeAction(this->mCurrentSession, packet, returnPacket);
+					if (packet->callback_id() != 0)
 					{
 						returnPacket->set_error_code(code);
-						returnPacket->set_operator_id(nNetMsgPackage->operator_id());
-						returnPacket->set_callback_id(nNetMsgPackage->callback_id());
+						returnPacket->set_operator_id(packet->operator_id());
+						returnPacket->set_callback_id(packet->callback_id());
 						this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
 					}
 				});
 			}
 		}
-		else if (nNetMsgPackage->callback_id() != 0)
+		else if (packet->callback_id() != 0)
 		{
-			const long long id = nNetMsgPackage->callback_id();
+			const long long id = packet->callback_id();
 			auto callback = this->mActionManager->GetCallback(id);
 			if (callback == nullptr)
 			{
 				SayNoDebugError("not find call back " << id);
 				return;
 			}
-			callback->Invoke(this->mCurrentSession, nNetMsgPackage);
+			callback->Invoke(this->mCurrentSession, packet);
 		}
 		this->mCurrentSession = nullptr;
 	}
@@ -219,8 +219,12 @@ namespace SoEasy
 		while (this->mRecvMessageQueue.PopItem(pMessagePacket))
 		{
 			const std::string & address = pMessagePacket->mAddress;
-			const std::string & message = pMessagePacket->mCommandMsg;
-			this->OnRecvNewMessageAfter(address, message.c_str(), message.size());
+			shared_ptr<NetWorkPacket> netWorkPacket = pMessagePacket->mMessagePacket;
+			shared_ptr<TcpClientSession> tcpSession = mNetWorkManager->GetTcpSession(address);
+			if (tcpSession != nullptr)
+			{
+				this->OnRecvNewMessageAfter(tcpSession, netWorkPacket);
+			}		
 		}
 	}
 }

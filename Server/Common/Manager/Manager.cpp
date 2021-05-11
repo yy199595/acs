@@ -3,6 +3,16 @@
 #include<Core/Applocation.h>
 namespace SoEasy
 {
+	NetMessageBuffer::NetMessageBuffer(const std::string & address, const shared_ptr<NetWorkPacket> packet)
+		:mAddress(address), mMessagePacket(packet)
+	{
+
+	}
+}
+namespace SoEasy
+{
+
+
 	Manager::Manager(const int priority) : mPriority(priority)
 	{
 

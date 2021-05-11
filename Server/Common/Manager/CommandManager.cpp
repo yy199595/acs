@@ -86,26 +86,9 @@ namespace SoEasy
 
 	}
 
-	void CommandManager::OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size)
+	void CommandManager::OnRecvNewMessageAfter(SharedTcpSession, shared_ptr<NetWorkPacket>)
 	{
-		shared_ptr<TcpClientSession> pTcpSession = this->GetTcpSession(address);
-		if (pTcpSession != nullptr)
-		{
-			std::string nCommondName;
-			std::string nCommandArgs;
-			RapidJsonReader jsonReader;
-			if (jsonReader.TryParse(msg, size) && jsonReader.TryGetValue("GM", nCommondName))
-			{
-				RapidJsonWriter jsonWriter;
-				jsonReader.TryGetValue("Args", nCommandArgs);
-				XCode code = this->Invoke(pTcpSession, nCommondName, nCommandArgs, jsonWriter);
-
-				jsonWriter.AddParameter("code", (int)code);
-				jsonWriter.AddParameter("GM", nCommondName);
-
-				this->SendMessageByAddress(address, jsonWriter);
-			}
-		}
+		
 	}
 
 	shared_ptr<TcpClientSession> CommandManager::GetTcpSession(const std::string & address)
@@ -140,31 +123,13 @@ namespace SoEasy
 	{
 		while (!this->mSendMessageQueue.empty())
 		{
-			NetMessageBuffer * retPacket = this->mSendMessageQueue.front();
-			this->mSendMessageQueue.pop();
-			const std::string & address = retPacket->mAddress;
-			shared_ptr<TcpClientSession> pSessionClient = this->GetTcpSession(address);
-			if (pSessionClient != nullptr)
-			{
-				mSessionLock.lock();
-				const std::string & message = retPacket->mCommandMsg;
-				pSessionClient->SendPackage(message);
-				mSessionLock.unlock();
-			}
-			delete retPacket;
+			
 		}
 	}
 
 	bool CommandManager::SendMessageByAddress(const std::string & address, RapidJsonWriter & jsonData)
 	{
-		shared_ptr<TcpClientSession> pSession = this->GetTcpSession(address);
-		if (pSession == nullptr)
-		{
-			return false;
-		}
-		const std::string & message = jsonData.Serialization();
-		NetMessageBuffer * sendPacket = new NetMessageBuffer(address, message.c_str(), message.size());
-		this->mSendMessageQueue.push(sendPacket);
+		
 		return true;
 	}
 

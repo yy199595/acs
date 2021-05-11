@@ -6,6 +6,7 @@
 namespace SoEasy
 {
 	// 将本机action注册到远端 储存所有可调用action列表
+
 	class RemoteActionManager : public SessionManager
 	{
 	public:
