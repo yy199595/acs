@@ -94,21 +94,26 @@ namespace SoEasy
 
 	void SessionManager::OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size)
 	{
-		shared_ptr<TcpClientSession> pTcpSession = this->mNetWorkManager->GetSessionByAdress(address);
+		shared_ptr<TcpClientSession> pTcpSession = this->mNetWorkManager->GetTcpSession(address);
 		SayNoAssertRet(pTcpSession, "not find session : " << address << " size = " << size);
 
 		shared_ptr<NetWorkPacket> nNetMsgPackage = make_shared<NetWorkPacket>();
 		SayNoAssertRet_F(nNetMsgPackage->ParseFromArray(msg, size));
 
+		if (this->mRecvMsgCallback != nullptr)
+		{
+			this->mRecvMsgCallback(pTcpSession, nNetMsgPackage);
+			return;
+		}
 	
 		if (!nNetMsgPackage->func_name().empty())
 		{
 			const std::string & name = nNetMsgPackage->func_name();
 	
-			NetLuaAction * luaAction = this->mActionManager->GetLuaAction(name);
+			shared_ptr<NetLuaAction> luaAction = this->mActionManager->GetLuaAction(name);
 			if (luaAction != nullptr)	//lua 函数自己返回
 			{			
-				XCode code = luaAction->Invoke(pTcpSession, nNetMsgPackage);
+				XCode code = luaAction->Invoke(address, nNetMsgPackage);
 				if (code != XCode::LuaCoroutineReturn)
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
@@ -137,7 +142,7 @@ namespace SoEasy
 		else if (nNetMsgPackage->callback_id() != 0)
 		{
 			const long long id = nNetMsgPackage->callback_id();
-			LocalRetActionProxy * callback = this->mActionManager->GetCallback(id);
+			auto callback = this->mActionManager->GetCallback(id);
 			if (callback == nullptr)
 			{
 				SayNoDebugError("not find call back " << id);
@@ -150,13 +155,13 @@ namespace SoEasy
 	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)
 	{
 		const std::string & name = callInfo->func_name();
-		LocalActionProxy * action = this->mActionManager->GetAction(name);
-		if (action == nullptr)
+		shared_ptr<LocalActionProxy> localActionProxy = this->mActionManager->GetAction(name);
+		if (localActionProxy == nullptr)
 		{
 			SayNoDebugError(name << " does not exist");
 			return XCode::CallFunctionNotExist;
 		}	
-		return action->Invoke(tcpSession, callInfo, returnData);
+		return localActionProxy->Invoke(callInfo, returnData);
 	}
 
 	long long SessionManager::GetIdByAddress(const std::string & address)

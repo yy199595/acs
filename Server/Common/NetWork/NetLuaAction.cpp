@@ -10,26 +10,7 @@ namespace SoEasy
 		this->mActionRef = action_ref;
 		this->mInvokeRef = invoke_ref;
 	}
-
-	/*XCode NetLuaAction::Invoke1(shared_ptr<TcpClientSession> session, long long operatorId)
-	{
-		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
-		if (lua_isfunction(this->luaEnv, -1))
-		{
-			LuaParameter::Write<shared_ptr<TcpClientSession>>(this->luaEnv, session);
-			lua_pushinteger(this->luaEnv, operatorId);
-			if (lua_pcall(this->luaEnv, 2, 1, 0) != 0)
-			{
-				const char * error = lua_tostring(luaEnv, -1);
-				SayNoDebugError("call lua function error " << error);
-				return XCode::CallLuaFunctionFail;
-			}
-			return (XCode)lua_tointeger(this->luaEnv, -1);
-		}
-		return XCode::CallLuaFunctionFail;
-	}
-*/
-	XCode NetLuaAction::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> requestData)
+	XCode NetLuaAction::Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mInvokeRef);
 		if (!lua_isfunction(this->luaEnv, -1))
@@ -41,7 +22,7 @@ namespace SoEasy
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		LuaParameter::Write<shared_ptr<TcpClientSession>>(luaEnv, session);
+		lua_pushstring(luaEnv, address.c_str());
 		lua_pushinteger(luaEnv, requestData->operator_id());
 		lua_pushinteger(luaEnv, requestData->callback_id());
 		const std::string & protocolName = requestData->protoc_name();

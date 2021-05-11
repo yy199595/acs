@@ -1,9 +1,8 @@
 #include"RemoteActionManager.h"
 #include<Util/StringHelper.h>
+#include<NetWork/ActionScheduler.h>
 #include<NetWork/RemoteScheduler.h>
-
 #include<Coroutine/CoroutineManager.h>
-
 #include<Manager/LocalActionManager.h>
 #include<Manager/ListenerManager.h>
 namespace SoEasy
@@ -39,10 +38,11 @@ namespace SoEasy
 		}
 		this->mActionManager = this->GetManager<LocalActionManager>();
 		this->mListenerManager = this->GetManager<ListenerManager>();
+		this->mCoroutineManager = this->GetManager<CoroutineManager>();
 		SayNoAssertRetFalse_F(this->mActionManager);
 		SayNoAssertRetFalse_F(this->mListenerManager);
+		SayNoAssertRetFalse_F(this->mCoroutineManager);
 
-		REGISTER_FUNCTION_1(RemoteActionManager::UpdateActions, PB::AreaActionInfo);
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
 		return this->mActionQuerySession->StartConnect();
 	}
@@ -54,12 +54,110 @@ namespace SoEasy
 
 	void RemoteActionManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-		PB::ActionUpdateInfo actionInfo;
-		RemoteScheduler remoteScheduler(tcpSession, this->mAreaId);
-		const std::string & address = this->mListenerManager->GetAddress();
-		SayNoDebugWarning("connect address manager success " << tcpSession->GetAddress());
-		actionInfo.set_address(address);
+		if (tcpSession == this->mActionQuerySession)
+		{
+			this->StartRegisterAction();
+			SayNoDebugInfo("start register location action to " << tcpSession->GetAddress());
+		}
+		else
+		{
+			const std::string & address = tcpSession->GetAddress();
+			std::vector<shared_ptr<RemoteActionProxy>> actionProxys;
+			this->GetActionProxyByAddress(address, actionProxys);
+			for (size_t index = 0; index < actionProxys.size(); index++)
+			{
+				shared_ptr<RemoteActionProxy> actionProxy = actionProxys[index];
+				actionProxy->BindSession(tcpSession);
+			}
+		}
+	}
 
+	bool RemoteActionManager::GetActionProxy(const std::string & action, shared_ptr<RemoteActionProxy> & actionProxy)
+	{
+		auto iter = this->mActionProxyMap.find(action);
+		if (iter == this->mActionProxyMap.end() || iter->second.empty())
+		{
+			this->StartPullActionList();
+			return false;
+		}
+		actionProxy = iter->second[0];
+		return actionProxy->IsAction() ? true : this->StartConnectToAction(actionProxy);
+	}
+
+	bool RemoteActionManager::GetActionProxy(const std::string & action, std::vector<shared_ptr<RemoteActionProxy>> & actionProxys)
+	{
+		auto iter = this->mActionProxyMap.find(action);
+		if (iter == this->mActionProxyMap.end() || iter->second.empty())
+		{
+			this->StartPullActionList();
+			return false;
+		}
+		for (size_t index = 0; index < iter->second.size(); index++)
+		{
+			shared_ptr<RemoteActionProxy> actionPrixy = iter->second[index];
+			if (!actionPrixy->IsAction() && !this->StartConnectToAction(actionPrixy))
+			{
+				return false;
+			}
+		}
+		actionProxys = iter->second;
+		return true;
+	}
+
+	bool RemoteActionManager::GetActionProxy(const std::string & action, long long operId, shared_ptr<RemoteActionProxy> & actionProxy)
+	{
+		auto iter = this->mActionProxyMap.find(action);
+		if (iter == this->mActionProxyMap.end() && iter->second.empty())
+		{
+			this->StartPullActionList();
+			return false;
+		}
+		//TODO
+		return true;
+	}
+
+	void RemoteActionManager::GetActionProxyByAddress(const std::string & address, std::vector<shared_ptr<RemoteActionProxy>>& actionProxys)
+	{
+		for (auto iter = this->mActionProxyMap.begin(); iter != this->mActionProxyMap.end(); iter++)
+		{
+			for (size_t index = 0; index < iter->second.size(); index++)
+			{
+				shared_ptr<RemoteActionProxy> actionProxy = iter->second[index];
+				if (actionProxy->GetActionAddress() == address)
+				{
+					actionProxys.push_back(actionProxy);
+				}
+			}
+		}
+	}
+
+	void RemoteActionManager::AddNewActionProxy(int argaId, const std::string & name, const std::string & address)
+	{
+		auto iter = this->mActionProxyMap.find(name);
+		if (iter == this->mActionProxyMap.end())
+		{
+			std::vector<shared_ptr<RemoteActionProxy>> actions;
+			this->mActionProxyMap.emplace(name, actions);
+		}
+		std::vector<shared_ptr<RemoteActionProxy>> & actionList = this->mActionProxyMap[name];
+		for (size_t index = 0; index < actionList.size(); index++)
+		{
+			if (actionList[index]->GetActionAddress() == address)
+			{
+				return;
+			}
+		}
+		shared_ptr<RemoteActionProxy> actionProxy = make_shared<RemoteActionProxy>(name, address, argaId);
+		actionList.push_back(actionProxy);
+	}
+	void RemoteActionManager::StartRegisterAction()
+	{
+		PB::ActionUpdateInfo actionInfo;
+		RemoteScheduler quertShceudler(this->mActionQuerySession);
+		const std::string & address = this->mListenerManager->GetAddress();	
+		SayNoDebugWarning("connect address manager success " << mActionQuerySession->GetAddress());
+		actionInfo.set_address(address);
+		actionInfo.set_areaid(mAreaId);
 		std::vector<std::string> actions;
 		this->mActionManager->GetAllFunction(actions);
 
@@ -69,53 +167,55 @@ namespace SoEasy
 			actionInfo.add_action_names()->assign(actionName);
 		}
 
-		remoteScheduler.Call("ActionRegisterManager.RegisterActions", &actionInfo, [](shared_ptr<TcpClientSession>, XCode code)
+		quertShceudler.Call("ActionRegisterManager.RegisterActions", &actionInfo, 
+			[this](shared_ptr<TcpClientSession> session, XCode code)
 		{
-			SayNoDebugInfo("register action successful");
+			void StartPullActionList();
+		});	
+	}
+	void RemoteActionManager::StartPullActionList()
+	{
+		Int32Data requestData;
+		requestData.set_data(this->mAreaId);
+		RemoteScheduler quertShceudler(this->mActionQuerySession);
+		quertShceudler.Call<ActionInfoList>("ActionRegisterManager.QueryActions", &requestData,
+			[this](shared_ptr<TcpClientSession> session, XCode code, const PB::ActionInfoList & returnData)
+		{
+			for (int index = 0; index < returnData.actionlist_size(); index++)
+			{
+				const ActionInfo & actionInfo = returnData.actionlist(index);
+				const int actionAreaId = actionInfo.adreid();
+				const std::string & actionName = actionInfo.actionname();
+				const std::string & actionAddress = actionInfo.address();
+				this->AddNewActionProxy(actionAreaId, actionName, actionAddress);
+				SayNoDebugWarning(actionAreaId << "\t" << actionAddress << "\t" << actionName);
+			}
 		});
 	}
-
-	RemoteActionProxy * RemoteActionManager::GetActionProxy(const std::string & action, long long id)
+	bool RemoteActionManager::StartConnectToAction(shared_ptr<RemoteActionProxy> actionProxy)
 	{
-		auto iter = this->mActionAddressMap.find(action);
-		if (iter == this->mActionAddressMap.end())
+		shared_ptr<TcpClientSession> tcpClientSession;
+		const std::string & address = actionProxy->GetActionAddress();
+		auto iter = this->mActionSessionMap.find(address);
+		if (iter != this->mActionSessionMap.end())
 		{
-			return nullptr;
-		}
-		std::vector<std::string> & addressList = iter->second;
-		if (addressList.empty())
-		{
-			return nullptr;
-		}
-		std::string & address = addressList[id % addressList.size()];
-		auto iter1 = this->mActionProxyMap.find(address);
-		return iter1 != this->mActionProxyMap.end() ? iter1->second : nullptr;
-	}
-
-	XCode RemoteActionManager::UpdateActions(shared_ptr<TcpClientSession> session, long long id, shared_ptr<PB::AreaActionInfo> actionInfos)
-	{
-		std::set<std::string> allActionAddress;
-		for (int index = 0; index < actionInfos->action_infos_size(); index++)
-		{
-			std::vector<std::string> actionAddressVector;
-			const AreaActionInfo_ActionInfo & actionInfo = actionInfos->action_infos(index);
-			const std::string & name = actionInfo.action_name();
-			for (int i = 0; i < actionInfo.action_address_size(); i++)
+			tcpClientSession = iter->second;
+			if (tcpClientSession->IsActive())
 			{
-				const std::string & address = actionInfo.action_address(i);
-
-				allActionAddress.insert(address);
-				actionAddressVector.push_back(address);
-			}	
-			this->mActionAddressMap.emplace(name, actionAddressVector);
+				return true;
+			}
 		}
-
-		for (const std::string & address : allActionAddress)
+		else
 		{
-			RemoteActionProxy * actionProxy = new RemoteActionProxy(this->mNetWorkManager, address);
-			this->mActionProxyMap.insert(std::make_pair(address, actionProxy));
+			std::string ip;
+			unsigned short port;
+			if (!StringHelper::ParseIpAddress(address, ip, port))
+			{
+				return false;
+			}
+			tcpClientSession = make_shared<TcpClientSession>(this, "ActionSession", ip, port);
+			this->mActionSessionMap.emplace(address, tcpClientSession);
 		}
-
-		return XCode::Successful;
+		return tcpClientSession->StartConnect();
 	}
 }

@@ -21,7 +21,7 @@ namespace DataBase
 	private:
 		bool StartConnectMysql();
 	private:
-		XCode QueryTable(shared_ptr<TcpClientSession> session, long long id, shared_ptr<StringArray> requestData);
+		XCode QueryTable(long long id, shared_ptr<StringArray> requestData);
 	private:
 		std::string mMysqlIp;		//ipµØÖ·
 		unsigned short mMysqlPort;	//¶Ë¿ÚºÅ

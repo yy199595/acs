@@ -15,8 +15,7 @@ namespace SoEasy
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		LocalActionProxy * actionBox = new LocalActionProxy1(action, name);
-		return this->BindFunction(name, actionBox);
+		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, name));
 	}
 
 	void Manager::AddFinishTaskId(long long taskId)
@@ -26,7 +25,7 @@ namespace SoEasy
 
 
 
-	bool Manager::BindFunction(const std::string & name, LocalActionProxy * actionBox)
+	bool Manager::BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox)
 	{	
 		LocalActionManager * pFunctionManager = this->GetManager<LocalActionManager>();
 		SayNoAssertRetFalse_F(pFunctionManager || actionBox);

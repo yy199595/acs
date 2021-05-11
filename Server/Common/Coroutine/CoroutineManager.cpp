@@ -38,18 +38,12 @@ namespace SoEasy
 #ifdef _WIN32
 		this->mMainCoroutineStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #endif
-		this->mNetWorkManager = nullptr;
-		this->mFunctionManager = nullptr;
 	}
 
 	bool CoroutineManager::OnInit()
 	{		
 		this->mTimerManager = this->GetManager<TimerManager>(); 
-		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mFunctionManager = this->GetManager<LocalActionManager>();
 		SayNoAssertRetFalse_F(this->mTimerManager);
-		SayNoAssertRetFalse_F(this->mNetWorkManager);
-		SayNoAssertRetFalse_F(this->mNetWorkManager);
 		return true;
 	}
 
@@ -199,75 +193,7 @@ namespace SoEasy
 		memcpy(cor->mContextStack, &dummy, cor->mStackSize);
 	}
 
-	XCode CoroutineManager::Call(const std::string func, Message & returnData)
-	{		
-		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(func, nullptr, callBack);
-		if (code == XCode::Successful)
-		{
-			this->YieldReturn();
-			if (!returnData.ParseFromString(callBack->GetMsgData()))
-			{
-				return XCode::ParseMessageError;
-			}
-			return callBack->GetCode();
-		}
-		return XCode::Failure;
-	}
-
-	XCode CoroutineManager::Call(const std::string func, const Message * message)
-	{
-		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(func, message, callBack);
-		if (code == XCode::Successful)
-		{
-			this->YieldReturn();
-			return callBack->GetCode();
-		}
-		return XCode::Failure;
-	}
-
-	XCode CoroutineManager::Call(const std::string func, const Message * message, Message & returnData)
-	{
-		NetWorkWaitCorAction * callBack = new NetWorkWaitCorAction(func, this);
-		XCode code = this->SendCallMessage(func, message, callBack);
-		if (code == XCode::Successful)
-		{
-			this->YieldReturn();
-			if (!returnData.ParseFromString(callBack->GetMsgData()))
-			{
-				return XCode::ParseMessageError;
-			}
-			return callBack->GetCode();
-		}
-		return XCode::Failure;
-	}
-
-	XCode CoroutineManager::SendCallMessage(const std::string & func, const Message * message, LocalRetActionProxy * callBack)
-	{
-		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
-
-		if (message != nullptr)
-		{
-			if (!message->SerializePartialToString(&mMessageBuffer))
-			{
-				return XCode::SerializationFailure;
-			}
-			callData->set_message_data(mMessageBuffer);
-			callData->set_protoc_name(message->GetTypeName());
-		}
-		long long id = 0;
-		this->mFunctionManager->AddCallback(callBack, id);
-		callData->set_func_name(func);
-		callData->set_callback_id(id);
-
-		if (!this->mNetWorkManager->SendMessageByName(func, callData))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Successful;
-	}
-
+	
 	void CoroutineManager::OnFrameUpdate(float t)
 	{
 #ifdef _WIN32

@@ -41,7 +41,7 @@ struct TableStruct_ServerCommon_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -49,15 +49,15 @@ struct TableStruct_ServerCommon_2eproto {
 };
 void AddDescriptors_ServerCommon_2eproto();
 namespace PB {
+class ActionInfo;
+class ActionInfoDefaultTypeInternal;
+extern ActionInfoDefaultTypeInternal _ActionInfo_default_instance_;
+class ActionInfoList;
+class ActionInfoListDefaultTypeInternal;
+extern ActionInfoListDefaultTypeInternal _ActionInfoList_default_instance_;
 class ActionUpdateInfo;
 class ActionUpdateInfoDefaultTypeInternal;
 extern ActionUpdateInfoDefaultTypeInternal _ActionUpdateInfo_default_instance_;
-class AreaActionInfo;
-class AreaActionInfoDefaultTypeInternal;
-extern AreaActionInfoDefaultTypeInternal _AreaActionInfo_default_instance_;
-class AreaActionInfo_ActionInfo;
-class AreaActionInfo_ActionInfoDefaultTypeInternal;
-extern AreaActionInfo_ActionInfoDefaultTypeInternal _AreaActionInfo_ActionInfo_default_instance_;
 class AssestCompareList;
 class AssestCompareListDefaultTypeInternal;
 extern AssestCompareListDefaultTypeInternal _AssestCompareList_default_instance_;
@@ -70,6 +70,12 @@ extern LogicServerDataDefaultTypeInternal _LogicServerData_default_instance_;
 class LogicServerListData;
 class LogicServerListDataDefaultTypeInternal;
 extern LogicServerListDataDefaultTypeInternal _LogicServerListData_default_instance_;
+class PlayerRegisterBack;
+class PlayerRegisterBackDefaultTypeInternal;
+extern PlayerRegisterBackDefaultTypeInternal _PlayerRegisterBack_default_instance_;
+class PlayerRegisterData;
+class PlayerRegisterDataDefaultTypeInternal;
+extern PlayerRegisterDataDefaultTypeInternal _PlayerRegisterData_default_instance_;
 class ServerRegisterBack;
 class ServerRegisterBackDefaultTypeInternal;
 extern ServerRegisterBackDefaultTypeInternal _ServerRegisterBack_default_instance_;
@@ -82,13 +88,15 @@ extern TransferAssestInfoDefaultTypeInternal _TransferAssestInfo_default_instanc
 }  // namespace PB
 namespace google {
 namespace protobuf {
+template<> ::PB::ActionInfo* Arena::CreateMaybeMessage<::PB::ActionInfo>(Arena*);
+template<> ::PB::ActionInfoList* Arena::CreateMaybeMessage<::PB::ActionInfoList>(Arena*);
 template<> ::PB::ActionUpdateInfo* Arena::CreateMaybeMessage<::PB::ActionUpdateInfo>(Arena*);
-template<> ::PB::AreaActionInfo* Arena::CreateMaybeMessage<::PB::AreaActionInfo>(Arena*);
-template<> ::PB::AreaActionInfo_ActionInfo* Arena::CreateMaybeMessage<::PB::AreaActionInfo_ActionInfo>(Arena*);
 template<> ::PB::AssestCompareList* Arena::CreateMaybeMessage<::PB::AssestCompareList>(Arena*);
 template<> ::PB::AssestCompareList_AssestCompareInfo* Arena::CreateMaybeMessage<::PB::AssestCompareList_AssestCompareInfo>(Arena*);
 template<> ::PB::LogicServerData* Arena::CreateMaybeMessage<::PB::LogicServerData>(Arena*);
 template<> ::PB::LogicServerListData* Arena::CreateMaybeMessage<::PB::LogicServerListData>(Arena*);
+template<> ::PB::PlayerRegisterBack* Arena::CreateMaybeMessage<::PB::PlayerRegisterBack>(Arena*);
+template<> ::PB::PlayerRegisterData* Arena::CreateMaybeMessage<::PB::PlayerRegisterData>(Arena*);
 template<> ::PB::ServerRegisterBack* Arena::CreateMaybeMessage<::PB::ServerRegisterBack>(Arena*);
 template<> ::PB::ServerRunInfo* Arena::CreateMaybeMessage<::PB::ServerRunInfo>(Arena*);
 template<> ::PB::TransferAssestInfo* Arena::CreateMaybeMessage<::PB::TransferAssestInfo>(Arena*);
@@ -1128,10 +1136,10 @@ class ActionUpdateInfo :
 
   // accessors -------------------------------------------------------
 
-  // repeated string action_names = 2;
+  // repeated string action_names = 3;
   int action_names_size() const;
   void clear_action_names();
-  static const int kActionNamesFieldNumber = 2;
+  static const int kActionNamesFieldNumber = 3;
   const ::std::string& action_names(int index) const;
   ::std::string* mutable_action_names(int index);
   void set_action_names(int index, const ::std::string& value);
@@ -1150,9 +1158,9 @@ class ActionUpdateInfo :
   const ::google::protobuf::RepeatedPtrField<::std::string>& action_names() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_action_names();
 
-  // string address = 1;
+  // string address = 2;
   void clear_address();
-  static const int kAddressFieldNumber = 1;
+  static const int kAddressFieldNumber = 2;
   const ::std::string& address() const;
   void set_address(const ::std::string& value);
   #if LANG_CXX11
@@ -1164,6 +1172,12 @@ class ActionUpdateInfo :
   ::std::string* release_address();
   void set_allocated_address(::std::string* address);
 
+  // int32 areaId = 1;
+  void clear_areaid();
+  static const int kAreaIdFieldNumber = 1;
+  ::google::protobuf::int32 areaid() const;
+  void set_areaid(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:PB.ActionUpdateInfo)
  private:
   class HasBitSetters;
@@ -1171,30 +1185,31 @@ class ActionUpdateInfo :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> action_names_;
   ::google::protobuf::internal::ArenaStringPtr address_;
+  ::google::protobuf::int32 areaid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class AreaActionInfo_ActionInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.AreaActionInfo.ActionInfo) */ {
+class ActionInfo :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ActionInfo) */ {
  public:
-  AreaActionInfo_ActionInfo();
-  virtual ~AreaActionInfo_ActionInfo();
+  ActionInfo();
+  virtual ~ActionInfo();
 
-  AreaActionInfo_ActionInfo(const AreaActionInfo_ActionInfo& from);
+  ActionInfo(const ActionInfo& from);
 
-  inline AreaActionInfo_ActionInfo& operator=(const AreaActionInfo_ActionInfo& from) {
+  inline ActionInfo& operator=(const ActionInfo& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AreaActionInfo_ActionInfo(AreaActionInfo_ActionInfo&& from) noexcept
-    : AreaActionInfo_ActionInfo() {
+  ActionInfo(ActionInfo&& from) noexcept
+    : ActionInfo() {
     *this = ::std::move(from);
   }
 
-  inline AreaActionInfo_ActionInfo& operator=(AreaActionInfo_ActionInfo&& from) noexcept {
+  inline ActionInfo& operator=(ActionInfo&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1206,34 +1221,34 @@ class AreaActionInfo_ActionInfo :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AreaActionInfo_ActionInfo& default_instance();
+  static const ActionInfo& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AreaActionInfo_ActionInfo* internal_default_instance() {
-    return reinterpret_cast<const AreaActionInfo_ActionInfo*>(
-               &_AreaActionInfo_ActionInfo_default_instance_);
+  static inline const ActionInfo* internal_default_instance() {
+    return reinterpret_cast<const ActionInfo*>(
+               &_ActionInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     8;
 
-  void Swap(AreaActionInfo_ActionInfo* other);
-  friend void swap(AreaActionInfo_ActionInfo& a, AreaActionInfo_ActionInfo& b) {
+  void Swap(ActionInfo* other);
+  friend void swap(ActionInfo& a, ActionInfo& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AreaActionInfo_ActionInfo* New() const final {
-    return CreateMaybeMessage<AreaActionInfo_ActionInfo>(nullptr);
+  inline ActionInfo* New() const final {
+    return CreateMaybeMessage<ActionInfo>(nullptr);
   }
 
-  AreaActionInfo_ActionInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AreaActionInfo_ActionInfo>(arena);
+  ActionInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ActionInfo>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AreaActionInfo_ActionInfo& from);
-  void MergeFrom(const AreaActionInfo_ActionInfo& from);
+  void CopyFrom(const ActionInfo& from);
+  void MergeFrom(const ActionInfo& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1255,7 +1270,7 @@ class AreaActionInfo_ActionInfo :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AreaActionInfo_ActionInfo* other);
+  void InternalSwap(ActionInfo* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1271,73 +1286,72 @@ class AreaActionInfo_ActionInfo :
 
   // accessors -------------------------------------------------------
 
-  // repeated string action_address = 2;
-  int action_address_size() const;
-  void clear_action_address();
-  static const int kActionAddressFieldNumber = 2;
-  const ::std::string& action_address(int index) const;
-  ::std::string* mutable_action_address(int index);
-  void set_action_address(int index, const ::std::string& value);
+  // string address = 2;
+  void clear_address();
+  static const int kAddressFieldNumber = 2;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
   #if LANG_CXX11
-  void set_action_address(int index, ::std::string&& value);
+  void set_address(::std::string&& value);
   #endif
-  void set_action_address(int index, const char* value);
-  void set_action_address(int index, const char* value, size_t size);
-  ::std::string* add_action_address();
-  void add_action_address(const ::std::string& value);
-  #if LANG_CXX11
-  void add_action_address(::std::string&& value);
-  #endif
-  void add_action_address(const char* value);
-  void add_action_address(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& action_address() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_action_address();
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
 
-  // string action_name = 1;
-  void clear_action_name();
-  static const int kActionNameFieldNumber = 1;
-  const ::std::string& action_name() const;
-  void set_action_name(const ::std::string& value);
+  // string actionName = 3;
+  void clear_actionname();
+  static const int kActionNameFieldNumber = 3;
+  const ::std::string& actionname() const;
+  void set_actionname(const ::std::string& value);
   #if LANG_CXX11
-  void set_action_name(::std::string&& value);
+  void set_actionname(::std::string&& value);
   #endif
-  void set_action_name(const char* value);
-  void set_action_name(const char* value, size_t size);
-  ::std::string* mutable_action_name();
-  ::std::string* release_action_name();
-  void set_allocated_action_name(::std::string* action_name);
+  void set_actionname(const char* value);
+  void set_actionname(const char* value, size_t size);
+  ::std::string* mutable_actionname();
+  ::std::string* release_actionname();
+  void set_allocated_actionname(::std::string* actionname);
 
-  // @@protoc_insertion_point(class_scope:PB.AreaActionInfo.ActionInfo)
+  // int32 adreId = 1;
+  void clear_adreid();
+  static const int kAdreIdFieldNumber = 1;
+  ::google::protobuf::int32 adreid() const;
+  void set_adreid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:PB.ActionInfo)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> action_address_;
-  ::google::protobuf::internal::ArenaStringPtr action_name_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  ::google::protobuf::internal::ArenaStringPtr actionname_;
+  ::google::protobuf::int32 adreid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class AreaActionInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.AreaActionInfo) */ {
+class ActionInfoList :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ActionInfoList) */ {
  public:
-  AreaActionInfo();
-  virtual ~AreaActionInfo();
+  ActionInfoList();
+  virtual ~ActionInfoList();
 
-  AreaActionInfo(const AreaActionInfo& from);
+  ActionInfoList(const ActionInfoList& from);
 
-  inline AreaActionInfo& operator=(const AreaActionInfo& from) {
+  inline ActionInfoList& operator=(const ActionInfoList& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AreaActionInfo(AreaActionInfo&& from) noexcept
-    : AreaActionInfo() {
+  ActionInfoList(ActionInfoList&& from) noexcept
+    : ActionInfoList() {
     *this = ::std::move(from);
   }
 
-  inline AreaActionInfo& operator=(AreaActionInfo&& from) noexcept {
+  inline ActionInfoList& operator=(ActionInfoList&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1349,34 +1363,34 @@ class AreaActionInfo :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AreaActionInfo& default_instance();
+  static const ActionInfoList& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AreaActionInfo* internal_default_instance() {
-    return reinterpret_cast<const AreaActionInfo*>(
-               &_AreaActionInfo_default_instance_);
+  static inline const ActionInfoList* internal_default_instance() {
+    return reinterpret_cast<const ActionInfoList*>(
+               &_ActionInfoList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     9;
 
-  void Swap(AreaActionInfo* other);
-  friend void swap(AreaActionInfo& a, AreaActionInfo& b) {
+  void Swap(ActionInfoList* other);
+  friend void swap(ActionInfoList& a, ActionInfoList& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AreaActionInfo* New() const final {
-    return CreateMaybeMessage<AreaActionInfo>(nullptr);
+  inline ActionInfoList* New() const final {
+    return CreateMaybeMessage<ActionInfoList>(nullptr);
   }
 
-  AreaActionInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AreaActionInfo>(arena);
+  ActionInfoList* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ActionInfoList>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AreaActionInfo& from);
-  void MergeFrom(const AreaActionInfo& from);
+  void CopyFrom(const ActionInfoList& from);
+  void MergeFrom(const ActionInfoList& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1398,7 +1412,7 @@ class AreaActionInfo :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AreaActionInfo* other);
+  void InternalSwap(ActionInfoList* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1412,35 +1426,317 @@ class AreaActionInfo :
 
   // nested types ----------------------------------------------------
 
-  typedef AreaActionInfo_ActionInfo ActionInfo;
-
   // accessors -------------------------------------------------------
 
-  // repeated .PB.AreaActionInfo.ActionInfo action_infos = 2;
-  int action_infos_size() const;
-  void clear_action_infos();
-  static const int kActionInfosFieldNumber = 2;
-  ::PB::AreaActionInfo_ActionInfo* mutable_action_infos(int index);
-  ::google::protobuf::RepeatedPtrField< ::PB::AreaActionInfo_ActionInfo >*
-      mutable_action_infos();
-  const ::PB::AreaActionInfo_ActionInfo& action_infos(int index) const;
-  ::PB::AreaActionInfo_ActionInfo* add_action_infos();
-  const ::google::protobuf::RepeatedPtrField< ::PB::AreaActionInfo_ActionInfo >&
-      action_infos() const;
+  // repeated .PB.ActionInfo actionList = 1;
+  int actionlist_size() const;
+  void clear_actionlist();
+  static const int kActionListFieldNumber = 1;
+  ::PB::ActionInfo* mutable_actionlist(int index);
+  ::google::protobuf::RepeatedPtrField< ::PB::ActionInfo >*
+      mutable_actionlist();
+  const ::PB::ActionInfo& actionlist(int index) const;
+  ::PB::ActionInfo* add_actionlist();
+  const ::google::protobuf::RepeatedPtrField< ::PB::ActionInfo >&
+      actionlist() const;
 
-  // int32 areaId = 1;
-  void clear_areaid();
-  static const int kAreaIdFieldNumber = 1;
-  ::google::protobuf::int32 areaid() const;
-  void set_areaid(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:PB.AreaActionInfo)
+  // @@protoc_insertion_point(class_scope:PB.ActionInfoList)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::PB::AreaActionInfo_ActionInfo > action_infos_;
-  ::google::protobuf::int32 areaid_;
+  ::google::protobuf::RepeatedPtrField< ::PB::ActionInfo > actionlist_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_ServerCommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PlayerRegisterData :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.PlayerRegisterData) */ {
+ public:
+  PlayerRegisterData();
+  virtual ~PlayerRegisterData();
+
+  PlayerRegisterData(const PlayerRegisterData& from);
+
+  inline PlayerRegisterData& operator=(const PlayerRegisterData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PlayerRegisterData(PlayerRegisterData&& from) noexcept
+    : PlayerRegisterData() {
+    *this = ::std::move(from);
+  }
+
+  inline PlayerRegisterData& operator=(PlayerRegisterData&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const PlayerRegisterData& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PlayerRegisterData* internal_default_instance() {
+    return reinterpret_cast<const PlayerRegisterData*>(
+               &_PlayerRegisterData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(PlayerRegisterData* other);
+  friend void swap(PlayerRegisterData& a, PlayerRegisterData& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerRegisterData* New() const final {
+    return CreateMaybeMessage<PlayerRegisterData>(nullptr);
+  }
+
+  PlayerRegisterData* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PlayerRegisterData>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PlayerRegisterData& from);
+  void MergeFrom(const PlayerRegisterData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PlayerRegisterData* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string account = 1;
+  void clear_account();
+  static const int kAccountFieldNumber = 1;
+  const ::std::string& account() const;
+  void set_account(const ::std::string& value);
+  #if LANG_CXX11
+  void set_account(::std::string&& value);
+  #endif
+  void set_account(const char* value);
+  void set_account(const char* value, size_t size);
+  ::std::string* mutable_account();
+  ::std::string* release_account();
+  void set_allocated_account(::std::string* account);
+
+  // string password = 2;
+  void clear_password();
+  static const int kPasswordFieldNumber = 2;
+  const ::std::string& password() const;
+  void set_password(const ::std::string& value);
+  #if LANG_CXX11
+  void set_password(::std::string&& value);
+  #endif
+  void set_password(const char* value);
+  void set_password(const char* value, size_t size);
+  ::std::string* mutable_password();
+  ::std::string* release_password();
+  void set_allocated_password(::std::string* password);
+
+  // string platform = 4;
+  void clear_platform();
+  static const int kPlatformFieldNumber = 4;
+  const ::std::string& platform() const;
+  void set_platform(const ::std::string& value);
+  #if LANG_CXX11
+  void set_platform(::std::string&& value);
+  #endif
+  void set_platform(const char* value);
+  void set_platform(const char* value, size_t size);
+  ::std::string* mutable_platform();
+  ::std::string* release_platform();
+  void set_allocated_platform(::std::string* platform);
+
+  // int32 area_id = 3;
+  void clear_area_id();
+  static const int kAreaIdFieldNumber = 3;
+  ::google::protobuf::int32 area_id() const;
+  void set_area_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:PB.PlayerRegisterData)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr account_;
+  ::google::protobuf::internal::ArenaStringPtr password_;
+  ::google::protobuf::internal::ArenaStringPtr platform_;
+  ::google::protobuf::int32 area_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_ServerCommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PlayerRegisterBack :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.PlayerRegisterBack) */ {
+ public:
+  PlayerRegisterBack();
+  virtual ~PlayerRegisterBack();
+
+  PlayerRegisterBack(const PlayerRegisterBack& from);
+
+  inline PlayerRegisterBack& operator=(const PlayerRegisterBack& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PlayerRegisterBack(PlayerRegisterBack&& from) noexcept
+    : PlayerRegisterBack() {
+    *this = ::std::move(from);
+  }
+
+  inline PlayerRegisterBack& operator=(PlayerRegisterBack&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const PlayerRegisterBack& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PlayerRegisterBack* internal_default_instance() {
+    return reinterpret_cast<const PlayerRegisterBack*>(
+               &_PlayerRegisterBack_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(PlayerRegisterBack* other);
+  friend void swap(PlayerRegisterBack& a, PlayerRegisterBack& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerRegisterBack* New() const final {
+    return CreateMaybeMessage<PlayerRegisterBack>(nullptr);
+  }
+
+  PlayerRegisterBack* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PlayerRegisterBack>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PlayerRegisterBack& from);
+  void MergeFrom(const PlayerRegisterBack& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PlayerRegisterBack* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string token = 3;
+  void clear_token();
+  static const int kTokenFieldNumber = 3;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // int64 player_id = 1;
+  void clear_player_id();
+  static const int kPlayerIdFieldNumber = 1;
+  ::google::protobuf::int64 player_id() const;
+  void set_player_id(::google::protobuf::int64 value);
+
+  // int64 register_time = 2;
+  void clear_register_time();
+  static const int kRegisterTimeFieldNumber = 2;
+  ::google::protobuf::int64 register_time() const;
+  void set_register_time(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:PB.PlayerRegisterBack)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::int64 player_id_;
+  ::google::protobuf::int64 register_time_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
@@ -2102,7 +2398,21 @@ inline void ServerRunInfo::set_logic_time(float value) {
 
 // ActionUpdateInfo
 
-// string address = 1;
+// int32 areaId = 1;
+inline void ActionUpdateInfo::clear_areaid() {
+  areaid_ = 0;
+}
+inline ::google::protobuf::int32 ActionUpdateInfo::areaid() const {
+  // @@protoc_insertion_point(field_get:PB.ActionUpdateInfo.areaId)
+  return areaid_;
+}
+inline void ActionUpdateInfo::set_areaid(::google::protobuf::int32 value) {
+  
+  areaid_ = value;
+  // @@protoc_insertion_point(field_set:PB.ActionUpdateInfo.areaId)
+}
+
+// string address = 2;
 inline void ActionUpdateInfo::clear_address() {
   address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2155,7 +2465,7 @@ inline void ActionUpdateInfo::set_allocated_address(::std::string* address) {
   // @@protoc_insertion_point(field_set_allocated:PB.ActionUpdateInfo.address)
 }
 
-// repeated string action_names = 2;
+// repeated string action_names = 3;
 inline int ActionUpdateInfo::action_names_size() const {
   return action_names_.size();
 }
@@ -2226,181 +2536,431 @@ ActionUpdateInfo::mutable_action_names() {
 
 // -------------------------------------------------------------------
 
-// AreaActionInfo_ActionInfo
+// ActionInfo
 
-// string action_name = 1;
-inline void AreaActionInfo_ActionInfo::clear_action_name() {
-  action_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// int32 adreId = 1;
+inline void ActionInfo::clear_adreid() {
+  adreid_ = 0;
 }
-inline const ::std::string& AreaActionInfo_ActionInfo::action_name() const {
-  // @@protoc_insertion_point(field_get:PB.AreaActionInfo.ActionInfo.action_name)
-  return action_name_.GetNoArena();
+inline ::google::protobuf::int32 ActionInfo::adreid() const {
+  // @@protoc_insertion_point(field_get:PB.ActionInfo.adreId)
+  return adreid_;
 }
-inline void AreaActionInfo_ActionInfo::set_action_name(const ::std::string& value) {
+inline void ActionInfo::set_adreid(::google::protobuf::int32 value) {
   
-  action_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.AreaActionInfo.ActionInfo.action_name)
+  adreid_ = value;
+  // @@protoc_insertion_point(field_set:PB.ActionInfo.adreId)
+}
+
+// string address = 2;
+inline void ActionInfo::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ActionInfo::address() const {
+  // @@protoc_insertion_point(field_get:PB.ActionInfo.address)
+  return address_.GetNoArena();
+}
+inline void ActionInfo::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.ActionInfo.address)
 }
 #if LANG_CXX11
-inline void AreaActionInfo_ActionInfo::set_action_name(::std::string&& value) {
+inline void ActionInfo::set_address(::std::string&& value) {
   
-  action_name_.SetNoArena(
+  address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.AreaActionInfo.ActionInfo.action_name)
+  // @@protoc_insertion_point(field_set_rvalue:PB.ActionInfo.address)
 }
 #endif
-inline void AreaActionInfo_ActionInfo::set_action_name(const char* value) {
+inline void ActionInfo::set_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  action_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.AreaActionInfo.ActionInfo.action_name)
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.ActionInfo.address)
 }
-inline void AreaActionInfo_ActionInfo::set_action_name(const char* value, size_t size) {
+inline void ActionInfo::set_address(const char* value, size_t size) {
   
-  action_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.AreaActionInfo.ActionInfo.action_name)
+  // @@protoc_insertion_point(field_set_pointer:PB.ActionInfo.address)
 }
-inline ::std::string* AreaActionInfo_ActionInfo::mutable_action_name() {
+inline ::std::string* ActionInfo::mutable_address() {
   
-  // @@protoc_insertion_point(field_mutable:PB.AreaActionInfo.ActionInfo.action_name)
-  return action_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:PB.ActionInfo.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* AreaActionInfo_ActionInfo::release_action_name() {
-  // @@protoc_insertion_point(field_release:PB.AreaActionInfo.ActionInfo.action_name)
+inline ::std::string* ActionInfo::release_address() {
+  // @@protoc_insertion_point(field_release:PB.ActionInfo.address)
   
-  return action_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AreaActionInfo_ActionInfo::set_allocated_action_name(::std::string* action_name) {
-  if (action_name != nullptr) {
+inline void ActionInfo::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
     
   } else {
     
   }
-  action_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), action_name);
-  // @@protoc_insertion_point(field_set_allocated:PB.AreaActionInfo.ActionInfo.action_name)
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:PB.ActionInfo.address)
 }
 
-// repeated string action_address = 2;
-inline int AreaActionInfo_ActionInfo::action_address_size() const {
-  return action_address_.size();
+// string actionName = 3;
+inline void ActionInfo::clear_actionname() {
+  actionname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AreaActionInfo_ActionInfo::clear_action_address() {
-  action_address_.Clear();
+inline const ::std::string& ActionInfo::actionname() const {
+  // @@protoc_insertion_point(field_get:PB.ActionInfo.actionName)
+  return actionname_.GetNoArena();
 }
-inline const ::std::string& AreaActionInfo_ActionInfo::action_address(int index) const {
-  // @@protoc_insertion_point(field_get:PB.AreaActionInfo.ActionInfo.action_address)
-  return action_address_.Get(index);
-}
-inline ::std::string* AreaActionInfo_ActionInfo::mutable_action_address(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.AreaActionInfo.ActionInfo.action_address)
-  return action_address_.Mutable(index);
-}
-inline void AreaActionInfo_ActionInfo::set_action_address(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:PB.AreaActionInfo.ActionInfo.action_address)
-  action_address_.Mutable(index)->assign(value);
+inline void ActionInfo::set_actionname(const ::std::string& value) {
+  
+  actionname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.ActionInfo.actionName)
 }
 #if LANG_CXX11
-inline void AreaActionInfo_ActionInfo::set_action_address(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:PB.AreaActionInfo.ActionInfo.action_address)
-  action_address_.Mutable(index)->assign(std::move(value));
+inline void ActionInfo::set_actionname(::std::string&& value) {
+  
+  actionname_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.ActionInfo.actionName)
 }
 #endif
-inline void AreaActionInfo_ActionInfo::set_action_address(int index, const char* value) {
+inline void ActionInfo::set_actionname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  action_address_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:PB.AreaActionInfo.ActionInfo.action_address)
+  
+  actionname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.ActionInfo.actionName)
 }
-inline void AreaActionInfo_ActionInfo::set_action_address(int index, const char* value, size_t size) {
-  action_address_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:PB.AreaActionInfo.ActionInfo.action_address)
+inline void ActionInfo::set_actionname(const char* value, size_t size) {
+  
+  actionname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.ActionInfo.actionName)
 }
-inline ::std::string* AreaActionInfo_ActionInfo::add_action_address() {
-  // @@protoc_insertion_point(field_add_mutable:PB.AreaActionInfo.ActionInfo.action_address)
-  return action_address_.Add();
+inline ::std::string* ActionInfo::mutable_actionname() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.ActionInfo.actionName)
+  return actionname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AreaActionInfo_ActionInfo::add_action_address(const ::std::string& value) {
-  action_address_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:PB.AreaActionInfo.ActionInfo.action_address)
+inline ::std::string* ActionInfo::release_actionname() {
+  // @@protoc_insertion_point(field_release:PB.ActionInfo.actionName)
+  
+  return actionname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-#if LANG_CXX11
-inline void AreaActionInfo_ActionInfo::add_action_address(::std::string&& value) {
-  action_address_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:PB.AreaActionInfo.ActionInfo.action_address)
-}
-#endif
-inline void AreaActionInfo_ActionInfo::add_action_address(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  action_address_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:PB.AreaActionInfo.ActionInfo.action_address)
-}
-inline void AreaActionInfo_ActionInfo::add_action_address(const char* value, size_t size) {
-  action_address_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:PB.AreaActionInfo.ActionInfo.action_address)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-AreaActionInfo_ActionInfo::action_address() const {
-  // @@protoc_insertion_point(field_list:PB.AreaActionInfo.ActionInfo.action_address)
-  return action_address_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-AreaActionInfo_ActionInfo::mutable_action_address() {
-  // @@protoc_insertion_point(field_mutable_list:PB.AreaActionInfo.ActionInfo.action_address)
-  return &action_address_;
+inline void ActionInfo::set_allocated_actionname(::std::string* actionname) {
+  if (actionname != nullptr) {
+    
+  } else {
+    
+  }
+  actionname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), actionname);
+  // @@protoc_insertion_point(field_set_allocated:PB.ActionInfo.actionName)
 }
 
 // -------------------------------------------------------------------
 
-// AreaActionInfo
+// ActionInfoList
 
-// int32 areaId = 1;
-inline void AreaActionInfo::clear_areaid() {
-  areaid_ = 0;
+// repeated .PB.ActionInfo actionList = 1;
+inline int ActionInfoList::actionlist_size() const {
+  return actionlist_.size();
 }
-inline ::google::protobuf::int32 AreaActionInfo::areaid() const {
-  // @@protoc_insertion_point(field_get:PB.AreaActionInfo.areaId)
-  return areaid_;
+inline void ActionInfoList::clear_actionlist() {
+  actionlist_.Clear();
 }
-inline void AreaActionInfo::set_areaid(::google::protobuf::int32 value) {
+inline ::PB::ActionInfo* ActionInfoList::mutable_actionlist(int index) {
+  // @@protoc_insertion_point(field_mutable:PB.ActionInfoList.actionList)
+  return actionlist_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::PB::ActionInfo >*
+ActionInfoList::mutable_actionlist() {
+  // @@protoc_insertion_point(field_mutable_list:PB.ActionInfoList.actionList)
+  return &actionlist_;
+}
+inline const ::PB::ActionInfo& ActionInfoList::actionlist(int index) const {
+  // @@protoc_insertion_point(field_get:PB.ActionInfoList.actionList)
+  return actionlist_.Get(index);
+}
+inline ::PB::ActionInfo* ActionInfoList::add_actionlist() {
+  // @@protoc_insertion_point(field_add:PB.ActionInfoList.actionList)
+  return actionlist_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::PB::ActionInfo >&
+ActionInfoList::actionlist() const {
+  // @@protoc_insertion_point(field_list:PB.ActionInfoList.actionList)
+  return actionlist_;
+}
+
+// -------------------------------------------------------------------
+
+// PlayerRegisterData
+
+// string account = 1;
+inline void PlayerRegisterData::clear_account() {
+  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PlayerRegisterData::account() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterData.account)
+  return account_.GetNoArena();
+}
+inline void PlayerRegisterData::set_account(const ::std::string& value) {
   
-  areaid_ = value;
-  // @@protoc_insertion_point(field_set:PB.AreaActionInfo.areaId)
+  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterData.account)
+}
+#if LANG_CXX11
+inline void PlayerRegisterData::set_account(::std::string&& value) {
+  
+  account_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.PlayerRegisterData.account)
+}
+#endif
+inline void PlayerRegisterData::set_account(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.PlayerRegisterData.account)
+}
+inline void PlayerRegisterData::set_account(const char* value, size_t size) {
+  
+  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.PlayerRegisterData.account)
+}
+inline ::std::string* PlayerRegisterData::mutable_account() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.PlayerRegisterData.account)
+  return account_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PlayerRegisterData::release_account() {
+  // @@protoc_insertion_point(field_release:PB.PlayerRegisterData.account)
+  
+  return account_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PlayerRegisterData::set_allocated_account(::std::string* account) {
+  if (account != nullptr) {
+    
+  } else {
+    
+  }
+  account_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), account);
+  // @@protoc_insertion_point(field_set_allocated:PB.PlayerRegisterData.account)
 }
 
-// repeated .PB.AreaActionInfo.ActionInfo action_infos = 2;
-inline int AreaActionInfo::action_infos_size() const {
-  return action_infos_.size();
+// string password = 2;
+inline void PlayerRegisterData::clear_password() {
+  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AreaActionInfo::clear_action_infos() {
-  action_infos_.Clear();
+inline const ::std::string& PlayerRegisterData::password() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterData.password)
+  return password_.GetNoArena();
 }
-inline ::PB::AreaActionInfo_ActionInfo* AreaActionInfo::mutable_action_infos(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.AreaActionInfo.action_infos)
-  return action_infos_.Mutable(index);
+inline void PlayerRegisterData::set_password(const ::std::string& value) {
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterData.password)
 }
-inline ::google::protobuf::RepeatedPtrField< ::PB::AreaActionInfo_ActionInfo >*
-AreaActionInfo::mutable_action_infos() {
-  // @@protoc_insertion_point(field_mutable_list:PB.AreaActionInfo.action_infos)
-  return &action_infos_;
+#if LANG_CXX11
+inline void PlayerRegisterData::set_password(::std::string&& value) {
+  
+  password_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.PlayerRegisterData.password)
 }
-inline const ::PB::AreaActionInfo_ActionInfo& AreaActionInfo::action_infos(int index) const {
-  // @@protoc_insertion_point(field_get:PB.AreaActionInfo.action_infos)
-  return action_infos_.Get(index);
+#endif
+inline void PlayerRegisterData::set_password(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.PlayerRegisterData.password)
 }
-inline ::PB::AreaActionInfo_ActionInfo* AreaActionInfo::add_action_infos() {
-  // @@protoc_insertion_point(field_add:PB.AreaActionInfo.action_infos)
-  return action_infos_.Add();
+inline void PlayerRegisterData::set_password(const char* value, size_t size) {
+  
+  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.PlayerRegisterData.password)
 }
-inline const ::google::protobuf::RepeatedPtrField< ::PB::AreaActionInfo_ActionInfo >&
-AreaActionInfo::action_infos() const {
-  // @@protoc_insertion_point(field_list:PB.AreaActionInfo.action_infos)
-  return action_infos_;
+inline ::std::string* PlayerRegisterData::mutable_password() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.PlayerRegisterData.password)
+  return password_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PlayerRegisterData::release_password() {
+  // @@protoc_insertion_point(field_release:PB.PlayerRegisterData.password)
+  
+  return password_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PlayerRegisterData::set_allocated_password(::std::string* password) {
+  if (password != nullptr) {
+    
+  } else {
+    
+  }
+  password_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), password);
+  // @@protoc_insertion_point(field_set_allocated:PB.PlayerRegisterData.password)
+}
+
+// int32 area_id = 3;
+inline void PlayerRegisterData::clear_area_id() {
+  area_id_ = 0;
+}
+inline ::google::protobuf::int32 PlayerRegisterData::area_id() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterData.area_id)
+  return area_id_;
+}
+inline void PlayerRegisterData::set_area_id(::google::protobuf::int32 value) {
+  
+  area_id_ = value;
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterData.area_id)
+}
+
+// string platform = 4;
+inline void PlayerRegisterData::clear_platform() {
+  platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PlayerRegisterData::platform() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterData.platform)
+  return platform_.GetNoArena();
+}
+inline void PlayerRegisterData::set_platform(const ::std::string& value) {
+  
+  platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterData.platform)
+}
+#if LANG_CXX11
+inline void PlayerRegisterData::set_platform(::std::string&& value) {
+  
+  platform_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.PlayerRegisterData.platform)
+}
+#endif
+inline void PlayerRegisterData::set_platform(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.PlayerRegisterData.platform)
+}
+inline void PlayerRegisterData::set_platform(const char* value, size_t size) {
+  
+  platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.PlayerRegisterData.platform)
+}
+inline ::std::string* PlayerRegisterData::mutable_platform() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.PlayerRegisterData.platform)
+  return platform_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PlayerRegisterData::release_platform() {
+  // @@protoc_insertion_point(field_release:PB.PlayerRegisterData.platform)
+  
+  return platform_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PlayerRegisterData::set_allocated_platform(::std::string* platform) {
+  if (platform != nullptr) {
+    
+  } else {
+    
+  }
+  platform_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), platform);
+  // @@protoc_insertion_point(field_set_allocated:PB.PlayerRegisterData.platform)
+}
+
+// -------------------------------------------------------------------
+
+// PlayerRegisterBack
+
+// int64 player_id = 1;
+inline void PlayerRegisterBack::clear_player_id() {
+  player_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 PlayerRegisterBack::player_id() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterBack.player_id)
+  return player_id_;
+}
+inline void PlayerRegisterBack::set_player_id(::google::protobuf::int64 value) {
+  
+  player_id_ = value;
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterBack.player_id)
+}
+
+// int64 register_time = 2;
+inline void PlayerRegisterBack::clear_register_time() {
+  register_time_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 PlayerRegisterBack::register_time() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterBack.register_time)
+  return register_time_;
+}
+inline void PlayerRegisterBack::set_register_time(::google::protobuf::int64 value) {
+  
+  register_time_ = value;
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterBack.register_time)
+}
+
+// string token = 3;
+inline void PlayerRegisterBack::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PlayerRegisterBack::token() const {
+  // @@protoc_insertion_point(field_get:PB.PlayerRegisterBack.token)
+  return token_.GetNoArena();
+}
+inline void PlayerRegisterBack::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.PlayerRegisterBack.token)
+}
+#if LANG_CXX11
+inline void PlayerRegisterBack::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.PlayerRegisterBack.token)
+}
+#endif
+inline void PlayerRegisterBack::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.PlayerRegisterBack.token)
+}
+inline void PlayerRegisterBack::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.PlayerRegisterBack.token)
+}
+inline ::std::string* PlayerRegisterBack::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.PlayerRegisterBack.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PlayerRegisterBack::release_token() {
+  // @@protoc_insertion_point(field_release:PB.PlayerRegisterBack.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PlayerRegisterBack::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:PB.PlayerRegisterBack.token)
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

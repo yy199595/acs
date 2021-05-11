@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Manager\LoginManager.h" />
     <ClInclude Include="Manager\ProxyManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Manager\LoginManager.cpp" />
     <ClCompile Include="Manager\ProxyManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

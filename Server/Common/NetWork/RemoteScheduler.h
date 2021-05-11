@@ -12,7 +12,7 @@ namespace SoEasy
 	{
 	public:
 		RemoteScheduler(long long operaotrId = 0);
-		RemoteScheduler(shared_ptr<TcpClientSession>, long long operaotrId = 0);
+		RemoteScheduler(shared_ptr<TcpClientSession>);
 		~RemoteScheduler() { }
 	public:
 		bool Call(std::string func);
@@ -31,8 +31,8 @@ namespace SoEasy
 		template<typename T>
 		bool Call(std::string func, Message * message, NetWorkRetAction2<T> action);
 	private:	
-		bool SendCallMessage(std::string & func, LuaTable & message, LocalRetActionProxy * action = nullptr);
-		bool SendCallMessage(std::string & func, Message * message = nullptr, LocalRetActionProxy * action = nullptr);		
+		bool SendCallMessage(std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
+		bool SendCallMessage(std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);		
 	public:
 		template<typename T, typename ... Args>
 		unsigned long long CreateCallback(Args &&... args);
@@ -47,14 +47,14 @@ namespace SoEasy
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
 	{
-		LocalRetActionProxy * pAction = new NetWorkRetActionBox2<T>(action, func);
+		auto pAction = make_shared<NetWorkRetActionBox2<T>>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
 	{
-		LocalRetActionProxy * pAction = new NetWorkRetActionBox2<T>(action, func);
+		auto pAction = make_shared<NetWorkRetActionBox2<T>>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 	template<typename T, typename ...Args>

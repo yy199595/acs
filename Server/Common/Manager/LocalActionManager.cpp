@@ -28,22 +28,6 @@ namespace SoEasy
 
 	void LocalActionManager::OnDestory()
 	{	
-		for (auto iter = this->mRetActionMap.begin(); iter != this->mRetActionMap.end(); iter++)
-		{
-			LocalRetActionProxy * pAction = iter->second;
-			delete pAction;
-		}
-
-		for (auto iter = this->mRegisterActions.begin(); iter != this->mRegisterActions.end(); iter++)
-		{
-			LocalActionProxy * pAction = iter->second;
-			delete pAction;
-		}
-		for (auto iter = this->mRegisterLuaActions.begin(); iter != this->mRegisterLuaActions.end(); iter++)
-		{
-			NetLuaAction * pAction = iter->second;
-			delete pAction;
-		}
 		this->mRetActionMap.clear();
 		this->mRegisterActions.clear();
 		this->mRegisterLuaActions.clear();
@@ -63,7 +47,7 @@ namespace SoEasy
 		}
 	}
 
-	bool LocalActionManager::BindFunction(NetLuaAction * actionBox)
+	bool LocalActionManager::BindFunction(shared_ptr<NetLuaAction> actionBox)
 	{
 		if (actionBox == nullptr)
 		{
@@ -80,7 +64,7 @@ namespace SoEasy
 		return true;
 	}
 
-	bool LocalActionManager::BindFunction(LocalActionProxy * actionBox)
+	bool LocalActionManager::BindFunction(shared_ptr<LocalActionProxy> actionBox)
 	{
 		if (actionBox == nullptr)
 		{
@@ -102,20 +86,18 @@ namespace SoEasy
 		auto iter = this->mRetActionMap.find(callbackId);
 		if (iter != this->mRetActionMap.end())
 		{
-			LocalRetActionProxy * actionBox = iter->second;
 			this->mRetActionMap.erase(iter);
-			delete actionBox;
 			return true;
 		}
 		return false;
 	}
 
-	LocalRetActionProxy * LocalActionManager::GetCallback(long long callbackId, bool remove)
+	shared_ptr<LocalRetActionProxy> LocalActionManager::GetCallback(long long callbackId, bool remove)
 	{
 		auto iter = this->mRetActionMap.find(callbackId);
 		if (iter != this->mRetActionMap.end())
 		{
-			LocalRetActionProxy * actionBox = iter->second;
+			shared_ptr<LocalRetActionProxy> actionBox = iter->second;
 			if (remove)
 			{
 				this->mRetActionMap.erase(iter);
@@ -125,7 +107,7 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	bool LocalActionManager::AddCallback(LocalRetActionProxy * actionBox, long long & callbackId)
+	bool LocalActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId)
 	{
 		if (actionBox == nullptr)
 		{
@@ -217,13 +199,13 @@ namespace SoEasy
 		return true;
 	}
 */
-	NetLuaAction * LocalActionManager::GetLuaAction(const std::string & name)
+	shared_ptr<NetLuaAction> LocalActionManager::GetLuaAction(const std::string & name)
 	{
 		auto iter = this->mRegisterLuaActions.find(name);
 		return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
 	}
 
-	LocalActionProxy * LocalActionManager::GetAction(const std::string & name)
+	shared_ptr<LocalActionProxy> LocalActionManager::GetAction(const std::string & name)
 	{
 		auto iter = this->mRegisterActions.find(name);
 		return iter != this->mRegisterActions.end() ? iter->second : nullptr;

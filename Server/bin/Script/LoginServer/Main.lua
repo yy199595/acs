@@ -11,6 +11,7 @@ end
 
 function LoginManager.Login(session, operId, messageData)
     SoEasy.Sleep(1000)
+    print("----------------")
     return 1
 end
 

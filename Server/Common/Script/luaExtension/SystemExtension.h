@@ -6,7 +6,7 @@ namespace SystemExtension
 
 	extern int CallWait(lua_State * luaEnv);
 
-	extern int WaitFor(lua_State * luaEnv);
+	extern int CallAction(lua_State * luaEnv);
 
 	extern int WaitNetFrame(lua_State * luaEnv);
 

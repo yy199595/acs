@@ -77,6 +77,15 @@ namespace SoEasy
 		this->mCoroutineId = mgr->GetCurrentCorId();
 	}
 
+	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(std::string name, CoroutineManager * coroutineMgr)
+	{
+		if (coroutineMgr->GetCoroutine() != nullptr)
+		{
+			return std::make_shared<NetWorkWaitCorAction>(name, coroutineMgr);
+		}
+		return nullptr;
+	}
+
 	void NetWorkWaitCorAction::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
 		this->mCode = (XCode)backData->error_code();

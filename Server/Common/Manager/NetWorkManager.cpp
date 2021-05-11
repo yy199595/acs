@@ -21,10 +21,8 @@ namespace SoEasy
 	{
 		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
 		this->mActionQueryManager = this->GetManager<RemoteActionManager>();
-
 		SayNoAssertRetFalse_F(this->mSessionContext);
-		//SayNoAssertRetFalse_F(this->mActionQueryManager);
-		return SessionManager::OnInit();
+		return true;
 	}
 
 	bool NetWorkManager::RemoveTcpSession(const std::string & address)
@@ -33,8 +31,14 @@ namespace SoEasy
 		if (iter != this->mSessionAdressMap.end())
 		{			
 			shared_ptr<TcpClientSession> tcpSession = iter->second;
-			SayNoDebugWarning("remove session " << tcpSession->GetSessionName() << " adress:" << tcpSession->GetAddress());
+			const long long socketId = tcpSession->GetSocketId();
+			auto iter1 = this->mSessionAdressMap1.find(socketId);
+			if (iter1 != this->mSessionAdressMap1.end())
+			{
+				this->mSessionAdressMap1.erase(iter1);
+			}
 			this->mSessionAdressMap.erase(iter);
+			SayNoDebugWarning("remove session " << tcpSession->GetSessionName() << " adress:" << tcpSession->GetAddress());
 			return true;
 		}
 		return false;
@@ -56,7 +60,9 @@ namespace SoEasy
 			this->mSessionLock.lock();
 			tcpSession->StartReceiveMsg();
 			this->mSessionLock.unlock();
-			this->mSessionAdressMap.insert(std::make_pair(address, tcpSession));
+			long long socketId = tcpSession->GetSocketId();
+			this->mSessionAdressMap.emplace(address, tcpSession);
+			this->mSessionAdressMap1.emplace(socketId, tcpSession);
 			SayNoDebugError("add new session " << address);
 			return true;
 		}
@@ -82,24 +88,9 @@ namespace SoEasy
 		return this->CloseTcpSession(address);
 	}
 
-	void NetWorkManager::OnFrameUpdateAfter() 
-	{ 
-		
-	}
-
-	void NetWorkManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
-	{
-
-	}
-
-	void NetWorkManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
-	{
-		
-	}
-
 	XCode NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		shared_ptr<TcpClientSession> pSession = this->GetSessionByAdress(address);
+		shared_ptr<TcpClientSession> pSession = this->GetTcpSession(address);
 
 		if (pSession == nullptr)
 		{
@@ -127,7 +118,23 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	shared_ptr<TcpClientSession> NetWorkManager::GetSessionByAdress(const std::string & adress)
+	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const long long skcketId)
+	{
+		auto iter = this->mSessionAdressMap1.find(skcketId);
+		if (iter != this->mSessionAdressMap1.end())
+		{
+			shared_ptr<TcpClientSession> session = iter->second;
+			if (!session->IsActive())
+			{
+				this->mSessionAdressMap1.erase(iter);
+				return nullptr;
+			}
+			return session;
+		}
+		return nullptr;
+	}
+
+	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const std::string & adress)
 	{
 		auto iter = this->mSessionAdressMap.find(adress);
 		if (iter != this->mSessionAdressMap.end())
@@ -145,20 +152,13 @@ namespace SoEasy
 
 	XCode NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		long long operId = returnPackage->operator_id();
-		RemoteActionProxy * actionProxy = this->mActionQueryManager->GetActionProxy(func, operId);
-		if (actionProxy == nullptr)
+		shared_ptr<RemoteActionProxy> actionProxy;
+		if (!this->mActionQueryManager->GetActionProxy(func, actionProxy))
 		{
-			SayNoDebugError(func << "  method does not exist");
 			return XCode::CallFunctionNotExist;
 		}
-		XCode code = actionProxy->CallAction(returnPackage);
-		if (code == XCode::SessionIsNull)
-		{
-			actionProxy->StartConnect(this);
-			return XCode::Successful;
-		}
-		return code;
+		actionProxy->Invoke(returnPackage);
+		return XCode::Successful;
 	}
 	
 	void NetWorkManager::OnDestory()

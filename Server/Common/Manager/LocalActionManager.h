@@ -15,13 +15,13 @@ namespace SoEasy
 		LocalActionManager();
 		virtual ~LocalActionManager() { }
 	public:
-		bool BindFunction( NetLuaAction * actionBox);
-		bool BindFunction( LocalActionProxy * actionBox);
+		bool BindFunction(shared_ptr<NetLuaAction> actionBox);
+		bool BindFunction(shared_ptr<LocalActionProxy> actionBox);
 		void GetAllFunction(std::vector<std::string> & funcs);
 	public:
 		bool DelCallback(long long callbackId);
-		LocalRetActionProxy * GetCallback(long long callbackId, bool remove = true);
-		bool AddCallback(LocalRetActionProxy * actionBox, long long & callbackId);
+		shared_ptr<LocalRetActionProxy> GetCallback(long long callbackId, bool remove = true);
+		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;
@@ -31,8 +31,8 @@ namespace SoEasy
 		bool Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo);
 		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo);*/
 	public:		
-		NetLuaAction * GetLuaAction(const std::string & name);
-		LocalActionProxy * GetAction(const std::string & name);
+		shared_ptr<NetLuaAction> GetLuaAction(const std::string & name);
+		shared_ptr<LocalActionProxy> GetAction(const std::string & name);
 	private:
 		std::string mMessageBuffer;
 		TimeRecorder mLogicTimeRecorder;
@@ -41,8 +41,8 @@ namespace SoEasy
 		class NetWorkManager * mNetWorkManager;
 		class CoroutineManager * mCoroutineScheduler;
 	private:
-		std::unordered_map<long long, LocalRetActionProxy *> mRetActionMap;
-		std::unordered_map<std::string, NetLuaAction *> mRegisterLuaActions;
-		std::unordered_map<std::string, LocalActionProxy *> mRegisterActions;
+		std::unordered_map<long long, shared_ptr<LocalRetActionProxy>> mRetActionMap;
+		std::unordered_map<std::string, shared_ptr<NetLuaAction>> mRegisterLuaActions;
+		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mRegisterActions;
 	};
 }

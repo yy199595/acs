@@ -219,7 +219,12 @@
     <ClCompile Include="NetWork\RemoteActionProxy.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
-    <ClCompile Include="Timer\TimerBase.cpp" />
+    <ClCompile Include="Timer\TimerBase.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWork\ActionScheduler.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -484,6 +489,9 @@
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="NetWork\RemoteActionProxy.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\ActionScheduler.h">
       <Filter>NetWork</Filter>
     </ClInclude>
   </ItemGroup>

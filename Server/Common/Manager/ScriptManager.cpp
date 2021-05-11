@@ -142,7 +142,7 @@ namespace SoEasy
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetLogicTime", &Applocation::GetLogicTime);
 
 		ClassProxyHelper::BeginRegister<NetWorkManager>(lua, "NetWorkManager");
-		ClassProxyHelper::PushMemberFunction<NetWorkManager>(lua, "GetSessionByAdress", &NetWorkManager::GetSessionByAdress);
+		//ClassProxyHelper::PushMemberFunction<NetWorkManager>(lua, "GetTcpSession", &NetWorkManager::GetTcpSession);
 
 		ClassProxyHelper::BeginRegister<TcpClientSession>(lua, "TcpClientSession");
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "GetIP", &TcpClientSession::GetIP);
@@ -163,8 +163,8 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Start", SystemExtension::Start);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "WaitFor", SystemExtension::WaitFor);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallWait", SystemExtension::CallWait);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallAction", SystemExtension::CallAction);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "WaitNetFrame", SystemExtension::WaitNetFrame);
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "AddTimer", SystemExtension::AddTimer);
@@ -178,7 +178,7 @@ namespace SoEasy
 
 	}
 
-	XCode ScriptManager::OnHotfix(shared_ptr<TcpClientSession>, long long operId)
+	XCode ScriptManager::OnHotfix(long long operId)
 	{
 		if (this->LoadAllModule())
 		{

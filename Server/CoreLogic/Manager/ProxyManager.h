@@ -18,10 +18,12 @@ namespace SoEasy
 	public:
 		shared_ptr<GameObject> GetClientObject(const long long id);
 	private:
+		void OnRecvServerMessage(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> msg);
+	private:
 		std::string mListenIp;
 		unsigned short mListenPort;
 		shared_ptr<TcpSessionListener> mTpcListener;
-		class RemoteActionManager * mActionQueryManager;
+		class RemoteActionManager * mRemoteActionManager;
 		std::unordered_map<long long, shared_ptr<GameObject>> mClientObjectMap;	//¿Í»§¶Ësession
 	};
 }

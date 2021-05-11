@@ -20,6 +20,7 @@ namespace SoEasy
 		const std::string mAddress;
 		const std::string mCommandMsg;
 	};
+	class LocalActionProxy;
 	typedef std::shared_ptr<NetMessageBuffer> SharedNetPacket;
 
 	class Manager : public Object
@@ -45,7 +46,7 @@ namespace SoEasy
 	public:
 		virtual void PushClassToLua(lua_State * luaEnv) { }
 	private:
-		bool BindFunction(const std::string & name, class LocalActionProxy * actionBox);
+		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	protected:
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
@@ -64,14 +65,14 @@ namespace SoEasy
 	template<typename T1>
 	inline bool Manager::BindFunction(std::string name, LocalAction2<T1> action)
 	{
+		typedef LocalActionProxy2<T1> ActionProxyType;
 		const size_t pos = name.find_first_of(".");
 		if (pos == std::string::npos)
 		{
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		LocalActionProxy * actionBox = new LocalActionProxy2<T1>(action, name);
-		return this->BindFunction(name, actionBox);
+		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
 	}
 
 	template<typename T1, typename T2>
@@ -83,8 +84,7 @@ namespace SoEasy
 			SayNoDebugError("register error : " << name);
 			return false;
 		}
-		LocalActionProxy * actionBox = new LocalActionProxy3<T1, T2>(action, name);
-		return this->BindFunction(name, actionBox);
+		return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action, name));
 	}
 
 	inline std::string GetFunctionName(std::string func)
@@ -93,8 +93,8 @@ namespace SoEasy
 		size_t pos = func.find("::");
 		return func.replace(pos, sizeof(buf), ".");
 	}
-#define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1, args2))
-#define REGISTER_FUNCTION_1(func,t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
-#define REGISTER_FUNCTION_2(func,t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3, args4))
+#define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))
+#define REGISTER_FUNCTION_1(func,t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))
+#define REGISTER_FUNCTION_2(func,t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
 
 }

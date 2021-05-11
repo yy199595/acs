@@ -39,6 +39,7 @@
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
+    <ClCompile Include="NetWork\ActionScheduler.cpp" />
     <ClCompile Include="NetWork\RemoteActionProxy.cpp" />
     <ClCompile Include="NetWork\NetLuaAction.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />
+    <ClInclude Include="NetWork\ActionScheduler.h" />
     <ClInclude Include="NetWork\RemoteActionProxy.h" />
     <ClInclude Include="NetWork\NetLuaAction.h" />
     <ClInclude Include="NetWork\NetLuaRetAction.h" />

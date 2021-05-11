@@ -25,12 +25,6 @@ namespace SoEasy
 		void YieldReturn();
 		void Sleep(long long ms);
 		void Resume(long long id);
-	public:
-		XCode Call(const std::string func, Message & returnData);
-		XCode Call(const std::string func, const Message * message = nullptr);
-		XCode Call(const std::string func, const Message * message, Message & returnData);
-	private:
-		XCode SendCallMessage(const std::string & func, const Message * message, class LocalRetActionProxy * callBack);
 	protected:
 		bool OnInit() override;
 		void OnInitComplete() override;
@@ -49,9 +43,7 @@ namespace SoEasy
 		void SaveStack(Coroutine *, char * top);
 	private:
 		std::string mMessageBuffer;
-		class TimerManager * mTimerManager;
-		class NetWorkManager * mNetWorkManager;
-		class LocalActionManager * mFunctionManager;		
+		class TimerManager * mTimerManager;	
 	private:
 		long long mCurrentCorId;
 #ifndef _WIN32

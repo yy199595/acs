@@ -2,6 +2,7 @@
 #include"Manager.h"
 namespace SoEasy
 {
+	typedef std::function<void(shared_ptr<TcpClientSession>, shared_ptr<NetWorkPacket>)> RecvMsgCallback;
 	class SessionManager : public Manager
 	{
 	public:
@@ -12,6 +13,8 @@ namespace SoEasy
 		shared_ptr<TcpClientSession> CreateTcpSession(SharedTcpSocket socket);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string address);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string ip, unsigned short port);
+	public:
+		void AddRecvCallback(RecvMsgCallback callback) { this->mRecvMsgCallback = callback; }
 	private:	//不要手动调用
 		bool AddNewSession(shared_ptr<TcpClientSession> tcpSession);
 		bool AddErrorSession(shared_ptr<TcpClientSession> tcpSession);
@@ -30,7 +33,8 @@ namespace SoEasy
 	protected:
 		class NetWorkManager * mNetWorkManager;
 	private:
-		NetWorkPacket mNetWorkPacket;	
+		NetWorkPacket mNetWorkPacket;
+		RecvMsgCallback mRecvMsgCallback;
 		class LocalActionManager * mActionManager;
 		class CoroutineManager * mCoroutineSheduler;
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;

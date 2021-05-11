@@ -133,7 +133,7 @@ namespace DataBase
 		}
 		return true;
 	}
-	XCode MysqlManager::QueryTable(shared_ptr<TcpClientSession> session, long long id, shared_ptr<StringArray> requestData)
+	XCode MysqlManager::QueryTable(long long id, shared_ptr<StringArray> requestData)
 	{
 		char buffer[100] = { 0 };
 		const std::string db = requestData->data_array(0);

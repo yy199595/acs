@@ -67,7 +67,7 @@ namespace SoEasy
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override
 		{
 			mReturnData.Clear();
-			XCode code = (XCode)backData.error_code();
+			XCode code = (XCode)backData->error_code();
 			if (code != XCode::TimeoutAutoCall)
 			{
 				const std::string & message = backData->message_data();			
@@ -118,6 +118,7 @@ namespace SoEasy
 	{
 	public:
 		NetWorkWaitCorAction(std::string name, CoroutineManager *);
+		static shared_ptr<NetWorkWaitCorAction> Create(std::string name, CoroutineManager *);
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;
 	public:

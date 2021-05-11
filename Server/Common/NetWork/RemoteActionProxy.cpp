@@ -4,57 +4,54 @@
 #include<Util/StringHelper.h>
 namespace SoEasy
 {
-
-	RemoteActionProxy::RemoteActionProxy(NetWorkManager * mgr, const std::string & address)
+	RemoteActionProxy::RemoteActionProxy(const std::string name, const std::string & address, int areaId)
 	{
-		this->mNetWorkManager = mgr;
+		this->mActionName = name;
+		this->mActionAreaId = areaId;
 		this->mActionAddress = address;
-		SayNoAssertRet_F(this->mSessionManager);
+		this->mNetWorkManager = Applocation::Get()->GetManager<NetWorkManager>();
 		SayNoAssertRet_F(this->mNetWorkManager);
-		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mActionIp, this->mActionPort));
 	}
 
-	XCode RemoteActionProxy::CallAction(shared_ptr<PB::NetWorkPacket> message)
+	void RemoteActionProxy::Invoke(shared_ptr<PB::NetWorkPacket> message)
 	{
-		if (!this->mActionSession)
-		{
-			return XCode::SessionIsNull;
-		}
-		if (!this->mActionSession->IsActive())
+		if (this->mActionSession == nullptr || !this->mActionSession->IsActive())
 		{
 			this->mSendQueue.push(message);
-			return XCode::SessionIsNull;
+			this->mActionSession = nullptr;
+			return;
 		}
-		return this->mNetWorkManager->SendMessageByAdress(mActionAddress, message);
+		if (!this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, message))
+		{
+			this->mSendQueue.push(message);
+			this->mActionSession = nullptr;
+		}
 	}
 
-	bool RemoteActionProxy::StartConnect(SessionManager * sMgr)
+	bool RemoteActionProxy::BindSession(shared_ptr<TcpClientSession> session)
 	{
-		if (mActionSession == nullptr)
+		if (this->mActionAddress != session->GetAddress())
 		{
-			mActionSession = make_shared<TcpClientSession>(sMgr, "ActionSession", mActionIp, mActionPort);
+			return false;
 		}
-		if (mActionSession->GetState() == Connect)
+		this->mActionSession = session;
+		while (!this->mSendQueue.empty())
 		{
-			return true;
-		}
-		return mActionSession->StartConnect(BIND_ACTION_2(RemoteActionProxy::OnConnectBack, this));
-	}
-
-	void RemoteActionProxy::OnConnectBack(shared_ptr<TcpClientSession> session, bool hasError)
-	{
-		if (hasError == false)
-		{
-			while (!this->mSendQueue.empty())
+			shared_ptr<PB::NetWorkPacket> sendPacket = this->mSendQueue.front();
+			if (!this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, sendPacket))
 			{
-				shared_ptr<PB::NetWorkPacket> message = this->mSendQueue.front();
-				this->CallAction(message);
-				this->mSendQueue.pop();
+				return false;
 			}
+			this->mSendQueue.pop();
 		}
-		else
+		return true;
+	}
+	bool RemoteActionProxy::IsAction()
+	{
+		if (this->mActionSession == nullptr)
 		{
-			SayNoDebugError("connect " << this->mActionAddress << " fail");
+			this->mActionSession = this->mNetWorkManager->GetTcpSession(this->mActionAddress);
 		}
+		return this->mActionSession != nullptr && this->mActionSession->IsActive();
 	}
 }

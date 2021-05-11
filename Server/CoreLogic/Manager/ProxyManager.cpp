@@ -8,6 +8,10 @@ namespace SoEasy
 {
 	bool ProxyManager::OnInit()
 	{
+		if (!SessionManager::OnInit())
+		{
+			return false;
+		}
 		std::string address;
 		if (!this->GetConfig().GetValue("ProxyAddress", address))
 		{
@@ -19,15 +23,15 @@ namespace SoEasy
 			SayNoDebugFatal("parse ProxyAddress fail");
 			return false;
 		}
-		this->mActionQueryManager = this->GetManager<RemoteActionManager>();
-		SayNoAssertRetFalse_F(this->mActionQueryManager);
+		this->mRemoteActionManager = this->GetManager<RemoteActionManager>();
+		SayNoAssertRetFalse_F(this->mRemoteActionManager);		
 		this->mTpcListener = make_shared<TcpSessionListener>(this, this->mListenPort);
 		if (!this->mTpcListener->InitListener())
 		{
 			return false;
 		 }
 		this->mTpcListener->StartAcceptConnect();
-		return SessionManager::OnInit();
+		return true;
 	}
 
 	void ProxyManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
@@ -57,7 +61,7 @@ namespace SoEasy
 
 	void ProxyManager::OnRecvNewMessageAfter(const std::string & address, const char * msg, size_t size)
 	{
-		shared_ptr<TcpClientSession> clientSession = this->mNetWorkManager->GetSessionByAdress(address);
+		shared_ptr<TcpClientSession> clientSession = this->mNetWorkManager->GetTcpSession(address);
 
 		SayNoAssertRet_F(clientSession);
 
@@ -69,35 +73,18 @@ namespace SoEasy
 		{
 			const std::string & name = netPacket->func_name();
 			const long long id = clientObject->GetGameObjectID();
-			RemoteActionProxy * actionProxy = this->mActionQueryManager->GetActionProxy(name, id);
-			if (actionProxy == nullptr)
+
+			shared_ptr<RemoteActionProxy> actionProxy;
+			if (this->mRemoteActionManager->GetActionProxy(name, actionProxy))
 			{
-				netPacket->clear_func_name();
-				netPacket->clear_operator_id();
-				netPacket->clear_message_data();
-				netPacket->set_error_code(XCode::CallFunctionNotExist);
-				this->mNetWorkManager->SendMessageByAdress(address, netPacket);
+				actionProxy->Invoke(netPacket);
 				return;
 			}
-			netPacket->set_operator_id(id);
-			XCode code = actionProxy->CallAction(netPacket);
-			if (code == XCode::SessionIsNull)
-			{
-				actionProxy->StartConnect(this);
-			}
-		}
-		else if(netPacket->operator_id() != 0) //转发给客户端
-		{
-			clientObject = this->GetClientObject(netPacket->operator_id());
-			if (clientObject != nullptr)
-			{
-				const std::string & address = clientObject->GetBindAddress();
-				this->mNetWorkManager->SendMessageByAdress(address, netPacket);
-			}
-		}
-		else  //调用本机方法
-		{
-
+			netPacket->clear_func_name();
+			netPacket->clear_operator_id();
+			netPacket->clear_message_data();
+			netPacket->set_error_code(XCode::CallFunctionNotExist);
+			this->mNetWorkManager->SendMessageByAdress(address, netPacket);
 		}
 	}
 
@@ -105,5 +92,16 @@ namespace SoEasy
 	{
 		auto iter = this->mClientObjectMap.find(id);
 		return iter != this->mClientObjectMap.end() ? iter->second : nullptr;
+	}
+
+	void ProxyManager::OnRecvServerMessage(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> messageData)
+	{
+		const long long playerId = messageData->operator_id();
+		shared_ptr<GameObject> playerObject = this->GetClientObject(playerId);
+		if (playerObject != nullptr)
+		{
+			const std::string & address = playerObject->GetBindAddress();
+			this->mNetWorkManager->SendMessageByAdress(address, messageData);
+		}
 	}
 }

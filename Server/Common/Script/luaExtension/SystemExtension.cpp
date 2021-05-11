@@ -121,7 +121,7 @@ namespace SystemExtension
 		}
 	
 		int invoke_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);	
-		NetLuaAction * luaAction = new NetLuaAction(luaEnv, action, action_ref, invoke_ref);
+		shared_ptr<NetLuaAction> luaAction = make_shared<NetLuaAction>(luaEnv, action, action_ref, invoke_ref);
 		lua_pushboolean(luaEnv, actionManager->BindFunction(luaAction));
 		return 1;
 	}
@@ -181,14 +181,8 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int WaitFor(lua_State * luaEnv)
+	int CallAction(lua_State * luaEnv)
 	{
-		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(luaEnv, 1);
-		if (tcpSession == nullptr)
-		{
-			lua_pushinteger(luaEnv, XCode::Failure);
-			return 1;
-		}
 		lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
 		{
@@ -203,7 +197,7 @@ namespace SystemExtension
 			return 1;
 		}
 
-		RemoteScheduler nCallController(tcpSession);
+		RemoteScheduler nCallController;
 		const char * funcName = lua_tostring(luaEnv, 2);
 		if (lua_isuserdata(luaEnv, 3))
 		{

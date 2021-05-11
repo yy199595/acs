@@ -10,19 +10,22 @@ namespace SoEasy
 	class RemoteActionProxy
 	{
 	public:
-		RemoteActionProxy(NetWorkManager * mgr, const std::string & address);
+		RemoteActionProxy(const std::string name, const std::string & address, int areaId);
 	public:
-		bool StartConnect(SessionManager * sMgr);
-		XCode CallAction(shared_ptr<PB::NetWorkPacket> message);
+		void Invoke(shared_ptr<PB::NetWorkPacket> message);
+		bool BindSession(shared_ptr<TcpClientSession> session);
+	public:
+		bool IsAction();
+		const int GetActionAreaId() { return this->mActionAreaId; }
+		const std::string & GetActionName() { return this->mActionName; }
+		const size_t GetMessageSize() { return this->mSendQueue.size(); }
+		const std::string & GetActionAddress() { return this->mActionAddress; }
 	private:
-		void OnConnectBack(shared_ptr<TcpClientSession> session, bool hasError);
-	private:
-		std::string mActionIp;
-		unsigned short mActionPort;
-		std::string mActionAddress;
-		SessionManager * mSessionManager;
+		int mActionAreaId;
+		std::string mActionName;
+		std::string mActionAddress;	
 		NetWorkManager * mNetWorkManager;
 		shared_ptr<TcpClientSession> mActionSession;
-		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue;
+		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue; //等待发送的消息
 	};
 }

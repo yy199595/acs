@@ -1,8 +1,7 @@
 
 Action = { }
 
-function Action.Invoke(action, session, operId, callbakcId, messageData)
-    local address = session:GetAddress()
+function Action.Invoke(action, address, operId, callbakcId, messageData)
     if type(messageData) == 'string' then
         local json = require("Util.JsonUtil")
         messageData = json.ToObject(messageData)
