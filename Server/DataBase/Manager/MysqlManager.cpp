@@ -45,7 +45,6 @@ namespace SoEasy
 			SayNoDebugError("not find field 'MysqlPassWord'");
 			return false;
 		}
-		REGISTER_FUNCTION_1(MysqlManager::QueryTable, StringArray);
 		return this->StartConnectMysql();
 	}
 
@@ -132,24 +131,5 @@ namespace SoEasy
 			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
 		return true;
-	}
-	XCode MysqlManager::QueryTable(long long id, shared_ptr<StringArray> requestData)
-	{
-		char buffer[100] = { 0 };
-		const std::string db = requestData->data_array(0);
-		const std::string table = requestData->data_array(1);
-		sprintf_s(buffer, "select * from %s;", table.c_str());
-		long long t1 = TimeHelper::GetMilTimestamp();
-
-		std::shared_ptr<MysqlQueryData> queryData;
-
-		XCode code = this->QueryData(db, buffer, queryData);
-		
-		SayNoDebugFatal("query time = " << TimeHelper::GetMilTimestamp() - t1 << "  count = " << queryData->GetColumnCount());
-		if (code != XCode::Successful)
-		{
-			SayNoDebugFatal("query error = " << queryData->GetErrorMessage());
-		}
-		return code;
 	}
 }

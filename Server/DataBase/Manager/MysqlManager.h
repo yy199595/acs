@@ -21,8 +21,6 @@ namespace SoEasy
 	private:
 		bool StartConnectMysql();
 	private:
-		XCode QueryTable(long long id, shared_ptr<StringArray> requestData);
-	private:
 		std::string mMysqlIp;		//ip地址
 		unsigned short mMysqlPort;	//端口号
 		std::string mDataBaseUser;	//用户名
