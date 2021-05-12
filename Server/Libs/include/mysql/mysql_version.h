@@ -7,21 +7,22 @@
 
 #ifndef _mysql_version_h
 #define _mysql_version_h
-
-#define PROTOCOL_VERSION            10
-#define MYSQL_SERVER_VERSION       "5.7.34"
-#define MYSQL_BASE_VERSION         "mysqld-5.7"
-#define MYSQL_SERVER_SUFFIX_DEF    ""
-#define FRM_VER                     6
-#define MYSQL_VERSION_ID            50734
-#define MYSQL_PORT                  3306
-#define MYSQL_PORT_DEFAULT          0
-#define MYSQL_UNIX_ADDR            "/tmp/mysql.sock"
+#ifdef _CUSTOMCONFIG_
+#include <custom_conf.h>
+#else
+#define PROTOCOL_VERSION            @PROTOCOL_VERSION@
+#define MYSQL_SERVER_VERSION       "@SERVER_VERSION@"
+#define MYSQL_VERSION_ID            @SERVER_VERSION_ID@
+#define MYSQL_PORT                  @MYSQL_TCP_PORT@
+#define MYSQL_PORT_DEFAULT          @MYSQL_TCP_PORT_DEFAULT@
+#define MYSQL_UNIX_ADDR            "@MYSQL_UNIX_ADDR@"
 #define MYSQL_CONFIG_NAME          "my"
-#define MYSQL_COMPILATION_COMMENT  "MySQL Community Server (GPL)"
-#define LIBMYSQL_VERSION           "5.7.34"
-#define LIBMYSQL_VERSION_ID         50734
-#define SYS_SCHEMA_VERSION         "1.5.2"
+#define MYSQL_COMPILATION_COMMENT  "@COMPILATION_COMMENT@"
+#define LIBMYSQL_VERSION           "@VERSION@"
+#define LIBMYSQL_VERSION_ID         @MYSQL_VERSION_ID@
+
+/* mysqld compile time options */
+#endif /* _CUSTOMCONFIG_ */
 
 #ifndef LICENSE
 #define LICENSE                     GPL

@@ -1,26 +1,14 @@
 /*
-   Copyright (c) 2001, 2021, Oracle and/or its affiliates.
+   Copyright (c) 2001, 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
-
-   Without limiting anything contained in the foregoing, this file,
-   which is part of C Driver for MySQL (Connector/C), is also subject to the
-   Universal FOSS Exception, version 1.0, a copy of which can be found at
-   http://oss.oracle.com/licenses/universal-foss-exception.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -29,13 +17,7 @@
 #ifndef MY_GLOBAL_INCLUDED
 #define MY_GLOBAL_INCLUDED
 
-/*
-  This include file should be included first in every header file.
-
-  This makes sure my_config.h is included to get platform specific
-  symbols defined and it makes sure a lot of platform/compiler
-  differences are mitigated.
-*/
+/* This is the include file that should be included 'first' in every C file. */
 
 #include "my_config.h"
 
@@ -74,7 +56,7 @@
 
 /*
   A lot of our programs uses asserts, so better to always include it
-  This also fixes a problem when people uses assert without including
+  This also fixes a problem when people uses DBUG_ASSERT without including
   assert.h
 */
 #include <assert.h>
@@ -127,10 +109,7 @@
 #undef SIZEOF_OFF_T
 #define SIZEOF_OFF_T 8
 
-static inline void sleep(unsigned long seconds)
-{
-  Sleep(seconds * 1000);
-}
+#define sleep(a) Sleep((a)*1000)
 
 /* Define missing access() modes. */
 #define F_OK 0
@@ -171,7 +150,7 @@ static inline void sleep(unsigned long seconds)
 #define compile_time_assert(X)                                              \
   do                                                                        \
   {                                                                         \
-    typedef char compile_time_assert[(X) ? 1 : -1] MY_ATTRIBUTE((unused)); \
+    typedef char compile_time_assert[(X) ? 1 : -1] __attribute__((unused)); \
   } while(0)
 
 #define QUOTE_ARG(x)		#x	/* Quote argument (before cpp) */
@@ -276,7 +255,6 @@ typedef socket_len_t SOCKET_SIZE_TYPE; /* Used by NDB */
 #define FN_HEADLEN	253	/* Max length of filepart of file name */
 #define FN_EXTLEN	20	/* Max length of extension (part of FN_LEN) */
 #define FN_REFLEN	512	/* Max length of full path-name */
-#define FN_REFLEN_SE	4000	/* Max length of full path-name in SE */
 #define FN_EXTCHAR	'.'
 #define FN_HOMELIB	'~'	/* ~/ is used as abbrev for home dir */
 #define FN_CURLIB	'.'	/* ./ is used as abbrev for current dir */
@@ -293,23 +271,12 @@ typedef socket_len_t SOCKET_SIZE_TYPE; /* Used by NDB */
 #define FN_NETWORK_DRIVES	/* Uses \\ to indicate network drives */
 #else
 #define FN_LIBCHAR	'/'
-/*
-  FN_LIBCHAR2 is not defined on !Windows. Use is_directory_separator().
-*/
+#define FN_LIBCHAR2	'/'
 #define FN_DIRSEP       "/"     /* Valid directory separators */
 #define FN_EXEEXT   ""
 #define FN_SOEXT    ".so"
 #define FN_ROOTDIR	"/"
 #endif
-
-static inline int is_directory_separator(char c)
-{
-#ifdef _WIN32
-  return c == FN_LIBCHAR || c == FN_LIBCHAR2;
-#else
-  return c == FN_LIBCHAR;
-#endif
-}
 
 /* 
   MY_FILE_MIN is  Windows speciality and is used to quickly detect
@@ -419,11 +386,6 @@ inline unsigned long long my_double2ulonglong(double d)
 
 #ifndef SIZE_T_MAX
 #define SIZE_T_MAX      (~((size_t) 0))
-#endif
-
-// Our ifdef trickery for my_isfinite does not work with gcc/solaris unless we:
-#ifdef HAVE_IEEEFP_H
-#include <ieeefp.h>
 #endif
 
 #if (__cplusplus >= 201103L)
@@ -683,9 +645,8 @@ static inline struct tm *gmtime_r(const time_t *clock, struct tm *res)
   gmtime_s(res, clock);
   return res;
 }
-#endif /* _WIN32 */
 
-#ifndef HAVE_STRUCT_TIMESPEC /* Windows before VS2015 */
+
 /*
   Declare a union to make sure FILETIME is properly aligned
   so it can be used directly as a 64 bit value. The value
@@ -702,7 +663,7 @@ struct timespec {
   long max_timeout_msec;
 };
 
-#endif /* !HAVE_STRUCT_TIMESPEC */
+#endif /* _WIN32 */
 
 C_MODE_START
 extern ulonglong my_getsystime(void);
@@ -710,26 +671,16 @@ C_MODE_END
 
 static inline void set_timespec_nsec(struct timespec *abstime, ulonglong nsec)
 {
-#ifdef HAVE_STRUCT_TIMESPEC
+#ifndef _WIN32
   ulonglong now= my_getsystime() + (nsec / 100);
-  ulonglong tv_sec= now / 10000000ULL;
-#if SIZEOF_TIME_T < SIZEOF_LONG_LONG
-  /* Ensure that the number of seconds don't overflow. */
-  tv_sec= MY_MIN(tv_sec, ((ulonglong)INT_MAX32));
-#endif
-  abstime->tv_sec=  (time_t)tv_sec;
+  abstime->tv_sec=   now / 10000000ULL;
   abstime->tv_nsec= (now % 10000000ULL) * 100 + (nsec % 100);
-#else /* !HAVE_STRUCT_TIMESPEC */
-  ulonglong max_timeout_msec= (nsec / 1000000);
+#else
   union ft64 tv;
   GetSystemTimeAsFileTime(&tv.ft);
   abstime->tv.i64= tv.i64 + (__int64)(nsec / 100);
-#if SIZEOF_LONG < SIZEOF_LONG_LONG
-  /* Ensure that the msec value doesn't overflow. */
-  max_timeout_msec= MY_MIN(max_timeout_msec, ((ulonglong)INT_MAX32));
+  abstime->max_timeout_msec= (long)(nsec / 1000000);
 #endif
-  abstime->max_timeout_msec= (long)max_timeout_msec;
-#endif /* !HAVE_STRUCT_TIMESPEC */
 }
 
 static inline void set_timespec(struct timespec *abstime, ulonglong sec)
@@ -746,7 +697,7 @@ static inline void set_timespec(struct timespec *abstime, ulonglong sec)
 */
 static inline int cmp_timespec(struct timespec *ts1, struct timespec *ts2)
 {
-#ifdef HAVE_STRUCT_TIMESPEC
+#ifndef _WIN32
   if (ts1->tv_sec > ts2->tv_sec ||
       (ts1->tv_sec == ts2->tv_sec && ts1->tv_nsec > ts2->tv_nsec))
     return 1;
@@ -764,19 +715,13 @@ static inline int cmp_timespec(struct timespec *ts1, struct timespec *ts2)
 
 static inline ulonglong diff_timespec(struct timespec *ts1, struct timespec *ts2)
 {
-#ifdef HAVE_STRUCT_TIMESPEC
+#ifndef _WIN32
   return (ts1->tv_sec - ts2->tv_sec) * 1000000000ULL +
     ts1->tv_nsec - ts2->tv_nsec;
 #else
   return (ts1->tv.i64 - ts2->tv.i64) * 100;
 #endif
 }
-
-#ifdef _WIN32
-typedef int MY_MODE;
-#else
-typedef mode_t MY_MODE;
-#endif /* _WIN32 */
 
 /* File permissions */
 #define USER_READ       (1L << 0)
@@ -792,13 +737,4 @@ typedef mode_t MY_MODE;
 #define GROUP_RWX       GROUP_READ | GROUP_WRITE | GROUP_EXECUTE
 #define OTHERS_RWX      OTHERS_READ | OTHERS_WRITE | OTHERS_EXECUTE
 
-/* Defaults */
-#define DEFAULT_SSL_CA_CERT     "ca.pem"
-#define DEFAULT_SSL_CA_KEY      "ca-key.pem"
-#define DEFAULT_SSL_SERVER_CERT "server-cert.pem"
-#define DEFAULT_SSL_SERVER_KEY  "server-key.pem"
-
-#if defined(_WIN32) || defined(_WIN64)
-  #define strcasecmp _stricmp
-#endif
 #endif  // MY_GLOBAL_INCLUDED

@@ -1,25 +1,13 @@
-/* Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
-
-   Without limiting anything contained in the foregoing, this file,
-   which is part of C Driver for MySQL (Connector/C), is also subject to the
-   Universal FOSS Exception, version 1.0, a copy of which can be found at
-   http://oss.oracle.com/licenses/universal-foss-exception.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -31,19 +19,13 @@
 
 #ifndef _mysql_com_h
 #define _mysql_com_h
-#include "binary_log_types.h"
-#include "my_command.h"
+
 #define HOSTNAME_LENGTH 60
 #define SYSTEM_CHARSET_MBMAXLEN 3
-#define FILENAME_CHARSET_MBMAXLEN 5
 #define NAME_CHAR_LEN	64              /* Field/table name length */
-#define USERNAME_CHAR_LENGTH 32
-#define USERNAME_CHAR_LENGTH_STR "32"
-#ifndef NAME_LEN
+#define USERNAME_CHAR_LENGTH 16
 #define NAME_LEN                (NAME_CHAR_LEN*SYSTEM_CHARSET_MBMAXLEN)
-#endif
 #define USERNAME_LENGTH         (USERNAME_CHAR_LENGTH*SYSTEM_CHARSET_MBMAXLEN)
-#define CONNECT_STRING_MAXLEN 1024
 
 #define MYSQL_AUTODETECT_CHARSET_NAME "auto"
 
@@ -84,15 +66,31 @@
 #define MYSQL_SERVICENAME "MySQL"
 #endif /* _WIN32 */
 
-/* The length of the header part for each generated column in the .frm file. */
-#define FRM_GCOL_HEADER_SIZE 4
 /*
-  Maximum length of the expression statement defined for generated columns.
+  You should add new commands to the end of this list, otherwise old
+  servers won't be able to handle them as 'unsupported'.
 */
-#define GENERATED_COLUMN_EXPRESSION_MAXLEN 65535 - FRM_GCOL_HEADER_SIZE
+
+enum enum_server_command
+{
+  COM_SLEEP, COM_QUIT, COM_INIT_DB, COM_QUERY, COM_FIELD_LIST,
+  COM_CREATE_DB, COM_DROP_DB, COM_REFRESH, COM_SHUTDOWN, COM_STATISTICS,
+  COM_PROCESS_INFO, COM_CONNECT, COM_PROCESS_KILL, COM_DEBUG, COM_PING,
+  COM_TIME, COM_DELAYED_INSERT, COM_CHANGE_USER, COM_BINLOG_DUMP,
+  COM_TABLE_DUMP, COM_CONNECT_OUT, COM_REGISTER_SLAVE,
+  COM_STMT_PREPARE, COM_STMT_EXECUTE, COM_STMT_SEND_LONG_DATA, COM_STMT_CLOSE,
+  COM_STMT_RESET, COM_SET_OPTION, COM_STMT_FETCH, COM_DAEMON,
+  COM_BINLOG_DUMP_GTID, COM_RESET_CONNECTION,
+  /* don't forget to update const char *command_name[] in sql_parse.cc */
+
+  /* Must be last */
+  COM_END
+};
+
+
 /*
   Length of random string sent by server on handshake; this is also length of
-  obfuscated password, received from client
+  obfuscated password, recieved from client
 */
 #define SCRAMBLE_LENGTH 20
 #define AUTH_PLUGIN_DATA_PART_1_LENGTH 8
@@ -391,6 +389,32 @@ typedef struct st_net {
 
 
 #define packet_error (~(unsigned long) 0)
+
+enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
+			MYSQL_TYPE_SHORT,  MYSQL_TYPE_LONG,
+			MYSQL_TYPE_FLOAT,  MYSQL_TYPE_DOUBLE,
+			MYSQL_TYPE_NULL,   MYSQL_TYPE_TIMESTAMP,
+			MYSQL_TYPE_LONGLONG,MYSQL_TYPE_INT24,
+			MYSQL_TYPE_DATE,   MYSQL_TYPE_TIME,
+			MYSQL_TYPE_DATETIME, MYSQL_TYPE_YEAR,
+			MYSQL_TYPE_NEWDATE, MYSQL_TYPE_VARCHAR,
+			MYSQL_TYPE_BIT,
+			MYSQL_TYPE_TIMESTAMP2,
+			MYSQL_TYPE_DATETIME2,
+			MYSQL_TYPE_TIME2,
+                        MYSQL_TYPE_NEWDECIMAL=246,
+			MYSQL_TYPE_ENUM=247,
+			MYSQL_TYPE_SET=248,
+			MYSQL_TYPE_TINY_BLOB=249,
+			MYSQL_TYPE_MEDIUM_BLOB=250,
+			MYSQL_TYPE_LONG_BLOB=251,
+			MYSQL_TYPE_BLOB=252,
+			MYSQL_TYPE_VAR_STRING=253,
+			MYSQL_TYPE_STRING=254,
+			MYSQL_TYPE_GEOMETRY=255
+
+};
+
 /* For backward compatibility */
 #define CLIENT_MULTI_QUERIES    CLIENT_MULTI_STATEMENTS    
 #define FIELD_TYPE_DECIMAL     MYSQL_TYPE_DECIMAL
@@ -449,7 +473,9 @@ enum mysql_enum_shutdown_level {
   /* don't flush InnoDB buffers, flush other storage engines' buffers*/
   SHUTDOWN_WAIT_CRITICAL_BUFFERS= (MYSQL_SHUTDOWN_KILLABLE_UPDATE << 1) + 1,
   /* Now the 2 levels of the KILL command */
-  KILL_QUERY= 254,
+//#if MYSQL_VERSION_ID >= 50000
+//  KILL_QUERY= 254,
+//#endif
   KILL_CONNECTION= 255
 };
 
@@ -481,15 +507,12 @@ enum enum_session_state_type
 {
   SESSION_TRACK_SYSTEM_VARIABLES,                       /* Session system variables */
   SESSION_TRACK_SCHEMA,                          /* Current schema */
-  SESSION_TRACK_STATE_CHANGE,                  /* track session state changes */
-  SESSION_TRACK_GTIDS,
-  SESSION_TRACK_TRANSACTION_CHARACTERISTICS,  /* Transaction chistics */
-  SESSION_TRACK_TRANSACTION_STATE             /* Transaction state */
+  SESSION_TRACK_STATE_CHANGE                  /* track session state changes */
 };
 
 #define SESSION_TRACK_BEGIN SESSION_TRACK_SYSTEM_VARIABLES
 
-#define SESSION_TRACK_END SESSION_TRACK_TRANSACTION_STATE
+#define SESSION_TRACK_END SESSION_TRACK_STATE_CHANGE
 
 #define IS_SESSION_STATE_TYPE(T) \
   (((int)(T) >= SESSION_TRACK_BEGIN) && ((T) <= SESSION_TRACK_END))
@@ -504,7 +527,6 @@ my_bool	my_net_init(NET *net, Vio* vio);
 void my_net_local_init(NET *net);
 void net_end(NET *net);
 void net_clear(NET *net, my_bool check_buffer);
-void net_claim_memory_ownership(NET *net);
 my_bool net_realloc(NET *net, size_t length);
 my_bool	net_flush(NET *net);
 my_bool	my_net_write(NET *net,const unsigned char *packet, size_t len);
@@ -599,10 +621,6 @@ char *octet2hex(char *to, const char *str, unsigned int len);
 
 /* end of password.c */
 
-my_bool generate_sha256_scramble(unsigned char *dst, size_t dst_size,
-                                 const char *src, size_t src_size, const char *rnd,
-                                 size_t rnd_size);
-
 char *get_tty_password(const char *opt_message);
 const char *mysql_errno_to_sqlstate(unsigned int mysql_errno);
 
@@ -613,11 +631,9 @@ void my_thread_end(void);
 
 #ifdef MY_GLOBAL_INCLUDED
 ulong STDCALL net_field_length(uchar **packet);
-ulong STDCALL net_field_length_checked(uchar **packet, ulong max_length);
 my_ulonglong net_field_length_ll(uchar **packet);
 uchar *net_store_length(uchar *pkg, ulonglong length);
 unsigned int net_length_size(ulonglong num);
-unsigned int net_field_length_size(const unsigned char *pos);
 #endif
 
 #ifdef __cplusplus

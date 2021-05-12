@@ -1,20 +1,13 @@
-/* Copyright (c) 2012, 2021, Oracle and/or its affiliates.
+/* Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2.0,
-  as published by the Free Software Foundation.
-
-  This program is also distributed with certain software (including
-  but not limited to OpenSSL) that is licensed under separate terms,
-  as designated in a particular file or component or in included license
-  documentation.  The authors of MySQL hereby grant you an additional
-  permission to link the program and your derivative works with the
-  separately licensed software that they have included with MySQL.
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License, version 2.0, for more details.
+  GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
@@ -88,7 +81,7 @@ inline_mysql_mdl_create(void *identity,
                         const MDL_key *mdl_key,
                         enum_mdl_type mdl_type,
                         enum_mdl_duration mdl_duration,
-                        MDL_ticket::enum_psi_status mdl_status,
+                        MDL_wait::enum_wait_status mdl_status,
                         const char *src_file, uint src_line)
 {
   PSI_metadata_lock *result;
@@ -107,7 +100,7 @@ inline_mysql_mdl_create(void *identity,
 
 static inline void inline_mysql_mdl_set_status(
   PSI_metadata_lock *psi,
-  MDL_ticket::enum_psi_status mdl_status)
+  MDL_wait::enum_wait_status mdl_status)
 {
   if (psi != NULL)
     PSI_METADATA_CALL(set_metadata_lock_status)(psi, mdl_status);

@@ -1,20 +1,13 @@
-/* Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -22,13 +15,6 @@
 
 #ifndef MY_THREAD_LOCAL_INCLUDED
 #define MY_THREAD_LOCAL_INCLUDED
-
-#ifndef _WIN32
-#include <pthread.h>
-#endif
-
-struct _db_code_state_;
-typedef uint32 my_thread_id;
 
 C_MODE_START
 
@@ -77,37 +63,43 @@ static inline int my_set_thread_local(thread_local_key_t key,
 #endif
 }
 
-/**
-  Retrieve the MySQL thread-local storage variant of errno.
-*/
-int my_errno();
 
-/**
-  Set the MySQL thread-local storage variant of errno.
-*/
-void set_my_errno(int my_errno);
-
-#ifdef _WIN32
+/* All thread specific variables are in the following struct */
+struct st_my_thread_var
+{
+  int thr_errno;
+#if defined(_WIN32)
 /*
   thr_winerr is used for returning the original OS error-code in Windows,
   my_osmaperr() returns EINVAL for all unknown Windows errors, hence we
   preserve the original Windows Error code in thr_winerr.
 */
-int thr_winerr();
-
-void set_thr_winerr(int winerr);
-
+  int thr_winerr;
 #endif
+  mysql_cond_t suspend;
+  mysql_mutex_t mutex;
+  mysql_mutex_t * volatile current_mutex;
+  mysql_cond_t * volatile current_cond;
+  my_thread_id id;
+  int volatile abort;
+  struct st_my_thread_var *next,**prev;
+  void *opt_info;
+  void  *stack_ends_here;
+#ifndef DBUG_OFF
+  void *dbug;
+#endif
+};
 
-#ifndef NDEBUG
+struct st_my_thread_var *mysys_thread_var();
+
+int set_mysys_thread_var(struct st_my_thread_var *mysys_var);
+
+#ifndef DBUG_OFF
 /* Return pointer to DBUG for holding current state */
-struct _db_code_state_ **my_thread_var_dbug();
-
-my_thread_id my_thread_var_id();
-
-void set_my_thread_var_id(my_thread_id id);
-
+void **my_thread_var_dbug();
 #endif
+
+#define my_errno mysys_thread_var()->thr_errno
 
 C_MODE_END
 

@@ -1,23 +1,16 @@
 #ifndef THR_RWLOCK_INCLUDED
 #define THR_RWLOCK_INCLUDED
 
-/* Copyright (c) 2014, 2021, Oracle and/or its affiliates.
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -39,12 +32,6 @@
   version of rwlocks that prefer readers. The P_S version of these
   are mysql_prlock_*() - see include/mysql/psi/mysql_thread.h
 */
-
-#include "my_global.h"
-#include "my_thread.h"
-#include "thr_cond.h"
-
-C_MODE_START
 
 #ifdef _WIN32
 typedef struct st_my_rw_lock_t
@@ -188,7 +175,7 @@ typedef struct st_rw_pr_lock_t {
   my_bool active_writer;
 #ifdef SAFE_MUTEX
   /** Thread holding wr-lock (for debug purposes only). */
-  my_thread_t writer_thread;
+  pthread_t writer_thread;
 #endif
 } rw_pr_lock_t;
 
@@ -199,23 +186,21 @@ extern int rw_pr_unlock(rw_pr_lock_t *);
 extern int rw_pr_destroy(rw_pr_lock_t *);
 
 static inline void
-rw_pr_lock_assert_write_owner(const rw_pr_lock_t *rwlock MY_ATTRIBUTE((unused)))
+rw_pr_lock_assert_write_owner(const rw_pr_lock_t *rwlock __attribute__((unused)))
 {
 #ifdef SAFE_MUTEX
-  assert(rwlock->active_writer &&
-         my_thread_equal(my_thread_self(), rwlock->writer_thread));
+  DBUG_ASSERT(rwlock->active_writer &&
+              pthread_equal(pthread_self(), rwlock->writer_thread));
 #endif
 }
 
 static inline void
-rw_pr_lock_assert_not_write_owner(const rw_pr_lock_t *rwlock MY_ATTRIBUTE((unused)))
+rw_pr_lock_assert_not_write_owner(const rw_pr_lock_t *rwlock __attribute__((unused)))
 {
 #ifdef SAFE_MUTEX
-  assert(!rwlock->active_writer ||
-         !my_thread_equal(my_thread_self(), rwlock->writer_thread));
+  DBUG_ASSERT(!rwlock->active_writer ||
+              !pthread_equal(pthread_self(), rwlock->writer_thread));
 #endif
 }
-
-C_MODE_END
 
 #endif /* THR_RWLOCK_INCLUDED */

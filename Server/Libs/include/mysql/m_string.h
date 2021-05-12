@@ -1,21 +1,14 @@
 /*
-   Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+   Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -33,8 +26,6 @@
 #define bmove please_use_memmove_rather_than_bmove
 #define strmov please_use_my_stpcpy_or_my_stpmov_rather_than_strmov
 #define strnmov please_use_my_stpncpy_or_my_stpnmov_rather_than_strnmov
-
-#include "mysql/service_my_snprintf.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -163,6 +154,9 @@ static inline int native_strncasecmp(const char *s1, const char *s2, size_t n)
 #endif
 }
 
+size_t my_snprintf(char* to, size_t n, const char* fmt, ...);
+size_t my_vsnprintf(char *to, size_t n, const char* fmt, va_list ap);
+
 /* Prototypes of normal stringfunctions (with may ours) */
 #ifndef HAVE_STRNLEN
 extern size_t strnlen(const char *s, size_t n);
@@ -232,20 +226,23 @@ extern char *longlong10_to_str(longlong val,char *dst,int radix);
 }
 #endif
 
-/*
-  LEX_STRING -- a pair of a C-string and its length.
-  (it's part of the plugin API as a MYSQL_LEX_STRING)
-  Ditto LEX_CSTRING/MYSQL_LEX_CSTRING.
-*/
-
-#include <mysql/mysql_lex_string.h>
+struct st_mysql_lex_string
+{
+  char *str;
+  size_t length;
+};
 typedef struct st_mysql_lex_string LEX_STRING;
+
+#define STRING_WITH_LEN(X) (X), ((size_t) (sizeof(X) - 1))
+#define USTRING_WITH_LEN(X) ((uchar*) X), ((size_t) (sizeof(X) - 1))
+#define C_STRING_WITH_LEN(X) ((char *) (X)), ((size_t) (sizeof(X) - 1))
+
+struct st_mysql_const_lex_string
+{
+  const char *str;
+  size_t length;
+};
 typedef struct st_mysql_const_lex_string LEX_CSTRING;
-
-#define STRING_WITH_LEN(X) (X), ((sizeof(X) - 1))
-#define USTRING_WITH_LEN(X) ((uchar*) X), ((sizeof(X) - 1))
-#define C_STRING_WITH_LEN(X) ((char *) (X)), ((sizeof(X) - 1))
-
 
 /**
   Skip trailing space.
@@ -301,7 +298,7 @@ static inline const uchar *skip_trailing_space(const uchar *ptr,size_t len)
     const uchar *start_words= (const uchar *)(intptr)
        ((((ulonglong)(intptr)ptr) + SIZEOF_INT - 1) / SIZEOF_INT * SIZEOF_INT);
 
-    assert(end_words > ptr);
+    DBUG_ASSERT(end_words > ptr);
     while (end > end_words && end[-1] == 0x20)
       end--;
     if (end[-1] == 0x20 && start_words < end_words)
@@ -336,12 +333,6 @@ static inline const uchar *skip_trailing_space(const uchar *ptr, size_t len)
 static inline void lex_string_set(LEX_STRING *lex_str, const char *c_str)
 {
   lex_str->str= (char *) c_str;
-  lex_str->length= strlen(c_str);
-}
-
-static inline void lex_cstring_set(LEX_CSTRING *lex_str, const char *c_str)
-{
-  lex_str->str= c_str;
   lex_str->length= strlen(c_str);
 }
 

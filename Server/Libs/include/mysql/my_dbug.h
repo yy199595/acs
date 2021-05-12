@@ -1,25 +1,13 @@
-/* Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License, version 2.0,
-   as published by the Free Software Foundation.
-
-   This program is also distributed with certain software (including
-   but not limited to OpenSSL) that is licensed under separate terms,
-   as designated in a particular file or component or in included license
-   documentation.  The authors of MySQL hereby grant you an additional
-   permission to link the program and your derivative works with the
-   separately licensed software that they have included with MySQL.
-
-   Without limiting anything contained in the foregoing, this file,
-   which is part of C Driver for MySQL (Connector/C), is also subject to the
-   Universal FOSS Exception, version 1.0, a copy of which can be found at
-   http://oss.oracle.com/licenses/universal-foss-exception.
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License, version 2.0, for more details.
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -33,7 +21,7 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#if !defined(NDEBUG)
+#if !defined(DBUG_OFF)
 
 struct _db_stack_frame_ {
   const char *func;      /* function name of the previous stack frame       */
@@ -61,7 +49,7 @@ extern  void _db_return_(uint _line_, struct _db_stack_frame_ *_stack_frame_);
 extern  void _db_pargs_(uint _line_,const char *keyword);
 extern  int _db_enabled_();
 extern  void _db_doprnt_(const char *format,...)
-  MY_ATTRIBUTE((format(printf, 1, 2)));
+  __attribute__((format(printf, 1, 2)));
 extern  void _db_doputs_(const char *log);
 extern  void _db_dump_(uint _line_,const char *keyword,
                        const unsigned char *memory, size_t length);
@@ -127,6 +115,7 @@ extern  const char* _db_get_func_(void);
 #define DBUG_END()  _db_end_ ()
 #define DBUG_LOCK_FILE _db_lock_file_()
 #define DBUG_UNLOCK_FILE _db_unlock_file_()
+#define DBUG_ASSERT(A) assert(A)
 #define DBUG_EXPLAIN(buf,len) _db_explain_(0, (buf),(len))
 #define DBUG_EXPLAIN_INITIAL(buf,len) _db_explain_init_((buf),(len))
 #define DEBUGGER_OFF                    do { _dbug_on_= 0; } while(0)
@@ -136,13 +125,13 @@ extern  const char* _db_get_func_(void);
 #else
 /*
   Avoid popup with abort/retry/ignore buttons. When BUG#31745 is fixed we can
-  call abort() instead of _exit(2) (now it would cause a "test signal" popup).
+  call abort() instead of _exit(3) (now it would cause a "test signal" popup).
 */
 #include <crtdbg.h>
 #define DBUG_ABORT() (_db_flush_(),\
                      (void)_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE),\
                      (void)_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR),\
-                     _exit(2))
+                     _exit(3))
 #endif
 #define DBUG_CHECK_CRASH(func, op) \
   do { char _dbuf_[255]; strxnmov(_dbuf_, sizeof(_dbuf_)-1, (func), (op)); \
@@ -192,6 +181,7 @@ extern void _db_flush_gcov_();
 #define DBUG_LONGJMP(a1) longjmp(a1)
 #define DBUG_DUMP(keyword,a1,a2)        do { } while(0)
 #define DBUG_END()                      do { } while(0)
+#define DBUG_ASSERT(A)                  do { } while(0)
 #define DBUG_LOCK_FILE                  do { } while(0)
 #define DBUG_FILE (stderr)
 #define DBUG_UNLOCK_FILE                do { } while(0)
@@ -227,7 +217,7 @@ void debug_sync_point(const char* lock_name, uint lock_timeout);
 #endif
 
 #ifdef __cplusplus
-#if !defined(NDEBUG)
+#if !defined(DBUG_OFF)
 #include <sstream>
 
 /*
@@ -249,7 +239,7 @@ void debug_sync_point(const char* lock_name, uint lock_timeout);
 	sout << v; \
 	DBUG_PUTS(keyword, sout.str().c_str()); \
 } while(0)
-#endif /* NDEBUG */
+#endif /* DBUG_OFF */
 #endif /* __cplusplus */
 
 #endif /* MY_DBUG_INCLUDED */
