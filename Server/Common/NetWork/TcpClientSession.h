@@ -26,6 +26,7 @@ namespace SoEasy
 	
 	class TcpClientSession : public std::enable_shared_from_this<TcpClientSession>
 	{
+		typedef std::function<void(shared_ptr<TcpClientSession>, bool)> ConnectCallback;
 	public:
 		TcpClientSession(SessionManager * manager, SharedTcpSocket socket);
 		TcpClientSession(SessionManager * manager, std::string name, std::string ip, unsigned short port);
@@ -77,5 +78,5 @@ namespace SoEasy
 		unsigned int mRecvBufferSize;
 	};
 	typedef shared_ptr<TcpClientSession> SharedTcpSession;
-	typedef std::function<void(SharedTcpSession session, bool hasError)> ConnectCallback;
+	
 }
