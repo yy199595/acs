@@ -18,7 +18,7 @@ INCLUDE_DIRECTORIES(../Libs/include/spdlog)
 INCLUDE_DIRECTORIES(../Libs/include/mysql)
 INCLUDE_DIRECTORIES(../Libs/include/redis)
 
-LINK_DIRECTORIES(.././Libs/lib)
+LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
 SET(CMAKE_CXX_COMPILER_ARG1 "g++") 
 

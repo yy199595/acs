@@ -17,7 +17,7 @@ INCLUDE_DIRECTORIES(../DataBase)
 INCLUDE_DIRECTORIES(../CoreLogic)
 INCLUDE_DIRECTORIES(../ServerData)
 
-LINK_DIRECTORIES(../../Libs/lib)
+LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
 SET(CMAKE_CXX_COMPILER_ARG1 "g++") 
 
@@ -25,7 +25,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 SET(CMAKE_BUILD_TYPE Debug)
 
 ADD_EXECUTABLE(Server ${SCENE_SRC})
-TARGET_LINK_LIBRARIES(Server Common protobuf Lua53 pthread hiredis mysqlclient yassl DataBase CoreLogic ServerData dl  ${MY_ADDLIB})
+TARGET_LINK_LIBRARIES(Server Common protobuf Lua53 pthread hiredis mysqlclient yassl DataBase CoreLogic ServerData dl ${MY_ADDLIB})
 
 SET(EXECUTABLE_OUTPUT_PATH ../../bin/)
 
