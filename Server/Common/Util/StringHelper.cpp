@@ -55,7 +55,7 @@ namespace StringHelper
 		const static std::string buffer = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
 		for (size_t index = 0; index < size; index++)
 		{
-			size_t pos = MathHelper::Random<size_t>(0, buffer.size());
+			int pos = MathHelper::Random<int>(0, (int)buffer.size());
 			ss << buffer[pos];
 		}
 		return ss.str();
