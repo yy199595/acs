@@ -3,7 +3,7 @@
 #include<Other/Command.h>
 namespace SoEasy
 {
-
+	class TcpSessionListener;
 	typedef std::function<XCode(shared_ptr<TcpClientSession>, const std::string &, RapidJsonWriter &)> CommandAction;
 	class CommandManager : public SessionManager
 	{
