@@ -23,7 +23,7 @@ namespace SoEasy
 		const std::string mMessage;
 	};
 	class SessionManager;
-	typedef std::function<void(shared_ptr<TcpClientSession> session, bool hasError)> ConnectCallback;
+	
 	class TcpClientSession : public std::enable_shared_from_this<TcpClientSession>
 	{
 	public:
@@ -77,4 +77,5 @@ namespace SoEasy
 		unsigned int mRecvBufferSize;
 	};
 	typedef shared_ptr<TcpClientSession> SharedTcpSession;
+	typedef std::function<void(SharedTcpSession session, bool hasError)> ConnectCallback;
 }
