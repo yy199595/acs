@@ -48,17 +48,47 @@ message ServerRunInfo
 
 message ActionUpdateInfo
 {
-    string address = 1; //监听地址
-    repeated string action_names =2;    //函数名字
+    int32 areaId = 1;   //区服id
+    string address = 2; //监听地址
+    repeated string action_names = 3;    //函数名字
 }
 
-message AreaActionInfo
+message ActionInfo
 {
-    int32 areaId = 1;   //区服id
-    message ActionInfo 
-    {
-        string action_name = 1; //名字
-        repeated string action_address =2;// 地址;
-    }
-    repeated ActionInfo action_infos = 2;   //所有方法地址
+    int32 adreId = 1;
+    string address = 2;
+    string actionName = 3;
+}
+
+message ActionInfoList
+{
+    repeated ActionInfo actionList = 1;
+}
+
+message UserRegisterData
+{
+    string account = 1;  //账户
+    string password = 2; //密码
+    int64 phonenum = 3; //手机号
+    string platform = 4;    //平台
+    string device_mac = 5;    //设备物理地址
+}
+
+message UserRegisterBack
+{
+    int64 player_id = 1; //玩家id
+    int64 register_time = 2; //注册事件
+    string token = 3; //生成的令牌
+}
+
+message UserAccountData
+{
+    int64 user_id = 1;      //用户id
+    string account = 2;     //账户
+    string passwd = 3;      //密码
+    string platform = 4;    //平台
+    int64 phonenum = 5;     //手机号
+    string device_mac = 6;  //设备id
+    int64 register_time = 7;    //注册事件
+    int64 last_logintime = 8;   //上次登录时间
 }
