@@ -3,6 +3,7 @@
 namespace SoEasy
 {
 	class SessionManager;
+	class TcpClientSession;
 	class TcpSessionListener
 	{
 	public:
