@@ -91,6 +91,18 @@ namespace SoEasy
 
 	
 
+	bool GameObject::RemoveComponent(const std::string & name)
+	{
+		ComponentIter iter = this->mComponentMap.find(name);
+		if (iter != this->mComponentMap.end())
+		{
+			Component * component = iter->second;
+			component->SetActive(false);
+			return true;
+		}
+		return false;
+	}
+
 	void GameObject::DestoryComponents()
 	{
 		ComponentIter iterator = this->mComponentMap.begin();

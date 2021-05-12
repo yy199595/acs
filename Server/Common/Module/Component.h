@@ -13,7 +13,7 @@ namespace SoEasy
 		inline shared_ptr<GameObject> GetGameObject()	{ return this->mGameObject; }
 	public:
 		template<typename T>
-		inline typename T * GetComponent();
+		inline T * GetComponent();
 		Component * GetComponentByName(const std::string name);
 	public:
 		bool IsComponent() override { return true; }
@@ -27,7 +27,7 @@ namespace SoEasy
 		shared_ptr<GameObject> mGameObject;
 	};
 	template<typename T>
-	inline typename T * Component::GetComponent()
+	inline T * Component::GetComponent()
 	{
 		this->mGameObject->GetComponent<T>();
 	}

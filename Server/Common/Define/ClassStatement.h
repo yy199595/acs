@@ -37,19 +37,3 @@ namespace SoEasy
 		return false;
 	}
 }
-
-namespace SoEasy
-{
-	class Object;
-	class Manager;
-	class NetWorkManager;
-	class ScriptManager;
-	class Component;
-	class RemoteScheduler;
-	class TcpClientSession;
-	class TcpSessionListener;
-	class GameObject;
-	class LocalActionManager;
-	class ActionRegisterManager;
-
-}

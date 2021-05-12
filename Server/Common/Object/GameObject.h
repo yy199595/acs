@@ -18,6 +18,8 @@ namespace SoEasy
 
 		template<typename T> 
 		inline bool RemoveComponent();
+
+		bool RemoveComponent(const std::string & name);
 		
 		template<typename T> 
 		inline T * GetOrAddComponent();
@@ -98,15 +100,12 @@ namespace SoEasy
 	template<typename T>
 	inline bool GameObject::RemoveComponent()
 	{
-		const char * name = TypeReflection<T>::Name;
-		ComponentIter iter = this->mComponentMap.find(name);
-		if (iter != this->mComponentMap.end())
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
 		{
-			Component * component = iter->second;
-			component->SetActive(false);
-			return true;
+			return false;
 		}
-		return false;
+		return this->RemoveComponent(name);
 	}
 
 	template<typename T>
