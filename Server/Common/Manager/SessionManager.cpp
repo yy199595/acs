@@ -26,7 +26,7 @@ namespace SoEasy
 		if (!StringHelper::ParseIpAddress(address, connectIp, connectPort))
 		{
 			SayNoDebugError("parse " << address << " fail")
-			return false;
+			return nullptr;
 		}
 		return this->CreateTcpSession(name, connectIp, connectPort);
 	}
