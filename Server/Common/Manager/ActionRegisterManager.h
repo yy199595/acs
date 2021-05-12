@@ -9,7 +9,7 @@ using namespace PB;
 
 namespace SoEasy
 {
-	struct ActionInfo
+	struct ActionProxyInfo
 	{
 	public:
 		int mAreaId;
@@ -17,7 +17,7 @@ namespace SoEasy
 		std::string mAddress;
 		std::string mActionName;
 	public:
-		bool operator == (ActionInfo & actionInfo)
+		bool operator == (ActionProxyInfo & actionInfo)
 		{
 			return this->mAreaId == actionInfo.mAreaId
 				&& this->mOperId == actionInfo.mOperId
@@ -43,13 +43,13 @@ namespace SoEasy
 		XCode RegisterActions(long long id, shared_ptr<ActionUpdateInfo> actionInfo);
 		XCode QueryActions(long long id, shared_ptr<Int32Data> areaId, shared_ptr<ActionInfoList> returnData);
 	private:
-		void AddActionInfo(ActionInfo & actionInfo);
+		void AddActionInfo(ActionProxyInfo & actionInfo);
 	private:
 		std::string mListenIp;
 		unsigned short mListenPort;
 		std::mutex mConnectSessionLock;
 		class NetWorkManager * mNetWorkManager;
-		std::vector<ActionInfo> mActionRegisterList;
+		std::vector<ActionProxyInfo> mActionRegisterList;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
 	};
 }

@@ -61,7 +61,7 @@ namespace SoEasy
 		
 		for (int index = 0; index < actions->action_names_size(); index++)
 		{
-			ActionInfo actionInfo;
+			ActionProxyInfo actionInfo;
 			actionInfo.mAreaId = actions->areaid();
 			actionInfo.mAddress = actions->address();
 			actionInfo.mOperId = currentSession->GetSocketId();
@@ -76,7 +76,7 @@ namespace SoEasy
 		const int areaId = requestData->data();
 		for (size_t index = 0; index < this->mActionRegisterList.size(); index++)
 		{
-			ActionInfo & actionInfo = this->mActionRegisterList[index];
+			ActionProxyInfo & actionInfo = this->mActionRegisterList[index];
 			if (actionInfo.mAreaId == areaId || actionInfo.mAreaId == 0)
 			{
 				PB::ActionInfo * info = returnData->add_actionlist();
@@ -88,7 +88,7 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	void ActionRegisterManager::AddActionInfo(ActionInfo & actionInfo)
+	void ActionRegisterManager::AddActionInfo(ActionProxyInfo & actionInfo)
 	{
 		for (size_t index = 0; index < this->mActionRegisterList.size(); index++)
 		{
@@ -100,7 +100,7 @@ namespace SoEasy
 		this->mActionRegisterList.push_back(actionInfo);
 		SayNoDebugLog(actionInfo.mAreaId << "  " << actionInfo.mAddress << "  " << actionInfo.mActionName);
 		std::sort(this->mActionRegisterList.begin(), this->mActionRegisterList.end(), []
-			(ActionInfo & a1, ActionInfo & a2)
+			(ActionProxyInfo & a1, ActionProxyInfo & a2)
 		{
 			return a1.mActionName.size() < a2.mActionName.size();
 		});
