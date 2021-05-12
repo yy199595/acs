@@ -2,6 +2,7 @@
 #include<regex>
 #include<sstream>
 #include"MD5.h"
+#include<stdlib.h>
 #include"MathHelper.h"
 namespace StringHelper
 {
