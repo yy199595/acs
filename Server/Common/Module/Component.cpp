@@ -3,11 +3,12 @@
 
 namespace SoEasy
 {
-	Component::Component(GameObject * obj)
+	Component::Component(shared_ptr<GameObject> obj)
 		: mGameObject(obj)
 	{
 		this->mGameObjectID = obj->GetGameObjectID();
 	}
+
 	Component * Component::GetComponentByName(const std::string name)
 	{
 		SayNoAssertRetNull_F(mGameObject);

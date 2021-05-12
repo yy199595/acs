@@ -260,14 +260,6 @@ namespace SystemExtension
 		return lua_yield(luaEnv, 1);
 	}
 
-	int WaitNetFrame(lua_State * luaEnv)
-	{
-		lua_pushthread(luaEnv);
-		int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		lua_State * coroutine = lua_tothread(luaEnv, -1);
-		return lua_yield(coroutine, 0);
-	}
-
 	int AddTimer(lua_State * lua)
 	{
 		if (!lua_isfunction(lua, 1))

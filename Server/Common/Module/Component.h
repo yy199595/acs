@@ -1,18 +1,16 @@
 #pragma once
-#include<Object/Object.h>
+#include<Object/GameObject.h>
 namespace SoEasy
 {
-	class GameObject;
 	class Component : public Object
 	{
 	public:
-		Component(GameObject *);
+		Component(shared_ptr<GameObject>);
 		virtual ~Component() {}
 	public:
 		friend class GameObject;
-	public:
 		inline long long GetGameObjectID() { return mGameObjectID; }
-		inline GameObject * GetGameObject()	{ return this->mGameObject; }
+		inline shared_ptr<GameObject> GetGameObject()	{ return this->mGameObject; }
 	public:
 		template<typename T>
 		inline typename T * GetComponent();
@@ -20,18 +18,17 @@ namespace SoEasy
 	public:
 		bool IsComponent() override { return true; }
 	protected:
+		virtual void OnInit() = 0;
 		virtual void OnFrameStart() { };
 		virtual void OnFrameUpdate(float delaTime) { };
 		virtual void OnAddComponent(Component * compinent) { };
 	private:
 		long long mGameObjectID;
-		GameObject * mGameObject;
+		shared_ptr<GameObject> mGameObject;
 	};
 	template<typename T>
 	inline typename T * Component::GetComponent()
 	{
-		const std::string name = TypeReflection<T>::Name;
-		Component * pComponent = this->GetComponentByName(name);
-		return static_cast<T *>(pComponent);
+		this->mGameObject->GetComponent<T>();
 	}
 }

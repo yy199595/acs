@@ -12,16 +12,17 @@ namespace SoEasy
 	public:
 		struct lua_State * GetLuaEnv() { return this->mLuaEnv; }
 	public:
-		bool LoadAllModule();
-		void AddRequirePath(const std::string path);
-		bool LoadLuaScript(const std::string filePath);
-	public:
 		template<typename T>
 		bool PushGlobalPoint(const std::string name, T * data);
 		inline std::string GetMainPath() { return this->mMainLuaPath; }
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;
+	private:
+		bool LoadAllModule();
+		void ClearRequirePath();
+		void AddRequirePath(const std::string path);
+		bool LoadLuaScript(const std::string filePath);
 	private:
 		bool StartLoadScript();
 		void OnPushGlobalObject();

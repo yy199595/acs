@@ -42,7 +42,7 @@ namespace SoEasy
 	{
 	public:
 		
-		MysqlQueryData() { }
+		MysqlQueryData();
 		~MysqlQueryData() { }
 	public:
 		friend class MysqlTaskAction;
@@ -52,14 +52,17 @@ namespace SoEasy
 		std::shared_ptr<MysqlQueryLine> GetLineData(size_t col = 0);	//获取一行数据
 		const std::string & GetErrorMessage() { return this->mErrorMessage; }	//获取错误消息
 	public:
+		void SetErrorCode(XCode code);
 		bool AddFieldName(const char * name, size_t len, int pos);
 		void AddFieldContent(int row, const char * data, size_t len);
-		void SetErrorCode(XCode code) { this->mErrorCode = code; }
 		void SetErrorMessage(const char * msg) { this->mErrorMessage = msg; }
+		const long long GetConsumeTime() { return this->mConsumeTime; }
 	public:
 		void DebugPrint();
 	private:
 		XCode mErrorCode;
+		long long mStartTime;
+		long long mConsumeTime;
 		std::string mErrorMessage;
 		std::unordered_map<std::string, int> mFiledMap;
 		std::vector<std::vector<std::string>> mContentVector;

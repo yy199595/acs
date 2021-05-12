@@ -7,24 +7,28 @@ namespace SoEasy
 	ServerConfig::ServerConfig(const std::string path)
 		:mConfigPath(path)
 	{
-		this->mFps = 10;
-		this->mServerID = 0;	
-		this->mServerPort = 0;
-		this->mServerAreaId = 0;
-		this->mCenterSrvPort = 0;
-		this->mRecvBufferCount = 1024;
-		this->mSendBufferCount = 1024;
+		
 	}
+
 
 	bool ServerConfig::InitConfig()
 	{
-		if (!FileHelper::ReadJsonFile(mConfigPath, this->mConfigDocument))
+		std::string outString = "";
+		this->mConfigDocument = make_shared<rapidjson::Document>();
+		if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
 		{
 			SayNoDebugError("not find config " << mConfigPath);
 			return false;
 		}
-		auto iter = this->mConfigDocument.MemberBegin();
-		for (; iter != this->mConfigDocument.MemberEnd(); iter++)
+		mConfigDocument->Parse(outString.c_str(), outString.size());
+		if (this->mConfigDocument->HasParseError())
+		{
+			SayNoDebugFatal("parse " << mConfigPath << " fail");
+			return false;
+		}
+
+		auto iter = this->mConfigDocument->MemberBegin();
+		for (; iter != this->mConfigDocument->MemberEnd(); iter++)
 		{
 			const std::string key = iter->name.GetString();
 			rapidjson::Value * value = &iter->value;
@@ -176,16 +180,6 @@ namespace SoEasy
 			return true;
 		}
 		return false;
-	}
-
-	bool ServerConfig::FindIpFromWhiteList(const std::string & ip)
-	{
-		if (this->mWhiteListVec.empty())
-		{
-			return true;
-		}
-		auto iter = this->mWhiteListVec.find(ip);
-		return iter != this->mWhiteListVec.end();
 	}
 
 	rapidjson::Value * ServerConfig::GetJsonValue(const std::string & k2)

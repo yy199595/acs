@@ -39,6 +39,12 @@ namespace SoEasy
 	}
 
 
+	void MysqlQueryData::SetErrorCode(XCode code)
+	{
+		long long nowTime = TimeHelper::GetMilTimestamp();
+		this->mConsumeTime = nowTime - this->mStartTime;
+	}
+
 	bool MysqlQueryData::AddFieldName(const char * name, size_t len, int pos)
 	{
 		const std::string key(name, len);
@@ -80,6 +86,11 @@ namespace SoEasy
 			std::cout << ss.str() << std::endl;
 		}
 
+	}
+
+	MysqlQueryData::MysqlQueryData()
+	{
+		this->mStartTime = TimeHelper::GetMilTimestamp();
 	}
 
 	std::shared_ptr<MysqlQueryLine> MysqlQueryData::GetLineData(size_t col)

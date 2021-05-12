@@ -34,7 +34,7 @@ namespace LuaAPIExtension
 		if (component)
 		{
 			const char * moduleName = lua_tostring(lua, 2);
-			GameObject * gameObject = component->GetGameObject();
+			SharedGameObject gameObject = component->GetGameObject();
 			if (gameObject != nullptr)
 			{
 				Component * retComponent = gameObject->GetComponentByName(moduleName);

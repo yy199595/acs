@@ -49,7 +49,7 @@ namespace SoEasy
 
 	void RemoteActionManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-
+		
 	}
 
 	void RemoteActionManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)

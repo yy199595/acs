@@ -12,6 +12,7 @@
     "MysqlAddress": "47.106.206.230:3306",
     "MysqlUserName": "root",
     "ThreadCount":0,
+    "ReConnectTime":5,
     "MysqlPassWord": "ZupKXuUbnHoffpmu",
     "ScriptMain":"./Script/Server/Main.lua",
     "ScriptInclude":

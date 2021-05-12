@@ -15,7 +15,7 @@ namespace TimeHelper
 	extern long long GetMicTimeStamp();
 
 	// 获取时间字符串 精确到秒
-	extern std::string GetDateString();
+	extern std::string GetDateString(long long t = time(NULL));
 
 	// 获取时间字符串精确到天
 	extern std::string GetYearMonthDayString();

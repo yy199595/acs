@@ -5,7 +5,7 @@ namespace SoEasy
 	class SayNoUdpSession : public Component
 	{
 	public:
-		SayNoUdpSession(GameObject *);
+		SayNoUdpSession(SharedGameObject );
 	public:
 		void StartReceiveMsg();
 		void SendPackage(const std::string & message);

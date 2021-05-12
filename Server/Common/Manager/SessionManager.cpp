@@ -86,6 +86,11 @@ namespace SoEasy
 
 	bool SessionManager::OnInit()
 	{
+		if (!this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime))
+		{
+			SayNoDebugFatal("not find field ReConnectTime");
+			return false;
+		}
 		this->mActionManager = this->GetManager<LocalActionManager>();
 		this->mNetWorkManager = this->GetManager<NetWorkManager>();
 		this->mCoroutineSheduler = this->GetManager<CoroutineManager>();
@@ -190,10 +195,11 @@ namespace SoEasy
 
 		while (this->mErrorSessionQueue.PopItem(pTcpSession))
 		{
-			if (!this->mNetWorkManager->RemoveTcpSession(pTcpSession))
+			this->mNetWorkManager->RemoveTcpSession(pTcpSession);
+			if (pTcpSession->IsContent()) //∂œœﬂ÷ÿ¡¨
 			{
-				SayNoDebugError("remove tcp session error : " << pTcpSession->GetAddress());
-				continue;
+				const std::string & address = pTcpSession->GetAddress();
+				this->mWaitConnectSessionMap.emplace(address, pTcpSession);
 			}
 			this->OnSessionErrorAfter(pTcpSession);
 			pTcpSession = nullptr;
@@ -210,6 +216,13 @@ namespace SoEasy
 			if (pTcpSession->IsContent())
 			{
 				pTcpSession->InvokeConnectCallback();
+				const std::string & address = pTcpSession->GetAddress();
+				auto iter = this->mWaitConnectSessionMap.find(address);
+				if (iter != this->mWaitConnectSessionMap.end())
+				{
+					this->mWaitConnectSessionMap.erase(iter);
+					SayNoDebugInfo(address << " reconnect success");
+				}
 			}
 			pTcpSession = nullptr;
 		}
@@ -225,6 +238,22 @@ namespace SoEasy
 			{
 				this->OnRecvNewMessageAfter(tcpSession, netWorkPacket);
 			}		
+		}
+	}
+	void SessionManager::OnSecondUpdate()
+	{
+		if (!this->mWaitConnectSessionMap.empty())
+		{
+			long long nowTime = TimeHelper::GetMilTimestamp();
+			auto iter = this->mWaitConnectSessionMap.begin();
+			for (; iter != this->mWaitConnectSessionMap.end(); iter++)
+			{
+				SharedTcpSession tcpSession = iter->second;
+				if (nowTime - tcpSession->GetStartTime() >= this->mReConnectTime * 1000)
+				{
+					tcpSession->StartConnect();
+				}
+			}
 		}
 	}
 }

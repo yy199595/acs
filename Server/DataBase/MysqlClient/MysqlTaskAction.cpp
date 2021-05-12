@@ -27,6 +27,7 @@ namespace SoEasy
 			this->SetCode(MysqlSocketIsNull);
 			return;
 		}
+		
 		if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
 		{
 			this->SetCode(MysqlSelectDbFailure);

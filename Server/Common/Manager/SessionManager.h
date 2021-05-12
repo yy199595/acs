@@ -27,12 +27,14 @@ namespace SoEasy
 		XCode InvokeAction(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData);
 	protected:
 		void OnSystemUpdate() final;
+		virtual void OnSecondUpdate() override;
 		long long GetIdByAddress(const std::string & address);
 		SharedTcpSession GetCurSession() { return this->mCurrentSession; }
 		bool ParseAddress(const std::string & address, string & ip, unsigned short & port);
 	protected:
 		class NetWorkManager * mNetWorkManager;
 	private:
+		int mReConnectTime;
 		NetWorkPacket mNetWorkPacket;
 		RecvMsgCallback mRecvMsgCallback;
 		class LocalActionManager * mActionManager;
@@ -41,5 +43,6 @@ namespace SoEasy
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;
 		DoubleBufferQueue<SharedTcpSession> mNewSessionQueue;
 		DoubleBufferQueue<SharedTcpSession> mErrorSessionQueue;
+		std::unordered_map<std::string, SharedTcpSession> mWaitConnectSessionMap;	//要断线重连的session
 	};
 }

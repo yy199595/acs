@@ -225,6 +225,9 @@
     <ClCompile Include="NetWork\ActionScheduler.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="Module\ActionComponent.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -493,6 +496,9 @@
     </ClInclude>
     <ClInclude Include="NetWork\ActionScheduler.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Module\ActionComponent.h">
+      <Filter>Module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

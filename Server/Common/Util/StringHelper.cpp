@@ -1,6 +1,7 @@
 #include"StringHelper.h"
 #include<regex>
 #include<sstream>
+#include"MD5.h"
 #include"MathHelper.h"
 namespace StringHelper
 {
@@ -48,17 +49,25 @@ namespace StringHelper
 		return path.substr(pos + 1, path.size());
 
 	}
-	void RandomString(std::string & outString, size_t size)
+	std::string RandomString(size_t size)
 	{
 		std::stringstream ss;
-		const static char buffer[] = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()_+=.,/?";
-		for (size_t index = 0; index < _countof(buffer); index++)
+		const static char buffer[] = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+		for (size_t index = 0; index < size; index++)
 		{
 			size_t pos = MathHelper::Random<size_t>(0, _countof(buffer));
 			ss << buffer[pos];
 		}
-		outString = ss.str();
+		return ss.str();
 	}
+
+	std::string CreateNewToken()
+	{
+		const int size = MathHelper::Random<int>(30, 100);
+		MD5 md5(RandomString(size));
+		return md5.toString();
+	}
+
 	bool ParseIpAddress(const std::string & address, std::string & ip, unsigned short & port)
 	{
 		size_t pos = address.find(":");

@@ -20,17 +20,7 @@ namespace SoEasy
 	Component * GameObject::AddComponentByName(const std::string name)
 	{
 		Component * component = this->GetComponentByName(name);
-		if (component == nullptr)
-		{			
-			Object * obj = ObjectFactory::Get()->CreateObjectByName(name);
-			if (obj != nullptr)
-			{
-				component = dynamic_cast<Component*>(obj);
-				SayNoAssertRetNull_F(component);
-				this->mWaitStartComponents.push(component);
-				this->mComponentMap.insert(std::make_pair(name, component));
-			}
-		}
+		
 		return component;
 	}
 

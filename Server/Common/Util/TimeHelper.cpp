@@ -36,9 +36,9 @@ long long TimeHelper::GetMicTimeStamp()
 	return timeNow.count();
 }
 
-std::string TimeHelper::GetDateString()
+std::string TimeHelper::GetDateString(long long time)
 {
-	time_t t = time(NULL) + 28800;
+	time_t t = time + 28800;
 	struct tm *pt = gmtime(&t);
 	char str[100];
 	size_t size = strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", pt);

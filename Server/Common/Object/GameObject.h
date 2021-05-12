@@ -1,8 +1,8 @@
 #pragma once
-#include<Module/Component.h>
-#include<Other/ObjectFactory.h>
+#include"Object.h"
 namespace SoEasy
 {
+	class Component;
 	class GameObject : public Object
 	{
 	public:
@@ -19,7 +19,6 @@ namespace SoEasy
 		template<typename T> 
 		typename bool RemoveComponent();
 		
-
 		template<typename T> 
 		typename TypeReflection<T>::Type * GetOrAddComponent();
 	
@@ -44,13 +43,34 @@ namespace SoEasy
 	private:
 		typedef SayNoHashMap<std::string, Component *>::iterator ComponentIter;
 	};
+	typedef shared_ptr<GameObject> SharedGameObject;
 
 	template<typename T>
 	inline typename T * GameObject::GetComponent()
 	{
-		const char * name = TypeReflection<T>::Name;
-		Component * component = this->GetComponentByName(name);
-		return static_cast<T*>(component);
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return false;
+		}
+
+		auto iter = this->mComponentMap.find(name);
+		if (iter != this->mComponentMap.end())
+		{
+			Component * component = iter->second;
+			return static_cast<T*>(component);
+		}
+		auto iter1 = this->mComponentMap.begin();
+		for (; iter1 != this->mComponentMap.end(); iter1++)
+		{
+			T * component = dynamic_cast<T*>(iter->second);
+			if (component != nullptr)
+			{
+				return component;
+			}
+		}
+		return nullptr;
 	}
 
 	template<typename T>

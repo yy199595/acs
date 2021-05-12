@@ -104,6 +104,14 @@ namespace SoEasy
 		return true;
 	}
 
+	void ScriptManager::ClearRequirePath()
+	{
+		std::string path = "";
+		lua_getglobal(mLuaEnv, "package");
+		lua_pushlstring(mLuaEnv, path.c_str(), path.size());
+		lua_setfield(mLuaEnv, -3, "path");
+	}
+
 	void ScriptManager::AddRequirePath(const std::string path)
 	{
 		lua_getglobal(mLuaEnv, "package");
@@ -125,24 +133,10 @@ namespace SoEasy
 
 	void ScriptManager::PushClassToLua(lua_State * lua)
 	{
-		ClassProxyHelper::BeginNewTalbe(lua, "SoEasy");
-		ClassProxyHelper::BeginRegister<ServerConfig>(lua, "ServerConfig");
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetFps", &ServerConfig::GetFps);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetServerID", &ServerConfig::GetServerID);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetServerIP", &ServerConfig::GetServerIP);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetServerName", &ServerConfig::GetServerName);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetServerPort", &ServerConfig::GetServerPort);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetServerAreaID", &ServerConfig::GetServerAreaID);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetCenterServerIP", &ServerConfig::GetCenterServerIP);
-		ClassProxyHelper::PushMemberFunction<ServerConfig>(lua, "GetCenterServerPort", &ServerConfig::GetCenterServerPort);
-
 		ClassProxyHelper::BeginRegister<Applocation>(lua, "Applocation");
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetRunTime", &Applocation::GetRunTime);
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetDelaTime", &Applocation::GetDelaTime);
 		ClassProxyHelper::PushMemberFunction<Applocation>(lua, "GetLogicTime", &Applocation::GetLogicTime);
-
-		ClassProxyHelper::BeginRegister<NetWorkManager>(lua, "NetWorkManager");
-		//ClassProxyHelper::PushMemberFunction<NetWorkManager>(lua, "GetTcpSession", &NetWorkManager::GetTcpSession);
 
 		ClassProxyHelper::BeginRegister<TcpClientSession>(lua, "TcpClientSession");
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "GetIP", &TcpClientSession::GetIP);
@@ -165,7 +159,6 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallWait", SystemExtension::CallWait);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallAction", SystemExtension::CallAction);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "WaitNetFrame", SystemExtension::WaitNetFrame);
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "AddTimer", SystemExtension::AddTimer);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "RemoveTimer", SystemExtension::RemoveTimer);

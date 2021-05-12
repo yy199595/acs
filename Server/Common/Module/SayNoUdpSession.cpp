@@ -2,7 +2,7 @@
 
 namespace SoEasy
 {
-	SayNoUdpSession::SayNoUdpSession(GameObject * obj)
+	SayNoUdpSession::SayNoUdpSession(SharedGameObject obj)
 		: Component(obj)
 	{
 		this->mUdpSocket = nullptr;

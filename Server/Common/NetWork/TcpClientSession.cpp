@@ -60,6 +60,11 @@ namespace SoEasy
 		{
 			return false;
 		}
+		if (mCurrentSatte == SessionState::Connect)
+		{
+			return false;
+		}
+
 		this->mConnectCount++;
 		this->mConnectCallback = action;
 		mCurrentSatte = SessionState::Connect;
