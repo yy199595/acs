@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(../../Libs/include/asio)
 INCLUDE_DIRECTORIES(../../Libs/include/lua5.3)
 INCLUDE_DIRECTORIES(../../Libs/include/mysql)
 INCLUDE_DIRECTORIES(../../Libs/include/spdlog)
+INCLUDE_DIRECTORIES(../../Libs/include/redis)
 
 INCLUDE_DIRECTORIES(../../Common)
 INCLUDE_DIRECTORIES(../../DataBase)
