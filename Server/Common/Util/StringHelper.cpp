@@ -2,7 +2,6 @@
 #include<regex>
 #include<sstream>
 #include"MD5.h"
-#include<stdlib.h>
 #include"MathHelper.h"
 namespace StringHelper
 {
@@ -53,10 +52,10 @@ namespace StringHelper
 	std::string RandomString(size_t size)
 	{
 		std::stringstream ss;
-		const static char buffer[] = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
+		const static std::string buffer = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
 		for (size_t index = 0; index < size; index++)
 		{
-			size_t pos = MathHelper::Random<size_t>(0, _countof(buffer));
+			size_t pos = MathHelper::Random<size_t>(0, buffer.size());
 			ss << buffer[pos];
 		}
 		return ss.str();
