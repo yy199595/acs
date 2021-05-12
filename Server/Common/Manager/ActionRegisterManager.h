@@ -27,7 +27,7 @@ namespace SoEasy
 		}
 	};
 
-
+	class TcpSessionListener;
 	// 所有方法都注册到这里(全局唯一)
 	class ActionRegisterManager : public SessionManager
 	{

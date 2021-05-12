@@ -1,5 +1,6 @@
 #include"ActionRegisterManager.h"
 #include<Core/Applocation.h>
+#include<Core/TcpSessionListener.h>
 #include<Util/StringHelper.h>
 #include<Manager/NetWorkManager.h>
 #include<NetWork/RemoteScheduler.h>
