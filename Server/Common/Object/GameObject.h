@@ -11,16 +11,16 @@ namespace SoEasy
 		virtual ~GameObject() {};
 	public:
 		template<typename T>
-		typename T * AddComponent();
+		inline T * AddComponent();
 
 		template<typename T> 
-		typename T * GetComponent();
+		inline T * GetComponent();
 
 		template<typename T> 
-		typename bool RemoveComponent();
+		inline bool RemoveComponent();
 		
 		template<typename T> 
-		typename TypeReflection<T>::Type * GetOrAddComponent();
+		inline T * GetOrAddComponent();
 	
 	public:
 		void DestoryComponents();
@@ -46,7 +46,7 @@ namespace SoEasy
 	typedef shared_ptr<GameObject> SharedGameObject;
 
 	template<typename T>
-	inline typename T * GameObject::GetComponent()
+	inline T * GameObject::GetComponent()
 	{
 		std::string name;
 		if (!SoEasy::GetTypeName<T>(name))
@@ -74,7 +74,7 @@ namespace SoEasy
 	}
 
 	template<typename T>
-	inline typename T * GameObject::AddComponent()
+	inline T * GameObject::AddComponent()
 	{
 		Component * component = this->GetComponent<T>();
 		if (component == nullptr)
@@ -91,7 +91,7 @@ namespace SoEasy
 	}
 
 	template<typename T>
-	inline typename bool GameObject::RemoveComponent()
+	inline bool GameObject::RemoveComponent()
 	{
 		const char * name = TypeReflection<T>::Name;
 		ComponentIter iter = this->mComponentMap.find(name);
@@ -105,7 +105,7 @@ namespace SoEasy
 	}
 
 	template<typename T>
-	inline typename TypeReflection<T>::Type * GameObject::GetOrAddComponent()
+	inline T * GameObject::GetOrAddComponent()
 	{
 		T * component = this->GetComponent<T>();
 		return component == nullptr ? this->AddComponent<T>() : component;
