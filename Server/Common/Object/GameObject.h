@@ -3,7 +3,7 @@
 namespace SoEasy
 {
 	class Component;
-	class GameObject : public Object
+	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
 	{
 	public:
 		GameObject(const long long id);
@@ -76,14 +76,19 @@ namespace SoEasy
 	template<typename T>
 	inline T * GameObject::AddComponent()
 	{
+		std::string name;
+		if (!SoEasy::GetTypeName<T>(name))
+		{
+			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			return nullptr;
+		}
 		Component * component = this->GetComponent<T>();
 		if (component == nullptr)
 		{
-			component = ObjectFactory::Get()->CreateObject<T>(this);
+			component = new T(this->shared_from_this());
 			if (component != nullptr)
 			{
 				this->mWaitStartComponents.push(component);
-				const std::string & name = component->GetTypeName();
 				this->mComponentMap.insert(std::make_pair(name, component));
 			}
 		}
