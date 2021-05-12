@@ -50,7 +50,6 @@
     <ClCompile Include="NetWork\TcpClientSession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
     <ClCompile Include="Object\Object.cpp" />
-    <ClCompile Include="Other\AreaActionTable.cpp" />
     <ClCompile Include="Other\AssestsFileInfo.cpp" />
     <ClCompile Include="Other\Command.cpp" />
     <ClCompile Include="Other\ObjectFactory.cpp" />
@@ -122,7 +121,6 @@
     <ClInclude Include="Object\GameObject.h" />
     <ClInclude Include="Object\MemoryObject.h" />
     <ClInclude Include="Object\Object.h" />
-    <ClInclude Include="Other\AreaActionTable.h" />
     <ClInclude Include="Other\AssestsFileInfo.h" />
     <ClInclude Include="Other\Command.h" />
     <ClInclude Include="Other\DoubleBufferQueue.h" />

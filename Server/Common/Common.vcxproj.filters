@@ -117,9 +117,6 @@
     <ClCompile Include="Object\Object.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="Other\AreaActionTable.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
     <ClCompile Include="Other\AssestsFileInfo.cpp">
       <Filter>Other</Filter>
     </ClCompile>
@@ -328,9 +325,6 @@
     </ClInclude>
     <ClInclude Include="Object\Object.h">
       <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Other\AreaActionTable.h">
-      <Filter>Other</Filter>
     </ClInclude>
     <ClInclude Include="Other\AssestsFileInfo.h">
       <Filter>Other</Filter>
