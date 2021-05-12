@@ -25,9 +25,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 SET(CMAKE_BUILD_TYPE Debug)
 
 ADD_EXECUTABLE(Server ${SCENE_SRC})
-TARGET_LINK_LIBRARIES(Server Common protobuf Lua53 pthread hiredis mysqlclient yassl DataBase CoreLogic ServerData dl ${MY_ADDLIB})
+TARGET_LINK_LIBRARIES(Server Common protobuf Lua53 pthread hiredis DataBase CoreLogic ServerData mysqlclient yassl dl ${MY_ADDLIB})
 
-SET(EXECUTABLE_OUTPUT_PATH ../../bin/)
+SET(EXECUTABLE_OUTPUT_PATH ../bin/)
 
 
 
