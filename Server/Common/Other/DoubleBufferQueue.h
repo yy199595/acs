@@ -11,7 +11,7 @@ namespace SoEasy
 	public:
 		DoubleBufferQueue() { }
 	public:
-		void AddItem(T & item);
+		void AddItem(const T & item);
 		bool PopItem(T & item);
 		void SwapQueueData();
 	private:
@@ -22,7 +22,7 @@ namespace SoEasy
 	};
 
 	template<typename T>
-	inline void DoubleBufferQueue<T>::AddItem(T & item)
+	inline void DoubleBufferQueue<T>::AddItem(const T & item)
 	{
 		mLock.lock();
 		mCacheQueue.push(item);
