@@ -1,7 +1,6 @@
 
 #pragma once
 #include"SessionManager.h"
-#include<Other/AreaActionTable.h>
 #include<NetWork/TcpClientSession.h>
 #include<Protocol/ServerCommon.pb.h>
 using namespace PB;
