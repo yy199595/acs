@@ -44,17 +44,14 @@ namespace Client
 				ActionScheduler shceuder(tcpSession);
 				shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
 
-				const long long num = MathHelper::Random<long long>(10000000, 99999999);
-				const long long phonenum = MathHelper::Random<long long>(11111111111, 99999999999);
-
-				registerData->set_phonenum(phonenum);
+				registerData->set_phonenum(13716061995);
 				registerData->set_platform("iphone_wecaht");
-				registerData->set_account(std::to_string(num) + "@qq.com");
+				registerData->set_account("646585122@qq.com");
 				registerData->set_password(StringHelper::RandomString(15));
 
 				long long t2 = TimeHelper::GetMilTimestamp();
 				XCode code = shceuder.Call("LoginManager.Register", registerData);	
-				SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2);
+				SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
 
 			}
 			SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);

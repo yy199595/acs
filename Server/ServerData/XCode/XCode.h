@@ -33,4 +33,6 @@ enum XCode
 	RedisInvokeFailure,
 	RedisJsonParseFail,
 
+
+	AccountAlreadyExists, //账号已经存在
 };

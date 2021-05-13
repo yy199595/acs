@@ -18,11 +18,8 @@ namespace SoEasy
 	bool LocalActionManager::OnInit()
 	{
 		this->mScriptManager = this->GetManager<ScriptManager>();
-		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mCoroutineScheduler = this->GetManager<CoroutineManager>();
-
-		SayNoAssertRetFalse_F(this->mNetWorkManager);
-		SayNoAssertRetFalse_F(this->mCoroutineScheduler);
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mCoroutineScheduler = this->GetManager<CoroutineManager>());
 		return true;
 	}
 

@@ -8,8 +8,7 @@ namespace SoEasy
 {
 	bool ProxyManager::OnInit()
 	{
-		this->mRemoteActionManager = this->GetManager<RemoteActionManager>();
-		SayNoAssertRetFalse_F(this->mRemoteActionManager);	
+		SayNoAssertRetFalse_F(this->mRemoteActionManager = this->GetManager<RemoteActionManager>());
 		this->mRemoteActionManager->SetRecvCallback(BIND_THIS_ACTION_2(ProxyManager::OnRecvServerMessage));
 		return ListenerManager::OnInit();
 	}

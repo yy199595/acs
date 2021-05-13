@@ -91,12 +91,9 @@ namespace SoEasy
 			SayNoDebugFatal("not find field ReConnectTime");
 			return false;
 		}
-		this->mActionManager = this->GetManager<LocalActionManager>();
-		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mCoroutineSheduler = this->GetManager<CoroutineManager>();
-		SayNoAssertRetFalse_F(this->mActionManager);
-		SayNoAssertRetFalse_F(this->mNetWorkManager);
-		SayNoAssertRetFalse_F(this->mCoroutineSheduler);
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
+		SayNoAssertRetFalse_F(this->mCoroutineSheduler = this->GetManager<CoroutineManager>());
 		return true;
 	}
 

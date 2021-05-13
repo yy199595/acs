@@ -64,22 +64,7 @@ namespace SoEasy
 
 	void RedisManager::OnInitComplete()
 	{
-		shared_ptr<InvokeResultData> setData = this->InvokeCommand("SET name %s", "1995954");
-		if (setData->GetCode() != XCode::Successful)
-		{
-			SayNoDebugError(setData->GetErrorStr());
-			return;
-		}
-		shared_ptr<InvokeResultData> getData = this->InvokeCommand("GET name");
-		if (getData->GetCode() == XCode::Successful)
-		{
-			rapidjson::Value jsonData;
-			if (getData->GetJsonData(jsonData))
-			{
-				const char * data = jsonData.GetString();
-				SayNoDebugLog("query data = " << data);
-			}
-		}
+		this->InvokeCommand("FLUSHALL");
 	}
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
@@ -106,6 +91,10 @@ namespace SoEasy
 		XCode code = taskAction->GetCode();
 		const std::string & error = taskAction->GetErrorStr();
 		const std::string & jsonData = taskAction->GetJsonData();
+		if (code != XCode::Successful)
+		{
+			SayNoDebugError("redis error : " << error);
+		}
 		return make_shared<InvokeResultData>(code, error, jsonData);
 	}
 	void RedisManager::OnTaskFinish(long long id)

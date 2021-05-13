@@ -36,13 +36,9 @@ namespace SoEasy
 			SayNoDebugFatal("parse ActionQueryAddress fail");
 			return false;
 		}
-		this->mActionManager = this->GetManager<LocalActionManager>();
-		this->mListenerManager = this->GetManager<ListenerManager>();
-		this->mCoroutineManager = this->GetManager<CoroutineManager>();
-		SayNoAssertRetFalse_F(this->mActionManager);
-		SayNoAssertRetFalse_F(this->mListenerManager);
-		SayNoAssertRetFalse_F(this->mCoroutineManager);
-
+		SayNoAssertRetFalse_F(this->mListenerManager = this->GetManager<ListenerManager>());
+		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
+		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
 		return this->mActionQuerySession->StartConnect();
 	}

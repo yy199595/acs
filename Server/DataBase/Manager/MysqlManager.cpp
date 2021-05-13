@@ -54,7 +54,7 @@ namespace SoEasy
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	shared_ptr<InvokeResultData> MysqlManager::QueryData(const std::string db, const std::string & sql)
+	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string db, const std::string & sql)
 	{
 		long long coreouitneId = this->mCoroutineManager->GetCurrentCorId();
 		if (coreouitneId == 0)
@@ -75,7 +75,10 @@ namespace SoEasy
 		XCode code = taskAction->GetCode();
 		const std::string & error = taskAction->GetErrorStr();
 		const std::string & jsonData = taskAction->GetJsonData();
-		
+		if (code != XCode::Successful)
+		{
+			SayNoDebugError("mysql error : " << error);
+		}
 		return make_shared<InvokeResultData>(code, error, jsonData);
 	}
 
@@ -95,21 +98,7 @@ namespace SoEasy
 
 	void MysqlManager::OnInitComplete()
 	{
-		string sql = "select * from player_risk";
-		shared_ptr<InvokeResultData> queryData = this->QueryData("shouhuzhemen299_db", sql);
-		if (queryData->GetCode() == XCode::Successful)
-		{
-			rapidjson::Value jsonData;
-			if (queryData->GetJsonData(jsonData) && jsonData.IsArray())
-			{
-				for (int index = 0; index < jsonData.Size(); index++)
-				{
-					const char * val = jsonData[index]["roleid"].GetString();
-					size_t lenght = jsonData[index]["roleid"].GetStringLength();
-					SayNoDebugInfo(std::string(val, lenght));
-				}
-			}
-		}
+		
 	}
 
 	bool MysqlManager::StartConnectMysql()

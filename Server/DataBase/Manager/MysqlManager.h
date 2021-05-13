@@ -14,7 +14,7 @@ namespace SoEasy
 	public:
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
 	public:
-		shared_ptr<InvokeResultData> QueryData(const std::string db, const std::string & sql);
+		shared_ptr<InvokeResultData> InvokeCommand(const std::string db, const std::string & sql);
 	protected:
 		bool OnInit() override;
 		void OnTaskFinish(long long id) final;

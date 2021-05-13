@@ -19,9 +19,8 @@ namespace SoEasy
 
 	bool NetWorkManager::OnInit()
 	{
-		this->mSessionContext = this->GetApp()->GetAsioContextPtr();
 		this->mActionQueryManager = this->GetManager<RemoteActionManager>();
-		SayNoAssertRetFalse_F(this->mSessionContext);
+		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		return true;
 	}
 
