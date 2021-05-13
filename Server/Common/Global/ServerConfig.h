@@ -15,6 +15,7 @@ namespace SoEasy
 	public:
 		bool HasValue(const std::string k2);
 		bool GetValue(const std::string k2, int & data);
+		bool GetValue(const std::string k2, long & data);
 		bool GetValue(const std::string k2, bool & data);
 		bool GetValue(const std::string k2, float & data);
 		bool GetValue(const std::string k2, double & data);

@@ -19,10 +19,16 @@ namespace SoEasy
 		RedisSocket * redisSocket = this->mRedisManager->GetRedisSocket(threadId);
 		if (redisSocket == nullptr)
 		{
+			this->mErrorCode = XCode::RedisSocketIsNull;
 			return;
 		}
 		QuertJsonWritre jsonWrite;
 		redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
+		if (replay == nullptr)
+		{
+			this->mErrorCode = XCode::RedisReplyIsNull;
+			return;
+		}
 		switch (replay->type)
 		{
 		case REDIS_REPLY_STATUS:

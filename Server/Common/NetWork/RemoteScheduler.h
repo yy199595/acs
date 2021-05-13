@@ -47,14 +47,14 @@ namespace SoEasy
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
 	{
-		auto pAction = make_shared<NetWorkRetActionBox2<T>>(action, func);
+		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 
 	template<typename T>
 	inline bool RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
 	{
-		auto pAction = make_shared<NetWorkRetActionBox2<T>>(action, func);
+		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 	template<typename T, typename ...Args>

@@ -77,7 +77,7 @@ namespace SoEasy
 		const std::string & jsonData = taskAction->GetJsonData();
 		if (code != XCode::Successful)
 		{
-			SayNoDebugError("mysql error : " << error);
+			SayNoDebugError("[mysql error] " << error);
 		}
 		return make_shared<InvokeResultData>(code, error, jsonData);
 	}

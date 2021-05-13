@@ -41,8 +41,13 @@ namespace SoEasy
 		}
 		
 		struct timeval tv;
-		tv.tv_sec = 2000 / 1000;
-		tv.tv_usec = (2000 % 1000) * 1000;
+		tv.tv_sec = 3;
+		tv.tv_usec = tv.tv_sec * 1000;
+		if (this->GetConfig().GetValue("RedisTimeout", tv.tv_sec))
+		{
+			tv.tv_usec = tv.tv_sec * 1000;
+		}
+
 		std::vector<long long> threadVector;
 		this->mThreadPool->GetAllTaskThread(threadVector);
 
@@ -55,6 +60,17 @@ namespace SoEasy
 				SayNoDebugFatal("connect redis fail " << mRedisIp << ":" << mRedisPort << " error:" << pRedisContext->errstr);
 				return false;
 			}
+			std::string redisPasswd;
+			if (this->GetConfig().GetValue("RedisPasswd", redisPasswd) && !redisPasswd.empty())
+			{
+				redisReply * reply = (redisReply *)redisCommand(pRedisContext, "AUTH %s", "yjz");
+				if (reply->type == REDIS_REPLY_ERROR)
+				{
+					SayNoDebugError("redis Authentication failed " << reply->str);
+					return false;
+				}
+			}
+		
 			this->mRedisContextMap.emplace(threadId, pRedisContext);
 			SayNoDebugLog("connect redis successful " << mRedisIp << ":" << mRedisPort);
 		}
@@ -93,7 +109,7 @@ namespace SoEasy
 		const std::string & jsonData = taskAction->GetJsonData();
 		if (code != XCode::Successful)
 		{
-			SayNoDebugError("redis error : " << error);
+			SayNoDebugError("[redis error] " << error);
 		}
 		return make_shared<InvokeResultData>(code, error, jsonData);
 	}

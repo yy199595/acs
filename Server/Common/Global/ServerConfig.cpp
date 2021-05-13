@@ -54,6 +54,17 @@ namespace SoEasy
 		return false;
 	}
 
+	bool ServerConfig::GetValue(const std::string k2, long & data)
+	{
+		rapidjson::Value * value = this->GetJsonValue(k2);
+		if (value && value->IsInt())
+		{
+			data = value->GetInt64();
+			return true;
+		}
+		return false;
+	}
+
 	bool ServerConfig::GetValue(const std::string k2, bool & data)
 	{
 		rapidjson::Value * value = this->GetJsonValue(k2);

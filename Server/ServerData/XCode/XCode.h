@@ -30,6 +30,7 @@ enum XCode
 	RedisNotInCoroutine,
 	RedisStartTaskFail,
 	RedisSocketIsNull,
+	RedisReplyIsNull,
 	RedisInvokeFailure,
 	RedisJsonParseFail,
 

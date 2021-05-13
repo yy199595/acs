@@ -36,16 +36,16 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	class NetWorkRetActionBox1 : public LocalRetActionProxy
+	class LocalRetActionProxy1 : public LocalRetActionProxy
 	{
 	public:
-		NetWorkRetActionBox1(NetWorkRetAction1 action, std::string & name)
+		LocalRetActionProxy1(NetWorkRetAction1 action, std::string & name)
 			: LocalRetActionProxy(name), mBindAction(action),mBindLuaAction(nullptr) {}
 
-		NetWorkRetActionBox1(NetLuaRetAction * action, std::string & name)
+		LocalRetActionProxy1(NetLuaRetAction * action, std::string & name)
 			:LocalRetActionProxy(name), mBindAction(nullptr), mBindLuaAction(action) { }
 
-		~NetWorkRetActionBox1() { if (mBindLuaAction) { delete mBindLuaAction; } }
+		~LocalRetActionProxy1() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;
@@ -55,13 +55,13 @@ namespace SoEasy
 	};
 
 	template<typename T>
-	class NetWorkRetActionBox2 : public LocalRetActionProxy
+	class LocalRetActionProxy2 : public LocalRetActionProxy
 	{
 	public:
-		NetWorkRetActionBox2(NetWorkRetAction2<T> action, std::string & name)
+		LocalRetActionProxy2(NetWorkRetAction2<T> action, std::string & name)
 			:LocalRetActionProxy(name), mBindAction(action) { }
 
-		~NetWorkRetActionBox2() { }
+		~LocalRetActionProxy2() { }
 
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override
@@ -86,12 +86,12 @@ namespace SoEasy
 	};
 
 
-	class NetWorkRetActionBoxLua : public LocalRetActionProxy
+	class LocalLuaRetActionProxy : public LocalRetActionProxy
 	{
 	public:
-		NetWorkRetActionBoxLua(NetLuaRetAction * action, std::string name);
+		LocalLuaRetActionProxy(NetLuaRetAction * action, std::string name);
 
-		~NetWorkRetActionBoxLua() { if (mBindLuaAction) { delete mBindLuaAction; } }
+		~LocalLuaRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData);
@@ -99,12 +99,12 @@ namespace SoEasy
 		NetLuaRetAction * mBindLuaAction;
 	};
 
-	class NetWorkWaitActionBoxLua : public LocalRetActionProxy
+	class LocalWaitRetActionProxy : public LocalRetActionProxy
 	{
 	public:
-		NetWorkWaitActionBoxLua(NetLuaWaitAction * action, std::string name);
+		LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name);
 
-		~NetWorkWaitActionBoxLua() { if (mBindLuaAction) { delete mBindLuaAction; } }
+		~LocalWaitRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData) override;

@@ -40,13 +40,13 @@ namespace SoEasy
 	}
 	bool RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkRetActionBox1>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkRetActionBox1>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 }
@@ -55,19 +55,19 @@ namespace SoEasy
 {
 	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkRetActionBoxLua>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkRetActionBoxLua>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
 	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkWaitActionBoxLua>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
@@ -110,7 +110,7 @@ namespace SoEasy
 
 	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
 	{
-		shared_ptr<LocalRetActionProxy> pAction = make_shared<NetWorkWaitActionBoxLua>(action, func);
+		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 }
