@@ -33,16 +33,8 @@ namespace SoEasy
 			this->mLuaEnv = luaL_newstate();
 			luaL_openlibs(mLuaEnv);
 		}
-		if (!this->GetConfig().GetValue("ScriptMain", this->mMainLuaPath))
-		{
-			SayNoDebugFatal("not find field 'ScriptMain'");
-			return false;
-		}
-		if (!this->GetConfig().GetValue("ScriptInclude", this->mRequirePaths))
-		{
-			SayNoDebugFatal("not find field 'ScriptInclude'");
-			return false;
-		}
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ScriptMain", this->mMainLuaPath));
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ScriptInclude", this->mRequirePaths));
 		for (std::string & include : this->mRequirePaths)
 		{
 			this->AddRequirePath(include);

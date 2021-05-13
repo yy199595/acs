@@ -21,24 +21,12 @@ namespace SoEasy
 
 	bool RedisManager::OnInit()
 	{
-		this->mThreadPool = this->GetApp()->GetThreadPool();
-		this->mCoroutineScheduler = this->GetManager<CoroutineManager>();
-		SayNoAssertRetFalse_F(this->mThreadPool);
-		SayNoAssertRetFalse_F(this->mCoroutineScheduler);
-
-
 		std::string redisAddress;
-		if (!this->GetConfig().GetValue("RedisAddress", redisAddress))
-		{
-			SayNoDebugFatal("not find field RedisAddress");
-			return false;
-		}
-
-		if (!StringHelper::ParseIpAddress(redisAddress, mRedisIp, mRedisPort))
-		{
-			SayNoDebugFatal("parse RedisAddress fail");
-			return false;
-		}
+		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
+		SayNoAssertRetFalse_F(this->mCoroutineScheduler = this->GetManager<CoroutineManager>());
+		
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("RedisAddress", redisAddress));	
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(redisAddress, mRedisIp, mRedisPort));
 		
 		struct timeval tv;
 		tv.tv_sec = 3;

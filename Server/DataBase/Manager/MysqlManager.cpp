@@ -16,10 +16,8 @@ namespace SoEasy
 
 	bool MysqlManager::OnInit()
 	{
-		this->mThreadPool = this->GetApp()->GetThreadPool();
-		SayNoAssertRetFalse_F(this->mThreadPool);
-		this->mCoroutineManager = this->GetManager<CoroutineManager>();
-		SayNoAssertRetFalse_F(this->mCoroutineManager);
+		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
+		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 
 		std::string mysqlAddress;
 		if (!GetConfig().GetValue("MysqlAddress", mysqlAddress))

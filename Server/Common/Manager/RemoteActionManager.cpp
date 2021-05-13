@@ -16,31 +16,18 @@ namespace SoEasy
 
 	bool RemoteActionManager::OnInit()
 	{
-		if (!SessionManager::OnInit())
-		{
-			return false;
-		}
-		if (!this->GetConfig().GetValue("AreaId", this->mAreaId))
-		{
-			SayNoDebugError("not find field AreaId");
-			return false;
-		}
-		std::string connectAddress;
-		if (!this->GetConfig().GetValue("ActionQueryAddress", connectAddress))
-		{
-			SayNoDebugError("not find field ActionQueryAddress");
-			return false;
-		}
-		if (!StringHelper::ParseIpAddress(connectAddress, mQueryIp, mQueryPort))
-		{
-			SayNoDebugFatal("parse ActionQueryAddress fail");
-			return false;
-		}
+		SayNoAssertRetFalse_F(SessionManager::OnInit());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ActionQueryAddress", mQueryAddress));
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(mQueryAddress, mQueryIp, mQueryPort));
+		
 		SayNoAssertRetFalse_F(this->mListenerManager = this->GetManager<ListenerManager>());
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
-		return this->mActionQuerySession->StartConnect();
+		SayNoAssertRetFalse_F(this->mActionQuerySession->StartConnect());
+
+		return true;
 	}
 
 	void RemoteActionManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)

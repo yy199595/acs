@@ -20,11 +20,7 @@ namespace SoEasy
 
 	bool CommandManager::OnInit()
 	{
-		if (!this->GetConfig().GetValue("CommondPort", this->mListenerPort))
-		{
-			SayNoDebugError("not find config field CommondPort");
-			return false;
-		}
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("CommondPort", this->mListenerPort));
 		return true;
 	}
 

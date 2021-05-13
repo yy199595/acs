@@ -20,17 +20,9 @@ namespace SoEasy
 	{
 		std::string listenAddress;
 		SayNoAssertRetFalse_F(SessionManager::OnInit());
-		if (!this->GetConfig().GetValue("ActionQueryAddress", listenAddress))
-		{
-			SayNoDebugError("not find config field ActionQueryAddress");
-			return false;
-		}
-		if (!StringHelper::ParseIpAddress(listenAddress, mListenIp, mListenPort))
-		{
-			SayNoDebugError("parse ActionQueryAddress fail");
-			return false;
-		}
-		
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ActionQueryAddress", listenAddress));
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(listenAddress, mListenIp, mListenPort));
+	
 		REGISTER_FUNCTION_1(ActionRegisterManager::RegisterActions, ActionUpdateInfo);
 		REGISTER_FUNCTION_2(ActionRegisterManager::QueryActions, Int32Data, ActionInfoList);
 

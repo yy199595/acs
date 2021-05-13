@@ -30,6 +30,7 @@ namespace SoEasy
 		int mAreaId;	//区服id
 		std::string mQueryIp;	//查询地址的ip
 		unsigned short mQueryPort;  // 查询地址的port
+		std::string mQueryAddress;
 		class LocalActionManager * mActionManager;
 		class ListenerManager * mListenerManager;
 		class CoroutineManager * mCoroutineManager;

@@ -7,25 +7,14 @@ namespace SoEasy
 {
 	bool ListenerManager::OnInit()
 	{
-		if (!SessionManager::OnInit())
-		{
-			return false;
-		}
-		std::string listenAddress;
+		SayNoAssertRetFalse_F(SessionManager::OnInit());
 		this->GetConfig().GetValue("WhiteList", this->mWhiteList);
-		if (!this->GetConfig().GetValue("ListenAddress", listenAddress))
-		{
-			SayNoDebugError("not find config field ListenAddress");
-			return false;
-		}
-		if (!StringHelper::ParseIpAddress(listenAddress, this->mListenerIp, this->mListenerPort))
-		{
-			SayNoDebugError("parse ListenAddress fail");
-			return false;
-		}
-		this->mListenAddress = listenAddress;
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", this->mListenAddress));
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(this->mListenAddress, this->mListenerIp, this->mListenerPort));
+
 		this->mTcpSessionListener = make_shared<TcpSessionListener>(this, this->mListenerPort);
-		return this->mTcpSessionListener->InitListener();
+		SayNoAssertRetFalse_F(this->mTcpSessionListener->InitListener());
+		return true;
 	}
 
 	void ListenerManager::OnInitComplete()

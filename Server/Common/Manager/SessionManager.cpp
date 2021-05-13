@@ -86,14 +86,10 @@ namespace SoEasy
 
 	bool SessionManager::OnInit()
 	{
-		if (!this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime))
-		{
-			SayNoDebugFatal("not find field ReConnectTime");
-			return false;
-		}
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineSheduler = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime));
 		return true;
 	}
 
