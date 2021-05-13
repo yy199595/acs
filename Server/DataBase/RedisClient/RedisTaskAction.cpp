@@ -54,6 +54,7 @@ namespace SoEasy
 			break;
 		case REDIS_REPLY_ARRAY:
 			jsonWrite.StartWriteArray("data");
+			this->mErrorCode = XCode::Successful;
 			for (size_t index = 0; index < replay->elements; index++)
 			{
 				redisReply * redisData = replay->element[index];

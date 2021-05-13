@@ -50,8 +50,8 @@ namespace Client
 				registerData->set_password(StringHelper::RandomString(15));
 
 				long long t2 = TimeHelper::GetMilTimestamp();
-				XCode code = shceuder.Call("LoginManager.Register", registerData);	
-				SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
+				//XCode code = shceuder.Call("LoginManager.Register", registerData);	
+				//SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
 
 			}
 			SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);

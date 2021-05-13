@@ -70,6 +70,17 @@ namespace SoEasy
 	void RedisManager::OnInitComplete()
 	{
 		//this->InvokeCommand("FLUSHALL");
+		rapidjson::Value jsonData;
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGETALL tb_player_account");
+		if (queryData->GetJsonData(jsonData) && jsonData.IsArray())
+		{
+			for (size_t index = 0; index < jsonData.Size(); index++)
+			{
+				const char * str = jsonData[index].GetString();
+				const int num = jsonData[index].GetStringLength();
+				SayNoDebugLog(std::string(str, num));
+			}
+		}
 	}
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
@@ -81,17 +92,17 @@ namespace SoEasy
 		}
 		va_list command;
 		va_start(command, format);
-		
 		long long taskId = NumberHelper::Create();
 		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskId, coroutineId);
 		taskAction->InitCommand(format, command);
+		va_end(command);
 		if (!mThreadPool->StartTaskAction(taskAction))
 		{
 			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
 		this->mCoroutineScheduler->YieldReturn();
-		va_end(command);
+		
 
 		XCode code = taskAction->GetCode();
 		const std::string & error = taskAction->GetErrorStr();
