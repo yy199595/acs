@@ -1,6 +1,5 @@
 {
     "AreaId": 0,
-    "FastUpdate": 10,
     "LogicFps": 30,
     "SystemFps":100,
     "ListenAddress": "127.0.0.1:7788",
