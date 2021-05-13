@@ -61,9 +61,8 @@ namespace DirectoryHelper
 	bool GetFilePaths(const std::string path, std::vector<std::string>& paths)
 	{
 #ifdef _WIN32
-
 		char newpath[PATH_MAX_LENGHT] = { 0 };
-		sprintf(newpath, "%s/*.*", path.c_str());
+		sprintf_s(newpath, "%s/*.*", path.c_str());
 		WIN32_FIND_DATA findFileData;
 		HANDLE  fileHandle = FindFirstFile(newpath, &findFileData);
 		if (fileHandle == INVALID_HANDLE_VALUE)
@@ -77,12 +76,21 @@ namespace DirectoryHelper
 				if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
 					memset(newpath, 0, PATH_MAX_LENGHT);
-					sprintf(newpath, "%s/%s", path.c_str(), findFileData.cFileName);
-					GetFilePaths(newpath, paths);
+#ifdef _MSC_VER
+					size_t size = sprintf_s(newpath, "%s/%s", path.c_str(), findFileData.cFileName);
+#else
+					size_t size = sprintf(newpath, "%s/%s", path.c_str(), findFileData.cFileName);
+#endif
+					GetFilePaths(std::string(newpath, size), paths);
 				}
 				else
 				{
+#ifdef _MSC_VER
+					size_t size = sprintf_s(newpath, "%s/%s", path.c_str(), findFileData.cFileName);
+#else
 					size_t size = sprintf(newpath, "%s/%s", path.c_str(), findFileData.cFileName);
+#endif
+					
 					paths.push_back(std::string(newpath, size));
 				}
 			}
