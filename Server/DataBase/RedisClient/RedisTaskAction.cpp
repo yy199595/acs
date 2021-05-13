@@ -19,6 +19,7 @@ namespace SoEasy
 		RedisSocket * redisSocket = this->mRedisManager->GetRedisSocket(threadId);
 		if (redisSocket == nullptr)
 		{
+			this->mErrorString = "redis scoket null";
 			this->mErrorCode = XCode::RedisSocketIsNull;
 			return;
 		}
@@ -26,6 +27,7 @@ namespace SoEasy
 		redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
 		if (replay == nullptr)
 		{
+			this->mErrorString = "redis replay null";
 			this->mErrorCode = XCode::RedisReplyIsNull;
 			return;
 		}
@@ -71,6 +73,7 @@ namespace SoEasy
 			jsonWrite.EndWriteArray();
 			break;
 		}
+		freeReplyObject(replay);
 		jsonWrite.Serialization(this->mQuertJsonData);
 	}
 }

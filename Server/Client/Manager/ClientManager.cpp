@@ -43,10 +43,10 @@ namespace Client
 			{
 				ActionScheduler shceuder(tcpSession);
 				shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
-
+				size_t num = 646585122 + index;
 				registerData->set_phonenum(13716061995);
 				registerData->set_platform("iphone_wecaht");
-				registerData->set_account("646585122@qq.com");
+				registerData->set_account(std::to_string(num) + "@qq.com");
 				registerData->set_password(StringHelper::RandomString(15));
 
 				long long t2 = TimeHelper::GetMilTimestamp();

@@ -63,12 +63,13 @@ namespace SoEasy
 			std::string redisPasswd;
 			if (this->GetConfig().GetValue("RedisPasswd", redisPasswd) && !redisPasswd.empty())
 			{
-				redisReply * reply = (redisReply *)redisCommand(pRedisContext, "AUTH %s", "yjz");
-				if (reply->type == REDIS_REPLY_ERROR)
+				redisReply * reply = (redisReply *)redisCommand(pRedisContext, "AUTH %s", redisPasswd.c_str());
+				if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
 				{
 					SayNoDebugError("redis Authentication failed " << reply->str);
 					return false;
 				}
+				freeReplyObject(reply);
 			}
 		
 			this->mRedisContextMap.emplace(threadId, pRedisContext);
@@ -80,7 +81,7 @@ namespace SoEasy
 
 	void RedisManager::OnInitComplete()
 	{
-		this->InvokeCommand("FLUSHALL");
+		//this->InvokeCommand("FLUSHALL");
 	}
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
