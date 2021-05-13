@@ -49,7 +49,7 @@ namespace SoEasy
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
 		virtual bool OnInit() = 0;			//初始化管理器
-		virtual void OnInitComplete() { }				//在初始化完成之后
+		virtual void OnInitComplete() { }				//在初始化完成之后 改方法会在协程中调用
 		virtual void OnSystemUpdate();					//处理系统事件
 		virtual void OnFrameUpdate(float t) { }			//逻辑帧
 		virtual void OnSecondUpdate() { }				//每秒调用

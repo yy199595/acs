@@ -54,45 +54,29 @@ namespace SoEasy
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	XCode MysqlManager::QueryData(const std::string db, const std::string & sql)
+	shared_ptr<InvokeResultData> MysqlManager::QueryData(const std::string db, const std::string & sql)
 	{
-		long long id = this->mCoroutineManager->GetCurrentCorId();
-		if (id == 0)
+		long long coreouitneId = this->mCoroutineManager->GetCurrentCorId();
+		if (coreouitneId == 0)
 		{
-			return XCode::MysqlNotInCoroutine;
+			return make_shared<InvokeResultData>(XCode::MysqlNotInCoroutine);
 		}
-		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
-
+		const long long taskId = NumberHelper::Create();
+		MysqlSharedTask taskAction = make_shared<MysqlTaskAction>(this, taskId, coreouitneId, db, sql);
 		
 		if (!mThreadPool->StartTaskAction(taskAction))
-		{
-			return XCode::MysqlStartTaskFail;
+		{		
+			return make_shared<InvokeResultData>(XCode::MysqlStartTaskFail);
 		}
-		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
+		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
 
 		this->mCoroutineManager->YieldReturn();
-		return taskAction->GetQueryData()->GetErrorCode();
-	}
 
-	XCode MysqlManager::QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData)
-	{
-		long long id = this->mCoroutineManager->GetCurrentCorId();
-		if (id == 0)
-		{
-			return XCode::MysqlNotInCoroutine;
-		}
-		MysqlSharedTask taskAction = std::make_shared<MysqlTaskAction>(this, id, db, sql);
+		XCode code = taskAction->GetCode();
+		const std::string & error = taskAction->GetErrorStr();
+		const std::string & jsonData = taskAction->GetJsonData();
 		
-		
-		if (!mThreadPool->StartTaskAction(taskAction))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
-		this->mTaskActionMap.insert(std::make_pair(taskAction->GetActionId(), taskAction));
-
-		this->mCoroutineManager->YieldReturn();
-		queryData = taskAction->GetQueryData();
-		return queryData->GetErrorCode();
+		return make_shared<InvokeResultData>(code, error, jsonData);
 	}
 
 	
@@ -103,8 +87,28 @@ namespace SoEasy
 		if (iter != this->mTaskActionMap.end())
 		{		
 			MysqlSharedTask taskAction = iter->second;
-			this->mCoroutineManager->Resume(taskAction->GetActionId());
+			const long long cor = taskAction->GetCoroutienId();
+			this->mCoroutineManager->Resume(cor);
 			this->mTaskActionMap.erase(iter);
+		}
+	}
+
+	void MysqlManager::OnInitComplete()
+	{
+		string sql = "select * from player_risk";
+		shared_ptr<InvokeResultData> queryData = this->QueryData("shouhuzhemen299_db", sql);
+		if (queryData->GetCode() == XCode::Successful)
+		{
+			rapidjson::Value jsonData;
+			if (queryData->GetJsonData(jsonData) && jsonData.IsArray())
+			{
+				for (int index = 0; index < jsonData.Size(); index++)
+				{
+					const char * val = jsonData[index]["roleid"].GetString();
+					size_t lenght = jsonData[index]["roleid"].GetStringLength();
+					SayNoDebugInfo(std::string(val, lenght));
+				}
+			}
 		}
 	}
 

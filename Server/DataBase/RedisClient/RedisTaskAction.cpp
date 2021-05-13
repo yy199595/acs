@@ -2,12 +2,18 @@
 #include<Manager/RedisManager.h>
 namespace SoEasy
 {
-	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long id, const std::string & command)
-		:ThreadTaskAction(mgr, id)
+	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, long long corId)
+		:ThreadTaskAction(mgr, taskId)
 	{
-		mCommand = command;
 		this->mRedisManager = mgr;
+		this->mCoreoutineId = corId;
 	}
+	void RedisTaskAction::InitCommand(const char * format, va_list command)
+	{
+		this->mFormat = format;
+		this->mCommand = command;
+	}
+
 	void RedisTaskAction::InvokeInThreadPool(long long threadId)
 	{
 		RedisSocket * redisSocket = this->mRedisManager->GetRedisSocket(threadId);
@@ -15,36 +21,50 @@ namespace SoEasy
 		{
 			return;
 		}
-		PB::NetWorkPacket data;
-		data.set_error_code(XCode::CallFunctionNotExist);
-		data.set_func_name("RedisManager.Query");
-		data.set_callback_id(456465465454);
-		data.set_operator_id(199595959595);
-
-		std::string name = data.SerializeAsString();
-		redisReply * replay = (redisReply*)redisCommand(redisSocket, "%s %s %b", "SET", "name1", name.c_str(), name.size());
-		
-		redisReply * replay1 = (redisReply*)redisCommand(redisSocket, "%s %s", "GET", "name1");
-
-		std::string str(replay1->str, replay1->len);
-
-
+		QuertJsonWritre jsonWrite;
+		redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
 		switch (replay->type)
 		{
 		case REDIS_REPLY_STATUS:
-			SayNoDebugInfo(std::string(replay->str, replay->len));
+			this->mErrorCode = XCode::Successful;
 			break;
 		case REDIS_REPLY_ERROR:
-			SayNoDebugError(std::string(replay->str, replay->len));
+			this->mErrorCode = RedisInvokeFailure;
+			this->mErrorString.assign(replay->str, replay->len);
 			break;
 		case REDIS_REPLY_INTEGER:
+			this->mErrorCode = XCode::Successful;
+			jsonWrite.Write("data", replay->integer);
 			break;
 		case REDIS_REPLY_NIL:
+			this->mErrorCode = XCode::Successful;
+			jsonWrite.Write("data");
 			break;
-		case REDIS_REPLY_STRING:		
+		case REDIS_REPLY_STRING:
+			this->mErrorCode = XCode::Successful;
+			jsonWrite.Write("data", replay->str, replay->len);
 			break;
 		case REDIS_REPLY_ARRAY:
+			jsonWrite.StartWriteArray("data");
+			for (size_t index = 0; index < replay->elements; index++)
+			{
+				redisReply * redisData = replay->element[index];
+				if (redisData->type == REDIS_REPLY_INTEGER)
+				{
+					jsonWrite.Write(redisData->integer);
+				}
+				else if (redisData->type == REDIS_REPLY_STRING)
+				{
+					jsonWrite.Write(redisData->str, redisData->len);
+				}
+				else if (redisData->type == REDIS_REPLY_NIL)
+				{
+					jsonWrite.Write();
+				}
+			}
+			jsonWrite.EndWriteArray();
 			break;
 		}
+		jsonWrite.Serialization(this->mQuertJsonData);
 	}
 }

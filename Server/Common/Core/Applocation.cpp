@@ -110,11 +110,11 @@ namespace SoEasy
 			}
 			SayNoDebugLog("init " << this->mCurrentManager->GetTypeName() << " successful");
 		}
-
+		CoroutineManager * corManager = this->GetManager<CoroutineManager>();
 		for (size_t index = 0; index < this->mSortManagers.size(); index++)
 		{
 			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnInitComplete();
+			corManager->Start(BIND_ACTION_0(Manager::OnInitComplete, this->mCurrentManager));
 		}
 		return true;
 	}

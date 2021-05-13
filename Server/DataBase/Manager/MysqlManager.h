@@ -2,6 +2,7 @@
 #include<XCode/XCode.h>
 #include<Manager/Manager.h>
 #include<MysqlClient/MysqlDefine.h>
+#include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
 	class MysqlTaskAction;
@@ -13,11 +14,11 @@ namespace SoEasy
 	public:
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
 	public:
-		XCode QueryData(const std::string db, const std::string & sql);
-		XCode QueryData(const std::string db, const std::string & sql, std::shared_ptr<MysqlQueryData> & queryData);
+		shared_ptr<InvokeResultData> QueryData(const std::string db, const std::string & sql);
 	protected:
 		bool OnInit() override;
 		void OnTaskFinish(long long id) final;
+		void OnInitComplete() final;
 	private:
 		bool StartConnectMysql();
 	private:

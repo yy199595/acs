@@ -18,9 +18,19 @@ enum XCode
 	SendMessageFail,	//发送消息失败
 	NoCoroutineContext,	//没有协程上下文
 
+	ParseJsonFailure,
+
 	MysqlNotInCoroutine,	//不在协程中
 	MysqlStartTaskFail,		//启动失败
 	MysqlSocketIsNull,		//socket空
 	MysqlSelectDbFailure,	//选择db失败
 	MysqlInvokeFailure,		//执行sql语句失败
+
+
+	RedisNotInCoroutine,
+	RedisStartTaskFail,
+	RedisSocketIsNull,
+	RedisInvokeFailure,
+	RedisJsonParseFail,
+
 };

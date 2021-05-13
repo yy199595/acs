@@ -81,7 +81,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/mysql;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
+    <IncludePath>../Libs/include/redis;../Libs/include/rapidjson;../ServerData;../Libs/include/spdlog;../DataBase;../Common;../Libs/include/mysql;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;$(IncludePath)</IncludePath>
     <OutDir>../Libs/lib</OutDir>
     <IntDir>../bin/debug/corelogic</IntDir>
     <TargetName>CoreLogic</TargetName>

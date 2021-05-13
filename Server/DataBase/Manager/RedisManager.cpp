@@ -1,4 +1,5 @@
 #include"RedisManager.h"
+#include<Util/NumberHelper.h>
 #include<Util/StringHelper.h>
 #include<Thread/ThreadPool.h>
 #include<NetWork/RemoteScheduler.h>
@@ -60,8 +61,62 @@ namespace SoEasy
 		
 		return true;
 	}
+
 	void RedisManager::OnInitComplete()
 	{
+		shared_ptr<InvokeResultData> setData = this->InvokeCommand("SET name %s", "1995954");
+		if (setData->GetCode() != XCode::Successful)
+		{
+			SayNoDebugError(setData->GetErrorStr());
+			return;
+		}
+		shared_ptr<InvokeResultData> getData = this->InvokeCommand("GET name");
+		if (getData->GetCode() == XCode::Successful)
+		{
+			rapidjson::Value jsonData;
+			if (getData->GetJsonData(jsonData))
+			{
+				const char * data = jsonData.GetString();
+				SayNoDebugLog("query data = " << data);
+			}
+		}
+	}
+
+	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
+	{
+		long long coroutineId = this->mCoroutineScheduler->GetCurrentCorId();
+		if (coroutineId == 0)
+		{
+			return make_shared<InvokeResultData>(XCode::RedisNotInCoroutine);
+		}
+		va_list command;
+		va_start(command, format);
 		
+		long long taskId = NumberHelper::Create();
+		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskId, coroutineId);
+		taskAction->InitCommand(format, command);
+		if (!mThreadPool->StartTaskAction(taskAction))
+		{
+			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
+		}
+		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
+		this->mCoroutineScheduler->YieldReturn();
+		va_end(command);
+
+		XCode code = taskAction->GetCode();
+		const std::string & error = taskAction->GetErrorStr();
+		const std::string & jsonData = taskAction->GetJsonData();
+		return make_shared<InvokeResultData>(code, error, jsonData);
+	}
+	void RedisManager::OnTaskFinish(long long id)
+	{
+		auto iter = this->mTaskActionMap.find(id);
+		if (iter != this->mTaskActionMap.end())
+		{
+			shared_ptr<RedisTaskAction> taskAction = iter->second;
+			long long coroutineId = taskAction->GetCoroutineId();
+			this->mCoroutineScheduler->Resume(coroutineId);
+			this->mTaskActionMap.erase(iter);
+		}
 	}
 }

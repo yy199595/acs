@@ -13,12 +13,14 @@ namespace SoEasy
 	public:
 		RapidJsonWriter() :jsonWriter(nullptr) { this->StartAddParameter(); }
 		const std::string & Serialization();
+		bool AddParameter(const char * key);
 		bool AddParameter(const char * key, const int value);
 		bool AddParameter(const char * key, const double value);
 		bool AddParameter(const char * key, const char * value);
 		bool AddParameter(const char * key, const long long value);
 		bool AddParameter(const char * key, const std::string value);
 		bool AddParameter(const char * key, const unsigned int value);
+		bool AddParameter(const char * key, const char * value, size_t size);
 		bool AddParameter(const char * key, const unsigned long long value);
 		bool AddParameter(const char * key, const std::vector<std::string> value);
 		bool AddParameter(const char * key, const google::protobuf::Message & value);

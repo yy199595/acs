@@ -132,8 +132,8 @@
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp" />
     <ClCompile Include="Manager\RedisManager.cpp" />
-    <ClCompile Include="MysqlClient\MysqlDefine.cpp" />
     <ClCompile Include="MysqlClient\MysqlTaskAction.cpp" />
+    <ClCompile Include="QueryResult\InvokeResultData.cpp" />
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +141,7 @@
     <ClInclude Include="Manager\RedisManager.h" />
     <ClInclude Include="MysqlClient\MysqlDefine.h" />
     <ClInclude Include="MysqlClient\MysqlTaskAction.h" />
+    <ClInclude Include="QueryResult\InvokeResultData.h" />
     <ClInclude Include="RedisClient\RedisDefine.h" />
     <ClInclude Include="RedisClient\RedisTaskAction.h" />
   </ItemGroup>

@@ -1,78 +1,83 @@
 #include "MysqlTaskAction.h"
 #include<Manager/MysqlManager.h>
-
+#include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
-	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
+	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, long long corId, const std::string & db, const std::string & sql)
 		: ThreadTaskAction(mgr, id)
 	{
-		this->ResetTask(mgr, id, db, sql);
-	}
-
-	void MysqlTaskAction::ResetTask(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
-	{
-		this->mActionId = id;
 		this->mSqlCommand = sql;
 		this->mDataBaseName = db;
 		this->mMysqlManager = mgr;
-		this->mMysqlQueryData = nullptr;	
+		this->mCoroutineId = corId;
 	}
 
 	void MysqlTaskAction::InvokeInThreadPool(long long threadId)
 	{
-		mMysqlQueryData = std::make_shared<MysqlQueryData>();
 		SayNoMysqlSocket * mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
 		if (mysqlSocket == nullptr)
 		{
-			this->SetCode(MysqlSocketIsNull);
+			this->mErrorCode = MysqlSocketIsNull;
 			return;
 		}
 		
 		if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
 		{
-			this->SetCode(MysqlSelectDbFailure);
+			this->mErrorCode = MysqlSelectDbFailure;
 			return;
 		}
 		const char * data = this->mSqlCommand.c_str();
 		const size_t lenght = this->mSqlCommand.length();
 		if (mysql_real_query(mysqlSocket, data, lenght) != 0)
 		{
-			this->SetCode(MysqlInvokeFailure);
-			mMysqlQueryData->SetErrorMessage(mysql_error(mysqlSocket));
+			this->mErrorCode = MysqlInvokeFailure;
+			this->mErrorString = mysql_error(mysqlSocket);
 			return;
 		}
+		this->mErrorCode = XCode::Successful;
 		MysqlQueryResult * queryResult = mysql_store_result(mysqlSocket);
 		if (queryResult != nullptr)
 		{		
+			QuertJsonWritre jsonWrite;
+			std::vector<char *> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
-			unsigned int fieldCount = mysql_field_count(mysqlSocket);			
+			unsigned int fieldCount = mysql_field_count(mysqlSocket);
 			for (unsigned int index = 0; index < fieldCount; index++)
 			{
 				MYSQL_FIELD * field = mysql_fetch_field(queryResult);
-				mMysqlQueryData->AddFieldName(field->name, field->name_length, index);
+				fieldNameVector.push_back(field->name);
 			}
-
-			for (unsigned long count = 0; count < rowCount; count++)
-			{
+			if (rowCount == 1)
+			{			
+				jsonWrite.StartWriteObject("data");
 				MYSQL_ROW row = mysql_fetch_row(queryResult);
 				unsigned long * lengths = mysql_fetch_lengths(queryResult);
-				for (unsigned int index = 0; index < fieldCount; index++)
+				for (size_t index = 0; index < fieldNameVector.size(); index++)
 				{
-					if (lengths[index] > 0 && row[index] != nullptr)
-					{
-						mMysqlQueryData->AddFieldContent(count, row[index], lengths[index]);
-					}
+					const char * key = fieldNameVector[index];
+					jsonWrite.Write(key, row[index], (int)lengths[index]);
 				}
+				jsonWrite.EndWriteObject();
 			}
+			else
+			{
+				jsonWrite.StartWriteArray("data");
+				for (unsigned long count = 0; count < rowCount; count++)
+				{
+					jsonWrite.StartWriteObject();
+					MYSQL_ROW row = mysql_fetch_row(queryResult);
+					unsigned long * lengths = mysql_fetch_lengths(queryResult);
+					for (size_t index = 0; index < fieldNameVector.size(); index++)
+					{
+						const char * key = fieldNameVector[index];
+						jsonWrite.Write(key, row[index], (int)lengths[index]);
+					}				
+					jsonWrite.EndWriteObject();
+				}
+				jsonWrite.EndWriteArray();
+			}	
 			mysql_free_result(queryResult);
+			jsonWrite.Serialization(this->mQuertJsonData);
 		}
-		this->SetCode(XCode::Successful);
 	}
-
-	bool MysqlTaskAction::SetCode(XCode code)
-	{
-		this->mMysqlQueryData->SetErrorCode(code);
-		return code == XCode::Successful;
-	}
-	
 }

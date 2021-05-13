@@ -80,6 +80,17 @@ namespace SoEasy
 		return false;
 	}
 
+	bool RapidJsonWriter::AddParameter(const char * key, const char * value, size_t size)
+	{
+		if (this->jsonWriter != nullptr)
+		{
+			this->jsonWriter->Key(key);
+			this->jsonWriter->String(value, size);
+			return true;
+		}
+		return false;
+	}
+
 	bool RapidJsonWriter::AddParameter(const char * key, const unsigned long long value)
 	{
 		if (this->jsonWriter != nullptr)
@@ -145,6 +156,16 @@ namespace SoEasy
 		delete this->jsonWriter;
 		this->jsonWriter = nullptr;
 		return mTempString;
+	}
+	bool RapidJsonWriter::AddParameter(const char * key)
+	{
+		if (this->jsonWriter != nullptr)
+		{
+			jsonWriter->Key(key);
+			jsonWriter->Null();
+			return true;
+		}
+		return false;
 	}
 }
 

@@ -5,6 +5,7 @@
 namespace SoEasy
 {
 	class MysqlManager;
+	class RedisManager;
 	class UserDataManager : public Manager
 	{
 	public:
@@ -19,5 +20,6 @@ namespace SoEasy
 	private:
 		int mAreaId;
 		MysqlManager * mMysqlManager;
+		RedisManager * mRedisManager;
 	};
 }
