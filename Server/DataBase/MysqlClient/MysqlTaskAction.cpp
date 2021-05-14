@@ -88,7 +88,7 @@ namespace SoEasy
 	{
 		if (this->mErrorCode != XCode::Successful)
 		{
-			SayNoDebugError("[redis error] " << this->mErrorString);
+			SayNoDebugError("[mysql error] " << this->mErrorString);
 		}
 		return std::make_shared<InvokeResultData>(mErrorCode, mErrorString, mDocument);
 	}

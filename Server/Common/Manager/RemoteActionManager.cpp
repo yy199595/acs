@@ -153,7 +153,7 @@ namespace SoEasy
 		quertShceudler.Call("ActionRegisterManager.RegisterActions", &actionInfo, 
 			[this](shared_ptr<TcpClientSession> session, XCode code)
 		{
-			void StartPullActionList();
+			this->StartPullActionList();
 		});	
 	}
 	void RemoteActionManager::StartPullActionList()

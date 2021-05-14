@@ -21,7 +21,11 @@ namespace SoEasy
 		bool HasValue(const char * key);
 		bool HasValue(const char * tab, const char * key);
 	public:
+		bool DelValue(const char * key);
+		bool DelValue(const char * tab, const char * key);
+	public:
 		bool SetValue(const char * key, const std::string & value);
+		bool SetValue(const char * key, const std::string & value, int second);
 		bool SetValue(const char * tab, const char * key, const std::string & value);
 		bool SetValue(const char * tab, const char * key, const shared_ptr<Message> value);
 	public:

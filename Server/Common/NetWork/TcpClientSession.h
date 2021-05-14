@@ -44,8 +44,7 @@ namespace SoEasy
 		inline const std::string & GetSessionName() { return mSessionName; }
 		inline void SetSessionName(const std::string & name) { mSessionName = name; }		
 	public:
-		bool StartConnect(ConnectCallback action = nullptr);
-		void InvokeConnectCallback();
+		bool StartConnect();
 	public:
 		void CloseSocket();
 		bool SendPackage(const std::string & message);
@@ -54,7 +53,7 @@ namespace SoEasy
 	public:
 		void StartReceiveMsg();
 	private:
-		
+		void Connect();
 		void ReadMessageBody(const  size_t allSize);
 		void InitMember(const std::string & ip, unsigned short port);
 	private:
@@ -65,7 +64,6 @@ namespace SoEasy
 		AsioContext & mAsioContext;
 		SharedTcpSocket mBinTcpSocket;
 		AsioTcpEndPoint mSocketEndPoint;
-		ConnectCallback mConnectCallback;
 	private:
 		bool mIsContent;
 		long long mStartTime;	

@@ -54,7 +54,7 @@ namespace SoEasy
 		return this->mCurrentSatte == Normal;
 	}
 
-	bool TcpClientSession::StartConnect(ConnectCallback action)
+	bool TcpClientSession::StartConnect()
 	{
 		if (this->IsActive() || this->mIsContent == false)
 		{
@@ -64,31 +64,12 @@ namespace SoEasy
 		{
 			return false;
 		}
-
 		this->mConnectCount++;
-		this->mConnectCallback = action;
 		mCurrentSatte = SessionState::Connect;
 		this->mStartTime = TimeHelper::GetSecTimeStamp();
+		this->mAsioContext.post(BIND_THIS_ACTION_0(TcpClientSession::Connect));
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
-		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this, action](const asio::error_code & code)
-		{
-			if (code)
-			{
-				this->CloseSocket();
-				SayNoDebugWarning("Connect " << this->GetSessionName() << " fail count = " << this->mConnectCount << " error : " << code.message());
-				return;
-			}
-			this->mConnectCount = 0;
-			mCurrentSatte = SessionState::Normal;
-			this->mDispatchManager->AddNewSession(shared_from_this());
-		});
 		return true;
-	}
-
-	void TcpClientSession::InvokeConnectCallback()
-	{
-		bool hasError = mCurrentSatte != SessionState::Normal;
-		if (this->mConnectCallback) { this->mConnectCallback(shared_from_this(), hasError); }
 	}
 
 	void TcpClientSession::CloseSocket()
@@ -145,6 +126,22 @@ namespace SoEasy
 			size_t packageSize = 0;
 			memcpy(&packageSize, this->mRecvMsgBuffer, t);
 			this->ReadMessageBody(packageSize);
+		});
+	}
+
+	void TcpClientSession::Connect()
+	{
+		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this](const asio::error_code & code)
+		{
+			if (code)
+			{
+				this->CloseSocket();
+				SayNoDebugWarning("Connect " << this->GetSessionName() << " fail count = " << this->mConnectCount << " error : " << code.message());
+				return;
+			}
+			this->mConnectCount = 0;
+			mCurrentSatte = SessionState::Normal;
+			this->mDispatchManager->AddNewSession(shared_from_this());
 		});
 	}
 

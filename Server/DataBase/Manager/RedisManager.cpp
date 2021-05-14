@@ -70,20 +70,14 @@ namespace SoEasy
 	void RedisManager::OnInitComplete()
 	{
 		//this->InvokeCommand("FLUSHALL");
-		rapidjson::Value jsonData;
-		const long long t1 = TimeHelper::GetMilTimestamp();
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGETALL tb_player_account");
-		SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);
-		if (queryData->GetJsonData(jsonData) && jsonData.IsArray())
-		{
-			for (size_t index = 0; index < jsonData.Size(); index += 2)
-			{
-				std::string key(jsonData[index].GetString(), jsonData[index].GetStringLength());
-				std::string value(jsonData[index + 1].GetString(), jsonData[index + 1].GetStringLength());
-
-				SayNoDebugLog(key << "  " << value.size());
-			}
-		}
+		std::string value;
+		this->SetValue("name", std::string("19959510"));
+		this->GetValue("name", value);
+		SayNoDebugInfo("name = " << value);
+		this->mCoroutineScheduler->Sleep(6000);
+		value = "";
+		this->GetValue("name", value);
+		SayNoDebugFatal("name = " << value);
 	}
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
@@ -130,6 +124,28 @@ namespace SoEasy
 			return queryData->GetInt64() == 1;
 		}
 		return false;
+	}
+
+	bool RedisManager::DelValue(const char * key)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("DEL %s", key);
+		return queryData->GetCode() == XCode::Successful;
+	}
+
+	bool RedisManager::DelValue(const char * tab, const char * key)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HDEL %s %S", tab, key);
+		return queryData->GetCode() == XCode::Successful;
+	}
+
+	bool RedisManager::SetValue(const char * key, const std::string & value, int second)
+	{
+		if (!this->HasValue(key))
+		{
+			this->SetValue(key, value);
+		}
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("EXPIRE %s %d", key, second);
+		return queryData->GetCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const char * key, const std::string & value)

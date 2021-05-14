@@ -60,7 +60,7 @@ namespace SoEasy
 			mCoroutineScheduler->YieldReturn();
 			return callBack->GetCode();
 		}
-		return XCode::Failure;
+		return code;
 	}
 
 	XCode ActionScheduler::Call(const std::string func, shared_ptr<Message> message, Message & returnData)

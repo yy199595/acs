@@ -208,7 +208,6 @@ namespace SoEasy
 			this->OnSessionConnectAfter(pTcpSession);
 			if (pTcpSession->IsContent())
 			{
-				pTcpSession->InvokeConnectCallback();
 				const std::string & address = pTcpSession->GetAddress();
 				auto iter = this->mWaitConnectSessionMap.find(address);
 				if (iter != this->mWaitConnectSessionMap.end())
