@@ -1,5 +1,6 @@
 #pragma once
 #include<XCode/XCode.h>
+#include"QueryField.h"
 #include<rapidjson/writer.h>
 #include<rapidjson/document.h>
 #include<rapidjson/stringbuffer.h>
@@ -27,9 +28,10 @@ namespace SoEasy
 		bool Write(const char * value, int size);
 	public:
 		bool Serialization(std::string & json);
+		bool Serialization(std::shared_ptr<rapidjson::Document> & document);
 	private:
-		rapidjson::StringBuffer strBuf;
-		rapidjson::Writer<rapidjson::StringBuffer> * jsonWriter;
+		rapidjson::StringBuffer mJsonStringBuf;
+		rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;
 	};
 }
 namespace SoEasy
@@ -39,7 +41,7 @@ namespace SoEasy
 	public:
 		InvokeResultData(XCode code);
 		InvokeResultData(XCode code, const std::string & error);
-		InvokeResultData(XCode code, const std::string & error, const std::string & json);
+		InvokeResultData(XCode code, const std::string & error, std::shared_ptr<rapidjson::Document> json);
 	public:
 		bool GetJsonData(rapidjson::Value & jsonData);
 		bool GetJsonData(const char * key, rapidjson::Value & jsonData);
@@ -48,9 +50,9 @@ namespace SoEasy
 	public:
 		XCode GetCode() { return this->mErrorCode; }
 		const std::string & GetErrorStr() { return this->mErrorStr; }
-	private:
+	protected:
 		XCode mErrorCode;
 		std::string mErrorStr;
-		rapidjson::Document mDocument;
+		std::shared_ptr<rapidjson::Document> mDocument;
 	};
 }

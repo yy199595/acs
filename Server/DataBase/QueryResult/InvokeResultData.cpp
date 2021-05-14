@@ -5,71 +5,83 @@ namespace SoEasy
 {
 	bool QuertJsonWritre::StartWriteObject()
 	{
-		return jsonWriter->StartObject();
+		return jsonWriter.StartObject();
 	}
 	bool QuertJsonWritre::StartWriteObject(const char * key)
 	{
-		jsonWriter->Key(key);
-		return jsonWriter->StartObject();
+		jsonWriter.Key(key);
+		return jsonWriter.StartObject();
 	}
 	bool QuertJsonWritre::EndWriteObject()
 	{
-		return jsonWriter->EndObject();
+		return jsonWriter.EndObject();
 	}
 
 	bool QuertJsonWritre::StartWriteArray(const char * key)
 	{
-		jsonWriter->Key(key);
-		return jsonWriter->StartArray();
+		jsonWriter.Key(key);
+		return jsonWriter.StartArray();
 	}
 	bool QuertJsonWritre::EndWriteArray()
 	{
-		return jsonWriter->EndArray();
+		return jsonWriter.EndArray();
 	}
 
 	bool QuertJsonWritre::Write(const char * key)
 	{
-		jsonWriter->Key(key);
-		return jsonWriter->Null();
+		jsonWriter.Key(key);
+		return jsonWriter.Null();
 	}
 
 	bool QuertJsonWritre::Write(const char * key, long long value)
 	{
-		jsonWriter->Key(key);
-		return jsonWriter->Int64(value);
+		jsonWriter.Key(key);
+		return jsonWriter.Int64(value);
 	}
 
 	bool QuertJsonWritre::Write(const char * key, const char * value, int size)
 	{
-		jsonWriter->Key(key);
+		jsonWriter.Key(key);
 		if (value == nullptr || size == 0)
 		{
-			return jsonWriter->String("");
+			return jsonWriter.String("");
 		}
-		return jsonWriter->String(value, size);
+		return jsonWriter.String(value, size);
 	}
 
 	bool QuertJsonWritre::Write()
 	{
-		return jsonWriter->Null();
+		return jsonWriter.Null();
 	}
 
 	bool QuertJsonWritre::Write(long long value)
 	{
-		return jsonWriter->Int64(value);
+		return jsonWriter.Int64(value);
 	}
 
 	bool QuertJsonWritre::Write(const char * value, int size)
 	{
-		return jsonWriter->String(value, size);
+		return jsonWriter.String(value, size);
 	}
 
 	bool QuertJsonWritre::Serialization(std::string & json)
 	{
-		if (this->jsonWriter->EndObject())
+		if (this->jsonWriter.EndObject())
 		{
-			json.assign(this->strBuf.GetString(), this->strBuf.GetSize());
+			json.assign(this->mJsonStringBuf.GetString(), this->mJsonStringBuf.GetSize());
 			return true;
+		}
+		return false;
+	}
+	bool QuertJsonWritre::Serialization(std::shared_ptr<rapidjson::Document>& document)
+	{
+		if (this->jsonWriter.EndObject())
+		{
+			document = std::make_shared<rapidjson::Document>();
+			const char * json = this->mJsonStringBuf.GetString();
+			const size_t size = this->mJsonStringBuf.GetLength();
+			document->Parse(json, size);
+			return document->HasParseError() == false;
 		}
 		return false;
 	}
@@ -77,18 +89,11 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	InvokeResultData::InvokeResultData(XCode code, const std::string & error, const std::string & json)
+	InvokeResultData::InvokeResultData(XCode code, const std::string & error, std::shared_ptr<rapidjson::Document> document)
 	{
 		this->mErrorStr = error;
 		this->mErrorCode = code;
-		if (this->mErrorCode == XCode::Successful)
-		{
-			this->mDocument.Parse(json.c_str(), json.size());
-			if (this->mDocument.HasParseError())
-			{
-				this->mErrorCode = XCode::ParseJsonFailure;
-			}
-		}
+		this->mDocument = document;
 	}
 
 	InvokeResultData::InvokeResultData(XCode code)
@@ -104,8 +109,8 @@ namespace SoEasy
 
 	long long InvokeResultData::GetInt64()
 	{
-		auto iter = this->mDocument.FindMember("data");
-		if (iter != this->mDocument.MemberEnd())
+		auto iter = this->mDocument->FindMember("data");
+		if (iter != this->mDocument->MemberEnd())
 		{
 			if (iter->value.IsInt64())
 			{
@@ -118,8 +123,8 @@ namespace SoEasy
 
 	bool InvokeResultData::GetJsonData(rapidjson::Value & jsonData)
 	{
-		auto iter = this->mDocument.FindMember("data");
-		if (iter == this->mDocument.MemberEnd())
+		auto iter = this->mDocument->FindMember("data");
+		if (iter == this->mDocument->MemberEnd())
 		{
 			return false;
 		}
@@ -129,8 +134,8 @@ namespace SoEasy
 
 	bool InvokeResultData::GetJsonData(const char * key, rapidjson::Value & jsonData)
 	{
-		auto iter = this->mDocument.FindMember("data");
-		if (iter == this->mDocument.MemberEnd() || iter->value.IsObject() == false)
+		auto iter = this->mDocument->FindMember("data");
+		if (iter == this->mDocument->MemberEnd() || iter->value.IsObject() == false)
 		{
 			return false;
 		}
@@ -144,10 +149,9 @@ namespace SoEasy
 	}
 
 	QuertJsonWritre::QuertJsonWritre()
+		:jsonWriter(mJsonStringBuf)
 	{
-		this->strBuf.Clear();
-		this->jsonWriter = new rapidjson::Writer<rapidjson::StringBuffer>(strBuf);
-		this->jsonWriter->StartObject();
+		this->jsonWriter.StartObject();
 	}
 	
 }

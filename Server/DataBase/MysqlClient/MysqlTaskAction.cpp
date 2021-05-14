@@ -77,7 +77,19 @@ namespace SoEasy
 				jsonWrite.EndWriteArray();
 			}	
 			mysql_free_result(queryResult);
-			jsonWrite.Serialization(this->mQuertJsonData);
+			if (!jsonWrite.Serialization(this->mDocument))
+			{
+				this->mErrorCode = XCode::RedisJsonParseFail;
+				this->mErrorString = "mysql result cast json failure";
+			}
 		}
+	}
+	std::shared_ptr<InvokeResultData> MysqlTaskAction::GetInvokeData()
+	{
+		if (this->mErrorCode != XCode::Successful)
+		{
+			SayNoDebugError("[redis error] " << this->mErrorString);
+		}
+		return std::make_shared<InvokeResultData>(mErrorCode, mErrorString, mDocument);
 	}
 }

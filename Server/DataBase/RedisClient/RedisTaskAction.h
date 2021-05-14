@@ -13,9 +13,7 @@ namespace SoEasy
 		void InvokeInThreadPool(long long threadId) override;	//在线程池执行的任务
 		long long GetCoroutineId() { return mCoreoutineId; }
 	public:
-		const XCode GetCode() { return this->mErrorCode; }
-		const std::string & GetErrorStr() { return this->mErrorString; }
-		const std::string & GetJsonData() { return this->mQuertJsonData; }
+		std::shared_ptr<InvokeResultData> GetInvokeData();
 	private:
 		va_list mCommand;
 		std::string mFormat;
@@ -24,6 +22,6 @@ namespace SoEasy
 	private:
 		XCode mErrorCode;
 		std::string mErrorString;
-		std::string mQuertJsonData;
+		std::shared_ptr<rapidjson::Document> mDocument;
 	};
 }

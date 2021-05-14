@@ -10,8 +10,18 @@ namespace SoEasy
 			SayNoDebugFatal("not find field AreaId");
 			return false;
 		}
+		REGISTER_FUNCTION_1(LoginManager::Login, UserAccountData);
 		REGISTER_FUNCTION_1(LoginManager::Register, UserRegisterData);
 		return true;
+	}
+
+	XCode LoginManager::Login(long long operId, shared_ptr<UserAccountData> LoginData)
+	{
+		ActionScheduler actionShceduler;
+		UserAccountData userAccountData;
+		shared_ptr<StringData> accountData = make_shared<StringData>();
+		accountData->set_data(LoginData->account());
+		return actionShceduler.Call("UserDataManager.QueryUserData", accountData, userAccountData);
 	}
 
 	XCode LoginManager::Register(long long operId, shared_ptr<UserRegisterData> registerData)

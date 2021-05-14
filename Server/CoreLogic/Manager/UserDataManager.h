@@ -17,6 +17,7 @@ namespace SoEasy
 
 	private:
 		XCode AddUserData(long long operId, shared_ptr<UserAccountData>);
+		XCode QueryUserData(long long operId, shared_ptr<StringData> account, shared_ptr<UserAccountData>);
 	private:
 		int mAreaId;
 		MysqlManager * mMysqlManager;

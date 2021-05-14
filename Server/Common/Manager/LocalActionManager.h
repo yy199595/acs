@@ -20,8 +20,8 @@ namespace SoEasy
 		void GetAllFunction(std::vector<std::string> & funcs);
 	public:
 		bool DelCallback(long long callbackId);
-		shared_ptr<LocalRetActionProxy> GetCallback(long long callbackId, bool remove = true);
 		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
+		shared_ptr<LocalRetActionProxy> GetCallback(long long callbackId, bool remove = true);
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;

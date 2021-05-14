@@ -11,6 +11,7 @@ namespace SoEasy
 	protected:
 		bool OnInit() override;
 	private:
+		XCode Login(long long operId, shared_ptr<UserAccountData> LoginData);
 		XCode Register(long long operId, shared_ptr<UserRegisterData> registerData);
 	private:
 		int mAreaId;

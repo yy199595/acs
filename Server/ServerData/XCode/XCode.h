@@ -36,4 +36,5 @@ enum XCode
 
 
 	AccountAlreadyExists, //账号已经存在
+	SaveValueToRedisFail,
 };

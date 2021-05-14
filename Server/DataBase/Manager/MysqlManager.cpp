@@ -70,14 +70,7 @@ namespace SoEasy
 
 		this->mCoroutineManager->YieldReturn();
 
-		XCode code = taskAction->GetCode();
-		const std::string & error = taskAction->GetErrorStr();
-		const std::string & jsonData = taskAction->GetJsonData();
-		if (code != XCode::Successful)
-		{
-			SayNoDebugError("[mysql error] " << error);
-		}
-		return make_shared<InvokeResultData>(code, error, jsonData);
+		return taskAction->GetInvokeData();
 	}
 
 	

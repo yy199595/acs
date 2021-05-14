@@ -24,7 +24,10 @@ namespace SoEasy
 			return;
 		}
 		QuertJsonWritre jsonWrite;
+		const long long t1 = TimeHelper::GetMicTimeStamp();
 		redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
+
+		SayNoDebugFatal("query cost time = " << TimeHelper::GetMicTimeStamp() - t1);
 		if (replay == nullptr)
 		{
 			this->mErrorString = "redis replay null";
@@ -75,6 +78,18 @@ namespace SoEasy
 			break;
 		}
 		freeReplyObject(replay);
-		jsonWrite.Serialization(this->mQuertJsonData);
+		if (!jsonWrite.Serialization(this->mDocument))
+		{
+			this->mErrorCode = XCode::RedisJsonParseFail;
+			this->mErrorString = "redis cast json failure";
+		}
+	}
+	std::shared_ptr<InvokeResultData> RedisTaskAction::GetInvokeData()
+	{
+		if (this->mErrorCode != XCode::Successful)
+		{
+			SayNoDebugError("[redis error] " << this->mErrorString);
+		}
+		return std::make_shared<InvokeResultData>(mErrorCode, mErrorString, mDocument);
 	}
 }

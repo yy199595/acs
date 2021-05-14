@@ -71,14 +71,17 @@ namespace SoEasy
 	{
 		//this->InvokeCommand("FLUSHALL");
 		rapidjson::Value jsonData;
+		const long long t1 = TimeHelper::GetMilTimestamp();
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGETALL tb_player_account");
+		SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);
 		if (queryData->GetJsonData(jsonData) && jsonData.IsArray())
 		{
-			for (size_t index = 0; index < jsonData.Size(); index++)
+			for (size_t index = 0; index < jsonData.Size(); index += 2)
 			{
-				const char * str = jsonData[index].GetString();
-				const int num = jsonData[index].GetStringLength();
-				SayNoDebugLog(std::string(str, num));
+				std::string key(jsonData[index].GetString(), jsonData[index].GetStringLength());
+				std::string value(jsonData[index + 1].GetString(), jsonData[index + 1].GetStringLength());
+
+				SayNoDebugLog(key << "  " << value.size());
 			}
 		}
 	}
@@ -88,6 +91,7 @@ namespace SoEasy
 		long long coroutineId = this->mCoroutineScheduler->GetCurrentCorId();
 		if (coroutineId == 0)
 		{
+			SayNoDebugError("[redis error] redis not in coreoutine");
 			return make_shared<InvokeResultData>(XCode::RedisNotInCoroutine);
 		}
 		va_list command;
@@ -98,21 +102,103 @@ namespace SoEasy
 		va_end(command);
 		if (!mThreadPool->StartTaskAction(taskAction))
 		{
+			SayNoDebugError("[redis error] start redis task fail");
 			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
 		}
 		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
 		this->mCoroutineScheduler->YieldReturn();
-		
 
-		XCode code = taskAction->GetCode();
-		const std::string & error = taskAction->GetErrorStr();
-		const std::string & jsonData = taskAction->GetJsonData();
-		if (code != XCode::Successful)
-		{
-			SayNoDebugError("[redis error] " << error);
-		}
-		return make_shared<InvokeResultData>(code, error, jsonData);
+		return taskAction->GetInvokeData();
 	}
+
+	bool RedisManager::HasValue(const char * key)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET %s", key);
+		if (queryData->GetCode() == XCode::Successful)
+		{
+			rapidjson::Value jsonValue;
+			return queryData->GetJsonData(jsonValue) && !jsonValue.IsNull();
+		}
+		return false;
+	}
+
+	bool RedisManager::HasValue(const char * tab, const char * key)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HEXISTS %s %s", tab, key);
+		if (queryData->GetCode() == XCode::Successful)
+		{
+			return queryData->GetInt64() == 1;
+		}
+		return false;
+	}
+
+	bool RedisManager::SetValue(const char * key, const std::string & value)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("SET %s %b", key, value.c_str(), value.size());
+		return queryData->GetCode() == XCode::Successful;
+	}
+
+	bool RedisManager::SetValue(const char * tab, const char * key, const std::string & value)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HSET %s %s %b", tab, key, value.c_str(), value.size());
+		return queryData->GetCode() == XCode::Successful;
+		
+	}
+
+	bool RedisManager::SetValue(const char * tab, const char * key, const shared_ptr<Message> value)
+	{
+		std::string serializeData;
+		if (!value->SerializePartialToString(&serializeData))
+		{
+			return false;
+		}
+		return this->SetValue(tab, key, serializeData);
+	}
+
+	bool RedisManager::GetValue(const char * key, std::string & value)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET %s", key);
+		if (queryData->GetCode() == XCode::Successful)
+		{
+			rapidjson::Value jsonValue;
+			if (queryData->GetJsonData(jsonValue) && jsonValue.IsString())
+			{
+				const char * str = jsonValue.GetString();
+				const size_t size = jsonValue.GetStringLength();
+				value.assign(str, size);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool RedisManager::GetValue(const char * tab, const char * key, std::string & value)
+	{
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGET %s %s", tab, key);
+		if (queryData->GetCode() == XCode::Successful)
+		{
+			rapidjson::Value jsonValue;
+			if (queryData->GetJsonData(jsonValue) && jsonValue.IsString())
+			{
+				const char * str = jsonValue.GetString();
+				const size_t size = jsonValue.GetStringLength();
+				value.assign(str, size);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool RedisManager::GetValue(const char * tab, const char * key, shared_ptr<Message> value)
+	{
+		std::string message;
+		if (!this->GetValue(tab, key, message))
+		{
+			return false;
+		}
+		return value->ParseFromString(message);
+	}
+
 	void RedisManager::OnTaskFinish(long long id)
 	{
 		auto iter = this->mTaskActionMap.find(id);

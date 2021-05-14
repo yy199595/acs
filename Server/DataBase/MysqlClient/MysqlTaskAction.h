@@ -1,6 +1,7 @@
 #pragma once
 #include"MysqlDefine.h"
 #include<Thread/ThreadTaskAction.h>
+#include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
 	class MysqlTaskAction : public ThreadTaskAction
@@ -15,9 +16,7 @@ namespace SoEasy
 		const std::string & GetSqlCommand() { return this->mSqlCommand; }
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }
 	public:
-		XCode GetCode() { return this->mErrorCode; }
-		const std::string & GetErrorStr() { return this->mErrorString; }
-		const std::string & GetJsonData() { return this->mQuertJsonData; }
+		std::shared_ptr<InvokeResultData> GetInvokeData();
 	private:
 		long long mCoroutineId;
 		std::string mSqlCommand;
@@ -26,7 +25,7 @@ namespace SoEasy
 	private:
 		XCode mErrorCode;
 		std::string mErrorString;
-		std::string mQuertJsonData;
+		std::shared_ptr<rapidjson::Document> mDocument;
 	};
 	typedef std::shared_ptr<MysqlTaskAction> MysqlSharedTask;
 }

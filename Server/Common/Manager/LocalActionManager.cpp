@@ -117,21 +117,7 @@ namespace SoEasy
 
 	void LocalActionManager::OnSecondUpdate()
 	{
-		/*const long long nowTime = TimeHelper::GetSecTimeStamp();
-		for (auto iter = this->mRetActionMap.begin(); iter != this->mRetActionMap.end();)
-		{
-			LocalRetActionProxy * retActionBox = iter->second;
-			if (retActionBox != nullptr && nowTime >= retActionBox->GetInitiativeTime())
-			{
-				this->mRetActionMap.erase(iter++);
-				const std::string message = "time out auto call";
-				retActionBox->Invoke(nullptr, XCode::TimeoutAutoCall, message);
-				SayNoDebugLog("call " << retActionBox->GetFunctionName() << " time out");
-				delete retActionBox;
-				continue;
-			}
-			iter++;
-		}*/
+		
 	}
 
 	void LocalActionManager::OnInitComplete()
@@ -143,63 +129,14 @@ namespace SoEasy
 		}
 	}
 
-	/*bool LocalActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo)
-	{
-		auto iter = this->mRetActionMap.find(id);
-		if (iter == this->mRetActionMap.end())
-		{
-			SayNoDebugError("No callback method found " << id);
-			return false;
-		}
-		LocalRetActionProxy * refActionBox = iter->second;
-		if (refActionBox == nullptr)
-		{
-			this->mRetActionMap.erase(iter);
-			return false;
-		}
-
-		refActionBox->Invoke(tcpSession, callInfo);
-		this->mRetActionMap.erase(iter);
-		delete refActionBox;
-		return true;
-	}
-
-	bool LocalActionManager::Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo)
-	{
-		NetLuaAction * pNetLuaAction = GetLuaFunction(name);
-		if (pNetLuaAction != nullptr)
-		{
-			shared_ptr<NetWorkPacket> returnData = make_shared<NetWorkPacket>();
-			pNetLuaAction->Invoke(tcpSession, callInfo, returnData);
-			return true;
-		}
-		LocalActionProxy * pAction = GetFunction(name);
-		if (pAction == nullptr)
-		{
-			return false;
-		}
-
-		this->mCoroutineScheduler->Start([this, callInfo, pAction, tcpSession]()
-		{
-			shared_ptr<NetWorkPacket> returnData = make_shared<NetWorkPacket>();
-			const long long nowTime = TimeHelper::GetMilTimestamp();
-			XCode code = pAction->Invoke(tcpSession, callInfo, returnData);
-			if (callInfo->callback_id() != 0)
-			{
-				const std::string & address = tcpSession->GetAddress();
-				returnData->set_error_code(code);
-				returnData->set_callback_id(callInfo->callback_id());
-				returnData->set_operator_id(callInfo->operator_id());
-				mNetWorkManager->SendMessageByAdress(address, returnData);
-			}
-		});
-		return true;
-	}
-*/
 	shared_ptr<NetLuaAction> LocalActionManager::GetLuaAction(const std::string & name)
 	{
-		auto iter = this->mRegisterLuaActions.find(name);
-		return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
+		if (this->mScriptManager != nullptr)
+		{
+			auto iter = this->mRegisterLuaActions.find(name);
+			return iter != this->mRegisterLuaActions.end() ? iter->second : nullptr;
+		}
+		return nullptr;
 	}
 
 	shared_ptr<LocalActionProxy> LocalActionManager::GetAction(const std::string & name)

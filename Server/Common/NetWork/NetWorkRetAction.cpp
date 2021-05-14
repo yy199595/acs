@@ -31,7 +31,7 @@ namespace SoEasy
 		this->mBindLuaAction->Inovke(code);
 	}
 
-	LocalRetActionProxy::LocalRetActionProxy(std::string & name)
+	LocalRetActionProxy::LocalRetActionProxy(const std::string & name)
 	{
 		this->mFunctionName = name;
 		this->mCreateTime = TimeHelper::GetMilTimestamp();

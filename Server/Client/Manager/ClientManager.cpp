@@ -50,8 +50,15 @@ namespace Client
 				registerData->set_password(StringHelper::RandomString(15));
 
 				long long t2 = TimeHelper::GetMilTimestamp();
-				//XCode code = shceuder.Call("LoginManager.Register", registerData);	
-				//SayNoDebugWarning("cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
+				XCode code = shceuder.Call("LoginManager.Register", registerData);	
+				SayNoDebugWarning("register cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
+
+				long long t3 = TimeHelper::GetMilTimestamp();
+				shared_ptr<UserAccountData> accountData = make_shared<UserAccountData>();
+				accountData->set_account(registerData->account());
+
+				XCode loginCode = shceuder.Call("LoginManager.Login", accountData);
+				SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
 
 			}
 			SayNoDebugFatal("cost time = " << TimeHelper::GetMilTimestamp() - t1);

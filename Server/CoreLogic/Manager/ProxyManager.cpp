@@ -8,9 +8,10 @@ namespace SoEasy
 {
 	bool ProxyManager::OnInit()
 	{
+		SayNoAssertRetFalse_F(ListenerManager::OnInit());
 		SayNoAssertRetFalse_F(this->mRemoteActionManager = this->GetManager<RemoteActionManager>());
 		this->mRemoteActionManager->SetRecvCallback(BIND_THIS_ACTION_2(ProxyManager::OnRecvServerMessage));
-		return ListenerManager::OnInit();
+		return true;
 	}
 
 	void ProxyManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)

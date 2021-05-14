@@ -17,6 +17,17 @@ namespace SoEasy
 		void OnTaskFinish(long long id) final;		//在线程池完成任务之后的通知
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const char * format, ...);
+	public:
+		bool HasValue(const char * key);
+		bool HasValue(const char * tab, const char * key);
+	public:
+		bool SetValue(const char * key, const std::string & value);
+		bool SetValue(const char * tab, const char * key, const std::string & value);
+		bool SetValue(const char * tab, const char * key, const shared_ptr<Message> value);
+	public:
+		bool GetValue(const char * key, std::string & value);
+		bool GetValue(const char * tab, const char * key, std::string & value);
+		bool GetValue(const char * tab, const char * key, shared_ptr<Message> value);
 	private:
 		std::string mRedisIp;		//redis ip地址
 		unsigned short mRedisPort;	//端口号
