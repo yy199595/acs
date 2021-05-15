@@ -7,6 +7,7 @@ namespace SoEasy
 	{
 	public:
 		CorSleepTimer(CoroutineManager * sheduler, long long id, long long ms);
+		~CorSleepTimer() { this->mScheduler = nullptr; }
 	public:
 		bool Invoke() override;
 	private:

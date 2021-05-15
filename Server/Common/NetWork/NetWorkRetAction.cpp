@@ -39,11 +39,6 @@ namespace SoEasy
 	void LocalRetActionProxy1::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
 	{
 		XCode code = (XCode)backData->error_code();
-		if (this->mBindLuaAction)
-		{
-			this->mBindLuaAction->Inovke(code);
-			return;
-		}
 		this->mBindAction(session, code);
 	}
 	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name)

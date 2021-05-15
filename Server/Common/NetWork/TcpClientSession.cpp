@@ -163,7 +163,6 @@ namespace SoEasy
 			if (error_code)
 			{
 				this->CloseSocket();
-				return;
 			}
 			else
 			{

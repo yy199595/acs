@@ -38,7 +38,10 @@ namespace SoEasy
 				std::unique_lock<std::mutex> waitLock(this->mThreadLock);
 				this->mThreadVarible.wait(waitLock);
 			}
-			std::swap(this->mTaskBuffer, this->mWaitInvokeTask);			
+			this->mThreadLock.lock();
+			std::swap(this->mTaskBuffer, this->mWaitInvokeTask);	
+			this->mThreadLock.unlock();
+
 			while (!this->mWaitInvokeTask.empty())
 			{
 				SharedThreadTask taskAction = this->mWaitInvokeTask.front();

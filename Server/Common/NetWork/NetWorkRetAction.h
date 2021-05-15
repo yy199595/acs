@@ -40,18 +40,14 @@ namespace SoEasy
 	{
 	public:
 		LocalRetActionProxy1(NetWorkRetAction1 action, std::string & name)
-			: LocalRetActionProxy(name), mBindAction(action),mBindLuaAction(nullptr) {}
+			: LocalRetActionProxy(name), mBindAction(action) {}
 
-		LocalRetActionProxy1(NetLuaRetAction * action, std::string & name)
-			:LocalRetActionProxy(name), mBindAction(nullptr), mBindLuaAction(action) { }
-
-		~LocalRetActionProxy1() { if (mBindLuaAction) { delete mBindLuaAction; } }
+		~LocalRetActionProxy1() { }
 
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> backData) override;
 	private:
 		NetWorkRetAction1 mBindAction;
-		NetLuaRetAction * mBindLuaAction;
 	};
 
 	template<typename T>
@@ -118,6 +114,7 @@ namespace SoEasy
 	{
 	public:
 		NetWorkWaitCorAction(std::string name, CoroutineManager *);
+		~NetWorkWaitCorAction() { std::cout << "delete NetWorkWaitCorAction" << std::endl; }
 		static shared_ptr<NetWorkWaitCorAction> Create(std::string name, CoroutineManager *);
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> backData) override;

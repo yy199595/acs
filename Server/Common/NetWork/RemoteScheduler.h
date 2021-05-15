@@ -34,9 +34,6 @@ namespace SoEasy
 		bool SendCallMessage(std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
 		bool SendCallMessage(std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);		
 	public:
-		template<typename T, typename ... Args>
-		unsigned long long CreateCallback(Args &&... args);
-	public:
 		long long mOperatorId;
 		std::string mMessageBuffer;
 		std::string mBindSessionAdress;
@@ -56,11 +53,5 @@ namespace SoEasy
 	{
 		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
 		return this->SendCallMessage(func, message, pAction);
-	}
-	template<typename T, typename ...Args>
-	inline unsigned long long RemoteScheduler::CreateCallback(Args && ...args)
-	{
-		T * pAction = new T(std::forward<Args>(args)...);
-		return this->mFunctionManager->AddCallback(pAction);
 	}
 }

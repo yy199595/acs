@@ -60,7 +60,7 @@ namespace Client
 
 					XCode loginCode = shceuder.Call("LoginManager.Login", accountData);
 					SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
-					this->mCoroutineManager->Sleep(100);
+					this->mCoroutineManager->Sleep(500);
 				}
 			});
 		}

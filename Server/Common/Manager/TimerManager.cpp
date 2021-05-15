@@ -17,16 +17,16 @@ namespace SoEasy
 		}
 		long long id = timer->GetTimerId();
 		auto iter = this->mTimerMap.find(id);
-		if (iter != this->mTimerMap.end())
+		if (iter == this->mTimerMap.end())
 		{
-			return false;
-		}
-		this->mTimerThreadLock.lock();
-		this->mNextWheelQueue.push(timer);
-		this->mTimerThreadLock.unlock();
-		this->mWheelVariable.notify_one();
-		this->mTimerMap.insert(std::make_pair(id, timer));
-		return true;
+			this->mTimerMap.insert(std::make_pair(id, timer));
+			this->mTimerThreadLock.lock();
+			this->mNextWheelQueue.push(timer);
+			this->mTimerThreadLock.unlock();
+			this->mWheelVariable.notify_one();
+			return true;
+		}	
+		return false;
 	}
 
 	
@@ -73,11 +73,15 @@ namespace SoEasy
 		if (iter != this->mTimerMap.end())
 		{
 			shared_ptr<TimerBase> timer = iter->second;
-			this->mTimerMap.erase(iter);
 			if (timer->Invoke() == false)
 			{
-				this->AddTimer(timer);
+				this->mTimerThreadLock.lock();
+				this->mNextWheelQueue.push(timer);
+				this->mTimerThreadLock.unlock();
+				this->mWheelVariable.notify_one();
+				return;
 			}
+			this->mTimerMap.erase(iter);
 		}
 	}
 
@@ -90,24 +94,31 @@ namespace SoEasy
 				std::unique_lock<std::mutex> lck(this->mTimerThreadLock);
 				this->mWheelVariable.wait(lck);
 			}
-			else
+			long long startTime = TimeHelper::GetMilTimestamp();
+
+			this->mTimerThreadLock.lock();
+			std::swap(this->mNextWheelQueue, this->mWheelQueue);
+			this->mTimerThreadLock.unlock();
+
+			while (!this->mWheelQueue.empty())
 			{
-				long long startTime = TimeHelper::GetMilTimestamp();
-				std::swap(this->mNextWheelQueue, this->mWheelQueue);
-				while (!this->mWheelQueue.empty())
+				this->mTimerThreadLock.lock();
+				shared_ptr<TimerBase> timer = this->mWheelQueue.front();
+				this->mWheelQueue.pop();
+				this->mTimerThreadLock.unlock();
+
+				if (timer->IsTrigger(startTime))
 				{
-					shared_ptr<TimerBase> timer = this->mWheelQueue.front();
-					this->mWheelQueue.pop();
-					if (timer->IsTrigger(startTime))
-					{
-						long long id = timer->GetTimerId();
-						this->AddFinishTaskId(id);
-						continue;
-					}
-					this->mNextWheelQueue.push(timer);
+					long long id = timer->GetTimerId();
+					this->AddFinishTaskId(id);
+					continue;
 				}
-				std::this_thread::sleep_for(std::chrono::milliseconds(this->mWheelInterval));
+				this->mTimerThreadLock.lock();
+				this->mNextWheelQueue.push(timer);
+				this->mTimerThreadLock.unlock();
+
 			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(this->mWheelInterval));
 		}
 	}
 }

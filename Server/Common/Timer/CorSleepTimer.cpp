@@ -11,6 +11,7 @@ namespace SoEasy
 
 	bool CorSleepTimer::Invoke()
 	{
+		assert(this->mScheduler);
 		this->mScheduler->Resume(this->mCoroutineId);
 		return true;
 	}

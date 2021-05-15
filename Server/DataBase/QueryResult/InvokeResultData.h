@@ -1,6 +1,5 @@
 #pragma once
 #include<XCode/XCode.h>
-#include"QueryField.h"
 #include<rapidjson/writer.h>
 #include<rapidjson/document.h>
 #include<rapidjson/stringbuffer.h>

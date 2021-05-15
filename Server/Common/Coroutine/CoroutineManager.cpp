@@ -92,7 +92,11 @@ namespace SoEasy
 
 	void CoroutineManager::Resume(long long id)
 	{
-		assert(this->mCurrentCorId == 0);
+		if (this->mCurrentCorId != 0)
+		{
+			SayNoDebugFatal("logic fail");
+			return;
+		}
 		Coroutine * pCoroutine = this->GetCoroutine(id);
 		if (pCoroutine != nullptr)
 		{

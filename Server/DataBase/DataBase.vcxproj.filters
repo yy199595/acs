@@ -35,9 +35,6 @@
     <ClCompile Include="QueryResult\InvokeResultData.cpp">
       <Filter>QueryResult</Filter>
     </ClCompile>
-    <ClCompile Include="QueryResult\QueryField.cpp">
-      <Filter>QueryResult</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h">
@@ -60,9 +57,6 @@
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlDefine.h">
       <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="QueryResult\QueryField.h">
-      <Filter>QueryResult</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
