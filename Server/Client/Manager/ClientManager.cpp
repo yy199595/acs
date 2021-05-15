@@ -36,29 +36,31 @@ namespace Client
 	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(2));
-
-		this->mCoroutineManager->Start([this, tcpSession]()
+		for (size_t index = 0; index < 100; index++)
 		{
+			this->mCoroutineManager->Start([this, tcpSession]()
+			{
+				while (true)
+				{
+					ActionScheduler shceuder(tcpSession);
+					shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
+					registerData->set_phonenum(13716061995);
+					registerData->set_platform("iphone_wecaht");
+					registerData->set_account("646585122@qq.com");
+					registerData->set_password(StringHelper::RandomString(15));
 
-			ActionScheduler shceuder(tcpSession);
-			shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
-			registerData->set_phonenum(13716061995);
-			registerData->set_platform("iphone_wecaht");
-			registerData->set_account("646585122@qq.com");
-			registerData->set_password(StringHelper::RandomString(15));
+					long long t2 = TimeHelper::GetMilTimestamp();
+					XCode code = shceuder.Call("LoginManager.Register", registerData);
+					SayNoDebugWarning("register cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
 
-			long long t2 = TimeHelper::GetMilTimestamp();
-			XCode code = shceuder.Call("LoginManager.Register", registerData);
-			SayNoDebugWarning("register cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
+					long long t3 = TimeHelper::GetMilTimestamp();
+					shared_ptr<UserAccountData> accountData = make_shared<UserAccountData>();
+					accountData->set_account(registerData->account());
 
-			long long t3 = TimeHelper::GetMilTimestamp();
-			shared_ptr<UserAccountData> accountData = make_shared<UserAccountData>();
-			accountData->set_account(registerData->account());
-
-			XCode loginCode = shceuder.Call("LoginManager.Login", accountData);
-			SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
-			this->mCoroutineManager->Sleep(500);
-
-		});
+					XCode loginCode = shceuder.Call("LoginManager.Login", accountData);
+					SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
+				}
+			});
+		}
 	}
 }

@@ -62,11 +62,6 @@ namespace SoEasy
 		{
 			return false;
 		}
-		if (tcpSession->IsActive())
-		{
-			tcpSession->CloseSocket();
-			return false;
-		}
 		this->mErrorSessionQueue.AddItem(tcpSession);
 		return true;
 	}

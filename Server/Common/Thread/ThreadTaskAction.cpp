@@ -11,9 +11,7 @@ namespace SoEasy
 	}
 	void ThreadTaskAction::NoticeToMainThread()
 	{
-		if (this->mBindManager)
-		{
-			this->mBindManager->AddFinishTask(this->mTaskActionId);
-		}
+		SayNoAssertRet_F(this->mBindManager);
+		this->mBindManager->AddFinishTask(this->mTaskActionId);
 	}
 }

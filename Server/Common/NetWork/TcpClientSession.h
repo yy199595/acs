@@ -43,17 +43,17 @@ namespace SoEasy
 		inline SharedTcpSocket GetSocket() { return this->mBinTcpSocket; }
 		inline const std::string & GetSessionName() { return mSessionName; }
 		inline void SetSessionName(const std::string & name) { mSessionName = name; }		
-	public:
-		bool StartConnect();
-	public:
-		void CloseSocket();
-		bool SendPackage(const std::string & message);
-		bool SendPackage(const char * message, const size_t size);
+	public:		
+		bool SendPackage(std::shared_ptr<std::string> message);
 		SessionManager * GetDispatchManager() { return this->mDispatchManager; }
 	public:
-		void StartReceiveMsg();
+		void StartClose();
+		bool StartConnect();
+		bool StartReceiveMsg();
 	private:
 		void Connect();
+		void Receive();
+		void CloseSocket();
 		void ReadMessageBody(const  size_t allSize);
 		void InitMember(const std::string & ip, unsigned short port);
 	private:
@@ -71,6 +71,10 @@ namespace SoEasy
 		SessionState mCurrentSatte;
 		unsigned int mConnectCount;
 		SessionManager * mDispatchManager;
+	private:	
+		std::function<void()> mRecvAction;
+		std::function<void()> mCloseAction;
+		std::function<void()> mConnectAction;
 	private:
 		char * mRecvMsgBuffer;
 		unsigned int mRecvBufferSize;

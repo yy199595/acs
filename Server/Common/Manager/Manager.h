@@ -37,20 +37,20 @@ namespace SoEasy
 		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
 	public:
-		void AddFinishTask(long long id);	//由其他线程调用
+		void AddFinishTask(long long id);	//不要手动调用
+	public:
 		bool StartTaskAction(shared_ptr<ThreadTaskAction> taskAction);
-
 		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
 	public:
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)
-	public:
-		virtual void PushClassToLua(lua_State * luaEnv) { }
+		virtual void PushClassToLua(lua_State * luaEnv) { }		//自身方法导出到lua
 	private:
 		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	protected:
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
-		virtual bool OnInit() = 0;			//初始化管理器
+		virtual bool OnInit() = 0;						//初始化管理器
+		virtual void OnHitfix() { }						//热更命令之后调用
 		virtual void OnInitComplete() { }				//在初始化完成之后 改方法会在协程中调用
 		virtual void OnSystemUpdate();					//处理系统事件
 		virtual void OnFrameUpdate(float t) { }			//逻辑帧

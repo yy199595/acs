@@ -56,14 +56,14 @@ namespace SoEasy
 		auto iter = this->mSessionAdressMap.find(address);
 		if (iter == this->mSessionAdressMap.end())
 		{
-			this->mSessionLock.lock();
-			tcpSession->StartReceiveMsg();
-			this->mSessionLock.unlock();
-			long long socketId = tcpSession->GetSocketId();
-			this->mSessionAdressMap.emplace(address, tcpSession);
-			this->mSessionAdressMap1.emplace(socketId, tcpSession);
-			SayNoDebugError("add new session " << address);
-			return true;
+			if (tcpSession->StartReceiveMsg())
+			{
+				long long socketId = tcpSession->GetSocketId();
+				this->mSessionAdressMap.emplace(address, tcpSession);
+				this->mSessionAdressMap1.emplace(socketId, tcpSession);
+				SayNoDebugError("add new session " << address);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -73,9 +73,7 @@ namespace SoEasy
 		auto iter = this->mSessionAdressMap.find(address);
 		if (iter != this->mSessionAdressMap.end())
 		{
-			this->mSessionLock.lock();
-			iter->second->CloseSocket();
-			this->mSessionLock.unlock();
+			iter->second->StartClose();
 			return true;
 		}
 		return false;
@@ -106,15 +104,8 @@ namespace SoEasy
 		size_t size = returnPackage->ByteSizeLong();
 		size_t length = size + sizeof(unsigned int);
 		memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
-		shared_ptr<string> sendMessage = make_shared<string>(this->mSendSharedBuffer, length);
-		
-		this->mSessionContext->post([pSession, sendMessage]()
-		{
-			const char * data = sendMessage->c_str();
-			const size_t size = sendMessage->size();
-			pSession->SendPackage(data, size);
-		});
-		return XCode::Successful;
+		shared_ptr<string> sendMessage = make_shared<string>(this->mSendSharedBuffer, length);		
+		return pSession->SendPackage(sendMessage) ? XCode::Successful : XCode::SendMessageFail;
 	}
 
 	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const long long skcketId)
