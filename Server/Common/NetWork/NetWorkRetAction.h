@@ -114,7 +114,7 @@ namespace SoEasy
 	{
 	public:
 		NetWorkWaitCorAction(std::string name, CoroutineManager *);
-		~NetWorkWaitCorAction() { std::cout << "delete NetWorkWaitCorAction" << std::endl; }
+		~NetWorkWaitCorAction() { }
 		static shared_ptr<NetWorkWaitCorAction> Create(std::string name, CoroutineManager *);
 	public:
 		void Invoke(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> backData) override;

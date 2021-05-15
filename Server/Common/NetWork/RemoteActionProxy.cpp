@@ -21,11 +21,7 @@ namespace SoEasy
 			this->mActionSession = nullptr;
 			return;
 		}
-		if (!this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, message))
-		{
-			this->mSendQueue.push(message);
-			this->mActionSession = nullptr;
-		}
+		this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, message);
 	}
 
 	bool RemoteActionProxy::BindSession(shared_ptr<TcpClientSession> session)
