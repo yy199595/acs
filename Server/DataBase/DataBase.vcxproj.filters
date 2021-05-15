@@ -18,6 +18,9 @@
     <Filter Include="QueryResult">
       <UniqueIdentifier>{81336db9-6107-4db7-a552-4f52b69aed87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{53b36b0e-a566-4d45-9d98-22f86fd680bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp">
@@ -34,6 +37,9 @@
     </ClCompile>
     <ClCompile Include="QueryResult\InvokeResultData.cpp">
       <Filter>QueryResult</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\MysqlExtension.cpp">
+      <Filter>Script</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +63,9 @@
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlDefine.h">
       <Filter>MysqlClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\MysqlExtension.h">
+      <Filter>Script</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,13 +4,15 @@
 #include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
+	class CoroutineManager;
 	class MysqlTaskAction : public ThreadTaskAction
 	{
 	public:
-		MysqlTaskAction(MysqlManager * mgr, long long id, long long corId, const std::string & db, const std::string & sql);
+		MysqlTaskAction(MysqlManager * mgr, long long id, CoroutineManager * corMgr, const std::string & db, const std::string & sql);
 		~MysqlTaskAction() { }
 	public:
-		void InvokeInThreadPool(long long threadId);	//在其他线程查询
+		void OnTaskFinish() final;
+		void InvokeInThreadPool(long long threadId) final;	//在其他线程查询
 	public:
 		const long long GetCoroutienId() { return this->mCoroutineId; }
 		const std::string & GetSqlCommand() { return this->mSqlCommand; }
@@ -22,6 +24,7 @@ namespace SoEasy
 		std::string mSqlCommand;
 		std::string mDataBaseName;
 		MysqlManager * mMysqlManager;
+		CoroutineManager * mCoroutineMgr;
 	private:
 		XCode mErrorCode;
 		std::string mErrorString;

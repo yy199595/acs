@@ -82,24 +82,26 @@ namespace SoEasy
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
 	{
-		long long coroutineId = this->mCoroutineScheduler->GetCurrentCorId();
-		if (coroutineId == 0)
+		if (this->mCoroutineScheduler->IsInMainCoroutine())
 		{
 			SayNoDebugError("[redis error] redis not in coreoutine");
 			return make_shared<InvokeResultData>(XCode::RedisNotInCoroutine);
 		}
+		
+		long long taskActionId = NumberHelper::Create();
+		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskActionId, this->mCoroutineScheduler);
+		
 		va_list command;
 		va_start(command, format);
-		long long taskId = NumberHelper::Create();
-		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskId, coroutineId);
 		taskAction->InitCommand(format, command);
 		va_end(command);
-		if (!mThreadPool->StartTaskAction(taskAction))
+
+		if (!this->StartTaskAction(taskAction))
 		{
 			SayNoDebugError("[redis error] start redis task fail");
 			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
 		}
-		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
+
 		this->mCoroutineScheduler->YieldReturn();
 
 		return taskAction->GetInvokeData();
@@ -213,17 +215,5 @@ namespace SoEasy
 			return false;
 		}
 		return value->ParseFromString(message);
-	}
-
-	void RedisManager::OnTaskFinish(long long id)
-	{
-		auto iter = this->mTaskActionMap.find(id);
-		if (iter != this->mTaskActionMap.end())
-		{
-			shared_ptr<RedisTaskAction> taskAction = iter->second;
-			long long coroutineId = taskAction->GetCoroutineId();
-			this->mCoroutineScheduler->Resume(coroutineId);
-			this->mTaskActionMap.erase(iter);
-		}
 	}
 }

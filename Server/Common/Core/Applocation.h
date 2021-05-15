@@ -3,13 +3,13 @@
 #ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
 #endif
-#include<thread>
 #include<Util/TimeHelper.h>
 #include<Define/CommonDef.h>
 #include<Other/TimeRecorder.h>
 #include<Global/ServerConfig.h>
 #include<Define/CommonTypeDef.h>
 #include<Define/ClassStatement.h>
+
 using namespace std;
 using namespace asio::ip;
 

@@ -1,5 +1,6 @@
 #include"TaskThread.h"
 #include<chrono>
+#include<sstream>
 using namespace std::chrono;
 namespace SoEasy
 {

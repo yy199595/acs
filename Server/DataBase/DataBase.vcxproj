@@ -135,6 +135,7 @@
     <ClCompile Include="MysqlClient\MysqlTaskAction.cpp" />
     <ClCompile Include="QueryResult\InvokeResultData.cpp" />
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
+    <ClCompile Include="Script\MysqlExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="QueryResult\InvokeResultData.h" />
     <ClInclude Include="RedisClient\RedisDefine.h" />
     <ClInclude Include="RedisClient\RedisTaskAction.h" />
+    <ClInclude Include="Script\MysqlExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

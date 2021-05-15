@@ -23,7 +23,7 @@ namespace SoEasy
  	protected:
 		bool OnInit() { return true; }
 		void OnInitComplete() final;
-		void OnTaskFinish(long long id) final;
+		void OnSystemUpdate() final;					//处理系统事件
 	private:
 		void RefreshTimer();
 	private:
@@ -34,6 +34,7 @@ namespace SoEasy
 		std::condition_variable mWheelVariable;		//是否轮询的条件变量
 		std::queue<shared_ptr<TimerBase>> mWheelQueue;	//正在轮询队列
 		std::queue<shared_ptr<TimerBase>> mNextWheelQueue;	//下次轮询队列
+		DoubleBufferQueue<long long> mFinishTimerQueue;	//完成一次的队列
 		std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap;	//所有timer的列表
 	};
 	template<typename T, typename ...Args>

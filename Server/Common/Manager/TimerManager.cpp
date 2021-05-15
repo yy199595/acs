@@ -67,21 +67,26 @@ namespace SoEasy
 		}
 	}
 
-	void TimerManager::OnTaskFinish(long long id)
+	void TimerManager::OnSystemUpdate()
 	{
-		auto iter = this->mTimerMap.find(id);
-		if (iter != this->mTimerMap.end())
+		long long timerId = 0;
+		this->mFinishTimerQueue.SwapQueueData();
+		if (this->mFinishTimerQueue.PopItem(timerId))
 		{
-			shared_ptr<TimerBase> timer = iter->second;
-			if (timer->Invoke() == false)
+			auto iter = this->mTimerMap.find(timerId);
+			if (iter != this->mTimerMap.end())
 			{
-				this->mTimerThreadLock.lock();
-				this->mNextWheelQueue.push(timer);
-				this->mTimerThreadLock.unlock();
-				this->mWheelVariable.notify_one();
-				return;
+				shared_ptr<TimerBase> timer = iter->second;
+				if (timer->Invoke() == false)
+				{
+					this->mTimerThreadLock.lock();
+					this->mNextWheelQueue.push(timer);
+					this->mTimerThreadLock.unlock();
+					this->mWheelVariable.notify_one();
+					return;
+				}
+				this->mTimerMap.erase(iter);
 			}
-			this->mTimerMap.erase(iter);
 		}
 	}
 
@@ -110,13 +115,12 @@ namespace SoEasy
 				if (timer->IsTrigger(startTime))
 				{
 					long long id = timer->GetTimerId();
-					this->AddFinishTaskId(id);
+					this->mFinishTimerQueue.AddItem(id);
 					continue;
 				}
 				this->mTimerThreadLock.lock();
 				this->mNextWheelQueue.push(timer);
 				this->mTimerThreadLock.unlock();
-
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(this->mWheelInterval));
 		}

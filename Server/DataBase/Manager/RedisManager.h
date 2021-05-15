@@ -14,7 +14,6 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;			//初始化管理器
 		void OnInitComplete() override;				//初始化完成之后
-		void OnTaskFinish(long long id) final;		//在线程池完成任务之后的通知
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const char * format, ...);
 	public:
@@ -38,6 +37,5 @@ namespace SoEasy
 		ThreadPool * mThreadPool;	//线程池
 		class CoroutineManager * mCoroutineScheduler;
 		std::unordered_map<long long, redisContext *> mRedisContextMap;
-		std::unordered_map<long long, shared_ptr<RedisTaskAction>> mTaskActionMap;
 	};
 }

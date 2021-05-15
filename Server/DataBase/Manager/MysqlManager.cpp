@@ -54,37 +54,20 @@ namespace SoEasy
 
 	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string db, const std::string & sql)
 	{
-		long long coreouitneId = this->mCoroutineManager->GetCurrentCorId();
-		if (coreouitneId == 0)
+		if (this->mCoroutineManager->IsInMainCoroutine())
 		{
 			return make_shared<InvokeResultData>(XCode::MysqlNotInCoroutine);
 		}
-		const long long taskId = NumberHelper::Create();
-		MysqlSharedTask taskAction = make_shared<MysqlTaskAction>(this, taskId, coreouitneId, db, sql);
-		
-		if (!mThreadPool->StartTaskAction(taskAction))
-		{		
+		long long taskActionId = NumberHelper::Create();
+		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, this->mCoroutineManager, db, sql);
+
+		if (!this->StartTaskAction(taskAction))
+		{
 			return make_shared<InvokeResultData>(XCode::MysqlStartTaskFail);
 		}
-		this->mTaskActionMap.insert(std::make_pair(taskAction->GetTaskId(), taskAction));
-
 		this->mCoroutineManager->YieldReturn();
 
 		return taskAction->GetInvokeData();
-	}
-
-	
-
-	void MysqlManager::OnTaskFinish(long long id)
-	{
-		auto iter = this->mTaskActionMap.find(id);
-		if (iter != this->mTaskActionMap.end())
-		{		
-			MysqlSharedTask taskAction = iter->second;
-			const long long cor = taskAction->GetCoroutienId();
-			this->mCoroutineManager->Resume(cor);
-			this->mTaskActionMap.erase(iter);
-		}
 	}
 
 	void MysqlManager::OnInitComplete()

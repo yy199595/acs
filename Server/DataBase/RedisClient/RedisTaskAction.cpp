@@ -1,17 +1,27 @@
 #include "RedisTaskAction.h"
 #include<Manager/RedisManager.h>
+#include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, long long corId)
+	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, CoroutineManager * corMgr)
 		:ThreadTaskAction(mgr, taskId)
 	{
 		this->mRedisManager = mgr;
-		this->mCoreoutineId = corId;
+		this->mCoroutineManager = corMgr;
+		this->mCoreoutineId = corMgr->GetCurrentCorId();
 	}
 	void RedisTaskAction::InitCommand(const char * format, va_list command)
 	{
 		this->mFormat = format;
 		this->mCommand = command;
+	}
+
+	void RedisTaskAction::OnTaskFinish()
+	{
+		if (this->mCoroutineManager != nullptr)
+		{
+			this->mCoroutineManager->Resume(this->mCoreoutineId);
+		}
 	}
 
 	void RedisTaskAction::InvokeInThreadPool(long long threadId)

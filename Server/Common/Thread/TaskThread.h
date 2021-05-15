@@ -1,5 +1,6 @@
 #pragma once
 #include<mutex>
+#include<queue>
 #include"ThreadTaskAction.h"
 #include<condition_variable>
 namespace SoEasy

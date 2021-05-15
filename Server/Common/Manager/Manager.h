@@ -8,7 +8,7 @@
 #include<Other/DoubleBufferQueue.h>
 namespace SoEasy
 {
-
+	class ThreadTaskAction;
 	struct NetMessageBuffer
 	{
 	public:
@@ -37,7 +37,9 @@ namespace SoEasy
 		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
 	public:
-		void AddFinishTaskId(long long taskId);	//由其他线程调用
+		void AddFinishTask(long long id);	//由其他线程调用
+		bool StartTaskAction(shared_ptr<ThreadTaskAction> taskAction);
+
 		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
 	public:
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)
@@ -54,10 +56,12 @@ namespace SoEasy
 		virtual void OnFrameUpdate(float t) { }			//逻辑帧
 		virtual void OnSecondUpdate() { }				//每秒调用
 		virtual void OnFrameUpdateAfter() { }			//在逻辑帧执行完成之后
-		virtual void OnTaskFinish(long long id) { }		//在线程池完成任务之后的通知
+		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//在线程池完成任务之后的通知
+		
 	private:
 		const int mPriority;
 		DoubleBufferQueue<long long> mFinishTaskQueue;  //在其他线程完成的任务存储
+		std::unordered_map<long long, shared_ptr<ThreadTaskAction>> mThreadTaskMap;
 	};
 	
 	template<typename T1>

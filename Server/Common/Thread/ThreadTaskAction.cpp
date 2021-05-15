@@ -1,4 +1,5 @@
 #include"ThreadTaskAction.h"
+#include<Manager/Manager.h>
 #include<Util/TimeHelper.h>
 namespace SoEasy
 {
@@ -12,7 +13,7 @@ namespace SoEasy
 	{
 		if (this->mBindManager)
 		{
-			this->mBindManager->AddFinishTaskId(this->mTaskActionId);
+			this->mBindManager->AddFinishTask(this->mTaskActionId);
 		}
 	}
 }

@@ -1,6 +1,8 @@
 #include"Manager.h"
 #include"LocalActionManager.h"
 #include<Core/Applocation.h>
+#include<Thread/ThreadPool.h>
+#include<Thread/ThreadTaskAction.h>
 namespace SoEasy
 {
 	NetMessageBuffer::NetMessageBuffer(const std::string & address, const shared_ptr<NetWorkPacket> packet)
@@ -28,12 +30,10 @@ namespace SoEasy
 		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, name));
 	}
 
-	void Manager::AddFinishTaskId(long long taskId)
+	void Manager::AddFinishTask(long long taskId)
 	{
 		this->mFinishTaskQueue.AddItem(taskId);
 	}
-
-
 
 	bool Manager::BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox)
 	{	
@@ -64,7 +64,34 @@ namespace SoEasy
 		this->mFinishTaskQueue.SwapQueueData();
 		while (this->mFinishTaskQueue.PopItem(taskId))
 		{
-			this->OnTaskFinish(taskId);
+			auto iter = this->mThreadTaskMap.find(taskId);
+			if (iter != this->mThreadTaskMap.end())
+			{
+				SharedThreadTask taskAction = iter->second;
+				if (taskAction != nullptr)
+				{
+					taskAction->OnTaskFinish();
+					this->OnTaskFinish(taskAction);
+				}				
+				this->mThreadTaskMap.erase(iter);
+			}			
 		}
+	}
+
+	bool Manager::StartTaskAction(shared_ptr<ThreadTaskAction> taskAction)
+	{
+		ThreadPool * threadPool = this->GetApp()->GetThreadPool();
+		SayNoAssertRetFalse_F(threadPool);
+		long long taskId = taskAction->GetTaskId();
+		auto iter = this->mThreadTaskMap.find(taskId);
+		if (iter == this->mThreadTaskMap.end())
+		{
+			if (threadPool->StartTaskAction(taskAction))
+			{
+				this->mThreadTaskMap.emplace(taskId, taskAction);
+				return true;
+			}
+		}
+		return false;
 	}
 }

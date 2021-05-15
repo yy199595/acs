@@ -1,15 +1,25 @@
-#include "MysqlTaskAction.h"
+#include"MysqlTaskAction.h"
 #include<Manager/MysqlManager.h>
+#include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
-	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, long long corId, const std::string & db, const std::string & sql)
+	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, CoroutineManager * corMgr, const std::string & db, const std::string & sql)
 		: ThreadTaskAction(mgr, id)
 	{
 		this->mSqlCommand = sql;
 		this->mDataBaseName = db;
 		this->mMysqlManager = mgr;
-		this->mCoroutineId = corId;
+		this->mCoroutineMgr = corMgr;
+		this->mCoroutineId = corMgr->GetCurrentCorId();
+	}
+
+	void MysqlTaskAction::OnTaskFinish()
+	{
+		if (this->mCoroutineMgr != nullptr)
+		{
+			this->mCoroutineMgr->Resume(this->mCoroutineId);
+		}
 	}
 
 	void MysqlTaskAction::InvokeInThreadPool(long long threadId)
