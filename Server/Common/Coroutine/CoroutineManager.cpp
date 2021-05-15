@@ -67,18 +67,6 @@ namespace SoEasy
 		return pCoroutine->mCoroutineId;
 	}
 
-#ifdef _WIN32
-	void CoroutineManager::LoopCheckDelCoroutine()
-	{
-		while (!this->mDestoryCoroutine.empty())
-		{
-			Coroutine * pCoroutine = this->mDestoryCoroutine.front();
-			this->mDestoryCoroutine.pop();
-			delete pCoroutine;
-		}
-	}
-#endif
-
 	void CoroutineManager::Sleep(long long ms)
 	{
 		Coroutine * pCoroutine = this->GetCoroutine();
@@ -201,7 +189,12 @@ namespace SoEasy
 	void CoroutineManager::OnFrameUpdate(float t)
 	{
 #ifdef _WIN32
-		this->LoopCheckDelCoroutine();
+		while (!this->mDestoryCoroutine.empty())
+		{
+			Coroutine * pCoroutine = this->mDestoryCoroutine.front();
+			this->mDestoryCoroutine.pop();
+			delete pCoroutine;
+		}
 #endif
 	}
 }

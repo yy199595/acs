@@ -11,6 +11,7 @@ namespace SoEasy
 		long long GetTaskId() { return this->mTaskActionId; }
 	public:
 		void NoticeToMainThread();
+		virtual void OnTaskFinish() { }
 		virtual void InvokeInThreadPool(long long threadId) = 0;	//在线程池执行的任务
 		long long GetStartTime() { return this->mStartTime; }
 	private:

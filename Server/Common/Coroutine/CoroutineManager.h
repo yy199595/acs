@@ -35,10 +35,7 @@ namespace SoEasy
 		Coroutine * GetCoroutine();
 		Coroutine * GetCoroutine(long long id);
 		long long GetCurrentCorId() { return this->mCurrentCorId; }
-	private:
-#ifdef _WIN32
-		void LoopCheckDelCoroutine();
-#endif
+		bool IsInMainCoroutine() { return this->mCurrentCorId == 0; }
 	private:
 		void SaveStack(Coroutine *, char * top);
 	private:
