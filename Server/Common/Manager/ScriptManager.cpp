@@ -60,6 +60,11 @@ namespace SoEasy
 		}
 	}
 
+	void ScriptManager::OnInitComplete()
+	{
+		SayNoAssertRet_F(this->LoadAllModule());
+	}
+
 
 	bool ScriptManager::LoadLuaScript(const std::string filePath)
 	{
@@ -70,7 +75,7 @@ namespace SoEasy
 			lua_pcall(mLuaEnv, 0, 1, errfunc);
 			SayNoDebugLog("load lua script success path :" << filePath);
 			lua_pop(mLuaEnv, 2);			
-			return this->LoadAllModule();
+			return true;
 		}
 		SayNoDebugError(lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
@@ -146,6 +151,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetYearMonthDayString", TimeHelper::GetYearMonthDayString);
 		
+		ClassProxyHelper::BeginNewTalbe(lua, "SoEasy");
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Start", SystemExtension::Start);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);

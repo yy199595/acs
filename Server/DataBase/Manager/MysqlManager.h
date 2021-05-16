@@ -16,8 +16,10 @@ namespace SoEasy
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const std::string db, const std::string & sql);
 	protected:
-		bool OnInit() override;
+		bool OnInit() final;
 		void OnInitComplete() final;
+		void PushClassToLua(lua_State * luaEnv) final;		//自身方法导出到lua
+
 	private:
 		bool StartConnectMysql();
 	private:

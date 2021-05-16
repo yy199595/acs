@@ -16,8 +16,10 @@ namespace SoEasy
 		bool PushGlobalPoint(const std::string name, T * data);
 		inline std::string GetMainPath() { return this->mMainLuaPath; }
 	protected:
-		bool OnInit() override;
-		void OnDestory() override;
+		bool OnInit() final;
+		void OnDestory() final;
+		void OnInitComplete() final;
+
 	private:
 		bool LoadAllModule();
 		void ClearRequirePath();

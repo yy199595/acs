@@ -78,6 +78,7 @@ namespace SystemExtension
 	{
 		if (lua_isstring(luaEnv, -1))
 		{
+			Applocation * app = Applocation::Get();
 			const std::string name = lua_tostring(luaEnv, -1);
 			//TODO
 			PtrProxy<Manager>::Write(luaEnv, nullptr);
@@ -244,7 +245,7 @@ namespace SystemExtension
 		const int size = lua_gettop(luaEnv);
 		lua_xmove(luaEnv, coroutine, size - 1);
 
-		return lua_resume(coroutine, luaEnv, 1);
+		return lua_resume(coroutine, luaEnv, size - 1);
 	}
 
 	int Sleep(lua_State * luaEnv)
@@ -276,8 +277,8 @@ namespace SystemExtension
 		{
 			count = lua_tointeger(lua, 3);
 		}
-		//TODO
-		TimerManager * pTimerManager = nullptr;
+		Applocation * app = Applocation::Get();
+		TimerManager * pTimerManager = app->GetManager<TimerManager>();
 		if (pTimerManager != nullptr)
 		{
 			lua_pushvalue(lua, 1);
@@ -300,8 +301,8 @@ namespace SystemExtension
 		if (lua_isinteger(lua, 1))
 		{
 			long long id = lua_tointeger(lua, 1);
-			//TODO
-			TimerManager * pTimerManager = nullptr;
+			Applocation * app = Applocation::Get();
+			TimerManager * pTimerManager = app->GetManager<TimerManager>();
 			if (pTimerManager != nullptr)
 			{
 				bool code = pTimerManager->RemoveTimer(id);

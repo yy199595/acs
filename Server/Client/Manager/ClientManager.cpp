@@ -35,7 +35,7 @@ namespace Client
 
 	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(1000000));
 		for (size_t index = 0; index < 100; index++)
 		{
 			this->mCoroutineManager->Start([this, tcpSession]()

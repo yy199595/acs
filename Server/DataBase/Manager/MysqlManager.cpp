@@ -6,6 +6,8 @@
 #include<Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlTaskAction.h>
 #include<Util/StringHelper.h>
+#include<Script/ClassProxyHelper.h>
+#include<Script/MysqlExtension.h>
 namespace SoEasy
 {
 	MysqlManager::MysqlManager()
@@ -73,6 +75,12 @@ namespace SoEasy
 	void MysqlManager::OnInitComplete()
 	{
 		
+	}
+
+	void MysqlManager::PushClassToLua(lua_State * luaEnv)
+	{
+		ClassProxyHelper::BeginNewTalbe(luaEnv, "MySqlClient");
+		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "MySqlClient", "InvokeCommand", MysqlClient::InvokeCommand);
 	}
 
 	bool MysqlManager::StartConnectMysql()
