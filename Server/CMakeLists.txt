@@ -1,8 +1,4 @@
 cmake_minimum_required(VERSION 3.1.3)
 PROJECT(Server)
 
-ADD_SUBDIRECTORY(Common)
-ADD_SUBDIRECTORY(CoreLogic)
-ADD_SUBDIRECTORY(DataBase)
-ADD_SUBDIRECTORY(ServerData)
 ADD_SUBDIRECTORY(Server)
