@@ -52,7 +52,7 @@ namespace SoEasy
 		RedisManager * redisManager = app->GetManager<RedisManager>();
 		if (redisManager == nullptr)
 		{
-			return false;
+			return nullptr;
 		}
 		long long taskId = NumberHelper::Create();
 		return std::make_shared<RedisLuaTask>(redisManager, taskId, cmd, lua, ref);
