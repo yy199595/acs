@@ -1,4 +1,5 @@
 #pragma once
+#include<memory>
 #include<hiredis/hiredis.h>
 #include<Thread/ThreadTaskAction.h>
 
