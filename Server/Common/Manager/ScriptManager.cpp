@@ -143,7 +143,6 @@ namespace SoEasy
 		
 		ClassProxyHelper::BeginRegister<LocalActionManager>(lua, "LocalActionManager");
 
-		ClassProxyHelper::BeginNewTalbe(lua, "TimeHelper");
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);
@@ -151,7 +150,6 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetYearMonthDayString", TimeHelper::GetYearMonthDayString);
 		
-		ClassProxyHelper::BeginNewTalbe(lua, "SoEasy");
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Start", SystemExtension::Start);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);

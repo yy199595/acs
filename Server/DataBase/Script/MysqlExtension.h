@@ -1,6 +1,8 @@
 #pragma once
 #include<Script/LuaInclude.h>
-namespace MysqlClient
+
+namespace SoEasy
 {
-	extern int InvokeCommand(lua_State * lua);
+	extern int InvokeMysqlCommand(lua_State * lua);
+	extern int InvokeRedisCommand(lua_State * lua);
 }

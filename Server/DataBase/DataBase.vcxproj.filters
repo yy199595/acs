@@ -44,6 +44,9 @@
     <ClCompile Include="MysqlClient\MysqlLuaTask.cpp">
       <Filter>MysqlClient</Filter>
     </ClCompile>
+    <ClCompile Include="RedisClient\RedisLuaTask.cpp">
+      <Filter>RedisClient</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h">
@@ -72,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlLuaTask.h">
       <Filter>MysqlClient</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisClient\RedisLuaTask.h">
+      <Filter>RedisClient</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

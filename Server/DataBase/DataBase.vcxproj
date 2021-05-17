@@ -135,6 +135,7 @@
     <ClCompile Include="MysqlClient\MysqlLuaTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlTaskAction.cpp" />
     <ClCompile Include="QueryResult\InvokeResultData.cpp" />
+    <ClCompile Include="RedisClient\RedisLuaTask.cpp" />
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
     <ClCompile Include="Script\MysqlExtension.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="MysqlClient\MysqlTaskAction.h" />
     <ClInclude Include="QueryResult\InvokeResultData.h" />
     <ClInclude Include="RedisClient\RedisDefine.h" />
+    <ClInclude Include="RedisClient\RedisLuaTask.h" />
     <ClInclude Include="RedisClient\RedisTaskAction.h" />
     <ClInclude Include="Script\MysqlExtension.h" />
   </ItemGroup>

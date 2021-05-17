@@ -14,6 +14,8 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;			//初始化管理器
 		void OnInitComplete() override;				//初始化完成之后
+		void PushClassToLua(lua_State * luaEnv) final;		//自身方法导出到lua
+
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const char * format, ...);
 	public:

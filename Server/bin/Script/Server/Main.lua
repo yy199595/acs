@@ -18,22 +18,23 @@ end
 function Main.Start()
     local table = {}
     table.name = 'yuejianzheng'
+
+    for k, v in pairs(SoEasy) do
+        print(k, v)
+    end
+
     --SoEasy.BindAction("LoginManager.Login", LoginManager.Login)
     SoEasy.Start(    
         function()
-            local queryData =
-                MysqlClient.InvokeCommand(
-                'shouhuzhemen299_db',
-                'select * from player_risk'
-            )
-            if queryData.code ~= 0 then
-                SoEasy.Error(queryData.code, queryData.error)
-            else
-                for k, v in pairs(queryData.data) do
-                    print(k, v)
-                end
-            end
-             print("cost time = ", t2 - t1)
+            local person = { }
+            person.Name = "yjz"
+            person.Age = 24
+           
+            local redisClient = require("DataBase.RedisClient")
+            print(redisClient.SetValue("yjz_person",person), "-------------")
+
+            local jsonValue = redisClient.GetValue("yjz_person")
+            SoEasy.Info(jsonValue)
         end
     )
 end

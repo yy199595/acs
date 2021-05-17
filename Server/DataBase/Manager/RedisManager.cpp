@@ -5,6 +5,8 @@
 #include<NetWork/RemoteScheduler.h>
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Script/MysqlExtension.h>
+#include<Script/ClassProxyHelper.h>
 namespace SoEasy
 {
 	RedisManager::RedisManager()
@@ -78,6 +80,11 @@ namespace SoEasy
 		value = "";
 		this->GetValue("name", value);
 		SayNoDebugFatal("name = " << value);
+	}
+
+	void RedisManager::PushClassToLua(lua_State * luaEnv)
+	{
+		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
 	}
 
 	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)

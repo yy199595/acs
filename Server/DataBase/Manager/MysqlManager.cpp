@@ -79,8 +79,7 @@ namespace SoEasy
 
 	void MysqlManager::PushClassToLua(lua_State * luaEnv)
 	{
-		ClassProxyHelper::BeginNewTalbe(luaEnv, "MysqlClient");
-		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "MysqlClient", "InvokeCommand", MysqlClient::InvokeCommand);
+		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeMysqlCommand", SoEasy::InvokeMysqlCommand);
 	}
 
 	bool MysqlManager::StartConnectMysql()
