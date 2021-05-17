@@ -137,6 +137,7 @@
     <ClCompile Include="QueryResult\InvokeResultData.cpp" />
     <ClCompile Include="RedisClient\RedisLuaTask.cpp" />
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
+    <ClCompile Include="RedisClient\RedisTaskBase.cpp" />
     <ClCompile Include="Script\MysqlExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +150,7 @@
     <ClInclude Include="RedisClient\RedisDefine.h" />
     <ClInclude Include="RedisClient\RedisLuaTask.h" />
     <ClInclude Include="RedisClient\RedisTaskAction.h" />
+    <ClInclude Include="RedisClient\RedisTaskBase.h" />
     <ClInclude Include="Script\MysqlExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

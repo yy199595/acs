@@ -1,5 +1,6 @@
 #include"MysqlExtension.h"
 #include<Manager/MysqlManager.h>
+#include<Manager/RedisManager.h>
 #include<MysqlClient/MysqlLuaTask.h>
 #include<RedisClient/RedisLuaTask.h>
 int SoEasy::InvokeMysqlCommand(lua_State * lua)
@@ -20,26 +21,39 @@ int SoEasy::InvokeMysqlCommand(lua_State * lua)
 int SoEasy::InvokeRedisCommand(lua_State * luaEnv)
 {
 	int n = lua_gettop(luaEnv);
-	std::stringstream stringBuffer;
-	std::vector<std::string> command;
-	for (int i = 1; i <= n; i++)
+	if (!lua_isstring(luaEnv, 1))
+	{
+		lua_pushnil(luaEnv);
+		return 1;
+	}
+	Applocation * app = Applocation::Get();
+	RedisManager * redisManager = app->GetManager<RedisManager>();
+
+	const char * cmd = lua_tostring(luaEnv, 1);
+	lua_pushthread(luaEnv);
+	shared_ptr<RedisLuaTask> taskAction = RedisLuaTask::Create(luaEnv, -1, cmd);
+	if (taskAction == nullptr)
+	{
+		lua_pushnil(luaEnv);
+		return 1;
+	}
+	for (int i = 2; i <= n; i++)
 	{
 		lua_pushvalue(luaEnv, -1);
 		lua_pushvalue(luaEnv, i);
 		if (lua_isnumber(luaEnv, -1))
 		{
 			long long num = lua_tointeger(luaEnv, -1);
-			command.push_back(std::to_string(num));
+			taskAction->AddCommandArgv(std::to_string(num));
 		}
 		else if (lua_isstring(luaEnv, -1))
 		{
 			size_t size = 0;
 			const char * str = lua_tolstring(luaEnv, -1, &size);
-			command.push_back(std::string(str, size));
+			taskAction->AddCommandArgv(str, size);
 		}
 	}
-	lua_pushthread(luaEnv);
-	if (RedisLuaTask::Start(luaEnv, -1, command))
+	if (redisManager->StartTaskAction(taskAction))
 	{
 		return lua_yield(luaEnv, 1);
 	}

@@ -47,6 +47,9 @@
     <ClCompile Include="RedisClient\RedisLuaTask.cpp">
       <Filter>RedisClient</Filter>
     </ClCompile>
+    <ClCompile Include="RedisClient\RedisTaskBase.cpp">
+      <Filter>RedisClient</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h">
@@ -77,6 +80,9 @@
       <Filter>MysqlClient</Filter>
     </ClInclude>
     <ClInclude Include="RedisClient\RedisLuaTask.h">
+      <Filter>RedisClient</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisClient\RedisTaskBase.h">
       <Filter>RedisClient</Filter>
     </ClInclude>
   </ItemGroup>

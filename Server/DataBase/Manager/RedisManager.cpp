@@ -87,36 +87,9 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
 	}
 
-	shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const char * format, ...)
-	{
-		if (this->mCoroutineScheduler->IsInMainCoroutine())
-		{
-			SayNoDebugError("[redis error] redis not in coreoutine");
-			return make_shared<InvokeResultData>(XCode::RedisNotInCoroutine);
-		}
-		
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskActionId, this->mCoroutineScheduler);
-		
-		va_list command;
-		va_start(command, format);
-		taskAction->InitCommand(format, command);
-		va_end(command);
-
-		if (!this->StartTaskAction(taskAction))
-		{
-			SayNoDebugError("[redis error] start redis task fail");
-			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
-		}
-
-		this->mCoroutineScheduler->YieldReturn();
-
-		return taskAction->GetInvokeData();
-	}
-
 	bool RedisManager::HasValue(const char * key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET %s", key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
 		if (queryData->GetCode() == XCode::Successful)
 		{
 			rapidjson::Value jsonValue;
@@ -127,7 +100,7 @@ namespace SoEasy
 
 	bool RedisManager::HasValue(const char * tab, const char * key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HEXISTS %s %s", tab, key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HEXISTS", tab, key);
 		if (queryData->GetCode() == XCode::Successful)
 		{
 			return queryData->GetInt64() == 1;
@@ -137,13 +110,13 @@ namespace SoEasy
 
 	bool RedisManager::DelValue(const char * key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("DEL %s", key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("DEL", key);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
 	bool RedisManager::DelValue(const char * tab, const char * key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HDEL %s %S", tab, key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HDEL", tab, key);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
@@ -153,19 +126,19 @@ namespace SoEasy
 		{
 			this->SetValue(key, value);
 		}
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("EXPIRE %s %d", key, second);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("EXPIRE", key, second);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const char * key, const std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("SET %s %b", key, value.c_str(), value.size());
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("SET", key, value);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const char * tab, const char * key, const std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HSET %s %s %b", tab, key, value.c_str(), value.size());
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HSET", tab, key, value);
 		return queryData->GetCode() == XCode::Successful;
 		
 	}
@@ -182,7 +155,7 @@ namespace SoEasy
 
 	bool RedisManager::GetValue(const char * key, std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET %s", key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
 		if (queryData->GetCode() == XCode::Successful)
 		{
 			rapidjson::Value jsonValue;

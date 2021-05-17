@@ -4,16 +4,11 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	RedisLuaTask::RedisLuaTask(RedisManager * mgr, long long taskId, lua_State * lua, int ref)
-		:ThreadTaskAction(mgr, taskId)
+	RedisLuaTask::RedisLuaTask(RedisManager * mgr, long long taskId, const std::string & cmd, lua_State * lua, int ref)
+		:RedisTaskBase(mgr, taskId, cmd)
 	{
 		this->mLuaEnv = lua;
-		this->mRedisManager = mgr;
 		this->mCoroutienRef = ref;
-	}
-	void RedisLuaTask::InitCommand(std::vector<std::string> & command)
-	{
-		this->mCommand = command;
 	}
 
 	void RedisLuaTask::OnTaskFinish()
@@ -34,93 +29,22 @@ namespace SoEasy
 			}
 			lua_resume(coroutine, this->mLuaEnv, 1);
 		}
-		if (this->mErrorCode != XCode::Successful)
+		if (this->GetErrorCode() != XCode::Successful)
 		{
-			SayNoDebugError("[redis error ]" << this->mErrorString);
+			SayNoDebugError("[redis error ]" << this->GetErrorStr());
 		}
 	}
 
-	void RedisLuaTask::InvokeInThreadPool(long long threadId)
+	void RedisLuaTask::OnQueryFinish(QuertJsonWritre & jsonWriter)
 	{
-		QuertJsonWritre jsonWrite;
-		RedisSocket * redisSocket = this->mRedisManager->GetRedisSocket(threadId);
-		if (redisSocket == nullptr)
-		{
-			this->mErrorString = "redis scoket null";
-			this->mErrorCode = XCode::RedisSocketIsNull;
-			this->EndWriteJson(jsonWrite);
-			return;
-		}
-		
-
-		for (size_t index = 0; index < this->mCommand.size(); index++)
-		{
-			this->mArgvArray[index] = this->mCommand[index].c_str();
-			this->mArgvSizeArray[index] = this->mCommand[index].size();
-		}
-		const int size = (int)this->mCommand.size();
-		redisReply * replay = (redisReply*)redisCommandArgv(redisSocket,size, this->mArgvArray, this->mArgvSizeArray);
-
-		//redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
-		if (replay == nullptr)
-		{
-			this->mErrorString = "redis replay null";
-			this->mErrorCode = XCode::RedisReplyIsNull;
-			this->EndWriteJson(jsonWrite);
-			return;
-		}
-		switch (replay->type)
-		{
-		case REDIS_REPLY_STATUS:
-			this->mErrorCode = XCode::Successful;
-			break;
-		case REDIS_REPLY_ERROR:
-			this->mErrorCode = RedisInvokeFailure;
-			this->mErrorString.assign(replay->str, replay->len);
-			break;
-		case REDIS_REPLY_INTEGER:
-			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data", replay->integer);
-			break;
-		case REDIS_REPLY_NIL:
-			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data");
-			break;
-		case REDIS_REPLY_STRING:
-			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data", replay->str, replay->len);
-			break;
-		case REDIS_REPLY_ARRAY:
-			jsonWrite.StartWriteArray("data");
-			this->mErrorCode = XCode::Successful;
-			for (size_t index = 0; index < replay->elements; index++)
-			{
-				redisReply * redisData = replay->element[index];
-				if (redisData->type == REDIS_REPLY_INTEGER)
-				{
-					jsonWrite.Write(redisData->integer);
-				}
-				else if (redisData->type == REDIS_REPLY_STRING)
-				{
-					jsonWrite.Write(redisData->str, redisData->len);
-				}
-				else if (redisData->type == REDIS_REPLY_NIL)
-				{
-					jsonWrite.Write();
-				}
-			}
-			jsonWrite.EndWriteArray();
-			break;
-		}
-		freeReplyObject(replay);
-		this->EndWriteJson(jsonWrite);
+		SayNoAssertRet_F(jsonWriter.Serialization(mQueryJsonData));
 	}
 
-	bool RedisLuaTask::Start(lua_State * lua, int index, std::vector<std::string> & cmmand)
+	shared_ptr<RedisLuaTask> RedisLuaTask::Create(lua_State * lua, int index, const char * cmd)
 	{
 		if (!lua_isthread(lua, index))
 		{
-			return false;
+			return nullptr;
 		}
 		Applocation * app = Applocation::Get();
 		lua_State * coroutine = lua_tothread(lua, index);
@@ -131,18 +55,6 @@ namespace SoEasy
 			return false;
 		}
 		long long taskId = NumberHelper::Create();
-		shared_ptr<RedisLuaTask> taskAction = std::make_shared<RedisLuaTask>(redisManager, taskId, lua, ref);
-		taskAction->InitCommand(cmmand);
-		return redisManager->StartTaskAction(taskAction);
-	}
-	void RedisLuaTask::EndWriteJson(QuertJsonWritre & jsonWrite)
-	{
-		jsonWrite.Write("code", (long long)this->mErrorCode);
-		jsonWrite.Write("error", this->mErrorString.c_str(), this->mErrorString.size());
-		if (!jsonWrite.Serialization(mQueryJsonData))
-		{
-			this->mErrorCode = XCode::RedisJsonParseFail;
-			SayNoDebugFatal("mysql result cast json failure");
-		}
+		return std::make_shared<RedisLuaTask>(redisManager, taskId, cmd, lua, ref);
 	}
 }
