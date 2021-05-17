@@ -42,27 +42,55 @@ namespace SoEasy
 
 	bool CoroutineManager::OnInit()
 	{		
-		this->mTimerManager = this->GetManager<TimerManager>(); 
-		SayNoAssertRetFalse_F(this->mTimerManager);
+		mCoroutinePoolMaxSize = CoroutinePoolMaxCount;
+		this->GetConfig().GetValue("CoroutinePoolMaxSize", mCoroutinePoolMaxSize);
+		SayNoAssertRetFalse_F(this->mTimerManager = this->GetManager<TimerManager>());
+
+		for (int index = 0; index < mCoroutinePoolMaxSize; index++)
+		{
+			Coroutine * coroutine = new Coroutine();
+
+			coroutine->mStackSize = 0;
+			coroutine->mScheduler = this;
+			coroutine->mCoroutineId = 0;
+			coroutine->mContextStack = nullptr;
+			this->mCoroutinePool.push(coroutine);
+		}
+		SayNoDebugLog("create " << mCoroutinePoolMaxSize << " coroutine");
 		return true;
 	}
 
 	void CoroutineManager::OnInitComplete()
 	{	
-		
+			
 	}
 
-	long long CoroutineManager::Start(CoroutineAction func)
+	long long CoroutineManager::Start(const std::string & name, CoroutineAction func)
 	{
-		long long id = this->Create(func);
+		long long id = this->Create(name, func);
 		this->Resume(id);
 		return id;
 	}
 
-	long long CoroutineManager::Create(CoroutineAction func)
+	long long CoroutineManager::Create(const std::string & name, CoroutineAction func)
 	{
 		long long id = NumberHelper::Create();
-		Coroutine * pCoroutine = new Coroutine(id, func);
+		Coroutine *	pCoroutine = nullptr;
+		if (!this->mCoroutinePool.empty())
+		{
+			pCoroutine = this->mCoroutinePool.front();
+			this->mCoroutinePool.pop();
+		}
+		else
+		{
+			pCoroutine = new Coroutine();
+			pCoroutine->mStackSize = 0;
+			pCoroutine->mContextStack = nullptr;		
+		}
+		pCoroutine->mBindFunc = func;
+		pCoroutine->mCoroutineId = id;
+		pCoroutine->mCoroutineName = name;
+		pCoroutine->mState = CorState::Ready;
 		this->mCoroutineMap.insert(std::make_pair(id, pCoroutine));
 		return pCoroutine->mCoroutineId;
 	}
@@ -92,6 +120,7 @@ namespace SoEasy
 			{
 				this->mCurrentCorId = id;
 #ifdef _WIN32
+				pCoroutine->mStackSize = STACK_SIZE;
 				pCoroutine->mContextStack = CreateFiber(STACK_SIZE, WinEntry, this);
 				SwitchToFiber(pCoroutine->mContextStack);
 #else
@@ -103,7 +132,6 @@ namespace SoEasy
 				makecontext(&pCoroutine->mCorContext, (void(*)(void))LinuxEntry, 1, this);
 				swapcontext(&this->mMainContext, &pCoroutine->mCorContext);
 #endif
-
 			}
 			else if (pCoroutine->mState == CorState::Suspend)
 			{
@@ -156,11 +184,10 @@ namespace SoEasy
 			this->mCurrentCorId = 0;
 			Coroutine * cor = iter->second;
 			this->mCoroutineMap.erase(iter);
-#ifdef _WIN32
 			mDestoryCoroutine.push(cor);
+#ifdef _WIN32	
 			SwitchToFiber(this->mMainCoroutineStack);
 #else
-			delete cor;
 			setcontext(&mMainContext);
 #endif
 		}
@@ -188,13 +215,27 @@ namespace SoEasy
 	
 	void CoroutineManager::OnFrameUpdate(float t)
 	{
-#ifdef _WIN32
 		while (!this->mDestoryCoroutine.empty())
 		{
 			Coroutine * pCoroutine = this->mDestoryCoroutine.front();
 			this->mDestoryCoroutine.pop();
-			delete pCoroutine;
-		}
+			if (this->mCoroutinePool.size() >= mCoroutinePoolMaxSize)
+			{
+				delete pCoroutine;
+				continue;
+			}
+			else
+			{
+#ifdef _WIN32
+				if (pCoroutine->mContextStack != nullptr)
+				{
+					DeleteFiber(pCoroutine->mContextStack);
+					pCoroutine->mContextStack = nullptr;
+					pCoroutine->mStackSize = 0;
+				}
 #endif
+				this->mCoroutinePool.push(pCoroutine);
+			}
+		}
 	}
 }

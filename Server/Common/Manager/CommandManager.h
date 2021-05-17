@@ -36,8 +36,8 @@ namespace SoEasy
 		unsigned short mListenerPort;
 	private:
 		std::mutex mSessionLock;
-		TcpSessionListener * mTcpListener;
 		std::vector<std::string> mAllCommandList;
+		shared_ptr<TcpSessionListener> mTcpListener;
 		std::queue<NetMessageBuffer *> mSendMessageQueue;
 		std::unordered_map<std::string, CommandBase *> mCommonActions;
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mTcpSessionMap;

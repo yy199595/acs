@@ -124,6 +124,7 @@ namespace SoEasy
 			return false;
 		}
 		this->mAsioContext.post(this->mRecvAction);
+		return true;
 	}
 
 	void TcpClientSession::Connect()

@@ -4,6 +4,7 @@
 namespace SoEasy
 {
 	class MysqlManager;
+	class QuertJsonWritre;
 	class MysqlLuaTask : public ThreadTaskAction
 	{
 	public:
@@ -14,6 +15,8 @@ namespace SoEasy
 		 void InvokeInThreadPool(long long threadId) final;
 	public:
 		static bool Start(lua_State * lua, int index, const std::string & db, const std::string & sql);
+	private:
+		void EndWriteJson(QuertJsonWritre & jsonWrite);
 	private:
 		XCode mErrorCode;
 		std::string mErrorStr;

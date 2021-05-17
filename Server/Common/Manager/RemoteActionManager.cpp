@@ -25,9 +25,13 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 		this->mActionQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
-		SayNoAssertRetFalse_F(this->mActionQuerySession->StartConnect());
-
 		return true;
+	}
+
+	void RemoteActionManager::OnInitComplete()
+	{
+		SayNoAssertRet_F(this->mActionQuerySession->StartConnect());
+		SayNoDebugInfo("connect query address " << mQueryIp << ":" << mQueryPort);
 	}
 
 	void RemoteActionManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)

@@ -11,6 +11,7 @@ namespace Client
 		~ClientManager() { }
 	protected:
 		bool OnInit() override;
+		void OnInitComplete() override;
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession);
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession);
 	private:

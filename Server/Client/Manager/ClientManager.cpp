@@ -28,6 +28,11 @@ namespace Client
 		return this->mClientSession != nullptr;
 	}
 
+	void ClientManager::OnInitComplete()
+	{
+		this->mCoroutineManager->Sleep(1000);
+	}
+
 	void ClientManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
 		tcpSession->StartConnect();
@@ -35,8 +40,7 @@ namespace Client
 
 	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(1000000));
-		for (size_t index = 0; index < 100; index++)
+		/*for (size_t index = 0; index < 100; index++)
 		{
 			this->mCoroutineManager->Start([this, tcpSession]()
 			{
@@ -61,6 +65,6 @@ namespace Client
 					SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
 				}
 			});
-		}
+		}*/
 	}
 }

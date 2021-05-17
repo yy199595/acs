@@ -114,7 +114,8 @@ namespace SoEasy
 		for (size_t index = 0; index < this->mSortManagers.size(); index++)
 		{
 			this->mCurrentManager = this->mSortManagers[index];
-			corManager->Start(BIND_ACTION_0(Manager::OnInitComplete, this->mCurrentManager));
+			const std::string name = this->mCurrentManager->GetTypeName() + ".OnInitComplete";
+			corManager->Start(name, BIND_ACTION_0(Manager::OnInitComplete, this->mCurrentManager));
 		}
 		return true;
 	}

@@ -20,6 +20,7 @@ namespace SoEasy
 				AsioTcpEndPoint tBindPoint(asio::ip::tcp::v4(), this->mListenerPort);
 				this->mBindAcceptor = new AsioTcpAcceptor(mAsioContext, tBindPoint);
 				this->mBindAcceptor->listen();
+				this->mListenAction = BIND_THIS_ACTION_0(TcpSessionListener::Listen);
 			}
 			catch (const asio::system_error& e)
 			{
@@ -31,12 +32,7 @@ namespace SoEasy
 		return false;
 	}
 
-	shared_ptr<TcpClientSession> TcpSessionListener::CreateTcpSession(SharedTcpSocket socket)
-	{
-		return std::make_shared<TcpClientSession>(this->mDispatchManager, socket);
-	}
-
-	void TcpSessionListener::StartAcceptConnect()
+	void TcpSessionListener::Listen()
 	{
 		SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(mAsioContext);
 		this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code & code)
@@ -47,8 +43,18 @@ namespace SoEasy
 				std::string ip = tcpSocket->remote_endpoint().address().to_string();
 				this->mDispatchManager->CreateTcpSession(tcpSocket);
 			}
-			this->mAsioContext.post(std::bind(&TcpSessionListener::StartAcceptConnect, this));
+			this->mAsioContext.post(mListenAction);
 		});
+	}
+
+	shared_ptr<TcpClientSession> TcpSessionListener::CreateTcpSession(SharedTcpSocket socket)
+	{
+		return std::make_shared<TcpClientSession>(this->mDispatchManager, socket);
+	}
+
+	void TcpSessionListener::StartAcceptConnect()
+	{
+		this->mAsioContext.post(mListenAction);
 	}
 
 	TcpSessionListener::~TcpSessionListener()

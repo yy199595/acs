@@ -14,6 +14,7 @@
     "MysqlUserName": "root",
     "ThreadCount":0,
     "ReConnectTime":5,
+    "CoroutinePoolMaxSize":100,
     "MysqlPassWord": "ZupKXuUbnHoffpmu",
     "ScriptMain":"./Script/Server/Main.lua",
     "ScriptInclude":

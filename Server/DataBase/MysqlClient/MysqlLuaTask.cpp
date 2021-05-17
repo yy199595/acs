@@ -20,42 +20,42 @@ namespace SoEasy
 		if (lua_isthread(this->mLuaEnv, -1))
 		{
 			lua_State * coroutine = lua_tothread(this->mLuaEnv, -1);
-			lua_pushinteger(coroutine, (int)this->mErrorCode);
-			if (this->mErrorCode == XCode::Successful)
+			if (lua_getfunction(this->mLuaEnv, "JsonUtil", "ToObject"))
 			{
-				if (lua_getfunction(this->mLuaEnv, "JsonUtil", "ToObject"))
+				const char * json = this->mQueryJsonData.c_str();
+				const size_t size = this->mQueryJsonData.size();
+				lua_pushlstring(this->mLuaEnv, json, size);
+				if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
 				{
-					const char * json = this->mQueryJsonData.c_str();
-					const size_t size = this->mQueryJsonData.size();
-					lua_pushlstring(this->mLuaEnv, json, size);
-					if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
-					{
-						SayNoDebugError("[lua error] " << lua_tostring(mLuaEnv, -1));
-					}
+					SayNoDebugError("[lua error] " << lua_tostring(mLuaEnv, -1));
 				}
 			}
-			else
-			{
-				const char * str = this->mErrorStr.c_str();
-				const size_t size = this->mErrorStr.size();
-				lua_pushlstring(this->mLuaEnv, str, size);
-			}		
-			lua_resume(coroutine, this->mLuaEnv, 2);
+			lua_resume(coroutine, this->mLuaEnv, 1);
+		}
+		if (this->mErrorCode != XCode::Successful)
+		{
+			SayNoDebugError("[mysql error ]" << this->mErrorStr);
+			SayNoDebugError("[mysql sql   ]" << this->mCommandSql);
 		}
 	}
 
 	void MysqlLuaTask::InvokeInThreadPool(long long threadId)
 	{
+		QuertJsonWritre jsonWrite;
 		SayNoMysqlSocket * mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
 		if (mysqlSocket == nullptr)
 		{
 			this->mErrorCode = MysqlSocketIsNull;
+			this->mErrorStr = "mysql socket null";
+			this->EndWriteJson(jsonWrite);
 			return;
 		}
 
 		if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
 		{
 			this->mErrorCode = MysqlSelectDbFailure;
+			this->mErrorStr = "select " + this->mDataBaseName + " fail";
+			this->EndWriteJson(jsonWrite);
 			return;
 		}
 		const char * data = this->mCommandSql.c_str();
@@ -64,13 +64,14 @@ namespace SoEasy
 		{
 			this->mErrorCode = MysqlInvokeFailure;
 			this->mErrorStr = mysql_error(mysqlSocket);
+			this->EndWriteJson(jsonWrite);
 			return;
 		}
+
 		this->mErrorCode = XCode::Successful;
 		MysqlQueryResult * queryResult = mysql_store_result(mysqlSocket);
 		if (queryResult != nullptr)
 		{
-			QuertJsonWritre jsonWrite;
 			std::vector<char *> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
 			unsigned int fieldCount = mysql_field_count(mysqlSocket);
@@ -109,12 +110,8 @@ namespace SoEasy
 				jsonWrite.EndWriteArray();
 			}
 			mysql_free_result(queryResult);
-			if (!jsonWrite.Serialization(mQueryJsonData))
-			{
-				this->mErrorCode = XCode::RedisJsonParseFail;
-				this->mErrorStr = "mysql result cast json failure";
-			}
 		}
+		this->EndWriteJson(jsonWrite);
 	}
 
 	bool MysqlLuaTask::Start(lua_State * lua, int index, const std::string & db, const std::string & sql)
@@ -135,4 +132,16 @@ namespace SoEasy
 		shared_ptr<MysqlLuaTask> taskAction =  std::make_shared<MysqlLuaTask>(mysqlManager, taskId, lua, ref, db, sql);
 		return mysqlManager->StartTaskAction(taskAction);
 	}
+
+	void MysqlLuaTask::EndWriteJson(QuertJsonWritre & jsonWrite)
+	{	
+		jsonWrite.Write("code", (long long)this->mErrorCode);
+		jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
+		if (!jsonWrite.Serialization(mQueryJsonData))
+		{
+			this->mErrorCode = XCode::RedisJsonParseFail;
+			SayNoDebugFatal("mysql result cast json failure");
+		}
+	}
+
 }

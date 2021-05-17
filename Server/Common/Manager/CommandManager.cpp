@@ -21,23 +21,17 @@ namespace SoEasy
 	bool CommandManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("CommondPort", this->mListenerPort));
+		this->mTcpListener = make_shared<TcpSessionListener>(this, this->mListenerPort);
+		SayNoAssertRetFalse_F(this->mTcpListener->InitListener());
 		return true;
 	}
 
 	void CommandManager::OnInitComplete()
 	{
-		unsigned short port = 0;
-		if (this->GetConfig().GetValue("CommandPort", port))
-		{
-			this->mTcpListener = new TcpSessionListener(this, port);
-			this->mSessionLock.lock();
-			this->mTcpListener->StartAcceptConnect();
-			this->mSessionLock.unlock();
-			SayNoDebugInfo("start command listener port : " << port);
-		}
-
+		this->mTcpListener->StartAcceptConnect();
 		this->AddCommandAction("stop", new StopCommand());
 		this->AddCommandAction("state", new StateCommand());
+		SayNoDebugInfo("start command listener port : " << this->mListenerPort);
 	}
 
 	bool CommandManager::AddCommandAction(const std::string gm, CommandBase * command)

@@ -11,6 +11,8 @@
 #endif
 #include<Manager/Manager.h>
 #include<NetWork/TcpClientSession.h>
+
+#define CoroutinePoolMaxCount 100	//协程池最大数量
 namespace SoEasy
 {
 	struct Coroutine;
@@ -19,8 +21,8 @@ namespace SoEasy
 	public:
 		CoroutineManager();
 	public:
-		long long Start(CoroutineAction func);
-		long long Create(CoroutineAction func);
+		long long Start(const std::string & name, CoroutineAction func);
+		long long Create(const std::string & name, CoroutineAction func);
 	public:
 		void YieldReturn();
 		void Sleep(long long ms);
@@ -46,10 +48,12 @@ namespace SoEasy
 #ifndef _WIN32
 		ucontext_t mMainContext;
 #else
-		void * mMainCoroutineStack;
-		std::queue<Coroutine *> mDestoryCoroutine;
+		void * mMainCoroutineStack;	
 #endif
+		int mCoroutinePoolMaxSize;  //协程池默认数量
 		char mSharedStack[STACK_SIZE];
+		std::queue<Coroutine *> mCoroutinePool;
+		std::queue<Coroutine *> mDestoryCoroutine;
 		std::unordered_map<long long, Coroutine *> mCoroutineMap;
 	};
 }

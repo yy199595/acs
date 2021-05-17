@@ -17,7 +17,7 @@ namespace SoEasy
 	struct Coroutine
 	{
 	public:
-		Coroutine(long long id, CoroutineAction func);
+		Coroutine() { }
 		~Coroutine();
 	public:
 		size_t mStackSize;
@@ -28,6 +28,7 @@ namespace SoEasy
 		CorState mState;
 		long long mCoroutineId;
 		CoroutineAction mBindFunc;
+		std::string mCoroutineName;
 		CoroutineManager * mScheduler;
 	};
 }

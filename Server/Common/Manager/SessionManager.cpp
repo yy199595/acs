@@ -118,7 +118,7 @@ namespace SoEasy
 			}
 			else  //在协程中执行
 			{
-				this->mCoroutineSheduler->Start([this, packet, address]()
+				this->mCoroutineSheduler->Start(packet->func_name(), [this, packet, address]()
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 					XCode code = this->InvokeAction(this->mCurrentSession, packet, returnPacket);

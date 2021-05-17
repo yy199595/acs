@@ -8,14 +8,6 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	void ActionRegisterManager::OnInitComplete()
-	{
-		SessionManager::OnInitComplete();
-		this->mNetWorkManager = this->GetManager<NetWorkManager>();
-		this->mTcpSessionListener->StartAcceptConnect();
-		SayNoDebugInfo("start listen port : " << this->mTcpSessionListener->GetListenPort());
-	}
-
 	bool ActionRegisterManager::OnInit()
 	{
 		std::string listenAddress;
@@ -27,7 +19,16 @@ namespace SoEasy
 		REGISTER_FUNCTION_2(ActionRegisterManager::QueryActions, Int32Data, ActionInfoList);
 
 		mTcpSessionListener = make_shared<TcpSessionListener>(this, mListenPort);
-		return mTcpSessionListener->InitListener();
+		SayNoAssertRetFalse_F(mTcpSessionListener->InitListener());
+		return true;
+	}
+
+	void ActionRegisterManager::OnInitComplete()
+	{
+		SessionManager::OnInitComplete();
+		this->mNetWorkManager = this->GetManager<NetWorkManager>();
+		this->mTcpSessionListener->StartAcceptConnect();
+		SayNoDebugInfo("start listen port : " << this->mTcpSessionListener->GetListenPort());
 	}
 
 	void ActionRegisterManager::OnSecondUpdate()

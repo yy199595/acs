@@ -13,7 +13,8 @@ namespace SoEasy
 		RemoteActionManager();
 		~RemoteActionManager() { }
 	protected:
-		bool OnInit() override;
+		bool OnInit() final;
+		void OnInitComplete() final;
 		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
 		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
 	public:

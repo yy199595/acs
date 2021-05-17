@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>../GM;../Libs/include/asio;../Libs/include/rapidjson;$(IncludePath)</IncludePath>
-    <OutDir>..\..\bin</OutDir>
-    <IntDir>..\..\bin\debug\gm</IntDir>
+    <OutDir>..\bin</OutDir>
+    <IntDir>..\bin\debug\gm</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
