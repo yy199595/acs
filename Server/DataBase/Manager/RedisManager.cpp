@@ -5,8 +5,12 @@
 #include<NetWork/RemoteScheduler.h>
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
-#include<Script/MysqlExtension.h>
 #include<Script/ClassProxyHelper.h>
+
+extern "C"
+{
+#include<Script/MysqlExtension.h>
+}
 namespace SoEasy
 {
 	RedisManager::RedisManager()

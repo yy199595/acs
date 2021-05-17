@@ -7,7 +7,10 @@
 #include<MysqlClient/MysqlTaskAction.h>
 #include<Util/StringHelper.h>
 #include<Script/ClassProxyHelper.h>
-#include<Script/MysqlExtension.h>
+extern "C"
+{
+	#include<Script/MysqlExtension.h>
+}
 namespace SoEasy
 {
 	MysqlManager::MysqlManager()
