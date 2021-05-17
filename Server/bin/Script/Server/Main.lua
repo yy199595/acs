@@ -31,8 +31,8 @@ function Main.Start()
             person.Age = 24
            
             local redisClient = require("DataBase.RedisClient")
-            print(redisClient.SetValue("yjz_person",person), "-------------")
-
+            print(redisClient.SetTimeoutValue("yjz_person", person, 1000), "-------------")
+            SoEasy.Sleep(500)
             local jsonValue = redisClient.GetValue("yjz_person")
             SoEasy.Info(jsonValue)
         end
