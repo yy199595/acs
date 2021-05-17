@@ -1,4 +1,5 @@
 #pragma once
+#include<Util/NumberHelper.h>
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
 #include<RedisClient/RedisTaskAction.h>
