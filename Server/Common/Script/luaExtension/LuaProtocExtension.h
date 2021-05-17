@@ -1,6 +1,6 @@
 #pragma once
 #include<Script/LuaInclude.h>
-namespace SoEasy
+extern "C"
 {
 	namespace LuaProtocExtension
 	{
