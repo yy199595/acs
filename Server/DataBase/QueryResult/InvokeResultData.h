@@ -1,4 +1,5 @@
 #pragma once
+#include<memory>
 #include<XCode/XCode.h>
 #include<rapidjson/writer.h>
 #include<rapidjson/document.h>
