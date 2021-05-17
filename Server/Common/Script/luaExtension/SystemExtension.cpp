@@ -8,10 +8,10 @@
 #include<Manager/NetWorkManager.h>
 #include<Manager/LocalActionManager.h>
 #include<NetWork/NetLuaAction.h>
-using namespace SoEasy;
-namespace SystemExtension
+
+namespace SoEasy
 {
-	int Call(lua_State * lua)
+	int SystemExtension::Call(lua_State * lua)
 	{
 		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
 		if (tcpSession == nullptr)
@@ -67,14 +67,14 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int GetApp(lua_State * luaEnv)
+	int SystemExtension::GetApp(lua_State * luaEnv)
 	{
 		Applocation * pApplocation = Applocation::Get();
 		LuaParameter::Write<Applocation *>(luaEnv, pApplocation);
 		return 1;
 	}
 
-	int GetManager(lua_State * luaEnv)
+	int SystemExtension::GetManager(lua_State * luaEnv)
 	{
 		if (lua_isstring(luaEnv, -1))
 		{
@@ -91,7 +91,7 @@ namespace SystemExtension
 		return 0;
 	}
 
-	int BindAction(lua_State * luaEnv)
+	int SystemExtension::BindAction(lua_State * luaEnv)
 	{
 
 		Applocation * pApplocation = Applocation::Get();
@@ -127,7 +127,7 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int SendByAddress(lua_State * luaEnv)
+	int SystemExtension::SendByAddress(lua_State * luaEnv)
 	{
 		Applocation * pApplocation = Applocation::Get();
 		NetWorkManager * manager = pApplocation->GetManager<NetWorkManager>();
@@ -158,7 +158,7 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int CallWait(lua_State * luaEnv)
+	int SystemExtension::CallWait(lua_State * luaEnv)
 	{
 		if (!lua_isuserdata(luaEnv, 2))
 		{
@@ -182,7 +182,7 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int CallAction(lua_State * luaEnv)
+	int SystemExtension::CallAction(lua_State * luaEnv)
 	{
 		lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
@@ -235,7 +235,7 @@ namespace SystemExtension
 		return lua_yield(luaEnv, 1);
 	}
 
-	int Start(lua_State * luaEnv)
+	int SystemExtension::Start(lua_State * luaEnv)
 	{
 		lua_State * coroutine = lua_newthread(luaEnv);
 		lua_pushvalue(luaEnv, 1);
@@ -248,7 +248,7 @@ namespace SystemExtension
 		return lua_resume(coroutine, luaEnv, size - 1);
 	}
 
-	int Sleep(lua_State * luaEnv)
+	int SystemExtension::Sleep(lua_State * luaEnv)
 	{	
 		long long ms = lua_tointeger(luaEnv, 1);
 		lua_pushthread(luaEnv);		
@@ -261,7 +261,7 @@ namespace SystemExtension
 		return lua_yield(luaEnv, 1);
 	}
 
-	int AddTimer(lua_State * lua)
+	int SystemExtension::AddTimer(lua_State * lua)
 	{
 		if (!lua_isfunction(lua, 1))
 		{
@@ -296,7 +296,7 @@ namespace SystemExtension
 		}
 		return 0;
 	}
-	int RemoveTimer(lua_State * lua)
+	int SystemExtension::RemoveTimer(lua_State * lua)
 	{
 		if (lua_isinteger(lua, 1))
 		{
