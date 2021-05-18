@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.3)
-PROJECT(Server)
+PROJECT(Server1)
 
 add_subdirectory(ServerData)
 add_subdirectory(Common)

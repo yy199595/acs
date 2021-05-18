@@ -17,8 +17,12 @@ include_directories(../DataBase)
 include_directories(../CoreLogic)
 include_directories(../ServerData)
 
+aux_source_directory(../Common SUPER_SRC)
+aux_source_directory(../DataBase SUPER_SRC)
+aux_source_directory(../CoreLogic SUPER_SRC)
+aux_source_directory(../ServerData SUPER_SRC)
 aux_source_directory(./main.cpp SUPER_SRC)
-
+message(${SUPER_SRC})
 LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
 SET(CMAKE_CXX_COMPILER_ARG1 "g++")
