@@ -215,10 +215,10 @@ namespace SoEasy
 
 	void ScriptManager::RegisterExtension(lua_State * lua)
 	{
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Log", LuaAPIExtension::DebugLog);
+		/*ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Log", LuaAPIExtension::DebugLog);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Info", LuaAPIExtension::DebugInfo);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Error", LuaAPIExtension::DebugError);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Warning", LuaAPIExtension::DebugWarning);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Warning", LuaAPIExtension::DebugWarning);*/
 
 
 		lua_newtable(lua);
