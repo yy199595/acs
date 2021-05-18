@@ -1,5 +1,5 @@
 #pragma once
-#include<CommonScript/LuaInclude.h>
+#include<Script/LuaInclude.h>
 namespace SystemExtension
 {
 	extern int Call(lua_State * luaEnv);
