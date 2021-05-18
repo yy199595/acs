@@ -152,7 +152,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetYearMonthDayString", TimeHelper::GetYearMonthDayString);
 		
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
+		/*ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Start", SystemExtension::Start);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallWait", SystemExtension::CallWait);
@@ -166,7 +166,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CreateByTable", LuaProtocExtension::CreateByTable);
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "BindAction", SystemExtension::BindAction);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "SendByAddress", SystemExtension::SendByAddress);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "SendByAddress", SystemExtension::SendByAddress);*/
 
 	}
 

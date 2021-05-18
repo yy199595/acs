@@ -18,33 +18,14 @@ namespace SoEasy
 
 	bool MysqlManager::OnInit()
 	{
+		std::string mysqlAddress;
 		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 
-		std::string mysqlAddress;
-		if (!GetConfig().GetValue("MysqlAddress", mysqlAddress))
-		{
-			SayNoDebugError("not find field 'MysqlAddress'");
-			return false;
-		}
-
-		if (!StringHelper::ParseIpAddress(mysqlAddress, mMysqlIp, mMysqlPort))
-		{
-			SayNoDebugError("parse 'MysqlAddress' fail");
-			return false;
-		}
-
-		if (!GetConfig().GetValue("MysqlUserName", mDataBaseUser))
-		{
-			SayNoDebugError("not find field 'MysqlUserName'");
-			return false;
-		}
-
-		if (!GetConfig().GetValue("MysqlPassWord", mDataBasePasswd))
-		{
-			SayNoDebugError("not find field 'MysqlPassWord'");
-			return false;
-		}
+		SayNoAssertRetFalse_F(GetConfig().GetValue("MysqlAddress", mysqlAddress));
+		SayNoAssertRetFalse_F(GetConfig().GetValue("MysqlUserName", mDataBaseUser));
+		SayNoAssertRetFalse_F(GetConfig().GetValue("MysqlPassWord", mDataBasePasswd));
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(mysqlAddress, mMysqlIp, mMysqlPort));
 		return this->StartConnectMysql();
 	}
 
@@ -79,7 +60,7 @@ namespace SoEasy
 
 	void MysqlManager::PushClassToLua(lua_State * luaEnv)
 	{
-		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeMysqlCommand", SoEasy::InvokeMysqlCommand);
+		//ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeMysqlCommand", SoEasy::InvokeMysqlCommand);
 	}
 
 	bool MysqlManager::StartConnectMysql()
