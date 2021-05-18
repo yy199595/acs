@@ -6,7 +6,7 @@ namespace SoEasy
 	{
 	public:
 		template<typename T>
-		bool RegisterManager();
+		bool RegisterManager(const std::string name);
 		Manager * Create(const std::string name);
 	private:
 		template<typename T>
@@ -15,14 +15,8 @@ namespace SoEasy
 		std::unordered_map<std::string, std::function<Manager *()>> mCreateActions;
 	};
 	template<typename T>
-	inline bool ManagerFactory::RegisterManager()
+	inline bool ManagerFactory::RegisterManager(const std::string name)
 	{
-		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
-		{
-			std::cout << "use 'TYPE_REFLECTION' register type:" << typeid(T).name() << std::endl;
-			return false;
-		}
 		auto iter = this->mCreateActions.find(name);
 		if (iter != this->mCreateActions.end())
 		{

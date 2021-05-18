@@ -18,24 +18,6 @@
 using namespace SoEasy;
 using namespace SoEasy;
 
-TYPE_REFLECTION(SoEasy::LoginManager, "LoginManager");
-TYPE_REFLECTION(SoEasy::ProxyManager, "ProxyManager");
-TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
-TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
-TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
-TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
-TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
-TYPE_REFLECTION(SoEasy::UserDataManager, "UserDataManager");
-TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
-TYPE_REFLECTION(SoEasy::LocalAccessManager, "LocalAccessManager");
-TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
-TYPE_REFLECTION(SoEasy::RemoteActionManager, "RemoteActionManager");
-TYPE_REFLECTION(SoEasy::ActionRegisterManager, "ActionRegisterManager");
-
-TYPE_REFLECTION(SoEasy::RedisManager, "RedisManager");
-TYPE_REFLECTION(SoEasy::MysqlManager, "MysqlManager");
-
-
 #ifdef _WIN32
 #pragma comment(lib,"lua53.lib")
 #pragma comment(lib,"Common.lib")
@@ -49,22 +31,21 @@ TYPE_REFLECTION(SoEasy::MysqlManager, "MysqlManager");
 int main(int argc, char ** argv)
 { 
 	ManagerFactory factory;
-	factory.RegisterManager<LoginManager>();
-	
-	factory.RegisterManager<ProxyManager>();
-	factory.RegisterManager<RedisManager>();
-	factory.RegisterManager<MysqlManager>();
-	factory.RegisterManager<TimerManager>();
-	factory.RegisterManager<ScriptManager>();
-	factory.RegisterManager<NetWorkManager>();
-	factory.RegisterManager<CommandManager>();
-	factory.RegisterManager<ListenerManager>();
-	factory.RegisterManager<CoroutineManager>();
-	factory.RegisterManager<UserDataManager>();
-	factory.RegisterManager<LocalAccessManager>();
-	factory.RegisterManager<LocalActionManager>();
-	factory.RegisterManager<RemoteActionManager>();
-	factory.RegisterManager<ActionRegisterManager>();
+	factory.RegisterManager<LoginManager>("LoginManager");
+	factory.RegisterManager<ProxyManager>("ProxyManager");
+	factory.RegisterManager<RedisManager>("RedisManager");
+	factory.RegisterManager<MysqlManager>("MysqlManager");
+	factory.RegisterManager<TimerManager>("TimerManager");
+	factory.RegisterManager<ScriptManager>("ScriptManager");
+	factory.RegisterManager<NetWorkManager>("NetWorkManager");
+	factory.RegisterManager<CommandManager>("CommandManager");
+	factory.RegisterManager<ListenerManager>("ListenerManager");
+	factory.RegisterManager<UserDataManager>("UserDataManager");
+	factory.RegisterManager<CoroutineManager>("CoroutineManager");
+	factory.RegisterManager<LocalAccessManager>("LocalAccessManager");
+	factory.RegisterManager<LocalActionManager>("LocalActionManager");
+	factory.RegisterManager<RemoteActionManager>("RemoteActionManager");
+	factory.RegisterManager<ActionRegisterManager>("ActionRegisterManager");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
