@@ -53,6 +53,7 @@ namespace SoEasy
 		float GetMeanFps();
 	private:
 		void UpdateConsoleTitle();
+		bool GetTypeName(size_t hash, std::string & name);
 	private:
 		int  LogicMainLoop();
 	private:
@@ -89,7 +90,8 @@ namespace SoEasy
 	inline bool Applocation::AddManager()
 	{
 		std::string name;
-		if (!mManagerFactory.GetTypeName<T>(name))
+		size_t hash = typeid(T).hash_code();
+		if (!this->GetTypeName(hash, name))
 		{
 			SayNoDebugError("please register type:" << typeid(T).name());
 			return false;

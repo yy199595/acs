@@ -228,6 +228,12 @@ namespace SoEasy
 		return this->Stop();
 	}
 
+
+	bool Applocation::GetTypeName(size_t hash, std::string & name)
+	{
+		return this->mManagerFactory.GetTypeName(hash, name);
+	}
+
 	void Applocation::UpdateConsoleTitle()
 	{
 		long long nowTime = TimeHelper::GetMilTimestamp();
