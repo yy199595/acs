@@ -89,9 +89,9 @@ namespace SoEasy
 	inline bool Applocation::AddManager()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		if (!mManagerFactory.GetTypeName<T>(name))
 		{
-			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			SayNoDebugError("please register type:" << typeid(T).name());
 			return false;
 		}
 		return this->AddManager(name);
