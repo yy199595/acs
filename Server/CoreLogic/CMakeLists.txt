@@ -1,30 +1,7 @@
 cmake_minimum_required(VERSION 3.1.3)
 PROJECT(CoreLogic)
 
-AUX_SOURCE_DIRECTORY(./ SUPER_SRC)
-AUX_SOURCE_DIRECTORY(./Manager SUPER_SRC)
+aux_source_directory(./Manager SUPER_SRC)
 
-INCLUDE_DIRECTORIES(./)
-INCLUDE_DIRECTORIES(./Manager SUPER_SRC)
-
-INCLUDE_DIRECTORIES(../Common)
-INCLUDE_DIRECTORIES(../DataBase)
-INCLUDE_DIRECTORIES(../ServerData)
-INCLUDE_DIRECTORIES(../Libs/include/rapidjson)
-INCLUDE_DIRECTORIES(../Libs/include/protobuf)
-INCLUDE_DIRECTORIES(../Libs/include/asio)
-INCLUDE_DIRECTORIES(../Libs/include/lua5.3)
-INCLUDE_DIRECTORIES(../Libs/include/spdlog)
-INCLUDE_DIRECTORIES(../Libs/include/mysql)
-INCLUDE_DIRECTORIES(../Libs/include/redis)
-
-LINK_DIRECTORIES(../Libs/lib)
-SET(CMAKE_CXX_COMPILER "ccache")
-SET(CMAKE_CXX_COMPILER_ARG1 "g++") 
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
-SET(CMAKE_BUILD_TYPE Debug)
-SET(LIBRARY_OUTPUT_PATH ../Libs/lib)
-ADD_LIBRARY(CoreLogic STATIC ${SUPER_SRC})
-
-#TARGET_LINK_LIBRARIES(Common protobuf ${MY_ADDLIB})
+include_directories(./)
+include_directories(./Manager SUPER_SRC)

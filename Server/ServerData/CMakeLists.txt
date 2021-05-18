@@ -1,21 +1,9 @@
 cmake_minimum_required(VERSION 3.1.3)
 PROJECT(ServerData)
 
-AUX_SOURCE_DIRECTORY(./ SUPER_SRC)
-AUX_SOURCE_DIRECTORY(./XCode SUPER_SRC)
-AUX_SOURCE_DIRECTORY(./Protocol SUPER_SRC)
+aux_source_directory(./XCode SUPER_SRC)
+aux_source_directory(./Protocol SUPER_SRC)
 
-INCLUDE_DIRECTORIES(./)
-INCLUDE_DIRECTORIES(./XCode)
-INCLUDE_DIRECTORIES(./Protocol)
-INCLUDE_DIRECTORIES(../Libs/include/protobuf)
-
-SET(CMAKE_CXX_COMPILER "ccache")
-SET(CMAKE_CXX_COMPILER_ARG1 "g++") 
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
-SET(CMAKE_BUILD_TYPE Debug)
-SET(LIBRARY_OUTPUT_PATH ../Libs/lib)
-ADD_LIBRARY(ServerData STATIC ${SUPER_SRC})
-
-#TARGET_LINK_LIBRARIES(Common protobuf ${MY_ADDLIB})
+include_directories(./)
+include_directories(./XCode)
+include_directories(./Protocol)
