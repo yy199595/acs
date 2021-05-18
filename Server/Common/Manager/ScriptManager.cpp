@@ -222,12 +222,12 @@ namespace SoEasy
 
 
 		lua_newtable(lua);
-		lua_pushtablefunction(lua, "Serialization", LuaProtocExtension::Serialization);
+		//lua_pushtablefunction(lua, "Serialization", LuaProtocExtension::Serialization);
 		lua_setglobal(lua, "ProtocUtil");
 
 		lua_getglobal(lua, "coroutine");
-		lua_pushtablefunction(lua, "sleep", CoroutineExtension::Sleep);
-		lua_pushtablefunction(lua, "start", CoroutineExtension::Start);
+	/*	lua_pushtablefunction(lua, "sleep", CoroutineExtension::Sleep);
+		lua_pushtablefunction(lua, "start", CoroutineExtension::Start);*/
 
 
 	}
