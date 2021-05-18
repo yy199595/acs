@@ -20,7 +20,7 @@ namespace SoEasy
 		std::string name;
 		if (!SoEasy::GetTypeName<T>(name))
 		{
-			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			std::cout << "use 'TYPE_REFLECTION' register type:" << typeid(T).name() << std::endl;
 			return false;
 		}
 		auto iter = this->mCreateActions.find(name);
