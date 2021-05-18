@@ -8,7 +8,8 @@
 #include<Manager/NetWorkManager.h>
 #include<Manager/LocalActionManager.h>
 #include<NetWork/NetLuaAction.h>
-
+#include<Protocol/Common.pb.h>
+#include<NetWork/NetLuaRetAction.h>
 using namespace SoEasy;
 
 	int SystemExtension::Call(lua_State * lua)
