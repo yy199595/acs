@@ -228,6 +228,9 @@
     <ClCompile Include="Timer\ActionTimeoutTimer.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\LocalAccessManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -499,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="Timer\ActionTimeoutTimer.h">
       <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\LocalAccessManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

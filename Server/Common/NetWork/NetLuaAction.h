@@ -14,6 +14,7 @@ namespace SoEasy
 		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mActionRef); }
 	public:
 		const std::string & GetActionName() { return mActionName; }
+		XCode Invoke(const shared_ptr<NetWorkPacket> requestData); //本地调用
 		XCode Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData);
 	private:
 		int mActionRef;

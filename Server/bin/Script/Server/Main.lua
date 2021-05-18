@@ -38,7 +38,7 @@ function Main.Start()
                 SoEasy.Error(jsonData.error)
             else
                 local tableUtil = require("Util.TableUtil")
-                tableUtil.Print(jsonData.data)
+                --tableUtil.Print(jsonData.data)
             end
 
             print(redisClient.SetTimeoutValue("yjz_person", person, 1000), "-------------")

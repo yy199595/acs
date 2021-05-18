@@ -11,7 +11,7 @@ namespace SoEasy
 		MysqlLuaTask(MysqlManager * mgr, long long taskId, const std::string & db, const std::string & sql, lua_State * lua, int ref);
 	protected:
 		 void OnTaskFinish() final;
-		 void OnQueryFinish(QuertJsonWritre & jsonWriter) final; //查询完成之后调用
+		 void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
 	public:
 		static bool Start(lua_State * lua, int index, const std::string & db, const std::string & sql);
 	private:

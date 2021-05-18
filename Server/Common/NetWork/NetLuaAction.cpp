@@ -10,6 +10,10 @@ namespace SoEasy
 		this->mActionRef = action_ref;
 		this->mInvokeRef = invoke_ref;
 	}
+	XCode NetLuaAction::Invoke(const shared_ptr<NetWorkPacket> requestData)
+	{
+		return XCode::Successful;
+	}
 	XCode NetLuaAction::Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mInvokeRef);

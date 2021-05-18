@@ -107,12 +107,13 @@ namespace SoEasy
 			if (luaAction != nullptr)	//lua 函数自己返回
 			{			
 				XCode code = luaAction->Invoke(address, packet);
-				if (code != XCode::LuaCoroutineReturn)
+				const long long callbackId = packet->callback_id();
+				if (code != XCode::LuaCoroutineReturn && callbackId != 0)
 				{
 					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 					returnPacket->set_error_code(code);
+					returnPacket->set_callback_id(callbackId);
 					returnPacket->set_operator_id(packet->operator_id());
-					returnPacket->set_callback_id(packet->callback_id());
 					this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
 				}
 			}
@@ -141,7 +142,7 @@ namespace SoEasy
 				SayNoDebugError("not find call back " << id);
 				return;
 			}
-			callback->Invoke(this->mCurrentSession, packet);
+			callback->Invoke(packet);
 		}
 		this->mCurrentSession = nullptr;
 	}

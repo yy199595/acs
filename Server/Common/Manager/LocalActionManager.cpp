@@ -109,6 +109,7 @@ namespace SoEasy
 		return nullptr;
 	}
 
+
 	bool LocalActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId)
 	{
 		if (actionBox == nullptr)
@@ -124,11 +125,6 @@ namespace SoEasy
 		}
 		// Ìí¼Ó³¬Ê±
 		return true;
-	}
-
-	void LocalActionManager::OnSecondUpdate()
-	{
-		
 	}
 
 	void LocalActionManager::OnInitComplete()

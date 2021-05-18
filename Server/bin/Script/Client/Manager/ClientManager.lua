@@ -10,7 +10,6 @@ end
 
 function ClientManager.Start(tcpSession)
 
-    SoEasy.Sleep(3000)
     local registerData = { }
     registerData.account = "6465851222@qq.com"
     registerData.password = "199595yjz."
@@ -20,7 +19,16 @@ function ClientManager.Start(tcpSession)
 
     local message = SoEasy.CreateByTable("PB.UserRegisterData", registerData)
     local code = SoEasy.CallBySession(tcpSession, "LoginManager.Register", message)
-    print(code)
+    print("register back", code)
+
+    local loginData = { }
+    loginData.account = registerData.account
+    loginData.passwd = registerData.password
+    local loginMessage = SoEasy.CreateByTable("PB.UserAccountData", loginData)
+    if loginMessage ~= nil then
+        local code = SoEasy.CallBySession(tcpSession, "LoginManager.Login", loginMessage)
+        print("login back", code)
+    end
 end
 
 

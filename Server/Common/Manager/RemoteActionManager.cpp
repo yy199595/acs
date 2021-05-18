@@ -178,7 +178,7 @@ namespace SoEasy
 		requestData.set_data(this->mAreaId);
 		RemoteScheduler quertShceudler(this->mActionQuerySession);
 		quertShceudler.Call<ActionInfoList>("ActionRegisterManager.QueryActions", &requestData,
-			[this](shared_ptr<TcpClientSession> session, XCode code, const PB::ActionInfoList & returnData)
+			[this](XCode code, const PB::ActionInfoList & returnData)
 		{
 			for (int index = 0; index < returnData.actionlist_size(); index++)
 			{

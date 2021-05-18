@@ -20,8 +20,18 @@ namespace SoEasy
 		ActionScheduler actionShceduler;
 		UserAccountData userAccountData;
 		shared_ptr<StringData> accountData = make_shared<StringData>();
-		accountData->set_data(LoginData->account());
-		return actionShceduler.Call("UserDataManager.QueryUserData", accountData, userAccountData);
+
+		const std::string & account = LoginData->account();
+		const std::string & passswd = LoginData->passwd();
+			
+		accountData->set_data(account);
+		XCode code = actionShceduler.Call("UserDataManager.QueryUserData", accountData, userAccountData);
+		if (code != XCode::Successful)
+		{
+			return XCode::AccountNotExists;
+		}
+		userAccountData.PrintDebugString();
+		return code;
 	}
 
 	XCode LoginManager::Register(long long operId, shared_ptr<UserRegisterData> registerData)

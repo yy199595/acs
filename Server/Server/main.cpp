@@ -14,6 +14,7 @@
 #include<Manager/ProxyManager.h>
 #include<Manager/LoginManager.h>
 #include<Manager/UserDataManager.h>
+#include<Manager/LocalAccessManager.h>
 using namespace SoEasy;
 using namespace SoEasy;
 
@@ -26,6 +27,7 @@ TYPE_REFLECTION(SoEasy::CommandManager, "CommandManager");
 TYPE_REFLECTION(SoEasy::ListenerManager, "ListenerManager");
 TYPE_REFLECTION(SoEasy::UserDataManager, "UserDataManager");
 TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
+TYPE_REFLECTION(SoEasy::LocalAccessManager, "LocalAccessManager");
 TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
 TYPE_REFLECTION(SoEasy::RemoteActionManager, "RemoteActionManager");
 TYPE_REFLECTION(SoEasy::ActionRegisterManager, "ActionRegisterManager");
@@ -59,6 +61,7 @@ int main(int argc, char ** argv)
 	factory.RegisterManager<ListenerManager>();
 	factory.RegisterManager<CoroutineManager>();
 	factory.RegisterManager<UserDataManager>();
+	factory.RegisterManager<LocalAccessManager>();
 	factory.RegisterManager<LocalActionManager>();
 	factory.RegisterManager<RemoteActionManager>();
 	factory.RegisterManager<ActionRegisterManager>();

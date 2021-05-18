@@ -20,8 +20,7 @@ namespace SoEasy
 		{
 			this->mErrorCode = MysqlSocketIsNull;
 			this->mErrorString = "mysql socket is null";
-			jsonWrite.Write("code", this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorString);
+			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		
@@ -29,8 +28,7 @@ namespace SoEasy
 		{
 			this->mErrorCode = MysqlSelectDbFailure;
 			this->mErrorString = "select " + this->mDataBaseName + " fail";
-			jsonWrite.Write("code", this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorString);
+			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		const char * data = this->mSqlCommand.c_str();
@@ -39,8 +37,7 @@ namespace SoEasy
 		{
 			this->mErrorCode = MysqlInvokeFailure;
 			this->mErrorString = mysql_error(mysqlSocket);
-			jsonWrite.Write("code", this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorString);
+			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		this->mErrorCode = XCode::Successful;
@@ -86,9 +83,12 @@ namespace SoEasy
 				jsonWrite.EndWriteArray();
 			}	
 			mysql_free_result(queryResult);
-			jsonWrite.Write("code", this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorString);
-			this->OnQueryFinish(jsonWrite);
 		}
+		this->OnQueryFinish(jsonWrite);
+	}
+	void MysqlTaskBase::OnQueryFinish(QuertJsonWritre & jsonWriter)
+	{
+		jsonWriter.Write("code", this->mErrorCode);
+		jsonWriter.Write("error", this->mErrorString);
 	}
 }

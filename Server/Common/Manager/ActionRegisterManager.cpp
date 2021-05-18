@@ -31,11 +31,6 @@ namespace SoEasy
 		SayNoDebugInfo("start listen port : " << this->mTcpSessionListener->GetListenPort());
 	}
 
-	void ActionRegisterManager::OnSecondUpdate()
-	{
-		SessionManager::OnSecondUpdate();
-	}
-
 	void ActionRegisterManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
 	{		
 		

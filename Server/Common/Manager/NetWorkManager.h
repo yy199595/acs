@@ -28,7 +28,6 @@ namespace SoEasy
 		XCode SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage);
 		XCode SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage);
 	public:
-		//shared_ptr<TcpClientSession> GetTcpSession(const  long long skcketId);
 		shared_ptr<TcpClientSession> GetTcpSession(const std::string & adress);
 	protected:
 		bool OnInit() override;
@@ -36,10 +35,11 @@ namespace SoEasy
 	private:
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
+		class LocalAccessManager * mLocalAccessManager;
+		class LocalActionManager * mLocalActionManager;
 		class RemoteActionManager * mActionQueryManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
-		std::unordered_map<long long, shared_ptr<TcpClientSession>> mSessionAdressMap1;	//所有session
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//所有session
 	};
 }

@@ -20,6 +20,7 @@ namespace SoEasy
 
 	void MysqlTaskAction::OnQueryFinish(QuertJsonWritre & jsonWriter)
 	{
+		MysqlTaskBase::OnQueryFinish(jsonWriter);
 		if (this->GetErrorCode() != XCode::Successful)
 		{
 			SayNoDebugError("[mysql error] " << this->GetErrorStr());

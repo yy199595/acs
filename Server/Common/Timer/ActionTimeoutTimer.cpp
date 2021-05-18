@@ -17,7 +17,7 @@ namespace SoEasy
 		{
 			std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
 			packet->set_error_code(XCode::TimeoutAutoCall);
-			actionCallback->Invoke(nullptr, packet);
+			actionCallback->Invoke(packet);
 		}
 		return false;
 	}

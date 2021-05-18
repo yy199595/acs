@@ -172,7 +172,7 @@ namespace SoEasy
 
 	bool RedisManager::GetValue(const char * tab, const char * key, std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGET %s %s", tab, key);
+		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGET", tab, key);
 		if (queryData->GetCode() == XCode::Successful)
 		{
 			rapidjson::Value jsonValue;

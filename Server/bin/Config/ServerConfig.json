@@ -33,6 +33,7 @@
         "UserDataManager",
         "ListenerManager",
         "LocalActionManager",
+        "LocalAccessManager",
         "RemoteActionManager",
         "ActionRegisterManager"
     ],

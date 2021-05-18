@@ -27,6 +27,7 @@
     <ClCompile Include="Coroutine\CoroutineManager.cpp" />
     <ClCompile Include="Global\LogHelper.cpp" />
     <ClCompile Include="Global\ServerConfig.cpp" />
+    <ClCompile Include="Manager\LocalAccessManager.cpp" />
     <ClCompile Include="Manager\LocalActionManager.cpp" />
     <ClCompile Include="Manager\RemoteActionManager.cpp" />
     <ClCompile Include="Manager\ActionRegisterManager.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="Global\LogHelper.h" />
     <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
+    <ClInclude Include="Manager\LocalAccessManager.h" />
     <ClInclude Include="Manager\LocalActionManager.h" />
     <ClInclude Include="Manager\RemoteActionManager.h" />
     <ClInclude Include="Manager\ActionRegisterManager.h" />

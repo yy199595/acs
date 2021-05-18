@@ -12,7 +12,7 @@ namespace SoEasy
 		~MysqlTaskBase() { }
 	protected:
 		void InvokeInThreadPool(long long threadId) final;	//在其他线程查询
-		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter) = 0; //查询完成之后调用
+		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter); //查询完成之后调用
 	public:
 		const std::string & GetSqlCommand() { return this->mSqlCommand; }
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }

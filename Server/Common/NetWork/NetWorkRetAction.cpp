@@ -12,7 +12,7 @@ namespace SoEasy
 		
 	}
 
-	void LocalLuaRetActionProxy::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
+	void LocalLuaRetActionProxy::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
 		XCode code = (XCode)backData->error_code();
 		const std::string & name = backData->protoc_name();
@@ -36,10 +36,9 @@ namespace SoEasy
 		this->mFunctionName = name;
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
 	}
-	void LocalRetActionProxy1::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
+	void LocalRetActionProxy1::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData->error_code();
-		this->mBindAction(session, code);
+		this->mBindAction((XCode)backData->error_code());
 	}
 	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name)
 		:LocalRetActionProxy(name), mBindLuaAction(action)
@@ -47,7 +46,7 @@ namespace SoEasy
 
 	}
 
-	void LocalWaitRetActionProxy::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
+	void LocalWaitRetActionProxy::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
 		XCode code = (XCode)backData->error_code();
 		const std::string & name = backData->protoc_name();
@@ -81,7 +80,7 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	void NetWorkWaitCorAction::Invoke(shared_ptr<TcpClientSession> session, const shared_ptr<NetWorkPacket> backData)
+	void NetWorkWaitCorAction::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
 		this->mCode = (XCode)backData->error_code();
 		this->mMessage = backData->message_data();
