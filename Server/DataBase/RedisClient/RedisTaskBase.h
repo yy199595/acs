@@ -18,6 +18,9 @@ namespace SoEasy
 	private:
 		inline void AddCommand(const char * value) { this->mCommand.push_back(value); }
 		inline void AddCommand(const std::string & value) { this->mCommand.push_back(value); }
+		inline void AddCommand(const int value) { this->mCommand.push_back(std::to_string(value)); }
+		inline void AddCommand(const float value) { this->mCommand.push_back(std::to_string(value)); }
+		inline void AddCommand(const double value) { this->mCommand.push_back(std::to_string(value)); }
 		inline void AddCommand(const long long value) { this->mCommand.push_back(std::to_string(value)); }
 	private:
 		void Encode() {}
@@ -37,8 +40,6 @@ namespace SoEasy
 		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter) = 0;
 	private:
 		std::vector<std::string> mCommand;
-		const char * mArgvArray[RedisLuaArgvSize];
-		size_t mArgvSizeArray[RedisLuaArgvSize];
 	private:
 		XCode mErrorCode;
 		std::string mErrorStr;

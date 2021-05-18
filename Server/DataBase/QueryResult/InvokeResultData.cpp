@@ -1,6 +1,5 @@
 #include "InvokeResultData.h"
 
-
 namespace SoEasy
 {
 	bool QuertJsonWritre::StartWriteObject()
@@ -31,6 +30,12 @@ namespace SoEasy
 	{
 		jsonWriter.Key(key);
 		return jsonWriter.Null();
+	}
+
+	bool QuertJsonWritre::Write(const char * key, XCode code)
+	{
+		jsonWriter.Key(key);
+		return jsonWriter.Int((int)code);
 	}
 
 	bool QuertJsonWritre::Write(const char * key, long long value)

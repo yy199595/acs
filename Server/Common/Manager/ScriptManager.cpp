@@ -8,13 +8,12 @@
 
 #include<NetWork/TcpClientSession.h>
 #include<NetWork/RemoteScheduler.h>
-extern "C"
-{
-	#include<Script/luaExtension/luaExtension.h>
-	#include<Script/luaExtension/SystemExtension.h>
-	#include<Script/luaExtension/LuaProtocExtension.h>
-	#include<Script/luaExtension/CoroutineExtension.h>
-}
+
+#include<Script/luaExtension/luaExtension.h>
+#include<Script/luaExtension/SystemExtension.h>
+#include<Script/luaExtension/LuaProtocExtension.h>
+#include<Script/luaExtension/CoroutineExtension.h>
+
 
 #include<Util/JsonHelper.h>
 #include<Util/FileHelper.h>

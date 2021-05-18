@@ -23,21 +23,26 @@ namespace SoEasy
 			this->OnQueryFinish(jsonWrite);
 			return;
 		}
+		const char ** argvArray = new const char *[this->mCommand.size()];
+		size_t * argvSizeArray = new size_t[this->mCommand.size()];
 
 		for (size_t index = 0; index < this->mCommand.size(); index++)
 		{
-			this->mArgvArray[index] = this->mCommand[index].c_str();
-			this->mArgvSizeArray[index] = this->mCommand[index].size();
+			argvArray[index] = this->mCommand[index].c_str();
+			argvSizeArray[index] = this->mCommand[index].size();
 		}
 		const int size = (int)this->mCommand.size();
-		redisReply * replay = (redisReply*)redisCommandArgv(redisSocket, size, this->mArgvArray, this->mArgvSizeArray);
+		redisReply * replay = (redisReply*)redisCommandArgv(redisSocket, size, argvArray, argvSizeArray);
+
+		delete[] argvArray;
+		delete[]argvSizeArray;
 
 		//redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
 		if (replay == nullptr)
 		{
 			this->mErrorStr = "redis replay null";
 			this->mErrorCode = XCode::RedisReplyIsNull;
-			jsonWrite.Write("code", (long long)this->mErrorCode);
+			jsonWrite.Write("code", this->mErrorCode);
 			jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
 			this->OnQueryFinish(jsonWrite);
 			return;
@@ -46,6 +51,7 @@ namespace SoEasy
 		{
 		case REDIS_REPLY_STATUS:
 			this->mErrorCode = XCode::Successful;
+			jsonWrite.Write("data", replay->str, replay->len);
 			break;
 		case REDIS_REPLY_ERROR:
 			this->mErrorCode = RedisInvokeFailure;
@@ -87,7 +93,7 @@ namespace SoEasy
 			break;
 		}
 		freeReplyObject(replay);
-		jsonWrite.Write("code", (long long)this->mErrorCode);
+		jsonWrite.Write("code", this->mErrorCode);
 		jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
 		this->OnQueryFinish(jsonWrite);
 	}

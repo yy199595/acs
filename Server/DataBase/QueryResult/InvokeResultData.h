@@ -20,8 +20,9 @@ namespace SoEasy
 
 	public:
 		bool Write(const char * key);
+		bool Write(const char * key, XCode code);
 		bool Write(const char * key, long long value);
-		bool Write(const char * key, const char * value, int size);
+		bool Write(const char * key, const char * value, int size);	
 	public:
 		bool Write();
 		bool Write(long long value);

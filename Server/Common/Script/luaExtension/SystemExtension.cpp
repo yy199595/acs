@@ -9,8 +9,8 @@
 #include<Manager/LocalActionManager.h>
 #include<NetWork/NetLuaAction.h>
 
-namespace SoEasy
-{
+using namespace SoEasy;
+
 	int SystemExtension::Call(lua_State * lua)
 	{
 		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
@@ -313,4 +313,3 @@ namespace SoEasy
 		lua_pushboolean(lua, false);
 		return 1;
 	}
-}

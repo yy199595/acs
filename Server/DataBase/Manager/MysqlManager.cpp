@@ -3,14 +3,11 @@
 #include<Util/NumberHelper.h>
 #include<Thread/ThreadPool.h>
 #include<Coroutine/CoroutineManager.h>
-#include<Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlTaskAction.h>
 #include<Util/StringHelper.h>
 #include<Script/ClassProxyHelper.h>
-extern "C"
-{
-	#include<Script/MysqlExtension.h>
-}
+#include<Script/MysqlExtension.h>
+
 namespace SoEasy
 {
 	MysqlManager::MysqlManager()
