@@ -1,6 +1,6 @@
 #pragma once
 #include<Define/CommonDef.h>
-#include<Script/LuaType/LuaFunction.h>
+#include<Script/LuaFunction.h>
 class LuaTable
 {
 public:

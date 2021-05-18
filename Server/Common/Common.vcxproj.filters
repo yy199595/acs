@@ -174,36 +174,6 @@
     <ClCompile Include="Util\TimeHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Script\ClassNameProxy.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\ClassProxyHelper.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\LuaManager.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\luaExtension\BindLuaFunction.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\luaExtension\CoroutineExtension.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\luaExtension\luaExtension.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\luaExtension\LuaProtocExtension.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\luaExtension\SystemExtension.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\LuaType\LuaFunction.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="Script\LuaType\LuaTable.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\ActionRegisterManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -230,6 +200,36 @@
     </ClCompile>
     <ClCompile Include="Manager\LocalAccessManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\BindLuaFunction.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\ClassNameProxy.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\ClassProxyHelper.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\CoroutineExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\luaExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaFunction.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaManager.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaProtocExtension.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\LuaTable.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Script\SystemExtension.cpp">
+      <Filter>Script</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -407,81 +407,6 @@
     <ClInclude Include="Util\TimeHelper.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Script\ClassMateProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\ClassNameProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\ClassProxyHelper.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\CommonParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\ContainerParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\CtorFunction.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\FunctionParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaDebugStack.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaInclude.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaManager.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaScriptEvent.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\MemberFuncProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\ParameterType.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\ProtocParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\StaticFuncProxy.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\UserDataParameter.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\luaExtension\BindLuaFunction.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\luaExtension\CoroutineExtension.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\luaExtension\luaExtension.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\luaExtension\LuaProtocExtension.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\luaExtension\SystemExtension.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaType\LuaFunction.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\LuaType\LuaTable.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\Util\luadebug.h">
-      <Filter>Script</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\ActionRegisterManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -505,6 +430,81 @@
     </ClInclude>
     <ClInclude Include="Manager\LocalAccessManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\BindLuaFunction.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ClassMateProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ClassNameProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ClassProxyHelper.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\CommonParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ContainerParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\CoroutineExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\CtorFunction.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\FunctionParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luadebug.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaDebugStack.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\luaExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaFunction.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaInclude.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaManager.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaProtocExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaScriptEvent.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\LuaTable.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\MemberFuncProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ParameterType.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\ProtocParameter.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\StaticFuncProxy.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\SystemExtension.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\UserDataParameter.h">
+      <Filter>Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
 #include"Manager.h"
 #include<Script/ClassProxyHelper.h>
-#include<Script/LuaType/LuaTable.h>
+#include<Script/LuaTable.h>
 namespace SoEasy
 {
 	class ScriptManager : public Manager

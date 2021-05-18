@@ -1,6 +1,6 @@
 #include"ScriptManager.h"
 #include<Core/Applocation.h>
-#include<Script/Util/luadebug.h>
+#include<Script/luadebug.h>
 #include<Object/GameObject.h>
 #include<Manager/ActionRegisterManager.h>
 #include<Manager/NetWorkManager.h>
@@ -9,10 +9,10 @@
 #include<NetWork/TcpClientSession.h>
 #include<NetWork/RemoteScheduler.h>
 
-#include<Script/luaExtension/luaExtension.h>
-#include<Script/luaExtension/SystemExtension.h>
-#include<Script/luaExtension/LuaProtocExtension.h>
-#include<Script/luaExtension/CoroutineExtension.h>
+#include<Script/luaExtension.h>
+#include<Script/SystemExtension.h>
+#include<Script/LuaProtocExtension.h>
+#include<Script/CoroutineExtension.h>
 
 
 #include<Util/JsonHelper.h>

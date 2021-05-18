@@ -5,7 +5,7 @@
 #include<NetWork/NetWorkRetAction.h>
 #include<Manager/LocalActionManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Script/LuaType/LuaTable.h>
+#include<Script/LuaTable.h>
 namespace SoEasy
 {
 	class RemoteScheduler

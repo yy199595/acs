@@ -7,7 +7,7 @@
 #include<NetWork/TcpClientSession.h>
 #include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
-#include<Script/LuaType/LuaFunction.h>
+#include<Script/LuaFunction.h>
 #include<Manager/RemoteActionManager.h>
 #include<Manager/LocalActionManager.h>
 #include<NetWork/RemoteActionProxy.h>

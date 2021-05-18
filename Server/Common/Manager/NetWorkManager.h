@@ -3,7 +3,7 @@
 #include<Protocol/Common.pb.h>
 #include<Manager/Manager.h>
 #include<Core/TcpSessionListener.h>
-#include<Script/LuaType/LuaTable.h>
+#include<Script/LuaTable.h>
 #include<Protocol/ServerCommon.pb.h>
 
 namespace SoEasy
