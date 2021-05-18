@@ -1,16 +1,19 @@
 #include"LocalActionManager.h"
 #include"ScriptManager.h"
 #include"NetWorkManager.h"
+#include"TimerManager.h"
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
 #include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Timer/ActionTimeoutTimer.h>
 namespace SoEasy
 {
 	LocalActionManager::LocalActionManager()
 	{
+		this->mMessageTimeout = 0;
 		this->mScriptManager = nullptr;
 		this->mNetWorkManager = nullptr;
 	}
@@ -18,6 +21,8 @@ namespace SoEasy
 	bool LocalActionManager::OnInit()
 	{
 		this->mScriptManager = this->GetManager<ScriptManager>();
+		this->GetConfig().GetValue("MsgTimeout", this->mMessageTimeout);
+		SayNoAssertRetFalse_F(this->mTimerManager = this->GetManager<TimerManager>());
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineScheduler = this->GetManager<CoroutineManager>());
 		return true;
@@ -112,6 +117,12 @@ namespace SoEasy
 		}
 		callbackId = NumberHelper::Create();
 		this->mRetActionMap.emplace(callbackId, actionBox);
+		if (this->mMessageTimeout != 0)
+		{
+			shared_ptr<ActionTimeoutTimer> timer = make_shared<ActionTimeoutTimer>(this->mMessageTimeout, callbackId, this);
+			this->mTimerManager->AddTimer(timer);
+		}
+		// Ìí¼Ó³¬Ê±
 		return true;
 	}
 

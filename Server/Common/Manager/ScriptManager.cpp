@@ -156,7 +156,8 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Start", SystemExtension::Start);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallWait", SystemExtension::CallWait);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallAction", SystemExtension::CallAction);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallByName", SystemExtension::CallByName);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallBySession", SystemExtension::CallBySession);
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "AddTimer", SystemExtension::AddTimer);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "RemoveTimer", SystemExtension::RemoveTimer);

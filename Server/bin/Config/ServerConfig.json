@@ -2,6 +2,7 @@
     "AreaId": 0,
     "LogicFps": 30,
     "SystemFps":100,
+    "MsgTimeout":5000,
     "ListenAddress": "127.0.0.1:7788",
     "ActionQueryAddress": "127.0.0.1:7799",
     "RecvBuffCount": 1024,

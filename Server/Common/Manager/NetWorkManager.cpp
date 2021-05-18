@@ -108,7 +108,7 @@ namespace SoEasy
 		return pSession->SendPackage(sendMessage) ? XCode::Successful : XCode::SendMessageFail;
 	}
 
-	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const long long skcketId)
+	/*shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const long long skcketId)
 	{
 		auto iter = this->mSessionAdressMap1.find(skcketId);
 		if (iter != this->mSessionAdressMap1.end())
@@ -122,7 +122,7 @@ namespace SoEasy
 			return session;
 		}
 		return nullptr;
-	}
+	}*/
 
 	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const std::string & adress)
 	{

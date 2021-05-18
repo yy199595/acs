@@ -15,24 +15,24 @@ namespace SoEasy
 		RemoteScheduler(shared_ptr<TcpClientSession>, long long operId = 0);
 		~RemoteScheduler() { }
 	public:
-		bool Call(std::string func);
-		bool Call(std::string func, NetWorkRetAction1 action);
+		XCode Call(std::string func);
+		XCode Call(std::string func, NetWorkRetAction1 action);
 		template<typename T>
-		bool Call(std::string func, NetWorkRetAction2<T> action);
+		XCode Call(std::string func, NetWorkRetAction2<T> action);
 	public:
-		bool Call(std::string func, LuaTable & message);
-		bool Call(std::string func, LuaTable & message, NetLuaRetAction * action);
-		bool Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action);
+		XCode Call(std::string func, LuaTable & message);
+		XCode Call(std::string func, LuaTable & message, NetLuaRetAction * action);
+		XCode Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action);
 	public:
-		bool Call(std::string func, Message * message);
-		bool Call(std::string func, Message * message, NetLuaRetAction * action);	
-		bool Call(std::string func, Message * message, NetWorkRetAction1 action);
-		bool Call(std::string func, Message * message, NetLuaWaitAction * action);
+		XCode Call(std::string func, Message * message);
+		XCode Call(std::string func, Message * message, NetLuaRetAction * action);
+		XCode Call(std::string func, Message * message, NetWorkRetAction1 action);
+		XCode Call(std::string func, Message * message, NetLuaWaitAction * action);
 		template<typename T>
-		bool Call(std::string func, Message * message, NetWorkRetAction2<T> action);
+		XCode Call(std::string func, Message * message, NetWorkRetAction2<T> action);
 	private:	
-		bool SendCallMessage(std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
-		bool SendCallMessage(std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);		
+		XCode SendCallMessage(std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
+		XCode SendCallMessage(std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);		
 	public:
 		long long mOperatorId;
 		std::string mMessageBuffer;
@@ -42,14 +42,14 @@ namespace SoEasy
 	};
 
 	template<typename T>
-	inline bool RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
+	inline XCode RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
 	{
 		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
 	}
 
 	template<typename T>
-	inline bool RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
+	inline XCode RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
 	{
 		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
 		return this->SendCallMessage(func, message, pAction);

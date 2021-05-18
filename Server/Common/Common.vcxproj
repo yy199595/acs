@@ -67,6 +67,7 @@
     <ClCompile Include="Thread\TaskThread.cpp" />
     <ClCompile Include="Thread\ThreadPool.cpp" />
     <ClCompile Include="Thread\ThreadTaskAction.cpp" />
+    <ClCompile Include="Timer\ActionTimeoutTimer.cpp" />
     <ClCompile Include="Timer\CorSleepTimer.cpp" />
     <ClCompile Include="Timer\LuaActionTimer.cpp" />
     <ClCompile Include="Timer\LuaSleepTimer.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Thread\TaskThread.h" />
     <ClInclude Include="Thread\ThreadPool.h" />
     <ClInclude Include="Thread\ThreadTaskAction.h" />
+    <ClInclude Include="Timer\ActionTimeoutTimer.h" />
     <ClInclude Include="Timer\CorSleepTimer.h" />
     <ClInclude Include="Timer\LuaActionTimer.h" />
     <ClInclude Include="Timer\LuaSleepTimer.h" />

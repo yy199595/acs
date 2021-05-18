@@ -27,16 +27,15 @@ namespace SoEasy
 		void OnDestory() override;
 		void OnSecondUpdate() override;
 		void OnInitComplete() override;
-	/*public:
-		bool Call(shared_ptr<TcpClientSession> tcpSession, const long long id, const shared_ptr<NetWorkPacket> callInfo);
-		bool Call(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const shared_ptr<NetWorkPacket> callInfo);*/
 	public:		
 		shared_ptr<NetLuaAction> GetLuaAction(const std::string & name);
 		shared_ptr<LocalActionProxy> GetAction(const std::string & name);
 	private:
+		int mMessageTimeout;
 		std::string mMessageBuffer;
 		TimeRecorder mLogicTimeRecorder;
 		TimeRecorder mNetLatencyRecorder;
+		class TimerManager * mTimerManager;
 		class ScriptManager * mScriptManager;
 		class NetWorkManager * mNetWorkManager;
 		class CoroutineManager * mCoroutineScheduler;

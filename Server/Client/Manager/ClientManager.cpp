@@ -4,26 +4,19 @@
 #include<NetWork/ActionScheduler.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Util/MathHelper.h>
+
 namespace Client
 {
 	bool ClientManager::OnInit()
 	{
-		if (!SessionManager::OnInit())
-		{
-			return false;
-		}
 		std::string address;
-		if (!this->GetConfig().GetValue("ListenAddress", address))
-		{
-			SayNoDebugFatal("not find field 'ListenAddress'");
-			return false;
-		}
-		if (!StringHelper::ParseIpAddress(address, this->mConnectIp, this->mConnectPort))
-		{
-			SayNoDebugFatal("parse 'ListenAddress' fail");
-			return false;
-		}
-		this->mCoroutineManager = this->GetManager<CoroutineManager>();
+		SayNoAssertRetFalse_F(SessionManager::OnInit());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", address));
+		
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(address, this->mConnectIp, this->mConnectPort));
+		
+		SayNoAssertRetFalse_F(this->mScriptManager = this->GetManager<ScriptManager>());
+		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 		this->mClientSession = this->CreateTcpSession("Client", this->mConnectIp, this->mConnectPort);
 		return this->mClientSession != nullptr;
 	}
@@ -40,6 +33,15 @@ namespace Client
 
 	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
 	{
+		lua_State * luaEnv = this->mScriptManager->GetLuaEnv();
+		if (lua_getfunction(luaEnv, "ClientManager", "OnConnectComplate"))
+		{
+			LuaParameter::Write<SharedTcpSession>(luaEnv, tcpSession);
+			if (lua_pcall(luaEnv, 1, 0, 0) != 0)
+			{
+				SayNoDebugError(lua_tostring(luaEnv, -1));
+			}
+		}
 		/*for (size_t index = 0; index < 100; index++)
 		{
 			this->mCoroutineManager->Start([this, tcpSession]()

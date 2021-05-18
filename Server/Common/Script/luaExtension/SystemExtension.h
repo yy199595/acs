@@ -7,7 +7,10 @@ namespace SystemExtension
 
 	extern int CallWait(lua_State * luaEnv);
 
-	extern int CallAction(lua_State * luaEnv);
+	extern int CallByName(lua_State * luaEnv);
+
+	extern int CallBySession(lua_State * luaEnv);
+
 
 	extern int AddTimer(lua_State * lua);
 

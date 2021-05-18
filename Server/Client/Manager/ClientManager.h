@@ -1,6 +1,7 @@
 #pragma once
 
 #include<Manager/SessionManager.h>
+#include<Manager/ScriptManager.h>
 using namespace SoEasy;
 namespace Client
 {
@@ -17,7 +18,9 @@ namespace Client
 	private:
 		std::string mConnectIp;
 		unsigned short mConnectPort;
+		class ScriptManager * mScriptManager;
 		CoroutineManager * mCoroutineManager;
 		shared_ptr<TcpClientSession> mClientSession;
+		
 	};
 }

@@ -182,7 +182,7 @@ using namespace SoEasy;
 		return 1;
 	}
 
-	int SystemExtension::CallAction(lua_State * luaEnv)
+	int SystemExtension::CallByName(lua_State * luaEnv)
 	{
 		lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
@@ -229,6 +229,56 @@ using namespace SoEasy;
 			if (!nCallController.Call(funcName, nullptr, waitAction))
 			{
 				lua_pushinteger(luaEnv, XCode::Failure);
+				return 1;
+			}
+		}
+		return lua_yield(luaEnv, 1);
+	}
+
+	int SystemExtension::CallBySession(lua_State * luaEnv)
+	{
+		lua_pushthread(luaEnv);
+		if (!lua_isthread(luaEnv, -1))
+		{
+			lua_pushinteger(luaEnv, XCode::Failure);
+			return 1;
+		}
+
+		NetLuaWaitAction * waitAction = NetLuaWaitAction::Create(luaEnv, -1);
+		if (waitAction == nullptr)
+		{
+			lua_pushinteger(luaEnv, XCode::Failure);
+			return 1;
+		}
+		SharedTcpSession tcpSession = LuaParameter::Read<SharedTcpSession>(luaEnv, 1);
+		RemoteScheduler nCallController(tcpSession);	
+		const char * funcName = lua_tostring(luaEnv, 2);
+		if (lua_isuserdata(luaEnv, 3))
+		{
+			Message * pMessage = (Message*)lua_touserdata(luaEnv, 3);
+			XCode code = nCallController.Call(funcName, pMessage, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
+				return 1;
+			}
+		}
+		else if (lua_istable(luaEnv, 3))
+		{
+			LuaTable luaTable(luaEnv, 3, true);
+			XCode code = nCallController.Call(funcName, luaTable, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
+				return 1;
+			}
+		}
+		else
+		{
+			XCode code = nCallController.Call(funcName, nullptr, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
 				return 1;
 			}
 		}

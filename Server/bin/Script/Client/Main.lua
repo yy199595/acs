@@ -1,6 +1,7 @@
 
 require "Util.TxtUtil"
 require "Util.JsonUtil"
+require "Manager.ClientManager"
 local clientManager = nil
 local loginSrvSession = nil
 

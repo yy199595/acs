@@ -24,27 +24,27 @@ namespace SoEasy
 		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
 	}
 
-	bool RemoteScheduler::Call(std::string func)
+	XCode RemoteScheduler::Call(std::string func)
 	{
 		return this->SendCallMessage(func);
 	}
 
-	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable)
+	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable)
 	{
 		return this->SendCallMessage(func, luaTable);
 	}
 
-	bool RemoteScheduler::Call(std::string func, Message * message)
+	XCode RemoteScheduler::Call(std::string func, Message * message)
 	{
 		return this->SendCallMessage(func, message);
 	}
-	bool RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
+	XCode RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
-	bool RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
+	XCode RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
 		return this->SendCallMessage(func, nullptr, pAction);
@@ -53,25 +53,25 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
+	XCode RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
 		return this->SendCallMessage(func, message, pAction);
 	}
 
-	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
+	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
-	bool RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
+	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
 		return this->SendCallMessage(func, luaTable, pAction);
 	}
 
-	bool RemoteScheduler::SendCallMessage(std::string & func, Message * message, shared_ptr<LocalRetActionProxy> action)
+	XCode RemoteScheduler::SendCallMessage(std::string & func, Message * message, shared_ptr<LocalRetActionProxy> action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
@@ -92,15 +92,16 @@ namespace SoEasy
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
-	bool RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, shared_ptr<LocalRetActionProxy> action)
+	XCode RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, shared_ptr<LocalRetActionProxy> action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
-		if (luaTable.Serialization(mMessageBuffer))
+		if (!luaTable.Serialization(mMessageBuffer))
 		{
-			newCallData->set_message_data(mMessageBuffer);
+			return XCode::SerializationFailure;
 		}
 		long long callbakcId = 0;
+		newCallData->set_message_data(mMessageBuffer);
 		this->mFunctionManager->AddCallback(action, callbakcId);
 		newCallData->set_func_name(func);
 		newCallData->set_callback_id(callbakcId);
@@ -108,7 +109,7 @@ namespace SoEasy
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
-	bool RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
+	XCode RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
 		return this->SendCallMessage(func, message, pAction);
