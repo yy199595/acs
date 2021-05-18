@@ -13,15 +13,15 @@ namespace SoEasy
 		SayNoAssertRet_F(this->mNetWorkManager);
 	}
 
-	void RemoteActionProxy::Invoke(shared_ptr<PB::NetWorkPacket> message)
+	XCode RemoteActionProxy::Invoke(shared_ptr<PB::NetWorkPacket> message)
 	{
 		if (this->mActionSession == nullptr || !this->mActionSession->IsActive())
 		{
 			this->mSendQueue.push(message);
 			this->mActionSession = nullptr;
-			return;
+			return XCode::CacheMessageNextSend;
 		}
-		this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, message);
+		return this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, message);
 	}
 
 	bool RemoteActionProxy::BindSession(shared_ptr<TcpClientSession> session)
@@ -34,7 +34,8 @@ namespace SoEasy
 		while (!this->mSendQueue.empty())
 		{
 			shared_ptr<PB::NetWorkPacket> sendPacket = this->mSendQueue.front();
-			if (!this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, sendPacket))
+			XCode code = this->mNetWorkManager->SendMessageByAdress(this->mActionAddress, sendPacket);
+			if (code != XCode::Successful)
 			{
 				return false;
 			}

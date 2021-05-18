@@ -16,6 +16,8 @@ namespace SoEasy
 
 	bool RemoteActionManager::OnInit()
 	{
+		REGISTER_FUNCTION_1(RemoteActionManager::UpdateActions, ActionInfoList);
+
 		SayNoAssertRetFalse_F(SessionManager::OnInit());
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ActionQueryAddress", mQueryAddress));
@@ -118,6 +120,20 @@ namespace SoEasy
 		}
 	}
 
+	XCode RemoteActionManager::UpdateActions(long long operId, shared_ptr<ActionInfoList> returnData)
+	{
+		for (int index = 0; index < returnData->actionlist_size(); index++)
+		{
+			const ActionInfo & actionInfo = returnData->actionlist(index);
+			const int actionAreaId = actionInfo.adreid();
+			const std::string & actionName = actionInfo.actionname();
+			const std::string & actionAddress = actionInfo.address();
+			this->AddNewActionProxy(actionAreaId, actionName, actionAddress);
+			SayNoDebugWarning(actionAreaId << "\t" << actionAddress << "\t" << actionName);
+		}
+		return XCode::Successful;
+	}
+
 	void RemoteActionManager::AddNewActionProxy(int argaId, const std::string & name, const std::string & address)
 	{
 		auto iter = this->mActionProxyMap.find(name);
@@ -153,12 +169,8 @@ namespace SoEasy
 			const std::string & actionName = actions[index];
 			actionInfo.add_action_names()->assign(actionName);
 		}
-
-		quertShceudler.Call("ActionRegisterManager.RegisterActions", &actionInfo, 
-			[this](shared_ptr<TcpClientSession> session, XCode code)
-		{
-			this->StartPullActionList();
-		});	
+		// ×¢²á±¾µØactionµ½Ô¶¶Ë
+		quertShceudler.Call("ActionRegisterManager.RegisterActions", &actionInfo);
 	}
 	void RemoteActionManager::StartPullActionList()
 	{
@@ -196,10 +208,7 @@ namespace SoEasy
 		{
 			std::string ip;
 			unsigned short port;
-			if (!StringHelper::ParseIpAddress(address, ip, port))
-			{
-				return false;
-			}
+			SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(address, ip, port));
 			tcpClientSession = make_shared<TcpClientSession>(this, "ActionSession", ip, port);
 			this->mActionSessionMap.emplace(address, tcpClientSession);
 		}

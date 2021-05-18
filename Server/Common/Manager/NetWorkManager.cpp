@@ -147,8 +147,7 @@ namespace SoEasy
 		{
 			return XCode::CallFunctionNotExist;
 		}
-		actionProxy->Invoke(returnPackage);
-		return XCode::Successful;
+		return actionProxy->Invoke(returnPackage);
 	}
 	
 	void NetWorkManager::OnDestory()

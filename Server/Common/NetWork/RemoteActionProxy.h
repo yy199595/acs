@@ -12,7 +12,7 @@ namespace SoEasy
 	public:
 		RemoteActionProxy(const std::string name, const std::string & address, int areaId);
 	public:
-		void Invoke(shared_ptr<PB::NetWorkPacket> message);
+		XCode Invoke(shared_ptr<PB::NetWorkPacket> message);
 		bool BindSession(shared_ptr<TcpClientSession> session);
 	public:
 		bool IsAction();

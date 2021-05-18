@@ -12,17 +12,18 @@ namespace SoEasy
 	struct ActionProxyInfo
 	{
 	public:
-		int mAreaId;
-		long long mOperId;
-		std::string mAddress;
-		std::string mActionName;
+		int mAreaId;			//服务器组id
+		std::string mQueryAddress;	//通信地址
+		std::string mActionName;	//action名字
+		std::string mListenerAddress;	//监听地址
 	public:
 		bool operator == (ActionProxyInfo & actionInfo)
 		{
 			return this->mAreaId == actionInfo.mAreaId
-				&& this->mOperId == actionInfo.mOperId
-				&& this->mAddress == actionInfo.mAddress
-				&& this->mActionName == actionInfo.mActionName;
+				&& this->mActionName == actionInfo.mActionName
+				&& this->mQueryAddress == actionInfo.mQueryAddress
+				&& this->mListenerAddress == actionInfo.mListenerAddress;
+				
 		}
 	};
 
@@ -43,6 +44,8 @@ namespace SoEasy
 		XCode RegisterActions(long long id, shared_ptr<ActionUpdateInfo> actionInfo);
 		XCode QueryActions(long long id, shared_ptr<Int32Data> areaId, shared_ptr<ActionInfoList> returnData);
 	private:
+		void BroadCastActionList(int areaId);
+	private:
 		void AddActionInfo(ActionProxyInfo & actionInfo);
 	private:
 		std::string mListenIp;
@@ -51,5 +54,6 @@ namespace SoEasy
 		class NetWorkManager * mNetWorkManager;
 		std::vector<ActionProxyInfo> mActionRegisterList;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
+		std::unordered_map<std::string, int> mAreaSessionMap;
 	};
 }

@@ -50,17 +50,20 @@ namespace SoEasy
 	{
 		shared_ptr<TcpClientSession> currentSession = this->GetCurSession();
 		int areaId = actions->areaid();
-		const string & address = actions->address();
-		
+			
+		const std::string & listenerAddress = actions->address();
+		const std::string & queryAddress = currentSession->GetAddress();
 		for (int index = 0; index < actions->action_names_size(); index++)
 		{
 			ActionProxyInfo actionInfo;
 			actionInfo.mAreaId = actions->areaid();
-			actionInfo.mAddress = actions->address();
-			actionInfo.mOperId = currentSession->GetSocketId();
+			actionInfo.mQueryAddress = queryAddress;
+			actionInfo.mListenerAddress = listenerAddress;
 			actionInfo.mActionName = actions->action_names(index);
 			this->AddActionInfo(actionInfo);
 		}
+		this->mAreaSessionMap.emplace(currentSession->GetAddress(), areaId);
+		this->BroadCastActionList(areaId);
 		return XCode::Successful;
 	}
 
@@ -74,11 +77,40 @@ namespace SoEasy
 			{
 				PB::ActionInfo * info = returnData->add_actionlist();
 				info->set_adreid(actionInfo.mAreaId);
-				info->set_address(actionInfo.mAddress);
 				info->set_actionname(actionInfo.mActionName);
+				info->set_address(actionInfo.mListenerAddress);
 			}
 		}
 		return XCode::Successful;
+	}
+
+	void ActionRegisterManager::BroadCastActionList(int areaId)
+	{
+		ActionInfoList returnData;
+		for (size_t index = 0; index < this->mActionRegisterList.size(); index++)
+		{
+			ActionProxyInfo & actionInfo = this->mActionRegisterList[index];
+			if (actionInfo.mAreaId == areaId || actionInfo.mAreaId == 0)
+			{
+				PB::ActionInfo * info = returnData.add_actionlist();
+				info->set_adreid(actionInfo.mAreaId);
+				info->set_actionname(actionInfo.mActionName);
+				info->set_address(actionInfo.mListenerAddress);
+			}
+		}
+		for (auto iter = this->mAreaSessionMap.begin(); iter != this->mAreaSessionMap.end(); iter++)
+		{
+			if (iter->second == areaId)
+			{
+				const std::string & address = iter->first;				
+				SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
+				if (tcpSession != nullptr)
+				{
+					RemoteScheduler callScheduler(tcpSession);
+					callScheduler.Call("RemoteActionManager.UpdateActions", &returnData);
+				}
+			}			
+		}
 	}
 
 	void ActionRegisterManager::AddActionInfo(ActionProxyInfo & actionInfo)
@@ -91,7 +123,7 @@ namespace SoEasy
 			}
 		}
 		this->mActionRegisterList.push_back(actionInfo);
-		SayNoDebugLog(actionInfo.mAreaId << "  " << actionInfo.mAddress << "  " << actionInfo.mActionName);
+		SayNoDebugLog(actionInfo.mAreaId << "  " << actionInfo.mListenerAddress << "  " << actionInfo.mActionName);
 		std::sort(this->mActionRegisterList.begin(), this->mActionRegisterList.end(), []
 			(ActionProxyInfo & a1, ActionProxyInfo & a2)
 		{

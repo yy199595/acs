@@ -19,6 +19,7 @@ enum XCode
 	NoCoroutineContext,	//没有协程上下文
 
 	ParseJsonFailure,
+	CacheMessageNextSend,	//缓存消息下次发送
 
 	MysqlNotInCoroutine,	//不在协程中
 	MysqlStartTaskFail,		//启动失败

@@ -23,6 +23,8 @@ namespace SoEasy
 		bool GetActionProxy(const std::string & action, long long operId, shared_ptr<RemoteActionProxy> & actionProxy);
 		void GetActionProxyByAddress(const std::string & address, std::vector<shared_ptr<RemoteActionProxy>> & actionProxys);
 	private:
+		XCode UpdateActions(long long operId, shared_ptr<ActionInfoList> actions);
+	private:
 		void StartRegisterAction();
 		void StartPullActionList();  //开始拉取action列表
 		bool StartConnectToAction(shared_ptr<RemoteActionProxy> actionProxy);
