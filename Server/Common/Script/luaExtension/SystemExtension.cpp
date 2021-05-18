@@ -5,10 +5,14 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Timer/LuaActionTimer.h>
 #include<Timer/LuaSleepTimer.h>
+#include<Manager/NetWorkManager.h>
+#include<Manager/LocalActionManager.h>
+#include<NetWork/NetLuaAction.h>
+#include<Protocol/Common.pb.h>
+#include<NetWork/NetLuaRetAction.h>
 using namespace SoEasy;
-namespace SystemExtension
-{
-	int Call(lua_State * lua)
+
+	int SystemExtension::Call(lua_State * lua)
 	{
 		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
 		if (tcpSession == nullptr)
@@ -64,21 +68,21 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int GetApp(lua_State * luaEnv)
+	int SystemExtension::GetApp(lua_State * luaEnv)
 	{
 		Applocation * pApplocation = Applocation::Get();
 		LuaParameter::Write<Applocation *>(luaEnv, pApplocation);
 		return 1;
 	}
 
-	int GetManager(lua_State * luaEnv)
+	int SystemExtension::GetManager(lua_State * luaEnv)
 	{
-		Applocation * pApplocation = Applocation::Get();
 		if (lua_isstring(luaEnv, -1))
 		{
+			Applocation * app = Applocation::Get();
 			const std::string name = lua_tostring(luaEnv, -1);
-			Manager * pManager = nullptr;//pApplocation->GetManagerByName(name);
-			PtrProxy<Manager>::Write(luaEnv, pManager);
+			//TODO
+			PtrProxy<Manager>::Write(luaEnv, nullptr);
 			if (lua_getglobal(luaEnv, name.c_str()) && lua_istable(luaEnv, -1))
 			{
 				lua_setmetatable(luaEnv, -2);
@@ -88,7 +92,74 @@ namespace SystemExtension
 		return 0;
 	}
 
-	int CallWait(lua_State * luaEnv)
+	int SystemExtension::BindAction(lua_State * luaEnv)
+	{
+
+		Applocation * pApplocation = Applocation::Get();
+		LocalActionManager * actionManager = pApplocation->GetManager<LocalActionManager>();
+		if (actionManager == nullptr)
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+
+		if (!lua_isstring(luaEnv, 1))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+		if (!lua_isfunction(luaEnv, 2))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+		const std::string action = lua_tostring(luaEnv, 1);
+		lua_pushvalue(luaEnv, 2);
+		int action_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
+		if (!lua_getfunction(luaEnv, "Action", "Invoke"))
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+
+		int invoke_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
+		shared_ptr<NetLuaAction> luaAction = make_shared<NetLuaAction>(luaEnv, action, action_ref, invoke_ref);
+		lua_pushboolean(luaEnv, actionManager->BindFunction(luaAction));
+		return 1;
+	}
+
+	int SystemExtension::SendByAddress(lua_State * luaEnv)
+	{
+		Applocation * pApplocation = Applocation::Get();
+		NetWorkManager * manager = pApplocation->GetManager<NetWorkManager>();
+		shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+		const std::string address = lua_tostring(luaEnv, 1);
+		returnPacket->set_error_code(lua_tointeger(luaEnv, 4));
+		returnPacket->set_callback_id(lua_tointeger(luaEnv, 3));
+		returnPacket->set_operator_id(lua_tointeger(luaEnv, 2));
+		if (lua_isstring(luaEnv, 5))
+		{
+			size_t size = 0;
+			const char * json = lua_tolstring(luaEnv, 4, &size);
+			returnPacket->set_message_data(json, size);
+		}
+		else if (lua_isuserdata(luaEnv, 5))
+		{
+			Message * pMessage = (Message *)lua_touserdata(luaEnv, -4);
+			if (pMessage != nullptr)
+			{
+				std::string messageBuffer;
+				if (pMessage->SerializePartialToString(&messageBuffer))
+				{
+					returnPacket->set_message_data(messageBuffer);
+				}
+			}
+		}
+		lua_pushboolean(luaEnv, manager->SendMessageByAdress(address, returnPacket));
+		return 1;
+	}
+
+	int SystemExtension::CallWait(lua_State * luaEnv)
 	{
 		if (!lua_isuserdata(luaEnv, 2))
 		{
@@ -112,14 +183,8 @@ namespace SystemExtension
 		return 1;
 	}
 
-	int WaitFor(lua_State * luaEnv)
+	int SystemExtension::CallByName(lua_State * luaEnv)
 	{
-		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(luaEnv, 1);
-		if (tcpSession == nullptr)
-		{
-			lua_pushinteger(luaEnv, XCode::Failure);
-			return 1;
-		}
 		lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
 		{
@@ -134,7 +199,7 @@ namespace SystemExtension
 			return 1;
 		}
 
-		RemoteScheduler nCallController(tcpSession);
+		RemoteScheduler nCallController;
 		const char * funcName = lua_tostring(luaEnv, 2);
 		if (lua_isuserdata(luaEnv, 3))
 		{
@@ -171,7 +236,57 @@ namespace SystemExtension
 		return lua_yield(luaEnv, 1);
 	}
 
-	int Start(lua_State * luaEnv)
+	int SystemExtension::CallBySession(lua_State * luaEnv)
+	{
+		lua_pushthread(luaEnv);
+		if (!lua_isthread(luaEnv, -1))
+		{
+			lua_pushinteger(luaEnv, XCode::Failure);
+			return 1;
+		}
+
+		NetLuaWaitAction * waitAction = NetLuaWaitAction::Create(luaEnv, -1);
+		if (waitAction == nullptr)
+		{
+			lua_pushinteger(luaEnv, XCode::Failure);
+			return 1;
+		}
+		SharedTcpSession tcpSession = LuaParameter::Read<SharedTcpSession>(luaEnv, 1);
+		RemoteScheduler nCallController(tcpSession);	
+		const char * funcName = lua_tostring(luaEnv, 2);
+		if (lua_isuserdata(luaEnv, 3))
+		{
+			Message * pMessage = (Message*)lua_touserdata(luaEnv, 3);
+			XCode code = nCallController.Call(funcName, pMessage, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
+				return 1;
+			}
+		}
+		else if (lua_istable(luaEnv, 3))
+		{
+			LuaTable luaTable(luaEnv, 3, true);
+			XCode code = nCallController.Call(funcName, luaTable, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
+				return 1;
+			}
+		}
+		else
+		{
+			XCode code = nCallController.Call(funcName, nullptr, waitAction);
+			if (code != XCode::Successful)
+			{
+				lua_pushinteger(luaEnv, code);
+				return 1;
+			}
+		}
+		return lua_yield(luaEnv, 1);
+	}
+
+	int SystemExtension::Start(lua_State * luaEnv)
 	{
 		lua_State * coroutine = lua_newthread(luaEnv);
 		lua_pushvalue(luaEnv, 1);
@@ -181,33 +296,23 @@ namespace SystemExtension
 		const int size = lua_gettop(luaEnv);
 		lua_xmove(luaEnv, coroutine, size - 1);
 
-		return lua_resume(coroutine, luaEnv, 1);
+		return lua_resume(coroutine, luaEnv, size - 1);
 	}
 
-	int Sleep(lua_State * luaEnv)
+	int SystemExtension::Sleep(lua_State * luaEnv)
 	{
 		long long ms = lua_tointeger(luaEnv, 1);
 		lua_pushthread(luaEnv);
-		Applocation * pApplocation = Applocation::Get();
-		TimerManager * pTimerManager = pApplocation->GetManager<TimerManager>();
+		TimerManager * pTimerManager = Applocation::Get()->GetManager<TimerManager>();
 		if (pTimerManager != nullptr)
 		{
-			long long targetTime = TimeHelper::GetMilTimestamp() + ms;
-			shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, targetTime);
+			shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, ms);
 			pTimerManager->AddTimer(pTimer);
 		}
-		return lua_yield(luaEnv, 01);
+		return lua_yield(luaEnv, 1);
 	}
 
-	int WaitNetFrame(lua_State * luaEnv)
-	{
-		lua_pushthread(luaEnv);
-		int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		lua_State * coroutine = lua_tothread(luaEnv, -1);
-		return lua_yield(coroutine, 0);
-	}
-
-	int AddTimer(lua_State * lua)
+	int SystemExtension::AddTimer(lua_State * lua)
 	{
 		if (!lua_isfunction(lua, 1))
 		{
@@ -223,8 +328,8 @@ namespace SystemExtension
 		{
 			count = lua_tointeger(lua, 3);
 		}
-		Applocation * pApplocation = Applocation::Get();
-		TimerManager * pTimerManager = pApplocation->GetManager<TimerManager>();
+		Applocation * app = Applocation::Get();
+		TimerManager * pTimerManager = app->GetManager<TimerManager>();
 		if (pTimerManager != nullptr)
 		{
 			lua_pushvalue(lua, 1);
@@ -242,13 +347,13 @@ namespace SystemExtension
 		}
 		return 0;
 	}
-	int RemoveTimer(lua_State * lua)
+	int SystemExtension::RemoveTimer(lua_State * lua)
 	{
 		if (lua_isinteger(lua, 1))
 		{
 			long long id = lua_tointeger(lua, 1);
-			Applocation * pApplocation = Applocation::Get();
-			TimerManager * pTimerManager = pApplocation->GetManager<TimerManager>();
+			Applocation * app = Applocation::Get();
+			TimerManager * pTimerManager = app->GetManager<TimerManager>();
 			if (pTimerManager != nullptr)
 			{
 				bool code = pTimerManager->RemoveTimer(id);
@@ -259,4 +364,3 @@ namespace SystemExtension
 		lua_pushboolean(lua, false);
 		return 1;
 	}
-}

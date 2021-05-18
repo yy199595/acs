@@ -84,7 +84,7 @@ namespace SoEasy
 
 	void RedisManager::PushClassToLua(lua_State * luaEnv)
 	{
-		//ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
+		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
 	}
 
 	bool RedisManager::HasValue(const char * key)
