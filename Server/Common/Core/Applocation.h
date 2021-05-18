@@ -102,7 +102,8 @@ namespace SoEasy
 	inline T * Applocation::GetManager()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		size_t hash = typeid(T).hash_code();
+		if (!this->GetTypeName(hash, name))
 		{
 			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
 			return nullptr;
@@ -127,7 +128,8 @@ namespace SoEasy
 	inline bool Applocation::TryAddManager()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		size_t hash = typeid(T).hash_code();
+		if (!this->GetTypeName(hash, name))
 		{
 			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
 			return false;
