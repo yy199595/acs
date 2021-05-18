@@ -8,6 +8,16 @@ int SoEasy::InvokeMysqlCommand(lua_State * lua)
 	size_t size;
 	Applocation * app = Applocation::Get();
 	MysqlManager * pMysqlManager = app->GetManager<MysqlManager>();
+	if (!lua_isstring(lua, 1))
+	{
+		lua_pushnil(lua);
+		return 1;
+	}
+	if (!lua_isstring(lua, 2))
+	{
+		lua_pushnil(lua);
+		return 1;
+	}
 	const std::string db = lua_tostring(lua, 1);
 	const char * sql = lua_tolstring(lua, 2, &size);
 	lua_pushthread(lua);

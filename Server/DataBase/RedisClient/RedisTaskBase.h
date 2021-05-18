@@ -37,7 +37,7 @@ namespace SoEasy
 		XCode GetErrorCode() { return this->mErrorCode; }
 		const std::string & GetErrorStr() { return this->mErrorStr; }
 	protected:
-		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter) = 0;
+		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter);
 	private:
 		std::vector<std::string> mCommand;
 	private:

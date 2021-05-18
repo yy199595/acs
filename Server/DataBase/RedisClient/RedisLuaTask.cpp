@@ -29,15 +29,20 @@ namespace SoEasy
 			}
 			lua_resume(coroutine, this->mLuaEnv, 1);
 		}
-		if (this->GetErrorCode() != XCode::Successful)
-		{
-			SayNoDebugError("[redis error ]" << this->GetErrorStr());
-		}
+		
 	}
 
 	void RedisLuaTask::OnQueryFinish(QuertJsonWritre & jsonWriter)
 	{
-		SayNoAssertRet_F(jsonWriter.Serialization(mQueryJsonData));
+		RedisTaskBase::OnQueryFinish(jsonWriter);
+		if (this->GetErrorCode() != XCode::Successful)
+		{
+			SayNoDebugError("[redis error ]" << this->GetErrorStr());
+		}
+		if (!jsonWriter.Serialization(mQueryJsonData))
+		{
+			SayNoDebugError("[redis error ] redis data to json fail");
+		}
 	}
 
 	shared_ptr<RedisLuaTask> RedisLuaTask::Create(lua_State * lua, int index, const char * cmd)

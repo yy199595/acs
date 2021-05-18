@@ -61,7 +61,7 @@ namespace SoEasy
 			return make_shared<InvokeResultData>(XCode::MysqlNotInCoroutine);
 		}
 		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, this->mCoroutineManager, db, sql);
+		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, db, sql, this->mCoroutineManager);
 
 		if (!this->StartTaskAction(taskAction))
 		{

@@ -44,6 +44,14 @@ namespace SoEasy
 		return jsonWriter.Int64(value);
 	}
 
+	bool QuertJsonWritre::Write(const char * key, const std::string & value)
+	{
+		jsonWriter.Key(key);
+		const char * str = value.c_str();
+		const size_t size = value.size();
+		return jsonWriter.String(str, size);
+	}
+
 	bool QuertJsonWritre::Write(const char * key, const char * value, int size)
 	{
 		jsonWriter.Key(key);

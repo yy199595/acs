@@ -13,16 +13,21 @@ namespace SoEasy
 	void RedisTaskAction::OnTaskFinish()
 	{
 		SayNoAssertRet_F(this->mCoroutineManager);
-		if (this->GetErrorCode() != XCode::Successful)
-		{
-			SayNoDebugError("[redis error ]" << this->GetErrorStr());
-		}
+		
 		this->mCoroutineManager->Resume(this->mCoreoutineId);
 	}
 
 	void RedisTaskAction::OnQueryFinish(QuertJsonWritre & jsonWriter)
-	{		
-		SayNoAssertRet_F(jsonWriter.Serialization(this->mDocument));
+	{
+		RedisTaskBase::OnQueryFinish(jsonWriter);
+		if (this->GetErrorCode() != XCode::Successful)
+		{
+			SayNoDebugError("[redis error ]" << this->GetErrorStr());
+		}
+		if (!jsonWriter.Serialization(this->mDocument))
+		{
+			SayNoDebugError("[redis error ] redis data to json fail");
+		}
 	}
 
 	std::shared_ptr<InvokeResultData> RedisTaskAction::GetInvokeData()

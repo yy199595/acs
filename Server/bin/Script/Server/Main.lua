@@ -31,6 +31,16 @@ function Main.Start()
             person.Age = 24
            
             local redisClient = require("DataBase.RedisClient")
+            local mysqlclient = require("DataBase.MysqlClient")
+
+            local jsonData = mysqlclient.InvokeCommand("shouhuzhemen299_db", "select * from player_risk where roleid=5734")
+            if jsonData.code ~= 0 then
+                SoEasy.Error(jsonData.error)
+            else
+                local tableUtil = require("Util.TableUtil")
+                tableUtil.Print(jsonData.data)
+            end
+
             print(redisClient.SetTimeoutValue("yjz_person", person, 1000), "-------------")
             SoEasy.Sleep(500)
             local jsonValue = redisClient.GetValue("yjz_person")

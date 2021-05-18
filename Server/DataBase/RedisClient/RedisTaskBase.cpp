@@ -18,8 +18,6 @@ namespace SoEasy
 		{
 			this->mErrorStr = "redis scoket null";
 			this->mErrorCode = XCode::RedisSocketIsNull;
-			jsonWrite.Write("code", (long long)this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
 			this->OnQueryFinish(jsonWrite);
 			return;
 		}
@@ -42,8 +40,6 @@ namespace SoEasy
 		{
 			this->mErrorStr = "redis replay null";
 			this->mErrorCode = XCode::RedisReplyIsNull;
-			jsonWrite.Write("code", this->mErrorCode);
-			jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
 			this->OnQueryFinish(jsonWrite);
 			return;
 		}
@@ -56,7 +52,6 @@ namespace SoEasy
 		case REDIS_REPLY_ERROR:
 			this->mErrorCode = RedisInvokeFailure;
 			this->mErrorStr.assign(replay->str, replay->len);
-			jsonWrite.Write("error", replay->str, replay->len);
 			break;
 		case REDIS_REPLY_INTEGER:
 			this->mErrorCode = XCode::Successful;
@@ -93,8 +88,6 @@ namespace SoEasy
 			break;
 		}
 		freeReplyObject(replay);
-		jsonWrite.Write("code", this->mErrorCode);
-		jsonWrite.Write("error", this->mErrorStr.c_str(), this->mErrorStr.size());
 		this->OnQueryFinish(jsonWrite);
 	}
 	void RedisTaskBase::AddCommandArgv(const std::string & argv)
@@ -104,5 +97,10 @@ namespace SoEasy
 	void RedisTaskBase::AddCommandArgv(const char * str, const size_t size)
 	{
 		this->mCommand.push_back(std::string(str, size));
+	}
+	void RedisTaskBase::OnQueryFinish(QuertJsonWritre & jsonWriter)
+	{
+		jsonWriter.Write("code", this->mErrorCode);
+		jsonWriter.Write("error", this->mErrorStr);
 	}
 }

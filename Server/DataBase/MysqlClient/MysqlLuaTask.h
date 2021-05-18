@@ -1,31 +1,22 @@
 #pragma once
+#include"MysqlTaskBase.h"
 #include<Script/LuaInclude.h>
-#include<Thread/ThreadTaskAction.h>
 namespace SoEasy
 {
 	class MysqlManager;
 	class QuertJsonWritre;
-	class MysqlLuaTask : public ThreadTaskAction
+	class MysqlLuaTask : public MysqlTaskBase
 	{
 	public:
-		MysqlLuaTask(MysqlManager * mgr, long long taskId, 
-			lua_State * lua, int ref, const std::string & db, const std::string & sql);
-	public:
+		MysqlLuaTask(MysqlManager * mgr, long long taskId, const std::string & db, const std::string & sql, lua_State * lua, int ref);
+	protected:
 		 void OnTaskFinish() final;
-		 void InvokeInThreadPool(long long threadId) final;
+		 void OnQueryFinish(QuertJsonWritre & jsonWriter) final; //查询完成之后调用
 	public:
 		static bool Start(lua_State * lua, int index, const std::string & db, const std::string & sql);
 	private:
-		void EndWriteJson(QuertJsonWritre & jsonWrite);
-	private:
-		XCode mErrorCode;
-		std::string mErrorStr;
-	private:
 		int mCroutineRef;
 		lua_State * mLuaEnv;
-		std::string mCommandSql;
-		std::string mDataBaseName;
 		std::string mQueryJsonData;
-		class MysqlManager * mMysqlManager;
 	};
 }
