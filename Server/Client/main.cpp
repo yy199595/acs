@@ -1,5 +1,5 @@
 #include<Core/Applocation.h>
-#include<Core/ManagerFactory.h>
+#include<Core/ManagerRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
@@ -9,14 +9,6 @@
 using namespace SoEasy;
 using namespace Client;
 
-TYPE_REFLECTION(Client::ClientManager, "ClientManager");
-TYPE_REFLECTION(SoEasy::TimerManager, "TimerManager");
-TYPE_REFLECTION(SoEasy::LocalActionManager, "LocalActionManager");
-TYPE_REFLECTION(SoEasy::ScriptManager, "ScriptManager");
-TYPE_REFLECTION(SoEasy::NetWorkManager, "NetWorkManager");
-TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
-
-
 #ifdef _WIN32
 #pragma comment(lib,"lua53.lib")
 #pragma comment(lib,"Common.lib")
@@ -25,16 +17,16 @@ TYPE_REFLECTION(SoEasy::CoroutineManager, "CoroutineManager");
 #endif
 int main(int argc, char ** argv)
 {
-	ManagerFactory factory;
-	factory.RegisterManager<LocalActionManager>();
-	factory.RegisterManager<ClientManager>();
-	factory.RegisterManager<TimerManager>();
-	factory.RegisterManager<ScriptManager>();
-	factory.RegisterManager<NetWorkManager>();
-	factory.RegisterManager<CoroutineManager>();
+	
+	ManagerRegistry::RegisterManager<TimerManager>("TimerManager");
+	ManagerRegistry::RegisterManager<ClientManager>("ClientManager");	
+	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
+	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
+	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
+	ManagerRegistry::RegisterManager<LocalActionManager>("LocalActionManager");
 
 
-	Applocation app("Client", factory, "./Config/ClientConfig.json");
+	Applocation app("Client", "./Config/ClientConfig.json");
 
 	return app.Run();
 }

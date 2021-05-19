@@ -17,11 +17,11 @@ namespace SoEasy
 {
 	class Manager;
 	class ThreadPool;
-	class ManagerFactory;
+	class ManagerRegistry;
 	class Applocation
 	{
 	public:
-		Applocation(const std::string srvName, ManagerFactory & factory, const std::string configPath);
+		Applocation(const std::string srvName, const std::string configPath);
 		virtual ~Applocation() {};
 	public:
 		ThreadPool * GetThreadPool() { return mThreadPool; }
@@ -81,7 +81,6 @@ namespace SoEasy
 		long long mMainLoopStartTime;
 	private:
 		ThreadPool * mThreadPool;		
-		ManagerFactory & mManagerFactory;
 		static Applocation * mApplocation;
 		std::vector<Manager *> mSortManagers;
 		std::unordered_map<std::string, Manager *> mManagerMap;

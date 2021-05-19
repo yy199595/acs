@@ -45,9 +45,6 @@
     <ClCompile Include="Core\Applocation.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ManagerFactory.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\TcpSessionListener.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -231,12 +228,12 @@
     <ClCompile Include="Script\SystemExtension.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ManagerRegistry.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ManagerFactory.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\TcpSessionListener.h">
@@ -505,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="Script\UserDataParameter.h">
       <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ManagerRegistry.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

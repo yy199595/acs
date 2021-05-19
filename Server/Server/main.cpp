@@ -1,5 +1,5 @@
 #include<Core/Applocation.h>
-#include<Core/ManagerFactory.h>
+#include<Core/ManagerRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/LocalActionManager.h>
@@ -30,27 +30,27 @@ using namespace SoEasy;
 #endif
 int main(int argc, char ** argv)
 { 
-	ManagerFactory factory;
-	factory.RegisterManager<LoginManager>("LoginManager");
-	factory.RegisterManager<ProxyManager>("ProxyManager");
-	factory.RegisterManager<RedisManager>("RedisManager");
-	factory.RegisterManager<MysqlManager>("MysqlManager");
-	factory.RegisterManager<TimerManager>("TimerManager");
-	factory.RegisterManager<ScriptManager>("ScriptManager");
-	factory.RegisterManager<NetWorkManager>("NetWorkManager");
-	factory.RegisterManager<CommandManager>("CommandManager");
-	factory.RegisterManager<ListenerManager>("ListenerManager");
-	factory.RegisterManager<UserDataManager>("UserDataManager");
-	factory.RegisterManager<CoroutineManager>("CoroutineManager");
-	factory.RegisterManager<LocalAccessManager>("LocalAccessManager");
-	factory.RegisterManager<LocalActionManager>("LocalActionManager");
-	factory.RegisterManager<RemoteActionManager>("RemoteActionManager");
-	factory.RegisterManager<ActionRegisterManager>("ActionRegisterManager");
+	
+	ManagerRegistry::RegisterManager<LoginManager>("LoginManager");
+	ManagerRegistry::RegisterManager<ProxyManager>("ProxyManager");
+	ManagerRegistry::RegisterManager<RedisManager>("RedisManager");
+	ManagerRegistry::RegisterManager<MysqlManager>("MysqlManager");
+	ManagerRegistry::RegisterManager<TimerManager>("TimerManager");
+	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
+	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
+	ManagerRegistry::RegisterManager<CommandManager>("CommandManager");
+	ManagerRegistry::RegisterManager<ListenerManager>("ListenerManager");
+	ManagerRegistry::RegisterManager<UserDataManager>("UserDataManager");
+	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
+	ManagerRegistry::RegisterManager<LocalAccessManager>("LocalAccessManager");
+	ManagerRegistry::RegisterManager<LocalActionManager>("LocalActionManager");
+	ManagerRegistry::RegisterManager<RemoteActionManager>("RemoteActionManager");
+	ManagerRegistry::RegisterManager<ActionRegisterManager>("ActionRegisterManager");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
 	
-	Applocation app(serverName, factory, configPath);
+	Applocation app(serverName, configPath);
 
 	return app.Run();
 }

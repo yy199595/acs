@@ -1,6 +1,6 @@
 
 #include"Applocation.h"
-#include"ManagerFactory.h"
+#include"ManagerRegistry.h"
 #include<Util/FileHelper.h>
 #include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
@@ -14,8 +14,8 @@ namespace SoEasy
 {
 	Applocation * Applocation::mApplocation = nullptr;
 
-	Applocation::Applocation(const std::string srvName, ManagerFactory & factory, const std::string configPath)
-		: mStartTime(TimeHelper::GetSecTimeStamp()), mConfig(configPath), mManagerFactory(factory)
+	Applocation::Applocation(const std::string srvName, const std::string configPath)
+		: mStartTime(TimeHelper::GetSecTimeStamp()), mConfig(configPath)
 	{
 		assert(!mApplocation);
 		mApplocation = this;
@@ -35,7 +35,7 @@ namespace SoEasy
 
 	bool Applocation::AddManager(const std::string & name)
 	{
-		Manager * manager = mManagerFactory.Create(name);
+		Manager * manager = ManagerRegistry::Create(name);
 		if (manager == nullptr)
 		{
 			SayNoDebugError("create " << name << " fail");
@@ -231,7 +231,7 @@ namespace SoEasy
 
 	bool Applocation::GetTypeName(size_t hash, std::string & name)
 	{
-		return this->mManagerFactory.GetTypeName(hash, name);
+		return ManagerRegistry::GetTypeName(hash, name);
 	}
 
 	void Applocation::UpdateConsoleTitle()

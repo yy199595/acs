@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Applocation.cpp" />
-    <ClCompile Include="Core\ManagerFactory.cpp" />
+    <ClCompile Include="Core\ManagerRegistry.cpp" />
     <ClCompile Include="Core\TcpSessionListener.cpp" />
     <ClCompile Include="Coroutine\Coroutine.cpp" />
     <ClCompile Include="Coroutine\CoroutineEvent.cpp" />
@@ -85,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h" />
-    <ClInclude Include="Core\ManagerFactory.h" />
+    <ClInclude Include="Core\ManagerRegistry.h" />
     <ClInclude Include="Core\TcpSessionListener.h" />
     <ClInclude Include="Coroutine\Coroutine.h" />
     <ClInclude Include="Coroutine\CoroutineEvent.h" />
