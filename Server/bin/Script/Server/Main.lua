@@ -23,7 +23,8 @@ function Main.Start()
             user.platform = 'ios_wechat'
             user.userid = 156465465478748456
             user.passwd = '199595yjz.'
-            --user.registertime = os.time()
+            user.phonenum = 110
+            user.registertime = os.time()
 
             print(mysqlclient.Insert('yjz', 'tb_player_account', user))
 
