@@ -67,7 +67,7 @@ aux_source_directory(../DataBase/QueryResult SUPER_SRC)
 aux_source_directory(../DataBase/RedisClient SUPER_SRC)
 aux_source_directory(../DataBase/Script SUPER_SRC)
 
-aux_source_directory(./main.cpp SUPER_SRC)
+aux_source_directory(./ SUPER_SRC)
 message(${SUPER_SRC})
 LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
