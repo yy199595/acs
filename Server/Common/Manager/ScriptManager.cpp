@@ -215,19 +215,19 @@ namespace SoEasy
 
 	void ScriptManager::RegisterExtension(lua_State * lua)
 	{
-		/*ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Log", LuaAPIExtension::DebugLog);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Log", LuaAPIExtension::DebugLog);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Info", LuaAPIExtension::DebugInfo);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Error", LuaAPIExtension::DebugError);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Warning", LuaAPIExtension::DebugWarning);*/
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Warning", LuaAPIExtension::DebugWarning);
 
 
 		lua_newtable(lua);
-		//lua_pushtablefunction(lua, "Serialization", LuaProtocExtension::Serialization);
+		lua_pushtablefunction(lua, "Serialization", LuaProtocExtension::Serialization);
 		lua_setglobal(lua, "ProtocUtil");
 
 		lua_getglobal(lua, "coroutine");
-	/*	lua_pushtablefunction(lua, "sleep", CoroutineExtension::Sleep);
-		lua_pushtablefunction(lua, "start", CoroutineExtension::Start);*/
+		lua_pushtablefunction(lua, "sleep", CoroutineExtension::Sleep);
+		lua_pushtablefunction(lua, "start", CoroutineExtension::Start);
 
 
 	}
