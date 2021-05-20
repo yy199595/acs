@@ -4,23 +4,27 @@
 #include<Object/Object.h>
 #include<Script/LuaInclude.h>
 #include<Global/ServerConfig.h>
-#include<NetWork/NetWorkAction.h>
 #include<Other/DoubleBufferQueue.h>
+#include<NetWork/TcpClientSession.h>
+#include<Protocol/Common.pb.h>
+using namespace PB;
 namespace SoEasy
 {
-	class ThreadTaskAction;
+	typedef shared_ptr<NetWorkPacket> SharedPacket;
 	struct NetMessageBuffer
 	{
 	public:
-		NetMessageBuffer(const std::string & address, const shared_ptr<NetWorkPacket> packet);
+		NetMessageBuffer(const std::string & address, const SharedPacket packet);
 	public:
 		const std::string mAddress;
-		const shared_ptr<NetWorkPacket> mMessagePacket;
+		const SharedPacket mMessagePacket;
 	};
+	
+	typedef shared_ptr<NetMessageBuffer> SharedNetPacket;
 
+	class ThreadTaskAction;
 	class LocalActionProxy;
-	typedef std::shared_ptr<NetMessageBuffer> SharedNetPacket;
-
+	
 	class Manager : public Object
 	{
 	public:
@@ -28,14 +32,6 @@ namespace SoEasy
 		virtual ~Manager() { }
 	protected:
 		friend Applocation;
-		bool BindFunction(std::string name, LocalAction1 action);
-
-		template<typename T1>
-		bool BindFunction(std::string name, LocalAction2<T1> action);
-
-		template<typename T1, typename T2>
-		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
-
 	public:
 		void AddFinishTask(long long id);	//不要手动调用
 	public:
@@ -44,8 +40,6 @@ namespace SoEasy
 	public:
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)
 		virtual void PushClassToLua(lua_State * luaEnv) { }		//自身方法导出到lua
-	private:
-		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	protected:
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
@@ -56,47 +50,18 @@ namespace SoEasy
 		virtual void OnFrameUpdate(float t) { }			//逻辑帧
 		virtual void OnSecondUpdate() { }				//每秒调用
 		virtual void OnFrameUpdateAfter() { }			//在逻辑帧执行完成之后
-		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//在线程池完成任务之后的通知
-		
+		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//在线程池完成任务之后的通知	
 	private:
 		const int mPriority;
 		DoubleBufferQueue<long long> mFinishTaskQueue;  //在其他线程完成的任务存储
 		std::unordered_map<long long, shared_ptr<ThreadTaskAction>> mThreadTaskMap;
 	};
 	
-	template<typename T1>
-	inline bool Manager::BindFunction(std::string name, LocalAction2<T1> action)
-	{
-		typedef LocalActionProxy2<T1> ActionProxyType;
-		const size_t pos = name.find_first_of(".");
-		if (pos == std::string::npos)
-		{
-			SayNoDebugError("register error : " << name);
-			return false;
-		}
-		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
-	}
-
-	template<typename T1, typename T2>
-	inline bool Manager::BindFunction(std::string name, LocalAction3<T1, T2> action)
-	{
-		const size_t pos = name.find_first_of(".");
-		if (pos == std::string::npos)
-		{
-			SayNoDebugError("register error : " << name);
-			return false;
-		}
-		return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action, name));
-	}
+	
 
 	inline std::string GetFunctionName(std::string func)
 	{
-		char buf[] = ".";
-		size_t pos = func.find("::");
-		return func.replace(pos, sizeof(buf), ".");
+		return func.substr(func.find("::") + 2);
 	}
-#define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))
-#define REGISTER_FUNCTION_1(func,t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))
-#define REGISTER_FUNCTION_2(func,t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
 
 }

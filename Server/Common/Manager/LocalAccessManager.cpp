@@ -1,16 +1,17 @@
 #include"LocalAccessManager.h"
-#include"LocalActionManager.h"
+#include"ActionManager.h"
 #include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkAction.h>
 #include<NetWork/NetLuaRetAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Service/ServiceBase.h>
 namespace SoEasy
 {
 	bool LocalAccessManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
-		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<LocalActionManager>());
+		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<ActionManager>());
 		return true;
 	}
 
@@ -31,16 +32,16 @@ namespace SoEasy
 		}
 	}
 
-	bool LocalAccessManager::CallAction(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
+	bool LocalAccessManager::CallService(const std::string & serviceName, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		shared_ptr<NetLuaAction> luaAction = this->mLocalActionManager->GetLuaAction(func);
+		shared_ptr<NetLuaAction> luaAction = this->mLocalActionManager->GetLuaAction(serviceName);
 		if (luaAction != nullptr)
 		{
 			this->mLocalCallActionMessage.push(returnPackage);
 			return true;
 		}
-		shared_ptr<LocalActionProxy> localAction = this->mLocalActionManager->GetAction(func);
-		if (localAction != nullptr)
+		ServiceBase * service = this->GetApp()->GetService(serviceName);
+		if (service != nullptr)
 		{
 			this->mLocalCallActionMessage.push(returnPackage);
 			return true;
@@ -60,7 +61,7 @@ namespace SoEasy
 
 	void LocalAccessManager::HandleLocationCallAction(shared_ptr<NetWorkPacket> returnPackage)
 	{
-		const std::string & action = returnPackage->func_name();
+		const std::string & action = returnPackage->action();
 
 		shared_ptr<NetLuaAction> luaAction = this->mLocalActionManager->GetLuaAction(action);
 		if (luaAction != nullptr)
@@ -79,15 +80,16 @@ namespace SoEasy
 			}
 			return;
 		}
-		shared_ptr<LocalActionProxy> localAction = this->mLocalActionManager->GetAction(action);
-		if (localAction != nullptr)
+		const std::string & serviceName = returnPackage->service();
+		ServiceBase * service = this->GetApp()->GetService(serviceName);
+		if (service != nullptr)
 		{
-			this->mCoroutineManager->Start(action, [this, localAction, returnPackage]()
+			this->mCoroutineManager->Start(action, [this, service, returnPackage]()
 			{
 				const long long callbackId = returnPackage->callback_id();
 				const long long operatorId = returnPackage->operator_id();
 				shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-				XCode code = localAction->Invoke(returnPackage, returnPacket);
+				XCode code = service->CallAction(returnPackage, returnPacket);
 				if (callbackId != 0)
 				{
 					returnPacket->set_error_code(code);

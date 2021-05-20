@@ -3,18 +3,17 @@
 #include<Util/NumberHelper.h>
 #include<Core/TcpSessionListener.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/RemoteActionManager.h>
+#include<Service/ServiceQuery.h>
 namespace SoEasy
 {
 	bool ProxyManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(ListenerManager::OnInit());
-		SayNoAssertRetFalse_F(this->mRemoteActionManager = this->GetManager<RemoteActionManager>());
-		this->mRemoteActionManager->SetRecvCallback(BIND_THIS_ACTION_2(ProxyManager::OnRecvServerMessage));
+		SayNoAssertRetFalse_F(this->mRemoteActionManager = this->GetManager<ServiceQuery>());
 		return true;
 	}
 
-	void ProxyManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ProxyManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
 	{
 		const long long id = tcpSession->GetSocketId();
 		auto iter = this->mClientObjectMap.find(id);
@@ -24,7 +23,7 @@ namespace SoEasy
 		}
 	}
 
-	void ProxyManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ProxyManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
 	{	
 		if (!tcpSession->IsContent())	//客户端
 		{
@@ -44,17 +43,17 @@ namespace SoEasy
 		shared_ptr<GameObject> clientObject = this->GetClientObject(tcpSession->GetSocketId());
 		if (clientObject != nullptr)//客户端发送过来的消息
 		{
-			const std::string & name = packet->func_name();
+			const std::string & service = packet->service();
+			const std::string & action = packet->action();
 			const long long id = clientObject->GetGameObjectID();
 
 			shared_ptr<RemoteActionProxy> actionProxy;
-			if (this->mRemoteActionManager->GetActionProxy(name, actionProxy))
+			if (this->mRemoteActionManager->GetActionProxy(service, actionProxy))
 			{
 				packet->set_operator_id(id);
 				actionProxy->Invoke(packet);
 				return;
 			}
-			packet->clear_func_name();
 			packet->clear_operator_id();
 			packet->clear_message_data();
 			packet->set_error_code(XCode::CallFunctionNotExist);

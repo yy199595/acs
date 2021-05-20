@@ -17,10 +17,10 @@
     <ClInclude Include="Manager\ProxyManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\LoginManager.h">
+    <ClInclude Include="Manager\UserDataManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\UserDataManager.h">
+    <ClInclude Include="Manager\LoginService.h">
       <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
@@ -28,10 +28,10 @@
     <ClCompile Include="Manager\ProxyManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\LoginManager.cpp">
+    <ClCompile Include="Manager\UserDataManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\UserDataManager.cpp">
+    <ClCompile Include="Manager\LoginService.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>

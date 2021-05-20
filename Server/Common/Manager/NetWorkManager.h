@@ -36,8 +36,8 @@ namespace SoEasy
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
 		class LocalAccessManager * mLocalAccessManager;
-		class LocalActionManager * mLocalActionManager;
-		class RemoteActionManager * mActionQueryManager;
+		class ActionManager * mLocalActionManager;
+		class ServiceQuery * mActionQueryManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//ËùÓÐsession

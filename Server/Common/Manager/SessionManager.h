@@ -1,5 +1,5 @@
 #pragma once
-#include"Manager.h"
+#include<Service/ServiceBase.h>
 namespace SoEasy
 {
 	typedef std::function<bool(shared_ptr<TcpClientSession>, shared_ptr<NetWorkPacket>)> RecvMsgCallback;
@@ -12,7 +12,6 @@ namespace SoEasy
 		friend TcpClientSession;
 		shared_ptr<TcpClientSession> CreateTcpSession(SharedTcpSocket socket);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string address);
-		void SetRecvCallback(RecvMsgCallback callback) { this->mRecvMsgCallback = callback; }
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string ip, unsigned short port);
 	private:	//不要手动调用
 		bool AddNewSession(SharedTcpSession tcpSession);
@@ -22,22 +21,20 @@ namespace SoEasy
 		bool OnInit() override;
 		virtual void OnSessionErrorAfter(SharedTcpSession tcpSession) = 0;
 		virtual void OnSessionConnectAfter(SharedTcpSession tcpSession) = 0;
-		virtual void OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> packet);
+		virtual void OnRecvNewMessageAfter(SharedTcpSession tcpSession, SharedPacket packet);
 	private:
-		XCode InvokeAction(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData);
+		bool CallAction(SharedPacket requestData);
+		bool CallLuaAction(SharedPacket requestData);
 	protected:
 		void OnSystemUpdate() final;
 		virtual void OnSecondUpdate() override;
-		long long GetIdByAddress(const std::string & address);
 		SharedTcpSession GetCurSession() { return this->mCurrentSession; }
-		bool ParseAddress(const std::string & address, string & ip, unsigned short & port);
 	protected:
 		class NetWorkManager * mNetWorkManager;
 	private:
 		int mReConnectTime;
 		NetWorkPacket mNetWorkPacket;
-		RecvMsgCallback mRecvMsgCallback;
-		class LocalActionManager * mActionManager;
+		class ActionManager * mActionManager;
 		class CoroutineManager * mCoroutineSheduler;
 		shared_ptr<TcpClientSession> mCurrentSession;  //当前正在执行action的session
 		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;

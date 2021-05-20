@@ -40,6 +40,9 @@
     <Filter Include="Thread">
       <UniqueIdentifier>{37ca78ed-1d59-4179-b8b4-e5e0f1da31bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Service">
+      <UniqueIdentifier>{e2767c4f-2396-4bdd-906f-4c00c1b66c2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Applocation.cpp">
@@ -171,15 +174,6 @@
     <ClCompile Include="Util\TimeHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\ActionRegisterManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\LocalActionManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\RemoteActionManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="NetWork\RemoteActionProxy.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
@@ -230,6 +224,18 @@
     </ClCompile>
     <ClCompile Include="Core\ManagerRegistry.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ServiceBase.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ServiceRegistry.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ServiceQuery.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\ActionManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -404,15 +410,6 @@
     <ClInclude Include="Util\TimeHelper.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\ActionRegisterManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\LocalActionManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\RemoteActionManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="NetWork\RemoteActionProxy.h">
       <Filter>NetWork</Filter>
     </ClInclude>
@@ -505,6 +502,18 @@
     </ClInclude>
     <ClInclude Include="Core\ManagerRegistry.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ServiceBase.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ServiceRegistry.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ServiceQuery.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ActionManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

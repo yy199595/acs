@@ -2,7 +2,7 @@
 #include<Core/Applocation.h>
 #include<Script/luadebug.h>
 #include<Object/GameObject.h>
-#include<Manager/ActionRegisterManager.h>
+#include<Service/ServiceRegistry.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/TimerManager.h>
 
@@ -50,7 +50,6 @@ namespace SoEasy
 
 		this->OnPushGlobalObject();
 		this->RegisterExtension(mLuaEnv);
-		REGISTER_FUNCTION_0(ScriptManager::OnHotfix);
 		return this->LoadLuaScript(this->mMainLuaPath);
 	}
 
@@ -143,7 +142,7 @@ namespace SoEasy
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "GetAddress", &TcpClientSession::GetAddress);
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "StartConnect", &TcpClientSession::StartConnect);
 		
-		ClassProxyHelper::BeginRegister<LocalActionManager>(lua, "LocalActionManager");
+		ClassProxyHelper::BeginRegister<ActionManager>(lua, "ActionManager");
 
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
@@ -168,15 +167,6 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "BindAction", SystemExtension::BindAction);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "SendByAddress", SystemExtension::SendByAddress);
 
-	}
-
-	XCode ScriptManager::OnHotfix(long long operId)
-	{
-		if (this->LoadAllModule())
-		{
-			return XCode::Successful;
-		}
-		return XCode::Failure;
 	}
 
 	void ScriptManager::OnPushGlobalObject()

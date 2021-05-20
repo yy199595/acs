@@ -18,8 +18,8 @@ namespace SoEasy
 		bool OnInit() override;
 		void OnInitComplete() override;
 	protected:
-		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
-		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
+		void OnSessionErrorAfter(SharedTcpSession tcpSession) override;
+		void OnSessionConnectAfter(SharedTcpSession tcpSession) override;
 	private:
 		std::string mListenerIp;	//¼àÌýµÄip
 		std::string mListenAddress;	//µØÖ·

@@ -2,17 +2,17 @@
 #include<Core/ManagerRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
-#include<Manager/LocalActionManager.h>
-#include<Manager/ActionRegisterManager.h>
+#include<Manager/ActionManager.h>
+#include<Service/ServiceRegistry.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/CommandManager.h>
 #include<Manager/ListenerManager.h>
-#include<Manager/RemoteActionManager.h>
+#include<Service/ServiceQuery.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/ProxyManager.h>
-#include<Manager/LoginManager.h>
+#include<Manager/LoginService.h>
 #include<Manager/UserDataManager.h>
 #include<Manager/LocalAccessManager.h>
 using namespace SoEasy;
@@ -31,7 +31,7 @@ using namespace SoEasy;
 int main(int argc, char ** argv)
 { 
 	
-	ManagerRegistry::RegisterManager<LoginManager>("LoginManager");
+	ManagerRegistry::RegisterManager<LoginService>("LoginService");
 	ManagerRegistry::RegisterManager<ProxyManager>("ProxyManager");
 	ManagerRegistry::RegisterManager<RedisManager>("RedisManager");
 	ManagerRegistry::RegisterManager<MysqlManager>("MysqlManager");
@@ -43,9 +43,9 @@ int main(int argc, char ** argv)
 	ManagerRegistry::RegisterManager<UserDataManager>("UserDataManager");
 	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
 	ManagerRegistry::RegisterManager<LocalAccessManager>("LocalAccessManager");
-	ManagerRegistry::RegisterManager<LocalActionManager>("LocalActionManager");
-	ManagerRegistry::RegisterManager<RemoteActionManager>("RemoteActionManager");
-	ManagerRegistry::RegisterManager<ActionRegisterManager>("ActionRegisterManager");
+	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
+	ManagerRegistry::RegisterManager<ServiceQuery>("ServiceQuery");
+	ManagerRegistry::RegisterManager<ServiceRegistry>("ServiceRegistry");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";

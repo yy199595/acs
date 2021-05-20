@@ -200,23 +200,37 @@ class NetWorkPacket :
 
   // accessors -------------------------------------------------------
 
-  // string func_name = 1;
-  void clear_func_name();
-  static const int kFuncNameFieldNumber = 1;
-  const ::std::string& func_name() const;
-  void set_func_name(const ::std::string& value);
+  // string service = 1;
+  void clear_service();
+  static const int kServiceFieldNumber = 1;
+  const ::std::string& service() const;
+  void set_service(const ::std::string& value);
   #if LANG_CXX11
-  void set_func_name(::std::string&& value);
+  void set_service(::std::string&& value);
   #endif
-  void set_func_name(const char* value);
-  void set_func_name(const char* value, size_t size);
-  ::std::string* mutable_func_name();
-  ::std::string* release_func_name();
-  void set_allocated_func_name(::std::string* func_name);
+  void set_service(const char* value);
+  void set_service(const char* value, size_t size);
+  ::std::string* mutable_service();
+  ::std::string* release_service();
+  void set_allocated_service(::std::string* service);
 
-  // bytes message_data = 5;
+  // string action = 2;
+  void clear_action();
+  static const int kActionFieldNumber = 2;
+  const ::std::string& action() const;
+  void set_action(const ::std::string& value);
+  #if LANG_CXX11
+  void set_action(::std::string&& value);
+  #endif
+  void set_action(const char* value);
+  void set_action(const char* value, size_t size);
+  ::std::string* mutable_action();
+  ::std::string* release_action();
+  void set_allocated_action(::std::string* action);
+
+  // bytes message_data = 6;
   void clear_message_data();
-  static const int kMessageDataFieldNumber = 5;
+  static const int kMessageDataFieldNumber = 6;
   const ::std::string& message_data() const;
   void set_message_data(const ::std::string& value);
   #if LANG_CXX11
@@ -228,9 +242,9 @@ class NetWorkPacket :
   ::std::string* release_message_data();
   void set_allocated_message_data(::std::string* message_data);
 
-  // string protoc_name = 6;
+  // string protoc_name = 7;
   void clear_protoc_name();
-  static const int kProtocNameFieldNumber = 6;
+  static const int kProtocNameFieldNumber = 7;
   const ::std::string& protoc_name() const;
   void set_protoc_name(const ::std::string& value);
   #if LANG_CXX11
@@ -242,21 +256,21 @@ class NetWorkPacket :
   ::std::string* release_protoc_name();
   void set_allocated_protoc_name(::std::string* protoc_name);
 
-  // uint64 operator_id = 3;
+  // uint64 operator_id = 4;
   void clear_operator_id();
-  static const int kOperatorIdFieldNumber = 3;
+  static const int kOperatorIdFieldNumber = 4;
   ::google::protobuf::uint64 operator_id() const;
   void set_operator_id(::google::protobuf::uint64 value);
 
-  // uint64 callback_id = 4;
+  // uint64 callback_id = 5;
   void clear_callback_id();
-  static const int kCallbackIdFieldNumber = 4;
+  static const int kCallbackIdFieldNumber = 5;
   ::google::protobuf::uint64 callback_id() const;
   void set_callback_id(::google::protobuf::uint64 value);
 
-  // int32 error_code = 2;
+  // int32 error_code = 3;
   void clear_error_code();
-  static const int kErrorCodeFieldNumber = 2;
+  static const int kErrorCodeFieldNumber = 3;
   ::google::protobuf::int32 error_code() const;
   void set_error_code(::google::protobuf::int32 value);
 
@@ -265,7 +279,8 @@ class NetWorkPacket :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr func_name_;
+  ::google::protobuf::internal::ArenaStringPtr service_;
+  ::google::protobuf::internal::ArenaStringPtr action_;
   ::google::protobuf::internal::ArenaStringPtr message_data_;
   ::google::protobuf::internal::ArenaStringPtr protoc_name_;
   ::google::protobuf::uint64 operator_id_;
@@ -1364,60 +1379,113 @@ class StringMap :
 #endif  // __GNUC__
 // NetWorkPacket
 
-// string func_name = 1;
-inline void NetWorkPacket::clear_func_name() {
-  func_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string service = 1;
+inline void NetWorkPacket::clear_service() {
+  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& NetWorkPacket::func_name() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.func_name)
-  return func_name_.GetNoArena();
+inline const ::std::string& NetWorkPacket::service() const {
+  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.service)
+  return service_.GetNoArena();
 }
-inline void NetWorkPacket::set_func_name(const ::std::string& value) {
+inline void NetWorkPacket::set_service(const ::std::string& value) {
   
-  func_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.func_name)
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.service)
 }
 #if LANG_CXX11
-inline void NetWorkPacket::set_func_name(::std::string&& value) {
+inline void NetWorkPacket::set_service(::std::string&& value) {
   
-  func_name_.SetNoArena(
+  service_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.func_name)
+  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.service)
 }
 #endif
-inline void NetWorkPacket::set_func_name(const char* value) {
+inline void NetWorkPacket::set_service(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  func_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.func_name)
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.service)
 }
-inline void NetWorkPacket::set_func_name(const char* value, size_t size) {
+inline void NetWorkPacket::set_service(const char* value, size_t size) {
   
-  func_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.func_name)
+  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.service)
 }
-inline ::std::string* NetWorkPacket::mutable_func_name() {
+inline ::std::string* NetWorkPacket::mutable_service() {
   
-  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.func_name)
-  return func_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.service)
+  return service_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* NetWorkPacket::release_func_name() {
-  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.func_name)
+inline ::std::string* NetWorkPacket::release_service() {
+  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.service)
   
-  return func_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return service_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void NetWorkPacket::set_allocated_func_name(::std::string* func_name) {
-  if (func_name != nullptr) {
+inline void NetWorkPacket::set_allocated_service(::std::string* service) {
+  if (service != nullptr) {
     
   } else {
     
   }
-  func_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), func_name);
-  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.func_name)
+  service_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service);
+  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.service)
 }
 
-// int32 error_code = 2;
+// string action = 2;
+inline void NetWorkPacket::clear_action() {
+  action_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NetWorkPacket::action() const {
+  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.action)
+  return action_.GetNoArena();
+}
+inline void NetWorkPacket::set_action(const ::std::string& value) {
+  
+  action_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.action)
+}
+#if LANG_CXX11
+inline void NetWorkPacket::set_action(::std::string&& value) {
+  
+  action_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.action)
+}
+#endif
+inline void NetWorkPacket::set_action(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  action_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.action)
+}
+inline void NetWorkPacket::set_action(const char* value, size_t size) {
+  
+  action_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.action)
+}
+inline ::std::string* NetWorkPacket::mutable_action() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.action)
+  return action_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NetWorkPacket::release_action() {
+  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.action)
+  
+  return action_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NetWorkPacket::set_allocated_action(::std::string* action) {
+  if (action != nullptr) {
+    
+  } else {
+    
+  }
+  action_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), action);
+  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.action)
+}
+
+// int32 error_code = 3;
 inline void NetWorkPacket::clear_error_code() {
   error_code_ = 0;
 }
@@ -1431,7 +1499,7 @@ inline void NetWorkPacket::set_error_code(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:PB.NetWorkPacket.error_code)
 }
 
-// uint64 operator_id = 3;
+// uint64 operator_id = 4;
 inline void NetWorkPacket::clear_operator_id() {
   operator_id_ = PROTOBUF_ULONGLONG(0);
 }
@@ -1445,7 +1513,7 @@ inline void NetWorkPacket::set_operator_id(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:PB.NetWorkPacket.operator_id)
 }
 
-// uint64 callback_id = 4;
+// uint64 callback_id = 5;
 inline void NetWorkPacket::clear_callback_id() {
   callback_id_ = PROTOBUF_ULONGLONG(0);
 }
@@ -1459,7 +1527,7 @@ inline void NetWorkPacket::set_callback_id(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:PB.NetWorkPacket.callback_id)
 }
 
-// bytes message_data = 5;
+// bytes message_data = 6;
 inline void NetWorkPacket::clear_message_data() {
   message_data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1512,7 +1580,7 @@ inline void NetWorkPacket::set_allocated_message_data(::std::string* message_dat
   // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.message_data)
 }
 
-// string protoc_name = 6;
+// string protoc_name = 7;
 inline void NetWorkPacket::clear_protoc_name() {
   protoc_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

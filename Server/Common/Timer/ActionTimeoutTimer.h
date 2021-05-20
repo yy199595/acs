@@ -2,15 +2,15 @@
 #include"TimerBase.h"
 namespace SoEasy
 {
-	class LocalActionManager;
+	class ActionManager;
 	class ActionTimeoutTimer : public TimerBase
 	{
 	public:
-		ActionTimeoutTimer(long long ms, long long callbackId, LocalActionManager * mgr);
+		ActionTimeoutTimer(long long ms, long long callbackId, ActionManager * mgr);
 	public:
 		bool Invoke() final;
 	private:
 		long long mCallbackId;
-		LocalActionManager * mActionManager;
+		ActionManager * mActionManager;
 	};
 }

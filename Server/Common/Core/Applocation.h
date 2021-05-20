@@ -16,6 +16,7 @@ using namespace asio::ip;
 namespace SoEasy
 {
 	class Manager;
+	class ServiceBase;
 	class ThreadPool;
 	class ManagerRegistry;
 	class Applocation
@@ -44,6 +45,9 @@ namespace SoEasy
 		template<typename T>
 		inline bool TryAddManager();
 		void GetManagers(std::vector<Manager *> & managers);
+		void GetServices(std::vector<ServiceBase *> & services);
+	public:
+		ServiceBase * GetService(const std::string & name);
 	private:
 		bool LoadManager();
 		bool InitManager();
@@ -84,6 +88,7 @@ namespace SoEasy
 		static Applocation * mApplocation;
 		std::vector<Manager *> mSortManagers;
 		std::unordered_map<std::string, Manager *> mManagerMap;
+		std::unordered_map<std::string, ServiceBase *> mServiceMap;
 	};
 	template<typename T>
 	inline bool Applocation::AddManager()
@@ -130,7 +135,7 @@ namespace SoEasy
 		size_t hash = typeid(T).hash_code();
 		if (!this->GetTypeName(hash, name))
 		{
-			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
+			SayNoDebugError("player register" << typeid(T).name());
 			return false;
 		}
 		auto iter = this->mManagerMap.find(name);

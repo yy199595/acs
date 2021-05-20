@@ -14,7 +14,7 @@ namespace SoEasy
 
 	void ActionComponent::OnInit()
 	{
-		this->mLocalActionManager = this->GetManager<LocalActionManager>();
-		this->mRemoteActionManager = this->GetManager<RemoteActionManager>();
+		this->mLocalActionManager = this->GetManager<ActionManager>();
+		this->mRemoteActionManager = this->GetManager<ServiceQuery>();
 	}
 }

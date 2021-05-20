@@ -3,7 +3,7 @@
 #include<Protocol/Common.pb.h>
 #include<NetWork/TcpClientSession.h>
 #include<NetWork/NetWorkRetAction.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Script/LuaTable.h>
 namespace SoEasy
@@ -15,43 +15,43 @@ namespace SoEasy
 		RemoteScheduler(shared_ptr<TcpClientSession>, long long operId = 0);
 		~RemoteScheduler() { }
 	public:
-		XCode Call(std::string func);
-		XCode Call(std::string func, NetWorkRetAction1 action);
+		XCode Call(const std::string service, std::string func);
+		XCode Call(const std::string service, std::string func, NetWorkRetAction1 action);
 		template<typename T>
-		XCode Call(std::string func, NetWorkRetAction2<T> action);
+		XCode Call(const std::string service, std::string func, NetWorkRetAction2<T> action);
 	public:
-		XCode Call(std::string func, LuaTable & message);
-		XCode Call(std::string func, LuaTable & message, NetLuaRetAction * action);
-		XCode Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action);
+		XCode Call(const std::string service, std::string func, LuaTable & message);
+		XCode Call(const std::string service, std::string func, LuaTable & message, NetLuaRetAction * action);
+		XCode Call(const std::string service, std::string func, LuaTable & luaTable, NetLuaWaitAction * action);
 	public:
-		XCode Call(std::string func, Message * message);
-		XCode Call(std::string func, Message * message, NetLuaRetAction * action);
-		XCode Call(std::string func, Message * message, NetWorkRetAction1 action);
-		XCode Call(std::string func, Message * message, NetLuaWaitAction * action);
+		XCode Call(const std::string service, std::string func, Message * message);
+		XCode Call(const std::string service, std::string func, Message * message, NetLuaRetAction * action);
+		XCode Call(const std::string service, std::string func, Message * message, NetWorkRetAction1 action);
+		XCode Call(const std::string service, std::string func, Message * message, NetLuaWaitAction * action);
 		template<typename T>
-		XCode Call(std::string func, Message * message, NetWorkRetAction2<T> action);
+		XCode Call(const std::string service, std::string func, Message * message, NetWorkRetAction2<T> action);
 	private:	
-		XCode SendCallMessage(std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
-		XCode SendCallMessage(std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);		
+		XCode SendCallMessage(const std::string & service, std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
+		XCode SendCallMessage(const std::string & service, std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);
 	public:
 		long long mOperatorId;
 		std::string mMessageBuffer;
 		std::string mBindSessionAdress;
 		NetWorkManager * mNetWorkManager;
-		LocalActionManager * mFunctionManager;
+		ActionManager * mFunctionManager;
 	};
 
 	template<typename T>
-	inline XCode RemoteScheduler::Call(std::string func, NetWorkRetAction2<T> action)
+	inline XCode RemoteScheduler::Call(const std::string service, std::string func, NetWorkRetAction2<T> action)
 	{
 		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
-		return this->SendCallMessage(func, nullptr, pAction);
+		return this->SendCallMessage(service, func, nullptr, pAction);
 	}
 
 	template<typename T>
-	inline XCode RemoteScheduler::Call(std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
+	inline XCode RemoteScheduler::Call(const std::string service, std::string func, google::protobuf::Message * message, NetWorkRetAction2<T> action)
 	{
 		auto pAction = make_shared<LocalRetActionProxy2<T>>(action, func);
-		return this->SendCallMessage(func, message, pAction);
+		return this->SendCallMessage(service, func, message, pAction);
 	}
 }

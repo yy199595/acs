@@ -20,7 +20,7 @@ namespace SoEasy
 	private:
 		bool OnRecvServerMessage(shared_ptr<TcpClientSession> session, shared_ptr<NetWorkPacket> msg);
 	private:
-		class RemoteActionManager * mRemoteActionManager;
+		class ServiceQuery * mRemoteActionManager;
 		std::unordered_map<long long, shared_ptr<GameObject>> mClientObjectMap;	//¿Í»§¶Ësession
 	};
 }

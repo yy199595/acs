@@ -1,49 +1,31 @@
 #include"Manager.h"
-#include"LocalActionManager.h"
+#include"ActionManager.h"
 #include<Core/Applocation.h>
 #include<Thread/ThreadPool.h>
 #include<Thread/ThreadTaskAction.h>
+
 namespace SoEasy
 {
-	NetMessageBuffer::NetMessageBuffer(const std::string & address, const shared_ptr<NetWorkPacket> packet)
+
+	
+	NetMessageBuffer::NetMessageBuffer(const std::string & address, const SharedPacket packet)
 		:mAddress(address), mMessagePacket(packet)
 	{
 
 	}
-}
-namespace SoEasy
-{
+	
 
 
 	Manager::Manager(const int priority) : mPriority(priority)
 	{
 
 	}
-	bool Manager::BindFunction(std::string name, LocalAction1 action)
-	{
-		const size_t pos = name.find_first_of(".");
-		if (pos == std::string::npos)
-		{
-			SayNoDebugError("register error : " << name);
-			return false;
-		}
-		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, name));
-	}
-
+	
 	void Manager::AddFinishTask(long long taskId)
 	{
 		this->mFinishTaskQueue.AddItem(taskId);
 	}
 
-	bool Manager::BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox)
-	{	
-		LocalActionManager * pFunctionManager = this->GetManager<LocalActionManager>();
-		SayNoAssertRetFalse_F(pFunctionManager || actionBox);
-		const size_t pos = name.find_first_of(".");
-		const std::string className = name.substr(0, pos);
-		const std::string funcName = name.substr(pos + 1, name.length());
-		return pFunctionManager->BindFunction(actionBox);
-	}
 	void Manager::ForeachManagers(std::function<bool(Manager*)> action)
 	{
 		std::vector<Manager *> managers;

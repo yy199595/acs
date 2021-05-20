@@ -1,6 +1,6 @@
 #include"NetWorkManager.h"
 #include"ScriptManager.h"
-#include"LocalActionManager.h"
+#include"ActionManager.h"
 #include"Manager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
@@ -8,8 +8,8 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
 #include<Script/LuaFunction.h>
-#include<Manager/RemoteActionManager.h>
-#include<Manager/LocalActionManager.h>
+#include<Service/ServiceQuery.h>
+#include<Manager/ActionManager.h>
 #include<NetWork/RemoteActionProxy.h>
 #include<Manager/LocalAccessManager.h>
 namespace SoEasy
@@ -22,11 +22,11 @@ namespace SoEasy
 	bool NetWorkManager::OnInit()
 	{
 		this->mLocalAccessManager = this->GetManager<LocalAccessManager>();
-		this->mActionQueryManager = this->GetManager<RemoteActionManager>();
+		this->mActionQueryManager = this->GetManager<ServiceQuery>();
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		
-		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<LocalActionManager>());
+		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<ActionManager>());
 		return true;
 	}
 
@@ -98,7 +98,7 @@ namespace SoEasy
 		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 		if (!returnPackage->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 		{
-			SayNoDebugError("Serialize Fail : " << returnPackage->func_name());
+			SayNoDebugError("Serialize Fail : " << returnPackage->action());
 			return XCode::SerializationFailure;
 		}
 		size_t size = returnPackage->ByteSizeLong();
@@ -128,7 +128,7 @@ namespace SoEasy
 	{
 		if (this->mLocalAccessManager != nullptr)
 		{
-			if (this->mLocalAccessManager->CallAction(func, returnPackage))
+			if (this->mLocalAccessManager->CallService(func, returnPackage))
 			{
 				SayNoDebugInfo("call location action " << func);
 				return XCode::Successful;

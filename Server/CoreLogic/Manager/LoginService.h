@@ -1,13 +1,13 @@
 #pragma once
-#include<Manager/Manager.h>
+#include<Service/ServiceBase.h>
 #include<Protocol/ServerCommon.pb.h>
 namespace SoEasy
 {
-	class LoginManager : public Manager
+	class LoginService : public ServiceBase
 	{
 	public:
-		LoginManager() { }
-		~LoginManager() { }
+		LoginService() { }
+		~LoginService() { }
 	protected:
 		bool OnInit() override;
 	private:

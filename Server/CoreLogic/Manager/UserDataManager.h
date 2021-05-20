@@ -1,20 +1,18 @@
 #pragma once
-#include<Manager/Manager.h>
+#include<Service/ServiceBase.h>
 #include<Protocol/ServerCommon.pb.h>
 
 namespace SoEasy
 {
 	class MysqlManager;
 	class RedisManager;
-	class UserDataManager : public Manager
+	class UserDataManager : public ServiceBase
 	{
 	public:
 		UserDataManager() { }
 		~UserDataManager() { }
 	protected:
 		bool OnInit() override;
-	public:
-
 	private:
 		XCode AddUserData(long long operId, shared_ptr<UserAccountData>);
 		XCode QueryUserData(long long operId, shared_ptr<StringData> account, shared_ptr<UserAccountData>);

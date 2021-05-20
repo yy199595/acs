@@ -1,29 +1,26 @@
 #pragma once
-#include"SessionManager.h"
 #include<NetWork/RemoteActionProxy.h>
 #include<Protocol/ServerCommon.pb.h>
-
+#include<Manager/SessionManager.h>
 namespace SoEasy
 {
 	// 将本机action注册到远端 储存所有可调用action列表
 
-	class RemoteActionManager : public SessionManager
+	class ServiceQuery : public SessionManager
 	{
 	public:
-		RemoteActionManager();
-		~RemoteActionManager() { }
+		ServiceQuery();
+		~ServiceQuery() { }
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
-		void OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession) override;
-		void OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession) override;
+		void OnSessionErrorAfter(SharedTcpSession tcpSession) final;
+		void OnSessionConnectAfter(SharedTcpSession tcpSession) final;
 	public:
 		bool GetActionProxy(const std::string & action, shared_ptr<RemoteActionProxy> & actionProxy);
 		bool GetActionProxy(const std::string & action, std::vector<shared_ptr<RemoteActionProxy>> & actionProxys);
 		bool GetActionProxy(const std::string & action, long long operId, shared_ptr<RemoteActionProxy> & actionProxy);
 		void GetActionProxyByAddress(const std::string & address, std::vector<shared_ptr<RemoteActionProxy>> & actionProxys);
-	private:
-		XCode UpdateActions(long long operId, shared_ptr<ActionInfoList> actions);
 	private:
 		void StartRegisterAction();
 		void StartPullActionList();  //开始拉取action列表
@@ -34,7 +31,7 @@ namespace SoEasy
 		std::string mQueryIp;	//查询地址的ip
 		unsigned short mQueryPort;  // 查询地址的port
 		std::string mQueryAddress;
-		class LocalActionManager * mActionManager;
+		class ActionManager * mActionManager;
 		class ListenerManager * mListenerManager;
 		class CoroutineManager * mCoroutineManager;
 		shared_ptr<TcpClientSession> mActionQuerySession;

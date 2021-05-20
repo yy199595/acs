@@ -29,7 +29,6 @@ namespace SoEasy
 		bool StartLoadScript();
 		void OnPushGlobalObject();
 		void PushClassToLua(struct lua_State * lua);
-		XCode OnHotfix(long long operId);
 	private:
 		void RegisterExtension(struct lua_State * lua);
 	private:

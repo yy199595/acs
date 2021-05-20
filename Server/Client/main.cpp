@@ -3,7 +3,7 @@
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include"Manager/ClientManager.h"
 using namespace SoEasy;
@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
 	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
 	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
-	ManagerRegistry::RegisterManager<LocalActionManager>("LocalActionManager");
+	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
 
 
 	Applocation app("Client", "./Config/ClientConfig.json");

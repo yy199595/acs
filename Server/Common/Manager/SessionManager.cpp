@@ -1,6 +1,6 @@
 #include"SessionManager.h"
 #include"NetWorkManager.h"
-#include"LocalActionManager.h"
+#include"ActionManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<NetWork/NetLuaAction.h>
@@ -71,109 +71,102 @@ namespace SoEasy
 		if (session != nullptr)
 		{
 			shared_ptr<NetWorkPacket> netPacket = make_shared<NetWorkPacket>();
-			if (netPacket->ParseFromArray(message, size))
+			if (!netPacket->ParseFromArray(message, size))
 			{
-				const std::string & address = session->GetAddress();
-				mRecvMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, netPacket));
+				session->StartClose();
+				SayNoDebugError("parse message error close session");
+				return;
 			}
+			const std::string & address = session->GetAddress();
+			mRecvMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, netPacket));
 		}
 	}
 
 	bool SessionManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
-		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<LocalActionManager>());
+		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineSheduler = this->GetManager<CoroutineManager>());
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime));
 		return true;
 	}
 
-	void SessionManager::OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> packet)
+	void SessionManager::OnRecvNewMessageAfter(SharedTcpSession tcpSession, SharedPacket requestData)
 	{
-		if (this->mRecvMsgCallback != nullptr)
-		{
-			if (this->mRecvMsgCallback(tcpSession, packet))
-			{
-				return;
-			}
-		}
 		this->mCurrentSession = tcpSession;
-		const std::string & address = tcpSession->GetAddress();
-		if (!packet->func_name().empty())
+		const std::string & serviceName = requestData->service();
+		const std::string & actionName = requestData->action();
+		if (!serviceName.empty() && !actionName.empty())
 		{
-			const std::string & name = packet->func_name();
-	
-			shared_ptr<NetLuaAction> luaAction = this->mActionManager->GetLuaAction(name);
-			if (luaAction != nullptr)	//lua 函数自己返回
-			{			
-				XCode code = luaAction->Invoke(address, packet);
-				const long long callbackId = packet->callback_id();
-				if (code != XCode::LuaCoroutineReturn && callbackId != 0)
-				{
-					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-					returnPacket->set_error_code(code);
-					returnPacket->set_callback_id(callbackId);
-					returnPacket->set_operator_id(packet->operator_id());
-					this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
-				}
-			}
-			else  //在协程中执行
+			if (!this->CallLuaAction(requestData))
 			{
-				this->mCoroutineSheduler->Start(packet->func_name(), [this, packet, address]()
-				{
-					shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-					XCode code = this->InvokeAction(this->mCurrentSession, packet, returnPacket);
-					if (packet->callback_id() != 0)
-					{
-						returnPacket->set_error_code(code);
-						returnPacket->set_operator_id(packet->operator_id());
-						returnPacket->set_callback_id(packet->callback_id());
-						this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
-					}
-				});
+				this->CallAction(requestData);
 			}
 		}
-		else if (packet->callback_id() != 0)
+		else if (requestData->callback_id() != 0)
 		{
-			const long long id = packet->callback_id();
-			auto callback = this->mActionManager->GetCallback(id);
+			const long long callbackId = requestData->callback_id();
+			auto callback = this->mActionManager->GetCallback(callbackId);
 			if (callback == nullptr)
 			{
-				SayNoDebugError("not find call back " << id);
+				SayNoDebugError("not find call back " << callbackId);
 				return;
 			}
-			callback->Invoke(packet);
+			callback->Invoke(requestData);
 		}
 		this->mCurrentSession = nullptr;
 	}
 
-	XCode SessionManager::InvokeAction(shared_ptr<TcpClientSession> tcpSession, shared_ptr<NetWorkPacket> callInfo, shared_ptr<NetWorkPacket> returnData)
+	bool SessionManager::CallAction(SharedPacket requestData)
 	{
-		const std::string & name = callInfo->func_name();
-		shared_ptr<LocalActionProxy> localActionProxy = this->mActionManager->GetAction(name);
-		if (localActionProxy == nullptr)
+		const std::string & serviceName = requestData->service();
+		const std::string & actionName = requestData->action();
+		ServiceBase * service = this->GetApp()->GetService(serviceName);
+		if (service == nullptr)
 		{
-			SayNoDebugError(name << " does not exist");
-			return XCode::CallFunctionNotExist;
-		}	
-		return localActionProxy->Invoke(callInfo, returnData);
-	}
-
-	long long SessionManager::GetIdByAddress(const std::string & address)
-	{
-		return 0;
-	}
-
-	bool SessionManager::ParseAddress(const std::string & address, string & ip, unsigned short & port)
-	{
-		size_t pos = address.find(":");
-		if (pos == std::string::npos)
-		{
+			SayNoDebugError("not find service " << serviceName);
 			return false;
 		}
-		ip = address.substr(0, pos);
-		port = (unsigned short)std::stoul(address.substr(pos + 1));
+		const std::string name = serviceName + "." + actionName;
+		const std::string address = this->mCurrentSession->GetAddress();
+		this->mCoroutineSheduler->Start(name, [address, this, service, requestData]()
+		{
+			long long callbackId = requestData->callback_id();
+			SharedPacket returnData = make_shared<NetWorkPacket>();
+			XCode code = service->CallAction(requestData, returnData);
+			if (callbackId != 0)
+			{
+				returnData->set_callback_id(callbackId);
+				returnData->set_operator_id(requestData->operator_id());
+				this->mNetWorkManager->SendMessageByAdress(address, returnData);
+			}
+		});
 		return true;
+	}
+
+	bool SessionManager::CallLuaAction(SharedPacket requestData)
+	{
+		//const std::string & serviceName = requestData->service();
+		//const std::string & actionName = requestData->action();
+		//const std::string & address = this->mCurrentSession->GetAddress();
+		//shared_ptr<NetLuaAction> luaAction = this->mActionManager->GetLuaAction(name);
+		//if (luaAction == nullptr)	//lua 函数自己返回
+		//{
+		//	return XCode::CallFunctionNotExist;
+		//}
+		//	
+		//	XCode code = luaAction->Invoke(address, requestData);
+		//	const long long callbackId = requestData->callback_id();
+		//	if (code != XCode::LuaCoroutineReturn && callbackId != 0)
+		//	{
+		//		shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+		//		returnPacket->set_error_code(code);
+		//		returnPacket->set_callback_id(callbackId);
+		//		returnPacket->set_operator_id(packet->operator_id());
+		//		this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
+		//	}
+		//}
+		return false;
 	}
 
 	void SessionManager::OnSystemUpdate()

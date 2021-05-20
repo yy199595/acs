@@ -28,9 +28,7 @@
     <ClCompile Include="Global\LogHelper.cpp" />
     <ClCompile Include="Global\ServerConfig.cpp" />
     <ClCompile Include="Manager\LocalAccessManager.cpp" />
-    <ClCompile Include="Manager\LocalActionManager.cpp" />
-    <ClCompile Include="Manager\RemoteActionManager.cpp" />
-    <ClCompile Include="Manager\ActionRegisterManager.cpp" />
+    <ClCompile Include="Manager\ActionManager.cpp" />
     <ClCompile Include="Manager\CommandManager.cpp" />
     <ClCompile Include="Manager\ListenerManager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
@@ -65,6 +63,9 @@
     <ClCompile Include="Script\LuaProtocExtension.cpp" />
     <ClCompile Include="Script\LuaTable.cpp" />
     <ClCompile Include="Script\SystemExtension.cpp" />
+    <ClCompile Include="Service\ServiceQuery.cpp" />
+    <ClCompile Include="Service\ServiceRegistry.cpp" />
+    <ClCompile Include="Service\ServiceBase.cpp" />
     <ClCompile Include="Thread\TaskThread.cpp" />
     <ClCompile Include="Thread\ThreadPool.cpp" />
     <ClCompile Include="Thread\ThreadTaskAction.cpp" />
@@ -99,9 +100,7 @@
     <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
     <ClInclude Include="Manager\LocalAccessManager.h" />
-    <ClInclude Include="Manager\LocalActionManager.h" />
-    <ClInclude Include="Manager\RemoteActionManager.h" />
-    <ClInclude Include="Manager\ActionRegisterManager.h" />
+    <ClInclude Include="Manager\ActionManager.h" />
     <ClInclude Include="Manager\CommandManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
     <ClInclude Include="Manager\Manager.h" />
@@ -154,6 +153,9 @@
     <ClInclude Include="Script\StaticFuncProxy.h" />
     <ClInclude Include="Script\SystemExtension.h" />
     <ClInclude Include="Script\UserDataParameter.h" />
+    <ClInclude Include="Service\ServiceQuery.h" />
+    <ClInclude Include="Service\ServiceRegistry.h" />
+    <ClInclude Include="Service\ServiceBase.h" />
     <ClInclude Include="Thread\TaskThread.h" />
     <ClInclude Include="Thread\ThreadPool.h" />
     <ClInclude Include="Thread\ThreadTaskAction.h" />

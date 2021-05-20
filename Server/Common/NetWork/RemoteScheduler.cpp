@@ -4,7 +4,7 @@
 #include<Util/ProtocHelper.h>
 #include<Script/LuaParameter.h>
 #include<Other/ObjectFactory.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 namespace SoEasy
 {
 	RemoteScheduler::RemoteScheduler(long long operaotrId)
@@ -12,7 +12,7 @@ namespace SoEasy
 		this->mOperatorId = operaotrId;
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
-		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
+		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
 	}
 
 	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operId)
@@ -21,57 +21,57 @@ namespace SoEasy
 		this->mBindSessionAdress = session->GetAddress();
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
-		this->mFunctionManager = pApplocation->GetManager<LocalActionManager>();
+		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
 	}
 
-	XCode RemoteScheduler::Call(std::string func)
+	XCode RemoteScheduler::Call(const std::string service, std::string func)
 	{
-		return this->SendCallMessage(func);
+		return this->SendCallMessage(service, func);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, LuaTable & luaTable)
 	{
-		return this->SendCallMessage(func, luaTable);
+		return this->SendCallMessage(service, func, luaTable);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, Message * message)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, Message * message)
 	{
-		return this->SendCallMessage(func, message);
+		return this->SendCallMessage(service, func, message);
 	}
-	XCode RemoteScheduler::Call(std::string func, Message * message, NetWorkRetAction1 action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, Message * message, NetWorkRetAction1 action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
-		return this->SendCallMessage(func, message, pAction);
+		return this->SendCallMessage(service, func, message, pAction);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, NetWorkRetAction1 action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, NetWorkRetAction1 action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalRetActionProxy1>(action, func);
-		return this->SendCallMessage(func, nullptr, pAction);
+		return this->SendCallMessage(service, func, nullptr, pAction);
 	}
 }
 
 namespace SoEasy
 {
-	XCode RemoteScheduler::Call(std::string func, Message * message, NetLuaRetAction * action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, Message * message, NetLuaRetAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
-		return this->SendCallMessage(func, message, pAction);
+		return this->SendCallMessage(service, func, message, pAction);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaRetAction * action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, LuaTable & luaTable, NetLuaRetAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalLuaRetActionProxy>(action, func);
-		return this->SendCallMessage(func, luaTable, pAction);
+		return this->SendCallMessage(service, func, luaTable, pAction);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, LuaTable & luaTable, NetLuaWaitAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
-		return this->SendCallMessage(func, luaTable, pAction);
+		return this->SendCallMessage(service, func, luaTable, pAction);
 	}
 
-	XCode RemoteScheduler::SendCallMessage(std::string & func, Message * message, shared_ptr<LocalRetActionProxy> action)
+	XCode RemoteScheduler::SendCallMessage(const std::string & service, std::string & func, Message * message, shared_ptr<LocalRetActionProxy> action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
@@ -82,7 +82,8 @@ namespace SoEasy
 		}
 		long long callbackId = 0;
 		this->mFunctionManager->AddCallback(action, callbackId);
-		newCallData->set_func_name(func);
+		newCallData->set_service(service);
+		newCallData->set_action(func);
 		newCallData->set_callback_id(callbackId);
 		newCallData->set_operator_id(mOperatorId);
 		if (this->mBindSessionAdress.empty())
@@ -92,7 +93,7 @@ namespace SoEasy
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
-	XCode RemoteScheduler::SendCallMessage(std::string & func, LuaTable & luaTable, shared_ptr<LocalRetActionProxy> action)
+	XCode RemoteScheduler::SendCallMessage(const std::string & service, std::string & func, LuaTable & luaTable, shared_ptr<LocalRetActionProxy> action)
 	{
 		mMessageBuffer.clear();
 		shared_ptr<NetWorkPacket> newCallData = make_shared<NetWorkPacket>();
@@ -103,15 +104,18 @@ namespace SoEasy
 		long long callbakcId = 0;
 		newCallData->set_message_data(mMessageBuffer);
 		this->mFunctionManager->AddCallback(action, callbakcId);
-		newCallData->set_func_name(func);
+
+		newCallData->set_service(service);
+		newCallData->set_service(func);
+
 		newCallData->set_callback_id(callbakcId);
 		newCallData->set_operator_id(mOperatorId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
-	XCode RemoteScheduler::Call(std::string func, Message * message, NetLuaWaitAction * action)
+	XCode RemoteScheduler::Call(const std::string service, std::string func, Message * message, NetLuaWaitAction * action)
 	{
 		shared_ptr<LocalRetActionProxy> pAction = make_shared<LocalWaitRetActionProxy>(action, func);
-		return this->SendCallMessage(func, message, pAction);
+		return this->SendCallMessage(service, func, message, pAction);
 	}
 }

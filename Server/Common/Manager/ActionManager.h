@@ -4,20 +4,18 @@
 
 namespace SoEasy
 {
-	// 注册本地服务， 推送本地服务到指定地址 管理远程回来的回调
+	// 注册本地Lua服务，管理远程回来的回调
 	class NetLuaAction;
 	class LocalActionProxy;
 	class LocalRetActionProxy;
 
-	class LocalActionManager : public Manager
+	class ActionManager : public Manager
 	{
 	public:
-		LocalActionManager();
-		virtual ~LocalActionManager() { }
+		ActionManager();
+		virtual ~ActionManager() { }
 	public:
 		bool BindFunction(shared_ptr<NetLuaAction> actionBox);
-		bool BindFunction(shared_ptr<LocalActionProxy> actionBox);
-		void GetAllFunction(std::vector<std::string> & funcs);
 	public:
 		bool DelCallback(long long callbackId);
 		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
@@ -29,7 +27,6 @@ namespace SoEasy
 		void OnInitComplete() override;
 	public:		
 		shared_ptr<NetLuaAction> GetLuaAction(const std::string & name);
-		shared_ptr<LocalActionProxy> GetAction(const std::string & name);
 	private:
 		int mMessageTimeout;
 		std::string mMessageBuffer;
@@ -42,6 +39,5 @@ namespace SoEasy
 	private:	
 		std::unordered_map<long long, shared_ptr<LocalRetActionProxy>> mRetActionMap;
 		std::unordered_map<std::string, shared_ptr<NetLuaAction>> mRegisterLuaActions;
-		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mRegisterActions;
 	};
 }

@@ -1,8 +1,8 @@
 #pragma once
 #include"Component.h"
 #include<Manager/NetWorkManager.h>
-#include<Manager/LocalActionManager.h>
-#include<Manager/RemoteActionManager.h>
+#include<Manager/ActionManager.h>
+#include<Service/ServiceQuery.h>
 
 namespace SoEasy
 {
@@ -17,8 +17,8 @@ namespace SoEasy
 		void OnInit() override;
 	private:
 		NetWorkManager * mNetWorkManager;
-		LocalActionManager * mLocalActionManager;
-		RemoteActionManager * mRemoteActionManager;
+		ActionManager * mLocalActionManager;
+		ServiceQuery * mRemoteActionManager;
 		std::unordered_map<std::string, std::string> mActionAddress;
 	};
 }

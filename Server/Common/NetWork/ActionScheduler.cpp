@@ -1,6 +1,6 @@
 #include "ActionScheduler.h"
 #include<Manager/NetWorkManager.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<NetWork/NetWorkRetAction.h>
 namespace SoEasy
@@ -23,18 +23,18 @@ namespace SoEasy
 	{
 		Applocation * app = Applocation::Get();
 		this->mNetWorkManager = app->GetManager<NetWorkManager>();
-		this->mActionManager = app->GetManager<LocalActionManager>();
+		this->mActionManager = app->GetManager<ActionManager>();
 		this->mCoroutineScheduler = app->GetManager<CoroutineManager>();
 	}
 
-	XCode ActionScheduler::Call(const std::string func, Message & returnData)
+	XCode ActionScheduler::Call(const std::string & service, const std::string func, Message & returnData)
 	{
 		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(func, this->mCoroutineScheduler);
 		if (callBack == nullptr)
 		{
 			return XCode::NoCoroutineContext;
 		}
-		XCode code = this->SendCallMessage(func, nullptr, callBack);
+		XCode code = this->SendCallMessage(service, func, nullptr, callBack);
 		if (code == XCode::Successful)
 		{
 			mCoroutineScheduler->YieldReturn();
@@ -47,14 +47,14 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ActionScheduler::Call(const std::string func, shared_ptr<Message> message)
+	XCode ActionScheduler::Call(const std::string & service, const std::string func, shared_ptr<Message> message)
 	{
 		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(func, this->mCoroutineScheduler);
 		if (callBack == nullptr)
 		{
 			return XCode::NoCoroutineContext;
 		}
-		XCode code = this->SendCallMessage(func, message, callBack);
+		XCode code = this->SendCallMessage(service, func, message, callBack);
 		if (code == XCode::Successful)
 		{
 			mCoroutineScheduler->YieldReturn();
@@ -63,14 +63,14 @@ namespace SoEasy
 		return code;
 	}
 
-	XCode ActionScheduler::Call(const std::string func, shared_ptr<Message> message, Message & returnData)
+	XCode ActionScheduler::Call(const std::string & service, const std::string func, shared_ptr<Message> message, Message & returnData)
 	{
 		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(func, this->mCoroutineScheduler);
 		if (callBack == nullptr)
 		{
 			return XCode::NoCoroutineContext;
 		}
-		XCode code = this->SendCallMessage(func, message, callBack);
+		XCode code = this->SendCallMessage(service, func, message, callBack);
 		if (code == XCode::Successful)
 		{
 			mCoroutineScheduler->YieldReturn();
@@ -85,7 +85,7 @@ namespace SoEasy
 
 	
 
-	XCode ActionScheduler::SendCallMessage(const std::string & func, shared_ptr<Message> message, shared_ptr<LocalRetActionProxy> callBack)
+	XCode ActionScheduler::SendCallMessage(const std::string & service, const std::string & func, shared_ptr<Message> message, shared_ptr<LocalRetActionProxy> callBack)
 	{
 		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
 		if (message != nullptr)
@@ -100,7 +100,8 @@ namespace SoEasy
 		}
 		long long id = 0;
 		this->mActionManager->AddCallback(callBack, id);
-		callData->set_func_name(func);
+		callData->set_service(service);
+		callData->set_action(func);
 		callData->set_callback_id(id);
 		if (this->mSessionAddress.empty())
 		{

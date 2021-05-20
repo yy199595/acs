@@ -23,12 +23,12 @@ namespace SoEasy
 		SayNoDebugInfo("start listener port " << this->mListenerPort);
 	}
 
-	void ListenerManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ListenerManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
 	{
 
 	}
 
-	void ListenerManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ListenerManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
 	{
 		// 判断是否在白名单
 		if (!this->mWhiteList.empty())

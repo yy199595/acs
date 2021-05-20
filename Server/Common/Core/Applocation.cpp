@@ -5,8 +5,9 @@
 #include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Service/ServiceBase.h>
 using namespace SoEasy;
 using namespace std::chrono;
 
@@ -50,6 +51,12 @@ namespace SoEasy
 		manager->Init(this, name);
 		this->mManagerMap.emplace(name, manager);
 		this->mSortManagers.emplace_back(manager);
+		ServiceBase * service = dynamic_cast<ServiceBase*>(manager);
+		if (service != nullptr)
+		{
+			this->mServiceMap.emplace(name, service);
+			SayNoDebugLog("add new service " << name);
+		}
 		return true;
 	}
 
@@ -62,6 +69,23 @@ namespace SoEasy
 			managers.push_back(manager);
 		}
 	}
+
+	void Applocation::GetServices(std::vector<ServiceBase*>& services)
+	{
+		auto iter = this->mServiceMap.begin();
+		for (; iter != this->mServiceMap.end(); iter++)
+		{
+			ServiceBase * service = iter->second;
+			services.push_back(service);
+		}
+	}
+
+	ServiceBase * Applocation::GetService(const std::string & name)
+	{
+		auto iter = this->mServiceMap.find(name);
+		return iter != this->mServiceMap.end() ? iter->second : nullptr;
+	}
+
 
 	bool Applocation::LoadManager()
 	{
@@ -86,7 +110,7 @@ namespace SoEasy
 			}
 		}
 		this->TryAddManager<TimerManager>();
-		this->TryAddManager<LocalActionManager>();
+		this->TryAddManager<ActionManager>();
 		this->TryAddManager<NetWorkManager>();
 		this->TryAddManager<CoroutineManager>();
 

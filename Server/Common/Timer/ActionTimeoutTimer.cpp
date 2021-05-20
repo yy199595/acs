@@ -1,9 +1,9 @@
 #include"ActionTimeoutTimer.h"
 #include<NetWork/NetWorkRetAction.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 namespace SoEasy
 {
-	ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, LocalActionManager * mgr)
+	ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, ActionManager * mgr)
 		:TimerBase(ms)
 	{
 		this->mActionManager = mgr;

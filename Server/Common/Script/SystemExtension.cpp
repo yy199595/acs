@@ -6,7 +6,7 @@
 #include<Timer/LuaActionTimer.h>
 #include<Timer/LuaSleepTimer.h>
 #include<Manager/NetWorkManager.h>
-#include<Manager/LocalActionManager.h>
+#include<Manager/ActionManager.h>
 #include<NetWork/NetLuaAction.h>
 #include<Protocol/Common.pb.h>
 #include<NetWork/NetLuaRetAction.h>
@@ -21,46 +21,47 @@ using namespace SoEasy;
 			return 1;
 		}
 
-		const char * funcName = lua_tostring(lua, 2);
+		const char * action = lua_tostring(lua, 3);
+		const char * service = lua_tostring(lua, 2);
 		RemoteScheduler nCallController(tcpSession);
 
-		if (lua_isfunction(lua, 3))
+		if (lua_isfunction(lua, 4))
 		{
 			std::string message = "";
-			NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 3);
-			lua_pushboolean(lua, nCallController.Call(funcName, nullptr, pRetAction));
+			NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 4);
+			lua_pushboolean(lua, nCallController.Call(service, action, nullptr, pRetAction));
 			return 1;
 		}
-		else if (lua_isuserdata(lua, 3))
+		else if (lua_isuserdata(lua, 4))
 		{
-			Message * pMessage = (Message *)lua_touserdata(lua, 3);
+			Message * pMessage = (Message *)lua_touserdata(lua, 4);
 			if (pMessage != nullptr)
 			{
-				if (!lua_isfunction(lua, 4))
+				if (!lua_isfunction(lua, 5))
 				{
-					lua_pushboolean(lua, nCallController.Call(funcName, pMessage));
+					lua_pushboolean(lua, nCallController.Call(service, action, pMessage));
 					return 1;
 				}
-				NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 4);
-				lua_pushboolean(lua, nCallController.Call(funcName, pMessage, pRetAction));
+				NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 5);
+				lua_pushboolean(lua, nCallController.Call(service, action, pMessage, pRetAction));
 				return 1;
 			}
 		}
-		else if (lua_istable(lua, 3))
+		else if (lua_istable(lua, 4))
 		{
-			LuaTable luaTable(lua, 3, true);
-			if (lua_isfunction(lua, 4))
+			LuaTable luaTable(lua, 4, true);
+			if (lua_isfunction(lua, 5))
 			{
-				NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 4);
-				lua_pushboolean(lua, nCallController.Call(funcName, luaTable, pRetAction));
+				NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 5);
+				lua_pushboolean(lua, nCallController.Call(service, action, luaTable, pRetAction));
 				return 1;
 			}
-			lua_pushboolean(lua, nCallController.Call(funcName, luaTable));
+			lua_pushboolean(lua, nCallController.Call(service, action, luaTable));
 			return 1;
 		}
 		else
 		{
-			lua_pushboolean(lua, nCallController.Call(funcName));
+			lua_pushboolean(lua, nCallController.Call(service, action));
 			return 1;
 		}
 
@@ -96,7 +97,7 @@ using namespace SoEasy;
 	{
 
 		Applocation * pApplocation = Applocation::Get();
-		LocalActionManager * actionManager = pApplocation->GetManager<LocalActionManager>();
+		ActionManager * actionManager = pApplocation->GetManager<ActionManager>();
 		if (actionManager == nullptr)
 		{
 			lua_pushboolean(luaEnv, false);
@@ -200,26 +201,27 @@ using namespace SoEasy;
 		}
 
 		RemoteScheduler nCallController;
-		const char * funcName = lua_tostring(luaEnv, 2);
-		if (lua_isuserdata(luaEnv, 3))
+		const char * action = lua_tostring(luaEnv, 3);
+		const char * service = lua_tostring(luaEnv, 2);
+		if (lua_isuserdata(luaEnv, 4))
 		{
 			std::string nMessageBuffer;
-			Message * pMessage = (Message*)lua_touserdata(luaEnv, 3);
+			Message * pMessage = (Message*)lua_touserdata(luaEnv, 4);
 			if (!pMessage->SerializePartialToString(&nMessageBuffer))
 			{
 				lua_pushinteger(luaEnv, XCode::SerializationFailure);
 				return 1;
 			}
-			if (!nCallController.Call(funcName, pMessage, waitAction))
+			if (!nCallController.Call(service, action, pMessage, waitAction))
 			{
 				lua_pushinteger(luaEnv, XCode::Failure);
 				return 1;
 			}
 		}
-		else if (lua_istable(luaEnv, 3))
+		else if (lua_istable(luaEnv, 4))
 		{
-			LuaTable luaTable(luaEnv, 3, true);
-			if (!nCallController.Call(funcName, luaTable, waitAction))
+			LuaTable luaTable(luaEnv, 4, true);
+			if (!nCallController.Call(service, action, luaTable, waitAction))
 			{
 				lua_pushinteger(luaEnv, XCode::Failure);
 				return 1;
@@ -227,7 +229,7 @@ using namespace SoEasy;
 		}
 		else
 		{
-			if (!nCallController.Call(funcName, nullptr, waitAction))
+			if (!nCallController.Call(service, action, nullptr, waitAction))
 			{
 				lua_pushinteger(luaEnv, XCode::Failure);
 				return 1;
@@ -253,21 +255,22 @@ using namespace SoEasy;
 		}
 		SharedTcpSession tcpSession = LuaParameter::Read<SharedTcpSession>(luaEnv, 1);
 		RemoteScheduler nCallController(tcpSession);	
-		const char * funcName = lua_tostring(luaEnv, 2);
-		if (lua_isuserdata(luaEnv, 3))
+		const char * action = lua_tostring(luaEnv, 3);
+		const char * service = lua_tostring(luaEnv, 2);
+		if (lua_isuserdata(luaEnv, 4))
 		{
-			Message * pMessage = (Message*)lua_touserdata(luaEnv, 3);
-			XCode code = nCallController.Call(funcName, pMessage, waitAction);
+			Message * pMessage = (Message*)lua_touserdata(luaEnv, 4);
+			XCode code = nCallController.Call(service, action, pMessage, waitAction);
 			if (code != XCode::Successful)
 			{
 				lua_pushinteger(luaEnv, code);
 				return 1;
 			}
 		}
-		else if (lua_istable(luaEnv, 3))
+		else if (lua_istable(luaEnv, 4))
 		{
-			LuaTable luaTable(luaEnv, 3, true);
-			XCode code = nCallController.Call(funcName, luaTable, waitAction);
+			LuaTable luaTable(luaEnv, 4, true);
+			XCode code = nCallController.Call(service, action, luaTable, waitAction);
 			if (code != XCode::Successful)
 			{
 				lua_pushinteger(luaEnv, code);
@@ -276,7 +279,7 @@ using namespace SoEasy;
 		}
 		else
 		{
-			XCode code = nCallController.Call(funcName, nullptr, waitAction);
+			XCode code = nCallController.Call(service, action, nullptr, waitAction);
 			if (code != XCode::Successful)
 			{
 				lua_pushinteger(luaEnv, code);
