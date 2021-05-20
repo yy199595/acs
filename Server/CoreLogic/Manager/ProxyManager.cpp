@@ -38,32 +38,6 @@ namespace SoEasy
 		}
 	}
 
-	void ProxyManager::OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket> packet)
-	{
-		shared_ptr<GameObject> clientObject = this->GetClientObject(tcpSession->GetSocketId());
-		if (clientObject != nullptr)//客户端发送过来的消息
-		{
-			const std::string & service = packet->service();
-			const std::string & action = packet->action();
-			const long long id = clientObject->GetGameObjectID();
-
-			shared_ptr<RemoteActionProxy> actionProxy;
-			if (this->mRemoteActionManager->GetActionProxy(service, actionProxy))
-			{
-				packet->set_operator_id(id);
-				actionProxy->Invoke(packet);
-				return;
-			}
-			packet->clear_operator_id();
-			packet->clear_message_data();
-			packet->set_error_code(XCode::CallFunctionNotExist);
-			this->mNetWorkManager->SendMessageByAdress(tcpSession->GetAddress(), packet);
-		}
-		else
-		{
-			SessionManager::OnRecvNewMessageAfter(tcpSession, packet);
-		}
-	}
 
 	shared_ptr<GameObject> ProxyManager::GetClientObject(const long long id)
 	{

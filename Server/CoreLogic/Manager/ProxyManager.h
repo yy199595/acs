@@ -14,7 +14,6 @@ namespace SoEasy
 		bool OnInit() override;
 		void OnSessionErrorAfter(SharedTcpSession tcpSession) override;
 		void OnSessionConnectAfter(SharedTcpSession tcpSession) override;
-		void OnRecvNewMessageAfter(SharedTcpSession tcpSession, shared_ptr<NetWorkPacket>) override;
 	public:
 		shared_ptr<GameObject> GetClientObject(const long long id);
 	private:
