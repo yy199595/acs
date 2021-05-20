@@ -3,12 +3,13 @@ syntax = "proto3";
 package PB;
 message NetWorkPacket
 {
-     string func_name = 1;
-     int32 error_code = 2;
-     uint64 operator_id = 3;
-     uint64 callback_id = 4;
-     bytes message_data = 5;
-     string protoc_name = 6;
+     string service = 1;
+     string action = 2;
+     int32 error_code = 3;
+     uint64 operator_id = 4;
+     uint64 callback_id = 5;
+     bytes message_data = 6;
+     string protoc_name = 7;
 }
 
 message StringArray
