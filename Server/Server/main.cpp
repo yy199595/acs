@@ -36,6 +36,7 @@ int main(int argc, char ** argv)
 	ManagerRegistry::RegisterManager<RedisManager>("RedisManager");
 	ManagerRegistry::RegisterManager<MysqlManager>("MysqlManager");
 	ManagerRegistry::RegisterManager<TimerManager>("TimerManager");
+	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
 	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
 	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
 	ManagerRegistry::RegisterManager<CommandManager>("CommandManager");
@@ -43,7 +44,7 @@ int main(int argc, char ** argv)
 	ManagerRegistry::RegisterManager<UserDataManager>("UserDataManager");
 	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
 	ManagerRegistry::RegisterManager<LocalAccessManager>("LocalAccessManager");
-	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
+
 	ManagerRegistry::RegisterManager<ServiceQuery>("ServiceQuery");
 	ManagerRegistry::RegisterManager<ServiceRegistry>("ServiceRegistry");
 

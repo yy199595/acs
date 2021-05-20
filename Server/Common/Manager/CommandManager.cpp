@@ -46,7 +46,7 @@ namespace SoEasy
 		return false;
 	}
 
-	void CommandManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void CommandManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -56,7 +56,7 @@ namespace SoEasy
 		}
 	}
 
-	void CommandManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
+	void CommandManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -74,11 +74,6 @@ namespace SoEasy
 		jsonData.AddParameter("Message", "Please enter your account and password (Login -account@psssword)");
 		this->SendMessageByAddress(tcpSession->GetAddress(), jsonData);
 
-	}
-
-	void CommandManager::OnRecvNewMessageAfter(SharedTcpSession, shared_ptr<NetWorkPacket>)
-	{
-		
 	}
 
 	shared_ptr<TcpClientSession> CommandManager::GetTcpSession(const std::string & address)

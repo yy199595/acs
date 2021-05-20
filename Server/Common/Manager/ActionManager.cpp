@@ -34,6 +34,36 @@ namespace SoEasy
 		this->mRegisterLuaActions.clear();
 	}
 
+	void ActionManager::OnSystemUpdate()
+	{
+		SharedPacket messageData;
+		this->mCallbackMessageQueue.SwapQueueData();
+		while (this->mCallbackMessageQueue.PopItem(messageData))
+		{
+			long long callbackId = messageData->callback_id();
+			shared_ptr<LocalRetActionProxy> callback = this->GetCallback(callbackId);
+			if (callback != nullptr)
+			{
+				callback->Invoke(messageData);
+			}
+		}
+	}
+
+	bool ActionManager::AddCallbackArgv(SharedPacket argv)
+	{
+		if (argv->callback_id() == 0)
+		{
+			this->mCallbackMessageQueue.AddItem(argv);
+			return true;
+		}
+		return false;
+	}
+
+	bool ActionManager::AddLuaActionArgv(const std::string & address, SharedPacket argv)
+	{
+		return false;
+	}
+
 	bool ActionManager::BindFunction(shared_ptr<NetLuaAction> actionBox)
 	{
 		if (actionBox == nullptr)
@@ -49,17 +79,6 @@ namespace SoEasy
 		SayNoDebugInfo("add lua action " << name << " successful");
 		this->mRegisterLuaActions.insert(std::make_pair(name, actionBox));
 		return true;
-	}
-
-	bool ActionManager::DelCallback(long long callbackId)
-	{
-		auto iter = this->mRetActionMap.find(callbackId);
-		if (iter != this->mRetActionMap.end())
-		{
-			this->mRetActionMap.erase(iter);
-			return true;
-		}
-		return false;
 	}
 
 	shared_ptr<LocalRetActionProxy> ActionManager::GetCallback(long long callbackId, bool remove)

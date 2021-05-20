@@ -32,7 +32,7 @@
         "LoginService",
         "UserDataManager",
         "ListenerManager",
-        "LocalActionManager",
+        "ActionManager",
         "LocalAccessManager",
         "ServiceQuery",
         "ServiceRegistry"

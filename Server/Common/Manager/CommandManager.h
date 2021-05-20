@@ -28,7 +28,6 @@ namespace SoEasy
 	protected:
 		void OnSessionErrorAfter(SharedTcpSession) override;
 		void OnSessionConnectAfter(SharedTcpSession) override;
-		void OnRecvNewMessageAfter(SharedTcpSession, shared_ptr<NetWorkPacket>) override;
 	private:
 		std::set<std::string> mLoginUserList;
 		std::set<std::string> mLoginAddressList;

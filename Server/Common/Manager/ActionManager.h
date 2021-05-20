@@ -15,18 +15,19 @@ namespace SoEasy
 		ActionManager();
 		virtual ~ActionManager() { }
 	public:
-		bool BindFunction(shared_ptr<NetLuaAction> actionBox);
+		bool AddCallbackArgv(SharedPacket argv);
+		bool AddLuaActionArgv(const std::string & address, SharedPacket argv);
 	public:
-		bool DelCallback(long long callbackId);
+		bool BindFunction(shared_ptr<NetLuaAction> actionBox);
 		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
-		shared_ptr<LocalRetActionProxy> GetCallback(long long callbackId, bool remove = true);
-	
 	protected:
 		bool OnInit() override;
 		void OnDestory() override;
+		void OnSystemUpdate() final;
 		void OnInitComplete() override;
 	public:		
 		shared_ptr<NetLuaAction> GetLuaAction(const std::string & name);
+		shared_ptr<LocalRetActionProxy> GetCallback(long long callbackId, bool remove = true);
 	private:
 		int mMessageTimeout;
 		std::string mMessageBuffer;
@@ -36,7 +37,8 @@ namespace SoEasy
 		class ScriptManager * mScriptManager;
 		class NetWorkManager * mNetWorkManager;
 		class CoroutineManager * mCoroutineScheduler;
-	private:	
+	private:
+		DoubleBufferQueue<SharedPacket> mCallbackMessageQueue;
 		std::unordered_map<long long, shared_ptr<LocalRetActionProxy>> mRetActionMap;
 		std::unordered_map<std::string, shared_ptr<NetLuaAction>> mRegisterLuaActions;
 	};

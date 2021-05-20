@@ -78,7 +78,24 @@ namespace SoEasy
 				return;
 			}
 			const std::string & address = session->GetAddress();
-			mRecvMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, netPacket));
+			const std::string & actionName = netPacket->action();
+			const std::string & serviceName = netPacket->service();
+			if (!serviceName.empty() && !actionName.empty())
+			{
+				if (!this->mActionManager->AddLuaActionArgv(address, netPacket))
+				{
+					const std::string & service = netPacket->service();
+					ServiceBase * serviceProxy = this->GetApp()->GetService(service);
+					if (serviceProxy != nullptr)
+					{
+						serviceProxy->AddActionArgv(make_shared<NetMessageBuffer>(address, netPacket));
+					}
+				}
+			}
+			else if (netPacket->callback_id() != 0)
+			{
+				this->mActionManager->AddCallbackArgv(netPacket);
+			}
 		}
 	}
 
@@ -89,84 +106,6 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->mCoroutineSheduler = this->GetManager<CoroutineManager>());
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime));
 		return true;
-	}
-
-	void SessionManager::OnRecvNewMessageAfter(SharedTcpSession tcpSession, SharedPacket requestData)
-	{
-		this->mCurrentSession = tcpSession;
-		const std::string & serviceName = requestData->service();
-		const std::string & actionName = requestData->action();
-		if (!serviceName.empty() && !actionName.empty())
-		{
-			if (!this->CallLuaAction(requestData))
-			{
-				this->CallAction(requestData);
-			}
-		}
-		else if (requestData->callback_id() != 0)
-		{
-			const long long callbackId = requestData->callback_id();
-			auto callback = this->mActionManager->GetCallback(callbackId);
-			if (callback == nullptr)
-			{
-				SayNoDebugError("not find call back " << callbackId);
-				return;
-			}
-			callback->Invoke(requestData);
-		}
-		this->mCurrentSession = nullptr;
-	}
-
-	bool SessionManager::CallAction(SharedPacket requestData)
-	{
-		const std::string & serviceName = requestData->service();
-		const std::string & actionName = requestData->action();
-		ServiceBase * service = this->GetApp()->GetService(serviceName);
-		if (service == nullptr)
-		{
-			SayNoDebugError("not find service " << serviceName);
-			return false;
-		}
-		const std::string name = serviceName + "." + actionName;
-		const std::string address = this->mCurrentSession->GetAddress();
-		this->mCoroutineSheduler->Start(name, [address, this, service, requestData]()
-		{
-			long long callbackId = requestData->callback_id();
-			SharedPacket returnData = make_shared<NetWorkPacket>();
-			XCode code = service->CallAction(requestData, returnData);
-			if (callbackId != 0)
-			{
-				returnData->set_callback_id(callbackId);
-				returnData->set_operator_id(requestData->operator_id());
-				this->mNetWorkManager->SendMessageByAdress(address, returnData);
-			}
-		});
-		return true;
-	}
-
-	bool SessionManager::CallLuaAction(SharedPacket requestData)
-	{
-		//const std::string & serviceName = requestData->service();
-		//const std::string & actionName = requestData->action();
-		//const std::string & address = this->mCurrentSession->GetAddress();
-		//shared_ptr<NetLuaAction> luaAction = this->mActionManager->GetLuaAction(name);
-		//if (luaAction == nullptr)	//lua 函数自己返回
-		//{
-		//	return XCode::CallFunctionNotExist;
-		//}
-		//	
-		//	XCode code = luaAction->Invoke(address, requestData);
-		//	const long long callbackId = requestData->callback_id();
-		//	if (code != XCode::LuaCoroutineReturn && callbackId != 0)
-		//	{
-		//		shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-		//		returnPacket->set_error_code(code);
-		//		returnPacket->set_callback_id(callbackId);
-		//		returnPacket->set_operator_id(packet->operator_id());
-		//		this->mNetWorkManager->SendMessageByAdress(address, returnPacket);
-		//	}
-		//}
-		return false;
 	}
 
 	void SessionManager::OnSystemUpdate()
@@ -206,19 +145,6 @@ namespace SoEasy
 				}
 			}
 			pTcpSession = nullptr;
-		}
-
-		SharedNetPacket pMessagePacket;
-		this->mRecvMessageQueue.SwapQueueData();
-		while (this->mRecvMessageQueue.PopItem(pMessagePacket))
-		{
-			const std::string & address = pMessagePacket->mAddress;
-			shared_ptr<NetWorkPacket> netWorkPacket = pMessagePacket->mMessagePacket;
-			shared_ptr<TcpClientSession> tcpSession = mNetWorkManager->GetTcpSession(address);
-			if (tcpSession != nullptr)
-			{
-				this->OnRecvNewMessageAfter(tcpSession, netWorkPacket);
-			}		
 		}
 	}
 	void SessionManager::OnSecondUpdate()

@@ -21,10 +21,6 @@ namespace SoEasy
 		bool OnInit() override;
 		virtual void OnSessionErrorAfter(SharedTcpSession tcpSession) = 0;
 		virtual void OnSessionConnectAfter(SharedTcpSession tcpSession) = 0;
-		virtual void OnRecvNewMessageAfter(SharedTcpSession tcpSession, SharedPacket packet);
-	private:
-		bool CallAction(SharedPacket requestData);
-		bool CallLuaAction(SharedPacket requestData);
 	protected:
 		void OnSystemUpdate() final;
 		virtual void OnSecondUpdate() override;
@@ -37,7 +33,6 @@ namespace SoEasy
 		class ActionManager * mActionManager;
 		class CoroutineManager * mCoroutineSheduler;
 		shared_ptr<TcpClientSession> mCurrentSession;  //当前正在执行action的session
-		DoubleBufferQueue<SharedNetPacket> mRecvMessageQueue;
 		DoubleBufferQueue<SharedTcpSession> mNewSessionQueue;
 		DoubleBufferQueue<SharedTcpSession> mErrorSessionQueue;
 		std::unordered_map<std::string, SharedTcpSession> mWaitConnectSessionMap;	//要断线重连的session

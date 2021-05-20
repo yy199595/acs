@@ -89,14 +89,7 @@ namespace SoEasy
 				const long long callbackId = returnPackage->callback_id();
 				const long long operatorId = returnPackage->operator_id();
 				shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-				XCode code = service->CallAction(returnPackage, returnPacket);
-				if (callbackId != 0)
-				{
-					returnPacket->set_error_code(code);
-					returnPacket->set_callback_id(callbackId);
-					returnPacket->set_operator_id(operatorId);
-					this->mLocalRetActionMessage.push(returnPacket);
-				}
+				
 			});
 		}
 	}
