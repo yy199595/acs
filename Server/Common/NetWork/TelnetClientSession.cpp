@@ -31,6 +31,7 @@ namespace SoEasy
 				if (error_code)
 				{
 					this->Close();
+					this->mSessionManager->AddErrorSession(shared_from_this());
 				}
 			});
 		});
@@ -52,12 +53,13 @@ namespace SoEasy
 			if (error_code)
 			{
 				this->Close();
+				this->mSessionManager->AddErrorSession(shared_from_this());
 				return;
 			}
 			std::ostringstream osstream;
 			osstream << &this->mRecvMsgBuffer;
 			std::string messageData = osstream.str();
-			std::cout << messageData << std::endl;
+			this->mSessionManager->AddReceiveMessage(this->shared_from_this(), messageData);
 			this->StartRecvMessage();
 		});
 	}

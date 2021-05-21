@@ -1,23 +1,28 @@
 #include"Command.h"
 #include<Core/Applocation.h>
+#include<Service/ServiceBase.h>
 namespace SoEasy
 {
-	XCode StopCommand::Invoke(const std::string & paramate, RapidJsonWriter & returnData)
+	CommandBase::CommandBase(CommandManager * commandMgr)
 	{
-		Applocation::Get()->Stop();
-		return XCode::Successful;
+		this->mCommandManager = commandMgr;
 	}
 
-	XCode StateCommand::Invoke(const std::string & paramate, RapidJsonWriter & returnData)
+	void StateCommand::Invoke(SharedTelnetSession session, const std::string paramate)
 	{
-		char buffer[1024] = { 0 };
-		Applocation * app = Applocation::Get();
-		std::stringstream nStringBuffer;
-		nStringBuffer << "logic time = " << app->GetLogicTime() << "\n";
-		nStringBuffer << "delatime = " << app->GetDelaTime();
 
-		const std::string message = nStringBuffer.str();
-		returnData.AddParameter("Message", message);
-		return XCode::Successful;
+	}
+
+	void ServiceListCommand::Invoke(SharedTelnetSession session, const std::string paramate)
+	{
+		std::stringstream returnMessage;
+		std::vector<ServiceBase *> services;
+		Applocation::Get()->GetServices(services);
+		for (ServiceBase * service : services)
+		{
+			returnMessage << service->GetTypeName() << '\n';
+		}
+		const std::string & address = session->GetAddress();
+		this->mCommandManager->AddCommandBackArgv(address, XCode::Successful, returnMessage.str());
 	}
 }

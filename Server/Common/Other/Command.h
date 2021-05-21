@@ -2,24 +2,30 @@
 #include<string>
 #include<XCode/XCode.h>
 #include<Object/Object.h>
-#include<Util/JsonHelper.h>
+#include<Manager/CommandManager.h>
+#include<NetWork/TelnetClientSession.h>
 namespace SoEasy
 {
 	class CommandBase
 	{
 	public:
-		virtual XCode Invoke(const std::string & paramate, RapidJsonWriter & returnData) = 0;
+		CommandBase(CommandManager * commandMgr);
+		virtual void Invoke(SharedTelnetSession session, const std::string paramate = "") = 0;
+	protected:
+		CommandManager * mCommandManager;
 	};
 
-	class StopCommand : public CommandBase
-	{
-	public:
-		XCode Invoke(const std::string & paramate, RapidJsonWriter & returnData) override;
-	};
-	
 	class StateCommand : public CommandBase
 	{
 	public:
-		XCode Invoke(const std::string & paramate, RapidJsonWriter & returnData) override;
+		using CommandBase::CommandBase;
+		void Invoke(SharedTelnetSession session, const std::string paramate) override;
+	};
+
+	class ServiceListCommand : public CommandBase
+	{
+	public:
+		using CommandBase::CommandBase;
+		void Invoke(SharedTelnetSession session, const std::string paramate) override;
 	};
 }

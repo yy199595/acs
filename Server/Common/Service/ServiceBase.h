@@ -17,8 +17,9 @@ namespace SoEasy
 		void AddActionArgv(SharedNetPacket argv);
 	protected:
 		virtual bool OnInit() override;
-		void OnSystemUpdate() final;
+		virtual bool OnReceiveMessage(SharedTcpSession session, SharedPacket packet) { return false; }
 	protected:
+		void OnSystemUpdate() final;
 		bool BindFunction(std::string name, LocalAction1 action);
 
 		template<typename T1>

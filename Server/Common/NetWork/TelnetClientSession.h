@@ -3,7 +3,7 @@
 namespace SoEasy
 {
 	class CommandManager;
-	class TelnetClientSession
+	class TelnetClientSession : public std::enable_shared_from_this<TelnetClientSession>
 	{
 	public:
 		TelnetClientSession(CommandManager * manager, SharedTcpSocket socket);
@@ -24,4 +24,5 @@ namespace SoEasy
 	private:
 		asio::streambuf mRecvMsgBuffer;
 	};
+	typedef std::shared_ptr<TelnetClientSession> SharedTelnetSession;
 }

@@ -49,10 +49,15 @@ namespace SoEasy
 		while (this->mHandleMessageQueue.PopItem(handlePacket))
 		{
 			const std::string & address = handlePacket->mAddress;
+			SharedPacket packetData = handlePacket->mMessagePacket;
 			SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
 			if (tcpSession != nullptr)
 			{
-				SharedPacket packetData = handlePacket->mMessagePacket;
+				if (this->OnReceiveMessage(tcpSession, packetData))	//自定义操作
+				{
+					continue;
+				}
+				// 默认操作
 				const std::string & action = packetData->action();
 				this->mCoroutineManager->Start(action, [packetData, address, this]()
 				{
