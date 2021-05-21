@@ -5,13 +5,10 @@ namespace SoEasy
 {
 	bool LoginService::OnInit()
 	{
-		if (!this->GetConfig().GetValue("AreaId", this->mAreaId))
-		{
-			SayNoDebugFatal("not find field AreaId");
-			return false;
-		}
+		SayNoAssertRetFalse_F(ServiceBase::OnInit());
 		REGISTER_FUNCTION_1(LoginService::Login, UserAccountData);
 		REGISTER_FUNCTION_1(LoginService::Register, UserRegisterData);
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));
 		return true;
 	}
 

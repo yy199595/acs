@@ -5,14 +5,11 @@ namespace SoEasy
 {
 	bool UserDataManager::OnInit()
 	{
-		if (!this->GetConfig().GetValue("AreaId", this->mAreaId))
-		{
-			SayNoDebugFatal("not find field AreaId");
-			return false;
-		}
+		SayNoAssertRetFalse_F(ServiceBase::OnInit());
 		REGISTER_FUNCTION_1(UserDataManager::AddUserData, UserAccountData);
 		REGISTER_FUNCTION_2(UserDataManager::QueryUserData, StringData, UserAccountData);
 
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId))
 		SayNoAssertRetFalse_F(this->mRedisManager = this->GetManager<RedisManager>());
 		SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
 		return true;

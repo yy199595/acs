@@ -47,6 +47,7 @@
     <ClCompile Include="NetWork\NetWorkRetAction.cpp" />
     <ClCompile Include="NetWork\RemoteScheduler.cpp" />
     <ClCompile Include="NetWork\TcpClientSession.cpp" />
+    <ClCompile Include="NetWork\TelnetClientSession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
     <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Other\AssestsFileInfo.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
     <ClInclude Include="NetWork\RemoteScheduler.h" />
     <ClInclude Include="NetWork\TcpClientSession.h" />
+    <ClInclude Include="NetWork\TelnetClientSession.h" />
     <ClInclude Include="Object\GameObject.h" />
     <ClInclude Include="Object\MemoryObject.h" />
     <ClInclude Include="Object\Object.h" />

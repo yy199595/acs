@@ -1,14 +1,11 @@
 #include"CommandManager.h"
-#include"NetWorkManager.h"
 #include<Core/Applocation.h>
-#include<Core/TcpSessionListener.h>
-
+#include<NetWork/TelnetClientSession.h>
 namespace SoEasy
 {
 
 	CommandManager::CommandManager()
 	{
-		this->mTcpListener = nullptr;
 		this->mTcpSessionMap.clear();
 		this->mCommonActions.clear();
 	}
@@ -20,15 +17,14 @@ namespace SoEasy
 
 	bool CommandManager::OnInit()
 	{
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("CommondPort", this->mListenerPort));
-		this->mTcpListener = make_shared<TcpSessionListener>(this, this->mListenerPort);
-		SayNoAssertRetFalse_F(this->mTcpListener->InitListener());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("CommandPort", this->mListenerPort));
+		SayNoAssertRetFalse_F(this->InitListener());
 		return true;
 	}
 
 	void CommandManager::OnInitComplete()
 	{
-		this->mTcpListener->StartAcceptConnect();
+		this->StartListen();
 		this->AddCommandAction("stop", new StopCommand());
 		this->AddCommandAction("state", new StateCommand());
 		SayNoDebugInfo("start command listener port : " << this->mListenerPort);
@@ -46,7 +42,7 @@ namespace SoEasy
 		return false;
 	}
 
-	void CommandManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
+	void CommandManager::OnSessionErrorAfter(std::shared_ptr<TelnetClientSession> tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -56,7 +52,7 @@ namespace SoEasy
 		}
 	}
 
-	void CommandManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
+	void CommandManager::OnSessionConnectAfter(std::shared_ptr<TelnetClientSession> tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -64,99 +60,61 @@ namespace SoEasy
 		{
 			this->mTcpSessionMap.erase(iter);
 		}
-		mSessionLock.lock();
-		tcpSession->StartReceiveMsg();
-		mSessionLock.unlock();
-		this->mTcpSessionMap.insert(std::make_pair(address, tcpSession));
-
-		RapidJsonWriter jsonData;
-		jsonData.AddParameter("code", (int)XCode::Successful);
-		jsonData.AddParameter("Message", "Please enter your account and password (Login -account@psssword)");
-		this->SendMessageByAddress(tcpSession->GetAddress(), jsonData);
-
+		this->mTcpSessionMap.emplace(address, tcpSession);
+		const std::string welcome = "welcome server console";
+		tcpSession->StartRecvMessage();
+		tcpSession->StartWriteMessage(welcome);
 	}
 
-	shared_ptr<TcpClientSession> CommandManager::GetTcpSession(const std::string & address)
+	void CommandManager::Listen()
 	{
-		auto iter = this->mTcpSessionMap.find(address);
-		return iter != this->mTcpSessionMap.end() ? iter->second : nullptr;
-
-	}
-
-	XCode CommandManager::Invoke(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const std::string & args, RapidJsonWriter & returnData)
-	{		
-		if (!this->CheckSessionIsLogin(tcpSession))
+		AsioContext & ioContext = this->GetApp()->GetAsioContext();
+		SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(ioContext);
+		this->mBindAcceptor->async_accept(*tcpSocket, [this, &ioContext, tcpSocket](const asio::error_code & code)
 		{
-			if (name == "login")
+			if (!code)
 			{
-				return this->Login(tcpSession, args, returnData);
+				unsigned short port = tcpSocket->remote_endpoint().port();
+				std::string ip = tcpSocket->remote_endpoint().address().to_string();
+				this->OnSessionConnectAfter(make_shared<TelnetClientSession>(this, tcpSocket));
 			}
-			returnData.AddParameter("Message", "Please enter your account and password (Login -account@psssword)");
-			return XCode::Failure;
-		}
-		auto iter = this->mCommonActions.find(name);
-		if (iter == this->mCommonActions.end())
-		{
-			returnData.AddParameter("Error", "GM " + name + " not exist");
-			return XCode::CallFunctionNotExist;
-		}
-		CommandBase * pCommandBase = iter->second;
-		return pCommandBase->Invoke(args, returnData);
+			ioContext.post(std::bind(&CommandManager::Listen, this));
+		});
 	}
 
-	void CommandManager::HandleCommandMsgBack()
+	void CommandManager::StartListen()
 	{
-		while (!this->mSendMessageQueue.empty())
-		{
-			
-		}
+		AsioContext & ioContext = this->GetApp()->GetAsioContext();
+		ioContext.post(std::bind(&CommandManager::Listen, this));
 	}
 
-	bool CommandManager::SendMessageByAddress(const std::string & address, RapidJsonWriter & jsonData)
+	bool CommandManager::InitListener()
 	{
-		
-		return true;
+		if (this->mBindAcceptor == nullptr)
+		{
+			try
+			{
+				AsioContext & io = this->GetApp()->GetAsioContext();
+				AsioTcpEndPoint bindPoint(asio::ip::tcp::v4(), this->mListenerPort);
+				this->mBindAcceptor = new AsioTcpAcceptor(io, bindPoint);
+			}
+			catch (const asio::system_error& e)
+			{
+				SayNoDebugError("start server fail " << e.what());
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
+
+
+
 
 	void CommandManager::OnFrameUpdate(float t)
 	{
 		Manager::OnFrameUpdate(t);
-		this->HandleCommandMsgBack();
+
 	}
 
-	bool CommandManager::CheckSessionIsLogin(shared_ptr<TcpClientSession> session)
-	{
-		const std::string & address = session->GetAddress();
-		auto iter = this->mLoginAddressList.find(address);
-		return iter != this->mLoginAddressList.end();
-	}
-
-	XCode CommandManager::Login(shared_ptr<TcpClientSession> tcpSession, const std::string & commandData, RapidJsonWriter & returnData)
-	{
-		size_t pos = commandData.find("@");
-		if (pos == std::string::npos)
-		{
-			returnData.AddParameter("Error", "GM Parameter Error");
-			return XCode::CommandArgsError;
-		}
-		std::string user = commandData.substr(0, pos);
-		std::string passwd = commandData.substr(pos + 1);
-		const std::string & address = tcpSession->GetAddress();
-		if (this->mLoginAddressList.find(address) != this->mLoginAddressList.end())
-		{
-			returnData.AddParameter("Error", "You have logged in successfully");
-			return XCode::Failure;
-		}
-		if (this->mLoginUserList.find(user) != this->mLoginUserList.end())
-		{
-			returnData.AddParameter("Error", "Your account has been logged in");
-			return XCode::Failure;
-		}
-		this->mLoginUserList.insert(user);
-		this->mLoginAddressList.insert(address);
-		returnData.AddParameter("list", this->mAllCommandList);
-		returnData.AddParameter("Message", "User Login Successful");
-		SayNoDebugWarning("user = " << user << " passwd = " << passwd);
-		return XCode::Successful;
-	}
 }

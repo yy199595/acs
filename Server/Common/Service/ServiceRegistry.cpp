@@ -10,6 +10,7 @@ namespace SoEasy
 {
 	bool ServiceRegistry::OnInit()
 	{
+		SayNoAssertRetFalse_F(ServiceBase::OnInit());
 		REGISTER_FUNCTION_1(ServiceRegistry::RegisterActions, ActionUpdateInfo);
 		REGISTER_FUNCTION_2(ServiceRegistry::QueryActions, Int32Data, ActionInfoList);
 		return true;

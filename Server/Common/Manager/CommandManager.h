@@ -1,45 +1,41 @@
 #pragma once
-#include"SessionManager.h"
+#include"Manager.h"
 #include<Other/Command.h>
 namespace SoEasy
 {
-	class TcpSessionListener;
-	typedef std::function<XCode(shared_ptr<TcpClientSession>, const std::string &, RapidJsonWriter &)> CommandAction;
-	class CommandManager : public SessionManager
+	class TelnetClientSession;
+	typedef std::function<XCode(shared_ptr<TelnetClientSession>, const std::string &, RapidJsonWriter &)> CommandAction;
+	class CommandManager : public Manager
 	{
 	public:
 		CommandManager();
 		~CommandManager();
 	public:
 		bool AddCommandAction(const std::string gm, CommandBase * command);
-	private:
-		XCode Login(shared_ptr<TcpClientSession> tcpSession, const std::string & commandData, RapidJsonWriter & returnData);
 	protected:
 		bool OnInit() override;
 		void OnInitComplete() override;
 		void OnFrameUpdate(float t) override;
+
 	private:
-		shared_ptr<TcpClientSession> GetTcpSession(const std::string & address);
-		XCode Invoke(shared_ptr<TcpClientSession> tcpSession, const std::string & name, const std::string & args, RapidJsonWriter & returnData);
-	private:
-		void HandleCommandMsgBack();
-		bool CheckSessionIsLogin(shared_ptr<TcpClientSession>);
-		bool SendMessageByAddress(const std::string & address, RapidJsonWriter & jsonData);
+		void Listen();
+		void StartListen();
+		bool InitListener();
 	protected:
-		void OnSessionErrorAfter(SharedTcpSession) override;
-		void OnSessionConnectAfter(SharedTcpSession) override;
+		void OnSessionErrorAfter(std::shared_ptr<TelnetClientSession> session);
+		void OnSessionConnectAfter(std::shared_ptr<TelnetClientSession> session);
 	private:
 		std::set<std::string> mLoginUserList;
 		std::set<std::string> mLoginAddressList;
 	private:
 		unsigned short mListenerPort;
+		AsioTcpAcceptor * mBindAcceptor;
 	private:
 		std::mutex mSessionLock;
 		std::vector<std::string> mAllCommandList;
-		shared_ptr<TcpSessionListener> mTcpListener;
 		std::queue<NetMessageBuffer *> mSendMessageQueue;
 		std::unordered_map<std::string, CommandBase *> mCommonActions;
-		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mTcpSessionMap;
+		std::unordered_map<std::string, shared_ptr<TelnetClientSession>> mTcpSessionMap;
 
 	};
 }

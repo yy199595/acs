@@ -35,7 +35,8 @@
         "ActionManager",
         "LocalAccessManager",
         "ServiceQuery",
-        "ServiceRegistry"
+        "ServiceRegistry",
+        "CommandManager"
     ],
     "WhiteList": [
         "127.0.0.1"
