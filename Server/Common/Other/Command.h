@@ -28,4 +28,11 @@ namespace SoEasy
 		using CommandBase::CommandBase;
 		void Invoke(SharedTelnetSession session, const std::string paramate) override;
 	};
+
+	class ServiceCallCommand :public CommandBase
+	{
+	public:
+		using CommandBase::CommandBase;
+		void Invoke(SharedTelnetSession session, const std::string paramate) override;
+	};
 }

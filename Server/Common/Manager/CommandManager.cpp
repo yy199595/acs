@@ -30,7 +30,7 @@ namespace SoEasy
 		this->StartListen();
 		this->AddCommandAction("state", new StateCommand(this));
 		this->AddCommandAction("list", new ServiceListCommand(this));
-
+		this->AddCommandAction("call", new ServiceCallCommand(this));
 		SayNoDebugInfo("start command listener port : " << this->mListenerPort);
 	}
 
@@ -51,8 +51,8 @@ namespace SoEasy
 		if (iter != this->mTcpSessionMap.end())
 		{
 			std::stringstream returnCommand;
-			returnCommand << "  <code = " << code << ">\n";
-			returnCommand << message;
+			returnCommand << "\t<code = " << code << ">\n";
+			returnCommand << "\t" << message << "\n";
 			iter->second->StartWriteMessage(returnCommand.str());
 		}
 	}
