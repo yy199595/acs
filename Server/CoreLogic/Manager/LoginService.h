@@ -1,12 +1,12 @@
 #pragma once
-#include<Service/ServiceBase.h>
+#include<Service/LocalService.h>
 #include<Protocol/ServerCommon.pb.h>
 namespace SoEasy
 {
-	class LoginService : public ServiceBase
+	class LoginService : public LocalService
 	{
 	public:
-		LoginService() { }
+		LoginService();
 		~LoginService() { }
 	protected:
 		bool OnInit() override;

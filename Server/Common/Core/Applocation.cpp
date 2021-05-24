@@ -1,6 +1,6 @@
 
 #include"Applocation.h"
-#include"ManagerRegistry.h"
+#include"ObjectRegistry.h"
 #include<Util/FileHelper.h>
 #include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
@@ -36,7 +36,7 @@ namespace SoEasy
 
 	bool Applocation::AddManager(const std::string & name)
 	{
-		Manager * manager = ManagerRegistry::Create(name);
+		Manager * manager = ObjectRegistry<Manager>::Create(name);
 		if (manager == nullptr)
 		{
 			SayNoDebugError("create " << name << " fail");
@@ -51,12 +51,6 @@ namespace SoEasy
 		manager->Init(this, name);
 		this->mManagerMap.emplace(name, manager);
 		this->mSortManagers.emplace_back(manager);
-		ServiceBase * service = dynamic_cast<ServiceBase*>(manager);
-		if (service != nullptr)
-		{
-			this->mServiceMap.emplace(name, service);
-			SayNoDebugLog("add new service " << name);
-		}
 		return true;
 	}
 
@@ -69,23 +63,6 @@ namespace SoEasy
 			managers.push_back(manager);
 		}
 	}
-
-	void Applocation::GetServices(std::vector<ServiceBase*>& services)
-	{
-		auto iter = this->mServiceMap.begin();
-		for (; iter != this->mServiceMap.end(); iter++)
-		{
-			ServiceBase * service = iter->second;
-			services.push_back(service);
-		}
-	}
-
-	ServiceBase * Applocation::GetService(const std::string & name)
-	{
-		auto iter = this->mServiceMap.find(name);
-		return iter != this->mServiceMap.end() ? iter->second : nullptr;
-	}
-
 
 	bool Applocation::LoadManager()
 	{
@@ -134,12 +111,10 @@ namespace SoEasy
 			}
 			SayNoDebugLog("init " << this->mCurrentManager->GetTypeName() << " successful");
 		}
-		CoroutineManager * corManager = this->GetManager<CoroutineManager>();
 		for (size_t index = 0; index < this->mSortManagers.size(); index++)
 		{
 			this->mCurrentManager = this->mSortManagers[index];
-			const std::string name = this->mCurrentManager->GetTypeName() + ".OnInitComplete";
-			corManager->Start(name, BIND_ACTION_0(Manager::OnInitComplete, this->mCurrentManager));
+			this->mCurrentManager->OnInitComplete();
 		}
 		return true;
 	}
@@ -255,7 +230,7 @@ namespace SoEasy
 
 	bool Applocation::GetTypeName(size_t hash, std::string & name)
 	{
-		return ManagerRegistry::GetTypeName(hash, name);
+		return ObjectRegistry<Manager>::GetTypeName(hash, name);
 	}
 
 	void Applocation::UpdateConsoleTitle()

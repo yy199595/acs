@@ -2,17 +2,17 @@
 #include<string>
 #include<XCode/XCode.h>
 #include<Object/Object.h>
-#include<Manager/CommandManager.h>
+#include<Manager/ConsoleManager.h>
 #include<NetWork/TelnetClientSession.h>
 namespace SoEasy
 {
 	class CommandBase
 	{
 	public:
-		CommandBase(CommandManager * commandMgr);
+		CommandBase(ConsoleManager * commandMgr);
 		virtual void Invoke(SharedTelnetSession session, const std::string paramate = "") = 0;
 	protected:
-		CommandManager * mCommandManager;
+		ConsoleManager * mCommandManager;
 	};
 
 	class StateCommand : public CommandBase

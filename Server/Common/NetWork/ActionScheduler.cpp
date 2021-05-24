@@ -103,10 +103,6 @@ namespace SoEasy
 		callData->set_service(service);
 		callData->set_action(func);
 		callData->set_callback_id(id);
-		if (this->mSessionAddress.empty())
-		{
-			return this->mNetWorkManager->SendMessageByName(func, callData);
-		}	
 		return this->mNetWorkManager->SendMessageByAdress(mSessionAddress, callData);
 	}
 

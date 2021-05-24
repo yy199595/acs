@@ -1,8 +1,8 @@
 #include"TelnetClientSession.h"
-#include<Manager/CommandManager.h>
+#include<Manager/ConsoleManager.h>
 namespace SoEasy
 {
-	TelnetClientSession::TelnetClientSession(CommandManager * manager, SharedTcpSocket socket)
+	TelnetClientSession::TelnetClientSession(ConsoleManager * manager, SharedTcpSocket socket)
 		:mAsioContext(manager->GetAsioContext())
 	{
 		this->mBindSocket = socket;

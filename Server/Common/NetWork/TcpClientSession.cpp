@@ -173,15 +173,19 @@ namespace SoEasy
 
 		this->mBinTcpSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),
 			[this, nMessageBuffer](const asio::error_code & error_code, const std::size_t messageSize)
-		{						
+		{				
 			if (error_code)
 			{
 				this->CloseSocket();
 			}
 			else
 			{
+				if (!this->mDispatchManager->AddRecvMessage(shared_from_this(), nMessageBuffer, messageSize))
+				{
+					this->CloseSocket();
+					return;
+				}
 				mAsioContext.post(this->mRecvAction);
-				this->mDispatchManager->AddRecvMessage(shared_from_this(), nMessageBuffer, messageSize);
 			}
 			if (nMessageBuffer != this->mRecvMsgBuffer)
 			{

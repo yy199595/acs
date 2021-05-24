@@ -1,20 +1,22 @@
 #include<Core/Applocation.h>
-#include<Core/ManagerRegistry.h>
+#include<Core/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/ActionManager.h>
-#include<Service/ServiceRegistry.h>
+
 #include<Manager/NetWorkManager.h>
-#include<Manager/CommandManager.h>
+#include<Manager/ConsoleManager.h>
 #include<Manager/ListenerManager.h>
-#include<Service/ServiceQuery.h>
+#include<Manager/ServiceManager.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/ProxyManager.h>
 #include<Manager/LoginService.h>
-#include<Manager/UserDataManager.h>
 #include<Manager/LocalAccessManager.h>
+
+
+#include<Service/ServiceRegistry.h>
 using namespace SoEasy;
 using namespace SoEasy;
 
@@ -31,22 +33,22 @@ using namespace SoEasy;
 int main(int argc, char ** argv)
 { 
 	
-	ManagerRegistry::RegisterManager<LoginService>("LoginService");
-	ManagerRegistry::RegisterManager<ProxyManager>("ProxyManager");
-	ManagerRegistry::RegisterManager<RedisManager>("RedisManager");
-	ManagerRegistry::RegisterManager<MysqlManager>("MysqlManager");
-	ManagerRegistry::RegisterManager<TimerManager>("TimerManager");
-	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
-	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
-	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
-	ManagerRegistry::RegisterManager<CommandManager>("CommandManager");
-	ManagerRegistry::RegisterManager<ListenerManager>("ListenerManager");
-	ManagerRegistry::RegisterManager<UserDataManager>("UserDataManager");
-	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
-	ManagerRegistry::RegisterManager<LocalAccessManager>("LocalAccessManager");
+	
+	ObjectRegistry<Manager>::RegisterManager<ProxyManager>("ProxyManager");
+	ObjectRegistry<Manager>::RegisterManager<RedisManager>("RedisManager");
+	ObjectRegistry<Manager>::RegisterManager<MysqlManager>("MysqlManager");
+	ObjectRegistry<Manager>::RegisterManager<TimerManager>("TimerManager");
+	ObjectRegistry<Manager>::RegisterManager<ActionManager>("ActionManager");
+	ObjectRegistry<Manager>::RegisterManager<ScriptManager>("ScriptManager");
+	ObjectRegistry<Manager>::RegisterManager<ServiceManager>("ServiceManager");
+	ObjectRegistry<Manager>::RegisterManager<NetWorkManager>("NetWorkManager");
+	ObjectRegistry<Manager>::RegisterManager<ConsoleManager>("ConsoleManager");
+	ObjectRegistry<Manager>::RegisterManager<ListenerManager>("ListenerManager");
+	ObjectRegistry<Manager>::RegisterManager<CoroutineManager>("CoroutineManager");
+	ObjectRegistry<Manager>::RegisterManager<LocalAccessManager>("LocalAccessManager");
 
-	ManagerRegistry::RegisterManager<ServiceQuery>("ServiceQuery");
-	ManagerRegistry::RegisterManager<ServiceRegistry>("ServiceRegistry");
+	ObjectRegistry<LocalService>::RegisterManager<LoginService>("LoginService");
+	ObjectRegistry<LocalService>::RegisterManager<ServiceRegistry>("ServiceRegistry");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";

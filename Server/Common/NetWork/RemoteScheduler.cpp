@@ -86,10 +86,6 @@ namespace SoEasy
 		newCallData->set_action(func);
 		newCallData->set_callback_id(callbackId);
 		newCallData->set_operator_id(mOperatorId);
-		if (this->mBindSessionAdress.empty())
-		{
-			return this->mNetWorkManager->SendMessageByName(func, newCallData);
-		}
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 

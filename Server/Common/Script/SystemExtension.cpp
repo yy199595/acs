@@ -93,42 +93,6 @@ using namespace SoEasy;
 		return 0;
 	}
 
-	int SystemExtension::BindAction(lua_State * luaEnv)
-	{
-
-		Applocation * pApplocation = Applocation::Get();
-		ActionManager * actionManager = pApplocation->GetManager<ActionManager>();
-		if (actionManager == nullptr)
-		{
-			lua_pushboolean(luaEnv, false);
-			return 1;
-		}
-
-		if (!lua_isstring(luaEnv, 1))
-		{
-			lua_pushboolean(luaEnv, false);
-			return 1;
-		}
-		if (!lua_isfunction(luaEnv, 2))
-		{
-			lua_pushboolean(luaEnv, false);
-			return 1;
-		}
-		const std::string action = lua_tostring(luaEnv, 1);
-		lua_pushvalue(luaEnv, 2);
-		int action_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		if (!lua_getfunction(luaEnv, "Action", "Invoke"))
-		{
-			lua_pushboolean(luaEnv, false);
-			return 1;
-		}
-
-		int invoke_ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		shared_ptr<NetLuaAction> luaAction = make_shared<NetLuaAction>(luaEnv, action, action_ref, invoke_ref);
-		lua_pushboolean(luaEnv, actionManager->BindFunction(luaAction));
-		return 1;
-	}
-
 	int SystemExtension::SendByAddress(lua_State * luaEnv)
 	{
 		Applocation * pApplocation = Applocation::Get();

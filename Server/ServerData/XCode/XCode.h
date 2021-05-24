@@ -16,6 +16,7 @@ enum XCode
 	CommandArgsError,	//CM命令参数错误
 	SessionIsNull,		//session是空
 	SendMessageFail,	//发送消息失败
+	HandleMessageFail,	//处理消息失败
 	NoCoroutineContext,	//没有协程上下文
 
 	ParseJsonFailure,

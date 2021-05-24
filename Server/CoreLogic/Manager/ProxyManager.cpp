@@ -3,13 +3,11 @@
 #include<Util/NumberHelper.h>
 #include<Core/TcpSessionListener.h>
 #include<Manager/NetWorkManager.h>
-#include<Service/ServiceQuery.h>
 namespace SoEasy
 {
 	bool ProxyManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(ListenerManager::OnInit());
-		SayNoAssertRetFalse_F(this->mRemoteActionManager = this->GetManager<ServiceQuery>());
 		return true;
 	}
 

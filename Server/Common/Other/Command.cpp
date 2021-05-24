@@ -7,7 +7,7 @@
 #include<google/protobuf/util/json_util.h>
 namespace SoEasy
 {
-	CommandBase::CommandBase(CommandManager * commandMgr)
+	CommandBase::CommandBase(ConsoleManager * commandMgr)
 	{
 		this->mCommandManager = commandMgr;
 	}
@@ -20,12 +20,7 @@ namespace SoEasy
 	void ServiceListCommand::Invoke(SharedTelnetSession session, const std::string paramate)
 	{
 		std::stringstream returnMessage;
-		std::vector<ServiceBase *> services;
-		Applocation::Get()->GetServices(services);
-		for (ServiceBase * service : services)
-		{
-			returnMessage << service->GetTypeName() << '\n';
-		}
+		
 		const std::string & address = session->GetAddress();
 		this->mCommandManager->AddCommandBackArgv(address, XCode::Successful, returnMessage.str());
 	}
@@ -44,7 +39,7 @@ namespace SoEasy
 		const std::string & action = paramates[1];
 		const std::string & protoc = paramates[2];
 		const std::string & json = paramates[3];
-		ServiceBase * serviceProxy = Applocation::Get()->GetService(service);
+		ServiceBase * serviceProxy = nullptr;	//TODO
 		if (serviceProxy == nullptr)
 		{
 			std::string returnData = "not find service : " + service;
@@ -63,11 +58,5 @@ namespace SoEasy
 			std::string returnData = "parse argv error : " + json;
 			this->mCommandManager->AddCommandBackArgv(address, XCode::Failure, returnData);
 		}
-		SharedPacket messageData = make_shared<PB::NetWorkPacket>();
-		messageData->set_service(paramates[0]);
-		messageData->set_action(paramates[1]);
-		messageData->set_protoc_name(paramates[2]);
-		messageData->set_message_data(message->SerializeAsString());
-		serviceProxy->AddActionArgv(messageData);
 	}
 }

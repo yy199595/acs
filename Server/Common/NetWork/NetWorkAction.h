@@ -39,7 +39,7 @@ namespace SoEasy
 		LocalActionProxy1(LocalAction1 action, std::string & name) 
 			: LocalActionProxy(name), mBindAction(action) { }
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
+		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
 	private:
 
 		LocalAction1 mBindAction;
@@ -53,12 +53,14 @@ namespace SoEasy
 	{
 	public:
 		LocalActionProxy2(LocalAction2<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action) { }
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
+	public:
+		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
 	private:
 		std::string mMessageBuffer;
 		shared_ptr<T1> mRequestData;
 		LocalAction2<T1> mBindAction;
 	};
+	
 	template<typename T1>
 	inline XCode LocalActionProxy2<T1>::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{

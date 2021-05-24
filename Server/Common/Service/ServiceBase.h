@@ -1,59 +1,38 @@
 #pragma once
+#include<memory>
 #include<Manager/Manager.h>
-#include<NetWork/NetWorkAction.h>
+#include<Protocol/Common.pb.h>
+using namespace std;
+using namespace PB;
 namespace SoEasy
 {
-	
-	
-	
-
-	class ServiceBase : public Manager
+	class NetWorkWaitCorAction;
+	class ServiceBase : public Object
 	{
 	public:
-		ServiceBase();
+		ServiceBase() { }
 		virtual ~ServiceBase() { }
 	public:
-		void AddActionArgv(SharedPacket argv);
-		void AddActionArgv(SharedNetPacket argv);
+		virtual bool OnInit();
+		virtual void OnSystemUpdate() { }
+		virtual void OnInitComplete() { };
+	public:
+		const int GetServiceId() { return this->mServiceId; }
+		const std::string & GetServiceName() { return this->mServiceName; }
 	protected:
-		virtual bool OnInit() override;
-		virtual bool OnReceiveMessage(SharedTcpSession session, SharedPacket packet) { return false; }
-	protected:
-		void OnSystemUpdate() final;
-		bool BindFunction(std::string name, LocalAction1 action);
-
-		template<typename T1>
-		bool BindFunction(std::string name, LocalAction2<T1> action);
-
-		template<typename T1, typename T2>
-		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
+		virtual bool HandleMessage(shared_ptr<NetWorkPacket>) = 0;
+	public:
+		void InitService(const std::string & name, int id);
+	public:
+		XCode Call(const std::string method, Message & returnData);
+		XCode Call(const std::string method, shared_ptr<Message> message = nullptr);
+		XCode Call(const std::string method, shared_ptr<Message> message, Message & returnData);
 	private:
-		XCode CallAction(SharedPacket request, SharedPacket returnData);
-		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
+		shared_ptr<NetWorkPacket> CreatePacket(const std::string & func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack);
 	private:
+		int mServiceId;
+		std::string mServiceName;
 		class ActionManager * mActionManager;
-		class NetWorkManager * mNetWorkManager;
-		class CoroutineManager * mCoroutineManager;
-		std::queue<SharedPacket> mLocalMessageQueue;
-		DoubleBufferQueue<SharedNetPacket> mHandleMessageQueue;
-		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
+		class CoroutineManager * mCorManager;
 	};
-
-	template<typename T1>
-	inline bool ServiceBase::BindFunction(std::string name, LocalAction2<T1> action)
-	{
-		typedef LocalActionProxy2<T1> ActionProxyType;
-		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
-	}
-
-	template<typename T1, typename T2>
-	inline bool ServiceBase::BindFunction(std::string name, LocalAction3<T1, T2> action)
-	{
-		const size_t pos = name.find_first_of(".");
-		return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action, name));
-	}
-#define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))
-#define REGISTER_FUNCTION_1(func,t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))
-#define REGISTER_FUNCTION_2(func,t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
-
 }

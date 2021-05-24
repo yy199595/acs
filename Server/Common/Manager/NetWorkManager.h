@@ -25,7 +25,6 @@ namespace SoEasy
 		bool RemoveTcpSession(const std::string & tcpSession);
 		bool RemoveTcpSession(shared_ptr<TcpClientSession> tcpSession);
 		
-		XCode SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage);
 		XCode SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage);
 	public:
 		shared_ptr<TcpClientSession> GetTcpSession(const std::string & adress);
@@ -37,7 +36,6 @@ namespace SoEasy
 		AsioContext * mSessionContext;
 		class LocalAccessManager * mLocalAccessManager;
 		class ActionManager * mLocalActionManager;
-		class ServiceQuery * mActionQueryManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//ËùÓÐsession

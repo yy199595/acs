@@ -66,9 +66,6 @@
     <ClCompile Include="Global\ServerConfig.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\CommandManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\ListenerManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -222,16 +219,7 @@
     <ClCompile Include="Script\SystemExtension.cpp">
       <Filter>Script</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ManagerRegistry.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Service\ServiceBase.cpp">
-      <Filter>Service</Filter>
-    </ClCompile>
     <ClCompile Include="Service\ServiceRegistry.cpp">
-      <Filter>Service</Filter>
-    </ClCompile>
-    <ClCompile Include="Service\ServiceQuery.cpp">
       <Filter>Service</Filter>
     </ClCompile>
     <ClCompile Include="Manager\ActionManager.cpp">
@@ -239,6 +227,21 @@
     </ClCompile>
     <ClCompile Include="NetWork\TelnetClientSession.cpp">
       <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\ServiceManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ProxyService.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\ConsoleManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\LocalService.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\ServiceBase.cpp">
+      <Filter>Service</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,9 +283,6 @@
     </ClInclude>
     <ClInclude Include="Global\ServerConfig.h">
       <Filter>Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\CommandManager.h">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\ListenerManager.h">
       <Filter>Manager</Filter>
@@ -503,16 +503,7 @@
     <ClInclude Include="Script\UserDataParameter.h">
       <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ManagerRegistry.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Service\ServiceBase.h">
-      <Filter>Service</Filter>
-    </ClInclude>
     <ClInclude Include="Service\ServiceRegistry.h">
-      <Filter>Service</Filter>
-    </ClInclude>
-    <ClInclude Include="Service\ServiceQuery.h">
       <Filter>Service</Filter>
     </ClInclude>
     <ClInclude Include="Manager\ActionManager.h">
@@ -520,6 +511,24 @@
     </ClInclude>
     <ClInclude Include="NetWork\TelnetClientSession.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ServiceManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ObjectRegistry.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ProxyService.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ConsoleManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\LocalService.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ServiceBase.h">
+      <Filter>Service</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

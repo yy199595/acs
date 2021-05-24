@@ -8,7 +8,6 @@
 #include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
 #include<Script/LuaFunction.h>
-#include<Service/ServiceQuery.h>
 #include<Manager/ActionManager.h>
 #include<NetWork/RemoteActionProxy.h>
 #include<Manager/LocalAccessManager.h>
@@ -22,7 +21,6 @@ namespace SoEasy
 	bool NetWorkManager::OnInit()
 	{
 		this->mLocalAccessManager = this->GetManager<LocalAccessManager>();
-		this->mActionQueryManager = this->GetManager<ServiceQuery>();
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		
@@ -124,25 +122,6 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	XCode NetWorkManager::SendMessageByName(const std::string & func, shared_ptr<NetWorkPacket> returnPackage)
-	{
-		if (this->mLocalAccessManager != nullptr)
-		{
-			if (this->mLocalAccessManager->CallService(func, returnPackage))
-			{
-				SayNoDebugInfo("call location action " << func);
-				return XCode::Successful;
-			}
-		}
-		
-		shared_ptr<RemoteActionProxy> actionProxy;
-		if (!this->mActionQueryManager->GetActionProxy(func, actionProxy))
-		{
-			return XCode::CallFunctionNotExist;
-		}
-		return actionProxy->Invoke(returnPackage);
-	}
-	
 	void NetWorkManager::OnDestory()
 	{
 		

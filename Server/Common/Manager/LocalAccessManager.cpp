@@ -34,36 +34,20 @@ namespace SoEasy
 
 	bool LocalAccessManager::CallService(const std::string & serviceName, shared_ptr<NetWorkPacket> returnPackage)
 	{
-		shared_ptr<NetLuaAction> luaAction = this->mLocalActionManager->GetLuaAction(serviceName);
-		if (luaAction != nullptr)
-		{
-			this->mLocalCallActionMessage.push(returnPackage);
-			return true;
-		}
-		ServiceBase * service = this->GetApp()->GetService(serviceName);
-		if (service != nullptr)
-		{
-			this->mLocalCallActionMessage.push(returnPackage);
-			return true;
-		}
+		
 		return false;
 	}
 
 	void LocalAccessManager::HandleLocationRetAction(shared_ptr<NetWorkPacket> returnPackage)
 	{
-		const long long callbackId = returnPackage->callback_id();
-		shared_ptr<LocalRetActionProxy> callBack = this->mLocalActionManager->GetCallback(callbackId);
-		if (callBack != nullptr)
-		{
-			callBack->Invoke(returnPackage);
-		}
+		
 	}
 
 	void LocalAccessManager::HandleLocationCallAction(shared_ptr<NetWorkPacket> returnPackage)
 	{
 		const std::string & action = returnPackage->action();
-
-		shared_ptr<NetLuaAction> luaAction = this->mLocalActionManager->GetLuaAction(action);
+		//TODO
+		shared_ptr<NetLuaAction> luaAction; //this->mLocalActionManager->GetLuaAction(action);
 		if (luaAction != nullptr)
 		{
 			XCode code = luaAction->Invoke(returnPackage);
@@ -79,18 +63,6 @@ namespace SoEasy
 				this->mLocalRetActionMessage.push(returnPacket);
 			}
 			return;
-		}
-		const std::string & serviceName = returnPackage->service();
-		ServiceBase * service = this->GetApp()->GetService(serviceName);
-		if (service != nullptr)
-		{
-			this->mCoroutineManager->Start(action, [this, service, returnPackage]()
-			{
-				const long long callbackId = returnPackage->callback_id();
-				const long long operatorId = returnPackage->operator_id();
-				shared_ptr<NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-				
-			});
 		}
 	}
 }

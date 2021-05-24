@@ -26,6 +26,5 @@ namespace SystemExtension
 
 	extern int SendByAddress(lua_State * luaEnv);
 
-	extern int BindAction(lua_State * luaEnv);
 };
 

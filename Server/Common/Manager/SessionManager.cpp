@@ -1,11 +1,13 @@
 #include"SessionManager.h"
 #include"NetWorkManager.h"
-#include"ActionManager.h"
+#include"ServiceManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
+#include<Service/LocalService.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Manager/ActionManager.h>
 namespace SoEasy
 {
 	SharedTcpSession SessionManager::CreateTcpSession(SharedTcpSocket socket)
@@ -66,43 +68,41 @@ namespace SoEasy
 		return true;
 	}
 
-	void SessionManager::AddRecvMessage(SharedTcpSession session, const char * message, size_t size)
+	bool SessionManager::AddRecvMessage(SharedTcpSession session, const char * message, size_t size)
 	{
-		if (session != nullptr)
+		shared_ptr<NetWorkPacket> messageData = make_shared<NetWorkPacket>();
+		if (!messageData->ParseFromArray(message, size))
 		{
-			shared_ptr<NetWorkPacket> netPacket = make_shared<NetWorkPacket>();
-			if (!netPacket->ParseFromArray(message, size))
+			session->StartClose();
+			SayNoDebugError("parse message error close session");
+			return false;
+		}
+		const std::string & action = messageData->action();
+		const std::string & service = messageData->service();
+		if (!service.empty() && !action.empty())
+		{
+			LocalService * localService = this->mServiceManager->GetLocalService(service);
+			if (localService == nullptr)
 			{
-				session->StartClose();
-				SayNoDebugError("parse message error close session");
-				return;
+				return false;
 			}
 			const std::string & address = session->GetAddress();
-			const std::string & actionName = netPacket->action();
-			const std::string & serviceName = netPacket->service();
-			if (!serviceName.empty() && !actionName.empty())
-			{
-				if (!this->mActionManager->AddLuaActionArgv(address, netPacket))
-				{
-					const std::string & service = netPacket->service();
-					ServiceBase * serviceProxy = this->GetApp()->GetService(service);
-					if (serviceProxy != nullptr)
-					{
-						serviceProxy->AddActionArgv(make_shared<NetMessageBuffer>(address, netPacket));
-					}
-				}
-			}
-			else if (netPacket->callback_id() != 0)
-			{
-				this->mActionManager->AddCallbackArgv(netPacket);
-			}
+			localService->AddActionArgv(address, messageData);
+			return true;
 		}
+		if (messageData->callback_id() == 0)
+		{
+			return false;
+		}
+		this->mActionManager->AddActionArgv(messageData);
+		return true;
 	}
 
 	bool SessionManager::OnInit()
 	{
-		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
+		SayNoAssertRetFalse_F(this->mServiceManager = this->GetManager<ServiceManager>());
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineSheduler = this->GetManager<CoroutineManager>());
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ReConnectTime", this->mReConnectTime));
 		return true;

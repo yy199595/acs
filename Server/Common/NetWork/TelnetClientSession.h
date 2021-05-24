@@ -2,11 +2,11 @@
 #include<Define/CommonDef.h>
 namespace SoEasy
 {
-	class CommandManager;
+	class ConsoleManager;
 	class TelnetClientSession : public std::enable_shared_from_this<TelnetClientSession>
 	{
 	public:
-		TelnetClientSession(CommandManager * manager, SharedTcpSocket socket);
+		TelnetClientSession(ConsoleManager * manager, SharedTcpSocket socket);
 		~TelnetClientSession() { }
 	public:
 		void StartRecvMessage();
@@ -20,7 +20,7 @@ namespace SoEasy
 		std::string mAddress;
 		AsioContext & mAsioContext;
 		SharedTcpSocket mBindSocket;
-		CommandManager * mSessionManager;
+		ConsoleManager * mSessionManager;
 	private:
 		asio::streambuf mRecvMsgBuffer;
 	};

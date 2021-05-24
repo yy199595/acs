@@ -2,7 +2,6 @@
 #include"Component.h"
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
-#include<Service/ServiceQuery.h>
 
 namespace SoEasy
 {
@@ -18,7 +17,6 @@ namespace SoEasy
 	private:
 		NetWorkManager * mNetWorkManager;
 		ActionManager * mLocalActionManager;
-		ServiceQuery * mRemoteActionManager;
 		std::unordered_map<std::string, std::string> mActionAddress;
 	};
 }

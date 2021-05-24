@@ -2,9 +2,9 @@
     "AreaId": 0,
     "LogicFps": 30,
     "SystemFps":100,
-    "MsgTimeout":5000,
+    "MsgTimeout":0,
+    "QueryAddress": "127.0.0.1:7788",
     "ListenAddress": "127.0.0.1:7788",
-    "ActionQueryAddress": "127.0.0.1:7788",
     "RecvBuffCount": 1024,
     "IsOpenRecoder": true,
     "CommandPort": 1020,
@@ -29,14 +29,14 @@
         "MysqlManager",
         "RedisManager",
         "ScriptManager",
-        "LoginService",
-        "UserDataManager",
         "ListenerManager",
         "ActionManager",
-        "LocalAccessManager",
-        "ServiceQuery",
-        "ServiceRegistry",
-        "CommandManager"
+        "ServiceManager",
+        "LocalAccessManager"
+    ],
+    "Service":[
+        "LoginService",
+        "ServiceRegistry"
     ],
     "WhiteList": [
         "127.0.0.1"

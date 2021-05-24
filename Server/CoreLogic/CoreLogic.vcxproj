@@ -21,12 +21,10 @@
   <ItemGroup>
     <ClInclude Include="Manager\LoginService.h" />
     <ClInclude Include="Manager\ProxyManager.h" />
-    <ClInclude Include="Manager\UserDataManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Manager\LoginService.cpp" />
     <ClCompile Include="Manager\ProxyManager.cpp" />
-    <ClCompile Include="Manager\UserDataManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

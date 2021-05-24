@@ -18,7 +18,6 @@ namespace SoEasy
 	class Manager;
 	class ServiceBase;
 	class ThreadPool;
-	class ManagerRegistry;
 	class Applocation
 	{
 	public:
@@ -45,9 +44,6 @@ namespace SoEasy
 		template<typename T>
 		inline bool TryAddManager();
 		void GetManagers(std::vector<Manager *> & managers);
-		void GetServices(std::vector<ServiceBase *> & services);
-	public:
-		ServiceBase * GetService(const std::string & name);
 	private:
 		bool LoadManager();
 		bool InitManager();
@@ -88,7 +84,6 @@ namespace SoEasy
 		static Applocation * mApplocation;
 		std::vector<Manager *> mSortManagers;
 		std::unordered_map<std::string, Manager *> mManagerMap;
-		std::unordered_map<std::string, ServiceBase *> mServiceMap;
 	};
 	template<typename T>
 	inline bool Applocation::AddManager()

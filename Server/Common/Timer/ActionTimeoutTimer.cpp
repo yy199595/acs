@@ -12,13 +12,9 @@ namespace SoEasy
 
 	bool ActionTimeoutTimer::Invoke()
 	{
-		shared_ptr<LocalRetActionProxy> actionCallback = this->mActionManager->GetCallback(mCallbackId);
-		if (actionCallback != nullptr)
-		{
-			std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
-			packet->set_error_code(XCode::TimeoutAutoCall);
-			actionCallback->Invoke(packet);
-		}
+		std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
+		packet->set_error_code(XCode::TimeoutAutoCall);
+		this->mActionManager->AddActionArgv(packet);
 		return false;
 	}
 }

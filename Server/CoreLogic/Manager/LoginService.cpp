@@ -3,9 +3,14 @@
 #include<NetWork/ActionScheduler.h>
 namespace SoEasy
 {
+	LoginService::LoginService()
+	{
+
+	}
+
 	bool LoginService::OnInit()
 	{
-		SayNoAssertRetFalse_F(ServiceBase::OnInit());
+		SayNoAssertRetFalse_F(LocalService::OnInit());
 		REGISTER_FUNCTION_1(LoginService::Login, UserAccountData);
 		REGISTER_FUNCTION_1(LoginService::Register, UserRegisterData);
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));

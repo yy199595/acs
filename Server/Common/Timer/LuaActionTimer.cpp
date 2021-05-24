@@ -32,7 +32,8 @@ namespace SoEasy
 			return true;
 		}
 		this->mInvokeCount++;
-		this->MoveNextInvokeTime(mInterval);
+		this->mDelayTime = mInterval;
+		this->mTickCount = 0;
 		if (this->mMaxInvokeCount == -1)
 		{
 			return false;

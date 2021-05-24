@@ -19,7 +19,6 @@ namespace SoEasy
 		inline void SetActive(bool isActive) { this->mIsActive = isActive; }
 		inline const std::string & GetTypeName() { return this->mClassName; }
 		inline ServerConfig & GetConfig() { return mAppLocation->GetConfig(); }
-		class CoroutineManager * GetScheduler();
 	public:
 		template<typename T>
 		inline T * GetManager() { return mAppLocation->GetManager<T>(); }
@@ -33,7 +32,6 @@ namespace SoEasy
 		long long mIntanceID;
 		std::string mClassName;
 		class Applocation * mAppLocation;
-		class CoroutineManager * mCoroutineManager;
 	};
 }
 

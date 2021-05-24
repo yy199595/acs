@@ -1,109 +1,93 @@
 #include"ServiceBase.h"
-#include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
+#include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	ServiceBase::ServiceBase()
-	{
-		this->mNetWorkManager = nullptr;
-		this->mCoroutineManager = nullptr;
-	}
-	XCode ServiceBase::CallAction(SharedPacket request, SharedPacket returnData)
-	{
-		const std::string & action = request->action();
-		auto iter = this->mActionMap.find(action);
-		if (iter == this->mActionMap.end())
-		{
-			SayNoDebugError("call func not find " << this->GetTypeName()
-				<< "." << action);
-			return XCode::CallFunctionNotExist;
-		}
-		shared_ptr<LocalActionProxy> actionProxy = iter->second;
-		return actionProxy->Invoke(request, returnData);
-	}
-
-	void ServiceBase::AddActionArgv(SharedPacket argv)
-	{
-		this->mLocalMessageQueue.push(argv);
-	}
-
-	void ServiceBase::AddActionArgv(SharedNetPacket argv)
-	{
-		this->mHandleMessageQueue.AddItem(argv);
-	}
-
 	bool ServiceBase::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
-		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
-		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
-
+		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 		return true;
 	}
 
-	void ServiceBase::OnSystemUpdate()
+	void ServiceBase::InitService(const std::string & name, int id)
 	{
-		SharedNetPacket handlePacket;
-		this->mHandleMessageQueue.SwapQueueData();
-		while (this->mHandleMessageQueue.PopItem(handlePacket))
+		this->mServiceId = id;
+		this->mServiceName = name;
+	}
+
+	XCode ServiceBase::Call(const std::string method, Message & returnData)
+	{
+		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		if (callBack == nullptr)
 		{
-			const std::string & address = handlePacket->mAddress;
-			SharedPacket packetData = handlePacket->mMessagePacket;
-			SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
-			if (tcpSession != nullptr)
+			return XCode::NoCoroutineContext;
+		}
+		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
+		{
+			return XCode::HandleMessageFail;
+		}
+		this->mCorManager->YieldReturn();
+		if (!returnData.ParseFromString(callBack->GetMsgData()))
+		{
+			return XCode::ParseMessageError;
+		}
+		return callBack->GetCode();
+	}
+
+	XCode ServiceBase::Call(const std::string method, shared_ptr<Message> message)
+	{
+		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		if (this->mCorManager->IsInMainCoroutine())
+		{
+			return XCode::NoCoroutineContext;
+		}
+		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
+		{
+			return XCode::HandleMessageFail;
+		}
+		this->mCorManager->YieldReturn();
+		return callBack->GetCode();
+	}
+
+	XCode ServiceBase::Call(const std::string method, shared_ptr<Message> message, Message & returnData)
+	{
+		shared_ptr<NetWorkWaitCorAction> callBack = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		if (callBack == nullptr)
+		{
+			return XCode::NoCoroutineContext;
+		}
+		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
+		{
+			return XCode::HandleMessageFail;
+		}
+		this->mCorManager->YieldReturn();
+		if (!returnData.ParseFromString(callBack->GetMsgData()))
+		{
+			return XCode::ParseMessageError;
+		}
+		return callBack->GetCode();
+	}
+	shared_ptr<NetWorkPacket> ServiceBase::CreatePacket(const std::string & func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack)
+	{
+		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
+		if (message != nullptr)
+		{
+			std::string messageBuffer;
+			if (!message->SerializePartialToString(&messageBuffer))
 			{
-				if (this->OnReceiveMessage(tcpSession, packetData))	//自定义操作
-				{
-					continue;
-				}
-				// 默认操作
-				const std::string & action = packetData->action();
-				this->mCoroutineManager->Start(action, [packetData, address, this]()
-				{
-					SharedPacket retData = make_shared<NetWorkPacket>();
-					XCode code = this->CallAction(packetData, retData);
-					if (packetData->callback_id() != 0)
-					{
-						retData->set_callback_id(packetData->callback_id());
-						retData->set_operator_id(packetData->operator_id());
-						this->mNetWorkManager->SendMessageByAdress(address, retData);
-					}
-				});
+				SayNoDebugError(func << " " << message->GetTypeName() << " Serialize fail");
+				return nullptr;
 			}
+			callData->set_message_data(messageBuffer);
+			callData->set_protoc_name(message->GetTypeName());
 		}
-		while (!this->mLocalMessageQueue.empty())
-		{
-			SharedPacket packetData = this->mLocalMessageQueue.front();
-			this->mLocalMessageQueue.pop();
-			const std::string & action = packetData->action();
-			this->mCoroutineManager->Start(action, [packetData, this]()
-			{
-				SharedPacket retData = make_shared<NetWorkPacket>();
-				XCode code = this->CallAction(packetData, retData);
-				if (packetData->callback_id() != 0)
-				{
-					retData->set_callback_id(packetData->callback_id());
-					retData->set_operator_id(packetData->operator_id());
-					this->mActionManager->AddCallbackArgv(retData);
-				}
-			});
-		}
-	}
-
-	bool ServiceBase::BindFunction(std::string name, LocalAction1 action)
-	{
-		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, name));
-	}
-	bool ServiceBase::BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox)
-	{
-		auto iter = this->mActionMap.find(name);
-		if (iter != this->mActionMap.end())
-		{
-			SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
-			return false;
-		}
-		this->mActionMap.emplace(name, actionBox);
-		return true;
+		long long id = 0;
+		this->mActionManager->AddCallback(callBack, id);
+		callData->set_action(func);
+		callData->set_callback_id(id);
+		callData->set_service(this->mServiceName);
+		return callData;
 	}
 }

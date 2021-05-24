@@ -5,8 +5,10 @@ namespace SoEasy
 	TimerManager::TimerManager()
 	{
 		this->mIsStop = false;
-		this->mWheelInterval = 20;
+		this->mTickCount = 0;
+		this->mTimerCount = 0;	
 		this->mTimerThread = nullptr;
+		this->mMaxTimeCount = MaxMinute * 60 * (1000 / TimerPrecision);
 	}
 
 	bool TimerManager::AddTimer(shared_ptr<TimerBase> timer)
@@ -15,15 +17,17 @@ namespace SoEasy
 		{
 			return false;
 		}
+		if (timer->mDelayTime <= 0)
+		{
+			timer->Invoke();
+			return true;
+		}
 		long long id = timer->GetTimerId();
 		auto iter = this->mTimerMap.find(id);
 		if (iter == this->mTimerMap.end())
 		{
-			this->mTimerMap.insert(std::make_pair(id, timer));
-			this->mTimerThreadLock.lock();
-			this->mNextWheelQueue.push(timer);
-			this->mTimerThreadLock.unlock();
-			this->mWheelVariable.notify_one();
+			this->mWheelQueue.AddItem(timer);
+			this->mTimerMap.emplace(id, timer);
 			return true;
 		}	
 		return false;
@@ -79,10 +83,7 @@ namespace SoEasy
 				shared_ptr<TimerBase> timer = iter->second;
 				if (timer->Invoke() == false)
 				{
-					this->mTimerThreadLock.lock();
-					this->mNextWheelQueue.push(timer);
-					this->mTimerThreadLock.unlock();
-					this->mWheelVariable.notify_one();
+					this->mWheelQueue.AddItem(timer);
 					return;
 				}
 				this->mTimerMap.erase(iter);
@@ -92,37 +93,77 @@ namespace SoEasy
 
 	void TimerManager::RefreshTimer()
 	{
+		this->mStartTime = TimeHelper::GetMilTimestamp();
 		while (this->mIsStop == false)
 		{
-			if (this->mNextWheelQueue.empty())
+			std::this_thread::sleep_for(std::chrono::milliseconds(TimerPrecision));
+			const long long nowTime = TimeHelper::GetMilTimestamp();
+
+			shared_ptr<TimerBase> newTimer;
+			this->mWheelQueue.SwapQueueData();
+			while (this->mWheelQueue.PopItem(newTimer))
 			{
-				std::unique_lock<std::mutex> lck(this->mTimerThreadLock);
-				this->mWheelVariable.wait(lck);
+				this->AddTimerToWheel(newTimer);
 			}
-			long long startTime = TimeHelper::GetMilTimestamp();
 
-			this->mTimerThreadLock.lock();
-			std::swap(this->mNextWheelQueue, this->mWheelQueue);
-			this->mTimerThreadLock.unlock();
-
-			while (!this->mWheelQueue.empty())
+			if (this->mTickCount >= this->mMaxTimeCount)
 			{
-				this->mTimerThreadLock.lock();
-				shared_ptr<TimerBase> timer = this->mWheelQueue.front();
-				this->mWheelQueue.pop();
-				this->mTimerThreadLock.unlock();
-
-				if (timer->IsTrigger(startTime))
+				auto iter = this->mNextWheelTimer.begin();
+				for (; iter != this->mNextWheelTimer.end();)
 				{
-					long long id = timer->GetTimerId();
-					this->mFinishTimerQueue.AddItem(id);
-					continue;
+					(*iter)->mTickCount -= this->mMaxTimeCount;
+					if (this->AddNextTimer((*iter)))
+					{
+						this->mNextWheelTimer.erase(iter++);
+						continue;
+					}
+					iter++;
 				}
-				this->mTimerThreadLock.lock();
-				this->mNextWheelQueue.push(timer);
-				this->mTimerThreadLock.unlock();
+				this->mTickCount = 0;
+				this->mStartTime = nowTime;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(this->mWheelInterval));
+			int tickCount = (nowTime - mStartTime) / TimerPrecision;
+			for (int index = this->mTickCount; index <= tickCount && index < this->mMaxTimeCount; index++)
+			{
+				std::queue<shared_ptr<TimerBase>> & taskList = this->mTimers[index];
+				while (!taskList.empty())
+				{
+					shared_ptr<TimerBase> timerData = taskList.front();
+					this->mFinishTimerQueue.AddItem(timerData->GetTimerId());
+					taskList.pop();
+				}
+			}
+			this->mTickCount = tickCount;
+		}
+	}
+
+	bool TimerManager::AddNextTimer(shared_ptr<TimerBase> timer)
+	{
+		if (timer->mTickCount < this->mMaxTimeCount)
+		{
+			this->mTimerCount++;
+			this->mTimers[timer->mTickCount].push(timer);
+			return true;
+		}
+		return false;
+	}
+
+	void TimerManager::AddTimerToWheel(shared_ptr<TimerBase> timer)
+	{
+		int solt = timer->mDelayTime / TimerPrecision;
+		timer->mTickCount = solt + this->mTickCount;
+		if (timer->mTickCount < this->mMaxTimeCount)
+		{
+			this->mTimers[timer->mTickCount].push(timer);
+		}
+		else if (timer->mTickCount - this->mMaxTimeCount < this->mMaxTimeCount)
+		{
+			timer->mTickCount -= this->mMaxTimeCount;
+			this->mTimers[timer->mTickCount].push(timer);
+		}
+		else
+		{
+			this->mNextWheelTimer.push_back(timer);
 		}
 	}
 }

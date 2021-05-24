@@ -16,9 +16,9 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_ServerCommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ActionInfo_ServerCommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_ServerCommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_AssestCompareList_AssestCompareInfo_ServerCommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_ServerCommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_LogicServerData_ServerCommon_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_ServerCommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ServiceData_ServerCommon_2eproto;
 namespace PB {
 class LogicServerDataDefaultTypeInternal {
  public:
@@ -48,18 +48,14 @@ class ServerRunInfoDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ServerRunInfo> _instance;
 } _ServerRunInfo_default_instance_;
-class ActionUpdateInfoDefaultTypeInternal {
+class ServiceDataDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ActionUpdateInfo> _instance;
-} _ActionUpdateInfo_default_instance_;
-class ActionInfoDefaultTypeInternal {
+  ::google::protobuf::internal::ExplicitlyConstructed<ServiceData> _instance;
+} _ServiceData_default_instance_;
+class ServiceDataListDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ActionInfo> _instance;
-} _ActionInfo_default_instance_;
-class ActionInfoListDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ActionInfoList> _instance;
-} _ActionInfoList_default_instance_;
+  ::google::protobuf::internal::ExplicitlyConstructed<ServiceDataList> _instance;
+} _ServiceDataList_default_instance_;
 class UserRegisterDataDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<UserRegisterData> _instance;
@@ -174,48 +170,34 @@ static void InitDefaultsServerRunInfo_ServerCommon_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_ServerRunInfo_ServerCommon_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsServerRunInfo_ServerCommon_2eproto}, {}};
 
-static void InitDefaultsActionUpdateInfo_ServerCommon_2eproto() {
+static void InitDefaultsServiceData_ServerCommon_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::PB::_ActionUpdateInfo_default_instance_;
-    new (ptr) ::PB::ActionUpdateInfo();
+    void* ptr = &::PB::_ServiceData_default_instance_;
+    new (ptr) ::PB::ServiceData();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::PB::ActionUpdateInfo::InitAsDefaultInstance();
+  ::PB::ServiceData::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_ActionUpdateInfo_ServerCommon_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsActionUpdateInfo_ServerCommon_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_ServiceData_ServerCommon_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsServiceData_ServerCommon_2eproto}, {}};
 
-static void InitDefaultsActionInfo_ServerCommon_2eproto() {
+static void InitDefaultsServiceDataList_ServerCommon_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::PB::_ActionInfo_default_instance_;
-    new (ptr) ::PB::ActionInfo();
+    void* ptr = &::PB::_ServiceDataList_default_instance_;
+    new (ptr) ::PB::ServiceDataList();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::PB::ActionInfo::InitAsDefaultInstance();
+  ::PB::ServiceDataList::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_ActionInfo_ServerCommon_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsActionInfo_ServerCommon_2eproto}, {}};
-
-static void InitDefaultsActionInfoList_ServerCommon_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::PB::_ActionInfoList_default_instance_;
-    new (ptr) ::PB::ActionInfoList();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::PB::ActionInfoList::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_ActionInfoList_ServerCommon_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsActionInfoList_ServerCommon_2eproto}, {
-      &scc_info_ActionInfo_ServerCommon_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<1> scc_info_ServiceDataList_ServerCommon_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsServiceDataList_ServerCommon_2eproto}, {
+      &scc_info_ServiceData_ServerCommon_2eproto.base,}};
 
 static void InitDefaultsUserRegisterData_ServerCommon_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -267,15 +249,14 @@ void InitDefaults_ServerCommon_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_AssestCompareList_ServerCommon_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_TransferAssestInfo_ServerCommon_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ServerRunInfo_ServerCommon_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_ActionUpdateInfo_ServerCommon_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_ActionInfo_ServerCommon_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_ActionInfoList_ServerCommon_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ServiceData_ServerCommon_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ServiceDataList_ServerCommon_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_UserRegisterData_ServerCommon_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_UserRegisterBack_ServerCommon_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_UserAccountData_ServerCommon_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_ServerCommon_2eproto[13];
+::google::protobuf::Metadata file_level_metadata_ServerCommon_2eproto[12];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_ServerCommon_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_ServerCommon_2eproto = nullptr;
 
@@ -333,27 +314,20 @@ const ::google::protobuf::uint32 TableStruct_ServerCommon_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::PB::ServerRunInfo, server_fps_),
   PROTOBUF_FIELD_OFFSET(::PB::ServerRunInfo, logic_time_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionUpdateInfo, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceData, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionUpdateInfo, areaid_),
-  PROTOBUF_FIELD_OFFSET(::PB::ActionUpdateInfo, address_),
-  PROTOBUF_FIELD_OFFSET(::PB::ActionUpdateInfo, action_names_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceData, adreid_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceData, service_id_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceData, service_name_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceData, service_address_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfo, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceDataList, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfo, adreid_),
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfo, address_),
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfo, actionname_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfoList, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::PB::ActionInfoList, actionlist_),
+  PROTOBUF_FIELD_OFFSET(::PB::ServiceDataList, services_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PB::UserRegisterData, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -394,12 +368,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 29, -1, sizeof(::PB::AssestCompareList)},
   { 35, -1, sizeof(::PB::TransferAssestInfo)},
   { 42, -1, sizeof(::PB::ServerRunInfo)},
-  { 52, -1, sizeof(::PB::ActionUpdateInfo)},
-  { 60, -1, sizeof(::PB::ActionInfo)},
-  { 68, -1, sizeof(::PB::ActionInfoList)},
-  { 74, -1, sizeof(::PB::UserRegisterData)},
-  { 84, -1, sizeof(::PB::UserRegisterBack)},
-  { 92, -1, sizeof(::PB::UserAccountData)},
+  { 52, -1, sizeof(::PB::ServiceData)},
+  { 61, -1, sizeof(::PB::ServiceDataList)},
+  { 67, -1, sizeof(::PB::UserRegisterData)},
+  { 77, -1, sizeof(::PB::UserRegisterBack)},
+  { 85, -1, sizeof(::PB::UserAccountData)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -410,9 +383,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_AssestCompareList_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_TransferAssestInfo_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ServerRunInfo_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ActionUpdateInfo_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ActionInfo_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ActionInfoList_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ServiceData_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_ServiceDataList_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_UserRegisterData_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_UserRegisterBack_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::PB::_UserAccountData_default_instance_),
@@ -421,7 +393,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_ServerCommon_2eproto = {
   {}, AddDescriptors_ServerCommon_2eproto, "ServerCommon.proto", schemas,
   file_default_instances, TableStruct_ServerCommon_2eproto::offsets,
-  file_level_metadata_ServerCommon_2eproto, 13, file_level_enum_descriptors_ServerCommon_2eproto, file_level_service_descriptors_ServerCommon_2eproto,
+  file_level_metadata_ServerCommon_2eproto, 12, file_level_enum_descriptors_ServerCommon_2eproto, file_level_service_descriptors_ServerCommon_2eproto,
 };
 
 const char descriptor_table_protodef_ServerCommon_2eproto[] =
@@ -440,26 +412,25 @@ const char descriptor_table_protodef_ServerCommon_2eproto[] =
   "|\n\rServerRunInfo\022\023\n\013server_name\030\001 \001(\t\022\025\n"
   "\rserver_areaId\030\002 \001(\005\022\027\n\017server_run_time\030"
   "\003 \001(\003\022\022\n\nserver_fps\030\004 \001(\002\022\022\n\nlogic_time\030"
-  "\005 \001(\002\"I\n\020ActionUpdateInfo\022\016\n\006areaId\030\001 \001("
-  "\005\022\017\n\007address\030\002 \001(\t\022\024\n\014action_names\030\003 \003(\t"
-  "\"A\n\nActionInfo\022\016\n\006adreId\030\001 \001(\005\022\017\n\007addres"
-  "s\030\002 \001(\t\022\022\n\nactionName\030\003 \001(\t\"4\n\016ActionInf"
-  "oList\022\"\n\nactionList\030\001 \003(\0132\016.PB.ActionInf"
-  "o\"m\n\020UserRegisterData\022\017\n\007account\030\001 \001(\t\022\020"
-  "\n\010password\030\002 \001(\t\022\020\n\010phonenum\030\003 \001(\003\022\020\n\010pl"
-  "atform\030\004 \001(\t\022\022\n\ndevice_mac\030\005 \001(\t\"K\n\020User"
-  "RegisterBack\022\021\n\tplayer_id\030\001 \001(\003\022\025\n\rregis"
-  "ter_time\030\002 \001(\003\022\r\n\005token\030\003 \001(\t\"\252\001\n\017UserAc"
-  "countData\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 "
-  "\001(\t\022\016\n\006passwd\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\020\n"
-  "\010phonenum\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rr"
-  "egister_time\030\007 \001(\003\022\026\n\016last_logintime\030\010 \001"
-  "(\003b\006proto3"
+  "\005 \001(\002\"`\n\013ServiceData\022\016\n\006adreId\030\001 \001(\005\022\022\n\n"
+  "service_id\030\002 \001(\005\022\024\n\014service_name\030\003 \001(\t\022\027"
+  "\n\017service_address\030\004 \001(\t\"4\n\017ServiceDataLi"
+  "st\022!\n\010services\030\001 \003(\0132\017.PB.ServiceData\"m\n"
+  "\020UserRegisterData\022\017\n\007account\030\001 \001(\t\022\020\n\010pa"
+  "ssword\030\002 \001(\t\022\020\n\010phonenum\030\003 \001(\003\022\020\n\010platfo"
+  "rm\030\004 \001(\t\022\022\n\ndevice_mac\030\005 \001(\t\"K\n\020UserRegi"
+  "sterBack\022\021\n\tplayer_id\030\001 \001(\003\022\025\n\rregister_"
+  "time\030\002 \001(\003\022\r\n\005token\030\003 \001(\t\"\252\001\n\017UserAccoun"
+  "tData\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\t\022"
+  "\016\n\006passwd\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\020\n\010pho"
+  "nenum\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rregis"
+  "ter_time\030\007 \001(\003\022\026\n\016last_logintime\030\010 \001(\003b\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_ServerCommon_2eproto = {
   false, InitDefaults_ServerCommon_2eproto, 
   descriptor_table_protodef_ServerCommon_2eproto,
-  "ServerCommon.proto", &assign_descriptors_table_ServerCommon_2eproto, 1170,
+  "ServerCommon.proto", &assign_descriptors_table_ServerCommon_2eproto, 1126,
 };
 
 void AddDescriptors_ServerCommon_2eproto() {
@@ -3055,492 +3026,89 @@ void ServerRunInfo::InternalSwap(ServerRunInfo* other) {
 
 // ===================================================================
 
-void ActionUpdateInfo::InitAsDefaultInstance() {
+void ServiceData::InitAsDefaultInstance() {
 }
-class ActionUpdateInfo::HasBitSetters {
+class ServiceData::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ActionUpdateInfo::kAreaIdFieldNumber;
-const int ActionUpdateInfo::kAddressFieldNumber;
-const int ActionUpdateInfo::kActionNamesFieldNumber;
+const int ServiceData::kAdreIdFieldNumber;
+const int ServiceData::kServiceIdFieldNumber;
+const int ServiceData::kServiceNameFieldNumber;
+const int ServiceData::kServiceAddressFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-ActionUpdateInfo::ActionUpdateInfo()
+ServiceData::ServiceData()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:PB.ActionUpdateInfo)
+  // @@protoc_insertion_point(constructor:PB.ServiceData)
 }
-ActionUpdateInfo::ActionUpdateInfo(const ActionUpdateInfo& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      action_names_(from.action_names_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
-  areaid_ = from.areaid_;
-  // @@protoc_insertion_point(copy_constructor:PB.ActionUpdateInfo)
-}
-
-void ActionUpdateInfo::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_ActionUpdateInfo_ServerCommon_2eproto.base);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  areaid_ = 0;
-}
-
-ActionUpdateInfo::~ActionUpdateInfo() {
-  // @@protoc_insertion_point(destructor:PB.ActionUpdateInfo)
-  SharedDtor();
-}
-
-void ActionUpdateInfo::SharedDtor() {
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void ActionUpdateInfo::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const ActionUpdateInfo& ActionUpdateInfo::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_ActionUpdateInfo_ServerCommon_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void ActionUpdateInfo::Clear() {
-// @@protoc_insertion_point(message_clear_start:PB.ActionUpdateInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  action_names_.Clear();
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  areaid_ = 0;
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* ActionUpdateInfo::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<ActionUpdateInfo*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // int32 areaId = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_areaid(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string address = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("PB.ActionUpdateInfo.address");
-        object = msg->mutable_address();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // repeated string action_names = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("PB.ActionUpdateInfo.action_names");
-          object = msg->add_action_names();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool ActionUpdateInfo::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:PB.ActionUpdateInfo)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 areaId = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &areaid_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string address = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "PB.ActionUpdateInfo.address"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated string action_names = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_action_names()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->action_names(this->action_names_size() - 1).data(),
-            static_cast<int>(this->action_names(this->action_names_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "PB.ActionUpdateInfo.action_names"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:PB.ActionUpdateInfo)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:PB.ActionUpdateInfo)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void ActionUpdateInfo::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:PB.ActionUpdateInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 areaId = 1;
-  if (this->areaid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
-  }
-
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionUpdateInfo.address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->address(), output);
-  }
-
-  // repeated string action_names = 3;
-  for (int i = 0, n = this->action_names_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->action_names(i).data(), static_cast<int>(this->action_names(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionUpdateInfo.action_names");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      3, this->action_names(i), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:PB.ActionUpdateInfo)
-}
-
-::google::protobuf::uint8* ActionUpdateInfo::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:PB.ActionUpdateInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 areaId = 1;
-  if (this->areaid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
-  }
-
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionUpdateInfo.address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->address(), target);
-  }
-
-  // repeated string action_names = 3;
-  for (int i = 0, n = this->action_names_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->action_names(i).data(), static_cast<int>(this->action_names(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionUpdateInfo.action_names");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(3, this->action_names(i), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:PB.ActionUpdateInfo)
-  return target;
-}
-
-size_t ActionUpdateInfo::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:PB.ActionUpdateInfo)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated string action_names = 3;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->action_names_size());
-  for (int i = 0, n = this->action_names_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->action_names(i));
-  }
-
-  // string address = 2;
-  if (this->address().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
-  }
-
-  // int32 areaId = 1;
-  if (this->areaid() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->areaid());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void ActionUpdateInfo::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:PB.ActionUpdateInfo)
-  GOOGLE_DCHECK_NE(&from, this);
-  const ActionUpdateInfo* source =
-      ::google::protobuf::DynamicCastToGenerated<ActionUpdateInfo>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:PB.ActionUpdateInfo)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:PB.ActionUpdateInfo)
-    MergeFrom(*source);
-  }
-}
-
-void ActionUpdateInfo::MergeFrom(const ActionUpdateInfo& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:PB.ActionUpdateInfo)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  action_names_.MergeFrom(from.action_names_);
-  if (from.address().size() > 0) {
-
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
-  if (from.areaid() != 0) {
-    set_areaid(from.areaid());
-  }
-}
-
-void ActionUpdateInfo::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:PB.ActionUpdateInfo)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void ActionUpdateInfo::CopyFrom(const ActionUpdateInfo& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:PB.ActionUpdateInfo)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool ActionUpdateInfo::IsInitialized() const {
-  return true;
-}
-
-void ActionUpdateInfo::Swap(ActionUpdateInfo* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void ActionUpdateInfo::InternalSwap(ActionUpdateInfo* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  action_names_.InternalSwap(CastToBase(&other->action_names_));
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(areaid_, other->areaid_);
-}
-
-::google::protobuf::Metadata ActionUpdateInfo::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_ServerCommon_2eproto);
-  return ::file_level_metadata_ServerCommon_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void ActionInfo::InitAsDefaultInstance() {
-}
-class ActionInfo::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ActionInfo::kAdreIdFieldNumber;
-const int ActionInfo::kAddressFieldNumber;
-const int ActionInfo::kActionNameFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-ActionInfo::ActionInfo()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:PB.ActionInfo)
-}
-ActionInfo::ActionInfo(const ActionInfo& from)
+ServiceData::ServiceData(const ServiceData& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  service_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.service_name().size() > 0) {
+    service_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_name_);
   }
-  actionname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.actionname().size() > 0) {
-    actionname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.actionname_);
+  service_address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.service_address().size() > 0) {
+    service_address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_address_);
   }
-  adreid_ = from.adreid_;
-  // @@protoc_insertion_point(copy_constructor:PB.ActionInfo)
+  ::memcpy(&adreid_, &from.adreid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&service_id_) -
+    reinterpret_cast<char*>(&adreid_)) + sizeof(service_id_));
+  // @@protoc_insertion_point(copy_constructor:PB.ServiceData)
 }
 
-void ActionInfo::SharedCtor() {
+void ServiceData::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_ActionInfo_ServerCommon_2eproto.base);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actionname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  adreid_ = 0;
+      &scc_info_ServiceData_ServerCommon_2eproto.base);
+  service_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&adreid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&service_id_) -
+      reinterpret_cast<char*>(&adreid_)) + sizeof(service_id_));
 }
 
-ActionInfo::~ActionInfo() {
-  // @@protoc_insertion_point(destructor:PB.ActionInfo)
+ServiceData::~ServiceData() {
+  // @@protoc_insertion_point(destructor:PB.ServiceData)
   SharedDtor();
 }
 
-void ActionInfo::SharedDtor() {
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actionname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void ServiceData::SharedDtor() {
+  service_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void ActionInfo::SetCachedSize(int size) const {
+void ServiceData::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const ActionInfo& ActionInfo::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_ActionInfo_ServerCommon_2eproto.base);
+const ServiceData& ServiceData::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ServiceData_ServerCommon_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void ActionInfo::Clear() {
-// @@protoc_insertion_point(message_clear_start:PB.ActionInfo)
+void ServiceData::Clear() {
+// @@protoc_insertion_point(message_clear_start:PB.ServiceData)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actionname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  adreid_ = 0;
+  service_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  service_address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&adreid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&service_id_) -
+      reinterpret_cast<char*>(&adreid_)) + sizeof(service_id_));
   _internal_metadata_.Clear();
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* ActionInfo::_InternalParse(const char* begin, const char* end, void* object,
+const char* ServiceData::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<ActionInfo*>(object);
+  auto msg = static_cast<ServiceData*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -3557,13 +3125,20 @@ const char* ActionInfo::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string address = 2;
+      // int32 service_id = 2;
       case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_service_id(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string service_name = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("PB.ActionInfo.address");
-        object = msg->mutable_address();
+        ctx->extra_parse_data().SetFieldName("PB.ServiceData.service_name");
+        object = msg->mutable_service_name();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -3573,13 +3148,13 @@ const char* ActionInfo::_InternalParse(const char* begin, const char* end, void*
         ptr += size;
         break;
       }
-      // string actionName = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+      // string service_address = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("PB.ActionInfo.actionName");
-        object = msg->mutable_actionname();
+        ctx->extra_parse_data().SetFieldName("PB.ServiceData.service_address");
+        object = msg->mutable_service_address();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -3613,11 +3188,11 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool ActionInfo::MergePartialFromCodedStream(
+bool ServiceData::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:PB.ActionInfo)
+  // @@protoc_insertion_point(parse_start:PB.ServiceData)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -3636,30 +3211,43 @@ bool ActionInfo::MergePartialFromCodedStream(
         break;
       }
 
-      // string address = 2;
+      // int32 service_id = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "PB.ActionInfo.address"));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &service_id_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // string actionName = 3;
+      // string service_name = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_actionname()));
+                input, this->mutable_service_name()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->actionname().data(), static_cast<int>(this->actionname().length()),
+            this->service_name().data(), static_cast<int>(this->service_name().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "PB.ActionInfo.actionName"));
+            "PB.ServiceData.service_name"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string service_address = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_service_address()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->service_address().data(), static_cast<int>(this->service_address().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "PB.ServiceData.service_address"));
         } else {
           goto handle_unusual;
         }
@@ -3678,18 +3266,18 @@ bool ActionInfo::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:PB.ActionInfo)
+  // @@protoc_insertion_point(parse_success:PB.ServiceData)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:PB.ActionInfo)
+  // @@protoc_insertion_point(parse_failure:PB.ServiceData)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void ActionInfo::SerializeWithCachedSizes(
+void ServiceData::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:PB.ActionInfo)
+  // @@protoc_insertion_point(serialize_start:PB.ServiceData)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3698,36 +3286,41 @@ void ActionInfo::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->adreid(), output);
   }
 
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionInfo.address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->address(), output);
+  // int32 service_id = 2;
+  if (this->service_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->service_id(), output);
   }
 
-  // string actionName = 3;
-  if (this->actionname().size() > 0) {
+  // string service_name = 3;
+  if (this->service_name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->actionname().data(), static_cast<int>(this->actionname().length()),
+      this->service_name().data(), static_cast<int>(this->service_name().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionInfo.actionName");
+      "PB.ServiceData.service_name");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->actionname(), output);
+      3, this->service_name(), output);
+  }
+
+  // string service_address = 4;
+  if (this->service_address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->service_address().data(), static_cast<int>(this->service_address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "PB.ServiceData.service_address");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->service_address(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:PB.ActionInfo)
+  // @@protoc_insertion_point(serialize_end:PB.ServiceData)
 }
 
-::google::protobuf::uint8* ActionInfo::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ServiceData::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:PB.ActionInfo)
+  // @@protoc_insertion_point(serialize_to_array_start:PB.ServiceData)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3736,38 +3329,43 @@ void ActionInfo::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->adreid(), target);
   }
 
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionInfo.address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->address(), target);
+  // int32 service_id = 2;
+  if (this->service_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->service_id(), target);
   }
 
-  // string actionName = 3;
-  if (this->actionname().size() > 0) {
+  // string service_name = 3;
+  if (this->service_name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->actionname().data(), static_cast<int>(this->actionname().length()),
+      this->service_name().data(), static_cast<int>(this->service_name().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.ActionInfo.actionName");
+      "PB.ServiceData.service_name");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->actionname(), target);
+        3, this->service_name(), target);
+  }
+
+  // string service_address = 4;
+  if (this->service_address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->service_address().data(), static_cast<int>(this->service_address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "PB.ServiceData.service_address");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->service_address(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:PB.ActionInfo)
+  // @@protoc_insertion_point(serialize_to_array_end:PB.ServiceData)
   return target;
 }
 
-size_t ActionInfo::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:PB.ActionInfo)
+size_t ServiceData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:PB.ServiceData)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3779,18 +3377,18 @@ size_t ActionInfo::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string address = 2;
-  if (this->address().size() > 0) {
+  // string service_name = 3;
+  if (this->service_name().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
+        this->service_name());
   }
 
-  // string actionName = 3;
-  if (this->actionname().size() > 0) {
+  // string service_address = 4;
+  if (this->service_address().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->actionname());
+        this->service_address());
   }
 
   // int32 adreId = 1;
@@ -3800,79 +3398,90 @@ size_t ActionInfo::ByteSizeLong() const {
         this->adreid());
   }
 
+  // int32 service_id = 2;
+  if (this->service_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->service_id());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void ActionInfo::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:PB.ActionInfo)
+void ServiceData::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:PB.ServiceData)
   GOOGLE_DCHECK_NE(&from, this);
-  const ActionInfo* source =
-      ::google::protobuf::DynamicCastToGenerated<ActionInfo>(
+  const ServiceData* source =
+      ::google::protobuf::DynamicCastToGenerated<ServiceData>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:PB.ActionInfo)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:PB.ServiceData)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:PB.ActionInfo)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:PB.ServiceData)
     MergeFrom(*source);
   }
 }
 
-void ActionInfo::MergeFrom(const ActionInfo& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:PB.ActionInfo)
+void ServiceData::MergeFrom(const ServiceData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:PB.ServiceData)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.address().size() > 0) {
+  if (from.service_name().size() > 0) {
 
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+    service_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_name_);
   }
-  if (from.actionname().size() > 0) {
+  if (from.service_address().size() > 0) {
 
-    actionname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.actionname_);
+    service_address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_address_);
   }
   if (from.adreid() != 0) {
     set_adreid(from.adreid());
   }
+  if (from.service_id() != 0) {
+    set_service_id(from.service_id());
+  }
 }
 
-void ActionInfo::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:PB.ActionInfo)
+void ServiceData::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:PB.ServiceData)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ActionInfo::CopyFrom(const ActionInfo& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:PB.ActionInfo)
+void ServiceData::CopyFrom(const ServiceData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PB.ServiceData)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ActionInfo::IsInitialized() const {
+bool ServiceData::IsInitialized() const {
   return true;
 }
 
-void ActionInfo::Swap(ActionInfo* other) {
+void ServiceData::Swap(ServiceData* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void ActionInfo::InternalSwap(ActionInfo* other) {
+void ServiceData::InternalSwap(ServiceData* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  service_name_.Swap(&other->service_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  actionname_.Swap(&other->actionname_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  service_address_.Swap(&other->service_address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(adreid_, other->adreid_);
+  swap(service_id_, other->service_id_);
 }
 
-::google::protobuf::Metadata ActionInfo::GetMetadata() const {
+::google::protobuf::Metadata ServiceData::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_ServerCommon_2eproto);
   return ::file_level_metadata_ServerCommon_2eproto[kIndexInFileMessages];
 }
@@ -3880,65 +3489,65 @@ void ActionInfo::InternalSwap(ActionInfo* other) {
 
 // ===================================================================
 
-void ActionInfoList::InitAsDefaultInstance() {
+void ServiceDataList::InitAsDefaultInstance() {
 }
-class ActionInfoList::HasBitSetters {
+class ServiceDataList::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ActionInfoList::kActionListFieldNumber;
+const int ServiceDataList::kServicesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-ActionInfoList::ActionInfoList()
+ServiceDataList::ServiceDataList()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:PB.ActionInfoList)
+  // @@protoc_insertion_point(constructor:PB.ServiceDataList)
 }
-ActionInfoList::ActionInfoList(const ActionInfoList& from)
+ServiceDataList::ServiceDataList(const ServiceDataList& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      actionlist_(from.actionlist_) {
+      services_(from.services_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:PB.ActionInfoList)
+  // @@protoc_insertion_point(copy_constructor:PB.ServiceDataList)
 }
 
-void ActionInfoList::SharedCtor() {
+void ServiceDataList::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_ActionInfoList_ServerCommon_2eproto.base);
+      &scc_info_ServiceDataList_ServerCommon_2eproto.base);
 }
 
-ActionInfoList::~ActionInfoList() {
-  // @@protoc_insertion_point(destructor:PB.ActionInfoList)
+ServiceDataList::~ServiceDataList() {
+  // @@protoc_insertion_point(destructor:PB.ServiceDataList)
   SharedDtor();
 }
 
-void ActionInfoList::SharedDtor() {
+void ServiceDataList::SharedDtor() {
 }
 
-void ActionInfoList::SetCachedSize(int size) const {
+void ServiceDataList::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const ActionInfoList& ActionInfoList::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_ActionInfoList_ServerCommon_2eproto.base);
+const ServiceDataList& ServiceDataList::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ServiceDataList_ServerCommon_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void ActionInfoList::Clear() {
-// @@protoc_insertion_point(message_clear_start:PB.ActionInfoList)
+void ServiceDataList::Clear() {
+// @@protoc_insertion_point(message_clear_start:PB.ServiceDataList)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  actionlist_.Clear();
+  services_.Clear();
   _internal_metadata_.Clear();
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* ActionInfoList::_InternalParse(const char* begin, const char* end, void* object,
+const char* ServiceDataList::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<ActionInfoList*>(object);
+  auto msg = static_cast<ServiceDataList*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -3948,14 +3557,14 @@ const char* ActionInfoList::_InternalParse(const char* begin, const char* end, v
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // repeated .PB.ActionInfo actionList = 1;
+      // repeated .PB.ServiceData services = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::PB::ActionInfo::_InternalParse;
-          object = msg->add_actionlist();
+          parser_till_end = ::PB::ServiceData::_InternalParse;
+          object = msg->add_services();
           if (size > end - ptr) goto len_delim_till_end;
           ptr += size;
           GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -3984,21 +3593,21 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool ActionInfoList::MergePartialFromCodedStream(
+bool ServiceDataList::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:PB.ActionInfoList)
+  // @@protoc_insertion_point(parse_start:PB.ServiceDataList)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .PB.ActionInfo actionList = 1;
+      // repeated .PB.ServiceData services = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_actionlist()));
+                input, add_services()));
         } else {
           goto handle_unusual;
         }
@@ -4017,27 +3626,27 @@ bool ActionInfoList::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:PB.ActionInfoList)
+  // @@protoc_insertion_point(parse_success:PB.ServiceDataList)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:PB.ActionInfoList)
+  // @@protoc_insertion_point(parse_failure:PB.ServiceDataList)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void ActionInfoList::SerializeWithCachedSizes(
+void ServiceDataList::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:PB.ActionInfoList)
+  // @@protoc_insertion_point(serialize_start:PB.ServiceDataList)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .PB.ActionInfo actionList = 1;
+  // repeated .PB.ServiceData services = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->actionlist_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->services_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1,
-      this->actionlist(static_cast<int>(i)),
+      this->services(static_cast<int>(i)),
       output);
   }
 
@@ -4045,33 +3654,33 @@ void ActionInfoList::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:PB.ActionInfoList)
+  // @@protoc_insertion_point(serialize_end:PB.ServiceDataList)
 }
 
-::google::protobuf::uint8* ActionInfoList::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ServiceDataList::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:PB.ActionInfoList)
+  // @@protoc_insertion_point(serialize_to_array_start:PB.ServiceDataList)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .PB.ActionInfo actionList = 1;
+  // repeated .PB.ServiceData services = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->actionlist_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->services_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, this->actionlist(static_cast<int>(i)), target);
+        1, this->services(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:PB.ActionInfoList)
+  // @@protoc_insertion_point(serialize_to_array_end:PB.ServiceDataList)
   return target;
 }
 
-size_t ActionInfoList::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:PB.ActionInfoList)
+size_t ServiceDataList::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:PB.ServiceDataList)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4083,14 +3692,14 @@ size_t ActionInfoList::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .PB.ActionInfo actionList = 1;
+  // repeated .PB.ServiceData services = 1;
   {
-    unsigned int count = static_cast<unsigned int>(this->actionlist_size());
+    unsigned int count = static_cast<unsigned int>(this->services_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->actionlist(static_cast<int>(i)));
+          this->services(static_cast<int>(i)));
     }
   }
 
@@ -4099,60 +3708,60 @@ size_t ActionInfoList::ByteSizeLong() const {
   return total_size;
 }
 
-void ActionInfoList::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:PB.ActionInfoList)
+void ServiceDataList::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:PB.ServiceDataList)
   GOOGLE_DCHECK_NE(&from, this);
-  const ActionInfoList* source =
-      ::google::protobuf::DynamicCastToGenerated<ActionInfoList>(
+  const ServiceDataList* source =
+      ::google::protobuf::DynamicCastToGenerated<ServiceDataList>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:PB.ActionInfoList)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:PB.ServiceDataList)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:PB.ActionInfoList)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:PB.ServiceDataList)
     MergeFrom(*source);
   }
 }
 
-void ActionInfoList::MergeFrom(const ActionInfoList& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:PB.ActionInfoList)
+void ServiceDataList::MergeFrom(const ServiceDataList& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:PB.ServiceDataList)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  actionlist_.MergeFrom(from.actionlist_);
+  services_.MergeFrom(from.services_);
 }
 
-void ActionInfoList::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:PB.ActionInfoList)
+void ServiceDataList::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:PB.ServiceDataList)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ActionInfoList::CopyFrom(const ActionInfoList& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:PB.ActionInfoList)
+void ServiceDataList::CopyFrom(const ServiceDataList& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PB.ServiceDataList)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ActionInfoList::IsInitialized() const {
+bool ServiceDataList::IsInitialized() const {
   return true;
 }
 
-void ActionInfoList::Swap(ActionInfoList* other) {
+void ServiceDataList::Swap(ServiceDataList* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void ActionInfoList::InternalSwap(ActionInfoList* other) {
+void ServiceDataList::InternalSwap(ServiceDataList* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&actionlist_)->InternalSwap(CastToBase(&other->actionlist_));
+  CastToBase(&services_)->InternalSwap(CastToBase(&other->services_));
 }
 
-::google::protobuf::Metadata ActionInfoList::GetMetadata() const {
+::google::protobuf::Metadata ServiceDataList::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_ServerCommon_2eproto);
   return ::file_level_metadata_ServerCommon_2eproto[kIndexInFileMessages];
 }
@@ -5827,14 +5436,11 @@ template<> PROTOBUF_NOINLINE ::PB::TransferAssestInfo* Arena::CreateMaybeMessage
 template<> PROTOBUF_NOINLINE ::PB::ServerRunInfo* Arena::CreateMaybeMessage< ::PB::ServerRunInfo >(Arena* arena) {
   return Arena::CreateInternal< ::PB::ServerRunInfo >(arena);
 }
-template<> PROTOBUF_NOINLINE ::PB::ActionUpdateInfo* Arena::CreateMaybeMessage< ::PB::ActionUpdateInfo >(Arena* arena) {
-  return Arena::CreateInternal< ::PB::ActionUpdateInfo >(arena);
+template<> PROTOBUF_NOINLINE ::PB::ServiceData* Arena::CreateMaybeMessage< ::PB::ServiceData >(Arena* arena) {
+  return Arena::CreateInternal< ::PB::ServiceData >(arena);
 }
-template<> PROTOBUF_NOINLINE ::PB::ActionInfo* Arena::CreateMaybeMessage< ::PB::ActionInfo >(Arena* arena) {
-  return Arena::CreateInternal< ::PB::ActionInfo >(arena);
-}
-template<> PROTOBUF_NOINLINE ::PB::ActionInfoList* Arena::CreateMaybeMessage< ::PB::ActionInfoList >(Arena* arena) {
-  return Arena::CreateInternal< ::PB::ActionInfoList >(arena);
+template<> PROTOBUF_NOINLINE ::PB::ServiceDataList* Arena::CreateMaybeMessage< ::PB::ServiceDataList >(Arena* arena) {
+  return Arena::CreateInternal< ::PB::ServiceDataList >(arena);
 }
 template<> PROTOBUF_NOINLINE ::PB::UserRegisterData* Arena::CreateMaybeMessage< ::PB::UserRegisterData >(Arena* arena) {
   return Arena::CreateInternal< ::PB::UserRegisterData >(arena);

@@ -1,5 +1,5 @@
 #pragma once
-#include<Service/ServiceBase.h>
+#include"Manager.h"
 namespace SoEasy
 {
 	typedef std::function<bool(shared_ptr<TcpClientSession>, shared_ptr<NetWorkPacket>)> RecvMsgCallback;
@@ -16,13 +16,13 @@ namespace SoEasy
 	private:	//不要手动调用
 		bool AddNewSession(SharedTcpSession tcpSession);
 		bool AddErrorSession(SharedTcpSession tcpSession);
-		void AddRecvMessage(SharedTcpSession tcpSession, const char * message, size_t size);
+		bool AddRecvMessage(SharedTcpSession tcpSession, const char * message, size_t size);
 	protected:
 		bool OnInit() override;
 		virtual void OnSessionErrorAfter(SharedTcpSession tcpSession) = 0;
 		virtual void OnSessionConnectAfter(SharedTcpSession tcpSession) = 0;
 	protected:
-		void OnSystemUpdate() final;
+		void OnSystemUpdate() override;
 		virtual void OnSecondUpdate() override;
 		SharedTcpSession GetCurSession() { return this->mCurrentSession; }
 	protected:
@@ -31,6 +31,7 @@ namespace SoEasy
 		int mReConnectTime;
 		NetWorkPacket mNetWorkPacket;
 		class ActionManager * mActionManager;
+		class ServiceManager * mServiceManager;
 		class CoroutineManager * mCoroutineSheduler;
 		shared_ptr<TcpClientSession> mCurrentSession;  //当前正在执行action的session
 		DoubleBufferQueue<SharedTcpSession> mNewSessionQueue;

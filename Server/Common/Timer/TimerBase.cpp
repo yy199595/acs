@@ -4,7 +4,8 @@ namespace SoEasy
 {
 	TimerBase::TimerBase(long long ms)
 	{
-		this->mTimerId = NumberHelper::Create();
-		this->mNextInvokeTime = TimeHelper::GetMilTimestamp() + ms;
+		this->mDelayTime = ms;
+		this->mTickCount = 0;
+		this->mTimerId = NumberHelper::Create();		
 	}
 }

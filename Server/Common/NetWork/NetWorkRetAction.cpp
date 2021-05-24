@@ -73,11 +73,11 @@ namespace SoEasy
 
 	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(std::string name, CoroutineManager * coroutineMgr)
 	{
-		if (coroutineMgr->GetCoroutine() != nullptr)
+		if (coroutineMgr->IsInMainCoroutine())
 		{
-			return std::make_shared<NetWorkWaitCorAction>(name, coroutineMgr);
+			return nullptr;
 		}
-		return nullptr;
+		return std::make_shared<NetWorkWaitCorAction>(name, coroutineMgr);
 	}
 
 	void NetWorkWaitCorAction::Invoke(const shared_ptr<NetWorkPacket> backData)

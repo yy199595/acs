@@ -17,11 +17,11 @@ namespace SoEasy
 
 	typedef std::shared_ptr<CmdMessageBuffer> SharedCmdData;
 
-	class CommandManager : public Manager
+	class ConsoleManager : public Manager
 	{
 	public:
-		CommandManager();
-		~CommandManager();
+		ConsoleManager();
+		~ConsoleManager();
 	public:
 		friend class TelnetClientSession;
 		bool AddCommandAction(const std::string gm, CommandBase * command);

@@ -1,5 +1,5 @@
 #include<Core/Applocation.h>
-#include<Core/ManagerRegistry.h>
+#include<Core/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
@@ -18,12 +18,12 @@ using namespace Client;
 int main(int argc, char ** argv)
 {
 	
-	ManagerRegistry::RegisterManager<TimerManager>("TimerManager");
-	ManagerRegistry::RegisterManager<ClientManager>("ClientManager");	
-	ManagerRegistry::RegisterManager<ScriptManager>("ScriptManager");
-	ManagerRegistry::RegisterManager<NetWorkManager>("NetWorkManager");
-	ManagerRegistry::RegisterManager<CoroutineManager>("CoroutineManager");
-	ManagerRegistry::RegisterManager<ActionManager>("ActionManager");
+	ObjectRegistry<Manager>::RegisterManager<TimerManager>("TimerManager");
+	ObjectRegistry<Manager>::RegisterManager<ClientManager>("ClientManager");
+	ObjectRegistry<Manager>::RegisterManager<ScriptManager>("ScriptManager");
+	ObjectRegistry<Manager>::RegisterManager<NetWorkManager>("NetWorkManager");
+	ObjectRegistry<Manager>::RegisterManager<CoroutineManager>("CoroutineManager");
+	ObjectRegistry<Manager>::RegisterManager<ActionManager>("ActionManager");
 
 
 	Applocation app("Client", "./Config/ClientConfig.json");

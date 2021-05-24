@@ -1,4 +1,4 @@
-#include"CommandManager.h"
+#include"ConsoleManager.h"
 #include<Other/Command.h>
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
@@ -7,25 +7,25 @@
 namespace SoEasy
 {
 
-	CommandManager::CommandManager()
+	ConsoleManager::ConsoleManager()
 	{
 		this->mTcpSessionMap.clear();
 		this->mCommonActions.clear();
 	}
 
-	CommandManager::~CommandManager()
+	ConsoleManager::~ConsoleManager()
 	{
 
 	}
 
-	bool CommandManager::OnInit()
+	bool ConsoleManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("CommandPort", this->mListenerPort));
 		SayNoAssertRetFalse_F(this->InitListener());
 		return true;
 	}
 
-	void CommandManager::OnInitComplete()
+	void ConsoleManager::OnInitComplete()
 	{
 		this->StartListen();
 		this->AddCommandAction("state", new StateCommand(this));
@@ -34,7 +34,7 @@ namespace SoEasy
 		SayNoDebugInfo("start command listener port : " << this->mListenerPort);
 	}
 
-	bool CommandManager::AddCommandAction(const std::string gm, CommandBase * command)
+	bool ConsoleManager::AddCommandAction(const std::string gm, CommandBase * command)
 	{
 		auto iter = this->mCommonActions.find(gm);
 		if (iter == this->mCommonActions.end())
@@ -45,7 +45,7 @@ namespace SoEasy
 		return false;
 	}
 
-	void CommandManager::AddCommandBackArgv(const std::string & address, XCode code, const std::string message)
+	void ConsoleManager::AddCommandBackArgv(const std::string & address, XCode code, const std::string message)
 	{
 		auto iter = this->mTcpSessionMap.find(address);
 		if (iter != this->mTcpSessionMap.end())
@@ -57,7 +57,7 @@ namespace SoEasy
 		}
 	}
 
-	void CommandManager::OnSessionErrorAfter(std::shared_ptr<TelnetClientSession> tcpSession)
+	void ConsoleManager::OnSessionErrorAfter(std::shared_ptr<TelnetClientSession> tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -68,7 +68,7 @@ namespace SoEasy
 		}
 	}
 
-	void CommandManager::OnSessionConnectAfter(std::shared_ptr<TelnetClientSession> tcpSession)
+	void ConsoleManager::OnSessionConnectAfter(std::shared_ptr<TelnetClientSession> tcpSession)
 	{
 		const std::string & address = tcpSession->GetAddress();
 		auto iter = this->mTcpSessionMap.find(address);
@@ -84,7 +84,7 @@ namespace SoEasy
 		this->mTcpSessionMap.emplace(address, tcpSession);
 	}
 
-	void CommandManager::OnRecvMessage(std::shared_ptr<TelnetClientSession> session, const std::string & message)
+	void ConsoleManager::OnRecvMessage(std::shared_ptr<TelnetClientSession> session, const std::string & message)
 	{
 		std::vector<std::string> commandArgvs;
 		StringHelper::SplitString(message, "\r\n", commandArgvs);
@@ -101,7 +101,7 @@ namespace SoEasy
 		}
 	}
 
-	void CommandManager::Listen()
+	void ConsoleManager::Listen()
 	{
 		AsioContext & ioContext = this->GetApp()->GetAsioContext();
 		SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(ioContext);
@@ -113,17 +113,17 @@ namespace SoEasy
 				std::string ip = tcpSocket->remote_endpoint().address().to_string();
 				this->OnSessionConnectAfter(make_shared<TelnetClientSession>(this, tcpSocket));
 			}
-			ioContext.post(std::bind(&CommandManager::Listen, this));
+			ioContext.post(std::bind(&ConsoleManager::Listen, this));
 		});
 	}
 
-	void CommandManager::StartListen()
+	void ConsoleManager::StartListen()
 	{
 		AsioContext & ioContext = this->GetApp()->GetAsioContext();
-		ioContext.post(std::bind(&CommandManager::Listen, this));
+		ioContext.post(std::bind(&ConsoleManager::Listen, this));
 	}
 
-	bool CommandManager::InitListener()
+	bool ConsoleManager::InitListener()
 	{
 		if (this->mBindAcceptor == nullptr)
 		{
@@ -143,12 +143,12 @@ namespace SoEasy
 		return false;
 	}
 
-	void CommandManager::AddErrorSession(std::shared_ptr<TelnetClientSession> session)
+	void ConsoleManager::AddErrorSession(std::shared_ptr<TelnetClientSession> session)
 	{
 		this->mErrorSessionQueue.AddItem(session);
 	}
 
-	void CommandManager::AddReceiveMessage(std::shared_ptr<TelnetClientSession> session, const std::string & message)
+	void ConsoleManager::AddReceiveMessage(std::shared_ptr<TelnetClientSession> session, const std::string & message)
 	{
 		const std::string & address = session->GetAddress();
 		this->mRecvMessageQueue.AddItem(make_shared<CmdMessageBuffer>(address, message));
@@ -157,7 +157,7 @@ namespace SoEasy
 
 
 
-	void CommandManager::OnFrameUpdate(float t)
+	void ConsoleManager::OnFrameUpdate(float t)
 	{
 		SharedTelnetSession telnetSession;
 		this->mRecvMessageQueue.SwapQueueData();
