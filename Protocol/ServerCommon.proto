@@ -46,23 +46,17 @@ message ServerRunInfo
     float logic_time = 5;       //逻辑耗时
 }
 
-message ActionUpdateInfo
-{
-    int32 areaId = 1;   //区服id
-    string address = 2; //监听地址
-    repeated string action_names = 3;    //函数名字
-}
-
-message ActionInfo
+message ServiceData
 {
     int32 adreId = 1;
-    string address = 2;
-    string actionName = 3;
+    int32 service_id = 2;
+    string service_name = 3;
+    string service_address = 4;
 }
 
-message ActionInfoList
+message ServiceDataList
 {
-    repeated ActionInfo actionList = 1;
+    repeated ServiceData services = 1;
 }
 
 message UserRegisterData

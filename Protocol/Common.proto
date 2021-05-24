@@ -3,11 +3,11 @@ syntax = "proto3";
 package PB;
 message NetWorkPacket
 {
-     string service = 1;
-     string action = 2;
-     int32 error_code = 3;
-     uint64 operator_id = 4;
-     uint64 callback_id = 5;
+     string service = 1;      //服务名
+     string action = 2;       //调用的方法
+     int32 error_code = 3;    //返回值
+     uint64 operator_id = 4;  // 玩家id
+     uint64 callback_id = 5;  //返回值
      bytes message_data = 6;
      string protoc_name = 7;
 }
