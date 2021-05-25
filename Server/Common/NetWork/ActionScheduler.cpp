@@ -5,17 +5,9 @@
 #include<NetWork/NetWorkRetAction.h>
 namespace SoEasy
 {
-	ActionScheduler::ActionScheduler(long long operId)
+	ActionScheduler::ActionScheduler(shared_ptr<TcpClientSession> session)
 	{
 		this->InitScheduler();
-		this->mOperatorId = operId;
-	}
-
-	ActionScheduler::ActionScheduler(shared_ptr<TcpClientSession> session, long long operId)
-	{
-		this->InitScheduler();
-		this->mOperatorId = operId;
-		this->mOperatorId = session->GetSocketId();
 		this->mSessionAddress = session->GetAddress();
 	}
 

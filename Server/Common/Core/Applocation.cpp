@@ -48,7 +48,6 @@ namespace SoEasy
 			SayNoDebugError(name << " Has been added");
 			return false;
 		}
-		manager->Init(this, name);
 		this->mManagerMap.emplace(name, manager);
 		this->mSortManagers.emplace_back(manager);
 		return true;

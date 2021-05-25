@@ -49,7 +49,17 @@ namespace SoEasy
 	inline Base * ObjectRegistry<Base>::Create(const std::string name)
 	{
 		auto iter = mCreateActions.find(name);
-		return iter != mCreateActions.end() ? iter->second() : nullptr;
+		if (iter != mCreateActions.end())
+		{
+			Base * object = iter->second();
+			if (object != nullptr)
+			{
+				Applocation * app = Applocation::Get();
+				object->Init(app, name);
+				return object;
+			}
+		}
+		return nullptr;
 	}
 
 	template<typename Base>

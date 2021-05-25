@@ -10,13 +10,14 @@
 #include<Manager/ServiceManager.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
-#include<Coroutine/CoroutineManager.h>
 #include<Manager/ProxyManager.h>
-#include<Manager/LoginService.h>
 #include<Manager/LocalAccessManager.h>
+#include<Coroutine/CoroutineManager.h>
 
-
+#include<Manager/LoginService.h>
+#include<Service/ClusterService.h>
 #include<Service/ServiceRegistry.h>
+
 using namespace SoEasy;
 using namespace SoEasy;
 
@@ -47,7 +48,9 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
 	ObjectRegistry<Manager>::Register<LocalAccessManager>("LocalAccessManager");
 
+
 	ObjectRegistry<LocalService>::Register<LoginService>("LoginService");
+	ObjectRegistry<LocalService>::Register<ClusterService>("ClusterService");
 	ObjectRegistry<LocalService>::Register<ServiceRegistry>("ServiceRegistry");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";

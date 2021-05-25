@@ -150,7 +150,7 @@ using namespace SoEasy;
 
 	int SystemExtension::CallByName(lua_State * luaEnv)
 	{
-		lua_pushthread(luaEnv);
+		/*lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
 		{
 			lua_pushinteger(luaEnv, XCode::Failure);
@@ -198,7 +198,7 @@ using namespace SoEasy;
 				lua_pushinteger(luaEnv, XCode::Failure);
 				return 1;
 			}
-		}
+		}*/
 		return lua_yield(luaEnv, 1);
 	}
 

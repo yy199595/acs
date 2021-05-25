@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -49,12 +52,6 @@ struct TableStruct_ServerCommon_2eproto {
 };
 void AddDescriptors_ServerCommon_2eproto();
 namespace PB {
-class AssestCompareList;
-class AssestCompareListDefaultTypeInternal;
-extern AssestCompareListDefaultTypeInternal _AssestCompareList_default_instance_;
-class AssestCompareList_AssestCompareInfo;
-class AssestCompareList_AssestCompareInfoDefaultTypeInternal;
-extern AssestCompareList_AssestCompareInfoDefaultTypeInternal _AssestCompareList_AssestCompareInfo_default_instance_;
 class LogicServerData;
 class LogicServerDataDefaultTypeInternal;
 extern LogicServerDataDefaultTypeInternal _LogicServerData_default_instance_;
@@ -64,18 +61,24 @@ extern LogicServerListDataDefaultTypeInternal _LogicServerListData_default_insta
 class ServerRegisterBack;
 class ServerRegisterBackDefaultTypeInternal;
 extern ServerRegisterBackDefaultTypeInternal _ServerRegisterBack_default_instance_;
-class ServerRunInfo;
-class ServerRunInfoDefaultTypeInternal;
-extern ServerRunInfoDefaultTypeInternal _ServerRunInfo_default_instance_;
 class ServiceData;
 class ServiceDataDefaultTypeInternal;
 extern ServiceDataDefaultTypeInternal _ServiceData_default_instance_;
-class ServiceDataList;
-class ServiceDataListDefaultTypeInternal;
-extern ServiceDataListDefaultTypeInternal _ServiceDataList_default_instance_;
-class TransferAssestInfo;
-class TransferAssestInfoDefaultTypeInternal;
-extern TransferAssestInfoDefaultTypeInternal _TransferAssestInfo_default_instance_;
+class ServiceRegister;
+class ServiceRegisterDefaultTypeInternal;
+extern ServiceRegisterDefaultTypeInternal _ServiceRegister_default_instance_;
+class ServiceRegister_Request;
+class ServiceRegister_RequestDefaultTypeInternal;
+extern ServiceRegister_RequestDefaultTypeInternal _ServiceRegister_Request_default_instance_;
+class ServiceRegister_Respond;
+class ServiceRegister_RespondDefaultTypeInternal;
+extern ServiceRegister_RespondDefaultTypeInternal _ServiceRegister_Respond_default_instance_;
+class ServiceRegister_Respond_ServiceInfosEntry_DoNotUse;
+class ServiceRegister_Respond_ServiceInfosEntry_DoNotUseDefaultTypeInternal;
+extern ServiceRegister_Respond_ServiceInfosEntry_DoNotUseDefaultTypeInternal _ServiceRegister_Respond_ServiceInfosEntry_DoNotUse_default_instance_;
+class ServicesNotice;
+class ServicesNoticeDefaultTypeInternal;
+extern ServicesNoticeDefaultTypeInternal _ServicesNotice_default_instance_;
 class UserAccountData;
 class UserAccountDataDefaultTypeInternal;
 extern UserAccountDataDefaultTypeInternal _UserAccountData_default_instance_;
@@ -88,15 +91,15 @@ extern UserRegisterDataDefaultTypeInternal _UserRegisterData_default_instance_;
 }  // namespace PB
 namespace google {
 namespace protobuf {
-template<> ::PB::AssestCompareList* Arena::CreateMaybeMessage<::PB::AssestCompareList>(Arena*);
-template<> ::PB::AssestCompareList_AssestCompareInfo* Arena::CreateMaybeMessage<::PB::AssestCompareList_AssestCompareInfo>(Arena*);
 template<> ::PB::LogicServerData* Arena::CreateMaybeMessage<::PB::LogicServerData>(Arena*);
 template<> ::PB::LogicServerListData* Arena::CreateMaybeMessage<::PB::LogicServerListData>(Arena*);
 template<> ::PB::ServerRegisterBack* Arena::CreateMaybeMessage<::PB::ServerRegisterBack>(Arena*);
-template<> ::PB::ServerRunInfo* Arena::CreateMaybeMessage<::PB::ServerRunInfo>(Arena*);
 template<> ::PB::ServiceData* Arena::CreateMaybeMessage<::PB::ServiceData>(Arena*);
-template<> ::PB::ServiceDataList* Arena::CreateMaybeMessage<::PB::ServiceDataList>(Arena*);
-template<> ::PB::TransferAssestInfo* Arena::CreateMaybeMessage<::PB::TransferAssestInfo>(Arena*);
+template<> ::PB::ServiceRegister* Arena::CreateMaybeMessage<::PB::ServiceRegister>(Arena*);
+template<> ::PB::ServiceRegister_Request* Arena::CreateMaybeMessage<::PB::ServiceRegister_Request>(Arena*);
+template<> ::PB::ServiceRegister_Respond* Arena::CreateMaybeMessage<::PB::ServiceRegister_Respond>(Arena*);
+template<> ::PB::ServiceRegister_Respond_ServiceInfosEntry_DoNotUse* Arena::CreateMaybeMessage<::PB::ServiceRegister_Respond_ServiceInfosEntry_DoNotUse>(Arena*);
+template<> ::PB::ServicesNotice* Arena::CreateMaybeMessage<::PB::ServicesNotice>(Arena*);
 template<> ::PB::UserAccountData* Arena::CreateMaybeMessage<::PB::UserAccountData>(Arena*);
 template<> ::PB::UserRegisterBack* Arena::CreateMaybeMessage<::PB::UserRegisterBack>(Arena*);
 template<> ::PB::UserRegisterData* Arena::CreateMaybeMessage<::PB::UserRegisterData>(Arena*);
@@ -503,25 +506,25 @@ class ServerRegisterBack :
 };
 // -------------------------------------------------------------------
 
-class AssestCompareList_AssestCompareInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.AssestCompareList.AssestCompareInfo) */ {
+class ServiceRegister_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister.Request) */ {
  public:
-  AssestCompareList_AssestCompareInfo();
-  virtual ~AssestCompareList_AssestCompareInfo();
+  ServiceRegister_Request();
+  virtual ~ServiceRegister_Request();
 
-  AssestCompareList_AssestCompareInfo(const AssestCompareList_AssestCompareInfo& from);
+  ServiceRegister_Request(const ServiceRegister_Request& from);
 
-  inline AssestCompareList_AssestCompareInfo& operator=(const AssestCompareList_AssestCompareInfo& from) {
+  inline ServiceRegister_Request& operator=(const ServiceRegister_Request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AssestCompareList_AssestCompareInfo(AssestCompareList_AssestCompareInfo&& from) noexcept
-    : AssestCompareList_AssestCompareInfo() {
+  ServiceRegister_Request(ServiceRegister_Request&& from) noexcept
+    : ServiceRegister_Request() {
     *this = ::std::move(from);
   }
 
-  inline AssestCompareList_AssestCompareInfo& operator=(AssestCompareList_AssestCompareInfo&& from) noexcept {
+  inline ServiceRegister_Request& operator=(ServiceRegister_Request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -533,34 +536,34 @@ class AssestCompareList_AssestCompareInfo :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AssestCompareList_AssestCompareInfo& default_instance();
+  static const ServiceRegister_Request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AssestCompareList_AssestCompareInfo* internal_default_instance() {
-    return reinterpret_cast<const AssestCompareList_AssestCompareInfo*>(
-               &_AssestCompareList_AssestCompareInfo_default_instance_);
+  static inline const ServiceRegister_Request* internal_default_instance() {
+    return reinterpret_cast<const ServiceRegister_Request*>(
+               &_ServiceRegister_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     3;
 
-  void Swap(AssestCompareList_AssestCompareInfo* other);
-  friend void swap(AssestCompareList_AssestCompareInfo& a, AssestCompareList_AssestCompareInfo& b) {
+  void Swap(ServiceRegister_Request* other);
+  friend void swap(ServiceRegister_Request& a, ServiceRegister_Request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AssestCompareList_AssestCompareInfo* New() const final {
-    return CreateMaybeMessage<AssestCompareList_AssestCompareInfo>(nullptr);
+  inline ServiceRegister_Request* New() const final {
+    return CreateMaybeMessage<ServiceRegister_Request>(nullptr);
   }
 
-  AssestCompareList_AssestCompareInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AssestCompareList_AssestCompareInfo>(arena);
+  ServiceRegister_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ServiceRegister_Request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AssestCompareList_AssestCompareInfo& from);
-  void MergeFrom(const AssestCompareList_AssestCompareInfo& from);
+  void CopyFrom(const ServiceRegister_Request& from);
+  void MergeFrom(const ServiceRegister_Request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -582,7 +585,7 @@ class AssestCompareList_AssestCompareInfo :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AssestCompareList_AssestCompareInfo* other);
+  void InternalSwap(ServiceRegister_Request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -598,65 +601,104 @@ class AssestCompareList_AssestCompareInfo :
 
   // accessors -------------------------------------------------------
 
-  // string file_name = 1;
-  void clear_file_name();
-  static const int kFileNameFieldNumber = 1;
-  const ::std::string& file_name() const;
-  void set_file_name(const ::std::string& value);
+  // repeated string service_names = 3;
+  int service_names_size() const;
+  void clear_service_names();
+  static const int kServiceNamesFieldNumber = 3;
+  const ::std::string& service_names(int index) const;
+  ::std::string* mutable_service_names(int index);
+  void set_service_names(int index, const ::std::string& value);
   #if LANG_CXX11
-  void set_file_name(::std::string&& value);
+  void set_service_names(int index, ::std::string&& value);
   #endif
-  void set_file_name(const char* value);
-  void set_file_name(const char* value, size_t size);
-  ::std::string* mutable_file_name();
-  ::std::string* release_file_name();
-  void set_allocated_file_name(::std::string* file_name);
-
-  // string file_md5 = 2;
-  void clear_file_md5();
-  static const int kFileMd5FieldNumber = 2;
-  const ::std::string& file_md5() const;
-  void set_file_md5(const ::std::string& value);
+  void set_service_names(int index, const char* value);
+  void set_service_names(int index, const char* value, size_t size);
+  ::std::string* add_service_names();
+  void add_service_names(const ::std::string& value);
   #if LANG_CXX11
-  void set_file_md5(::std::string&& value);
+  void add_service_names(::std::string&& value);
   #endif
-  void set_file_md5(const char* value);
-  void set_file_md5(const char* value, size_t size);
-  ::std::string* mutable_file_md5();
-  ::std::string* release_file_md5();
-  void set_allocated_file_md5(::std::string* file_md5);
+  void add_service_names(const char* value);
+  void add_service_names(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& service_names() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_service_names();
 
-  // @@protoc_insertion_point(class_scope:PB.AssestCompareList.AssestCompareInfo)
+  // string service_address = 2;
+  void clear_service_address();
+  static const int kServiceAddressFieldNumber = 2;
+  const ::std::string& service_address() const;
+  void set_service_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_service_address(::std::string&& value);
+  #endif
+  void set_service_address(const char* value);
+  void set_service_address(const char* value, size_t size);
+  ::std::string* mutable_service_address();
+  ::std::string* release_service_address();
+  void set_allocated_service_address(::std::string* service_address);
+
+  // int32 area_id = 1;
+  void clear_area_id();
+  static const int kAreaIdFieldNumber = 1;
+  ::google::protobuf::int32 area_id() const;
+  void set_area_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:PB.ServiceRegister.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr file_name_;
-  ::google::protobuf::internal::ArenaStringPtr file_md5_;
+  ::google::protobuf::RepeatedPtrField<::std::string> service_names_;
+  ::google::protobuf::internal::ArenaStringPtr service_address_;
+  ::google::protobuf::int32 area_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class AssestCompareList :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.AssestCompareList) */ {
+class ServiceRegister_Respond_ServiceInfosEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<ServiceRegister_Respond_ServiceInfosEntry_DoNotUse, 
+    ::std::string, ::google::protobuf::int32,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<ServiceRegister_Respond_ServiceInfosEntry_DoNotUse, 
+    ::std::string, ::google::protobuf::int32,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+    0 > SuperType;
+  ServiceRegister_Respond_ServiceInfosEntry_DoNotUse();
+  ServiceRegister_Respond_ServiceInfosEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse& other);
+  static const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse*>(&_ServiceRegister_Respond_ServiceInfosEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
+class ServiceRegister_Respond :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister.Respond) */ {
  public:
-  AssestCompareList();
-  virtual ~AssestCompareList();
+  ServiceRegister_Respond();
+  virtual ~ServiceRegister_Respond();
 
-  AssestCompareList(const AssestCompareList& from);
+  ServiceRegister_Respond(const ServiceRegister_Respond& from);
 
-  inline AssestCompareList& operator=(const AssestCompareList& from) {
+  inline ServiceRegister_Respond& operator=(const ServiceRegister_Respond& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AssestCompareList(AssestCompareList&& from) noexcept
-    : AssestCompareList() {
+  ServiceRegister_Respond(ServiceRegister_Respond&& from) noexcept
+    : ServiceRegister_Respond() {
     *this = ::std::move(from);
   }
 
-  inline AssestCompareList& operator=(AssestCompareList&& from) noexcept {
+  inline ServiceRegister_Respond& operator=(ServiceRegister_Respond&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -668,154 +710,34 @@ class AssestCompareList :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AssestCompareList& default_instance();
+  static const ServiceRegister_Respond& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AssestCompareList* internal_default_instance() {
-    return reinterpret_cast<const AssestCompareList*>(
-               &_AssestCompareList_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    4;
-
-  void Swap(AssestCompareList* other);
-  friend void swap(AssestCompareList& a, AssestCompareList& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AssestCompareList* New() const final {
-    return CreateMaybeMessage<AssestCompareList>(nullptr);
-  }
-
-  AssestCompareList* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AssestCompareList>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AssestCompareList& from);
-  void MergeFrom(const AssestCompareList& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AssestCompareList* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  typedef AssestCompareList_AssestCompareInfo AssestCompareInfo;
-
-  // accessors -------------------------------------------------------
-
-  // repeated .PB.AssestCompareList.AssestCompareInfo assestList = 1;
-  int assestlist_size() const;
-  void clear_assestlist();
-  static const int kAssestListFieldNumber = 1;
-  ::PB::AssestCompareList_AssestCompareInfo* mutable_assestlist(int index);
-  ::google::protobuf::RepeatedPtrField< ::PB::AssestCompareList_AssestCompareInfo >*
-      mutable_assestlist();
-  const ::PB::AssestCompareList_AssestCompareInfo& assestlist(int index) const;
-  ::PB::AssestCompareList_AssestCompareInfo* add_assestlist();
-  const ::google::protobuf::RepeatedPtrField< ::PB::AssestCompareList_AssestCompareInfo >&
-      assestlist() const;
-
-  // @@protoc_insertion_point(class_scope:PB.AssestCompareList)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::PB::AssestCompareList_AssestCompareInfo > assestlist_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_ServerCommon_2eproto;
-};
-// -------------------------------------------------------------------
-
-class TransferAssestInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.TransferAssestInfo) */ {
- public:
-  TransferAssestInfo();
-  virtual ~TransferAssestInfo();
-
-  TransferAssestInfo(const TransferAssestInfo& from);
-
-  inline TransferAssestInfo& operator=(const TransferAssestInfo& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  TransferAssestInfo(TransferAssestInfo&& from) noexcept
-    : TransferAssestInfo() {
-    *this = ::std::move(from);
-  }
-
-  inline TransferAssestInfo& operator=(TransferAssestInfo&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const TransferAssestInfo& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const TransferAssestInfo* internal_default_instance() {
-    return reinterpret_cast<const TransferAssestInfo*>(
-               &_TransferAssestInfo_default_instance_);
+  static inline const ServiceRegister_Respond* internal_default_instance() {
+    return reinterpret_cast<const ServiceRegister_Respond*>(
+               &_ServiceRegister_Respond_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     5;
 
-  void Swap(TransferAssestInfo* other);
-  friend void swap(TransferAssestInfo& a, TransferAssestInfo& b) {
+  void Swap(ServiceRegister_Respond* other);
+  friend void swap(ServiceRegister_Respond& a, ServiceRegister_Respond& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline TransferAssestInfo* New() const final {
-    return CreateMaybeMessage<TransferAssestInfo>(nullptr);
+  inline ServiceRegister_Respond* New() const final {
+    return CreateMaybeMessage<ServiceRegister_Respond>(nullptr);
   }
 
-  TransferAssestInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<TransferAssestInfo>(arena);
+  ServiceRegister_Respond* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ServiceRegister_Respond>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const TransferAssestInfo& from);
-  void MergeFrom(const TransferAssestInfo& from);
+  void CopyFrom(const ServiceRegister_Respond& from);
+  void MergeFrom(const ServiceRegister_Respond& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -837,7 +759,7 @@ class TransferAssestInfo :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(TransferAssestInfo* other);
+  void InternalSwap(ServiceRegister_Respond* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -851,67 +773,53 @@ class TransferAssestInfo :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
 
-  // string file_name = 1;
-  void clear_file_name();
-  static const int kFileNameFieldNumber = 1;
-  const ::std::string& file_name() const;
-  void set_file_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_file_name(::std::string&& value);
-  #endif
-  void set_file_name(const char* value);
-  void set_file_name(const char* value, size_t size);
-  ::std::string* mutable_file_name();
-  ::std::string* release_file_name();
-  void set_allocated_file_name(::std::string* file_name);
+  // map<string, int32> service_infos = 1;
+  int service_infos_size() const;
+  void clear_service_infos();
+  static const int kServiceInfosFieldNumber = 1;
+  const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
+      service_infos() const;
+  ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
+      mutable_service_infos();
 
-  // bytes file_content = 2;
-  void clear_file_content();
-  static const int kFileContentFieldNumber = 2;
-  const ::std::string& file_content() const;
-  void set_file_content(const ::std::string& value);
-  #if LANG_CXX11
-  void set_file_content(::std::string&& value);
-  #endif
-  void set_file_content(const char* value);
-  void set_file_content(const void* value, size_t size);
-  ::std::string* mutable_file_content();
-  ::std::string* release_file_content();
-  void set_allocated_file_content(::std::string* file_content);
-
-  // @@protoc_insertion_point(class_scope:PB.TransferAssestInfo)
+  // @@protoc_insertion_point(class_scope:PB.ServiceRegister.Respond)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr file_name_;
-  ::google::protobuf::internal::ArenaStringPtr file_content_;
+  ::google::protobuf::internal::MapField<
+      ServiceRegister_Respond_ServiceInfosEntry_DoNotUse,
+      ::std::string, ::google::protobuf::int32,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+      0 > service_infos_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class ServerRunInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServerRunInfo) */ {
+class ServiceRegister :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister) */ {
  public:
-  ServerRunInfo();
-  virtual ~ServerRunInfo();
+  ServiceRegister();
+  virtual ~ServiceRegister();
 
-  ServerRunInfo(const ServerRunInfo& from);
+  ServiceRegister(const ServiceRegister& from);
 
-  inline ServerRunInfo& operator=(const ServerRunInfo& from) {
+  inline ServiceRegister& operator=(const ServiceRegister& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ServerRunInfo(ServerRunInfo&& from) noexcept
-    : ServerRunInfo() {
+  ServiceRegister(ServiceRegister&& from) noexcept
+    : ServiceRegister() {
     *this = ::std::move(from);
   }
 
-  inline ServerRunInfo& operator=(ServerRunInfo&& from) noexcept {
+  inline ServiceRegister& operator=(ServiceRegister&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -923,34 +831,34 @@ class ServerRunInfo :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ServerRunInfo& default_instance();
+  static const ServiceRegister& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServerRunInfo* internal_default_instance() {
-    return reinterpret_cast<const ServerRunInfo*>(
-               &_ServerRunInfo_default_instance_);
+  static inline const ServiceRegister* internal_default_instance() {
+    return reinterpret_cast<const ServiceRegister*>(
+               &_ServiceRegister_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     6;
 
-  void Swap(ServerRunInfo* other);
-  friend void swap(ServerRunInfo& a, ServerRunInfo& b) {
+  void Swap(ServiceRegister* other);
+  friend void swap(ServiceRegister& a, ServiceRegister& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ServerRunInfo* New() const final {
-    return CreateMaybeMessage<ServerRunInfo>(nullptr);
+  inline ServiceRegister* New() const final {
+    return CreateMaybeMessage<ServiceRegister>(nullptr);
   }
 
-  ServerRunInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServerRunInfo>(arena);
+  ServiceRegister* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ServiceRegister>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServerRunInfo& from);
-  void MergeFrom(const ServerRunInfo& from);
+  void CopyFrom(const ServiceRegister& from);
+  void MergeFrom(const ServiceRegister& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -972,7 +880,7 @@ class ServerRunInfo :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ServerRunInfo* other);
+  void InternalSwap(ServiceRegister* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -986,56 +894,16 @@ class ServerRunInfo :
 
   // nested types ----------------------------------------------------
 
+  typedef ServiceRegister_Request Request;
+  typedef ServiceRegister_Respond Respond;
+
   // accessors -------------------------------------------------------
 
-  // string server_name = 1;
-  void clear_server_name();
-  static const int kServerNameFieldNumber = 1;
-  const ::std::string& server_name() const;
-  void set_server_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_server_name(::std::string&& value);
-  #endif
-  void set_server_name(const char* value);
-  void set_server_name(const char* value, size_t size);
-  ::std::string* mutable_server_name();
-  ::std::string* release_server_name();
-  void set_allocated_server_name(::std::string* server_name);
-
-  // int64 server_run_time = 3;
-  void clear_server_run_time();
-  static const int kServerRunTimeFieldNumber = 3;
-  ::google::protobuf::int64 server_run_time() const;
-  void set_server_run_time(::google::protobuf::int64 value);
-
-  // int32 server_areaId = 2;
-  void clear_server_areaid();
-  static const int kServerAreaIdFieldNumber = 2;
-  ::google::protobuf::int32 server_areaid() const;
-  void set_server_areaid(::google::protobuf::int32 value);
-
-  // float server_fps = 4;
-  void clear_server_fps();
-  static const int kServerFpsFieldNumber = 4;
-  float server_fps() const;
-  void set_server_fps(float value);
-
-  // float logic_time = 5;
-  void clear_logic_time();
-  static const int kLogicTimeFieldNumber = 5;
-  float logic_time() const;
-  void set_logic_time(float value);
-
-  // @@protoc_insertion_point(class_scope:PB.ServerRunInfo)
+  // @@protoc_insertion_point(class_scope:PB.ServiceRegister)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr server_name_;
-  ::google::protobuf::int64 server_run_time_;
-  ::google::protobuf::int32 server_areaid_;
-  float server_fps_;
-  float logic_time_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
@@ -1190,25 +1058,25 @@ class ServiceData :
 };
 // -------------------------------------------------------------------
 
-class ServiceDataList :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceDataList) */ {
+class ServicesNotice :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServicesNotice) */ {
  public:
-  ServiceDataList();
-  virtual ~ServiceDataList();
+  ServicesNotice();
+  virtual ~ServicesNotice();
 
-  ServiceDataList(const ServiceDataList& from);
+  ServicesNotice(const ServicesNotice& from);
 
-  inline ServiceDataList& operator=(const ServiceDataList& from) {
+  inline ServicesNotice& operator=(const ServicesNotice& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ServiceDataList(ServiceDataList&& from) noexcept
-    : ServiceDataList() {
+  ServicesNotice(ServicesNotice&& from) noexcept
+    : ServicesNotice() {
     *this = ::std::move(from);
   }
 
-  inline ServiceDataList& operator=(ServiceDataList&& from) noexcept {
+  inline ServicesNotice& operator=(ServicesNotice&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1220,34 +1088,34 @@ class ServiceDataList :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ServiceDataList& default_instance();
+  static const ServicesNotice& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServiceDataList* internal_default_instance() {
-    return reinterpret_cast<const ServiceDataList*>(
-               &_ServiceDataList_default_instance_);
+  static inline const ServicesNotice* internal_default_instance() {
+    return reinterpret_cast<const ServicesNotice*>(
+               &_ServicesNotice_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     8;
 
-  void Swap(ServiceDataList* other);
-  friend void swap(ServiceDataList& a, ServiceDataList& b) {
+  void Swap(ServicesNotice* other);
+  friend void swap(ServicesNotice& a, ServicesNotice& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ServiceDataList* New() const final {
-    return CreateMaybeMessage<ServiceDataList>(nullptr);
+  inline ServicesNotice* New() const final {
+    return CreateMaybeMessage<ServicesNotice>(nullptr);
   }
 
-  ServiceDataList* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServiceDataList>(arena);
+  ServicesNotice* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ServicesNotice>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServiceDataList& from);
-  void MergeFrom(const ServiceDataList& from);
+  void CopyFrom(const ServicesNotice& from);
+  void MergeFrom(const ServicesNotice& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1269,7 +1137,7 @@ class ServiceDataList :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ServiceDataList* other);
+  void InternalSwap(ServicesNotice* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1297,7 +1165,7 @@ class ServiceDataList :
   const ::google::protobuf::RepeatedPtrField< ::PB::ServiceData >&
       services() const;
 
-  // @@protoc_insertion_point(class_scope:PB.ServiceDataList)
+  // @@protoc_insertion_point(class_scope:PB.ServicesNotice)
  private:
   class HasBitSetters;
 
@@ -2094,370 +1962,171 @@ ServerRegisterBack::logic_srv_list() const {
 
 // -------------------------------------------------------------------
 
-// AssestCompareList_AssestCompareInfo
+// ServiceRegister_Request
 
-// string file_name = 1;
-inline void AssestCompareList_AssestCompareInfo::clear_file_name() {
-  file_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// int32 area_id = 1;
+inline void ServiceRegister_Request::clear_area_id() {
+  area_id_ = 0;
 }
-inline const ::std::string& AssestCompareList_AssestCompareInfo::file_name() const {
-  // @@protoc_insertion_point(field_get:PB.AssestCompareList.AssestCompareInfo.file_name)
-  return file_name_.GetNoArena();
+inline ::google::protobuf::int32 ServiceRegister_Request::area_id() const {
+  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.area_id)
+  return area_id_;
 }
-inline void AssestCompareList_AssestCompareInfo::set_file_name(const ::std::string& value) {
+inline void ServiceRegister_Request::set_area_id(::google::protobuf::int32 value) {
   
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.AssestCompareList.AssestCompareInfo.file_name)
+  area_id_ = value;
+  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.area_id)
+}
+
+// string service_address = 2;
+inline void ServiceRegister_Request::clear_service_address() {
+  service_address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ServiceRegister_Request::service_address() const {
+  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.service_address)
+  return service_address_.GetNoArena();
+}
+inline void ServiceRegister_Request::set_service_address(const ::std::string& value) {
+  
+  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_address)
 }
 #if LANG_CXX11
-inline void AssestCompareList_AssestCompareInfo::set_file_name(::std::string&& value) {
+inline void ServiceRegister_Request::set_service_address(::std::string&& value) {
   
-  file_name_.SetNoArena(
+  service_address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.AssestCompareList.AssestCompareInfo.file_name)
+  // @@protoc_insertion_point(field_set_rvalue:PB.ServiceRegister.Request.service_address)
 }
 #endif
-inline void AssestCompareList_AssestCompareInfo::set_file_name(const char* value) {
+inline void ServiceRegister_Request::set_service_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.AssestCompareList.AssestCompareInfo.file_name)
+  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.ServiceRegister.Request.service_address)
 }
-inline void AssestCompareList_AssestCompareInfo::set_file_name(const char* value, size_t size) {
+inline void ServiceRegister_Request::set_service_address(const char* value, size_t size) {
   
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.AssestCompareList.AssestCompareInfo.file_name)
+  // @@protoc_insertion_point(field_set_pointer:PB.ServiceRegister.Request.service_address)
 }
-inline ::std::string* AssestCompareList_AssestCompareInfo::mutable_file_name() {
+inline ::std::string* ServiceRegister_Request::mutable_service_address() {
   
-  // @@protoc_insertion_point(field_mutable:PB.AssestCompareList.AssestCompareInfo.file_name)
-  return file_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:PB.ServiceRegister.Request.service_address)
+  return service_address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* AssestCompareList_AssestCompareInfo::release_file_name() {
-  // @@protoc_insertion_point(field_release:PB.AssestCompareList.AssestCompareInfo.file_name)
+inline ::std::string* ServiceRegister_Request::release_service_address() {
+  // @@protoc_insertion_point(field_release:PB.ServiceRegister.Request.service_address)
   
-  return file_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return service_address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AssestCompareList_AssestCompareInfo::set_allocated_file_name(::std::string* file_name) {
-  if (file_name != nullptr) {
+inline void ServiceRegister_Request::set_allocated_service_address(::std::string* service_address) {
+  if (service_address != nullptr) {
     
   } else {
     
   }
-  file_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_name);
-  // @@protoc_insertion_point(field_set_allocated:PB.AssestCompareList.AssestCompareInfo.file_name)
+  service_address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service_address);
+  // @@protoc_insertion_point(field_set_allocated:PB.ServiceRegister.Request.service_address)
 }
 
-// string file_md5 = 2;
-inline void AssestCompareList_AssestCompareInfo::clear_file_md5() {
-  file_md5_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// repeated string service_names = 3;
+inline int ServiceRegister_Request::service_names_size() const {
+  return service_names_.size();
 }
-inline const ::std::string& AssestCompareList_AssestCompareInfo::file_md5() const {
-  // @@protoc_insertion_point(field_get:PB.AssestCompareList.AssestCompareInfo.file_md5)
-  return file_md5_.GetNoArena();
+inline void ServiceRegister_Request::clear_service_names() {
+  service_names_.Clear();
 }
-inline void AssestCompareList_AssestCompareInfo::set_file_md5(const ::std::string& value) {
-  
-  file_md5_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.AssestCompareList.AssestCompareInfo.file_md5)
+inline const ::std::string& ServiceRegister_Request::service_names(int index) const {
+  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.service_names)
+  return service_names_.Get(index);
+}
+inline ::std::string* ServiceRegister_Request::mutable_service_names(int index) {
+  // @@protoc_insertion_point(field_mutable:PB.ServiceRegister.Request.service_names)
+  return service_names_.Mutable(index);
+}
+inline void ServiceRegister_Request::set_service_names(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_names)
+  service_names_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
-inline void AssestCompareList_AssestCompareInfo::set_file_md5(::std::string&& value) {
-  
-  file_md5_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.AssestCompareList.AssestCompareInfo.file_md5)
+inline void ServiceRegister_Request::set_service_names(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_names)
+  service_names_.Mutable(index)->assign(std::move(value));
 }
 #endif
-inline void AssestCompareList_AssestCompareInfo::set_file_md5(const char* value) {
+inline void ServiceRegister_Request::set_service_names(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
-  file_md5_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.AssestCompareList.AssestCompareInfo.file_md5)
+  service_names_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:PB.ServiceRegister.Request.service_names)
 }
-inline void AssestCompareList_AssestCompareInfo::set_file_md5(const char* value, size_t size) {
-  
-  file_md5_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.AssestCompareList.AssestCompareInfo.file_md5)
+inline void ServiceRegister_Request::set_service_names(int index, const char* value, size_t size) {
+  service_names_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:PB.ServiceRegister.Request.service_names)
 }
-inline ::std::string* AssestCompareList_AssestCompareInfo::mutable_file_md5() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.AssestCompareList.AssestCompareInfo.file_md5)
-  return file_md5_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+inline ::std::string* ServiceRegister_Request::add_service_names() {
+  // @@protoc_insertion_point(field_add_mutable:PB.ServiceRegister.Request.service_names)
+  return service_names_.Add();
 }
-inline ::std::string* AssestCompareList_AssestCompareInfo::release_file_md5() {
-  // @@protoc_insertion_point(field_release:PB.AssestCompareList.AssestCompareInfo.file_md5)
-  
-  return file_md5_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+inline void ServiceRegister_Request::add_service_names(const ::std::string& value) {
+  service_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:PB.ServiceRegister.Request.service_names)
 }
-inline void AssestCompareList_AssestCompareInfo::set_allocated_file_md5(::std::string* file_md5) {
-  if (file_md5 != nullptr) {
-    
-  } else {
-    
-  }
-  file_md5_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_md5);
-  // @@protoc_insertion_point(field_set_allocated:PB.AssestCompareList.AssestCompareInfo.file_md5)
+#if LANG_CXX11
+inline void ServiceRegister_Request::add_service_names(::std::string&& value) {
+  service_names_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:PB.ServiceRegister.Request.service_names)
+}
+#endif
+inline void ServiceRegister_Request::add_service_names(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  service_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:PB.ServiceRegister.Request.service_names)
+}
+inline void ServiceRegister_Request::add_service_names(const char* value, size_t size) {
+  service_names_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:PB.ServiceRegister.Request.service_names)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+ServiceRegister_Request::service_names() const {
+  // @@protoc_insertion_point(field_list:PB.ServiceRegister.Request.service_names)
+  return service_names_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+ServiceRegister_Request::mutable_service_names() {
+  // @@protoc_insertion_point(field_mutable_list:PB.ServiceRegister.Request.service_names)
+  return &service_names_;
 }
 
 // -------------------------------------------------------------------
 
-// AssestCompareList
+// -------------------------------------------------------------------
 
-// repeated .PB.AssestCompareList.AssestCompareInfo assestList = 1;
-inline int AssestCompareList::assestlist_size() const {
-  return assestlist_.size();
+// ServiceRegister_Respond
+
+// map<string, int32> service_infos = 1;
+inline int ServiceRegister_Respond::service_infos_size() const {
+  return service_infos_.size();
 }
-inline void AssestCompareList::clear_assestlist() {
-  assestlist_.Clear();
+inline void ServiceRegister_Respond::clear_service_infos() {
+  service_infos_.Clear();
 }
-inline ::PB::AssestCompareList_AssestCompareInfo* AssestCompareList::mutable_assestlist(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.AssestCompareList.assestList)
-  return assestlist_.Mutable(index);
+inline const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
+ServiceRegister_Respond::service_infos() const {
+  // @@protoc_insertion_point(field_map:PB.ServiceRegister.Respond.service_infos)
+  return service_infos_.GetMap();
 }
-inline ::google::protobuf::RepeatedPtrField< ::PB::AssestCompareList_AssestCompareInfo >*
-AssestCompareList::mutable_assestlist() {
-  // @@protoc_insertion_point(field_mutable_list:PB.AssestCompareList.assestList)
-  return &assestlist_;
-}
-inline const ::PB::AssestCompareList_AssestCompareInfo& AssestCompareList::assestlist(int index) const {
-  // @@protoc_insertion_point(field_get:PB.AssestCompareList.assestList)
-  return assestlist_.Get(index);
-}
-inline ::PB::AssestCompareList_AssestCompareInfo* AssestCompareList::add_assestlist() {
-  // @@protoc_insertion_point(field_add:PB.AssestCompareList.assestList)
-  return assestlist_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::PB::AssestCompareList_AssestCompareInfo >&
-AssestCompareList::assestlist() const {
-  // @@protoc_insertion_point(field_list:PB.AssestCompareList.assestList)
-  return assestlist_;
+inline ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
+ServiceRegister_Respond::mutable_service_infos() {
+  // @@protoc_insertion_point(field_mutable_map:PB.ServiceRegister.Respond.service_infos)
+  return service_infos_.MutableMap();
 }
 
 // -------------------------------------------------------------------
 
-// TransferAssestInfo
-
-// string file_name = 1;
-inline void TransferAssestInfo::clear_file_name() {
-  file_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& TransferAssestInfo::file_name() const {
-  // @@protoc_insertion_point(field_get:PB.TransferAssestInfo.file_name)
-  return file_name_.GetNoArena();
-}
-inline void TransferAssestInfo::set_file_name(const ::std::string& value) {
-  
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.TransferAssestInfo.file_name)
-}
-#if LANG_CXX11
-inline void TransferAssestInfo::set_file_name(::std::string&& value) {
-  
-  file_name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.TransferAssestInfo.file_name)
-}
-#endif
-inline void TransferAssestInfo::set_file_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.TransferAssestInfo.file_name)
-}
-inline void TransferAssestInfo::set_file_name(const char* value, size_t size) {
-  
-  file_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.TransferAssestInfo.file_name)
-}
-inline ::std::string* TransferAssestInfo::mutable_file_name() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.TransferAssestInfo.file_name)
-  return file_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* TransferAssestInfo::release_file_name() {
-  // @@protoc_insertion_point(field_release:PB.TransferAssestInfo.file_name)
-  
-  return file_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void TransferAssestInfo::set_allocated_file_name(::std::string* file_name) {
-  if (file_name != nullptr) {
-    
-  } else {
-    
-  }
-  file_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_name);
-  // @@protoc_insertion_point(field_set_allocated:PB.TransferAssestInfo.file_name)
-}
-
-// bytes file_content = 2;
-inline void TransferAssestInfo::clear_file_content() {
-  file_content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& TransferAssestInfo::file_content() const {
-  // @@protoc_insertion_point(field_get:PB.TransferAssestInfo.file_content)
-  return file_content_.GetNoArena();
-}
-inline void TransferAssestInfo::set_file_content(const ::std::string& value) {
-  
-  file_content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.TransferAssestInfo.file_content)
-}
-#if LANG_CXX11
-inline void TransferAssestInfo::set_file_content(::std::string&& value) {
-  
-  file_content_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.TransferAssestInfo.file_content)
-}
-#endif
-inline void TransferAssestInfo::set_file_content(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  file_content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.TransferAssestInfo.file_content)
-}
-inline void TransferAssestInfo::set_file_content(const void* value, size_t size) {
-  
-  file_content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.TransferAssestInfo.file_content)
-}
-inline ::std::string* TransferAssestInfo::mutable_file_content() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.TransferAssestInfo.file_content)
-  return file_content_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* TransferAssestInfo::release_file_content() {
-  // @@protoc_insertion_point(field_release:PB.TransferAssestInfo.file_content)
-  
-  return file_content_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void TransferAssestInfo::set_allocated_file_content(::std::string* file_content) {
-  if (file_content != nullptr) {
-    
-  } else {
-    
-  }
-  file_content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_content);
-  // @@protoc_insertion_point(field_set_allocated:PB.TransferAssestInfo.file_content)
-}
-
-// -------------------------------------------------------------------
-
-// ServerRunInfo
-
-// string server_name = 1;
-inline void ServerRunInfo::clear_server_name() {
-  server_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ServerRunInfo::server_name() const {
-  // @@protoc_insertion_point(field_get:PB.ServerRunInfo.server_name)
-  return server_name_.GetNoArena();
-}
-inline void ServerRunInfo::set_server_name(const ::std::string& value) {
-  
-  server_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.ServerRunInfo.server_name)
-}
-#if LANG_CXX11
-inline void ServerRunInfo::set_server_name(::std::string&& value) {
-  
-  server_name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.ServerRunInfo.server_name)
-}
-#endif
-inline void ServerRunInfo::set_server_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  server_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.ServerRunInfo.server_name)
-}
-inline void ServerRunInfo::set_server_name(const char* value, size_t size) {
-  
-  server_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.ServerRunInfo.server_name)
-}
-inline ::std::string* ServerRunInfo::mutable_server_name() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.ServerRunInfo.server_name)
-  return server_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ServerRunInfo::release_server_name() {
-  // @@protoc_insertion_point(field_release:PB.ServerRunInfo.server_name)
-  
-  return server_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ServerRunInfo::set_allocated_server_name(::std::string* server_name) {
-  if (server_name != nullptr) {
-    
-  } else {
-    
-  }
-  server_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), server_name);
-  // @@protoc_insertion_point(field_set_allocated:PB.ServerRunInfo.server_name)
-}
-
-// int32 server_areaId = 2;
-inline void ServerRunInfo::clear_server_areaid() {
-  server_areaid_ = 0;
-}
-inline ::google::protobuf::int32 ServerRunInfo::server_areaid() const {
-  // @@protoc_insertion_point(field_get:PB.ServerRunInfo.server_areaId)
-  return server_areaid_;
-}
-inline void ServerRunInfo::set_server_areaid(::google::protobuf::int32 value) {
-  
-  server_areaid_ = value;
-  // @@protoc_insertion_point(field_set:PB.ServerRunInfo.server_areaId)
-}
-
-// int64 server_run_time = 3;
-inline void ServerRunInfo::clear_server_run_time() {
-  server_run_time_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 ServerRunInfo::server_run_time() const {
-  // @@protoc_insertion_point(field_get:PB.ServerRunInfo.server_run_time)
-  return server_run_time_;
-}
-inline void ServerRunInfo::set_server_run_time(::google::protobuf::int64 value) {
-  
-  server_run_time_ = value;
-  // @@protoc_insertion_point(field_set:PB.ServerRunInfo.server_run_time)
-}
-
-// float server_fps = 4;
-inline void ServerRunInfo::clear_server_fps() {
-  server_fps_ = 0;
-}
-inline float ServerRunInfo::server_fps() const {
-  // @@protoc_insertion_point(field_get:PB.ServerRunInfo.server_fps)
-  return server_fps_;
-}
-inline void ServerRunInfo::set_server_fps(float value) {
-  
-  server_fps_ = value;
-  // @@protoc_insertion_point(field_set:PB.ServerRunInfo.server_fps)
-}
-
-// float logic_time = 5;
-inline void ServerRunInfo::clear_logic_time() {
-  logic_time_ = 0;
-}
-inline float ServerRunInfo::logic_time() const {
-  // @@protoc_insertion_point(field_get:PB.ServerRunInfo.logic_time)
-  return logic_time_;
-}
-inline void ServerRunInfo::set_logic_time(float value) {
-  
-  logic_time_ = value;
-  // @@protoc_insertion_point(field_set:PB.ServerRunInfo.logic_time)
-}
+// ServiceRegister
 
 // -------------------------------------------------------------------
 
@@ -2599,35 +2268,35 @@ inline void ServiceData::set_allocated_service_address(::std::string* service_ad
 
 // -------------------------------------------------------------------
 
-// ServiceDataList
+// ServicesNotice
 
 // repeated .PB.ServiceData services = 1;
-inline int ServiceDataList::services_size() const {
+inline int ServicesNotice::services_size() const {
   return services_.size();
 }
-inline void ServiceDataList::clear_services() {
+inline void ServicesNotice::clear_services() {
   services_.Clear();
 }
-inline ::PB::ServiceData* ServiceDataList::mutable_services(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.ServiceDataList.services)
+inline ::PB::ServiceData* ServicesNotice::mutable_services(int index) {
+  // @@protoc_insertion_point(field_mutable:PB.ServicesNotice.services)
   return services_.Mutable(index);
 }
 inline ::google::protobuf::RepeatedPtrField< ::PB::ServiceData >*
-ServiceDataList::mutable_services() {
-  // @@protoc_insertion_point(field_mutable_list:PB.ServiceDataList.services)
+ServicesNotice::mutable_services() {
+  // @@protoc_insertion_point(field_mutable_list:PB.ServicesNotice.services)
   return &services_;
 }
-inline const ::PB::ServiceData& ServiceDataList::services(int index) const {
-  // @@protoc_insertion_point(field_get:PB.ServiceDataList.services)
+inline const ::PB::ServiceData& ServicesNotice::services(int index) const {
+  // @@protoc_insertion_point(field_get:PB.ServicesNotice.services)
   return services_.Get(index);
 }
-inline ::PB::ServiceData* ServiceDataList::add_services() {
-  // @@protoc_insertion_point(field_add:PB.ServiceDataList.services)
+inline ::PB::ServiceData* ServicesNotice::add_services() {
+  // @@protoc_insertion_point(field_add:PB.ServicesNotice.services)
   return services_.Add();
 }
 inline const ::google::protobuf::RepeatedPtrField< ::PB::ServiceData >&
-ServiceDataList::services() const {
-  // @@protoc_insertion_point(field_list:PB.ServiceDataList.services)
+ServicesNotice::services() const {
+  // @@protoc_insertion_point(field_list:PB.ServicesNotice.services)
   return services_;
 }
 

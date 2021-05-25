@@ -36,14 +36,15 @@ namespace SoEasy
 		bool OnInit() override;
 		void OnInitComplete() override;
 	private:
-		XCode Register(long long id, shared_ptr<ServiceDataList> actionInfo, shared_ptr<ServiceDataList> returnData);
-		XCode QueryService(long long id, shared_ptr<Int32Data> areaId, shared_ptr<ServiceDataList> returnData);
+		XCode Register(long long id, shared_ptr<ServiceRegister_Request> actionInfo, shared_ptr<ServiceRegister_Respond> returnData);
 	private:
-		void AddActionInfo(ActionProxyInfo & actionInfo);
+		void RefreshServices(int areaId);
+		int AddService(int areaId, const std::string & name, const std::string & address);
 	private:
-		unsigned short mServiceIndex;
+		int mServiceIndex;
 		class NetWorkManager * mNetWorkManager;
-		std::vector<ProxyService *> mActionRegisterList;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
+		std::unordered_map<int, ProxyService *> mServiceMap;
+		std::unordered_map<int, std::set<std::string>> mQuerySessionMap;
 	};
 }

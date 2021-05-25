@@ -25,21 +25,15 @@ namespace SoEasy
 		LocalService * GetLocalService(const std::string & name);
 		SharedTcpSession GetProxySession(const std::string & address);
 	public:
-		void GetLocalServices(std::vector<LocalService *> services);
+		bool RemoveProxyervice(const int id);
+	public:
+		void GetLocalServices(std::vector<LocalService *> & services);
+		void AddProxyService(const std::string & name, int areaId, int serviceId, const std::string & address);
 	private:
-		void StartRegister();
-		void QueryRemoteService();
 		bool CreateLocalService();
 	private:
-		int mAreaId;	//区服id
-		std::string mQueryIp;	//查询地址的ip
-		unsigned short mQueryPort;  // 查询地址的port
-		std::string mQueryAddress;
-		std::string mListenAddress;
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
-		class ListenerManager * mListenerManager;
-		shared_ptr<TcpClientSession> mQuerySession;
 		std::unordered_map<int, ProxyService *> mProxyServiceMap;//action地址
 		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mActionSessionMap; //服务通信session

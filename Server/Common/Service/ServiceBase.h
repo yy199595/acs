@@ -15,16 +15,19 @@ namespace SoEasy
 	public:
 		virtual bool OnInit();
 		virtual void OnInitComplete() { };
-		virtual void OnSystemUpdate() { }	
+		virtual void OnSystemUpdate() { };
+		virtual void OnConnectDone(SharedTcpSession tcpSession) { }
 	public:
 		bool IsInit() { return this->mIsInit; }
+		virtual const std::string & GetServiceName() = 0;
 		const int GetServiceId() { return this->mServiceId; }
-		const std::string & GetServiceName() { return this->mServiceName; }
-	protected:
-		
+ 	protected:
 		virtual bool HandleMessage(shared_ptr<NetWorkPacket>) = 0;
 	public:
-		void InitService(const std::string & name, int id);
+		void Sleep(long long ms);
+		void Start(const std::string & name, std::function<void()> && func);
+	public:
+		void InitService(int serviceId);
 	public:
 		XCode Call(const std::string method, Message & returnData);
 		XCode Call(const std::string method, shared_ptr<Message> message = nullptr);
@@ -34,7 +37,6 @@ namespace SoEasy
 	private:
 		bool mIsInit;
 		int mServiceId;
-		std::string mServiceName;
 		class ActionManager * mActionManager;
 		class CoroutineManager * mCorManager;
 	};

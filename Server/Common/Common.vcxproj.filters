@@ -243,6 +243,9 @@
     <ClCompile Include="Service\ServiceBase.cpp">
       <Filter>Service</Filter>
     </ClCompile>
+    <ClCompile Include="Service\ClusterService.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -528,6 +531,9 @@
       <Filter>Service</Filter>
     </ClInclude>
     <ClInclude Include="Service\ServiceBase.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\ClusterService.h">
       <Filter>Service</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,6 +9,18 @@ namespace SoEasy
 		
 	}
 
+	SharedTcpSession LocalService::GetCurTcpSession()
+	{
+		long long currentId = this->mCorManager->GetCurrentCorId();
+		auto iter = this->mCurrentSessionMap.find(currentId);
+		if (iter != this->mCurrentSessionMap.end())
+		{
+			const std::string & address = iter->second;
+			return this->mNetWorkManager->GetTcpSession(address);
+		}
+		return nullptr;
+	}
+
 	XCode LocalService::CallAction(SharedPacket request, SharedPacket returnData)
 	{
 		const std::string & action = request->action();
@@ -98,6 +110,8 @@ namespace SoEasy
 		this->mCorManager->Start(action, [address, this, packet, localAction]()
 		{
 			SharedPacket retData = make_shared<NetWorkPacket>();
+			long long currentId = this->mCorManager->GetCurrentCorId();
+			this->mCurrentSessionMap.emplace(currentId, address);
 			XCode code = localAction->Invoke(packet, retData);
 			if (packet->callback_id() != 0)
 			{
@@ -105,6 +119,11 @@ namespace SoEasy
 				retData->set_callback_id(packet->callback_id());
 				retData->set_operator_id(packet->operator_id());
 				this->mNetWorkManager->SendMessageByAdress(address, retData);
+			}
+			auto iter = mCurrentSessionMap.find(currentId);
+			if (iter != mCurrentSessionMap.end())
+			{
+				mCurrentSessionMap.erase(iter);
 			}
 		});
 		return true;

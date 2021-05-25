@@ -4,9 +4,9 @@
 namespace SoEasy
 {
 	ProxyService::ProxyService(const std::string & name, const std::string & address, int id, int areaId)
-		: mServiceAddress(address), mAreaId(areaId)
+		: mServiceAddress(address), mAreaId(areaId), mServiceName(name)
 	{
-		this->InitService(name, id);
+		this->InitService(id);
 	}
 
 	bool ProxyService::OnInit()
@@ -18,7 +18,7 @@ namespace SoEasy
 
 	void ProxyService::OnSystemUpdate()
 	{
-		if (this->mProxyMessageQueue.empty())
+		if (!this->mProxyMessageQueue.empty())
 		{
 			while (mProxyServiceSession->IsActive() && this->mProxyMessageQueue.empty())
 			{

@@ -16,13 +16,24 @@ namespace SoEasy
 		return true;
 	}
 
-	void ServiceBase::InitService(const std::string & name, int id)
+	void ServiceBase::Sleep(long long ms)
+	{
+		SayNoAssertRet_F(this->mCorManager->IsInMainCoroutine());
+		this->mCorManager->Sleep(ms);
+	}
+
+	void ServiceBase::Start(const std::string & name, std::function<void()> && func)
+	{
+		SayNoAssertRet_F(this->mCorManager->IsInMainCoroutine());
+		this->mCorManager->Start(name, std::move(func));
+	}
+
+	void ServiceBase::InitService(int serviceId)
 	{
 		if (this->mIsInit == false)
 		{
-			this->mServiceId = id;
-			this->mServiceName = name;
 			this->mIsInit = true;
+			this->mServiceId = serviceId;
 		}
 	}
 
@@ -96,7 +107,7 @@ namespace SoEasy
 		this->mActionManager->AddCallback(callBack, id);
 		callData->set_action(func);
 		callData->set_callback_id(id);
-		callData->set_service(this->mServiceName);
+		callData->set_service(this->GetTypeName());
 		return callData;
 	}
 }

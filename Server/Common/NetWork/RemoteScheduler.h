@@ -11,8 +11,7 @@ namespace SoEasy
 	class RemoteScheduler
 	{
 	public:
-		RemoteScheduler(long long operaotrId = 0);
-		RemoteScheduler(shared_ptr<TcpClientSession>, long long operId = 0);
+		RemoteScheduler(shared_ptr<TcpClientSession>);
 		~RemoteScheduler() { }
 	public:
 		XCode Call(const std::string service, std::string func);
@@ -34,7 +33,6 @@ namespace SoEasy
 		XCode SendCallMessage(const std::string & service, std::string & func, LuaTable & message, shared_ptr<LocalRetActionProxy> action = nullptr);
 		XCode SendCallMessage(const std::string & service, std::string & func, Message * message = nullptr, shared_ptr<LocalRetActionProxy> action = nullptr);
 	public:
-		long long mOperatorId;
 		std::string mMessageBuffer;
 		std::string mBindSessionAdress;
 		NetWorkManager * mNetWorkManager;

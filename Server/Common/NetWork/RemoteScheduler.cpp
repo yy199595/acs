@@ -7,17 +7,10 @@
 #include<Manager/ActionManager.h>
 namespace SoEasy
 {
-	RemoteScheduler::RemoteScheduler(long long operaotrId)
-	{
-		this->mOperatorId = operaotrId;
-		Applocation * pApplocation = Applocation::Get();
-		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
-		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
-	}
+	
 
-	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session, long long operId)
+	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session)
 	{
-		this->mOperatorId = operId;
 		this->mBindSessionAdress = session->GetAddress();
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
@@ -85,7 +78,6 @@ namespace SoEasy
 		newCallData->set_service(service);
 		newCallData->set_action(func);
 		newCallData->set_callback_id(callbackId);
-		newCallData->set_operator_id(mOperatorId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 
@@ -105,7 +97,6 @@ namespace SoEasy
 		newCallData->set_service(func);
 
 		newCallData->set_callback_id(callbakcId);
-		newCallData->set_operator_id(mOperatorId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);
 	}
 

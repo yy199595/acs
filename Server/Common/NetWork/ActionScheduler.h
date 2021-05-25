@@ -11,8 +11,7 @@ namespace SoEasy
 	class ActionScheduler
 	{
 	public:
-		ActionScheduler(long long operId = 0);
-		ActionScheduler(shared_ptr<TcpClientSession> session, long long operId = 0);
+		ActionScheduler(shared_ptr<TcpClientSession> session);
 	public:
 		XCode Call(const std::string & service, const std::string func, Message & returnData);
 		XCode Call(const std::string & service, const std::string func, shared_ptr<Message> message = nullptr);
@@ -21,7 +20,6 @@ namespace SoEasy
 		void InitScheduler();
 		XCode SendCallMessage(const std::string & service, const std::string & func, shared_ptr<Message> message, shared_ptr<LocalRetActionProxy> callBack);
 	private:
-		long long mOperatorId;
 		std::string mSessionAddress;
 		NetWorkManager * mNetWorkManager;
 		ActionManager * mActionManager;

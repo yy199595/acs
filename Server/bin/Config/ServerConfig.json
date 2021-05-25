@@ -1,5 +1,6 @@
 {
     "AreaId": 0,
+    "ServerId": 1,
     "LogicFps": 30,
     "SystemFps":100,
     "MsgTimeout":0,
@@ -36,6 +37,7 @@
     ],
     "Service":[
         "LoginService",
+        "ClusterService",
         "ServiceRegistry"
     ],
     "WhiteList": [

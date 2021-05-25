@@ -3,6 +3,7 @@
 #include<Core/TcpSessionListener.h>
 #include<Util/StringHelper.h>
 #include<Manager/NetWorkManager.h>
+#include<NetWork/ActionScheduler.h>
 #include<NetWork/RemoteScheduler.h>
 #include<Protocol/ServerCommon.pb.h>
 #include<Coroutine/CoroutineManager.h>
@@ -14,66 +15,98 @@ namespace SoEasy
 	{
 
 	}
+
 	bool ServiceRegistry::OnInit()
 	{
 		this->mServiceIndex = 100;
 		SayNoAssertRetFalse_F(LocalService::OnInit());
-		REGISTER_FUNCTION_2(ServiceRegistry::Register, ServiceDataList, ServiceDataList);
-		REGISTER_FUNCTION_2(ServiceRegistry::QueryService, Int32Data, ServiceDataList);
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		REGISTER_FUNCTION_2(ServiceRegistry::Register, ServiceRegister_Request, ServiceRegister_Respond);
 		return true;
 	}
 
 	void ServiceRegistry::OnInitComplete()
 	{
-		
+
 	}
 
-	XCode ServiceRegistry::Register(long long operId, shared_ptr<ServiceDataList> actions, shared_ptr<ServiceDataList> returnData)
+	XCode ServiceRegistry::Register(long long operId, shared_ptr<ServiceRegister_Request> actionInfo, shared_ptr<ServiceRegister_Respond> returnData)
 	{
-		for (int index = 0; index < actions->services_size(); index++)
+		int areaId = actionInfo->area_id();
+		const std::string & address = actionInfo->service_address();
+		for (int index = 0; index < actionInfo->service_names_size(); index++)
 		{
-			const ServiceData & serviceData = actions->services(index);
-			int areaId = serviceData.adreid();
-			const std::string & name = serviceData.service_name();
-			const std::string & address = serviceData.service_address();
-			const int serviceid = areaId << 32 | (this->mServiceIndex++);			
-			
-			ServiceData * retServiceData = returnData->add_services();
-			if (retServiceData != nullptr)
-			{
-				retServiceData->CopyFrom(serviceData);
-				retServiceData->set_service_id(serviceid);
-			}
-
-			SayNoDebugInfo("register service " << name << " " << address << " " << serviceid);
-			this->mActionRegisterList.push_back(new ProxyService(name, address, serviceid, areaId));
+			const std::string & name = actionInfo->service_names(index);
+			const int serviceId = this->AddService(areaId, name, address);
+			returnData->mutable_service_infos()->insert({ name, serviceId });
+			SayNoDebugLog("register service " << areaId << " " << name << "  " << address);
 		}
+		SharedTcpSession tcpSession = this->GetCurTcpSession();
+		auto iter = this->mQuerySessionMap.find(areaId);
+		if (iter == this->mQuerySessionMap.end())
+		{
+			std::set<std::string> tempArray;
+			this->mQuerySessionMap.emplace(areaId, tempArray);
+		}
+		this->mQuerySessionMap[areaId].insert(tcpSession->GetAddress());
+
+		this->RefreshServices(areaId);
 		return XCode::Successful;
 	}
 
-	XCode ServiceRegistry::QueryService(long long operId, shared_ptr<Int32Data> requestData, shared_ptr<ServiceDataList> returnData)
+	void ServiceRegistry::RefreshServices(int areaId)
 	{
-		const int areaId = requestData->data();
-		for (size_t index = 0; index < this->mActionRegisterList.size(); index++)
+		ServicesNotice serviceDatas;
+		for (auto iter = this->mServiceMap.begin(); iter != this->mServiceMap.end(); iter++)
 		{
-			ProxyService * proxyService = this->mActionRegisterList[index];
-			if (proxyService->GetAreaId() == 0 || proxyService->GetAreaId() == areaId)
+			ProxyService * service = iter->second;
+			if (service != nullptr && (service->GetAreaId() == areaId || service->GetAreaId() == 0))
 			{
-				ServiceData * serviceData = returnData->add_services();
+				ServiceData * serviceData = serviceDatas.add_services();
 				if (serviceData != nullptr)
 				{
-					serviceData->set_adreid(proxyService->GetAreaId());
-					serviceData->set_service_id(proxyService->GetServiceId());
-					serviceData->set_service_address(proxyService->GetAddress());
-					serviceData->set_service_name(proxyService->GetServiceName());
+					serviceData->set_adreid(service->GetAreaId());
+					serviceData->set_service_id(service->GetServiceId());
+					serviceData->set_service_address(service->GetAddress());
+					serviceData->set_service_name(service->GetServiceName());
 				}
 			}
 		}
-		return XCode::Successful;
+
+		auto iter1 = this->mQuerySessionMap.find(areaId);
+		if (iter1 != this->mQuerySessionMap.end())
+		{
+			for (const std::string & address : iter1->second)
+			{
+				SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
+				if (tcpSession != nullptr)
+				{
+					RemoteScheduler remoteShceduler(tcpSession);
+					remoteShceduler.Call("ClusterService", "RefreshServices", &serviceDatas);
+				}
+			}
+		}
 	}
 
-	void ServiceRegistry::AddActionInfo(ActionProxyInfo & actionInfo)
+	int ServiceRegistry::AddService(int areaId, const std::string & name, const std::string & address)
 	{
-		
+		auto iter = this->mServiceMap.begin();
+		for (; iter != this->mServiceMap.end(); iter++)
+		{
+			ProxyService * service = iter->second;
+			if (service->GetAreaId() == areaId && service->GetServiceName() == name && service->GetAddress() == address)
+			{
+				return service->GetServiceId();
+			}
+		}
+		const int serviceId = this->mServiceIndex++;
+		ProxyService * proxyService = new ProxyService(name, address, serviceId, areaId);
+		if (proxyService != nullptr)
+		{
+			proxyService->Init(this->GetApp(), name);
+			this->mServiceMap.insert(std::make_pair(serviceId, proxyService));
+			return proxyService->GetServiceId();
+		}
+		return 0;
 	}
 }

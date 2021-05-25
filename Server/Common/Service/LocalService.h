@@ -12,6 +12,7 @@ namespace SoEasy
 	public:
 		bool HasAction(const std::string & action);
 		void AddActionArgv(const std::string & address, SharedPacket argv);
+		const std::string & GetServiceName() final { return this->GetTypeName(); }
 	public:
 		 bool OnInit() override;
 		 void OnSystemUpdate() override;
@@ -27,7 +28,9 @@ namespace SoEasy
 
 		template<typename T1, typename T2>
 		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
+
 	protected:
+		SharedTcpSession GetCurTcpSession();
 		XCode CallAction(SharedPacket request, SharedPacket returnData);
 		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	private:
@@ -35,6 +38,7 @@ namespace SoEasy
 		class CoroutineManager * mCorManager;
 		class NetWorkManager * mNetWorkManager;
 		DoubleBufferQueue<SharedNetPacket> mHandleMessageQueue;
+		std::unordered_map<long long, std::string> mCurrentSessionMap;
 		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
 	};
 

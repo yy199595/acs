@@ -71,15 +71,7 @@ namespace SoEasy
 
 	void RedisManager::OnInitComplete()
 	{
-		//this->InvokeCommand("FLUSHALL");
-		std::string value;
-		this->SetValue("name", std::string("19959510"));
-		this->GetValue("name", value);
-		SayNoDebugInfo("name = " << value);
-		this->mCoroutineScheduler->Sleep(6000);
-		value = "";
-		this->GetValue("name", value);
-		SayNoDebugFatal("name = " << value);
+		
 	}
 
 	void RedisManager::PushClassToLua(lua_State * luaEnv)

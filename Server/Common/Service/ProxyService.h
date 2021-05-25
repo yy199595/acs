@@ -11,6 +11,8 @@ namespace SoEasy
 	public:
 		const int GetAreaId() { return this->mAreaId; }
 		const std::string & GetAddress() { return this->mServiceAddress; }
+		const std::string & GetServiceName() final { return mServiceName; }
+
 	public:
 		 bool OnInit() final;
 		 void OnSystemUpdate() final;
@@ -18,6 +20,7 @@ namespace SoEasy
 		bool HandleMessage(shared_ptr<NetWorkPacket> messageData) final;
 	private:
 		int mAreaId;
+		const std::string mServiceName;
 		const std::string mServiceAddress;
 		class NetWorkManager * mNetManager;
 		SharedTcpSession mProxyServiceSession;
