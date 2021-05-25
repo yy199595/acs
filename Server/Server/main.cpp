@@ -34,21 +34,21 @@ int main(int argc, char ** argv)
 { 
 	
 	
-	ObjectRegistry<Manager>::RegisterManager<ProxyManager>("ProxyManager");
-	ObjectRegistry<Manager>::RegisterManager<RedisManager>("RedisManager");
-	ObjectRegistry<Manager>::RegisterManager<MysqlManager>("MysqlManager");
-	ObjectRegistry<Manager>::RegisterManager<TimerManager>("TimerManager");
-	ObjectRegistry<Manager>::RegisterManager<ActionManager>("ActionManager");
-	ObjectRegistry<Manager>::RegisterManager<ScriptManager>("ScriptManager");
-	ObjectRegistry<Manager>::RegisterManager<ServiceManager>("ServiceManager");
-	ObjectRegistry<Manager>::RegisterManager<NetWorkManager>("NetWorkManager");
-	ObjectRegistry<Manager>::RegisterManager<ConsoleManager>("ConsoleManager");
-	ObjectRegistry<Manager>::RegisterManager<ListenerManager>("ListenerManager");
-	ObjectRegistry<Manager>::RegisterManager<CoroutineManager>("CoroutineManager");
-	ObjectRegistry<Manager>::RegisterManager<LocalAccessManager>("LocalAccessManager");
+	ObjectRegistry<Manager>::Register<ProxyManager>("ProxyManager");
+	ObjectRegistry<Manager>::Register<RedisManager>("RedisManager");
+	ObjectRegistry<Manager>::Register<MysqlManager>("MysqlManager");
+	ObjectRegistry<Manager>::Register<TimerManager>("TimerManager");
+	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
+	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
+	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
+	ObjectRegistry<Manager>::Register<NetWorkManager>("NetWorkManager");
+	ObjectRegistry<Manager>::Register<ConsoleManager>("ConsoleManager");
+	ObjectRegistry<Manager>::Register<ListenerManager>("ListenerManager");
+	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
+	ObjectRegistry<Manager>::Register<LocalAccessManager>("LocalAccessManager");
 
-	ObjectRegistry<LocalService>::RegisterManager<LoginService>("LoginService");
-	ObjectRegistry<LocalService>::RegisterManager<ServiceRegistry>("ServiceRegistry");
+	ObjectRegistry<LocalService>::Register<LoginService>("LoginService");
+	ObjectRegistry<LocalService>::Register<ServiceRegistry>("ServiceRegistry");
 
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
