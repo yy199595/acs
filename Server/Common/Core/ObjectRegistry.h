@@ -8,7 +8,7 @@ namespace SoEasy
 	{
 	public:
 		template<typename T>
-		static bool RegisterManager(const std::string name);
+		static bool Register(const std::string name);
 		static Base * Create(const std::string name);
 		static bool GetTypeName(const size_t hash, std::string & name);
 	private:
@@ -26,7 +26,7 @@ namespace SoEasy
 
 	template<typename Base>
 	template<typename T>
-	inline bool ObjectRegistry<Base>::RegisterManager(const std::string name)
+	inline bool ObjectRegistry<Base>::Register(const std::string name)
 	{
 		size_t hash = typeid(T).hash_code();
 		auto iter = mCreateActions.find(name);

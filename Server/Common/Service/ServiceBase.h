@@ -10,16 +10,18 @@ namespace SoEasy
 	class ServiceBase : public Object
 	{
 	public:
-		ServiceBase() { }
+		ServiceBase();
 		virtual ~ServiceBase() { }
 	public:
 		virtual bool OnInit();
-		virtual void OnSystemUpdate() { }
 		virtual void OnInitComplete() { };
+		virtual void OnSystemUpdate() { }	
 	public:
+		bool IsInit() { return this->mIsInit; }
 		const int GetServiceId() { return this->mServiceId; }
 		const std::string & GetServiceName() { return this->mServiceName; }
 	protected:
+		
 		virtual bool HandleMessage(shared_ptr<NetWorkPacket>) = 0;
 	public:
 		void InitService(const std::string & name, int id);
@@ -30,6 +32,7 @@ namespace SoEasy
 	private:
 		shared_ptr<NetWorkPacket> CreatePacket(const std::string & func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack);
 	private:
+		bool mIsInit;
 		int mServiceId;
 		std::string mServiceName;
 		class ActionManager * mActionManager;

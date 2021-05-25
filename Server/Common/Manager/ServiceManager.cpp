@@ -20,8 +20,9 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", mQueryAddress));
 		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(mQueryAddress, mQueryIp, mQueryPort));
 
+		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 		SayNoAssertRetFalse_F(this->mListenerManager = this->GetManager<ListenerManager>());
-		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
+		
 
 		this->mListenAddress = this->mListenerManager->GetAddress();
 		this->mQuerySession = make_shared<TcpClientSession>(this, "QuerySession", mQueryIp, mQueryPort);
@@ -31,14 +32,6 @@ namespace SoEasy
 	void ServiceManager::OnInitComplete()
 	{
 		this->mQuerySession->StartConnect();
-		CoroutineManager * coroutineMgr = this->GetManager<CoroutineManager>();
-		auto iter = this->mLocalServiceMap.begin();
-		for (; iter != this->mLocalServiceMap.end(); iter++)
-		{
-			LocalService * localService = iter->second;
-			SayNoDebugInfo("start " << iter->first << " service successful");
-			coroutineMgr->Start(localService->GetServiceName(), std::bind(&LocalService::OnInitComplete, localService));
-		}
 	}
 
 	void ServiceManager::OnSystemUpdate()
@@ -48,19 +41,19 @@ namespace SoEasy
 		for (; iter != this->mLocalServiceMap.end(); iter++)
 		{
 			LocalService * localService = iter->second;
-			if (localService != nullptr && localService->IsActive())
+			if (localService->IsActive())
 			{
 				localService->OnSystemUpdate();
-			}		
+			}
 		}
 		auto iter1 = this->mProxyServiceMap.begin();
 		for (; iter1 != this->mProxyServiceMap.end(); iter1++)
 		{
 			ProxyService * proxyService = iter1->second;
-			if (proxyService != nullptr && proxyService->IsActive())
+			if (proxyService->IsActive())
 			{
 				proxyService->OnSystemUpdate();
-			}		
+			}
 		}
 	}
 
@@ -74,7 +67,7 @@ namespace SoEasy
 		if (tcpSession == this->mQuerySession)
 		{
 			SayNoDebugInfo("connect query session successful");
-			this->mCoroutineManager->Start("ServiceOper", BIND_THIS_ACTION_0(ServiceManager::StartRegister));		
+			this->mCorManager->Start("ServiceOper", BIND_THIS_ACTION_0(ServiceManager::StartRegister));
 		}
 	}
 
@@ -93,9 +86,7 @@ namespace SoEasy
 			return false;
 		}
 		SayNoDebugLog("add new service " << name);
-		const std::string newName = name + ".Init";
-		this->mLocalServiceMap.emplace(name, service);
-		this->mCoroutineManager->Start(newName, BIND_ACTION_0(LocalService::OnInitComplete, service));		
+		this->mLocalServiceMap.emplace(name, service);	
 		return true;
 	}
 
@@ -147,6 +138,7 @@ namespace SoEasy
 
 	void ServiceManager::StartRegister()
 	{
+		//注册本机服务
 		shared_ptr<ServiceDataList> serviceList = make_shared<ServiceDataList>();
 		auto iter = this->mLocalServiceMap.begin();
 		for (; iter != this->mLocalServiceMap.end(); iter++)
@@ -163,20 +155,32 @@ namespace SoEasy
 		ServiceDataList retServiceDatas;
 		ActionScheduler actionSchduler(this->mQuerySession);
 		actionSchduler.Call("ServiceRegistry", "Register", serviceList, retServiceDatas);
+	
+		//查询远程服务
+		this->QueryRemoteService(); 
+
+		//初始化本机服务
 		for (int index = 0; index < retServiceDatas.services_size(); index++)
 		{
 			const ServiceData & serviceData = retServiceDatas.services(index);
 			LocalService * localService = this->GetLocalService(serviceData.service_name());
 			if (localService != nullptr)
 			{
+				const std::string name = serviceData.service_name() + ".Init";
 				localService->InitService(serviceData.service_name(), serviceData.service_id());
+				this->mCorManager->Start(name, BIND_ACTION_0(LocalService::OnInitComplete, localService));
 				SayNoDebugLog(serviceData.service_name() << " register sucessful " << serviceData.service_id());
 			}
 		}
+	}
 
-		retServiceDatas.Clear();
+	void ServiceManager::QueryRemoteService()
+	{
 		shared_ptr<Int32Data> data = make_shared<Int32Data>();
 		data->set_data(this->mAreaId);
+
+		ServiceDataList retServiceDatas;
+		ActionScheduler actionSchduler(this->mQuerySession);
 		actionSchduler.Call("ServiceRegistry", "QueryService", data, retServiceDatas);
 		for (int index = 0; index < retServiceDatas.services_size(); index++)
 		{
@@ -188,9 +192,15 @@ namespace SoEasy
 			{
 				const int areaId = serviceData.adreid();
 				const std::string & address = serviceData.service_address();
-				const std::string & serviceName = serviceData.service_name();
-				this->mProxyServiceMap.emplace(serviceId, new ProxyService(serviceName, address, serviceId, areaId));
-			}		
+				const std::string & serviceName = serviceData.service_name();//在本机创建远程服务副本
+				ProxyService * proxyService = new ProxyService(serviceName, address, serviceId, areaId);
+				if (proxyService != nullptr)
+				{
+					this->mProxyServiceMap.emplace(serviceId, proxyService);
+					const std::string name = serviceData.service_name() + ".Init";
+					this->mCorManager->Start(name, BIND_ACTION_0(ProxyService::OnInitComplete, proxyService));
+				}
+			}
 		}
 	}
 

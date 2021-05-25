@@ -65,6 +65,15 @@ namespace SoEasy
 			
 	}
 
+	void CoroutineManager::OnSystemUpdate()
+	{
+		while (!this->mWakeUpCoroutine.empty())
+		{
+			this->Resume(this->mWakeUpCoroutine.front());
+			this->mWakeUpCoroutine.pop();
+		}
+	}
+
 	long long CoroutineManager::Start(const std::string & name, CoroutineAction func)
 	{
 		long long id = this->Create(name, func);
@@ -110,7 +119,7 @@ namespace SoEasy
 	{
 		if (this->mCurrentCorId != 0)
 		{
-			SayNoDebugFatal("logic fail");
+			this->mWakeUpCoroutine.push(id);
 			return;
 		}
 		Coroutine * pCoroutine = this->GetCoroutine(id);
@@ -185,6 +194,7 @@ namespace SoEasy
 			Coroutine * cor = iter->second;
 			this->mCoroutineMap.erase(iter);
 			mDestoryCoroutine.push(cor);
+			SayNoDebugWarning("remove coroutine " << cor->mCoroutineName);
 #ifdef _WIN32	
 			SwitchToFiber(this->mMainCoroutineStack);
 #else

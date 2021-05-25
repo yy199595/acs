@@ -28,9 +28,10 @@ namespace SoEasy
 		void Sleep(long long ms);
 		void Resume(long long id);
 	protected:
-		bool OnInit() override;
-		void OnInitComplete() override;
-		void OnFrameUpdate(float t) override;
+		bool OnInit() final;
+		void OnInitComplete() final;
+		void OnSystemUpdate() final;					//处理系统事件
+		void OnFrameUpdate(float t) final;
 	public:
 		long long GetNowTime();
 		void Destory(long long id);
@@ -52,6 +53,7 @@ namespace SoEasy
 #endif
 		int mCoroutinePoolMaxSize;  //协程池默认数量
 		char mSharedStack[STACK_SIZE];
+		std::queue<long long> mWakeUpCoroutine;
 		std::queue<Coroutine *> mCoroutinePool;
 		std::queue<Coroutine *> mDestoryCoroutine;
 		std::unordered_map<long long, Coroutine *> mCoroutineMap;

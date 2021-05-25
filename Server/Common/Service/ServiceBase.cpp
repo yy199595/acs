@@ -4,6 +4,11 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
+	ServiceBase::ServiceBase()
+	{
+		this->mIsInit = false;
+		this->mServiceId = 0;
+	}
 	bool ServiceBase::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
@@ -13,8 +18,12 @@ namespace SoEasy
 
 	void ServiceBase::InitService(const std::string & name, int id)
 	{
-		this->mServiceId = id;
-		this->mServiceName = name;
+		if (this->mIsInit == false)
+		{
+			this->mServiceId = id;
+			this->mServiceName = name;
+			this->mIsInit = true;
+		}
 	}
 
 	XCode ServiceBase::Call(const std::string method, Message & returnData)
