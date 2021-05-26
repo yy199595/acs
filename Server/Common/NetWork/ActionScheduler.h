@@ -11,6 +11,7 @@ namespace SoEasy
 	class ActionScheduler
 	{
 	public:
+		ActionScheduler(const std::string & address);
 		ActionScheduler(shared_ptr<TcpClientSession> session);
 	public:
 		XCode Call(const std::string & service, const std::string func, Message & returnData);

@@ -7,14 +7,19 @@
 #include<Manager/ActionManager.h>
 namespace SoEasy
 {
-	
-
-	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session)
+	RemoteScheduler::RemoteScheduler(const std::string & address)
 	{
-		this->mBindSessionAdress = session->GetAddress();
+		this->mBindSessionAdress = address;
 		Applocation * pApplocation = Applocation::Get();
 		this->mNetWorkManager = pApplocation->GetManager<NetWorkManager>();
 		this->mFunctionManager = pApplocation->GetManager<ActionManager>();
+	}
+	RemoteScheduler::RemoteScheduler(shared_ptr<TcpClientSession> session)
+	{
+		Applocation * app = Applocation::Get();
+		this->mBindSessionAdress = session->GetAddress();
+		this->mNetWorkManager = app->GetManager<NetWorkManager>();
+		this->mFunctionManager = app->GetManager<ActionManager>();
 	}
 
 	XCode RemoteScheduler::Call(const std::string service, std::string func)

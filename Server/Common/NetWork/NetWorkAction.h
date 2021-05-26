@@ -78,16 +78,6 @@ namespace SoEasy
 			}
 			return this->mBindAction(operId, mRequestData);
 		}
-		else if (callbackId != 0)
-		{
-			XCode code = this->mBindAction(operId, mRequestData);
-			if (mRequestData->SerializePartialToString(&mMessageBuffer))
-			{
-				returnData->set_message_data(mMessageBuffer);
-				returnData->set_protoc_name(mRequestData->GetTypeName());
-			}
-			return code;
-		}
 		return XCode::Failure;
 	}
 }

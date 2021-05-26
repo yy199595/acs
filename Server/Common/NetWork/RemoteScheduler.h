@@ -11,6 +11,7 @@ namespace SoEasy
 	class RemoteScheduler
 	{
 	public:
+		RemoteScheduler(const std::string & address);
 		RemoteScheduler(shared_ptr<TcpClientSession>);
 		~RemoteScheduler() { }
 	public:

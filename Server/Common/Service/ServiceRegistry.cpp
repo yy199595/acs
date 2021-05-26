@@ -78,12 +78,8 @@ namespace SoEasy
 		{
 			for (const std::string & address : iter1->second)
 			{
-				SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
-				if (tcpSession != nullptr)
-				{
-					RemoteScheduler remoteShceduler(tcpSession);
-					remoteShceduler.Call("ClusterService", "RefreshServices", &serviceDatas);
-				}
+				RemoteScheduler remoteShceduler(address);
+				remoteShceduler.Call("ClusterService", "RefreshServices", &serviceDatas);
 			}
 		}
 	}

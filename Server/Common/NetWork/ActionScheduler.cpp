@@ -5,6 +5,11 @@
 #include<NetWork/NetWorkRetAction.h>
 namespace SoEasy
 {
+	ActionScheduler::ActionScheduler(const std::string & address)
+	{
+		this->InitScheduler();
+		this->mSessionAddress = address;
+	}
 	ActionScheduler::ActionScheduler(shared_ptr<TcpClientSession> session)
 	{
 		this->InitScheduler();
