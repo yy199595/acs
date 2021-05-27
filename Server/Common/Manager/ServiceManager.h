@@ -18,7 +18,7 @@ namespace SoEasy
 		void OnSessionErrorAfter(SharedTcpSession tcpSession) final;
 		void OnSessionConnectAfter(SharedTcpSession tcpSession) final;
 	public:
-		bool NewLocalService(const std::string & name);
+		ProxyService * AddProxyService(int areaId, int serviceId, const std::string name, const std::string address);
 	public:
 		ProxyService * GetProxyService(int id);
 		ProxyService * GetProxyService(const std::string & name);
@@ -28,10 +28,10 @@ namespace SoEasy
 		bool RemoveProxyervice(const int id);
 	public:
 		void GetLocalServices(std::vector<LocalService *> & services);
-		void AddProxyService(const std::string & name, int areaId, int serviceId, const std::string & address);
 	private:
 		bool CreateLocalService();
 	private:
+		int mNodeId;
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
 		std::unordered_map<int, ProxyService *> mProxyServiceMap;//actionµÿ÷∑

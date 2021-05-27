@@ -12,11 +12,10 @@ namespace SoEasy
 	public:
 		bool HasAction(const std::string & action);
 		void AddActionArgv(const std::string & address, SharedPacket argv);
-		const std::string & GetServiceName() final { return this->GetTypeName(); }
 	public:
 		 bool OnInit() override;
 		 void OnSystemUpdate() override;
-		 virtual void OnRefreshService() = 0;	//刷新服务表调用
+		 virtual void OnRefreshService() { };	//刷新服务表调用
 	private:
 		bool HandleMessage(SharedPacket packet) override;
 		bool HandleMessage(SharedTcpSession session, SharedPacket packet);

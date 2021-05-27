@@ -14,7 +14,9 @@ namespace SoEasy
 	
 	bool ServiceManager::OnInit()
 	{
+
 		SayNoAssertRetFalse_F(SessionManager::OnInit());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("Service", this->mServiceList));
 		
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
@@ -76,23 +78,25 @@ namespace SoEasy
 		}
 	}
 
-	bool ServiceManager::NewLocalService(const std::string & name)
+	ProxyService * ServiceManager::AddProxyService(int areaId, int serviceId, const std::string name, const std::string address)
 	{
-		LocalService * service = ObjectRegistry<LocalService>::Create(name);
-		if (service == nullptr)
+		auto iter = this->mProxyServiceMap.find(serviceId);
+		if (iter == this->mProxyServiceMap.end())
 		{
-			SayNoDebugError("create " << name << " service fail");
-			return false;
+			ProxyService * proxyService = new ProxyService(address, areaId);
+			if (proxyService != nullptr)
+			{
+				proxyService->InitService(name, serviceId);
+				if (proxyService->OnInit())
+				{
+					this->mProxyServiceMap.emplace(serviceId, proxyService);
+					SayNoDebugInfo("add new proxy service " << name << " " << serviceId);
+					return proxyService;
+				}
+			}
+			return nullptr;
 		}
-		
-		if (!service->OnInit())
-		{
-			SayNoDebugError("init " << name << " service fail");
-			return false;
-		}
-		SayNoDebugLog("add new service " << name);
-		this->mLocalServiceMap.emplace(name, service);	
-		return true;
+		return iter->second;
 	}
 
 	LocalService * ServiceManager::GetLocalService(const std::string & name)
@@ -141,21 +145,6 @@ namespace SoEasy
 		}
 	}
 
-	void ServiceManager::AddProxyService(const std::string & name, int areaId, int serviceId, const std::string & address)
-	{
-		auto iter = this->mProxyServiceMap.find(serviceId);
-		if (iter == this->mProxyServiceMap.end())
-		{
-			ProxyService * proxyService = new ProxyService(name, address, serviceId, areaId);
-			if (proxyService != nullptr)
-			{
-				proxyService->Init(this->GetApp(), name);
-				this->mProxyServiceMap.emplace(serviceId, proxyService);
-				this->mCorManager->Start(name + ".Init", BIND_ACTION_0(ProxyService::OnInitComplete, proxyService));
-			}
-		}
-	}
-
 	ProxyService * ServiceManager::GetProxyService(int id)
 	{
 		auto iter = this->mProxyServiceMap.find(id);
@@ -173,10 +162,21 @@ namespace SoEasy
 		for (size_t index = 0; index < this->mServiceList.size(); index++)
 		{
 			const std::string & name = this->mServiceList[index];
-			if (this->NewLocalService(name) == false)
+			LocalService * localService = ObjectRegistry<LocalService>::Create(name);
+			if (localService == nullptr)
 			{
+				SayNoDebugError("create " << name << " service fail");
 				return false;
 			}
+			int serviceId = (int)(this->mNodeId) << 16 | (index);
+			localService->InitService(name, serviceId);
+			if (!localService->OnInit())
+			{
+				SayNoDebugError("init " << name << " service fail");
+				return false;
+			}
+			SayNoDebugLog("add new service " << name << " id " << serviceId);
+			this->mLocalServiceMap.emplace(name, localService);
 		}
 		return true;
 	}

@@ -53,6 +53,7 @@
     <ClCompile Include="Other\AssestsFileInfo.cpp" />
     <ClCompile Include="Other\Command.cpp" />
     <ClCompile Include="Other\ObjectFactory.cpp" />
+    <ClCompile Include="Other\ServiceNode.cpp" />
     <ClCompile Include="Other\TimeRecorder.cpp" />
     <ClCompile Include="Script\BindLuaFunction.cpp" />
     <ClCompile Include="Script\ClassNameProxy.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="Other\Command.h" />
     <ClInclude Include="Other\DoubleBufferQueue.h" />
     <ClInclude Include="Other\ObjectFactory.h" />
+    <ClInclude Include="Other\ServiceNode.h" />
     <ClInclude Include="Other\TimeRecorder.h" />
     <ClInclude Include="Script\BindLuaFunction.h" />
     <ClInclude Include="Script\ClassMateProxy.h" />

@@ -28,12 +28,14 @@ namespace SoEasy
 		this->mCorManager->Start(name, std::move(func));
 	}
 
-	void ServiceBase::InitService(int serviceId)
+	void ServiceBase::InitService(const std::string & serviceName, int serviceId)
 	{
 		if (this->mIsInit == false)
 		{
 			this->mIsInit = true;
 			this->mServiceId = serviceId;
+			this->mServiceName = serviceName;
+			this->Init(Applocation::Get(), serviceName);
 		}
 	}
 
@@ -63,7 +65,7 @@ namespace SoEasy
 		{
 			return XCode::NoCoroutineContext;
 		}
-		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
+		if (!this->HandleMessage(this->CreatePacket(method, message, callBack)))
 		{
 			return XCode::HandleMessageFail;
 		}
@@ -89,6 +91,16 @@ namespace SoEasy
 		}
 		return callBack->GetCode();
 	}
+
+	XCode ServiceBase::Notice(const std::string method, shared_ptr<Message> message)
+	{
+		if (this->HandleMessage(this->CreatePacket(method, message, nullptr)))
+		{
+			return XCode::Successful;
+		}
+		return XCode::Failure;
+	}
+
 	shared_ptr<NetWorkPacket> ServiceBase::CreatePacket(const std::string & func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack)
 	{
 		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
@@ -103,10 +115,13 @@ namespace SoEasy
 			callData->set_message_data(messageBuffer);
 			callData->set_protoc_name(message->GetTypeName());
 		}
-		long long id = 0;
-		this->mActionManager->AddCallback(callBack, id);
+		if (callBack != nullptr)
+		{
+			long long id = 0;
+			this->mActionManager->AddCallback(callBack, id);
+			callData->set_callback_id(id);
+		}		
 		callData->set_action(func);
-		callData->set_callback_id(id);
 		callData->set_service(this->GetTypeName());
 		return callData;
 	}

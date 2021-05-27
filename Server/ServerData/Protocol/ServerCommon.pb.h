@@ -61,21 +61,21 @@ extern LogicServerListDataDefaultTypeInternal _LogicServerListData_default_insta
 class ServerRegisterBack;
 class ServerRegisterBackDefaultTypeInternal;
 extern ServerRegisterBackDefaultTypeInternal _ServerRegisterBack_default_instance_;
+class Service;
+class ServiceDefaultTypeInternal;
+extern ServiceDefaultTypeInternal _Service_default_instance_;
 class ServiceData;
 class ServiceDataDefaultTypeInternal;
 extern ServiceDataDefaultTypeInternal _ServiceData_default_instance_;
-class ServiceRegister;
-class ServiceRegisterDefaultTypeInternal;
-extern ServiceRegisterDefaultTypeInternal _ServiceRegister_default_instance_;
-class ServiceRegister_Request;
-class ServiceRegister_RequestDefaultTypeInternal;
-extern ServiceRegister_RequestDefaultTypeInternal _ServiceRegister_Request_default_instance_;
-class ServiceRegister_Respond;
-class ServiceRegister_RespondDefaultTypeInternal;
-extern ServiceRegister_RespondDefaultTypeInternal _ServiceRegister_Respond_default_instance_;
-class ServiceRegister_Respond_ServiceInfosEntry_DoNotUse;
-class ServiceRegister_Respond_ServiceInfosEntry_DoNotUseDefaultTypeInternal;
-extern ServiceRegister_Respond_ServiceInfosEntry_DoNotUseDefaultTypeInternal _ServiceRegister_Respond_ServiceInfosEntry_DoNotUse_default_instance_;
+class Service_NodeRegisterRequest;
+class Service_NodeRegisterRequestDefaultTypeInternal;
+extern Service_NodeRegisterRequestDefaultTypeInternal _Service_NodeRegisterRequest_default_instance_;
+class Service_RegisterRequest;
+class Service_RegisterRequestDefaultTypeInternal;
+extern Service_RegisterRequestDefaultTypeInternal _Service_RegisterRequest_default_instance_;
+class Service_RegisterRequest_MServiceMapEntry_DoNotUse;
+class Service_RegisterRequest_MServiceMapEntry_DoNotUseDefaultTypeInternal;
+extern Service_RegisterRequest_MServiceMapEntry_DoNotUseDefaultTypeInternal _Service_RegisterRequest_MServiceMapEntry_DoNotUse_default_instance_;
 class ServicesNotice;
 class ServicesNoticeDefaultTypeInternal;
 extern ServicesNoticeDefaultTypeInternal _ServicesNotice_default_instance_;
@@ -94,11 +94,11 @@ namespace protobuf {
 template<> ::PB::LogicServerData* Arena::CreateMaybeMessage<::PB::LogicServerData>(Arena*);
 template<> ::PB::LogicServerListData* Arena::CreateMaybeMessage<::PB::LogicServerListData>(Arena*);
 template<> ::PB::ServerRegisterBack* Arena::CreateMaybeMessage<::PB::ServerRegisterBack>(Arena*);
+template<> ::PB::Service* Arena::CreateMaybeMessage<::PB::Service>(Arena*);
 template<> ::PB::ServiceData* Arena::CreateMaybeMessage<::PB::ServiceData>(Arena*);
-template<> ::PB::ServiceRegister* Arena::CreateMaybeMessage<::PB::ServiceRegister>(Arena*);
-template<> ::PB::ServiceRegister_Request* Arena::CreateMaybeMessage<::PB::ServiceRegister_Request>(Arena*);
-template<> ::PB::ServiceRegister_Respond* Arena::CreateMaybeMessage<::PB::ServiceRegister_Respond>(Arena*);
-template<> ::PB::ServiceRegister_Respond_ServiceInfosEntry_DoNotUse* Arena::CreateMaybeMessage<::PB::ServiceRegister_Respond_ServiceInfosEntry_DoNotUse>(Arena*);
+template<> ::PB::Service_NodeRegisterRequest* Arena::CreateMaybeMessage<::PB::Service_NodeRegisterRequest>(Arena*);
+template<> ::PB::Service_RegisterRequest* Arena::CreateMaybeMessage<::PB::Service_RegisterRequest>(Arena*);
+template<> ::PB::Service_RegisterRequest_MServiceMapEntry_DoNotUse* Arena::CreateMaybeMessage<::PB::Service_RegisterRequest_MServiceMapEntry_DoNotUse>(Arena*);
 template<> ::PB::ServicesNotice* Arena::CreateMaybeMessage<::PB::ServicesNotice>(Arena*);
 template<> ::PB::UserAccountData* Arena::CreateMaybeMessage<::PB::UserAccountData>(Arena*);
 template<> ::PB::UserRegisterBack* Arena::CreateMaybeMessage<::PB::UserRegisterBack>(Arena*);
@@ -506,25 +506,25 @@ class ServerRegisterBack :
 };
 // -------------------------------------------------------------------
 
-class ServiceRegister_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister.Request) */ {
+class Service_NodeRegisterRequest :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Service.NodeRegisterRequest) */ {
  public:
-  ServiceRegister_Request();
-  virtual ~ServiceRegister_Request();
+  Service_NodeRegisterRequest();
+  virtual ~Service_NodeRegisterRequest();
 
-  ServiceRegister_Request(const ServiceRegister_Request& from);
+  Service_NodeRegisterRequest(const Service_NodeRegisterRequest& from);
 
-  inline ServiceRegister_Request& operator=(const ServiceRegister_Request& from) {
+  inline Service_NodeRegisterRequest& operator=(const Service_NodeRegisterRequest& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ServiceRegister_Request(ServiceRegister_Request&& from) noexcept
-    : ServiceRegister_Request() {
+  Service_NodeRegisterRequest(Service_NodeRegisterRequest&& from) noexcept
+    : Service_NodeRegisterRequest() {
     *this = ::std::move(from);
   }
 
-  inline ServiceRegister_Request& operator=(ServiceRegister_Request&& from) noexcept {
+  inline Service_NodeRegisterRequest& operator=(Service_NodeRegisterRequest&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -536,34 +536,34 @@ class ServiceRegister_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ServiceRegister_Request& default_instance();
+  static const Service_NodeRegisterRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServiceRegister_Request* internal_default_instance() {
-    return reinterpret_cast<const ServiceRegister_Request*>(
-               &_ServiceRegister_Request_default_instance_);
+  static inline const Service_NodeRegisterRequest* internal_default_instance() {
+    return reinterpret_cast<const Service_NodeRegisterRequest*>(
+               &_Service_NodeRegisterRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     3;
 
-  void Swap(ServiceRegister_Request* other);
-  friend void swap(ServiceRegister_Request& a, ServiceRegister_Request& b) {
+  void Swap(Service_NodeRegisterRequest* other);
+  friend void swap(Service_NodeRegisterRequest& a, Service_NodeRegisterRequest& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ServiceRegister_Request* New() const final {
-    return CreateMaybeMessage<ServiceRegister_Request>(nullptr);
+  inline Service_NodeRegisterRequest* New() const final {
+    return CreateMaybeMessage<Service_NodeRegisterRequest>(nullptr);
   }
 
-  ServiceRegister_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServiceRegister_Request>(arena);
+  Service_NodeRegisterRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Service_NodeRegisterRequest>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServiceRegister_Request& from);
-  void MergeFrom(const ServiceRegister_Request& from);
+  void CopyFrom(const Service_NodeRegisterRequest& from);
+  void MergeFrom(const Service_NodeRegisterRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -585,7 +585,7 @@ class ServiceRegister_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ServiceRegister_Request* other);
+  void InternalSwap(Service_NodeRegisterRequest* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -601,41 +601,19 @@ class ServiceRegister_Request :
 
   // accessors -------------------------------------------------------
 
-  // repeated string service_names = 3;
-  int service_names_size() const;
-  void clear_service_names();
-  static const int kServiceNamesFieldNumber = 3;
-  const ::std::string& service_names(int index) const;
-  ::std::string* mutable_service_names(int index);
-  void set_service_names(int index, const ::std::string& value);
+  // string node_address = 3;
+  void clear_node_address();
+  static const int kNodeAddressFieldNumber = 3;
+  const ::std::string& node_address() const;
+  void set_node_address(const ::std::string& value);
   #if LANG_CXX11
-  void set_service_names(int index, ::std::string&& value);
+  void set_node_address(::std::string&& value);
   #endif
-  void set_service_names(int index, const char* value);
-  void set_service_names(int index, const char* value, size_t size);
-  ::std::string* add_service_names();
-  void add_service_names(const ::std::string& value);
-  #if LANG_CXX11
-  void add_service_names(::std::string&& value);
-  #endif
-  void add_service_names(const char* value);
-  void add_service_names(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& service_names() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_service_names();
-
-  // string service_address = 2;
-  void clear_service_address();
-  static const int kServiceAddressFieldNumber = 2;
-  const ::std::string& service_address() const;
-  void set_service_address(const ::std::string& value);
-  #if LANG_CXX11
-  void set_service_address(::std::string&& value);
-  #endif
-  void set_service_address(const char* value);
-  void set_service_address(const char* value, size_t size);
-  ::std::string* mutable_service_address();
-  ::std::string* release_service_address();
-  void set_allocated_service_address(::std::string* service_address);
+  void set_node_address(const char* value);
+  void set_node_address(const char* value, size_t size);
+  ::std::string* mutable_node_address();
+  ::std::string* release_node_address();
+  void set_allocated_node_address(::std::string* node_address);
 
   // int32 area_id = 1;
   void clear_area_id();
@@ -643,20 +621,26 @@ class ServiceRegister_Request :
   ::google::protobuf::int32 area_id() const;
   void set_area_id(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:PB.ServiceRegister.Request)
+  // int32 node_id = 2;
+  void clear_node_id();
+  static const int kNodeIdFieldNumber = 2;
+  ::google::protobuf::int32 node_id() const;
+  void set_node_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:PB.Service.NodeRegisterRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> service_names_;
-  ::google::protobuf::internal::ArenaStringPtr service_address_;
+  ::google::protobuf::internal::ArenaStringPtr node_address_;
   ::google::protobuf::int32 area_id_;
+  ::google::protobuf::int32 node_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class ServiceRegister_Respond_ServiceInfosEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<ServiceRegister_Respond_ServiceInfosEntry_DoNotUse, 
+class Service_RegisterRequest_MServiceMapEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<Service_RegisterRequest_MServiceMapEntry_DoNotUse, 
     ::std::string, ::google::protobuf::int32,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
@@ -665,40 +649,40 @@ public:
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<ServiceRegister_Respond_ServiceInfosEntry_DoNotUse, 
+  typedef ::google::protobuf::internal::MapEntry<Service_RegisterRequest_MServiceMapEntry_DoNotUse, 
     ::std::string, ::google::protobuf::int32,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
     0 > SuperType;
-  ServiceRegister_Respond_ServiceInfosEntry_DoNotUse();
-  ServiceRegister_Respond_ServiceInfosEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse& other);
-  static const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const ServiceRegister_Respond_ServiceInfosEntry_DoNotUse*>(&_ServiceRegister_Respond_ServiceInfosEntry_DoNotUse_default_instance_); }
+  Service_RegisterRequest_MServiceMapEntry_DoNotUse();
+  Service_RegisterRequest_MServiceMapEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const Service_RegisterRequest_MServiceMapEntry_DoNotUse& other);
+  static const Service_RegisterRequest_MServiceMapEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const Service_RegisterRequest_MServiceMapEntry_DoNotUse*>(&_Service_RegisterRequest_MServiceMapEntry_DoNotUse_default_instance_); }
   void MergeFrom(const ::google::protobuf::Message& other) final;
   ::google::protobuf::Metadata GetMetadata() const;
 };
 
 // -------------------------------------------------------------------
 
-class ServiceRegister_Respond :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister.Respond) */ {
+class Service_RegisterRequest :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Service.RegisterRequest) */ {
  public:
-  ServiceRegister_Respond();
-  virtual ~ServiceRegister_Respond();
+  Service_RegisterRequest();
+  virtual ~Service_RegisterRequest();
 
-  ServiceRegister_Respond(const ServiceRegister_Respond& from);
+  Service_RegisterRequest(const Service_RegisterRequest& from);
 
-  inline ServiceRegister_Respond& operator=(const ServiceRegister_Respond& from) {
+  inline Service_RegisterRequest& operator=(const Service_RegisterRequest& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ServiceRegister_Respond(ServiceRegister_Respond&& from) noexcept
-    : ServiceRegister_Respond() {
+  Service_RegisterRequest(Service_RegisterRequest&& from) noexcept
+    : Service_RegisterRequest() {
     *this = ::std::move(from);
   }
 
-  inline ServiceRegister_Respond& operator=(ServiceRegister_Respond&& from) noexcept {
+  inline Service_RegisterRequest& operator=(Service_RegisterRequest&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -710,34 +694,34 @@ class ServiceRegister_Respond :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ServiceRegister_Respond& default_instance();
+  static const Service_RegisterRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServiceRegister_Respond* internal_default_instance() {
-    return reinterpret_cast<const ServiceRegister_Respond*>(
-               &_ServiceRegister_Respond_default_instance_);
+  static inline const Service_RegisterRequest* internal_default_instance() {
+    return reinterpret_cast<const Service_RegisterRequest*>(
+               &_Service_RegisterRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     5;
 
-  void Swap(ServiceRegister_Respond* other);
-  friend void swap(ServiceRegister_Respond& a, ServiceRegister_Respond& b) {
+  void Swap(Service_RegisterRequest* other);
+  friend void swap(Service_RegisterRequest& a, Service_RegisterRequest& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ServiceRegister_Respond* New() const final {
-    return CreateMaybeMessage<ServiceRegister_Respond>(nullptr);
+  inline Service_RegisterRequest* New() const final {
+    return CreateMaybeMessage<Service_RegisterRequest>(nullptr);
   }
 
-  ServiceRegister_Respond* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServiceRegister_Respond>(arena);
+  Service_RegisterRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Service_RegisterRequest>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServiceRegister_Respond& from);
-  void MergeFrom(const ServiceRegister_Respond& from);
+  void CopyFrom(const Service_RegisterRequest& from);
+  void MergeFrom(const Service_RegisterRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -759,7 +743,7 @@ class ServiceRegister_Respond :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ServiceRegister_Respond* other);
+  void InternalSwap(Service_RegisterRequest* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -776,50 +760,57 @@ class ServiceRegister_Respond :
 
   // accessors -------------------------------------------------------
 
-  // map<string, int32> service_infos = 1;
-  int service_infos_size() const;
-  void clear_service_infos();
-  static const int kServiceInfosFieldNumber = 1;
+  // map<string, int32> mServiceMap = 2;
+  int mservicemap_size() const;
+  void clear_mservicemap();
+  static const int kMServiceMapFieldNumber = 2;
   const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
-      service_infos() const;
+      mservicemap() const;
   ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
-      mutable_service_infos();
+      mutable_mservicemap();
 
-  // @@protoc_insertion_point(class_scope:PB.ServiceRegister.Respond)
+  // int64 id = 1;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  ::google::protobuf::int64 id() const;
+  void set_id(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:PB.Service.RegisterRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::MapField<
-      ServiceRegister_Respond_ServiceInfosEntry_DoNotUse,
+      Service_RegisterRequest_MServiceMapEntry_DoNotUse,
       ::std::string, ::google::protobuf::int32,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
-      0 > service_infos_;
+      0 > mservicemap_;
+  ::google::protobuf::int64 id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
 // -------------------------------------------------------------------
 
-class ServiceRegister :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.ServiceRegister) */ {
+class Service :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Service) */ {
  public:
-  ServiceRegister();
-  virtual ~ServiceRegister();
+  Service();
+  virtual ~Service();
 
-  ServiceRegister(const ServiceRegister& from);
+  Service(const Service& from);
 
-  inline ServiceRegister& operator=(const ServiceRegister& from) {
+  inline Service& operator=(const Service& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ServiceRegister(ServiceRegister&& from) noexcept
-    : ServiceRegister() {
+  Service(Service&& from) noexcept
+    : Service() {
     *this = ::std::move(from);
   }
 
-  inline ServiceRegister& operator=(ServiceRegister&& from) noexcept {
+  inline Service& operator=(Service&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -831,34 +822,34 @@ class ServiceRegister :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ServiceRegister& default_instance();
+  static const Service& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServiceRegister* internal_default_instance() {
-    return reinterpret_cast<const ServiceRegister*>(
-               &_ServiceRegister_default_instance_);
+  static inline const Service* internal_default_instance() {
+    return reinterpret_cast<const Service*>(
+               &_Service_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     6;
 
-  void Swap(ServiceRegister* other);
-  friend void swap(ServiceRegister& a, ServiceRegister& b) {
+  void Swap(Service* other);
+  friend void swap(Service& a, Service& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ServiceRegister* New() const final {
-    return CreateMaybeMessage<ServiceRegister>(nullptr);
+  inline Service* New() const final {
+    return CreateMaybeMessage<Service>(nullptr);
   }
 
-  ServiceRegister* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServiceRegister>(arena);
+  Service* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Service>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServiceRegister& from);
-  void MergeFrom(const ServiceRegister& from);
+  void CopyFrom(const Service& from);
+  void MergeFrom(const Service& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -880,7 +871,7 @@ class ServiceRegister :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ServiceRegister* other);
+  void InternalSwap(Service* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -894,12 +885,12 @@ class ServiceRegister :
 
   // nested types ----------------------------------------------------
 
-  typedef ServiceRegister_Request Request;
-  typedef ServiceRegister_Respond Respond;
+  typedef Service_NodeRegisterRequest NodeRegisterRequest;
+  typedef Service_RegisterRequest RegisterRequest;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:PB.ServiceRegister)
+  // @@protoc_insertion_point(class_scope:PB.Service)
  private:
   class HasBitSetters;
 
@@ -1962,171 +1953,130 @@ ServerRegisterBack::logic_srv_list() const {
 
 // -------------------------------------------------------------------
 
-// ServiceRegister_Request
+// Service_NodeRegisterRequest
 
 // int32 area_id = 1;
-inline void ServiceRegister_Request::clear_area_id() {
+inline void Service_NodeRegisterRequest::clear_area_id() {
   area_id_ = 0;
 }
-inline ::google::protobuf::int32 ServiceRegister_Request::area_id() const {
-  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.area_id)
+inline ::google::protobuf::int32 Service_NodeRegisterRequest::area_id() const {
+  // @@protoc_insertion_point(field_get:PB.Service.NodeRegisterRequest.area_id)
   return area_id_;
 }
-inline void ServiceRegister_Request::set_area_id(::google::protobuf::int32 value) {
+inline void Service_NodeRegisterRequest::set_area_id(::google::protobuf::int32 value) {
   
   area_id_ = value;
-  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.area_id)
+  // @@protoc_insertion_point(field_set:PB.Service.NodeRegisterRequest.area_id)
 }
 
-// string service_address = 2;
-inline void ServiceRegister_Request::clear_service_address() {
-  service_address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// int32 node_id = 2;
+inline void Service_NodeRegisterRequest::clear_node_id() {
+  node_id_ = 0;
 }
-inline const ::std::string& ServiceRegister_Request::service_address() const {
-  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.service_address)
-  return service_address_.GetNoArena();
+inline ::google::protobuf::int32 Service_NodeRegisterRequest::node_id() const {
+  // @@protoc_insertion_point(field_get:PB.Service.NodeRegisterRequest.node_id)
+  return node_id_;
 }
-inline void ServiceRegister_Request::set_service_address(const ::std::string& value) {
+inline void Service_NodeRegisterRequest::set_node_id(::google::protobuf::int32 value) {
   
-  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_address)
+  node_id_ = value;
+  // @@protoc_insertion_point(field_set:PB.Service.NodeRegisterRequest.node_id)
+}
+
+// string node_address = 3;
+inline void Service_NodeRegisterRequest::clear_node_address() {
+  node_address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Service_NodeRegisterRequest::node_address() const {
+  // @@protoc_insertion_point(field_get:PB.Service.NodeRegisterRequest.node_address)
+  return node_address_.GetNoArena();
+}
+inline void Service_NodeRegisterRequest::set_node_address(const ::std::string& value) {
+  
+  node_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.Service.NodeRegisterRequest.node_address)
 }
 #if LANG_CXX11
-inline void ServiceRegister_Request::set_service_address(::std::string&& value) {
+inline void Service_NodeRegisterRequest::set_node_address(::std::string&& value) {
   
-  service_address_.SetNoArena(
+  node_address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.ServiceRegister.Request.service_address)
+  // @@protoc_insertion_point(field_set_rvalue:PB.Service.NodeRegisterRequest.node_address)
 }
 #endif
-inline void ServiceRegister_Request::set_service_address(const char* value) {
+inline void Service_NodeRegisterRequest::set_node_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.ServiceRegister.Request.service_address)
+  node_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.Service.NodeRegisterRequest.node_address)
 }
-inline void ServiceRegister_Request::set_service_address(const char* value, size_t size) {
+inline void Service_NodeRegisterRequest::set_node_address(const char* value, size_t size) {
   
-  service_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  node_address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.ServiceRegister.Request.service_address)
+  // @@protoc_insertion_point(field_set_pointer:PB.Service.NodeRegisterRequest.node_address)
 }
-inline ::std::string* ServiceRegister_Request::mutable_service_address() {
+inline ::std::string* Service_NodeRegisterRequest::mutable_node_address() {
   
-  // @@protoc_insertion_point(field_mutable:PB.ServiceRegister.Request.service_address)
-  return service_address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:PB.Service.NodeRegisterRequest.node_address)
+  return node_address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* ServiceRegister_Request::release_service_address() {
-  // @@protoc_insertion_point(field_release:PB.ServiceRegister.Request.service_address)
+inline ::std::string* Service_NodeRegisterRequest::release_node_address() {
+  // @@protoc_insertion_point(field_release:PB.Service.NodeRegisterRequest.node_address)
   
-  return service_address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return node_address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void ServiceRegister_Request::set_allocated_service_address(::std::string* service_address) {
-  if (service_address != nullptr) {
+inline void Service_NodeRegisterRequest::set_allocated_node_address(::std::string* node_address) {
+  if (node_address != nullptr) {
     
   } else {
     
   }
-  service_address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service_address);
-  // @@protoc_insertion_point(field_set_allocated:PB.ServiceRegister.Request.service_address)
-}
-
-// repeated string service_names = 3;
-inline int ServiceRegister_Request::service_names_size() const {
-  return service_names_.size();
-}
-inline void ServiceRegister_Request::clear_service_names() {
-  service_names_.Clear();
-}
-inline const ::std::string& ServiceRegister_Request::service_names(int index) const {
-  // @@protoc_insertion_point(field_get:PB.ServiceRegister.Request.service_names)
-  return service_names_.Get(index);
-}
-inline ::std::string* ServiceRegister_Request::mutable_service_names(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.ServiceRegister.Request.service_names)
-  return service_names_.Mutable(index);
-}
-inline void ServiceRegister_Request::set_service_names(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_names)
-  service_names_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void ServiceRegister_Request::set_service_names(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:PB.ServiceRegister.Request.service_names)
-  service_names_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void ServiceRegister_Request::set_service_names(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  service_names_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:PB.ServiceRegister.Request.service_names)
-}
-inline void ServiceRegister_Request::set_service_names(int index, const char* value, size_t size) {
-  service_names_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:PB.ServiceRegister.Request.service_names)
-}
-inline ::std::string* ServiceRegister_Request::add_service_names() {
-  // @@protoc_insertion_point(field_add_mutable:PB.ServiceRegister.Request.service_names)
-  return service_names_.Add();
-}
-inline void ServiceRegister_Request::add_service_names(const ::std::string& value) {
-  service_names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:PB.ServiceRegister.Request.service_names)
-}
-#if LANG_CXX11
-inline void ServiceRegister_Request::add_service_names(::std::string&& value) {
-  service_names_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:PB.ServiceRegister.Request.service_names)
-}
-#endif
-inline void ServiceRegister_Request::add_service_names(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  service_names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:PB.ServiceRegister.Request.service_names)
-}
-inline void ServiceRegister_Request::add_service_names(const char* value, size_t size) {
-  service_names_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:PB.ServiceRegister.Request.service_names)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-ServiceRegister_Request::service_names() const {
-  // @@protoc_insertion_point(field_list:PB.ServiceRegister.Request.service_names)
-  return service_names_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-ServiceRegister_Request::mutable_service_names() {
-  // @@protoc_insertion_point(field_mutable_list:PB.ServiceRegister.Request.service_names)
-  return &service_names_;
+  node_address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), node_address);
+  // @@protoc_insertion_point(field_set_allocated:PB.Service.NodeRegisterRequest.node_address)
 }
 
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
 
-// ServiceRegister_Respond
+// Service_RegisterRequest
 
-// map<string, int32> service_infos = 1;
-inline int ServiceRegister_Respond::service_infos_size() const {
-  return service_infos_.size();
+// int64 id = 1;
+inline void Service_RegisterRequest::clear_id() {
+  id_ = PROTOBUF_LONGLONG(0);
 }
-inline void ServiceRegister_Respond::clear_service_infos() {
-  service_infos_.Clear();
+inline ::google::protobuf::int64 Service_RegisterRequest::id() const {
+  // @@protoc_insertion_point(field_get:PB.Service.RegisterRequest.id)
+  return id_;
+}
+inline void Service_RegisterRequest::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:PB.Service.RegisterRequest.id)
+}
+
+// map<string, int32> mServiceMap = 2;
+inline int Service_RegisterRequest::mservicemap_size() const {
+  return mservicemap_.size();
+}
+inline void Service_RegisterRequest::clear_mservicemap() {
+  mservicemap_.Clear();
 }
 inline const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
-ServiceRegister_Respond::service_infos() const {
-  // @@protoc_insertion_point(field_map:PB.ServiceRegister.Respond.service_infos)
-  return service_infos_.GetMap();
+Service_RegisterRequest::mservicemap() const {
+  // @@protoc_insertion_point(field_map:PB.Service.RegisterRequest.mServiceMap)
+  return mservicemap_.GetMap();
 }
 inline ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
-ServiceRegister_Respond::mutable_service_infos() {
-  // @@protoc_insertion_point(field_mutable_map:PB.ServiceRegister.Respond.service_infos)
-  return service_infos_.MutableMap();
+Service_RegisterRequest::mutable_mservicemap() {
+  // @@protoc_insertion_point(field_mutable_map:PB.Service.RegisterRequest.mServiceMap)
+  return mservicemap_.MutableMap();
 }
 
 // -------------------------------------------------------------------
 
-// ServiceRegister
+// Service
 
 // -------------------------------------------------------------------
 

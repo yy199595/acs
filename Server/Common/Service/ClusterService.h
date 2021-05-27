@@ -22,11 +22,11 @@ namespace SoEasy
 		XCode RemoveService(long long, shared_ptr<Int32Data> service);
 		XCode RefreshServices(long long, shared_ptr<ServicesNotice> services);
 	private:
-		int mAreaId;
+		unsigned short mAreaId;
+		unsigned short mNodeId;
 		std::string mQueryAddress;
 		std::string mListenAddress;
-		SharedTcpSession mQuerySession;
 		ServiceManager * mServiceManager;
-		
+		class ProxyService * mRegistryService;
 	};
 }

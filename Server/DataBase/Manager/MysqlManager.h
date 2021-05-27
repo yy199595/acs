@@ -3,6 +3,7 @@
 #include<Manager/Manager.h>
 #include<MysqlClient/MysqlDefine.h>
 #include<QueryResult/InvokeResultData.h>
+#pragma execution_character_set("utf-8")
 namespace SoEasy
 {
 	class MysqlTaskAction;
@@ -15,6 +16,12 @@ namespace SoEasy
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const std::string db, const std::string & sql);
+	public:
+		bool CreateMysqlDb();
+		bool CreateMysqlTable();
+		bool CreateMysqlTable(const char * tab, rapidjson::Value * jsonValue);
+		bool CreateNewMysqlTable(const char * tab, rapidjson::Value * jsonValue);
+
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
@@ -27,7 +34,10 @@ namespace SoEasy
 		unsigned short mMysqlPort;	//端口号
 		std::string mDataBaseUser;	//用户名
 		std::string mDataBasePasswd; //密码
+		std::string mDataBaseName;	//数据库名字
 		ThreadPool * mThreadPool;		//线程池
+		std::string mSqlTablePath;
+		SayNoMysqlSocket * mMysqlSockt;
 		std::unordered_map<long long, SayNoMysqlSocket *> mMysqlSocketMap;	//线程id和 socket
 	private:
 		class CoroutineManager * mCoroutineManager;

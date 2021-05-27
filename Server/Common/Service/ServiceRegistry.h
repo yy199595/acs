@@ -9,6 +9,7 @@ using namespace PB;
 
 namespace SoEasy
 {
+	class ServiceNode;
 	struct ActionProxyInfo
 	{
 	public:
@@ -33,18 +34,21 @@ namespace SoEasy
 		ServiceRegistry();
 		~ServiceRegistry() { }
 	protected:
-		bool OnInit() override;
-		void OnInitComplete() override;
+		bool OnInit() final;
+		void OnSystemUpdate() final;
+		void OnInitComplete() final;
 	private:
-		XCode Register(long long id, shared_ptr<ServiceRegister_Request> actionInfo, shared_ptr<ServiceRegister_Respond> returnData);
+		XCode RegisterNode(long long id, shared_ptr<Service_NodeRegisterRequest> nodeInfo);
+		XCode RegisterService(long long id, shared_ptr<Service_RegisterRequest> serviceInfos);
 	private:
-		void RefreshServices(int areaId);
-		int AddService(int areaId, const std::string & name, const std::string & address);
+		XCode RefreshServices(int areaId);
 	private:
 		int mServiceIndex;
 		class NetWorkManager * mNetWorkManager;
+		std::vector<ProxyService *> mProxyServices;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
 		std::unordered_map<int, ProxyService *> mServiceMap;
-		std::unordered_map<int, std::set<std::string>> mQuerySessionMap;
+		std::unordered_map<long long, ServiceNode *> mServiceNodeMap;
+		std::unordered_map<std::string, long long> mQuerySessionMap;
 	};
 }

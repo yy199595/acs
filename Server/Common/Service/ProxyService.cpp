@@ -3,29 +3,26 @@
 #include<Manager/ServiceManager.h>
 namespace SoEasy
 {
-	ProxyService::ProxyService(const std::string & name, const std::string & address, int id, int areaId)
-		: mServiceAddress(address), mAreaId(areaId), mServiceName(name)
+	ProxyService::ProxyService(const std::string & address, int areaId)
+		: mServiceAddress(address), mAreaId(areaId)
 	{
-		this->InitService(id);
+		
 	}
 
 	bool ProxyService::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mServiceManager = this->GetManager<ServiceManager>());
-		return true;
+		return ServiceBase::OnInit();
 	}
 
 	void ProxyService::OnSystemUpdate()
 	{
-		if (!this->mProxyMessageQueue.empty())
+		if (!this->mProxyMessageQueue.empty() && mProxyServiceSession->IsActive())
 		{
-			while (mProxyServiceSession->IsActive() && this->mProxyMessageQueue.empty())
-			{
-				SharedPacket proxyData = this->mProxyMessageQueue.front();
-				this->mProxyMessageQueue.pop();
-				this->mNetManager->SendMessageByAdress(this->mServiceAddress, proxyData);
-			}
+			SharedPacket proxyData = this->mProxyMessageQueue.front();
+			this->mProxyMessageQueue.pop();
+			this->mNetManager->SendMessageByAdress(this->mServiceAddress, proxyData);
 		}
 	}
 	bool ProxyService::HandleMessage(shared_ptr<NetWorkPacket> messageData)

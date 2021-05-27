@@ -1,0 +1,12 @@
+{
+    "tb_player_account":
+    {
+        "account":["varchar(64)", "账号"],
+        "platform": ["varchar(64)", "平台"],
+        "userid":["bigint(20)", "用户唯一id"],
+        "passwd":["varchar(32)","用户密码"],
+        "phonenum":["bigint(20)","手机号"],
+        "registertime":["bigint(20)","注册时间"],
+        "primaty_key":"account"
+    }
+}

@@ -2,11 +2,14 @@
 #include<Manager/ServiceManager.h>
 #include<NetWork/ActionScheduler.h>
 #include<Coroutine/CoroutineManager.h>
+#include<Service/ProxyService.h>
 namespace SoEasy
 {
 	bool ClusterService::OnInit()
 	{
+		this->mRegistryService = nullptr;
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", mQueryAddress));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", mListenAddress));
 		SayNoAssertRetFalse_F(this->mServiceManager = this->GetManager<ServiceManager>());
@@ -18,53 +21,63 @@ namespace SoEasy
 
 	void ClusterService::OnInitComplete()
 	{
-		this->mQuerySession = this->mServiceManager->GetProxySession(this->mQueryAddress);
+		this->mRegistryService = this->mServiceManager->AddProxyService(0, 0, "ServiceRegistry", this->mQueryAddress);
+		if (this->mRegistryService != nullptr)
+		{
+			this->StarRegister();
+			SayNoDebugInfo("start register local service to " << this->mQueryAddress);
+		}
 	}
 
 	void ClusterService::OnConnectDone(SharedTcpSession tcpSession)
 	{
-		if (this->mQuerySession != tcpSession)
-		{
-			return;
-		}
-		SayNoDebugInfo("start register local service to " << this->mQueryAddress);
-		this->Start("ServiceRegister", BIND_THIS_ACTION_0(ClusterService::StarRegister));
+		
+		
 	}
 
 	void ClusterService::StarRegister()
 	{
 		std::vector<LocalService *> localServices;
 		this->mServiceManager->GetLocalServices(localServices);
-		shared_ptr<ServiceRegister_Request> registerService = make_shared<ServiceRegister_Request>();
+		
+		shared_ptr<Service_NodeRegisterRequest> registerNode = make_shared<Service_NodeRegisterRequest>();
 
-		registerService->set_area_id(this->mAreaId);
-		registerService->set_service_address(this->mListenAddress);
+		registerNode->set_area_id(this->mAreaId);
+		registerNode->set_node_id(this->mNodeId);
+		registerNode->set_node_address(this->mListenAddress);
+
+		XCode regNodeCode = this->mRegistryService->Call("RegisterNode", registerNode);
+
+		if (regNodeCode != XCode::Successful)
+		{
+			SayNoDebugError("register node fail");
+			return;
+		}
+
+		long long globalId = (long long)this->mAreaId << 32 | this->mNodeId;
+		shared_ptr<Service_RegisterRequest> registerService = make_shared<Service_RegisterRequest>();
+		
+		int index = 0;
+		registerService->set_id(globalId);
 		for (LocalService * localService : localServices)
 		{
-			std::string * serviceName = registerService->add_service_names();
-			serviceName->assign(localService->GetServiceName());
+			auto element = registerService->mutable_mservicemap();
+			element->insert({ localService->GetServiceName(),  localService->GetServiceId() });
 		}
-		PB::ServiceRegister_Respond retServiceDatas;
-		ActionScheduler actionSchduler(this->mQuerySession);
-		actionSchduler.Call("ServiceRegistry", "Register", registerService, retServiceDatas);
 
-		auto iter = retServiceDatas.service_infos().begin();
-		for (; iter != retServiceDatas.service_infos().end(); iter++)
+		XCode regServiceCode = this->mRegistryService->Call("RegisterService", registerService);
+
+		if (regServiceCode != XCode::Successful)
 		{
-			const std::string serviceName = iter->first;
-			LocalService * localService = this->mServiceManager->GetLocalService(serviceName);
-			if (localService != nullptr)
-			{
-				localService->InitService(iter->second);
-				SayNoDebugInfo("register " << serviceName << " successful " << iter->second);
-			}
+			SayNoDebugError("register service fail");
+			return;
 		}
+		SayNoDebugLog("register local service successful");
 	}
 
 	XCode ClusterService::RemoveService(long long, shared_ptr<Int32Data> serviceData)
 	{
 		const int serviceId = serviceData->data();
-		
 		return XCode::Successful;
 	}
 
@@ -73,17 +86,11 @@ namespace SoEasy
 		for (int index = 0; index < retServiceDatas->services_size(); index++)
 		{
 			const ServiceData & serviceData = retServiceDatas->services(index);
-			const int mAreaId = serviceData.adreid();
+			const int areaId = serviceData.adreid();
 			const int serviceId = serviceData.service_id();
 			const std::string & address = serviceData.service_address();
 			const std::string & serviceName = serviceData.service_name();
-			LocalService * localService = this->mServiceManager->GetLocalService(serviceData.service_name());
-			if (localService != nullptr)
-			{
-				localService->InitService(serviceId);
-				SayNoDebugInfo("register " << serviceData.service_name() << " success");
-			}
-			this->mServiceManager->AddProxyService(serviceName, mAreaId, serviceId, address);
+			this->mServiceManager->AddProxyService(areaId, serviceId, serviceName, address);
 		}
 		return XCode::Successful;
 	}
