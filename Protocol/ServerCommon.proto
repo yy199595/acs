@@ -21,29 +21,20 @@ message ServerRegisterBack
     repeated LogicServerData logic_srv_list = 1;
 }
 
-message AssestCompareList
+message Service
 {
-    message AssestCompareInfo
+    message NodeRegisterRequest
     {
-        string file_name = 1;   //文件名
-        string file_md5 = 2;    //文件md5
+        int32 area_id = 1;  //服务器组id
+        int32 node_id = 2;  //节点id
+        string node_address = 3; //节点地址
     }
-    repeated AssestCompareInfo assestList = 1;
-}
 
-message TransferAssestInfo
-{
-    string file_name = 1;   //当前传输文件名字
-    bytes file_content = 2;     //本次传输的内容
-}
-
-message ServerRunInfo
-{
-    string server_name = 1; //名字
-    int32 server_areaId = 2;    //区服id
-    int64 server_run_time = 3;  //运行时间
-    float server_fps = 4;       //fps
-    float logic_time = 5;       //逻辑耗时
+    message RegisterRequest
+    {
+        int64 id = 1;   // 区服id和节点id组合
+        map<string, int32> mServiceMap = 2; //服务名和id的map
+    }
 }
 
 message ServiceData
@@ -54,7 +45,7 @@ message ServiceData
     string service_address = 4;
 }
 
-message ServiceDataList
+message ServicesNotice
 {
     repeated ServiceData services = 1;
 }
