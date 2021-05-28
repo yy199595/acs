@@ -24,7 +24,7 @@ namespace SoEasy
 			{
 				Applocation * app = Applocation::Get();
 				proxyService->InitService(name, serviceId);
-				SayNoAssertRetFalse_F(proxyService->OnInit());
+				SayNoAssertRetNull_F(proxyService->OnInit());
 				this->mServiceMap.emplace(name, proxyService);
 				return proxyService;
 			}
