@@ -12,7 +12,7 @@
     "RedisTimeout":3,
     "RedisPasswd":"646585122@qq.com",
     "RedisAddress":"127.0.0.1:6379",
-    "SqlTable":"./sql/MysqlTable.json",
+    "SqlTable":"./sql/sql.json",
     "MysqlDbName":"PlayerGame",
     "MysqlAddress": "47.106.206.230:3306",
     "MysqlUserName": "root",
