@@ -94,6 +94,7 @@ namespace SoEasy
 				return false;
 			}
 		}
+		return true;
 	}
 
 	bool MysqlManager::CreateMysqlTable(const char * tab, rapidjson::Value * jsonValue)
