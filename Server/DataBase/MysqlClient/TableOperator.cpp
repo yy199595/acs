@@ -40,6 +40,7 @@ namespace SoEasy
 				return false;
 			}
 			SayNoDebugLog("create " << this->mDataBase << " db successful");
+			mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str());
 		}
 
 		for (auto iter = this->mDocument.MemberBegin(); iter != this->mDocument.MemberEnd(); iter++)
