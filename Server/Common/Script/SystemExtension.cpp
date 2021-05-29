@@ -10,6 +10,8 @@
 #include<NetWork/NetLuaAction.h>
 #include<Protocol/Common.pb.h>
 #include<NetWork/NetLuaRetAction.h>
+#include<Service/LocalLuaService.h>
+#include<Manager/ServiceManager.h>
 using namespace SoEasy;
 
 	int SystemExtension::Call(lua_State * lua)
@@ -122,6 +124,44 @@ using namespace SoEasy;
 		}
 		lua_pushboolean(luaEnv, manager->SendMessageByAdress(address, returnPacket));
 		return 1;
+	}
+
+	extern bool SystemExtension::RequireLua(lua_State * luaEnv, const char * name)
+	{
+		lua_getglobal(luaEnv, "require");
+		if (lua_isfunction(luaEnv, -1))
+		{
+			lua_pushstring(luaEnv, name);
+			if (lua_pcall(luaEnv, 1, 1, 0) != 0)
+			{
+				SayNoDebugError(lua_tostring(luaEnv, -1));
+				return false;
+			}
+			return lua_istable(luaEnv, -1);
+		}
+		return false;
+	}
+
+	int SystemExtension::NewService(lua_State * luaEnv)
+	{
+		const char * name = lua_tostring(luaEnv, 1);
+		if (SystemExtension::RequireLua(luaEnv, name))
+		{
+			Applocation * app = Applocation::Get();
+			SayNoDebugFatal("********** " << name);
+			LocalLuaService * luaService = new LocalLuaService(luaEnv, -1);
+			ServiceManager * serviceMgr = app->GetManager<ServiceManager>();
+			if (serviceMgr != nullptr)
+			{
+				if (serviceMgr->AddLuaService(name, luaService) != nullptr)
+				{
+					int id = luaService->GetServiceId();
+					lua_pushinteger(luaEnv, id);
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	int SystemExtension::CallWait(lua_State * luaEnv)

@@ -37,7 +37,7 @@ namespace SoEasy
 
 	void ClusterService::StarRegister()
 	{
-		std::vector<LocalService *> localServices;
+		std::vector<ServiceBase *> localServices;
 		this->mServiceManager->GetLocalServices(localServices);
 		
 		shared_ptr<Service_NodeRegisterRequest> registerNode = make_shared<Service_NodeRegisterRequest>();
@@ -59,7 +59,7 @@ namespace SoEasy
 		
 		int index = 0;
 		registerService->set_id(globalId);
-		for (LocalService * localService : localServices)
+		for (ServiceBase * localService : localServices)
 		{
 			auto element = registerService->mutable_mservicemap();
 			element->insert({ localService->GetServiceName(),  localService->GetServiceId() });

@@ -1,6 +1,7 @@
 #include"ServiceManager.h"
 #include<Service/LocalService.h>
 #include<Service/ProxyService.h>
+#include<Service/LocalLuaService.h>
 
 #include<Util/StringHelper.h>
 #include<Core/ObjectRegistry.h>
@@ -78,6 +79,37 @@ namespace SoEasy
 		}
 	}
 
+	LocalLuaService * ServiceManager::AddLuaService(const std::string name, LocalLuaService * service)
+	{
+		auto iter = this->mLuaServiceMap.find(name);
+		if (iter == this->mLuaServiceMap.end())
+		{			
+			int serviceId = 0;
+			LocalService * localService = this->GetLocalService(name);
+			if (localService != nullptr)
+			{
+				serviceId = localService->GetServiceId();
+			}
+			else
+			{
+				size_t index = this->mServiceList.size() + 1;
+				serviceId = (int)this->mNodeId << 16 | index;			
+			}
+
+			service->InitService(name, serviceId);
+			if (service->OnInit())
+			{
+				this->mServiceList.push_back(name);
+				this->mReadyServiceQueue.push(service);
+				this->mLuaServiceMap.emplace(name, service);
+				SayNoDebugInfo("add new lua service " << name << " " << serviceId);
+				return service;
+			}
+			SayNoDebugError("init lua service " << name << " fail");
+		}
+		return nullptr;
+	}
+
 	ProxyService * ServiceManager::AddProxyService(int areaId, int serviceId, const std::string name, const std::string address)
 	{
 		auto iter = this->mProxyServiceMap.find(serviceId);
@@ -103,6 +135,12 @@ namespace SoEasy
 	{
 		auto iter = this->mLocalServiceMap.find(name);
 		return iter != this->mLocalServiceMap.end() ? iter->second : nullptr;
+	}
+
+	LocalLuaService * ServiceManager::GetLuaService(const std::string & name)
+	{
+		auto iter = this->mLuaServiceMap.find(name);
+		return iter != this->mLuaServiceMap.end() ? iter->second : nullptr;
 	}
 
 	SharedTcpSession ServiceManager::GetProxySession(const std::string & address)
@@ -135,13 +173,18 @@ namespace SoEasy
 		return false;
 	}
 
-	void ServiceManager::GetLocalServices(std::vector<LocalService*> & services)
+	void ServiceManager::GetLocalServices(std::vector<ServiceBase*> & services)
 	{
 		services.clear();
 		auto iter = this->mLocalServiceMap.begin();
 		for (; iter != this->mLocalServiceMap.end(); iter++)
 		{
 			services.push_back(iter->second);
+		}
+		auto iter1 = this->mLuaServiceMap.begin();
+		for (; iter1 != this->mLuaServiceMap.end(); iter1++)
+		{
+			services.push_back(iter1->second);
 		}
 	}
 

@@ -4,10 +4,9 @@
 #include<QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
-	MysqlTaskBase::MysqlTaskBase(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql)
+	MysqlTaskBase::MysqlTaskBase(MysqlManager * mgr, long long id, const std::string & db)
 		: ThreadTaskAction(mgr, id)
 	{
-		this->mSqlCommand = sql;
 		this->mDataBaseName = db;
 		this->mMysqlManager = mgr;
 	}
@@ -31,9 +30,8 @@ namespace SoEasy
 			this->OnQueryFinish(jsonWrite);
 			return;
 		}
-		const char * data = this->mSqlCommand.c_str();
-		const size_t lenght = this->mSqlCommand.length();
-		if (mysql_real_query(mysqlSocket, data, lenght) != 0)
+		const std::string & sql = this->GetSqlCommand();
+		if (mysql_real_query(mysqlSocket, sql.c_str(), sql.size()) != 0)
 		{
 			this->mErrorCode = MysqlInvokeFailure;
 			this->mErrorString = mysql_error(mysqlSocket);
@@ -45,13 +43,13 @@ namespace SoEasy
 		if (queryResult != nullptr)
 		{		
 			
-			std::vector<char *> fieldNameVector;
+			std::vector<MYSQL_FIELD *> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
 			unsigned int fieldCount = mysql_field_count(mysqlSocket);
 			for (unsigned int index = 0; index < fieldCount; index++)
 			{
 				MYSQL_FIELD * field = mysql_fetch_field(queryResult);
-				fieldNameVector.push_back(field->name);
+				fieldNameVector.push_back(field);
 			}
 			if (rowCount == 1)
 			{			
@@ -60,8 +58,8 @@ namespace SoEasy
 				unsigned long * lengths = mysql_fetch_lengths(queryResult);
 				for (size_t index = 0; index < fieldNameVector.size(); index++)
 				{
-					const char * key = fieldNameVector[index];
-					jsonWrite.Write(key, row[index], (int)lengths[index]);
+					MYSQL_FIELD * field = fieldNameVector[index];
+					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 				}
 				jsonWrite.EndWriteObject();
 			}
@@ -75,8 +73,8 @@ namespace SoEasy
 					unsigned long * lengths = mysql_fetch_lengths(queryResult);
 					for (size_t index = 0; index < fieldNameVector.size(); index++)
 					{
-						const char * key = fieldNameVector[index];
-						jsonWrite.Write(key, row[index], (int)lengths[index]);
+						MYSQL_FIELD * field = fieldNameVector[index];
+						this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 					}				
 					jsonWrite.EndWriteObject();
 				}
@@ -90,5 +88,24 @@ namespace SoEasy
 	{
 		jsonWriter.Write("code", this->mErrorCode);
 		jsonWriter.Write("error", this->mErrorString);
+		SayNoDebugError("[mysql error] " << this->mErrorString);
+		SayNoDebugError("[mysql command] " << this->GetSqlCommand());
+	}
+
+	void MysqlTaskBase::WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size)
+	{
+		switch (field->type)
+		{
+		case enum_field_types::MYSQL_TYPE_LONG:
+		case enum_field_types::MYSQL_TYPE_LONGLONG:
+			jsonWriter.Write(field->name, data == nullptr ? 0 : std::atoll(data));
+			break;
+		case enum_field_types::MYSQL_TYPE_FLOAT:
+		case enum_field_types::MYSQL_TYPE_DOUBLE:
+			jsonWriter.Write(field->name, data == nullptr ? 0 : std::atof(data));
+		default:
+			jsonWriter.Write(field->name, data, size);
+			break;
+		}
 	}
 }

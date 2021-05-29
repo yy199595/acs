@@ -5,7 +5,7 @@
 namespace SoEasy
 {
 	MysqlTaskAction::MysqlTaskAction(MysqlManager * mgr, long long id, const std::string & db, const std::string & sql, CoroutineManager * corMgr)
-		: MysqlTaskBase(mgr, id, db, sql)
+		: MysqlTaskBase(mgr, id, db), mSqlCommand(sql)
 	{
 		this->mCoroutineMgr = corMgr;
 		this->mCoroutineId = corMgr->GetCurrentCorId();

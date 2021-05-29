@@ -58,6 +58,17 @@ namespace SoEasy
 				this->mThreadTaskMap.erase(iter);
 			}			
 		}
+		while (!this->mWaitDispatchTasks.empty())
+		{
+			shared_ptr<ThreadTaskAction> taskAction = this->mWaitDispatchTasks.front();
+			ThreadPool * threadPool = this->GetApp()->GetThreadPool();
+			if (threadPool->StartTaskAction(taskAction))
+			{
+				this->mWaitDispatchTasks.pop();
+				continue;
+			}
+			break;
+		}
 	}
 
 	bool Manager::StartTaskAction(shared_ptr<ThreadTaskAction> taskAction)
@@ -66,14 +77,16 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(threadPool);
 		long long taskId = taskAction->GetTaskId();
 		auto iter = this->mThreadTaskMap.find(taskId);
-		if (iter == this->mThreadTaskMap.end())
+		if (iter != this->mThreadTaskMap.end())
 		{
-			if (threadPool->StartTaskAction(taskAction))
-			{
-				this->mThreadTaskMap.emplace(taskId, taskAction);
-				return true;
-			}
+			SayNoDebugError("task exits " << taskId);
+			return false;
 		}
-		return false;
+		if (!threadPool->StartTaskAction(taskAction))
+		{
+			this->mWaitDispatchTasks.push(taskAction);
+		}
+		this->mThreadTaskMap.emplace(taskId, taskAction);
+		return true;
 	}
 }

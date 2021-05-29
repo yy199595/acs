@@ -5,7 +5,7 @@
 namespace SoEasy
 {
 	TcpClientSession::TcpClientSession(SessionManager * manager, SharedTcpSocket socket)
-		:mAsioContext(manager->GetAsioContext()), mCurrentSatte(None)
+		:mAsioContext(manager->GetAsioContext()), mCurrentSatte(Session_None)
 	{
 		this->mIsContent = false;
 		this->mBinTcpSocket = socket;
@@ -13,7 +13,7 @@ namespace SoEasy
 		if (this->mBinTcpSocket != nullptr)
 		{
 			this->mDispatchManager = manager;
-			mCurrentSatte = SessionState::Normal;
+			mCurrentSatte = SessionState::Session_Normal;
 			this->mSocketEndPoint = socket->remote_endpoint();
 			this->InitMember(this->mSocketEndPoint.address().to_string(), this->mSocketEndPoint.port());
 			this->mSocketId = (long long)this->mSocketEndPoint.address().to_v4().to_uint() << 32 | this->mPort;
@@ -21,7 +21,7 @@ namespace SoEasy
 	}
 
 	TcpClientSession::TcpClientSession(SessionManager * manager, std::string name, std::string ip, unsigned short port)
-		: mAsioContext(manager->GetAsioContext()), mCurrentSatte(None)
+		: mAsioContext(manager->GetAsioContext()), mCurrentSatte(Session_None)
 	{		
 		this->mIsContent = true;
 		this->mSessionName = name;
@@ -54,7 +54,7 @@ namespace SoEasy
 
 	bool TcpClientSession::IsActive()
 	{
-		return this->mCurrentSatte == Normal;
+		return this->mCurrentSatte == Session_OK;
 	}
 
 	bool TcpClientSession::SendPackage(std::shared_ptr<std::string> message)
@@ -83,6 +83,7 @@ namespace SoEasy
 
 	void TcpClientSession::StartClose()
 	{
+		this->mCurrentSatte = Session_Close;
 		this->mAsioContext.post(this->mCloseAction);
 	}
 
@@ -92,12 +93,12 @@ namespace SoEasy
 		{
 			return false;
 		}
-		if (mCurrentSatte == SessionState::Connect)
+		if (mCurrentSatte == SessionState::Session_Connect)
 		{
 			return false;
 		}
 		this->mConnectCount++;
-		mCurrentSatte = SessionState::Connect;
+		mCurrentSatte = SessionState::Session_Connect;
 		this->mStartTime = TimeHelper::GetSecTimeStamp();
 		this->mAsioContext.post(BIND_THIS_ACTION_0(TcpClientSession::Connect));
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
@@ -113,13 +114,13 @@ namespace SoEasy
 			this->mBinTcpSocket->shutdown(asio::socket_base::shutdown_receive, closeCode);
 			this->mBinTcpSocket->close(closeCode);
 		}
-		this->mCurrentSatte = SessionState::ConnectError;
+		this->mCurrentSatte = SessionState::Session_Error;
 		this->mDispatchManager->AddErrorSession(shared_from_this());
 	}
 
 	bool TcpClientSession::StartReceiveMsg()
 	{
-		if (!this->IsActive())
+		if (this->mCurrentSatte != Session_Normal)
 		{
 			return false;
 		}
@@ -138,13 +139,14 @@ namespace SoEasy
 				return;
 			}
 			this->mConnectCount = 0;
-			mCurrentSatte = SessionState::Normal;
+			mCurrentSatte = Session_Normal;
 			this->mDispatchManager->AddNewSession(shared_from_this());
 		});
 	}
 
 	void TcpClientSession::Receive()
 	{
+		this->mCurrentSatte = Session_OK;
 		this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
 			[this](const asio::error_code & error_code, const std::size_t t)
 		{

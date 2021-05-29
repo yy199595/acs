@@ -66,6 +66,7 @@
     <ClCompile Include="Script\LuaTable.cpp" />
     <ClCompile Include="Script\SystemExtension.cpp" />
     <ClCompile Include="Service\ClusterService.cpp" />
+    <ClCompile Include="Service\LocalLuaService.cpp" />
     <ClCompile Include="Service\ProxyService.cpp" />
     <ClCompile Include="Service\ServiceBase.cpp" />
     <ClCompile Include="Service\ServiceRegistry.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Script\SystemExtension.h" />
     <ClInclude Include="Script\UserDataParameter.h" />
     <ClInclude Include="Service\ClusterService.h" />
+    <ClInclude Include="Service\LocalLuaService.h" />
     <ClInclude Include="Service\ProxyService.h" />
     <ClInclude Include="Service\ServiceBase.h" />
     <ClInclude Include="Service\ServiceRegistry.h" />

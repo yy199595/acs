@@ -15,7 +15,7 @@ namespace SoEasy
 		ActionManager();
 		virtual ~ActionManager() { }
 	public:
-		void AddActionArgv(shared_ptr<NetWorkPacket> messageData);	
+		bool AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData);	
 		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
 	protected:
 		bool OnInit() override;

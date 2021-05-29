@@ -21,6 +21,7 @@ namespace SoEasy
 	public:
 		bool Write(const char * key);
 		bool Write(const char * key, XCode code);
+		bool Write(const char * key, double value);
 		bool Write(const char * key, long long value);
 		bool Write(const char * key, const std::string & value);
 		bool Write(const char * key, const char * value, int size);	

@@ -3,25 +3,29 @@
 
 namespace SoEasy
 {
-	NetLuaAction::NetLuaAction(lua_State * lua, const std::string name, int action_ref, int invoke_ref)
+	NetLuaAction::NetLuaAction(lua_State * lua, const std::string name, int action_ref)
 	{
 		this->luaEnv = lua;
 		this->mActionName = name;
-		this->mActionRef = action_ref;
-		this->mInvokeRef = invoke_ref;
+		this->mActionref = action_ref;
+		SayNoAssertRet_F(lua_getfunction(lua, "Action", "Invoke"));
+		this->mInvokeref = luaL_ref(this->luaEnv, LUA_REGISTRYINDEX);
 	}
+
 	XCode NetLuaAction::Invoke(const shared_ptr<NetWorkPacket> requestData)
 	{
 		return XCode::Successful;
 	}
+
 	XCode NetLuaAction::Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData)
 	{
-		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mInvokeRef);
+		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mInvokeref);
 		if (!lua_isfunction(this->luaEnv, -1))
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mActionRef);
+
+		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mActionref);
 		if (!lua_isfunction(this->luaEnv, -1))
 		{
 			return XCode::CallLuaFunctionFail;

@@ -5,7 +5,7 @@ namespace SoEasy
 {
 	MysqlLuaTask::MysqlLuaTask(MysqlManager * mgr, long long taskId, 
 		const std::string & db, const std::string & sql, lua_State * lua, int ref)
-		:MysqlTaskBase(mgr, taskId, db, sql)
+		:MysqlTaskBase(mgr, taskId, db), mSqlCommand(sql)
 	{
 		this->mLuaEnv = lua;
 		this->mCroutineRef = ref;

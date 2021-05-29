@@ -63,7 +63,7 @@ namespace SoEasy
 
 	void ScriptManager::OnInitComplete()
 	{
-		SayNoAssertRet_F(this->LoadAllModule());
+		
 	}
 
 
@@ -76,7 +76,7 @@ namespace SoEasy
 			lua_pcall(mLuaEnv, 0, 1, errfunc);
 			SayNoDebugLog("load lua script success path :" << filePath);
 			lua_pop(mLuaEnv, 2);			
-			return true;
+			return this->LoadAllModule();
 		}
 		SayNoDebugError(lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
@@ -165,6 +165,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CreateByTable", LuaProtocExtension::CreateByTable);
 
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "SendByAddress", SystemExtension::SendByAddress);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "NewService", SystemExtension::NewService);
 
 	}
 

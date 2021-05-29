@@ -39,9 +39,16 @@ namespace SoEasy
 		}
 	}
 
-	void ActionManager::AddActionArgv(shared_ptr<NetWorkPacket> messageData)
+	bool ActionManager::AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData)
 	{
+		auto iter = this->mRetActionMap.find(id);
+		if (iter == this->mRetActionMap.end())
+		{
+			SayNoDebugError("not find callback " << id);
+			return false;
+		}
 		this->mCallbackMessageQueue.AddItem(messageData);
+		return true;
 	}
 
 	bool ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId)

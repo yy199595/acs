@@ -6,21 +6,19 @@ namespace SoEasy
 {
 	class LocalService : public ServiceBase
 	{
-	public:		
+	public:
 		LocalService();
 		virtual ~LocalService() { }
 	public:
-		bool HasAction(const std::string & action);
-		void AddActionArgv(const std::string & address, SharedPacket argv);
+		bool HasMethod(const std::string & action) final;
 	public:
-		 bool OnInit() override;
-		 void OnSystemUpdate() override;
-		 virtual void OnRefreshService() { };	//刷新服务表调用
+		bool OnInit() override;
+		virtual void OnRefreshService() { };	//刷新服务表调用
 	private:
-		bool HandleMessage(SharedPacket packet) override;
-		bool HandleMessage(SharedTcpSession session, SharedPacket packet);
+		bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) final;
+		bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) final;
 	protected:
-		
+
 		bool BindFunction(std::string name, LocalAction1 action);
 
 		template<typename T1>
@@ -34,10 +32,8 @@ namespace SoEasy
 		XCode CallAction(SharedPacket request, SharedPacket returnData);
 		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	private:
-		class ActionManager * mActionManager;
 		class CoroutineManager * mCorManager;
 		class NetWorkManager * mNetWorkManager;
-		DoubleBufferQueue<SharedNetPacket> mHandleMessageQueue;
 		std::unordered_map<long long, std::string> mCurrentSessionMap;
 		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
 	};

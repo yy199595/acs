@@ -270,6 +270,7 @@ const ::google::protobuf::uint32 TableStruct_ServerCommon_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::PB::LogicServerData, server_ip_),
   PROTOBUF_FIELD_OFFSET(::PB::LogicServerData, server_port_),
   PROTOBUF_FIELD_OFFSET(::PB::LogicServerData, server_token_),
+  PROTOBUF_FIELD_OFFSET(::PB::LogicServerData, logicaddress_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PB::LogicServerListData, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -349,28 +350,29 @@ const ::google::protobuf::uint32 TableStruct_ServerCommon_2eproto::offsets[] PRO
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, user_id_),
+  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, userid_),
   PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, account_),
   PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, passwd_),
   PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, platform_),
   PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, phonenum_),
-  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, device_mac_),
-  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, register_time_),
-  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, last_logintime_),
+  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, devicemac_),
+  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, registertime_),
+  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, lastlogintime_),
+  PROTOBUF_FIELD_OFFSET(::PB::UserAccountData, token_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::PB::LogicServerData)},
-  { 10, -1, sizeof(::PB::LogicServerListData)},
-  { 16, -1, sizeof(::PB::ServerRegisterBack)},
-  { 22, -1, sizeof(::PB::Service_NodeRegisterRequest)},
-  { 30, 37, sizeof(::PB::Service_RegisterRequest_MServiceMapEntry_DoNotUse)},
-  { 39, -1, sizeof(::PB::Service_RegisterRequest)},
-  { 46, -1, sizeof(::PB::Service)},
-  { 51, -1, sizeof(::PB::ServiceData)},
-  { 60, -1, sizeof(::PB::ServicesNotice)},
-  { 66, -1, sizeof(::PB::UserRegisterData)},
-  { 76, -1, sizeof(::PB::UserRegisterBack)},
-  { 84, -1, sizeof(::PB::UserAccountData)},
+  { 11, -1, sizeof(::PB::LogicServerListData)},
+  { 17, -1, sizeof(::PB::ServerRegisterBack)},
+  { 23, -1, sizeof(::PB::Service_NodeRegisterRequest)},
+  { 31, 38, sizeof(::PB::Service_RegisterRequest_MServiceMapEntry_DoNotUse)},
+  { 40, -1, sizeof(::PB::Service_RegisterRequest)},
+  { 47, -1, sizeof(::PB::Service)},
+  { 52, -1, sizeof(::PB::ServiceData)},
+  { 61, -1, sizeof(::PB::ServicesNotice)},
+  { 67, -1, sizeof(::PB::UserRegisterData)},
+  { 77, -1, sizeof(::PB::UserRegisterBack)},
+  { 85, -1, sizeof(::PB::UserAccountData)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -395,37 +397,38 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_ServerCommon_2eproto[] =
-  "\n\022ServerCommon.proto\022\002PB\"u\n\017LogicServerD"
-  "ata\022\017\n\007area_id\030\001 \001(\005\022\023\n\013server_name\030\002 \001("
-  "\t\022\021\n\tserver_ip\030\003 \001(\t\022\023\n\013server_port\030\004 \001("
-  "\005\022\024\n\014server_token\030\005 \001(\t\"\?\n\023LogicServerLi"
-  "stData\022(\n\013server_data\030\001 \001(\0132\023.PB.LogicSe"
-  "rverData\"A\n\022ServerRegisterBack\022+\n\016logic_"
-  "srv_list\030\001 \003(\0132\023.PB.LogicServerData\"\357\001\n\007"
-  "Service\032M\n\023NodeRegisterRequest\022\017\n\007area_i"
-  "d\030\001 \001(\005\022\017\n\007node_id\030\002 \001(\005\022\024\n\014node_address"
-  "\030\003 \001(\t\032\224\001\n\017RegisterRequest\022\n\n\002id\030\001 \001(\003\022A"
-  "\n\013mServiceMap\030\002 \003(\0132,.PB.Service.Registe"
-  "rRequest.MServiceMapEntry\0322\n\020MServiceMap"
-  "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\005:\0028\001\"`\n"
-  "\013ServiceData\022\016\n\006adreId\030\001 \001(\005\022\022\n\nservice_"
-  "id\030\002 \001(\005\022\024\n\014service_name\030\003 \001(\t\022\027\n\017servic"
-  "e_address\030\004 \001(\t\"3\n\016ServicesNotice\022!\n\010ser"
-  "vices\030\001 \003(\0132\017.PB.ServiceData\"m\n\020UserRegi"
-  "sterData\022\017\n\007account\030\001 \001(\t\022\020\n\010password\030\002 "
-  "\001(\t\022\020\n\010phonenum\030\003 \001(\003\022\020\n\010platform\030\004 \001(\t\022"
-  "\022\n\ndevice_mac\030\005 \001(\t\"K\n\020UserRegisterBack\022"
-  "\021\n\tplayer_id\030\001 \001(\003\022\025\n\rregister_time\030\002 \001("
-  "\003\022\r\n\005token\030\003 \001(\t\"\252\001\n\017UserAccountData\022\017\n\007"
-  "user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\t\022\016\n\006passwd"
-  "\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\020\n\010phonenum\030\005 \001"
-  "(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rregister_time\030"
-  "\007 \001(\003\022\026\n\016last_logintime\030\010 \001(\003b\006proto3"
+  "\n\022ServerCommon.proto\022\002PB\"\213\001\n\017LogicServer"
+  "Data\022\017\n\007area_id\030\001 \001(\005\022\023\n\013server_name\030\002 \001"
+  "(\t\022\021\n\tserver_ip\030\003 \001(\t\022\023\n\013server_port\030\004 \001"
+  "(\005\022\024\n\014server_token\030\005 \001(\t\022\024\n\014logicAddress"
+  "\030\006 \001(\005\"\?\n\023LogicServerListData\022(\n\013server_"
+  "data\030\001 \001(\0132\023.PB.LogicServerData\"A\n\022Serve"
+  "rRegisterBack\022+\n\016logic_srv_list\030\001 \003(\0132\023."
+  "PB.LogicServerData\"\357\001\n\007Service\032M\n\023NodeRe"
+  "gisterRequest\022\017\n\007area_id\030\001 \001(\005\022\017\n\007node_i"
+  "d\030\002 \001(\005\022\024\n\014node_address\030\003 \001(\t\032\224\001\n\017Regist"
+  "erRequest\022\n\n\002id\030\001 \001(\003\022A\n\013mServiceMap\030\002 \003"
+  "(\0132,.PB.Service.RegisterRequest.MService"
+  "MapEntry\0322\n\020MServiceMapEntry\022\013\n\003key\030\001 \001("
+  "\t\022\r\n\005value\030\002 \001(\005:\0028\001\"`\n\013ServiceData\022\016\n\006a"
+  "dreId\030\001 \001(\005\022\022\n\nservice_id\030\002 \001(\005\022\024\n\014servi"
+  "ce_name\030\003 \001(\t\022\027\n\017service_address\030\004 \001(\t\"3"
+  "\n\016ServicesNotice\022!\n\010services\030\001 \003(\0132\017.PB."
+  "ServiceData\"m\n\020UserRegisterData\022\017\n\007accou"
+  "nt\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\022\020\n\010phonenum\030\003"
+  " \001(\003\022\020\n\010platform\030\004 \001(\t\022\022\n\ndevice_mac\030\005 \001"
+  "(\t\"K\n\020UserRegisterBack\022\021\n\tplayer_id\030\001 \001("
+  "\003\022\025\n\rregister_time\030\002 \001(\003\022\r\n\005token\030\003 \001(\t\""
+  "\265\001\n\017UserAccountData\022\016\n\006userid\030\001 \001(\003\022\017\n\007a"
+  "ccount\030\002 \001(\t\022\016\n\006passwd\030\003 \001(\t\022\020\n\010platform"
+  "\030\004 \001(\t\022\020\n\010phonenum\030\005 \001(\003\022\021\n\tdevicemac\030\006 "
+  "\001(\t\022\024\n\014registertime\030\007 \001(\003\022\025\n\rlastloginti"
+  "me\030\010 \001(\003\022\r\n\005token\030\t \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_ServerCommon_2eproto = {
   false, InitDefaults_ServerCommon_2eproto, 
   descriptor_table_protodef_ServerCommon_2eproto,
-  "ServerCommon.proto", &assign_descriptors_table_ServerCommon_2eproto, 1037,
+  "ServerCommon.proto", &assign_descriptors_table_ServerCommon_2eproto, 1071,
 };
 
 void AddDescriptors_ServerCommon_2eproto() {
@@ -453,6 +456,7 @@ const int LogicServerData::kServerNameFieldNumber;
 const int LogicServerData::kServerIpFieldNumber;
 const int LogicServerData::kServerPortFieldNumber;
 const int LogicServerData::kServerTokenFieldNumber;
+const int LogicServerData::kLogicAddressFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 LogicServerData::LogicServerData()
@@ -477,8 +481,8 @@ LogicServerData::LogicServerData(const LogicServerData& from)
     server_token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.server_token_);
   }
   ::memcpy(&area_id_, &from.area_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&server_port_) -
-    reinterpret_cast<char*>(&area_id_)) + sizeof(server_port_));
+    static_cast<size_t>(reinterpret_cast<char*>(&logicaddress_) -
+    reinterpret_cast<char*>(&area_id_)) + sizeof(logicaddress_));
   // @@protoc_insertion_point(copy_constructor:PB.LogicServerData)
 }
 
@@ -489,8 +493,8 @@ void LogicServerData::SharedCtor() {
   server_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   server_token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&area_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&server_port_) -
-      reinterpret_cast<char*>(&area_id_)) + sizeof(server_port_));
+      reinterpret_cast<char*>(&logicaddress_) -
+      reinterpret_cast<char*>(&area_id_)) + sizeof(logicaddress_));
 }
 
 LogicServerData::~LogicServerData() {
@@ -523,8 +527,8 @@ void LogicServerData::Clear() {
   server_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   server_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&area_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&server_port_) -
-      reinterpret_cast<char*>(&area_id_)) + sizeof(server_port_));
+      reinterpret_cast<char*>(&logicaddress_) -
+      reinterpret_cast<char*>(&area_id_)) + sizeof(logicaddress_));
   _internal_metadata_.Clear();
 }
 
@@ -601,6 +605,13 @@ const char* LogicServerData::_InternalParse(const char* begin, const char* end, 
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // int32 logicAddress = 6;
+      case 6: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 48) goto handle_unusual;
+        msg->set_logicaddress(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -708,6 +719,19 @@ bool LogicServerData::MergePartialFromCodedStream(
         break;
       }
 
+      // int32 logicAddress = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (48 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &logicaddress_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -775,6 +799,11 @@ void LogicServerData::SerializeWithCachedSizes(
       5, this->server_token(), output);
   }
 
+  // int32 logicAddress = 6;
+  if (this->logicaddress() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->logicaddress(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -829,6 +858,11 @@ void LogicServerData::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         5, this->server_token(), target);
+  }
+
+  // int32 logicAddress = 6;
+  if (this->logicaddress() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->logicaddress(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -887,6 +921,13 @@ size_t LogicServerData::ByteSizeLong() const {
         this->server_port());
   }
 
+  // int32 logicAddress = 6;
+  if (this->logicaddress() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->logicaddress());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -932,6 +973,9 @@ void LogicServerData::MergeFrom(const LogicServerData& from) {
   if (from.server_port() != 0) {
     set_server_port(from.server_port());
   }
+  if (from.logicaddress() != 0) {
+    set_logicaddress(from.logicaddress());
+  }
 }
 
 void LogicServerData::CopyFrom(const ::google::protobuf::Message& from) {
@@ -967,6 +1011,7 @@ void LogicServerData::InternalSwap(LogicServerData* other) {
     GetArenaNoVirtual());
   swap(area_id_, other->area_id_);
   swap(server_port_, other->server_port_);
+  swap(logicaddress_, other->logicaddress_);
 }
 
 ::google::protobuf::Metadata LogicServerData::GetMetadata() const {
@@ -4296,14 +4341,15 @@ class UserAccountData::HasBitSetters {
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int UserAccountData::kUserIdFieldNumber;
+const int UserAccountData::kUseridFieldNumber;
 const int UserAccountData::kAccountFieldNumber;
 const int UserAccountData::kPasswdFieldNumber;
 const int UserAccountData::kPlatformFieldNumber;
 const int UserAccountData::kPhonenumFieldNumber;
-const int UserAccountData::kDeviceMacFieldNumber;
-const int UserAccountData::kRegisterTimeFieldNumber;
-const int UserAccountData::kLastLogintimeFieldNumber;
+const int UserAccountData::kDevicemacFieldNumber;
+const int UserAccountData::kRegistertimeFieldNumber;
+const int UserAccountData::kLastlogintimeFieldNumber;
+const int UserAccountData::kTokenFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UserAccountData::UserAccountData()
@@ -4327,13 +4373,17 @@ UserAccountData::UserAccountData(const UserAccountData& from)
   if (from.platform().size() > 0) {
     platform_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.platform_);
   }
-  device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.device_mac().size() > 0) {
-    device_mac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.device_mac_);
+  devicemac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.devicemac().size() > 0) {
+    devicemac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.devicemac_);
   }
-  ::memcpy(&user_id_, &from.user_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&last_logintime_) -
-    reinterpret_cast<char*>(&user_id_)) + sizeof(last_logintime_));
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.token().size() > 0) {
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  ::memcpy(&userid_, &from.userid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&lastlogintime_) -
+    reinterpret_cast<char*>(&userid_)) + sizeof(lastlogintime_));
   // @@protoc_insertion_point(copy_constructor:PB.UserAccountData)
 }
 
@@ -4343,10 +4393,11 @@ void UserAccountData::SharedCtor() {
   account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   passwd_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&last_logintime_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(last_logintime_));
+  devicemac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&userid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&lastlogintime_) -
+      reinterpret_cast<char*>(&userid_)) + sizeof(lastlogintime_));
 }
 
 UserAccountData::~UserAccountData() {
@@ -4358,7 +4409,8 @@ void UserAccountData::SharedDtor() {
   account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   passwd_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   platform_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  devicemac_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void UserAccountData::SetCachedSize(int size) const {
@@ -4379,10 +4431,11 @@ void UserAccountData::Clear() {
   account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   passwd_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&last_logintime_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(last_logintime_));
+  devicemac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&userid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&lastlogintime_) -
+      reinterpret_cast<char*>(&userid_)) + sizeof(lastlogintime_));
   _internal_metadata_.Clear();
 }
 
@@ -4399,10 +4452,10 @@ const char* UserAccountData::_InternalParse(const char* begin, const char* end, 
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // int64 user_id = 1;
+      // int64 userid = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_user_id(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_userid(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -4461,13 +4514,13 @@ const char* UserAccountData::_InternalParse(const char* begin, const char* end, 
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string device_mac = 6;
+      // string devicemac = 6;
       case 6: {
         if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("PB.UserAccountData.device_mac");
-        object = msg->mutable_device_mac();
+        ctx->extra_parse_data().SetFieldName("PB.UserAccountData.devicemac");
+        object = msg->mutable_devicemac();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -4477,18 +4530,34 @@ const char* UserAccountData::_InternalParse(const char* begin, const char* end, 
         ptr += size;
         break;
       }
-      // int64 register_time = 7;
+      // int64 registertime = 7;
       case 7: {
         if (static_cast<::google::protobuf::uint8>(tag) != 56) goto handle_unusual;
-        msg->set_register_time(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_registertime(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // int64 last_logintime = 8;
+      // int64 lastlogintime = 8;
       case 8: {
         if (static_cast<::google::protobuf::uint8>(tag) != 64) goto handle_unusual;
-        msg->set_last_logintime(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_lastlogintime(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string token = 9;
+      case 9: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 74) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("PB.UserAccountData.token");
+        object = msg->mutable_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       default: {
@@ -4525,13 +4594,13 @@ bool UserAccountData::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int64 user_id = 1;
+      // int64 userid = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &user_id_)));
+                 input, &userid_)));
         } else {
           goto handle_unusual;
         }
@@ -4596,41 +4665,56 @@ bool UserAccountData::MergePartialFromCodedStream(
         break;
       }
 
-      // string device_mac = 6;
+      // string devicemac = 6;
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_device_mac()));
+                input, this->mutable_devicemac()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->device_mac().data(), static_cast<int>(this->device_mac().length()),
+            this->devicemac().data(), static_cast<int>(this->devicemac().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "PB.UserAccountData.device_mac"));
+            "PB.UserAccountData.devicemac"));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // int64 register_time = 7;
+      // int64 registertime = 7;
       case 7: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (56 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &register_time_)));
+                 input, &registertime_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // int64 last_logintime = 8;
+      // int64 lastlogintime = 8;
       case 8: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (64 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &last_logintime_)));
+                 input, &lastlogintime_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string token = 9;
+      case 9: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (74 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->token().data(), static_cast<int>(this->token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "PB.UserAccountData.token"));
         } else {
           goto handle_unusual;
         }
@@ -4664,9 +4748,9 @@ void UserAccountData::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
+  // int64 userid = 1;
+  if (this->userid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->userid(), output);
   }
 
   // string account = 2;
@@ -4704,24 +4788,34 @@ void UserAccountData::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(5, this->phonenum(), output);
   }
 
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
+  // string devicemac = 6;
+  if (this->devicemac().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->device_mac().data(), static_cast<int>(this->device_mac().length()),
+      this->devicemac().data(), static_cast<int>(this->devicemac().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.UserAccountData.device_mac");
+      "PB.UserAccountData.devicemac");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      6, this->device_mac(), output);
+      6, this->devicemac(), output);
   }
 
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(7, this->register_time(), output);
+  // int64 registertime = 7;
+  if (this->registertime() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(7, this->registertime(), output);
   }
 
-  // int64 last_logintime = 8;
-  if (this->last_logintime() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(8, this->last_logintime(), output);
+  // int64 lastlogintime = 8;
+  if (this->lastlogintime() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(8, this->lastlogintime(), output);
+  }
+
+  // string token = 9;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "PB.UserAccountData.token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      9, this->token(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4737,9 +4831,9 @@ void UserAccountData::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
+  // int64 userid = 1;
+  if (this->userid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->userid(), target);
   }
 
   // string account = 2;
@@ -4780,25 +4874,36 @@ void UserAccountData::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(5, this->phonenum(), target);
   }
 
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
+  // string devicemac = 6;
+  if (this->devicemac().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->device_mac().data(), static_cast<int>(this->device_mac().length()),
+      this->devicemac().data(), static_cast<int>(this->devicemac().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "PB.UserAccountData.device_mac");
+      "PB.UserAccountData.devicemac");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        6, this->device_mac(), target);
+        6, this->devicemac(), target);
   }
 
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(7, this->register_time(), target);
+  // int64 registertime = 7;
+  if (this->registertime() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(7, this->registertime(), target);
   }
 
-  // int64 last_logintime = 8;
-  if (this->last_logintime() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(8, this->last_logintime(), target);
+  // int64 lastlogintime = 8;
+  if (this->lastlogintime() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(8, this->lastlogintime(), target);
+  }
+
+  // string token = 9;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "PB.UserAccountData.token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        9, this->token(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4843,18 +4948,25 @@ size_t UserAccountData::ByteSizeLong() const {
         this->platform());
   }
 
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
+  // string devicemac = 6;
+  if (this->devicemac().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->device_mac());
+        this->devicemac());
   }
 
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
+  // string token = 9;
+  if (this->token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->token());
+  }
+
+  // int64 userid = 1;
+  if (this->userid() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->user_id());
+        this->userid());
   }
 
   // int64 phonenum = 5;
@@ -4864,18 +4976,18 @@ size_t UserAccountData::ByteSizeLong() const {
         this->phonenum());
   }
 
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
+  // int64 registertime = 7;
+  if (this->registertime() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->register_time());
+        this->registertime());
   }
 
-  // int64 last_logintime = 8;
-  if (this->last_logintime() != 0) {
+  // int64 lastlogintime = 8;
+  if (this->lastlogintime() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->last_logintime());
+        this->lastlogintime());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -4917,21 +5029,25 @@ void UserAccountData::MergeFrom(const UserAccountData& from) {
 
     platform_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.platform_);
   }
-  if (from.device_mac().size() > 0) {
+  if (from.devicemac().size() > 0) {
 
-    device_mac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.device_mac_);
+    devicemac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.devicemac_);
   }
-  if (from.user_id() != 0) {
-    set_user_id(from.user_id());
+  if (from.token().size() > 0) {
+
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  if (from.userid() != 0) {
+    set_userid(from.userid());
   }
   if (from.phonenum() != 0) {
     set_phonenum(from.phonenum());
   }
-  if (from.register_time() != 0) {
-    set_register_time(from.register_time());
+  if (from.registertime() != 0) {
+    set_registertime(from.registertime());
   }
-  if (from.last_logintime() != 0) {
-    set_last_logintime(from.last_logintime());
+  if (from.lastlogintime() != 0) {
+    set_lastlogintime(from.lastlogintime());
   }
 }
 
@@ -4966,12 +5082,14 @@ void UserAccountData::InternalSwap(UserAccountData* other) {
     GetArenaNoVirtual());
   platform_.Swap(&other->platform_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  device_mac_.Swap(&other->device_mac_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  devicemac_.Swap(&other->devicemac_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(user_id_, other->user_id_);
+  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(userid_, other->userid_);
   swap(phonenum_, other->phonenum_);
-  swap(register_time_, other->register_time_);
-  swap(last_logintime_, other->last_logintime_);
+  swap(registertime_, other->registertime_);
+  swap(lastlogintime_, other->lastlogintime_);
 }
 
 ::google::protobuf::Metadata UserAccountData::GetMetadata() const {

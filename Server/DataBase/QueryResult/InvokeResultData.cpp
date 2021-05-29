@@ -38,6 +38,12 @@ namespace SoEasy
 		return jsonWriter.Int((int)code);
 	}
 
+	bool QuertJsonWritre::Write(const char * key, double value)
+	{
+		jsonWriter.Key(key);
+		return jsonWriter.Double(value);
+	}
+
 	bool QuertJsonWritre::Write(const char * key, long long value)
 	{
 		jsonWriter.Key(key);

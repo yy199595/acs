@@ -132,9 +132,13 @@
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp" />
     <ClCompile Include="Manager\RedisManager.cpp" />
+    <ClCompile Include="MysqlClient\MysqlInsertTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlLuaTask.cpp" />
+    <ClCompile Include="MysqlClient\MysqlQueryTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlTaskAction.cpp" />
     <ClCompile Include="MysqlClient\MysqlTaskBase.cpp" />
+    <ClCompile Include="MysqlClient\MysqlUpdateTask.cpp" />
+    <ClCompile Include="MysqlClient\TableOperator.cpp" />
     <ClCompile Include="QueryResult\InvokeResultData.cpp" />
     <ClCompile Include="RedisClient\RedisLuaTask.cpp" />
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
@@ -145,9 +149,13 @@
     <ClInclude Include="Manager\MysqlManager.h" />
     <ClInclude Include="Manager\RedisManager.h" />
     <ClInclude Include="MysqlClient\MysqlDefine.h" />
+    <ClInclude Include="MysqlClient\MysqlInsertTask.h" />
     <ClInclude Include="MysqlClient\MysqlLuaTask.h" />
+    <ClInclude Include="MysqlClient\MysqlQueryTask.h" />
     <ClInclude Include="MysqlClient\MysqlTaskAction.h" />
     <ClInclude Include="MysqlClient\MysqlTaskBase.h" />
+    <ClInclude Include="MysqlClient\MysqlUpdateTask.h" />
+    <ClInclude Include="MysqlClient\TableOperator.h" />
     <ClInclude Include="QueryResult\InvokeResultData.h" />
     <ClInclude Include="RedisClient\RedisDefine.h" />
     <ClInclude Include="RedisClient\RedisLuaTask.h" />

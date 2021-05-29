@@ -15,14 +15,21 @@ namespace SoEasy
 	public:
 		virtual bool OnInit();
 		virtual void OnInitComplete() { };
-		virtual void OnSystemUpdate() { };
+		virtual void OnSystemUpdate();
 		virtual void OnConnectDone(SharedTcpSession tcpSession) { }
+	public:	
+		void PushHandleMessage(SharedPacket argv);
+		void PushHandleMessage(const std::string & address, SharedPacket argv);
 	public:
 		bool IsInit() { return this->mIsInit; }
 		const int GetServiceId() { return this->mServiceId; }
+		virtual bool HasMethod(const std::string & method) = 0;
 		const std::string & GetServiceName() { return this->mServiceName; };
  	protected:
-		virtual bool HandleMessage(shared_ptr<NetWorkPacket>) = 0;
+		bool ReplyMessage(const long long cb, shared_ptr<NetWorkPacket> msg);
+		bool ReplyMessage(const std::string & address, shared_ptr<NetWorkPacket> msg);
+		virtual bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) = 0;
+		virtual bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) = 0;
 	public:
 		void Sleep(long long ms);
 		void Start(const std::string & name, std::function<void()> && func);
@@ -40,7 +47,10 @@ namespace SoEasy
 		bool mIsInit;
 		int mServiceId;
 		std::string mServiceName;
+		class NetWorkManager * mNetManager;
 		class ActionManager * mActionManager;
 		class CoroutineManager * mCorManager;
+		DoubleBufferQueue<SharedPacket> mLocalHandleMsgQueue;
+		DoubleBufferQueue<SharedNetPacket> mProxyHandleMsgQueue;
 	};
 }

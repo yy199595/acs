@@ -5,10 +5,12 @@ namespace SoEasy
 {
 	enum SessionState
 	{
-		None,
-		Connect, //正在连接
-		Normal,	//正常
-		ConnectError,	//错误
+		Session_None,
+		Session_Connect, //正在连接
+		Session_Normal,	//正常
+		Session_OK,	//可读可写
+		Session_Error,	//错误
+		Session_Close,	//手动关闭
 	};
 
 

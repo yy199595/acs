@@ -36,24 +36,15 @@ namespace SoEasy
 			return false;
 		}
 		auto iter = this->mThreadMap.begin();
-		size_t size = iter->second->GetTaskSize();
-		long long threadId = iter->second->GetThreadId();
 		for (; iter != this->mThreadMap.end(); iter++)
 		{
 			TaskThread * taskThread = iter->second;
-			if (taskThread->GetTaskSize() == 0)
+			if (taskThread->IsRunning() == false)
 			{
 				taskThread->AddTaskAction(taskAction);
 				return true;
 			}
-			if (taskThread->GetTaskSize() < size)
-			{
-				size = taskThread->GetTaskSize();
-				threadId = taskThread->GetThreadId();
-			}
 		}
-		TaskThread * taskThread = this->GetTaskThread(threadId);
-		taskThread->AddTaskAction(taskAction);
-		return true;
+		return false;
 	}
 }

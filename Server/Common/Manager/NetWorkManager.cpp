@@ -57,7 +57,6 @@ namespace SoEasy
 		{
 			if (tcpSession->StartReceiveMsg())
 			{
-				long long socketId = tcpSession->GetSocketId();
 				this->mSessionAdressMap.emplace(address, tcpSession);
 				SayNoDebugError("add new session " << address);
 				return true;

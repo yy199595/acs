@@ -193,6 +193,26 @@ namespace SoEasy
 		return false;
 	}
 
+	bool ServerConfig::GetValue(const std::string k2, std::unordered_map<std::string, std::string>& data)
+	{
+		rapidjson::Value * value = this->GetJsonValue(k2);
+		if (value == nullptr || !value->IsObject())
+		{
+			return false;
+		}
+		for (auto iter = value->MemberBegin(); iter != value->MemberEnd(); iter++)
+		{
+			if (!iter->name.IsString() || !iter->value.IsString())
+			{
+				return false;
+			}
+			const std::string key(iter->name.GetString(), iter->name.GetStringLength());
+			const std::string value(iter->value.GetString(), iter->value.GetStringLength());
+			data.insert(std::make_pair(key, value));
+		}
+		return true;
+	}
+
 	rapidjson::Value * ServerConfig::GetJsonValue(const std::string & k2)
 	{
 		auto iter = this->mMapConfigData.find(k2);

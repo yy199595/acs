@@ -24,9 +24,11 @@
     "ScriptInclude":
     [
         "./Script/Common",
-        "./Script/Server"
+        "./Script/Server",
+        "./Script/Server/Service"
     ],
-    "Managers": [
+    "Managers": 
+    [
         "NetWorkManager",
         "TimerManager",
         "MysqlManager",

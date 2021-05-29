@@ -12,12 +12,14 @@ namespace SoEasy
 	protected:
 		void OnTaskFinish() final;
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
+		const std::string & GetSqlCommand() final { return this->mSqlCommand; }
 	public:
 		const long long GetCoroutienId() { return this->mCoroutineId; }
 	public:
 		std::shared_ptr<InvokeResultData> GetInvokeData();
 	private:
 		long long mCoroutineId;
+		const std::string mSqlCommand;
 		CoroutineManager * mCoroutineMgr;
 		std::shared_ptr<rapidjson::Document> mDocument;
 	};

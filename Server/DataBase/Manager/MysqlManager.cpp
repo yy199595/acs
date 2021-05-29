@@ -8,6 +8,11 @@
 #include<Script/ClassProxyHelper.h>
 #include<Script/MysqlExtension.h>
 #include<Util/FileHelper.h>
+
+#include<MysqlClient/TableOperator.h>
+#include<MysqlClient/MysqlQueryTask.h>
+#include<MysqlClient/MysqlInsertTask.h>
+#include<MysqlClient/MysqlUpdateTask.h>
 namespace SoEasy
 {
 	MysqlManager::MysqlManager()
@@ -37,14 +42,14 @@ namespace SoEasy
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string db, const std::string & sql)
+	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string & sql)
 	{
 		if (this->mCoroutineManager->IsInMainCoroutine())
 		{
 			return make_shared<InvokeResultData>(XCode::MysqlNotInCoroutine);
 		}
 		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, db, sql, this->mCoroutineManager);
+		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, this->mDataBaseName, sql, this->mCoroutineManager);
 
 		if (!this->StartTaskAction(taskAction))
 		{
@@ -55,98 +60,47 @@ namespace SoEasy
 		return taskAction->GetInvokeData();
 	}
 
-	bool MysqlManager::CreateMysqlDb()
+	bool MysqlManager::InsertData(const std::string tab, shared_ptr<Message> data)
 	{
-		if (mysql_select_db(this->mMysqlSockt, this->mDataBaseName.c_str()) != 0)
-		{
-			std::string sql = "Create DataBase " + this->mDataBaseName;
-			if (mysql_real_query(mMysqlSockt, sql.c_str(), sql.length()) != 0)
-			{
-				SayNoDebugError("create " << this->mDataBaseName << " db fail");
-				return false;
-			}
-			SayNoDebugLog("create " << this->mDataBaseName << " db successful");
-		}
-		return this->CreateMysqlTable();
+		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
+		long long taskActionId = NumberHelper::Create();
+		shared_ptr<MysqlInsertTask> taskAction = make_shared<MysqlInsertTask>(this, taskActionId, this->mDataBaseName);
+
+		SayNoAssertRetFalse_F(taskAction->InitTask(tab, this->mCoroutineManager, data));
+		
+		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
+		this->mCoroutineManager->YieldReturn();
+
+		return taskAction->GetErrorCode() == XCode::Successful;
 	}
 
-	bool MysqlManager::CreateMysqlTable()
+	bool MysqlManager::QueryData(const std::string tab, shared_ptr<Message> data, const std::string & key)
 	{
-		std::string jsonConfig;
-		if (!FileHelper::ReadTxtFile(this->mSqlTablePath, jsonConfig))
-		{
-			SayNoDebugFatal("not find sql config " << jsonConfig);
-			return false;
-		}
-		rapidjson::Document jsonDocument;
-		jsonDocument.Parse(jsonConfig.c_str(), jsonConfig.size());
-		if (jsonDocument.HasParseError())
-		{
-			SayNoDebugFatal("parse json fail " << jsonConfig);
-			return false;
-		}
-		for (auto iter = jsonDocument.MemberBegin(); iter != jsonDocument.MemberEnd(); iter++)
-		{
-			const char * tableName = iter->name.GetString();
-			if (!iter->value.IsObject() || !this->CreateMysqlTable(tableName, &iter->value))
-			{
-				SayNoDebugError("create sql table fail " << tableName);
-				return false;
-			}
-		}
-		return true;
+		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
+		
+		long long taskActionId = NumberHelper::Create();
+		shared_ptr<MysqlQueryTask> taskAction = make_shared<MysqlQueryTask>(this, taskActionId, this->mDataBaseName);
+		SayNoAssertRetFalse_F(taskAction->InitTask(tab, this->mCoroutineManager, key, data));
+		
+		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
+		this->mCoroutineManager->YieldReturn();
+		return taskAction->GetErrorCode() == XCode::Successful;
 	}
 
-	bool MysqlManager::CreateMysqlTable(const char * tab, rapidjson::Value * jsonValue)
+	bool MysqlManager::UpdateData(const std::string tab, shared_ptr<Message> data, const std::string & key)
 	{
-		std::string sql = "desc " + std::string(tab);
-		if (mysql_real_query(mMysqlSockt, sql.c_str(), sql.length()) != 0)
-		{
-			return this->CreateNewMysqlTable(tab, jsonValue);
-		}
-		return true;
+		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
+		
+		long long taskActionId = NumberHelper::Create();
+		shared_ptr<MysqlUpdateTask> taskAction = make_shared<MysqlUpdateTask>(this, taskActionId, this->mDataBaseName);
+		SayNoAssertRetFalse_F(taskAction->InitTask(tab, this->mCoroutineManager, key, data));
+		
+		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
+		
+		this->mCoroutineManager->YieldReturn();
+		return taskAction->GetErrorCode() == XCode::Successful;
 	}
-	bool MysqlManager::CreateNewMysqlTable(const char * tab, rapidjson::Value * jsonValue)
-	{
-		std::stringstream sqlCommand;
-		auto iter1 = jsonValue->FindMember("primaty_key");
-		if (iter1 == jsonValue->MemberEnd())
-		{
-			return false;	//没有设置主键
-		}
-		std::string paimaty = iter1->value.GetString();
 
-		auto iter2 = jsonValue->FindMember(paimaty.c_str());
-		if (iter2 == jsonValue->MemberEnd())
-		{
-			return false;		//字段没有主键
-		}
-
-		sqlCommand << "create table `" << tab << "`(\n";
-		for (auto iter = jsonValue->MemberBegin(); iter != jsonValue->MemberEnd(); iter++)
-		{
-			std::string key = iter->name.GetString();
-			if (key != "primaty_key")
-			{
-				if (!iter->value.IsArray())
-				{
-					return false;
-				}
-				rapidjson::Value jsonArray = iter->value.GetArray();
-				sqlCommand << "`" << key << "` " << jsonArray[0].GetString();
-				sqlCommand << " comment '" << jsonArray[1].GetString() << "',\n";
-			}
-		}
-		sqlCommand << "PRIMARY KEY (`" << paimaty << "`)\n";
-		sqlCommand << ")ENGINE=InnoDB DEFAULT CHARSET = utf8;";
-		const std::string sql = sqlCommand.str();
-		if (mysql_real_query(mMysqlSockt, sql.c_str(), sql.length()) != 0)
-		{
-			SayNoDebugError(mysql_error(mMysqlSockt));
-			return false;
-		}	
-		return true;
-	}
 
 	void MysqlManager::OnInitComplete()
 	{
@@ -180,6 +134,7 @@ namespace SoEasy
 			this->mMysqlSocketMap.insert(std::make_pair(threadId, this->mMysqlSockt));
 			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
-		return this->CreateMysqlDb();
+		TableOperator tableOper(this->mMysqlSockt, this->mDataBaseName, this->mSqlTablePath);	
+		return tableOper.InitMysqlTable();
 	}
 }

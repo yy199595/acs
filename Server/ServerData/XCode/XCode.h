@@ -24,6 +24,7 @@ enum XCode
 
 	MysqlNotInCoroutine,	//不在协程中
 	MysqlStartTaskFail,		//启动失败
+	MysqlInitTaskFail,		// 初始化任务失败
 	MysqlSocketIsNull,		//socket空
 	MysqlSelectDbFailure,	//选择db失败
 	MysqlInvokeFailure,		//执行sql语句失败

@@ -249,6 +249,9 @@
     <ClCompile Include="Other\ServiceNode.cpp">
       <Filter>Other</Filter>
     </ClCompile>
+    <ClCompile Include="Service\LocalLuaService.cpp">
+      <Filter>Service</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -541,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="Other\ServiceNode.h">
       <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\LocalLuaService.h">
+      <Filter>Service</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

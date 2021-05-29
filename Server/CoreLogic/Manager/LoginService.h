@@ -3,6 +3,8 @@
 #include<Protocol/ServerCommon.pb.h>
 namespace SoEasy
 {
+	class MysqlManager;
+	class RedisManager;
 	class LoginService : public LocalService
 	{
 	public:
@@ -10,10 +12,13 @@ namespace SoEasy
 		~LoginService() { }
 	protected:
 		bool OnInit() override;
+		void OnInitComplete() final;
 	private:
 		XCode Login(long long operId, shared_ptr<UserAccountData> LoginData);
 		XCode Register(long long operId, shared_ptr<UserRegisterData> registerData);
 	private:
 		int mAreaId;
+		RedisManager * mRedisManager;
+		MysqlManager * mMysqlManager;
 	};
 }

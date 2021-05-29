@@ -18,21 +18,26 @@ namespace SoEasy
 
 	void ProxyService::OnSystemUpdate()
 	{
-		if (!this->mProxyMessageQueue.empty() && mProxyServiceSession->IsActive())
+		ServiceBase::OnSystemUpdate();
+		while (!this->mProxyMessageQueue.empty() && this->mProxyServiceSession->IsActive())
 		{
 			SharedPacket proxyData = this->mProxyMessageQueue.front();
-			this->mProxyMessageQueue.pop();
 			this->mNetManager->SendMessageByAdress(this->mServiceAddress, proxyData);
+			this->mProxyMessageQueue.pop();
 		}
 	}
-	bool ProxyService::HandleMessage(shared_ptr<NetWorkPacket> messageData)
+	bool ProxyService::InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket> messageData)
 	{
-		this->mProxyMessageQueue.push(messageData);
 		if (this->mProxyServiceSession == nullptr)
 		{
 			this->mProxyServiceSession = this->mServiceManager->GetProxySession(this->mServiceAddress);
-			SayNoAssertRetFalse_F(this->mProxyServiceSession);
 		}
+		this->mProxyMessageQueue.push(messageData);
 		return true;
+	}
+
+	bool ProxyService::InvokeMethod(const std::string & address, const std::string & method, SharedPacket messageData)
+	{		
+		return false;
 	}
 }

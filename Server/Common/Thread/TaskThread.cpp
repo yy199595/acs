@@ -7,6 +7,7 @@ namespace SoEasy
 	TaskThread::TaskThread()
 	{
 		this->mThreadId = 0;
+		this->mTaskState = Idle;
 		std::stringstream streamBuffer;
 		this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
 		if (this->mBindThread != nullptr)
@@ -22,32 +23,38 @@ namespace SoEasy
 		this->mThreadVarible.wait(lck);
 	}
 
-	void TaskThread::AddTaskAction(SharedThreadTask taskAction)
+	bool TaskThread::AddTaskAction(SharedThreadTask taskAction)
 	{
-		this->mThreadLock.lock();
-		this->mTaskBuffer.push(taskAction);
-		this->mThreadLock.unlock();
-		this->mThreadVarible.notify_one();
+		if (this->mTaskState == Idle)
+		{
+			this->mThreadLock.lock();
+			this->mWaitInvokeTask.push(taskAction);
+			this->mThreadLock.unlock();
+			this->mThreadVarible.notify_one();
+			return true;
+		}
+		return false;
 	}
 
 	void TaskThread::Run()
 	{
 		while (true)
-		{		
-			if (this->mTaskBuffer.empty())
+		{
+			if (this->mWaitInvokeTask.empty())
 			{
+				this->mTaskState = Idle;
 				std::unique_lock<std::mutex> waitLock(this->mThreadLock);
 				this->mThreadVarible.wait(waitLock);
 			}
-			this->mThreadLock.lock();
-			std::swap(this->mTaskBuffer, this->mWaitInvokeTask);	
-			this->mThreadLock.unlock();
-
-			while (!this->mWaitInvokeTask.empty())
+			else
 			{
+				this->mThreadLock.lock();
+				this->mTaskState = Running;
 				SharedThreadTask taskAction = this->mWaitInvokeTask.front();
 				this->mWaitInvokeTask.pop();
-				taskAction->InvokeInThreadPool(this->mThreadId);	
+				this->mThreadLock.unlock();
+
+				taskAction->InvokeInThreadPool(this->mThreadId);
 				taskAction->NoticeToMainThread();// 通知到主线程
 			}
 		}

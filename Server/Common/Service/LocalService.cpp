@@ -35,13 +35,7 @@ namespace SoEasy
 		return actionProxy->Invoke(request, returnData);
 	}
 
-	void LocalService::AddActionArgv(const std::string & address, SharedPacket argv)
-	{
-		SharedNetPacket packet = make_shared<NetMessageBuffer>(address, argv);
-		this->mHandleMessageQueue.AddItem(packet);
-	}
-
-	bool LocalService::HasAction(const std::string & action)
+	bool LocalService::HasMethod(const std::string & action)
 	{
 		auto iter = this->mActionMap.find(action);
 		return iter != this->mActionMap.end();
@@ -49,76 +43,54 @@ namespace SoEasy
 
 	bool LocalService::OnInit()
 	{
-		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 		return ServiceBase::OnInit();
 	}
 
-	void LocalService::OnSystemUpdate()
+	bool LocalService::InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket> reqData)
 	{
-		SharedNetPacket handlePacket;
-		this->mHandleMessageQueue.SwapQueueData();
-		while (this->mHandleMessageQueue.PopItem(handlePacket))
-		{
-			const std::string & address = handlePacket->mAddress;
-			SharedPacket packetData = handlePacket->mMessagePacket;
-			SharedTcpSession tcpSession = this->mNetWorkManager->GetTcpSession(address);
-			if (tcpSession != nullptr)
-			{
-				this->HandleMessage(tcpSession, packetData);
-			}
-		}
-	}
-
-	bool LocalService::HandleMessage(SharedPacket packet)
-	{
-		const std::string & action = packet->action();
-		auto iter = this->mActionMap.find(action);
+		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
-			SayNoDebugError("not find method " << action);
 			return false;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		this->mCorManager->Start(action, [this, packet, localAction]()
+		this->Start(method, [localAction, reqData, this]()
 		{
-			SharedPacket retData = make_shared<NetWorkPacket>();
-			XCode code = localAction->Invoke(packet, retData);
-			if (packet->callback_id() != 0)
+			shared_ptr<NetWorkPacket> resData = make_shared<NetWorkPacket>();
+			XCode code = localAction->Invoke(reqData, resData);
+			if (reqData->callback_id() != 0)
 			{
-				retData->set_error_code(code);
-				retData->set_callback_id(packet->callback_id());
-				retData->set_operator_id(packet->operator_id());
-				this->mActionManager->AddActionArgv(retData);
+				resData->set_error_code(code);
+				resData->set_callback_id(reqData->callback_id());
+				resData->set_operator_id(reqData->operator_id());
+				this->ReplyMessage(reqData->callback_id(), resData);
 			}
 		});
 		return true;
 	}
 
-	bool LocalService::HandleMessage(SharedTcpSession session, SharedPacket packet)
+	bool LocalService::InvokeMethod(const std::string & address, const std::string & method, SharedPacket reqData)
 	{
-		const std::string & action = packet->action();
-		auto iter = this->mActionMap.find(action);
+		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
-			SayNoDebugError("not find method " << action);
 			return false;
 		}
-		const std::string & address = session->GetAddress();
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		this->mCorManager->Start(action, [address, this, packet, localAction]()
+		this->mCorManager->Start(method, [address, this, reqData, localAction]()
 		{
 			SharedPacket retData = make_shared<NetWorkPacket>();
 			long long currentId = this->mCorManager->GetCurrentCorId();
 			this->mCurrentSessionMap.emplace(currentId, address);
-			XCode code = localAction->Invoke(packet, retData);
-			if (packet->callback_id() != 0)
+			XCode code = localAction->Invoke(reqData, retData);
+			if (reqData->callback_id() != 0)
 			{
 				retData->set_error_code(code);
-				retData->set_callback_id(packet->callback_id());
-				retData->set_operator_id(packet->operator_id());
-				this->mNetWorkManager->SendMessageByAdress(address, retData);
+				retData->set_callback_id(reqData->callback_id());
+				retData->set_operator_id(reqData->operator_id());
+				this->ReplyMessage(address, retData);
 			}
 			auto iter = mCurrentSessionMap.find(currentId);
 			if (iter != mCurrentSessionMap.end())

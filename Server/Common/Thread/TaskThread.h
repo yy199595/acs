@@ -5,6 +5,11 @@
 #include<condition_variable>
 namespace SoEasy
 {
+	enum ThreadState
+	{
+		Idle,
+		Running,
+	};
 	class ThreadPool;
 	class TaskThread
 	{
@@ -13,16 +18,17 @@ namespace SoEasy
 	public:
 		void WaitToNextWake();
 		long long GetThreadId() { return mThreadId; }
-		void AddTaskAction(SharedThreadTask taskAction);
-		size_t GetTaskSize() const { return this->mWaitInvokeTask.size() + this->mTaskBuffer.size(); }
+		bool AddTaskAction(SharedThreadTask taskAction);
+		ThreadState GetTaskState() { return this->mTaskState; }
+		bool IsRunning() { return this->mTaskState == Running; }
 	private:
 		void Run();
 	private:
 		long long mThreadId;
 		std::mutex mThreadLock;
+		ThreadState mTaskState;
 		std::thread * mBindThread;
 		std::condition_variable mThreadVarible;
-		std::queue<SharedThreadTask> mTaskBuffer;
 		std::queue<SharedThreadTask> mWaitInvokeTask;
 	};
 }

@@ -10,12 +10,14 @@ namespace SoEasy
 		~ProxyService() { }
 	public:
 		const int GetAreaId() { return this->mAreaId; }
+		bool HasMethod(const std::string & method) final { return true; }
 		const std::string & GetAddress() { return this->mServiceAddress; }
 	public:
 		 bool OnInit() final;
 		 void OnSystemUpdate() final;
 	protected:
-		bool HandleMessage(shared_ptr<NetWorkPacket> messageData) final;
+		 bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) final;
+		 bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) final;
 	private:
 		int mAreaId;
 		const std::string mServiceAddress;

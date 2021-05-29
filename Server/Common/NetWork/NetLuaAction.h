@@ -10,15 +10,15 @@ namespace SoEasy
 	class NetLuaAction
 	{
 	public:
-		NetLuaAction(lua_State * lua, const std::string name, int action_ref, int invoke_ref);
-		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mActionRef); }
+		NetLuaAction(lua_State * lua, const std::string name, int action_ref);
+		virtual ~NetLuaAction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mActionref); }
 	public:
 		const std::string & GetActionName() { return mActionName; }
 		XCode Invoke(const shared_ptr<NetWorkPacket> requestData); //本地调用
 		XCode Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData);
 	private:
-		int mActionRef;
-		int mInvokeRef;
+		int mActionref;
+		int mInvokeref;
 		lua_State * luaEnv;
 		std::string mActionName;
 	};

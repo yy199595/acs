@@ -6,6 +6,7 @@
 #include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Service/LocalService.h>
+#include<Service/LocalLuaService.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/ActionManager.h>
 namespace SoEasy
@@ -49,11 +50,6 @@ namespace SoEasy
 		{
 			return false;
 		}
-		if (!tcpSession->IsActive())
-		{
-			SayNoDebugError(tcpSession->GetAddress() << " is error add fail");
-			return false;
-		}
 		this->mNewSessionQueue.AddItem(tcpSession);
 		return true;
 	}
@@ -77,24 +73,27 @@ namespace SoEasy
 			SayNoDebugError("parse message error close session");
 			return false;
 		}
-		const std::string & action = messageData->action();
+		const std::string & method = messageData->action();
 		const std::string & service = messageData->service();
-		if (!service.empty() && !action.empty())
+		const long long callbackId = messageData->callback_id();
+		if (!service.empty() && !method.empty())
 		{
-			LocalService * localService = this->mServiceManager->GetLocalService(service);
-			if (localService == nullptr)
-			{
-				return false;
-			}
 			const std::string & address = session->GetAddress();
-			localService->AddActionArgv(address, messageData);
-			return true;
-		}
-		if (messageData->callback_id() == 0)
-		{
+			LocalLuaService * luaService = this->mServiceManager->GetLuaService(service);
+			if (luaService != nullptr && luaService->HasMethod(method))
+			{
+				luaService->PushHandleMessage(address, messageData);
+				return true;
+			}
+			LocalService * localService = this->mServiceManager->GetLocalService(service);
+			if (localService != nullptr && localService->HasMethod(method))
+			{
+				localService->PushHandleMessage(address, messageData);
+				return true;
+			}
 			return false;
 		}
-		this->mActionManager->AddActionArgv(messageData);
+		this->mActionManager->AddActionArgv(callbackId, messageData);
 		return true;
 	}
 
@@ -117,7 +116,7 @@ namespace SoEasy
 		while (this->mErrorSessionQueue.PopItem(pTcpSession))
 		{
 			this->mNetWorkManager->RemoveTcpSession(pTcpSession);
-			if (pTcpSession->IsContent()) //断线重连
+			if (pTcpSession->IsContent() && pTcpSession->GetState() != Session_Close) //断线重连(代码关闭不重连)
 			{
 				const std::string & address = pTcpSession->GetAddress();
 				this->mWaitConnectSessionMap.emplace(address, pTcpSession);

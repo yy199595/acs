@@ -3,7 +3,6 @@
 #include<Manager/Manager.h>
 #include<MysqlClient/MysqlDefine.h>
 #include<QueryResult/InvokeResultData.h>
-#pragma execution_character_set("utf-8")
 namespace SoEasy
 {
 	class MysqlTaskAction;
@@ -15,13 +14,11 @@ namespace SoEasy
 	public:
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
 	public:
-		shared_ptr<InvokeResultData> InvokeCommand(const std::string db, const std::string & sql);
+		shared_ptr<InvokeResultData> InvokeCommand(const std::string & sql);
 	public:
-		bool CreateMysqlDb();
-		bool CreateMysqlTable();
-		bool CreateMysqlTable(const char * tab, rapidjson::Value * jsonValue);
-		bool CreateNewMysqlTable(const char * tab, rapidjson::Value * jsonValue);
-
+		bool InsertData(const std::string tab, shared_ptr<Message> data);
+		bool QueryData(const std::string tab, shared_ptr<Message> data, const std::string & key);
+		bool UpdateData(const std::string tab, shared_ptr<Message> data, const std::string & key);
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;

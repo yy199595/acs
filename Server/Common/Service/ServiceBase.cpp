@@ -1,5 +1,6 @@
 #include"ServiceBase.h"
 #include<Manager/ActionManager.h>
+#include<Manager/NetWorkManager.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
@@ -11,9 +12,58 @@ namespace SoEasy
 	}
 	bool ServiceBase::OnInit()
 	{
+		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetWorkManager>());
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 		return true;
+	}
+
+	void ServiceBase::OnSystemUpdate()
+	{
+		SharedPacket localPacket;
+		SharedNetPacket proxyService;
+		this->mLocalHandleMsgQueue.SwapQueueData();
+		this->mProxyHandleMsgQueue.SwapQueueData();
+		while (this->mLocalHandleMsgQueue.PopItem(localPacket))
+		{
+			const std::string & method = localPacket->action();
+			if (!this->InvokeMethod(method, localPacket))
+			{
+				SayNoDebugError("call " << this->GetServiceName() << "." << method << " fail");
+			}
+		}
+		while (this->mProxyHandleMsgQueue.PopItem(proxyService))
+		{
+			const std::string & address = proxyService->mAddress;
+			const std::string & method = proxyService->mMessagePacket->action();
+			if (!this->InvokeMethod(address, method, proxyService->mMessagePacket))
+			{
+				SayNoDebugError(address << " call " << this->GetServiceName() << "." << method << " fail");
+			}
+		}
+	}
+
+	void ServiceBase::PushHandleMessage(SharedPacket argv)
+	{
+		this->mLocalHandleMsgQueue.AddItem(argv);
+	}
+
+	void ServiceBase::PushHandleMessage(const std::string & address, SharedPacket argv)
+	{
+		SharedNetPacket packet = make_shared<NetMessageBuffer>(address, argv);
+		this->mProxyHandleMsgQueue.AddItem(packet);
+	}
+
+	bool ServiceBase::ReplyMessage(const std::string & address, shared_ptr<NetWorkPacket> msg)
+	{
+		SayNoAssertRetFalse_F(this->mNetManager);
+		return this->mNetManager->SendMessageByAdress(address, msg);
+	}
+
+	bool ServiceBase::ReplyMessage(const long long cb, shared_ptr<NetWorkPacket> msg)
+	{
+		SayNoAssertRetFalse_F(this->mActionManager);
+		return this->mActionManager->AddActionArgv(cb, msg);
 	}
 
 	void ServiceBase::Sleep(long long ms)
@@ -46,10 +96,7 @@ namespace SoEasy
 		{
 			return XCode::NoCoroutineContext;
 		}
-		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
-		{
-			return XCode::HandleMessageFail;
-		}
+		this->PushHandleMessage(this->CreatePacket(method, nullptr, callBack));
 		this->mCorManager->YieldReturn();
 		if (!returnData.ParseFromString(callBack->GetMsgData()))
 		{
@@ -65,10 +112,7 @@ namespace SoEasy
 		{
 			return XCode::NoCoroutineContext;
 		}
-		if (!this->HandleMessage(this->CreatePacket(method, message, callBack)))
-		{
-			return XCode::HandleMessageFail;
-		}
+		this->PushHandleMessage(this->CreatePacket(method, message, callBack));
 		this->mCorManager->YieldReturn();
 		return callBack->GetCode();
 	}
@@ -80,10 +124,7 @@ namespace SoEasy
 		{
 			return XCode::NoCoroutineContext;
 		}
-		if (!this->HandleMessage(this->CreatePacket(method, nullptr, callBack)))
-		{
-			return XCode::HandleMessageFail;
-		}
+		this->PushHandleMessage(this->CreatePacket(method, message, callBack));
 		this->mCorManager->YieldReturn();
 		if (!returnData.ParseFromString(callBack->GetMsgData()))
 		{
@@ -94,10 +135,7 @@ namespace SoEasy
 
 	XCode ServiceBase::Notice(const std::string method, shared_ptr<Message> message)
 	{
-		if (this->HandleMessage(this->CreatePacket(method, message, nullptr)))
-		{
-			return XCode::Successful;
-		}
+		this->PushHandleMessage(this->CreatePacket(method, message, nullptr));
 		return XCode::Failure;
 	}
 

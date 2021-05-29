@@ -258,6 +258,12 @@ class LogicServerData :
   ::google::protobuf::int32 server_port() const;
   void set_server_port(::google::protobuf::int32 value);
 
+  // int32 logicAddress = 6;
+  void clear_logicaddress();
+  static const int kLogicAddressFieldNumber = 6;
+  ::google::protobuf::int32 logicaddress() const;
+  void set_logicaddress(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:PB.LogicServerData)
  private:
   class HasBitSetters;
@@ -268,6 +274,7 @@ class LogicServerData :
   ::google::protobuf::internal::ArenaStringPtr server_token_;
   ::google::protobuf::int32 area_id_;
   ::google::protobuf::int32 server_port_;
+  ::google::protobuf::int32 logicaddress_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
@@ -1610,25 +1617,39 @@ class UserAccountData :
   ::std::string* release_platform();
   void set_allocated_platform(::std::string* platform);
 
-  // string device_mac = 6;
-  void clear_device_mac();
-  static const int kDeviceMacFieldNumber = 6;
-  const ::std::string& device_mac() const;
-  void set_device_mac(const ::std::string& value);
+  // string devicemac = 6;
+  void clear_devicemac();
+  static const int kDevicemacFieldNumber = 6;
+  const ::std::string& devicemac() const;
+  void set_devicemac(const ::std::string& value);
   #if LANG_CXX11
-  void set_device_mac(::std::string&& value);
+  void set_devicemac(::std::string&& value);
   #endif
-  void set_device_mac(const char* value);
-  void set_device_mac(const char* value, size_t size);
-  ::std::string* mutable_device_mac();
-  ::std::string* release_device_mac();
-  void set_allocated_device_mac(::std::string* device_mac);
+  void set_devicemac(const char* value);
+  void set_devicemac(const char* value, size_t size);
+  ::std::string* mutable_devicemac();
+  ::std::string* release_devicemac();
+  void set_allocated_devicemac(::std::string* devicemac);
 
-  // int64 user_id = 1;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  ::google::protobuf::int64 user_id() const;
-  void set_user_id(::google::protobuf::int64 value);
+  // string token = 9;
+  void clear_token();
+  static const int kTokenFieldNumber = 9;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // int64 userid = 1;
+  void clear_userid();
+  static const int kUseridFieldNumber = 1;
+  ::google::protobuf::int64 userid() const;
+  void set_userid(::google::protobuf::int64 value);
 
   // int64 phonenum = 5;
   void clear_phonenum();
@@ -1636,17 +1657,17 @@ class UserAccountData :
   ::google::protobuf::int64 phonenum() const;
   void set_phonenum(::google::protobuf::int64 value);
 
-  // int64 register_time = 7;
-  void clear_register_time();
-  static const int kRegisterTimeFieldNumber = 7;
-  ::google::protobuf::int64 register_time() const;
-  void set_register_time(::google::protobuf::int64 value);
+  // int64 registertime = 7;
+  void clear_registertime();
+  static const int kRegistertimeFieldNumber = 7;
+  ::google::protobuf::int64 registertime() const;
+  void set_registertime(::google::protobuf::int64 value);
 
-  // int64 last_logintime = 8;
-  void clear_last_logintime();
-  static const int kLastLogintimeFieldNumber = 8;
-  ::google::protobuf::int64 last_logintime() const;
-  void set_last_logintime(::google::protobuf::int64 value);
+  // int64 lastlogintime = 8;
+  void clear_lastlogintime();
+  static const int kLastlogintimeFieldNumber = 8;
+  ::google::protobuf::int64 lastlogintime() const;
+  void set_lastlogintime(::google::protobuf::int64 value);
 
   // @@protoc_insertion_point(class_scope:PB.UserAccountData)
  private:
@@ -1656,11 +1677,12 @@ class UserAccountData :
   ::google::protobuf::internal::ArenaStringPtr account_;
   ::google::protobuf::internal::ArenaStringPtr passwd_;
   ::google::protobuf::internal::ArenaStringPtr platform_;
-  ::google::protobuf::internal::ArenaStringPtr device_mac_;
-  ::google::protobuf::int64 user_id_;
+  ::google::protobuf::internal::ArenaStringPtr devicemac_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::int64 userid_;
   ::google::protobuf::int64 phonenum_;
-  ::google::protobuf::int64 register_time_;
-  ::google::protobuf::int64 last_logintime_;
+  ::google::protobuf::int64 registertime_;
+  ::google::protobuf::int64 lastlogintime_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ServerCommon_2eproto;
 };
@@ -1860,6 +1882,20 @@ inline void LogicServerData::set_allocated_server_token(::std::string* server_to
   }
   server_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), server_token);
   // @@protoc_insertion_point(field_set_allocated:PB.LogicServerData.server_token)
+}
+
+// int32 logicAddress = 6;
+inline void LogicServerData::clear_logicaddress() {
+  logicaddress_ = 0;
+}
+inline ::google::protobuf::int32 LogicServerData::logicaddress() const {
+  // @@protoc_insertion_point(field_get:PB.LogicServerData.logicAddress)
+  return logicaddress_;
+}
+inline void LogicServerData::set_logicaddress(::google::protobuf::int32 value) {
+  
+  logicaddress_ = value;
+  // @@protoc_insertion_point(field_set:PB.LogicServerData.logicAddress)
 }
 
 // -------------------------------------------------------------------
@@ -2569,18 +2605,18 @@ inline void UserRegisterBack::set_allocated_token(::std::string* token) {
 
 // UserAccountData
 
-// int64 user_id = 1;
-inline void UserAccountData::clear_user_id() {
-  user_id_ = PROTOBUF_LONGLONG(0);
+// int64 userid = 1;
+inline void UserAccountData::clear_userid() {
+  userid_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 UserAccountData::user_id() const {
-  // @@protoc_insertion_point(field_get:PB.UserAccountData.user_id)
-  return user_id_;
+inline ::google::protobuf::int64 UserAccountData::userid() const {
+  // @@protoc_insertion_point(field_get:PB.UserAccountData.userid)
+  return userid_;
 }
-inline void UserAccountData::set_user_id(::google::protobuf::int64 value) {
+inline void UserAccountData::set_userid(::google::protobuf::int64 value) {
   
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:PB.UserAccountData.user_id)
+  userid_ = value;
+  // @@protoc_insertion_point(field_set:PB.UserAccountData.userid)
 }
 
 // string account = 2;
@@ -2756,85 +2792,138 @@ inline void UserAccountData::set_phonenum(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:PB.UserAccountData.phonenum)
 }
 
-// string device_mac = 6;
-inline void UserAccountData::clear_device_mac() {
-  device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string devicemac = 6;
+inline void UserAccountData::clear_devicemac() {
+  devicemac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& UserAccountData::device_mac() const {
-  // @@protoc_insertion_point(field_get:PB.UserAccountData.device_mac)
-  return device_mac_.GetNoArena();
+inline const ::std::string& UserAccountData::devicemac() const {
+  // @@protoc_insertion_point(field_get:PB.UserAccountData.devicemac)
+  return devicemac_.GetNoArena();
 }
-inline void UserAccountData::set_device_mac(const ::std::string& value) {
+inline void UserAccountData::set_devicemac(const ::std::string& value) {
   
-  device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.UserAccountData.device_mac)
+  devicemac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.UserAccountData.devicemac)
 }
 #if LANG_CXX11
-inline void UserAccountData::set_device_mac(::std::string&& value) {
+inline void UserAccountData::set_devicemac(::std::string&& value) {
   
-  device_mac_.SetNoArena(
+  devicemac_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.UserAccountData.device_mac)
+  // @@protoc_insertion_point(field_set_rvalue:PB.UserAccountData.devicemac)
 }
 #endif
-inline void UserAccountData::set_device_mac(const char* value) {
+inline void UserAccountData::set_devicemac(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.UserAccountData.device_mac)
+  devicemac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.UserAccountData.devicemac)
 }
-inline void UserAccountData::set_device_mac(const char* value, size_t size) {
+inline void UserAccountData::set_devicemac(const char* value, size_t size) {
   
-  device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  devicemac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.UserAccountData.device_mac)
+  // @@protoc_insertion_point(field_set_pointer:PB.UserAccountData.devicemac)
 }
-inline ::std::string* UserAccountData::mutable_device_mac() {
+inline ::std::string* UserAccountData::mutable_devicemac() {
   
-  // @@protoc_insertion_point(field_mutable:PB.UserAccountData.device_mac)
-  return device_mac_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:PB.UserAccountData.devicemac)
+  return devicemac_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* UserAccountData::release_device_mac() {
-  // @@protoc_insertion_point(field_release:PB.UserAccountData.device_mac)
+inline ::std::string* UserAccountData::release_devicemac() {
+  // @@protoc_insertion_point(field_release:PB.UserAccountData.devicemac)
   
-  return device_mac_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return devicemac_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void UserAccountData::set_allocated_device_mac(::std::string* device_mac) {
-  if (device_mac != nullptr) {
+inline void UserAccountData::set_allocated_devicemac(::std::string* devicemac) {
+  if (devicemac != nullptr) {
     
   } else {
     
   }
-  device_mac_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), device_mac);
-  // @@protoc_insertion_point(field_set_allocated:PB.UserAccountData.device_mac)
+  devicemac_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), devicemac);
+  // @@protoc_insertion_point(field_set_allocated:PB.UserAccountData.devicemac)
 }
 
-// int64 register_time = 7;
-inline void UserAccountData::clear_register_time() {
-  register_time_ = PROTOBUF_LONGLONG(0);
+// int64 registertime = 7;
+inline void UserAccountData::clear_registertime() {
+  registertime_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 UserAccountData::register_time() const {
-  // @@protoc_insertion_point(field_get:PB.UserAccountData.register_time)
-  return register_time_;
+inline ::google::protobuf::int64 UserAccountData::registertime() const {
+  // @@protoc_insertion_point(field_get:PB.UserAccountData.registertime)
+  return registertime_;
 }
-inline void UserAccountData::set_register_time(::google::protobuf::int64 value) {
+inline void UserAccountData::set_registertime(::google::protobuf::int64 value) {
   
-  register_time_ = value;
-  // @@protoc_insertion_point(field_set:PB.UserAccountData.register_time)
+  registertime_ = value;
+  // @@protoc_insertion_point(field_set:PB.UserAccountData.registertime)
 }
 
-// int64 last_logintime = 8;
-inline void UserAccountData::clear_last_logintime() {
-  last_logintime_ = PROTOBUF_LONGLONG(0);
+// int64 lastlogintime = 8;
+inline void UserAccountData::clear_lastlogintime() {
+  lastlogintime_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 UserAccountData::last_logintime() const {
-  // @@protoc_insertion_point(field_get:PB.UserAccountData.last_logintime)
-  return last_logintime_;
+inline ::google::protobuf::int64 UserAccountData::lastlogintime() const {
+  // @@protoc_insertion_point(field_get:PB.UserAccountData.lastlogintime)
+  return lastlogintime_;
 }
-inline void UserAccountData::set_last_logintime(::google::protobuf::int64 value) {
+inline void UserAccountData::set_lastlogintime(::google::protobuf::int64 value) {
   
-  last_logintime_ = value;
-  // @@protoc_insertion_point(field_set:PB.UserAccountData.last_logintime)
+  lastlogintime_ = value;
+  // @@protoc_insertion_point(field_set:PB.UserAccountData.lastlogintime)
+}
+
+// string token = 9;
+inline void UserAccountData::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& UserAccountData::token() const {
+  // @@protoc_insertion_point(field_get:PB.UserAccountData.token)
+  return token_.GetNoArena();
+}
+inline void UserAccountData::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:PB.UserAccountData.token)
+}
+#if LANG_CXX11
+inline void UserAccountData::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:PB.UserAccountData.token)
+}
+#endif
+inline void UserAccountData::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:PB.UserAccountData.token)
+}
+inline void UserAccountData::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:PB.UserAccountData.token)
+}
+inline ::std::string* UserAccountData::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:PB.UserAccountData.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* UserAccountData::release_token() {
+  // @@protoc_insertion_point(field_release:PB.UserAccountData.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void UserAccountData::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:PB.UserAccountData.token)
 }
 
 #ifdef __GNUC__

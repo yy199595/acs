@@ -79,7 +79,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
 	}
 
-	bool RedisManager::HasValue(const char * key)
+	bool RedisManager::HasValue(const std::string &  key)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
 		if (queryData->GetCode() == XCode::Successful)
@@ -90,7 +90,7 @@ namespace SoEasy
 		return false;
 	}
 
-	bool RedisManager::HasValue(const char * tab, const char * key)
+	bool RedisManager::HasValue(const std::string &  tab, const std::string &  key)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HEXISTS", tab, key);
 		if (queryData->GetCode() == XCode::Successful)
@@ -100,19 +100,19 @@ namespace SoEasy
 		return false;
 	}
 
-	bool RedisManager::DelValue(const char * key)
+	bool RedisManager::DelValue(const std::string &  key)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("DEL", key);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
-	bool RedisManager::DelValue(const char * tab, const char * key)
+	bool RedisManager::DelValue(const std::string &  tab, const std::string &  key)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HDEL", tab, key);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
-	bool RedisManager::SetValue(const char * key, const std::string & value, int second)
+	bool RedisManager::SetValue(const std::string &  key, const std::string & value, int second)
 	{
 		if (!this->HasValue(key))
 		{
@@ -122,20 +122,20 @@ namespace SoEasy
 		return queryData->GetCode() == XCode::Successful;
 	}
 
-	bool RedisManager::SetValue(const char * key, const std::string & value)
+	bool RedisManager::SetValue(const std::string &  key, const std::string & value)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("SET", key, value);
 		return queryData->GetCode() == XCode::Successful;
 	}
 
-	bool RedisManager::SetValue(const char * tab, const char * key, const std::string & value)
+	bool RedisManager::SetValue(const std::string &  tab, const std::string &  key, const std::string & value)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HSET", tab, key, value);
 		return queryData->GetCode() == XCode::Successful;
 		
 	}
 
-	bool RedisManager::SetValue(const char * tab, const char * key, const shared_ptr<Message> value)
+	bool RedisManager::SetValue(const std::string &  tab, const std::string &  key, const shared_ptr<Message> value)
 	{
 		std::string serializeData;
 		if (!value->SerializePartialToString(&serializeData))
@@ -145,7 +145,7 @@ namespace SoEasy
 		return this->SetValue(tab, key, serializeData);
 	}
 
-	bool RedisManager::GetValue(const char * key, std::string & value)
+	bool RedisManager::GetValue(const std::string &  key, std::string & value)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
 		if (queryData->GetCode() == XCode::Successful)
@@ -153,7 +153,7 @@ namespace SoEasy
 			rapidjson::Value jsonValue;
 			if (queryData->GetJsonData(jsonValue) && jsonValue.IsString())
 			{
-				const char * str = jsonValue.GetString();
+				const std::string &  str = jsonValue.GetString();
 				const size_t size = jsonValue.GetStringLength();
 				value.assign(str, size);
 				return true;
@@ -162,7 +162,7 @@ namespace SoEasy
 		return false;
 	}
 
-	bool RedisManager::GetValue(const char * tab, const char * key, std::string & value)
+	bool RedisManager::GetValue(const std::string &  tab, const std::string &  key, std::string & value)
 	{
 		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGET", tab, key);
 		if (queryData->GetCode() == XCode::Successful)
@@ -179,7 +179,7 @@ namespace SoEasy
 		return false;
 	}
 
-	bool RedisManager::GetValue(const char * tab, const char * key, shared_ptr<Message> value)
+	bool RedisManager::GetValue(const std::string &  tab, const std::string &  key, shared_ptr<Message> value)
 	{
 		std::string message;
 		if (!this->GetValue(tab, key, message))
