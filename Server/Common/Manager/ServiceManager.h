@@ -37,7 +37,7 @@ namespace SoEasy
 		int mNodeId;
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
-		std::queue<ServiceBase *> mReadyServiceQueue;
+		std::vector<ServiceBase *> mServiceVector;
 		std::unordered_map<int, ProxyService *> mProxyServiceMap;//action地址
 		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
 		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua服务

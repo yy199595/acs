@@ -1,7 +1,9 @@
 #pragma once
 
-#include<Manager/SessionManager.h>
+
 #include<Manager/ScriptManager.h>
+#include<Manager/SessionManager.h>
+#include<Protocol/ServerCommon.pb.h>
 using namespace SoEasy;
 namespace Client
 {

@@ -9,6 +9,7 @@ message LogicServerData
     string server_ip = 3;
     int32 server_port = 4;
     string server_token = 5;
+    int32 logicAddress = 6;
 }
 
 message LogicServerListData
@@ -68,12 +69,13 @@ message UserRegisterBack
 
 message UserAccountData
 {
-    int64 user_id = 1;      //用户id
+    int64 userid = 1;      //用户id
     string account = 2;     //账户
     string passwd = 3;      //密码
     string platform = 4;    //平台
     int64 phonenum = 5;     //手机号
-    string device_mac = 6;  //设备id
-    int64 register_time = 7;    //注册事件
-    int64 last_logintime = 8;   //上次登录时间
+    string devicemac = 6;  //设备id
+    int64 registertime = 7;    //注册事件
+    int64 lastlogintime = 8;   //上次登录时间
+    string token = 9;   //登陆令牌
 }

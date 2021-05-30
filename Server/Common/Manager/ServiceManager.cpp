@@ -38,22 +38,12 @@ namespace SoEasy
 	void ServiceManager::OnSystemUpdate()
 	{
 		SessionManager::OnSystemUpdate();
-		auto iter = this->mLocalServiceMap.begin();
-		for (; iter != this->mLocalServiceMap.end(); iter++)
+		for (size_t index = 0; index < this->mServiceVector.size(); index++)
 		{
-			LocalService * localService = iter->second;
-			if (localService->IsActive())
+			ServiceBase * service = this->mServiceVector[index];
+			if (service != nullptr && service->IsActive())
 			{
-				localService->OnSystemUpdate();
-			}
-		}
-		auto iter1 = this->mProxyServiceMap.begin();
-		for (; iter1 != this->mProxyServiceMap.end(); iter1++)
-		{
-			ProxyService * proxyService = iter1->second;
-			if (proxyService->IsActive())
-			{
-				proxyService->OnSystemUpdate();
+				service->OnSystemUpdate();
 			}
 		}
 	}
@@ -100,7 +90,7 @@ namespace SoEasy
 			if (service->OnInit())
 			{
 				this->mServiceList.push_back(name);
-				this->mReadyServiceQueue.push(service);
+				this->mServiceVector.push_back(service);
 				this->mLuaServiceMap.emplace(name, service);
 				SayNoDebugInfo("add new lua service " << name << " " << serviceId);
 				return service;
@@ -121,6 +111,7 @@ namespace SoEasy
 				proxyService->InitService(name, serviceId);
 				if (proxyService->OnInit())
 				{
+					this->mServiceVector.push_back(proxyService);
 					this->mProxyServiceMap.emplace(serviceId, proxyService);
 					SayNoDebugInfo("add new proxy service " << name << " " << serviceId);
 					return proxyService;
@@ -219,6 +210,7 @@ namespace SoEasy
 				return false;
 			}
 			SayNoDebugLog("add new service " << name << " id " << serviceId);
+			this->mServiceVector.push_back(localService);
 			this->mLocalServiceMap.emplace(name, localService);
 		}
 		return true;

@@ -4,6 +4,7 @@
 #include<Manager/TimerManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
+#include<Manager/ServiceManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include"Manager/ClientManager.h"
 using namespace SoEasy;
@@ -18,12 +19,14 @@ using namespace Client;
 int main(int argc, char ** argv)
 {
 	
-	ObjectRegistry<Manager>::RegisterManager<TimerManager>("TimerManager");
-	ObjectRegistry<Manager>::RegisterManager<ClientManager>("ClientManager");
-	ObjectRegistry<Manager>::RegisterManager<ScriptManager>("ScriptManager");
-	ObjectRegistry<Manager>::RegisterManager<NetWorkManager>("NetWorkManager");
-	ObjectRegistry<Manager>::RegisterManager<CoroutineManager>("CoroutineManager");
-	ObjectRegistry<Manager>::RegisterManager<ActionManager>("ActionManager");
+	ObjectRegistry<Manager>::Register<TimerManager>("TimerManager");
+	ObjectRegistry<Manager>::Register<ClientManager>("ClientManager");
+	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
+	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
+	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
+	ObjectRegistry<Manager>::Register<NetWorkManager>("NetWorkManager");
+	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
+	
 
 
 	Applocation app("Client", "./Config/ClientConfig.json");

@@ -1,16 +1,16 @@
 #include"ClientManager.h"
+#include<Util/MathHelper.h>
 #include<Util/StringHelper.h>
-#include<Protocol/ServerCommon.pb.h>
 #include<NetWork/ActionScheduler.h>
 #include<Coroutine/CoroutineManager.h>
-#include<Util/MathHelper.h>
+#include<Other/ObjectFactory.h>
 
 namespace Client
 {
 	bool ClientManager::OnInit()
 	{
 		std::string address;
-		SayNoAssertRetFalse_F(SessionManager::OnInit());
+		SessionManager::OnInit();
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", address));
 		
 		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(address, this->mConnectIp, this->mConnectPort));

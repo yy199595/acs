@@ -61,7 +61,11 @@ namespace SoEasy
 					SayNoDebugError(this->GetServiceName() << ":" << lua_tostring(this->mLuaEnv, -1));
 					return false;
 				}
-				return lua_toboolean(this->mLuaEnv, -1);
+				if (!lua_toboolean(this->mLuaEnv, -1))
+				{
+					SayNoDebugError(this->GetServiceName() << " init fail");
+					return false;
+				}
 			}
 		}
 		return ServiceBase::OnInit();

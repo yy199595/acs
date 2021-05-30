@@ -1,4 +1,5 @@
 {
+    "NodeId":0,
     "FastUpdate": 10,
     "LogicFps": 30,
     "SystemFps":100,
@@ -11,9 +12,15 @@
         "./Script/Common",
         "./Script/Client"
     ],
+    "Service":
+    [
+
+    ],
     "Managers": [
         "ClientManager",
-        "ScriptManager"
+        "ScriptManager",
+        "ActionManager",
+        "ServiceManager"
     ],
     "WhiteList": [
         "127.0.0.1"
