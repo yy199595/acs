@@ -3,3 +3,4 @@ PROJECT(Server)
 PROJECT(Client)
 
 add_subdirectory(Server)
+add_subdirectory(Client)
