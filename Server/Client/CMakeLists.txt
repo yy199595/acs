@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.3)
-PROJECT(client)
+PROJECT(Client)
 
 
 #第三方库包含
@@ -60,8 +60,8 @@ SET(CMAKE_CXX_COMPILER_ARG1 "g++")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 SET(CMAKE_BUILD_TYPE Debug)
 
-ADD_EXECUTABLE(client ${SUPER_SRC})
-TARGET_LINK_LIBRARIES(client Lua53 protobuf pthread dl ${MY_ADDLIB})
+ADD_EXECUTABLE(Client ${SUPER_SRC})
+TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl ${MY_ADDLIB})
 
 SET(EXECUTABLE_OUTPUT_PATH ../bin/)
 
