@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>../DataBase;../Libs/include/spdlog;../Libs/include/rapidjson;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;../ServerData;../Common;$(IncludePath)</IncludePath>
+    <IncludePath>../Libs/include/spdlog;../Libs/include/rapidjson;../Libs/include/protobuf;../Libs/include/lua5.3;../Libs/include/asio;../ServerData;../Common;$(IncludePath)</IncludePath>
     <LibraryPath>../Libs/lib;$(LibraryPath)</LibraryPath>
     <OutDir>..\bin</OutDir>
     <IntDir>../bin/debug/client</IntDir>
