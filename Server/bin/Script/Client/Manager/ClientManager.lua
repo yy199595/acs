@@ -27,7 +27,7 @@ function ClientManager.Start(tcpSession)
     loginData.passwd = registerData.password
     local loginMessage = SoEasy.CreateByTable("PB.UserAccountData", loginData)
     if loginMessage ~= nil then
-        local code = SoEasy.CallBySession(tcpSession, "LoginManager.Login", loginMessage)
+        local code = SoEasy.CallBySession(tcpSession, "LoginService", "Login", loginMessage)
         print("login back", code)
     end
 end
