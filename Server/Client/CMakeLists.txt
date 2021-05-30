@@ -49,6 +49,9 @@ include_directories(../ServerData/Protocol)
 aux_source_directory(../ServerData/XCode SUPER_SRC)
 aux_source_directory(../ServerData/Protocol SUPER_SRC)
 
+include_directories(./Manager)
+aux_source_directory(./Manager SUPER_SRC)
+
 aux_source_directory(./ SUPER_SRC)
 LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
