@@ -14,7 +14,7 @@ namespace SoEasy
 		 const std::string & GetSqlCommand() { return mSqlCommand; };
 		 void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
 	public:
-		static bool Start(lua_State * lua, int index, const std::string & db, const std::string & sql);
+		static bool Start(lua_State * lua, int index, const std::string & sql);
 	private:
 		int mCroutineRef;
 		lua_State * mLuaEnv;

@@ -99,7 +99,7 @@ namespace SoEasy
 		this->mFunctionManager->AddCallback(action, callbakcId);
 
 		newCallData->set_service(service);
-		newCallData->set_service(func);
+		newCallData->set_action(func);
 
 		newCallData->set_callback_id(callbakcId);
 		return this->mNetWorkManager->SendMessageByAdress(this->mBindSessionAdress, newCallData);

@@ -13,15 +13,9 @@ int SoEasy::InvokeMysqlCommand(lua_State * lua)
 		lua_pushnil(lua);
 		return 1;
 	}
-	if (!lua_isstring(lua, 2))
-	{
-		lua_pushnil(lua);
-		return 1;
-	}
-	const std::string db = lua_tostring(lua, 1);
-	const char * sql = lua_tolstring(lua, 2, &size);
+	const char * sql = lua_tolstring(lua, 1, &size);
 	lua_pushthread(lua);
-	if (MysqlLuaTask::Start(lua, -1, db, std::string(sql, size)))
+	if (MysqlLuaTask::Start(lua, -1, std::string(sql, size)))
 	{
 		return lua_yield(lua, 1);
 	}

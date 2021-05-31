@@ -13,6 +13,7 @@ namespace SoEasy
 		~MysqlManager() { }
 	public:
 		SayNoMysqlSocket * GetMysqlSocket(long long threadId);
+		const std::string & GetDataBaseName() { return this->mDataBaseName; }
 	public:
 		shared_ptr<InvokeResultData> InvokeCommand(const std::string & sql);
 	public:

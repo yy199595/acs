@@ -88,8 +88,11 @@ namespace SoEasy
 	{
 		jsonWriter.Write("code", this->mErrorCode);
 		jsonWriter.Write("error", this->mErrorString);
-		SayNoDebugError("[mysql error] " << this->mErrorString);
-		SayNoDebugError("[mysql command] " << this->GetSqlCommand());
+		if (this->mErrorCode != XCode::Successful)
+		{
+			SayNoDebugError("[mysql error] " << this->mErrorString);
+			SayNoDebugError("[mysql command] " << this->GetSqlCommand());
+		}	
 	}
 
 	void MysqlTaskBase::WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size)

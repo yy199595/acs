@@ -10,7 +10,8 @@
     "ScriptInclude":
     [
         "./Script/Common",
-        "./Script/Client"
+        "./Script/Client",
+        "./Script/Client/Manager"
     ],
     "Service":
     [

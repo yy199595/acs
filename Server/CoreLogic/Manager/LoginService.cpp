@@ -22,23 +22,7 @@ namespace SoEasy
 
 	void LoginService::OnInitComplete()
 	{
-		shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
-		registerData->set_account("199595@qq.com");
-		registerData->set_password("thispassword");
-		registerData->set_phonenum(13716061995);
-		XCode code = this->Register(0, registerData);
-
-		if (code == XCode::Successful)
-		{
-			shared_ptr<UserAccountData> LoginData = make_shared<UserAccountData>();
-			LoginData->set_account(registerData->account());
-			if (this->Login(0, LoginData) == XCode::Successful)
-			{
-				SayNoDebugLog("Login Successful");
-				return;
-			}
-			SayNoDebugFatal("Login Failure");
-		}
+		
 	}
 
 	XCode LoginService::Login(long long operId, shared_ptr<UserAccountData> LoginData)

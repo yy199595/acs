@@ -44,7 +44,7 @@ namespace SoEasy
 		}
 	}
 
-	bool MysqlLuaTask::Start(lua_State * lua, int index, const std::string & db, const std::string & sql)
+	bool MysqlLuaTask::Start(lua_State * lua, int index, const std::string & sql)
 	{
 		if (!lua_isthread(lua, index))
 		{
@@ -59,6 +59,7 @@ namespace SoEasy
 			return false;
 		}
 		long long taskId = NumberHelper::Create();
+		const std::string & db = mysqlManager->GetDataBaseName();
 		shared_ptr<MysqlLuaTask> taskAction =  std::make_shared<MysqlLuaTask>(mysqlManager, taskId, db, sql, lua, ref);
 		return mysqlManager->StartTaskAction(taskAction);
 	}

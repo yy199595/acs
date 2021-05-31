@@ -15,17 +15,15 @@ namespace SystemExtension
 
 	extern int RemoveTimer(lua_State * lua);
 
-	extern int Start(lua_State * lua);
-
 	extern int Sleep(lua_State * luaEnv);
 
 	extern int GetApp(lua_State * luaEnv);
 
 	extern int GetManager(lua_State * luaEnv);
 
-	extern int SendByAddress(lua_State * luaEnv);
-
 	extern int NewService(lua_State * luaEnv);
+
+	extern int LuaReplyMsg(lua_State * luaEnv);
 
 	extern bool RequireLua(lua_State * luaEnv, const char * name);
 };

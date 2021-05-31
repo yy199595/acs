@@ -1,9 +1,11 @@
 TxtUtil = {}
-require "Util.JsonUtil"
+require "JsonUtil"
 TxtUtil.ReadJsonFile = function(path)
     local file = io.open(path, 'r')
     if file ~= nil then
         local str = file:read("*all")
-        return JsonUtil.Decode(str)
+        return JsonUtil.ToObject(str)
     end
 end
+
+return TxtUtil

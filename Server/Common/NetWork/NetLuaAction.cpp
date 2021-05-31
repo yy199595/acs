@@ -8,18 +8,66 @@ namespace SoEasy
 		this->luaEnv = lua;
 		this->mActionName = name;
 		this->mActionref = action_ref;
-		SayNoAssertRet_F(lua_getfunction(lua, "Action", "Invoke"));
-		this->mInvokeref = luaL_ref(this->luaEnv, LUA_REGISTRYINDEX);
+		SayNoAssertRet_F(lua_getfunction(lua, "ServiceProxy", "Invoke"));
+		this->mLocalref = luaL_ref(this->luaEnv, LUA_REGISTRYINDEX);
+		SayNoAssertRet_F(lua_getfunction(lua, "ServiceProxy", "InvokeAddress"));
+		this->mProxyref = luaL_ref(this->luaEnv, LUA_REGISTRYINDEX);
+	}
+
+	NetLuaAction::~NetLuaAction()
+	{
+		luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mLocalref);
+		luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mProxyref);
+		luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->mActionref);
 	}
 
 	XCode NetLuaAction::Invoke(const shared_ptr<NetWorkPacket> requestData)
 	{
-		return XCode::Successful;
+		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mLocalref);
+		if (!lua_isfunction(this->luaEnv, -1))
+		{
+			return XCode::CallLuaFunctionFail;
+		}
+
+		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mActionref);
+		if (!lua_isfunction(this->luaEnv, -1))
+		{
+			return XCode::CallLuaFunctionFail;
+		}
+		lua_pushinteger(luaEnv, requestData->operator_id());
+		lua_pushinteger(luaEnv, requestData->callback_id());
+		const std::string & protocolName = requestData->protoc_name();
+		if (!protocolName.empty())
+		{
+			const std::string & message = requestData->message_data();
+			Message * protocolMessage = ObjectFactory::Get()->CreateMessage(protocolName);
+			if (protocolMessage != nullptr && protocolMessage->ParseFromString(message))
+			{
+				std::string jsonString;
+				if (!ProtocHelper::GetJsonString(protocolMessage, jsonString))
+				{
+					return XCode::ProtocbufCastJsonFail;
+				}
+				lua_pushlstring(luaEnv, jsonString.c_str(), jsonString.size());
+			}
+		}
+		else
+		{
+			const std::string & jsonString = requestData->message_data();
+			lua_pushlstring(luaEnv, jsonString.c_str(), jsonString.size());
+		}
+
+		if (lua_pcall(luaEnv, 4, 0, 0) != 0)
+		{
+			SayNoDebugError(lua_tostring(luaEnv, -1));
+			return XCode::CallLuaFunctionFail;
+		}
+		return XCode::LuaCoroutineReturn;
 	}
 
 	XCode NetLuaAction::Invoke(const std::string & address, const shared_ptr<NetWorkPacket> requestData)
 	{
-		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mInvokeref);
+		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->mProxyref);
 		if (!lua_isfunction(this->luaEnv, -1))
 		{
 			return XCode::CallLuaFunctionFail;

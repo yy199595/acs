@@ -1,10 +1,9 @@
 Main = {}
 local this = Main
-require('Util.JsonUtil')
-require('Action.Action')
+require"ServiceProxy"
 
 function Main.Load()
-    local hofix = require('Util.HofixHelper')
+    local hofix = require('HofixHelper')
 end
 
 function Main.Start()

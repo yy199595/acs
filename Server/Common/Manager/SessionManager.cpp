@@ -83,12 +83,14 @@ namespace SoEasy
 			if (luaService != nullptr && luaService->HasMethod(method))
 			{
 				luaService->PushHandleMessage(address, messageData);
+				SayNoDebugInfo("call lua method " << service << "." << method);
 				return true;
 			}
 			LocalService * localService = this->mServiceManager->GetLocalService(service);
 			if (localService != nullptr && localService->HasMethod(method))
 			{
 				localService->PushHandleMessage(address, messageData);
+				SayNoDebugInfo("call c++ method " << service << "." << method);
 				return true;
 			}
 			return false;

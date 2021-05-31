@@ -95,37 +95,6 @@ using namespace SoEasy;
 		return 0;
 	}
 
-	int SystemExtension::SendByAddress(lua_State * luaEnv)
-	{
-		Applocation * pApplocation = Applocation::Get();
-		NetWorkManager * manager = pApplocation->GetManager<NetWorkManager>();
-		shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
-		const std::string address = lua_tostring(luaEnv, 1);
-		returnPacket->set_error_code(lua_tointeger(luaEnv, 4));
-		returnPacket->set_callback_id(lua_tointeger(luaEnv, 3));
-		returnPacket->set_operator_id(lua_tointeger(luaEnv, 2));
-		if (lua_isstring(luaEnv, 5))
-		{
-			size_t size = 0;
-			const char * json = lua_tolstring(luaEnv, 4, &size);
-			returnPacket->set_message_data(json, size);
-		}
-		else if (lua_isuserdata(luaEnv, 5))
-		{
-			Message * pMessage = (Message *)lua_touserdata(luaEnv, -4);
-			if (pMessage != nullptr)
-			{
-				std::string messageBuffer;
-				if (pMessage->SerializePartialToString(&messageBuffer))
-				{
-					returnPacket->set_message_data(messageBuffer);
-				}
-			}
-		}
-		lua_pushboolean(luaEnv, manager->SendMessageByAdress(address, returnPacket));
-		return 1;
-	}
-
 	extern bool SystemExtension::RequireLua(lua_State * luaEnv, const char * name)
 	{
 		lua_getglobal(luaEnv, "require");
@@ -160,6 +129,57 @@ using namespace SoEasy;
 					return 1;
 				}
 			}
+		}
+		return 0;
+	}
+
+	int SystemExtension::LuaReplyMsg(lua_State * luaEnv)
+	{
+		Applocation * app = Applocation::Get();
+		if (lua_isstring(luaEnv, 1)) //远程回复
+		{		
+			NetWorkManager * netManager = app->GetManager<NetWorkManager>();
+			if (netManager != nullptr)
+			{
+				const std::string address = lua_tostring(luaEnv, 1);
+				const long long callbackId = lua_tointeger(luaEnv, 2);
+				const long long operId = lua_tointeger(luaEnv, 3);
+				const int code = lua_tointeger(luaEnv, 4);
+				shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+
+				returnPacket->set_error_code(code);
+				returnPacket->set_operator_id(operId);
+				returnPacket->set_callback_id(callbackId);
+				if (lua_isstring(luaEnv, 5))
+				{
+					size_t size = 0;
+					const char * str = lua_tolstring(luaEnv, 5, &size);
+					returnPacket->set_message_data(str, size);
+				}
+				netManager->SendMessageByAdress(address, returnPacket);
+				return 0;
+			}
+		}
+		else if (lua_isinteger(luaEnv, 1)) //本机回复
+		{
+			ActionManager * actManager = app->GetManager<ActionManager>();
+			
+			const long long callbackId = lua_tointeger(luaEnv, 1);
+			const long long operId = lua_tointeger(luaEnv, 2);
+			const int code = lua_tointeger(luaEnv, 3);
+			
+			shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+
+			returnPacket->set_error_code(code);
+			returnPacket->set_operator_id(operId);
+			returnPacket->set_callback_id(callbackId);
+			if (lua_isstring(luaEnv, 4))
+			{
+				size_t size = 0;
+				const char * str = lua_tolstring(luaEnv, 4, &size);
+				returnPacket->set_message_data(str, size);
+			}
+			actManager->AddActionArgv(callbackId, returnPacket);
 		}
 		return 0;
 	}
@@ -291,19 +311,6 @@ using namespace SoEasy;
 			}
 		}
 		return lua_yield(luaEnv, 1);
-	}
-
-	int SystemExtension::Start(lua_State * luaEnv)
-	{
-		lua_State * coroutine = lua_newthread(luaEnv);
-		lua_pushvalue(luaEnv, 1);
-		lua_xmove(luaEnv, coroutine, 1);
-		lua_replace(luaEnv, 1);
-
-		const int size = lua_gettop(luaEnv);
-		lua_xmove(luaEnv, coroutine, size - 1);
-
-		return lua_resume(coroutine, luaEnv, size - 1);
 	}
 
 	int SystemExtension::Sleep(lua_State * luaEnv)
