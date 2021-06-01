@@ -1,0 +1,47 @@
+{
+    "AreaId": 0,
+    "NodeId": 1,
+    "FastUpdate": 10,
+    "LogicFps": 30,
+    "SystemFps":100,
+    "ThreadCount":0,
+    "ReConnectTime":5,
+    "ListenAddress": "127.0.0.1:7788",
+    "QueryAddress": "127.0.0.1:7799",
+    "RecvBuffCount": 1024,
+    "IsOpenRecoder": true,
+    "CommandPort": 1020,
+    "SqlTable":"./sql/sql.json",
+    "MysqlDbName":"PlayerGame",
+    "RedisTimeout":3,
+    "RedisPasswd":"646585122@qq.com",
+    "RedisAddress":"127.0.0.1:6379",
+    "MysqlAddress": "47.106.206.230:3306",
+    "MysqlUserName": "root",
+    "MysqlPassWord": "ZupKXuUbnHoffpmu",
+    "CoroutinePoolMaxSize":100,
+    "ScriptMain":"./Script/Server/Main.lua",
+    "ScriptInclude":
+    [
+        "./Script/Common",
+        "./Script/Server",
+        "./Script/Server/Service"
+    ],
+    "Service":
+    [
+        "LoginService",
+        "ClusterService"
+    ],
+    "Managers": [
+        "NetWorkManager",
+        "TimerManager",
+        "ListenerManager",
+        "ActionManager",
+        "ServiceManager",
+        "MysqlManager",
+        "RedisManager"
+    ],
+    "WhiteList": [
+        "127.0.0.1"
+    ]
+}
