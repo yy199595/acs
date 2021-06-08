@@ -36,7 +36,6 @@
     <ClCompile Include="Manager\ServiceManager.cpp" />
     <ClCompile Include="Manager\SessionManager.cpp" />
     <ClCompile Include="Manager\TimerManager.cpp" />
-    <ClCompile Include="Module\ActionComponent.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
     <ClCompile Include="NetWork\ActionScheduler.cpp" />
@@ -114,7 +113,6 @@
     <ClInclude Include="Manager\ServiceManager.h" />
     <ClInclude Include="Manager\SessionManager.h" />
     <ClInclude Include="Manager\TimerManager.h" />
-    <ClInclude Include="Module\ActionComponent.h" />
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />

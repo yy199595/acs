@@ -128,27 +128,27 @@ namespace SoEasy
 		sqlStream << "alter table " << table << " add " << fieldDesc->name();
 		if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
 		{
-			sqlStream << " int(20) NOT NULL DEFAULT 0";
+			sqlStream << " int(20) DEFAULT 0";
 		}
 		else if (fieldDesc->type() == FieldDescriptor::TYPE_INT64)
 		{
-			sqlStream << " bigint(32) NOT NULL DEFAULT 0";
+			sqlStream << " bigint(32) DEFAULT 0";
 		}
 		else if (fieldDesc->type() == FieldDescriptor::TYPE_FLOAT)
 		{
-			sqlStream << " float(20) NOT NULL DEFAULT 0";
+			sqlStream << " float(20) DEFAULT 0";
 		}
 		else if (fieldDesc->type() == FieldDescriptor::TYPE_DOUBLE)
 		{
-			sqlStream << " double(32) NOT NULL DEFAULT 0";
+			sqlStream << " double(32) DEFAULT 0";
 		}
 		else if (fieldDesc->type() == FieldDescriptor::TYPE_STRING)
 		{
-			sqlStream << " varchar(64) NOT NULL DEFAULT ''";
+			sqlStream << " varchar(64) DEFAULT NULL";
 		}
 		else if (fieldDesc->type() == FieldDescriptor::TYPE_BYTES)
 		{
-			sqlStream << " BLOB(64) NOT NULL DEFAULT ''";
+			sqlStream << " BLOB(64) DEFAULT NULL";
 		}
 		const std::string sql = sqlStream.str();
 		if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
@@ -180,27 +180,45 @@ namespace SoEasy
 			sqlCommand << "`" << fileDesc->name() << "` ";
 			if (fileDesc->type() == FieldDescriptor::TYPE_INT32)
 			{
-				sqlCommand << "int(20) NOT NULL DEFAULT 0,\n";
+				if (fileDesc->name() == key)
+				{
+					sqlCommand << "int(20) NOT NULL,\n";
+					continue;
+				}
+				sqlCommand << "int(20) DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_INT64)
 			{
-				sqlCommand << "bigint(32) NOT NULL DEFAULT 0,\n";
+				if (fileDesc->name() == key)
+				{
+					sqlCommand << "int(20) NOT NULL,\n";
+					continue;
+				}
+				sqlCommand << "bigint(32) DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_FLOAT)
 			{
+				SayNoAssertRetFalse_F(fileDesc->name() == key);
 				sqlCommand << "float(20) NOT NULL DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_DOUBLE)
 			{
-				sqlCommand << "double(32) NOT NULL DEFAULT 0,\n";
+				SayNoAssertRetFalse_F(fileDesc->name() == key);
+				sqlCommand << "double(32) DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_STRING)
 			{
-				sqlCommand << "varchar(64) NOT NULL DEFAULT '',\n";
+				if (fileDesc->name() == key)
+				{
+					sqlCommand << "varchar(20),\n";
+					continue;
+				}
+				sqlCommand << "varchar(64) DEFAULT NULL,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_BYTES)
 			{
-				sqlCommand << "BLOB(64) NOT NULL DEFAULT '',\n";
+				SayNoAssertRetFalse_F(fileDesc->name() == key);
+				sqlCommand << "BLOB(64) DEFAULT NULL,\n";
 			}
 			else
 			{

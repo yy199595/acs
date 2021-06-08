@@ -4,6 +4,7 @@
 #include<NetWork/NetLuaAction.h>
 namespace SoEasy
 {
+	class ScriptManager;
 	class LocalLuaService : public ServiceBase
 	{
 	public:
@@ -18,7 +19,9 @@ namespace SoEasy
 	private:
 		int mServiceIndex;
 		lua_State * mLuaEnv;
-		std::unordered_map<std::string, int> mDefultActionMap;	//默认函数
-		std::unordered_map<std::string, NetLuaAction *> mActionMap;
+		ScriptManager * mScriptManager;
+		std::set<std::string> mMethodCacheSet;
+		//std::unordered_map<std::string, int> mDefultActionMap;	//默认函数
+		//std::unordered_map<std::string, NetLuaAction *> mActionMap;
 	};
 }

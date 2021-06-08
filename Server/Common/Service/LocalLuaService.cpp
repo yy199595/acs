@@ -1,14 +1,12 @@
 #include"LocalLuaService.h"
 #include<NetWork/NetLuaAction.h>
+#include<Other/ObjectFactory.h>
+#include<Manager/ScriptManager.h>
 namespace SoEasy
 {
 	LocalLuaService::LocalLuaService(lua_State * luaEnv, int index)
 		: mServiceIndex(0), mLuaEnv(nullptr)
-	{
-
-		mDefultActionMap["OnInit"] = 0;
-		mDefultActionMap["OnComplete"] = 0;
-
+	{	
 		if (lua_istable(luaEnv, index))
 		{
 			this->mLuaEnv = luaEnv;
@@ -21,22 +19,9 @@ namespace SoEasy
 				const char * key = lua_tostring(luaEnv, -2);
 				if (lua_isfunction(luaEnv, -1))
 				{
-					int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-					auto iter = this->mDefultActionMap.find(key);
-					if (iter != this->mDefultActionMap.end())
-					{
-						this->mDefultActionMap[key] = ref;
-					}
-					else
-					{
-						NetLuaAction * luaAction = new NetLuaAction(luaEnv, key, ref);
-						this->mActionMap.emplace(key, luaAction);
-					}				
+					this->mMethodCacheSet.insert(key);	
 				}
-				else
-				{
-					lua_pop(this->mLuaEnv, 1);
-				}			
+				lua_pop(this->mLuaEnv, 1);
 			}
 		}
 	}
@@ -47,25 +32,19 @@ namespace SoEasy
 
 	bool LocalLuaService::OnInit()
 	{
-		auto iter = this->mDefultActionMap.find("OnInit");
-		if (iter != this->mDefultActionMap.end())
+		this->mScriptManager = this->GetManager<ScriptManager>();
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			int ref = iter->second;
-			this->mDefultActionMap.erase(iter);
-			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-			if (lua_isfunction(this->mLuaEnv, -1))
+			return false;
+		}
+		lua_getfield(this->mLuaEnv, -1, "OnInit");
+		if (lua_isfunction(this->mLuaEnv, -1))
+		{
+			lua_pcall(this->mLuaEnv, 0, 0, 0);
+			if (!lua_toboolean(this->mLuaEnv, -1))
 			{
-				luaL_unref(mLuaEnv, LUA_REGISTRYINDEX, ref);
-				if (lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
-				{
-					SayNoDebugError(this->GetServiceName() << ":" << lua_tostring(this->mLuaEnv, -1));
-					return false;
-				}
-				if (!lua_toboolean(this->mLuaEnv, -1))
-				{
-					SayNoDebugError(this->GetServiceName() << " init fail");
-					return false;
-				}
+				return false;
 			}
 		}
 		return ServiceBase::OnInit();
@@ -73,49 +52,101 @@ namespace SoEasy
 
 	bool LocalLuaService::HasMethod(const std::string & name)
 	{
-		auto iter = this->mActionMap.find(name);
-		return iter != this->mActionMap.end();
+		auto iter = this->mMethodCacheSet.find(name);
+		return iter != this->mMethodCacheSet.end();
 	}
 
 	bool LocalLuaService::InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket> reqData)
-	{
-		auto iter = this->mActionMap.find(method);
-		if (iter == this->mActionMap.end())
+	{	
+		const static std::string luaAction = "ServiceProxy.LocalInvoke";
+		int ref = this->mScriptManager->GetGlobalReference(luaAction);
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+
+		if (!lua_isfunction(this->mLuaEnv, -1))
+		{
+			SayNoDebugError("not find function " << luaAction);
+			return false;
+		}
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+		if (!lua_istable(this->mLuaEnv, -1))
 		{
 			return false;
 		}
-		NetLuaAction * luaAction = iter->second;
-		XCode code = luaAction->Invoke(reqData);
-		long long callbackId = reqData->callback_id();
-		if (code != XCode::LuaCoroutineReturn && callbackId != 0)
+		lua_pushstring(this->mLuaEnv, method.c_str());
+		lua_pushinteger(this->mLuaEnv, reqData->operator_id());
+		lua_pushinteger(this->mLuaEnv, reqData->callback_id());
+		if (!reqData->message_data().empty())
 		{
-			reqData->clear_action();
-			reqData->clear_service();
-			reqData->clear_message_data();
-			reqData->set_error_code(code);
-			return this->ReplyMessage(callbackId, reqData);
+			if (!reqData->protoc_name().empty())
+			{
+				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protoc_name());
+				if (message != nullptr)
+				{
+					std::string json;
+					ProtocHelper::GetJsonString(message, json);
+					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+				}
+			}
+			else
+			{
+				const std::string & data = reqData->message_data();
+				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
+			}
 		}
-		return true;
+		if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
+		{
+			const char * err = lua_tostring(this->mLuaEnv, -1);
+			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
+			return false;
+		}
+		return lua_toboolean(this->mLuaEnv, -1);
 	}
 
 	bool LocalLuaService::InvokeMethod(const std::string & address, const std::string & method, SharedPacket reqData)
-	{
-		auto iter = this->mActionMap.find(method);
-		if (iter == this->mActionMap.end())
+	{		
+		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
+		int ref = this->mScriptManager->GetGlobalReference(luaAction);
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+
+		if (!lua_isfunction(this->mLuaEnv, -1))
+		{
+			SayNoDebugError("not find function " << luaAction);
+			return false;
+		}
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+		if (!lua_istable(this->mLuaEnv, -1))
 		{
 			return false;
 		}
-		NetLuaAction * luaAction = iter->second;
-		XCode code = luaAction->Invoke(address, reqData);
-		if (code != XCode::LuaCoroutineReturn && reqData->callback_id() != 0)
+		lua_pushstring(this->mLuaEnv, method.c_str());
+		lua_pushstring(this->mLuaEnv, address.c_str());
+		lua_pushinteger(this->mLuaEnv, reqData->operator_id());
+		lua_pushinteger(this->mLuaEnv, reqData->callback_id());
+		if (!reqData->message_data().empty())
 		{
-			reqData->clear_action();
-			reqData->clear_service();
-			reqData->clear_message_data();
-			reqData->set_error_code(code);
-			return this->ReplyMessage(address, reqData);
+			if (!reqData->protoc_name().empty())
+			{
+				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protoc_name());
+				if (message != nullptr)
+				{
+					std::string json;
+					ProtocHelper::GetJsonString(message, json);
+					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+				}
+			}
+			else
+			{
+				const std::string & data = reqData->message_data();
+				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
+			}
 		}
-		return true;
+		if (lua_pcall(this->mLuaEnv, 6, 1, 0) != 0)
+		{
+			const char * err = lua_tostring(this->mLuaEnv, -1);
+			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
+			return false;
+		}
+		return lua_toboolean(this->mLuaEnv, -1);
 	}
 
 }

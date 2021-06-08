@@ -101,6 +101,10 @@ namespace SoEasy
 		return taskAction->GetErrorCode() == XCode::Successful;
 	}
 
+	bool MysqlManager::DeleteData(const std::string tab, shared_ptr<Message> data, const std::string & key)
+	{
+		return false;
+	}
 
 	void MysqlManager::OnInitComplete()
 	{

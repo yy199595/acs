@@ -117,8 +117,8 @@ using namespace SoEasy;
 		if (SystemExtension::RequireLua(luaEnv, name))
 		{
 			Applocation * app = Applocation::Get();
-			SayNoDebugFatal("********** " << name);
 			LocalLuaService * luaService = new LocalLuaService(luaEnv, -1);
+			luaService->Init(app, name);
 			ServiceManager * serviceMgr = app->GetManager<ServiceManager>();
 			if (serviceMgr != nullptr)
 			{
@@ -133,7 +133,7 @@ using namespace SoEasy;
 		return 0;
 	}
 
-	int SystemExtension::LuaReplyMsg(lua_State * luaEnv)
+	int SystemExtension::LuaRetMessage(lua_State * luaEnv)
 	{
 		Applocation * app = Applocation::Get();
 		if (lua_isstring(luaEnv, 1)) //Ô¶³Ì»Ø¸´

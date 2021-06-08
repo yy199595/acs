@@ -27,9 +27,13 @@ namespace SoEasy
 		if (pDescriptor != nullptr)
 		{
 			MessageFactory * factory = MessageFactory::generated_factory();
-			Message * pMessage = const_cast<Message *>(factory->GetPrototype(pDescriptor));
-			mMessageMap.insert(std::make_pair(name, pMessage));
-			return pMessage;
+			const Message * pMessage = factory->GetPrototype(pDescriptor);
+			if (pMessage != nullptr)
+			{
+				Message * newMessage = pMessage->New();
+				mMessageMap.insert(std::make_pair(name, newMessage));
+				return newMessage;
+			}
 		}
 		return nullptr;
 	}

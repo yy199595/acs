@@ -1,15 +1,15 @@
-RedisClient = { }
+RedisClient = {}
 local this = RedisClient
 function RedisClient.InvokeCommand(cmd, ...)
     if coroutine.running() == nil then
-        SoEasy.Error("please use it in the coroutine");
+        SoEasy.Error("please use it in the coroutine")
         return nil
     end
     return SoEasy.InvokeRedisCommand(cmd, ...)
 end
 
 function RedisClient.SetValue(key, value)
-    if type(value) == 'table' then
+    if type(value) == "table" then
         local json = require("Util.JsonUtil")
         value = json.ToString(value)
     end
@@ -18,7 +18,7 @@ function RedisClient.SetValue(key, value)
 end
 
 function RedisClient.SetHashValue(tab, key, value)
-    if type(value) == 'table' then
+    if type(value) == "table" then
         local json = require("Util.JsonUtil")
         value = json.ToString(value)
     end
@@ -43,7 +43,7 @@ function RedisClient.GetHashValue(tab, key)
 end
 
 function RedisClient.SetTimeoutValue(key, value, ms)
-    if type(value) == 'table' then
+    if type(value) == "table" then
         local json = require("Util.JsonUtil")
         value = json.ToString(value)
     end

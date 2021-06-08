@@ -1,17 +1,15 @@
-
-ClientManager = { }
+require "Coroutine"
+ClientManager = {}
 local this = ClientManager
 
 function ClientManager.OnConnectComplate(tcpSession)
-
     SoEasy.Error(tcpSession, SoEasy.CallBySession)
     local cor = coroutine.create(this.Start)
     coroutine.resume(cor, tcpSession)
 end
 
 function ClientManager.Start(tcpSession)
-
-    local registerData = { }
+    local registerData = {}
     registerData.account = "6465851222@qq.com"
     registerData.password = "199595yjz."
     registerData.phonenum = 13716061995
@@ -21,13 +19,12 @@ function ClientManager.Start(tcpSession)
     local code = SoEasy.CallBySession(tcpSession, "LoginService", "Register", registerData)
     print("register back", code)
 
-    local loginData = { }
+    local loginData = {}
     loginData.account = registerData.account
     loginData.passwd = registerData.password
 
-    local code = SoEasy.CallBySession(tcpSession, "LoginService", "Login", loginData)
+    code = SoEasy.CallBySession(tcpSession, "LoginService", "Login", loginData)
     print("login back", code)
 end
-
 
 return ClientManager

@@ -66,6 +66,44 @@ namespace SoEasy
 		
 	}
 
+	int ScriptManager::GetGlobalReference(const std::string & name)
+	{
+		auto iter = this->mGlobalRefMap.find(name);
+		if (iter == this->mGlobalRefMap.end())
+		{
+			size_t pos = name.find(".");
+			if (pos != std::string::npos)
+			{
+				const std::string tab = name.substr(0, pos);
+				const std::string key = name.substr(pos + 1);
+				lua_getglobal(this->mLuaEnv, tab.c_str());
+				if (!lua_istable(this->mLuaEnv, -1))
+				{
+					SayNoDebugError("find lua object fail " << name);
+					return 0;
+				}
+				lua_getfield(this->mLuaEnv, -1, key.c_str());
+				if (lua_isnil(this->mLuaEnv, -1))
+				{
+					SayNoDebugError("find lua object field fail " << name);
+					return 0;
+				}
+				int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+				this->mGlobalRefMap.emplace(name, ref);
+				return ref;
+			}
+			lua_getglobal(this->mLuaEnv, name.c_str());
+			if (lua_isnil(this->mLuaEnv, -1))
+			{
+				SayNoDebugError("find lua object field fail " << name);
+				return 0;
+			}
+			int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+			this->mGlobalRefMap.emplace(name, ref);
+		}
+		return iter->second;
+	}
+
 
 	bool ScriptManager::LoadLuaScript(const std::string filePath)
 	{
@@ -163,7 +201,7 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "GetManager", SystemExtension::GetManager);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CreateByTable", LuaProtocExtension::CreateByTable);
 
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "LuaReplyMsg", SystemExtension::LuaReplyMsg);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "LuaRetMessage", SystemExtension::LuaRetMessage);
 		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "NewService", SystemExtension::NewService);
 
 	}

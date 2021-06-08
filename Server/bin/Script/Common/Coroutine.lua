@@ -1,8 +1,7 @@
-
 function coroutine.wakeup(cor, ...)
-   local res, ret = coroutine.resume(cor, ...)
-   assert(res, ret)
-   return ret 
+    local res, ret = coroutine.resume(cor, ...)
+    assert(res, ret)
+    return ret
 end
 
 function coroutine.start(func, ...)
@@ -14,5 +13,5 @@ function coroutine.sleep(ms)
     if coroutine.running() == nil then
         assert(false, "sleep not in coroutine")
     end
-    return SoEasy.sleep(ms)
+    return SoEasy.Sleep(ms)
 end

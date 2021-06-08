@@ -32,9 +32,8 @@ using namespace SoEasy;
 #pragma comment(lib,"libprotobufd.lib")
 #endif
 int main(int argc, char ** argv)
-{ 
-	
-	
+{
+
 	ObjectRegistry<Manager>::Register<ProxyManager>("ProxyManager");
 	ObjectRegistry<Manager>::Register<RedisManager>("RedisManager");
 	ObjectRegistry<Manager>::Register<MysqlManager>("MysqlManager");

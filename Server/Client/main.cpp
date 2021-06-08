@@ -18,7 +18,6 @@ using namespace Client;
 #endif
 int main(int argc, char ** argv)
 {
-	
 	ObjectRegistry<Manager>::Register<TimerManager>("TimerManager");
 	ObjectRegistry<Manager>::Register<ClientManager>("ClientManager");
 	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");

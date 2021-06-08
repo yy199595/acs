@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp" />
     <ClCompile Include="Manager\RedisManager.cpp" />
+    <ClCompile Include="MysqlClient\MysqlDeleteTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlInsertTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlLuaTask.cpp" />
     <ClCompile Include="MysqlClient\MysqlQueryTask.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Manager\MysqlManager.h" />
     <ClInclude Include="Manager\RedisManager.h" />
     <ClInclude Include="MysqlClient\MysqlDefine.h" />
+    <ClInclude Include="MysqlClient\MysqlDeleteTask.h" />
     <ClInclude Include="MysqlClient\MysqlInsertTask.h" />
     <ClInclude Include="MysqlClient\MysqlLuaTask.h" />
     <ClInclude Include="MysqlClient\MysqlQueryTask.h" />

@@ -20,6 +20,7 @@ namespace SoEasy
 		bool InsertData(const std::string tab, shared_ptr<Message> data);
 		bool QueryData(const std::string tab, shared_ptr<Message> data, const std::string & key);
 		bool UpdateData(const std::string tab, shared_ptr<Message> data, const std::string & key);
+		bool DeleteData(const std::string tab, shared_ptr<Message> data, const std::string & key);
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;

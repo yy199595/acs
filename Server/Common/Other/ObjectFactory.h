@@ -1,7 +1,7 @@
 #pragma once
 #include<Object/Object.h>
-#include<Define/ThreadQueue.h>
 #include<Protocol/Common.pb.h>
+#include<Protocol/ServerCommon.pb.h>
 using namespace google::protobuf;
 namespace SoEasy
 {

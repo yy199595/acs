@@ -19,7 +19,8 @@ namespace SoEasy
 		bool OnInit() final;
 		void OnDestory() final;
 		void OnInitComplete() final;
-
+	public:
+		int GetGlobalReference(const std::string & name);
 	private:
 		bool LoadAllModule();
 		void ClearRequirePath();
@@ -37,6 +38,7 @@ namespace SoEasy
 		struct lua_State * mLuaEnv;
 		const static std::string mName;
 		std::vector<std::string> mRequirePaths;
+		std::unordered_map<std::string, int> mGlobalRefMap;
 	};
 
 	template<typename T>

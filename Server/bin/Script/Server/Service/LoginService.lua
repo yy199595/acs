@@ -1,6 +1,4 @@
-
 LoginService = {}
-local json = require "JsonUtil"
 local redisClient = require "RedisClient"
 local mysqlClient = require "MysqlClient"
 function LoginService.OnInit()
@@ -8,31 +6,26 @@ function LoginService.OnInit()
     return true
 end
 
-function LoginService.Register(operId, registerData)
-
-    local accountData = { }
+function LoginService.Register(_, registerData)
+    local accountData = {}
     accountData.userid = 1545646545454
     accountData.passwd = registerData.password
     accountData.account = registerData.account
 
-
     local account = registerData.account
     local queryData = redisClient.GetHashValue("tb_player_account", account)
     if queryData ~= nil then
-        return 31
+        return XCode.AccountAlreadyExists
     end
     if mysqlClient.Insert("tb_player_account", accountData) then
         local redisCode = redisClient.SetHashValue("tb_player_account", account, accountData)
         SoEasy.Error("redis code", redisCode)
-        return 0
-    end 
-    return 1
+        return XCode.Successful
+    end
+    return XCode.Failure
 end
 
-
 function LoginService.Query()
-
-
 end
 
 return LoginService

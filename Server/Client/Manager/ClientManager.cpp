@@ -24,6 +24,8 @@ namespace Client
 	void ClientManager::OnInitComplete()
 	{
 		this->mCoroutineManager->Sleep(1000);
+		//PB::UserRegisterData data;
+		ObjectFactory::Get()->CreateMessage("PB.UserRegisterData");
 	}
 
 	void ClientManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
