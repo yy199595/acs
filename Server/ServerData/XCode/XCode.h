@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 enum XCode
 {
 	Successful = 0,//成功
