@@ -1,4 +1,4 @@
-#parame once;
+#parama once;
 enum XCode
 {
 	Successful = 0,//成功
