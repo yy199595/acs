@@ -11,6 +11,11 @@ namespace SoEasy
 		this->mCoroutienRef = ref;
 	}
 
+	RedisLuaTask::~RedisLuaTask()
+	{
+		luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);
+	}
+
 	void RedisLuaTask::OnTaskFinish()
 	{
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);

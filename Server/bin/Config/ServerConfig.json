@@ -35,8 +35,7 @@
         "ScriptManager",
         "ListenerManager",
         "ActionManager",
-        "ServiceManager",
-        "LocalAccessManager"
+        "ServiceManager"
     ],
     "Service": [
         "LoginService",

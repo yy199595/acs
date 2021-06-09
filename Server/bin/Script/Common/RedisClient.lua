@@ -19,7 +19,7 @@ end
 
 function RedisClient.SetHashValue(tab, key, value)
     if type(value) == "table" then
-        local json = require("Util.JsonUtil")
+        local json = require("JsonUtil")
         value = json.ToString(value)
     end
     local queryData = this.InvokeCommand("HSET", tab, key, value)
@@ -31,7 +31,7 @@ function RedisClient.GetValue(key)
     if queryData == nil or queryData.code ~= 0 then
         return nil
     end
-    return queryData.data
+    return JsonUtil.ToObject(queryData.data)
 end
 
 function RedisClient.GetHashValue(tab, key)

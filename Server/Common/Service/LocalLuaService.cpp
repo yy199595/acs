@@ -1,5 +1,4 @@
 #include"LocalLuaService.h"
-#include<NetWork/NetLuaAction.h>
 #include<Other/ObjectFactory.h>
 #include<Manager/ScriptManager.h>
 namespace SoEasy
@@ -27,7 +26,7 @@ namespace SoEasy
 	}
 	LocalLuaService::~LocalLuaService()
 	{
-
+		luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
 	}
 
 	bool LocalLuaService::OnInit()

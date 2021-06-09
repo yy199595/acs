@@ -7,7 +7,6 @@
 #include<Timer/LuaSleepTimer.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
-#include<NetWork/NetLuaAction.h>
 #include<Protocol/Common.pb.h>
 #include<NetWork/NetLuaRetAction.h>
 #include<Service/LocalLuaService.h>

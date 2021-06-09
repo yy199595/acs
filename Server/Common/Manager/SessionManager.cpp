@@ -3,7 +3,6 @@
 #include"ServiceManager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
-#include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Service/LocalService.h>
 #include<Service/LocalLuaService.h>

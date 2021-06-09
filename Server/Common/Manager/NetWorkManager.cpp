@@ -10,7 +10,6 @@
 #include<Script/LuaFunction.h>
 #include<Manager/ActionManager.h>
 #include<NetWork/RemoteActionProxy.h>
-#include<Manager/LocalAccessManager.h>
 namespace SoEasy
 {
 	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
@@ -20,7 +19,6 @@ namespace SoEasy
 
 	bool NetWorkManager::OnInit()
 	{
-		this->mLocalAccessManager = this->GetManager<LocalAccessManager>();
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
 		

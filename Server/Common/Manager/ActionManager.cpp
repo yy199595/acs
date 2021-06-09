@@ -5,7 +5,6 @@
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
-#include<NetWork/NetLuaAction.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Timer/ActionTimeoutTimer.h>

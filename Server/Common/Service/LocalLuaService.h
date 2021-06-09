@@ -1,7 +1,6 @@
 #pragma once
 #include"ServiceBase.h"
 #include<Script/LuaInclude.h>
-#include<NetWork/NetLuaAction.h>
 namespace SoEasy
 {
 	class ScriptManager;

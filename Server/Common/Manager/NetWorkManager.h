@@ -34,7 +34,6 @@ namespace SoEasy
 	private:
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
-		class LocalAccessManager * mLocalAccessManager;
 		class ActionManager * mLocalActionManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];

@@ -14,10 +14,13 @@ function LoginService.Register(_, registerData)
 
     local account = registerData.account
     local queryData = redisClient.GetHashValue("tb_player_account", account)
+    SoEasy.Info(queryData)
     if queryData ~= nil then
         return XCode.AccountAlreadyExists
     end
-    if mysqlClient.Insert("tb_player_account", accountData) then
+    local res = mysqlClient.Insert("tb_player_account", accountData)
+    print(res)
+    if res then
         local redisCode = redisClient.SetHashValue("tb_player_account", account, accountData)
         SoEasy.Error("redis code", redisCode)
         return XCode.Successful

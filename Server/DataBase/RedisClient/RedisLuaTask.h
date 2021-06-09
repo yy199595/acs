@@ -11,6 +11,7 @@ namespace SoEasy
 	{
 	public:
 		RedisLuaTask(RedisManager * mgr, long long taskId, const std::string & cmd, lua_State * lua, int ref);
+		~RedisLuaTask();
 	protected:
 		void OnTaskFinish() final;  //执行完成之后在主线程调用
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) final;

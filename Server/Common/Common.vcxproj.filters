@@ -90,9 +90,6 @@
     <ClCompile Include="Module\SayNoUdpSession.cpp">
       <Filter>Module</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\NetLuaAction.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
     <ClCompile Include="NetWork\NetLuaRetAction.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
@@ -182,9 +179,6 @@
     </ClCompile>
     <ClCompile Include="Timer\ActionTimeoutTimer.cpp">
       <Filter>Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\LocalAccessManager.cpp">
-      <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="Script\BindLuaFunction.cpp">
       <Filter>Script</Filter>
@@ -317,9 +311,6 @@
     <ClInclude Include="Module\SayNoUdpSession.h">
       <Filter>Module</Filter>
     </ClInclude>
-    <ClInclude Include="NetWork\NetLuaAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
     <ClInclude Include="NetWork\NetLuaRetAction.h">
       <Filter>NetWork</Filter>
     </ClInclude>
@@ -427,9 +418,6 @@
     </ClInclude>
     <ClInclude Include="Timer\ActionTimeoutTimer.h">
       <Filter>Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\LocalAccessManager.h">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Script\BindLuaFunction.h">
       <Filter>Script</Filter>

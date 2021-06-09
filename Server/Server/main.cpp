@@ -11,7 +11,6 @@
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Manager/ProxyManager.h>
-#include<Manager/LocalAccessManager.h>
 #include<Coroutine/CoroutineManager.h>
 
 #include<Manager/LoginService.h>
@@ -45,7 +44,6 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<ConsoleManager>("ConsoleManager");
 	ObjectRegistry<Manager>::Register<ListenerManager>("ListenerManager");
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
-	ObjectRegistry<Manager>::Register<LocalAccessManager>("LocalAccessManager");
 
 
 	ObjectRegistry<LocalService>::Register<LoginService>("LoginService");
