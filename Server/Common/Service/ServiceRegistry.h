@@ -13,9 +13,9 @@ namespace SoEasy
 	struct ActionProxyInfo
 	{
 	public:
-		int mAreaId;			//·şÎñÆ÷×éid
-		std::string mActionName;	//actionÃû×Ö
-		std::string mListenerAddress;	//¼àÌıµØÖ·
+		int mAreaId;			//æœåŠ¡å™¨ç»„id
+		std::string mActionName;	//actionåå­—
+		std::string mListenerAddress;	//ç›‘å¬åœ°å€
 	public:
 		bool operator == (ActionProxyInfo & actionInfo)
 		{
@@ -27,7 +27,7 @@ namespace SoEasy
 	};
 	class ProxyService;
 	class TcpSessionListener;
-	// ËùÓĞ·½·¨¶¼×¢²áµ½ÕâÀï(È«¾ÖÎ¨Ò»)
+	// æ‰€æœ‰æ–¹æ³•éƒ½æ³¨å†Œåˆ°è¿™é‡Œ(å…¨å±€å”¯ä¸€)
 	class ServiceRegistry : public LocalService
 	{
 	public:

@@ -3,7 +3,7 @@
 
 namespace LuaProtocExtension
 {
-	//°ÉÒ»¸ölua±íĞòÁĞ»¯³ÉÒ»¸öprotoc¶ÔÏó£¬·µ»ØĞòÁĞ»¯ºóµÄ¶ş½øÖÆ
+	//å§ä¸€ä¸ªluaè¡¨åºåˆ—åŒ–æˆä¸€ä¸ªprotocå¯¹è±¡ï¼Œè¿”å›åºåˆ—åŒ–åçš„äºŒè¿›åˆ¶
 	extern int Serialization(lua_State * lua);
 	extern int CreateByTable(lua_State * lua);
 

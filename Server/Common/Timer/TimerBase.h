@@ -11,12 +11,12 @@ namespace SoEasy
 		virtual ~TimerBase() { }
 	public:
 		friend class TimerManager;
-		virtual bool Invoke() = 0; //´¥·¢Ö®ºóÖ´ĞĞµÄ²Ù×÷(·µ»ØÖµ±íÊ¾ÊÇ·ñÒÆ³ı, ²»ÒÆ³ı»áÌí¼Óµ½ÁĞ±í¼ÌĞøµÈ´ıÏÂ´Î)
+		virtual bool Invoke() = 0; //è§¦å‘ä¹‹åæ‰§è¡Œçš„æ“ä½œ(è¿”å›å€¼è¡¨ç¤ºæ˜¯å¦ç§»é™¤, ä¸ç§»é™¤ä¼šæ·»åŠ åˆ°åˆ—è¡¨ç»§ç»­ç­‰å¾…ä¸‹æ¬¡)
 	public:
 		const int GetTickCount() { return mTickCount; }
 		const long long GetTimerId() { return mTimerId; }
 	protected:
-		int mTickCount;	//¶àÉÙ´ÎÖ®ºóÖ´ĞĞ
+		int mTickCount;	//å¤šå°‘æ¬¡ä¹‹åæ‰§è¡Œ
 		long long mTimerId;
 		long long mDelayTime;
 	};

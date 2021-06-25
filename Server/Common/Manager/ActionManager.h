@@ -4,7 +4,7 @@
 
 namespace SoEasy
 {
-	// 注册本地Lua服务，管理远程回来的回调
+	// 娉ㄥ唽鏈湴Lua鏈嶅姟锛岀鐞嗚繙绋嬪洖鏉ョ殑鍥炶皟
 	class NetLuaAction;
 	class LocalActionProxy;
 	class LocalRetActionProxy;
@@ -19,7 +19,7 @@ namespace SoEasy
 		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
 	protected:
 		bool OnInit() override;
-		void OnSystemUpdate() final;					//处理系统事件
+		void OnSystemUpdate() final;					//澶勭悊绯荤粺浜嬩欢
 	private:
 		int mMessageTimeout;
 		std::string mMessageBuffer;

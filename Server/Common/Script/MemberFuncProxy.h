@@ -14,7 +14,7 @@ namespace MemberFunction
 	template<typename T, typename Ret, typename ...Args>
 	struct MemberFuncProxy { };
 }
-// 返回值为void类型
+// 杩斿洖鍊间负void绫诲瀷
 namespace MemberFunction
 {
 	template<typename T>
@@ -192,7 +192,7 @@ namespace MemberFunction
 		}
 	};
 }
-// 返回值为非void类型
+// 杩斿洖鍊间负闈瀡oid绫诲瀷
 namespace MemberFunction
 {
 	template<typename T, typename Ret>

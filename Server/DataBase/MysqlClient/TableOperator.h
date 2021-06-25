@@ -5,8 +5,8 @@ namespace SoEasy
 {
 
 	/*
-	¸ù¾ÝprotobufÎÄ¼þ´´½¨sql±í
-	Èç¹û×Ö¶ÎÃ»ÓÐ»á¸üÐÂ×Ö¶Î
+	æ ¹æ®protobufæ–‡ä»¶åˆ›å»ºsqlè¡¨
+	å¦‚æžœå­—æ®µæ²¡æœ‰ä¼šæ›´æ–°å­—æ®µ
 	*/
 
 	class TableOperator

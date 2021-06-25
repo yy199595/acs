@@ -7,8 +7,8 @@ namespace SoEasy
 	public:
 		NetworkLatencyInfo() { memset(this, 0, sizeof(*this)); }
 	public:
-		int mTimeoutCount;	//³¬Ê±´ÎÊı
-		long long mMaxLatency;	//×î´óÑÓ³Ù
-		long long mMinLatency;	//×îĞ¡ÑÓ³Ù
+		int mTimeoutCount;	//è¶…æ—¶æ¬¡æ•°
+		long long mMaxLatency;	//æœ€å¤§å»¶è¿Ÿ
+		long long mMinLatency;	//æœ€å°å»¶è¿Ÿ
 	};
 }

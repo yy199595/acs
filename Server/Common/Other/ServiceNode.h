@@ -18,8 +18,8 @@ namespace SoEasy
 	private:
 		const int mAreaId;
 		const int mNodeId;
-		const std::string mAddress; //监听地址
-		const std::string mNoticeAddress; //通信地址
+		const std::string mAddress; //鐩戝惉鍦板潃
+		const std::string mNoticeAddress; //閫氫俊鍦板潃
 		std::unordered_map<std::string, ProxyService *> mServiceMap;
 	};
 }

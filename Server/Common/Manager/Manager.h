@@ -33,28 +33,28 @@ namespace SoEasy
 	protected:
 		friend Applocation;
 	public:
-		void AddFinishTask(long long id);	//²»ÒªÊÖ¶¯µ÷ÓÃ
+		void AddFinishTask(long long id);	//ä¸è¦æ‰‹åŠ¨è°ƒç”¨
 	public:
 		bool StartTaskAction(shared_ptr<ThreadTaskAction> taskAction);
 		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
 	public:
-		inline int GetPriority() { return mPriority; }	//ÓÅÏÈ¼¶(¸ù¾İÓÅÏÈ¼¶È·¶¨µ÷ÓÃË³Ğò)
-		virtual void PushClassToLua(lua_State * luaEnv) { }		//×ÔÉí·½·¨µ¼³öµ½lua
+		inline int GetPriority() { return mPriority; }	//ä¼˜å…ˆçº§(æ ¹æ®ä¼˜å…ˆçº§ç¡®å®šè°ƒç”¨é¡ºåº)
+		virtual void PushClassToLua(lua_State * luaEnv) { }		//è‡ªèº«æ–¹æ³•å¯¼å‡ºåˆ°lua
 	protected:
 		void ForeachManagers(std::function<bool(Manager *)> action);
 	protected:
-		virtual bool OnInit() = 0;						//³õÊ¼»¯¹ÜÀíÆ÷
-		virtual void OnHitfix() { }						//ÈÈ¸üÃüÁîÖ®ºóµ÷ÓÃ
-		virtual void OnInitComplete() { }				//ÔÚ³õÊ¼»¯Íê³ÉÖ®ºó ¸Ä·½·¨»áÔÚĞ­³ÌÖĞµ÷ÓÃ
-		virtual void OnSystemUpdate();					//´¦ÀíÏµÍ³ÊÂ¼ş
-		virtual void OnFrameUpdate(float t) { }			//Âß¼­Ö¡
-		virtual void OnSecondUpdate() { }				//Ã¿Ãëµ÷ÓÃ
-		virtual void OnFrameUpdateAfter() { }			//ÔÚÂß¼­Ö¡Ö´ĞĞÍê³ÉÖ®ºó
-		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//ÔÚÏß³Ì³ØÍê³ÉÈÎÎñÖ®ºóµÄÍ¨Öª	
+		virtual bool OnInit() = 0;						//åˆå§‹åŒ–ç®¡ç†å™¨
+		virtual void OnHitfix() { }						//çƒ­æ›´å‘½ä»¤ä¹‹åè°ƒç”¨
+		virtual void OnInitComplete() { }				//åœ¨åˆå§‹åŒ–å®Œæˆä¹‹å æ”¹æ–¹æ³•ä¼šåœ¨åç¨‹ä¸­è°ƒç”¨
+		virtual void OnSystemUpdate();					//å¤„ç†ç³»ç»Ÿäº‹ä»¶
+		virtual void OnFrameUpdate(float t) { }			//é€»è¾‘å¸§
+		virtual void OnSecondUpdate() { }				//æ¯ç§’è°ƒç”¨
+		virtual void OnFrameUpdateAfter() { }			//åœ¨é€»è¾‘å¸§æ‰§è¡Œå®Œæˆä¹‹å
+		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//åœ¨çº¿ç¨‹æ± å®Œæˆä»»åŠ¡ä¹‹åçš„é€šçŸ¥	
 	private:
 		const int mPriority;
-		DoubleBufferQueue<long long> mFinishTaskQueue;  //ÔÚÆäËûÏß³ÌÍê³ÉµÄÈÎÎñ´æ´¢
-		std::queue<shared_ptr<ThreadTaskAction>> mWaitDispatchTasks; //µÈ´ıÅÉ·¢µÄÈÎÎñ
+		DoubleBufferQueue<long long> mFinishTaskQueue;  //åœ¨å…¶ä»–çº¿ç¨‹å®Œæˆçš„ä»»åŠ¡å­˜å‚¨
+		std::queue<shared_ptr<ThreadTaskAction>> mWaitDispatchTasks; //ç­‰å¾…æ´¾å‘çš„ä»»åŠ¡
 		std::unordered_map<long long, shared_ptr<ThreadTaskAction>> mThreadTaskMap;
 	};
 	

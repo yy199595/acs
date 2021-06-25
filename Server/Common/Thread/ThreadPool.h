@@ -8,7 +8,7 @@ namespace SoEasy
 	class ThreadPool
 	{
 	public:	
-		ThreadPool(unsigned int count = 0);	//Æô¶¯Ïß³Ì³ØÊıÁ¿
+		ThreadPool(unsigned int count = 0);	//å¯åŠ¨çº¿ç¨‹æ± æ•°é‡
 		TaskThread * GetTaskThread(long long id);
 		void GetAllTaskThread(std::vector<long long> & threads);
 		bool StartTaskAction(std::shared_ptr<ThreadTaskAction> taskAction);

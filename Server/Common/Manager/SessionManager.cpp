@@ -117,7 +117,7 @@ namespace SoEasy
 		while (this->mErrorSessionQueue.PopItem(pTcpSession))
 		{
 			this->mNetWorkManager->RemoveTcpSession(pTcpSession);
-			if (pTcpSession->IsContent() && pTcpSession->GetState() != Session_Close) //¶ÏÏßÖØÁ¬(´úÂë¹Ø±Õ²»ÖØÁ¬)
+			if (pTcpSession->IsContent() && pTcpSession->GetState() != Session_Close) //æ–­çº¿é‡è¿ž(ä»£ç å…³é—­ä¸é‡è¿ž)
 			{
 				const std::string & address = pTcpSession->GetAddress();
 				this->mWaitConnectSessionMap.emplace(address, pTcpSession);

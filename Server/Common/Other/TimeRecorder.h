@@ -11,12 +11,12 @@ namespace SoEasy
 	public:
 		void Clear() { memset(this, 0, sizeof(*this)); }
 	public:
-		int mTimeoutCount;	//³¬Ê±´ÎÊı
-		long long mCallCount;	//µ÷ÓÃ´ÎÊı
-		double mSumLatency;	//×ÜÑÓ³Ù
-		double mMaxLatency;	//×î´óÑÓ³Ù
-		double mMinLatency;	//×îĞ¡ÑÓ³Ù
-		double mAverageLatency;	//Æ½¾ùÑÓ³Ù
+		int mTimeoutCount;	//è¶…æ—¶æ¬¡æ•°
+		long long mCallCount;	//è°ƒç”¨æ¬¡æ•°
+		double mSumLatency;	//æ€»å»¶è¿Ÿ
+		double mMaxLatency;	//æœ€å¤§å»¶è¿Ÿ
+		double mMinLatency;	//æœ€å°å»¶è¿Ÿ
+		double mAverageLatency;	//å¹³å‡å»¶è¿Ÿ
 	};
 
 
@@ -34,7 +34,7 @@ namespace SoEasy
 		void AddCostTimeInfo(const std::string & func, long long lastTime);
 		void AddCostTimeInfo(const std::string & func, XCode code, long long lastTime);
 	private:
-		long long mLastClearTime;//(ºÁÃë)
+		long long mLastClearTime;//(æ¯«ç§’)
 		std::unordered_map<std::string, CostTimeInfo> mCallFuncInfoMap;
 	};
 }

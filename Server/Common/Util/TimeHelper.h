@@ -5,19 +5,19 @@ namespace TimeHelper
 {
 	extern std::string GetDateStr(long long time = 0);
 
-	// »ñÈ¡ºÁÃëÊ±¼ä´Á
+	// è·å–æ¯«ç§’æ—¶é—´æˆ³
 	extern long long GetMilTimestamp();
 
-	// »ñÈ¡Ãë¼¶Ê±¼ä´Á
+	// è·å–ç§’çº§æ—¶é—´æˆ³
 	extern long long GetSecTimeStamp();
 
-	// »ñÈ¡Î¢Ãî¼¶Ê±¼ä´Á
+	// è·å–å¾®å¦™çº§æ—¶é—´æˆ³
 	extern long long GetMicTimeStamp();
 
-	// »ñÈ¡Ê±¼ä×Ö·û´® ¾«È·µ½Ãë
+	// è·å–æ—¶é—´å­—ç¬¦ä¸² ç²¾ç¡®åˆ°ç§’
 	extern std::string GetDateString(long long t = time(NULL));
 
-	// »ñÈ¡Ê±¼ä×Ö·û´®¾«È·µ½Ìì
+	// è·å–æ—¶é—´å­—ç¬¦ä¸²ç²¾ç¡®åˆ°å¤©
 	extern std::string GetYearMonthDayString();
 
 	

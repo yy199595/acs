@@ -11,7 +11,7 @@ namespace SoEasy
 	public:
 		long long GetCoroutineId() { return mCoreoutineId; }
 	protected:
-		void OnTaskFinish() final;  //执行完成之后在主线程调用
+		void OnTaskFinish() final;  //鎵ц瀹屾垚涔嬪悗鍦ㄤ富绾跨▼璋冪敤
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) final;
 	public:
 		std::shared_ptr<InvokeResultData> GetInvokeData();

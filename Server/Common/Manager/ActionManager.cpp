@@ -58,7 +58,7 @@ namespace SoEasy
 		}
 		callbackId = NumberHelper::Create();
 		this->mRetActionMap.emplace(callbackId, actionBox);
-		if (this->mMessageTimeout != 0)// Ìí¼Ó³¬Ê±
+		if (this->mMessageTimeout != 0)// æ·»åŠ è¶…æ—¶
 		{
 			shared_ptr<ActionTimeoutTimer> timer = make_shared<ActionTimeoutTimer>(this->mMessageTimeout, callbackId, this);
 			this->mTimerManager->AddTimer(timer);

@@ -13,7 +13,7 @@ namespace SoEasy
 		bool HasMethod(const std::string & action) final;
 	public:
 		bool OnInit() override;
-		virtual void OnRefreshService() { };	//Ë¢ĞÂ·şÎñ±íµ÷ÓÃ
+		virtual void OnRefreshService() { };	//åˆ·æ–°æœåŠ¡è¡¨è°ƒç”¨
 	private:
 		bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) final;
 		bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) final;

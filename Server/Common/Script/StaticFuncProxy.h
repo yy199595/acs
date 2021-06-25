@@ -14,7 +14,7 @@ namespace StaticFunction
 	struct StaticFuncProxy { };
 }
 
-// 返回值为 void 类型
+// 杩斿洖鍊间负 void 绫诲瀷
 namespace StaticFunction
 {
 
@@ -183,7 +183,7 @@ namespace StaticFunction
 		}
 	};
 }
-// 返回值为非void类型
+// 杩斿洖鍊间负闈瀡oid绫诲瀷
 namespace StaticFunction
 {
 	template<typename Ret>

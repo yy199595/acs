@@ -7,7 +7,7 @@
 #include<type_traits>
 #include<unordered_map>
 #include<google/protobuf/message.h>
-// ÆÕÍ¨Êı¾İÀàĞÍ
+// æ™®é€šæ•°æ®ç±»å‹
 namespace CommonParameter
 {
 	template<typename T>
@@ -52,7 +52,7 @@ namespace CommonParameter
 	template<> struct IsCommonParameter<void> { constexpr static  bool value = true; };
 
 }
-// stdÈİÆ÷ÀàĞÍ
+// stdå®¹å™¨ç±»å‹
 namespace ContainerParameter
 {
 	template<typename T>
@@ -91,7 +91,7 @@ namespace ContainerParameter
 	template<typename Key, typename Value>
 	struct IsContainerParameter<std::unordered_map<Key, Value> *> { constexpr static bool value = true; };
 }
-// º¯ÊıÀàĞÍ
+// å‡½æ•°ç±»å‹
 namespace FunctionParameter
 {
 	template<typename T>
@@ -146,7 +146,7 @@ namespace ProtocParameter
 	struct IsProtocParameter<std::shared_ptr<T>> { constexpr static bool value = std::is_base_of<google::protobuf::Message, T>::value; };
 }
 
-// ×Ô¶¨ÒåÊı¾İÀàĞÍ
+// è‡ªå®šä¹‰æ•°æ®ç±»å‹
 namespace UserDataParameter
 {
 	template<typename T>

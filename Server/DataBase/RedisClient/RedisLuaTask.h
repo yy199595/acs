@@ -13,7 +13,7 @@ namespace SoEasy
 		RedisLuaTask(RedisManager * mgr, long long taskId, const std::string & cmd, lua_State * lua, int ref);
 		~RedisLuaTask();
 	protected:
-		void OnTaskFinish() final;  //执行完成之后在主线程调用
+		void OnTaskFinish() final;  //鎵ц瀹屾垚涔嬪悗鍦ㄤ富绾跨▼璋冪敤
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) final;
 	public:
 		static shared_ptr<RedisLuaTask> Create(lua_State * lua, int index, const char * cmd);

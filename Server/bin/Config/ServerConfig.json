@@ -11,7 +11,7 @@
     "IsOpenRecoder": true,
     "CommandPort": 1020,
     "RedisTimeout": 3,
-    "RedisPasswd": "646585122@qq.com",
+    "RedisPasswd": "你好",
     "RedisAddress": "127.0.0.1:6379",
     "SqlTable": "./sql/sql.json",
     "MysqlDbName": "PlayerGame",

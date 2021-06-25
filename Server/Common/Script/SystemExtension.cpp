@@ -135,7 +135,7 @@ using namespace SoEasy;
 	int SystemExtension::LuaRetMessage(lua_State * luaEnv)
 	{
 		Applocation * app = Applocation::Get();
-		if (lua_isstring(luaEnv, 1)) //远程回复
+		if (lua_isstring(luaEnv, 1)) //杩滅▼鍥炲
 		{		
 			NetWorkManager * netManager = app->GetManager<NetWorkManager>();
 			if (netManager != nullptr)
@@ -159,7 +159,7 @@ using namespace SoEasy;
 				return 0;
 			}
 		}
-		else if (lua_isinteger(luaEnv, 1)) //本机回复
+		else if (lua_isinteger(luaEnv, 1)) //鏈満鍥炲
 		{
 			ActionManager * actManager = app->GetManager<ActionManager>();
 			

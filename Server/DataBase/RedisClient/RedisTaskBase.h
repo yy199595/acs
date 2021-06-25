@@ -11,7 +11,7 @@ namespace SoEasy
 	public:
 		RedisTaskBase(RedisManager * mgr, long long taskId, const std::string & cmd);
 	public:
-		void InvokeInThreadPool(long long threadId) final;	//ÔÚÏß³Ì³ØÖ´ĞĞµÄÈÎÎñ
+		void InvokeInThreadPool(long long threadId) final;	//åœ¨çº¿ç¨‹æ± æ‰§è¡Œçš„ä»»åŠ¡
 	public:
 		template<typename ...Args>
 		void InitCommand(Args &&... args);

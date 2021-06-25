@@ -6,8 +6,8 @@
 #include"Manager.h"
 #include<condition_variable>
 #include<Timer/TimerBase.h>
-#define TimerPrecision 20 //¾«¶È  ºÁÃë
-#define MaxMinute 1		//Ò»È¦ÂÖÑ¯Ê±¼ä ·ÖÖÓ
+#define TimerPrecision 20 //ç²¾åº¦  æ¯«ç§’
+#define MaxMinute 1		//ä¸€åœˆè½®è¯¢æ—¶é—´ åˆ†é’Ÿ
 namespace SoEasy
 {
 	class TimerManager : public Manager
@@ -26,7 +26,7 @@ namespace SoEasy
  	protected:
 		bool OnInit() { return true; }
 		void OnInitComplete() final;
-		void OnSystemUpdate() final;					//´¦ÀíÏµÍ³ÊÂ¼ş
+		void OnSystemUpdate() final;					//å¤„ç†ç³»ç»Ÿäº‹ä»¶
 	private:
 		void RefreshTimer();
 		bool AddNextTimer(shared_ptr<TimerBase> timer);
@@ -35,16 +35,16 @@ namespace SoEasy
 		bool mIsStop;
 		std::thread * mTimerThread;
 		std::mutex mTimerThreadLock;
-		std::condition_variable mWheelVariable;		//ÊÇ·ñÂÖÑ¯µÄÌõ¼ş±äÁ¿		
-		DoubleBufferQueue<long long> mFinishTimerQueue;	//Íê³ÉÒ»´ÎµÄ¶ÓÁĞ
-		DoubleBufferQueue<shared_ptr<TimerBase>> mWheelQueue;	//ĞèÒªÂÖÑ¯µÄ¶ÓÁĞ
-		std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap;	//ËùÓĞtimerµÄÁĞ±í
+		std::condition_variable mWheelVariable;		//æ˜¯å¦è½®è¯¢çš„æ¡ä»¶å˜é‡		
+		DoubleBufferQueue<long long> mFinishTimerQueue;	//å®Œæˆä¸€æ¬¡çš„é˜Ÿåˆ—
+		DoubleBufferQueue<shared_ptr<TimerBase>> mWheelQueue;	//éœ€è¦è½®è¯¢çš„é˜Ÿåˆ—
+		std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap;	//æ‰€æœ‰timerçš„åˆ—è¡¨
 	private:
 		int mTickCount;
 		int mTimerCount;
 		int mMaxTimeCount;
 		long long mStartTime;
-		std::list<shared_ptr<TimerBase>> mNextWheelTimer;	// ±¾´Î²»¹Ø×¢µÄ¶¨Ê±Æ÷
+		std::list<shared_ptr<TimerBase>> mNextWheelTimer;	// æœ¬æ¬¡ä¸å…³æ³¨çš„å®šæ—¶å™¨
 		std::queue<shared_ptr<TimerBase>> mTimers[MaxMinute * 60 * (1000 / TimerPrecision)];
 	};
 	template<typename T, typename ...Args>

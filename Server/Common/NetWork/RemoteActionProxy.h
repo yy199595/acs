@@ -26,6 +26,6 @@ namespace SoEasy
 		std::string mActionAddress;	
 		NetWorkManager * mNetWorkManager;
 		shared_ptr<TcpClientSession> mActionSession;
-		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue; //等待发送的消息
+		std::queue<shared_ptr<PB::NetWorkPacket>> mSendQueue; //绛夊緟鍙戦�佺殑娑堟伅
 	};
 }

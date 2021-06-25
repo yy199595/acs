@@ -11,9 +11,9 @@ namespace SoEasy
 		MysqlTaskBase(MysqlManager * mgr, long long id, const std::string & db);
 		~MysqlTaskBase() { }
 	protected:
-		void InvokeInThreadPool(long long threadId) final;	//ÔÚÆäËûÏß³Ì²éÑ¯
+		void InvokeInThreadPool(long long threadId) final;	//åœ¨å…¶ä»–çº¿ç¨‹æŸ¥è¯¢
 		virtual const std::string & GetSqlCommand() = 0;
-		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter); //²éÑ¯Íê³ÉÖ®ºóµ÷ÓÃ
+		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter); //æŸ¥è¯¢å®Œæˆä¹‹åŽè°ƒç”¨
 	public:
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }
 	public:

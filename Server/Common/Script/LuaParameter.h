@@ -39,7 +39,7 @@ namespace LuaParameter
 
 namespace LuaParameter
 {
-	//ÆÕÍ¨Êı¾İÀàĞÍ
+	//æ™®é€šæ•°æ®ç±»å‹
 	template<typename T>
 	inline typename std::enable_if<CommonParameter::IsCommonParameter<T>::value, void>::type Write(lua_State * lua, T data)
 	{
@@ -56,7 +56,7 @@ namespace LuaParameter
 
 namespace LuaParameter
 {
-	//ÈİÆ÷Êı¾İÀàĞÍ
+	//å®¹å™¨æ•°æ®ç±»å‹
 	template<typename T>
 	inline typename std::enable_if<ContainerParameter::IsContainerParameter<T>::value, void>::type Write(lua_State * lua, T data)
 	{
@@ -72,7 +72,7 @@ namespace LuaParameter
 
 namespace LuaParameter
 {
-	//º¯ÊıÊı¾İÀàĞÍ
+	//å‡½æ•°æ•°æ®ç±»å‹
 	template<typename T>
 	inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, T>::type Read(lua_State * lua, int index)
 	{
@@ -102,7 +102,7 @@ namespace LuaParameter
 
 namespace LuaParameter
 {
-	// user dataÀàĞÍ
+	// user dataç±»å‹
 	template<typename T>
 	inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, T>::type Read(lua_State * lua, int index)
 	{

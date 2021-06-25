@@ -23,7 +23,7 @@ namespace ContainerParameter
 	}
 }
 
-// vector ¶ÔÏó
+// vector å¯¹è±¡
 namespace ContainerParameter
 {
 	template<typename T>
@@ -57,13 +57,13 @@ namespace ContainerParameter
 	};
 }
 
-// vector ÒıÓÃ  
+// vector å¼•ç”¨  
 namespace ContainerParameter
 {
 	template<typename T>
 	struct ContainerStruct<std::vector<T> &>
 	{
-		//¶ÁµÄÊ±ºò×¢ÒâÊÍ·ÅÄÚ´æ
+		//è¯»çš„æ—¶å€™æ³¨æ„é‡Šæ”¾å†…å­˜
 		static std::vector<T> & Read(lua_State * lua, int index)
 		{
 			LuaDebugLog("Do not return vector references");
@@ -86,13 +86,13 @@ namespace ContainerParameter
 	};
 }
 
-// vector Ö¸Õë 
+// vector æŒ‡é’ˆ 
 namespace ContainerParameter
 {
 	template<typename T>
 	struct ContainerStruct<std::vector<T> *>
 	{
-		//¶ÁµÄÊ±ºò×¢ÒâÊÍ·ÅÄÚ´æ
+		//è¯»çš„æ—¶å€™æ³¨æ„é‡Šæ”¾å†…å­˜
 		static std::shared_ptr<std::vector<T>> Read(lua_State * lua, int index)
 		{
 			std::vector<T> * ret = new std::vector<T>();
@@ -121,7 +121,7 @@ namespace ContainerParameter
 	};
 }
 
-// hashmap¶ÔÏó
+// hashmapå¯¹è±¡
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
@@ -157,7 +157,7 @@ namespace ContainerParameter
 	};
 }
 
-// hashmapÒıÓÃ
+// hashmapå¼•ç”¨
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
@@ -194,7 +194,7 @@ namespace ContainerParameter
 	};
 }
 
-// hashmapÖ¸Õë
+// hashmapæŒ‡é’ˆ
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
@@ -231,7 +231,7 @@ namespace ContainerParameter
 	};
 }
 
-// map¶ÔÏó
+// mapå¯¹è±¡
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
@@ -267,7 +267,7 @@ namespace ContainerParameter
 	};
 }
 
-// mapÒıÓÃ
+// mapå¼•ç”¨
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
@@ -304,13 +304,13 @@ namespace ContainerParameter
 	};
 }
 
-// mapÖ¸Õë
+// mapæŒ‡é’ˆ
 namespace ContainerParameter
 {
 	template<typename Key,typename Value>
 	struct ContainerStruct<std::map<Key, Value> *>
 	{
-		// ×¢ÒâÊÍ·ÅÄÚ´æ
+		// æ³¨æ„é‡Šæ”¾å†…å­˜
 		static std::map<Key, Value> * Read(lua_State * lua, int index)
 		{
 			std::map<Key, Value> * ret = new std::map<Key, Value>();

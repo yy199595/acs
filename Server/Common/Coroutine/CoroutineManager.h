@@ -12,7 +12,7 @@
 #include<Manager/Manager.h>
 #include<NetWork/TcpClientSession.h>
 
-#define CoroutinePoolMaxCount 100	//Ğ­³Ì³Ø×î´óÊıÁ¿
+#define CoroutinePoolMaxCount 100	//åç¨‹æ± æœ€å¤§æ•°é‡
 namespace SoEasy
 {
 	struct Coroutine;
@@ -30,7 +30,7 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
-		void OnSystemUpdate() final;					//´¦ÀíÏµÍ³ÊÂ¼ş
+		void OnSystemUpdate() final;					//å¤„ç†ç³»ç»Ÿäº‹ä»¶
 		void OnFrameUpdate(float t) final;
 	public:
 		long long GetNowTime();
@@ -52,7 +52,7 @@ namespace SoEasy
 #else
 		void * mMainCoroutineStack;	
 #endif
-		int mCoroutinePoolMaxSize;  //Ğ­³Ì³ØÄ¬ÈÏÊıÁ¿
+		int mCoroutinePoolMaxSize;  //åç¨‹æ± é»˜è®¤æ•°é‡
 		char mSharedStack[STACK_SIZE];
 		std::queue<long long> mWakeUpCoroutine;
 		std::queue<Coroutine *> mCoroutinePool;

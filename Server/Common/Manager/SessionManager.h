@@ -13,7 +13,7 @@ namespace SoEasy
 		shared_ptr<TcpClientSession> CreateTcpSession(SharedTcpSocket socket);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string address);
 		shared_ptr<TcpClientSession> CreateTcpSession(std::string name, std::string ip, unsigned short port);
-	private:	//不要手动调用
+	private:	//涓嶈鎵嬪姩璋冪敤
 		bool AddNewSession(SharedTcpSession tcpSession);
 		bool AddErrorSession(SharedTcpSession tcpSession);
 		bool AddRecvMessage(SharedTcpSession tcpSession, const char * message, size_t size);
@@ -33,9 +33,9 @@ namespace SoEasy
 		class ActionManager * mActionManager;
 		class ServiceManager * mServiceManager;
 		class CoroutineManager * mCoroutineSheduler;
-		shared_ptr<TcpClientSession> mCurrentSession;  //当前正在执行action的session
+		shared_ptr<TcpClientSession> mCurrentSession;  //褰撳墠姝ｅ湪鎵цaction鐨剆ession
 		DoubleBufferQueue<SharedTcpSession> mNewSessionQueue;
 		DoubleBufferQueue<SharedTcpSession> mErrorSessionQueue;
-		std::unordered_map<std::string, SharedTcpSession> mWaitConnectSessionMap;	//要断线重连的session
+		std::unordered_map<std::string, SharedTcpSession> mWaitConnectSessionMap;	//瑕佹柇绾块噸杩炵殑session
 	};
 }

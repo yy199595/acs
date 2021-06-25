@@ -94,7 +94,7 @@ namespace DirectoryHelper
 					paths.push_back(std::string(newpath, size));
 				}
 			}
-			//Èç¹ûÊÇµ±Ç°Â·¾¶»òÕß¸¸Ä¿Â¼µÄ¿ì½İ·½Ê½£¬»òÕßÊÇÆÕÍ¨Ä¿Â¼£¬ÔòÑ°ÕÒÏÂÒ»¸öÄ¿Â¼»òÕßÎÄ¼ş
+			//å¦‚æœæ˜¯å½“å‰è·¯å¾„æˆ–è€…çˆ¶ç›®å½•çš„å¿«æ·æ–¹å¼ï¼Œæˆ–è€…æ˜¯æ™®é€šç›®å½•ï¼Œåˆ™å¯»æ‰¾ä¸‹ä¸€ä¸ªç›®å½•æˆ–è€…æ–‡ä»¶
 			if (!FindNextFile(fileHandle, &findFileData))
 			{
 				break;

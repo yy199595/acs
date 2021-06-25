@@ -55,7 +55,7 @@ namespace SoEasy
 				this->mThreadLock.unlock();
 
 				taskAction->InvokeInThreadPool(this->mThreadId);
-				taskAction->NoticeToMainThread();// 通知到主线程
+				taskAction->NoticeToMainThread();// 閫氱煡鍒颁富绾跨▼
 			}
 		}
 	}

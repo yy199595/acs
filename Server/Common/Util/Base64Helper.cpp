@@ -45,7 +45,7 @@ namespace Base64Helper
 	}
 	std::string Base64Decode(const char * data, const size_t size)
 	{
-		//½âÂë±í
+		//è§£ç è¡¨
 		static const char DecodeTable[] =
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -61,7 +61,7 @@ namespace Base64Helper
 			26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
 			39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, // 'a'-'z'
 		};
-		//·µ»ØÖµ
+		//è¿”å›å€¼
 		std::string strDecode;
 		int nValue;
 		int i = 0;
@@ -84,7 +84,7 @@ namespace Base64Helper
 				}
 				i += 4;
 			}
-			else// »Ø³µ»»ĞĞ,Ìø¹ı
+			else// å›è½¦æ¢è¡Œ,è·³è¿‡
 			{
 				data++;
 				i++;

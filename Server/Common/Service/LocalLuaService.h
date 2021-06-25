@@ -20,7 +20,7 @@ namespace SoEasy
 		lua_State * mLuaEnv;
 		ScriptManager * mScriptManager;
 		std::set<std::string> mMethodCacheSet;
-		//std::unordered_map<std::string, int> mDefultActionMap;	//Ä¬ÈÏº¯Êý
+		//std::unordered_map<std::string, int> mDefultActionMap;	//é»˜è®¤å‡½æ•°
 		//std::unordered_map<std::string, NetLuaAction *> mActionMap;
 	};
 }

@@ -13,7 +13,7 @@ namespace SoEasy
 	public:
 		void NoticeToMainThread();
 		virtual void OnTaskFinish() = 0;
-		virtual void InvokeInThreadPool(long long threadId) = 0;	//ÔÚÏß³Ì³ØÖ´ÐÐµÄÈÎÎñ
+		virtual void InvokeInThreadPool(long long threadId) = 0;	//åœ¨çº¿ç¨‹æ± æ‰§è¡Œçš„ä»»åŠ¡
 		long long GetStartTime() { return this->mStartTime; }
 	private:
 		long long mStartTime;

@@ -37,6 +37,6 @@ namespace SoEasy
 		class ActionManager * mLocalActionManager;
 	private:
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
-		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//ËùÓÐsession
+		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//æ‰€æœ‰session
 	};
 }

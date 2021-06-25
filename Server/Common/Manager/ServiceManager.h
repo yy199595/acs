@@ -38,9 +38,9 @@ namespace SoEasy
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
 		std::vector<ServiceBase *> mServiceVector;
-		std::unordered_map<int, ProxyService *> mProxyServiceMap;//action地址
-		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
-		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua服务
-		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mActionSessionMap; //服务通信session
+		std::unordered_map<int, ProxyService *> mProxyServiceMap;//action鍦板潃
+		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action鍦板潃
+		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua鏈嶅姟
+		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mActionSessionMap; //鏈嶅姟閫氫俊session
 	};
 }

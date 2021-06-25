@@ -6,11 +6,11 @@ namespace SoEasy
 	enum SessionState
 	{
 		Session_None,
-		Session_Connect, //正在连接
-		Session_Normal,	//正常
-		Session_OK,	//可读可写
-		Session_Error,	//错误
-		Session_Close,	//手动关闭
+		Session_Connect, //姝ｅ湪杩炴帴
+		Session_Normal,	//姝ｅ父
+		Session_OK,	//鍙鍙啓
+		Session_Error,	//閿欒
+		Session_Close,	//鎵嬪姩鍏抽棴
 	};
 
 

@@ -30,7 +30,7 @@ namespace SoEasy
 
 	void ListenerManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
 	{
-		// 判断是否在白名单
+		// 鍒ゆ柇鏄惁鍦ㄧ櫧鍚嶅崟
 		if (!this->mWhiteList.empty())
 		{
 			const string & ip = tcpSession->GetIP();

@@ -13,9 +13,9 @@ namespace SoEasy
 		~RedisManager() { }
 		RedisSocket * GetRedisSocket(long long id);
 	protected:
-		bool OnInit() final;			//³õÊ¼»¯¹ÜÀíÆ÷
-		void OnInitComplete() override;				//³õÊ¼»¯Íê³ÉÖ®ºó
-		void PushClassToLua(lua_State * luaEnv) final;		//×ÔÉí·½·¨µ¼³öµ½lua
+		bool OnInit() final;			//åˆå§‹åŒ–ç®¡ç†å™¨
+		void OnInitComplete() override;				//åˆå§‹åŒ–å®Œæˆä¹‹å
+		void PushClassToLua(lua_State * luaEnv) final;		//è‡ªèº«æ–¹æ³•å¯¼å‡ºåˆ°lua
 	public:
 		template<typename ... Args>
 		shared_ptr<InvokeResultData> InvokeCommand(const std::string &  cmd, Args && ... args);
@@ -35,9 +35,9 @@ namespace SoEasy
 		bool GetValue(const std::string & tab, const std::string &  key, std::string & value);
 		bool GetValue(const std::string & tab, const std::string &  key, shared_ptr<Message> value);
 	private:
-		std::string mRedisIp;		//redis ipµØÖ·
-		unsigned short mRedisPort;	//¶Ë¿ÚºÅ
-		ThreadPool * mThreadPool;	//Ïß³Ì³Ø
+		std::string mRedisIp;		//redis ipåœ°å€
+		unsigned short mRedisPort;	//ç«¯å£å·
+		ThreadPool * mThreadPool;	//çº¿ç¨‹æ± 
 		class CoroutineManager * mCoroutineScheduler;
 		std::unordered_map<long long, redisContext *> mRedisContextMap;
 	};

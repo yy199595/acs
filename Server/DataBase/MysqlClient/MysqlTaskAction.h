@@ -11,7 +11,7 @@ namespace SoEasy
 		~MysqlTaskAction() { }
 	protected:
 		void OnTaskFinish() final;
-		void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
+		void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //鏌ヨ瀹屾垚涔嬪悗璋冪敤
 		const std::string & GetSqlCommand() final { return this->mSqlCommand; }
 	public:
 		const long long GetCoroutienId() { return this->mCoroutineId; }

@@ -24,20 +24,20 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
-		void PushClassToLua(lua_State * luaEnv) final;		//×ÔÉí·½·¨µ¼³öµ½lua
+		void PushClassToLua(lua_State * luaEnv) final;		//è‡ªèº«æ–¹æ³•å¯¼å‡ºåˆ°lua
 
 	private:
 		bool StartConnectMysql();
 	private:
-		std::string mMysqlIp;		//ipµØÖ·
-		unsigned short mMysqlPort;	//¶Ë¿ÚºÅ
-		std::string mDataBaseUser;	//ÓÃ»§Ãû
-		std::string mDataBasePasswd; //ÃÜÂë
-		std::string mDataBaseName;	//Êı¾İ¿âÃû×Ö
-		ThreadPool * mThreadPool;		//Ïß³Ì³Ø
+		std::string mMysqlIp;		//ipåœ°å€
+		unsigned short mMysqlPort;	//ç«¯å£å·
+		std::string mDataBaseUser;	//ç”¨æˆ·å
+		std::string mDataBasePasswd; //å¯†ç 
+		std::string mDataBaseName;	//æ•°æ®åº“åå­—
+		ThreadPool * mThreadPool;		//çº¿ç¨‹æ± 
 		std::string mSqlTablePath;
 		SayNoMysqlSocket * mMysqlSockt;
-		std::unordered_map<long long, SayNoMysqlSocket *> mMysqlSocketMap;	//Ïß³ÌidºÍ socket
+		std::unordered_map<long long, SayNoMysqlSocket *> mMysqlSocketMap;	//çº¿ç¨‹idå’Œ socket
 	private:
 		class CoroutineManager * mCoroutineManager;
 	};

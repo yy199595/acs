@@ -5,7 +5,7 @@
 using namespace PB;
 namespace SoEasy
 {
-	// ´¦ÀíÍâ²¿Á¬½Ó½øÀ´µÄsession
+	// å¤„ç†å¤–éƒ¨è¿æ¥è¿›æ¥çš„session
 	class TcpSessionListener;
 	class ListenerManager : public SessionManager
 	{
@@ -21,10 +21,10 @@ namespace SoEasy
 		void OnSessionErrorAfter(SharedTcpSession tcpSession) override;
 		void OnSessionConnectAfter(SharedTcpSession tcpSession) override;
 	private:
-		std::string mListenerIp;	//¼àÌıµÄip
-		std::string mListenAddress;	//µØÖ·
-		unsigned short mListenerPort; //¼àÌıµÄ¶Ë¿ÚºÅ
-		std::set<std::string> mWhiteList;	//°×Ãûµ¥
+		std::string mListenerIp;	//ç›‘å¬çš„ip
+		std::string mListenAddress;	//åœ°å€
+		unsigned short mListenerPort; //ç›‘å¬çš„ç«¯å£å·
+		std::set<std::string> mWhiteList;	//ç™½åå•
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
 	};
 }

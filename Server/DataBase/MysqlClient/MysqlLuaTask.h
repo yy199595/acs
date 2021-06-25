@@ -12,7 +12,7 @@ namespace SoEasy
 	protected:
 		 void OnTaskFinish() final;
 		 const std::string & GetSqlCommand() { return mSqlCommand; };
-		 void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
+		 void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //鏌ヨ瀹屾垚涔嬪悗璋冪敤
 	public:
 		static bool Start(lua_State * lua, int index, const std::string & sql);
 	private:
