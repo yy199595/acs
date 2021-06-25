@@ -1,4 +1,4 @@
-#include<fstream>
+﻿#include<fstream>
 #include"ServerConfig.h"
 #include<Define/CommonDef.h>
 #include<Util/FileHelper.h>
@@ -20,6 +20,7 @@ namespace SoEasy
 			SayNoDebugError("not find config " << mConfigPath);
 			return false;
 		}
+		SayNoDebugWarning(outString);
 		mConfigDocument->Parse(outString.c_str(), outString.size());
 		if (this->mConfigDocument->HasParseError())
 		{
