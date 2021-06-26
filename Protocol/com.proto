@@ -1,0 +1,58 @@
+
+syntax = "proto3";
+package PB;
+message NetWorkPacket
+{
+     string Service = 1;      //服务名
+     string Method = 2;       //调用的方法
+     int32 Code = 3;          //返回值
+     uint64 EntityId = 4;     // 玩家id
+     uint64 RpcId = 5;        //返回值
+     bytes MessageData = 6;   //参数
+     string ProtocName = 7;   //参数名字
+}
+
+message StringArray
+{
+     repeated string DataArray = 1;
+}
+
+message Int32Array
+{
+     repeated int32 DataArray = 1;
+}
+
+message Int64Array
+{
+     repeated int64 DataArray = 1;
+}
+
+message StringData
+{
+     string Data = 1;
+}
+
+message Int32Data
+{
+     int32 Data = 1;
+}
+
+message Int64Data
+{
+     int64 Data = 1;
+}
+
+message floatData
+{
+     float Data = 1;
+}
+
+message DoubleData
+{
+     double Data = 1;
+}
+
+message StringMap
+{
+     map<string, string> Data = 1;
+}
