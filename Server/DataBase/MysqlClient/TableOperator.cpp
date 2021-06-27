@@ -1,10 +1,11 @@
-#include"TableOperator.h"
+﻿#include"TableOperator.h"
 #include<fstream>
+#include<Protocol/db.pb.h>
 #include<Manager/MysqlManager.h>
 namespace SoEasy
 {
-	TableOperator::TableOperator(SayNoMysqlSocket * socket, const std::string db, const std::string & path)
-		:mConfigPath(path)
+	TableOperator::TableOperator(SayNoMysqlSocket * socket, const std::string db, rapidjson::Document & doc)
+		:mDocument(doc)
 	{
 		this->mDataBase = db;
 		this->mMysqlSocket = socket;
@@ -12,25 +13,6 @@ namespace SoEasy
 
 	bool TableOperator::InitMysqlTable()
 	{
-		std::fstream fs(this->mConfigPath, std::ios::in);
-		if (!fs.is_open())
-		{
-			SayNoDebugError("not find file " << this->mConfigPath);
-			return false;
-		}
-		std::string json;
-		std::string temp;
-		while (std::getline(fs, temp))
-		{
-			json.append(temp);
-		}
-		this->mDocument.Parse(json.c_str(), json.size());
-		if (this->mDocument.HasParseError())
-		{
-			SayNoDebugError("parse " << this->mConfigPath << " json fail");
-			return false;
-		}
-
 		if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) != 0)
 		{
 			std::string sql = "Create DataBase " + this->mDataBase;
@@ -52,11 +34,22 @@ namespace SoEasy
 			}
 			const std::string table = iter->name.GetString();
 			const std::string name = iter->value.FindMember("protobuf")->value.GetString();
-			const std::string key = iter->value.FindMember("primatykey")->value.GetString();
+			auto iter1 = iter->value.FindMember("keys");
+			if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
+			{
+				SayNoDebugError(table << " sql table config error");
+				return false;
+			}
+			std::vector<std::string> keys;
+			for (unsigned int index = 0; index < iter1->value.Size(); index++)
+			{
+				const std::string key = iter1->value[index].GetString();
+				keys.push_back(key);
+			}
 			std::string sql = "desc " + table;
 			if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
 			{
-				if (!this->CreateMysqlTable(table, name, key))
+				if (!this->CreateMysqlTable(table, name, keys))
 				{
 					SayNoDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
 					return false;
@@ -65,22 +58,24 @@ namespace SoEasy
 			}
 			else
 			{
-				this->UpdateMysqlTable(table, name, key);
+				this->UpdateMysqlTable(table, name, keys);
 			}
 		}
 		return true;
 	}
 
-	bool TableOperator::UpdateMysqlTable(const std::string table, const std::string name, const std::string key)
+	bool TableOperator::UpdateMysqlTable(const std::string table, const std::string name, const std::vector<std::string> & keys)
 	{
 		const DescriptorPool * pDescriptorPool = DescriptorPool::generated_pool();
 		const Descriptor * pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
-		if (pDescriptor->FindFieldByName(key) == nullptr)
+		for (const std::string & key : keys)
 		{
-			SayNoDebugError("create " << name << " error 'key' not find");
-			return false;
+			if (pDescriptor->FindFieldByName(key) == nullptr)
+			{
+				SayNoDebugError("create " << name << " error 'key' not find");
+				return false;
+			}
 		}
-
 		MysqlQueryResult * queryResult = mysql_store_result(this->mMysqlSocket);
 		if (queryResult == nullptr)
 		{
@@ -159,16 +154,31 @@ namespace SoEasy
 		return true;
 	}
 
-	bool TableOperator::CreateMysqlTable(const std::string table, const std::string name, const std::string key)
+	bool TableOperator::CreateMysqlTable(const std::string table, const std::string name, const std::vector<std::string> & keys)
 	{
+		db::UserAccountData account;
 		const DescriptorPool * pDescriptorPool = DescriptorPool::generated_pool();
 		const Descriptor * pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
-		if (pDescriptor->FindFieldByName(key) == nullptr)
+		for (const std::string & key : keys)
 		{
-			SayNoDebugError("create " << name << " error 'key' not find");
-			return false;
-		}
+			if (pDescriptor->FindFieldByName(key) == nullptr)
+			{
+				SayNoDebugError("create " << name << " error 'key' not find");
+				return false;
+			}
+		}	
 		std::stringstream sqlCommand;
+		auto IsHasField = [&keys](const std::string & name)->bool
+		{
+			for (const std::string & key : keys)
+			{
+				if (key == name)
+				{
+					return true;
+				}
+			}
+			return false;
+		};
 		sqlCommand << "create table `" << table << "`(\n";
 		for (int index = 1; index <= pDescriptor->field_count(); index++)
 		{
@@ -180,7 +190,7 @@ namespace SoEasy
 			sqlCommand << "`" << fileDesc->name() << "` ";
 			if (fileDesc->type() == FieldDescriptor::TYPE_INT32)
 			{
-				if (fileDesc->name() == key)
+				if (IsHasField(fileDesc->name()))
 				{
 					sqlCommand << "int(20) NOT NULL,\n";
 					continue;
@@ -189,35 +199,35 @@ namespace SoEasy
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_INT64)
 			{
-				if (fileDesc->name() == key)
+				if (IsHasField(fileDesc->name()))
 				{
-					sqlCommand << "int(20) NOT NULL,\n";
+					sqlCommand << "bigint(32) NOT NULL,\n";
 					continue;
 				}
 				sqlCommand << "bigint(32) DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_FLOAT)
 			{
-				SayNoAssertRetFalse_F(fileDesc->name() == key);
+				SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
 				sqlCommand << "float(20) NOT NULL DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_DOUBLE)
 			{
-				SayNoAssertRetFalse_F(fileDesc->name() == key);
+				SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
 				sqlCommand << "double(32) DEFAULT 0,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_STRING)
 			{
-				if (fileDesc->name() == key)
+				if (IsHasField(fileDesc->name()))
 				{
-					sqlCommand << "varchar(20),\n";
+					sqlCommand << "varchar(20) NOT NULL,\n";
 					continue;
 				}
 				sqlCommand << "varchar(64) DEFAULT NULL,\n";
 			}
 			else if (fileDesc->type() == FieldDescriptor::TYPE_BYTES)
 			{
-				SayNoAssertRetFalse_F(fileDesc->name() == key);
+				SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
 				sqlCommand << "BLOB(64) DEFAULT NULL,\n";
 			}
 			else
@@ -225,7 +235,17 @@ namespace SoEasy
 				assert(false);
 			}
 		}
-		sqlCommand << "PRIMARY KEY (`" << key << "`)\n";
+		sqlCommand << "PRIMARY KEY (";
+		for (size_t index = 0; index < keys.size(); index++)
+		{
+			const std::string & key = keys[index];
+			if (index == keys.size() - 1)
+			{			
+				sqlCommand << "`" << key << "`)\n";
+				break;
+			}
+			sqlCommand << "`" << key << "`,";
+		}
 		sqlCommand << ")ENGINE=InnoDB DEFAULT CHARSET = utf8;";
 		const std::string sql = sqlCommand.str();
 		if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)

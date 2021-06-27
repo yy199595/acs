@@ -130,13 +130,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Protocol\Common.pb.h" />
-    <ClInclude Include="Protocol\ServerCommon.pb.h" />
+    <ClInclude Include="Protocol\c2s.pb.h" />
+    <ClInclude Include="Protocol\com.pb.h" />
+    <ClInclude Include="Protocol\db.pb.h" />
+    <ClInclude Include="Protocol\s2s.pb.h" />
     <ClInclude Include="XCode\XCode.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Protocol\Common.pb.cc" />
-    <ClCompile Include="Protocol\ServerCommon.pb.cc" />
+    <ClCompile Include="Protocol\c2s.pb.cc" />
+    <ClCompile Include="Protocol\com.pb.cc" />
+    <ClCompile Include="Protocol\db.pb.cc" />
+    <ClCompile Include="Protocol\s2s.pb.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

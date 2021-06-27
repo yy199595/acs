@@ -1,17 +1,6 @@
-{
-    "tb_player_account":
-    {
-        "protobuf":"PB.UserAccountData",
-        "primatykey":"account"
-    },
-    "tb_player_register":
-    {
-        "protobuf":"PB.ServiceData",
-        "primatykey":"adreId"
-    },
-    "tb_player_logicservice":
-    {
-        "protobuf":"PB.LogicServerData",
-        "primatykey":"area_id"
+﻿{
+    "tb_player_account": {
+        "protobuf": "db.UserAccountData",
+        "keys":["Account", "UserID"]
     }
 }

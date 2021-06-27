@@ -1,4 +1,4 @@
-#include"LocalService.h"
+﻿#include"LocalService.h"
 #include<Manager/ActionManager.h>
 #include<Manager/NetWorkManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -23,7 +23,7 @@ namespace SoEasy
 
 	XCode LocalService::CallAction(SharedPacket request, SharedPacket returnData)
 	{
-		const std::string & action = request->action();
+		const std::string & action = request->method();
 		auto iter = this->mActionMap.find(action);
 		if (iter == this->mActionMap.end())
 		{
@@ -60,12 +60,12 @@ namespace SoEasy
 		{
 			shared_ptr<NetWorkPacket> resData = make_shared<NetWorkPacket>();
 			XCode code = localAction->Invoke(reqData, resData);
-			if (reqData->callback_id() != 0)
+			if (reqData->rpcid() != 0)
 			{
-				resData->set_error_code(code);
-				resData->set_callback_id(reqData->callback_id());
-				resData->set_operator_id(reqData->operator_id());
-				this->ReplyMessage(reqData->callback_id(), resData);
+				resData->set_code(code);
+				resData->set_rpcid(reqData->rpcid());
+				resData->set_entityid(reqData->entityid());
+				this->ReplyMessage(reqData->rpcid(), resData);
 			}
 		});
 		return true;
@@ -85,11 +85,11 @@ namespace SoEasy
 			long long currentId = this->mCorManager->GetCurrentCorId();
 			this->mCurrentSessionMap.emplace(currentId, address);
 			XCode code = localAction->Invoke(reqData, retData);
-			if (reqData->callback_id() != 0)
+			if (reqData->rpcid() != 0)
 			{
-				retData->set_error_code(code);
-				retData->set_callback_id(reqData->callback_id());
-				retData->set_operator_id(reqData->operator_id());
+				retData->set_code(code);
+				retData->set_rpcid(reqData->rpcid());
+				retData->set_entityid(reqData->entityid());
 				this->ReplyMessage(address, retData);
 			}
 			auto iter = mCurrentSessionMap.find(currentId);

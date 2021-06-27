@@ -1,35 +1,52 @@
-#include"SystemExtension.h"
+﻿#include"SystemExtension.h"
 #include<Util/TimeHelper.h>
 #include<Core/Applocation.h>
 #include<Manager/TimerManager.h>
-#include<NetWork/RemoteScheduler.h>
 #include<Timer/LuaActionTimer.h>
 #include<Timer/LuaSleepTimer.h>
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 #include<NetWork/NetLuaRetAction.h>
 #include<Service/LocalLuaService.h>
 #include<Manager/ServiceManager.h>
+#include<Other/ServiceNode.h>
+#include<Manager/ServiceNodeManager.h>
 using namespace SoEasy;
 
 	int SystemExtension::Call(lua_State * lua)
 	{
-		shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
+		/*shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
 		if (tcpSession == nullptr)
 		{
 			lua_pushboolean(lua, false);
 			return 1;
 		}
 
-		const char * action = lua_tostring(lua, 3);
-		const char * service = lua_tostring(lua, 2);
-		RemoteScheduler nCallController(tcpSession);
+		Applocation * app = Applocation::Get();
+		ServiceNodeManager * serviceNodeManager = app->GetManager<ServiceNodeManager>();
+		if (serviceNodeManager == nullptr)
+		{
+			lua_pushboolean(lua, false);
+			return 1;
+		}
+		const std::string & address = tcpSession->GetAddress();
+		ServiceNode * serviceNode = serviceNodeManager->GetServiceNode(address);
+		if (serviceNode == nullptr)
+		{
+			lua_pushboolean(lua, false);
+			return 1;
+		}
 
+
+		const char * method = lua_tostring(lua, 3);
+		const char * service = lua_tostring(lua, 2);
+		
 		if (lua_isfunction(lua, 4))
 		{
 			std::string message = "";
 			NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 4);
+			serviceNode->Call(service, method, nullptr);
 			lua_pushboolean(lua, nCallController.Call(service, action, nullptr, pRetAction));
 			return 1;
 		}
@@ -66,7 +83,7 @@ using namespace SoEasy;
 			return 1;
 		}
 
-		lua_pushboolean(lua, false);
+		lua_pushboolean(lua, false);*/
 		return 1;
 	}
 
@@ -146,14 +163,14 @@ using namespace SoEasy;
 				const int code = lua_tointeger(luaEnv, 4);
 				shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 
-				returnPacket->set_error_code(code);
-				returnPacket->set_operator_id(operId);
-				returnPacket->set_callback_id(callbackId);
+				returnPacket->set_code(code);
+				returnPacket->set_entityid(operId);
+				returnPacket->set_rpcid(callbackId);
 				if (lua_isstring(luaEnv, 5))
 				{
 					size_t size = 0;
 					const char * str = lua_tolstring(luaEnv, 5, &size);
-					returnPacket->set_message_data(str, size);
+					returnPacket->set_messagedata(str, size);
 				}
 				netManager->SendMessageByAdress(address, returnPacket);
 				return 0;
@@ -169,14 +186,14 @@ using namespace SoEasy;
 			
 			shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
 
-			returnPacket->set_error_code(code);
-			returnPacket->set_operator_id(operId);
-			returnPacket->set_callback_id(callbackId);
+			returnPacket->set_code(code);
+			returnPacket->set_entityid(operId);
+			returnPacket->set_rpcid(callbackId);
 			if (lua_isstring(luaEnv, 4))
 			{
 				size_t size = 0;
 				const char * str = lua_tolstring(luaEnv, 4, &size);
-				returnPacket->set_message_data(str, size);
+				returnPacket->set_messagedata(str, size);
 			}
 			actManager->AddActionArgv(callbackId, returnPacket);
 		}
@@ -263,7 +280,7 @@ using namespace SoEasy;
 
 	int SystemExtension::CallBySession(lua_State * luaEnv)
 	{
-		lua_pushthread(luaEnv);
+		/*lua_pushthread(luaEnv);
 		if (!lua_isthread(luaEnv, -1))
 		{
 			lua_pushinteger(luaEnv, XCode::Failure);
@@ -309,7 +326,8 @@ using namespace SoEasy;
 				return 1;
 			}
 		}
-		return lua_yield(luaEnv, 1);
+		return lua_yield(luaEnv, 1);*/
+		return 0;
 	}
 
 	int SystemExtension::Sleep(lua_State * luaEnv)

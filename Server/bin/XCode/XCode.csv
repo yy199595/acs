@@ -1,30 +1,32 @@
-Name	Desc	Value
-Successful	成功	0
-Failure	失败	1
-ParseMessageError	解析protobuf失败	2
-CallFunctionNotExist	调用方法不存在	3
-TimeoutAutoCall	超时自动调用	4
-CallLuaFunctionFail	调用lua方法错误	5
-JsonCastProtocbufFail	json转protobuf失败	6
-ProtocbufCastJsonFail	protobuf转json失败	7
-CreatePorotbufFail	创建protobuf失败	8
-SerializationFailure	序列化失败	9
-CommandArgsError	GM命令参数错误	10
-SessionIsNull	Session是空	11
-SendMessageFail	发送消息错误	12
-NoCoroutineContext	没有协程上下文	13
-ParseJsonFailure	解析json失败	14
-CacheMessageNextSend	缓存消息下次发送	15
-MysqlNotInCoroutine	Mysql没有协程上下文	16
-MysqlStartTaskFail	Mysql任务启动失败	17
-MysqlInitTaskFail	Mysql初始化失败	18
-MysqlSocketIsNull	Mysql连接是空	19
-MysqlSelectDbFailure	Mysql选择数据库失败	20
-MysqlInvokeFailure	Mysql执行sql语句失败	21
-RedisNotInCoroutine	Redis没有协程上下文	22
-RedisStartTaskFail	Redis任务启动失败	23
-RedisSocketIsNull	Redis连接是空	24
-RedisReplyIsNull	Redis回复是空	25
-RedisInvokeFailure	Rsedis命令执行失败	26
-AccountAlreadyExists	账号已经存在	27
-AccountNotExists	账号不存在	28
+Name	Desc
+Successful	成功
+Failure	失败
+ParseMessageError	解析protobuf失败
+CallServiceNotFound	调用服务未发现
+CallFunctionNotExist	调用方法不存在
+CallArgsError	调用参数错误
+TimeoutAutoCall	超时自动调用
+CallLuaFunctionFail	调用lua方法错误
+JsonCastProtocbufFail	json转protobuf失败
+ProtocbufCastJsonFail	protobuf转json失败
+CreatePorotbufFail	创建protobuf失败
+SerializationFailure	序列化失败
+CommandArgsError	GM命令参数错误
+SessionIsNull	Session是空
+SendMessageFail	发送消息错误
+NoCoroutineContext	没有协程上下文
+ParseJsonFailure	解析json失败
+CacheMessageNextSend	缓存消息下次发送
+MysqlNotInCoroutine	Mysql没有协程上下文
+MysqlStartTaskFail	Mysql任务启动失败
+MysqlInitTaskFail	Mysql初始化失败
+MysqlSocketIsNull	Mysql连接是空
+MysqlSelectDbFailure	Mysql选择数据库失败
+MysqlInvokeFailure	Mysql执行sql语句失败
+RedisNotInCoroutine	Redis没有协程上下文
+RedisStartTaskFail	Redis任务启动失败
+RedisSocketIsNull	Redis连接是空
+RedisReplyIsNull	Redis回复是空
+RedisInvokeFailure	Rsedis命令执行失败
+AccountAlreadyExists	账号已经存在
+AccountNotExists	账号不存在

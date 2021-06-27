@@ -1,4 +1,4 @@
-#include"ActionManager.h"
+﻿#include"ActionManager.h"
 #include"ScriptManager.h"
 #include"NetWorkManager.h"
 #include"TimerManager.h"
@@ -28,7 +28,7 @@ namespace SoEasy
 		this->mCallbackMessageQueue.SwapQueueData();
 		while (this->mCallbackMessageQueue.PopItem(callbackData))
 		{
-			const long long callbackId = callbackData->callback_id();
+			const long long callbackId = callbackData->rpcid();
 			auto iter = this->mRetActionMap.find(callbackId);
 			if (iter != this->mRetActionMap.end())
 			{
@@ -50,13 +50,13 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId)
+	long long ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox)
 	{
 		if (actionBox == nullptr)
 		{
-			return false;
+			return 0;
 		}
-		callbackId = NumberHelper::Create();
+		long long callbackId = NumberHelper::Create();
 		this->mRetActionMap.emplace(callbackId, actionBox);
 		if (this->mMessageTimeout != 0)// 添加超时
 		{
@@ -64,7 +64,7 @@ namespace SoEasy
 			this->mTimerManager->AddTimer(timer);
 		}
 		this->mRetActionMap.emplace(callbackId, actionBox);
-		return true;
+		return callbackId;
 	}
 
 }

@@ -33,6 +33,7 @@
     <ClCompile Include="Manager\NetWorkManager.cpp" />
     <ClCompile Include="Manager\ScriptManager.cpp" />
     <ClCompile Include="Manager\ServiceManager.cpp" />
+    <ClCompile Include="Manager\ServiceNodeManager.cpp" />
     <ClCompile Include="Manager\SessionManager.cpp" />
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
@@ -42,7 +43,6 @@
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
     <ClCompile Include="NetWork\NetWorkRetAction.cpp" />
-    <ClCompile Include="NetWork\RemoteScheduler.cpp" />
     <ClCompile Include="NetWork\TcpClientSession.cpp" />
     <ClCompile Include="NetWork\TelnetClientSession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
@@ -106,6 +106,7 @@
     <ClInclude Include="Manager\ListenerManager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="Manager\NetWorkManager.h" />
+    <ClInclude Include="Manager\ServiceNodeManager.h" />
     <ClInclude Include="Manager\ScriptManager.h" />
     <ClInclude Include="Manager\ServiceManager.h" />
     <ClInclude Include="Manager\SessionManager.h" />
@@ -118,7 +119,6 @@
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
-    <ClInclude Include="NetWork\RemoteScheduler.h" />
     <ClInclude Include="NetWork\TcpClientSession.h" />
     <ClInclude Include="NetWork\TelnetClientSession.h" />
     <ClInclude Include="Object\GameObject.h" />

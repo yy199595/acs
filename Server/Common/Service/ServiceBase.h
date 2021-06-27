@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include<memory>
 #include<Manager/Manager.h>
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 using namespace std;
 using namespace PB;
 namespace SoEasy

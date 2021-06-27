@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include<XCode/XCode.h>
 #include"TcpClientSession.h"
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 #include<Other/ObjectFactory.h>
 
 using namespace PB;
@@ -65,10 +65,10 @@ namespace SoEasy
 	inline XCode LocalActionProxy2<T1>::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{
 		mRequestData = std::make_shared<T1>();
-		const long long operId = requestData->operator_id();
-		const std::string & name = requestData->protoc_name();
-		const long long callbackId = requestData->callback_id();
-		const std::string & message = requestData->message_data();
+		const long long operId = requestData->entityid();
+		const std::string & name = requestData->protocname();
+		const long long callbackId = requestData->rpcid();
+		const std::string & message = requestData->messagedata();
 		if (!message.empty() && !name.empty())
 		{
 			if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
@@ -103,9 +103,9 @@ namespace SoEasy
 	inline XCode LocalActionProxy3<T1, T2>::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
 	{
 		mRequestData = make_shared<T1>();
-		const long long operId = requestData->operator_id();
-		const std::string & name = requestData->protoc_name();
-		const std::string & message = requestData->message_data();
+		const long long operId = requestData->entityid();
+		const std::string & name = requestData->protocname();
+		const std::string & message = requestData->messagedata();
 		if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
 		{		
 			SayNoDebugError("parse proto fail : " << mRequestData->GetTypeName());
@@ -115,8 +115,8 @@ namespace SoEasy
 		XCode code = this->mBindAction(operId, mRequestData, mReturnData);
 		if (mReturnData->SerializePartialToString(&mMessageBuffer))
 		{
-			returnData->set_message_data(mMessageBuffer);
-			returnData->set_protoc_name(mReturnData->GetTypeName());
+			returnData->set_messagedata(mMessageBuffer);
+			returnData->set_protocname(mReturnData->GetTypeName());
 		}
 		return code;
 	}

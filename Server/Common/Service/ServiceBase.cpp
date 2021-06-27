@@ -1,4 +1,4 @@
-#include"ServiceBase.h"
+﻿#include"ServiceBase.h"
 #include<Manager/ActionManager.h>
 #include<Manager/NetWorkManager.h>
 #include<NetWork/NetWorkRetAction.h>
@@ -26,7 +26,7 @@ namespace SoEasy
 		this->mProxyHandleMsgQueue.SwapQueueData();
 		while (this->mLocalHandleMsgQueue.PopItem(localPacket))
 		{
-			const std::string & method = localPacket->action();
+			const std::string & method = localPacket->method();
 			if (!this->InvokeMethod(method, localPacket))
 			{
 				SayNoDebugError("call " << this->GetServiceName() << "." << method << " fail");
@@ -35,7 +35,7 @@ namespace SoEasy
 		while (this->mProxyHandleMsgQueue.PopItem(proxyService))
 		{
 			const std::string & address = proxyService->mAddress;
-			const std::string & method = proxyService->mMessagePacket->action();
+			const std::string & method = proxyService->mMessagePacket->method();
 			if (!this->InvokeMethod(address, method, proxyService->mMessagePacket))
 			{
 				SayNoDebugError(address << " call " << this->GetServiceName() << "." << method << " fail");
@@ -150,16 +150,14 @@ namespace SoEasy
 				SayNoDebugError(func << " " << message->GetTypeName() << " Serialize fail");
 				return nullptr;
 			}
-			callData->set_message_data(messageBuffer);
-			callData->set_protoc_name(message->GetTypeName());
+			callData->set_messagedata(messageBuffer);
+			callData->set_protocname(message->GetTypeName());
 		}
 		if (callBack != nullptr)
 		{
-			long long id = 0;
-			this->mActionManager->AddCallback(callBack, id);
-			callData->set_callback_id(id);
+			callData->set_rpcid(this->mActionManager->AddCallback(callBack));
 		}		
-		callData->set_action(func);
+		callData->set_method(func);
 		callData->set_service(this->GetTypeName());
 		return callData;
 	}

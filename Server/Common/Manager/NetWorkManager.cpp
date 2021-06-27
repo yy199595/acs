@@ -1,11 +1,10 @@
-#include"NetWorkManager.h"
+﻿#include"NetWorkManager.h"
 #include"ScriptManager.h"
 #include"ActionManager.h"
 #include"Manager.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<NetWork/TcpClientSession.h>
-#include<NetWork/RemoteScheduler.h>
 #include<Manager/ScriptManager.h>
 #include<Script/LuaFunction.h>
 #include<Manager/ActionManager.h>
@@ -46,6 +45,11 @@ namespace SoEasy
 		return this->RemoveTcpSession(address);
 	}
 
+	XCode NetWorkManager::SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage)
+	{
+		return this->SendMessageByAdress(address, *returnPackage);
+	}
+
 	bool NetWorkManager::AddTcpSession(shared_ptr<TcpClientSession> tcpSession)
 	{
 		SayNoAssertRetFalse_F(tcpSession);
@@ -80,7 +84,7 @@ namespace SoEasy
 		return this->CloseTcpSession(address);
 	}
 
-	XCode NetWorkManager::SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage)
+	XCode NetWorkManager::SendMessageByAdress(const std::string & address, const NetWorkPacket & returnPackage)
 	{
 		shared_ptr<TcpClientSession> pSession = this->GetTcpSession(address);
 
@@ -91,14 +95,15 @@ namespace SoEasy
 		}
 		
 		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
-		if (!returnPackage->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
+		if (!returnPackage.SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 		{
-			SayNoDebugError("Serialize Fail : " << returnPackage->action());
+			SayNoDebugError("Serialize Fail : " << returnPackage.method());
 			return XCode::SerializationFailure;
 		}
-		size_t size = returnPackage->ByteSizeLong();
+		size_t size = returnPackage.ByteSizeLong();
 		size_t length = size + sizeof(unsigned int);
 		memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
+		SayNoDebugLog("call " << returnPackage.service() << "." << returnPackage.method());
 		shared_ptr<string> sendMessage = make_shared<string>(this->mSendSharedBuffer, length);		
 		return pSession->SendPackage(sendMessage) ? XCode::Successful : XCode::SendMessageFail;
 	}

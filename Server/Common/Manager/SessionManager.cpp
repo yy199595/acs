@@ -1,4 +1,4 @@
-#include"SessionManager.h"
+﻿#include"SessionManager.h"
 #include"NetWorkManager.h"
 #include"ServiceManager.h"
 #include<Core/Applocation.h>
@@ -72,9 +72,9 @@ namespace SoEasy
 			SayNoDebugError("parse message error close session");
 			return false;
 		}
-		const std::string & method = messageData->action();
+		const std::string & method = messageData->method();
 		const std::string & service = messageData->service();
-		const long long callbackId = messageData->callback_id();
+		const long long callbackId = messageData->rpcid();
 		if (!service.empty() && !method.empty())
 		{
 			const std::string & address = session->GetAddress();

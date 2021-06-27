@@ -1,4 +1,4 @@
-#include"ActionTimeoutTimer.h"
+﻿#include"ActionTimeoutTimer.h"
 #include<NetWork/NetWorkRetAction.h>
 #include<Manager/ActionManager.h>
 namespace SoEasy
@@ -13,8 +13,8 @@ namespace SoEasy
 	bool ActionTimeoutTimer::Invoke()
 	{
 		std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
-		packet->set_callback_id(this->mCallbackId);
-		packet->set_error_code(XCode::TimeoutAutoCall);
+		packet->set_rpcid(this->mCallbackId);
+		packet->set_code(XCode::TimeoutAutoCall);
 		this->mActionManager->AddActionArgv(this->mCallbackId, packet);
 		return false;
 	}

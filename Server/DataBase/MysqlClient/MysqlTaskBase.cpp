@@ -1,4 +1,4 @@
-#include"MysqlTaskBase.h"
+﻿#include"MysqlTaskBase.h"
 #include<Manager/MysqlManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
@@ -9,6 +9,7 @@ namespace SoEasy
 	{
 		this->mDataBaseName = db;
 		this->mMysqlManager = mgr;
+		this->mTableConfig = nullptr;
 	}
 
 	void MysqlTaskBase::InvokeInThreadPool(long long threadId)
@@ -93,6 +94,15 @@ namespace SoEasy
 			SayNoDebugError("[mysql error] " << this->mErrorString);
 			SayNoDebugError("[mysql command] " << this->GetSqlCommand());
 		}	
+	}
+
+	SqlTableConfig * MysqlTaskBase::GetTabConfig(const std::string & tab)
+	{
+		if (this->mTableConfig == nullptr)
+		{
+			this->mTableConfig = this->mMysqlManager->GetTableConfig(tab);
+		}
+		return this->mTableConfig;
 	}
 
 	void MysqlTaskBase::WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size)

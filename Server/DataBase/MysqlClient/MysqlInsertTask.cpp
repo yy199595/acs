@@ -1,4 +1,4 @@
-#include "MysqlInsertTask.h"
+﻿#include "MysqlInsertTask.h"
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
@@ -9,11 +9,11 @@ namespace SoEasy
 	}
 
 	bool MysqlInsertTask::InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data)
-	{
+	{	
 		if (!corMgr->IsInMainCoroutine())
 		{
 			this->mData = data;
-			this->mTable = tab;
+			this->mTable = tab;			
 			this->mCorManager = corMgr;
 			this->mCoroutineId = corMgr->GetCurrentCorId();
 			return true;

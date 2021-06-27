@@ -1,4 +1,4 @@
-#include"JsonHelper.h"
+﻿#include"JsonHelper.h"
 
 namespace SoEasy
 {
@@ -102,7 +102,24 @@ namespace SoEasy
 		return false;
 	}
 
-	bool RapidJsonWriter::AddParameter(const char * key, const std::vector<std::string> value)
+	bool RapidJsonWriter::AddParameter(const char * key, const std::set<std::string>& value)
+	{
+		if (this->jsonWriter != nullptr)
+		{
+			jsonWriter->Key(key);
+			jsonWriter->StartArray();
+			for (auto iter = value.begin(); iter != value.end(); iter++)
+			{
+				const std::string & str = (*iter);
+				jsonWriter->String(str.c_str(), str.size());
+			}
+			jsonWriter->EndArray();
+			return true;
+		}
+		return false;
+	}
+
+	bool RapidJsonWriter::AddParameter(const char * key, const std::vector<std::string> & value)
 	{
 		if (this->jsonWriter != nullptr)
 		{

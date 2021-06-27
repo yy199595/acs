@@ -1,4 +1,4 @@
-#include"LocalLuaService.h"
+﻿#include"LocalLuaService.h"
 #include<Other/ObjectFactory.h>
 #include<Manager/ScriptManager.h>
 namespace SoEasy
@@ -72,13 +72,13 @@ namespace SoEasy
 			return false;
 		}
 		lua_pushstring(this->mLuaEnv, method.c_str());
-		lua_pushinteger(this->mLuaEnv, reqData->operator_id());
-		lua_pushinteger(this->mLuaEnv, reqData->callback_id());
-		if (!reqData->message_data().empty())
+		lua_pushinteger(this->mLuaEnv, reqData->entityid());
+		lua_pushinteger(this->mLuaEnv, reqData->rpcid());
+		if (!reqData->messagedata().empty())
 		{
-			if (!reqData->protoc_name().empty())
+			if (!reqData->protocname().empty())
 			{
-				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protoc_name());
+				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -88,7 +88,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = reqData->message_data();
+				const std::string & data = reqData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}
@@ -119,13 +119,13 @@ namespace SoEasy
 		}
 		lua_pushstring(this->mLuaEnv, method.c_str());
 		lua_pushstring(this->mLuaEnv, address.c_str());
-		lua_pushinteger(this->mLuaEnv, reqData->operator_id());
-		lua_pushinteger(this->mLuaEnv, reqData->callback_id());
-		if (!reqData->message_data().empty())
+		lua_pushinteger(this->mLuaEnv, reqData->entityid());
+		lua_pushinteger(this->mLuaEnv, reqData->rpcid());
+		if (!reqData->messagedata().empty())
 		{
-			if (!reqData->protoc_name().empty())
+			if (!reqData->protocname().empty())
 			{
-				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protoc_name());
+				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -135,7 +135,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = reqData->message_data();
+				const std::string & data = reqData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}

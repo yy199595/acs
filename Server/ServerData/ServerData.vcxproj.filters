@@ -21,18 +21,30 @@
     <ClInclude Include="XCode\XCode.h">
       <Filter>XCode</Filter>
     </ClInclude>
-    <ClInclude Include="Protocol\Common.pb.h">
+    <ClInclude Include="Protocol\c2s.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="Protocol\ServerCommon.pb.h">
+    <ClInclude Include="Protocol\com.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol\s2s.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol\db.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Protocol\Common.pb.cc">
+    <ClCompile Include="Protocol\c2s.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="Protocol\ServerCommon.pb.cc">
+    <ClCompile Include="Protocol\com.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Protocol\s2s.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="Protocol\db.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
   </ItemGroup>

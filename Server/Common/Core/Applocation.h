@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
@@ -31,6 +31,7 @@ namespace SoEasy
 		inline long long GetStartTime() { return this->mStartTime; }
 		AsioContext & GetAsioContext() { return (*mAsioContext); }
 		AsioContext * GetAsioContextPtr() { return mAsioContext; }
+		const std::string & GetServerName() { return this->mServerName; }
 		long long GetRunTime() { return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 		inline const std::string & GetConfigDirectory() { return this->mSrvConfigDirectory; }
 	public:

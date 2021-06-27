@@ -1,4 +1,4 @@
-#include"ScriptManager.h"
+﻿#include"ScriptManager.h"
 #include<Core/Applocation.h>
 #include<Script/luadebug.h>
 #include<Object/GameObject.h>
@@ -7,7 +7,6 @@
 #include<Manager/TimerManager.h>
 
 #include<NetWork/TcpClientSession.h>
-#include<NetWork/RemoteScheduler.h>
 
 #include<Script/luaExtension.h>
 #include<Script/SystemExtension.h>
@@ -180,8 +179,6 @@ namespace SoEasy
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "GetAddress", &TcpClientSession::GetAddress);
 		ClassProxyHelper::PushMemberFunction<TcpClientSession>(lua, "StartConnect", &TcpClientSession::StartConnect);
 		
-		ClassProxyHelper::BeginRegister<ActionManager>(lua, "ActionManager");
-
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);

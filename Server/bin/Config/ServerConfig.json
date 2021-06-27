@@ -11,7 +11,7 @@
     "IsOpenRecoder": true,
     "CommandPort": 1020,
     "RedisTimeout": 3,
-    "RedisPasswd": "你好",
+    "RedisPasswd": "",
     "RedisAddress": "127.0.0.1:6379",
     "SqlTable": "./sql/sql.json",
     "MysqlDbName": "player_db",
@@ -35,7 +35,8 @@
         "ScriptManager",
         "ListenerManager",
         "ActionManager",
-        "ServiceManager"
+        "ServiceManager",
+        "ServiceNodeManager"
     ],
     "Service": [
         "LoginService",

@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include"TcpClientSession.h"
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 
 namespace SoEasy
 {

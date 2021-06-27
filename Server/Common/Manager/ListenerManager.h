@@ -1,7 +1,5 @@
-#pragma once
+﻿#pragma once
 #include"SessionManager.h"
-#include<Protocol/ServerCommon.pb.h>
-
 using namespace PB;
 namespace SoEasy
 {

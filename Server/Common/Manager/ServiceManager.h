@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include"SessionManager.h"
-#include<Protocol/ServerCommon.pb.h>
+#include<Protocol/s2s.pb.h>
 namespace SoEasy
 {
 	class ServiceBase;

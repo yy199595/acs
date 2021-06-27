@@ -1,10 +1,10 @@
-#pragma once
+﻿#pragma once
 
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 #include<Manager/Manager.h>
 #include<Core/TcpSessionListener.h>
 #include<Script/LuaTable.h>
-#include<Protocol/ServerCommon.pb.h>
+#include<Protocol/s2s.pb.h>
 
 namespace SoEasy
 {
@@ -24,8 +24,8 @@ namespace SoEasy
 
 		bool RemoveTcpSession(const std::string & tcpSession);
 		bool RemoveTcpSession(shared_ptr<TcpClientSession> tcpSession);
-		
-		XCode SendMessageByAdress(const std::string & address, shared_ptr<NetWorkPacket> returnPackage);
+		XCode SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage);
+		XCode SendMessageByAdress(const std::string & address, const NetWorkPacket & returnPackage);
 	public:
 		shared_ptr<TcpClientSession> GetTcpSession(const std::string & adress);
 	protected:

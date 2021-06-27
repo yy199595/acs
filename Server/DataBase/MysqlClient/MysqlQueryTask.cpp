@@ -1,4 +1,5 @@
-#include"MysqlQueryTask.h"
+﻿#include"MysqlQueryTask.h"
+#include<Manager/MysqlManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
 namespace SoEasy
@@ -9,19 +10,16 @@ namespace SoEasy
 
 	}
 
-	bool MysqlQueryTask::InitTask(const std::string tab, CoroutineManager * corMgr,const std::string key, shared_ptr<Message> data)
+	bool MysqlQueryTask::InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data)
 	{
 		if (!corMgr->IsInMainCoroutine())
 		{
-			this->mKey = key;
 			this->mData = data;
 			this->mTable = tab;
 			this->mCorManager = corMgr;
+			SayNoAssertRetFalse_F(this->GetTabConfig(tab));
 			this->mCoroutineId = corMgr->GetCurrentCorId();
-
-			const Descriptor * pDescriptor = this->mData->GetDescriptor();
-			this->mFieldDesc = pDescriptor->FindFieldByName(this->mKey);
-			return this->mFieldDesc != nullptr;
+			return true;
 		}
 		return false;
 	}
@@ -37,19 +35,35 @@ namespace SoEasy
 		if (this->mSqlCommand.empty())
 		{
 			std::stringstream sqlStream;
-			sqlStream << "select * from " << this->mTable << " where " << this->mKey << "=";
+			const Descriptor * pDescriptor = this->mData->GetDescriptor();
 			const Reflection * pReflection = this->mData->GetReflection();
-			if (this->mFieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
+			sqlStream << "select * from " << this->mTable << " where ";
+			SqlTableConfig * tableConfig = this->GetTabConfig(this->mTable);
+
+			for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
 			{
-				sqlStream << "'" << pReflection->GetString(*this->mData, mFieldDesc) << "'";
-			}
-			else if (mFieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
-			{
-				sqlStream << pReflection->GetString(*this->mData, mFieldDesc);
-			}
-			else if (mFieldDesc->type() == FieldDescriptor::Type::TYPE_INT32)
-			{
-				sqlStream << pReflection->GetString(*this->mData, mFieldDesc);
+				const std::string & key = tableConfig->mKeys[index];
+				const FieldDescriptor * fieldDesc = pDescriptor->FindFieldByName(key);
+				sqlStream << key << "=";
+				switch (fieldDesc->type())
+				{
+				case FieldDescriptor::Type::TYPE_STRING:
+					sqlStream << "'" << pReflection->GetString(*this->mData, fieldDesc) << "'";
+					break;
+				case FieldDescriptor::Type::TYPE_INT64:
+					sqlStream << pReflection->GetInt64(*this->mData, fieldDesc);
+					break;
+				case FieldDescriptor::Type::TYPE_INT32:
+					sqlStream << pReflection->GetInt32(*this->mData, fieldDesc);
+					break;
+				default:
+					assert(false);
+					break;
+				}
+				if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+				{
+					sqlStream << " and ";
+				}
 			}
 			this->mSqlCommand = sqlStream.str();
 		}

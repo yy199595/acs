@@ -1,4 +1,4 @@
-#include "ActionScheduler.h"
+﻿#include "ActionScheduler.h"
 #include<Manager/NetWorkManager.h>
 #include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -84,7 +84,7 @@ namespace SoEasy
 
 	XCode ActionScheduler::SendCallMessage(const std::string & service, const std::string & func, shared_ptr<Message> message, shared_ptr<LocalRetActionProxy> callBack)
 	{
-		shared_ptr<NetWorkPacket> callData = make_shared<NetWorkPacket>();
+		NetWorkPacket requestData;
 		if (message != nullptr)
 		{
 			std::string messageBuffer;
@@ -92,15 +92,13 @@ namespace SoEasy
 			{
 				return XCode::SerializationFailure;
 			}
-			callData->set_message_data(messageBuffer);
-			callData->set_protoc_name(message->GetTypeName());
+			requestData.set_messagedata(messageBuffer);
+			requestData.set_protocname(message->GetTypeName());
 		}
-		long long id = 0;
-		this->mActionManager->AddCallback(callBack, id);
-		callData->set_service(service);
-		callData->set_action(func);
-		callData->set_callback_id(id);
-		return this->mNetWorkManager->SendMessageByAdress(mSessionAddress, callData);
+		requestData.set_method(func);
+		requestData.set_service(service);
+		requestData.set_rpcid(this->mActionManager->AddCallback(callBack));
+		return this->mNetWorkManager->SendMessageByAdress(mSessionAddress, requestData);
 	}
 
 }

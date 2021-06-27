@@ -22,7 +22,6 @@ local cpp_string = ""
 local csharp_string = ""
 local file_count = 0
 local file_content = {}
-
 while true do
     local line = fs:read()
     if line == nil then
@@ -32,11 +31,10 @@ while true do
     local linedata = split(line, "\t")
     content.name = linedata[1]
     content.desc = linedata[2]
-    content.value = linedata[3]
+    content.value = file_count
     file_count = file_count + 1
     table.insert(file_content, content)
 end
-
 for index, conetnt in ipairs(file_content) do
     if index == file_count then
         lua_string = string.format("%s\n\t%s = %s--%s", lua_string, conetnt.name, conetnt.value, conetnt.desc)

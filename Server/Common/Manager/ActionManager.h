@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<Manager/Manager.h>
 #include<Other/TimeRecorder.h>
 
@@ -16,7 +16,7 @@ namespace SoEasy
 		virtual ~ActionManager() { }
 	public:
 		bool AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData);	
-		bool AddCallback(shared_ptr<LocalRetActionProxy> actionBox, long long & callbackId);
+		long long AddCallback(shared_ptr<LocalRetActionProxy> actionBox);
 	protected:
 		bool OnInit() override;
 		void OnSystemUpdate() final;					//处理系统事件

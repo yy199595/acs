@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include<Service/LocalService.h>
-#include<Protocol/ServerCommon.pb.h>
+#include<Protocol/c2s.pb.h>
 namespace SoEasy
 {
 	class MysqlManager;
@@ -14,8 +14,8 @@ namespace SoEasy
 		bool OnInit() override;
 		void OnInitComplete() final;
 	private:
-		XCode Login(long long operId, shared_ptr<UserAccountData> LoginData);
-		XCode Register(long long operId, shared_ptr<UserRegisterData> registerData);
+		XCode Login(long long operId, shared_ptr<c2s::UserVerify_Request> LoginData);
+		XCode Register(long long operId, shared_ptr<c2s::UserRegister_Request> registerData);
 	private:
 		int mAreaId;
 		RedisManager * mRedisManager;

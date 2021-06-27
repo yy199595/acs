@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<fstream>
 #include<rapidjson/writer.h>
 #include<rapidjson/document.h>
@@ -22,7 +22,8 @@ namespace SoEasy
 		bool AddParameter(const char * key, const unsigned int value);
 		bool AddParameter(const char * key, const char * value, size_t size);
 		bool AddParameter(const char * key, const unsigned long long value);
-		bool AddParameter(const char * key, const std::vector<std::string> value);
+		bool AddParameter(const char * key, const std::set<std::string> & value);
+		bool AddParameter(const char * key, const std::vector<std::string> & value);
 		bool AddParameter(const char * key, const google::protobuf::Message & value);
 	public:
 		bool SaveJsonToFile(const char * path);

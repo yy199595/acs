@@ -1,8 +1,7 @@
-#include"RedisManager.h"
+﻿#include"RedisManager.h"
 #include<Util/NumberHelper.h>
 #include<Util/StringHelper.h>
 #include<Thread/ThreadPool.h>
-#include<NetWork/RemoteScheduler.h>
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Script/ClassProxyHelper.h>

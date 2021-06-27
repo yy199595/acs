@@ -1,8 +1,9 @@
-
+﻿
 #pragma once
 #include"LocalService.h"
+#include<Protocol/com.pb.h>
 #include<NetWork/TcpClientSession.h>
-#include<Protocol/ServerCommon.pb.h>
+
 using namespace PB;
 
 
@@ -38,17 +39,11 @@ namespace SoEasy
 		void OnSystemUpdate() final;
 		void OnInitComplete() final;
 	private:
-		XCode RegisterNode(long long id, shared_ptr<Service_NodeRegisterRequest> nodeInfo);
-		XCode RegisterService(long long id, shared_ptr<Service_RegisterRequest> serviceInfos);
-	private:
-		XCode RefreshServices(int areaId);
+		XCode RegisterNode(long long id, shared_ptr<s2s::NodeRegister_Request> nodeInfo);
 	private:
 		int mServiceIndex;
 		class NetWorkManager * mNetWorkManager;
-		std::vector<ProxyService *> mProxyServices;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
-		std::unordered_map<int, ProxyService *> mServiceMap;
 		std::unordered_map<long long, ServiceNode *> mServiceNodeMap;
-		std::unordered_map<std::string, long long> mQuerySessionMap;
 	};
 }

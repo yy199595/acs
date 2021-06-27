@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 #include<XCode/XCode.h>
 #include"NetLuaRetAction.h"
 #include<Util/NumberBuilder.h>
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 #include<NetWork/TcpClientSession.h>
 
 using namespace PB;

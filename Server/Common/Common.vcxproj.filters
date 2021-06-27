@@ -99,9 +99,6 @@
     <ClCompile Include="NetWork\NetWorkRetAction.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\RemoteScheduler.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
     <ClCompile Include="NetWork\TcpClientSession.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
@@ -243,6 +240,9 @@
     <ClCompile Include="Service\LocalLuaService.cpp">
       <Filter>Service</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\ServiceNodeManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -318,9 +318,6 @@
       <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="NetWork\NetWorkRetAction.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
-    <ClInclude Include="NetWork\RemoteScheduler.h">
       <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="NetWork\TcpClientSession.h">
@@ -529,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="Service\LocalLuaService.h">
       <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ServiceNodeManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

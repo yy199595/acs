@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include<XCode/XCode.h>
 #include<Object/Object.h>
@@ -6,7 +6,7 @@
 #include<Global/ServerConfig.h>
 #include<Other/DoubleBufferQueue.h>
 #include<NetWork/TcpClientSession.h>
-#include<Protocol/Common.pb.h>
+#include<Protocol/com.pb.h>
 using namespace PB;
 namespace SoEasy
 {

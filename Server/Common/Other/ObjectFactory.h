@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include<Object/Object.h>
-#include<Protocol/Common.pb.h>
-#include<Protocol/ServerCommon.pb.h>
+#include<Protocol/com.pb.h>
+#include<Protocol/s2s.pb.h>
 using namespace google::protobuf;
 namespace SoEasy
 {

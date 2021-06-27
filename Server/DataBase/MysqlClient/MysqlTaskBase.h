@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 #include"MysqlDefine.h"
 #include<Thread/ThreadTaskAction.h>
 namespace SoEasy
 {
+	class SqlTableConfig;
 	class QuertJsonWritre;
 	class CoroutineManager;
 	class MysqlTaskBase : public ThreadTaskAction
@@ -18,6 +19,7 @@ namespace SoEasy
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }
 	public:
 		XCode GetErrorCode() { return this->mErrorCode; }
+		SqlTableConfig * GetTabConfig(const std::string & tab);
 		const std::string & GetErrorStr() { return this->mErrorString; }
 	private:
 		void WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size);
@@ -27,5 +29,6 @@ namespace SoEasy
 	private:
 		XCode mErrorCode;
 		std::string mErrorString;
+		SqlTableConfig * mTableConfig;
 	};
 }

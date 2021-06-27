@@ -1,4 +1,4 @@
-#include"NetWorkRetAction.h"
+﻿#include"NetWorkRetAction.h"
 #include<Util/TimeHelper.h>
 #include<Util/ProtocHelper.h>
 #include<Other/ObjectFactory.h>
@@ -14,9 +14,9 @@ namespace SoEasy
 
 	void LocalLuaRetActionProxy::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData->error_code();
-		const std::string & name = backData->protoc_name();
-		const std::string & message = backData->message_data();
+		XCode code = (XCode)backData->code();
+		const std::string & name = backData->protocname();
+		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
 			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
@@ -38,7 +38,7 @@ namespace SoEasy
 	}
 	void LocalRetActionProxy1::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
-		this->mBindAction((XCode)backData->error_code());
+		this->mBindAction((XCode)backData->code());
 	}
 	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name)
 		:LocalRetActionProxy(name), mBindLuaAction(action)
@@ -48,9 +48,9 @@ namespace SoEasy
 
 	void LocalWaitRetActionProxy::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
-		XCode code = (XCode)backData->error_code();
-		const std::string & name = backData->protoc_name();
-		const std::string & message = backData->message_data();
+		XCode code = (XCode)backData->code();
+		const std::string & name = backData->protocname();
+		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
 			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
@@ -82,8 +82,8 @@ namespace SoEasy
 
 	void NetWorkWaitCorAction::Invoke(const shared_ptr<NetWorkPacket> backData)
 	{
-		this->mCode = (XCode)backData->error_code();
-		this->mMessage = backData->message_data();
+		this->mCode = (XCode)backData->code();
+		this->mMessage = backData->messagedata();
 		this->mScheduler->Resume(mCoroutineId);
 	}
 }
