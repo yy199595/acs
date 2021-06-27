@@ -63,10 +63,10 @@ namespace SoEasy
 		void Invoke(shared_ptr<NetWorkPacket> backData) override
 		{
 			mReturnData.Clear();
-			XCode code = (XCode)backData->error_code();
+			XCode code = (XCode)backData->code();
 			if (code != XCode::TimeoutAutoCall)
 			{
-				const std::string & message = backData->message_data();			
+				const std::string & message = backData->messagedata();			
 				if (!mReturnData.ParseFromArray(message.c_str(), message.size()))
 				{
 					this->mBindAction(XCode::ParseMessageError, mReturnData);
