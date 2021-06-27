@@ -21,7 +21,7 @@ namespace SoEasy
 				SayNoDebugError("create " << this->mDataBase << " db fail");
 				return false;
 			}
-			SayNoDebugInfo(sql);
+			SayNoDebugInfo("\n" << sql);
 			mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str());
 		}
 
@@ -145,13 +145,13 @@ namespace SoEasy
 		{
 			sqlStream << " BLOB(64) DEFAULT NULL";
 		}
-		const std::string sql = sqlStream.str();
-		SayNoDebugInfo(sql);
+		const std::string sql = sqlStream.str();	
 		if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
 		{
 			SayNoDebugError(mysql_error(mMysqlSocket));
 			return false;
 		}
+		SayNoDebugInfo("\n" << sql);
 		return true;
 	}
 
@@ -254,7 +254,7 @@ namespace SoEasy
 			SayNoDebugError(mysql_error(mMysqlSocket));
 			return false;
 		}
-		SayNoDebugInfo(sql);
+		SayNoDebugInfo("\n" << sql);
 		return true;
 
 	}
