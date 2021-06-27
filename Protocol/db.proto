@@ -1,0 +1,15 @@
+syntax = "proto3";
+package db;
+
+message UserAccountData
+{
+    int64 UserID = 1;      //用户id
+    string Account = 2;     //账户
+    string Passwd = 3;      //密码
+    string Platform = 4;    //平台
+    int64 Phonenum = 5;     //手机号
+    string Devicemac = 6;  //设备id
+    int64 Registertime = 7;    //注册事件
+    int64 Lastlogintime = 8;   //上次登录时间
+    string Token = 9;   //登陆令牌
+}
