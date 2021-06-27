@@ -16,6 +16,7 @@ namespace SoEasy
 		this->mCorManager = corMgr;
 		SayNoAssertRetFalse_F(this->GetTabConfig(tab));
 		this->mCoroutineId = corMgr->GetCurrentCorId();
+		return true;
 	}
 	void MysqlDeleteTask::OnTaskFinish()
 	{
