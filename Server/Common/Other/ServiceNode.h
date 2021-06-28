@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include<Object/Object.h>
+#include<Protocol/s2s.pb.h>
 #include<Service/ProxyService.h>
 namespace SoEasy
 {
@@ -9,10 +10,11 @@ namespace SoEasy
 	public:
 		ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress = "");
 	public:
-		const int GetAreaId() { return this->mAreaId; }
-		const int GetNodeId() { return this->mNodeId; }
-		const std::string & GetAddress() { return this->mAddress; }
-		const std::string & GetNodeName() { return this->mNodeName; }
+		const int GetAreaId() { return this->mNodeInfoMessage.areaid(); }
+		const int GetNodeId() { return this->mNodeInfoMessage.nodeid(); }
+		const std::string & GetAddress() { return this->mNodeInfoMessage.address(); }
+		const std::string & GetNodeName() { return this->mNodeInfoMessage.servername(); }
+		const s2s::NodeData_NodeInfo & GetNodeMessage() { return this->mNodeInfoMessage;}
 	public:
 		bool AddService(const std::string & service);
 		bool HasService(const std::string & service);
@@ -32,8 +34,6 @@ namespace SoEasy
 		void PushMessageData(SharedPacket messageData);
 		void PushMessageData(const std::string & service, const std::string & method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
 	private:
-		const int mAreaId;
-		const int mNodeId;
 		const std::string mAddress; //监听地址
 		const std::string mNoticeAddress;	//通信地址
 		const std::string mNodeName;	//进程名字
@@ -43,6 +43,7 @@ namespace SoEasy
 		class ActionManager * mActionManager;
 		class NetWorkManager * mNetWorkManager;	
 		class ServiceManager * mServiceManager;
+		s2s::NodeData_NodeInfo mNodeInfoMessage;
 		std::queue<shared_ptr<PB::NetWorkPacket>> mMessageQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 	};

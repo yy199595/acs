@@ -18,12 +18,13 @@ namespace SoEasy
 		void OnInitComplete()final;
 		void OnConnectDone(SharedTcpSession tcpSession) final;
 	private:
-		void StarRegister();
+		void StarRegisterNode();
 	private:
-		XCode RemoveService(long long, shared_ptr<Int32Data> service);
+		XCode DelNode(long long, shared_ptr<Int32Data> node);
+		XCode AddNode(long long, shared_ptr<s2s::NodeData_NodeInfo> nodeInfo);
 	private:
-		unsigned short mAreaId;
-		unsigned short mNodeId;
+		short mAreaId;
+		short mNodeId;
 		std::string mQueryAddress;
 		std::string mListenAddress;
 		ServiceManager * mServiceManager;

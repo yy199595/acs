@@ -19,18 +19,11 @@ namespace SoEasy
 		void OnSessionErrorAfter(SharedTcpSession tcpSession) final;
 		void OnSessionConnectAfter(SharedTcpSession tcpSession) final;
 	public:
-		LocalLuaService * AddLuaService(const std::string name, LocalLuaService * service);
-		ProxyService * AddProxyService(int areaId, int serviceId, const std::string name, const std::string address);
-	public:
-		ProxyService * GetProxyService(int id);
-		ProxyService * GetProxyService(const std::string & name);
 		LocalService * GetLocalService(const std::string & name);
 		LocalLuaService * GetLuaService(const std::string & name);
-		SharedTcpSession GetProxySession(const std::string & address);
+		LocalLuaService * AddLuaService(const std::string name, LocalLuaService * service);
 	public:
-		bool RemoveProxyervice(const int id);
-	public:
-		void GetLocalServices(std::vector<ServiceBase *> & services);
+		void GetLocalServices(std::vector<std::string> & serviceNames);
 	private:
 		bool CreateLocalService();
 	private:
@@ -38,7 +31,6 @@ namespace SoEasy
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
 		std::vector<ServiceBase *> mServiceVector;
-		std::unordered_map<int, ProxyService *> mProxyServiceMap;//action地址
 		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
 		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua服务
 		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mActionSessionMap; //服务通信session

@@ -1,15 +1,15 @@
-﻿#include<fstream>
-#include"ServerConfig.h"
-#include<Define/CommonDef.h>
-#include<Util/FileHelper.h>
+﻿#include <fstream>
+#include "ServerConfig.h"
+#include <Define/CommonDef.h>
+#include <Util/FileHelper.h>
 namespace SoEasy
 {
 	ServerConfig::ServerConfig(const std::string path)
-		:mConfigPath(path)
+		: mConfigPath(path)
 	{
-		
+		this->mAreaId = 0;
+		this->mNodeId = 0;
 	}
-
 
 	bool ServerConfig::InitConfig()
 	{
@@ -20,7 +20,6 @@ namespace SoEasy
 			SayNoDebugError("not find config " << mConfigPath);
 			return false;
 		}
-		SayNoDebugWarning(outString);
 		mConfigDocument->Parse(outString.c_str(), outString.size());
 		if (this->mConfigDocument->HasParseError())
 		{
@@ -32,21 +31,24 @@ namespace SoEasy
 		for (; iter != this->mConfigDocument->MemberEnd(); iter++)
 		{
 			const std::string key = iter->name.GetString();
-			rapidjson::Value * value = &iter->value;
+			rapidjson::Value *value = &iter->value;
 			this->mMapConfigData.emplace(key, value);
 		}
+		SayNoAssertRetFalse_F(this->GetValue("AreaId", this->mAreaId));
+		SayNoAssertRetFalse_F(this->GetValue("NodeId", this->mNodeId));
+		SayNoAssertRetFalse_F(this->GetValue("NodeName", this->mNodeName));
 		return true;
 	}
 
 	bool ServerConfig::HasValue(const std::string k2)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		return value != nullptr && value->IsNull() == false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, int & data)
+	bool ServerConfig::GetValue(const std::string k2, int &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsInt())
 		{
 			data = value->GetInt();
@@ -55,9 +57,20 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, long & data)
+	bool ServerConfig::GetValue(const std::string k2, short &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
+		if (value && value->IsInt())
+		{
+			data = (short)value->GetInt();
+			return true;
+		}
+		return false;
+	}
+
+	bool ServerConfig::GetValue(const std::string k2, long &data)
+	{
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsInt())
 		{
 			data = value->GetInt64();
@@ -66,9 +79,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, bool & data)
+	bool ServerConfig::GetValue(const std::string k2, bool &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsBool())
 		{
 			data = value->GetBool();
@@ -77,9 +90,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, float & data)
+	bool ServerConfig::GetValue(const std::string k2, float &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsFloat())
 		{
 			data = value->GetFloat();
@@ -88,9 +101,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, double & data)
+	bool ServerConfig::GetValue(const std::string k2, double &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsDouble())
 		{
 			data = value->GetDouble();
@@ -99,9 +112,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, long long & data)
+	bool ServerConfig::GetValue(const std::string k2, long long &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsInt64())
 		{
 			data = value->GetInt64();
@@ -110,13 +123,13 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, std::string & data)
+	bool ServerConfig::GetValue(const std::string k2, std::string &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsString())
 		{
 			data.clear();
-			const char * str = value->GetString();
+			const char *str = value->GetString();
 			const size_t size = value->GetStringLength();
 			data.append(str, size);
 			return true;
@@ -124,9 +137,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, unsigned int & data)
+	bool ServerConfig::GetValue(const std::string k2, unsigned int &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsUint())
 		{
 			data = value->GetUint();
@@ -135,9 +148,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, unsigned short & data)
+	bool ServerConfig::GetValue(const std::string k2, unsigned short &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsUint())
 		{
 			data = (unsigned short)value->GetUint();
@@ -146,9 +159,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, unsigned long long & data)
+	bool ServerConfig::GetValue(const std::string k2, unsigned long long &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsUint64())
 		{
 			data = value->GetUint64();
@@ -157,10 +170,10 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, std::set<std::string>& data)
+	bool ServerConfig::GetValue(const std::string k2, std::set<std::string> &data)
 	{
 		data.clear();
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsArray())
 		{
 			for (auto iter = value->Begin(); iter != value->End(); iter++)
@@ -176,9 +189,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, std::vector<std::string>& data)
+	bool ServerConfig::GetValue(const std::string k2, std::vector<std::string> &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value && value->IsArray())
 		{
 			for (auto iter = value->Begin(); iter != value->End(); iter++)
@@ -194,9 +207,9 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServerConfig::GetValue(const std::string k2, std::unordered_map<std::string, std::string>& data)
+	bool ServerConfig::GetValue(const std::string k2, std::unordered_map<std::string, std::string> &data)
 	{
-		rapidjson::Value * value = this->GetJsonValue(k2);
+		rapidjson::Value *value = this->GetJsonValue(k2);
 		if (value == nullptr || !value->IsObject())
 		{
 			return false;
@@ -214,7 +227,7 @@ namespace SoEasy
 		return true;
 	}
 
-	rapidjson::Value * ServerConfig::GetJsonValue(const std::string & k2)
+	rapidjson::Value *ServerConfig::GetJsonValue(const std::string &k2)
 	{
 		auto iter = this->mMapConfigData.find(k2);
 		return iter != this->mMapConfigData.end() ? iter->second : nullptr;

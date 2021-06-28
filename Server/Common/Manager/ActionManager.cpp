@@ -28,8 +28,8 @@ namespace SoEasy
 		this->mCallbackMessageQueue.SwapQueueData();
 		while (this->mCallbackMessageQueue.PopItem(callbackData))
 		{
-			const long long callbackId = callbackData->rpcid();
-			auto iter = this->mRetActionMap.find(callbackId);
+			long long rpcId = callbackData->rpcid();
+			auto iter = this->mRetActionMap.find(rpcId);
 			if (iter != this->mRetActionMap.end())
 			{
 				iter->second->Invoke(callbackData);
@@ -38,7 +38,7 @@ namespace SoEasy
 		}
 	}
 
-	bool ActionManager::AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData)
+	bool ActionManager::AddActionArgv(int id, shared_ptr<NetWorkPacket> messageData)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
@@ -50,21 +50,20 @@ namespace SoEasy
 		return true;
 	}
 
-	long long ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> actionBox)
+	long long ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> rpcAction)
 	{
-		if (actionBox == nullptr)
+		if (rpcAction == nullptr)
 		{
 			return 0;
 		}
 		long long callbackId = NumberHelper::Create();
-		this->mRetActionMap.emplace(callbackId, actionBox);
+		this->mRetActionMap.emplace(callbackId, rpcAction);
 		if (this->mMessageTimeout != 0)// 添加超时
 		{
 			shared_ptr<ActionTimeoutTimer> timer = make_shared<ActionTimeoutTimer>(this->mMessageTimeout, callbackId, this);
 			this->mTimerManager->AddTimer(timer);
 		}
-		this->mRetActionMap.emplace(callbackId, actionBox);
+		this->mRetActionMap.emplace(callbackId, rpcAction);
 		return callbackId;
 	}
-
 }

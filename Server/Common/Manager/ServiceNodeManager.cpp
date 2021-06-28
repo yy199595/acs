@@ -1,5 +1,5 @@
-﻿#include"ServiceNodeManager.h"
-#include<Other/ServiceNode.h>
+﻿#include "ServiceNodeManager.h"
+#include <Other/ServiceNode.h>
 namespace SoEasy
 {
 	bool ServiceNodeManager::DelServiceNode(int nodeId)
@@ -7,27 +7,54 @@ namespace SoEasy
 		auto iter = this->mServiceNodeMap1.find(nodeId);
 		if (iter != this->mServiceNodeMap1.end())
 		{
-			ServiceNode * serviceNode = iter->second;
-			serviceNode->SetActive(false);
-			const std::string & address = serviceNode->GetAddress();
-			auto iter1 = this->mServiceNodeMap2.find(address);
-			if (iter1 != this->mServiceNodeMap2.end())
+			ServiceNode *serviceNode = iter->second;
+			if (serviceNode != nullptr)
 			{
-				this->mServiceNodeMap2.erase(iter1);
+				serviceNode->SetActive(false);
+				const std::string &address = serviceNode->GetAddress();
+				auto iter1 = this->mServiceNodeMap2.find(address);
+				if (iter1 != this->mServiceNodeMap2.end())
+				{
+					this->mServiceNodeMap2.erase(iter1);
+				}
 			}
+			this->mServiceNodeMap1.erase(iter);
 			return true;
 		}
 		return false;
 	}
 
-	bool ServiceNodeManager::AddServiceNode(ServiceNode * serviceNode)
+	bool ServiceNodeManager::DelServiceNode(const std::string &address)
+	{
+		auto iter1 = this->mServiceNodeMap2.find(address);
+		if (iter1 != this->mServiceNodeMap2.end())
+		{
+			ServiceNode *serviceNode = iter1->second;
+			if (serviceNode != nullptr)
+			{
+				serviceNode->SetActive(false);
+				const int nodeId = serviceNode->GetNodeId();
+				auto iter2 = this->mServiceNodeMap1.find(nodeId);
+				if (iter2 != this->mServiceNodeMap1.end())
+				{
+					this->mServiceNodeMap1.erase(iter2);
+				}
+			}
+			this->mServiceNodeMap2.erase(iter1);
+			return true;
+		}
+		return false;
+	}
+
+	bool ServiceNodeManager::AddServiceNode(ServiceNode *serviceNode)
 	{
 		const int id = serviceNode->GetNodeId();
-		const std::string & address = serviceNode->GetAddress();
+		const std::string &address = serviceNode->GetAddress();
 		auto iter = this->mServiceNodeMap1.find(id);
 		if (iter == this->mServiceNodeMap1.end())
 		{
 			SayNoDebugLog(serviceNode->GetJsonString());
+			this->mServiceNodeArray.push_back(serviceNode);
 			this->mServiceNodeMap1.emplace(id, serviceNode);
 			this->mServiceNodeMap2.emplace(address, serviceNode);
 			serviceNode->Init(this->GetApp(), serviceNode->GetNodeName());
@@ -40,36 +67,57 @@ namespace SoEasy
 	{
 		std::string queryAddress;
 		this->GetConfig().GetValue("QueryAddress", queryAddress);
-		ServiceNode * centerNode = new ServiceNode(0, 0, "Center", queryAddress);
+		ServiceNode *centerNode = new ServiceNode(0, 0, "Center", queryAddress);
 		centerNode->AddService(std::string("ServiceRegistry"));
 		return this->AddServiceNode(centerNode);
 	}
 
 	void ServiceNodeManager::OnSystemUpdate()
 	{
-		auto iter = this->mServiceNodeMap1.begin();
-		for (; iter != this->mServiceNodeMap1.end();)
+		if (!this->mServiceNodeArray.empty())
 		{
-			ServiceNode * serviceNode = iter->second;
-			if (!serviceNode->IsActive())
+			auto iter = this->mServiceNodeArray.begin();
+			for (; iter != this->mServiceNodeArray.end();)
 			{
-				delete serviceNode;
-				this->mServiceNodeMap1.erase(iter++);
-				continue;
+				ServiceNode *serviceNode = (*iter);
+				if (serviceNode == nullptr || !serviceNode->IsActive())
+				{
+					serviceNode->OnDestory();
+					delete serviceNode;
+					this->mServiceNodeArray.erase(iter++);
+					continue;
+				}
+				iter++;
+				serviceNode->OnSystemUpdate();
 			}
-			iter++;
-			serviceNode->OnSystemUpdate();
 		}
 	}
 
-	ServiceNode * ServiceNodeManager::GetServiceNode(const int nodeId)
+	ServiceNode *ServiceNodeManager::GetServiceNode(const int nodeId)
 	{
 		auto iter = this->mServiceNodeMap1.find(nodeId);
-		return iter != this->mServiceNodeMap1.end() ? iter->second : nullptr;
+		if(iter != this->mServiceNodeMap1.end())
+		{
+			ServiceNode * serviceNode = iter->second;
+			if(serviceNode != nullptr && serviceNode->IsActive())
+			{
+				return serviceNode;
+			}
+		}
+		return nullptr;
 	}
-	ServiceNode * ServiceNodeManager::GetServiceNode(const std::string & address)
+
+	ServiceNode *ServiceNodeManager::GetServiceNode(const std::string &address)
 	{
 		auto iter = this->mServiceNodeMap2.find(address);
-		return iter != this->mServiceNodeMap2.end() ? iter->second : nullptr;
+		if(iter != this->mServiceNodeMap2.end())
+		{
+			ServiceNode * serviceNode = iter->second;
+			if(serviceNode != nullptr && serviceNode->IsActive())
+			{
+				return serviceNode;
+			}
+		}
+		return nullptr;
 	}
 }

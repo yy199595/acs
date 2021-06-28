@@ -22,7 +22,6 @@ namespace SoEasy
 		void PushHandleMessage(const std::string & address, SharedPacket argv);
 	public:
 		bool IsInit() { return this->mIsInit; }
-		const int GetServiceId() { return this->mServiceId; }
 		virtual bool HasMethod(const std::string & method) = 0;
 		const std::string & GetServiceName() { return this->mServiceName; };
  	protected:
@@ -34,7 +33,7 @@ namespace SoEasy
 		void Sleep(long long ms);
 		void Start(const std::string & name, std::function<void()> && func);
 	public:
-		void InitService(const std::string & name, int serviceId);
+		void InitService(const std::string & name);
 	public:
 		XCode Call(const std::string method, Message & returnData);
 		XCode Call(const std::string method, shared_ptr<Message> message = nullptr);	
@@ -45,7 +44,6 @@ namespace SoEasy
 		shared_ptr<NetWorkPacket> CreatePacket(const std::string & func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack);
 	private:
 		bool mIsInit;
-		int mServiceId;
 		std::string mServiceName;
 		class NetWorkManager * mNetManager;
 		class ActionManager * mActionManager;

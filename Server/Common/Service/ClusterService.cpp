@@ -1,40 +1,40 @@
-﻿#include"ClusterService.h"
-#include<Manager/ServiceManager.h>
-#include<NetWork/ActionScheduler.h>
-#include<Manager/ServiceNodeManager.h>
-#include<Coroutine/CoroutineManager.h>
-#include<Service/ProxyService.h>
-#include<Other/ServiceNode.h>
+﻿#include "ClusterService.h"
+#include <Manager/ServiceManager.h>
+#include <NetWork/ActionScheduler.h>
+#include <Manager/ServiceNodeManager.h>
+#include <Coroutine/CoroutineManager.h>
+#include <Service/ProxyService.h>
+#include <Other/ServiceNode.h>
 namespace SoEasy
 {
 	bool ClusterService::OnInit()
 	{
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("AreaId", this->mAreaId));
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
+		this->mAreaId = this->GetConfig().GetAreaId();
+		this->mNodeId = this->GetConfig().GetNodeId();
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", mQueryAddress));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", mListenAddress));
 		SayNoAssertRetFalse_F(this->mServiceManager = this->GetManager<ServiceManager>());
 		SayNoAssertRetFalse_F(this->mServiceNodeManager = this->GetManager<ServiceNodeManager>());
 
-		REGISTER_FUNCTION_1(ClusterService::RemoveService, Int32Data);
+		REGISTER_FUNCTION_1(ClusterService::DelNode, Int32Data);
+		REGISTER_FUNCTION_1(ClusterService::AddNode, s2s::NodeData_NodeInfo);
 		return LocalService::OnInit();
 	}
 
 	void ClusterService::OnInitComplete()
 	{
-		this->StarRegister();
+		this->StarRegisterNode();
 	}
 
 	void ClusterService::OnConnectDone(SharedTcpSession tcpSession)
 	{
-
 	}
 
-	void ClusterService::StarRegister()
+	void ClusterService::StarRegisterNode()
 	{
-		std::vector<ServiceBase*> localServices;
+		std::vector<std::string> localServices;
 		this->mServiceManager->GetLocalServices(localServices);
-		ServiceNode * centerNode = this->mServiceNodeManager->GetServiceNode(0);
+		ServiceNode *centerNode = this->mServiceNodeManager->GetServiceNode(0);
 		SayNoAssertRet_F(centerNode && !localServices.empty());
 
 		s2s::NodeRegister_Request registerInfo;
@@ -42,18 +42,42 @@ namespace SoEasy
 		registerInfo.set_nodeid(this->mNodeId);
 		registerInfo.set_address(this->mListenAddress);
 		registerInfo.set_servername(this->GetApp()->GetServerName());
-		for (ServiceBase * localService : localServices)
+		for (const std::string &name : localServices)
 		{
-			const std::string & name = localService->GetServiceName();
 			registerInfo.add_services()->assign(name);
 		}
 		XCode code = centerNode->Call("ServiceRegistry", "RegisterNode", &registerInfo);
-		SayNoDebugLog("register local service successful");
+		if (code != XCode::Successful)
+		{
+			SayNoDebugLog("register local service node fail");
+			return;
+		}
+		SayNoDebugLog("register local service node successful");
 	}
 
-	XCode ClusterService::RemoveService(long long, shared_ptr<Int32Data> serviceData)
+	XCode ClusterService::DelNode(long long, shared_ptr<Int32Data> serviceData)
 	{
-		const int serviceId = serviceData->data();
+		const int nodeId = serviceData->data();
+		bool res = this->mServiceNodeManager->DelServiceNode(nodeId);
+		return nodeId ? XCode::Successful : XCode::Failure;
+	}
+
+	XCode ClusterService::AddNode(long long, shared_ptr<s2s::NodeData_NodeInfo> nodeInfo)
+	{
+		const int nodeId = nodeInfo->nodeid();
+		ServiceNode *serviceNode = this->mServiceNodeManager->GetServiceNode(nodeId);
+		if (serviceNode == nullptr)
+		{
+			const int areaId = nodeInfo->areaid();
+			const std::string &name = nodeInfo->servername();
+			const std::string &address = nodeInfo->address();
+			serviceNode = new ServiceNode(areaId, nodeId, name, address);
+		}
+		for (int index = 0; index < nodeInfo->services_size(); index++)
+		{
+			const std::string &service = nodeInfo->services(index);
+			serviceNode->AddService(service);
+		}
 		return XCode::Successful;
 	}
 }

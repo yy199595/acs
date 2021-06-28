@@ -8,7 +8,6 @@ namespace SoEasy
 	ServiceBase::ServiceBase()
 	{
 		this->mIsInit = false;
-		this->mServiceId = 0;
 	}
 	bool ServiceBase::OnInit()
 	{
@@ -78,12 +77,11 @@ namespace SoEasy
 		this->mCorManager->Start(name, std::move(func));
 	}
 
-	void ServiceBase::InitService(const std::string & serviceName, int serviceId)
+	void ServiceBase::InitService(const std::string & serviceName)
 	{
 		if (this->mIsInit == false)
 		{
 			this->mIsInit = true;
-			this->mServiceId = serviceId;
 			this->mServiceName = serviceName;
 			this->Init(Applocation::Get(), serviceName);
 		}

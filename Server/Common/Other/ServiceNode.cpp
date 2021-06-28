@@ -9,7 +9,7 @@
 namespace SoEasy
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress)
-		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mNoticeAddress(nAddress)
+		: mAddress(address), mNodeName(name), mNoticeAddress(nAddress)
 	{
 		Applocation * app = Applocation::Get();
 		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
@@ -25,6 +25,11 @@ namespace SoEasy
 			StringHelper::ParseIpAddress(address, ip, port);
 			this->mNodeTcpSession = make_shared<TcpClientSession>(this->mServiceManager, name, ip, port);
 		}
+		this->mNodeInfoMessage.Clear();
+		this->mNodeInfoMessage.set_areaid(areaId);
+		this->mNodeInfoMessage.set_nodeid(nodeId);
+		this->mNodeInfoMessage.set_servername(name);
+		this->mNodeInfoMessage.set_address(address);
 	}
 
 	bool ServiceNode::AddService(const std::string & service)
@@ -33,6 +38,7 @@ namespace SoEasy
 		if (iter == this->mServiceArray.end())
 		{
 			this->mServiceArray.insert(service);
+			this->mNodeInfoMessage.add_services(service);
 			return true;
 		}
 		return false;
@@ -59,13 +65,9 @@ namespace SoEasy
 
 	std::string ServiceNode::GetJsonString()
 	{
-		RapidJsonWriter jsonWrite;
-		jsonWrite.AddParameter("AreaId", this->mAreaId);
-		jsonWrite.AddParameter("NodeId", this->mNodeId);
-		jsonWrite.AddParameter("Name", this->mNodeName);
-		jsonWrite.AddParameter("Address", this->mAddress);
-		jsonWrite.AddParameter("Service", this->mServiceArray);
-		return jsonWrite.Serialization();
+		std::string json;
+		util::MessageToJsonString(this->mNodeInfoMessage, &json);
+		return json;
 	}
 
 	XCode ServiceNode::Notice(const std::string & service, const std::string & method, const Message * request)

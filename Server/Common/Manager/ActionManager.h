@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include<Manager/Manager.h>
 #include<Other/TimeRecorder.h>
-
 namespace SoEasy
 {
 	// 注册本地Lua服务，管理远程回来的回调
@@ -15,8 +14,8 @@ namespace SoEasy
 		ActionManager();
 		virtual ~ActionManager() { }
 	public:
-		bool AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData);	
-		long long AddCallback(shared_ptr<LocalRetActionProxy> actionBox);
+		long long AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
+		bool AddActionArgv(int id, shared_ptr<NetWorkPacket> messageData);	
 	protected:
 		bool OnInit() override;
 		void OnSystemUpdate() final;					//处理系统事件

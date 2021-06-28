@@ -1,12 +1,10 @@
 ﻿
 #pragma once
-#include"LocalService.h"
-#include<Protocol/com.pb.h>
-#include<NetWork/TcpClientSession.h>
+#include "LocalService.h"
+#include <Protocol/com.pb.h>
+#include <NetWork/TcpClientSession.h>
 
 using namespace PB;
-
-
 
 namespace SoEasy
 {
@@ -14,16 +12,13 @@ namespace SoEasy
 	struct ActionProxyInfo
 	{
 	public:
-		int mAreaId;			//服务器组id
-		std::string mActionName;	//action名字
-		std::string mListenerAddress;	//监听地址
+		int mAreaId;				  //服务器组id
+		std::string mActionName;	  //action名字
+		std::string mListenerAddress; //监听地址
 	public:
-		bool operator == (ActionProxyInfo & actionInfo)
+		bool operator==(ActionProxyInfo &actionInfo)
 		{
-			return this->mAreaId == actionInfo.mAreaId
-				&& this->mActionName == actionInfo.mActionName
-				&& this->mListenerAddress == actionInfo.mListenerAddress;
-				
+			return this->mAreaId == actionInfo.mAreaId && this->mActionName == actionInfo.mActionName && this->mListenerAddress == actionInfo.mListenerAddress;
 		}
 	};
 	class ProxyService;
@@ -33,16 +28,20 @@ namespace SoEasy
 	{
 	public:
 		ServiceRegistry();
-		~ServiceRegistry() { }
+		~ServiceRegistry() {}
+
 	protected:
 		bool OnInit() final;
 		void OnSystemUpdate() final;
 		void OnInitComplete() final;
+
 	private:
+		void NoticeNode(int areaId);
 		XCode RegisterNode(long long id, shared_ptr<s2s::NodeRegister_Request> nodeInfo);
+		XCode QueryNodes(long long id, shared_ptr<PB::Int32Data> areaId, shared_ptr<s2s::NodeData_Array> nodeArray);
 	private:
 		int mServiceIndex;
-		class NetWorkManager * mNetWorkManager;
+		class NetWorkManager *mNetWorkManager;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
 		std::unordered_map<long long, ServiceNode *> mServiceNodeMap;
 	};
