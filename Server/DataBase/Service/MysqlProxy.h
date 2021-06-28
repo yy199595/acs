@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Service/LocalService.h>
 namespace SoEasy
 {
@@ -7,13 +7,11 @@ namespace SoEasy
     public:
         MysqlProxy();
         ~MysqlProxy() {}
-
-    public:
-        
-        XCode Insert(shared_ptr<Message> requestData);
-        XCode Update(shared_ptr<Message> requestData);
-        XCode Delete(shared_ptr<Message> requestData);
-        XCode Query(shared_ptr<Message> requestData, shared_ptr<Message> responseData);
+    public:     
+        XCode Insert( Message & requestData);
+        XCode Update( Message & requestData);
+        XCode Delete( Message & requestData);
+        XCode Query( Message & requestData, Message & responseData);
     public:
         bool OnInit() final;
     private:

@@ -21,6 +21,9 @@
     <Filter Include="Script">
       <UniqueIdentifier>{53b36b0e-a566-4d45-9d98-22f86fd680bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Service">
+      <UniqueIdentifier>{e2b769b4-d33c-4b1a-b0b5-87096b5d5016}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="MysqlClient\MysqlDeleteTask.cpp">
       <Filter>MysqlClient</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\MysqlProxy.cpp">
+      <Filter>Service</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlDeleteTask.h">
       <Filter>MysqlClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\MysqlProxy.h">
+      <Filter>Service</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

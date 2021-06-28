@@ -38,7 +38,6 @@
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
-    <ClCompile Include="NetWork\ActionScheduler.cpp" />
     <ClCompile Include="NetWork\RemoteActionProxy.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
@@ -52,6 +51,7 @@
     <ClCompile Include="Other\ObjectFactory.cpp" />
     <ClCompile Include="Other\ServiceNode.cpp" />
     <ClCompile Include="Other\TimeRecorder.cpp" />
+    <ClCompile Include="Pool\ProtocolPool.cpp" />
     <ClCompile Include="Script\BindLuaFunction.cpp" />
     <ClCompile Include="Script\ClassNameProxy.cpp" />
     <ClCompile Include="Script\ClassProxyHelper.cpp" />
@@ -114,7 +114,6 @@
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />
-    <ClInclude Include="NetWork\ActionScheduler.h" />
     <ClInclude Include="NetWork\RemoteActionProxy.h" />
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />
@@ -130,6 +129,8 @@
     <ClInclude Include="Other\ObjectFactory.h" />
     <ClInclude Include="Other\ServiceNode.h" />
     <ClInclude Include="Other\TimeRecorder.h" />
+    <ClInclude Include="Pool\ObjectPool.h" />
+    <ClInclude Include="Pool\ProtocolPool.h" />
     <ClInclude Include="Script\BindLuaFunction.h" />
     <ClInclude Include="Script\ClassMateProxy.h" />
     <ClInclude Include="Script\ClassNameProxy.h" />

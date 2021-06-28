@@ -145,6 +145,7 @@
     <ClCompile Include="RedisClient\RedisTaskAction.cpp" />
     <ClCompile Include="RedisClient\RedisTaskBase.cpp" />
     <ClCompile Include="Script\MysqlExtension.cpp" />
+    <ClCompile Include="Service\MysqlProxy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="RedisClient\RedisTaskAction.h" />
     <ClInclude Include="RedisClient\RedisTaskBase.h" />
     <ClInclude Include="Script\MysqlExtension.h" />
+    <ClInclude Include="Service\MysqlProxy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

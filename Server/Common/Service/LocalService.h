@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include"ServiceBase.h"
 #include<NetWork/NetWorkAction.h>
@@ -20,13 +20,16 @@ namespace SoEasy
 
 		bool BindFunction(std::string name, LocalAction1 action);
 
-		bool BindFunction(std::string name, MysqlOperAction action);
+		bool Bind(std::string name, MysqlOperAction action);
 
-		bool BindFunction(std::string name, MysqlQueryAction action);
+		bool Bind(std::string name, MysqlQueryAction action);
 
 
 		template<typename T1>
 		bool BindFunction(std::string name, LocalAction2<T1> action);
+
+		template<typename T1>
+		bool BindFunction(std::string name, LocalAction4<T1> action);
 
 		template<typename T1, typename T2>
 		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
@@ -46,6 +49,13 @@ namespace SoEasy
 	inline bool LocalService::BindFunction(std::string name, LocalAction2<T1> action)
 	{
 		typedef LocalActionProxy2<T1> ActionProxyType;
+		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
+	}
+
+	template<typename T1>
+	inline bool LocalService::BindFunction(std::string name, LocalAction4<T1> action)
+	{
+		typedef LocalActionProxy4<T1> ActionProxyType;
 		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
 	}
 

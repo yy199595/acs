@@ -1,5 +1,5 @@
 ﻿#include"LocalLuaService.h"
-#include<Other/ObjectFactory.h>
+#include<Pool/ProtocolPool.h>
 #include<Manager/ScriptManager.h>
 namespace SoEasy
 {
@@ -78,13 +78,15 @@ namespace SoEasy
 		{
 			if (!reqData->protocname().empty())
 			{
-				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protocname());
+				ProtocolPool * pool = ProtocolPool::Get();
+				Message * message = pool->Create(reqData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
 					ProtocHelper::GetJsonString(message, json);
 					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
 				}
+				pool->Destory(message);
 			}
 			else
 			{
@@ -125,13 +127,15 @@ namespace SoEasy
 		{
 			if (!reqData->protocname().empty())
 			{
-				Message * message = ObjectFactory::Get()->CreateMessage(reqData->protocname());
+				ProtocolPool * pool = ProtocolPool::Get();
+				Message * message = pool->Create(reqData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
 					ProtocHelper::GetJsonString(message, json);
 					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
 				}
+				pool->Destory(message);
 			}
 			else
 			{

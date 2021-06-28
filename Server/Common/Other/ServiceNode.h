@@ -26,16 +26,17 @@ namespace SoEasy
 
 	public:
 		std::string GetJsonString();
-		XCode Notice(const std::string &service, const std::string &method, const shared_ptr<Message> request = nullptr); //不回应
+		XCode Notice(const std::string &service, const std::string &method); //不回应
+		XCode Notice(const std::string &service, const std::string &method, const Message & request); //不回应
 	public:
 		XCode Invoke(const std::string &service, const std::string &method);
-		XCode Invoke(const std::string &service, const std::string &method, const shared_ptr<Message> request);
+		XCode Invoke(const std::string &service, const std::string &method, const Message & request);
 	public: // c++ 使用
-		XCode Call(const std::string &service, const std::string &method, shared_ptr<Message> &response);
-		XCode Call(const std::string &service, const std::string &method, const shared_ptr<Message> request, shared_ptr<Message> &response);
+		XCode Call(const std::string &service, const std::string &method, Message &response);
+		XCode Call(const std::string &service, const std::string &method, const Message & request, Message &response);
 	public: // lua使用
 		void PushMessageData(SharedPacket messageData);
-		void PushMessageData(const std::string &service, const std::string &method, const shared_ptr<Message> request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
+		void PushMessageData(const std::string &service, const std::string &method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
 
 	private:
 		const std::string mAddress;		  //监听地址

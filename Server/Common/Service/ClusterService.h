@@ -20,8 +20,8 @@ namespace SoEasy
 	private:
 		void StarRegisterNode();
 	private:
-		XCode DelNode(long long, shared_ptr<Int32Data> node);
-		XCode AddNode(long long, shared_ptr<s2s::NodeData_NodeInfo> nodeInfo);
+		XCode DelNode(long long, const Int32Data & node);
+		XCode AddNode(long long, const s2s::NodeData_NodeInfo & nodeInfo);
 	private:
 		short mAreaId;
 		short mNodeId;

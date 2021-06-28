@@ -1,6 +1,5 @@
 ﻿#include "ClusterService.h"
 #include <Manager/ServiceManager.h>
-#include <NetWork/ActionScheduler.h>
 #include <Manager/ServiceNodeManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Service/ProxyService.h>
@@ -46,7 +45,7 @@ namespace SoEasy
 		{
 			registerInfo.add_services()->assign(name);
 		}
-		XCode code = centerNode->Call("ServiceRegistry", "RegisterNode", &registerInfo);
+		XCode code = centerNode->Invoke("ServiceRegistry", "RegisterNode", registerInfo);
 		if (code != XCode::Successful)
 		{
 			SayNoDebugLog("register local service node fail");
@@ -55,27 +54,27 @@ namespace SoEasy
 		SayNoDebugLog("register local service node successful");
 	}
 
-	XCode ClusterService::DelNode(long long, shared_ptr<Int32Data> serviceData)
+	XCode ClusterService::DelNode(long long, const Int32Data & serviceData)
 	{
-		const int nodeId = serviceData->data();
+		const int nodeId = serviceData.data();
 		bool res = this->mServiceNodeManager->DelServiceNode(nodeId);
 		return nodeId ? XCode::Successful : XCode::Failure;
 	}
 
-	XCode ClusterService::AddNode(long long, shared_ptr<s2s::NodeData_NodeInfo> nodeInfo)
+	XCode ClusterService::AddNode(long long, const s2s::NodeData_NodeInfo & nodeInfo)
 	{
-		const int nodeId = nodeInfo->nodeid();
+		const int nodeId = nodeInfo.nodeid();
 		ServiceNode *serviceNode = this->mServiceNodeManager->GetServiceNode(nodeId);
 		if (serviceNode == nullptr)
 		{
-			const int areaId = nodeInfo->areaid();
-			const std::string &name = nodeInfo->servername();
-			const std::string &address = nodeInfo->address();
+			const int areaId = nodeInfo.areaid();
+			const std::string &name = nodeInfo.servername();
+			const std::string &address = nodeInfo.address();
 			serviceNode = new ServiceNode(areaId, nodeId, name, address);
 		}
-		for (int index = 0; index < nodeInfo->services_size(); index++)
+		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
-			const std::string &service = nodeInfo->services(index);
+			const std::string &service = nodeInfo.services(index);
 			serviceNode->AddService(service);
 		}
 		// 通知所有服务

@@ -1,4 +1,4 @@
-#include "MysqlProxy.h"
+﻿#include "MysqlProxy.h"
 #include <Other/ServiceNode.h>
 #include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
@@ -19,31 +19,30 @@ namespace SoEasy
     {
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-
-        this->BindFunction("MysqlProxy.Insert", std::bind(&MysqlProxy::Insert, this, args1));
-        this->BindFunction("MysqlProxy.Update", std::bind(&MysqlProxy::Update, this, args1));
-        this->BindFunction("MysqlProxy.Delete", std::bind(&MysqlProxy::Delete, this, args1));
-        this->BindFunction("MysqlProxy.Query", std::bind(&MysqlProxy::Query, this, args1, args2));
+        this->Bind("MysqlProxy.Insert", MysqlOperAction(std::bind(&MysqlProxy::Insert, this, args1)));
+        this->Bind("MysqlProxy.Update", MysqlOperAction(std::bind(&MysqlProxy::Update, this, args1)));
+        this->Bind("MysqlProxy.Delete", MysqlOperAction(std::bind(&MysqlProxy::Delete, this, args1)));
+        this->Bind("MysqlProxy.Query", MysqlQueryAction(std::bind(&MysqlProxy::Query, this, args1, args2)));
         return true;
     }
 
-    XCode MysqlProxy::Query(shared_ptr<Message> requestData, shared_ptr<Message> responseData)
+    XCode MysqlProxy::Query(Message & requestData, Message & responseData)
     {
         auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
-        XCode startCode = this->mMysqlManager->StartTask(insertTask, responseData);
+        XCode startCode = this->mMysqlManager->StartTask(insertTask, &responseData);
         if (startCode != XCode::Successful)
         {
-            responseData->Clear();
+            responseData.Clear();
             return startCode;
         }
         this->mCorManager->YieldReturn();
         return insertTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::Insert(shared_ptr<Message> requestData)
+    XCode MysqlProxy::Insert(Message & requestData)
     {
         auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
-        XCode startCode = this->mMysqlManager->StartTask(insertTask, requestData);
+        XCode startCode = this->mMysqlManager->StartTask(insertTask, &requestData);
         if (startCode != XCode::Successful)
         {
             return startCode;
@@ -51,10 +50,10 @@ namespace SoEasy
         this->mCorManager->YieldReturn();
         return insertTask->GetErrorCode();
     }
-    XCode MysqlProxy::Update(shared_ptr<Message> requestData)
+    XCode MysqlProxy::Update(Message & requestData)
     {
         auto updateTask = this->mMysqlManager->CreateMysqlTask<MysqlUpdateTask>();
-        XCode startCode = this->mMysqlManager->StartTask(updateTask, requestData);
+        XCode startCode = this->mMysqlManager->StartTask(updateTask, &requestData);
         if (startCode != XCode::Successful)
         {
             return startCode;
@@ -62,10 +61,10 @@ namespace SoEasy
         this->mCorManager->YieldReturn();
         return updateTask->GetErrorCode();
     }
-    XCode MysqlProxy::Delete(shared_ptr<Message> requestData)
+    XCode MysqlProxy::Delete(Message & requestData)
     {
         auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
-        XCode startCode = this->mMysqlManager->StartTask(deleteTask, requestData);
+        XCode startCode = this->mMysqlManager->StartTask(deleteTask, &requestData);
         if (startCode != XCode::Successful)
         {
             return startCode;

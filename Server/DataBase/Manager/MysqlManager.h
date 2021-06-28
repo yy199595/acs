@@ -45,13 +45,7 @@ namespace SoEasy
 	public:
 		template <typename T>
 		shared_ptr<T> CreateMysqlTask();
-		XCode StartTask(shared_ptr<MysqlTaskBase> task, shared_ptr<Message> messageData);
-	public:
-		bool QueryData(shared_ptr<Message> data);
-		bool InsertData(const shared_ptr<Message> data);
-		bool UpdateData(const shared_ptr<Message> data);
-		bool DeleteData(const shared_ptr<Message> data);
-
+		XCode StartTask(shared_ptr<MysqlTaskBase> task, Message * messageData);
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;

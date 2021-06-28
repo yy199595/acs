@@ -23,14 +23,8 @@ namespace SoEasy
 	public:
 		template<typename T>
 		bool RegisterObject();
-	public:
-		Message * CreateMessage(const std::string & name);
-		shared_ptr<Message> CreateShareMessage(const std::string & name);
 	private:
 		size_t mQueueCount;
-	private:
-		std::unordered_map<std::string, Message *> mMessageMap;
-	public:
 		std::unordered_map<std::string, CreateAction> mRegisterClassMap;
 	};
 	template<typename ...Args>

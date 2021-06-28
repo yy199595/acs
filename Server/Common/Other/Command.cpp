@@ -1,8 +1,7 @@
-#include"Command.h"
+﻿#include"Command.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<Service/ServiceBase.h>
-#include<Other/ObjectFactory.h>
 #include<Util/ProtocHelper.h>
 #include<google/protobuf/util/json_util.h>
 namespace SoEasy
@@ -45,18 +44,6 @@ namespace SoEasy
 			std::string returnData = "not find service : " + service;
 			this->mCommandManager->AddCommandBackArgv(address, XCode::Failure, returnData);
 			return;
-		}
-		Message * message = ObjectFactory::Get()->CreateMessage(protoc);
-		if (message == nullptr)
-		{
-			std::string returnData = "not find ptotoc : " + protoc;
-			this->mCommandManager->AddCommandBackArgv(address, XCode::Failure, returnData);
-			return;
-		}
-		if (!util::JsonStringToMessage(json, message).ok())
-		{
-			std::string returnData = "parse argv error : " + json;
-			this->mCommandManager->AddCommandBackArgv(address, XCode::Failure, returnData);
 		}
 	}
 }

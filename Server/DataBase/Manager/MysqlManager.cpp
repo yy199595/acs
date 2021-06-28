@@ -106,7 +106,7 @@ namespace SoEasy
 		return taskAction->GetInvokeData();
 	}
 
-	XCode MysqlManager::StartTask(shared_ptr<MysqlTaskBase> task, shared_ptr<Message> messageData)
+	XCode MysqlManager::StartTask(shared_ptr<MysqlTaskBase> task, Message * messageData)
 	{
 		if(this->mCoroutineManager->IsInMainCoroutine())
 		{
@@ -126,126 +126,9 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	bool MysqlManager::InsertData(const shared_ptr<Message> data)
-	{
-		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlInsertTask> taskAction = make_shared<MysqlInsertTask>(this, taskActionId, this->mDataBaseName);
-
-		std::string table;
-		if (!this->GetTableName(data->GetTypeName(), table))
-		{
-			SayNoDebugError(data->GetTypeName() << " not found sql table");
-			return false;
-		}
-		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-
-		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
-		this->mCoroutineManager->YieldReturn();
-
-		return taskAction->GetErrorCode() == XCode::Successful;
-	}
-
-	bool MysqlManager::QueryData(shared_ptr<Message> data)
-	{
-		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlQueryTask> taskAction = make_shared<MysqlQueryTask>(this, taskActionId, this->mDataBaseName);
-
-		std::string table;
-		if (!this->GetTableName(data->GetTypeName(), table))
-		{
-			SayNoDebugError(data->GetTypeName() << " not found sql table");
-			return false;
-		}
-
-		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-
-		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
-		this->mCoroutineManager->YieldReturn();
-		return taskAction->GetErrorCode() == XCode::Successful;
-	}
-
-	bool MysqlManager::UpdateData(const shared_ptr<Message> data)
-	{
-		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
-
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlUpdateTask> taskAction = make_shared<MysqlUpdateTask>(this, taskActionId, this->mDataBaseName);
-
-		std::string table;
-		if (!this->GetTableName(data->GetTypeName(), table))
-		{
-			SayNoDebugError(data->GetTypeName() << " not found sql table");
-			return false;
-		}
-
-		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-
-		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
-
-		this->mCoroutineManager->YieldReturn();
-		return taskAction->GetErrorCode() == XCode::Successful;
-	}
-
-	bool MysqlManager::DeleteData(const shared_ptr<Message> data)
-	{
-		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
-
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlDeleteTask> taskAction = make_shared<MysqlDeleteTask>(this, taskActionId, this->mDataBaseName);
-
-		std::string table;
-		if (!this->GetTableName(data->GetTypeName(), table))
-		{
-			SayNoDebugError(data->GetTypeName() << " not found sql table");
-			return false;
-		}
-
-		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-
-		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
-
-		this->mCoroutineManager->YieldReturn();
-		return taskAction->GetErrorCode() == XCode::Successful;
-	}
-
 	void MysqlManager::OnInitComplete()
 	{
-		this->mCoroutineManager->Start("new", [this]()
-									   {
-										   shared_ptr<db::UserAccountData> accountData = make_shared<db::UserAccountData>();
-										   accountData->set_account("646585122@qq.com");
-										   accountData->set_userid(420625199511045331);
-										   accountData->set_passwd("199595yjz");
-										   accountData->set_devicemac("ios_qq");
-										   accountData->set_registertime(19959595);
-
-										   if (this->InsertData(accountData))
-										   {
-											   SayNoDebugWarning("insert data successful " << accountData->DebugString());
-											   accountData->set_passwd("yjz199595");
-											   accountData->set_lastlogintime(123456);
-											   accountData->set_devicemac("ios_wrchat");
-											   if (this->UpdateData(accountData))
-											   {
-												   SayNoDebugWarning("update data successful " << accountData->DebugString());
-											   }
-
-											   shared_ptr<db::UserAccountData> queryData = make_shared<db::UserAccountData>();
-											   queryData->set_account("646585122@qq.com");
-											   queryData->set_userid(420625199511045331);
-											   if (this->QueryData(queryData))
-											   {
-												   SayNoDebugInfo("query data successful \n"
-																  << queryData->Utf8DebugString());
-											   }
-											   if (this->DeleteData(queryData))
-											   {
-												   SayNoDebugError("delete data successful");
-											   }
-										   }
-									   });
+		
 	}
 
 	void MysqlManager::PushClassToLua(lua_State *luaEnv)

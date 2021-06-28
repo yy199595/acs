@@ -5,10 +5,10 @@ namespace SoEasy
 	MysqlInsertTask::MysqlInsertTask(MysqlManager * mgr, long long id, const std::string & db)
 		: MysqlTaskBase(mgr, id, db)
 	{
-		
+		this->mData = nullptr;
 	}
 
-	bool MysqlInsertTask::InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data)
+	bool MysqlInsertTask::InitTask(const std::string tab, CoroutineManager * corMgr, Message * data)
 	{	
 		if (!corMgr->IsInMainCoroutine())
 		{

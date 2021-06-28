@@ -37,8 +37,8 @@ namespace SoEasy
 
 	private:
 		void NoticeNode(int areaId);
-		XCode RegisterNode(long long id, shared_ptr<s2s::NodeRegister_Request> nodeInfo);
-		XCode QueryNodes(long long id, shared_ptr<PB::Int32Data> areaId, shared_ptr<s2s::NodeData_Array> nodeArray);
+		XCode RegisterNode(long long id, const s2s::NodeRegister_Request & nodeInfo);
+		XCode QueryNodes(long long id, const PB::Int32Data & areaId, s2s::NodeData_Array & nodeArray);
 	private:
 		int mServiceIndex;
 		class NetWorkManager *mNetWorkManager;

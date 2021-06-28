@@ -1,7 +1,7 @@
 ﻿#include"NetWorkRetAction.h"
 #include<Util/TimeHelper.h>
 #include<Util/ProtocHelper.h>
-#include<Other/ObjectFactory.h>
+#include<Pool/ProtocolPool.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
@@ -19,13 +19,16 @@ namespace SoEasy
 		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
-			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
+			ProtocolPool * pool = ProtocolPool::Get();
+			Message * pMessage = pool->Create(name);
 			if (pMessage != nullptr && pMessage->ParseFromString(message))
 			{
 				this->mBindLuaAction->Inovke(code, pMessage);
+				pool->Destory(pMessage);
 				return;
 			}
 			this->mBindLuaAction->Inovke(code, message);
+			pool->Destory(pMessage);
 			return;
 		}
 		this->mBindLuaAction->Inovke(code);
@@ -53,13 +56,16 @@ namespace SoEasy
 		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
-			Message * pMessage = ObjectFactory::Get()->CreateMessage(name);
+			ProtocolPool * pool = ProtocolPool::Get();
+			Message * pMessage = pool->Create(name); 
 			if (pMessage != nullptr && pMessage->ParseFromString(message))
 			{
 				this->mBindLuaAction->Inovke(code, pMessage);
+				pool->Destory(pMessage);
 				return;
 			}
 			this->mBindLuaAction->Inovke(code, message);
+			pool->Destory(pMessage);
 			return;
 		}
 		this->mBindLuaAction->Inovke(code);

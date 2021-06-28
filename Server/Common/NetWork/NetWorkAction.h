@@ -3,7 +3,7 @@
 #include "TcpClientSession.h"
 #include <Protocol/com.pb.h>
 #include <Other/ObjectFactory.h>
-
+#include<Pool/ObjectPool.h>
 using namespace PB;
 namespace SoEasy
 {
@@ -13,13 +13,16 @@ namespace SoEasy
 	using LocalAction1 = std::function<XCode(long long)>;
 
 	template <typename T>
-	using LocalAction2 = std::function<XCode(long long, shared_ptr<T>)>;
+	using LocalAction2 = std::function<XCode(long long, const T &)>;
 
 	template <typename T1, typename T2>
-	using LocalAction3 = std::function<XCode(long long, shared_ptr<T1>, shared_ptr<T2>)>;
+	using LocalAction3 = std::function<XCode(long long, const T1 &, T2 &)>;
 
-	using MysqlOperAction = std::function<XCode(shared_ptr<Message>)>;
-	using MysqlQueryAction = std::function<XCode(shared_ptr<Message>, shared_ptr<Message>)>;
+	template <typename T>
+	using LocalAction4 = std::function<XCode(long long, T &)>;
+
+	using MysqlOperAction = std::function<XCode(Message &)>;
+	using MysqlQueryAction = std::function<XCode(Message &, Message &)>;
 
 	class LocalActionProxy
 	{
@@ -38,7 +41,7 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	class LocalActionProxy1 : public LocalActionProxy
+	class LocalActionProxy1 : public LocalActionProxy // 无参数 无返回
 	{
 	public:
 		LocalActionProxy1(LocalAction1 action, std::string &name)
@@ -86,7 +89,7 @@ namespace SoEasy
 namespace SoEasy
 {
 	template <typename T1>
-	class LocalActionProxy2 : public LocalActionProxy
+	class LocalActionProxy2 : public LocalActionProxy //有参数 无返回
 	{
 	public:
 		LocalActionProxy2(LocalAction2<T1> action, std::string &name) : LocalActionProxy(name), mBindAction(action) {}
@@ -96,35 +99,34 @@ namespace SoEasy
 
 	private:
 		std::string mMessageBuffer;
-		shared_ptr<T1> mRequestData;
 		LocalAction2<T1> mBindAction;
+		ObjectPool<T1> mRequestPool;
 	};
 
 	template <typename T1>
-	inline XCode LocalActionProxy2<T1>::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
+	inline XCode LocalActionProxy2<T1>::Invoke(const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage)
 	{
-		mRequestData = std::make_shared<T1>();
-		const long long operId = requestData->entityid();
-		const std::string &name = requestData->protocname();
-		const long long callbackId = requestData->rpcid();
-		const std::string &message = requestData->messagedata();
-		if (!message.empty() && !name.empty())
+		const long long operId = requestMessage->entityid();
+		const long long callbackId = requestMessage->rpcid();
+		const std::string &message = requestMessage->messagedata();
+
+		T1 * mRequestData = this->mRequestPool.Create();
+		if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
 		{
-			if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
-			{
-				SayNoDebugError("parse proto fail : " << name);
-				return XCode::ParseMessageError;
-			}
-			return this->mBindAction(operId, mRequestData);
+			this->mRequestPool.Destory(mRequestData);
+			SayNoDebugError("parse proto fail : " << mRequestData->GetTypeName());
+			return XCode::ParseMessageError;
 		}
-		return XCode::Failure;
+		XCode code = this->mBindAction(operId, *mRequestData);
+		this->mRequestPool.Destory(mRequestData);
+		return code;
 	}
 }
 
 namespace SoEasy
 {
 	template <typename T1, typename T2>
-	class LocalActionProxy3 : public LocalActionProxy
+	class LocalActionProxy3 : public LocalActionProxy //一个参数 一个返回
 	{
 	public:
 		LocalActionProxy3(LocalAction3<T1, T2> action, std::string &name)
@@ -135,55 +137,58 @@ namespace SoEasy
 
 	private:
 		std::string mMessageBuffer;
-		shared_ptr<T2> mReturnData;
-		shared_ptr<T1> mRequestData;
+		ObjectPool<T1> mRequestDataPool;
+		ObjectPool<T2> mResponseDataPool;
 		LocalAction3<T1, T2> mBindAction;
 	};
 	template <typename T1, typename T2>
-	inline XCode LocalActionProxy3<T1, T2>::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
+	inline XCode LocalActionProxy3<T1, T2>::Invoke(const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage)
 	{
-		mRequestData = make_shared<T1>();
-		const long long operId = requestData->entityid();
-		const std::string &name = requestData->protocname();
-		const std::string &message = requestData->messagedata();
-		if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
+		T1 * requestData = this->mRequestDataPool.Create();
+		const long long operId = requestMessage->entityid();
+		const std::string &message = requestMessage->messagedata();
+		if (!requestData->ParseFromArray(message.c_str(), message.size()))
 		{
-			SayNoDebugError("parse proto fail : " << mRequestData->GetTypeName());
+			this->mRequestDataPool.Destory(requestData);
+			SayNoDebugError("parse proto fail : " << requestData->GetTypeName());
 			return XCode::ParseMessageError;
 		}
-		mReturnData = make_shared<T2>();
-		XCode code = this->mBindAction(operId, mRequestData, mReturnData);
-		if (mReturnData->SerializePartialToString(&mMessageBuffer))
+		T2 * responseData = this->mResponseDataPool.Create();
+		XCode code = this->mBindAction(operId, *requestData, *responseData);
+		if (responseData->SerializePartialToString(&mMessageBuffer))
 		{
-			returnData->set_messagedata(mMessageBuffer);
-			returnData->set_protocname(mReturnData->GetTypeName());
+			responseMessage->set_messagedata(mMessageBuffer);
+			responseMessage->set_protocname(responseData->GetTypeName());
 		}
+		this->mRequestDataPool.Destory(requestData);
+		this->mResponseDataPool.Destory(responseData);
 		return code;
 	}
 }
 
-//namespace SoEasy
-//{
-//	template<typename T1>
-//	class NetWorkActionBox4 : public LocalActionProxy
-//	{
-//	public:
-//		NetWorkActionBox4(NetWorkAction4<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action) { }
-//		XCode Invoke(shared_ptr<TcpClientSession>session, const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override
-//		{
-//			mReturnData = make_shared<T1>();
-//			const long long operId = requestData->operator_id();
-//			XCode code = this->mBindAction(session, operId, mReturnData);
-//			if (mReturnData->SerializePartialToString(&mMessageBuffer))
-//			{
-//				returnData->set_message_data(mMessageBuffer);
-//				returnData->set_protoc_name(mReturnData->GetTypeName());
-//			}
-//			return code;
-//		}
-//	private:
-//		std::string mMessageBuffer;
-//		shared_ptr<T1> mReturnData;
-//		NetWorkAction4<T1> mBindAction;
-//	};
-//}
+namespace SoEasy
+{
+	template<typename T1>
+	class LocalActionProxy4 : public LocalActionProxy //无参数 一个返回
+	{
+	public:
+		LocalActionProxy4(LocalAction4<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action) { }
+		XCode Invoke(shared_ptr<TcpClientSession>session, const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage) override
+		{
+			T1 * responseData = mResponseDataPool.Create();
+			const long long operId = requestMessage->entityid();
+			XCode code = this->mBindAction(session, operId, *responseData);
+			if (responseData->SerializePartialToString(&mMessageBuffer))
+			{
+				responseMessage->set_messagedata(mMessageBuffer);
+				responseMessage->set_protocname(responseData->GetTypeName());
+			}
+			this->mResponseDataPool.Destory(responseData);
+			return code;
+		}
+	private:
+		std::string mMessageBuffer;
+		LocalAction4<T1> mBindAction;
+		ObjectPool<T1> mResponseDataPool;
+	};
+}

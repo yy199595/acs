@@ -22,8 +22,8 @@ namespace SoEasy
 		{
 			std::string ip;
 			unsigned short port;
-			StringHelper::ParseIpAddress(address, ip, port);
-			this->mNodeTcpSession = make_shared<TcpClientSession>(this->mServiceManager, name, ip, port);
+			StringHelper::ParseIpAddress(address, ip, port);	
+			this->mNodeTcpSession = this->mServiceManager->CreateTcpSession(name, ip, port);
 		}
 		this->mNodeInfoMessage.Clear();
 		this->mNodeInfoMessage.set_areaid(areaId);
@@ -70,7 +70,7 @@ namespace SoEasy
 		return json;
 	}
 
-	XCode ServiceNode::Notice(const std::string & service, const std::string & method, const shared_ptr<Message> request)
+	XCode ServiceNode::Notice(const std::string & service, const std::string & method)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -80,7 +80,21 @@ namespace SoEasy
 		{
 			return XCode::CallServiceNotFound;
 		}
-		this->PushMessageData(service, method, request);
+		this->PushMessageData(service, method);
+		return XCode::Successful;
+	}
+
+	XCode ServiceNode::Notice(const std::string & service, const std::string & method, const Message & request)
+	{
+		if (service.empty() || method.empty())
+		{
+			return XCode::CallArgsError;
+		}
+		if (this->HasService(service) == false)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		this->PushMessageData(service, method, &request);
 		return XCode::Successful;
 	}
 
@@ -104,7 +118,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Call(const std::string & service, const std::string & method, shared_ptr<Message> & response)
+	XCode ServiceNode::Call(const std::string & service, const std::string & method, Message & response)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -119,7 +133,7 @@ namespace SoEasy
 		{
 			this->PushMessageData(service, method, nullptr, rpcCallback);
 			this->mCorManager->YieldReturn();
-			if (response->ParseFromString(rpcCallback->GetMsgData()))
+			if (response.ParseFromString(rpcCallback->GetMsgData()))
 			{
 				return rpcCallback->GetCode();
 			}
@@ -128,7 +142,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Invoke(const std::string & service, const std::string & method, const shared_ptr<Message> request)
+	XCode ServiceNode::Invoke(const std::string & service, const std::string & method, const Message & request)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -141,14 +155,14 @@ namespace SoEasy
 		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
-			this->PushMessageData(service, method, request, rpcCallback);
+			this->PushMessageData(service, method, &request, rpcCallback);
 			this->mCorManager->YieldReturn();
 			return rpcCallback->GetCode();
 		}
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Call(const std::string & service, const std::string & method, const shared_ptr<Message> request, shared_ptr<Message> & response)
+	XCode ServiceNode::Call(const std::string & service, const std::string & method, const Message & request, Message & response)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -161,9 +175,9 @@ namespace SoEasy
 		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
-			this->PushMessageData(service, method, request, rpcCallback);
+			this->PushMessageData(service, method, &request, rpcCallback);
 			this->mCorManager->YieldReturn();
-			if (response->ParseFromString(rpcCallback->GetMsgData()))
+			if (response.ParseFromString(rpcCallback->GetMsgData()))
 			{
 				return rpcCallback->GetCode();
 			}
@@ -176,7 +190,6 @@ namespace SoEasy
 	{
 		if (!this->mNodeTcpSession->IsActive())
 		{
-			this->mNodeTcpSession->StartConnect();
 			this->mMessageQueue.push(messageData);
 		}
 		else
@@ -186,7 +199,7 @@ namespace SoEasy
 		}
 	}
 
-	void ServiceNode::PushMessageData(const std::string & service, const std::string & method, const shared_ptr<Message> request, shared_ptr<LocalRetActionProxy> rpcReply)
+	void ServiceNode::PushMessageData(const std::string & service, const std::string & method, const Message * request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
 		shared_ptr<PB::NetWorkPacket> msgData = make_shared<PB::NetWorkPacket>();
 		if (msgData != nullptr)
@@ -199,7 +212,7 @@ namespace SoEasy
 					msgData->set_messagedata(messagdData);
 					msgData->set_protocname(request->GetTypeName());
 				}
-			}
+			}		
 			msgData->set_method(method);
 			msgData->set_service(service);
 			msgData->set_rpcid(this->mActionManager->AddCallback(rpcReply));

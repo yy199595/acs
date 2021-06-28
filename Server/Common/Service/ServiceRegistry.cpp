@@ -3,7 +3,6 @@
 #include <Util/StringHelper.h>
 #include <Core/TcpSessionListener.h>
 #include <Manager/NetWorkManager.h>
-#include <NetWork/ActionScheduler.h>
 #include <Coroutine/CoroutineManager.h>
 
 #include <Other/ServiceNode.h>
@@ -35,11 +34,11 @@ namespace SoEasy
 	{
 	}
 
-	XCode ServiceRegistry::RegisterNode(long long id, shared_ptr<s2s::NodeRegister_Request> nodeInfo)
+	XCode ServiceRegistry::RegisterNode(long long id, const s2s::NodeRegister_Request & nodeInfo)
 	{
-		const int areaId = nodeInfo->areaid();
-		const int nodeId = nodeInfo->nodeid();
-		const std::string &address = nodeInfo->address();
+		const int areaId = nodeInfo.areaid();
+		const int nodeId = nodeInfo.nodeid();
+		const std::string &address = nodeInfo.address();
 		SharedTcpSession tcpSession = this->GetCurTcpSession();
 		long long key = (long long)areaId << 32 | nodeId;
 		auto iter = this->mServiceNodeMap.find(key);
@@ -48,9 +47,9 @@ namespace SoEasy
 			return XCode::Failure;
 		}
 		ServiceNode *serviceNode = new ServiceNode(areaId, nodeId, address, tcpSession->GetAddress());
-		for (int index = 0; index < nodeInfo->services_size(); index++)
+		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
-			serviceNode->AddService(nodeInfo->services(index));
+			serviceNode->AddService(nodeInfo.services(index));
 		}
 		SayNoDebugInfo(serviceNode->GetJsonString());
 		this->mServiceNodeMap.emplace(key, serviceNode);
@@ -59,16 +58,16 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	XCode ServiceRegistry::QueryNodes(long long id, shared_ptr<PB::Int32Data> areaData, shared_ptr<s2s::NodeData_Array> nodeArray)
+	XCode ServiceRegistry::QueryNodes(long long id, const PB::Int32Data & areaData, s2s::NodeData_Array & nodeArray)
 	{
-		const int areaId = areaData->data();
+		const int areaId = areaData.data();
 		auto iter = this->mServiceNodeMap.begin();
 		for (; iter != this->mServiceNodeMap.end(); iter++)
 		{
 			ServiceNode *serviceNode = iter->second;
 			if (serviceNode->GetAreaId() == areaId)
 			{
-				s2s::NodeData_NodeInfo *nodeData = nodeArray->add_nodearray();
+				s2s::NodeData_NodeInfo *nodeData = nodeArray.add_nodearray();
 				const s2s::NodeData_NodeInfo &nodeInfo = serviceNode->GetNodeMessage();
 				nodeData->CopyFrom(nodeInfo);
 			}
@@ -86,7 +85,7 @@ namespace SoEasy
 			if (serviceNode->GetAreaId() == areaId || serviceNode->GetAreaId() == 0)
 			{
 				const s2s::NodeData_NodeInfo &nodeInfo = serviceNode->GetNodeMessage();
-				serviceNode->Notice("ClusterService", "AddNode", &nodeInfo);
+				serviceNode->Notice("ClusterService", "AddNode", nodeInfo);
 			}
 		}
 	}

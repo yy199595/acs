@@ -15,7 +15,7 @@ namespace SoEasy
 		virtual ~ActionManager() { }
 	public:
 		long long AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-		bool AddActionArgv(int id, shared_ptr<NetWorkPacket> messageData);	
+		bool AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData);	
 	protected:
 		bool OnInit() override;
 		void OnSystemUpdate() final;					//处理系统事件

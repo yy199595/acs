@@ -1,4 +1,4 @@
-#include"TcpClientSession.h"
+﻿#include"TcpClientSession.h"
 #include<Core/Applocation.h>
 #include<Util/StringHelper.h>
 #include<Manager/SessionManager.h>
@@ -135,7 +135,8 @@ namespace SoEasy
 			if (code)
 			{
 				this->CloseSocket();
-				SayNoDebugWarning("Connect " << this->GetSessionName() << " fail count = " << this->mConnectCount << " error : " << code.message());
+				SayNoDebugWarning("Connect " << this->GetSessionName() 
+					<< " fail count = " << this->mConnectCount << " error : " << code.message());
 				return;
 			}
 			this->mConnectCount = 0;
@@ -152,6 +153,7 @@ namespace SoEasy
 		{
 			if (error_code)
 			{
+				SayNoDebugError(error_code.message());
 				this->CloseSocket();
 				return;
 			}

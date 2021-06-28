@@ -43,6 +43,9 @@
     <Filter Include="Service">
       <UniqueIdentifier>{e2767c4f-2396-4bdd-906f-4c00c1b66c2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pool">
+      <UniqueIdentifier>{c12b1b53-46c4-48d1-b320-98770009f9a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Applocation.cpp">
@@ -171,9 +174,6 @@
     <ClCompile Include="Timer\TimerBase.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\ActionScheduler.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
     <ClCompile Include="Timer\ActionTimeoutTimer.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
@@ -242,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="Manager\ServiceNodeManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Pool\ProtocolPool.cpp">
+      <Filter>Pool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,9 +413,6 @@
     <ClInclude Include="NetWork\RemoteActionProxy.h">
       <Filter>NetWork</Filter>
     </ClInclude>
-    <ClInclude Include="NetWork\ActionScheduler.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
     <ClInclude Include="Timer\ActionTimeoutTimer.h">
       <Filter>Timer</Filter>
     </ClInclude>
@@ -529,6 +529,12 @@
     </ClInclude>
     <ClInclude Include="Manager\ServiceNodeManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Pool\ObjectPool.h">
+      <Filter>Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Pool\ProtocolPool.h">
+      <Filter>Pool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

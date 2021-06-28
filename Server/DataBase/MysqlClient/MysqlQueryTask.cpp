@@ -7,10 +7,10 @@ namespace SoEasy
 	MysqlQueryTask::MysqlQueryTask(MysqlManager * mgr, long long id, const std::string & db)
 		:MysqlTaskBase(mgr, id, db)
 	{
-
+		this->mData = nullptr;
 	}
 
-	bool MysqlQueryTask::InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data)
+	bool MysqlQueryTask::InitTask(const std::string tab, CoroutineManager * corMgr, Message * data)
 	{
 		if (!corMgr->IsInMainCoroutine())
 		{
@@ -96,28 +96,28 @@ namespace SoEasy
 						const size_t size = iter1->value.GetStringLength();
 						if (str != nullptr && size > 0)
 						{
-							pReflection->SetString(mData.get(), fieldDesc, std::string(str, size));
+							pReflection->SetString(mData, fieldDesc, std::string(str, size));
 						}					
 					}
 					else if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
 					{
 						int value = iter1->value.GetInt();
-						pReflection->SetInt32(mData.get(), fieldDesc,value);
+						pReflection->SetInt32(mData, fieldDesc,value);
 					}					
 					else if (fieldDesc->type() == FieldDescriptor::TYPE_INT64)
 					{
 						long long value = iter1->value.GetInt64();
-						pReflection->SetInt64(mData.get(), fieldDesc, value);
+						pReflection->SetInt64(mData, fieldDesc, value);
 					}
 					else if (fieldDesc->type() == FieldDescriptor::TYPE_FLOAT)
 					{
 						float value = iter1->value.GetFloat();
-						pReflection->SetFloat(mData.get(), fieldDesc, value);
+						pReflection->SetFloat(mData, fieldDesc, value);
 					}
 					else if (fieldDesc->type() == FieldDescriptor::TYPE_DOUBLE)
 					{
 						double value = iter1->value.GetDouble();
-						pReflection->SetDouble(mData.get(), fieldDesc, value);
+						pReflection->SetDouble(mData, fieldDesc, value);
 					}
 				}
 			}

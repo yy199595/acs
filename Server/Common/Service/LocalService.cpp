@@ -116,12 +116,12 @@ namespace SoEasy
 		return true;
 	}
 
-	bool LocalService::BindFunction(std::string name, MysqlOperAction action)
+	bool LocalService::Bind(std::string name, MysqlOperAction action)
 	{
 		return this->BindFunction(name, make_shared<LocalMysqlActionProxy>(action, name));
 	}
 
-	bool LocalService::BindFunction(std::string name, MysqlQueryAction action)
+	bool LocalService::Bind(std::string name, MysqlQueryAction action)
 	{
 		return this->BindFunction(name, make_shared<LocalMysqlQueryActionProxy>(action, name));
 	}

@@ -38,12 +38,12 @@ namespace SoEasy
 		}
 	}
 
-	bool ActionManager::AddActionArgv(int id, shared_ptr<NetWorkPacket> messageData)
+	bool ActionManager::AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
 		{
-			SayNoDebugError("not find callback " << id);
+			SayNoDebugError("not find rpc cb " << id);
 			return false;
 		}
 		this->mCallbackMessageQueue.AddItem(messageData);

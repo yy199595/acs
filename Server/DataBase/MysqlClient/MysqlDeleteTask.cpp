@@ -6,9 +6,9 @@ namespace SoEasy
 	MysqlDeleteTask::MysqlDeleteTask(MysqlManager * mgr, long long id, const std::string & db)
 		: MysqlTaskBase(mgr, id, db)
 	{
-
+		this->mData = nullptr;
 	}
-	bool MysqlDeleteTask::InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data)
+	bool MysqlDeleteTask::InitTask(const std::string tab, CoroutineManager * corMgr, Message * data)
 	{
 		SayNoAssertRetFalse_F(corMgr->IsInLogicCoroutine());
 		this->mData = data;
