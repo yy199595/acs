@@ -25,6 +25,7 @@ namespace SoEasy
 		bool RegisterObject();
 	public:
 		Message * CreateMessage(const std::string & name);
+		shared_ptr<Message> CreateShareMessage(const std::string & name);
 	private:
 		size_t mQueueCount;
 	private:
