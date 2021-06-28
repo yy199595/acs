@@ -9,7 +9,7 @@ namespace SoEasy
 		MysqlUpdateTask(MysqlManager * mgr, long long id, const std::string & db);
 		~MysqlUpdateTask() { }
 	public:
-		bool InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data);
+		bool InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data) final;
 	protected:
 		void OnTaskFinish() final;
 		const std::string & GetSqlCommand() final;

@@ -17,6 +17,7 @@ namespace SoEasy
 		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter); //查询完成之后调用
 	public:
 		const std::string & GetDataBaseName() { return this->mDataBaseName; }
+		virtual bool InitTask(const std::string tab, CoroutineManager * corMgr, shared_ptr<Message> data) { }
 	public:
 		XCode GetErrorCode() { return this->mErrorCode; }
 		SqlTableConfig * GetTabConfig(const std::string & tab);

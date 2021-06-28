@@ -19,5 +19,6 @@ namespace SoEasy
 
     private:
         class MysqlManager *mMysqlManager;
+        class CoroutineManager * mCorManager;
     }
 }

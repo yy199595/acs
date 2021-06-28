@@ -1,34 +1,34 @@
-﻿#include"MysqlManager.h"
-#include<fstream>
-#include<Core/Applocation.h>
-#include<Util/NumberHelper.h>
-#include<Thread/ThreadPool.h>
-#include<Coroutine/CoroutineManager.h>
-#include<MysqlClient/MysqlTaskAction.h>
-#include<Util/StringHelper.h>
-#include<Script/ClassProxyHelper.h>
-#include<Script/MysqlExtension.h>
-#include<Util/FileHelper.h>
+﻿#include "MysqlManager.h"
+#include <fstream>
+#include <Core/Applocation.h>
+#include <Util/NumberHelper.h>
+#include <Thread/ThreadPool.h>
+#include <Coroutine/CoroutineManager.h>
+#include <MysqlClient/MysqlTaskAction.h>
+#include <Util/StringHelper.h>
+#include <Script/ClassProxyHelper.h>
+#include <Script/MysqlExtension.h>
+#include <Util/FileHelper.h>
 
-#include<MysqlClient/TableOperator.h>
-#include<MysqlClient/MysqlQueryTask.h>
-#include<MysqlClient/MysqlInsertTask.h>
-#include<MysqlClient/MysqlUpdateTask.h>
-#include<MysqlClient/MysqlDeleteTask.h>
-#include<Protocol/db.pb.h>
+#include <MysqlClient/TableOperator.h>
+#include <MysqlClient/MysqlQueryTask.h>
+#include <MysqlClient/MysqlInsertTask.h>
+#include <MysqlClient/MysqlUpdateTask.h>
+#include <MysqlClient/MysqlDeleteTask.h>
+#include <Protocol/db.pb.h>
 namespace SoEasy
 {
 	SqlTableConfig::SqlTableConfig(const std::string tab, const std::string pb)
-		:mTableName(tab), mProtobufName(pb)
+		: mTableName(tab), mProtobufName(pb)
 	{
 	}
 	void SqlTableConfig::AddKey(const std::string key)
 	{
 		this->mKeys.push_back(key);
 	}
-	bool SqlTableConfig::HasKey(const std::string & key)
+	bool SqlTableConfig::HasKey(const std::string &key)
 	{
-		for (const std::string & k : this->mKeys)
+		for (const std::string &k : this->mKeys)
 		{
 			if (k == key)
 			{
@@ -65,13 +65,13 @@ namespace SoEasy
 		return true;
 	}
 
-	SayNoMysqlSocket * MysqlManager::GetMysqlSocket(long long threadId)
+	SayNoMysqlSocket *MysqlManager::GetMysqlSocket(long long threadId)
 	{
 		auto iter = this->mMysqlSocketMap.find(threadId);
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	bool MysqlManager::GetTableName(const std::string & pb, std::string & table)
+	bool MysqlManager::GetTableName(const std::string &pb, std::string &table)
 	{
 		auto iter = this->mTablePbMap.find(pb);
 		if (iter != this->mTablePbMap.end())
@@ -82,13 +82,13 @@ namespace SoEasy
 		return false;
 	}
 
-	SqlTableConfig * MysqlManager::GetTableConfig(const std::string & tab)
+	SqlTableConfig *MysqlManager::GetTableConfig(const std::string &tab)
 	{
 		auto iter = this->mSqlConfigMap.find(tab);
 		return iter != this->mSqlConfigMap.end() ? iter->second : nullptr;
 	}
 
-	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string & sql)
+	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string &sql)
 	{
 		if (this->mCoroutineManager->IsInMainCoroutine())
 		{
@@ -106,6 +106,26 @@ namespace SoEasy
 		return taskAction->GetInvokeData();
 	}
 
+	XCode MysqlManager::StartTask(shared_ptr<MysqlTaskBase> task, shared_ptr<Message> messageData)
+	{
+		if(this->mCoroutineManager->IsInMainCoroutine())
+		{
+			return XCode::NoCoroutineContext;
+		}
+		std::string table;
+		if (!this->GetTableName(messageData->GetTypeName(), table))
+		{
+			SayNoDebugError(messageData->GetTypeName() << " not found sql table");
+			return XCode::CallArgsError;
+		}
+		task->InitTask(table, this->mCoroutineManager, messageData);
+		if(!this->StartTaskAction(task))
+		{
+			return XCode::MysqlStartTaskFail;
+		}
+		return XCode::Successful;
+	}
+
 	bool MysqlManager::InsertData(const shared_ptr<Message> data)
 	{
 		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
@@ -119,7 +139,7 @@ namespace SoEasy
 			return false;
 		}
 		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-		
+
 		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
 		this->mCoroutineManager->YieldReturn();
 
@@ -128,7 +148,7 @@ namespace SoEasy
 
 	bool MysqlManager::QueryData(shared_ptr<Message> data)
 	{
-		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());	
+		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
 		long long taskActionId = NumberHelper::Create();
 		shared_ptr<MysqlQueryTask> taskAction = make_shared<MysqlQueryTask>(this, taskActionId, this->mDataBaseName);
 
@@ -140,7 +160,7 @@ namespace SoEasy
 		}
 
 		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-		
+
 		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
 		this->mCoroutineManager->YieldReturn();
 		return taskAction->GetErrorCode() == XCode::Successful;
@@ -149,7 +169,7 @@ namespace SoEasy
 	bool MysqlManager::UpdateData(const shared_ptr<Message> data)
 	{
 		SayNoAssertRetFalse_F(this->mCoroutineManager->IsInLogicCoroutine());
-		
+
 		long long taskActionId = NumberHelper::Create();
 		shared_ptr<MysqlUpdateTask> taskAction = make_shared<MysqlUpdateTask>(this, taskActionId, this->mDataBaseName);
 
@@ -161,9 +181,9 @@ namespace SoEasy
 		}
 
 		SayNoAssertRetFalse_F(taskAction->InitTask(table, this->mCoroutineManager, data));
-		
+
 		SayNoAssertRetFalse_F(this->StartTaskAction(taskAction));
-		
+
 		this->mCoroutineManager->YieldReturn();
 		return taskAction->GetErrorCode() == XCode::Successful;
 	}
@@ -193,41 +213,42 @@ namespace SoEasy
 	void MysqlManager::OnInitComplete()
 	{
 		this->mCoroutineManager->Start("new", [this]()
-			{
-				shared_ptr<db::UserAccountData> accountData = make_shared<db::UserAccountData>();
-				accountData->set_account("646585122@qq.com");
-				accountData->set_userid(420625199511045331);
-				accountData->set_passwd("199595yjz");
-				accountData->set_devicemac("ios_qq");
-				accountData->set_registertime(19959595);
+									   {
+										   shared_ptr<db::UserAccountData> accountData = make_shared<db::UserAccountData>();
+										   accountData->set_account("646585122@qq.com");
+										   accountData->set_userid(420625199511045331);
+										   accountData->set_passwd("199595yjz");
+										   accountData->set_devicemac("ios_qq");
+										   accountData->set_registertime(19959595);
 
-				if (this->InsertData(accountData))
-				{
-					SayNoDebugWarning("insert data successful " << accountData->DebugString());
-					accountData->set_passwd("yjz199595");
-					accountData->set_lastlogintime(123456);
-					accountData->set_devicemac("ios_wrchat");
-					if (this->UpdateData(accountData))
-					{
-						SayNoDebugWarning("update data successful " << accountData->DebugString());
-					}
+										   if (this->InsertData(accountData))
+										   {
+											   SayNoDebugWarning("insert data successful " << accountData->DebugString());
+											   accountData->set_passwd("yjz199595");
+											   accountData->set_lastlogintime(123456);
+											   accountData->set_devicemac("ios_wrchat");
+											   if (this->UpdateData(accountData))
+											   {
+												   SayNoDebugWarning("update data successful " << accountData->DebugString());
+											   }
 
-					shared_ptr<db::UserAccountData> queryData = make_shared<db::UserAccountData>();
-					queryData->set_account("646585122@qq.com");
-					queryData->set_userid(420625199511045331);
-					if (this->QueryData(queryData))
-					{
-						SayNoDebugInfo("query data successful \n" << queryData->Utf8DebugString());
-					}
-					if (this->DeleteData(queryData))
-					{
-						SayNoDebugError("delete data successful");
-					}
-				}
-			});
+											   shared_ptr<db::UserAccountData> queryData = make_shared<db::UserAccountData>();
+											   queryData->set_account("646585122@qq.com");
+											   queryData->set_userid(420625199511045331);
+											   if (this->QueryData(queryData))
+											   {
+												   SayNoDebugInfo("query data successful \n"
+																  << queryData->Utf8DebugString());
+											   }
+											   if (this->DeleteData(queryData))
+											   {
+												   SayNoDebugError("delete data successful");
+											   }
+										   }
+									   });
 	}
 
-	void MysqlManager::PushClassToLua(lua_State * luaEnv)
+	void MysqlManager::PushClassToLua(lua_State *luaEnv)
 	{
 		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeMysqlCommand", SoEasy::InvokeMysqlCommand);
 	}
@@ -259,7 +280,7 @@ namespace SoEasy
 			{
 				SayNoDebugError(mSqlTablePath << " error");
 				return false;
-			}		
+			}
 			auto iter1 = iter->value.FindMember("keys");
 			auto iter2 = iter->value.FindMember("protobuf");
 			if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
@@ -272,7 +293,7 @@ namespace SoEasy
 			}
 			const std::string tab = iter->name.GetString();
 			const std::string pb = iter2->value.GetString();
-			SqlTableConfig * tabConfig = new SqlTableConfig(tab, pb);
+			SqlTableConfig *tabConfig = new SqlTableConfig(tab, pb);
 			for (unsigned int index = 0; index < iter1->value.Size(); index++)
 			{
 				tabConfig->AddKey(iter1->value[index].GetString());
@@ -286,17 +307,17 @@ namespace SoEasy
 
 	bool MysqlManager::StartConnectMysql()
 	{
-		const char * ip = this->mMysqlIp.c_str();
+		const char *ip = this->mMysqlIp.c_str();
 		const unsigned short port = this->mMysqlPort;
-		const char * passWd = this->mDataBasePasswd.c_str();
-		const char * userName = this->mDataBaseUser.c_str();
-		
+		const char *passWd = this->mDataBasePasswd.c_str();
+		const char *userName = this->mDataBaseUser.c_str();
+
 		std::vector<long long> taskThreads;
 		this->mThreadPool->GetAllTaskThread(taskThreads);
 		for (size_t index = 0; index < taskThreads.size(); index++)
 		{
 			long long threadId = taskThreads[index];
-			SayNoMysqlSocket * mysqlSocket1 = mysql_init((MYSQL*)0);
+			SayNoMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
 			this->mMysqlSockt = mysql_real_connect(mysqlSocket1, ip, userName, passWd, NULL, port, NULL, CLIENT_MULTI_STATEMENTS);
 			if (this->mMysqlSockt == nullptr)
 			{
