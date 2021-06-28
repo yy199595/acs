@@ -18,6 +18,8 @@
 #include<Service/ClusterService.h>
 #include<Service/ServiceRegistry.h>
 
+#include<Service/MysqlProxy.h>
+
 using namespace SoEasy;
 using namespace SoEasy;
 
@@ -49,6 +51,7 @@ int main(int argc, char ** argv)
 
 
 
+	ObjectRegistry<LocalService>::Register<MysqlProxy>("MysqlProxy");
 	ObjectRegistry<LocalService>::Register<LoginService>("LoginService");
 	ObjectRegistry<LocalService>::Register<ClusterService>("ClusterService");
 	ObjectRegistry<LocalService>::Register<ServiceRegistry>("ServiceRegistry");

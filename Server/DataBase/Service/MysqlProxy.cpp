@@ -1,4 +1,5 @@
 #include "MysqlProxy.h"
+#include <Other/ServiceNode.h>
 #include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include <MysqlClient/MysqlInsertTask.h>
@@ -7,6 +8,13 @@
 #include <MysqlClient/MysqlDeleteTask.h>
 namespace SoEasy
 {
+    MysqlProxy::MysqlProxy()
+    {
+        this->mMysqlNodeId = 0;
+        this->mCorManager = nullptr;
+        this->mMysqlManager = nullptr;
+    }
+
     bool MysqlProxy::OnInit()
     {
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
@@ -56,7 +64,7 @@ namespace SoEasy
     }
     XCode MysqlProxy::Delete(shared_ptr<Message> requestData)
     {
-         auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
+        auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
         XCode startCode = this->mMysqlManager->StartTask(deleteTask, requestData);
         if (startCode != XCode::Successful)
         {

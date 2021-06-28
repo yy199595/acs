@@ -5,7 +5,7 @@ namespace SoEasy
     class MysqlProxy : public LocalService
     {
     public:
-        MysqlProxy() {}
+        MysqlProxy();
         ~MysqlProxy() {}
 
     public:
@@ -16,9 +16,9 @@ namespace SoEasy
         XCode Query(shared_ptr<Message> requestData, shared_ptr<Message> responseData);
     public:
         bool OnInit() final;
-
     private:
+        int mMysqlNodeId;
         class MysqlManager *mMysqlManager;
         class CoroutineManager * mCorManager;
-    }
+    };
 }

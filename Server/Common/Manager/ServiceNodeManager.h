@@ -19,6 +19,8 @@ namespace SoEasy
 	public:
 		ServiceNode * GetServiceNode(const int nodeId);
 		ServiceNode * GetServiceNode(const std::string & address);
+		ServiceNode * GetNodeByNodeName(const std::string & nodeName);
+		ServiceNode * GetNodeByServiceName(const std::string & service);
 	private:
 		std::list<ServiceNode *> mServiceNodeArray;
 		std::unordered_map<int, ServiceNode *> mServiceNodeMap1;

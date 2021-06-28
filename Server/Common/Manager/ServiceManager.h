@@ -23,6 +23,7 @@ namespace SoEasy
 		LocalLuaService * GetLuaService(const std::string & name);
 		LocalLuaService * AddLuaService(const std::string name, LocalLuaService * service);
 	public:
+		void GetLocalServices(std::vector<ServiceBase *> & services);
 		void GetLocalServices(std::vector<std::string> & serviceNames);
 	private:
 		bool CreateLocalService();

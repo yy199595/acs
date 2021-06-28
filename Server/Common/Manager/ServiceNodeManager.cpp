@@ -96,10 +96,10 @@ namespace SoEasy
 	ServiceNode *ServiceNodeManager::GetServiceNode(const int nodeId)
 	{
 		auto iter = this->mServiceNodeMap1.find(nodeId);
-		if(iter != this->mServiceNodeMap1.end())
+		if (iter != this->mServiceNodeMap1.end())
 		{
-			ServiceNode * serviceNode = iter->second;
-			if(serviceNode != nullptr && serviceNode->IsActive())
+			ServiceNode *serviceNode = iter->second;
+			if (serviceNode != nullptr && serviceNode->IsActive())
 			{
 				return serviceNode;
 			}
@@ -110,14 +110,38 @@ namespace SoEasy
 	ServiceNode *ServiceNodeManager::GetServiceNode(const std::string &address)
 	{
 		auto iter = this->mServiceNodeMap2.find(address);
-		if(iter != this->mServiceNodeMap2.end())
+		if (iter != this->mServiceNodeMap2.end())
 		{
-			ServiceNode * serviceNode = iter->second;
-			if(serviceNode != nullptr && serviceNode->IsActive())
+			ServiceNode *serviceNode = iter->second;
+			if (serviceNode != nullptr && serviceNode->IsActive())
 			{
 				return serviceNode;
 			}
 		}
 		return nullptr;
 	}
+
+	ServiceNode *ServiceNodeManager::GetNodeByNodeName(const std::string &nodeName)
+	{
+		for (ServiceNode *serviceNode : this->mServiceNodeArray)
+		{
+			if (serviceNode->IsActive() && serviceNode->GetNodeName() == nodeName)
+			{
+				return serviceNode;
+			}
+		}
+		return nullptr;
+	}
+	ServiceNode *ServiceNodeManager::GetNodeByServiceName(const std::string &service)
+	{
+		for (ServiceNode *serviceNode : this->mServiceNodeArray)
+		{
+			if (serviceNode->IsActive() && serviceNode->HasService(service))
+			{
+				return serviceNode;
+			}
+		}
+		return nullptr;
+	}
+
 }

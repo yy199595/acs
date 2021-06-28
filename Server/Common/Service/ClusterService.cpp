@@ -78,6 +78,15 @@ namespace SoEasy
 			const std::string &service = nodeInfo->services(index);
 			serviceNode->AddService(service);
 		}
+		// 通知所有服务
+		std::vector<ServiceBase *> services;
+		this->mServiceManager->GetLocalServices(services);
+
+		for(ServiceBase * service : services)
+		{
+			service->OnRefreshService();
+		}
+
 		return XCode::Successful;
 	}
 }
