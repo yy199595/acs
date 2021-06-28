@@ -28,11 +28,7 @@ namespace SoEasy
 	}
 	bool ProxyService::InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket> messageData)
 	{
-		if (this->mProxyServiceSession == nullptr)
-		{
-			this->mProxyServiceSession = this->mServiceManager->GetProxySession(this->mServiceAddress);
-		}
-		this->mProxyMessageQueue.push(messageData);
+		
 		return true;
 	}
 
