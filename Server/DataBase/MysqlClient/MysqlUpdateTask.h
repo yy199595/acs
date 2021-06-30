@@ -12,6 +12,7 @@ namespace SoEasy
 		bool InitTask(const std::string tab, CoroutineManager * corMgr, Message * data) final;
 	protected:
 		void OnTaskFinish() final;
+		bool GetSqlCommand(std::string & sql) final;
 		const std::string & GetSqlCommand() final;
 	private:
 		Message * mData;

@@ -31,7 +31,14 @@ namespace SoEasy
 			this->OnQueryFinish(jsonWrite);
 			return;
 		}
-		const std::string & sql = this->GetSqlCommand();
+		std::string sql;
+		if(!this->GetSqlCommand(sql))
+		{
+			this->mErrorCode = XCode::MysqlInvokeFailure;
+			this->mErrorString = "protobuf args error ";
+			this->OnQueryFinish(jsonWrite);
+			return;
+		}
 		if (mysql_real_query(mysqlSocket, sql.c_str(), sql.size()) != 0)
 		{
 			this->mErrorCode = MysqlInvokeFailure;
@@ -92,8 +99,7 @@ namespace SoEasy
 		if (this->mErrorCode != XCode::Successful)
 		{
 			SayNoDebugError("[mysql error] " << this->mErrorString);
-			SayNoDebugError("[mysql command] " << this->GetSqlCommand());
-		}	
+		}
 	}
 
 	SqlTableConfig * MysqlTaskBase::GetTabConfig(const std::string & tab)

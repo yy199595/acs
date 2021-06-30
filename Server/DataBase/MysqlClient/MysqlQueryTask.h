@@ -11,7 +11,7 @@ namespace SoEasy
 		bool InitTask(const std::string tab, CoroutineManager * corMgr, Message * data) final;
 	protected:
 		void OnTaskFinish() final;
-		const std::string & GetSqlCommand() final;
+		bool GetSqlCommand(std::string & sql) final;
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) final; //查询完成之后调用
 	private:
 		Message * mData;
