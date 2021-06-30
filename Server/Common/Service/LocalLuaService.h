@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"ServiceBase.h"
 #include<Script/LuaInclude.h>
 namespace SoEasy
@@ -12,9 +12,10 @@ namespace SoEasy
 	public:
 		bool OnInit() final;
 		bool HasMethod(const std::string & name) final;
+		bool IsLuaService() final { return true; };
 	protected:
-		bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) final;
-		bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) final;
+		virtual XCode InvokeMethod(const SharedPacket, SharedPacket) final;
+		virtual XCode InvokeMethod(const std::string &address, const SharedPacket, SharedPacket) final;
 	private:
 		int mServiceIndex;
 		lua_State * mLuaEnv;

@@ -8,7 +8,6 @@
 #include<Manager/ScriptManager.h>
 #include<Script/LuaFunction.h>
 #include<Manager/ActionManager.h>
-#include<NetWork/RemoteActionProxy.h>
 namespace SoEasy
 {
 	NetWorkManager::NetWorkManager() : mSessionContext(nullptr)
@@ -45,9 +44,31 @@ namespace SoEasy
 		return this->RemoveTcpSession(address);
 	}
 
-	XCode NetWorkManager::SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage)
+	bool NetWorkManager::SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage)
 	{
-		return this->SendMessageByAdress(address, *returnPackage);
+		shared_ptr<TcpClientSession> targetSession = this->GetTcpSession(address);
+		if (targetSession == nullptr)
+		{
+			SayNoDebugError("not find session " << address);
+			return false;
+		}
+
+		if (!targetSession->IsActive())
+		{
+			return false;
+		}
+
+		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
+		if (!returnPackage->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
+		{
+			SayNoDebugError("Serialize Fail : " << returnPackage->method());
+			return false;
+		}
+		size_t size = returnPackage->ByteSizeLong();
+		size_t length = size + sizeof(unsigned int);
+		memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
+		SayNoDebugLog("call " << returnPackage->service() << "." << returnPackage->method());
+		return targetSession->SendPackage(make_shared<string>(this->mSendSharedBuffer, length));
 	}
 
 	bool NetWorkManager::AddTcpSession(shared_ptr<TcpClientSession> tcpSession)
@@ -82,30 +103,6 @@ namespace SoEasy
 	{
 		const std::string & address = tcpSession->GetAddress();
 		return this->CloseTcpSession(address);
-	}
-
-	XCode NetWorkManager::SendMessageByAdress(const std::string & address, const NetWorkPacket & returnPackage)
-	{
-		shared_ptr<TcpClientSession> pSession = this->GetTcpSession(address);
-
-		if (pSession == nullptr)
-		{
-			SayNoDebugError("not find session " << address);
-			return XCode::SessionIsNull;
-		}
-		
-		char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
-		if (!returnPackage.SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
-		{
-			SayNoDebugError("Serialize Fail : " << returnPackage.method());
-			return XCode::SerializationFailure;
-		}
-		size_t size = returnPackage.ByteSizeLong();
-		size_t length = size + sizeof(unsigned int);
-		memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
-		SayNoDebugLog("call " << returnPackage.service() << "." << returnPackage.method());
-		shared_ptr<string> sendMessage = make_shared<string>(this->mSendSharedBuffer, length);		
-		return pSession->SendPackage(sendMessage) ? XCode::Successful : XCode::SendMessageFail;
 	}
 
 	shared_ptr<TcpClientSession> NetWorkManager::GetTcpSession(const std::string & adress)

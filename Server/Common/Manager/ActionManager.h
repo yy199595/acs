@@ -15,7 +15,8 @@ namespace SoEasy
 		virtual ~ActionManager() { }
 	public:
 		long long AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-		bool AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData);	
+		bool PushLocalResponseData(shared_ptr<NetWorkPacket> messageData);
+		bool PushRemoteResponseData(shared_ptr<NetWorkPacket> messageData);
 	protected:
 		bool OnInit() override;
 		void OnSystemUpdate() final;					//处理系统事件
@@ -26,7 +27,8 @@ namespace SoEasy
 		TimeRecorder mNetLatencyRecorder;
 		class TimerManager * mTimerManager;
 	private:
-		DoubleBufferQueue<SharedPacket> mCallbackMessageQueue;
+		std::queue<SharedPacket> mLocalMessageQueue;
+		DoubleBufferQueue<SharedPacket> mRemoteMessageQueue;
 		std::unordered_map<long long, shared_ptr<LocalRetActionProxy>> mRetActionMap;
 	};
 }

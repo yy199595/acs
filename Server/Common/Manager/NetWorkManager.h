@@ -24,8 +24,7 @@ namespace SoEasy
 
 		bool RemoveTcpSession(const std::string & tcpSession);
 		bool RemoveTcpSession(shared_ptr<TcpClientSession> tcpSession);
-		XCode SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage);
-		XCode SendMessageByAdress(const std::string & address, const NetWorkPacket & returnPackage);
+		bool SendMessageByAdress(const std::string & address, const SharedPacket & returnPackage);
 	public:
 		shared_ptr<TcpClientSession> GetTcpSession(const std::string & adress);
 	protected:

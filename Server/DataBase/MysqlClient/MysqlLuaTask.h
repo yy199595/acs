@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"MysqlTaskBase.h"
 #include<Script/LuaInclude.h>
 namespace SoEasy
@@ -11,8 +11,8 @@ namespace SoEasy
 		MysqlLuaTask(MysqlManager * mgr, long long taskId, const std::string & db, const std::string & sql, lua_State * lua, int ref);
 	protected:
 		 void OnTaskFinish() final;
-		 const std::string & GetSqlCommand() { return mSqlCommand; };
 		 void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
+		 bool GetSqlCommand(std::string & sql) final { sql = mSqlCommand; return true; };
 	public:
 		static bool Start(lua_State * lua, int index, const std::string & sql);
 	private:

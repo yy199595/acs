@@ -1,5 +1,6 @@
 ﻿#include "ServiceNodeManager.h"
 #include <Other/ServiceNode.h>
+#include<Manager/NetWorkManager.h>
 namespace SoEasy
 {
 	bool ServiceNodeManager::DelServiceNode(int nodeId)
@@ -63,6 +64,24 @@ namespace SoEasy
 		return false;
 	}
 
+	SharedTcpSession ServiceNodeManager::GetNodeSession(const int nodeId)
+	{
+		ServiceNode * serviceNode = this->GetServiceNode(nodeId);
+		if (serviceNode == nullptr)
+		{
+			return nullptr;
+		}
+		const std::string & address = serviceNode->GetAddress();
+		SharedTcpSession nodeSession = this->mNetWorkManager->GetTcpSession(address);
+		if (nodeSession == nullptr)
+		{
+			this->mConnectSessionList.insert(address);
+			nodeSession = this->CreateTcpSession(serviceNode->GetNodeName(), address);
+			return nullptr;
+		}
+		return nodeSession->IsActive() ? nodeSession : nullptr;
+	}
+
 	bool ServiceNodeManager::OnInit()
 	{
 		std::string queryAddress;
@@ -91,6 +110,14 @@ namespace SoEasy
 				serviceNode->OnSystemUpdate();
 			}
 		}
+	}
+
+	void ServiceNodeManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
+	{
+	}
+
+	void ServiceNodeManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
+	{
 	}
 
 	ServiceNode *ServiceNodeManager::GetServiceNode(const int nodeId)

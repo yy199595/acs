@@ -168,9 +168,6 @@
     <ClCompile Include="Util\TimeHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\RemoteActionProxy.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
     <ClCompile Include="Timer\TimerBase.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
@@ -218,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="Manager\ServiceManager.cpp">
       <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Service\ProxyService.cpp">
-      <Filter>Service</Filter>
     </ClCompile>
     <ClCompile Include="Manager\ConsoleManager.cpp">
       <Filter>Manager</Filter>
@@ -410,9 +404,6 @@
     <ClInclude Include="Util\TimeHelper.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="NetWork\RemoteActionProxy.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
     <ClInclude Include="Timer\ActionTimeoutTimer.h">
       <Filter>Timer</Filter>
     </ClInclude>
@@ -505,9 +496,6 @@
     </ClInclude>
     <ClInclude Include="Core\ObjectRegistry.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Service\ProxyService.h">
-      <Filter>Service</Filter>
     </ClInclude>
     <ClInclude Include="Manager\ConsoleManager.h">
       <Filter>Manager</Filter>

@@ -55,6 +55,7 @@ namespace SoEasy
 
 		for (size_t index = 0; index < fieldList.size(); index++)
 		{
+			const FieldDescriptor * fieldDesc = fieldList[index];
 			if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
 			{
 				sqlStream << "'" << pReflection->GetString(*this->mData, fieldDesc) << "',";

@@ -15,7 +15,7 @@ namespace SoEasy
 		std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
 		packet->set_rpcid(this->mCallbackId);
 		packet->set_code(XCode::TimeoutAutoCall);
-		this->mActionManager->AddActionArgv(this->mCallbackId, packet);
+		this->mActionManager->PushLocalResponseData(packet);
 		return false;
 	}
 }

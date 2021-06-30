@@ -38,7 +38,6 @@
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
-    <ClCompile Include="NetWork\RemoteActionProxy.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
     <ClCompile Include="NetWork\NetWorkRetAction.cpp" />
@@ -64,7 +63,6 @@
     <ClCompile Include="Script\SystemExtension.cpp" />
     <ClCompile Include="Service\ClusterService.cpp" />
     <ClCompile Include="Service\LocalLuaService.cpp" />
-    <ClCompile Include="Service\ProxyService.cpp" />
     <ClCompile Include="Service\ServiceBase.cpp" />
     <ClCompile Include="Service\ServiceRegistry.cpp" />
     <ClCompile Include="Service\LocalService.cpp" />
@@ -114,7 +112,6 @@
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />
-    <ClInclude Include="NetWork\RemoteActionProxy.h" />
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
@@ -158,7 +155,6 @@
     <ClInclude Include="Script\UserDataParameter.h" />
     <ClInclude Include="Service\ClusterService.h" />
     <ClInclude Include="Service\LocalLuaService.h" />
-    <ClInclude Include="Service\ProxyService.h" />
     <ClInclude Include="Service\ServiceBase.h" />
     <ClInclude Include="Service\ServiceRegistry.h" />
     <ClInclude Include="Service\LocalService.h" />

@@ -14,52 +14,21 @@ namespace SoEasy
 		virtual ~ServiceBase() {}
 
 	public:
-		virtual bool OnInit();
-		virtual void OnInitComplete(){};
-		virtual void OnSystemUpdate();
-		virtual void OnConnectDone(SharedTcpSession tcpSession) {}
-
-	public:
-		void PushHandleMessage(SharedPacket argv);
-		void PushHandleMessage(const std::string &address, SharedPacket argv);
-
+		virtual bool OnInit() { return false; }
+		virtual void OnInitComplete() {};
+		virtual bool IsLuaService() { return false; };
 	public:
 		bool IsInit() { return this->mIsInit; }
 		virtual bool HasMethod(const std::string &method) = 0;
-		virtual void OnRefreshService(){}; //刷新服务表调用
+		virtual void OnRefreshService() {}; //刷新服务表调用
 		const std::string &GetServiceName() { return this->mServiceName; };
-
-	protected:
-		bool ReplyMessage(const long long cb, shared_ptr<NetWorkPacket> msg);
-		bool ReplyMessage(const std::string &address, shared_ptr<NetWorkPacket> msg);
-		virtual bool InvokeMethod(const std::string &method, shared_ptr<NetWorkPacket>) = 0;
-		virtual bool InvokeMethod(const std::string &address, const std::string &method, SharedPacket packet) = 0;
-
 	public:
-		void Sleep(long long ms);
-		void Start(const std::string &name, std::function<void()> &&func);
-
+		virtual XCode InvokeMethod(const SharedPacket, SharedPacket) = 0;
+		virtual XCode InvokeMethod(const std::string &address, const SharedPacket, SharedPacket) = 0;
 	public:
 		void InitService(const std::string &name);
-
-	public:
-		XCode Call(const std::string method, Message &returnData);
-		XCode Call(const std::string method, shared_ptr<Message> message = nullptr);
-		XCode Call(const std::string method, shared_ptr<Message> message, Message &returnData);
-
-	public:
-		XCode Notice(const std::string method, shared_ptr<Message> message = nullptr);
-
-	private:
-		shared_ptr<NetWorkPacket> CreatePacket(const std::string &func, shared_ptr<Message> message, shared_ptr<NetWorkWaitCorAction> callBack);
-
 	private:
 		bool mIsInit;
 		std::string mServiceName;
-		class NetWorkManager *mNetManager;
-		class ActionManager *mActionManager;
-		class CoroutineManager *mCorManager;
-		DoubleBufferQueue<SharedPacket> mLocalHandleMsgQueue;
-		DoubleBufferQueue<SharedNetPacket> mProxyHandleMsgQueue;
 	};
 }

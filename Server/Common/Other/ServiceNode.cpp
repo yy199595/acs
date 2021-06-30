@@ -15,16 +15,9 @@ namespace SoEasy
 		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
 		SayNoAssertRet_F(this->mActionManager = app->GetManager<ActionManager>());
 		SayNoAssertRet_F(this->mNetWorkManager = app->GetManager<NetWorkManager>());
-		SayNoAssertRet_F(this->mServiceManager = app->GetManager<ServiceManager>());
-
-		this->mNodeTcpSession = this->mNetWorkManager->GetTcpSession(this->mNoticeAddress);
-		if (this->mNodeTcpSession == nullptr)
-		{
-			std::string ip;
-			unsigned short port;
-			StringHelper::ParseIpAddress(address, ip, port);	
-			this->mNodeTcpSession = this->mServiceManager->CreateTcpSession(name, ip, port);
-		}
+		SayNoAssertRet_F(this->mServiceNodeManager = app->GetManager<ServiceNodeManager>());
+		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
+		
 		this->mNodeInfoMessage.Clear();
 		this->mNodeInfoMessage.set_areaid(areaId);
 		this->mNodeInfoMessage.set_nodeid(nodeId);
@@ -52,15 +45,23 @@ namespace SoEasy
 
 	void ServiceNode::OnSystemUpdate()
 	{
-		while (!this->mMessageQueue.empty())
+		if (!this->mMessageQueue.empty())
 		{
-			if (!this->mNodeTcpSession->IsActive())
+			const int nodeId = this->GetNodeId();
+			if (this->mServiceNodeManager->GetNodeSession(this->GetNodeId()))
 			{
-				break;
+				while (!this->mMessageQueue.empty())
+				{
+					SharedPacket messageData = this->mMessageQueue.front();
+					const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
+					if (!this->mNetWorkManager->SendMessageByAdress(address, messageData))
+					{
+						break;
+					}
+					this->mMessageQueue.pop();
+				}			
 			}
-			this->PushMessageData(this->mMessageQueue.front());
-			this->mMessageQueue.pop();
-		}
+		}	
 	}
 
 	std::string ServiceNode::GetJsonString()
@@ -188,15 +189,18 @@ namespace SoEasy
 
 	void ServiceNode::PushMessageData(SharedPacket messageData)
 	{
-		if (!this->mNodeTcpSession->IsActive())
+		if (this->mServiceNodeManager->GetNodeSession(this->GetNodeId()))
 		{
-			this->mMessageQueue.push(messageData);
+			const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
+			if (!this->mNetWorkManager->SendMessageByAdress(address, messageData))
+			{
+				this->mMessageQueue.push(messageData);
+			}
 		}
 		else
 		{
-			const std::string & address = this->mAddress.empty() ? mNoticeAddress : mAddress;
-			this->mNetWorkManager->SendMessageByAdress(address, messageData);
-		}
+			this->mMessageQueue.push(messageData);
+		}		
 	}
 
 	void ServiceNode::PushMessageData(const std::string & service, const std::string & method, const Message * request, shared_ptr<LocalRetActionProxy> rpcReply)

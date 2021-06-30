@@ -47,57 +47,28 @@ namespace SoEasy
 		return ServiceBase::OnInit();
 	}
 
-	bool LocalService::InvokeMethod(const std::string &method, shared_ptr<NetWorkPacket> reqData)
+	XCode LocalService::InvokeMethod(const SharedPacket requestData, SharedPacket responseData)
 	{
+		const std::string & method = requestData->method();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
-			return false;
+			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		this->Start(method, [localAction, reqData, this]()
-					{
-						shared_ptr<NetWorkPacket> resData = make_shared<NetWorkPacket>();
-						XCode code = localAction->Invoke(reqData, resData);
-						if (reqData->rpcid() != 0)
-						{
-							resData->set_code(code);
-							resData->set_rpcid(reqData->rpcid());
-							resData->set_entityid(reqData->entityid());
-							this->ReplyMessage(reqData->rpcid(), resData);
-						}
-					});
-		return true;
+		return localAction->Invoke(requestData, responseData);
 	}
 
-	bool LocalService::InvokeMethod(const std::string &address, const std::string &method, SharedPacket reqData)
+	XCode LocalService::InvokeMethod(const std::string &address, const SharedPacket requestData, SharedPacket responseData)
 	{
+		const std::string & method = requestData->method();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
-			return false;
+			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		this->mCorManager->Start(method, [address, this, reqData, localAction]()
-								 {
-									 SharedPacket retData = make_shared<NetWorkPacket>();
-									 long long currentId = this->mCorManager->GetCurrentCorId();
-									 this->mCurrentSessionMap.emplace(currentId, address);
-									 XCode code = localAction->Invoke(reqData, retData);
-									 if (reqData->rpcid() != 0)
-									 {
-										 retData->set_code(code);
-										 retData->set_rpcid(reqData->rpcid());
-										 retData->set_entityid(reqData->entityid());
-										 this->ReplyMessage(address, retData);
-									 }
-									 auto iter = mCurrentSessionMap.find(currentId);
-									 if (iter != mCurrentSessionMap.end())
-									 {
-										 mCurrentSessionMap.erase(iter);
-									 }
-								 });
-		return true;
+		return localAction->Invoke(requestData, responseData);
 	}
 
 	bool LocalService::BindFunction(std::string name, LocalAction1 action)

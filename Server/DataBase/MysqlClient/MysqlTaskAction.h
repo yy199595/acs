@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"MysqlTaskBase.h"
 #include<QueryResult/InvokeResultData.h>
 namespace SoEasy
@@ -12,7 +12,7 @@ namespace SoEasy
 	protected:
 		void OnTaskFinish() final;
 		void OnQueryFinish(QuertJsonWritre & jsonWriter) override; //查询完成之后调用
-		const std::string & GetSqlCommand() final { return this->mSqlCommand; }
+		bool GetSqlCommand(std::string & sql) final { sql = this->mSqlCommand; return true; }
 	public:
 		const long long GetCoroutienId() { return this->mCoroutineId; }
 	public:

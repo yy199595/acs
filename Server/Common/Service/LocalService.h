@@ -14,16 +14,14 @@ namespace SoEasy
 	public:
 		bool OnInit() override;
 	private:
-		bool InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket>) final;
-		bool InvokeMethod(const std::string & address, const std::string & method, SharedPacket packet) final;
+		virtual XCode InvokeMethod(const SharedPacket, SharedPacket) final;
+		virtual XCode InvokeMethod(const std::string &address, const SharedPacket, SharedPacket) final;
 	protected:
-
 		bool BindFunction(std::string name, LocalAction1 action);
 
 		bool Bind(std::string name, MysqlOperAction action);
 
 		bool Bind(std::string name, MysqlQueryAction action);
-
 
 		template<typename T1>
 		bool BindFunction(std::string name, LocalAction2<T1> action);

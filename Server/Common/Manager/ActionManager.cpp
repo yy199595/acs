@@ -24,29 +24,51 @@ namespace SoEasy
 
 	void ActionManager::OnSystemUpdate()
 	{
-		SharedPacket callbackData;
-		this->mCallbackMessageQueue.SwapQueueData();
-		while (this->mCallbackMessageQueue.PopItem(callbackData))
+		SharedPacket responseData;
+		this->mRemoteMessageQueue.SwapQueueData();
+		while (this->mRemoteMessageQueue.PopItem(responseData))
 		{
-			long long rpcId = callbackData->rpcid();
+			long long rpcId = responseData->rpcid();
 			auto iter = this->mRetActionMap.find(rpcId);
 			if (iter != this->mRetActionMap.end())
 			{
-				iter->second->Invoke(callbackData);
+				iter->second->Invoke(responseData);
 				this->mRetActionMap.erase(iter);
 			}
 		}
+		while (!this->mLocalMessageQueue.empty())
+		{
+			responseData = this->mLocalMessageQueue.front();		
+			long long rpcId = responseData->rpcid();
+			auto iter = this->mRetActionMap.find(rpcId);
+			if (iter != this->mRetActionMap.end())
+			{
+				iter->second->Invoke(responseData);
+				this->mRetActionMap.erase(iter);
+			}
+			this->mLocalMessageQueue.pop();
+		}
 	}
 
-	bool ActionManager::AddActionArgv(long long id, shared_ptr<NetWorkPacket> messageData)
+	bool ActionManager::PushLocalResponseData(shared_ptr<NetWorkPacket> messageData)
 	{
+		long long id = messageData->rpcid();
 		auto iter = this->mRetActionMap.find(id);
 		if (iter == this->mRetActionMap.end())
 		{
 			SayNoDebugError("not find rpc cb " << id);
 			return false;
 		}
-		this->mCallbackMessageQueue.AddItem(messageData);
+		this->mLocalMessageQueue.push(messageData);
+		return true;
+	}
+	bool ActionManager::PushRemoteResponseData(shared_ptr<NetWorkPacket> messageData)
+	{
+		if (messageData->rpcid() == 0)
+		{
+			return false;
+		}
+		this->mRemoteMessageQueue.AddItem(messageData);
 		return true;
 	}
 

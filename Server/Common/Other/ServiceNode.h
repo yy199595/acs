@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include <Object/Object.h>
-#include <Protocol/s2s.pb.h>
-#include <Service/ProxyService.h>
+#include<Object/Object.h>
+#include<Protocol/com.pb.h>
+#include<Protocol/s2s.pb.h>
+#include<Manager/ServiceNodeManager.h>
 namespace SoEasy
 {
 	class LocalRetActionProxy;
@@ -9,7 +10,6 @@ namespace SoEasy
 	{
 	public:
 		ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress = "");
-
 	public:
 		const int GetAreaId() { return this->mNodeInfoMessage.areaid(); }
 		const int GetNodeId() { return this->mNodeInfoMessage.nodeid(); }
@@ -23,7 +23,6 @@ namespace SoEasy
 
 	public:
 		void OnSystemUpdate();
-
 	public:
 		std::string GetJsonString();
 		XCode Notice(const std::string &service, const std::string &method); //不回应
@@ -37,18 +36,18 @@ namespace SoEasy
 	public: // lua使用
 		void PushMessageData(SharedPacket messageData);
 		void PushMessageData(const std::string &service, const std::string &method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
-
 	private:
+		std::string mIp;
+		unsigned short mPort;
 		const std::string mAddress;		  //监听地址
 		const std::string mNoticeAddress; //通信地址
 		const std::string mNodeName;	  //进程名字
-		SharedTcpSession mNodeTcpSession;
 		std::set<std::string> mServiceArray; //服务列表
 		class CoroutineManager *mCorManager; //协程
 		class ActionManager *mActionManager;
 		class NetWorkManager *mNetWorkManager;
-		class ServiceManager *mServiceManager;
 		s2s::NodeData_NodeInfo mNodeInfoMessage;
+		ServiceNodeManager * mServiceNodeManager;
 		std::queue<shared_ptr<PB::NetWorkPacket>> mMessageQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 	};

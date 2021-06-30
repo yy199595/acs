@@ -1,12 +1,12 @@
 ﻿#include "ServiceRegistry.h"
 #include <Core/Applocation.h>
 #include <Util/StringHelper.h>
+#include <Other/ServiceNode.h>
 #include <Core/TcpSessionListener.h>
 #include <Manager/NetWorkManager.h>
 #include <Coroutine/CoroutineManager.h>
 
-#include <Other/ServiceNode.h>
-#include <Service/ProxyService.h>
+
 
 namespace SoEasy
 {
@@ -16,7 +16,6 @@ namespace SoEasy
 
 	bool ServiceRegistry::OnInit()
 	{
-		this->mServiceIndex = 100;
 		SayNoAssertRetFalse_F(LocalService::OnInit());
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
 
@@ -25,13 +24,9 @@ namespace SoEasy
 		return true;
 	}
 
-	void ServiceRegistry::OnSystemUpdate()
-	{
-		LocalService::OnSystemUpdate();
-	}
-
 	void ServiceRegistry::OnInitComplete()
 	{
+
 	}
 
 	XCode ServiceRegistry::RegisterNode(long long id, const s2s::NodeRegister_Request & nodeInfo)

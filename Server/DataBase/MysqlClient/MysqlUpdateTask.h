@@ -13,7 +13,6 @@ namespace SoEasy
 	protected:
 		void OnTaskFinish() final;
 		bool GetSqlCommand(std::string & sql) final;
-		const std::string & GetSqlCommand() final;
 	private:
 		Message * mData;
 		std::string mTable;

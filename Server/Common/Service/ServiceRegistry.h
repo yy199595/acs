@@ -32,7 +32,6 @@ namespace SoEasy
 
 	protected:
 		bool OnInit() final;
-		void OnSystemUpdate() final;
 		void OnInitComplete() final;
 
 	private:
@@ -40,7 +39,6 @@ namespace SoEasy
 		XCode RegisterNode(long long id, const s2s::NodeRegister_Request & nodeInfo);
 		XCode QueryNodes(long long id, const PB::Int32Data & areaId, s2s::NodeData_Array & nodeArray);
 	private:
-		int mServiceIndex;
 		class NetWorkManager *mNetWorkManager;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;
 		std::unordered_map<long long, ServiceNode *> mServiceNodeMap;

@@ -1,24 +1,24 @@
 ﻿#include "ServiceManager.h"
 #include <Service/LocalService.h>
-#include <Service/ProxyService.h>
 #include <Service/LocalLuaService.h>
 
 #include <Util/StringHelper.h>
 #include <Core/ObjectRegistry.h>
-
-#include <Manager/ListenerManager.h>
+#include<Manager/NetWorkManager.h>
+#include<Manager/ActionManager.h>
 #include <Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
 
 	bool ServiceManager::OnInit()
 	{
-
-		SayNoAssertRetFalse_F(SessionManager::OnInit());
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("Service", this->mServiceList));
 
+		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
+
 		return this->CreateLocalService();
 	}
 
@@ -35,29 +35,86 @@ namespace SoEasy
 
 	void ServiceManager::OnSystemUpdate()
 	{
-		SessionManager::OnSystemUpdate();
-		for (size_t index = 0; index < this->mServiceVector.size(); index++)
+		SharedNetPacket messageBuffer;
+		this->mRemoteMessageQueue.SwapQueueData();
+		// 远程调用消息处理
+		while (this->mRemoteMessageQueue.PopItem(messageBuffer))
 		{
-			ServiceBase *service = this->mServiceVector[index];
-			if (service != nullptr && service->IsActive())
+			const std::string & address = messageBuffer->mAddress;
+			const SharedPacket & messageData = messageBuffer->mMessagePacket;
+			ServiceBase * localService = this->GetService(messageData->service());
+			if (localService != nullptr)
 			{
-				service->OnSystemUpdate();
+				this->mCorManager->Start(messageData->method(), [address, localService, this, messageData]()
+					{
+						SharedPacket responseData = responseData = make_shared<NetWorkPacket>();															
+						XCode code = localService->InvokeMethod(address, messageData, responseData);
+						if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
+						{
+							responseData->set_code(code);
+							responseData->set_rpcid(messageData->rpcid());
+							responseData->set_entityid(messageData->entityid());
+							this->mNetManager->SendMessageByAdress(address, responseData);
+						}
+					});
+			}
+			// 本机调用消息处理
+			while (!this->mLocalMessageQueue.empty())
+			{
+				const SharedPacket & messageData = this->mLocalMessageQueue.front();
+				ServiceBase * localService = this->GetService(messageData->service());
+				if (localService != nullptr)
+				{
+					this->mCorManager->Start(messageData->method(), [localService, this, messageData]()
+						{
+							SharedPacket responseData = responseData = make_shared<NetWorkPacket>();					
+							XCode code = localService->InvokeMethod(messageData, responseData);
+							if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
+							{
+								responseData->set_code(code);
+								responseData->set_rpcid(messageData->rpcid());
+								responseData->set_entityid(messageData->entityid());
+								this->mActionManager->PushLocalResponseData(responseData);
+							}
+						});
+				}
+				this->mLocalMessageQueue.pop();
 			}
 		}
 	}
 
-	void ServiceManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
+	bool ServiceManager::PushRequestMessage(SharedPacket messageData)
 	{
+		const std::string & service = messageData->service();
+		ServiceBase * localService = this->GetService(service);
+		if (localService == nullptr)
+		{
+			return false;
+		}
+		const std::string & method = messageData->method();
+		if (!localService->HasMethod(method))
+		{
+			return false;
+		}
+		this->mLocalMessageQueue.push(messageData);
+		return true;
 	}
 
-	void ServiceManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
+	bool ServiceManager::PushRequestMessage(const std::string & address, SharedPacket messageData)
 	{
-		auto iter1 = this->mLocalServiceMap.begin();
-		for (; iter1 != this->mLocalServiceMap.end(); iter1++)
+		const std::string & service = messageData->service();
+		ServiceBase * localService = this->GetService(service);
+		if (localService == nullptr)
 		{
-			LocalService *localService = iter1->second;
-			localService->OnConnectDone(tcpSession);
+			return false;
 		}
+		const std::string & method = messageData->method();
+		if (!localService->HasMethod(method))
+		{
+			return false;
+		}
+		this->mRemoteMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, messageData));
+		return true;
 	}
 
 	LocalLuaService *ServiceManager::AddLuaService(const std::string name, LocalLuaService *service)
@@ -69,7 +126,6 @@ namespace SoEasy
 			if (service->OnInit())
 			{
 				this->mServiceList.push_back(name);
-				this->mServiceVector.push_back(service);
 				this->mLuaServiceMap.emplace(name, service);
 				SayNoDebugInfo("add new lua service " << name);
 				return service;
@@ -77,6 +133,16 @@ namespace SoEasy
 			SayNoDebugError("init lua service " << name << " fail");
 		}
 		return nullptr;
+	}
+
+	ServiceBase * ServiceManager::GetService(const std::string & name)
+	{
+		LocalLuaService * luaService = this->GetLuaService(name);
+		if (luaService == nullptr)
+		{
+			return this->GetLocalService(name);
+		}
+		return luaService;
 	}
 
 	LocalService *ServiceManager::GetLocalService(const std::string &name)
@@ -156,7 +222,6 @@ namespace SoEasy
 				return false;
 			}
 			SayNoDebugLog("add new service " << name);
-			this->mServiceVector.push_back(localService);
 			this->mLocalServiceMap.emplace(name, localService);
 		}
 		return true;

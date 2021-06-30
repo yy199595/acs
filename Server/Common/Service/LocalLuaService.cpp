@@ -55,7 +55,7 @@ namespace SoEasy
 		return iter != this->mMethodCacheSet.end();
 	}
 
-	bool LocalLuaService::InvokeMethod(const std::string & method, shared_ptr<NetWorkPacket> reqData)
+	XCode LocalLuaService::InvokeMethod(const SharedPacket requestData, SharedPacket responseData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -64,22 +64,23 @@ namespace SoEasy
 		if (!lua_isfunction(this->mLuaEnv, -1))
 		{
 			SayNoDebugError("not find function " << luaAction);
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
 		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
+		const std::string & method = requestData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
-		lua_pushinteger(this->mLuaEnv, reqData->entityid());
-		lua_pushinteger(this->mLuaEnv, reqData->rpcid());
-		if (!reqData->messagedata().empty())
+		lua_pushinteger(this->mLuaEnv, requestData->entityid());
+		lua_pushinteger(this->mLuaEnv, requestData->rpcid());
+		if (!requestData->messagedata().empty())
 		{
-			if (!reqData->protocname().empty())
+			if (!requestData->protocname().empty())
 			{
 				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(reqData->protocname());
+				Message * message = pool->Create(requestData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -90,7 +91,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = reqData->messagedata();
+				const std::string & data = requestData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}
@@ -98,12 +99,12 @@ namespace SoEasy
 		{
 			const char * err = lua_tostring(this->mLuaEnv, -1);
 			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
-		return lua_toboolean(this->mLuaEnv, -1);
+		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
-	bool LocalLuaService::InvokeMethod(const std::string & address, const std::string & method, SharedPacket reqData)
+	XCode LocalLuaService::InvokeMethod(const std::string &address, const SharedPacket requestData, SharedPacket responseData)
 	{		
 		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -112,23 +113,24 @@ namespace SoEasy
 		if (!lua_isfunction(this->mLuaEnv, -1))
 		{
 			SayNoDebugError("not find function " << luaAction);
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
 		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
+		const std::string & method = requestData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
 		lua_pushstring(this->mLuaEnv, address.c_str());
-		lua_pushinteger(this->mLuaEnv, reqData->entityid());
-		lua_pushinteger(this->mLuaEnv, reqData->rpcid());
-		if (!reqData->messagedata().empty())
+		lua_pushinteger(this->mLuaEnv, requestData->entityid());
+		lua_pushinteger(this->mLuaEnv, requestData->rpcid());
+		if (!requestData->messagedata().empty())
 		{
-			if (!reqData->protocname().empty())
+			if (!requestData->protocname().empty())
 			{
 				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(reqData->protocname());
+				Message * message = pool->Create(requestData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -139,7 +141,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = reqData->messagedata();
+				const std::string & data = requestData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}
@@ -147,9 +149,9 @@ namespace SoEasy
 		{
 			const char * err = lua_tostring(this->mLuaEnv, -1);
 			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
-			return false;
+			return XCode::CallLuaFunctionFail;
 		}
-		return lua_toboolean(this->mLuaEnv, -1);
+		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
 }

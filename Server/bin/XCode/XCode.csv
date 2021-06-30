@@ -7,6 +7,7 @@ CallFunctionNotExist	调用方法不存在
 CallArgsError	调用参数错误
 TimeoutAutoCall	超时自动调用
 CallLuaFunctionFail	调用lua方法错误
+NotResponseMessage	不返回数据
 JsonCastProtocbufFail	json转protobuf失败
 ProtocbufCastJsonFail	protobuf转json失败
 CreatePorotbufFail	创建protobuf失败

@@ -72,30 +72,19 @@ namespace SoEasy
 			SayNoDebugError("parse message error close session");
 			return false;
 		}
+
 		const std::string & method = messageData->method();
 		const std::string & service = messageData->service();
 		const long long callbackId = messageData->rpcid();
 		if (!service.empty() && !method.empty())
 		{
 			const std::string & address = session->GetAddress();
-			LocalLuaService * luaService = this->mServiceManager->GetLuaService(service);
-			if (luaService != nullptr && luaService->HasMethod(method))
+			if (!mServiceManager->PushRequestMessage(address, messageData))
 			{
-				luaService->PushHandleMessage(address, messageData);
-				SayNoDebugInfo("call lua method " << service << "." << method);
-				return true;
-			}
-			LocalService * localService = this->mServiceManager->GetLocalService(service);
-			if (localService != nullptr && localService->HasMethod(method))
-			{
-				localService->PushHandleMessage(address, messageData);
-				SayNoDebugInfo("call c++ method " << service << "." << method);
-				return true;
-			}
-			return false;
+				return false;
+			}			
 		}
-		this->mActionManager->AddActionArgv(callbackId, messageData);
-		return true;
+		return this->mActionManager->PushRemoteResponseData(messageData);
 	}
 
 	bool SessionManager::OnInit()

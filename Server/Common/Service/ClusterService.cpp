@@ -2,7 +2,6 @@
 #include <Manager/ServiceManager.h>
 #include <Manager/ServiceNodeManager.h>
 #include <Coroutine/CoroutineManager.h>
-#include <Service/ProxyService.h>
 #include <Other/ServiceNode.h>
 namespace SoEasy
 {
@@ -23,10 +22,6 @@ namespace SoEasy
 	void ClusterService::OnInitComplete()
 	{
 		this->StarRegisterNode();
-	}
-
-	void ClusterService::OnConnectDone(SharedTcpSession tcpSession)
-	{
 	}
 
 	void ClusterService::StarRegisterNode()

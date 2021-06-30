@@ -195,7 +195,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 			const char *str = lua_tolstring(luaEnv, 4, &size);
 			returnPacket->set_messagedata(str, size);
 		}
-		actManager->AddActionArgv(callbackId, returnPacket);
+		actManager->PushLocalResponseData(returnPacket);
 	}
 	return 0;
 }

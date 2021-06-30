@@ -16,7 +16,6 @@ namespace SoEasy
 	public:
 		bool OnInit() final;
 		void OnInitComplete()final;
-		void OnConnectDone(SharedTcpSession tcpSession) final;
 	private:
 		void StarRegisterNode();
 	private:
