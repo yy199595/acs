@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #pragma once
 #include<queue>
 #include<mutex>
@@ -31,7 +31,7 @@ namespace SoEasy
 	template<typename T>
 	inline void DoubleBufferQueue<T>::SwapQueueData()
 	{
-		if (!this->mCacheQueue.empty())
+		if (!this->mCacheQueue.empty() && this->mWorkQueue.empty())
 		{
 			mLock.lock();
 			std::swap(this->mCacheQueue, this->mWorkQueue);

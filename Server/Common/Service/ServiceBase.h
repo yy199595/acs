@@ -14,7 +14,7 @@ namespace SoEasy
 		virtual ~ServiceBase() {}
 
 	public:
-		virtual bool OnInit() { return false; }
+		virtual bool OnInit() { return true; }
 		virtual void OnInitComplete() {};
 		virtual bool IsLuaService() { return false; };
 	public:

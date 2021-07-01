@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<memory>
 #include<XCode/XCode.h>
 #include<rapidjson/writer.h>
@@ -31,7 +31,7 @@ namespace SoEasy
 		bool Write(const char * value, int size);
 	public:
 		bool Serialization(std::string & json);
-		bool Serialization(std::shared_ptr<rapidjson::Document> & document);
+		bool Serialization(rapidjson::Document & document);
 	private:
 		rapidjson::StringBuffer mJsonStringBuf;
 		rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;

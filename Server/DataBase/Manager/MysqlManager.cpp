@@ -7,7 +7,6 @@
 #include <MysqlClient/MysqlTaskAction.h>
 #include <Util/StringHelper.h>
 #include <Script/ClassProxyHelper.h>
-#include <Script/MysqlExtension.h>
 #include <Util/FileHelper.h>
 
 #include <MysqlClient/TableOperator.h>
@@ -129,11 +128,6 @@ namespace SoEasy
 	void MysqlManager::OnInitComplete()
 	{
 		
-	}
-
-	void MysqlManager::PushClassToLua(lua_State *luaEnv)
-	{
-		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeMysqlCommand", SoEasy::InvokeMysqlCommand);
 	}
 
 	bool MysqlManager::InitMysqlTable()

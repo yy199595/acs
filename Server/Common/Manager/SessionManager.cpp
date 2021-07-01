@@ -16,6 +16,7 @@ namespace SoEasy
 		if (tcpSession != nullptr)
 		{
 			this->mNewSessionQueue.AddItem(tcpSession);
+			SayNoDebugFatal("add new client session " << tcpSession->GetAddress());
 			return tcpSession;
 		}
 		return nullptr;
@@ -50,6 +51,7 @@ namespace SoEasy
 			return false;
 		}
 		this->mNewSessionQueue.AddItem(tcpSession);
+		SayNoDebugFatal("add new node session " << tcpSession->GetAddress());
 		return true;
 	}
 
@@ -114,7 +116,6 @@ namespace SoEasy
 			this->OnSessionErrorAfter(pTcpSession);
 			pTcpSession = nullptr;
 		}
-
 		while (this->mNewSessionQueue.PopItem(pTcpSession))
 		{
 			if (!this->mNetWorkManager->AddTcpSession(pTcpSession))
@@ -122,6 +123,7 @@ namespace SoEasy
 				SayNoDebugError("add tcp session error : " << pTcpSession->GetAddress());
 				continue;
 			}
+			SayNoDebugFatal("new session " << pTcpSession->GetAddress());
 			this->OnSessionConnectAfter(pTcpSession);
 			if (pTcpSession->IsContent())
 			{

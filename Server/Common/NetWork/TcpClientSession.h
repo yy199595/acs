@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<Define/CommonDef.h>
 #include<Module/Component.h>
 namespace SoEasy
@@ -63,7 +63,6 @@ namespace SoEasy
 		long long mSocketId;
 		std::string mAdress;
 		unsigned short mPort;
-		AsioContext & mAsioContext;
 		SharedTcpSocket mBinTcpSocket;
 		AsioTcpEndPoint mSocketEndPoint;
 	private:

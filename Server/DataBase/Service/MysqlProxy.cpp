@@ -6,6 +6,8 @@
 #include <MysqlClient/MysqlUpdateTask.h>
 #include <MysqlClient/MysqlQueryTask.h>
 #include <MysqlClient/MysqlDeleteTask.h>
+#include<Protocol/db.pb.h>
+#include<google/protobuf/util/json_util.h>
 namespace SoEasy
 {
     MysqlProxy::MysqlProxy()
@@ -23,20 +25,34 @@ namespace SoEasy
         this->Bind("MysqlProxy.Update", MysqlOperAction(std::bind(&MysqlProxy::Update, this, args1)));
         this->Bind("MysqlProxy.Delete", MysqlOperAction(std::bind(&MysqlProxy::Delete, this, args1)));
         this->Bind("MysqlProxy.Query", MysqlQueryAction(std::bind(&MysqlProxy::Query, this, args1, args2)));
+
         return true;
     }
 
+	void MysqlProxy::OnInitComplete()
+	{
+		db::UserAccountData userData;
+		userData.set_account("646585122@qq.com");
+		userData.set_userid(420625199511045331);
+		this->Query(userData, userData);
+	}
+
     XCode MysqlProxy::Query(Message & requestData, Message & responseData)
     {
-        auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
-        XCode startCode = this->mMysqlManager->StartTask(insertTask, &responseData);
+        auto qyeryTask = this->mMysqlManager->CreateMysqlTask<MysqlQueryTask>();
+        XCode startCode = this->mMysqlManager->StartTask(qyeryTask, &responseData);
         if (startCode != XCode::Successful)
         {
             responseData.Clear();
             return startCode;
         }
         this->mCorManager->YieldReturn();
-        return insertTask->GetErrorCode();
+		const std::string & json = qyeryTask->GetJsonData();
+		if(!util::JsonStringToMessage(json, &responseData).ok())
+		{
+			return XCode::JsonCastProtocbufFail;
+		}
+        return qyeryTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Insert(Message & requestData)

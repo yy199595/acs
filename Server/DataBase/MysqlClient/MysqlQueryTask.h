@@ -12,7 +12,6 @@ namespace SoEasy
 	protected:
 		void OnTaskFinish() final;
 		bool GetSqlCommand(std::string & sql) final;
-		void OnQueryFinish(QuertJsonWritre & jsonWriter) final; //查询完成之后调用
 	private:
 		Message * mData;
 		std::string mTable;

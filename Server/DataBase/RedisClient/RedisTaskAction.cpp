@@ -1,4 +1,4 @@
-#include"RedisTaskAction.h"
+﻿#include"RedisTaskAction.h"
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
@@ -23,10 +23,6 @@ namespace SoEasy
 		if (this->GetErrorCode() != XCode::Successful)
 		{
 			SayNoDebugError("[redis error ]" << this->GetErrorStr());
-		}
-		if (!jsonWriter.Serialization(this->mDocument))
-		{
-			SayNoDebugError("[redis error ] redis data to json fail");
 		}
 	}
 

@@ -47,7 +47,7 @@ namespace SoEasy
 			{
 				this->mCorManager->Start(messageData->method(), [address, localService, this, messageData]()
 					{
-						SharedPacket responseData = responseData = make_shared<NetWorkPacket>();															
+						SharedPacket responseData = make_shared<NetWorkPacket>();															
 						XCode code = localService->InvokeMethod(address, messageData, responseData);
 						if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
 						{
@@ -67,7 +67,7 @@ namespace SoEasy
 				{
 					this->mCorManager->Start(messageData->method(), [localService, this, messageData]()
 						{
-							SharedPacket responseData = responseData = make_shared<NetWorkPacket>();					
+							SharedPacket responseData = make_shared<NetWorkPacket>();					
 							XCode code = localService->InvokeMethod(messageData, responseData);
 							if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
 							{

@@ -1,4 +1,4 @@
-#include"MysqlTaskAction.h"
+﻿#include"MysqlTaskAction.h"
 #include<Manager/MysqlManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
@@ -16,19 +16,6 @@ namespace SoEasy
 	{
 		SayNoAssertRet_F(this->mCoroutineMgr);
 		this->mCoroutineMgr->Resume(this->mCoroutineId);
-	}
-
-	void MysqlTaskAction::OnQueryFinish(QuertJsonWritre & jsonWriter)
-	{
-		MysqlTaskBase::OnQueryFinish(jsonWriter);
-		if (this->GetErrorCode() != XCode::Successful)
-		{
-			SayNoDebugError("[mysql error] " << this->GetErrorStr());
-		}
-		if (!jsonWriter.Serialization(this->mDocument))
-		{
-			SayNoDebugError("[mysql error] Serialization To Json fail");
-		}
 	}
 
 	std::shared_ptr<InvokeResultData> MysqlTaskAction::GetInvokeData()

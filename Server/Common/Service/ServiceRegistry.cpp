@@ -33,15 +33,17 @@ namespace SoEasy
 	{
 		const int areaId = nodeInfo.areaid();
 		const int nodeId = nodeInfo.nodeid();
+		
 		const std::string &address = nodeInfo.address();
-		SharedTcpSession tcpSession = this->GetCurTcpSession();
+		const std::string & nodeName = nodeInfo.servername();
+		//SharedTcpSession tcpSession = this->GetCurTcpSession();
 		long long key = (long long)areaId << 32 | nodeId;
 		auto iter = this->mServiceNodeMap.find(key);
 		if (iter != this->mServiceNodeMap.end())
 		{
 			return XCode::Failure;
 		}
-		ServiceNode *serviceNode = new ServiceNode(areaId, nodeId, address, tcpSession->GetAddress());
+		ServiceNode *serviceNode = new ServiceNode(areaId, nodeId, nodeName, address);
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
 			serviceNode->AddService(nodeInfo.services(index));

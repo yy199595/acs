@@ -49,8 +49,6 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
-		void PushClassToLua(lua_State *luaEnv) final; //自身方法导出到lua
-
 	private:
 		bool InitMysqlTable();
 		bool StartConnectMysql();

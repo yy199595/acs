@@ -71,12 +71,18 @@ namespace SoEasy
 		{
 			return nullptr;
 		}
+		const std::string & name = serviceNode->GetNodeName();
 		const std::string & address = serviceNode->GetAddress();
 		SharedTcpSession nodeSession = this->mNetWorkManager->GetTcpSession(address);
 		if (nodeSession == nullptr)
 		{
-			this->mConnectSessionList.insert(address);
-			nodeSession = this->CreateTcpSession(serviceNode->GetNodeName(), address);
+			auto iter = this->mConnectSessionMap.find(address);
+			if (iter != this->mConnectSessionMap.end())
+			{
+				return nullptr;
+			}
+			nodeSession = this->CreateTcpSession(name, address);
+			this->mConnectSessionMap.insert(std::make_pair(address, nodeSession));
 			return nullptr;
 		}
 		return nodeSession->IsActive() ? nodeSession : nullptr;
@@ -85,14 +91,16 @@ namespace SoEasy
 	bool ServiceNodeManager::OnInit()
 	{
 		std::string queryAddress;
-		this->GetConfig().GetValue("QueryAddress", queryAddress);
-		ServiceNode *centerNode = new ServiceNode(0, 0, "Center", queryAddress);
-		centerNode->AddService(std::string("ServiceRegistry"));
-		return this->AddServiceNode(centerNode);
+		SessionManager::OnInit();
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", queryAddress));
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		ServiceNode * centerNode = new ServiceNode(0, 0, "Center", queryAddress);
+		return centerNode->AddService(std::string("ServiceRegistry")) && this->AddServiceNode(centerNode);
 	}
 
 	void ServiceNodeManager::OnSystemUpdate()
 	{
+		SessionManager::OnSystemUpdate();
 		if (!this->mServiceNodeArray.empty())
 		{
 			auto iter = this->mServiceNodeArray.begin();
@@ -118,6 +126,12 @@ namespace SoEasy
 
 	void ServiceNodeManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
 	{
+		const std::string & address = tcpSession->GetAddress();
+		auto iter = this->mConnectSessionMap.find(address);
+		if (iter != this->mConnectSessionMap.end())
+		{
+			this->mConnectSessionMap.erase(iter);
+		}
 	}
 
 	ServiceNode *ServiceNodeManager::GetServiceNode(const int nodeId)

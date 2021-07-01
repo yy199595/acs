@@ -5,7 +5,6 @@
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Script/ClassProxyHelper.h>
-#include<Script/MysqlExtension.h>
 namespace SoEasy
 {
 	RedisManager::RedisManager()
@@ -71,11 +70,6 @@ namespace SoEasy
 	void RedisManager::OnInitComplete()
 	{
 		
-	}
-
-	void RedisManager::PushClassToLua(lua_State * luaEnv)
-	{
-		ClassProxyHelper::PushStaticExtensionFunction(luaEnv, "SoEasy", "InvokeRedisCommand", SoEasy::InvokeRedisCommand);
 	}
 
 	bool RedisManager::HasValue(const std::string &  key)

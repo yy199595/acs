@@ -41,12 +41,6 @@
     <ClCompile Include="QueryResult\InvokeResultData.cpp">
       <Filter>QueryResult</Filter>
     </ClCompile>
-    <ClCompile Include="Script\MysqlExtension.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlLuaTask.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
     <ClCompile Include="RedisClient\RedisLuaTask.cpp">
       <Filter>RedisClient</Filter>
     </ClCompile>
@@ -95,12 +89,6 @@
       <Filter>QueryResult</Filter>
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlDefine.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="Script\MysqlExtension.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlLuaTask.h">
       <Filter>MysqlClient</Filter>
     </ClInclude>
     <ClInclude Include="RedisClient\RedisLuaTask.h">

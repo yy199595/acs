@@ -18,8 +18,7 @@ namespace SoEasy
 	bool NetWorkManager::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
-		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());
-		
+		SayNoAssertRetFalse_F(this->mSessionContext = this->GetApp()->GetAsioContextPtr());	
 		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<ActionManager>());
 		return true;
 	}
@@ -124,5 +123,8 @@ namespace SoEasy
 	void NetWorkManager::OnDestory()
 	{
 		
+	}
+	void NetWorkManager::NetUpdate()
+	{
 	}
 }

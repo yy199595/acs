@@ -1,4 +1,4 @@
-#include "InvokeResultData.h"
+﻿#include "InvokeResultData.h"
 
 namespace SoEasy
 {
@@ -92,15 +92,14 @@ namespace SoEasy
 		}
 		return false;
 	}
-	bool QuertJsonWritre::Serialization(std::shared_ptr<rapidjson::Document>& document)
+	bool QuertJsonWritre::Serialization(rapidjson::Document & document)
 	{
 		if (this->jsonWriter.EndObject())
 		{
-			document = std::make_shared<rapidjson::Document>();
 			const char * json = this->mJsonStringBuf.GetString();
 			const size_t size = this->mJsonStringBuf.GetLength();
-			document->Parse(json, size);
-			return document->HasParseError() == false;
+			document.Parse(json, size);
+			return document.HasParseError() == false;
 		}
 		return false;
 	}

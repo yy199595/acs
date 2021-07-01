@@ -31,6 +31,8 @@ namespace SoEasy
 		bool OnInit() override;
 		void OnDestory() override;
 	private:
+		void NetUpdate();
+	private:
 		std::mutex mSessionLock;
 		AsioContext * mSessionContext;
 		class ActionManager * mLocalActionManager;

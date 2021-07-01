@@ -1,4 +1,4 @@
-
+﻿
 #include"Applocation.h"
 #include"ObjectRegistry.h"
 #include<Util/FileHelper.h>
@@ -137,14 +137,15 @@ namespace SoEasy
 			Stop();
 			return -3;
 		}
-
-		this->mNetThread = new std::thread([this]()
-		{
-			this->mAsioContext->run();
-		});
+		this->mNetThread = new std::thread(BIND_THIS_ACTION_0(Applocation::NetWorkMainLoop));
 		this->mNetThread->detach();
-
 		return this->LogicMainLoop();
+	}
+
+	void Applocation::NetWorkMainLoop()
+	{
+		asio::error_code error;
+		this->mAsioContext->run(error);
 	}
 
 	int Applocation::Stop()
@@ -188,6 +189,7 @@ namespace SoEasy
 		const long long systemUpdateInterval = 1000 / systemFps;
 		while (!this->mIsClose)
 		{
+			this->mAsioContext->poll();
 			startTimer = TimeHelper::GetMilTimestamp();
 			if (startTimer - mLastSystemTime >= systemUpdateInterval)
 			{

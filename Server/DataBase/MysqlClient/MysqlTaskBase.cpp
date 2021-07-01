@@ -14,13 +14,11 @@ namespace SoEasy
 
 	void MysqlTaskBase::InvokeInThreadPool(long long threadId)
 	{
-		QuertJsonWritre jsonWrite;
 		SayNoMysqlSocket * mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
 		if (mysqlSocket == nullptr)
 		{
 			this->mErrorCode = MysqlSocketIsNull;
 			this->mErrorString = "mysql socket is null";
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		
@@ -28,7 +26,6 @@ namespace SoEasy
 		{
 			this->mErrorCode = MysqlSelectDbFailure;
 			this->mErrorString = "select " + this->mDataBaseName + " fail";
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		std::string sql;
@@ -36,21 +33,19 @@ namespace SoEasy
 		{
 			this->mErrorCode = XCode::MysqlInvokeFailure;
 			this->mErrorString = "protobuf args error ";
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		if (mysql_real_query(mysqlSocket, sql.c_str(), sql.size()) != 0)
 		{
 			this->mErrorCode = MysqlInvokeFailure;
 			this->mErrorString = mysql_error(mysqlSocket);
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		this->mErrorCode = XCode::Successful;
 		MysqlQueryResult * queryResult = mysql_store_result(mysqlSocket);
 		if (queryResult != nullptr)
 		{		
-			
+			QuertJsonWritre jsonWrite;
 			std::vector<MYSQL_FIELD *> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
 			unsigned int fieldCount = mysql_field_count(mysqlSocket);
@@ -61,7 +56,7 @@ namespace SoEasy
 			}
 			if (rowCount == 1)
 			{			
-				jsonWrite.StartWriteObject("data");
+				//jsonWrite.StartWriteObject();
 				MYSQL_ROW row = mysql_fetch_row(queryResult);
 				unsigned long * lengths = mysql_fetch_lengths(queryResult);
 				for (size_t index = 0; index < fieldNameVector.size(); index++)
@@ -69,7 +64,7 @@ namespace SoEasy
 					MYSQL_FIELD * field = fieldNameVector[index];
 					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 				}
-				jsonWrite.EndWriteObject();
+				//jsonWrite.EndWriteObject();
 			}
 			else
 			{
@@ -89,18 +84,10 @@ namespace SoEasy
 				jsonWrite.EndWriteArray();
 			}	
 			mysql_free_result(queryResult);
-		}
-		this->OnQueryFinish(jsonWrite);
-	}
-	void MysqlTaskBase::OnQueryFinish(QuertJsonWritre & jsonWriter)
-	{
-		jsonWriter.Write("code", this->mErrorCode);
-		jsonWriter.Write("error", this->mErrorString);
-		if (this->mErrorCode != XCode::Successful)
-		{
-			SayNoDebugError("[mysql error] " << this->mErrorString);
+			jsonWrite.Serialization(mJsonData);
 		}
 	}
+	
 
 	SqlTableConfig * MysqlTaskBase::GetTabConfig(const std::string & tab)
 	{

@@ -56,7 +56,8 @@ namespace SoEasy
 		void UpdateConsoleTitle();
 		bool GetTypeName(size_t hash, std::string & name);
 	private:
-		int  LogicMainLoop();
+		int LogicMainLoop();
+		void NetWorkMainLoop();
 	private:
 		AsioWork * mAsioWork;
 		std::thread * mNetThread;

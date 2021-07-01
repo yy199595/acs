@@ -14,6 +14,7 @@ namespace SoEasy
         XCode Query( Message & requestData, Message & responseData);
     public:
         bool OnInit() final;
+		void OnInitComplete() final;
     private:
         int mMysqlNodeId;
         class MysqlManager *mMysqlManager;

@@ -5,7 +5,7 @@
 namespace SoEasy
 {
 	TcpClientSession::TcpClientSession(SessionManager * manager, SharedTcpSocket socket)
-		:mAsioContext(manager->GetAsioContext()), mCurrentSatte(Session_None)
+		: mCurrentSatte(Session_None)
 	{
 		this->mIsContent = false;
 		this->mBinTcpSocket = socket;
@@ -21,13 +21,12 @@ namespace SoEasy
 	}
 
 	TcpClientSession::TcpClientSession(SessionManager * manager, std::string name, std::string ip, unsigned short port)
-		: mAsioContext(manager->GetAsioContext()), mCurrentSatte(Session_None)
+		: mCurrentSatte(Session_None)
 	{		
 		this->mIsContent = true;
 		this->mSessionName = name;
 		this->InitMember(ip, port);
 		this->mDispatchManager = manager;
-		this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(mAsioContext);
 		this->mSocketEndPoint = asio::ip::tcp::endpoint(asio::ip::address::from_string(mIp), mPort);
 		this->mSocketId = (long long)this->mSocketEndPoint.address().to_v4().to_uint() << 32 | this->mPort;
 	}
@@ -67,7 +66,8 @@ namespace SoEasy
 		{
 			return false;
 		}
-		this->mAsioContext.post([this, message]()
+		AsioContext & io = this->mDispatchManager->GetAsioContext();
+		io.post([this, message]()
 		{
 			mBinTcpSocket->async_send(asio::buffer(message->c_str(), message->size()),
 				[this](const asio::error_code & error_code, std::size_t size)
@@ -84,7 +84,8 @@ namespace SoEasy
 	void TcpClientSession::StartClose()
 	{
 		this->mCurrentSatte = Session_Close;
-		this->mAsioContext.post(this->mCloseAction);
+		AsioContext & io = this->mDispatchManager->GetAsioContext();
+		io.post(this->mCloseAction);
 	}
 
 	bool TcpClientSession::StartConnect()
@@ -100,7 +101,8 @@ namespace SoEasy
 		this->mConnectCount++;
 		mCurrentSatte = SessionState::Session_Connect;
 		this->mStartTime = TimeHelper::GetSecTimeStamp();
-		this->mAsioContext.post(BIND_THIS_ACTION_0(TcpClientSession::Connect));
+		AsioContext & io = this->mDispatchManager->GetAsioContext();
+		io.post(BIND_THIS_ACTION_0(TcpClientSession::Connect));
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
 		return true;
 	}
@@ -124,12 +126,18 @@ namespace SoEasy
 		{
 			return false;
 		}
-		this->mAsioContext.post(this->mRecvAction);
+		AsioContext & io = this->mDispatchManager->GetAsioContext();
+		io.post(this->mRecvAction);
 		return true;
 	}
 
 	void TcpClientSession::Connect()
 	{
+		if (this->mBinTcpSocket == nullptr)
+		{
+			AsioContext & io = this->mDispatchManager->GetAsioContext();
+			this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(io);
+		}
 		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this](const asio::error_code & code)
 		{
 			if (code)
@@ -189,7 +197,8 @@ namespace SoEasy
 					this->CloseSocket();
 					return;
 				}
-				mAsioContext.post(this->mRecvAction);
+				AsioContext & io = this->mDispatchManager->GetAsioContext();
+				io.post(this->mRecvAction);
 			}
 			if (nMessageBuffer != this->mRecvMsgBuffer)
 			{

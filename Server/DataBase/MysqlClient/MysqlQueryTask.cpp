@@ -103,7 +103,7 @@ namespace SoEasy
 		return true;
 	}
 
-	void MysqlQueryTask::OnQueryFinish(QuertJsonWritre &jsonWriter)
+	/*void MysqlQueryTask::OnQueryFinish(QuertJsonWritre &jsonWriter)
 	{
 		MysqlTaskBase::OnQueryFinish(jsonWriter);
 		const Reflection *pReflection = this->mData->GetReflection();
@@ -154,5 +154,5 @@ namespace SoEasy
 				}
 			}
 		}
-	}
+	}*/
 }

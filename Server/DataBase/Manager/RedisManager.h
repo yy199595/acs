@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<Util/NumberHelper.h>
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
@@ -15,7 +15,6 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;			//初始化管理器
 		void OnInitComplete() override;				//初始化完成之后
-		void PushClassToLua(lua_State * luaEnv) final;		//自身方法导出到lua
 	public:
 		template<typename ... Args>
 		shared_ptr<InvokeResultData> InvokeCommand(const std::string &  cmd, Args && ... args);
