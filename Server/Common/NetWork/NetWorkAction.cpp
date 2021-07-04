@@ -2,20 +2,20 @@
 #include<Pool/ProtocolPool.h>
 namespace SoEasy
 {
-	XCode LocalActionProxy1::Invoke(shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
+	XCode LocalActionProxy1::Invoke(PB::NetWorkPacket * messageData)
 	{
-		const long long operId = requestData->entityid();
+		const long long operId = messageData->entityid();
 		return this->mBindAction(operId);
 	}
 }
 
 namespace SoEasy
 {
-	XCode LocalMysqlActionProxy::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
+	XCode LocalMysqlActionProxy::Invoke(PB::NetWorkPacket * messageData)
 	{
 		ProtocolPool * pool = ProtocolPool::Get();
-		const std::string &message = requestData->messagedata();
-		const std::string &protocName = requestData->protocname();
+		const std::string &message = messageData->messagedata();
+		const std::string &protocName = messageData->protocname();
 		
 		Message * requestMessage = pool->Create(protocName);
 		if (requestMessage == nullptr)
@@ -35,11 +35,11 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	XCode LocalMysqlQueryActionProxy::Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData)
+	XCode LocalMysqlQueryActionProxy::Invoke(PB::NetWorkPacket * messageData)
 	{
 		ProtocolPool * pool = ProtocolPool::Get();
-		const std::string &message = requestData->messagedata();
-		const std::string &protocName = requestData->protocname();
+		const std::string &message = messageData->messagedata();
+		const std::string &protocName = messageData->protocname();
 		Message * requestMessage = pool->Create(protocName);
 		if (requestMessage == nullptr)
 		{
@@ -59,7 +59,7 @@ namespace SoEasy
 				pool->Destory(requestMessage);
 				return XCode::SerializationFailure;
 			}
-			returnData->set_messagedata(responseMessage);
+			messageData->set_messagedata(responseMessage);
 		}
 		pool->Destory(requestMessage);
 		return code;

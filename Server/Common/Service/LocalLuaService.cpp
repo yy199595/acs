@@ -55,7 +55,7 @@ namespace SoEasy
 		return iter != this->mMethodCacheSet.end();
 	}
 
-	XCode LocalLuaService::InvokeMethod(const SharedPacket requestData, SharedPacket responseData)
+	XCode LocalLuaService::InvokeMethod(PB::NetWorkPacket * messageData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -71,16 +71,16 @@ namespace SoEasy
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		const std::string & method = requestData->method();
+		const std::string & method = messageData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
-		lua_pushinteger(this->mLuaEnv, requestData->entityid());
-		lua_pushinteger(this->mLuaEnv, requestData->rpcid());
-		if (!requestData->messagedata().empty())
+		lua_pushinteger(this->mLuaEnv, messageData->entityid());
+		lua_pushinteger(this->mLuaEnv, messageData->rpcid());
+		if (!messageData->messagedata().empty())
 		{
-			if (!requestData->protocname().empty())
+			if (!messageData->protocname().empty())
 			{
 				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(requestData->protocname());
+				Message * message = pool->Create(messageData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -91,7 +91,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = requestData->messagedata();
+				const std::string & data = messageData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}
@@ -104,7 +104,7 @@ namespace SoEasy
 		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
-	XCode LocalLuaService::InvokeMethod(const std::string &address, const SharedPacket requestData, SharedPacket responseData)
+	XCode LocalLuaService::InvokeMethod(const std::string &address, PB::NetWorkPacket * messageData)
 	{		
 		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -120,17 +120,17 @@ namespace SoEasy
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		const std::string & method = requestData->method();
+		const std::string & method = messageData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
 		lua_pushstring(this->mLuaEnv, address.c_str());
-		lua_pushinteger(this->mLuaEnv, requestData->entityid());
-		lua_pushinteger(this->mLuaEnv, requestData->rpcid());
-		if (!requestData->messagedata().empty())
+		lua_pushinteger(this->mLuaEnv, messageData->entityid());
+		lua_pushinteger(this->mLuaEnv, messageData->rpcid());
+		if (!messageData->messagedata().empty())
 		{
-			if (!requestData->protocname().empty())
+			if (!messageData->protocname().empty())
 			{
 				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(requestData->protocname());
+				Message * message = pool->Create(messageData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
@@ -141,7 +141,7 @@ namespace SoEasy
 			}
 			else
 			{
-				const std::string & data = requestData->messagedata();
+				const std::string & data = messageData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
 		}

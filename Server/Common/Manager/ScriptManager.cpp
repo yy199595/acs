@@ -3,7 +3,7 @@
 #include<Script/luadebug.h>
 #include<Object/GameObject.h>
 #include<Service/ServiceRegistry.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetSessionManager.h>
 #include<Manager/TimerManager.h>
 
 #include<NetWork/TcpClientSession.h>

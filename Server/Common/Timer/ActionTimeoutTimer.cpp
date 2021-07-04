@@ -1,6 +1,7 @@
 ﻿#include"ActionTimeoutTimer.h"
 #include<NetWork/NetWorkRetAction.h>
 #include<Manager/ActionManager.h>
+#include<Pool/ObjectPool.h>
 namespace SoEasy
 {
 	ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, ActionManager * mgr)
@@ -12,10 +13,11 @@ namespace SoEasy
 
 	bool ActionTimeoutTimer::Invoke()
 	{
-		std::shared_ptr<NetWorkPacket> packet = make_shared<NetWorkPacket>();
+		NetWorkPacket * packet = NetPacketPool.Create();
 		packet->set_rpcid(this->mCallbackId);
 		packet->set_code(XCode::TimeoutAutoCall);
-		this->mActionManager->PushLocalResponseData(packet);
+		this->mActionManager->InvokeCallback(mCallbackId, packet);
+		NetPacketPool.Destory(packet);
 		return false;
 	}
 }

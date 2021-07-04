@@ -24,58 +24,48 @@ namespace SoEasy
 		const unsigned short mPort;
 		const std::string mMessage;
 	};
-	class SessionManager;
+	class NetSessionManager;
 	
 	class TcpClientSession : public std::enable_shared_from_this<TcpClientSession>
 	{
 		typedef std::function<void(shared_ptr<TcpClientSession>, bool)> ConnectCallback;
 	public:
-		TcpClientSession(SessionManager * manager, SharedTcpSocket socket);
-		TcpClientSession(SessionManager * manager, std::string name, std::string ip, unsigned short port);
+		TcpClientSession(NetSessionManager * manager, SharedTcpSocket socket);
+		TcpClientSession(NetSessionManager * manager, std::string name, std::string ip, unsigned short port);
 		virtual ~TcpClientSession();
 	public:
 		bool IsActive();	
 		inline const std::string & GetIP() { return mIp; }
 		inline unsigned short GetPort() { return mPort; }
-		inline long long GetSocketId() { return mSocketId; }
-		inline long long GetStartTime() { return mStartTime; }
 		inline SessionState GetState() { return mCurrentSatte; }
 		inline const bool IsContent() { return this->mIsContent; }
 		inline const std::string & GetAddress() { return mAdress; }	
 		inline SharedTcpSocket GetSocket() { return this->mBinTcpSocket; }
 		inline const std::string & GetSessionName() { return mSessionName; }
-		inline void SetSessionName(const std::string & name) { mSessionName = name; }		
 	public:		
-		bool SendPackage(std::shared_ptr<std::string> message);
-		SessionManager * GetDispatchManager() { return this->mDispatchManager; }
+		bool SendPackage(const shared_ptr<std::string> message);
 	public:
 		void StartClose();
 		bool StartConnect();
-		bool StartReceiveMsg();
+		void StartReceiveMsg();
 	private:
-		void Connect();
-		void Receive();
-		void CloseSocket();
 		void ReadMessageBody(const  size_t allSize);
 		void InitMember(const std::string & ip, unsigned short port);
 	private:
 		std::string mIp;
-		long long mSocketId;
 		std::string mAdress;
 		unsigned short mPort;
+		AsioContext & mAsioContext;
 		SharedTcpSocket mBinTcpSocket;
 		AsioTcpEndPoint mSocketEndPoint;
 	private:
 		bool mIsContent;
-		long long mStartTime;	
 		std::string mSessionName;
 		SessionState mCurrentSatte;
 		unsigned int mConnectCount;
-		SessionManager * mDispatchManager;
+		NetSessionManager * mDispatchManager;
 	private:	
 		std::function<void()> mRecvAction;
-		std::function<void()> mCloseAction;
-		std::function<void()> mConnectAction;
 	private:
 		char * mRecvMsgBuffer;
 		unsigned int mRecvBufferSize;

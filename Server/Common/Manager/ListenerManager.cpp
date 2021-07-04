@@ -1,46 +1,49 @@
-#include "ListenerManager.h"
+﻿#include "ListenerManager.h"
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
-#include<Manager/NetWorkManager.h>
-#include<Core/TcpSessionListener.h>
+#include<Manager/NetSessionManager.h>
 namespace SoEasy
 {
-	bool ListenerManager::OnInit()
+	void ListenerManager::StartAccept()
 	{
-		SayNoAssertRetFalse_F(SessionManager::OnInit());
-		this->GetConfig().GetValue("WhiteList", this->mWhiteList);
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", this->mListenAddress));
-		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(this->mListenAddress, this->mListenerIp, this->mListenerPort));
-
-		this->mTcpSessionListener = make_shared<TcpSessionListener>(this, this->mListenerPort);
-		SayNoAssertRetFalse_F(this->mTcpSessionListener->InitListener());
-		return true;
-	}
-
-	void ListenerManager::OnInitComplete()
-	{
-		this->mTcpSessionListener->StartAcceptConnect();
-		SayNoDebugInfo("start listener port " << this->mListenerPort);
-	}
-
-	void ListenerManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
-	{
-
-	}
-
-	void ListenerManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
-	{
-		// 判断是否在白名单
-		if (!this->mWhiteList.empty())
+		if (this->mBindAcceptor != nullptr)
 		{
-			const string & ip = tcpSession->GetIP();
-			auto iter = this->mWhiteList.find(ip);
-			if (iter == this->mWhiteList.end())
-			{
-				mNetWorkManager->RemoveTcpSession(tcpSession);
-				return;
-			}
+			AsioContext & io = this->mDispatchManager->GetAsioCtx();
+			SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(io);
+			this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code & code)
+				{
+					if (!code)
+					{
+						this->mDispatchManager->Create(tcpSocket);
+					}
+					AsioContext & io = this->mDispatchManager->GetAsioCtx();
+					io.post(BIND_THIS_ACTION_0(ListenerManager::StartAccept));
+				});
 		}
 	}
 
+	bool ListenerManager::OnInit()
+	{
+		this->GetConfig().GetValue("WhiteList", this->mWhiteList);
+		SayNoAssertRetFalse_F(this->mDispatchManager = this->GetManager<NetSessionManager>());
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", this->mListenAddress));
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(this->mListenAddress, this->mListenerIp, this->mListenerPort));
+
+		try
+		{
+			AsioContext & io = this->mDispatchManager->GetAsioCtx();
+			AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mListenerPort);
+			this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+
+			this->mBindAcceptor->listen();
+			return true;
+		}
+		catch (const asio::system_error & e)
+		{
+			SayNoDebugError("start server fail " << e.what());
+			return false;
+		}
+
+		return true;
+	}
 }

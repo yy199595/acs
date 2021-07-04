@@ -2,7 +2,7 @@
 #include<Core/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<Manager/ServiceManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
 	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
 	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
-	ObjectRegistry<Manager>::Register<NetWorkManager>("NetWorkManager");
+	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
 	
 

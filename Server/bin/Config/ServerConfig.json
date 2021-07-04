@@ -29,7 +29,8 @@
         "./Script/Server/Service"
     ],
     "Managers": [
-        "NetWorkManager",
+        "NetProxyManager",
+        "NetSessionManager",
         "TimerManager",
         "MysqlManager",
         "RedisManager",

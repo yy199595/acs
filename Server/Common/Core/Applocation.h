@@ -29,8 +29,6 @@ namespace SoEasy
 		inline float GetDelaTime() { return this->mDelatime; }
 		inline long long GetLogicTime() { return this->mLogicTime; }
 		inline long long GetStartTime() { return this->mStartTime; }
-		AsioContext & GetAsioContext() { return (*mAsioContext); }
-		AsioContext * GetAsioContextPtr() { return mAsioContext; }
 		const std::string & GetServerName() { return this->mServerName; }
 		long long GetRunTime() { return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 		inline const std::string & GetConfigDirectory() { return this->mSrvConfigDirectory; }
@@ -57,11 +55,6 @@ namespace SoEasy
 		bool GetTypeName(size_t hash, std::string & name);
 	private:
 		int LogicMainLoop();
-		void NetWorkMainLoop();
-	private:
-		AsioWork * mAsioWork;
-		std::thread * mNetThread;
-		AsioContext * mAsioContext;
 	private:
 		bool mIsClose;
 		long long mLogicTime;

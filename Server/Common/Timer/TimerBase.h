@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<functional>
 #include<Util/TimeHelper.h>
 #include<Util/NumberHelper.h>

@@ -4,7 +4,7 @@
 #include <Manager/TimerManager.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
-#include <Manager/NetWorkManager.h>
+#include <Manager/NetProxyManager.h>
 #include <Manager/ActionManager.h>
 #include <Protocol/com.pb.h>
 #include <NetWork/NetLuaRetAction.h>
@@ -12,6 +12,8 @@
 #include <Manager/ServiceManager.h>
 #include <Other/ServiceNode.h>
 #include <Manager/ServiceNodeManager.h>
+
+#include<Pool/ObjectPool.h>
 using namespace SoEasy;
 
 int SystemExtension::Call(lua_State *lua)
@@ -154,14 +156,14 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 	Applocation *app = Applocation::Get();
 	if (lua_isstring(luaEnv, 1)) //远程回复
 	{
-		NetWorkManager *netManager = app->GetManager<NetWorkManager>();
+		NetProxyManager *netManager = app->GetManager<NetProxyManager>();
 		if (netManager != nullptr)
 		{
 			const std::string address = lua_tostring(luaEnv, 1);
 			const long long callbackId = lua_tointeger(luaEnv, 2);
 			const long long operId = lua_tointeger(luaEnv, 3);
 			const int code = lua_tointeger(luaEnv, 4);
-			shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+			PB::NetWorkPacket * returnPacket = NetPacketPool.Create();
 
 			returnPacket->set_code(code);
 			returnPacket->set_entityid(operId);
@@ -172,7 +174,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 				const char *str = lua_tolstring(luaEnv, 5, &size);
 				returnPacket->set_messagedata(str, size);
 			}
-			netManager->SendMessageByAdress(address, returnPacket);
+			netManager->SendMsgByAddress(address, returnPacket);
 			return 0;
 		}
 	}
@@ -184,7 +186,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 		const long long operId = lua_tointeger(luaEnv, 2);
 		const int code = lua_tointeger(luaEnv, 3);
 
-		shared_ptr<PB::NetWorkPacket> returnPacket = make_shared<NetWorkPacket>();
+		PB::NetWorkPacket * returnPacket = NetPacketPool.Create();
 
 		returnPacket->set_code(code);
 		returnPacket->set_entityid(operId);
@@ -195,7 +197,8 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 			const char *str = lua_tolstring(luaEnv, 4, &size);
 			returnPacket->set_messagedata(str, size);
 		}
-		actManager->PushLocalResponseData(returnPacket);
+		actManager->InvokeCallback(callbackId, returnPacket);
+		NetPacketPool.Destory(returnPacket);
 	}
 	return 0;
 }

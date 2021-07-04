@@ -36,7 +36,6 @@ namespace SoEasy
 		void AddFinishTask(long long id);	//不要手动调用
 	public:
 		bool StartTaskAction(shared_ptr<ThreadTaskAction> taskAction);
-		AsioContext & GetAsioContext() { return this->GetApp()->GetAsioContext(); }
 	public:
 		inline int GetPriority() { return mPriority; }	//优先级(根据优先级确定调用顺序)
 		virtual void PushClassToLua(lua_State * luaEnv) { }		//自身方法导出到lua

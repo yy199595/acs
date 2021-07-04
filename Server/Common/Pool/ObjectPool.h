@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include<queue>
+#include<Protocol/com.pb.h>
 namespace SoEasy
 {
 	template<typename T>
@@ -62,4 +63,9 @@ namespace SoEasy
 		}
 		return true;
 	}
+}
+
+namespace SoEasy
+{
+	extern thread_local ObjectPool<PB::NetWorkPacket> NetPacketPool;
 }

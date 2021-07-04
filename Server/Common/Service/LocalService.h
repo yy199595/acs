@@ -14,8 +14,8 @@ namespace SoEasy
 	public:
 		bool OnInit() override;
 	private:
-		virtual XCode InvokeMethod(const SharedPacket, SharedPacket) final;
-		virtual XCode InvokeMethod(const std::string &address, const SharedPacket, SharedPacket) final;
+		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;
 	protected:
 		bool BindFunction(std::string name, LocalAction1 action);
 
@@ -33,12 +33,10 @@ namespace SoEasy
 		bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
 	protected:
-		SharedTcpSession GetCurTcpSession();
-		XCode CallAction(SharedPacket request, SharedPacket returnData);
 		bool BindFunction(const std::string & name, shared_ptr<LocalActionProxy> actionBox);
 	private:
 		class CoroutineManager * mCorManager;
-		class NetWorkManager * mNetWorkManager;
+		class NetSessionManager * mNetWorkManager;
 		std::unordered_map<long long, std::string> mCurrentSessionMap;
 		std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
 	};

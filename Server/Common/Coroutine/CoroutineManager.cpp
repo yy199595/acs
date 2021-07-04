@@ -7,7 +7,7 @@
 #include<Util/NumberHelper.h>
 #include<Timer/CorSleepTimer.h>
 #include<Manager/TimerManager.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<NetWork/NetWorkRetAction.h>
 using namespace std::chrono;

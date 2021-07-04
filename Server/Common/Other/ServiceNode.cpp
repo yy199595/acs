@@ -1,11 +1,12 @@
 ﻿#include"ServiceNode.h"
 #include<Util/StringHelper.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetProxyManager.h>
 #include<Manager/ActionManager.h>
 #include<Manager/ServiceManager.h>
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Util/JsonHelper.h>
+#include<Pool/ObjectPool.h>
 namespace SoEasy
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress)
@@ -14,7 +15,7 @@ namespace SoEasy
 		Applocation * app = Applocation::Get();
 		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
 		SayNoAssertRet_F(this->mActionManager = app->GetManager<ActionManager>());
-		SayNoAssertRet_F(this->mNetWorkManager = app->GetManager<NetWorkManager>());
+		SayNoAssertRet_F(this->mNetWorkManager = app->GetManager<NetProxyManager>());
 		SayNoAssertRet_F(this->mServiceNodeManager = app->GetManager<ServiceNodeManager>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 		
@@ -47,20 +48,17 @@ namespace SoEasy
 	{
 		if (!this->mMessageQueue.empty())
 		{
-			const int nodeId = this->GetNodeId();
-			if (this->mServiceNodeManager->GetNodeSession(this->GetNodeId()))
+			while (this->mMessageQueue.empty())
 			{
-				while (!this->mMessageQueue.empty())
+				PB::NetWorkPacket * msgData = this->mMessageQueue.front();
+				const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
+				if (!this->mNetWorkManager->SendMsgByAddress(address, msgData))
 				{
-					SharedPacket messageData = this->mMessageQueue.front();
-					const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
-					if (!this->mNetWorkManager->SendMessageByAdress(address, messageData))
-					{
-						break;
-					}
-					this->mMessageQueue.pop();
-				}			
+					return;
+				}
+				this->mMessageQueue.pop();
 			}
+			
 		}	
 	}
 
@@ -187,25 +185,19 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	void ServiceNode::PushMessageData(SharedPacket messageData)
+	void ServiceNode::PushMessageData(PB::NetWorkPacket * messageData)
 	{
-		if (this->mServiceNodeManager->GetNodeSession(this->GetNodeId()))
-		{
-			const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
-			if (!this->mNetWorkManager->SendMessageByAdress(address, messageData))
-			{
-				this->mMessageQueue.push(messageData);
-			}
-		}
-		else
+		const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
+		if (!this->mNetWorkManager->SendMsgByAddress(address, messageData))
 		{
 			this->mMessageQueue.push(messageData);
-		}		
+			this->mNetWorkManager->ConnectByAddress(address, this->mNodeName);
+		}
 	}
 
 	void ServiceNode::PushMessageData(const std::string & service, const std::string & method, const Message * request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
-		shared_ptr<PB::NetWorkPacket> msgData = make_shared<PB::NetWorkPacket>();
+		PB::NetWorkPacket * msgData = NetPacketPool.Create();
 		if (msgData != nullptr)
 		{
 			if (request != nullptr)

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include"SessionManager.h"
+#include"NetProxyManager.h"
 #include<Protocol/s2s.pb.h>
 #include<Other/DoubleBufferQueue.h>
 namespace SoEasy
@@ -16,10 +16,9 @@ namespace SoEasy
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
-		void OnSystemUpdate() final;
 	public:
-		bool PushRequestMessage(SharedPacket messageData);
-		bool PushRequestMessage(const std::string & adress, SharedPacket messageData);
+		bool HandlerMessage(PB::NetWorkPacket * messageData);
+		bool HandlerMessage(const std::string & adress, PB::NetWorkPacket * messageData);
 	public:
 		ServiceBase * GetService(const std::string & name);
 		LocalService * GetLocalService(const std::string & name);
@@ -32,12 +31,10 @@ namespace SoEasy
 		bool CreateLocalService();
 	private:
 		int mNodeId;
-		class NetWorkManager * mNetManager;
+		class NetProxyManager * mNetManager;
 		class ActionManager * mActionManager;
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
-		std::queue<SharedPacket> mLocalMessageQueue;
-		DoubleBufferQueue<SharedNetPacket> mRemoteMessageQueue;
 		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
 		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua服务
 	};

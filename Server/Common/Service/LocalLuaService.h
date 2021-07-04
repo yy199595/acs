@@ -14,8 +14,8 @@ namespace SoEasy
 		bool HasMethod(const std::string & name) final;
 		bool IsLuaService() final { return true; };
 	protected:
-		virtual XCode InvokeMethod(const SharedPacket, SharedPacket) final;
-		virtual XCode InvokeMethod(const std::string &address, const SharedPacket, SharedPacket) final;
+		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;
 	private:
 		int mServiceIndex;
 		lua_State * mLuaEnv;

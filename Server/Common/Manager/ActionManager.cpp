@@ -1,6 +1,6 @@
 ﻿#include"ActionManager.h"
 #include"ScriptManager.h"
-#include"NetWorkManager.h"
+#include"NetSessionManager.h"
 #include"TimerManager.h"
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
@@ -22,56 +22,6 @@ namespace SoEasy
 		return true;
 	}
 
-	void ActionManager::OnSystemUpdate()
-	{
-		SharedPacket responseData;
-		this->mRemoteMessageQueue.SwapQueueData();
-		while (this->mRemoteMessageQueue.PopItem(responseData))
-		{
-			long long rpcId = responseData->rpcid();
-			auto iter = this->mRetActionMap.find(rpcId);
-			if (iter != this->mRetActionMap.end())
-			{
-				iter->second->Invoke(responseData);
-				this->mRetActionMap.erase(iter);
-			}
-		}
-		while (!this->mLocalMessageQueue.empty())
-		{
-			responseData = this->mLocalMessageQueue.front();		
-			long long rpcId = responseData->rpcid();
-			auto iter = this->mRetActionMap.find(rpcId);
-			if (iter != this->mRetActionMap.end())
-			{
-				iter->second->Invoke(responseData);
-				this->mRetActionMap.erase(iter);
-			}
-			this->mLocalMessageQueue.pop();
-		}
-	}
-
-	bool ActionManager::PushLocalResponseData(shared_ptr<NetWorkPacket> messageData)
-	{
-		long long id = messageData->rpcid();
-		auto iter = this->mRetActionMap.find(id);
-		if (iter == this->mRetActionMap.end())
-		{
-			SayNoDebugError("not find rpc cb " << id);
-			return false;
-		}
-		this->mLocalMessageQueue.push(messageData);
-		return true;
-	}
-	bool ActionManager::PushRemoteResponseData(shared_ptr<NetWorkPacket> messageData)
-	{
-		if (messageData->rpcid() == 0)
-		{
-			return false;
-		}
-		this->mRemoteMessageQueue.AddItem(messageData);
-		return true;
-	}
-
 	long long ActionManager::AddCallback(shared_ptr<LocalRetActionProxy> rpcAction)
 	{
 		if (rpcAction == nullptr)
@@ -87,5 +37,17 @@ namespace SoEasy
 		}
 		this->mRetActionMap.emplace(callbackId, rpcAction);
 		return callbackId;
+	}
+	bool ActionManager::InvokeCallback(long long id, PB::NetWorkPacket * messageData)
+	{
+		auto iter = this->mRetActionMap.find(id);
+		if (iter != this->mRetActionMap.end())
+		{
+			shared_ptr<LocalRetActionProxy> action = iter->second;
+			action->Invoke(messageData);
+			this->mRetActionMap.erase(iter);
+			return true;
+		}
+		return false;
 	}
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef _MSC_VER
 #ifndef _WIN32_WINNT||_WIN32_WINNT!=0x0601
@@ -97,26 +97,4 @@ namespace SoEasy
 
 	template<typename T>
 	struct SayNoTypeProxy<std::shared_ptr<T>> { typedef T Type; };
-}
-
-namespace SoEasy
-{
-	enum AsioError
-	{
-		ErrorNone,
-		ErrorSend,
-		ErrorRecv,
-		ErrorConnect,
-		ErrorClose,
-		ErrorMax
-	};
-	enum SessionEventType
-	{
-		NoneType,
-		ClientConnectType,
-		ServerConnetSuccessful,
-		ServerConnectFail,
-		SessionError,
-		MaxType
-	};
 }

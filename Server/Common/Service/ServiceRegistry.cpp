@@ -2,8 +2,7 @@
 #include <Core/Applocation.h>
 #include <Util/StringHelper.h>
 #include <Other/ServiceNode.h>
-#include <Core/TcpSessionListener.h>
-#include <Manager/NetWorkManager.h>
+#include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
 
 
@@ -17,7 +16,7 @@ namespace SoEasy
 	bool ServiceRegistry::OnInit()
 	{
 		SayNoAssertRetFalse_F(LocalService::OnInit());
-		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
 
 		REGISTER_FUNCTION_1(ServiceRegistry::RegisterNode, s2s::NodeRegister_Request);
 		REGISTER_FUNCTION_2(ServiceRegistry::QueryNodes, PB::Int32Data, s2s::NodeData_Array);

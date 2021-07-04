@@ -4,13 +4,13 @@
 #include<Manager/TimerManager.h>
 #include<Manager/ActionManager.h>
 
-#include<Manager/NetWorkManager.h>
-#include<Manager/ConsoleManager.h>
+#include<Manager/NetSessionManager.h>
 #include<Manager/ListenerManager.h>
 #include<Manager/ServiceManager.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
 #include<Manager/ProxyManager.h>
+#include<Manager/NetProxyManager.h>
 #include<Manager/ServiceNodeManager.h>
 #include<Coroutine/CoroutineManager.h>
 
@@ -43,11 +43,13 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
 	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
 	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
-	ObjectRegistry<Manager>::Register<NetWorkManager>("NetWorkManager");
-	ObjectRegistry<Manager>::Register<ConsoleManager>("ConsoleManager");
+	
 	ObjectRegistry<Manager>::Register<ListenerManager>("ListenerManager");
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
 	ObjectRegistry<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
+	ObjectRegistry<Manager>::Register<NetProxyManager>("NetProxyManager");
+	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
+
 
 
 

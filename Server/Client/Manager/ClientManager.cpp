@@ -9,7 +9,7 @@ namespace Client
 	bool ClientManager::OnInit()
 	{
 		std::string address;
-		SessionManager::OnInit();
+		NetProxyManager::OnInit();
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", address));
 		
 		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(address, this->mConnectIp, this->mConnectPort));

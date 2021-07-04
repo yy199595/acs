@@ -2,12 +2,12 @@
 
 
 #include<Manager/ScriptManager.h>
-#include<Manager/SessionManager.h>
+#include<Manager/NetProxyManager.h>
 #include<Protocol/c2s.pb.h>
 using namespace SoEasy;
 namespace Client
 {
-	class ClientManager : public SessionManager
+	class ClientManager : public NetProxyManager
 	{
 	public:
 		ClientManager() { }

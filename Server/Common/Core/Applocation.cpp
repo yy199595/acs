@@ -4,7 +4,7 @@
 #include<Util/FileHelper.h>
 #include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Service/ServiceBase.h>
@@ -29,8 +29,6 @@ namespace SoEasy
 		this->mLogicRunCount = 0;
 		this->mSystemRunCount = 0;
 		this->mSrvConfigDirectory = configPath;
-		this->mAsioContext = new AsioContext();
-		this->mAsioWork = new AsioWork(*mAsioContext);
 		this->mLogHelper = new LogHelper("./Logs", srvName);
 	}
 
@@ -87,7 +85,7 @@ namespace SoEasy
 		}
 		this->TryAddManager<TimerManager>();
 		this->TryAddManager<ActionManager>();
-		this->TryAddManager<NetWorkManager>();
+		this->TryAddManager<NetSessionManager>();
 		this->TryAddManager<CoroutineManager>();
 
 		std::sort(this->mSortManagers.begin(), this->mSortManagers.end(),
@@ -136,22 +134,13 @@ namespace SoEasy
 		{
 			Stop();
 			return -3;
-		}
-		this->mNetThread = new std::thread(BIND_THIS_ACTION_0(Applocation::NetWorkMainLoop));
-		this->mNetThread->detach();
+		}	
 		return this->LogicMainLoop();
-	}
-
-	void Applocation::NetWorkMainLoop()
-	{
-		asio::error_code error;
-		this->mAsioContext->run(error);
 	}
 
 	int Applocation::Stop()
 	{
 		this->mIsClose = true;
-		this->mAsioContext->stop();
 		for (size_t index = 0; index < this->mSortManagers.size(); index++)
 		{
 			this->mCurrentManager = this->mSortManagers[index];
@@ -189,7 +178,6 @@ namespace SoEasy
 		const long long systemUpdateInterval = 1000 / systemFps;
 		while (!this->mIsClose)
 		{
-			this->mAsioContext->poll();
 			startTimer = TimeHelper::GetMilTimestamp();
 			if (startTimer - mLastSystemTime >= systemUpdateInterval)
 			{

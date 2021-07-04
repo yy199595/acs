@@ -4,7 +4,7 @@
 
 #include <Util/StringHelper.h>
 #include <Core/ObjectRegistry.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetProxyManager.h>
 #include<Manager/ActionManager.h>
 #include <Coroutine/CoroutineManager.h>
 namespace SoEasy
@@ -15,7 +15,7 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("Service", this->mServiceList));
 
-		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetProxyManager>());
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 
@@ -33,87 +33,52 @@ namespace SoEasy
 		}
 	}
 
-	void ServiceManager::OnSystemUpdate()
+	bool ServiceManager::HandlerMessage(PB::NetWorkPacket * messageData)
 	{
-		SharedNetPacket messageBuffer;
-		this->mRemoteMessageQueue.SwapQueueData();
-		// 远程调用消息处理
-		while (this->mRemoteMessageQueue.PopItem(messageBuffer))
+		ServiceBase * localService = this->GetService(messageData->service());
+		if (localService == nullptr || localService->HasMethod(messageData->method()))
 		{
-			const std::string & address = messageBuffer->mAddress;
-			const SharedPacket & messageData = messageBuffer->mMessagePacket;
-			ServiceBase * localService = this->GetService(messageData->service());
-			if (localService != nullptr)
+			return false;
+		}
+		this->mCorManager->Start(messageData->method(), [localService, this, messageData]()
 			{
-				this->mCorManager->Start(messageData->method(), [address, localService, this, messageData]()
-					{
-						SharedPacket responseData = make_shared<NetWorkPacket>();															
-						XCode code = localService->InvokeMethod(address, messageData, responseData);
-						if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
-						{
-							responseData->set_code(code);
-							responseData->set_rpcid(messageData->rpcid());
-							responseData->set_entityid(messageData->entityid());
-							this->mNetManager->SendMessageByAdress(address, responseData);
-						}
-					});
-			}
-			// 本机调用消息处理
-			while (!this->mLocalMessageQueue.empty())
-			{
-				const SharedPacket & messageData = this->mLocalMessageQueue.front();
-				ServiceBase * localService = this->GetService(messageData->service());
-				if (localService != nullptr)
+				long long rpcId = messageData->rpcid();
+				XCode code = localService->InvokeMethod(messageData);
+				if (rpcId != 0 && code != XCode::NotResponseMessage)
 				{
-					this->mCorManager->Start(messageData->method(), [localService, this, messageData]()
-						{
-							SharedPacket responseData = make_shared<NetWorkPacket>();					
-							XCode code = localService->InvokeMethod(messageData, responseData);
-							if (messageData->rpcid() != 0 && code != XCode::NotResponseMessage)
-							{
-								responseData->set_code(code);
-								responseData->set_rpcid(messageData->rpcid());
-								responseData->set_entityid(messageData->entityid());
-								this->mActionManager->PushLocalResponseData(responseData);
-							}
-						});
+					messageData->clear_method();
+					messageData->clear_service();
+					messageData->set_code((int)code);
+					this->mActionManager->InvokeCallback(rpcId, messageData);
+					NetPacketPool.Destory(messageData);
 				}
-				this->mLocalMessageQueue.pop();
-			}
-		}
-	}
-
-	bool ServiceManager::PushRequestMessage(SharedPacket messageData)
-	{
-		const std::string & service = messageData->service();
-		ServiceBase * localService = this->GetService(service);
-		if (localService == nullptr)
-		{
-			return false;
-		}
-		const std::string & method = messageData->method();
-		if (!localService->HasMethod(method))
-		{
-			return false;
-		}
-		this->mLocalMessageQueue.push(messageData);
+			});
 		return true;
 	}
 
-	bool ServiceManager::PushRequestMessage(const std::string & address, SharedPacket messageData)
+	bool ServiceManager::HandlerMessage(const std::string & address, PB::NetWorkPacket * messageData)
 	{
-		const std::string & service = messageData->service();
-		ServiceBase * localService = this->GetService(service);
-		if (localService == nullptr)
+		ServiceBase * localService = this->GetService(messageData->service());
+		if (localService == nullptr || localService->HasMethod(messageData->method()))
 		{
 			return false;
 		}
-		const std::string & method = messageData->method();
-		if (!localService->HasMethod(method))
-		{
-			return false;
-		}
-		this->mRemoteMessageQueue.AddItem(make_shared<NetMessageBuffer>(address, messageData));
+
+		this->mCorManager->Start(messageData->method(), [address, localService, this, messageData]()
+			{
+				XCode code = localService->InvokeMethod(address, messageData);
+				if (messageData->rpcid() == 0 || code != XCode::NotResponseMessage)
+				{
+					NetPacketPool.Destory(messageData);
+				}
+				else
+				{
+					messageData->clear_method();
+					messageData->clear_service();
+					messageData->set_code((int)code);
+					this->mNetManager->SendMsgByAddress(address, messageData);
+				}				
+			});
 		return true;
 	}
 

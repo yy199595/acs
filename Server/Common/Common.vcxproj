@@ -20,21 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Applocation.cpp" />
-    <ClCompile Include="Core\TcpSessionListener.cpp" />
     <ClCompile Include="Coroutine\Coroutine.cpp" />
     <ClCompile Include="Coroutine\CoroutineEvent.cpp" />
     <ClCompile Include="Coroutine\CoroutineManager.cpp" />
     <ClCompile Include="Global\LogHelper.cpp" />
     <ClCompile Include="Global\ServerConfig.cpp" />
     <ClCompile Include="Manager\ActionManager.cpp" />
-    <ClCompile Include="Manager\ConsoleManager.cpp" />
     <ClCompile Include="Manager\ListenerManager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
-    <ClCompile Include="Manager\NetWorkManager.cpp" />
+    <ClCompile Include="Manager\NetSessionManager.cpp" />
     <ClCompile Include="Manager\ScriptManager.cpp" />
     <ClCompile Include="Manager\ServiceManager.cpp" />
     <ClCompile Include="Manager\ServiceNodeManager.cpp" />
-    <ClCompile Include="Manager\SessionManager.cpp" />
+    <ClCompile Include="Manager\NetProxyManager.cpp" />
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
@@ -42,14 +40,13 @@
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
     <ClCompile Include="NetWork\NetWorkRetAction.cpp" />
     <ClCompile Include="NetWork\TcpClientSession.cpp" />
-    <ClCompile Include="NetWork\TelnetClientSession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
     <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Other\AssestsFileInfo.cpp" />
-    <ClCompile Include="Other\Command.cpp" />
     <ClCompile Include="Other\ObjectFactory.cpp" />
     <ClCompile Include="Other\ServiceNode.cpp" />
     <ClCompile Include="Other\TimeRecorder.cpp" />
+    <ClCompile Include="Pool\ObjectPool.cpp" />
     <ClCompile Include="Pool\ProtocolPool.cpp" />
     <ClCompile Include="Script\BindLuaFunction.cpp" />
     <ClCompile Include="Script\ClassNameProxy.cpp" />
@@ -87,7 +84,6 @@
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h" />
     <ClInclude Include="Core\ObjectRegistry.h" />
-    <ClInclude Include="Core\TcpSessionListener.h" />
     <ClInclude Include="Coroutine\Coroutine.h" />
     <ClInclude Include="Coroutine\CoroutineEvent.h" />
     <ClInclude Include="Coroutine\CoroutineManager.h" />
@@ -100,14 +96,13 @@
     <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
     <ClInclude Include="Manager\ActionManager.h" />
-    <ClInclude Include="Manager\ConsoleManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
     <ClInclude Include="Manager\Manager.h" />
-    <ClInclude Include="Manager\NetWorkManager.h" />
+    <ClInclude Include="Manager\NetSessionManager.h" />
     <ClInclude Include="Manager\ServiceNodeManager.h" />
     <ClInclude Include="Manager\ScriptManager.h" />
     <ClInclude Include="Manager\ServiceManager.h" />
-    <ClInclude Include="Manager\SessionManager.h" />
+    <ClInclude Include="Manager\NetProxyManager.h" />
     <ClInclude Include="Manager\TimerManager.h" />
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
@@ -115,13 +110,12 @@
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
+    <ClInclude Include="NetWork\SocketEvent.h" />
     <ClInclude Include="NetWork\TcpClientSession.h" />
-    <ClInclude Include="NetWork\TelnetClientSession.h" />
     <ClInclude Include="Object\GameObject.h" />
     <ClInclude Include="Object\MemoryObject.h" />
     <ClInclude Include="Object\Object.h" />
     <ClInclude Include="Other\AssestsFileInfo.h" />
-    <ClInclude Include="Other\Command.h" />
     <ClInclude Include="Other\DoubleBufferQueue.h" />
     <ClInclude Include="Other\ObjectFactory.h" />
     <ClInclude Include="Other\ServiceNode.h" />
@@ -163,6 +157,7 @@
     <ClInclude Include="Thread\ThreadTaskAction.h" />
     <ClInclude Include="Timer\ActionTimeoutTimer.h" />
     <ClInclude Include="Timer\CorSleepTimer.h" />
+    <ClInclude Include="Timer\DelayTimer.h" />
     <ClInclude Include="Timer\LuaActionTimer.h" />
     <ClInclude Include="Timer\LuaSleepTimer.h" />
     <ClInclude Include="Timer\TimerBase.h" />

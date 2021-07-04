@@ -51,9 +51,6 @@
     <ClCompile Include="Core\Applocation.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\TcpSessionListener.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Coroutine\Coroutine.cpp">
       <Filter>Coroutine</Filter>
     </ClCompile>
@@ -75,13 +72,7 @@
     <ClCompile Include="Manager\Manager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\NetWorkManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\ScriptManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\SessionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\TimerManager.cpp">
@@ -112,9 +103,6 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="Other\AssestsFileInfo.cpp">
-      <Filter>Other</Filter>
-    </ClCompile>
-    <ClCompile Include="Other\Command.cpp">
       <Filter>Other</Filter>
     </ClCompile>
     <ClCompile Include="Other\ObjectFactory.cpp">
@@ -210,13 +198,7 @@
     <ClCompile Include="Manager\ActionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="NetWork\TelnetClientSession.cpp">
-      <Filter>NetWork</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\ServiceManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\ConsoleManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="Service\LocalService.cpp">
@@ -240,12 +222,18 @@
     <ClCompile Include="Pool\ProtocolPool.cpp">
       <Filter>Pool</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\NetSessionManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\NetProxyManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Pool\ObjectPool.cpp">
+      <Filter>Pool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\TcpSessionListener.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Coroutine\Coroutine.h">
@@ -287,13 +275,7 @@
     <ClInclude Include="Manager\Manager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\NetWorkManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\ScriptManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\SessionManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\TimerManager.h">
@@ -330,9 +312,6 @@
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="Other\AssestsFileInfo.h">
-      <Filter>Other</Filter>
-    </ClInclude>
-    <ClInclude Include="Other\Command.h">
       <Filter>Other</Filter>
     </ClInclude>
     <ClInclude Include="Other\DoubleBufferQueue.h">
@@ -488,17 +467,11 @@
     <ClInclude Include="Manager\ActionManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="NetWork\TelnetClientSession.h">
-      <Filter>NetWork</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\ServiceManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Core\ObjectRegistry.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\ConsoleManager.h">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Service\LocalService.h">
       <Filter>Service</Filter>
@@ -523,6 +496,18 @@
     </ClInclude>
     <ClInclude Include="Pool\ProtocolPool.h">
       <Filter>Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\SocketEvent.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\DelayTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\NetSessionManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\NetProxyManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

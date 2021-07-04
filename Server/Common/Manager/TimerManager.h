@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<list>
 #include<queue>
 #include<thread>
@@ -19,6 +19,7 @@ namespace SoEasy
 		void Stop();
 		bool RemoveTimer(long long id);
 		bool AddTimer(shared_ptr<TimerBase> timer);
+		bool AddTimer(long long ms, std::function<void(void)> func);
 		shared_ptr<TimerBase> GetTimer(long long id);
 	public:
 		template<typename T, typename ... Args>

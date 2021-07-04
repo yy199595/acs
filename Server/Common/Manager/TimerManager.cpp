@@ -1,4 +1,5 @@
-#include "TimerManager.h"
+﻿#include "TimerManager.h"
+#include<Timer/DelayTimer.h>
 #include<Util/TimeHelper.h>
 namespace SoEasy
 {
@@ -33,7 +34,15 @@ namespace SoEasy
 		return false;
 	}
 
-	
+	bool TimerManager::AddTimer(long long ms, std::function<void(void)> func)
+	{
+		if (ms == 0)
+		{
+			func();
+			return true;
+		}
+		return this->AddTimer(make_shared<DelayTimer>(ms, func));
+	}
 
 	void TimerManager::Stop()
 	{

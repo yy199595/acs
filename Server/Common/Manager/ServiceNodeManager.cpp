@@ -1,6 +1,6 @@
 ﻿#include "ServiceNodeManager.h"
 #include <Other/ServiceNode.h>
-#include<Manager/NetWorkManager.h>
+#include<Manager/NetSessionManager.h>
 namespace SoEasy
 {
 	bool ServiceNodeManager::DelServiceNode(int nodeId)
@@ -64,43 +64,17 @@ namespace SoEasy
 		return false;
 	}
 
-	SharedTcpSession ServiceNodeManager::GetNodeSession(const int nodeId)
-	{
-		ServiceNode * serviceNode = this->GetServiceNode(nodeId);
-		if (serviceNode == nullptr)
-		{
-			return nullptr;
-		}
-		const std::string & name = serviceNode->GetNodeName();
-		const std::string & address = serviceNode->GetAddress();
-		SharedTcpSession nodeSession = this->mNetWorkManager->GetTcpSession(address);
-		if (nodeSession == nullptr)
-		{
-			auto iter = this->mConnectSessionMap.find(address);
-			if (iter != this->mConnectSessionMap.end())
-			{
-				return nullptr;
-			}
-			nodeSession = this->CreateTcpSession(name, address);
-			this->mConnectSessionMap.insert(std::make_pair(address, nodeSession));
-			return nullptr;
-		}
-		return nodeSession->IsActive() ? nodeSession : nullptr;
-	}
-
 	bool ServiceNodeManager::OnInit()
 	{
 		std::string queryAddress;
-		SessionManager::OnInit();
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", queryAddress));
-		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
 		ServiceNode * centerNode = new ServiceNode(0, 0, "Center", queryAddress);
 		return centerNode->AddService(std::string("ServiceRegistry")) && this->AddServiceNode(centerNode);
 	}
 
 	void ServiceNodeManager::OnSystemUpdate()
 	{
-		SessionManager::OnSystemUpdate();
 		if (!this->mServiceNodeArray.empty())
 		{
 			auto iter = this->mServiceNodeArray.begin();
@@ -117,20 +91,6 @@ namespace SoEasy
 				iter++;
 				serviceNode->OnSystemUpdate();
 			}
-		}
-	}
-
-	void ServiceNodeManager::OnSessionErrorAfter(SharedTcpSession tcpSession)
-	{
-	}
-
-	void ServiceNodeManager::OnSessionConnectAfter(SharedTcpSession tcpSession)
-	{
-		const std::string & address = tcpSession->GetAddress();
-		auto iter = this->mConnectSessionMap.find(address);
-		if (iter != this->mConnectSessionMap.end())
-		{
-			this->mConnectSessionMap.erase(iter);
 		}
 	}
 

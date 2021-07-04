@@ -32,7 +32,7 @@ namespace SoEasy
 
 	public:
 		const std::string &GetName() { return this->mActionName; }
-		virtual XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket>) = 0;
+		virtual XCode Invoke(PB::NetWorkPacket * messageData) = 0;
 
 	protected:
 		std::string mActionName;
@@ -48,7 +48,7 @@ namespace SoEasy
 			: LocalActionProxy(name), mBindAction(action) {}
 
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
+		XCode Invoke(PB::NetWorkPacket * messageData) final;
 
 	private:
 		LocalAction1 mBindAction;
@@ -64,7 +64,7 @@ namespace SoEasy
 			: LocalActionProxy(name), mBindAction(action) {}
 
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
+		XCode Invoke(PB::NetWorkPacket * messageData) final;
 
 	private:
 		MysqlOperAction mBindAction;
@@ -80,7 +80,7 @@ namespace SoEasy
 			: LocalActionProxy(name), mBindAction(action) {}
 
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
+		XCode Invoke(PB::NetWorkPacket * messageData) final;
 	private:
 		MysqlQueryAction mBindAction;
 	};
@@ -95,7 +95,7 @@ namespace SoEasy
 		LocalActionProxy2(LocalAction2<T1> action, std::string &name) : LocalActionProxy(name), mBindAction(action) {}
 
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) final;
+		XCode Invoke(PB::NetWorkPacket * messageData) final;
 
 	private:
 		std::string mMessageBuffer;
@@ -104,11 +104,11 @@ namespace SoEasy
 	};
 
 	template <typename T1>
-	inline XCode LocalActionProxy2<T1>::Invoke(const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage)
+	inline XCode LocalActionProxy2<T1>::Invoke(PB::NetWorkPacket * messageData)
 	{
-		const long long operId = requestMessage->entityid();
-		const long long callbackId = requestMessage->rpcid();
-		const std::string &message = requestMessage->messagedata();
+		const long long operId = messageData->entityid();
+		const long long callbackId = messageData->rpcid();
+		const std::string &message = messageData->messagedata();
 
 		T1 * mRequestData = this->mRequestPool.Create();
 		if (!mRequestData->ParseFromArray(message.c_str(), message.size()))
@@ -133,7 +133,7 @@ namespace SoEasy
 			: LocalActionProxy(name), mBindAction(action) {}
 
 	public:
-		XCode Invoke(const shared_ptr<NetWorkPacket> requestData, shared_ptr<NetWorkPacket> returnData) override;
+		XCode Invoke(PB::NetWorkPacket * messageData) override;
 
 	private:
 		std::string mMessageBuffer;
@@ -142,11 +142,11 @@ namespace SoEasy
 		LocalAction3<T1, T2> mBindAction;
 	};
 	template <typename T1, typename T2>
-	inline XCode LocalActionProxy3<T1, T2>::Invoke(const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage)
+	inline XCode LocalActionProxy3<T1, T2>::Invoke(PB::NetWorkPacket * messageData)
 	{
 		T1 * requestData = this->mRequestDataPool.Create();
-		const long long operId = requestMessage->entityid();
-		const std::string &message = requestMessage->messagedata();
+		const long long operId = messageData->entityid();
+		const std::string &message = messageData->messagedata();
 		if (!requestData->ParseFromArray(message.c_str(), message.size()))
 		{
 			this->mRequestDataPool.Destory(requestData);
@@ -157,8 +157,8 @@ namespace SoEasy
 		XCode code = this->mBindAction(operId, *requestData, *responseData);
 		if (responseData->SerializePartialToString(&mMessageBuffer))
 		{
-			responseMessage->set_messagedata(mMessageBuffer);
-			responseMessage->set_protocname(responseData->GetTypeName());
+			messageData->set_messagedata(mMessageBuffer);
+			messageData->set_protocname(responseData->GetTypeName());
 		}
 		this->mRequestDataPool.Destory(requestData);
 		this->mResponseDataPool.Destory(responseData);
@@ -173,15 +173,15 @@ namespace SoEasy
 	{
 	public:
 		LocalActionProxy4(LocalAction4<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action) { }
-		XCode Invoke(shared_ptr<TcpClientSession>session, const shared_ptr<NetWorkPacket> requestMessage, shared_ptr<NetWorkPacket> responseMessage) override
+		XCode Invoke(PB::NetWorkPacket * messageData) override
 		{
 			T1 * responseData = mResponseDataPool.Create();
-			const long long operId = requestMessage->entityid();
-			XCode code = this->mBindAction(session, operId, *responseData);
+			const long long operId = messageData->entityid();
+			XCode code = this->mBindAction(operId, *responseData);
 			if (responseData->SerializePartialToString(&mMessageBuffer))
 			{
-				responseMessage->set_messagedata(mMessageBuffer);
-				responseMessage->set_protocname(responseData->GetTypeName());
+				messageData->set_messagedata(mMessageBuffer);
+				messageData->set_protocname(responseData->GetTypeName());
 			}
 			this->mResponseDataPool.Destory(responseData);
 			return code;

@@ -34,7 +34,7 @@ namespace SoEasy
 		XCode Call(const std::string &service, const std::string &method, Message &response);
 		XCode Call(const std::string &service, const std::string &method, const Message & request, Message &response);
 	public: // lua使用
-		void PushMessageData(SharedPacket messageData);
+		void PushMessageData(PB::NetWorkPacket * messageData);
 		void PushMessageData(const std::string &service, const std::string &method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
 	private:
 		std::string mIp;
@@ -45,10 +45,10 @@ namespace SoEasy
 		std::set<std::string> mServiceArray; //服务列表
 		class CoroutineManager *mCorManager; //协程
 		class ActionManager *mActionManager;
-		class NetWorkManager *mNetWorkManager;
+		class NetProxyManager *mNetWorkManager;
 		s2s::NodeData_NodeInfo mNodeInfoMessage;
 		ServiceNodeManager * mServiceNodeManager;
-		std::queue<shared_ptr<PB::NetWorkPacket>> mMessageQueue;
+		std::queue<PB::NetWorkPacket *> mMessageQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 	};
 }

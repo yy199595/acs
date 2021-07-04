@@ -1,37 +1,11 @@
 ﻿#include "LocalService.h"
 #include <Manager/ActionManager.h>
-#include <Manager/NetWorkManager.h>
+#include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
 	LocalService::LocalService()
 	{
-	}
-
-	SharedTcpSession LocalService::GetCurTcpSession()
-	{
-		long long currentId = this->mCorManager->GetCurrentCorId();
-		auto iter = this->mCurrentSessionMap.find(currentId);
-		if (iter != this->mCurrentSessionMap.end())
-		{
-			const std::string &address = iter->second;
-			return this->mNetWorkManager->GetTcpSession(address);
-		}
-		return nullptr;
-	}
-
-	XCode LocalService::CallAction(SharedPacket request, SharedPacket returnData)
-	{
-		const std::string &action = request->method();
-		auto iter = this->mActionMap.find(action);
-		if (iter == this->mActionMap.end())
-		{
-			SayNoDebugError("call func not find " << this->GetTypeName()
-												  << "." << action);
-			return XCode::CallFunctionNotExist;
-		}
-		shared_ptr<LocalActionProxy> actionProxy = iter->second;
-		return actionProxy->Invoke(request, returnData);
 	}
 
 	bool LocalService::HasMethod(const std::string &action)
@@ -43,32 +17,32 @@ namespace SoEasy
 	bool LocalService::OnInit()
 	{
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetWorkManager>());
+		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
 		return ServiceBase::OnInit();
 	}
 
-	XCode LocalService::InvokeMethod(const SharedPacket requestData, SharedPacket responseData)
+	XCode LocalService::InvokeMethod(PB::NetWorkPacket * msgData)
 	{
-		const std::string & method = requestData->method();
+		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
 			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(requestData, responseData);
+		return localAction->Invoke(msgData);
 	}
 
-	XCode LocalService::InvokeMethod(const std::string &address, const SharedPacket requestData, SharedPacket responseData)
+	XCode LocalService::InvokeMethod(const std::string &address, PB::NetWorkPacket * msgData)
 	{
-		const std::string & method = requestData->method();
+		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
 			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(requestData, responseData);
+		return localAction->Invoke(msgData);
 	}
 
 	bool LocalService::BindFunction(std::string name, LocalAction1 action)
