@@ -6,8 +6,7 @@
 namespace SoEasy
 {
 
-	LocalLuaRetActionProxy::LocalLuaRetActionProxy(NetLuaRetAction * action, std::string name)
-		: LocalRetActionProxy(name), mBindLuaAction(action)
+	LocalLuaRetActionProxy::LocalLuaRetActionProxy(NetLuaRetAction * action) : mBindLuaAction(action)
 	{
 		
 	}
@@ -34,17 +33,16 @@ namespace SoEasy
 		this->mBindLuaAction->Inovke(code);
 	}
 
-	LocalRetActionProxy::LocalRetActionProxy(const std::string & name)
-	{
-		this->mFunctionName = name;
+	LocalRetActionProxy::LocalRetActionProxy()
+	{		
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
 	}
+
 	void LocalRetActionProxy1::Invoke(PB::NetWorkPacket * backData)
 	{
 		this->mBindAction((XCode)backData->code());
 	}
-	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name)
-		:LocalRetActionProxy(name), mBindLuaAction(action)
+	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action) : mBindLuaAction(action)
 	{
 
 	}
@@ -70,20 +68,19 @@ namespace SoEasy
 		}
 		this->mBindLuaAction->Inovke(code);
 	}
-	NetWorkWaitCorAction::NetWorkWaitCorAction(std::string name, CoroutineManager * mgr)
-		: LocalRetActionProxy(name)
+	NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineManager * mgr)
 	{
 		this->mScheduler = mgr;
 		this->mCoroutineId = mgr->GetCurrentCorId();
 	}
 
-	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(std::string name, CoroutineManager * coroutineMgr)
+	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(CoroutineManager * coroutineMgr)
 	{
 		if (coroutineMgr->IsInMainCoroutine())
 		{
 			return nullptr;
 		}
-		return std::make_shared<NetWorkWaitCorAction>(name, coroutineMgr);
+		return std::make_shared<NetWorkWaitCorAction>(coroutineMgr);
 	}
 
 	void NetWorkWaitCorAction::Invoke(PB::NetWorkPacket * backData)

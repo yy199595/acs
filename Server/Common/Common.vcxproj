@@ -40,6 +40,7 @@
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
     <ClCompile Include="NetWork\NetWorkRetAction.cpp" />
     <ClCompile Include="NetWork\TcpClientSession.cpp" />
+    <ClCompile Include="NetWork\TcpProxySession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
     <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Other\AssestsFileInfo.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
     <ClInclude Include="NetWork\SocketEvent.h" />
     <ClInclude Include="NetWork\TcpClientSession.h" />
+    <ClInclude Include="NetWork\TcpProxySession.h" />
     <ClInclude Include="Object\GameObject.h" />
     <ClInclude Include="Object\MemoryObject.h" />
     <ClInclude Include="Object\Object.h" />

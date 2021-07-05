@@ -17,19 +17,21 @@ namespace SoEasy
 	class LocalRetActionProxy
 	{
 	public:
-		LocalRetActionProxy(const std::string & name);
+		LocalRetActionProxy();
 		virtual ~LocalRetActionProxy() { }
 	public:
 		long long GetCreateTime() { return this->mCreateTime; }
-		std::string & GetFunctionName() { return this->mFunctionName; }
 	public:
 		virtual void Invoke(PB::NetWorkPacket * backData) = 0;
 	private:
 		long long mActionKey;
 		long long mCreateTime;
 		std::string mFunctionName;
-	protected:
-		
+	public:
+#ifdef _DEBUG
+		std::string mService;
+		std::string mMethod;
+#endif
 	};
 
 }
@@ -39,8 +41,7 @@ namespace SoEasy
 	class LocalRetActionProxy1 : public LocalRetActionProxy
 	{
 	public:
-		LocalRetActionProxy1(NetWorkRetAction1 action, std::string & name)
-			: LocalRetActionProxy(name), mBindAction(action) {}
+		LocalRetActionProxy1(NetWorkRetAction1 action) : mBindAction(action) {}
 
 		~LocalRetActionProxy1() { }
 
@@ -54,8 +55,7 @@ namespace SoEasy
 	class LocalRetActionProxy2 : public LocalRetActionProxy
 	{
 	public:
-		LocalRetActionProxy2(NetWorkRetAction2<T> action, std::string & name)
-			:LocalRetActionProxy(name), mBindAction(action) { }
+		LocalRetActionProxy2(NetWorkRetAction2<T> action) : mBindAction(action) { }
 
 		~LocalRetActionProxy2() { }
 
@@ -85,7 +85,7 @@ namespace SoEasy
 	class LocalLuaRetActionProxy : public LocalRetActionProxy
 	{
 	public:
-		LocalLuaRetActionProxy(NetLuaRetAction * action, std::string name);
+		LocalLuaRetActionProxy(NetLuaRetAction * action);
 
 		~LocalLuaRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
@@ -98,7 +98,7 @@ namespace SoEasy
 	class LocalWaitRetActionProxy : public LocalRetActionProxy
 	{
 	public:
-		LocalWaitRetActionProxy(NetLuaWaitAction * action, std::string name);
+		LocalWaitRetActionProxy(NetLuaWaitAction * action);
 
 		~LocalWaitRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
@@ -113,9 +113,9 @@ namespace SoEasy
 	class NetWorkWaitCorAction : public LocalRetActionProxy
 	{
 	public:
-		NetWorkWaitCorAction(std::string name, CoroutineManager *);
+		NetWorkWaitCorAction(CoroutineManager *);
 		~NetWorkWaitCorAction() { }
-		static shared_ptr<NetWorkWaitCorAction> Create(std::string name, CoroutineManager *);
+		static shared_ptr<NetWorkWaitCorAction> Create(CoroutineManager *);
 	public:
 		void Invoke(PB::NetWorkPacket * backData) override;
 	public:

@@ -10,7 +10,8 @@ namespace SoEasy
 		ObjectPool(size_t maxCount = 100);
 		~ObjectPool();
 	public:
-		T * Create();
+		template<typename ... Args>
+		T * Create(Args &&... args);
 		bool Destory(T * data);
 	private:
 		const size_t mMaxCount;
@@ -36,17 +37,7 @@ namespace SoEasy
 			delete object;
 		}
 	}
-	template<typename T>
-	inline T * ObjectPool<T>::Create()
-	{
-		if (!this->mObjectQueue.empty())
-		{
-			T * object = this->mObjectQueue.front();
-			this->mObjectQueue.pop();
-			return object;
-		}
-		return new T();
-	}
+	
 	template<typename T>
 	inline bool ObjectPool<T>::Destory(T * data)
 	{
@@ -62,6 +53,18 @@ namespace SoEasy
 			return false;
 		}
 		return true;
+	}
+	template<typename T>
+	template<typename ...Args>
+	inline T * ObjectPool<T>::Create(Args &&... args)
+	{
+		if (!this->mObjectQueue.empty())
+		{
+			T * object = this->mObjectQueue.front();
+			this->mObjectQueue.pop();
+			return object;
+		}
+		return new T();
 	}
 }
 

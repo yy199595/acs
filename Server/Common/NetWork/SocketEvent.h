@@ -21,6 +21,13 @@ namespace SoEasy
 
 	enum SessionType
 	{
+		SessionNone,
+		SessionClient, //外部连接进来的
+		SessionNode		//连接到外部的
+	};
+
+	enum SessionType
+	{
 		SessionNoneType,
 		SessionClientType,
 		SessionNodeType

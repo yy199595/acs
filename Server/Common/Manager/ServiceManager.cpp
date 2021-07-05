@@ -58,16 +58,19 @@ namespace SoEasy
 
 	bool ServiceManager::HandlerMessage(const std::string & address, PB::NetWorkPacket * messageData)
 	{
-		ServiceBase * localService = this->GetService(messageData->service());
-		if (localService == nullptr || localService->HasMethod(messageData->method()))
+		const std::string & method = messageData->method();
+		const std::string & service = messageData->service();
+		ServiceBase * localService = this->GetService(service);
+		if (localService == nullptr || !localService->HasMethod(method))
 		{
+			SayNoDebugError("call function not find [" << service << "." << method << "]");
 			return false;
 		}
 
-		this->mCorManager->Start(messageData->method(), [address, localService, this, messageData]()
+		this->mCorManager->Start(method, [address, localService, this, messageData]()
 			{
 				XCode code = localService->InvokeMethod(address, messageData);
-				if (messageData->rpcid() == 0 || code != XCode::NotResponseMessage)
+				if (messageData->rpcid() == 0 || code == XCode::NotResponseMessage)
 				{
 					NetPacketPool.Destory(messageData);
 				}

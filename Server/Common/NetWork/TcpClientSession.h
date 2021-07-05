@@ -26,9 +26,8 @@ namespace SoEasy
 	};
 	class NetSessionManager;
 	
-	class TcpClientSession : public std::enable_shared_from_this<TcpClientSession>
+	class TcpClientSession
 	{
-		typedef std::function<void(shared_ptr<TcpClientSession>, bool)> ConnectCallback;
 	public:
 		TcpClientSession(NetSessionManager * manager, SharedTcpSocket socket);
 		TcpClientSession(NetSessionManager * manager, std::string name, std::string ip, unsigned short port);
@@ -37,8 +36,6 @@ namespace SoEasy
 		bool IsActive();	
 		inline const std::string & GetIP() { return mIp; }
 		inline unsigned short GetPort() { return mPort; }
-		inline SessionState GetState() { return mCurrentSatte; }
-		inline const bool IsContent() { return this->mIsContent; }
 		inline const std::string & GetAddress() { return mAdress; }	
 		inline SharedTcpSocket GetSocket() { return this->mBinTcpSocket; }
 		inline const std::string & GetSessionName() { return mSessionName; }
@@ -47,7 +44,7 @@ namespace SoEasy
 	public:
 		void StartClose();
 		bool StartConnect();
-		void StartReceiveMsg();
+		bool StartReceiveMsg();
 	private:
 		void ReadMessageBody(const  size_t allSize);
 		void InitMember(const std::string & ip, unsigned short port);
@@ -59,13 +56,10 @@ namespace SoEasy
 		SharedTcpSocket mBinTcpSocket;
 		AsioTcpEndPoint mSocketEndPoint;
 	private:
-		bool mIsContent;
+		SessionType mSessionType;
 		std::string mSessionName;
-		SessionState mCurrentSatte;
 		unsigned int mConnectCount;
 		NetSessionManager * mDispatchManager;
-	private:	
-		std::function<void()> mRecvAction;
 	private:
 		char * mRecvMsgBuffer;
 		unsigned int mRecvBufferSize;

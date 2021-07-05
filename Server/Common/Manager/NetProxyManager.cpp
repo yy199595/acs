@@ -11,7 +11,7 @@ namespace SoEasy
 	{
 		if (eve == nullptr) return false;
 		this->mNetEventQueue.AddItem(eve);
-		return false;
+		return true;
 	}
 
 	bool NetProxyManager::DescorySession(const std::string & address)
@@ -31,6 +31,13 @@ namespace SoEasy
 		{
 			return false;
 		}
+#ifdef _DEBUG
+		const std::string & method = msgData->method();
+		const std::string & service = msgData->service();
+		SayNoDebugInfo("call " << service << "." << method << " [" << address << "]");
+#endif // _DEBUG
+
+		
 		Main2NetEvent * eve = new Main2NetEvent(SocketSendMsgEvent, address, "", msgData);
 		return this->mNetWorkManager->AddNetSessionEvent(eve);
 	}
@@ -75,7 +82,6 @@ namespace SoEasy
 		this->mNetEventQueue.SwapQueueData();
 		while (this->mNetEventQueue.PopItem(eve))
 		{
-			this->HandlerNetEvent(eve);
 			const std::string & address = eve->GetAddress();
 			if (eve->GetEventType() == Net2MainEventType::SocketConnectSuc)
 			{
@@ -114,7 +120,7 @@ namespace SoEasy
 					}
 					else
 					{
-						Main2NetEvent * e = new Main2NetEvent(Main2NetEventType::SocketDectoryEvent, address);
+						Main2NetEvent * e = new Main2NetEvent(SocketDectoryEvent, address);
 						this->mNetWorkManager->AddNetSessionEvent(e);
 					}
 					this->mSessionMap.erase(iter);
@@ -145,21 +151,14 @@ namespace SoEasy
 	{
 		const std::string & method = messageData->method();
 		const std::string & service = messageData->service();
-		const long long callbackId = messageData->rpcid();
 		if (!service.empty() && !method.empty())
 		{
-			if (!mServiceManager->HandlerMessage(address, messageData))
-			{
-				return false;
-			}
+			return mServiceManager->HandlerMessage(address, messageData);			
 		}
 		long long rpcId = messageData->rpcid();
 		return this->mActionManager->InvokeCallback(rpcId, messageData);
 	}
-	bool NetProxyManager::HandlerNetEvent(Net2MainEvent * eve)
-	{
-		return false;
-	}
+
 	bool NetProxyManager::RemoveSessionByAddress(const std::string & address)
 	{
 		auto iter = this->mSessionMap.find(address);

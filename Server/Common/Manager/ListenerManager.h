@@ -12,16 +12,16 @@ namespace SoEasy
 	public:
 		const std::string & GetAddress() { return mListenAddress; }
 	public:
-		void StartAccept();
+		bool StartAccept();
 	protected:
 		bool OnInit() override;
 	private:
+		bool mIsAccept;
 		std::string mListenerIp;	//监听的ip
 		std::string mListenAddress;			//地址
 		unsigned short mListenerPort;
 		AsioTcpAcceptor * mBindAcceptor;
 		NetSessionManager * mDispatchManager;	
 		std::set<std::string> mWhiteList;	//白名单
-		std::function<void(void)> mListenAction;
 	};
 }

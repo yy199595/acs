@@ -44,7 +44,15 @@ namespace SoEasy
 		if (iter != this->mRetActionMap.end())
 		{
 			shared_ptr<LocalRetActionProxy> action = iter->second;
-			action->Invoke(messageData);
+			if (action != nullptr)
+			{
+				action->Invoke(messageData);
+#ifdef _DEBUG
+				double t = (TimeHelper::GetMilTimestamp() - action->GetCreateTime()) / 1000.0f;
+				SayNoDebugWarning("call " << action->mService <<"." << action->mMethod << " response" << " [" << t << "s]");
+#endif	
+			}
+			
 			this->mRetActionMap.erase(iter);
 			return true;
 		}

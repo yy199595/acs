@@ -24,18 +24,22 @@ namespace SoEasy
 		return true;
 	}
 
-	void NetSessionManager::OnConnectSuccess(SharedTcpSession session)
+	void NetSessionManager::OnConnectSuccess(TcpClientSession * session)
 	{
 #ifdef _DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
 #endif
 		const std::string & address = session->GetAddress();
-		const std::string & name = session->GetSessionName();
+		const std::string & name = session->GetSessionName();		
 		Net2MainEvent * eve = new Net2MainEvent(SocketConnectSuc, address, name);
-		this->mNetProxyManager->AddNetSessionEvent(eve);
+		if (eve != nullptr)
+		{
+			this->mRecvSessionQueue.push(address);
+			this->mNetProxyManager->AddNetSessionEvent(eve);
+		}
 	}
 
-	void NetSessionManager::OnSessionError(SharedTcpSession session, Net2MainEventType type)
+	void NetSessionManager::OnSessionError(TcpClientSession * session, Net2MainEventType type)
 	{
 #ifdef _DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
@@ -46,7 +50,7 @@ namespace SoEasy
 		this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetSessionManager::OnRecvMessage(SharedTcpSession session, const char * message, const size_t size)
+	bool NetSessionManager::OnRecvMessage(TcpClientSession * session, const char * message, const size_t size)
 	{
 #ifdef _DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
@@ -59,11 +63,12 @@ namespace SoEasy
 		}
 		const std::string & address = session->GetAddress();
 		const std::string & name = session->GetSessionName();
+		this->mRecvSessionQueue.push(address);
 		Net2MainEvent * eve = new Net2MainEvent(SocketReceiveData, address, name, msgData);
 		return this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetSessionManager::OnSendMessageError(SharedTcpSession session, const char * message, const size_t size)
+	bool NetSessionManager::OnSendMessageError(TcpClientSession * session, const char * message, const size_t size)
 	{
 #ifdef _DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
@@ -101,15 +106,15 @@ namespace SoEasy
 		return true;
 	}
 
-	shared_ptr<TcpClientSession> NetSessionManager::Create(shared_ptr<AsioTcpSocket> socket)
+	TcpClientSession * NetSessionManager::Create(shared_ptr<AsioTcpSocket> socket)
 	{
 #ifdef _DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
-		SharedTcpSession session = make_shared<TcpClientSession>(this, socket);
-		if (this->mSessionAdressMap.find(session->GetAddress()) != this->mSessionAdressMap.end())
+		TcpClientSession * session = new TcpClientSession(this, socket);
+		if (this->mSessionAdressMap.find(session->GetAddress()) == this->mSessionAdressMap.end())
 		{
-			session->StartReceiveMsg();
+			this->mRecvSessionQueue.push(session->GetAddress());
 			this->mSessionAdressMap.emplace(session->GetAddress(), session);
 			Net2MainEvent * eve = new Net2MainEvent(SocketNewConnect, session->GetAddress());
 			this->mNetProxyManager->AddNetSessionEvent(eve);
@@ -118,7 +123,7 @@ namespace SoEasy
 		return nullptr;
 	}
 
-	shared_ptr<TcpClientSession> NetSessionManager::Create(const std::string & name, const std::string & address)
+	TcpClientSession * NetSessionManager::Create(const std::string & name, const std::string & address)
 	{
 #ifdef _DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
@@ -132,7 +137,7 @@ namespace SoEasy
 		unsigned short port;
 		if (StringHelper::ParseIpAddress(address, ip, port))
 		{
-			SharedTcpSession session = make_shared<TcpClientSession>(this, name, ip, port);
+			TcpClientSession * session = new TcpClientSession(this, name, ip, port);
 			this->mSessionAdressMap.emplace(address, session);
 			return session;
 		}
@@ -157,12 +162,18 @@ namespace SoEasy
 		this->mListenerManager->StartAccept();
 		while (this->mIsClose == false)
 		{
-			asio::error_code code;
-			this->mAsioContext.poll(code);
-			if (code)
+			this->mAsioContext.poll();
+			this->mListenerManager->StartAccept();
+			while (!this->mRecvSessionQueue.empty())
 			{
-				SayNoDebugError(code.message());
+				TcpClientSession * tcpSession = this->GetSession(this->mRecvSessionQueue.front());
+				if (tcpSession != nullptr && tcpSession->IsActive())
+				{
+					tcpSession->StartReceiveMsg();
+				}
+				this->mRecvSessionQueue.pop();
 			}
+			
 			this->mNetEventQueue.SwapQueueData(); //处理主线程过来的数据
 			while (this->mNetEventQueue.PopItem(sessionEvent))
 			{
@@ -188,7 +199,7 @@ namespace SoEasy
 		else if (eve->GetEventType() == SocketConnectEvent)
 		{
 			const std::string & name = eve->GetName();
-			SharedTcpSession session = this->Create(name, address);
+			TcpClientSession * session = this->Create(name, address);
 			if (session == nullptr || !session->StartConnect())
 			{
 				Net2MainEvent * eve = new Net2MainEvent(SocketConnectFail, address, name);
@@ -197,7 +208,7 @@ namespace SoEasy
 		}
 		else if (eve->GetEventType() == SocketSendMsgEvent)
 		{
-			SharedTcpSession session = this->GetSession(address);
+			TcpClientSession * session = this->GetSession(address);
 			PB::NetWorkPacket * messageData = eve->GetMsgData();
 			char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 			if (!messageData->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
@@ -223,25 +234,23 @@ namespace SoEasy
 			}		
 		}
 	}
-	shared_ptr<TcpClientSession> NetSessionManager::GetSession(const std::string & address)
+
+	TcpClientSession * NetSessionManager::GetSession(const std::string & address)
 	{
 #ifdef _DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
 		auto iter = this->mSessionAdressMap.find(address);
-		if (iter != this->mSessionAdressMap.end())
-		{
-			return iter->second->IsActive() ? iter->second : nullptr;
-		}
-		return nullptr;
+		return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
 	}
+
 	bool NetSessionManager::DescorySession(const std::string & address)
 	{
 		auto iter = this->mSessionAdressMap.find(address);
 		if (iter != this->mSessionAdressMap.end())
 		{
-			SharedTcpSession session = iter->second;
-			if (session->IsActive())
+			TcpClientSession * session = iter->second;
+			if (session != nullptr && session->IsActive())
 			{
 				session->StartClose();
 			}

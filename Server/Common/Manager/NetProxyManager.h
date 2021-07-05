@@ -22,7 +22,6 @@ namespace SoEasy
 		void OnSystemUpdate() final;
 		virtual bool OnRecvMessage(const std::string & address, PB::NetWorkPacket * msg);
 	private:
-		bool HandlerNetEvent(Net2MainEvent * eve);
 		bool RemoveSessionByAddress(const std::string & address);
 	private:
 		int mReConnectTime;

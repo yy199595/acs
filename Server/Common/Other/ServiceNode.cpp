@@ -48,7 +48,7 @@ namespace SoEasy
 	{
 		if (!this->mMessageQueue.empty())
 		{
-			while (this->mMessageQueue.empty())
+			while (!this->mMessageQueue.empty())
 			{
 				PB::NetWorkPacket * msgData = this->mMessageQueue.front();
 				const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
@@ -107,7 +107,7 @@ namespace SoEasy
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
 			this->PushMessageData(service, method, nullptr, rpcCallback);
@@ -127,7 +127,7 @@ namespace SoEasy
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
 			this->PushMessageData(service, method, nullptr, rpcCallback);
@@ -151,7 +151,7 @@ namespace SoEasy
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
 			this->PushMessageData(service, method, &request, rpcCallback);
@@ -171,7 +171,7 @@ namespace SoEasy
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(method, this->mCorManager);
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
 		if (rpcCallback != nullptr)
 		{
 			this->PushMessageData(service, method, &request, rpcCallback);
@@ -208,10 +208,17 @@ namespace SoEasy
 					msgData->set_messagedata(messagdData);
 					msgData->set_protocname(request->GetTypeName());
 				}
-			}		
+			}
 			msgData->set_method(method);
 			msgData->set_service(service);
-			msgData->set_rpcid(this->mActionManager->AddCallback(rpcReply));
+			if (rpcReply != nullptr)
+			{
+#ifdef _DEBUG
+				rpcReply->mMethod = method;
+				rpcReply->mService = service;
+#endif
+				msgData->set_rpcid(this->mActionManager->AddCallback(rpcReply));
+			}		
 			this->PushMessageData(msgData);
 		}
 	}

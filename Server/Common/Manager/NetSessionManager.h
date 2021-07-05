@@ -5,9 +5,9 @@
 
 #include<Script/LuaTable.h>
 #include<Protocol/s2s.pb.h>
+#include<Pool/ObjectPool.h>
 #include<NetWork/SocketEvent.h>
 #include<Other/DoubleBufferQueue.h>
-#include<Pool/ObjectPool.h>
 namespace SoEasy
 {
 	// 管理所有session  在网络线程中运行
@@ -20,15 +20,15 @@ namespace SoEasy
 	public:
 		friend Applocation;
 	public: //网络线程调用
-		void OnConnectSuccess(SharedTcpSession session);
-		void OnSessionError(SharedTcpSession session, Net2MainEventType type);
-		bool OnRecvMessage(SharedTcpSession session, const char * message, const size_t size);
-		bool OnSendMessageError(SharedTcpSession session, const char * message, const size_t size);
+		void OnConnectSuccess(TcpClientSession * session);
+		void OnSessionError(TcpClientSession * session, Net2MainEventType type);
+		bool OnRecvMessage(TcpClientSession * session, const char * message, const size_t size);
+		bool OnSendMessageError(TcpClientSession * session, const char * message, const size_t size);
 	public:
 		bool AddNetSessionEvent(Main2NetEvent * eve);
 	public:
-		shared_ptr<TcpClientSession> Create(shared_ptr<AsioTcpSocket> socket);
-		shared_ptr<TcpClientSession> Create(const std::string & name, const std::string & address);
+		TcpClientSession * Create(shared_ptr<AsioTcpSocket> socket);
+		TcpClientSession * Create(const std::string & name, const std::string & address);
 	public:
 		AsioContext & GetAsioCtx() { return (mAsioContext); }
 	protected:
@@ -41,7 +41,7 @@ namespace SoEasy
 		void HandlerMainThreadEvent(Main2NetEvent * eve);
 	private:
 		bool DescorySession(const std::string & address);
-		shared_ptr<TcpClientSession> GetSession(const std::string & address);
+		TcpClientSession * GetSession(const std::string & address);
 	private:
 		AsioContext mAsioContext;
 		class ActionManager * mLocalActionManager;
@@ -51,8 +51,9 @@ namespace SoEasy
 		std::thread * mNetThread;
 		std::thread::id mNetThreadId;
 		class ListenerManager * mListenerManager;
+		std::queue<std::string> mRecvSessionQueue;
 		DoubleBufferQueue<Main2NetEvent *> mNetEventQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
-		std::unordered_map<std::string, shared_ptr<TcpClientSession>> mSessionAdressMap;	//所有session
+		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap;	//所有session
 	};
 }

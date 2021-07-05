@@ -231,6 +231,9 @@
     <ClCompile Include="Pool\ObjectPool.cpp">
       <Filter>Pool</Filter>
     </ClCompile>
+    <ClCompile Include="NetWork\TcpProxySession.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -508,6 +511,9 @@
     </ClInclude>
     <ClInclude Include="Manager\NetProxyManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\TcpProxySession.h">
+      <Filter>NetWork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
