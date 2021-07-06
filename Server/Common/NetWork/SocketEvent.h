@@ -26,13 +26,6 @@ namespace SoEasy
 		SessionNode		//连接到外部的
 	};
 
-	enum SessionType
-	{
-		SessionNoneType,
-		SessionClientType,
-		SessionNodeType
-	};
-
 	// 网络->逻辑事件
 	template<typename T>
 	class SocketEvent
