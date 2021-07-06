@@ -17,7 +17,7 @@ namespace SoEasy
 		const std::string &GetName() { return this->mName; }
 		const std::string &GetAddress() { return this->mAddress; }
 		bool IsNodeSession() { return this->mSessionType == SessionType::SessionNode; }
-		int GetConnectCount() { return this->mConnectCount}
+		int GetConnectCount() { return this->mConnectCount;}
 	public:
 		bool StartColse();
 		bool StartReceive();
