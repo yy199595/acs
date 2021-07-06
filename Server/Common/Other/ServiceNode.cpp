@@ -1,24 +1,24 @@
-﻿#include"ServiceNode.h"
-#include<Util/StringHelper.h>
-#include<Manager/NetProxyManager.h>
-#include<Manager/ActionManager.h>
-#include<Manager/ServiceManager.h>
-#include<NetWork/NetWorkRetAction.h>
-#include<Coroutine/CoroutineManager.h>
-#include<Util/JsonHelper.h>
-#include<Pool/ObjectPool.h>
+﻿#include "ServiceNode.h"
+#include <Util/StringHelper.h>
+#include <Manager/NetProxyManager.h>
+#include <Manager/ActionManager.h>
+#include <Manager/ServiceManager.h>
+#include <NetWork/NetWorkRetAction.h>
+#include <Coroutine/CoroutineManager.h>
+#include <Util/JsonHelper.h>
+#include <Pool/ObjectPool.h>
 namespace SoEasy
 {
-	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress)
-		: mAddress(address), mNodeName(name), mNoticeAddress(nAddress)
+	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
+		: mAddress(address), mNodeName(name)
 	{
-		Applocation * app = Applocation::Get();
+		Applocation *app = Applocation::Get();
 		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
 		SayNoAssertRet_F(this->mActionManager = app->GetManager<ActionManager>());
 		SayNoAssertRet_F(this->mNetWorkManager = app->GetManager<NetProxyManager>());
 		SayNoAssertRet_F(this->mServiceNodeManager = app->GetManager<ServiceNodeManager>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
-		
+
 		this->mNodeInfoMessage.Clear();
 		this->mNodeInfoMessage.set_areaid(areaId);
 		this->mNodeInfoMessage.set_nodeid(nodeId);
@@ -26,7 +26,7 @@ namespace SoEasy
 		this->mNodeInfoMessage.set_address(address);
 	}
 
-	bool ServiceNode::AddService(const std::string & service)
+	bool ServiceNode::AddService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		if (iter == this->mServiceArray.end())
@@ -38,7 +38,7 @@ namespace SoEasy
 		return false;
 	}
 
-	bool ServiceNode::HasService(const std::string & service)
+	bool ServiceNode::HasService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		return iter != this->mServiceArray.end();
@@ -46,20 +46,15 @@ namespace SoEasy
 
 	void ServiceNode::OnSystemUpdate()
 	{
-		if (!this->mMessageQueue.empty())
+		while (!this->mMessageQueue.empty())
 		{
-			while (!this->mMessageQueue.empty())
+			PB::NetWorkPacket *msgData = this->mMessageQueue.front();
+			if (!this->mNetWorkManager->SendMsgByAddress(this->mAddress, msgData))
 			{
-				PB::NetWorkPacket * msgData = this->mMessageQueue.front();
-				const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
-				if (!this->mNetWorkManager->SendMsgByAddress(address, msgData))
-				{
-					return;
-				}
-				this->mMessageQueue.pop();
+				return;
 			}
-			
-		}	
+			this->mMessageQueue.pop();
+		}
 	}
 
 	std::string ServiceNode::GetJsonString()
@@ -69,7 +64,7 @@ namespace SoEasy
 		return json;
 	}
 
-	XCode ServiceNode::Notice(const std::string & service, const std::string & method)
+	XCode ServiceNode::Notice(const std::string &service, const std::string &method)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -83,7 +78,7 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	XCode ServiceNode::Notice(const std::string & service, const std::string & method, const Message & request)
+	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -97,7 +92,7 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	XCode ServiceNode::Invoke(const std::string & service, const std::string & method)
+	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -117,7 +112,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Call(const std::string & service, const std::string & method, Message & response)
+	XCode ServiceNode::Call(const std::string &service, const std::string &method, Message &response)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -141,7 +136,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Invoke(const std::string & service, const std::string & method, const Message & request)
+	XCode ServiceNode::Invoke(const std::string &service, const std::string &method, const Message &request)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -161,7 +156,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	XCode ServiceNode::Call(const std::string & service, const std::string & method, const Message & request, Message & response)
+	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
 	{
 		if (service.empty() || method.empty())
 		{
@@ -185,19 +180,18 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	void ServiceNode::PushMessageData(PB::NetWorkPacket * messageData)
+	void ServiceNode::PushMessageData(PB::NetWorkPacket *messageData)
 	{
-		const std::string & address = mNoticeAddress.empty() ? mAddress : mNoticeAddress;
-		if (!this->mNetWorkManager->SendMsgByAddress(address, messageData))
+		if (!this->mNetWorkManager->SendMsgByAddress(this->mAddress, messageData))
 		{
 			this->mMessageQueue.push(messageData);
-			this->mNetWorkManager->ConnectByAddress(address, this->mNodeName);
+			this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
 		}
 	}
 
-	void ServiceNode::PushMessageData(const std::string & service, const std::string & method, const Message * request, shared_ptr<LocalRetActionProxy> rpcReply)
+	void ServiceNode::PushMessageData(const std::string &service, const std::string &method, const Message *request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
-		PB::NetWorkPacket * msgData = NetPacketPool.Create();
+		PB::NetWorkPacket *msgData = NetPacketPool.Create();
 		if (msgData != nullptr)
 		{
 			if (request != nullptr)
@@ -218,7 +212,7 @@ namespace SoEasy
 				rpcReply->mService = service;
 #endif
 				msgData->set_rpcid(this->mActionManager->AddCallback(rpcReply));
-			}		
+			}
 			this->PushMessageData(msgData);
 		}
 	}

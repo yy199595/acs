@@ -9,7 +9,7 @@ namespace SoEasy
 	class ServiceNode : public Object
 	{
 	public:
-		ServiceNode(int areaId, int nodeId, const std::string name, const std::string address, const std::string nAddress = "");
+		ServiceNode(int areaId, int nodeId, const std::string name, const std::string address);
 	public:
 		const int GetAreaId() { return this->mNodeInfoMessage.areaid(); }
 		const int GetNodeId() { return this->mNodeInfoMessage.nodeid(); }
@@ -40,7 +40,6 @@ namespace SoEasy
 		std::string mIp;
 		unsigned short mPort;
 		const std::string mAddress;		  //监听地址
-		const std::string mNoticeAddress; //通信地址
 		const std::string mNodeName;	  //进程名字
 		std::set<std::string> mServiceArray; //服务列表
 		class CoroutineManager *mCorManager; //协程

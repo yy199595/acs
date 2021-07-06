@@ -1,66 +1,75 @@
-﻿#include"NetProxyManager.h"
-#include"NetSessionManager.h"
-#include"ServiceManager.h"
-#include<Core/Applocation.h>
-#include<Manager/TimerManager.h>
-#include<Manager/ActionManager.h>
+﻿#include "NetProxyManager.h"
+#include "NetSessionManager.h"
+#include "ServiceManager.h"
+#include <Core/Applocation.h>
+#include <Manager/TimerManager.h>
+#include <Manager/ActionManager.h>
 namespace SoEasy
 {
-	
-	bool NetProxyManager::AddNetSessionEvent(Net2MainEvent * eve)
+
+	bool NetProxyManager::AddNetSessionEvent(Net2MainEvent *eve)
 	{
-		if (eve == nullptr) return false;
+		if (eve == nullptr)
+			return false;
 		this->mNetEventQueue.AddItem(eve);
 		return true;
 	}
 
-	bool NetProxyManager::DescorySession(const std::string & address)
+	bool NetProxyManager::DescorySession(const std::string &address)
 	{
-		Main2NetEvent * eve = new Main2NetEvent(SocketDectoryEvent, address);
+		Main2NetEvent *eve = new Main2NetEvent(SocketDectoryEvent, address);
 		return this->mNetWorkManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetProxyManager::SendMsgByAddress(const std::string & address, PB::NetWorkPacket * msgData)
+	bool NetProxyManager::SendMsgByAddress(const std::string &address, PB::NetWorkPacket *msgData)
 	{
-		if (msgData == nullptr)
-		{
-			return false;
-		}
-		auto iter = this->mSessionMap.find(address);
-		if (iter == this->mSessionMap.end())
+		TcpProxySession *tcpSession = this->GetProxySession(address);
+		if (tcpSession == nullptr || msgData == nullptr)
 		{
 			return false;
 		}
 #ifdef _DEBUG
-		const std::string & method = msgData->method();
-		const std::string & service = msgData->service();
+		const std::string &method = msgData->method();
+		const std::string &service = msgData->service();
 		SayNoDebugInfo("call " << service << "." << method << " [" << address << "]");
 #endif // _DEBUG
-
-		
-		Main2NetEvent * eve = new Main2NetEvent(SocketSendMsgEvent, address, "", msgData);
-		return this->mNetWorkManager->AddNetSessionEvent(eve);
+		return tcpSession->SendMessageData(msgData);
 	}
 
-	bool NetProxyManager::ConnectByAddress(const std::string & address, const std::string & name, int delayTime)
+	bool NetProxyManager::ConnectByAddress(const std::string &address, const std::string &name)
 	{
-		auto iter = this->mConnectSessions.find(address);
-		if (iter != this->mConnectSessions.end())
+		auto iter = this->mConnectSessionMap.find(address);
+		if (iter != this->mConnectSessionMap.end())
 		{
 			return true;
 		}
-		if (delayTime == 0)
+
+		TcpProxySession *tcpSession = new TcpProxySession(name, address);
+		if (tcpSession != nullptr)
 		{
-			this->mConnectSessions.insert(address);
-			Main2NetEvent * eve = new Main2NetEvent(SocketConnectEvent, address, name);
-			return this->mNetWorkManager->AddNetSessionEvent(eve);
+			tcpSession->StartConnect();
+			this->mConnectSessionMap.emplace(address, tcpSession);
+			return true;
 		}
-		return this->mTimerManager->AddTimer(delayTime, [this, address, name]()
-			{
-				this->mConnectSessions.insert(address);
-				Main2NetEvent * eve = new Main2NetEvent(SocketConnectEvent, address, name);			
-				return this->mNetWorkManager->AddNetSessionEvent(eve);
-			});
+		return false;
+	}
+
+	TcpProxySession *NetProxyManager::GetProxySession(const std::string &address)
+	{
+		auto iter = this->mSessionMap.find(address);
+		return iter != this->mSessionMap.end() ? iter->second : nullptr;
+	}
+
+	TcpProxySession *NetProxyManager::DelProxySession(const std::string &address)
+	{
+		auto iter = this->mSessionMap.find(address);
+		if (iter != this->mSessionMap.end())
+		{
+			TcpProxySession *session = iter->second;
+			this->mSessionMap.erase(iter);
+			return session;
+		}
+		return nullptr;
 	}
 
 	bool NetProxyManager::OnInit()
@@ -78,95 +87,110 @@ namespace SoEasy
 	{
 		shared_ptr<TcpClientSession> pTcpSession = nullptr;
 
-		Net2MainEvent * eve = nullptr;
+		Net2MainEvent *eve = nullptr;
 		this->mNetEventQueue.SwapQueueData();
 		while (this->mNetEventQueue.PopItem(eve))
 		{
-			const std::string & address = eve->GetAddress();
+			const std::string &address = eve->GetAddress();
 			if (eve->GetEventType() == Net2MainEventType::SocketConnectSuc)
 			{
-				this->RemoveSessionByAddress(address);			
-				auto iter = this->mConnectSessions.find(address);
-				if (iter != this->mConnectSessions.end())
+				auto iter = this->mConnectSessionMap.find(address);
+				if (iter != this->mConnectSessionMap.end())
 				{
-					this->mConnectSessions.erase(iter);
+					TcpProxySession *session = iter->second;
+					this->mSessionMap.emplace(address, session);
+					this->mConnectSessionMap.erase(iter);
+#ifdef _DEBUG
+					SayNoDebugInfo("connect to " << address << " successful");
+#endif
 				}
-				this->mSessionMap.emplace(address, SessionNodeType);
-				SayNoDebugInfo("connect to " << address << " successful");
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketNewConnect)
 			{
-				this->RemoveSessionByAddress(address);
-				this->mSessionMap.emplace(address, SessionClientType);
-				SayNoDebugInfo("new socket connect : " << address);
-
+				TcpProxySession *session = this->GetProxySession(address);
+				if (session == nullptr)
+				{
+					session = new TcpProxySession(address);
+					this->mSessionMap.emplace(address, session);
+#ifdef _DEBUG
+					SayNoDebugInfo("new session connect [" << address << "]");
+#endif
+				}
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketConnectFail)
 			{
-				this->RemoveSessionByAddress(address);
-				const std::string & name = eve->GetName();
-				SayNoDebugWarning("connect " << name << " " << address << "fail");
-				this->ConnectByAddress(address, name, this->mReConnectTime);
+				auto iter = this->mConnectSessionMap.find(address);
+				if (iter != this->mConnectSessionMap.end())
+				{
+					TcpProxySession *session = iter->second;
+					this->mTimerManager->AddTimer(this->mReConnectTime, BIND_ACTION_0(TcpProxySession::StartConnect, session));
+#ifdef _DEBUG
+					const std::string &name = eve->GetName();
+					SayNoDebugWarning("connect " << name << " " << address << "fail");
+#endif
+				}
+				else
+				{
+					SayNoDebugError("not find address [" << address << "]");
+				}
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveFail)
 			{
-				auto iter = this->mSessionMap.find(address);
-				if (iter != this->mSessionMap.end())
+				TcpProxySession *tcpSession = this->DelProxySession(address);
+				if (tcpSession != nullptr)
 				{
-					if (iter->second == SessionType::SessionNodeType)
+					if (tcpSession->IsNodeSession())
 					{
-						const std::string & name = eve->GetName();
-						this->ConnectByAddress(address, name, this->mReConnectTime);
+						this->mConnectSessionMap.emplace(tcpSession->GetAddress(), tcpSession);
+						this->mTimerManager->AddTimer(this->mReConnectTime, BIND_ACTION_0(TcpProxySession::StartConnect, tcpSession));
+#ifdef _DEBUG
+						SayNoDebugError("receive message error re connect [" << tcpSession->GetConnectCount() << "]");
+#endif
 					}
 					else
 					{
-						Main2NetEvent * e = new Main2NetEvent(SocketDectoryEvent, address);
-						this->mNetWorkManager->AddNetSessionEvent(e);
+						delete tcpSession;
 					}
-					this->mSessionMap.erase(iter);
 				}
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketSendMsgFail)
 			{
-				const std::string & name = eve->GetName();
-				PB::NetWorkPacket * msgData = eve->GetMsgData();
-				SayNoDebugError("send " << msgData->service() << "." << msgData->method() << " error");
-				NetPacketPool.Destory(msgData);
+				const std::string &name = eve->GetName();
+				PB::NetWorkPacket *msgData = eve->GetMsgData();
+				if (msgData != nullptr)
+				{
+					NetPacketPool.Destory(msgData);
+					SayNoDebugError("send " << msgData->service() << "." << msgData->method() << " error");
+				}
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveData)
 			{
-				PB::NetWorkPacket * msgData = eve->GetMsgData();
+				PB::NetWorkPacket *msgData = eve->GetMsgData();
 				if (!this->OnRecvMessage(address, msgData))
 				{
-					this->RemoveSessionByAddress(address);
-					Main2NetEvent * e = new Main2NetEvent(SocketDectoryEvent, address);
-					this->mNetWorkManager->AddNetSessionEvent(e);
+					NetPacketPool.Destory(msgData);
+					TcpProxySession *session = this->DelProxySession(address);
+					if (session != nullptr)
+					{
+						delete session;
+						Main2NetEvent *e = new Main2NetEvent(SocketDectoryEvent, address);
+						this->mNetWorkManager->AddNetSessionEvent(e);
+					}
 				}
 			}
 			delete eve;
 		}
 	}
 
-	bool NetProxyManager::OnRecvMessage(const std::string & address, PB::NetWorkPacket * messageData)
+	bool NetProxyManager::OnRecvMessage(const std::string &address, PB::NetWorkPacket *messageData)
 	{
-		const std::string & method = messageData->method();
-		const std::string & service = messageData->service();
+		const std::string &method = messageData->method();
+		const std::string &service = messageData->service();
 		if (!service.empty() && !method.empty())
 		{
-			return mServiceManager->HandlerMessage(address, messageData);			
+			return mServiceManager->HandlerMessage(address, messageData);
 		}
 		long long rpcId = messageData->rpcid();
 		return this->mActionManager->InvokeCallback(rpcId, messageData);
-	}
-
-	bool NetProxyManager::RemoveSessionByAddress(const std::string & address)
-	{
-		auto iter = this->mSessionMap.find(address);
-		if (iter != this->mSessionMap.end())
-		{
-			this->mSessionMap.erase(iter);
-			return true;
-		}
-		return false;
 	}
 }
