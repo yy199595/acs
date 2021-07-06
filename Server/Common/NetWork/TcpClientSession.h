@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include<Define/CommonDef.h>
-#include<Module/Component.h>
+#include<NetWork/SocketEvent.h>
 namespace SoEasy
 {
 	enum SessionState
