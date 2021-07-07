@@ -1,18 +1,26 @@
-﻿#include "MysqlTaskBase.h"
+﻿#include "MysqlThreadTask.h"
 #include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include <QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
-	MysqlTaskBase::MysqlTaskBase(MysqlManager *mgr, long long id, const std::string &db)
-		: ThreadTaskAction(mgr, id)
+	MysqlThreadTask::MysqlThreadTask(MysqlManager * mgr, long long id, const std::string &db, const std::string & sql)
+		: ThreadTaskAction(mgr, id), mDataBaseName(db), mSqlCommand(sql)
 	{
-		this->mDataBaseName = db;
 		this->mMysqlManager = mgr;
-		this->mTableConfig = nullptr;
+		SayNoAssertRet_F(this->mCorManager = mgr->GetManager<CoroutineManager>());
+		this->mCoroutineId = this->mCorManager->GetCurrentCorId();
 	}
 
-	void MysqlTaskBase::InvokeInThreadPool(long long threadId)
+	void MysqlThreadTask::OnTaskFinish()
+	{
+		if (this->mCorManager && this->mCoroutineId != 0)
+		{
+			this->mCorManager->Resume(this->mCoroutineId);
+		}
+	}
+
+	void MysqlThreadTask::InvokeInThreadPool(long long threadId)
 	{
 		SayNoMysqlSocket *mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
 		if (mysqlSocket == nullptr)
@@ -28,14 +36,8 @@ namespace SoEasy
 			this->mErrorString = "select " + this->mDataBaseName + " fail";
 			return;
 		}
-		std::string sql;
-		if (!this->GetSqlCommand(sql))
-		{
-			this->mErrorCode = XCode::MysqlInvokeFailure;
-			this->mErrorString = "protobuf args error ";
-			return;
-		}
-		if (mysql_real_query(mysqlSocket, sql.c_str(), sql.size()) != 0)
+		
+		if (mysql_real_query(mysqlSocket, mSqlCommand.c_str(), mSqlCommand.size()) != 0)
 		{
 			this->mErrorCode = MysqlInvokeFailure;
 			this->mErrorString = mysql_error(mysqlSocket);
@@ -94,28 +96,30 @@ namespace SoEasy
 		}
 	}
 
-	SqlTableConfig *MysqlTaskBase::GetTabConfig(const std::string &tab)
-	{
-		if (this->mTableConfig == nullptr)
-		{
-			this->mTableConfig = this->mMysqlManager->GetTableConfig(tab);
-		}
-		return this->mTableConfig;
-	}
-
-	void MysqlTaskBase::WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size)
+	void MysqlThreadTask::WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size)
 	{
 		switch (field->type)
 		{
 		case enum_field_types::MYSQL_TYPE_LONG:
 		case enum_field_types::MYSQL_TYPE_LONGLONG:
-			jsonWriter.Write(field->name, data == nullptr ? 0 : std::atoll(data));
+			this->mValue2 = std::atoll(data);
+			if (this->mValue2 != 0)
+			{
+				jsonWriter.Write(field->name, this->mValue2);
+			}		
 			break;
 		case enum_field_types::MYSQL_TYPE_FLOAT:
 		case enum_field_types::MYSQL_TYPE_DOUBLE:
-			jsonWriter.Write(field->name, data == nullptr ? 0 : std::atof(data));
+			this->mValue1 = std::atof(data);
+			if (this->mValue1 != 0)
+			{
+				jsonWriter.Write(field->name, this->mValue1);
+			}		
 		default:
-			jsonWriter.Write(field->name, data, size);
+			if (data != nullptr && size > 0)
+			{
+				jsonWriter.Write(field->name, data, size);
+			}			
 			break;
 		}
 	}

@@ -19,10 +19,6 @@ namespace SoEasy
 	protected:
 		bool BindFunction(std::string name, LocalAction1 action);
 
-		bool Bind(std::string name, MysqlOperAction action);
-
-		bool Bind(std::string name, MysqlQueryAction action);
-
 		template<typename T1>
 		bool BindFunction(std::string name, LocalAction2<T1> action);
 

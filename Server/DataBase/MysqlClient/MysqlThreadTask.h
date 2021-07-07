@@ -6,37 +6,32 @@ namespace SoEasy
 	class SqlTableConfig;
 	class QuertJsonWritre;
 	class CoroutineManager;
-	class MysqlTaskBase : public ThreadTaskAction
+	class MysqlThreadTask : public ThreadTaskAction
 	{
 	public:
-		MysqlTaskBase(MysqlManager *mgr, long long id, const std::string &db);
-		~MysqlTaskBase() {}
-
+		MysqlThreadTask(MysqlManager *mgr, long long id, const std::string &db, const std::string & sql);
+		~MysqlThreadTask() {}
 	protected:
+		void OnTaskFinish() final;
 		void InvokeInThreadPool(long long threadId) final; //在其他线程查询
-		virtual bool GetSqlCommand(std::string &sql) = 0;
-
-	public:
-		const std::string &GetDataBaseName() { return this->mDataBaseName; }
-		virtual bool InitTask(const std::string tab, CoroutineManager *corMgr, Message *data) { return false; }
-
 	public:
 		XCode GetErrorCode() { return this->mErrorCode; }
-		SqlTableConfig *GetTabConfig(const std::string &tab);
 		const std::string &GetErrorStr() { return this->mErrorString; }
 		const std::vector<std::string> &GetQueryDatas() { return this->mQueryDatas; }
-
 	private:
 		void WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
-
 	private:
-		std::string mDataBaseName;
-		MysqlManager *mMysqlManager;
-
+		const std::string mSqlCommand;
+		const std::string mDataBaseName;
 	private:
 		XCode mErrorCode;
-		std::string mErrorString;
-		SqlTableConfig *mTableConfig;
+		long long mCoroutineId;
+		std::string mErrorString;	
+		MysqlManager *mMysqlManager;
+		CoroutineManager * mCorManager;
 		std::vector<std::string> mQueryDatas;
+	private:
+		double mValue1;
+		long long mValue2;
 	};
 }

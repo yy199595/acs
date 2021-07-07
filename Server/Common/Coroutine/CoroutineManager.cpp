@@ -1,4 +1,4 @@
-#include"CoroutineManager.h"
+﻿#include"CoroutineManager.h"
 #include<chrono>
 #include<memory.h>
 #include"Coroutine.h"
@@ -160,17 +160,19 @@ namespace SoEasy
 	void CoroutineManager::YieldReturn()
 	{
 		Coroutine * pCoroutine = this->GetCoroutine();
-		if (pCoroutine != nullptr)
+		if (pCoroutine == nullptr)
 		{
-			this->mCurrentCorId = 0;
-			pCoroutine->mState = CorState::Suspend;
-#ifdef _WIN32
-			SwitchToFiber(this->mMainCoroutineStack);
-#else
-			this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
-			swapcontext(&pCoroutine->mCorContext, &this->mMainContext);
-#endif
+			SayNoDebugFatal("not find coroutine context");
+			return;
 		}
+		this->mCurrentCorId = 0;
+		pCoroutine->mState = CorState::Suspend;
+#ifdef _WIN32
+		SwitchToFiber(this->mMainCoroutineStack);
+#else
+		this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
+		swapcontext(&pCoroutine->mCorContext, &this->mMainContext);
+#endif
 	}
 
 	Coroutine * CoroutineManager::GetCoroutine()
@@ -194,7 +196,6 @@ namespace SoEasy
 			Coroutine * cor = iter->second;
 			this->mCoroutineMap.erase(iter);
 			mDestoryCoroutine.push(cor);
-			SayNoDebugWarning("remove coroutine " << cor->mCoroutineName);
 #ifdef _WIN32	
 			SwitchToFiber(this->mMainCoroutineStack);
 #else

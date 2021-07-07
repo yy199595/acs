@@ -1,12 +1,9 @@
 ﻿#include "MysqlProxy.h"
+#include <Protocol/db.pb.h>
 #include <Other/ServiceNode.h>
 #include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
-#include <MysqlClient/MysqlInsertTask.h>
-#include <MysqlClient/MysqlUpdateTask.h>
-#include <MysqlClient/MysqlQueryTask.h>
-#include <MysqlClient/MysqlDeleteTask.h>
-#include <Protocol/db.pb.h>
+#include<MysqlClient/MysqlThreadTask.h>
 #include <google/protobuf/util/json_util.h>
 #include <Pool/ProtocolPool.h>
 namespace SoEasy
@@ -41,25 +38,154 @@ namespace SoEasy
     XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
         ProtocolPool *protocolPool = ProtocolPool::Get();
-        Message *messageData = protocolPool->Create(requertData.protocolname());
-        if (messageData == nullptr)
+		const std::string & messageData = requertData.protocolmessage();
+        Message * protocolMessage = protocolPool->Create(requertData.protocolname());
+        if (protocolMessage == nullptr)
         {
             return XCode::Failure;
         }
-        
+		if (!protocolMessage->ParseFromString(messageData))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::ParseMessageError;
+		}
+		std::string sql;
+		if (!this->mMysqlManager->GetAddSqlCommand(*protocolMessage, sql))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::CallArgsError;
+		}
+		long long id = NumberHelper::Create();
+		protocolPool->Destory(protocolMessage);
+		const std::string & tab = this->mMysqlManager->GetDataBaseName();
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+
+		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		{		
+			return XCode::MysqlStartTaskFail;
+		}
+		this->mCorManager->YieldReturn();
+		response.set_errorstr(mysqlTask->GetErrorStr());
+		return mysqlTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
+		ProtocolPool *protocolPool = ProtocolPool::Get();
+		const std::string & messageData = requertData.protocolmessage();
+		Message * protocolMessage = protocolPool->Create(requertData.protocolname());
+		if (protocolMessage == nullptr)
+		{
+			return XCode::Failure;
+		}
+		if (!protocolMessage->ParseFromString(messageData))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::ParseMessageError;
+		}
+		std::string sql;
+		if (!this->mMysqlManager->GetSaveSqlCommand(*protocolMessage, sql))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::CallArgsError;
+		}
+		long long id = NumberHelper::Create();
+		protocolPool->Destory(protocolMessage);
+		const std::string & tab = this->mMysqlManager->GetDataBaseName();
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+
+		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		{
+			return XCode::MysqlStartTaskFail;
+		}
+		this->mCorManager->YieldReturn();
+		response.set_errorstr(mysqlTask->GetErrorStr());
+		return mysqlTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
+		ProtocolPool *protocolPool = ProtocolPool::Get();
+		const std::string & messageData = requertData.protocolmessage();
+		Message * protocolMessage = protocolPool->Create(requertData.protocolname());
+		if (protocolMessage == nullptr)
+		{
+			return XCode::Failure;
+		}
+		if (!protocolMessage->ParseFromString(messageData))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::ParseMessageError;
+		}
+		std::string sql;
+		if (!this->mMysqlManager->GetDeleleSqlCommand(*protocolMessage, sql))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::CallArgsError;
+		}
+		long long id = NumberHelper::Create();
+		protocolPool->Destory(protocolMessage);
+		const std::string & tab = this->mMysqlManager->GetDataBaseName();
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+
+		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		{
+			return XCode::MysqlStartTaskFail;
+		}
+		this->mCorManager->YieldReturn();
+		response.set_errorstr(mysqlTask->GetErrorStr());
+		return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Response &requertData, s2s::MysqlQuery_Response &response)
-    {
-    }
+	XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request & requertData, s2s::MysqlQuery_Response & response)
+	{
+		ProtocolPool *protocolPool = ProtocolPool::Get();
+		const std::string & messageData = requertData.protocolmessage();
+		Message * protocolMessage = protocolPool->Create(requertData.protocolname());
+		if (protocolMessage == nullptr)
+		{
+			return XCode::Failure;
+		}
+		if (!protocolMessage->ParseFromString(messageData))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::ParseMessageError;
+		}
+		std::string sql;
+		if (!this->mMysqlManager->GetQuerySqlCommand(*protocolMessage, sql))
+		{
+			protocolPool->Destory(protocolMessage);
+			return XCode::CallArgsError;
+		}
+		long long id = NumberHelper::Create();
+		protocolPool->Destory(protocolMessage);
+		const std::string & tab = this->mMysqlManager->GetDataBaseName();
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+
+		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		{
+			return XCode::MysqlStartTaskFail;
+		}
+		this->mCorManager->YieldReturn();
+		XCode code = mysqlTask->GetErrorCode();
+		if (code == XCode::Successful)
+		{
+			const std::vector<std::string> & jsonArray = mysqlTask->GetQueryDatas();
+			for (const std::string & json : jsonArray)
+			{
+				if (!util::JsonStringToMessage(json, protocolMessage).ok())
+				{
+					return XCode::JsonCastProtocbufFail;
+				}
+				std::string * jsonData = response.add_querydatas();
+				jsonData->append(protocolMessage->SerializeAsString());
+			}
+			return XCode::Successful;
+		}
+		response.set_errotstr(mysqlTask->GetErrorStr());
+		return code;
+	}
+
 
     // XCode MysqlProxy::Query(Message &requestData, Message &responseData)
     // {

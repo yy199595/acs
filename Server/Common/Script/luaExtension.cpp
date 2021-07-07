@@ -1,8 +1,9 @@
-#include"luaExtension.h"
+﻿#include"luaExtension.h"
 #include<Manager/Manager.h>
 #include<Object/GameObject.h>
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
+#include<Module/Component.h>
 using namespace SoEasy;
 namespace LuaAPIExtension
 {

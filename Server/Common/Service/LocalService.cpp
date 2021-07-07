@@ -57,17 +57,10 @@ namespace SoEasy
 			SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
 			return false;
 		}
+#ifdef _DEBUG
+		actionBox->mServiceName = this->GetServiceName();
+#endif
 		this->mActionMap.emplace(name, actionBox);
 		return true;
-	}
-
-	bool LocalService::Bind(std::string name, MysqlOperAction action)
-	{
-		return this->BindFunction(name, make_shared<LocalMysqlActionProxy>(action, name));
-	}
-
-	bool LocalService::Bind(std::string name, MysqlQueryAction action)
-	{
-		return this->BindFunction(name, make_shared<LocalMysqlQueryActionProxy>(action, name));
 	}
 }

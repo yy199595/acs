@@ -4,17 +4,15 @@
 #include <Util/NumberHelper.h>
 #include <Thread/ThreadPool.h>
 #include <Coroutine/CoroutineManager.h>
-#include <MysqlClient/MysqlTaskAction.h>
 #include <Util/StringHelper.h>
 #include <Script/ClassProxyHelper.h>
 #include <Util/FileHelper.h>
 
 #include <MysqlClient/TableOperator.h>
-#include <MysqlClient/MysqlQueryTask.h>
-#include <MysqlClient/MysqlInsertTask.h>
-#include <MysqlClient/MysqlUpdateTask.h>
-#include <MysqlClient/MysqlDeleteTask.h>
 #include <Protocol/db.pb.h>
+
+#include<Service/MysqlProxy.h>
+#include<Manager/ServiceManager.h>
 namespace SoEasy
 {
 	SqlTableConfig::SqlTableConfig(const std::string tab, const std::string pb)
@@ -87,46 +85,51 @@ namespace SoEasy
 		return iter != this->mSqlConfigMap.end() ? iter->second : nullptr;
 	}
 
-	shared_ptr<InvokeResultData> MysqlManager::InvokeCommand(const std::string &sql)
-	{
-		if (this->mCoroutineManager->IsInMainCoroutine())
-		{
-			return make_shared<InvokeResultData>(XCode::MysqlNotInCoroutine);
-		}
-		long long taskActionId = NumberHelper::Create();
-		shared_ptr<MysqlTaskAction> taskAction = make_shared<MysqlTaskAction>(this, taskActionId, this->mDataBaseName, sql, this->mCoroutineManager);
-
-		if (!this->StartTaskAction(taskAction))
-		{
-			return make_shared<InvokeResultData>(XCode::MysqlStartTaskFail);
-		}
-		this->mCoroutineManager->YieldReturn();
-
-		return taskAction->GetInvokeData();
-	}
-
-	XCode MysqlManager::StartTask(shared_ptr<MysqlTaskBase> task, Message * messageData)
-	{
-		if(this->mCoroutineManager->IsInMainCoroutine())
-		{
-			return XCode::NoCoroutineContext;
-		}
-		std::string table;
-		if (!this->GetTableName(messageData->GetTypeName(), table))
-		{
-			SayNoDebugError(messageData->GetTypeName() << " not found sql table");
-			return XCode::CallArgsError;
-		}
-		task->InitTask(table, this->mCoroutineManager, messageData);
-		if(!this->StartTaskAction(task))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
-		return XCode::Successful;
-	}
 
 	void MysqlManager::OnInitComplete()
 	{
+
+		this->mCoroutineManager->Start("MysqlProxy", [this]()
+			{
+				ServiceManager * serviceManager = this->GetManager<ServiceManager>();
+
+				LocalService * mysqlService = serviceManager->GetLocalService("MysqlProxy");
+
+				MysqlProxy * mysqlProxy = (MysqlProxy *)mysqlService;
+
+				s2s::MysqlOper_Request requestData;
+				s2s::MysqlOper_Response responseData;
+
+				db::UserAccountData userData;
+				userData.set_userid(13716061995);
+				for (int index = 0; index < 10; index++)
+				{
+					userData.set_phonenum(15510561831 + index);
+					userData.set_passwd("0x0x0x0x0x0x0x0x0x0x0x");
+					userData.set_token(TimeHelper::GetDateString());
+					userData.set_registertime(TimeHelper::GetSecTimeStamp());
+
+					userData.set_account(std::to_string((646585122 + index)) + "@qq.com");
+
+					requestData.set_protocolname(userData.GetTypeName());
+					requestData.set_protocolmessage(userData.SerializeAsString());
+
+					XCode code = mysqlProxy->Add(0, requestData, responseData);
+					SayNoDebugError("code = " << code);
+				}
+
+				userData.Clear();
+				userData.set_userid(13716061995);
+
+				s2s::MysqlQuery_Request queryRequest;
+				s2s::MysqlQuery_Response queryResponse;
+				queryRequest.set_protocolname(userData.GetTypeName());
+				queryRequest.set_protocolmessage(userData.SerializeAsString());
+
+				mysqlProxy->QueryData(0, queryRequest, queryResponse);
+			});
+
+		
 		
 	}
 
@@ -204,6 +207,363 @@ namespace SoEasy
 			this->mMysqlSocketMap.insert(std::make_pair(threadId, this->mMysqlSockt));
 			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
+		return true;
+	}
+
+	bool MysqlManager::GetTableNameByProtocolName(const std::string & name, std::string & tableName)
+	{
+		auto iter = this->mTablePbMap.find(name);
+		if (iter != this->mTablePbMap.end())
+		{
+			tableName = iter->second;
+			return true;
+		}
+		return false;
+	}
+
+	bool MysqlManager::GetAddSqlCommand(const Message & messageData, std::string & sqlCommand)
+	{
+		std::string tableName;
+		const std::string typeName = messageData.GetTypeName();
+		SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+
+		this->mSqlCommandStream.str("");
+		
+		std::vector<const FieldDescriptor *> fieldList;
+		const Descriptor *pDescriptor = messageData.GetDescriptor();
+		const Reflection *pReflection = messageData.GetReflection();
+		pReflection->ListFields(messageData, &fieldList);
+
+		mSqlCommandStream << "insert into " << tableName << "(";
+		for (size_t index = 0; index < fieldList.size(); index++)
+		{
+			if (index < fieldList.size() - 1)
+			{
+				mSqlCommandStream << fieldList[index]->name() << ",";
+				continue;
+			}
+			mSqlCommandStream << fieldList[index]->name();
+		}
+		mSqlCommandStream << ")values(";
+
+		for (size_t index = 0; index < fieldList.size(); index++)
+		{
+			const FieldDescriptor * fieldDesc = fieldList[index];
+			if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
+			{
+				mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_BYTES)
+			{
+				mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
+			{
+				mSqlCommandStream << pReflection->GetInt64(messageData, fieldDesc) << ",";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT64)
+			{
+				mSqlCommandStream << pReflection->GetUInt64(messageData, fieldDesc) << ",";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT32)
+			{
+				mSqlCommandStream << pReflection->GetInt32(messageData, fieldDesc) << ",";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT32)
+			{
+				mSqlCommandStream << pReflection->GetUInt32(messageData, fieldDesc) << ",";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_FLOAT)
+			{
+				mSqlCommandStream << pReflection->GetFloat(messageData, fieldDesc) << ",";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_DOUBLE)
+			{
+				mSqlCommandStream << pReflection->GetDouble(messageData, fieldDesc) << ",";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		sqlCommand = mSqlCommandStream.str();
+		sqlCommand[sqlCommand.size() - 1] = ')';
+		return true;
+
+	}
+
+	bool MysqlManager::GetSaveSqlCommand(const Message & messageData, std::string & sqlCommand)
+	{
+		std::string tableName;
+		const std::string typeName = messageData.GetTypeName();
+		SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+
+		SqlTableConfig * tableConfig = this->GetTableConfig(tableName);
+		SayNoAssertRetFalse_F(tableConfig);
+
+		std::vector<const FieldDescriptor *> fieldList;
+		const Descriptor *pDescriptor = messageData.GetDescriptor();
+		const Reflection *pReflection = messageData.GetReflection();
+		pReflection->ListFields(messageData, &fieldList);
+
+		mSqlCommandStream2 << " where ";
+		mSqlCommandStream << "update " << tableName << " set ";
+
+		for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+		{
+			const std::string &key = tableConfig->mKeys[index];
+			const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
+			mSqlCommandStream2 << key << "=";
+			if (fieldDesc->type() == FieldDescriptor::TYPE_STRING)
+			{
+				std::string key = pReflection->GetString(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_string())
+				{
+					return false;
+				}
+				mSqlCommandStream2 << "'" << key << "'";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_INT64)
+			{
+				long long key = pReflection->GetInt64(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_int64())
+				{
+					return false;
+				}
+				mSqlCommandStream2 << key;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT64)
+			{
+				unsigned long long key = pReflection->GetUInt64(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_uint64())
+				{
+					return false;
+				}
+				mSqlCommandStream2 << key;
+			}
+
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
+			{
+				int key = pReflection->GetInt32(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_int32())
+				{
+					return false;
+				}
+				mSqlCommandStream2 << key;
+			}
+
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT32)
+			{
+				unsigned int key = pReflection->GetUInt32(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_uint32())
+				{
+					return false;
+				}
+				mSqlCommandStream2 << key;
+			}
+			else
+			{
+				return false;
+			}
+			if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+			{
+				mSqlCommandStream2 << " and ";
+			}
+		}
+
+		for (size_t index = 0; index < fieldList.size(); index++)
+		{
+			const FieldDescriptor *fieldDesc = fieldList[index];
+			if (tableConfig->HasKey(fieldDesc->name()))
+			{
+				continue;
+			}
+			mSqlCommandStream << fieldDesc->name() << "=";
+			switch (fieldDesc->type())
+			{
+			case FieldDescriptor::Type::TYPE_BYTES:
+			case FieldDescriptor::Type::TYPE_STRING:
+				mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+				break;
+			case FieldDescriptor::Type::TYPE_INT64:
+				mSqlCommandStream << pReflection->GetInt64(messageData, fieldDesc) << ",";
+				break;
+			case FieldDescriptor::Type::TYPE_UINT64:
+				mSqlCommandStream << pReflection->GetUInt64(messageData, fieldDesc) << ",";
+				break;
+			case FieldDescriptor::Type::TYPE_INT32:
+				mSqlCommandStream << pReflection->GetInt32(messageData, fieldDesc) << ",";
+				break;
+			case FieldDescriptor::Type::TYPE_UINT32:
+				mSqlCommandStream << pReflection->GetUInt32(messageData, fieldDesc) << ",";
+				break;
+			case FieldDescriptor::Type::TYPE_FLOAT:
+				mSqlCommandStream << pReflection->GetFloat(messageData, fieldDesc) << ",";
+				break;
+			case FieldDescriptor::Type::TYPE_DOUBLE:
+				mSqlCommandStream << pReflection->GetDouble(messageData, fieldDesc) << ",";
+				break;
+			default:
+				return false;
+			}
+		}
+		sqlCommand = mSqlCommandStream.str();
+		sqlCommand[sqlCommand.size() - 1] = ' ';
+		sqlCommand.append(mSqlCommandStream2.str());
+
+		return true;
+	}
+
+	bool MysqlManager::GetQuerySqlCommand(const Message & messageData, std::string & sqlCommand)
+	{
+		std::string tableName;
+		const std::string typeName = messageData.GetTypeName();
+		SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+
+		SqlTableConfig * tableConfig = this->GetTableConfig(tableName);
+		SayNoAssertRetFalse_F(tableConfig);
+
+		mSqlCommandStream.str("");
+
+		const Descriptor *pDescriptor = messageData.GetDescriptor();
+		const Reflection *pReflection = messageData.GetReflection();
+		mSqlCommandStream << "select * from " << tableName << " where ";
+		
+		for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+		{
+			const std::string &key = tableConfig->mKeys[index];
+			const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
+			if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
+			{
+				const std::string val = pReflection->GetString(messageData, fieldDesc);
+				if (val == fieldDesc->default_value_string())
+				{
+					continue;
+				}
+				mSqlCommandStream << key << "='" << val << "'";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
+			{
+				long long val = pReflection->GetInt64(messageData, fieldDesc);
+				if (val == fieldDesc->default_value_int64())
+				{
+					continue;
+				}
+				mSqlCommandStream << key << "=" << val;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT64)
+			{
+				unsigned long long val = pReflection->GetUInt64(messageData, fieldDesc);
+				if (val == fieldDesc->default_value_uint64())
+				{
+					continue;
+				}
+				mSqlCommandStream << key << "=" << val;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
+			{
+				int val = pReflection->GetInt32(messageData, fieldDesc);
+				if (val == fieldDesc->default_value_int32())
+				{
+					continue;
+				}
+				mSqlCommandStream << key << "=" << val;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT32)
+			{
+				unsigned int val = pReflection->GetUInt32(messageData, fieldDesc);
+				if (val == fieldDesc->default_value_uint32())
+				{
+					continue;
+				}
+				mSqlCommandStream << key << "=" << val;
+			}
+			if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+			{
+				mSqlCommandStream << " and ";
+			}
+		}
+		sqlCommand = mSqlCommandStream.str();
+		return true;
+	}
+
+	bool MysqlManager::GetDeleleSqlCommand(const Message & messageData, std::string & sqlCommand)
+	{
+		std::string tableName;
+		const std::string typeName = messageData.GetTypeName();
+		SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+
+		SqlTableConfig * tableConfig = this->GetTableConfig(tableName);
+		SayNoAssertRetFalse_F(tableConfig);
+
+		this->mSqlCommandStream.str("");
+
+		
+		mSqlCommandStream << "delete from " << tableName << " where ";
+		const Descriptor *pDescriptor = messageData.GetDescriptor();
+		const Reflection *pReflection = messageData.GetReflection();
+		
+		for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+		{
+			const std::string &key = tableConfig->mKeys[index];
+			const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
+			mSqlCommandStream << key << "=";
+			if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
+			{
+				const std::string key = pReflection->GetString(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_string())
+				{
+					return false;
+				}
+				mSqlCommandStream << "'" << key << "'";
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT32)
+			{
+				int key = pReflection->GetInt32(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_int32())
+				{
+					return false;
+				}
+				mSqlCommandStream << key;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT32)
+			{
+				unsigned int key = pReflection->GetUInt32(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_uint32())
+				{
+					return false;
+				}
+				mSqlCommandStream << key;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
+			{
+				long long key = pReflection->GetInt64(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_int64())
+				{
+					return false;
+				}
+				mSqlCommandStream << key;
+			}
+			else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT64)
+			{
+				unsigned long long key = pReflection->GetUInt64(messageData, fieldDesc);
+				if (key == fieldDesc->default_value_uint64())
+				{
+					return false;
+				}
+				mSqlCommandStream << key;
+			}
+			else
+			{
+				return false;
+			}
+
+			if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+			{
+				mSqlCommandStream << " and ";
+			}
+		}
+		sqlCommand = mSqlCommandStream.str();
 		return true;
 	}
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<sstream>
 #include<Util/ProtocHelper.h>
 #include<Global/LogHelper.h>
@@ -65,7 +65,7 @@ inline std::string FromatFileLine(const char * file, const int line)
 #define SayNoAssertRetNull(obj, msg)		SayNoAssertError(obj, msg, return nullptr)
 #define SayNoAssertRetFail(obj, msg)		SayNoAssertError(obj, msg, return XCode::Failure)
 
-
+#define SayNoAssertRetCode(obj,code) SayNoAssertRetVal(obj, "", code)
 #define SayNoAssertRetZero_F(obj)	SayNoAssertRetVal(obj, "", 0)
 #define SayNoAssertRet_F(obj)		SayNoAssertRet(obj, "")
 #define SayNoAssertRetFail_F(obj)	SayNoAssertRetFail(obj, "")

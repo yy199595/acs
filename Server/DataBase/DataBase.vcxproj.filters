@@ -32,9 +32,6 @@
     <ClCompile Include="Manager\RedisManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlTaskAction.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
     <ClCompile Include="RedisClient\RedisTaskAction.cpp">
       <Filter>RedisClient</Filter>
     </ClCompile>
@@ -47,26 +44,14 @@
     <ClCompile Include="RedisClient\RedisTaskBase.cpp">
       <Filter>RedisClient</Filter>
     </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlTaskBase.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
     <ClCompile Include="MysqlClient\TableOperator.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlInsertTask.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlQueryTask.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlUpdateTask.cpp">
-      <Filter>MysqlClient</Filter>
-    </ClCompile>
-    <ClCompile Include="MysqlClient\MysqlDeleteTask.cpp">
       <Filter>MysqlClient</Filter>
     </ClCompile>
     <ClCompile Include="Service\MysqlProxy.cpp">
       <Filter>Service</Filter>
+    </ClCompile>
+    <ClCompile Include="MysqlClient\MysqlThreadTask.cpp">
+      <Filter>MysqlClient</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,9 +60,6 @@
     </ClInclude>
     <ClInclude Include="Manager\RedisManager.h">
       <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlTaskAction.h">
-      <Filter>MysqlClient</Filter>
     </ClInclude>
     <ClInclude Include="RedisClient\RedisTaskAction.h">
       <Filter>RedisClient</Filter>
@@ -97,26 +79,14 @@
     <ClInclude Include="RedisClient\RedisTaskBase.h">
       <Filter>RedisClient</Filter>
     </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlTaskBase.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
     <ClInclude Include="MysqlClient\TableOperator.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlInsertTask.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlQueryTask.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlUpdateTask.h">
-      <Filter>MysqlClient</Filter>
-    </ClInclude>
-    <ClInclude Include="MysqlClient\MysqlDeleteTask.h">
       <Filter>MysqlClient</Filter>
     </ClInclude>
     <ClInclude Include="Service\MysqlProxy.h">
       <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="MysqlClient\MysqlThreadTask.h">
+      <Filter>MysqlClient</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -26,7 +26,7 @@ namespace SoEasy
 namespace SoEasy
 {
 	class MysqlTaskAction;
-	class MysqlTaskBase;
+	class MysqlThreadTask;
 	class MysqlManager : public Manager
 	{
 	public:
@@ -40,12 +40,14 @@ namespace SoEasy
 	public:
 		SqlTableConfig *GetTableConfig(const std::string &tab);
 		bool GetTableName(const std::string &pb, std::string &table);
-		shared_ptr<InvokeResultData> InvokeCommand(const std::string &sql);
+		bool GetTableNameByProtocolName(const std::string & name, std::string & tableName);
 
 	public:
-		template <typename T>
-		shared_ptr<T> CreateMysqlTask();
-		XCode StartTask(shared_ptr<MysqlTaskBase> task, Message * messageData);
+		bool GetAddSqlCommand(const Message & messageData, std::string & sqlCommand);
+		bool GetSaveSqlCommand(const Message & messageData, std::string & sqlCommand);
+		bool GetQuerySqlCommand(const Message & messageData, std::string & sqlCommand);
+		bool GetDeleleSqlCommand(const Message & messageData, std::string & sqlCommand);
+
 	protected:
 		bool OnInit() final;
 		void OnInitComplete() final;
@@ -62,17 +64,12 @@ namespace SoEasy
 		ThreadPool *mThreadPool;	 //线程池
 		std::string mSqlTablePath;
 		SayNoMysqlSocket *mMysqlSockt;
+		std::stringstream mSqlCommandStream;
+		std::stringstream mSqlCommandStream2;
 		std::unordered_map<std::string, std::string> mTablePbMap;
 		std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
 		std::unordered_map<long long, SayNoMysqlSocket *> mMysqlSocketMap; //线程id和 socket
 	private:
 		class CoroutineManager *mCoroutineManager;
 	};
-
-	template <typename T>
-	shared_ptr<T> MysqlManager::CreateMysqlTask()
-	{
-		long long id = NumberHelper::Create();
-		return make_shared<T>(this, id, this->mDataBaseName);
-	}
 }

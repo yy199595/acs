@@ -47,7 +47,6 @@ namespace SoEasy
 		{
 			serviceNode->AddService(nodeInfo.services(index));
 		}
-		SayNoDebugInfo(serviceNode->GetJsonString());
 		this->mServiceNodeMap.emplace(key, serviceNode);
 
 		this->NoticeNode(areaId);

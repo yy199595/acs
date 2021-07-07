@@ -1,9 +1,13 @@
 ﻿#pragma once
-#include <XCode/XCode.h>
-#include "TcpClientSession.h"
-#include <Protocol/com.pb.h>
-#include <Other/ObjectFactory.h>
+#include<XCode/XCode.h>
+#include"TcpClientSession.h"
+#include<Protocol/com.pb.h>
+#include<Other/ObjectFactory.h>
 #include<Pool/ObjectPool.h>
+#ifdef _DEBUG
+#include<google/protobuf/util/json_util.h>
+#endif // _DEBUG
+
 using namespace PB;
 namespace SoEasy
 {
@@ -21,9 +25,6 @@ namespace SoEasy
 	template <typename T>
 	using LocalAction4 = std::function<XCode(long long, T &)>;
 
-	using MysqlOperAction = std::function<XCode(Message &)>;
-	using MysqlQueryAction = std::function<XCode(Message &, Message &)>;
-
 	class LocalActionProxy
 	{
 	public:
@@ -36,6 +37,11 @@ namespace SoEasy
 
 	protected:
 		std::string mActionName;
+	public:
+#ifdef _DEBUG
+		std::string mServiceName;
+#endif
+
 	};
 }
 
@@ -52,37 +58,6 @@ namespace SoEasy
 
 	private:
 		LocalAction1 mBindAction;
-	};
-}
-
-namespace SoEasy
-{
-	class LocalMysqlActionProxy : public LocalActionProxy
-	{
-	public:
-		LocalMysqlActionProxy(MysqlOperAction action, std::string &name)
-			: LocalActionProxy(name), mBindAction(action) {}
-
-	public:
-		XCode Invoke(PB::NetWorkPacket * messageData) final;
-
-	private:
-		MysqlOperAction mBindAction;
-	};
-}
-
-namespace SoEasy
-{
-	class LocalMysqlQueryActionProxy : public LocalActionProxy
-	{
-	public:
-		LocalMysqlQueryActionProxy(MysqlQueryAction action, std::string &name)
-			: LocalActionProxy(name), mBindAction(action) {}
-
-	public:
-		XCode Invoke(PB::NetWorkPacket * messageData) final;
-	private:
-		MysqlQueryAction mBindAction;
 	};
 }
 
@@ -117,7 +92,19 @@ namespace SoEasy
 			SayNoDebugError("parse proto fail : " << mRequestData->GetTypeName());
 			return XCode::ParseMessageError;
 		}
+#ifdef _DEBUG
+		std::string json;
+		util::MessageToJsonString(*mRequestData, &json);
+		SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName()
+			<< "(" << mRequestData->GetTypeName() << ")] : " << json);
+#endif
 		XCode code = this->mBindAction(operId, *mRequestData);
+#ifdef _DEBUG
+		if (messageData->rpcid() != 0)
+		{
+			SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName() << "]");
+		}		
+#endif
 		this->mRequestPool.Destory(mRequestData);
 		return code;
 	}
@@ -154,12 +141,23 @@ namespace SoEasy
 			return XCode::ParseMessageError;
 		}
 		T2 * responseData = this->mResponseDataPool.Create();
+#ifdef _DEBUG
+		std::string json;
+		util::MessageToJsonString(*requestData, &json);
+		SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName()
+			<< "(" << requestData->GetTypeName() << ")] : " << json);
+#endif
 		XCode code = this->mBindAction(operId, *requestData, *responseData);
 		if (responseData->SerializePartialToString(&mMessageBuffer))
 		{
 			messageData->set_messagedata(mMessageBuffer);
 			messageData->set_protocname(responseData->GetTypeName());
 		}
+#ifdef _DEBUG
+		util::MessageToJsonString(*responseData, &json);
+		SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName()
+			<<"(" << responseData->GetTypeName() << ")] : " << json);
+#endif
 		this->mRequestDataPool.Destory(requestData);
 		this->mResponseDataPool.Destory(responseData);
 		return code;
@@ -177,7 +175,16 @@ namespace SoEasy
 		{
 			T1 * responseData = mResponseDataPool.Create();
 			const long long operId = messageData->entityid();
+#ifdef _DEBUG
+			SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName() << "]");
+#endif
 			XCode code = this->mBindAction(operId, *responseData);
+#ifdef _DEBUG
+			std::string json;
+			util::MessageToJsonString(*responseData, &json);
+			SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName()
+				<< "(" << responseData->GetTypeName() << ")] : " << json);
+#endif
 			if (responseData->SerializePartialToString(&mMessageBuffer))
 			{
 				messageData->set_messagedata(mMessageBuffer);
