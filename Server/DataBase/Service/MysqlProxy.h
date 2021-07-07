@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <Protocol/s2s.pb.h>
 #include <Service/LocalService.h>
 namespace SoEasy
 {
@@ -7,17 +8,19 @@ namespace SoEasy
     public:
         MysqlProxy();
         ~MysqlProxy() {}
-    public:     
-        XCode Insert( Message & requestData);
-        XCode Update( Message & requestData);
-        XCode Delete( Message & requestData);
-        XCode Query( Message & requestData, Message & responseData);
+
+    public:
+        XCode Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response);
+        XCode Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response);
+        XCode Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response);
+        XCode QueryData(long long, const s2s::MysqlQuery_Request &requertData, s2s::MysqlQuery_Response &response);
     public:
         bool OnInit() final;
-		void OnInitComplete() final;
+        void OnInitComplete() final;
+
     private:
         int mMysqlNodeId;
         class MysqlManager *mMysqlManager;
-        class CoroutineManager * mCorManager;
+        class CoroutineManager *mCorManager;
     };
 }

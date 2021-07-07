@@ -6,8 +6,9 @@
 #include <MysqlClient/MysqlUpdateTask.h>
 #include <MysqlClient/MysqlQueryTask.h>
 #include <MysqlClient/MysqlDeleteTask.h>
-#include<Protocol/db.pb.h>
-#include<google/protobuf/util/json_util.h>
+#include <Protocol/db.pb.h>
+#include <google/protobuf/util/json_util.h>
+#include <Pool/ProtocolPool.h>
 namespace SoEasy
 {
     MysqlProxy::MysqlProxy()
@@ -21,71 +22,100 @@ namespace SoEasy
     {
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-        this->Bind("MysqlProxy.Insert", MysqlOperAction(std::bind(&MysqlProxy::Insert, this, args1)));
-        this->Bind("MysqlProxy.Update", MysqlOperAction(std::bind(&MysqlProxy::Update, this, args1)));
-        this->Bind("MysqlProxy.Delete", MysqlOperAction(std::bind(&MysqlProxy::Delete, this, args1)));
-        this->Bind("MysqlProxy.Query", MysqlQueryAction(std::bind(&MysqlProxy::Query, this, args1, args2)));
+
+        REGISTER_FUNCTION_2(MysqlProxy::Add, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
+        REGISTER_FUNCTION_2(MysqlProxy::Save, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
+        REGISTER_FUNCTION_2(MysqlProxy::Delete, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
+        REGISTER_FUNCTION_2(MysqlProxy::QueryData, s2s::MysqlQuery_Request, s2s::MysqlQuery_Response);
 
         return true;
     }
 
-	void MysqlProxy::OnInitComplete()
-	{
-		db::UserAccountData userData;
-		userData.set_account("646585122@qq.com");
-		userData.set_userid(420625199511045331);
-		this->Query(userData, userData);
-	}
-
-    XCode MysqlProxy::Query(Message & requestData, Message & responseData)
+    void MysqlProxy::OnInitComplete()
     {
-        auto qyeryTask = this->mMysqlManager->CreateMysqlTask<MysqlQueryTask>();
-        XCode startCode = this->mMysqlManager->StartTask(qyeryTask, &responseData);
-        if (startCode != XCode::Successful)
-        {
-            responseData.Clear();
-            return startCode;
-        }
-        this->mCorManager->YieldReturn();
-		const std::string & json = qyeryTask->GetJsonData();
-		if(!util::JsonStringToMessage(json, &responseData).ok())
-		{
-			return XCode::JsonCastProtocbufFail;
-		}
-        return qyeryTask->GetErrorCode();
+        db::UserAccountData userData;
+        userData.set_account("646585122@qq.com");
+        userData.set_userid(420625199511045331);
     }
 
-    XCode MysqlProxy::Insert(Message & requestData)
+    XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-        auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
-        XCode startCode = this->mMysqlManager->StartTask(insertTask, &requestData);
-        if (startCode != XCode::Successful)
+        ProtocolPool *protocolPool = ProtocolPool::Get();
+        Message *messageData = protocolPool->Create(requertData.protocolname());
+        if (messageData == nullptr)
         {
-            return startCode;
+            return XCode::Failure;
         }
-        this->mCorManager->YieldReturn();
-        return insertTask->GetErrorCode();
+        
     }
-    XCode MysqlProxy::Update(Message & requestData)
+
+    XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-        auto updateTask = this->mMysqlManager->CreateMysqlTask<MysqlUpdateTask>();
-        XCode startCode = this->mMysqlManager->StartTask(updateTask, &requestData);
-        if (startCode != XCode::Successful)
-        {
-            return startCode;
-        }
-        this->mCorManager->YieldReturn();
-        return updateTask->GetErrorCode();
     }
-    XCode MysqlProxy::Delete(Message & requestData)
+
+    XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-        auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
-        XCode startCode = this->mMysqlManager->StartTask(deleteTask, &requestData);
-        if (startCode != XCode::Successful)
-        {
-            return startCode;
-        }
-        this->mCorManager->YieldReturn();
-        return deleteTask->GetErrorCode();
     }
+
+    XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Response &requertData, s2s::MysqlQuery_Response &response)
+    {
+    }
+
+    // XCode MysqlProxy::Query(Message &requestData, Message &responseData)
+    // {
+    //     auto queryTask = this->mMysqlManager->CreateMysqlTask<MysqlQueryTask>();
+    //     XCode startCode = this->mMysqlManager->StartTask(queryTask, &responseData);
+    //     if (startCode != XCode::Successful)
+    //     {
+    //         responseData.Clear();
+    //         return startCode;
+    //     }
+    //     this->mCorManager->YieldReturn();
+    //     const std::vector<std::string> &queryDatas = queryTask->GetQueryDatas();
+    //     if (queryDatas.empty())
+    //     {
+    //         return XCode::Failure;
+    //     }
+
+    //     const std::string &json = queryDatas[0];
+    //     if (!util::JsonStringToMessage(json, &responseData).ok())
+    //     {
+    //         return XCode::JsonCastProtocbufFail;
+    //     }
+    //     return queryTask->GetErrorCode();
+    // }
+
+    // XCode MysqlProxy::Insert(Message &requestData)
+    // {
+    //     auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
+    //     XCode startCode = this->mMysqlManager->StartTask(insertTask, &requestData);
+    //     if (startCode != XCode::Successful)
+    //     {
+    //         return startCode;
+    //     }
+    //     this->mCorManager->YieldReturn();
+    //     return insertTask->GetErrorCode();
+    // }
+    // XCode MysqlProxy::Update(Message &requestData)
+    // {
+    //     auto updateTask = this->mMysqlManager->CreateMysqlTask<MysqlUpdateTask>();
+    //     XCode startCode = this->mMysqlManager->StartTask(updateTask, &requestData);
+    //     if (startCode != XCode::Successful)
+    //     {
+    //         return startCode;
+    //     }
+    //     this->mCorManager->YieldReturn();
+    //     return updateTask->GetErrorCode();
+    // }
+    // XCode MysqlProxy::Delete(Message &requestData)
+    // {
+    //     auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
+    //     XCode startCode = this->mMysqlManager->StartTask(deleteTask, &requestData);
+    //     if (startCode != XCode::Successful)
+    //     {
+    //         return startCode;
+    //     }
+    //     this->mCorManager->YieldReturn();
+    //     return deleteTask->GetErrorCode();
+    // }
 }

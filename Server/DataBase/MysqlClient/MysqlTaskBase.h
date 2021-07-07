@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include"MysqlDefine.h"
-#include<Thread/ThreadTaskAction.h>
+#include "MysqlDefine.h"
+#include <Thread/ThreadTaskAction.h>
 namespace SoEasy
 {
 	class SqlTableConfig;
@@ -9,28 +9,34 @@ namespace SoEasy
 	class MysqlTaskBase : public ThreadTaskAction
 	{
 	public:
-		MysqlTaskBase(MysqlManager * mgr, long long id, const std::string & db);
-		~MysqlTaskBase() { }
+		MysqlTaskBase(MysqlManager *mgr, long long id, const std::string &db);
+		~MysqlTaskBase() {}
+
 	protected:
-		void InvokeInThreadPool(long long threadId) final;	//在其他线程查询
-		virtual bool GetSqlCommand(std::string & sql) = 0;
+		void InvokeInThreadPool(long long threadId) final; //在其他线程查询
+		virtual bool GetSqlCommand(std::string &sql) = 0;
+
 	public:
-		const std::string & GetDataBaseName() { return this->mDataBaseName; }
-		virtual bool InitTask(const std::string tab, CoroutineManager * corMgr, Message * data) { return false; }
+		const std::string &GetDataBaseName() { return this->mDataBaseName; }
+		virtual bool InitTask(const std::string tab, CoroutineManager *corMgr, Message *data) { return false; }
+
 	public:
 		XCode GetErrorCode() { return this->mErrorCode; }
-		SqlTableConfig * GetTabConfig(const std::string & tab);
-		const std::string & GetJsonData() { return this->mJsonData; }
-		const std::string & GetErrorStr() { return this->mErrorString; }
+		SqlTableConfig *GetTabConfig(const std::string &tab);
+		const std::string &GetErrorStr() { return this->mErrorString; }
+		const std::vector<std::string> &GetQueryDatas() { return this->mQueryDatas; }
+
 	private:
-		void WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size);
+		void WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
+
 	private:
 		std::string mDataBaseName;
-		MysqlManager * mMysqlManager;
+		MysqlManager *mMysqlManager;
+
 	private:
 		XCode mErrorCode;
-		std::string mJsonData;
 		std::string mErrorString;
-		SqlTableConfig * mTableConfig;
+		SqlTableConfig *mTableConfig;
+		std::vector<std::string> mQueryDatas;
 	};
 }

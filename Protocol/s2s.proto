@@ -28,3 +28,30 @@ message NodeData
         repeated NodeInfo NodeArray = 1;
     }
 }
+
+message MysqlQuery
+{
+    message Request
+    {
+        string ProtocolName = 1;
+        bytes ProtocolMessage = 2;
+    }
+    message Response
+    {
+        string ErrotStr = 1;
+        repeated bytes QueryDatas = 2;
+    }
+}
+
+message MysqlOper
+{
+    message Request
+    {
+        string ProtocolName = 1;
+        bytes ProtocolMessage =2;
+    }
+    message Response
+    {
+        string ErrorStr = 1;
+    }
+}

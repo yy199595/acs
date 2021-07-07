@@ -1,10 +1,10 @@
-﻿#include"MysqlTaskBase.h"
-#include<Manager/MysqlManager.h>
-#include<Coroutine/CoroutineManager.h>
-#include<QueryResult/InvokeResultData.h>
+﻿#include "MysqlTaskBase.h"
+#include <Manager/MysqlManager.h>
+#include <Coroutine/CoroutineManager.h>
+#include <QueryResult/InvokeResultData.h>
 namespace SoEasy
 {
-	MysqlTaskBase::MysqlTaskBase(MysqlManager * mgr, long long id, const std::string & db)
+	MysqlTaskBase::MysqlTaskBase(MysqlManager *mgr, long long id, const std::string &db)
 		: ThreadTaskAction(mgr, id)
 	{
 		this->mDataBaseName = db;
@@ -14,14 +14,14 @@ namespace SoEasy
 
 	void MysqlTaskBase::InvokeInThreadPool(long long threadId)
 	{
-		SayNoMysqlSocket * mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
+		SayNoMysqlSocket *mysqlSocket = this->mMysqlManager->GetMysqlSocket(threadId);
 		if (mysqlSocket == nullptr)
 		{
 			this->mErrorCode = MysqlSocketIsNull;
 			this->mErrorString = "mysql socket is null";
 			return;
 		}
-		
+
 		if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
 		{
 			this->mErrorCode = MysqlSelectDbFailure;
@@ -29,7 +29,7 @@ namespace SoEasy
 			return;
 		}
 		std::string sql;
-		if(!this->GetSqlCommand(sql))
+		if (!this->GetSqlCommand(sql))
 		{
 			this->mErrorCode = XCode::MysqlInvokeFailure;
 			this->mErrorString = "protobuf args error ";
@@ -42,54 +42,59 @@ namespace SoEasy
 			return;
 		}
 		this->mErrorCode = XCode::Successful;
-		MysqlQueryResult * queryResult = mysql_store_result(mysqlSocket);
+		MysqlQueryResult *queryResult = mysql_store_result(mysqlSocket);
 		if (queryResult != nullptr)
-		{		
-			QuertJsonWritre jsonWrite;
+		{
+
 			std::vector<MYSQL_FIELD *> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
 			unsigned int fieldCount = mysql_field_count(mysqlSocket);
 			for (unsigned int index = 0; index < fieldCount; index++)
 			{
-				MYSQL_FIELD * field = mysql_fetch_field(queryResult);
+				MYSQL_FIELD *field = mysql_fetch_field(queryResult);
 				fieldNameVector.push_back(field);
 			}
 			if (rowCount == 1)
-			{			
-				//jsonWrite.StartWriteObject();
+			{
+				QuertJsonWritre jsonWrite;
 				MYSQL_ROW row = mysql_fetch_row(queryResult);
-				unsigned long * lengths = mysql_fetch_lengths(queryResult);
+				unsigned long *lengths = mysql_fetch_lengths(queryResult);
 				for (size_t index = 0; index < fieldNameVector.size(); index++)
 				{
-					MYSQL_FIELD * field = fieldNameVector[index];
+					MYSQL_FIELD *field = fieldNameVector[index];
 					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 				}
-				//jsonWrite.EndWriteObject();
+				std::string json;
+				if (jsonWrite.Serialization(json))
+				{
+					this->mQueryDatas.push_back(json);
+				}
 			}
 			else
 			{
-				jsonWrite.StartWriteArray("data");
+
 				for (unsigned long count = 0; count < rowCount; count++)
 				{
-					jsonWrite.StartWriteObject();
+					QuertJsonWritre jsonWrite;
 					MYSQL_ROW row = mysql_fetch_row(queryResult);
-					unsigned long * lengths = mysql_fetch_lengths(queryResult);
+					unsigned long *lengths = mysql_fetch_lengths(queryResult);
 					for (size_t index = 0; index < fieldNameVector.size(); index++)
 					{
-						MYSQL_FIELD * field = fieldNameVector[index];
+						MYSQL_FIELD *field = fieldNameVector[index];
 						this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
-					}				
-					jsonWrite.EndWriteObject();
+					}
+					std::string json;
+					if (jsonWrite.Serialization(json))
+					{
+						this->mQueryDatas.push_back(json);
+					}
 				}
-				jsonWrite.EndWriteArray();
-			}	
+			}
 			mysql_free_result(queryResult);
-			jsonWrite.Serialization(mJsonData);
 		}
 	}
-	
 
-	SqlTableConfig * MysqlTaskBase::GetTabConfig(const std::string & tab)
+	SqlTableConfig *MysqlTaskBase::GetTabConfig(const std::string &tab)
 	{
 		if (this->mTableConfig == nullptr)
 		{
@@ -98,7 +103,7 @@ namespace SoEasy
 		return this->mTableConfig;
 	}
 
-	void MysqlTaskBase::WriteValue(QuertJsonWritre & jsonWriter, MYSQL_FIELD * field, const char * data, long size)
+	void MysqlTaskBase::WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size)
 	{
 		switch (field->type)
 		{
