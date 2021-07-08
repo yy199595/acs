@@ -1,5 +1,6 @@
-#include <Manager/Manager.h>
-
+#include<Manager/Manager.h>
+#include<Protocol/s2s.pb.h>
+#include<Pool/ObjectPool.h>
 namespace SoEasy
 {
     class MysqlProxyManager : public Manager
@@ -11,19 +12,25 @@ namespace SoEasy
     protected:
         bool OnInit() final;
         void OnInitComplete() final;
-        void OnSystemUpdate() final;
+        void OnFrameUpdate(float t) final;
 
     public:
-        XCode Add(shared_ptr<Message> data);
-        XCode Query(shared_ptr<Message> data);
-        XCode Update(shared_ptr<Message> data);
-        XCode Delete(shared_ptr<Message> data);
+        XCode Add(const Message & data);
+        XCode Save(const Message & data);
+        XCode Delete(const Message & data);
+        XCode Query(const Message & data, Message & queryData);
     private:
         class ServiceNode *GetServiceNode();
-
+    private:
+        std::queue<long long> mWakeUpQueue;
     private:
         int mMysqlProxyNodeId;
         class CoroutineManager *mCorManager;
         class ServiceNodeManager *mNodeManager;
+        ObjectPool<s2s::MysqlOper_Request> mMysqlOperReqPool;
+        ObjectPool<s2s::MysqlOper_Response> mMysqlOperResPool;
+
+        ObjectPool<s2s::MysqlQuery_Request> mMysqlQueryReqPool;
+        ObjectPool<s2s::MysqlQuery_Response> mMysqlQueryResPool;
     };
 }

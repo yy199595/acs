@@ -12,8 +12,7 @@ namespace SoEasy
 
 	void RedisTaskAction::OnTaskFinish()
 	{
-		SayNoAssertRet_F(this->mCoroutineManager);
-		
+		SayNoAssertRet_F(this->mCoroutineManager);	
 		this->mCoroutineManager->Resume(this->mCoreoutineId);
 	}
 

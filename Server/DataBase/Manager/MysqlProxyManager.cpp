@@ -2,6 +2,7 @@
 #include <Other/ServiceNode.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ServiceNodeManager.h>
+#include <Protocol/s2s.pb.h>
 namespace SoEasy
 {
     bool MysqlProxyManager::OnInit()
@@ -15,10 +16,17 @@ namespace SoEasy
 
     void MysqlProxyManager::OnInitComplete()
     {
+
     }
 
-    void MysqlProxyManager::OnSystemUpdate()
+    void MysqlProxyManager::OnFrameUpdate(float t)
     {
+        while (!this->mWakeUpQueue.empty() && this->GetServiceNode())
+        {
+            const long long id = this->mWakeUpQueue.front();
+            this->mCorManager->Resume(id);
+            this->mWakeUpQueue.pop();
+        }
     }
 
     ServiceNode *MysqlProxyManager::GetServiceNode()
@@ -33,47 +41,129 @@ namespace SoEasy
         return proxyNode;
     }
 
-    XCode MysqlProxyManager::Add(shared_ptr<Message> data)
+    XCode MysqlProxyManager::Add(const Message &data)
     {
         ServiceNode *proxyNode = this->GetServiceNode();
-        if (proxyNode != nullptr)
+        if (proxyNode == nullptr)
         {
-            return proxyNode->Invoke("MysqlProxy", "Insert", data);
+            long long id = this->mCorManager->GetCurrentCorId();
+            this->mWakeUpQueue.push(id);
+            this->mCorManager->YieldReturn();
         }
-        this->mCorManager->YieldReturn();
+
+        std::string messageData;
+        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
+        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
+        if (requestData->SerializeToString(&messageData))
+        {
+            requestData->set_protocolname(data.GetTypeName());
+            requestData->set_protocolmessage(messageData);
+        }
+        XCode code = proxyNode->Call("MysqlProxy", "Insert", *requestData, *responseData);
+#ifdef _DEBUG
+        if (code != XCode::Successful)
+        {
+            SayNoDebugError("[mysql error] : " << responseData->errorstr());
+        }
+#endif
+        this->mMysqlOperReqPool.Destory(requestData);
+        this->mMysqlOperResPool.Destory(responseData);
+        return code;
+    }
+
+    XCode MysqlProxyManager::Query(const Message &data, Message &queryData)
+    {
+        ServiceNode *proxyNode = this->GetServiceNode();
+        if (proxyNode == nullptr)
+        {
+            long long id = this->mCorManager->GetCurrentCorId();
+            this->mWakeUpQueue.push(id);
+            this->mCorManager->YieldReturn();
+        }
+
+        std::string messageData;
+        s2s::MysqlQuery_Request *requestData = this->mMysqlQueryReqPool.Create();
+        s2s::MysqlQuery_Response *responseData = this->mMysqlQueryResPool.Create();
+        if (requestData->SerializeToString(&messageData))
+        {
+            requestData->set_protocolname(data.GetTypeName());
+            requestData->set_protocolmessage(messageData);
+        }
+        XCode code = proxyNode->Call("MysqlProxy", "Save", *requestData, *responseData);
+#ifdef _DEBUG
+        if (code != XCode::Successful)
+        {
+            SayNoDebugError("[mysql error] : " << responseData->errotstr());
+        }
+#endif
+        if (code == XCode::Successful)
+        {
+            if (responseData->querydatas_size() > 0)
+            {
+                const std::string &data = responseData->querydatas(0);
+                queryData.ParseFromString(data);
+            }
+        }
+        this->mMysqlQueryReqPool.Destory(requestData);
+        this->mMysqlQueryResPool.Destory(responseData);
         return XCode::Failure;
     }
 
-    XCode MysqlProxyManager::Query(shared_ptr<Message> data)
+    XCode MysqlProxyManager::Save(const Message &data)
     {
         ServiceNode *proxyNode = this->GetServiceNode();
-        if (proxyNode != nullptr)
+        if (proxyNode == nullptr)
         {
-            return proxyNode->Call("MysqlProxy", "Query", data, data);
+            long long id = this->mCorManager->GetCurrentCorId();
+            this->mWakeUpQueue.push(id);
+            this->mCorManager->YieldReturn();
         }
-        this->mCorManager->YieldReturn();
+        std::string messageData;
+        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
+        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
+        if (requestData->SerializeToString(&messageData))
+        {
+            requestData->set_protocolname(data.GetTypeName());
+            requestData->set_protocolmessage(messageData);
+        }
+        XCode code = proxyNode->Call("MysqlProxy", "Save", *requestData, *responseData);
+#ifdef _DEBUG
+        if (code != XCode::Successful)
+        {
+            SayNoDebugError("[mysql error] : " << responseData->errorstr());
+        }
+#endif
+        this->mMysqlOperReqPool.Destory(requestData);
+        this->mMysqlOperResPool.Destory(responseData);
         return XCode::Failure;
     }
 
-    XCode MysqlProxyManager::Update(shared_ptr<Message> data)
+    XCode MysqlProxyManager::Delete(const Message &data)
     {
         ServiceNode *proxyNode = this->GetServiceNode();
-        if (proxyNode != nullptr)
+        if (proxyNode == nullptr)
         {
-            return proxyNode->Invoke("MysqlProxy", "Insert", data);
+            long long id = this->mCorManager->GetCurrentCorId();
+            this->mWakeUpQueue.push(id);
+            this->mCorManager->YieldReturn();
         }
-        this->mCorManager->YieldReturn();
-        return XCode::Failure;
-    }
-
-    XCode MysqlProxyManager::Delete(shared_ptr<Message> data)
-    {
-        ServiceNode *proxyNode = this->GetServiceNode();
-        if (proxyNode != nullptr)
+        std::string messageData;
+        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
+        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
+        if (requestData->SerializeToString(&messageData))
         {
-            return proxyNode->Invoke("MysqlProxy", "Insert", data);
+            requestData->set_protocolname(data.GetTypeName());
+            requestData->set_protocolmessage(messageData);
         }
-        this->mCorManager->YieldReturn();
-        return XCode::Failure;
+        XCode code = proxyNode->Call("MysqlProxy", "Delete", *requestData, *responseData);
+#ifdef _DEBUG
+        if (code != XCode::Successful)
+        {
+            SayNoDebugError("[mysql error] : " << responseData->errorstr());
+        }
+#endif
+        this->mMysqlOperReqPool.Destory(requestData);
+        this->mMysqlOperResPool.Destory(responseData);
+        return code;
     }
 }

@@ -79,10 +79,6 @@ namespace SoEasy
 				{
 					jsonWrite.Write(redisData->str, redisData->len);
 				}
-				else if (redisData->type == REDIS_REPLY_NIL)
-				{
-					jsonWrite.Write();
-				}
 			}
 			jsonWrite.EndWriteArray();
 			break;
