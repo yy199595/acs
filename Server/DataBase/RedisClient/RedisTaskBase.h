@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"RedisDefine.h"
 #include<Thread/ThreadTaskAction.h>
 #define RedisLuaArgvSize 10
@@ -34,10 +34,10 @@ namespace SoEasy
 		void AddCommandArgv(const std::string & argv);
 		void AddCommandArgv(const char * str, const size_t size);
 	public:
+		bool GetOnceData(std::string & value);
 		XCode GetErrorCode() { return this->mErrorCode; }
 		const std::string & GetErrorStr() { return this->mErrorStr; }
-	protected:
-		virtual void OnQueryFinish(QuertJsonWritre & jsonWriter);
+		std::vector<std::string> & GetQueryDatas() { return this->mQueryDatas; }
 	private:
 		std::vector<std::string> mCommand;
 	private:
@@ -45,6 +45,7 @@ namespace SoEasy
 		std::string mErrorStr;
 	private:
 		RedisManager * mRedisManager;
+		std::vector<std::string> mQueryDatas;
 	};
 	template<typename ...Args>
 	inline void RedisTaskBase::InitCommand(Args && ...args)

@@ -33,6 +33,7 @@
     <ClCompile Include="Manager\ServiceManager.cpp" />
     <ClCompile Include="Manager\ServiceNodeManager.cpp" />
     <ClCompile Include="Manager\NetProxyManager.cpp" />
+    <ClCompile Include="Manager\ThreadTaskManager.cpp" />
     <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
@@ -99,11 +100,13 @@
     <ClInclude Include="Manager\ActionManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="Manager\ManagerInterface.h" />
     <ClInclude Include="Manager\NetSessionManager.h" />
     <ClInclude Include="Manager\ServiceNodeManager.h" />
     <ClInclude Include="Manager\ScriptManager.h" />
     <ClInclude Include="Manager\ServiceManager.h" />
     <ClInclude Include="Manager\NetProxyManager.h" />
+    <ClInclude Include="Manager\ThreadTaskManager.h" />
     <ClInclude Include="Manager\TimerManager.h" />
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />

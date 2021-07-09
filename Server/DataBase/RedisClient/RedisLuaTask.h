@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"RedisDefine.h"
 #include"RedisTaskBase.h"
 #include<Script/LuaInclude.h>
@@ -14,7 +14,6 @@ namespace SoEasy
 		~RedisLuaTask();
 	protected:
 		void OnTaskFinish() final;  //执行完成之后在主线程调用
-		void OnQueryFinish(QuertJsonWritre & jsonWriter) final;
 	public:
 		static shared_ptr<RedisLuaTask> Create(lua_State * lua, int index, const char * cmd);
 	private:

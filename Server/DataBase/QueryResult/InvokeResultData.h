@@ -37,25 +37,3 @@ namespace SoEasy
 		rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;
 	};
 }
-namespace SoEasy
-{
-	class InvokeResultData
-	{
-	public:
-		InvokeResultData(XCode code);
-		InvokeResultData(XCode code, const std::string & error);
-		InvokeResultData(XCode code, const std::string & error, std::shared_ptr<rapidjson::Document> json);
-	public:
-		bool GetJsonData(rapidjson::Value & jsonData);
-		bool GetJsonData(const char * key, rapidjson::Value & jsonData);
-	public:
-		long long GetInt64();
-	public:
-		XCode GetCode() { return this->mErrorCode; }
-		const std::string & GetErrorStr() { return this->mErrorStr; }
-	protected:
-		XCode mErrorCode;
-		std::string mErrorStr;
-		std::shared_ptr<rapidjson::Document> mDocument;
-	};
-}

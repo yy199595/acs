@@ -16,15 +16,14 @@ namespace Client
 		
 		SayNoAssertRetFalse_F(this->mScriptManager = this->GetManager<ScriptManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
-		this->mClientSession = this->CreateTcpSession("Client", this->mConnectIp, this->mConnectPort);
+		
 		return this->mClientSession != nullptr;
 	}
 
 	void ClientManager::OnInitComplete()
 	{
 		this->mCoroutineManager->Sleep(1000);
-		//PB::UserRegisterData data;
-		ObjectFactory::Get()->CreateMessage("PB.UserRegisterData");
+		
 	}
 
 	void ClientManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)

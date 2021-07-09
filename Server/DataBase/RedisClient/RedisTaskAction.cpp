@@ -3,33 +3,17 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, const std::string & cmd, CoroutineManager * corMgr)
+	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, const std::string & cmd)
 		: RedisTaskBase(mgr, taskId, cmd)
 	{
-		this->mCoroutineManager = corMgr;
-		this->mCoreoutineId = corMgr->GetCurrentCorId();
+		Applocation * app = Applocation::Get();
+		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
+		this->mCoreoutineId = this->mCorManager->GetCurrentCorId();
 	}
 
 	void RedisTaskAction::OnTaskFinish()
 	{
-		SayNoAssertRet_F(this->mCoroutineManager);
-		
-		this->mCoroutineManager->Resume(this->mCoreoutineId);
-	}
-
-	void RedisTaskAction::OnQueryFinish(QuertJsonWritre & jsonWriter)
-	{
-		RedisTaskBase::OnQueryFinish(jsonWriter);
-		if (this->GetErrorCode() != XCode::Successful)
-		{
-			SayNoDebugError("[redis error ]" << this->GetErrorStr());
-		}
-	}
-
-	std::shared_ptr<InvokeResultData> RedisTaskAction::GetInvokeData()
-	{
-		XCode code = this->GetErrorCode();
-		const std::string & error = this->GetErrorStr();
-		return std::make_shared<InvokeResultData>(code, error, mDocument);
+		SayNoAssertRet_F(this->mCorManager);
+		this->mCorManager->Resume(this->mCoreoutineId);
 	}
 }

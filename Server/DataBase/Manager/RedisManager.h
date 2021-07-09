@@ -17,7 +17,7 @@ namespace SoEasy
 		void OnInitComplete() override;				//初始化完成之后
 	public:
 		template<typename ... Args>
-		shared_ptr<InvokeResultData> InvokeCommand(const std::string &  cmd, Args && ... args);
+		RedisSharedTask CreateTask(const std::string &  cmd, Args && ... args);
 	public:
 		bool HasValue(const std::string & key);
 		bool HasValue(const std::string & tab, const std::string &  key);
@@ -37,29 +37,29 @@ namespace SoEasy
 		std::string mRedisIp;		//redis ip地址
 		unsigned short mRedisPort;	//端口号
 		ThreadPool * mThreadPool;	//线程池
-		class CoroutineManager * mCoroutineScheduler;
+		class CoroutineManager * mCorManager;;
 		std::unordered_map<long long, redisContext *> mRedisContextMap;
 	};
 	template<typename ...Args>
-	inline shared_ptr<InvokeResultData> RedisManager::InvokeCommand(const std::string &  cmd, Args && ...args)
+	inline RedisSharedTask RedisManager::CreateTask(const std::string &  cmd, Args && ...args)
 	{
-		if (this->mCoroutineScheduler->IsInMainCoroutine())
+		if (sizeof ...(Args) == 0)
+		{
+			return nullptr;
+		}
+		if (this->mCorManager->IsInMainCoroutine())
 		{
 			SayNoDebugError("[redis error] redis not in coreoutine");
-			return make_shared<InvokeResultData>(XCode::RedisNotInCoroutine);
+			return nullptr;
 		}
 
 		long long taskActionId = NumberHelper::Create();
-		shared_ptr<RedisTaskAction> taskAction = make_shared<RedisTaskAction>(this, taskActionId, cmd, this->mCoroutineScheduler);
-		taskAction->InitCommand(std::forward<Args>(args)...);	
-		if (!this->StartTaskAction(taskAction))
+		RedisSharedTask taskAction = make_shared<RedisTaskAction>(this, taskActionId, cmd);
+		if (taskAction != nullptr)
 		{
-			SayNoDebugError("[redis error] start redis task fail");
-			return make_shared<InvokeResultData>(XCode::RedisStartTaskFail);
+			taskAction->InitCommand(std::forward<Args>(args)...);
+			return taskAction;
 		}
-
-		this->mCoroutineScheduler->YieldReturn();
-
-		return taskAction->GetInvokeData();
+		return nullptr;
 	}
 }

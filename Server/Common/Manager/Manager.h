@@ -7,6 +7,7 @@
 #include<Other/DoubleBufferQueue.h>
 #include<NetWork/TcpClientSession.h>
 #include<Protocol/com.pb.h>
+#include"ManagerInterface.h"
 using namespace PB;
 namespace SoEasy
 {
@@ -52,9 +53,6 @@ namespace SoEasy
 		virtual void OnTaskFinish(shared_ptr<ThreadTaskAction> taskAction) { }		//在线程池完成任务之后的通知	
 	private:
 		const int mPriority;
-		DoubleBufferQueue<long long> mFinishTaskQueue;  //在其他线程完成的任务存储
-		std::queue<shared_ptr<ThreadTaskAction>> mWaitDispatchTasks; //等待派发的任务
-		std::unordered_map<long long, shared_ptr<ThreadTaskAction>> mThreadTaskMap;
 	};
 	
 	

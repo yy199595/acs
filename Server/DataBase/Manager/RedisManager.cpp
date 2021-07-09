@@ -23,7 +23,7 @@ namespace SoEasy
 	{
 		std::string redisAddress;
 		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
-		SayNoAssertRetFalse_F(this->mCoroutineScheduler = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 		
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("RedisAddress", redisAddress));	
 		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(redisAddress, mRedisIp, mRedisPort));
@@ -74,57 +74,79 @@ namespace SoEasy
 
 	bool RedisManager::HasValue(const std::string &  key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
-		if (queryData->GetCode() == XCode::Successful)
+		RedisSharedTask redisTask = this->CreateTask("GET", key);
+		if (!this->StartTaskAction(redisTask))
 		{
-			rapidjson::Value jsonValue;
-			return queryData->GetJsonData(jsonValue) && !jsonValue.IsNull();
+			return false;
 		}
-		return false;
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::HasValue(const std::string &  tab, const std::string &  key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HEXISTS", tab, key);
-		if (queryData->GetCode() == XCode::Successful)
+		RedisSharedTask redisTask = this->CreateTask("HEXISTS", tab, key);
+		if (!this->StartTaskAction(redisTask))
 		{
-			return queryData->GetInt64() == 1;
+			return false;
 		}
-		return false;
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::DelValue(const std::string &  key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("DEL", key);
-		return queryData->GetCode() == XCode::Successful;
+		RedisSharedTask redisTask = this->CreateTask("DEL", key);
+		if (!this->StartTaskAction(redisTask))
+		{
+			return false;
+		}
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::DelValue(const std::string &  tab, const std::string &  key)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HDEL", tab, key);
-		return queryData->GetCode() == XCode::Successful;
+		RedisSharedTask redisTask = this->CreateTask("HDEL", tab, key);
+		if (!this->StartTaskAction(redisTask))
+		{
+			return false;
+		}
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const std::string &  key, const std::string & value, int second)
-	{
-		if (!this->HasValue(key))
+	{		
+		RedisSharedTask redisTask = this->CreateTask("EXPIRE", key, second);
+		if (!this->StartTaskAction(redisTask))
 		{
-			this->SetValue(key, value);
+			return false;
 		}
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("EXPIRE", key, second);
-		return queryData->GetCode() == XCode::Successful;
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const std::string &  key, const std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("SET", key, value);
-		return queryData->GetCode() == XCode::Successful;
+		RedisSharedTask redisTask = this->CreateTask("SET", key, value);
+		if (!this->StartTaskAction(redisTask))
+		{
+			return false;
+		}
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 	}
 
 	bool RedisManager::SetValue(const std::string &  tab, const std::string &  key, const std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HSET", tab, key, value);
-		return queryData->GetCode() == XCode::Successful;
+		RedisSharedTask redisTask = this->CreateTask("HSET", tab, key, value);
+		if (!this->StartTaskAction(redisTask))
+		{
+			return false;
+		}
+		this->mCorManager->YieldReturn();
+		return redisTask->GetErrorCode() == XCode::Successful;
 		
 	}
 
@@ -140,36 +162,22 @@ namespace SoEasy
 
 	bool RedisManager::GetValue(const std::string &  key, std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("GET", key);
-		if (queryData->GetCode() == XCode::Successful)
+		RedisSharedTask redisTask = this->CreateTask("GET", key);
+		if (!this->StartTaskAction(redisTask))
 		{
-			rapidjson::Value jsonValue;
-			if (queryData->GetJsonData(jsonValue) && jsonValue.IsString())
-			{
-				const std::string &  str = jsonValue.GetString();
-				const size_t size = jsonValue.GetStringLength();
-				value.assign(str, size);
-				return true;
-			}
+			return false;
 		}
-		return false;
+		return redisTask->GetOnceData(value);
 	}
 
 	bool RedisManager::GetValue(const std::string &  tab, const std::string &  key, std::string & value)
 	{
-		shared_ptr<InvokeResultData> queryData = this->InvokeCommand("HGET", tab, key);
-		if (queryData->GetCode() == XCode::Successful)
+		RedisSharedTask redisTask = this->CreateTask("HGET", tab, key);
+		if (!this->StartTaskAction(redisTask))
 		{
-			rapidjson::Value jsonValue;
-			if (queryData->GetJsonData(jsonValue) && jsonValue.IsString())
-			{
-				const char * str = jsonValue.GetString();
-				const size_t size = jsonValue.GetStringLength();
-				value.assign(str, size);
-				return true;
-			}
+			return false;
 		}
-		return false;
+		return redisTask->GetOnceData(value);
 	}
 
 	bool RedisManager::GetValue(const std::string &  tab, const std::string &  key, shared_ptr<Message> value)

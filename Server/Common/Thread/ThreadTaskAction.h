@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<memory>
 #include<Manager/Manager.h>
 namespace SoEasy
@@ -6,7 +6,7 @@ namespace SoEasy
 	class ThreadTaskAction
 	{
 	public:
-		ThreadTaskAction(Manager * manager, long long id);
+		ThreadTaskAction(long long id);
 		virtual ~ThreadTaskAction() { }
 	public:
 		long long GetTaskId() { return this->mTaskActionId; }
@@ -17,8 +17,7 @@ namespace SoEasy
 		long long GetStartTime() { return this->mStartTime; }
 	private:
 		long long mStartTime;
-		Manager * mBindManager;
-		long long mTaskActionId;		
+		long long mTaskActionId;
 	};
 	typedef std::shared_ptr<ThreadTaskAction> SharedThreadTask;
 }

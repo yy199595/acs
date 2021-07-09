@@ -9,7 +9,7 @@
 #include<Global/ServerConfig.h>
 #include<Define/CommonTypeDef.h>
 #include<Define/ClassStatement.h>
-
+#include<Manager/ManagerInterface.h>
 using namespace std;
 using namespace asio::ip;
 
@@ -63,7 +63,6 @@ namespace SoEasy
 		std::string mServerName;
 		long long mLastUpdateTime;
 		long long mLastSystemTime;
-		Manager * mCurrentManager;	
 		class LogHelper * mLogHelper;
 		std::string mSrvConfigDirectory;
 	private:
@@ -77,8 +76,12 @@ namespace SoEasy
 	private:
 		ThreadPool * mThreadPool;		
 		static Applocation * mApplocation;
-		std::vector<Manager *> mSortManagers;
 		std::unordered_map<std::string, Manager *> mManagerMap;
+	private:
+		std::vector<IFrameUpdate *> mFrameUpdateManagers;
+		std::vector<ISystemUpdate *> mSystemUpdateManagers;
+		std::vector<ISecondUpdate *> mSecondUpdateManagers;
+		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
 	};
 	template<typename T>
 	inline bool Applocation::AddManager()

@@ -1,4 +1,4 @@
-#include"RedisLuaTask.h"
+﻿#include"RedisLuaTask.h"
 #include<Util/NumberHelper.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -35,19 +35,6 @@ namespace SoEasy
 			lua_resume(coroutine, this->mLuaEnv, 1);
 		}
 		
-	}
-
-	void RedisLuaTask::OnQueryFinish(QuertJsonWritre & jsonWriter)
-	{
-		RedisTaskBase::OnQueryFinish(jsonWriter);
-		if (this->GetErrorCode() != XCode::Successful)
-		{
-			SayNoDebugError("[redis error ]" << this->GetErrorStr());
-		}
-		if (!jsonWriter.Serialization(mQueryJsonData))
-		{
-			SayNoDebugError("[redis error ] redis data to json fail");
-		}
 	}
 
 	shared_ptr<RedisLuaTask> RedisLuaTask::Create(lua_State * lua, int index, const char * cmd)

@@ -234,6 +234,9 @@
     <ClCompile Include="NetWork\TcpProxySession.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\ThreadTaskManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -514,6 +517,12 @@
     </ClInclude>
     <ClInclude Include="NetWork\TcpProxySession.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ManagerInterface.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ThreadTaskManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

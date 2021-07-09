@@ -1,4 +1,4 @@
-#include"RedisTaskBase.h"
+﻿#include"RedisTaskBase.h"
 #include<Manager/RedisManager.h>
 namespace SoEasy
 {
@@ -12,13 +12,11 @@ namespace SoEasy
 
 	void RedisTaskBase::InvokeInThreadPool(long long threadId)
 	{
-		QuertJsonWritre jsonWrite;
 		RedisSocket * redisSocket = this->mRedisManager->GetRedisSocket(threadId);
 		if (redisSocket == nullptr)
 		{
 			this->mErrorStr = "redis scoket null";
 			this->mErrorCode = XCode::RedisSocketIsNull;
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		const char ** argvArray = new const char *[this->mCommand.size()];
@@ -40,14 +38,13 @@ namespace SoEasy
 		{
 			this->mErrorStr = "redis replay null";
 			this->mErrorCode = XCode::RedisReplyIsNull;
-			this->OnQueryFinish(jsonWrite);
 			return;
 		}
 		switch (replay->type)
 		{
 		case REDIS_REPLY_STATUS:
 			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data", replay->str, replay->len);
+			this->mQueryDatas.push_back(std::string(replay->str, replay->len));
 			break;
 		case REDIS_REPLY_ERROR:
 			this->mErrorCode = RedisInvokeFailure;
@@ -55,40 +52,28 @@ namespace SoEasy
 			break;
 		case REDIS_REPLY_INTEGER:
 			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data", replay->integer);
+			this->mQueryDatas.push_back(std::to_string(replay->integer));
 			break;
 		case REDIS_REPLY_NIL:
 			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data");
 			break;
 		case REDIS_REPLY_STRING:
 			this->mErrorCode = XCode::Successful;
-			jsonWrite.Write("data", replay->str, replay->len);
+			this->mQueryDatas.push_back(std::to_string(replay->integer));
 			break;
 		case REDIS_REPLY_ARRAY:
-			jsonWrite.StartWriteArray("data");
 			this->mErrorCode = XCode::Successful;
 			for (size_t index = 0; index < replay->elements; index++)
 			{
 				redisReply * redisData = replay->element[index];
-				if (redisData->type == REDIS_REPLY_INTEGER)
+				if (redisData->type == REDIS_REPLY_INTEGER || redisData->type == REDIS_REPLY_STRING)
 				{
-					jsonWrite.Write(redisData->integer);
-				}
-				else if (redisData->type == REDIS_REPLY_STRING)
-				{
-					jsonWrite.Write(redisData->str, redisData->len);
-				}
-				else if (redisData->type == REDIS_REPLY_NIL)
-				{
-					jsonWrite.Write();
-				}
+					this->mQueryDatas.push_back(std::to_string(redisData->integer));
+				}				
 			}
-			jsonWrite.EndWriteArray();
 			break;
 		}
 		freeReplyObject(replay);
-		this->OnQueryFinish(jsonWrite);
 	}
 	void RedisTaskBase::AddCommandArgv(const std::string & argv)
 	{
@@ -98,9 +83,18 @@ namespace SoEasy
 	{
 		this->mCommand.push_back(std::string(str, size));
 	}
-	void RedisTaskBase::OnQueryFinish(QuertJsonWritre & jsonWriter)
+	bool RedisTaskBase::GetOnceData(std::string & value)
 	{
-		jsonWriter.Write("code", this->mErrorCode);
-		jsonWriter.Write("error", this->mErrorStr);
+		if (this->mErrorCode != XCode::Successful)
+		{
+			return false;
+		}
+		if (this->mQueryDatas.empty())
+		{
+			return false;
+		}
+		value = this->mQueryDatas[0];
+		return true;
+
 	}
 }

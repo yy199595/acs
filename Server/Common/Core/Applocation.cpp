@@ -24,7 +24,6 @@ namespace SoEasy
 		this->mLogicTime = 0;
 		this->mIsClose = false;
 		this->mThreadPool = nullptr;
-		this->mCurrentManager = nullptr;
 		this->mServerName = srvName;
 		this->mLogicRunCount = 0;
 		this->mSystemRunCount = 0;
@@ -47,18 +46,18 @@ namespace SoEasy
 			return false;
 		}
 		this->mManagerMap.emplace(name, manager);
-		this->mSortManagers.emplace_back(manager);
 		return true;
 	}
 
 	void Applocation::GetManagers(std::vector<Manager*>& managers)
 	{
 		managers.clear();
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
+		auto iter = this->mManagerMap.begin();
+		for (; iter != this->mManagerMap.end(); iter++)
 		{
-			Manager * manager = this->mSortManagers[index];
+			Manager * manager = iter->second;
 			managers.push_back(manager);
-		}
+		}		
 	}
 
 	bool Applocation::LoadManager()
@@ -88,30 +87,37 @@ namespace SoEasy
 		this->TryAddManager<NetSessionManager>();
 		this->TryAddManager<CoroutineManager>();
 
-		std::sort(this->mSortManagers.begin(), this->mSortManagers.end(),
-			[](Manager * m1, Manager * m2)->bool
-		{
-			return m1->GetPriority() < m2->GetPriority();
-		});
 		return true;
 	}
 
 	bool Applocation::InitManager()
 	{
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
+		auto iter = this->mManagerMap.begin();
+		for (; iter != this->mManagerMap.end(); iter++)
 		{
-			this->mCurrentManager = this->mSortManagers[index];
-			if (!this->mCurrentManager->IsActive() || !this->mCurrentManager->OnInit())
+			Manager * manager = iter->second;
+			if (manager->IsActive() == false || manager->OnInit() == false)
 			{
-				SayNoDebugError("init " << this->mCurrentManager->GetTypeName() << " fail");
+				SayNoDebugError("init " << manager->GetTypeName() << " fail");
 				return false;
 			}
-			SayNoDebugLog("init " << this->mCurrentManager->GetTypeName() << " successful");
-		}
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
-		{
-			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnInitComplete();
+			SayNoDebugLog("init " << manager->GetTypeName() << " successful");
+			IFrameUpdate * manager1 = dynamic_cast<IFrameUpdate *>(manager);
+			ISystemUpdate * manager2 = dynamic_cast<ISystemUpdate *>(manager);
+			ISecondUpdate * manager3 = dynamic_cast<ISecondUpdate *>(manager);
+
+			if (manager != nullptr)
+			{
+				this->mFrameUpdateManagers.push_back(manager1);
+			}
+			if (manager2 != nullptr)
+			{
+				this->mSystemUpdateManagers.push_back(manager2);
+			}
+			if (manager3 != nullptr)
+			{
+				this->mSecondUpdateManagers.push_back(manager3);
+			}
 		}
 		return true;
 	}
@@ -141,13 +147,13 @@ namespace SoEasy
 	int Applocation::Stop()
 	{
 		this->mIsClose = true;
-		for (size_t index = 0; index < this->mSortManagers.size(); index++)
+		auto iter = this->mManagerMap.begin();
+		for (; iter != this->mManagerMap.end(); iter++)
 		{
-			this->mCurrentManager = this->mSortManagers[index];
-			this->mCurrentManager->OnDestory();
+			Manager * manager = iter->second;
+			manager->OnDestory();
 		}
 		this->mManagerMap.clear();
-		this->mSortManagers.clear();
 		this->mLogHelper->DropLog();
 #ifdef _WIN32
 		return getchar();
@@ -179,39 +185,37 @@ namespace SoEasy
 		while (!this->mIsClose)
 		{
 			startTimer = TimeHelper::GetMilTimestamp();
-			if (startTimer - mLastSystemTime >= systemUpdateInterval)
+			std::this_thread::sleep_for(chrono::milliseconds(1));
+			for (size_t index = 0; index < this->mSystemUpdateManagers.size(); index++)
 			{
-				this->mSystemRunCount++;
-				for (size_t index = 0; index < this->mSortManagers.size(); index++)
-				{
-					this->mCurrentManager = this->mSortManagers[index];
-					this->mCurrentManager->OnSystemUpdate();
-				}
-				startTimer = mLastSystemTime = TimeHelper::GetMilTimestamp();
+				this->mSystemUpdateManagers[index]->OnSystemUpdate();			
 			}
-
+			
 			if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
 			{
 				this->mLogicRunCount++;
-				for (size_t index = 0; index < this->mSortManagers.size(); index++)
+				for (size_t index = 0; index < this->mFrameUpdateManagers.size(); index++)
 				{
-					this->mCurrentManager = this->mSortManagers[index];
-					this->mCurrentManager->OnFrameUpdate(this->mDelatime);
+					this->mFrameUpdateManagers[index]->OnFrameUpdate(this->mDelatime);
+				}				
+
+				for (size_t index = 0; index < this->mLastFrameUpdateManager.size(); index++)
+				{
+					this->mLastFrameUpdateManager[index]->OnLastFrameUpdate();
 				}
+
 				startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
 			}
 
 			if (startTimer - secondTimer >= 1000)
 			{
-				for (size_t index = 0; index < this->mSortManagers.size(); index++)
+				for (size_t index = 0; index < this->mSecondUpdateManagers.size(); index++)
 				{
-					this->mCurrentManager = this->mSortManagers[index];
-					this->mCurrentManager->OnSecondUpdate();
+					this->mSecondUpdateManagers[index]->OnSecondUpdate();
 				}
 				this->UpdateConsoleTitle();
 				secondTimer = TimeHelper::GetMilTimestamp();
-			}
-			std::this_thread::sleep_for(chrono::milliseconds(1));
+			}		
 		}
 		return this->Stop();
 	}
