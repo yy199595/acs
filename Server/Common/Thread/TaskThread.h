@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include<mutex>
 #include<queue>
+#include<thread>
 #include"ThreadTaskAction.h"
 #include<condition_variable>
 #include<Other/DoubleBufferQueue.h>
