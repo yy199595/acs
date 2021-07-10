@@ -18,16 +18,15 @@ namespace SoEasy
 		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
-			ProtocolPool * pool = ProtocolPool::Get();
-			Message * pMessage = pool->Create(name);
+			Message * pMessage = GprotocolPool.Create(name);
 			if (pMessage != nullptr && pMessage->ParseFromString(message))
 			{
 				this->mBindLuaAction->Inovke(code, pMessage);
-				pool->Destory(pMessage);
+				GprotocolPool.Destory(pMessage);
 				return;
 			}
 			this->mBindLuaAction->Inovke(code, message);
-			pool->Destory(pMessage);
+			GprotocolPool.Destory(pMessage);
 			return;
 		}
 		this->mBindLuaAction->Inovke(code);
@@ -54,16 +53,15 @@ namespace SoEasy
 		const std::string & message = backData->messagedata();
 		if (!message.empty())
 		{
-			ProtocolPool * pool = ProtocolPool::Get();
-			Message * pMessage = pool->Create(name); 
+			Message * pMessage = GprotocolPool.Create(name);
 			if (pMessage != nullptr && pMessage->ParseFromString(message))
 			{
 				this->mBindLuaAction->Inovke(code, pMessage);
-				pool->Destory(pMessage);
+				GprotocolPool.Destory(pMessage);
 				return;
 			}
 			this->mBindLuaAction->Inovke(code, message);
-			pool->Destory(pMessage);
+			GprotocolPool.Destory(pMessage);
 			return;
 		}
 		this->mBindLuaAction->Inovke(code);

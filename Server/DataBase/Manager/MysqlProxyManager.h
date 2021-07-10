@@ -1,9 +1,9 @@
-#include<Manager/Manager.h>
+﻿#include<Manager/Manager.h>
 #include<Protocol/s2s.pb.h>
 #include<Pool/ObjectPool.h>
 namespace SoEasy
 {
-    class MysqlProxyManager : public Manager
+    class MysqlProxyManager : public Manager, public IFrameUpdate
     {
     public:
         MysqlProxyManager() {}
