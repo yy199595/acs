@@ -1,4 +1,4 @@
-#include "MysqlManager.h"
+﻿#include "MysqlManager.h"
 #include <fstream>
 #include <Core/Applocation.h>
 #include <Util/NumberHelper.h>
@@ -87,8 +87,7 @@ namespace SoEasy
 
 	void MysqlManager::OnInitComplete()
 	{
-
-		this->mCoroutineManager->Start("MysqlProxy", [this]()
+		/*this->mCoroutineManager->Start("MysqlProxy", [this]()
 			{
 				ServiceManager * serviceManager = this->GetManager<ServiceManager>();
 
@@ -126,7 +125,7 @@ namespace SoEasy
 				queryRequest.set_protocolmessage(userData.SerializeAsString());
 
 				mysqlProxy->QueryData(0, queryRequest, queryResponse);
-			});
+			});*/
 
 		
 		
@@ -191,11 +190,9 @@ namespace SoEasy
 		const char *passWd = this->mDataBasePasswd.c_str();
 		const char *userName = this->mDataBaseUser.c_str();
 
-		std::vector<long long> taskThreads;
-		this->mTaskManager->GetAllTaskThread(taskThreads);
-		for (size_t index = 0; index < taskThreads.size(); index++)
-		{
-			long long threadId = taskThreads[index];
+		int count = this->mTaskManager->GetThreadCount();
+		for (int index = 0; index < count; index++)
+		{		
 			SayNoMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
 			this->mMysqlSockt = mysql_real_connect(mysqlSocket1, ip, userName, passWd, NULL, port, NULL, CLIENT_MULTI_STATEMENTS);
 			if (this->mMysqlSockt == nullptr)
@@ -203,7 +200,7 @@ namespace SoEasy
 				SayNoDebugError("connect mysql failure " << ip << ":" << port << "  " << userName << " " << passWd);
 				return false;
 			}
-			this->mMysqlSocketMap.insert(std::make_pair(threadId, this->mMysqlSockt));
+			this->mMysqlSocketMap.insert(std::make_pair(index, this->mMysqlSockt));
 			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
 		return true;
@@ -300,9 +297,12 @@ namespace SoEasy
 		SqlTableConfig * tableConfig = this->GetTableConfig(tableName);
 		SayNoAssertRetFalse_F(tableConfig);
 
-		std::vector<const FieldDescriptor *> fieldList;
+		
 		const Descriptor *pDescriptor = messageData.GetDescriptor();
 		const Reflection *pReflection = messageData.GetReflection();
+
+
+		std::vector<const FieldDescriptor *> fieldList;
 		pReflection->ListFields(messageData, &fieldList);
 
 		mSqlCommandStream2 << " where ";
@@ -427,11 +427,18 @@ namespace SoEasy
 		const Descriptor *pDescriptor = messageData.GetDescriptor();
 		const Reflection *pReflection = messageData.GetReflection();
 		mSqlCommandStream << "select * from " << tableName << " where ";
-		
-		for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+		std::vector<const FieldDescriptor *> fieldList;
+		pReflection->ListFields(messageData, &fieldList);
+		if (fieldList.empty())
 		{
-			const std::string &key = tableConfig->mKeys[index];
-			const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
+			return false;
+		}
+		for (size_t index =0;index < fieldList.size();index++)
+		{
+		
+			const FieldDescriptor *fieldDesc = fieldList[index];
+			const std::string &key = fieldDesc->name();
+					
 			if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
 			{
 				const std::string val = pReflection->GetString(messageData, fieldDesc);
@@ -477,7 +484,7 @@ namespace SoEasy
 				}
 				mSqlCommandStream << key << "=" << val;
 			}
-			if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+			if (tableConfig->mKeys.size() > 1 && index < fieldList.size() - 1)
 			{
 				mSqlCommandStream << " and ";
 			}
@@ -501,7 +508,7 @@ namespace SoEasy
 		mSqlCommandStream << "delete from " << tableName << " where ";
 		const Descriptor *pDescriptor = messageData.GetDescriptor();
 		const Reflection *pReflection = messageData.GetReflection();
-		
+	
 		for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
 		{
 			const std::string &key = tableConfig->mKeys[index];

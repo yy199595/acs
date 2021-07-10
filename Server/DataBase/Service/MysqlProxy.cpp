@@ -1,4 +1,4 @@
-#include "MysqlProxy.h"
+﻿#include "MysqlProxy.h"
 #include <Protocol/db.pb.h>
 #include <Other/ServiceNode.h>
 #include <Manager/MysqlManager.h>
@@ -60,14 +60,18 @@ namespace SoEasy
 		protocolPool->Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
-
-		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
+		
+		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
 		{
 			return XCode::MysqlStartTaskFail;
 		}
 		
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
+#ifdef _DEBUG
+		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+		SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
+#endif // _DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -95,13 +99,17 @@ namespace SoEasy
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
+		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
 		{
 			return XCode::MysqlStartTaskFail;
 		}
 
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
+#ifdef _DEBUG
+		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+		SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
+#endif // _DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -129,12 +137,16 @@ namespace SoEasy
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
+		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
 		{
 			return XCode::MysqlStartTaskFail;
 		}
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
+#ifdef _DEBUG
+		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+		SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
+#endif // _DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -162,7 +174,7 @@ namespace SoEasy
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
+		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
 		{
 			return XCode::MysqlStartTaskFail;
 		}
@@ -184,6 +196,10 @@ namespace SoEasy
 			return XCode::Successful;
 		}
 		response.set_errotstr(mysqlTask->GetErrorStr());
+#ifdef _DEBUG
+		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+		SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
+#endif // _DEBUG
 		return code;
 	}
 

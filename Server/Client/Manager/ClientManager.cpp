@@ -1,72 +1,146 @@
 ﻿#include"ClientManager.h"
 #include<Util/MathHelper.h>
 #include<Util/StringHelper.h>
-#include<Coroutine/CoroutineManager.h>
-#include<Other/ObjectFactory.h>
 
+#include<Protocol/db.pb.h>
+#include<Pool/ObjectPool.h>
+
+#include<Manager/ActionManager.h>
+
+#include<Other/ObjectFactory.h>
+#include<NetWork/NetWorkRetAction.h>
+#include<Coroutine/CoroutineManager.h>
 namespace Client
 {
 	bool ClientManager::OnInit()
-	{
-		std::string address;
-		NetProxyManager::OnInit();
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", address));
-		
-		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(address, this->mConnectIp, this->mConnectPort));
-		
-		SayNoAssertRetFalse_F(this->mScriptManager = this->GetManager<ScriptManager>());
+	{	
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", this->mAddress));
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(this->mAddress, this->mConnectIp, this->mConnectPort));
 		
-		return this->mClientSession != nullptr;
+		return NetProxyManager::OnInit();;
 	}
 
 	void ClientManager::OnInitComplete()
 	{
-		this->mCoroutineManager->Sleep(1000);
-		
+		this->ConnectByAddress(this->mAddress, "GateServer");
+		this->mCoroutineManager->Start("", BIND_THIS_ACTION_0(ClientManager::InvokeAction));
 	}
 
-	void ClientManager::OnSessionErrorAfter(shared_ptr<TcpClientSession> tcpSession)
+	void ClientManager::OnFrameUpdate(float t)
 	{
-		tcpSession->StartConnect();
-	}
-
-	void ClientManager::OnSessionConnectAfter(shared_ptr<TcpClientSession> tcpSession)
-	{
-		lua_State * luaEnv = this->mScriptManager->GetLuaEnv();
-		if (lua_getfunction(luaEnv, "ClientManager", "OnConnectComplate"))
+		if (!this->mWaitSendMessages.empty())
 		{
-			LuaParameter::Write<SharedTcpSession>(luaEnv, tcpSession);
-			if (lua_pcall(luaEnv, 1, 0, 0) != 0)
+			TcpProxySession * tcpSession = this->GetProxySession(this->mAddress);
+			if (tcpSession != nullptr)
 			{
-				SayNoDebugError(lua_tostring(luaEnv, -1));
-			}
+				PB::NetWorkPacket * messageData = this->mWaitSendMessages.front();
+				tcpSession->SendMessageData(messageData);
+				this->mWaitSendMessages.pop();
+			}						
 		}
-		/*for (size_t index = 0; index < 100; index++)
+	}
+
+	XCode ClientManager::Notice(const std::string & service, const std::string & method)
+	{
+		return XCode();
+	}
+
+	XCode ClientManager::Notice(const std::string & service, const std::string & method, const Message & request)
+	{
+		return XCode();
+	}
+
+	XCode ClientManager::Invoke(const std::string & service, const std::string & method)
+	{
+		return XCode();
+	}
+
+	XCode ClientManager::Invoke(const std::string & service, const std::string & method, const Message & request)
+	{
+		return XCode();
+	}
+
+	XCode ClientManager::Call(const std::string & service, const std::string & method, Message & response)
+	{
+		PB::NetWorkPacket * messageData = NetPacketPool.Create();
+		messageData->set_service(service);
+		messageData->set_method(method);
+
+		
+
+		return XCode();
+	}
+
+	XCode ClientManager::Call(const std::string & service, const std::string & method, const Message & request, Message & response)
+	{
+		PB::NetWorkPacket * messageData = NetPacketPool.Create();
+		ActionManager * pActionManager = this->GetManager<ActionManager>();
+		if (messageData == nullptr)
 		{
-			this->mCoroutineManager->Start([this, tcpSession]()
-			{
-				while (true)
-				{
-					ActionScheduler shceuder(tcpSession);
-					shared_ptr<UserRegisterData> registerData = make_shared<UserRegisterData>();
-					registerData->set_phonenum(13716061995);
-					registerData->set_platform("iphone_wecaht");
-					registerData->set_account("646585122@qq.com");
-					registerData->set_password(StringHelper::RandomString(15));
+			return XCode::Failure;
+		}
+		messageData->set_method(method);
+		messageData->set_service(service);
+		messageData->set_messagedata(request.SerializeAsString());
 
-					long long t2 = TimeHelper::GetMilTimestamp();
-					XCode code = shceuder.Call("LoginService.Register", registerData);
-					SayNoDebugWarning("register cost time = " << TimeHelper::GetMilTimestamp() - t2 << " code = " << code);
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCoroutineManager);
+		if (rpcCallback != nullptr)
+		{
+#ifdef _DEBUG
+			rpcCallback->mMethod = method;
+			rpcCallback->mService = service;
+#endif
+			messageData->set_rpcid(pActionManager->AddCallback(rpcCallback));
+		}
+		this->mWaitSendMessages.push(messageData);
+		this->mCoroutineManager->YieldReturn();
+		response.ParseFromString(rpcCallback->GetMsgData());
+		return rpcCallback->GetCode();
 
-					long long t3 = TimeHelper::GetMilTimestamp();
-					shared_ptr<UserAccountData> accountData = make_shared<UserAccountData>();
-					accountData->set_account(registerData->account());
+	}
 
-					XCode loginCode = shceuder.Call("LoginService.Login", accountData);
-					SayNoDebugWarning("login cost time = " << TimeHelper::GetMilTimestamp() - t3 << " code = " << code);
-				}
-			});
-		}*/
+	void ClientManager::InvokeAction()
+	{
+
+		s2s::MysqlQuery_Request requestData;
+		s2s::MysqlQuery_Response responseData;
+
+		db::UserAccountData userAccountData;
+		
+
+		for (int index = 0; index < 1; index++)
+		{
+			userAccountData.set_userid(13716061995 + index);
+			userAccountData.set_token(StringHelper::CreateNewToken());
+			userAccountData.set_passwd(StringHelper::CreateNewToken());
+			userAccountData.set_registertime(TimeHelper::GetMilTimestamp());
+			userAccountData.set_lastlogintime(TimeHelper::GetMilTimestamp());
+			userAccountData.set_account(std::to_string(646585122+index)+ "@qq.com");
+
+			requestData.set_protocolname(userAccountData.GetTypeName());
+			requestData.set_protocolmessage(userAccountData.SerializeAsString());
+
+			XCode code = this->Call("MysqlProxy", "Add", requestData, responseData);
+
+
+		}
+
+		
+
+
+		XCode code = this->Call("MysqlProxy", "QueryData", requestData, responseData);
+		if (code != XCode::Successful)
+		{
+			const std::string & err = responseData.errotstr();
+			SayNoDebugError(err);
+		}
+		for (int index = 0; index < responseData.querydatas_size(); index++)
+		{
+			const std::string & value = responseData.querydatas(index);
+			userAccountData.ParseFromString(value);
+			SayNoDebugLogProtocBuf(userAccountData);
+		}
+
 	}
 }

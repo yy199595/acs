@@ -1,4 +1,4 @@
-#include "NetProxyManager.h"
+﻿#include "NetProxyManager.h"
 #include "NetSessionManager.h"
 #include "ServiceManager.h"
 #include <Core/Applocation.h>
@@ -104,6 +104,7 @@ namespace SoEasy
 #ifdef _DEBUG
 					SayNoDebugInfo("connect to " << address << " successful");
 #endif
+					this->OnConnectSuccessful(session);
 				}
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketNewConnect)
@@ -117,6 +118,7 @@ namespace SoEasy
 					SayNoDebugInfo("new session connect [" << address << "]");
 #endif
 				}
+				this->OnNewSessionConnect(session);
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketConnectFail)
 			{

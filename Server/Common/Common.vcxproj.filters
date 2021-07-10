@@ -114,9 +114,6 @@
     <ClCompile Include="Thread\TaskThread.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
-    <ClCompile Include="Thread\ThreadPool.cpp">
-      <Filter>Thread</Filter>
-    </ClCompile>
     <ClCompile Include="Thread\ThreadTaskAction.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
       <Filter>Other</Filter>
     </ClInclude>
     <ClInclude Include="Thread\TaskThread.h">
-      <Filter>Thread</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread\ThreadPool.h">
       <Filter>Thread</Filter>
     </ClInclude>
     <ClInclude Include="Thread\ThreadTaskAction.h">

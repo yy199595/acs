@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include<list>
 #include<queue>
 #include<memory>
@@ -16,7 +16,7 @@
 namespace SoEasy
 {
 	struct Coroutine;
-	class CoroutineManager : public Manager
+	class CoroutineManager : public Manager, public ISystemUpdate, public IFrameUpdate
 	{
 	public:
 		CoroutineManager();

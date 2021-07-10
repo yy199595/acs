@@ -4,6 +4,7 @@
 #include<Manager/TimerManager.h>
 #include<Manager/ActionManager.h>
 
+#include<Manager/ThreadTaskManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ListenerManager.h>
 #include<Manager/ServiceManager.h>
@@ -49,6 +50,7 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
 	ObjectRegistry<Manager>::Register<NetProxyManager>("NetProxyManager");
 	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
+	ObjectRegistry<Manager>::Register<ThreadTaskManager>("ThreadTaskManager");
 
 
 

@@ -38,6 +38,7 @@
         "ListenerManager",
         "ActionManager",
         "ServiceManager",
+        "ThreadTaskManager",
         "ServiceNodeManager"
     ],
     "Service": [

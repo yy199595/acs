@@ -3,8 +3,7 @@
 namespace SoEasy
 {
 
-	RedisTaskBase::RedisTaskBase(RedisManager * mgr, long long taskId, const std::string & cmd)
-		: ThreadTaskAction(mgr, taskId)
+	RedisTaskBase::RedisTaskBase(RedisManager * mgr, const std::string & cmd)
 	{
 		this->mRedisManager = mgr;
 		this->mCommand.push_back(cmd);

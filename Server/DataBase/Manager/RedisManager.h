@@ -1,11 +1,14 @@
 ﻿#pragma once
 #include<Util/NumberHelper.h>
+
 #include<Coroutine/CoroutineManager.h>
 #include<QueryResult/InvokeResultData.h>
 #include<RedisClient/RedisTaskAction.h>
+
 using namespace SoEasy;
 namespace SoEasy
 {
+	class ThreadTaskManager;
 	class RedisManager : public Manager
 	{
 	public:
@@ -36,8 +39,10 @@ namespace SoEasy
 	private:
 		std::string mRedisIp;		//redis ip地址
 		unsigned short mRedisPort;	//端口号
-		ThreadPool * mThreadPool;	//线程池
-		class CoroutineManager * mCorManager;;
+		CoroutineManager * mCorManager;;
+		ThreadTaskManager * mTaskManager;
+		
+		
 		std::unordered_map<long long, redisContext *> mRedisContextMap;
 	};
 	template<typename ...Args>
@@ -53,8 +58,7 @@ namespace SoEasy
 			return nullptr;
 		}
 
-		long long taskActionId = NumberHelper::Create();
-		RedisSharedTask taskAction = make_shared<RedisTaskAction>(this, taskActionId, cmd);
+		RedisSharedTask taskAction = make_shared<RedisTaskAction>(this, cmd);
 		if (taskAction != nullptr)
 		{
 			taskAction->InitCommand(std::forward<Args>(args)...);

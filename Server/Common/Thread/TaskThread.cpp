@@ -1,4 +1,4 @@
-#include "TaskThread.h"
+﻿#include "TaskThread.h"
 #include <chrono>
 #include <sstream>
 #include <functional>
@@ -6,18 +6,13 @@
 using namespace std::chrono;
 namespace SoEasy
 {
-	TaskThread::TaskThread(ThreadTaskManager * manager)
+	TaskThread::TaskThread(ThreadTaskManager * manager, int index)
 	{
-		this->mThreadId = 0;
 		this->mTaskState = Idle;
+		this->mThreadIndex = index;
 		this->mTaskManager = manager;
 		std::stringstream streamBuffer;
 		this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
-		if (this->mBindThread != nullptr)
-		{
-			streamBuffer << this->mBindThread->get_id();
-			streamBuffer >> this->mThreadId;
-		}
 	}
 
 	void TaskThread::WaitToNextWake()
@@ -42,8 +37,8 @@ namespace SoEasy
 
 			while (this->mWaitInvokeTask.PopItem(taskAction))
 			{
-				taskAction->InvokeInThreadPool(this->mThreadId);
-				taskAction->NoticeToMainThread(); // 通知到主线程
+				taskAction->InvokeInThreadPool(this->mThreadIndex);
+				this->mTaskManager->OnTaskFinish(taskAction->GetTaskId());
 			}
 
 			this->mTaskState = ThreadState::Idle;

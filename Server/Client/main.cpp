@@ -1,12 +1,15 @@
-#include<Core/Applocation.h>
+﻿#include<Core/Applocation.h>
 #include<Core/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<Manager/ServiceManager.h>
-#include<Coroutine/CoroutineManager.h>
+#include<Manager/ServiceNodeManager.h>
 #include"Manager/ClientManager.h"
+#include<Coroutine/CoroutineManager.h>
+#include<Manager/NetProxyManager.h>
+
 using namespace SoEasy;
 using namespace Client;
 
@@ -23,8 +26,11 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
 	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
 	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
-	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
+	ObjectRegistry<Manager>::Register<NetProxyManager>("NetProxyManager");
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
+	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
+	ObjectRegistry<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
+
 	
 
 

@@ -18,9 +18,9 @@ namespace SoEasy
 
 	bool NetSessionManager::OnInit()
 	{		
+		this->mListenerManager = this->GetManager<ListenerManager>();
 		SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetManager<NetProxyManager>());
 		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<ActionManager>());
-		SayNoAssertRetFalse_F(this->mListenerManager = this->GetManager<ListenerManager>());
 		return true;
 	}
 
@@ -159,11 +159,14 @@ namespace SoEasy
 		Main2NetEvent * sessionEvent = nullptr;
 		auto sleep = std::chrono::milliseconds(1);
 		this->mNetThreadId = std::this_thread::get_id();
-		this->mListenerManager->StartAccept();
 		while (this->mIsClose == false)
 		{
 			this->mAsioContext.poll();
-			this->mListenerManager->StartAccept();
+			if (this->mListenerManager)
+			{
+				this->mListenerManager->StartAccept();
+			}
+			
 			while (!this->mRecvSessionQueue.empty())
 			{
 				TcpClientSession * tcpSession = this->GetSession(this->mRecvSessionQueue.front());

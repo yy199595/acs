@@ -1,5 +1,7 @@
 {
     "NodeId":0,
+    "AreaId":0,
+    "NodeName":"Client",
     "FastUpdate": 10,
     "LogicFps": 30,
     "SystemFps":100,
@@ -19,7 +21,6 @@
     ],
     "Managers": [
         "ClientManager",
-        "ScriptManager",
         "ActionManager",
         "ServiceManager"
     ],

@@ -1,27 +1,42 @@
-#include "ThreadTaskManager.h"
+﻿#include "ThreadTaskManager.h"
 #include <Thread/ThreadTaskAction.h>
 #include <Util/NumberHelper.h>
 namespace SoEasy
 {
-
+	ThreadTaskManager::ThreadTaskManager()
+	{
+		this->mThreadCount = 0;
+	}
 	bool ThreadTaskManager::OnInit()
 	{
-		this->mThreadCount = (int)std::thread::hardware_concurrency();
-		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ThreadCount", this->mThreadCount));	
+		int count = this->GetThreadCount();
+		for (int index = 0; index < count; index++)
+		{
+			TaskThread *taskThread = new TaskThread(this, index);
+			if (taskThread == nullptr)
+			{
+				return false;
+			}
+			mThreadArray.push_back(taskThread);
+		}
+		SayNoDebugLog("start new thread [ " << this->mThreadCount << " ]");
 		return true;
 	}
 
 	void ThreadTaskManager::OnInitComplete()
 	{
-		for (int index = 0; index < this->mThreadCount; index++)
+		
+	}
+
+	int ThreadTaskManager::GetThreadCount()
+	{
+		if (this->mThreadCount == 0)
 		{
-			TaskThread *taskThread = new TaskThread(this);
-			if (taskThread != nullptr)
-			{
-				mThreadArray.push_back(taskThread);
-				SayNoDebugLog("start new thread id " << taskThread->GetThreadId());
-			}
+			int count = 0;
+			this->GetConfig().GetValue("ThreadCount", count);
+			this->mThreadCount = count != 0 ? count : (int)std::thread::hardware_concurrency();
 		}
+		return this->mThreadCount;
 	}
 
 	long long ThreadTaskManager::CreateTaskId()
@@ -34,20 +49,11 @@ namespace SoEasy
 		mFinishTaskQueue.AddItem(taskId);
 	}
 
-	void ThreadTaskManager::GetAllTaskThread(std::vector<long long>& threads)
-	{
-		threads.clear();
-		for (TaskThread* task : this->mThreadArray)
-		{
-			threads.push_back(task->GetThreadId());
-		}
-	}
-
-	long long ThreadTaskManager::StartInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction)
+	bool ThreadTaskManager::StartInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction)
 	{
 		if (taskAction == nullptr || !taskAction->InitTaskAction(this))
 		{
-			return 0;
+			return false;
 		}		
 		if(this->mThreadIndex == this->mThreadArray.size())
 		{
@@ -55,7 +61,7 @@ namespace SoEasy
 		}
 		this->mThreadTaskMap.emplace(taskAction->GetTaskId(), taskAction);
 		this->mThreadArray[this->mThreadIndex]->AddTaskAction(taskAction);
-		return taskAction->GetTaskId();
+		return true;
 	}
 
 	void ThreadTaskManager::OnSystemUpdate()

@@ -18,7 +18,7 @@ namespace SoEasy
 	class RedisTaskAction : public RedisTaskBase
 	{
 	public:
-		RedisTaskAction(RedisManager * mgr, long long taskId, const std::string & cmd);
+		RedisTaskAction(RedisManager * mgr, const std::string & cmd);
 	public:
 		long long GetCoroutineId() { return mCoreoutineId; }
 	protected:

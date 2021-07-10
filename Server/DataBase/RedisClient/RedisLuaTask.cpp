@@ -4,8 +4,8 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	RedisLuaTask::RedisLuaTask(RedisManager * mgr, long long taskId, const std::string & cmd, lua_State * lua, int ref)
-		:RedisTaskBase(mgr, taskId, cmd)
+	RedisLuaTask::RedisLuaTask(RedisManager * mgr, const std::string & cmd, lua_State * lua, int ref)
+		:RedisTaskBase(mgr, cmd)
 	{
 		this->mLuaEnv = lua;
 		this->mCoroutienRef = ref;
@@ -51,7 +51,6 @@ namespace SoEasy
 		{
 			return nullptr;
 		}
-		long long taskId = NumberHelper::Create();
-		return std::make_shared<RedisLuaTask>(redisManager, taskId, cmd, lua, ref);
+		return std::make_shared<RedisLuaTask>(redisManager, cmd, lua, ref);
 	}
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Manager.h"
 #include <NetWork/SocketEvent.h>
 #include <NetWork/TcpProxySession.h>
@@ -25,6 +25,8 @@ namespace SoEasy
 	protected:
 		bool OnInit() override;
 		void OnSystemUpdate() final;
+		virtual void OnNewSessionConnect(TcpProxySession * session) { }
+		virtual void OnConnectSuccessful(TcpProxySession * session) { }
 		virtual bool OnRecvMessage(const std::string &address, PB::NetWorkPacket *msg);
 	private:
 		int mReConnectTime;

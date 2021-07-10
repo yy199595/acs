@@ -1,5 +1,9 @@
 ﻿#pragma once
+#include<string>
+#include<vector>
+#include<memory>
 #include"RedisDefine.h"
+#include<XCode/XCode.h>
 #include<Thread/ThreadTaskAction.h>
 #define RedisLuaArgvSize 10
 namespace SoEasy
@@ -9,7 +13,7 @@ namespace SoEasy
 	class RedisTaskBase : public ThreadTaskAction 
 	{
 	public:
-		RedisTaskBase(RedisManager * mgr, long long taskId, const std::string & cmd);
+		RedisTaskBase(RedisManager * mgr, const std::string & cmd);
 	public:
 		void InvokeInThreadPool(long long threadId) final;	//在线程池执行的任务
 	public:

@@ -1,7 +1,7 @@
 ﻿#include"RedisManager.h"
 #include<Util/NumberHelper.h>
 #include<Util/StringHelper.h>
-#include<Thread/ThreadPool.h>
+#include<Manager/ThreadTaskManager.h>
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Script/ClassProxyHelper.h>
@@ -10,7 +10,6 @@ namespace SoEasy
 	RedisManager::RedisManager()
 	{
 		this->mRedisPort = 0;
-		this->mThreadPool = nullptr;
 	}
 
 	RedisSocket * RedisManager::GetRedisSocket(long long id)
@@ -22,8 +21,9 @@ namespace SoEasy
 	bool RedisManager::OnInit()
 	{
 		std::string redisAddress;
-		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
+		
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
 		
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("RedisAddress", redisAddress));	
 		SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(redisAddress, mRedisIp, mRedisPort));
@@ -36,12 +36,10 @@ namespace SoEasy
 			tv.tv_usec = tv.tv_sec * 1000;
 		}
 
-		std::vector<long long> threadVector;
-		this->mThreadPool->GetAllTaskThread(threadVector);
+		int count = this->mTaskManager->GetThreadCount();
 
-		for (size_t index = 0; index < threadVector.size(); index++)
-		{
-			long long threadId = threadVector[index];
+		for (int index = 0; index < count; index++)
+		{			
 			redisContext * pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
 			if (pRedisContext->err != 0)
 			{
@@ -60,7 +58,7 @@ namespace SoEasy
 				freeReplyObject(reply);
 			}
 		
-			this->mRedisContextMap.emplace(threadId, pRedisContext);
+			this->mRedisContextMap.emplace(index, pRedisContext);
 			SayNoDebugLog("connect redis successful " << mRedisIp << ":" << mRedisPort);
 		}
 		
@@ -75,7 +73,8 @@ namespace SoEasy
 	bool RedisManager::HasValue(const std::string &  key)
 	{
 		RedisSharedTask redisTask = this->CreateTask("GET", key);
-		if (!this->StartTaskAction(redisTask))
+	
+		if (this->mTaskManager->StartInvokeTask(redisTask) == 0)
 		{
 			return false;
 		}
@@ -86,7 +85,7 @@ namespace SoEasy
 	bool RedisManager::HasValue(const std::string &  tab, const std::string &  key)
 	{
 		RedisSharedTask redisTask = this->CreateTask("HEXISTS", tab, key);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -97,7 +96,7 @@ namespace SoEasy
 	bool RedisManager::DelValue(const std::string &  key)
 	{
 		RedisSharedTask redisTask = this->CreateTask("DEL", key);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -108,7 +107,7 @@ namespace SoEasy
 	bool RedisManager::DelValue(const std::string &  tab, const std::string &  key)
 	{
 		RedisSharedTask redisTask = this->CreateTask("HDEL", tab, key);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -119,7 +118,7 @@ namespace SoEasy
 	bool RedisManager::SetValue(const std::string &  key, const std::string & value, int second)
 	{		
 		RedisSharedTask redisTask = this->CreateTask("EXPIRE", key, second);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -130,7 +129,7 @@ namespace SoEasy
 	bool RedisManager::SetValue(const std::string &  key, const std::string & value)
 	{
 		RedisSharedTask redisTask = this->CreateTask("SET", key, value);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -141,7 +140,7 @@ namespace SoEasy
 	bool RedisManager::SetValue(const std::string &  tab, const std::string &  key, const std::string & value)
 	{
 		RedisSharedTask redisTask = this->CreateTask("HSET", tab, key, value);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -163,7 +162,7 @@ namespace SoEasy
 	bool RedisManager::GetValue(const std::string &  key, std::string & value)
 	{
 		RedisSharedTask redisTask = this->CreateTask("GET", key);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}
@@ -173,7 +172,7 @@ namespace SoEasy
 	bool RedisManager::GetValue(const std::string &  tab, const std::string &  key, std::string & value)
 	{
 		RedisSharedTask redisTask = this->CreateTask("HGET", tab, key);
-		if (!this->StartTaskAction(redisTask))
+		if (!this->mTaskManager->StartInvokeTask(redisTask))
 		{
 			return false;
 		}

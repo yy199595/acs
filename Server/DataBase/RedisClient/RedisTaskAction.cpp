@@ -3,8 +3,8 @@
 #include<Coroutine/CoroutineManager.h>
 namespace SoEasy
 {
-	RedisTaskAction::RedisTaskAction(RedisManager * mgr, long long taskId, const std::string & cmd)
-		: RedisTaskBase(mgr, taskId, cmd)
+	RedisTaskAction::RedisTaskAction(RedisManager * mgr, const std::string & cmd)
+		: RedisTaskBase(mgr, cmd)
 	{
 		Applocation * app = Applocation::Get();
 		SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());

@@ -1,8 +1,9 @@
-
+﻿
 #include"Applocation.h"
 #include"ObjectRegistry.h"
 #include<Util/FileHelper.h>
 #include<Manager/TimerManager.h>
+#include<Manager/ThreadTaskManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
@@ -100,7 +101,7 @@ namespace SoEasy
 			ISystemUpdate * manager2 = dynamic_cast<ISystemUpdate *>(manager);
 			ISecondUpdate * manager3 = dynamic_cast<ISecondUpdate *>(manager);
 
-			if (manager != nullptr)
+			if (manager1 != nullptr)
 			{
 				this->mFrameUpdateManagers.push_back(manager1);
 				SayNoDebugLog("add " << manager->GetTypeName() << " to FrameUpdateArray");
@@ -115,6 +116,13 @@ namespace SoEasy
 				this->mSecondUpdateManagers.push_back(manager3);
 				SayNoDebugLog("add " << manager->GetTypeName() << " to SecondUpdateArray");
 			}
+		}
+
+		iter = this->mManagerMap.begin();
+		for (; iter != this->mManagerMap.end(); iter++)
+		{
+			Manager * manager = iter->second;
+			manager->OnInitComplete();
 		}
 		return true;
 	}
