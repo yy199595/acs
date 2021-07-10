@@ -79,15 +79,14 @@ namespace SoEasy
 		{
 			if (!messageData->protocname().empty())
 			{
-				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(messageData->protocname());
+				Message * message = GprotocolPool.Create(messageData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
 					ProtocHelper::GetJsonString(message, json);
 					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
 				}
-				pool->Destory(message);
+				GprotocolPool.Destory(message);
 			}
 			else
 			{
@@ -128,16 +127,15 @@ namespace SoEasy
 		if (!messageData->messagedata().empty())
 		{
 			if (!messageData->protocname().empty())
-			{
-				ProtocolPool * pool = ProtocolPool::Get();
-				Message * message = pool->Create(messageData->protocname());
+			{				
+				Message * message = GprotocolPool.Create(messageData->protocname());
 				if (message != nullptr)
 				{
 					std::string json;
 					ProtocHelper::GetJsonString(message, json);
 					lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
 				}
-				pool->Destory(message);
+				GprotocolPool.Destory(message);
 			}
 			else
 			{
