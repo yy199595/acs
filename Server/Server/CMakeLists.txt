@@ -28,6 +28,8 @@ include_directories(../Common/Timer)
 include_directories(../Common/Util)
 include_directories(../Common/Script)
 include_directories(../Common/Service)
+include_directories(../Common/Pool)
+
 
 aux_source_directory(../Common/Core SUPER_SRC)
 aux_source_directory(../Common/Coroutine SUPER_SRC)
@@ -43,6 +45,7 @@ aux_source_directory(../Common/Timer SUPER_SRC)
 aux_source_directory(../Common/Util SUPER_SRC)
 aux_source_directory(../Common/Script SUPER_SRC)
 aux_source_directory(../Common/Service SUPER_SRC)
+aux_source_directory(../Common/Pool SUPER_SRC)
 
 include_directories(../ServerData)
 include_directories(../ServerData/XCode)
