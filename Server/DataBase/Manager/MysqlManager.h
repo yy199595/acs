@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <XCode/XCode.h>
 #include <Manager/Manager.h>
 #include <Util/NumberHelper.h>
@@ -61,7 +61,6 @@ namespace SoEasy
 		std::string mDataBaseUser;	 //用户名
 		std::string mDataBasePasswd; //密码
 		std::string mDataBaseName;	 //数据库名字
-		ThreadPool *mThreadPool;	 //线程池
 		std::string mSqlTablePath;
 		SayNoMysqlSocket *mMysqlSockt;
 		std::stringstream mSqlCommandStream;
@@ -70,6 +69,7 @@ namespace SoEasy
 		std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
 		std::unordered_map<long long, SayNoMysqlSocket *> mMysqlSocketMap; //线程id和 socket
 	private:
+		class ThreadTaskManager* mTaskManager;
 		class CoroutineManager *mCoroutineManager;
 	};
 }

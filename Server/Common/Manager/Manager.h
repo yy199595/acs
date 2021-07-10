@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include<XCode/XCode.h>
 #include<Object/Object.h>
@@ -29,14 +29,10 @@ namespace SoEasy
 	class Manager : public Object
 	{
 	public:
-		Manager();
+		Manager() { }
 		virtual ~Manager() { }
 	protected:
 		friend Applocation;
-	public:
-		void AddFinishTask(long long id);	//不要手动调用
-	public:
-		bool StartTaskAction(shared_ptr<ThreadTaskAction> taskAction);
 	public:
 		virtual void PushClassToLua(lua_State * luaEnv) { }		//自身方法导出到lua
 	protected:

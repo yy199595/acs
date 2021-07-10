@@ -1,4 +1,4 @@
-﻿#include "NetProxyManager.h"
+#include "NetProxyManager.h"
 #include "NetSessionManager.h"
 #include "ServiceManager.h"
 #include <Core/Applocation.h>
@@ -28,11 +28,6 @@ namespace SoEasy
 		{
 			return false;
 		}
-#ifdef _DEBUG
-		const std::string &method = msgData->method();
-		const std::string &service = msgData->service();
-		SayNoDebugInfo("call " << service << "." << method << " [" << address << "]");
-#endif // _DEBUG
 		return tcpSession->SendMessageData(msgData);
 	}
 
@@ -40,6 +35,12 @@ namespace SoEasy
 	{
 		auto iter = this->mConnectSessionMap.find(address);
 		if (iter != this->mConnectSessionMap.end())
+		{
+			return true;
+		}
+
+		auto iter1 = this->mSessionMap.find(address);
+		if (iter1 != this->mSessionMap.end())
 		{
 			return true;
 		}

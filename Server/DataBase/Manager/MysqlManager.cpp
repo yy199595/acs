@@ -1,8 +1,7 @@
-﻿#include "MysqlManager.h"
+#include "MysqlManager.h"
 #include <fstream>
 #include <Core/Applocation.h>
 #include <Util/NumberHelper.h>
-#include <Thread/ThreadPool.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Util/StringHelper.h>
 #include <Script/ClassProxyHelper.h>
@@ -13,6 +12,7 @@
 
 #include<Service/MysqlProxy.h>
 #include<Manager/ServiceManager.h>
+#include<Manager/ThreadTaskManager.h>
 namespace SoEasy
 {
 	SqlTableConfig::SqlTableConfig(const std::string tab, const std::string pb)
@@ -40,14 +40,13 @@ namespace SoEasy
 {
 	MysqlManager::MysqlManager()
 	{
-		this->mThreadPool = 0;
 		this->mMysqlPort = 0;
 	}
 
 	bool MysqlManager::OnInit()
 	{
 		std::string mysqlAddress;
-		SayNoAssertRetFalse_F(this->mThreadPool = this->GetApp()->GetThreadPool());
+		SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
 		SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
 
 		SayNoAssertRetFalse_F(GetConfig().GetValue("SqlTable", mSqlTablePath));
@@ -193,7 +192,7 @@ namespace SoEasy
 		const char *userName = this->mDataBaseUser.c_str();
 
 		std::vector<long long> taskThreads;
-		this->mThreadPool->GetAllTaskThread(taskThreads);
+		this->mTaskManager->GetAllTaskThread(taskThreads);
 		for (size_t index = 0; index < taskThreads.size(); index++)
 		{
 			long long threadId = taskThreads[index];

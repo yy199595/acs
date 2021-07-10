@@ -1,4 +1,4 @@
-﻿#include "ServiceNodeManager.h"
+#include "ServiceNodeManager.h"
 #include <Other/ServiceNode.h>
 #include<Manager/NetSessionManager.h>
 namespace SoEasy
@@ -73,7 +73,7 @@ namespace SoEasy
 		return centerNode->AddService(std::string("ServiceRegistry")) && this->AddServiceNode(centerNode);
 	}
 
-	void ServiceNodeManager::OnSystemUpdate()
+	void ServiceNodeManager::OnFrameUpdate(float t)
 	{
 		if (!this->mServiceNodeArray.empty())
 		{
@@ -89,7 +89,7 @@ namespace SoEasy
 					continue;
 				}
 				iter++;
-				serviceNode->OnSystemUpdate();
+				serviceNode->OnFrameUpdate(t);
 			}
 		}
 	}

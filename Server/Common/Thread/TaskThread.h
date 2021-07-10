@@ -11,7 +11,6 @@ namespace SoEasy
 		Idle,
 		Running,
 	};
-	class ThreadPool;
 	class ThreadTaskManager;
 	class TaskThread
 	{

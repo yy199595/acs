@@ -1,4 +1,4 @@
-﻿#include "ServiceNode.h"
+#include "ServiceNode.h"
 #include <Util/StringHelper.h>
 #include <Manager/NetProxyManager.h>
 #include <Manager/ActionManager.h>
@@ -44,16 +44,16 @@ namespace SoEasy
 		return iter != this->mServiceArray.end();
 	}
 
-	void ServiceNode::OnSystemUpdate()
+	void ServiceNode::OnFrameUpdate(float t)
 	{
-		while (!this->mMessageQueue.empty())
+		if (!this->mMessageQueue.empty())
 		{
-			PB::NetWorkPacket *msgData = this->mMessageQueue.front();
-			if (!this->mNetWorkManager->SendMsgByAddress(this->mAddress, msgData))
+			TcpProxySession* tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+			while (tcpSession != nullptr && !this->mMessageQueue.empty())
 			{
-				return;
+				tcpSession->SendMessageData(this->mMessageQueue.front());
+				this->mMessageQueue.pop();
 			}
-			this->mMessageQueue.pop();
 		}
 	}
 
@@ -182,10 +182,20 @@ namespace SoEasy
 
 	void ServiceNode::PushMessageData(PB::NetWorkPacket *messageData)
 	{
-		if (!this->mNetWorkManager->SendMsgByAddress(this->mAddress, messageData))
+		TcpProxySession * tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+		if (tcpSession == nullptr)
 		{
 			this->mMessageQueue.push(messageData);
 			this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
+		}
+		else
+		{
+			while (!this->mMessageQueue.empty())
+			{
+				tcpSession->SendMessageData(this->mMessageQueue.front());
+				this->mMessageQueue.pop();
+			}
+			tcpSession->SendMessageData(messageData);
 		}
 	}
 

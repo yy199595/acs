@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
@@ -17,14 +17,12 @@ namespace SoEasy
 {
 	class Manager;
 	class ServiceBase;
-	class ThreadPool;
 	class Applocation
 	{
 	public:
 		Applocation(const std::string srvName, const std::string configPath);
 		virtual ~Applocation() {};
 	public:
-		ThreadPool * GetThreadPool() { return mThreadPool; }
 		ServerConfig & GetConfig() { return this->mConfig; }
 		inline float GetDelaTime() { return this->mDelatime; }
 		inline long long GetLogicTime() { return this->mLogicTime; }

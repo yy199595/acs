@@ -1,4 +1,4 @@
-﻿#include "TimerManager.h"
+#include "TimerManager.h"
 #include<Timer/DelayTimer.h>
 #include<Util/TimeHelper.h>
 namespace SoEasy
@@ -80,7 +80,7 @@ namespace SoEasy
 		}
 	}
 
-	void TimerManager::OnSystemUpdate()
+	void TimerManager::OnFrameUpdate(float t)
 	{
 		long long timerId = 0;
 		this->mFinishTimerQueue.SwapQueueData();

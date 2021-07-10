@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Manager.h"
 #include <NetWork/SocketEvent.h>
 #include <NetWork/TcpProxySession.h>

@@ -1,7 +1,8 @@
-﻿#include "MysqlProxy.h"
+#include "MysqlProxy.h"
 #include <Protocol/db.pb.h>
 #include <Other/ServiceNode.h>
 #include <Manager/MysqlManager.h>
+#include <Manager/ThreadTaskManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlThreadTask.h>
 #include <google/protobuf/util/json_util.h>
@@ -19,6 +20,7 @@ namespace SoEasy
     {
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
 
         REGISTER_FUNCTION_2(MysqlProxy::Add, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
         REGISTER_FUNCTION_2(MysqlProxy::Save, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
@@ -55,15 +57,15 @@ namespace SoEasy
 			protocolPool->Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-		long long id = NumberHelper::Create();
 		protocolPool->Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
-		{		
+		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
+		{
 			return XCode::MysqlStartTaskFail;
 		}
+		
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
 		return mysqlTask->GetErrorCode();
@@ -89,15 +91,15 @@ namespace SoEasy
 			protocolPool->Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-		long long id = NumberHelper::Create();
 		protocolPool->Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
 		{
 			return XCode::MysqlStartTaskFail;
 		}
+
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
 		return mysqlTask->GetErrorCode();
@@ -123,12 +125,11 @@ namespace SoEasy
 			protocolPool->Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-		long long id = NumberHelper::Create();
 		protocolPool->Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
 		{
 			return XCode::MysqlStartTaskFail;
 		}
@@ -157,15 +158,15 @@ namespace SoEasy
 			protocolPool->Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-		long long id = NumberHelper::Create();
 		protocolPool->Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, id, tab, sql);
+		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mMysqlManager->StartTaskAction(mysqlTask))
+		if (this->mTaskManager->StartInvokeTask(mysqlTask) == 0)
 		{
 			return XCode::MysqlStartTaskFail;
 		}
+
 		this->mCorManager->YieldReturn();
 		XCode code = mysqlTask->GetErrorCode();
 		if (code == XCode::Successful)

@@ -1,5 +1,6 @@
-﻿#include "ThreadTaskManager.h"
+#include "ThreadTaskManager.h"
 #include <Thread/ThreadTaskAction.h>
+#include <Util/NumberHelper.h>
 namespace SoEasy
 {
 
@@ -23,9 +24,23 @@ namespace SoEasy
 		}
 	}
 
+	long long ThreadTaskManager::CreateTaskId()
+	{
+		return NumberHelper::Create();
+	}
+
 	void ThreadTaskManager::OnTaskFinish(long long taskId)
 	{
 		mFinishTaskQueue.AddItem(taskId);
+	}
+
+	void ThreadTaskManager::GetAllTaskThread(std::vector<long long>& threads)
+	{
+		threads.clear();
+		for (TaskThread* task : this->mThreadArray)
+		{
+			threads.push_back(task->GetThreadId());
+		}
 	}
 
 	long long ThreadTaskManager::StartInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction)

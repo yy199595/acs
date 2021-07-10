@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Manager.h"
 #include <Thread/TaskThread.h>
@@ -19,10 +19,9 @@ namespace SoEasy
 
 	public:
 		long long CreateTaskId();
-		void OnTaskFinish(long long taskId);	
+		void OnTaskFinish(long long taskId);
+		void GetAllTaskThread(std::vector<long long>& threads);
 		long long StartInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction);
-	private:
-		bool TryInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction);
 	private:
 		DoubleBufferQueue<long long> mFinishTaskQueue;				 //在其他线程完成的任务存储
 		std::unordered_map<long long, shared_ptr<ThreadTaskAction>> mThreadTaskMap;

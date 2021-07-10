@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <Protocol/s2s.pb.h>
 #include <Service/LocalService.h>
 namespace SoEasy
@@ -22,5 +22,6 @@ namespace SoEasy
         int mMysqlNodeId;
         class MysqlManager *mMysqlManager;
         class CoroutineManager *mCorManager;
+        class ThreadTaskManager* mTaskManager;
     };
 }

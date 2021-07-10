@@ -1,4 +1,4 @@
-﻿
+
 #include"Applocation.h"
 #include"ObjectRegistry.h"
 #include<Util/FileHelper.h>
@@ -75,6 +75,7 @@ namespace SoEasy
 				return false;
 			}
 		}
+
 		this->TryAddManager<TimerManager>();
 		this->TryAddManager<ActionManager>();
 		this->TryAddManager<NetSessionManager>();
@@ -102,14 +103,17 @@ namespace SoEasy
 			if (manager != nullptr)
 			{
 				this->mFrameUpdateManagers.push_back(manager1);
+				SayNoDebugLog("add " << manager->GetTypeName() << " to FrameUpdateArray");
 			}
 			if (manager2 != nullptr)
 			{
 				this->mSystemUpdateManagers.push_back(manager2);
+				SayNoDebugLog("add " << manager->GetTypeName() << " to SystemUpdateArray");
 			}
 			if (manager3 != nullptr)
 			{
 				this->mSecondUpdateManagers.push_back(manager3);
+				SayNoDebugLog("add " << manager->GetTypeName() << " to SecondUpdateArray");
 			}
 		}
 		return true;

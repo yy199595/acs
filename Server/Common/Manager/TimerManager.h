@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include<list>
 #include<queue>
 #include<thread>
@@ -10,7 +10,7 @@
 #define MaxMinute 1		//一圈轮询时间 分钟
 namespace SoEasy
 {
-	class TimerManager : public Manager,  public ISystemUpdate
+	class TimerManager : public Manager,  public IFrameUpdate
 	{
 	public:
 		TimerManager();
@@ -27,7 +27,7 @@ namespace SoEasy
  	protected:
 		bool OnInit() { return true; }
 		void OnInitComplete() final;
-		void OnSystemUpdate() final;					//处理系统事件
+		void OnFrameUpdate(float t) final;					//处理系统事件
 	private:
 		void RefreshTimer();
 		bool AddNextTimer(shared_ptr<TimerBase> timer);

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "MysqlDefine.h"
 #include <Thread/ThreadTaskAction.h>
 namespace SoEasy
@@ -9,7 +9,7 @@ namespace SoEasy
 	class MysqlThreadTask : public ThreadTaskAction
 	{
 	public:
-		MysqlThreadTask(MysqlManager *mgr, long long id, const std::string &db, const std::string & sql);
+		MysqlThreadTask(MysqlManager *mgr, const std::string &db, const std::string & sql);
 		~MysqlThreadTask() {}
 	protected:
 		void OnTaskFinish() final;

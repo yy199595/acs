@@ -1,7 +1,6 @@
-﻿#include"Manager.h"
+#include"Manager.h"
 #include"ActionManager.h"
 #include<Core/Applocation.h>
-#include<Thread/ThreadPool.h>
 #include<Thread/ThreadTaskAction.h>
 
 namespace SoEasy
@@ -26,28 +25,5 @@ namespace SoEasy
 				break;
 			}
 		}
-	}
-
-	bool Manager::StartTaskAction(shared_ptr<ThreadTaskAction> taskAction)
-	{
-		if (taskAction == nullptr)
-		{
-			return false;
-		}
-		ThreadPool * threadPool = this->GetApp()->GetThreadPool();
-		SayNoAssertRetFalse_F(threadPool);
-		long long taskId = taskAction->GetTaskId();
-		auto iter = this->mThreadTaskMap.find(taskId);
-		if (iter != this->mThreadTaskMap.end())
-		{
-			SayNoDebugError("task exits " << taskId);
-			return false;
-		}
-		if (!threadPool->StartTaskAction(taskAction))
-		{
-			this->mWaitDispatchTasks.push(taskAction);
-		}
-		this->mThreadTaskMap.emplace(taskId, taskAction);
-		return true;
 	}
 }

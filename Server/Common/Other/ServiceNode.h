@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include<Object/Object.h>
 #include<Protocol/com.pb.h>
 #include<Protocol/s2s.pb.h>
@@ -22,7 +22,7 @@ namespace SoEasy
 		bool HasService(const std::string &service);
 
 	public:
-		void OnSystemUpdate();
+		void OnFrameUpdate(float t);
 	public:
 		std::string GetJsonString();
 		XCode Notice(const std::string &service, const std::string &method); //不回应

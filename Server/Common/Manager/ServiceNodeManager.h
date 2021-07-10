@@ -1,10 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #include"Manager.h"
 namespace SoEasy
 {
 	class ServiceNode;
-	class ServiceNodeManager : public Manager, public ISystemUpdate
+	class ServiceNodeManager : public Manager, public IFrameUpdate
 	{
 	public:
 		ServiceNodeManager() { }
@@ -15,7 +15,7 @@ namespace SoEasy
 		bool AddServiceNode(ServiceNode * serviceNode);
 	protected:
 		bool OnInit() final;
-		void OnSystemUpdate() final;
+		void OnFrameUpdate(float t) final;
 	public:
 		ServiceNode * GetServiceNode(const int nodeId);
 		ServiceNode * GetServiceNode(const std::string & address);
@@ -26,6 +26,5 @@ namespace SoEasy
 		std::list<ServiceNode *> mServiceNodeArray;
 		std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
 		std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;
-		std::unordered_map<std::string, SharedTcpSession> mConnectSessionMap;
 	};
 }

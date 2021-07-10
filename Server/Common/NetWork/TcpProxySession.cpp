@@ -1,4 +1,4 @@
-﻿#include "TcpProxySession.h"
+#include "TcpProxySession.h"
 #include <Core/Applocation.h>
 #include <Pool/ObjectPool.h>
 #include <Manager/NetProxyManager.h>
@@ -45,6 +45,11 @@ namespace SoEasy
 		{
 			return false;
 		}
+#ifdef _DEBUG
+		const std::string& method = messageData->method();
+		const std::string& service = messageData->service();
+		SayNoDebugInfo("call " << service << "." << method << " [" << this->mAddress << "]");
+#endif // _DEBUG
 		Main2NetEvent *eve = new Main2NetEvent(SocketSendMsgEvent, mAddress, "", messageData);
 		return this->mNetManager->AddNetSessionEvent(eve);
 	}
