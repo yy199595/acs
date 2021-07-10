@@ -1,4 +1,4 @@
-#include "TcpProxySession.h"
+﻿#include "TcpProxySession.h"
 #include <Core/Applocation.h>
 #include <Pool/ObjectPool.h>
 #include <Manager/NetProxyManager.h>
@@ -71,7 +71,7 @@ namespace SoEasy
 		{
 			return false;
 		}
-		PB::NetWorkPacket *messageData = NetPacketPool.Create();
+		PB::NetWorkPacket *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;
@@ -87,7 +87,7 @@ namespace SoEasy
 		{
 			return false;
 		}
-		PB::NetWorkPacket *messageData = NetPacketPool.Create();
+		PB::NetWorkPacket *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;
@@ -99,7 +99,7 @@ namespace SoEasy
 			messageData->set_messagedata(mMessageBuffer);
 			return this->SendMessageData(messageData);
 		}
-		NetPacketPool.Destory(messageData);
+		GnetPacketPool.Destory(messageData);
 		return false;
 	}
 }

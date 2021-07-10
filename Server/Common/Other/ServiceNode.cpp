@@ -1,4 +1,4 @@
-#include "ServiceNode.h"
+﻿#include "ServiceNode.h"
 #include <Util/StringHelper.h>
 #include <Manager/NetProxyManager.h>
 #include <Manager/ActionManager.h>
@@ -201,7 +201,7 @@ namespace SoEasy
 
 	void ServiceNode::PushMessageData(const std::string &service, const std::string &method, const Message *request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
-		PB::NetWorkPacket *msgData = NetPacketPool.Create();
+		PB::NetWorkPacket *msgData = GnetPacketPool.Create();
 		if (msgData != nullptr)
 		{
 			if (request != nullptr)

@@ -162,7 +162,7 @@ namespace SoEasy
 				PB::NetWorkPacket *msgData = eve->GetMsgData();
 				if (msgData != nullptr)
 				{
-					NetPacketPool.Destory(msgData);
+					GnetPacketPool.Destory(msgData);
 					SayNoDebugError("send " << msgData->service() << "." << msgData->method() << " error");
 				}
 			}
@@ -171,7 +171,7 @@ namespace SoEasy
 				PB::NetWorkPacket *msgData = eve->GetMsgData();
 				if (!this->OnRecvMessage(address, msgData))
 				{
-					NetPacketPool.Destory(msgData);
+					GnetPacketPool.Destory(msgData);
 					TcpProxySession *session = this->DelProxySession(address);
 					if (session != nullptr)
 					{

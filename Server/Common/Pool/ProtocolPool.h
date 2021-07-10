@@ -9,10 +9,10 @@ namespace SoEasy
 	class ProtocolPool
 	{
 	public:
-		static ProtocolPool * Get();
 		Message * Create(const std::string & name);
 		bool Destory(Message * messageData);
 	private:
 		std::unordered_map<std::string, std::queue<Message *>> mProtocolMap;
 	};
+	extern ProtocolPool GprotocolPool;
 }

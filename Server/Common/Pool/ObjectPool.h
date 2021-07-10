@@ -70,5 +70,5 @@ namespace SoEasy
 
 namespace SoEasy
 {
-	extern thread_local ObjectPool<PB::NetWorkPacket> NetPacketPool;
+	extern thread_local ObjectPool<PB::NetWorkPacket> GnetPacketPool;
 }

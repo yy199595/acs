@@ -2,11 +2,7 @@
 #include<Define/CommonDef.h>
 namespace SoEasy
 {
-	ProtocolPool * ProtocolPool::Get()
-	{
-		static ProtocolPool obj;
-		return &obj;
-	}
+	ProtocolPool GprotocolPool;
 	Message * ProtocolPool::Create(const std::string & name)
 	{
 		if (name.empty())

@@ -2,5 +2,5 @@
 
 namespace SoEasy
 {
-	thread_local ObjectPool<PB::NetWorkPacket> NetPacketPool;
+	thread_local ObjectPool<PB::NetWorkPacket> GnetPacketPool;
 }

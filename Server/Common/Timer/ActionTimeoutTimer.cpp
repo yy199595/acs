@@ -13,11 +13,11 @@ namespace SoEasy
 
 	bool ActionTimeoutTimer::Invoke()
 	{
-		NetWorkPacket * packet = NetPacketPool.Create();
+		NetWorkPacket * packet = GnetPacketPool.Create();
 		packet->set_rpcid(this->mCallbackId);
 		packet->set_code(XCode::TimeoutAutoCall);
 		this->mActionManager->InvokeCallback(mCallbackId, packet);
-		NetPacketPool.Destory(packet);
+		GnetPacketPool.Destory(packet);
 		return false;
 	}
 }

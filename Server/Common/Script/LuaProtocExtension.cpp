@@ -1,10 +1,11 @@
 ﻿#include "LuaProtocExtension.h"
 #include<Define/CommonDef.h>
 #include<Pool/ProtocolPool.h>
+#include<Other/ObjectFactory.h>
 #include<google/protobuf/message.h>
 #include<google/protobuf/descriptor.h>
 #include<google/protobuf/util/json_util.h>
-#include<Other/ObjectFactory.h>
+
 using namespace google::protobuf;
 using namespace google::protobuf::util;
 using namespace SoEasy;
@@ -49,18 +50,17 @@ namespace LuaProtocExtension
 			return 1;
 		}
 		const char * name = lua_tostring(lua, 1);
-		ProtocolPool * pool = ProtocolPool::Get();
-		Message * pMessage = pool->Create(name);
+		Message * pMessage = GprotocolPool.Create(name);
 		if (pMessage == nullptr || !lua_getfunction(lua, "JsonUtil", "ToString"))
 		{
-			pool->Destory(pMessage);
+			GprotocolPool.Destory(pMessage);
 			lua_pushnil(lua);
 			return 1;
 		}
 		lua_pushvalue(lua, 2);
 		if (lua_pcall(lua, 1, 1, 0) != 0)
 		{
-			pool->Destory(pMessage);
+			GprotocolPool.Destory(pMessage);
 			SayNoDebugError(lua_tostring(lua, -1));
 			lua_pushnil(lua);
 			return 1;

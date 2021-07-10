@@ -50,7 +50,7 @@ namespace SoEasy
 					messageData->clear_service();
 					messageData->set_code((int)code);
 					this->mActionManager->InvokeCallback(rpcId, messageData);
-					NetPacketPool.Destory(messageData);
+					GnetPacketPool.Destory(messageData);
 				}
 			});
 		return true;
@@ -72,7 +72,7 @@ namespace SoEasy
 				XCode code = localService->InvokeMethod(address, messageData);
 				if (messageData->rpcid() == 0 || code == XCode::NotResponseMessage)
 				{
-					NetPacketPool.Destory(messageData);
+					GnetPacketPool.Destory(messageData);
 				}
 				else
 				{

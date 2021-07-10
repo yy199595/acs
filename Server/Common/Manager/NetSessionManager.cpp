@@ -55,10 +55,10 @@ namespace SoEasy
 #ifdef _DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
 #endif
-		PB::NetWorkPacket * msgData = NetPacketPool.Create();
+		PB::NetWorkPacket * msgData = GnetPacketPool.Create();
 		if (!msgData->ParseFromArray(message, size))
 		{
-			NetPacketPool.Destory(msgData);
+			GnetPacketPool.Destory(msgData);
 			return false;
 		}
 		const std::string & address = session->GetAddress();
@@ -78,10 +78,10 @@ namespace SoEasy
 			return false;
 		}
 
-		PB::NetWorkPacket * msgData = NetPacketPool.Create();
+		PB::NetWorkPacket * msgData = GnetPacketPool.Create();
 		if (!msgData->ParseFromArray(message, size))
 		{
-			NetPacketPool.Destory(msgData);
+			GnetPacketPool.Destory(msgData);
 			return false;
 		}
 		const std::string & address = session->GetAddress();
@@ -216,7 +216,7 @@ namespace SoEasy
 			char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 			if (!messageData->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 			{
-				NetPacketPool.Destory(messageData);
+				GnetPacketPool.Destory(messageData);
 				SayNoDebugError("Serialize Fail : " << messageData->method());
 			}
 			else
@@ -226,7 +226,7 @@ namespace SoEasy
 				memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
 				if (session->SendPackage(make_shared<string>(this->mSendSharedBuffer, length)))
 				{
-					NetPacketPool.Destory(messageData);				
+					GnetPacketPool.Destory(messageData);				
 				}
 				else
 				{
