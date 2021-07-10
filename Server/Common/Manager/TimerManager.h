@@ -10,7 +10,7 @@
 #define MaxMinute 1		//一圈轮询时间 分钟
 namespace SoEasy
 {
-	class TimerManager : public Manager
+	class TimerManager : public Manager,  public ISystemUpdate
 	{
 	public:
 		TimerManager();

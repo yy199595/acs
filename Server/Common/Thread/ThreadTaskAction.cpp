@@ -1,17 +1,21 @@
-#include"ThreadTaskAction.h"
-#include<Manager/Manager.h>
-#include<Util/TimeHelper.h>
+#include "ThreadTaskAction.h"
+#include <Util/TimeHelper.h>
+#include <Util/NumberHelper.h>
+#include <Manager/ThreadTaskManager.h>
 namespace SoEasy
 {
-	ThreadTaskAction::ThreadTaskAction(Manager * manager, long long id)
+	ThreadTaskAction::ThreadTaskAction()
 	{
-		this->mTaskActionId = id;
-		this->mBindManager = manager;
 		this->mStartTime = TimeHelper::GetMilTimestamp();
 	}
-	void ThreadTaskAction::NoticeToMainThread()
+
+	bool ThreadTaskAction::InitTaskAction(ThreadTaskManager *taskManager)
 	{
-		SayNoAssertRet_F(this->mBindManager);
-		this->mBindManager->AddFinishTask(this->mTaskActionId);
+		if (taskManager == nullptr)
+		{
+			return false;
+		}
+		this->mTaskActionId = taskManager->CreateTaskId();
+		return true;
 	}
 }

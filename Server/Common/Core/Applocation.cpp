@@ -2,7 +2,6 @@
 #include"Applocation.h"
 #include"ObjectRegistry.h"
 #include<Util/FileHelper.h>
-#include<Thread/ThreadPool.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
@@ -23,7 +22,6 @@ namespace SoEasy
 		this->mDelatime = 0;
 		this->mLogicTime = 0;
 		this->mIsClose = false;
-		this->mThreadPool = nullptr;
 		this->mServerName = srvName;
 		this->mLogicRunCount = 0;
 		this->mSystemRunCount = 0;
@@ -67,11 +65,6 @@ namespace SoEasy
 		{
 			SayNoDebugError("not find field : Managers");
 			return false;
-		}
-		unsigned int count = 0;
-		if (mConfig.GetValue("ThreadCount", count))
-		{
-			this->mThreadPool = new ThreadPool(count);
 		}
 
 		for (size_t index = 0; index < managers.size(); index++)
@@ -172,8 +165,7 @@ namespace SoEasy
 		long long fristTimer = TimeHelper::GetMilTimestamp();
 		long long startTimer = TimeHelper::GetMilTimestamp();
 		long long secondTimer = TimeHelper::GetMilTimestamp();
-		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();	
-		this->mLastSystemTime = TimeHelper::GetMilTimestamp();
+		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
 		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
 		int logicFps = 30;
 		int systemFps = 100;

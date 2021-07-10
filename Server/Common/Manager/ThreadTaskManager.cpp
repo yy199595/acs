@@ -1,7 +1,48 @@
 ﻿#include "ThreadTaskManager.h"
-
+#include <Thread/ThreadTaskAction.h>
 namespace SoEasy
 {
+
+	bool ThreadTaskManager::OnInit()
+	{
+		this->mThreadCount = (int)std::thread::hardware_concurrency();
+		SayNoAssertRetFalse_F(this->GetConfig().GetValue("ThreadCount", this->mThreadCount));	
+		return true;
+	}
+
+	void ThreadTaskManager::OnInitComplete()
+	{
+		for (int index = 0; index < this->mThreadCount; index++)
+		{
+			TaskThread *taskThread = new TaskThread(this);
+			if (taskThread != nullptr)
+			{
+				mThreadArray.push_back(taskThread);
+				SayNoDebugLog("start new thread id " << taskThread->GetThreadId());
+			}
+		}
+	}
+
+	void ThreadTaskManager::OnTaskFinish(long long taskId)
+	{
+		mFinishTaskQueue.AddItem(taskId);
+	}
+
+	long long ThreadTaskManager::StartInvokeTask(std::shared_ptr<ThreadTaskAction> taskAction)
+	{
+		if (taskAction == nullptr || !taskAction->InitTaskAction(this))
+		{
+			return 0;
+		}		
+		if(this->mThreadIndex == this->mThreadArray.size())
+		{
+			this->mThreadIndex = 0;
+		}
+		this->mThreadTaskMap.emplace(taskAction->GetTaskId(), taskAction);
+		this->mThreadArray[this->mThreadIndex]->AddTaskAction(taskAction);
+		return taskAction->GetTaskId();
+	}
+
 	void ThreadTaskManager::OnSystemUpdate()
 	{
 		long long taskId = 0;
@@ -15,21 +56,9 @@ namespace SoEasy
 				if (taskAction != nullptr)
 				{
 					taskAction->OnTaskFinish();
-					this->OnTaskFinish(taskAction);
 				}
 				this->mThreadTaskMap.erase(iter);
 			}
-		}
-		while (!this->mWaitDispatchTasks.empty())
-		{
-			shared_ptr<ThreadTaskAction> taskAction = this->mWaitDispatchTasks.front();
-			ThreadPool * threadPool = this->GetApp()->GetThreadPool();
-			if (threadPool->StartTaskAction(taskAction))
-			{
-				this->mWaitDispatchTasks.pop();
-				continue;
-			}
-			break;
 		}
 	}
 }

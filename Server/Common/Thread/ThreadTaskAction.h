@@ -1,20 +1,22 @@
 ﻿#pragma once
-#include<memory>
-#include<Manager/Manager.h>
+#include <memory>
 namespace SoEasy
 {
+	class ThreadTaskManager;
 	class ThreadTaskAction
 	{
 	public:
-		ThreadTaskAction(long long id);
-		virtual ~ThreadTaskAction() { }
+		ThreadTaskAction();
+		virtual ~ThreadTaskAction() {}
+	public:
+		bool InitTaskAction(ThreadTaskManager *taskManager);
 	public:
 		long long GetTaskId() { return this->mTaskActionId; }
 	public:
-		void NoticeToMainThread();
 		virtual void OnTaskFinish() = 0;
-		virtual void InvokeInThreadPool(long long threadId) = 0;	//在线程池执行的任务
+		virtual void InvokeInThreadPool(long long threadId) = 0; //在线程池执行的任务
 		long long GetStartTime() { return this->mStartTime; }
+
 	private:
 		long long mStartTime;
 		long long mTaskActionId;

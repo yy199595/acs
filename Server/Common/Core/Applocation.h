@@ -73,8 +73,7 @@ namespace SoEasy
 		long long mLogicRunCount;
 		long long mSystemRunCount;
 		long long mMainLoopStartTime;
-	private:
-		ThreadPool * mThreadPool;		
+	private:	
 		static Applocation * mApplocation;
 		std::unordered_map<std::string, Manager *> mManagerMap;
 	private:

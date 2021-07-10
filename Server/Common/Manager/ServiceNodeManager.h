@@ -4,7 +4,7 @@
 namespace SoEasy
 {
 	class ServiceNode;
-	class ServiceNodeManager : public Manager
+	class ServiceNodeManager : public Manager, public ISystemUpdate
 	{
 	public:
 		ServiceNodeManager() { }

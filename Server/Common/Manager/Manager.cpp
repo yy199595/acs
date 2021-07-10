@@ -14,18 +14,6 @@ namespace SoEasy
 
 	}
 	
-
-
-	Manager::Manager(const int priority) : mPriority(priority)
-	{
-
-	}
-	
-	void Manager::AddFinishTask(long long taskId)
-	{
-		this->mFinishTaskQueue.AddItem(taskId);
-	}
-
 	void Manager::ForeachManagers(std::function<bool(Manager*)> action)
 	{
 		std::vector<Manager *> managers;
@@ -38,11 +26,6 @@ namespace SoEasy
 				break;
 			}
 		}
-	}
-
-	void Manager::OnSystemUpdate()
-	{	
-		
 	}
 
 	bool Manager::StartTaskAction(shared_ptr<ThreadTaskAction> taskAction)

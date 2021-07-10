@@ -3,6 +3,7 @@
 #include<queue>
 #include"ThreadTaskAction.h"
 #include<condition_variable>
+#include<Other/DoubleBufferQueue.h>
 namespace SoEasy
 {
 	enum ThreadState
@@ -11,14 +12,15 @@ namespace SoEasy
 		Running,
 	};
 	class ThreadPool;
+	class ThreadTaskManager;
 	class TaskThread
 	{
 	public:
-		TaskThread();
+		TaskThread(ThreadTaskManager * taskManaer);
 	public:
 		void WaitToNextWake();
 		long long GetThreadId() { return mThreadId; }
-		bool AddTaskAction(SharedThreadTask taskAction);
+		void AddTaskAction(SharedThreadTask taskAction);
 		ThreadState GetTaskState() { return this->mTaskState; }
 		bool IsRunning() { return this->mTaskState == Running; }
 	private:
@@ -28,7 +30,8 @@ namespace SoEasy
 		std::mutex mThreadLock;
 		ThreadState mTaskState;
 		std::thread * mBindThread;
+		ThreadTaskManager * mTaskManager;
 		std::condition_variable mThreadVarible;
-		std::queue<SharedThreadTask> mWaitInvokeTask;
+		DoubleBufferQueue<SharedThreadTask> mWaitInvokeTask;
 	};
 }

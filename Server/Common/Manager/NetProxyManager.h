@@ -6,11 +6,10 @@
 namespace SoEasy
 {
 	// session 代理管理器 负责与网络线程通信 处理网络事件
-	class NetProxyManager : public Manager
+	class NetProxyManager : public Manager, public ISystemUpdate
 	{
 	public:
-		friend class NetSessionManager;
-		NetProxyManager() : Manager(1) {}
+		NetProxyManager() {}
 		virtual ~NetProxyManager() { }
 
 	public:

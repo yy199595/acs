@@ -1,13 +1,16 @@
-#include"TaskThread.h"
-#include<chrono>
-#include<sstream>
+#include "TaskThread.h"
+#include <chrono>
+#include <sstream>
+#include <functional>
+#include<Manager/ThreadTaskManager.h>
 using namespace std::chrono;
 namespace SoEasy
 {
-	TaskThread::TaskThread()
+	TaskThread::TaskThread(ThreadTaskManager * manager)
 	{
 		this->mThreadId = 0;
 		this->mTaskState = Idle;
+		this->mTaskManager = manager;
 		std::stringstream streamBuffer;
 		this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
 		if (this->mBindThread != nullptr)
@@ -23,40 +26,29 @@ namespace SoEasy
 		this->mThreadVarible.wait(lck);
 	}
 
-	bool TaskThread::AddTaskAction(SharedThreadTask taskAction)
+	void TaskThread::AddTaskAction(SharedThreadTask taskAction)
 	{
-		if (this->mTaskState == Idle)
-		{
-			this->mThreadLock.lock();
-			this->mWaitInvokeTask.push(taskAction);
-			this->mThreadLock.unlock();
-			this->mThreadVarible.notify_one();
-			return true;
-		}
-		return false;
+		this->mTaskState = ThreadState::Running;
+		this->mWaitInvokeTask.AddItem(taskAction);
+		this->mThreadVarible.notify_one();
 	}
 
 	void TaskThread::Run()
 	{
 		while (true)
 		{
-			if (this->mWaitInvokeTask.empty())
-			{
-				this->mTaskState = Idle;
-				std::unique_lock<std::mutex> waitLock(this->mThreadLock);
-				this->mThreadVarible.wait(waitLock);
-			}
-			else
-			{
-				this->mThreadLock.lock();
-				this->mTaskState = Running;
-				SharedThreadTask taskAction = this->mWaitInvokeTask.front();
-				this->mWaitInvokeTask.pop();
-				this->mThreadLock.unlock();
+			SharedThreadTask taskAction;
+			this->mWaitInvokeTask.SwapQueueData();
 
+			while (this->mWaitInvokeTask.PopItem(taskAction))
+			{
 				taskAction->InvokeInThreadPool(this->mThreadId);
-				taskAction->NoticeToMainThread();// 通知到主线程
+				taskAction->NoticeToMainThread(); // 通知到主线程
 			}
+
+			this->mTaskState = ThreadState::Idle;
+			std::unique_lock<std::mutex> waitLock(this->mThreadLock);
+			this->mThreadVarible.wait(waitLock);
 		}
 	}
 }
