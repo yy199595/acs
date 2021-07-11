@@ -217,7 +217,7 @@ namespace SoEasy
 			msgData->set_service(service);
 			if (rpcReply != nullptr)
 			{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 				rpcReply->mMethod = method;
 				rpcReply->mService = service;
 #endif

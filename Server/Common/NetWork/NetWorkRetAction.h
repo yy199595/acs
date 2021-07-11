@@ -28,7 +28,7 @@ namespace SoEasy
 		long long mCreateTime;
 		std::string mFunctionName;
 	public:
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		std::string mService;
 		std::string mMethod;
 #endif

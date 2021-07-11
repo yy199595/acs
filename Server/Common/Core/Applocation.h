@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
@@ -66,7 +66,6 @@ namespace SoEasy
 	private:
 		float mLogicFps;
 		float mDelatime;
-		float mSystemFps;
 	private:	
 		long long mLogicRunCount;
 		long long mSystemRunCount;

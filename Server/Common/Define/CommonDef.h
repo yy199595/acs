@@ -89,3 +89,5 @@ inline std::string FromatFileLine(const char * file, const int line)
 #define BIND_THIS_ACTION_2(func) std::bind(&func, this, args1, args2)
 #define BIND_THIS_ACTION_3(func) std::bind(&func, this, args1, args2, args3)
 #define BIND_THIS_ACTION_4(func) std::bind(&func, this, args1, args2, args3, args4)
+
+#define SOEASY_DEBUG

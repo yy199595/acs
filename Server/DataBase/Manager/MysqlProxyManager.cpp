@@ -60,7 +60,7 @@ namespace SoEasy
             requestData->set_protocolmessage(messageData);
         }
         XCode code = proxyNode->Call("MysqlProxy", "Insert", *requestData, *responseData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {
             SayNoDebugError("[mysql error] : " << responseData->errorstr());
@@ -90,7 +90,7 @@ namespace SoEasy
             requestData->set_protocolmessage(messageData);
         }
         XCode code = proxyNode->Call("MysqlProxy", "Save", *requestData, *responseData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {
             SayNoDebugError("[mysql error] : " << responseData->errotstr());
@@ -127,7 +127,7 @@ namespace SoEasy
             requestData->set_protocolmessage(messageData);
         }
         XCode code = proxyNode->Call("MysqlProxy", "Save", *requestData, *responseData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {
             SayNoDebugError("[mysql error] : " << responseData->errorstr());
@@ -156,7 +156,7 @@ namespace SoEasy
             requestData->set_protocolmessage(messageData);
         }
         XCode code = proxyNode->Call("MysqlProxy", "Delete", *requestData, *responseData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {
             SayNoDebugError("[mysql error] : " << responseData->errorstr());

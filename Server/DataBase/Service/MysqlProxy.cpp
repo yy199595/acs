@@ -57,7 +57,7 @@ namespace SoEasy
 			return XCode::CallArgsError;
 		}
 		GprotocolPool.Destory(protocolMessage);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
@@ -70,10 +70,10 @@ namespace SoEasy
 		
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
 		SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -96,7 +96,7 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
 		GprotocolPool.Destory(protocolMessage);
@@ -110,10 +110,10 @@ namespace SoEasy
 
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
 		SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -136,7 +136,7 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
 		GprotocolPool.Destory(protocolMessage);
@@ -149,10 +149,10 @@ namespace SoEasy
 		}
 		this->mCorManager->YieldReturn();
 		response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
 		SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 		return mysqlTask->GetErrorCode();
     }
 
@@ -176,7 +176,7 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
 		GprotocolPool.Destory(protocolMessage);
@@ -205,10 +205,10 @@ namespace SoEasy
 			return XCode::Successful;
 		}
 		response.set_errotstr(mysqlTask->GetErrorStr());
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
 		SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 		return code;
 	}
 

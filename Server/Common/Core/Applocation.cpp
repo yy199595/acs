@@ -187,8 +187,8 @@ namespace SoEasy
 		const long long systemUpdateInterval = 1000 / systemFps;
 		while (!this->mIsClose)
 		{
+			std::this_thread::sleep_for(1ms);
 			startTimer = TimeHelper::GetMilTimestamp();
-			std::this_thread::sleep_for(chrono::milliseconds(1));
 			for (size_t index = 0; index < this->mSystemUpdateManagers.size(); index++)
 			{
 				this->mSystemUpdateManagers[index]->OnSystemUpdate();			
@@ -233,13 +233,11 @@ namespace SoEasy
 	{
 		long long nowTime = TimeHelper::GetMilTimestamp();
 		float seconds = (nowTime - this->mMainLoopStartTime) / 1000.0f;
-		this->mSystemFps = this->mSystemRunCount / seconds;
 		this->mLogicFps = this->mLogicRunCount / seconds;
 #ifdef _WIN32
-		std::string contitle = this->mServerName + " system:" + 
-			std::to_string(this->mSystemFps)+ "  logic:" + std::to_string(this->mLogicFps);
-		SetConsoleTitle(contitle.c_str());
-#endif
-		
+		char buffer[100] = { 0 };
+		sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
+		SetConsoleTitle(buffer);
+#endif	
 	}
 }

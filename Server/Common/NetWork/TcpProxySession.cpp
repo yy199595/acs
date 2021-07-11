@@ -34,7 +34,7 @@ namespace SoEasy
 	{
 		Main2NetEvent *eve = new Main2NetEvent(SocketDectoryEvent, mAddress);
 		this->mNetManager->AddNetSessionEvent(eve);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoDebugError("desctory session [" << this->mAddress << "]");
 #endif
 	}
@@ -45,11 +45,11 @@ namespace SoEasy
 		{
 			return false;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		const std::string& method = messageData->method();
 		const std::string& service = messageData->service();
 		SayNoDebugInfo("call " << service << "." << method << " [" << this->mAddress << "]");
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 		Main2NetEvent *eve = new Main2NetEvent(SocketSendMsgEvent, mAddress, "", messageData);
 		return this->mNetManager->AddNetSessionEvent(eve);
 	}

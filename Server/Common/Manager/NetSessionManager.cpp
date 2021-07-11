@@ -26,7 +26,7 @@ namespace SoEasy
 
 	void NetSessionManager::OnConnectSuccess(TcpClientSession * session)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
 #endif
 		const std::string & address = session->GetAddress();
@@ -41,7 +41,7 @@ namespace SoEasy
 
 	void NetSessionManager::OnSessionError(TcpClientSession * session, Net2MainEventType type)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
 #endif
 		const std::string & address = session->GetAddress();
@@ -52,7 +52,7 @@ namespace SoEasy
 
 	bool NetSessionManager::OnRecvMessage(TcpClientSession * session, const char * message, const size_t size)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
 #endif
 		PB::NetWorkPacket * msgData = GnetPacketPool.Create();
@@ -70,7 +70,7 @@ namespace SoEasy
 
 	bool NetSessionManager::OnSendMessageError(TcpClientSession * session, const char * message, const size_t size)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
 #endif
 		if (message == nullptr || size == 0)
@@ -92,7 +92,7 @@ namespace SoEasy
 
 	bool NetSessionManager::AddNetSessionEvent(Main2NetEvent * eve)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(!this->IsInNetThead());
 #endif
 		if (eve->GetEventType() == SocketSendMsgEvent)
@@ -108,7 +108,7 @@ namespace SoEasy
 
 	TcpClientSession * NetSessionManager::Create(shared_ptr<AsioTcpSocket> socket)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
 		TcpClientSession * session = new TcpClientSession(this, socket);
@@ -125,7 +125,7 @@ namespace SoEasy
 
 	TcpClientSession * NetSessionManager::Create(const std::string & name, const std::string & address)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
 		auto iter = this->mSessionAdressMap.find(address);
@@ -157,10 +157,11 @@ namespace SoEasy
 	void NetSessionManager::NetUpdate()
 	{
 		Main2NetEvent * sessionEvent = nullptr;
-		auto sleep = std::chrono::milliseconds(1);
 		this->mNetThreadId = std::this_thread::get_id();
 		while (this->mIsClose == false)
 		{
+			this_thread::sleep_for(1ms);
+
 			this->mAsioContext.poll();
 			if (this->mListenerManager)
 			{
@@ -183,7 +184,7 @@ namespace SoEasy
 				this->HandlerMainThreadEvent(sessionEvent);
 				delete sessionEvent;
 			}
-			std::this_thread::sleep_for(sleep);			
+				
 		}
 	}
 	bool NetSessionManager::IsInNetThead()
@@ -240,7 +241,7 @@ namespace SoEasy
 
 	TcpClientSession * NetSessionManager::GetSession(const std::string & address)
 	{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
 		auto iter = this->mSessionAdressMap.find(address);

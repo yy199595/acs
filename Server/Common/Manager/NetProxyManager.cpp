@@ -101,7 +101,7 @@ namespace SoEasy
 					TcpProxySession *session = iter->second;
 					this->mSessionMap.emplace(address, session);
 					this->mConnectSessionMap.erase(iter);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 					SayNoDebugInfo("connect to " << address << " successful");
 #endif
 					this->OnConnectSuccessful(session);
@@ -114,7 +114,7 @@ namespace SoEasy
 				{
 					session = new TcpProxySession(address);
 					this->mSessionMap.emplace(address, session);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 					SayNoDebugInfo("new session connect [" << address << "]");
 #endif
 				}
@@ -127,7 +127,7 @@ namespace SoEasy
 				{
 					TcpProxySession *session = iter->second;
 					this->mTimerManager->AddTimer(this->mReConnectTime, BIND_ACTION_0(TcpProxySession::StartConnect, session));
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 					const std::string &name = eve->GetName();
 					SayNoDebugWarning("connect " << name << " " << address << "fail");
 #endif
@@ -146,7 +146,7 @@ namespace SoEasy
 					{
 						this->mConnectSessionMap.emplace(tcpSession->GetAddress(), tcpSession);
 						this->mTimerManager->AddTimer(this->mReConnectTime, BIND_ACTION_0(TcpProxySession::StartConnect, tcpSession));
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 						SayNoDebugError("receive message error re connect [" << tcpSession->GetConnectCount() << "]");
 #endif
 					}

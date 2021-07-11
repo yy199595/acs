@@ -47,7 +47,7 @@ namespace SoEasy
 			if (action != nullptr)
 			{
 				action->Invoke(messageData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 				double t = (TimeHelper::GetMilTimestamp() - action->GetCreateTime()) / 1000.0f;
 				SayNoDebugWarning("call " << action->mService <<"." << action->mMethod << " response" << " [" << t << "s]");
 #endif	

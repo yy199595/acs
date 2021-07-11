@@ -87,7 +87,7 @@ namespace Client
 		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCoroutineManager);
 		if (rpcCallback != nullptr)
 		{
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 			rpcCallback->mMethod = method;
 			rpcCallback->mService = service;
 #endif

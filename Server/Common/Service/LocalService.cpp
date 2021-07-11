@@ -57,7 +57,7 @@ namespace SoEasy
 			SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
 			return false;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		actionBox->mServiceName = this->GetServiceName();
 #endif
 		this->mActionMap.emplace(name, actionBox);

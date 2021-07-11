@@ -4,9 +4,9 @@
 #include<Protocol/com.pb.h>
 #include<Other/ObjectFactory.h>
 #include<Pool/ObjectPool.h>
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 #include<google/protobuf/util/json_util.h>
-#endif // _DEBUG
+#endif // SOEASY_DEBUG
 
 using namespace PB;
 namespace SoEasy
@@ -38,7 +38,7 @@ namespace SoEasy
 	protected:
 		std::string mActionName;
 	public:
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		std::string mServiceName;
 #endif
 
@@ -92,14 +92,14 @@ namespace SoEasy
 			SayNoDebugError("parse proto fail : " << mRequestData->GetTypeName());
 			return XCode::ParseMessageError;
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		std::string json;
 		util::MessageToJsonString(*mRequestData, &json);
 		SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName()
 			<< "(" << mRequestData->GetTypeName() << ")] : " << json);
 #endif
 		XCode code = this->mBindAction(operId, *mRequestData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		if (messageData->rpcid() != 0)
 		{
 			SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName() << "]");
@@ -141,7 +141,7 @@ namespace SoEasy
 			return XCode::ParseMessageError;
 		}
 		T2 * responseData = this->mResponseDataPool.Create();
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		std::string json;
 		util::MessageToJsonString(*requestData, &json);
 		SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName()
@@ -153,7 +153,7 @@ namespace SoEasy
 			messageData->set_messagedata(mMessageBuffer);
 			messageData->set_protocname(responseData->GetTypeName());
 		}
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 		util::MessageToJsonString(*responseData, &json);
 		SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName()
 			<<"(" << responseData->GetTypeName() << ")] : " << json);
@@ -175,11 +175,11 @@ namespace SoEasy
 		{
 			T1 * responseData = mResponseDataPool.Create();
 			const long long operId = messageData->entityid();
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 			SayNoDebugWarning("[request ] [" << this->mServiceName << "." << this->GetName() << "]");
 #endif
 			XCode code = this->mBindAction(operId, *responseData);
-#ifdef _DEBUG
+#ifdef SOEASY_DEBUG
 			std::string json;
 			util::MessageToJsonString(*responseData, &json);
 			SayNoDebugWarning("[response] [" << this->mServiceName << "." << this->GetName()

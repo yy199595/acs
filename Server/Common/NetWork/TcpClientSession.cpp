@@ -21,11 +21,16 @@ namespace SoEasy
 	TcpClientSession::TcpClientSession(NetSessionManager * manager, std::string name, std::string ip, unsigned short port)
 		:mAsioContext(manager->GetAsioCtx())
 	{		
+		asio::error_code ec;
 		this->mSessionName = name;
 		this->InitMember(ip, port);
 		this->mDispatchManager = manager;
 		this->mSessionType = SessionNode;
-		this->mSocketEndPoint = asio::ip::tcp::endpoint(asio::ip::address::from_string(mIp), mPort);
+		this->mSocketEndPoint = asio::ip::tcp::endpoint(asio::ip::make_address(mIp, ec), mPort);
+		if (ec)
+		{
+			SayNoDebugError(ec.message());
+		}
 	}
 
 	void TcpClientSession::InitMember(const std::string & ip, unsigned short port)

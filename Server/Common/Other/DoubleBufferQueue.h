@@ -17,24 +17,25 @@ namespace SoEasy
 	private:
 		std::mutex mLock;
 	private:
-		std::queue<T> mWorkQueue;
-		std::queue<T> mCacheQueue;
+		std::queue<T> mReadQueue;
+		std::queue<T> mWrterQueue;
 	};
 
 	template<typename T>
 	inline void DoubleBufferQueue<T>::AddItem(const T & item)
 	{
 		mLock.lock();
-		mCacheQueue.push(item);
+		mWrterQueue.emplace(item);
 		mLock.unlock();
 	}
 	template<typename T>
 	inline void DoubleBufferQueue<T>::SwapQueueData()
 	{
-		if (!this->mCacheQueue.empty() && this->mWorkQueue.empty())
+		if (!this->mWrterQueue.empty() && this->mReadQueue.empty())
 		{
 			mLock.lock();
-			std::swap(this->mCacheQueue, this->mWorkQueue);
+			//std::swap(this->mCacheQueue, this->mWorkQueue);
+			this->mReadQueue.swap(this->mWrterQueue);
 			mLock.unlock();
 		}
 
@@ -42,10 +43,10 @@ namespace SoEasy
 	template<typename T>
 	inline bool DoubleBufferQueue<T>::PopItem(T & item)
 	{
-		if (!this->mWorkQueue.empty())
+		if (!this->mReadQueue.empty())
 		{
-			item = this->mWorkQueue.front();
-			this->mWorkQueue.pop();
+			item = this->mReadQueue.front();
+			this->mReadQueue.pop();
 			return true;
 		}
 		return false;

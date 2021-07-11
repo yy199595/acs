@@ -1,4 +1,4 @@
-#define  _CRT_SECURE_NO_WARNINGS
+﻿#define  _CRT_SECURE_NO_WARNINGS
 #include"TimeHelper.h"
 #include<chrono>
 #include<time.h>
@@ -18,22 +18,19 @@ std::string TimeHelper::GetDateStr(long long time)
 long long TimeHelper::GetMilTimestamp()
 {
 	auto tmp = system_clock::now().time_since_epoch();
-	auto timeNow = duration_cast<milliseconds>(tmp);
-	return timeNow.count();
+	return duration_cast<milliseconds>(tmp).count();
 }
 
 long long TimeHelper::GetSecTimeStamp()
 {
 	auto tmp = system_clock::now().time_since_epoch();
-	auto timeNow = duration_cast<seconds>(tmp);
-	return timeNow.count();
+	return duration_cast<seconds>(tmp).count();
 }
 
 long long TimeHelper::GetMicTimeStamp()
 {
 	auto tmp = system_clock::now().time_since_epoch();
-	auto timeNow = duration_cast<microseconds>(tmp);
-	return timeNow.count();
+	return duration_cast<microseconds>(tmp).count();
 }
 
 std::string TimeHelper::GetDateString(long long time)
