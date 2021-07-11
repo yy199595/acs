@@ -37,7 +37,10 @@ namespace SoEasy
 		}
 
 		int count = this->mTaskManager->GetThreadCount();
-
+		if (count == 0)
+		{
+			return false;
+		}
 		for (int index = 0; index < count; index++)
 		{			
 			redisContext * pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
@@ -59,8 +62,8 @@ namespace SoEasy
 			}
 		
 			this->mRedisContextMap.emplace(index, pRedisContext);
-			SayNoDebugLog("connect redis successful " << mRedisIp << ":" << mRedisPort);
 		}
+		SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "] count [" << count << "]");
 		
 		return true;
 	}

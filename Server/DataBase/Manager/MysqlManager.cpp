@@ -191,6 +191,10 @@ namespace SoEasy
 		const char *userName = this->mDataBaseUser.c_str();
 
 		int count = this->mTaskManager->GetThreadCount();
+		if (count == 0)
+		{
+			return false;
+		}
 		for (int index = 0; index < count; index++)
 		{		
 			SayNoMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
@@ -201,8 +205,8 @@ namespace SoEasy
 				return false;
 			}
 			this->mMysqlSocketMap.insert(std::make_pair(index, this->mMysqlSockt));
-			SayNoDebugInfo("connect mysql successful " << ip << ":" << port << "  " << userName << " " << passWd);
 		}
+		SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "]  [" << userName << "] " << "[ count" << count << "]");
 		return true;
 	}
 

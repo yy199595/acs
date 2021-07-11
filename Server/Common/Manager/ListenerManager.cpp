@@ -39,6 +39,7 @@ namespace SoEasy
 
 			this->mIsAccept = true;
 			this->mBindAcceptor->listen();
+			SayNoDebugInfo("start listener {" << this->mListenAddress << "}");
 			return true;
 		}
 		catch (const asio::system_error & e)

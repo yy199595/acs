@@ -189,7 +189,6 @@ namespace SoEasy
 				SayNoDebugError("init " << name << " service fail");
 				return false;
 			}
-			SayNoDebugLog("add new service " << name);
 			this->mLocalServiceMap.emplace(name, localService);
 		}
 		return true;
