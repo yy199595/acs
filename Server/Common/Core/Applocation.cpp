@@ -95,8 +95,7 @@ namespace SoEasy
 			{
 				SayNoDebugError("init " << manager->GetTypeName() << " fail");
 				return false;
-			}
-			SayNoDebugLog("init " << manager->GetTypeName() << " successful");
+			}			
 			IFrameUpdate * manager1 = dynamic_cast<IFrameUpdate *>(manager);
 			ISystemUpdate * manager2 = dynamic_cast<ISystemUpdate *>(manager);
 			ISecondUpdate * manager3 = dynamic_cast<ISecondUpdate *>(manager);

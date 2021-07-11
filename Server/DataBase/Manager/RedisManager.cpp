@@ -63,7 +63,7 @@ namespace SoEasy
 		
 			this->mRedisContextMap.emplace(index, pRedisContext);
 		}
-		SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "] count [" << count << "]");
+		SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]  [ count:" << count << "]");
 		
 		return true;
 	}

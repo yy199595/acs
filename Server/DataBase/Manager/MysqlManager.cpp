@@ -206,7 +206,7 @@ namespace SoEasy
 			}
 			this->mMysqlSocketMap.insert(std::make_pair(index, this->mMysqlSockt));
 		}
-		SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "]  [" << userName << "] " << "[ count" << count << "]");
+		SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "] [count:" << count << "]");
 		return true;
 	}
 
