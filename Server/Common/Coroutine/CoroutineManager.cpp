@@ -74,14 +74,14 @@ namespace SoEasy
 		}
 	}
 
-	long long CoroutineManager::Start(const std::string & name, CoroutineAction func)
+	long long CoroutineManager::Start(CoroutineAction func)
 	{
-		long long id = this->Create(name, func);
+		long long id = this->Create(func);
 		this->Resume(id);
 		return id;
 	}
 
-	long long CoroutineManager::Create(const std::string & name, CoroutineAction func)
+	long long CoroutineManager::Create(CoroutineAction func)
 	{
 		long long id = NumberHelper::Create();
 		Coroutine *	pCoroutine = nullptr;
@@ -98,7 +98,6 @@ namespace SoEasy
 		}
 		pCoroutine->mBindFunc = func;
 		pCoroutine->mCoroutineId = id;
-		pCoroutine->mCoroutineName = name;
 		pCoroutine->mState = CorState::Ready;
 		this->mCoroutineMap.insert(std::make_pair(id, pCoroutine));
 		return pCoroutine->mCoroutineId;

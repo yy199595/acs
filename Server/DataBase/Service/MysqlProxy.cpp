@@ -179,7 +179,6 @@ namespace SoEasy
 #ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
-		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
@@ -204,11 +203,12 @@ namespace SoEasy
 			}
 			return XCode::Successful;
 		}
+		GprotocolPool.Destory(protocolMessage);
 		response.set_errotstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
 		SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
-#endif // SOEASY_DEBUG
+#endif
 		return code;
 	}
 

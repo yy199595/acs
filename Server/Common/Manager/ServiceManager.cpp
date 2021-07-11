@@ -28,8 +28,7 @@ namespace SoEasy
 		for (; iter != this->mLocalServiceMap.end(); iter++)
 		{
 			LocalService *localService = iter->second;
-			auto cb = BIND_ACTION_0(LocalService::OnInitComplete, localService);
-			this->mCorManager->Start(localService->GetServiceName() + ".Init", cb);
+			this->mCorManager->Start(BIND_ACTION_0(LocalService::OnInitComplete, localService));
 		}
 	}
 
@@ -38,9 +37,10 @@ namespace SoEasy
 		ServiceBase * localService = this->GetService(messageData->service());
 		if (localService == nullptr || localService->HasMethod(messageData->method()))
 		{
+			GnetPacketPool.Destory(messageData);
 			return false;
 		}
-		this->mCorManager->Start(messageData->method(), [localService, this, messageData]()
+		this->mCorManager->Start([localService, this, messageData]()
 			{
 				long long rpcId = messageData->rpcid();
 				XCode code = localService->InvokeMethod(messageData);
@@ -50,8 +50,8 @@ namespace SoEasy
 					messageData->clear_service();
 					messageData->set_code((int)code);
 					this->mActionManager->InvokeCallback(rpcId, messageData);
-					GnetPacketPool.Destory(messageData);
 				}
+				GnetPacketPool.Destory(messageData);
 			});
 		return true;
 	}
@@ -63,11 +63,12 @@ namespace SoEasy
 		ServiceBase * localService = this->GetService(service);
 		if (localService == nullptr || !localService->HasMethod(method))
 		{
+			GnetPacketPool.Destory(messageData);
 			SayNoDebugError("call function not find [" << service << "." << method << "]");
 			return false;
 		}
 
-		this->mCorManager->Start(method, [address, localService, this, messageData]()
+		this->mCorManager->Start([address, localService, this, messageData]()
 			{
 				XCode code = localService->InvokeMethod(address, messageData);
 				if (messageData->rpcid() == 0 || code == XCode::NotResponseMessage)

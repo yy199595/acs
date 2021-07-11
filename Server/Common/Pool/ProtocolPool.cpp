@@ -12,7 +12,7 @@ namespace SoEasy
 		auto iter = this->mProtocolMap.find(name);
 		if (iter != this->mProtocolMap.end())
 		{
-			std::queue<Message *> messageQueue = iter->second;
+			std::queue<Message *> & messageQueue = iter->second;
 			if (!messageQueue.empty())
 			{
 				Message * messageData = messageQueue.front();
@@ -46,7 +46,7 @@ namespace SoEasy
 			std::queue<Message *> messageQueue;
 			this->mProtocolMap.emplace(name, messageQueue);
 		}
-		std::queue<Message *> messageQueue = this->mProtocolMap[name];
+		std::queue<Message *> & messageQueue = this->mProtocolMap[name];
 		if (messageQueue.size() >= ProtocolMaxCount)
 		{
 			delete messageData;

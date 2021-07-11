@@ -64,6 +64,7 @@ int main(int argc, char ** argv)
 	std::string serverName = argc == 3 ? argv[1] : "Server";
 	std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
 	
+	//_CrtDumpMemoryLeaks();
 	Applocation app(serverName, configPath);
 
 	return app.Run();

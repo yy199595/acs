@@ -24,7 +24,7 @@ namespace Client
 	void ClientManager::OnInitComplete()
 	{
 		this->ConnectByAddress(this->mAddress, "GateServer");
-		this->mCoroutineManager->Start("", BIND_THIS_ACTION_0(ClientManager::InvokeAction));
+		this->mCoroutineManager->Start(BIND_THIS_ACTION_0(ClientManager::InvokeAction));
 	}
 
 	void ClientManager::OnFrameUpdate(float t)
@@ -110,39 +110,23 @@ namespace Client
 		
 		userAccountData.set_userid(13716061995);
 
-		/*for (int index = 0; index < 10; index++)
-		{
-			
-			userAccountData.set_token(StringHelper::CreateNewToken());
-			userAccountData.set_passwd(StringHelper::CreateNewToken());
-			userAccountData.set_registertime(TimeHelper::GetMilTimestamp());
-			userAccountData.set_lastlogintime(TimeHelper::GetMilTimestamp());
-			userAccountData.set_account(std::to_string(646585122+index)+ "@qq.com");
-
-			
-
-			XCode code = this->Call("MysqlProxy", "Add", requestData, responseData);
-
-
-		}*/
-
 		requestData.set_protocolname(userAccountData.GetTypeName());
 		requestData.set_protocolmessage(userAccountData.SerializeAsString());
 		
-
-
-		XCode code = this->Call("MysqlProxy", "QueryData", requestData, responseData);
-		if (code != XCode::Successful)
+		while (true)
 		{
-			const std::string & err = responseData.errotstr();
-			SayNoDebugError(err);
+			XCode code = this->Call("MysqlProxy", "QueryData", requestData, responseData);
+			if (code != XCode::Successful)
+			{
+				const std::string & err = responseData.errotstr();
+				SayNoDebugError(err);
+			}
+			for (int index = 0; index < responseData.querydatas_size(); index++)
+			{
+				const std::string & value = responseData.querydatas(index);
+				userAccountData.ParseFromString(value);
+				SayNoDebugLogProtocBuf(userAccountData);
+			}
 		}
-		for (int index = 0; index < responseData.querydatas_size(); index++)
-		{
-			const std::string & value = responseData.querydatas(index);
-			userAccountData.ParseFromString(value);
-			SayNoDebugLogProtocBuf(userAccountData);
-		}
-
 	}
 }

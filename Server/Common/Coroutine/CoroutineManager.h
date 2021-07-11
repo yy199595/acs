@@ -21,8 +21,8 @@ namespace SoEasy
 	public:
 		CoroutineManager();
 	public:
-		long long Start(const std::string & name, CoroutineAction func);
-		long long Create(const std::string & name, CoroutineAction func);
+		long long Start(CoroutineAction func);
+		long long Create(CoroutineAction func);
 	public:
 		void YieldReturn();
 		void Sleep(long long ms);

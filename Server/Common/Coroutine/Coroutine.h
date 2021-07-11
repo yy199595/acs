@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include"CoroutineEvent.h"
 #ifndef _WIN32
 #include<ucontext.h>
@@ -28,7 +28,6 @@ namespace SoEasy
 		CorState mState;
 		long long mCoroutineId;
 		CoroutineAction mBindFunc;
-		std::string mCoroutineName;
 		CoroutineManager * mScheduler;
 	};
 }

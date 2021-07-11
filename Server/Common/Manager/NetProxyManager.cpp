@@ -26,6 +26,7 @@ namespace SoEasy
 		TcpProxySession *tcpSession = this->GetProxySession(address);
 		if (tcpSession == nullptr || msgData == nullptr)
 		{
+			GnetPacketPool.Destory(msgData);
 			return false;
 		}
 		return tcpSession->SendMessageData(msgData);
@@ -159,12 +160,7 @@ namespace SoEasy
 			else if (eve->GetEventType() == Net2MainEventType::SocketSendMsgFail)
 			{
 				const std::string &name = eve->GetName();
-				PB::NetWorkPacket *msgData = eve->GetMsgData();
-				if (msgData != nullptr)
-				{
-					GnetPacketPool.Destory(msgData);
-					SayNoDebugError("send " << msgData->service() << "." << msgData->method() << " error");
-				}
+				GnetPacketPool.Destory(eve->GetMsgData());
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveData)
 			{
@@ -194,6 +190,8 @@ namespace SoEasy
 			return mServiceManager->HandlerMessage(address, messageData);
 		}
 		long long rpcId = messageData->rpcid();
-		return this->mActionManager->InvokeCallback(rpcId, messageData);
+		bool res = this->mActionManager->InvokeCallback(rpcId, messageData);
+		GnetPacketPool.Destory(messageData);
+		return res;
 	}
 }
