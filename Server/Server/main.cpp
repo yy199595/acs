@@ -34,6 +34,12 @@ using namespace SoEasy;
 #pragma comment(lib,"ServerData.lib")
 #pragma comment(lib,"libprotobufd.lib")
 #endif
+
+#ifndef _DEBUG
+#DEFINE _DEBUG
+#endif
+
+
 int main(int argc, char ** argv)
 {
 
