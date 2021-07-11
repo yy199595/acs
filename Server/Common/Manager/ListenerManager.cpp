@@ -21,6 +21,7 @@ namespace SoEasy
 				}
 				this->mIsAccept = true;
 			});
+		this->mIsAccept = false;
 		return true;
 	}
 
