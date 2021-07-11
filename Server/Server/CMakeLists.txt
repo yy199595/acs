@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.1.3)
 PROJECT(Server)
-
+add_definitions(-D _DEBUG)
 
 #第三方库包含
 
