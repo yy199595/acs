@@ -156,11 +156,12 @@ namespace SoEasy
 	
 	void NetSessionManager::NetUpdate()
 	{
+		std::chrono::milliseconds time(1);
 		Main2NetEvent * sessionEvent = nullptr;
 		this->mNetThreadId = std::this_thread::get_id();
 		while (this->mIsClose == false)
 		{
-			this_thread::sleep_for(1ms);
+			this_thread::sleep_for(time);
 
 			this->mAsioContext.poll();
 			if (this->mListenerManager)

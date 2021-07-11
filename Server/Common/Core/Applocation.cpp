@@ -183,11 +183,12 @@ namespace SoEasy
 		mConfig.GetValue("LogicFps", logicFps);
 		mConfig.GetValue("SystemFps", systemFps);
 
+		std::chrono::milliseconds time(1);
 		const long long LogicUpdateInterval = 1000 / logicFps;
 		const long long systemUpdateInterval = 1000 / systemFps;
 		while (!this->mIsClose)
 		{
-			std::this_thread::sleep_for(1ms);
+			std::this_thread::sleep_for(time);
 			startTimer = TimeHelper::GetMilTimestamp();
 			for (size_t index = 0; index < this->mSystemUpdateManagers.size(); index++)
 			{
