@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.3)
+﻿cmake_minimum_required(VERSION 3.1.3)
 PROJECT(Server)
 
 
@@ -60,12 +60,13 @@ include_directories(../CoreLogic/Manager)
 aux_source_directory(../CoreLogic/Manager SUPER_SRC)
 
 include_directories(../DataBase)
+include_directories(../DataBase/Service)
 include_directories(../DataBase/Manager)
 include_directories(../DataBase/MysqlClient)
 include_directories(../DataBase/QueryResult)
 include_directories(../DataBase/RedisClient)
-include_directories(../DataBase/Script)
 
+aux_source_directory(../DataBase/Service SUPER_SRC)
 aux_source_directory(../DataBase/Manager SUPER_SRC)
 aux_source_directory(../DataBase/MysqlClient SUPER_SRC)
 aux_source_directory(../DataBase/QueryResult SUPER_SRC)
@@ -73,6 +74,7 @@ aux_source_directory(../DataBase/RedisClient SUPER_SRC)
 aux_source_directory(../DataBase/Script SUPER_SRC)
 
 aux_source_directory(./ SUPER_SRC)
+
 LINK_DIRECTORIES(../Libs/lib)
 SET(CMAKE_CXX_COMPILER "ccache")
 SET(CMAKE_CXX_COMPILER_ARG1 "g++")
@@ -80,6 +82,7 @@ SET(CMAKE_CXX_COMPILER_ARG1 "g++")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 SET(CMAKE_BUILD_TYPE Debug)
 
+message(${SUPER_SRC})
 ADD_EXECUTABLE(Server ${SUPER_SRC})
 TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
 

@@ -53,6 +53,9 @@
     <ClCompile Include="MysqlClient\MysqlThreadTask.cpp">
       <Filter>MysqlClient</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\MysqlProxyManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h">
@@ -87,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="MysqlClient\MysqlThreadTask.h">
       <Filter>MysqlClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\MysqlProxyManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

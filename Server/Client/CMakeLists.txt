@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.3)
+﻿cmake_minimum_required(VERSION 3.1.3)
 PROJECT(Client)
 
 
@@ -12,6 +12,7 @@ include_directories(../Libs/include/spdlog)
 #公共组件
 
 include_directories(../Common)
+include_directories(../Common/Pool)
 include_directories(../Common/Core)
 include_directories(../Common/Coroutine)
 include_directories(../Common/Define)
@@ -28,6 +29,7 @@ include_directories(../Common/Script)
 include_directories(../Common/Service)
 
 aux_source_directory(../Common/Core SUPER_SRC)
+aux_source_directory(../Common/Pool SUPER_SRC)
 aux_source_directory(../Common/Coroutine SUPER_SRC)
 aux_source_directory(../Common/Define SUPER_SRC)
 aux_source_directory(../Common/Global SUPER_SRC)

@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Manager\MysqlManager.cpp" />
+    <ClCompile Include="Manager\MysqlProxyManager.cpp" />
     <ClCompile Include="Manager\RedisManager.cpp" />
     <ClCompile Include="MysqlClient\MysqlThreadTask.cpp" />
     <ClCompile Include="MysqlClient\TableOperator.cpp" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Manager\MysqlManager.h" />
+    <ClInclude Include="Manager\MysqlProxyManager.h" />
     <ClInclude Include="Manager\RedisManager.h" />
     <ClInclude Include="MysqlClient\MysqlDefine.h" />
     <ClInclude Include="MysqlClient\MysqlThreadTask.h" />

@@ -108,24 +108,26 @@ namespace Client
 
 		db::UserAccountData userAccountData;
 		
+		userAccountData.set_userid(13716061995);
 
-		for (int index = 0; index < 1; index++)
+		/*for (int index = 0; index < 10; index++)
 		{
-			userAccountData.set_userid(13716061995 + index);
+			
 			userAccountData.set_token(StringHelper::CreateNewToken());
 			userAccountData.set_passwd(StringHelper::CreateNewToken());
 			userAccountData.set_registertime(TimeHelper::GetMilTimestamp());
 			userAccountData.set_lastlogintime(TimeHelper::GetMilTimestamp());
 			userAccountData.set_account(std::to_string(646585122+index)+ "@qq.com");
 
-			requestData.set_protocolname(userAccountData.GetTypeName());
-			requestData.set_protocolmessage(userAccountData.SerializeAsString());
+			
 
 			XCode code = this->Call("MysqlProxy", "Add", requestData, responseData);
 
 
-		}
+		}*/
 
+		requestData.set_protocolname(userAccountData.GetTypeName());
+		requestData.set_protocolmessage(userAccountData.SerializeAsString());
 		
 
 

@@ -57,6 +57,9 @@ namespace SoEasy
 			return XCode::CallArgsError;
 		}
 		GprotocolPool.Destory(protocolMessage);
+#ifdef _DEBUG
+		SayNoDebugInfo(sql);
+#endif
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 		
@@ -93,6 +96,9 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
+#ifdef _DEBUG
+		SayNoDebugInfo(sql);
+#endif
 		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
@@ -130,6 +136,9 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
+#ifdef _DEBUG
+		SayNoDebugInfo(sql);
+#endif
 		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
@@ -153,7 +162,8 @@ namespace SoEasy
 		Message * protocolMessage = GprotocolPool.Create(requertData.protocolname());
 		if (protocolMessage == nullptr)
 		{
-			return XCode::Failure;
+			response.set_errotstr("create " + requertData.protocolname() + " fail");
+			return XCode::CreatePorotbufFail;
 		}
 		if (!protocolMessage->ParseFromString(messageData))
 		{
@@ -166,6 +176,9 @@ namespace SoEasy
 			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
+#ifdef _DEBUG
+		SayNoDebugInfo(sql);
+#endif
 		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
