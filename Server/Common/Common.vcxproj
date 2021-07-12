@@ -73,6 +73,7 @@
     <ClCompile Include="Timer\LuaSleepTimer.cpp" />
     <ClCompile Include="Timer\TimerBase.cpp" />
     <ClCompile Include="Util\Base64Helper.cpp" />
+    <ClCompile Include="Util\CsvHelper.cpp" />
     <ClCompile Include="Util\DirectoryHelper.cpp" />
     <ClCompile Include="Util\FileHelper.cpp" />
     <ClCompile Include="Util\JsonHelper.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Timer\LuaSleepTimer.h" />
     <ClInclude Include="Timer\TimerBase.h" />
     <ClInclude Include="Util\Base64Helper.h" />
+    <ClInclude Include="Util\CsvHelper.h" />
     <ClInclude Include="Util\DirectoryHelper.h" />
     <ClInclude Include="Util\FileHelper.h" />
     <ClInclude Include="Util\JsonHelper.h" />

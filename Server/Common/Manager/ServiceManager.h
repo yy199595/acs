@@ -29,6 +29,7 @@ namespace SoEasy
 		void GetLocalServices(std::vector<std::string> & serviceNames);
 	private:
 		bool CreateLocalService();
+		bool SaveRpcInfoToFile(const std::string & path);
 	private:
 		int mNodeId;
 		class NetProxyManager * mNetManager;

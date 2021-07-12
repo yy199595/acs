@@ -19,7 +19,8 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
 
-		return this->CreateLocalService();
+		SayNoAssertRetFalse_F(this->CreateLocalService());
+		SayNoAssertRetFalse_F(this->SaveRpcInfoToFile("./Config/rpc.csv"));
 	}
 
 	void ServiceManager::OnInitComplete()
@@ -193,6 +194,15 @@ namespace SoEasy
 			this->mLocalServiceMap.emplace(name, localService);
 		}
 		return true;
+	}
+
+	bool ServiceManager::SaveRpcInfoToFile(const std::string & path)
+	{
+		for (auto iter = this->mLuaServiceMap.begin(); iter != this->mLuaServiceMap.end(); iter++)
+		{
+			LocalLuaService * luaService = iter->second;
+			
+		}
 	}
 
 }

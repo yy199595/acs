@@ -55,6 +55,10 @@ namespace SoEasy
 		return iter != this->mMethodCacheSet.end();
 	}
 
+	void LocalLuaService::GetServiceList(std::vector<shared_ptr<LocalActionProxy>>& service)
+	{
+	}
+
 	XCode LocalLuaService::InvokeMethod(PB::NetWorkPacket * messageData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";

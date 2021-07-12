@@ -30,13 +30,16 @@ namespace SoEasy
 	public:
 		LocalActionProxy(std::string &name) { this->mActionName = name; }
 		virtual ~LocalActionProxy() {}
-
 	public:
 		const std::string &GetName() { return this->mActionName; }
 		virtual XCode Invoke(PB::NetWorkPacket * messageData) = 0;
-
+	public:
+		const std::string & GetRequestMsgName() { return this->mRequestMsgName; }
+		const std::string & GetResponseMsgName() { return this->mResponseMsgName; }
 	protected:
 		std::string mActionName;
+		std::string mRequestMsgName;
+		std::string mResponseMsgName;
 	public:
 #ifdef SOEASY_DEBUG
 		std::string mServiceName;
@@ -67,7 +70,12 @@ namespace SoEasy
 	class LocalActionProxy2 : public LocalActionProxy //有参数 无返回
 	{
 	public:
-		LocalActionProxy2(LocalAction2<T1> action, std::string &name) : LocalActionProxy(name), mBindAction(action) {}
+		LocalActionProxy2(LocalAction2<T1> action, std::string &name) : LocalActionProxy(name), mBindAction(action) 
+		{
+			T1 * message = mRequestPool.Create();
+			this->mRequestMsgName = message->GetTypeName();
+			mRequestPool.Destory(message);
+		}
 
 	public:
 		XCode Invoke(PB::NetWorkPacket * messageData) final;
@@ -117,7 +125,16 @@ namespace SoEasy
 	{
 	public:
 		LocalActionProxy3(LocalAction3<T1, T2> action, std::string &name)
-			: LocalActionProxy(name), mBindAction(action) {}
+			: LocalActionProxy(name), mBindAction(action) 
+		{
+			T1 * message = mRequestDataPool.Create();
+			this->mRequestMsgName = message->GetTypeName();
+			mRequestDataPool.Destory(message);
+
+			T2 * message2 = mResponseDataPool.Create();
+			this->mResponseMsgName = message2->GetTypeName();
+			mResponseDataPool.Destory(message2);
+		}
 
 	public:
 		XCode Invoke(PB::NetWorkPacket * messageData) override;
@@ -170,7 +187,13 @@ namespace SoEasy
 	class LocalActionProxy4 : public LocalActionProxy //无参数 一个返回
 	{
 	public:
-		LocalActionProxy4(LocalAction4<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action) { }
+		LocalActionProxy4(LocalAction4<T1> action, std::string & name) :LocalActionProxy(name), mBindAction(action)
+		{
+			T1 * message = mResponseDataPool.Create();
+			this->mResponseMsgName = message->GetTypeName();
+			this->mResponseDataPool.Destory(message);
+		}
+
 		XCode Invoke(PB::NetWorkPacket * messageData) override
 		{
 			T1 * responseData = mResponseDataPool.Create();

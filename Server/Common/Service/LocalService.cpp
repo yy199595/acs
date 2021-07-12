@@ -21,6 +21,15 @@ namespace SoEasy
 		return ServiceBase::OnInit();
 	}
 
+	void LocalService::GetServiceList(std::vector<shared_ptr<LocalActionProxy>>& service)
+	{
+		auto iter = this->mActionMap.begin();
+		for (; iter != this->mActionMap.end(); iter++)
+		{
+			service.push_back(iter->second);
+		}
+	}
+
 	XCode LocalService::InvokeMethod(PB::NetWorkPacket * msgData)
 	{
 		const std::string & method = msgData->method();

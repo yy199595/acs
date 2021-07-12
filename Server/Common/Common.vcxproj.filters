@@ -234,6 +234,9 @@
     <ClCompile Include="Manager\ThreadTaskManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="Util\CsvHelper.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -517,6 +520,9 @@
     </ClInclude>
     <ClInclude Include="Manager\ThreadTaskManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\CsvHelper.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

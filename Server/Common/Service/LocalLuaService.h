@@ -13,6 +13,8 @@ namespace SoEasy
 		bool OnInit() final;
 		bool HasMethod(const std::string & name) final;
 		bool IsLuaService() final { return true; };
+	public:
+		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service)final;
 	protected:
 		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
 		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;

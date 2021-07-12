@@ -1,4 +1,4 @@
-#include"StringHelper.h"
+﻿#include"StringHelper.h"
 #include<regex>
 #include<sstream>
 #include"MD5.h"
@@ -7,6 +7,7 @@ namespace StringHelper
 {
 	void SplitString(const std::string & targetString, const std::string delim, std::vector<std::string>& ret)
 	{
+		ret.clear();
 		if (targetString.length() == 0)
 			return;
 		std::regex re{ delim };

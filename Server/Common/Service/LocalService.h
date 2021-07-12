@@ -13,6 +13,8 @@ namespace SoEasy
 		bool HasMethod(const std::string & action) final;
 	public:
 		bool OnInit() override;
+	public:
+		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) final;
 	private:
 		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
 		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;

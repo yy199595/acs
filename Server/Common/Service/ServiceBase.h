@@ -25,6 +25,7 @@ namespace SoEasy
 	public:
 		virtual XCode InvokeMethod(PB::NetWorkPacket *) = 0;
 		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) = 0;
+		virtual void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) = 0;
 	public:
 		void InitService(const std::string &name);
 	private:
