@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Service/LocalService.h>
 #include<Protocol/c2s.pb.h>
-namespace SoEasy
+namespace Sentry
 {
 	class MysqlManager;
 	class RedisManager;

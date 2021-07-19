@@ -38,21 +38,21 @@ inline std::string FromatFileLine(const char * file, const int line)
 	return std::string(buffer, size);	
 }
 
-#define SAYNO_LOG(type, msg) {std::stringstream ss; ss << msg; SoEasy::LogHelper::AddLog(type, ss.str());}
+#define SAYNO_LOG(type, msg) {std::stringstream ss; ss << msg; Sentry::LogHelper::AddLog(type, ss.str());}
 
 #define TypeLimit(base,child) typename std::enable_if<std::is_base_of<base, child>::value, T>::type
 
-#define SayNoCommonLog(msg)		SAYNO_LOG(SoEasy::ELogType::debug, msg)
-#define SayNoCommonError(msg)	SAYNO_LOG(SoEasy::ELogType::err, msg)
-#define SayNoCommonWarning(msg) SAYNO_LOG(SoEasy::ELogType::warn, msg)
-#define SayNoCommonFatal(msg)	SAYNO_LOG(SoEasy::ELogType::critical, msg)
-#define SayNoCommonInfo(msg)	SAYNO_LOG(SoEasy::ELogType::info, msg)
+#define SayNoCommonLog(msg)		SAYNO_LOG(Sentry::ELogType::debug, msg)
+#define SayNoCommonError(msg)	SAYNO_LOG(Sentry::ELogType::err, msg)
+#define SayNoCommonWarning(msg) SAYNO_LOG(Sentry::ELogType::warn, msg)
+#define SayNoCommonFatal(msg)	SAYNO_LOG(Sentry::ELogType::critical, msg)
+#define SayNoCommonInfo(msg)	SAYNO_LOG(Sentry::ELogType::info, msg)
 
-#define SayNoDebugLog(msg)		SAYNO_LOG(SoEasy::ELogType::debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugWarning(msg)	SAYNO_LOG(SoEasy::ELogType::warn, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugError(msg)	SAYNO_LOG(SoEasy::ELogType::err, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugFatal(msg)	SAYNO_LOG(SoEasy::ELogType::critical, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugInfo(msg)		SAYNO_LOG(SoEasy::ELogType::info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugLog(msg)		SAYNO_LOG(Sentry::ELogType::debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugWarning(msg)	SAYNO_LOG(Sentry::ELogType::warn, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugError(msg)	SAYNO_LOG(Sentry::ELogType::err, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugFatal(msg)	SAYNO_LOG(Sentry::ELogType::critical, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define SayNoDebugInfo(msg)		SAYNO_LOG(Sentry::ELogType::info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
 
 
 #define SayNoAssertError(obj, msg, val) { bool bCode = !(obj); if(bCode) { SayNoDebugError(#obj<< "  "  << msg); val; } }

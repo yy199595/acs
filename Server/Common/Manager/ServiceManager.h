@@ -2,7 +2,7 @@
 #include"NetProxyManager.h"
 #include<Protocol/s2s.pb.h>
 #include<Other/DoubleBufferQueue.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ServiceBase;
 	class LocalService;
@@ -17,8 +17,8 @@ namespace SoEasy
 		bool OnInit() final;
 		void OnInitComplete() final;
 	public:
-		bool HandlerMessage(PB::NetWorkPacket * messageData);
-		bool HandlerMessage(const std::string & adress, PB::NetWorkPacket * messageData);
+		bool HandlerMessage(com::NetWorkPacket * messageData);
+		bool HandlerMessage(const std::string & adress, com::NetWorkPacket * messageData);
 	public:
 		ServiceBase * GetService(const std::string & name);
 		LocalService * GetLocalService(const std::string & name);

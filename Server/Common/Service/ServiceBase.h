@@ -3,8 +3,10 @@
 #include <Manager/Manager.h>
 #include <Protocol/com.pb.h>
 using namespace std;
-using namespace PB;
-namespace SoEasy
+using namespace com;
+
+
+namespace Sentry
 {
 	class NetWorkWaitCorAction;
 	class ServiceBase : public Object
@@ -23,8 +25,8 @@ namespace SoEasy
 		virtual void OnRefreshService() {}; //刷新服务表调用
 		const std::string &GetServiceName() { return this->mServiceName; };
 	public:
-		virtual XCode InvokeMethod(PB::NetWorkPacket *) = 0;
-		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) = 0;
+		virtual XCode InvokeMethod(com::NetWorkPacket *) = 0;
+		virtual XCode InvokeMethod(const std::string &address, com::NetWorkPacket *) = 0;
 		virtual void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) = 0;
 	public:
 		void InitService(const std::string &name);

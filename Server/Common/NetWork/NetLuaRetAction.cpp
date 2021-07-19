@@ -1,6 +1,6 @@
 #include "NetLuaRetAction.h"
 
-namespace SoEasy
+namespace Sentry
 {
 	NetLuaRetAction * NetLuaRetAction::Create(lua_State * lua, int index)
 	{
@@ -64,7 +64,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	NetLuaWaitAction * NetLuaWaitAction::Create(lua_State * lua, int index)
 	{

@@ -2,7 +2,7 @@
 #include<functional>
 #include<Util/TimeHelper.h>
 #include<Util/NumberHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	class TimerBase
 	{

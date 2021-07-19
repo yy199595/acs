@@ -6,7 +6,7 @@
 #include<google/protobuf/message.h>
 #include<Define/CommonTypeDef.h>
 using namespace std;
-namespace SoEasy
+namespace Sentry
 {
 	class RapidJsonWriter
 	{
@@ -36,7 +36,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class RapidJsonReader
 	{

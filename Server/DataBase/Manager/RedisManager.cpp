@@ -5,7 +5,7 @@
 #include<RedisClient/RedisTaskAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Script/ClassProxyHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	RedisManager::RedisManager()
 	{

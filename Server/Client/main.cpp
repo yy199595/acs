@@ -10,7 +10,7 @@
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/NetProxyManager.h>
 
-using namespace SoEasy;
+using namespace Sentry;
 using namespace Client;
 
 #ifdef _WIN32

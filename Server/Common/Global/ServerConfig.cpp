@@ -2,7 +2,7 @@
 #include "ServerConfig.h"
 #include <Define/CommonDef.h>
 #include <Util/FileHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	ServerConfig::ServerConfig(const std::string path)
 		: mConfigPath(path)

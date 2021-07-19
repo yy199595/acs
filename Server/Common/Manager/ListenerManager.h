@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"Manager.h"
-namespace SoEasy
+namespace Sentry
 {
 	// 处理外部连接进来的session
 	class TcpSessionListener;

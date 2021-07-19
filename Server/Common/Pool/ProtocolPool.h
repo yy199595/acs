@@ -4,7 +4,7 @@
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 #define ProtocolMaxCount 10
-namespace SoEasy
+namespace Sentry
 {
 	class ProtocolPool
 	{

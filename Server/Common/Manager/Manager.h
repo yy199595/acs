@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include<XCode/XCode.h>
 #include<Object/Object.h>
@@ -8,8 +8,8 @@
 #include<NetWork/TcpClientSession.h>
 #include<Protocol/com.pb.h>
 #include"ManagerInterface.h"
-using namespace PB;
-namespace SoEasy
+using namespace com;
+namespace Sentry
 {
 	typedef shared_ptr<NetWorkPacket> SharedPacket;
 	struct NetMessageBuffer

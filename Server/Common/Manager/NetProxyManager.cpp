@@ -4,7 +4,7 @@
 #include <Core/Applocation.h>
 #include <Manager/TimerManager.h>
 #include <Manager/ActionManager.h>
-namespace SoEasy
+namespace Sentry
 {
 
 	bool NetProxyManager::AddNetSessionEvent(Net2MainEvent *eve)
@@ -21,7 +21,7 @@ namespace SoEasy
 		return this->mNetWorkManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetProxyManager::SendMsgByAddress(const std::string &address, PB::NetWorkPacket *msgData)
+	bool NetProxyManager::SendMsgByAddress(const std::string &address, com::NetWorkPacket *msgData)
 	{
 		TcpProxySession *tcpSession = this->GetProxySession(address);
 		if (tcpSession == nullptr || msgData == nullptr)
@@ -164,7 +164,7 @@ namespace SoEasy
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveData)
 			{
-				PB::NetWorkPacket *msgData = eve->GetMsgData();
+				com::NetWorkPacket *msgData = eve->GetMsgData();
 				if (!this->OnRecvMessage(address, msgData))
 				{
 					GnetPacketPool.Destory(msgData);
@@ -181,7 +181,7 @@ namespace SoEasy
 		}
 	}
 
-	bool NetProxyManager::OnRecvMessage(const std::string &address, PB::NetWorkPacket *messageData)
+	bool NetProxyManager::OnRecvMessage(const std::string &address, com::NetWorkPacket *messageData)
 	{
 		const std::string &method = messageData->method();
 		const std::string &service = messageData->service();

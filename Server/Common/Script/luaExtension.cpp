@@ -4,7 +4,7 @@
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Module/Component.h>
-using namespace SoEasy;
+using namespace Sentry;
 namespace LuaAPIExtension
 {
 	int GameObjectGetComponent(lua_State * lua)

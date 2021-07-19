@@ -2,7 +2,7 @@
 #include<Script/LuaInclude.h>
 #include<Define/CommonTypeDef.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	class GameObject;
 	class BindLuaFunction
@@ -19,7 +19,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class BindServerLuaFunction : public BindLuaFunction
 	{
@@ -29,7 +29,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class BindClientLuaFunction : public BindLuaFunction
 	{

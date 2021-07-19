@@ -3,7 +3,7 @@
 #include<Define/CommonTypeDef.h>
 #include<Define/ClassStatement.h>
 #include<Core/Applocation.h>
-namespace SoEasy
+namespace Sentry
 {
 	class Object
 	{

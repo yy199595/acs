@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-namespace SoEasy
+namespace Sentry
 {
 	struct NetworkLatencyInfo
 	{

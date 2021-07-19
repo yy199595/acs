@@ -1,6 +1,6 @@
 #pragma once
 #include"Object.h"
-namespace SoEasy
+namespace Sentry
 {
 	class Component;
 	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
@@ -51,7 +51,7 @@ namespace SoEasy
 	inline T * GameObject::GetComponent()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		if (!Sentry::GetTypeName<T>(name))
 		{
 			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
 			return false;
@@ -79,7 +79,7 @@ namespace SoEasy
 	inline T * GameObject::AddComponent()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		if (!Sentry::GetTypeName<T>(name))
 		{
 			SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
 			return nullptr;
@@ -101,7 +101,7 @@ namespace SoEasy
 	inline bool GameObject::RemoveComponent()
 	{
 		std::string name;
-		if (!SoEasy::GetTypeName<T>(name))
+		if (!Sentry::GetTypeName<T>(name))
 		{
 			return false;
 		}

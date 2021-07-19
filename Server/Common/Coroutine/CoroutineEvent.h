@@ -6,7 +6,7 @@
 #else
 #define STACK_SIZE 1024 * 1024
 #endif
-namespace SoEasy
+namespace Sentry
 {
 	class CoroutineManager;
 	typedef std::function<void()> CoroutineAction;

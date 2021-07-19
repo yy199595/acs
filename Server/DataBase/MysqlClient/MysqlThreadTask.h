@@ -1,7 +1,7 @@
 #pragma once
 #include "MysqlDefine.h"
 #include <Thread/ThreadTaskAction.h>
-namespace SoEasy
+namespace Sentry
 {
 	class SqlTableConfig;
 	class QuertJsonWritre;

@@ -8,10 +8,10 @@
 #include<Manager/ActionManager.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Service/ServiceBase.h>
-using namespace SoEasy;
+using namespace Sentry;
 using namespace std::chrono;
 
-namespace SoEasy
+namespace Sentry
 {
 	Applocation * Applocation::mApplocation = nullptr;
 

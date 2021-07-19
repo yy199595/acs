@@ -1,6 +1,6 @@
 #include"CoroutineEvent.h"
 #include"CoroutineManager.h"
-namespace SoEasy
+namespace Sentry
 {
 	CorSleepEvent::CorSleepEvent(CoroutineManager * scheduler, long long id, long long ms)
 		: CoroutineEvent(scheduler, id)

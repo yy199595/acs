@@ -3,7 +3,7 @@
 #include <Manager/ServiceNodeManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Other/ServiceNode.h>
-namespace SoEasy
+namespace Sentry
 {
 	bool ClusterService::OnInit()
 	{

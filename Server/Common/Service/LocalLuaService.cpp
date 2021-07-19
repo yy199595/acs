@@ -1,7 +1,7 @@
 ﻿#include"LocalLuaService.h"
 #include<Pool/ProtocolPool.h>
 #include<Manager/ScriptManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	LocalLuaService::LocalLuaService(lua_State * luaEnv, int index)
 		: mServiceIndex(0), mLuaEnv(nullptr)
@@ -59,7 +59,7 @@ namespace SoEasy
 	{
 	}
 
-	XCode LocalLuaService::InvokeMethod(PB::NetWorkPacket * messageData)
+	XCode LocalLuaService::InvokeMethod(com::NetWorkPacket * messageData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -107,7 +107,7 @@ namespace SoEasy
 		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
-	XCode LocalLuaService::InvokeMethod(const std::string &address, PB::NetWorkPacket * messageData)
+	XCode LocalLuaService::InvokeMethod(const std::string &address, com::NetWorkPacket * messageData)
 	{		
 		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);

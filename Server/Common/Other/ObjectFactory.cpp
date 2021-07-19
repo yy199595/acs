@@ -1,7 +1,7 @@
 ﻿#include "ObjectFactory.h"
 #include <Define/CommonDef.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	ObjectFactory *ObjectFactory::Get()
 	{

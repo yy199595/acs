@@ -237,6 +237,9 @@
     <ClCompile Include="Util\CsvHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\ProtocolManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -523,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="Util\CsvHelper.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\ProtocolManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

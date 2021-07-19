@@ -1,6 +1,6 @@
 ﻿#include"RedisTaskBase.h"
 #include<Manager/RedisManager.h>
-namespace SoEasy
+namespace Sentry
 {
 
 	RedisTaskBase::RedisTaskBase(RedisManager * mgr, const std::string & cmd)

@@ -5,7 +5,7 @@
 #include<Util/FileHelper.h>
 #include<Util/DirectoryHelper.h>
 #include<Global/LogHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	TimeRecorder::TimeRecorder()
 	{

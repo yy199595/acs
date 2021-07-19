@@ -3,7 +3,7 @@
 #include<Protocol/com.pb.h>
 #include<Protocol/s2s.pb.h>
 #include<Manager/ServiceNodeManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	class LocalRetActionProxy;
 	class ServiceNode : public Object
@@ -34,7 +34,7 @@ namespace SoEasy
 		XCode Call(const std::string &service, const std::string &method, Message &response);
 		XCode Call(const std::string &service, const std::string &method, const Message & request, Message &response);
 	public: // lua使用
-		void PushMessageData(PB::NetWorkPacket * messageData);
+		void PushMessageData(com::NetWorkPacket * messageData);
 		void PushMessageData(const std::string &service, const std::string &method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
 	private:
 		std::string mIp;
@@ -47,7 +47,7 @@ namespace SoEasy
 		class NetProxyManager *mNetWorkManager;
 		s2s::NodeData_NodeInfo mNodeInfoMessage;
 		ServiceNodeManager * mServiceNodeManager;
-		std::queue<PB::NetWorkPacket *> mMessageQueue;
+		std::queue<com::NetWorkPacket *> mMessageQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 	};
 }

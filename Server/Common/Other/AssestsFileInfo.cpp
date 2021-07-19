@@ -2,7 +2,7 @@
 #include<Util/MD5.h>
 #include<fstream>
 #include<sstream>
-namespace SoEasy
+namespace Sentry
 {
 	AssestsFileInfo::AssestsFileInfo()
 	{

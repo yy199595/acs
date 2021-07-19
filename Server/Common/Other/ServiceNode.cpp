@@ -7,7 +7,7 @@
 #include <Coroutine/CoroutineManager.h>
 #include <Util/JsonHelper.h>
 #include <Pool/ObjectPool.h>
-namespace SoEasy
+namespace Sentry
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAddress(address), mNodeName(name)
@@ -180,7 +180,7 @@ namespace SoEasy
 		return XCode::Failure;
 	}
 
-	void ServiceNode::PushMessageData(PB::NetWorkPacket *messageData)
+	void ServiceNode::PushMessageData(com::NetWorkPacket *messageData)
 	{
 		TcpProxySession * tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
 		if (tcpSession == nullptr)
@@ -201,7 +201,7 @@ namespace SoEasy
 
 	void ServiceNode::PushMessageData(const std::string &service, const std::string &method, const Message *request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
-		PB::NetWorkPacket *msgData = GnetPacketPool.Create();
+		com::NetWorkPacket *msgData = GnetPacketPool.Create();
 		if (msgData != nullptr)
 		{
 			if (request != nullptr)

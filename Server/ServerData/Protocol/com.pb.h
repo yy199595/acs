@@ -44,14 +44,14 @@ struct TableStruct_com_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[10]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
 };
 void AddDescriptors_com_2eproto();
-namespace PB {
+namespace com {
 class DoubleData;
 class DoubleDataDefaultTypeInternal;
 extern DoubleDataDefaultTypeInternal _DoubleData_default_instance_;
@@ -67,9 +67,6 @@ extern Int64ArrayDefaultTypeInternal _Int64Array_default_instance_;
 class Int64Data;
 class Int64DataDefaultTypeInternal;
 extern Int64DataDefaultTypeInternal _Int64Data_default_instance_;
-class NetWorkPacket;
-class NetWorkPacketDefaultTypeInternal;
-extern NetWorkPacketDefaultTypeInternal _NetWorkPacket_default_instance_;
 class StringArray;
 class StringArrayDefaultTypeInternal;
 extern StringArrayDefaultTypeInternal _StringArray_default_instance_;
@@ -85,214 +82,27 @@ extern StringMap_DataEntry_DoNotUseDefaultTypeInternal _StringMap_DataEntry_DoNo
 class floatData;
 class floatDataDefaultTypeInternal;
 extern floatDataDefaultTypeInternal _floatData_default_instance_;
-}  // namespace PB
+}  // namespace com
 namespace google {
 namespace protobuf {
-template<> ::PB::DoubleData* Arena::CreateMaybeMessage<::PB::DoubleData>(Arena*);
-template<> ::PB::Int32Array* Arena::CreateMaybeMessage<::PB::Int32Array>(Arena*);
-template<> ::PB::Int32Data* Arena::CreateMaybeMessage<::PB::Int32Data>(Arena*);
-template<> ::PB::Int64Array* Arena::CreateMaybeMessage<::PB::Int64Array>(Arena*);
-template<> ::PB::Int64Data* Arena::CreateMaybeMessage<::PB::Int64Data>(Arena*);
-template<> ::PB::NetWorkPacket* Arena::CreateMaybeMessage<::PB::NetWorkPacket>(Arena*);
-template<> ::PB::StringArray* Arena::CreateMaybeMessage<::PB::StringArray>(Arena*);
-template<> ::PB::StringData* Arena::CreateMaybeMessage<::PB::StringData>(Arena*);
-template<> ::PB::StringMap* Arena::CreateMaybeMessage<::PB::StringMap>(Arena*);
-template<> ::PB::StringMap_DataEntry_DoNotUse* Arena::CreateMaybeMessage<::PB::StringMap_DataEntry_DoNotUse>(Arena*);
-template<> ::PB::floatData* Arena::CreateMaybeMessage<::PB::floatData>(Arena*);
+template<> ::com::DoubleData* Arena::CreateMaybeMessage<::com::DoubleData>(Arena*);
+template<> ::com::Int32Array* Arena::CreateMaybeMessage<::com::Int32Array>(Arena*);
+template<> ::com::Int32Data* Arena::CreateMaybeMessage<::com::Int32Data>(Arena*);
+template<> ::com::Int64Array* Arena::CreateMaybeMessage<::com::Int64Array>(Arena*);
+template<> ::com::Int64Data* Arena::CreateMaybeMessage<::com::Int64Data>(Arena*);
+template<> ::com::StringArray* Arena::CreateMaybeMessage<::com::StringArray>(Arena*);
+template<> ::com::StringData* Arena::CreateMaybeMessage<::com::StringData>(Arena*);
+template<> ::com::StringMap* Arena::CreateMaybeMessage<::com::StringMap>(Arena*);
+template<> ::com::StringMap_DataEntry_DoNotUse* Arena::CreateMaybeMessage<::com::StringMap_DataEntry_DoNotUse>(Arena*);
+template<> ::com::floatData* Arena::CreateMaybeMessage<::com::floatData>(Arena*);
 }  // namespace protobuf
 }  // namespace google
-namespace PB {
+namespace com {
 
 // ===================================================================
 
-class NetWorkPacket :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.NetWorkPacket) */ {
- public:
-  NetWorkPacket();
-  virtual ~NetWorkPacket();
-
-  NetWorkPacket(const NetWorkPacket& from);
-
-  inline NetWorkPacket& operator=(const NetWorkPacket& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  NetWorkPacket(NetWorkPacket&& from) noexcept
-    : NetWorkPacket() {
-    *this = ::std::move(from);
-  }
-
-  inline NetWorkPacket& operator=(NetWorkPacket&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const NetWorkPacket& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const NetWorkPacket* internal_default_instance() {
-    return reinterpret_cast<const NetWorkPacket*>(
-               &_NetWorkPacket_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    0;
-
-  void Swap(NetWorkPacket* other);
-  friend void swap(NetWorkPacket& a, NetWorkPacket& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline NetWorkPacket* New() const final {
-    return CreateMaybeMessage<NetWorkPacket>(nullptr);
-  }
-
-  NetWorkPacket* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<NetWorkPacket>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const NetWorkPacket& from);
-  void MergeFrom(const NetWorkPacket& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(NetWorkPacket* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string Service = 1;
-  void clear_service();
-  static const int kServiceFieldNumber = 1;
-  const ::std::string& service() const;
-  void set_service(const ::std::string& value);
-  #if LANG_CXX11
-  void set_service(::std::string&& value);
-  #endif
-  void set_service(const char* value);
-  void set_service(const char* value, size_t size);
-  ::std::string* mutable_service();
-  ::std::string* release_service();
-  void set_allocated_service(::std::string* service);
-
-  // string Method = 2;
-  void clear_method();
-  static const int kMethodFieldNumber = 2;
-  const ::std::string& method() const;
-  void set_method(const ::std::string& value);
-  #if LANG_CXX11
-  void set_method(::std::string&& value);
-  #endif
-  void set_method(const char* value);
-  void set_method(const char* value, size_t size);
-  ::std::string* mutable_method();
-  ::std::string* release_method();
-  void set_allocated_method(::std::string* method);
-
-  // bytes MessageData = 6;
-  void clear_messagedata();
-  static const int kMessageDataFieldNumber = 6;
-  const ::std::string& messagedata() const;
-  void set_messagedata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_messagedata(::std::string&& value);
-  #endif
-  void set_messagedata(const char* value);
-  void set_messagedata(const void* value, size_t size);
-  ::std::string* mutable_messagedata();
-  ::std::string* release_messagedata();
-  void set_allocated_messagedata(::std::string* messagedata);
-
-  // string ProtocName = 7;
-  void clear_protocname();
-  static const int kProtocNameFieldNumber = 7;
-  const ::std::string& protocname() const;
-  void set_protocname(const ::std::string& value);
-  #if LANG_CXX11
-  void set_protocname(::std::string&& value);
-  #endif
-  void set_protocname(const char* value);
-  void set_protocname(const char* value, size_t size);
-  ::std::string* mutable_protocname();
-  ::std::string* release_protocname();
-  void set_allocated_protocname(::std::string* protocname);
-
-  // uint64 EntityId = 4;
-  void clear_entityid();
-  static const int kEntityIdFieldNumber = 4;
-  ::google::protobuf::uint64 entityid() const;
-  void set_entityid(::google::protobuf::uint64 value);
-
-  // uint64 RpcId = 5;
-  void clear_rpcid();
-  static const int kRpcIdFieldNumber = 5;
-  ::google::protobuf::uint64 rpcid() const;
-  void set_rpcid(::google::protobuf::uint64 value);
-
-  // int32 Code = 3;
-  void clear_code();
-  static const int kCodeFieldNumber = 3;
-  ::google::protobuf::int32 code() const;
-  void set_code(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:PB.NetWorkPacket)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr service_;
-  ::google::protobuf::internal::ArenaStringPtr method_;
-  ::google::protobuf::internal::ArenaStringPtr messagedata_;
-  ::google::protobuf::internal::ArenaStringPtr protocname_;
-  ::google::protobuf::uint64 entityid_;
-  ::google::protobuf::uint64 rpcid_;
-  ::google::protobuf::int32 code_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_com_2eproto;
-};
-// -------------------------------------------------------------------
-
 class StringArray :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.StringArray) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.StringArray) */ {
  public:
   StringArray();
   virtual ~StringArray();
@@ -329,7 +139,7 @@ class StringArray :
                &_StringArray_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    0;
 
   void Swap(StringArray* other);
   friend void swap(StringArray& a, StringArray& b) {
@@ -408,7 +218,7 @@ class StringArray :
   const ::google::protobuf::RepeatedPtrField<::std::string>& dataarray() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_dataarray();
 
-  // @@protoc_insertion_point(class_scope:PB.StringArray)
+  // @@protoc_insertion_point(class_scope:com.StringArray)
  private:
   class HasBitSetters;
 
@@ -420,7 +230,7 @@ class StringArray :
 // -------------------------------------------------------------------
 
 class Int32Array :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Int32Array) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Int32Array) */ {
  public:
   Int32Array();
   virtual ~Int32Array();
@@ -457,7 +267,7 @@ class Int32Array :
                &_Int32Array_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    1;
 
   void Swap(Int32Array* other);
   friend void swap(Int32Array& a, Int32Array& b) {
@@ -526,7 +336,7 @@ class Int32Array :
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
       mutable_dataarray();
 
-  // @@protoc_insertion_point(class_scope:PB.Int32Array)
+  // @@protoc_insertion_point(class_scope:com.Int32Array)
  private:
   class HasBitSetters;
 
@@ -539,7 +349,7 @@ class Int32Array :
 // -------------------------------------------------------------------
 
 class Int64Array :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Int64Array) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Int64Array) */ {
  public:
   Int64Array();
   virtual ~Int64Array();
@@ -576,7 +386,7 @@ class Int64Array :
                &_Int64Array_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(Int64Array* other);
   friend void swap(Int64Array& a, Int64Array& b) {
@@ -645,7 +455,7 @@ class Int64Array :
   ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
       mutable_dataarray();
 
-  // @@protoc_insertion_point(class_scope:PB.Int64Array)
+  // @@protoc_insertion_point(class_scope:com.Int64Array)
  private:
   class HasBitSetters;
 
@@ -658,7 +468,7 @@ class Int64Array :
 // -------------------------------------------------------------------
 
 class StringData :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.StringData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.StringData) */ {
  public:
   StringData();
   virtual ~StringData();
@@ -695,7 +505,7 @@ class StringData :
                &_StringData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    3;
 
   void Swap(StringData* other);
   friend void swap(StringData& a, StringData& b) {
@@ -766,7 +576,7 @@ class StringData :
   ::std::string* release_data();
   void set_allocated_data(::std::string* data);
 
-  // @@protoc_insertion_point(class_scope:PB.StringData)
+  // @@protoc_insertion_point(class_scope:com.StringData)
  private:
   class HasBitSetters;
 
@@ -778,7 +588,7 @@ class StringData :
 // -------------------------------------------------------------------
 
 class Int32Data :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Int32Data) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Int32Data) */ {
  public:
   Int32Data();
   virtual ~Int32Data();
@@ -815,7 +625,7 @@ class Int32Data :
                &_Int32Data_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(Int32Data* other);
   friend void swap(Int32Data& a, Int32Data& b) {
@@ -878,7 +688,7 @@ class Int32Data :
   ::google::protobuf::int32 data() const;
   void set_data(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:PB.Int32Data)
+  // @@protoc_insertion_point(class_scope:com.Int32Data)
  private:
   class HasBitSetters;
 
@@ -890,7 +700,7 @@ class Int32Data :
 // -------------------------------------------------------------------
 
 class Int64Data :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.Int64Data) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Int64Data) */ {
  public:
   Int64Data();
   virtual ~Int64Data();
@@ -927,7 +737,7 @@ class Int64Data :
                &_Int64Data_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(Int64Data* other);
   friend void swap(Int64Data& a, Int64Data& b) {
@@ -990,7 +800,7 @@ class Int64Data :
   ::google::protobuf::int64 data() const;
   void set_data(::google::protobuf::int64 value);
 
-  // @@protoc_insertion_point(class_scope:PB.Int64Data)
+  // @@protoc_insertion_point(class_scope:com.Int64Data)
  private:
   class HasBitSetters;
 
@@ -1002,7 +812,7 @@ class Int64Data :
 // -------------------------------------------------------------------
 
 class floatData :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.floatData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.floatData) */ {
  public:
   floatData();
   virtual ~floatData();
@@ -1039,7 +849,7 @@ class floatData :
                &_floatData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(floatData* other);
   friend void swap(floatData& a, floatData& b) {
@@ -1102,7 +912,7 @@ class floatData :
   float data() const;
   void set_data(float value);
 
-  // @@protoc_insertion_point(class_scope:PB.floatData)
+  // @@protoc_insertion_point(class_scope:com.floatData)
  private:
   class HasBitSetters;
 
@@ -1114,7 +924,7 @@ class floatData :
 // -------------------------------------------------------------------
 
 class DoubleData :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.DoubleData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.DoubleData) */ {
  public:
   DoubleData();
   virtual ~DoubleData();
@@ -1151,7 +961,7 @@ class DoubleData :
                &_DoubleData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(DoubleData* other);
   friend void swap(DoubleData& a, DoubleData& b) {
@@ -1214,7 +1024,7 @@ class DoubleData :
   double data() const;
   void set_data(double value);
 
-  // @@protoc_insertion_point(class_scope:PB.DoubleData)
+  // @@protoc_insertion_point(class_scope:com.DoubleData)
  private:
   class HasBitSetters;
 
@@ -1250,7 +1060,7 @@ static bool _ParseMap(const char* begin, const char* end, void* object, ::google
 // -------------------------------------------------------------------
 
 class StringMap :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:PB.StringMap) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.StringMap) */ {
  public:
   StringMap();
   virtual ~StringMap();
@@ -1287,7 +1097,7 @@ class StringMap :
                &_StringMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(StringMap* other);
   friend void swap(StringMap& a, StringMap& b) {
@@ -1354,7 +1164,7 @@ class StringMap :
   ::google::protobuf::Map< ::std::string, ::std::string >*
       mutable_data();
 
-  // @@protoc_insertion_point(class_scope:PB.StringMap)
+  // @@protoc_insertion_point(class_scope:com.StringMap)
  private:
   class HasBitSetters;
 
@@ -1377,264 +1187,6 @@ class StringMap :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// NetWorkPacket
-
-// string Service = 1;
-inline void NetWorkPacket::clear_service() {
-  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& NetWorkPacket::service() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.Service)
-  return service_.GetNoArena();
-}
-inline void NetWorkPacket::set_service(const ::std::string& value) {
-  
-  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.Service)
-}
-#if LANG_CXX11
-inline void NetWorkPacket::set_service(::std::string&& value) {
-  
-  service_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.Service)
-}
-#endif
-inline void NetWorkPacket::set_service(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.Service)
-}
-inline void NetWorkPacket::set_service(const char* value, size_t size) {
-  
-  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.Service)
-}
-inline ::std::string* NetWorkPacket::mutable_service() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.Service)
-  return service_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NetWorkPacket::release_service() {
-  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.Service)
-  
-  return service_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NetWorkPacket::set_allocated_service(::std::string* service) {
-  if (service != nullptr) {
-    
-  } else {
-    
-  }
-  service_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service);
-  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.Service)
-}
-
-// string Method = 2;
-inline void NetWorkPacket::clear_method() {
-  method_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& NetWorkPacket::method() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.Method)
-  return method_.GetNoArena();
-}
-inline void NetWorkPacket::set_method(const ::std::string& value) {
-  
-  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.Method)
-}
-#if LANG_CXX11
-inline void NetWorkPacket::set_method(::std::string&& value) {
-  
-  method_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.Method)
-}
-#endif
-inline void NetWorkPacket::set_method(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.Method)
-}
-inline void NetWorkPacket::set_method(const char* value, size_t size) {
-  
-  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.Method)
-}
-inline ::std::string* NetWorkPacket::mutable_method() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.Method)
-  return method_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NetWorkPacket::release_method() {
-  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.Method)
-  
-  return method_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NetWorkPacket::set_allocated_method(::std::string* method) {
-  if (method != nullptr) {
-    
-  } else {
-    
-  }
-  method_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), method);
-  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.Method)
-}
-
-// int32 Code = 3;
-inline void NetWorkPacket::clear_code() {
-  code_ = 0;
-}
-inline ::google::protobuf::int32 NetWorkPacket::code() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.Code)
-  return code_;
-}
-inline void NetWorkPacket::set_code(::google::protobuf::int32 value) {
-  
-  code_ = value;
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.Code)
-}
-
-// uint64 EntityId = 4;
-inline void NetWorkPacket::clear_entityid() {
-  entityid_ = PROTOBUF_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 NetWorkPacket::entityid() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.EntityId)
-  return entityid_;
-}
-inline void NetWorkPacket::set_entityid(::google::protobuf::uint64 value) {
-  
-  entityid_ = value;
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.EntityId)
-}
-
-// uint64 RpcId = 5;
-inline void NetWorkPacket::clear_rpcid() {
-  rpcid_ = PROTOBUF_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 NetWorkPacket::rpcid() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.RpcId)
-  return rpcid_;
-}
-inline void NetWorkPacket::set_rpcid(::google::protobuf::uint64 value) {
-  
-  rpcid_ = value;
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.RpcId)
-}
-
-// bytes MessageData = 6;
-inline void NetWorkPacket::clear_messagedata() {
-  messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& NetWorkPacket::messagedata() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.MessageData)
-  return messagedata_.GetNoArena();
-}
-inline void NetWorkPacket::set_messagedata(const ::std::string& value) {
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.MessageData)
-}
-#if LANG_CXX11
-inline void NetWorkPacket::set_messagedata(::std::string&& value) {
-  
-  messagedata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.MessageData)
-}
-#endif
-inline void NetWorkPacket::set_messagedata(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.MessageData)
-}
-inline void NetWorkPacket::set_messagedata(const void* value, size_t size) {
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.MessageData)
-}
-inline ::std::string* NetWorkPacket::mutable_messagedata() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.MessageData)
-  return messagedata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NetWorkPacket::release_messagedata() {
-  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.MessageData)
-  
-  return messagedata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NetWorkPacket::set_allocated_messagedata(::std::string* messagedata) {
-  if (messagedata != nullptr) {
-    
-  } else {
-    
-  }
-  messagedata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), messagedata);
-  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.MessageData)
-}
-
-// string ProtocName = 7;
-inline void NetWorkPacket::clear_protocname() {
-  protocname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& NetWorkPacket::protocname() const {
-  // @@protoc_insertion_point(field_get:PB.NetWorkPacket.ProtocName)
-  return protocname_.GetNoArena();
-}
-inline void NetWorkPacket::set_protocname(const ::std::string& value) {
-  
-  protocname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.NetWorkPacket.ProtocName)
-}
-#if LANG_CXX11
-inline void NetWorkPacket::set_protocname(::std::string&& value) {
-  
-  protocname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.NetWorkPacket.ProtocName)
-}
-#endif
-inline void NetWorkPacket::set_protocname(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  protocname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.NetWorkPacket.ProtocName)
-}
-inline void NetWorkPacket::set_protocname(const char* value, size_t size) {
-  
-  protocname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.NetWorkPacket.ProtocName)
-}
-inline ::std::string* NetWorkPacket::mutable_protocname() {
-  
-  // @@protoc_insertion_point(field_mutable:PB.NetWorkPacket.ProtocName)
-  return protocname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NetWorkPacket::release_protocname() {
-  // @@protoc_insertion_point(field_release:PB.NetWorkPacket.ProtocName)
-  
-  return protocname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NetWorkPacket::set_allocated_protocname(::std::string* protocname) {
-  if (protocname != nullptr) {
-    
-  } else {
-    
-  }
-  protocname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), protocname);
-  // @@protoc_insertion_point(field_set_allocated:PB.NetWorkPacket.ProtocName)
-}
-
-// -------------------------------------------------------------------
-
 // StringArray
 
 // repeated string DataArray = 1;
@@ -1645,64 +1197,64 @@ inline void StringArray::clear_dataarray() {
   dataarray_.Clear();
 }
 inline const ::std::string& StringArray::dataarray(int index) const {
-  // @@protoc_insertion_point(field_get:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_get:com.StringArray.DataArray)
   return dataarray_.Get(index);
 }
 inline ::std::string* StringArray::mutable_dataarray(int index) {
-  // @@protoc_insertion_point(field_mutable:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_mutable:com.StringArray.DataArray)
   return dataarray_.Mutable(index);
 }
 inline void StringArray::set_dataarray(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_set:com.StringArray.DataArray)
   dataarray_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
 inline void StringArray::set_dataarray(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_set:com.StringArray.DataArray)
   dataarray_.Mutable(index)->assign(std::move(value));
 }
 #endif
 inline void StringArray::set_dataarray(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   dataarray_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_set_char:com.StringArray.DataArray)
 }
 inline void StringArray::set_dataarray(int index, const char* value, size_t size) {
   dataarray_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_set_pointer:com.StringArray.DataArray)
 }
 inline ::std::string* StringArray::add_dataarray() {
-  // @@protoc_insertion_point(field_add_mutable:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_add_mutable:com.StringArray.DataArray)
   return dataarray_.Add();
 }
 inline void StringArray::add_dataarray(const ::std::string& value) {
   dataarray_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_add:com.StringArray.DataArray)
 }
 #if LANG_CXX11
 inline void StringArray::add_dataarray(::std::string&& value) {
   dataarray_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_add:com.StringArray.DataArray)
 }
 #endif
 inline void StringArray::add_dataarray(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   dataarray_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_add_char:com.StringArray.DataArray)
 }
 inline void StringArray::add_dataarray(const char* value, size_t size) {
   dataarray_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_add_pointer:com.StringArray.DataArray)
 }
 inline const ::google::protobuf::RepeatedPtrField<::std::string>&
 StringArray::dataarray() const {
-  // @@protoc_insertion_point(field_list:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_list:com.StringArray.DataArray)
   return dataarray_;
 }
 inline ::google::protobuf::RepeatedPtrField<::std::string>*
 StringArray::mutable_dataarray() {
-  // @@protoc_insertion_point(field_mutable_list:PB.StringArray.DataArray)
+  // @@protoc_insertion_point(field_mutable_list:com.StringArray.DataArray)
   return &dataarray_;
 }
 
@@ -1718,25 +1270,25 @@ inline void Int32Array::clear_dataarray() {
   dataarray_.Clear();
 }
 inline ::google::protobuf::int32 Int32Array::dataarray(int index) const {
-  // @@protoc_insertion_point(field_get:PB.Int32Array.DataArray)
+  // @@protoc_insertion_point(field_get:com.Int32Array.DataArray)
   return dataarray_.Get(index);
 }
 inline void Int32Array::set_dataarray(int index, ::google::protobuf::int32 value) {
   dataarray_.Set(index, value);
-  // @@protoc_insertion_point(field_set:PB.Int32Array.DataArray)
+  // @@protoc_insertion_point(field_set:com.Int32Array.DataArray)
 }
 inline void Int32Array::add_dataarray(::google::protobuf::int32 value) {
   dataarray_.Add(value);
-  // @@protoc_insertion_point(field_add:PB.Int32Array.DataArray)
+  // @@protoc_insertion_point(field_add:com.Int32Array.DataArray)
 }
 inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
 Int32Array::dataarray() const {
-  // @@protoc_insertion_point(field_list:PB.Int32Array.DataArray)
+  // @@protoc_insertion_point(field_list:com.Int32Array.DataArray)
   return dataarray_;
 }
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
 Int32Array::mutable_dataarray() {
-  // @@protoc_insertion_point(field_mutable_list:PB.Int32Array.DataArray)
+  // @@protoc_insertion_point(field_mutable_list:com.Int32Array.DataArray)
   return &dataarray_;
 }
 
@@ -1752,25 +1304,25 @@ inline void Int64Array::clear_dataarray() {
   dataarray_.Clear();
 }
 inline ::google::protobuf::int64 Int64Array::dataarray(int index) const {
-  // @@protoc_insertion_point(field_get:PB.Int64Array.DataArray)
+  // @@protoc_insertion_point(field_get:com.Int64Array.DataArray)
   return dataarray_.Get(index);
 }
 inline void Int64Array::set_dataarray(int index, ::google::protobuf::int64 value) {
   dataarray_.Set(index, value);
-  // @@protoc_insertion_point(field_set:PB.Int64Array.DataArray)
+  // @@protoc_insertion_point(field_set:com.Int64Array.DataArray)
 }
 inline void Int64Array::add_dataarray(::google::protobuf::int64 value) {
   dataarray_.Add(value);
-  // @@protoc_insertion_point(field_add:PB.Int64Array.DataArray)
+  // @@protoc_insertion_point(field_add:com.Int64Array.DataArray)
 }
 inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
 Int64Array::dataarray() const {
-  // @@protoc_insertion_point(field_list:PB.Int64Array.DataArray)
+  // @@protoc_insertion_point(field_list:com.Int64Array.DataArray)
   return dataarray_;
 }
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
 Int64Array::mutable_dataarray() {
-  // @@protoc_insertion_point(field_mutable_list:PB.Int64Array.DataArray)
+  // @@protoc_insertion_point(field_mutable_list:com.Int64Array.DataArray)
   return &dataarray_;
 }
 
@@ -1783,41 +1335,41 @@ inline void StringData::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& StringData::data() const {
-  // @@protoc_insertion_point(field_get:PB.StringData.Data)
+  // @@protoc_insertion_point(field_get:com.StringData.Data)
   return data_.GetNoArena();
 }
 inline void StringData::set_data(const ::std::string& value) {
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:PB.StringData.Data)
+  // @@protoc_insertion_point(field_set:com.StringData.Data)
 }
 #if LANG_CXX11
 inline void StringData::set_data(::std::string&& value) {
   
   data_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:PB.StringData.Data)
+  // @@protoc_insertion_point(field_set_rvalue:com.StringData.Data)
 }
 #endif
 inline void StringData::set_data(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:PB.StringData.Data)
+  // @@protoc_insertion_point(field_set_char:com.StringData.Data)
 }
 inline void StringData::set_data(const char* value, size_t size) {
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:PB.StringData.Data)
+  // @@protoc_insertion_point(field_set_pointer:com.StringData.Data)
 }
 inline ::std::string* StringData::mutable_data() {
   
-  // @@protoc_insertion_point(field_mutable:PB.StringData.Data)
+  // @@protoc_insertion_point(field_mutable:com.StringData.Data)
   return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* StringData::release_data() {
-  // @@protoc_insertion_point(field_release:PB.StringData.Data)
+  // @@protoc_insertion_point(field_release:com.StringData.Data)
   
   return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1828,7 +1380,7 @@ inline void StringData::set_allocated_data(::std::string* data) {
     
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:PB.StringData.Data)
+  // @@protoc_insertion_point(field_set_allocated:com.StringData.Data)
 }
 
 // -------------------------------------------------------------------
@@ -1840,13 +1392,13 @@ inline void Int32Data::clear_data() {
   data_ = 0;
 }
 inline ::google::protobuf::int32 Int32Data::data() const {
-  // @@protoc_insertion_point(field_get:PB.Int32Data.Data)
+  // @@protoc_insertion_point(field_get:com.Int32Data.Data)
   return data_;
 }
 inline void Int32Data::set_data(::google::protobuf::int32 value) {
   
   data_ = value;
-  // @@protoc_insertion_point(field_set:PB.Int32Data.Data)
+  // @@protoc_insertion_point(field_set:com.Int32Data.Data)
 }
 
 // -------------------------------------------------------------------
@@ -1858,13 +1410,13 @@ inline void Int64Data::clear_data() {
   data_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Int64Data::data() const {
-  // @@protoc_insertion_point(field_get:PB.Int64Data.Data)
+  // @@protoc_insertion_point(field_get:com.Int64Data.Data)
   return data_;
 }
 inline void Int64Data::set_data(::google::protobuf::int64 value) {
   
   data_ = value;
-  // @@protoc_insertion_point(field_set:PB.Int64Data.Data)
+  // @@protoc_insertion_point(field_set:com.Int64Data.Data)
 }
 
 // -------------------------------------------------------------------
@@ -1876,13 +1428,13 @@ inline void floatData::clear_data() {
   data_ = 0;
 }
 inline float floatData::data() const {
-  // @@protoc_insertion_point(field_get:PB.floatData.Data)
+  // @@protoc_insertion_point(field_get:com.floatData.Data)
   return data_;
 }
 inline void floatData::set_data(float value) {
   
   data_ = value;
-  // @@protoc_insertion_point(field_set:PB.floatData.Data)
+  // @@protoc_insertion_point(field_set:com.floatData.Data)
 }
 
 // -------------------------------------------------------------------
@@ -1894,13 +1446,13 @@ inline void DoubleData::clear_data() {
   data_ = 0;
 }
 inline double DoubleData::data() const {
-  // @@protoc_insertion_point(field_get:PB.DoubleData.Data)
+  // @@protoc_insertion_point(field_get:com.DoubleData.Data)
   return data_;
 }
 inline void DoubleData::set_data(double value) {
   
   data_ = value;
-  // @@protoc_insertion_point(field_set:PB.DoubleData.Data)
+  // @@protoc_insertion_point(field_set:com.DoubleData.Data)
 }
 
 // -------------------------------------------------------------------
@@ -1918,12 +1470,12 @@ inline void StringMap::clear_data() {
 }
 inline const ::google::protobuf::Map< ::std::string, ::std::string >&
 StringMap::data() const {
-  // @@protoc_insertion_point(field_map:PB.StringMap.Data)
+  // @@protoc_insertion_point(field_map:com.StringMap.Data)
   return data_.GetMap();
 }
 inline ::google::protobuf::Map< ::std::string, ::std::string >*
 StringMap::mutable_data() {
-  // @@protoc_insertion_point(field_mutable_map:PB.StringMap.Data)
+  // @@protoc_insertion_point(field_mutable_map:com.StringMap.Data)
   return data_.MutableMap();
 }
 
@@ -1948,12 +1500,10 @@ StringMap::mutable_data() {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace PB
+}  // namespace com
 
 // @@protoc_insertion_point(global_scope)
 

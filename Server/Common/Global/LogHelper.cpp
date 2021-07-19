@@ -2,7 +2,7 @@
 #include<Util/TimeHelper.h>
 #include<Core/Applocation.h>
 #include<spdlog/sinks/rotating_file_sink.h>
-namespace SoEasy
+namespace Sentry
 {
 	void LogInfoConsole::ShowMessage(const std::string & log)
 	{
@@ -63,7 +63,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	void LogHelper::PushLog(ELogType type, const std::string & log)
 	{

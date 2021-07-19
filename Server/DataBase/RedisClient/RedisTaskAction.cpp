@@ -1,7 +1,7 @@
 ﻿#include"RedisTaskAction.h"
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	RedisTaskAction::RedisTaskAction(RedisManager * mgr, const std::string & cmd)
 		: RedisTaskBase(mgr, cmd)

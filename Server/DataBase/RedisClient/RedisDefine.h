@@ -3,14 +3,14 @@
 #include<hiredis/hiredis.h>
 #include<Thread/ThreadTaskAction.h>
 
-using namespace SoEasy;
-namespace SoEasy
+using namespace Sentry;
+namespace Sentry
 {
 	class RedisManager;
 	typedef redisContext RedisSocket;
 }
 
-namespace SoEasy
+namespace Sentry
 {
 
 }

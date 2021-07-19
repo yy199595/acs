@@ -23,7 +23,7 @@ public:
 #define ChildType(type, base) typename std::enable_if<std::is_base_of<base,type>::value && TypeReflection<type>::Value, type>::type
 
 
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	inline bool GetTypeName(std::string & name) 

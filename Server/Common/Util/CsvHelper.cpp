@@ -2,7 +2,7 @@
 #include"FileHelper.h"
 #include"StringHelper.h"
 #include<fstream>
-namespace SoEasy
+namespace Sentry
 {
 	void CsvLine::Add(const std::string & value)
 	{
@@ -24,7 +24,7 @@ namespace SoEasy
 	}
 	
 }
-namespace SoEasy
+namespace Sentry
 {
 	CsvFileReader::CsvFileReader(const std::string & path)
 		: mPath(path)
@@ -67,7 +67,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	CsvFileWriter::CsvFileWriter()
 	{

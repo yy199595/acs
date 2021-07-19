@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"TimerBase.h"
-namespace SoEasy
+namespace Sentry
 {
 	class DelayTimer : public TimerBase
 	{

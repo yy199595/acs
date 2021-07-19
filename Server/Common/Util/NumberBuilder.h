@@ -1,6 +1,6 @@
 #pragma once
 #include<Define/CommonTypeDef.h>
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	class NumberBuilder

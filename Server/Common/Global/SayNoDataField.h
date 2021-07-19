@@ -1,6 +1,6 @@
 #pragma once
 #include<Define/CommonDef.h>
-namespace SoEasy
+namespace Sentry
 {
 	class SayNoDataField
 	{

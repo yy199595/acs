@@ -5,7 +5,7 @@
 #include<google/protobuf/descriptor.h>
 #include<google/protobuf/util/json_util.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	class GameObject;
 	using namespace google::protobuf;
@@ -36,7 +36,7 @@ namespace SoEasy
 }
 	
 
-namespace SoEasy
+namespace Sentry
 { 
 	bool BindClientLuaFunction::Invoke(GameObject * gameObject, const std::string & data)
 	{

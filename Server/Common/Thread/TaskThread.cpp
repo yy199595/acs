@@ -4,7 +4,7 @@
 #include <functional>
 #include<Manager/ThreadTaskManager.h>
 using namespace std::chrono;
-namespace SoEasy
+namespace Sentry
 {
 	TaskThread::TaskThread(ThreadTaskManager * manager, int index)
 	{

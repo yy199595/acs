@@ -1,6 +1,6 @@
 ﻿#include"ServiceBase.h"
 #include<NetWork/NetWorkRetAction.h>
-namespace SoEasy
+namespace Sentry
 {
 	ServiceBase::ServiceBase()
 	{

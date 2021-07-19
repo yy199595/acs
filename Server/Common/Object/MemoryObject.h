@@ -1,6 +1,6 @@
 #pragma once
 #include<Other/MemoryPool.h>
-namespace SoEasy
+namespace Sentry
 {
 	class MemoryObject
 	{

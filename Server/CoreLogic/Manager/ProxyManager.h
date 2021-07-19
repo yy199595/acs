@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Object/GameObject.h>
 #include<Manager/NetProxyManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ProxyManager : public NetProxyManager
 	{

@@ -2,7 +2,7 @@
 #include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
 #include <QueryResult/InvokeResultData.h>
-namespace SoEasy
+namespace Sentry
 {
 	MysqlThreadTask::MysqlThreadTask(MysqlManager * mgr, const std::string &db, const std::string & sql)
 		: mDataBaseName(db), mSqlCommand(sql)

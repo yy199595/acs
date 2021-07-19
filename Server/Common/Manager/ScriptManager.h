@@ -2,7 +2,7 @@
 #include"Manager.h"
 #include<Script/ClassProxyHelper.h>
 #include<Script/LuaTable.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ScriptManager : public Manager
 	{

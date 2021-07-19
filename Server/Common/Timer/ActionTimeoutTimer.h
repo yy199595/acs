@@ -1,6 +1,6 @@
 #pragma once
 #include"TimerBase.h"
-namespace SoEasy
+namespace Sentry
 {
 	class ActionManager;
 	class ActionTimeoutTimer : public TimerBase

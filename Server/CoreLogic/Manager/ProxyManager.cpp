@@ -2,7 +2,7 @@
 #include<Util/StringHelper.h>
 #include<Util/NumberHelper.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	
 }

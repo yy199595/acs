@@ -13,7 +13,7 @@
 using namespace std;
 using namespace asio::ip;
 
-namespace SoEasy
+namespace Sentry
 {
 	class Manager;
 	class ServiceBase;

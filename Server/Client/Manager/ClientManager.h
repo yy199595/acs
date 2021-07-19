@@ -3,7 +3,7 @@
 #include<Manager/ScriptManager.h>
 #include<Manager/NetProxyManager.h>
 #include<Protocol/c2s.pb.h>
-using namespace SoEasy;
+using namespace Sentry;
 using namespace google::protobuf;
 namespace Client
 {
@@ -34,7 +34,7 @@ namespace Client
 		class ScriptManager * mScriptManager;
 		CoroutineManager * mCoroutineManager;
 	private:
-		std::queue<PB::NetWorkPacket *> mWaitSendMessages;
+		std::queue<com::NetWorkPacket *> mWaitSendMessages;
 		
 	};
 }

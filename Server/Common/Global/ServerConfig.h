@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <rapidjson/document.h>
 #include <Define/CommonTypeDef.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ServerConfig
 	{

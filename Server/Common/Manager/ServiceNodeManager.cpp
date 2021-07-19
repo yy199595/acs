@@ -1,7 +1,7 @@
 #include "ServiceNodeManager.h"
 #include <Other/ServiceNode.h>
 #include<Manager/NetSessionManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	bool ServiceNodeManager::DelServiceNode(int nodeId)
 	{

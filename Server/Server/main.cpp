@@ -21,8 +21,8 @@
 
 #include<Service/MysqlProxy.h>
 
-using namespace SoEasy;
-using namespace SoEasy;
+using namespace Sentry;
+using namespace Sentry;
 
 #ifdef _WIN32
 #pragma comment(lib,"lua53.lib")

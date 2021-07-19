@@ -3,7 +3,7 @@
 #include<Core/Applocation.h>
 #include<Thread/ThreadTaskAction.h>
 
-namespace SoEasy
+namespace Sentry
 {
 
 	

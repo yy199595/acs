@@ -3,7 +3,7 @@
 #include<Define/CommonTypeDef.h>
 #include<spdlog/sinks/basic_file_sink.h>
 #include<spdlog/sinks/stdout_color_sinks.h>
-namespace SoEasy
+namespace Sentry
 {
 	using ELogType = spdlog::level::level_enum;
 
@@ -47,7 +47,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 
 	class LogHelper

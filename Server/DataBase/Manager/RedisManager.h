@@ -5,8 +5,8 @@
 #include<QueryResult/InvokeResultData.h>
 #include<RedisClient/RedisTaskAction.h>
 
-using namespace SoEasy;
-namespace SoEasy
+using namespace Sentry;
+namespace Sentry
 {
 	class ThreadTaskManager;
 	class RedisManager : public Manager

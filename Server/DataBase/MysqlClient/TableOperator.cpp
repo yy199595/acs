@@ -2,7 +2,7 @@
 #include <fstream>
 #include <Protocol/db.pb.h>
 #include <Manager/MysqlManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	TableOperator::TableOperator(SayNoMysqlSocket *socket, const std::string db, rapidjson::Document &doc)
 		: mDocument(doc)

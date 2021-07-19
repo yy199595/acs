@@ -7,7 +7,7 @@
 #include<MysqlClient/MysqlThreadTask.h>
 #include <google/protobuf/util/json_util.h>
 #include <Pool/ProtocolPool.h>
-namespace SoEasy
+namespace Sentry
 {
     MysqlProxy::MysqlProxy()
     {

@@ -2,7 +2,7 @@
 #include<cstring>
 #include<unordered_map>
 #include<XCode/XCode.h>
-namespace SoEasy
+namespace Sentry
 {
 	struct CostTimeInfo
 	{

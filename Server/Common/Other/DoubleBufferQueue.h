@@ -3,7 +3,7 @@
 #include<queue>
 #include<mutex>
 #include<atomic>
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	class DoubleBufferQueue

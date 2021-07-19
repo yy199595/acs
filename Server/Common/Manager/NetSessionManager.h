@@ -8,7 +8,7 @@
 #include<Pool/ObjectPool.h>
 #include<NetWork/SocketEvent.h>
 #include<Other/DoubleBufferQueue.h>
-namespace SoEasy
+namespace Sentry
 {
 	// 管理所有session  在网络线程中运行
 	class TcpClientSession;

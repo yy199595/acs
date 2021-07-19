@@ -1,7 +1,7 @@
 #pragma once
 #include<Manager/Manager.h>
 #include<Service/ServiceBase.h>
-namespace SoEasy
+namespace Sentry
 {
 	template<typename Base>
 	class ObjectRegistry

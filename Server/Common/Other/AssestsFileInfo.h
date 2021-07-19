@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include<string>
-namespace SoEasy
+namespace Sentry
 {
 	class AssestsFileInfo
 	{

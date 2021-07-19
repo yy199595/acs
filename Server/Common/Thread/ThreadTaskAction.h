@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <memory>
-namespace SoEasy
+namespace Sentry
 {
 	class ThreadTaskManager;
 	class ThreadTaskAction

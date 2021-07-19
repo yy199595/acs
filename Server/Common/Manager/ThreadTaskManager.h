@@ -3,7 +3,7 @@
 #include "Manager.h"
 #include <Thread/TaskThread.h>
 #include <Other/DoubleBufferQueue.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ThreadTaskAction;
 	class ThreadTaskManager : public Manager, public ISystemUpdate

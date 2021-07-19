@@ -7,7 +7,7 @@
 
 
 
-namespace SoEasy
+namespace Sentry
 {
 	ServiceRegistry::ServiceRegistry()
 	{
@@ -19,7 +19,7 @@ namespace SoEasy
 		SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
 
 		REGISTER_FUNCTION_1(ServiceRegistry::RegisterNode, s2s::NodeRegister_Request);
-		REGISTER_FUNCTION_2(ServiceRegistry::QueryNodes, PB::Int32Data, s2s::NodeData_Array);
+		REGISTER_FUNCTION_2(ServiceRegistry::QueryNodes, com::Int32Data, s2s::NodeData_Array);
 		return true;
 	}
 
@@ -53,7 +53,7 @@ namespace SoEasy
 		return XCode::Successful;
 	}
 
-	XCode ServiceRegistry::QueryNodes(long long id, const PB::Int32Data & areaData, s2s::NodeData_Array & nodeArray)
+	XCode ServiceRegistry::QueryNodes(long long id, const com::Int32Data & areaData, s2s::NodeData_Array & nodeArray)
 	{
 		const int areaId = areaData.data();
 		auto iter = this->mServiceNodeMap.begin();

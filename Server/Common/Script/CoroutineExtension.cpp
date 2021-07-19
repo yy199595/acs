@@ -2,7 +2,7 @@
 #include<chrono>
 #include<Core/Applocation.h>
 #include<Manager/ScriptManager.h>
-using namespace SoEasy;
+using namespace Sentry;
 namespace CoroutineExtension
 {
 	int Sleep(lua_State * lua)

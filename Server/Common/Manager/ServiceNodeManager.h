@@ -1,7 +1,7 @@
 #pragma once
 
 #include"Manager.h"
-namespace SoEasy
+namespace Sentry
 {
 	class ServiceNode;
 	class ServiceNodeManager : public Manager, public IFrameUpdate

@@ -1,6 +1,6 @@
 ﻿#include"ObjectPool.h"
 
-namespace SoEasy
+namespace Sentry
 {
-	thread_local ObjectPool<PB::NetWorkPacket> GnetPacketPool;
+	thread_local ObjectPool<com::NetWorkPacket> GnetPacketPool;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include<Module/Component.h>
-namespace SoEasy
+namespace Sentry
 {
 	template<typename ObjectType>
 	class SayNoFactory

@@ -1,6 +1,6 @@
 ﻿#include "ProtocolPool.h"
 #include<Define/CommonDef.h>
-namespace SoEasy
+namespace Sentry
 {
 	ProtocolPool GprotocolPool;
 	Message * ProtocolPool::Create(const std::string & name)

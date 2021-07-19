@@ -3,7 +3,7 @@
 #include<Util/StringHelper.h>
 #include<Manager/NetSessionManager.h>
 #include<NetWork/SocketEvent.h>
-namespace SoEasy
+namespace Sentry
 {
 	TcpClientSession::TcpClientSession(NetSessionManager * manager, SharedTcpSocket socket)
 		:mAsioContext(manager->GetAsioCtx())

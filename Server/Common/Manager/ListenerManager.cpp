@@ -2,7 +2,7 @@
 #include<Util/StringHelper.h>
 #include<Core/Applocation.h>
 #include<Manager/NetSessionManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	bool ListenerManager::StartAccept()
 	{

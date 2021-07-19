@@ -1,7 +1,7 @@
 #pragma once
 #include"TimerBase.h"
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	class CorSleepTimer : public TimerBase
 	{

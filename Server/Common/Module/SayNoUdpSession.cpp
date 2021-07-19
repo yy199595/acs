@@ -1,6 +1,6 @@
 #include"SayNoUdpSession.h"
 
-namespace SoEasy
+namespace Sentry
 {
 	SayNoUdpSession::SayNoUdpSession(SharedGameObject obj)
 		: Component(obj)

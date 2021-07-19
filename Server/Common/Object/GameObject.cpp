@@ -3,7 +3,7 @@
 #include<Core/Applocation.h>
 #include<Module/Component.h>
 #include<Module/SayNoFactory.h>
-namespace SoEasy
+namespace Sentry
 {
 	GameObject::GameObject(const long long id)
 		: mGameObjectId(id)

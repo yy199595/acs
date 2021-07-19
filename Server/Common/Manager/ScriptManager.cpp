@@ -19,7 +19,7 @@
 #include<Util/MathHelper.h>
 #include<Util/ProtocHelper.h>
 #include<Util/DirectoryHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	ScriptManager::ScriptManager()
 	{
@@ -186,20 +186,20 @@ namespace SoEasy
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
 		ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetYearMonthDayString", TimeHelper::GetYearMonthDayString);
 		
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Call", SystemExtension::Call);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Sleep", SystemExtension::Sleep);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallWait", SystemExtension::CallWait);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallByName", SystemExtension::CallByName);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CallBySession", SystemExtension::CallBySession);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Call", SystemExtension::Call);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Sleep", SystemExtension::Sleep);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallWait", SystemExtension::CallWait);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallByName", SystemExtension::CallByName);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallBySession", SystemExtension::CallBySession);
 
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "AddTimer", SystemExtension::AddTimer);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "RemoveTimer", SystemExtension::RemoveTimer);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "AddTimer", SystemExtension::AddTimer);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
 
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "GetManager", SystemExtension::GetManager);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "CreateByTable", LuaProtocExtension::CreateByTable);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "GetManager", SystemExtension::GetManager);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CreateByTable", LuaProtocExtension::CreateByTable);
 
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "LuaRetMessage", SystemExtension::LuaRetMessage);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "NewService", SystemExtension::NewService);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "LuaRetMessage", SystemExtension::LuaRetMessage);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "NewService", SystemExtension::NewService);
 
 	}
 
@@ -239,10 +239,10 @@ namespace SoEasy
 
 	void ScriptManager::RegisterExtension(lua_State * lua)
 	{
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Log", LuaAPIExtension::DebugLog);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Info", LuaAPIExtension::DebugInfo);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Error", LuaAPIExtension::DebugError);
-		ClassProxyHelper::PushStaticExtensionFunction(lua, "SoEasy", "Warning", LuaAPIExtension::DebugWarning);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Log", LuaAPIExtension::DebugLog);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Info", LuaAPIExtension::DebugInfo);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Error", LuaAPIExtension::DebugError);
+		ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
 
 
 		lua_newtable(lua);

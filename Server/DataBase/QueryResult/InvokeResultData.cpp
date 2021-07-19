@@ -1,6 +1,6 @@
 ﻿#include "InvokeResultData.h"
 
-namespace SoEasy
+namespace Sentry
 {
 	bool QuertJsonWritre::StartWriteObject()
 	{
@@ -105,7 +105,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 
 	QuertJsonWritre::QuertJsonWritre()

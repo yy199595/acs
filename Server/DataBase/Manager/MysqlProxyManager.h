@@ -1,7 +1,7 @@
 ﻿#include<Manager/Manager.h>
 #include<Protocol/s2s.pb.h>
 #include<Pool/ObjectPool.h>
-namespace SoEasy
+namespace Sentry
 {
     class MysqlProxyManager : public Manager, public IFrameUpdate
     {

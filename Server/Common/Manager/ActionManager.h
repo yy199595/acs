@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Manager/Manager.h>
 #include<Other/TimeRecorder.h>
-namespace SoEasy
+namespace Sentry
 {
 	// 注册本地Lua服务，管理远程回来的回调
 	class NetLuaAction;
@@ -15,7 +15,7 @@ namespace SoEasy
 		virtual ~ActionManager() { }
 	public:
 		long long AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-		bool InvokeCallback(long long id, PB::NetWorkPacket * messageData);
+		bool InvokeCallback(long long id, com::NetWorkPacket * messageData);
 	protected:
 		bool OnInit() override;
 	private:

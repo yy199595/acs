@@ -5,7 +5,7 @@
 #include"ThreadTaskAction.h"
 #include<condition_variable>
 #include<Other/DoubleBufferQueue.h>
-namespace SoEasy
+namespace Sentry
 {
 	enum ThreadState
 	{

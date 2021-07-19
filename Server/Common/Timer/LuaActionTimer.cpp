@@ -2,7 +2,7 @@
 #include<Util/MathHelper.h>
 #include<Util/TimeHelper.h>
 #include<Define/CommonDef.h>
-namespace SoEasy
+namespace Sentry
 {
 	LuaActionTimer::LuaActionTimer(lua_State * luaEnv, int ref, int interval, int count)
 		: TimerBase(interval)

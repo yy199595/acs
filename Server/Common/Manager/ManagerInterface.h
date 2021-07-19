@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace SoEasy
+namespace Sentry
 {
 	class IFrameUpdate
 	{

@@ -1,6 +1,6 @@
 ﻿#include"JsonHelper.h"
 
-namespace SoEasy
+namespace Sentry
 {
 	bool RapidJsonWriter::StartAddParameter()
 	{
@@ -186,7 +186,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	bool RapidJsonReader::TryParse(const char * str, size_t size)
 	{

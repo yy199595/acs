@@ -3,7 +3,7 @@
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ServiceNodeManager.h>
 #include <Protocol/s2s.pb.h>
-namespace SoEasy
+namespace Sentry
 {
     bool MysqlProxyManager::OnInit()
     {

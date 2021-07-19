@@ -3,7 +3,7 @@
 #include<Protocol/com.pb.h>
 #include<Protocol/s2s.pb.h>
 using namespace google::protobuf;
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	inline Object * CreateNullArgcObject() { return new T(); }

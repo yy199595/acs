@@ -4,7 +4,7 @@
 #include<Script/LuaInclude.h>
 
 #define RedisLuaArgvSize 10
-namespace SoEasy
+namespace Sentry
 {
 	class QuertJsonWritre;
 	class RedisLuaTask : public RedisTaskBase

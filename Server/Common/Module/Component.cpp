@@ -1,7 +1,7 @@
 #include"Component.h"
 #include<Object/GameObject.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	Component::Component(shared_ptr<GameObject> obj)
 		: mGameObject(obj)

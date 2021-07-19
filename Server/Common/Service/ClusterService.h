@@ -2,8 +2,8 @@
 #include"LocalService.h"
 #include<Protocol/com.pb.h>
 #include<Protocol/s2s.pb.h>
-using namespace PB;
-namespace SoEasy
+using namespace com;
+namespace Sentry
 {
 	class ServiceManager;
 	class CoroutineManager;

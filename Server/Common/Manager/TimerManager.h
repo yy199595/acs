@@ -8,7 +8,7 @@
 #include<Timer/TimerBase.h>
 #define TimerPrecision 20 //精度  毫秒
 #define MaxMinute 1		//一圈轮询时间 分钟
-namespace SoEasy
+namespace Sentry
 {
 	class TimerManager : public Manager,  public IFrameUpdate
 	{

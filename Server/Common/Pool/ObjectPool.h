@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<queue>
 #include<Protocol/com.pb.h>
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	class ObjectPool
@@ -68,7 +68,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
-	extern thread_local ObjectPool<PB::NetWorkPacket> GnetPacketPool;
+	extern thread_local ObjectPool<com::NetWorkPacket> GnetPacketPool;
 }

@@ -2,7 +2,7 @@
 #include <Manager/ActionManager.h>
 #include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	LocalService::LocalService()
 	{
@@ -30,7 +30,7 @@ namespace SoEasy
 		}
 	}
 
-	XCode LocalService::InvokeMethod(PB::NetWorkPacket * msgData)
+	XCode LocalService::InvokeMethod(com::NetWorkPacket * msgData)
 	{
 		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);
@@ -42,7 +42,7 @@ namespace SoEasy
 		return localAction->Invoke(msgData);
 	}
 
-	XCode LocalService::InvokeMethod(const std::string &address, PB::NetWorkPacket * msgData)
+	XCode LocalService::InvokeMethod(const std::string &address, com::NetWorkPacket * msgData)
 	{
 		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);
@@ -56,7 +56,7 @@ namespace SoEasy
 
 	bool LocalService::BindFunction(std::string name, LocalAction1 action)
 	{
-		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, name));
+		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, this->GetServiceName(), name));
 	}
 	bool LocalService::BindFunction(const std::string &name, shared_ptr<LocalActionProxy> actionBox)
 	{
@@ -66,9 +66,6 @@ namespace SoEasy
 			SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
 			return false;
 		}
-#ifdef SOEASY_DEBUG
-		actionBox->mServiceName = this->GetServiceName();
-#endif
 		this->mActionMap.emplace(name, actionBox);
 		return true;
 	}

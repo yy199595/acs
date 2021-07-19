@@ -8,7 +8,7 @@
 
 using namespace google::protobuf;
 using namespace google::protobuf::util;
-using namespace SoEasy;
+using namespace Sentry;
 namespace LuaProtocExtension
 {
 	int Serialization(lua_State * lua)

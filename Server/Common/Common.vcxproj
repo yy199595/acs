@@ -29,6 +29,7 @@
     <ClCompile Include="Manager\ListenerManager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\NetSessionManager.cpp" />
+    <ClCompile Include="Manager\ProtocolManager.cpp" />
     <ClCompile Include="Manager\ScriptManager.cpp" />
     <ClCompile Include="Manager\ServiceManager.cpp" />
     <ClCompile Include="Manager\ServiceNodeManager.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="Manager\ManagerInterface.h" />
     <ClInclude Include="Manager\NetSessionManager.h" />
+    <ClInclude Include="Manager\ProtocolManager.h" />
     <ClInclude Include="Manager\ServiceNodeManager.h" />
     <ClInclude Include="Manager\ScriptManager.h" />
     <ClInclude Include="Manager\ServiceManager.h" />

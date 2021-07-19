@@ -4,9 +4,9 @@
 #include <Protocol/com.pb.h>
 #include <NetWork/TcpClientSession.h>
 
-using namespace PB;
+using namespace com;
 
-namespace SoEasy
+namespace Sentry
 {
 	class ServiceNode;
 	struct ActionProxyInfo
@@ -37,7 +37,7 @@ namespace SoEasy
 	private:
 		void NoticeNode(int areaId);
 		XCode RegisterNode(long long id, const s2s::NodeRegister_Request & nodeInfo);
-		XCode QueryNodes(long long id, const PB::Int32Data & areaId, s2s::NodeData_Array & nodeArray);
+		XCode QueryNodes(long long id, const com::Int32Data & areaId, s2s::NodeData_Array & nodeArray);
 	private:
 		class NetSessionManager *mNetWorkManager;
 		shared_ptr<TcpSessionListener> mTcpSessionListener;

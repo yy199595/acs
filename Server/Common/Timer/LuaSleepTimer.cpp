@@ -1,6 +1,6 @@
 #include"LuaSleepTimer.h"
 
-namespace SoEasy
+namespace Sentry
 {
 	LuaSleepTimer::LuaSleepTimer(lua_State * lua, int ref, long long ms)
 		: TimerBase(ms)

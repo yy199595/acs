@@ -1,7 +1,7 @@
 #include "TimerManager.h"
 #include<Timer/DelayTimer.h>
 #include<Util/TimeHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	TimerManager::TimerManager()
 	{

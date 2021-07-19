@@ -1,7 +1,7 @@
 ﻿#include "ThreadTaskManager.h"
 #include <Thread/ThreadTaskAction.h>
 #include <Util/NumberHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	ThreadTaskManager::ThreadTaskManager()
 	{

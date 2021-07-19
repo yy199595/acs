@@ -1,6 +1,6 @@
 #include"CorSleepTimer.h"
 #include<Util/TimeHelper.h>
-namespace SoEasy
+namespace Sentry
 {
 	CorSleepTimer::CorSleepTimer(CoroutineManager * sheduler, long long id, long long ms)
 		: TimerBase(ms)

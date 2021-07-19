@@ -2,7 +2,7 @@
 #include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	Object::Object()
 	{

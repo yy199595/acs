@@ -4,7 +4,7 @@
 #include<ucontext.h>
 #endif
 
-namespace SoEasy
+namespace Sentry
 {
 	enum CorState
 	{

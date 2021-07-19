@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<string>
 #include<vector>
-namespace SoEasy
+namespace Sentry
 {
 	class CsvLine
 	{
@@ -16,7 +16,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class CsvFileReader
 	{
@@ -32,7 +32,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class CsvFileWriter
 	{

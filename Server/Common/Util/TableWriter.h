@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
 #include<fstream>
-namespace SoEasy
+namespace Sentry
 {
 	class TableWriter
 	{

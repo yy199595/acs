@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Define/CommonDef.h>
 #include<NetWork/SocketEvent.h>
-namespace SoEasy
+namespace Sentry
 {
 	enum SessionState
 	{

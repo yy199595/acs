@@ -2,7 +2,7 @@
 #include<XCode/XCode.h>
 #include<Define/CommonDef.h>
 #include<Script/LuaParameter.h>
-namespace SoEasy
+namespace Sentry
 {
 	class NetLuaRetAction
 	{
@@ -21,7 +21,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class NetLuaWaitAction
 	{

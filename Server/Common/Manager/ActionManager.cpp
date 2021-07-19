@@ -8,7 +8,7 @@
 #include<NetWork/NetWorkRetAction.h>
 #include<Coroutine/CoroutineManager.h>
 #include<Timer/ActionTimeoutTimer.h>
-namespace SoEasy
+namespace Sentry
 {
 	ActionManager::ActionManager()
 	{
@@ -38,7 +38,7 @@ namespace SoEasy
 		this->mRetActionMap.emplace(callbackId, rpcAction);
 		return callbackId;
 	}
-	bool ActionManager::InvokeCallback(long long id, PB::NetWorkPacket * messageData)
+	bool ActionManager::InvokeCallback(long long id, com::NetWorkPacket * messageData)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter != this->mRetActionMap.end())

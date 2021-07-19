@@ -2,7 +2,7 @@
 #include<Util/NumberHelper.h>
 #include<Manager/MysqlManager.h>
 #include<Manager/RedisManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	LoginService::LoginService()
 	{

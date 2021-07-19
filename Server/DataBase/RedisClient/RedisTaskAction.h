@@ -3,7 +3,7 @@
 #include<QueryResult/InvokeResultData.h>
 
 
-namespace SoEasy
+namespace Sentry
 {
 	class RedisInvokeResult
 	{
@@ -12,7 +12,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class CoroutineManager;
 	class RedisTaskAction : public RedisTaskBase

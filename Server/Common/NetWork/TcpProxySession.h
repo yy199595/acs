@@ -4,7 +4,7 @@
 #include <NetWork/SocketEvent.h>
 
 using namespace google::protobuf;
-namespace SoEasy
+namespace Sentry
 {
 	class TcpProxySession
 	{
@@ -22,7 +22,7 @@ namespace SoEasy
 		bool StartColse();
 		bool StartReceive();
 		void StartConnect();
-		bool SendMessageData(PB::NetWorkPacket *messageData);
+		bool SendMessageData(com::NetWorkPacket *messageData);
 
 	public:
 		bool Notice(const std::string &service, const std::string &method);							//不回应

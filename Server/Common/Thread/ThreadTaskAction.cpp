@@ -2,7 +2,7 @@
 #include <Util/TimeHelper.h>
 #include <Util/NumberHelper.h>
 #include <Manager/ThreadTaskManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	ThreadTaskAction::ThreadTaskAction()
 	{

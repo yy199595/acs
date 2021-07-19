@@ -1,7 +1,7 @@
 #pragma once
 #include"TimerBase.h"
 #include<Script/LuaInclude.h>
-namespace SoEasy
+namespace Sentry
 {
 	class LuaSleepTimer : public TimerBase
 	{

@@ -5,8 +5,8 @@
 #include<Protocol/com.pb.h>
 #include<NetWork/TcpClientSession.h>
 
-using namespace PB;
-namespace SoEasy
+using namespace com;
+namespace Sentry
 {
 
 	using NetWorkRetAction1 = std::function<void(XCode)>;
@@ -22,7 +22,7 @@ namespace SoEasy
 	public:
 		long long GetCreateTime() { return this->mCreateTime; }
 	public:
-		virtual void Invoke(PB::NetWorkPacket * backData) = 0;
+		virtual void Invoke(com::NetWorkPacket * backData) = 0;
 	private:
 		long long mActionKey;
 		long long mCreateTime;
@@ -36,7 +36,7 @@ namespace SoEasy
 
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class LocalRetActionProxy1 : public LocalRetActionProxy
 	{
@@ -46,7 +46,7 @@ namespace SoEasy
 		~LocalRetActionProxy1() { }
 
 	public:
-		void Invoke(PB::NetWorkPacket * backData) override;
+		void Invoke(com::NetWorkPacket * backData) override;
 	private:
 		NetWorkRetAction1 mBindAction;
 	};
@@ -60,7 +60,7 @@ namespace SoEasy
 		~LocalRetActionProxy2() { }
 
 	public:
-		void Invoke(PB::NetWorkPacket * backData) override
+		void Invoke(com::NetWorkPacket * backData) override
 		{
 			mReturnData.Clear();
 			XCode code = (XCode)backData->code();
@@ -90,7 +90,7 @@ namespace SoEasy
 		~LocalLuaRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(PB::NetWorkPacket * backData);
+		void Invoke(com::NetWorkPacket * backData);
 	private:
 		NetLuaRetAction * mBindLuaAction;
 	};
@@ -103,7 +103,7 @@ namespace SoEasy
 		~LocalWaitRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(PB::NetWorkPacket * backData) override;
+		void Invoke(com::NetWorkPacket * backData) override;
 	private:
 		NetLuaWaitAction * mBindLuaAction;
 	};
@@ -117,7 +117,7 @@ namespace SoEasy
 		~NetWorkWaitCorAction() { }
 		static shared_ptr<NetWorkWaitCorAction> Create(CoroutineManager *);
 	public:
-		void Invoke(PB::NetWorkPacket * backData) override;
+		void Invoke(com::NetWorkPacket * backData) override;
 	public:
 		XCode GetCode() { return this->mCode; }
 		const std::string & GetMsgData() { return this->mMessage; }

@@ -2,7 +2,7 @@
 
 #include"ServiceBase.h"
 #include<NetWork/NetWorkAction.h>
-namespace SoEasy
+namespace Sentry
 {
 	class LocalService : public ServiceBase
 	{
@@ -16,8 +16,8 @@ namespace SoEasy
 	public:
 		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) final;
 	private:
-		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
-		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(com::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(const std::string &address, com::NetWorkPacket *) final;
 	protected:
 		bool BindFunction(std::string name, LocalAction1 action);
 
@@ -43,21 +43,21 @@ namespace SoEasy
 	inline bool LocalService::BindFunction(std::string name, LocalAction2<T1> action)
 	{
 		typedef LocalActionProxy2<T1> ActionProxyType;
-		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
+		return this->BindFunction(name, make_shared<ActionProxyType>(action));
 	}
 
 	template<typename T1>
 	inline bool LocalService::BindFunction(std::string name, LocalAction4<T1> action)
 	{
 		typedef LocalActionProxy4<T1> ActionProxyType;
-		return this->BindFunction(name, make_shared<ActionProxyType>(action, name));
+		return this->BindFunction(name, make_shared<ActionProxyType>(action));
 	}
 
 	template<typename T1, typename T2>
 	inline bool LocalService::BindFunction(std::string name, LocalAction3<T1, T2> action)
 	{
 		const size_t pos = name.find_first_of(".");
-		return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action, name));
+		return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action));
 	}
 #define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))
 #define REGISTER_FUNCTION_1(func,t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))

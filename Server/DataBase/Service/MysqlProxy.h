@@ -1,7 +1,7 @@
 #pragma once
 #include <Protocol/s2s.pb.h>
 #include <Service/LocalService.h>
-namespace SoEasy
+namespace Sentry
 {
     class MysqlProxy : public LocalService
     {

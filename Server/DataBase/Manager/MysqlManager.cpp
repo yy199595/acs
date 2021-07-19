@@ -13,7 +13,7 @@
 #include<Service/MysqlProxy.h>
 #include<Manager/ServiceManager.h>
 #include<Manager/ThreadTaskManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	SqlTableConfig::SqlTableConfig(const std::string tab, const std::string pb)
 		: mTableName(tab), mProtobufName(pb)
@@ -36,7 +36,7 @@ namespace SoEasy
 	}
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	MysqlManager::MysqlManager()
 	{

@@ -3,7 +3,7 @@
 #include<Util/ProtocHelper.h>
 #include<Pool/ProtocolPool.h>
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 
 	LocalLuaRetActionProxy::LocalLuaRetActionProxy(NetLuaRetAction * action) : mBindLuaAction(action)
@@ -11,7 +11,7 @@ namespace SoEasy
 		
 	}
 
-	void LocalLuaRetActionProxy::Invoke(PB::NetWorkPacket * backData)
+	void LocalLuaRetActionProxy::Invoke(com::NetWorkPacket * backData)
 	{
 		XCode code = (XCode)backData->code();
 		const std::string & name = backData->protocname();
@@ -37,7 +37,7 @@ namespace SoEasy
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
 	}
 
-	void LocalRetActionProxy1::Invoke(PB::NetWorkPacket * backData)
+	void LocalRetActionProxy1::Invoke(com::NetWorkPacket * backData)
 	{
 		this->mBindAction((XCode)backData->code());
 	}
@@ -46,7 +46,7 @@ namespace SoEasy
 
 	}
 
-	void LocalWaitRetActionProxy::Invoke(PB::NetWorkPacket * backData)
+	void LocalWaitRetActionProxy::Invoke(com::NetWorkPacket * backData)
 	{
 		XCode code = (XCode)backData->code();
 		const std::string & name = backData->protocname();
@@ -81,7 +81,7 @@ namespace SoEasy
 		return std::make_shared<NetWorkWaitCorAction>(coroutineMgr);
 	}
 
-	void NetWorkWaitCorAction::Invoke(PB::NetWorkPacket * backData)
+	void NetWorkWaitCorAction::Invoke(com::NetWorkPacket * backData)
 	{
 		this->mCode = (XCode)backData->code();
 		this->mMessage = backData->messagedata();

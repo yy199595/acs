@@ -6,7 +6,7 @@
 #include<XCode/XCode.h>
 #include<Thread/ThreadTaskAction.h>
 #define RedisLuaArgvSize 10
-namespace SoEasy
+namespace Sentry
 {
 	class RedisManager;
 	class QuertJsonWritre;

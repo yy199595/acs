@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include"ServiceBase.h"
 #include<Script/LuaInclude.h>
-namespace SoEasy
+namespace Sentry
 {
 	class ScriptManager;
 	class LocalLuaService : public ServiceBase
@@ -16,8 +16,8 @@ namespace SoEasy
 	public:
 		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service)final;
 	protected:
-		virtual XCode InvokeMethod(PB::NetWorkPacket *) final;
-		virtual XCode InvokeMethod(const std::string &address, PB::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(com::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(const std::string &address, com::NetWorkPacket *) final;
 	private:
 		int mServiceIndex;
 		lua_State * mLuaEnv;

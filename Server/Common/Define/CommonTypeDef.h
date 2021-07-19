@@ -85,7 +85,7 @@ typedef std::function<void(const AsioErrorCode &, const size_t)> AsioReceiveCall
 typedef std::shared_ptr<AsioTcpSocket> SharedTcpSocket;
 
 
-namespace SoEasy
+namespace Sentry
 {
 	template<typename T>
 	struct SayNoTypeProxy { typedef T Type; };

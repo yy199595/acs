@@ -6,7 +6,7 @@
 #else
 #include<ucontext.h>
 #endif
-namespace SoEasy
+namespace Sentry
 {
 	Coroutine::~Coroutine()
 	{

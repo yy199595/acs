@@ -3,7 +3,7 @@
 #include <NetWork/SocketEvent.h>
 #include <NetWork/TcpProxySession.h>
 #include <Other/DoubleBufferQueue.h>
-namespace SoEasy
+namespace Sentry
 {
 	// session 代理管理器 负责与网络线程通信 处理网络事件
 	class NetProxyManager : public Manager, public ISystemUpdate
@@ -16,7 +16,7 @@ namespace SoEasy
 		bool AddNetSessionEvent(Net2MainEvent *eve); //不要手动调用
 	public:
 		bool DescorySession(const std::string &address);
-		bool SendMsgByAddress(const std::string &address, PB::NetWorkPacket *msg);
+		bool SendMsgByAddress(const std::string &address, com::NetWorkPacket *msg);
 		bool ConnectByAddress(const std::string &address, const std::string &name);
 
 	public:
@@ -27,7 +27,7 @@ namespace SoEasy
 		void OnSystemUpdate() final;
 		virtual void OnNewSessionConnect(TcpProxySession * session) { }
 		virtual void OnConnectSuccessful(TcpProxySession * session) { }
-		virtual bool OnRecvMessage(const std::string &address, PB::NetWorkPacket *msg);
+		virtual bool OnRecvMessage(const std::string &address, com::NetWorkPacket *msg);
 	private:
 		int mReConnectTime;
 		class TimerManager *mTimerManager;

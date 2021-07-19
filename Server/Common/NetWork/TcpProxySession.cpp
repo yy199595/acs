@@ -4,7 +4,7 @@
 #include <Manager/NetProxyManager.h>
 #include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 
 	TcpProxySession::TcpProxySession(const std::string &address)
@@ -39,7 +39,7 @@ namespace SoEasy
 #endif
 	}
 
-	bool TcpProxySession::SendMessageData(PB::NetWorkPacket *messageData)
+	bool TcpProxySession::SendMessageData(com::NetWorkPacket *messageData)
 	{
 		if (messageData == nullptr)
 		{
@@ -71,7 +71,7 @@ namespace SoEasy
 		{
 			return false;
 		}
-		PB::NetWorkPacket *messageData = GnetPacketPool.Create();
+		com::NetWorkPacket *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;
@@ -87,7 +87,7 @@ namespace SoEasy
 		{
 			return false;
 		}
-		PB::NetWorkPacket *messageData = GnetPacketPool.Create();
+		com::NetWorkPacket *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;

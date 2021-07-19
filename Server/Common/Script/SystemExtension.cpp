@@ -14,7 +14,7 @@
 #include <Manager/ServiceNodeManager.h>
 
 #include<Pool/ObjectPool.h>
-using namespace SoEasy;
+using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)
 {
@@ -163,7 +163,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 			const long long callbackId = lua_tointeger(luaEnv, 2);
 			const long long operId = lua_tointeger(luaEnv, 3);
 			const int code = lua_tointeger(luaEnv, 4);
-			PB::NetWorkPacket * returnPacket = GnetPacketPool.Create();
+			com::NetWorkPacket * returnPacket = GnetPacketPool.Create();
 
 			returnPacket->set_code(code);
 			returnPacket->set_entityid(operId);
@@ -186,7 +186,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 		const long long operId = lua_tointeger(luaEnv, 2);
 		const int code = lua_tointeger(luaEnv, 3);
 
-		PB::NetWorkPacket * returnPacket = GnetPacketPool.Create();
+		com::NetWorkPacket * returnPacket = GnetPacketPool.Create();
 
 		returnPacket->set_code(code);
 		returnPacket->set_entityid(operId);

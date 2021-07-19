@@ -12,7 +12,7 @@
 #include<NetWork/NetWorkRetAction.h>
 using namespace std::chrono;
 
-namespace SoEasy
+namespace Sentry
 {
 #ifdef _WIN32
 #include<Windows.h>

@@ -2,7 +2,7 @@
 #include<NetWork/NetWorkRetAction.h>
 #include<Manager/ActionManager.h>
 #include<Pool/ObjectPool.h>
-namespace SoEasy
+namespace Sentry
 {
 	ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, ActionManager * mgr)
 		:TimerBase(ms)

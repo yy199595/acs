@@ -5,7 +5,7 @@
 #include <MysqlClient/MysqlDefine.h>
 #include <QueryResult/InvokeResultData.h>
 
-namespace SoEasy
+namespace Sentry
 {
 	class SqlTableConfig
 	{
@@ -23,7 +23,7 @@ namespace SoEasy
 	};
 }
 
-namespace SoEasy
+namespace Sentry
 {
 	class MysqlTaskAction;
 	class MysqlThreadTask;

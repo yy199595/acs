@@ -2,7 +2,7 @@
 #include<Util/NumberHelper.h>
 #include<Manager/RedisManager.h>
 #include<Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	RedisLuaTask::RedisLuaTask(RedisManager * mgr, const std::string & cmd, lua_State * lua, int ref)
 		:RedisTaskBase(mgr, cmd)

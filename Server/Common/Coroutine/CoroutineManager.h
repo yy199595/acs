@@ -13,7 +13,7 @@
 #include<NetWork/TcpClientSession.h>
 
 #define CoroutinePoolMaxCount 100	//协程池最大数量
-namespace SoEasy
+namespace Sentry
 {
 	struct Coroutine;
 	class CoroutineManager : public Manager, public ISystemUpdate, public IFrameUpdate

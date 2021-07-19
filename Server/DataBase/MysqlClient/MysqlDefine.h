@@ -11,8 +11,8 @@
 #include<XCode/XCode.h>
 #include<Thread/ThreadTaskAction.h>
 using namespace std;
-using namespace SoEasy;
-namespace SoEasy
+using namespace Sentry;
+namespace Sentry
 {
 	class MysqlManager;
 	typedef  MYSQL_RES MysqlQueryResult;

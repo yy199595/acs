@@ -8,7 +8,7 @@
 #include<Manager/ListenerManager.h>
 #include<Manager/ActionManager.h>
 #include<Manager/NetProxyManager.h>
-namespace SoEasy
+namespace Sentry
 {
 	NetSessionManager::NetSessionManager()
 	{
@@ -55,7 +55,7 @@ namespace SoEasy
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
 #endif
-		PB::NetWorkPacket * msgData = GnetPacketPool.Create();
+		com::NetWorkPacket * msgData = GnetPacketPool.Create();
 		if (!msgData->ParseFromArray(message, size))
 		{
 			GnetPacketPool.Destory(msgData);
@@ -78,7 +78,7 @@ namespace SoEasy
 			return false;
 		}
 
-		PB::NetWorkPacket * msgData = GnetPacketPool.Create();
+		com::NetWorkPacket * msgData = GnetPacketPool.Create();
 		if (!msgData->ParseFromArray(message, size))
 		{
 			GnetPacketPool.Destory(msgData);
@@ -214,7 +214,7 @@ namespace SoEasy
 		else if (eve->GetEventType() == SocketSendMsgEvent)
 		{
 			TcpClientSession * session = this->GetSession(address);
-			PB::NetWorkPacket * messageData = eve->GetMsgData();
+			com::NetWorkPacket * messageData = eve->GetMsgData();
 			char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 			if (!messageData->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 			{

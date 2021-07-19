@@ -1,6 +1,6 @@
 #pragma once
 #include<Object/GameObject.h>
-namespace SoEasy
+namespace Sentry
 {
 	class Component : public Object
 	{

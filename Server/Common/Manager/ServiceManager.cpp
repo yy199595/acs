@@ -7,7 +7,7 @@
 #include<Manager/NetProxyManager.h>
 #include<Manager/ActionManager.h>
 #include <Coroutine/CoroutineManager.h>
-namespace SoEasy
+namespace Sentry
 {
 
 	bool ServiceManager::OnInit()
@@ -21,19 +21,22 @@ namespace SoEasy
 
 		SayNoAssertRetFalse_F(this->CreateLocalService());
 		SayNoAssertRetFalse_F(this->SaveRpcInfoToFile("./Config/rpc.csv"));
+		return true;
 	}
 
 	void ServiceManager::OnInitComplete()
 	{
+		std::vector<shared_ptr<LocalActionProxy>> methodVec;
 		auto iter = this->mLocalServiceMap.begin();
 		for (; iter != this->mLocalServiceMap.end(); iter++)
 		{
 			LocalService *localService = iter->second;
+			localService->GetServiceList(methodVec);
 			this->mCorManager->Start(BIND_ACTION_0(LocalService::OnInitComplete, localService));
 		}
 	}
 
-	bool ServiceManager::HandlerMessage(PB::NetWorkPacket * messageData)
+	bool ServiceManager::HandlerMessage(com::NetWorkPacket * messageData)
 	{
 		ServiceBase * localService = this->GetService(messageData->service());
 		if (localService == nullptr || localService->HasMethod(messageData->method()))
@@ -57,7 +60,7 @@ namespace SoEasy
 		return true;
 	}
 
-	bool ServiceManager::HandlerMessage(const std::string & address, PB::NetWorkPacket * messageData)
+	bool ServiceManager::HandlerMessage(const std::string & address, com::NetWorkPacket * messageData)
 	{
 		const std::string & method = messageData->method();
 		const std::string & service = messageData->service();
