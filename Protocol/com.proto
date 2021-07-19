@@ -1,16 +1,6 @@
 
 syntax = "proto3";
-package PB;
-message NetWorkPacket
-{
-     string Service = 1;      //服务名
-     string Method = 2;       //调用的方法
-     int32 Code = 3;          //返回值
-     uint64 EntityId = 4;     // 玩家id
-     uint64 RpcId = 5;        //返回值
-     bytes MessageData = 6;   //参数
-     string ProtocName = 7;   //参数名字
-}
+package com;
 
 message StringArray
 {
