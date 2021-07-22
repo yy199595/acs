@@ -1,16 +1,17 @@
 ﻿#pragma once
 
-#include"Manager.h"
+#include "Manager.h"
 
 namespace Sentry
 {
 	class ProtocolConfig
 	{
 	public:
-		ProtocolConfig(const unsigned short id, const std::string & service, const std::string & method,
-			const std::string & request, const std::string & response, bool client = false)
-			:IsClientMessage(client), MethodName(method), MethodId(id),
-			ServiceName(service), RequestMsgName(request), ResponseMsgName(response) {}
+		ProtocolConfig(const unsigned short id, const std::string &service, const std::string &method,
+					   const std::string &request, const std::string &response, bool client = false)
+			: IsClientMessage(client), MethodName(method), MethodId(id),
+			  ServiceName(service), RequestMsgName(request), ResponseMsgName(response) {}
+
 	public:
 		const bool IsClientMessage;
 		const std::string MethodName;
@@ -26,13 +27,17 @@ namespace Sentry
 	class ProtocolManager : public Manager
 	{
 	public:
-		ProtocolManager() { }
-		~ProtocolManager() { }
+		ProtocolManager() {}
+		~ProtocolManager() {}
+
 	protected:
 		bool OnInit() final;
+
 	public:
-		const ProtocolConfig * GetProtocolConfig(unsigned short id) const;
-		const ProtocolConfig * GetProtocolConfig(const std::string & service, const std::string & method) const;
+		const ProtocolConfig *GetProtocolConfig(unsigned short id) const;
+		const ProtocolConfig *GetProtocolConfig(const std::string &service, const std::string &method) const;
+	public:
+		IMessage * ParseMessage(const char *msg, const size_t size) const;
 	public:
 		std::unordered_map<unsigned short, ProtocolConfig *> mProtocolMap;
 		std::unordered_map<std::string, ProtocolConfig *> mProtocolNameMap;

@@ -1,6 +1,6 @@
-﻿#include"ProtocolManager.h"
-#include<Util/FileHelper.h>
-#include<Util/StringHelper.h>
+﻿#include "ProtocolManager.h"
+#include <Util/FileHelper.h>
+#include <Util/StringHelper.h>
 namespace Sentry
 {
 	bool ProtocolManager::OnInit()
@@ -14,38 +14,79 @@ namespace Sentry
 		for (size_t index = 0; index < fileContents.size(); index++)
 		{
 			tempArray.clear();
-			const std::string & content = fileContents[index];
+			const std::string &content = fileContents[index];
 			StringHelper::SplitString(content, "\t", tempArray);
 
 			unsigned short id = (unsigned short)std::stoi(tempArray[0]);
-			const std::string & service = tempArray[1];
-			const std::string & method = tempArray[2];
+			const std::string &service = tempArray[1];
+			const std::string &method = tempArray[2];
 			const bool client = tempArray[3] != "FALSE";
-			const std::string & request = tempArray[4];
-			const std::string & response = tempArray[5];
-			
+			const std::string &request = tempArray[4];
+			const std::string &response = tempArray[5];
 
-			ProtocolConfig * protocol = new ProtocolConfig(id, service, method, request, response, client);
+			ProtocolConfig *protocol = new ProtocolConfig(id, service, method, request, response, client);
 			if (protocol != nullptr)
 			{
 				std::string name = service + "." + method;
 				this->mProtocolMap.insert(std::make_pair(id, protocol));
 				this->mProtocolNameMap.insert(std::make_pair(name, protocol));
 			}
-			
 		}
 
 		return true;
 	}
-	const ProtocolConfig * ProtocolManager::GetProtocolConfig(unsigned short id) const
+	const ProtocolConfig *ProtocolManager::GetProtocolConfig(unsigned short id) const
 	{
 		auto iter = this->mProtocolMap.find(id);
 		return iter != this->mProtocolMap.end() ? iter->second : nullptr;
 	}
-	const ProtocolConfig * ProtocolManager::GetProtocolConfig(const std::string & service, const std::string & method) const
+	const ProtocolConfig *ProtocolManager::GetProtocolConfig(const std::string &service, const std::string &method) const
 	{
 		std::string name = service + "." + method;
 		auto iter = this->mProtocolNameMap.find(name);
 		return iter != this->mProtocolNameMap.end() ? iter->second : nullptr;
+	}
+
+	IMessage *ProtocolManager::ParseMessage(const char *message, const size_t size) const
+	{
+		if (message == nullptr || size == 0)
+		{
+			return nullptr;
+		}
+		if (message[0] == 1) //请求消息
+		{
+			size_t offset = 1;
+			unsigned short actionId = 0;
+			memcpy(&actionId, message + offset, sizeof(unsigned short));
+			const ProtocolConfig *config = this->GetProtocolConfig(actionId);
+			if (config == nullptr)
+			{
+				SayNoDebugError("not find action id " << actionId);
+				return nullptr;
+			}
+			offset += sizeof(unsigned short);
+			RequestMessage *netMessage = new RequestMessage();
+			if (config->IsClientMessage)
+			{
+				memcpy(&netMessage->UserId, message + offset, sizeof(long long));
+				offset += sizeof(long long);
+			}
+			if (!config->ResponseMsgName.empty())
+			{
+				memcpy(&netMessage->RpcId, message + offset, sizeof(long long));
+				offset += sizeof(long long);
+			}
+			if (!config->RequestMsgName.empty())
+			{
+				netMessage->ProtocolName = config->RequestMsgName;
+				netMessage->MessageData.assign(message + offset, size - offset);
+			}
+			netMessage->Method = config->MethodName;
+			netMessage->Service = config->ServiceName;
+			return netMessage;
+		}
+		else if (message[0] == 2) //回复消息
+		{
+		}
 	}
 }
