@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include<string>
-#include<Protocol/com.pb.h>
+#include<memory>
+#include"RpcMessage.h"
+using namespace std;
 namespace Sentry
 {
 	enum Net2MainEventType
@@ -31,18 +33,18 @@ namespace Sentry
 	class SocketEvent
 	{
 	public:
-		SocketEvent(T type, const std::string & address, const std::string name = "", com::NetWorkPacket * msg = nullptr)
+		SocketEvent(T type, const std::string & address, const std::string name = "", shared_ptr<IMessage> msg = nullptr)
 			:mEventType(type),mName(name), mAddress(address), mMessageData(msg) {}
 	public:
 		T GetEventType() { return this->mEventType; }
 		const std::string & GetName() { return this->mName; }
 		const std::string & GetAddress() { return this->mAddress; }		
-		com::NetWorkPacket * GetMsgData() { return this->mMessageData; }
+		shared_ptr<IMessage> GetMsgData() { return this->mMessageData; }
 	private:
 		T mEventType;
 		std::string mName;
 		const std::string mAddress;
-		com::NetWorkPacket * mMessageData;
+		shared_ptr<IMessage> mMessageData;
 	};
 
 	typedef SocketEvent<Net2MainEventType> Net2MainEvent; //网络到逻辑事件

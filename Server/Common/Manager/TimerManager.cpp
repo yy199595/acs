@@ -1,14 +1,12 @@
 #include "TimerManager.h"
-#include<Timer/DelayTimer.h>
-#include<Util/TimeHelper.h>
+#include <Timer/DelayTimer.h>
+#include <Util/TimeHelper.h>
 namespace Sentry
 {
 	TimerManager::TimerManager()
 	{
-		this->mIsStop = false;
 		this->mTickCount = 0;
-		this->mTimerCount = 0;	
-		this->mTimerThread = nullptr;
+		this->mTimerCount = 0;
 		this->mMaxTimeCount = MaxMinute * 60 * (1000 / TimerPrecision);
 	}
 
@@ -27,10 +25,10 @@ namespace Sentry
 		auto iter = this->mTimerMap.find(id);
 		if (iter == this->mTimerMap.end())
 		{
-			this->mWheelQueue.AddItem(timer);
+			this->AddTimerToWheel(timer);
 			this->mTimerMap.emplace(id, timer);
 			return true;
-		}	
+		}
 		return false;
 	}
 
@@ -44,12 +42,6 @@ namespace Sentry
 		return this->AddTimer(make_shared<DelayTimer>(ms, func));
 	}
 
-	void TimerManager::Stop()
-	{
-		this->mIsStop = true;
-		this->mWheelVariable.notify_one();
-	}
-
 	bool TimerManager::RemoveTimer(long long id)
 	{
 		auto iter = this->mTimerMap.find(id);
@@ -58,7 +50,7 @@ namespace Sentry
 			shared_ptr<TimerBase> pTimer = iter->second;
 			this->mTimerMap.erase(iter);
 			return true;
-		}	
+		}
 		return false;
 	}
 
@@ -68,82 +60,55 @@ namespace Sentry
 		return iter != this->mTimerMap.end() ? iter->second : nullptr;
 	}
 
-	void TimerManager::OnInitComplete()
-	{
-		if (this->mTimerThread == nullptr)
-		{
-			this->mTimerThread = new std::thread(&TimerManager::RefreshTimer, this);
-			if (this->mTimerThread != nullptr)
-			{
-				this->mTimerThread->detach();
-			}		
-		}
-	}
-
-	void TimerManager::OnFrameUpdate(float t)
-	{
-		long long timerId = 0;
-		this->mFinishTimerQueue.SwapQueueData();
-		if (this->mFinishTimerQueue.PopItem(timerId))
-		{
-			auto iter = this->mTimerMap.find(timerId);
-			if (iter != this->mTimerMap.end())
-			{
-				shared_ptr<TimerBase> timer = iter->second;
-				if (timer->Invoke() == false)
-				{
-					this->mWheelQueue.AddItem(timer);
-					return;
-				}
-				this->mTimerMap.erase(iter);
-			}
-		}
-	}
-
-	void TimerManager::RefreshTimer()
+	void TimerManager::OnSystemUpdate()
 	{
 		this->mStartTime = TimeHelper::GetMilTimestamp();
-		while (this->mIsStop == false)
+		const long long nowTime = TimeHelper::GetMilTimestamp();
+
+		//shared_ptr<TimerBase> newTimer;
+
+		if (this->mTickCount >= this->mMaxTimeCount)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(TimerPrecision));
-			const long long nowTime = TimeHelper::GetMilTimestamp();
-
-			shared_ptr<TimerBase> newTimer;
-			this->mWheelQueue.SwapQueueData();
-			while (this->mWheelQueue.PopItem(newTimer))
+			auto iter = this->mNextWheelTimer.begin();
+			for (; iter != this->mNextWheelTimer.end();)
 			{
-				this->AddTimerToWheel(newTimer);
-			}
-
-			if (this->mTickCount >= this->mMaxTimeCount)
-			{
-				auto iter = this->mNextWheelTimer.begin();
-				for (; iter != this->mNextWheelTimer.end();)
+				(*iter)->mTickCount -= this->mMaxTimeCount;
+				if (this->AddNextTimer((*iter)))
 				{
-					(*iter)->mTickCount -= this->mMaxTimeCount;
-					if (this->AddNextTimer((*iter)))
-					{
-						this->mNextWheelTimer.erase(iter++);
-						continue;
-					}
-					iter++;
+					this->mNextWheelTimer.erase(iter++);
+					continue;
 				}
-				this->mTickCount = 0;
-				this->mStartTime = nowTime;
+				iter++;
 			}
-			int tickCount = (nowTime - mStartTime) / TimerPrecision;
-			for (int index = this->mTickCount; index <= tickCount && index < this->mMaxTimeCount; index++)
-			{
-				std::queue<shared_ptr<TimerBase>> & taskList = this->mTimers[index];
-				while (!taskList.empty())
-				{
-					shared_ptr<TimerBase> timerData = taskList.front();
-					this->mFinishTimerQueue.AddItem(timerData->GetTimerId());
-					taskList.pop();
-				}
-			}
-			this->mTickCount = tickCount;
+			this->mTickCount = 0;
+			this->mStartTime = nowTime;
 		}
+		int tickCount = (nowTime - mStartTime) / TimerPrecision;
+		for (int index = this->mTickCount; index <= tickCount && index < this->mMaxTimeCount; index++)
+		{
+			std::queue<shared_ptr<TimerBase>> &taskList = this->mTimers[index];
+			while (!taskList.empty())
+			{
+				shared_ptr<TimerBase> timerData = taskList.front();
+
+				this->InvokeTimer(timerData->GetTimerId());
+
+				taskList.pop();
+			}
+		}
+		this->mTickCount = tickCount;
+	}
+
+	bool TimerManager::InvokeTimer(long long id)
+	{
+		auto iter = this->mTimerMap.find(id);
+		if (iter != this->mTimerMap.end())
+		{
+			iter->second->Invoke();
+			this->mTimerMap.erase(iter);
+			return true;
+		}
+		return false;
 	}
 
 	bool TimerManager::AddNextTimer(shared_ptr<TimerBase> timer)

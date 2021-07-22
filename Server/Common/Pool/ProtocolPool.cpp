@@ -3,7 +3,7 @@
 namespace Sentry
 {
 	ProtocolPool GprotocolPool;
-	Message * ProtocolPool::Create(const std::string & name)
+	SharedMessage ProtocolPool::Create(const std::string & name)
 	{
 		if (name.empty())
 		{
@@ -12,10 +12,10 @@ namespace Sentry
 		auto iter = this->mProtocolMap.find(name);
 		if (iter != this->mProtocolMap.end())
 		{
-			std::queue<Message *> & messageQueue = iter->second;
+			std::queue<SharedMessage> & messageQueue = iter->second;
 			if (!messageQueue.empty())
 			{
-				Message * messageData = messageQueue.front();
+				SharedMessage messageData = messageQueue.front();
 				messageQueue.pop();
 				return messageData;
 			}
@@ -30,10 +30,10 @@ namespace Sentry
 		}
 		MessageFactory *factory = MessageFactory::generated_factory();
 		const Message *pMessage = factory->GetPrototype(pDescriptor);
-		return pMessage != nullptr ? pMessage->New() : nullptr;
+		return pMessage != nullptr ? std::shared_ptr(pMessage->New()) : nullptr;
 	}
 
-	bool ProtocolPool::Destory(Message * messageData)
+	bool ProtocolPool::Destory(SharedMessage messageData)
 	{
 		if (messageData == nullptr)
 		{
@@ -43,17 +43,15 @@ namespace Sentry
 		auto iter = this->mProtocolMap.find(name);
 		if (iter == this->mProtocolMap.end())
 		{
-			std::queue<Message *> messageQueue;
+			std::queue<SharedMessage> messageQueue;
 			this->mProtocolMap.emplace(name, messageQueue);
 		}
-		std::queue<Message *> & messageQueue = this->mProtocolMap[name];
-		if (messageQueue.size() >= ProtocolMaxCount)
+		std::queue<SharedMessage> & messageQueue = this->mProtocolMap[name];
+		if (messageQueue.size() < ProtocolMaxCount)
 		{
-			delete messageData;
-			return true;
-		}
-		messageData->Clear();
-		messageQueue.push(messageData);
+			messageData->Clear();
+			messageQueue.push(messageData);
+		}	
 		return true;
 	}
 }

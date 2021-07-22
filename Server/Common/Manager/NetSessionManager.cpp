@@ -1,13 +1,15 @@
-﻿#include"NetSessionManager.h"
-#include"ScriptManager.h"
-#include"ActionManager.h"
-#include"Manager.h"
-#include<Core/Applocation.h>
-#include<Util/StringHelper.h>
-#include<NetWork/TcpClientSession.h>
-#include<Manager/ListenerManager.h>
-#include<Manager/ActionManager.h>
-#include<Manager/NetProxyManager.h>
+﻿#include "NetSessionManager.h"
+#include "ScriptManager.h"
+#include "ActionManager.h"
+#include "Manager.h"
+#include <Core/Applocation.h>
+#include <Util/StringHelper.h>
+#include <NetWork/TcpClientSession.h>
+#include <Manager/ListenerManager.h>
+#include <Manager/ActionManager.h>
+#include <Manager/NetProxyManager.h>
+#include <Manager/ProtocolManager.h>
+
 namespace Sentry
 {
 	NetSessionManager::NetSessionManager()
@@ -17,21 +19,21 @@ namespace Sentry
 	}
 
 	bool NetSessionManager::OnInit()
-	{		
+	{
 		this->mListenerManager = this->GetManager<ListenerManager>();
 		SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetManager<NetProxyManager>());
 		SayNoAssertRetFalse_F(this->mLocalActionManager = this->GetManager<ActionManager>());
 		return true;
 	}
 
-	void NetSessionManager::OnConnectSuccess(TcpClientSession * session)
+	void NetSessionManager::OnConnectSuccess(TcpClientSession *session)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
 #endif
-		const std::string & address = session->GetAddress();
-		const std::string & name = session->GetSessionName();		
-		Net2MainEvent * eve = new Net2MainEvent(SocketConnectSuc, address, name);
+		const std::string &address = session->GetAddress();
+		const std::string &name = session->GetSessionName();
+		Net2MainEvent *eve = new Net2MainEvent(SocketConnectSuc, address, name);
 		if (eve != nullptr)
 		{
 			this->mRecvSessionQueue.push(address);
@@ -39,36 +41,108 @@ namespace Sentry
 		}
 	}
 
-	void NetSessionManager::OnSessionError(TcpClientSession * session, Net2MainEventType type)
+	void NetSessionManager::OnSessionError(TcpClientSession *session, Net2MainEventType type)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRet_F(this->IsInNetThead());
 #endif
-		const std::string & address = session->GetAddress();
-		const std::string & name = session->GetSessionName();
-		Net2MainEvent * eve = new Net2MainEvent(type, address, name);
+		const std::string &address = session->GetAddress();
+		const std::string &name = session->GetSessionName();
+		Net2MainEvent *eve = new Net2MainEvent(type, address, name);
 		this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetSessionManager::OnRecvMessage(TcpClientSession * session, const char * message, const size_t size)
+	shared_ptr<IMessage> NetSessionManager::ParseMessage(const char *message, const size_t size)
 	{
+		if (message == nullptr || size == 0)
+		{
+			return nullptr;
+		}
+		NetRpcType type = (NetRpcType)message[0];
+		if (type == NetRpcType::RpcBackType || type == NetRpcType::RpcClientBackType)
+		{
+			if(size < sizeof(long long) + sizeof(int))
+			{
+				return nullptr;
+			}
+			shared_ptr<ResponseMessage> messageData = make_shared<ResponseMessage>();
+			if (messageData != nullptr)
+			{
+				memcpy(&messageData->RpcId, message, sizeof(long long));
+				message = message + sizeof(long long);
+				memcpy(&messageData->Code, message, sizeof(int));
+				if(type == NetRpcType::RpcClientBackType)
+				{
+					if(size < sizeof(long long) + sizeof(int) + sizeof(long long))
+					{
+						return nullptr;
+					}
+					message = message + sizeof(messageData->Code);
+					memcpy(&messageData->UserId, message, sizeof(messageData->UserId));
+				}
+			}
+			return messageData;
+		}
+
+		unsigned short actionId = 0;
+		memcpy(&actionId, message, sizeof(unsigned short));
+		ProtocolManager *pProtocolManager = this->GetManager<ProtocolManager>();
+		const ProtocolConfig *config = pProtocolManager->GetProtocolConfig(actionId);
+		if (config == nullptr)
+		{
+			return false;
+		}
+		shared_ptr<RequestMessage> messageData = make_shared<RequestMessage>();
+
+		if (messageData != nullptr)
+		{
+			messageData->Method = config->MethodName;
+			messageData->Service = config->ServiceName;
+			messageData->ProtocolName = config->RequestMsgName;
+			switch (type)
+			{
+			case NetRpcType::RpcCallType:
+				message = message + sizeof(unsigned short);
+				memcpy(&messageData->RpcId, message, sizeof(messageData->RpcId));
+				messageData->MessageData.assign(message+sizeof)
+				break;
+			case NetRpcType::RpcClientCallType:
+				message = message + sizeof(unsigned short);
+				memcpy(&messageData->RpcId, message, sizeof(long long));
+				memcpy(&messageData->UserId, message + sizeof(long long), sizeof(messageData->UserId));
+				break;
+			case NetRpcType::RpcClientNoticeType:
+				memcpy(&messageData->UserId, message, sizeof(messageData->UserId));
+				break;
+			}
+		}
+		return messageData;
+	}
+
+	bool NetSessionManager::OnRecvMessage(TcpClientSession *session, const char *message, const size_t size)
+	{
+		if (message == nullptr || size == 0)
+		{
+			return false;
+		}
+		NetRpcType type = (NetRpcType)message[0];
+
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
 #endif
-		com::NetWorkPacket * msgData = GnetPacketPool.Create();
-		if (!msgData->ParseFromArray(message, size))
+		if (recvMessage != nullptr)
 		{
-			GnetPacketPool.Destory(msgData);
-			return false;
+			const std::string &address = session->GetAddress();
+			const std::string &name = session->GetSessionName();
+
+			this->mRecvSessionQueue.push(address);
+			Net2MainEvent *eve = new Net2MainEvent(SocketReceiveData, address, name, recvMessage);
+			return this->mNetProxyManager->AddNetSessionEvent(eve);
 		}
-		const std::string & address = session->GetAddress();
-		const std::string & name = session->GetSessionName();
-		this->mRecvSessionQueue.push(address);
-		Net2MainEvent * eve = new Net2MainEvent(SocketReceiveData, address, name, msgData);
-		return this->mNetProxyManager->AddNetSessionEvent(eve);
+		return false;
 	}
 
-	bool NetSessionManager::OnSendMessageError(TcpClientSession * session, const char * message, const size_t size)
+	bool NetSessionManager::OnSendMessageError(TcpClientSession *session, const char *message, const size_t size)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(this->IsInNetThead());
@@ -78,19 +152,19 @@ namespace Sentry
 			return false;
 		}
 
-		com::NetWorkPacket * msgData = GnetPacketPool.Create();
+		com::NetWorkPacket *msgData = GnetPacketPool.Create();
 		if (!msgData->ParseFromArray(message, size))
 		{
 			GnetPacketPool.Destory(msgData);
 			return false;
 		}
-		const std::string & address = session->GetAddress();
-		const std::string & name = session->GetSessionName();
-		Net2MainEvent * eve = new Net2MainEvent(SocketSendMsgFail, address, name, msgData);
+		const std::string &address = session->GetAddress();
+		const std::string &name = session->GetSessionName();
+		Net2MainEvent *eve = new Net2MainEvent(SocketSendMsgFail, address, name, msgData);
 		return this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetSessionManager::AddNetSessionEvent(Main2NetEvent * eve)
+	bool NetSessionManager::AddNetSessionEvent(Main2NetEvent *eve)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetFalse_F(!this->IsInNetThead());
@@ -106,24 +180,24 @@ namespace Sentry
 		return true;
 	}
 
-	TcpClientSession * NetSessionManager::Create(shared_ptr<AsioTcpSocket> socket)
+	TcpClientSession *NetSessionManager::Create(shared_ptr<AsioTcpSocket> socket)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
 #endif
-		TcpClientSession * session = new TcpClientSession(this, socket);
+		TcpClientSession *session = new TcpClientSession(this, socket);
 		if (this->mSessionAdressMap.find(session->GetAddress()) == this->mSessionAdressMap.end())
 		{
 			this->mRecvSessionQueue.push(session->GetAddress());
 			this->mSessionAdressMap.emplace(session->GetAddress(), session);
-			Net2MainEvent * eve = new Net2MainEvent(SocketNewConnect, session->GetAddress());
+			Net2MainEvent *eve = new Net2MainEvent(SocketNewConnect, session->GetAddress());
 			this->mNetProxyManager->AddNetSessionEvent(eve);
 			return session;
 		}
 		return nullptr;
 	}
 
-	TcpClientSession * NetSessionManager::Create(const std::string & name, const std::string & address)
+	TcpClientSession *NetSessionManager::Create(const std::string &name, const std::string &address)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
@@ -137,7 +211,7 @@ namespace Sentry
 		unsigned short port;
 		if (StringHelper::ParseIpAddress(address, ip, port))
 		{
-			TcpClientSession * session = new TcpClientSession(this, name, ip, port);
+			TcpClientSession *session = new TcpClientSession(this, name, ip, port);
 			this->mSessionAdressMap.emplace(address, session);
 			return session;
 		}
@@ -146,18 +220,17 @@ namespace Sentry
 
 	void NetSessionManager::OnDestory()
 	{
-		
 	}
 	void NetSessionManager::OnInitComplete()
 	{
 		this->mNetThread = new std::thread(BIND_THIS_ACTION_0(NetSessionManager::NetUpdate));
 		this->mNetThread->detach();
 	}
-	
+
 	void NetSessionManager::NetUpdate()
 	{
 		std::chrono::milliseconds time(1);
-		Main2NetEvent * sessionEvent = nullptr;
+		Main2NetEvent *sessionEvent = nullptr;
 		this->mNetThreadId = std::this_thread::get_id();
 		while (this->mIsClose == false)
 		{
@@ -168,24 +241,23 @@ namespace Sentry
 			{
 				this->mListenerManager->StartAccept();
 			}
-			
+
 			while (!this->mRecvSessionQueue.empty())
 			{
-				TcpClientSession * tcpSession = this->GetSession(this->mRecvSessionQueue.front());
+				TcpClientSession *tcpSession = this->GetSession(this->mRecvSessionQueue.front());
 				if (tcpSession != nullptr && tcpSession->IsActive())
 				{
 					tcpSession->StartReceiveMsg();
 				}
 				this->mRecvSessionQueue.pop();
 			}
-			
+
 			this->mNetEventQueue.SwapQueueData(); //处理主线程过来的数据
 			while (this->mNetEventQueue.PopItem(sessionEvent))
 			{
 				this->HandlerMainThreadEvent(sessionEvent);
 				delete sessionEvent;
 			}
-				
 		}
 	}
 	bool NetSessionManager::IsInNetThead()
@@ -193,29 +265,30 @@ namespace Sentry
 		return this->mNetThreadId == std::this_thread::get_id();
 	}
 
-	void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent * eve) //处理主线程过来的事件
+	void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent *eve) //处理主线程过来的事件
 	{
-		if (eve == nullptr) return;
-		const std::string & address = eve->GetAddress();
+		if (eve == nullptr)
+			return;
+		const std::string &address = eve->GetAddress();
 		if (eve->GetEventType() == SocketDectoryEvent)
 		{
 			this->DescorySession(address);
 		}
 		else if (eve->GetEventType() == SocketConnectEvent)
 		{
-			const std::string & name = eve->GetName();
-			TcpClientSession * session = this->Create(name, address);
+			const std::string &name = eve->GetName();
+			TcpClientSession *session = this->Create(name, address);
 			if (session == nullptr || !session->StartConnect())
 			{
-				Net2MainEvent * eve = new Net2MainEvent(SocketConnectFail, address, name);
+				Net2MainEvent *eve = new Net2MainEvent(SocketConnectFail, address, name);
 				this->mNetProxyManager->AddNetSessionEvent(eve);
 			}
 		}
 		else if (eve->GetEventType() == SocketSendMsgEvent)
 		{
-			TcpClientSession * session = this->GetSession(address);
-			com::NetWorkPacket * messageData = eve->GetMsgData();
-			char * bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
+			TcpClientSession *session = this->GetSession(address);
+			com::NetWorkPacket *messageData = eve->GetMsgData();
+			char *bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
 			if (!messageData->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
 			{
 				GnetPacketPool.Destory(messageData);
@@ -228,19 +301,19 @@ namespace Sentry
 				memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
 				if (session->SendPackage(make_shared<string>(this->mSendSharedBuffer, length)))
 				{
-					GnetPacketPool.Destory(messageData);				
+					GnetPacketPool.Destory(messageData);
 				}
 				else
 				{
-					const std::string & name = session->GetSessionName();
-					Net2MainEvent * eve = new Net2MainEvent(Net2MainEventType::SocketSendMsgFail, address, name, messageData);
+					const std::string &name = session->GetSessionName();
+					Net2MainEvent *eve = new Net2MainEvent(Net2MainEventType::SocketSendMsgFail, address, name, messageData);
 					this->mNetProxyManager->AddNetSessionEvent(eve);
-				}			
-			}		
+				}
+			}
 		}
 	}
 
-	TcpClientSession * NetSessionManager::GetSession(const std::string & address)
+	TcpClientSession *NetSessionManager::GetSession(const std::string &address)
 	{
 #ifdef SOEASY_DEBUG
 		SayNoAssertRetNull_F(this->IsInNetThead());
@@ -249,12 +322,12 @@ namespace Sentry
 		return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
 	}
 
-	bool NetSessionManager::DescorySession(const std::string & address)
+	bool NetSessionManager::DescorySession(const std::string &address)
 	{
 		auto iter = this->mSessionAdressMap.find(address);
 		if (iter != this->mSessionAdressMap.end())
 		{
-			TcpClientSession * session = iter->second;
+			TcpClientSession *session = iter->second;
 			if (session != nullptr && session->IsActive())
 			{
 				session->StartClose();
