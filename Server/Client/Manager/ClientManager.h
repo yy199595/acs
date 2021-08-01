@@ -2,7 +2,6 @@
 
 #include<Manager/ScriptManager.h>
 #include<Manager/NetProxyManager.h>
-#include<Protocol/c2s.pb.h>
 using namespace Sentry;
 using namespace google::protobuf;
 namespace Client
@@ -34,7 +33,7 @@ namespace Client
 		class ScriptManager * mScriptManager;
 		CoroutineManager * mCoroutineManager;
 	private:
-		std::queue<com::NetWorkPacket *> mWaitSendMessages;
+		std::queue<NetMessageProxy *> mWaitSendMessages;
 		
 	};
 }

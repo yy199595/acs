@@ -16,8 +16,8 @@ namespace Sentry
 	public:
 		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service)final;
 	protected:
-		virtual XCode InvokeMethod(com::NetWorkPacket *) final;
-		virtual XCode InvokeMethod(const std::string &address, com::NetWorkPacket *) final;
+		virtual XCode InvokeMethod(NetMessageProxy *) final;
+		virtual XCode InvokeMethod(const std::string &address, NetMessageProxy *) final;
 	private:
 		int mServiceIndex;
 		lua_State * mLuaEnv;

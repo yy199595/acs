@@ -4,6 +4,7 @@
 #include<Protocol/com.pb.h>
 #include<Other/ObjectFactory.h>
 #include<Pool/ObjectPool.h>
+#include<NetWork/NetMessageProxy.h>
 #ifdef SOEASY_DEBUG
 #include<google/protobuf/util/json_util.h>
 #endif // SOEASY_DEBUG
@@ -12,9 +13,6 @@
 using namespace com;
 namespace Sentry
 {
-
-	using RegisterAction = std::function<XCode(const std::string &, shared_ptr<NetWorkPacket>)>;
-
 	using LocalAction1 = std::function<XCode(long long)>;
 
 	template <typename T>

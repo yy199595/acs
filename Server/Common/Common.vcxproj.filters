@@ -240,6 +240,9 @@
     <ClCompile Include="Manager\ProtocolManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="NetWork\NetMessageProxy.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Applocation.h">
@@ -529,6 +532,9 @@
     </ClInclude>
     <ClInclude Include="Manager\ProtocolManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWork\NetMessageProxy.h">
+      <Filter>NetWork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,8 +7,7 @@
 #include <Pool/ObjectPool.h>
 #include <NetWork/SocketEvent.h>
 #include <Other/DoubleBufferQueue.h>
-
-#include <NetWork/RpcMessage.h>
+#include <NetWork/NetMessageProxy.h>
 namespace Sentry
 {
 	// 管理所有session  在网络线程中运行
@@ -35,8 +34,6 @@ namespace Sentry
 		TcpClientSession *Create(shared_ptr<AsioTcpSocket> socket);
 		TcpClientSession *Create(const std::string &name, const std::string &address);
 
-	private:
-		shared_ptr<IMessage> ParseMessage(const char *message, const size_t size);
 	public:
 		AsioContext &GetAsioCtx() { return (mAsioContext); }
 

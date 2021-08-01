@@ -59,7 +59,7 @@ namespace Sentry
 	{
 	}
 
-	XCode LocalLuaService::InvokeMethod(com::NetWorkPacket * messageData)
+	XCode LocalLuaService::InvokeMethod(NetMessageProxy * messageData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -107,7 +107,7 @@ namespace Sentry
 		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
-	XCode LocalLuaService::InvokeMethod(const std::string &address, com::NetWorkPacket * messageData)
+	XCode LocalLuaService::InvokeMethod(const std::string &address, NetMessageProxy * messageData)
 	{		
 		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);

@@ -22,7 +22,7 @@ namespace Sentry
 	public:
 		long long GetCreateTime() { return this->mCreateTime; }
 	public:
-		virtual void Invoke(com::NetWorkPacket * backData) = 0;
+		virtual void Invoke(NetMessageProxy * backData) = 0;
 	private:
 		long long mActionKey;
 		long long mCreateTime;
@@ -46,7 +46,7 @@ namespace Sentry
 		~LocalRetActionProxy1() { }
 
 	public:
-		void Invoke(com::NetWorkPacket * backData) override;
+		void Invoke(NetMessageProxy * backData) override;
 	private:
 		NetWorkRetAction1 mBindAction;
 	};
@@ -60,7 +60,7 @@ namespace Sentry
 		~LocalRetActionProxy2() { }
 
 	public:
-		void Invoke(com::NetWorkPacket * backData) override
+		void Invoke(NetMessageProxy * backData) override
 		{
 			mReturnData.Clear();
 			XCode code = (XCode)backData->code();
@@ -90,7 +90,7 @@ namespace Sentry
 		~LocalLuaRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(com::NetWorkPacket * backData);
+		void Invoke(NetMessageProxy * backData);
 	private:
 		NetLuaRetAction * mBindLuaAction;
 	};
@@ -103,7 +103,7 @@ namespace Sentry
 		~LocalWaitRetActionProxy() { if (mBindLuaAction) { delete mBindLuaAction; } }
 
 	public:
-		void Invoke(com::NetWorkPacket * backData) override;
+		void Invoke(NetMessageProxy * backData) override;
 	private:
 		NetLuaWaitAction * mBindLuaAction;
 	};
@@ -117,7 +117,7 @@ namespace Sentry
 		~NetWorkWaitCorAction() { }
 		static shared_ptr<NetWorkWaitCorAction> Create(CoroutineManager *);
 	public:
-		void Invoke(com::NetWorkPacket * backData) override;
+		void Invoke(NetMessageProxy * backData) override;
 	public:
 		XCode GetCode() { return this->mCode; }
 		const std::string & GetMsgData() { return this->mMessage; }

@@ -47,46 +47,12 @@ namespace Sentry
 		return iter != this->mProtocolNameMap.end() ? iter->second : nullptr;
 	}
 
-	IMessage *ProtocolManager::ParseMessage(const char *message, const size_t size) const
+	Message * ProtocolManager::CreateMessage(const std::string & name)
 	{
-		if (message == nullptr || size == 0)
-		{
-			return nullptr;
-		}
-		if (message[0] == 1) //请求消息
-		{
-			size_t offset = 1;
-			unsigned short actionId = 0;
-			memcpy(&actionId, message + offset, sizeof(unsigned short));
-			const ProtocolConfig *config = this->GetProtocolConfig(actionId);
-			if (config == nullptr)
-			{
-				SayNoDebugError("not find action id " << actionId);
-				return nullptr;
-			}
-			offset += sizeof(unsigned short);
-			RequestMessage *netMessage = new RequestMessage();
-			if (config->IsClientMessage)
-			{
-				memcpy(&netMessage->UserId, message + offset, sizeof(long long));
-				offset += sizeof(long long);
-			}
-			if (!config->ResponseMsgName.empty())
-			{
-				memcpy(&netMessage->RpcId, message + offset, sizeof(long long));
-				offset += sizeof(long long);
-			}
-			if (!config->RequestMsgName.empty())
-			{
-				netMessage->ProtocolName = config->RequestMsgName;
-				netMessage->MessageData.assign(message + offset, size - offset);
-			}
-			netMessage->Method = config->MethodName;
-			netMessage->Service = config->ServiceName;
-			return netMessage;
-		}
-		else if (message[0] == 2) //回复消息
-		{
-		}
+		return nullptr;
+	}
+	Message * ProtocolManager::CreateMessage(const std::string & name, const char * msg, const size_t size)
+	{
+		return nullptr;
 	}
 }

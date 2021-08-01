@@ -67,8 +67,3 @@ namespace Sentry
 		return new T();
 	}
 }
-
-namespace Sentry
-{
-	extern thread_local ObjectPool<com::NetWorkPacket> GnetPacketPool;
-}

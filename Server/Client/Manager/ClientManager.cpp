@@ -34,7 +34,7 @@ namespace Client
 			TcpProxySession * tcpSession = this->GetProxySession(this->mAddress);
 			if (tcpSession != nullptr)
 			{
-				com::NetWorkPacket * messageData = this->mWaitSendMessages.front();
+				NetMessageProxy * messageData = this->mWaitSendMessages.front();
 				tcpSession->SendMessageData(messageData);
 				this->mWaitSendMessages.pop();
 			}						
@@ -63,7 +63,7 @@ namespace Client
 
 	XCode ClientManager::Call(const std::string & service, const std::string & method, Message & response)
 	{
-		com::NetWorkPacket * messageData = GnetPacketPool.Create();
+		NetMessageProxy * messageData = GnetPacketPool.Create();
 		messageData->set_service(service);
 		messageData->set_method(method);
 
@@ -74,7 +74,7 @@ namespace Client
 
 	XCode ClientManager::Call(const std::string & service, const std::string & method, const Message & request, Message & response)
 	{
-		com::NetWorkPacket * messageData = GnetPacketPool.Create();
+		NetMessageProxy * messageData = GnetPacketPool.Create();
 		ActionManager * pActionManager = this->GetManager<ActionManager>();
 		if (messageData == nullptr)
 		{

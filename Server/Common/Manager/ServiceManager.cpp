@@ -36,38 +36,27 @@ namespace Sentry
 		}
 	}
 
-	bool ServiceManager::HandlerMessage(com::NetWorkPacket * messageData)
+	bool ServiceManager::HandlerMessage(NetMessageProxy * messageData)
 	{
-		ServiceBase * localService = this->GetService(messageData->service());
-		if (localService == nullptr || localService->HasMethod(messageData->method()))
+		ServiceBase * localService = this->GetService(messageData->GetService());
+		if (localService == nullptr || localService->HasMethod(messageData->GetMethd()))
 		{
-			GnetPacketPool.Destory(messageData);
 			return false;
 		}
 		this->mCorManager->Start([localService, this, messageData]()
 			{
-				long long rpcId = messageData->rpcid();
-				XCode code = localService->InvokeMethod(messageData);
-				if (rpcId != 0 && code != XCode::NotResponseMessage)
-				{
-					messageData->clear_method();
-					messageData->clear_service();
-					messageData->set_code((int)code);
-					this->mActionManager->InvokeCallback(rpcId, messageData);
-				}
-				GnetPacketPool.Destory(messageData);
+				//TODO		
 			});
 		return true;
 	}
 
-	bool ServiceManager::HandlerMessage(const std::string & address, com::NetWorkPacket * messageData)
+	bool ServiceManager::HandlerMessage(const std::string & address, NetMessageProxy * messageData)
 	{
-		const std::string & method = messageData->method();
-		const std::string & service = messageData->service();
+		const std::string & method = messageData->GetMethd();
+		const std::string & service = messageData->GetService();
 		ServiceBase * localService = this->GetService(service);
 		if (localService == nullptr || !localService->HasMethod(method))
-		{
-			GnetPacketPool.Destory(messageData);
+		{			
 			SayNoDebugError("call function not find [" << service << "." << method << "]");
 			return false;
 		}
@@ -75,17 +64,10 @@ namespace Sentry
 		this->mCorManager->Start([address, localService, this, messageData]()
 			{
 				XCode code = localService->InvokeMethod(address, messageData);
-				if (messageData->rpcid() == 0 || code == XCode::NotResponseMessage)
+				if (messageData->SetCode(code))
 				{
-					GnetPacketPool.Destory(messageData);
-				}
-				else
-				{
-					messageData->clear_method();
-					messageData->clear_service();
-					messageData->set_code((int)code);
 					this->mNetManager->SendMsgByAddress(address, messageData);
-				}				
+				}
 			});
 		return true;
 	}

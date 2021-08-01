@@ -11,7 +11,7 @@ namespace Sentry
 		
 	}
 
-	void LocalLuaRetActionProxy::Invoke(com::NetWorkPacket * backData)
+	void LocalLuaRetActionProxy::Invoke(NetMessageProxy * backData)
 	{
 		XCode code = (XCode)backData->code();
 		const std::string & name = backData->protocname();
@@ -37,7 +37,7 @@ namespace Sentry
 		this->mCreateTime = TimeHelper::GetMilTimestamp();
 	}
 
-	void LocalRetActionProxy1::Invoke(com::NetWorkPacket * backData)
+	void LocalRetActionProxy1::Invoke(NetMessageProxy * backData)
 	{
 		this->mBindAction((XCode)backData->code());
 	}
@@ -46,7 +46,7 @@ namespace Sentry
 
 	}
 
-	void LocalWaitRetActionProxy::Invoke(com::NetWorkPacket * backData)
+	void LocalWaitRetActionProxy::Invoke(NetMessageProxy * backData)
 	{
 		XCode code = (XCode)backData->code();
 		const std::string & name = backData->protocname();
@@ -81,7 +81,7 @@ namespace Sentry
 		return std::make_shared<NetWorkWaitCorAction>(coroutineMgr);
 	}
 
-	void NetWorkWaitCorAction::Invoke(com::NetWorkPacket * backData)
+	void NetWorkWaitCorAction::Invoke(NetMessageProxy * backData)
 	{
 		this->mCode = (XCode)backData->code();
 		this->mMessage = backData->messagedata();

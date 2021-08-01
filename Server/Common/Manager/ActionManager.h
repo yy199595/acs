@@ -15,7 +15,7 @@ namespace Sentry
 		virtual ~ActionManager() { }
 	public:
 		long long AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-		bool InvokeCallback(long long id, com::NetWorkPacket * messageData);
+		bool InvokeCallback(long long id, NetMessageProxy * messageData);
 	protected:
 		bool OnInit() override;
 	private:

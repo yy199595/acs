@@ -2,5 +2,5 @@
 
 namespace Sentry
 {
-	thread_local ObjectPool<com::NetWorkPacket> GnetPacketPool;
+	thread_local ObjectPool<NetMessageProxy> GnetPacketPool;
 }

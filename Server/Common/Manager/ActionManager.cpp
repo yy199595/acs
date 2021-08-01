@@ -38,7 +38,7 @@ namespace Sentry
 		this->mRetActionMap.emplace(callbackId, rpcAction);
 		return callbackId;
 	}
-	bool ActionManager::InvokeCallback(long long id, com::NetWorkPacket * messageData)
+	bool ActionManager::InvokeCallback(long long id, NetMessageProxy * messageData)
 	{
 		auto iter = this->mRetActionMap.find(id);
 		if (iter != this->mRetActionMap.end())

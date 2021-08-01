@@ -21,7 +21,7 @@ namespace Sentry
 		return this->mNetWorkManager->AddNetSessionEvent(eve);
 	}
 
-	bool NetProxyManager::SendMsgByAddress(const std::string &address, com::NetWorkPacket *msgData)
+	bool NetProxyManager::SendMsgByAddress(const std::string &address, NetMessageProxy *msgData)
 	{
 		TcpProxySession *tcpSession = this->GetProxySession(address);
 		if (tcpSession == nullptr || msgData == nullptr)
@@ -164,7 +164,7 @@ namespace Sentry
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveData)
 			{
-				com::NetWorkPacket *msgData = eve->GetMsgData();
+				NetMessageProxy *msgData = eve->GetMsgData();
 				if (!this->OnRecvMessage(address, msgData))
 				{
 					GnetPacketPool.Destory(msgData);
@@ -181,7 +181,7 @@ namespace Sentry
 		}
 	}
 
-	bool NetProxyManager::OnRecvMessage(const std::string &address, com::NetWorkPacket *messageData)
+	bool NetProxyManager::OnRecvMessage(const std::string &address, NetMessageProxy *messageData)
 	{
 		const std::string &method = messageData->method();
 		const std::string &service = messageData->service();

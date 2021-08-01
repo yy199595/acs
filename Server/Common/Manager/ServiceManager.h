@@ -17,8 +17,8 @@ namespace Sentry
 		bool OnInit() final;
 		void OnInitComplete() final;
 	public:
-		bool HandlerMessage(com::NetWorkPacket * messageData);
-		bool HandlerMessage(const std::string & adress, com::NetWorkPacket * messageData);
+		bool HandlerMessage(NetMessageProxy * messageData);
+		bool HandlerMessage(const std::string & adress, NetMessageProxy * messageData);
 	public:
 		ServiceBase * GetService(const std::string & name);
 		LocalService * GetLocalService(const std::string & name);

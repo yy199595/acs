@@ -30,7 +30,7 @@ namespace Sentry
 		}
 	}
 
-	XCode LocalService::InvokeMethod(com::NetWorkPacket * msgData)
+	XCode LocalService::InvokeMethod(NetMessageProxy * msgData)
 	{
 		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);
@@ -42,7 +42,7 @@ namespace Sentry
 		return localAction->Invoke(msgData);
 	}
 
-	XCode LocalService::InvokeMethod(const std::string &address, com::NetWorkPacket * msgData)
+	XCode LocalService::InvokeMethod(const std::string &address, NetMessageProxy * msgData)
 	{
 		const std::string & method = msgData->method();
 		auto iter = this->mActionMap.find(method);

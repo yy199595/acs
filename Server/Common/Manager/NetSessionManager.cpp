@@ -52,72 +52,6 @@ namespace Sentry
 		this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
-	shared_ptr<IMessage> NetSessionManager::ParseMessage(const char *message, const size_t size)
-	{
-		if (message == nullptr || size == 0)
-		{
-			return nullptr;
-		}
-		NetRpcType type = (NetRpcType)message[0];
-		if (type == NetRpcType::RpcBackType || type == NetRpcType::RpcClientBackType)
-		{
-			if(size < sizeof(long long) + sizeof(int))
-			{
-				return nullptr;
-			}
-			shared_ptr<ResponseMessage> messageData = make_shared<ResponseMessage>();
-			if (messageData != nullptr)
-			{
-				memcpy(&messageData->RpcId, message, sizeof(long long));
-				message = message + sizeof(long long);
-				memcpy(&messageData->Code, message, sizeof(int));
-				if(type == NetRpcType::RpcClientBackType)
-				{
-					if(size < sizeof(long long) + sizeof(int) + sizeof(long long))
-					{
-						return nullptr;
-					}
-					message = message + sizeof(messageData->Code);
-					memcpy(&messageData->UserId, message, sizeof(messageData->UserId));
-				}
-			}
-			return messageData;
-		}
-
-		unsigned short actionId = 0;
-		memcpy(&actionId, message, sizeof(unsigned short));
-		ProtocolManager *pProtocolManager = this->GetManager<ProtocolManager>();
-		const ProtocolConfig *config = pProtocolManager->GetProtocolConfig(actionId);
-		if (config == nullptr)
-		{
-			return false;
-		}
-		shared_ptr<RequestMessage> messageData = make_shared<RequestMessage>();
-
-		if (messageData != nullptr)
-		{
-			messageData->Method = config->MethodName;
-			messageData->Service = config->ServiceName;
-			messageData->ProtocolName = config->RequestMsgName;
-			switch (type)
-			{
-			case NetRpcType::RpcCallType:
-				message = message + sizeof(unsigned short);
-				memcpy(&messageData->RpcId, message, sizeof(messageData->RpcId));
-				messageData->MessageData.assign(message+sizeof)
-				break;
-			case NetRpcType::RpcClientCallType:
-				message = message + sizeof(unsigned short);
-				memcpy(&messageData->RpcId, message, sizeof(long long));
-				memcpy(&messageData->UserId, message + sizeof(long long), sizeof(messageData->UserId));
-				break;
-			case NetRpcType::RpcClientNoticeType:
-				memcpy(&messageData->UserId, message, sizeof(messageData->UserId));
-				break;
-			}
-		}
-		return messageData;
-	}
 
 	bool NetSessionManager::OnRecvMessage(TcpClientSession *session, const char *message, const size_t size)
 	{
@@ -125,21 +59,17 @@ namespace Sentry
 		{
 			return false;
 		}
-		NetRpcType type = (NetRpcType)message[0];
 
-#ifdef SOEASY_DEBUG
-		SayNoAssertRetFalse_F(this->IsInNetThead());
-#endif
-		if (recvMessage != nullptr)
+		NetMessageProxy * messageData = NetMessageProxy::Create(message, size);
+		if (messageData == nullptr)
 		{
-			const std::string &address = session->GetAddress();
-			const std::string &name = session->GetSessionName();
-
-			this->mRecvSessionQueue.push(address);
-			Net2MainEvent *eve = new Net2MainEvent(SocketReceiveData, address, name, recvMessage);
-			return this->mNetProxyManager->AddNetSessionEvent(eve);
+			return false;
 		}
-		return false;
+
+		const std::string &name = session->GetSessionName();
+		this->mRecvSessionQueue.push(session->GetAddress());
+		Net2MainEvent *eve = new Net2MainEvent(SocketReceiveData, session->GetAddress(), name, messageData);
+		return this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
 	bool NetSessionManager::OnSendMessageError(TcpClientSession *session, const char *message, const size_t size)
@@ -152,15 +82,15 @@ namespace Sentry
 			return false;
 		}
 
-		com::NetWorkPacket *msgData = GnetPacketPool.Create();
-		if (!msgData->ParseFromArray(message, size))
+		NetMessageProxy * messageData = NetMessageProxy::Create(message, size);
+		if (messageData == nullptr)
 		{
-			GnetPacketPool.Destory(msgData);
 			return false;
 		}
+
 		const std::string &address = session->GetAddress();
 		const std::string &name = session->GetSessionName();
-		Net2MainEvent *eve = new Net2MainEvent(SocketSendMsgFail, address, name, msgData);
+		Net2MainEvent *eve = new Net2MainEvent(SocketSendMsgFail, address, name, messageData);
 		return this->mNetProxyManager->AddNetSessionEvent(eve);
 	}
 
@@ -287,28 +217,18 @@ namespace Sentry
 		else if (eve->GetEventType() == SocketSendMsgEvent)
 		{
 			TcpClientSession *session = this->GetSession(address);
-			com::NetWorkPacket *messageData = eve->GetMsgData();
-			char *bufferStartPos = this->mSendSharedBuffer + sizeof(unsigned int);
-			if (!messageData->SerializeToArray(bufferStartPos, ASIO_TCP_SEND_MAX_COUNT))
+			if (session != nullptr)
 			{
-				GnetPacketPool.Destory(messageData);
-				SayNoDebugError("Serialize Fail : " << messageData->method());
-			}
-			else
-			{
-				size_t size = messageData->ByteSizeLong();
-				size_t length = size + sizeof(unsigned int);
-				memcpy(this->mSendSharedBuffer, &size, sizeof(unsigned int));
-				if (session->SendPackage(make_shared<string>(this->mSendSharedBuffer, length)))
-				{
-					GnetPacketPool.Destory(messageData);
-				}
-				else
+				NetMessageProxy * messageData = eve->GetMsgData();
+				size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, ASIO_TCP_SEND_MAX_COUNT);
+				if (size == 0)
 				{
 					const std::string &name = session->GetSessionName();
 					Net2MainEvent *eve = new Net2MainEvent(Net2MainEventType::SocketSendMsgFail, address, name, messageData);
 					this->mNetProxyManager->AddNetSessionEvent(eve);
+					return;
 				}
+				session->SendPackage(std::make_shared<std::string>(this->mSendSharedBuffer, size));
 			}
 		}
 	}

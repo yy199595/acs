@@ -39,7 +39,7 @@ namespace Sentry
 #endif
 	}
 
-	bool TcpProxySession::SendMessageData(com::NetWorkPacket *messageData)
+	bool TcpProxySession::SendMessageData(NetMessageProxy *messageData)
 	{
 		if (messageData == nullptr)
 		{
@@ -71,7 +71,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		com::NetWorkPacket *messageData = GnetPacketPool.Create();
+		NetMessageProxy *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;
@@ -87,7 +87,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		com::NetWorkPacket *messageData = GnetPacketPool.Create();
+		NetMessageProxy *messageData = GnetPacketPool.Create();
 		if (messageData == nullptr)
 		{
 			return XCode::Failure;

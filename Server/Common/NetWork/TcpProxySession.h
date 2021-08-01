@@ -22,7 +22,7 @@ namespace Sentry
 		bool StartColse();
 		bool StartReceive();
 		void StartConnect();
-		bool SendMessageData(com::NetWorkPacket *messageData);
+		bool SendMessageData(NetMessageProxy *messageData);
 
 	public:
 		bool Notice(const std::string &service, const std::string &method);							//不回应

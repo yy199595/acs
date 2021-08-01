@@ -180,7 +180,7 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	void ServiceNode::PushMessageData(com::NetWorkPacket *messageData)
+	void ServiceNode::PushMessageData(NetMessageProxy *messageData)
 	{
 		TcpProxySession * tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
 		if (tcpSession == nullptr)
@@ -201,7 +201,7 @@ namespace Sentry
 
 	void ServiceNode::PushMessageData(const std::string &service, const std::string &method, const Message *request, shared_ptr<LocalRetActionProxy> rpcReply)
 	{
-		com::NetWorkPacket *msgData = GnetPacketPool.Create();
+		NetMessageProxy *msgData = GnetPacketPool.Create();
 		if (msgData != nullptr)
 		{
 			if (request != nullptr)

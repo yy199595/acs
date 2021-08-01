@@ -1,4 +1,4 @@
-#include"Manager.h"
+﻿#include"Manager.h"
 #include"ActionManager.h"
 #include<Core/Applocation.h>
 #include<Thread/ThreadTaskAction.h>
@@ -6,13 +6,6 @@
 namespace Sentry
 {
 
-	
-	NetMessageBuffer::NetMessageBuffer(const std::string & address, const SharedPacket packet)
-		:mAddress(address), mMessagePacket(packet)
-	{
-
-	}
-	
 	void Manager::ForeachManagers(std::function<bool(Manager*)> action)
 	{
 		std::vector<Manager *> managers;

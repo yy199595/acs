@@ -11,18 +11,6 @@
 using namespace com;
 namespace Sentry
 {
-	typedef shared_ptr<NetWorkPacket> SharedPacket;
-	struct NetMessageBuffer
-	{
-	public:
-		NetMessageBuffer(const std::string & address, const SharedPacket packet);
-	public:
-		const std::string mAddress;
-		const SharedPacket mMessagePacket;
-	};
-	
-	typedef shared_ptr<NetMessageBuffer> SharedNetPacket;
-
 	class ThreadTaskAction;
 	class LocalActionProxy;
 	
