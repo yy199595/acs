@@ -21,7 +21,7 @@ namespace Sentry
 		return ServiceBase::OnInit();
 	}
 
-	void LocalService::GetServiceList(std::vector<shared_ptr<LocalActionProxy>>& service)
+	void LocalService::GetServiceList(std::vector<shared_ptr<LocalActionProxy>> &service)
 	{
 		auto iter = this->mActionMap.begin();
 		for (; iter != this->mActionMap.end(); iter++)
@@ -30,28 +30,28 @@ namespace Sentry
 		}
 	}
 
-	XCode LocalService::InvokeMethod(NetMessageProxy * msgData)
+	XCode LocalService::InvokeMethod(NetMessageProxy *msgData)
 	{
-		const std::string & method = msgData->method();
+		const std::string &method = msgData->GetMethd();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
 			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(msgData);
+		return localAction->Invoke(msgData->GetUserId(), msgData->GetReqMessage(), msgData->GetResMessage());
 	}
 
-	XCode LocalService::InvokeMethod(const std::string &address, NetMessageProxy * msgData)
+	XCode LocalService::InvokeMethod(const std::string &address, NetMessageProxy *msgData)
 	{
-		const std::string & method = msgData->method();
+		const std::string &method = msgData->GetMethd();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
 			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(msgData);
+		return localAction->Invoke(msgData->GetUserId(), msgData->GetReqMessage(), msgData->GetResMessage());
 	}
 
 	bool LocalService::BindFunction(std::string name, LocalAction1 action)

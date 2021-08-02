@@ -1,38 +1,58 @@
-﻿#include"NetMessageProxy.h"
-#include<Manager/ProtocolManager.h>
+﻿#include "NetMessageProxy.h"
+#include <Manager/ProtocolManager.h>
 
-namespace Sentry 
+namespace Sentry
 {
-	template<typename T>
-	bool MemoryCopy(T & tar, const void * sou, size_t & offset, const size_t maxsize)
+	template <typename T>
+	bool MemoryCopy(T &tar, const void *sou, size_t &offset, const size_t maxsize)
 	{
 		memcpy(tar, sou + offset, sizeof(T);
 		offset += sizeof(T);
 		return offset <= maxsize;
 	}
 
-
 	NetMessageProxy::NetMessageProxy(NetMessageType type)
-		:mMsgType(type)
+		: mMsgType(type)
+	{
+		this->Clear();
+	}
+
+	NetMessageProxy::~NetMessageProxy()
+	{
+		this->Clear();
+		if (this->mReqMessage != nullptr)
+		{
+			delete this->mReqMessage;
+		}
+		if (this->mResMessage != nullptr)
+		{
+			delete this->mResMessage;
+		}
+	}
+
+	void NetMessageProxy::Clear()
 	{
 		this->mRpcId = 0;
 		this->mUserId = 0;
+		this->mMethod.clear();
+		this->mService.clear();
 	}
-	NetMessageProxy * NetMessageProxy::Create(const char * message, const size_t size)
+
+	NetMessageProxy *NetMessageProxy::Create(const char *message, const size_t size)
 	{
 		if (message == nullptr || size == 0)
 		{
 			return nullptr;
 		}
 		size_t offset = 1;
-		Applocation * app = Applocation::Get();
-		ProtocolManager * pProtocolMgr = app->GetManager<ProtocolManager>();
+		Applocation *app = Applocation::Get();
+		ProtocolManager *pProtocolMgr = app->GetManager<ProtocolManager>();
 
 		int code = 0;
 		long long rpcid = 0;
 		long long userid = 0;
 		unsigned short actionid = 0;
-		const ProtocolConfig * config = nullptr;
+		const ProtocolConfig *config = nullptr;
 
 		NetMessageType messageType = (NetMessageType)message[0];
 
@@ -68,15 +88,15 @@ namespace Sentry
 			return nullptr;
 		}
 
-		NetMessageProxy * messageData = new NetMessageProxy(messageType);
+		NetMessageProxy *messageData = new NetMessageProxy(messageType);
 
 		messageData->mRpcId = rpcid;
 		messageData->mUserId = userid;
 		messageData->mActionId = actionid;
-		const std::string & request = config->RequestMsgName;
-		const std::string & response = config->ResponseMsgName;
+		const std::string &request = config->RequestMsgName;
+		const std::string &response = config->ResponseMsgName;
 
-		const char * msg = message + offset;
+		const char *msg = message + offset;
 		const size_t lenght = size - offset;
 		if (messageType < RequestEnd)
 		{
@@ -110,7 +130,7 @@ namespace Sentry
 			if (messageData->mResMessage != nullptr)
 			{
 				if (!messageData->mResMessage->ParseFromArray(msg, lenght))
-				{			
+				{
 					SayNoDebugError("parse response " << response << " msg error");
 					return nullptr;
 				}
@@ -122,7 +142,39 @@ namespace Sentry
 		delete messageData;
 		return nullptr;
 	}
-	size_t NetMessageProxy::WriteToBuffer(char * buffer, const size_t size)
+
+	NetMessageProxy *NetMessageProxy::Create(NetMessageType type, const std::string &service, const std::string &method)
+	{
+		if (type > RequestEnd)
+		{
+			return nullptr;
+		}
+		Applocation *app = Applocation::Get();
+		ProtocolManager *pProtocolMgr = app->GetManager<ProtocolManager>();
+
+		const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
+		if (config != nullptr)
+		{
+			NetMessageProxy *messageData = new NetMessageProxy(type);
+			messageData->mActionId = config->MethodId;
+			return messageData;
+		}
+		return nullptr;
+	}
+
+	bool NetMessageProxy::InitMessageParame(Message *message = nullptr, long long rcpId = 0, long long userId = 0)
+	{
+		if (this->mMsgType > RequestEnd)
+		{
+			return false;
+		}
+		this->mRpcId = rcpId;
+		this->mUserId = userId;
+		this->mReqMessage = message;
+		return true;
+	}
+
+	size_t NetMessageProxy::WriteToBuffer(char *buffer, const size_t size)
 	{
 		if (this->mMsgType < RequestEnd)
 		{
@@ -133,17 +185,17 @@ namespace Sentry
 		memcpy(buffer, &this->mActionId, sizeof(this->mActionId));
 		offset += sizeof(this->mActionId);
 		if (this->mRpcId != 0)
-		{		
+		{
 			memcpy(buffer, &this->mRpcId, sizeof(this->mRpcId));
 			offset += sizeof(this->mRpcId);
 		}
 		if (this->mUserId != 0)
-		{		
+		{
 			memcpy(buffer, &this->mUserId, sizeof(this->mUserId));
 			offset += sizeof(this->mUserId);
 		}
 		if (this->mReqMessage != nullptr)
-		{		
+		{
 			if (!this->mReqMessage->SerializePartialToArray(buffer + offset, size - offset))
 			{
 				return false;
@@ -183,5 +235,3 @@ namespace Sentry
 		return false;
 	}
 }
-
-

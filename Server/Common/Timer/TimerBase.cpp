@@ -1,11 +1,11 @@
 #include "TimerBase.h"
-#include<iostream>
+#include <iostream>
 namespace Sentry
 {
 	TimerBase::TimerBase(long long ms)
 	{
 		this->mDelayTime = ms;
-		this->mTickCount = 0;
-		this->mTimerId = NumberHelper::Create();		
+		this->mTimerId = NumberHelper::Create();
+		this->mTriggerTime = TimeHelper::GetMilTimestamp() + ms;
 	}
 }

@@ -66,6 +66,7 @@ namespace Sentry
 	template <typename T1>
 	inline XCode LocalActionProxy2<T1>::Invoke(long long id, Message * request, Message * response)
 	{
+		SayNoAssertRetCode_F(request);
 		T1 * message = static_cast<T1*>(request);
 		return this->mBindAction(id, *message);
 	}
@@ -89,6 +90,8 @@ namespace Sentry
 	template <typename T1, typename T2>
 	inline XCode LocalActionProxy3<T1, T2>::Invoke(long long id, Message * request, Message * response)
 	{
+		SayNoAssertRetCode_F(request);
+		SayNoAssertRetCode_F(response);
 		T1 * requestData = static_cast<T1*>(request);
 		T2 * responseData = static_cast<T2*>(response);
 		return this->mBindAction(id, *requestData, *responseData);
@@ -105,6 +108,7 @@ namespace Sentry
 
 		XCode Invoke(long long id, Message * request, Message * response) override
 		{
+			SayNoAssertRetCode_F(response);
 			T1 * responseData = static_cast<T1*>(response);
 			return this->mBindAction(id, *responseData);
 		}

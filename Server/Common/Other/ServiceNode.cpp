@@ -48,7 +48,7 @@ namespace Sentry
 	{
 		if (!this->mMessageQueue.empty())
 		{
-			TcpProxySession* tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+			TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
 			while (tcpSession != nullptr && !this->mMessageQueue.empty())
 			{
 				tcpSession->SendMessageData(this->mMessageQueue.front());
@@ -74,8 +74,13 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		this->PushMessageData(service, method);
-		return XCode::Successful;
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
+		if (messageData == nullptr)
+		{
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+		return this->PushMessageData(messageData);
 	}
 
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
@@ -88,8 +93,14 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		this->PushMessageData(service, method, &request);
-		return XCode::Successful;
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
+		if (messageData == nullptr)
+		{
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+		messageData->InitMessageParame(request.New());
+		return this->PushMessageData(messageData);
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
@@ -98,14 +109,25 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
+
 		if (this->HasService(service) == false)
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
-		if (rpcCallback != nullptr)
+
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sRequest, service, method);
+
+		if (messageData == nullptr)
 		{
-			this->PushMessageData(service, method, nullptr, rpcCallback);
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
+
+		if (messageData->InitMessageParame(nullptr, this->mActionManager->AddCallback(rpcCallback)))
+		{
+			this->PushMessageData(messageData);
 			this->mCorManager->YieldReturn();
 			return rpcCallback->GetCode();
 		}
@@ -122,10 +144,21 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
-		if (rpcCallback != nullptr)
+
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sRequest, service, method);
+
+		if (messageData == nullptr)
 		{
-			this->PushMessageData(service, method, nullptr, rpcCallback);
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
+		long long rpcId = this->mActionManager->AddCallback(rpcCallback);
+
+		if (rpcId > 0 && messageData->InitMessageParame(nullptr, rpcId))
+		{
+			this->PushMessageData(messageData);
 			this->mCorManager->YieldReturn();
 			if (response.ParseFromString(rpcCallback->GetMsgData()))
 			{
@@ -146,10 +179,20 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
-		if (rpcCallback != nullptr)
+
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sRequest, service, method);
+
+		if (messageData == nullptr)
 		{
-			this->PushMessageData(service, method, &request, rpcCallback);
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
+		long long rpcId = this->mActionManager->AddCallback(rpcCallback);
+		if (rpcId > 0 && messageData->InitMessageParame(request.New(), rpcId))
+		{
+			this->PushMessageData(messageData);
 			this->mCorManager->YieldReturn();
 			return rpcCallback->GetCode();
 		}
@@ -166,10 +209,20 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
-		if (rpcCallback != nullptr)
+
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sRequest, service, method);
+
+		if (messageData == nullptr)
 		{
-			this->PushMessageData(service, method, &request, rpcCallback);
+			SayNoDebugError("not find [" << service << "." << method << "]");
+			return XCode::CallArgsError;
+		}
+
+		shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCorManager);
+		long long rpcId = this->mActionManager->AddCallback(rpcCallback);
+		if (rpcId > 0 && messageData->InitMessageParame(request.New()))
+		{
+			this->PushMessageData(messageData);
 			this->mCorManager->YieldReturn();
 			if (response.ParseFromString(rpcCallback->GetMsgData()))
 			{
@@ -180,13 +233,14 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	void ServiceNode::PushMessageData(NetMessageProxy *messageData)
+	XCode ServiceNode::PushMessageData(NetMessageProxy *messageData)
 	{
-		TcpProxySession * tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
 		if (tcpSession == nullptr)
 		{
 			this->mMessageQueue.push(messageData);
 			this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
+			// TODO
 		}
 		else
 		{
@@ -195,35 +249,11 @@ namespace Sentry
 				tcpSession->SendMessageData(this->mMessageQueue.front());
 				this->mMessageQueue.pop();
 			}
-			tcpSession->SendMessageData(messageData);
-		}
-	}
-
-	void ServiceNode::PushMessageData(const std::string &service, const std::string &method, const Message *request, shared_ptr<LocalRetActionProxy> rpcReply)
-	{
-		NetMessageProxy *msgData = GnetPacketPool.Create();
-		if (msgData != nullptr)
-		{
-			if (request != nullptr)
+			if (tcpSession->SendMessageData(messageData))
 			{
-				std::string messagdData;
-				if (request->SerializePartialToString(&messagdData))
-				{
-					msgData->set_messagedata(messagdData);
-					msgData->set_protocname(request->GetTypeName());
-				}
+				return XCode::Successful;
 			}
-			msgData->set_method(method);
-			msgData->set_service(service);
-			if (rpcReply != nullptr)
-			{
-#ifdef SOEASY_DEBUG
-				rpcReply->mMethod = method;
-				rpcReply->mService = service;
-#endif
-				msgData->set_rpcid(this->mActionManager->AddCallback(rpcReply));
-			}
-			this->PushMessageData(msgData);
 		}
+		return XCode::SendMessageFail;
 	}
 }

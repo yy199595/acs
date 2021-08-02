@@ -32,10 +32,10 @@ namespace Sentry
 		bool SaveRpcInfoToFile(const std::string & path);
 	private:
 		int mNodeId;
-		class NetProxyManager * mNetManager;
 		class ActionManager * mActionManager;
 		class CoroutineManager * mCorManager;
 		std::vector<std::string> mServiceList;
+		class NetProxyManager * mNetProxyManager;
 		std::unordered_map<std::string, LocalService *> mLocalServiceMap;//action地址
 		std::unordered_map<std::string, LocalLuaService *> mLuaServiceMap;	//lua服务
 	};

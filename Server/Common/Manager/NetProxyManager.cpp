@@ -2,8 +2,8 @@
 #include "NetSessionManager.h"
 #include "ServiceManager.h"
 #include <Core/Applocation.h>
-#include <Manager/TimerManager.h>
 #include <Manager/ActionManager.h>
+#include <Timer/TimerManager.h>
 namespace Sentry
 {
 
@@ -26,10 +26,16 @@ namespace Sentry
 		TcpProxySession *tcpSession = this->GetProxySession(address);
 		if (tcpSession == nullptr || msgData == nullptr)
 		{
-			GnetPacketPool.Destory(msgData);
+			delete msgData;
 			return false;
 		}
 		return tcpSession->SendMessageData(msgData);
+	}
+
+	bool NetProxyManager::SendResponseMessage(const std::string &address, XCode code, NetMessageProxy * message)
+	{
+		message->SetCode(code);
+		return this->SendMsgByAddress(address, message);
 	}
 
 	bool NetProxyManager::ConnectByAddress(const std::string &address, const std::string &name)
@@ -159,15 +165,12 @@ namespace Sentry
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketSendMsgFail)
 			{
-				const std::string &name = eve->GetName();
-				GnetPacketPool.Destory(eve->GetMsgData());
 			}
 			else if (eve->GetEventType() == Net2MainEventType::SocketReceiveData)
 			{
 				NetMessageProxy *msgData = eve->GetMsgData();
 				if (!this->OnRecvMessage(address, msgData))
 				{
-					GnetPacketPool.Destory(msgData);
 					TcpProxySession *session = this->DelProxySession(address);
 					if (session != nullptr)
 					{
@@ -183,15 +186,13 @@ namespace Sentry
 
 	bool NetProxyManager::OnRecvMessage(const std::string &address, NetMessageProxy *messageData)
 	{
-		const std::string &method = messageData->method();
-		const std::string &service = messageData->service();
+		const std::string &method = messageData->GetMethd();
+		const std::string &service = messageData->GetService();
 		if (!service.empty() && !method.empty())
 		{
 			return mServiceManager->HandlerMessage(address, messageData);
 		}
-		long long rpcId = messageData->rpcid();
-		bool res = this->mActionManager->InvokeCallback(rpcId, messageData);
-		GnetPacketPool.Destory(messageData);
-		return res;
+		long long rpcId = messageData->GetRpcId();
+		return this->mActionManager->InvokeCallback(rpcId, messageData);
 	}
 }

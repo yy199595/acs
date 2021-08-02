@@ -46,8 +46,8 @@ namespace Sentry
 			return false;
 		}
 #ifdef SOEASY_DEBUG
-		const std::string& method = messageData->method();
-		const std::string& service = messageData->service();
+		const std::string &method = messageData->GetMethd();
+		const std::string &service = messageData->GetService();
 		SayNoDebugInfo("call " << service << "." << method << " [" << this->mAddress << "]");
 #endif // SOEASY_DEBUG
 		Main2NetEvent *eve = new Main2NetEvent(SocketSendMsgEvent, mAddress, "", messageData);
@@ -71,13 +71,12 @@ namespace Sentry
 		{
 			return false;
 		}
-		NetMessageProxy *messageData = GnetPacketPool.Create();
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
 		if (messageData == nullptr)
 		{
+			SayNoDebugError("not find method " << service << "." << method);
 			return XCode::Failure;
 		}
-		messageData->set_method(method);
-		messageData->set_service(service);
 		return this->SendMessageData(messageData);
 	}
 
@@ -87,19 +86,14 @@ namespace Sentry
 		{
 			return false;
 		}
-		NetMessageProxy *messageData = GnetPacketPool.Create();
+		NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
 		if (messageData == nullptr)
 		{
+			SayNoDebugError("not find method " << service << "." << method);
 			return XCode::Failure;
 		}
-		if (request.SerializeToString(&mMessageBuffer))
-		{
-			messageData->set_method(method);
-			messageData->set_service(service);
-			messageData->set_messagedata(mMessageBuffer);
-			return this->SendMessageData(messageData);
-		}
-		GnetPacketPool.Destory(messageData);
-		return false;
+		Message *reqMessage = request.New();
+		messageData->InitMessageParame(reqMessage);
+		return this->SendMessageData(messageData);
 	}
 }

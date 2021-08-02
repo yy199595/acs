@@ -34,8 +34,8 @@ namespace Sentry
 		XCode Call(const std::string &service, const std::string &method, Message &response);
 		XCode Call(const std::string &service, const std::string &method, const Message & request, Message &response);
 	public: // lua使用
-		void PushMessageData(NetMessageProxy * messageData);
-		void PushMessageData(const std::string &service, const std::string &method, const Message * request = nullptr, shared_ptr<LocalRetActionProxy> rpcReply = nullptr);
+		XCode PushMessageData(NetMessageProxy * messageData);
+		XCode AsyncPushMessageData(NetMessageProxy * messageData);
 	private:
 		std::string mIp;
 		unsigned short mPort;

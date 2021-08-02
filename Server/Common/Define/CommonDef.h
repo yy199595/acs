@@ -65,6 +65,7 @@ inline std::string FromatFileLine(const char * file, const int line)
 #define SayNoAssertRetNull(obj, msg)		SayNoAssertError(obj, msg, return nullptr)
 #define SayNoAssertRetFail(obj, msg)		SayNoAssertError(obj, msg, return XCode::Failure)
 
+#define SayNoAssertRetCode_F(obj) SayNoAssertRetVal(obj, "", XCode::Failure)
 #define SayNoAssertRetCode(obj,code) SayNoAssertRetVal(obj, "", code)
 #define SayNoAssertRetZero_F(obj)	SayNoAssertRetVal(obj, "", 0)
 #define SayNoAssertRet_F(obj)		SayNoAssertRet(obj, "")

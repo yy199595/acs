@@ -15,9 +15,10 @@ namespace Sentry
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
 		SayNoAssertRetFalse_F(this->GetConfig().GetValue("Service", this->mServiceList));
 
-		SayNoAssertRetFalse_F(this->mNetManager = this->GetManager<NetProxyManager>());
+		
 		SayNoAssertRetFalse_F(this->mActionManager = this->GetManager<ActionManager>());
 		SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
+		SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetManager<NetProxyManager>());
 
 		SayNoAssertRetFalse_F(this->CreateLocalService());
 		SayNoAssertRetFalse_F(this->SaveRpcInfoToFile("./Config/rpc.csv"));
@@ -66,7 +67,7 @@ namespace Sentry
 				XCode code = localService->InvokeMethod(address, messageData);
 				if (messageData->SetCode(code))
 				{
-					this->mNetManager->SendMsgByAddress(address, messageData);
+					this->mNetProxyManager->SendMsgByAddress(address, messageData);
 				}
 			});
 		return true;

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <XCode/XCode.h>
-#include<google/protobuf/message.h>
+#include <google/protobuf/message.h>
 
 using google::protobuf::Message;
 namespace Sentry
@@ -25,45 +25,47 @@ namespace Sentry
 	{
 	public:
 		NetMessageProxy(NetMessageType type);
-		~NetMessageProxy() { }
+		~NetMessageProxy();
+
 	public:
-		static NetMessageProxy * Create(const char * message, const size_t size);
+		static NetMessageProxy *Create(const char *message, const size_t size);
+		static NetMessageProxy *Create(NetMessageType type, const std::string & service, const std::string &method);
+
 	public:
-		size_t WriteToBuffer(char * buffer, const size_t size);
+		bool InitMessageParame(Message * message = nullptr, long long rcpId = 0, long long userId = 0);
 	public:
-		const std::string & GetMethd() { return this->mMethod; }
-		const std::string & GetService() { return this->mService; }
+		void Clear();
+		size_t WriteToBuffer(char *buffer, const size_t size);
+
+	public:
+		const std::string &GetMethd() { return this->mMethod; }
+		const std::string &GetService() { return this->mService; }
+
 	public:
 		bool SetCode(XCode code);
+
 	public:
-		template<typename T>
-		T & GetReqMesssage();
-		template<typename T>
-		T & GetResMessage();
+		long long GetRpcId() { return this->mRpcId; }
+		long long GetUserId() { return this->mUserId; }
+		Message *GetReqMessage() { return this->mReqMessage; }
+		Message *GetResMessage() { return this->mResMessage; }
 		NetMessageType GetMessageType() { return this->mMsgType; }
-		const std::string & GetJsonData() { return this->mJsonString; }
+		const std::string &GetJsonData() { return this->mJsonString; }
+
 	private:
 		NetMessageType mMsgType;
+
 	private:
 		XCode mCode;
 		long long mRpcId;
 		long long mUserId;
 		std::string mMethod;
-		std::string mService;	
+		std::string mService;
 		unsigned short mActionId;
+
 	private:
-		Message * mReqMessage;
-		Message * mResMessage;
+		Message *mReqMessage;
+		Message *mResMessage;
 		std::string mJsonString;
 	};
-	template<typename T>
-	inline T & NetMessageProxy::GetReqMesssage()
-	{
-		return static_cast<T&>(*mReqMessage);
-	}
-	template<typename T>
-	inline T & NetMessageProxy::GetResMessage()
-	{
-		return static_cast<T&>(*mResMessage);
-	}
 }
