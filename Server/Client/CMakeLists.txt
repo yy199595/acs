@@ -56,13 +56,14 @@ aux_source_directory(./Manager SUPER_SRC)
 
 aux_source_directory(./ SUPER_SRC)
 LINK_DIRECTORIES(../Libs/lib)
-if(UNIX)
+
+IF(APPLE)
+    SET (CMAKE_C_COMPILER "Library/Developer/CommandLineTools/usr/bin/clang++")
+    SET (CMAKE_C_FLAGS "-Wall -std=c++11")
+ELSEIF(UNIX)
     SET(CMAKE_CXX_COMPILER "ccache")
     SET(CMAKE_CXX_COMPILER_ARG1 "g++")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
-ELSEIF(APPLE)
-    SET (CMAKE_C_COMPILER "Library/Developer/CommandLineTools/usr/bin/clang++")
-    SET (CMAKE_C_FLAGS "-Wall -std=c++11")
 ENDIF()
 SET(CMAKE_BUILD_TYPE Debug)
 
