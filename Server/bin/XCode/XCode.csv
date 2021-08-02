@@ -3,6 +3,9 @@ Successful	成功
 Failure	失败
 ParseMessageError	解析protobuf失败
 CallServiceNotFound	调用服务未发现
+NotFoundRpcConfig	没有rpc配置
+RpcTypeError	rpc类型错误
+InitMessageFail	初始化消息失败
 CallFunctionNotExist	调用方法不存在
 CallArgsError	调用参数错误
 TimeoutAutoCall	超时自动调用

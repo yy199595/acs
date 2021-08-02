@@ -1,5 +1,4 @@
 ﻿#include"LocalLuaService.h"
-#include<Pool/ProtocolPool.h>
 #include<Manager/ScriptManager.h>
 namespace Sentry
 {
@@ -59,7 +58,7 @@ namespace Sentry
 	{
 	}
 
-	XCode LocalLuaService::InvokeMethod(NetMessageProxy * messageData)
+	bool LocalLuaService::InvokeMethod(NetMessageProxy * messageData)
 	{	
 		const static std::string luaAction = "ServiceProxy.LocalInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -75,7 +74,7 @@ namespace Sentry
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		const std::string & method = messageData->method();
+		/*const std::string & method = messageData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
 		lua_pushinteger(this->mLuaEnv, messageData->entityid());
 		lua_pushinteger(this->mLuaEnv, messageData->rpcid());
@@ -97,17 +96,17 @@ namespace Sentry
 				const std::string & data = messageData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
-		}
-		if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
+		}*/
+		/*if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
 		{
 			const char * err = lua_tostring(this->mLuaEnv, -1);
 			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
 			return XCode::CallLuaFunctionFail;
-		}
+		}*/
 		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
 	}
 
-	XCode LocalLuaService::InvokeMethod(const std::string &address, NetMessageProxy * messageData)
+	bool LocalLuaService::InvokeMethod(const std::string &address, NetMessageProxy * messageData)
 	{		
 		const static std::string luaAction = "ServiceProxy.ProxyInvoke";
 		int ref = this->mScriptManager->GetGlobalReference(luaAction);
@@ -116,14 +115,14 @@ namespace Sentry
 		if (!lua_isfunction(this->mLuaEnv, -1))
 		{
 			SayNoDebugError("not find function " << luaAction);
-			return XCode::CallLuaFunctionFail;
+			return false;
 		}
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
 		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			return XCode::CallLuaFunctionFail;
+			return false;
 		}
-		const std::string & method = messageData->method();
+		/*const std::string & method = messageData->method();
 		lua_pushstring(this->mLuaEnv, method.c_str());
 		lua_pushstring(this->mLuaEnv, address.c_str());
 		lua_pushinteger(this->mLuaEnv, messageData->entityid());
@@ -146,11 +145,11 @@ namespace Sentry
 				const std::string & data = messageData->messagedata();
 				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
 			}
-		}
+		}*/
 		if (lua_pcall(this->mLuaEnv, 6, 1, 0) != 0)
 		{
 			const char * err = lua_tostring(this->mLuaEnv, -1);
-			SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
+			//SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
 			return XCode::CallLuaFunctionFail;
 		}
 		return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;

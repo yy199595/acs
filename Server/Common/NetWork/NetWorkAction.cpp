@@ -1,9 +1,10 @@
 ﻿#include"NetWorkAction.h"
-#include<Pool/ProtocolPool.h>
 namespace Sentry
 {
-	XCode LocalActionProxy1::Invoke(long long id, Message * request, Message * response)
+	bool LocalActionProxy1::Invoke(NetMessageProxy * messageData)
 	{
-		return this->mBindAction(id);
+		long long userId = messageData->GetUserId();
+		XCode code = this->mBindAction(userId);
+		return messageData->InitMessageData(code, nullptr);
 	}
 }

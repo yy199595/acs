@@ -49,7 +49,17 @@ namespace Sentry
 
 	Message * ProtocolManager::CreateMessage(const std::string & name)
 	{
-		return nullptr;
+		const DescriptorPool *pDescriptorPool = DescriptorPool::generated_pool();
+		const Descriptor *pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
+		if (pDescriptor == nullptr)
+		{
+			SayNoDebugError("create pb fail " << name);
+			return nullptr;
+		}
+		MessageFactory *factory = MessageFactory::generated_factory();
+		const Message *pMessage = factory->GetPrototype(pDescriptor);
+
+		return pMessage->New();
 	}
 	Message * ProtocolManager::CreateMessage(const std::string & name, const char * msg, const size_t size)
 	{

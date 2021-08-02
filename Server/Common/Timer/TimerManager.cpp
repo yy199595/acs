@@ -1,4 +1,4 @@
-#include "TimerManager.h"
+﻿#include "TimerManager.h"
 #include <Timer/DelayTimer.h>
 #include <Util/TimeHelper.h>
 namespace Sentry
@@ -18,6 +18,7 @@ namespace Sentry
 			this->mTimerLayers.push_back(timerLayer);
 		}
 		this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
+		return true;
 	}
 
 	bool TimerManager::AddTimer(shared_ptr<TimerBase> timer)

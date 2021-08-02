@@ -30,7 +30,7 @@ namespace Sentry
 		LocalActionProxy() {}
 		virtual ~LocalActionProxy() {}
 	public:
-		virtual XCode Invoke(long long id, Message * request, Message * response) = 0;
+		virtual bool Invoke(NetMessageProxy * messageData) = 0;
 	};
 }
 
@@ -42,7 +42,7 @@ namespace Sentry
 		LocalActionProxy1(LocalAction1 action) : mBindAction(action) {}
 
 	public:
-		XCode Invoke(long long id, Message * request, Message * response) final;
+		bool Invoke(NetMessageProxy * messageData) final;
 
 	private:
 		LocalAction1 mBindAction;
@@ -58,17 +58,26 @@ namespace Sentry
 		LocalActionProxy2(LocalAction2<T1> action) : mBindAction(action) {}
 
 	public:
-		XCode Invoke(long long id, Message * request, Message * response) final;
+		bool Invoke(NetMessageProxy * messageData) final;
 	private:
 		LocalAction2<T1> mBindAction;
+		ObjectPool<T1> mReqMessagePool;
 	};
 
 	template <typename T1>
-	inline XCode LocalActionProxy2<T1>::Invoke(long long id, Message * request, Message * response)
+	inline bool LocalActionProxy2<T1>::Invoke(NetMessageProxy * messageData)
 	{
-		SayNoAssertRetCode_F(request);
-		T1 * message = static_cast<T1*>(request);
-		return this->mBindAction(id, *message);
+		T1 * message = mReqMessagePool.Create();
+		if (!message->ParseFromString(messageData->GetMsgBody()))
+		{
+			mReqMessagePool.Destory(message);
+			return false;
+		}
+		long long userId = messageData->GetUserId();
+		XCode code = this->mBindAction(userId, *message);
+
+		mReqMessagePool.Destory(message);
+		return messageData->InitMessageData(code, nullptr);
 	}
 }
 
@@ -82,19 +91,35 @@ namespace Sentry
 			:  mBindAction(action) { }
 
 	public:
-		XCode Invoke(long long id, Message * request, Message * response) override;
+		bool Invoke(NetMessageProxy * messageData) override;
 	private:
+		ObjectPool<T1> mReqMessagePool;
+		ObjectPool<T2> mResMessagePool;
 		LocalAction3<T1, T2> mBindAction;
 	};
 
 	template <typename T1, typename T2>
-	inline XCode LocalActionProxy3<T1, T2>::Invoke(long long id, Message * request, Message * response)
+	inline bool LocalActionProxy3<T1, T2>::Invoke(NetMessageProxy * messageData)
 	{
-		SayNoAssertRetCode_F(request);
-		SayNoAssertRetCode_F(response);
-		T1 * requestData = static_cast<T1*>(request);
-		T2 * responseData = static_cast<T2*>(response);
-		return this->mBindAction(id, *requestData, *responseData);
+		T1 * request = this->mReqMessagePool.Create();
+		if (!request->ParseFromString(messageData->GetMsgBody()))
+		{
+			mReqMessagePool.Destory(request);
+			const ProtocolConfig * config = messageData->GetProConfig();
+			SayNoDebugError("call <<" << config->ServiceName << "." 
+				<< config->MethodName <<">>[" << request->GetTypeName() << "] parse fail");
+			return false;
+		}
+		long long userId = messageData->GetUserId();
+		T2 * response = this->mResMessagePool.Create();
+		XCode code = this->mBindAction(userId, *request, *response);
+
+		bool res = messageData->InitMessageData(code, response);
+
+		mReqMessagePool.Destory(request);
+		mResMessagePool.Destory(response);
+
+		return res;
 	}
 }
 
@@ -106,13 +131,18 @@ namespace Sentry
 	public:
 		LocalActionProxy4(LocalAction4<T1> action) :mBindAction(action) {}
 
-		XCode Invoke(long long id, Message * request, Message * response) override
+		bool Invoke(NetMessageProxy * messageData) override
 		{
-			SayNoAssertRetCode_F(response);
-			T1 * responseData = static_cast<T1*>(response);
-			return this->mBindAction(id, *responseData);
+			long long userId = messageData->GetUserId();
+			T1 * responseData = mResMessagePool.Create();
+			XCode this->mBindAction(userId, *responseData);
+			bool res = messageData->InitMessageData(code, responseData);
+
+			this->mResMessagePool.Destory(responseData);
+			return res;
 		}
 	private:
 		LocalAction4<T1> mBindAction;
+		ObjectPool<T1> mResMessagePool;
 	};
 }

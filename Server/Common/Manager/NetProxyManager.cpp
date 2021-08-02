@@ -32,12 +32,6 @@ namespace Sentry
 		return tcpSession->SendMessageData(msgData);
 	}
 
-	bool NetProxyManager::SendResponseMessage(const std::string &address, XCode code, NetMessageProxy * message)
-	{
-		message->SetCode(code);
-		return this->SendMsgByAddress(address, message);
-	}
-
 	bool NetProxyManager::ConnectByAddress(const std::string &address, const std::string &name)
 	{
 		auto iter = this->mConnectSessionMap.find(address);

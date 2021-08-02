@@ -26,8 +26,8 @@ namespace Sentry
 		virtual void OnRefreshService() {}; //刷新服务表调用
 		const std::string &GetServiceName() { return this->mServiceName; };
 	public:
-		virtual XCode InvokeMethod(NetMessageProxy *) = 0;
-		virtual XCode InvokeMethod(const std::string &address, NetMessageProxy *) = 0;
+		virtual bool InvokeMethod(NetMessageProxy *) = 0;
+		virtual bool InvokeMethod(const std::string &address, NetMessageProxy *) = 0;
 		virtual void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) = 0;
 	public:
 		void InitService(const std::string &name);

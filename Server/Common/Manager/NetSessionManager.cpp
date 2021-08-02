@@ -1,7 +1,6 @@
 ﻿#include "NetSessionManager.h"
 #include "ScriptManager.h"
 #include "ActionManager.h"
-#include "Manager.h"
 #include <Core/Applocation.h>
 #include <Util/StringHelper.h>
 #include <NetWork/TcpClientSession.h>

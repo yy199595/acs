@@ -13,11 +13,7 @@ namespace Sentry
 
 	bool ActionTimeoutTimer::Invoke()
 	{
-		NetWorkPacket * packet = GnetPacketPool.Create();
-		packet->set_rpcid(this->mCallbackId);
-		packet->set_code(XCode::TimeoutAutoCall);
-		this->mActionManager->InvokeCallback(mCallbackId, packet);
-		GnetPacketPool.Destory(packet);
+		// TODO
 		return false;
 	}
 }

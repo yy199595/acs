@@ -30,33 +30,37 @@ namespace Sentry
 		}
 	}
 
-	XCode LocalService::InvokeMethod(NetMessageProxy *msgData)
+	bool LocalService::InvokeMethod(NetMessageProxy * messageData)
 	{
-		const std::string &method = msgData->GetMethd();
+		const std::string &method = messageData->GetMethd();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
-			return XCode::CallFunctionNotExist;
+			SayNoDebugError("call <<" << messageData->GetService() 
+					<< "." << messageData->GetMethd() << ">> not found");
+			return false;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(msgData->GetUserId(), msgData->GetReqMessage(), msgData->GetResMessage());
+		return localAction->Invoke(messageData);
 	}
 
-	XCode LocalService::InvokeMethod(const std::string &address, NetMessageProxy *msgData)
+	bool LocalService::InvokeMethod(const std::string &address, NetMessageProxy * messageData)
 	{
-		const std::string &method = msgData->GetMethd();
+		const std::string &method = messageData->GetMethd();
 		auto iter = this->mActionMap.find(method);
 		if (iter == this->mActionMap.end())
 		{
+			SayNoDebugError("call <<" << messageData->GetService()
+				<< "." << messageData->GetMethd() << ">> not found");
 			return XCode::CallFunctionNotExist;
 		}
 		shared_ptr<LocalActionProxy> localAction = iter->second;
-		return localAction->Invoke(msgData->GetUserId(), msgData->GetReqMessage(), msgData->GetResMessage());
+		return localAction->Invoke(messageData);
 	}
 
 	bool LocalService::BindFunction(std::string name, LocalAction1 action)
 	{
-		return this->BindFunction(name, make_shared<LocalActionProxy1>(action, this->GetServiceName(), name));
+		return this->BindFunction(name, make_shared<LocalActionProxy1>(action));
 	}
 	bool LocalService::BindFunction(const std::string &name, shared_ptr<LocalActionProxy> actionBox)
 	{

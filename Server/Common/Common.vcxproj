@@ -35,7 +35,6 @@
     <ClCompile Include="Manager\ServiceNodeManager.cpp" />
     <ClCompile Include="Manager\NetProxyManager.cpp" />
     <ClCompile Include="Manager\ThreadTaskManager.cpp" />
-    <ClCompile Include="Manager\TimerManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
     <ClCompile Include="Module\SayNoUdpSession.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
@@ -51,7 +50,6 @@
     <ClCompile Include="Other\ServiceNode.cpp" />
     <ClCompile Include="Other\TimeRecorder.cpp" />
     <ClCompile Include="Pool\ObjectPool.cpp" />
-    <ClCompile Include="Pool\ProtocolPool.cpp" />
     <ClCompile Include="Script\BindLuaFunction.cpp" />
     <ClCompile Include="Script\ClassNameProxy.cpp" />
     <ClCompile Include="Script\ClassProxyHelper.cpp" />
@@ -74,6 +72,8 @@
     <ClCompile Include="Timer\LuaActionTimer.cpp" />
     <ClCompile Include="Timer\LuaSleepTimer.cpp" />
     <ClCompile Include="Timer\TimerBase.cpp" />
+    <ClCompile Include="Timer\TimerManager.cpp" />
+    <ClCompile Include="Timer\TimeWheelLayer.cpp" />
     <ClCompile Include="Util\Base64Helper.cpp" />
     <ClCompile Include="Util\CsvHelper.cpp" />
     <ClCompile Include="Util\DirectoryHelper.cpp" />
@@ -110,7 +110,6 @@
     <ClInclude Include="Manager\ServiceManager.h" />
     <ClInclude Include="Manager\NetProxyManager.h" />
     <ClInclude Include="Manager\ThreadTaskManager.h" />
-    <ClInclude Include="Manager\TimerManager.h" />
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
     <ClInclude Include="Module\SayNoUdpSession.h" />
@@ -127,10 +126,10 @@
     <ClInclude Include="Other\AssestsFileInfo.h" />
     <ClInclude Include="Other\DoubleBufferQueue.h" />
     <ClInclude Include="Other\ObjectFactory.h" />
+    <ClInclude Include="Other\ProtocolConfig.h" />
     <ClInclude Include="Other\ServiceNode.h" />
     <ClInclude Include="Other\TimeRecorder.h" />
     <ClInclude Include="Pool\ObjectPool.h" />
-    <ClInclude Include="Pool\ProtocolPool.h" />
     <ClInclude Include="Script\BindLuaFunction.h" />
     <ClInclude Include="Script\ClassMateProxy.h" />
     <ClInclude Include="Script\ClassNameProxy.h" />
@@ -169,6 +168,8 @@
     <ClInclude Include="Timer\LuaActionTimer.h" />
     <ClInclude Include="Timer\LuaSleepTimer.h" />
     <ClInclude Include="Timer\TimerBase.h" />
+    <ClInclude Include="Timer\TimerManager.h" />
+    <ClInclude Include="Timer\TimeWheelLayer.h" />
     <ClInclude Include="Util\Base64Helper.h" />
     <ClInclude Include="Util\CsvHelper.h" />
     <ClInclude Include="Util\DirectoryHelper.h" />

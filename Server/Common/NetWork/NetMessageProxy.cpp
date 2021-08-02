@@ -4,9 +4,9 @@
 namespace Sentry
 {
 	template <typename T>
-	bool MemoryCopy(T &tar, const void *sou, size_t &offset, const size_t maxsize)
+	bool MemoryCopy(T * tar, const char *sou, size_t &offset, const size_t maxsize)
 	{
-		memcpy(tar, sou + offset, sizeof(T);
+		memcpy((char*)tar, sou + offset, sizeof(T));
 		offset += sizeof(T);
 		return offset <= maxsize;
 	}
@@ -20,22 +20,13 @@ namespace Sentry
 	NetMessageProxy::~NetMessageProxy()
 	{
 		this->Clear();
-		if (this->mReqMessage != nullptr)
-		{
-			delete this->mReqMessage;
-		}
-		if (this->mResMessage != nullptr)
-		{
-			delete this->mResMessage;
-		}
 	}
 
 	void NetMessageProxy::Clear()
 	{
 		this->mRpcId = 0;
 		this->mUserId = 0;
-		this->mMethod.clear();
-		this->mService.clear();
+		this->mProConfig = nullptr;
 	}
 
 	NetMessageProxy *NetMessageProxy::Create(const char *message, const size_t size)
@@ -56,34 +47,34 @@ namespace Sentry
 
 		NetMessageType messageType = (NetMessageType)message[0];
 
-		SayNoAssertRetNull_F(MemoryCopy(actionid, message, offset, size));
+		//SayNoAssertRetNull_F(MemoryCopy(actionid, message, offset, size));
 		config = pProtocolMgr->GetProtocolConfig(actionid);
 		SayNoAssertRetNull_F(config);
 
 		switch (messageType)
 		{
 		case s2sRequest:
-			SayNoAssertRetNull_F(MemoryCopy(rpcid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
 			break;
 		case s2sResponse:
-			SayNoAssertRetNull_F(MemoryCopy(code, message, offset, size));
-			SayNoAssertRetNull_F(MemoryCopy(rpcid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
 			break;
 		case s2sNotice:
 
 			break;
 		case c2sRequest:
-			SayNoAssertRetNull_F(MemoryCopy(rpcid, message, offset, size));
-			SayNoAssertRetNull_F(MemoryCopy(userid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
 			break;
 		case c2sResponse:
-			SayNoAssertRetNull_F(MemoryCopy(rpcid, message, offset, size));
-			SayNoAssertRetNull_F(MemoryCopy(userid, message, offset, size));
-			SayNoAssertRetNull_F(MemoryCopy(code, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
 			break;
 		case c2sNotice:
 		case s2cNotice:
-			SayNoAssertRetNull_F(MemoryCopy(userid, message, offset, size));
+			SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
 		default:
 			return nullptr;
 		}
@@ -92,55 +83,14 @@ namespace Sentry
 
 		messageData->mRpcId = rpcid;
 		messageData->mUserId = userid;
-		messageData->mActionId = actionid;
-		const std::string &request = config->RequestMsgName;
-		const std::string &response = config->ResponseMsgName;
-
-		const char *msg = message + offset;
-		const size_t lenght = size - offset;
-		if (messageType < RequestEnd)
+		messageData->mCode = (XCode)code;
+		messageData->mProConfig = config;
+		if (offset < size)
 		{
-			messageData->mMethod = config->MethodName;
-			messageData->mService = config->ServiceName;
-			messageData->mReqMessage = pProtocolMgr->CreateMessage(request);
-			if (messageData->mReqMessage != nullptr)
-			{
-				if (!messageData->mReqMessage->ParseFromArray(msg, lenght))
-				{
-					delete messageData;
-					SayNoDebugError("parse request " << request << " msg error");
-					return nullptr;
-				}
-				return messageData;
-			}
-
-			messageData->mJsonString.append(msg, lenght);
-			return messageData;
+			const char * msg = message + offset;
+			messageData->mMessageData.append(msg, size - offset);
 		}
-
-		if (messageType > RequestEnd)
-		{
-			messageData->mCode = (XCode)code;
-			if (messageData->mCode != XCode::Successful)
-			{
-				return messageData;
-			}
-
-			messageData->mResMessage = pProtocolMgr->CreateMessage(response);
-			if (messageData->mResMessage != nullptr)
-			{
-				if (!messageData->mResMessage->ParseFromArray(msg, lenght))
-				{
-					SayNoDebugError("parse response " << response << " msg error");
-					return nullptr;
-				}
-				return messageData;
-			}
-			messageData->mJsonString.append(msg, lenght);
-			return messageData;
-		}
-		delete messageData;
-		return nullptr;
+		return messageData;
 	}
 
 	NetMessageProxy *NetMessageProxy::Create(NetMessageType type, const std::string &service, const std::string &method)
@@ -156,13 +106,13 @@ namespace Sentry
 		if (config != nullptr)
 		{
 			NetMessageProxy *messageData = new NetMessageProxy(type);
-			messageData->mActionId = config->MethodId;
+			messageData->mProConfig = config;
 			return messageData;
 		}
 		return nullptr;
 	}
 
-	bool NetMessageProxy::InitMessageParame(Message *message = nullptr, long long rcpId = 0, long long userId = 0)
+	bool NetMessageProxy::InitMessageParame(Message *message, long long rcpId, long long userId)
 	{
 		if (this->mMsgType > RequestEnd)
 		{
@@ -170,20 +120,72 @@ namespace Sentry
 		}
 		this->mRpcId = rcpId;
 		this->mUserId = userId;
-		this->mReqMessage = message;
+		if (message != nullptr)
+		{
+			if (!message->SerializePartialToString(&this->mMessageData))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
+	bool NetMessageProxy::InitMessageData(XCode code, Message * message)
+	{
+		if (this->mProConfig == nullptr)
+		{			
+			return false;
+		}
+		if (this->mMsgType >= RequestEnd)
+		{
+			return false;
+		}
+		if (this->mRpcId == 0)
+		{
+			return false;
+		}
+		if (this->mUserId != 0)
+		{
+			SayNoAssertRetFalse_F(this->mMsgType == s2sRequest);
+			this->mMsgType = c2sResponse;		
+		}
+		SayNoAssertRetFalse_F(this->mMsgType == s2sRequest);
+		if (message != nullptr && code == XCode::Successful)
+		{
+			if (!message->SerializePartialToString(&this->mMessageData))
+			{
+				return false;
+			}
+		}
+		this->mCode = code;
+		return true;
+	}
+
+	bool NetMessageProxy::InitMessageData(Message * message, long long rpcId, long long userId)
+	{
+		SayNoAssertRetFalse_F(this->mProConfig);
+		this->mRpcId = rpcId;
+		this->mUserId = userId;
+		if (message != nullptr)
+		{
+			if (!message->SerializePartialToString(&this->mMessageData))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+
 	size_t NetMessageProxy::WriteToBuffer(char *buffer, const size_t size)
 	{
-		if (this->mMsgType < RequestEnd)
+		if (this->mMsgType >= RequestEnd)
 		{
 			return 0;
 		}
 		size_t offset = sizeof(unsigned int);
-		size_t size = sizeof(this->mActionId);
-		memcpy(buffer, &this->mActionId, sizeof(this->mActionId));
-		offset += sizeof(this->mActionId);
+		memcpy(buffer, &this->mProConfig->MethodId, sizeof(this->mProConfig->MethodId));
+		offset += sizeof(this->mProConfig->MethodId);
 		if (this->mRpcId != 0)
 		{
 			memcpy(buffer, &this->mRpcId, sizeof(this->mRpcId));
@@ -194,44 +196,9 @@ namespace Sentry
 			memcpy(buffer, &this->mUserId, sizeof(this->mUserId));
 			offset += sizeof(this->mUserId);
 		}
-		if (this->mReqMessage != nullptr)
-		{
-			if (!this->mReqMessage->SerializePartialToArray(buffer + offset, size - offset))
-			{
-				return false;
-			}
-			offset += this->mReqMessage->ByteSizeLong();
-		}
-		if (!this->mJsonString.empty())
-		{
-			memcpy(buffer + offset, this->mJsonString.c_str(), this->mJsonString.size());
-			offset += this->mJsonString.size();
-		}
+		memcpy(buffer + offset, this->mMessageData.c_str(), this->mMessageData.size());
+		offset += this->mMessageData.size();
 		memcpy(buffer, &offset, sizeof(unsigned int));
 		return offset;
-	}
-	bool NetMessageProxy::SetCode(XCode code)
-	{
-		if (this->mRpcId == 0)
-		{
-			return false;
-		}
-		if (this->mMsgType >= RequestEnd)
-		{
-			return false;
-		}
-		if (this->mMsgType == s2sRequest)
-		{
-			this->mCode = code;
-			this->mMsgType = s2sResponse;
-			return true;
-		}
-		if (this->mMsgType == c2sRequest)
-		{
-			this->mCode = code;
-			this->mMsgType = c2sResponse;
-			return true;
-		}
-		return false;
 	}
 }

@@ -1,4 +1,4 @@
-#include"LuaActionTimer.h"
+﻿#include"LuaActionTimer.h"
 #include<Util/MathHelper.h>
 #include<Util/TimeHelper.h>
 #include<Define/CommonDef.h>
@@ -33,7 +33,6 @@ namespace Sentry
 		}
 		this->mInvokeCount++;
 		this->mDelayTime = mInterval;
-		this->mTickCount = 0;
 		if (this->mMaxInvokeCount == -1)
 		{
 			return false;

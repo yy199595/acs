@@ -1,7 +1,6 @@
 ﻿#include"NetWorkRetAction.h"
 #include<Util/TimeHelper.h>
 #include<Util/ProtocHelper.h>
-#include<Pool/ProtocolPool.h>
 #include<Coroutine/CoroutineManager.h>
 namespace Sentry
 {
@@ -13,23 +12,15 @@ namespace Sentry
 
 	void LocalLuaRetActionProxy::Invoke(NetMessageProxy * backData)
 	{
-		XCode code = (XCode)backData->code();
-		const std::string & name = backData->protocname();
-		const std::string & message = backData->messagedata();
-		if (!message.empty())
+		XCode code = backData->GetCode();
+		//TODO
+		/*Message * pMessage = backData->GetResMessage();
+		if (pMessage != nullptr)
 		{
-			Message * pMessage = GprotocolPool.Create(name);
-			if (pMessage != nullptr && pMessage->ParseFromString(message))
-			{
-				this->mBindLuaAction->Inovke(code, pMessage);
-				GprotocolPool.Destory(pMessage);
-				return;
-			}
-			this->mBindLuaAction->Inovke(code, message);
-			GprotocolPool.Destory(pMessage);
+			this->mBindLuaAction->Inovke(code, pMessage);
 			return;
 		}
-		this->mBindLuaAction->Inovke(code);
+		this->mBindLuaAction->Inovke(code);*/
 	}
 
 	LocalRetActionProxy::LocalRetActionProxy()
@@ -39,7 +30,7 @@ namespace Sentry
 
 	void LocalRetActionProxy1::Invoke(NetMessageProxy * backData)
 	{
-		this->mBindAction((XCode)backData->code());
+		
 	}
 	LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction * action) : mBindLuaAction(action)
 	{
@@ -48,23 +39,21 @@ namespace Sentry
 
 	void LocalWaitRetActionProxy::Invoke(NetMessageProxy * backData)
 	{
-		XCode code = (XCode)backData->code();
-		const std::string & name = backData->protocname();
-		const std::string & message = backData->messagedata();
-		if (!message.empty())
-		{
-			Message * pMessage = GprotocolPool.Create(name);
-			if (pMessage != nullptr && pMessage->ParseFromString(message))
-			{
-				this->mBindLuaAction->Inovke(code, pMessage);
-				GprotocolPool.Destory(pMessage);
-				return;
-			}
-			this->mBindLuaAction->Inovke(code, message);
-			GprotocolPool.Destory(pMessage);
-			return;
-		}
-		this->mBindLuaAction->Inovke(code);
+		XCode code = backData->GetCode();
+		// TODO
+		//Message * pMessage = backData->GetResMessage();
+		//if (pMessage != nullptr)
+		//{
+		//	this->mBindLuaAction->Inovke(code, pMessage);
+		//	return;
+		//}
+		//const std::string & json = backData->GetJsonData();
+		//if (!json.empty())
+		//{
+		//	this->mBindLuaAction->Inovke(code, json);
+		//	return;
+		//}
+		//this->mBindLuaAction->Inovke(code);
 	}
 	NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineManager * mgr)
 	{
@@ -83,8 +72,9 @@ namespace Sentry
 
 	void NetWorkWaitCorAction::Invoke(NetMessageProxy * backData)
 	{
-		this->mCode = (XCode)backData->code();
-		this->mMessage = backData->messagedata();
+		this->mCode = backData->GetCode();
+		// TODO优化
+		this->mMessage = backData->GetMsgBody();
 		this->mScheduler->Resume(mCoroutineId);
 	}
 }

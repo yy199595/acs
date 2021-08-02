@@ -1,6 +1,5 @@
 ﻿#include "LuaProtocExtension.h"
 #include<Define/CommonDef.h>
-#include<Pool/ProtocolPool.h>
 #include<Other/ObjectFactory.h>
 #include<google/protobuf/message.h>
 #include<google/protobuf/descriptor.h>
@@ -50,17 +49,15 @@ namespace LuaProtocExtension
 			return 1;
 		}
 		const char * name = lua_tostring(lua, 1);
-		Message * pMessage = GprotocolPool.Create(name);
+		Message * pMessage = nullptr;
 		if (pMessage == nullptr || !lua_getfunction(lua, "JsonUtil", "ToString"))
-		{
-			GprotocolPool.Destory(pMessage);
+		{			
 			lua_pushnil(lua);
 			return 1;
 		}
 		lua_pushvalue(lua, 2);
 		if (lua_pcall(lua, 1, 1, 0) != 0)
-		{
-			GprotocolPool.Destory(pMessage);
+		{			
 			SayNoDebugError(lua_tostring(lua, -1));
 			lua_pushnil(lua);
 			return 1;

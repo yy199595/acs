@@ -75,9 +75,6 @@
     <ClCompile Include="Manager\ScriptManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\TimerManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Module\Component.cpp">
       <Filter>Module</Filter>
     </ClCompile>
@@ -216,9 +213,6 @@
     <ClCompile Include="Manager\ServiceNodeManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Pool\ProtocolPool.cpp">
-      <Filter>Pool</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\NetSessionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -242,6 +236,12 @@
     </ClCompile>
     <ClCompile Include="NetWork\NetMessageProxy.cpp">
       <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer\TimerManager.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer\TimeWheelLayer.cpp">
+      <Filter>Timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -288,9 +288,6 @@
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\ScriptManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\TimerManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Module\Component.h">
@@ -503,9 +500,6 @@
     <ClInclude Include="Pool\ObjectPool.h">
       <Filter>Pool</Filter>
     </ClInclude>
-    <ClInclude Include="Pool\ProtocolPool.h">
-      <Filter>Pool</Filter>
-    </ClInclude>
     <ClInclude Include="NetWork\SocketEvent.h">
       <Filter>NetWork</Filter>
     </ClInclude>
@@ -535,6 +529,15 @@
     </ClInclude>
     <ClInclude Include="NetWork\NetMessageProxy.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\TimerManager.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer\TimeWheelLayer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Other\ProtocolConfig.h">
+      <Filter>Other</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

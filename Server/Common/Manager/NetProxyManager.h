@@ -18,8 +18,7 @@ namespace Sentry
 		bool DescorySession(const std::string &address);
 		bool SendMsgByAddress(const std::string &address, NetMessageProxy *msg);
 		bool ConnectByAddress(const std::string &address, const std::string &name);
-		bool SendResponseMessage(const std::string & address, XCode code,NetMessageProxy *msg);
-
+		
 	public:
 		TcpProxySession *GetProxySession(const std::string &address);
 		TcpProxySession *DelProxySession(const std::string & address);

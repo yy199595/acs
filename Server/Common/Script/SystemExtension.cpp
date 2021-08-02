@@ -1,7 +1,7 @@
 ﻿#include "SystemExtension.h"
 #include <Util/TimeHelper.h>
 #include <Core/Applocation.h>
-#include <Manager/TimerManager.h>
+#include <Timer/TimerManager.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Manager/NetProxyManager.h>
@@ -163,18 +163,18 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 			const long long callbackId = lua_tointeger(luaEnv, 2);
 			const long long operId = lua_tointeger(luaEnv, 3);
 			const int code = lua_tointeger(luaEnv, 4);
-			NetMessageProxy * returnPacket = GnetPacketPool.Create();
+			/*NetMessageProxy * returnPacket = GnetPacketPool.Create();
 
 			returnPacket->set_code(code);
 			returnPacket->set_entityid(operId);
-			returnPacket->set_rpcid(callbackId);
+			returnPacket->set_rpcid(callbackId);*/
 			if (lua_isstring(luaEnv, 5))
 			{
 				size_t size = 0;
 				const char *str = lua_tolstring(luaEnv, 5, &size);
-				returnPacket->set_messagedata(str, size);
+				//returnPacket->set_messagedata(str, size);
 			}
-			netManager->SendMsgByAddress(address, returnPacket);
+			//netManager->SendMsgByAddress(address, returnPacket);
 			return 0;
 		}
 	}
@@ -186,19 +186,19 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 		const long long operId = lua_tointeger(luaEnv, 2);
 		const int code = lua_tointeger(luaEnv, 3);
 
-		NetMessageProxy * returnPacket = GnetPacketPool.Create();
+		//NetMessageProxy * returnPacket = GnetPacketPool.Create();
 
-		returnPacket->set_code(code);
+		/*returnPacket->set_code(code);
 		returnPacket->set_entityid(operId);
-		returnPacket->set_rpcid(callbackId);
+		returnPacket->set_rpcid(callbackId);*/
 		if (lua_isstring(luaEnv, 4))
 		{
 			size_t size = 0;
 			const char *str = lua_tolstring(luaEnv, 4, &size);
-			returnPacket->set_messagedata(str, size);
+			//returnPacket->set_messagedata(str, size);
 		}
-		actManager->InvokeCallback(callbackId, returnPacket);
-		GnetPacketPool.Destory(returnPacket);
+		//actManager->InvokeCallback(callbackId, returnPacket);
+		//GnetPacketPool.Destory(returnPacket);
 	}
 	return 0;
 }

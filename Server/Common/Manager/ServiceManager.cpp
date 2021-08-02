@@ -21,7 +21,6 @@ namespace Sentry
 		SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetManager<NetProxyManager>());
 
 		SayNoAssertRetFalse_F(this->CreateLocalService());
-		SayNoAssertRetFalse_F(this->SaveRpcInfoToFile("./Config/rpc.csv"));
 		return true;
 	}
 
@@ -57,19 +56,19 @@ namespace Sentry
 		const std::string & service = messageData->GetService();
 		ServiceBase * localService = this->GetService(service);
 		if (localService == nullptr || !localService->HasMethod(method))
-		{			
+		{
 			SayNoDebugError("call function not find [" << service << "." << method << "]");
 			return false;
 		}
 
 		this->mCorManager->Start([address, localService, this, messageData]()
+		{
+			if (localService->InvokeMethod(address, messageData))
 			{
-				XCode code = localService->InvokeMethod(address, messageData);
-				if (messageData->SetCode(code))
-				{
-					this->mNetProxyManager->SendMsgByAddress(address, messageData);
-				}
-			});
+				this->mNetProxyManager->SendMsgByAddress(address, messageData);
+			}
+			delete messageData;
+		});
 		return true;
 	}
 
@@ -181,14 +180,4 @@ namespace Sentry
 		}
 		return true;
 	}
-
-	bool ServiceManager::SaveRpcInfoToFile(const std::string & path)
-	{
-		for (auto iter = this->mLuaServiceMap.begin(); iter != this->mLuaServiceMap.end(); iter++)
-		{
-			LocalLuaService * luaService = iter->second;
-			
-		}
-	}
-
 }

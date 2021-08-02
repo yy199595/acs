@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <XCode/XCode.h>
+#include <Other/ProtocolConfig.h>
 #include <google/protobuf/message.h>
 
 using google::protobuf::Message;
@@ -36,36 +37,29 @@ namespace Sentry
 	public:
 		void Clear();
 		size_t WriteToBuffer(char *buffer, const size_t size);
+	public:
+		const std::string &GetMsgBody() { return this->mMessageData; }
+		const std::string &GetMethd() { return this->mProConfig->MethodName; }
+		const std::string &GetService() { return this->mProConfig->ServiceName; }	
+		const ProtocolConfig * GetProConfig() { return this->mProConfig; }
+	public:
+		bool InitMessageData(XCode code, Message * message); // response
+		bool InitMessageData(Message * message, long long rpcId, long long userId); //request
+		
 
 	public:
-		const std::string &GetMethd() { return this->mMethod; }
-		const std::string &GetService() { return this->mService; }
-
-	public:
-		bool SetCode(XCode code);
-
-	public:
+		XCode GetCode() { return this->mCode; }
 		long long GetRpcId() { return this->mRpcId; }
 		long long GetUserId() { return this->mUserId; }
-		Message *GetReqMessage() { return this->mReqMessage; }
-		Message *GetResMessage() { return this->mResMessage; }
-		NetMessageType GetMessageType() { return this->mMsgType; }
-		const std::string &GetJsonData() { return this->mJsonString; }
-
+		NetMessageType GetMessageType() { return this->mMsgType; }	
 	private:
 		NetMessageType mMsgType;
-
 	private:
 		XCode mCode;
 		long long mRpcId;
 		long long mUserId;
-		std::string mMethod;
-		std::string mService;
-		unsigned short mActionId;
-
 	private:
-		Message *mReqMessage;
-		Message *mResMessage;
-		std::string mJsonString;
+		std::string mMessageData;
+		const ProtocolConfig * mProConfig;
 	};
 }

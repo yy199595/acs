@@ -16,8 +16,8 @@ namespace Sentry
 	public:
 		void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> & service) final;
 	private:
-		virtual XCode InvokeMethod(NetMessageProxy *) final;
-		virtual XCode InvokeMethod(const std::string &address, NetMessageProxy *) final;
+		virtual bool InvokeMethod(NetMessageProxy *) final;
+		virtual bool InvokeMethod(const std::string &address, NetMessageProxy *) final;
 	protected:
 		bool BindFunction(std::string name, LocalAction1 action);
 
