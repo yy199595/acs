@@ -6,7 +6,6 @@
 #include <Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlThreadTask.h>
 #include <google/protobuf/util/json_util.h>
-#include <Pool/ProtocolPool.h>
 namespace Sentry
 {
     MysqlProxy::MysqlProxy()
@@ -40,23 +39,21 @@ namespace Sentry
     XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
 		const std::string & messageData = requertData.protocolmessage();
-        Message * protocolMessage = GprotocolPool.Create(requertData.protocolname());
+        Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
         }
 		if (!protocolMessage->ParseFromString(messageData))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::ParseMessageError;
 		}
 		std::string sql;
 		if (!this->mMysqlManager->GetAddSqlCommand(*protocolMessage, sql))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
-		GprotocolPool.Destory(protocolMessage);
+		//GprotocolPool.Destory(protocolMessage);
 #ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
@@ -80,26 +77,23 @@ namespace Sentry
     XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
 		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = GprotocolPool.Create(requertData.protocolname());
+		Message * protocolMessage = nullptr; //GprotocolPool.Create(requertData.protocolname());
 		if (protocolMessage == nullptr)
 		{
 			return XCode::Failure;
 		}
 		if (!protocolMessage->ParseFromString(messageData))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::ParseMessageError;
 		}
 		std::string sql;
 		if (!this->mMysqlManager->GetSaveSqlCommand(*protocolMessage, sql))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
 #ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
-		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
@@ -120,26 +114,23 @@ namespace Sentry
     XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
 		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = GprotocolPool.Create(requertData.protocolname());
+		Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
 		if (protocolMessage == nullptr)
 		{
 			return XCode::Failure;
 		}
 		if (!protocolMessage->ParseFromString(messageData))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::ParseMessageError;
 		}
 		std::string sql;
 		if (!this->mMysqlManager->GetDeleleSqlCommand(*protocolMessage, sql))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
 #ifdef SOEASY_DEBUG
 		SayNoDebugInfo(sql);
 #endif
-		GprotocolPool.Destory(protocolMessage);
 		const std::string & tab = this->mMysqlManager->GetDataBaseName();
 		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
@@ -159,7 +150,7 @@ namespace Sentry
 	XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request & requertData, s2s::MysqlQuery_Response & response)
 	{
 		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = GprotocolPool.Create(requertData.protocolname());
+		Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
 		if (protocolMessage == nullptr)
 		{
 			response.set_errotstr("create " + requertData.protocolname() + " fail");
@@ -167,13 +158,11 @@ namespace Sentry
 		}
 		if (!protocolMessage->ParseFromString(messageData))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::ParseMessageError;
 		}
 		std::string sql;
 		if (!this->mMysqlManager->GetQuerySqlCommand(*protocolMessage, sql))
 		{
-			GprotocolPool.Destory(protocolMessage);
 			return XCode::CallArgsError;
 		}
 #ifdef SOEASY_DEBUG
@@ -203,7 +192,6 @@ namespace Sentry
 			}
 			return XCode::Successful;
 		}
-		GprotocolPool.Destory(protocolMessage);
 		response.set_errotstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
 		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();

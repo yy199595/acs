@@ -85,12 +85,18 @@ ELSEIF(UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 ENDIF()
 
+SET(EX_PLATFORM 64)
+SET(EX_PLATFORM_NAME "x64")
 
 SET(CMAKE_BUILD_TYPE Debug)
 
 message(${SUPER_SRC})
 ADD_EXECUTABLE(Server ${SUPER_SRC})
+IF(UNIX)
 TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
+ELSEIF(WIN32)
+TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd mysqlclient hiredis ${MY_ADDLIB})
+ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ../bin/)
 

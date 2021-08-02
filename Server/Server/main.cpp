@@ -1,7 +1,7 @@
 ﻿#include<Core/Applocation.h>
 #include<Core/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
-#include<Manager/TimerManager.h>
+#include<Timer/TimerManager.h>
 #include<Manager/ActionManager.h>
 
 #include<Manager/ThreadTaskManager.h>

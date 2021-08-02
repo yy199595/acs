@@ -2,7 +2,6 @@
 #include<sstream>
 #include<Util/ProtocHelper.h>
 #include<Global/LogHelper.h>
-#define DeletePtr(obj) if(obj != nullptr) {delete obj; obj = nullptr; }
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
@@ -10,7 +9,6 @@
 #define args5 std::placeholders::_5
 #define ASIO_TCP_SEND_MAX_COUNT 1024 * 1024
 
-#define if_false(code, content) if (!code) { content; }
 inline std::string FromatFileLine(const char * file, const int line)
 {
 	const size_t lenght = strlen(file);
