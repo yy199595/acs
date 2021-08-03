@@ -78,9 +78,6 @@
     <ClCompile Include="Module\Component.cpp">
       <Filter>Module</Filter>
     </ClCompile>
-    <ClCompile Include="Module\SayNoUdpSession.cpp">
-      <Filter>Module</Filter>
-    </ClCompile>
     <ClCompile Include="NetWork\NetLuaRetAction.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
@@ -98,9 +95,6 @@
     </ClCompile>
     <ClCompile Include="Object\Object.cpp">
       <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Other\AssestsFileInfo.cpp">
-      <Filter>Other</Filter>
     </ClCompile>
     <ClCompile Include="Other\ObjectFactory.cpp">
       <Filter>Other</Filter>
@@ -275,9 +269,6 @@
     <ClInclude Include="Global\LogHelper.h">
       <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="Global\SayNoDataField.h">
-      <Filter>Global</Filter>
-    </ClInclude>
     <ClInclude Include="Global\ServerConfig.h">
       <Filter>Global</Filter>
     </ClInclude>
@@ -294,9 +285,6 @@
       <Filter>Module</Filter>
     </ClInclude>
     <ClInclude Include="Module\SayNoFactory.h">
-      <Filter>Module</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\SayNoUdpSession.h">
       <Filter>Module</Filter>
     </ClInclude>
     <ClInclude Include="NetWork\NetLuaRetAction.h">
@@ -319,9 +307,6 @@
     </ClInclude>
     <ClInclude Include="Object\Object.h">
       <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Other\AssestsFileInfo.h">
-      <Filter>Other</Filter>
     </ClInclude>
     <ClInclude Include="Other\DoubleBufferQueue.h">
       <Filter>Other</Filter>

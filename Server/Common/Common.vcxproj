@@ -36,7 +36,6 @@
     <ClCompile Include="Manager\NetProxyManager.cpp" />
     <ClCompile Include="Manager\ThreadTaskManager.cpp" />
     <ClCompile Include="Module\Component.cpp" />
-    <ClCompile Include="Module\SayNoUdpSession.cpp" />
     <ClCompile Include="NetWork\NetLuaRetAction.cpp" />
     <ClCompile Include="NetWork\NetMessageProxy.cpp" />
     <ClCompile Include="NetWork\NetWorkAction.cpp" />
@@ -45,7 +44,6 @@
     <ClCompile Include="NetWork\TcpProxySession.cpp" />
     <ClCompile Include="Object\GameObject.cpp" />
     <ClCompile Include="Object\Object.cpp" />
-    <ClCompile Include="Other\AssestsFileInfo.cpp" />
     <ClCompile Include="Other\ObjectFactory.cpp" />
     <ClCompile Include="Other\ServiceNode.cpp" />
     <ClCompile Include="Other\TimeRecorder.cpp" />
@@ -97,7 +95,6 @@
     <ClInclude Include="Define\CommonTypeDef.h" />
     <ClInclude Include="Define\ThreadQueue.h" />
     <ClInclude Include="Global\LogHelper.h" />
-    <ClInclude Include="Global\SayNoDataField.h" />
     <ClInclude Include="Global\ServerConfig.h" />
     <ClInclude Include="Manager\ActionManager.h" />
     <ClInclude Include="Manager\ListenerManager.h" />
@@ -112,7 +109,6 @@
     <ClInclude Include="Manager\ThreadTaskManager.h" />
     <ClInclude Include="Module\Component.h" />
     <ClInclude Include="Module\SayNoFactory.h" />
-    <ClInclude Include="Module\SayNoUdpSession.h" />
     <ClInclude Include="NetWork\NetLuaRetAction.h" />
     <ClInclude Include="NetWork\NetWorkAction.h" />
     <ClInclude Include="NetWork\NetWorkRetAction.h" />
@@ -123,7 +119,6 @@
     <ClInclude Include="Object\GameObject.h" />
     <ClInclude Include="Object\MemoryObject.h" />
     <ClInclude Include="Object\Object.h" />
-    <ClInclude Include="Other\AssestsFileInfo.h" />
     <ClInclude Include="Other\DoubleBufferQueue.h" />
     <ClInclude Include="Other\ObjectFactory.h" />
     <ClInclude Include="Other\ProtocolConfig.h" />
