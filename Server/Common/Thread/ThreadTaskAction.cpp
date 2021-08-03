@@ -1,6 +1,4 @@
 #include "ThreadTaskAction.h"
-#include <Util/TimeHelper.h>
-#include <Util/NumberHelper.h>
 #include <Manager/ThreadTaskManager.h>
 
 namespace Sentry
@@ -19,4 +17,4 @@ namespace Sentry
         this->mTaskActionId = taskManager->CreateTaskId();
         return true;
     }
-}
+}// namespace Sentry

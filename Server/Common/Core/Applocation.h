@@ -4,13 +4,13 @@
 #define ASIO_STANDALONE
 #endif
 
-#include<Util/TimeHelper.h>
-#include<Define/CommonDef.h>
-#include<Other/TimeRecorder.h>
-#include<Global/ServerConfig.h>
-#include<Define/CommonTypeDef.h>
-#include<Define/ClassStatement.h>
-#include<Manager/ManagerInterface.h>
+#include <Define/ClassStatement.h>
+#include <Define/CommonDef.h>
+#include <Define/CommonTypeDef.h>
+#include <Global/ServerConfig.h>
+#include <Manager/ManagerInterface.h>
+#include <Other/TimeRecorder.h>
+#include <Util/TimeHelper.h>
 
 using namespace std;
 using namespace asio::ip;
@@ -26,7 +26,8 @@ namespace Sentry
     public:
         Applocation(const std::string srvName, const std::string configPath);
 
-        virtual ~Applocation() {};
+        virtual ~Applocation(){};
+
     public:
         ServerConfig &GetConfig() { return this->mConfig; }
 
@@ -91,16 +92,20 @@ namespace Sentry
         class LogHelper *mLogHelper;
 
         std::string mSrvConfigDirectory;
+
     private:
         float mLogicFps;
         float mDelatime;
+
     private:
         long long mLogicRunCount;
         long long mSystemRunCount;
         long long mMainLoopStartTime;
+
     private:
         static Applocation *mApplocation;
         std::unordered_map<std::string, Manager *> mManagerMap;
+
     private:
         std::vector<IFrameUpdate *> mFrameUpdateManagers;
         std::vector<ISystemUpdate *> mSystemUpdateManagers;
@@ -169,6 +174,9 @@ namespace Sentry
     inline Applocation *GetApp() { return Applocation::Get(); }
 
     template<typename T>
-    inline T *GetManager() { return Applocation::Get()->GetManager<T>(); }
+    inline T *GetManager()
+    {
+        return Applocation::Get()->GetManager<T>();
+    }
 
-}
+}// namespace Sentry

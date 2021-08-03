@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include<Object/Object.h>
-#include<Protocol/com.pb.h>
-#include<Protocol/s2s.pb.h>
-#include<Manager/ServiceNodeManager.h>
+#include <Manager/ServiceNodeManager.h>
+#include <Object/Object.h>
+#include <Protocol/com.pb.h>
+#include <Protocol/s2s.pb.h>
 
 namespace Sentry
 {
@@ -36,19 +36,19 @@ namespace Sentry
     public:
         std::string GetJsonString();
 
-        XCode Notice(const std::string &service, const std::string &method); //不回应
-        XCode Notice(const std::string &service, const std::string &method, const Message &request); //不回应
+        XCode Notice(const std::string &service, const std::string &method);                        //不回应
+        XCode Notice(const std::string &service, const std::string &method, const Message &request);//不回应
     public:
         XCode Invoke(const std::string &service, const std::string &method);
 
         XCode Invoke(const std::string &service, const std::string &method, const Message &request);
 
-    public: // c++ 使用
+    public:// c++ 使用
         XCode Call(const std::string &service, const std::string &method, Message &response);
 
         XCode Call(const std::string &service, const std::string &method, const Message &request, Message &response);
 
-    public: // lua使用
+    public:// lua使用
         XCode PushMessageData(NetMessageProxy *messageData);
 
         XCode AsyncPushMessageData(NetMessageProxy *messageData);
@@ -56,10 +56,10 @@ namespace Sentry
     private:
         std::string mIp;
         unsigned short mPort;
-        const std::string mAddress;          //监听地址
-        const std::string mNodeName;      //进程名字
-        std::set<std::string> mServiceArray; //服务列表
-        class CoroutineManager *mCorManager; //协程
+        const std::string mAddress;         //监听地址
+        const std::string mNodeName;        //进程名字
+        std::set<std::string> mServiceArray;//服务列表
+        class CoroutineManager *mCorManager;//协程
         class ActionManager *mActionManager;
 
         class NetProxyManager *mNetWorkManager;
@@ -69,4 +69,4 @@ namespace Sentry
         std::queue<NetMessageProxy *> mMessageQueue;
         char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
     };
-}
+}// namespace Sentry

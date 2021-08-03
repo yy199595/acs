@@ -1,19 +1,13 @@
 ﻿#include "SystemExtension.h"
-#include <Util/TimeHelper.h>
 #include <Core/Applocation.h>
-#include <Timer/TimerManager.h>
-#include <Timer/LuaActionTimer.h>
-#include <Timer/LuaSleepTimer.h>
-#include <Manager/NetProxyManager.h>
 #include <Manager/ActionManager.h>
-#include <Protocol/com.pb.h>
+#include <Manager/NetProxyManager.h>
+#include <Manager/ServiceManager.h>
 #include <NetWork/NetLuaRetAction.h>
 #include <Service/LocalLuaService.h>
-#include <Manager/ServiceManager.h>
-#include <Other/ServiceNode.h>
-#include <Manager/ServiceNodeManager.h>
-
-#include<Pool/ObjectPool.h>
+#include <Timer/LuaActionTimer.h>
+#include <Timer/LuaSleepTimer.h>
+#include <Timer/TimerManager.h>
 
 using namespace Sentry;
 
@@ -155,7 +149,7 @@ int SystemExtension::NewService(lua_State *luaEnv)
 int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 {
     Applocation *app = Applocation::Get();
-    if (lua_isstring(luaEnv, 1)) //远程回复
+    if (lua_isstring(luaEnv, 1))//远程回复
     {
         NetProxyManager *netManager = app->GetManager<NetProxyManager>();
         if (netManager != nullptr)
@@ -178,7 +172,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
             //netManager->SendMsgByAddress(address, returnPacket);
             return 0;
         }
-    } else if (lua_isinteger(luaEnv, 1)) //本机回复
+    } else if (lua_isinteger(luaEnv, 1))//本机回复
     {
         ActionManager *actManager = app->GetManager<ActionManager>();
 

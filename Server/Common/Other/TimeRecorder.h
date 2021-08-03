@@ -1,13 +1,12 @@
 #pragma once
 
-#include<cstring>
-#include<unordered_map>
-#include<XCode/XCode.h>
+#include <XCode/XCode.h>
+#include <cstring>
+#include <unordered_map>
 
 namespace Sentry
 {
-    struct CostTimeInfo
-    {
+    struct CostTimeInfo {
     public:
         CostTimeInfo() { this->Clear(); }
 
@@ -15,12 +14,12 @@ namespace Sentry
         void Clear() { memset(this, 0, sizeof(*this)); }
 
     public:
-        int mTimeoutCount;    //超时次数
-        long long mCallCount;    //调用次数
+        int mTimeoutCount;     //超时次数
+        long long mCallCount;  //调用次数
         double mSumLatency;    //总延迟
         double mMaxLatency;    //最大延迟
         double mMinLatency;    //最小延迟
-        double mAverageLatency;    //平均延迟
+        double mAverageLatency;//平均延迟
     };
 
 
@@ -49,4 +48,4 @@ namespace Sentry
         long long mLastClearTime;//(毫秒)
         std::unordered_map<std::string, CostTimeInfo> mCallFuncInfoMap;
     };
-}
+}// namespace Sentry

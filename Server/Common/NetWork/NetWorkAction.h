@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-#include<XCode/XCode.h>
-#include"TcpClientSession.h"
-#include<Protocol/com.pb.h>
-#include<Other/ObjectFactory.h>
-#include<Pool/ObjectPool.h>
-#include<NetWork/NetMessageProxy.h>
+#include "TcpClientSession.h"
+#include <NetWork/NetMessageProxy.h>
+#include <Other/ObjectFactory.h>
+#include <Pool/ObjectPool.h>
+#include <Protocol/com.pb.h>
+#include <XCode/XCode.h>
 
 #ifdef SOEASY_DEBUG
 
-#include<google/protobuf/util/json_util.h>
+#include <google/protobuf/util/json_util.h>
 
-#endif // SOEASY_DEBUG
+#endif// SOEASY_DEBUG
 
 
 using namespace com;
@@ -38,11 +38,11 @@ namespace Sentry
     public:
         virtual bool Invoke(NetMessageProxy *messageData) = 0;
     };
-}
+}// namespace Sentry
 
 namespace Sentry
 {
-    class LocalActionProxy1 : public LocalActionProxy // 无参数 无返回
+    class LocalActionProxy1 : public LocalActionProxy// 无参数 无返回
     {
     public:
         LocalActionProxy1(LocalAction1 action) : mBindAction(action) {}
@@ -53,12 +53,12 @@ namespace Sentry
     private:
         LocalAction1 mBindAction;
     };
-}
+}// namespace Sentry
 
 namespace Sentry
 {
     template<typename T1>
-    class LocalActionProxy2 : public LocalActionProxy //有参数 无返回
+    class LocalActionProxy2 : public LocalActionProxy//有参数 无返回
     {
     public:
         LocalActionProxy2(LocalAction2<T1> action) : mBindAction(action) {}
@@ -86,16 +86,16 @@ namespace Sentry
         mReqMessagePool.Destory(message);
         return messageData->InitMessageData(code, nullptr);
     }
-}
+}// namespace Sentry
 
 namespace Sentry
 {
     template<typename T1, typename T2>
-    class LocalActionProxy3 : public LocalActionProxy //一个参数 一个返回
+    class LocalActionProxy3 : public LocalActionProxy//一个参数 一个返回
     {
     public:
         LocalActionProxy3(LocalAction3<T1, T2> action)
-                : mBindAction(action) {}
+            : mBindAction(action) {}
 
     public:
         bool Invoke(NetMessageProxy *messageData) override;
@@ -129,12 +129,12 @@ namespace Sentry
 
         return res;
     }
-}
+}// namespace Sentry
 
 namespace Sentry
 {
     template<typename T1>
-    class LocalActionProxy4 : public LocalActionProxy //无参数 一个返回
+    class LocalActionProxy4 : public LocalActionProxy//无参数 一个返回
     {
     public:
         LocalActionProxy4(LocalAction4<T1> action) : mBindAction(action) {}
@@ -143,8 +143,7 @@ namespace Sentry
         {
             long long userId = messageData->GetUserId();
             T1 *responseData = mResMessagePool.Create();
-            XCode
-            this->mBindAction(userId, *responseData);
+            XCode this->mBindAction(userId, *responseData);
             bool res = messageData->InitMessageData(code, responseData);
 
             this->mResMessagePool.Destory(responseData);
@@ -155,4 +154,4 @@ namespace Sentry
         LocalAction4<T1> mBindAction;
         ObjectPool<T1> mResMessagePool;
     };
-}
+}// namespace Sentry

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include"ServiceBase.h"
-#include<Script/LuaInclude.h>
+#include "ServiceBase.h"
+#include <Script/LuaInclude.h>
 
 namespace Sentry
 {
@@ -20,6 +20,7 @@ namespace Sentry
         bool HasMethod(const std::string &name) final;
 
         bool IsLuaService() final { return true; };
+
     public:
         void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> &service) final;
 
@@ -36,4 +37,4 @@ namespace Sentry
         //std::unordered_map<std::string, int> mDefultActionMap;	//默认函数
         //std::unordered_map<std::string, NetLuaAction *> mActionMap;
     };
-}
+}// namespace Sentry

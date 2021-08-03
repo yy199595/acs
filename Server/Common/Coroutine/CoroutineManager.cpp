@@ -2,14 +2,9 @@
 #include<chrono>
 #include<memory.h>
 #include"Coroutine.h"
-#include"CoroutineEvent.h"
-#include<Core/Applocation.h>
 #include<Util/NumberHelper.h>
 #include<Timer/TimerManager.h>
 #include<Timer/CorSleepTimer.h>
-
-#include<Manager/NetSessionManager.h>
-#include<Manager/ActionManager.h>
 #include<NetWork/NetWorkRetAction.h>
 
 using namespace std::chrono;

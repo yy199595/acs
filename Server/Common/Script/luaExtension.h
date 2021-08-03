@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Script/LuaInclude.h>
+#include <Script/LuaInclude.h>
 
 namespace LuaAPIExtension
 {
@@ -25,4 +25,4 @@ namespace LuaAPIExtension
     extern int AddComponent(lua_State *lua);
 
     extern std::map<int, std::string> GetLuaStackData(lua_State *lua);
-}
+}// namespace LuaAPIExtension

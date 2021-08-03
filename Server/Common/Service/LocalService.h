@@ -43,10 +43,6 @@ namespace Sentry
 
     private:
         class CoroutineManager *mCorManager;
-
-        class NetSessionManager *mNetWorkManager;
-
-        std::unordered_map<long long, std::string> mCurrentSessionMap;
         std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
     };
 
@@ -67,7 +63,6 @@ namespace Sentry
     template<typename T1, typename T2>
     inline bool LocalService::BindFunction(std::string name, LocalAction3<T1, T2> action)
     {
-        const size_t pos = name.find_first_of(".");
         return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action));
     }
 

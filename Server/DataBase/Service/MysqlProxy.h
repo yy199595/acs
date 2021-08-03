@@ -27,7 +27,6 @@ namespace Sentry
         void OnInitComplete() final;
 
     private:
-        int mMysqlNodeId;
 
         class MysqlManager *mMysqlManager;
 
@@ -35,4 +34,4 @@ namespace Sentry
 
         class ThreadTaskManager *mTaskManager;
     };
-}
+}// namespace Sentry

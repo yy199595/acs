@@ -1,9 +1,7 @@
-#include"BindLuaFunction.h"
-#include<Define/CommonDef.h>
-#include<Define/ClassStatement.h>
-#include<google/protobuf/message.h>
-#include<google/protobuf/descriptor.h>
-#include<google/protobuf/util/json_util.h>
+#include "BindLuaFunction.h"
+#include <Define/CommonDef.h>
+#include <Define/ClassStatement.h>
+#include <google/protobuf/util/json_util.h>
 
 namespace Sentry
 {
@@ -35,7 +33,7 @@ namespace Sentry
         SayNoDebugError(lua_tostring(this->mLua, -1));
         return false;
     }
-}
+}// namespace Sentry
 
 
 namespace Sentry
@@ -52,5 +50,4 @@ namespace Sentry
         return BindLuaFunction::Invoke(gameObject, jsonData);
     }
 
-}
-
+}// namespace Sentry

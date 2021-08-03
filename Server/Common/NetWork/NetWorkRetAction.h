@@ -4,6 +4,7 @@
 #include"NetLuaRetAction.h"
 #include<Util/NumberBuilder.h>
 #include<Protocol/com.pb.h>
+#include<NetWork/NetMessageProxy.h>
 #include<NetWork/TcpClientSession.h>
 
 using namespace com;
@@ -69,11 +70,10 @@ namespace Sentry
         void Invoke(NetMessageProxy *backData) override
         {
             mReturnData.Clear();
-            XCode code = (XCode) backData->code();
+            XCode code = backData->GetCode();
             if (code != XCode::TimeoutAutoCall)
             {
-                const std::string &message = backData->messagedata();
-                if (!mReturnData.ParseFromArray(message.c_str(), message.size()))
+                if(!this->mReturnData.ParseFromString(backData->GetMsgBody()))
                 {
                     this->mBindAction(XCode::ParseMessageError, mReturnData);
                     SayNoDebugError("parse " << typeid(T).name() << " error code:" << code);

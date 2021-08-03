@@ -1,6 +1,5 @@
 ﻿#include "TcpProxySession.h"
 #include <Core/Applocation.h>
-#include <Pool/ObjectPool.h>
 #include <Manager/NetProxyManager.h>
 #include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>

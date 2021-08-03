@@ -9,9 +9,7 @@ namespace Sentry
     class ServiceBase;
 
     class LocalService;
-
-    class ProxyService;
-
+    
     class LocalLuaService;
 
     class ServiceManager : public Manager

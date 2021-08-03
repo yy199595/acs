@@ -1,16 +1,14 @@
 ﻿#include "ServiceManager.h"
-#include <Service/LocalService.h>
 #include <Service/LocalLuaService.h>
+#include <Service/LocalService.h>
 
-#include <Util/StringHelper.h>
 #include <Core/ObjectRegistry.h>
-#include<Manager/NetProxyManager.h>
-#include<Manager/ActionManager.h>
 #include <Coroutine/CoroutineManager.h>
+#include <Manager/ActionManager.h>
+#include <Util/StringHelper.h>
 
 namespace Sentry
 {
-
     bool ServiceManager::OnInit()
     {
         SayNoAssertRetFalse_F(this->GetConfig().GetValue("NodeId", this->mNodeId));
@@ -179,4 +177,4 @@ namespace Sentry
         }
         return true;
     }
-}
+}// namespace Sentry

@@ -1,12 +1,11 @@
 
 #include "LuaInclude.h"
-#include"LuaParameter.h"
+#include "LuaParameter.h"
 
 namespace ContainerParameter
 {
     template<typename T>
-    struct ContainerStruct
-    {
+    struct ContainerStruct {
         static T Read(lua_State *lua, int index)
         {
             assert(false);
@@ -27,14 +26,13 @@ namespace ContainerParameter
     {
         ContainerStruct<T>::Write(lua, data);
     }
-}
+}// namespace ContainerParameter
 
 // vector 对象
 namespace ContainerParameter
 {
     template<typename T>
-    struct ContainerStruct<std::vector<T>>
-    {
+    struct ContainerStruct<std::vector<T>> {
         static std::vector<T> Read(lua_State *lua, int index)
         {
             std::vector<T> ret;
@@ -62,14 +60,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
-// vector 引用  
+// vector 引用
 namespace ContainerParameter
 {
     template<typename T>
-    struct ContainerStruct<std::vector<T> &>
-    {
+    struct ContainerStruct<std::vector<T> &> {
         //读的时候注意释放内存
         static std::vector<T> &Read(lua_State *lua, int index)
         {
@@ -92,14 +89,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
-// vector 指针 
+// vector 指针
 namespace ContainerParameter
 {
     template<typename T>
-    struct ContainerStruct<std::vector<T> *>
-    {
+    struct ContainerStruct<std::vector<T> *> {
         //读的时候注意释放内存
         static std::shared_ptr<std::vector<T>> Read(lua_State *lua, int index)
         {
@@ -128,14 +124,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // hashmap对象
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::unordered_map<Key, Value>>
-    {
+    struct ContainerStruct<std::unordered_map<Key, Value>> {
         static std::unordered_map<Key, Value> Read(lua_State *lua, int index)
         {
             std::unordered_map<Key, Value> ret;
@@ -165,14 +160,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // hashmap引用
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::unordered_map<Key, Value> &>
-    {
+    struct ContainerStruct<std::unordered_map<Key, Value> &> {
         static std::unordered_map<Key, Value> &Read(lua_State *lua, int index)
         {
             std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
@@ -203,14 +197,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // hashmap指针
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::unordered_map<Key, Value> *>
-    {
+    struct ContainerStruct<std::unordered_map<Key, Value> *> {
         static std::unordered_map<Key, Value> *Read(lua_State *lua, int index)
         {
             std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
@@ -241,14 +234,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // map对象
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::map<Key, Value>>
-    {
+    struct ContainerStruct<std::map<Key, Value>> {
         static std::map<Key, Value> Read(lua_State *lua, int index)
         {
             std::map<Key, Value> ret;
@@ -278,14 +270,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // map引用
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::map<Key, Value> &>
-    {
+    struct ContainerStruct<std::map<Key, Value> &> {
         static std::map<Key, Value> &Read(lua_State *lua, int index)
         {
             std::map<Key, Value> *ret = new std::map<Key, Value>();
@@ -316,14 +307,13 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter
 
 // map指针
 namespace ContainerParameter
 {
     template<typename Key, typename Value>
-    struct ContainerStruct<std::map<Key, Value> *>
-    {
+    struct ContainerStruct<std::map<Key, Value> *> {
         // 注意释放内存
         static std::map<Key, Value> *Read(lua_State *lua, int index)
         {
@@ -355,4 +345,4 @@ namespace ContainerParameter
             lua_settop(lua, top);
         }
     };
-}
+}// namespace ContainerParameter

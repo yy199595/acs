@@ -1,9 +1,7 @@
 ﻿#include "LuaProtocExtension.h"
-#include<Define/CommonDef.h>
-#include<Other/ObjectFactory.h>
-#include<google/protobuf/message.h>
-#include<google/protobuf/descriptor.h>
-#include<google/protobuf/util/json_util.h>
+#include <Define/CommonDef.h>
+#include <Other/ObjectFactory.h>
+#include <google/protobuf/util/json_util.h>
 
 using namespace google::protobuf;
 using namespace google::protobuf::util;
@@ -71,5 +69,4 @@ namespace LuaProtocExtension
         }
         return 0;
     }
-}
-
+}// namespace LuaProtocExtension

@@ -1,4 +1,4 @@
-#include"LuaInclude.h"
+#include "LuaInclude.h"
 
 namespace ClassMateProxy
 {
@@ -46,4 +46,4 @@ namespace ClassMateProxy
         //printf("destory object %s\n", typeid(T).name());
         return 0;
     }
-}
+}// namespace ClassMateProxy

@@ -1,27 +1,27 @@
 #pragma once
 
-#include"LuaInclude.h"
+#include "LuaInclude.h"
 
 namespace CtorFunction
 {
-    template<typename T, typename ... Args>
-    int CreateUserData(lua_State *luaEnv, Args ... args)
+    template<typename T, typename... Args>
+    int CreateUserData(lua_State *luaEnv, Args... args)
     {
         void *userdata = lua_newuserdata(luaEnv, sizeof(PtrProxy<T>));
-        new(userdata)PtrProxy<T>(new T(std::forward<Args>(args)...), true);
+        new (userdata) PtrProxy<T>(new T(std::forward<Args>(args)...), true);
         const char *name = ClassNameProxy::GetLuaClassName<T>();
         lua_getglobal(luaEnv, name);
         lua_setmetatable(luaEnv, -2);
         return 1;
     }
-}
+}// namespace CtorFunction
 namespace CtorFunction
 {
     template<typename T>
     static int PushCtor(lua_State *luaEnv)
     {
         void *userdata = lua_newuserdata(luaEnv, sizeof(PtrProxy<T>));
-        new(userdata)PtrProxy<T>(new T(), true);
+        new (userdata) PtrProxy<T>(new T(), true);
         const char *name = ClassNameProxy::GetLuaClassName<T>();
         lua_getglobal(luaEnv, name);
         lua_setmetatable(luaEnv, -2);
@@ -126,4 +126,4 @@ namespace CtorFunction
         T9 t9 = LuaParameter::Read<T9>(luaEnv, 9);
         return CreateUserData<T>(luaEnv, t1, t2, t3, t4, t5, t6, t7, t8, t9);
     }
-}
+}// namespace CtorFunction

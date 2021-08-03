@@ -1,12 +1,11 @@
-﻿#include"LuaActionTimer.h"
-#include<Util/MathHelper.h>
-#include<Util/TimeHelper.h>
-#include<Define/CommonDef.h>
+﻿#include "LuaActionTimer.h"
+#include <Define/CommonDef.h>
+#include <Util/MathHelper.h>
 
 namespace Sentry
 {
     LuaActionTimer::LuaActionTimer(lua_State *luaEnv, int ref, int interval, int count)
-            : TimerBase(interval)
+        : TimerBase(interval)
     {
         this->mRef = ref;
         this->mLuaEnv = luaEnv;
@@ -40,4 +39,4 @@ namespace Sentry
         }
         return this->mInvokeCount >= this->mMaxInvokeCount;
     }
-}
+}// namespace Sentry

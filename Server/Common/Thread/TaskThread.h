@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include<mutex>
-#include<queue>
-#include<thread>
-#include"ThreadTaskAction.h"
-#include<condition_variable>
-#include<Other/DoubleBufferQueue.h>
+#include "ThreadTaskAction.h"
+#include <Other/DoubleBufferQueue.h>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 namespace Sentry
 {
@@ -43,4 +43,4 @@ namespace Sentry
         std::condition_variable mThreadVarible;
         DoubleBufferQueue<SharedThreadTask> mWaitInvokeTask;
     };
-}
+}// namespace Sentry

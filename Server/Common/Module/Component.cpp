@@ -1,6 +1,4 @@
 #include"Component.h"
-#include<Object/GameObject.h>
-
 namespace Sentry
 {
     Component::Component(shared_ptr<GameObject> obj)

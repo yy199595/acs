@@ -1,6 +1,6 @@
 #include "ServiceNodeManager.h"
+#include <Manager/NetSessionManager.h>
 #include <Other/ServiceNode.h>
-#include<Manager/NetSessionManager.h>
 
 namespace Sentry
 {
@@ -147,4 +147,4 @@ namespace Sentry
         return nullptr;
     }
 
-}
+}// namespace Sentry

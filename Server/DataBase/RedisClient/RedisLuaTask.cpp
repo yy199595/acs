@@ -1,12 +1,12 @@
-﻿#include"RedisLuaTask.h"
-#include<Util/NumberHelper.h>
-#include<Manager/RedisManager.h>
-#include<Coroutine/CoroutineManager.h>
+﻿#include "RedisLuaTask.h"
+#include <Coroutine/CoroutineManager.h>
+#include <Manager/RedisManager.h>
+#include <Util/NumberHelper.h>
 
 namespace Sentry
 {
     RedisLuaTask::RedisLuaTask(RedisManager *mgr, const std::string &cmd, lua_State *lua, int ref)
-            : RedisTaskBase(mgr, cmd)
+        : RedisTaskBase(mgr, cmd)
     {
         this->mLuaEnv = lua;
         this->mCoroutienRef = ref;
@@ -35,7 +35,6 @@ namespace Sentry
             }
             lua_resume(coroutine, this->mLuaEnv, 1);
         }
-
     }
 
     shared_ptr<RedisLuaTask> RedisLuaTask::Create(lua_State *lua, int index, const char *cmd)
@@ -54,4 +53,4 @@ namespace Sentry
         }
         return std::make_shared<RedisLuaTask>(redisManager, cmd, lua, ref);
     }
-}
+}// namespace Sentry

@@ -1,9 +1,9 @@
-﻿#include"luaExtension.h"
-#include<Manager/Manager.h>
-#include<Object/GameObject.h>
-#include<Util/StringHelper.h>
-#include<Core/Applocation.h>
-#include<Module/Component.h>
+﻿#include "luaExtension.h"
+#include <Core/Applocation.h>
+#include <Manager/Manager.h>
+#include <Module/Component.h>
+#include <Object/GameObject.h>
+#include <Util/StringHelper.h>
 
 using namespace Sentry;
 namespace LuaAPIExtension
@@ -180,7 +180,6 @@ namespace LuaAPIExtension
             }
             outstring = stringBuffer.str();
         }
-
     }
 
     int DebugLog(lua_State *luaEnv)
@@ -214,4 +213,4 @@ namespace LuaAPIExtension
         SayNoCommonWarning(printString);
         return 0;
     }
-}
+}// namespace LuaAPIExtension

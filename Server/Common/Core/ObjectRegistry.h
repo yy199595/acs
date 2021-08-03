@@ -1,7 +1,7 @@
 #pragma once
 
-#include<Manager/Manager.h>
-#include<Service/ServiceBase.h>
+#include <Manager/Manager.h>
+#include <Service/ServiceBase.h>
 
 namespace Sentry
 {
@@ -81,4 +81,4 @@ namespace Sentry
         return false;
     }
 
-}
+}// namespace Sentry

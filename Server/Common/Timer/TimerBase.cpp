@@ -1,5 +1,4 @@
 #include "TimerBase.h"
-#include <iostream>
 
 namespace Sentry
 {
@@ -9,4 +8,4 @@ namespace Sentry
         this->mTimerId = NumberHelper::Create();
         this->mTriggerTime = TimeHelper::GetMilTimestamp() + ms;
     }
-}
+}// namespace Sentry

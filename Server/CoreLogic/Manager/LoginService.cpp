@@ -1,13 +1,11 @@
 ﻿#include "LoginService.h"
-#include<Util/NumberHelper.h>
-#include<Manager/MysqlManager.h>
-#include<Manager/RedisManager.h>
+#include <Manager/MysqlManager.h>
+#include <Manager/RedisManager.h>
 
 namespace Sentry
 {
     LoginService::LoginService()
     {
-
     }
 
     bool LoginService::OnInit()
@@ -19,7 +17,6 @@ namespace Sentry
 
     void LoginService::OnInitComplete()
     {
-
     }
 
     XCode LoginService::Login(long long operId, shared_ptr<c2s::UserVerify_Request> LoginData)
@@ -31,4 +28,4 @@ namespace Sentry
     {
         return XCode::Successful;
     }
-}
+}// namespace Sentry

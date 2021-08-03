@@ -1,14 +1,11 @@
-﻿#include"NetWorkRetAction.h"
-#include<Util/TimeHelper.h>
-#include<Util/ProtocHelper.h>
-#include<Coroutine/CoroutineManager.h>
+﻿#include "NetWorkRetAction.h"
+#include <Coroutine/CoroutineManager.h>
 
 namespace Sentry
 {
 
     LocalLuaRetActionProxy::LocalLuaRetActionProxy(NetLuaRetAction *action) : mBindLuaAction(action)
     {
-
     }
 
     void LocalLuaRetActionProxy::Invoke(NetMessageProxy *backData)
@@ -31,12 +28,10 @@ namespace Sentry
 
     void LocalRetActionProxy1::Invoke(NetMessageProxy *backData)
     {
-
     }
 
     LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction *action) : mBindLuaAction(action)
     {
-
     }
 
     void LocalWaitRetActionProxy::Invoke(NetMessageProxy *backData)
@@ -80,4 +75,4 @@ namespace Sentry
         this->mMessage = backData->GetMsgBody();
         this->mScheduler->Resume(mCoroutineId);
     }
-}
+}// namespace Sentry

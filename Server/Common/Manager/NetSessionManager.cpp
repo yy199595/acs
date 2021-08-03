@@ -1,14 +1,9 @@
 ﻿#include "NetSessionManager.h"
 #include "ScriptManager.h"
 #include "ActionManager.h"
-#include <Core/Applocation.h>
 #include <Util/StringHelper.h>
-#include <NetWork/TcpClientSession.h>
 #include <Manager/ListenerManager.h>
-#include <Manager/ActionManager.h>
 #include <Manager/NetProxyManager.h>
-#include <Manager/ProtocolManager.h>
-
 namespace Sentry
 {
     NetSessionManager::NetSessionManager()

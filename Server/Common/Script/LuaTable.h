@@ -1,7 +1,7 @@
 #pragma once
 
-#include<Define/CommonDef.h>
-#include<Script/LuaFunction.h>
+#include <Define/CommonDef.h>
+#include <Script/LuaFunction.h>
 
 class LuaTable
 {
@@ -20,11 +20,11 @@ public:
     T GetMemberVariable(const char *name);
 
 public:
-    template<typename Ret, typename ... Args>
-    bool Function(const char *func, Ret &retValue, Args &&... args);
+    template<typename Ret, typename... Args>
+    bool Function(const char *func, Ret &retValue, Args &&...args);
 
-    template<typename ... Args>
-    bool Action(const char *func, Args &&... args);
+    template<typename... Args>
+    bool Action(const char *func, Args &&...args);
 
     bool Serialization(Message &message);
 
@@ -49,7 +49,7 @@ T LuaTable::GetMemberVariable(const char *name)
     return T();
 }
 
-template<typename Ret, typename ...Args>
+template<typename Ret, typename... Args>
 inline bool LuaTable::Function(const char *func, Ret &retValue, Args &&...args)
 {
     lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
@@ -62,7 +62,7 @@ inline bool LuaTable::Function(const char *func, Ret &retValue, Args &&...args)
     {
         return false;
     }
-    LuaParameter::WriteArgs<Args ...>(this->luaEnv, std::forward<Args>(args)...);
+    LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 1, 0) != 0)
     {
         SayNoDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
@@ -72,7 +72,7 @@ inline bool LuaTable::Function(const char *func, Ret &retValue, Args &&...args)
     return true;
 }
 
-template<typename ...Args>
+template<typename... Args>
 inline bool LuaTable::Action(const char *func, Args &&...args)
 {
     lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
@@ -85,7 +85,7 @@ inline bool LuaTable::Action(const char *func, Args &&...args)
     {
         return false;
     }
-    LuaParameter::WriteArgs<Args ...>(this->luaEnv, std::forward<Args>(args)...);
+    LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 0, 0) != 0)
     {
         SayNoDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));

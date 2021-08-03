@@ -1,9 +1,8 @@
 ﻿#pragma once
-#pragma once
 
-#include<queue>
-#include<mutex>
-#include<atomic>
+#include <atomic>
+#include <mutex>
+#include <queue>
 
 namespace Sentry
 {
@@ -22,6 +21,7 @@ namespace Sentry
 
     private:
         std::mutex mLock;
+
     private:
         std::queue<T> mReadQueue;
         std::queue<T> mWrterQueue;
@@ -40,12 +40,9 @@ namespace Sentry
     {
         if (!this->mWrterQueue.empty() && this->mReadQueue.empty())
         {
-            mLock.lock();
-            //std::swap(this->mCacheQueue, this->mWorkQueue);
+            std::lock_guard<std::mutex> lock(this->mLock);
             this->mReadQueue.swap(this->mWrterQueue);
-            mLock.unlock();
         }
-
     }
 
     template<typename T>
@@ -59,4 +56,4 @@ namespace Sentry
         }
         return false;
     }
-}
+}// namespace Sentry

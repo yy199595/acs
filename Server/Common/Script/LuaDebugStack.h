@@ -9,9 +9,9 @@ namespace LuaDebugStack
         char text[4096];
 
         va_list args;
-                va_start(args, fmt);
+        va_start(args, fmt);
         vsnprintf(text, sizeof(text), fmt, args);
-                va_end(args);
+        va_end(args);
         printf("[lua error]  %s\n", text);
         lua_getglobal(L, "_ALERT");
         if (lua_isfunction(L, -1))
@@ -93,12 +93,12 @@ namespace LuaDebugStack
 #ifdef _MSC_VER
             size_t size = sprintf_s(buffer, "%s, %d, %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
 #else
-            size_t size =	sprintf(buffer, "%s, %d, %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
-#endif // _MSC_VER
+            size_t size = sprintf(buffer, "%s, %d, %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
+#endif// _MSC_VER
             PrintLuaLog(std::string(buffer, size));
             retstring.append(buffer, size);
             level++;
         }
         return retstring;
     }
-};
+};// namespace LuaDebugStack

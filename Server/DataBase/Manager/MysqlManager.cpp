@@ -1,17 +1,10 @@
 ﻿#include "MysqlManager.h"
 #include <fstream>
-#include <Core/Applocation.h>
-#include <Util/NumberHelper.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Util/StringHelper.h>
 #include <Script/ClassProxyHelper.h>
-#include <Util/FileHelper.h>
 
 #include <MysqlClient/TableOperator.h>
-#include <Protocol/db.pb.h>
-
-#include<Service/MysqlProxy.h>
-#include<Manager/ServiceManager.h>
 #include<Manager/ThreadTaskManager.h>
 
 namespace Sentry

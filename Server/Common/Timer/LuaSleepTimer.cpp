@@ -1,9 +1,9 @@
-#include"LuaSleepTimer.h"
+#include "LuaSleepTimer.h"
 
 namespace Sentry
 {
     LuaSleepTimer::LuaSleepTimer(lua_State *lua, int ref, long long ms)
-            : TimerBase(ms)
+        : TimerBase(ms)
     {
         this->mRef = ref;
         this->mLuaEnv = lua;
@@ -30,4 +30,4 @@ namespace Sentry
         lua_resume(coroutine, this->mLuaEnv, 0);
         return true;
     }
-}
+}// namespace Sentry

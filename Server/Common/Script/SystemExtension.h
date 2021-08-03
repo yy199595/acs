@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Script/LuaInclude.h>
+#include <Script/LuaInclude.h>
 
 namespace SystemExtension
 {
@@ -27,5 +27,4 @@ namespace SystemExtension
     extern int LuaRetMessage(lua_State *luaEnv);
 
     extern bool RequireLua(lua_State *luaEnv, const char *name);
-};
-
+};// namespace SystemExtension

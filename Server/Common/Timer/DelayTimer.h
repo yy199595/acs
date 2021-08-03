@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include"TimerBase.h"
+#include "TimerBase.h"
 
 namespace Sentry
 {
@@ -8,7 +8,7 @@ namespace Sentry
     {
     public:
         DelayTimer(long long ms, std::function<void(void)> &func)
-                : TimerBase(ms), mBindAction(func) {}
+            : TimerBase(ms), mBindAction(func) {}
 
     public:
         bool Invoke() final
@@ -20,4 +20,4 @@ namespace Sentry
     private:
         std::function<void(void)> mBindAction;
     };
-}
+}// namespace Sentry

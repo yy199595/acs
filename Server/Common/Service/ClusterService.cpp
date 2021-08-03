@@ -1,7 +1,7 @@
 ﻿#include "ClusterService.h"
+#include <Coroutine/CoroutineManager.h>
 #include <Manager/ServiceManager.h>
 #include <Manager/ServiceNodeManager.h>
-#include <Coroutine/CoroutineManager.h>
 #include <Other/ServiceNode.h>
 
 namespace Sentry
@@ -84,4 +84,4 @@ namespace Sentry
 
         return XCode::Successful;
     }
-}
+}// namespace Sentry

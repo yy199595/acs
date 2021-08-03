@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include<string>
-#include<vector>
-#include<memory>
-#include"RedisDefine.h"
-#include<XCode/XCode.h>
-#include<Thread/ThreadTaskAction.h>
+#include "RedisDefine.h"
+#include <Thread/ThreadTaskAction.h>
+#include <XCode/XCode.h>
+#include <memory>
+#include <string>
+#include <vector>
 
 #define RedisLuaArgvSize 10
 namespace Sentry
@@ -20,10 +20,10 @@ namespace Sentry
         RedisTaskBase(RedisManager *mgr, const std::string &cmd);
 
     public:
-        void InvokeInThreadPool(long long threadId) final;    //在线程池执行的任务
+        void InvokeInThreadPool(long long threadId) final;//在线程池执行的任务
     public:
-        template<typename ...Args>
-        void InitCommand(Args &&... args);
+        template<typename... Args>
+        void InitCommand(Args &&...args);
 
     private:
         inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
@@ -41,11 +41,11 @@ namespace Sentry
     private:
         void Encode() {}
 
-        template<typename T, typename ... Args>
-        inline void Encode(const T &t, Args ... args)
+        template<typename T, typename... Args>
+        inline void Encode(const T &t, Args... args)
         {
             this->AddCommand(t);
-            this->Encode(std::forward<Args>(args) ...);
+            this->Encode(std::forward<Args>(args)...);
         }
 
     public:
@@ -64,17 +64,19 @@ namespace Sentry
 
     private:
         std::vector<std::string> mCommand;
+
     private:
         XCode mErrorCode;
         std::string mErrorStr;
+
     private:
         RedisManager *mRedisManager;
         std::vector<std::string> mQueryDatas;
     };
 
-    template<typename ...Args>
+    template<typename... Args>
     inline void RedisTaskBase::InitCommand(Args &&...args)
     {
         this->Encode(std::forward<Args>(args)...);
     }
-}
+}// namespace Sentry

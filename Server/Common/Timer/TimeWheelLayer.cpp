@@ -3,7 +3,7 @@
 namespace Sentry
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int start, int end)
-            : mLayerId(layerId), mMaxCount(count), mStart(start), mEnd(end)
+        : mLayerId(layerId), mMaxCount(count), mStart(start), mEnd(end)
     {
         this->mCurIndex = 0;
         for (int index = 0; index < count; index++)
@@ -49,4 +49,4 @@ namespace Sentry
         }
         return false;
     }
-}
+}// namespace Sentry

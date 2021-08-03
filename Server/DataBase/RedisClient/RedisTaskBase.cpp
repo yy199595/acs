@@ -1,5 +1,5 @@
-﻿#include"RedisTaskBase.h"
-#include<Manager/RedisManager.h>
+﻿#include "RedisTaskBase.h"
+#include <Manager/RedisManager.h>
 
 namespace Sentry
 {
@@ -31,7 +31,7 @@ namespace Sentry
         redisReply *replay = (redisReply *) redisCommandArgv(redisSocket, size, argvArray, argvSizeArray);
 
         delete[] argvArray;
-        delete[]argvSizeArray;
+        delete[] argvSizeArray;
 
         //redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
         if (replay == nullptr)
@@ -98,6 +98,5 @@ namespace Sentry
         }
         value = this->mQueryDatas[0];
         return true;
-
     }
-}
+}// namespace Sentry

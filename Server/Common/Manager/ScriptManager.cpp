@@ -1,20 +1,12 @@
 ﻿#include"ScriptManager.h"
-#include<Core/Applocation.h>
 #include<Script/luadebug.h>
-#include<Object/GameObject.h>
-#include<Service/ServiceRegistry.h>
 #include<Manager/NetSessionManager.h>
-#include<NetWork/TcpClientSession.h>
 #include<Script/luaExtension.h>
 #include<Script/SystemExtension.h>
 #include<Script/LuaProtocExtension.h>
 #include<Script/CoroutineExtension.h>
 
-
 #include<Util/JsonHelper.h>
-#include<Util/FileHelper.h>
-#include<Util/MathHelper.h>
-#include<Util/ProtocHelper.h>
 #include<Util/DirectoryHelper.h>
 
 namespace Sentry

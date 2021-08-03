@@ -1,9 +1,9 @@
 #pragma once
 
-#include"LuaInclude.h"
-#include"LuaDebugStack.h"
-#include<google/protobuf/message.h>
-#include<google/protobuf/util/json_util.h>
+#include "LuaDebugStack.h"
+#include "LuaInclude.h"
+#include <google/protobuf/message.h>
+#include <google/protobuf/util/json_util.h>
 
 using namespace std;
 using namespace google::protobuf;
@@ -11,8 +11,7 @@ using namespace google::protobuf::util;
 namespace ProtocParameter
 {
     template<typename T>
-    struct ProtocStruct
-    {
+    struct ProtocStruct {
         static T Read(lua_State *lua, int index)
         {
             if (lua_istable(lua, index) && lua_getfunction(lua, "JsonUtil", "ToString"))
@@ -53,13 +52,12 @@ namespace ProtocParameter
             }
         }
     };
-}
+}// namespace ProtocParameter
 
 namespace ProtocParameter
 {
     template<typename T>
-    struct ProtocStruct<T *>
-    {
+    struct ProtocStruct<T *> {
         static T *Read(lua_State *lua, int index)
         {
             static T message;
@@ -102,8 +100,7 @@ namespace ProtocParameter
     };
 
     template<typename T>
-    struct ProtocStruct<T &>
-    {
+    struct ProtocStruct<T &> {
         static T &Read(lua_State *lua, int index)
         {
             static T message;
@@ -145,7 +142,7 @@ namespace ProtocParameter
             }
         }
     };
-}
+}// namespace ProtocParameter
 
 namespace ProtocParameter
 {
@@ -160,4 +157,4 @@ namespace ProtocParameter
     {
         ProtocStruct<T>::Write(lua, data);
     }
-}
+}// namespace ProtocParameter

@@ -1,6 +1,5 @@
 ﻿#include "TimerManager.h"
 #include <Timer/DelayTimer.h>
-#include <Util/TimeHelper.h>
 
 namespace Sentry
 {
@@ -140,4 +139,4 @@ namespace Sentry
         }
         return false;
     }
-}
+}// namespace Sentry

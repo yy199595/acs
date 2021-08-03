@@ -1,19 +1,18 @@
 #pragma once
 
-#include<assert.h>
-#include<iostream>
-#include<string.h>
-#include<memory>
+#include <assert.h>
+#include <iostream>
+#include <memory>
+#include <string.h>
 
-extern "C"
-{
-#include<lua.h>
-#include<lualib.h>
-#include<lauxlib.h>
+extern "C" {
+#include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
 };
 
-#include"ParameterType.h"
-#include"ClassNameProxy.h"
+#include "ClassNameProxy.h"
+#include "ParameterType.h"
 
 inline std::string FromatFileAndLine(const char *file, const int line)
 {
@@ -25,7 +24,7 @@ inline std::string FromatFileAndLine(const char *file, const int line)
 #ifdef _WIN32
         if (file[index] == '\\')
 #else
-            if (file[index] == '/')
+        if (file[index] == '/')
 #endif
         {
             fileName = file + index + 1;
@@ -38,16 +37,35 @@ inline std::string FromatFileAndLine(const char *file, const int line)
     size_t size = sprintf_s(buffer, "%s:%d", fileName, line);
 #else
     size_t size = sprintf(buffer, "%s:%d", fileName, line);
-#endif // _MSG
+#endif// _MSG
     return std::string(buffer, size);
 }
 
 
-#define LuaDebugLog(msg) {  std::cout << "[Lua Error] : " << FromatFileAndLine(__FILE__, __LINE__) << "  [" << msg << "]" << std::endl;}
-#define LuaAssertLog(code, msg) { if(code != 0) LuaDebugLog(#code << msg);}
-#define LuaAssertReturn(code, msg) { if(code != 0) { LuaDebugLog(msg); return;}}
-#define LuaAssertReturnValue(code, msg, val) { if(code != 0) { LuaDebugLog(#code << msg) return val;}}
-#define LuaAssertReturnZero(code, msg) { if(code) { LuaDebugLog(#code << msg) return 0;}}
+#define LuaDebugLog(msg)                                                                                            \
+    {                                                                                                               \
+        std::cout << "[Lua Error] : " << FromatFileAndLine(__FILE__, __LINE__) << "  [" << msg << "]" << std::endl; \
+    }
+#define LuaAssertLog(code, msg)                   \
+    {                                             \
+        if (code != 0) LuaDebugLog(#code << msg); \
+    }
+#define LuaAssertReturn(code, msg) \
+    {                              \
+        if (code != 0)             \
+        {                          \
+            LuaDebugLog(msg);      \
+            return;                \
+        }                          \
+    }
+#define LuaAssertReturnValue(code, msg, val)                     \
+    {                                                            \
+        if (code != 0) { LuaDebugLog(#code << msg) return val; } \
+    }
+#define LuaAssertReturnZero(code, msg)                    \
+    {                                                     \
+        if (code) { LuaDebugLog(#code << msg) return 0; } \
+    }
 
 inline bool lua_getfunction(lua_State *lua, const char *tab, const char *func)
 {
@@ -98,26 +116,22 @@ inline void lua_pushglobalfunction(lua_State *lua, const char *name, lua_CFuncti
 }
 
 template<typename T>
-struct TypeProxy
-{
+struct TypeProxy {
     typedef T Type;
 };
 
 template<typename T>
-struct TypeProxy<T *>
-{
+struct TypeProxy<T *> {
     typedef T Type;
 };
 
 template<typename T>
-struct TypeProxy<T &>
-{
+struct TypeProxy<T &> {
     typedef T Type;
 };
 
 template<typename T>
-struct TypeProxy<std::shared_ptr<T>>
-{
+struct TypeProxy<std::shared_ptr<T>> {
     typedef T Type;
 };
 
@@ -168,17 +182,16 @@ namespace LuaParameter
     inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, void>::type
     Write(lua_State *lua, T data);
 
-    template<typename T, typename ... Args>
-    inline void Encode(lua_State *lua, const T &t, Args ... args);
+    template<typename T, typename... Args>
+    inline void Encode(lua_State *lua, const T &t, Args... args);
 
-    template<typename ...Args>
-    inline void WriteArgs(lua_State *lua, Args ... args);
-}
+    template<typename... Args>
+    inline void WriteArgs(lua_State *lua, Args... args);
+}// namespace LuaParameter
 
 
 template<typename T>
-struct PtrProxy
-{
+struct PtrProxy {
 public:
     PtrProxy(T *t) : mNativePtr(t), mIsDestory(false) {}
 
@@ -200,7 +213,7 @@ public:
     static void Write(lua_State *lua, T *data)
     {
         if (data == nullptr) return;
-        new(lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
+        new (lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
     }
 
 
@@ -228,8 +241,7 @@ private:
 
 
 template<typename T>
-struct SharedPtrProxy
-{
+struct SharedPtrProxy {
 public:
     SharedPtrProxy(std::shared_ptr<T> t) : mNativePtr(t) {}
 
@@ -249,13 +261,13 @@ public:
     static void Write(lua_State *lua, std::shared_ptr<T> data)
     {
         if (data == nullptr) return;
-        new(lua_newuserdata(lua, sizeof(SharedPtrProxy<T>))) SharedPtrProxy<T>(data, false);
+        new (lua_newuserdata(lua, sizeof(SharedPtrProxy<T>))) SharedPtrProxy<T>(data, false);
     }
 
     static void Write(lua_State *lua, T *data)
     {
         if (data == nullptr) return;
-        new(lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
+        new (lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
     }
 
     static void Destory(lua_State *lua, int index)

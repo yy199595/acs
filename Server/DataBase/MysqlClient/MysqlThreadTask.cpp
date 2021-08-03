@@ -1,12 +1,11 @@
 #include "MysqlThreadTask.h"
-#include <Manager/MysqlManager.h>
 #include <Coroutine/CoroutineManager.h>
-#include <QueryResult/InvokeResultData.h>
+#include <Manager/MysqlManager.h>
 
 namespace Sentry
 {
     MysqlThreadTask::MysqlThreadTask(MysqlManager *mgr, const std::string &db, const std::string &sql)
-            : mDataBaseName(db), mSqlCommand(sql)
+        : mDataBaseName(db), mSqlCommand(sql)
     {
         this->mMysqlManager = mgr;
         SayNoAssertRet_F(this->mCorManager = mgr->GetManager<CoroutineManager>());
@@ -123,4 +122,4 @@ namespace Sentry
                 break;
         }
     }
-}
+}// namespace Sentry

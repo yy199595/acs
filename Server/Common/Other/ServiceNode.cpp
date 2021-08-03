@@ -1,17 +1,16 @@
 ﻿#include "ServiceNode.h"
-#include <Util/StringHelper.h>
-#include <Manager/NetProxyManager.h>
+#include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
+#include <Manager/NetProxyManager.h>
 #include <Manager/ServiceManager.h>
 #include <NetWork/NetWorkRetAction.h>
-#include <Coroutine/CoroutineManager.h>
 #include <Util/JsonHelper.h>
-#include <Pool/ObjectPool.h>
+#include <Util/StringHelper.h>
 
 namespace Sentry
 {
     ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
-            : mAddress(address), mNodeName(name)
+        : mAddress(address), mNodeName(name)
     {
         Applocation *app = Applocation::Get();
         SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
@@ -257,4 +256,4 @@ namespace Sentry
         }
         return XCode::SendMessageFail;
     }
-}
+}// namespace Sentry

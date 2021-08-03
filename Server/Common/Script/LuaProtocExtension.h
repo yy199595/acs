@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Script/LuaInclude.h>
+#include <Script/LuaInclude.h>
 
 namespace LuaProtocExtension
 {
@@ -9,4 +9,4 @@ namespace LuaProtocExtension
 
     extern int CreateByTable(lua_State *lua);
 
-}
+}// namespace LuaProtocExtension

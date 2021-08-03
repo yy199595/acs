@@ -1,9 +1,8 @@
 #pragma once
 
-#include<Script/LuaInclude.h>
+#include <Script/LuaInclude.h>
 
-struct LuaDebug
-{
+struct LuaDebug {
     static void enumStack(lua_State *L);
 
     static int onError(lua_State *L);
@@ -42,9 +41,9 @@ inline void LuaDebug::printError(lua_State *L, const char *fmt, ...)
     char text[4096];
 
     va_list args;
-            va_start(args, fmt);
+    va_start(args, fmt);
     vsnprintf(text, sizeof(text), fmt, args);
-            va_end(args);
+    va_end(args);
     printf("[lua error]  %s\n", text);
     lua_getglobal(L, "_ALERT");
     if (lua_isfunction(L, -1))
@@ -130,5 +129,4 @@ inline void LuaDebug::callStack(lua_State *L, int n)
 inline void LuaDebug::enumStack(lua_State *L)
 {
     //callStack(L, 0);
-
 }

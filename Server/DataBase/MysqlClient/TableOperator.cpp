@@ -1,7 +1,6 @@
 ﻿#include "TableOperator.h"
 #include <fstream>
 #include <Protocol/db.pb.h>
-#include <Manager/MysqlManager.h>
 
 namespace Sentry
 {

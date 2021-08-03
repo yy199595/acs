@@ -1,12 +1,11 @@
-﻿#include"ActionTimeoutTimer.h"
-#include<NetWork/NetWorkRetAction.h>
-#include<Manager/ActionManager.h>
-#include<Pool/ObjectPool.h>
+﻿#include "ActionTimeoutTimer.h"
+#include <Manager/ActionManager.h>
+#include <NetWork/NetWorkRetAction.h>
 
 namespace Sentry
 {
     ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, ActionManager *mgr)
-            : TimerBase(ms)
+        : TimerBase(ms)
     {
         this->mActionManager = mgr;
         this->mCallbackId = callbackId;
@@ -17,4 +16,4 @@ namespace Sentry
         // TODO
         return false;
     }
-}
+}// namespace Sentry

@@ -1,9 +1,9 @@
 #pragma once
 
-#include<Define/CommonDef.h>
-#include<Define/CommonTypeDef.h>
-#include<Define/ClassStatement.h>
-#include<Core/Applocation.h>
+#include <Core/Applocation.h>
+#include <Define/ClassStatement.h>
+#include <Define/CommonDef.h>
+#include <Define/CommonTypeDef.h>
 
 namespace Sentry
 {
@@ -32,7 +32,10 @@ namespace Sentry
 
     public:
         template<typename T>
-        inline T *GetManager() { return mAppLocation->GetManager<T>(); }
+        inline T *GetManager()
+        {
+            return mAppLocation->GetManager<T>();
+        }
 
     public:
         virtual bool IsManager() { return false; }
@@ -50,5 +53,4 @@ namespace Sentry
 
         class Applocation *mAppLocation;
     };
-}
-
+}// namespace Sentry

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include<functional>
-#include<Util/TimeHelper.h>
-#include<Util/NumberHelper.h>
+#include <Util/NumberHelper.h>
+#include <Util/TimeHelper.h>
+#include <functional>
 
 namespace Sentry
 {
@@ -14,7 +14,7 @@ namespace Sentry
         virtual ~TimerBase() {}
 
     public:
-        virtual bool Invoke() = 0; //触发之后执行的操作(返回值表示是否移除, 不移除会添加到列表继续等待下次)
+        virtual bool Invoke() = 0;//触发之后执行的操作(返回值表示是否移除, 不移除会添加到列表继续等待下次)
     public:
         const long long GetTimerId() { return mTimerId; }
 
@@ -25,4 +25,4 @@ namespace Sentry
         long long mDelayTime;
         long long mTriggerTime;
     };
-}
+}// namespace Sentry

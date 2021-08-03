@@ -1,14 +1,13 @@
 #pragma once
 
-#include<string>
-#include<vector>
-#include<typeinfo>
-#include<unordered_map>
+#include <string>
+#include <typeinfo>
+#include <unordered_map>
+#include <vector>
 
 namespace ClassNameProxy
 {
-    struct ClassRegisterInfo
-    {
+    struct ClassRegisterInfo {
     public:
         std::string mName;
         std::vector<std::string> mParentNames;
@@ -80,4 +79,4 @@ namespace ClassNameProxy
         }
         return nullptr;
     }
-};
+};// namespace ClassNameProxy

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include<Object/GameObject.h>
-#include<Manager/NetProxyManager.h>
+#include <Manager/NetProxyManager.h>
+#include <Object/GameObject.h>
 
 namespace Sentry
 {
@@ -17,4 +17,4 @@ namespace Sentry
         unsigned short mPorxyPort;
         std::string mProxyAddress;
     };
-}
+}// namespace Sentry

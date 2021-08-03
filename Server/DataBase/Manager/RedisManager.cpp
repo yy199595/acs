@@ -1,9 +1,6 @@
 ﻿#include"RedisManager.h"
-#include<Util/NumberHelper.h>
 #include<Util/StringHelper.h>
 #include<Manager/ThreadTaskManager.h>
-#include<RedisClient/RedisTaskAction.h>
-#include<Coroutine/CoroutineManager.h>
 #include<Script/ClassProxyHelper.h>
 
 namespace Sentry

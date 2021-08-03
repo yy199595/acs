@@ -1,7 +1,6 @@
 ﻿#include "NetProxyManager.h"
 #include "NetSessionManager.h"
 #include "ServiceManager.h"
-#include <Core/Applocation.h>
 #include <Manager/ActionManager.h>
 #include <Timer/TimerManager.h>
 namespace Sentry

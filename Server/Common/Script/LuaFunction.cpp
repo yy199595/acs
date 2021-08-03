@@ -1,5 +1,5 @@
 #include "LuaFunction.h"
-#include<Define/CommonDef.h>
+#include <Define/CommonDef.h>
 
 LuaFunction::LuaFunction(lua_State *luaEnv, int ref)
 {

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include<queue>
-#include<Protocol/com.pb.h>
+#include <queue>
 
 namespace Sentry
 {
@@ -14,8 +13,8 @@ namespace Sentry
         ~ObjectPool();
 
     public:
-        template<typename ... Args>
-        T *Create(Args &&... args);
+        template<typename... Args>
+        T *Create(Args &&...args);
 
         bool Destory(T *data);
 
@@ -26,7 +25,7 @@ namespace Sentry
 
     template<typename T>
     inline ObjectPool<T>::ObjectPool(size_t maxCount)
-            : mMaxCount(maxCount)
+        : mMaxCount(maxCount)
     {
         for (size_t index = 0; index < maxCount; index++)
         {
@@ -64,8 +63,8 @@ namespace Sentry
     }
 
     template<typename T>
-    template<typename ...Args>
-    inline T *ObjectPool<T>::Create(Args &&... args)
+    template<typename... Args>
+    inline T *ObjectPool<T>::Create(Args &&...args)
     {
         if (!this->mObjectQueue.empty())
         {
@@ -75,4 +74,4 @@ namespace Sentry
         }
         return new T();
     }
-}
+}// namespace Sentry

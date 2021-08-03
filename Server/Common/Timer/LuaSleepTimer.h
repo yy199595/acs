@@ -1,7 +1,7 @@
 #pragma once
 
-#include"TimerBase.h"
-#include<Script/LuaInclude.h>
+#include "TimerBase.h"
+#include <Script/LuaInclude.h>
 
 namespace Sentry
 {
@@ -15,9 +15,9 @@ namespace Sentry
         static shared_ptr<LuaSleepTimer> Create(lua_State *lua, int index, long long ms);
 
     public:
-        bool Invoke() override; //����֮��ִ�еĲ���
+        bool Invoke() override;//����֮��ִ�еĲ���
     private:
         int mRef;
         lua_State *mLuaEnv;
     };
-}
+}// namespace Sentry

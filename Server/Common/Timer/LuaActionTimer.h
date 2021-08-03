@@ -1,7 +1,7 @@
 #pragma once
 
-#include"TimerBase.h"
-#include<Script/LuaInclude.h>
+#include "TimerBase.h"
+#include <Script/LuaInclude.h>
 
 namespace Sentry
 {
@@ -13,7 +13,7 @@ namespace Sentry
         ~LuaActionTimer();
 
     public:
-        bool Invoke() override; //����֮��ִ�еĲ���
+        bool Invoke() override;//����֮��ִ�еĲ���
     private:
         int mRef;
         int mInterval;
@@ -21,4 +21,4 @@ namespace Sentry
         int mMaxInvokeCount;
         lua_State *mLuaEnv;
     };
-}
+}// namespace Sentry

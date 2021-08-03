@@ -1,11 +1,11 @@
-﻿#include"RedisTaskAction.h"
-#include<Manager/RedisManager.h>
-#include<Coroutine/CoroutineManager.h>
+﻿#include "RedisTaskAction.h"
+#include <Coroutine/CoroutineManager.h>
+#include <Manager/RedisManager.h>
 
 namespace Sentry
 {
     RedisTaskAction::RedisTaskAction(RedisManager *mgr, const std::string &cmd)
-            : RedisTaskBase(mgr, cmd)
+        : RedisTaskBase(mgr, cmd)
     {
         Applocation *app = Applocation::Get();
         SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
@@ -17,4 +17,4 @@ namespace Sentry
         SayNoAssertRet_F(this->mCorManager);
         this->mCorManager->Resume(this->mCoreoutineId);
     }
-}
+}// namespace Sentry

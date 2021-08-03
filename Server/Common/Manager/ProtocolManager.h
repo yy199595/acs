@@ -2,10 +2,12 @@
 
 #include "Manager.h"
 
-#include<Other/ProtocolConfig.h>
+#include <Other/ProtocolConfig.h>
 
-namespace Sentry {
-    class ProtocolManager : public Manager {
+namespace Sentry
+{
+    class ProtocolManager : public Manager
+    {
     public:
         ProtocolManager() {}
 
@@ -28,4 +30,4 @@ namespace Sentry {
         std::unordered_map<unsigned short, ProtocolConfig *> mProtocolMap;
         std::unordered_map<std::string, ProtocolConfig *> mProtocolNameMap;
     };
-}
+}// namespace Sentry

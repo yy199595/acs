@@ -1,30 +1,30 @@
-﻿#include<Core/Applocation.h>
-#include<Core/ObjectRegistry.h>
-#include<Manager/ScriptManager.h>
-#include<Timer/TimerManager.h>
-#include<Manager/ActionManager.h>
+﻿#include <Core/Applocation.h>
+#include <Core/ObjectRegistry.h>
+#include <Manager/ActionManager.h>
+#include <Manager/ScriptManager.h>
+#include <Timer/TimerManager.h>
 
-#include<Manager/ThreadTaskManager.h>
-#include<Manager/NetSessionManager.h>
-#include<Manager/ListenerManager.h>
-#include<Manager/ServiceManager.h>
-#include<Manager/MysqlManager.h>
-#include<Manager/RedisManager.h>
-#include<Manager/ProxyManager.h>
-#include<Manager/NetProxyManager.h>
-#include<Manager/ServiceNodeManager.h>
-#include<Coroutine/CoroutineManager.h>
+#include <Coroutine/CoroutineManager.h>
+#include <Manager/ListenerManager.h>
+#include <Manager/MysqlManager.h>
+#include <Manager/NetProxyManager.h>
+#include <Manager/NetSessionManager.h>
+#include <Manager/ProxyManager.h>
+#include <Manager/RedisManager.h>
+#include <Manager/ServiceManager.h>
+#include <Manager/ServiceNodeManager.h>
+#include <Manager/ThreadTaskManager.h>
 
-#include<Manager/LoginService.h>
-#include<Service/ClusterService.h>
-#include<Service/ServiceRegistry.h>
+#include <Manager/LoginService.h>
+#include <Service/ClusterService.h>
+#include <Service/ServiceRegistry.h>
 
-#include<Service/MysqlProxy.h>
+#include <Service/MysqlProxy.h>
 
 using namespace Sentry;
 using namespace Sentry;
 
-#ifdef _WIN32 && _MSC_VER
+#ifdef _WIN32 &&_MSC_VER
 #pragma comment(lib, "lua53.lib")
 #pragma comment(lib, "Common.lib")
 #pragma comment(lib, "hiredis.lib")

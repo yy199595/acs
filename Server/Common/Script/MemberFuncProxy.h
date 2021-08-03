@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include"LuaInclude.h"
-#include<functional>
+#include "LuaInclude.h"
+#include <functional>
 
 namespace MemberFunction
 {
@@ -14,18 +14,16 @@ namespace MemberFunction
         return (*func);
     }
 
-    template<typename T, typename Ret, typename ...Args>
-    struct MemberFuncProxy
-    {
+    template<typename T, typename Ret, typename... Args>
+    struct MemberFuncProxy {
     };
-}
+}// namespace MemberFunction
 // 返回值为void类型
 namespace MemberFunction
 {
     template<typename T>
-    struct MemberFuncProxy<T, void>
-    {
-        typedef void(T::*Function)();
+    struct MemberFuncProxy<T, void> {
+        typedef void (T::*Function)();
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -37,9 +35,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1>
-    struct MemberFuncProxy<T, void, T1>
-    {
-        typedef void(T::*Function)(T1);
+    struct MemberFuncProxy<T, void, T1> {
+        typedef void (T::*Function)(T1);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -52,9 +49,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2>
-    struct MemberFuncProxy<T, void, T1, T2>
-    {
-        typedef void(T::*Function)(T1, T2);
+    struct MemberFuncProxy<T, void, T1, T2> {
+        typedef void (T::*Function)(T1, T2);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -68,9 +64,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3>
-    struct MemberFuncProxy<T, void, T1, T2, T3>
-    {
-        typedef void(T::*Function)(T1, T2, T3);
+    struct MemberFuncProxy<T, void, T1, T2, T3> {
+        typedef void (T::*Function)(T1, T2, T3);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -85,9 +80,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4> {
+        typedef void (T::*Function)(T1, T2, T3, T4);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -103,9 +97,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4, T5);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5> {
+        typedef void (T::*Function)(T1, T2, T3, T4, T5);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -122,9 +115,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4, T5, T6);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6> {
+        typedef void (T::*Function)(T1, T2, T3, T4, T5, T6);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -142,9 +134,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4, T5, T6, T7);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7> {
+        typedef void (T::*Function)(T1, T2, T3, T4, T5, T6, T7);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -163,9 +154,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7, T8>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7, T8> {
+        typedef void (T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -185,9 +175,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-    {
-        typedef void(T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8, T9);
+    struct MemberFuncProxy<T, void, T1, T2, T3, T4, T5, T6, T7, T8, T9> {
+        typedef void (T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8, T9);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -206,14 +195,13 @@ namespace MemberFunction
             return 0;
         }
     };
-}
+}// namespace MemberFunction
 // 返回值为非void类型
 namespace MemberFunction
 {
     template<typename T, typename Ret>
-    struct MemberFuncProxy<T, Ret>
-    {
-        typedef Ret(T::*Function)();
+    struct MemberFuncProxy<T, Ret> {
+        typedef Ret (T::*Function)();
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -225,9 +213,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1>
-    struct MemberFuncProxy<T, Ret, T1>
-    {
-        typedef Ret(T::*Function)(T1);
+    struct MemberFuncProxy<T, Ret, T1> {
+        typedef Ret (T::*Function)(T1);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -241,9 +228,8 @@ namespace MemberFunction
 
 
     template<typename T, typename Ret, typename T1, typename T2>
-    struct MemberFuncProxy<T, Ret, T1, T2>
-    {
-        typedef Ret(T::*Function)(T1, T2);
+    struct MemberFuncProxy<T, Ret, T1, T2> {
+        typedef Ret (T::*Function)(T1, T2);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -258,9 +244,8 @@ namespace MemberFunction
 
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3> {
+        typedef Ret (T::*Function)(T1, T2, T3);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -275,9 +260,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -293,9 +277,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4, typename T5>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4, T5);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4, T5);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -312,9 +295,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4, T5, T6);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4, T5, T6);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -332,9 +314,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4, T5, T6, T7);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4, T5, T6, T7);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -353,9 +334,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7, T8>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7, T8> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -375,9 +355,8 @@ namespace MemberFunction
     };
 
     template<typename T, typename Ret, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-    {
-        typedef Ret(T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8, T9);
+    struct MemberFuncProxy<T, Ret, T1, T2, T3, T4, T5, T6, T7, T8, T9> {
+        typedef Ret (T::*Function)(T1, T2, T3, T4, T5, T6, T7, T8, T9);
 
         static int Invoke(lua_State *luaEnv)
         {
@@ -396,4 +375,4 @@ namespace MemberFunction
             return 1;
         }
     };
-}
+}// namespace MemberFunction

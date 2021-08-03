@@ -1,10 +1,10 @@
 ﻿#include "MysqlProxy.h"
-#include <Protocol/db.pb.h>
-#include <Other/ServiceNode.h>
+#include <Coroutine/CoroutineManager.h>
 #include <Manager/MysqlManager.h>
 #include <Manager/ThreadTaskManager.h>
-#include <Coroutine/CoroutineManager.h>
-#include<MysqlClient/MysqlThreadTask.h>
+#include <MysqlClient/MysqlThreadTask.h>
+#include <Other/ServiceNode.h>
+#include <Protocol/db.pb.h>
 #include <google/protobuf/util/json_util.h>
 
 namespace Sentry
@@ -54,7 +54,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-            //GprotocolPool.Destory(protocolMessage);
+        //GprotocolPool.Destory(protocolMessage);
 #ifdef SOEASY_DEBUG
         SayNoDebugInfo(sql);
 #endif
@@ -71,14 +71,14 @@ namespace Sentry
 #ifdef SOEASY_DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
-#endif // SOEASY_DEBUG
+#endif// SOEASY_DEBUG
         return mysqlTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
         const std::string &messageData = requertData.protocolmessage();
-        Message *protocolMessage = nullptr; //GprotocolPool.Create(requertData.protocolname());
+        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
@@ -108,7 +108,7 @@ namespace Sentry
 #ifdef SOEASY_DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
-#endif // SOEASY_DEBUG
+#endif// SOEASY_DEBUG
         return mysqlTask->GetErrorCode();
     }
 
@@ -144,7 +144,7 @@ namespace Sentry
 #ifdef SOEASY_DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
-#endif // SOEASY_DEBUG
+#endif// SOEASY_DEBUG
         return mysqlTask->GetErrorCode();
     }
 
@@ -260,4 +260,4 @@ namespace Sentry
     //     this->mCorManager->YieldReturn();
     //     return deleteTask->GetErrorCode();
     // }
-}
+}// namespace Sentry

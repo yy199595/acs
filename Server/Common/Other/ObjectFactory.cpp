@@ -8,4 +8,4 @@ namespace Sentry
         static ObjectFactory factory(10);
         return &factory;
     }
-}
+}// namespace Sentry

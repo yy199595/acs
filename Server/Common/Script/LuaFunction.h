@@ -1,7 +1,7 @@
 #pragma once
 
-#include<Define/CommonDef.h>
-#include<Script/LuaInclude.h>
+#include <Define/CommonDef.h>
+#include <Script/LuaInclude.h>
 
 class LuaFunction
 {
@@ -19,13 +19,13 @@ public:
     template<typename Ret>
     Ret Func();
 
-    template<typename Ret, typename ... Args>
-    Ret Func(Args ... args);
+    template<typename Ret, typename... Args>
+    Ret Func(Args... args);
 
     void Action();
 
-    template<typename ...Args>
-    void Action(Args ... args);
+    template<typename... Args>
+    void Action(Args... args);
 
     inline int GetFunctionRef() { return this->ref; }
 
@@ -34,26 +34,26 @@ private:
     lua_State *luaEnv;
 };
 
-template<typename ...Args>
-inline void LuaFunction::Action(Args ... args)
+template<typename... Args>
+inline void LuaFunction::Action(Args... args)
 {
     lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
     if (lua_isfunction(this->luaEnv, -1))
     {
-        LuaParameter::WriteArgs<Args ...>(this->luaEnv, std::forward<Args>(args)...);
+        LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
         int status = lua_pcall(this->luaEnv, sizeof...(Args), 0, 0);
         SayNoAssertRet(status == 0, lua_tostring(luaEnv, -1));
     }
 }
 
 
-template<typename Ret, typename ...Args>
-inline Ret LuaFunction::Func(Args ...args)
+template<typename Ret, typename... Args>
+inline Ret LuaFunction::Func(Args... args)
 {
     lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
     if (lua_isfunction(this->luaEnv, -1))
     {
-        LuaParameter::WriteArgs<Args ...>(this->luaEnv, std::forward<Args>(args)...);
+        LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
         int status = lua_pcall(this->luaEnv, sizeof...(Args), 1, 0);
         SayNoAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
         return LuaParameter::Read<Ret>(this->luaEnv, -1);

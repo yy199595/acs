@@ -1,7 +1,7 @@
 #pragma once
 
-#include<Script/LuaInclude.h>
-#include<Define/CommonTypeDef.h>
+#include <Define/CommonTypeDef.h>
+#include <Script/LuaInclude.h>
 
 namespace Sentry
 {
@@ -11,7 +11,7 @@ namespace Sentry
     {
     public:
         BindLuaFunction(lua_State *lua, int ref)
-                : mRef(ref), mLua(lua) {}
+            : mRef(ref), mLua(lua) {}
 
         ~BindLuaFunction() { luaL_unref(mLua, LUA_REGISTRYINDEX, this->mRef); }
 
@@ -22,7 +22,7 @@ namespace Sentry
         const int mRef;
         lua_State *mLua;
     };
-}
+}// namespace Sentry
 
 namespace Sentry
 {
@@ -33,7 +33,7 @@ namespace Sentry
 
         ~BindServerLuaFunction() { luaL_unref(mLua, LUA_REGISTRYINDEX, this->mRef); }
     };
-}
+}// namespace Sentry
 
 namespace Sentry
 {
@@ -50,4 +50,4 @@ namespace Sentry
     private:
         const std::string mPbName;
     };
-}
+}// namespace Sentry

@@ -1,26 +1,25 @@
 ﻿#pragma once
 
-#include<Define/CommonDef.h>
-#include<NetWork/SocketEvent.h>
+#include <Define/CommonDef.h>
+#include <NetWork/SocketEvent.h>
 
 namespace Sentry
 {
     enum SessionState
     {
         Session_None,
-        Session_Connect, //正在连接
-        Session_Normal,    //正常
-        Session_OK,    //可读可写
-        Session_Error,    //错误
-        Session_Close,    //手动关闭
+        Session_Connect,//正在连接
+        Session_Normal, //正常
+        Session_OK,     //可读可写
+        Session_Error,  //错误
+        Session_Close,  //手动关闭
     };
 
 
-    struct NetWorkPack
-    {
+    struct NetWorkPack {
     public:
         NetWorkPack(std::string &ip, unsigned int port, char *buf, size_t size)
-                : mIp(ip), mPort(port), mMessage(buf, size) {}
+            : mIp(ip), mPort(port), mMessage(buf, size) {}
 
     public:
         const std::string mIp;
@@ -74,11 +73,13 @@ namespace Sentry
         AsioContext &mAsioContext;
         SharedTcpSocket mBinTcpSocket;
         AsioTcpEndPoint mSocketEndPoint;
+
     private:
         SessionType mSessionType;
         std::string mSessionName;
         unsigned int mConnectCount;
         NetSessionManager *mDispatchManager;
+
     private:
         char *mRecvMsgBuffer;
         unsigned int mRecvBufferSize;
@@ -86,4 +87,4 @@ namespace Sentry
 
     typedef shared_ptr<TcpClientSession> SharedTcpSession;
 
-}
+}// namespace Sentry

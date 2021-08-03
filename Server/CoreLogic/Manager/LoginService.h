@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include<Service/LocalService.h>
-#include<Protocol/c2s.pb.h>
+#include <Protocol/c2s.pb.h>
+#include <Service/LocalService.h>
 
 namespace Sentry
 {
@@ -27,8 +27,7 @@ namespace Sentry
         XCode Register(long long operId, shared_ptr<c2s::UserRegister_Request> registerData);
 
     private:
-        int mAreaId;
         RedisManager *mRedisManager;
         MysqlManager *mMysqlManager;
     };
-}
+}// namespace Sentry

@@ -1,14 +1,14 @@
 #pragma once
 
-#include"LuaInclude.h"
-#include"LuaDebugStack.h"
-#include"ClassNameProxy.h"
+#include "ClassNameProxy.h"
+#include "LuaDebugStack.h"
+#include "LuaInclude.h"
 
 class LuaManager
 {
 public:
     LuaManager()
-            : luaEnv(nullptr)
+        : luaEnv(nullptr)
     {
         errorFunctonRef = 0;
         luaEnv = luaL_newstate();

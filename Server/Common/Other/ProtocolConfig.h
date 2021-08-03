@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<string>
+#include <string>
 
 namespace Sentry
 {
@@ -9,8 +9,8 @@ namespace Sentry
     public:
         ProtocolConfig(const unsigned short id, const std::string &service, const std::string &method,
                        const std::string &request, const std::string &response, bool client = false)
-                : IsClientMessage(client), MethodName(method), MethodId(id),
-                  ServiceName(service), RequestMsgName(request), ResponseMsgName(response) {}
+            : IsClientMessage(client), MethodName(method), MethodId(id),
+              ServiceName(service), RequestMsgName(request), ResponseMsgName(response) {}
 
     public:
         const bool IsClientMessage;
@@ -20,4 +20,4 @@ namespace Sentry
         const std::string RequestMsgName;
         const std::string ResponseMsgName;
     };
-}
+}// namespace Sentry

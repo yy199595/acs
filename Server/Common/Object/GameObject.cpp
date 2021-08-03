@@ -1,18 +1,17 @@
-#include"GameObject.h"
-#include<Define/CommonDef.h>
-#include<Core/Applocation.h>
-#include<Module/Component.h>
+#include "GameObject.h"
+#include <Core/Applocation.h>
+#include <Define/CommonDef.h>
+#include <Module/Component.h>
 
 namespace Sentry
 {
     GameObject::GameObject(const long long id)
-            : mGameObjectId(id)
+        : mGameObjectId(id)
     {
-
     }
 
     GameObject::GameObject(const long long id, const std::string &address)
-            : mGameObjectId(id)
+        : mGameObjectId(id)
     {
         mSessionAddress = address;
     }
@@ -118,9 +117,4 @@ namespace Sentry
             this->mWaitStartComponents.pop();
         }
     }
-}
-
-
-
-
-
+}// namespace Sentry

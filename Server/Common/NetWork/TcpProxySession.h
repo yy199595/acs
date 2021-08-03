@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <XCode/XCode.h>
-#include <Protocol/com.pb.h>
 #include <NetWork/SocketEvent.h>
+#include <Protocol/com.pb.h>
+#include <XCode/XCode.h>
 
 using namespace google::protobuf;
 namespace Sentry
@@ -35,19 +35,14 @@ namespace Sentry
         bool SendMessageData(NetMessageProxy *messageData);
 
     public:
-        bool Notice(const std::string &service, const std::string &method);                            //不回应
-        bool Notice(const std::string &service, const std::string &method, const Message &request); //不回应
+        bool Notice(const std::string &service, const std::string &method);                        //不回应
+        bool Notice(const std::string &service, const std::string &method, const Message &request);//不回应
     private:
         int mConnectCount;
         std::string mName;
         std::string mAddress;
         SessionType mSessionType;
-        std::string mMessageBuffer;
-
         class CoroutineManager *mCorManager;
-
         class NetSessionManager *mNetManager;
-
-        class NetProxyManager *mNetProxyManager;
     };
-}
+}// namespace Sentry

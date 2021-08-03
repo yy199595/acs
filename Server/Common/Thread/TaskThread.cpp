@@ -1,8 +1,7 @@
 ﻿#include "TaskThread.h"
+#include <Manager/ThreadTaskManager.h>
 #include <chrono>
-#include <sstream>
 #include <functional>
-#include<Manager/ThreadTaskManager.h>
 
 using namespace std::chrono;
 namespace Sentry
@@ -12,7 +11,6 @@ namespace Sentry
         this->mTaskState = Idle;
         this->mThreadIndex = index;
         this->mTaskManager = manager;
-        std::stringstream streamBuffer;
         this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
     }
 
@@ -47,4 +45,4 @@ namespace Sentry
             this->mThreadVarible.wait(waitLock);
         }
     }
-}
+}// namespace Sentry

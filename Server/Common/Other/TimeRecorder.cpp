@@ -1,10 +1,9 @@
-#include<fstream>
 #include "TimeRecorder.h"
-#include<Util/MathHelper.h>
-#include<Util/TimeHelper.h>
-#include<Util/FileHelper.h>
-#include<Util/DirectoryHelper.h>
-#include<Global/LogHelper.h>
+#include <Global/LogHelper.h>
+#include <Util/DirectoryHelper.h>
+#include <Util/MathHelper.h>
+#include <Util/TimeHelper.h>
+#include <fstream>
 
 namespace Sentry
 {
@@ -115,4 +114,4 @@ namespace Sentry
         fs.close();
         return true;
     }
-}
+}// namespace Sentry

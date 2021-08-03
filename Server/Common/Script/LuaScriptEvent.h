@@ -1,7 +1,7 @@
 
 namespace LuaScriptEvent
 {
-    template<typename ... Args>
+    template<typename... Args>
     class ScriptEvent
     {
     public:
@@ -15,7 +15,7 @@ namespace LuaScriptEvent
             }
         }
 
-        static bool Invoke(Args ... args)
+        static bool Invoke(Args... args)
         {
             if (callbackList.size() == 0)
             {
@@ -30,26 +30,29 @@ namespace LuaScriptEvent
         }
 
     private:
-        static std::vector <EventCallback> callbackList;
+        static std::vector<EventCallback> callbackList;
     };
 
-    template<typename ... Args>
-    typename std::vector<std::function < void(Args...)>>
-    ScriptEvent<Args ...>::callbackList;
+    template<typename... Args>
+    typename std::vector<std::function<void(Args...)>>
+            ScriptEvent<Args...>::callbackList;
 
-#define DEF_SCRIPT_EVENT(EventName, ...) class EventName : public ScriptEvent<__VA_ARGS__> {};
+#define DEF_SCRIPT_EVENT(EventName, ...)              \
+    class EventName : public ScriptEvent<__VA_ARGS__> \
+    {                                                 \
+    };
 
-#define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent, name)                                        \
-    {                                                                                        \
-        ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, name);    \
-        helper.PushStaticFunction("Add", scriptEvent::Add);                                    \
-        helper.PushStaticFunction("Invoke", scriptEvent::Invoke);                            \
+#define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent, name)                                    \
+    {                                                                                    \
+        ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, name); \
+        helper.PushStaticFunction("Add", scriptEvent::Add);                              \
+        helper.PushStaticFunction("Invoke", scriptEvent::Invoke);                        \
     }
 
-#define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent)                                                        \
-    {                                                                                                \
-        ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, #scriptEvent);    \
-        helper.PushStaticFunction("Add", scriptEvent::Add);                                            \
-        helper.PushStaticFunction("Invoke", scriptEvent::Invoke);                                    \
+#define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent)                                                  \
+    {                                                                                            \
+        ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, #scriptEvent); \
+        helper.PushStaticFunction("Add", scriptEvent::Add);                                      \
+        helper.PushStaticFunction("Invoke", scriptEvent::Invoke);                                \
     }
-}
+}// namespace LuaScriptEvent

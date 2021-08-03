@@ -1,11 +1,11 @@
 #pragma once
 
-#include"LuaInclude.h"
-#include"UserDataParameter.h"
-#include"FunctionParameter.h"
-#include"ContainerParameter.h"
-#include"CommonParameter.h"
-#include"ProtocParameter.h"
+#include "CommonParameter.h"
+#include "ContainerParameter.h"
+#include "FunctionParameter.h"
+#include "LuaInclude.h"
+#include "ProtocParameter.h"
+#include "UserDataParameter.h"
 
 namespace LuaParameter
 {
@@ -20,7 +20,7 @@ namespace LuaParameter
     {
         lua_pushinteger(lua, (int) data);
     }
-}
+}// namespace LuaParameter
 
 //namespace LuaParameter
 //{
@@ -55,7 +55,7 @@ namespace LuaParameter
     {
         return CommonParameter::Read<T>(lua, index);
     }
-}
+}// namespace LuaParameter
 
 namespace LuaParameter
 {
@@ -73,7 +73,7 @@ namespace LuaParameter
     {
         return ContainerParameter::Read<T>(lua, index);
     }
-}
+}// namespace LuaParameter
 
 namespace LuaParameter
 {
@@ -89,9 +89,8 @@ namespace LuaParameter
     inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, void>::type
     Write(lua_State *lua, T data)
     {
-
     }
-}
+}// namespace LuaParameter
 
 namespace LuaParameter
 {
@@ -108,7 +107,7 @@ namespace LuaParameter
     {
         ProtocParameter::Write<T>(lua, data);
     }
-}
+}// namespace LuaParameter
 
 namespace LuaParameter
 {
@@ -126,22 +125,22 @@ namespace LuaParameter
     {
         UserDataParameter::Write<T>(lua, data);
     }
-}
+}// namespace LuaParameter
 
 namespace LuaParameter
 {
     inline void Encode(lua_State *lua) {}
 
-    template<typename T, typename ... Args>
-    inline void Encode(lua_State *lua, const T &t, Args ... args)
+    template<typename T, typename... Args>
+    inline void Encode(lua_State *lua, const T &t, Args... args)
     {
         LuaParameter::Write<T>(lua, t);
-        Encode(lua, std::forward<Args>(args) ...);
+        Encode(lua, std::forward<Args>(args)...);
     }
 
-    template<typename ...Args>
-    inline void WriteArgs(lua_State *lua, Args ... args)
+    template<typename... Args>
+    inline void WriteArgs(lua_State *lua, Args... args)
     {
         Encode(lua, std::forward<Args>(args)...);
     }
-}
+}// namespace LuaParameter

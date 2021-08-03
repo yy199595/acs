@@ -1,14 +1,17 @@
 ﻿#pragma once
 
-#include<Object/Object.h>
-#include<Protocol/com.pb.h>
-#include<Protocol/s2s.pb.h>
+#include <Object/Object.h>
+#include <Protocol/com.pb.h>
+#include <Protocol/s2s.pb.h>
 
 using namespace google::protobuf;
 namespace Sentry
 {
     template<typename T>
-    inline Object *CreateNullArgcObject() { return new T(); }
+    inline Object *CreateNullArgcObject()
+    {
+        return new T();
+    }
 
     typedef std::function<Object *()> CreateAction;
 
@@ -21,11 +24,11 @@ namespace Sentry
         static ObjectFactory *Get();
 
     public:
-        template<typename ... Args>
-        Object *CreateObjectByName(std::string name, Args &&... args);
+        template<typename... Args>
+        Object *CreateObjectByName(std::string name, Args &&...args);
 
-        template<typename T, typename ... Args>
-        T *CreateObject(Args &&... args);
+        template<typename T, typename... Args>
+        T *CreateObject(Args &&...args);
 
     public:
         template<typename T>
@@ -36,14 +39,14 @@ namespace Sentry
         std::unordered_map<std::string, CreateAction> mRegisterClassMap;
     };
 
-    template<typename ...Args>
+    template<typename... Args>
     inline Object *ObjectFactory::CreateObjectByName(std::string name, Args &&...args)
     {
 
         return nullptr;
     }
 
-    template<typename T, typename ...Args>
+    template<typename T, typename... Args>
     inline T *ObjectFactory::CreateObject(Args &&...args)
     {
         std::string className = TypeReflection<T>::Name;
@@ -68,4 +71,4 @@ namespace Sentry
         this->mRegisterClassMap.insert(std::make_pair(name, action));
         return true;
     }
-}
+}// namespace Sentry

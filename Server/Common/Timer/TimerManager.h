@@ -29,7 +29,7 @@ namespace Sentry
     protected:
         bool OnInit();
 
-        void OnSystemUpdate() final; //处理系统事件
+        void OnSystemUpdate() final;//处理系统事件
     private:
         void RefreshTimer();
 
@@ -48,7 +48,7 @@ namespace Sentry
         NumberBuilder<long long> mTimerIdPool;
         std::queue<shared_ptr<TimerBase>> mTimers;
         std::vector<TimeWheelLayer *> mTimerLayers;
-        std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap; //所有timer的列表
+        std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap;//所有timer的列表
     };
 
     template<typename T, typename... Args>
@@ -57,4 +57,4 @@ namespace Sentry
         std::shared_ptr<T> timer = std::make_shared<T>(std::forward<Args>(args)...);
         return this->AddTimer(timer) ? timer : nullptr;
     }
-}
+}// namespace Sentry

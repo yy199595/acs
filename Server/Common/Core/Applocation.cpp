@@ -1,12 +1,12 @@
 ﻿
-#include"Applocation.h"
-#include"ObjectRegistry.h"
-#include<Util/FileHelper.h>
-#include<Timer/TimerManager.h>
-#include<Manager/ThreadTaskManager.h>
-#include<Manager/NetSessionManager.h>
-#include<Manager/ActionManager.h>
-#include<Coroutine/CoroutineManager.h>
+#include "Applocation.h"
+#include "ObjectRegistry.h"
+#include <Coroutine/CoroutineManager.h>
+#include <Manager/ActionManager.h>
+#include <Manager/NetSessionManager.h>
+#include <Manager/ThreadTaskManager.h>
+#include <Timer/TimerManager.h>
+#include <Util/FileHelper.h>
 
 using namespace Sentry;
 using namespace std::chrono;
@@ -16,7 +16,7 @@ namespace Sentry
     Applocation *Applocation::mApplocation = nullptr;
 
     Applocation::Applocation(const std::string srvName, const std::string configPath)
-            : mStartTime(TimeHelper::GetSecTimeStamp()), mConfig(configPath)
+        : mStartTime(TimeHelper::GetSecTimeStamp()), mConfig(configPath)
     {
         assert(!mApplocation);
         mApplocation = this;
@@ -172,8 +172,6 @@ namespace Sentry
 
     int Applocation::LogicMainLoop()
     {
-        long long interval = 1000 / 33;
-        long long fristTimer = TimeHelper::GetMilTimestamp();
         long long startTimer = TimeHelper::GetMilTimestamp();
         long long secondTimer = TimeHelper::GetMilTimestamp();
         this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
@@ -241,4 +239,4 @@ namespace Sentry
         SetConsoleTitle(buffer);
 #endif
     }
-}
+}// namespace Sentry
