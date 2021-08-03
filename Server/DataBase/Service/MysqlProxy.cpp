@@ -6,6 +6,7 @@
 #include <Coroutine/CoroutineManager.h>
 #include<MysqlClient/MysqlThreadTask.h>
 #include <google/protobuf/util/json_util.h>
+
 namespace Sentry
 {
     MysqlProxy::MysqlProxy()
@@ -19,7 +20,7 @@ namespace Sentry
     {
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-		SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
+        SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
 
         REGISTER_FUNCTION_2(MysqlProxy::Add, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
         REGISTER_FUNCTION_2(MysqlProxy::Save, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
@@ -38,167 +39,168 @@ namespace Sentry
 
     XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-		const std::string & messageData = requertData.protocolmessage();
-        Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        const std::string &messageData = requertData.protocolmessage();
+        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
         }
-		if (!protocolMessage->ParseFromString(messageData))
-		{
-			return XCode::ParseMessageError;
-		}
-		std::string sql;
-		if (!this->mMysqlManager->GetAddSqlCommand(*protocolMessage, sql))
-		{
-			return XCode::CallArgsError;
-		}
-		//GprotocolPool.Destory(protocolMessage);
+        if (!protocolMessage->ParseFromString(messageData))
+        {
+            return XCode::ParseMessageError;
+        }
+        std::string sql;
+        if (!this->mMysqlManager->GetAddSqlCommand(*protocolMessage, sql))
+        {
+            return XCode::CallArgsError;
+        }
+            //GprotocolPool.Destory(protocolMessage);
 #ifdef SOEASY_DEBUG
-		SayNoDebugInfo(sql);
+        SayNoDebugInfo(sql);
 #endif
-		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
-		
-		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
-		
-		this->mCorManager->YieldReturn();
-		response.set_errorstr(mysqlTask->GetErrorStr());
+        const std::string &tab = this->mMysqlManager->GetDataBaseName();
+        shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
+
+        if (!this->mTaskManager->StartInvokeTask(mysqlTask))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
+
+        this->mCorManager->YieldReturn();
+        response.set_errorstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
-		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
-		SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
 #endif // SOEASY_DEBUG
-		return mysqlTask->GetErrorCode();
+        return mysqlTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = nullptr; //GprotocolPool.Create(requertData.protocolname());
-		if (protocolMessage == nullptr)
-		{
-			return XCode::Failure;
-		}
-		if (!protocolMessage->ParseFromString(messageData))
-		{
-			return XCode::ParseMessageError;
-		}
-		std::string sql;
-		if (!this->mMysqlManager->GetSaveSqlCommand(*protocolMessage, sql))
-		{
-			return XCode::CallArgsError;
-		}
+        const std::string &messageData = requertData.protocolmessage();
+        Message *protocolMessage = nullptr; //GprotocolPool.Create(requertData.protocolname());
+        if (protocolMessage == nullptr)
+        {
+            return XCode::Failure;
+        }
+        if (!protocolMessage->ParseFromString(messageData))
+        {
+            return XCode::ParseMessageError;
+        }
+        std::string sql;
+        if (!this->mMysqlManager->GetSaveSqlCommand(*protocolMessage, sql))
+        {
+            return XCode::CallArgsError;
+        }
 #ifdef SOEASY_DEBUG
-		SayNoDebugInfo(sql);
+        SayNoDebugInfo(sql);
 #endif
-		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
+        const std::string &tab = this->mMysqlManager->GetDataBaseName();
+        shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
+        if (!this->mTaskManager->StartInvokeTask(mysqlTask))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
 
-		this->mCorManager->YieldReturn();
-		response.set_errorstr(mysqlTask->GetErrorStr());
+        this->mCorManager->YieldReturn();
+        response.set_errorstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
-		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
-		SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
 #endif // SOEASY_DEBUG
-		return mysqlTask->GetErrorCode();
+        return mysqlTask->GetErrorCode();
     }
 
     XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
     {
-		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
-		if (protocolMessage == nullptr)
-		{
-			return XCode::Failure;
-		}
-		if (!protocolMessage->ParseFromString(messageData))
-		{
-			return XCode::ParseMessageError;
-		}
-		std::string sql;
-		if (!this->mMysqlManager->GetDeleleSqlCommand(*protocolMessage, sql))
-		{
-			return XCode::CallArgsError;
-		}
+        const std::string &messageData = requertData.protocolmessage();
+        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        if (protocolMessage == nullptr)
+        {
+            return XCode::Failure;
+        }
+        if (!protocolMessage->ParseFromString(messageData))
+        {
+            return XCode::ParseMessageError;
+        }
+        std::string sql;
+        if (!this->mMysqlManager->GetDeleleSqlCommand(*protocolMessage, sql))
+        {
+            return XCode::CallArgsError;
+        }
 #ifdef SOEASY_DEBUG
-		SayNoDebugInfo(sql);
+        SayNoDebugInfo(sql);
 #endif
-		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
+        const std::string &tab = this->mMysqlManager->GetDataBaseName();
+        shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
-		this->mCorManager->YieldReturn();
-		response.set_errorstr(mysqlTask->GetErrorStr());
+        if (!this->mTaskManager->StartInvokeTask(mysqlTask))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
+        this->mCorManager->YieldReturn();
+        response.set_errorstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
-		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
-		SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
 #endif // SOEASY_DEBUG
-		return mysqlTask->GetErrorCode();
+        return mysqlTask->GetErrorCode();
     }
 
-	XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request & requertData, s2s::MysqlQuery_Response & response)
-	{
-		const std::string & messageData = requertData.protocolmessage();
-		Message * protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
-		if (protocolMessage == nullptr)
-		{
-			response.set_errotstr("create " + requertData.protocolname() + " fail");
-			return XCode::CreatePorotbufFail;
-		}
-		if (!protocolMessage->ParseFromString(messageData))
-		{
-			return XCode::ParseMessageError;
-		}
-		std::string sql;
-		if (!this->mMysqlManager->GetQuerySqlCommand(*protocolMessage, sql))
-		{
-			return XCode::CallArgsError;
-		}
+    XCode
+    MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request &requertData, s2s::MysqlQuery_Response &response)
+    {
+        const std::string &messageData = requertData.protocolmessage();
+        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        if (protocolMessage == nullptr)
+        {
+            response.set_errotstr("create " + requertData.protocolname() + " fail");
+            return XCode::CreatePorotbufFail;
+        }
+        if (!protocolMessage->ParseFromString(messageData))
+        {
+            return XCode::ParseMessageError;
+        }
+        std::string sql;
+        if (!this->mMysqlManager->GetQuerySqlCommand(*protocolMessage, sql))
+        {
+            return XCode::CallArgsError;
+        }
 #ifdef SOEASY_DEBUG
-		SayNoDebugInfo(sql);
+        SayNoDebugInfo(sql);
 #endif
-		const std::string & tab = this->mMysqlManager->GetDataBaseName();
-		shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
+        const std::string &tab = this->mMysqlManager->GetDataBaseName();
+        shared_ptr<MysqlThreadTask> mysqlTask = make_shared<MysqlThreadTask>(this->mMysqlManager, tab, sql);
 
-		if (!this->mTaskManager->StartInvokeTask(mysqlTask))
-		{
-			return XCode::MysqlStartTaskFail;
-		}
+        if (!this->mTaskManager->StartInvokeTask(mysqlTask))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
 
-		this->mCorManager->YieldReturn();
-		XCode code = mysqlTask->GetErrorCode();
-		if (code == XCode::Successful)
-		{
-			const std::vector<std::string> & jsonArray = mysqlTask->GetQueryDatas();
-			for (const std::string & json : jsonArray)
-			{
-				if (!util::JsonStringToMessage(json, protocolMessage).ok())
-				{
-					return XCode::JsonCastProtocbufFail;
-				}
-				std::string * jsonData = response.add_querydatas();
-				jsonData->append(protocolMessage->SerializeAsString());
-			}
-			return XCode::Successful;
-		}
-		response.set_errotstr(mysqlTask->GetErrorStr());
+        this->mCorManager->YieldReturn();
+        XCode code = mysqlTask->GetErrorCode();
+        if (code == XCode::Successful)
+        {
+            const std::vector<std::string> &jsonArray = mysqlTask->GetQueryDatas();
+            for (const std::string &json : jsonArray)
+            {
+                if (!util::JsonStringToMessage(json, protocolMessage).ok())
+                {
+                    return XCode::JsonCastProtocbufFail;
+                }
+                std::string *jsonData = response.add_querydatas();
+                jsonData->append(protocolMessage->SerializeAsString());
+            }
+            return XCode::Successful;
+        }
+        response.set_errotstr(mysqlTask->GetErrorStr());
 #ifdef SOEASY_DEBUG
-		long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
-		SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
 #endif
-		return code;
-	}
+        return code;
+    }
 
 
     // XCode MysqlProxy::Query(Message &requestData, Message &responseData)

@@ -1,26 +1,28 @@
 #include"Coroutine.h"
 #include<memory.h>
 #include"CoroutineManager.h"
+
 #ifdef _WIN32
+
 #include<Windows.h>
+
 #else
 #include<ucontext.h>
 #endif
 namespace Sentry
 {
-	Coroutine::~Coroutine()
-	{
-		if (this->mContextStack)
-		{
+    Coroutine::~Coroutine()
+    {
+        if (this->mContextStack)
+        {
 #ifdef _WIN32
-			DeleteFiber(this->mContextStack);
+            DeleteFiber(this->mContextStack);
 #else
-			free(this->mContextStack);
+            free(this->mContextStack);
 #endif
-			this->mContextStack = nullptr;
-		}
-	}
-
+            this->mContextStack = nullptr;
+        }
+    }
 
 
 }

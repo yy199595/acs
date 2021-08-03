@@ -180,13 +180,11 @@ namespace Sentry
 
 	bool NetProxyManager::OnRecvMessage(const std::string &address, NetMessageProxy *messageData)
 	{
-		const std::string &method = messageData->GetMethd();
-		const std::string &service = messageData->GetService();
-		if (!service.empty() && !method.empty())
-		{
-			return mServiceManager->HandlerMessage(address, messageData);
-		}
-		long long rpcId = messageData->GetRpcId();
-		return this->mActionManager->InvokeCallback(rpcId, messageData);
+		if(messageData->GetMessageType() < RequestEnd)
+        {
+            return mServiceManager->HandlerMessage(address, messageData);
+        }
+		this->mActionManager->InvokeCallback(messageData);
+		return true;
 	}
 }

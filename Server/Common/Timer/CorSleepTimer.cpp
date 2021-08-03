@@ -1,18 +1,19 @@
 #include"CorSleepTimer.h"
 #include<Util/TimeHelper.h>
+
 namespace Sentry
 {
-	CorSleepTimer::CorSleepTimer(CoroutineManager * sheduler, long long id, long long ms)
-		: TimerBase(ms)
-	{
-		this->mCoroutineId = id;
-		this->mScheduler = sheduler;
-	}
+    CorSleepTimer::CorSleepTimer(CoroutineManager *sheduler, long long id, long long ms)
+            : TimerBase(ms)
+    {
+        this->mCoroutineId = id;
+        this->mScheduler = sheduler;
+    }
 
-	bool CorSleepTimer::Invoke()
-	{
-		assert(this->mScheduler);
-		this->mScheduler->Resume(this->mCoroutineId);
-		return true;
-	}
+    bool CorSleepTimer::Invoke()
+    {
+        assert(this->mScheduler);
+        this->mScheduler->Resume(this->mCoroutineId);
+        return true;
+    }
 }

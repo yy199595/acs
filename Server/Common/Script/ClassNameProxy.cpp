@@ -2,5 +2,5 @@
 
 namespace ClassNameProxy
 {
-	std::unordered_map<size_t, ClassRegisterInfo * > classNameMap = {};
+    std::unordered_map<size_t, ClassRegisterInfo *> classNameMap = {};
 }

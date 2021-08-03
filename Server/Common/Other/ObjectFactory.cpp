@@ -3,9 +3,9 @@
 
 namespace Sentry
 {
-	ObjectFactory *ObjectFactory::Get()
-	{
-		static ObjectFactory factory(10);
-		return &factory;
-	}
+    ObjectFactory *ObjectFactory::Get()
+    {
+        static ObjectFactory factory(10);
+        return &factory;
+    }
 }

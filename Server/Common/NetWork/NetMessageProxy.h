@@ -2,7 +2,7 @@
 #include <XCode/XCode.h>
 #include <Other/ProtocolConfig.h>
 #include <google/protobuf/message.h>
-
+#include <Pool/ObjectPool.h>
 using google::protobuf::Message;
 namespace Sentry
 {
