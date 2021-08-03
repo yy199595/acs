@@ -24,7 +24,7 @@
 using namespace Sentry;
 using namespace Sentry;
 
-#ifdef _WIN32
+#ifdef _WIN32 && _MSC_VER
 #pragma comment(lib,"lua53.lib")
 #pragma comment(lib,"Common.lib")
 #pragma comment(lib,"hiredis.lib")

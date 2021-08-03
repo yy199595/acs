@@ -2,7 +2,6 @@
 #include<Define/CommonDef.h>
 #include<Core/Applocation.h>
 #include<Module/Component.h>
-#include<Module/SayNoFactory.h>
 namespace Sentry
 {
 	GameObject::GameObject(const long long id)
