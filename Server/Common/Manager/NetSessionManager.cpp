@@ -1,9 +1,9 @@
 ﻿#include "NetSessionManager.h"
-#include "ScriptManager.h"
 #include "ActionManager.h"
-#include <Util/StringHelper.h>
+#include "ScriptManager.h"
 #include <Manager/ListenerManager.h>
 #include <Manager/NetProxyManager.h>
+#include <Util/StringHelper.h>
 namespace Sentry
 {
     NetSessionManager::NetSessionManager()
@@ -177,7 +177,7 @@ namespace Sentry
                 this->mRecvSessionQueue.pop();
             }
 
-            this->mNetEventQueue.SwapQueueData(); //处理主线程过来的数据
+            this->mNetEventQueue.SwapQueueData();//处理主线程过来的数据
             while (this->mNetEventQueue.PopItem(sessionEvent))
             {
                 this->HandlerMainThreadEvent(sessionEvent);
@@ -191,7 +191,7 @@ namespace Sentry
         return this->mNetThreadId == std::this_thread::get_id();
     }
 
-    void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent *eve) //处理主线程过来的事件
+    void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent *eve)//处理主线程过来的事件
     {
         if (eve == nullptr)
             return;
@@ -253,4 +253,4 @@ namespace Sentry
         }
         return false;
     }
-}
+}// namespace Sentry

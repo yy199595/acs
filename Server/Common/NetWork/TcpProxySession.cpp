@@ -15,7 +15,6 @@ namespace Sentry
         Applocation *app = Applocation::Get();
         SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
         SayNoAssertRet_F(this->mNetManager = app->GetManager<NetSessionManager>());
-        SayNoAssertRet_F(this->mNetProxyManager = app->GetManager<NetProxyManager>());
     }
 
     TcpProxySession::TcpProxySession(const std::string &name, const std::string &address)
@@ -27,7 +26,6 @@ namespace Sentry
         Applocation *app = Applocation::Get();
         SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
         SayNoAssertRet_F(this->mNetManager = app->GetManager<NetSessionManager>());
-        SayNoAssertRet_F(this->mNetProxyManager = app->GetManager<NetProxyManager>());
     }
 
     TcpProxySession::~TcpProxySession()

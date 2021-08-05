@@ -1,17 +1,14 @@
 ﻿#include "MysqlProxy.h"
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/MysqlManager.h>
+#include <Manager/ProtocolManager.h>
 #include <Manager/ThreadTaskManager.h>
 #include <MysqlClient/MysqlThreadTask.h>
-#include <Other/ServiceNode.h>
 #include <Protocol/db.pb.h>
-#include <google/protobuf/util/json_util.h>
-
 namespace Sentry
 {
     MysqlProxy::MysqlProxy()
     {
-        this->mMysqlNodeId = 0;
         this->mCorManager = nullptr;
         this->mMysqlManager = nullptr;
     }
@@ -21,6 +18,7 @@ namespace Sentry
         SayNoAssertRetFalse_F(this->mMysqlManager = this->GetManager<MysqlManager>());
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
         SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
+        SayNoAssertRetFalse_F(this->mProtocolManager = this->GetManager<ProtocolManager>());
 
         REGISTER_FUNCTION_2(MysqlProxy::Add, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
         REGISTER_FUNCTION_2(MysqlProxy::Save, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
@@ -37,10 +35,10 @@ namespace Sentry
         userData.set_userid(420625199511045331);
     }
 
-    XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-        const std::string &messageData = requertData.protocolmessage();
-        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        const std::string &messageData = request.protocolmessage();
+        Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
@@ -54,7 +52,6 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        //GprotocolPool.Destory(protocolMessage);
 #ifdef SOEASY_DEBUG
         SayNoDebugInfo(sql);
 #endif
@@ -75,10 +72,10 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-        const std::string &messageData = requertData.protocolmessage();
-        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        const std::string &messageData = request.protocolmessage();
+        Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
@@ -112,10 +109,10 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &requertData, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-        const std::string &messageData = requertData.protocolmessage();
-        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        const std::string &messageData = request.protocolmessage();
+        Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
         if (protocolMessage == nullptr)
         {
             return XCode::Failure;
@@ -148,16 +145,16 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode
-    MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request &requertData, s2s::MysqlQuery_Response &response)
+    XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
     {
-        const std::string &messageData = requertData.protocolmessage();
-        Message *protocolMessage = nullptr;//GprotocolPool.Create(requertData.protocolname());
+        Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
         if (protocolMessage == nullptr)
         {
-            response.set_errotstr("create " + requertData.protocolname() + " fail");
+            response.set_errotstr("create " + request.protocolname() + " fail");
             return XCode::CreatePorotbufFail;
         }
+        const std::string &messageData = request.protocolmessage();
+
         if (!protocolMessage->ParseFromString(messageData))
         {
             return XCode::ParseMessageError;

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include"ServiceBase.h"
-#include<NetWork/NetWorkAction.h>
+#include "ServiceBase.h"
+#include <NetWork/NetWorkAction.h>
 
 namespace Sentry
 {
@@ -70,4 +70,4 @@ namespace Sentry
 #define REGISTER_FUNCTION_1(func, t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))
 #define REGISTER_FUNCTION_2(func, t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
 
-}
+}// namespace Sentry

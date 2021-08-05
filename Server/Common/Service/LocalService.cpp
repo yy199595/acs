@@ -18,7 +18,6 @@ namespace Sentry
     bool LocalService::OnInit()
     {
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
         return ServiceBase::OnInit();
     }
 
@@ -53,7 +52,7 @@ namespace Sentry
         {
             SayNoDebugError("call <<" << messageData->GetService()
                                       << "." << messageData->GetMethd() << ">> not found");
-            return XCode::CallFunctionNotExist;
+            return false;
         }
         shared_ptr<LocalActionProxy> localAction = iter->second;
         return localAction->Invoke(messageData);
