@@ -91,7 +91,7 @@ SET(EX_PLATFORM_NAME "x64")
 SET(CMAKE_BUILD_TYPE Debug)
 
 message(${SUPER_SRC})
-ADD_EXECUTABLE(Server ${SUPER_SRC})
+ADD_EXECUTABLE(Server ${SUPER_SRC} ../Common/Manager/HttpClientManager.cpp)
 IF(UNIX)
 TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
 ELSEIF(WIN32)
