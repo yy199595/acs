@@ -5,21 +5,29 @@ add_definitions(-D _DEBUG)
 #第三方库包含
 
 SET(LinkDir ${PROJECT_SOURCE_DIR}../Libs/lib)
-SET(Libdir ${PROJECT_SOURCE_DIR}../Libs)
+SET(LibDir ${PROJECT_SOURCE_DIR}../Libs)
 SET(CommonDir ${PROJECT_SOURCE_DIR}../Common)
 SET(DataBaseDir ${PROJECT_SOURCE_DIR}../DataBase)
 SET(CoreLogicDir ${PROJECT_SOURCE_DIR}../CoreLogic)
 SET(ServerDataDir ${PROJECT_SOURCE_DIR}../ServerData)
 SET(OutputDir ${PROJECT_SOURCE_DIR}../bin)
 
+message(${LibDir})
+message(${LinkDir})
+message(${CommonDir})
+message(${DataBaseDir})
+message(${CoreLogicDir})
+message(${ServerDataDir})
+message(${OutputDir})
 
-include_directories(${Libdir}/include/rapidjson)
-include_directories(${Libdir}include/protobuf)
-include_directories(${Libdir}include/asio)
-include_directories(${Libdir}include/lua5.3)
-include_directories(${Libdir}include/mysql)
-include_directories(${Libdir}include/spdlog)
-include_directories(${Libdir}include/redis)
+
+include_directories(${LibDir}/include/rapidjson)
+include_directories(${LibDir}include/protobuf)
+include_directories(${LibDir}include/asio)
+include_directories(${LibDir}include/lua5.3)
+include_directories(${LibDir}include/mysql)
+include_directories(${LibDir}include/spdlog)
+include_directories(${LibDir}include/redis)
 #公共组件
 
 include_directories(${CommonDir})
@@ -99,8 +107,6 @@ SET(EX_PLATFORM 64)
 SET(EX_PLATFORM_NAME "x64")
 
 SET(CMAKE_BUILD_TYPE Debug)
-
-message(${SUPER_SRC})
 
 IF(UNIX)
 TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
