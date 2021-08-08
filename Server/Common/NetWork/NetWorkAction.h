@@ -143,7 +143,7 @@ namespace Sentry
         {
             long long userId = messageData->GetUserId();
             T1 *responseData = mResMessagePool.Create();
-            XCode this->mBindAction(userId, *responseData);
+            XCode code = this->mBindAction(userId, *responseData);
             bool res = messageData->InitMessageData(code, responseData);
 
             this->mResMessagePool.Destory(responseData);

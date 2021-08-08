@@ -20,11 +20,11 @@
 #include <Service/ServiceRegistry.h>
 
 #include <Service/MysqlProxy.h>
-
 using namespace Sentry;
 using namespace Sentry;
 
-#ifdef _WIN32 &&_MSC_VER
+#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma comment(lib, "lua53.lib")
 #pragma comment(lib, "Common.lib")
 #pragma comment(lib, "hiredis.lib")
@@ -33,6 +33,7 @@ using namespace Sentry;
 #pragma comment(lib, "CoreLogic.lib")
 #pragma comment(lib, "ServerData.lib")
 #pragma comment(lib, "libprotobufd.lib")
+#endif
 #endif
 
 int main(int argc, char **argv)
