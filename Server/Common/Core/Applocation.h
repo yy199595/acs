@@ -15,34 +15,45 @@
 using namespace std;
 using namespace asio::ip;
 
-namespace Sentry {
+namespace Sentry
+{
 				class Manager;
 
 				class ServiceBase;
 
-				class Applocation {
+				class Applocation
+				{
 				public:
 								Applocation(const std::string srvName, const std::string configPath);
 
-								virtual ~Applocation() {};
+								virtual ~Applocation()
+								{};
 
 				public:
-								ServerConfig &GetConfig() { return this->mConfig; }
+								ServerConfig &GetConfig()
+								{ return this->mConfig; }
 
-								inline float GetDelaTime() { return this->mDelatime; }
+								inline float GetDelaTime()
+								{ return this->mDelatime; }
 
-								inline long long GetLogicTime() { return this->mLogicTime; }
+								inline long long GetLogicTime()
+								{ return this->mLogicTime; }
 
-								inline long long GetStartTime() { return this->mStartTime; }
+								inline long long GetStartTime()
+								{ return this->mStartTime; }
 
-								const std::string &GetServerName() { return this->mServerName; }
+								const std::string &GetServerName()
+								{ return this->mServerName; }
 
-								long long GetRunTime() { return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
+								long long GetRunTime()
+								{ return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 
-								inline const std::string &GetConfigDirectory() { return this->mSrvConfigDirectory; }
+								inline const std::string &GetConfigDirectory()
+								{ return this->mSrvConfigDirectory; }
 
 				public:
-								static Applocation *Get() { return mApplocation; }
+								static Applocation *Get()
+								{ return mApplocation; }
 
 				public:
 								template<typename T>
@@ -112,10 +123,12 @@ namespace Sentry {
 				};
 
 				template<typename T>
-				inline bool Applocation::AddManager() {
+				inline bool Applocation::AddManager()
+				{
 								std::string name;
 								size_t hash = typeid(T).hash_code();
-								if (!this->GetTypeName(hash, name)) {
+								if (!this->GetTypeName(hash, name))
+								{
 												SayNoDebugError("please register type:" << typeid(T).name());
 												return false;
 								}
@@ -123,21 +136,26 @@ namespace Sentry {
 				}
 
 				template<typename T>
-				inline T *Applocation::GetManager() {
+				inline T *Applocation::GetManager()
+				{
 								std::string name;
 								size_t hash = typeid(T).hash_code();
-								if (!this->GetTypeName(hash, name)) {
+								if (!this->GetTypeName(hash, name))
+								{
 												SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
 												return nullptr;
 								}
 								auto iter = this->mManagerMap.find(name);
-								if (iter != this->mManagerMap.end()) {
+								if (iter != this->mManagerMap.end())
+								{
 												return dynamic_cast<T *>(iter->second);
 								}
 								auto iter1 = this->mManagerMap.begin();
-								for (; iter1 != this->mManagerMap.end(); iter1++) {
+								for (; iter1 != this->mManagerMap.end(); iter1++)
+								{
 												T *manager = dynamic_cast<T *>(iter1->second);
-												if (manager != nullptr) {
+												if (manager != nullptr)
+												{
 																return manager;
 												}
 								}
@@ -145,24 +163,29 @@ namespace Sentry {
 				}
 
 				template<typename T>
-				inline bool Applocation::TryAddManager() {
+				inline bool Applocation::TryAddManager()
+				{
 								std::string name;
 								size_t hash = typeid(T).hash_code();
-								if (!this->GetTypeName(hash, name)) {
+								if (!this->GetTypeName(hash, name))
+								{
 												SayNoDebugError("player register" << typeid(T).name());
 												return false;
 								}
 								auto iter = this->mManagerMap.find(name);
-								if (iter == this->mManagerMap.end()) {
+								if (iter == this->mManagerMap.end())
+								{
 												return this->AddManager(name);
 								}
 								return false;
 				}
 
-				inline Applocation *GetApp() { return Applocation::Get(); }
+				inline Applocation *GetApp()
+				{ return Applocation::Get(); }
 
 				template<typename T>
-				inline T *GetManager() {
+				inline T *GetManager()
+				{
 								return Applocation::Get()->GetManager<T>();
 				}
 

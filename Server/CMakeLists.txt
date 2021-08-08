@@ -15,7 +15,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Libs/include/redis)
 #公共组件
 
 include_directories(${PROJECT_SOURCE_DIR}/Common)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Core)
+include_directories(${PROJECT_SOURCE_DIR}/Common/App)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Coroutine)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Define)
 include_directories(${PROJECT_SOURCE_DIR}/Common//Global)
@@ -31,7 +31,8 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Service)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Pool)
 
-#ux_source_directory(${PROJECT_SOURCE_DIR}/Common/Core CommonSource)
+#框架底层
+aux_source_directory(${PROJECT_SOURCE_DIR}/Common/Core CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/Common/Coroutine CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/Common/Define CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/Common/Global CommonSource)
@@ -79,7 +80,7 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/lib)
 
 #SET(CMAKE_CXX_COMPILER "ccache")
 #SET(CMAKE_CXX_COMPILER_ARG1 "g++")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 
 SET(CMAKE_BUILD_TYPE Debug)
 

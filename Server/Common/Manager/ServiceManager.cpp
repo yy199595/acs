@@ -2,7 +2,7 @@
 #include <Service/LocalLuaService.h>
 #include <Service/LocalService.h>
 
-#include <Core/ObjectRegistry.h>
+#include <Object/ObjectRegistry.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
 #include <Util/StringHelper.h>

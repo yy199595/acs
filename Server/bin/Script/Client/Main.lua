@@ -1,4 +1,3 @@
-
 require "TxtUtil"
 require "JsonUtil"
 require "ClientManager"
@@ -20,10 +19,10 @@ function Main.Start()
 
     local count = 0
     SoEasy.AddTimer(
-        function()
-            count = count + 1
-            local registerInfo = SoEasy.CreateByTable("PB.UserRegisterData", registerData)
-            SoEasy.Warning(registerInfo, count)
-        end, 1000, 10)
+            function()
+                count = count + 1
+                local registerInfo = SoEasy.CreateByTable("PB.UserRegisterData", registerData)
+                SoEasy.Warning(registerInfo, count)
+            end, 1000, 10)
 end
 

@@ -1,5 +1,5 @@
 ﻿#include<Core/Applocation.h>
-#include<Core/ObjectRegistry.h>
+#include<Object/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/TimerManager.h>
 #include<Manager/NetSessionManager.h>

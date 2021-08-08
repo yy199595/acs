@@ -35,7 +35,6 @@
         "TimerManager",
         "MysqlManager",
         "RedisManager",
-        "ScriptManager",
         "ListenerManager",
         "ActionManager",
         "ServiceManager",
