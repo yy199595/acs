@@ -14,7 +14,7 @@
 #include <Manager/ServiceManager.h>
 #include <Manager/ServiceNodeManager.h>
 #include <Manager/ThreadTaskManager.h>
-
+#include <Manager/ProtocolManager.h>
 #include <Manager/LoginService.h>
 #include <Service/ClusterService.h>
 #include <Service/ServiceRegistry.h>
@@ -46,6 +46,8 @@ int main(int argc, char **argv)
     ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
     ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
     ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
+    ObjectRegistry<Manager>::Register<ProtocolManager>("ProtocolManager");
+
 
     ObjectRegistry<Manager>::Register<ListenerManager>("ListenerManager");
     ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");

@@ -15,7 +15,7 @@ namespace Sentry
     {
         if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) != 0)
         {
-            std::string sql = "Create DataBase " + this->mDataBase;
+            std::string sql = "Create DB " + this->mDataBase;
             if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
             {
                 SayNoDebugError("create " << this->mDataBase << " db fail");

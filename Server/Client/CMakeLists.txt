@@ -44,12 +44,12 @@ aux_source_directory(../Common/Util SUPER_SRC)
 aux_source_directory(../Common/Script SUPER_SRC)
 aux_source_directory(../Common/Service SUPER_SRC)
 
-include_directories(../ServerData)
-include_directories(../ServerData/XCode)
-include_directories(../ServerData/Protocol)
+include_directories(../Protocol)
+include_directories(../Protocol/XCode)
+include_directories(../Protocol/Protocol)
 
-aux_source_directory(../ServerData/XCode SUPER_SRC)
-aux_source_directory(../ServerData/Protocol SUPER_SRC)
+aux_source_directory(../Protocol/XCode SUPER_SRC)
+aux_source_directory(../Protocol/Protocol SUPER_SRC)
 
 include_directories(./Manager)
 aux_source_directory(./Manager SUPER_SRC)

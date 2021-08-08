@@ -5,6 +5,7 @@
     "SystemFps": 100,
     "MsgTimeout": 0,
     "NodeName":"Server",
+    "rpc": "./Rpc/rpc.csv",
     "ProxyAddress": "127.0.0.1:1995",
     "QueryAddress": "127.0.0.1:7788",
     "ListenAddress": "127.0.0.1:7788",

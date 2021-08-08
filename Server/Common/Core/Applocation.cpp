@@ -7,6 +7,7 @@
 #include <Manager/ThreadTaskManager.h>
 #include <Timer/TimerManager.h>
 #include <Util/FileHelper.h>
+#include <Manager/ProtocolManager.h>
 
 using namespace Sentry;
 using namespace std::chrono;
@@ -79,9 +80,9 @@ namespace Sentry
 
 								this->TryAddManager<TimerManager>();
 								this->TryAddManager<ActionManager>();
-								this->TryAddManager<NetSessionManager>();
+								this->TryAddManager<ProtocolManager>();
 								this->TryAddManager<CoroutineManager>();
-
+								this->TryAddManager<NetSessionManager>();
 								return true;
 				}
 
