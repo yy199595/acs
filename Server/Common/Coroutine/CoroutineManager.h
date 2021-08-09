@@ -14,8 +14,6 @@
 #endif
 #endif
 #include<ucontext.h>
-#else
-#include<Windows.h>
 #endif
 
 #include<Manager/Manager.h>

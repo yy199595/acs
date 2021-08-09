@@ -9,10 +9,6 @@
 #endif
 #endif
 #include<ucontext.h>
-#else
-
-#include <windows.h>
-
 #endif
 
 namespace Sentry
