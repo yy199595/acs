@@ -7,9 +7,15 @@
 #include<functional>
 #include<unordered_map>
 #include"CoroutineEvent.h"
-
 #ifndef _WIN32
+#if __APPLE__
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+#endif
 #include<ucontext.h>
+#else
+#include<Windows.h>
 #endif
 
 #include<Manager/Manager.h>

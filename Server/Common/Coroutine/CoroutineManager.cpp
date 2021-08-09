@@ -12,9 +12,6 @@ using namespace std::chrono;
 namespace Sentry
 {
 #ifdef _WIN32
-
-#include<Windows.h>
-
     void __stdcall WinEntry(LPVOID manager)
 #else
     void LinuxEntry(void * manager)
