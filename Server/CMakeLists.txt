@@ -74,7 +74,7 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/DB/QueryResult DBSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/DB/RedisClient DBSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/DB/Script DataBaseSource)
 
-aux_source_directory(${PROJECT_SOURCE_DIR}/Main SUPER_SRC)
+aux_source_directory(${PROJECT_SOURCE_DIR}/Main MainSource)
 
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/lib)
 
@@ -84,7 +84,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-ADD_EXECUTABLE(Server ${SUPER_SRC} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
+ADD_EXECUTABLE(Server ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
 TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
