@@ -7,7 +7,7 @@ namespace Sentry
     // 处理外部连接进来的session
     class TcpSessionListener;
 
-    class ListenerManager : public Manager
+				class ListenerManager : public Manager, public INetSystemUpdate
     {
     public:
         ListenerManager() {}
@@ -17,11 +17,9 @@ namespace Sentry
     public:
         const std::string &GetAddress() { return mListenAddress; }
 
-    public:
-        bool StartAccept();
-
     protected:
         bool OnInit() override;
+        void OnNetSystemUpdate(AsioContext & io) final;
 
     private:
         bool mIsAccept;

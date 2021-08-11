@@ -45,11 +45,20 @@ namespace Sentry
 								const std::string &GetServerName()
 								{ return this->mServerName; }
 
+								inline AsioContext &GetNetContext()
+								{ return this->mAsioContext; }
+
 								long long GetRunTime()
 								{ return TimeHelper::GetSecTimeStamp() - this->mStartTime; }
 
 								inline const std::string &GetConfigDirectory()
 								{ return this->mSrvConfigDirectory; }
+
+								inline bool IsMainThread()
+								{ return std::this_thread::get_id() == this->mMainThreadId; }
+
+								inline bool IsNetThreadThread()
+								{ return std::this_thread::get_id() == this->mNetWorkThreadId; }
 
 				public:
 								static Applocation *Get()
@@ -89,6 +98,13 @@ namespace Sentry
 				private:
 								int LogicMainLoop();
 
+								void NetworkLoop();
+
+				private:
+								AsioContext mAsioContext;
+								std::thread *mNetWorkThread;
+								std::thread::id mMainThreadId;
+								std::thread::id mNetWorkThreadId;
 				private:
 								bool mIsClose;
 								long long mLogicTime;
@@ -116,10 +132,12 @@ namespace Sentry
 								std::unordered_map<std::string, Manager *> mManagerMap;
 
 				private:
+
 								std::vector<IFrameUpdate *> mFrameUpdateManagers;
 								std::vector<ISystemUpdate *> mSystemUpdateManagers;
 								std::vector<ISecondUpdate *> mSecondUpdateManagers;
 								std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
+								std::vector<INetSystemUpdate *> mNetSystemUpdateManagers;
 				};
 
 				template<typename T>

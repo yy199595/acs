@@ -5,24 +5,27 @@
 
 namespace Sentry
 {
-				bool ListenerManager::StartAccept()
+
+				void ListenerManager::OnNetSystemUpdate(AsioContext &io)
 				{
 								if (this->mIsAccept == false || this->mBindAcceptor == nullptr)
 								{
-												return false;
+												return;
 								}
-
-								AsioContext &io = this->mDispatchManager->GetAsioCtx();
 								SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(io);
 								this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code &code) {
 												if (!code)
 												{
-																this->mDispatchManager->Create(tcpSocket);
+																TcpClientSession *clientSession = this->mDispatchManager->Create(tcpSocket);
+																if (clientSession != nullptr)
+																{
+																				const std::string &address = clientSession->GetAddress();
+																				SayNoDebugInfo("connect new session : [" << address << "]");
+																}
 												}
 												this->mIsAccept = true;
 								});
 								this->mIsAccept = false;
-								return true;
 				}
 
 				bool ListenerManager::OnInit()
@@ -36,8 +39,9 @@ namespace Sentry
 
 								try
 								{
+												AsioContext &io = this->GetApp()->GetNetContext();
 												AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mListenerPort);
-												this->mBindAcceptor = new AsioTcpAcceptor(this->mDispatchManager->GetAsioCtx(), endPoint);
+												this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
 												this->mIsAccept = true;
 												this->mBindAcceptor->listen();

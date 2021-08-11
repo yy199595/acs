@@ -4,45 +4,52 @@
 
 namespace Sentry
 {
-    class Component : public Object
-    {
-    public:
-        Component(shared_ptr<GameObject>);
+				class Component : public Object
+				{
+				public:
+								Component(shared_ptr<GameObject>);
 
-        virtual ~Component() {}
+								virtual ~Component()
+								{}
 
-    public:
-        friend class GameObject;
+				public:
+								friend class GameObject;
 
-        inline long long GetGameObjectID() { return mGameObjectID; }
+								inline long long GetGameObjectID()
+								{ return mGameObjectID; }
 
-        inline shared_ptr<GameObject> GetGameObject() { return this->mGameObject; }
+								inline shared_ptr<GameObject> GetGameObject()
+								{ return this->mGameObject; }
 
-    public:
-        template<typename T>
-        inline T *GetComponent();
+				public:
+								template<typename T>
+								inline T *GetComponent();
 
-        Component *GetComponentByName(const std::string name);
+								Component *GetComponentByName(const std::string name);
 
-    public:
-        bool IsComponent() override { return true; }
+				public:
+								bool IsComponent() override
+								{ return true; }
 
-    protected:
-        virtual void OnInit() = 0;
+				protected:
+								virtual void OnInit() = 0;
 
-        virtual void OnFrameStart() {};
+								virtual void OnFrameStart()
+								{};
 
-        virtual void OnFrameUpdate(float delaTime) {};
+								virtual void OnFrameUpdate(float delaTime)
+								{};
 
-        virtual void OnAddComponent(Component *compinent) {};
-    private:
-        long long mGameObjectID;
-        shared_ptr<GameObject> mGameObject;
-    };
+								virtual void OnAddComponent(Component *compinent)
+								{};
+				private:
+								long long mGameObjectID;
+								shared_ptr<GameObject> mGameObject;
+				};
 
-    template<typename T>
-    inline T *Component::GetComponent()
-    {
-        this->mGameObject->GetComponent<T>();
-    }
+				template<typename T>
+				inline T *Component::GetComponent()
+				{
+								this->mGameObject->GetComponent<T>();
+				}
 }

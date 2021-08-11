@@ -4,7 +4,6 @@
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
 #include <Manager/NetSessionManager.h>
-#include <Manager/ThreadTaskManager.h>
 #include <Timer/TimerManager.h>
 #include <Util/FileHelper.h>
 #include <Manager/ProtocolManager.h>
@@ -27,6 +26,7 @@ namespace Sentry
 								this->mServerName = srvName;
 								this->mLogicRunCount = 0;
 								this->mSystemRunCount = 0;
+								this->mNetWorkThread = nullptr;
 								this->mSrvConfigDirectory = configPath;
 								this->mLogHelper = new LogHelper("./Logs", srvName);
 				}
@@ -62,7 +62,7 @@ namespace Sentry
 
 				bool Applocation::LoadManager()
 				{
-								std::vector <std::string> managers;
+								std::vector<std::string> managers;
 								if (!mConfig.GetValue("Managers", managers))
 								{
 												SayNoDebugError("not find field : Managers");
@@ -88,8 +88,8 @@ namespace Sentry
 
 				bool Applocation::InitManager()
 				{
-								auto iter = this->mManagerMap.begin();
-								for (; iter != this->mManagerMap.end(); iter++)
+
+								for (auto iter = this->mManagerMap.begin(); iter != this->mManagerMap.end(); iter++)
 								{
 												Manager *manager = iter->second;
 												if (manager->IsActive() == false || manager->OnInit() == false)
@@ -100,7 +100,7 @@ namespace Sentry
 												IFrameUpdate *manager1 = dynamic_cast<IFrameUpdate *>(manager);
 												ISystemUpdate *manager2 = dynamic_cast<ISystemUpdate *>(manager);
 												ISecondUpdate *manager3 = dynamic_cast<ISecondUpdate *>(manager);
-
+												INetSystemUpdate *manager4 = dynamic_cast<INetSystemUpdate *>(manager);
 												if (manager1 != nullptr)
 												{
 																this->mFrameUpdateManagers.push_back(manager1);
@@ -116,15 +116,28 @@ namespace Sentry
 																this->mSecondUpdateManagers.push_back(manager3);
 																SayNoDebugLog("add " << manager->GetTypeName() << " to SecondUpdateArray");
 												}
+												if (manager4 != nullptr)
+												{
+																this->mNetSystemUpdateManagers.push_back(manager4);
+																SayNoDebugLog("add " << manager->GetTypeName() << " to NetSystemUpdateArray");
+												}
 								}
 
-								iter = this->mManagerMap.begin();
-								for (; iter != this->mManagerMap.end(); iter++)
+								for (auto iter = this->mManagerMap.begin(); iter != this->mManagerMap.end(); iter++)
 								{
 												Manager *manager = iter->second;
 												manager->OnInitComplete();
 								}
-								return true;
+
+								this->mNetWorkThread = new std::thread(std::bind(BIND_THIS_ACTION_0(Applocation::NetworkLoop)));
+
+								if (this->mNetWorkThread != nullptr)
+								{
+												this->mMainThreadId = std::this_thread::get_id();
+												this->mNetWorkThreadId = this->mNetWorkThread->get_id();
+												return true;
+								}
+								return false;
 				}
 
 				int Applocation::Run()
@@ -184,7 +197,6 @@ namespace Sentry
 
 								std::chrono::milliseconds time(1);
 								const long long LogicUpdateInterval = 1000 / logicFps;
-								const long long systemUpdateInterval = 1000 / systemFps;
 								while (!this->mIsClose)
 								{
 												std::this_thread::sleep_for(time);
@@ -221,6 +233,21 @@ namespace Sentry
 												}
 								}
 								return this->Stop();
+				}
+
+				void Applocation::NetworkLoop()
+				{
+								std::chrono::milliseconds time(1);
+								while (this->mIsClose == false)
+								{
+												std::this_thread::sleep_for(time);
+												mAsioContext.poll();
+												for (size_t index = 0; index < this->mNetSystemUpdateManagers.size(); index++)
+												{
+																INetSystemUpdate *manager = this->mNetSystemUpdateManagers[index];
+																manager->OnNetSystemUpdate(this->mAsioContext);
+												}
+								}
 				}
 
 

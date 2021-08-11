@@ -5,7 +5,6 @@
 #include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
 
-
 namespace Sentry
 {
     ServiceRegistry::ServiceRegistry()

@@ -6,7 +6,6 @@
 #include<Script/LuaProtocExtension.h>
 #include<Script/CoroutineExtension.h>
 
-#include<Util/JsonHelper.h>
 #include<Util/DirectoryHelper.h>
 
 namespace Sentry

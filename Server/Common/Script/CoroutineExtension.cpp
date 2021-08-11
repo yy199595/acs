@@ -1,7 +1,5 @@
 #include "CoroutineExtension.h"
 #include <Core/Applocation.h>
-#include <Manager/ScriptManager.h>
-#include <chrono>
 
 using namespace Sentry;
 namespace CoroutineExtension

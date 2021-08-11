@@ -1,6 +1,5 @@
 ﻿#include "LocalService.h"
 #include <Manager/ActionManager.h>
-#include <Manager/NetSessionManager.h>
 #include <Coroutine/CoroutineManager.h>
 
 namespace Sentry
