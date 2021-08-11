@@ -3,6 +3,11 @@
 #include"CoroutineEvent.h"
 
 #ifndef _WIN32
+#if __APPLE__
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+#endif
 #include<ucontext.h>
 #endif
 
