@@ -36,7 +36,6 @@ namespace Sentry
     private:
         short mAreaId;
         short mNodeId;
-        std::string mQueryAddress;
         std::string mListenAddress;
         ServiceManager *mServiceManager;
         ServiceNodeManager *mServiceNodeManager;

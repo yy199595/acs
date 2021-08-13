@@ -39,6 +39,7 @@ namespace Sentry
         bool GetValue(const std::string k1, const std::string k2, std::string &value);
 
         bool GetValue(const std::string k1, const std::string k2, unsigned short & value);
+        bool GetValue(const std::string k1, const std::string k2, std::vector<std::string> & value);
 
     public:
         short GetNodeId()

@@ -23,8 +23,8 @@ namespace Sentry
             this->mLuaEnv = luaL_newstate();
             luaL_openlibs(mLuaEnv);
         }
-        SayNoAssertRetFalse_F(this->GetConfig().GetValue("ScriptMain", this->mMainLuaPath));
-        SayNoAssertRetFalse_F(this->GetConfig().GetValue("ScriptInclude", this->mRequirePaths));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Script","main", this->mMainLuaPath));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Script","include",this->mRequirePaths));
         for (std::string &include : this->mRequirePaths)
         {
             this->AddRequirePath(include);

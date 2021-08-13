@@ -17,7 +17,7 @@
         "ip": "127.0.0.1",
         "port": 7788
     },
-    "NetWoek": {
+    "NetWork": {
         "MsgTimeout": 0,
         "ReConnectTime": 5,
         "RecvBufferCount": 1024
@@ -36,7 +36,7 @@
     },
     "Redis": {
         "ip": "127.0.0.1",
-        "port": 5379,
+        "port": 6379,
         "timeout": 3,
         "passwd": ""
     },
@@ -58,7 +58,8 @@
         "ActionManager",
         "ServiceManager",
         "ThreadTaskManager",
-        "ServiceNodeManager"
+        "ServiceNodeManager",
+        "ScriptManager"
     ],
     "Service": [
         "MysqlProxy",

@@ -168,6 +168,31 @@ namespace Sentry
         return true;
     }
 
+    bool ServerConfig::GetValue(const std::string k1, const std::string k2, std::vector<std::string> & value)
+    {
+        rapidjson::Value *json = this->GetJsonValue(k1);
+        if (json == nullptr || !json->IsObject())
+        {
+            return false;
+        }
+        auto iter = json->FindMember(k2.c_str());
+        if(iter == json->MemberEnd() || !iter->value.IsArray())
+        {
+            return false;
+        }
+
+        for(auto iter1 = iter->value.Begin(); iter1 != iter->value.End(); iter1++)
+        {
+            if(!iter1->IsString())
+            {
+                return false;
+            }
+            value.push_back(iter1->GetString());
+        }
+
+        return true;
+    }
+
     bool ServerConfig::GetValue(const std::string k1, const std::string k2, std::string &value)
     {
         rapidjson::Value  * json = this->GetJsonValue(k1);
