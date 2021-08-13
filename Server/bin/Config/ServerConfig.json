@@ -17,23 +17,22 @@
         "ip": "127.0.0.1",
         "port": 7788
     },
-    "NetWoek":
-    {
-        "MsgTimeout":0,
-        "ReConnectTime":5,
-        "RecvBufferCount":1024
+    "NetWoek": {
+        "MsgTimeout": 0,
+        "ReConnectTime": 5,
+        "RecvBufferCount": 1024
     },
     "IsOpenRecoder": true,
     "CommandPort": 1020,
     "ThreadCount": 0,
     "CoroutinePoolMaxSize": 100,
     "Mysql": {
-        "ip": "",
+        "ip": "101.36.127.23",
         "port": 3306,
         "user": "yjz",
         "passwd": "yjz199595",
         "db": "player_db",
-        "sql":"./sql/sql.json"
+        "sql": "./sql/sql.json"
     },
     "Redis": {
         "ip": "127.0.0.1",
@@ -41,12 +40,14 @@
         "timeout": 3,
         "passwd": ""
     },
-    "ScriptMain": "./Script/Server/Main.lua",
-    "ScriptInclude": [
-        "./Script/Common",
-        "./Script/Server",
-        "./Script/Server/Service"
-    ],
+    "Script": {
+        "main": "./Script/Server/Main.lua",
+        "include": [
+            "./Script/Common",
+            "./Script/Server",
+            "./Script/Server/Service"
+        ]
+    },
     "Managers": [
         "NetProxyManager",
         "NetSessionManager",

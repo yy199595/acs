@@ -41,16 +41,14 @@ namespace Sentry
 
     bool MysqlManager::OnInit()
     {
-        std::string mysqlAddress;
         SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
         SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
-
-        this->GetConfig().GetValue("Mysql", "ip", this->mMysqlIp);
-        this->GetConfig().GetValue("Mysql", "port",this->mMysqlPort);
-        this->GetConfig().GetValue("Mysql","user",this->mDataBaseUser);
-        this->GetConfig().GetValue("Mysql","passwd",this->mDataBasePasswd);
-        this->GetConfig().GetValue("Mysql","db",this->mDataBaseName);
-        this->GetConfig().GetValue("Mysql", "sql", this->mSqlTablePath);
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql", "ip", this->mMysqlIp));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql", "port",this->mMysqlPort));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql","user",this->mDataBaseUser));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql","passwd",this->mDataBasePasswd));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql","db",this->mDataBaseName));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Mysql", "sql", this->mSqlTablePath));
 
         SayNoAssertRetFalse_F(this->StartConnectMysql());
         SayNoAssertRetFalse_F(this->InitMysqlTable());

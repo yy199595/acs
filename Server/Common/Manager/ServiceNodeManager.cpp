@@ -67,10 +67,11 @@ namespace Sentry
 
     bool ServiceNodeManager::OnInit()
     {
-        std::string queryAddress;
-        SayNoAssertRetFalse_F(this->GetConfig().GetValue("QueryAddress", queryAddress));
+        this->GetConfig().GetValue("CenterAddress", "ip", this->mCenterIp);
+        this->GetConfig().GetValue("CenterAddress", "port", this->mCenterPort);
+        this->mCenterAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
         SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetManager<NetSessionManager>());
-        ServiceNode *centerNode = new ServiceNode(0, 0, "Center", queryAddress);
+        ServiceNode *centerNode = new ServiceNode(0, 0, "Center", this->mCenterAddress);
         return centerNode->AddService(std::string("ServiceRegistry")) && this->AddServiceNode(centerNode);
     }
 

@@ -18,20 +18,19 @@ namespace Sentry
 
     bool RedisManager::OnInit()
     {
-        std::string redisAddress;
-
         SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
         SayNoAssertRetFalse_F(this->mTaskManager = this->GetManager<ThreadTaskManager>());
 
-        SayNoAssertRetFalse_F(this->GetConfig().GetValue("RedisAddress", redisAddress));
-        SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(redisAddress, mRedisIp, mRedisPort));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Redis", "ip",this->mRedisIp));
+        SayNoAssertRetFalse_F(this->GetConfig().GetValue("Redis", "port",this->mRedisPort));
 
         struct timeval tv;
         tv.tv_sec = 3;
         tv.tv_usec = tv.tv_sec * 1000;
-        //if (this->GetConfig().GetValue("RedisTimeout", (int)tv.tv_sec))
+        int second = 0;
+        if (this->GetConfig().GetValue("Redis","timeout", second))
         {
-            tv.tv_usec = tv.tv_sec * 1000;
+            tv.tv_usec = second * 1000;
         }
 
         int count = this->mTaskManager->GetThreadCount();

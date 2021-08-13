@@ -184,7 +184,7 @@ namespace Sentry
         return true;
     }
 
-    bool ServerConfig::GetValue(const std::string k1, const std::string k2, unsigned short value)
+    bool ServerConfig::GetValue(const std::string k1, const std::string k2, unsigned short & value)
     {
         rapidjson::Value  * json = this->GetJsonValue(k1);
         if(json== nullptr || !json->IsObject())
@@ -192,7 +192,7 @@ namespace Sentry
             return false;
         }
         auto iter = json->FindMember(k2.c_str());
-        if(iter == json->MemberEnd() || !iter->value.IsString())
+        if(iter == json->MemberEnd() || !iter->value.IsInt())
         {
             return false;
         }

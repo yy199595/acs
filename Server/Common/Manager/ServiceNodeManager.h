@@ -35,8 +35,10 @@ namespace Sentry
         ServiceNode *GetNodeByServiceName(const std::string &service);
 
     private:
+        std::string mCenterIp;
+        unsigned short mCenterPort;
+        std::string mCenterAddress;
         class NetSessionManager *mNetWorkManager;
-
         std::list<ServiceNode *> mServiceNodeArray;
         std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
         std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;

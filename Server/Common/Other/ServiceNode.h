@@ -13,7 +13,6 @@ namespace Sentry
     {
     public:
         ServiceNode(int areaId, int nodeId, const std::string name, const std::string address);
-
     public:
         const int GetAreaId() { return this->mNodeInfoMessage.areaid(); }
 
