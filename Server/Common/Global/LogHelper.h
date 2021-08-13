@@ -1,12 +1,14 @@
 #pragma once
+#include <unordered_map>
 #include<spdlog/spdlog.h>
 #include<Define/CommonTypeDef.h>
 #include<spdlog/sinks/basic_file_sink.h>
 #include<spdlog/sinks/stdout_color_sinks.h>
 namespace Sentry
 {
-	using ELogType = spdlog::level::level_enum;
+	//using ELogType = spdlog::level::level_enum;
 
+	typedef spdlog::level::level_enum ELogType;
 	class LogConsole
 	{
 	public:
@@ -50,8 +52,7 @@ namespace Sentry
 namespace Sentry
 {
 
-	class LogHelper
-	{
+	class LogHelper {
 	public:
 		LogHelper(const std::string path, const std::string name);
 		~LogHelper() { }
@@ -62,7 +63,7 @@ namespace Sentry
 	private:
 		std::string mLogPath;
 		std::shared_ptr<spdlog::logger> mLogger;
-		std::unordered_map<ELogType, LogConsole *> mLoggerMap;
+		std::unordered_map<int , LogConsole *> mLoggerMap;
 	private:
 		static LogHelper * mLogHelper;
 	};

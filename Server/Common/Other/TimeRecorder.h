@@ -1,6 +1,7 @@
 #pragma once
 
 #include <XCode/XCode.h>
+#include <string>
 #include <cstring>
 #include <unordered_map>
 
