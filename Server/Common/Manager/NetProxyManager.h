@@ -18,7 +18,7 @@ namespace Sentry
     public:
         bool AddNetSessionEvent(Net2MainEvent *eve); //不要手动调用
     public:
-        bool DescorySession(const std::string &address);
+        bool DestorySession(const std::string &address);
 
         bool SendMsgByAddress(const std::string &address, NetMessageProxy *msg);
 

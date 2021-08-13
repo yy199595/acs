@@ -14,7 +14,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool NetProxyManager::DescorySession(const std::string &address)
+	bool NetProxyManager::DestorySession(const std::string &address)
 	{
 		Main2NetEvent *eve = new Main2NetEvent(SocketDectoryEvent, address);
 		return this->mNetWorkManager->AddNetSessionEvent(eve);
