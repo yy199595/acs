@@ -20,71 +20,69 @@
 #define CoroutinePoolMaxCount 100    //协程池最大数量
 namespace Sentry
 {
-				struct Coroutine;
+    struct Coroutine;
 
-				class CoroutineManager : public Manager, public ISystemUpdate, public IFrameUpdate
-				{
-				public:
-								CoroutineManager();
+    class CoroutineManager : public Manager, public IFrameUpdate
+    {
+    public:
+        CoroutineManager();
 
-				public:
-								long long Start(CoroutineAction func);
+    public:
+        long long Start(CoroutineAction func);
 
-								long long Create(CoroutineAction func);
+        long long Create(CoroutineAction func);
 
-				public:
-								void YieldReturn();
+    public:
+        void YieldReturn();
 
-								void Sleep(long long ms);
+        void Sleep(long long ms);
 
-								void Resume(long long id);
+        void Resume(long long id);
 
-				protected:
-								bool OnInit() final;
+    protected:
+        bool OnInit() final;
 
-								void OnInitComplete() final;
+        void OnInitComplete() final;
 
-								void OnSystemUpdate() final;                    //处理系统事件
-								void OnFrameUpdate(float t) final;
+        void OnFrameUpdate(float t) final;
 
-				public:
-								long long GetNowTime();
+    public:
+        long long GetNowTime();
 
-								void Destory(long long id);
+        void Destory(long long id);
 
-								Coroutine *GetCoroutine();
+        Coroutine *GetCoroutine();
 
-								Coroutine *GetCoroutine(long long id);
+        Coroutine *GetCoroutine(long long id);
 
-								long long GetCurrentCorId()
-								{ return this->mCurrentCorId; }
+        long long GetCurrentCorId()
+        { return this->mCurrentCorId; }
 
-								bool IsInMainCoroutine()
-								{ return this->mCurrentCorId == 0; }
+        bool IsInMainCoroutine()
+        { return this->mCurrentCorId == 0; }
 
-								bool IsInLogicCoroutine()
-								{ return this->mCurrentCorId != 0; }
+        bool IsInLogicCoroutine()
+        { return this->mCurrentCorId != 0; }
 
-				private:
-								void SaveStack(Coroutine *, char *top);
+    private:
+        void SaveStack(Coroutine *, char *top);
 
-				private:
-								std::string mMessageBuffer;
+    private:
+        std::string mMessageBuffer;
 
-								class TimerManager *mTimerManager;
+        class TimerManager *mTimerManager;
 
-				private:
-								long long mCurrentCorId;
+    private:
+        long long mCurrentCorId;
 #ifndef _WIN32
-								ucontext_t mMainContext;
+        ucontext_t mMainContext;
 #else
-								void *mMainCoroutineStack;
+        void *mMainCoroutineStack;
 #endif
-								int mCoroutinePoolMaxSize;  //协程池默认数量
-								char mSharedStack[STACK_SIZE];
-								std::queue<long long> mWakeUpCoroutine;
-								std::queue<Coroutine *> mCoroutinePool;
-								std::queue<Coroutine *> mDestoryCoroutine;
-								std::unordered_map<long long, Coroutine *> mCoroutineMap;
-				};
+        int mCoroutinePoolMaxSize;  //协程池默认数量
+        char mSharedStack[STACK_SIZE];
+        std::queue<Coroutine *> mCoroutinePool;
+        std::queue<Coroutine *> mDestoryCoroutine;
+        std::unordered_map<long long, Coroutine *> mCoroutineMap;
+    };
 }

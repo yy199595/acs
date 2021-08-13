@@ -2,6 +2,15 @@
 
 #include<functional>
 
+#ifndef _WIN32
+#if __APPLE__
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+#endif
+#include<ucontext.h>
+#endif
+
 #ifdef _WIN32
 #define STACK_SIZE 1024 * 2
 #else

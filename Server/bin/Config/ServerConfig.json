@@ -3,26 +3,44 @@
     "NodeId": 1,
     "LogicFps": 30,
     "SystemFps": 100,
-    "MsgTimeout": 0,
-    "NodeName":"Server",
+    "NodeName": "Server",
     "rpc": "./Rpc/rpc.csv",
-    "ProxyAddress": "127.0.0.1:1995",
-    "QueryAddress": "127.0.0.1:7788",
-    "ListenAddress": "127.0.0.1:7788",
-    "RecvBuffCount": 1024,
+    "ProxyAddress": {
+        "ip": "127.0.0.1",
+        "port": 1995
+    },
+    "CenterAddress": {
+        "ip": "127.0.0.1",
+        "port": 7788
+    },
+    "ListenAddress": {
+        "ip": "127.0.0.1",
+        "port": 7788
+    },
+    "NetWoek":
+    {
+        "MsgTimeout":0,
+        "ReConnectTime":5,
+        "RecvBufferCount":1024
+    },
     "IsOpenRecoder": true,
     "CommandPort": 1020,
-    "RedisTimeout": 3,
-    "RedisPasswd": "",
-    "RedisAddress": "127.0.0.1:6379",
-    "SqlTable": "./sql/sql.json",
-    "MysqlDbName": "player_db",
-    "MysqlAddress": "101.36.127.23:3306",
-    "MysqlUserName": "yjz",
     "ThreadCount": 0,
-    "ReConnectTime": 5,
     "CoroutinePoolMaxSize": 100,
-    "MysqlPassWord": "yjz199595",
+    "Mysql": {
+        "ip": "",
+        "port": 3306,
+        "user": "yjz",
+        "passwd": "yjz199595",
+        "db": "player_db",
+        "sql":"./sql/sql.json"
+    },
+    "Redis": {
+        "ip": "127.0.0.1",
+        "port": 5379,
+        "timeout": 3,
+        "passwd": ""
+    },
     "ScriptMain": "./Script/Server/Main.lua",
     "ScriptInclude": [
         "./Script/Common",

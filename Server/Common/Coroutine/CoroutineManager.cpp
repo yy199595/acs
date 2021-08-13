@@ -63,15 +63,6 @@ namespace Sentry
 
     }
 
-    void CoroutineManager::OnSystemUpdate()
-    {
-      while (!this->mWakeUpCoroutine.empty())
-      {
-        this->Resume(this->mWakeUpCoroutine.front());
-        this->mWakeUpCoroutine.pop();
-      }
-    }
-
     long long CoroutineManager::Start(CoroutineAction func)
     {
       long long id = this->Create(func);
@@ -115,8 +106,8 @@ namespace Sentry
     {
       if (this->mCurrentCorId != 0)
       {
-        this->mWakeUpCoroutine.push(id);
-        return;
+          SayNoDebugError("logic error");
+          return;
       }
       Coroutine *pCoroutine = this->GetCoroutine(id);
       if (pCoroutine != nullptr)

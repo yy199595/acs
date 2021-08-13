@@ -29,7 +29,7 @@ namespace Sentry
         struct timeval tv;
         tv.tv_sec = 3;
         tv.tv_usec = tv.tv_sec * 1000;
-        if (this->GetConfig().GetValue("RedisTimeout", tv.tv_sec))
+        //if (this->GetConfig().GetValue("RedisTimeout", (int)tv.tv_sec))
         {
             tv.tv_usec = tv.tv_sec * 1000;
         }
