@@ -129,7 +129,6 @@ namespace Sentry
             manager->OnInitComplete();
         }
 
-        SayNoDebugLog("=====  start " << this->mServerName << " successful  ========");
 
         this->mNetWorkThread = new std::thread(std::bind(BIND_THIS_ACTION_0(Applocation::NetworkLoop)));
 
@@ -137,6 +136,11 @@ namespace Sentry
         {
             this->mMainThreadId = std::this_thread::get_id();
             this->mNetWorkThreadId = this->mNetWorkThread->get_id();
+
+            SayNoDebugLog("=====  start " << this->mServerName << " successful  ========");
+            SayNoDebugInfo(
+                    "main thread : [" << this->mMainThreadId << "]  " << "net thread : [" << this->mNetWorkThreadId
+                                      << "]");
             return true;
         }
         return false;
@@ -242,8 +246,8 @@ namespace Sentry
         std::chrono::milliseconds time(1);
         while (this->mIsClose == false)
         {
-            std::this_thread::sleep_for(time);
             mAsioContext.poll();
+            std::this_thread::sleep_for(time);
             for (size_t index = 0; index < this->mNetSystemUpdateManagers.size(); index++)
             {
                 INetSystemUpdate *manager = this->mNetSystemUpdateManagers[index];

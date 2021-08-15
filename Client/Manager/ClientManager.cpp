@@ -13,121 +13,78 @@
 
 namespace Client
 {
-				bool ClientManager::OnInit()
-				{
-								SayNoAssertRetFalse_F(this->GetConfig().GetValue("ListenAddress", this->mAddress));
-								SayNoAssertRetFalse_F(this->mCoroutineManager = this->GetManager<CoroutineManager>());
-								SayNoAssertRetFalse_F(StringHelper::ParseIpAddress(this->mAddress, this->mConnectIp, this->mConnectPort));
+    bool ClientManager::OnInit()
+    {
+        this->GetConfig().GetValue("ListenAddress", "ip", this->mConnectIp);
+        this->GetConfig().GetValue("ListenAddress", "port", this->mConnectPort);
+        this->mCoroutineManager = this->GetManager<CoroutineManager>();
+        return NetProxyManager::OnInit();;
+    }
 
-								return NetProxyManager::OnInit();;
-				}
+    void ClientManager::OnInitComplete()
+    {
+        this->ConnectByAddress(this->mAddress, "GateServer");
+        this->mCoroutineManager->Start(BIND_THIS_ACTION_0(ClientManager::InvokeAction));
+    }
 
-				void ClientManager::OnInitComplete()
-				{
-								this->ConnectByAddress(this->mAddress, "GateServer");
-								this->mCoroutineManager->Start(BIND_THIS_ACTION_0(ClientManager::InvokeAction));
-				}
+    void ClientManager::OnFrameUpdate(float t)
+    {
+        if (!this->mWaitSendMessages.empty())
+        {
+            TcpProxySession *tcpSession = this->GetProxySession(this->mAddress);
+            if (tcpSession != nullptr)
+            {
+                NetMessageProxy *messageData = this->mWaitSendMessages.front();
+                tcpSession->SendMessageData(messageData);
+                this->mWaitSendMessages.pop();
+            }
+        }
+    }
 
-				void ClientManager::OnFrameUpdate(float t)
-				{
-								if (!this->mWaitSendMessages.empty())
-								{
-												TcpProxySession *tcpSession = this->GetProxySession(this->mAddress);
-												if (tcpSession != nullptr)
-												{
-																NetMessageProxy *messageData = this->mWaitSendMessages.front();
-																tcpSession->SendMessageData(messageData);
-																this->mWaitSendMessages.pop();
-												}
-								}
-				}
+    XCode ClientManager::Notice(const std::string &service, const std::string &method)
+    {
+        return XCode();
+    }
 
-				XCode ClientManager::Notice(const std::string &service, const std::string &method)
-				{
-								return XCode();
-				}
+    XCode ClientManager::Notice(const std::string &service, const std::string &method, const Message &request)
+    {
+        return XCode();
+    }
 
-				XCode ClientManager::Notice(const std::string &service, const std::string &method, const Message &request)
-				{
-								return XCode();
-				}
+    XCode ClientManager::Invoke(const std::string &service, const std::string &method)
+    {
+        return XCode();
+    }
 
-				XCode ClientManager::Invoke(const std::string &service, const std::string &method)
-				{
-								return XCode();
-				}
+    XCode ClientManager::Invoke(const std::string &service, const std::string &method, const Message &request)
+    {
+        return XCode();
+    }
 
-				XCode ClientManager::Invoke(const std::string &service, const std::string &method, const Message &request)
-				{
-								return XCode();
-				}
-
-				XCode ClientManager::Call(const std::string &service, const std::string &method, Message &response)
-				{
-								NetMessageProxy *messageData = GnetPacketPool.Create();
-								messageData->set_service(service);
-								messageData->set_method(method);
+    XCode ClientManager::Call(const std::string &service, const std::string &method, Message &response)
+    {
 
 
-								return XCode();
-				}
+        return XCode();
+    }
 
-				XCode ClientManager::Call(const std::string &service, const std::string &method, const Message &request,
-				                          Message &response)
-				{
-								NetMessageProxy *messageData = GnetPacketPool.Create();
-								ActionManager *pActionManager = this->GetManager<ActionManager>();
-								if (messageData == nullptr)
-								{
-												return XCode::Failure;
-								}
-								messageData->set_method(method);
-								messageData->set_service(service);
-								messageData->set_messagedata(request.SerializeAsString());
+    XCode ClientManager::Call(const std::string &service, const std::string &method, const Message &request,
+                              Message &response)
+    {
+        return XCode::Successful;
+    }
 
-								shared_ptr<NetWorkWaitCorAction> rpcCallback = NetWorkWaitCorAction::Create(this->mCoroutineManager);
-								if (rpcCallback != nullptr)
-								{
-#ifdef SOEASY_DEBUG
-												rpcCallback->mMethod = method;
-												rpcCallback->mService = service;
-#endif
-												messageData->set_rpcid(pActionManager->AddCallback(rpcCallback));
-								}
-								this->mWaitSendMessages.push(messageData);
-								this->mCoroutineManager->YieldReturn();
-								response.ParseFromString(rpcCallback->GetMsgData());
-								return rpcCallback->GetCode();
+    void ClientManager::InvokeAction()
+    {
 
-				}
+        s2s::MysqlQuery_Request requestData;
+        s2s::MysqlQuery_Response responseData;
 
-				void ClientManager::InvokeAction()
-				{
+        db::UserAccountData userAccountData;
 
-								s2s::MysqlQuery_Request requestData;
-								s2s::MysqlQuery_Response responseData;
+        userAccountData.set_userid(13716061995);
 
-								db::UserAccountData userAccountData;
-
-								userAccountData.set_userid(13716061995);
-
-								requestData.set_protocolname(userAccountData.GetTypeName());
-								requestData.set_protocolmessage(userAccountData.SerializeAsString());
-
-								while (true)
-								{
-												XCode code = this->Call("MysqlProxy", "QueryData", requestData, responseData);
-												if (code != XCode::Successful)
-												{
-																const std::string &err = responseData.errotstr();
-																SayNoDebugError(err);
-												}
-												for (int index = 0; index < responseData.querydatas_size(); index++)
-												{
-																const std::string &value = responseData.querydatas(index);
-																userAccountData.ParseFromString(value);
-																SayNoDebugLogProtocBuf(userAccountData);
-												}
-								}
-				}
+        requestData.set_protocolname(userAccountData.GetTypeName());
+        requestData.set_protocolmessage(userAccountData.SerializeAsString());
+    }
 }
