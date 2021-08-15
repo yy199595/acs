@@ -23,6 +23,7 @@ namespace Client
 
     void ClientManager::OnInitComplete()
     {
+        this->mAddress = this->mConnectIp + ":" + std::to_string(this->mConnectPort);
         this->ConnectByAddress(this->mAddress, "GateServer");
         this->mCoroutineManager->Start(BIND_THIS_ACTION_0(ClientManager::InvokeAction));
     }
