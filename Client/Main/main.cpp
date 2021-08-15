@@ -1,14 +1,16 @@
 ﻿#include<Core/Applocation.h>
 #include<Object/ObjectRegistry.h>
 #include<Manager/ScriptManager.h>
-#include<Manager/TimerManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
 #include<Manager/ServiceManager.h>
 #include<Manager/ServiceNodeManager.h>
-#include"Manager/ClientManager.h"
 #include<Coroutine/CoroutineManager.h>
 #include<Manager/NetProxyManager.h>
+#include <Timer/TimerManager.h>
+#include "ClientManager.h"
+
+#include <Manager/ProtocolManager.h>
 
 using namespace Sentry;
 using namespace Client;
@@ -30,6 +32,7 @@ int main(int argc, char ** argv)
 	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
 	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
 	ObjectRegistry<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
+	ObjectRegistry<Manager>::Register<ProtocolManager>("ProtocolManager");
 
 	
 

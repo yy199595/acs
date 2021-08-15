@@ -7,18 +7,30 @@
     "SystemFps":100,
     "RecvBuffCount": 1024,
     "ReConnectTime":3,
-    "ListenAddress": "127.0.0.1:7788",
-    "ScriptMain":"./Script/Client/Main.lua",
-    "ScriptInclude":
-    [
-        "./Script/Common",
-        "./Script/Client",
-        "./Script/Client/Manager"
-    ],
+    "rpc":"./Rpc/rpc.csv",
+    "Script":
+    {
+        "main":"./Script/Client/Main.lua",
+        "include":
+        [
+            "./Script/Common",
+            "./Script/Client",
+            "./Script/Client/Manager"    
+        ]
+    },
     "Service":
     [
 
     ],
+    "ListenAddress": {
+        "ip": "127.0.0.1",
+        "port": 7788
+    },
+    "NetWork": {
+        "MsgTimeout": 0,
+        "ReConnectTime": 5,
+        "RecvBufferCount": 1024
+    },
     "Managers": [
         "ClientManager",
         "ActionManager",
