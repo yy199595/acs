@@ -1,6 +1,6 @@
 ﻿
 #include "Applocation.h"
-#include "ObjectRegistry.h"
+#include <Object/ObjectRegistry.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
 #include <Manager/NetSessionManager.h>

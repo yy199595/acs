@@ -36,6 +36,8 @@ include_directories(${PROJECT_INIT_PATH}/Protocol)
 include_directories(${PROJECT_SOURCE_DIR})
 aux_source_directory(${PROJECT_SOURCE_DIR}/Manager SUPER_SRC)
 
+aux_source_directory(${PROJECT_INIT_PATH}/Protocol/Protocol SUPER_SRC)
+
 aux_source_directory(${PROJECT_SOURCE_DIR}/Main SUPER_SRC)
 LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
 
@@ -61,7 +63,7 @@ if(MSVC)
     ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf)
 else()
-    ADD_EXECUTABLE(Client ${MainSource} ${SUPER_SRC})
+    ADD_EXECUTABLE(Client ${SUPER_SRC})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
 endif()
 
