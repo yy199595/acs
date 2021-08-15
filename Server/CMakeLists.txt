@@ -47,8 +47,6 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Script CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Service CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Pool CommonSource)
 
-AUTOGEN_SOURCE_GROUP()
-
 include_directories(${PROJECT_SOURCE_DIR}/../Protocol)
 include_directories(${PROJECT_SOURCE_DIR}/../Protocol/XCode)
 include_directories(${PROJECT_SOURCE_DIR}/../Protocol/Protocol)
