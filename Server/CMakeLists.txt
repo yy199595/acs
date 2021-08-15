@@ -13,6 +13,20 @@ include_directories(${PROJECT_SOURCE_DIR}/../Libs/include/spdlog)
 include_directories(${PROJECT_SOURCE_DIR}/../Libs/include/redis)
 #公共组件
 
+include_directories(${PROJECT_SOURCE_DIR}/../Protocol)
+include_directories(${PROJECT_SOURCE_DIR}/../Protocol/XCode)
+include_directories(${PROJECT_SOURCE_DIR}/../Protocol/Protocol)
+
+include_directories(${PROJECT_SOURCE_DIR}/Logic)
+include_directories(${PROJECT_SOURCE_DIR}/Logic/Manager)
+
+include_directories(${PROJECT_SOURCE_DIR}/DB)
+include_directories(${PROJECT_SOURCE_DIR}/DB/Service)
+include_directories(${PROJECT_SOURCE_DIR}/DB/Manager)
+include_directories(${PROJECT_SOURCE_DIR}/DB/MysqlClient)
+include_directories(${PROJECT_SOURCE_DIR}/DB/QueryResult)
+include_directories(${PROJECT_SOURCE_DIR}/DB/RedisClient)
+
 include_directories(${PROJECT_SOURCE_DIR}/../Common)
 include_directories(${PROJECT_SOURCE_DIR}/../Common/App)
 include_directories(${PROJECT_SOURCE_DIR}/../Common/Coroutine)
@@ -47,24 +61,11 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Script CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Service CommonSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Common/Pool CommonSource)
 
-include_directories(${PROJECT_SOURCE_DIR}/../Protocol)
-include_directories(${PROJECT_SOURCE_DIR}/../Protocol/XCode)
-include_directories(${PROJECT_SOURCE_DIR}/../Protocol/Protocol)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Protocol/XCode ProtocolSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/../Protocol/Protocol ProtocolSource)
 
-include_directories(${PROJECT_SOURCE_DIR}/Logic)
-include_directories(${PROJECT_SOURCE_DIR}/Logic/Manager)
-
 aux_source_directory(${PROJECT_SOURCE_DIR}/Logic/Manager LogicSource)
-
-include_directories(${PROJECT_SOURCE_DIR}/DB)
-include_directories(${PROJECT_SOURCE_DIR}/DB/Service)
-include_directories(${PROJECT_SOURCE_DIR}/DB/Manager)
-include_directories(${PROJECT_SOURCE_DIR}/DB/MysqlClient)
-include_directories(${PROJECT_SOURCE_DIR}/DB/QueryResult)
-include_directories(${PROJECT_SOURCE_DIR}/DB/RedisClient)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/DB/Service DBSource)
 aux_source_directory(${PROJECT_SOURCE_DIR}/DB/Manager DBSource)
@@ -86,6 +87,14 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_BUILD_TYPE Debug)
 
 ADD_EXECUTABLE(Server ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
-TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl ${MY_ADDLIB})
+
+if(MSVC)
+    TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql)
+else()
+    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl)
+endif()
+
+
+
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

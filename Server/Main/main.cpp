@@ -23,19 +23,6 @@
 using namespace Sentry;
 using namespace Sentry;
 
-#ifdef _WIN32
-#ifdef _MSC_VER
-#pragma comment(lib, "lua53.lib")
-#pragma comment(lib, "Common.lib")
-#pragma comment(lib, "hiredis.lib")
-#pragma comment(lib, "libmysql.lib")
-#pragma comment(lib, "DataBase.lib")
-#pragma comment(lib, "CoreLogic.lib")
-#pragma comment(lib, "ServerData.lib")
-#pragma comment(lib, "libprotobufd.lib")
-#endif
-#endif
-
 int main(int argc, char **argv)
 {
 
@@ -65,7 +52,6 @@ int main(int argc, char **argv)
     std::string serverName = argc == 3 ? argv[1] : "Server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";
 
-    //_CrtDumpMemoryLeaks();
     Applocation app(serverName, configPath);
 
     return app.Run();

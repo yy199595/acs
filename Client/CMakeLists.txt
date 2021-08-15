@@ -61,8 +61,12 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_BUILD_TYPE Debug)
 
 ADD_EXECUTABLE(Client ${SUPER_SRC})
-TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl ${MY_ADDLIB})
 
+if(MSVC)
+    TARGET_LINK_LIBRARIES(Client Lua53 protobuf)
+else()
+    TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
+endif()
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 
