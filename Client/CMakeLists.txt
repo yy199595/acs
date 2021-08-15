@@ -12,21 +12,7 @@ include_directories(${PROJECT_INIT_PATH}/Libs/include/spdlog)
 #公共组件
 
 include_directories(${PROJECT_INIT_PATH}/Common)
-include_directories(${PROJECT_INIT_PATH}/Common/Pool)
-include_directories(${PROJECT_INIT_PATH}/Common/Core)
-include_directories(${PROJECT_INIT_PATH}/Common/Coroutine)
-include_directories(${PROJECT_INIT_PATH}/Common/Define)
-include_directories(${PROJECT_INIT_PATH}/Common/Global)
-include_directories(${PROJECT_INIT_PATH}/Common/Manager)
-include_directories(${PROJECT_INIT_PATH}/Common/Module)
-include_directories(${PROJECT_INIT_PATH}/Common/NetWork)
-include_directories(${PROJECT_INIT_PATH}/Common/Object)
-include_directories(${PROJECT_INIT_PATH}/Common/Other)
-include_directories(${PROJECT_INIT_PATH}/Common/Thread)
-include_directories(${PROJECT_INIT_PATH}/Common/Timer)
-include_directories(${PROJECT_INIT_PATH}/Common/Util)
-include_directories(${PROJECT_INIT_PATH}/Common/Script)
-include_directories(${PROJECT_INIT_PATH}/Common/Service)
+
 
 aux_source_directory(${PROJECT_INIT_PATH}/Common/Core SUPER_SRC)
 aux_source_directory(${PROJECT_INIT_PATH}/Common/Pool SUPER_SRC)
@@ -45,13 +31,9 @@ aux_source_directory(${PROJECT_INIT_PATH}/Common/Script SUPER_SRC)
 aux_source_directory(${PROJECT_INIT_PATH}/Common/Service SUPER_SRC)
 
 include_directories(${PROJECT_INIT_PATH}/Protocol)
-include_directories(${PROJECT_INIT_PATH}/Protocol/XCode)
-include_directories(${PROJECT_INIT_PATH}/Protocol/Protocol)
 
-aux_source_directory(${PROJECT_INIT_PATH}/Protocol/XCode SUPER_SRC)
-aux_source_directory(${PROJECT_INIT_PATH}/Protocol/Protocol SUPER_SRC)
 
-include_directories(${PROJECT_SOURCE_DIR}/Manager)
+include_directories(${PROJECT_SOURCE_DIR})
 aux_source_directory(${PROJECT_SOURCE_DIR}/Manager SUPER_SRC)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/Main SUPER_SRC)
@@ -79,7 +61,7 @@ if(MSVC)
     ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf)
 else()
-    ADD_EXECUTABLE(Server ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
+    ADD_EXECUTABLE(Client ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
 endif()
 
