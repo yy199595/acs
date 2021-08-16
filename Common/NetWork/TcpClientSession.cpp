@@ -119,65 +119,67 @@ namespace Sentry
         this->mBinTcpSocket = nullptr;
     }
 
-    bool TcpClientSession::StartReceiveMsg()
-    {
-        if (this->IsActive() == false)
-        {
-            return false;
-        }
-        memset(this->mRecvMsgBuffer, 0, this->mRecvBufferSize);
-        this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
-                                             [this](const asio::error_code &error_code, const std::size_t t) {
-                                                 if (error_code)
-                                                 {
-                                                     this->StartClose();
-                                                     SayNoDebugError(error_code.message());
-                                                     this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
-                                                 } else
-                                                 {
-                                                     size_t packageSize = 0;
-                                                     memcpy(&packageSize, this->mRecvMsgBuffer, t);
-                                                     this->ReadMessageBody(packageSize);
-                                                 }
-                                             });
-        return true;
-    }
+	bool TcpClientSession::StartReceiveMsg()
+	{
+		if (this->IsActive() == false)
+		{
+			return false;
+		}
+		memset(this->mRecvMsgBuffer, 0, this->mRecvBufferSize);
+		this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
+			[this](const asio::error_code &error_code, const std::size_t t) {
+			if (error_code)
+			{
+				this->StartClose();
+				SayNoDebugError(error_code.message());
+				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+			}
+			else
+			{
+				size_t packageSize = 0;
+				memcpy(&packageSize, this->mRecvMsgBuffer, t);
+				this->ReadMessageBody(packageSize);
+			}
+		});
+		return true;
+	}
 
-    void TcpClientSession::ReadMessageBody(const size_t allSize)
-    {
-        char *nMessageBuffer = this->mRecvMsgBuffer;
-        if (allSize > this->mRecvBufferSize)
-        {
-            nMessageBuffer = new char[allSize];
-            if (nMessageBuffer == nullptr)
-            {
-                this->StartClose();
-                this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
-                return;
-            }
-        }
+	void TcpClientSession::ReadMessageBody(const size_t allSize)
+	{
+		char *nMessageBuffer = this->mRecvMsgBuffer;
+		if (allSize > this->mRecvBufferSize)
+		{
+			nMessageBuffer = new char[allSize];
+			if (nMessageBuffer == nullptr)
+			{
+				this->StartClose();
+				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+				return;
+			}
+		}
 
-        this->mBinTcpSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),
-                                             [this, nMessageBuffer](const asio::error_code &error_code,
-                                                                    const std::size_t messageSize) {
-                                                 if (error_code)
-                                                 {
-                                                     this->StartClose();
-                                                     SayNoDebugError(error_code.message());
-                                                     this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
-                                                 } else
-                                                 {
-                                                     if (!this->mDispatchManager->OnRecvMessage(this, nMessageBuffer,
-                                                                                                messageSize))
-                                                     {
-                                                         this->StartClose();
-                                                         SayNoDebugError("parse message fail close socket " << mAdress);
-                                                     }
-                                                 }
-                                                 if (nMessageBuffer != this->mRecvMsgBuffer)
-                                                 {
-                                                     delete[]nMessageBuffer;
-                                                 }
-                                             });
-    }
+		this->mBinTcpSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),
+			[this, nMessageBuffer](const asio::error_code &error_code,
+				const std::size_t messageSize) {
+			if (error_code)
+			{
+				this->StartClose();
+				SayNoDebugError(error_code.message());
+				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+			}
+			else
+			{
+				if (!this->mDispatchManager->OnRecvMessage(this, nMessageBuffer,
+					messageSize))
+				{
+					this->StartClose();
+					SayNoDebugError("parse message fail close socket " << mAdress);
+				}
+			}
+			if (nMessageBuffer != this->mRecvMsgBuffer)
+			{
+				delete[]nMessageBuffer;
+			}
+		});
+	}
 }

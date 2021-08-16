@@ -37,6 +37,7 @@ namespace Sentry
 #ifdef _WIN32
         this->mMainCoroutineStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #endif
+		this->mCurrentCorId = 0;
     }
 
     bool CoroutineManager::OnInit()
@@ -107,7 +108,7 @@ namespace Sentry
     {
         if (this->mCurrentCorId != 0)
         {
-            SayNoDebugError("logic error");
+            SayNoDebugFatal("logic error");
             return;
         }
         Coroutine *pCoroutine = this->GetCoroutine(id);

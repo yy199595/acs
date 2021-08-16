@@ -11,6 +11,7 @@ namespace Sentry
         return offset <= maxsize;
     }
 
+
     NetMessageProxy::NetMessageProxy(NetMessageType type)
             : mMsgType(type)
     {
@@ -47,7 +48,7 @@ namespace Sentry
 
         NetMessageType messageType = (NetMessageType) message[0];
 
-        //SayNoAssertRetNull_F(MemoryCopy(actionid, message, offset, size));
+        SayNoAssertRetNull_F(MemoryCopy(&actionid, message, offset, size));
         config = pProtocolMgr->GetProtocolConfig(actionid);
         SayNoAssertRetNull_F(config);
 
@@ -183,19 +184,21 @@ namespace Sentry
         {
             return 0;
         }
-        size_t offset = sizeof(unsigned int);
-        memcpy(buffer, &this->mProConfig->MethodId, sizeof(this->mProConfig->MethodId));
-        offset += sizeof(this->mProConfig->MethodId);
+		size_t offset = sizeof(unsigned int);
+		unsigned char type = (unsigned char)this->mMsgType;  
+		memcpy(buffer + offset, &type, sizeof(type)); offset += sizeof(type);
+		memcpy(buffer + offset, &mProConfig->MethodId, sizeof(this->mProConfig->MethodId));
+
+		offset += sizeof(this->mProConfig->MethodId);
+
         if (this->mRpcId != 0)
-        {
-            memcpy(buffer, &this->mRpcId, sizeof(this->mRpcId));
-            offset += sizeof(this->mRpcId);
+        {          	
+			memcpy(buffer + offset, &mRpcId, sizeof(mRpcId)); offset += sizeof(mRpcId);
         }
         if (this->mUserId != 0)
         {
-            memcpy(buffer, &this->mUserId, sizeof(this->mUserId));
-            offset += sizeof(this->mUserId);
-        }
+			memcpy(buffer + offset, &mUserId, sizeof(mUserId)); offset += sizeof(mUserId);
+        }	
         memcpy(buffer + offset, this->mMessageData.c_str(), this->mMessageData.size());
         offset += this->mMessageData.size();
         memcpy(buffer, &offset, sizeof(unsigned int));
