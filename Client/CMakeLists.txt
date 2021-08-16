@@ -46,7 +46,7 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 if(MSVC)
     
-    message("currentdir = " ${PROJECT_SOURCE_DIR} " last dir = " ${PROJECT_INIT_PATH})
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/CMakeFiles)
     file(GLOB_RECURSE ClientFiles ${CMAKE_CURRENT_SOURCE_DIR} "*.h" "*.cpp")

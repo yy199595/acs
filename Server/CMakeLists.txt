@@ -61,7 +61,8 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_BUILD_TYPE Debug)
 
 if(MSVC)
-    
+
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     message("currentdir = " ${PROJECT_SOURCE_DIR} " last dir = " ${PROJECT_INIT_PATH})
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/CMakeFiles)
