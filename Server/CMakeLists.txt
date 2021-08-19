@@ -60,8 +60,8 @@ SET(CMAKE_CXX_STANDARD 11)
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-if(MSVC)
 
+if(MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     message("currentdir = " ${PROJECT_SOURCE_DIR} " last dir = " ${PROJECT_INIT_PATH})
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -77,13 +77,13 @@ if(MSVC)
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 
-    ADD_EXECUTABLE(Server ${CommonFiles} ${ServerFiles})
+    ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql)
 else()
-    ADD_EXECUTABLE(Server ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
+    ADD_EXECUTABLE(Server ${AsmFiles} ${MainSource} ${CommonSource} ${ProtocolSource} ${LogicSource} ${DBSource})
     TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl)
 endif()
-
+message("asm files = " ${AsmFiles})
 SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

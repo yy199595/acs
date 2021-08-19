@@ -7,6 +7,21 @@ file(GLOB_RECURSE ProtocolSrc ${CMAKE_CURRENT_SOURCE_DIR} "Protocol/*.h" "Protoc
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 
 set(PROJECT_INIT_PATH ${PROJECT_SOURCE_DIR})
+set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Coroutine/Context)
+if(WIN32)
+	SET(AsmFiles ${ContextPath}/context_x64.asm)
+	 if(MSVC)
+        if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+            set(AsmFiles ${ContextPath}/context_x86.asm)
+        endif()
+        set_property(SOURCE ${AsmFiles} PROPERTY LANGUAGE ASM_MASM)
+    else()
+        set(AsmFiles ${ContextPath}//context.S)
+    endif()
+else()
+	SET(AsmFiles ${ContextPath}/context.S)
+endif()
+
 
 macro(source_group_by_dir dir source_files)
     if(MSVC)
