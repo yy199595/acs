@@ -1,5 +1,5 @@
 ﻿#include<Core/Applocation.h>
-#include<Object/ObjectRegistry.h>
+#include<Object/ReflectHelper.h>
 #include<Manager/ScriptManager.h>
 #include<Manager/NetSessionManager.h>
 #include<Manager/ActionManager.h>
@@ -17,16 +17,16 @@ using namespace Client;
 
 int main(int argc, char ** argv)
 {
-	ObjectRegistry<Manager>::Register<TimerManager>("TimerManager");
-	ObjectRegistry<Manager>::Register<ClientManager>("ClientManager");
-	ObjectRegistry<Manager>::Register<ScriptManager>("ScriptManager");
-	ObjectRegistry<Manager>::Register<ActionManager>("ActionManager");
-	ObjectRegistry<Manager>::Register<ServiceManager>("ServiceManager");
-	ObjectRegistry<Manager>::Register<NetProxyManager>("NetProxyManager");
-	ObjectRegistry<Manager>::Register<CoroutineManager>("CoroutineManager");
-	ObjectRegistry<Manager>::Register<NetSessionManager>("NetSessionManager");
-	ObjectRegistry<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
-	ObjectRegistry<Manager>::Register<ProtocolManager>("ProtocolManager");
+	ReflectHelper<Manager>::Register<TimerManager>("TimerManager");
+	ReflectHelper<Manager>::Register<ClientManager>("ClientManager");
+	ReflectHelper<Manager>::Register<ScriptManager>("ScriptManager");
+	ReflectHelper<Manager>::Register<ActionManager>("ActionManager");
+	ReflectHelper<Manager>::Register<ServiceManager>("ServiceManager");
+	ReflectHelper<Manager>::Register<NetProxyManager>("NetProxyManager");
+	ReflectHelper<Manager>::Register<CoroutineManager>("CoroutineManager");
+	ReflectHelper<Manager>::Register<NetSessionManager>("NetSessionManager");
+	ReflectHelper<Manager>::Register<ServiceNodeManager>("ServiceNodeManager");
+	ReflectHelper<Manager>::Register<ProtocolManager>("ProtocolManager");
 
 	
 

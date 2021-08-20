@@ -2,7 +2,7 @@
 #include <Service/LocalLuaService.h>
 #include <Service/LocalService.h>
 
-#include <Object/ObjectRegistry.h>
+#include <Object/ReflectHelper.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
 #include <Util/StringHelper.h>
@@ -161,7 +161,7 @@ namespace Sentry
         for (size_t index = 0; index < this->mServiceList.size(); index++)
         {
             const std::string &name = this->mServiceList[index];
-            LocalService *localService = ObjectRegistry<LocalService>::Create(name);
+            LocalService *localService = ReflectHelper<LocalService>::Create(name);
             if (localService == nullptr)
             {
                 SayNoDebugError("create " << name << " service fail");

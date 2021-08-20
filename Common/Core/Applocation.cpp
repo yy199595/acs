@@ -1,6 +1,6 @@
 ﻿
 #include "Applocation.h"
-#include <Object/ObjectRegistry.h>
+#include <Object/ReflectHelper.h>
 #include <Coroutine/CoroutineManager.h>
 #include <Manager/ActionManager.h>
 #include <Manager/NetSessionManager.h>
@@ -33,7 +33,7 @@ namespace Sentry
 
     bool Applocation::AddManager(const std::string &name)
     {
-        Manager *manager = ObjectRegistry<Manager>::Create(name);
+        Manager *manager = ReflectHelper<Manager>::Create(name);
         if (manager == nullptr)
         {
             SayNoDebugError("create " << name << " fail");
@@ -60,6 +60,12 @@ namespace Sentry
         }
     }
 
+	Manager * Applocation::GetManagerByName(const std::string & name)
+	{
+		auto iter = this->mManagerMap.find(name);
+		return iter != this->mManagerMap.end() ? iter->second : nullptr;
+	}
+
     bool Applocation::LoadManager()
     {
         std::vector<std::string> managers;
@@ -78,11 +84,11 @@ namespace Sentry
             }
         }
 
-        this->TryAddManager<TimerManager>();
-        this->TryAddManager<ActionManager>();
-        this->TryAddManager<ProtocolManager>();
-        this->TryAddManager<CoroutineManager>();
-        this->TryAddManager<NetSessionManager>();
+        this->AddManager<TimerManager>();
+        this->AddManager<ActionManager>();
+        this->AddManager<ProtocolManager>();
+        this->AddManager<CoroutineManager>();
+        this->AddManager<NetSessionManager>();
         return true;
     }
 
@@ -259,7 +265,7 @@ namespace Sentry
 
     bool Applocation::GetTypeName(size_t hash, std::string &name)
     {
-        return ObjectRegistry<Manager>::GetTypeName(hash, name);
+        return ReflectHelper<Manager>::GetTypeName(hash, name);
     }
 
     void Applocation::UpdateConsoleTitle()
