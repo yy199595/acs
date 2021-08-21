@@ -25,7 +25,7 @@ namespace Client
     {
         this->mAddress = this->mConnectIp + ":" + std::to_string(this->mConnectPort);
         this->ConnectByAddress(this->mAddress, "GateServer");
-        this->mCoroutineManager->Start(BIND_THIS_ACTION_0(ClientManager::InvokeAction));
+        this->mCoroutineManager->Start(&ClientManager::InvokeAction, this);
     }
 
     void ClientManager::OnFrameUpdate(float t)

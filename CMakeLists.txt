@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(Sentry)
 if(MSVC)
-    add_definitions(-w)
     enable_language(C CXX ASM_MASM)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 else()
     enable_language(C CXX ASM)
 endif()
+add_definitions(-w)
 file(GLOB_RECURSE CommonSrc ${CMAKE_CURRENT_SOURCE_DIR} "Common/*.h" "Common/*.cpp")
 file(GLOB_RECURSE ProtocolSrc ${CMAKE_CURRENT_SOURCE_DIR} "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.cc")
 
