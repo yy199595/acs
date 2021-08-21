@@ -12,7 +12,7 @@ namespace Sentry
     enum ThreadState
     {
         Idle,
-        Running,
+        Run,
     };
 
     class ThreadTaskManager;
@@ -29,7 +29,7 @@ namespace Sentry
 
         ThreadState GetTaskState() { return this->mTaskState; }
 
-        bool IsRunning() { return this->mTaskState == Running; }
+        bool IsRunning() { return this->mTaskState == ThreadState::Run; }
 
     private:
         void Run();

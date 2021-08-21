@@ -24,7 +24,7 @@
     },
     "IsOpenRecoder": true,
     "CommandPort": 1020,
-    "ThreadCount": 0,
+    "ThreadCount": 1,
     "CoroutinePoolMaxSize": 100,
     "Mysql": {
         "ip": "101.36.127.23",

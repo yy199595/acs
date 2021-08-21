@@ -1,7 +1,9 @@
 #pragma once
-
+#include<queue>
+#include<vector>
 #include<functional>
-
+#include"Context/context.h"
+#include"CotoutiFunction/CotoutiFunction.h"
 #ifndef _WIN32
 #if __APPLE__
 #ifndef _XOPEN_SOURCE
@@ -10,12 +12,22 @@
 #endif
 #include<ucontext.h>
 #endif
+#define SentryAsmCoroutine
 
-#ifdef _WIN32
-#define STACK_SIZE 1024 * 2
+#ifdef SentryAsmCoroutine
+	#define STACK_SIZE 1024 * 1024
 #else
-#define STACK_SIZE 1024 * 1024
-#endif
+	#ifdef _WIN32
+		#define STACK_SIZE 1024 * 2
+	#else
+		#define STACK_SIZE 1024 * 1024
+	#endif
+#endif // SentryAsmCoroutine
+
+
+
+
+
 namespace Sentry
 {
     class CoroutineManager;
@@ -63,4 +75,24 @@ namespace Sentry
         int mCount;
         int mMaxCount;
     };
+}
+
+namespace Sentry
+{
+	struct Coroutine;
+	class CoroutinePool
+	{
+	public:
+		CoroutinePool(int count);
+		virtual ~CoroutinePool();
+	public:
+		Coroutine * Pop();
+		void Push(Coroutine * coroutine);
+	public:
+		Coroutine * Get(unsigned int id);
+	private:
+		unsigned int mId;
+		std::vector<Coroutine *> mAllCoroutine;
+		std::queue<unsigned int> mIdleCoroutines;
+	};
 }

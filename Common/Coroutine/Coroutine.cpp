@@ -7,18 +7,38 @@
 #endif
 namespace Sentry
 {
-    Coroutine::~Coroutine()
-    {
-        if (this->mContextStack)
-        {
-#ifdef _WIN32
-            DeleteFiber(this->mContextStack);
+	Coroutine::Coroutine()
+	{
+#ifdef SentryAsmCoroutine
+		this->mFunction = nullptr;
+		this->mCorContext = nullptr;
 #else
-            free(this->mContextStack);
+
+#ifndef _WIN32
+		ucontext_t mCorContext;
+#else
+		this->mCorContext = nullptr;
 #endif
-            this->mContextStack = nullptr;
-        }
-    }
 
-
+#endif
+	}
+	Coroutine::~Coroutine()
+	{
+#ifdef SentryAsmCoroutine
+		if (this->mCorContext != nullptr)
+		{
+			delete this->mCorContext;
+		}
+#else
+		if (this->mCorContext)
+		{
+#ifdef _WIN32
+			DeleteFiber(this->mCorContext);
+#else
+			free(this->mContextStack);
+#endif
+			this->mCorContext = nullptr;
+		}
+#endif
+	}
 }

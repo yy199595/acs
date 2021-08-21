@@ -21,7 +21,7 @@ namespace Sentry
 
     void TaskThread::AddTaskAction(SharedThreadTask taskAction)
     {
-        this->mTaskState = ThreadState::Running;
+        this->mTaskState = ThreadState::Run;
         this->mWaitInvokeTask.AddItem(taskAction);
         this->mThreadVarible.notify_one();
     }

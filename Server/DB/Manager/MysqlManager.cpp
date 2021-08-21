@@ -200,8 +200,9 @@ namespace Sentry
                 return false;
             }
             this->mMysqlSocketMap.insert(std::make_pair(index, this->mMysqlSockt));
+			SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "] [index = " << index << "]");
         }
-        SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "] [count:" << count << "]");
+       
         return true;
     }
 

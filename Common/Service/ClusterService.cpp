@@ -29,7 +29,7 @@ namespace Sentry
 
     void ClusterService::OnInitComplete()
     {
-        this->StarRegisterNode();
+        //this->StarRegisterNode();
 
     }
 
