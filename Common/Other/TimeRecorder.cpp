@@ -76,7 +76,6 @@ namespace Sentry
 
     bool TimeRecorder::SaveDataToFile(const std::string path)
     {
-        long long nowTime = TimeHelper::GetSecTimeStamp();
         if (this->mCallFuncInfoMap.empty())
         {
             return false;

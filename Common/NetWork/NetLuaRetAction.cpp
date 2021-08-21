@@ -112,6 +112,7 @@ namespace Sentry
                 if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
                 {
                     const char *error = lua_tostring(this->luaEnv, -1);
+                    SayNoDebugError(error);
                 }
                 if (lua_istable(this->luaEnv, -1))
                 {

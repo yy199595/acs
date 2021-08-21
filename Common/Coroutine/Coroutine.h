@@ -25,6 +25,7 @@ namespace Sentry
 		char * mStackTop;
 		tb_context_t mCorContext;
 #elif __linux__
+		void * mContextStack;
 		ucontext_t mCorContext;
 #elif _WIN32
 		void * mCorStack;

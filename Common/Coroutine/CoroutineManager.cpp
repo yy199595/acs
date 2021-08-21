@@ -29,10 +29,8 @@ namespace Sentry
 	{
 		CoroutineManager *pCoroutineMgr = (CoroutineManager *)manager;
 #endif
-#endif		
-		char cc = 0;
+#endif
 		Coroutine * logicCoroutine = pCoroutineMgr->GetCoroutine();
-		logicCoroutine->mStackTop = &cc;
 		SayNoDebugError("Invoke Coroutine Id " << logicCoroutine->mCoroutineId);
 		if (logicCoroutine != nullptr)
 		{
@@ -117,10 +115,10 @@ namespace Sentry
 			getcontext(&logicCoroutine->mCorContext);
 			logicCoroutine->mState = CorState::Running;
 			logicCoroutine->mCorContext.uc_stack.ss_size = STACK_SIZE;
-			logicCoroutine->mCorContext.uc_link = &this->mMainContext;
 			logicCoroutine->mCorContext.uc_stack.ss_sp = this->mSharedStack;
+			logicCoroutine->mCorContext.uc_link = &this->mMainCoroutine->mCorContext;
 			makecontext(&logicCoroutine->mCorContext, (void(*)(void)) MainEntry, 1, this);
-			swapcontext(&this->mMainContext, &logicCoroutine->mCorContext);
+			swapcontext(&this->mMainCoroutine->mCorContext, &logicCoroutine->mCorContext);
 #endif
 		}
 		else if (logicCoroutine->mState == CorState::Suspend)
@@ -136,7 +134,7 @@ namespace Sentry
 #elif __linux__
 			void *start = this->mSharedStack + STACK_SIZE - logicCoroutine->mStackSize;
 			memcpy(start, logicCoroutine->mContextStack, logicCoroutine->mStackSize);
-			swapcontext(&this->mMainContext, &logicCoroutine->mCorContext);
+			swapcontext(&this->mMainCoroutine->mCorContext, &logicCoroutine->mCorContext);
 #endif
 
 #ifdef __COROUTINE_ASM__
@@ -209,7 +207,7 @@ namespace Sentry
         SwitchToFiber(this->mMainCoroutine->mCorStack);
 #else
         this->SaveStack(logicCoroutine, this->mSharedStack + STACK_SIZE);
-        swapcontext(&logicCoroutine->mCorContext, &this->mMainContext);
+        swapcontext(&logicCoroutine->mCorContext, &this->mMainCoroutine->mCorContext);
 #endif
     }
 
@@ -236,7 +234,7 @@ namespace Sentry
 #elif _WIN32
 		SwitchToFiber(this->mMainCoroutine->mCorStack);
 #else
-		setcontext(&mMainContext);
+		setcontext(&this->mMainCoroutine->mCorContext);
 #endif
 	}
 
@@ -256,11 +254,11 @@ namespace Sentry
 		size_t size = top - &dummy;
 		if (cor->mStackSize < size)
 		{
-			free(cor->mCorStack);
-			cor->mCorStack = malloc(size);
+			free(cor->mContextStack);
+			cor->mContextStack = malloc(size);
 		}
 		cor->mStackSize = size;
-		memcpy(cor->mCorStack, &dummy, size);
+		memcpy(cor->mContextStack, &dummy, size);
 #endif
           
     }

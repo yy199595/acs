@@ -164,7 +164,6 @@ namespace Sentry
 
     bool ServiceManager::CreateLocalService()
     {
-        Applocation *app = Applocation::Get();
         for (size_t index = 0; index < this->mServiceList.size(); index++)
         {
             const std::string &name = this->mServiceList[index];

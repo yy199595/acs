@@ -118,7 +118,7 @@ namespace Sentry {
 
 	template<typename F, typename T, typename P1, typename P2, typename P3>
 	inline Closure* new_closure(F&& f, T* o, P1&& p1, P2 && p2, P3 && p3) {
-		return new xx::Method3<F, T, P1, P2>(
+		return new xx::Method3<F, T, P1, P2, P3>(
 			std::forward<F>(f), o, std::forward<P1>(p1), std::forward<P2>(p2), std::forward<P3>(p3));
 	}
 

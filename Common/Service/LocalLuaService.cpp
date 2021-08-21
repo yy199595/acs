@@ -69,12 +69,12 @@ namespace Sentry
         if (!lua_isfunction(this->mLuaEnv, -1))
         {
             SayNoDebugError("not find function " << luaAction);
-            return XCode::CallLuaFunctionFail;
+            return false;
         }
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
         if (!lua_istable(this->mLuaEnv, -1))
         {
-            return XCode::CallLuaFunctionFail;
+            return false;
         }
         /*const std::string & method = messageData->method();
         lua_pushstring(this->mLuaEnv, method.c_str());
@@ -105,7 +105,7 @@ namespace Sentry
             SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
             return XCode::CallLuaFunctionFail;
         }*/
-        return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
+        return lua_toboolean(this->mLuaEnv, -1);
     }
 
     bool LocalLuaService::InvokeMethod(const std::string &address, NetMessageProxy *messageData)
@@ -152,9 +152,9 @@ namespace Sentry
         {
             const char *err = lua_tostring(this->mLuaEnv, -1);
             //SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
-            return XCode::CallLuaFunctionFail;
+            return false;
         }
-        return lua_toboolean(this->mLuaEnv, -1) ? XCode::NotResponseMessage : XCode::CallLuaFunctionFail;
+        return lua_toboolean(this->mLuaEnv, -1);
     }
 
 }
