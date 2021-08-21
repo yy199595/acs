@@ -28,9 +28,10 @@ namespace Sentry
         bool HandlerMessage(NetMessageProxy *messageData);
 
         bool HandlerMessage(const std::string &adress, NetMessageProxy *messageData);
-
-	private:
-		void Invoke(const std::string &adress, NetMessageProxy *messageData);
+		
+	private:	
+		void Invoke1(NetMessageProxy *messageData);
+		void Invoke2(const std::string &adress, NetMessageProxy *messageData);
     public:
         ServiceBase *GetService(const std::string &name);
 

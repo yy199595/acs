@@ -8,10 +8,6 @@
 #include<unordered_map>
 #include"Coroutine.h"
 
-#ifndef _WIN32
-#include<ucontext.h>
-#endif
-
 #include<Manager/Manager.h>
 #include<NetWork/TcpClientSession.h>
 
@@ -27,17 +23,26 @@ namespace Sentry
 
 		template<typename F, typename T>
 		unsigned int Start(F && f, T * o) {
-			return this->StartCoroutine(new_closure(std::forward<F>(f), o));
+			return this->StartCoroutine(
+				new_closure(std::forward<F>(f), o));
 		}
 
 		template<typename F, typename T,typename P>
 		unsigned int Start(F && f, T * o,P && p) {
-			return this->StartCoroutine(new_closure(std::forward<F>(f), o, std::forward<P>(p)));
+			return this->StartCoroutine(
+				new_closure(std::forward<F>(f), o, std::forward<P>(p)));
 		}
 
 		template<typename F,typename T, typename P1, typename P2>
 		unsigned int Start(F && f, T * t,P1 && p1, P2 && p2) {
-			return this->StartCoroutine(new_closure(std::forward<F>(f), t, std::forward<P>(p1), std::forward<P>(p2)));
+			return this->StartCoroutine(
+				new_closure(std::forward<F>(f), t, std::forward<P1>(p1), std::forward<P2>(p2)));
+		}
+
+		template<typename F, typename T, typename P1, typename P2, typename P3>
+		unsigned int Start(F && f, T * t, P1 && p1, P2 && p2, P3 && p3) {
+			return this->StartCoroutine(
+				new_closure(std::forward<F>(f), t, std::forward<P1>(p1), std::forward<P2>(p2), std::forward<P3>(p3)));
 		}
 	private:
 		unsigned int StartCoroutine(Closure * func);

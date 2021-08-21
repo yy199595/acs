@@ -31,8 +31,7 @@ namespace Sentry
         {
             LocalService *localService = iter->second;
             localService->GetServiceList(methodVec);
-			ServiceBase * ptr = localService;
-			this->mCorManager->Start(&LocalService::OnInitComplete, ptr);
+			this->mCorManager->Start(&LocalService::OnInitComplete, localService);
         }
     }
 
@@ -43,9 +42,7 @@ namespace Sentry
         {
             return false;
         }
-        this->mCorManager->Start([localService, this, messageData]() {
-            //TODO
-        });
+		this->mCorManager->Start(&ServiceManager::Invoke1, this, messageData);
         return true;
     }
 
@@ -59,20 +56,11 @@ namespace Sentry
             SayNoDebugError("call function not find [" << service << "." << method << "]");
             return false;
         }
-
-		this->mCorManager->Start(&ServiceManager::Invoke, this, address, messageData);
-
-        this->mCorManager->Start([address, localService, this, messageData]() {
-            if (localService->InvokeMethod(address, messageData))
-            {
-                this->mNetProxyManager->SendMsgByAddress(address, messageData);
-            }
-            delete messageData;
-        });
+		this->mCorManager->Start(&ServiceManager::Invoke2, this, address, messageData);
         return true;
     }
 
-    LocalLuaService *ServiceManager::AddLuaService(const std::string name, LocalLuaService *service)
+	LocalLuaService *ServiceManager::AddLuaService(const std::string name, LocalLuaService *service)
     {
         auto iter = this->mLuaServiceMap.find(name);
         if (iter == this->mLuaServiceMap.end())
@@ -90,9 +78,20 @@ namespace Sentry
         return nullptr;
     }
 
-	void ServiceManager::Invoke(const std::string & adress, NetMessageProxy * messageData)
+	void ServiceManager::Invoke1(NetMessageProxy *messageData)
 	{
 
+	}
+
+	void ServiceManager::Invoke2(const std::string & address, NetMessageProxy * messageData)
+	{
+		ServiceBase * localService = this->GetService(messageData->GetService());
+		if (localService->InvokeMethod(messageData))
+		{
+			SayNoDebugError("Invoke " << messageData->GetMethd() << " fail");
+			return;
+		}
+		this->mNetProxyManager->SendMsgByAddress(address, messageData);
 	}
 
 	ServiceBase *ServiceManager::GetService(const std::string &name)

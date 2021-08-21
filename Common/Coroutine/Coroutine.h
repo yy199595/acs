@@ -20,16 +20,16 @@ namespace Sentry
     public:
         size_t mStackSize;
 		Closure * mFunction;
-#ifdef SentryAsmCoroutine		
+#ifdef __COROUTINE_ASM__	
+		char * mStack;
+		char * mStackTop;
 		tb_context_t mCorContext;
-#else
-		void * mCorContext;	
-#ifndef _WIN32	
+#elif __linux__
 		ucontext_t mCorContext;
+#elif _WIN32
+		void * mCorStack;
 #endif
-
-#endif
-        CorState mState;
+        CorState mState;		
         long long mCoroutineId;
         CoroutineManager *mScheduler;
     };

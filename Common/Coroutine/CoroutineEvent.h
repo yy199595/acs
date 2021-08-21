@@ -2,31 +2,24 @@
 #include<queue>
 #include<vector>
 #include<functional>
-#include"Context/context.h"
+
+#define __COROUTINE_ASM__
+
+#ifdef __APPLE__
+#ifndef __COROUTINE_ASM__
+#define __COROUTINE_ASM__
+#endif // !1
+#endif
 #include"CotoutiFunction/CotoutiFunction.h"
-#ifndef _WIN32
-#if __APPLE__
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
-#endif
-#endif
-#include<ucontext.h>
-#endif
-#define SentryAsmCoroutine
-
-#ifdef SentryAsmCoroutine
+#ifdef __COROUTINE_ASM__
+	#include"Context/context.h"	
 	#define STACK_SIZE 1024 * 1024
-#else
-	#ifdef _WIN32
-		#define STACK_SIZE 1024 * 2
-	#else
-		#define STACK_SIZE 1024 * 1024
-	#endif
-#endif // SentryAsmCoroutine
-
-
-
-
+#elif __linux__
+	#include<ucontext.h>
+	#define STACK_SIZE 1024 * 1024
+#elif _WIN32
+	#define STACK_SIZE 1024 * 1024
+#endif
 
 namespace Sentry
 {

@@ -13,39 +13,45 @@ using namespace std::chrono;
 #endif
 namespace Sentry
 {
-#ifdef SentryAsmCoroutine
-	void AsmEntry(tb_context_from_t parame)
+#ifdef __COROUTINE_ASM__
+	void MainEntry(tb_context_from_t parame)
 	{
 		CoroutineManager *pCoroutineMgr = (CoroutineManager*)parame.priv;
+		Coroutine * mainCoroutine = pCoroutineMgr->GetCoroutine(0);
+		mainCoroutine->mCorContext = parame.ctx;
 #else
 #if _WIN32
-	void __stdcall WinEntry(LPVOID manager)
+	void __stdcall MainEntry(LPVOID manager)
 	{
 		CoroutineManager *pCoroutineMgr = (CoroutineManager *)manager;
 #else
-	void LinuxEntry(void *manager)
+	void MainEntry(void *manager)
 	{
 		CoroutineManager *pCoroutineMgr = (CoroutineManager *)manager;
 #endif
-#endif
-		Coroutine *pCoroutine = pCoroutineMgr->GetCoroutine();
-		if (pCoroutine != nullptr)
+#endif		
+		char cc = 0;
+		Coroutine * logicCoroutine = pCoroutineMgr->GetCoroutine();
+		logicCoroutine->mStackTop = &cc;
+		SayNoDebugError("Invoke Coroutine Id " << logicCoroutine->mCoroutineId);
+		if (logicCoroutine != nullptr)
 		{
-			pCoroutine->mFunction->run();
-			pCoroutineMgr->Destory(pCoroutine);
+			logicCoroutine->mFunction->run();
+			pCoroutineMgr->Destory(logicCoroutine);
+#ifdef __COROUTINE_ASM__
+			tb_context_jump(parame.ctx, nullptr);
+#endif
 		}
 	}
 
     CoroutineManager::CoroutineManager()
 		:mCorPool(100)
     {
-#ifdef SentryAsmCoroutine
 		this->mMainCoroutine = this->mCorPool.Pop();
-		this->mMainCoroutine->mStackSize = STACK_SIZE;
-		this->mMainCoroutine->mCorContext = this->mSharedStack;
-#elif _WIN32
-		this->mMainCoroutine = this->mCorPool.Pop();
-		this->mMainCoroutine->mCorContext = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
+#ifdef __COROUTINE_ASM__		
+		
+#elif _WIN32		
+		this->mMainCoroutine->mCorStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #endif
 		this->mCurrentCorId = 0;
     }
@@ -64,75 +70,94 @@ namespace Sentry
 
     void CoroutineManager::Sleep(long long ms)
     {
-        Coroutine *pCoroutine = this->GetCoroutine();
-        if (pCoroutine != nullptr)
+        Coroutine *logicCoroutine = this->GetCoroutine();
+        if (logicCoroutine != nullptr)
         {
-            const long long id = pCoroutine->mCoroutineId;
+            const long long id = logicCoroutine->mCoroutineId;
             this->mTimerManager->CreateTimer<CorSleepTimer>(this, id, ms);
             this->YieldReturn();
         }
     }
 
-    void CoroutineManager::Resume(unsigned int id)
-    {
-        if (this->mCurrentCorId != 0)
-        {
-            SayNoDebugFatal("logic error");
-            return;
-        }
-        Coroutine *pCoroutine = this->GetCoroutine(id);
-        if (pCoroutine != nullptr)
-        {
-            if (pCoroutine->mState == CorState::Ready)
-            {
-                this->mCurrentCorId = id;
-				pCoroutine->mStackSize = STACK_SIZE;
-#ifdef SentryAsmCoroutine
-				char * stack = (char*)this->mMainCoroutine->mCorContext;
-				pCoroutine->mCorContext = tb_context_make(stack, STACK_SIZE, AsmEntry);		
-				tb_context_jump(pCoroutine->mCorContext, this);
-#elif _WIN32
-                pCoroutine->mCorContext = CreateFiber(STACK_SIZE, WinEntry, this);
-                SwitchToFiber(pCoroutine->mCorContext);
-#else
-                getcontext(&pCoroutine->mCorContext);
-                pCoroutine->mState = CorState::Running;
-                pCoroutine->mCorContext.uc_stack.ss_size = STACK_SIZE;
-                pCoroutine->mCorContext.uc_link = &this->mMainContext;
-                pCoroutine->mCorContext.uc_stack.ss_sp = this->mSharedStack;
-                makecontext(&pCoroutine->mCorContext, (void (*)(void)) LinuxEntry, 1, this);
-                swapcontext(&this->mMainContext, &pCoroutine->mCorContext);
+	void CoroutineManager::Resume(unsigned int id)
+	{
+		if (this->mCurrentCorId != 0)
+		{
+			SayNoDebugFatal("logic error");
+			return;
+		}
+		Coroutine *logicCoroutine = this->GetCoroutine(id);
+		if (logicCoroutine == nullptr)
+		{
+			SayNoDebugFatal("not find coroutine id : " << id);
+			return;
+		}
+		this->mCurrentCorId = id;
+#ifdef __COROUTINE_ASM__	
+		tb_context_from_t from;
 #endif
-            } 
-			else if (pCoroutine->mState == CorState::Suspend)
-            {
-                this->mCurrentCorId = id;
-                pCoroutine->mState = CorState::Running;
-#ifdef SentryAsmCoroutine
-				tb_context_jump(pCoroutine->mCorContext, this);
+		if (logicCoroutine->mState == CorState::Ready)
+		{			
+#ifdef __COROUTINE_ASM__
+			if (logicCoroutine->mStack == nullptr)
+			{
+				logicCoroutine->mStackSize = 1024 * 2;
+				logicCoroutine->mStack = (char *)malloc(1024 * 2);
+				logicCoroutine->mStackTop = logicCoroutine->mStack + logicCoroutine->mStackSize;
+			}
+			//this->SaveStack(logicCoroutine, nullptr);
+			logicCoroutine->mCorContext = tb_context_make(
+				logicCoroutine->mStack, logicCoroutine->mStackSize, MainEntry);
+			SayNoDebugLog("resume new coroutine id " << logicCoroutine->mCoroutineId);
+			from = tb_context_jump(logicCoroutine->mCorContext, this);
 #elif _WIN32
-                SwitchToFiber(pCoroutine->mCorContext);
-#else
-                void *start = this->mSharedStack + STACK_SIZE - pCoroutine->mStackSize;
-                memcpy(start, pCoroutine->mContextStack, pCoroutine->mStackSize);
-                swapcontext(&this->mMainContext, &pCoroutine->mCorContext);
+			logicCoroutine->mCorStack = CreateFiber(STACK_SIZE, MainEntry, this);
+			SwitchToFiber(logicCoroutine->mCorStack);
+#elif __linux__
+			getcontext(&logicCoroutine->mCorContext);
+			logicCoroutine->mState = CorState::Running;
+			logicCoroutine->mCorContext.uc_stack.ss_size = STACK_SIZE;
+			logicCoroutine->mCorContext.uc_link = &this->mMainContext;
+			logicCoroutine->mCorContext.uc_stack.ss_sp = this->mSharedStack;
+			makecontext(&logicCoroutine->mCorContext, (void(*)(void)) MainEntry, 1, this);
+			swapcontext(&this->mMainContext, &logicCoroutine->mCorContext);
 #endif
-            }
-        }
-    }
+		}
+		else if (logicCoroutine->mState == CorState::Suspend)
+		{
+			this->mCurrentCorId = id;
+			logicCoroutine->mState = CorState::Running;
+#ifdef __COROUTINE_ASM__
+			this->SaveStack(this->mMainCoroutine, nullptr);
+			SayNoDebugLog("from " << mMainCoroutine->mCoroutineId << " swap to " << logicCoroutine->mCoroutineId);
+			from = tb_context_jump(logicCoroutine->mCorContext, this);			
+#elif _WIN32
+			SwitchToFiber(logicCoroutine->mCorStack);
+#elif __linux__
+			void *start = this->mSharedStack + STACK_SIZE - logicCoroutine->mStackSize;
+			memcpy(start, logicCoroutine->mContextStack, logicCoroutine->mStackSize);
+			swapcontext(&this->mMainContext, &logicCoroutine->mCorContext);
+#endif
+
+#ifdef __COROUTINE_ASM__
+			logicCoroutine->mCorContext = from.ctx;
+#endif
+		}
+
+	}
 
 	unsigned int CoroutineManager::StartCoroutine(Closure * func)
 	{
 		Coroutine * coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
 		{
-#ifndef SentryAsmCoroutine
+#ifndef __COROUTINE_ASM__
 	#ifdef _WIN32
-			if (coroutine->mCorContext != nullptr)
+			if (coroutine->mCorStack != nullptr)
 			{
-				DeleteFiber(coroutine->mCorContext);
+				DeleteFiber(coroutine->mCorStack);
 				coroutine->mStackSize = 0;
-				coroutine->mCorContext = nullptr;
+				coroutine->mCorStack = nullptr;
 			}
 	#endif
 #endif
@@ -146,50 +171,54 @@ namespace Sentry
 
 	void CoroutineManager::Loop()
 	{
-		while (true)
+		for (int index = 0; index < 1000; index++)
 		{
+			SayNoDebugWarning(__FUNCTION__ << " " << __LINE__ << " index = " << index);
 			this->Sleep(1000);
-			SayNoDebugFatal("================");
 		}
 	}
 
 	void CoroutineManager::Loop2()
 	{
-		while (true)
+		for (int index = 0; index < 1000; index++)
 		{
+			SayNoDebugError(__FUNCTION__ << " " << __LINE__ << " index = " << index);
 			this->Sleep(1000);
-			SayNoDebugWarning("================");
 		}
 	}
 
 	void CoroutineManager::YieldReturn()
     {
-        Coroutine *pCoroutine = this->GetCoroutine();
-        if (pCoroutine == nullptr)
+        Coroutine *logicCoroutine = this->GetCoroutine();
+        if (logicCoroutine == nullptr)
         {
             SayNoDebugFatal("not find coroutine context");
             return;
         }
-		if (pCoroutine->mCoroutineId == 0)
+		if (logicCoroutine->mCoroutineId == 0)
 		{
 			SayNoDebugFatal("try yield main coroutine");
 			return;
 		}
         this->mCurrentCorId = 0;
-        pCoroutine->mState = CorState::Suspend;
-#ifdef SentryAsmCoroutine
-		this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
-		tb_context_jump(pCoroutine->mCorContext, this->mMainCoroutine->mCorContext);
+        logicCoroutine->mState = CorState::Suspend;
+#ifdef __COROUTINE_ASM__
+		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
+		//logicCoroutine->mCorContext = from.ctx;
 #elif _WIN32
-        SwitchToFiber(this->mMainCoroutine->mCorContext);
+        SwitchToFiber(this->mMainCoroutine->mCorStack);
 #else
-        this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
-        swapcontext(&pCoroutine->mCorContext, &this->mMainContext);
+        this->SaveStack(logicCoroutine, this->mSharedStack + STACK_SIZE);
+        swapcontext(&logicCoroutine->mCorContext, &this->mMainContext);
 #endif
     }
 
     Coroutine *CoroutineManager::GetCoroutine()
     {
+		if (this->mCurrentCorId == 0)
+		{
+			return nullptr;
+		}
 		return this->mCorPool.Get(this->mCurrentCorId);     
     }
 
@@ -202,10 +231,10 @@ namespace Sentry
 	{
 		this->mCurrentCorId = 0;
 		this->mCorPool.Push(coroutine);
-#ifdef SentryAsmCoroutine
-		tb_context_jump(this->mMainCoroutine->mCorContext, this);
+#ifdef __COROUTINE_ASM__
+		
 #elif _WIN32
-		SwitchToFiber(this->mMainCoroutine->mCorContext);
+		SwitchToFiber(this->mMainCoroutine->mCorStack);
 #else
 		setcontext(&mMainContext);
 #endif
@@ -219,15 +248,21 @@ namespace Sentry
 
     void CoroutineManager::SaveStack(Coroutine *cor, char *top)
     {
-        char dummy = 0;
-        size_t size = top - &dummy;
-        if (cor->mStackSize < size)
-        {
-            free(cor->mCorContext);
-            cor->mCorContext = malloc(size);
-        }
-        cor->mStackSize = size;
-        memcpy(cor->mCorContext, &dummy, cor->mStackSize);
+#ifdef __COROUTINE_ASM__
+		size_t size = cor->mStackTop - (char *)cor->mCorContext;
+		memcpy(cor->mStack, cor->mCorContext, size);
+#else
+		char dummy = 0;
+		size_t size = top - &dummy;
+		if (cor->mStackSize < size)
+		{
+			free(cor->mCorStack);
+			cor->mCorStack = malloc(size);
+		}
+		cor->mStackSize = size;
+		memcpy(cor->mCorStack, &dummy, size);
+#endif
+          
     }
 
 

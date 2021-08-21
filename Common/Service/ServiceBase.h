@@ -35,9 +35,7 @@ namespace Sentry
         const std::string &GetServiceName() { return this->mServiceName; };
     public:
         virtual bool InvokeMethod(NetMessageProxy *) = 0;
-
-        virtual bool InvokeMethod(const std::string &address, NetMessageProxy *) = 0;
-
+     
         virtual void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> &service) = 0;
 
     public:
