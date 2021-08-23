@@ -116,7 +116,7 @@ namespace Sentry
 			logicCoroutine->mState = CorState::Running;
 			logicCoroutine->mCorContext.uc_stack.ss_size = STACK_SIZE;
 			logicCoroutine->mCorContext.uc_stack.ss_sp = this->mSharedStack;
-			logicCoroutine->mCorContext.uc_link = &this->mMainCoroutine->mContextStack;
+			logicCoroutine->mCorContext.uc_link = &this->mMainCoroutine->mCorContext;
 			makecontext(&logicCoroutine->mCorContext, (void(*)(void)) MainEntry, 1, this);
 			swapcontext(&this->mMainCoroutine->mCorContext, &logicCoroutine->mCorContext);
 #endif
