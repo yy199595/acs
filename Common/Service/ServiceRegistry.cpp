@@ -33,6 +33,10 @@ namespace Sentry
 
         const std::string &address = nodeInfo.address();
         const std::string &nodeName = nodeInfo.servername();
+		if (address.empty() || nodeName.empty())
+		{
+			return XCode::Failure;
+		}
         //SharedTcpSession tcpSession = this->GetCurTcpSession();
         long long key = (long long) areaId << 32 | nodeId;
         auto iter = this->mServiceNodeMap.find(key);

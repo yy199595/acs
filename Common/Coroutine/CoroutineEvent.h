@@ -18,7 +18,7 @@
 	#include<ucontext.h>
 	#define STACK_SIZE 1024 * 1024
 #elif _WIN32
-	#define STACK_SIZE 1024 * 1024
+	#define STACK_SIZE 1024 * 2
 #endif
 
 

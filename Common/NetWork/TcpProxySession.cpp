@@ -69,7 +69,7 @@ namespace Sentry
         {
             return false;
         }
-        NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
+        NetMessageProxy *messageData = NetMessageProxy::Create(S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);
@@ -84,14 +84,13 @@ namespace Sentry
         {
             return false;
         }
-        NetMessageProxy *messageData = NetMessageProxy::Create(s2sNotice, service, method);
+        NetMessageProxy *messageData = NetMessageProxy::Create(S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);
             return XCode::Failure;
         }
-        Message *reqMessage = request.New();
-        messageData->InitMessageParame(reqMessage);
+		messageData->SetMessage(request);      
         return this->SendMessageData(messageData);
     }
 }

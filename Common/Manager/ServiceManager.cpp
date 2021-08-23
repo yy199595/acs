@@ -86,7 +86,7 @@ namespace Sentry
 	void ServiceManager::Invoke2(const std::string & address, NetMessageProxy * messageData)
 	{
 		ServiceBase * localService = this->GetService(messageData->GetService());
-		if (localService->InvokeMethod(messageData))
+		if (!localService->InvokeMethod(messageData))
 		{
 			SayNoDebugError("Invoke " << messageData->GetMethd() << " fail");
 			return;

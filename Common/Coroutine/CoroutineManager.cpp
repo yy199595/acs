@@ -31,7 +31,7 @@ namespace Sentry
 #endif
 #endif
 		Coroutine * logicCoroutine = pCoroutineMgr->GetCoroutine();
-		SayNoDebugError("Invoke Coroutine Id " << logicCoroutine->mCoroutineId);
+		//SayNoDebugError("Invoke Coroutine Id " << logicCoroutine->mCoroutineId);
 		if (logicCoroutine != nullptr)
 		{
 			logicCoroutine->mFunction->run();
@@ -62,8 +62,8 @@ namespace Sentry
 
     void CoroutineManager::OnInitComplete()
     {
-		this->Start(&CoroutineManager::Loop, this);
-		this->Start(&CoroutineManager::Loop2, this);
+		//this->Start(&CoroutineManager::Loop, this);
+		//this->Start(&CoroutineManager::Loop2, this);
     }
 
     void CoroutineManager::Sleep(long long ms)

@@ -55,28 +55,29 @@ namespace Sentry
         return this->mBinTcpSocket != nullptr && this->mBinTcpSocket->is_open();
     }
 
-    bool TcpClientSession::SendPackage(const shared_ptr<std::string> message)
-    {
-        if (message == nullptr || message->size() == 0)
-        {
-            return false;
-        }
-        if (!this->mBinTcpSocket || !this->mBinTcpSocket->is_open())
-        {
-            return false;
-        }
+	bool TcpClientSession::SendPackage(const shared_ptr<std::string> message)
+	{
+		if (message == nullptr || message->size() == 0)
+		{
+			return false;
+		}
+		if (!this->mBinTcpSocket || !this->mBinTcpSocket->is_open())
+		{
+			return false;
+		}
 
-        mBinTcpSocket->async_send(asio::buffer(message->c_str(), message->size()),
-                                  [this, message](const asio::error_code &error_code, std::size_t size) {
-                                      if (error_code)
-                                      {
-                                          this->StartClose();
-                                          const char *msg = message->c_str();
-                                          this->mDispatchManager->OnSendMessageError(this, msg, size);
-                                      }
-                                  });
-        return true;
-    }
+		mBinTcpSocket->async_send(asio::buffer(message->c_str(), message->size()),
+			[this, message](const asio::error_code &error_code, std::size_t size) 
+		{
+			if (error_code)
+			{
+				this->StartClose();
+				const char *msg = message->c_str();
+				this->mDispatchManager->OnSendMessageError(this, msg, size);
+			}
+		});
+		return true;
+	}
 
     bool TcpClientSession::StartConnect()
     {
@@ -127,7 +128,8 @@ namespace Sentry
 		}
 		memset(this->mRecvMsgBuffer, 0, this->mRecvBufferSize);
 		this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
-			[this](const asio::error_code &error_code, const std::size_t t) {
+			[this](const asio::error_code &error_code, const std::size_t t) 
+		{
 			if (error_code)
 			{
 				this->StartClose();

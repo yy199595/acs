@@ -8,18 +8,18 @@ namespace Sentry
 {
 	enum NetMessageType
 	{
-		s2sRequest = 1,
-		c2sRequest = 2,
-		c2sNotice = 3,
-		s2cNotice = 4,
-		s2sNotice = 5,
+		S2S_REQUEST = 1,
+		C2S_REQUEST = 2,
+		C2S_NOTICE = 3,
+		S2C_REQUEST = 4,
+		S2S_NOTICE = 5,
 
-		RequestEnd = 100,
+		REQUEST_END = 100,
 
-		s2sResponse = 101,
-		c2sResponse = 103,
+		S2S_RESPONSE = 101,
+		C2S_RESPONSE = 103,
 
-		ResponseEnd = 255
+		RESPONSE_END = 255
 	};
 
 	class NetMessageProxy
@@ -31,9 +31,6 @@ namespace Sentry
 	public:
 		static NetMessageProxy *Create(const char *message, const size_t size);
 		static NetMessageProxy *Create(NetMessageType type, const std::string & service, const std::string &method);
-
-	public:
-		bool InitMessageParame(Message * message = nullptr, long long rcpId = 0, long long userId = 0);
 	public:
 		void Clear();
 		size_t WriteToBuffer(char *buffer, const size_t size);
@@ -43,10 +40,12 @@ namespace Sentry
 		const std::string &GetService() { return this->mProConfig->ServiceName; }	
 		const ProtocolConfig * GetProConfig() { return this->mProConfig; }
 	public:
-		bool InitMessageData(XCode code, Message * message); // response
-		bool InitMessageData(Message * message, long long rpcId, long long userId); //request
-		
-
+		void SetType(NetMessageType type);
+		void SetCode(XCode code) { this->mCode = code; }
+		void SetRpcId(const long long id) { this->mRpcId = id; }
+		void SetUserId(const long long id) { this->mUserId = id; }
+		void ClearMessage() { this->mMessageData.clear(); }
+		bool SetMessage(const Message & message) { return message.SerializePartialToString(&mMessageData); }
 	public:
 		XCode GetCode() { return this->mCode; }
 		long long GetRpcId() { return this->mRpcId; }

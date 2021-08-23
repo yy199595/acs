@@ -80,11 +80,13 @@ namespace Sentry
             mReqMessagePool.Destory(message);
             return false;
         }
+		messageData->ClearMessage();
         long long userId = messageData->GetUserId();
         XCode code = this->mBindAction(userId, *message);
 
+		messageData->SetCode(code);
         mReqMessagePool.Destory(message);
-        return messageData->InitMessageData(code, nullptr);
+		return true;
     }
 }// namespace Sentry
 
@@ -122,12 +124,13 @@ namespace Sentry
         T2 *response = this->mResMessagePool.Create();
         XCode code = this->mBindAction(userId, *request, *response);
 
-        bool res = messageData->InitMessageData(code, response);
+		messageData->SetCode(code);
+		messageData->SetMessage(*response);
 
         mReqMessagePool.Destory(request);
         mResMessagePool.Destory(response);
 
-        return res;
+		return true;
     }
 }// namespace Sentry
 
@@ -144,10 +147,11 @@ namespace Sentry
             long long userId = messageData->GetUserId();
             T1 *responseData = mResMessagePool.Create();
             XCode code = this->mBindAction(userId, *responseData);
-            bool res = messageData->InitMessageData(code, responseData);
 
+			messageData->SetCode(code);
+			messageData->SetMessage(*responseData);    
             this->mResMessagePool.Destory(responseData);
-            return res;
+            return true;
         }
 
     private:

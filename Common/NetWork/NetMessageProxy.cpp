@@ -6,7 +6,7 @@ namespace Sentry
     template<typename T>
     bool MemoryCopy(T *tar, const char *sou, size_t &offset, const size_t maxsize)
     {
-        memcpy((char *) tar, sou + offset, sizeof(T));
+        memcpy(tar, sou + offset, sizeof(T));
         offset += sizeof(T);
         return offset <= maxsize;
     }
@@ -43,38 +43,35 @@ namespace Sentry
         int code = 0;
         long long rpcid = 0;
         long long userid = 0;
-        unsigned short actionid = 0;
-        const ProtocolConfig *config = nullptr;
-
+        unsigned short actionid = 0;     
         NetMessageType messageType = (NetMessageType) message[0];
-
         SayNoAssertRetNull_F(MemoryCopy(&actionid, message, offset, size));
-        config = pProtocolMgr->GetProtocolConfig(actionid);
+		const ProtocolConfig * config = pProtocolMgr->GetProtocolConfig(actionid);
         SayNoAssertRetNull_F(config);
 
         switch (messageType)
         {
-            case s2sRequest:
+            case S2S_REQUEST:
             SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 break;
-            case s2sResponse:
+            case S2S_RESPONSE:
             SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 break;
-            case s2sNotice:
+            case S2S_NOTICE:
 
                 break;
-            case c2sRequest:
+            case C2S_REQUEST:
             SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
                 break;
-            case c2sResponse:
+            case C2S_RESPONSE:
             SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
                 break;
-            case c2sNotice:
-            case s2cNotice:
+            case C2S_NOTICE:
+            case S2C_REQUEST:
             SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
             default:
                 return nullptr;
@@ -96,7 +93,7 @@ namespace Sentry
 
     NetMessageProxy *NetMessageProxy::Create(NetMessageType type, const std::string &service, const std::string &method)
     {
-        if (type > RequestEnd)
+        if (type > REQUEST_END)
         {
             return nullptr;
         }
@@ -113,74 +110,16 @@ namespace Sentry
         return nullptr;
     }
 
-    bool NetMessageProxy::InitMessageParame(Message *message, long long rcpId, long long userId)
-    {
-        if (this->mMsgType > RequestEnd)
-        {
-            return false;
-        }
-        this->mRpcId = rcpId;
-        this->mUserId = userId;
-        if (message != nullptr)
-        {
-            if (!message->SerializePartialToString(&this->mMessageData))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool NetMessageProxy::InitMessageData(XCode code, Message *message)
-    {
-        if (this->mProConfig == nullptr)
-        {
-            return false;
-        }
-        if (this->mMsgType >= RequestEnd)
-        {
-            return false;
-        }
-        if (this->mRpcId == 0)
-        {
-            return false;
-        }
-        if (this->mUserId != 0)
-        {
-            SayNoAssertRetFalse_F(this->mMsgType == s2sRequest);
-            this->mMsgType = c2sResponse;
-        }
-        SayNoAssertRetFalse_F(this->mMsgType == s2sRequest);
-        if (message != nullptr && code == XCode::Successful)
-        {
-            if (!message->SerializePartialToString(&this->mMessageData))
-            {
-                return false;
-            }
-        }
-        this->mCode = code;
-        return true;
-    }
-
-    bool NetMessageProxy::InitMessageData(Message *message, long long rpcId, long long userId)
-    {
-        SayNoAssertRetFalse_F(this->mProConfig);
-        this->mRpcId = rpcId;
-        this->mUserId = userId;
-        if (message != nullptr)
-        {
-            if (!message->SerializePartialToString(&this->mMessageData))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+	void NetMessageProxy::SetType(NetMessageType type)
+	{
+		this->mMsgType = type;
+		this->mMessageData.clear();
+	}
 
 
     size_t NetMessageProxy::WriteToBuffer(char *buffer, const size_t size)
     {
-        if (this->mMsgType >= RequestEnd)
+        if (this->mMsgType >= REQUEST_END)
         {
             return 0;
         }

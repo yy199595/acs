@@ -26,9 +26,6 @@ namespace Sentry
         void OnInitComplete() final;
 
     private:
-        void StarRegisterNode();
-
-    private:
         XCode DelNode(long long, const Int32Data &node);
 
         XCode AddNode(long long, const s2s::NodeData_NodeInfo &nodeInfo);

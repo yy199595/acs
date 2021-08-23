@@ -174,7 +174,7 @@ namespace Sentry
 
     bool NetProxyManager::OnRecvMessage(const std::string &address, NetMessageProxy *messageData)
     {
-        if (messageData->GetMessageType() < RequestEnd)
+        if (messageData->GetMessageType() < REQUEST_END)
         {
             return mServiceManager->HandlerMessage(address, messageData);
         }

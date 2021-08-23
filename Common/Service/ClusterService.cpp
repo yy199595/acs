@@ -29,33 +29,28 @@ namespace Sentry
 
     void ClusterService::OnInitComplete()
     {
-        //this->StarRegisterNode();
+		std::vector<std::string> localServices;
+		this->mServiceManager->GetLocalServices(localServices);
+		ServiceNode *centerNode = this->mServiceNodeManager->GetServiceNode(0);
+		SayNoAssertRet_F(centerNode && !localServices.empty());
 
-    }
+		s2s::NodeRegister_Request registerInfo;
+		registerInfo.set_areaid(this->mAreaId);
+		registerInfo.set_nodeid(this->mNodeId);
+		registerInfo.set_address(this->mListenAddress);
+		registerInfo.set_servername(this->GetApp()->GetServerName());
+		for (const std::string &name : localServices)
+		{
+			registerInfo.add_services()->assign(name);
+		}
+		XCode code = centerNode->Invoke("ServiceRegistry", "RegisterNode", registerInfo);
+		if (code != XCode::Successful)
+		{
+			SayNoDebugLog("register local service node fail");
+			return;
+		}
+		SayNoDebugLog("register local service node successful");
 
-    void ClusterService::StarRegisterNode()
-    {
-        std::vector<std::string> localServices;
-        this->mServiceManager->GetLocalServices(localServices);
-        ServiceNode *centerNode = this->mServiceNodeManager->GetServiceNode(0);
-        SayNoAssertRet_F(centerNode && !localServices.empty());
-
-        s2s::NodeRegister_Request registerInfo;
-        registerInfo.set_areaid(this->mAreaId);
-        registerInfo.set_nodeid(this->mNodeId);
-        registerInfo.set_address(this->mListenAddress);
-        registerInfo.set_servername(this->GetApp()->GetServerName());
-        for (const std::string &name : localServices)
-        {
-            registerInfo.add_services()->assign(name);
-        }
-        XCode code = centerNode->Invoke("ServiceRegistry", "RegisterNode", registerInfo);
-        if (code != XCode::Successful)
-        {
-            SayNoDebugLog("register local service node fail");
-            return;
-        }
-        SayNoDebugLog("register local service node successful");
     }
 
     XCode ClusterService::DelNode(long long, const Int32Data &serviceData)
