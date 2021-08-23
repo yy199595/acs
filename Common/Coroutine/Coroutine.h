@@ -28,7 +28,7 @@ namespace Sentry
 		void * mContextStack;
 		ucontext_t mCorContext;
 #elif _WIN32
-		void * mCorStack;
+		void * mContextStack;
 #endif
         CorState mState;		
         long long mCoroutineId;

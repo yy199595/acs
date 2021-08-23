@@ -16,7 +16,7 @@ namespace Sentry
 		this->mFunction = nullptr;
 		this->mCorContext = nullptr;
 #elif _WIN32
-		this->mCorStack = nullptr;
+		this->mContextStack = nullptr;
 #endif
 	}
 	Coroutine::~Coroutine()
@@ -26,7 +26,7 @@ namespace Sentry
 #elif __linux__
 		free(this->mContextStack);
 #elif _WIN32
-		DeleteFiber(this->mCorStack);
+		DeleteFiber(this->mContextStack);
 #endif
 	}
 }

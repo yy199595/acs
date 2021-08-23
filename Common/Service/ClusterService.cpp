@@ -29,7 +29,7 @@ namespace Sentry
 
     void ClusterService::OnInitComplete()
     {
-		std::vector<std::string> localServices;
+		/*std::vector<std::string> localServices;
 		this->mServiceManager->GetLocalServices(localServices);
 		ServiceNode *centerNode = this->mServiceNodeManager->GetServiceNode(0);
 		SayNoAssertRet_F(centerNode && !localServices.empty());
@@ -49,7 +49,7 @@ namespace Sentry
 			SayNoDebugLog("register local service node fail");
 			return;
 		}
-		SayNoDebugLog("register local service node successful");
+		SayNoDebugLog("register local service node successful");*/
 
     }
 

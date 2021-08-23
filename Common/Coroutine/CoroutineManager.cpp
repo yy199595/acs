@@ -49,7 +49,7 @@ namespace Sentry
 #ifdef __COROUTINE_ASM__		
 		
 #elif _WIN32		
-		this->mMainCoroutine->mCorStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
+		this->mMainCoroutine->mContextStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #endif
 		this->mCurrentCorId = 0;
     }
@@ -62,8 +62,8 @@ namespace Sentry
 
     void CoroutineManager::OnInitComplete()
     {
-		//this->Start(&CoroutineManager::Loop, this);
-		//this->Start(&CoroutineManager::Loop2, this);
+		this->Start(&CoroutineManager::Loop, this);
+		this->Start(&CoroutineManager::Loop2, this);
     }
 
     void CoroutineManager::Sleep(long long ms)
@@ -109,14 +109,14 @@ namespace Sentry
 			SayNoDebugLog("resume new coroutine id " << logicCoroutine->mCoroutineId);
 			from = tb_context_jump(logicCoroutine->mCorContext, this);
 #elif _WIN32
-			logicCoroutine->mCorStack = CreateFiber(STACK_SIZE, MainEntry, this);
-			SwitchToFiber(logicCoroutine->mCorStack);
+			logicCoroutine->mContextStack = CreateFiber(STACK_SIZE, MainEntry, this);
+			SwitchToFiber(logicCoroutine->mContextStack);
 #elif __linux__
 			getcontext(&logicCoroutine->mCorContext);
 			logicCoroutine->mState = CorState::Running;
 			logicCoroutine->mCorContext.uc_stack.ss_size = STACK_SIZE;
 			logicCoroutine->mCorContext.uc_stack.ss_sp = this->mSharedStack;
-			logicCoroutine->mCorContext.uc_link = &this->mMainCoroutine->mCorContext;
+			logicCoroutine->mCorContext.uc_link = &this->mMainCoroutine->mContextStack;
 			makecontext(&logicCoroutine->mCorContext, (void(*)(void)) MainEntry, 1, this);
 			swapcontext(&this->mMainCoroutine->mCorContext, &logicCoroutine->mCorContext);
 #endif
@@ -129,7 +129,7 @@ namespace Sentry
 			SayNoDebugLog("from " << mMainCoroutine->mCoroutineId << " swap to " << logicCoroutine->mCoroutineId);
 			from = tb_context_jump(logicCoroutine->mCorContext, this);			
 #elif _WIN32
-			SwitchToFiber(logicCoroutine->mCorStack);
+			SwitchToFiber(logicCoroutine->mContextStack);
 #elif __linux__
 			void *start = this->mSharedStack + STACK_SIZE - logicCoroutine->mStackSize;
 			memcpy(start, logicCoroutine->mContextStack, logicCoroutine->mStackSize);
@@ -150,11 +150,11 @@ namespace Sentry
 		{
 #ifndef __COROUTINE_ASM__
 	#ifdef _WIN32
-			if (coroutine->mCorStack != nullptr)
+			if (coroutine->mContextStack != nullptr)
 			{
-				DeleteFiber(coroutine->mCorStack);
+				DeleteFiber(coroutine->mContextStack);
 				coroutine->mStackSize = 0;
-				coroutine->mCorStack = nullptr;
+				coroutine->mContextStack = nullptr;
 			}
 	#endif
 #endif
@@ -204,7 +204,7 @@ namespace Sentry
 		from = tb_context_jump(this->mMainCoroutine->mCorContext, nullptr);
 		this->mMainCoroutine->mCorContext = from.ctx;
 #elif _WIN32
-        SwitchToFiber(this->mMainCoroutine->mCorStack);
+        SwitchToFiber(this->mMainCoroutine->mContextStack);
 #else
         this->SaveStack(logicCoroutine, this->mSharedStack + STACK_SIZE);
         swapcontext(&logicCoroutine->mCorContext, &this->mMainCoroutine->mCorContext);
@@ -232,7 +232,7 @@ namespace Sentry
 #ifdef __COROUTINE_ASM__
 		
 #elif _WIN32
-		SwitchToFiber(this->mMainCoroutine->mCorStack);
+		SwitchToFiber(this->mMainCoroutine->mContextStack);
 #else
 		setcontext(&this->mMainCoroutine->mCorContext);
 #endif
@@ -254,11 +254,11 @@ namespace Sentry
 		size_t size = top - &dummy;
 		if (cor->mStackSize < size)
 		{
-			free(cor->mCorStack);
-			cor->mCorStack = malloc(size);
+			free(cor->mContextStack);
+			cor->mContextStack = malloc(size);
 		}
 		cor->mStackSize = size;
-		memcpy(cor->mCorStack, &dummy, size);
+		memcpy(cor->mContextStack, &dummy, size);
 #endif
           
     }
