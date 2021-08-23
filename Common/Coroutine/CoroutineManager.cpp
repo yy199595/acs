@@ -125,8 +125,7 @@ namespace Sentry
 		{
 			this->mCurrentCorId = id;
 			logicCoroutine->mState = CorState::Running;
-#ifdef __COROUTINE_ASM__
-			this->SaveStack(this->mMainCoroutine, nullptr);
+#ifdef __COROUTINE_ASM__			
 			SayNoDebugLog("from " << mMainCoroutine->mCoroutineId << " swap to " << logicCoroutine->mCoroutineId);
 			from = tb_context_jump(logicCoroutine->mCorContext, this);			
 #elif _WIN32
@@ -201,8 +200,9 @@ namespace Sentry
         this->mCurrentCorId = 0;
         logicCoroutine->mState = CorState::Suspend;
 #ifdef __COROUTINE_ASM__
-		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
-		//logicCoroutine->mCorContext = from.ctx;
+		tb_context_from_t from;
+		from = tb_context_jump(this->mMainCoroutine->mCorContext, nullptr);
+		this->mMainCoroutine->mCorContext = from.ctx;
 #elif _WIN32
         SwitchToFiber(this->mMainCoroutine->mCorStack);
 #else
@@ -254,11 +254,11 @@ namespace Sentry
 		size_t size = top - &dummy;
 		if (cor->mStackSize < size)
 		{
-			free(cor->mContextStack);
-			cor->mContextStack = malloc(size);
+			free(cor->mCorStack);
+			cor->mCorStack = malloc(size);
 		}
 		cor->mStackSize = size;
-		memcpy(cor->mContextStack, &dummy, size);
+		memcpy(cor->mCorStack, &dummy, size);
 #endif
           
     }
