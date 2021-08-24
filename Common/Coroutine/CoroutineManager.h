@@ -6,12 +6,10 @@
 #include<tuple>
 #include<functional>
 #include<unordered_map>
-#include"CoroutineEvent.h"
+#include"Coroutine.h"
 
 #ifndef _WIN32
-
 #include<ucontext.h>
-
 #endif
 
 #include<Manager/Manager.h>
@@ -20,69 +18,80 @@
 #define CoroutinePoolMaxCount 100    //协程池最大数量
 namespace Sentry
 {
-    struct Coroutine;
+	class CoroutineManager : public Manager, public IFrameUpdate
+	{
+	public:
+		CoroutineManager();
 
-    class CoroutineManager : public Manager, public IFrameUpdate
-    {
-    public:
-        CoroutineManager();
+	public:
 
-    public:
-        long long Start(CoroutineAction func);
+		template<typename F, typename T>
+		unsigned int Start(F && f, T * o) {
+			return this->StartCoroutine(new_closure(std::forward<F>(f), o));
+		}
 
-        long long Create(CoroutineAction func);
+		template<typename F, typename T,typename P>
+		unsigned int Start(F && f, T * o,P && p) {
+			return this->StartCoroutine(new_closure(std::forward<F>(f), o, std::forward<P>(p)));
+		}
 
-    public:
-        void YieldReturn();
+		template<typename F,typename T, typename P1, typename P2>
+		unsigned int Start(F && f, T * t,P1 && p1, P2 && p2) {
+			return this->StartCoroutine(new_closure(std::forward<F>(f), t, std::forward<P>(p1), std::forward<P>(p2)));
+		}
+	private:
+		unsigned int StartCoroutine(Closure * func);
+	public:
+		void YieldReturn();
 
-        void Sleep(long long ms);
+		void Sleep(long long ms);
 
-        void Resume(long long id);
+		void Resume(unsigned int id);
 
-    protected:
-        bool OnInit() final;
+	protected:
+		bool OnInit() final;
 
-        void OnInitComplete() final;
+		void OnInitComplete() final;
 
-        void OnFrameUpdate(float t) final;
+		void OnFrameUpdate(float t) final;
+	private:
+		void Loop();
+		void Loop2();
 
-    public:
-        long long GetNowTime();
+	public:
+		long long GetNowTime();
 
-        void Destory(long long id);
+		void Destory(Coroutine * coroutine);
 
-        Coroutine *GetCoroutine();
+		Coroutine *GetCoroutine();
 
-        Coroutine *GetCoroutine(long long id);
+		Coroutine *GetCoroutine(unsigned int id);
 
-        long long GetCurrentCorId()
-        { return this->mCurrentCorId; }
+		unsigned int GetCurrentCorId()
+		{
+			return this->mCurrentCorId;
+		}
 
-        bool IsInMainCoroutine()
-        { return this->mCurrentCorId == 0; }
+		bool IsInMainCoroutine()
+		{
+			return this->mCurrentCorId == 0;
+		}
 
-        bool IsInLogicCoroutine()
-        { return this->mCurrentCorId != 0; }
+		bool IsInLogicCoroutine()
+		{
+			return this->mCurrentCorId != 0;
+		}
 
-    private:
-        void SaveStack(Coroutine *, char *top);
+	private:
+		void SaveStack(Coroutine *, char *top);
 
-    private:
-        std::string mMessageBuffer;
-
-        class TimerManager *mTimerManager;
-
-    private:
-        long long mCurrentCorId;
-#ifndef _WIN32
-        ucontext_t mMainContext;
-#else
-        void *mMainCoroutineStack;
-#endif
-        int mCoroutinePoolMaxSize;  //协程池默认数量
-        char mSharedStack[STACK_SIZE];
-        std::queue<Coroutine *> mCoroutinePool;
-        std::queue<Coroutine *> mDestoryCoroutine;
-        std::unordered_map<long long, Coroutine *> mCoroutineMap;
-    };
+	private:
+		std::string mMessageBuffer;
+		class TimerManager *mTimerManager;
+	private:
+		CoroutinePool mCorPool;
+		Coroutine * mMainCoroutine;
+		unsigned int mCurrentCorId;
+		char mSharedStack[STACK_SIZE];
+	};
 }

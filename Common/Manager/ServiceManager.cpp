@@ -31,7 +31,8 @@ namespace Sentry
         {
             LocalService *localService = iter->second;
             localService->GetServiceList(methodVec);
-            this->mCorManager->Start(BIND_ACTION_0(LocalService::OnInitComplete, localService));
+			ServiceBase * ptr = localService;
+			this->mCorManager->Start(&LocalService::OnInitComplete, ptr);
         }
     }
 
@@ -58,6 +59,8 @@ namespace Sentry
             SayNoDebugError("call function not find [" << service << "." << method << "]");
             return false;
         }
+
+		this->mCorManager->Start(&ServiceManager::Invoke, this, address, messageData);
 
         this->mCorManager->Start([address, localService, this, messageData]() {
             if (localService->InvokeMethod(address, messageData))
@@ -87,7 +90,12 @@ namespace Sentry
         return nullptr;
     }
 
-    ServiceBase *ServiceManager::GetService(const std::string &name)
+	void ServiceManager::Invoke(const std::string & adress, NetMessageProxy * messageData)
+	{
+
+	}
+
+	ServiceBase *ServiceManager::GetService(const std::string &name)
     {
         LocalLuaService *luaService = this->GetLuaService(name);
         if (luaService == nullptr)

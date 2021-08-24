@@ -155,46 +155,47 @@ namespace Sentry
     }
 
 
-    void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent *eve)//处理主线程过来的事件
-    {
-        if (eve == nullptr)
-            return;
-        const std::string &address = eve->GetAddress();
-        if (eve->GetEventType() == SocketDectoryEvent)
-        {
-            this->DescorySession(address);
-        } else if (eve->GetEventType() == SocketConnectEvent)
-        {
-            const std::string &name = eve->GetName();
-            TcpClientSession *session = this->Create(name, address);
-            if (session == nullptr || !session->StartConnect())
-            {
-                Net2MainEvent *eve = new Net2MainEvent(SocketConnectFail, address, name);
-                this->mNetProxyManager->AddNetSessionEvent(eve);
-            }
-        } else if (eve->GetEventType() == SocketSendMsgEvent)
-        {
-            TcpClientSession *session = this->GetSession(address);
-            if (session != nullptr)
-            {
-                NetMessageProxy *messageData = eve->GetMsgData();
-                size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, ASIO_TCP_SEND_MAX_COUNT);
-                if (size == 0)
-                {
-                    const std::string &name = session->GetSessionName();
-                    Net2MainEvent *eve = new Net2MainEvent(Net2MainEventType::SocketSendMsgFail, address, name,
-                                                           messageData);
-                    this->mNetProxyManager->AddNetSessionEvent(eve);
-                    return;
-                }
-                session->SendPackage(std::make_shared<std::string>(this->mSendSharedBuffer, size));
-            }
-        }
-    }
+	void NetSessionManager::HandlerMainThreadEvent(Main2NetEvent *eve)//处理主线程过来的事件
+	{
+		if (eve == nullptr)
+			return;
+		const std::string &address = eve->GetAddress();
+		if (eve->GetEventType() == SocketDectoryEvent)
+		{
+			this->DescorySession(address);
+		}
+		else if (eve->GetEventType() == SocketConnectEvent)
+		{
+			const std::string &name = eve->GetName();
+			TcpClientSession *session = this->Create(name, address);
+			if (session == nullptr || !session->StartConnect())
+			{
+				Net2MainEvent *eve = new Net2MainEvent(SocketConnectFail, address, name);
+				this->mNetProxyManager->AddNetSessionEvent(eve);
+			}
+		}
+		else if (eve->GetEventType() == SocketSendMsgEvent)
+		{
+			TcpClientSession *session = this->GetSession(address);
+			if (session != nullptr)
+			{
+				NetMessageProxy *messageData = eve->GetMsgData();
+				size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, ASIO_TCP_SEND_MAX_COUNT);
+				if (size == 0)
+				{
+					const std::string &name = session->GetSessionName();
+					Net2MainEvent *eve = new Net2MainEvent(Net2MainEventType::SocketSendMsgFail, address, name,
+						messageData);
+					this->mNetProxyManager->AddNetSessionEvent(eve);
+					return;
+				}
+				session->SendPackage(std::make_shared<std::string>(this->mSendSharedBuffer, size));
+			}
+		}
+	}
 
     TcpClientSession *NetSessionManager::GetSession(const std::string &address)
     {
-
         auto iter = this->mSessionAdressMap.find(address);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
     }

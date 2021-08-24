@@ -1,7 +1,5 @@
 ﻿#pragma once
-
 #include"CoroutineEvent.h"
-
 namespace Sentry
 {
     enum CorState
@@ -17,19 +15,22 @@ namespace Sentry
     struct Coroutine
     {
     public:
-        Coroutine() {}
-
+		Coroutine();
         ~Coroutine();
-
     public:
         size_t mStackSize;
-        void *mContextStack;
-#ifndef _WIN32
-        ucontext_t mCorContext;
+		Closure * mFunction;
+#ifdef SentryAsmCoroutine		
+		tb_context_t mCorContext;
+#else
+		void * mCorContext;	
+#ifndef _WIN32	
+		ucontext_t mCorContext;
+#endif
+
 #endif
         CorState mState;
         long long mCoroutineId;
-        CoroutineAction mBindFunc;
         CoroutineManager *mScheduler;
     };
-}
+};

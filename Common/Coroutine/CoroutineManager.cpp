@@ -13,84 +13,53 @@ using namespace std::chrono;
 #endif
 namespace Sentry
 {
-#ifdef _WIN32
-    void __stdcall WinEntry(LPVOID manager)
+#ifdef SentryAsmCoroutine
+	void AsmEntry(tb_context_from_t parame)
+	{
+		CoroutineManager *pCoroutineMgr = (CoroutineManager*)parame.priv;
 #else
-
-    void LinuxEntry(void *manager)
+#if _WIN32
+	void __stdcall WinEntry(LPVOID manager)
+	{
+		CoroutineManager *pCoroutineMgr = (CoroutineManager *)manager;
+#else
+	void LinuxEntry(void *manager)
+	{
+		CoroutineManager *pCoroutineMgr = (CoroutineManager *)manager;
 #endif
-    {
-        CoroutineManager *pCoroutineMgr = (CoroutineManager *) manager;
-        if (pCoroutineMgr != nullptr)
-        {
-            Coroutine *pCoroutine = pCoroutineMgr->GetCoroutine();
-            if (pCoroutine != nullptr)
-            {
-                pCoroutine->mBindFunc();
-                pCoroutineMgr->Destory(pCoroutine->mCoroutineId);
-            }
-        }
-    }
+#endif
+		Coroutine *pCoroutine = pCoroutineMgr->GetCoroutine();
+		if (pCoroutine != nullptr)
+		{
+			pCoroutine->mFunction->run();
+			pCoroutineMgr->Destory(pCoroutine);
+		}
+	}
 
     CoroutineManager::CoroutineManager()
+		:mCorPool(100)
     {
-#ifdef _WIN32
-        this->mMainCoroutineStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
+#ifdef SentryAsmCoroutine
+		this->mMainCoroutine = this->mCorPool.Pop();
+		this->mMainCoroutine->mStackSize = STACK_SIZE;
+		this->mMainCoroutine->mCorContext = this->mSharedStack;
+#elif _WIN32
+		this->mMainCoroutine = this->mCorPool.Pop();
+		this->mMainCoroutine->mCorContext = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #endif
 		this->mCurrentCorId = 0;
     }
 
     bool CoroutineManager::OnInit()
     {
-        mCoroutinePoolMaxSize = CoroutinePoolMaxCount;
-        this->GetConfig().GetValue("CoroutinePoolMaxSize", mCoroutinePoolMaxSize);
-        SayNoAssertRetFalse_F(this->mTimerManager = this->GetManager<TimerManager>());
-
-        for (int index = 0; index < mCoroutinePoolMaxSize; index++)
-        {
-            Coroutine *coroutine = new Coroutine();
-
-            coroutine->mStackSize = 0;
-            coroutine->mScheduler = this;
-            coroutine->mCoroutineId = 0;
-            coroutine->mContextStack = nullptr;
-            this->mCoroutinePool.push(coroutine);
-        }
-        SayNoDebugLog("create " << mCoroutinePoolMaxSize << " coroutine");
+		SayNoAssertRetFalse_F(this->mTimerManager = this->GetManager<TimerManager>());
         return true;
     }
 
     void CoroutineManager::OnInitComplete()
     {
-
-    }
-
-    long long CoroutineManager::Start(CoroutineAction func)
-    {
-        long long id = this->Create(func);
-        this->Resume(id);
-        return id;
-    }
-
-    long long CoroutineManager::Create(CoroutineAction func)
-    {
-        long long id = NumberHelper::Create();
-        Coroutine *pCoroutine = nullptr;
-        if (!this->mCoroutinePool.empty())
-        {
-            pCoroutine = this->mCoroutinePool.front();
-            this->mCoroutinePool.pop();
-        } else
-        {
-            pCoroutine = new Coroutine();
-            pCoroutine->mStackSize = 0;
-            pCoroutine->mContextStack = nullptr;
-        }
-        pCoroutine->mBindFunc = func;
-        pCoroutine->mCoroutineId = id;
-        pCoroutine->mState = CorState::Ready;
-        this->mCoroutineMap.insert(std::make_pair(id, pCoroutine));
-        return pCoroutine->mCoroutineId;
+		this->Start(&CoroutineManager::Loop, this);
+		this->Start(&CoroutineManager::Loop2, this);
     }
 
     void CoroutineManager::Sleep(long long ms)
@@ -104,7 +73,7 @@ namespace Sentry
         }
     }
 
-    void CoroutineManager::Resume(long long id)
+    void CoroutineManager::Resume(unsigned int id)
     {
         if (this->mCurrentCorId != 0)
         {
@@ -117,10 +86,14 @@ namespace Sentry
             if (pCoroutine->mState == CorState::Ready)
             {
                 this->mCurrentCorId = id;
-#ifdef _WIN32
-                pCoroutine->mStackSize = STACK_SIZE;
-                pCoroutine->mContextStack = CreateFiber(STACK_SIZE, WinEntry, this);
-                SwitchToFiber(pCoroutine->mContextStack);
+				pCoroutine->mStackSize = STACK_SIZE;
+#ifdef SentryAsmCoroutine
+				char * stack = (char*)this->mMainCoroutine->mCorContext;
+				pCoroutine->mCorContext = tb_context_make(stack, STACK_SIZE, AsmEntry);		
+				tb_context_jump(pCoroutine->mCorContext, this);
+#elif _WIN32
+                pCoroutine->mCorContext = CreateFiber(STACK_SIZE, WinEntry, this);
+                SwitchToFiber(pCoroutine->mCorContext);
 #else
                 getcontext(&pCoroutine->mCorContext);
                 pCoroutine->mState = CorState::Running;
@@ -130,12 +103,15 @@ namespace Sentry
                 makecontext(&pCoroutine->mCorContext, (void (*)(void)) LinuxEntry, 1, this);
                 swapcontext(&this->mMainContext, &pCoroutine->mCorContext);
 #endif
-            } else if (pCoroutine->mState == CorState::Suspend)
+            } 
+			else if (pCoroutine->mState == CorState::Suspend)
             {
                 this->mCurrentCorId = id;
                 pCoroutine->mState = CorState::Running;
-#ifdef _WIN32
-                SwitchToFiber(pCoroutine->mContextStack);
+#ifdef SentryAsmCoroutine
+				tb_context_jump(pCoroutine->mCorContext, this);
+#elif _WIN32
+                SwitchToFiber(pCoroutine->mCorContext);
 #else
                 void *start = this->mSharedStack + STACK_SIZE - pCoroutine->mStackSize;
                 memcpy(start, pCoroutine->mContextStack, pCoroutine->mStackSize);
@@ -145,7 +121,48 @@ namespace Sentry
         }
     }
 
-    void CoroutineManager::YieldReturn()
+	unsigned int CoroutineManager::StartCoroutine(Closure * func)
+	{
+		Coroutine * coroutine = this->mCorPool.Pop();
+		if (coroutine != nullptr)
+		{
+#ifndef SentryAsmCoroutine
+	#ifdef _WIN32
+			if (coroutine->mCorContext != nullptr)
+			{
+				DeleteFiber(coroutine->mCorContext);
+				coroutine->mStackSize = 0;
+				coroutine->mCorContext = nullptr;
+			}
+	#endif
+#endif
+			coroutine->mFunction = func;
+			coroutine->mState = CorState::Ready;
+			this->Resume(coroutine->mCoroutineId);
+			return coroutine->mCoroutineId;
+		}
+		return 0;
+	}
+
+	void CoroutineManager::Loop()
+	{
+		while (true)
+		{
+			this->Sleep(1000);
+			SayNoDebugFatal("================");
+		}
+	}
+
+	void CoroutineManager::Loop2()
+	{
+		while (true)
+		{
+			this->Sleep(1000);
+			SayNoDebugWarning("================");
+		}
+	}
+
+	void CoroutineManager::YieldReturn()
     {
         Coroutine *pCoroutine = this->GetCoroutine();
         if (pCoroutine == nullptr)
@@ -153,10 +170,18 @@ namespace Sentry
             SayNoDebugFatal("not find coroutine context");
             return;
         }
+		if (pCoroutine->mCoroutineId == 0)
+		{
+			SayNoDebugFatal("try yield main coroutine");
+			return;
+		}
         this->mCurrentCorId = 0;
         pCoroutine->mState = CorState::Suspend;
-#ifdef _WIN32
-        SwitchToFiber(this->mMainCoroutineStack);
+#ifdef SentryAsmCoroutine
+		this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
+		tb_context_jump(pCoroutine->mCorContext, this->mMainCoroutine->mCorContext);
+#elif _WIN32
+        SwitchToFiber(this->mMainCoroutine->mCorContext);
 #else
         this->SaveStack(pCoroutine, this->mSharedStack + STACK_SIZE);
         swapcontext(&pCoroutine->mCorContext, &this->mMainContext);
@@ -165,32 +190,26 @@ namespace Sentry
 
     Coroutine *CoroutineManager::GetCoroutine()
     {
-        auto iter = this->mCoroutineMap.find(this->mCurrentCorId);
-        return iter != this->mCoroutineMap.end() ? iter->second : nullptr;
+		return this->mCorPool.Get(this->mCurrentCorId);     
     }
 
-    Coroutine *CoroutineManager::GetCoroutine(long long id)
+    Coroutine *CoroutineManager::GetCoroutine(unsigned int id)
     {
-        auto iter = this->mCoroutineMap.find(id);
-        return iter != this->mCoroutineMap.end() ? iter->second : nullptr;
+		return this->mCorPool.Get(id);
     }
 
-    void CoroutineManager::Destory(long long id)
-    {
-        auto iter = this->mCoroutineMap.find(id);
-        if (iter != this->mCoroutineMap.end())
-        {
-            this->mCurrentCorId = 0;
-            Coroutine *cor = iter->second;
-            this->mCoroutineMap.erase(iter);
-            mDestoryCoroutine.push(cor);
-#ifdef _WIN32
-            SwitchToFiber(this->mMainCoroutineStack);
+	void CoroutineManager::Destory(Coroutine * coroutine)
+	{
+		this->mCurrentCorId = 0;
+		this->mCorPool.Push(coroutine);
+#ifdef SentryAsmCoroutine
+		tb_context_jump(this->mMainCoroutine->mCorContext, this);
+#elif _WIN32
+		SwitchToFiber(this->mMainCoroutine->mCorContext);
 #else
-            setcontext(&mMainContext);
+		setcontext(&mMainContext);
 #endif
-        }
-    }
+	}
 
     long long CoroutineManager::GetNowTime()
     {
@@ -204,36 +223,16 @@ namespace Sentry
         size_t size = top - &dummy;
         if (cor->mStackSize < size)
         {
-            free(cor->mContextStack);
-            cor->mContextStack = malloc(size);
+            free(cor->mCorContext);
+            cor->mCorContext = malloc(size);
         }
         cor->mStackSize = size;
-        memcpy(cor->mContextStack, &dummy, cor->mStackSize);
+        memcpy(cor->mCorContext, &dummy, cor->mStackSize);
     }
 
 
     void CoroutineManager::OnFrameUpdate(float t)
     {
-        while (!this->mDestoryCoroutine.empty())
-        {
-            Coroutine *pCoroutine = this->mDestoryCoroutine.front();
-            this->mDestoryCoroutine.pop();
-            if (this->mCoroutinePool.size() >= mCoroutinePoolMaxSize)
-            {
-                delete pCoroutine;
-                continue;
-            } else
-            {
-#ifdef _WIN32
-                if (pCoroutine->mContextStack != nullptr)
-                {
-                  DeleteFiber(pCoroutine->mContextStack);
-                  pCoroutine->mContextStack = nullptr;
-                  pCoroutine->mStackSize = 0;
-                }
-#endif
-                this->mCoroutinePool.push(pCoroutine);
-            }
-        }
+
     }
 }

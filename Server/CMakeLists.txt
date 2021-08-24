@@ -52,17 +52,9 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/Main MainSource)
 
 LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
 
-#SET(CMAKE_CXX_COMPILER "ccache")
-#SET(CMAKE_CXX_COMPILER_ARG1 "g++")
-SET(CMAKE_CXX_STANDARD 11)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=gnu++11" )
-
-
 SET(CMAKE_BUILD_TYPE Debug)
 
-
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     message("currentdir = " ${PROJECT_SOURCE_DIR} " last dir = " ${PROJECT_INIT_PATH})
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/CMakeFiles)
