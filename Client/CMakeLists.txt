@@ -43,7 +43,7 @@ if(MSVC)
     ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 libprotobufd)
 else()
-    ADD_EXECUTABLE(Client ${SUPER_SRC})
+    ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
 endif()
 
