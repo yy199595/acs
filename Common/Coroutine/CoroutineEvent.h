@@ -10,7 +10,7 @@
 #define __COROUTINE_ASM__
 #endif // !1
 #endif
-#include"CotoutiFunction/CotoutiFunction.h"
+#include<Method/MethodProxy.h>
 #ifdef __COROUTINE_ASM__
 	#include"Context/context.h"	
 	#define STACK_SIZE 1024 * 1024

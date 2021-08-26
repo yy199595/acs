@@ -3,7 +3,7 @@
 #include "TimeWheelLayer.h"
 #include <Manager/Manager.h>
 #include <Util/NumberBuilder.h>
-
+#include <Method/MethodProxy.h>
 namespace Sentry
 {
     class TimerManager : public Manager, public ISystemUpdate
@@ -18,9 +18,17 @@ namespace Sentry
 
         bool AddTimer(shared_ptr<TimerBase> timer);
 
-        bool AddTimer(long long ms, std::function<void(void)> func);
+		template<typename F,typename O, typename ... Args>
+		bool AddTimer(long long ms, F && f, O * o, Args &&... args) {
+
+			MethodProxy * methodProxy = NewMethodProxy(
+				std::forward<F>(f), o, std::forward<Args>(args)...);
+			return this->AddTimer(ms, methodProxy);
+		}
 
         shared_ptr<TimerBase> GetTimer(long long id);
+	private:
+		bool AddTimer(long long ms, MethodProxy * func);
 
     public:
         template<typename T, typename... Args>
@@ -30,8 +38,6 @@ namespace Sentry
         bool OnInit();
 
         void OnSystemUpdate() final;//处理系统事件
-    private:
-        void RefreshTimer();
 
         bool InvokeTimer(long long id);
 

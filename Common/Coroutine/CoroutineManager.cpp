@@ -143,7 +143,7 @@ namespace Sentry
 
 	}
 
-	unsigned int CoroutineManager::StartCoroutine(Closure * func)
+	unsigned int CoroutineManager::StartCoroutine(MethodProxy * func)
 	{
 		Coroutine * coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)

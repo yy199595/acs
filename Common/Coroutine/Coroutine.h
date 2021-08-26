@@ -19,7 +19,7 @@ namespace Sentry
         ~Coroutine();
     public:
         size_t mStackSize;
-		Closure * mFunction;
+		MethodProxy * mFunction;
 #ifdef __COROUTINE_ASM__	
 		char * mStack;
 		char * mStackTop;

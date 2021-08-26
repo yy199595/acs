@@ -1,23 +1,24 @@
 ﻿#pragma once
 
 #include "TimerBase.h"
-
+#include<Method/MethodProxy.h>
 namespace Sentry
 {
-    class DelayTimer : public TimerBase
-    {
-    public:
-        DelayTimer(long long ms, std::function<void(void)> &func)
-            : TimerBase(ms), mBindAction(func) {}
+	class DelayTimer : public TimerBase
+	{
+	public:
+		DelayTimer(long long ms, MethodProxy * func)
+			: TimerBase(ms), mFunc(func) {}
 
-    public:
-        bool Invoke() final
-        {
-            this->mBindAction();
-            return true;
-        }
-
-    private:
-        std::function<void(void)> mBindAction;
-    };
+	public:
+		bool Invoke() final
+		{
+			this->mFunc->run();
+			delete mFunc;
+			this->mFunc = nullptr;
+			return true;
+		}
+	private:
+		MethodProxy * mFunc;
+	};
 }// namespace Sentry

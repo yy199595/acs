@@ -39,11 +39,12 @@ namespace Sentry
         return false;
     }
 
-    bool TimerManager::AddTimer(long long ms, std::function<void(void)> func)
+    bool TimerManager::AddTimer(long long ms, MethodProxy * func)
     {
         if (ms == 0)
         {
-            func();
+            func->run();
+			delete func;
             return true;
         }
         return this->AddTimer(make_shared<DelayTimer>(ms, func));

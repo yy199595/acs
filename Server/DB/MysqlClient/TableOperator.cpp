@@ -11,58 +11,61 @@ namespace Sentry
         this->mMysqlSocket = socket;
     }
 
-    bool TableOperator::InitMysqlTable()
-    {
-        if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) != 0)
-        {
-            std::string sql = "Create DB " + this->mDataBase;
-            if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
-            {
-                SayNoDebugError("create " << this->mDataBase << " db fail");
-                return false;
-            }
-            SayNoDebugInfo("\n"
-                                   << sql);
-            mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str());
-        }
+	bool TableOperator::InitMysqlTable()
+	{
+		if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) != 0)
+		{
+			const std::string sql = "CREATE DATABASE " + this->mDataBase;
+			if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
+			{
+				const char * err = mysql_error(mMysqlSocket);
+				SayNoDebugError("create " << this->mDataBase << " db fail : " << err);
+				return false;
+			}
+			if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) == 0)
+			{
+				SayNoDebugInfo("create db " << this->mDataBase << " successful");
+			}
+		}
 
-        for (auto iter = this->mDocument.MemberBegin(); iter != this->mDocument.MemberEnd(); iter++)
-        {
-            if (!iter->name.IsString() || !iter->value.IsObject())
-            {
-                SayNoDebugError("json config error");
-                return false;
-            }
-            const std::string table = iter->name.GetString();
-            const std::string name = iter->value.FindMember("protobuf")->value.GetString();
-            auto iter1 = iter->value.FindMember("keys");
-            if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
-            {
-                SayNoDebugError(table << " sql table config error");
-                return false;
-            }
-            std::vector<std::string> keys;
-            for (unsigned int index = 0; index < iter1->value.Size(); index++)
-            {
-                const std::string key = iter1->value[index].GetString();
-                keys.push_back(key);
-            }
-            std::string sql = "desc " + table;
-            if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
-            {
-                if (!this->CreateMysqlTable(table, name, keys))
-                {
-                    SayNoDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
-                    return false;
-                }
-                SayNoDebugInfo("create new table success " << table);
-            } else
-            {
-                this->UpdateMysqlTable(table, name, keys);
-            }
-        }
-        return true;
-    }
+		for (auto iter = this->mDocument.MemberBegin(); iter != this->mDocument.MemberEnd(); iter++)
+		{
+			if (!iter->name.IsString() || !iter->value.IsObject())
+			{
+				SayNoDebugError("json config error");
+				return false;
+			}
+			const std::string table = iter->name.GetString();
+			const std::string name = iter->value.FindMember("protobuf")->value.GetString();
+			auto iter1 = iter->value.FindMember("keys");
+			if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
+			{
+				SayNoDebugError(table << " sql table config error");
+				return false;
+			}
+			std::vector<std::string> keys;
+			for (unsigned int index = 0; index < iter1->value.Size(); index++)
+			{
+				const std::string key = iter1->value[index].GetString();
+				keys.push_back(key);
+			}
+			std::string sql = "desc " + table;
+			if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
+			{
+				if (!this->CreateMysqlTable(table, name, keys))
+				{
+					SayNoDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
+					return false;
+				}
+				SayNoDebugInfo("create new table success " << table);
+			}
+			else
+			{
+				this->UpdateMysqlTable(table, name, keys);
+			}
+		}
+		return true;
+	}
 
     bool TableOperator::UpdateMysqlTable(const std::string table, const std::string name,
                                          const std::vector<std::string> &keys)
