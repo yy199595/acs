@@ -49,8 +49,6 @@ namespace Sentry
 
         class SceneSessionComponent *mNetWorkManager;
 
-		class ServiceMgrComponent * mServiceMgrComponent;
-
         DoubleBufferQueue<Net2MainEvent *> mNetEventQueue;
         std::unordered_map<std::string, TcpProxySession *> mSessionMap; //管理所有的session
         std::unordered_map<std::string, TcpProxySession *> mConnectSessionMap; //正在连接的session

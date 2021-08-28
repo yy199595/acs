@@ -1,12 +1,9 @@
 ﻿#include"SceneActionComponent.h"
-#include"SceneScriptComponent.h"
 #include"SceneSessionComponent.h"
 #include<Util/StringHelper.h>
 #include<Core/App.h>
 #include<Util/NumberHelper.h>
-#include<Timer/TimerComponent.h>
 #include<NetWork/NetWorkRetAction.h>
-#include<Coroutine/CoroutineComponent.h>
 #include<Timer/ActionTimeoutTimer.h>
 
 namespace Sentry

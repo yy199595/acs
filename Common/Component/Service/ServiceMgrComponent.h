@@ -34,8 +34,6 @@ namespace Sentry
     private:
         int mNodeId;
 
-        class SceneActionComponent *mActionManager;
-
         class CoroutineComponent *mCorComponent;
 
         class SceneNetProxyComponent *mNetProxyManager;

@@ -2,13 +2,11 @@
 #include "App.h"
 
 #include <Util/FileHelper.h>
-#include <Timer/TimerComponent.h>
 #include <Scene/SceneActionComponent.h>
 #include <Scene/SceneProtocolComponent.h>
 #include <Scene/SceneSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <Coroutine/CoroutineComponent.h>
 
 using namespace Sentry;
 using namespace std::chrono;

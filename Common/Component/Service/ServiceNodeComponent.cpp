@@ -73,7 +73,6 @@ namespace Sentry
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-		SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<SceneSessionComponent>());
 
         this->mCenterAddress = mCenterIp + ":" + std::to_string(this->mCenterPort);       
         ServiceNode *centerNode = new ServiceNode(0, 0, "Center", this->mCenterAddress);

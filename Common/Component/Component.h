@@ -43,8 +43,6 @@ namespace Sentry
 
 		virtual void Start() { };
 
-		virtual void Destory() { }
-
 		virtual int GetPriority() { return 100; }
 	protected:
 		long long gameObjectID;

@@ -29,9 +29,6 @@ namespace Sentry
 
     private:
         int mMessageTimeout;
-        std::string mMessageBuffer;
-        TimeRecorder mLogicTimeRecorder;
-        TimeRecorder mNetLatencyRecorder;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;
 		std::unordered_map<unsigned int, shared_ptr<LocalRetActionProxy>> mRetActionMap;

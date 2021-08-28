@@ -2,8 +2,6 @@
 #include <Core/App.h>
 #include <Util/StringHelper.h>
 #include <Service/ServiceNode.h>
-#include <Scene/SceneSessionComponent.h>
-#include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
@@ -14,8 +12,6 @@ namespace Sentry
     bool ServiceRegistry::Awake()
     {
         SayNoAssertRetFalse_F(LocalService::Awake());
-        SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<SceneSessionComponent>());
-
         REGISTER_FUNCTION_1(ServiceRegistry::RegisterNode, s2s::NodeRegister_Request);
         REGISTER_FUNCTION_2(ServiceRegistry::QueryNodes, com::Int32Data, s2s::NodeData_Array);
         return true;

@@ -38,7 +38,6 @@ namespace Sentry
         std::string mCenterIp;
         unsigned short mCenterPort;
         std::string mCenterAddress;
-        class SceneSessionComponent *mNetWorkManager;
         std::list<ServiceNode *> mServiceNodeArray;
         std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
         std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;

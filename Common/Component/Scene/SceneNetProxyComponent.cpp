@@ -79,7 +79,6 @@ namespace Sentry
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mTimerManager = App::Get().GetTimerComponent();
-		mServiceMgrComponent = Service::GetComponent<ServiceMgrComponent>();
         SayNoAssertRetFalse_F(this->mActionManager = Scene::GetComponent<SceneActionComponent>());
         SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<SceneSessionComponent>());
         SayNoAssertRetFalse_F(config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime));

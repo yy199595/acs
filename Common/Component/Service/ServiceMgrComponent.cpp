@@ -13,8 +13,7 @@ namespace Sentry
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		this->mCorComponent = App::Get().GetCoroutineComponent();
         SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
-		
-        SayNoAssertRetFalse_F(this->mActionManager = Scene::GetComponent<SceneActionComponent>());
+
         SayNoAssertRetFalse_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
         SayNoAssertRetFalse_F(this->mNetProxyManager = Scene::GetComponent<SceneNetProxyComponent>());
         return true;

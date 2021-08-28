@@ -56,8 +56,6 @@ namespace Sentry
 
 	private:
 
-		class SceneActionComponent *mLocalActionManager;
-
 		class SceneNetProxyComponent *mNetProxyManager;
 
 	private:

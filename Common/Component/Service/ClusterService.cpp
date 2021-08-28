@@ -3,7 +3,6 @@
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
 #include <Service/ServiceNodeComponent.h>
-#include <Coroutine/CoroutineComponent.h>
 #include <Service/ServiceMgrComponent.h>
 
 namespace Sentry
@@ -18,8 +17,6 @@ namespace Sentry
 		App::Get().GetConfig().GetValue("ListenAddress", "port", port);
 
         this->mListenAddress = ip + ":" + std::to_string(port);
-		
-        SayNoAssertRetFalse_F(this->mServiceManager = gameObject->GetComponent<ServiceMgrComponent>());
         SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
 
         REGISTER_FUNCTION_1(ClusterService::DelNode, Int32Data);

@@ -22,7 +22,6 @@
 
 #include <Service/MysqlProxy.h>
 using namespace Sentry;
-#include<Coroutine/Context/context.h>
 
 int main(int argc, char **argv)
 {

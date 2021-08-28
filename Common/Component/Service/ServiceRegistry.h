@@ -49,9 +49,6 @@ namespace Sentry
         XCode QueryNodes(long long id, const com::Int32Data &areaId, s2s::NodeData_Array &nodeArray);
 
     private:
-        class SceneSessionComponent *mNetWorkManager;
-
-        shared_ptr<TcpSessionListener> mTcpSessionListener;
         std::unordered_map<long long, ServiceNode *> mServiceNodeMap;
     };
 }
