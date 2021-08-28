@@ -115,7 +115,7 @@ namespace Sentry
 			return m1->GetPriority() < m2->GetPriority();
 		});
 
-		for each(Component * component in components)
+		for(Component * component : components)
 		{
 			SayNoAssertRetFalse_F(this->InitComponent(component));
 			this->mAllComponents.push_back(component);
