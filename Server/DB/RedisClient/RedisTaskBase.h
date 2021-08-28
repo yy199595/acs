@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "RedisDefine.h"
-#include <Thread/ThreadTaskAction.h>
+#include <Thread/TaskProxy.h>
 #include <XCode/XCode.h>
 #include <memory>
 #include <string>
@@ -10,17 +10,16 @@
 #define RedisLuaArgvSize 10
 namespace Sentry
 {
-    class RedisManager;
+    class SceneRedisComponent;
 
     class QuertJsonWritre;
 
-    class RedisTaskBase : public ThreadTaskAction
+    class RedisTaskBase : public TaskProxy
     {
     public:
-        RedisTaskBase(RedisManager *mgr, const std::string &cmd);
-
+        RedisTaskBase(const std::string &cmd);
     public:
-        void InvokeInThreadPool(long long threadId) final;//在线程池执行的任务
+        void Run() final;//在线程池执行的任务
     public:
         template<typename... Args>
         void InitCommand(Args &&...args);
@@ -69,8 +68,7 @@ namespace Sentry
         XCode mErrorCode;
         std::string mErrorStr;
 
-    private:
-        RedisManager *mRedisManager;
+    private:       
         std::vector<std::string> mQueryDatas;
     };
 

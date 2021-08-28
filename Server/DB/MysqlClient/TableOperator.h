@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include<string>
-#include<Manager/MysqlManager.h>
+#include<Scene/SceneMysqlComponent.h>
 
 namespace Sentry
 {

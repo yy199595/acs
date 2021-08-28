@@ -1,6 +1,6 @@
 ﻿#include "NetMessageProxy.h"
-#include <Manager/ProtocolManager.h>
-
+#include <Scene/SceneProtocolComponent.h>
+#include <Core/App.h>
 namespace Sentry
 {
     template<typename T>
@@ -30,15 +30,14 @@ namespace Sentry
         this->mProConfig = nullptr;
     }
 
-    NetMessageProxy *NetMessageProxy::Create(const char *message, const size_t size)
+    NetMessageProxy *NetMessageProxy::Create(const std::string & address, const char *message, const size_t size)
     {
         if (message == nullptr || size == 0)
         {
             return nullptr;
         }
         size_t offset = 1;
-        Applocation *app = Applocation::Get();
-        ProtocolManager *pProtocolMgr = app->GetManager<ProtocolManager>();
+        SceneProtocolComponent *pProtocolMgr = Scene::GetComponent<SceneProtocolComponent>();
 
         int code = 0;
         long long rpcid = 0;
@@ -79,10 +78,12 @@ namespace Sentry
 
         NetMessageProxy *messageData = new NetMessageProxy(messageType);
 
+		
         messageData->mRpcId = rpcid;
         messageData->mUserId = userid;
         messageData->mCode = (XCode) code;
         messageData->mProConfig = config;
+		messageData->mAddress = address;
         if (offset < size)
         {
             const char *msg = message + offset;
@@ -91,19 +92,19 @@ namespace Sentry
         return messageData;
     }
 
-    NetMessageProxy *NetMessageProxy::Create(NetMessageType type, const std::string &service, const std::string &method)
+    NetMessageProxy *NetMessageProxy::Create(const std::string & address, NetMessageType type, const std::string &service, const std::string &method)
     {
         if (type > REQUEST_END)
         {
             return nullptr;
         }
-        Applocation *app = Applocation::Get();
-        ProtocolManager *pProtocolMgr = app->GetManager<ProtocolManager>();
+        SceneProtocolComponent *pProtocolMgr = Scene::GetComponent<SceneProtocolComponent>();
 
         const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
         if (config != nullptr)
         {
             NetMessageProxy *messageData = new NetMessageProxy(type);
+			messageData->mAddress = address;
             messageData->mProConfig = config;
             return messageData;
         }

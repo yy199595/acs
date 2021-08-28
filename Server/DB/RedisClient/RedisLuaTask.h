@@ -12,14 +12,14 @@ namespace Sentry
     class RedisLuaTask : public RedisTaskBase
     {
     public:
-        RedisLuaTask(RedisManager *mgr, const std::string &cmd, lua_State *lua, int ref);
+        RedisLuaTask(const std::string &cmd, lua_State *lua, int ref);
 
         ~RedisLuaTask();
 
     protected:
-        void OnTaskFinish() final;  //执行完成之后在主线程调用
+        void RunFinish() final;  //执行完成之后在主线程调用
     public:
-        static std::shared_ptr<RedisLuaTask> Create(lua_State *lua, int index, const char *cmd);
+        static RedisLuaTask * Create(lua_State *lua, int index, const char *cmd);
 
     private:
         int mCoroutienRef;

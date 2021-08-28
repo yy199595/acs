@@ -42,7 +42,7 @@ namespace Sentry
         std::string mName;
         std::string mAddress;
         SessionType mSessionType;
-        class CoroutineManager *mCorManager;
-        class NetSessionManager *mNetManager;
+        class CoroutineComponent *mCorComponent;
+        class SceneSessionComponent *mNetManager;
     };
 }// namespace Sentry

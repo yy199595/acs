@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "ThreadTaskAction.h"
+#include "TaskProxy.h"
 #include <Other/DoubleBufferQueue.h>
 #include <condition_variable>
 #include <mutex>
@@ -15,20 +15,21 @@ namespace Sentry
         Run,
     };
 
-    class ThreadTaskManager;
+    class SceneTaskComponent;
 
     class TaskThread
     {
     public:
-        TaskThread(ThreadTaskManager *taskManaer, int index);
+        TaskThread(SceneTaskComponent *taskManaer, int index);
 
     public:
         void WaitToNextWake();
 
-        void AddTaskAction(SharedThreadTask taskAction);
+        void AddTask(TaskProxy * task);
 
         ThreadState GetTaskState() { return this->mTaskState; }
 
+		std::thread::id & GetId() { return this->mThreadId; }
         bool IsRunning() { return this->mTaskState == ThreadState::Run; }
 
     private:
@@ -36,11 +37,14 @@ namespace Sentry
 
     private:
         int mThreadIndex;
+		
         std::mutex mThreadLock;
         ThreadState mTaskState;
         std::thread *mBindThread;
-        ThreadTaskManager *mTaskManager;
+        SceneTaskComponent *mTaskManager;
+		std::thread::id mThreadId;
+		std::queue<unsigned int> mFinishTasks;
         std::condition_variable mThreadVarible;
-        DoubleBufferQueue<SharedThreadTask> mWaitInvokeTask;
+        DoubleBufferQueue<TaskProxy *> mWaitInvokeTask;
     };
 }// namespace Sentry

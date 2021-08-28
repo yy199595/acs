@@ -58,7 +58,7 @@ macro(source_group_by_dir dir source_files)
     endif(MSVC)
 endmacro(source_group_by_dir)
 
-option(BUILD_ALL "build all projects" ON)
+option(BUILD_ALL "build all projects" OFF)
 option(BUILD_SERVER "build server projects" ON)
 option(BUILD_CLIENT "build client projects" ON)
 

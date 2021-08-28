@@ -1,12 +1,10 @@
 #pragma once
 
-#include"Object.h"
-
+#include<Component/ComponentHelper.h>
 namespace Sentry
 {
     class Component;
-
-    class GameObject : public Object, public std::enable_shared_from_this<GameObject>
+    class GameObject : public Object
     {
     public:
         GameObject(const long long id);
@@ -16,10 +14,15 @@ namespace Sentry
         virtual ~GameObject() {};
     public:
         template<typename T>
-        inline T *AddComponent();
+        inline bool AddComponent();
+		bool AddComponent(const std::string & name);
+		bool AddComponent(const std::string & name, Component * component);
 
         template<typename T>
         inline T *GetComponent();
+
+		template<typename T>
+		inline T *GetComponent(const std::string & name);
 
         template<typename T>
         inline bool RemoveComponent();
@@ -30,97 +33,68 @@ namespace Sentry
         inline T *GetOrAddComponent();
 
     public:
-        void DestoryComponents();
-
-        Component *AddComponentByName(const std::string name);
-
-        Component *GetComponentByName(const std::string name);
-
-        bool RemoveComponentByName(const std::string &name);
-
-        void GetAllComponent(SayNoArray<Component *> &mConponentArray);
-
-    protected:
-        void OnDestory() override;
+		void OnDestory() override;
+        void GetComponents(std::vector<Component *> & components);
 
     public:
-        inline const std::string &GetBindAddress() { return this->mSessionAddress; }
-
-        inline const long long GetGameObjectID() const { return this->mGameObjectId; }
-
-    private:
-        void PollComponent(float t);
+		inline const long long GetId() const { return this->mGameObjectId; }
+        inline const std::string &GetAddress() { return this->mSessionAddress; }
 
     private:
         long long mGameObjectId;
-        std::string mSessionAddress;
-        SayNoQueue<Component *> mWaitStartComponents;
-        SayNoHashMap<std::string, Component *> mComponentMap;
-    private:
-        typedef SayNoHashMap<std::string, Component *>::iterator ComponentIter;
+        std::string mSessionAddress;    
+        std::unordered_map<std::string, Component *> mComponentMap;
     };
-
-    typedef shared_ptr<GameObject> SharedGameObject;
-
     template<typename T>
     inline T *GameObject::GetComponent()
     {
-        std::string name;
-        if (!Sentry::GetTypeName<T>(name))
-        {
-            SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
-            return false;
-        }
-
-        auto iter = this->mComponentMap.find(name);
-        if (iter != this->mComponentMap.end())
-        {
-            Component *component = iter->second;
-            return static_cast<T *>(component);
-        }
-        auto iter1 = this->mComponentMap.begin();
-        for (; iter1 != this->mComponentMap.end(); iter1++)
-        {
-            T *component = dynamic_cast<T *>(iter->second);
-            if (component != nullptr)
-            {
-                return component;
-            }
-        }
-        return nullptr;
+		Type * type = ComponentHelper::Get<T>();
+		if (type == nullptr)
+		{
+			return nullptr;
+		}
+        return this->GetComponent<T>(type->Name);
     }
 
-    template<typename T>
-    inline T *GameObject::AddComponent()
-    {
-        std::string name;
-        if (!Sentry::GetTypeName<T>(name))
-        {
-            SayNoDebugError("use 'TYPE_REFLECTION' register type:" << typeid(T).name());
-            return nullptr;
-        }
-        Component *component = this->GetComponent<T>();
-        if (component == nullptr)
-        {
-            component = new T(this->shared_from_this());
-            if (component != nullptr)
-            {
-                this->mWaitStartComponents.push(component);
-                this->mComponentMap.insert(std::make_pair(name, component));
-            }
-        }
-        return static_cast<T *>(component);
-    }
+	template<typename T>
+	T * GameObject::GetComponent(const std::string & name)
+	{
+		auto iter = this->mComponentMap.find(name);
+		if (iter != this->mComponentMap.end())
+		{
+			Component *component = iter->second;
+			return static_cast<T *>(component);
+		}
+		return nullptr;
+	}
 
-    template<typename T>
+	template<typename T>
+	inline bool GameObject::AddComponent()
+	{
+		Type * type = ComponentHelper::Get<T>();
+		if (type == nullptr)
+		{
+			return false;
+		}
+		const std::string & name = type->Name;
+		auto iter = this->mComponentMap.find(name);
+		if (iter != this->mComponentMap.end())
+		{
+			return false;
+		}
+		Component * component = type->Create();
+		return this->AddComponent(name, component);		
+	}
+
+	template<typename T>
     inline bool GameObject::RemoveComponent()
     {
-        std::string name;
-        if (!Sentry::GetTypeName<T>(name))
-        {
-            return false;
-        }
-        return this->RemoveComponent(name);
+		Type * type = ComponentHelper::Get<T>();
+		if (type == nullptr)
+		{
+			return false;
+		}
+		return this->RemoveComponent(type->Name);
     }
 
     template<typename T>

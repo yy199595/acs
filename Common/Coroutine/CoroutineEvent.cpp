@@ -1,5 +1,5 @@
 #include"CoroutineEvent.h"
-#include"CoroutineManager.h"
+#include"CoroutineComponent.h"
 #include"Coroutine.h"
 
 namespace Sentry

@@ -1,7 +1,7 @@
 #include"Object.h"
-#include<Core/Applocation.h>
+#include<Core/App.h>
 #include<Util/NumberHelper.h>
-#include<Coroutine/CoroutineManager.h>
+#include<Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
@@ -15,13 +15,12 @@ namespace Sentry
 
     }
 
-    bool Object::Init(Applocation *app, const std::string &name)
+    bool Object::Init(const std::string &name)
     {
         if (this->mIsActive == false)
         {
             this->SetActive(true);
             this->mClassName = name;
-            this->mAppLocation = app;
             this->mIntanceID = NumberHelper::Create();
             return true;
         }

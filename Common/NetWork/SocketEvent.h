@@ -40,8 +40,7 @@ namespace Sentry
 
         ~SocketEvent()
         {
-            if (mMessageData != nullptr)
-            { delete mMessageData; }
+           
         }
 
     public:

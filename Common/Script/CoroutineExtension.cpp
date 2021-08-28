@@ -1,5 +1,5 @@
 #include "CoroutineExtension.h"
-#include <Core/Applocation.h>
+#include <Core/App.h>
 
 using namespace Sentry;
 namespace CoroutineExtension
@@ -15,7 +15,7 @@ namespace CoroutineExtension
         }
         SayNoAssertRetZero_F(lua_isthread(lua, -1));
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        Applocation * frameWork = Applocation::Get();
+        App * frameWork = App::Get();
         SayNoTimerManager * timerManager = frameWork->GetTimerManager();
         SayNoLuaSleepTimer * timer = Object::CreateObject<SayNoLuaSleepTimer>(lua, ref, ms);
         timerManager->AddTimer(timer);

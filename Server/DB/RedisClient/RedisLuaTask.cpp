@@ -1,12 +1,14 @@
 ﻿#include "RedisLuaTask.h"
-#include <Coroutine/CoroutineManager.h>
-#include <Manager/RedisManager.h>
+
+#include <Core/App.h>
 #include <Util/NumberHelper.h>
+#include <Scene/SceneRedisComponent.h>
+#include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
-    RedisLuaTask::RedisLuaTask(RedisManager *mgr, const std::string &cmd, lua_State *lua, int ref)
-        : RedisTaskBase(mgr, cmd)
+    RedisLuaTask::RedisLuaTask(const std::string &cmd, lua_State *lua, int ref)
+        : RedisTaskBase(cmd)
     {
         this->mLuaEnv = lua;
         this->mCoroutienRef = ref;
@@ -17,7 +19,7 @@ namespace Sentry
         luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);
     }
 
-    void RedisLuaTask::OnTaskFinish()
+    void RedisLuaTask::RunFinish()
     {
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);
         if (lua_isthread(this->mLuaEnv, -1))
@@ -37,20 +39,19 @@ namespace Sentry
         }
     }
 
-    shared_ptr<RedisLuaTask> RedisLuaTask::Create(lua_State *lua, int index, const char *cmd)
+    RedisLuaTask * RedisLuaTask::Create(lua_State *lua, int index, const char *cmd)
     {
         if (!lua_isthread(lua, index))
         {
             return nullptr;
-        }
-        Applocation *app = Applocation::Get();
+        }       
         lua_State *coroutine = lua_tothread(lua, index);
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        RedisManager *redisManager = app->GetManager<RedisManager>();
+        SceneRedisComponent *redisManager = Scene::GetComponent<SceneRedisComponent>();
         if (redisManager == nullptr)
         {
             return nullptr;
         }
-        return std::make_shared<RedisLuaTask>(redisManager, cmd, lua, ref);
+        return new RedisLuaTask(cmd, lua, ref);
     }
 }// namespace Sentry

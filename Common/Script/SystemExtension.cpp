@@ -1,13 +1,13 @@
 ﻿#include "SystemExtension.h"
-#include <Core/Applocation.h>
-#include <Manager/ActionManager.h>
-#include <Manager/NetProxyManager.h>
-#include <Manager/ServiceManager.h>
+#include <Core/App.h>
+#include <Scene/SceneActionComponent.h>
+#include <Scene/SceneNetProxyComponent.h>
+#include <Service/ServiceMgrComponent.h>
 #include <NetWork/NetLuaRetAction.h>
 #include <Service/LocalLuaService.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
-#include <Timer/TimerManager.h>
+#include <Timer/TimerComponent.h>
 
 using namespace Sentry;
 
@@ -20,8 +20,8 @@ int SystemExtension::Call(lua_State *lua)
             return 1;
         }
 
-        Applocation * app = Applocation::Get();
-        ServiceNodeManager * serviceNodeManager = app->GetManager<ServiceNodeManager>();
+        App * app = App::Get();
+        ServiceNodeComponent * serviceNodeManager = app->GetManager<ServiceNodeComponent>();
         if (serviceNodeManager == nullptr)
         {
             lua_pushboolean(lua, false);
@@ -86,8 +86,8 @@ int SystemExtension::Call(lua_State *lua)
 
 int SystemExtension::GetApp(lua_State *luaEnv)
 {
-    Applocation *pApplocation = Applocation::Get();
-    LuaParameter::Write<Applocation *>(luaEnv, pApplocation);
+    App * pApplocation = &App::Get();
+    LuaParameter::Write<App *>(luaEnv, pApplocation);
     return 1;
 }
 
@@ -95,7 +95,7 @@ int SystemExtension::GetManager(lua_State *luaEnv)
 {
     if (lua_isstring(luaEnv, -1))
     {
-        Applocation *app = Applocation::Get();
+        App &app = App::Get();
         const std::string name = lua_tostring(luaEnv, -1);
         //TODO
         PtrProxy<Manager>::Write(luaEnv, nullptr);
@@ -128,18 +128,17 @@ int SystemExtension::NewService(lua_State *luaEnv)
 {
     const char *name = lua_tostring(luaEnv, 1);
     if (SystemExtension::RequireLua(luaEnv, name))
-    {
-        Applocation *app = Applocation::Get();
+    {     
         LocalLuaService *luaService = new LocalLuaService(luaEnv, -1);
-        luaService->Init(app, name);
-        ServiceManager *serviceMgr = app->GetManager<ServiceManager>();
+		if (luaService->Init(name) == false)
+		{
+			lua_pushboolean(luaEnv, false);
+			return 1;
+		}
+        ServiceMgrComponent *serviceMgr = Service::GetComponent<ServiceMgrComponent>();
         if (serviceMgr != nullptr)
         {
-            if (serviceMgr->AddLuaService(name, luaService) != nullptr)
-            {
-                lua_pushboolean(luaEnv, true);
-                return 1;
-            }
+           //TODO
         }
     }
     lua_pushboolean(luaEnv, false);
@@ -148,10 +147,9 @@ int SystemExtension::NewService(lua_State *luaEnv)
 
 int SystemExtension::LuaRetMessage(lua_State *luaEnv)
 {
-    Applocation *app = Applocation::Get();
     if (lua_isstring(luaEnv, 1))//远程回复
     {
-        NetProxyManager *netManager = app->GetManager<NetProxyManager>();
+        SceneNetProxyComponent *netManager = Scene::GetComponent<SceneNetProxyComponent>();
         if (netManager != nullptr)
         {
             const std::string address = lua_tostring(luaEnv, 1);
@@ -174,7 +172,7 @@ int SystemExtension::LuaRetMessage(lua_State *luaEnv)
         }
     } else if (lua_isinteger(luaEnv, 1))//本机回复
     {
-        ActionManager *actManager = app->GetManager<ActionManager>();
+        SceneActionComponent *actManager = Scene::GetComponent<SceneActionComponent>();
 
         const long long callbackId = lua_tointeger(luaEnv, 1);
         const long long operId = lua_tointeger(luaEnv, 2);
@@ -331,7 +329,7 @@ int SystemExtension::Sleep(lua_State *luaEnv)
 {
     long long ms = lua_tointeger(luaEnv, 1);
     lua_pushthread(luaEnv);
-    TimerManager *pTimerManager = Applocation::Get()->GetManager<TimerManager>();
+    TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
     if (pTimerManager != nullptr)
     {
         shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, ms);
@@ -356,8 +354,7 @@ int SystemExtension::AddTimer(lua_State *lua)
     {
         count = lua_tointeger(lua, 3);
     }
-    Applocation *app = Applocation::Get();
-    TimerManager *pTimerManager = app->GetManager<TimerManager>();
+    TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
     if (pTimerManager != nullptr)
     {
         lua_pushvalue(lua, 1);
@@ -381,8 +378,7 @@ int SystemExtension::RemoveTimer(lua_State *lua)
     if (lua_isinteger(lua, 1))
     {
         long long id = lua_tointeger(lua, 1);
-        Applocation *app = Applocation::Get();
-        TimerManager *pTimerManager = app->GetManager<TimerManager>();
+        TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
         if (pTimerManager != nullptr)
         {
             bool code = pTimerManager->RemoveTimer(id);

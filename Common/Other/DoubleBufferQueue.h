@@ -3,58 +3,101 @@
 #include <atomic>
 #include <mutex>
 #include <queue>
-
+#include <vector>
+#include <list>
 namespace Sentry
 {
-				template<typename T>
-				class DoubleBufferQueue
-				{
-				public:
-								DoubleBufferQueue()
-								{}
+	template<typename T>
+	class DoubleBufferQueue
+	{
+	public:
+		DoubleBufferQueue()
+		{}
 
-				public:
-								void AddItem(const T &item);
+	public:
+		void Add(const T &item);
 
-								bool PopItem(T &item);
+		void AddRange(std::list<T> &items);
 
-								void SwapQueueData();
+		void AddRange(std::queue<T> &items);
 
-				private:
-								std::mutex mLock;
+		void AddRange(std::vector<T> &items);
 
-				private:
-								std::queue<T> mReadQueue;
-								std::queue<T> mWrterQueue;
-				};
+		bool PopItem(T &item);
 
-				template<typename T>
-				inline void DoubleBufferQueue<T>::AddItem(const T &item)
-				{
-								mLock.lock();
-								mWrterQueue.emplace(item);
-								mLock.unlock();
-				}
+		void SwapQueueData();
 
-				template<typename T>
-				inline void DoubleBufferQueue<T>::SwapQueueData()
-				{
-								if (!this->mWrterQueue.empty() && this->mReadQueue.empty())
-								{
-												std::lock_guard<std::mutex> lock(this->mLock);
-												this->mReadQueue.swap(this->mWrterQueue);
-								}
-				}
+	private:
+		std::mutex mLock;
 
-				template<typename T>
-				inline bool DoubleBufferQueue<T>::PopItem(T &item)
-				{
-								if (!this->mReadQueue.empty())
-								{
-												item = this->mReadQueue.front();
-												this->mReadQueue.pop();
-												return true;
-								}
-								return false;
-				}
+	private:
+		std::queue<T> mReadQueue;
+		std::queue<T> mWrterQueue;
+	};
+
+	template<typename T>
+	inline void DoubleBufferQueue<T>::Add(const T &item)
+	{
+		mLock.lock();
+		mWrterQueue.emplace(item);
+		mLock.unlock();
+	}
+
+	template<typename T>
+	void DoubleBufferQueue<T>::AddRange(std::list<T> &items)
+	{
+		mLock.lock();
+		for (auto iter = items.begin(); iter != items.end(); iter++)
+		{
+			mWrterQueue.emplace(*iter);
+		}
+		items.clear();
+		mLock.unlock();
+	}
+
+	template<typename T>
+	void DoubleBufferQueue<T>::AddRange(std::vector<T> &items)
+	{
+		mLock.lock();
+		for (size_t index = 0; index < items.size(); index++)
+		{
+			mWrterQueue.emplace(items[index]);
+		}
+		items.clear();
+		mLock.unlock();
+	}
+
+	template<typename T>
+	inline void DoubleBufferQueue<T>::AddRange(std::queue<T> &item)
+	{
+		mLock.lock();
+		while (!item.empty())
+		{
+			mWrterQueue.emplace(item.front());
+			item.pop();
+		}
+		mLock.unlock();
+	}
+
+	template<typename T>
+	inline void DoubleBufferQueue<T>::SwapQueueData()
+	{
+		if (!this->mWrterQueue.empty() && this->mReadQueue.empty())
+		{
+			std::lock_guard<std::mutex> lock(this->mLock);
+			this->mReadQueue.swap(this->mWrterQueue);
+		}
+	}
+
+	template<typename T>
+	inline bool DoubleBufferQueue<T>::PopItem(T &item)
+	{
+		if (!this->mReadQueue.empty())
+		{
+			item = this->mReadQueue.front();
+			this->mReadQueue.pop();
+			return true;
+		}
+		return false;
+	}
 }// namespace Sentry

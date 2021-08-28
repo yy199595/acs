@@ -1,11 +1,11 @@
 ﻿#include "TaskThread.h"
-#include <Manager/ThreadTaskManager.h>
+#include <Scene/SceneTaskComponent.h>
 #include <functional>
 
 using namespace std::chrono;
 namespace Sentry
 {
-    TaskThread::TaskThread(ThreadTaskManager *manager, int index)
+    TaskThread::TaskThread(SceneTaskComponent *manager, int index)
     {
         this->mTaskState = Idle;
         this->mThreadIndex = index;
@@ -19,25 +19,32 @@ namespace Sentry
         this->mThreadVarible.wait(lck);
     }
 
-    void TaskThread::AddTaskAction(SharedThreadTask taskAction)
+    void TaskThread::AddTask(TaskProxy * task)
     {
         this->mTaskState = ThreadState::Run;
-        this->mWaitInvokeTask.AddItem(taskAction);
+        this->mWaitInvokeTask.Add(task);
         this->mThreadVarible.notify_one();
     }
 
     void TaskThread::Run()
     {
+		this->mThreadId = std::this_thread::get_id();
         while (true)
         {
-            SharedThreadTask taskAction;
+			TaskProxy * task = nullptr;
             this->mWaitInvokeTask.SwapQueueData();
-
-            while (this->mWaitInvokeTask.PopItem(taskAction))
+            while (this->mWaitInvokeTask.PopItem(task))
             {
-                taskAction->InvokeInThreadPool(this->mThreadIndex);
-                this->mTaskManager->OnTaskFinish(taskAction->GetTaskId());
+				task->Run();
+				this->mFinishTasks.push(task->GetTaskId());       
             }
+
+			while (!this->mFinishTasks.empty())
+			{
+				unsigned int id = this->mFinishTasks.front();
+				this->mFinishTasks.pop();
+				this->mTaskManager->PushFinishTask(id);
+			}
 
             this->mTaskState = ThreadState::Idle;
             std::unique_lock<std::mutex> waitLock(this->mThreadLock);

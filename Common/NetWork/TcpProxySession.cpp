@@ -1,8 +1,8 @@
 ﻿#include "TcpProxySession.h"
-#include <Core/Applocation.h>
-#include <Manager/NetProxyManager.h>
-#include <Manager/NetSessionManager.h>
-#include <Coroutine/CoroutineManager.h>
+#include <Core/App.h>
+#include <Scene/SceneNetProxyComponent.h>
+#include <Scene/SceneSessionComponent.h>
+#include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
@@ -11,10 +11,9 @@ namespace Sentry
     {
         this->mConnectCount = 0;
         this->mAddress = address;
-        this->mSessionType = SessionClient;
-        Applocation *app = Applocation::Get();
-        SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
-        SayNoAssertRet_F(this->mNetManager = app->GetManager<NetSessionManager>());
+        this->mSessionType = SessionClient;   
+		this->mCorComponent = App::Get().GetCoroutineComponent();     
+        SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
     }
 
     TcpProxySession::TcpProxySession(const std::string &name, const std::string &address)
@@ -23,9 +22,8 @@ namespace Sentry
         this->mConnectCount = 0;
         this->mAddress = address;
         this->mSessionType = SessionNode;
-        Applocation *app = Applocation::Get();
-        SayNoAssertRet_F(this->mCorManager = app->GetManager<CoroutineManager>());
-        SayNoAssertRet_F(this->mNetManager = app->GetManager<NetSessionManager>());
+		this->mCorComponent = App::Get().GetCoroutineComponent();
+		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
     }
 
     TcpProxySession::~TcpProxySession()
@@ -69,7 +67,8 @@ namespace Sentry
         {
             return false;
         }
-        NetMessageProxy *messageData = NetMessageProxy::Create(S2S_NOTICE, service, method);
+		const std::string & address = this->GetAddress();
+        NetMessageProxy *messageData = NetMessageProxy::Create(address, S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);
@@ -84,7 +83,8 @@ namespace Sentry
         {
             return false;
         }
-        NetMessageProxy *messageData = NetMessageProxy::Create(S2S_NOTICE, service, method);
+		const std::string & address = this->GetAddress();
+        NetMessageProxy *messageData = NetMessageProxy::Create(address, S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);

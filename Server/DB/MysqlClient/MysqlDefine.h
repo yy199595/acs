@@ -12,13 +12,13 @@
 #include<memory>
 #include<unordered_map>
 #include<XCode/XCode.h>
-#include<Thread/ThreadTaskAction.h>
+#include<Thread/TaskProxy.h>
 
 using namespace std;
 using namespace Sentry;
 namespace Sentry
 {
-    class MysqlManager;
+    class SceneMysqlComponent;
 
     typedef MYSQL_RES MysqlQueryResult;
     typedef MYSQL SayNoMysqlSocket;

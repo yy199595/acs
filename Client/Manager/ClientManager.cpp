@@ -13,19 +13,19 @@
 
 namespace Client
 {
-    bool ClientManager::OnInit()
+    bool ClientManager::Awake()
     {
         this->GetConfig().GetValue("ListenAddress", "ip", this->mConnectIp);
         this->GetConfig().GetValue("ListenAddress", "port", this->mConnectPort);
         this->mCoroutineManager = this->GetManager<CoroutineManager>();
-        return NetProxyManager::OnInit();;
+        return NetProxyManager::Awake();;
     }
 
-    void ClientManager::OnInitComplete()
+    void ClientManager::Start()
     {
         this->mAddress = this->mConnectIp + ":" + std::to_string(this->mConnectPort);
         this->ConnectByAddress(this->mAddress, "GateServer");
-        this->mCoroutineManager->Start(&ClientManager::InvokeAction, this);
+        this->mCoroutineManager->StartCoroutine(&ClientManager::InvokeAction, this);
     }
 
     void ClientManager::OnFrameUpdate(float t)

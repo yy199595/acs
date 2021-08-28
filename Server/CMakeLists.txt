@@ -18,6 +18,10 @@ include_directories(${PROJECT_SOURCE_DIR}/Logic)
 include_directories(${PROJECT_INIT_PATH}/Common)
 include_directories(${PROJECT_INIT_PATH}/Protocol)
 
+include_directories(${PROJECT_SOURCE_DIR}/DB/Component)
+include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)
+include_directories(${PROJECT_INIT_PATH}/Common/Component)
+
 file(GLOB_RECURSE DBSource "DB/*.h" "DB/*.cpp" "DB/*.hpp" "DB/*.cc")
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 file(GLOB_RECURSE LogicSource "Logic/*.h" "Logic/*.cpp" "Logic/*.hpp" "Logic/*.cc")

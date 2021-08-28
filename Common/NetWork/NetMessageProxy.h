@@ -29,12 +29,13 @@ namespace Sentry
 		~NetMessageProxy();
 
 	public:
-		static NetMessageProxy *Create(const char *message, const size_t size);
-		static NetMessageProxy *Create(NetMessageType type, const std::string & service, const std::string &method);
+		static NetMessageProxy *Create(const std::string & address, const char *message, const size_t size);
+		static NetMessageProxy *Create(const std::string & address, NetMessageType type, const std::string & service, const std::string &method);
 	public:
 		void Clear();
 		size_t WriteToBuffer(char *buffer, const size_t size);
 	public:
+		const std::string &GetAddress() { return this->mAddress; }
 		const std::string &GetMsgBody() { return this->mMessageData; }
 		const std::string &GetMethd() { return this->mProConfig->MethodName; }
 		const std::string &GetService() { return this->mProConfig->ServiceName; }	
@@ -42,22 +43,23 @@ namespace Sentry
 	public:
 		void SetType(NetMessageType type);
 		void SetCode(XCode code) { this->mCode = code; }
-		void SetRpcId(const long long id) { this->mRpcId = id; }
 		void SetUserId(const long long id) { this->mUserId = id; }
+		void SetRpcId(const unsigned int id) { this->mRpcId = id; }
 		void ClearMessage() { this->mMessageData.clear(); }
 		bool SetMessage(const Message & message) { return message.SerializePartialToString(&mMessageData); }
 	public:
 		XCode GetCode() { return this->mCode; }
-		long long GetRpcId() { return this->mRpcId; }
+		unsigned int GetRpcId() { return this->mRpcId; }
 		long long GetUserId() { return this->mUserId; }
 		NetMessageType GetMessageType() { return this->mMsgType; }	
 	private:
 		NetMessageType mMsgType;
 	private:
 		XCode mCode;
-		long long mRpcId;
 		long long mUserId;
+		unsigned int mRpcId;
 	private:
+		std::string mAddress;
 		std::string mMessageData;
 		const ProtocolConfig * mProConfig;
 	};

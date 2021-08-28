@@ -1,14 +1,14 @@
 #pragma once
 
 #include "TimerBase.h"
-#include <Coroutine/CoroutineManager.h>
+#include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
     class CorSleepTimer : public TimerBase
     {
     public:
-        CorSleepTimer(CoroutineManager *sheduler, long long id, long long ms);
+        CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms);
 
         ~CorSleepTimer() { this->mScheduler = nullptr; }
 
@@ -18,6 +18,6 @@ namespace Sentry
     private:
         long long mCoroutineId;
         long long mNextInvokeTime;
-        CoroutineManager *mScheduler;
+        CoroutineComponent *mScheduler;
     };
 }// namespace Sentry

@@ -12,8 +12,8 @@ namespace Client
 		ClientManager() { }
 		~ClientManager() { }
 	protected:
-		bool OnInit() override;
-		void OnInitComplete() override;
+		bool Awake() override;
+		void Start() override;
 		void OnFrameUpdate(float t) override;
 	public:
 		XCode Notice(const std::string &service, const std::string &method); //不回应

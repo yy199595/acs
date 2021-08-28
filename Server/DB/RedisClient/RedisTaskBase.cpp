@@ -1,18 +1,18 @@
 ﻿#include "RedisTaskBase.h"
-#include <Manager/RedisManager.h>
-
+#include <Scene/SceneRedisComponent.h>
+#include <Core/App.h>
 namespace Sentry
 {
 
-    RedisTaskBase::RedisTaskBase(RedisManager *mgr, const std::string &cmd)
-    {
-        this->mRedisManager = mgr;
+    RedisTaskBase::RedisTaskBase(const std::string &cmd)
+    {       
         this->mCommand.push_back(cmd);
     }
 
-    void RedisTaskBase::InvokeInThreadPool(long long threadId)
+    void RedisTaskBase::Run()
     {
-        RedisSocket *redisSocket = this->mRedisManager->GetRedisSocket(threadId);
+		SceneRedisComponent * redisManager = Scene::GetComponent<SceneRedisComponent>();
+        RedisSocket *redisSocket = redisManager->GetRedisSocket();
         if (redisSocket == nullptr)
         {
             this->mErrorStr = "redis scoket null";

@@ -10,7 +10,7 @@ namespace Sentry
         Finish,
     };
 
-    class CoroutineManager;
+    class CoroutineComponent;
 
     struct Coroutine
     {
@@ -32,6 +32,6 @@ namespace Sentry
 #endif
         CorState mState;		
         long long mCoroutineId;
-        CoroutineManager *mScheduler;
+        CoroutineComponent *mScheduler;
     };
 };

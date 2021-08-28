@@ -7,15 +7,15 @@ namespace Sentry
     {
     public:
         NumberBuilder(const T num = 100) : mIndex(num) {}
-        inline const T GetNumber();
-        inline void ReceiveNumber(const T num);
+        inline const T Pop();
+        inline void Push(const T num);
 
     private:
         T mIndex;
-        SayNoQueue<T> mNumberQueue;
+        std::queue<T> mNumberQueue;
     };
     template<typename T>
-    inline const T NumberBuilder<T>::GetNumber()
+    inline const T NumberBuilder<T>::Pop()
     {
         if (!this->mNumberQueue.empty())
         {
@@ -26,7 +26,7 @@ namespace Sentry
         return this->mIndex++;
     }
     template<typename T>
-    inline void NumberBuilder<T>::ReceiveNumber(const T num)
+    inline void NumberBuilder<T>::Push(const T num)
     {
         this->mNumberQueue.push(num);
     }

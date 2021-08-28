@@ -1,7 +1,6 @@
 ﻿#include "luaExtension.h"
-#include <Core/Applocation.h>
-#include <Manager/Manager.h>
-#include <Module/Component.h>
+#include <Core/App.h>
+#include <Component/Component.h>
 #include <Object/GameObject.h>
 #include <Util/StringHelper.h>
 
@@ -16,7 +15,7 @@ namespace LuaAPIExtension
         if (gameObject)
         {
             const char *moduleName = lua_tostring(lua, 2);
-            Component *component = gameObject->GetComponentByName(moduleName);
+            Component *component = gameObject->GetComponent<Component>(moduleName);
             if (component)
             {
                 PtrProxy<Component>::Write(lua, component);
@@ -31,23 +30,7 @@ namespace LuaAPIExtension
 
     int ComponentGetComponent(lua_State *lua)
     {
-        SayNoAssertRetZero_F(lua_isuserdata(lua, 1));
-        SayNoAssertRetZero_F(lua_isstring(lua, 2));
-        Component *component = PtrProxy<Component>::Read(lua, 1);
-        if (component)
-        {
-            const char *moduleName = lua_tostring(lua, 2);
-            SharedGameObject gameObject = component->GetGameObject();
-            if (gameObject != nullptr)
-            {
-                Component *retComponent = gameObject->GetComponentByName(moduleName);
-                PtrProxy<Component>::Write(lua, retComponent);
-                lua_getglobal(lua, moduleName);
-                lua_setmetatable(lua, -2);
-                return 1;
-            }
-        }
-        lua_pushnil(lua);
+        
         return 1;
     }
 
@@ -102,7 +85,7 @@ namespace LuaAPIExtension
         GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
         if (gameObject)
         {
-            Component *component = gameObject->GetComponentByName(name);
+            Component *component = gameObject->GetComponent<Component>(name);
             if (component)
             {
                 PtrProxy<Component>::Write(lua, component);
@@ -123,10 +106,10 @@ namespace LuaAPIExtension
         const char *name = lua_tostring(lua, -1);
         GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
         if (gameObject)
-        {
-            Component *component = gameObject->AddComponentByName(name);
-            if (component != nullptr)
+        {        
+            if (gameObject->AddComponent(name))
             {
+				Component *component = gameObject->GetComponent<Component>(name);
                 PtrProxy<Component>::Write(lua, component);
                 lua_getglobal(lua, name);
                 lua_setmetatable(lua, -2);

@@ -2,7 +2,7 @@
 
 namespace Sentry
 {
-    CorSleepTimer::CorSleepTimer(CoroutineManager *sheduler, long long id, long long ms)
+    CorSleepTimer::CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms)
         : TimerBase(ms)
     {
         this->mCoroutineId = id;

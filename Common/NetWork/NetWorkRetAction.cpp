@@ -1,6 +1,6 @@
 ﻿#include "NetWorkRetAction.h"
-#include <Coroutine/CoroutineManager.h>
-
+#include <Coroutine/CoroutineComponent.h>
+#include <Util/TimeHelper.h>
 namespace Sentry
 {
 
@@ -53,13 +53,13 @@ namespace Sentry
         //this->mBindLuaAction->Inovke(code);
     }
 
-    NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineManager *mgr)
+    NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineComponent *mgr)
     {
         this->mScheduler = mgr;
         this->mCoroutineId = mgr->GetCurrentCorId();
     }
 
-    shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(CoroutineManager *coroutineMgr)
+    shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(CoroutineComponent *coroutineMgr)
     {
         if (coroutineMgr->IsInMainCoroutine())
         {

@@ -4,18 +4,18 @@
 
 namespace Sentry
 {
-    class ActionManager;
+    class SceneActionComponent;
 
     class ActionTimeoutTimer : public TimerBase
     {
     public:
-        ActionTimeoutTimer(long long ms, long long callbackId, ActionManager *mgr);
+        ActionTimeoutTimer(long long ms, long long callbackId, SceneActionComponent *mgr);
 
     public:
         bool Invoke() final;
 
     private:
         long long mCallbackId;
-        ActionManager *mActionManager;
+        SceneActionComponent *mActionManager;
     };
 }

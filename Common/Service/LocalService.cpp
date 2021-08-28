@@ -1,6 +1,8 @@
 ﻿#include "LocalService.h"
-#include <Manager/ActionManager.h>
-#include <Coroutine/CoroutineManager.h>
+
+#include <Core/App.h>
+#include <Scene/SceneActionComponent.h>
+#include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
@@ -14,22 +16,13 @@ namespace Sentry
         return iter != this->mActionMap.end();
     }
 
-    bool LocalService::OnInit()
+    bool LocalService::Awake()
     {
-        SayNoAssertRetFalse_F(this->mCorManager = this->GetManager<CoroutineManager>());
-        return ServiceBase::OnInit();
+		this->mCorComponent = App::Get().GetCoroutineComponent();     
+        return ServiceBase::Awake();
     }
 
-    void LocalService::GetServiceList(std::vector<shared_ptr<LocalActionProxy>> &service)
-    {
-        auto iter = this->mActionMap.begin();
-        for (; iter != this->mActionMap.end(); iter++)
-        {
-            service.push_back(iter->second);
-        }
-    }
-
-    bool LocalService::InvokeMethod(NetMessageProxy *messageData)
+    XCode LocalService::InvokeMethod(NetMessageProxy *messageData)
     {
         const std::string &method = messageData->GetMethd();
         auto iter = this->mActionMap.find(method);
@@ -37,21 +30,7 @@ namespace Sentry
         {
             SayNoDebugError("call <<" << messageData->GetService()
                                       << "." << messageData->GetMethd() << ">> not found");
-            return false;
-        }
-        shared_ptr<LocalActionProxy> localAction = iter->second;
-        return localAction->Invoke(messageData);
-    }
-
-    bool LocalService::InvokeMethod(const std::string &address, NetMessageProxy *messageData)
-    {
-        const std::string &method = messageData->GetMethd();
-        auto iter = this->mActionMap.find(method);
-        if (iter == this->mActionMap.end())
-        {
-            SayNoDebugError("call <<" << messageData->GetService()
-                                      << "." << messageData->GetMethd() << ">> not found");
-            return false;
+            return XCode::CallFunctionNotExist;
         }
         shared_ptr<LocalActionProxy> localAction = iter->second;
         return localAction->Invoke(messageData);

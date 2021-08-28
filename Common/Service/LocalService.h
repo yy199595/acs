@@ -5,6 +5,13 @@
 
 namespace Sentry
 {
+
+	inline std::string GetFunctionName(const std::string func)
+	{
+		size_t pos = func.find("::");
+		return func.substr(pos + 2);
+	}
+
     class LocalService : public ServiceBase
     {
     public:
@@ -16,16 +23,11 @@ namespace Sentry
         bool HasMethod(const std::string &action) final;
 
     public:
-        bool OnInit() override;
-
-    public:
-        void GetServiceList(std::vector<shared_ptr<LocalActionProxy>> &service) final;
+        bool Awake() override;
 
     private:
-        virtual bool InvokeMethod(NetMessageProxy *) final;
-
-        virtual bool InvokeMethod(const std::string &address, NetMessageProxy *) final;
-
+        virtual XCode InvokeMethod(NetMessageProxy *) final;
+     
     protected:
         bool BindFunction(std::string name, LocalAction1 action);
 
@@ -42,7 +44,7 @@ namespace Sentry
         bool BindFunction(const std::string &name, shared_ptr<LocalActionProxy> actionBox);
 
     private:
-        class CoroutineManager *mCorManager;
+        class CoroutineComponent *mCorComponent;
         std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
     };
 

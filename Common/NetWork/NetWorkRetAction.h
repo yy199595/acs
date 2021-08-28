@@ -30,7 +30,6 @@ namespace Sentry
         virtual void Invoke(NetMessageProxy *backData) = 0;
 
     private:
-        long long mActionKey;
         long long mCreateTime;
         std::string mFunctionName;
     public:
@@ -125,16 +124,16 @@ namespace Sentry
         NetLuaWaitAction *mBindLuaAction;
     };
 
-    class CoroutineManager;
+    class CoroutineComponent;
 
     class NetWorkWaitCorAction : public LocalRetActionProxy
     {
     public:
-        NetWorkWaitCorAction(CoroutineManager *);
+        NetWorkWaitCorAction(CoroutineComponent *);
 
         ~NetWorkWaitCorAction() {}
 
-        static shared_ptr<NetWorkWaitCorAction> Create(CoroutineManager *);
+        static shared_ptr<NetWorkWaitCorAction> Create(CoroutineComponent *);
 
     public:
         void Invoke(NetMessageProxy *backData) override;
@@ -148,6 +147,6 @@ namespace Sentry
         XCode mCode;
         std::string mMessage;
         long long mCoroutineId;
-        CoroutineManager *mScheduler;
+        CoroutineComponent *mScheduler;
     };
 }
