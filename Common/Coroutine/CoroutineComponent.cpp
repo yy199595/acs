@@ -138,6 +138,10 @@ namespace Sentry
 
 	void CoroutineComponent::Resume(unsigned int id)
 	{
+		if (id == 0)
+		{
+			return;
+		}
 		Coroutine *logicCoroutine = this->GetCoroutine(id);
 		if (logicCoroutine == nullptr)
 		{

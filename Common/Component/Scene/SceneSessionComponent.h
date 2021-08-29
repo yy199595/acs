@@ -4,9 +4,10 @@
 #include <Component/Component.h>
 #include <Script/LuaTable.h>
 #include <Pool/ObjectPool.h>
-#include <NetWork/SocketEvent.h>
+
 #include <Other/DoubleBufferQueue.h>
 #include <NetWork/NetMessageProxy.h>
+#include <NetWork/SocketEveHandler.h>
 
 namespace Sentry
 {
@@ -22,16 +23,16 @@ namespace Sentry
 		{}
 
 	public: //网络线程调用
-		void OnConnectSuccess(TcpClientSession *session);
+		void OnConnectComplate(TcpClientSession *session, bool isSuc);
 
-		void OnSessionError(TcpClientSession *session, Net2MainEventType type);
+		void OnSessionError(TcpClientSession *session);
 
 		bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size);
 
 		bool OnSendMessageError(TcpClientSession *session, const char *message, const size_t size);
 
 	public:
-		bool AddNetSessionEvent(Main2NetEvent *eve);
+		bool PushEventHandler(SocketEveHandler *eve);
 
 	public:
 		TcpClientSession *Create(shared_ptr<AsioTcpSocket> socket);
@@ -45,22 +46,22 @@ namespace Sentry
 
 		void OnNetSystemUpdate(AsioContext & io) final;
 
+	public:
+		bool StartClose(const std::string &address);
+		bool StartConnect(const std::string & address, const std::string & name);
+		bool StartSendMessage(const std::string & address, NetMessageProxy * message);
 	private:
-
-		void HandlerMainThreadEvent(Main2NetEvent *eve);
-
-	private:
-		bool DescorySession(const std::string &address);
+		
 
 		TcpClientSession *GetSession(const std::string &address);
 
 	private:
 
-		class SceneNetProxyComponent *mNetProxyManager;
+		class SceneNetProxyComponent *mNetProxyComponent;
 
 	private:
 		std::queue<std::string> mRecvSessionQueue;
-		DoubleBufferQueue<Main2NetEvent *> mNetEventQueue;
+		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
 		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
 	};

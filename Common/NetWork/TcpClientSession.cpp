@@ -79,34 +79,34 @@ namespace Sentry
 		return true;
 	}
 
-    bool TcpClientSession::StartConnect()
-    {
-        if (this->IsActive() || this->mSessionType != SessionNode)
-        {
-            return false;
-        }
-        this->mConnectCount++;
-        if (this->mBinTcpSocket == nullptr)
-        {
-            this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(this->mAsioContext);
-        }
-        this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this](const asio::error_code &error_code) {
-            if (error_code)
-            {
-                this->StartClose();
-                SayNoDebugWarning("Connect " << this->GetSessionName()
-                                             << " fail count = " << this->mConnectCount << " error : "
-                                             << error_code.message());
-                this->mDispatchManager->OnSessionError(this, Net2MainEventType::SocketConnectFail);
-            } else
-            {
-                this->mConnectCount = 0;
-                this->mDispatchManager->OnConnectSuccess(this);
-            }
-        });
-        SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
-        return true;
-    }
+	bool TcpClientSession::StartConnect()
+	{
+		if (this->IsActive() || this->mSessionType != SessionNode)
+		{
+			return false;
+		}
+		this->mConnectCount++;
+		if (this->mBinTcpSocket == nullptr)
+		{
+			this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(this->mAsioContext);
+		}
+		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this](const asio::error_code &error_code) {
+			if (error_code)
+			{
+				this->StartClose();
+				SayNoDebugWarning("Connect " << this->GetSessionName()
+					<< " fail count = " << this->mConnectCount << " error : "<< error_code.message());
+				this->mDispatchManager->OnConnectComplate(this, false);
+			}
+			else
+			{
+				this->mConnectCount = 0;
+				this->mDispatchManager->OnConnectComplate(this, true);
+			}
+		});
+		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
+		return true;
+	}
 
     void TcpClientSession::StartClose()
     {
@@ -134,7 +134,7 @@ namespace Sentry
 			{
 				this->StartClose();
 				SayNoDebugError(error_code.message());
-				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+				this->mDispatchManager->OnSessionError(this);
 			}
 			else
 			{
@@ -155,7 +155,7 @@ namespace Sentry
 			if (nMessageBuffer == nullptr)
 			{
 				this->StartClose();
-				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+				this->mDispatchManager->OnSessionError(this);
 				return;
 			}
 		}
@@ -167,7 +167,7 @@ namespace Sentry
 			{
 				this->StartClose();
 				SayNoDebugError(error_code.message());
-				this->mDispatchManager->OnSessionError(this, SocketReceiveFail);
+				this->mDispatchManager->OnSessionError(this);
 			}
 			else
 			{

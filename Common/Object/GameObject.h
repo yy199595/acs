@@ -16,8 +16,7 @@ namespace Sentry
         template<typename T>
         inline bool AddComponent();
 		bool AddComponent(const std::string & name);
-		bool AddComponent(const std::string & name, Component * component);
-
+		
         template<typename T>
         inline T *GetComponent();
 
@@ -35,7 +34,8 @@ namespace Sentry
     public:
 		void OnDestory() override;
         void GetComponents(std::vector<Component *> & components);
-
+	private:
+		bool AddComponent(Component * component);
     public:
 		inline const long long GetId() const { return this->mGameObjectId; }
         inline const std::string &GetAddress() { return this->mSessionAddress; }
@@ -48,7 +48,7 @@ namespace Sentry
     template<typename T>
     inline T *GameObject::GetComponent()
     {
-		Type * type = ComponentHelper::Get<T>();
+		Type * type = ComponentHelper::GetType<T>();
 		if (type == nullptr)
 		{
 			return nullptr;
@@ -71,25 +71,18 @@ namespace Sentry
 	template<typename T>
 	inline bool GameObject::AddComponent()
 	{
-		Type * type = ComponentHelper::Get<T>();
-		if (type == nullptr)
+		if (this->GetComponent<T>() == nullptr)
 		{
-			return false;
+			Component * component = ComponentHelper::CreateComponent<T>();
+			return this->AddComponent(component);
 		}
-		const std::string & name = type->Name;
-		auto iter = this->mComponentMap.find(name);
-		if (iter != this->mComponentMap.end())
-		{
-			return false;
-		}
-		Component * component = type->Create();
-		return this->AddComponent(name, component);		
+		return false;
 	}
 
 	template<typename T>
     inline bool GameObject::RemoveComponent()
     {
-		Type * type = ComponentHelper::Get<T>();
+		Type * type = ComponentHelper::GetType<T>();
 		if (type == nullptr)
 		{
 			return false;

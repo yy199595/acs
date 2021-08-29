@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include <Component/Component.h>
-#include <NetWork/SocketEvent.h>
+
 #include <NetWork/TcpProxySession.h>
 #include <Other/DoubleBufferQueue.h>
+#include <NetWork/SocketEveHandler.h>
 
 namespace Sentry
 {
@@ -16,19 +17,24 @@ namespace Sentry
         virtual ~SceneNetProxyComponent() {}
 
     public:
-        bool AddNetSessionEvent(Net2MainEvent *eve); //不要手动调用
+        bool PushEventHandler(SocketEveHandler *eve); //不要手动调用
     public:
         bool DestorySession(const std::string &address);
 
         bool SendMsgByAddress(const std::string &address, NetMessageProxy *msg);
 
-        bool ConnectByAddress(const std::string &address, const std::string &name);
+		TcpProxySession * ConnectByAddress(const std::string &address, const std::string &name);
 
     public:
         TcpProxySession *GetProxySession(const std::string &address);
 
         TcpProxySession *DelProxySession(const std::string &address);
-
+	public:
+		void NewConnect(const std::string & address);
+		void SessionError(const std::string & address);
+		void ConnectFailure(const std::string & address);
+		void ConnectSuccessful(const std::string & address);
+		void ReceiveNewMessage(const std::string & address, NetMessageProxy * message);
     protected:
         bool Awake() override;
 
@@ -39,7 +45,6 @@ namespace Sentry
         virtual void OnConnectSuccessful(TcpProxySession *session) {}
 
         virtual bool OnRecvMessage(const std::string &address, NetMessageProxy *msg);
-
     private:
         int mReConnectTime;
 
@@ -49,8 +54,9 @@ namespace Sentry
 
         class SceneSessionComponent *mNetWorkManager;
 
-        DoubleBufferQueue<Net2MainEvent *> mNetEventQueue;
+        DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
         std::unordered_map<std::string, TcpProxySession *> mSessionMap; //管理所有的session
         std::unordered_map<std::string, TcpProxySession *> mConnectSessionMap; //正在连接的session
+		std::unordered_map<std::string, std::queue<unsigned int>> mConnectCoroutines;
     };
 }

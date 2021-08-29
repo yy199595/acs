@@ -17,41 +17,35 @@ namespace Sentry
 
 
 	bool GameObject::AddComponent(const std::string & name)
-	{
-		Type * type = ComponentHelper::Get(name);
-		if (type == nullptr)
-		{
-			SayNoDebugError("create " << name << " failure");
-			return false;
-		}
-
+	{		
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
 			return false;
 		}
 
-		Component * component = type->Create();
-		return this->AddComponent(name, component);		
+		Component * component = ComponentHelper::CreateComponent(name);
+		return this->AddComponent(component);		
 	}
 
-	bool GameObject::AddComponent(const std::string & name, Component * component)
+	bool GameObject::AddComponent(Component * component)
 	{
 		if (component == nullptr)
 		{
 			return false;
 		}
-		auto iter = this->mComponentMap.find(name);
+		Type * type = component->GetType();
+		auto iter = this->mComponentMap.find(type->Name);
 		if (iter != this->mComponentMap.end())
 		{
-			SayNoDebugError("add " << name << "failure");
+			SayNoDebugError("add " << type->Name << "failure");
 			return false;
 		}
-		if (component->Init(name))
+		if (component->Init(type->Name))
 		{
 			component->gameObject = this;
 			component->gameObjectID = mGameObjectId;
-			this->mComponentMap.emplace(name, component);
+			this->mComponentMap.emplace(type->Name, component);
 			return true;
 		}
 		return false;
@@ -85,6 +79,7 @@ namespace Sentry
             Component *component = iter->second;
             component->SetActive(false);
 			this->mComponentMap.erase(iter);
+			ComponentHelper::DestoryComponent(component);
             return true;
         }
         return false;

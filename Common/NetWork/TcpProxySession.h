@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include <NetWork/SocketEvent.h>
+
 #include <Protocol/com.pb.h>
 #include <XCode/XCode.h>
+#include <NetWork/SocketEvent.h>
 
 using namespace google::protobuf;
 namespace Sentry
@@ -26,9 +27,7 @@ namespace Sentry
         int GetConnectCount() { return this->mConnectCount; }
 
     public:
-        bool StartColse();
-
-        bool StartReceive();
+		void StartColse();
 
         void StartConnect();
 
@@ -42,7 +41,6 @@ namespace Sentry
         std::string mName;
         std::string mAddress;
         SessionType mSessionType;
-        class CoroutineComponent *mCorComponent;
         class SceneSessionComponent *mNetManager;
     };
 }// namespace Sentry

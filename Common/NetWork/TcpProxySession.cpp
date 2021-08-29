@@ -11,8 +11,7 @@ namespace Sentry
     {
         this->mConnectCount = 0;
         this->mAddress = address;
-        this->mSessionType = SessionClient;   
-		this->mCorComponent = App::Get().GetCoroutineComponent();     
+        this->mSessionType = SessionClient;    
         SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
     }
 
@@ -22,14 +21,13 @@ namespace Sentry
         this->mConnectCount = 0;
         this->mAddress = address;
         this->mSessionType = SessionNode;
-		this->mCorComponent = App::Get().GetCoroutineComponent();
 		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
     }
 
     TcpProxySession::~TcpProxySession()
-    {
-        Main2NetEvent *eve = new Main2NetEvent(SocketDectoryEvent, mAddress);
-        this->mNetManager->AddNetSessionEvent(eve);
+    {    
+		MainSocketCloseHandler * handler = new MainSocketCloseHandler(mAddress);
+        this->mNetManager->PushEventHandler(handler);
 #ifdef SOEASY_DEBUG
         SayNoDebugError("desctory session [" << this->mAddress << "]");
 #endif
@@ -46,19 +44,28 @@ namespace Sentry
         const std::string &service = messageData->GetService();
         SayNoDebugInfo("call " << service << "." << method << " [" << this->mAddress << "]");
 #endif // SOEASY_DEBUG
-        Main2NetEvent *eve = new Main2NetEvent(SocketSendMsgEvent, mAddress, "", messageData);
-        return this->mNetManager->AddNetSessionEvent(eve);
+		MainSocketSendHandler * handler = new MainSocketSendHandler(mAddress, messageData);
+        return this->mNetManager->PushEventHandler(handler);
     }
 
-    void TcpProxySession::StartConnect()
+	void TcpProxySession::StartColse()
+	{
+		MainSocketCloseHandler * handler = new MainSocketCloseHandler(mAddress);
+		this->mNetManager->PushEventHandler(handler);
+#ifdef SOEASY_DEBUG
+		SayNoDebugError("desctory session [" << this->mAddress << "]");
+#endif
+	}
+
+	void TcpProxySession::StartConnect()
     {
         if (!this->IsNodeSession())
         {
             return;
         }
         this->mConnectCount++;
-        Main2NetEvent *eve = new Main2NetEvent(SocketConnectEvent, mAddress);
-        this->mNetManager->AddNetSessionEvent(eve);
+		MainSocketConnectHandler * handler = new MainSocketConnectHandler(mAddress, mName);
+        this->mNetManager->PushEventHandler(handler);
     }
 
     bool TcpProxySession::Notice(const std::string &service, const std::string &method)
