@@ -57,7 +57,11 @@ namespace Sentry
         return iter != this->mMethodCacheSet.end();
     }
 
-    XCode LocalLuaService::InvokeMethod(NetMessageProxy *messageData)
+	void LocalLuaService::GetMethods(std::vector<LocalActionProxy*> & methods)
+	{
+	}
+
+    XCode LocalLuaService::InvokeMethod(PacketMapper *messageData)
     {
         const static std::string luaAction = "ServiceProxy.LocalInvoke";
         int ref = this->mScriptManager->GetGlobalReference(luaAction);

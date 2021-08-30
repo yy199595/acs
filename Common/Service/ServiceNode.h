@@ -5,7 +5,7 @@
 #include <Component/Service/ServiceNodeComponent.h>
 namespace Sentry
 {
-	class NetMessageProxy;
+	class PacketMapper;
     class LocalRetActionProxy;
 
     class ServiceNode : public Object
@@ -48,8 +48,8 @@ namespace Sentry
 
 	private:
 		class TcpProxySession * GetNodeSession();
-		XCode SendRpcMessage(NetMessageProxy * message);
-		XCode SendRpcMessage(NetMessageProxy * message, Message &response);
+		XCode SendRpcMessage(PacketMapper * message);
+		XCode SendRpcMessage(PacketMapper * message, Message &response);
     private:
         std::string mIp;
         unsigned short mPort;

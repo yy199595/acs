@@ -6,7 +6,7 @@
 #include <Pool/ObjectPool.h>
 
 #include <Other/DoubleBufferQueue.h>
-#include <NetWork/NetMessageProxy.h>
+#include <NetWork/PacketMapper.h>
 #include <NetWork/SocketEveHandler.h>
 
 namespace Sentry
@@ -49,7 +49,7 @@ namespace Sentry
 	public:
 		bool StartClose(const std::string &address);
 		bool StartConnect(const std::string & address, const std::string & name);
-		bool StartSendMessage(const std::string & address, NetMessageProxy * message);
+		bool StartSendMessage(const std::string & address, PacketMapper * message);
 	private:
 		
 

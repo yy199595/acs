@@ -21,12 +21,13 @@ namespace Sentry
 
     public:
         bool HasMethod(const std::string &action) final;
-
+		void GetMethods(std::vector<LocalActionProxy*> & methods) final;
+		const std::string &GetServiceName()final { return this->GetTypeName(); }
     public:
         bool Awake() override;
 
     private:
-        virtual XCode InvokeMethod(NetMessageProxy *) final;
+        virtual XCode InvokeMethod(PacketMapper *) final;
      
     protected:
         bool BindFunction(std::string name, LocalAction1 action);
@@ -41,31 +42,31 @@ namespace Sentry
         bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
     protected:
-        bool BindFunction(const std::string &name, shared_ptr<LocalActionProxy> actionBox);
+        bool BindFunction(LocalActionProxy * actionBox);
 
     private:
         class CoroutineComponent *mCorComponent;
-        std::unordered_map<std::string, shared_ptr<LocalActionProxy>> mActionMap;
+        std::unordered_map<std::string, LocalActionProxy *> mActionMap;
     };
 
     template<typename T1>
     inline bool LocalService::BindFunction(std::string name, LocalAction2<T1> action)
     {
         typedef LocalActionProxy2<T1> ActionProxyType;
-        return this->BindFunction(name, make_shared<ActionProxyType>(action));
+        return this->BindFunction(new ActionProxyType(name, action));
     }
 
     template<typename T1>
     inline bool LocalService::BindFunction(std::string name, LocalAction4<T1> action)
     {
         typedef LocalActionProxy4<T1> ActionProxyType;
-        return this->BindFunction(name, make_shared<ActionProxyType>(action));
+        return this->BindFunction(new ActionProxyType(name, action));
     }
 
     template<typename T1, typename T2>
     inline bool LocalService::BindFunction(std::string name, LocalAction3<T1, T2> action)
     {
-        return this->BindFunction(name, make_shared<LocalActionProxy3<T1, T2>>(action));
+        return this->BindFunction(new LocalActionProxy3<T1, T2>(name, action));
     }
 
 #define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))

@@ -35,7 +35,7 @@ namespace Sentry
 #endif
     }
 
-    bool TcpProxySession::SendMessageData(NetMessageProxy *messageData)
+    bool TcpProxySession::SendMessageData(PacketMapper *messageData)
     {
         if (messageData == nullptr)
         {
@@ -81,7 +81,7 @@ namespace Sentry
             return false;
         }
 		const std::string & address = this->GetAddress();
-        NetMessageProxy *messageData = NetMessageProxy::Create(address, S2S_NOTICE, service, method);
+        PacketMapper *messageData = PacketMapper::Create(address, S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);
@@ -97,7 +97,7 @@ namespace Sentry
             return false;
         }
 		const std::string & address = this->GetAddress();
-        NetMessageProxy *messageData = NetMessageProxy::Create(address, S2S_NOTICE, service, method);
+        PacketMapper *messageData = PacketMapper::Create(address, S2S_NOTICE, service, method);
         if (messageData == nullptr)
         {
             SayNoDebugError("not find method " << service << "." << method);

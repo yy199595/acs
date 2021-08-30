@@ -32,7 +32,7 @@ namespace Sentry
         void StartConnect();
 		bool IsActive() { return this->mIsActive; }
 		void SetActive(bool active) { this->mIsActive = active; }
-        bool SendMessageData(NetMessageProxy *messageData);
+        bool SendMessageData(PacketMapper *messageData);
 
     public:
         bool Notice(const std::string &service, const std::string &method);                        //不回应

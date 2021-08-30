@@ -24,14 +24,14 @@ namespace Sentry
         bool Awake() final;
 
     public:
-        bool HandlerMessage(NetMessageProxy *messageData);
+        bool HandlerMessage(PacketMapper *messageData);
 
-        bool HandlerMessage(const std::string &adress, NetMessageProxy *messageData);
+        bool HandlerMessage(const std::string &adress, PacketMapper *messageData);
 		
 		virtual int GetPriority() { return 1; }
 	private:	
-		void Invoke1(NetMessageProxy *messageData);
-		void Invoke2(const std::string &adress, NetMessageProxy *messageData);
+		void Invoke1(PacketMapper *messageData);
+		void Invoke2(const std::string &adress, PacketMapper *messageData);
     private:
         int mNodeId;
 

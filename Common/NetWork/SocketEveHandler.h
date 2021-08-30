@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
 #include"SocketEvent.h"
-#include"NetMessageProxy.h"
+#include"PacketMapper.h"
 namespace Sentry
 {
 	class SceneSessionComponent;
@@ -16,13 +16,13 @@ namespace Sentry
 	class MainSocketSendHandler : public SocketEveHandler
 	{
 	public:
-		MainSocketSendHandler(const std::string & address, NetMessageProxy * message)
+		MainSocketSendHandler(const std::string & address, PacketMapper * message)
 			: mAddress(address), mSendMessage(message) { }
 	public:
 		void RunHandler(SceneSessionComponent *) final;
 	private:		
 		const std::string mAddress;
-		NetMessageProxy * mSendMessage;
+		PacketMapper * mSendMessage;
 	};
 
 	class MainSocketCloseHandler : public SocketEveHandler
@@ -88,12 +88,12 @@ namespace Sentry
 	class NetReceiveNewMessageHandler : public SocketEveHandler
 	{
 	public:
-		NetReceiveNewMessageHandler(const std::string & address, NetMessageProxy * message)
+		NetReceiveNewMessageHandler(const std::string & address, PacketMapper * message)
 			:mAddress(address), mRecvMessage(message) { }
 	public:
 		void RunHandler(SceneNetProxyComponent * component);
 	private:
 		const std::string mAddress;
-		NetMessageProxy * mRecvMessage;
+		PacketMapper * mRecvMessage;
 	};
 }

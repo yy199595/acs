@@ -19,7 +19,7 @@ namespace Sentry
         return true;
     }
 
-    bool ServiceMgrComponent::HandlerMessage(NetMessageProxy *messageData)
+    bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
     {
 		const std::string & service = messageData->GetService();
 		ServiceBase * localService = this->gameObject->GetComponent<ServiceBase>(service);
@@ -31,7 +31,7 @@ namespace Sentry
         return true;
     }
 
-    bool ServiceMgrComponent::HandlerMessage(const std::string &address, NetMessageProxy *messageData)
+    bool ServiceMgrComponent::HandlerMessage(const std::string &address, PacketMapper *messageData)
     {
         const std::string &method = messageData->GetMethd();
         const std::string &service = messageData->GetService();
@@ -44,18 +44,20 @@ namespace Sentry
 		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke2, this, address, messageData);
         return true;
     }
-	void ServiceMgrComponent::Invoke1(NetMessageProxy *messageData)
+	void ServiceMgrComponent::Invoke1(PacketMapper *messageData)
 	{
 
 	}
 
-	void ServiceMgrComponent::Invoke2(const std::string & address, NetMessageProxy * messageData)
+	void ServiceMgrComponent::Invoke2(const std::string & address, PacketMapper * messageData)
 	{
 		const std::string &service = messageData->GetService();
 		ServiceBase *localService = this->gameObject->GetComponent<ServiceBase>(service);
 		XCode code = localService->InvokeMethod(messageData);
 		
-		messageData->SetCode(code);
-		this->mNetProxyManager->SendMsgByAddress(address, messageData);
+		if (messageData->SetCode(code))
+		{
+			this->mNetProxyManager->SendMsgByAddress(address, messageData);
+		}	
 	}
 }// namespace Sentry

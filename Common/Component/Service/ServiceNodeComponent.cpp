@@ -76,7 +76,7 @@ namespace Sentry
 
         this->mCenterAddress = mCenterIp + ":" + std::to_string(this->mCenterPort);       
         ServiceNode *centerNode = new ServiceNode(0, 0, "Center", this->mCenterAddress);
-        return centerNode->AddService(std::string("ServiceRegistry")) && this->AddNode(centerNode);
+        return centerNode->AddService(std::string("ServiceCenter")) && this->AddNode(centerNode);
     }
 
     void ServiceNodeComponent::OnFrameUpdate(float t)

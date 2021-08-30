@@ -29,12 +29,12 @@ namespace Sentry
     class TcpSessionListener;
 
     // 所有方法都注册到这里(全局唯一)
-    class ServiceRegistry : public LocalService
+    class ServiceCenter : public LocalService
     {
     public:
-        ServiceRegistry();
+        ServiceCenter();
 
-        ~ServiceRegistry() {}
+        ~ServiceCenter() {}
 
     protected:
         bool Awake() final;
@@ -44,9 +44,9 @@ namespace Sentry
     private:
         void NoticeNode(int areaId);
 
-        XCode RegisterNode(long long id, const s2s::NodeRegister_Request &nodeInfo);
+        XCode Add(long long id, const s2s::NodeRegister_Request &nodeInfo);
 
-        XCode QueryNodes(long long id, const com::Int32Data &areaId, s2s::NodeData_Array &nodeArray);
+        XCode Query(long long id, const com::Int32Data &areaId, s2s::NodeData_Array &nodeArray);
 
     private:
         std::unordered_map<long long, ServiceNode *> mServiceNodeMap;

@@ -24,7 +24,7 @@ namespace Sentry
         return this->mNetWorkManager->PushEventHandler(handler);
     }
 
-    bool SceneNetProxyComponent::SendMsgByAddress(const std::string &address, NetMessageProxy *msgData)
+    bool SceneNetProxyComponent::SendMsgByAddress(const std::string &address, PacketMapper *msgData)
     {
         TcpProxySession *tcpSession = this->GetProxySession(address);
         if (tcpSession == nullptr || msgData == nullptr)
@@ -155,7 +155,7 @@ namespace Sentry
 		}
 	}
 
-	void SceneNetProxyComponent::ReceiveNewMessage(const std::string & address, NetMessageProxy * message)
+	void SceneNetProxyComponent::ReceiveNewMessage(const std::string & address, PacketMapper * message)
 	{
 		if (!this->OnRecvMessage(address, message))
 		{
@@ -182,7 +182,7 @@ namespace Sentry
 		}
 	}
 
-    bool SceneNetProxyComponent::OnRecvMessage(const std::string &address, NetMessageProxy *messageData)
+    bool SceneNetProxyComponent::OnRecvMessage(const std::string &address, PacketMapper *messageData)
     {
         if (messageData->GetMessageType() < REQUEST_END)
         {			

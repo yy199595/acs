@@ -4,7 +4,8 @@
 #include <Util/FileHelper.h>
 #include <Util/StringHelper.h>
 #include <google/protobuf/util/json_util.h>
-
+#include <Service/ServiceBase.h>
+#include <NetWork/NetWorkAction.h>
 namespace Sentry
 {
 
@@ -43,6 +44,36 @@ namespace Sentry
         }
         return true;
     }
+
+	void SceneProtocolComponent::Start()
+	{
+		std::vector<Component *> components;
+		App::Get().Service.GetComponents(components);
+
+		std::vector<LocalActionProxy *> localMethods;
+		for (size_t index = 0; index < components.size(); index++)
+		{
+			Component * component = components[index];
+			ServiceBase * service = dynamic_cast<ServiceBase*>(component);
+			if (service == nullptr)
+			{
+				continue;
+			}
+			localMethods.clear();
+			service->GetMethods(localMethods);
+			for (LocalActionProxy * method : localMethods)
+			{
+				unsigned short id = 0;
+				std::string requestName;
+				std::string responseName;
+				method->GetRequestType(requestName);
+				method->GetResponseType(responseName);
+				SayNoDebugFatal(service->GetServiceName() << "." << method->GetName()
+					<< "\t" << requestName << "\t" << responseName);
+			}
+
+		}
+	}
 
 
     const ProtocolConfig *SceneProtocolComponent::GetProtocolConfig(unsigned short id) const

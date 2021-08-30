@@ -16,13 +16,14 @@ namespace Sentry
 
     public:
         bool Awake() final;
-
+		void Start() override { }
         bool HasMethod(const std::string &name) final;
-
+		void GetMethods(std::vector<LocalActionProxy*> & methods) final;
+		const std::string &GetServiceName()final { return this->GetTypeName(); } //TODO
         bool IsLuaService() final { return true; };
 
     protected:
-        virtual XCode InvokeMethod(NetMessageProxy *) final;      
+        virtual XCode InvokeMethod(PacketMapper *) final;      
     private:
         int mServiceIndex;
         lua_State *mLuaEnv;

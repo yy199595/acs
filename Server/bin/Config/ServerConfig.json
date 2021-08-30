@@ -58,9 +58,9 @@
     ],
     "Service": [
         "MysqlProxy",
+        "ServiceCenter",
         "LoginService",
-        "ClusterService",
-        "ServiceRegistry"
+        "ClusterService"      
     ],
     "WhiteList": [
         "127.0.0.1"

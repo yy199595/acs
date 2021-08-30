@@ -12,7 +12,7 @@ namespace Sentry
 
     class LocalRetActionProxy;
 
-	class NetMessageProxy;
+	class PacketMapper;
     class SceneActionComponent : public Component
     {
     public:
@@ -21,7 +21,7 @@ namespace Sentry
         virtual ~SceneActionComponent() {}
 
     public:
-        bool InvokeCallback(NetMessageProxy *messageData);
+        bool InvokeCallback(PacketMapper *messageData);
         unsigned int AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
 
     protected:

@@ -21,7 +21,7 @@ namespace Sentry
     public:
         bool DestorySession(const std::string &address);
 
-        bool SendMsgByAddress(const std::string &address, NetMessageProxy *msg);
+        bool SendMsgByAddress(const std::string &address, PacketMapper *msg);
 
 		TcpProxySession * ConnectByAddress(const std::string &address, const std::string &name);
 
@@ -34,7 +34,7 @@ namespace Sentry
 		void SessionError(const std::string & address);
 		void ConnectFailure(const std::string & address);
 		void ConnectSuccessful(const std::string & address);
-		void ReceiveNewMessage(const std::string & address, NetMessageProxy * message);
+		void ReceiveNewMessage(const std::string & address, PacketMapper * message);
     protected:
         bool Awake() override;
 
@@ -44,7 +44,7 @@ namespace Sentry
 
         virtual void OnConnectSuccessful(TcpProxySession *session) {}
 
-        virtual bool OnRecvMessage(const std::string &address, NetMessageProxy *msg);
+        virtual bool OnRecvMessage(const std::string &address, PacketMapper *msg);
     private:
         int mReConnectTime;
 

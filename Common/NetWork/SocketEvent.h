@@ -2,7 +2,7 @@
 
 #include<string>
 #include<memory>
-#include"NetMessageProxy.h"
+#include"PacketMapper.h"
 
 using namespace std;
 namespace Sentry

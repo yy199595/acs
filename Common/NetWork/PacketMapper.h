@@ -22,15 +22,15 @@ namespace Sentry
 		RESPONSE_END = 255
 	};
 
-	class NetMessageProxy
+	class PacketMapper
 	{
 	public:
-		NetMessageProxy(NetMessageType type);
-		~NetMessageProxy();
+		PacketMapper(NetMessageType type);
+		~PacketMapper();
 
 	public:
-		static NetMessageProxy *Create(const std::string & address, const char *message, const size_t size);
-		static NetMessageProxy *Create(const std::string & address, NetMessageType type, const std::string & service, const std::string &method);
+		static PacketMapper *Create(const std::string & address, const char *message, const size_t size);
+		static PacketMapper *Create(const std::string & address, NetMessageType type, const std::string & service, const std::string &method);
 	public:
 		void Clear();
 		size_t WriteToBuffer(char *buffer, const size_t size);
@@ -41,8 +41,8 @@ namespace Sentry
 		const std::string &GetService() { return this->mProConfig->ServiceName; }	
 		const ProtocolConfig * GetProConfig() { return this->mProConfig; }
 	public:
+		bool SetCode(XCode code);
 		void SetType(NetMessageType type);
-		void SetCode(XCode code) { this->mCode = code; }
 		void SetUserId(const long long id) { this->mUserId = id; }
 		void SetRpcId(const unsigned int id) { this->mRpcId = id; }
 		void ClearMessage() { this->mMessageData.clear(); }
@@ -52,6 +52,7 @@ namespace Sentry
 		unsigned int GetRpcId() { return this->mRpcId; }
 		long long GetUserId() { return this->mUserId; }
 		NetMessageType GetMessageType() { return this->mMsgType; }	
+		size_t GetPackageSize();
 	private:
 		NetMessageType mMsgType;
 	private:

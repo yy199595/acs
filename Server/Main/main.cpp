@@ -18,7 +18,7 @@
 #include <Scene/SceneProtocolComponent.h>
 #include <Service/LoginService.h>
 #include <Service/ClusterService.h>
-#include <Service/ServiceRegistry.h>
+#include <Service/ServiceCenter.h>
 
 #include <Service/MysqlProxy.h>
 using namespace Sentry;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     ComponentHelper::Add<MysqlProxy>("MysqlProxy");
     ComponentHelper::Add<LoginService>("LoginService");
     ComponentHelper::Add<ClusterService>("ClusterService");
-    ComponentHelper::Add<ServiceRegistry>("ServiceRegistry");
+    ComponentHelper::Add<ServiceCenter>("ServiceCenter");
 
     std::string serverName = argc == 3 ? argv[1] : "Server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/ServerConfig.json";

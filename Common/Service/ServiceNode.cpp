@@ -7,7 +7,7 @@
 #include <NetWork/NetWorkRetAction.h>
 #include <Util/JsonHelper.h>
 #include <Util/StringHelper.h>
-#include <NetWork/NetMessageProxy.h>
+#include <NetWork/PacketMapper.h>
 namespace Sentry
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
@@ -77,7 +77,7 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_NOTICE, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
 		if (messageData == nullptr)
 		{
 			SayNoDebugError("not find [" << service << "." << method << "]");
@@ -96,7 +96,7 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_NOTICE, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
 		if (messageData == nullptr)
 		{
 			SayNoDebugError("not find [" << service << "." << method << "]");
@@ -118,7 +118,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_REQUEST, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
 		if (messageData == nullptr)
 		{
@@ -139,7 +139,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_REQUEST, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
 		if (messageData == nullptr)
 		{
@@ -160,7 +160,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_REQUEST, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
 		if (messageData == nullptr)
 		{
@@ -182,7 +182,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 
-		NetMessageProxy *messageData = NetMessageProxy::Create(mAddress, S2S_REQUEST, service, method);
+		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
 		if (messageData == nullptr)
 		{
@@ -202,7 +202,7 @@ namespace Sentry
 		}
 		return this->mNetWorkManager->GetProxySession(this->mAddress);
 	}
-	XCode ServiceNode::SendRpcMessage(NetMessageProxy * message)
+	XCode ServiceNode::SendRpcMessage(PacketMapper * message)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
 		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
@@ -225,7 +225,7 @@ namespace Sentry
 		}
 		return rpcCallback->GetCode();
 	}
-	XCode ServiceNode::SendRpcMessage(NetMessageProxy * message, Message & response)
+	XCode ServiceNode::SendRpcMessage(PacketMapper * message, Message & response)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
 		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);

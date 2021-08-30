@@ -1,28 +1,28 @@
-﻿#include "ServiceRegistry.h"
+﻿#include "ServiceCenter.h"
 #include <Core/App.h>
 #include <Util/StringHelper.h>
 #include <Service/ServiceNode.h>
 
 namespace Sentry
 {
-    ServiceRegistry::ServiceRegistry()
+    ServiceCenter::ServiceCenter()
     {
     }
 
-    bool ServiceRegistry::Awake()
+    bool ServiceCenter::Awake()
     {
         SayNoAssertRetFalse_F(LocalService::Awake());
-        REGISTER_FUNCTION_1(ServiceRegistry::RegisterNode, s2s::NodeRegister_Request);
-        REGISTER_FUNCTION_2(ServiceRegistry::QueryNodes, com::Int32Data, s2s::NodeData_Array);
+        REGISTER_FUNCTION_1(ServiceCenter::Add, s2s::NodeRegister_Request);
+        REGISTER_FUNCTION_2(ServiceCenter::Query, com::Int32Data, s2s::NodeData_Array);
         return true;
     }
 
-    void ServiceRegistry::Start()
+    void ServiceCenter::Start()
     {
 
     }
 
-    XCode ServiceRegistry::RegisterNode(long long id, const s2s::NodeRegister_Request &nodeInfo)
+    XCode ServiceCenter::Add(long long id, const s2s::NodeRegister_Request &nodeInfo)
     {
         const int areaId = nodeInfo.areaid();
         const int nodeId = nodeInfo.nodeid();
@@ -46,12 +46,13 @@ namespace Sentry
             serviceNode->AddService(nodeInfo.services(index));
         }
         this->mServiceNodeMap.emplace(key, serviceNode);
+		SayNoDebugLog(nodeName << " [" << address << "] register successful ......");
 
-        this->NoticeNode(areaId);
+        //this->NoticeNode(areaId);
         return XCode::Successful;
     }
 
-    XCode ServiceRegistry::QueryNodes(long long id, const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
+    XCode ServiceCenter::Query(long long id, const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
     {
         const int areaId = areaData.data();
         auto iter = this->mServiceNodeMap.begin();
@@ -68,7 +69,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    void ServiceRegistry::NoticeNode(int areaId)
+    void ServiceCenter::NoticeNode(int areaId)
     {
         auto iter = this->mServiceNodeMap.begin();
         for (; iter != this->mServiceNodeMap.end(); iter++)

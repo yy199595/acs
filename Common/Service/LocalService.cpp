@@ -16,13 +16,22 @@ namespace Sentry
         return iter != this->mActionMap.end();
     }
 
-    bool LocalService::Awake()
+	void LocalService::GetMethods(std::vector<LocalActionProxy*> & methods)
+	{
+		auto iter = this->mActionMap.begin();
+		for (; iter != this->mActionMap.end(); iter++)
+		{
+			methods.push_back(iter->second);
+		}
+	}
+
+	bool LocalService::Awake()
     {
 		this->mCorComponent = App::Get().GetCoroutineComponent();     
-        return ServiceBase::Awake();
+		return true;
     }
 
-    XCode LocalService::InvokeMethod(NetMessageProxy *messageData)
+    XCode LocalService::InvokeMethod(PacketMapper *messageData)
     {
         const std::string &method = messageData->GetMethd();
         auto iter = this->mActionMap.find(method);
@@ -32,17 +41,18 @@ namespace Sentry
                                       << "." << messageData->GetMethd() << ">> not found");
             return XCode::CallFunctionNotExist;
         }
-        shared_ptr<LocalActionProxy> localAction = iter->second;
+        LocalActionProxy * localAction = iter->second;
         return localAction->Invoke(messageData);
     }
 
     bool LocalService::BindFunction(std::string name, LocalAction1 action)
     {
-        return this->BindFunction(name, make_shared<LocalActionProxy1>(action));
+        return this->BindFunction(new LocalActionProxy1(name, action));
     }
 
-    bool LocalService::BindFunction(const std::string &name, shared_ptr<LocalActionProxy> actionBox)
+    bool LocalService::BindFunction(LocalActionProxy * actionBox)
     {
+		const std::string & name = actionBox->GetName();
         auto iter = this->mActionMap.find(name);
         if (iter != this->mActionMap.end())
         {

@@ -43,7 +43,7 @@ namespace Sentry
             return false;
         }
 		const std::string & address = session->GetAddress();
-        NetMessageProxy *messageData = NetMessageProxy::Create(address, message, size);
+        PacketMapper *messageData = PacketMapper::Create(address, message, size);
         if (messageData == nullptr)
         {
             return false;
@@ -159,13 +159,13 @@ namespace Sentry
 			return false;
 		}
 		TcpClientSession *session = this->Create(name, address);
-		if (session == nullptr || !session->StartConnect())
+		if (session != nullptr)
 		{
-			return true;
+			return session->StartConnect();
 		}
 		return false;
 	}
-	bool SceneSessionComponent::StartSendMessage(const std::string & address, NetMessageProxy * messageData)
+	bool SceneSessionComponent::StartSendMessage(const std::string & address, PacketMapper * messageData)
 	{
 		TcpClientSession *session = this->GetSession(address);
 		if (session != nullptr)

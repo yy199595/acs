@@ -14,7 +14,7 @@ namespace Sentry
 
     protected:
         bool Awake() final;
-
+		void Start() final;
     public:
         const ProtocolConfig *GetProtocolConfig(unsigned short id) const;
 

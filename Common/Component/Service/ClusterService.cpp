@@ -46,7 +46,7 @@ namespace Sentry
 		registerInfo.set_nodeid(this->mNodeId);
 		registerInfo.set_address(this->mListenAddress);
 		registerInfo.set_servername(App::Get().GetServerName());
-		XCode code = centerNode->Invoke("ServiceRegistry", "RegisterNode", registerInfo);
+		XCode code = centerNode->Invoke("ServiceCenter", "Add", registerInfo);
 		if (code != XCode::Successful)
 		{
 			SayNoDebugLog("register local service node fail");

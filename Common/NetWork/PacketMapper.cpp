@@ -1,4 +1,4 @@
-﻿#include "NetMessageProxy.h"
+﻿#include "PacketMapper.h"
 #include <Scene/SceneProtocolComponent.h>
 #include <Core/App.h>
 namespace Sentry
@@ -12,25 +12,25 @@ namespace Sentry
     }
 
 
-    NetMessageProxy::NetMessageProxy(NetMessageType type)
+    PacketMapper::PacketMapper(NetMessageType type)
             : mMsgType(type)
     {
         this->Clear();
     }
 
-    NetMessageProxy::~NetMessageProxy()
+    PacketMapper::~PacketMapper()
     {
         this->Clear();
     }
 
-    void NetMessageProxy::Clear()
+    void PacketMapper::Clear()
     {
         this->mRpcId = 0;
         this->mUserId = 0;
         this->mProConfig = nullptr;
     }
 
-    NetMessageProxy *NetMessageProxy::Create(const std::string & address, const char *message, const size_t size)
+    PacketMapper *PacketMapper::Create(const std::string & address, const char *message, const size_t size)
     {
         if (message == nullptr || size == 0)
         {
@@ -40,8 +40,8 @@ namespace Sentry
         SceneProtocolComponent *pProtocolMgr = Scene::GetComponent<SceneProtocolComponent>();
 
         int code = 0;
-        long long rpcid = 0;
-        long long userid = 0;
+		long long userid = 0;
+        unsigned int rpcid = 0;
         unsigned short actionid = 0;     
         NetMessageType messageType = (NetMessageType) message[0];
         SayNoAssertRetNull_F(MemoryCopy(&actionid, message, offset, size));
@@ -76,7 +76,7 @@ namespace Sentry
                 return nullptr;
         }
 
-        NetMessageProxy *messageData = new NetMessageProxy(messageType);
+        PacketMapper *messageData = new PacketMapper(messageType);
 
 		
         messageData->mRpcId = rpcid;
@@ -92,7 +92,7 @@ namespace Sentry
         return messageData;
     }
 
-    NetMessageProxy *NetMessageProxy::Create(const std::string & address, NetMessageType type, const std::string &service, const std::string &method)
+    PacketMapper *PacketMapper::Create(const std::string & address, NetMessageType type, const std::string &service, const std::string &method)
     {
         if (type > REQUEST_END)
         {
@@ -103,7 +103,7 @@ namespace Sentry
         const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
         if (config != nullptr)
         {
-            NetMessageProxy *messageData = new NetMessageProxy(type);
+            PacketMapper *messageData = new PacketMapper(type);
 			messageData->mAddress = address;
             messageData->mProConfig = config;
             return messageData;
@@ -111,19 +111,43 @@ namespace Sentry
         return nullptr;
     }
 
-	void NetMessageProxy::SetType(NetMessageType type)
+	bool PacketMapper::SetCode(XCode code)
+	{
+		if (this->mRpcId == 0)
+		{
+			return false;
+		}
+		switch (this->mMsgType)
+		{
+		case NetMessageType::C2S_REQUEST:
+			this->mMsgType = S2S_RESPONSE;
+			return this->mUserId != 0;
+		case NetMessageType::S2S_REQUEST:
+			this->mMsgType = S2S_RESPONSE;
+			return true;
+		}
+		return false;
+	}
+
+	void PacketMapper::SetType(NetMessageType type)
 	{
 		this->mMsgType = type;
 		this->mMessageData.clear();
 	}
 
+	size_t PacketMapper::GetPackageSize()
+	{
+		size_t size = sizeof(char);
+		size += sizeof(this->mProConfig->MethodId);
+		size += this->mRpcId == 0 ? 0 : sizeof(this->mRpcId);
+		size += this->mUserId == 0 ? 0 : sizeof(this->mUserId);
+		size += this->mMessageData.size();
+		return size;
+	}
 
-    size_t NetMessageProxy::WriteToBuffer(char *buffer, const size_t size)
-    {
-        if (this->mMsgType >= REQUEST_END)
-        {
-            return 0;
-        }
+
+    size_t PacketMapper::WriteToBuffer(char *buffer, const size_t size)
+    {      
 		size_t offset = sizeof(unsigned int);
 		unsigned char type = (unsigned char)this->mMsgType;  
 		memcpy(buffer + offset, &type, sizeof(type)); offset += sizeof(type);

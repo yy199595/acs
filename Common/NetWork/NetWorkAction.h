@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "TcpClientSession.h"
-#include <NetWork/NetMessageProxy.h>
+#include <NetWork/PacketMapper.h>
 #include <Other/ObjectFactory.h>
 #include <Pool/ObjectPool.h>
 #include <Protocol/com.pb.h>
@@ -31,28 +31,35 @@ namespace Sentry
     class LocalActionProxy
     {
     public:
-        LocalActionProxy() {}
+        LocalActionProxy(const std::string name) : mName(name) {}
 
         virtual ~LocalActionProxy() {}
-
+	public:
+		const std::string & GetName() { return this->mName; }
+		virtual bool GetRequestType(std::string & requestName) = 0;
+		virtual bool GetResponseType(std::string & responseName) = 0;
     public:
-        virtual XCode Invoke(NetMessageProxy *messageData) = 0;
+        virtual XCode Invoke(PacketMapper *messageData) = 0;
+	private:
+		const std::string mName;
     };
 }// namespace Sentry
 
 namespace Sentry
 {
-    class LocalActionProxy1 : public LocalActionProxy// 无参数 无返回
-    {
-    public:
-        LocalActionProxy1(LocalAction1 action) : mBindAction(action) {}
+	class LocalActionProxy1 : public LocalActionProxy// 无参数 无返回
+	{
+	public:
+		LocalActionProxy1(const std::string name, LocalAction1 action)
+			:LocalActionProxy(name), mBindAction(action) {}
 
-    public:
-        XCode Invoke(NetMessageProxy *messageData) final;
-
-    private:
-        LocalAction1 mBindAction;
-    };
+	public:
+		XCode Invoke(PacketMapper *messageData) final;
+		bool GetRequestType(std::string & requestName) override { return false; };
+		bool GetResponseType(std::string & responseName)override { return false; }
+	private:
+		LocalAction1 mBindAction;
+	};
 }// namespace Sentry
 
 namespace Sentry
@@ -61,18 +68,20 @@ namespace Sentry
     class LocalActionProxy2 : public LocalActionProxy//有参数 无返回
     {
     public:
-        LocalActionProxy2(LocalAction2<T1> action) : mBindAction(action) {}
+        LocalActionProxy2(const std::string name, LocalAction2<T1> action)
+			:LocalActionProxy(name), mBindAction(action) {}
 
     public:
-		XCode Invoke(NetMessageProxy *messageData) final;
-
+		XCode Invoke(PacketMapper *messageData) final;
+		bool GetRequestType(std::string & requestName) override;
+		bool GetResponseType(std::string & responseName)override { return false; }
     private:
         LocalAction2<T1> mBindAction;
         ObjectPool<T1> mReqMessagePool;
     };
 
     template<typename T1>
-    inline XCode LocalActionProxy2<T1>::Invoke(NetMessageProxy *messageData)
+    inline XCode LocalActionProxy2<T1>::Invoke(PacketMapper *messageData)
     {
         T1 *message = mReqMessagePool.Create();
         if (!message->ParseFromString(messageData->GetMsgBody()))
@@ -86,6 +95,14 @@ namespace Sentry
         mReqMessagePool.Destory(message);
 		return code;
     }
+	template<typename T1>
+	inline bool LocalActionProxy2<T1>::GetRequestType(std::string & requestName)
+	{
+		T1 *message = mReqMessagePool.Create();
+		requestName = message->GetTypeName();
+		mReqMessagePool.Destory(message);
+		return true;
+	}
 }// namespace Sentry
 
 namespace Sentry
@@ -94,20 +111,39 @@ namespace Sentry
     class LocalActionProxy3 : public LocalActionProxy//一个参数 一个返回
     {
     public:
-        LocalActionProxy3(LocalAction3<T1, T2> action)
-            : mBindAction(action) {}
+        LocalActionProxy3(const std::string name, LocalAction3<T1, T2> action)
+            : LocalActionProxy(name), mBindAction(action) {}
 
     public:
-		XCode Invoke(NetMessageProxy *messageData) override;
+		XCode Invoke(PacketMapper *messageData) override;
 
+		bool GetRequestType(std::string & requestName) override;
+		bool GetResponseType(std::string & responseName)override;
     private:
         ObjectPool<T1> mReqMessagePool;
         ObjectPool<T2> mResMessagePool;
         LocalAction3<T1, T2> mBindAction;
     };
+	template<typename T1, typename T2>
+	bool LocalActionProxy3<T1, T2>::GetRequestType(std::string & requestName)
+	{
+		T1 * request = mReqMessagePool.Create();
+		requestName = request->GetTypeName();
+		mReqMessagePool.Destory(request);
+		return true;
+	}
+
+	template<typename T1, typename T2>
+	bool LocalActionProxy3<T1, T2>::GetResponseType(std::string & responseName)
+	{
+		T2 * response = mResMessagePool.Create();
+		responseName = response->GetTypeName();
+		mResMessagePool.Destory(response);
+		return true;
+	}
 
     template<typename T1, typename T2>
-    inline XCode LocalActionProxy3<T1, T2>::Invoke(NetMessageProxy *messageData)
+    inline XCode LocalActionProxy3<T1, T2>::Invoke(PacketMapper *messageData)
     {
         T1 *request = this->mReqMessagePool.Create();
         if (!request->ParseFromString(messageData->GetMsgBody()))
@@ -134,9 +170,10 @@ namespace Sentry
     class LocalActionProxy4 : public LocalActionProxy//无参数 一个返回
     {
     public:
-        LocalActionProxy4(LocalAction4<T1> action) : mBindAction(action) {}
+        LocalActionProxy4(const std::string name, LocalAction4<T1> action) 
+			:LocalActionProxy(name), mBindAction(action) {}
 
-		XCode Invoke(NetMessageProxy *messageData) override
+		XCode Invoke(PacketMapper *messageData) override
         {
             long long userId = messageData->GetUserId();
             T1 *responseData = mResMessagePool.Create();
@@ -146,6 +183,18 @@ namespace Sentry
             this->mResMessagePool.Destory(responseData);
             return code;
         }
+
+		bool GetRequestType(std::string & requestName) override
+		{
+			return false;
+		}
+		bool GetResponseType(std::string & responseName)override
+		{
+			T1 *response = mResMessagePool.Create();
+			responseName = response->GetTypeName();
+			this->mResMessagePool.Destory(response);
+			return true;
+		}
 
     private:
         LocalAction4<T1> mBindAction;

@@ -4,7 +4,7 @@
 #include"NetLuaRetAction.h"
 #include<Util/NumberBuilder.h>
 #include<Protocol/com.pb.h>
-#include<NetWork/NetMessageProxy.h>
+#include<NetWork/PacketMapper.h>
 #include<NetWork/TcpClientSession.h>
 
 using namespace com;
@@ -27,7 +27,7 @@ namespace Sentry
         long long GetCreateTime() { return this->mCreateTime; }
 
     public:
-        virtual void Invoke(NetMessageProxy *backData) = 0;
+        virtual void Invoke(PacketMapper *backData) = 0;
 
     private:
         long long mCreateTime;
@@ -51,7 +51,7 @@ namespace Sentry
         ~LocalRetActionProxy1() {}
 
     public:
-        void Invoke(NetMessageProxy *backData) override;
+        void Invoke(PacketMapper *backData) override;
 
     private:
         NetWorkRetAction1 mBindAction;
@@ -66,7 +66,7 @@ namespace Sentry
         ~LocalRetActionProxy2() {}
 
     public:
-        void Invoke(NetMessageProxy *backData) override
+        void Invoke(PacketMapper *backData) override
         {
             mReturnData.Clear();
             XCode code = backData->GetCode();
@@ -100,7 +100,7 @@ namespace Sentry
         }
 
     public:
-        void Invoke(NetMessageProxy *backData);
+        void Invoke(PacketMapper *backData);
 
     private:
         NetLuaRetAction *mBindLuaAction;
@@ -118,7 +118,7 @@ namespace Sentry
         }
 
     public:
-        void Invoke(NetMessageProxy *backData) override;
+        void Invoke(PacketMapper *backData) override;
 
     private:
         NetLuaWaitAction *mBindLuaAction;
@@ -136,7 +136,7 @@ namespace Sentry
         static shared_ptr<NetWorkWaitCorAction> Create(CoroutineComponent *);
 
     public:
-        void Invoke(NetMessageProxy *backData) override;
+        void Invoke(PacketMapper *backData) override;
 
     public:
         XCode GetCode() { return this->mCode; }

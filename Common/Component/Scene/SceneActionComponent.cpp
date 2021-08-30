@@ -38,7 +38,7 @@ namespace Sentry
         return id;
     }
 
-	bool SceneActionComponent::InvokeCallback(NetMessageProxy *messageData)
+	bool SceneActionComponent::InvokeCallback(PacketMapper *messageData)
 	{
 		unsigned int rpcId = messageData->GetRpcId();
 		auto iter = this->mRetActionMap.find(rpcId);

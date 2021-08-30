@@ -8,7 +8,7 @@ namespace Sentry
     {
     }
 
-    void LocalLuaRetActionProxy::Invoke(NetMessageProxy *backData)
+    void LocalLuaRetActionProxy::Invoke(PacketMapper *backData)
     {
         XCode code = backData->GetCode();
         //TODO
@@ -26,7 +26,7 @@ namespace Sentry
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
 
-    void LocalRetActionProxy1::Invoke(NetMessageProxy *backData)
+    void LocalRetActionProxy1::Invoke(PacketMapper *backData)
     {
     }
 
@@ -34,7 +34,7 @@ namespace Sentry
     {
     }
 
-    void LocalWaitRetActionProxy::Invoke(NetMessageProxy *backData)
+    void LocalWaitRetActionProxy::Invoke(PacketMapper *backData)
     {
         XCode code = backData->GetCode();
         // TODO
@@ -68,7 +68,7 @@ namespace Sentry
         return std::make_shared<NetWorkWaitCorAction>(coroutineMgr);
     }
 
-    void NetWorkWaitCorAction::Invoke(NetMessageProxy *backData)
+    void NetWorkWaitCorAction::Invoke(PacketMapper *backData)
     {
         this->mCode = backData->GetCode();
         // TODO优化
