@@ -9,6 +9,7 @@ namespace Sentry
 
     TcpProxySession::TcpProxySession(const std::string &address)
     {
+		this->mIsActive = true;
         this->mConnectCount = 0;
         this->mAddress = address;
         this->mSessionType = SessionClient;    
@@ -19,6 +20,7 @@ namespace Sentry
     {
         this->mName = name;
         this->mConnectCount = 0;
+		this->mIsActive = false;
         this->mAddress = address;
         this->mSessionType = SessionNode;
 		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
@@ -39,6 +41,10 @@ namespace Sentry
         {
             return false;
         }
+		if (this->IsActive() == false)
+		{
+			return false;
+		}
 #ifdef SOEASY_DEBUG
         const std::string &method = messageData->GetMethd();
         const std::string &service = messageData->GetService();

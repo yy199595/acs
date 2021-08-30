@@ -30,7 +30,7 @@ namespace Sentry
 
     public:
         void OnFrameUpdate(float t);
-
+		void OnConnectSuccessful();
     public:
         std::string GetJsonString();
 
@@ -46,9 +46,10 @@ namespace Sentry
 
         XCode Call(const std::string &service, const std::string &method, const Message &request, Message &response);
 
-    public:// lua 使用
-        XCode PushMessage(NetMessageProxy *messageData);
-
+	private:
+		class TcpProxySession * GetNodeSession();
+		XCode SendRpcMessage(NetMessageProxy * message);
+		XCode SendRpcMessage(NetMessageProxy * message, Message &response);
     private:
         std::string mIp;
         unsigned short mPort;
@@ -57,12 +58,10 @@ namespace Sentry
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
         class SceneActionComponent *mActionManager;
-
         class SceneNetProxyComponent *mNetWorkManager;
-
         s2s::NodeData_NodeInfo mNodeInfoMessage;
         ServiceNodeComponent *mServiceNodeManager;
-        std::queue<NetMessageProxy *> mMessageQueue;
+		std::queue<unsigned int> mConnectCoroutines;
         char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
     };
 }// namespace Sentry

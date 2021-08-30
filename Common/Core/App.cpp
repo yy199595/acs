@@ -16,17 +16,17 @@ namespace Sentry
     App *App::mApp = nullptr;
 
     App::App(const std::string srvName, const std::string configPath)
-            : mStartTime(TimeHelper::GetSecTimeStamp()), mConfig(configPath),
+            : mStartTime(TimeHelper::GetMilTimestamp()), mConfig(configPath),
 		Scene(0), Service(1)
-    {
-        assert(!mApp);
+    {       
 		mApp = this;
         this->mDelatime = 0;
         this->mLogicTime = 0;
-        this->mIsClose = false;
+		this->mIsClose = false;
         this->mServerName = srvName;
         this->mLogicRunCount = 0;
         this->mSystemRunCount = 0;
+		this->mIsInitComplate = false;
         this->mNetWorkThread = nullptr;
         this->mSrvConfigDirectory = configPath;
         this->mLogHelper = new LogHelper("./Logs", srvName);
@@ -70,7 +70,6 @@ namespace Sentry
 				SayNoDebugFatal("add " << name << " to scene failure");
 				return false;
 			}
-			SayNoDebugLog("add new service component [ " << name << " ]");
         }
 
 		for (size_t index = 0; index < managers.size(); index++)
@@ -81,7 +80,6 @@ namespace Sentry
 				SayNoDebugFatal("add " << name << " to service failure");
 				return false;
 			}
-			SayNoDebugLog("add new scene component [ " << name << " ]");
 		}
         return true;
     }
@@ -139,23 +137,19 @@ namespace Sentry
 		INetSystemUpdate *manager4 = dynamic_cast<INetSystemUpdate *>(component);
 		if (manager1 != nullptr)
 		{
-			this->mFrameUpdateManagers.push_back(manager1);
-			SayNoDebugLog("add " << component->GetTypeName() << " to FrameUpdateArray");
+			this->mFrameUpdateManagers.push_back(manager1);			
 		}
 		if (manager2 != nullptr)
 		{
 			this->mSystemUpdateManagers.push_back(manager2);
-			SayNoDebugLog("add " << component->GetTypeName() << " to SystemUpdateArray");
 		}
 		if (manager3 != nullptr)
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
-			SayNoDebugLog("add " << component->GetTypeName() << " to SecondUpdateArray");
 		}
 		if (manager4 != nullptr)
 		{
 			this->mNetSystemUpdateManagers.push_back(manager4);
-			SayNoDebugLog("add " << component->GetTypeName() << " to NetSystemUpdateArray");
 		}
 		return true;
 	}
@@ -167,11 +161,8 @@ namespace Sentry
 		{
 			this->mMainThreadId = std::this_thread::get_id();
 			this->mNetWorkThreadId = this->mNetWorkThread->get_id();
-
-			SayNoDebugLog("=====  start " << this->mServerName << " successful  ========");
-			SayNoDebugInfo(
-				"main thread : [" << this->mMainThreadId << "]  " << "net thread : [" << this->mNetWorkThreadId
-				<< "]");
+			SayNoDebugInfo("main thread : [" 
+				<< this->mMainThreadId << "]  " << "net thread : [" << this->mNetWorkThreadId << "]");
 			return true;
 		}
 		return false;
@@ -179,31 +170,27 @@ namespace Sentry
 
 	void App::StartComponent()
 	{
-		for(Component * component : this->mAllComponents)
+		for (size_t index = 0; index < this->mAllComponents.size(); index++)
 		{
-			component->Start();
-			SayNoDebugInfo("start component " << component->GetTypeName());
-		}
+			Component * component = this->mAllComponents[index];
+			if (component != nullptr)
+			{
+				float process = index / (float)this->mAllComponents.size();
+				SayNoDebugInfo("[" << process * 100 << "%]" << " start component " << component->GetTypeName());
+
+				component->Start();
+			}
+		}		
+		this->mIsInitComplate = true;
+		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
+		SayNoDebugLog("=====  start " << this->mServerName << " successful ["<< t / 1000.0f <<"s] ========");
 	}
 
 	int App::Run()
     {
-        if (!mConfig.InitConfig())
+        if (!mConfig.InitConfig() || !this->LoadComponent() || !this->InitComponent())
         {
-            Stop();
-            return -1;
-        }
-
-        if (!this->LoadComponent())
-        {
-            Stop();
-            return -2;
-        }
-
-        if (!this->InitComponent())
-        {
-            Stop();
-            return -3;
+			return this->Stop();
         }
         return this->LogicMainLoop();
     }
@@ -217,7 +204,7 @@ namespace Sentry
 #ifdef _WIN32
         return getchar();
 #endif
-        return 0;
+        return -1;
     }
 
     float App::GetMeanFps()
@@ -227,14 +214,13 @@ namespace Sentry
 
     int App::LogicMainLoop()
     {
+		int logicFps = 30;
+		mConfig.GetValue("LogicFps", logicFps);
         long long startTimer = TimeHelper::GetMilTimestamp();
         long long secondTimer = TimeHelper::GetMilTimestamp();
         this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
-        this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-        int logicFps = 30;
-        int systemFps = 100;
-        mConfig.GetValue("LogicFps", logicFps);
-        mConfig.GetValue("SystemFps", systemFps);
+        this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();   
+       
 
         std::chrono::milliseconds time(1);
         const long long LogicUpdateInterval = 1000 / logicFps;
@@ -246,32 +232,34 @@ namespace Sentry
             {
                 this->mSystemUpdateManagers[index]->OnSystemUpdate();
             }
+			if (this->mIsInitComplate)
+			{
+				if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
+				{
+					this->mLogicRunCount++;
+					for (size_t index = 0; index < this->mFrameUpdateManagers.size(); index++)
+					{
+						this->mFrameUpdateManagers[index]->OnFrameUpdate(this->mDelatime);
+					}
 
-            if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
-            {
-                this->mLogicRunCount++;
-                for (size_t index = 0; index < this->mFrameUpdateManagers.size(); index++)
-                {
-                    this->mFrameUpdateManagers[index]->OnFrameUpdate(this->mDelatime);
-                }
+					for (size_t index = 0; index < this->mLastFrameUpdateManager.size(); index++)
+					{
+						this->mLastFrameUpdateManager[index]->OnLastFrameUpdate();
+					}
 
-                for (size_t index = 0; index < this->mLastFrameUpdateManager.size(); index++)
-                {
-                    this->mLastFrameUpdateManager[index]->OnLastFrameUpdate();
-                }
+					startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
+				}
 
-                startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
-            }
-
-            if (startTimer - secondTimer >= 1000)
-            {
-                for (size_t index = 0; index < this->mSecondUpdateManagers.size(); index++)
-                {
-                    this->mSecondUpdateManagers[index]->OnSecondUpdate();
-                }
-                this->UpdateConsoleTitle();
-                secondTimer = TimeHelper::GetMilTimestamp();
-            }
+				if (startTimer - secondTimer >= 1000)
+				{
+					for (size_t index = 0; index < this->mSecondUpdateManagers.size(); index++)
+					{
+						this->mSecondUpdateManagers[index]->OnSecondUpdate();
+					}
+					this->UpdateConsoleTitle();
+					secondTimer = TimeHelper::GetMilTimestamp();
+				}
+			}
         }
         return this->Stop();
     }

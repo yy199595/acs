@@ -22,6 +22,7 @@ namespace Sentry
 
         void OnSystemUpdate() final;
 
+		int GetPriority() override { return 2; }
     public:
 		void GetThreads(std::vector<std::thread::id> & threads);
 

@@ -37,6 +37,8 @@ namespace Sentry
 		void Start() final;
 
 		void OnSystemUpdate() final;
+
+		int GetPriority() override { return 1; }
 	private:
 		void Loop();
 		void Loop2();

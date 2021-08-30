@@ -4,7 +4,9 @@
 #include "SceneActionComponent.h"
 #include "SceneSessionComponent.h"
 #include <Timer/TimerComponent.h>
+#include<Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
+#include<Service/ServiceNode.h>
 namespace Sentry
 {
 
@@ -34,15 +36,11 @@ namespace Sentry
     }
 
 	TcpProxySession * SceneNetProxyComponent::ConnectByAddress(const std::string &address, const std::string &name)
-    {
-		CoroutineComponent * cooutineComponent = App::Get().GetCoroutineComponent();
-
-		unsigned int corId = cooutineComponent->GetCurrentCorId();
+    {		
         auto iter = this->mConnectSessionMap.find(address);
         if (iter != this->mConnectSessionMap.end())
         {
-			mConnectCoroutines[address].push(corId);
-			cooutineComponent->YieldReturn();			
+			return iter->second;
         }
 		else
 		{
@@ -50,13 +48,11 @@ namespace Sentry
 			if (tcpSession != nullptr)
 			{
 				tcpSession->StartConnect();
-				mConnectCoroutines[address].push(corId);
 				this->mConnectSessionMap.emplace(address, tcpSession);
-				cooutineComponent->YieldReturn();
 				return tcpSession;
 			}
 		}
-        return this->GetProxySession(address);;
+		return nullptr;
     }
 
     TcpProxySession *SceneNetProxyComponent::GetProxySession(const std::string &address)
@@ -99,14 +95,9 @@ namespace Sentry
 #ifdef SOEASY_DEBUG
 			SayNoDebugInfo("connect to " << address << " successful");
 #endif
-			CoroutineComponent * coroutineComponent = App::Get().GetCoroutineComponent();
-			auto iter = this->mConnectCoroutines.find(address);
-			while (!iter->second.empty())
-			{
-				unsigned int id = iter->second.front();
-				iter->second.pop();
-				coroutineComponent->Resume(id);
-			}
+			session->SetActive(true);
+			ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();
+			nodeComponent->GetServiceNode(address)->OnConnectSuccessful();
 			this->OnConnectSuccessful(session);
 		}
 	}

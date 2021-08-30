@@ -57,6 +57,5 @@ namespace Sentry
         DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
         std::unordered_map<std::string, TcpProxySession *> mSessionMap; //管理所有的session
         std::unordered_map<std::string, TcpProxySession *> mConnectSessionMap; //正在连接的session
-		std::unordered_map<std::string, std::queue<unsigned int>> mConnectCoroutines;
     };
 }

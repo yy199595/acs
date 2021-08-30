@@ -30,13 +30,15 @@ namespace Sentry
 		void StartColse();
 
         void StartConnect();
-
+		bool IsActive() { return this->mIsActive; }
+		void SetActive(bool active) { this->mIsActive = active; }
         bool SendMessageData(NetMessageProxy *messageData);
 
     public:
         bool Notice(const std::string &service, const std::string &method);                        //不回应
         bool Notice(const std::string &service, const std::string &method, const Message &request);//不回应
     private:
+		bool mIsActive;
         int mConnectCount;
         std::string mName;
         std::string mAddress;

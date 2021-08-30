@@ -27,10 +27,10 @@
     "ThreadCount": 1,
     "CoroutinePoolMaxSize": 100,
     "Mysql": {
-        "ip": "127.0.0.1",
+        "ip": "101.36.127.23",
         "port": 3306,
-        "user": "root",
-        "passwd": "199595yjz.",
+        "user": "yjz",
+        "passwd": "yjz199595",
         "db": "player_db",
         "sql": "./sql/sql.json"
     },

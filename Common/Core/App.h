@@ -61,7 +61,7 @@ namespace Sentry
 
 		long long GetRunTime()
 		{
-			return TimeHelper::GetSecTimeStamp() - this->mStartTime;
+			return TimeHelper::GetMilTimestamp() - this->mStartTime;
 		}
 
 		inline const std::string &GetConfigDirectory()
@@ -121,6 +121,7 @@ namespace Sentry
 		std::thread::id mNetWorkThreadId;
 	private:
 		bool mIsClose;
+		bool mIsInitComplate;
 		long long mLogicTime;
 		long long mStartTime;
 		ServerConfig mConfig;
@@ -128,6 +129,7 @@ namespace Sentry
 		long long mLastUpdateTime;
 		long long mLastSystemTime;
 		class LogHelper *mLogHelper;
+		
 		std::string mSrvConfigDirectory;
 
 	private:

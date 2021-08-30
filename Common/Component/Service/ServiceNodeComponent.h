@@ -20,6 +20,7 @@ namespace Sentry
 
         bool AddNode(ServiceNode *serviceNode);
 
+		virtual int GetPriority() { return 0; }
     protected:
         bool Awake() final;
 

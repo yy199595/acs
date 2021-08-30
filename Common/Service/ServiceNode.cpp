@@ -47,14 +47,16 @@ namespace Sentry
 
 	void ServiceNode::OnFrameUpdate(float t)
 	{
-		if (!this->mMessageQueue.empty())
+		
+	}
+
+	void ServiceNode::OnConnectSuccessful()
+	{
+		while (!this->mConnectCoroutines.empty())
 		{
-			TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
-			while (tcpSession != nullptr && !this->mMessageQueue.empty())
-			{
-				tcpSession->SendMessageData(this->mMessageQueue.front());
-				this->mMessageQueue.pop();
-			}
+			unsigned int id = this->mConnectCoroutines.front();
+			this->mConnectCoroutines.pop();
+			this->mCorComponent->Resume(id);
 		}
 	}
 
@@ -81,7 +83,7 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-		return this->PushMessage(messageData);
+		return this->SendRpcMessage(messageData);
 	}
 
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
@@ -101,7 +103,7 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 		messageData->SetMessage(request);
-		return this->PushMessage(messageData);
+		return this->SendRpcMessage(messageData);
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
@@ -123,18 +125,7 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
-		if (this->PushMessage(messageData))
-		{
-
-		}
-		long long rpcId = this->mActionManager->AddCallback(rpcCallback);
-
-		messageData->SetRpcId(rpcId);
-		this->PushMessage(messageData);
-		this->mCorComponent->YieldReturn();
-		return rpcCallback->GetCode();
+		return this->SendRpcMessage(messageData);
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, Message &response)
@@ -155,22 +146,7 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
-		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-
-		if (rpcId > 0)
-		{
-			messageData->SetRpcId(rpcId);
-			this->PushMessage(messageData);
-			this->mCorComponent->YieldReturn();
-			if (response.ParseFromString(rpcCallback->GetMsgData()))
-			{
-				return rpcCallback->GetCode();
-			}
-			return XCode::SerializationFailure;
-		}
-		return XCode::Failure;
+		return this->SendRpcMessage(messageData, response);
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method, const Message &request)
@@ -191,17 +167,8 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
-		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-		if (rpcId > 0 && messageData->SetMessage(request))
-		{
-			messageData->SetRpcId(rpcId);
-			this->PushMessage(messageData);
-			this->mCorComponent->YieldReturn();
-			return rpcCallback->GetCode();
-		}
-		return XCode::Failure;
+		messageData->SetMessage(request);
+		return this->SendRpcMessage(messageData);
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
@@ -222,44 +189,72 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
-		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-		if (rpcId > 0 && messageData->SetMessage(request))
-		{
-			messageData->SetRpcId(rpcId);
-			this->PushMessage(messageData);
-			this->mCorComponent->YieldReturn();
-			if (response.ParseFromString(rpcCallback->GetMsgData()))
-			{
-				return rpcCallback->GetCode();
-			}
-			return XCode::SerializationFailure;
-		}
-		return XCode::Failure;
+		messageData->SetMessage(request);
+		return this->SendRpcMessage(messageData, response);
 	}
 
-	XCode ServiceNode::PushMessage(NetMessageProxy *messageData)
+	TcpProxySession * ServiceNode::GetNodeSession()
 	{
 		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
 		if (tcpSession == nullptr)
 		{
-			this->mMessageQueue.push(messageData);
 			this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
-			// TODO
 		}
-		else
+		return this->mNetWorkManager->GetProxySession(this->mAddress);
+	}
+	XCode ServiceNode::SendRpcMessage(NetMessageProxy * message)
+	{
+		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
+		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
+		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+		if (tcpSession == nullptr)
 		{
-			while (!this->mMessageQueue.empty())
+			tcpSession = this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
+			if (!tcpSession->IsActive())
 			{
-				tcpSession->SendMessageData(this->mMessageQueue.front());
-				this->mMessageQueue.pop();
-			}
-			if (tcpSession->SendMessageData(messageData))
-			{
-				return XCode::Successful;
+				unsigned int id = this->mCorComponent->GetCurrentCorId();
+				this->mConnectCoroutines.push(id);
+				this->mCorComponent->YieldReturn();
 			}
 		}
-		return XCode::SendMessageFail;
+
+		message->SetRpcId(rpcId);
+		if (!tcpSession->SendMessageData(message))
+		{
+			return XCode::SendMessageFail;
+		}
+		return rpcCallback->GetCode();
+	}
+	XCode ServiceNode::SendRpcMessage(NetMessageProxy * message, Message & response)
+	{
+		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
+		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
+		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
+		if (tcpSession == nullptr)
+		{
+			tcpSession = this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
+			if (!tcpSession->IsActive())
+			{
+				unsigned int id = this->mCorComponent->GetCurrentCorId();
+				this->mConnectCoroutines.push(id);
+				this->mCorComponent->YieldReturn();
+			}
+		}
+		
+		message->SetRpcId(rpcId);
+		if (!tcpSession->SendMessageData(message))
+		{
+			return XCode::SendMessageFail;
+		}
+		if (rpcCallback->GetCode() == XCode::Successful)
+		{
+			const std::string & data = rpcCallback->GetMsgData();
+			if (response.ParseFromString(data) == false)
+			{
+				SayNoDebugFatal("parse response message error type : " << response.GetTypeName());
+				return XCode::ParseMessageError;
+			}
+		}
+		return rpcCallback->GetCode();
 	}
 }// namespace Sentry

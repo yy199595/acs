@@ -28,6 +28,7 @@ namespace Sentry
 
         bool HandlerMessage(const std::string &adress, NetMessageProxy *messageData);
 		
+		virtual int GetPriority() { return 1; }
 	private:	
 		void Invoke1(NetMessageProxy *messageData);
 		void Invoke2(const std::string &adress, NetMessageProxy *messageData);

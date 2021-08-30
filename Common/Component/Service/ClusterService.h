@@ -22,7 +22,7 @@ namespace Sentry
 
         void Start() final;
 
-		int GetPriority() final { return 0; }
+		int GetPriority() final { return 1000; }
     private:
         XCode DelNode(long long, const Int32Data &node);
 
