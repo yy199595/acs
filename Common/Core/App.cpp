@@ -15,22 +15,22 @@ namespace Sentry
 {
     App *App::mApp = nullptr;
 
-    App::App(const std::string srvName, const std::string configPath)
-            : mStartTime(TimeHelper::GetMilTimestamp()), mConfig(configPath),
-		Scene(0), Service(1)
-    {       
+	App::App(const std::string srvName, const std::string cfgDir)
+		: mStartTime(TimeHelper::GetMilTimestamp()),
+		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1)
+	{
 		mApp = this;
-        this->mDelatime = 0;
-        this->mLogicTime = 0;
+		this->mDelatime = 0;
+		this->mLogicTime = 0;
 		this->mIsClose = false;
-        this->mServerName = srvName;
-        this->mLogicRunCount = 0;
-        this->mSystemRunCount = 0;
+		this->mServerName = srvName;
+		this->mLogicRunCount = 0;
+		this->mSystemRunCount = 0;
 		this->mIsInitComplate = false;
-        this->mNetWorkThread = nullptr;
-        this->mSrvConfigDirectory = configPath;
-        this->mLogHelper = new LogHelper("./Logs", srvName);
-    }
+		this->mNetWorkThread = nullptr;
+		this->mConfigDir = cfgDir;
+		this->mLogHelper = new LogHelper("./Logs", srvName);
+	}
 
     bool App::LoadComponent()
     {

@@ -201,3 +201,115 @@ namespace Sentry
         ObjectPool<T1> mResMessagePool;
     };
 }// namespace Sentry
+
+
+namespace Sentry
+{
+	class ServiceMethod
+	{
+	public:
+		ServiceMethod(const std::string name) : mName(name) { }
+		virtual XCode Invoke(PacketMapper *messageData) = 0;
+		const std::string & GetName() { return this->mName; }
+	private:
+		std::string mName;
+	};
+	template<typename T>
+	class ServiceMethod1 : public ServiceMethod
+	{
+	public:
+		typedef XCode(T::*ServerFunc)(long long);
+		ServiceMethod1(const std::string name, T * o, ServerFunc func)
+			: ServiceMethod(name) ,_o(o), _func(func) { }
+	public:
+		XCode Invoke(PacketMapper *messageData) override
+		{
+			return (_o->*_func)(messageData->GetUserId());
+		}
+	private:
+		T * _o;
+		ServerFunc _func;
+	};
+	template<typename T, typename T1>
+	class ServiceMethod2 : public ServiceMethod
+	{
+	public:
+		typedef XCode(T::*ServerFunc)(long long, const T1 &);
+		ServiceMethod2(const std::string name, T * o, ServerFunc func)
+			:ServiceMethod(name), _o(o), _func(func) { }
+	public:
+		XCode Invoke(PacketMapper *messageData) override
+		{
+			T1 * request = mReqMessagePool.Create();
+			const std::string & data = messageData->GetMsgBody();
+			if (!request->ParseFromString(data))
+			{
+				mReqMessagePool.Destory(request);
+				return XCode::ParseMessageError;
+			}
+			XCode code = (_o->*_func)(messageData->GetUserId(), *request);
+			mReqMessagePool.Destory(request);
+			return code;
+		}
+	private:
+		T * _o;
+		ServerFunc _func;
+		ObjectPool<T1> mReqMessagePool;
+	};
+
+	template<typename T, typename T1, typename T2>
+	class ServiceMethod3 : public ServiceMethod
+	{
+	public:
+		typedef XCode(T::*ServerFunc)(long long, const T1 &, T2 &);
+		ServiceMethod3(const std::string name, T * o, ServerFunc func)
+			: ServiceMethod(name),_o(o), _func(func) { }
+	public:
+		XCode Invoke(PacketMapper *messageData) override
+		{
+			T1 * request = mReqMessagePool.Create();
+			const std::string & data = messageData->GetMsgBody();
+			if (!request->ParseFromString(data))
+			{
+				mReqMessagePool.Destory(request);
+				return XCode::ParseMessageError;
+			}
+			T2 * response = mResMessagePool.Create();
+			XCode code = (_o->*_func)(messageData->GetUserId(), *request, *response);
+			if (code == XCode::Successful)
+			{
+				messageData->SetMessage(*response);			
+			}
+			mReqMessagePool.Destory(request);
+			mResMessagePool.Destory(response);
+			return code;
+		}
+	private:
+		T * _o;
+		ServerFunc _func;
+		std::string mBuffer;
+		ObjectPool<T1> mReqMessagePool;
+		ObjectPool<T2> mResMessagePool;
+	};
+
+	template<typename T, typename T1>
+	class ServiceMethod4 : public ServiceMethod
+	{
+	public:
+		typedef XCode(T::*ServerFunc)(long long, T1 &);
+		ServiceMethod4(const std::string name, T * o, ServerFunc func)
+			:ServiceMethod(name), _o(o), _func(func) { }
+	public:
+		XCode Invoke(PacketMapper *messageData) override
+		{
+			T1 * response = mResMessagePool.Create();			
+			XCode code = (_o->*_func)(messageData->GetUserId(), *response);
+			mResMessagePool.Destory(response);
+			return code;
+		}
+	private:
+		T * _o;
+		ServerFunc _func;
+		ObjectPool<T1> mResMessagePool;
+	};
+}

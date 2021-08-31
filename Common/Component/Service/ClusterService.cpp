@@ -19,8 +19,8 @@ namespace Sentry
         this->mListenAddress = ip + ":" + std::to_string(port);
         SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
 
-        REGISTER_FUNCTION_1(ClusterService::DelNode, Int32Data);
-        REGISTER_FUNCTION_1(ClusterService::AddNode, s2s::NodeData_NodeInfo);
+        REGISTER_FUNCTION_1(ClusterService::Del, Int32Data);
+        REGISTER_FUNCTION_1(ClusterService::Add, s2s::NodeData_NodeInfo);
 
         return LocalService::Awake();
     }
@@ -53,17 +53,16 @@ namespace Sentry
 			return;
 		}
 		SayNoDebugLog("register local service node successful");
-
 	}
 
-    XCode ClusterService::DelNode(long long, const Int32Data &serviceData)
+    XCode ClusterService::Del(long long, const Int32Data &serviceData)
     {
         const int nodeId = serviceData.data();
         bool res = this->mNodeComponent->DelNode(nodeId);
         return nodeId ? XCode::Successful : XCode::Failure;
     }
 
-    XCode ClusterService::AddNode(long long, const s2s::NodeData_NodeInfo &nodeInfo)
+    XCode ClusterService::Add(long long, const s2s::NodeData_NodeInfo &nodeInfo)
     {
         const int nodeId = nodeInfo.nodeid();
         ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(nodeId);

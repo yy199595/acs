@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Scene/SceneActionComponent.h>
 #include <Coroutine/CoroutineComponent.h>
-
+#include <Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
     LocalService::LocalService()
@@ -52,7 +52,14 @@ namespace Sentry
 
     bool LocalService::BindFunction(LocalActionProxy * actionBox)
     {
+		SceneProtocolComponent * procolComponent = Scene::GetComponent<SceneProtocolComponent>();
 		const std::string & name = actionBox->GetName();
+		if (procolComponent->GetProtocolConfig(this->GetServiceName(), name) == nullptr)
+		{
+			SayNoDebugFatal(this->GetServiceName() << "." << name << " not config");
+			return false;
+		}
+		
         auto iter = this->mActionMap.find(name);
         if (iter != this->mActionMap.end())
         {

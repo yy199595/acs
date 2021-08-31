@@ -41,6 +41,10 @@ namespace Sentry
         template<typename T1, typename T2>
         bool BindFunction(std::string name, LocalAction3<T1, T2> action);
 
+	protected:
+		template<typename O>
+		bool BindFunction(std::string name, XCode (O::* func));
+
     protected:
         bool BindFunction(LocalActionProxy * actionBox);
 

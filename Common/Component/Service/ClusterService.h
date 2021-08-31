@@ -24,9 +24,8 @@ namespace Sentry
 
 		int GetPriority() final { return 1000; }
     private:
-        XCode DelNode(long long, const Int32Data &node);
-
-        XCode AddNode(long long, const s2s::NodeData_NodeInfo &nodeInfo);
+        XCode Del(long long, const Int32Data &node);
+        XCode Add(long long, const s2s::NodeData_NodeInfo &nodeInfo);
 
     private:
         short mAreaId;

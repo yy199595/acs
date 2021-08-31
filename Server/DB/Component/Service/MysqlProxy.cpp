@@ -21,6 +21,9 @@ namespace Sentry
         SayNoAssertRetFalse_F(this->mMysqlManager = Scene::GetComponent<SceneMysqlComponent>());
         SayNoAssertRetFalse_F(this->mProtocolManager = Scene::GetComponent<SceneProtocolComponent>());
 
+		ServiceMethod * method =
+			new ServiceMethod3<MysqlProxy, s2s::MysqlOper_Request, s2s::MysqlOper_Response>("", this, &MysqlProxy::Add);
+
         REGISTER_FUNCTION_2(MysqlProxy::Add, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
         REGISTER_FUNCTION_2(MysqlProxy::Save, s2s::MysqlOper_Request, s2s::MysqlOper_Response);
         REGISTER_FUNCTION_2(MysqlProxy::Delete, s2s::MysqlOper_Request, s2s::MysqlOper_Response);

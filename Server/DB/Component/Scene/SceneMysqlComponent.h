@@ -70,12 +70,12 @@ namespace Sentry
         bool StartConnectMysql();
 
     private:
+		std::string mSqlPath;
         std::string mMysqlIp;         //ip地址
         unsigned short mMysqlPort;     //端口号
         std::string mDataBaseUser;     //用户名
         std::string mDataBasePasswd; //密码
-        std::string mDataBaseName;     //数据库名字
-        std::string mSqlTablePath;
+        std::string mDataBaseName;     //数据库名字      
         SayNoMysqlSocket *mMysqlSockt;
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;

@@ -1,0 +1,48 @@
+{
+    "ServiceCenter": {
+        "id": 100,
+        "Add": {
+            "id": 101,
+            "request": "s2s.NodeRegister.Request"
+        },
+        "Query": {
+            "id": 102,
+            "request": "com.Int32Data",
+            "response": "s2s.NodeData.Array"
+        }
+    },
+    "ClusterService": {
+        "id": 200,
+        "Add": {
+            "id": 201,
+            "request": "s2s.NodeData.NodeInfo"
+        },
+        "Del": {
+            "id": 202,
+            "request": "com.Int32Data"
+        }
+    },
+    "MysqlProxy": {
+        "id": 300,
+        "Add": {
+            "id": 301,
+            "request": "s2s.MysqlOper.Request",
+            "response": "s2s.MysqlOper.Response"
+        },
+        "Save": {
+            "id": 302,
+            "request": "s2s.MysqlOper.Request",
+            "response": "s2s.MysqlOper.Response"
+        },
+        "Delete": {
+            "id": 303,
+            "request": "s2s.MysqlOper.Request",
+            "response": "s2s.MysqlOper.Response"
+        },
+        "QueryData": {
+            "id": 304,
+            "request": "s2s.MysqlQuery.Request",
+            "response": "s2s.MysqlQuery.Response"
+        }
+    }
+}

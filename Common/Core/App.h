@@ -23,7 +23,7 @@ namespace Sentry
 	class App
 	{
 	public:
-		App(const std::string srvName, const std::string configPath);
+		App(const std::string srvName, const std::string cfgDir);
 
 		virtual ~App()
 		{};
@@ -64,9 +64,9 @@ namespace Sentry
 			return TimeHelper::GetMilTimestamp() - this->mStartTime;
 		}
 
-		inline const std::string &GetConfigDirectory()
+		inline const std::string &GetConfigDir()
 		{
-			return this->mSrvConfigDirectory;
+			return this->mConfigDir;
 		}
 
 		inline bool IsMainThread()
@@ -130,7 +130,7 @@ namespace Sentry
 		long long mLastSystemTime;
 		class LogHelper *mLogHelper;
 		
-		std::string mSrvConfigDirectory;
+		std::string mConfigDir;
 
 	private:
 		float mLogicFps;

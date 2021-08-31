@@ -6,6 +6,7 @@
 #include <google/protobuf/util/json_util.h>
 #include <Service/ServiceBase.h>
 #include <NetWork/NetWorkAction.h>
+#include <rapidjson/document.h>
 namespace Sentry
 {
 
@@ -16,63 +17,72 @@ namespace Sentry
 
 	bool SceneProtocolComponent::Awake()
     {
-        std::string path;
-        std::vector<std::string> tempArray;
-        std::vector<std::string> fileContents;
-        SayNoAssertRetFalse_F(App::Get().GetConfig().GetValue("rpc", path));
-        SayNoAssertRetFalse_F(FileHelper::ReadTxtFile(path, fileContents));
+		rapidjson::Document jsonMapper;
+		const std::string & dir = App::Get().GetConfigDir();	
+		if (!FileHelper::ReadJsonFile(dir + "rpc.json", jsonMapper))
+		{
+			SayNoDebugFatal("not find file : rpc.json");
+			return false;
+		}
 
-        for (size_t index = 1; index < fileContents.size(); index++)
-        {
-            tempArray.clear();
-            const std::string &content = fileContents[index];
-            StringHelper::SplitString(content, "\t", tempArray);
+		auto iter1 = jsonMapper.MemberBegin();
+		for (; iter1 != jsonMapper.MemberEnd(); iter1++)
+		{
+			const std::string service = iter1->name.GetString();
+			rapidjson::Value& jsonValue = iter1->value;
+			SayNoAssertRetFalse_F(jsonValue.IsObject());
+			SayNoAssertRetFalse_F(jsonValue.HasMember("id"));
 
-            unsigned short id = (unsigned short) std::stoi(tempArray[0]);
-            const std::string service = tempArray[1];
-            const std::string method = tempArray[2];
-            const std::string request = tempArray.size() >= 4 ? tempArray[3] : "";
-            const std::string response = tempArray.size() >= 5 ? tempArray[4] : "";
+			auto iter2 = jsonValue.MemberBegin();
+			for (; iter2 != jsonValue.MemberEnd(); iter2++)
+			{
+				if (!iter2->value.IsObject())
+				{
+					continue;
+				}
+				std::string request;
+				std::string response;
+				std::string method = iter2->name.GetString();
+				SayNoAssertRetFalse_F(iter2->value.HasMember("id"));
+				unsigned short id = (unsigned short)iter2->value["id"].GetUint();
+				if (iter2->value.HasMember("request"))
+				{
+					request = iter2->value["request"].GetString();
+					Message * message = this->CreateMessage(request);
+					if (message == nullptr)
+					{
+						SayNoDebugFatal("create " << request << " failure");
+						return false;
+					}
+					this->DestoryMessage(message);
+				}
+				if (iter2->value.HasMember("response"))
+				{
+					response = iter2->value["response"].GetString();
+					Message * message = this->CreateMessage(response);
+					if (message == nullptr)
+					{
+						SayNoDebugFatal("create " << response << " failure");
+						return false;
+					}
+					this->DestoryMessage(message);
+				}
+				ProtocolConfig *protocol = new ProtocolConfig(id, service, method, request, response);
+				if (protocol != nullptr)
+				{
+					std::string name = service + "." + method;
+					this->mProtocolMap.insert(std::make_pair(id, protocol));
+					this->mProtocolNameMap.insert(std::make_pair(name, protocol));
+				}
+			}
 
-            ProtocolConfig *protocol = new ProtocolConfig(id, service, method, request, response);
-            if (protocol != nullptr)
-            {
-                std::string name = service + "." + method;
-                this->mProtocolMap.insert(std::make_pair(id, protocol));
-                this->mProtocolNameMap.insert(std::make_pair(name, protocol));
-            }
-        }
+		}
         return true;
     }
 
 	void SceneProtocolComponent::Start()
 	{
-		std::vector<Component *> components;
-		App::Get().Service.GetComponents(components);
-
-		std::vector<LocalActionProxy *> localMethods;
-		for (size_t index = 0; index < components.size(); index++)
-		{
-			Component * component = components[index];
-			ServiceBase * service = dynamic_cast<ServiceBase*>(component);
-			if (service == nullptr)
-			{
-				continue;
-			}
-			localMethods.clear();
-			service->GetMethods(localMethods);
-			for (LocalActionProxy * method : localMethods)
-			{
-				unsigned short id = 0;
-				std::string requestName;
-				std::string responseName;
-				method->GetRequestType(requestName);
-				method->GetResponseType(responseName);
-				SayNoDebugFatal(service->GetServiceName() << "." << method->GetName()
-					<< "\t" << requestName << "\t" << responseName);
-			}
-
-		}
+			
 	}
 
 

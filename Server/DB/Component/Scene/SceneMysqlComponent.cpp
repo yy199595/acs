@@ -40,15 +40,15 @@ namespace Sentry
     bool SceneMysqlComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
+		this->mSqlPath = App::Get().GetConfigDir() + "sql.json";
         SayNoAssertRetFalse_F(this->mTaskManager = Scene::GetComponent<SceneTaskComponent>());
         SayNoAssertRetFalse_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
 
         SayNoAssertRetFalse_F(config.GetValue("Mysql", "ip", this->mMysqlIp));
         SayNoAssertRetFalse_F(config.GetValue("Mysql", "port",this->mMysqlPort));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql","user",this->mDataBaseUser));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql","passwd",this->mDataBasePasswd));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql","db",this->mDataBaseName));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql", "sql", this->mSqlTablePath));
+		SayNoAssertRetFalse_F(config.GetValue("Mysql", "db", this->mDataBaseName));
+        SayNoAssertRetFalse_F(config.GetValue("Mysql","user",this->mDataBaseUser));    
+		SayNoAssertRetFalse_F(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
 
         SayNoAssertRetFalse_F(this->StartConnectMysql());
         SayNoAssertRetFalse_F(this->InitMysqlTable());
@@ -148,10 +148,10 @@ namespace Sentry
 
     bool SceneMysqlComponent::InitMysqlTable()
     {
-        std::fstream fs(this->mSqlTablePath, std::ios::in);
+        std::fstream fs(this->mSqlPath, std::ios::in);
         if (!fs.is_open())
         {
-            SayNoDebugError("not find file " << this->mSqlTablePath);
+            SayNoDebugError("not find file " << this->mSqlPath);
             return false;
         }
         std::string json;
@@ -164,25 +164,27 @@ namespace Sentry
         document.Parse(json.c_str(), json.size());
         if (document.HasParseError())
         {
-            SayNoDebugError("parse " << mSqlTablePath << " json fail");
+            SayNoDebugError("parse " << mSqlPath << " json fail");
             return false;
         }
         for (auto iter = document.MemberBegin(); iter != document.MemberEnd(); iter++)
         {
             if (!iter->name.IsString() || !iter->value.IsObject())
             {
-                SayNoDebugError(mSqlTablePath << " error");
+                SayNoDebugError(mSqlPath << " error");
                 return false;
             }
             auto iter1 = iter->value.FindMember("keys");
             auto iter2 = iter->value.FindMember("protobuf");
             if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
             {
-                SayNoDebugError(mSqlTablePath << " error");
+                SayNoDebugError(mSqlPath << " error");
+				return false;
             }
             if (iter2 == iter->value.MemberEnd() || !iter2->value.IsString())
             {
-                SayNoDebugError(mSqlTablePath << " error");
+                SayNoDebugError(mSqlPath << " error");
+				return false;
             }
             const std::string tab = iter->name.GetString();
             const std::string pb = iter2->value.GetString();
