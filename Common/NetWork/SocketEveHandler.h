@@ -16,12 +16,11 @@ namespace Sentry
 	class MainSocketSendHandler : public SocketEveHandler
 	{
 	public:
-		MainSocketSendHandler(const std::string & address, PacketMapper * message)
-			: mAddress(address), mSendMessage(message) { }
+		MainSocketSendHandler(PacketMapper * message)
+			: mSendMessage(message) { }
 	public:
 		void RunHandler(SceneSessionComponent *) final;
 	private:		
-		const std::string mAddress;
 		PacketMapper * mSendMessage;
 	};
 
@@ -88,12 +87,11 @@ namespace Sentry
 	class NetReceiveNewMessageHandler : public SocketEveHandler
 	{
 	public:
-		NetReceiveNewMessageHandler(const std::string & address, PacketMapper * message)
-			:mAddress(address), mRecvMessage(message) { }
+		NetReceiveNewMessageHandler(PacketMapper * message)
+			: mRecvMessage(message) { }
 	public:
 		void RunHandler(SceneNetProxyComponent * component);
-	private:
-		const std::string mAddress;
+	private:		
 		PacketMapper * mRecvMessage;
 	};
 }

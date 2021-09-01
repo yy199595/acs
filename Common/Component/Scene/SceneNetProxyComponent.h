@@ -34,7 +34,8 @@ namespace Sentry
 		void SessionError(const std::string & address);
 		void ConnectFailure(const std::string & address);
 		void ConnectSuccessful(const std::string & address);
-		void ReceiveNewMessage(const std::string & address, PacketMapper * message);
+
+		void ReceiveNewMessage(PacketMapper * message);
     protected:
         bool Awake() override;
 
@@ -44,7 +45,7 @@ namespace Sentry
 
         virtual void OnConnectSuccessful(TcpProxySession *session) {}
 
-        virtual bool OnRecvMessage(const std::string &address, PacketMapper *msg);
+        virtual bool OnRecvMessage(PacketMapper *msg);
     private:
         int mReConnectTime;
 

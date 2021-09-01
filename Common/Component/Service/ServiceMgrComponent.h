@@ -13,6 +13,8 @@ namespace Sentry
     
     class LocalLuaService;
 
+	class ServiceMethod;
+
     class ServiceMgrComponent : public Component
     {
     public:
@@ -26,12 +28,9 @@ namespace Sentry
     public:
         bool HandlerMessage(PacketMapper *messageData);
 
-        bool HandlerMessage(const std::string &adress, PacketMapper *messageData);
-		
 		virtual int GetPriority() { return 1; }
 	private:	
-		void Invoke1(PacketMapper *messageData);
-		void Invoke2(const std::string &adress, PacketMapper *messageData);
+		void Invoke(ServiceMethod * method, PacketMapper *messageData);
     private:
         int mNodeId;
 

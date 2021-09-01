@@ -6,9 +6,10 @@ namespace Sentry
 {
 	void MainSocketSendHandler::RunHandler(SceneSessionComponent * sessionComponent)
 	{
-		if (!sessionComponent->StartSendMessage(this->mAddress, mSendMessage))
+		const std::string & address = this->mSendMessage->GetAddress();
+		if (!sessionComponent->StartSendMessage(address, mSendMessage))
 		{
-			SayNoDebugError("send message to " << this->mAddress << " failure");
+			SayNoDebugError("send message to " << address << " failure");
 		}
 	}
 	
@@ -50,7 +51,7 @@ namespace Sentry
 
 	void NetReceiveNewMessageHandler::RunHandler(SceneNetProxyComponent * component)
 	{
-		component->ReceiveNewMessage(mAddress, mRecvMessage);
+		component->ReceiveNewMessage(mRecvMessage);
 	}
 
 	void NetErrorHandler::RunHandler(SceneNetProxyComponent * component)

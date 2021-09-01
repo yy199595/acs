@@ -50,7 +50,7 @@ namespace Sentry
         const std::string &service = messageData->GetService();
         SayNoDebugInfo("call " << service << "." << method << " [" << this->mAddress << "]");
 #endif // SOEASY_DEBUG
-		MainSocketSendHandler * handler = new MainSocketSendHandler(mAddress, messageData);
+		MainSocketSendHandler * handler = new MainSocketSendHandler(messageData);
         return this->mNetManager->PushEventHandler(handler);
     }
 

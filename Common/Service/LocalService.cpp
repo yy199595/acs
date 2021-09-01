@@ -10,63 +10,63 @@ namespace Sentry
     {
     }
 
-    bool LocalService::HasMethod(const std::string &action)
+    bool LocalService::HasMethod(const std::string &method)
     {
-        auto iter = this->mActionMap.find(action);
-        return iter != this->mActionMap.end();
+		auto iter = this->mMethodMap.find(method);
+		return iter != this->mMethodMap.end();
     }
 
-	void LocalService::GetMethods(std::vector<LocalActionProxy*> & methods)
+	ServiceMethod * LocalService::GetMethod(const std::string &method)
 	{
-		auto iter = this->mActionMap.begin();
-		for (; iter != this->mActionMap.end(); iter++)
-		{
-			methods.push_back(iter->second);
-		}
+		auto iter = this->mMethodMap.find(method);
+		return iter != this->mMethodMap.end() ? iter->second : nullptr;
 	}
 
-	bool LocalService::Awake()
-    {
-		this->mCorComponent = App::Get().GetCoroutineComponent();     
-		return true;
-    }
+  //  bool LocalService::BindFunction(std::string name, LocalAction1 action)
+  //  {
+  //      return this->BindFunction(new LocalActionProxy1(name, action));
+  //  }
 
-    XCode LocalService::InvokeMethod(PacketMapper *messageData)
-    {
-        const std::string &method = messageData->GetMethd();
-        auto iter = this->mActionMap.find(method);
-        if (iter == this->mActionMap.end())
-        {
-            SayNoDebugError("call <<" << messageData->GetService()
-                                      << "." << messageData->GetMethd() << ">> not found");
-            return XCode::CallFunctionNotExist;
-        }
-        LocalActionProxy * localAction = iter->second;
-        return localAction->Invoke(messageData);
-    }
+  //  bool LocalService::BindFunction(LocalActionProxy * actionBox)
+  //  {
+		//SceneProtocolComponent * procolComponent = Scene::GetComponent<SceneProtocolComponent>();
+		//const std::string & name = actionBox->GetName();
+		//if (procolComponent->GetProtocolConfig(this->GetServiceName(), name) == nullptr)
+		//{
+		//	SayNoDebugFatal(this->GetServiceName() << "." << name << " not config");
+		//	return false;
+		//}
+		//
+  //      auto iter = this->mActionMap.find(name);
+  //      if (iter != this->mActionMap.end())
+  //      {
+  //          SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
+  //          return false;
+  //      }
+  //      this->mActionMap.emplace(name, actionBox);
+  //      return true;
+  //  }
 
-    bool LocalService::BindFunction(std::string name, LocalAction1 action)
-    {
-        return this->BindFunction(new LocalActionProxy1(name, action));
-    }
-
-    bool LocalService::BindFunction(LocalActionProxy * actionBox)
-    {
+	bool LocalService::Bind(ServiceMethod * method)
+	{
 		SceneProtocolComponent * procolComponent = Scene::GetComponent<SceneProtocolComponent>();
-		const std::string & name = actionBox->GetName();
+		if (procolComponent == nullptr)
+		{
+			return false;
+		}
+		const std::string & name = method->GetName();
 		if (procolComponent->GetProtocolConfig(this->GetServiceName(), name) == nullptr)
 		{
 			SayNoDebugFatal(this->GetServiceName() << "." << name << " not config");
 			return false;
 		}
-		
-        auto iter = this->mActionMap.find(name);
-        if (iter != this->mActionMap.end())
-        {
-            SayNoDebugError("register " << this->GetTypeName() << "." << name << " fail");
-            return false;
-        }
-        this->mActionMap.emplace(name, actionBox);
-        return true;
-    }
+		auto iter = this->mMethodMap.find(name);
+		if (iter != this->mMethodMap.end())
+		{
+			SayNoDebugFatal(this->GetServiceName() << "." << name << " add failure");
+			return false;
+		}
+		this->mMethodMap.emplace(name, method);
+		return true;
+	}
 }

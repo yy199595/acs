@@ -19,45 +19,33 @@ namespace Sentry
         return true;
     }
 
-    bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
-    {
+	bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
+	{
 		const std::string & service = messageData->GetService();
 		ServiceBase * localService = this->gameObject->GetComponent<ServiceBase>(service);
-        if (localService == nullptr || localService->HasMethod(messageData->GetMethd()))
-        {
-            return false;
-        }
-		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke1, this, messageData);
-        return true;
-    }
-
-    bool ServiceMgrComponent::HandlerMessage(const std::string &address, PacketMapper *messageData)
-    {
-        const std::string &method = messageData->GetMethd();
-        const std::string &service = messageData->GetService();
-		ServiceBase *localService = this->gameObject->GetComponent<ServiceBase>(service);
-		if (localService == nullptr || localService->HasMethod(method) == false)
+		if (localService == nullptr)
 		{
-			SayNoDebugError("call function not find [" << service << "." << method << "]");
+			SayNoDebugFatal("call service not exist : [" << service << "]");
 			return false;
-		}             
-		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke2, this, address, messageData);
-        return true;
-    }
-	void ServiceMgrComponent::Invoke1(PacketMapper *messageData)
-	{
-
+		}
+		const std::string & methodName = messageData->GetMethd();
+		ServiceMethod * method = localService->GetMethod(methodName);
+		if (service == nullptr)
+		{
+			return false;
+			SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
+		}
+		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
+		return true;
 	}
-
-	void ServiceMgrComponent::Invoke2(const std::string & address, PacketMapper * messageData)
+	
+	void ServiceMgrComponent::Invoke(ServiceMethod * method, PacketMapper *messageData)
 	{
-		const std::string &service = messageData->GetService();
-		ServiceBase *localService = this->gameObject->GetComponent<ServiceBase>(service);
-		XCode code = localService->InvokeMethod(messageData);
-		
-		if (messageData->SetCode(code))
+		XCode code = method->Invoke(messageData);
+		const std::string & address = messageData->GetAddress();
+		if (!address.empty() && messageData->SetCode(code))
 		{
 			this->mNetProxyManager->SendMsgByAddress(address, messageData);
-		}	
+		}
 	}
 }// namespace Sentry

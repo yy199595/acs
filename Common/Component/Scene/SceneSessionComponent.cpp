@@ -49,7 +49,7 @@ namespace Sentry
             return false;
         }
 
-		NetReceiveNewMessageHandler * handler = new NetReceiveNewMessageHandler(address, messageData);
+		NetReceiveNewMessageHandler * handler = new NetReceiveNewMessageHandler(messageData);
 		return this->mNetProxyComponent->PushEventHandler(handler);
     }
 

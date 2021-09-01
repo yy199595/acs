@@ -155,10 +155,11 @@ namespace Sentry
 		}
 	}
 
-	void SceneNetProxyComponent::ReceiveNewMessage(const std::string & address, PacketMapper * message)
+	void SceneNetProxyComponent::ReceiveNewMessage(PacketMapper * message)
 	{
-		if (!this->OnRecvMessage(address, message))
+		if (!this->OnRecvMessage(message))
 		{
+			const std::string & address = message->GetAddress();
 			TcpProxySession *session = this->DelProxySession(address);
 			if (session != nullptr)
 			{
@@ -182,12 +183,16 @@ namespace Sentry
 		}
 	}
 
-    bool SceneNetProxyComponent::OnRecvMessage(const std::string &address, PacketMapper *messageData)
+    bool SceneNetProxyComponent::OnRecvMessage(PacketMapper *messageData)
     {
         if (messageData->GetMessageType() < REQUEST_END)
         {			
 			ServiceMgrComponent * serviceComponent = Service::GetComponent<ServiceMgrComponent>();
-			return serviceComponent->HandlerMessage(address, messageData);    
+			if (serviceComponent == nullptr)
+			{
+				return false;
+			}
+			return serviceComponent->HandlerMessage(messageData);    
         }
         this->mActionManager->InvokeCallback(messageData);
         return true;

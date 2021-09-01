@@ -57,55 +57,56 @@ namespace Sentry
         return iter != this->mMethodCacheSet.end();
     }
 
-	void LocalLuaService::GetMethods(std::vector<LocalActionProxy*> & methods)
+	ServiceMethod * LocalLuaService::GetMethod(const std::string &method)
 	{
+		return nullptr;
 	}
 
-    XCode LocalLuaService::InvokeMethod(PacketMapper *messageData)
-    {
-        const static std::string luaAction = "ServiceProxy.LocalInvoke";
-        int ref = this->mScriptManager->GetGlobalReference(luaAction);
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+  //  XCode LocalLuaService::InvokeMethod(PacketMapper *messageData)
+  //  {
+  //      const static std::string luaAction = "ServiceProxy.LocalInvoke";
+  //      int ref = this->mScriptManager->GetGlobalReference(luaAction);
+  //      lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 
-        if (!lua_isfunction(this->mLuaEnv, -1))
-        {
-            SayNoDebugError("not find function " << luaAction);
-            return XCode::CallFunctionNotExist;
-        }
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
-        if (!lua_istable(this->mLuaEnv, -1))
-        {
-			return XCode::CallFunctionNotExist;
-        }
-        /*const std::string & method = messageData->method();
-        lua_pushstring(this->mLuaEnv, method.c_str());
-        lua_pushinteger(this->mLuaEnv, messageData->entityid());
-        lua_pushinteger(this->mLuaEnv, messageData->rpcid());
-        if (!messageData->messagedata().empty())
-        {
-            if (!messageData->protocname().empty())
-            {
-                Message * message = GprotocolPool.Create(messageData->protocname());
-                if (message != nullptr)
-                {
-                    std::string json;
-                    ProtocHelper::GetJsonString(message, json);
-                    lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
-                }
-                GprotocolPool.Destory(message);
-            }
-            else
-            {
-                const std::string & data = messageData->messagedata();
-                lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
-            }
-        }*/
-        /*if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
-        {
-            const char * err = lua_tostring(this->mLuaEnv, -1);
-            SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
-            return XCode::CallLuaFunctionFail;
-        }*/
-		return XCode::NotResponseMessage;
-    }
+  //      if (!lua_isfunction(this->mLuaEnv, -1))
+  //      {
+  //          SayNoDebugError("not find function " << luaAction);
+  //          return XCode::CallFunctionNotExist;
+  //      }
+  //      lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+  //      if (!lua_istable(this->mLuaEnv, -1))
+  //      {
+		//	return XCode::CallFunctionNotExist;
+  //      }
+  //      /*const std::string & method = messageData->method();
+  //      lua_pushstring(this->mLuaEnv, method.c_str());
+  //      lua_pushinteger(this->mLuaEnv, messageData->entityid());
+  //      lua_pushinteger(this->mLuaEnv, messageData->rpcid());
+  //      if (!messageData->messagedata().empty())
+  //      {
+  //          if (!messageData->protocname().empty())
+  //          {
+  //              Message * message = GprotocolPool.Create(messageData->protocname());
+  //              if (message != nullptr)
+  //              {
+  //                  std::string json;
+  //                  ProtocHelper::GetJsonString(message, json);
+  //                  lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+  //              }
+  //              GprotocolPool.Destory(message);
+  //          }
+  //          else
+  //          {
+  //              const std::string & data = messageData->messagedata();
+  //              lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
+  //          }
+  //      }*/
+  //      /*if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
+  //      {
+  //          const char * err = lua_tostring(this->mLuaEnv, -1);
+  //          SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
+  //          return XCode::CallLuaFunctionFail;
+  //      }*/
+		//return XCode::NotResponseMessage;
+  //  }
 }

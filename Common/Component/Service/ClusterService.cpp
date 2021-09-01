@@ -19,9 +19,8 @@ namespace Sentry
         this->mListenAddress = ip + ":" + std::to_string(port);
         SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
 
-        REGISTER_FUNCTION_1(ClusterService::Del, Int32Data);
-        REGISTER_FUNCTION_1(ClusterService::Add, s2s::NodeData_NodeInfo);
-
+		__ADD_SERVICE_METHOD__(ClusterService::Add);
+		__ADD_SERVICE_METHOD__(ClusterService::Del);
         return LocalService::Awake();
     }
 

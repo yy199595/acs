@@ -9,13 +9,12 @@ namespace Sentry
     {
     }
 
-    bool ServiceCenter::Awake()
-    {
-        SayNoAssertRetFalse_F(LocalService::Awake());
-        REGISTER_FUNCTION_1(ServiceCenter::Add, s2s::NodeRegister_Request);
-        REGISTER_FUNCTION_2(ServiceCenter::Query, com::Int32Data, s2s::NodeData_Array);
-        return true;
-    }
+	bool ServiceCenter::Awake()
+	{
+		__ADD_SERVICE_METHOD__(ServiceCenter::Add);
+		__ADD_SERVICE_METHOD__(ServiceCenter::Query);
+		return LocalService::Awake();
+	}
 
     void ServiceCenter::Start()
     {

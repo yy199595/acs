@@ -21,60 +21,33 @@ namespace Sentry
 
     public:
         bool HasMethod(const std::string &action) final;
-		void GetMethods(std::vector<LocalActionProxy*> & methods) final;
+		ServiceMethod * GetMethod(const std::string &method) final;
 		const std::string &GetServiceName()final { return this->GetTypeName(); }
-    public:
-        bool Awake() override;
-
-    private:
-        virtual XCode InvokeMethod(PacketMapper *) final;
-     
-    protected:
-        bool BindFunction(std::string name, LocalAction1 action);
-
-        template<typename T1>
-        bool BindFunction(std::string name, LocalAction2<T1> action);
-
-        template<typename T1>
-        bool BindFunction(std::string name, LocalAction4<T1> action);
-
-        template<typename T1, typename T2>
-        bool BindFunction(std::string name, LocalAction3<T1, T2> action);
-
 	protected:
-		template<typename O>
-		bool BindFunction(std::string name, XCode (O::* func));
+		template<typename T>
+		bool Bind(std::string name, ServiceMethodType1<T> func) {
+			return this->Bind(new ServiceMethod1<T>(name, (T*)this, func));
+		}
 
-    protected:
-        bool BindFunction(LocalActionProxy * actionBox);
+		template<typename T, typename T1>
+		bool Bind(std::string name, ServiceMethodType2<T, T1> func) {
+			return this->Bind(new ServiceMethod2<T, T1>(name, (T*)this, func));
+		}
 
+		template<typename T, typename T1, typename T2>
+		bool Bind(std::string name, ServiceMethodType3<T, T1, T2> func) {
+			return this->Bind(new ServiceMethod3<T, T1, T2>(name, (T*)this, func));
+		}
+
+		template<typename T, typename T1>
+		bool Bind(std::string name, ServiceMethodType4<T, T1> func) {
+			return this->Bind(new ServiceMethod4<T, T1>(name, (T*)this, func));
+		}
+
+	private:
+		bool Bind(ServiceMethod * method);
     private:
-        class CoroutineComponent *mCorComponent;
-        std::unordered_map<std::string, LocalActionProxy *> mActionMap;
+		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
     };
-
-    template<typename T1>
-    inline bool LocalService::BindFunction(std::string name, LocalAction2<T1> action)
-    {
-        typedef LocalActionProxy2<T1> ActionProxyType;
-        return this->BindFunction(new ActionProxyType(name, action));
-    }
-
-    template<typename T1>
-    inline bool LocalService::BindFunction(std::string name, LocalAction4<T1> action)
-    {
-        typedef LocalActionProxy4<T1> ActionProxyType;
-        return this->BindFunction(new ActionProxyType(name, action));
-    }
-
-    template<typename T1, typename T2>
-    inline bool LocalService::BindFunction(std::string name, LocalAction3<T1, T2> action)
-    {
-        return this->BindFunction(new LocalActionProxy3<T1, T2>(name, action));
-    }
-
-#define REGISTER_FUNCTION_0(func) this->BindFunction(GetFunctionName(#func), std::bind(&func, this, args1))
-#define REGISTER_FUNCTION_1(func, t1) this->BindFunction<t1>(GetFunctionName(#func), std::bind(&func, this, args1, args2))
-#define REGISTER_FUNCTION_2(func, t1, t2) this->BindFunction<t1, t2>(GetFunctionName(#func), std::bind(&func, this, args1, args2, args3))
-
+#define __ADD_SERVICE_METHOD__(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
 }// namespace Sentry
