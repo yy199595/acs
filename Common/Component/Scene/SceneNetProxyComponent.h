@@ -21,7 +21,7 @@ namespace Sentry
     public:
         bool DestorySession(const std::string &address);
 
-        bool SendMsgByAddress(const std::string &address, PacketMapper *msg);
+        bool SendNetMessage(PacketMapper * message);
 
 		TcpProxySession * ConnectByAddress(const std::string &address, const std::string &name);
 

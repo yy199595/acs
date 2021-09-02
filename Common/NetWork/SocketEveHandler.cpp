@@ -6,9 +6,9 @@ namespace Sentry
 {
 	void MainSocketSendHandler::RunHandler(SceneSessionComponent * sessionComponent)
 	{
-		const std::string & address = this->mSendMessage->GetAddress();
-		if (!sessionComponent->StartSendMessage(address, mSendMessage))
+		if (!sessionComponent->StartSendMessage(mSendMessage))
 		{
+			const std::string & address = mSendMessage->GetAddress();
 			SayNoDebugError("send message to " << address << " failure");
 		}
 	}

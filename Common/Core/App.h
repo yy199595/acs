@@ -146,7 +146,8 @@ namespace Sentry
 	private:
 		TimerComponent * mTimerComponent;
 		CoroutineComponent * mCoroutienComponent;
-		std::vector<Component *> mAllComponents;
+		std::vector<Component *> mSceneComponents;
+		std::vector<Component *> mServiceComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;

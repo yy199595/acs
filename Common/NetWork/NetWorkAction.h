@@ -75,6 +75,7 @@ namespace Sentry
 				return XCode::ParseMessageError;
 			}
 			XCode code = (_o->*_func)(messageData->GetUserId(), *request);
+			messageData->ClearMessage();
 			mReqMessagePool.Destory(request);
 			return code;
 		}
@@ -103,6 +104,7 @@ namespace Sentry
 			}
 			T2 * response = mResMessagePool.Create();
 			XCode code = (_o->*_func)(messageData->GetUserId(), *request, *response);
+			messageData->ClearMessage();
 			if (code == XCode::Successful)
 			{
 				messageData->SetMessage(*response);			

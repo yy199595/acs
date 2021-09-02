@@ -24,10 +24,16 @@ namespace Sentry
         return this->mNetWorkManager->PushEventHandler(handler);
     }
 
-    bool SceneNetProxyComponent::SendMsgByAddress(const std::string &address, PacketMapper *msgData)
+    bool SceneNetProxyComponent::SendNetMessage(PacketMapper *msgData)
     {
+		const std::string &address = msgData->GetAddress();
+		if (address.empty())
+		{
+			SayNoDebugFatal("address is null send failure");
+			return false;
+		}
         TcpProxySession *tcpSession = this->GetProxySession(address);
-        if (tcpSession == nullptr || msgData == nullptr)
+        if (tcpSession == nullptr)
         {
             delete msgData;
             return false;
@@ -93,7 +99,7 @@ namespace Sentry
 			this->mSessionMap.emplace(address, session);
 			this->mConnectSessionMap.erase(iter);
 #ifdef SOEASY_DEBUG
-			SayNoDebugInfo("connect to " << address << " successful");
+			SayNoDebugWarning("connect to " << address << " successful");
 #endif
 			session->SetActive(true);
 			ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();

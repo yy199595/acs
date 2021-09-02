@@ -25,30 +25,28 @@ using namespace Sentry;
 
 int main(int argc, char **argv)
 {
-	ComponentHelper::Add<ProxyManager>("ProxyManager");
-    ComponentHelper::Add<SceneRedisComponent>("SceneRedisComponent");
-    ComponentHelper::Add<SceneMysqlComponent>("SceneMysqlComponent");
-    ComponentHelper::Add<TimerComponent>("TimerComponent");
-    ComponentHelper::Add<SceneActionComponent>("SceneActionComponent");
-    ComponentHelper::Add<SceneScriptComponent>("SceneScriptComponent");
-    ComponentHelper::Add<SceneProtocolComponent>("SceneProtocolComponent");
-	ComponentHelper::Add<ServiceMgrComponent>("ServiceMgrComponent");
-
-
-    ComponentHelper::Add<SceneListenComponent>("SceneListenComponent");
-    ComponentHelper::Add<CoroutineComponent>("CoroutineComponent");
-    ComponentHelper::Add<ServiceNodeComponent>("ServiceNodeComponent");
-    ComponentHelper::Add<SceneNetProxyComponent>("SceneNetProxyComponent");
-    ComponentHelper::Add<SceneSessionComponent>("SceneSessionComponent");
-    ComponentHelper::Add<SceneTaskComponent>("SceneTaskComponent");
-
-
-    ComponentHelper::Add<MysqlProxy>("MysqlProxy");
-    ComponentHelper::Add<LoginService>("LoginService");
-    ComponentHelper::Add<ClusterService>("ClusterService");
-    ComponentHelper::Add<ServiceCenter>("ServiceCenter");
-
-    std::string serverName = argc == 3 ? argv[1] : "Server";
+	__REGISTER_COMPONENT__(ProxyManager);
+	__REGISTER_COMPONENT__(TimerComponent);
+	__REGISTER_COMPONENT__(ServiceMgrComponent);
+	__REGISTER_COMPONENT__(SceneRedisComponent);
+	__REGISTER_COMPONENT__(SceneMysqlComponent);
+	__REGISTER_COMPONENT__(SceneActionComponent);
+	__REGISTER_COMPONENT__(SceneScriptComponent);
+	__REGISTER_COMPONENT__(SceneProtocolComponent);
+	
+	__REGISTER_COMPONENT__(SceneTaskComponent);
+	__REGISTER_COMPONENT__(CoroutineComponent);
+	__REGISTER_COMPONENT__(ServiceNodeComponent);
+	__REGISTER_COMPONENT__(SceneListenComponent);
+	__REGISTER_COMPONENT__(SceneSessionComponent);
+	__REGISTER_COMPONENT__(SceneNetProxyComponent);
+	
+	__REGISTER_COMPONENT__(MysqlProxy);
+	__REGISTER_COMPONENT__(LoginService);
+	__REGISTER_COMPONENT__(ServiceCenter);
+	__REGISTER_COMPONENT__(ClusterService);
+	
+    std::string serverName = argc == 3 ? argv[1] : "server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/";
 
     App app(serverName, configPath);

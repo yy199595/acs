@@ -223,6 +223,7 @@ namespace Sentry
 		{
 			return XCode::SendMessageFail;
 		}
+		this->mCorComponent->YieldReturn();
 		return rpcCallback->GetCode();
 	}
 	XCode ServiceNode::SendRpcMessage(PacketMapper * message, Message & response)
@@ -246,6 +247,7 @@ namespace Sentry
 		{
 			return XCode::SendMessageFail;
 		}
+		this->mCorComponent->YieldReturn();
 		if (rpcCallback->GetCode() == XCode::Successful)
 		{
 			const std::string & data = rpcCallback->GetMsgData();

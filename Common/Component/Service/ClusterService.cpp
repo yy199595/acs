@@ -48,7 +48,7 @@ namespace Sentry
 		XCode code = centerNode->Invoke("ServiceCenter", "Add", registerInfo);
 		if (code != XCode::Successful)
 		{
-			SayNoDebugLog("register local service node fail");
+			SayNoDebugError("register local service node fail");
 			return;
 		}
 		SayNoDebugLog("register local service node successful");

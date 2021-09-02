@@ -45,7 +45,7 @@ namespace Sentry
 		const std::string & address = messageData->GetAddress();
 		if (!address.empty() && messageData->SetCode(code))
 		{
-			this->mNetProxyManager->SendMsgByAddress(address, messageData);
+			this->mNetProxyManager->SendNetMessage(messageData);
 		}
 	}
 }// namespace Sentry

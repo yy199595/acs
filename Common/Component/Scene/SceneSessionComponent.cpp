@@ -165,8 +165,14 @@ namespace Sentry
 		}
 		return false;
 	}
-	bool SceneSessionComponent::StartSendMessage(const std::string & address, PacketMapper * messageData)
+	bool SceneSessionComponent::StartSendMessage(PacketMapper * messageData)
 	{
+		const std::string & address = messageData->GetAddress();
+		if (address.empty())
+		{
+			SayNoDebugFatal("address is null send failure");
+			return false;
+		}
 		TcpClientSession *session = this->GetSession(address);
 		if (session != nullptr)
 		{			

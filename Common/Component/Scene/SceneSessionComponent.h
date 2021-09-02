@@ -48,8 +48,9 @@ namespace Sentry
 
 	public:
 		bool StartClose(const std::string &address);
+		bool StartSendMessage(PacketMapper * message);
 		bool StartConnect(const std::string & address, const std::string & name);
-		bool StartSendMessage(const std::string & address, PacketMapper * message);
+		
 	private:
 		
 

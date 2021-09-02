@@ -88,33 +88,37 @@ namespace Sentry
 	{
 
 		// 初始化scene组件
-		std::vector<Component *> components;
-		this->Scene.GetComponents(components);
-		std::sort(components.begin(), components.end(),
+		this->Scene.GetComponents(this->mSceneComponents);
+		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
 			[](Component * m1, Component * m2)->bool
 		{
 			return m1->GetPriority() < m2->GetPriority();
 		});
 
-		for(Component * component : components)
+		for(Component * component : mSceneComponents)
 		{
-			SayNoAssertRetFalse_F(this->InitComponent(component));
-			this->mAllComponents.push_back(component);
+			if (!this->InitComponent(component))
+			{
+				SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
+				return false;
+			}
 		}
-		components.clear();
-
+		
 		//初始化servie组件
-		this->Service.GetComponents(components);
-		std::sort(components.begin(), components.end(),
+		this->Service.GetComponents(this->mServiceComponents);
+		std::sort(mServiceComponents.begin(), mServiceComponents.end(),
 			[](Component * m1, Component * m2)->bool
 		{
 			return m1->GetPriority() < m2->GetPriority();
 		});
 
-		for(Component * component : components)
+		for(Component * component : mServiceComponents)
 		{
-			SayNoAssertRetFalse_F(this->InitComponent(component));
-			this->mAllComponents.push_back(component);
+			if (!this->InitComponent(component))
+			{
+				SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
+				return false;
+			}
 		}
 
 		SayNoAssertRetFalse_F(this->StartNetThread());
@@ -169,18 +173,32 @@ namespace Sentry
 	}
 
 	void App::StartComponent()
-	{
-		for (size_t index = 0; index < this->mAllComponents.size(); index++)
+	{		
+		for (size_t index = 0; index < this->mSceneComponents.size(); index++)
 		{
-			Component * component = this->mAllComponents[index];
+			Component * component = this->mSceneComponents[index];
 			if (component != nullptr)
 			{
-				float process = index / (float)this->mAllComponents.size();
-				SayNoDebugInfo("[" << process * 100 << "%]" << " start component " << component->GetTypeName());
-
+				float process = index / (float)this->mSceneComponents.size();
+				SayNoDebugInfo("[" << process * 100 << "%]"
+					<< " start component " << component->GetTypeName());
 				component->Start();
 			}
-		}		
+		}
+		SayNoDebugLog("start all scene component successful ......");
+
+		for (size_t index = 0; index < this->mServiceComponents.size(); index++)
+		{
+			Component * component = this->mServiceComponents[index];
+			if (component != nullptr)
+			{
+				float process = index / (float)mServiceComponents.size();
+				SayNoDebugInfo("[" << process * 100 << "%]" 
+					<< " start service " << component->GetTypeName());
+				component->Start();
+			}
+		}
+		SayNoDebugLog("start all service component successful ......");
 		this->mIsInitComplate = true;
 		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 		SayNoDebugLog("=====  start " << this->mServerName << " successful ["<< t / 1000.0f <<"s] ========");
