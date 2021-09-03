@@ -2,26 +2,21 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
+#include <Scene/SceneListenComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 
 namespace Sentry
 {
     bool ClusterService::Awake()
-    {
-        std::string ip;
-        unsigned short port = 0;
-        this->mAreaId = App::Get().GetConfig().GetAreaId();
-        this->mNodeId = App::Get().GetConfig().GetNodeId();
-		App::Get().GetConfig().GetValue("ListenAddress", "ip", ip);
-		App::Get().GetConfig().GetValue("ListenAddress", "port", port);
-
-        this->mListenAddress = ip + ":" + std::to_string(port);
-        SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
-
+    {      
 		__ADD_SERVICE_METHOD__(ClusterService::Add);
 		__ADD_SERVICE_METHOD__(ClusterService::Del);
-        return LocalService::Awake();
+		ServerConfig & config = App::Get().GetConfig();
+		this->mAreaId = App::Get().GetConfig().GetAreaId();
+		this->mNodeId = App::Get().GetConfig().GetNodeId();
+		SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
+		return true;
     }
 
 	void ClusterService::Start()
@@ -40,10 +35,11 @@ namespace Sentry
 		}
 
 		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
+		SceneListenComponent * listenComponent = Scene::GetComponent<SceneListenComponent>();
 
 		registerInfo.set_areaid(this->mAreaId);
 		registerInfo.set_nodeid(this->mNodeId);
-		registerInfo.set_address(this->mListenAddress);
+		registerInfo.set_address(listenComponent->GetAddress());
 		registerInfo.set_servername(App::Get().GetServerName());
 		XCode code = centerNode->Invoke("ServiceCenter", "Add", registerInfo);
 		if (code != XCode::Successful)
@@ -51,7 +47,7 @@ namespace Sentry
 			SayNoDebugError("register local service node fail");
 			return;
 		}
-		SayNoDebugLog("register local service node successful");
+		SayNoDebugLog("register all service to center successful");
 	}
 
     XCode ClusterService::Del(long long, const Int32Data &serviceData)

@@ -30,7 +30,6 @@ namespace Sentry
     private:
         short mAreaId;
         short mNodeId;
-        std::string mListenAddress;
         ServiceNodeComponent * mNodeComponent;
     };
 }

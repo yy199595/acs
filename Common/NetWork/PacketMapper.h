@@ -18,7 +18,7 @@ namespace Sentry
 
 		S2S_RESPONSE = 101,
 		C2S_RESPONSE = 103,
-
+		S2C_NOTICE = 104,
 		RESPONSE_END = 255
 	};
 
@@ -49,8 +49,8 @@ namespace Sentry
 		bool SetMessage(const Message & message) { return message.SerializePartialToString(&mMessageData); }
 	public:
 		XCode GetCode() { return this->mCode; }
-		unsigned int GetRpcId() { return this->mRpcId; }
 		long long GetUserId() { return this->mUserId; }
+		unsigned int GetRpcId() { return this->mRpcId; }		
 		NetMessageType GetMessageType() { return this->mMsgType; }	
 		size_t GetPackageSize();
 	private:

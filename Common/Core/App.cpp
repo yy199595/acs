@@ -289,11 +289,10 @@ namespace Sentry
         {
             mAsioContext.poll();
             std::this_thread::sleep_for(time);
-            for (size_t index = 0; index < this->mNetSystemUpdateManagers.size(); index++)
-            {
-                INetSystemUpdate *manager = this->mNetSystemUpdateManagers[index];
-                manager->OnNetSystemUpdate(this->mAsioContext);
-            }
+			for (INetSystemUpdate * component : this->mNetSystemUpdateManagers)
+			{
+				component->OnNetSystemUpdate(this->mAsioContext);
+			}          
         }
     }
 

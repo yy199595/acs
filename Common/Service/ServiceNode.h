@@ -62,6 +62,5 @@ namespace Sentry
         s2s::NodeData_NodeInfo mNodeInfoMessage;
         ServiceNodeComponent *mServiceNodeManager;
 		std::queue<unsigned int> mConnectCoroutines;
-        char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
     };
 }// namespace Sentry

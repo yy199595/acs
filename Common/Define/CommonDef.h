@@ -7,7 +7,7 @@
 #define args3 std::placeholders::_3
 #define args4 std::placeholders::_4
 #define args5 std::placeholders::_5
-#define ASIO_TCP_SEND_MAX_COUNT 1024 * 1024
+#define TCP_SEND_MAX_COUNT 1024 * 1024
 
 inline std::string FromatFileLine(const char * file, const int line)
 {

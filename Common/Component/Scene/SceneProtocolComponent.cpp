@@ -139,7 +139,16 @@ namespace Sentry
         return nullptr;
     }
 
-    bool SceneProtocolComponent::DestoryMessage(Message *message)
+	bool SceneProtocolComponent::GetJsonByMessage(Message * message, std::string & json)
+	{
+		if (message == nullptr)
+		{
+			return false;
+		}
+		return util::MessageToJsonString(*message, &json).ok();
+	}
+
+	bool SceneProtocolComponent::DestoryMessage(Message *message)
     {
         if (message == nullptr)
         {

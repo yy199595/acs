@@ -63,7 +63,7 @@ namespace Sentry
 	private:
 		std::queue<std::string> mRecvSessionQueue;
 		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
-		char mSendSharedBuffer[ASIO_TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
+		char mSendSharedBuffer[TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
 		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
 	};
 }

@@ -30,7 +30,8 @@ namespace Sentry
 
 		virtual int GetPriority() { return 1; }
 	private:	
-		void Invoke(ServiceMethod * method, PacketMapper *messageData);
+		std::string GetJson(PacketMapper * messageData);
+		void Invoke(ServiceMethod * method, PacketMapper *messageData);		
     private:
         int mNodeId;
 

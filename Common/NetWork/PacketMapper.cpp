@@ -1,6 +1,8 @@
 ﻿#include "PacketMapper.h"
-#include <Scene/SceneProtocolComponent.h>
+
 #include <Core/App.h>
+#include <Util/JsonHelper.h>
+#include <Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
     template<typename T>
@@ -51,27 +53,27 @@ namespace Sentry
         switch (messageType)
         {
             case S2S_REQUEST:
-            SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
+				SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 break;
             case S2S_RESPONSE:
-            SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
+				SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 break;
             case S2S_NOTICE:
 
                 break;
             case C2S_REQUEST:
-            SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
+				SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
                 break;
             case C2S_RESPONSE:
-            SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
+				SayNoAssertRetNull_F(MemoryCopy(&rpcid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
                 SayNoAssertRetNull_F(MemoryCopy(&code, message, offset, size));
                 break;
             case C2S_NOTICE:
             case S2C_REQUEST:
-            SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
+				SayNoAssertRetNull_F(MemoryCopy(&userid, message, offset, size));
             default:
                 return nullptr;
         }
@@ -155,17 +157,25 @@ namespace Sentry
 
 		offset += sizeof(this->mProConfig->MethodId);
 
+		if (this->mMsgType > REQUEST_END)
+		{
+			int code = (int)this->mCode;
+			memcpy(buffer + offset, &code, sizeof(code)); offset += sizeof(code);
+		}
+
         if (this->mRpcId != 0)
         {          	
 			memcpy(buffer + offset, &mRpcId, sizeof(mRpcId)); offset += sizeof(mRpcId);
         }
+		
         if (this->mUserId != 0)
         {
 			memcpy(buffer + offset, &mUserId, sizeof(mUserId)); offset += sizeof(mUserId);
         }	
         memcpy(buffer + offset, this->mMessageData.c_str(), this->mMessageData.size());
         offset += this->mMessageData.size();
-        memcpy(buffer, &offset, sizeof(unsigned int));
+		size_t sumSize = offset - sizeof(unsigned int);
+        memcpy(buffer, &sumSize, sizeof(unsigned int));
         return offset;
     }
 }

@@ -5,7 +5,8 @@
 #include <Scene/SceneActionComponent.h>
 #include <Util/StringHelper.h>
 #include <Core/App.h>
-
+#include <Util/JsonHelper.h>
+#include <Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()
@@ -39,12 +40,44 @@ namespace Sentry
 		return true;
 	}
 	
+	std::string ServiceMgrComponent::GetJson(PacketMapper * messageData)
+	{
+		RapidJsonWriter jsonWriter;
+		jsonWriter.AddParameter("rpcid", messageData->GetRpcId());
+		jsonWriter.AddParameter("userid", messageData->GetUserId());
+		jsonWriter.AddParameter("method", messageData->GetProConfig()->ServiceName
+			+ "." + messageData->GetProConfig()->MethodName);
+		const std::string & name = messageData->GetMessageType() < REQUEST_END
+			? messageData->GetProConfig()->RequestMsgName : messageData->GetProConfig()->ResponseMsgName;
+	
+		if (!name.empty())
+		{
+			SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
+			Message * message = protocolComponent->CreateMessage(name);
+			if (message != nullptr &&message->ParseFromString(messageData->GetMsgBody()))
+			{
+				std::string json;
+				if (protocolComponent->GetJsonByMessage(message, json))
+				{
+					jsonWriter.AddParameter("message", json);
+				}
+			}
+		}
+		return jsonWriter.Serialization();
+	}
+
 	void ServiceMgrComponent::Invoke(ServiceMethod * method, PacketMapper *messageData)
 	{
+#ifdef _DEBUG	
+		SayNoDebugLog("[ request ]" << this->GetJson(messageData));
+#endif
 		XCode code = method->Invoke(messageData);
 		const std::string & address = messageData->GetAddress();
 		if (!address.empty() && messageData->SetCode(code))
 		{
+#ifdef _DEBUG	
+			SayNoDebugLog("[ response ]" << this->GetJson(messageData));
+#endif
 			this->mNetProxyManager->SendNetMessage(messageData);
 		}
 	}

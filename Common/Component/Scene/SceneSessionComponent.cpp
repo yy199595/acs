@@ -24,6 +24,10 @@ namespace Sentry
     void SceneSessionComponent::OnConnectComplate(TcpClientSession *session, bool isSuc)
     {
         const std::string &address = session->GetAddress();
+		if (isSuc)
+		{
+			this->mRecvSessionQueue.push(address);
+		}
 		NetSocketConnectHandler * handler = new NetSocketConnectHandler(address, isSuc);
 		this->mNetProxyComponent->PushEventHandler(handler);       
     }
@@ -48,7 +52,7 @@ namespace Sentry
         {
             return false;
         }
-
+		this->mRecvSessionQueue.push(address);
 		NetReceiveNewMessageHandler * handler = new NetReceiveNewMessageHandler(messageData);
 		return this->mNetProxyComponent->PushEventHandler(handler);
     }
@@ -112,16 +116,17 @@ namespace Sentry
        
         while (!this->mRecvSessionQueue.empty())
         {
-            TcpClientSession *tcpSession = this->GetSession(this->mRecvSessionQueue.front());
+			const std::string & address = this->mRecvSessionQueue.front();
+            TcpClientSession *tcpSession = this->GetSession(address);
             if (tcpSession != nullptr && tcpSession->IsActive())
             {
-                tcpSession->StartReceiveMsg();
+				tcpSession->StartReceiveMsg();
             }
             this->mRecvSessionQueue.pop();
         }
 
-		SocketEveHandler * eveHandler = nullptr;
-        this->mNetEventQueue.SwapQueueData();//处理主线程过来的数据
+		this->mNetEventQueue.SwapQueueData();
+		SocketEveHandler * eveHandler = nullptr;    
         while (this->mNetEventQueue.PopItem(eveHandler))
         {
 			eveHandler->RunHandler(this);
@@ -175,8 +180,8 @@ namespace Sentry
 		}
 		TcpClientSession *session = this->GetSession(address);
 		if (session != nullptr)
-		{			
-			size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, ASIO_TCP_SEND_MAX_COUNT);
+		{						
+			size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, TCP_SEND_MAX_COUNT);		
 			return session->SendPackage(std::make_shared<std::string>(this->mSendSharedBuffer, size));
 		}
 		return false;

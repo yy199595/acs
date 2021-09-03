@@ -27,6 +27,8 @@ namespace Sentry
 
         Message *CreateMessageByJson(const std::string &name, const char *msg, const size_t size);
 
+	public:
+		bool GetJsonByMessage(Message * message, std::string & json);
     private:
         std::unordered_map<unsigned short, ProtocolConfig *> mProtocolMap;
         std::unordered_map<std::string, ProtocolConfig *> mProtocolNameMap;
