@@ -7,14 +7,6 @@
 #include <Protocol/com.pb.h>
 #include <XCode/XCode.h>
 
-#ifdef SOEASY_DEBUG
-
-#include <google/protobuf/util/json_util.h>
-
-#endif// SOEASY_DEBUG
-
-
-using namespace com;
 namespace Sentry
 {
 	template<typename T>
@@ -38,6 +30,8 @@ namespace Sentry
 	{
 	public:
 		ServiceMethod(const std::string name) : mName(name) { }
+	public:
+		virtual bool IsLuaMethod() = 0;
 		virtual XCode Invoke(PacketMapper *messageData) = 0;
 		const std::string & GetName() { return this->mName; }
 	private:
@@ -54,6 +48,7 @@ namespace Sentry
 		{
 			return (_o->*_func)(messageData->GetUserId());
 		}
+		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
 		ServiceMethodType1<T> _func;
@@ -79,6 +74,7 @@ namespace Sentry
 			mReqMessagePool.Destory(request);
 			return code;
 		}
+		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
 		ObjectPool<T1> mReqMessagePool;
@@ -113,6 +109,7 @@ namespace Sentry
 			mResMessagePool.Destory(response);
 			return code;
 		}
+		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
 		ObjectPool<T1> mReqMessagePool;
@@ -134,6 +131,7 @@ namespace Sentry
 			mResMessagePool.Destory(response);
 			return code;
 		}
+		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
 		ObjectPool<T1> mResMessagePool;

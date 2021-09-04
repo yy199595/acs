@@ -135,23 +135,19 @@ namespace Sentry
 			return false;
 		}
 
-		IFrameUpdate *manager1 = dynamic_cast<IFrameUpdate *>(component);
-		ISystemUpdate *manager2 = dynamic_cast<ISystemUpdate *>(component);
-		ISecondUpdate *manager3 = dynamic_cast<ISecondUpdate *>(component);
-		INetSystemUpdate *manager4 = dynamic_cast<INetSystemUpdate *>(component);
-		if (manager1 != nullptr)
+		if (IFrameUpdate *manager1 = dynamic_cast<IFrameUpdate *>(component))
 		{
-			this->mFrameUpdateManagers.push_back(manager1);			
+			this->mFrameUpdateManagers.push_back(manager1);
 		}
-		if (manager2 != nullptr)
+		if (ISystemUpdate *manager2 = dynamic_cast<ISystemUpdate *>(component))
 		{
 			this->mSystemUpdateManagers.push_back(manager2);
 		}
-		if (manager3 != nullptr)
+		if (ISecondUpdate *manager3 = dynamic_cast<ISecondUpdate *>(component))
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}
-		if (manager4 != nullptr)
+		if (INetSystemUpdate *manager4 = dynamic_cast<INetSystemUpdate *>(component))
 		{
 			this->mNetSystemUpdateManagers.push_back(manager4);
 		}

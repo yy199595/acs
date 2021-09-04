@@ -36,6 +36,11 @@ namespace Sentry
 			return false;
 			SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
 		}
+		if (method->IsLuaMethod())
+		{
+			method->Invoke(messageData);
+			return true;
+		}
 		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
 		return true;
 	}

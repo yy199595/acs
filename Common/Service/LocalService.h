@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "ServiceBase.h"
-#include <NetWork/NetWorkAction.h>
+#include <NetWork/ServiceMethod.h>
 
 namespace Sentry
 {
@@ -20,6 +20,7 @@ namespace Sentry
         virtual ~LocalService() {}
 
     public:
+		bool AddMethod(ServiceMethod * method) final;
         bool HasMethod(const std::string &action) final;
 		ServiceMethod * GetMethod(const std::string &method) final;
 		const std::string &GetServiceName()final { return this->GetTypeName(); }
@@ -43,11 +44,6 @@ namespace Sentry
 		bool Bind(std::string name, ServiceMethodType4<T, T1> func) {
 			return this->Bind(new ServiceMethod4<T, T1>(name, (T*)this, func));
 		}
-
-	private:
-		bool Bind(ServiceMethod * method);
-    private:
-		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
     };
 #define __ADD_SERVICE_METHOD__(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
 }// namespace Sentry

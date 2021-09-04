@@ -6,6 +6,7 @@
 #include <MysqlClient/MyqslTask.h>
 #include <Core/App.h>
 #include <Util/TimeHelper.h>
+#include<google/protobuf/util/json_util.h>
 namespace Sentry
 {
     MysqlProxy::MysqlProxy()
@@ -52,7 +53,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
         const std::string &tab = this->mMysqlManager->GetDataBaseName();
@@ -66,7 +67,7 @@ namespace Sentry
 
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
@@ -90,7 +91,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
         const std::string &tab = this->mMysqlManager->GetDataBaseName();
@@ -103,10 +104,10 @@ namespace Sentry
 
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
-#endif// SOEASY_DEBUG
+#endif
         return mysqlTask->GetErrorCode();
     }
 
@@ -127,7 +128,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
         const std::string &tab = this->mMysqlManager->GetDataBaseName();
@@ -140,7 +141,7 @@ namespace Sentry
         }
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask->GetErrorStr());
-#ifdef SOEASY_DEBUG
+#ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
@@ -166,9 +167,6 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef SOEASY_DEBUG
-        SayNoDebugInfo(sql);
-#endif
         const std::string &tab = this->mMysqlManager->GetDataBaseName();
         MyqslTask * mysqlTask = new MyqslTask(tab, sql);
         if (!this->mTaskManager->StartTask(mysqlTask))
@@ -200,63 +198,4 @@ namespace Sentry
 #endif
         return code;
     }
-
-
-    // XCode MysqlProxy::Query(Message &requestData, Message &responseData)
-    // {
-    //     auto queryTask = this->mMysqlManager->CreateMysqlTask<MysqlQueryTask>();
-    //     XCode startCode = this->mMysqlManager->StartTask(queryTask, &responseData);
-    //     if (startCode != XCode::Successful)
-    //     {
-    //         responseData.Clear();
-    //         return startCode;
-    //     }
-    //     this->mCorComponent->YieldReturn();
-    //     const std::vector<std::string> &queryDatas = queryTask->GetQueryDatas();
-    //     if (queryDatas.empty())
-    //     {
-    //         return XCode::Failure;
-    //     }
-
-    //     const std::string &json = queryDatas[0];
-    //     if (!util::JsonStringToMessage(json, &responseData).ok())
-    //     {
-    //         return XCode::JsonCastProtocbufFail;
-    //     }
-    //     return queryTask->GetErrorCode();
-    // }
-
-    // XCode MysqlProxy::Insert(Message &requestData)
-    // {
-    //     auto insertTask = this->mMysqlManager->CreateMysqlTask<MysqlInsertTask>();
-    //     XCode startCode = this->mMysqlManager->StartTask(insertTask, &requestData);
-    //     if (startCode != XCode::Successful)
-    //     {
-    //         return startCode;
-    //     }
-    //     this->mCorComponent->YieldReturn();
-    //     return insertTask->GetErrorCode();
-    // }
-    // XCode MysqlProxy::Update(Message &requestData)
-    // {
-    //     auto updateTask = this->mMysqlManager->CreateMysqlTask<MysqlUpdateTask>();
-    //     XCode startCode = this->mMysqlManager->StartTask(updateTask, &requestData);
-    //     if (startCode != XCode::Successful)
-    //     {
-    //         return startCode;
-    //     }
-    //     this->mCorComponent->YieldReturn();
-    //     return updateTask->GetErrorCode();
-    // }
-    // XCode MysqlProxy::Delete(Message &requestData)
-    // {
-    //     auto deleteTask = this->mMysqlManager->CreateMysqlTask<MysqlDeleteTask>();
-    //     XCode startCode = this->mMysqlManager->StartTask(deleteTask, &requestData);
-    //     if (startCode != XCode::Successful)
-    //     {
-    //         return startCode;
-    //     }
-    //     this->mCorComponent->YieldReturn();
-    //     return deleteTask->GetErrorCode();
-    // }
 }// namespace Sentry

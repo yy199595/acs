@@ -5,7 +5,7 @@
 #include <Util/StringHelper.h>
 #include <google/protobuf/util/json_util.h>
 #include <Service/ServiceBase.h>
-#include <NetWork/NetWorkAction.h>
+#include <NetWork/ServiceMethod.h>
 #include <rapidjson/document.h>
 namespace Sentry
 {

@@ -18,12 +18,22 @@ namespace Sentry
         this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code &code) {
             if (!code)
             {
-                TcpClientSession *clientSession = this->mDispatchManager->Create(tcpSocket);
-                if (clientSession != nullptr)
-                {
-                    const std::string &address = clientSession->GetAddress();
-                    SayNoDebugInfo("connect new session : [" << address << "]");
-                }
+				std::string ip = tcpSocket->remote_endpoint().address().to_string();
+				if (this->mWhiteList.empty() || this->mWhiteList.find(ip) != this->mWhiteList.end())
+				{
+					TcpClientSession *clientSession = this->mDispatchManager->Create(tcpSocket);
+					if (clientSession != nullptr)
+					{
+						const std::string &address = clientSession->GetAddress();
+						SayNoDebugInfo("connect new session : [" << address << "]");
+					}
+				}
+				else
+				{
+					asio::error_code err;
+					tcpSocket->close(err);
+					SayNoDebugError("Close unauthorized links : [" << ip << "]");
+				}          
             }
             this->mIsAccept = true;
         });
@@ -35,10 +45,10 @@ namespace Sentry
         this->mIsAccept = false;
 		ServerConfig & config = App::Get().GetConfig();
 		config.GetValue("WhiteList", this->mWhiteList);
-		SayNoAssertRetFalse_F(this->mDispatchManager = Scene::GetComponent<SceneSessionComponent>());
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "ip", this->mListenerIp));
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "port", this->mListenerPort));
         this->mListenAddress = this->mListenerIp + ":" + std::to_string(this->mListenerPort);
+		SayNoAssertRetFalse_F(this->mDispatchManager = Scene::GetComponent<SceneSessionComponent>());
         try
         {
             AsioContext &io = App::Get().GetNetContext();

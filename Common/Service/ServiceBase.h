@@ -11,26 +11,30 @@ using namespace com;
 namespace Sentry
 {
 	class ServiceMethod;
-    class NetWorkWaitCorAction;
+	class NetWorkWaitCorAction;
 
-    class ServiceBase : public Component
-    {
-    public:
-        ServiceBase() {}
+	class ServiceBase : public Component
+	{
+	public:
+		ServiceBase() {}
 
-        virtual ~ServiceBase() {}
+		virtual ~ServiceBase() {}
 
-    public:
+	public:
 
-        virtual void Start() {};
+		virtual void Start() {};
 		virtual bool Awake() { return true; }
-        virtual bool IsLuaService() { return false; };
-    public:      
+		virtual bool IsLuaService() { return false; };
+	public:
+		virtual void OnRefreshService() {}; //刷新服务表调用
 		virtual const std::string &GetServiceName() = 0;
-        virtual bool HasMethod(const std::string &method) = 0;
-		virtual ServiceMethod * GetMethod(const std::string &method) = 0;
-        virtual void OnRefreshService() {}; //刷新服务表调用
-    private:
-        std::string mServiceName;
-    };
+	public:
+		bool AddMethod(ServiceMethod * method);
+		bool HasMethod(const std::string &method);
+		ServiceMethod * GetMethod(const std::string &method);
+	private:
+		std::string mServiceName;
+		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
+		std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
+	};
 }
