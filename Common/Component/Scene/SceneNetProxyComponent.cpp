@@ -81,12 +81,14 @@ namespace Sentry
 
     bool SceneNetProxyComponent::Awake()
     {
+		this->mReConnectTime = 3;
+		this->mReConnectCount = 5;
 		ServerConfig & config = App::Get().GetConfig();
 		this->mTimerManager = App::Get().GetTimerComponent();
+		config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime);
+		config.GetValue("NetWork", "ReConnectCount", this->mReConnectCount);
         SayNoAssertRetFalse_F(this->mActionManager = Scene::GetComponent<SceneActionComponent>());
-        SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<SceneSessionComponent>());
-        SayNoAssertRetFalse_F(config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime));
-        this->mReConnectTime = this->mReConnectTime * 1000;
+        SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<SceneSessionComponent>());     
         return true;
     }
 
@@ -96,15 +98,18 @@ namespace Sentry
 		if (iter != this->mConnectSessionMap.end())
 		{
 			TcpProxySession *session = iter->second;
-			this->mSessionMap.emplace(address, session);
-			this->mConnectSessionMap.erase(iter);
-#ifdef SOEASY_DEBUG
+			if (session != nullptr)
+			{
+				session->SetActive(true);
+				this->mConnectSessionMap.erase(iter);
+				this->mSessionMap.emplace(address, session);
+
+				this->OnConnectSuccessful(session);
+				Service::GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
+			}
+#ifdef _DEBUG
 			SayNoDebugWarning("connect to " << address << " successful");
 #endif
-			session->SetActive(true);
-			ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();
-			nodeComponent->GetServiceNode(address)->OnConnectSuccessful();
-			this->OnConnectSuccessful(session);
 		}
 	}
 
@@ -114,11 +119,22 @@ namespace Sentry
 		if (iter != this->mConnectSessionMap.end())
 		{
 			TcpProxySession *session = iter->second;
-			this->mTimerManager->AddTimer(this->mReConnectTime, &TcpProxySession::StartConnect, session);
-#ifdef SOEASY_DEBUG
-			const std::string &name = session->GetName();
-			SayNoDebugWarning("connect " << name << " " << address << "fail");
+			if (session->GetConnectCount() < this->mReConnectCount)
+			{
+#ifdef _DEBUG
+				const std::string &name = session->GetName();
+				SayNoDebugError("connect " << name << " " << address << " failure "
+					<< "reconnect in " << this->mReConnectTime << " atter [" << session->GetConnectCount() << "]");
 #endif
+				this->mTimerManager->AddTimer(this->mReConnectTime * 1000, &TcpProxySession::StartConnect, session);
+			}
+			else
+			{
+				session->SetActive(false);
+				const std::string &name = session->GetName();
+				SayNoDebugFatal("connect " << name << " " << address << " failure");
+				Service::GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
+			}
 		}
 		else
 		{

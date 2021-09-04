@@ -59,7 +59,9 @@ namespace Sentry
 				std::string json;
 				if (protocolComponent->GetJsonByMessage(message, json))
 				{
-					jsonWriter.AddParameter("message", json);
+					std::string retData =
+						jsonWriter.Serialization() + " \"message\":" + json;
+					return retData;
 				}
 			}
 		}
@@ -69,14 +71,14 @@ namespace Sentry
 	void ServiceMgrComponent::Invoke(ServiceMethod * method, PacketMapper *messageData)
 	{
 #ifdef _DEBUG	
-		SayNoDebugLog("[ request ]" << this->GetJson(messageData));
+		SayNoDebugInfo("[ request ]" << this->GetJson(messageData));
 #endif
 		XCode code = method->Invoke(messageData);
 		const std::string & address = messageData->GetAddress();
 		if (!address.empty() && messageData->SetCode(code))
 		{
 #ifdef _DEBUG	
-			SayNoDebugLog("[ response ]" << this->GetJson(messageData));
+		SayNoDebugInfo("[ response ]" << this->GetJson(messageData));
 #endif
 			this->mNetProxyManager->SendNetMessage(messageData);
 		}

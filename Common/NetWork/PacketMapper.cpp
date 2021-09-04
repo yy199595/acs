@@ -29,10 +29,16 @@ namespace Sentry
     {
         this->mRpcId = 0;
         this->mUserId = 0;
-        this->mProConfig = nullptr;
+		this->mAddress.clear();
+		this->mMessageData.clear();
+		this->mProConfig = nullptr;
     }
 
-    PacketMapper *PacketMapper::Create(const std::string & address, const char *message, const size_t size)
+	void PacketMapper::Destory(PacketMapper * message)
+	{
+	}
+
+	PacketMapper *PacketMapper::Create(const std::string & address, const char *message, const size_t size)
     {
         if (message == nullptr || size == 0)
         {

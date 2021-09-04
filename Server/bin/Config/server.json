@@ -19,7 +19,8 @@
     },
     "NetWork": {
         "MsgTimeout": 0,
-        "ReConnectTime": 5,
+        "ReConnectTime": 3,
+        "ReConnectCount": 5,
         "RecvBufferCount": 1024
     },
     "IsOpenRecoder": true,
@@ -60,7 +61,7 @@
         "MysqlProxy",
         "ServiceCenter",
         "LoginService",
-        "ClusterService"      
+        "ClusterService"
     ],
     "WhiteList": [
         "127.0.0.1"

@@ -30,7 +30,7 @@ namespace Sentry
 
     public:
         void OnFrameUpdate(float t);
-		void OnConnectSuccessful();
+		void OnConnectNodeAfter();
     public:
         std::string GetJsonString();
 

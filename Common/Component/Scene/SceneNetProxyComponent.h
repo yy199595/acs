@@ -48,7 +48,7 @@ namespace Sentry
         virtual bool OnRecvMessage(PacketMapper *msg);
     private:
         int mReConnectTime;
-
+		int mReConnectCount;
         class TimerComponent *mTimerManager;
 
         class SceneActionComponent *mActionManager;

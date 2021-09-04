@@ -69,6 +69,15 @@ namespace Sentry
         this->mNetManager->PushEventHandler(handler);
     }
 
+	void TcpProxySession::SetActive(bool active)
+	{
+		this->mIsActive = active;
+		if (this->mIsActive)
+		{
+			this->mConnectCount = 0;
+		}
+	}
+
     bool TcpProxySession::Notice(const std::string &service, const std::string &method)
     {
         if (service.empty() || method.empty())

@@ -18,6 +18,7 @@ SerializationFailure	序列化失败
 CommandArgsError	GM命令参数错误
 SessionIsNull	Session是空
 SendMessageFail	发送消息错误
+NetWorkError	网络错误
 NoCoroutineContext	没有协程上下文
 ParseJsonFailure	解析json失败
 CacheMessageNextSend	缓存消息下次发送

@@ -159,16 +159,12 @@ namespace Sentry
     }
 	bool SceneSessionComponent::StartConnect(const std::string & address, const std::string & name)
 	{
-		if (this->GetSession(address) != nullptr)
+		TcpClientSession *session = this->GetSession(address);
+		if (session == nullptr)
 		{
-			return false;
+			session = this->Create(name, address);
 		}
-		TcpClientSession *session = this->Create(name, address);
-		if (session != nullptr)
-		{
-			return session->StartConnect();
-		}
-		return false;
+		return session->StartConnect();
 	}
 	bool SceneSessionComponent::StartSendMessage(PacketMapper * messageData)
 	{

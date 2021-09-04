@@ -30,8 +30,8 @@ namespace Sentry
 		void StartColse();
 
         void StartConnect();
-		bool IsActive() { return this->mIsActive; }
-		void SetActive(bool active) { this->mIsActive = active; }
+		void SetActive(bool active);
+		bool IsActive() { return this->mIsActive; }	
         bool SendMessageData(PacketMapper *messageData);
 
     public:

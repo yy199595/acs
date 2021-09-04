@@ -29,6 +29,7 @@ namespace Sentry
 		~PacketMapper();
 
 	public:
+		static void Destory(PacketMapper * message);
 		static PacketMapper *Create(const std::string & address, const char *message, const size_t size);
 		static PacketMapper *Create(const std::string & address, NetMessageType type, const std::string & service, const std::string &method);
 	public:
@@ -38,7 +39,7 @@ namespace Sentry
 		const std::string &GetAddress() { return this->mAddress; }
 		const std::string &GetMsgBody() { return this->mMessageData; }
 		const std::string &GetMethd() { return this->mProConfig->MethodName; }
-		const std::string &GetService() { return this->mProConfig->ServiceName; }	
+		const std::string &GetService() { return this->mProConfig->ServiceName; }
 		const ProtocolConfig * GetProConfig() { return this->mProConfig; }
 	public:
 		bool SetCode(XCode code);
@@ -50,18 +51,19 @@ namespace Sentry
 	public:
 		XCode GetCode() { return this->mCode; }
 		long long GetUserId() { return this->mUserId; }
-		unsigned int GetRpcId() { return this->mRpcId; }		
-		NetMessageType GetMessageType() { return this->mMsgType; }	
+		unsigned int GetRpcId() { return this->mRpcId; }
+		NetMessageType GetMessageType() { return this->mMsgType; }
 		size_t GetPackageSize();
-	private:
-		NetMessageType mMsgType;
 	private:
 		XCode mCode;
 		long long mUserId;
 		unsigned int mRpcId;
+		NetMessageType mMsgType;
 	private:
 		std::string mAddress;
 		std::string mMessageData;
 		const ProtocolConfig * mProConfig;
+		std::queue<PacketMapper *> mNetPool;
+		std::queue<PacketMapper *> mMainPool;
 	};
 }

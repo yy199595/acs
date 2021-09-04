@@ -50,7 +50,7 @@ namespace Sentry
 		
 	}
 
-	void ServiceNode::OnConnectSuccessful()
+	void ServiceNode::OnConnectNodeAfter()
 	{
 		while (!this->mConnectCoroutines.empty())
 		{
@@ -217,11 +217,10 @@ namespace Sentry
 				this->mCorComponent->YieldReturn();
 			}
 		}
-
 		message->SetRpcId(rpcId);
 		if (!tcpSession->SendMessageData(message))
 		{
-			return XCode::SendMessageFail;
+			return XCode::NetWorkError;
 		}
 		this->mCorComponent->YieldReturn();
 		return rpcCallback->GetCode();
@@ -231,10 +230,10 @@ namespace Sentry
 		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
 		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
 		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
-		if (tcpSession == nullptr)
+		if (tcpSession == nullptr || !tcpSession->IsActive())
 		{
 			tcpSession = this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
-			if (!tcpSession->IsActive())
+			if (tcpSession != nullptr)
 			{
 				unsigned int id = this->mCorComponent->GetCurrentCorId();
 				this->mConnectCoroutines.push(id);
@@ -245,7 +244,7 @@ namespace Sentry
 		message->SetRpcId(rpcId);
 		if (!tcpSession->SendMessageData(message))
 		{
-			return XCode::SendMessageFail;
+			return XCode::NetWorkError;
 		}
 		this->mCorComponent->YieldReturn();
 		if (rpcCallback->GetCode() == XCode::Successful)
