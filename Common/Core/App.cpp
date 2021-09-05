@@ -16,8 +16,8 @@ namespace Sentry
     App *App::mApp = nullptr;
 
 	App::App(const std::string srvName, const std::string cfgDir)
-		: mStartTime(TimeHelper::GetMilTimestamp()),
-		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1)
+		: mStartTime(TimeHelper::GetMilTimestamp()), mAsioContext(1),
+		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1), mAsioWork(mAsioContext)
 	{
 		mApp = this;
 		this->mDelatime = 0;
@@ -39,6 +39,7 @@ namespace Sentry
 		this->Scene.AddComponent<SceneProtocolComponent>();
 		this->Scene.AddComponent<CoroutineComponent>();
 		this->Scene.AddComponent<SceneSessionComponent>();
+		this->Scene.AddComponent<SceneNetProxyComponent>();
 
 		this->Service.AddComponent<ServiceNodeComponent>();
 		this->Service.AddComponent<ServiceMgrComponent>();
@@ -156,13 +157,13 @@ namespace Sentry
 
 	bool App::StartNetThread()
 	{
-		this->mNetWorkThread = new std::thread(std::bind(BIND_THIS_ACTION_0(App::NetworkLoop)));
+	    auto func = std::bind(&App::NetworkLoop, this);
+	    this->mNetWorkThread = new std::thread(func);
 		if (this->mNetWorkThread != nullptr)
 		{
 			this->mMainThreadId = std::this_thread::get_id();
 			this->mNetWorkThreadId = this->mNetWorkThread->get_id();
-			SayNoDebugInfo("main thread : [" 
-				<< this->mMainThreadId << "]  " << "net thread : [" << this->mNetWorkThreadId << "]");
+			this->mNetWorkThread->detach();
 			return true;
 		}
 		return false;
@@ -242,34 +243,34 @@ namespace Sentry
         {
             std::this_thread::sleep_for(time);
             startTimer = TimeHelper::GetMilTimestamp();
-            for (size_t index = 0; index < this->mSystemUpdateManagers.size(); index++)
+            for(ISystemUpdate * component : this->mSystemUpdateManagers)
             {
-                this->mSystemUpdateManagers[index]->OnSystemUpdate();
+                component->OnSystemUpdate();
             }
+
 			if (this->mIsInitComplate)
 			{
 				if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
 				{
 					this->mLogicRunCount++;
-					for (size_t index = 0; index < this->mFrameUpdateManagers.size(); index++)
+					for(IFrameUpdate * component : this->mFrameUpdateManagers)
 					{
-						this->mFrameUpdateManagers[index]->OnFrameUpdate(this->mDelatime);
+					    component->OnFrameUpdate(this->mDelatime);
 					}
 
-					for (size_t index = 0; index < this->mLastFrameUpdateManager.size(); index++)
+					for(ILastFrameUpdate * component : this->mLastFrameUpdateManager)
 					{
-						this->mLastFrameUpdateManager[index]->OnLastFrameUpdate();
+					    component->OnLastFrameUpdate();
 					}
-
 					startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
 				}
 
 				if (startTimer - secondTimer >= 1000)
 				{
-					for (size_t index = 0; index < this->mSecondUpdateManagers.size(); index++)
-					{
-						this->mSecondUpdateManagers[index]->OnSecondUpdate();
-					}
+				    for(ISecondUpdate * component : this->mSecondUpdateManagers)
+				    {
+				        component->OnSecondUpdate();
+				    }
 					this->UpdateConsoleTitle();
 					secondTimer = TimeHelper::GetMilTimestamp();
 				}
@@ -280,16 +281,18 @@ namespace Sentry
 
     void App::NetworkLoop()
     {
+	    asio::error_code err;
         std::chrono::milliseconds time(1);
-        while (this->mIsClose == false)
+        while (!this->mIsClose)
         {
-            mAsioContext.poll();
-            std::this_thread::sleep_for(time);
+            mAsioContext.poll(err);
 			for (INetSystemUpdate * component : this->mNetSystemUpdateManagers)
 			{
 				component->OnNetSystemUpdate(this->mAsioContext);
-			}          
+			}
+			std::this_thread::sleep_for(time);
         }
+        SayNoDebugError("net thread logout");
     }
 
     void App::UpdateConsoleTitle()
@@ -301,6 +304,8 @@ namespace Sentry
         char buffer[100] = {0};
         sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
         SetConsoleTitle(buffer);
+#else
+        SayNoDebugInfo("fps = " << this->mLogicFps);
 #endif
     }
 }// namespace Sentry

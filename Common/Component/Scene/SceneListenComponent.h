@@ -19,6 +19,7 @@ namespace Sentry
 
 	protected:
 		bool Awake() override;
+		void Start() override;
 		void OnNetSystemUpdate(AsioContext & io) final;
 
 	private:

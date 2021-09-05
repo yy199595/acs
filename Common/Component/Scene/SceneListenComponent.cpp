@@ -3,17 +3,18 @@
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<NetWork/TcpClientSession.h>
-#include<Component/Scene/SceneSessionComponent.h>
+#include<Scene/SceneSessionComponent.h>
 
 namespace Sentry
 {
 
     void SceneListenComponent::OnNetSystemUpdate(AsioContext &io)
     {
-        if (this->mIsAccept == false || this->mBindAcceptor == nullptr)
+        if (!this->mIsAccept || this->mBindAcceptor == nullptr)
         {
             return;
         }
+        SayNoDebugWarning("start listen " << this->mListenAddress);
         SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(io);
         this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code &code) {
             if (!code)
@@ -52,12 +53,9 @@ namespace Sentry
         try
         {
             AsioContext &io = App::Get().GetNetContext();
-            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mListenerPort);
+            auto address = asio::ip::make_address_v4(mListenerIp);
+            AsioTcpEndPoint endPoint(address, this->mListenerPort);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
-
-            this->mIsAccept = true;
-            this->mBindAcceptor->listen();
-            SayNoDebugInfo("start listener {" << this->mListenAddress << "}");
             return true;
         }
         catch (const asio::system_error &e)
@@ -65,5 +63,12 @@ namespace Sentry
             SayNoDebugError("start server fail " << e.what());
             return false;
         }
+    }
+
+    void SceneListenComponent::Start()
+    {
+        this->mIsAccept = true;
+        this->mBindAcceptor->listen();
+        SayNoDebugInfo("start listener {" << this->mListenAddress << "}");
     }
 }

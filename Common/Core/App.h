@@ -115,6 +115,7 @@ namespace Sentry
 		GameObject Scene;
 		GameObject Service;
 	private:
+	    AsioWork mAsioWork;
 		AsioContext mAsioContext;
 		std::thread *mNetWorkThread;
 		std::thread::id mMainThreadId;

@@ -28,10 +28,14 @@ namespace Sentry
         this->InitMember(ip, port);
         this->mDispatchManager = manager;
         this->mSessionType = SessionNode;
-        this->mSocketEndPoint = asio::ip::tcp::endpoint(asio::ip::make_address(mIp, ec), mPort);
-        if (ec)
+        try
         {
-            SayNoDebugError(ec.message());
+            auto address = asio::ip::make_address_v4(mIp);
+            this->mSocketEndPoint = asio::ip::tcp::endpoint(address, mPort);
+        }
+        catch(const asio::error_code & err)
+        {
+            SayNoDebugError(err.message());
         }
     }
 
@@ -122,7 +126,7 @@ namespace Sentry
 
 	bool TcpClientSession::StartReceiveMsg()
 	{
-		if (this->IsActive() == false)
+		if (!this->IsActive())
 		{
 			return false;
 		}

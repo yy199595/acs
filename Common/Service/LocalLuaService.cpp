@@ -51,17 +51,6 @@ namespace Sentry
         return ServiceBase::Awake();
     }
 
-    bool LocalLuaService::HasMethod(const std::string &name)
-    {
-        auto iter = this->mMethodCacheSet.find(name);
-        return iter != this->mMethodCacheSet.end();
-    }
-
-	ServiceMethod * LocalLuaService::GetMethod(const std::string &method)
-	{
-		return nullptr;
-	}
-
   //  XCode LocalLuaService::InvokeMethod(PacketMapper *messageData)
   //  {
   //      const static std::string luaAction = "ServiceProxy.LocalInvoke";

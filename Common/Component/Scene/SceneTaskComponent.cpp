@@ -19,7 +19,6 @@ namespace Sentry
 			TaskThread *taskThread = new TaskThread(this, index);
 			mThreadArray.push_back(taskThread);
 		}
-		SayNoDebugLog("start new thread [ " << this->mThreadCount << " ]");
 		return true;
 	}
 

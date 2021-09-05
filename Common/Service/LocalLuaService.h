@@ -17,8 +17,6 @@ namespace Sentry
     public:
         bool Awake() final;
 		bool IsLuaService() final { return true; };
-        bool HasMethod(const std::string &name) final;
-		ServiceMethod * GetMethod(const std::string &method) final;
 		const std::string &GetServiceName()final { return this->GetTypeName(); } //TODO
         
     private:

@@ -51,7 +51,6 @@
     },
     "Scene": [
         "SceneTaskComponent",
-        "SceneNetProxyComponent",
         "SceneMysqlComponent",
         "SceneRedisComponent",
         "SceneListenComponent",
