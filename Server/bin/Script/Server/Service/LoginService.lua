@@ -1,6 +1,4 @@
 LoginService = {}
-local redisClient = require "RedisClient"
-local mysqlClient = require "MysqlClient"
 function LoginService.OnInit()
     SoEasy.Warning("init login service")
     return true

@@ -11,7 +11,7 @@ namespace Sentry
 
     class LocalService;
     
-    class LocalLuaService;
+    class LuaServiceProxy;
 
 	class ServiceMethod;
 

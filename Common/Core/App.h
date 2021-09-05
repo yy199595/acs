@@ -39,11 +39,6 @@ namespace Sentry
 			return this->mDelatime;
 		}
 
-		inline long long GetLogicTime()
-		{
-			return this->mLogicTime;
-		}
-
 		inline long long GetStartTime()
 		{
 			return this->mStartTime;
@@ -123,7 +118,6 @@ namespace Sentry
 	private:
 		bool mIsClose;
 		bool mIsInitComplate;
-		long long mLogicTime;
 		long long mStartTime;
 		ServerConfig mConfig;
 		std::string mServerName;

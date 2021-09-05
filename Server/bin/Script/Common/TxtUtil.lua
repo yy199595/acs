@@ -1,5 +1,4 @@
 TxtUtil = {}
-require "JsonUtil"
 TxtUtil.ReadJsonFile = function(path)
     local file = io.open(path, 'r')
     if file ~= nil then

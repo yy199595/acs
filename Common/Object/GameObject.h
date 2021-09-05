@@ -16,6 +16,7 @@ namespace Sentry
         template<typename T>
         inline bool AddComponent();
 		bool AddComponent(const std::string & name);
+		bool AddComponent(const std::string name, Component * component);
 		
         template<typename T>
         inline T *GetComponent();
@@ -34,8 +35,6 @@ namespace Sentry
     public:
 		void OnDestory() override;
         void GetComponents(std::vector<Component *> & components);
-	private:
-		bool AddComponent(Component * component);
     public:
 		inline const long long GetId() const { return this->mGameObjectId; }
         inline const std::string &GetAddress() { return this->mSessionAddress; }
@@ -72,9 +71,9 @@ namespace Sentry
 	inline bool GameObject::AddComponent()
 	{
 		if (this->GetComponent<T>() == nullptr)
-		{
-			Component * component = ComponentHelper::CreateComponent<T>();
-			return this->AddComponent(component);
+		{			
+			Component * component = ComponentHelper::CreateComponent<T>();		
+			return this->AddComponent(component->GetTypeName(), component);
 		}
 		return false;
 	}

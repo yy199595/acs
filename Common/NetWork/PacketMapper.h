@@ -47,7 +47,8 @@ namespace Sentry
 		void SetUserId(const long long id) { this->mUserId = id; }
 		void SetRpcId(const unsigned int id) { this->mRpcId = id; }
 		void ClearMessage() { this->mMessageData.clear(); }
-		bool SetMessage(const Message & message) { return message.SerializePartialToString(&mMessageData); }
+		bool SetMessage(const Message * message);
+		bool SetMessage(const Message & message);
 	public:
 		XCode GetCode() { return this->mCode; }
 		long long GetUserId() { return this->mUserId; }

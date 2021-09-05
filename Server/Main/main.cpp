@@ -11,7 +11,7 @@
 #include <Scene/ProxyManager.h>
 #include <Scene/SceneRedisComponent.h>
 
-
+#include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Scene/SceneTaskComponent.h>
@@ -40,6 +40,8 @@ int main(int argc, char **argv)
 	__REGISTER_COMPONENT__(SceneListenComponent);
 	__REGISTER_COMPONENT__(SceneSessionComponent);
 	__REGISTER_COMPONENT__(SceneNetProxyComponent);
+
+	__REGISTER_COMPONENT__(LuaServiceMgrComponent);
 	
 	__REGISTER_COMPONENT__(MysqlProxy);
 	__REGISTER_COMPONENT__(LoginService);

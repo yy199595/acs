@@ -1,5 +1,5 @@
 ﻿#include "ServiceMgrComponent.h"
-#include <Service/LocalLuaService.h>
+#include <Service/LuaServiceProxy.h>
 #include <Service/LocalService.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/SceneActionComponent.h>

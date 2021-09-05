@@ -32,8 +32,7 @@ namespace Sentry
 		bool AddMethod(ServiceMethod * method);
 		bool HasMethod(const std::string &method);
 		ServiceMethod * GetMethod(const std::string &method);
-	private:
-		std::string mServiceName;
+	private:	
 		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
 		std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
 	};

@@ -1,40 +1,51 @@
-﻿#include"LocalLuaService.h"
+﻿#include"LuaServiceProxy.h"
 
 #include<Core/App.h>
+#include<NetWork/LuaServiceMethod.h>
 #include<Scene/SceneScriptComponent.h>
+#include<Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
-    LocalLuaService::LocalLuaService(lua_State *luaEnv, int index)
-            : mServiceIndex(0), mLuaEnv(nullptr)
+    LuaServiceProxy::LuaServiceProxy()
+		: mIdx(0), mLuaEnv(nullptr)
     {
-        if (lua_istable(luaEnv, index))
+       /* if (lua_istable(luaEnv, index))
         {
             this->mLuaEnv = luaEnv;
             this->mServiceIndex = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
             lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
             int tabindex = lua_gettop(luaEnv);
-            lua_pushnil(this->mLuaEnv);
-            while (lua_next(this->mLuaEnv, tabindex) != 0)
-            {
-                const char *key = lua_tostring(luaEnv, -2);
-                if (lua_isfunction(luaEnv, -1))
-                {
-                    this->mMethodCacheSet.insert(key);
-                }
-                lua_pop(this->mLuaEnv, 1);
-            }
-        }
+           
+        }*/
     }
 
-    LocalLuaService::~LocalLuaService()
+    LuaServiceProxy::~LuaServiceProxy()
     {
-        luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+        luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
     }
 
-    bool LocalLuaService::Awake()
+	bool LuaServiceProxy::InitService(const std::string name, lua_State * luaEnv)
+	{
+		this->mServiceName = name;
+		lua_getglobal(luaEnv, name.c_str());
+		if (!lua_istable(luaEnv, -1))
+		{
+			return false;
+		}
+		this->mLuaEnv = luaEnv;
+		this->mIdx = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
+		SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
+
+		
+	}
+
+    bool LuaServiceProxy::Awake()
     {
-        this->mScriptManager = Scene::GetComponent<SceneScriptComponent>();
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
+		if (!lua_istable(this->mLuaEnv, -1))
+		{
+			return false;
+		}
         if (!lua_istable(this->mLuaEnv, -1))
         {
             return false;
@@ -48,10 +59,10 @@ namespace Sentry
                 return false;
             }
         }
-        return ServiceBase::Awake();
+		return true;
     }
 
-  //  XCode LocalLuaService::InvokeMethod(PacketMapper *messageData)
+  //  XCode LuaServiceProxy::InvokeMethod(PacketMapper *messageData)
   //  {
   //      const static std::string luaAction = "ServiceProxy.LocalInvoke";
   //      int ref = this->mScriptManager->GetGlobalReference(luaAction);

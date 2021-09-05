@@ -33,6 +33,7 @@ namespace Sentry
 			SayNoAssertRetFalse_F(jsonValue.IsObject());
 			SayNoAssertRetFalse_F(jsonValue.HasMember("id"));
 
+			std::vector<ProtocolConfig *> methods;
 			auto iter2 = jsonValue.MemberBegin();
 			for (; iter2 != jsonValue.MemberEnd(); iter2++)
 			{
@@ -70,12 +71,13 @@ namespace Sentry
 				ProtocolConfig *protocol = new ProtocolConfig(id, service, method, request, response);
 				if (protocol != nullptr)
 				{
+					methods.push_back(protocol);
 					std::string name = service + "." + method;
 					this->mProtocolMap.insert(std::make_pair(id, protocol));
 					this->mProtocolNameMap.insert(std::make_pair(name, protocol));
 				}
 			}
-
+			this->mServiceMap.emplace(service, methods);
 		}
         return true;
     }
@@ -86,7 +88,30 @@ namespace Sentry
 	}
 
 
-    const ProtocolConfig *SceneProtocolComponent::GetProtocolConfig(unsigned short id) const
+	void SceneProtocolComponent::GetServices(std::vector<std::string> & services)
+	{
+		auto iter = this->mServiceMap.begin();
+		for (; iter != this->mServiceMap.end(); iter++)
+		{
+			services.push_back(iter->first);
+		}
+	}
+
+	bool SceneProtocolComponent::GetMethods(const std::string service, std::vector<std::string> & methods)
+	{
+		auto iter = this->mServiceMap.find(service);
+		if (iter == this->mServiceMap.end())
+		{
+			return false;
+		}
+		for (ProtocolConfig * config : iter->second)
+		{
+			methods.push_back(config->MethodName);
+		}
+		return true;
+	}
+
+	const ProtocolConfig *SceneProtocolComponent::GetProtocolConfig(unsigned short id) const
     {
         auto iter = this->mProtocolMap.find(id);
         return iter != this->mProtocolMap.end() ? iter->second : nullptr;

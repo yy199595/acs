@@ -22,8 +22,6 @@ namespace SystemExtension
 
     extern int GetManager(lua_State *luaEnv);
 
-    extern int NewService(lua_State *luaEnv);
-
     extern int LuaRetMessage(lua_State *luaEnv);
 
     extern bool RequireLua(lua_State *luaEnv, const char *name);

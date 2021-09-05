@@ -21,7 +21,6 @@ namespace Sentry
 	{
 		mApp = this;
 		this->mDelatime = 0;
-		this->mLogicTime = 0;
 		this->mIsClose = false;
 		this->mServerName = srvName;
 		this->mLogicRunCount = 0;

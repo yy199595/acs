@@ -41,8 +41,10 @@
         "timeout": 3,
         "passwd": ""
     },
-    "Script": {
+    "ScriptPath":"./Script/",   
+    "Script": {      
         "main": "./Script/Server/Main.lua",
+        "service":"./Script/Server/Service",
         "include": [
             "./Script/Common",
             "./Script/Server",
@@ -57,6 +59,7 @@
         "SceneScriptComponent"
     ],
     "Service": [
+        "LuaServiceMgrComponent",
         "MysqlProxy",
         "ServiceCenter",
         "LoginService",

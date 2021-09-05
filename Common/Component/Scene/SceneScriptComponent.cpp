@@ -24,17 +24,22 @@ namespace Sentry
             this->mLuaEnv = luaL_newstate();
             luaL_openlibs(mLuaEnv);
         }
+		std::string luaDir;
 		ServerConfig & config = App::Get().GetConfig();
-        SayNoAssertRetFalse_F(config.GetValue("Script","main", this->mMainLuaPath));
-        SayNoAssertRetFalse_F(config.GetValue("Script","include",this->mRequirePaths));
-        for (std::string &include : this->mRequirePaths)
-        {
-            this->AddRequirePath(include);
-        }
+		SayNoAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
 
+		this->PushClassToLua();
         this->OnPushGlobalObject();
         this->RegisterExtension(mLuaEnv);
-        return this->LoadLuaScript(this->mMainLuaPath);
+		
+		std::vector<std::string> luaFiles;
+		DirectoryHelper::GetFilePaths(luaDir, luaFiles);
+
+		for (std::string & luaFile : luaFiles)
+		{
+			this->LoadLuaScript(luaFile);
+		}
+		return this->LoadAllModule();;
     }
 
     void SceneScriptComponent::OnDestory()
@@ -98,7 +103,7 @@ namespace Sentry
             lua_pcall(mLuaEnv, 0, 1, errfunc);
             SayNoDebugLog("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
-            return this->LoadAllModule();
+			return true;
         }
         SayNoDebugError(lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
@@ -134,6 +139,14 @@ namespace Sentry
 
     void SceneScriptComponent::AddRequirePath(const std::string path)
     {
+		std::vector<std::string> luaFiles;
+		if (DirectoryHelper::GetFilePaths(path, luaFiles))
+		{
+			for (std::string & file : luaFiles)
+			{
+				this->LoadLuaScript(file);
+			}
+		}
         lua_getglobal(mLuaEnv, "package");
         lua_getfield(mLuaEnv, -1, "path");
         std::string nRequestPath = lua_tostring(mLuaEnv, -1);
@@ -151,36 +164,32 @@ namespace Sentry
         lua_setfield(mLuaEnv, -3, "path");
     }
 
-    void SceneScriptComponent::PushClassToLua(lua_State *lua)
+    void SceneScriptComponent::PushClassToLua()
     {
-        ClassProxyHelper::BeginRegister<App>(lua, "App");
-        ClassProxyHelper::PushMemberFunction<App>(lua, "GetRunTime", &App::GetRunTime);
-        ClassProxyHelper::PushMemberFunction<App>(lua, "GetDelaTime", &App::GetDelaTime);
-        ClassProxyHelper::PushMemberFunction<App>(lua, "GetLogicTime", &App::GetLogicTime);
+        ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
+        ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetRunTime", &App::GetRunTime);
+        ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetDelaTime", &App::GetDelaTime);     
 
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMilTimestamp", TimeHelper::GetMilTimestamp);
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
-        ClassProxyHelper::PushStaticFunction(lua, "TimeHelper", "GetYearMonthDayString",
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMilTimestamp", TimeHelper::GetMilTimestamp);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetYearMonthDayString",
                                              TimeHelper::GetYearMonthDayString);
 
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Call", SystemExtension::Call);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Sleep", SystemExtension::Sleep);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallWait", SystemExtension::CallWait);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallByName", SystemExtension::CallByName);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CallBySession", SystemExtension::CallBySession);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Call", SystemExtension::Call);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Sleep", SystemExtension::Sleep);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallWait", SystemExtension::CallWait);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallByName", SystemExtension::CallByName);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallBySession", SystemExtension::CallBySession);
 
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "AddTimer", SystemExtension::AddTimer);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "AddTimer", SystemExtension::AddTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
 
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "GetManager", SystemExtension::GetManager);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "CreateByTable",
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "GetManager", SystemExtension::GetManager);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CreateByTable",
                                                       LuaProtocExtension::CreateByTable);
-
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "LuaRetMessage", SystemExtension::LuaRetMessage);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "NewService", SystemExtension::NewService);
 
     }
 

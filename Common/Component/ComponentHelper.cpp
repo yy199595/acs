@@ -60,6 +60,7 @@ namespace Sentry
 		if (component != nullptr)
 		{
 			component->mType = type;
+			component->Init(type->Name);
 		}
 		return component;
 	}

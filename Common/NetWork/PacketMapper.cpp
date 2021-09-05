@@ -125,6 +125,7 @@ namespace Sentry
 		{
 			return false;
 		}
+		this->mCode = code;
 		switch (this->mMsgType)
 		{
 		case NetMessageType::C2S_REQUEST:
@@ -141,6 +142,20 @@ namespace Sentry
 	{
 		this->mMsgType = type;
 		this->mMessageData.clear();
+	}
+
+	bool PacketMapper::SetMessage(const Message * message)
+	{
+		if (message == nullptr)
+		{
+			return false;
+		}
+		return message->SerializePartialToString(&mMessageData);
+	}
+
+	bool PacketMapper::SetMessage(const Message & message)
+	{
+		return message.SerializePartialToString(&mMessageData);
 	}
 
 	size_t PacketMapper::GetPackageSize()

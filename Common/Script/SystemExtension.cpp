@@ -4,7 +4,7 @@
 #include <Scene/SceneNetProxyComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <NetWork/NetLuaRetAction.h>
-#include <Service/LocalLuaService.h>
+#include <Service/LuaServiceProxy.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
@@ -122,27 +122,6 @@ extern bool SystemExtension::RequireLua(lua_State *luaEnv, const char *name)
         return lua_istable(luaEnv, -1);
     }
     return false;
-}
-
-int SystemExtension::NewService(lua_State *luaEnv)
-{
-    const char *name = lua_tostring(luaEnv, 1);
-    if (SystemExtension::RequireLua(luaEnv, name))
-    {     
-        LocalLuaService *luaService = new LocalLuaService(luaEnv, -1);
-		if (luaService->Init(name) == false)
-		{
-			lua_pushboolean(luaEnv, false);
-			return 1;
-		}
-        ServiceMgrComponent *serviceMgr = Service::GetComponent<ServiceMgrComponent>();
-        if (serviceMgr != nullptr)
-        {
-           //TODO
-        }
-    }
-    lua_pushboolean(luaEnv, false);
-    return 1;
 }
 
 int SystemExtension::LuaRetMessage(lua_State *luaEnv)

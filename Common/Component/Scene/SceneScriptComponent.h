@@ -30,6 +30,7 @@ namespace Sentry
         void Start() final;
 
     public:
+		bool LoadLuaScript(const std::string filePath);
         int GetGlobalReference(const std::string &name);
 
     private:
@@ -39,14 +40,12 @@ namespace Sentry
 
         void AddRequirePath(const std::string path);
 
-        bool LoadLuaScript(const std::string filePath);
-
     private:
         bool StartLoadScript();
 
         void OnPushGlobalObject();
 
-        void PushClassToLua(struct lua_State *lua);
+        void PushClassToLua();
 
     private:
         void RegisterExtension(struct lua_State *lua);

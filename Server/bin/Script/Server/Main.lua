@@ -1,8 +1,6 @@
 Main = {}
-require "ServiceProxy"
-require "Coroutine"
 function Main.Load()
-    local hofix = require("HofixHelper")
+   
 end
 
 function Main.Start()

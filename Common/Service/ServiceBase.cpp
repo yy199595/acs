@@ -1,6 +1,6 @@
 ﻿#include"ServiceBase.h"
 #include<Core/App.h>
-#include<NetWork/ServiceMethod.h>
+#include <NetWork/LuaServiceMethod.h>
 #include<Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
