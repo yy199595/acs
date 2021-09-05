@@ -56,7 +56,7 @@ namespace Sentry
 
 		inline AsioContext &GetNetContext()
 		{
-			return this->mAsioContext;
+			return *mAsioContext;
 		}
 
 		long long GetRunTime()
@@ -115,8 +115,8 @@ namespace Sentry
 		GameObject Scene;
 		GameObject Service;
 	private:
-	    AsioWork mAsioWork;
-		AsioContext mAsioContext;
+	    AsioWork * mAsioWork;
+		AsioContext * mAsioContext;
 		std::thread *mNetWorkThread;
 		std::thread::id mMainThreadId;
 		std::thread::id mNetWorkThreadId;

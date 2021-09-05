@@ -16,8 +16,8 @@ namespace Sentry
     App *App::mApp = nullptr;
 
 	App::App(const std::string srvName, const std::string cfgDir)
-		: mStartTime(TimeHelper::GetMilTimestamp()), mAsioContext(1),
-		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1), mAsioWork(mAsioContext)
+		: mStartTime(TimeHelper::GetMilTimestamp()),
+		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1)
 	{
 		mApp = this;
 		this->mDelatime = 0;
@@ -29,6 +29,8 @@ namespace Sentry
 		this->mIsInitComplate = false;
 		this->mNetWorkThread = nullptr;
 		this->mConfigDir = cfgDir;
+		this->mAsioContext = new AsioContext(1);
+		this->mAsioWork = new AsioWork(*mAsioContext);
 		this->mLogHelper = new LogHelper("./Logs", srvName);
 	}
 
@@ -285,10 +287,10 @@ namespace Sentry
         std::chrono::milliseconds time(1);
         while (!this->mIsClose)
         {
-            mAsioContext.poll(err);
+            mAsioContext->poll(err);
 			for (INetSystemUpdate * component : this->mNetSystemUpdateManagers)
 			{
-				component->OnNetSystemUpdate(this->mAsioContext);
+				component->OnNetSystemUpdate(*mAsioContext);
 			}
 			std::this_thread::sleep_for(time);
         }
