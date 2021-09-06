@@ -37,7 +37,7 @@ namespace Sentry
 
 		for (std::string & luaFile : luaFiles)
 		{
-			this->LoadLuaScript(luaFile);
+			SayNoAssertRetFalse_F(this->LoadLuaScript(luaFile));
 		}
 		return this->LoadAllModule();;
     }
@@ -105,7 +105,7 @@ namespace Sentry
             lua_pop(mLuaEnv, 2);
 			return true;
         }
-        SayNoDebugError(lua_tostring(mLuaEnv, -1));
+        SayNoDebugError("load lua script failure : " << lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }
