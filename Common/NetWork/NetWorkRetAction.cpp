@@ -1,6 +1,7 @@
 ﻿#include "NetWorkRetAction.h"
 #include <Coroutine/CoroutineComponent.h>
 #include <Util/TimeHelper.h>
+#include <Core/App.h>
 namespace Sentry
 {
 
@@ -59,13 +60,14 @@ namespace Sentry
         this->mCoroutineId = mgr->GetCurrentCorId();
     }
 
-    shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create(CoroutineComponent *coroutineMgr)
+    shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create()
     {
-        if (coroutineMgr->IsInMainCoroutine())
+		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+        if (corComponent->IsInMainCoroutine())
         {
             return nullptr;
         }
-        return std::make_shared<NetWorkWaitCorAction>(coroutineMgr);
+        return std::make_shared<NetWorkWaitCorAction>(corComponent);
     }
 
     void NetWorkWaitCorAction::Invoke(PacketMapper *backData)

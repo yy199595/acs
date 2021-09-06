@@ -133,7 +133,7 @@ namespace Sentry
 
         ~NetWorkWaitCorAction() {}
 
-        static shared_ptr<NetWorkWaitCorAction> Create(CoroutineComponent *);
+        static shared_ptr<NetWorkWaitCorAction> Create();
 
     public:
         void Invoke(PacketMapper *backData) override;

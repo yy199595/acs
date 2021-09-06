@@ -144,6 +144,13 @@ namespace Sentry
 		this->mMessageData.clear();
 	}
 
+	bool PacketMapper::SetRpcId(const unsigned int id)
+	{
+		if (id == 0)return false;
+		this->mRpcId = id;
+		return true;
+	}
+
 	bool PacketMapper::SetMessage(const Message * message)
 	{
 		if (message == nullptr)

@@ -23,7 +23,7 @@ namespace Sentry
 
         bool SendNetMessage(PacketMapper * message);
 
-		TcpProxySession * ConnectByAddress(const std::string &address, const std::string &name);
+		TcpProxySession * Create(const std::string &address, const std::string &name);
 
     public:
         TcpProxySession *GetProxySession(const std::string &address);
@@ -32,8 +32,7 @@ namespace Sentry
 	public:
 		void NewConnect(const std::string & address);
 		void SessionError(const std::string & address);
-		void ConnectFailure(const std::string & address);
-		void ConnectSuccessful(const std::string & address);
+		void ConnectAfter(const std::string & address, bool isSuc);
 
 		void ReceiveNewMessage(PacketMapper * message);
     protected:
@@ -57,6 +56,5 @@ namespace Sentry
 
         DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
         std::unordered_map<std::string, TcpProxySession *> mSessionMap; //管理所有的session
-        std::unordered_map<std::string, TcpProxySession *> mConnectSessionMap; //正在连接的session
     };
 }

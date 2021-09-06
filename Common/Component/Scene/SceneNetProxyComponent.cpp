@@ -41,24 +41,17 @@ namespace Sentry
         return tcpSession->SendMessageData(msgData);
     }
 
-	TcpProxySession * SceneNetProxyComponent::ConnectByAddress(const std::string &address, const std::string &name)
+	TcpProxySession * SceneNetProxyComponent::Create(const std::string &address, const std::string &name)
     {		
-        auto iter = this->mConnectSessionMap.find(address);
-        if (iter != this->mConnectSessionMap.end())
-        {
-			return iter->second;
-        }
-		else
+		auto iter = this->mSessionMap.find(address);
+		if (iter != this->mSessionMap.end())
 		{
-			TcpProxySession *tcpSession = new TcpProxySession(name, address);
-			if (tcpSession != nullptr)
-			{
-				tcpSession->StartConnect();
-				this->mConnectSessionMap.emplace(address, tcpSession);
-				return tcpSession;
-			}
+			return iter->second;
 		}
-		return nullptr;
+		TcpProxySession *tcpSession = new TcpProxySession(name, address);
+
+		this->mSessionMap.emplace(address, tcpSession);
+		return tcpSession;
     }
 
     TcpProxySession *SceneNetProxyComponent::GetProxySession(const std::string &address)
@@ -92,53 +85,21 @@ namespace Sentry
         return true;
     }
 
-	void SceneNetProxyComponent::ConnectSuccessful(const std::string & address)
+	void SceneNetProxyComponent::ConnectAfter(const std::string & address, bool isSuc)
 	{
-		auto iter = this->mConnectSessionMap.find(address);
-		if (iter != this->mConnectSessionMap.end())
+		auto iter = this->mSessionMap.find(address);
+		if (iter != this->mSessionMap.end())
 		{
 			TcpProxySession *session = iter->second;
 			if (session != nullptr)
 			{
-				session->SetActive(true);
-				this->mConnectSessionMap.erase(iter);
-				this->mSessionMap.emplace(address, session);
-
+				session->SetActive(isSuc);
 				this->OnConnectSuccessful(session);
 				Service::GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
 			}
 #ifdef _DEBUG
-			SayNoDebugWarning("connect to " << address << " successful");
+			SayNoDebugWarning("connect to " << address << isSuc ? " successful" : " failure");
 #endif
-		}
-	}
-
-	void SceneNetProxyComponent::ConnectFailure(const std::string & address)
-	{
-		auto iter = this->mConnectSessionMap.find(address);
-		if (iter != this->mConnectSessionMap.end())
-		{
-			TcpProxySession *session = iter->second;
-			if (session->GetConnectCount() < this->mReConnectCount)
-			{
-#ifdef _DEBUG
-				const std::string &name = session->GetName();
-				SayNoDebugError("connect " << name << " " << address << " failure "
-					<< "reconnect in " << this->mReConnectTime << " atter [" << session->GetConnectCount() << "]");
-#endif
-				this->mTimerManager->AddTimer(this->mReConnectTime * 1000, &TcpProxySession::StartConnect, session);
-			}
-			else
-			{
-				session->SetActive(false);
-				const std::string &name = session->GetName();
-				SayNoDebugFatal("connect " << name << " " << address << " failure");
-				Service::GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
-			}
-		}
-		else
-		{
-			SayNoDebugError("not find address [" << address << "]");
 		}
 	}
 
@@ -158,22 +119,24 @@ namespace Sentry
 
 	void SceneNetProxyComponent::SessionError(const std::string & address)
 	{
-		TcpProxySession *tcpSession = this->DelProxySession(address);
-		if (tcpSession != nullptr)
+		auto iter = this->mSessionMap.find(address);
+		if (iter != this->mSessionMap.end())
 		{
+			TcpProxySession *tcpSession = iter->second;
 			if (tcpSession->IsNodeSession())
 			{
-				this->mConnectSessionMap.emplace(tcpSession->GetAddress(), tcpSession);
-				this->mTimerManager->AddTimer(this->mReConnectTime,
-					&TcpProxySession::StartConnect, tcpSession);
+
+				tcpSession->SetActive(false);
 #ifdef SOEASY_DEBUG
-				SayNoDebugError("receive message error re connect [" << tcpSession->GetConnectCount() << "]");
+				SayNoDebugError("[" << tcpSession->GetName() << " " << address << "] error");
 #endif
+				return;
 			}
-			else
-			{
-				delete tcpSession;
-			}
+			delete tcpSession;
+			this->mSessionMap.erase(iter);
+#ifdef SOEASY_DEBUG
+			SayNoDebugError(" remove session [" << address << "]");
+#endif
 		}
 	}
 

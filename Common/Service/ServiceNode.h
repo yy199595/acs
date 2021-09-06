@@ -47,7 +47,6 @@ namespace Sentry
         XCode Call(const std::string &service, const std::string &method, const Message &request, Message &response);
 
 	private:
-		class TcpProxySession * GetNodeSession();
 		XCode SendRpcMessage(PacketMapper * message);
 		XCode SendRpcMessage(PacketMapper * message, Message &response);
     private:
@@ -57,8 +56,9 @@ namespace Sentry
         const std::string mNodeName;        //进程名字
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
+		class TcpProxySession * mTcpSession;
         class SceneActionComponent *mActionManager;
-        class SceneNetProxyComponent *mNetWorkManager;
+        //class SceneNetProxyComponent *mNetWorkManager;
         s2s::NodeData_NodeInfo mNodeInfoMessage;
         ServiceNodeComponent *mServiceNodeManager;
 		std::queue<unsigned int> mConnectCoroutines;

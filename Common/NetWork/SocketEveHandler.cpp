@@ -34,14 +34,7 @@ namespace Sentry
 {
 	void NetSocketConnectHandler::RunHandler(SceneNetProxyComponent * component)
 	{
-		if (this->mIsSuccessful)
-		{
-			component->ConnectSuccessful(mAddress);
-		}
-		else
-		{
-			component->ConnectFailure(mAddress);
-		}
+		component->ConnectAfter(mAddress, this->mIsSuccessful);
 	}
 
 	void NetNewSocketConnectHandler::RunHandler(SceneNetProxyComponent * component)

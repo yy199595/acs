@@ -45,7 +45,7 @@ namespace Sentry
 		bool SetCode(XCode code);
 		void SetType(NetMessageType type);
 		void SetUserId(const long long id) { this->mUserId = id; }
-		void SetRpcId(const unsigned int id) { this->mRpcId = id; }
+		bool SetRpcId(const unsigned int id);
 		void ClearMessage() { this->mMessageData.clear(); }
 		bool SetMessage(const Message * message);
 		bool SetMessage(const Message & message);

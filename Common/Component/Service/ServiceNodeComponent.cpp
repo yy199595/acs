@@ -1,9 +1,9 @@
 #include "ServiceNodeComponent.h"
 
 #include <Core/App.h>
-#include <Scene/SceneSessionComponent.h>
 #include <Service/ServiceNode.h>
-
+#include <Scene/SceneSessionComponent.h>
+#include <Scene/SceneProtocolComponent.h>
 namespace Sentry
 {
     bool ServiceNodeComponent::DelNode(int nodeId)
@@ -50,55 +50,51 @@ namespace Sentry
         return false;
     }
 
-    bool ServiceNodeComponent::AddNode(ServiceNode *serviceNode)
-    {
-        const int id = serviceNode->GetNodeId();
-        auto iter = this->mServiceNodeMap1.find(id);
-		const std::string & name = serviceNode->GetNodeName();
-		const std::string &address = serviceNode->GetAddress();
-        if (iter == this->mServiceNodeMap1.end() && serviceNode->Init(name))
-        {
-            SayNoDebugLog(serviceNode->GetJsonString());
-            this->mServiceNodeArray.push_back(serviceNode);
-            this->mServiceNodeMap1.emplace(id, serviceNode);
-            this->mServiceNodeMap2.emplace(address, serviceNode);
-            
-            return true;
-        }
-        return false;
-    }
+	ServiceNode * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
+	{
+		auto iter = this->mServiceNodeMap1.find(nodeId);
+		if (iter != this->mServiceNodeMap1.end())
+		{
+			return nullptr;
+		}
+		ServiceNode * serviceNode = new ServiceNode(areaId, nodeId, name, address);
+		if (serviceNode != nullptr)
+		{
+			serviceNode->Init(name);
+			this->mServiceNodeArray.push_back(serviceNode);
+			this->mServiceNodeMap1.emplace(nodeId, serviceNode);
+			this->mServiceNodeMap2.emplace(address, serviceNode);
+			SayNoDebugInfo("create new service " << name << "  [" << address << "]");
+		}
+		return serviceNode;
+	}
 
     bool ServiceNodeComponent::Awake()
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-
-        this->mCenterAddress = mCenterIp + ":" + std::to_string(this->mCenterPort);       
-        ServiceNode *centerNode = new ServiceNode(0, 0, "Center", this->mCenterAddress);
-        return centerNode->AddService(std::string("ServiceCenter")) && this->AddNode(centerNode);
+		SayNoAssertRetFalse_F(mProtocolComponent = Scene::GetComponent<SceneProtocolComponent>());
+        const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);       	
+		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("ServiceCenter");
     }
 
-    void ServiceNodeComponent::OnFrameUpdate(float t)
-    {
-        if (!this->mServiceNodeArray.empty())
-        {
-            auto iter = this->mServiceNodeArray.begin();
-            for (; iter != this->mServiceNodeArray.end();)
-            {
-                ServiceNode *serviceNode = (*iter);
-                if (serviceNode == nullptr || !serviceNode->IsActive())
-                {
-                    serviceNode->OnDestory();
-                    delete serviceNode;
-                    this->mServiceNodeArray.erase(iter++);
-                    continue;
-                }
-                iter++;
-                serviceNode->OnFrameUpdate(t);
-            }
-        }
-    }
+	void ServiceNodeComponent::OnSecondUpdate()
+	{
+		auto iter = this->mServiceNodeArray.begin();
+		for (; iter != this->mServiceNodeArray.end();)
+		{
+			ServiceNode *serviceNode = (*iter);
+			if (serviceNode == nullptr || !serviceNode->IsActive())
+			{
+				serviceNode->OnDestory();
+				delete serviceNode;
+				this->mServiceNodeArray.erase(iter++);
+				continue;
+			}
+			iter++;
+		}
+	}
 
     ServiceNode *ServiceNodeComponent::GetServiceNode(const int nodeId)
     {

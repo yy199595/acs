@@ -6,7 +6,7 @@ namespace Sentry
 {
     class ServiceNode;
 
-    class ServiceNodeComponent : public Component, public IFrameUpdate
+    class ServiceNodeComponent : public Component, public ISecondUpdate
     {
     public:
         ServiceNodeComponent() {}
@@ -16,15 +16,16 @@ namespace Sentry
     public:
         bool DelNode(int nodeId);
 
+		virtual int GetPriority() { return 0; }
+
         bool DelNode(const std::string &address);
 
-        bool AddNode(ServiceNode *serviceNode);
-
-		virtual int GetPriority() { return 0; }
+		ServiceNode * CreateNode(int areaId, int nodeId, std::string name, std::string address);
+	
     protected:
         bool Awake() final;
 
-        void OnFrameUpdate(float t) final;
+        void OnSecondUpdate() final;
 
     public:
         ServiceNode *GetServiceNode(const int nodeId);
@@ -38,9 +39,9 @@ namespace Sentry
     private:
         std::string mCenterIp;
         unsigned short mCenterPort;
-        std::string mCenterAddress;
         std::list<ServiceNode *> mServiceNodeArray;
         std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
         std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;
+		class SceneProtocolComponent * mProtocolComponent;
     };
 }

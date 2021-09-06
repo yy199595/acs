@@ -13,18 +13,20 @@ namespace Sentry
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAddress(address), mNodeName(name)
 	{
-		
+		SceneNetProxyComponent * component = Scene::GetComponent<SceneNetProxyComponent>();
 		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = Scene::GetComponent<SceneActionComponent>());
-		SayNoAssertRet_F(this->mNetWorkManager = Scene::GetComponent<SceneNetProxyComponent>());
 		SayNoAssertRet_F(this->mServiceNodeManager = Service::GetComponent<ServiceNodeComponent>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
+
+		
 
 		this->mNodeInfoMessage.Clear();
 		this->mNodeInfoMessage.set_areaid(areaId);
 		this->mNodeInfoMessage.set_nodeid(nodeId);
 		this->mNodeInfoMessage.set_servername(name);
 		this->mNodeInfoMessage.set_address(address);
+		this->mTcpSession = component->Create(address, mNodeName);
 	}
 
 	bool ServiceNode::AddService(const std::string &service)
@@ -193,56 +195,43 @@ namespace Sentry
 		return this->SendRpcMessage(messageData, response);
 	}
 
-	TcpProxySession * ServiceNode::GetNodeSession()
-	{
-		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
-		if (tcpSession == nullptr)
-		{
-			this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
-		}
-		return this->mNetWorkManager->GetProxySession(this->mAddress);
-	}
 	XCode ServiceNode::SendRpcMessage(PacketMapper * message)
 	{
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
+		auto rpcCallback = NetWorkWaitCorAction::Create();
 		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
-		if (tcpSession == nullptr)
+
+		if (!this->mTcpSession->IsActive())
 		{
-			tcpSession = this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
-			if (!tcpSession->IsActive())
-			{
-				unsigned int id = this->mCorComponent->GetCurrentCorId();
-				this->mConnectCoroutines.push(id);
-				this->mCorComponent->YieldReturn();
-			}
+			unsigned int id = this->mCorComponent->GetCurrentCorId();
+			this->mConnectCoroutines.push(id);
+			this->mTcpSession->StartConnect();
+			this->mCorComponent->YieldReturn();
 		}
+
 		message->SetRpcId(rpcId);
-		if (!tcpSession->SendMessageData(message))
+		if (!this->mTcpSession->SendMessageData(message))
 		{
 			return XCode::NetWorkError;
 		}
 		this->mCorComponent->YieldReturn();
 		return rpcCallback->GetCode();
 	}
+
 	XCode ServiceNode::SendRpcMessage(PacketMapper * message, Message & response)
 	{
-		auto rpcCallback = NetWorkWaitCorAction::Create(this->mCorComponent);
+		auto rpcCallback = NetWorkWaitCorAction::Create();
 		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-		TcpProxySession *tcpSession = this->mNetWorkManager->GetProxySession(this->mAddress);
-		if (tcpSession == nullptr || !tcpSession->IsActive())
+
+		if (!this->mTcpSession->IsActive())
 		{
-			tcpSession = this->mNetWorkManager->ConnectByAddress(this->mAddress, this->mNodeName);
-			if (tcpSession != nullptr)
-			{
-				unsigned int id = this->mCorComponent->GetCurrentCorId();
-				this->mConnectCoroutines.push(id);
-				this->mCorComponent->YieldReturn();
-			}
+			unsigned int id = this->mCorComponent->GetCurrentCorId();
+			this->mTcpSession->StartConnect();			
+			this->mConnectCoroutines.push(id);
+			this->mCorComponent->YieldReturn();
 		}
 		
 		message->SetRpcId(rpcId);
-		if (!tcpSession->SendMessageData(message))
+		if (!this->mTcpSession->SendMessageData(message))
 		{
 			return XCode::NetWorkError;
 		}
