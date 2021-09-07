@@ -25,7 +25,11 @@ del /F /S /Q *.user
 del /F /S /Q *.sln
 rmdir /s/q .vs
 rmdir /s/q CMakeFiles
-rmdir /s/q ./Server/Server.dir
-rmdir /s/q ./Server/CMakeFiles
 rmdir /s/q Debug
 rmdir /s/q Win32
+cd Server
+rmdir /s/q CMakeFiles
+rmdir /s/q Server.dir
+cd bin
+rmdir /s/q Debug
+rmdir /s/q Logs
