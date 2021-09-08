@@ -11,7 +11,7 @@
 namespace Sentry
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
-		: mAddress(address), mNodeName(name)
+		: mAddress(address), mNodeName(name), mIsClose(false)
 	{
 		SceneNetProxyComponent * component = Scene::GetComponent<SceneNetProxyComponent>();
 		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
@@ -27,6 +27,7 @@ namespace Sentry
 		this->mNodeInfoMessage.set_servername(name);
 		this->mNodeInfoMessage.set_address(address);
 		this->mTcpSession = component->Create(address, mNodeName);
+		this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::HandleMessageSend, this);
 	}
 
 	bool ServiceNode::AddService(const std::string &service)
@@ -47,19 +48,9 @@ namespace Sentry
 		return iter != this->mServiceArray.end();
 	}
 
-	void ServiceNode::OnFrameUpdate(float t)
-	{
-		
-	}
-
 	void ServiceNode::OnConnectNodeAfter()
 	{
-		while (!this->mConnectCoroutines.empty())
-		{
-			unsigned int id = this->mConnectCoroutines.front();
-			this->mConnectCoroutines.pop();
-			this->mCorComponent->Resume(id);
-		}
+		this->mCorComponent->Resume(mCorId);
 	}
 
 	std::string ServiceNode::GetJsonString()
@@ -85,7 +76,8 @@ namespace Sentry
 			SayNoDebugError("not find [" << service << "." << method << "]");
 			return XCode::CallArgsError;
 		}
-		return this->SendRpcMessage(messageData);
+		this->AddMessageToQueue(messageData, false);
+		return XCode::Successful;
 	}
 
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
@@ -105,7 +97,8 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 		messageData->SetMessage(request);
-		return this->SendRpcMessage(messageData);
+		this->AddMessageToQueue(messageData, false);
+		return XCode::Successful;
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
@@ -198,44 +191,22 @@ namespace Sentry
 	XCode ServiceNode::SendRpcMessage(PacketMapper * message)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create();
-		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-
-		if (!this->mTcpSession->IsActive())
+		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
 		{
-			unsigned int id = this->mCorComponent->GetCurrentCorId();
-			this->mConnectCoroutines.push(id);
-			this->mTcpSession->StartConnect();
-			this->mCorComponent->YieldReturn();
+			return XCode::Failure;
 		}
-
-		message->SetRpcId(rpcId);
-		if (!this->mTcpSession->SendMessageData(message))
-		{
-			return XCode::NetWorkError;
-		}
-		this->mCorComponent->YieldReturn();
+		this->AddMessageToQueue(message);
 		return rpcCallback->GetCode();
 	}
 
 	XCode ServiceNode::SendRpcMessage(PacketMapper * message, Message & response)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create();
-		unsigned int rpcId = this->mActionManager->AddCallback(rpcCallback);
-
-		if (!this->mTcpSession->IsActive())
+		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
 		{
-			unsigned int id = this->mCorComponent->GetCurrentCorId();
-			this->mTcpSession->StartConnect();			
-			this->mConnectCoroutines.push(id);
-			this->mCorComponent->YieldReturn();
+			return XCode::Failure;
 		}
-		
-		message->SetRpcId(rpcId);
-		if (!this->mTcpSession->SendMessageData(message))
-		{
-			return XCode::NetWorkError;
-		}
-		this->mCorComponent->YieldReturn();
+		this->AddMessageToQueue(message);
 		if (rpcCallback->GetCode() == XCode::Successful)
 		{
 			const std::string & data = rpcCallback->GetMsgData();
@@ -247,4 +218,43 @@ namespace Sentry
 		}
 		return rpcCallback->GetCode();
 	}
+
+	void ServiceNode::HandleMessageSend()
+	{
+		while (!this->mIsClose)
+		{
+			if (this->mNodeMessageQueue.empty())
+			{
+				this->mCorComponent->YieldReturn();
+			}
+			while (!this->mTcpSession->IsActive())
+			{
+				this->mTcpSession->StartConnect();
+				this->mCorComponent->YieldReturn();
+				if (!this->mTcpSession->IsActive())
+				{
+					this->mCorComponent->Sleep(3000);
+				}
+			}
+
+			while (!this->mNodeMessageQueue.empty())
+			{
+				PacketMapper * message = this->mNodeMessageQueue.front();
+				this->mNodeMessageQueue.pop();
+				this->mTcpSession->SendMessageData(message);
+			}
+		}
+	}
+
+	void ServiceNode::AddMessageToQueue(PacketMapper * message, bool yield)
+	{
+		if (message != nullptr)
+		{
+			this->mNodeMessageQueue.push(message);
+			this->mCorComponent->Resume(this->mCorId);
+			if (yield == false) return;
+			this->mCorComponent->YieldReturn();
+		}
+	}
+
 }// namespace Sentry

@@ -30,7 +30,11 @@ namespace Sentry
 		this->RegisterExtension();
         this->OnPushGlobalObject();    
 		SayNoAssertRetFalse_F(this->LoadAllFile());
-		SayNoAssertRetFalse_F(this->StartInvokeMain());
+		mMainLuaTable = LuaTable::Create(mLuaEnv, "Main");
+
+		SayNoAssertRetFalse_F(mMainLuaTable);
+		SayNoAssertRetFalse_F(mMainLuaTable->Action("Awake"));
+
 		return true;
     }
 
@@ -80,7 +84,7 @@ namespace Sentry
 
     void SceneScriptComponent::Start()
     {
-
+		mMainLuaTable->Action("Start");
     }
 
 	int SceneScriptComponent::GetLuaRef(const std::string & tab, const std::string & field)
@@ -142,23 +146,6 @@ namespace Sentry
         lua_pop(mLuaEnv, 1);
         return false;
     }
-
-	bool SceneScriptComponent::StartInvokeMain()
-	{
-		if (mMainLuaTable != nullptr)
-		{
-			delete mMainLuaTable;
-			mMainLuaTable = nullptr;
-		}
-
-		mMainLuaTable = LuaTable::Create(mLuaEnv, "Main");
-
-		SayNoAssertRetFalse_F(mMainLuaTable);
-		SayNoAssertRetFalse_F(mMainLuaTable->Action("Awake"));
-
-		mMainLuaTable->Action("Start");
-		return true;
-	}
 
     void SceneScriptComponent::ClearRequirePath()
     {

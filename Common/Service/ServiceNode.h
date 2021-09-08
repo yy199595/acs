@@ -22,14 +22,12 @@ namespace Sentry
         const std::string &GetNodeName() { return this->mNodeInfoMessage.servername(); }
 
         const s2s::NodeData_NodeInfo &GetNodeMessage() { return this->mNodeInfoMessage; }
-
     public:
         bool AddService(const std::string &service);
 
         bool HasService(const std::string &service);
-
+		void AddMessageToQueue(PacketMapper * message, bool yield = true);
     public:
-        void OnFrameUpdate(float t);
 		void OnConnectNodeAfter();
     public:
         std::string GetJsonString();
@@ -49,8 +47,13 @@ namespace Sentry
 	private:
 		XCode SendRpcMessage(PacketMapper * message);
 		XCode SendRpcMessage(PacketMapper * message, Message &response);
+	private:
+		void HandleMessageSend();
+		
     private:
+		bool mIsClose;
         std::string mIp;
+		unsigned int mCorId;
         unsigned short mPort;
         const std::string mAddress;         //监听地址
         const std::string mNodeName;        //进程名字
@@ -61,6 +64,6 @@ namespace Sentry
         //class SceneNetProxyComponent *mNetWorkManager;
         s2s::NodeData_NodeInfo mNodeInfoMessage;
         ServiceNodeComponent *mServiceNodeManager;
-		std::queue<unsigned int> mConnectCoroutines;
+		std::queue<PacketMapper *> mNodeMessageQueue;
     };
 }// namespace Sentry

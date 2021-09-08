@@ -36,8 +36,6 @@ namespace Sentry
     private:
 		bool LoadAllFile();
 
-        bool StartInvokeMain();
-		
         void ClearRequirePath();
 
         void AddRequirePath(const std::string path);

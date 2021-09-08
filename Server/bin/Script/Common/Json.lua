@@ -1,5 +1,5 @@
 --
--- JsonUtil.lua
+-- Json.lua
 --
 -- Copyright (c) 2019 rxi
 --
@@ -22,7 +22,7 @@
 -- SOFTWARE.
 --
 
-JsonUtil = { _version = "0.1.1" }
+Json = { _version = "0.1.1" }
 
 -------------------------------------------------------------------------------
 -- Encode
@@ -125,7 +125,7 @@ Encode = function(val, stack)
     error("unexpected type '" .. t .. "'")
 end
 
-function JsonUtil.ToString(val)
+function Json.ToString(val)
     return (Encode(val))
 end
 
@@ -377,7 +377,7 @@ parse = function(str, idx)
     decode_error(str, idx, "unexpected character '" .. chr .. "'")
 end
 
-function JsonUtil.ToObject(data)
+function Json.ToObject(data)
     if type(data) ~= "string" then
         print("[Error] expected argument of type string, got " .. type(data))
         return data
@@ -390,4 +390,4 @@ function JsonUtil.ToObject(data)
     return res
 end
 
-return JsonUtil
+return Json

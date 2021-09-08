@@ -8,86 +8,90 @@
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
+#include <Service/ServiceNodeComponent.h>
+#include <Scene/SceneScriptComponent.h>
+#include <Scene/SceneProtocolComponent.h>
 
+#include <NetWork/PacketMapper.h>
+#include <Service/ServiceNode.h>
 using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)
 {
-    /*shared_ptr<TcpClientSession> tcpSession = LuaParameter::Read<shared_ptr<TcpClientSession>>(lua, 1);
-        if (tcpSession == nullptr)
-        {
-            lua_pushboolean(lua, false);
-            return 1;
-        }
+	luaL_checktype(lua, 1, LUA_TNUMBER);
+	luaL_checktype(lua, 2, LUA_TSTRING);
+	luaL_checktype(lua, 3, LUA_TSTRING);
+	const int nodeId = lua_tointeger(lua, 1);
+	const char * service = lua_tostring(lua, 2);
+	const char * method = lua_tostring(lua, 3);
 
-        App * app = App::Get();
-        ServiceNodeComponent * serviceNodeManager = app->GetManager<ServiceNodeComponent>();
-        if (serviceNodeManager == nullptr)
-        {
-            lua_pushboolean(lua, false);
-            return 1;
-        }
-        const std::string & address = tcpSession->GetAddress();
-        ServiceNode * serviceNode = serviceNodeManager->GetServiceNode(address);
-        if (serviceNode == nullptr)
-        {
-            lua_pushboolean(lua, false);
-            return 1;
-        }
+	ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();
 
+	ServiceNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
+	if (serviceNode == nullptr || !serviceNode->HasService(service))
+	{
+		lua_pushinteger(lua, XCode::CallServiceNotFound);
+		return 1;
+	}
+	int index = 4;
+	PacketMapper * packetMapper = nullptr;
+	if (lua_isinteger(lua, index))
+	{
+		const long long userId = lua_tointeger(lua, index);
+		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2C_REQUEST, service, method);
+		if (packetMapper == nullptr)
+		{
+			lua_pushinteger(lua, XCode::CallArgsError);
+			return 1;
+		}
+		index++;
+		packetMapper->SetUserId(userId);
+	}
+	else
+	{
+		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2S_REQUEST, service, method);
+	}
 
-        const char * method = lua_tostring(lua, 3);
-        const char * service = lua_tostring(lua, 2);
+	const ProtocolConfig * config = packetMapper->GetProConfig();
+	if (lua_istable(lua, index))
+	{
+		SceneScriptComponent * scriptComponent = Scene::GetComponent<SceneScriptComponent>();
+		int ref = scriptComponent->GetLuaRef("Json", "ToString");
+		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+		lua_pushvalue(lua, index);
+		if (lua_pcall(lua, 1, 1, 0) != 0)
+		{
+			SayNoDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
+			lua_pushinteger(lua, (int)XCode::Failure);
+			return 1;
+		}
 
-        if (lua_isfunction(lua, 4))
-        {
-            std::string message = "";
-            NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 4);
-            serviceNode->Call(service, method, nullptr);
-            lua_pushboolean(lua, nCallController.Call(service, action, nullptr, pRetAction));
-            return 1;
-        }
-        else if (lua_isuserdata(lua, 4))
-        {
-            Message * pMessage = (Message *)lua_touserdata(lua, 4);
-            if (pMessage != nullptr)
-            {
-                if (!lua_isfunction(lua, 5))
-                {
-                    lua_pushboolean(lua, nCallController.Call(service, action, pMessage));
-                    return 1;
-                }
-                NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 5);
-                lua_pushboolean(lua, nCallController.Call(service, action, pMessage, pRetAction));
-                return 1;
-            }
-        }
-        else if (lua_istable(lua, 4))
-        {
-            LuaTable luaTable(lua, 4, true);
-            if (lua_isfunction(lua, 5))
-            {
-                NetLuaRetAction * pRetAction = NetLuaRetAction::Create(lua, 5);
-                lua_pushboolean(lua, nCallController.Call(service, action, luaTable, pRetAction));
-                return 1;
-            }
-            lua_pushboolean(lua, nCallController.Call(service, action, luaTable));
-            return 1;
-        }
-        else
-        {
-            lua_pushboolean(lua, nCallController.Call(service, action));
-            return 1;
-        }
-
-        lua_pushboolean(lua, false);*/
-    return 1;
+		size_t size = 0;
+		const char * json = lua_tolstring(lua, -1, &size);
+		if (!config->RequestMsgName.empty())
+		{
+			SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
+			Message * message = protocolComponent->CreateMessageByJson(config->RequestMsgName, json, size);
+			if (!packetMapper->SetMessage(message))
+			{
+				lua_pushinteger(lua, (int)XCode::ProtocbufCastJsonFail);
+				return 1;
+			}
+		}
+		else
+		{
+			packetMapper->SetMessage(json, size);
+		}
+	}
+	serviceNode->AddMessageToQueue(packetMapper, false);
+	lua_pushinteger(lua, (int)XCode::Successful);
+	return 1;
 }
 
 int SystemExtension::GetApp(lua_State *luaEnv)
 {
-    App * pApplocation = &App::Get();
-    LuaParameter::Write<App *>(luaEnv, pApplocation);
+    App * app = &App::Get();
+    LuaParameter::Write<App *>(luaEnv, app);
     return 1;
 }
 
@@ -124,55 +128,6 @@ extern bool SystemExtension::RequireLua(lua_State *luaEnv, const char *name)
     return false;
 }
 
-int SystemExtension::LuaRetMessage(lua_State *luaEnv)
-{
-    if (lua_isstring(luaEnv, 1))//远程回复
-    {
-        SceneNetProxyComponent *netManager = Scene::GetComponent<SceneNetProxyComponent>();
-        if (netManager != nullptr)
-        {
-            const std::string address = lua_tostring(luaEnv, 1);
-            const long long callbackId = lua_tointeger(luaEnv, 2);
-            const long long operId = lua_tointeger(luaEnv, 3);
-            const int code = lua_tointeger(luaEnv, 4);
-            /*PacketMapper * returnPacket = GnetPacketPool.Create();
-
-            returnPacket->set_code(code);
-            returnPacket->set_entityid(operId);
-            returnPacket->set_rpcid(callbackId);*/
-            if (lua_isstring(luaEnv, 5))
-            {
-                size_t size = 0;
-                const char *str = lua_tolstring(luaEnv, 5, &size);
-                //returnPacket->set_messagedata(str, size);
-            }
-            //netManager->SendMsgByAddress(address, returnPacket);
-            return 0;
-        }
-    } else if (lua_isinteger(luaEnv, 1))//本机回复
-    {
-        SceneActionComponent *actManager = Scene::GetComponent<SceneActionComponent>();
-
-        const long long callbackId = lua_tointeger(luaEnv, 1);
-        const long long operId = lua_tointeger(luaEnv, 2);
-        const int code = lua_tointeger(luaEnv, 3);
-
-        //PacketMapper * returnPacket = GnetPacketPool.Create();
-
-        /*returnPacket->set_code(code);
-        returnPacket->set_entityid(operId);
-        returnPacket->set_rpcid(callbackId);*/
-        if (lua_isstring(luaEnv, 4))
-        {
-            size_t size = 0;
-            const char *str = lua_tolstring(luaEnv, 4, &size);
-            //returnPacket->set_messagedata(str, size);
-        }
-        //actManager->InvokeCallback(callbackId, returnPacket);
-        //GnetPacketPool.Destory(returnPacket);
-    }
-    return 0;
-}
 
 int SystemExtension::CallWait(lua_State *luaEnv)
 {
