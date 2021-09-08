@@ -7,6 +7,7 @@ function Service.Invoke(method, response, message, id, json)
         request = JsonUtil.ToObject(json)
     end
     local code, res = method(id, request)
+   print(code, res)
     if code == XCode.Successful then
         res = JsonUtil.ToString(res)
     end

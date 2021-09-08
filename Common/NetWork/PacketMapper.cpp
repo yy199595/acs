@@ -34,9 +34,7 @@ namespace Sentry
 		this->mProConfig = nullptr;
     }
 
-	void PacketMapper::Destory(PacketMapper * message)
-	{
-	}
+	thread_local std::queue<PacketMapper *> PacketMapper::mPacketPool;
 
 	PacketMapper *PacketMapper::Create(const std::string & address, const char *message, const size_t size)
     {
@@ -84,9 +82,8 @@ namespace Sentry
                 return nullptr;
         }
 
-        PacketMapper *messageData = new PacketMapper(messageType);
-
-		
+		PacketMapper *messageData = PacketMapper::Create(messageType);
+	
         messageData->mRpcId = rpcid;
         messageData->mUserId = userid;
         messageData->mCode = (XCode) code;
@@ -111,7 +108,7 @@ namespace Sentry
         const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
         if (config != nullptr)
         {
-            PacketMapper *messageData = new PacketMapper(type);
+			PacketMapper * messageData = PacketMapper::Create(type);
 			messageData->mAddress = address;
             messageData->mProConfig = config;
             return messageData;
@@ -165,6 +162,17 @@ namespace Sentry
 		return message.SerializePartialToString(&mMessageData);
 	}
 
+	bool PacketMapper::SetMessage(const char * message, const size_t size)
+	{
+		if (message == nullptr || size == 0)
+		{
+			return false;
+		}
+		this->mMessageData.clear();
+		this->mMessageData.append(message, size);
+		return true;
+	}
+
 	size_t PacketMapper::GetPackageSize()
 	{
 		size_t size = sizeof(char);
@@ -173,6 +181,19 @@ namespace Sentry
 		size += this->mUserId == 0 ? 0 : sizeof(this->mUserId);
 		size += this->mMessageData.size();
 		return size;
+	}
+
+	PacketMapper * PacketMapper::Create(NetMessageType type)
+	{
+		PacketMapper * packet = nullptr;
+		if (!mPacketPool.empty())
+		{
+			packet = mPacketPool.front();
+			packet->mMsgType = type;
+			mPacketPool.pop();
+			return packet;
+		}
+		return new PacketMapper(type);
 	}
 
 
@@ -206,4 +227,22 @@ namespace Sentry
         memcpy(buffer, &sumSize, sizeof(unsigned int));
         return offset;
     }
+	void PacketMapper::Destory()
+	{
+		if (this->mPacketPool.size() >= 100)
+		{
+			delete this;
+			return;
+		}
+		else
+		{			
+			this->mRpcId = 0;
+			this->mUserId = 0;
+			this->mAddress.clear();
+			this->mMsgType = S2S_NONE;
+			this->mProConfig = nullptr;
+			this->mMessageData.clear();
+			mPacketPool.push(this);
+		}	
+	}
 }

@@ -17,23 +17,7 @@ namespace Sentry
 		string servicePath;
 		SayNoAssertRetFalse_F(protoComponent);
 		SayNoAssertRetFalse_F(scriptComponent);
-		SayNoAssertRetFalse_F(App::Get().GetConfig().GetValue("Script", "service", servicePath));
-
 		lua_State * lua = scriptComponent->GetLuaEnv();
-
-		std::vector<std::string> servicePaths;
-		SayNoAssertRetFalse_F(DirectoryHelper::GetFilePaths(servicePath, servicePaths));
-
-		
-		for (std::string & path : servicePaths)
-		{
-			if (!scriptComponent->LoadLuaScript(path))
-			{
-				SayNoDebugFatal("load " << path << " failure");
-				return false;
-			}
-		}
-
 
 		std::vector<std::string> services;
 		protoComponent->GetServices(services);

@@ -35,10 +35,15 @@ namespace Sentry
         TcpProxySession *tcpSession = this->GetProxySession(address);
         if (tcpSession == nullptr)
         {
-            delete msgData;
+			msgData->Destory();
             return false;
         }
-        return tcpSession->SendMessageData(msgData);
+		if (!tcpSession->SendMessageData(msgData))
+		{
+			msgData->Destory();
+			return false;
+		}
+		return true;
     }
 
 	TcpProxySession * SceneNetProxyComponent::Create(const std::string &address, const std::string &name)

@@ -8,6 +8,7 @@ namespace Sentry
 {
 	enum NetMessageType
 	{
+		S2S_NONE = 0,
 		S2S_REQUEST = 1,
 		C2S_REQUEST = 2,
 		C2S_NOTICE = 3,
@@ -29,12 +30,13 @@ namespace Sentry
 		~PacketMapper();
 
 	public:
-		static void Destory(PacketMapper * message);
 		static PacketMapper *Create(const std::string & address, const char *message, const size_t size);
 		static PacketMapper *Create(const std::string & address, NetMessageType type, const std::string & service, const std::string &method);
 	public:
 		void Clear();
 		size_t WriteToBuffer(char *buffer, const size_t size);
+	public:
+		void Destory();
 	public:
 		const std::string &GetAddress() { return this->mAddress; }
 		const std::string &GetMsgBody() { return this->mMessageData; }
@@ -49,12 +51,15 @@ namespace Sentry
 		void ClearMessage() { this->mMessageData.clear(); }
 		bool SetMessage(const Message * message);
 		bool SetMessage(const Message & message);
+		bool SetMessage(const char * message, const size_t size);
 	public:
 		XCode GetCode() { return this->mCode; }
 		long long GetUserId() { return this->mUserId; }
 		unsigned int GetRpcId() { return this->mRpcId; }
 		NetMessageType GetMessageType() { return this->mMsgType; }
 		size_t GetPackageSize();
+	private:
+		static PacketMapper *Create(NetMessageType type);
 	private:
 		XCode mCode;
 		long long mUserId;
@@ -64,7 +69,6 @@ namespace Sentry
 		std::string mAddress;
 		std::string mMessageData;
 		const ProtocolConfig * mProConfig;
-		std::queue<PacketMapper *> mNetPool;
-		std::queue<PacketMapper *> mMainPool;
+		static thread_local std::queue<PacketMapper *> mPacketPool;
 	};
 }

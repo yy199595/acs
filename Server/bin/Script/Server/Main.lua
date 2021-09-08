@@ -1,17 +1,10 @@
 Main = {}
-function Main.Load()
-   
+function Main.Awake()
+    for key, value in pairs(package.loaded) do
+        print(key, value)
+    end
 end
 
 function Main.Start()
-    local address = SoEasy.NewService("LoginService")
-
-    local registerData = {}
-    registerData.account = "6465851222@qq.com"
-    registerData.password = "199595yjz."
-    registerData.phonenum = 13716061995
-    registerData.platform = "ios_qq"
-    registerData.device_mac = "0xs1dsx"
-
-    print(address)
+    
 end

@@ -8,7 +8,8 @@
 
 #include <Core/App.h>
 #include<Util/DirectoryHelper.h>
-
+#include<Util/FileHelper.h>
+#include<Util/MD5.h>
 namespace Sentry
 {
     SceneScriptComponent::SceneScriptComponent()
@@ -24,24 +25,51 @@ namespace Sentry
             this->mLuaEnv = luaL_newstate();
             luaL_openlibs(mLuaEnv);
         }
+		
+		this->PushClassToLua();
+		this->RegisterExtension();
+        this->OnPushGlobalObject();    
+		SayNoAssertRetFalse_F(this->LoadAllFile());
+		SayNoAssertRetFalse_F(this->StartInvokeMain());
+		return true;
+    }
+
+	bool SceneScriptComponent::LoadAllFile()
+	{
 		std::string luaDir;
 		ServerConfig & config = App::Get().GetConfig();
 		SayNoAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
 
-		this->PushClassToLua();
-        this->OnPushGlobalObject();
-        this->RegisterExtension(mLuaEnv);
-		
 		std::vector<std::string> luaFiles;
 		DirectoryHelper::GetFilePaths(luaDir, luaFiles);
 
-		for (std::string & luaFile : luaFiles)
+		std::string dir, name, luaFile;
+		for (std::string & path : luaFiles)
 		{
-			SayNoAssertRetFalse_F(this->LoadLuaScript(luaFile));
+			if (FileHelper::ReadTxtFile(path, luaFile)
+				&& DirectoryHelper::GetDirAndFileName(path, dir, name))
+			{
+				MD5 md5(luaFile.c_str(), luaFile.size());
+				auto iter = this->mLuaFileMd5s.find(name);
+				if (iter == this->mLuaFileMd5s.end())
+				{
+					mLuaFileMd5s.emplace(name, md5.toString());
+					SayNoAssertRetFalse_F(this->LoadLuaScript(path));
+				}
+				else
+				{
+					const std::string & oldMd5 = iter->second;
+					const std::string & newMd5 = md5.toString();
+					if (oldMd5 != newMd5)
+					{
+						mLuaFileMd5s[name] = newMd5;
+						SayNoAssertRetFalse_F(this->LoadLuaScript(path));
+					}
+				}
+			}
 		}
-		return this->LoadAllModule();;
-    }
-
+	}
+	
     void SceneScriptComponent::OnDestory()
     {
         if (this->mLuaEnv != nullptr)
@@ -55,43 +83,48 @@ namespace Sentry
 
     }
 
-    int SceneScriptComponent::GetGlobalReference(const std::string &name)
-    {
-        auto iter = this->mGlobalRefMap.find(name);
-        if (iter == this->mGlobalRefMap.end())
-        {
-            size_t pos = name.find(".");
-            if (pos != std::string::npos)
-            {
-                const std::string tab = name.substr(0, pos);
-                const std::string key = name.substr(pos + 1);
-                lua_getglobal(this->mLuaEnv, tab.c_str());
-                if (!lua_istable(this->mLuaEnv, -1))
-                {
-                    SayNoDebugError("find lua object fail " << name);
-                    return 0;
-                }
-                lua_getfield(this->mLuaEnv, -1, key.c_str());
-                if (lua_isnil(this->mLuaEnv, -1))
-                {
-                    SayNoDebugError("find lua object field fail " << name);
-                    return 0;
-                }
-                int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-                this->mGlobalRefMap.emplace(name, ref);
-                return ref;
-            }
-            lua_getglobal(this->mLuaEnv, name.c_str());
-            if (lua_isnil(this->mLuaEnv, -1))
-            {
-                SayNoDebugError("find lua object field fail " << name);
-                return 0;
-            }
-            int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-            this->mGlobalRefMap.emplace(name, ref);
-        }
-        return iter->second;
-    }
+	int SceneScriptComponent::GetLuaRef(const std::string & tab, const std::string & field)
+	{
+		const std::string key = tab + "." + field;
+		auto iter = this->mGlobalRefMap.find(key);
+		if (iter != this->mGlobalRefMap.end())
+		{
+			return iter->second;
+		}
+		lua_getglobal(this->mLuaEnv, tab.c_str());
+		if (!lua_istable(this->mLuaEnv, -1))
+		{
+			SayNoDebugError("find lua object fail " << tab);
+			return 0;
+		}
+		lua_getfield(this->mLuaEnv, -1, field.c_str());
+		if (lua_isnil(this->mLuaEnv, -1))
+		{
+			SayNoDebugError("find lua object field fail " << field);
+			return 0;
+		}
+		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+		this->mGlobalRefMap.emplace(key, ref);
+		return ref;
+	}
+
+	int SceneScriptComponent::GetLuaRef(const std::string &name)
+	{
+		auto iter = this->mGlobalRefMap.find(name);
+		if (iter != this->mGlobalRefMap.end())
+		{
+			return iter->second;
+		}
+		lua_getglobal(this->mLuaEnv, name.c_str());
+		if (lua_isnil(this->mLuaEnv, -1))
+		{
+			SayNoDebugError("find lua object field fail " << name);
+			return 0;
+		}
+		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+		this->mGlobalRefMap.emplace(name, ref);
+		return ref;
+	}
 
 
     bool SceneScriptComponent::LoadLuaScript(const std::string filePath)
@@ -110,24 +143,22 @@ namespace Sentry
         return false;
     }
 
-    bool SceneScriptComponent::LoadAllModule()
-    {
-        if (mMainLuaTable != nullptr)
-        {
-            delete mMainLuaTable;
-            mMainLuaTable = nullptr;
-        }
-        mMainLuaTable = LuaTable::Create(mLuaEnv, "Main");
-        if (mMainLuaTable != nullptr)
-        {
-            if (!mMainLuaTable->Action("Load"))
-            {
-                return false;
-            }
-            mMainLuaTable->Action("Start");
-        }
-        return true;
-    }
+	bool SceneScriptComponent::StartInvokeMain()
+	{
+		if (mMainLuaTable != nullptr)
+		{
+			delete mMainLuaTable;
+			mMainLuaTable = nullptr;
+		}
+
+		mMainLuaTable = LuaTable::Create(mLuaEnv, "Main");
+
+		SayNoAssertRetFalse_F(mMainLuaTable);
+		SayNoAssertRetFalse_F(mMainLuaTable->Action("Awake"));
+
+		mMainLuaTable->Action("Start");
+		return true;
+	}
 
     void SceneScriptComponent::ClearRequirePath()
     {
@@ -198,50 +229,21 @@ namespace Sentry
 
     }
 
-    bool SceneScriptComponent::StartLoadScript()
+    void SceneScriptComponent::RegisterExtension()
     {
-        std::vector<std::string> nAllLuaFile;
-        if (!DirectoryHelper::GetFilePaths("Script", "*.lua", nAllLuaFile) || nAllLuaFile.empty())
-        {
-            SayNoDebugError("not find field or director");
-            return false;
-        }
-        std::string nMainLau;
-        std::string nFileName;
-        std::string nLuaFileDir;
-        for (std::string &path : nAllLuaFile)
-        {
-            if (DirectoryHelper::GetDirAndFileName(path, nLuaFileDir, nFileName))
-            {
-                this->AddRequirePath(nLuaFileDir);
-                if (path.find("Main.lua") != std::string::npos)
-                {
-                    nMainLau = path;
-                }
-            }
-        }
-        if (!this->LoadLuaScript(nMainLau))
-        {
-            return false;
-        }
-        return this->LoadAllModule();
-    }
-
-    void SceneScriptComponent::RegisterExtension(lua_State *lua)
-    {
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Log", LuaAPIExtension::DebugLog);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Info", LuaAPIExtension::DebugInfo);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Error", LuaAPIExtension::DebugError);
-        ClassProxyHelper::PushStaticExtensionFunction(lua, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Log", LuaAPIExtension::DebugLog);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Info", LuaAPIExtension::DebugInfo);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Error", LuaAPIExtension::DebugError);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
 
 
-        lua_newtable(lua);
-        lua_pushtablefunction(lua, "Serialization", LuaProtocExtension::Serialization);
-        lua_setglobal(lua, "ProtocUtil");
+        lua_newtable(this->mLuaEnv);
+        lua_pushtablefunction(this->mLuaEnv, "Serialization", LuaProtocExtension::Serialization);
+        lua_setglobal(this->mLuaEnv, "ProtocUtil");
 
-        lua_getglobal(lua, "coroutine");
-        lua_pushtablefunction(lua, "sleep", CoroutineExtension::Sleep);
-        lua_pushtablefunction(lua, "start", CoroutineExtension::Start);
+        lua_getglobal(this->mLuaEnv, "coroutine");
+        lua_pushtablefunction(this->mLuaEnv, "sleep", CoroutineExtension::Sleep);
+        lua_pushtablefunction(this->mLuaEnv, "start", CoroutineExtension::Start);
 
 
     }

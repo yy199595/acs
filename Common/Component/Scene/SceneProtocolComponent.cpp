@@ -159,7 +159,7 @@ namespace Sentry
             {
                 return message;
             }
-            return message;
+            return nullptr;
         }
         return nullptr;
     }

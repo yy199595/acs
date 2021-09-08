@@ -30,25 +30,27 @@ namespace Sentry
         void Start() final;
 
     public:
-		bool LoadLuaScript(const std::string filePath);
-        int GetGlobalReference(const std::string &name);
-
+		
+		int GetLuaRef(const std::string & name);
+		int GetLuaRef(const std::string & tab, const std::string & field);
     private:
-        bool LoadAllModule();
+		bool LoadAllFile();
 
+        bool StartInvokeMain();
+		
         void ClearRequirePath();
 
         void AddRequirePath(const std::string path);
 
+		bool LoadLuaScript(const std::string filePath);
     private:
-        bool StartLoadScript();
 
         void OnPushGlobalObject();
 
         void PushClassToLua();
 
     private:
-        void RegisterExtension(struct lua_State *lua);
+        void RegisterExtension();
 
     private:
         std::string mMainLuaPath;
@@ -57,6 +59,7 @@ namespace Sentry
         const static std::string mName;
         std::vector<std::string> mRequirePaths;
         std::unordered_map<std::string, int> mGlobalRefMap;
+		std::unordered_map<std::string, std::string> mLuaFileMd5s;
     };
 
     template<typename T>
