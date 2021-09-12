@@ -1,7 +1,6 @@
 ﻿#pragma once
-
+#include<Script/LuaInclude.h>
 #include<XCode/XCode.h>
-#include"NetLuaRetAction.h"
 #include<Util/NumberBuilder.h>
 #include<Protocol/com.pb.h>
 #include<NetWork/PacketMapper.h>
@@ -11,15 +10,13 @@ using namespace com;
 namespace Sentry
 {
 
-    using NetWorkRetAction1 = std::function<void(XCode)>;
-
     template<typename T>
     using NetWorkRetAction2 = std::function<void(XCode, const T &)>;
 
     class LocalRetActionProxy
     {
     public:
-        LocalRetActionProxy();
+        LocalRetActionProxy() {}
 
         virtual ~LocalRetActionProxy() {}
 
@@ -43,85 +40,18 @@ namespace Sentry
 
 namespace Sentry
 {
-    class LocalRetActionProxy1 : public LocalRetActionProxy
-    {
-    public:
-        LocalRetActionProxy1(NetWorkRetAction1 action) : mBindAction(action) {}
-
-        ~LocalRetActionProxy1() {}
-
-    public:
-        void Invoke(PacketMapper *backData) override;
-
-    private:
-        NetWorkRetAction1 mBindAction;
-    };
-
-    template<typename T>
-    class LocalRetActionProxy2 : public LocalRetActionProxy
-    {
-    public:
-        LocalRetActionProxy2(NetWorkRetAction2<T> action) : mBindAction(action) {}
-
-        ~LocalRetActionProxy2() {}
-
-    public:
-        void Invoke(PacketMapper *backData) override
-        {
-            mReturnData.Clear();
-            XCode code = backData->GetCode();
-            if (code != XCode::TimeoutAutoCall)
-            {
-                if(!this->mReturnData.ParseFromString(backData->GetMsgBody()))
-                {
-                    this->mBindAction(XCode::ParseMessageError, mReturnData);
-                    SayNoDebugError("parse " << typeid(T).name() << " error code:" << code);
-                    return;
-                }
-            }
-            this->mBindAction(code, mReturnData);
-        }
-
-    private:
-        T mReturnData;
-        NetWorkRetAction2<T> mBindAction;
-    };
-
-
-    class LocalLuaRetActionProxy : public LocalRetActionProxy
-    {
-    public:
-        LocalLuaRetActionProxy(NetLuaRetAction *action);
-
-        ~LocalLuaRetActionProxy()
-        {
-            if (mBindLuaAction)
-            { delete mBindLuaAction; }
-        }
-
-    public:
-        void Invoke(PacketMapper *backData);
-
-    private:
-        NetLuaRetAction *mBindLuaAction;
-    };
 
     class LocalWaitRetActionProxy : public LocalRetActionProxy
     {
     public:
-        LocalWaitRetActionProxy(NetLuaWaitAction *action);
-
-        ~LocalWaitRetActionProxy()
-        {
-            if (mBindLuaAction)
-            { delete mBindLuaAction; }
-        }
-
+        LocalWaitRetActionProxy(lua_State *lua, lua_State * cor) : mCoroutine(cor), luaEnv(lua) {}
     public:
         void Invoke(PacketMapper *backData) override;
 
     private:
-        NetLuaWaitAction *mBindLuaAction;
+		int ref;
+		lua_State *luaEnv;
+		lua_State * mCoroutine;
     };
 
     class CoroutineComponent;

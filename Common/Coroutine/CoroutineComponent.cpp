@@ -39,7 +39,7 @@ namespace Sentry
 			logicCoroutine->mFunction->run();
 			pCoroutineMgr->Destory(logicCoroutine);
 #ifdef __COROUTINE_ASM__
-			tb_context_jump(parame.ctx, nullptr);
+			tb_context_jump(parame.ctx, logicCoroutine->mCorContext);
 #endif
 		}
 	}

@@ -21,7 +21,7 @@ namespace Sentry
 
 	void ClusterService::Start()
 	{
-		std::vector<Component *> components;
+		/*std::vector<Component *> components;
 		s2s::NodeRegister_Request registerInfo;
 		this->gameObject->GetComponents(components);
 
@@ -47,7 +47,7 @@ namespace Sentry
 			SayNoDebugError("register local service node fail");
 			return;
 		}
-		SayNoDebugLog("register all service to center successful");
+		SayNoDebugLog("register all service to center successful");*/
 	}
 
     XCode ClusterService::Del(long long, const Int32Data &serviceData)

@@ -52,7 +52,6 @@ namespace Sentry
 
     private:
         std::string mMainLuaPath;
-        LuaTable *mMainLuaTable;
         struct lua_State *mLuaEnv;
         const static std::string mName;
         std::vector<std::string> mRequirePaths;

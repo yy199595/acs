@@ -1,5 +1,5 @@
 #include "LuaSleepTimer.h"
-
+#include <Define/CommonDef.h>
 namespace Sentry
 {
     LuaSleepTimer::LuaSleepTimer(lua_State *lua, int ref, long long ms)
@@ -26,8 +26,8 @@ namespace Sentry
         {
             return true;
         }
-        lua_State *coroutine = lua_tothread(this->mLuaEnv, -1);
-        lua_resume(coroutine, this->mLuaEnv, 0);
+        lua_State *co = lua_tothread(this->mLuaEnv, -1);
+		lua_presume(co, this->mLuaEnv, 0);
         return true;
     }
 }// namespace Sentry

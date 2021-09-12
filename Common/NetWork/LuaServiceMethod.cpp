@@ -19,7 +19,6 @@ namespace Sentry
 	{
 		lua_State *coroutine = lua_newthread(this->mLuaEnv);
 		int ref = this->mScriptComponent->GetLuaRef("Service", "Invoke");
-
 		//lua_getfunction(mLuaEnv, "Service", "Invoke");
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 		luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
@@ -51,7 +50,7 @@ namespace Sentry
 			lua_pushlstring(coroutine, json, size);
 		}
 		int top = lua_gettop(coroutine);
-		lua_resume(coroutine, this->mLuaEnv, top - 1);
+		lua_presume(coroutine, this->mLuaEnv, top - 1);
 		return XCode::Successful;
 	}
 	int LuaServiceMethod::Response(lua_State * lua)

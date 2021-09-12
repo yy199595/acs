@@ -8,6 +8,7 @@
 #include <Util/JsonHelper.h>
 #include <Util/StringHelper.h>
 #include <NetWork/PacketMapper.h>
+#include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)

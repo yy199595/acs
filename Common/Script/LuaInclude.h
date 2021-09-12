@@ -99,9 +99,19 @@ inline int lua_reffunction(lua_State *lua, const char *tab, const char *func)
     return 0;
 }
 
+
+
 #define lua_ref(lua) luaL_ref(lua, LUA_REGISTRYINDEX)
 #define lua_unref(lua, ref) luaL_unref(lua, LUA_REGISTRYINDEX, ref)
 #define lua_getref(lua, ref) lua_rawgeti(lua, LUA_REGISTRYINDEX, ref)
+#define lua_presume(cor, lua, args)  \
+{ \
+	int code = lua_resume(cor, lua, args); \
+	if(code != 0 && code != LUA_YIELD) \
+	{	\
+		SayNoDebugError(lua_tostring(cor, -1);)\
+	} \
+}\
 
 inline void lua_pushtablefunction(lua_State *lua, const char *name, lua_CFunction func)
 {

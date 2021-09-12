@@ -62,6 +62,19 @@ namespace Sentry
 		return true;
     }
 
+	void LuaServiceProxy::Start()
+	{
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);	
+		lua_getfield(this->mLuaEnv, -1, "Start");
+		if (lua_isfunction(this->mLuaEnv, -1))
+		{
+			lua_State * coroutine = lua_newthread(this->mLuaEnv);
+			lua_pushvalue(this->mLuaEnv, -2);
+			lua_xmove(this->mLuaEnv, coroutine, 1);
+			lua_resume(coroutine, this->mLuaEnv, 0);
+		}
+	}
+
   //  XCode LuaServiceProxy::InvokeMethod(PacketMapper *messageData)
   //  {
   //      const static std::string luaAction = "ServiceProxy.LocalInvoke";

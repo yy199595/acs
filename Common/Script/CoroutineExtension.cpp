@@ -33,7 +33,7 @@ namespace CoroutineExtension
 
         const int size = lua_gettop(lua);
         lua_xmove(lua, coroutine, size - 1);
-        lua_resume(coroutine, lua, size - 1);
+		lua_presume(coroutine, lua, size - 1);
 
         return 1;
     }

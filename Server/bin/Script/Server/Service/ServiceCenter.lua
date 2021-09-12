@@ -1,6 +1,7 @@
 ServiceCenter = {}
 
 function ServiceCenter.Add(id, nodeInfo)
+    print("&&&&&&&&&&&&")
     Sentry.Sleep(1000)
     print(type(id), type(nodeInfo))
 

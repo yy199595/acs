@@ -10,12 +10,13 @@
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
+
+#include <Service/LuaServiceProxy.h>
 namespace Sentry
 {
     SceneScriptComponent::SceneScriptComponent()
     {
-        this->mLuaEnv = nullptr;
-        this->mMainLuaTable = nullptr;
+        this->mLuaEnv = nullptr;     
     }
 
     bool SceneScriptComponent::Awake()
@@ -30,11 +31,16 @@ namespace Sentry
 		this->RegisterExtension();
         this->OnPushGlobalObject();    
 		SayNoAssertRetFalse_F(this->LoadAllFile());
-		mMainLuaTable = LuaTable::Create(mLuaEnv, "Main");
-
-		SayNoAssertRetFalse_F(mMainLuaTable);
-		SayNoAssertRetFalse_F(mMainLuaTable->Action("Awake"));
-
+		
+		if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
+		{
+			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
+			{
+				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				return false;
+			}
+			return (bool)lua_toboolean(this->mLuaEnv, -1);
+		}
 		return true;
     }
 
@@ -84,7 +90,13 @@ namespace Sentry
 
     void SceneScriptComponent::Start()
     {
-		mMainLuaTable->Action("Start");
+		if (lua_getfunction(this->mLuaEnv, "Main", "Start"))
+		{			
+			lua_State * coroutine = lua_newthread(this->mLuaEnv);	
+			lua_pushvalue(this->mLuaEnv, -2);
+			lua_xmove(this->mLuaEnv, coroutine, 1);
+			lua_presume(coroutine, this->mLuaEnv, 0);
+		}
     }
 
 	int SceneScriptComponent::GetLuaRef(const std::string & tab, const std::string & field)
@@ -198,10 +210,6 @@ namespace Sentry
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Call", SystemExtension::Call);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Sleep", SystemExtension::Sleep);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallWait", SystemExtension::CallWait);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallByName", SystemExtension::CallByName);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CallBySession", SystemExtension::CallBySession);
-
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "AddTimer", SystemExtension::AddTimer);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
 

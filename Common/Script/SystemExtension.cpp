@@ -3,7 +3,7 @@
 #include <Scene/SceneActionComponent.h>
 #include <Scene/SceneNetProxyComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <NetWork/NetLuaRetAction.h>
+#include <NetWork/NetWorkRetAction.h>
 #include <Service/LuaServiceProxy.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
@@ -24,6 +24,14 @@ int SystemExtension::Call(lua_State *lua)
 	const int nodeId = lua_tointeger(lua, 1);
 	const char * service = lua_tostring(lua, 2);
 	const char * method = lua_tostring(lua, 3);
+
+	if (lua_pushthread(lua) == 1)
+	{
+		lua_pushinteger(lua, XCode::NoCoroutineContext);
+		SayNoDebugError("call " << service << "." << method << " not coroutine context");
+		return 1;
+	}
+	lua_State * coroutine = lua_tothread(lua, -1);
 
 	ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();
 
@@ -83,9 +91,19 @@ int SystemExtension::Call(lua_State *lua)
 			packetMapper->SetMessage(json, size);
 		}
 	}
+
+	auto actionComponent = Scene::GetComponent<SceneActionComponent>();
+	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
+
+	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))
+	{
+		lua_pushinteger(lua, (int)XCode::Failure);
+		return 1;
+	}
+	
 	serviceNode->AddMessageToQueue(packetMapper, false);
-	lua_pushinteger(lua, (int)XCode::Successful);
-	return 1;
+	
+	return lua_yield(lua, 1);
 }
 
 int SystemExtension::GetApp(lua_State *luaEnv)
@@ -126,137 +144,6 @@ extern bool SystemExtension::RequireLua(lua_State *luaEnv, const char *name)
         return lua_istable(luaEnv, -1);
     }
     return false;
-}
-
-
-int SystemExtension::CallWait(lua_State *luaEnv)
-{
-    if (!lua_isuserdata(luaEnv, 2))
-    {
-        lua_pushnil(luaEnv);
-        return 1;
-    }
-    if (!lua_isfunction(luaEnv, 1))
-    {
-        lua_pushnil(luaEnv);
-        return 1;
-    }
-    lua_State *coroutine = lua_newthread(luaEnv);
-    lua_pushvalue(luaEnv, 1);
-    lua_xmove(luaEnv, coroutine, 1);
-    lua_replace(luaEnv, 1);
-
-    const int size = lua_gettop(luaEnv);
-    lua_xmove(luaEnv, coroutine, size - 1);
-
-    lua_resume(coroutine, luaEnv, 1);
-    return 1;
-}
-
-int SystemExtension::CallByName(lua_State *luaEnv)
-{
-    /*lua_pushthread(luaEnv);
-        if (!lua_isthread(luaEnv, -1))
-        {
-            lua_pushinteger(luaEnv, XCode::Failure);
-            return 1;
-        }
-
-        NetLuaWaitAction * waitAction = NetLuaWaitAction::Create(luaEnv, -1);
-        if (waitAction == nullptr)
-        {
-            lua_pushinteger(luaEnv, XCode::Failure);
-            return 1;
-        }
-
-        RemoteScheduler nCallController;
-        const char * action = lua_tostring(luaEnv, 3);
-        const char * service = lua_tostring(luaEnv, 2);
-        if (lua_isuserdata(luaEnv, 4))
-        {
-            std::string nMessageBuffer;
-            Message * pMessage = (Message*)lua_touserdata(luaEnv, 4);
-            if (!pMessage->SerializePartialToString(&nMessageBuffer))
-            {
-                lua_pushinteger(luaEnv, XCode::SerializationFailure);
-                return 1;
-            }
-            if (!nCallController.Call(service, action, pMessage, waitAction))
-            {
-                lua_pushinteger(luaEnv, XCode::Failure);
-                return 1;
-            }
-        }
-        else if (lua_istable(luaEnv, 4))
-        {
-            LuaTable luaTable(luaEnv, 4, true);
-            if (!nCallController.Call(service, action, luaTable, waitAction))
-            {
-                lua_pushinteger(luaEnv, XCode::Failure);
-                return 1;
-            }
-        }
-        else
-        {
-            if (!nCallController.Call(service, action, nullptr, waitAction))
-            {
-                lua_pushinteger(luaEnv, XCode::Failure);
-                return 1;
-            }
-        }*/
-    return lua_yield(luaEnv, 1);
-}
-
-int SystemExtension::CallBySession(lua_State *luaEnv)
-{
-    /*lua_pushthread(luaEnv);
-        if (!lua_isthread(luaEnv, -1))
-        {
-            lua_pushinteger(luaEnv, XCode::Failure);
-            return 1;
-        }
-
-        NetLuaWaitAction * waitAction = NetLuaWaitAction::Create(luaEnv, -1);
-        if (waitAction == nullptr)
-        {
-            lua_pushinteger(luaEnv, XCode::Failure);
-            return 1;
-        }
-        SharedTcpSession tcpSession = LuaParameter::Read<SharedTcpSession>(luaEnv, 1);
-        RemoteScheduler nCallController(tcpSession);
-        const char * action = lua_tostring(luaEnv, 3);
-        const char * service = lua_tostring(luaEnv, 2);
-        if (lua_isuserdata(luaEnv, 4))
-        {
-            Message * pMessage = (Message*)lua_touserdata(luaEnv, 4);
-            XCode code = nCallController.Call(service, action, pMessage, waitAction);
-            if (code != XCode::Successful)
-            {
-                lua_pushinteger(luaEnv, code);
-                return 1;
-            }
-        }
-        else if (lua_istable(luaEnv, 4))
-        {
-            LuaTable luaTable(luaEnv, 4, true);
-            XCode code = nCallController.Call(service, action, luaTable, waitAction);
-            if (code != XCode::Successful)
-            {
-                lua_pushinteger(luaEnv, code);
-                return 1;
-            }
-        }
-        else
-        {
-            XCode code = nCallController.Call(service, action, nullptr, waitAction);
-            if (code != XCode::Successful)
-            {
-                lua_pushinteger(luaEnv, code);
-                return 1;
-            }
-        }
-        return lua_yield(luaEnv, 1);*/
-    return 0;
 }
 
 int SystemExtension::Sleep(lua_State *luaEnv)

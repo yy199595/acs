@@ -2,56 +2,34 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Util/TimeHelper.h>
 #include <Core/App.h>
+#include <Scene/SceneScriptComponent.h>
 namespace Sentry
 {
-
-    LocalLuaRetActionProxy::LocalLuaRetActionProxy(NetLuaRetAction *action) : mBindLuaAction(action)
+	void LocalWaitRetActionProxy::Invoke(PacketMapper *backData)
     {
-    }
-
-    void LocalLuaRetActionProxy::Invoke(PacketMapper *backData)
-    {
-        XCode code = backData->GetCode();
-        //TODO
-        /*Message * pMessage = backData->GetResMessage();
-        if (pMessage != nullptr)
-        {
-            this->mBindLuaAction->Inovke(code, pMessage);
-            return;
-        }
-        this->mBindLuaAction->Inovke(code);*/
-    }
-
-    LocalRetActionProxy::LocalRetActionProxy()
-    {
-        this->mCreateTime = TimeHelper::GetMilTimestamp();
-    }
-
-    void LocalRetActionProxy1::Invoke(PacketMapper *backData)
-    {
-    }
-
-    LocalWaitRetActionProxy::LocalWaitRetActionProxy(NetLuaWaitAction *action) : mBindLuaAction(action)
-    {
-    }
-
-    void LocalWaitRetActionProxy::Invoke(PacketMapper *backData)
-    {
-        XCode code = backData->GetCode();
-        // TODO
-        //Message * pMessage = backData->GetResMessage();
-        //if (pMessage != nullptr)
-        //{
-        //	this->mBindLuaAction->Inovke(code, pMessage);
-        //	return;
-        //}
-        //const std::string & json = backData->GetJsonData();
-        //if (!json.empty())
-        //{
-        //	this->mBindLuaAction->Inovke(code, json);
-        //	return;
-        //}
-        //this->mBindLuaAction->Inovke(code);
+		auto config = backData->GetProConfig();
+		lua_pushinteger(this->mCoroutine, (int)backData->GetCode());
+		
+		if (!backData->GetMsgBody().empty())
+		{
+			const char * json = backData->GetMsgBody().c_str();
+			const size_t size = backData->GetMsgBody().size();
+			auto scriptCom = Scene::GetComponent<SceneScriptComponent>();
+			lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
+			if (lua_isfunction(this->luaEnv, -1))
+			{
+				lua_pushlstring(this->luaEnv, json, size);
+				if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
+				{
+					SayNoDebugError(lua_tostring(this->luaEnv, -1));
+					return;
+				}
+				lua_xmove(this->luaEnv, this->mCoroutine, 1);
+				lua_presume(this->mCoroutine, this->luaEnv, 2);
+				return;
+			}
+		}
+		lua_presume(this->mCoroutine, this->luaEnv, 1);
     }
 
     NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineComponent *mgr)

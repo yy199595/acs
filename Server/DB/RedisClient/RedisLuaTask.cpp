@@ -35,7 +35,7 @@ namespace Sentry
                     SayNoDebugError("[lua error] " << lua_tostring(mLuaEnv, -1));
                 }
             }
-            lua_resume(coroutine, this->mLuaEnv, 1);
+			lua_presume(coroutine, this->mLuaEnv, 1);
         }
     }
 
