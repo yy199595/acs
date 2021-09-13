@@ -36,7 +36,7 @@ namespace Sentry
         userData.set_userid(420625199511045331);
     }
 
-    XCode MysqlProxy::Add(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
         const std::string &messageData = request.protocolmessage();
         Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
@@ -74,7 +74,7 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::Save(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
         const std::string &messageData = request.protocolmessage();
         Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
@@ -111,7 +111,7 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::Delete(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlProxy::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
         const std::string &messageData = request.protocolmessage();
         Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
@@ -148,7 +148,7 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlProxy::QueryData(long long, const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
+    XCode MysqlProxy::QueryData(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
     {
         Message *protocolMessage = this->mProtocolManager->CreateMessage(request.protocolname());
         if (protocolMessage == nullptr)

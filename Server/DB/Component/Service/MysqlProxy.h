@@ -13,13 +13,13 @@ namespace Sentry
         ~MysqlProxy() {}
 
     public:
-        XCode Add(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
+        XCode Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
 
-        XCode Save(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
+        XCode Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
 
-        XCode Delete(long long, const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
+        XCode Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
 
-        XCode QueryData(long long, const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response);
+        XCode QueryData(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response);
 
     public:
         bool Awake() final;

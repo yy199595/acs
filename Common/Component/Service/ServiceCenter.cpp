@@ -21,7 +21,7 @@ namespace Sentry
 
     }
 
-    XCode ServiceCenter::Add(long long id, const s2s::NodeRegister_Request &nodeInfo)
+    XCode ServiceCenter::Add(const s2s::NodeRegister_Request &nodeInfo)
     {
         const int areaId = nodeInfo.areaid();
         const int nodeId = nodeInfo.nodeid();
@@ -51,7 +51,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode ServiceCenter::Query(long long id, const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
+    XCode ServiceCenter::Query(const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
     {
         const int areaId = areaData.data();
         auto iter = this->mServiceNodeMap.begin();

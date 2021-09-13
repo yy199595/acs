@@ -50,14 +50,14 @@ namespace Sentry
 		SayNoDebugLog("register all service to center successful");*/
 	}
 
-    XCode ClusterService::Del(long long, const Int32Data &serviceData)
+    XCode ClusterService::Del(const Int32Data &serviceData)
     {
         const int nodeId = serviceData.data();
         bool res = this->mNodeComponent->DelNode(nodeId);
         return nodeId ? XCode::Successful : XCode::Failure;
     }
 
-    XCode ClusterService::Add(long long, const s2s::NodeData_NodeInfo &nodeInfo)
+    XCode ClusterService::Add(const s2s::NodeData_NodeInfo &nodeInfo)
     {
         const int nodeId = nodeInfo.nodeid();
         ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(nodeId);
