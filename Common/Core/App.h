@@ -79,7 +79,7 @@ namespace Sentry
 		{
 			return *mApp;
 		}
-	public:
+	public:	
 		inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
 		inline CoroutineComponent * GetCoroutineComponent() { return this->mCoroutienComponent; }
 	private:
@@ -96,6 +96,8 @@ namespace Sentry
 		int Run();
 
 		int Stop();
+
+		void Hotfix();
 
 		float GetMeanFps();
 

@@ -9,14 +9,10 @@
 using namespace com;
 namespace Sentry
 {
-
-    template<typename T>
-    using NetWorkRetAction2 = std::function<void(XCode, const T &)>;
-
     class LocalRetActionProxy
     {
     public:
-        LocalRetActionProxy() {}
+		LocalRetActionProxy();
 
         virtual ~LocalRetActionProxy() {}
 
@@ -40,7 +36,6 @@ namespace Sentry
 
 namespace Sentry
 {
-
     class LocalWaitRetActionProxy : public LocalRetActionProxy
     {
     public:
@@ -61,7 +56,7 @@ namespace Sentry
     public:
         NetWorkWaitCorAction(CoroutineComponent *);
 
-        ~NetWorkWaitCorAction() {}
+		~NetWorkWaitCorAction();
 
         static shared_ptr<NetWorkWaitCorAction> Create();
 
@@ -69,14 +64,13 @@ namespace Sentry
         void Invoke(PacketMapper *backData) override;
 
     public:
-        XCode GetCode() { return this->mCode; }
+        XCode GetCode() { return this->mResponseData->GetCode(); }
 
-        const std::string &GetMsgData() { return this->mMessage; }
+        const std::string &GetMsgData() { return this->mResponseData->GetMsgBody(); }
 
     private:
-        XCode mCode;
-        std::string mMessage;
-        long long mCoroutineId;
+		unsigned int mCoroutineId;
+		PacketMapper * mResponseData;
         CoroutineComponent *mScheduler;
     };
 }

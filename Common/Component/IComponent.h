@@ -31,4 +31,10 @@ namespace Sentry
 	public:
 		virtual void OnNetSystemUpdate(AsioContext & io) = 0;
 	};
+
+	class IHotfix
+	{
+	public:
+		virtual void OnHotFix() = 0;
+	};
 }

@@ -28,6 +28,9 @@ namespace Sentry
         bool Awake() override;
 
     private:
+#ifdef _DEBUG
+		char mBuffer[100];
+#endif
         int mMessageTimeout;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;

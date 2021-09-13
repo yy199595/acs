@@ -35,10 +35,21 @@ namespace Sentry
     NetWorkWaitCorAction::NetWorkWaitCorAction(CoroutineComponent *mgr)
     {
         this->mScheduler = mgr;
+		this->mResponseData = nullptr;
         this->mCoroutineId = mgr->GetCurrentCorId();
     }
 
-    shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create()
+	NetWorkWaitCorAction::~NetWorkWaitCorAction()
+	{
+		if (this->mResponseData != nullptr)
+		{
+			this->mResponseData->Destory();
+			this->mResponseData = nullptr;
+		}
+		
+	}
+
+	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create()
     {
 		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
         if (corComponent->IsInMainCoroutine())
@@ -50,9 +61,13 @@ namespace Sentry
 
     void NetWorkWaitCorAction::Invoke(PacketMapper *backData)
     {
-        this->mCode = backData->GetCode();
-        // TODO优化
-        this->mMessage = backData->GetMsgBody();
+		this->mResponseData = backData;
         this->mScheduler->Resume(mCoroutineId);
     }
+
+	LocalRetActionProxy::LocalRetActionProxy()
+	{
+		this->mCreateTime = TimeHelper::GetMilTimestamp();
+	}
+
 }// namespace Sentry

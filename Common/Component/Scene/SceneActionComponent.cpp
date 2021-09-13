@@ -46,21 +46,16 @@ namespace Sentry
 		{
 			return false;
 		}
-		shared_ptr<LocalRetActionProxy> action = iter->second;
-		if (action != nullptr)
-		{
-			action->Invoke(messageData);
-#ifdef SOEASY_DEBUG
-			const ProtocolConfig *config = messageData->GetProConfig();
-			double t = (TimeHelper::GetMilTimestamp() - action->GetCreateTime()) / 1000.0f;
-			SayNoDebugWarning(
-				"call " << config->ServiceName << "." << config->MethodName << " response" << " [" << t
-				<< "s]");
+		iter->second->Invoke(messageData);
+#ifdef _DEBUG
+		memset(this->mBuffer, 0, 100);
+		const ProtocolConfig *config = messageData->GetProConfig();
+		float t = (TimeHelper::GetMilTimestamp() - iter->second->GetCreateTime()) / 1000.0f;
+		SayNoDebugLog("call " << config->ServiceName << "." << config->MethodName << "  response [elapsed time = ]" << t);
 #endif
-		}
+
 		this->mNumberPool.Push(rpcId);
 		this->mRetActionMap.erase(iter);
 		return true;
-
 	}
 }

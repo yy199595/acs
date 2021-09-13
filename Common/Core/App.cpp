@@ -223,7 +223,26 @@ namespace Sentry
         return -1;
     }
 
-    float App::GetMeanFps()
+	void App::Hotfix()
+	{
+		for (Component * component : this->mSceneComponents)
+		{
+			if (auto hotfix = dynamic_cast<IHotfix*>(component))
+			{
+				hotfix->OnHotFix();
+			}
+		}
+
+		for (Component * component : this->mServiceComponents)
+		{
+			if (auto hotfix = dynamic_cast<IHotfix*>(component))
+			{
+				hotfix->OnHotFix();
+			}
+		}
+	}
+
+	float App::GetMeanFps()
     {
         return 0;
     }
