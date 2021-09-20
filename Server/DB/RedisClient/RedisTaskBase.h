@@ -10,7 +10,7 @@
 #define RedisLuaArgvSize 10
 namespace Sentry
 {
-    class SceneRedisComponent;
+    class RedisComponent;
 
     class QuertJsonWritre;
 

@@ -1,17 +1,18 @@
 #include "LuaServiceMethod.h"
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
-#include <Scene/SceneScriptComponent.h>
-#include <Scene/SceneNetProxyComponent.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Scene/LuaScriptComponent.h>
+#include <Scene/NetProxyComponent.h>
+#include <Scene/ProtocolComponent.h>
+#include <Pool/MessagePool.h>
 namespace Sentry
 {
 
 	LuaServiceMethod::LuaServiceMethod(const std::string & name, lua_State * lua, int idx)
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
-		this->mScriptComponent = Scene::GetComponent<SceneScriptComponent>();
-		this->mProtocolComponent = Scene::GetComponent<SceneProtocolComponent>();
+		this->mScriptComponent = Scene::GetComponent<LuaScriptComponent>();
+		this->mProtocolComponent = Scene::GetComponent<ProtocolComponent>();
 		SayNoAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
@@ -34,13 +35,19 @@ namespace Sentry
 		const ProtocolConfig * protocolConfig = messageData->GetProConfig();
 		if (!protocolConfig->RequestMsgName.empty())
 		{		
-			Message * message = this->mProtocolComponent->CreateMessage(protocolConfig->RequestMsgName);
-			if (message == nullptr || !message->ParseFromString(messageData->GetMsgBody()))
+			const std::string & data = messageData->GetMsgBody();
+			const std::string & name = protocolConfig->RequestMsgName;
+			
+			Message * message = MessagePool::NewByData(name, data);
+			if (message == nullptr)
 			{
 				SayNoDebugFatal("Init request message failure");
-				return XCode::Failure;
-			}		
-			this->mProtocolComponent->GetJsonByMessage(message, mMessageJson);
+				return XCode::ParseMessageError;
+			}
+			if (!util::MessageToJsonString(*message, &mMessageJson).ok())
+			{
+				return XCode::ProtocbufCastJsonFail;
+			}
 			lua_pushlstring(coroutine, mMessageJson.c_str(), mMessageJson.size());
 		}
 		else if (messageData->GetMsgBody().size() > 0)
@@ -62,7 +69,7 @@ namespace Sentry
 			responseData->Destory();
 			return 0;
 		}
-		SceneNetProxyComponent * sessionComponent = Scene::GetComponent<SceneNetProxyComponent>();
+		NetProxyComponent * sessionComponent = Scene::GetComponent<NetProxyComponent>();
 
 		responseData->ClearMessage();
 		if (lua_isstring(lua, 3))
@@ -70,10 +77,10 @@ namespace Sentry
 			size_t size = 0;
 			const char * json = lua_tolstring(lua, 3, &size);
 			const std::string & responseName = responseData->GetProConfig()->ResponseMsgName;
-			if (!responseName.empty())
+			Message * message = MessagePool::NewByJson(responseName, json, size);
+			if (message != nullptr)
 			{
-				SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
-				Message * message = protocolComponent->CreateMessageByJson(responseName, json, size);
+				SayNoAssertBreakFatal_F(message);
 				SayNoAssertBreakFatal_F(responseData->SetMessage(message));
 			}
 			else

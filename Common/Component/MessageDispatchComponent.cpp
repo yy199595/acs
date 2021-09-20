@@ -2,12 +2,12 @@
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <NetWork/PacketMapper.h>
-#include <Service/ServiceBase.h>
+#include <Service/ServiceComponent.h>
 #include <NetWork/ServiceMethod.h>
 namespace Sentry
 {
 	MessageDispatchComponent::MessageDispatchComponent()
-		:mServiceObject(App::Get().Service)
+		:mServiceObject(App::Get().Scene)
 	{
 		this->mIsStarted = false;
 	}
@@ -43,7 +43,7 @@ namespace Sentry
 			this->mWaitMsgQueue.pop();
 			const std::string & method = message->GetProConfig()->MethodName;
 			const std::string & service = message->GetProConfig()->ServiceName;
-			ServiceBase * serviceComponent = mServiceObject.GetComponent<ServiceBase>(service);
+			ServiceComponent * serviceComponent = mServiceObject.GetComponent<ServiceComponent>(service);
 			if (serviceComponent != nullptr && serviceComponent->HasMethod(method))
 			{
 				ServiceMethod * serviceMethod = serviceComponent->GetMethod(method);

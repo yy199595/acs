@@ -1,19 +1,20 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
-#include <Scene/SceneActionComponent.h>
-#include <Scene/SceneNetProxyComponent.h>
+#include <Scene/ActionComponent.h>
+#include <Scene/NetProxyComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <NetWork/NetWorkRetAction.h>
-#include <Service/LuaServiceProxy.h>
+#include <Service/LuaServiceComponent.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
 #include <Service/ServiceNodeComponent.h>
-#include <Scene/SceneScriptComponent.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Scene/LuaScriptComponent.h>
+#include <Scene/ProtocolComponent.h>
 
 #include <NetWork/PacketMapper.h>
 #include <Service/ServiceNode.h>
+#include <Pool/MessagePool.h>
 using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)
@@ -33,7 +34,7 @@ int SystemExtension::Call(lua_State *lua)
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
 
-	ServiceNodeComponent * nodeComponent = Service::GetComponent<ServiceNodeComponent>();
+	ServiceNodeComponent * nodeComponent = Scene::GetComponent<ServiceNodeComponent>();
 
 	ServiceNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
@@ -63,7 +64,7 @@ int SystemExtension::Call(lua_State *lua)
 	const ProtocolConfig * config = packetMapper->GetProConfig();
 	if (lua_istable(lua, index))
 	{
-		SceneScriptComponent * scriptComponent = Scene::GetComponent<SceneScriptComponent>();
+		LuaScriptComponent * scriptComponent = Scene::GetComponent<LuaScriptComponent>();
 		int ref = scriptComponent->GetLuaRef("Json", "ToString");
 		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 		lua_pushvalue(lua, index);
@@ -76,10 +77,9 @@ int SystemExtension::Call(lua_State *lua)
 
 		size_t size = 0;
 		const char * json = lua_tolstring(lua, -1, &size);
-		if (!config->RequestMsgName.empty())
+		Message * message = MessagePool::NewByJson(config->RequestMsgName, json, size);
+		if (message != nullptr)
 		{
-			SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
-			Message * message = protocolComponent->CreateMessageByJson(config->RequestMsgName, json, size);
 			if (!packetMapper->SetMessage(message))
 			{
 				lua_pushinteger(lua, (int)XCode::ProtocbufCastJsonFail);
@@ -92,7 +92,7 @@ int SystemExtension::Call(lua_State *lua)
 		}
 	}
 
-	auto actionComponent = Scene::GetComponent<SceneActionComponent>();
+	auto actionComponent = Scene::GetComponent<ActionComponent>();
 	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
 
 	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))

@@ -1,11 +1,11 @@
 ﻿#include "TaskThread.h"
-#include <Scene/SceneTaskComponent.h>
+#include <Scene/TaskComponent.h>
 #include <functional>
 
 using namespace std::chrono;
 namespace Sentry
 {
-    TaskThread::TaskThread(SceneTaskComponent *manager, int index)
+    TaskThread::TaskThread(TaskComponent *manager, int index)
     {
         this->mTaskState = Idle;
         this->mThreadIndex = index;

@@ -2,7 +2,7 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Util/TimeHelper.h>
 #include <Core/App.h>
-#include <Scene/SceneScriptComponent.h>
+#include <Scene/LuaScriptComponent.h>
 namespace Sentry
 {
 	void LocalWaitRetActionProxy::Invoke(PacketMapper *backData)
@@ -14,7 +14,7 @@ namespace Sentry
 		{
 			const char * json = backData->GetMsgBody().c_str();
 			const size_t size = backData->GetMsgBody().size();
-			auto scriptCom = Scene::GetComponent<SceneScriptComponent>();
+			auto scriptCom = Scene::GetComponent<LuaScriptComponent>();
 			lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
 			if (lua_isfunction(this->luaEnv, -1))
 			{

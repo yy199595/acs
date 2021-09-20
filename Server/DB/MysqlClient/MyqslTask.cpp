@@ -1,7 +1,7 @@
 #include "MyqslTask.h"
 
 #include <Core/App.h>
-#include <Scene/SceneMysqlComponent.h>
+#include <Scene/MysqlComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
@@ -24,7 +24,7 @@ namespace Sentry
 
     void MyqslTask::Run()
     {
-		SceneMysqlComponent * pMysqlManager = Scene::GetComponent<SceneMysqlComponent>();
+		MysqlComponent * pMysqlManager = Scene::GetComponent<MysqlComponent>();
         SayNoMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
         if (mysqlSocket == nullptr)
         {

@@ -1,18 +1,16 @@
 #include "LuaServiceMgrComponent.h"
 #include <Core/App.h>
 #include <NetWork/LuaServiceMethod.h>
-#include <Service/LuaServiceProxy.h>
-#include <Scene/SceneScriptComponent.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Service/LuaServiceComponent.h>
+#include <Scene/LuaScriptComponent.h>
+#include <Scene/ProtocolComponent.h>
 #include <Util/DirectoryHelper.h>
 namespace Sentry
 {
 	bool LuaServiceMgrComponent::Awake()
 	{
-		
-
-		SceneScriptComponent * scriptComponent = Scene::GetComponent<SceneScriptComponent>();
-		SceneProtocolComponent * protoComponent = Scene::GetComponent<SceneProtocolComponent>();
+		LuaScriptComponent * scriptComponent = Scene::GetComponent<LuaScriptComponent>();
+		ProtocolComponent * protoComponent = Scene::GetComponent<ProtocolComponent>();
 
 		string servicePath;
 		SayNoAssertRetFalse_F(protoComponent);
@@ -22,7 +20,7 @@ namespace Sentry
 		std::vector<std::string> services;
 		protoComponent->GetServices(services);
 
-		GameObject & serviceObject = App::Get().Service;
+		GameObject & serviceObject = App::Get().Scene;
 		for (std::string & service : services)
 		{
 			lua_getglobal(lua, service.c_str());
@@ -35,11 +33,11 @@ namespace Sentry
 			{
 				continue;
 			}
-
-			ServiceBase * localService = serviceObject.GetComponent<ServiceBase>(service);
+		
+			ServiceComponent * localService = serviceObject.GetComponent<ServiceComponent>(service);
 			if (localService == nullptr)
 			{
-				LuaServiceProxy * luaSerivce = new LuaServiceProxy();
+				LuaServiceComponent * luaSerivce = new LuaServiceComponent();
 				if (serviceObject.AddComponent(service, localService))
 				{
 					SayNoDebugError("add service " << service << " failure");

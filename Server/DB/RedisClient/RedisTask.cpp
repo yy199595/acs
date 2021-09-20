@@ -1,6 +1,6 @@
 ﻿#include "RedisTask.h"
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/SceneRedisComponent.h>
+#include <Scene/RedisComponent.h>
 #include <Core/App.h>
 namespace Sentry
 {

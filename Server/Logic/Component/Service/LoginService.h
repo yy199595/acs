@@ -1,15 +1,15 @@
 ﻿#pragma once
 
 #include <Protocol/c2s.pb.h>
-#include <Service/LocalService.h>
+#include <Service/LocalServiceComponent.h>
 
 namespace Sentry
 {
-    class SceneMysqlComponent;
+    class MysqlComponent;
 
-    class SceneRedisComponent;
+    class RedisComponent;
 
-    class LoginService : public LocalService
+    class LoginService : public LocalServiceComponent
     {
     public:
         LoginService();
@@ -27,7 +27,7 @@ namespace Sentry
         XCode Register(long long operId, shared_ptr<c2s::UserRegister_Request> registerData);
 
     private:
-        SceneRedisComponent *mRedisManager;
-        SceneMysqlComponent *mMysqlManager;
+        RedisComponent *mRedisManager;
+        MysqlComponent *mMysqlManager;
     };
 }// namespace Sentry

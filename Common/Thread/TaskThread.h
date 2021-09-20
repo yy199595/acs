@@ -15,12 +15,12 @@ namespace Sentry
         Run,
     };
 
-    class SceneTaskComponent;
+    class TaskComponent;
 
     class TaskThread
     {
     public:
-        TaskThread(SceneTaskComponent *taskManaer, int index);
+        TaskThread(TaskComponent *taskManaer, int index);
 
     public:
         void WaitToNextWake();
@@ -41,7 +41,7 @@ namespace Sentry
         std::mutex mThreadLock;
         ThreadState mTaskState;
         std::thread *mBindThread;
-        SceneTaskComponent *mTaskManager;
+        TaskComponent *mTaskManager;
 		std::thread::id mThreadId;
 		std::queue<unsigned int> mFinishTasks;
         std::condition_variable mThreadVarible;

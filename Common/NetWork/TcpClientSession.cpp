@@ -1,12 +1,12 @@
 ﻿#include"TcpClientSession.h"
 #include<Core/App.h>
 #include<Util/StringHelper.h>
-#include<Scene/SceneSessionComponent.h>
+#include<Scene/NetSessionComponent.h>
 #include<NetWork/SocketEvent.h>
 
 namespace Sentry
 {
-    TcpClientSession::TcpClientSession(AsioContext &io, SceneSessionComponent *manager, SharedTcpSocket socket)
+    TcpClientSession::TcpClientSession(AsioContext &io, NetSessionComponent *manager, SharedTcpSocket socket)
             : mAsioContext(io)
     {
         this->mBinTcpSocket = socket;
@@ -19,7 +19,7 @@ namespace Sentry
         }
     }
 
-    TcpClientSession::TcpClientSession(AsioContext &io, SceneSessionComponent *manager, std::string name, std::string ip,
+    TcpClientSession::TcpClientSession(AsioContext &io, NetSessionComponent *manager, std::string name, std::string ip,
                                        unsigned short port)
             : mAsioContext(io)
     {

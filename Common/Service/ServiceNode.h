@@ -60,8 +60,8 @@ namespace Sentry
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
 		class TcpProxySession * mTcpSession;
-        class SceneActionComponent *mActionManager;
-        //class SceneNetProxyComponent *mNetWorkManager;
+        class ActionComponent *mActionManager;
+        //class NetProxyComponent *mNetWorkManager;
         s2s::NodeData_NodeInfo mNodeInfoMessage;
         ServiceNodeComponent *mServiceNodeManager;
 		std::queue<PacketMapper *> mNodeMessageQueue;

@@ -3,7 +3,7 @@
 #include <memory>
 namespace Sentry
 {
-    class SceneTaskComponent;
+    class TaskComponent;
 
     class TaskProxy
     {
@@ -11,7 +11,7 @@ namespace Sentry
         TaskProxy();
         virtual ~TaskProxy() {}
     public:
-		friend class SceneTaskComponent;
+		friend class TaskComponent;
         virtual void Run() = 0; //在线程池执行的任务
 		virtual void RunFinish() = 0;
 	public:

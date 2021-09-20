@@ -1,12 +1,13 @@
 ﻿#include "ServiceMgrComponent.h"
-#include <Service/LuaServiceProxy.h>
-#include <Service/LocalService.h>
+#include <Service/LuaServiceComponent.h>
+#include <Service/LocalServiceComponent.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/SceneActionComponent.h>
+#include <Scene/ActionComponent.h>
 #include <Util/StringHelper.h>
 #include <Core/App.h>
 #include <Util/JsonHelper.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Scene/ProtocolComponent.h>
+#include <Pool/MessagePool.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()
@@ -16,14 +17,14 @@ namespace Sentry
         SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
 
         SayNoAssertRetFalse_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
-        SayNoAssertRetFalse_F(this->mNetProxyManager = Scene::GetComponent<SceneNetProxyComponent>());
+        SayNoAssertRetFalse_F(this->mNetProxyManager = Scene::GetComponent<NetProxyComponent>());
         return true;
     }
 
 	bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
 	{
 		const std::string & service = messageData->GetService();
-		ServiceBase * localService = this->gameObject->GetComponent<ServiceBase>(service);
+		ServiceComponent * localService = this->gameObject->GetComponent<ServiceComponent>(service);
 		if (localService == nullptr)
 		{
 			SayNoDebugFatal("call service not exist : [" << service << "]");
@@ -55,19 +56,16 @@ namespace Sentry
 		const std::string & name = messageData->GetMessageType() < REQUEST_END
 			? messageData->GetProConfig()->RequestMsgName : messageData->GetProConfig()->ResponseMsgName;
 	
-		if (!name.empty())
+		const std::string & data = messageData->GetMsgBody();
+		if (!name.empty() && !data.empty())
 		{
-			SceneProtocolComponent * protocolComponent = Scene::GetComponent<SceneProtocolComponent>();
-			Message * message = protocolComponent->CreateMessage(name);
-			if (message != nullptr &&message->ParseFromString(messageData->GetMsgBody()))
+			std::string json;		
+			Message * message = MessagePool::NewByData(name, data);
+			if (message != nullptr && util::MessageToJsonString(*message, &json).ok())
 			{
-				std::string json;
-				if (protocolComponent->GetJsonByMessage(message, json))
-				{
-					std::string retData =
-						jsonWriter.Serialization() + " \"message\":" + json;
-					return retData;
-				}
+				std::string retData =
+					jsonWriter.Serialization() + " \"message\":" + json;
+				return retData;
 			}
 		}
 		return jsonWriter.Serialization();

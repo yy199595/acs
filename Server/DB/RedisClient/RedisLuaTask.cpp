@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Util/NumberHelper.h>
-#include <Scene/SceneRedisComponent.h>
+#include <Scene/RedisComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
@@ -47,7 +47,7 @@ namespace Sentry
         }       
         lua_State *coroutine = lua_tothread(lua, index);
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        SceneRedisComponent *redisManager = Scene::GetComponent<SceneRedisComponent>();
+        RedisComponent *redisManager = Scene::GetComponent<RedisComponent>();
         if (redisManager == nullptr)
         {
             return nullptr;

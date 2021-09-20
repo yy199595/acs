@@ -18,7 +18,7 @@ namespace Sentry
 {
 	class Manager;
 
-	class ServiceBase;
+	class ServiceComponent;
 
 	class App
 	{
@@ -110,7 +110,6 @@ namespace Sentry
 
 	public:
 		GameObject Scene;
-		GameObject Service;
 	private:
 	    AsioWork * mAsioWork;
 		AsioContext * mAsioContext;
@@ -144,7 +143,6 @@ namespace Sentry
 		TimerComponent * mTimerComponent;
 		CoroutineComponent * mCoroutienComponent;
 		std::vector<Component *> mSceneComponents;
-		std::vector<Component *> mServiceComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
@@ -162,15 +160,6 @@ namespace Sentry
 		inline T * GetComponent()
 		{
 			return App::Get().Scene.GetComponent<T>();
-		}
-	}
-
-	namespace Service
-	{
-		template<typename T>
-		inline T * GetComponent()
-		{
-			return App::Get().Service.GetComponent<T>();
 		}
 	}
 }

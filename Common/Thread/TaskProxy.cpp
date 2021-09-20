@@ -1,6 +1,6 @@
 #include "TaskProxy.h"
 #include <Util/TimeHelper.h>
-#include <Scene/SceneTaskComponent.h>
+#include <Scene/TaskComponent.h>
 
 namespace Sentry
 {

@@ -4,13 +4,13 @@
 #include"PacketMapper.h"
 namespace Sentry
 {
-	class SceneSessionComponent;
-	class SceneNetProxyComponent;
+	class NetSessionComponent;
+	class NetProxyComponent;
 	class SocketEveHandler
 	{
 	public:
-		virtual void RunHandler(SceneSessionComponent *) { };
-		virtual void RunHandler(SceneNetProxyComponent *) { };
+		virtual void RunHandler(NetSessionComponent *) { };
+		virtual void RunHandler(NetProxyComponent *) { };
 	};
 
 	class MainSocketSendHandler : public SocketEveHandler
@@ -19,7 +19,7 @@ namespace Sentry
 		MainSocketSendHandler(PacketMapper * message)
 			: mSendMessage(message) { }
 	public:
-		void RunHandler(SceneSessionComponent *) final;
+		void RunHandler(NetSessionComponent *) final;
 	private:		
 		PacketMapper * mSendMessage;
 	};
@@ -30,7 +30,7 @@ namespace Sentry
 		MainSocketCloseHandler(const std::string & address)
 			:mAddress(address) { }
 	public:
-		void RunHandler(SceneSessionComponent *) final;
+		void RunHandler(NetSessionComponent *) final;
 	private:
 		const std::string mAddress;
 	};
@@ -41,7 +41,7 @@ namespace Sentry
 		MainSocketConnectHandler(const std::string & address, const std::string & name)
 			: mAddress(address), mName(name) {}
 	public:
-		void RunHandler(SceneSessionComponent *) final;
+		void RunHandler(NetSessionComponent *) final;
 	private:
 		const std::string mName;
 		const std::string mAddress;
@@ -56,7 +56,7 @@ namespace Sentry
 		NetSocketConnectHandler(const std::string & address, bool isSuc)
 			: mIsSuccessful(isSuc), mAddress(address) { }
 	public:
-		void RunHandler(SceneNetProxyComponent * component);
+		void RunHandler(NetProxyComponent * component);
 	private:
 		const bool mIsSuccessful;
 		const std::string mAddress;
@@ -68,7 +68,7 @@ namespace Sentry
 		NetNewSocketConnectHandler(const std::string & address)
 			:mAddress(address) { }
 	public:
-		void RunHandler(SceneNetProxyComponent * component);
+		void RunHandler(NetProxyComponent * component);
 	private:
 		const std::string mAddress;
 	};
@@ -79,7 +79,7 @@ namespace Sentry
 		NetErrorHandler(const std::string & address)
 			: mAddress(address) { }
 	public:
-		void RunHandler(SceneNetProxyComponent * component);
+		void RunHandler(NetProxyComponent * component);
 	private:
 		const std::string mAddress;
 	};
@@ -90,7 +90,7 @@ namespace Sentry
 		NetReceiveNewMessageHandler(PacketMapper * message)
 			: mRecvMessage(message) { }
 	public:
-		void RunHandler(SceneNetProxyComponent * component);
+		void RunHandler(NetProxyComponent * component);
 	private:		
 		PacketMapper * mRecvMessage;
 	};

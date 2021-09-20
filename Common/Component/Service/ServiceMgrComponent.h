@@ -1,17 +1,17 @@
 ﻿#pragma once
 
 #include<Protocol/s2s.pb.h>
-#include<Scene/SceneNetProxyComponent.h>
+#include<Scene/NetProxyComponent.h>
 #include<Other/DoubleBufferQueue.h>
 
 
 namespace Sentry
 {
-    class ServiceBase;
+    class ServiceComponent;
 
-    class LocalService;
+    class LocalServiceComponent;
     
-    class LuaServiceProxy;
+    class LuaServiceComponent;
 
 	class ServiceMethod;
 
@@ -28,7 +28,7 @@ namespace Sentry
     public:
         bool HandlerMessage(PacketMapper *messageData);
 
-		virtual int GetPriority() { return 1; }
+		virtual int GetPriority() { return 500; }
 	private:	
 		std::string GetJson(PacketMapper * messageData);
 		void Invoke(ServiceMethod * method, PacketMapper *messageData);		
@@ -37,6 +37,6 @@ namespace Sentry
 
         class CoroutineComponent *mCorComponent;
 
-        class SceneNetProxyComponent *mNetProxyManager;
+        class NetProxyComponent *mNetProxyManager;
     };
 }

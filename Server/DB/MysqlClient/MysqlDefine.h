@@ -18,7 +18,7 @@ using namespace std;
 using namespace Sentry;
 namespace Sentry
 {
-    class SceneMysqlComponent;
+    class MysqlComponent;
 
     typedef MYSQL_RES MysqlQueryResult;
     typedef MYSQL SayNoMysqlSocket;

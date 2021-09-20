@@ -18,7 +18,7 @@ namespace Sentry
 		int mIdx;
 		lua_State * mLuaEnv;
 		std::string mMessageJson;
-		class SceneScriptComponent * mScriptComponent;
-		class SceneProtocolComponent * mProtocolComponent;
+		class LuaScriptComponent * mScriptComponent;
+		class ProtocolComponent * mProtocolComponent;
 	};
 }

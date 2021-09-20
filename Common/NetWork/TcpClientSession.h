@@ -29,14 +29,14 @@ namespace Sentry
         const std::string mMessage;
     };
 
-    class SceneSessionComponent;
+    class NetSessionComponent;
 
     class TcpClientSession
     {
     public:
-        TcpClientSession(AsioContext &io, SceneSessionComponent *manager, SharedTcpSocket socket);
+        TcpClientSession(AsioContext &io, NetSessionComponent *manager, SharedTcpSocket socket);
 
-        TcpClientSession(AsioContext &io, SceneSessionComponent *manager, std::string name, std::string ip,
+        TcpClientSession(AsioContext &io, NetSessionComponent *manager, std::string name, std::string ip,
                          unsigned short port);
 
         virtual ~TcpClientSession();
@@ -86,7 +86,7 @@ namespace Sentry
         SessionType mSessionType;
         std::string mSessionName;
         unsigned int mConnectCount;
-        SceneSessionComponent *mDispatchManager;
+        NetSessionComponent *mDispatchManager;
 
     private:
         char *mRecvMsgBuffer;

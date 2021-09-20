@@ -7,7 +7,7 @@
 using namespace Sentry;
 namespace Sentry
 {
-    class SceneRedisComponent;
+    class RedisComponent;
 
     typedef redisContext RedisSocket;
 }// namespace Sentry

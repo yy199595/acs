@@ -1,5 +1,5 @@
 ﻿#include "RedisTaskBase.h"
-#include <Scene/SceneRedisComponent.h>
+#include <Scene/RedisComponent.h>
 #include <Core/App.h>
 namespace Sentry
 {
@@ -11,7 +11,7 @@ namespace Sentry
 
     void RedisTaskBase::Run()
     {
-		SceneRedisComponent * redisManager = Scene::GetComponent<SceneRedisComponent>();
+		RedisComponent * redisManager = Scene::GetComponent<RedisComponent>();
         RedisSocket *redisSocket = redisManager->GetRedisSocket();
         if (redisSocket == nullptr)
         {

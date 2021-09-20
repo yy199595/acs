@@ -1,7 +1,7 @@
 ﻿#include "TcpProxySession.h"
 #include <Core/App.h>
-#include <Scene/SceneNetProxyComponent.h>
-#include <Scene/SceneSessionComponent.h>
+#include <Scene/NetProxyComponent.h>
+#include <Scene/NetSessionComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
@@ -13,7 +13,7 @@ namespace Sentry
         this->mConnectCount = 0;
         this->mAddress = address;
         this->mSessionType = SessionClient;    
-        SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
+        SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<NetSessionComponent>());
     }
 
     TcpProxySession::TcpProxySession(const std::string &name, const std::string &address)
@@ -23,7 +23,7 @@ namespace Sentry
 		this->mIsActive = false;
         this->mAddress = address;
         this->mSessionType = SessionNode;
-		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<SceneSessionComponent>());
+		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<NetSessionComponent>());
     }
 
     TcpProxySession::~TcpProxySession()

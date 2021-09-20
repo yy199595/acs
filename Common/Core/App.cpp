@@ -2,9 +2,9 @@
 #include "App.h"
 
 #include <Util/FileHelper.h>
-#include <Scene/SceneActionComponent.h>
-#include <Scene/SceneProtocolComponent.h>
-#include <Scene/SceneSessionComponent.h>
+#include <Scene/ActionComponent.h>
+#include <Scene/ProtocolComponent.h>
+#include <Scene/NetSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 
@@ -17,7 +17,7 @@ namespace Sentry
 
 	App::App(const std::string srvName, const std::string cfgDir)
 		: mStartTime(TimeHelper::GetMilTimestamp()),
-		mConfig(cfgDir + srvName + ".json"), Scene(0), Service(1)
+		mConfig(cfgDir + srvName + ".json"), Scene(1)
 	{
 		mApp = this;
 		this->mDelatime = 0;
@@ -36,14 +36,14 @@ namespace Sentry
     bool App::LoadComponent()
     {
 		this->Scene.AddComponent<TimerComponent>();
-		this->Scene.AddComponent<SceneActionComponent>();
-		this->Scene.AddComponent<SceneProtocolComponent>();
+		this->Scene.AddComponent<ActionComponent>();
+		this->Scene.AddComponent<ProtocolComponent>();
 		this->Scene.AddComponent<CoroutineComponent>();
-		this->Scene.AddComponent<SceneSessionComponent>();
-		this->Scene.AddComponent<SceneNetProxyComponent>();
+		this->Scene.AddComponent<NetSessionComponent>();
+		this->Scene.AddComponent<NetProxyComponent>();
 
-		this->Service.AddComponent<ServiceNodeComponent>();
-		this->Service.AddComponent<ServiceMgrComponent>();
+		this->Scene.AddComponent<ServiceNodeComponent>();
+		this->Scene.AddComponent<ServiceMgrComponent>();
 
 		this->mTimerComponent = this->Scene.GetComponent<TimerComponent>();
 		this->mCoroutienComponent = this->Scene.GetComponent<CoroutineComponent>();
@@ -67,7 +67,7 @@ namespace Sentry
         for (size_t index = 0; index < services.size(); index++)
         {
             const std::string &name = services[index];
-			if (this->Service.AddComponent(name) == false)
+			if (this->Scene.AddComponent(name) == false)
 			{
 				SayNoDebugFatal("add " << name << " to scene failure");
 				return false;
@@ -107,14 +107,14 @@ namespace Sentry
 		}
 		
 		//初始化servie组件
-		this->Service.GetComponents(this->mServiceComponents);
-		std::sort(mServiceComponents.begin(), mServiceComponents.end(),
+		this->Scene.GetComponents(this->mSceneComponents);
+		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
 			[](Component * m1, Component * m2)->bool
 		{
 			return m1->GetPriority() < m2->GetPriority();
 		});
 
-		for(Component * component : mServiceComponents)
+		for(Component * component : mSceneComponents)
 		{
 			if (!this->InitComponent(component))
 			{
@@ -183,21 +183,8 @@ namespace Sentry
 				component->Start();
 			}
 		}
-		SayNoDebugLog("start all scene component successful ......");
-
-		for (size_t index = 0; index < this->mServiceComponents.size(); index++)
-		{
-			Component * component = this->mServiceComponents[index];
-			if (component != nullptr)
-			{
-				float process = index / (float)mServiceComponents.size();
-				SayNoDebugInfo("[" << process * 100 << "%]" 
-					<< " start service " << component->GetTypeName());
-				component->Start();
-			}
-		}
-		SayNoDebugLog("start all service component successful ......");
 		this->mIsInitComplate = true;
+		SayNoDebugLog("start all scene component successful ......");	
 		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 		SayNoDebugLog("=====  start " << this->mServerName << " successful ["<< t / 1000.0f <<"s] ========");
 	}
@@ -215,7 +202,6 @@ namespace Sentry
     {
         this->mIsClose = true;
 		this->Scene.OnDestory();
-		this->Service.OnDestory();
         this->mLogHelper->DropLog();
 #ifdef _WIN32
         return getchar();
@@ -226,14 +212,6 @@ namespace Sentry
 	void App::Hotfix()
 	{
 		for (Component * component : this->mSceneComponents)
-		{
-			if (auto hotfix = dynamic_cast<IHotfix*>(component))
-			{
-				hotfix->OnHotFix();
-			}
-		}
-
-		for (Component * component : this->mServiceComponents)
 		{
 			if (auto hotfix = dynamic_cast<IHotfix*>(component))
 			{

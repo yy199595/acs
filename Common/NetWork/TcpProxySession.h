@@ -43,6 +43,6 @@ namespace Sentry
         std::string mName;
         std::string mAddress;
         SessionType mSessionType;
-        class SceneSessionComponent *mNetManager;
+        class NetSessionComponent *mNetManager;
     };
 }// namespace Sentry

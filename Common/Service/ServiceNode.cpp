@@ -1,8 +1,8 @@
 ﻿#include "ServiceNode.h"
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/SceneActionComponent.h>
-#include <Scene/SceneNetProxyComponent.h>
+#include <Scene/ActionComponent.h>
+#include <Scene/NetProxyComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <NetWork/NetWorkRetAction.h>
 #include <Util/JsonHelper.h>
@@ -14,10 +14,10 @@ namespace Sentry
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAddress(address), mNodeName(name), mIsClose(false)
 	{
-		SceneNetProxyComponent * component = Scene::GetComponent<SceneNetProxyComponent>();
+		NetProxyComponent * component = Scene::GetComponent<NetProxyComponent>();
 		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
-		SayNoAssertRet_F(this->mActionManager = Scene::GetComponent<SceneActionComponent>());
-		SayNoAssertRet_F(this->mServiceNodeManager = Service::GetComponent<ServiceNodeComponent>());
+		SayNoAssertRet_F(this->mActionManager = Scene::GetComponent<ActionComponent>());
+		SayNoAssertRet_F(this->mServiceNodeManager = Scene::GetComponent<ServiceNodeComponent>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 
 		

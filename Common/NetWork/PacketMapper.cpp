@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Util/JsonHelper.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Scene/ProtocolComponent.h>
 namespace Sentry
 {
     template<typename T>
@@ -43,7 +43,7 @@ namespace Sentry
             return nullptr;
         }
         size_t offset = 1;
-        SceneProtocolComponent *pProtocolMgr = Scene::GetComponent<SceneProtocolComponent>();
+        ProtocolComponent *pProtocolMgr = Scene::GetComponent<ProtocolComponent>();
 
         int code = 0;
 		long long userid = 0;
@@ -103,7 +103,7 @@ namespace Sentry
         {
             return nullptr;
         }
-        SceneProtocolComponent *pProtocolMgr = Scene::GetComponent<SceneProtocolComponent>();
+        ProtocolComponent *pProtocolMgr = Scene::GetComponent<ProtocolComponent>();
 
         const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
         if (config != nullptr)

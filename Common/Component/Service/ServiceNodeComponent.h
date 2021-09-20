@@ -42,6 +42,6 @@ namespace Sentry
         std::list<ServiceNode *> mServiceNodeArray;
         std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
         std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;
-		class SceneProtocolComponent * mProtocolComponent;
+		class ProtocolComponent * mProtocolComponent;
     };
 }

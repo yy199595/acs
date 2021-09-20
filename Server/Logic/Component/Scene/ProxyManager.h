@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include<Scene/SceneNetProxyComponent.h>
+#include<Scene/NetProxyComponent.h>
 namespace Sentry
 {
-    class ProxyManager : public SceneNetProxyComponent
+    class ProxyManager : public NetProxyComponent
     {
     public:
         ProxyManager() {}

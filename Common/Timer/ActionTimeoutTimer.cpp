@@ -1,10 +1,10 @@
 ﻿#include "ActionTimeoutTimer.h"
-#include <Scene/SceneActionComponent.h>
+#include <Scene/ActionComponent.h>
 #include <NetWork/NetWorkRetAction.h>
 
 namespace Sentry
 {
-    ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, SceneActionComponent *mgr)
+    ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, ActionComponent *mgr)
         : TimerBase(ms)
     {
         this->mActionManager = mgr;

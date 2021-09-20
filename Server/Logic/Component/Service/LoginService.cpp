@@ -1,6 +1,6 @@
 ﻿#include "LoginService.h"
-#include <Scene/SceneMysqlComponent.h>
-#include <Scene/SceneRedisComponent.h>
+#include <Scene/MysqlComponent.h>
+#include <Scene/RedisComponent.h>
 
 namespace Sentry
 {
@@ -12,7 +12,7 @@ namespace Sentry
     {
 
 
-        return LocalService::Awake();
+        return LocalServiceComponent::Awake();
     }
 
     void LoginService::Start()

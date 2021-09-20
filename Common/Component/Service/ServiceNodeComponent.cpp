@@ -2,8 +2,8 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/SceneSessionComponent.h>
-#include <Scene/SceneProtocolComponent.h>
+#include <Scene/NetSessionComponent.h>
+#include <Scene/ProtocolComponent.h>
 namespace Sentry
 {
     bool ServiceNodeComponent::DelNode(int nodeId)
@@ -74,9 +74,9 @@ namespace Sentry
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-		SayNoAssertRetFalse_F(mProtocolComponent = Scene::GetComponent<SceneProtocolComponent>());
+		SayNoAssertRetFalse_F(mProtocolComponent = Scene::GetComponent<ProtocolComponent>());
         const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);       	
-		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("ServiceCenter");
+		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterComponent");
     }
 
 	void ServiceNodeComponent::OnSecondUpdate()

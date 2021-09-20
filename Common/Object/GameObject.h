@@ -19,10 +19,10 @@ namespace Sentry
 		bool AddComponent(const std::string name, Component * component);
 		
         template<typename T>
-        inline T *GetComponent();
+        inline T *GetComponent() const;
 
 		template<typename T>
-		inline T *GetComponent(const std::string & name);
+		inline T *GetComponent(const std::string & name) const;
 
         template<typename T>
         inline bool RemoveComponent();
@@ -34,7 +34,7 @@ namespace Sentry
 
     public:
 		void OnDestory() override;
-        void GetComponents(std::vector<Component *> & components);
+        void GetComponents(std::vector<Component *> & components) const;
     public:
 		inline const long long GetId() const { return this->mGameObjectId; }
         inline const std::string &GetAddress() { return this->mSessionAddress; }
@@ -45,7 +45,7 @@ namespace Sentry
         std::unordered_map<std::string, Component *> mComponentMap;
     };
     template<typename T>
-    inline T *GameObject::GetComponent()
+    inline T *GameObject::GetComponent() const
     {
 		Type * type = ComponentHelper::GetType<T>();
 		if (type == nullptr)
@@ -56,7 +56,7 @@ namespace Sentry
     }
 
 	template<typename T>
-	T * GameObject::GetComponent(const std::string & name)
+	T * GameObject::GetComponent(const std::string & name) const
 	{
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())

@@ -28,10 +28,10 @@
     "ThreadCount": 1,
     "CoroutinePoolMaxSize": 100,
     "Mysql": {
-        "ip": "101.36.127.23",
+        "ip": "127.0.0.1",
         "port": 3306,
-        "user": "yjz",
-        "passwd": "yjz199595",
+        "user": "root",
+        "passwd": "199595yjz.",
         "db": "player_db",
         "sql": "./sql/sql.json"
     },
@@ -52,18 +52,17 @@
         ]
     },
     "Scene": [
-        "SceneTaskComponent",
-        "SceneMysqlComponent",
-        "SceneRedisComponent",
-        "SceneListenComponent",
-        "SceneScriptComponent"
+        "TaskComponent",
+        "MysqlComponent",
+        "RedisComponent",
+        "ListenerComponent",
+        "LuaScriptComponent",
+        "LuaServiceMgrComponent"
     ],
-    "Service": [
-        "LuaServiceMgrComponent",
+    "Service": [     
         "MysqlProxy",
-        "ServiceCenter",
-        "LoginService",
-        "ClusterService"
+        "CenterComponent",
+        "ClusterComponent"
     ],
     "WhiteList": [
         "127.0.0.1"
