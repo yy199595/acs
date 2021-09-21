@@ -67,7 +67,7 @@ namespace Sentry
         for (size_t index = 0; index < services.size(); index++)
         {
             const std::string &name = services[index];
-			if (this->Scene.AddComponent(name) == false)
+			if (!this->Scene.AddComponent(name))
 			{
 				SayNoDebugFatal("add " << name << " to scene failure");
 				return false;
@@ -77,7 +77,7 @@ namespace Sentry
 		for (size_t index = 0; index < managers.size(); index++)
 		{
 			const std::string &name = managers[index];
-			if (this->Scene.AddComponent(name) == false)
+			if (!this->Scene.AddComponent(name))
 			{
 				SayNoDebugFatal("add " << name << " to service failure");
 				return false;
@@ -113,7 +113,7 @@ namespace Sentry
 
 	bool App::InitComponent(Component * component)
 	{
-		if (component->IsActive() == false || component->Awake() == false)
+		if (!component->IsActive() || !component->Awake())
 		{
 			SayNoDebugError("init " << component->GetTypeName() << " fail");
 			return false;
@@ -142,18 +142,14 @@ namespace Sentry
 	{
 	    auto func = std::bind(&App::NetworkLoop, this);
 	    this->mNetWorkThread = new std::thread(func);
-		if (this->mNetWorkThread != nullptr)
-		{
-			this->mMainThreadId = std::this_thread::get_id();
-			this->mNetWorkThreadId = this->mNetWorkThread->get_id();
-			this->mNetWorkThread->detach();
-			return true;
-		}
-		return false;
+        this->mMainThreadId = std::this_thread::get_id();
+        this->mNetWorkThreadId = this->mNetWorkThread->get_id();
+        this->mNetWorkThread->detach();
+        return true;
 	}
 
 	void App::StartComponent()
-	{		
+	{
 		for (size_t index = 0; index < this->mSceneComponents.size(); index++)
 		{
 			Component * component = this->mSceneComponents[index];
@@ -166,6 +162,7 @@ namespace Sentry
 			}
 		}
 		this->mIsInitComplate = true;
+        this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
 		SayNoDebugLog("start all scene component successful ......");	
 		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 		SayNoDebugLog("=====  start " << this->mServerName << " successful ["<< t / 1000.0f <<"s] ========");
@@ -214,7 +211,6 @@ namespace Sentry
         long long startTimer = TimeHelper::GetMilTimestamp();
         long long secondTimer = TimeHelper::GetMilTimestamp();
         this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
-        this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();   
        
 
         std::chrono::milliseconds time(1);
