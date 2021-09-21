@@ -10,7 +10,7 @@
 #define CoroutinePoolMaxCount 100    //协程池最大数量
 namespace Sentry
 {
-	class CoroutineComponent : public Component, public ISystemUpdate
+	class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate
 	{
 	public:
 		CoroutineComponent();
@@ -29,6 +29,10 @@ namespace Sentry
 
 		void Sleep(long long ms);
 
+		void YieldNextLoop();
+
+		void YieldNextFrame();
+
 		void Resume(unsigned int id);
 
 	protected:
@@ -38,10 +42,9 @@ namespace Sentry
 
 		void OnSystemUpdate() final;
 
+		void OnLastFrameUpdate() final;
+
 		int GetPriority() override { return 1; }
-	private:
-		void Loop();
-		void Loop2();
 
 	public:
 		long long GetNowTime();
@@ -66,7 +69,6 @@ namespace Sentry
 		{
 			return this->mCurrentCorId != 0;
 		}
-
 	private:
 		void ResumeCoroutine();
 #ifdef __COROUTINE_ASM__
@@ -77,6 +79,7 @@ namespace Sentry
 	private:
 		std::string mMessageBuffer;
 		class TimerComponent *mTimerManager;
+		std::queue<unsigned int> mLateUpdateCors;
 	private:
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;

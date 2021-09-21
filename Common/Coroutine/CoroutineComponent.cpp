@@ -59,17 +59,19 @@ namespace Sentry
     bool CoroutineComponent::Awake()
     {
 		SayNoAssertRetFalse_F(this->mTimerManager = Scene::GetComponent<TimerComponent>());
-		
+
         return true;
     }
 
     void CoroutineComponent::Start()
     {
-		for (int index = 0; index < 20; index++)
+		long long t1 = TimeHelper::GetMilTimestamp();
+		for (size_t index = 0; index < 10000000; index++)
 		{
-			this->StartCoroutine(&CoroutineComponent::Loop, this);
-			this->StartCoroutine(&CoroutineComponent::Loop2, this);
+			this->YieldNextLoop();
 		}
+		long long t2 = TimeHelper::GetMilTimestamp();
+		SayNoDebugLog("时间 = " << t2 - t1);
     }
 
     void CoroutineComponent::Sleep(long long ms)
@@ -82,6 +84,26 @@ namespace Sentry
             this->YieldReturn();
         }
     }
+
+	void CoroutineComponent::YieldNextLoop()
+	{
+		Coroutine *logicCoroutine = this->GetCoroutine();
+		if (logicCoroutine != nullptr)
+		{
+			this->mResumeCors.push(logicCoroutine->mCoroutineId);
+			this->YieldReturn();
+		}
+	}
+
+	void CoroutineComponent::YieldNextFrame()
+	{
+		Coroutine *logicCoroutine = this->GetCoroutine();
+		if (logicCoroutine != nullptr)
+		{
+			this->mLateUpdateCors.push(logicCoroutine->mCoroutineId);
+			this->YieldReturn();
+		}
+	}
 
 	void CoroutineComponent::ResumeCoroutine()
 	{
@@ -188,24 +210,6 @@ namespace Sentry
 		return 0;
 	}
 
-	void CoroutineComponent::Loop()
-	{
-		for (int index = 0; index < 10; index++)
-		{
-			SayNoDebugWarning(__FUNCTION__ << " " << __LINE__ << " index = " << index);
-			this->Sleep(1000);
-		}
-	}
-
-	void CoroutineComponent::Loop2()
-	{
-		for (int index = 0; index < 10; index++)
-		{
-			SayNoDebugError(__FUNCTION__ << " " << __LINE__ << " index = " << index);
-			this->Sleep(1000);
-		}
-	}
-
 	void CoroutineComponent::YieldReturn()
     {
         Coroutine *logicCoroutine = this->GetCoroutine();
@@ -270,6 +274,7 @@ namespace Sentry
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
+		SayNoDebugInfo("save stack size = " << cor->mStackSize);
 	}
 #else
     void CoroutineComponent::SaveStack(Coroutine *cor, char *top)
@@ -297,4 +302,14 @@ namespace Sentry
 		}
 		this->mCurrentCorId = 0;
     }
+	void CoroutineComponent::OnLastFrameUpdate()
+	{
+		while (!this->mLateUpdateCors.empty())
+		{
+			this->mCurrentCorId = this->mLateUpdateCors.front();
+			this->ResumeCoroutine();
+			this->mLateUpdateCors.pop();
+		}
+		this->mCurrentCorId = 0;
+	}
 }
