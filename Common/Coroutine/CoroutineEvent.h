@@ -1,9 +1,8 @@
 #pragma once
+#include<set>
 #include<queue>
 #include<vector>
 #include<functional>
-
-#define __COROUTINE_ASM__
 
 #ifdef __APPLE__
 #ifndef __COROUTINE_ASM__
@@ -39,5 +38,24 @@ namespace Sentry
 		unsigned int mId;
 		std::vector<Coroutine *> mAllCoroutine;
 		std::queue<unsigned int> mIdleCoroutines;
+	};
+}
+
+namespace Sentry
+{
+	class CoroutineComponent;
+	class CoroutineGroup
+	{
+	public:
+		CoroutineGroup(CoroutineComponent *);
+	public:
+		bool Add(unsigned int id);
+		bool Remove(unsigned int id);
+		void AwaitAll();
+	private:
+		bool mIsYield;
+		unsigned int mCoroutineId;
+		CoroutineComponent * mCorComponent;
+		std::set<unsigned int> mCoroutines;
 	};
 }

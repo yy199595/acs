@@ -35,6 +35,8 @@ namespace Sentry
 
 		void Resume(unsigned int id);
 
+		CoroutineGroup * NewCoroutineGroup();
+
 	protected:
 		bool Awake() final;
 
@@ -70,6 +72,7 @@ namespace Sentry
 			return this->mCurrentCorId != 0;
 		}
 	private:
+		void Loop();
 		void ResumeCoroutine();
 #ifdef __COROUTINE_ASM__
 		void SaveStack(Coroutine *);
@@ -91,5 +94,6 @@ namespace Sentry
 		char mSharedStack[STACK_SIZE];
 #endif
 		std::queue<unsigned int> mResumeCors;
+		std::list<CoroutineGroup *> mCoroutineGroups;
 	};
 }

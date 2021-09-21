@@ -1,7 +1,7 @@
 #include"CoroutineEvent.h"
 #include"CoroutineComponent.h"
 #include"Coroutine.h"
-
+#include<Core/App.h>
 namespace Sentry
 {
 	CoroutinePool::CoroutinePool(int count)
@@ -13,6 +13,9 @@ namespace Sentry
 			if (coroutine != nullptr)
 			{
 				coroutine->mCoroutineId = mId++;
+#ifdef __COROUTINE_ASM__
+				coroutine->sid = coroutine->mCoroutineId & 7;
+#endif
 				this->mAllCoroutine.push_back(coroutine);
 				this->mIdleCoroutines.push(coroutine->mCoroutineId);
 			}
@@ -35,9 +38,6 @@ namespace Sentry
 			unsigned int id = this->mIdleCoroutines.front();
 			this->mIdleCoroutines.pop();
 			Coroutine * coroutine = this->mAllCoroutine[id];
-#ifdef __COROUTINE_ASM__
-			coroutine->sid = id & 7;
-#endif
 			return coroutine;
 		}
 		else
@@ -46,6 +46,9 @@ namespace Sentry
 			if (coroutine != nullptr)
 			{
 				coroutine->mCoroutineId = mId++;
+#ifdef __COROUTINE_ASM__
+				coroutine->sid = coroutine->mCoroutineId & 7;
+#endif
 				coroutine->mState = CorState::Ready;
 				this->mAllCoroutine.push_back(coroutine);
 			}
@@ -75,5 +78,50 @@ namespace Sentry
 			return nullptr;
 		}
 		return this->mAllCoroutine[id];	
+	}
+	
+}
+
+namespace Sentry
+{
+	
+	CoroutineGroup::CoroutineGroup(CoroutineComponent * cor)
+	{
+		this->mIsYield = false;
+		this->mCorComponent = cor;
+		this->mCoroutineId = cor->GetCurrentCorId();
+	}
+
+	bool CoroutineGroup::Add(unsigned int id)
+	{
+		if (this->mIsYield == false)
+		{
+			this->mCoroutines.insert(id);
+			return true;
+		}
+		return false;
+	}
+	bool CoroutineGroup::Remove(unsigned int id)
+	{
+		auto iter = this->mCoroutines.find(id);
+		if (iter == this->mCoroutines.end())
+		{
+			return false;
+		}
+		this->mCoroutines.erase(iter);
+		if (this->mCoroutines.empty())
+		{
+			this->mCorComponent->Resume(this->mCoroutineId);
+			return true;
+		}
+		return false;
+	}
+	void CoroutineGroup::AwaitAll()
+	{
+		if (this->mIsYield == false)
+		{
+			this->mIsYield = true;
+			this->mCorComponent->YieldReturn();
+		}
 	}
 }

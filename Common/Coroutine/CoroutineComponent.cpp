@@ -66,13 +66,20 @@ namespace Sentry
     void CoroutineComponent::Start()
     {
 		long long t1 = TimeHelper::GetMilTimestamp();
-		for (size_t index = 0; index < 10000000; index++)
+		CoroutineGroup * group = this->NewCoroutineGroup();
+		for (size_t index = 0; index < 100000; index++)
 		{
-			this->YieldNextLoop();
+			group->Add(this->StartCoroutine(&CoroutineComponent::Loop, this));
 		}
+		group->AwaitAll();
 		long long t2 = TimeHelper::GetMilTimestamp();
-		SayNoDebugLog("时间 = " << t2 - t1);
+		SayNoDebugError("时间 = " << t2 - t1);
     }
+
+	void CoroutineComponent::Loop()
+	{
+		this->YieldNextLoop();
+	}
 
     void CoroutineComponent::Sleep(long long ms)
     {
@@ -187,6 +194,17 @@ namespace Sentry
 		this->mResumeCors.push(id);		
 	}
 
+	CoroutineGroup * CoroutineComponent::NewCoroutineGroup()
+	{
+		if (this->mCurrentCorId == 0)
+		{
+			return nullptr;
+		}
+		CoroutineGroup * group = new CoroutineGroup(this);
+		this->mCoroutineGroups.push_back(group);
+		return group;
+	}
+
 	unsigned int CoroutineComponent::StartCoroutine(MethodProxy * func)
 	{
 		Coroutine * coroutine = this->mCorPool.Pop();
@@ -251,6 +269,21 @@ namespace Sentry
 
 	void CoroutineComponent::Destory(Coroutine * coroutine)
 	{
+		unsigned int id = coroutine->mCoroutineId;
+		if (!this->mCoroutineGroups.empty())
+		{
+			auto iter = this->mCoroutineGroups.begin();
+			for (; iter != this->mCoroutineGroups.end(); iter++)
+			{
+				CoroutineGroup * group = (*iter);
+				if (group->Remove(id))
+				{
+					this->mCoroutineGroups.erase(iter);
+					delete group;
+					break;
+				}
+			}
+		}
 		this->mCurrentCorId = 0;
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
@@ -274,7 +307,7 @@ namespace Sentry
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
-		SayNoDebugInfo("save stack size = " << cor->mStackSize);
+		SayNoDebugInfo("asm save stack size = " << cor->mStackSize);
 	}
 #else
     void CoroutineComponent::SaveStack(Coroutine *cor, char *top)
@@ -288,7 +321,7 @@ namespace Sentry
 		}
 		cor->mStackSize = size;
 		memcpy(cor->mContextStack, &dummy, size);
-        
+		SayNoDebugInfo("context save stack size = " << cor->mStackSize);
     }
 #endif 
 

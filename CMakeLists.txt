@@ -62,7 +62,6 @@ option(BUILD_ALL "build all projects" OFF)
 option(BUILD_SERVER "build server projects" ON)
 option(BUILD_CLIENT "build client projects" ON)
 
-
 if(BUILD_ALL)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Server)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Client)
