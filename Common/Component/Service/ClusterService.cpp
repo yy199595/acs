@@ -1,4 +1,4 @@
-﻿#include "ClusterComponent.h"
+﻿#include "ClusterService.h"
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
@@ -8,10 +8,10 @@
 
 namespace Sentry
 {
-    bool ClusterComponent::Awake()
+    bool ClusterService::Awake()
     {      
-		__ADD_SERVICE_METHOD__(ClusterComponent::Add);
-		__ADD_SERVICE_METHOD__(ClusterComponent::Del);
+		__ADD_SERVICE_METHOD__(ClusterService::Add);
+		__ADD_SERVICE_METHOD__(ClusterService::Del);
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
@@ -19,7 +19,7 @@ namespace Sentry
 		return true;
     }
 
-	void ClusterComponent::Start()
+	void ClusterService::Start()
 	{
 		/*std::vector<Component *> components;
 		s2s::NodeRegister_Request registerInfo;
@@ -41,7 +41,7 @@ namespace Sentry
 		registerInfo.set_nodeid(this->mNodeId);
 		registerInfo.set_address(listenComponent->GetAddress());
 		registerInfo.set_servername(App::Get().GetServerName());
-		XCode code = centerNode->Invoke("CenterComponent", "Add", registerInfo);
+		XCode code = centerNode->Invoke("CenterService", "Add", registerInfo);
 		if (code != XCode::Successful)
 		{
 			SayNoDebugError("register local service node fail");
@@ -50,14 +50,14 @@ namespace Sentry
 		SayNoDebugLog("register all service to center successful");*/
 	}
 
-    XCode ClusterComponent::Del(const Int32Data &serviceData)
+    XCode ClusterService::Del(const Int32Data &serviceData)
     {
         const int nodeId = serviceData.data();
         bool res = this->mNodeComponent->DelNode(nodeId);
         return nodeId ? XCode::Successful : XCode::Failure;
     }
 
-    XCode ClusterComponent::Add(const s2s::NodeData_NodeInfo &nodeInfo)
+    XCode ClusterService::Add(const s2s::NodeData_NodeInfo &nodeInfo)
     {
         const int nodeId = nodeInfo.nodeid();
         ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(nodeId);

@@ -34,7 +34,9 @@ namespace Sentry
 		{
 			unsigned int id = this->mIdleCoroutines.front();
 			this->mIdleCoroutines.pop();
-			return this->mAllCoroutine[id];
+			Coroutine * coroutine = this->mAllCoroutine[id];
+			coroutine->sid = id & 7;
+			return coroutine;
 		}
 		else
 		{
@@ -63,7 +65,7 @@ namespace Sentry
 	}
 	Coroutine * CoroutinePool::Get(unsigned int id)
 	{
-		if (id > this->mAllCoroutine.size())
+		if (id >= this->mAllCoroutine.size())
 		{
 			return nullptr;
 		}

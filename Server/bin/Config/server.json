@@ -41,16 +41,7 @@
         "timeout": 3,
         "passwd": ""
     },
-    "ScriptPath":"./Script/",   
-    "Script": {      
-        "main": "./Script/Server/Main.lua",
-        "service":"./Script/Server/Service",
-        "include": [
-            "./Script/Common",
-            "./Script/Server",
-            "./Script/Server/Service"
-        ]
-    },
+    "ScriptPath":"./Script/",
     "Scene": [
         "TaskComponent",
         "MysqlComponent",
@@ -59,10 +50,10 @@
         "LuaScriptComponent",
         "LuaServiceMgrComponent"
     ],
-    "Service": [     
-        "MysqlProxy",
-        "CenterComponent",
-        "ClusterComponent"
+    "Service": [
+        "MysqlService",
+        "CenterService", 
+        "ClusterService"
     ],
     "WhiteList": [
         "127.0.0.1"

@@ -10,12 +10,12 @@ namespace Sentry
 
     class ServiceNodeComponent;
 
-    class ClusterComponent : public LocalServiceComponent
+    class ClusterService : public LocalServiceComponent
     {
     public:
-        ClusterComponent() {}
+        ClusterService() {}
 
-        ~ClusterComponent() {}
+        ~ClusterService() {}
 
     public:
         bool Awake() final;

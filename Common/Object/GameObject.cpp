@@ -48,6 +48,7 @@ namespace Sentry
 
 	void GameObject::GetComponents(std::vector<Component*>& components) const
 	{
+		components.clear();
 		auto iter = this->mComponentMap.begin();
 		for (; iter != this->mComponentMap.end(); iter++)
 		{

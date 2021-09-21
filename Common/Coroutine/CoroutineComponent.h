@@ -69,8 +69,11 @@ namespace Sentry
 
 	private:
 		void ResumeCoroutine();
+#ifdef __COROUTINE_ASM__
+		void SaveStack(Coroutine *);
+#else
 		void SaveStack(Coroutine *, char *top);
-
+#endif
 	private:
 		std::string mMessageBuffer;
 		class TimerComponent *mTimerManager;
@@ -78,7 +81,12 @@ namespace Sentry
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;
 		unsigned int mCurrentCorId;
+#ifdef __COROUTINE_ASM__
+		Stack * mSharedStack;
+#else
+		char * mTop;
 		char mSharedStack[STACK_SIZE];
+#endif
 		std::queue<unsigned int> mResumeCors;
 	};
 }

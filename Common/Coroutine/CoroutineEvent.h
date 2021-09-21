@@ -3,7 +3,7 @@
 #include<vector>
 #include<functional>
 
-//#define __COROUTINE_ASM__
+#define __COROUTINE_ASM__
 
 #ifdef __APPLE__
 #ifndef __COROUTINE_ASM__

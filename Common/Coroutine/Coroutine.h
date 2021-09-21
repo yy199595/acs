@@ -12,6 +12,8 @@ namespace Sentry
 
     class CoroutineComponent;
 
+	
+
     struct Coroutine
     {
     public:
@@ -20,9 +22,10 @@ namespace Sentry
     public:
         size_t mStackSize;
 		MethodProxy * mFunction;
-#ifdef __COROUTINE_ASM__	
-		char * mStack;
+#ifdef __COROUTINE_ASM__
+		int sid;
 		char * mStackTop;
+		std::string mStack;
 		tb_context_t mCorContext;
 #elif __linux__
 		void * mContextStack;
@@ -32,6 +35,14 @@ namespace Sentry
 #endif
         CorState mState;		
         long long mCoroutineId;
-        CoroutineComponent *mScheduler;
     };
+
+	struct Stack
+	{
+		char * p;
+		char * top;
+		Coroutine * co;
+	};
+	
+
 };

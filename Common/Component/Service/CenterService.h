@@ -29,12 +29,12 @@ namespace Sentry
     class TcpSessionListener;
 
     // 所有方法都注册到这里(全局唯一)
-    class CenterComponent : public LocalServiceComponent
+    class CenterService : public LocalServiceComponent
     {
     public:
-        CenterComponent();
+        CenterService();
 
-        ~CenterComponent() {}
+        ~CenterService() {}
 
     protected:
         bool Awake() final;

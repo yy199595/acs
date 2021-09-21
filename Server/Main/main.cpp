@@ -17,8 +17,8 @@
 #include <Scene/TaskComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/LoginService.h>
-#include <Service/ClusterComponent.h>
-#include <Service/CenterComponent.h>
+#include <Service/ClusterService.h>
+#include <Service/CenterService.h>
 
 #include <Service/MysqlService.h>
 using namespace Sentry;
@@ -44,8 +44,8 @@ int main(int argc, char **argv)
 	
 	__REGISTER_COMPONENT__(MysqlService);
 	__REGISTER_COMPONENT__(LoginService);
-	__REGISTER_COMPONENT__(CenterComponent);
-	__REGISTER_COMPONENT__(ClusterComponent);
+	__REGISTER_COMPONENT__(CenterService);
+	__REGISTER_COMPONENT__(ClusterService);
 	
     std::string serverName = argc == 3 ? argv[1] : "server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/";

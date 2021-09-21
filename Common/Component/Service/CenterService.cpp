@@ -1,27 +1,27 @@
-﻿#include "CenterComponent.h"
+﻿#include "CenterService.h"
 #include <Core/App.h>
 #include <Util/StringHelper.h>
 #include <Service/ServiceNode.h>
 
 namespace Sentry
 {
-    CenterComponent::CenterComponent()
+    CenterService::CenterService()
     {
     }
 
-	bool CenterComponent::Awake()
+	bool CenterService::Awake()
 	{
-		__ADD_SERVICE_METHOD__(CenterComponent::Add);
-		__ADD_SERVICE_METHOD__(CenterComponent::Query);
+		__ADD_SERVICE_METHOD__(CenterService::Add);
+		__ADD_SERVICE_METHOD__(CenterService::Query);
 		return LocalServiceComponent::Awake();
 	}
 
-    void CenterComponent::Start()
+    void CenterService::Start()
     {
 
     }
 
-    XCode CenterComponent::Add(const s2s::NodeRegister_Request &nodeInfo)
+    XCode CenterService::Add(const s2s::NodeRegister_Request &nodeInfo)
     {
         const int areaId = nodeInfo.areaid();
         const int nodeId = nodeInfo.nodeid();
@@ -51,7 +51,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode CenterComponent::Query(const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
+    XCode CenterService::Query(const com::Int32Data &areaData, s2s::NodeData_Array &nodeArray)
     {
         const int areaId = areaData.data();
         auto iter = this->mServiceNodeMap.begin();
@@ -68,7 +68,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    void CenterComponent::NoticeNode(int areaId)
+    void CenterService::NoticeNode(int areaId)
     {
         auto iter = this->mServiceNodeMap.begin();
         for (; iter != this->mServiceNodeMap.end(); iter++)
@@ -78,7 +78,7 @@ namespace Sentry
             if (serviceNode->GetAreaId() == areaId || serviceNode->GetAreaId() == 0)
             {
                 const s2s::NodeData_NodeInfo &nodeInfo = serviceNode->GetNodeMessage();
-                serviceNode->Notice("ClusterComponent", "AddNode", nodeInfo);
+                serviceNode->Notice("ClusterService", "AddNode", nodeInfo);
             }
         }
     }

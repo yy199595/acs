@@ -105,27 +105,9 @@ namespace Sentry
 				return false;
 			}
 		}
-		
-		//初始化servie组件
-		this->Scene.GetComponents(this->mSceneComponents);
-		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
-			[](Component * m1, Component * m2)->bool
-		{
-			return m1->GetPriority() < m2->GetPriority();
-		});
-
-		for(Component * component : mSceneComponents)
-		{
-			if (!this->InitComponent(component))
-			{
-				SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
-				return false;
-			}
-		}
 
 		SayNoAssertRetFalse_F(this->StartNetThread());
-		CoroutineComponent * pCoroutineManager = this->Scene.GetComponent<CoroutineComponent>();
-		pCoroutineManager->StartCoroutine(&App::StartComponent, this);
+		this->mCoroutienComponent->StartCoroutine(&App::StartComponent, this);
 		return true;
 	}
 

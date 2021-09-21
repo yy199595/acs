@@ -1,5 +1,5 @@
 {
-    "ServiceCenter": {
+    "CenterService": {
         "id": 100,
         "Add": {
             "id": 101,
@@ -22,7 +22,7 @@
             "request": "com.Int32Data"
         }
     },
-    "MysqlProxy": {
+    "MysqlService": {
         "id": 300,
         "Add": {
             "id": 301,
