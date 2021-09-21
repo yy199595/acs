@@ -54,6 +54,7 @@ namespace Sentry
 	{
 		if (coroutine != nullptr)
 		{
+			coroutine->mStack.clear();
 			if (coroutine->mFunction != nullptr)
 			{
 				delete coroutine->mFunction;

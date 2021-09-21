@@ -65,8 +65,11 @@ namespace Sentry
 
     void CoroutineComponent::Start()
     {
-		this->StartCoroutine(&CoroutineComponent::Loop, this);
-		this->StartCoroutine(&CoroutineComponent::Loop2, this);	
+		for (int index = 0; index < 20; index++)
+		{
+			this->StartCoroutine(&CoroutineComponent::Loop, this);
+			this->StartCoroutine(&CoroutineComponent::Loop2, this);
+		}
     }
 
     void CoroutineComponent::Sleep(long long ms)
@@ -187,7 +190,7 @@ namespace Sentry
 
 	void CoroutineComponent::Loop()
 	{
-		for (int index = 0; index < 1000; index++)
+		for (int index = 0; index < 10; index++)
 		{
 			SayNoDebugWarning(__FUNCTION__ << " " << __LINE__ << " index = " << index);
 			this->Sleep(1000);
@@ -196,7 +199,7 @@ namespace Sentry
 
 	void CoroutineComponent::Loop2()
 	{
-		for (int index = 0; index < 1000; index++)
+		for (int index = 0; index < 10; index++)
 		{
 			SayNoDebugError(__FUNCTION__ << " " << __LINE__ << " index = " << index);
 			this->Sleep(1000);
