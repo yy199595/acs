@@ -18,6 +18,8 @@ namespace Sentry
 #ifdef __COROUTINE_ASM__
 	void MainEntry(tb_context_from_t parame)
 	{
+		CoroutineComponent *pCoroutineMgr = App::Get().GetCoroutineComponent();
+		((Coroutine*)parame.priv)->mCorContext = parame.ctx;
 #else
 #if _WIN32
 	void __stdcall MainEntry(LPVOID manager)
@@ -28,9 +30,7 @@ namespace Sentry
 	{
 		CoroutineComponent *pCoroutineMgr = (CoroutineComponent *)manager;
 #endif
-#endif
-		CoroutineComponent *pCoroutineMgr = App::Get().GetCoroutineComponent();	
-		((Coroutine*)parame.priv)->mCorContext = parame.ctx;
+#endif		
 		Coroutine * logicCoroutine = pCoroutineMgr->GetCoroutine();
 		if (logicCoroutine != nullptr)
 		{

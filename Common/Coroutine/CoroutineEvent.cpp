@@ -35,7 +35,9 @@ namespace Sentry
 			unsigned int id = this->mIdleCoroutines.front();
 			this->mIdleCoroutines.pop();
 			Coroutine * coroutine = this->mAllCoroutine[id];
+#ifdef __COROUTINE_ASM__
 			coroutine->sid = id & 7;
+#endif
 			return coroutine;
 		}
 		else
@@ -54,7 +56,9 @@ namespace Sentry
 	{
 		if (coroutine != nullptr)
 		{
+#ifdef __COROUTINE_ASM__
 			coroutine->mStack.clear();
+#endif
 			if (coroutine->mFunction != nullptr)
 			{
 				delete coroutine->mFunction;
