@@ -78,6 +78,7 @@ namespace Sentry
 				}
 			}
 		}
+        return true;
 	}
 	
     void LuaScriptComponent::OnDestory()
