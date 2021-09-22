@@ -31,8 +31,13 @@ LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
 SET(CMAKE_BUILD_TYPE Debug)
 list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
 
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    message("使用ccache缓存")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif ()
+
 if(MSVC)
-    message("currentdir = " ${PROJECT_SOURCE_DIR} " last dir = " ${PROJECT_INIT_PATH})
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     
     foreach(file_name ${CommonFiles})

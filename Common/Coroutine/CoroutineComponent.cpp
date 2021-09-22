@@ -321,7 +321,7 @@ namespace Sentry
 		}
 		cor->mStackSize = size;
 		memcpy(cor->mContextStack, &dummy, size);
-		SayNoDebugInfo("context save stack size = " << cor->mStackSize);
+		//SayNoDebugInfo("context save stack size = " << cor->mStackSize);
     }
 #endif 
 
