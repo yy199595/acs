@@ -100,12 +100,12 @@ namespace Sentry
 				this->StartClose();
 				SayNoDebugWarning("Connect " << this->GetSessionName()
 					<< " fail count = " << this->mConnectCount << " error : "<< error_code.message());
-				this->mDispatchManager->OnConnectComplate(this, false);
+                this->mDispatchManager->OnConnectComplete(this, false);
 			}
 			else
 			{
 				this->mConnectCount = 0;
-				this->mDispatchManager->OnConnectComplate(this, true);
+                this->mDispatchManager->OnConnectComplete(this, true);
 			}
 		});
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);

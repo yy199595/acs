@@ -6,8 +6,6 @@
 #include<Util/NumberHelper.h>
 #include<Timer/TimerComponent.h>
 #include<Timer/CorSleepTimer.h>
-#include<NetWork/NetWorkRetAction.h>
-
 
 using namespace std::chrono;
 #ifdef _WIN32
@@ -67,7 +65,7 @@ namespace Sentry
     {
 		long long t1 = TimeHelper::GetMilTimestamp();
 		CoroutineGroup * group = this->NewCoroutineGroup();
-		for (size_t index = 0; index < 100000; index++)
+		for (size_t index = 0; index < 1000000; index++)
 		{
 			group->Add(this->StartCoroutine(&CoroutineComponent::Loop, this));
 		}
@@ -78,7 +76,9 @@ namespace Sentry
 
 	void CoroutineComponent::Loop()
 	{
-		this->YieldNextLoop();
+        for (int i = 0; i < 100; ++i) {
+            this->YieldNextLoop();
+        }
 	}
 
     void CoroutineComponent::Sleep(long long ms)
@@ -307,7 +307,6 @@ namespace Sentry
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
-		SayNoDebugInfo("asm save stack size = " << cor->mStackSize);
 	}
 #else
     void CoroutineComponent::SaveStack(Coroutine *cor, char *top)
@@ -321,7 +320,6 @@ namespace Sentry
 		}
 		cor->mStackSize = size;
 		memcpy(cor->mContextStack, &dummy, size);
-		//SayNoDebugInfo("context save stack size = " << cor->mStackSize);
     }
 #endif 
 

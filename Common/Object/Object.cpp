@@ -1,7 +1,5 @@
 #include"Object.h"
-#include<Core/App.h>
 #include<Util/NumberHelper.h>
-#include<Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
@@ -17,7 +15,7 @@ namespace Sentry
 
     bool Object::Init(const std::string &name)
     {
-        if (this->mIsActive == false)
+        if (!this->mIsActive)
         {
             this->SetActive(true);
             this->mClassName = name;

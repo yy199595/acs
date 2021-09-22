@@ -7,7 +7,6 @@
 #include<functional>
 #include"Coroutine.h"
 #include<Component/Component.h>
-#define CoroutinePoolMaxCount 100    //协程池最大数量
 namespace Sentry
 {
 	class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate

@@ -1,5 +1,4 @@
 #include "GameObject.h"
-#include <Core/App.h>
 #include <Define/CommonDef.h>
 #include <Component/Component.h>
 namespace Sentry

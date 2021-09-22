@@ -2,23 +2,23 @@
 // Created by 64658 on 2021/8/5.
 //
 
-#include "SceneHttpComponent.h"
+#include "HttpClientComponent.h"
 #include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
 {
-    bool SceneHttpComponent::Awake()
+    bool HttpClientComponent::Awake()
     {
       
       return true;
     }
 
-    void SceneHttpComponent::OnSystemUpdate()
+    void HttpClientComponent::OnSystemUpdate()
     {
 
     }
 
-    XCode SceneHttpComponent::Get(const std::string &url, std::string &json, int timeout)
+    XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
       if (this->mCorComponent->IsInMainCoroutine())
       {

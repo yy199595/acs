@@ -49,7 +49,7 @@ namespace Sentry
         return this->mNetManager->PushEventHandler(handler);
     }
 
-	void TcpProxySession::StartColse()
+	void TcpProxySession::StartClose()
 	{
 		MainSocketCloseHandler * handler = new MainSocketCloseHandler(mAddress);
 		this->mNetManager->PushEventHandler(handler);

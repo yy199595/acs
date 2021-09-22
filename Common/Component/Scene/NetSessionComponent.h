@@ -23,7 +23,7 @@ namespace Sentry
 		{}
 
 	public: //网络线程调用
-		void OnConnectComplate(TcpClientSession *session, bool isSuc);
+		void OnConnectComplete(TcpClientSession *session, bool isSuc);
 
 		void OnSessionError(TcpClientSession *session);
 

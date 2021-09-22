@@ -18,43 +18,6 @@
 
 using namespace std;
 
-template<typename Key, typename Value>
-using SayNoMap = std::map<Key, Value>;
-
-template<typename Key, typename Value>
-using SayNoHashMap = std::unordered_map<Key, Value>;
-
-template<typename Key, typename Value>
-using SayNoHashMultiMap = std::multimap<Key, Value>;
-
-template<typename Key, typename Value>
-using SayNoPair = std::pair<Key, Value>;
-
-template<typename Value>
-using SayNoArray = std::vector<Value>;
-
-template<typename Value>
-using SayNoList = std::list<Value>;
-
-template<typename Value>
-using SayNoQueue = std::queue<Value>;
-
-template<typename Value>
-using SayNoThreadQueue = MultiThread::ConcurrentQueue<Value>;
-
-template<typename Value>
-using SayNoSet = std::set<Value>;
-
-using SayNoAction = std::function<void(void)>;
-
-template<typename Object>
-using SayNoWeakPtr = std::weak_ptr<Object>;
-
-typedef std::string SayNoString;
-
-
-
-
 typedef int int32;
 typedef long long int64;
 typedef unsigned int uint32;

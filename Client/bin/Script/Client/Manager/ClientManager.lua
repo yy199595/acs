@@ -2,7 +2,7 @@ require "Coroutine"
 ClientManager = {}
 local this = ClientManager
 
-function ClientManager.OnConnectComplate(tcpSession)
+function ClientManager.OnConnectComplete(tcpSession)
     SoEasy.Error(tcpSession, SoEasy.CallBySession)
     local cor = coroutine.create(this.Start)
     coroutine.resume(cor, tcpSession)

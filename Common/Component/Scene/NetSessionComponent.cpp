@@ -3,7 +3,6 @@
 #include <Core/App.h>
 #include "ActionComponent.h"
 #include "LuaScriptComponent.h"
-#include "ListenerComponent.h"
 #include "NetProxyComponent.h"
 #include <Util/StringHelper.h>
 #include <NetWork/TcpClientSession.h>
@@ -21,7 +20,7 @@ namespace Sentry
         return true;
     }
 
-    void NetSessionComponent::OnConnectComplate(TcpClientSession *session, bool isSuc)
+    void NetSessionComponent::OnConnectComplete(TcpClientSession *session, bool isSuc)
     {
         const std::string &address = session->GetAddress();
 		if (isSuc)

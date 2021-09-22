@@ -32,14 +32,14 @@ namespace Sentry
 
 	private:
 		std::queue<T> mReadQueue;
-		std::queue<T> mWrterQueue;
+		std::queue<T> mWriteQueue;
 	};
 
 	template<typename T>
 	inline void DoubleBufferQueue<T>::Add(const T &item)
 	{
 		mLock.lock();
-		mWrterQueue.emplace(item);
+		mWriteQueue.emplace(item);
 		mLock.unlock();
 	}
 
@@ -49,7 +49,7 @@ namespace Sentry
 		mLock.lock();
 		for (auto iter = items.begin(); iter != items.end(); iter++)
 		{
-			mWrterQueue.emplace(*iter);
+			mWriteQueue.emplace(*iter);
 		}
 		items.clear();
 		mLock.unlock();
@@ -61,7 +61,7 @@ namespace Sentry
 		mLock.lock();
 		for (size_t index = 0; index < items.size(); index++)
 		{
-			mWrterQueue.emplace(items[index]);
+			mWriteQueue.emplace(items[index]);
 		}
 		items.clear();
 		mLock.unlock();
@@ -73,7 +73,7 @@ namespace Sentry
 		mLock.lock();
 		while (!item.empty())
 		{
-			mWrterQueue.emplace(item.front());
+			mWriteQueue.emplace(item.front());
 			item.pop();
 		}
 		mLock.unlock();
@@ -82,10 +82,10 @@ namespace Sentry
 	template<typename T>
 	inline void DoubleBufferQueue<T>::SwapQueueData()
 	{
-		if (!this->mWrterQueue.empty() && this->mReadQueue.empty())
+		if (!this->mWriteQueue.empty() && this->mReadQueue.empty())
 		{
 			std::lock_guard<std::mutex> lock(this->mLock);
-			this->mReadQueue.swap(this->mWrterQueue);
+			this->mReadQueue.swap(this->mWriteQueue);
 		}
 	}
 

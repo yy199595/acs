@@ -77,16 +77,4 @@ inline std::string FromatFileLine(const char * file, const int line)
 
 #define SayNoDebugLogProtocBuf(msg) { std::string str; ProtocHelper::GetJsonString(msg, str); SayNoDebugLog(str);}
 
-#define BIND_ACTION_0(func, obj) std::bind(&func, obj)
-#define BIND_ACTION_1(func, obj) std::bind(&func, obj, args1)
-#define BIND_ACTION_2(func, obj) std::bind(&func, obj, args1, args2)
-#define BIND_ACTION_3(func, obj) std::bind(&func, obj, args1, args2, args3)
-#define BIND_ACTION_4(func, obj) std::bind(&func, obj, args1, args2, args3, args4)
-
-#define BIND_THIS_ACTION_0(func) std::bind(&func, this)
-#define BIND_THIS_ACTION_1(func) std::bind(&func, this, args1)
-#define BIND_THIS_ACTION_2(func) std::bind(&func, this, args1, args2)
-#define BIND_THIS_ACTION_3(func) std::bind(&func, this, args1, args2, args3)
-#define BIND_THIS_ACTION_4(func) std::bind(&func, this, args1, args2, args3, args4)
-
 #define SOEASY_DEBUG

@@ -4,12 +4,12 @@
 #include <Component/Component.h>
 namespace Sentry
 {
-    class SceneHttpComponent : public Component, public ISystemUpdate
+    class HttpClientComponent : public Component, public ISystemUpdate
     {
     public:
-        SceneHttpComponent() {}
+        HttpClientComponent() {}
 
-        ~SceneHttpComponent() {}
+        ~HttpClientComponent() {}
 
     public:
         bool Awake() final;

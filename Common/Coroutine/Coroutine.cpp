@@ -1,6 +1,4 @@
 #include"Coroutine.h"
-#include<memory.h>
-#include"CoroutineComponent.h"
 
 #ifdef _WIN32
 #include<Windows.h>

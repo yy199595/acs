@@ -1,6 +1,5 @@
 ﻿#include"LuaScriptComponent.h"
 #include<Script/luadebug.h>
-#include"NetSessionComponent.h"
 #include<Script/luaExtension.h>
 #include<Script/SystemExtension.h>
 #include<Script/LuaProtocExtension.h>

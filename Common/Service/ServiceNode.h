@@ -61,9 +61,7 @@ namespace Sentry
         class CoroutineComponent *mCorComponent;//协程
 		class TcpProxySession * mTcpSession;
         class ActionComponent *mActionManager;
-        //class NetProxyComponent *mNetWorkManager;
         s2s::NodeData_NodeInfo mNodeInfoMessage;
-        ServiceNodeComponent *mServiceNodeManager;
 		std::queue<PacketMapper *> mNodeMessageQueue;
     };
 }// namespace Sentry

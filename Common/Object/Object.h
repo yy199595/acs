@@ -29,7 +29,7 @@ namespace Sentry
 
         virtual bool IsComponent() { return false; }
 
-        virtual bool IsGameObejct() { return false; }
+        virtual bool IsGameObject() { return false; }
 
         virtual void OnDestory() {}
 

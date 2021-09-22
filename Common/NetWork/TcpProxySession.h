@@ -27,7 +27,7 @@ namespace Sentry
         int GetConnectCount() { return this->mConnectCount; }
 
     public:
-		void StartColse();
+		void StartClose();
 
         void StartConnect();
 		void SetActive(bool active);

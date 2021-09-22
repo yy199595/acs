@@ -20,7 +20,7 @@ namespace Sentry
         bool Awake() final;
 		void Start() final;
 		bool IsLuaService() final { return true; };
-		const std::string &GetServiceName()final { return this->GetTypeName(); } //TODO
+		const std::string &GetServiceName()final { return this->mServiceName; }
         
     private:
 		int mIdx;

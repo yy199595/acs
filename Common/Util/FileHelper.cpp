@@ -11,14 +11,6 @@ namespace FileHelper
 {
     bool FileIsExist(const std::string path)
     {
-        /*std::fstream fs;
-		fs.open(path, std::ios::in);
-		if (fs.is_open())
-		{
-			fs.close();
-			return true;
-		}
-		return false;*/
 #ifdef _WIN32
         return _access(path.c_str(), 0) == 0;
 #else

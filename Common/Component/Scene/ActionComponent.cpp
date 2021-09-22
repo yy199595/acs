@@ -1,5 +1,4 @@
 ﻿#include"ActionComponent.h"
-#include"NetSessionComponent.h"
 #include<Util/StringHelper.h>
 #include<Core/App.h>
 #include<Util/NumberHelper.h>
