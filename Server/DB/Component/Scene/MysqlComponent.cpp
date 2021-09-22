@@ -102,47 +102,6 @@ namespace Sentry
 
     void MysqlComponent::Start()
     {
-        /*this->mCorComponent->Start("MysqlService", [this]()
-            {
-                ServiceMgrComponent * serviceManager = this->GetManager<ServiceMgrComponent>();
-
-                LocalServiceComponent * mysqlService = serviceManager->GetLocalService("MysqlService");
-
-                MysqlService * mysqlProxy = (MysqlService *)mysqlService;
-
-                s2s::MysqlOper_Request requestData;
-                s2s::MysqlOper_Response responseData;
-
-                db::UserAccountData userData;
-                userData.set_userid(13716061995);
-                for (int index = 0; index < 10; index++)
-                {
-                    userData.set_phonenum(15510561831 + index);
-                    userData.set_passwd("0x0x0x0x0x0x0x0x0x0x0x");
-                    userData.set_token(TimeHelper::GetDateString());
-                    userData.set_registertime(TimeHelper::GetSecTimeStamp());
-
-                    userData.set_account(std::to_string((646585122 + index)) + "@qq.com");
-
-                    requestData.set_protocolname(userData.GetTypeName());
-                    requestData.set_protocolmessage(userData.SerializeAsString());
-
-                    XCode code = mysqlProxy->Add(0, requestData, responseData);
-                    SayNoDebugError("code = " << code);
-                }
-
-                userData.Clear();
-                userData.set_userid(13716061995);
-
-                s2s::MysqlQuery_Request queryRequest;
-                s2s::MysqlQuery_Response queryResponse;
-                queryRequest.set_protocolname(userData.GetTypeName());
-                queryRequest.set_protocolmessage(userData.SerializeAsString());
-
-                mysqlProxy->QueryData(0, queryRequest, queryResponse);
-            });*/
-
-
 
     }
 
@@ -481,7 +440,7 @@ namespace Sentry
         return true;
     }
 
-    bool MysqlComponent::GetDeleleSqlCommand(const Message &messageData, std::string &sqlCommand)
+    bool MysqlComponent::GetDeleteSqlCommand(const Message &messageData, std::string &sqlCommand)
     {
         std::string tableName;
         const std::string typeName = messageData.GetTypeName();

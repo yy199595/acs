@@ -32,6 +32,7 @@ namespace Sentry
 	public:
 		Coroutine * Pop();
 		void Push(Coroutine * coroutine);
+        size_t GetCorCount() { return this->mAllCoroutine.size();}
 	public:
 		Coroutine * Get(unsigned int id);
 	private:

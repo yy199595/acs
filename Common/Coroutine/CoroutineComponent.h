@@ -9,7 +9,7 @@
 #include<Component/Component.h>
 namespace Sentry
 {
-	class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate
+    class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
 	{
 	public:
 		CoroutineComponent();
@@ -44,6 +44,8 @@ namespace Sentry
 		void OnSystemUpdate() final;
 
 		void OnLastFrameUpdate() final;
+
+        void OnSecondUpdate() final;
 
 		int GetPriority() override { return 1; }
 

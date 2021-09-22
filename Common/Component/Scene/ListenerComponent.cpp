@@ -14,7 +14,6 @@ namespace Sentry
         {
             return;
         }
-        SayNoDebugWarning("start listen " << this->mListenAddress);
         SharedTcpSocket tcpSocket = std::make_shared<AsioTcpSocket>(io);
         this->mBindAcceptor->async_accept(*tcpSocket, [this, tcpSocket](const asio::error_code &code) {
             if (!code)

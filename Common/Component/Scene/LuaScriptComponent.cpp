@@ -50,7 +50,7 @@ namespace Sentry
 		SayNoAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
 
 		std::vector<std::string> luaFiles;
-		DirectoryHelper::GetFilePaths(luaDir, luaFiles);
+		DirectoryHelper::GetFilePaths(luaDir, "*.lua",luaFiles);
 
 		std::string dir, name, luaFile;
 		for (std::string & path : luaFiles)
@@ -154,7 +154,7 @@ namespace Sentry
             lua_pop(mLuaEnv, 2);
 			return true;
         }
-        SayNoDebugError("load lua script failure : " << lua_tostring(mLuaEnv, -1));
+        SayNoDebugError("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }
@@ -170,7 +170,7 @@ namespace Sentry
     void LuaScriptComponent::AddRequirePath(const std::string path)
     {
 		std::vector<std::string> luaFiles;
-		if (DirectoryHelper::GetFilePaths(path, luaFiles))
+		if (DirectoryHelper::GetFilePaths(path, "*.lua",luaFiles))
 		{
 			for (std::string & file : luaFiles)
 			{
@@ -214,9 +214,12 @@ namespace Sentry
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "GetManager", SystemExtension::GetManager);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CreateByTable",
-                                                      LuaProtocExtension::CreateByTable);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CreateByTable",LuaProtocExtension::CreateByTable);
 
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Debug", LuaAPIExtension::DebugLog);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry","Warning",LuaAPIExtension::DebugWarning);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"Sentry","Error",LuaAPIExtension::DebugError);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"Sentry","Info", LuaAPIExtension::DebugInfo);
     }
 
     void LuaScriptComponent::OnPushGlobalObject()

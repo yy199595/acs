@@ -57,7 +57,7 @@ namespace Sentry
 
         bool GetQuerySqlCommand(const Message &messageData, std::string &sqlCommand);
 
-        bool GetDeleleSqlCommand(const Message &messageData, std::string &sqlCommand);
+        bool GetDeleteSqlCommand(const Message &messageData, std::string &sqlCommand);
 
     protected:
         bool Awake() final;

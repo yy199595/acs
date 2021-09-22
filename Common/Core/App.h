@@ -124,8 +124,6 @@ namespace Sentry
 		std::string mServerName;
 		long long mLastUpdateTime;
 		long long mLastSystemTime;
-		class LogHelper *mLogHelper;
-		
 		std::string mConfigDir;
 
 	private:

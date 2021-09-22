@@ -65,7 +65,7 @@ namespace Sentry
     {
 		long long t1 = TimeHelper::GetMilTimestamp();
 		CoroutineGroup * group = this->NewCoroutineGroup();
-		for (size_t index = 0; index < 1000000; index++)
+		for (size_t index = 0; index < 100000; index++)
 		{
 			group->Add(this->StartCoroutine(&CoroutineComponent::Loop, this));
 		}
@@ -343,4 +343,21 @@ namespace Sentry
 		}
 		this->mCurrentCorId = 0;
 	}
+
+    void CoroutineComponent::OnSecondUpdate() {
+
+//        size_t index = 1;
+//        long long size = 0;
+//        Coroutine * cor = mCorPool.Get(index);
+//
+//        while(cor != nullptr)
+//        {
+//            index++;
+//            size += cor->mStack.capacity();
+//            cor = mCorPool.Get(index);
+//        }
+//        double memory = size / 1024.0f /1024.0f;
+//        SayNoDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+//         << "平均使用内存 ：" << size / mCorPool.GetCorCount());
+    }
 }

@@ -30,7 +30,7 @@ namespace Sentry
 		this->mConfigDir = cfgDir;
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*mAsioContext);
-		this->mLogHelper = new LogHelper("./Logs", srvName);
+		LogHelper::Init("./Logs", srvName);
 	}
 
     bool App::LoadComponent()
@@ -181,7 +181,7 @@ namespace Sentry
     {
         this->mIsClose = true;
 		this->Scene.OnDestory();
-        this->mLogHelper->DropLog();
+        spdlog::drop_all();
 #ifdef _WIN32
         return getchar();
 #endif
@@ -281,7 +281,7 @@ namespace Sentry
         sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
         SetConsoleTitle(buffer);
 #else
-        SayNoDebugInfo("fps = " << this->mLogicFps);
+        //SayNoDebugInfo("fps = " << this->mLogicFps);
 #endif
     }
 }// namespace Sentry

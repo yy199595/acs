@@ -117,7 +117,7 @@ namespace Sentry
 			return XCode::ParseMessageError;
 		}
         std::string sql;
-        if (!this->mMysqlManager->GetDeleleSqlCommand(*message, sql))
+        if (!this->mMysqlManager->GetDeleteSqlCommand(*message, sql))
         {
             return XCode::CallArgsError;
         }
