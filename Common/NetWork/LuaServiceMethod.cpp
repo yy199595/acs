@@ -16,7 +16,57 @@ namespace Sentry
 		SayNoAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
-	XCode LuaServiceMethod::Invoke(PacketMapper *messageData)
+    XCode LuaServiceMethod::Invoke(PacketMapper *messageData)
+    {
+        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, mIdx);
+        luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+        lua_pushinteger(this->mLuaEnv, messageData->GetUserId());
+        const ProtocolConfig * config = messageData->GetProConfig();
+        if(!messageData->GetMsgBody().empty())
+        {
+            int ref = this->mScriptComponent->GetLuaRef("Json", "ToObject");
+            lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+            luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+
+            const std::string & data = messageData->GetMsgBody();
+            if(!config->Request.empty())
+            {
+                Message * message = MessagePool::NewByData(config->Request, data);
+                if(message == nullptr)
+                {
+                    return XCode::ParseMessageError;
+                }
+                string json = "";
+                if(!util::MessageToJsonString(*message, &json).ok())
+                {
+                    return XCode::ProtocbufCastJsonFail;
+                }
+                lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+            }
+            else
+            {
+                lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
+            }
+            if(lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
+            {
+                SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+                return XCode::CallLuaFunctionFail;
+            }
+            lua_remove(this->mLuaEnv, -2);
+        }
+
+        if(lua_pcall(this->mLuaEnv, 2,2,0) !=0)
+        {
+            SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+            return XCode::CallLuaFunctionFail;
+        }
+        lua_tointeger(this->mLuaEnv, -2);
+
+
+        return XCode::Successful;
+    }
+
+	XCode LuaServiceMethod::AsyncInvoke(PacketMapper *message)
 	{
 		lua_State *coroutine = lua_newthread(this->mLuaEnv);
 		int ref = this->mScriptComponent->GetLuaRef("Service", "Invoke");
@@ -33,10 +83,10 @@ namespace Sentry
 		lua_pushlightuserdata(coroutine, messageData);
 		lua_pushinteger(coroutine, messageData->GetUserId());
 		const ProtocolConfig * protocolConfig = messageData->GetProConfig();
-		if (!protocolConfig->RequestMsgName.empty())
+		if (!protocolConfig->Request.empty())
 		{		
 			const std::string & data = messageData->GetMsgBody();
-			const std::string & name = protocolConfig->RequestMsgName;
+			const std::string & name = protocolConfig->Request;
 			
 			Message * message = MessagePool::NewByData(name, data);
 			if (message == nullptr)
@@ -76,7 +126,7 @@ namespace Sentry
 		{
 			size_t size = 0;
 			const char * json = lua_tolstring(lua, 3, &size);
-			const std::string & responseName = responseData->GetProConfig()->ResponseMsgName;
+			const std::string & responseName = responseData->GetProConfig()->Response;
 			Message * message = MessagePool::NewByJson(responseName, json, size);
 			if (message != nullptr)
 			{

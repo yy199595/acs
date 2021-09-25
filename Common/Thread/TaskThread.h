@@ -20,11 +20,9 @@ namespace Sentry
     class TaskThread
     {
     public:
-        TaskThread(TaskComponent *taskManaer, int index);
+        TaskThread(TaskComponent *taskComponent, int index);
 
     public:
-        void WaitToNextWake();
-
         void AddTask(TaskProxy * task);
 
         ThreadState GetTaskState() { return this->mTaskState; }
@@ -36,15 +34,14 @@ namespace Sentry
         void Run();
 
     private:
-        int mThreadIndex;
-		
+        bool mIsStop;
         std::mutex mThreadLock;
         ThreadState mTaskState;
-        std::thread *mBindThread;
+        std::thread mBindThread;
         TaskComponent *mTaskManager;
 		std::thread::id mThreadId;
 		std::queue<unsigned int> mFinishTasks;
-        std::condition_variable mThreadVarible;
+        std::condition_variable mThreadVariable;
         DoubleBufferQueue<TaskProxy *> mWaitInvokeTask;
     };
 }// namespace Sentry

@@ -50,7 +50,7 @@ namespace Sentry
 		memset(this->mBuffer, 0, 100);
 		const ProtocolConfig *config = messageData->GetProConfig();
 		float t = (TimeHelper::GetMilTimestamp() - iter->second->GetCreateTime()) / 1000.0f;
-		SayNoDebugLog("call " << config->ServiceName << "." << config->MethodName << "  response [elapsed time = ]" << t);
+		SayNoDebugLog("call " << config->Service << "." << config->Method << "  response [elapsed time = ]" << t);
 #endif
 
 		this->mNumberPool.Push(rpcId);

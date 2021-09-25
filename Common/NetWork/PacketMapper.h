@@ -40,8 +40,8 @@ namespace Sentry
 	public:
 		const std::string &GetAddress() { return this->mAddress; }
 		const std::string &GetMsgBody() { return this->mMessageData; }
-		const std::string &GetMethd() { return this->mProConfig->MethodName; }
-		const std::string &GetService() { return this->mProConfig->ServiceName; }
+		const std::string &GetMethd() { return this->mProConfig->Method; }
+		const std::string &GetService() { return this->mProConfig->Service; }
 		const ProtocolConfig * GetProConfig() { return this->mProConfig; }
 	public:
 		bool SetCode(XCode code);

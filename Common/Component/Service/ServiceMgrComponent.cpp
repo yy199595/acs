@@ -23,6 +23,7 @@ namespace Sentry
 	bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
 	{
 		const std::string & service = messageData->GetService();
+        const ProtocolConfig * config = messageData->GetProConfig();
 		ServiceComponent * localService = this->gameObject->GetComponent<ServiceComponent>(service);
 		if (localService == nullptr)
 		{
@@ -36,13 +37,21 @@ namespace Sentry
 			return false;
 			SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
 		}
-		if (method->IsLuaMethod())
-		{
-			method->Invoke(messageData);
-			return true;
-		}
-		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
-		return true;
+        if(config->Async) //异步调用
+        {
+            if (method->IsLuaMethod())
+            {
+                method->Invoke(messageData);
+                return true;
+            }
+            this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
+            return true;
+        }
+        //同步调用
+        if(method->IsLuaMethod())
+        {
+
+        }
 	}
 	
 	std::string ServiceMgrComponent::GetJson(PacketMapper * messageData)
@@ -50,10 +59,10 @@ namespace Sentry
 		RapidJsonWriter jsonWriter;
 		jsonWriter.AddParameter("rpcid", messageData->GetRpcId());
 		jsonWriter.AddParameter("userid", messageData->GetUserId());
-		jsonWriter.AddParameter("method", messageData->GetProConfig()->ServiceName
-			+ "." + messageData->GetProConfig()->MethodName);
+		jsonWriter.AddParameter("method", messageData->GetProConfig()->Service
+			+ "." + messageData->GetProConfig()->Method);
 		const std::string & name = messageData->GetMessageType() < REQUEST_END
-			? messageData->GetProConfig()->RequestMsgName : messageData->GetProConfig()->ResponseMsgName;
+                                   ? messageData->GetProConfig()->Request : messageData->GetProConfig()->Response;
 	
 		const std::string & data = messageData->GetMsgBody();
 		if (!name.empty() && !data.empty())

@@ -175,7 +175,7 @@ namespace Sentry
 	size_t PacketMapper::GetPackageSize()
 	{
 		size_t size = sizeof(char);
-		size += sizeof(this->mProConfig->MethodId);
+		size += sizeof(this->mProConfig->Id);
 		size += this->mRpcId == 0 ? 0 : sizeof(this->mRpcId);
 		size += this->mUserId == 0 ? 0 : sizeof(this->mUserId);
 		size += this->mMessageData.size();
@@ -201,9 +201,9 @@ namespace Sentry
 		size_t offset = sizeof(unsigned int);
 		unsigned char type = (unsigned char)this->mMsgType;  
 		memcpy(buffer + offset, &type, sizeof(type)); offset += sizeof(type);
-		memcpy(buffer + offset, &mProConfig->MethodId, sizeof(this->mProConfig->MethodId));
+		memcpy(buffer + offset, &mProConfig->Id, sizeof(this->mProConfig->Id));
 
-		offset += sizeof(this->mProConfig->MethodId);
+		offset += sizeof(this->mProConfig->Id);
 
 		if (this->mMsgType > REQUEST_END)
 		{

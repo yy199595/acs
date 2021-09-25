@@ -77,7 +77,7 @@ int SystemExtension::Call(lua_State *lua)
 
 		size_t size = 0;
 		const char * json = lua_tolstring(lua, -1, &size);
-		Message * message = MessagePool::NewByJson(config->RequestMsgName, json, size);
+		Message * message = MessagePool::NewByJson(config->Request, json, size);
 		if (message != nullptr)
 		{
 			if (!packetMapper->SetMessage(message))

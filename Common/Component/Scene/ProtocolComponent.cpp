@@ -35,45 +35,42 @@ namespace Sentry
 			std::vector<ProtocolConfig *> methods;
 			auto iter2 = jsonValue.MemberBegin();
 			for (; iter2 != jsonValue.MemberEnd(); iter2++)
-			{
-				if (!iter2->value.IsObject())
-				{
-					continue;
-				}
-				std::string request;
-				std::string response;
-				std::string method = iter2->name.GetString();
-				SayNoAssertRetFalse_F(iter2->value.HasMember("id"));
-				unsigned short id = (unsigned short)iter2->value["id"].GetUint();
-				if (iter2->value.HasMember("request"))
-				{
-					request = iter2->value["request"].GetString();
-					Message * message = MessagePool::New(request);
-					if (message == nullptr)
-					{
-						SayNoDebugFatal("create " << request << " failure");
-						return false;
-					}
-				}
-				if (iter2->value.HasMember("response"))
-				{
-					response = iter2->value["response"].GetString();
-					Message * message = MessagePool::New(response);
-					if (message == nullptr)
-					{
-						SayNoDebugFatal("create " << response << " failure");
-						return false;
-					}
-				}
-				ProtocolConfig *protocol = new ProtocolConfig(id, service, method, request, response);
-				if (protocol != nullptr)
-				{
-					methods.push_back(protocol);
-					std::string name = service + "." + method;
-					this->mProtocolMap.insert(std::make_pair(id, protocol));
-					this->mProtocolNameMap.insert(std::make_pair(name, protocol));
-				}
-			}
+            {
+                if (!iter2->value.IsObject())
+                {
+                    continue;
+                }
+                ProtocolConfig *protocolConfig = new ProtocolConfig();
+                protocolConfig->Method = iter2->name.GetString();
+                SayNoAssertRetFalse_F(iter2->value.HasMember("id"));
+                protocolConfig->Id = (unsigned short) iter2->value["id"].GetUint();
+                if (iter2->value.HasMember("request"))
+                {
+                    protocolConfig->Request = iter2->value["request"].GetString();
+                    Message *message = MessagePool::New(protocolConfig->Request);
+                    if (message == nullptr)
+                    {
+                        SayNoDebugFatal("create " << protocolConfig->Request << " failure");
+                        return false;
+                    }
+                }
+                if (iter2->value.HasMember("response"))
+                {
+                    protocolConfig->Response = iter2->value["response"].GetString();
+                    Message *message = MessagePool::New(protocolConfig->Response);
+                    if (message == nullptr)
+                    {
+                        SayNoDebugFatal("create " << protocolConfig->Response << " failure");
+                        return false;
+                    }
+                }
+
+
+                methods.push_back(protocolConfig);
+                std::string name = service + "." + protocolConfig->Method;
+                this->mProtocolNameMap.insert(std::make_pair(name, protocolConfig));
+                this->mProtocolMap.insert(std::make_pair(protocolConfig->Id, protocolConfig));
+            }
 			this->mServiceMap.emplace(service, methods);
 		}
         return true;
@@ -103,7 +100,7 @@ namespace Sentry
 		}
 		for (ProtocolConfig * config : iter->second)
 		{
-			methods.push_back(config->MethodName);
+			methods.push_back(config->Method);
 		}
 		return true;
 	}

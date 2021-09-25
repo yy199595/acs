@@ -44,14 +44,11 @@
     "ScriptPath":"./Script/",
     "Scene": [
         "TaskComponent",
-        "MysqlComponent",
-        "RedisComponent",
         "ListenerComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent"
     ],
     "Service": [
-        "MysqlService",
         "CenterService", 
         "ClusterService"
     ],

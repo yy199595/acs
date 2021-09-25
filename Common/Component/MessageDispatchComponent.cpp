@@ -41,8 +41,8 @@ namespace Sentry
 			}
 			PacketMapper * message = this->mWaitMsgQueue.front();
 			this->mWaitMsgQueue.pop();
-			const std::string & method = message->GetProConfig()->MethodName;
-			const std::string & service = message->GetProConfig()->ServiceName;
+			const std::string & method = message->GetProConfig()->Method;
+			const std::string & service = message->GetProConfig()->Service;
 			ServiceComponent * serviceComponent = mServiceObject.GetComponent<ServiceComponent>(service);
 			if (serviceComponent != nullptr && serviceComponent->HasMethod(method))
 			{
