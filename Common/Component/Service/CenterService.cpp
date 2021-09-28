@@ -11,8 +11,8 @@ namespace Sentry
 
 	bool CenterService::Awake()
 	{
-		__ADD_SERVICE_METHOD__(CenterService::Add);
-		__ADD_SERVICE_METHOD__(CenterService::Query);
+		Add_Method(CenterService::Add);
+		Add_Method(CenterService::Query);
 		return LocalServiceComponent::Awake();
 	}
 

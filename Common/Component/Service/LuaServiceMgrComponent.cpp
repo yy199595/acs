@@ -62,6 +62,7 @@ namespace Sentry
 				}
 				int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
 				localService->AddMethod(new LuaServiceMethod(method, lua, idx));
+				SayNoDebugInfo("add new lua service method : " << service << "." << method);
 			}
 		}
 		return true;

@@ -12,7 +12,7 @@ namespace Sentry
 	public:
 		bool IsLuaMethod() final { return true; }
 		 XCode Invoke(PacketMapper *messageData) final;
-         XCode AsyncInvoke(PacketMapper * message) final;
+         XCode AsyncInvoke(PacketMapper * message);
 	private:
 		static int Response(lua_State * lua);
 	private:

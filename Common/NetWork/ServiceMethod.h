@@ -47,7 +47,6 @@ namespace Sentry
 	public:
 		virtual bool IsLuaMethod() = 0;
 		virtual XCode Invoke(PacketMapper *messageData) = 0;
-        virtual XCode AsyncInvoke(PacketMapper * messageData) = 0;
 		const std::string & GetName() { return this->mName; }
 	private:
 		std::string mName;

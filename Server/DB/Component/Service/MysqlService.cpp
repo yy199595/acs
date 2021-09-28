@@ -22,10 +22,10 @@ namespace Sentry
         SayNoAssertRetFalse_F(this->mMysqlManager = Scene::GetComponent<MysqlComponent>());
         SayNoAssertRetFalse_F(this->mProtocolManager = Scene::GetComponent<ProtocolComponent>());
 
-		__ADD_SERVICE_METHOD__(MysqlService::Add);
-		__ADD_SERVICE_METHOD__(MysqlService::Save);
-		__ADD_SERVICE_METHOD__(MysqlService::Delete);
-		__ADD_SERVICE_METHOD__(MysqlService::QueryData);
+		Add_Method(MysqlService::Add);
+		Add_Method(MysqlService::Save);
+		Add_Method(MysqlService::Delete);
+		Add_Method(MysqlService::QueryData);
         return true;
     }
 

@@ -65,7 +65,7 @@ namespace Sentry
     {
 		long long t1 = TimeHelper::GetMilTimestamp();
 		CoroutineGroup * group = this->NewCoroutineGroup();
-		for (size_t index = 0; index < 100000; index++)
+		for (size_t index = 0; index < 10; index++)
 		{
 			group->Add(this->StartCoroutine(&CoroutineComponent::Loop, this));
 		}
@@ -76,8 +76,11 @@ namespace Sentry
 
 	void CoroutineComponent::Loop()
 	{
-        for (int i = 0; i < 100; ++i) {
-            this->YieldNextLoop();
+		double val = 0.3;
+		std::string str = __FUNCTION__;
+        for (int i = 0; i < 10; ++i) 
+		{
+            this->Sleep(1000);
         }
 	}
 
@@ -132,7 +135,6 @@ namespace Sentry
 		if (logicCoroutine->mState == CorState::Ready)
 		{
 #ifdef __COROUTINE_ASM__
-			logicCoroutine->mStackSize = 0;
 			if (stack.co != logicCoroutine)
 			{
 				this->SaveStack(stack.co);
@@ -306,6 +308,7 @@ namespace Sentry
 		cor->mStack.clear();
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
+		SayNoDebugWarning("size = " << cor->mStackSize);
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
 	}
 #else
@@ -346,18 +349,17 @@ namespace Sentry
 
     void CoroutineComponent::OnSecondUpdate() {
 
-//        size_t index = 1;
-//        long long size = 0;
-//        Coroutine * cor = mCorPool.Get(index);
-//
-//        while(cor != nullptr)
-//        {
-//            index++;
-//            size += cor->mStack.capacity();
-//            cor = mCorPool.Get(index);
-//        }
-//        double memory = size / 1024.0f /1024.0f;
-//        SayNoDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
-//         << "平均使用内存 ：" << size / mCorPool.GetCorCount());
+		size_t index = 1;
+		long long size = 0;
+		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
+		{
+			Coroutine * cor = mCorPool.Get(index);
+			size += cor->mStackSize;
+			cor = mCorPool.Get(index);
+		}
+		
+		double memory = size / 1024.0f / 1024.0f;
+		SayNoDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
     }
 }

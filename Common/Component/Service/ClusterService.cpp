@@ -10,8 +10,8 @@ namespace Sentry
 {
     bool ClusterService::Awake()
     {      
-		__ADD_SERVICE_METHOD__(ClusterService::Add);
-		__ADD_SERVICE_METHOD__(ClusterService::Del);
+		Add_Method(ClusterService::Add);
+		Add_Method(ClusterService::Del);
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
@@ -27,8 +27,7 @@ namespace Sentry
 
 		for (Component * component : components)
 		{
-			ServiceComponent * service = dynamic_cast<ServiceComponent *>(component);
-			if (service != nullptr)
+			if (ServiceComponent * service = dynamic_cast<ServiceComponent *>(component))
 			{
 				registerInfo.add_services(service->GetTypeName());
 			}

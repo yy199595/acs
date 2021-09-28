@@ -62,5 +62,5 @@ namespace Sentry
 			return this->AddMethod(new ServiceMethod4<T, T1>(name, (T*)this, func));
 		}
     };
-#define __ADD_SERVICE_METHOD__(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
+#define Add_Method(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
 }// namespace Sentry

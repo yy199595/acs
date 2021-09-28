@@ -41,8 +41,12 @@ namespace Sentry
                     continue;
                 }
                 ProtocolConfig *protocolConfig = new ProtocolConfig();
+
+				protocolConfig->Service = service;
                 protocolConfig->Method = iter2->name.GetString();
                 SayNoAssertRetFalse_F(iter2->value.HasMember("id"));
+
+				protocolConfig->Async = iter2->value["async"].GetBool();
                 protocolConfig->Id = (unsigned short) iter2->value["id"].GetUint();
                 if (iter2->value.HasMember("request"))
                 {

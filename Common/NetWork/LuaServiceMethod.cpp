@@ -16,66 +16,93 @@ namespace Sentry
 		SayNoAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
-    XCode LuaServiceMethod::Invoke(PacketMapper *messageData)
-    {
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, mIdx);
-        luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
-        lua_pushinteger(this->mLuaEnv, messageData->GetUserId());
-        const ProtocolConfig * config = messageData->GetProConfig();
-        if(!messageData->GetMsgBody().empty())
-        {
-            int ref = this->mScriptComponent->GetLuaRef("Json", "ToObject");
-            lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-            luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+	XCode LuaServiceMethod::Invoke(PacketMapper *messageData)
+	{
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, mIdx);
+		luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+		lua_pushinteger(this->mLuaEnv, messageData->GetUserId());
+		const ProtocolConfig * config = messageData->GetProConfig();
+		if (!messageData->GetMsgBody().empty())
+		{
+			int ref = this->mScriptComponent->GetLuaRef("Json", "ToObject");
+			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+			luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 
-            const std::string & data = messageData->GetMsgBody();
-            if(!config->Request.empty())
-            {
-                Message * message = MessagePool::NewByData(config->Request, data);
-                if(message == nullptr)
-                {
-                    return XCode::ParseMessageError;
-                }
-                string json = "";
-                if(!util::MessageToJsonString(*message, &json).ok())
-                {
-                    return XCode::ProtocbufCastJsonFail;
-                }
-                lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
-            }
-            else
-            {
-                lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
-            }
-            if(lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
-            {
-                SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
-                return XCode::CallLuaFunctionFail;
-            }
-            lua_remove(this->mLuaEnv, -2);
-        }
+			const std::string & data = messageData->GetMsgBody();
+			if (!config->Request.empty())
+			{
+				Message * message = MessagePool::NewByData(config->Request, data);
+				if (message == nullptr)
+				{
+					return XCode::ParseMessageError;
+				}
+				string json = "";
+				if (!util::MessageToJsonString(*message, &json).ok())
+				{
+					return XCode::ProtocbufCastJsonFail;
+				}
+				lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+			}
+			else
+			{
+				lua_pushlstring(this->mLuaEnv, data.c_str(), data.size());
+			}
+			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
+			{
+				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				return XCode::CallLuaFunctionFail;
+			}
+			lua_remove(this->mLuaEnv, -2);
+		}
 
-        if(lua_pcall(this->mLuaEnv, 2,2,0) !=0)
-        {
-            SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
-            return XCode::CallLuaFunctionFail;
-        }
-        lua_tointeger(this->mLuaEnv, -2);
+		if (lua_pcall(this->mLuaEnv, 2, 2, 0) != 0)
+		{
+			SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+			return XCode::CallLuaFunctionFail;
+		}
 
+		XCode code = (XCode)lua_tointeger(this->mLuaEnv, -2);
+		if (lua_istable(this->mLuaEnv, -1) && code == XCode::Successful)
+		{
+			int ref = this->mScriptComponent->GetLuaRef("Json", "ToString");
+			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+			luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+			lua_pushvalue(this->mLuaEnv, -3);
+			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
+			{
+				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				return XCode::CallLuaFunctionFail;
+			}
+			size_t size = 0;
+			const char * json = lua_tolstring(this->mLuaEnv, -1, &size);
+			Message * message = MessagePool::NewByJson(config->Response, json, size);
 
-        return XCode::Successful;
-    }
+			message != nullptr ? messageData->SetMessage(*message) :
+				messageData->SetMessage(json, size);
+		}
 
-	XCode LuaServiceMethod::AsyncInvoke(PacketMapper *message)
+		return code;
+	}
+
+	XCode LuaServiceMethod::AsyncInvoke(PacketMapper *messageData)
 	{
 		lua_State *coroutine = lua_newthread(this->mLuaEnv);
 		int ref = this->mScriptComponent->GetLuaRef("Service", "Invoke");
 		//lua_getfunction(mLuaEnv, "Service", "Invoke");
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-		luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+		//luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+
+		if (!lua_isfunction(this->mLuaEnv, -1))
+		{
+			return XCode::CallLuaFunctionFail;
+		}
 
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);	
-		luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+		//luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
+		if (!lua_isfunction(this->mLuaEnv, -1))
+		{
+			return XCode::CallLuaFunctionFail;
+		}
 
 		mMessageJson.clear();
 		lua_xmove(this->mLuaEnv, coroutine, 2);
@@ -108,7 +135,7 @@ namespace Sentry
 		}
 		int top = lua_gettop(coroutine);
 		lua_presume(coroutine, this->mLuaEnv, top - 1);
-		return XCode::Successful;
+		return XCode::LuaCoroutineWait;
 	}
 	int LuaServiceMethod::Response(lua_State * lua)
 	{

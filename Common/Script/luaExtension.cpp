@@ -94,8 +94,6 @@ namespace LuaAPIExtension
                 return 1;
             }
         }
-        lua_pushnil(lua);
-        return 1;
         return 0;
     }
 

@@ -7,6 +7,7 @@
 #include <Util/JsonHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
+#include <NetWork/LuaServiceMethod.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()
@@ -23,7 +24,7 @@ namespace Sentry
 	bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
 	{
 		const std::string & service = messageData->GetService();
-        const ProtocolConfig * config = messageData->GetProConfig();
+		const ProtocolConfig * config = messageData->GetProConfig();
 		ServiceComponent * localService = this->gameObject->GetComponent<ServiceComponent>(service);
 		if (localService == nullptr)
 		{
@@ -37,21 +38,33 @@ namespace Sentry
 			return false;
 			SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
 		}
-        if(config->Async) //异步调用
-        {
-            if (method->IsLuaMethod())
-            {
-                method->Invoke(messageData);
-                return true;
-            }
-            this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
-            return true;
-        }
-        //同步调用
-        if(method->IsLuaMethod())
-        {
+		if (!config->Async) //同步调用
+		{
+			XCode code = method->Invoke(messageData);
+			const std::string & address = messageData->GetAddress();
+			if (!address.empty() && messageData->SetCode(code))
+			{
+				this->mNetProxyManager->SendNetMessage(messageData);
+			}
+			return true;
+		}
 
-        }
+		if (method->IsLuaMethod()) // 异步调用
+		{
+			LuaServiceMethod *  luaMethod = static_cast<LuaServiceMethod*>(method);
+			if (luaMethod != nullptr)
+			{
+				XCode code = luaMethod->AsyncInvoke(messageData);
+				if (code != XCode::LuaCoroutineWait)
+				{
+					SayNoDebugError("call lua function " << service << "." << method << " failure");
+					return false;
+				}
+			}
+			return true;
+		}
+		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
+		return true;
 	}
 	
 	std::string ServiceMgrComponent::GetJson(PacketMapper * messageData)
