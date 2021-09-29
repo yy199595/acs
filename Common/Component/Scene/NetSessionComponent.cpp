@@ -187,7 +187,7 @@ namespace Sentry
             {
                 std::string * message = this->mSendBufferPool.Create();
                 message->append(this->mSendSharedBuffer, size);
-                session->SendPackage(message);
+                return session->SendPackage(message);
             }
 		}
 		return false;

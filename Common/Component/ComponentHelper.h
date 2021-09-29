@@ -67,5 +67,5 @@ namespace Sentry
 		Type * type = iter->second;
 		return CreateComponent(type->Name);
 	}
-#define __REGISTER_COMPONENT__(type) ComponentHelper::Add<type>(#type)
+#define __register_component__(type) ComponentHelper::Add<type>(#type)
 }// namespace Sentry

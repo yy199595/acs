@@ -20,7 +20,7 @@ namespace Sentry
     class TaskThread
     {
     public:
-        TaskThread(TaskComponent *taskComponent, int index);
+        TaskThread(TaskComponent *taskComponent);
 
     public:
         void AddTask(TaskProxy * task);

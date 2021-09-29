@@ -46,9 +46,13 @@
         "TaskComponent",
         "ListenerComponent",
         "LuaScriptComponent",
+        "MysqlComponent",
+        "MysqlProxyComponent",
         "LuaServiceMgrComponent"
     ],
     "Service": [
+        "MysqlService",
+	    "LoginService",
         "CenterService", 
         "ClusterService"
     ],

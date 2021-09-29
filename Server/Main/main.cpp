@@ -10,6 +10,7 @@
 #include <Scene/NetSessionComponent.h>
 #include <Scene/ProxyManager.h>
 #include <Scene/RedisComponent.h>
+#include <Scene/MysqlProxyComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>
@@ -24,28 +25,29 @@
 using namespace Sentry;
 int main(int argc, char **argv)
 {
-	__REGISTER_COMPONENT__(ProxyManager);
-	__REGISTER_COMPONENT__(TimerComponent);
-	__REGISTER_COMPONENT__(ServiceMgrComponent);
-	__REGISTER_COMPONENT__(RedisComponent);
-	__REGISTER_COMPONENT__(MysqlComponent);
-	__REGISTER_COMPONENT__(ActionComponent);
-	__REGISTER_COMPONENT__(LuaScriptComponent);
-	__REGISTER_COMPONENT__(ProtocolComponent);
+	__register_component__(ProxyManager);
+	__register_component__(TimerComponent);
+	__register_component__(ServiceMgrComponent);
+	__register_component__(RedisComponent);
+	__register_component__(MysqlComponent);
+	__register_component__(ActionComponent);
+	__register_component__(LuaScriptComponent);
+	__register_component__(ProtocolComponent);
+    __register_component__(MysqlProxyComponent);
 	
-	__REGISTER_COMPONENT__(TaskComponent);
-	__REGISTER_COMPONENT__(CoroutineComponent);
-	__REGISTER_COMPONENT__(ServiceNodeComponent);
-	__REGISTER_COMPONENT__(ListenerComponent);
-	__REGISTER_COMPONENT__(NetSessionComponent);
-	__REGISTER_COMPONENT__(NetProxyComponent);
+	__register_component__(TaskComponent);
+	__register_component__(CoroutineComponent);
+	__register_component__(ServiceNodeComponent);
+	__register_component__(ListenerComponent);
+	__register_component__(NetSessionComponent);
+	__register_component__(NetProxyComponent);
 
-	__REGISTER_COMPONENT__(LuaServiceMgrComponent);
+	__register_component__(LuaServiceMgrComponent);
 	
-	__REGISTER_COMPONENT__(MysqlService);
-	__REGISTER_COMPONENT__(LoginService);
-	__REGISTER_COMPONENT__(CenterService);
-	__REGISTER_COMPONENT__(ClusterService);
+	__register_component__(MysqlService);
+	__register_component__(LoginService);
+	__register_component__(CenterService);
+	__register_component__(ClusterService);
 	
     std::string serverName = argc == 3 ? argv[1] : "server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/";

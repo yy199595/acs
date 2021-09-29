@@ -50,16 +50,8 @@ namespace Sentry
 		Type * type = ComponentHelper::GetType<T>();
 		if (type == nullptr)
 		{
-			return nullptr;
+            return nullptr;
 		}
-        auto iter1 = this->mComponentMap.begin();
-        for (; iter1 != this->mComponentMap.end(); iter1++)
-        {
-            if(T * component = dynamic_cast<T*>(iter1->second))
-            {
-                return component;
-            }
-        }
         return this->GetComponent<T>(type->Name);
     }
 

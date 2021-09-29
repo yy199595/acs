@@ -5,7 +5,7 @@
 using namespace std::chrono;
 namespace Sentry
 {
-    TaskThread::TaskThread(TaskComponent *manager, int index)
+    TaskThread::TaskThread(TaskComponent *manager)
         : mBindThread(std::bind(&TaskThread::Run, this))
     {
         this->mIsStop = false;

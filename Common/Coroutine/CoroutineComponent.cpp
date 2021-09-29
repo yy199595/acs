@@ -80,7 +80,7 @@ namespace Sentry
 		std::string str = __FUNCTION__;
         for (int i = 0; i < 10; ++i) 
 		{
-            this->Sleep(1000);
+            this->Sleep(100);
         }
 	}
 
@@ -202,7 +202,7 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		CoroutineGroup * group = new CoroutineGroup(this);
+        auto group = new CoroutineGroup(this);
 		this->mCoroutineGroups.push_back(group);
 		return group;
 	}
@@ -297,18 +297,13 @@ namespace Sentry
 #endif
 	}
 
-    long long CoroutineComponent::GetNowTime()
-    {
-        auto timeNow = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-        return timeNow.count();
-    }
 #ifdef __COROUTINE_ASM__
 	void CoroutineComponent::SaveStack(Coroutine * cor)
 	{
 		cor->mStack.clear();
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
-		SayNoDebugWarning("size = " << cor->mStackSize);
+		//SayNoDebugWarning("size = " << cor->mStackSize);
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
 	}
 #else
@@ -359,7 +354,7 @@ namespace Sentry
 		}
 		
 		double memory = size / 1024.0f / 1024.0f;
-		SayNoDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
-			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
+		//SayNoDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+			//<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
     }
 }

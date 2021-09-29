@@ -9,7 +9,7 @@ namespace Sentry
 
     class RedisComponent;
 
-    class LoginService : public LocalServiceComponent
+    class LoginService : public LocalServiceComponent, ILoadData
     {
     public:
         LoginService();
@@ -21,10 +21,12 @@ namespace Sentry
 
         void Start() final;
 
-    private:
-        XCode Login(long long operId, shared_ptr<c2s::UserVerify_Request> LoginData);
+        void OnLodaData() final;
 
-        XCode Register(long long operId, shared_ptr<c2s::UserRegister_Request> registerData);
+    private:
+        XCode Login(long long operId, const c2s::UserVerify_Request& LoginData);
+
+        XCode Register(long long operId, const c2s::UserRegister_Request & registerData);
 
     private:
         RedisComponent *mRedisManager;

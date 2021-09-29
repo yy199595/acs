@@ -50,7 +50,6 @@ namespace Sentry
 		int GetPriority() override { return 1; }
 
 	public:
-		long long GetNowTime();
 
 		void Destory(Coroutine * coroutine);
 

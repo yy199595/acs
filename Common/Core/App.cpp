@@ -149,24 +149,35 @@ namespace Sentry
 	}
 
 	void App::StartComponent()
-	{
-		for (size_t index = 0; index < this->mSceneComponents.size(); index++)
-		{
-			Component * component = this->mSceneComponents[index];
-			if (component != nullptr)
-			{
-				float process = index / (float)this->mSceneComponents.size();
-				SayNoDebugInfo("[" << process * 100 << "%]"
-					<< " start component " << component->GetTypeName());
-				component->Start();
-			}
-		}
-		this->mIsInitComplate = true;
+    {
+        for (int index = 0; index < this->mSceneComponents.size(); index++)
+        {
+            Component *component = this->mSceneComponents[index];
+            if (component != nullptr)
+            {
+                float process = index / (float) this->mSceneComponents.size();
+                SayNoDebugInfo("[" << process * 100 << "%]"
+                                   << " start component " << component->GetTypeName());
+                component->Start();
+            }
+        }
+
         this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-		SayNoDebugLog("start all scene component successful ......");	
-		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
-		SayNoDebugLog("=====  start " << this->mServerName << " successful ["<< t / 1000.0f <<"s] ========");
-	}
+        SayNoDebugLog("start all scene component successful ......");
+        long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
+
+        for (Component *component: this->mSceneComponents)
+        {
+            if (ILoadData *loadComponent = dynamic_cast<ILoadData *>(component))
+            {
+                loadComponent->OnLodaData();
+                SayNoDebugLog("load " << component->GetTypeName() << " data");
+            }
+        }
+        this->mIsInitComplate = true;
+        SayNoDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
+
+    }
 
 	int App::Run()
     {
@@ -219,38 +230,39 @@ namespace Sentry
         {
             std::this_thread::sleep_for(time);
             startTimer = TimeHelper::GetMilTimestamp();
-            for(ISystemUpdate * component : this->mSystemUpdateManagers)
+            for (ISystemUpdate *component: this->mSystemUpdateManagers)
             {
                 component->OnSystemUpdate();
             }
 
-			if (this->mIsInitComplate)
-			{
-				if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
-				{
-					this->mLogicRunCount++;
-					for(IFrameUpdate * component : this->mFrameUpdateManagers)
-					{
-					    component->OnFrameUpdate(this->mDelatime);
-					}
+            if (!this->mIsInitComplate)
+            {
+                continue;
+            }
+            if (startTimer - mLastUpdateTime >= LogicUpdateInterval)
+            {
+                this->mLogicRunCount++;
+                for (IFrameUpdate *component: this->mFrameUpdateManagers)
+                {
+                    component->OnFrameUpdate(this->mDelatime);
+                }
 
-					for(ILastFrameUpdate * component : this->mLastFrameUpdateManager)
-					{
-					    component->OnLastFrameUpdate();
-					}
-					startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
-				}
+                for (ILastFrameUpdate *component: this->mLastFrameUpdateManager)
+                {
+                    component->OnLastFrameUpdate();
+                }
+                startTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
+            }
 
-				if (startTimer - secondTimer >= 1000)
-				{
-				    for(ISecondUpdate * component : this->mSecondUpdateManagers)
-				    {
-				        component->OnSecondUpdate();
-				    }
-					this->UpdateConsoleTitle();
-					secondTimer = TimeHelper::GetMilTimestamp();
-				}
-			}
+            if (startTimer - secondTimer >= 1000)
+            {
+                for (ISecondUpdate *component: this->mSecondUpdateManagers)
+                {
+                    component->OnSecondUpdate();
+                }
+                this->UpdateConsoleTitle();
+                secondTimer = TimeHelper::GetMilTimestamp();
+            }
         }
         return this->Stop();
     }

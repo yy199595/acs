@@ -5,13 +5,12 @@
 #include <Scene/ListenerComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
-
 namespace Sentry
 {
     bool ClusterService::Awake()
     {      
-		Add_Method(ClusterService::Add);
-		Add_Method(ClusterService::Del);
+		__add_method(ClusterService::Add);
+		__add_method(ClusterService::Del);
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
@@ -27,11 +26,11 @@ namespace Sentry
 
 		for (Component * component : components)
 		{
-			if (ServiceComponent * service = dynamic_cast<ServiceComponent *>(component))
-			{
-				registerInfo.add_services(service->GetTypeName());
-			}
-		}
+            if (ServiceComponent *service = dynamic_cast<ServiceComponent *>(component))
+            {
+                registerInfo.add_services(service->GetTypeName());
+            }
+        }
 
 		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
 		ListenerComponent * listenComponent = Scene::GetComponent<ListenerComponent>();
@@ -47,6 +46,7 @@ namespace Sentry
 			return;
 		}
 		SayNoDebugLog("register all service to center successful");
+
 	}
 
     XCode ClusterService::Del(const Int32Data &serviceData)
