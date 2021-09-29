@@ -55,7 +55,6 @@ namespace Sentry
                 delete data;
                 return true;
             }
-            data->Clear();
             this->mObjectQueue.push(data);
             return false;
         }

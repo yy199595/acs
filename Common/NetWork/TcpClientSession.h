@@ -60,7 +60,7 @@ namespace Sentry
         { return mSessionName; }
 
     public:
-        bool SendPackage(const shared_ptr<std::string> message);
+        bool SendPackage(std::string * message);
 
     public:
         void StartClose();

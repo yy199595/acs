@@ -29,7 +29,7 @@ namespace Sentry
 
 		bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size);
 
-		bool OnSendMessageError(TcpClientSession *session, const char *message, const size_t size);
+		bool OnSendMessageAfter(std::string * message);
 
 	public:
 		bool PushEventHandler(SocketEveHandler *eve);
@@ -61,6 +61,7 @@ namespace Sentry
 		class NetProxyComponent *mNetProxyComponent;
 
 	private:
+        ObjectPool<std::string> mSendBufferPool;
 		std::queue<std::string> mRecvSessionQueue;
 		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
 		char mSendSharedBuffer[TCP_SEND_MAX_COUNT + sizeof(unsigned int)];

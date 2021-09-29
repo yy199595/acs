@@ -59,7 +59,7 @@ namespace Sentry
         return this->mBinTcpSocket != nullptr && this->mBinTcpSocket->is_open();
     }
 
-	bool TcpClientSession::SendPackage(const shared_ptr<std::string> message)
+	bool TcpClientSession::SendPackage(std::string * message)
 	{
 		if (message == nullptr || message->size() == 0)
 		{
@@ -76,9 +76,8 @@ namespace Sentry
 			if (error_code)
 			{
 				this->StartClose();
-				const char *msg = message->c_str();
-				this->mDispatchManager->OnSendMessageError(this, msg, size);
 			}
+            this->mDispatchManager->OnSendMessageAfter(message);
 		});
 		return true;
 	}
@@ -144,6 +143,11 @@ namespace Sentry
 			{
 				size_t packageSize = 0;
 				memcpy(&packageSize, this->mRecvMsgBuffer, t);
+                if(packageSize >= 1024 * 10) //最大为10k
+                {
+                    this->StartClose();
+                    return;
+                }
 				this->ReadMessageBody(packageSize);
 			}
 		});
@@ -156,12 +160,6 @@ namespace Sentry
 		if (allSize > this->mRecvBufferSize)
 		{
 			nMessageBuffer = new char[allSize];
-			if (nMessageBuffer == nullptr)
-			{
-				this->StartClose();
-				this->mDispatchManager->OnSessionError(this);
-				return;
-			}
 		}
 
 		this->mBinTcpSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),

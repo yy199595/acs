@@ -52,20 +52,28 @@ namespace Sentry
 		{
 			return nullptr;
 		}
+        auto iter1 = this->mComponentMap.begin();
+        for (; iter1 != this->mComponentMap.end(); iter1++)
+        {
+            if(T * component = dynamic_cast<T*>(iter1->second))
+            {
+                return component;
+            }
+        }
         return this->GetComponent<T>(type->Name);
     }
 
 	template<typename T>
 	T * GameObject::GetComponent(const std::string & name) const
-	{
-		auto iter = this->mComponentMap.find(name);
-		if (iter != this->mComponentMap.end())
-		{
-			Component *component = iter->second;
-			return static_cast<T *>(component);
-		}
-		return nullptr;
-	}
+    {
+        auto iter = this->mComponentMap.find(name);
+        if (iter != this->mComponentMap.end())
+        {
+            Component *component = iter->second;
+            return static_cast<T *>(component);
+        }
+        return nullptr;
+    }
 
 	template<typename T>
 	inline bool GameObject::AddComponent()

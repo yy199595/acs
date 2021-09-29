@@ -56,8 +56,14 @@ namespace Sentry
 		return this->mNetProxyComponent->PushEventHandler(handler);
     }
 
-    bool NetSessionComponent::OnSendMessageError(TcpClientSession *session, const char *message, const size_t size)
+    bool NetSessionComponent::OnSendMessageAfter(std::string *message)
     {
+        if(message != nullptr)
+        {
+            message->clear();
+            this->mSendBufferPool.Destory(message);
+            return true;
+        }
 		return false;
     }
 
@@ -175,9 +181,14 @@ namespace Sentry
 		}
 		TcpClientSession *session = this->GetSession(address);
 		if (session != nullptr)
-		{						
-			size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, TCP_SEND_MAX_COUNT);		
-			return session->SendPackage(std::make_shared<std::string>(this->mSendSharedBuffer, size));
+		{
+			size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, TCP_SEND_MAX_COUNT);
+            if(size > 0)
+            {
+                std::string * message = this->mSendBufferPool.Create();
+                message->append(this->mSendSharedBuffer, size);
+                session->SendPackage(message);
+            }
 		}
 		return false;
 	}
