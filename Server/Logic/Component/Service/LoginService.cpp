@@ -13,7 +13,7 @@ namespace Sentry
     {
         //__add_method(LoginService::Login);
         //__add_method(LoginService::Register);
-        return LocalServiceComponent::Awake();
+		return true;
     }
 
     void LoginService::Start()

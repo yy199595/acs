@@ -161,7 +161,7 @@ namespace Sentry
                 component->Start();
             }
         }
-
+		this->mIsInitComplate = true;
         this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
         SayNoDebugLog("start all scene component successful ......");
         long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
@@ -174,7 +174,7 @@ namespace Sentry
                 SayNoDebugLog("load " << component->GetTypeName() << " data");
             }
         }
-        this->mIsInitComplate = true;
+        
         SayNoDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 
     }

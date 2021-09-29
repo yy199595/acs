@@ -37,7 +37,7 @@ namespace Sentry
         if (proxyNode == nullptr)
         {
             proxyNode = this->mNodeManager->GetNodeByServiceName("MysqlService");
-            this->mMysqlProxyNodeId = proxyNode != nullptr ? proxyNode->GetNodeId() : -1;
+            this->mMysqlProxyNodeId = proxyNode != nullptr ? proxyNode->GetNodeUId() : -1;
             return proxyNode;
         }
         return proxyNode;
@@ -61,7 +61,7 @@ namespace Sentry
             requestData->set_protocolname(data.GetTypeName());
             requestData->set_protocolmessage(messageData);
         }
-        XCode code = proxyNode->Call("MysqlService", "Insert", *requestData, *responseData);
+        XCode code = proxyNode->Call("MysqlService", "Add", *requestData, *responseData);
 #ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {
@@ -91,7 +91,7 @@ namespace Sentry
             requestData->set_protocolname(data.GetTypeName());
             requestData->set_protocolmessage(messageData);
         }
-        XCode code = proxyNode->Call("MysqlService", "Save", *requestData, *responseData);
+        XCode code = proxyNode->Call("MysqlService", "Query", *requestData, *responseData);
 #ifdef SOEASY_DEBUG
         if (code != XCode::Successful)
         {

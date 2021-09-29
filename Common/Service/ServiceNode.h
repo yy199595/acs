@@ -11,17 +11,15 @@ namespace Sentry
     class ServiceNode : public Object
     {
     public:
-        ServiceNode(int areaId, int nodeId, const std::string name, const std::string address);
+        ServiceNode(int uid, const std::string name, const std::string address);
     public:
-        const int GetAreaId() { return this->mNodeInfoMessage.areaid(); }
+      
+		const int GetNodeUId() { return this->mNodeUId; }
 
-        const int GetNodeId() { return this->mNodeInfoMessage.nodeid(); }
+		const std::string &GetAddress() { return this->mAddress; }
 
-        const std::string &GetAddress() { return this->mNodeInfoMessage.address(); }
+		const std::string &GetNodeName() { return this->mNodeName; }
 
-        const std::string &GetNodeName() { return this->mNodeInfoMessage.servername(); }
-
-        const s2s::NodeData_NodeInfo &GetNodeMessage() { return this->mNodeInfoMessage; }
     public:
         bool AddService(const std::string &service);
 
@@ -30,8 +28,7 @@ namespace Sentry
     public:
 		void OnConnectNodeAfter();
     public:
-        std::string GetJsonString();
-
+       
         XCode Notice(const std::string &service, const std::string &method);                        //不回应
         XCode Notice(const std::string &service, const std::string &method, const Message &request);//不回应
     public:
@@ -51,17 +48,17 @@ namespace Sentry
 		void HandleMessageSend();
 		
     private:
+		int mNodeUId;
 		bool mIsClose;
         std::string mIp;
 		unsigned int mCorId;
-        unsigned short mPort;
+        unsigned short mPort;	
         const std::string mAddress;         //监听地址
         const std::string mNodeName;        //进程名字
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
 		class TcpProxySession * mTcpSession;
         class ActionComponent *mActionManager;
-        s2s::NodeData_NodeInfo mNodeInfoMessage;
 		std::queue<PacketMapper *> mNodeMessageQueue;
     };
 }// namespace Sentry

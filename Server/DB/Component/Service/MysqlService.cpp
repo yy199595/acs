@@ -24,8 +24,9 @@ namespace Sentry
 
 		__add_method(MysqlService::Add);
 		__add_method(MysqlService::Save);
+		__add_method(MysqlService::Query);
 		__add_method(MysqlService::Delete);
-		__add_method(MysqlService::QueryData);
+		
         return true;
     }
 
@@ -141,7 +142,7 @@ namespace Sentry
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlService::QueryData(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
+    XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
     {
 		const std::string & name = request.protocolname();
 		const std::string & data = request.protocolmessage();

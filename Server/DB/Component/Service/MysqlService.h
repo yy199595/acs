@@ -19,7 +19,7 @@ namespace Sentry
 
         XCode Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
 
-        XCode QueryData(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response);
+        XCode Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response);
 
     public:
         bool Awake() final;

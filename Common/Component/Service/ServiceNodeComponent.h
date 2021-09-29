@@ -18,9 +18,7 @@ namespace Sentry
 
 		virtual int GetPriority() { return 0; }
 
-        bool DelNode(const std::string &address);
-
-		ServiceNode * CreateNode(int areaId, int nodeId, std::string name, std::string address);
+		ServiceNode * CreateNode(int uid, std::string name, std::string address);
 	
     protected:
         bool Awake() final;
@@ -37,6 +35,7 @@ namespace Sentry
         ServiceNode *GetNodeByServiceName(const std::string &service);
 
     private:
+		int mNodeId;
         std::string mCenterIp;
         unsigned short mCenterPort;
         std::list<ServiceNode *> mServiceNodeArray;

@@ -32,6 +32,7 @@ namespace Sentry
             }
         }
 
+		s2s::NodeRegister_Response responseInfo;
 		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
 		ListenerComponent * listenComponent = Scene::GetComponent<ListenerComponent>();
 
@@ -39,7 +40,7 @@ namespace Sentry
 		registerInfo.set_nodeid(this->mNodeId);
 		registerInfo.set_address(listenComponent->GetAddress());
 		registerInfo.set_servername(App::Get().GetServerName());
-		XCode code = centerNode->Invoke("CenterService", "Add", registerInfo);
+		XCode code = centerNode->Call("CenterService", "Add", registerInfo, responseInfo);
 		if (code != XCode::Successful)
 		{
 			SayNoDebugError("register local service node fail");
@@ -56,31 +57,35 @@ namespace Sentry
         return nodeId ? XCode::Successful : XCode::Failure;
     }
 
-    XCode ClusterService::Add(const s2s::NodeData_NodeInfo &nodeInfo)
-    {
-        const int nodeId = nodeInfo.nodeid();
-        ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(nodeId);
-        if (serviceNode == nullptr)
-        {
-            const int areaId = nodeInfo.areaid();
-            const std::string &name = nodeInfo.servername();
-            const std::string &address = nodeInfo.address();
-            serviceNode = new ServiceNode(areaId, nodeId, name, address);
-        }
-        for (int index = 0; index < nodeInfo.services_size(); index++)
-        {
-            const std::string &service = nodeInfo.services(index);
-            serviceNode->AddService(service);
-        }
-        // 通知所有服务
-		std::vector<ServiceComponent *> services;
-		//this->mServiceManager->GetLocalServices(services);
-
-		for (ServiceComponent *service : services)
+	XCode ClusterService::Add(const s2s::NodeInfo & nodeInfo)
+	{
+		const int uid = nodeInfo.uid();
+		ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
+		if (serviceNode == nullptr)
 		{
-			service->OnRefreshService();
+			const std::string &name = nodeInfo.servername();
+			const std::string &address = nodeInfo.address();
+			serviceNode = new ServiceNode(uid, name, address);
 		}
+		for (int index = 0; index < nodeInfo.services_size(); index++)
+		{
+			const std::string &service = nodeInfo.services(index);
+			if (serviceNode->AddService(service))
+			{
+				SayNoDebugLog(nodeInfo.servername() << " add new service " << service);
+			}
+		}
+		// 通知所有服务
+		std::vector<Component *> components;
+		this->gameObject->GetComponents(components);
+		for (Component * component : components)
+		{
+			if (ServiceComponent * serviceComponent = dynamic_cast<ServiceComponent*>(component))
+			{
+				serviceComponent->OnRefreshService();
+			}
+		}
+		return XCode::Successful;
+	}
 
-        return XCode::Successful;
-    }
 }// namespace Sentry

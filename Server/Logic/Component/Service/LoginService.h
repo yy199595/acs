@@ -9,7 +9,7 @@ namespace Sentry
 
     class RedisComponent;
 
-    class LoginService : public LocalServiceComponent, ILoadData
+    class LoginService : public LocalServiceComponent, public ILoadData
     {
     public:
         LoginService();

@@ -16,6 +16,7 @@ namespace Sentry
         bool Awake() final;
 		void Start() final;
     public:
+		bool HasService(const std::string & service);
 		void GetServices(std::vector<std::string> & services);
 		bool GetMethods(const std::string service, std::vector<std::string> & methods);
         const ProtocolConfig *GetProtocolConfig(unsigned short id) const;

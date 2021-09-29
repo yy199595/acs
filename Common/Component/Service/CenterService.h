@@ -42,13 +42,12 @@ namespace Sentry
         void Start() final;
 
     private:
-        void NoticeNode(int areaId);
 
-        XCode Add(const s2s::NodeRegister_Request &nodeInfo);
+        XCode Add(const s2s::NodeRegister_Request &nodeInfo, s2s::NodeRegister_Response & response);
 
-        XCode Query(const com::Int32Data &areaId, s2s::NodeData_Array &nodeArray);
+        XCode Query(const s2s::NodeQuery_Request & service, s2s::NodeQuery_Response &response);
 
     private:
-        std::unordered_map<long long, ServiceNode *> mServiceNodeMap;
+        std::unordered_map<int, ServiceNode *> mServiceNodeMap;
     };
 }

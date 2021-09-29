@@ -9,21 +9,14 @@
 #include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
-	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
-		: mAddress(address), mNodeName(name), mIsClose(false)
+	ServiceNode::ServiceNode(int uid, const std::string name, const std::string address)
+		: mNodeUId(uid), mAddress(address), mNodeName(name), mIsClose(false)
 	{
 		NetProxyComponent * component = Scene::GetComponent<NetProxyComponent>();
 		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = Scene::GetComponent<ActionComponent>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 
-		
-
-		this->mNodeInfoMessage.Clear();
-		this->mNodeInfoMessage.set_areaid(areaId);
-		this->mNodeInfoMessage.set_nodeid(nodeId);
-		this->mNodeInfoMessage.set_servername(name);
-		this->mNodeInfoMessage.set_address(address);
 		this->mTcpSession = component->Create(address, mNodeName);
 		this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::HandleMessageSend, this);
 	}
@@ -34,7 +27,6 @@ namespace Sentry
 		if (iter == this->mServiceArray.end())
 		{
 			this->mServiceArray.insert(service);
-			this->mNodeInfoMessage.add_services(service);
 			return true;
 		}
 		return false;
@@ -51,23 +43,13 @@ namespace Sentry
 		this->mCorComponent->Resume(mCorId);
 	}
 
-	std::string ServiceNode::GetJsonString()
-	{
-		std::string json;
-		util::MessageToJsonString(this->mNodeInfoMessage, &json);
-		return json;
-	}
-
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method)
 	{
 		if (service.empty() || method.empty())
 		{
 			return XCode::CallArgsError;
 		}
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
-		}
+		
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
 		if (messageData == nullptr)
 		{
@@ -84,10 +66,7 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
-		}
+		
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
 		if (messageData == nullptr)
 		{
@@ -106,11 +85,6 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
-		}
-
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
 		if (messageData == nullptr)
@@ -126,10 +100,6 @@ namespace Sentry
 		if (service.empty() || method.empty())
 		{
 			return XCode::CallArgsError;
-		}
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
 		}
 
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
@@ -148,10 +118,6 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
-		}
 
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
 
@@ -169,10 +135,6 @@ namespace Sentry
 		if (service.empty() || method.empty())
 		{
 			return XCode::CallArgsError;
-		}
-		if (this->HasService(service) == false)
-		{
-			return XCode::CallServiceNotFound;
 		}
 
 		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);

@@ -46,11 +46,15 @@
             "request": "s2s.MysqlOper.Request",
             "response": "s2s.MysqlOper.Response"
         },
-        "QueryData": {
+        "Query": {
             "id": 304,
             "async":true,
             "request": "s2s.MysqlQuery.Request",
             "response": "s2s.MysqlQuery.Response"
         }
+    },
+    "LoginService":{
+        "id":400
     }
+
 }

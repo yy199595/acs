@@ -86,6 +86,12 @@ namespace Sentry
 	}
 
 
+	bool ProtocolComponent::HasService(const std::string & service)
+	{
+		auto iter = this->mServiceMap.find(service);
+		return iter != this->mServiceMap.end();
+	}
+
 	void ProtocolComponent::GetServices(std::vector<std::string> & services)
 	{
 		auto iter = this->mServiceMap.begin();
