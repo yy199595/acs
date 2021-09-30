@@ -27,14 +27,6 @@ namespace Sentry
 		
     }
 
-	void TaskComponent::GetThreads(std::vector<std::thread::id> & threads)
-	{
-		for (TaskThread * taskThread : this->mThreadArray)
-		{
-			threads.push_back(taskThread->GetId());
-		}
-	}
-
 	void TaskComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
@@ -80,7 +72,6 @@ namespace Sentry
 				if (task != nullptr)
 				{
 					task->RunFinish();
-					delete task;
 				}				             
                 this->mTaskMap.erase(iter);
             }

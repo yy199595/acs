@@ -32,7 +32,7 @@ namespace Sentry
         std::queue<long long> mWakeUpQueue;
     private:
         int mMysqlProxyNodeId;
-
+        std::string mMessageBuffer;
         class CoroutineComponent *mCorComponent;
 
         class ServiceNodeComponent *mNodeManager;

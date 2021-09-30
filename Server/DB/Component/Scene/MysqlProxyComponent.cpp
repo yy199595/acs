@@ -53,24 +53,14 @@ namespace Sentry
             this->mCorComponent->YieldReturn();
         }
 
-        std::string messageData;
-        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
-        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
-        if (requestData->SerializeToString(&messageData))
+        if (!data.SerializeToString(&mMessageBuffer))
         {
-            requestData->set_protocolname(data.GetTypeName());
-            requestData->set_protocolmessage(messageData);
+            return XCode::SerializationFailure;
         }
-        XCode code = proxyNode->Call("MysqlService", "Add", *requestData, *responseData);
-#ifdef SOEASY_DEBUG
-        if (code != XCode::Successful)
-        {
-            SayNoDebugError("[mysql error] : " << responseData->errorstr());
-        }
-#endif
-        this->mMysqlOperReqPool.Destory(requestData);
-        this->mMysqlOperResPool.Destory(responseData);
-        return code;
+        s2s::MysqlOper_Request requestData;
+        requestData.set_protocolname(data.GetTypeName());
+        requestData.set_protocolmessage(this->mMessageBuffer);
+        return proxyNode->Invoke("MysqlService", "Add", requestData);
     }
 
     XCode MysqlProxyComponent::Query(const Message &data, Message &queryData)
@@ -83,32 +73,27 @@ namespace Sentry
             this->mCorComponent->YieldReturn();
         }
 
-        std::string messageData;
-        s2s::MysqlQuery_Request *requestData = this->mMysqlQueryReqPool.Create();
-        s2s::MysqlQuery_Response *responseData = this->mMysqlQueryResPool.Create();
-        if (requestData->SerializeToString(&messageData))
+        if (!data.SerializeToString(&this->mMessageBuffer))
         {
-            requestData->set_protocolname(data.GetTypeName());
-            requestData->set_protocolmessage(messageData);
+            return XCode::SerializationFailure;
         }
-        XCode code = proxyNode->Call("MysqlService", "Query", *requestData, *responseData);
-#ifdef SOEASY_DEBUG
-        if (code != XCode::Successful)
+
+        s2s::MysqlQuery_Request requestData;
+        s2s::MysqlQuery_Response responseData;
+
+        requestData.set_protocolname(data.GetTypeName());
+        requestData.set_protocolmessage(this->mMessageBuffer);
+
+        XCode code = proxyNode->Call("MysqlService", "Query", requestData, responseData);
+        if (code == XCode::Successful && responseData.querydatas_size() > 0)
         {
-            SayNoDebugError("[mysql error] : " << responseData->errotstr());
-        }
-#endif
-        if (code == XCode::Successful)
-        {
-            if (responseData->querydatas_size() > 0)
+            const std::string &data = responseData.querydatas(0);
+            if(!queryData.ParseFromString(data))
             {
-                const std::string &data = responseData->querydatas(0);
-                queryData.ParseFromString(data);
+                return XCode::ParseMessageError;
             }
         }
-        this->mMysqlQueryReqPool.Destory(requestData);
-        this->mMysqlQueryResPool.Destory(responseData);
-        return XCode::Failure;
+        return code;
     }
 
     XCode MysqlProxyComponent::Save(const Message &data)
@@ -120,24 +105,14 @@ namespace Sentry
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
-        std::string messageData;
-        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
-        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
-        if (requestData->SerializeToString(&messageData))
+        if(!data.SerializeToString(&this->mMessageBuffer))
         {
-            requestData->set_protocolname(data.GetTypeName());
-            requestData->set_protocolmessage(messageData);
+            return XCode::SerializationFailure;
         }
-        XCode code = proxyNode->Call("MysqlService", "Save", *requestData, *responseData);
-#ifdef SOEASY_DEBUG
-        if (code != XCode::Successful)
-        {
-            SayNoDebugError("[mysql error] : " << responseData->errorstr());
-        }
-#endif
-        this->mMysqlOperReqPool.Destory(requestData);
-        this->mMysqlOperResPool.Destory(responseData);
-        return XCode::Failure;
+        s2s::MysqlOper_Request requestData;
+        requestData.set_protocolname(data.GetTypeName());
+        requestData.set_protocolmessage(this->mMessageBuffer);
+        return proxyNode->Invoke("MysqlService", "Save", requestData);
     }
 
     XCode MysqlProxyComponent::Delete(const Message &data)
@@ -149,23 +124,14 @@ namespace Sentry
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
-        std::string messageData;
-        s2s::MysqlOper_Request *requestData = this->mMysqlOperReqPool.Create();
-        s2s::MysqlOper_Response *responseData = this->mMysqlOperResPool.Create();
-        if (requestData->SerializeToString(&messageData))
+        s2s::MysqlOper_Request requestData;
+        if (!data.SerializeToString(&this->mMessageBuffer))
         {
-            requestData->set_protocolname(data.GetTypeName());
-            requestData->set_protocolmessage(messageData);
+            return XCode::SerializationFailure;
         }
-        XCode code = proxyNode->Call("MysqlService", "Delete", *requestData, *responseData);
-#ifdef SOEASY_DEBUG
-        if (code != XCode::Successful)
-        {
-            SayNoDebugError("[mysql error] : " << responseData->errorstr());
-        }
-#endif
-        this->mMysqlOperReqPool.Destory(requestData);
-        this->mMysqlOperResPool.Destory(responseData);
-        return code;
+
+        requestData.set_protocolname(data.GetTypeName());
+        requestData.set_protocolmessage(this->mMessageBuffer);
+        return proxyNode->Invoke("MysqlService", "Delete", requestData);
     }
 }

@@ -9,8 +9,8 @@
 #include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
-	ServiceNode::ServiceNode(int uid, const std::string name, const std::string address)
-		: mNodeUId(uid), mAddress(address), mNodeName(name), mIsClose(false)
+	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
+		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
 		NetProxyComponent * component = Scene::GetComponent<NetProxyComponent>();
 		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());

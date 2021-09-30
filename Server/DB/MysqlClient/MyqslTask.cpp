@@ -20,11 +20,16 @@ namespace Sentry
         {
 			corComponent->Resume(this->mCoroutineId);
         }
+        if(this->mErrorCode != XCode::Successful)
+        {
+            SayNoDebugError(this->mSqlCommand);
+            SayNoDebugError(this->mErrorString);
+        }
     }
 
     void MyqslTask::Run()
     {
-		MysqlComponent * pMysqlManager = Scene::GetComponent<MysqlComponent>();
+        MysqlComponent *pMysqlManager = Scene::GetComponent<MysqlComponent>();
         SayNoMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
         if (mysqlSocket == nullptr)
         {
@@ -74,9 +79,9 @@ namespace Sentry
                 {
                     this->mQueryDatas.push_back(json);
                 }
-            } else
+            }
+            else
             {
-
                 for (unsigned long count = 0; count < rowCount; count++)
                 {
                     QuertJsonWritre jsonWrite;

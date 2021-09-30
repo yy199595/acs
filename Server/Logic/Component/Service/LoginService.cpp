@@ -38,7 +38,7 @@ namespace Sentry
 
         if(responseCode == XCode::Successful)
         {
-
+            SayNoDebugLogProtocBuf(response);
         }
     }
 

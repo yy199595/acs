@@ -62,11 +62,14 @@ namespace Sentry
 		const int uid = nodeInfo.uid();
 		ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
 		if (serviceNode == nullptr)
-		{
-			const std::string &name = nodeInfo.servername();
-			const std::string &address = nodeInfo.address();
-			serviceNode = new ServiceNode(uid, name, address);
-		}
+        {
+            const int areaId = uid / 10000;
+            const int nodeId = uid % 10000;
+            const std::string &name = nodeInfo.servername();
+            const std::string &address = nodeInfo.address();
+            serviceNode = new ServiceNode(areaId, nodeId, name, address);
+        }
+
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
 			const std::string &service = nodeInfo.services(index);

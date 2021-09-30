@@ -11,14 +11,16 @@ namespace Sentry
     class ServiceNode : public Object
     {
     public:
-        ServiceNode(int uid, const std::string name, const std::string address);
+        ServiceNode(int areaId, int nodeId, const std::string name, const std::string address);
     public:
-      
-		const int GetNodeUId() { return this->mNodeUId; }
 
 		const std::string &GetAddress() { return this->mAddress; }
 
 		const std::string &GetNodeName() { return this->mNodeName; }
+
+        const int GetAreaId() { return this->mAreaId; }
+        const int GetNodeId() { return this->mNodeId;}
+        const int GetNodeUId() { return this->mAreaId * 10000 + this->mNodeId; }
 
     public:
         bool AddService(const std::string &service);
@@ -48,7 +50,8 @@ namespace Sentry
 		void HandleMessageSend();
 		
     private:
-		int mNodeUId;
+		int mAreaId;
+        int mNodeId;
 		bool mIsClose;
         std::string mIp;
 		unsigned int mCorId;

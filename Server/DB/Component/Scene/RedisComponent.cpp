@@ -43,16 +43,18 @@ namespace Sentry
         SayNoAssertRetFalse_F(config.GetValue("Redis", "port",this->mRedisPort));
 
         int second = 3;
-		std::vector<std::thread::id> threads;
-		this->mTaskManager->GetThreads(threads);
+		const std::vector<TaskThread*> & threads = this->mTaskManager->GetThreads();
 		config.GetValue("Redis", "timeout", second);
 		
-		for (std::thread::id & id : threads)
+		for (TaskThread * taskThread : threads)
 		{
 			redisContext * redisSocket = this->ConnectRedis(second);
-			SayNoAssertRetFalse_F(redisSocket);
-			this->mRedisContextMap.emplace(id, redisSocket);
-			SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]  [ id = " << id << "]");
+			if(redisSocket == nullptr)
+            {
+                return false;
+            }
+			this->mRedisContextMap.emplace(taskThread->GetId(), redisSocket);
+			SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
 		}
         return true;
     }

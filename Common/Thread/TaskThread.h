@@ -27,7 +27,7 @@ namespace Sentry
 
         ThreadState GetTaskState() { return this->mTaskState; }
 
-		std::thread::id & GetId() { return this->mThreadId; }
+		const std::thread::id GetId() { return this->mThreadId; }
         bool IsRunning() { return this->mTaskState == ThreadState::Run; }
 
     private:

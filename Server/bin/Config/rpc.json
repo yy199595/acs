@@ -9,8 +9,8 @@
         "Query": {
             "id": 102,
             "async":false,
-            "request": "com.Int32Data",
-            "response": "s2s.NodeData.Array"
+            "request": "s2s.NodeQuery.Request",
+            "response": "s2s.NodeQuery.Response"
         }
     },
     "ClusterService": {
@@ -18,7 +18,7 @@
         "Add": {
             "id": 201,
             "async":false,
-            "request": "s2s.NodeData.NodeInfo"
+            "request": "s2s.NodeInfo"
         },
         "Del": {
             "id": 202,

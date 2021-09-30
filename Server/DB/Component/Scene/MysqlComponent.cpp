@@ -57,7 +57,13 @@ namespace Sentry
 
     SayNoMysqlSocket *MysqlComponent::GetMysqlSocket()
     {
+        if(App::Get().IsMainThread())
+        {
+            SayNoDebugError("try in main thread invoke sql");
+            return nullptr;
+        }
 		auto id = std::this_thread::get_id();
+        SayNoDebugWarning(id);
         auto iter = this->mMysqlSocketMap.find(id);
         return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
     }
@@ -161,13 +167,16 @@ namespace Sentry
 
     bool MysqlComponent::StartConnectMysql()
     {
-		std::vector<std::thread::id> threadTasks;
-		this->mTaskManager->GetThreads(threadTasks);
-		for (std::thread::id & id : threadTasks)
+		const std::vector<TaskThread *> & threadTasks = this->mTaskManager->GetThreads();
+		for (TaskThread * taskThread : threadTasks)
 		{
+            SayNoDebugWarning(taskThread->GetId());
 			auto mysqlScoket = this->ConnectMysql();
-			SayNoAssertRetFalse_F(mysqlScoket);
-			this->mMysqlSocketMap.insert(std::make_pair(id, mysqlScoket));
+			if(mysqlScoket == nullptr)
+            {
+                return false;
+            }
+			this->mMysqlSocketMap.insert(std::make_pair(taskThread->GetId(), mysqlScoket));
 		}
         return true;
     }
@@ -214,28 +223,36 @@ namespace Sentry
             if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
             {
                 mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_BYTES)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_BYTES)
             {
                 mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT64)
             {
                 mSqlCommandStream << pReflection->GetInt64(messageData, fieldDesc) << ",";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT64)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT64)
             {
                 mSqlCommandStream << pReflection->GetUInt64(messageData, fieldDesc) << ",";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT32)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_INT32)
             {
                 mSqlCommandStream << pReflection->GetInt32(messageData, fieldDesc) << ",";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT32)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_UINT32)
             {
                 mSqlCommandStream << pReflection->GetUInt32(messageData, fieldDesc) << ",";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_FLOAT)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_FLOAT)
             {
                 mSqlCommandStream << pReflection->GetFloat(messageData, fieldDesc) << ",";
-            } else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_DOUBLE)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::Type::TYPE_DOUBLE)
             {
                 mSqlCommandStream << pReflection->GetDouble(messageData, fieldDesc) << ",";
-            } else
+            }
+            else
             {
                 return false;
             }

@@ -31,16 +31,18 @@ namespace Sentry
 		{
 			return XCode::Failure;
 		}
-		//SharedTcpSession tcpSession = this->GetCurTcpSession();
-		const int key = areaId * 10000 + nodeId;
+
+        ServiceNode *serviceNode = new ServiceNode(areaId, nodeId, nodeName, address);
+
+        const int key = serviceNode->GetNodeUId();
 		auto iter = this->mServiceNodeMap.find(key);
 		if (iter != this->mServiceNodeMap.end())
 		{
+            delete serviceNode;
 			return XCode::Failure;
 		}
 		ProtocolComponent * protoComponent = this->gameObject->GetComponent<ProtocolComponent>();
 
-		ServiceNode *serviceNode = new ServiceNode(key, nodeName, address);
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
 			const std::string & service = nodeInfo.services(index);
@@ -59,8 +61,26 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode CenterService::Query(const s2s::NodeQuery_Request & service, s2s::NodeQuery_Response & response)
+	XCode CenterService::Query(const s2s::NodeQuery_Request & request, s2s::NodeQuery_Response & response)
 	{
+        const int areaId = request.areaid();
+        const std::string & service = request.service();
+
+        auto iter = this->mServiceNodeMap.begin();
+        for(; iter != this->mServiceNodeMap.end(); iter++)
+        {
+            ServiceNode * node = iter->second;
+            if(node->GetAreaId() == areaId && node->HasService(service))
+            {
+               s2s::NodeInfo * nodeInfo = response.add_nodeinfos();
+                nodeInfo->set_address(node->GetAddress());
+            }
+        }
 		return XCode::Successful;
 	}
+
+    void CenterService::NoticeAllNode(const s2s::NodeInfo & nodeInfo)
+    {
+
+    }
 }

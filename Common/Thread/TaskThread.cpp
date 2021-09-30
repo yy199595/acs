@@ -10,8 +10,9 @@ namespace Sentry
     {
         this->mIsStop = false;
         this->mTaskState = Idle;
+        this->mBindThread.detach();
         this->mTaskManager = manager;
-        //this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
+        SayNoDebugWarning("id = " << this->mThreadId)
     }
 
     void TaskThread::AddTask(TaskProxy * task)
@@ -23,8 +24,8 @@ namespace Sentry
 
     void TaskThread::Run()
     {
-		this->mThreadId = std::this_thread::get_id();
-
+        this->mThreadId = std::this_thread::get_id();
+        SayNoDebugWarning("id = " << this->GetId());
         while (!this->mIsStop)
         {
 			TaskProxy * task = nullptr;

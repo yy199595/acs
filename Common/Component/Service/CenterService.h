@@ -48,6 +48,8 @@ namespace Sentry
         XCode Query(const s2s::NodeQuery_Request & service, s2s::NodeQuery_Response &response);
 
     private:
+        void NoticeAllNode(const s2s::NodeInfo & nodeInfo);
+    private:
         std::unordered_map<int, ServiceNode *> mServiceNodeMap;
     };
 }

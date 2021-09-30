@@ -28,21 +28,16 @@ namespace Sentry
         return false;
     }
 
-	ServiceNode * ServiceNodeComponent::CreateNode(int uid, std::string name, std::string address)
+	ServiceNode * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
 	{
-		auto iter = this->mServiceNodeMap1.find(uid);
-		if (iter != this->mServiceNodeMap1.end())
-		{
-			return iter->second;
-		}
-		ServiceNode * serviceNode = new ServiceNode(uid, name, address);
+		ServiceNode * serviceNode = new ServiceNode(areaId, nodeId, name, address);
 		if (serviceNode != nullptr)
 		{
 			serviceNode->Init(name);
 			this->mServiceNodeArray.push_back(serviceNode);
-			this->mServiceNodeMap1.emplace(uid, serviceNode);
 			this->mServiceNodeMap2.emplace(address, serviceNode);
-			SayNoDebugInfo("create new service " << name << "  [" << address << "]");
+            this->mServiceNodeMap1.emplace(serviceNode->GetNodeUId(), serviceNode);
+            SayNoDebugInfo("create new service " << name << "  [" << address << "]");
 		}
 		return serviceNode;
 	}
@@ -50,12 +45,12 @@ namespace Sentry
     bool ServiceNodeComponent::Awake()
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
-		SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
+		SayNoAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
 		SayNoAssertRetFalse_F(mProtocolComponent = Scene::GetComponent<ProtocolComponent>());
-        std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);       	
-		return this->CreateNode(0, "Center", centerAddress)->AddService("CenterService");
+        const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
+		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
     }
 
 	void ServiceNodeComponent::OnSecondUpdate()
@@ -119,16 +114,36 @@ namespace Sentry
     }
 
 	ServiceNode *ServiceNodeComponent::GetNodeByServiceName(const std::string &service)
-	{
-		for (ServiceNode *serviceNode : this->mServiceNodeArray)
-		{
-			if (serviceNode->IsActive() && serviceNode->HasService(service))
-			{
-				return serviceNode;
-			}
-		}
+    {
+        for (ServiceNode *serviceNode: this->mServiceNodeArray)
+        {
+            if (serviceNode->IsActive() && serviceNode->HasService(service))
+            {
+                return serviceNode;
+            }
+        }
 
-		return nullptr;
-	}
+        s2s::NodeQuery_Request request;
+        s2s::NodeQuery_Response response;
+        request.set_areaid(this->mAreaId);
+        request.set_service(service);
+        ServiceNode *centerNode = this->GetServiceNode(0);
+        XCode code = centerNode->Call("CenterService", "Query", request, response);
+
+        ServiceNode * newServiceNode = nullptr;
+        if (code == XCode::Successful && response.nodeinfos_size() > 0)
+        {
+            for (int index = 0; index < response.nodeinfos_size(); index++)
+            {
+                const int areaId = response.nodeinfos(index).uid() / 10000;
+                const int nodeId = response.nodeinfos(index).uid() % 10000;
+                const std::string &address = response.nodeinfos(index).address();
+                const std::string &nodeName = response.nodeinfos(index).servername();
+                newServiceNode = this->CreateNode(areaId, nodeId, nodeName, address);
+
+            }
+        }
+        return newServiceNode;
+    }
 
 }// namespace Sentry

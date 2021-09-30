@@ -55,22 +55,20 @@ namespace Sentry
 #ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
-        const std::string &tab = this->mMysqlManager->GetDataBaseName();
-        MyqslTask * mysqlTask = new MyqslTask(tab, sql);
+        MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
-        if (!this->mTaskManager->StartTask(mysqlTask))
+        if (!this->mTaskManager->StartTask(&mysqlTask))
         {
-			delete mysqlTask;
             return XCode::MysqlStartTaskFail;
         }
 
         this->mCorComponent->YieldReturn();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
-        return mysqlTask->GetErrorCode();
+        return mysqlTask.GetErrorCode();
     }
 
     XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
@@ -91,21 +89,19 @@ namespace Sentry
 #ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
-        const std::string &tab = this->mMysqlManager->GetDataBaseName();
-		MyqslTask * mysqlTask = new MyqslTask(tab, sql);
-
-        if (!this->mTaskManager->StartTask(mysqlTask))
+		MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
+        if (!this->mTaskManager->StartTask(&mysqlTask))
         {
             return XCode::MysqlStartTaskFail;
         }
 
         this->mCorComponent->YieldReturn();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
 #endif
-        return mysqlTask->GetErrorCode();
+        return mysqlTask.GetErrorCode();
     }
 
     XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
@@ -125,21 +121,19 @@ namespace Sentry
 #ifdef _DEBUG
         SayNoDebugInfo(sql);
 #endif
-        const std::string &tab = this->mMysqlManager->GetDataBaseName();
-        MyqslTask * mysqlTask = new MyqslTask(tab, sql);
+        MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
-        if (!this->mTaskManager->StartTask(mysqlTask))
+        if (!this->mTaskManager->StartTask(&mysqlTask))
         {
-			delete mysqlTask;
             return XCode::MysqlStartTaskFail;
         }
         this->mCorComponent->YieldReturn();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
         SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
-        return mysqlTask->GetErrorCode();
+        return mysqlTask.GetErrorCode();
     }
 
     XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
