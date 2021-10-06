@@ -33,6 +33,9 @@ namespace Sentry
         userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
         XCode code = mysqlProxyComponent->Add(userAccountData);
 
+		userAccountData.Clear();
+		userAccountData.set_account("646585122@qq.com");
+
         db::UserAccountData response;
         XCode responseCode = mysqlProxyComponent->Query(userAccountData, response);
 

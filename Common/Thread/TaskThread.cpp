@@ -6,13 +6,18 @@ using namespace std::chrono;
 namespace Sentry
 {
     TaskThread::TaskThread(TaskComponent *manager)
-        : mBindThread(std::bind(&TaskThread::Run, this))
     {
-        this->mIsStop = false;
+		this->mIsStop = false;
         this->mTaskState = Idle;
-        this->mBindThread.detach();
-        this->mTaskManager = manager;
-        SayNoDebugWarning("id = " << this->mThreadId)
+        this->mTaskManager = manager;	
+		this->mBindThread = new std::thread(std::bind(&TaskThread::Run, this));
+		if (this->mBindThread != nullptr)
+		{
+			this->mThreadId = this->mBindThread->get_id();
+			SayNoDebugWarning("id = " << this->mThreadId);
+			this->mBindThread->detach();
+			
+		}	
     }
 
     void TaskThread::AddTask(TaskProxy * task)
@@ -24,8 +29,6 @@ namespace Sentry
 
     void TaskThread::Run()
     {
-        this->mThreadId = std::this_thread::get_id();
-        SayNoDebugWarning("id = " << this->GetId());
         while (!this->mIsStop)
         {
 			TaskProxy * task = nullptr;

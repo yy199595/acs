@@ -65,7 +65,7 @@ namespace Sentry
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
         return mysqlTask.GetErrorCode();
@@ -98,7 +98,7 @@ namespace Sentry
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
 #endif
         return mysqlTask.GetErrorCode();
@@ -130,7 +130,7 @@ namespace Sentry
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
         return mysqlTask.GetErrorCode();

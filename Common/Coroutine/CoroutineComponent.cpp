@@ -63,7 +63,7 @@ namespace Sentry
 
     void CoroutineComponent::Start()
     {
-		long long t1 = TimeHelper::GetMilTimestamp();
+		/*long long t1 = TimeHelper::GetMilTimestamp();
 		CoroutineGroup * group = this->NewCoroutineGroup();
 		for (size_t index = 0; index < 10; index++)
 		{
@@ -71,7 +71,7 @@ namespace Sentry
 		}
 		group->AwaitAll();
 		long long t2 = TimeHelper::GetMilTimestamp();
-		SayNoDebugError("时间 = " << t2 - t1);
+		SayNoDebugError("时间 = " << t2 - t1);*/
     }
 
 	void CoroutineComponent::Loop()

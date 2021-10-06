@@ -37,7 +37,7 @@ namespace Sentry
         bool mIsStop;
         std::mutex mThreadLock;
         ThreadState mTaskState;
-        std::thread mBindThread;
+        std::thread * mBindThread;
         TaskComponent *mTaskManager;
 		std::thread::id mThreadId;
 		std::queue<unsigned int> mFinishTasks;

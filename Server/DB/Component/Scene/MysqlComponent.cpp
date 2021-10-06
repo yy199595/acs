@@ -50,7 +50,7 @@ namespace Sentry
         SayNoAssertRetFalse_F(config.GetValue("Mysql","user",this->mDataBaseUser));    
 		SayNoAssertRetFalse_F(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
 
-        SayNoAssertRetFalse_F(this->StartConnectMysql());
+        SayNoAssertRetFalse_F(this->StartConnect());
         SayNoAssertRetFalse_F(this->InitMysqlTable());
         return true;
     }
@@ -165,7 +165,7 @@ namespace Sentry
         return tableOper.InitMysqlTable();
     }
 
-    bool MysqlComponent::StartConnectMysql()
+    bool MysqlComponent::StartConnect()
     {
 		const std::vector<TaskThread *> & threadTasks = this->mTaskManager->GetThreads();
 		for (TaskThread * taskThread : threadTasks)
@@ -403,7 +403,6 @@ namespace Sentry
         }
         for (size_t index = 0; index < fieldList.size(); index++)
         {
-
             const FieldDescriptor *fieldDesc = fieldList[index];
             const std::string &key = fieldDesc->name();
 

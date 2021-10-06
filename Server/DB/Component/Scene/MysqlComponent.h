@@ -65,9 +65,9 @@ namespace Sentry
         void Start() final;
 
     private:
-        bool InitMysqlTable();
 
-        bool StartConnectMysql();
+		bool StartConnect();
+        bool InitMysqlTable();
 
     private:
 		std::string mSqlPath;
