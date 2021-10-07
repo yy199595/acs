@@ -115,7 +115,6 @@ namespace Sentry
 	{
 		if (!component->IsActive() || !component->Awake())
 		{
-			SayNoDebugError("init " << component->GetTypeName() << " fail");
 			return false;
 		}
 

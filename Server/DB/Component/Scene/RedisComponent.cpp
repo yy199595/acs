@@ -73,9 +73,10 @@ namespace Sentry
 			return nullptr;
 		}
 		std::string redisPasswd;
-		if (config.GetValue("RedisPasswd", redisPasswd) && !redisPasswd.empty())
+		if (config.GetValue("Redis", "passwd", redisPasswd) && !redisPasswd.empty())
 		{
-			redisReply *reply = (redisReply *)redisCommand(pRedisContext, "AUTH %s", redisPasswd.c_str());
+			void * p = redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
+			redisReply *reply = (redisReply *)redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
 			if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
 			{
 				SayNoDebugError("redis Authentication failed " << reply->str);
