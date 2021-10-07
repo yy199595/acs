@@ -14,7 +14,7 @@ namespace Sentry
 		{
 			const char * json = backData->GetMsgBody().c_str();
 			const size_t size = backData->GetMsgBody().size();
-			auto scriptCom = Scene::GetComponent<LuaScriptComponent>();
+			auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
 			lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
 			if (lua_isfunction(this->luaEnv, -1))
 			{
