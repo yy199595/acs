@@ -48,7 +48,7 @@ namespace Sentry
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-		SayNoAssertRetFalse_F(mProtocolComponent = Scene::GetComponent<ProtocolComponent>());
+		SayNoAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtocolComponent>());
         const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
 		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
     }

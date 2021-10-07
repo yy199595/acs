@@ -6,7 +6,7 @@ namespace Sentry
 {
 	bool ServiceComponent::AddMethod(ServiceMethod * method)
 	{
-		ProtocolComponent * procolComponent = Scene::GetComponent<ProtocolComponent>();
+		ProtocolComponent * procolComponent = App::Get().GetComponent<ProtocolComponent>();
 		if (procolComponent == nullptr)
 		{
 			return false;

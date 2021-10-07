@@ -16,7 +16,7 @@ namespace Sentry
 
     bool NetSessionComponent::Awake()
     {
-        SayNoAssertRetFalse_F(this->mNetProxyComponent = Scene::GetComponent<NetProxyComponent>());
+        SayNoAssertRetFalse_F(this->mNetProxyComponent = this->GetComponent<NetProxyComponent>());
         return true;
     }
 

@@ -34,7 +34,7 @@ namespace Sentry
 		}
 		this->mLuaEnv = luaEnv;
 		this->mIdx = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		ProtocolComponent * protocolComponent = Scene::GetComponent<ProtocolComponent>();
+		ProtocolComponent * protocolComponent = App::Get().GetComponent<ProtocolComponent>();
 
         return true;
 		

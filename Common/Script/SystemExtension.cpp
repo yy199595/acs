@@ -34,7 +34,7 @@ int SystemExtension::Call(lua_State *lua)
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
 
-	ServiceNodeComponent * nodeComponent = Scene::GetComponent<ServiceNodeComponent>();
+	ServiceNodeComponent * nodeComponent = App::Get().GetComponent<ServiceNodeComponent>();
 
 	ServiceNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
@@ -64,7 +64,7 @@ int SystemExtension::Call(lua_State *lua)
 	const ProtocolConfig * config = packetMapper->GetProConfig();
 	if (lua_istable(lua, index))
 	{
-		LuaScriptComponent * scriptComponent = Scene::GetComponent<LuaScriptComponent>();
+		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
 		int ref = scriptComponent->GetLuaRef("Json", "ToString");
 		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 		lua_pushvalue(lua, index);
@@ -92,7 +92,7 @@ int SystemExtension::Call(lua_State *lua)
 		}
 	}
 
-	auto actionComponent = Scene::GetComponent<ActionComponent>();
+	auto actionComponent = App::Get().GetComponent<ActionComponent>();
 	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
 
 	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))
@@ -150,7 +150,7 @@ int SystemExtension::Sleep(lua_State *luaEnv)
 {
     long long ms = lua_tointeger(luaEnv, 1);
     lua_pushthread(luaEnv);
-    TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
+    TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
     if (pTimerManager != nullptr)
     {
         shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, ms);
@@ -175,7 +175,7 @@ int SystemExtension::AddTimer(lua_State *lua)
     {
         count = lua_tointeger(lua, 3);
     }
-    TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
+    TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
     if (pTimerManager != nullptr)
     {
         lua_pushvalue(lua, 1);
@@ -199,7 +199,7 @@ int SystemExtension::RemoveTimer(lua_State *lua)
     if (lua_isinteger(lua, 1))
     {
         long long id = lua_tointeger(lua, 1);
-        TimerComponent *pTimerManager = Scene::GetComponent<TimerComponent>();
+        TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
         if (pTimerManager != nullptr)
         {
             bool code = pTimerManager->RemoveTimer(id);

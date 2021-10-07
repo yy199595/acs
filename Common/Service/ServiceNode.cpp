@@ -12,9 +12,9 @@ namespace Sentry
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
-		NetProxyComponent * component = Scene::GetComponent<NetProxyComponent>();
-		SayNoAssertRet_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
-		SayNoAssertRet_F(this->mActionManager = Scene::GetComponent<ActionComponent>());
+		NetProxyComponent * component = App::Get().GetComponent<NetProxyComponent>();
+		SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
+		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 
 		this->mTcpSession = component->Create(address, mNodeName);

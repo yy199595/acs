@@ -66,7 +66,13 @@ namespace Sentry
 		}
     }
 
-    bool GameObject::RemoveComponent(const std::string &name)
+	Component * GameObject::GetComponentByName(const std::string & name)
+	{
+		auto iter = this->mComponentMap.find(name);
+		return iter != this->mComponentMap.end() ? iter->second : nullptr;
+	}
+
+	bool GameObject::RemoveComponent(const std::string &name)
     {
         auto iter = this->mComponentMap.find(name);
         if (iter != this->mComponentMap.end())

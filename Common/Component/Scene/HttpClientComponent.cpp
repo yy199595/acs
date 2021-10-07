@@ -41,7 +41,7 @@ namespace Sentry
     bool HttpClientComponent::Awake()
     {
         this->mHttpContext = new AsioContext(1);
-        auto taskComponent = Scene::GetComponent<TaskComponent>();
+        auto taskComponent = this->GetComponent<TaskComponent>();
         SayNoAssertRetFalse_F(taskComponent);
         this->mHttpThread = new TaskThread(taskComponent);
         return true;

@@ -16,8 +16,8 @@ namespace Sentry
     App *App::mApp = nullptr;
 
 	App::App(const std::string srvName, const std::string cfgDir)
-		: mStartTime(TimeHelper::GetMilTimestamp()),
-		mConfig(cfgDir + srvName + ".json"), Scene(1)
+		:GameObject(0), mStartTime(TimeHelper::GetMilTimestamp()),
+		mConfig(cfgDir + srvName + ".json")
 	{
 		mApp = this;
 		this->mDelatime = 0;
@@ -35,18 +35,18 @@ namespace Sentry
 
     bool App::LoadComponent()
     {
-		this->Scene.AddComponent<TimerComponent>();
-		this->Scene.AddComponent<ActionComponent>();
-		this->Scene.AddComponent<ProtocolComponent>();
-		this->Scene.AddComponent<CoroutineComponent>();
-		this->Scene.AddComponent<NetSessionComponent>();
-		this->Scene.AddComponent<NetProxyComponent>();
+		this->AddComponent<TimerComponent>();
+		this->AddComponent<ActionComponent>();
+		this->AddComponent<ProtocolComponent>();
+		this->AddComponent<CoroutineComponent>();
+		this->AddComponent<NetSessionComponent>();
+		this->AddComponent<NetProxyComponent>();
 
-		this->Scene.AddComponent<ServiceNodeComponent>();
-		this->Scene.AddComponent<ServiceMgrComponent>();
+		this->AddComponent<ServiceNodeComponent>();
+		this->AddComponent<ServiceMgrComponent>();
 
-		this->mTimerComponent = this->Scene.GetComponent<TimerComponent>();
-		this->mCoroutienComponent = this->Scene.GetComponent<CoroutineComponent>();
+		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->mCoroutienComponent = this->GetComponent<CoroutineComponent>();
 
 
 
@@ -67,7 +67,7 @@ namespace Sentry
         for (size_t index = 0; index < services.size(); index++)
         {
             const std::string &name = services[index];
-			if (!this->Scene.AddComponent(name))
+			if (!this->AddComponent(name))
 			{
 				SayNoDebugFatal("add " << name << " to scene failure");
 				return false;
@@ -77,7 +77,7 @@ namespace Sentry
 		for (size_t index = 0; index < managers.size(); index++)
 		{
 			const std::string &name = managers[index];
-			if (!this->Scene.AddComponent(name))
+			if (!this->AddComponent(name))
 			{
 				SayNoDebugFatal("add " << name << " to service failure");
 				return false;
@@ -90,7 +90,7 @@ namespace Sentry
 	{
 
 		// 初始化scene组件
-		this->Scene.GetComponents(this->mSceneComponents);
+		this->GetComponents(this->mSceneComponents);
 		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
 			[](Component * m1, Component * m2)->bool
 		{
@@ -114,7 +114,7 @@ namespace Sentry
 	bool App::InitComponent(Component * component)
 	{
 		if (!component->IsActive() || !component->Awake())
-		{
+		{ 
 			return false;
 		}
 
@@ -189,8 +189,8 @@ namespace Sentry
 
     int App::Stop()
     {
-        this->mIsClose = true;
-		this->Scene.OnDestory();
+		this->OnDestory();
+        this->mIsClose = true;		
         spdlog::drop_all();
 #ifdef _WIN32
         return getchar();

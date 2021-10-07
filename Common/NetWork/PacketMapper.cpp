@@ -42,7 +42,7 @@ namespace Sentry
             return nullptr;
         }
         size_t offset = 1;
-        ProtocolComponent *pProtocolMgr = Scene::GetComponent<ProtocolComponent>();
+        ProtocolComponent *pProtocolMgr = App::Get().GetComponent<ProtocolComponent>();
 
         int code = 0;
 		long long userid = 0;
@@ -102,7 +102,7 @@ namespace Sentry
         {
             return nullptr;
         }
-        ProtocolComponent *pProtocolMgr = Scene::GetComponent<ProtocolComponent>();
+        ProtocolComponent *pProtocolMgr = App::Get().GetComponent<ProtocolComponent>();
 
         const ProtocolConfig *config = pProtocolMgr->GetProtocolConfig(service, method);
         if (config != nullptr)

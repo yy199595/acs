@@ -41,8 +41,8 @@ namespace Sentry
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mSqlPath = App::Get().GetConfigDir() + "sql.json";
-        SayNoAssertRetFalse_F(this->mTaskManager = Scene::GetComponent<TaskComponent>());
-        SayNoAssertRetFalse_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
+        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskComponent>());
+        SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
         SayNoAssertRetFalse_F(config.GetValue("Mysql", "ip", this->mMysqlIp));
         SayNoAssertRetFalse_F(config.GetValue("Mysql", "port",this->mMysqlPort));

@@ -9,8 +9,8 @@ namespace Sentry
 {
 	bool LuaServiceMgrComponent::Awake()
 	{
-		LuaScriptComponent * scriptComponent = Scene::GetComponent<LuaScriptComponent>();
-		ProtocolComponent * protoComponent = Scene::GetComponent<ProtocolComponent>();
+		LuaScriptComponent * scriptComponent = this->GetComponent<LuaScriptComponent>();
+		ProtocolComponent * protoComponent = this->GetComponent<ProtocolComponent>();
 
 		string servicePath;
 		SayNoAssertRetFalse_F(protoComponent);
@@ -20,7 +20,6 @@ namespace Sentry
 		std::vector<std::string> services;
 		protoComponent->GetServices(services);
 
-		GameObject & serviceObject = App::Get().Scene;
 		for (std::string & service : services)
 		{
 			lua_getglobal(lua, service.c_str());
@@ -34,11 +33,11 @@ namespace Sentry
 				continue;
 			}
 		
-			ServiceComponent * localService = serviceObject.GetComponent<ServiceComponent>(service);
+			ServiceComponent * localService = App::Get().GetComponent<ServiceComponent>(service);
 			if (localService == nullptr)
 			{
 				LuaServiceComponent * luaSerivce = new LuaServiceComponent();
-				if (serviceObject.AddComponent(service, localService))
+				if (App::Get().AddComponent(service, localService))
 				{
 					SayNoDebugError("add service " << service << " failure");
 					return false;

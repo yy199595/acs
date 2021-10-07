@@ -48,7 +48,7 @@ namespace Sentry
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "ip", this->mListenerIp));
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "port", this->mListenerPort));
         this->mListenAddress = this->mListenerIp + ":" + std::to_string(this->mListenerPort);
-		SayNoAssertRetFalse_F(this->mDispatchManager = Scene::GetComponent<NetSessionComponent>());
+		SayNoAssertRetFalse_F(this->mDispatchManager = this->GetComponent<NetSessionComponent>());
         try
         {
             AsioContext &io = App::Get().GetNetContext();

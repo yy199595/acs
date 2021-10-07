@@ -42,6 +42,12 @@ namespace Sentry
 			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
 		}
 
+		static Type * GetType(size_t hash)
+		{
+			auto iter = mTypeInfoMap1.find(hash);
+			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
+		}
+
 		static bool DestoryComponent(Component * component);
 		template<typename T>
 		static Component * CreateComponent(bool fromPool = true);

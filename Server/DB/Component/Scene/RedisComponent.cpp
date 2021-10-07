@@ -35,8 +35,8 @@ namespace Sentry
     bool RedisComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
-		SayNoAssertRetFalse_F(this->mTaskManager = Scene::GetComponent<TaskComponent>());
-        SayNoAssertRetFalse_F(this->mCorComponent = Scene::GetComponent<CoroutineComponent>());
+		SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskComponent>());
+        SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
         
 
         SayNoAssertRetFalse_F(config.GetValue("Redis", "ip",this->mRedisIp));

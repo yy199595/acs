@@ -63,9 +63,20 @@ namespace Sentry
 
 		virtual int GetPriority() { return 100; }
 	protected:
+		template<typename T>
+		T * GetComponent();
+	private:
+		Component * GetComponentByHash(const size_t hash);
+	protected:
 		Type * mType;
 		long long gameObjectID;
 		GameObject * gameObject;
 		std::unordered_map<std::string, void*> mEventMap;
 	};
+	template<typename T>
+	inline T * Component::GetComponent()
+	{
+		const size_t hash = typeid(T).hash_code();
+		return static_cast<T*>(this->GetComponentByHash(hash));
+	}
 }

@@ -11,7 +11,7 @@ namespace Sentry
 
     void RedisTaskBase::Run()
     {
-		RedisComponent * redisManager = Scene::GetComponent<RedisComponent>();
+		RedisComponent * redisManager = App::Get().GetComponent<RedisComponent>();
         RedisSocket *redisSocket = redisManager->GetRedisSocket();
         if (redisSocket == nullptr)
         {

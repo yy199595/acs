@@ -14,7 +14,7 @@ namespace Sentry
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
-		SayNoAssertRetFalse_F(this->mNodeComponent = gameObject->GetComponent<ServiceNodeComponent>());
+		SayNoAssertRetFalse_F(this->mNodeComponent = this->GetComponent<ServiceNodeComponent>());
 		return true;
     }
 
@@ -34,7 +34,7 @@ namespace Sentry
 
 		s2s::NodeRegister_Response responseInfo;
 		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
-		ListenerComponent * listenComponent = Scene::GetComponent<ListenerComponent>();
+		ListenerComponent * listenComponent = this->GetComponent<ListenerComponent>();
 
 		registerInfo.set_areaid(this->mAreaId);
 		registerInfo.set_nodeid(this->mNodeId);

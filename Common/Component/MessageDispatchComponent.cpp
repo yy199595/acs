@@ -7,7 +7,7 @@
 namespace Sentry
 {
 	MessageDispatchComponent::MessageDispatchComponent()
-		:mServiceObject(App::Get().Scene)
+		:mServiceObject(App::Get())
 	{
 		this->mIsStarted = false;
 	}

@@ -11,7 +11,7 @@ namespace Sentry
     {
         this->mMysqlProxyNodeId = -1;
 		this->mCorComponent = App::Get().GetCoroutineComponent();     
-        SayNoAssertRetFalse_F(this->mNodeManager = Scene::GetComponent<ServiceNodeComponent>());
+        SayNoAssertRetFalse_F(this->mNodeManager = this->GetComponent<ServiceNodeComponent>());
 
         return true;
     }

@@ -84,8 +84,8 @@ namespace Sentry
 		this->mTimerManager = App::Get().GetTimerComponent();
 		config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime);
 		config.GetValue("NetWork", "ReConnectCount", this->mReConnectCount);
-        SayNoAssertRetFalse_F(this->mActionManager = Scene::GetComponent<ActionComponent>());
-        SayNoAssertRetFalse_F(this->mNetWorkManager = Scene::GetComponent<NetSessionComponent>());     
+        SayNoAssertRetFalse_F(this->mActionManager = this->GetComponent<ActionComponent>());
+        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetComponent<NetSessionComponent>());     
         return true;
     }
 
@@ -99,7 +99,7 @@ namespace Sentry
 			{
 				session->SetActive(isSuc);
 				this->OnConnectSuccessful(session);
-				Scene::GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
+				this->GetComponent<ServiceNodeComponent>()->GetServiceNode(address)->OnConnectNodeAfter();
 			}
 #ifdef _DEBUG
 			SayNoDebugWarning("connect to " << address << isSuc ? " successful" : " failure");
@@ -176,7 +176,7 @@ namespace Sentry
     {
         if (messageData->GetMessageType() < REQUEST_END)
         {			
-			ServiceMgrComponent * serviceComponent = Scene::GetComponent<ServiceMgrComponent>();
+			ServiceMgrComponent * serviceComponent = this->GetComponent<ServiceMgrComponent>();
 			if (serviceComponent == nullptr)
 			{
 				return false;

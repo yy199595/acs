@@ -11,8 +11,8 @@ namespace Sentry
 	LuaServiceMethod::LuaServiceMethod(const std::string & name, lua_State * lua, int idx)
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
-		this->mScriptComponent = Scene::GetComponent<LuaScriptComponent>();
-		this->mProtocolComponent = Scene::GetComponent<ProtocolComponent>();
+		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
+		this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>();
 		SayNoAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
@@ -146,7 +146,7 @@ namespace Sentry
 			responseData->Destory();
 			return 0;
 		}
-		NetProxyComponent * sessionComponent = Scene::GetComponent<NetProxyComponent>();
+		NetProxyComponent * sessionComponent = App::Get().GetComponent<NetProxyComponent>();
 
 		responseData->ClearMessage();
 		if (lua_isstring(lua, 3))

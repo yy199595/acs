@@ -24,6 +24,8 @@ namespace Sentry
 		template<typename T>
 		inline T *GetComponent(const std::string & name) const;
 
+		Component * GetComponentByName(const std::string & name);
+
         template<typename T>
         inline bool RemoveComponent();
 

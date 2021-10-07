@@ -47,7 +47,7 @@ namespace Sentry
         }       
         lua_State *coroutine = lua_tothread(lua, index);
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        RedisComponent *redisManager = Scene::GetComponent<RedisComponent>();
+        RedisComponent *redisManager = App::Get().GetComponent<RedisComponent>();
         if (redisManager == nullptr)
         {
             return nullptr;

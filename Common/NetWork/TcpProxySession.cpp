@@ -13,7 +13,7 @@ namespace Sentry
         this->mConnectCount = 0;
         this->mAddress = address;
         this->mSessionType = SessionClient;    
-        SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<NetSessionComponent>());
+        SayNoAssertRet_F(this->mNetManager = App::Get().GetComponent<NetSessionComponent>());
     }
 
     TcpProxySession::TcpProxySession(const std::string &name, const std::string &address)
@@ -23,7 +23,7 @@ namespace Sentry
 		this->mIsActive = false;
         this->mAddress = address;
         this->mSessionType = SessionNode;
-		SayNoAssertRet_F(this->mNetManager = Scene::GetComponent<NetSessionComponent>());
+		SayNoAssertRet_F(this->mNetManager = App::Get().GetComponent<NetSessionComponent>());
     }
 
     TcpProxySession::~TcpProxySession()

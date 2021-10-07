@@ -20,7 +20,7 @@ namespace Sentry
 
 	class ServiceComponent;
 
-	class App
+	class App : public GameObject
 	{
 	public:
 		App(const std::string srvName, const std::string cfgDir);
@@ -108,8 +108,6 @@ namespace Sentry
 
 		void NetworkLoop();
 
-	public:
-		GameObject Scene;
 	private:
 	    AsioWork * mAsioWork;
 		AsioContext * mAsioContext;
@@ -148,16 +146,3 @@ namespace Sentry
 		std::vector<INetSystemUpdate *> mNetSystemUpdateManagers;
 	};
 }// namespace Sentry
-
-
-namespace Sentry
-{
-	namespace Scene
-	{
-		template<typename T>
-		inline T * GetComponent()
-		{
-			return App::Get().Scene.GetComponent<T>();
-		}
-	}
-}

@@ -29,7 +29,7 @@ namespace Sentry
 
     void MyqslTask::Run()
     {
-        MysqlComponent *pMysqlManager = Scene::GetComponent<MysqlComponent>();
+        MysqlComponent *pMysqlManager = App::Get().GetComponent<MysqlComponent>();
         SayNoMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
         if (mysqlSocket == nullptr)
         {

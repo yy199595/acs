@@ -56,7 +56,7 @@ namespace Sentry
 
     bool CoroutineComponent::Awake()
     {
-		SayNoAssertRetFalse_F(this->mTimerManager = Scene::GetComponent<TimerComponent>());
+		SayNoAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
 
         return true;
     }

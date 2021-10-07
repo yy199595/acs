@@ -18,9 +18,9 @@ namespace Sentry
     bool MysqlService::Awake()
     {
 		this->mCorComponent = App::Get().GetCoroutineComponent();
-		SayNoAssertRetFalse_F(this->mTaskManager = Scene::GetComponent<TaskComponent>());
-        SayNoAssertRetFalse_F(this->mMysqlManager = Scene::GetComponent<MysqlComponent>());
-        SayNoAssertRetFalse_F(this->mProtocolManager = Scene::GetComponent<ProtocolComponent>());
+		SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskComponent>());
+        SayNoAssertRetFalse_F(this->mMysqlManager = this->GetComponent<MysqlComponent>());
+        SayNoAssertRetFalse_F(this->mProtocolManager = this->GetComponent<ProtocolComponent>());
 
 		__add_method(MysqlService::Add);
 		__add_method(MysqlService::Save);
