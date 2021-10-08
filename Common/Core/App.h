@@ -92,6 +92,8 @@ namespace Sentry
 		bool InitComponent(Component * component);
 
 		void StartComponent();
+
+        void OnZeroRefresh();
 	public:
 		int Run();
 
@@ -110,6 +112,7 @@ namespace Sentry
 
 	private:
 	    AsioWork * mAsioWork;
+        long long mNextRefreshTime;
 		AsioContext * mAsioContext;
 		std::thread *mNetWorkThread;
 		std::thread::id mMainThreadId;

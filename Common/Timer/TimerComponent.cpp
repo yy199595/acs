@@ -33,8 +33,7 @@ namespace Sentry
         if (iter == this->mTimerMap.end())
         {
             this->mTimerMap.emplace(id, timer);
-            this->AddTimerToWheel(timer);
-            return true;
+            return this->AddTimerToWheel(timer);
         }
         return false;
     }
@@ -138,6 +137,7 @@ namespace Sentry
                 return true;
             }
         }
+        SayNoDebugError("add timer " << timer->GetTimerId() << " failure");
         return false;
     }
 }// namespace Sentry

@@ -67,7 +67,8 @@ namespace Sentry
         }
     }
 
-    bool LogHelper::Init(const std::string path, const std::string name) {
+    bool LogHelper::Init(const std::string path, const std::string name)
+    {
         std::string logPath = path + "/" + TimeHelper::GetYearMonthDayString();
         mFatalLog = spdlog::basic_logger_mt(name + ".fatal", logPath + "/fatal.log");
         mErrorLog = spdlog::basic_logger_mt(name + ".error", logPath + "/error.log");

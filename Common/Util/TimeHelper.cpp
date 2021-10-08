@@ -32,20 +32,36 @@ long long TimeHelper::GetMicTimeStamp()
     return duration_cast<microseconds>(tmp).count();
 }
 
+long long TimeHelper::GetToDayZeroTime()
+{
+    time_t now = GetSecTimeStamp();
+    struct tm *t = localtime(&now);
+    t->tm_hour = 0;
+    t->tm_min = 0;
+    t->tm_sec = 0;
+    return mktime(t);
+}
+
+long long TimeHelper::GetTomorrowZeroTime()
+{
+    long long t = GetToDayZeroTime();
+    return t + 24 * 60 * 60;
+}
+
 std::string TimeHelper::GetDateString(long long time)
 {
-    time_t t = time + 28800;
-    struct tm *pt = gmtime(&t);
     char str[100];
+    time_t t = GetSecTimeStamp();
+    struct tm *pt = localtime(&t);
     size_t size = strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", pt);
     return std::string(str, size);
 }
 
 std::string TimeHelper::GetYearMonthDayString()
 {
-    time_t t = time(NULL) + 28800;
-    struct tm *pt = gmtime(&t);
     char str[100];
-    size_t size = strftime(str, sizeof(str), "%Y%m%d", pt);
+    time_t t = GetSecTimeStamp();
+    struct tm *pt = localtime(&t);
+    size_t size = strftime(str, sizeof(str), "%Y-%m-%d", pt);
     return std::string(str, size);
 }

@@ -20,5 +20,9 @@ namespace TimeHelper
     // 获取时间字符串精确到天
     extern std::string GetYearMonthDayString();
 
+    //获取今天零点时间戳
+    extern long long GetToDayZeroTime();
 
+    //获取明天零点时间戳
+    extern long long GetTomorrowZeroTime();
 }// namespace TimeHelper

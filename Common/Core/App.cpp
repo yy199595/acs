@@ -7,7 +7,6 @@
 #include <Scene/NetSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
-
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -30,8 +29,23 @@ namespace Sentry
 		this->mConfigDir = cfgDir;
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*mAsioContext);
-		LogHelper::Init("./Logs", srvName);
-	}
+		LogHelper::Init("./Logs", this->mServerName);
+        this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
+
+    }
+
+    void App::OnZeroRefresh()
+    {
+        spdlog::drop_all();
+        LogHelper::Init("./Logs", this->mServerName);
+        for (Component * component : this->mSceneComponents)
+        {
+            if (auto zeroComponent = dynamic_cast<IZeroRefresh*>(component))
+            {
+                zeroComponent->OnZeroRefresh();
+            }
+        }
+    }
 
     bool App::LoadComponent()
     {
@@ -87,29 +101,28 @@ namespace Sentry
     }
 
 	bool App::InitComponent()
-	{
+    {
 
-		// 初始化scene组件
-		this->GetComponents(this->mSceneComponents);
-		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
-			[](Component * m1, Component * m2)->bool
-		{
-			return m1->GetPriority() < m2->GetPriority();
-		});
+        // 初始化scene组件
+        this->GetComponents(this->mSceneComponents);
+        std::sort(mSceneComponents.begin(), mSceneComponents.end(),
+                  [](Component *m1, Component *m2) -> bool
+                  {
+                      return m1->GetPriority() < m2->GetPriority();
+                  });
 
-		for(Component * component : mSceneComponents)
-		{
-			if (!this->InitComponent(component))
-			{
-				SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
-				return false;
-			}
-		}
-
-		SayNoAssertRetFalse_F(this->StartNetThread());
-		this->mCoroutienComponent->StartCoroutine(&App::StartComponent, this);
-		return true;
-	}
+        for (Component *component: mSceneComponents)
+        {
+            if (!this->InitComponent(component))
+            {
+                SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
+                return false;
+            }
+        }
+        SayNoAssertRetFalse_F(this->StartNetThread());
+        this->mCoroutienComponent->StartCoroutine(&App::StartComponent, this);
+        return true;
+    }
 
 	bool App::InitComponent(Component * component)
 	{
@@ -211,7 +224,7 @@ namespace Sentry
 
 	float App::GetMeanFps()
     {
-        return 0;
+
     }
 
     int App::LogicMainLoop()
@@ -261,6 +274,11 @@ namespace Sentry
                 }
                 this->UpdateConsoleTitle();
                 secondTimer = TimeHelper::GetMilTimestamp();
+                if (secondTimer - this->mNextRefreshTime >= 0)
+                {
+                    this->OnZeroRefresh();
+                    this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
+                }
             }
         }
         return this->Stop();

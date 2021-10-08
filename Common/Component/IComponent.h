@@ -43,4 +43,10 @@ namespace Sentry
     public:
         virtual void OnLodaData() = 0;
     };
+
+    class IZeroRefresh
+    {
+    public:
+        virtual void OnZeroRefresh() = 0;
+    };
 }
