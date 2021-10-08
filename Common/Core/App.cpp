@@ -39,6 +39,7 @@ namespace Sentry
         spdlog::drop_all();
         LogHelper::Init("./Logs", this->mServerName);
         for (Component * component : this->mSceneComponents)
+
         {
             if (auto zeroComponent = dynamic_cast<IZeroRefresh*>(component))
             {
@@ -221,11 +222,6 @@ namespace Sentry
 			}
 		}
 	}
-
-	float App::GetMeanFps()
-    {
-
-    }
 
     int App::LogicMainLoop()
     {

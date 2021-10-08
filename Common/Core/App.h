@@ -101,8 +101,6 @@ namespace Sentry
 
 		void Hotfix();
 
-		float GetMeanFps();
-
 	private:
 		void UpdateConsoleTitle();
 	private:
