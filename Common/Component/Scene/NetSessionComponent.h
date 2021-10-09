@@ -14,7 +14,7 @@ namespace Sentry
 	// 管理所有session  在网络线程中运行
 	class TcpClientSession;
 
-	class NetSessionComponent : public Component, public INetSystemUpdate
+    class NetSessionComponent : public Component, public INetSystemUpdate, public ISessionHandler
 	{
 	public:
 		NetSessionComponent();
@@ -23,15 +23,17 @@ namespace Sentry
 		{}
 
 	public: //网络线程调用
-		void OnConnectComplete(TcpClientSession *session, bool isSuc);
 
-		void OnSessionError(TcpClientSession *session);
+		void OnSessionError(TcpClientSession *session) override;
 
-		bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size);
+		void OnSendMessageAfter(std::string * message) override;
 
-		bool OnSendMessageAfter(std::string * message);
+        void OnConnectComplete(TcpClientSession *session, bool isSuc) override;
 
-	public:
+        bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size) override;
+
+
+    public:
 		bool PushEventHandler(SocketEveHandler *eve);
 
 	public:

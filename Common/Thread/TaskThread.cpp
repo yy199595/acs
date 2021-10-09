@@ -14,7 +14,6 @@ namespace Sentry
 		if (this->mBindThread != nullptr)
 		{
 			this->mThreadId = this->mBindThread->get_id();
-			SayNoDebugWarning("id = " << this->mThreadId);
 			this->mBindThread->detach();
 			
 		}	

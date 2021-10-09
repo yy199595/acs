@@ -9,6 +9,8 @@
 
 namespace Sentry
 {
+    template<typename T>
+    using ServiceMethodType0 = XCode(T::*)(long long, const std::string &);
 
 	template<typename T>
 	using ServiceMethodType1 = XCode(T::*)();
@@ -51,6 +53,27 @@ namespace Sentry
 	private:
 		std::string mName;
 	};
+
+    template<typename T>
+    class ServiceMethod0 : public ServiceMethod
+    {
+    public:
+        ServiceMethod0(const std::string name, T * o, ServiceMethodType0<T> func)
+                : ServiceMethod(name) ,_o(o), _func(func) { }
+
+    public:
+        XCode Invoke(PacketMapper *messageData) override
+        {
+            long long userId = messageData->GetUserId();
+            _o->SetCurAddress(messageData->GetAddress());
+            return (_o->*_func)(userId, messageData->GetMsgBody());
+        }
+        bool IsLuaMethod() override { return false; };
+    private:
+        T * _o;
+        ServiceMethodType0<T> _func;
+    };
+
 	template<typename T>
 	class ServiceMethod1 : public ServiceMethod
 	{
@@ -64,7 +87,8 @@ namespace Sentry
 		XCode Invoke(PacketMapper *messageData) override
 		{
 			long long userId = messageData->GetUserId();
-			if (userId == 0) {
+            _o->SetCurAddress(messageData->GetAddress());
+            if (userId == 0) {
 				return (_o->*_func)();
 			}
 			return (_o->*_objfunc)(userId);
@@ -88,7 +112,8 @@ namespace Sentry
 		XCode Invoke(PacketMapper *messageData) override
 		{
 			T1 * request = mReqMessagePool.Create();
-			const std::string & data = messageData->GetMsgBody();
+            _o->SetCurAddress(messageData->GetAddress());
+            const std::string & data = messageData->GetMsgBody();
 			if (!request->ParseFromString(data))
 			{
 				mReqMessagePool.Destory(request);
@@ -125,7 +150,8 @@ namespace Sentry
 		XCode Invoke(PacketMapper *messageData) override
 		{
 			T1 * request = mReqMessagePool.Create();
-			const std::string & data = messageData->GetMsgBody();
+            _o->SetCurAddress(messageData->GetAddress());
+            const std::string & data = messageData->GetMsgBody();
 			if (!request->ParseFromString(data))
 			{
 				mReqMessagePool.Destory(request);
@@ -168,8 +194,10 @@ namespace Sentry
 		{
 			T1 * response = mResMessagePool.Create();		
 			long long userId = messageData->GetUserId();
+            _o->SetCurAddress(messageData->GetAddress());
 
-			XCode code = userId == 0 ?
+
+            XCode code = userId == 0 ?
 				(_o->*_func)(*response) : (_o->*_objfunc)(userId, *response);
 
 			mResMessagePool.Destory(response);

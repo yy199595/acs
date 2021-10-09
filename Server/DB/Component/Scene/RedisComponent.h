@@ -44,14 +44,14 @@ namespace Sentry
 
         bool SetValue(const std::string &tab, const std::string &key, const std::string &value);
 
-        bool SetValue(const std::string &tab, const std::string &key, const shared_ptr<Message> value);
+        bool SetValue(const std::string &tab, const std::string &key, const Message & value);
 
     public:
         bool GetValue(const std::string &key, std::string &value);
 
         bool GetValue(const std::string &tab, const std::string &key, std::string &value);
 
-        bool GetValue(const std::string &tab, const std::string &key, shared_ptr<Message> value);
+        bool GetValue(const std::string &tab, const std::string &key, Message & value);
 
     private:
         std::string mRedisIp;        //redis ip地址
@@ -60,26 +60,4 @@ namespace Sentry
         CoroutineComponent *mCorComponent;
         std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
     };
-
-    template<typename ...Args>
-    inline RedisTask * RedisComponent::CreateTask(const std::string &cmd, Args &&...args)
-    {
-        if (sizeof ...(Args) == 0)
-        {
-            return nullptr;
-        }
-        if (this->mCorComponent->IsInMainCoroutine())
-        {
-            SayNoDebugError("[redis error] redis not in coreoutine");
-            return nullptr;
-        }
-
-		RedisTask * taskAction = new RedisTask(cmd);
-        if (taskAction != nullptr)
-        {
-            taskAction->InitCommand(std::forward<Args>(args)...);
-            return taskAction;
-        }
-        return nullptr;
-    }
 }

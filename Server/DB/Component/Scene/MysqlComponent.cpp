@@ -170,7 +170,6 @@ namespace Sentry
 		const std::vector<TaskThread *> & threadTasks = this->mTaskManager->GetThreads();
 		for (TaskThread * taskThread : threadTasks)
 		{
-            SayNoDebugWarning(taskThread->GetId());
 			auto mysqlScoket = this->ConnectMysql();
 			if(mysqlScoket == nullptr)
             {

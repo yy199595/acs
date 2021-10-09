@@ -1,32 +1,31 @@
 ﻿#include"TcpClientSession.h"
-#include<Core/App.h>
 #include<Util/StringHelper.h>
-#include<Scene/NetSessionComponent.h>
+#include<Component/IComponent.h>
 #include<NetWork/SocketEvent.h>
 
 namespace Sentry
 {
-    TcpClientSession::TcpClientSession(AsioContext &io, NetSessionComponent *manager, SharedTcpSocket socket)
+    TcpClientSession::TcpClientSession(AsioContext &io, ISessionHandler *manager, SharedTcpSocket socket)
             : mAsioContext(io)
     {
         this->mBinTcpSocket = socket;
         this->mSessionType = SessionClient;
         if (this->mBinTcpSocket != nullptr)
         {
-            this->mDispatchManager = manager;
+            this->mSessionHandler = manager;
             this->mSocketEndPoint = socket->remote_endpoint();
             this->InitMember(this->mSocketEndPoint.address().to_string(), this->mSocketEndPoint.port());
         }
     }
 
-    TcpClientSession::TcpClientSession(AsioContext &io, NetSessionComponent *manager, std::string name, std::string ip,
+    TcpClientSession::TcpClientSession(AsioContext &io, ISessionHandler *manager, std::string name, std::string ip,
                                        unsigned short port)
             : mAsioContext(io)
     {
         asio::error_code ec;
         this->mSessionName = name;
         this->InitMember(ip, port);
-        this->mDispatchManager = manager;
+        this->mSessionHandler = manager;
         this->mSessionType = SessionNode;
         try
         {
@@ -77,7 +76,7 @@ namespace Sentry
 			{
 				this->StartClose();
 			}
-            this->mDispatchManager->OnSendMessageAfter(message);
+            this->mSessionHandler->OnSendMessageAfter(message);
 		});
 		return true;
 	}
@@ -99,12 +98,12 @@ namespace Sentry
 				this->StartClose();
 				SayNoDebugWarning("Connect " << this->GetSessionName()
 					<< " fail count = " << this->mConnectCount << " error : "<< error_code.message());
-                this->mDispatchManager->OnConnectComplete(this, false);
+                this->mSessionHandler->OnConnectComplete(this, false);
 			}
 			else
 			{
 				this->mConnectCount = 0;
-                this->mDispatchManager->OnConnectComplete(this, true);
+                this->mSessionHandler->OnConnectComplete(this, true);
 			}
 		});
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
@@ -137,7 +136,7 @@ namespace Sentry
 			{
 				this->StartClose();
 				SayNoDebugError(error_code.message());
-				this->mDispatchManager->OnSessionError(this);
+				this->mSessionHandler->OnSessionError(this);
 			}
 			else
 			{
@@ -169,11 +168,11 @@ namespace Sentry
 			{
 				this->StartClose();
 				SayNoDebugError(error_code.message());
-				this->mDispatchManager->OnSessionError(this);
+				this->mSessionHandler->OnSessionError(this);
 			}
 			else
 			{
-				if (!this->mDispatchManager->OnRecvMessage(this, nMessageBuffer,
+				if (!this->mSessionHandler->OnRecvMessage(this, nMessageBuffer,
 					messageSize))
 				{
 					this->StartClose();

@@ -50,3 +50,16 @@ namespace Sentry
         virtual void OnZeroRefresh() = 0;
     };
 }
+
+namespace Sentry
+{
+    class TcpClientSession;
+    class ISessionHandler
+    {
+    public:
+        virtual void OnSendMessageAfter(std::string * message) = 0;
+        virtual void OnSessionError(TcpClientSession *session) = 0;
+        virtual void OnConnectComplete(TcpClientSession *session, bool isSuc) = 0;
+        virtual bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size) = 0;
+    };
+}

@@ -22,6 +22,7 @@ namespace Sentry
 
 	private:
 		bool mIsAccept;
+        int mMaxConnectCount;
 		std::string mListenerIp;    //监听的ip
 		std::string mListenAddress;            //地址
 		unsigned short mListenerPort;

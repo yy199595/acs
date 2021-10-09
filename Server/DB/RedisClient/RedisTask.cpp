@@ -12,6 +12,10 @@ namespace Sentry
 
     void RedisTask::RunFinish()
     {
+        if(this->GetErrorCode() != XCode::Successful)
+        {
+            SayNoDebugError(this->GetErrorStr());
+        }
 		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
 		if (this->mCoreoutineId != 0)
 		{

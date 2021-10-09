@@ -34,7 +34,10 @@ namespace Sentry
 		bool AddMethod(ServiceMethod * method);
 		bool HasMethod(const std::string &method);
 		ServiceMethod * GetMethod(const std::string &method);
-	private:	
+        const std::string & GetCurAddress() { return this->mCurSessionAddress;}
+        void SetCurAddress(const std::string & address) { this->mCurSessionAddress = address;}
+	private:
+        std::string mCurSessionAddress;
 		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
 		std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
 	};

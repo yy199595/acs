@@ -43,8 +43,10 @@ namespace Sentry
     bool ListenerComponent::Awake()
     {
         this->mIsAccept = false;
+        this->mMaxConnectCount = 10000;
 		ServerConfig & config = App::Get().GetConfig();
 		config.GetValue("WhiteList", this->mWhiteList);
+        config.GetValue("ListenAddress", "maxConnect", this->mListenerIp);
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "ip", this->mListenerIp));
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "port", this->mListenerPort));
         this->mListenAddress = this->mListenerIp + ":" + std::to_string(this->mListenerPort);
@@ -52,10 +54,8 @@ namespace Sentry
         try
         {
             AsioContext &io = App::Get().GetNetContext();
-            auto address = asio::ip::make_address_v4(mListenerIp);
-            AsioTcpEndPoint endPoint(address, this->mListenerPort);
-            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
-            return true;
+            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mListenerPort);
+            return (this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint))->is_open();
         }
         catch (const asio::system_error &e)
         {
@@ -66,8 +66,20 @@ namespace Sentry
 
     void ListenerComponent::Start()
     {
+        asio::error_code err;
         this->mIsAccept = true;
-        this->mBindAcceptor->listen();
-        SayNoDebugInfo("start listener {" << this->mListenAddress << "}");
+        this->mBindAcceptor->listen(this->mMaxConnectCount, err);
+        if(!err)
+        {
+            SayNoDebugInfo("start listener {"
+                                   << this->mBindAcceptor->local_endpoint().address().to_string()
+                                   << ":" << this->mBindAcceptor->local_endpoint().port()
+                                   << "  max count = " << this->mMaxConnectCount << "}");
+        }
+        else
+        {
+            SayNoDebugError(err.message());
+            App::Get().Stop();
+        }
     }
 }

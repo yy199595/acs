@@ -5,38 +5,14 @@
 
 namespace Sentry
 {
-    enum SessionState
-    {
-        Session_None,
-        Session_Connect,//正在连接
-        Session_Normal, //正常
-        Session_OK,     //可读可写
-        Session_Error,  //错误
-        Session_Close,  //手动关闭
-    };
-
-
-    struct NetWorkPack
-    {
-    public:
-        NetWorkPack(std::string &ip, unsigned int port, char *buf, size_t size)
-                : mIp(ip), mPort(port), mMessage(buf, size)
-        {}
-
-    public:
-        const std::string mIp;
-        const unsigned short mPort;
-        const std::string mMessage;
-    };
-
-    class NetSessionComponent;
+    class ISessionHandler;
 
     class TcpClientSession
     {
     public:
-        TcpClientSession(AsioContext &io, NetSessionComponent *manager, SharedTcpSocket socket);
+        TcpClientSession(AsioContext &io, ISessionHandler *handler, SharedTcpSocket socket);
 
-        TcpClientSession(AsioContext &io, NetSessionComponent *manager, std::string name, std::string ip,
+        TcpClientSession(AsioContext &io, ISessionHandler *handler, std::string name, std::string ip,
                          unsigned short port);
 
         virtual ~TcpClientSession();
@@ -86,7 +62,7 @@ namespace Sentry
         SessionType mSessionType;
         std::string mSessionName;
         unsigned int mConnectCount;
-        NetSessionComponent *mDispatchManager;
+        ISessionHandler * mSessionHandler;
 
     private:
         char *mRecvMsgBuffer;

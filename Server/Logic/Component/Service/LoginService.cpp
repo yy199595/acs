@@ -3,6 +3,7 @@
 #include <Scene/MysqlComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
+#include <Scene/RedisComponent.h>
 namespace Sentry
 {
     LoginService::LoginService()
@@ -23,7 +24,8 @@ namespace Sentry
 
     void LoginService::OnLodaData()
     {
-        MysqlProxyComponent * mysqlProxyComponent = this->gameObject->GetComponent<MysqlProxyComponent>();
+        RedisComponent * redisComponent = this->GetComponent<RedisComponent>();
+        MysqlProxyComponent * mysqlProxyComponent = this->GetComponent<MysqlProxyComponent>();
 
         db::UserAccountData userAccountData;
         userAccountData.set_userid(112233445);
@@ -32,6 +34,13 @@ namespace Sentry
         userAccountData.set_account("646585122@qq.com");
         userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
         XCode code = mysqlProxyComponent->Add(userAccountData);
+
+        if(redisComponent->SetValue("user", userAccountData.account(), userAccountData))
+        {
+            db::UserAccountData queryData;
+            redisComponent->GetValue("user", userAccountData.account(), queryData);
+            SayNoDebugLogProtocBuf(queryData);
+        }
 
 		userAccountData.Clear();
 		userAccountData.set_account("646585122@qq.com");

@@ -56,15 +56,13 @@ namespace Sentry
 		return this->mNetProxyComponent->PushEventHandler(handler);
     }
 
-    bool NetSessionComponent::OnSendMessageAfter(std::string *message)
+    void NetSessionComponent::OnSendMessageAfter(std::string *message)
     {
         if(message != nullptr)
         {
             message->clear();
             this->mSendBufferPool.Destory(message);
-            return true;
         }
-		return false;
     }
 
 	bool NetSessionComponent::PushEventHandler(SocketEveHandler *eve)
