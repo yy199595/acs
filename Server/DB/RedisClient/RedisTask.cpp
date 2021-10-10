@@ -7,7 +7,7 @@ namespace Sentry
     RedisTask::RedisTask(const std::string &cmd) : RedisTaskBase(cmd)
     {
 		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
-		SayNoAssertRet_F(this->mCoreoutineId = corComponent->GetCurrentCorId() != 0);
+		SayNoAssertRet_F(this->mCoreoutineId = corComponent->GetCurrentCorId());
     }
 
     void RedisTask::RunFinish()

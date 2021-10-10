@@ -28,6 +28,6 @@ namespace Sentry
     protected:
         void RunFinish() final;  //执行完成之后在主线程调用
     private:
-        long long mCoreoutineId;       
+        unsigned int mCoreoutineId;       
     };
 }
