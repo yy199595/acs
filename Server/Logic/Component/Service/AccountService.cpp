@@ -1,4 +1,4 @@
-﻿#include "LoginService.h"
+﻿#include "AccountService.h"
 #include <Core/App.h>
 #include <Scene/MysqlComponent.h>
 #include <Scene/RedisComponent.h>
@@ -6,23 +6,23 @@
 #include <Scene/RedisComponent.h>
 namespace Sentry
 {
-    LoginService::LoginService()
+    AccountService::AccountService()
     {
     }
 
-    bool LoginService::Awake()
+    bool AccountService::Awake()
     {
-        //__add_method(LoginService::Login);
-        //__add_method(LoginService::Register);
+        //__add_method(AccountService::Login);
+        //__add_method(AccountService::Register);
 		return true;
     }
 
-    void LoginService::Start()
+    void AccountService::Start()
     {
 
     }
 
-    void LoginService::OnLodaData()
+    void AccountService::OnLodaData()
     {
         RedisComponent * redisComponent = this->GetComponent<RedisComponent>();
         MysqlProxyComponent * mysqlProxyComponent = this->GetComponent<MysqlProxyComponent>();
@@ -61,12 +61,12 @@ namespace Sentry
         }
     }
 
-    XCode LoginService::Login(long long operId, const c2s::UserVerify_Request & LoginData)
+    XCode AccountService::Login(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
     {
-        return XCode::Failure;
+        return XCode::Successful;
     }
 
-    XCode LoginService::Register(long long operId, const c2s::UserRegister_Request & registerData)
+    XCode AccountService::Register(long long operId, const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response)
     {
         return XCode::Successful;
     }

@@ -6,7 +6,7 @@ function Main.Load()
 end
 
 function Main.Start()
-    local address = SoEasy.NewService("LoginService")
+    local address = SoEasy.NewService("AccountService")
 
     local registerData = {}
     registerData.account = "6465851222@qq.com"

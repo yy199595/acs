@@ -1,10 +1,10 @@
-LoginService = {}
-function LoginService.OnInit()
+AccountService = {}
+function AccountService.OnInit()
     SoEasy.Warning("init login service")
     return true
 end
 
-function LoginService.Register(_, registerData)
+function AccountService.Register(_, registerData)
     local accountData = {}
     accountData.userid = 1545646545454
     accountData.passwd = registerData.password
@@ -26,7 +26,7 @@ function LoginService.Register(_, registerData)
     return XCode.Failure
 end
 
-function LoginService.Query()
+function AccountService.Query()
 end
 
-return LoginService
+return AccountService

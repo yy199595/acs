@@ -17,7 +17,7 @@
 #include <Service/ServiceNodeComponent.h>
 #include <Scene/TaskComponent.h>
 #include <Scene/ProtocolComponent.h>
-#include <Service/LoginService.h>
+#include <Service/AccountService.h>
 #include <Service/ClusterService.h>
 #include <Service/CenterService.h>
 #include <Scene/GatewayComponent.h>
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	__register_component__(LuaServiceMgrComponent);
 	
 	__register_component__(MysqlService);
-	__register_component__(LoginService);
+	__register_component__(AccountService);
 	__register_component__(CenterService);
 	__register_component__(ClusterService);
     __register_component__(GatewayService);

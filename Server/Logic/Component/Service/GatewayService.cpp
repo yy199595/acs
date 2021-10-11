@@ -31,12 +31,13 @@ namespace Sentry
         }
         long long userId = std::stoll(queryData);
         GameObject * gameObject = new GameObject(userId, address);
-        gameObject->AddComponent<NodeMaperComponent>();
-        // 给连接到网关的对象加组件
         if(!this->mGameObjComponent->Add(gameObject))
         {
             return XCode::Failure;
         }
+        // 给连接到网关的对象加组件
+        gameObject->AddComponent<NodeMaperComponent>();
+
         return XCode::Successful;
     }
 

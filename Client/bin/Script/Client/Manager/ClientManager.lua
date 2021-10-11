@@ -16,14 +16,14 @@ function ClientManager.Start(tcpSession)
     registerData.platform = "ios_qq"
     registerData.device_mac = "0xs1dsx"
 
-    local code = SoEasy.CallBySession(tcpSession, "LoginService", "Register", registerData)
+    local code = SoEasy.CallBySession(tcpSession, "AccountService", "Register", registerData)
     print("register back", code)
 
     local loginData = {}
     loginData.account = registerData.account
     loginData.passwd = registerData.password
 
-    code = SoEasy.CallBySession(tcpSession, "LoginService", "Login", loginData)
+    code = SoEasy.CallBySession(tcpSession, "AccountService", "Login", loginData)
     print("login back", code)
 end
 
