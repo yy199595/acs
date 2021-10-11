@@ -25,7 +25,7 @@ namespace Sentry
         void InitCommand(Args &&...args);
 
     private:
-        inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
+        //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
 
         inline void AddCommand(const std::string &value) { this->mCommand.push_back(value); }
 

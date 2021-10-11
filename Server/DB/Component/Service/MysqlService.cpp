@@ -152,19 +152,18 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        const std::string &tab = this->mMysqlManager->GetDataBaseName();
-        MyqslTask * mysqlTask = new MyqslTask(tab, sql);
-        if (!this->mTaskManager->StartTask(mysqlTask))
+
+        MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
+        if (!this->mTaskManager->StartTask(&mysqlTask))
         {
-			delete mysqlTask;
             return XCode::MysqlStartTaskFail;
         }
 
         this->mCorComponent->YieldReturn();
-        XCode code = mysqlTask->GetErrorCode();
+        XCode code = mysqlTask.GetErrorCode();
         if (code == XCode::Successful)
         {	
-            const std::vector<std::string> &jsonArray = mysqlTask->GetQueryDatas();
+            const std::vector<std::string> &jsonArray = mysqlTask.GetQueryDatas();
 			for (const std::string &json : jsonArray)
 			{
 				Message * message = MessagePool::NewByJson(name, json);
@@ -177,9 +176,9 @@ namespace Sentry
 			}
             return XCode::Successful;
         }
-        response.set_errotstr(mysqlTask->GetErrorStr());
+        response.set_errotstr(mysqlTask.GetErrorStr());
 #ifdef SOEASY_DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask->GetStartTime();
+        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
 #endif
         return code;

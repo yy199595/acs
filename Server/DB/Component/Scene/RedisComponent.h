@@ -40,16 +40,16 @@ namespace Sentry
 
 		bool SetValue(const std::string &key, const std::string &value, int second);
 
-		bool SetValue(const std::string &tab, const std::string &key, const std::string &value);
+        bool SetValue(const std::string &tab, const std::string &key, const Message & value);
 
-		bool SetValue(const std::string &tab, const std::string &key, const Message & value);
+        bool SetValue(const std::string &tab, const std::string &key, const std::string &value);
 
 	public:
 		bool GetValue(const std::string &key, std::string &value);
 
-		bool GetValue(const std::string &tab, const std::string &key, std::string &value);
+        bool GetValue(const std::string &tab, const std::string &key, Message & value);
 
-		bool GetValue(const std::string &tab, const std::string &key, Message & value);
+        bool GetValue(const std::string &tab, const std::string &key, std::string &value);
 
 	private:
 		std::string mRedisIp;        //redis ip地址

@@ -19,6 +19,12 @@ namespace Sentry
             this->mErrorCode = XCode::RedisSocketIsNull;
             return;
         }
+        std::stringstream sss;
+        for(const std::string & str : this->mCommand)
+        {
+           sss << str << "#";
+        }
+        SayNoDebugInfo(sss.str());
         const char **argvArray = new const char *[this->mCommand.size()];
         size_t *argvSizeArray = new size_t[this->mCommand.size()];
 
@@ -59,7 +65,7 @@ namespace Sentry
                 break;
             case REDIS_REPLY_STRING:
                 this->mErrorCode = XCode::Successful;
-                this->mQueryDatas.push_back(std::to_string(replay->integer));
+                this->mQueryDatas.push_back(std::string (replay->str, replay->len));
                 break;
             case REDIS_REPLY_ARRAY:
                 this->mErrorCode = XCode::Successful;

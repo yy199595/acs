@@ -178,12 +178,12 @@ namespace Sentry
 
     bool RedisComponent::SetValue(const std::string &tab, const std::string &key, const Message &value)
     {
-        std::string serializeData;
-        if (!value.SerializePartialToString(&serializeData))
+        std::string valueData;
+        if(!value.SerializeToString(&valueData))
         {
             return false;
         }
-        return this->SetValue(tab, key, serializeData);
+        return this->SetValue(tab, key, valueData);
     }
 
     bool RedisComponent::GetValue(const std::string &key, std::string &value)
@@ -194,6 +194,7 @@ namespace Sentry
         {
             return false;
         }
+        this->mCorComponent->YieldReturn();
         return redisTask.GetOnceData(value);
     }
 
@@ -205,6 +206,7 @@ namespace Sentry
         {
             return false;
         }
+        this->mCorComponent->YieldReturn();
         return redisTask.GetOnceData(value);
     }
 
