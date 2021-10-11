@@ -5,6 +5,7 @@
 #include <Service/GatewayService.h>
 #include <Scene/GameObjectComponent.h>
 #include <Service/ServiceNodeComponent.h>
+#include <Scene/NodeMaperComponent.h>
 namespace Sentry
 {
     bool GatewayComponent::Awake()
@@ -24,45 +25,62 @@ namespace Sentry
         {
             return false;
         }
-        const std::string &method = msg->GetMethd();
+
         if (tcpProxySession->IsNodeSession()) // 服务器发送过来的
         {
-            if (this->mGateService->HasMethod(method))
+            switch(msg->GetMessageType())
             {
-                return NetProxyComponent::OnRecvMessage(msg);
-            }
-            GameObject *gameObject = this->mGameObjComponent->Find(msg->GetUserId());
-            if (gameObject != nullptr)
-            {
-                const std::string &userAddress = gameObject->GetAddress();
-                TcpProxySession *userSession = this->GetProxySession(userAddress);
-                if (userSession != nullptr)
-                {
-                    userSession->SendMessageData(msg);
-                }
+                case NetMessageType::S2C_NOTICE:
+                case NetMessageType::S2C_REQUEST:
+                case NetMessageType::C2S_RESPONSE:
+                    this->SendMessagToClient(msg);
+                    return true;
+                case NetMessageType::S2S_NOTICE:
+                case NetMessageType::S2S_REQUEST:
+                case NetMessageType::S2S_RESPONSE:
+                    return NetProxyComponent::OnRecvMessage(msg);
             }
             return true;
         }
         //客户端发送过来的
 
-        if (this->mGateService->HasMethod(method))
-        {
-            return NetProxyComponent::OnRecvMessage(msg);
-        }
+        const std::string & service = msg->GetService();
         GameObject *gameObject = this->mGameObjComponent->Find(address);
         if (gameObject == nullptr)
         {
+            if(!this->mGateService->HasMethod(service))
+            {
+                return false;
+            }
+            return NetProxyComponent::OnRecvMessage(msg);
+        }
+        NodeMaperComponent * nodeMaperComponent = gameObject->GetComponent<NodeMaperComponent>();
+        if(nodeMaperComponent == nullptr)
+        {
             return false;
         }
-        const std::string & service = msg->GetService();
-        ServiceNode * serviceNode = this->mNodeComponent->GetNodeByServiceName(service);
+
+        ServiceNode * serviceNode = nodeMaperComponent->GetService(service);
         if(serviceNode == nullptr)
         {
             return false;
         }
         msg->SetUserId(gameObject->GetId());
         serviceNode->AddMessageToQueue(msg, false);
-
         return true;
+    }
+
+    void GatewayComponent::SendMessagToClient(PacketMapper * msg)
+    {
+        GameObject *gameObject = this->mGameObjComponent->Find(msg->GetUserId());
+        if (gameObject != nullptr)
+        {
+            const std::string &userAddress = gameObject->GetAddress();
+            TcpProxySession *userSession = this->GetProxySession(userAddress);
+            if (userSession != nullptr)
+            {
+                userSession->SendMessageData(msg);
+            }
+        }
     }
 }

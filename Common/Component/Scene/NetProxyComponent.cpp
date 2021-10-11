@@ -183,6 +183,10 @@ namespace Sentry
 			}
 			return serviceComponent->HandlerMessage(messageData);    
         }
+        if(messageData->GetRpcId() == 0)
+        {
+            return false;
+        }
         this->mActionManager->InvokeCallback(messageData);
         return true;
     }

@@ -55,6 +55,19 @@
     },
     "LoginService":{
         "id":400
+    },
+    "GatewayService":{
+        "id":500,
+        "Login":{
+            "id":501,
+            "async":true,
+            "request":"c2s.GateLogin.Request"
+        },
+        "Logout":{
+            "id":502,
+            "async":false,
+            "request":"c2s.GateLogout.Request"
+        }
     }
 
 }

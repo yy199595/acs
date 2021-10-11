@@ -7,6 +7,7 @@
 #include <Scene/RedisComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/GameObjectComponent.h>
+#include <Scene/NodeMaperComponent.h>
 namespace Sentry
 {
     bool GatewayService::Awake()
@@ -30,6 +31,7 @@ namespace Sentry
         }
         long long userId = std::stoll(queryData);
         GameObject * gameObject = new GameObject(userId, address);
+        gameObject->AddComponent<NodeMaperComponent>();
         // 给连接到网关的对象加组件
         if(!this->mGameObjComponent->Add(gameObject))
         {

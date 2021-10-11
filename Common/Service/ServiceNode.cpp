@@ -13,7 +13,7 @@ namespace Sentry
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
 		NetProxyComponent * component = App::Get().GetComponent<NetProxyComponent>();
-		SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
+        SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
 		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 
@@ -43,7 +43,16 @@ namespace Sentry
 		this->mCorComponent->Resume(mCorId);
 	}
 
-	XCode ServiceNode::Notice(const std::string &service, const std::string &method)
+    void ServiceNode::GetServicers(std::vector<std::string> & services)
+    {
+        services.clear();
+        for(const std::string & name : this->mServiceArray)
+        {
+            services.emplace_back(name);
+        }
+    }
+
+    XCode ServiceNode::Notice(const std::string &service, const std::string &method)
 	{
 		if (service.empty() || method.empty())
 		{

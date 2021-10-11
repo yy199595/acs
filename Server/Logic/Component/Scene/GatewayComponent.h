@@ -16,6 +16,8 @@ namespace Sentry
         bool OnRecvMessage(PacketMapper *msg) override;
 
     private:
+        void SendMessagToClient(PacketMapper * msg);
+    private:
         class GatewayService * mGateService;
         class RedisComponent * mRedisComponent;
         class ServiceNodeComponent * mNodeComponent;

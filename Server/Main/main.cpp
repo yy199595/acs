@@ -20,6 +20,8 @@
 #include <Service/LoginService.h>
 #include <Service/ClusterService.h>
 #include <Service/CenterService.h>
+#include <Scene/GatewayComponent.h>
+#include <Service/GatewayService.h>
 
 
 #include <Service/MysqlService.h>
@@ -35,6 +37,7 @@ int main(int argc, char **argv)
 	__register_component__(LuaScriptComponent);
 	__register_component__(ProtocolComponent);
     __register_component__(MysqlProxyComponent);
+    __register_component__(GatewayComponent);
 	
 	__register_component__(TaskComponent);
 	__register_component__(CoroutineComponent);
@@ -49,6 +52,7 @@ int main(int argc, char **argv)
 	__register_component__(LoginService);
 	__register_component__(CenterService);
 	__register_component__(ClusterService);
+    __register_component__(GatewayService);
 	
     std::string serverName = argc == 3 ? argv[1] : "server";
     std::string configPath = argc == 3 ? argv[2] : "./Config/";

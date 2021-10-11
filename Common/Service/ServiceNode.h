@@ -26,6 +26,7 @@ namespace Sentry
         bool AddService(const std::string &service);
 
         bool HasService(const std::string &service);
+        void GetServicers(std::vector<std::string> & services);
 		void AddMessageToQueue(PacketMapper * message, bool yield = true);
     public:
 		void OnConnectNodeAfter();

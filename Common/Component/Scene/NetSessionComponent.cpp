@@ -27,15 +27,13 @@ namespace Sentry
 		{
 			this->mRecvSessionQueue.push(address);
 		}
-		NetSocketConnectHandler * handler = new NetSocketConnectHandler(address, isSuc);
-		this->mNetProxyComponent->PushEventHandler(handler);       
+		this->mNetProxyComponent->PushEventHandler(new NetSocketConnectHandler(address, isSuc));
     }
 
     void NetSessionComponent::OnSessionError(TcpClientSession *session)
     {
 		const std::string &address = session->GetAddress();
-		NetErrorHandler * handler = new NetErrorHandler(address);    
-        this->mNetProxyComponent->PushEventHandler(handler);
+        this->mNetProxyComponent->PushEventHandler(new NetErrorHandler(address));
     }
 
 
@@ -52,8 +50,7 @@ namespace Sentry
             return false;
         }
 		this->mRecvSessionQueue.push(address);
-		NetReceiveNewMessageHandler * handler = new NetReceiveNewMessageHandler(messageData);
-		return this->mNetProxyComponent->PushEventHandler(handler);
+		return this->mNetProxyComponent->PushEventHandler(new NetReceiveNewMessageHandler(messageData));
     }
 
     void NetSessionComponent::OnSendMessageAfter(std::string *message)
@@ -82,9 +79,7 @@ namespace Sentry
         {
             this->mRecvSessionQueue.push(address);
             this->mSessionAdressMap.emplace(address, session);
-
-			NetNewSocketConnectHandler * handler = new NetNewSocketConnectHandler(address);
-            this->mNetProxyComponent->PushEventHandler(handler);
+            this->mNetProxyComponent->PushEventHandler(new NetNewSocketConnectHandler(address));
             return session;
         }
         return nullptr;

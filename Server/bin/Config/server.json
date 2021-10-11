@@ -49,13 +49,16 @@
         "MysqlComponent",
         "RedisComponent",
         "MysqlProxyComponent",
+        "NetProxyComponent",
+        "GatewayComponent",
         "LuaServiceMgrComponent"
     ],
     "Service": [
         "MysqlService",
 	    "LoginService",
         "CenterService", 
-        "ClusterService"
+        "ClusterService",
+        "GatewayService"
     ],
     "WhiteList": [
         "127.0.0.1"

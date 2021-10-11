@@ -49,12 +49,26 @@ namespace Sentry
     template<typename T>
     inline T *GameObject::GetComponent() const
     {
-		Type * type = ComponentHelper::GetType<T>();
-		if (type == nullptr)
-		{
+        Type *type = ComponentHelper::GetType<T>();
+        if (type == nullptr)
+        {
             return nullptr;
-		}
-        return this->GetComponent<T>(type->Name);
+        }
+        T *component = this->GetComponent<T>(type->Name);
+        if (component != nullptr)
+        {
+            return component;
+        }
+
+        auto iter = this->mComponentMap.begin();
+        for (; iter != this->mComponentMap.end(); iter++)
+        {
+            if (component = dynamic_cast<T *>(iter->second))
+            {
+                return component;
+            }
+        }
+        return nullptr;
     }
 
 	template<typename T>

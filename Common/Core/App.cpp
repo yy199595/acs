@@ -65,8 +65,8 @@ namespace Sentry
 
 
 		std::vector<std::string> services;
-        std::vector<std::string> managers;
-        if (!mConfig.GetValue("Scene", managers))
+        std::vector<std::string> components;
+        if (!mConfig.GetValue("Scene", components))
         {
             SayNoDebugError("not find field : Managers");
             return false;
@@ -78,25 +78,23 @@ namespace Sentry
 			return false;
 		}
 
-        for (size_t index = 0; index < services.size(); index++)
+        for(const std::string & name : components)
         {
-            const std::string &name = services[index];
-			if (!this->AddComponent(name))
-			{
-				SayNoDebugFatal("add " << name << " to scene failure");
-				return false;
-			}
+            if (!this->AddComponent(name))
+            {
+                SayNoDebugFatal("add " << name << " to service failure");
+                return false;
+            }
         }
 
-		for (size_t index = 0; index < managers.size(); index++)
-		{
-			const std::string &name = managers[index];
-			if (!this->AddComponent(name))
-			{
-				SayNoDebugFatal("add " << name << " to service failure");
-				return false;
-			}
-		}
+        for(const std::string & name : services)
+        {
+            if (!this->AddComponent(name))
+            {
+                SayNoDebugFatal("add " << name << " to scene failure");
+                return false;
+            }
+        }
         return true;
     }
 
