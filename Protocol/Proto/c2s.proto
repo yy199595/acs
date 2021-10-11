@@ -33,3 +33,19 @@ message UserVerify
         string GateAddress = 3; //网关地址
     }
 }
+
+message GateLogin
+{
+    message Request
+    {
+        string Token = 1;
+    }
+}
+
+message GateLogout
+{
+    message Request
+    {
+
+    }
+}

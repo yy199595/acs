@@ -25,6 +25,17 @@ namespace Sentry
         return false;
     }
 
+    void RedisComponent::ClearAllData()
+    {
+        auto iter = this->mRedisContextMap.begin();
+        for(; iter!=this->mRedisContextMap.end();iter++)
+        {
+            RedisSocket * c = iter->second;
+            redisCommand(c, "FLUSHALL");
+            return;
+        }
+    }
+
     RedisSocket *RedisComponent::GetRedisSocket()
     {
         auto id = std::this_thread::get_id();
@@ -218,5 +229,29 @@ namespace Sentry
             return false;
         }
         return value.ParseFromString(message);
+    }
+
+    bool RedisComponent::AddToSet(const std::string & set, const std::string &member)
+    {
+        RedisTask redisTask("SADD");
+        redisTask.InitCommand(set, member);
+        if (!this->mTaskManager->StartTask(&redisTask))
+        {
+            return false;
+        }
+        this->mCorComponent->YieldReturn();
+        return redisTask.GetErrorCode() == XCode::Successful;
+    }
+
+    bool RedisComponent::DelFromSet(const std::string & set, const std::string & member)
+    {
+        RedisTask redisTask("SREM");
+        redisTask.InitCommand(set, member);
+        if (!this->mTaskManager->StartTask(&redisTask))
+        {
+            return false;
+        }
+        this->mCorComponent->YieldReturn();
+        return redisTask.GetErrorCode() == XCode::Successful;
     }
 }

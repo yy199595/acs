@@ -35,6 +35,13 @@ namespace Sentry
         userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
         XCode code = mysqlProxyComponent->Add(userAccountData);
 
+        redisComponent->ClearAllData();
+        redisComponent->AddToSet("user", userAccountData.account());
+        redisComponent->DelFromSet("user", userAccountData.account());
+
+        redisComponent->AddToSet("user", userAccountData.account());
+
+
         if(redisComponent->SetValue("user", userAccountData.account(), userAccountData))
         {
             db::UserAccountData queryData;

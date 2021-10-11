@@ -8,7 +8,7 @@
 #include <Scene/MysqlComponent.h>
 #include <Scene/NetProxyComponent.h>
 #include <Scene/NetSessionComponent.h>
-#include <Scene/ProxyManager.h>
+#include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
 
@@ -26,7 +26,7 @@
 using namespace Sentry;
 int main(int argc, char **argv)
 {
-	__register_component__(ProxyManager);
+	__register_component__(GatewayComponent);
 	__register_component__(TimerComponent);
 	__register_component__(ServiceMgrComponent);
 	__register_component__(RedisComponent);

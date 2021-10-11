@@ -7,6 +7,23 @@ namespace Sentry
     RedisTaskBase::RedisTaskBase(const std::string &cmd)
     {       
         this->mCommand.push_back(cmd);
+        this->mStartTime = TimeHelper::GetMilTimestamp();
+    }
+
+    float RedisTaskBase::GetCostTime()
+    {
+        return (TimeHelper::GetMilTimestamp() - this->mStartTime) / 1000.0f;
+    }
+
+    void RedisTaskBase::DebugInvokeInfo()
+    {
+        std::stringstream sss;
+        sss << "[" << this->GetCostTime() << "s] {";
+        for (const std::string &str: this->mCommand)
+        {
+            sss << str << " ";
+        }
+        SayNoDebugLog(sss.str() << "}");
     }
 
     void RedisTaskBase::Run()
@@ -19,12 +36,7 @@ namespace Sentry
             this->mErrorCode = XCode::RedisSocketIsNull;
             return;
         }
-        std::stringstream sss;
-        for(const std::string & str : this->mCommand)
-        {
-           sss << str << "#";
-        }
-        SayNoDebugInfo(sss.str());
+
         const char **argvArray = new const char *[this->mCommand.size()];
         size_t *argvSizeArray = new size_t[this->mCommand.size()];
 
@@ -72,9 +84,13 @@ namespace Sentry
                 for (size_t index = 0; index < replay->elements; index++)
                 {
                     redisReply *redisData = replay->element[index];
-                    if (redisData->type == REDIS_REPLY_INTEGER || redisData->type == REDIS_REPLY_STRING)
+                    if(redisData->type == REDIS_REPLY_INTEGER)
                     {
                         this->mQueryDatas.push_back(std::to_string(redisData->integer));
+                    }
+                    else if(redisData->type == REDIS_REPLY_STRING)
+                    {
+                        this->mQueryDatas.push_back(std::string(redisData->str, redisData->len));
                     }
                 }
                 break;

@@ -17,6 +17,8 @@ namespace Sentry
 
 		~RedisComponent() {}
 
+    public:
+        void ClearAllData();
 		bool CloseRedisSocket();
 		RedisSocket *GetRedisSocket();
 
@@ -34,6 +36,10 @@ namespace Sentry
 		bool DelValue(const std::string &key);
 
 		bool DelValue(const std::string &tab, const std::string &key);
+
+    public: // hashset
+        bool AddToSet(const std::string & set, const std::string &member);
+        bool DelFromSet(const std::string & set, const std::string & member);
 
 	public:
 		bool SetValue(const std::string &key, const std::string &value);

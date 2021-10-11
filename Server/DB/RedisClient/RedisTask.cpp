@@ -20,6 +20,7 @@ namespace Sentry
 		if (this->mCoreoutineId != 0)
 		{
 			corComponent->Resume(this->mCoreoutineId);
-		}		
+		}
+        this->DebugInvokeInfo();
     }
 }// namespace Sentry

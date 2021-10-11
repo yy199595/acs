@@ -55,7 +55,6 @@ namespace Sentry
 		this->AddComponent<ProtocolComponent>();
 		this->AddComponent<CoroutineComponent>();
 		this->AddComponent<NetSessionComponent>();
-		this->AddComponent<NetProxyComponent>();
 
 		this->AddComponent<ServiceNodeComponent>();
 		this->AddComponent<ServiceMgrComponent>();

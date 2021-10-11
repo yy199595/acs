@@ -23,6 +23,7 @@ namespace Sentry
     public:
         template<typename... Args>
         void InitCommand(Args &&...args);
+        float GetCostTime();
 
     private:
         //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
@@ -53,6 +54,9 @@ namespace Sentry
         void AddCommandArgv(const char *str, const size_t size);
 
     public:
+
+        void DebugInvokeInfo();
+
         bool GetOnceData(std::string &value);
 
         XCode GetErrorCode() { return this->mErrorCode; }
@@ -62,8 +66,8 @@ namespace Sentry
         std::vector<std::string> &GetQueryDatas() { return this->mQueryDatas; }
 
     private:
+        long long mStartTime;
         std::vector<std::string> mCommand;
-
     private:
         XCode mErrorCode;
         std::string mErrorStr;
