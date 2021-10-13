@@ -26,11 +26,17 @@ namespace Sentry
 		virtual void OnLastFrameUpdate() = 0;
 	};
 
-	class INetSystemUpdate
+	class ITcpContextUpdate
 	{
 	public:
-		virtual void OnNetSystemUpdate(AsioContext & io) = 0;
+		virtual void OnTcpContextUpdate(AsioContext & io) = 0;
 	};
+
+    class IHttpContextUpdate
+    {
+    public:
+        virtual void OnHttpContextUpdate(AsioContext & io) = 0;
+    };
 
 	class IHotfix
 	{

@@ -7,6 +7,7 @@
 namespace Sentry
 {
     class TaskComponent;
+    class CoroutineComponent;
     class HttpRequestTask : public TaskProxy
     {
     public:
@@ -30,22 +31,25 @@ namespace Sentry
 
 namespace Sentry
 {
-    class HttpClientComponent : public Component, public ISystemUpdate
+    class HttpClientComponent : public Component, public IHttpContextUpdate
     {
     public:
-        HttpClientComponent() {}
+        HttpClientComponent()
+        {}
 
-        ~HttpClientComponent() {}
+        ~HttpClientComponent()
+        {}
 
     public:
         bool Awake() final;
-        void OnSystemUpdate() final;
+
+        void OnHttpContextUpdate(AsioContext &ctx) final;
 
     public:
-        XCode Get(const std::string & url, std::string & json, int timeout = 5);
+        XCode Get(const std::string &url, std::string &json, int timeout = 5);
+
     private:
-        AsioContext * mHttpContext;
-        class TaskThread * mHttpThread;
-        class CoroutineComponent *mCorComponent;
+        TaskComponent *mTaskComponent;
+        CoroutineComponent *mCorComponent;
     };
 }

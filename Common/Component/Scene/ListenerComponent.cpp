@@ -8,7 +8,7 @@
 namespace Sentry
 {
 
-    void ListenerComponent::OnNetSystemUpdate(AsioContext &io)
+    void ListenerComponent::OnTcpContextUpdate(AsioContext &io)
     {
         if (!this->mIsAccept || this->mBindAcceptor == nullptr)
         {
@@ -53,7 +53,7 @@ namespace Sentry
 		SayNoAssertRetFalse_F(this->mDispatchManager = this->GetComponent<NetSessionComponent>());
         try
         {
-            AsioContext &io = App::Get().GetNetContext();
+            AsioContext &io = App::Get().GetTcpContext();
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mListenerPort);
             return (this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint))->is_open();
         }

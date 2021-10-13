@@ -71,7 +71,7 @@ namespace Sentry
 
 	TcpClientSession *NetSessionComponent::Create(shared_ptr<AsioTcpSocket> socket)
     {
-		AsioContext & io = App::Get().GetNetContext();
+		AsioContext & io = App::Get().GetTcpContext();
         TcpClientSession *session = new TcpClientSession(io, this, socket);
 
 		const std::string & address = session->GetAddress();
@@ -96,7 +96,7 @@ namespace Sentry
         unsigned short port;
         if (StringHelper::ParseIpAddress(address, ip, port))
         {
-			AsioContext & io = App::Get().GetNetContext();
+			AsioContext & io = App::Get().GetTcpContext();
             TcpClientSession *session = new TcpClientSession(io, this, name, ip, port);
             this->mSessionAdressMap.emplace(address, session);
             return session;
@@ -109,7 +109,7 @@ namespace Sentry
     }
 
 
-    void NetSessionComponent::OnNetSystemUpdate(AsioContext &io)
+    void NetSessionComponent::OnTcpContextUpdate(AsioContext &io)
     {
        
         while (!this->mRecvSessionQueue.empty())

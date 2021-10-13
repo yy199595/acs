@@ -64,7 +64,7 @@ namespace Sentry
             {
                 return false;
             }
-            this->mRedisContextMap.emplace(taskThread->GetId(), redisSocket);
+            this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
             SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
         }
         return true;
@@ -187,6 +187,36 @@ namespace Sentry
         return redisTask.GetErrorCode() == XCode::Successful;
     }
 
+    bool RedisComponent::SetJsonValue(const std::string & key, const Message & value)
+    {
+        std::string jsonData;
+        if(!util::MessageToJsonString(value, & jsonData).ok())
+        {
+            return false;
+        }
+        return this->SetValue(key, jsonData);
+    }
+
+    bool RedisComponent::SetJsonValue(const std::string &tab, const std::string &key, const Message & value)
+    {
+        std::string jsonData;
+        if (!util::MessageToJsonString(value, &jsonData).ok())
+        {
+            return false;
+        }
+        return this->SetValue(tab, key, jsonData);
+    }
+
+    bool RedisComponent::SetValue(const std::string & key, const Message & value)
+    {
+        std::string valueData;
+        if(!value.SerializeToString(&valueData))
+        {
+            return false;
+        }
+        return this->SetValue(key, valueData);
+    }
+
     bool RedisComponent::SetValue(const std::string &tab, const std::string &key, const Message &value)
     {
         std::string valueData;
@@ -229,6 +259,26 @@ namespace Sentry
             return false;
         }
         return value.ParseFromString(message);
+    }
+
+    bool RedisComponent::GetJsonValue(const std::string & key, Message & value)
+    {
+        std::string jsonValue;
+        if(!this->GetValue(key, jsonValue))
+        {
+            return false;
+        }
+        return util::JsonStringToMessage(jsonValue, &value).ok();
+    }
+
+    bool RedisComponent::GetJsonValue(const std::string &tab, const std::string &key, Message & value)
+    {
+        std::string jsonValue;
+        if (!this->GetValue(tab, key, jsonValue))
+        {
+            return false;
+        }
+        return util::JsonStringToMessage(jsonValue, &value).ok();
     }
 
     bool RedisComponent::AddToSet(const std::string & set, const std::string &member)

@@ -5,7 +5,7 @@ namespace Sentry
 {
 	// 处理外部连接进来的session
 	class NetSessionComponent;
-	class ListenerComponent : public Component, public INetSystemUpdate
+	class ListenerComponent : public Component, public ITcpContextUpdate
 	{
 	public:
 		ListenerComponent() {}
@@ -18,7 +18,7 @@ namespace Sentry
 	protected:
 		bool Awake() override;
 		void Start() override;
-		void OnNetSystemUpdate(AsioContext & io) final;
+		void OnTcpContextUpdate(AsioContext & io) final;
 
 	private:
 		bool mIsAccept;

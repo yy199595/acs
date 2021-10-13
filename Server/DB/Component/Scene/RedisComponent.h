@@ -39,10 +39,16 @@ namespace Sentry
 
     public: // hashset
         bool AddToSet(const std::string & set, const std::string &member);
+
         bool DelFromSet(const std::string & set, const std::string & member);
 
 	public:
-		bool SetValue(const std::string &key, const std::string &value);
+
+        bool SetValue(const std::string & key, const Message & value);
+
+        bool SetValue(const std::string &key, const std::string &value);
+
+        bool SetJsonValue(const std::string & key, const Message & value);
 
 		bool SetValue(const std::string &key, const std::string &value, int second);
 
@@ -50,12 +56,18 @@ namespace Sentry
 
         bool SetValue(const std::string &tab, const std::string &key, const std::string &value);
 
+        bool SetJsonValue(const std::string &tba, const std::string &key, const Message & value);
+
 	public:
 		bool GetValue(const std::string &key, std::string &value);
 
         bool GetValue(const std::string &tab, const std::string &key, Message & value);
 
         bool GetValue(const std::string &tab, const std::string &key, std::string &value);
+
+        bool GetJsonValue(const std::string & key, Message & value);
+
+        bool GetJsonValue(const std::string &tab, const std::string &key, Message & value);
 
 	private:
 		std::string mRedisIp;        //redis ip地址

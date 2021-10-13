@@ -31,7 +31,11 @@ namespace Sentry
 
         bool StartTask(TaskProxy * taskAction);
 
+        bool StartTask(const std::string & name, TaskProxy * task);
+
         void PushFinishTask(std::queue<unsigned int> & tasks);
+
+        NetWorkThread * NewNetworkThread(const std::string & name, class MethodProxy * method);
 
         const std::vector<TaskThread *> GetThreads() { return this->mThreadArray;}
     private:
@@ -41,5 +45,6 @@ namespace Sentry
         int mThreadCount;
         std::vector<TaskThread *> mThreadArray;
 		NumberBuilder<unsigned int> mTaskNumberPool;
+        std::unordered_map<std::string, NetWorkThread *> mNetThread;
     };
 }

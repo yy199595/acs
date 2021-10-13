@@ -40,14 +40,12 @@ namespace Sentry
 {
     bool HttpClientComponent::Awake()
     {
-        this->mHttpContext = new AsioContext(1);
-        auto taskComponent = this->GetComponent<TaskComponent>();
-        SayNoAssertRetFalse_F(taskComponent);
-        this->mHttpThread = new TaskThread(taskComponent);
+        this->mTaskComponent = this->GetComponent<TaskComponent>();
+        this->mCorComponent = this->GetComponent<CoroutineComponent>();
         return true;
     }
 
-    void HttpClientComponent::OnSystemUpdate()
+    void HttpClientComponent::OnHttpContextUpdate(AsioContext & ctx)
     {
 
     }
@@ -58,9 +56,6 @@ namespace Sentry
       {
         return XCode::NoCoroutineContext;
       }
-
-      asio::io_context & io = App::Get().GetNetContext();
-
 
 
       return XCode::Successful;

@@ -175,7 +175,7 @@ namespace Sentry
             {
                 return false;
             }
-			this->mMysqlSocketMap.insert(std::make_pair(taskThread->GetId(), mysqlScoket));
+			this->mMysqlSocketMap.insert(std::make_pair(taskThread->GetThreadId(), mysqlScoket));
 		}
         return true;
     }

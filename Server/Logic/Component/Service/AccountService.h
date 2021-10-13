@@ -5,9 +5,10 @@
 
 namespace Sentry
 {
-    class MysqlComponent;
 
     class RedisComponent;
+    class MysqlProxyComponent;
+
 
     class AccountService : public LocalServiceComponent, public ILoadData
     {
@@ -24,12 +25,16 @@ namespace Sentry
         void OnLodaData() final;
 
     private:
-        XCode Login(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response);
+        XCode LoginByToken(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response);
+
+        XCode LoginByPasswd(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response);
 
         XCode Register(long long operId, const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response);
 
     private:
-        RedisComponent *mRedisManager;
-        MysqlComponent *mMysqlManager;
+        const std::string NewToken(const std::string & account);
+    private:
+        RedisComponent *mRedisComponent;
+        MysqlProxyComponent *mMysqlComponent;
     };
 }// namespace Sentry

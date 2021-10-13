@@ -1,6 +1,7 @@
 ﻿#include "TaskComponent.h"
 #include <Util/NumberHelper.h>
 #include <Core/App.h>
+#include <Method/MethodProxy.h>
 namespace Sentry
 {
     TaskComponent::TaskComponent()
@@ -27,7 +28,20 @@ namespace Sentry
 		
     }
 
-	void TaskComponent::PushFinishTask(unsigned int taskId)
+    NetWorkThread * TaskComponent::NewNetworkThread(const std::string & name,MethodProxy * method)
+    {
+        auto iter = this->mNetThread.find(name);
+        if(iter == this->mNetThread.end())
+        {
+            NetWorkThread * thread = new NetWorkThread(this, method);
+            this->mNetThread.emplace(name, thread);
+            SayNoDebugLog("start new network thread [" <<  name << "]");
+            return thread;
+        }
+        return iter->second;
+    }
+
+    void TaskComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
 	}
@@ -43,20 +57,43 @@ namespace Sentry
     }
 
     bool TaskComponent::StartTask(TaskProxy * task)
-    {             
-		if (task != nullptr)
-		{
-			auto iter = this->mTaskMap.find(task->GetTaskId());
-			if (iter == this->mTaskMap.end())
-			{
-				task->mTaskId = mTaskNumberPool.Pop();
-				this->mTaskMap.emplace(task->GetTaskId(), task);
-				size_t index = task->GetTaskId() % mThreadCount;
-				this->mThreadArray[index]->AddTask(task);
-				return true;
-			}
-		}     
-        return true;
+    {
+        if (task == nullptr)
+        {
+            return false;
+        }
+        auto iter = this->mTaskMap.find(task->GetTaskId());
+        if (iter == this->mTaskMap.end())
+        {
+            task->mTaskId = mTaskNumberPool.Pop();
+            this->mTaskMap.emplace(task->GetTaskId(), task);
+            size_t index = task->GetTaskId() % mThreadCount;
+            this->mThreadArray[index]->AddTask(task);
+            return true;
+        }
+        return false;
+    }
+
+    bool TaskComponent::StartTask(const std::string & name, TaskProxy * task)
+    {
+        if(task== nullptr)
+        {
+            return false;
+        }
+        auto iter1 = this->mNetThread.find(name);
+        if(iter1 == this->mNetThread.end())
+        {
+            return false;
+        }
+        auto iter = this->mTaskMap.find(task->GetTaskId());
+        if (iter == this->mTaskMap.end())
+        {
+            task->mTaskId = mTaskNumberPool.Pop();
+            this->mTaskMap.emplace(task->GetTaskId(), task);
+            iter1->second->AddTask(task);
+            return true;
+        }
+        return false;
     }
 
     void TaskComponent::OnSystemUpdate()

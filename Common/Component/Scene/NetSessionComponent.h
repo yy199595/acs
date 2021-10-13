@@ -14,7 +14,7 @@ namespace Sentry
 	// 管理所有session  在网络线程中运行
 	class TcpClientSession;
 
-    class NetSessionComponent : public Component, public INetSystemUpdate, public ISessionHandler
+    class NetSessionComponent : public Component, public ITcpContextUpdate, public ISessionHandler
 	{
 	public:
 		NetSessionComponent();
@@ -46,7 +46,7 @@ namespace Sentry
 
 		void OnDestory() override;
 
-		void OnNetSystemUpdate(AsioContext & io) final;
+		void OnTcpContextUpdate(AsioContext & io) final;
 
 	public:
 		bool StartClose(const std::string &address);

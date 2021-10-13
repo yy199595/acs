@@ -49,10 +49,15 @@ namespace Sentry
 			return this->mServerName;
 		}
 
-		inline AsioContext &GetNetContext()
+		inline AsioContext &GetTcpContext()
 		{
-			return *mAsioContext;
+			return *mTcpContext;
 		}
+
+        inline AsioContext &GetHttpContext()
+        {
+            return *mHttpContext;
+        }
 
 		long long GetRunTime()
 		{
@@ -69,10 +74,15 @@ namespace Sentry
 			return std::this_thread::get_id() == this->mMainThreadId;
 		}
 
-		inline bool IsNetThreadThread()
+		inline bool IsTcpThread()
 		{
-			return std::this_thread::get_id() == this->mNetWorkThreadId;
+			return std::this_thread::get_id() == this->mTcpThreadId;
 		}
+
+        inline bool IsHttpThread()
+        {
+            return std::this_thread::get_id() == this->mHttpThreadId;
+        }
 
 	public:
 		static App &Get()
@@ -106,15 +116,21 @@ namespace Sentry
 	private:
 		int LogicMainLoop();
 
-		void NetworkLoop();
+		void TcpThreadLoop();
 
+        void HttpThreadLoop();
 	private:
-	    AsioWork * mAsioWork;
         long long mNextRefreshTime;
-		AsioContext * mAsioContext;
-		std::thread *mNetWorkThread;
 		std::thread::id mMainThreadId;
-		std::thread::id mNetWorkThreadId;
+		std::thread::id mTcpThreadId;
+        std::thread::id mHttpThreadId;
+    private:
+        AsioWork * mTcpWork;
+        AsioWork * mHttpWork;
+        AsioContext * mTcpContext;
+        AsioContext * mHttpContext;
+        std::thread * mTcpWorkThread;
+        std::thread * mHttpWoekThread;
 	private:
 		bool mIsClose;
 		bool mIsInitComplate;
@@ -144,6 +160,9 @@ namespace Sentry
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
-		std::vector<INetSystemUpdate *> mNetSystemUpdateManagers;
-	};
+    private:
+		std::vector<ITcpContextUpdate *> mTcpUpdateComponent;
+        std::vector<IHttpContextUpdate *> mHttpUpdateComponent;
+
+    };
 }// namespace Sentry

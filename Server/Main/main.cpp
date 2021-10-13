@@ -11,6 +11,7 @@
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
+#include <Scene/HttpClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>
@@ -38,6 +39,7 @@ int main(int argc, char **argv)
 	__register_component__(ProtocolComponent);
     __register_component__(MysqlProxyComponent);
     __register_component__(GatewayComponent);
+    __register_component__(HttpClientComponent);
 	
 	__register_component__(TaskComponent);
 	__register_component__(CoroutineComponent);

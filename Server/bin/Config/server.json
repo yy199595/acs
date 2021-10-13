@@ -51,11 +51,11 @@
         "MysqlProxyComponent",
         "NetProxyComponent",
         "GatewayComponent",
+        "HttpClientComponent",
         "LuaServiceMgrComponent"
     ],
     "Service": [
         "MysqlService",
-	    "LoginService",
         "CenterService", 
         "ClusterService",
         "GatewayService"

@@ -7,6 +7,7 @@
 #include <Scene/NetSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
+#include <Scene/TaskComponent.h>
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -17,19 +18,21 @@ namespace Sentry
 	App::App(const std::string srvName, const std::string cfgDir)
 		:GameObject(0), mStartTime(TimeHelper::GetMilTimestamp()),
 		mConfig(cfgDir + srvName + ".json")
-	{
-		mApp = this;
-		this->mDelatime = 0;
-		this->mIsClose = false;
-		this->mServerName = srvName;
-		this->mLogicRunCount = 0;
-		this->mSystemRunCount = 0;
-		this->mIsInitComplate = false;
-		this->mNetWorkThread = nullptr;
-		this->mConfigDir = cfgDir;
-		this->mAsioContext = new AsioContext(1);
-		this->mAsioWork = new AsioWork(*mAsioContext);
-		LogHelper::Init("./Logs", this->mServerName);
+    {
+        mApp = this;
+        this->mDelatime = 0;
+        this->mIsClose = false;
+        this->mServerName = srvName;
+        this->mLogicRunCount = 0;
+        this->mSystemRunCount = 0;
+        this->mIsInitComplate = false;
+        this->mConfigDir = cfgDir;
+
+        this->mTcpContext = new AsioContext(1);
+        this->mHttpContext = new AsioContext(1);
+        this->mTcpWork = new AsioWork(*this->mTcpContext);
+        this->mHttpWork = new AsioWork(*this->mHttpContext);
+        LogHelper::Init("./Logs", this->mServerName);
         this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
 
     }
@@ -141,22 +144,34 @@ namespace Sentry
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}
-		if (INetSystemUpdate *manager4 = dynamic_cast<INetSystemUpdate *>(component))
+		if (ITcpContextUpdate *manager4 = dynamic_cast<ITcpContextUpdate *>(component))
 		{
-			this->mNetSystemUpdateManagers.push_back(manager4);
+			this->mTcpUpdateComponent.push_back(manager4);
 		}
+
+        if (IHttpContextUpdate *manager5 = dynamic_cast<IHttpContextUpdate *>(component))
+        {
+            this->mHttpUpdateComponent.push_back(manager5);
+        }
 		return true;
 	}
 
 	bool App::StartNetThread()
-	{
-	    auto func = std::bind(&App::NetworkLoop, this);
-	    this->mNetWorkThread = new std::thread(func);
-        this->mMainThreadId = std::this_thread::get_id();
-        this->mNetWorkThreadId = this->mNetWorkThread->get_id();
-        this->mNetWorkThread->detach();
+    {
+        TaskComponent *taskComponent = this->GetComponent<TaskComponent>();
+        if (taskComponent == nullptr)
+        {
+            return false;
+        }
+        auto tcpThread = taskComponent->NewNetworkThread("Tcp", NewMethodProxy(&App::TcpThreadLoop, this));
+        auto httpThread = taskComponent->NewNetworkThread("Http", NewMethodProxy(&App::HttpThreadLoop, this));
+
+        SayNoAssertRetFalse_F(tcpThread != nullptr && httpThread != nullptr);
+
+        this->mTcpThreadId = tcpThread->GetThreadId();
+        this->mHttpThreadId = httpThread->GetThreadId();
         return true;
-	}
+    }
 
 	void App::StartComponent()
     {
@@ -277,20 +292,22 @@ namespace Sentry
         return this->Stop();
     }
 
-    void App::NetworkLoop()
+    void App::TcpThreadLoop()
     {
-	    asio::error_code err;
-        std::chrono::milliseconds time(1);
-        while (!this->mIsClose)
+        this->mTcpContext->poll();
+        for (ITcpContextUpdate *component: this->mTcpUpdateComponent)
         {
-            mAsioContext->poll(err);
-			for (INetSystemUpdate * component : this->mNetSystemUpdateManagers)
-			{
-				component->OnNetSystemUpdate(*mAsioContext);
-			}
-			std::this_thread::sleep_for(time);
+            component->OnTcpContextUpdate(*mTcpContext);
         }
-        SayNoDebugError("net thread logout");
+    }
+
+    void App::HttpThreadLoop()
+    {
+        this->mHttpContext->poll();
+        for (IHttpContextUpdate *component: this->mHttpUpdateComponent)
+        {
+            component->OnHttpContextUpdate(*mHttpContext);
+        }
     }
 
     void App::UpdateConsoleTitle()
