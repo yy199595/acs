@@ -74,7 +74,7 @@ namespace Sentry
         std::string host = "";
         std::string port = "";
         std::string path = "";
-        if(!HttpUrlHelper::TryParse(this->mHttpUrl, host, port, path))
+        if (!HttpUrlHelper::TryParse(this->mHttpUrl, host, port, path))
         {
             SayNoDebugError("parse " << this->mHttpUrl << " failure");
             return;
@@ -82,8 +82,8 @@ namespace Sentry
         asio::error_code err;
         tcp::resolver resolver(mAsioContext);
         tcp::resolver::query query(host, port);
-        tcp::resolver::iterator endpoint = resolver.resolve(query,err);
-        if(err)
+        tcp::resolver::iterator endpoint = resolver.resolve(query, err);
+        if (err)
         {
             SayNoDebugError("{ " << this->mHttpUrl << " } " << err.message());
             return;
@@ -91,14 +91,14 @@ namespace Sentry
 
         tcp::socket socket1(this->mAsioContext);
         asio::connect(socket1, endpoint, err);
-        if(err)
+        if (err)
         {
             SayNoDebugError(err.message());
             return;
         }
         SayNoDebugInfo("connect http host " << socket1.remote_endpoint().address() << ":" << port << "  successful");
 
-        asio::streambuf  request;
+        asio::streambuf request;
         std::ostream requestStream(&request);
 
         requestStream << "GET " << path.c_str() << " HTTP/1.0\r\n";
@@ -107,7 +107,7 @@ namespace Sentry
         requestStream << "Connection: close\r\n\r\n";
 
         size_t size = asio::write(socket1, request, err);
-        if(err)
+        if (err)
         {
             SayNoDebugError(err.message());
             return;
@@ -116,13 +116,42 @@ namespace Sentry
 
         asio::streambuf response;
         size_t count = asio::read_until(socket1, response, "\r\n");
-        SayNoDebugError("count = " << count);
+
         std::istream response_stream(&response);
 
-        std::string message;
-        while(std::getline(response_stream, message))
+        std::string httpVersion;
+        response_stream >> httpVersion;
+
+        unsigned int httpCode;
+        response_stream >> httpCode;
+
+        SayNoDebugError(httpVersion << "   " << httpCode);
+
+        if (httpCode != 200)
         {
-            SayNoDebugWarning(message);
+            return;
+        }
+
+        std::string header;
+        std::vector<string> headers;
+        while (std::getline(response_stream, header) && header != "\r")
+        {
+            headers.push_back(header);
+        }
+
+        asio::error_code error;
+        while (asio::read(socket1, response,
+                          asio::transfer_at_least(1), error))
+        {
+        }
+
+        //响应有数据
+        if (response.size())
+        {
+            std::istream response_stream(&response);
+            std::istreambuf_iterator<char> eos;
+            std::string reponse_data = std::string(std::istreambuf_iterator<char>(response_stream), eos);
+            SayNoDebugError(reponse_data);
         }
     }
 
@@ -144,7 +173,7 @@ namespace Sentry
     void HttpClientComponent::Start()
     {
         std::string json ;
-        this->Get("http://timor.tech/api/holiday/year", json);
+        this->Get("https://timor.tech/api/holiday/year", json);
     }
 
     void HttpClientComponent::OnHttpContextUpdate(AsioContext & ctx)
