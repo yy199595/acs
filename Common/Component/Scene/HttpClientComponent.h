@@ -6,6 +6,15 @@
 
 namespace Sentry
 {
+    class HttpUrlHelper
+    {
+    public:
+       static bool TryParse(const std::string & url, std::string & host, std::string & port, std::string & path);
+    };
+}
+
+namespace Sentry
+{
     class TaskComponent;
     class CoroutineComponent;
     class HttpRequestTask : public TaskProxy
@@ -42,7 +51,7 @@ namespace Sentry
 
     public:
         bool Awake() final;
-
+        void Start() final;
         void OnHttpContextUpdate(AsioContext &ctx) final;
 
     public:
