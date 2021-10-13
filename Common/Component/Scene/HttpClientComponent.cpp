@@ -5,6 +5,7 @@
 #include <Thread/TaskThread.h>
 #include "HttpClientComponent.h"
 #include "TaskComponent.h"
+#include<Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
 
 namespace Sentry
@@ -74,6 +75,7 @@ namespace Sentry
         std::string host = "";
         std::string port = "";
         std::string path = "";
+		const long long t1 = TimeHelper::GetMilTimestamp();
         if (!HttpUrlHelper::TryParse(this->mHttpUrl, host, port, path))
         {
             SayNoDebugError("parse " << this->mHttpUrl << " failure");
@@ -101,12 +103,13 @@ namespace Sentry
         asio::streambuf request;
         std::ostream requestStream(&request);
 
-        requestStream << "GET " << path.c_str() << " HTTP/1.0\r\n";
-        requestStream << "Host: " << host.c_str() << "\r\n";
+        requestStream << "GET " << path << " HTTP/1.0\r\n";
+        requestStream << "Host: " << host << "\r\n";
         requestStream << "Accept: */*\r\n";
         requestStream << "Connection: close\r\n\r\n";
 
         size_t size = asio::write(socket1, request, err);
+		
         if (err)
         {
             SayNoDebugError(err.message());
@@ -115,44 +118,24 @@ namespace Sentry
         SayNoDebugLog("write message " << size);
 
         asio::streambuf response;
-        size_t count = asio::read_until(socket1, response, "\r\n");
+		//asio::read(socket1, response, asio::transfer_at_least(1), err);
+
+		asio::read_until(socket1, response, "\r\n");
 
         std::istream response_stream(&response);
+		while (asio::read(socket1, response, asio::transfer_at_least(1), err))
+		{
 
-        std::string httpVersion;
-        response_stream >> httpVersion;
+		}
 
-        unsigned int httpCode;
-        response_stream >> httpCode;
+		std::string responseMessage;
+		while (std::getline(response_stream, responseMessage))
+		{
+			SayNoDebugError(responseMessage);
+		}
 
-        SayNoDebugError(httpVersion << "   " << httpCode);
-
-        if (httpCode != 200)
-        {
-            return;
-        }
-
-        std::string header;
-        std::vector<string> headers;
-        while (std::getline(response_stream, header) && header != "\r")
-        {
-            headers.push_back(header);
-        }
-
-        asio::error_code error;
-        while (asio::read(socket1, response,
-                          asio::transfer_at_least(1), error))
-        {
-        }
-
-        //响应有数据
-        if (response.size())
-        {
-            std::istream response_stream(&response);
-            std::istreambuf_iterator<char> eos;
-            std::string reponse_data = std::string(std::istreambuf_iterator<char>(response_stream), eos);
-            SayNoDebugError(reponse_data);
-        }
+		SayNoDebugError(responseMessage);
+		SayNoDebugFatal("时间 = " << ((TimeHelper::GetMilTimestamp() - t1) / 1000.0f) << "s");   
     }
 
     void HttpRequestTask::RunFinish()

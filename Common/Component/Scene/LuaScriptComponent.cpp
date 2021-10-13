@@ -204,7 +204,7 @@ namespace Sentry
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMilTimestamp", TimeHelper::GetMilTimestamp);
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
+        //ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetYearMonthDayString",
                                              TimeHelper::GetYearMonthDayString);
 

@@ -8,11 +8,11 @@ namespace Sentry
 {
     IThread::IThread(TaskComponent * task)
     {
+		this->mIsClose = false;
         this->mTaskComponent = task;
         this->mThread = new std::thread(std::bind(&IThread::Run, this));
         this->mThreadId = this->mThread->get_id();
-        this->mThread->detach();
-        this->mIsClose = false;
+        this->mThread->detach();   
     }
 
     void IThread::Run()

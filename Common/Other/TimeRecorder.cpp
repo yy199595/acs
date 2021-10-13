@@ -26,7 +26,7 @@ namespace Sentry
 
     void TimeRecorder::AddCostTimeInfo(const std::string &func, long long lastTime)
     {
-        long long nowTime = TimeHelper::GetMicTimeStamp();
+        long long nowTime = TimeHelper::GetMilTimestamp();
         auto iter = this->mCallFuncInfoMap.find(func);
         if (iter == this->mCallFuncInfoMap.end())
         {

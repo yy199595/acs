@@ -26,11 +26,11 @@ long long TimeHelper::GetSecTimeStamp()
     return duration_cast<seconds>(tmp).count();
 }
 
-long long TimeHelper::GetMicTimeStamp()
-{
-    auto tmp = system_clock::now().time_since_epoch();
-    return duration_cast<microseconds>(tmp).count();
-}
+//long long TimeHelper::GetMicTimeStamp()
+//{
+//    auto tmp = system_clock::now().time_since_epoch();
+//    return duration_cast<microseconds>(tmp).count();
+//}
 
 long long TimeHelper::GetToDayZeroTime()
 {
