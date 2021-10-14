@@ -63,9 +63,10 @@ namespace Sentry
                 com::DataPacket_Response responseMessage;
 
                 responseMessage.set_code(code);
+				responseMessage.set_methodid(methodId);
                 responseMessage.set_messagedata(responseContent);
-                responseMessage.set_userid(requestMessage.userid());
-                responseMessage.set_methodid(requestMessage.methodid());
+				responseMessage.set_rpcid(requestMessage.rpcid());
+                responseMessage.set_userid(requestMessage.userid());   
                 this->mNetProxyManager->SendNetMessage(address, responseMessage);
             }
         }

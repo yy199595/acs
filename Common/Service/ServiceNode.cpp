@@ -123,7 +123,8 @@ namespace Sentry
         MessageStream &messageStream = this->mNetProxyComponent->GetSendStream();
         messageStream << DataMessageType::TYPE_REQUEST << config->MethodId << requestData;
 
-        if(!tcpProxySession->SendMessageData(messageStream.Serialize(size), size))
+		const char * message = messageStream.Serialize(size);
+        if(!tcpProxySession->SendMessageData(message, size))
         {
             return XCode::SendMessageFail;
         }

@@ -8,8 +8,9 @@ namespace Sentry
 {
     const char * MessageStream::Serialize(size_t & size)
     {
-        size = this->mPos - sizeof(unsigned int);
-        memcpy(this->mBuffer, &size, sizeof(unsigned int));
+		size = this->mPos;
+		size_t head = this->mPos - sizeof(unsigned int);
+        memcpy(this->mBuffer, &head, sizeof(unsigned int));
         return this->mBuffer;
     }
 
@@ -29,8 +30,9 @@ namespace Sentry
 
     MessageStream & MessageStream::operator << (const Message & message)
     {
+		std::string ms = message.SerializeAsString();
         size_t size = message.ByteSizeLong();
-        if (message.SerializeToArray(this->mBuffer + this->mPos, TCP_SEND_MAX_COUNT))
+        if (message.SerializeToArray(this->mBuffer + this->mPos, TCP_SEND_MAX_COUNT - this->mPos))
         {
             this->mPos += size;
         }

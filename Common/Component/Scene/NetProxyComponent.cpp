@@ -41,7 +41,8 @@ namespace Sentry
         messageData.clear_methodid();
         MessageStream & sendStream = this->GetSendStream();
         sendStream << TYPE_RESPONSE << methodId << messageData;
-        return tcpSession->SendMessageData(sendStream.Serialize(size), size);
+		const char * message = sendStream.Serialize(size);
+        return tcpSession->SendMessageData(message, size);
     }
 
     MessageStream & NetProxyComponent::GetSendStream()
