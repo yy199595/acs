@@ -22,10 +22,6 @@ namespace Sentry
     public:
 		const std::string &GetServiceName()final { return this->GetTypeName(); }
 	protected:
-        template<typename T>
-        bool Bind(std::string name, ServiceMethodType0<T> func){
-            return this->AddMethod(new ServiceMethod0<T>(name, (T*)this, func));
-        }
 
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType1<T> func) {

@@ -133,7 +133,7 @@ public:
    */
   void on_work_finished() const ASIO_NOEXCEPT;
 
-  /// Request the thread pool to invoke the given function object.
+  /// RequestMessage the thread pool to invoke the given function object.
   /**
    * This function is used to ask the thread pool to execute the given function
    * object. If the current thread belongs to the pool, @c dispatch() executes
@@ -150,7 +150,7 @@ public:
   template <typename Function, typename Allocator>
   void dispatch(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the thread pool to invoke the given function object.
+  /// RequestMessage the thread pool to invoke the given function object.
   /**
    * This function is used to ask the thread pool to execute the given function
    * object. The function object will never be executed inside @c post().
@@ -166,7 +166,7 @@ public:
   template <typename Function, typename Allocator>
   void post(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the thread pool to invoke the given function object.
+  /// RequestMessage the thread pool to invoke the given function object.
   /**
    * This function is used to ask the thread pool to execute the given function
    * object. The function object will never be executed inside @c defer().

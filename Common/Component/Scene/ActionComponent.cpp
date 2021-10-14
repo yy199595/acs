@@ -37,24 +37,24 @@ namespace Sentry
         return id;
     }
 
-	bool ActionComponent::InvokeCallback(PacketMapper *messageData)
-	{
-		unsigned int rpcId = messageData->GetRpcId();
-		auto iter = this->mRetActionMap.find(rpcId);
-		if (iter == this->mRetActionMap.end())
-		{
-			return false;
-		}
-		iter->second->Invoke(messageData);
-#ifdef _DEBUG
-		memset(this->mBuffer, 0, 100);
-		const ProtocolConfig *config = messageData->GetProConfig();
-		float t = (TimeHelper::GetMilTimestamp() - iter->second->GetCreateTime()) / 1000.0f;
-		SayNoDebugLog("call " << config->Service << "." << config->Method << "  response [elapsed time = ]" << t);
-#endif
+    bool ActionComponent::OnResponseMessage(const std::string & address, SharedMessage message)
+    {
+        com::DataPacket_Response response;
+        const char * ptr = message->c_str();
+        if(!response.ParseFromArray(ptr + 3, message->size() -3))
+        {
+            return false;
+        }
+        unsigned int rpcId = response.rpcid();
+        auto iter = this->mRetActionMap.find(rpcId);
+        if (iter == this->mRetActionMap.end())
+        {
+            return false;
+        }
+        iter->second->Invoke(response);
 
-		this->mNumberPool.Push(rpcId);
-		this->mRetActionMap.erase(iter);
-		return true;
-	}
+        this->mNumberPool.Push(rpcId);
+        this->mRetActionMap.erase(iter);
+        return true;
+    }
 }

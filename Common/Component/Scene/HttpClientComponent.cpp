@@ -131,7 +131,7 @@ namespace Sentry
 		std::string responseMessage;
 		while (std::getline(response_stream, responseMessage))
 		{
-			SayNoDebugError(responseMessage);
+			//SayNoDebugError(responseMessage);
 		}
 
 		SayNoDebugError(responseMessage);
@@ -140,7 +140,7 @@ namespace Sentry
 
     void HttpRequestTask::RunFinish()
     {
-
+        this->mCorComponent->Resume(this->mCorId);
     }
 }
 

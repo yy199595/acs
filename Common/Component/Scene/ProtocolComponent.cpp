@@ -30,7 +30,7 @@ namespace Sentry
 			const std::string service = iter1->name.GetString();
 			rapidjson::Value& jsonValue = iter1->value;
 			SayNoAssertRetFalse_F(jsonValue.IsObject());
-			SayNoAssertRetFalse_F(jsonValue.HasMember("id"));
+			SayNoAssertRetFalse_F(jsonValue.HasMember("ID"));
 
 			std::vector<ProtocolConfig *> methods;
 			auto iter2 = jsonValue.MemberBegin();
@@ -42,38 +42,64 @@ namespace Sentry
                 }
                 ProtocolConfig *protocolConfig = new ProtocolConfig();
 
-				protocolConfig->Service = service;
+				protocolConfig->ServiceName = service;
                 protocolConfig->Method = iter2->name.GetString();
-                SayNoAssertRetFalse_F(iter2->value.HasMember("id"));
+                SayNoAssertRetFalse_F(iter2->value.HasMember("ID"));
 
-				protocolConfig->Async = iter2->value["async"].GetBool();
-                protocolConfig->Id = (unsigned short) iter2->value["id"].GetUint();
-                if (iter2->value.HasMember("request"))
+				protocolConfig->IsAsync = iter2->value["Async"].GetBool();
+                protocolConfig->MethodId = (unsigned short) iter2->value["ID"].GetUint();
+
+
+                if(iter2->value.HasMember("Request"))
                 {
-                    protocolConfig->Request = iter2->value["request"].GetString();
-                    Message *message = MessagePool::New(protocolConfig->Request);
-                    if (message == nullptr)
+                    const rapidjson::Value & jsonValue = iter2->value["Request"];
+                    if(!jsonValue.IsObject())
                     {
-                        SayNoDebugFatal("create " << protocolConfig->Request << " failure");
                         return false;
                     }
-                }
-                if (iter2->value.HasMember("response"))
-                {
-                    protocolConfig->Response = iter2->value["response"].GetString();
-                    Message *message = MessagePool::New(protocolConfig->Response);
-                    if (message == nullptr)
+                    if(jsonValue.HasMember("Message"))
                     {
-                        SayNoDebugFatal("create " << protocolConfig->Response << " failure");
-                        return false;
+                        protocolConfig->RequestMessage = jsonValue["Message"].GetString();
+                        Message *message = MessagePool::New(protocolConfig->RequestMessage);
+                        if (message == nullptr)
+                        {
+                            SayNoDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
+                            return false;
+                        }
+                    }
+                    if(jsonValue.HasMember("Component"))
+                    {
+                        protocolConfig->RequestHandler = jsonValue["Component"].GetString();
                     }
                 }
 
+                if(iter2->value.HasMember("Response"))
+                {
+                    const rapidjson::Value & jsonValue = iter2->value["Response"];
+                    if(!jsonValue.IsObject())
+                    {
+                        return false;
+                    }
+                    if(jsonValue.HasMember("Message"))
+                    {
+                        protocolConfig->ResponseMessage = jsonValue["Message"].GetString();
+                        Message *message = MessagePool::New(protocolConfig->ResponseMessage);
+                        if (message == nullptr)
+                        {
+                            SayNoDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
+                            return false;
+                        }
+                    }
+                    if(jsonValue.HasMember("Component"))
+                    {
+                        protocolConfig->ResponseHandler = jsonValue["Component"].GetString();
+                    }
+                }
 
                 methods.push_back(protocolConfig);
                 std::string name = service + "." + protocolConfig->Method;
                 this->mProtocolNameMap.insert(std::make_pair(name, protocolConfig));
-                this->mProtocolMap.insert(std::make_pair(protocolConfig->Id, protocolConfig));
+                this->mProtocolMap.insert(std::make_pair(protocolConfig->MethodId, protocolConfig));
             }
 			this->mServiceMap.emplace(service, methods);
 		}

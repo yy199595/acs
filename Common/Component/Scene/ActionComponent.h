@@ -13,7 +13,7 @@ namespace Sentry
     class LocalRetActionProxy;
 
 	class PacketMapper;
-    class ActionComponent : public Component
+    class ActionComponent : public Component, public IResponseMessageHandler
     {
     public:
         ActionComponent();
@@ -21,9 +21,8 @@ namespace Sentry
         virtual ~ActionComponent() {}
 
     public:
-        bool InvokeCallback(PacketMapper *messageData);
         unsigned int AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-
+        bool OnResponseMessage(const std::string & address, SharedMessage message) final;
     protected:
         bool Awake() override;
 

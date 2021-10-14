@@ -3,7 +3,6 @@
 #include<XCode/XCode.h>
 #include<Util/NumberBuilder.h>
 #include<Protocol/com.pb.h>
-#include<NetWork/PacketMapper.h>
 #include<NetWork/TcpClientSession.h>
 
 using namespace com;
@@ -20,7 +19,7 @@ namespace Sentry
         long long GetCreateTime() { return this->mCreateTime; }
 
     public:
-        virtual void Invoke(PacketMapper *backData) = 0;
+        virtual void Invoke(const com::DataPacket_Response & backData) = 0;
 
     private:
         long long mCreateTime;
@@ -41,7 +40,7 @@ namespace Sentry
     public:
         LocalWaitRetActionProxy(lua_State *lua, lua_State * cor) : mCoroutine(cor), luaEnv(lua) {}
     public:
-        void Invoke(PacketMapper *backData) override;
+        void Invoke(const com::DataPacket_Response & backData) override;
 
     private:
 		int ref;
@@ -61,16 +60,16 @@ namespace Sentry
         static shared_ptr<NetWorkWaitCorAction> Create();
 
     public:
-        void Invoke(PacketMapper *backData) override;
-
+        void Invoke(const com::DataPacket_Response & backData) override;
     public:
-        XCode GetCode() { return this->mResponseData->GetCode(); }
+        XCode GetCode() { return this->mCode; }
 
-        const std::string &GetMsgData() { return this->mResponseData->GetMsgBody(); }
+        const std::string &GetMsgData() { return this->mMessage; }
 
     private:
+        XCode mCode;
+        std::string mMessage;
 		unsigned int mCoroutineId;
-		PacketMapper * mResponseData;
         CoroutineComponent *mScheduler;
     };
 }

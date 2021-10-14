@@ -64,7 +64,7 @@ namespace Sentry
 	XCode CenterService::Query(const s2s::NodeQuery_Request & request, s2s::NodeQuery_Response & response)
 	{
         const int areaId = request.areaid();
-        const std::string & service = request.service();
+        const std::string & service = request.servicename();
 
         auto iter = this->mServiceNodeMap.begin();
         for(; iter != this->mServiceNodeMap.end(); iter++)

@@ -83,11 +83,11 @@ public:
   // Construct a new strand implementation.
   ASIO_DECL void construct(implementation_type& impl);
 
-  // Request the io_context to invoke the given handler.
+  // RequestMessage the io_context to invoke the given handler.
   template <typename Handler>
   void dispatch(implementation_type& impl, Handler& handler);
 
-  // Request the io_context to invoke the given handler and return immediately.
+  // RequestMessage the io_context to invoke the given handler and return immediately.
   template <typename Handler>
   void post(implementation_type& impl, Handler& handler);
 

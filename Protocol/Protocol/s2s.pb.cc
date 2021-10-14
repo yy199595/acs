@@ -311,7 +311,7 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, areaid_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, service_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, servicename_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Response, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -405,21 +405,21 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "Address\030\003 \001(\t\022\022\n\nServerName\030\004 \001(\t\022\020\n\010Ser"
   "vices\030\005 \003(\t\032\027\n\010Response\022\013\n\003Uid\030\001 \001(\005\"N\n\010"
   "NodeInfo\022\013\n\003Uid\030\001 \001(\005\022\017\n\007Address\030\002 \001(\t\022\022"
-  "\n\nServerName\030\003 \001(\t\022\020\n\010Services\030\004 \003(\t\"e\n\t"
-  "NodeQuery\032*\n\007Request\022\016\n\006AreaId\030\001 \001(\005\022\017\n\007"
-  "Service\030\002 \001(\t\032,\n\010Response\022 \n\tNodeInfos\030\001"
-  " \003(\0132\r.s2s.NodeInfo\"x\n\nMysqlQuery\0328\n\007Req"
-  "uest\022\024\n\014ProtocolName\030\001 \001(\t\022\027\n\017ProtocolMe"
-  "ssage\030\002 \001(\014\0320\n\010Response\022\020\n\010ErrotStr\030\001 \001("
-  "\t\022\022\n\nQueryDatas\030\002 \003(\014\"c\n\tMysqlOper\0328\n\007Re"
-  "quest\022\024\n\014ProtocolName\030\001 \001(\t\022\027\n\017ProtocolM"
-  "essage\030\002 \001(\014\032\034\n\010Response\022\020\n\010ErrorStr\030\001 \001"
-  "(\tb\006proto3"
+  "\n\nServerName\030\003 \001(\t\022\020\n\010Services\030\004 \003(\t\"i\n\t"
+  "NodeQuery\032.\n\007Request\022\016\n\006AreaId\030\001 \001(\005\022\023\n\013"
+  "ServiceName\030\002 \001(\t\032,\n\010Response\022 \n\tNodeInf"
+  "os\030\001 \003(\0132\r.s2s.NodeInfo\"x\n\nMysqlQuery\0328\n"
+  "\007Request\022\024\n\014ProtocolName\030\001 \001(\t\022\027\n\017Protoc"
+  "olMessage\030\002 \001(\014\0320\n\010Response\022\020\n\010ErrotStr\030"
+  "\001 \001(\t\022\022\n\nQueryDatas\030\002 \003(\014\"c\n\tMysqlOper\0328"
+  "\n\007Request\022\024\n\014ProtocolName\030\001 \001(\t\022\027\n\017Proto"
+  "colMessage\030\002 \001(\014\032\034\n\010Response\022\020\n\010ErrorStr"
+  "\030\001 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 570,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 574,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -1926,7 +1926,7 @@ class NodeQuery_Request::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int NodeQuery_Request::kAreaIdFieldNumber;
-const int NodeQuery_Request::kServiceFieldNumber;
+const int NodeQuery_Request::kServiceNameFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 NodeQuery_Request::NodeQuery_Request()
@@ -1938,9 +1938,9 @@ NodeQuery_Request::NodeQuery_Request(const NodeQuery_Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  service_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.service().size() > 0) {
-    service_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_);
+  servicename_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.servicename().size() > 0) {
+    servicename_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servicename_);
   }
   areaid_ = from.areaid_;
   // @@protoc_insertion_point(copy_constructor:s2s.NodeQuery.Request)
@@ -1949,7 +1949,7 @@ NodeQuery_Request::NodeQuery_Request(const NodeQuery_Request& from)
 void NodeQuery_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_NodeQuery_Request_s2s_2eproto.base);
-  service_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servicename_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   areaid_ = 0;
 }
 
@@ -1959,7 +1959,7 @@ NodeQuery_Request::~NodeQuery_Request() {
 }
 
 void NodeQuery_Request::SharedDtor() {
-  service_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servicename_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void NodeQuery_Request::SetCachedSize(int size) const {
@@ -1977,7 +1977,7 @@ void NodeQuery_Request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servicename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   areaid_ = 0;
   _internal_metadata_.Clear();
 }
@@ -2002,13 +2002,13 @@ const char* NodeQuery_Request::_InternalParse(const char* begin, const char* end
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string Service = 2;
+      // string ServiceName = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.Service");
-        object = msg->mutable_service();
+        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.ServiceName");
+        object = msg->mutable_servicename();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -2065,15 +2065,15 @@ bool NodeQuery_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // string Service = 2;
+      // string ServiceName = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_service()));
+                input, this->mutable_servicename()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->service().data(), static_cast<int>(this->service().length()),
+            this->servicename().data(), static_cast<int>(this->servicename().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeQuery.Request.Service"));
+            "s2s.NodeQuery.Request.ServiceName"));
         } else {
           goto handle_unusual;
         }
@@ -2112,14 +2112,14 @@ void NodeQuery_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
   }
 
-  // string Service = 2;
-  if (this->service().size() > 0) {
+  // string ServiceName = 2;
+  if (this->servicename().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->service().data(), static_cast<int>(this->service().length()),
+      this->servicename().data(), static_cast<int>(this->servicename().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.Service");
+      "s2s.NodeQuery.Request.ServiceName");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->service(), output);
+      2, this->servicename(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2140,15 +2140,15 @@ void NodeQuery_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
   }
 
-  // string Service = 2;
-  if (this->service().size() > 0) {
+  // string ServiceName = 2;
+  if (this->servicename().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->service().data(), static_cast<int>(this->service().length()),
+      this->servicename().data(), static_cast<int>(this->servicename().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.Service");
+      "s2s.NodeQuery.Request.ServiceName");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->service(), target);
+        2, this->servicename(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2172,11 +2172,11 @@ size_t NodeQuery_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string Service = 2;
-  if (this->service().size() > 0) {
+  // string ServiceName = 2;
+  if (this->servicename().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->service());
+        this->servicename());
   }
 
   // int32 AreaId = 1;
@@ -2213,9 +2213,9 @@ void NodeQuery_Request::MergeFrom(const NodeQuery_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.service().size() > 0) {
+  if (from.servicename().size() > 0) {
 
-    service_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_);
+    servicename_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servicename_);
   }
   if (from.areaid() != 0) {
     set_areaid(from.areaid());
@@ -2247,7 +2247,7 @@ void NodeQuery_Request::Swap(NodeQuery_Request* other) {
 void NodeQuery_Request::InternalSwap(NodeQuery_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  service_.Swap(&other->service_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  servicename_.Swap(&other->servicename_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(areaid_, other->areaid_);
 }

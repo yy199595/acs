@@ -28,30 +28,44 @@ namespace Sentry
 
     TcpProxySession::~TcpProxySession()
     {    
-		MainSocketCloseHandler * handler = new MainSocketCloseHandler(mAddress);
+		auto handler = new MainSocketCloseHandler(mAddress);
         this->mNetManager->PushEventHandler(handler);
 #ifdef SOEASY_DEBUG
         SayNoDebugError("desctory session [" << this->mAddress << "]");
 #endif
     }
 
-    bool TcpProxySession::SendMessageData(PacketMapper *messageData)
+    bool TcpProxySession::SendMessageData(SharedMessage message)
     {
-        if (messageData == nullptr)
+        if (message == nullptr || message->size() <= 3)
         {
             return false;
         }
-		if (this->IsActive() == false)
+        if (!this->IsActive())
+        {
+            return false;
+        }
+        auto handler = new MainSocketSendHandler(this->mAddress, message);
+        return this->mNetManager->PushEventHandler(handler);
+    }
+
+    bool TcpProxySession::SendMessageData(const char * message, size_t size)
+    {
+        if (message == nullptr || size <= 3)
+        {
+            return false;
+        }
+		if (!this->IsActive())
 		{
 			return false;
 		}
-		MainSocketSendHandler * handler = new MainSocketSendHandler(messageData);
+		auto handler = new MainSocketSendHandler(this->mAddress, message, size);
         return this->mNetManager->PushEventHandler(handler);
     }
 
 	void TcpProxySession::StartClose()
 	{
-		MainSocketCloseHandler * handler = new MainSocketCloseHandler(mAddress);
+		auto handler = new MainSocketCloseHandler(mAddress);
 		this->mNetManager->PushEventHandler(handler);
 #ifdef SOEASY_DEBUG
 		SayNoDebugError("desctory session [" << this->mAddress << "]");
@@ -65,7 +79,7 @@ namespace Sentry
             return;
         }
         this->mConnectCount++;
-		MainSocketConnectHandler * handler = new MainSocketConnectHandler(mAddress, mName);
+		auto handler = new MainSocketConnectHandler(mAddress, mName);
         this->mNetManager->PushEventHandler(handler);
     }
 
@@ -77,37 +91,4 @@ namespace Sentry
 			this->mConnectCount = 0;
 		}
 	}
-
-    bool TcpProxySession::Notice(const std::string &service, const std::string &method)
-    {
-        if (service.empty() || method.empty())
-        {
-            return false;
-        }
-		const std::string & address = this->GetAddress();
-        PacketMapper *messageData = PacketMapper::Create(address, S2S_NOTICE, service, method);
-        if (messageData == nullptr)
-        {
-            SayNoDebugError("not find method " << service << "." << method);
-            return XCode::Failure;
-        }
-        return this->SendMessageData(messageData);
-    }
-
-    bool TcpProxySession::Notice(const std::string &service, const std::string &method, const Message &request)
-    {
-        if (service.empty() || method.empty())
-        {
-            return false;
-        }
-		const std::string & address = this->GetAddress();
-        PacketMapper *messageData = PacketMapper::Create(address, S2S_NOTICE, service, method);
-        if (messageData == nullptr)
-        {
-            SayNoDebugError("not find method " << service << "." << method);
-            return XCode::Failure;
-        }
-		messageData->SetMessage(request);      
-        return this->SendMessageData(messageData);
-    }
 }

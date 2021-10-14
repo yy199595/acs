@@ -41,7 +41,7 @@ struct TableStruct_c2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -73,12 +73,18 @@ extern GateLoginDefaultTypeInternal _GateLogin_default_instance_;
 class GateLogin_Request;
 class GateLogin_RequestDefaultTypeInternal;
 extern GateLogin_RequestDefaultTypeInternal _GateLogin_Request_default_instance_;
+class GateLogin_Response;
+class GateLogin_ResponseDefaultTypeInternal;
+extern GateLogin_ResponseDefaultTypeInternal _GateLogin_Response_default_instance_;
 class GateLogout;
 class GateLogoutDefaultTypeInternal;
 extern GateLogoutDefaultTypeInternal _GateLogout_default_instance_;
 class GateLogout_Request;
 class GateLogout_RequestDefaultTypeInternal;
 extern GateLogout_RequestDefaultTypeInternal _GateLogout_Request_default_instance_;
+class GateLogout_Response;
+class GateLogout_ResponseDefaultTypeInternal;
+extern GateLogout_ResponseDefaultTypeInternal _GateLogout_Response_default_instance_;
 class ServerInfo;
 class ServerInfoDefaultTypeInternal;
 extern ServerInfoDefaultTypeInternal _ServerInfo_default_instance_;
@@ -93,8 +99,10 @@ template<> ::c2s::AccountRegister_Request* Arena::CreateMaybeMessage<::c2s::Acco
 template<> ::c2s::AccountRegister_Response* Arena::CreateMaybeMessage<::c2s::AccountRegister_Response>(Arena*);
 template<> ::c2s::GateLogin* Arena::CreateMaybeMessage<::c2s::GateLogin>(Arena*);
 template<> ::c2s::GateLogin_Request* Arena::CreateMaybeMessage<::c2s::GateLogin_Request>(Arena*);
+template<> ::c2s::GateLogin_Response* Arena::CreateMaybeMessage<::c2s::GateLogin_Response>(Arena*);
 template<> ::c2s::GateLogout* Arena::CreateMaybeMessage<::c2s::GateLogout>(Arena*);
 template<> ::c2s::GateLogout_Request* Arena::CreateMaybeMessage<::c2s::GateLogout_Request>(Arena*);
+template<> ::c2s::GateLogout_Response* Arena::CreateMaybeMessage<::c2s::GateLogout_Response>(Arena*);
 template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -1170,6 +1178,111 @@ class GateLogin_Request :
 };
 // -------------------------------------------------------------------
 
+class GateLogin_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin.Response) */ {
+ public:
+  GateLogin_Response();
+  virtual ~GateLogin_Response();
+
+  GateLogin_Response(const GateLogin_Response& from);
+
+  inline GateLogin_Response& operator=(const GateLogin_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GateLogin_Response(GateLogin_Response&& from) noexcept
+    : GateLogin_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline GateLogin_Response& operator=(GateLogin_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GateLogin_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GateLogin_Response* internal_default_instance() {
+    return reinterpret_cast<const GateLogin_Response*>(
+               &_GateLogin_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(GateLogin_Response* other);
+  friend void swap(GateLogin_Response& a, GateLogin_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GateLogin_Response* New() const final {
+    return CreateMaybeMessage<GateLogin_Response>(nullptr);
+  }
+
+  GateLogin_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GateLogin_Response& from);
+  void MergeFrom(const GateLogin_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GateLogin_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:c2s.GateLogin.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GateLogin :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin) */ {
  public:
@@ -1208,7 +1321,7 @@ class GateLogin :
                &_GateLogin_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(GateLogin* other);
   friend void swap(GateLogin& a, GateLogin& b) {
@@ -1264,6 +1377,7 @@ class GateLogin :
   // nested types ----------------------------------------------------
 
   typedef GateLogin_Request Request;
+  typedef GateLogin_Response Response;
 
   // accessors -------------------------------------------------------
 
@@ -1315,7 +1429,7 @@ class GateLogout_Request :
                &_GateLogout_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(GateLogout_Request* other);
   friend void swap(GateLogout_Request& a, GateLogout_Request& b) {
@@ -1382,6 +1496,111 @@ class GateLogout_Request :
 };
 // -------------------------------------------------------------------
 
+class GateLogout_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogout.Response) */ {
+ public:
+  GateLogout_Response();
+  virtual ~GateLogout_Response();
+
+  GateLogout_Response(const GateLogout_Response& from);
+
+  inline GateLogout_Response& operator=(const GateLogout_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GateLogout_Response(GateLogout_Response&& from) noexcept
+    : GateLogout_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline GateLogout_Response& operator=(GateLogout_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GateLogout_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GateLogout_Response* internal_default_instance() {
+    return reinterpret_cast<const GateLogout_Response*>(
+               &_GateLogout_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(GateLogout_Response* other);
+  friend void swap(GateLogout_Response& a, GateLogout_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GateLogout_Response* New() const final {
+    return CreateMaybeMessage<GateLogout_Response>(nullptr);
+  }
+
+  GateLogout_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogout_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GateLogout_Response& from);
+  void MergeFrom(const GateLogout_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GateLogout_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:c2s.GateLogout.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GateLogout :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogout) */ {
  public:
@@ -1420,7 +1639,7 @@ class GateLogout :
                &_GateLogout_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   void Swap(GateLogout* other);
   friend void swap(GateLogout& a, GateLogout& b) {
@@ -1476,6 +1695,7 @@ class GateLogout :
   // nested types ----------------------------------------------------
 
   typedef GateLogout_Request Request;
+  typedef GateLogout_Response Response;
 
   // accessors -------------------------------------------------------
 
@@ -2275,6 +2495,10 @@ inline void GateLogin_Request::set_allocated_token(::std::string* token) {
 
 // -------------------------------------------------------------------
 
+// GateLogin_Response
+
+// -------------------------------------------------------------------
+
 // GateLogin
 
 // -------------------------------------------------------------------
@@ -2283,11 +2507,19 @@ inline void GateLogin_Request::set_allocated_token(::std::string* token) {
 
 // -------------------------------------------------------------------
 
+// GateLogout_Response
+
+// -------------------------------------------------------------------
+
 // GateLogout
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

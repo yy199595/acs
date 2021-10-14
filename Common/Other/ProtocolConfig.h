@@ -7,11 +7,13 @@ namespace Sentry
     class ProtocolConfig
     {
     public:
-        bool Async;
+        bool IsAsync;
         std::string Method;
-        unsigned short Id;
-        std::string Service;
-        std::string Request;
-        std::string Response;
+        unsigned short MethodId;
+        std::string ServiceName;
+        std::string RequestMessage;
+        std::string ResponseMessage;
+        std::string RequestHandler;
+        std::string ResponseHandler;
     };
 }// namespace Sentry

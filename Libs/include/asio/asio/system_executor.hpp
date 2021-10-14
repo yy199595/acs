@@ -52,7 +52,7 @@ public:
   {
   }
 
-  /// Request the system executor to invoke the given function object.
+  /// RequestMessage the system executor to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will always be executed inside this function.
@@ -67,7 +67,7 @@ public:
   template <typename Function, typename Allocator>
   void dispatch(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the system executor to invoke the given function object.
+  /// RequestMessage the system executor to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.
@@ -83,7 +83,7 @@ public:
   template <typename Function, typename Allocator>
   void post(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the system executor to invoke the given function object.
+  /// RequestMessage the system executor to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.

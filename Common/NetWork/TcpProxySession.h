@@ -3,6 +3,7 @@
 
 #include <Protocol/com.pb.h>
 #include <XCode/XCode.h>
+#include <Define/CommonTypeDef.h>
 #include <NetWork/SocketEvent.h>
 
 using namespace google::protobuf;
@@ -31,12 +32,10 @@ namespace Sentry
 
         void StartConnect();
 		void SetActive(bool active);
-		bool IsActive() { return this->mIsActive; }	
-        bool SendMessageData(PacketMapper *messageData);
+		bool IsActive() { return this->mIsActive; }
+        bool SendMessageData(SharedMessage message);
+        bool SendMessageData(const char * msg, size_t size);
 
-    public:
-        bool Notice(const std::string &service, const std::string &method);                        //不回应
-        bool Notice(const std::string &service, const std::string &method, const Message &request);//不回应
     private:
 		bool mIsActive;
         int mConnectCount;

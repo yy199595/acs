@@ -4,7 +4,7 @@
 namespace Sentry
 {
     // 网关
-    class GatewayComponent : public NetProxyComponent
+    class GatewayComponent : public Component
     {
     public:
         GatewayComponent() {}
@@ -13,10 +13,6 @@ namespace Sentry
 
     protected:
         bool Awake() override;
-        bool OnRecvMessage(PacketMapper *msg) override;
-
-    private:
-        void SendMessagToClient(PacketMapper * msg);
     private:
         class GatewayService * mGateService;
         class RedisComponent * mRedisComponent;

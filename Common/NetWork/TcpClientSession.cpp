@@ -58,7 +58,7 @@ namespace Sentry
         return this->mBinTcpSocket != nullptr && this->mBinTcpSocket->is_open();
     }
 
-	bool TcpClientSession::SendPackage(std::string * message)
+	bool TcpClientSession::SendPackage(SharedMessage message)
 	{
 		if (message == nullptr || message->size() == 0)
 		{
@@ -76,7 +76,6 @@ namespace Sentry
 			{
 				this->StartClose();
 			}
-            this->mSessionHandler->OnSendMessageAfter(message);
 		});
 		return true;
 	}

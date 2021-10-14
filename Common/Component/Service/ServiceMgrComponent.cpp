@@ -1,7 +1,6 @@
 ﻿#include "ServiceMgrComponent.h"
 #include <Service/LocalServiceComponent.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/ActionComponent.h>
 #include <Util/StringHelper.h>
 #include <Core/App.h>
 #include <Util/JsonHelper.h>
@@ -18,93 +17,91 @@ namespace Sentry
 
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
         SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetComponent<NetProxyComponent>());
+        SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
         return true;
     }
 
-	bool ServiceMgrComponent::HandlerMessage(PacketMapper *messageData)
-	{
-		const std::string & service = messageData->GetService();
-		const ProtocolConfig * config = messageData->GetProConfig();
-		ServiceComponent * localService = this->gameObject->GetComponent<ServiceComponent>(service);
-		if (localService == nullptr)
-		{
-			SayNoDebugFatal("call service not exist : [" << service << "]");
-			return false;
-		}
-		const std::string & methodName = messageData->GetMethd();
-		ServiceMethod * method = localService->GetMethod(methodName);
-		if (service == nullptr)
-		{
-			return false;
-			SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
-		}
-		if (!config->Async) //同步调用
-		{
-			XCode code = method->Invoke(messageData);
-			const std::string & address = messageData->GetAddress();
-			if (!address.empty() && messageData->SetCode(code))
-			{
-				this->mNetProxyManager->SendNetMessage(messageData);
-			}
-			return true;
-		}
+    bool ServiceMgrComponent::OnRequestMessage(const std::string & address, SharedMessage message)
+    {
+        unsigned short methodId = 0;
+        const char *ptr = message->c_str();
+        memcpy(&methodId, ptr + 1, sizeof(methodId));
 
-		if (method->IsLuaMethod()) // 异步调用
-		{
-			LuaServiceMethod *  luaMethod = static_cast<LuaServiceMethod*>(method);
-			if (luaMethod != nullptr)
-			{
-				XCode code = luaMethod->AsyncInvoke(messageData);
-				if (code != XCode::LuaCoroutineWait)
-				{
-					SayNoDebugError("call lua function " << service << "." << method << " failure");
-					return false;
-				}
-			}
-			return true;
-		}
-		this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, messageData);
-		return true;
-	}
-	
-	std::string ServiceMgrComponent::GetJson(PacketMapper * messageData)
-	{
-		RapidJsonWriter jsonWriter;
-		jsonWriter.AddParameter("rpcid", messageData->GetRpcId());
-		jsonWriter.AddParameter("userid", messageData->GetUserId());
-		jsonWriter.AddParameter("method", messageData->GetProConfig()->Service
-			+ "." + messageData->GetProConfig()->Method);
-		const std::string & name = messageData->GetMessageType() < REQUEST_END
-                                   ? messageData->GetProConfig()->Request : messageData->GetProConfig()->Response;
-	
-		const std::string & data = messageData->GetMsgBody();
-		if (!name.empty() && !data.empty())
-		{
-			std::string json;		
-			Message * message = MessagePool::NewByData(name, data);
-			if (message != nullptr && util::MessageToJsonString(*message, &json).ok())
-			{
-				std::string retData =
-					jsonWriter.Serialization() + " \"message\":" + json;
-				return retData;
-			}
-		}
-		return jsonWriter.Serialization();
-	}
+        const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
+        if (protocolConfig == nullptr)
+        {
+            return false;
+        }
+        const std::string &service = protocolConfig->ServiceName;
+        auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
+        if (logicService == nullptr)
+        {
+            SayNoDebugFatal("call service not exist : [" << service << "]");
+            return false;
+        }
 
-	void ServiceMgrComponent::Invoke(ServiceMethod * method, PacketMapper *messageData)
-	{
-#ifdef _DEBUG	
-		SayNoDebugInfo("[ request ]" << this->GetJson(messageData));
-#endif
-		XCode code = method->Invoke(messageData);
-		const std::string & address = messageData->GetAddress();
-		if (!address.empty() && messageData->SetCode(code))
-		{
-#ifdef _DEBUG	
-		SayNoDebugInfo("[ response ]" << this->GetJson(messageData));
-#endif
-			this->mNetProxyManager->SendNetMessage(messageData);
-		}
-	}
+        const std::string &methodName = protocolConfig->Method;
+        ServiceMethod *method = logicService->GetMethod(methodName);
+        if (service == nullptr)
+        {
+            SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
+            return false;
+        }
+
+        if (!protocolConfig->IsAsync)
+        {
+            com::DataPacket_Request requestMessage;
+            if(!requestMessage.ParseFromArray(ptr + 3, message->size() -3))
+            {
+                return false;
+            }
+            std::string responseContent;
+            method->SetAddress(address);
+            XCode code = method->Invoke(requestMessage, responseContent);
+            if (requestMessage.rpcid() != 0)
+            {
+                com::DataPacket_Response responseMessage;
+
+                responseMessage.set_code(code);
+                responseMessage.set_messagedata(responseContent);
+                responseMessage.set_userid(requestMessage.userid());
+                responseMessage.set_methodid(requestMessage.methodid());
+                this->mNetProxyManager->SendNetMessage(address, responseMessage);
+            }
+        }
+        else if(method->IsLuaMethod()) //lua 异步
+        {
+
+        }
+        else
+        {
+            std::string add = address;
+            this->mCorComponent
+                    ->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, add, message);
+        }
+        return true;
+    }
+
+	void ServiceMgrComponent::Invoke(ServiceMethod * method, std::string &address, SharedMessage message)
+    {
+        const char * ptr = message->c_str();
+        com::DataPacket_Request requestMessage;
+        if(!requestMessage.ParseFromArray(ptr + 3, message->size() -3))
+        {
+            return;
+        }
+        std::string responseContent;
+        method->SetAddress(address);
+        XCode code = method->Invoke(requestMessage, responseContent);
+        if (requestMessage.rpcid() != 0)
+        {
+            com::DataPacket_Response responseMessage;
+
+            responseMessage.set_code(code);
+            responseMessage.set_messagedata(responseContent);
+            responseMessage.set_userid(requestMessage.userid());
+            responseMessage.set_methodid(requestMessage.methodid());
+            this->mNetProxyManager->SendNetMessage(address, responseMessage);
+        }
+    }
 }// namespace Sentry

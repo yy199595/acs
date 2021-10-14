@@ -126,7 +126,7 @@ namespace Sentry
         s2s::NodeQuery_Request request;
         s2s::NodeQuery_Response response;
         request.set_areaid(this->mAreaId);
-        request.set_service(service);
+        request.set_servicename(service);
         ServiceNode *centerNode = this->GetServiceNode(0);
         XCode code = centerNode->Call("CenterService", "Query", request, response);
 

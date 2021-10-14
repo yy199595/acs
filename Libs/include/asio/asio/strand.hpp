@@ -171,7 +171,7 @@ public:
     executor_.on_work_finished();
   }
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the strand to execute the given function
    * object on its underlying executor. The function object will be executed
@@ -193,7 +193,7 @@ public:
         executor_, ASIO_MOVE_CAST(Function)(f), a);
   }
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.
@@ -213,7 +213,7 @@ public:
         executor_, ASIO_MOVE_CAST(Function)(f), a);
   }
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.

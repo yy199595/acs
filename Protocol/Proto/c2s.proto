@@ -47,11 +47,19 @@ message GateLogin
     {
         string Token = 1;
     }
+    message Response
+    {
+
+    }
 }
 
 message GateLogout
 {
     message Request
+    {
+
+    }
+    message Response
     {
 
     }

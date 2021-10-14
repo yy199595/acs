@@ -15,7 +15,7 @@ namespace Sentry
 
 	class ServiceMethod;
 
-    class ServiceMgrComponent : public Component
+    class ServiceMgrComponent : public Component, public IRequestMessageHandler
     {
     public:
         ServiceMgrComponent() {}
@@ -26,17 +26,15 @@ namespace Sentry
         bool Awake() final;
 
     public:
-        bool HandlerMessage(PacketMapper *messageData);
+        bool OnRequestMessage(const std::string & address, SharedMessage message) final;
 
-		virtual int GetPriority() { return 500; }
-	private:	
-		std::string GetJson(PacketMapper * messageData);
-        void Invoke(ServiceMethod * method, PacketMapper *messageData);
+        virtual int GetPriority() { return 500; }
+	private:
+        void Invoke(ServiceMethod * method, std::string &address, SharedMessage message);
     private:
         int mNodeId;
-
         class CoroutineComponent *mCorComponent;
-
         class NetProxyComponent *mNetProxyManager;
+        class ProtocolComponent * mProtocolComponent;
     };
 }

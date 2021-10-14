@@ -11,8 +11,8 @@ namespace Sentry
 		LuaServiceMethod(const std::string & name, lua_State * lua, int idx);
 	public:
 		bool IsLuaMethod() final { return true; }
-		 XCode Invoke(PacketMapper *messageData) final;
-         XCode AsyncInvoke(PacketMapper * message);
+		 XCode Invoke(const com::DataPacket_Request & request, std::string & response) final;
+         XCode AsyncInvoke(const com::DataPacket_Request & request);
 	private:
 		static int Response(lua_State * lua);
 	private:

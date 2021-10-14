@@ -30,7 +30,7 @@ message NodeQuery
     message Request
     {
         int32 AreaId = 1;
-        string Service = 2;
+        string ServiceName = 2;
     }
     message Response
     {

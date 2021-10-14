@@ -44,7 +44,7 @@ struct TableStruct_com_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -52,6 +52,15 @@ struct TableStruct_com_2eproto {
 };
 void AddDescriptors_com_2eproto();
 namespace com {
+class DataPacket;
+class DataPacketDefaultTypeInternal;
+extern DataPacketDefaultTypeInternal _DataPacket_default_instance_;
+class DataPacket_Request;
+class DataPacket_RequestDefaultTypeInternal;
+extern DataPacket_RequestDefaultTypeInternal _DataPacket_Request_default_instance_;
+class DataPacket_Response;
+class DataPacket_ResponseDefaultTypeInternal;
+extern DataPacket_ResponseDefaultTypeInternal _DataPacket_Response_default_instance_;
 class DoubleData;
 class DoubleDataDefaultTypeInternal;
 extern DoubleDataDefaultTypeInternal _DoubleData_default_instance_;
@@ -85,6 +94,9 @@ extern floatDataDefaultTypeInternal _floatData_default_instance_;
 }  // namespace com
 namespace google {
 namespace protobuf {
+template<> ::com::DataPacket* Arena::CreateMaybeMessage<::com::DataPacket>(Arena*);
+template<> ::com::DataPacket_Request* Arena::CreateMaybeMessage<::com::DataPacket_Request>(Arena*);
+template<> ::com::DataPacket_Response* Arena::CreateMaybeMessage<::com::DataPacket_Response>(Arena*);
 template<> ::com::DoubleData* Arena::CreateMaybeMessage<::com::DoubleData>(Arena*);
 template<> ::com::Int32Array* Arena::CreateMaybeMessage<::com::Int32Array>(Arena*);
 template<> ::com::Int32Data* Arena::CreateMaybeMessage<::com::Int32Data>(Arena*);
@@ -1178,6 +1190,403 @@ class StringMap :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
+// -------------------------------------------------------------------
+
+class DataPacket_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.DataPacket.Request) */ {
+ public:
+  DataPacket_Request();
+  virtual ~DataPacket_Request();
+
+  DataPacket_Request(const DataPacket_Request& from);
+
+  inline DataPacket_Request& operator=(const DataPacket_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DataPacket_Request(DataPacket_Request&& from) noexcept
+    : DataPacket_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline DataPacket_Request& operator=(DataPacket_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DataPacket_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DataPacket_Request* internal_default_instance() {
+    return reinterpret_cast<const DataPacket_Request*>(
+               &_DataPacket_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(DataPacket_Request* other);
+  friend void swap(DataPacket_Request& a, DataPacket_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DataPacket_Request* New() const final {
+    return CreateMaybeMessage<DataPacket_Request>(nullptr);
+  }
+
+  DataPacket_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DataPacket_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DataPacket_Request& from);
+  void MergeFrom(const DataPacket_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DataPacket_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // bytes MessageData = 4;
+  void clear_messagedata();
+  static const int kMessageDataFieldNumber = 4;
+  const ::std::string& messagedata() const;
+  void set_messagedata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_messagedata(::std::string&& value);
+  #endif
+  void set_messagedata(const char* value);
+  void set_messagedata(const void* value, size_t size);
+  ::std::string* mutable_messagedata();
+  ::std::string* release_messagedata();
+  void set_allocated_messagedata(::std::string* messagedata);
+
+  // int64 UserId = 1;
+  void clear_userid();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 userid() const;
+  void set_userid(::google::protobuf::int64 value);
+
+  // uint32 RpcId = 2;
+  void clear_rpcid();
+  static const int kRpcIdFieldNumber = 2;
+  ::google::protobuf::uint32 rpcid() const;
+  void set_rpcid(::google::protobuf::uint32 value);
+
+  // int32 MethodId = 3;
+  void clear_methodid();
+  static const int kMethodIdFieldNumber = 3;
+  ::google::protobuf::int32 methodid() const;
+  void set_methodid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:com.DataPacket.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr messagedata_;
+  ::google::protobuf::int64 userid_;
+  ::google::protobuf::uint32 rpcid_;
+  ::google::protobuf::int32 methodid_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DataPacket_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.DataPacket.Response) */ {
+ public:
+  DataPacket_Response();
+  virtual ~DataPacket_Response();
+
+  DataPacket_Response(const DataPacket_Response& from);
+
+  inline DataPacket_Response& operator=(const DataPacket_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DataPacket_Response(DataPacket_Response&& from) noexcept
+    : DataPacket_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline DataPacket_Response& operator=(DataPacket_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DataPacket_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DataPacket_Response* internal_default_instance() {
+    return reinterpret_cast<const DataPacket_Response*>(
+               &_DataPacket_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(DataPacket_Response* other);
+  friend void swap(DataPacket_Response& a, DataPacket_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DataPacket_Response* New() const final {
+    return CreateMaybeMessage<DataPacket_Response>(nullptr);
+  }
+
+  DataPacket_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DataPacket_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DataPacket_Response& from);
+  void MergeFrom(const DataPacket_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DataPacket_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // bytes MessageData = 5;
+  void clear_messagedata();
+  static const int kMessageDataFieldNumber = 5;
+  const ::std::string& messagedata() const;
+  void set_messagedata(const ::std::string& value);
+  #if LANG_CXX11
+  void set_messagedata(::std::string&& value);
+  #endif
+  void set_messagedata(const char* value);
+  void set_messagedata(const void* value, size_t size);
+  ::std::string* mutable_messagedata();
+  ::std::string* release_messagedata();
+  void set_allocated_messagedata(::std::string* messagedata);
+
+  // int32 Code = 1;
+  void clear_code();
+  static const int kCodeFieldNumber = 1;
+  ::google::protobuf::int32 code() const;
+  void set_code(::google::protobuf::int32 value);
+
+  // uint32 UserId = 2;
+  void clear_userid();
+  static const int kUserIdFieldNumber = 2;
+  ::google::protobuf::uint32 userid() const;
+  void set_userid(::google::protobuf::uint32 value);
+
+  // int64 RpcId = 3;
+  void clear_rpcid();
+  static const int kRpcIdFieldNumber = 3;
+  ::google::protobuf::int64 rpcid() const;
+  void set_rpcid(::google::protobuf::int64 value);
+
+  // int32 MethodId = 4;
+  void clear_methodid();
+  static const int kMethodIdFieldNumber = 4;
+  ::google::protobuf::int32 methodid() const;
+  void set_methodid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:com.DataPacket.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr messagedata_;
+  ::google::protobuf::int32 code_;
+  ::google::protobuf::uint32 userid_;
+  ::google::protobuf::int64 rpcid_;
+  ::google::protobuf::int32 methodid_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DataPacket :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.DataPacket) */ {
+ public:
+  DataPacket();
+  virtual ~DataPacket();
+
+  DataPacket(const DataPacket& from);
+
+  inline DataPacket& operator=(const DataPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DataPacket(DataPacket&& from) noexcept
+    : DataPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline DataPacket& operator=(DataPacket&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DataPacket& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DataPacket* internal_default_instance() {
+    return reinterpret_cast<const DataPacket*>(
+               &_DataPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  void Swap(DataPacket* other);
+  friend void swap(DataPacket& a, DataPacket& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DataPacket* New() const final {
+    return CreateMaybeMessage<DataPacket>(nullptr);
+  }
+
+  DataPacket* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DataPacket>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DataPacket& from);
+  void MergeFrom(const DataPacket& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DataPacket* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef DataPacket_Request Request;
+  typedef DataPacket_Response Response;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:com.DataPacket)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
 // ===================================================================
 
 
@@ -1479,9 +1888,231 @@ StringMap::mutable_data() {
   return data_.MutableMap();
 }
 
+// -------------------------------------------------------------------
+
+// DataPacket_Request
+
+// int64 UserId = 1;
+inline void DataPacket_Request::clear_userid() {
+  userid_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 DataPacket_Request::userid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Request.UserId)
+  return userid_;
+}
+inline void DataPacket_Request::set_userid(::google::protobuf::int64 value) {
+  
+  userid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Request.UserId)
+}
+
+// uint32 RpcId = 2;
+inline void DataPacket_Request::clear_rpcid() {
+  rpcid_ = 0u;
+}
+inline ::google::protobuf::uint32 DataPacket_Request::rpcid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Request.RpcId)
+  return rpcid_;
+}
+inline void DataPacket_Request::set_rpcid(::google::protobuf::uint32 value) {
+  
+  rpcid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Request.RpcId)
+}
+
+// int32 MethodId = 3;
+inline void DataPacket_Request::clear_methodid() {
+  methodid_ = 0;
+}
+inline ::google::protobuf::int32 DataPacket_Request::methodid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Request.MethodId)
+  return methodid_;
+}
+inline void DataPacket_Request::set_methodid(::google::protobuf::int32 value) {
+  
+  methodid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Request.MethodId)
+}
+
+// bytes MessageData = 4;
+inline void DataPacket_Request::clear_messagedata() {
+  messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DataPacket_Request::messagedata() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Request.MessageData)
+  return messagedata_.GetNoArena();
+}
+inline void DataPacket_Request::set_messagedata(const ::std::string& value) {
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.DataPacket.Request.MessageData)
+}
+#if LANG_CXX11
+inline void DataPacket_Request::set_messagedata(::std::string&& value) {
+  
+  messagedata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.DataPacket.Request.MessageData)
+}
+#endif
+inline void DataPacket_Request::set_messagedata(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.DataPacket.Request.MessageData)
+}
+inline void DataPacket_Request::set_messagedata(const void* value, size_t size) {
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.DataPacket.Request.MessageData)
+}
+inline ::std::string* DataPacket_Request::mutable_messagedata() {
+  
+  // @@protoc_insertion_point(field_mutable:com.DataPacket.Request.MessageData)
+  return messagedata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DataPacket_Request::release_messagedata() {
+  // @@protoc_insertion_point(field_release:com.DataPacket.Request.MessageData)
+  
+  return messagedata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DataPacket_Request::set_allocated_messagedata(::std::string* messagedata) {
+  if (messagedata != nullptr) {
+    
+  } else {
+    
+  }
+  messagedata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), messagedata);
+  // @@protoc_insertion_point(field_set_allocated:com.DataPacket.Request.MessageData)
+}
+
+// -------------------------------------------------------------------
+
+// DataPacket_Response
+
+// int32 Code = 1;
+inline void DataPacket_Response::clear_code() {
+  code_ = 0;
+}
+inline ::google::protobuf::int32 DataPacket_Response::code() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.Code)
+  return code_;
+}
+inline void DataPacket_Response::set_code(::google::protobuf::int32 value) {
+  
+  code_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.Code)
+}
+
+// uint32 UserId = 2;
+inline void DataPacket_Response::clear_userid() {
+  userid_ = 0u;
+}
+inline ::google::protobuf::uint32 DataPacket_Response::userid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.UserId)
+  return userid_;
+}
+inline void DataPacket_Response::set_userid(::google::protobuf::uint32 value) {
+  
+  userid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.UserId)
+}
+
+// int64 RpcId = 3;
+inline void DataPacket_Response::clear_rpcid() {
+  rpcid_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 DataPacket_Response::rpcid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.RpcId)
+  return rpcid_;
+}
+inline void DataPacket_Response::set_rpcid(::google::protobuf::int64 value) {
+  
+  rpcid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.RpcId)
+}
+
+// int32 MethodId = 4;
+inline void DataPacket_Response::clear_methodid() {
+  methodid_ = 0;
+}
+inline ::google::protobuf::int32 DataPacket_Response::methodid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.MethodId)
+  return methodid_;
+}
+inline void DataPacket_Response::set_methodid(::google::protobuf::int32 value) {
+  
+  methodid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.MethodId)
+}
+
+// bytes MessageData = 5;
+inline void DataPacket_Response::clear_messagedata() {
+  messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DataPacket_Response::messagedata() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.MessageData)
+  return messagedata_.GetNoArena();
+}
+inline void DataPacket_Response::set_messagedata(const ::std::string& value) {
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.MessageData)
+}
+#if LANG_CXX11
+inline void DataPacket_Response::set_messagedata(::std::string&& value) {
+  
+  messagedata_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.DataPacket.Response.MessageData)
+}
+#endif
+inline void DataPacket_Response::set_messagedata(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.DataPacket.Response.MessageData)
+}
+inline void DataPacket_Response::set_messagedata(const void* value, size_t size) {
+  
+  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.DataPacket.Response.MessageData)
+}
+inline ::std::string* DataPacket_Response::mutable_messagedata() {
+  
+  // @@protoc_insertion_point(field_mutable:com.DataPacket.Response.MessageData)
+  return messagedata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DataPacket_Response::release_messagedata() {
+  // @@protoc_insertion_point(field_release:com.DataPacket.Response.MessageData)
+  
+  return messagedata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DataPacket_Response::set_allocated_messagedata(::std::string* messagedata) {
+  if (messagedata != nullptr) {
+    
+  } else {
+    
+  }
+  messagedata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), messagedata);
+  // @@protoc_insertion_point(field_set_allocated:com.DataPacket.Response.MessageData)
+}
+
+// -------------------------------------------------------------------
+
+// DataPacket
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

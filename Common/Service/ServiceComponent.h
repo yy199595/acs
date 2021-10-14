@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <Component/Component.h>
-#include <NetWork/PacketMapper.h>
 
 using namespace std;
 using namespace com;

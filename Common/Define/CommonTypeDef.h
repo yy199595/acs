@@ -47,6 +47,9 @@ typedef std::function<void(const AsioErrorCode &, const size_t)> AsioReceiveCall
 
 typedef std::shared_ptr<AsioTcpSocket> SharedTcpSocket;
 
+typedef std::shared_ptr<std::string> SharedMessage;
+
+
 
 namespace Sentry
 {

@@ -46,3 +46,22 @@ message StringMap
 {
      map<string, string> Data = 1;
 }
+
+message DataPacket
+{
+     message Request
+     {
+          int64 UserId = 1;
+          uint32 RpcId = 2;
+          int32 MethodId = 3;
+          bytes MessageData = 4;
+     }
+     message Response
+     {
+          int32 Code = 1;
+          uint32 UserId = 2;
+          int64 RpcId = 3;
+          int32 MethodId = 4;
+          bytes MessageData = 5;
+     }
+}

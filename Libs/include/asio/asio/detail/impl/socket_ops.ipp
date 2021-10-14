@@ -2890,7 +2890,7 @@ inline int gai_serv(addrinfo_type* aihead,
     }
     else
     {
-      // Service not supported for socket type.
+      // ServiceName not supported for socket type.
       return EAI_SERVICE;
     }
   }

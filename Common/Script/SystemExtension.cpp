@@ -12,7 +12,6 @@
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/ProtocolComponent.h>
 
-#include <NetWork/PacketMapper.h>
 #include <Service/ServiceNode.h>
 #include <Pool/MessagePool.h>
 using namespace Sentry;
@@ -47,61 +46,61 @@ int SystemExtension::Call(lua_State *lua)
 	if (lua_isinteger(lua, index))
 	{
 		const long long userId = lua_tointeger(lua, index);
-		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2C_REQUEST, service, method);
-		if (packetMapper == nullptr)
-		{
-			lua_pushinteger(lua, XCode::CallArgsError);
-			return 1;
-		}
-		index++;
-		packetMapper->SetUserId(userId);
+//		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2C_REQUEST, service, method);
+//		if (packetMapper == nullptr)
+//		{
+//			lua_pushinteger(lua, XCode::CallArgsError);
+//			return 1;
+//		}
+//		index++;
+//		packetMapper->SetUserId(userId);
 	}
 	else
 	{
-		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2S_REQUEST, service, method);
+		//packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2S_REQUEST, service, method);
 	}
-
-	const ProtocolConfig * config = packetMapper->GetProConfig();
-	if (lua_istable(lua, index))
-	{
-		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		int ref = scriptComponent->GetLuaRef("Json", "ToString");
-		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-		lua_pushvalue(lua, index);
-		if (lua_pcall(lua, 1, 1, 0) != 0)
-		{
-			SayNoDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
-			lua_pushinteger(lua, (int)XCode::Failure);
-			return 1;
-		}
-
-		size_t size = 0;
-		const char * json = lua_tolstring(lua, -1, &size);
-		Message * message = MessagePool::NewByJson(config->Request, json, size);
-		if (message != nullptr)
-		{
-			if (!packetMapper->SetMessage(message))
-			{
-				lua_pushinteger(lua, (int)XCode::ProtocbufCastJsonFail);
-				return 1;
-			}
-		}
-		else
-		{
-			packetMapper->SetMessage(json, size);
-		}
-	}
-
-	auto actionComponent = App::Get().GetComponent<ActionComponent>();
-	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
-
-	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))
-	{
-		lua_pushinteger(lua, (int)XCode::Failure);
-		return 1;
-	}
-	
-	serviceNode->AddMessageToQueue(packetMapper, false);
+//
+//	const ProtocolConfig * config = packetMapper->GetProConfig();
+//	if (lua_istable(lua, index))
+//	{
+//		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
+//		int ref = scriptComponent->GetLuaRef("Json", "ToString");
+//		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+//		lua_pushvalue(lua, index);
+//		if (lua_pcall(lua, 1, 1, 0) != 0)
+//		{
+//			SayNoDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
+//			lua_pushinteger(lua, (int)XCode::Failure);
+//			return 1;
+//		}
+//
+//		size_t size = 0;
+//		const char * json = lua_tolstring(lua, -1, &size);
+//		Message * message = MessagePool::NewByJson(config->RequestMessage, json, size);
+//		if (message != nullptr)
+//		{
+//			if (!packetMapper->SetMessage(message))
+//			{
+//				lua_pushinteger(lua, (int)XCode::ProtocbufCastJsonFail);
+//				return 1;
+//			}
+//		}
+//		else
+//		{
+//			packetMapper->SetMessage(json, size);
+//		}
+//	}
+//
+//	auto actionComponent = App::Get().GetComponent<ActionComponent>();
+//	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
+//
+//	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))
+//	{
+//		lua_pushinteger(lua, (int)XCode::Failure);
+//		return 1;
+//	}
+//
+//	serviceNode->AddMessageToQueue(packetMapper, false);
 	
 	return lua_yield(lua, 1);
 }

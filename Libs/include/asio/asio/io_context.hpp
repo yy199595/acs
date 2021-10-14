@@ -509,7 +509,7 @@ public:
    */
   void reset();
 
-  /// (Deprecated: Use asio::dispatch().) Request the io_context to
+  /// (Deprecated: Use asio::dispatch().) RequestMessage the io_context to
   /// invoke the given handler.
   /**
    * This function is used to ask the io_context to execute the given handler.
@@ -535,7 +535,7 @@ public:
   ASIO_INITFN_RESULT_TYPE(LegacyCompletionHandler, void ())
   dispatch(ASIO_MOVE_ARG(LegacyCompletionHandler) handler);
 
-  /// (Deprecated: Use asio::post().) Request the io_context to invoke
+  /// (Deprecated: Use asio::post().) RequestMessage the io_context to invoke
   /// the given handler and return immediately.
   /**
    * This function is used to ask the io_context to execute the given handler,
@@ -641,7 +641,7 @@ public:
    */
   void on_work_finished() const ASIO_NOEXCEPT;
 
-  /// Request the io_context to invoke the given function object.
+  /// RequestMessage the io_context to invoke the given function object.
   /**
    * This function is used to ask the io_context to execute the given function
    * object. If the current thread is running the io_context, @c dispatch()
@@ -658,7 +658,7 @@ public:
   template <typename Function, typename Allocator>
   void dispatch(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the io_context to invoke the given function object.
+  /// RequestMessage the io_context to invoke the given function object.
   /**
    * This function is used to ask the io_context to execute the given function
    * object. The function object will never be executed inside @c post().
@@ -674,7 +674,7 @@ public:
   template <typename Function, typename Allocator>
   void post(ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
 
-  /// Request the io_context to invoke the given function object.
+  /// RequestMessage the io_context to invoke the given function object.
   /**
    * This function is used to ask the io_context to execute the given function
    * object. The function object will never be executed inside @c defer().

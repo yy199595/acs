@@ -4,8 +4,8 @@
 #include <Scene/ActionComponent.h>
 #include <Scene/NetProxyComponent.h>
 #include <NetWork/NetWorkRetAction.h>
+#include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
-#include <NetWork/PacketMapper.h>
 #include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
@@ -15,10 +15,9 @@ namespace Sentry
 		NetProxyComponent * component = App::Get().GetComponent<NetProxyComponent>();
         SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
-		SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
-
-		this->mTcpSession = component->Create(address, mNodeName);
-		this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::HandleMessageSend, this);
+        SayNoAssertRet_F(this->mNetProxyComponent = App::Get().GetComponent<NetProxyComponent>());
+        SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
+        SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 	}
 
 	bool ServiceNode::AddService(const std::string &service)
@@ -32,7 +31,24 @@ namespace Sentry
 		return false;
 	}
 
-	bool ServiceNode::HasService(const std::string &service)
+    TcpProxySession * ServiceNode::GetTcpSession()
+    {
+        TcpProxySession *tcpProxySession = this->mNetProxyComponent->Create(this->mAddress, this->mNodeName);
+        if (!tcpProxySession->IsActive())
+        {
+            unsigned int corId = this->mCorComponent->GetCurrentCorId();
+            if (corId == 0)
+            {
+                return nullptr;
+            }
+            this->mCoroutines.push(corId);
+            tcpProxySession->StartConnect();
+            this->mCorComponent->YieldReturn();
+        }
+        return this->mNetProxyComponent->GetProxySession(this->mAddress);
+    }
+
+    bool ServiceNode::HasService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		return iter != this->mServiceArray.end();
@@ -40,7 +56,12 @@ namespace Sentry
 
 	void ServiceNode::OnConnectNodeAfter()
 	{
-		this->mCorComponent->Resume(mCorId);
+		while(!this->mCoroutines.empty())
+        {
+            unsigned int corId = this->mCoroutines.front();
+            this->mCoroutines.pop();
+            this->mCorComponent->Resume(corId);
+        }
 	}
 
     void ServiceNode::GetServicers(std::vector<std::string> & services)
@@ -53,133 +74,92 @@ namespace Sentry
     }
 
     XCode ServiceNode::Notice(const std::string &service, const std::string &method)
-	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
-		
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		this->AddMessageToQueue(messageData, false);
-		return XCode::Successful;
-	}
+    {
+        return XCode::Successful;
+    }
 
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
 	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
-		
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_NOTICE, service, method);
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		messageData->SetMessage(request);
-		this->AddMessageToQueue(messageData, false);
-		return XCode::Successful;
+        return XCode::Successful;
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
 	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
-
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
-
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		return this->SendRpcMessage(messageData);
+        return XCode::Successful;
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, Message &response)
 	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
-
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
-
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		return this->SendRpcMessage(messageData, response);
+        return XCode::Successful;
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method, const Message &request)
 	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
-
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
-
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		messageData->SetMessage(request);
-		return this->SendRpcMessage(messageData);
+        return XCode::Successful;
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
-	{
-		if (service.empty() || method.empty())
-		{
-			return XCode::CallArgsError;
-		}
+    {
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if (config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+        TcpProxySession *tcpProxySession = this->GetTcpSession();
+        if (!tcpProxySession->IsActive())
+        {
+            return XCode::SendMessageFail;
+        }
+        if (!request.SerializeToString(&mMessageBuffer))
+        {
+            return XCode::SerializationFailure;
+        }
+        size_t size = 0;
+        com::DataPacket_Request requestData;
+        requestData.set_messagedata(mMessageBuffer);
+        auto rpcCallback = NetWorkWaitCorAction::Create();
+        requestData.set_rpcid(this->mActionManager->AddCallback(rpcCallback));
 
-		PacketMapper *messageData = PacketMapper::Create(mAddress, S2S_REQUEST, service, method);
+        MessageStream &messageStream = this->mNetProxyComponent->GetSendStream();
+        messageStream << DataMessageType::TYPE_REQUEST << config->MethodId << requestData;
 
-		if (messageData == nullptr)
-		{
-			SayNoDebugError("not find [" << service << "." << method << "]");
-			return XCode::CallArgsError;
-		}
-		messageData->SetMessage(request);
-		return this->SendRpcMessage(messageData, response);
-	}
+        if(!tcpProxySession->SendMessageData(messageStream.Serialize(size), size))
+        {
+            return XCode::SendMessageFail;
+        }
+        this->mCorComponent->YieldReturn();
 
-	XCode ServiceNode::SendRpcMessage(PacketMapper * message)
+        if(rpcCallback->GetCode() == XCode::Successful)
+        {
+            response.ParseFromString(rpcCallback->GetMsgData());
+            return XCode::Successful;
+        }
+        return rpcCallback->GetCode();
+    }
+
+	XCode ServiceNode::SendRpcMessage(SharedMessage message)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create();
-		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
-		{
-			return XCode::Failure;
-		}
-		this->AddMessageToQueue(message);
+//		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
+//		{
+//			return XCode::Failure;
+//		}
+		//this->AddMessageToQueue(message);
 		return rpcCallback->GetCode();
 	}
 
-	XCode ServiceNode::SendRpcMessage(PacketMapper * message, Message & response)
+	XCode ServiceNode::SendRpcMessage(SharedMessage message, Message & response)
 	{
 		auto rpcCallback = NetWorkWaitCorAction::Create();
-		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
-		{
-			return XCode::Failure;
-		}
-		this->AddMessageToQueue(message);
+//		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
+//		{
+//			return XCode::Failure;
+//		}
+		//this->AddMessageToQueue(message);
 		if (rpcCallback->GetCode() == XCode::Successful)
 		{
 			const std::string & data = rpcCallback->GetMsgData();
-			if (response.ParseFromString(data) == false)
+			if (!response.ParseFromString(data))
 			{
 				SayNoDebugFatal("parse response message error type : " << response.GetTypeName());
 				return XCode::ParseMessageError;
@@ -187,43 +167,4 @@ namespace Sentry
 		}
 		return rpcCallback->GetCode();
 	}
-
-	void ServiceNode::HandleMessageSend()
-	{
-		while (!this->mIsClose)
-		{
-			if (this->mNodeMessageQueue.empty())
-			{
-				this->mCorComponent->YieldReturn();
-			}
-			while (!this->mTcpSession->IsActive())
-			{
-				this->mTcpSession->StartConnect();
-				this->mCorComponent->YieldReturn();
-				if (!this->mTcpSession->IsActive())
-				{
-					this->mCorComponent->Sleep(3000);
-				}
-			}
-
-			while (!this->mNodeMessageQueue.empty())
-			{
-				PacketMapper * message = this->mNodeMessageQueue.front();
-				this->mNodeMessageQueue.pop();
-				this->mTcpSession->SendMessageData(message);
-			}
-		}
-	}
-
-	void ServiceNode::AddMessageToQueue(PacketMapper * message, bool yield)
-	{
-		if (message != nullptr)
-		{
-			this->mNodeMessageQueue.push(message);
-			this->mCorComponent->Resume(this->mCorId);
-			if (yield == false) return;
-			this->mCorComponent->YieldReturn();
-		}
-	}
-
 }// namespace Sentry

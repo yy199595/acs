@@ -1,11 +1,12 @@
 ﻿#include "NetProxyComponent.h"
 
 #include <Core/App.h>
-#include "ActionComponent.h"
+#include <Scene/ProtocolComponent.h>
 #include "NetSessionComponent.h"
 #include<Service/ServiceNodeComponent.h>
-#include <Service/ServiceMgrComponent.h>
 #include<Service/ServiceNode.h>
+#include <Scene/ActionComponent.h>
+#include <Service/ServiceMgrComponent.h>
 namespace Sentry
 {
 
@@ -19,30 +20,53 @@ namespace Sentry
 
     bool NetProxyComponent::DestorySession(const std::string &address)
     {
-		MainSocketCloseHandler * handler = new MainSocketCloseHandler(address);
+		 auto handler = new MainSocketCloseHandler(address);
         return this->mNetWorkManager->PushEventHandler(handler);
     }
 
-    bool NetProxyComponent::SendNetMessage(PacketMapper *msgData)
+    bool NetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Response & messageData)
     {
-		const std::string &address = msgData->GetAddress();
-		if (address.empty())
-		{
-			SayNoDebugFatal("address is null send failure");
-			return false;
-		}
+        auto methodId = (unsigned short)messageData.methodid();
+        if(methodId <= 0)
+        {
+            return false;
+        }
         TcpProxySession *tcpSession = this->GetProxySession(address);
         if (tcpSession == nullptr)
         {
-			msgData->Destory();
             return false;
         }
-		if (!tcpSession->SendMessageData(msgData))
-		{
-			msgData->Destory();
-			return false;
-		}
-		return true;
+
+        size_t size = 0;
+        messageData.clear_methodid();
+        MessageStream & sendStream = this->GetSendStream();
+        sendStream << TYPE_RESPONSE << methodId << messageData;
+        return tcpSession->SendMessageData(sendStream.Serialize(size), size);
+    }
+
+    MessageStream & NetProxyComponent::GetSendStream()
+    {
+        this->mSendStream.ResetPos();
+        return this->mSendStream;
+    }
+
+    bool NetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Request & messageData)
+    {
+        unsigned short methodId = (unsigned short)messageData.methodid();
+        if(methodId <= 0)
+        {
+            return false;
+        }
+        TcpProxySession *tcpSession = this->GetProxySession(address);
+        if (tcpSession == nullptr)
+        {
+            return false;
+        }
+        size_t size = 0;
+        messageData.clear_methodid();
+        MessageStream & sendStream = this->GetSendStream();
+        sendStream << TYPE_REQUEST << methodId << messageData;
+        return tcpSession->SendMessageData(sendStream.Serialize(size), size);
     }
 
 	TcpProxySession * NetProxyComponent::Create(const std::string &address, const std::string &name)
@@ -52,7 +76,7 @@ namespace Sentry
 		{
 			return iter->second;
 		}
-		TcpProxySession *tcpSession = new TcpProxySession(name, address);
+		auto tcpSession = new TcpProxySession(name, address);
 
 		this->mSessionMap.emplace(address, tcpSession);
 		return tcpSession;
@@ -81,11 +105,30 @@ namespace Sentry
 		this->mReConnectTime = 3;
 		this->mReConnectCount = 5;
 		ServerConfig & config = App::Get().GetConfig();
-		this->mTimerManager = App::Get().GetTimerComponent();
 		config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime);
 		config.GetValue("NetWork", "ReConnectCount", this->mReConnectCount);
-        SayNoAssertRetFalse_F(this->mActionManager = this->GetComponent<ActionComponent>());
-        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetComponent<NetSessionComponent>());     
+        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetComponent<NetSessionComponent>());
+        SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
+
+        SayNoAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
+
+        SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+
+        std::vector<Component *> components;
+        this->gameObject->GetComponents(components);
+        for(Component * component : components)
+        {
+            if(auto reqHandler = dynamic_cast<IRequestMessageHandler*>(component))
+            {
+                this->mRequestMsgHandlers.emplace(component->GetTypeName(), reqHandler);
+            }
+            if(auto resHandler = dynamic_cast<IResponseMessageHandler*>(component))
+            {
+                this->mResponseMsgHandlers.emplace(component->GetTypeName(), resHandler);
+            }
+        }
+        SayNoAssertRetFalse_F(!this->mRequestMsgHandlers.empty() && !this->mResponseMsgHandlers.empty());
+
         return true;
     }
 
@@ -144,19 +187,42 @@ namespace Sentry
 		}
 	}
 
-	void NetProxyComponent::ReceiveNewMessage(PacketMapper * message)
+	bool NetProxyComponent::ReceiveNewMessage(const std::string & address, SharedMessage message)
 	{
-		if (!this->OnRecvMessage(message))
-		{
-			const std::string & address = message->GetAddress();
-			TcpProxySession *session = this->DelProxySession(address);
-			if (session != nullptr)
-			{
-				delete session;
-				MainSocketCloseHandler * handler = new MainSocketCloseHandler(address);
-				this->mNetWorkManager->PushEventHandler(handler);
-			}
-		}
+        unsigned short methodId = 0;
+        const char * msg = message->c_str();
+        const size_t size = message->size();
+        memcpy(&methodId, msg + 1, sizeof(methodId));
+        const ProtocolConfig * protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
+
+        if(protocolConfig == nullptr)
+        {
+            return false;
+        }
+
+        auto messageType = (DataMessageType)message->at(0);
+        if(messageType ==  DataMessageType::TYPE_REQUEST)
+        {
+            const std::string &handler = protocolConfig->RequestHandler;
+            auto iter = this->mRequestMsgHandlers.find(handler);
+            if (iter != this->mRequestMsgHandlers.end())
+            {
+                return iter->second->OnRequestMessage(address, message);
+            }
+            return this->mServiceComponent->OnRequestMessage(address, message);
+        }
+        else if(messageType == DataMessageType::TYPE_RESPONSE)
+        {
+            const std::string & handler = protocolConfig->RequestHandler;
+            auto iter = this->mResponseMsgHandlers.find(handler);
+            if(iter != this->mResponseMsgHandlers.end())
+            {
+                return iter->second->OnResponseMessage(address, message);
+            }
+            this->mActionComponent->OnResponseMessage(address, message);
+            return true;
+        }
+        return false;
 	}
 
 	void NetProxyComponent::OnSystemUpdate()
@@ -171,23 +237,4 @@ namespace Sentry
 			eveHandler = nullptr;
 		}
 	}
-
-    bool NetProxyComponent::OnRecvMessage(PacketMapper *messageData)
-    {
-        if (messageData->GetMessageType() < REQUEST_END)
-        {			
-			ServiceMgrComponent * serviceComponent = this->GetComponent<ServiceMgrComponent>();
-			if (serviceComponent == nullptr)
-			{
-				return false;
-			}
-			return serviceComponent->HandlerMessage(messageData);    
-        }
-        if(messageData->GetRpcId() == 0)
-        {
-            return false;
-        }
-        this->mActionManager->InvokeCallback(messageData);
-        return true;
-    }
 }

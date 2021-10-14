@@ -5,7 +5,6 @@
 #include <Component/Service/ServiceNodeComponent.h>
 namespace Sentry
 {
-	class PacketMapper;
     class LocalRetActionProxy;
 
     class ServiceNode : public Object
@@ -27,7 +26,7 @@ namespace Sentry
 
         bool HasService(const std::string &service);
         void GetServicers(std::vector<std::string> & services);
-		void AddMessageToQueue(PacketMapper * message, bool yield = true);
+		void AddMessageToQueue(SharedMessage message, bool yield = true);
     public:
 		void OnConnectNodeAfter();
     public:
@@ -45,24 +44,27 @@ namespace Sentry
         XCode Call(const std::string &service, const std::string &method, const Message &request, Message &response);
 
 	private:
-		XCode SendRpcMessage(PacketMapper * message);
-		XCode SendRpcMessage(PacketMapper * message, Message &response);
+		XCode SendRpcMessage(SharedMessage message);
+		XCode SendRpcMessage(SharedMessage message, Message &response);
 	private:
-		void HandleMessageSend();
-		
+		class TcpProxySession * GetTcpSession();
+
+    private:
+        std::string mMessageBuffer;
+        com::DataPacket_Request mRequestData;
     private:
 		int mAreaId;
         int mNodeId;
 		bool mIsClose;
         std::string mIp;
-		unsigned int mCorId;
-        unsigned short mPort;	
+        unsigned short mPort;
         const std::string mAddress;         //监听地址
         const std::string mNodeName;        //进程名字
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
-		class TcpProxySession * mTcpSession;
         class ActionComponent *mActionManager;
-		std::queue<PacketMapper *> mNodeMessageQueue;
+		std::queue<unsigned  int> mCoroutines;
+        class ProtocolComponent * mProtocolComponent;
+        class NetProxyComponent * mNetProxyComponent;
     };
 }// namespace Sentry

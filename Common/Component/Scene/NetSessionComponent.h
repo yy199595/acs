@@ -6,7 +6,6 @@
 #include <Pool/ObjectPool.h>
 
 #include <Other/DoubleBufferQueue.h>
-#include <NetWork/PacketMapper.h>
 #include <NetWork/SocketEveHandler.h>
 
 namespace Sentry
@@ -25,8 +24,6 @@ namespace Sentry
 	public: //网络线程调用
 
 		void OnSessionError(TcpClientSession *session) override;
-
-		void OnSendMessageAfter(std::string * message) override;
 
         void OnConnectComplete(TcpClientSession *session, bool isSuc) override;
 
@@ -50,10 +47,10 @@ namespace Sentry
 
 	public:
 		bool StartClose(const std::string &address);
-		bool StartSendMessage(PacketMapper * message);
 		bool StartConnect(const std::string & address, const std::string & name);
-		
-	private:
+        bool StartSendMessage(const std::string & address, SharedMessage message);
+
+    private:
 		
 
 		TcpClientSession *GetSession(const std::string &address);
@@ -63,10 +60,9 @@ namespace Sentry
 		class NetProxyComponent *mNetProxyComponent;
 
 	private:
-        ObjectPool<std::string> mSendBufferPool;
 		std::queue<std::string> mRecvSessionQueue;
-		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
-		char mSendSharedBuffer[TCP_SEND_MAX_COUNT + sizeof(unsigned int)];
+        class ProtocolComponent * mProtocolComponent;
+        DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
 		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
 	};
 }

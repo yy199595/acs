@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "TcpClientSession.h"
-#include <NetWork/PacketMapper.h>
 #include <Other/ObjectFactory.h>
 #include <Pool/ObjectPool.h>
 #include <Protocol/com.pb.h>
@@ -9,9 +8,6 @@
 
 namespace Sentry
 {
-    template<typename T>
-    using ServiceMethodType0 = XCode(T::*)(long long, const std::string &);
-
 	template<typename T>
 	using ServiceMethodType1 = XCode(T::*)();
 
@@ -48,31 +44,13 @@ namespace Sentry
 		ServiceMethod(const std::string name) : mName(name) { }
 	public:
 		virtual bool IsLuaMethod() = 0;
-		virtual XCode Invoke(PacketMapper *messageData) = 0;
+        virtual void SetAddress(const std::string & address) { };
+        virtual XCode Invoke(const com::DataPacket_Request & request, std::string & response) = 0;
 		const std::string & GetName() { return this->mName; }
 	private:
 		std::string mName;
 	};
 
-    template<typename T>
-    class ServiceMethod0 : public ServiceMethod
-    {
-    public:
-        ServiceMethod0(const std::string name, T * o, ServiceMethodType0<T> func)
-                : ServiceMethod(name) ,_o(o), _func(func) { }
-
-    public:
-        XCode Invoke(PacketMapper *messageData) override
-        {
-            long long userId = messageData->GetUserId();
-            _o->SetCurAddress(messageData->GetAddress());
-            return (_o->*_func)(userId, messageData->GetMsgBody());
-        }
-        bool IsLuaMethod() override { return false; };
-    private:
-        T * _o;
-        ServiceMethodType0<T> _func;
-    };
 
 	template<typename T>
 	class ServiceMethod1 : public ServiceMethod
@@ -84,16 +62,18 @@ namespace Sentry
 		ServiceMethod1(const std::string name, T * o, ServiceMethodType11<T> func)
 			: ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-		XCode Invoke(PacketMapper *messageData) override
+        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+
+        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
 		{
-			long long userId = messageData->GetUserId();
-            _o->SetCurAddress(messageData->GetAddress());
+			long long userId = request.userid();
             if (userId == 0) {
 				return (_o->*_func)();
 			}
 			return (_o->*_objfunc)(userId);
 		}
-		bool IsLuaMethod() override { return false; };
+
+        bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
 		ServiceMethodType1<T> _func;
@@ -109,25 +89,20 @@ namespace Sentry
 		ServiceMethod2(const std::string name, T * o, ServiceMethodType22<T, T1> func)
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-		XCode Invoke(PacketMapper *messageData) override
-		{
-			T1 * request = mReqMessagePool.Create();
-            _o->SetCurAddress(messageData->GetAddress());
-            const std::string & data = messageData->GetMsgBody();
-			if (!request->ParseFromString(data))
-			{
-				mReqMessagePool.Destory(request);
-				return XCode::ParseMessageError;
-			}
-			long long userId = messageData->GetUserId();
-
-			XCode code = userId == 0 ? 
-				(_o->*_func)(*request) : (_o->*_objfunc)(userId, *request);
-
-			messageData->ClearMessage();
-			mReqMessagePool.Destory(request);
-			return code;
-		}
+        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
+        {
+            T1 *req = mReqMessagePool.Create();
+            if (!req->ParseFromString(request.messagedata()))
+            {
+                mReqMessagePool.Destory(req);
+                return XCode::ParseMessageError;
+            }
+            XCode code = request.userid() == 0 ?
+                         (_o->*_func)(*req) : (_o->*_objfunc)(request.userid(), *req);
+            mReqMessagePool.Destory(req);
+            return code;
+        }
 		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
@@ -147,28 +122,26 @@ namespace Sentry
 		ServiceMethod3(const std::string name, T * o, ServiceMethodType33<T, T1, T2> func)
 			: ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-		XCode Invoke(PacketMapper *messageData) override
+        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
 		{
-			T1 * request = mReqMessagePool.Create();
-            _o->SetCurAddress(messageData->GetAddress());
-            const std::string & data = messageData->GetMsgBody();
-			if (!request->ParseFromString(data))
+            T1 * req = mReqMessagePool.Create();
+			if (!req->ParseFromString(request.messagedata()))
 			{
-				mReqMessagePool.Destory(request);
+				mReqMessagePool.Destory(req);
 				return XCode::ParseMessageError;
 			}
-			T2 * response = mResMessagePool.Create();
-			long long userId = messageData->GetUserId();
+            T2 * res = mResMessagePool.Create();
 
-			XCode code = userId == 0 ?
-				(_o->*_func)(*request, *response) : (_o->*_objfunc)(userId, *request, *response);
-			messageData->ClearMessage();
+			XCode code = request.userid() == 0 ?
+				(_o->*_func)(*req, *res) : (_o->*_objfunc)(request.userid(), *req, *res);
+
 			if (code == XCode::Successful)
 			{
-				messageData->SetMessage(*response);			
+                res->SerializeToString(&response);
 			}
-			mReqMessagePool.Destory(request);
-			mResMessagePool.Destory(response);
+			mReqMessagePool.Destory(req);
+			mResMessagePool.Destory(res);
 			return code;
 		}
 		bool IsLuaMethod() override { return false; };
@@ -190,17 +163,20 @@ namespace Sentry
 		ServiceMethod4(const std::string name, T * o, ServiceMethodType44<T, T1> func)
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-		XCode Invoke(PacketMapper *messageData) override
+        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
 		{
-			T1 * response = mResMessagePool.Create();		
-			long long userId = messageData->GetUserId();
-            _o->SetCurAddress(messageData->GetAddress());
+            T1 * res = mResMessagePool.Create();
 
+            XCode code = request.userid() == 0 ?
+				(_o->*_func)(*res) : (_o->*_objfunc)(request.userid(), *res);
 
-            XCode code = userId == 0 ?
-				(_o->*_func)(*response) : (_o->*_objfunc)(userId, *response);
+            if (code == XCode::Successful)
+            {
+                res->SerializeToString(&response);
+            }
+            mResMessagePool.Destory(res);
 
-			mResMessagePool.Destory(response);
 			return code;
 		}
 		bool IsLuaMethod() override { return false; };

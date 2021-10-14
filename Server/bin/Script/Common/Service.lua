@@ -1,6 +1,6 @@
 
-Service = {}
-function Service.Invoke(method, response, message, id, json)
+ServiceName = {}
+function ServiceName.Invoke(method, response, message, id, json)
     local request = nil
     if type(json) == 'string' then
         request = Json.ToObject(json)
@@ -12,4 +12,4 @@ function Service.Invoke(method, response, message, id, json)
     return response(message, code, res)
 end
 
-return Service
+return ServiceName

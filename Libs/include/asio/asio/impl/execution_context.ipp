@@ -66,7 +66,7 @@ void execution_context::service::notify_fork(execution_context::fork_event)
 }
 
 service_already_exists::service_already_exists()
-  : std::logic_error("Service already exists.")
+  : std::logic_error("ServiceName already exists.")
 {
 }
 

@@ -137,7 +137,7 @@ public:
     context().get_executor().on_work_finished();
   }
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the strand to execute the given function
    * object on its underlying io_context. The function object will be executed
@@ -161,7 +161,7 @@ public:
   }
 
 #if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use asio::dispatch().) Request the strand to invoke
+  /// (Deprecated: Use asio::dispatch().) RequestMessage the strand to invoke
   /// the given handler.
   /**
    * This function is used to ask the strand to execute the given handler.
@@ -190,7 +190,7 @@ public:
   }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.
@@ -212,7 +212,7 @@ public:
   }
 
 #if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use asio::post().) Request the strand to invoke the
+  /// (Deprecated: Use asio::post().) RequestMessage the strand to invoke the
   /// given handler and return immediately.
   /**
    * This function is used to ask the strand to execute the given handler, but
@@ -237,7 +237,7 @@ public:
   }
 #endif // !defined(ASIO_NO_DEPRECATED)
 
-  /// Request the strand to invoke the given function object.
+  /// RequestMessage the strand to invoke the given function object.
   /**
    * This function is used to ask the executor to execute the given function
    * object. The function object will never be executed inside this function.

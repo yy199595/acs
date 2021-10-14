@@ -5,6 +5,7 @@
 #include "LuaScriptComponent.h"
 #include "NetProxyComponent.h"
 #include <Util/StringHelper.h>
+#include <Scene/ProtocolComponent.h>
 #include <NetWork/TcpClientSession.h>
 namespace Sentry
 {
@@ -16,6 +17,7 @@ namespace Sentry
 
     bool NetSessionComponent::Awake()
     {
+        SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
         SayNoAssertRetFalse_F(this->mNetProxyComponent = this->GetComponent<NetProxyComponent>());
         return true;
     }
@@ -43,23 +45,18 @@ namespace Sentry
         {
             return false;
         }
-		const std::string & address = session->GetAddress();
-        PacketMapper *messageData = PacketMapper::Create(address, message, size);
-        if (messageData == nullptr)
+        unsigned short methodId = 0;
+        memcpy(&methodId, message + 1, sizeof(methodId));
+        const std::string &address = session->GetAddress();
+        if (this->mProtocolComponent->GetProtocolConfig(methodId) == nullptr)
         {
+            SayNoDebugError(address << " parse message error");
             return false;
         }
-		this->mRecvSessionQueue.push(address);
-		return this->mNetProxyComponent->PushEventHandler(new NetReceiveNewMessageHandler(messageData));
-    }
 
-    void NetSessionComponent::OnSendMessageAfter(std::string *message)
-    {
-        if(message != nullptr)
-        {
-            message->clear();
-            this->mSendBufferPool.Destory(message);
-        }
+        this->mRecvSessionQueue.push(address);
+        auto handler = new NetReceiveNewMessageHandler(address, message, size);
+        return this->mNetProxyComponent->PushEventHandler(handler);
     }
 
 	bool NetSessionComponent::PushEventHandler(SocketEveHandler *eve)
@@ -111,7 +108,6 @@ namespace Sentry
 
     void NetSessionComponent::OnTcpContextUpdate(AsioContext &io)
     {
-       
         while (!this->mRecvSessionQueue.empty())
         {
 			const std::string & address = this->mRecvSessionQueue.front();
@@ -164,25 +160,13 @@ namespace Sentry
 		}
 		return session->StartConnect();
 	}
-	bool NetSessionComponent::StartSendMessage(PacketMapper * messageData)
-	{
-		const std::string & address = messageData->GetAddress();
-		if (address.empty())
-		{
-			SayNoDebugFatal("address is null send failure");
-			return false;
-		}
-		TcpClientSession *session = this->GetSession(address);
-		if (session != nullptr)
-		{
-			size_t size = messageData->WriteToBuffer(this->mSendSharedBuffer, TCP_SEND_MAX_COUNT);
-            if(size > 0)
-            {
-                std::string * message = this->mSendBufferPool.Create();
-                message->append(this->mSendSharedBuffer, size);
-                return session->SendPackage(message);
-            }
-		}
-		return false;
-	}
+
+    bool NetSessionComponent::StartSendMessage(const std::string & address, SharedMessage message)
+    {
+        TcpClientSession *session = this->GetSession(address);
+        if (session != nullptr)
+        {
+            return session->SendPackage(message);
+        }
+    }
 }// namespace Sentry

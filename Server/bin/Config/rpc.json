@@ -1,72 +1,108 @@
 {
     "CenterService": {
-        "id": 100,
+        "ID": 100,
         "Add": {
-            "id": 101,
-            "async":false,
-            "request": "s2s.NodeRegister.Request"
+            "ID": 101,
+            "Async":false,
+            "Request":{
+                "Message":"s2s.NodeRegister.Request"
+            },
+            "Response":{
+                "Message":"s2s.NodeRegister.Response"
+            }
         },
         "Query": {
-            "id": 102,
-            "async":false,
-            "request": "s2s.NodeQuery.Request",
-            "response": "s2s.NodeQuery.Response"
+            "ID": 102,
+            "Async":false,
+            "Request":{
+                "Message":"s2s.NodeQuery.Request"
+            },
+            "Response":{
+                "Message":"s2s.NodeQuery.Response"
+            }
         }
     },
     "ClusterService": {
-        "id": 200,
+        "ID": 200,
         "Add": {
-            "id": 201,
-            "async":false,
-            "request": "s2s.NodeInfo"
+            "ID": 201,
+            "Async":false,
+            "Request":{
+                "Message":"s2s.NodeInfo"
+            }
         },
         "Del": {
-            "id": 202,
-            "async":false,
-            "request": "com.Int32Data"
+            "ID": 202,
+            "Async":false,
+            "Request":{
+                "Message":"com.Int32Data"
+            }
         }
     },
     "MysqlService": {
-        "id": 300,
+        "ID": 300,
         "Add": {
-            "id": 301,
-            "async":true,
-            "request": "s2s.MysqlOper.Request",
-            "response": "s2s.MysqlOper.Response"
+            "ID": 301,
+            "Async":true,
+            "Request":{
+                "Message":"s2s.MysqlOper.Request"
+            },
+            "Response":{
+                "Message":"s2s.MysqlOper.Response"
+            }
         },
         "Save": {
-            "id": 302,
-            "async":true,
-            "request": "s2s.MysqlOper.Request",
-            "response": "s2s.MysqlOper.Response"
+            "ID": 302,
+            "Async":true,
+            "Request":{
+                "Message":"s2s.MysqlOper.Request"
+            },
+            "Response":{
+                "Message":"s2s.MysqlOper.Response"
+            }
         },
         "Delete": {
-            "id": 303,
-            "async":true,
-            "request": "s2s.MysqlOper.Request",
-            "response": "s2s.MysqlOper.Response"
+            "ID": 303,
+            "Async":true,
+            "Request":{
+                "Message":"s2s.MysqlOper.Request"
+            },
+            "Response":{
+                "Message":"s2s.MysqlOper.Response"
+            }
         },
         "Query": {
-            "id": 304,
-            "async":true,
-            "request": "s2s.MysqlQuery.Request",
-            "response": "s2s.MysqlQuery.Response"
+            "ID": 304,
+            "Async":true,
+            "Request":{
+                "Message":"s2s.MysqlQuery.Request"
+            },
+            "Response":{
+                "Message":"s2s.MysqlQuery.Response"
+            }
         }
     },
     "LoginService":{
-        "id":400
+        "ID":400
     },
     "GatewayService":{
-        "id":500,
+        "ID":500,
         "Login":{
-            "id":501,
-            "async":true,
-            "request":"c2s.GateLogin.Request"
+            "ID":501,
+            "Async":true,
+            "Request":{
+                "Message":"c2s.GateLogin.Request"
+            },
+            "Response":{
+                "Message":"c2s.GateLogin.Response"
+            }
         },
         "Logout":{
-            "id":502,
-            "async":false,
-            "request":"c2s.GateLogout.Request"
+            "ID":502,
+            "Async":false,
+            "Request":{
+                "Message":"c2s.GateLogout.Request"
+            }
         }
     }
 

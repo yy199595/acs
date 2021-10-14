@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
 #include"SocketEvent.h"
-#include"PacketMapper.h"
+#include<Define/CommonTypeDef.h>
 namespace Sentry
 {
 	class NetSessionComponent;
@@ -14,15 +14,23 @@ namespace Sentry
 	};
 
 	class MainSocketSendHandler : public SocketEveHandler
-	{
-	public:
-		MainSocketSendHandler(PacketMapper * message)
-			: mSendMessage(message) { }
-	public:
-		void RunHandler(NetSessionComponent *) final;
-	private:		
-		PacketMapper * mSendMessage;
-	};
+    {
+    public:
+        MainSocketSendHandler(const std::string &address, SharedMessage message) :
+                mAddress(address), mMessage(message)
+        {}
+
+        MainSocketSendHandler(const std::string &address, const char *msg, size_t size)
+                : mAddress(address), mMessage(make_shared<std::string>(msg, size))
+        {}
+
+    public:
+        void RunHandler(NetSessionComponent *) final;
+
+    private:
+        std::string mAddress;
+        SharedMessage mMessage;
+    };
 
 	class MainSocketCloseHandler : public SocketEveHandler
 	{
@@ -50,48 +58,63 @@ namespace Sentry
 
 namespace Sentry
 {
-	class NetSocketConnectHandler : public SocketEveHandler
-	{
-	public:
-		NetSocketConnectHandler(const std::string & address, bool isSuc)
-			: mIsSuccessful(isSuc), mAddress(address) { }
-	public:
-		void RunHandler(NetProxyComponent * component);
-	private:
-		const bool mIsSuccessful;
-		const std::string mAddress;
-	};
+    class NetSocketConnectHandler : public SocketEveHandler
+    {
+    public:
+        NetSocketConnectHandler(const std::string &address, bool isSuc)
+                : mIsSuccessful(isSuc), mAddress(address)
+        {}
 
-	class NetNewSocketConnectHandler : public SocketEveHandler
-	{
-	public:
-		NetNewSocketConnectHandler(const std::string & address)
-			:mAddress(address) { }
-	public:
-		void RunHandler(NetProxyComponent * component);
-	private:
-		const std::string mAddress;
-	};
+    public:
+        void RunHandler(NetProxyComponent *component);
 
-	class NetErrorHandler : public SocketEveHandler
-	{
-	public:
-		NetErrorHandler(const std::string & address)
-			: mAddress(address) { }
-	public:
-		void RunHandler(NetProxyComponent * component);
-	private:
-		const std::string mAddress;
-	};
+    private:
+        const bool mIsSuccessful;
+        const std::string mAddress;
+    };
 
-	class NetReceiveNewMessageHandler : public SocketEveHandler
-	{
-	public:
-		NetReceiveNewMessageHandler(PacketMapper * message)
-			: mRecvMessage(message) { }
-	public:
-		void RunHandler(NetProxyComponent * component);
-	private:		
-		PacketMapper * mRecvMessage;
-	};
+    class NetNewSocketConnectHandler : public SocketEveHandler
+    {
+    public:
+        NetNewSocketConnectHandler(const std::string &address)
+                : mAddress(address)
+        {}
+
+    public:
+        void RunHandler(NetProxyComponent *component);
+
+    private:
+        const std::string mAddress;
+    };
+
+    class NetErrorHandler : public SocketEveHandler
+    {
+    public:
+        NetErrorHandler(const std::string &address)
+                : mAddress(address)
+        {}
+
+    public:
+        void RunHandler(NetProxyComponent *component);
+
+    private:
+        const std::string mAddress;
+    };
+
+    class NetReceiveNewMessageHandler : public SocketEveHandler
+    {
+    public:
+        NetReceiveNewMessageHandler(const std::string &address, const char * msg, size_t size)
+                : mAddress(address), mMessage(make_shared<std::string>(msg, size))
+        {}
+
+        ~NetReceiveNewMessageHandler();
+
+    public:
+        void RunHandler(NetProxyComponent *component);
+
+    private:
+        std::string mAddress;
+        SharedMessage mMessage;
+    };
 }

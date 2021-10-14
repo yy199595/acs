@@ -5,6 +5,7 @@
 #include <NetWork/TcpProxySession.h>
 #include <Other/DoubleBufferQueue.h>
 #include <NetWork/SocketEveHandler.h>
+#include <Network/MessageStream.h>
 
 namespace Sentry
 {
@@ -12,49 +13,65 @@ namespace Sentry
     class NetProxyComponent : public Component, public ISystemUpdate
     {
     public:
-        NetProxyComponent() {}
+        NetProxyComponent()
+        {}
 
-        virtual ~NetProxyComponent() {}
+        virtual ~NetProxyComponent()
+        {}
 
     public:
         bool PushEventHandler(SocketEveHandler *eve); //不要手动调用
     public:
         bool DestorySession(const std::string &address);
 
-        bool SendNetMessage(PacketMapper * message);
+        bool SendNetMessage(const std::string &address, com::DataPacket_Request &message);
 
-		TcpProxySession * Create(const std::string &address, const std::string &name);
+        bool SendNetMessage(const std::string &address, com::DataPacket_Response &message);
+
+        TcpProxySession *Create(const std::string &address, const std::string &name);
 
     public:
+        MessageStream &GetSendStream();
+
         TcpProxySession *GetProxySession(const std::string &address);
 
         TcpProxySession *DelProxySession(const std::string &address);
-	public:
-		void NewConnect(const std::string & address);
-		void SessionError(const std::string & address);
-		void ConnectAfter(const std::string & address, bool isSuc);
 
-		void ReceiveNewMessage(PacketMapper * message);
+
+    public:
+        void NewConnect(const std::string &address);
+
+        void SessionError(const std::string &address);
+
+        void ConnectAfter(const std::string &address, bool isSuc);
+
+        bool ReceiveNewMessage(const std::string &address, SharedMessage message);
+
     protected:
         bool Awake() override;
 
         void OnSystemUpdate() final;
 
-        virtual void OnNewSessionConnect(TcpProxySession *session) {}
+        virtual void OnNewSessionConnect(TcpProxySession *session)
+        {}
 
-        virtual void OnConnectSuccessful(TcpProxySession *session) {}
+        virtual void OnConnectSuccessful(TcpProxySession *session)
+        {}
 
-        virtual bool OnRecvMessage(PacketMapper *msg);
     private:
         int mReConnectTime;
-		int mReConnectCount;
-        class TimerComponent *mTimerManager;
+        int mReConnectCount;
+        MessageStream mSendStream;
 
-        class ActionComponent *mActionManager;
+        class ActionComponent * mActionComponent;
+        class ServiceMgrComponent * mServiceComponent;
 
         class NetSessionComponent *mNetWorkManager;
+        class ProtocolComponent *mProtocolComponent;
 
         DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
         std::unordered_map<std::string, TcpProxySession *> mSessionMap; //管理所有的session
+        std::unordered_map<std::string, IRequestMessageHandler *> mRequestMsgHandlers;
+        std::unordered_map<std::string, IResponseMessageHandler *> mResponseMsgHandlers;
     };
 }

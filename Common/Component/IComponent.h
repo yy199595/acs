@@ -55,6 +55,19 @@ namespace Sentry
     public:
         virtual void OnZeroRefresh() = 0;
     };
+
+
+    class IRequestMessageHandler
+    {
+    public:
+        virtual bool OnRequestMessage(const std::string & address, SharedMessage message) = 0; //注意message内存释放
+    };
+
+    class IResponseMessageHandler
+    {
+    public:
+        virtual bool OnResponseMessage(const std::string & address, SharedMessage message) = 0; //注意message内存释放
+    };
 }
 
 namespace Sentry
@@ -63,7 +76,6 @@ namespace Sentry
     class ISessionHandler
     {
     public:
-        virtual void OnSendMessageAfter(std::string * message) = 0;
         virtual void OnSessionError(TcpClientSession *session) = 0;
         virtual void OnConnectComplete(TcpClientSession *session, bool isSuc) = 0;
         virtual bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size) = 0;

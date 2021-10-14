@@ -259,7 +259,7 @@ typedef struct st_mysql
   my_ulonglong affected_rows;
   my_ulonglong insert_id;		/* id if insert on table with NEXTNR */
   my_ulonglong extra_info;		/* Not used */
-  unsigned long thread_id;		/* Id for connection in server */
+  unsigned long thread_id;		/* MethodId for connection in server */
   unsigned long packet_length;
   unsigned int	port;
   unsigned long client_flag,server_capabilities;
@@ -616,7 +616,7 @@ typedef struct st_mysql_stmt
   /* copy of mysql->affected_rows after statement execution */
   my_ulonglong   affected_rows;
   my_ulonglong   insert_id;            /* copy of mysql->insert_id */
-  unsigned long	 stmt_id;	       /* Id for prepared statement */
+  unsigned long	 stmt_id;	       /* MethodId for prepared statement */
   unsigned long  flags;                /* i.e. type of cursor to open */
   unsigned long  prefetch_rows;        /* number of rows per one COM_FETCH */
   /*
