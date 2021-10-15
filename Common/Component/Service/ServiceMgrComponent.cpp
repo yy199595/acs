@@ -16,7 +16,7 @@ namespace Sentry
         SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
 
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-        SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetComponent<NetProxyComponent>());
+        SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetComponent<TcpNetProxyComponent>());
         SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
         return true;
     }

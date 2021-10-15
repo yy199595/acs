@@ -1,7 +1,7 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
 #include <Scene/ActionComponent.h>
-#include <Scene/NetProxyComponent.h>
+#include <Scene/TcpNetProxyComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <NetWork/NetWorkRetAction.h>
 #include <Service/LuaServiceComponent.h>

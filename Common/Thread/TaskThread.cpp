@@ -1,12 +1,12 @@
 ﻿#include "TaskThread.h"
-#include <Scene/TaskComponent.h>
+#include <Scene/TaskPoolComponent.h>
 #include <functional>
 #include <Method/MethodProxy.h>
 using namespace std::chrono;
 
 namespace Sentry
 {
-    IThread::IThread(TaskComponent * task)
+    IThread::IThread(TaskPoolComponent * task)
     {
 		this->mIsClose = false;
         this->mTaskComponent = task;
@@ -28,7 +28,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    TaskThread::TaskThread(TaskComponent * taskComponent)
+    TaskThread::TaskThread(TaskPoolComponent * taskComponent)
         : IThread(taskComponent)
     {
         this->mTaskState = Idle;
@@ -67,7 +67,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    NetWorkThread::NetWorkThread(TaskComponent *taskComponent, MethodProxy * method)
+    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, MethodProxy * method)
         : IThread(taskComponent), mMethodProxy(method)
     {
 

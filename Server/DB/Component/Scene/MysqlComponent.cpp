@@ -1,7 +1,7 @@
 ﻿#include "MysqlComponent.h"
 #include <fstream>
 #include <Core/App.h>
-#include <Scene/TaskComponent.h>
+#include <Scene/TaskPoolComponent.h>
 #include <MysqlClient/TableOperator.h>
 #include <Coroutine/CoroutineComponent.h>
 
@@ -41,7 +41,7 @@ namespace Sentry
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mSqlPath = App::Get().GetConfigDir() + "sql.json";
-        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskComponent>());
+        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
         SayNoAssertRetFalse_F(config.GetValue("Mysql", "ip", this->mMysqlIp));

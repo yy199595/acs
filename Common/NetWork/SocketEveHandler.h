@@ -4,13 +4,13 @@
 #include<Define/CommonTypeDef.h>
 namespace Sentry
 {
-	class NetSessionComponent;
-	class NetProxyComponent;
+	class TcpNetSessionComponent;
+	class TcpNetProxyComponent;
 	class SocketEveHandler
 	{
 	public:
-		virtual void RunHandler(NetSessionComponent *) { };
-		virtual void RunHandler(NetProxyComponent *) { };
+		virtual void RunHandler(TcpNetSessionComponent *) { };
+		virtual void RunHandler(TcpNetProxyComponent *) { };
 	};
 
 	class MainSocketSendHandler : public SocketEveHandler
@@ -25,7 +25,7 @@ namespace Sentry
         {}
 
     public:
-        void RunHandler(NetSessionComponent *) final;
+        void RunHandler(TcpNetSessionComponent *) final;
 
     private:
         std::string mAddress;
@@ -38,7 +38,7 @@ namespace Sentry
 		MainSocketCloseHandler(const std::string & address)
 			:mAddress(address) { }
 	public:
-		void RunHandler(NetSessionComponent *) final;
+		void RunHandler(TcpNetSessionComponent *) final;
 	private:
 		const std::string mAddress;
 	};
@@ -49,7 +49,7 @@ namespace Sentry
 		MainSocketConnectHandler(const std::string & address, const std::string & name)
 			: mAddress(address), mName(name) {}
 	public:
-		void RunHandler(NetSessionComponent *) final;
+		void RunHandler(TcpNetSessionComponent *) final;
 	private:
 		const std::string mName;
 		const std::string mAddress;
@@ -66,7 +66,7 @@ namespace Sentry
         {}
 
     public:
-        void RunHandler(NetProxyComponent *component);
+        void RunHandler(TcpNetProxyComponent *component);
 
     private:
         const bool mIsSuccessful;
@@ -81,7 +81,7 @@ namespace Sentry
         {}
 
     public:
-        void RunHandler(NetProxyComponent *component);
+        void RunHandler(TcpNetProxyComponent *component);
 
     private:
         const std::string mAddress;
@@ -95,7 +95,7 @@ namespace Sentry
         {}
 
     public:
-        void RunHandler(NetProxyComponent *component);
+        void RunHandler(TcpNetProxyComponent *component);
 
     private:
         const std::string mAddress;
@@ -111,7 +111,7 @@ namespace Sentry
         ~NetReceiveNewMessageHandler();
 
     public:
-        void RunHandler(NetProxyComponent *component);
+        void RunHandler(TcpNetProxyComponent *component);
 
     private:
         std::string mAddress;

@@ -1,10 +1,10 @@
 #include "SocketEveHandler.h"
 #include <Core/App.h>
-#include <Scene/NetSessionComponent.h>
-#include <Scene/NetProxyComponent.h>
+#include <Scene/TcpNetSessionComponent.h>
+#include <Scene/TcpNetProxyComponent.h>
 namespace Sentry
 {
-	void MainSocketSendHandler::RunHandler(NetSessionComponent * sessionComponent)
+	void MainSocketSendHandler::RunHandler(TcpNetSessionComponent * sessionComponent)
 	{
 		if (!sessionComponent->StartSendMessage(this->mAddress, mMessage))
 		{
@@ -12,7 +12,7 @@ namespace Sentry
 		}
 	}
 	
-	void MainSocketCloseHandler::RunHandler(NetSessionComponent * sessionComponent)
+	void MainSocketCloseHandler::RunHandler(TcpNetSessionComponent * sessionComponent)
 	{
 		if (!sessionComponent->StartClose(mAddress))
 		{
@@ -20,7 +20,7 @@ namespace Sentry
 		}
 	}
 
-	void MainSocketConnectHandler::RunHandler(NetSessionComponent * sessionComponent)
+	void MainSocketConnectHandler::RunHandler(TcpNetSessionComponent * sessionComponent)
 	{
 		if (!sessionComponent->StartConnect(mAddress, mName))
 		{
@@ -31,22 +31,22 @@ namespace Sentry
 
 namespace Sentry
 {
-	void NetSocketConnectHandler::RunHandler(NetProxyComponent * component)
+	void NetSocketConnectHandler::RunHandler(TcpNetProxyComponent * component)
 	{
 		component->ConnectAfter(mAddress, this->mIsSuccessful);
 	}
 
-	void NetNewSocketConnectHandler::RunHandler(NetProxyComponent * component)
+	void NetNewSocketConnectHandler::RunHandler(TcpNetProxyComponent * component)
 	{
 		component->NewConnect(mAddress);
 	}
 
-	void NetReceiveNewMessageHandler::RunHandler(NetProxyComponent * component)
+	void NetReceiveNewMessageHandler::RunHandler(TcpNetProxyComponent * component)
 	{
 		component->ReceiveNewMessage(this->mAddress, this->mMessage);
 	}
 
-	void NetErrorHandler::RunHandler(NetProxyComponent * component)
+	void NetErrorHandler::RunHandler(TcpNetProxyComponent * component)
 	{
 		component->SessionError(mAddress);
 	}

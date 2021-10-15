@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/NetSessionComponent.h>
+#include <Scene/TcpNetSessionComponent.h>
 #include <Scene/ProtocolComponent.h>
 namespace Sentry
 {

@@ -4,10 +4,10 @@
 #include <Util/FileHelper.h>
 #include <Scene/ActionComponent.h>
 #include <Scene/ProtocolComponent.h>
-#include <Scene/NetSessionComponent.h>
+#include <Scene/TcpNetSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <Scene/TaskComponent.h>
+#include <Scene/TaskPoolComponent.h>
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -57,7 +57,7 @@ namespace Sentry
 		this->AddComponent<ActionComponent>();
 		this->AddComponent<ProtocolComponent>();
 		this->AddComponent<CoroutineComponent>();
-		this->AddComponent<NetSessionComponent>();
+		this->AddComponent<TcpNetSessionComponent>();
 
 		this->AddComponent<ServiceNodeComponent>();
 		this->AddComponent<ServiceMgrComponent>();
@@ -158,7 +158,7 @@ namespace Sentry
 
 	bool App::StartNetThread()
     {
-        TaskComponent *taskComponent = this->GetComponent<TaskComponent>();
+        TaskPoolComponent *taskComponent = this->GetComponent<TaskPoolComponent>();
         if (taskComponent == nullptr)
         {
             return false;

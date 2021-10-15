@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/ActionComponent.h>
-#include <Scene/NetProxyComponent.h>
+#include <Scene/TcpNetProxyComponent.h>
 #include <NetWork/NetWorkRetAction.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
@@ -12,10 +12,10 @@ namespace Sentry
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
-		NetProxyComponent * component = App::Get().GetComponent<NetProxyComponent>();
+		TcpNetProxyComponent * component = App::Get().GetComponent<TcpNetProxyComponent>();
         SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
-        SayNoAssertRet_F(this->mNetProxyComponent = App::Get().GetComponent<NetProxyComponent>());
+        SayNoAssertRet_F(this->mNetProxyComponent = App::Get().GetComponent<TcpNetProxyComponent>());
         SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
         SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 	}

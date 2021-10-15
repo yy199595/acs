@@ -65,6 +65,6 @@ namespace Sentry
         class ActionComponent *mActionManager;
 		std::queue<unsigned  int> mCoroutines;
         class ProtocolComponent * mProtocolComponent;
-        class NetProxyComponent * mNetProxyComponent;
+        class TcpNetProxyComponent * mNetProxyComponent;
     };
 }// namespace Sentry

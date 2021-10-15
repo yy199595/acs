@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/ListenerComponent.h>
+#include <Scene/TcpServerComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 namespace Sentry
@@ -34,7 +34,7 @@ namespace Sentry
 
 		s2s::NodeRegister_Response responseInfo;
 		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
-		ListenerComponent * listenComponent = this->GetComponent<ListenerComponent>();
+		TcpServerComponent * listenComponent = this->GetComponent<TcpServerComponent>();
 
 		registerInfo.set_areaid(this->mAreaId);
 		registerInfo.set_nodeid(this->mNodeId);

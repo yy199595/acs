@@ -32,7 +32,7 @@ namespace Sentry
 
         class CoroutineComponent *mCorComponent;
 
-        class TaskComponent *mTaskManager;
+        class TaskPoolComponent *mTaskManager;
 
         class ProtocolComponent * mProtocolManager;
     };

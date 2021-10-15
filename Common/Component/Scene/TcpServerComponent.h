@@ -4,13 +4,13 @@
 namespace Sentry
 {
 	// 处理外部连接进来的session
-	class NetSessionComponent;
-	class ListenerComponent : public Component, public ITcpContextUpdate
+	class TcpNetSessionComponent;
+	class TcpServerComponent : public Component, public ITcpContextUpdate
 	{
 	public:
-		ListenerComponent() {}
+		TcpServerComponent() {}
 
-		~ListenerComponent() {}
+		~TcpServerComponent() {}
 
 	public:
 		const std::string &GetAddress() { return mListenAddress; }
@@ -27,7 +27,7 @@ namespace Sentry
 		std::string mListenAddress;            //地址
 		unsigned short mListenerPort;
 		AsioTcpAcceptor *mBindAcceptor;
-		NetSessionComponent *mDispatchManager;
+		TcpNetSessionComponent *mDispatchManager;
 		std::set<std::string> mWhiteList;    //白名单
 	};
 }

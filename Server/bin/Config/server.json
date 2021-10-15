@@ -43,13 +43,13 @@
     },
     "ScriptPath":"./Script/",
     "Scene": [
-        "TaskComponent",
-        "ListenerComponent",
+        "TaskPoolComponent",
+        "TcpServerComponent",
         "LuaScriptComponent",
         "MysqlComponent",
         "RedisComponent",
         "MysqlProxyComponent",
-        "NetProxyComponent",
+        "TcpNetProxyComponent",
         "GatewayComponent",
         "HttpClientComponent",
         "LuaServiceMgrComponent"

@@ -5,6 +5,41 @@
 
 namespace Sentry
 {
+
+    enum ETcpErrorType
+    {
+        ErrNone,
+        ErrConnect,
+        ErrRead,
+        ErrWrite,
+    };
+
+    class ITcpEventHandler
+    {
+    public:
+        virtual void Run(ETcpErrorType type, const char * msg, size_t size);
+    };
+
+    template<typename T, typename F>
+    class TcpEventHandler : public ITcpEventHandler
+    {
+    public:
+        TcpEventHandler(F && f, T * o): _o(o), _f(std::forward<F>(f)) { }
+
+    public:
+        void Run(ETcpErrorType type, const char *msg, size_t size) override
+        {
+            (_o->*_f)(type, msg, size);
+        }
+    private:
+        T * _o;
+        std::remove_reference<F> _f;
+    };
+}
+
+
+namespace Sentry
+{
     class ISessionHandler;
 
     class TcpClientSession

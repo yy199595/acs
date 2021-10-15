@@ -9,7 +9,7 @@
 #include <Define/CommonDef.h>
 namespace Sentry
 {
-    class TaskComponent;
+    class TaskPoolComponent;
     enum ThreadState
     {
         Idle,
@@ -19,7 +19,7 @@ namespace Sentry
     class IThread
     {
     public:
-        IThread(TaskComponent *taskComponent);
+        IThread(TaskPoolComponent *taskComponent);
 
         virtual ~IThread()
         {}
@@ -44,13 +44,13 @@ namespace Sentry
         std::thread *mThread;
         std::thread::id mThreadId;
     protected:
-        TaskComponent *mTaskComponent;
+        TaskPoolComponent *mTaskComponent;
     };
 
     class TaskThread : public IThread
     {
     public:
-        TaskThread(TaskComponent * taskComponent);
+        TaskThread(TaskPoolComponent * taskComponent);
 
     public:
         void AddTask(TaskProxy * task) final;
@@ -70,7 +70,7 @@ namespace Sentry
     class NetWorkThread : public IThread
     {
     public:
-        NetWorkThread(TaskComponent * taskComponent, class MethodProxy * method = nullptr);
+        NetWorkThread(TaskPoolComponent * taskComponent, class MethodProxy * method = nullptr);
     public:
         void AddTask(TaskProxy * task) final;
     protected:

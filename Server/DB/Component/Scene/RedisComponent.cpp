@@ -1,6 +1,6 @@
 ﻿#include"RedisComponent.h"
 #include<Util/StringHelper.h>
-#include<Scene/TaskComponent.h>
+#include<Scene/TaskPoolComponent.h>
 #include<Coroutine/CoroutineComponent.h>
 #include<Script/ClassProxyHelper.h>
 #include <Core/App.h>
@@ -46,7 +46,7 @@ namespace Sentry
     bool RedisComponent::Awake()
     {
         ServerConfig &config = App::Get().GetConfig();
-        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskComponent>());
+        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
 

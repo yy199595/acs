@@ -1,15 +1,15 @@
-﻿#include "TaskComponent.h"
+﻿#include "TaskPoolComponent.h"
 #include <Util/NumberHelper.h>
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
 namespace Sentry
 {
-    TaskComponent::TaskComponent()
+    TaskPoolComponent::TaskPoolComponent()
     {
         this->mThreadCount = 0;
     }
 
-	bool TaskComponent::Awake()
+	bool TaskPoolComponent::Awake()
 	{
 		int count = 0;
 		App::Get().GetConfig().GetValue("ThreadCount", count);
@@ -23,12 +23,12 @@ namespace Sentry
 		return true;
 	}
 
-    void TaskComponent::Start()
+    void TaskPoolComponent::Start()
     {
 		
     }
 
-    NetWorkThread * TaskComponent::NewNetworkThread(const std::string & name,MethodProxy * method)
+    NetWorkThread * TaskPoolComponent::NewNetworkThread(const std::string & name,MethodProxy * method)
     {
         auto iter = this->mNetThread.find(name);
         if(iter == this->mNetThread.end())
@@ -41,22 +41,22 @@ namespace Sentry
         return iter->second;
     }
 
-    void TaskComponent::PushFinishTask(unsigned int taskId)
+    void TaskPoolComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
 	}
 
-	void TaskComponent::PushFinishTask(std::queue<unsigned int> & tasks)
+	void TaskPoolComponent::PushFinishTask(std::queue<unsigned int> & tasks)
 	{
 		this->mFinishTaskQueue.AddRange(tasks);
 	}
 
-    long long TaskComponent::CreateTaskId()
+    long long TaskPoolComponent::CreateTaskId()
     {
         return NumberHelper::Create();
     }
 
-    bool TaskComponent::StartTask(TaskProxy * task)
+    bool TaskPoolComponent::StartTask(TaskProxy * task)
     {
         if (task == nullptr)
         {
@@ -74,7 +74,7 @@ namespace Sentry
         return false;
     }
 
-    bool TaskComponent::StartTask(const std::string & name, TaskProxy * task)
+    bool TaskPoolComponent::StartTask(const std::string & name, TaskProxy * task)
     {
         if(task== nullptr)
         {
@@ -96,7 +96,7 @@ namespace Sentry
         return false;
     }
 
-    void TaskComponent::OnSystemUpdate()
+    void TaskPoolComponent::OnSystemUpdate()
     {
         unsigned int taskId = 0;
         this->mFinishTaskQueue.SwapQueueData();

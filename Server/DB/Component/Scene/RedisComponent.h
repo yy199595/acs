@@ -8,7 +8,7 @@
 using namespace Sentry;
 namespace Sentry
 {
-	class TaskComponent;
+	class TaskPoolComponent;
 
 	class RedisComponent : public Component
 	{
@@ -72,7 +72,7 @@ namespace Sentry
 	private:
 		std::string mRedisIp;        //redis ip地址
 		unsigned short mRedisPort;    //端口号
-		TaskComponent *mTaskManager;
+		TaskPoolComponent *mTaskManager;
 		CoroutineComponent *mCorComponent;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};

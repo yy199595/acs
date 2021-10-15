@@ -10,13 +10,13 @@
 namespace Sentry
 {
     // session 代理管理器 负责与网络线程通信 处理网络事件
-    class NetProxyComponent : public Component, public ISystemUpdate
+    class TcpNetProxyComponent : public Component, public ISystemUpdate
     {
     public:
-        NetProxyComponent()
+        TcpNetProxyComponent()
         {}
 
-        virtual ~NetProxyComponent()
+        virtual ~TcpNetProxyComponent()
         {}
 
     public:
@@ -66,7 +66,7 @@ namespace Sentry
         class ActionComponent * mActionComponent;
         class ServiceMgrComponent * mServiceComponent;
 
-        class NetSessionComponent *mNetWorkManager;
+        class TcpNetSessionComponent *mNetWorkManager;
         class ProtocolComponent *mProtocolComponent;
 
         DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;

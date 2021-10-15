@@ -13,12 +13,12 @@ namespace Sentry
 	// 管理所有session  在网络线程中运行
 	class TcpClientSession;
 
-    class NetSessionComponent : public Component, public ITcpContextUpdate, public ISessionHandler
+    class TcpNetSessionComponent : public Component, public ITcpContextUpdate, public ISessionHandler
 	{
 	public:
-		NetSessionComponent();
+		TcpNetSessionComponent();
 
-		virtual ~NetSessionComponent()
+		virtual ~TcpNetSessionComponent()
 		{}
 
 	public: //网络线程调用
@@ -57,7 +57,7 @@ namespace Sentry
 
 	private:
 
-		class NetProxyComponent *mNetProxyComponent;
+		class TcpNetProxyComponent *mNetProxyComponent;
 
 	private:
 		std::queue<std::string> mRecvSessionQueue;

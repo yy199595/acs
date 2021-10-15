@@ -2,7 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/NetProxyComponent.h>
+#include <Scene/TcpNetProxyComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
 namespace Sentry
@@ -150,7 +150,7 @@ namespace Sentry
 //		XCode code = (XCode)lua_tointeger(lua, 2);
 //        com::DataPacket_Request * responseData = (com::DataPacket_Request*)lua_touserdata(lua, 1);
 //
-//		NetProxyComponent * sessionComponent = App::Get().GetComponent<NetProxyComponent>();
+//		TcpNetProxyComponent * sessionComponent = App::Get().GetComponent<TcpNetProxyComponent>();
 //		responseData->ClearMessage();
 //		if (lua_isstring(lua, 3))
 //		{

@@ -4,19 +4,19 @@
 #include <Timer/TimerComponent.h>
 
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/ListenerComponent.h>
+#include <Scene/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/NetProxyComponent.h>
-#include <Scene/NetSessionComponent.h>
+#include <Scene/TcpNetProxyComponent.h>
+#include <Scene/TcpNetSessionComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Scene/HttpClientComponent.h>
+#include <Http/HttpClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Service/ServiceNodeComponent.h>
-#include <Scene/TaskComponent.h>
+#include <Scene/TaskPoolComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/AccountService.h>
 #include <Service/ClusterService.h>
@@ -41,12 +41,12 @@ int main(int argc, char **argv)
     __register_component__(GatewayComponent);
     __register_component__(HttpClientComponent);
 	
-	__register_component__(TaskComponent);
+	__register_component__(TaskPoolComponent);
 	__register_component__(CoroutineComponent);
 	__register_component__(ServiceNodeComponent);
-	__register_component__(ListenerComponent);
-	__register_component__(NetSessionComponent);
-	__register_component__(NetProxyComponent);
+	__register_component__(TcpServerComponent);
+	__register_component__(TcpNetSessionComponent);
+	__register_component__(TcpNetProxyComponent);
 
 	__register_component__(LuaServiceMgrComponent);
 	

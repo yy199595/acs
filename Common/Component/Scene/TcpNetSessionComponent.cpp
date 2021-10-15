@@ -1,28 +1,28 @@
-﻿#include "NetSessionComponent.h"
+﻿#include "TcpNetSessionComponent.h"
 
 #include <Core/App.h>
 #include "ActionComponent.h"
 #include "LuaScriptComponent.h"
-#include "NetProxyComponent.h"
+#include "TcpNetProxyComponent.h"
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <NetWork/TcpClientSession.h>
 namespace Sentry
 {
-    NetSessionComponent::NetSessionComponent()
+    TcpNetSessionComponent::TcpNetSessionComponent()
     {
 
     }
 
 
-    bool NetSessionComponent::Awake()
+    bool TcpNetSessionComponent::Awake()
     {
         SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
-        SayNoAssertRetFalse_F(this->mNetProxyComponent = this->GetComponent<NetProxyComponent>());
+        SayNoAssertRetFalse_F(this->mNetProxyComponent = this->GetComponent<TcpNetProxyComponent>());
         return true;
     }
 
-    void NetSessionComponent::OnConnectComplete(TcpClientSession *session, bool isSuc)
+    void TcpNetSessionComponent::OnConnectComplete(TcpClientSession *session, bool isSuc)
     {
         const std::string &address = session->GetAddress();
 		if (isSuc)
@@ -32,14 +32,14 @@ namespace Sentry
 		this->mNetProxyComponent->PushEventHandler(new NetSocketConnectHandler(address, isSuc));
     }
 
-    void NetSessionComponent::OnSessionError(TcpClientSession *session)
+    void TcpNetSessionComponent::OnSessionError(TcpClientSession *session)
     {
 		const std::string &address = session->GetAddress();
         this->mNetProxyComponent->PushEventHandler(new NetErrorHandler(address));
     }
 
 
-    bool NetSessionComponent::OnRecvMessage(TcpClientSession *session, const char *message, const size_t size)
+    bool TcpNetSessionComponent::OnRecvMessage(TcpClientSession *session, const char *message, const size_t size)
     {
         if (message == nullptr || size == 0)
         {
@@ -59,14 +59,14 @@ namespace Sentry
         return this->mNetProxyComponent->PushEventHandler(handler);
     }
 
-	bool NetSessionComponent::PushEventHandler(SocketEveHandler *eve)
+	bool TcpNetSessionComponent::PushEventHandler(SocketEveHandler *eve)
 	{
 		if (eve == nullptr) return false;
 		this->mNetEventQueue.Add(eve);
 		return true;
 	}
 
-	TcpClientSession *NetSessionComponent::Create(shared_ptr<AsioTcpSocket> socket)
+	TcpClientSession *TcpNetSessionComponent::Create(shared_ptr<AsioTcpSocket> socket)
     {
 		AsioContext & io = App::Get().GetTcpContext();
         TcpClientSession *session = new TcpClientSession(io, this, socket);
@@ -82,7 +82,7 @@ namespace Sentry
         return nullptr;
     }
 
-    TcpClientSession *NetSessionComponent::Create(const std::string &name, const std::string &address)
+    TcpClientSession *TcpNetSessionComponent::Create(const std::string &name, const std::string &address)
     {
         auto iter = this->mSessionAdressMap.find(address);
         if (iter != this->mSessionAdressMap.end())
@@ -101,12 +101,12 @@ namespace Sentry
         return nullptr;
     }
 
-    void NetSessionComponent::OnDestory()
+    void TcpNetSessionComponent::OnDestory()
     {
     }
 
 
-    void NetSessionComponent::OnTcpContextUpdate(AsioContext &io)
+    void TcpNetSessionComponent::OnTcpContextUpdate(AsioContext &io)
     {
         while (!this->mRecvSessionQueue.empty())
         {
@@ -128,13 +128,13 @@ namespace Sentry
         }
     }
 
-    TcpClientSession *NetSessionComponent::GetSession(const std::string &address)
+    TcpClientSession *TcpNetSessionComponent::GetSession(const std::string &address)
     {
         auto iter = this->mSessionAdressMap.find(address);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
     }
 
-    bool NetSessionComponent::StartClose(const std::string &address)
+    bool TcpNetSessionComponent::StartClose(const std::string &address)
     {
         auto iter = this->mSessionAdressMap.find(address);
         if (iter != this->mSessionAdressMap.end())
@@ -151,7 +151,7 @@ namespace Sentry
         }
         return false;
     }
-	bool NetSessionComponent::StartConnect(const std::string & address, const std::string & name)
+	bool TcpNetSessionComponent::StartConnect(const std::string & address, const std::string & name)
 	{
 		TcpClientSession *session = this->GetSession(address);
 		if (session == nullptr)
@@ -161,7 +161,7 @@ namespace Sentry
 		return session->StartConnect();
 	}
 
-    bool NetSessionComponent::StartSendMessage(const std::string & address, SharedMessage message)
+    bool TcpNetSessionComponent::StartSendMessage(const std::string & address, SharedMessage message)
     {
         TcpClientSession *session = this->GetSession(address);
         if (session != nullptr)

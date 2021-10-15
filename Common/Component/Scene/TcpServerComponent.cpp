@@ -1,14 +1,14 @@
-﻿#include "ListenerComponent.h"
+﻿#include "TcpServerComponent.h"
 
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<NetWork/TcpClientSession.h>
-#include<Scene/NetSessionComponent.h>
+#include<Scene/TcpNetSessionComponent.h>
 
 namespace Sentry
 {
 
-    void ListenerComponent::OnTcpContextUpdate(AsioContext &io)
+    void TcpServerComponent::OnTcpContextUpdate(AsioContext &io)
     {
         if (!this->mIsAccept || this->mBindAcceptor == nullptr)
         {
@@ -40,7 +40,7 @@ namespace Sentry
         this->mIsAccept = false;
     }
 
-    bool ListenerComponent::Awake()
+    bool TcpServerComponent::Awake()
     {
         this->mIsAccept = false;
         this->mMaxConnectCount = 10000;
@@ -50,7 +50,7 @@ namespace Sentry
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "ip", this->mListenerIp));
         SayNoAssertRetFalse_F(config.GetValue("ListenAddress", "port", this->mListenerPort));
         this->mListenAddress = this->mListenerIp + ":" + std::to_string(this->mListenerPort);
-		SayNoAssertRetFalse_F(this->mDispatchManager = this->GetComponent<NetSessionComponent>());
+		SayNoAssertRetFalse_F(this->mDispatchManager = this->GetComponent<TcpNetSessionComponent>());
         try
         {
             AsioContext &io = App::Get().GetTcpContext();
@@ -64,7 +64,7 @@ namespace Sentry
         }
     }
 
-    void ListenerComponent::Start()
+    void TcpServerComponent::Start()
     {
         asio::error_code err;
         this->mIsAccept = true;

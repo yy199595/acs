@@ -1,8 +1,8 @@
-﻿#include "NetProxyComponent.h"
+﻿#include "TcpNetProxyComponent.h"
 
 #include <Core/App.h>
 #include <Scene/ProtocolComponent.h>
-#include "NetSessionComponent.h"
+#include "TcpNetSessionComponent.h"
 #include<Service/ServiceNodeComponent.h>
 #include<Service/ServiceNode.h>
 #include <Scene/ActionComponent.h>
@@ -10,7 +10,7 @@
 namespace Sentry
 {
 
-    bool NetProxyComponent::PushEventHandler(SocketEveHandler *eve)
+    bool TcpNetProxyComponent::PushEventHandler(SocketEveHandler *eve)
     {
         if (eve == nullptr)
             return false;
@@ -18,13 +18,13 @@ namespace Sentry
         return true;
     }
 
-    bool NetProxyComponent::DestorySession(const std::string &address)
+    bool TcpNetProxyComponent::DestorySession(const std::string &address)
     {
 		 auto handler = new MainSocketCloseHandler(address);
         return this->mNetWorkManager->PushEventHandler(handler);
     }
 
-    bool NetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Response & messageData)
+    bool TcpNetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Response & messageData)
     {
         auto methodId = (unsigned short)messageData.methodid();
         if(methodId <= 0)
@@ -45,13 +45,13 @@ namespace Sentry
         return tcpSession->SendMessageData(message, size);
     }
 
-    MessageStream & NetProxyComponent::GetSendStream()
+    MessageStream & TcpNetProxyComponent::GetSendStream()
     {
         this->mSendStream.ResetPos();
         return this->mSendStream;
     }
 
-    bool NetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Request & messageData)
+    bool TcpNetProxyComponent::SendNetMessage(const std::string & address, com::DataPacket_Request & messageData)
     {
         unsigned short methodId = (unsigned short)messageData.methodid();
         if(methodId <= 0)
@@ -70,7 +70,7 @@ namespace Sentry
         return tcpSession->SendMessageData(sendStream.Serialize(size), size);
     }
 
-	TcpProxySession * NetProxyComponent::Create(const std::string &address, const std::string &name)
+	TcpProxySession * TcpNetProxyComponent::Create(const std::string &address, const std::string &name)
     {		
 		auto iter = this->mSessionMap.find(address);
 		if (iter != this->mSessionMap.end())
@@ -83,13 +83,13 @@ namespace Sentry
 		return tcpSession;
     }
 
-    TcpProxySession *NetProxyComponent::GetProxySession(const std::string &address)
+    TcpProxySession *TcpNetProxyComponent::GetProxySession(const std::string &address)
     {
         auto iter = this->mSessionMap.find(address);
         return iter != this->mSessionMap.end() ? iter->second : nullptr;
     }
 
-    TcpProxySession *NetProxyComponent::DelProxySession(const std::string &address)
+    TcpProxySession *TcpNetProxyComponent::DelProxySession(const std::string &address)
     {
         auto iter = this->mSessionMap.find(address);
         if (iter != this->mSessionMap.end())
@@ -101,14 +101,14 @@ namespace Sentry
         return nullptr;
     }
 
-    bool NetProxyComponent::Awake()
+    bool TcpNetProxyComponent::Awake()
     {
 		this->mReConnectTime = 3;
 		this->mReConnectCount = 5;
 		ServerConfig & config = App::Get().GetConfig();
 		config.GetValue("NetWork", "ReConnectTime", this->mReConnectTime);
 		config.GetValue("NetWork", "ReConnectCount", this->mReConnectCount);
-        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetComponent<NetSessionComponent>());
+        SayNoAssertRetFalse_F(this->mNetWorkManager = this->GetComponent<TcpNetSessionComponent>());
         SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
 
         SayNoAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
@@ -133,7 +133,7 @@ namespace Sentry
         return true;
     }
 
-	void NetProxyComponent::ConnectAfter(const std::string & address, bool isSuc)
+	void TcpNetProxyComponent::ConnectAfter(const std::string & address, bool isSuc)
 	{
 		auto iter = this->mSessionMap.find(address);
 		if (iter != this->mSessionMap.end())
@@ -151,7 +151,7 @@ namespace Sentry
 		}
 	}
 
-	void NetProxyComponent::NewConnect(const std::string & address)
+	void TcpNetProxyComponent::NewConnect(const std::string & address)
 	{
 		TcpProxySession *session = this->GetProxySession(address);
 		if (session == nullptr)
@@ -165,7 +165,7 @@ namespace Sentry
 		this->OnNewSessionConnect(session);
 	}
 
-	void NetProxyComponent::SessionError(const std::string & address)
+	void TcpNetProxyComponent::SessionError(const std::string & address)
 	{
 		auto iter = this->mSessionMap.find(address);
 		if (iter != this->mSessionMap.end())
@@ -188,7 +188,7 @@ namespace Sentry
 		}
 	}
 
-	bool NetProxyComponent::ReceiveNewMessage(const std::string & address, SharedMessage message)
+	bool TcpNetProxyComponent::ReceiveNewMessage(const std::string & address, SharedMessage message)
 	{
         unsigned short methodId = 0;
         const char * msg = message->c_str();
@@ -226,7 +226,7 @@ namespace Sentry
         return false;
 	}
 
-	void NetProxyComponent::OnSystemUpdate()
+	void TcpNetProxyComponent::OnSystemUpdate()
 	{
 		shared_ptr<TcpClientSession> pTcpSession = nullptr;
 		SocketEveHandler *eveHandler = nullptr;

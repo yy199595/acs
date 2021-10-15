@@ -8,12 +8,12 @@ namespace Sentry
 {
     class TaskProxy;
 
-    class TaskComponent : public Component, public ISystemUpdate
+    class TaskPoolComponent : public Component, public ISystemUpdate
     {
     public:
-        TaskComponent();
+        TaskPoolComponent();
 
-        ~TaskComponent() {}
+        ~TaskPoolComponent() {}
 
     public:
         bool Awake() final;

@@ -83,7 +83,7 @@ namespace Sentry
         std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
         std::unordered_map<std::thread::id, SayNoMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
-        class TaskComponent *mTaskManager;
+        class TaskPoolComponent *mTaskManager;
         class CoroutineComponent *mCorComponent;
     };
 }
