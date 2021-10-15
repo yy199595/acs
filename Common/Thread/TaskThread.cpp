@@ -47,8 +47,10 @@ namespace Sentry
         this->mWaitInvokeTask.SwapQueueData();
         while (this->mWaitInvokeTask.PopItem(task))
         {
-            task->Run();
-            this->mFinishTasks.push(task->GetTaskId());
+            if(task->Run())
+            {
+                this->mFinishTasks.push(task->GetTaskId());
+            }
         }
 
         while (!this->mFinishTasks.empty())
@@ -88,8 +90,10 @@ namespace Sentry
         this->mWaitInvokeTask.SwapQueueData();
         while(this->mWaitInvokeTask.PopItem(taskProxy))
         {
-            taskProxy->Run();
-            this->mFinishTasks.emplace(taskProxy->GetTaskId());
+            if(taskProxy->Run())
+            {
+                this->mFinishTasks.emplace(taskProxy->GetTaskId());
+            }
         }
 
         while (!this->mFinishTasks.empty())

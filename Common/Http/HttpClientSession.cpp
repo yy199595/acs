@@ -8,7 +8,7 @@
 namespace Sentry
 {
     HttpClientSession::HttpClientSession(AsioContext &io,const std::string & host, const std::string & port)
-        : mHttpContext(io), response_stream(&response), mResolver(io), mQuery(host, port)
+        : mHttpContext(io), mResponseStream(&mResponseBuf), mResolver(io), mQuery(host, port)
     {
         this->mResponseHandler = nullptr;
     }
@@ -42,7 +42,7 @@ namespace Sentry
         if(err)
         {
             SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpResolverError, nullptr);
+            this->mResponseHandler->Run(EHttpError::HttpResolverError, this->mResponseStream);
             return;
         }
         this->mHttpSocket = std::make_shared<asio::ip::tcp::socket>(this->mHttpContext);
@@ -55,7 +55,7 @@ namespace Sentry
         if (err)
         {
             SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpConnectError, nullptr);
+            this->mResponseHandler->Run(EHttpError::HttpConnectError, mResponseStream);
             return;
         }
         SayNoDebugLog("connect http host " << this->mHttpSocket->remote_endpoint().address()
@@ -70,12 +70,12 @@ namespace Sentry
         if(err)
         {
             SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpWriteError, nullptr);
+            this->mResponseHandler->Run(EHttpError::HttpWriteError, mResponseStream);
             return;
         }
         this->mRequestMessage->clear();
-        asio::async_read_until(*this->mHttpSocket, response, "\r\n",
-                               std::bind(&HttpClientSession::ReadHeadHandler, this, args1, args2));
+        asio::async_read(*this->mHttpSocket, this->mResponseBuf, asio::transfer_at_least(1),
+                         std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
     }
 
     void HttpClientSession::ReadHeadHandler(const asio::error_code &err, const size_t size)
@@ -83,54 +83,34 @@ namespace Sentry
         if (err)
         {
             SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpReadError, nullptr);
+            this->mResponseHandler->Run(EHttpError::HttpReadError, mResponseStream);
             return;
         }
-        std::istream response_stream(&response);
         std::istreambuf_iterator<char> eos;
-        SayNoDebugError(string(std::istreambuf_iterator<char>(response_stream), eos));
-
-        asio::async_read(*this->mHttpSocket, response, asio::transfer_at_least(1),
+        SayNoDebugError(string(std::istreambuf_iterator<char>(this->mResponseStream), eos));
+        asio::async_read(*this->mHttpSocket, this->mResponseBuf, asio::transfer_at_least(1),
                          std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
     }
 
-    void HttpClientSession::ReadReadHandler(const asio::error_code &err, const size_t size)
-    {
-        if (err)
-        {
-            SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpReadError, nullptr);
-            return;
-        }
-        std::istream response_stream(&response);
-        std::istreambuf_iterator<char> eos;
-        SayNoDebugInfo(string(std::istreambuf_iterator<char>(response_stream), eos));
-        asio::async_read(*this->mHttpSocket, response, asio::transfer_at_least(1),
-                         std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
-    }
 
     void HttpClientSession::ReadBodyHandler(const asio::error_code &err, const size_t size)
     {
         if (size == 0)
         {
-            std::string header = "";
-            while (std::getline(response_stream, header) && header != "\r")
-            {
-
-                SayNoDebugInfo(header);
-            }
-
-            std::istream response_stream(&response);
-            std::istreambuf_iterator<char> eos;
-            SayNoDebugWarning(string(std::istreambuf_iterator<char>(response_stream), eos));
+//            std::istreambuf_iterator<char> eos;
+//            SayNoDebugWarning("size = " << this->mResponseBuf.size() << "\n"
+//                                        << string(std::istreambuf_iterator<char>(this->mResponseStream), eos));
+            this->mResponseHandler->Run(EHttpError::HttpSuccessful, mResponseStream);
         }
-        if (err)
+        else if(err)
         {
             SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpResponseError, nullptr);
-            return;
+            this->mResponseHandler->Run(EHttpError::HttpResponseError, mResponseStream);
         }
-        asio::async_read(*this->mHttpSocket, response, asio::transfer_at_least(1),
-                         std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
+        else
+        {
+            asio::async_read(*this->mHttpSocket, this->mResponseBuf, asio::transfer_at_least(1),
+                             std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
+        }
     }
 }

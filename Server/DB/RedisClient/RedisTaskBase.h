@@ -19,7 +19,7 @@ namespace Sentry
     public:
         RedisTaskBase(const std::string &cmd);
     public:
-        void Run() final;//在线程池执行的任务
+        bool Run() final;//在线程池执行的任务
     public:
         template<typename... Args>
         void InitCommand(Args &&...args);

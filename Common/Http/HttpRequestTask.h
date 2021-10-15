@@ -25,23 +25,26 @@ namespace Sentry
     class HttpRequestTask : public TaskProxy
     {
     public:
-        HttpRequestTask(const std::string & url, AsioContext & io);
+        HttpRequestTask(const std::string & url, AsioContext & io, std::string & res);
+        ~HttpRequestTask();
     public:
-        XCode GetCode() { return this->mCode;}
+        int GetCode() { return this->mCode;}
         const std::string & GetData() { return this->mData;}
 
     public:
-        void Run() final; //在线程池执行的任务
+        bool Run() final; //在线程池执行的任务
         void RunFinish() final;
 
     private:
-        void OnResponse(EHttpError err, SharedMessage message);
+        void OnResponse(EHttpError err, std::istream & message);
     private:
-        XCode mCode;
-        std::string mData;
+        int mCode;
+        std::string & mData;
         unsigned int mCorId;
         const std::string mHttpUrl;
         AsioContext & mAsioContext;
+        HttpClientSession * mHttpClient;
+        TaskPoolComponent * mTaskComponent;
         CoroutineComponent * mCorComponent;
     };
 }

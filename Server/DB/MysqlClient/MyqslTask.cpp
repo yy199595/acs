@@ -27,7 +27,7 @@ namespace Sentry
         }
     }
 
-    void MyqslTask::Run()
+    bool MyqslTask::Run()
     {
         MysqlComponent *pMysqlManager = App::Get().GetComponent<MysqlComponent>();
         SayNoMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
@@ -35,21 +35,21 @@ namespace Sentry
         {
             this->mErrorCode = MysqlSocketIsNull;
             this->mErrorString = "mysql socket is null";
-            return;
+            return true;
         }
 
         if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
         {
             this->mErrorCode = MysqlSelectDbFailure;
             this->mErrorString = "select " + this->mDataBaseName + " fail";
-            return;
+            return true;
         }
 
         if (mysql_real_query(mysqlSocket, mSqlCommand.c_str(), mSqlCommand.size()) != 0)
         {
             this->mErrorCode = MysqlInvokeFailure;
             this->mErrorString = mysql_error(mysqlSocket);
-            return;
+            return true;
         }
         this->mErrorCode = XCode::Successful;
         MysqlQueryResult *queryResult = mysql_store_result(mysqlSocket);
@@ -101,6 +101,7 @@ namespace Sentry
             }
             mysql_free_result(queryResult);
         }
+        return true;
     }
 
     void MyqslTask::WriteValue(QuertJsonWritre &jsonWriter, MYSQL_FIELD *field, const char *data, long size)

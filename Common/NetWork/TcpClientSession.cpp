@@ -60,7 +60,7 @@ namespace Sentry
 
 	bool TcpClientSession::SendPackage(SharedMessage message)
 	{
-		if (message == nullptr || message->size() == 0)
+		if (message == nullptr || message->empty())
 		{
 			return false;
 		}
@@ -127,7 +127,6 @@ namespace Sentry
 		{
 			return false;
 		}
-		memset(this->mRecvMsgBuffer, 0, this->mRecvBufferSize);
 		this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
 			[this](const asio::error_code &error_code, const std::size_t t) 
 		{

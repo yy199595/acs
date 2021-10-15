@@ -21,7 +21,7 @@ namespace Sentry
     protected:
         void RunFinish() final;
 
-        void Run() final; //在其他线程查询
+        bool Run() final; //在其他线程查询
     public:
         XCode GetErrorCode() { return this->mErrorCode; }
 

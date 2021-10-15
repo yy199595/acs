@@ -5,6 +5,7 @@
 #include "HttpRequestTask.h"
 #include <Core/App.h>
 #include <Http/HttpClientSession.h>
+#include <Scene/TaskPoolComponent.h>
 namespace Sentry
 {
     bool HttpUrlHelper::TryParse(const std::string & url, std::string & host, std::string & port, std::string & path)
@@ -59,100 +60,69 @@ namespace Sentry
 }
 namespace Sentry
 {
-    HttpRequestTask::HttpRequestTask(const std::string & url, AsioContext & io)
-            :mHttpUrl(url), mAsioContext(io)
+    HttpRequestTask::HttpRequestTask(const std::string & url, AsioContext & io, std::string & res)
+            :mHttpUrl(url), mAsioContext(io), mData(res)
     {
+        this->mCode = 0;
+        this->mHttpClient = nullptr;
         this->mCorComponent = App::Get().GetCoroutineComponent();
         this->mCorId = this->mCorComponent->GetCurrentCorId();
+        this->mTaskComponent = App::Get().GetComponent<TaskPoolComponent>();
     }
 
-    void HttpRequestTask::OnResponse(EHttpError err, SharedMessage message)
+    HttpRequestTask::~HttpRequestTask() noexcept
     {
+        if(this->mHttpClient != nullptr)
+        {
+            delete this->mHttpClient;
+        }
+    }
 
+    void HttpRequestTask::OnResponse(EHttpError err, HttpResponseStream & httpResponseStream)
+    {
+        if(err != EHttpError::HttpSuccessful)
+        {
+            this->mCode = 1;
+            return;
+        }
+        std::string version;
+        httpResponseStream >> version >> this->mCode;
+        if (this->mCode != 200)
+        {
+            return;
+        }
+        std::string content;
+        while (std::getline(httpResponseStream, content))
+        {
+            if (content.size() == 1 && content == "\r")
+            {
+                break;
+            }
+        }
+        std::istreambuf_iterator<char> eos;
+        this->mData.append(std::istreambuf_iterator<char>(httpResponseStream), eos);
+        this->mTaskComponent->PushFinishTask(this->GetTaskId());
     }
 
 
-    void HttpRequestTask::Run()
+    bool HttpRequestTask::Run()
     {
         std::string host = "";
         std::string port = "";
         std::string path = "";
-        const long long t1 = TimeHelper::GetMilTimestamp();
         if (!HttpUrlHelper::TryParse(this->mHttpUrl, host, port, path))
         {
             SayNoDebugError("parse " << this->mHttpUrl << " failure");
-            return;
+            return true;
         }
-        std::shared_ptr<std::string> requet = std::make_shared<std::string>();
-
-        std::stringstream requestStream;
-
-        requestStream << "GET " << path << " HTTP/1.0\r\n";
-        requestStream << "Host: " << host << "\r\n";
-        requestStream << "Accept: */*\r\n";
-        requestStream << "Connection: close\r\n\r\n";
 
         char buffer[1024] = {0};
         size_t size = sprintf(buffer, "GET %s HTTP/1.0\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", path.c_str(), host.c_str());
 
-        HttpClientSession * httpClient = new HttpClientSession(this->mAsioContext, host, port);
+        this->mHttpClient = new HttpClientSession(this->mAsioContext, host, port);
         IHttpReponseHandler * handler = new HttpResponseHandler<HttpRequestTask>(&HttpRequestTask::OnResponse, this);
-        httpClient->Request(std::make_shared<std::string>(buffer, size), handler);
-
-//        asio::error_code err;
-//        tcp::resolver resolver(mAsioContext);
-//        tcp::resolver::query query(host, port);
-//        tcp::resolver::iterator endpoint = resolver.resolve(query, err);
-//        if (err)
-//        {
-//            SayNoDebugError("{ " << this->mHttpUrl << " } " << err.message());
-//            return;
-//        }
-//
-//        tcp::socket socket1(this->mAsioContext);
-//        asio::connect(socket1, endpoint, err);
-//        if (err)
-//        {
-//            SayNoDebugError(err.message());
-//            return;
-//        }
-//        SayNoDebugInfo("connect http host " << socket1.remote_endpoint().address() << ":" << port << "  successful");
-//
-//        asio::streambuf request;
-//        std::ostream requestStream(&request);
-//
-//        requestStream << "GET " << path << " HTTP/1.0\r\n";
-//        requestStream << "Host: " << host << "\r\n";
-//        requestStream << "Accept: */*\r\n";
-//        requestStream << "Connection: close\r\n\r\n";
-//
-//        size_t size = asio::write(socket1, request, err);
-//
-//        if (err)
-//        {
-//            SayNoDebugError(err.message());
-//            return;
-//        }
-//        SayNoDebugLog("write message " << size);
-//
-//        asio::streambuf response;
-//        asio::read_until(socket1, response, "\r\n");
-//
-//
-//        std::istream response_stream(&response);
-//        while (asio::read(socket1, response, asio::transfer_at_least(1), err))
-//        {
-//
-//        }
-//
-//        std::string responseMessage;
-//        while (std::getline(response_stream, responseMessage))
-//        {
-//            //SayNoDebugError(responseMessage);
-//        }
-
-        //SayNoDebugError(responseMessage);
-        SayNoDebugFatal("时间 = " << ((TimeHelper::GetMilTimestamp() - t1) / 1000.0f) << "s");
+        this->mHttpClient->Request(std::make_shared<std::string>(buffer, size), handler);
+        return false;
     }
 
     void HttpRequestTask::RunFinish()

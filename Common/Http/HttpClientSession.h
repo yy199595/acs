@@ -22,20 +22,21 @@ namespace Sentry
 
 namespace Sentry
 {
+    typedef std::istream HttpResponseStream;
     class IHttpReponseHandler
     {
     public:
-        virtual void Run(EHttpError code, SharedMessage response) = 0;
+        virtual void Run(EHttpError code, std::istream & response) = 0;
     };
 
     template<typename T>
     class HttpResponseHandler : public IHttpReponseHandler
     {
     public:
-        typedef void (T::*HandlerFunc)(EHttpError, SharedMessage);
+        typedef void (T::*HandlerFunc)(EHttpError, HttpResponseStream &);
         HttpResponseHandler(HandlerFunc && f, T * o):_o(o), _f(std::forward<HandlerFunc>(f)) { }
     public:
-        void Run(EHttpError code, SharedMessage response) override
+        void Run(EHttpError code, HttpResponseStream & response) override
         {
             (_o->*_f)(code, response);
         }
@@ -70,8 +71,6 @@ namespace Sentry
 
         void ReadHeadHandler(const asio::error_code &err, const size_t size);
 
-        void ReadReadHandler(const asio::error_code &err, const size_t size);
-
         void ReadBodyHandler(const asio::error_code &err, const size_t size);
 
     private:
@@ -83,8 +82,8 @@ namespace Sentry
         tcp::resolver mResolver;
         tcp::resolver::query mQuery;
     private:
-        asio::streambuf response;
-        std::istream response_stream;
+        asio::streambuf mResponseBuf;
+        HttpResponseStream mResponseStream;
     };
 }
 #endif //SENTRY_HTTPCLIENTSESSION_H

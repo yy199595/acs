@@ -20,7 +20,11 @@ namespace Sentry
     void HttpClientComponent::Start()
     {
         std::string json ;
-        this->Get("http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json", json);
+        this->Get("http://timor.tech/api/holiday/year", json);
+        SayNoDebugFatal(json);
+        this->Get("https://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json", json);
+        SayNoDebugError(json);
+
     }
 
     void HttpClientComponent::OnHttpContextUpdate(AsioContext & ctx)
@@ -30,15 +34,23 @@ namespace Sentry
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
-      if (this->mCorComponent->IsInMainCoroutine())
-      {
-        return XCode::NoCoroutineContext;
-      }
-      HttpRequestTask httpTask(url, App::Get().GetHttpContext());
-      this->mTaskComponent->StartTask("Http", &httpTask);
-      this->mCorComponent->YieldReturn();
+        if (this->mCorComponent->IsInMainCoroutine())
+        {
+            return XCode::NoCoroutineContext;
+        }
+        json.clear();
+        HttpRequestTask httpTask(url, App::Get().GetHttpContext(), json);
+        this->mTaskComponent->StartTask("Http", &httpTask);
+        this->mCorComponent->YieldReturn();
 
-
-      return XCode::Successful;
+        if (httpTask.GetCode() == 0)
+        {
+            return XCode::Successful;
+        }
+        if (httpTask.GetCode() == 1)
+        {
+            return XCode::NetWorkError;
+        }
+        return XCode::Failure;
     }
 }

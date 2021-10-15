@@ -26,7 +26,7 @@ namespace Sentry
         SayNoDebugLog(sss.str() << "}");
     }
 
-    void RedisTaskBase::Run()
+    bool RedisTaskBase::Run()
     {
 		RedisComponent * redisManager = App::Get().GetComponent<RedisComponent>();
         RedisSocket *redisSocket = redisManager->GetRedisSocket();
@@ -34,7 +34,7 @@ namespace Sentry
         {
             this->mErrorStr = "redis scoket null";
             this->mErrorCode = XCode::RedisSocketIsNull;
-            return;
+            return true;
         }
 
         const char **argvArray = new const char *[this->mCommand.size()];
@@ -56,7 +56,7 @@ namespace Sentry
         {
             this->mErrorStr = "redis replay null";
             this->mErrorCode = XCode::RedisReplyIsNull;
-            return;
+            return true;
         }
         switch (replay->type)
         {
@@ -96,6 +96,7 @@ namespace Sentry
                 break;
         }
         freeReplyObject(replay);
+        return true;
     }
 
     void RedisTaskBase::AddCommandArgv(const std::string &argv)
