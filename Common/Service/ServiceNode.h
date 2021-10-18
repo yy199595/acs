@@ -47,7 +47,7 @@ namespace Sentry
 		XCode SendRpcMessage(SharedMessage message);
 		XCode SendRpcMessage(SharedMessage message, Message &response);
 	private:
-		class TcpProxySession * GetTcpSession();
+		class TcpClientSession * GetTcpSession();
 
     private:
         std::string mMessageBuffer;
@@ -65,6 +65,5 @@ namespace Sentry
         class ActionComponent *mActionManager;
 		std::queue<unsigned  int> mCoroutines;
         class ProtocolComponent * mProtocolComponent;
-        class TcpNetProxyComponent * mNetProxyComponent;
     };
 }// namespace Sentry

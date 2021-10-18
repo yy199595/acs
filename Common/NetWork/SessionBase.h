@@ -29,7 +29,6 @@ namespace Sentry
 		AsioContext & GetContext() { return this->mContext; }
 	public:
 		void StartReceive();
-		
 		virtual const std::string & GetAddress() = 0;
 		void StartConnect(std::string name, std::string ip, unsigned short port);
 	public:

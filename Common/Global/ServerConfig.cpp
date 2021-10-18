@@ -238,7 +238,7 @@ namespace Sentry
 		{
 			if (!iter->second->IsObject())
 			{
-				return false;
+				return nullptr;
 			}
 			auto iter1 = iter->second->FindMember(k2.c_str());
 			return iter1 != iter->second->MemberEnd() ? &iter1->value : nullptr;

@@ -6,7 +6,6 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/TcpNetProxyComponent.h>
 #include <Scene/TcpNetSessionComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
@@ -46,7 +45,6 @@ int main(int argc, char **argv)
 	__register_component__(ServiceNodeComponent);
 	__register_component__(TcpServerComponent);
 	__register_component__(TcpNetSessionComponent);
-	__register_component__(TcpNetProxyComponent);
 
 	__register_component__(LuaServiceMgrComponent);
 	

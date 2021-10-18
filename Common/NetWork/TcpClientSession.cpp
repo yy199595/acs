@@ -1,5 +1,4 @@
 ﻿#include"TcpClientSession.h"
-#include<Util/StringHelper.h>
 #include<Component/IComponent.h>
 #include<NetWork/SocketEvent.h>
 
@@ -22,14 +21,10 @@ namespace Sentry
 
 	void TcpClientSession::OnStartConnect(std::string name, std::string ip, unsigned short port)
 	{
-		if (this->mSocket == nullptr)
-		{
-			this->mSocket = std::make_shared<AsioTcpSocket>(this->GetContext());
-		}
-		if (this->mSocket->is_open())
-		{
-			return;
-		}
+        if(this->mSocket->is_open())
+        {
+            return;
+        }
 		this->mConnectCount++;
 		this->mSessionName = name;
 		auto address = asio::ip::make_address_v4(ip);

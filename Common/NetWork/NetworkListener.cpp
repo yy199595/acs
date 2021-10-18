@@ -6,39 +6,43 @@
 #include<Component/IComponent.h>
 namespace Sentry
 {
-	NetworkListener::NetworkListener(const std::string & name, NetWorkThread * t, unsigned short port, int maxCount)
-		: mName(name), mTaskThread(t), mPort(port), mMaxCount(maxCount), mTaskScheduler(App::Get().GetTaskScheduler())
-	{
-		this->mBindAcceptor = nullptr;
-		this->mSessionHandler = nullptr;
-		AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mPort);
-		this->mBindAcceptor = new AsioTcpAcceptor(t->GetContext(), endPoint);
-	}
+	NetworkListener::NetworkListener(NetWorkThread * t, ListenConfig & config)
+		: mTaskThread(t), mConfig(config),
+        mTaskScheduler(App::Get().GetTaskScheduler())
+    {
+        this->mBindAcceptor = nullptr;
+        this->mSessionHandler = nullptr;
+    }
 
 	void NetworkListener::StartListen(ISocketHandler * handler)
 	{
-		asio::error_code err;
 		this->mSessionHandler = handler;
-		this->mBindAcceptor->listen(this->mMaxCount, err);	
-		if (!err)
-		{
-			SayNoDebugInfo("start " << this->mName << "listener "
-				<< this->mBindAcceptor->local_endpoint().address().to_string() << ":" <<
-				this->mBindAcceptor->local_endpoint().port() << "  max count = " << this->mMaxCount << "}");
-
-			this->mSessionHandler->SetNetThread(mTaskThread);
-			this->mTaskThread->AddTask(new FucntionTask<NetworkListener>(&NetworkListener::ListenConnect, this));			
-		}
-		else
-		{
-			SayNoDebugError(err.message());
-			App::Get().Stop();
-		}
+        this->mSessionHandler->SetNetThread(this->mTaskThread);
+        this->mTaskThread->AddTask(NewMethodProxy(&NetworkListener::ListenConnect, this));
 	}
 
 	void NetworkListener::ListenConnect()
 	{
-		this->mSessionSocket = this->mSessionHandler->CreateSocket(this->mTaskThread->GetContext());
+        if(this->mBindAcceptor == nullptr)
+        {
+            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
+            this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
+            try
+            {
+                asio::error_code err;
+                this->mBindAcceptor->listen(this->mConfig.Count, err);
+
+                SayNoDebugInfo("start " << this->mConfig.Name << " listener "
+                                        << this->mBindAcceptor->local_endpoint().address().to_string() << ":" <<
+                                        this->mBindAcceptor->local_endpoint().port() << "  max count = " << this->mConfig.Count
+                                        << "}");
+            }
+            catch(asio::system_error & err)
+            {
+                SayNoDebugError(err.what());
+            }
+        }
+		this->mSessionSocket = this->mSessionHandler->CreateSocket();
 		this->mBindAcceptor->async_accept(this->mSessionSocket->GetSocket(), std::bind(&NetworkListener::OnConnectHandler, this, args1));
 	}
 

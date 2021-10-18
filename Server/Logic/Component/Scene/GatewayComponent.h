@@ -1,6 +1,5 @@
 ﻿#pragma once
-
-#include<Scene/TcpNetProxyComponent.h>
+#include <Component/Component.h>
 namespace Sentry
 {
     // 网关

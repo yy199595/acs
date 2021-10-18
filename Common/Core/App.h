@@ -104,8 +104,6 @@ namespace Sentry
 
 		bool InitComponent();
 
-		bool StartNetThread();
-
 		bool InitComponent(Component * component);
 
 		void StartComponent();
@@ -122,10 +120,6 @@ namespace Sentry
 		void UpdateConsoleTitle();
 	private:
 		void LogicMainLoop();
-
-		void TcpThreadLoop();
-
-        void HttpThreadLoop();
 	private:
 		
         long long mNextRefreshTime;
@@ -174,9 +168,5 @@ namespace Sentry
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
-    private:
-		std::vector<ITcpContextUpdate *> mTcpUpdateComponent;
-        std::vector<IHttpContextUpdate *> mHttpUpdateComponent;
-
     };
 }// namespace Sentry

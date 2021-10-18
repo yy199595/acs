@@ -19,19 +19,13 @@
         {
             "port":7788,
             "count":10000,
-            "handler":""
+            "handler":"TcpNetSessionComponent"
         },
-        "http":
+        "tcp1":
         {
-            "port":80,
+            "port":7789,
             "count":10000,
-            "handler":""
-        },
-        "telnet":
-        {
-            "port":1995,
-            "count":10000,
-            "handler":""
+            "handler":"TcpNetSessionComponent"
         }
     },
     "NetWork": {
@@ -66,7 +60,6 @@
         "MysqlComponent",
         "RedisComponent",
         "MysqlProxyComponent",
-        "TcpNetProxyComponent",
         "GatewayComponent",
         "HttpClientComponent",
         "LuaServiceMgrComponent"

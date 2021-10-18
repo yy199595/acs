@@ -11,6 +11,7 @@ namespace Sentry
 	{
 		this->mIsOpen = false;
 		this->mIsConnected = false;
+        this->mSocket = make_shared<AsioTcpSocket>(this->mContext);
 	}
 
 	void SessionBase::Close()
@@ -20,7 +21,7 @@ namespace Sentry
 			this->OnClose();
 			return;
 		}
-		this->mTaskScheduler.AddMainTask(NewMethodProxy(&SessionBase::OnClose, this, this));
+		this->mTaskScheduler.AddMainTask(NewMethodProxy(&SessionBase::OnClose, this));
 	}
 
 	void SessionBase::SetSocket(SharedTcpSocket socket)
@@ -63,7 +64,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::OnSendMessage, this));
+		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::OnSendMessage, this, message));
 	}
 
 	void SessionBase::OnSendMessage(SharedMessage message)
@@ -72,7 +73,7 @@ namespace Sentry
 		{
 			return;
 		}
-		this->mSocket->async_send(message->c_str(), message->size(), 
+		this->mSocket->async_send(asio::buffer(message->c_str(), message->size()),
 			[message, this](const asio::error_code &error_code, std::size_t size)
 		{
 			if (error_code)

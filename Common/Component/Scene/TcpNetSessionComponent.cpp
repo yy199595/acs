@@ -40,7 +40,7 @@ namespace Sentry
         return true;
     }
 
-	void TcpNetSessionComponent::OnClose(SessionBase * socket)
+	void TcpNetSessionComponent::OnCloseSession(TcpClientSession * socket)
 	{
 		if (socket == nullptr)
 		{
@@ -56,18 +56,12 @@ namespace Sentry
 		}
 	}
 
-	SessionBase * TcpNetSessionComponent::CreateSocket(AsioContext & io)
-	{
-		return new TcpClientSession(this);
-	}
-
-	void TcpNetSessionComponent::OnSessionErr(SessionBase * session, const  asio::error_code & err)
+	void TcpNetSessionComponent::OnSessionError(TcpClientSession * clientSession, const  asio::error_code & err)
 	{
 		if (err)
 		{
-			const std::string & address = session->GetAddress();
-			SayNoDebugError("[" << address << "]" << " error", err.message());
-			TcpClientSession * clientSession = static_cast<TcpClientSession*>(session);
+			const std::string & address = clientSession->GetAddress();
+			SayNoDebugError("[" << address << "]" << " error" << err.message());
 			if (clientSession->IsConnected())
 			{
 				std::string ip;
@@ -89,7 +83,7 @@ namespace Sentry
 		}
 	}
 
-	void TcpNetSessionComponent::OnConnectRemote(SessionBase * session, const asio::error_code & err)
+	void TcpNetSessionComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
 	{
 		const std::string & address = session->GetAddress();
 		if (err)
@@ -98,33 +92,30 @@ namespace Sentry
 		}
 	}
 
-	void TcpNetSessionComponent::OnListenConnect(NetWorkThread * netTask, SessionBase * session)
+	bool TcpNetSessionComponent::OnListenNewSession(TcpClientSession *clientSession)
 	{
-		TcpClientSession * clientSession = dynamic_cast<TcpClientSession*>(session);
 		if (clientSession != nullptr)
 		{
 			const std::string & address = clientSession->GetAddress();
 			auto iter = this->mSessionAdressMap.find(address);
 			if (iter != this->mSessionAdressMap.end())
 			{
-				return;
+				return false;
 			}
 			this->mSessionAdressMap.emplace(address, clientSession);
 		}
+        return true;
 	}
-	void TcpNetSessionComponent::OnReceiveNewMessage(SessionBase * session, SharedMessage message)
+	bool TcpNetSessionComponent::OnReceiveMessage(TcpClientSession *session, SharedMessage message)
 	{
 		unsigned short methodId = 0;
-		const char * msg = message->c_str();
-		const size_t size = message->size();
-		memcpy(&methodId, msg + 1, sizeof(methodId));
 		const std::string & address = session->GetAddress();
-		const ProtocolConfig * protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
+        memcpy(&methodId, message->c_str(), sizeof(methodId));
+        const ProtocolConfig * protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
 
 		if (protocolConfig == nullptr)
 		{
-			this->CloseSession(address);
-			return;
+			return false;
 		}
 
 		auto messageType = (DataMessageType)message->at(0);
@@ -134,13 +125,9 @@ namespace Sentry
 			auto iter = this->mRequestMsgHandlers.find(handler);
 			if (iter != this->mRequestMsgHandlers.end())
 			{
-				if (!iter->second->OnRequestMessage(address, message))
-				{
-					this->CloseSession(address);
-				}
-				return;
+				return iter->second->OnRequestMessage(address, message);
 			}
-			this->mServiceComponent->OnRequestMessage(address, message);
+			return this->mServiceComponent->OnRequestMessage(address, message);
 		}
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
 		{
@@ -148,19 +135,11 @@ namespace Sentry
 			auto iter = this->mResponseMsgHandlers.find(handler);
 			if (iter != this->mResponseMsgHandlers.end())
 			{
-				if (!iter->second->OnResponseMessage(address, message))
-				{
-					this->CloseSession(address);
-				}
-				return;
+				return iter->second->OnResponseMessage(address, message);
 			}
-			this->mActionComponent->OnResponseMessage(address, message);
+			return this->mActionComponent->OnResponseMessage(address, message);
 		}
-		else
-		{
-			this->CloseSession(address);
-		}
-		
+        return false;
 	}
 
 	TcpClientSession *TcpNetSessionComponent::ConnectRemote(const std::string &name, const std::string & ip, unsigned short port)
@@ -219,26 +198,21 @@ namespace Sentry
 
 	bool TcpNetSessionComponent::SendByAddress(const std::string & address, com::DataPacket_Request & message)
 	{
-		unsigned short methodId = message.methodid();
-		message.clear_methodid();
-		return this->SendByAddress(address, TYPE_REQUEST, methodId, message);
+		return this->SendByAddress(address, TYPE_REQUEST, message);
 	}
 
 	bool TcpNetSessionComponent::SendByAddress(const std::string & address, com::DataPacket_Response & message)
 	{
-		unsigned short methodId = message.methodid();
-		message.clear_methodid();
-		return this->SendByAddress(address, TYPE_RESPONSE, methodId, message);
+		return this->SendByAddress(address, TYPE_RESPONSE, message);
 	}
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, DataMessageType type, unsigned short methodId, Message & message)
+	bool TcpNetSessionComponent::SendByAddress(const std::string & address, DataMessageType type, Message & message)
 	{
-		// size + type + methodId + body
-		const size_t size = message.ByteSizeLong() + 7;
+		// size + type + + body
+		const size_t size = message.ByteSizeLong() + 5;
 		memcpy(this->mMessageBuffer, &size, sizeof(char));
 		memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
-		memcpy(this->mMessageBuffer + 5, &methodId, sizeof(unsigned short));
-		if (!message.ParseFromArray(this->mMessageBuffer + 7, 1024 * 1024 - 7))
+		if (!message.ParseFromArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
 		{
 			return false;
 		}

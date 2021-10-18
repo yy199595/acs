@@ -26,22 +26,23 @@ namespace Sentry
 				continue;
 			}
 
-			const std::string name = iter->name.GetString();
-			const int count = iter->value["count"].GetInt();
-			unsigned short port = iter->value["port"].GetUint();
-			const std::string component = iter->value["handler"].GetString();
-			ISocketHandler * socketHandler = dynamic_cast<ISocketHandler*>(this->gameObject->GetComponentByName(component));
-			if (socketHandler == nullptr)
+            ListenConfig listenConfig;
+            listenConfig.Name = iter->name.GetString();
+            listenConfig.Port = iter->value["port"].GetUint();
+            listenConfig.Count = iter->value["count"].GetInt();
+            listenConfig.Handler = iter->value["handler"].GetString();;
+
+			if (!dynamic_cast<ISocketHandler*>(this->gameObject->GetComponentByName(listenConfig.Handler)))
 			{
 				return false;
 			}
-			NetWorkThread * netThread = taskComponent->NewNetworkThread(name, nullptr);
+			NetWorkThread * netThread = taskComponent->NewNetworkThread(listenConfig.Name, nullptr);
 			if (netThread == nullptr)
 			{
 				return false;
 			}
-			NetworkListener * listener = new NetworkListener(name, netThread, port, count);
-			this->mListenerMap.insert(std::make_pair(name, listener));
+			auto listener = new NetworkListener(netThread, listenConfig);
+			this->mListenerMap.insert(std::make_pair(listenConfig.Name, listener));
 
 		}
 		return true;
@@ -51,10 +52,13 @@ namespace Sentry
     {
 		auto iter = this->mListenerMap.begin();
 		for (; iter != this->mListenerMap.end(); iter++)
-		{			
-			const std::string & name = iter->second->GetName();
-			Component * component = this->gameObject->GetComponentByName(name);
-			iter->second->StartListen(dynamic_cast<ISocketHandler*>(component));
+		{
+            const ListenConfig & config = iter->second->GetConfig();
+			Component * component = this->gameObject->GetComponentByName(config.Handler);
+            if(auto handler = dynamic_cast<ISocketHandler*>(component))
+            {
+                iter->second->StartListen(handler);
+            }
 		}
     }
 }

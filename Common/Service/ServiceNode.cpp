@@ -2,7 +2,6 @@
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/ActionComponent.h>
-#include <Scene/TcpNetProxyComponent.h>
 #include <NetWork/NetWorkRetAction.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
@@ -12,10 +11,8 @@ namespace Sentry
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
-		TcpNetProxyComponent * component = App::Get().GetComponent<TcpNetProxyComponent>();
         SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
-        SayNoAssertRet_F(this->mNetProxyComponent = App::Get().GetComponent<TcpNetProxyComponent>());
         SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
         SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 	}
@@ -31,21 +28,9 @@ namespace Sentry
 		return false;
 	}
 
-    TcpProxySession * ServiceNode::GetTcpSession()
+    TcpClientSession * ServiceNode::GetTcpSession()
     {
-        TcpProxySession *tcpProxySession = this->mNetProxyComponent->Create(this->mAddress, this->mNodeName);
-        if (!tcpProxySession->IsActive())
-        {
-            unsigned int corId = this->mCorComponent->GetCurrentCorId();
-            if (corId == 0)
-            {
-                return nullptr;
-            }
-            this->mCoroutines.push(corId);
-            tcpProxySession->StartConnect();
-            this->mCorComponent->YieldReturn();
-        }
-        return this->mNetProxyComponent->GetProxySession(this->mAddress);
+        return nullptr;
     }
 
     bool ServiceNode::HasService(const std::string &service)
@@ -100,42 +85,43 @@ namespace Sentry
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
     {
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-        if (config == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
-        TcpProxySession *tcpProxySession = this->GetTcpSession();
-        if (!tcpProxySession->IsActive())
-        {
-            return XCode::SendMessageFail;
-        }
-        if (!request.SerializeToString(&mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-        size_t size = 0;
-        com::DataPacket_Request requestData;
-        requestData.set_messagedata(mMessageBuffer);
-        auto rpcCallback = NetWorkWaitCorAction::Create();
-        requestData.set_rpcid(this->mActionManager->AddCallback(rpcCallback));
-
-        MessageStream &messageStream = this->mNetProxyComponent->GetSendStream();
-        messageStream << DataMessageType::TYPE_REQUEST << config->MethodId << requestData;
-
-		const char * message = messageStream.Serialize(size);
-        if(!tcpProxySession->SendMessageData(message, size))
-        {
-            return XCode::SendMessageFail;
-        }
-        this->mCorComponent->YieldReturn();
-
-        if(rpcCallback->GetCode() == XCode::Successful)
-        {
-            response.ParseFromString(rpcCallback->GetMsgData());
-            return XCode::Successful;
-        }
-        return rpcCallback->GetCode();
+//        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+//        if (config == nullptr)
+//        {
+//            return XCode::CallFunctionNotExist;
+//        }
+//        TcpClientSession *tcpProxySession = this->GetTcpSession();
+//        if (!tcpProxySession->IsActive())
+//        {
+//            return XCode::SendMessageFail;
+//        }
+//        if (!request.SerializeToString(&mMessageBuffer))
+//        {
+//            return XCode::SerializationFailure;
+//        }
+//        size_t size = 0;
+//        com::DataPacket_Request requestData;
+//        requestData.set_messagedata(mMessageBuffer);
+//        auto rpcCallback = NetWorkWaitCorAction::Create();
+//        requestData.set_rpcid(this->mActionManager->AddCallback(rpcCallback));
+//
+//        MessageStream &messageStream = this->mNetProxyComponent->GetSendStream();
+//        messageStream << DataMessageType::TYPE_REQUEST << config->MethodId << requestData;
+//
+//		const char * message = messageStream.Serialize(size);
+//        if(!tcpProxySession->SendMessageData(message, size))
+//        {
+//            return XCode::SendMessageFail;
+//        }
+//        this->mCorComponent->YieldReturn();
+//
+//        if(rpcCallback->GetCode() == XCode::Successful)
+//        {
+//            response.ParseFromString(rpcCallback->GetMsgData());
+//            return XCode::Successful;
+//        }
+//        return rpcCallback->GetCode();
+        return XCode::Successful;
     }
 
 	XCode ServiceNode::SendRpcMessage(SharedMessage message)

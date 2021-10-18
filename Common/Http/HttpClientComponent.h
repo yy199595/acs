@@ -5,7 +5,7 @@
 
 namespace Sentry
 {
-    class HttpClientComponent : public Component, public IHttpContextUpdate
+    class HttpClientComponent : public Component
     {
     public:
         HttpClientComponent()
@@ -17,8 +17,6 @@ namespace Sentry
     public:
         bool Awake() final;
         void Start() final;
-        void OnHttpContextUpdate(AsioContext &ctx) final;
-
     public:
         XCode Get(const std::string &url, std::string &json, int timeout = 5);
 

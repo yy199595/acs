@@ -108,6 +108,7 @@ namespace Sentry
 		while (this->mWaitInvokeMethod.PopItem(taskMethod))
 		{
 			taskMethod->run();
+            delete taskMethod;
 		}
 
         while (!this->mFinishTasks.empty())
@@ -141,7 +142,6 @@ namespace Sentry
 				task->run();
 				delete task;
 			}
-
 		}
 	}
 	void MainTaskScheduler::Stop()

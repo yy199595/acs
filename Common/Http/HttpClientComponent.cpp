@@ -46,11 +46,6 @@ namespace Sentry
 
     }
 
-    void HttpClientComponent::OnHttpContextUpdate(AsioContext & ctx)
-    {
-
-    }
-
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
 		json.clear();

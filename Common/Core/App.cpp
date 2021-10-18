@@ -122,7 +122,6 @@ namespace Sentry
 				return false;
 			}
 		}
-		SayNoAssertRetFalse_F(this->StartNetThread());
 		this->mCoroutienComponent->StartCoroutine(&App::StartComponent, this);
 		return true;
 	}
@@ -146,32 +145,6 @@ namespace Sentry
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}
-		if (ITcpContextUpdate *manager4 = dynamic_cast<ITcpContextUpdate *>(component))
-		{
-			this->mTcpUpdateComponent.push_back(manager4);
-		}
-
-		if (IHttpContextUpdate *manager5 = dynamic_cast<IHttpContextUpdate *>(component))
-		{
-			this->mHttpUpdateComponent.push_back(manager5);
-		}
-		return true;
-	}
-
-	bool App::StartNetThread()
-	{
-		TaskPoolComponent *taskComponent = this->GetComponent<TaskPoolComponent>();
-		if (taskComponent == nullptr)
-		{
-			return false;
-		}
-		auto tcpThread = taskComponent->NewNetworkThread("Tcp", NewMethodProxy(&App::TcpThreadLoop, this));
-		auto httpThread = taskComponent->NewNetworkThread("Http", NewMethodProxy(&App::HttpThreadLoop, this));
-
-		SayNoAssertRetFalse_F(tcpThread != nullptr && httpThread != nullptr);
-
-		this->mTcpThreadId = tcpThread->GetThreadId();
-		this->mHttpThreadId = httpThread->GetThreadId();
 		return true;
 	}
 
@@ -285,24 +258,6 @@ namespace Sentry
 			}
 		}
 	}
-
-    void App::TcpThreadLoop()
-    {
-        this->mTcpContext->poll();
-        for (ITcpContextUpdate *component: this->mTcpUpdateComponent)
-        {
-            component->OnTcpContextUpdate(*mTcpContext);
-        }
-    }
-
-    void App::HttpThreadLoop()
-    {
-        this->mHttpContext->poll();
-        for (IHttpContextUpdate *component: this->mHttpUpdateComponent)
-        {
-            component->OnHttpContextUpdate(*mHttpContext);
-        }
-    }
 
     void App::UpdateConsoleTitle()
     {

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <Define/CommonTypeDef.h>
+#include<Thread/TaskThread.h>
 #include<NetWork/SessionBase.h>
 namespace Sentry
 {
@@ -26,18 +26,6 @@ namespace Sentry
 	public:
 		virtual void OnLastFrameUpdate() = 0;
 	};
-
-	class ITcpContextUpdate
-	{
-	public:
-		virtual void OnTcpContextUpdate(AsioContext & io) = 0;
-	};
-
-    class IHttpContextUpdate
-    {
-    public:
-        virtual void OnHttpContextUpdate(AsioContext & io) = 0;
-    };
 
 	class IHotfix
 	{
@@ -72,25 +60,74 @@ namespace Sentry
 
 namespace Sentry
 {
-	class SessionBase;
 	class NetWorkThread;
     class TcpClientSession;
 	
     class ISocketHandler
     {
     public:
-		
-		virtual void OnClose(SessionBase * socket) = 0;
-		virtual SessionBase * CreateSocket(AsioContext & io) = 0;
-		virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
+
+        virtual SessionBase * CreateSocket() = 0;
+        virtual void OnClose(SessionBase * socket) = 0;
+        virtual void OnListenConnect(SessionBase * session) = 0;
+        virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
 		virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
-		virtual void OnListenConnect(NetWorkThread * netTask, SessionBase * session) = 0;		
 		virtual void OnReceiveNewMessage(SessionBase * session, SharedMessage message) = 0;
 		
 	public:
-		virtual NetWorkThread * GetNetThread() { return mNetThread; };
-		void SetNetThread(NetWorkThread * t) { this->mNetThread = t; };
+        NetWorkThread * GetNetThread()
+        {
+            return mNetThread;
+        };
+		void SetNetThread(NetWorkThread * t)
+        {
+            this->mNetThread = t;
+        };
+        AsioContext & GetContext() { return mNetThread->GetContext();}
 	private:
 		NetWorkThread * mNetThread;
+    };
+
+    template<typename T>
+    class ScoketHandler : public ISocketHandler
+    {
+    public:
+        SessionBase * CreateSocket() override
+        {
+            return new T(this);
+        };
+        void OnClose(SessionBase * socket) override
+        {
+            this->OnCloseSession(static_cast<T*>(socket));
+        };
+        void OnSessionErr(SessionBase * session, const asio::error_code & err) override
+        {
+            this->OnSessionError(static_cast<T*>(session), err);
+        }
+        void OnConnectRemote(SessionBase * session, const asio::error_code & err) override
+        {
+            this->OnConnectRemoteAfter(static_cast<T*>(session), err);
+        }
+        void OnListenConnect(SessionBase * session) override
+        {
+            if(!this->OnListenNewSession(static_cast<T*>(session)))
+            {
+                session->Close();
+            }
+        }
+        void OnReceiveNewMessage(SessionBase * session, SharedMessage message) override
+        {
+            if(!this->OnReceiveMessage(static_cast<T*>(session), message))
+            {
+                session->Close();
+            }
+
+        }
+    protected:
+        virtual void OnCloseSession(T * session) = 0;
+        virtual bool OnListenNewSession(T * session) = 0;
+        virtual bool OnReceiveMessage(T * session, SharedMessage message) = 0;
+        virtual void OnSessionError(T * session, const asio::error_code & err) = 0;
+        virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) = 0;
     };
 }

@@ -6,29 +6,24 @@
 #include <Pool/ObjectPool.h>
 
 #include <Other/DoubleBufferQueue.h>
-#include <NetWork/SocketEveHandler.h>
-
 namespace Sentry
 {
 	// 管理所有session
 	class TcpClientSession;
 
-	class TcpNetSessionComponent : public Component, public ISocketHandler
+	class TcpNetSessionComponent : public Component, public ScoketHandler<TcpClientSession>
 	{
 	public:
 		TcpNetSessionComponent();
 
-		virtual ~TcpNetSessionComponent()
-		{}
+		virtual ~TcpNetSessionComponent() {}
 
-	public:
-		void OnClose(SessionBase * socket) override;
-		SessionBase * CreateSocket(AsioContext & io) override;
-		void OnSessionErr(SessionBase * session, const asio::error_code & err) override;
-		void OnConnectRemote(SessionBase * session, const asio::error_code & err) override;
-		void OnListenConnect(NetWorkThread * netTask, SessionBase * session) override;
-		void OnReceiveNewMessage(SessionBase * session, SharedMessage message) override;
-
+    protected:
+		void OnCloseSession(TcpClientSession * socket) override;
+        bool OnListenNewSession(TcpClientSession * session) override;
+        bool OnReceiveMessage(TcpClientSession * session, SharedMessage message) override;
+        void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
+		void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
 	public:
 		TcpClientSession * ConnectRemote(const std::string &name, const std::string & ip, unsigned short port);
 
@@ -43,7 +38,7 @@ namespace Sentry
 		bool SendByAddress(const std::string & address, com::DataPacket_Request & message);
 		bool SendByAddress(const std::string & address, com::DataPacket_Response & message);
 	private:
-		bool SendByAddress(const std::string & address, DataMessageType type, unsigned short methodId, Message & message);
+		bool SendByAddress(const std::string & address, DataMessageType type, Message & message);
 	private:
 
 		TcpClientSession *GetSession(const std::string &address);
@@ -57,8 +52,7 @@ namespace Sentry
 
 	private:
 		char mMessageBuffer[1024 * 1024];
-		std::queue<std::string> mRecvSessionQueue;		
-		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
+		std::queue<std::string> mRecvSessionQueue;
 		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
 	private:
 		std::unordered_map<std::string, IRequestMessageHandler *> mRequestMsgHandlers;
