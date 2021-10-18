@@ -6,11 +6,10 @@
 #include <Pool/ObjectPool.h>
 
 #include <Other/DoubleBufferQueue.h>
+#include <Network/TcpClientSession.h>
 namespace Sentry
 {
 	// 管理所有session
-	class TcpClientSession;
-
 	class TcpNetSessionComponent : public Component, public ScoketHandler<TcpClientSession>
 	{
 	public:
@@ -19,12 +18,15 @@ namespace Sentry
 		virtual ~TcpNetSessionComponent() {}
 
     protected:
-		void OnCloseSession(TcpClientSession * socket) override;
+
+        void OnCloseSession(TcpClientSession * socket) override;
         bool OnListenNewSession(TcpClientSession * session) override;
         bool OnReceiveMessage(TcpClientSession * session, SharedMessage message) override;
         void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
 		void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
+        void OnSendMessageAfter(TcpClientSession *session, SharedMessage message, const asio::error_code &err) override;
 	public:
+        SessionBase * CreateSocket() { return new TcpClientSession(this);}
 		TcpClientSession * ConnectRemote(const std::string &name, const std::string & ip, unsigned short port);
 
 	protected:
@@ -53,7 +55,8 @@ namespace Sentry
 	private:
 		char mMessageBuffer[1024 * 1024];
 		std::queue<std::string> mRecvSessionQueue;
-		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
+        std::vector<TcpClientSession *> mSessionArray;
+        std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap;
 	private:
 		std::unordered_map<std::string, IRequestMessageHandler *> mRequestMsgHandlers;
 		std::unordered_map<std::string, IResponseMessageHandler *> mResponseMsgHandlers;

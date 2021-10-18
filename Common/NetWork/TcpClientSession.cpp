@@ -19,33 +19,6 @@ namespace Sentry
 		}    
     }
 
-	void TcpClientSession::OnStartConnect(std::string name, std::string ip, unsigned short port)
-	{
-        if(this->mSocket->is_open())
-        {
-            return;
-        }
-		this->mConnectCount++;
-		this->mSessionName = name;
-		auto address = asio::ip::make_address_v4(ip);
-		this->mAdress = ip + ":" + std::to_string(port);
-		asio::ip::tcp::endpoint endPoint(address, port);
-		this->mSocket->async_connect(endPoint, [this](const asio::error_code &error_code)
-		{
-			this->OnConnect(error_code);
-			if (error_code)
-			{
-				this->OnClose();
-				SayNoDebugWarning("Connect " << this->GetSessionName()
-					<< " fail count = " << this->mConnectCount << " error : " << error_code.message());
-				return;
-			}
-			this->mConnectCount = 0;
-		});
-		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
-	}
-
-
 	void TcpClientSession::OnStartReceive()
 	{
 		if (this->mRecvMsgBuffer == nullptr)
@@ -88,7 +61,7 @@ namespace Sentry
 			if (error_code)
 			{
 				this->OnClose();
-				SayNoDebugError(error_code.message());			
+				SayNoDebugError(error_code.message());
 			}
 			else
 			{

@@ -2,10 +2,10 @@
 #pragma once
 
 #include <Component/Component.h>
-
+#include <Http/HttpClientSession.h>
 namespace Sentry
 {
-    class HttpClientComponent : public Component
+    class HttpClientComponent : public Component//, public ScoketHandler<HttpClientSession>
     {
     public:
         HttpClientComponent()
@@ -14,6 +14,13 @@ namespace Sentry
         ~HttpClientComponent()
         {}
 
+    protected:
+//        SessionBase * CreateSocket() override { return nullptr; }
+//         void OnCloseSession(HttpClientSession * session) override;
+//         bool OnListenNewSession(HttpClientSession * session) override;
+//         bool OnReceiveMessage(HttpClientSession * session, SharedMessage message) override;
+//         void OnSessionError(HttpClientSession * session, const asio::error_code & err) override;
+//         void OnConnectRemoteAfter(HttpClientSession * session, const asio::error_code & err) override;
     public:
         bool Awake() final;
         void Start() final;

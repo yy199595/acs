@@ -26,6 +26,10 @@
             "port":7789,
             "count":10000,
             "handler":"TcpNetSessionComponent"
+        },
+        "http":
+        {
+            "handler":"HttpClientComponent"
         }
     },
     "NetWork": {

@@ -25,25 +25,37 @@ namespace Sentry
 			{
 				continue;
 			}
-
             ListenConfig listenConfig;
+            listenConfig.Port = 0;
+
+            if(iter->value.HasMember("potr"))
+            {
+                listenConfig.Port = iter->value["port"].GetUint();
+                listenConfig.Count = iter->value["count"].GetInt();
+            }
             listenConfig.Name = iter->name.GetString();
-            listenConfig.Port = iter->value["port"].GetUint();
-            listenConfig.Count = iter->value["count"].GetInt();
             listenConfig.Handler = iter->value["handler"].GetString();;
 
-			if (!dynamic_cast<ISocketHandler*>(this->gameObject->GetComponentByName(listenConfig.Handler)))
-			{
-				return false;
-			}
+            Component * component = this->gameObject->GetComponentByName(listenConfig.Handler);
+
+			auto socketHandler = dynamic_cast<ISocketHandler*>(component);
+			if(socketHandler == nullptr)
+            {
+                SayNoDebugError("not find socket handler " << listenConfig.Handler);
+                return false;
+            }
 			NetWorkThread * netThread = taskComponent->NewNetworkThread(listenConfig.Name, nullptr);
 			if (netThread == nullptr)
 			{
+                SayNoDebugError("create " << listenConfig.Name << " thread failure");
 				return false;
 			}
-			auto listener = new NetworkListener(netThread, listenConfig);
-			this->mListenerMap.insert(std::make_pair(listenConfig.Name, listener));
-
+            if(listenConfig.Port !=0)
+            {
+                auto listener = new NetworkListener(netThread, listenConfig);
+                this->mListenerMap.insert(std::make_pair(listenConfig.Name, listener));
+            }
+            socketHandler->SetNetThread(netThread);
 		}
 		return true;
     }

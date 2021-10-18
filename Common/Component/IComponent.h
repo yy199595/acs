@@ -73,7 +73,7 @@ namespace Sentry
         virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
 		virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
 		virtual void OnReceiveNewMessage(SessionBase * session, SharedMessage message) = 0;
-		
+		virtual void OnSendMessage(SessionBase * session, SharedMessage message, const asio::error_code & err) = 0;
 	public:
         NetWorkThread * GetNetThread()
         {
@@ -92,10 +92,6 @@ namespace Sentry
     class ScoketHandler : public ISocketHandler
     {
     public:
-        SessionBase * CreateSocket() override
-        {
-            return new T(this);
-        };
         void OnClose(SessionBase * socket) override
         {
             this->OnCloseSession(static_cast<T*>(socket));
@@ -121,7 +117,11 @@ namespace Sentry
             {
                 session->Close();
             }
+        }
 
+        void OnSendMessage(SessionBase *session, SharedMessage message, const asio::error_code &err) override
+        {
+            this->OnSendMessageAfter(static_cast<T*>(session), message, err);
         }
     protected:
         virtual void OnCloseSession(T * session) = 0;
@@ -129,5 +129,6 @@ namespace Sentry
         virtual bool OnReceiveMessage(T * session, SharedMessage message) = 0;
         virtual void OnSessionError(T * session, const asio::error_code & err) = 0;
         virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) = 0;
+        virtual void OnSendMessageAfter(T * session, SharedMessage message, const asio::error_code & err) = 0;
     };
 }

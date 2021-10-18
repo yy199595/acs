@@ -14,7 +14,6 @@ namespace Sentry
 
     }
 
-
     bool TcpNetSessionComponent::Awake()
     {
 		SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
@@ -35,8 +34,6 @@ namespace Sentry
 				this->mResponseMsgHandlers.emplace(component->GetTypeName(), resHandler);
 			}
 		}
-		SayNoAssertRetFalse_F(!this->mRequestMsgHandlers.empty() && !this->mResponseMsgHandlers.empty());
-
         return true;
     }
 
@@ -52,7 +49,7 @@ namespace Sentry
 		{
 			this->mSessionAdressMap.erase(iter);
 			SayNoDebugError("remove tcp socket " << address);
-			delete socket;			
+			delete socket;
 		}
 	}
 
@@ -66,8 +63,8 @@ namespace Sentry
 			{
 				std::string ip;
 				unsigned short port;
+                const std::string & name = clientSession->GetName();
 				StringHelper::ParseIpAddress(address, ip, port);
-				const std::string & name = clientSession->GetSessionName();
 				clientSession->StartConnect(name, ip, port);
 			}
 			else
@@ -82,6 +79,11 @@ namespace Sentry
 			}
 		}
 	}
+
+    void TcpNetSessionComponent::OnSendMessageAfter(TcpClientSession *session, SharedMessage message, const asio::error_code &err)
+    {
+
+    }
 
 	void TcpNetSessionComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
 	{
@@ -152,9 +154,8 @@ namespace Sentry
 		}
 		AsioContext & io = this->GetNetThread()->GetContext();
 		SharedTcpSocket socket = make_shared<AsioTcpSocket>(io);
-		TcpClientSession * clientSession = new TcpClientSession(this);
 
-		clientSession->SetSocket(socket);
+		auto clientSession = new TcpClientSession(this);
 		clientSession->StartConnect(name, ip, port);
 		return clientSession;
 

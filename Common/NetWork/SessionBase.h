@@ -2,7 +2,7 @@
 
 #include<Method/MethodProxy.h>
 #include<Define/CommonTypeDef.h>
-
+#include<atomic>
 namespace Sentry
 {
 	enum DataMessageType
@@ -23,35 +23,42 @@ namespace Sentry
 		~SessionBase() { }
 	public:
 		void Close();
-		void SetSocket(SharedTcpSocket socket);
 		AsioTcpSocket & GetSocket() { return *mSocket; }
-		ISocketHandler & GetHandler() { return *mHandler; }
-		AsioContext & GetContext() { return this->mContext; }
+        AsioContext & GetContext() { return this->mContext; }
 	public:
-		void StartReceive();
-		virtual const std::string & GetAddress() = 0;
-		void StartConnect(std::string name, std::string ip, unsigned short port);
+        const std::string & GetName() { return this->mName; }
+        const std::string & GetLocalAddress() { return this->mLocalAddress;};
+        const std::string & GetRemoteAddress() { return this->mRemoteAddress;};
+		void StartConnect(std::string name, std::string host, unsigned short port);
+        const std::string & GetAddress() { return this->mIsConnected ? this->mLocalAddress : this->mRemoteAddress;}
 	public:
-		bool IsActive();
-		bool SendNetMessage(SharedMessage message);
-		bool IsConnected() { return this->mIsConnected; }
+        void OnListenDone();
+        bool SendNetMessage(SharedMessage message);
+        bool IsActive() { return this->mIsOpen; }
+        bool IsConnected() { return this->mIsConnected; }
 	protected:
 		void OnClose();
 		void OnError(const asio::error_code &err);
 		void OnConnect(const asio::error_code & err);
-		void OnReceiveMessage(const char * msg, size_t size);
+		void OnReceiveMessage(const char * msg, size_t size); //子类调用
 	protected:
 		virtual void OnStartReceive() = 0;
-		virtual void OnStartConnect(std::string name, std::string ip, unsigned short port) = 0;
 	private:
 		void OnSendMessage(SharedMessage message);
-	protected:
-		SharedTcpSocket mSocket;
-	private:
-		bool mIsOpen;
+        void ConnectHandler(const asio::error_code & err);
+        void OnStartConnect(std::string name, std::string ip, unsigned short port);
+    protected:
+        std::string mName;
+        SharedTcpSocket mSocket;
+    private:
+        std::string mLocalAddress;
+        std::string mRemoteAddress;
+    private:
 		bool mIsConnected;
-		AsioContext & mContext;		
+        int mConnectCount;
+        AsioContext & mContext;
 		ISocketHandler * mHandler;
 		MainTaskScheduler & mTaskScheduler;
+        std::atomic_bool mIsOpen;
 	};
 }

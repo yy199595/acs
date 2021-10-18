@@ -18,6 +18,30 @@ namespace Sentry
         return true;
     }
 
+//    void HttpClientComponent::OnCloseSession(HttpClientSession * session)
+//    {
+//
+//    }
+//
+//    bool HttpClientComponent::OnListenNewSession(HttpClientSession * session)
+//    {
+//        return false;
+//    }
+//
+//    bool HttpClientComponent::OnReceiveMessage(HttpClientSession * session, SharedMessage message)
+//    {
+//        return true;
+//    }
+//
+//    void HttpClientComponent::OnSessionError(HttpClientSession * session, const asio::error_code & err)
+//    {
+//
+//    }
+//    void HttpClientComponent::OnConnectRemoteAfter(HttpClientSession * session, const asio::error_code & err)
+//    {
+//
+//    }
+
     void HttpClientComponent::Start()
     {
         std::string json ;
@@ -40,10 +64,7 @@ namespace Sentry
 				SayNoDebugFatal(jsonValue[index]["name"].GetString() << " = "  << json);
 			}
 		}
-		
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
-       
-
     }
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)

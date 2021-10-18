@@ -17,7 +17,6 @@ namespace Sentry
 	void NetworkListener::StartListen(ISocketHandler * handler)
 	{
 		this->mSessionHandler = handler;
-        this->mSessionHandler->SetNetThread(this->mTaskThread);
         this->mTaskThread->AddTask(NewMethodProxy(&NetworkListener::ListenConnect, this));
 	}
 
@@ -54,9 +53,10 @@ namespace Sentry
 			const std::string & address = this->mSessionSocket->GetAddress();
 			SayNoDebugError(this->mName << " listen new socket " << address);
 #endif
-			this->mSessionSocket->StartReceive();
+            this->mSessionSocket->OnListenDone();
 			this->mTaskScheduler.AddMainTask(NewMethodProxy(
 				&ISocketHandler::OnListenConnect, this->mSessionHandler, this->mSessionSocket));
+            SayNoDebugInfo(this->mConfig.Name << " listen new socket " << this->mSessionSocket->GetAddress());
 		}
 		else
 		{		

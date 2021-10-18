@@ -7,10 +7,10 @@ namespace Sentry
     struct ListenConfig
     {
     public:
-        int Count;
+        int Count = 0;
         std::string Name;
         std::string Handler;
-        unsigned short Port;
+        unsigned short Port = 0;
     };
 
 	class ISocketHandler;
