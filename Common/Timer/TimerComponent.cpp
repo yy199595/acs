@@ -38,7 +38,7 @@ namespace Sentry
         return false;
     }
 
-    bool TimerComponent::AddTimer(long long ms, MethodProxy * func)
+    bool TimerComponent::AddTimer(long long ms, StaticMethod * func)
     {
         if (ms == 0)
         {

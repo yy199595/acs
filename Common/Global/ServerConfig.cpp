@@ -225,10 +225,24 @@ namespace Sentry
         return true;
     }
 
-
-    rapidjson::Value *ServerConfig::GetJsonValue(const std::string &k2)
+    rapidjson::Value *ServerConfig::GetJsonValue(const std::string k2)
     {
         auto iter = this->mMapConfigData.find(k2);
         return iter != this->mMapConfigData.end() ? iter->second : nullptr;
     }
+
+	rapidjson::Value *ServerConfig::GetJsonValue(const std::string k1, const std::string k2)
+	{
+		auto iter = this->mMapConfigData.find(k2);
+		if (iter != this->mMapConfigData.end())
+		{
+			if (!iter->second->IsObject())
+			{
+				return false;
+			}
+			auto iter1 = iter->second->FindMember(k2.c_str());
+			return iter1 != iter->second->MemberEnd() ? &iter1->value : nullptr;
+		}
+		return nullptr;
+	}
 }

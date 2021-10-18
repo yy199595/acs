@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <Define/CommonTypeDef.h>
+#include<NetWork/SessionBase.h>
 namespace Sentry
 {
 	class IFrameUpdate
@@ -56,28 +57,40 @@ namespace Sentry
         virtual void OnZeroRefresh() = 0;
     };
 
-
     class IRequestMessageHandler
     {
     public:
-        virtual bool OnRequestMessage(const std::string & address, SharedMessage message) = 0; //注意message内存释放
+        virtual bool OnRequestMessage(const std::string & address, SharedMessage message) = 0;
     };
 
     class IResponseMessageHandler
     {
     public:
-        virtual bool OnResponseMessage(const std::string & address, SharedMessage message) = 0; //注意message内存释放
+        virtual bool OnResponseMessage(const std::string & address, SharedMessage message) = 0;
     };
 }
 
 namespace Sentry
 {
+	class SessionBase;
+	class NetWorkThread;
     class TcpClientSession;
-    class ISessionHandler
+	
+    class ISocketHandler
     {
     public:
-        virtual void OnSessionError(TcpClientSession *session) = 0;
-        virtual void OnConnectComplete(TcpClientSession *session, bool isSuc) = 0;
-        virtual bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size) = 0;
+		
+		virtual void OnClose(SessionBase * socket) = 0;
+		virtual SessionBase * CreateSocket(AsioContext & io) = 0;
+		virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
+		virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
+		virtual void OnListenConnect(NetWorkThread * netTask, SessionBase * session) = 0;		
+		virtual void OnReceiveNewMessage(SessionBase * session, SharedMessage message) = 0;
+		
+	public:
+		virtual NetWorkThread * GetNetThread() { return mNetThread; };
+		void SetNetThread(NetWorkThread * t) { this->mNetThread = t; };
+	private:
+		NetWorkThread * mNetThread;
     };
 }

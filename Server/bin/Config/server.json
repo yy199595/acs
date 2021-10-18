@@ -13,9 +13,26 @@
         "ip": "127.0.0.1",
         "port": 7788
     },
-    "ListenAddress": {
-        "ip": "127.0.0.1",
-        "port": 7788
+    "Listener": {
+        "ip":"127.0.0.1",
+        "tcp":
+        {
+            "port":7788,
+            "count":10000,
+            "handler":""
+        },
+        "http":
+        {
+            "port":80,
+            "count":10000,
+            "handler":""
+        },
+        "telnet":
+        {
+            "port":1995,
+            "count":10000,
+            "handler":""
+        }
     },
     "NetWork": {
         "MsgTimeout": 0,

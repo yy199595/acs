@@ -7,7 +7,7 @@ namespace Sentry
 	class DelayTimer : public TimerBase
 	{
 	public:
-		DelayTimer(long long ms, MethodProxy * func)
+		DelayTimer(long long ms, StaticMethod * func)
 			: TimerBase(ms), mFunc(func) {}
 
 	public:
@@ -19,6 +19,6 @@ namespace Sentry
 			return true;
 		}
 	private:
-		MethodProxy * mFunc;
+		StaticMethod * mFunc;
 	};
 }// namespace Sentry

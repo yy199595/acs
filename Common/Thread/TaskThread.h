@@ -7,8 +7,10 @@
 #include <queue>
 #include <thread>
 #include <Define/CommonDef.h>
+#include <Other/DoubleBufferQueue.h>
 namespace Sentry
 {
+	class StaticMethod;
     class TaskPoolComponent;
     enum ThreadState
     {
@@ -70,14 +72,33 @@ namespace Sentry
     class NetWorkThread : public IThread
     {
     public:
-        NetWorkThread(TaskPoolComponent * taskComponent, class MethodProxy * method = nullptr);
+        NetWorkThread(TaskPoolComponent * taskComponent, class StaticMethod * method = nullptr);
     public:
         void AddTask(TaskProxy * task) final;
+		void AddTask(StaticMethod * task);
+		AsioContext & GetContext() { return *mAsioContext; }
     protected:
         void Update() final;
     private:
-        class MethodProxy * mMethodProxy;
+		AsioWork * mAsioWork;
+		AsioContext * mAsioContext;
+        StaticMethod * mMethodProxy;
         std::queue<unsigned int> mFinishTasks;
         DoubleBufferQueue<TaskProxy *> mWaitInvokeTask;
+		DoubleBufferQueue<StaticMethod *> mWaitInvokeMethod;
     };
+
+	class MainTaskScheduler
+	{
+	public:
+		MainTaskScheduler(StaticMethod * method);
+	public:
+		int Run();
+		void Stop();
+		void AddMainTask(StaticMethod * task);		
+	private:
+		bool mIsStop;
+		StaticMethod * mMainMethod;
+		DoubleBufferQueue<StaticMethod *> mTaskQueue;
+	};
 }// namespace Sentry

@@ -28,7 +28,7 @@ namespace Sentry
         HttpRequestTask(const std::string & url, AsioContext & io, std::string & res);
         ~HttpRequestTask();
     public:
-        int GetCode() { return this->mCode;}
+        XCode GetCode() { return this->mCode;}
         const std::string & GetData() { return this->mData;}
 
     public:
@@ -38,9 +38,10 @@ namespace Sentry
     private:
         void OnResponse(EHttpError err, std::istream & message);
     private:
-        int mCode;
+        XCode mCode;
         std::string & mData;
         unsigned int mCorId;
+		long long mStartTime;
         const std::string mHttpUrl;
         AsioContext & mAsioContext;
         HttpClientSession * mHttpClient;

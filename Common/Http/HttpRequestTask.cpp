@@ -58,16 +58,17 @@ namespace Sentry
         return true;
     }
 }
+#include<Util/TimeHelper.h>
 namespace Sentry
 {
     HttpRequestTask::HttpRequestTask(const std::string & url, AsioContext & io, std::string & res)
             :mHttpUrl(url), mAsioContext(io), mData(res)
-    {
-        this->mCode = 0;
+    {     
         this->mHttpClient = nullptr;
         this->mCorComponent = App::Get().GetCoroutineComponent();
         this->mCorId = this->mCorComponent->GetCurrentCorId();
         this->mTaskComponent = App::Get().GetComponent<TaskPoolComponent>();
+		this->mStartTime = TimeHelper::GetMilTimestamp();
     }
 
     HttpRequestTask::~HttpRequestTask() noexcept
@@ -80,28 +81,46 @@ namespace Sentry
 
     void HttpRequestTask::OnResponse(EHttpError err, HttpResponseStream & httpResponseStream)
     {
-        if(err != EHttpError::HttpSuccessful)
-        {
-            this->mCode = 1;
-            return;
-        }
+		switch (err)
+		{
+		case EHttpError::HttpConnectError:
+		case EHttpError::HttpReadError:
+		case EHttpError::HttpWriteError:
+			this->mCode = XCode::HttpNetWorkError;
+			break;
+		case EHttpError::HttpResolverError:
+			this->mCode = XCode::HostResolverError;
+			break;
+		}
+		int code = 0;
         std::string version;
-        httpResponseStream >> version >> this->mCode;
-        if (this->mCode != 200)
+        httpResponseStream >> version >> code;
+        if (code != 200)
         {
-            return;
+			std::string err;
+			while (std::getline(httpResponseStream, err))
+			{
+				SayNoDebugError(err);
+			}
+			this->mCode = XCode::HttpResponseError;
         }
-        std::string content;
-        while (std::getline(httpResponseStream, content))
-        {
-            if (content.size() == 1 && content == "\r")
-            {
-                break;
-            }
-        }
-        std::istreambuf_iterator<char> eos;
-        this->mData.append(std::istreambuf_iterator<char>(httpResponseStream), eos);
+		else
+		{
+			std::string content;
+			this->mCode = XCode::Successful;
+			while (std::getline(httpResponseStream, content))
+			{
+				if (content.size() == 1 && content == "\r")
+				{
+					break;
+				}
+			}
+			std::istreambuf_iterator<char> eos;
+			this->mData.append(std::istreambuf_iterator<char>(httpResponseStream), eos);
+		}
+       
         this->mTaskComponent->PushFinishTask(this->GetTaskId());
+		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - this->mStartTime) / 1000.0f);
     }
 
 
@@ -115,6 +134,7 @@ namespace Sentry
             SayNoDebugError("parse " << this->mHttpUrl << " failure");
             return true;
         }
+		SayNoDebugInfo("host = " << host << "  port = " << port);
 
         char buffer[1024] = {0};
         size_t size = sprintf(buffer, "GET %s HTTP/1.0\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", path.c_str(), host.c_str());

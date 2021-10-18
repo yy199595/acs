@@ -1,7 +1,6 @@
 #include "SocketEveHandler.h"
 #include <Core/App.h>
 #include <Scene/TcpNetSessionComponent.h>
-#include <Scene/TcpNetProxyComponent.h>
 namespace Sentry
 {
 	void MainSocketSendHandler::RunHandler(TcpNetSessionComponent * sessionComponent)

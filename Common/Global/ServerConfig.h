@@ -41,6 +41,10 @@ namespace Sentry
         bool GetValue(const std::string k1, const std::string k2, unsigned short & value);
         bool GetValue(const std::string k1, const std::string k2, std::vector<std::string> & value);
 
+
+		rapidjson::Value *GetJsonValue(const std::string k1);
+		rapidjson::Value *GetJsonValue(const std::string k1, const std::string k2);
+
     public:
         short GetNodeId()
         { return this->mNodeId; }
@@ -50,9 +54,6 @@ namespace Sentry
 
         const std::string &GetNodeName()
         { return this->mNodeName; }
-
-    private:
-        rapidjson::Value *GetJsonValue(const std::string &k2);
 
     private:
         unsigned short mAreaId;

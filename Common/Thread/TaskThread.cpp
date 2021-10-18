@@ -69,10 +69,11 @@ namespace Sentry
 
 namespace Sentry
 {
-    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, MethodProxy * method)
+    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, StaticMethod * method)
         : IThread(taskComponent), mMethodProxy(method)
     {
-
+		this->mAsioContext = new AsioContext(1);
+		this->mAsioWork = new AsioWork(*this->mAsioContext);
     }
 
     void NetWorkThread::AddTask(TaskProxy *task)
@@ -80,14 +81,22 @@ namespace Sentry
         this->mWaitInvokeTask.Add(task);
     }
 
-    void NetWorkThread::Update()
+	void NetWorkThread::AddTask(StaticMethod * task)
+	{
+		this->mWaitInvokeMethod.Add(task);
+	}
+
+	void NetWorkThread::Update()
     {
+		this->mAsioContext->poll();
         if(this->mMethodProxy)
         {
             this->mMethodProxy->run();
         }
         TaskProxy * taskProxy = nullptr;
+		StaticMethod * taskMethod = nullptr;
         this->mWaitInvokeTask.SwapQueueData();
+		this->mWaitInvokeMethod.SwapQueueData();
         while(this->mWaitInvokeTask.PopItem(taskProxy))
         {
             if(taskProxy->Run())
@@ -96,6 +105,11 @@ namespace Sentry
             }
         }
 
+		while (this->mWaitInvokeMethod.PopItem(taskMethod))
+		{
+			taskMethod->run();
+		}
+
         while (!this->mFinishTasks.empty())
         {
             unsigned int id = this->mFinishTasks.front();
@@ -103,6 +117,45 @@ namespace Sentry
             this->mTaskComponent->PushFinishTask(id);
         }
     }
+}
+
+namespace Sentry
+{
+	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
+		: mMainMethod(method)
+	{
+		this->mIsStop = false;
+	}
+
+	int MainTaskScheduler::Run()
+	{
+		StaticMethod * task = nullptr;
+		std::chrono::milliseconds time(1);
+		while (!this->mIsStop)
+		{
+			this_thread::sleep_for(time);
+			this->mMainMethod->run();
+			this->mTaskQueue.SwapQueueData();
+			while (this->mTaskQueue.PopItem(task))
+			{
+				task->run();
+				delete task;
+			}
+
+		}
+	}
+	void MainTaskScheduler::Stop()
+	{
+		this->mIsStop = true;
+	}
+	void MainTaskScheduler::AddMainTask(StaticMethod * task)
+	{
+		if (task == nullptr)
+		{
+			return;
+		}
+		this->mTaskQueue.Add(task);
+	}
 }
 
 // namespace Sentry

@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include<Protocol/s2s.pb.h>
-#include<Scene/TcpNetProxyComponent.h>
+#include<Component/Component.h>
 #include<Other/DoubleBufferQueue.h>
-
 
 namespace Sentry
 {
@@ -34,7 +33,7 @@ namespace Sentry
     private:
         int mNodeId;
         class CoroutineComponent *mCorComponent;
-        class TcpNetProxyComponent *mNetProxyManager;
         class ProtocolComponent * mProtocolComponent;
+		class TcpNetSessionComponent *mNetSessionComponent;
     };
 }

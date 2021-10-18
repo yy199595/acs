@@ -5,150 +5,78 @@
 
 namespace Sentry
 {
-    TcpClientSession::TcpClientSession(AsioContext &io, ISessionHandler *manager, SharedTcpSocket socket)
-            : mAsioContext(io)
-    {
-        this->mBinTcpSocket = socket;
-        this->mSessionType = SessionClient;
-        if (this->mBinTcpSocket != nullptr)
-        {
-            this->mSessionHandler = manager;
-            this->mSocketEndPoint = socket->remote_endpoint();
-            this->InitMember(this->mSocketEndPoint.address().to_string(), this->mSocketEndPoint.port());
-        }
-    }
-
-    TcpClientSession::TcpClientSession(AsioContext &io, ISessionHandler *manager, std::string name, std::string ip,
-                                       unsigned short port)
-            : mAsioContext(io)
-    {
-        asio::error_code ec;
-        this->mSessionName = name;
-        this->InitMember(ip, port);
-        this->mSessionHandler = manager;
-        this->mSessionType = SessionNode;
-        try
-        {
-            auto address = asio::ip::make_address_v4(mIp);
-            this->mSocketEndPoint = asio::ip::tcp::endpoint(address, mPort);
-        }
-        catch(const asio::error_code & err)
-        {
-            SayNoDebugError(err.message());
-        }
-    }
-
-    void TcpClientSession::InitMember(const std::string &ip, unsigned short port)
-    {
-        this->mIp = ip;
-        this->mPort = port;
-        this->mConnectCount = 0;
-        this->mRecvBufferSize = 1024;
-        this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
-        this->mAdress = this->mIp + ":" + std::to_string(this->mPort);
+    TcpClientSession::TcpClientSession(ISocketHandler * handler)
+            : SessionBase(handler)
+    {      
+		this->mRecvBufferSize = 1024;
+		this->mRecvMsgBuffer = nullptr;
     }
 
     TcpClientSession::~TcpClientSession()
     {
-        delete[]this->mRecvMsgBuffer;
+		if (this->mRecvMsgBuffer != nullptr)
+		{
+			delete[]this->mRecvMsgBuffer;
+		}    
     }
 
-    bool TcpClientSession::IsActive()
-    {
-        return this->mBinTcpSocket != nullptr && this->mBinTcpSocket->is_open();
-    }
-
-	bool TcpClientSession::SendPackage(SharedMessage message)
+	void TcpClientSession::OnStartConnect(std::string name, std::string ip, unsigned short port)
 	{
-		if (message == nullptr || message->empty())
+		if (this->mSocket == nullptr)
 		{
-			return false;
+			this->mSocket = std::make_shared<AsioTcpSocket>(this->GetContext());
 		}
-		if (!this->mBinTcpSocket || !this->mBinTcpSocket->is_open())
+		if (this->mSocket->is_open())
 		{
-			return false;
-		}
-
-		mBinTcpSocket->async_send(asio::buffer(message->c_str(), message->size()),
-			[this, message](const asio::error_code &error_code, std::size_t size) 
-		{
-			if (error_code)
-			{
-				this->StartClose();
-			}
-		});
-		return true;
-	}
-
-	bool TcpClientSession::StartConnect()
-	{
-		if (this->IsActive() || this->mSessionType != SessionNode)
-		{
-			return false;
+			return;
 		}
 		this->mConnectCount++;
-		if (this->mBinTcpSocket == nullptr)
+		this->mSessionName = name;
+		auto address = asio::ip::make_address_v4(ip);
+		this->mAdress = ip + ":" + std::to_string(port);
+		asio::ip::tcp::endpoint endPoint(address, port);
+		this->mSocket->async_connect(endPoint, [this](const asio::error_code &error_code)
 		{
-			this->mBinTcpSocket = std::make_shared<AsioTcpSocket>(this->mAsioContext);
-		}
-		this->mBinTcpSocket->async_connect(this->mSocketEndPoint, [this](const asio::error_code &error_code) {
+			this->OnConnect(error_code);
 			if (error_code)
 			{
-				this->StartClose();
+				this->OnClose();
 				SayNoDebugWarning("Connect " << this->GetSessionName()
-					<< " fail count = " << this->mConnectCount << " error : "<< error_code.message());
-                this->mSessionHandler->OnConnectComplete(this, false);
+					<< " fail count = " << this->mConnectCount << " error : " << error_code.message());
+				return;
 			}
-			else
-			{
-				this->mConnectCount = 0;
-                this->mSessionHandler->OnConnectComplete(this, true);
-			}
+			this->mConnectCount = 0;
 		});
 		SayNoDebugLog(this->GetSessionName() << " start connect " << this->mAdress);
-		return true;
 	}
 
-    void TcpClientSession::StartClose()
-    {
-        if (this->mBinTcpSocket != nullptr && this->mBinTcpSocket->is_open())
-        {
-            asio::error_code closeCode;
-            this->mBinTcpSocket->shutdown(asio::socket_base::shutdown_send, closeCode);
-            this->mBinTcpSocket->shutdown(asio::socket_base::shutdown_receive, closeCode);
-            this->mBinTcpSocket->close(closeCode);
-        }
-        this->mBinTcpSocket = nullptr;
-    }
 
-	bool TcpClientSession::StartReceiveMsg()
+	void TcpClientSession::OnStartReceive()
 	{
-		if (!this->IsActive())
+		if (this->mRecvMsgBuffer == nullptr)
 		{
-			return false;
+			this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
 		}
-		this->mBinTcpSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
-			[this](const asio::error_code &error_code, const std::size_t t) 
+		this->mSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
+			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			if (error_code)
 			{
-				this->StartClose();
-				SayNoDebugError(error_code.message());
-				this->mSessionHandler->OnSessionError(this);
+				this->OnClose();
+				SayNoDebugError(error_code.message());			
 			}
 			else
 			{
 				size_t packageSize = 0;
 				memcpy(&packageSize, this->mRecvMsgBuffer, t);
-                if(packageSize >= 1024 * 10) //最大为10k
-                {
-                    this->StartClose();
-                    return;
-                }
+				if (packageSize >= 1024 * 10) //最大为10k
+				{
+					this->OnClose();
+					return;
+				}
 				this->ReadMessageBody(packageSize);
 			}
 		});
-		return true;
 	}
 
 	void TcpClientSession::ReadMessageBody(const size_t allSize)
@@ -159,24 +87,18 @@ namespace Sentry
 			nMessageBuffer = new char[allSize];
 		}
 
-		this->mBinTcpSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),
+		this->mSocket->async_read_some(asio::buffer(nMessageBuffer, allSize),
 			[this, nMessageBuffer](const asio::error_code &error_code,
 				const std::size_t messageSize) {
 			if (error_code)
 			{
-				this->StartClose();
-				SayNoDebugError(error_code.message());
-				this->mSessionHandler->OnSessionError(this);
+				this->OnClose();
+				SayNoDebugError(error_code.message());			
 			}
 			else
 			{
-				if (!this->mSessionHandler->OnRecvMessage(this, nMessageBuffer,
-					messageSize))
-				{
-					this->StartClose();
-					SayNoDebugError("parse message fail close socket " << mAdress);
-				}
-			}
+				this->OnReceiveMessage(nMessageBuffer, messageSize);				
+			}	
 			if (nMessageBuffer != this->mRecvMsgBuffer)
 			{
 				delete[]nMessageBuffer;

@@ -36,3 +36,8 @@ RedisReplyIsNull	Redis回复是空
 RedisInvokeFailure	Rsedis命令执行失败
 AccountAlreadyExists	账号已经存在
 AccountNotExists	账号不存在
+HttpTaskStarFail	Http任务启动失败
+HttpUrlParseError	HttpUrl解析失败
+HostResolverError	Host主机没发现
+HttpNetWorkError	Http网络错误
+HttpResponseError	Http服务器返回错误

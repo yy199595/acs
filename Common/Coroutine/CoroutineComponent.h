@@ -22,7 +22,7 @@ namespace Sentry
 		}
 
 	private:
-		unsigned int StartCoroutine(MethodProxy * func);
+		unsigned int StartCoroutine(StaticMethod * func);
 	public:
 		void YieldReturn();
 

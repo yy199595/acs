@@ -35,7 +35,7 @@ namespace Sentry
 
         void PushFinishTask(std::queue<unsigned int> & tasks);
 
-        NetWorkThread * NewNetworkThread(const std::string & name, class MethodProxy * method);
+        NetWorkThread * NewNetworkThread(const std::string & name, class StaticMethod * method);
 
         const std::vector<TaskThread *> GetThreads() { return this->mThreadArray;}
     private:

@@ -10,10 +10,10 @@
 
 namespace Sentry
 {
-	// 管理所有session  在网络线程中运行
+	// 管理所有session
 	class TcpClientSession;
 
-    class TcpNetSessionComponent : public Component, public ITcpContextUpdate, public ISessionHandler
+	class TcpNetSessionComponent : public Component, public ISocketHandler
 	{
 	public:
 		TcpNetSessionComponent();
@@ -21,48 +21,47 @@ namespace Sentry
 		virtual ~TcpNetSessionComponent()
 		{}
 
-	public: //网络线程调用
-
-		void OnSessionError(TcpClientSession *session) override;
-
-        void OnConnectComplete(TcpClientSession *session, bool isSuc) override;
-
-        bool OnRecvMessage(TcpClientSession *session, const char *message, const size_t size) override;
-
-
-    public:
-		bool PushEventHandler(SocketEveHandler *eve);
+	public:
+		void OnClose(SessionBase * socket) override;
+		SessionBase * CreateSocket(AsioContext & io) override;
+		void OnSessionErr(SessionBase * session, const asio::error_code & err) override;
+		void OnConnectRemote(SessionBase * session, const asio::error_code & err) override;
+		void OnListenConnect(NetWorkThread * netTask, SessionBase * session) override;
+		void OnReceiveNewMessage(SessionBase * session, SharedMessage message) override;
 
 	public:
-		TcpClientSession *Create(shared_ptr<AsioTcpSocket> socket);
-
-		TcpClientSession *Create(const std::string &name, const std::string &address);
+		TcpClientSession * ConnectRemote(const std::string &name, const std::string & ip, unsigned short port);
 
 	protected:
 		bool Awake() override;
 
 		void OnDestory() override;
 
-		void OnTcpContextUpdate(AsioContext & io) final;
-
 	public:
-		bool StartClose(const std::string &address);
-		bool StartConnect(const std::string & address, const std::string & name);
-        bool StartSendMessage(const std::string & address, SharedMessage message);
-
-    private:
-		
+		bool CloseSession(const std::string &address);
+		bool SendByAddress(const std::string & address, SharedMessage message);
+		bool SendByAddress(const std::string & address, com::DataPacket_Request & message);
+		bool SendByAddress(const std::string & address, com::DataPacket_Response & message);
+	private:
+		bool SendByAddress(const std::string & address, DataMessageType type, unsigned short methodId, Message & message);
+	private:
 
 		TcpClientSession *GetSession(const std::string &address);
 
 	private:
+		class ActionComponent * mActionComponent;
+		class ServiceMgrComponent * mServiceComponent;
 
-		class TcpNetProxyComponent *mNetProxyComponent;
+		class TcpNetSessionComponent *mNetWorkManager;
+		class ProtocolComponent *mProtocolComponent;
 
 	private:
-		std::queue<std::string> mRecvSessionQueue;
-        class ProtocolComponent * mProtocolComponent;
-        DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
+		char mMessageBuffer[1024 * 1024];
+		std::queue<std::string> mRecvSessionQueue;		
+		DoubleBufferQueue<SocketEveHandler *> mNetEventQueue;
 		std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap; //所有session
+	private:
+		std::unordered_map<std::string, IRequestMessageHandler *> mRequestMsgHandlers;
+		std::unordered_map<std::string, IResponseMessageHandler *> mResponseMsgHandlers;
 	};
 }

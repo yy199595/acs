@@ -37,5 +37,10 @@ enum XCode
 	RedisReplyIsNull = 33,//Redis回复是空
 	RedisInvokeFailure = 34,//Rsedis命令执行失败
 	AccountAlreadyExists = 35,//账号已经存在
-	AccountNotExists = 36//账号不存在
+	AccountNotExists = 36,//账号不存在
+	HttpTaskStarFail = 37,//Http任务启动失败
+	HttpUrlParseError = 38,//HttpUrl解析失败
+	HostResolverError = 39,//Host主机没发现
+	HttpNetWorkError = 40,//Http网络错误
+	HttpResponseError = 41//Http服务器返回错误
 };

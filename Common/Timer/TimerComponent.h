@@ -21,14 +21,14 @@ namespace Sentry
 		template<typename F,typename O, typename ... Args>
 		bool AddTimer(long long ms, F && f, O * o, Args &&... args) {
 
-			MethodProxy * methodProxy = NewMethodProxy(
+			StaticMethod * methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);
 		}
 
         shared_ptr<TimerBase> GetTimer(long long id);
 	private:
-		bool AddTimer(long long ms, MethodProxy * func);
+		bool AddTimer(long long ms, StaticMethod * func);
 
     public:
         template<typename T, typename... Args>

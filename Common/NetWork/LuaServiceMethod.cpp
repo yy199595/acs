@@ -2,7 +2,6 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/TcpNetProxyComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
 namespace Sentry

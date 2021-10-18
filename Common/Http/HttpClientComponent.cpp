@@ -8,6 +8,7 @@
 #include<Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Http/HttpRequestTask.h>
+#include<Util/JsonHelper.h>
 namespace Sentry
 {
     bool HttpClientComponent::Awake()
@@ -20,10 +21,28 @@ namespace Sentry
     void HttpClientComponent::Start()
     {
         std::string json ;
-        this->Get("http://timor.tech/api/holiday/year", json);
-        SayNoDebugFatal(json);
-        this->Get("https://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json", json);
-        SayNoDebugError(json);
+		long long t1 = TimeHelper::GetMilTimestamp();
+		
+		
+		
+       this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
+		rapidjson::Document doc;
+
+		if (!doc.Parse(json.c_str(), json.size()).HasParseError())
+		{
+			rapidjson::Value & jsonValue = doc["result"];
+			for (unsigned int index = 0; index < jsonValue.Size(); index++)
+			{
+				char buffer[256] = { 0 };
+				std::string id = jsonValue[index]["id"].GetString();
+				size_t size = sprintf(buffer, "http://apis.juhe.cn/xzqh/query?fid=%s&key=f5c417a28abf995d7ce6312b29556fd9", id.c_str());
+				this->Get(std::string(buffer, size), json);
+				SayNoDebugFatal(jsonValue[index]["name"].GetString() << " = "  << json);
+			}
+		}
+		
+		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
+       
 
     }
 
@@ -34,23 +53,17 @@ namespace Sentry
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
+		json.clear();
         if (this->mCorComponent->IsInMainCoroutine())
         {
             return XCode::NoCoroutineContext;
-        }
-        json.clear();
+        }  
         HttpRequestTask httpTask(url, App::Get().GetHttpContext(), json);
-        this->mTaskComponent->StartTask("Http", &httpTask);
-        this->mCorComponent->YieldReturn();
-
-        if (httpTask.GetCode() == 0)
-        {
-            return XCode::Successful;
-        }
-        if (httpTask.GetCode() == 1)
-        {
-            return XCode::NetWorkError;
-        }
-        return XCode::Failure;
+		if (!this->mTaskComponent->StartTask("Http", &httpTask))
+		{
+			return XCode::HttpTaskStarFail;
+		}		
+        this->mCorComponent->YieldReturn();  
+		return httpTask.GetCode();
     }
 }

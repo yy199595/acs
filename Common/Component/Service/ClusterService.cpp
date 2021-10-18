@@ -38,7 +38,7 @@ namespace Sentry
 
 		registerInfo.set_areaid(this->mAreaId);
 		registerInfo.set_nodeid(this->mNodeId);
-		registerInfo.set_address(listenComponent->GetAddress());
+		//TODO
 		registerInfo.set_servername(App::Get().GetServerName());
 		XCode code = centerNode->Call("CenterService", "Add", registerInfo, responseInfo);
 		if (code != XCode::Successful)

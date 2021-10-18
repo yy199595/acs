@@ -22,7 +22,7 @@ namespace Sentry
         ~Coroutine();
     public:
         size_t mStackSize;
-		MethodProxy * mFunction;
+		StaticMethod * mFunction;
 #ifdef __COROUTINE_ASM__
 		int sid;
 		char * mStackTop;

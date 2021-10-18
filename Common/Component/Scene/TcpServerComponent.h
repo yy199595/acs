@@ -1,9 +1,28 @@
 ﻿#pragma once
 
 #include <Component/Component.h>
+
+namespace Sentry
+{
+	struct NetListenerInfo
+	{
+	public:
+		std::string Name;
+		unsigned int Count;
+		unsigned short Port;
+		std::string ListenIp;
+		AsioWork * TcptWork;
+		AsioContext * TcpContext;
+		std::string HandlerComponent;
+		class NetWorkThread * NetThread;
+		class NetworkListener * TcpListener;
+	};
+}
+
 namespace Sentry
 {
 	// 处理外部连接进来的session
+	class NetworkListener;
 	class TcpNetSessionComponent;
 	class TcpServerComponent : public Component, public ITcpContextUpdate
 	{
@@ -12,22 +31,11 @@ namespace Sentry
 
 		~TcpServerComponent() {}
 
-	public:
-		const std::string &GetAddress() { return mListenAddress; }
-
 	protected:
 		bool Awake() override;
-		void Start() override;
-		void OnTcpContextUpdate(AsioContext & io) final;
-
-	private:
-		bool mIsAccept;
-        int mMaxConnectCount;
-		std::string mListenerIp;    //监听的ip
-		std::string mListenAddress;            //地址
-		unsigned short mListenerPort;
-		AsioTcpAcceptor *mBindAcceptor;
-		TcpNetSessionComponent *mDispatchManager;
+		void Start() override;		
+	private:		
 		std::set<std::string> mWhiteList;    //白名单
+		std::unordered_map<std::string, NetworkListener *> mListenerMap;
 	};
 }

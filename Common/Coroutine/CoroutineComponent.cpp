@@ -207,7 +207,7 @@ namespace Sentry
 		return group;
 	}
 
-	unsigned int CoroutineComponent::StartCoroutine(MethodProxy * func)
+	unsigned int CoroutineComponent::StartCoroutine(StaticMethod * func)
 	{
 		Coroutine * coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)

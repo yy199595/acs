@@ -7,6 +7,7 @@
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
 #include <NetWork/LuaServiceMethod.h>
+#include<Scene/TcpNetSessionComponent.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()
@@ -16,8 +17,8 @@ namespace Sentry
         SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
 
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-        SayNoAssertRetFalse_F(this->mNetProxyManager = this->GetComponent<TcpNetProxyComponent>());
         SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		SayNoAssertRetFalse_F(this->mNetSessionComponent = this->GetComponent<TcpNetSessionComponent>());
         return true;
     }
 
@@ -67,7 +68,7 @@ namespace Sentry
                 responseMessage.set_messagedata(responseContent);
 				responseMessage.set_rpcid(requestMessage.rpcid());
                 responseMessage.set_userid(requestMessage.userid());   
-                this->mNetProxyManager->SendNetMessage(address, responseMessage);
+                this->mNetSessionComponent->SendByAddress(address, responseMessage);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步
@@ -102,7 +103,8 @@ namespace Sentry
             responseMessage.set_messagedata(responseContent);
             responseMessage.set_userid(requestMessage.userid());
             responseMessage.set_methodid(requestMessage.methodid());
-            this->mNetProxyManager->SendNetMessage(address, responseMessage);
+			//TODO
+           // this->mNetProxyManager->SendNetMessage(address, responseMessage);
         }
     }
 }// namespace Sentry

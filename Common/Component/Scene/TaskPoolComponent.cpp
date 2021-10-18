@@ -28,7 +28,7 @@ namespace Sentry
 		
     }
 
-    NetWorkThread * TaskPoolComponent::NewNetworkThread(const std::string & name,MethodProxy * method)
+    NetWorkThread * TaskPoolComponent::NewNetworkThread(const std::string & name,StaticMethod * method)
     {
         auto iter = this->mNetThread.find(name);
         if(iter == this->mNetThread.end())

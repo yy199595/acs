@@ -10,6 +10,7 @@
 #include <Object/GameObject.h>
 
 #include <Timer/TimerComponent.h>
+#include <Thread/TaskThread.h>
 #include <Coroutine/CoroutineComponent.h>
 using namespace std;
 using namespace asio::ip;
@@ -19,6 +20,7 @@ namespace Sentry
 	class Manager;
 
 	class ServiceComponent;
+	class MainTaskScheduler;
 
 	class App : public GameObject
 	{
@@ -58,6 +60,11 @@ namespace Sentry
         {
             return *mHttpContext;
         }
+
+		inline MainTaskScheduler & GetTaskScheduler()
+		{
+			return this->mTaskScheduler;
+		}
 
 		long long GetRunTime()
 		{
@@ -114,16 +121,18 @@ namespace Sentry
 	private:
 		void UpdateConsoleTitle();
 	private:
-		int LogicMainLoop();
+		void LogicMainLoop();
 
 		void TcpThreadLoop();
 
         void HttpThreadLoop();
 	private:
+		
         long long mNextRefreshTime;
 		std::thread::id mMainThreadId;
 		std::thread::id mTcpThreadId;
         std::thread::id mHttpThreadId;
+		class MainTaskScheduler mTaskScheduler;
     private:
         AsioWork * mTcpWork;
         AsioWork * mHttpWork;
@@ -131,6 +140,11 @@ namespace Sentry
         AsioContext * mHttpContext;
         std::thread * mTcpWorkThread;
         std::thread * mHttpWoekThread;
+	private:
+		int mFps;
+		long long mStartTimer;
+		long long mSecondTimer;
+		long long mLogicUpdateInterval;
 	private:
 		bool mIsClose;
 		bool mIsInitComplate;
