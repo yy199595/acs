@@ -51,7 +51,7 @@ namespace Sentry
 		{			
 #ifdef _DEBUG
 			const std::string & address = this->mSessionSocket->GetAddress();
-			SayNoDebugError(this->mName << " listen new socket " << address);
+			SayNoDebugError(this->mConfig.Name << " listen new socket " << address);
 #endif
             this->mSessionSocket->OnListenDone();
 			this->mTaskScheduler.AddMainTask(NewMethodProxy(

@@ -143,6 +143,7 @@ namespace Sentry
 				delete task;
 			}
 		}
+		return 0;
 	}
 	void MainTaskScheduler::Stop()
 	{
