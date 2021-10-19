@@ -25,11 +25,11 @@ namespace Sentry
         bool Awake() final;
 
     public:
-        bool OnRequestMessage(const std::string & address, SharedMessage message) final;
+        bool OnRequestMessage(const com::DataPacket_Request * message) final;
 
         virtual int GetPriority() { return 500; }
 	private:
-        void Invoke(ServiceMethod * method, std::string &address, SharedMessage message);
+        void Invoke(ServiceMethod * method, const com::DataPacket_Request * request);
     private:
         int mNodeId;
         class CoroutineComponent *mCorComponent;

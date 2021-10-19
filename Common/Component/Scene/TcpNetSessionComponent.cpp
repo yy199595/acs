@@ -19,21 +19,6 @@ namespace Sentry
 		SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
 		SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
 		SayNoAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
-		
-
-		std::vector<Component *> components;
-		this->gameObject->GetComponents(components);
-		for (Component * component : components)
-		{
-			if (auto reqHandler = dynamic_cast<IRequestMessageHandler*>(component))
-			{
-				this->mRequestMsgHandlers.emplace(component->GetTypeName(), reqHandler);
-			}
-			if (auto resHandler = dynamic_cast<IResponseMessageHandler*>(component))
-			{
-				this->mResponseMsgHandlers.emplace(component->GetTypeName(), resHandler);
-			}
-		}
         return true;
     }
 
@@ -108,38 +93,47 @@ namespace Sentry
 		}
         return true;
 	}
+
 	bool TcpNetSessionComponent::OnReceiveMessage(TcpClientSession *session, SharedMessage message)
 	{
-		unsigned short methodId = 0;
+        const char * heard = message->c_str() + 1;
 		const std::string & address = session->GetAddress();
-        memcpy(&methodId, message->c_str(), sizeof(methodId));
-        const ProtocolConfig * protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
-
-		if (protocolConfig == nullptr)
-		{
-			return false;
-		}
-
 		auto messageType = (DataMessageType)message->at(0);
 		if (messageType == DataMessageType::TYPE_REQUEST)
 		{
-			const std::string &handler = protocolConfig->RequestHandler;
-			auto iter = this->mRequestMsgHandlers.find(handler);
-			if (iter != this->mRequestMsgHandlers.end())
-			{
-				return iter->second->OnRequestMessage(address, message);
-			}
-			return this->mServiceComponent->OnRequestMessage(address, message);
+            this->mRequestData.Clear();
+            if(!this->mRequestData.ParseFromArray(heard, message->size() - 1))
+            {
+                return false;
+            }
+            unsigned short methodId = this->mRequestData.methodid();
+            if(this->mProtocolComponent->GetProtocolConfig(methodId) == nullptr)
+            {
+                return false;
+            }
+            this->mRequestData.set_address(address);
+            com::DataPacket_Request * request = this->mRequestData.New();
+            if(!this->mServiceComponent->OnRequestMessage(request))
+            {
+                delete request;
+                return false;
+            }
+            return true;
 		}
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
 		{
-			const std::string & handler = protocolConfig->RequestHandler;
-			auto iter = this->mResponseMsgHandlers.find(handler);
-			if (iter != this->mResponseMsgHandlers.end())
-			{
-				return iter->second->OnResponseMessage(address, message);
-			}
-			return this->mActionComponent->OnResponseMessage(address, message);
+            this->mResponseData.Clear();
+            if(!this->mResponseData.ParseFromArray(heard, message->size() - 1))
+            {
+                return false;
+            }
+            com::DataPacket_Response * response = this->mResponseData.New();
+            if(!this->mActionComponent->OnResponseMessage(response))
+            {
+                delete response;
+                return false;
+            }
+            return true;
 		}
         return false;
 	}

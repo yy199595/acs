@@ -22,7 +22,7 @@ namespace Sentry
 
     public:
         unsigned int AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
-        bool OnResponseMessage(const std::string & address, SharedMessage message) final;
+        bool OnResponseMessage(const com::DataPacket_Response * message) final;
     protected:
         bool Awake() override;
 

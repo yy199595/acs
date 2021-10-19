@@ -53,12 +53,11 @@ namespace Sentry
 		class ProtocolComponent *mProtocolComponent;
 
 	private:
+        com::DataPacket_Request mRequestData;
+        com::DataPacket_Response mResponseData;
 		char mMessageBuffer[1024 * 1024];
 		std::queue<std::string> mRecvSessionQueue;
         std::vector<TcpClientSession *> mSessionArray;
         std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap;
-	private:
-		std::unordered_map<std::string, IRequestMessageHandler *> mRequestMsgHandlers;
-		std::unordered_map<std::string, IResponseMessageHandler *> mResponseMsgHandlers;
 	};
 }

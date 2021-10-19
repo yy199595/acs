@@ -47,11 +47,8 @@ namespace Sentry
     };
 }
 
-
-
 namespace Sentry
 {
-
     class HttpClientSession
     {
     public:

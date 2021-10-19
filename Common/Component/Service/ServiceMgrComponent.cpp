@@ -22,12 +22,9 @@ namespace Sentry
         return true;
     }
 
-    bool ServiceMgrComponent::OnRequestMessage(const std::string & address, SharedMessage message)
+    bool ServiceMgrComponent::OnRequestMessage(const com::DataPacket_Request * request)
     {
-        unsigned short methodId = 0;
-        const char *ptr = message->c_str();
-        memcpy(&methodId, ptr + 1, sizeof(methodId));
-
+        unsigned short methodId = request->methodid();
         const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
         if (protocolConfig == nullptr)
         {
@@ -51,24 +48,19 @@ namespace Sentry
 
         if (!protocolConfig->IsAsync)
         {
-            com::DataPacket_Request requestMessage;
-            if(!requestMessage.ParseFromArray(ptr + 3, message->size() -3))
-            {
-                return false;
-            }
             std::string responseContent;
-            method->SetAddress(address);
-            XCode code = method->Invoke(requestMessage, responseContent);
-            if (requestMessage.rpcid() != 0)
+            method->SetAddress(request->address());
+            XCode code = method->Invoke(*request, responseContent);
+            if (request->rpcid() != 0)
             {
+                delete request;
                 com::DataPacket_Response responseMessage;
 
                 responseMessage.set_code(code);
-				responseMessage.set_methodid(methodId);
+                responseMessage.set_rpcid(request->rpcid());
+                responseMessage.set_userid(request->userid());
                 responseMessage.set_messagedata(responseContent);
-				responseMessage.set_rpcid(requestMessage.rpcid());
-                responseMessage.set_userid(requestMessage.userid());   
-                this->mNetSessionComponent->SendByAddress(address, responseMessage);
+                this->mNetSessionComponent->SendByAddress(request->address(), responseMessage);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步
@@ -77,34 +69,26 @@ namespace Sentry
         }
         else
         {
-            std::string add = address;
             this->mCorComponent
-                    ->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, add, message);
+                    ->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, request);
         }
         return true;
     }
 
-	void ServiceMgrComponent::Invoke(ServiceMethod * method, std::string &address, SharedMessage message)
+	void ServiceMgrComponent::Invoke(ServiceMethod * method, const com::DataPacket_Request * request)
     {
-        const char * ptr = message->c_str();
-        com::DataPacket_Request requestMessage;
-        if(!requestMessage.ParseFromArray(ptr + 3, message->size() -3))
+        std::string content;
+        method->SetAddress(request->address());
+        XCode code = method->Invoke(*request, content);
+        if (request->rpcid() != 0)
         {
-            return;
-        }
-        std::string responseContent;
-        method->SetAddress(address);
-        XCode code = method->Invoke(requestMessage, responseContent);
-        if (requestMessage.rpcid() != 0)
-        {
-            com::DataPacket_Response responseMessage;
+            delete request;
+            com::DataPacket_Response response;
 
-            responseMessage.set_code(code);
-            responseMessage.set_messagedata(responseContent);
-            responseMessage.set_userid(requestMessage.userid());
-            responseMessage.set_methodid(requestMessage.methodid());
-			//TODO
-           // this->mNetProxyManager->SendNetMessage(address, responseMessage);
+            response.set_code(code);
+            response.set_messagedata(content);
+            response.set_userid(request->userid());
+            this->mNetSessionComponent->SendByAddress(request->address(), response);
         }
     }
 }// namespace Sentry

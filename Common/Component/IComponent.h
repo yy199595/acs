@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include<Thread/TaskThread.h>
 #include<NetWork/SessionBase.h>
+#include<Protocol/com.pb.h>
 namespace Sentry
 {
 	class IFrameUpdate
@@ -48,13 +49,13 @@ namespace Sentry
     class IRequestMessageHandler
     {
     public:
-        virtual bool OnRequestMessage(const std::string & address, SharedMessage message) = 0;
+        virtual bool OnRequestMessage(const com::DataPacket_Request * message) = 0;
     };
 
     class IResponseMessageHandler
     {
     public:
-        virtual bool OnResponseMessage(const std::string & address, SharedMessage message) = 0;
+        virtual bool OnResponseMessage(const com::DataPacket_Response * message) = 0;
     };
 }
 

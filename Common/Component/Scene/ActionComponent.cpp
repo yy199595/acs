@@ -26,7 +26,7 @@ namespace Sentry
         {
             return 0;
         }
-		unsigned int id = this->mNumberPool.Pop();     
+		unsigned int id = this->mNumberPool.Pop();
         if (this->mMessageTimeout != 0)// 添加超时
         {
             shared_ptr<ActionTimeoutTimer> timer = 
@@ -37,24 +37,18 @@ namespace Sentry
         return id;
     }
 
-    bool ActionComponent::OnResponseMessage(const std::string & address, SharedMessage message)
+    bool ActionComponent::OnResponseMessage(const com::DataPacket_Response * response)
     {
-        com::DataPacket_Response response;
-        const char * ptr = message->c_str();
-        if(!response.ParseFromArray(ptr + 3, message->size() -3))
-        {
-            return false;
-        }
-        unsigned int rpcId = response.rpcid();
+        unsigned int rpcId = response->rpcid();
         auto iter = this->mRetActionMap.find(rpcId);
         if (iter == this->mRetActionMap.end())
         {
             return false;
         }
-        iter->second->Invoke(response);
-
+        iter->second->Invoke(*response);
         this->mNumberPool.Push(rpcId);
         this->mRetActionMap.erase(iter);
+        delete response;
         return true;
     }
 }

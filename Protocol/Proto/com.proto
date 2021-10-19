@@ -54,14 +54,14 @@ message DataPacket
           int64 UserId = 1;
           uint32 RpcId = 2;
           int32 MethodId = 3;
-          bytes MessageData = 4;
+          string Address = 4;
+          bytes MessageData = 5;
      }
      message Response
      {
           int32 Code = 1;
           uint32 UserId = 2;
           int64 RpcId = 3;
-          int32 MethodId = 4;
-          bytes MessageData = 5;
+          bytes MessageData = 4;
      }
 }

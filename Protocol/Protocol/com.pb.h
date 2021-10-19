@@ -1287,9 +1287,23 @@ class DataPacket_Request :
 
   // accessors -------------------------------------------------------
 
-  // bytes MessageData = 4;
+  // string Address = 4;
+  void clear_address();
+  static const int kAddressFieldNumber = 4;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // bytes MessageData = 5;
   void clear_messagedata();
-  static const int kMessageDataFieldNumber = 4;
+  static const int kMessageDataFieldNumber = 5;
   const ::std::string& messagedata() const;
   void set_messagedata(const ::std::string& value);
   #if LANG_CXX11
@@ -1324,6 +1338,7 @@ class DataPacket_Request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
   ::google::protobuf::internal::ArenaStringPtr messagedata_;
   ::google::protobuf::int64 userid_;
   ::google::protobuf::uint32 rpcid_;
@@ -1428,9 +1443,9 @@ class DataPacket_Response :
 
   // accessors -------------------------------------------------------
 
-  // bytes MessageData = 5;
+  // bytes MessageData = 4;
   void clear_messagedata();
-  static const int kMessageDataFieldNumber = 5;
+  static const int kMessageDataFieldNumber = 4;
   const ::std::string& messagedata() const;
   void set_messagedata(const ::std::string& value);
   #if LANG_CXX11
@@ -1460,12 +1475,6 @@ class DataPacket_Response :
   ::google::protobuf::int64 rpcid() const;
   void set_rpcid(::google::protobuf::int64 value);
 
-  // int32 MethodId = 4;
-  void clear_methodid();
-  static const int kMethodIdFieldNumber = 4;
-  ::google::protobuf::int32 methodid() const;
-  void set_methodid(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:com.DataPacket.Response)
  private:
   class HasBitSetters;
@@ -1475,7 +1484,6 @@ class DataPacket_Response :
   ::google::protobuf::int32 code_;
   ::google::protobuf::uint32 userid_;
   ::google::protobuf::int64 rpcid_;
-  ::google::protobuf::int32 methodid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -1934,7 +1942,60 @@ inline void DataPacket_Request::set_methodid(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:com.DataPacket.Request.MethodId)
 }
 
-// bytes MessageData = 4;
+// string Address = 4;
+inline void DataPacket_Request::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DataPacket_Request::address() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Request.Address)
+  return address_.GetNoArena();
+}
+inline void DataPacket_Request::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.DataPacket.Request.Address)
+}
+#if LANG_CXX11
+inline void DataPacket_Request::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.DataPacket.Request.Address)
+}
+#endif
+inline void DataPacket_Request::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.DataPacket.Request.Address)
+}
+inline void DataPacket_Request::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.DataPacket.Request.Address)
+}
+inline ::std::string* DataPacket_Request::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:com.DataPacket.Request.Address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DataPacket_Request::release_address() {
+  // @@protoc_insertion_point(field_release:com.DataPacket.Request.Address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DataPacket_Request::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:com.DataPacket.Request.Address)
+}
+
+// bytes MessageData = 5;
 inline void DataPacket_Request::clear_messagedata() {
   messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2033,21 +2094,7 @@ inline void DataPacket_Response::set_rpcid(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:com.DataPacket.Response.RpcId)
 }
 
-// int32 MethodId = 4;
-inline void DataPacket_Response::clear_methodid() {
-  methodid_ = 0;
-}
-inline ::google::protobuf::int32 DataPacket_Response::methodid() const {
-  // @@protoc_insertion_point(field_get:com.DataPacket.Response.MethodId)
-  return methodid_;
-}
-inline void DataPacket_Response::set_methodid(::google::protobuf::int32 value) {
-  
-  methodid_ = value;
-  // @@protoc_insertion_point(field_set:com.DataPacket.Response.MethodId)
-}
-
-// bytes MessageData = 5;
+// bytes MessageData = 4;
 inline void DataPacket_Response::clear_messagedata() {
   messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
