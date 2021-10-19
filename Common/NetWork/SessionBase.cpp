@@ -142,6 +142,7 @@ namespace Sentry
             this->mIsOpen = false;
             this->mSocket->close(err);
 		}
+		SayNoDebugError("remove socket " << this->GetRemoteAddress());
 		this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnClose, this->mHandler, this));
 	}
 

@@ -18,6 +18,7 @@ namespace Sentry
 	{
 	public:
 		NetworkListener(NetWorkThread * thread, ListenConfig & config);
+		~NetworkListener();
 	public:
 		void StartListen(ISocketHandler * handler);
 		bool IsOpen() { return this->mBindAcceptor->is_open(); }

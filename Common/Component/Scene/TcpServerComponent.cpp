@@ -28,7 +28,7 @@ namespace Sentry
             ListenConfig listenConfig;
             listenConfig.Port = 0;
 
-            if(iter->value.HasMember("potr"))
+            if(iter->value.HasMember("port"))
             {
                 listenConfig.Port = iter->value["port"].GetUint();
                 listenConfig.Count = iter->value["count"].GetInt();

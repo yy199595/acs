@@ -3,7 +3,7 @@
 #include<Protocol/s2s.pb.h>
 #include<Component/Component.h>
 #include<Other/DoubleBufferQueue.h>
-
+#include<Pool/ObjectPool.h>
 namespace Sentry
 {
     class ServiceComponent;
@@ -25,15 +25,16 @@ namespace Sentry
         bool Awake() final;
 
     public:
-        bool OnRequestMessage(const com::DataPacket_Request * message) final;
+        bool OnRequestMessage(const com::DataPacket_Request & message) final;
 
         virtual int GetPriority() { return 500; }
 	private:
-        void Invoke(ServiceMethod * method, const com::DataPacket_Request * request);
+        void Invoke(ServiceMethod * method, com::DataPacket_Request * request);
     private:
         int mNodeId;
         class CoroutineComponent *mCorComponent;
         class ProtocolComponent * mProtocolComponent;
 		class TcpNetSessionComponent *mNetSessionComponent;
+		ObjectPool<com::DataPacket_Request> mRequestDataPool;
     };
 }

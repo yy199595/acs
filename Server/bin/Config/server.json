@@ -15,21 +15,17 @@
     },
     "Listener": {
         "ip":"127.0.0.1",
-        "tcp":
+        "service":
         {
             "port":7788,
             "count":10000,
             "handler":"TcpNetSessionComponent"
         },
-        "tcp1":
+        "telnet":
         {
-            "port":7789,
+            "port":1995,
             "count":10000,
-            "handler":"TcpNetSessionComponent"
-        },
-        "http":
-        {
-            "handler":"HttpClientComponent"
+            "handler":"TelnetClientComponent"
         }
     },
     "NetWork": {
@@ -66,7 +62,8 @@
         "MysqlProxyComponent",
         "GatewayComponent",
         "HttpClientComponent",
-        "LuaServiceMgrComponent"
+        "LuaServiceMgrComponent",
+        "TelnetClientComponent"
     ],
     "Service": [
         "MysqlService",

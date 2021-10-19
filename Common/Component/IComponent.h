@@ -49,13 +49,13 @@ namespace Sentry
     class IRequestMessageHandler
     {
     public:
-        virtual bool OnRequestMessage(const com::DataPacket_Request * message) = 0;
+        virtual bool OnRequestMessage(const com::DataPacket_Request & message) = 0;
     };
 
     class IResponseMessageHandler
     {
     public:
-        virtual bool OnResponseMessage(const com::DataPacket_Response * message) = 0;
+        virtual bool OnResponseMessage(const com::DataPacket_Response & message) = 0;
     };
 }
 

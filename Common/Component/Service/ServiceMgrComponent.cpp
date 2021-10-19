@@ -22,9 +22,9 @@ namespace Sentry
         return true;
     }
 
-    bool ServiceMgrComponent::OnRequestMessage(const com::DataPacket_Request * request)
+    bool ServiceMgrComponent::OnRequestMessage(const com::DataPacket_Request & request)
     {
-        unsigned short methodId = request->methodid();
+        unsigned short methodId = request.methodid();
         const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
         if (protocolConfig == nullptr)
         {
@@ -49,18 +49,17 @@ namespace Sentry
         if (!protocolConfig->IsAsync)
         {
             std::string responseContent;
-            method->SetAddress(request->address());
-            XCode code = method->Invoke(*request, responseContent);
-            if (request->rpcid() != 0)
+            method->SetAddress(request.address());
+            XCode code = method->Invoke(request, responseContent);
+            if (request.rpcid() != 0)
             {
-                delete request;
                 com::DataPacket_Response responseMessage;
 
                 responseMessage.set_code(code);
-                responseMessage.set_rpcid(request->rpcid());
-                responseMessage.set_userid(request->userid());
+                responseMessage.set_rpcid(request.rpcid());
+                responseMessage.set_userid(request.userid());
                 responseMessage.set_messagedata(responseContent);
-                this->mNetSessionComponent->SendByAddress(request->address(), responseMessage);
+                this->mNetSessionComponent->SendByAddress(request.address(), responseMessage);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步
@@ -69,26 +68,26 @@ namespace Sentry
         }
         else
         {
-            this->mCorComponent
-                    ->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, request);
+			com::DataPacket_Request * requestData = this->mRequestDataPool.CopyFrom(request);
+            this->mCorComponent->StartCoroutine(&ServiceMgrComponent::Invoke, this, method, requestData);
         }
         return true;
     }
 
-	void ServiceMgrComponent::Invoke(ServiceMethod * method, const com::DataPacket_Request * request)
+	void ServiceMgrComponent::Invoke(ServiceMethod * method, com::DataPacket_Request * request)
     {
         std::string content;
         method->SetAddress(request->address());
         XCode code = method->Invoke(*request, content);
         if (request->rpcid() != 0)
         {
-            delete request;
             com::DataPacket_Response response;
-
             response.set_code(code);
             response.set_messagedata(content);
             response.set_userid(request->userid());
             this->mNetSessionComponent->SendByAddress(request->address(), response);
+
+			this->mRequestDataPool.Destory(request);
         }
     }
 }// namespace Sentry

@@ -11,6 +11,7 @@
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
 #include <Http/HttpClientComponent.h>
+#include <Scene/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>
@@ -45,6 +46,7 @@ int main(int argc, char **argv)
     __register_component__(ServiceNodeComponent);
     __register_component__(TcpServerComponent);
     __register_component__(TcpNetSessionComponent);
+	__register_component__(TelnetClientComponent);
 
     __register_component__(LuaServiceMgrComponent);
 

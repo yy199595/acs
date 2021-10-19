@@ -75,7 +75,7 @@ namespace Sentry
             return;
         }
         this->mRequestMessage->clear();
-		/*asio::async_read_until(*this->mHttpSocket, this->mResponseBuf, "\r\n\r\n", 
+		/*/asio::async_read_until(*this->mHttpSocket, this->mResponseBuf, "\r\n\r\n", 
 			std::bind(&HttpClientSession::ReadHeadHandler, this, args1, args2));*/
         asio::async_read(*this->mHttpSocket, this->mResponseBuf, asio::transfer_at_least(1),
                          std::bind(&HttpClientSession::ReadBodyHandler, this, args1, args2));
@@ -100,9 +100,9 @@ namespace Sentry
     {
         if (err == asio::error::eof)
         {
-//            std::istreambuf_iterator<char> eos;
-//            SayNoDebugWarning("size = " << this->mResponseBuf.size() << "\n"
-//                                        << string(std::istreambuf_iterator<char>(this->mResponseStream), eos));
+            std::istreambuf_iterator<char> eos;
+            SayNoDebugWarning("size = " << this->mResponseBuf.size() << "\n"
+                                        << string(std::istreambuf_iterator<char>(this->mResponseStream), eos));
             this->mResponseHandler->Run(EHttpError::HttpSuccessful, mResponseStream);
         }	
 		else if(err)

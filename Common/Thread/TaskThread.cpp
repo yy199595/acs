@@ -101,7 +101,7 @@ namespace Sentry
         {
             if(taskProxy->Run())
             {
-                this->mFinishTasks.emplace(taskProxy->GetTaskId());
+                this->mFinishTasks.push(taskProxy->GetTaskId());
             }
         }
 

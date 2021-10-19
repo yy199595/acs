@@ -112,13 +112,7 @@ namespace Sentry
                 return false;
             }
             this->mRequestData.set_address(address);
-            com::DataPacket_Request * request = this->mRequestData.New();
-            if(!this->mServiceComponent->OnRequestMessage(request))
-            {
-                delete request;
-                return false;
-            }
-            return true;
+			return this->mServiceComponent->OnRequestMessage(mRequestData);          
 		}
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
 		{
@@ -127,13 +121,8 @@ namespace Sentry
             {
                 return false;
             }
-            com::DataPacket_Response * response = this->mResponseData.New();
-            if(!this->mActionComponent->OnResponseMessage(response))
-            {
-                delete response;
-                return false;
-            }
-            return true;
+			this->mActionComponent->OnResponseMessage(mResponseData);         
+			return true;
 		}
         return false;
 	}

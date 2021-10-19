@@ -15,6 +15,7 @@ namespace Sentry
     public:
         template<typename... Args>
         T *Create(Args &&...args);
+		T * CopyFrom(const T & data);
 
         bool Destory(T *data);
 
@@ -73,4 +74,11 @@ namespace Sentry
         }
         return new T();
     }
+	template<typename T>
+	T * ObjectPool<T>::CopyFrom(const T & data)
+	{
+		T * t = this->Create();
+		t->CopyFrom(data);
+		return t;
+	}
 }// namespace Sentry

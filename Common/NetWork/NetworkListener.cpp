@@ -14,6 +14,13 @@ namespace Sentry
         this->mSessionHandler = nullptr;
     }
 
+	NetworkListener::~NetworkListener()
+	{
+		asio::error_code err;
+		this->mBindAcceptor->close(err);
+		delete this->mBindAcceptor;
+	}
+
 	void NetworkListener::StartListen(ISocketHandler * handler)
 	{
 		this->mSessionHandler = handler;
@@ -30,11 +37,9 @@ namespace Sentry
             {
                 asio::error_code err;
                 this->mBindAcceptor->listen(this->mConfig.Count, err);
-
-                SayNoDebugInfo("start " << this->mConfig.Name << " listener "
-                                        << this->mBindAcceptor->local_endpoint().address().to_string() << ":" <<
-                                        this->mBindAcceptor->local_endpoint().port() << "  max count = " << this->mConfig.Count
-                                        << "}");
+				SayNoDebugInfo("start " << this->mConfig.Name << " listener "
+					<< this->mBindAcceptor->local_endpoint().address().to_string()
+					<< ":" << this->mBindAcceptor->local_endpoint().port() << " successful");
             }
             catch(asio::system_error & err)
             {
@@ -48,11 +53,7 @@ namespace Sentry
 	void NetworkListener::OnConnectHandler(const asio::error_code & code)
 	{
 		if (!code)
-		{			
-#ifdef _DEBUG
-			const std::string & address = this->mSessionSocket->GetAddress();
-			SayNoDebugError(this->mConfig.Name << " listen new socket " << address);
-#endif
+		{
             this->mSessionSocket->OnListenDone();
 			this->mTaskScheduler.AddMainTask(NewMethodProxy(
 				&ISocketHandler::OnListenConnect, this->mSessionHandler, this->mSessionSocket));

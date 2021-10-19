@@ -37,18 +37,17 @@ namespace Sentry
         return id;
     }
 
-    bool ActionComponent::OnResponseMessage(const com::DataPacket_Response * response)
+    bool ActionComponent::OnResponseMessage(const com::DataPacket_Response & response)
     {
-        unsigned int rpcId = response->rpcid();
+        unsigned int rpcId = response.rpcid();
         auto iter = this->mRetActionMap.find(rpcId);
         if (iter == this->mRetActionMap.end())
         {
             return false;
         }
-        iter->second->Invoke(*response);
+        iter->second->Invoke(response);
         this->mNumberPool.Push(rpcId);
-        this->mRetActionMap.erase(iter);
-        delete response;
+        this->mRetActionMap.erase(iter);     
         return true;
     }
 }
