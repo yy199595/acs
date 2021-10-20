@@ -31,6 +31,14 @@ LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
 SET(CMAKE_BUILD_TYPE Debug)
 list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
 
+foreach(file ${CommonFiles})
+    message(${file})
+endforeach()
+
+foreach(file ${ServerFiles})
+    message(${file})
+endforeach()
+
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     message("使用ccache缓存")
