@@ -10,6 +10,7 @@ namespace Sentry
     bool TcpServerComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
+        config.GetValue("ip", this->mHostIp);
 		config.GetValue("WhiteList", this->mWhiteList);
 		TaskPoolComponent * taskComponent = this->GetComponent<TaskPoolComponent>();
 		rapidjson::Value * jsonValue = config.GetJsonValue("Listener");
@@ -25,7 +26,7 @@ namespace Sentry
 			}
             ListenConfig listenConfig;
             listenConfig.Port = 0;
-
+            listenConfig.Ip = this->mHostIp;
             if(iter->value.HasMember("port"))
             {
                 listenConfig.Port = iter->value["port"].GetUint();
@@ -71,7 +72,7 @@ namespace Sentry
                 if(listener->StartListen(handler))
                 {
                     const ListenConfig & config = listener->GetConfig();
-                    SayNoDebugLog(config.Name << " listen local host port " << config.Port << " successful");
+                    SayNoDebugLog(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
                 }
                 else
                 {

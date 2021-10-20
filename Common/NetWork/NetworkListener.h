@@ -8,6 +8,7 @@ namespace Sentry
     {
     public:
         int Count = 0;
+        std::string Ip;
         std::string Name;
         std::string Handler;
         unsigned short Port = 0;
