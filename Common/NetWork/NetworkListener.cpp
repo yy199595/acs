@@ -36,10 +36,6 @@ namespace Sentry
 	{
         if(this->mBindAcceptor == nullptr)
         {
-            tcp::resolver resolver(this->mTaskThread->GetContext());
-            SayNoDebugLog(asio::ip::host_name());
-            tcp::resolver::query query(asio::ip::host_name(), "");
-
             AsioTcpEndPoint endPoint( asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
 
