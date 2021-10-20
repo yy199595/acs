@@ -36,17 +36,20 @@ namespace Sentry
 	{
         if(this->mBindAcceptor == nullptr)
         {
-            AsioTcpEndPoint endPoint( asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
-            this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
 
             try
             {
+                AsioTcpEndPoint endPoint( asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
+                this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
+
+
                 this->mBindAcceptor->listen(this->mConfig.Count);
                 this->mIsListen = true;
             }
-            catch (std::error_code & err)
+            catch (std::system_error & err)
             {
                 this->mIsListen = false;
+                SayNoDebugFatal(err.what());
             }
             CoroutineComponent * component = App::Get().GetCoroutineComponent();
             this->mTaskScheduler.AddMainTask(NewMethodProxy(&CoroutineComponent::Resume, component, this->mCorId));

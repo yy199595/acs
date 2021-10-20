@@ -10,9 +10,9 @@ namespace Sentry
     bool TcpServerComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
-        config.GetValue("ip", this->mHostIp);
 		config.GetValue("WhiteList", this->mWhiteList);
-		TaskPoolComponent * taskComponent = this->GetComponent<TaskPoolComponent>();
+        config.GetValue("Listener","ip", this->mHostIp);
+        TaskPoolComponent * taskComponent = this->GetComponent<TaskPoolComponent>();
 		rapidjson::Value * jsonValue = config.GetJsonValue("Listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
