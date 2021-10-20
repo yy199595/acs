@@ -49,7 +49,8 @@ namespace Sentry
             catch (std::system_error & err)
             {
                 this->mIsListen = false;
-                SayNoDebugFatal(err.what());
+                SayNoDebugFatal("listen " << this->mConfig.Ip << ":"
+                                          << this->mConfig.Port << " failure" << err.what());
             }
             CoroutineComponent * component = App::Get().GetCoroutineComponent();
             this->mTaskScheduler.AddMainTask(NewMethodProxy(&CoroutineComponent::Resume, component, this->mCorId));
