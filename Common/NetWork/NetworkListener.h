@@ -20,13 +20,15 @@ namespace Sentry
 		NetworkListener(NetWorkThread * thread, ListenConfig & config);
 		~NetworkListener();
 	public:
-		void StartListen(ISocketHandler * handler);
+		bool StartListen(ISocketHandler * handler);
 		bool IsOpen() { return this->mBindAcceptor->is_open(); }
         const ListenConfig & GetConfig() { return this->mConfig;}
 	private:
 		void ListenConnect();
 		void OnConnectHandler(const asio::error_code & err);
 	private:
+        bool mIsListen;
+        unsigned int mCorId;
         ListenConfig mConfig;
 		NetWorkThread * mTaskThread;
 		AsioTcpAcceptor *mBindAcceptor;	

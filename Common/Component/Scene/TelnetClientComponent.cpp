@@ -24,36 +24,33 @@ namespace Sentry
 
 	void TelnetClientComponent::OnCloseSession(TelnetClientSession * session)
 	{
-
+        delete session;
 	}
 
 	bool TelnetClientComponent::OnListenNewSession(TelnetClientSession * session)
 	{
-		SharedMessage message = make_shared<std::string>("ÇëÊäÈëÃÜÂë");
-		message->append("\n");
+		std::string * message = new std::string("welcom sentry seever\nè¯·è¾“å…¥ç”¨æˆ·åå’Œå¯†ç :");
 		session->SendNetMessage(message);
 		return true;
 	}
 
-	bool TelnetClientComponent::OnReceiveMessage(TelnetClientSession * session, SharedMessage message)
-	{
-		SayNoDebugWarning(*message);
-
-		message->append("\n");
-		session->SendNetMessage(message);
-		return true;
-	}
+	bool TelnetClientComponent::OnReceiveMessage(TelnetClientSession * session, const std::string & message)
+    {
+        if (message == "exit")
+        {
+            return false;
+        }
+        std::string *newMessage = this->mStringPool.New("ä½ è¯´");
+        newMessage->append(message + "\n");
+        session->SendNetMessage(newMessage);
+        return true;
+    }
 
 	void TelnetClientComponent::OnSessionError(TelnetClientSession * session, const asio::error_code & err)
 	{
 	}
 
 	void TelnetClientComponent::OnConnectRemoteAfter(TelnetClientSession * session, const asio::error_code & err)
-	{
-
-	}
-
-	void TelnetClientComponent::OnSendMessageAfter(TelnetClientSession * session, SharedMessage message, const asio::error_code & err)
 	{
 
 	}

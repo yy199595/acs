@@ -2,8 +2,6 @@
 
 #include<Core/App.h>
 #include<Util/StringHelper.h>
-#include<NetWork/TcpClientSession.h>
-#include<Scene/TcpNetSessionComponent.h>
 #include<Scene/TaskPoolComponent.h>
 #include <NetWork/NetworkListener.h>
 #include <Thread/TaskThread.h>
@@ -69,7 +67,16 @@ namespace Sentry
 			Component * component = this->gameObject->GetComponentByName(config.Handler);
             if(auto handler = dynamic_cast<ISocketHandler*>(component))
             {
-                iter->second->StartListen(handler);
+                NetworkListener * listener = iter->second;
+                if(listener->StartListen(handler))
+                {
+                    const ListenConfig & config = listener->GetConfig();
+                    SayNoDebugLog(config.Name << " listen local host port " << config.Port << " successful");
+                }
+                else
+                {
+                    App::Get().Stop();
+                }
             }
 		}
     }

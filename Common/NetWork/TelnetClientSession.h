@@ -13,6 +13,7 @@ namespace Sentry
 	private:
 		void ReadHandler(const asio::error_code & err, const size_t size);
 	private:
+        const std::string mDelim;
 		asio::streambuf mReceiveBuffer;
 	};
 }

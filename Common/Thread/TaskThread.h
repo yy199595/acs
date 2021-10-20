@@ -1,13 +1,12 @@
 ﻿#pragma once
 
 #include "TaskProxy.h"
-#include <Other/DoubleBufferQueue.h>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <Define/CommonDef.h>
-#include <Other/DoubleBufferQueue.h>
+#include <Other/MultiThreadQueue.h>
 namespace Sentry
 {
 	class StaticMethod;
@@ -66,7 +65,7 @@ namespace Sentry
         ThreadState mTaskState;
 		std::queue<unsigned int> mFinishTasks;
         std::condition_variable mThreadVariable;
-        DoubleBufferQueue<TaskProxy *> mWaitInvokeTask;
+        MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
     };
 
     class NetWorkThread : public IThread
@@ -84,8 +83,8 @@ namespace Sentry
 		AsioContext * mAsioContext;
         StaticMethod * mMethodProxy;
         std::queue<unsigned int> mFinishTasks;
-        DoubleBufferQueue<TaskProxy *> mWaitInvokeTask;
-		DoubleBufferQueue<StaticMethod *> mWaitInvokeMethod;
+        MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
+		MultiThreadQueue<StaticMethod *> mWaitInvokeMethod;
     };
 
 	class MainTaskScheduler
@@ -99,6 +98,6 @@ namespace Sentry
 	private:
 		bool mIsStop;
 		StaticMethod * mMainMethod;
-		DoubleBufferQueue<StaticMethod *> mTaskQueue;
+		MultiThreadQueue<StaticMethod *> mTaskQueue;
 	};
 }// namespace Sentry

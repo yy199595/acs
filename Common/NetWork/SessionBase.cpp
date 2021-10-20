@@ -2,6 +2,7 @@
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
 #include <regex>
+#include <Pool/StringPool.h>
 namespace Sentry
 {
 
@@ -106,7 +107,7 @@ namespace Sentry
                                + ":" + std::to_string(this->mSocket->remote_endpoint().port());
     }
 
-	bool SessionBase::SendNetMessage(SharedMessage message)
+	bool SessionBase::SendNetMessage(std::string * message)
 	{
 		if (message == nullptr || message->empty())
 		{
@@ -115,7 +116,7 @@ namespace Sentry
 		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::OnSendMessage, this, message));
 	}
 
-	void SessionBase::OnSendMessage(SharedMessage message)
+	void SessionBase::OnSendMessage(std::string * message)
     {
         if (!this->IsActive())
         {
@@ -158,8 +159,11 @@ namespace Sentry
 
 	void SessionBase::OnReceiveMessage(const char * msg, size_t size)
     {
-        SharedMessage message = make_shared<std::string>(msg, size);
-        this->mTaskScheduler
-                .AddMainTask(NewMethodProxy(&ISocketHandler::OnReceiveNewMessage, this->mHandler, this, message));
+        if (msg == nullptr || size == 0)
+        {
+            return;
+        }
+        std::string *message = this->mHandler->GetStringPool().New(msg, size);
+        this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnReceiveNewMessage, this->mHandler, this, message));
     }
 }

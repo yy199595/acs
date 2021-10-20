@@ -65,10 +65,6 @@ namespace Sentry
 		}
 	}
 
-    void TcpNetSessionComponent::OnSendMessageAfter(TcpClientSession *session, SharedMessage message, const asio::error_code &err)
-    {
-
-    }
 
 	void TcpNetSessionComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
 	{
@@ -94,35 +90,35 @@ namespace Sentry
         return true;
 	}
 
-	bool TcpNetSessionComponent::OnReceiveMessage(TcpClientSession *session, SharedMessage message)
+	bool TcpNetSessionComponent::OnReceiveMessage(TcpClientSession *session, const string & message)
 	{
-        const char * heard = message->c_str() + 1;
+        const char * body = message.c_str() + 1;
+        const size_t bodySize = message.size() - 1;
 		const std::string & address = session->GetAddress();
-		auto messageType = (DataMessageType)message->at(0);
+		auto messageType = (DataMessageType)message.at(0);
 		if (messageType == DataMessageType::TYPE_REQUEST)
-		{
+        {
             this->mRequestData.Clear();
-            if(!this->mRequestData.ParseFromArray(heard, message->size() - 1))
+            if (!this->mRequestData.ParseFromArray(body, bodySize))
             {
                 return false;
             }
             unsigned short methodId = this->mRequestData.methodid();
-            if(this->mProtocolComponent->GetProtocolConfig(methodId) == nullptr)
+            if (this->mProtocolComponent->GetProtocolConfig(methodId) == nullptr)
             {
                 return false;
             }
             this->mRequestData.set_address(address);
-			return this->mServiceComponent->OnRequestMessage(mRequestData);          
-		}
+            return this->mServiceComponent->OnRequestMessage(mRequestData);
+        }
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
 		{
             this->mResponseData.Clear();
-            if(!this->mResponseData.ParseFromArray(heard, message->size() - 1))
+            if(!this->mResponseData.ParseFromArray(body, bodySize))
             {
                 return false;
             }
-			this->mActionComponent->OnResponseMessage(mResponseData);         
-			return true;
+            return this->mActionComponent->OnResponseMessage(mResponseData);
 		}
         return false;
 	}
@@ -170,7 +166,7 @@ namespace Sentry
         return false;
     }
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, SharedMessage message)
+	bool TcpNetSessionComponent::SendByAddress(const std::string & address, std::string * message)
 	{
 		TcpClientSession * tcpSession = this->GetSession(address);
 		if (tcpSession == nullptr)
@@ -200,6 +196,6 @@ namespace Sentry
 		{
 			return false;
 		}
-		return this->SendByAddress(address, std::make_shared<std::string>(this->mMessageBuffer, size));
+		return true;//this->SendByAddress(address, this->mStringPool.New(this->mMessageBuffer, size));
 	}
 }// namespace Sentry

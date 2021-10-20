@@ -2,7 +2,7 @@
 
 #include<Component/Component.h>
 #include <Thread/TaskThread.h>
-#include <Other/DoubleBufferQueue.h>
+#include <Other/MultiThreadQueue.h>
 #include <Util/NumberBuilder.h>
 namespace Sentry
 {
@@ -39,7 +39,7 @@ namespace Sentry
 
         const std::vector<TaskThread *> GetThreads() { return this->mThreadArray;}
     private:
-        DoubleBufferQueue<unsigned int> mFinishTaskQueue;                 //在其他线程完成的任务存储
+        MultiThreadQueue<unsigned int> mFinishTaskQueue;                 //在其他线程完成的任务存储
         std::unordered_map<unsigned int, TaskProxy *> mTaskMap;
     private:
         int mThreadCount;

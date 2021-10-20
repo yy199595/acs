@@ -3,9 +3,8 @@
 #include <thread>
 #include <Component/Component.h>
 #include <Script/LuaTable.h>
-#include <Pool/ObjectPool.h>
 
-#include <Other/DoubleBufferQueue.h>
+#include <Other/MultiThreadQueue.h>
 #include <Network/TcpClientSession.h>
 namespace Sentry
 {
@@ -21,10 +20,9 @@ namespace Sentry
 
         void OnCloseSession(TcpClientSession * socket) override;
         bool OnListenNewSession(TcpClientSession * session) override;
-        bool OnReceiveMessage(TcpClientSession * session, SharedMessage message) override;
+        bool OnReceiveMessage(TcpClientSession * session, const string & message) override;
         void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
 		void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
-        void OnSendMessageAfter(TcpClientSession *session, SharedMessage message, const asio::error_code &err) override;
 	public:
         SessionBase * CreateSocket() { return new TcpClientSession(this);}
 		TcpClientSession * ConnectRemote(const std::string &name, const std::string & ip, unsigned short port);
@@ -36,12 +34,12 @@ namespace Sentry
 
 	public:
 		bool CloseSession(const std::string &address);
-		bool SendByAddress(const std::string & address, SharedMessage message);
+		bool SendByAddress(const std::string & address, std::string * message);
 		bool SendByAddress(const std::string & address, com::DataPacket_Request & message);
 		bool SendByAddress(const std::string & address, com::DataPacket_Response & message);
 	private:
 		bool SendByAddress(const std::string & address, DataMessageType type, Message & message);
-	private:
+    private:
 
 		TcpClientSession *GetSession(const std::string &address);
 
@@ -53,9 +51,9 @@ namespace Sentry
 		class ProtocolComponent *mProtocolComponent;
 
 	private:
+        char mMessageBuffer[1024 * 1024];
         com::DataPacket_Request mRequestData;
         com::DataPacket_Response mResponseData;
-		char mMessageBuffer[1024 * 1024];
 		std::queue<std::string> mRecvSessionQueue;
         std::vector<TcpClientSession *> mSessionArray;
         std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap;

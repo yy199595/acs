@@ -33,7 +33,7 @@ namespace Sentry
         const std::string & GetAddress() { return this->mIsConnected ? this->mLocalAddress : this->mRemoteAddress;}
 	public:
         void OnListenDone();
-        bool SendNetMessage(SharedMessage message);
+        bool SendNetMessage(std::string * message);
         bool IsActive() { return this->mIsOpen; }
         bool IsConnected() { return this->mIsConnected; }
 	protected:
@@ -44,7 +44,7 @@ namespace Sentry
 	protected:
 		virtual void OnStartReceive() = 0;
 	private:
-		void OnSendMessage(SharedMessage message);
+		void OnSendMessage(std::string * message);
         void ConnectHandler(const asio::error_code & err);
         void OnStartConnect(std::string name, std::string ip, unsigned short port);
     protected:
@@ -58,7 +58,7 @@ namespace Sentry
         int mConnectCount;
         AsioContext & mContext;
 		ISocketHandler * mHandler;
-		MainTaskScheduler & mTaskScheduler;
+        MainTaskScheduler & mTaskScheduler;
         std::atomic_bool mIsOpen;
 	};
 }

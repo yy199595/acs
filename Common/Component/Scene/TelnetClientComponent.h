@@ -14,10 +14,9 @@ namespace Sentry
 	protected:		
 		 void OnCloseSession(TelnetClientSession * session) override;
 		 bool OnListenNewSession(TelnetClientSession * session) override;
-		 bool OnReceiveMessage(TelnetClientSession * session, SharedMessage message) override;
+		 bool OnReceiveMessage(TelnetClientSession * session, const std::string & message) override;
 		 void OnSessionError(TelnetClientSession * session, const asio::error_code & err) override;
 		 void OnConnectRemoteAfter(TelnetClientSession * session, const asio::error_code & err) override;
-		 void OnSendMessageAfter(TelnetClientSession * session, SharedMessage message, const asio::error_code & err) override;
 	};
 }
 

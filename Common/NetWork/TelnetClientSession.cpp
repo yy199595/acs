@@ -4,7 +4,7 @@
 namespace Sentry
 {
 	TelnetClientSession::TelnetClientSession(ISocketHandler * hanlder)
-		:SessionBase(hanlder)
+		:SessionBase(hanlder),mDelim("\r\n")
 	{
 
 	}
@@ -20,7 +20,7 @@ namespace Sentry
 		{
 			return;
 		}
-		asio::async_read_until(this->GetSocket(), this->mReceiveBuffer, "\r\n",
+		asio::async_read_until(this->GetSocket(), this->mReceiveBuffer, this->mDelim,
 			std::bind(&TelnetClientSession::ReadHandler, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
@@ -36,9 +36,9 @@ namespace Sentry
 			std::istream is(&this->mReceiveBuffer);
 			std::string message(std::istreambuf_iterator<char>(is), eos);
 
-			this->OnReceiveMessage(message.c_str(), message.size());
+			this->OnReceiveMessage(message.c_str(), message.size() - this->mDelim.size());
 
-			asio::async_read_until(this->GetSocket(), this->mReceiveBuffer, "\r\n",
+			asio::async_read_until(this->GetSocket(), this->mReceiveBuffer, this->mDelim,
 				std::bind(&TelnetClientSession::ReadHandler, this, std::placeholders::_1, std::placeholders::_2));
 		}		
 	}

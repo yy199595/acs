@@ -10,6 +10,7 @@ namespace Sentry
 		: mTaskThread(t), mConfig(config),
         mTaskScheduler(App::Get().GetTaskScheduler())
     {
+        this->mIsListen = false;
         this->mBindAcceptor = nullptr;
         this->mSessionHandler = nullptr;
     }
@@ -21,10 +22,14 @@ namespace Sentry
 		delete this->mBindAcceptor;
 	}
 
-	void NetworkListener::StartListen(ISocketHandler * handler)
+	bool NetworkListener::StartListen(ISocketHandler * handler)
 	{
 		this->mSessionHandler = handler;
         this->mTaskThread->AddTask(NewMethodProxy(&NetworkListener::ListenConnect, this));
+
+        this->mCorId = App::Get().GetCoroutineComponent()->GetCurrentCorId();
+        App::Get().GetCoroutineComponent()->YieldReturn();
+        return this->mIsListen;
 	}
 
 	void NetworkListener::ListenConnect()
@@ -33,18 +38,18 @@ namespace Sentry
         {
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
+
             try
             {
-                asio::error_code err;
-                this->mBindAcceptor->listen(this->mConfig.Count, err);
-				SayNoDebugInfo("start " << this->mConfig.Name << " listener "
-					<< this->mBindAcceptor->local_endpoint().address().to_string()
-					<< ":" << this->mBindAcceptor->local_endpoint().port() << " successful");
+                this->mBindAcceptor->listen(this->mConfig.Count);
+                this->mIsListen = true;
             }
-            catch(asio::system_error & err)
+            catch (std::error_code & err)
             {
-                SayNoDebugError(err.what());
+                this->mIsListen = false;
             }
+            CoroutineComponent * component = App::Get().GetCoroutineComponent();
+            this->mTaskScheduler.AddMainTask(NewMethodProxy(&CoroutineComponent::Resume, component, this->mCorId));
         }
 		this->mSessionSocket = this->mSessionHandler->CreateSocket();
 		this->mBindAcceptor->async_accept(this->mSessionSocket->GetSocket(), std::bind(&NetworkListener::OnConnectHandler, this, args1));

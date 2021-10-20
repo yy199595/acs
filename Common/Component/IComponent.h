@@ -2,6 +2,7 @@
 #include<Thread/TaskThread.h>
 #include<NetWork/SessionBase.h>
 #include<Protocol/com.pb.h>
+#include<Pool/StringPool.h>
 namespace Sentry
 {
 	class IFrameUpdate
@@ -73,8 +74,8 @@ namespace Sentry
         virtual void OnListenConnect(SessionBase * session) = 0;
         virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
 		virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
-		virtual void OnReceiveNewMessage(SessionBase * session, SharedMessage message) = 0;
-		virtual void OnSendMessage(SessionBase * session, SharedMessage message, const asio::error_code & err) = 0;
+		virtual void OnReceiveNewMessage(SessionBase * session, string * message) = 0;
+		virtual void OnSendMessage(SessionBase * session, string * message, const asio::error_code & err) = 0;
 	public:
         NetWorkThread * GetNetThread()
         {
@@ -84,9 +85,12 @@ namespace Sentry
         {
             this->mNetThread = t;
         };
+        StringPool & GetStringPool() { return this->mStringPool;}
         AsioContext & GetContext() { return mNetThread->GetContext();}
-	private:
-		NetWorkThread * mNetThread;
+
+    protected:
+        StringPool mStringPool;
+        NetWorkThread * mNetThread;
     };
 
     template<typename T>
@@ -112,24 +116,26 @@ namespace Sentry
                 session->Close();
             }
         }
-        void OnReceiveNewMessage(SessionBase * session, SharedMessage message) override
+        void OnReceiveNewMessage(SessionBase * session, string * message) override
         {
-            if(!this->OnReceiveMessage(static_cast<T*>(session), message))
+            if(!this->OnReceiveMessage(static_cast<T*>(session), *message))
             {
                 session->Close();
             }
+            this->mStringPool.Destory(message);
         }
 
-        void OnSendMessage(SessionBase *session, SharedMessage message, const asio::error_code &err) override
+        void OnSendMessage(SessionBase *session, string * message, const asio::error_code &err) override
         {
-            this->OnSendMessageAfter(static_cast<T*>(session), message, err);
+            this->OnSendMessageAfter(static_cast<T*>(session), *message, err);
+            this->mStringPool.Destory(message);
         }
     protected:
         virtual void OnCloseSession(T * session) = 0;
         virtual bool OnListenNewSession(T * session) = 0;
-        virtual bool OnReceiveMessage(T * session, SharedMessage message) = 0;
+        virtual bool OnReceiveMessage(T * session, const string & message) = 0;
         virtual void OnSessionError(T * session, const asio::error_code & err) = 0;
         virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) = 0;
-        virtual void OnSendMessageAfter(T * session, SharedMessage message, const asio::error_code & err) = 0;
+        virtual void OnSendMessageAfter(T * session, const std::string & message, const asio::error_code & err) { };
     };
 }
