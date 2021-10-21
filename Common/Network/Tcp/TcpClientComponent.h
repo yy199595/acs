@@ -8,12 +8,12 @@
 namespace Sentry
 {
 	// 管理所有session
-	class TcpNetSessionComponent : public Component, public ScoketHandler<TcpClientSession>
+	class TcpClientComponent : public Component, public ScoketHandler<TcpClientSession>
 	{
 	public:
-		TcpNetSessionComponent();
+		TcpClientComponent();
 
-		virtual ~TcpNetSessionComponent() {}
+		virtual ~TcpClientComponent() {}
 
     protected:
 
@@ -46,7 +46,7 @@ namespace Sentry
 		class ActionComponent * mActionComponent;
 		class ServiceMgrComponent * mServiceComponent;
 
-		class TcpNetSessionComponent *mNetWorkManager;
+		class TcpClientComponent *mNetWorkManager;
 		class ProtocolComponent *mProtocolComponent;
 
 	private:

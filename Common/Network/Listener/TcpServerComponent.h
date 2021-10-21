@@ -5,7 +5,7 @@ namespace Sentry
 {
 	// 处理外部连接进来的session
 	class NetworkListener;
-	class TcpNetSessionComponent;
+	class TcpClientComponent;
 	class TcpServerComponent : public Component
 	{
 	public:

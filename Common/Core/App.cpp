@@ -4,7 +4,7 @@
 #include <Util/FileHelper.h>
 #include <Scene/ActionComponent.h>
 #include <Scene/ProtocolComponent.h>
-#include <Network/Tcp/TcpNetSessionComponent.h>
+#include <Network/Tcp/TcpClientComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Scene/TaskPoolComponent.h>
@@ -59,7 +59,7 @@ namespace Sentry
 		this->AddComponent<ActionComponent>();
 		this->AddComponent<ProtocolComponent>();
 		this->AddComponent<CoroutineComponent>();
-		this->AddComponent<TcpNetSessionComponent>();
+		this->AddComponent<TcpClientComponent>();
 
 		this->AddComponent<ServiceNodeComponent>();
 		this->AddComponent<ServiceMgrComponent>();

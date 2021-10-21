@@ -1,4 +1,4 @@
-﻿#include "TcpNetSessionComponent.h"
+﻿#include "TcpClientComponent.h"
 
 #include <Core/App.h>
 #include <Scene/ActionComponent.h>
@@ -9,12 +9,12 @@
 #include <Network/Tcp/TcpClientSession.h>
 namespace Sentry
 {
-    TcpNetSessionComponent::TcpNetSessionComponent()
+    TcpClientComponent::TcpClientComponent()
     {
 
     }
 
-    bool TcpNetSessionComponent::Awake()
+    bool TcpClientComponent::Awake()
     {
 		SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
 		SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
@@ -22,7 +22,7 @@ namespace Sentry
         return true;
     }
 
-	void TcpNetSessionComponent::OnCloseSession(TcpClientSession * socket)
+	void TcpClientComponent::OnCloseSession(TcpClientSession * socket)
 	{
 		if (socket == nullptr)
 		{
@@ -38,7 +38,7 @@ namespace Sentry
 		}
 	}
 
-	void TcpNetSessionComponent::OnSessionError(TcpClientSession * clientSession, const  asio::error_code & err)
+	void TcpClientComponent::OnSessionError(TcpClientSession * clientSession, const  asio::error_code & err)
 	{
 		if (err)
 		{
@@ -66,7 +66,7 @@ namespace Sentry
 	}
 
 
-	void TcpNetSessionComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
+	void TcpClientComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
 	{
 		const std::string & address = session->GetAddress();
 		if (err)
@@ -75,7 +75,7 @@ namespace Sentry
 		}
 	}
 
-	bool TcpNetSessionComponent::OnListenNewSession(TcpClientSession *clientSession)
+	bool TcpClientComponent::OnListenNewSession(TcpClientSession *clientSession)
 	{
 		if (clientSession != nullptr)
 		{
@@ -90,7 +90,7 @@ namespace Sentry
         return true;
 	}
 
-	bool TcpNetSessionComponent::OnReceiveMessage(TcpClientSession *session, const string & message)
+	bool TcpClientComponent::OnReceiveMessage(TcpClientSession *session, const string & message)
 	{
         const char * body = message.c_str() + 1;
         const size_t bodySize = message.size() - 1;
@@ -123,7 +123,7 @@ namespace Sentry
         return false;
 	}
 
-	TcpClientSession *TcpNetSessionComponent::ConnectRemote(const std::string &name, const std::string & ip, unsigned short port)
+	TcpClientSession *TcpClientComponent::ConnectRemote(const std::string &name, const std::string & ip, unsigned short port)
 	{
 		std::string address = ip + ":" + std::to_string(port);
 		auto iter = this->mSessionAdressMap.find(address);
@@ -141,17 +141,17 @@ namespace Sentry
 
 	}
 
-    void TcpNetSessionComponent::OnDestory()
+    void TcpClientComponent::OnDestory()
     {
     }
 
-    TcpClientSession *TcpNetSessionComponent::GetSession(const std::string &address)
+    TcpClientSession *TcpClientComponent::GetSession(const std::string &address)
     {
         auto iter = this->mSessionAdressMap.find(address);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
     }
 
-    bool TcpNetSessionComponent::CloseSession(const std::string &address)
+    bool TcpClientComponent::CloseSession(const std::string &address)
     {
         auto iter = this->mSessionAdressMap.find(address);
         if (iter != this->mSessionAdressMap.end())
@@ -166,7 +166,7 @@ namespace Sentry
         return false;
     }
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, std::string * message)
+	bool TcpClientComponent::SendByAddress(const std::string & address, std::string * message)
 	{
 		TcpClientSession * tcpSession = this->GetSession(address);
 		if (tcpSession == nullptr)
@@ -176,17 +176,17 @@ namespace Sentry
 		return tcpSession->SendNetMessage(message);
 	}
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, com::DataPacket_Request & message)
+	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Request & message)
 	{
 		return this->SendByAddress(address, TYPE_REQUEST, message);
 	}
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, com::DataPacket_Response & message)
+	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Response & message)
 	{
 		return this->SendByAddress(address, TYPE_RESPONSE, message);
 	}
 
-	bool TcpNetSessionComponent::SendByAddress(const std::string & address, DataMessageType type, Message & message)
+	bool TcpClientComponent::SendByAddress(const std::string & address, DataMessageType type, Message & message)
 	{
 		// size + type + + body
 		const size_t size = message.ByteSizeLong() + 5;

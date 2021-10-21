@@ -34,7 +34,7 @@ namespace Sentry
         int mNodeId;
         class CoroutineComponent *mCorComponent;
         class ProtocolComponent * mProtocolComponent;
-		class TcpNetSessionComponent *mNetSessionComponent;
+		class TcpClientComponent *mNetSessionComponent;
 		ObjectPool<com::DataPacket_Request> mRequestDataPool;
     };
 }

@@ -7,7 +7,7 @@
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
-#include <Network/Tcp/TcpNetSessionComponent.h>
+#include <Network/Tcp/TcpClientComponent.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()
@@ -18,7 +18,7 @@ namespace Sentry
 
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
         SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
-		SayNoAssertRetFalse_F(this->mNetSessionComponent = this->GetComponent<TcpNetSessionComponent>());
+		SayNoAssertRetFalse_F(this->mNetSessionComponent = this->GetComponent<TcpClientComponent>());
         return true;
     }
 
