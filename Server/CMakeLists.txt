@@ -4,29 +4,29 @@ PROJECT(Server)
 
 #第三方库包含
 
-include_directories(${PROJECT_INIT_PATH}/Libs/include/rapidjson)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/protobuf)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/asio)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/lua5.3)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/mysql)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/spdlog)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/redis)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/rapidjson)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/protobuf)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/asio)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/lua5.3)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/mysql)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/redis)
 #公共组件
 
 include_directories(${PROJECT_SOURCE_DIR}/DB)
 include_directories(${PROJECT_SOURCE_DIR}/Logic)
-include_directories(${PROJECT_INIT_PATH}/Common)
-include_directories(${PROJECT_INIT_PATH}/Protocol)
+include_directories(${PROJECT_COMMON_DIR}/Common)
+include_directories(${PROJECT_COMMON_DIR}/Protocol)
 
 include_directories(${PROJECT_SOURCE_DIR}/DB/Component)
 include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)
-include_directories(${PROJECT_INIT_PATH}/Common/Component)
+include_directories(${PROJECT_COMMON_DIR}/Common/Component)
 
 file(GLOB_RECURSE DBSource "DB/*.h" "DB/*.cpp" "DB/*.hpp" "DB/*.cc")
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 file(GLOB_RECURSE LogicSource "Logic/*.h" "Logic/*.cpp" "Logic/*.hpp" "Logic/*.cc")
 
-LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
+LINK_DIRECTORIES(${PROJECT_COMMON_DIR}/Libs/lib)
 
 SET(CMAKE_BUILD_TYPE Debug)
 list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
@@ -41,15 +41,19 @@ endforeach()
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
-    message("使用ccache缓存")
+    message("use [ccache]")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif ()
 
 if(MSVC)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     
+    foreach(file_name ${AsmFiles})
+        source_group_by_dir(${PROJECT_COMMON_DIR} ${file_name})
+    endforeach()
+
     foreach(file_name ${CommonFiles})
-        source_group_by_dir(${PROJECT_INIT_PATH} ${file_name})
+        source_group_by_dir(${PROJECT_COMMON_DIR} ${file_name})
     endforeach()
 
     foreach(file_name ${ServerFiles})

@@ -17,7 +17,7 @@ foreach(file ${CommonFiles})
 endforeach()
 
 set(CMAKE_CXX_STANDARD 11)
-
+set(PROJECT_COMMON_DIR ${PROJECT_SOURCE_DIR})
 if(MSVC)
     add_compile_options(/W4 /fp:fast /EHsc)
     add_link_options(/SAFESEH:NO)
@@ -28,7 +28,7 @@ else()
     endif()
 endif()
 
-set(PROJECT_INIT_PATH ${PROJECT_SOURCE_DIR})
+
 set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Coroutine/Context)
 if(WIN32)
      SET(AsmFiles ${ContextPath}/context_x64.asm)
