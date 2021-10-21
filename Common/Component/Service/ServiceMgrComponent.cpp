@@ -6,7 +6,7 @@
 #include <Util/JsonHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
-#include <NetWork/LuaServiceMethod.h>
+#include <TcpNetwork/LuaServiceMethod.h>
 #include<Scene/TcpNetSessionComponent.h>
 namespace Sentry
 {

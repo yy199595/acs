@@ -5,7 +5,7 @@
 #include <Script/LuaTable.h>
 
 #include <Other/MultiThreadQueue.h>
-#include <Network/TcpClientSession.h>
+#include <TcpNetwork/TcpClientSession.h>
 namespace Sentry
 {
 	// 管理所有session

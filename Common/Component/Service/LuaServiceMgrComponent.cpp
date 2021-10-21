@@ -1,6 +1,6 @@
 #include "LuaServiceMgrComponent.h"
 #include <Core/App.h>
-#include <NetWork/LuaServiceMethod.h>
+#include <TcpNetwork/LuaServiceMethod.h>
 #include <Service/LuaServiceComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/ProtocolComponent.h>

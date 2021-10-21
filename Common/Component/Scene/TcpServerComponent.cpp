@@ -3,7 +3,7 @@
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<Scene/TaskPoolComponent.h>
-#include <NetWork/NetworkListener.h>
+#include <TcpNetwork/NetworkListener.h>
 #include <Thread/TaskThread.h>
 namespace Sentry
 {

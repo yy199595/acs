@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include<Thread/TaskThread.h>
-#include<NetWork/SessionBase.h>
+#include<TcpNetwork/SessionBase.h>
 #include<Protocol/com.pb.h>
 #include<Pool/StringPool.h>
 namespace Sentry

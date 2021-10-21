@@ -6,7 +6,7 @@
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <NetWork/TcpClientSession.h>
+#include <TcpNetwork/TcpClientSession.h>
 namespace Sentry
 {
     TcpNetSessionComponent::TcpNetSessionComponent()

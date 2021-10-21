@@ -2,7 +2,7 @@
 #include<Util/StringHelper.h>
 #include<Core/App.h>
 #include<Util/NumberHelper.h>
-#include<NetWork/NetWorkRetAction.h>
+#include<TcpNetwork/NetWorkRetAction.h>
 #include<Timer/ActionTimeoutTimer.h>
 
 namespace Sentry

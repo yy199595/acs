@@ -3,7 +3,7 @@
 #include<XCode/XCode.h>
 #include<Util/NumberBuilder.h>
 #include<Protocol/com.pb.h>
-#include<NetWork/TcpClientSession.h>
+#include<TcpNetwork/TcpClientSession.h>
 
 using namespace com;
 namespace Sentry

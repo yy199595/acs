@@ -2,7 +2,7 @@
 #pragma once
 
 #include<Service/LocalServiceComponent.h>
-#include<NetWork/TcpClientSession.h>
+#include<TcpNetwork/TcpClientSession.h>
 
 using namespace com;
 
