@@ -29,28 +29,27 @@ namespace Sentry
 
         this->mCorId = App::Get().GetCoroutineComponent()->GetCurrentCorId();
         App::Get().GetCoroutineComponent()->YieldReturn();
-        return this->mIsListen;
+		return this->mIsListen;
 	}
 
 	void NetworkListener::ListenConnect()
 	{
         if(this->mBindAcceptor == nullptr)
         {
+			try
+			{
+				AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
+				this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
 
-            try
-            {
-                AsioTcpEndPoint endPoint( asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
-                this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
-
-
-                this->mBindAcceptor->listen(this->mConfig.Count);
-                this->mIsListen = true;
-            }
+				this->mBindAcceptor->listen(this->mConfig.Count);
+				this->mIsListen = true;
+			}
             catch (std::system_error & err)
             {
                 this->mIsListen = false;
                 SayNoDebugFatal("listen " << this->mConfig.Ip << ":"
                                           << this->mConfig.Port << " failure" << err.what());
+				return;
             }
             CoroutineComponent * component = App::Get().GetCoroutineComponent();
             this->mTaskScheduler.AddMainTask(NewMethodProxy(&CoroutineComponent::Resume, component, this->mCorId));
