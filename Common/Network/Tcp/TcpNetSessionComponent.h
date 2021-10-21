@@ -3,9 +3,8 @@
 #include <thread>
 #include <Component/Component.h>
 #include <Script/LuaTable.h>
-
 #include <Other/MultiThreadQueue.h>
-#include <TcpNetwork/TcpClientSession.h>
+#include <Network/Tcp/TcpClientSession.h>
 namespace Sentry
 {
 	// 管理所有session

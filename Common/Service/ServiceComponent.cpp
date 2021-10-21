@@ -1,6 +1,6 @@
 ﻿#include"ServiceComponent.h"
 #include<Core/App.h>
-#include <TcpNetwork/LuaServiceMethod.h>
+#include <Method/LuaServiceMethod.h>
 #include<Scene/ProtocolComponent.h>
 namespace Sentry
 {

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Define/CommonDef.h>
-#include <TcpNetwork/SessionBase.h>
+#include <Network/SessionBase.h>
 
 namespace Sentry
 {

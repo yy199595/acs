@@ -1,8 +1,8 @@
 
 #pragma once
+#include"HttpClientSession.h"
+#include<Component/Component.h>
 
-#include <Component/Component.h>
-#include <Http/HttpClientSession.h>
 namespace Sentry
 {
     class HttpClientComponent : public Component//, public ScoketHandler<HttpClientSession>

@@ -1,6 +1,6 @@
 ﻿#include "ActionTimeoutTimer.h"
 #include <Scene/ActionComponent.h>
-#include <TcpNetwork/NetWorkRetAction.h>
+#include <Method/NetWorkRetAction.h>
 
 namespace Sentry
 {

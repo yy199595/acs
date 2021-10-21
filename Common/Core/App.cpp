@@ -4,7 +4,7 @@
 #include <Util/FileHelper.h>
 #include <Scene/ActionComponent.h>
 #include <Scene/ProtocolComponent.h>
-#include <Scene/TcpNetSessionComponent.h>
+#include <Network/Tcp/TcpNetSessionComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Scene/TaskPoolComponent.h>

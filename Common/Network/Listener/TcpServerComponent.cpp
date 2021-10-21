@@ -3,8 +3,9 @@
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<Scene/TaskPoolComponent.h>
-#include <TcpNetwork/NetworkListener.h>
-#include <Thread/TaskThread.h>
+
+#include<Thread/TaskThread.h>
+#include<Network/Listener/NetworkListener.h>
 namespace Sentry
 {
     bool TcpServerComponent::Awake()

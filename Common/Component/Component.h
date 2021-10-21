@@ -10,7 +10,7 @@
 #include <Protocol/s2s.pb.h>
 #include <Define/CommonDef.h>
 #include <Method/MethodProxy.h>
-#include<Define/CommonTypeDef.h>
+#include <Define/CommonTypeDef.h>
 namespace Sentry
 {
 	class Component;

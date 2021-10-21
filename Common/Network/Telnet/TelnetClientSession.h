@@ -1,6 +1,7 @@
 #pragma once
-#include "SessionBase.h"
+
 #include <istream>
+#include <Network/SessionBase.h>
 namespace Sentry
 {
 	class TelnetClientSession : public SessionBase

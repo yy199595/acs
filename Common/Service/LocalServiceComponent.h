@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "ServiceComponent.h"
-#include <TcpNetwork/ServiceMethod.h>
+#include <Method/ServiceMethod.h>
 
 namespace Sentry
 {

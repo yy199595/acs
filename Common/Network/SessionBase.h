@@ -1,8 +1,8 @@
 #pragma once
-
+#include<atomic>
 #include<Method/MethodProxy.h>
 #include<Define/CommonTypeDef.h>
-#include<atomic>
+
 namespace Sentry
 {
 	enum DataMessageType

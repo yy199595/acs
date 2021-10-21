@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/ActionComponent.h>
-#include <TcpNetwork/NetWorkRetAction.h>
+#include <Method/NetWorkRetAction.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
 #include <google/protobuf/util/json_util.h>

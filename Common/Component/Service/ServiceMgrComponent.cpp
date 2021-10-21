@@ -6,8 +6,8 @@
 #include <Util/JsonHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
-#include <TcpNetwork/LuaServiceMethod.h>
-#include<Scene/TcpNetSessionComponent.h>
+#include <Method/LuaServiceMethod.h>
+#include <Network/Tcp/TcpNetSessionComponent.h>
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()

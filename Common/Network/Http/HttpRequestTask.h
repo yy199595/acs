@@ -7,7 +7,7 @@
 #include <Thread/TaskProxy.h>
 #include <XCode/XCode.h>
 #include <Define/CommonTypeDef.h>
-#include <Http/HttpClientSession.h>
+#include "HttpClientSession.h"
 namespace Sentry
 {
     class HttpUrlHelper

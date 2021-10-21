@@ -2,8 +2,9 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/TcpNetSessionComponent.h>
 #include <Scene/ProtocolComponent.h>
+#include <Network/Tcp/TcpNetSessionComponent.h>
+
 namespace Sentry
 {
     bool ServiceNodeComponent::DelNode(int nodeId)

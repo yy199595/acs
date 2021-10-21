@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Scene/ActionComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <TcpNetwork/NetWorkRetAction.h>
+#include <Method/NetWorkRetAction.h>
 #include <Service/LuaServiceComponent.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>

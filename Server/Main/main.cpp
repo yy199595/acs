@@ -4,14 +4,14 @@
 #include <Timer/TimerComponent.h>
 
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/TcpServerComponent.h>
+#include <Network/Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/TcpNetSessionComponent.h>
+#include <Network/Tcp/TcpNetSessionComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Http/HttpClientComponent.h>
-#include <Scene/TelnetClientComponent.h>
+#include <Network/Http/HttpClientComponent.h>
+#include <Network/Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Service/ServiceMgrComponent.h>

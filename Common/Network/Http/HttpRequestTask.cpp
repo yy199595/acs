@@ -4,7 +4,7 @@
 
 #include "HttpRequestTask.h"
 #include <Core/App.h>
-#include <Http/HttpClientSession.h>
+#include "HttpClientSession.h"
 #include <Scene/TaskPoolComponent.h>
 namespace Sentry
 {

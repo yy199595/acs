@@ -5,10 +5,10 @@
 #include <Thread/TaskThread.h>
 #include "HttpClientComponent.h"
 #include "Component/Scene/TaskPoolComponent.h"
-#include<Util/StringHelper.h>
+#include <Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Http/HttpRequestTask.h>
-#include<Util/JsonHelper.h>
+#include "HttpRequestTask.h"
+#include <Util/JsonHelper.h>
 namespace Sentry
 {
     bool HttpClientComponent::Awake()

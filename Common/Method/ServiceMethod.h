@@ -1,6 +1,4 @@
 ﻿#pragma once
-
-#include "TcpClientSession.h"
 #include <Other/ObjectFactory.h>
 #include <Pool/ObjectPool.h>
 #include <Protocol/com.pb.h>

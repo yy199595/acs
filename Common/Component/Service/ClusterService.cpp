@@ -2,9 +2,9 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/TcpServerComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
+#include <Network/Listener/TcpServerComponent.h>
 namespace Sentry
 {
     bool ClusterService::Awake()

@@ -1,6 +1,5 @@
 ﻿#include"TcpClientSession.h"
 #include<Component/IComponent.h>
-#include<TcpNetwork/SocketEvent.h>
 
 namespace Sentry
 {

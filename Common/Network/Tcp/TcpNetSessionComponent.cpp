@@ -1,12 +1,12 @@
 ﻿#include "TcpNetSessionComponent.h"
 
 #include <Core/App.h>
-#include "ActionComponent.h"
-#include "LuaScriptComponent.h"
+#include <Scene/ActionComponent.h>
+#include <Scene/LuaScriptComponent.h>
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <TcpNetwork/TcpClientSession.h>
+#include <Network/Tcp/TcpClientSession.h>
 namespace Sentry
 {
     TcpNetSessionComponent::TcpNetSessionComponent()

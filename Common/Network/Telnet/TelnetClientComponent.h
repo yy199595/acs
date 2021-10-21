@@ -1,6 +1,6 @@
 #pragma once
-#include "Component.h"
-#include <TcpNetwork/TelnetClientSession.h>
+#include "TelnetClientSession.h"
+#include <Component/Component.h>
 namespace Sentry
 {
 	class TelnetClientComponent : public Component, public ScoketHandler<TelnetClientSession>
