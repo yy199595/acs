@@ -75,19 +75,18 @@ namespace Sentry
 		}
 	}
 
-	bool TcpClientComponent::OnListenNewSession(TcpClientSession *clientSession)
+	void TcpClientComponent::OnListenNewSession(TcpClientSession *clientSession, const asio::error_code & err)
 	{
-		if (clientSession != nullptr)
-		{
-			const std::string & address = clientSession->GetAddress();
-			auto iter = this->mSessionAdressMap.find(address);
-			if (iter != this->mSessionAdressMap.end())
-			{
-				return false;
-			}
-			this->mSessionAdressMap.emplace(address, clientSession);
-		}
-        return true;
+        if(err)
+        {
+            delete clientSession;
+            SayNoDebugError(err.message());
+        }
+        else
+        {
+            const std::string & address = clientSession->GetAddress();
+            this->mSessionAdressMap.emplace(address, clientSession);
+        }
 	}
 
 	bool TcpClientComponent::OnReceiveMessage(TcpClientSession *session, const string & message)

@@ -4,6 +4,7 @@
 
 #ifndef SENTRY_HTTPCLIENTSESSION_H
 #define SENTRY_HTTPCLIENTSESSION_H
+#include <Network/SessionBase.h>
 #include <Define/CommonTypeDef.h>
 using namespace asio::ip;
 
@@ -49,20 +50,18 @@ namespace Sentry
 
 namespace Sentry
 {
-    class HttpClientSession
+    class ISocketHandler;
+    class HttpRequestTask;
+
+    class HttpClientSession : public SessionBase
     {
     public:
-        HttpClientSession(AsioContext &io, const std::string &host, const std::string &port = "80");
+        HttpClientSession(ISocketHandler * handler, HttpRequestTask & httpTask);
 
         ~HttpClientSession();
 
-    public:
-        void Request(SharedMessage message, IHttpReponseHandler *handler);
-
     private:
         void ConnectHandler(const asio::error_code &err);
-
-        void ResolverHandler(const asio::error_code &err, tcp::resolver::iterator iterator);
 
         void WriteHandler(const asio::error_code &err, const size_t size);
 
@@ -70,14 +69,13 @@ namespace Sentry
 
         void ReadBodyHandler(const asio::error_code &err, const size_t size);
 
+    protected:
+        void OnSessionEnable() override;
+
+        void OnConnect(const asio::error_code &err) override;
+
     private:
-        AsioContext &mHttpContext;
-        SharedTcpSocket mHttpSocket;
-        SharedMessage mRequestMessage;
-        IHttpReponseHandler *mResponseHandler;
-    private:
-        tcp::resolver mResolver;
-        tcp::resolver::query mQuery;
+        HttpRequestTask & mHttpTask;
     private:
         asio::streambuf mResponseBuf;
         HttpResponseStream mResponseStream;

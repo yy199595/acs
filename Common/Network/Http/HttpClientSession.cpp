@@ -4,54 +4,28 @@
 
 
 #include <asio.hpp>
+
 #include "HttpClientSession.h"
 #include <Define/CommonDef.h>
+#include <Network/Http/HttpRequestTask.h>
 namespace Sentry
 {
-    HttpClientSession::HttpClientSession(AsioContext &io,const std::string & host, const std::string & port)
-        : mHttpContext(io), mResponseStream(&mResponseBuf), mResolver(io), mQuery(host, port)
+    HttpClientSession::HttpClientSession(ISocketHandler * handler, HttpRequestTask & task)
+        : SessionBase(handler), mHttpTask(task), mResponseStream(&mResponseBuf)
     {
-        this->mResponseHandler = nullptr;
+
     }
 
     HttpClientSession::~HttpClientSession()
     {
-        if(this->mResponseHandler)
-        {
-            delete this->mResponseHandler;
-        }
-        if(this->mHttpSocket != nullptr && this->mHttpSocket->is_open())
-        {
-            asio::error_code err;
-            this->mHttpSocket->close(err);
-			SayNoDebugError(err.message());
-        }
+
     }
 
-    void HttpClientSession::Request(SharedMessage message, IHttpReponseHandler *handler)
+    void HttpClientSession::OnConnect(const asio::error_code &err)
     {
-        if (message == nullptr || message->empty() || handler == nullptr)
-        {
-            return;
-        }
-        this->mRequestMessage = message;
-        this->mResponseHandler = handler;
-        this->mResolver.async_resolve(this->mQuery, std::bind(&HttpClientSession::ResolverHandler, this, args1, args2));
-    }
 
-    void HttpClientSession::ResolverHandler(const asio::error_code &err, tcp::resolver::iterator iterator)
-    {
-        if(err)
-        {
-            SayNoDebugError(err.message());
-            this->mResponseHandler->Run(EHttpError::HttpResolverError, this->mResponseStream);
-            return;
-        }
-        this->mHttpSocket = std::make_shared<asio::ip::tcp::socket>(this->mHttpContext);
-        //this->mHttpSocket->async_connect(*iterator, std::bind(&HttpClientSession::ConnectHandler, this, args1));
-        asio::async_connect(*this->mHttpSocket, iterator, std::bind(&HttpClientSession::ConnectHandler, this, args1));
     }
-
+    
     void HttpClientSession::ConnectHandler(const asio::error_code &err)
     {
         if (err)

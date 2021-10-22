@@ -18,10 +18,10 @@ namespace Sentry
     protected:
 
         void OnCloseSession(TcpClientSession * socket) override;
-        bool OnListenNewSession(TcpClientSession * session) override;
         bool OnReceiveMessage(TcpClientSession * session, const string & message) override;
         void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
-		void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
+        void OnListenNewSession(TcpClientSession * session, const asio::error_code & err) override;
+        void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
 	public:
         SessionBase * CreateSocket() { return new TcpClientSession(this);}
 		TcpClientSession * ConnectRemote(const std::string &name, const std::string & ip, unsigned short port);

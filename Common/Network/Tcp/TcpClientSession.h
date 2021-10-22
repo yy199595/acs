@@ -3,18 +3,6 @@
 #include <Define/CommonDef.h>
 #include <Network/SessionBase.h>
 
-namespace Sentry
-{
-
-    enum ETcpErrorType
-    {
-        ErrNone,
-        ErrConnect,
-        ErrRead,
-        ErrWrite,
-    };
-}
-
 
 namespace Sentry
 {
@@ -27,8 +15,9 @@ namespace Sentry
      
         virtual ~TcpClientSession();
 	protected:
-		void OnStartReceive();
+		void OnSessionEnable() override;
     private:
+        void StartReceive();
         void ReadMessageBody(const size_t allSize);
     private:
         char *mRecvMsgBuffer;

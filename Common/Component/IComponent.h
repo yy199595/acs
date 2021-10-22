@@ -71,9 +71,9 @@ namespace Sentry
 
         virtual SessionBase * CreateSocket() = 0;
         virtual void OnClose(SessionBase * socket) = 0;
-        virtual void OnListenConnect(SessionBase * session) = 0;
         virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
-		virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
+        virtual void OnListenConnect(SessionBase * session, const asio::error_code & err) = 0;
+        virtual void OnConnectRemote(SessionBase * session, const asio::error_code & err) = 0;
 		virtual void OnReceiveNewMessage(SessionBase * session, string * message) = 0;
 		virtual void OnSendMessage(SessionBase * session, string * message, const asio::error_code & err) = 0;
 	public:
@@ -109,12 +109,9 @@ namespace Sentry
         {
             this->OnConnectRemoteAfter(static_cast<T*>(session), err);
         }
-        void OnListenConnect(SessionBase * session) override
+        void OnListenConnect(SessionBase * session, const asio::error_code & err) override
         {
-            if(!this->OnListenNewSession(static_cast<T*>(session)))
-            {
-                session->Close();
-            }
+            this->OnListenNewSession(static_cast<T*>(session, err));
         }
         void OnReceiveNewMessage(SessionBase * session, string * message) override
         {
@@ -132,9 +129,9 @@ namespace Sentry
         }
     protected:
         virtual void OnCloseSession(T * session) = 0;
-        virtual bool OnListenNewSession(T * session) = 0;
         virtual bool OnReceiveMessage(T * session, const string & message) = 0;
         virtual void OnSessionError(T * session, const asio::error_code & err) = 0;
+        virtual void OnListenNewSession(T * session, const asio::error_code & err) = 0;
         virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) = 0;
         virtual void OnSendMessageAfter(T * session, const std::string & message, const asio::error_code & err) { };
     };

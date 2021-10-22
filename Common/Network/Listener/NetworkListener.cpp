@@ -60,19 +60,11 @@ namespace Sentry
 
 	void NetworkListener::OnConnectHandler(const asio::error_code & code)
 	{
-		if (!code)
-		{
-            this->mSessionSocket->OnListenDone();
-			this->mTaskScheduler.AddMainTask(NewMethodProxy(
-				&ISocketHandler::OnListenConnect, this->mSessionHandler, this->mSessionSocket));
+        this->mSessionSocket->OnListenDone(code);
+        if(!code)
+        {
             SayNoDebugInfo(this->mConfig.Name << " listen new socket " << this->mSessionSocket->GetAddress());
-		}
-		else
-		{		
-			mSessionSocket->Close();
-			delete this->mSessionSocket;
-			SayNoDebugError(code.message());
-		}
-		this->mTaskThread->GetContext().post(std::bind(&NetworkListener::ListenConnect, this));
+        }
+        this->mTaskThread->GetContext().post(std::bind(&NetworkListener::ListenConnect, this));
 	}
 }

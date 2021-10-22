@@ -26,16 +26,25 @@ namespace Sentry
 		this->mTaskScheduler.AddMainTask(NewMethodProxy(&SessionBase::OnClose, this));
 	}
 
-    void SessionBase::OnListenDone()
+    void SessionBase::InitMember(bool isConnect)
     {
-        this->OnStartReceive();
-        this->mIsConnected = false;
+        this->mIsConnected = isConnect;
         this->mIsOpen = this->mSocket->is_open();
         this->mLocalAddress = this->mSocket->local_endpoint().address().to_string()
                               + ":" + std::to_string(this->mSocket->local_endpoint().port());
 
         this->mRemoteAddress = this->mSocket->remote_endpoint().address().to_string()
                                + ":" + std::to_string(this->mSocket->remote_endpoint().port());
+    }
+
+    void SessionBase::OnListenDone(const asio::error_code & err)
+    {
+        if(!err)
+        {
+            this->InitMember(false);
+            this->OnSessionEnable();
+        }
+        this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnListenConnect, this->mHandler, this, err));
     }
 
     void SessionBase::StartConnect(std::string name, std::string ip, unsigned short port)
@@ -45,10 +54,10 @@ namespace Sentry
 			return;
 		}
 		this->mIsConnected = true;
-		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::OnStartConnect, this, name, ip, port));
+		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::ConnectRemoteHandler, this, name, ip, port));
 	}
 
-    void SessionBase::OnStartConnect(std::string name, std::string host, unsigned short port)
+    void SessionBase::ConnectRemoteHandler(std::string name, std::string host, unsigned short port)
     {
         if (this->mSocket->is_open())
         {
@@ -96,15 +105,9 @@ namespace Sentry
             this->OnClose();
             return;
         }
+        this->InitMember(true);
         this->OnConnect(err);
-        this->OnStartReceive();
-        this->mConnectCount = 0;
-        this->mIsOpen = this->mSocket->is_open();
-        this->mLocalAddress = this->mSocket->local_endpoint().address().to_string()
-                              + ":" + std::to_string(this->mSocket->local_endpoint().port());
-
-        this->mRemoteAddress = this->mSocket->remote_endpoint().address().to_string()
-                               + ":" + std::to_string(this->mSocket->remote_endpoint().port());
+        this->OnSessionEnable();
     }
 
 	bool SessionBase::SendNetMessage(std::string * message)
@@ -113,10 +116,10 @@ namespace Sentry
 		{
 			return false;
 		}
-		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::OnSendMessage, this, message));
+		this->mHandler->GetNetThread()->AddTask(NewMethodProxy(&SessionBase::SendHandler, this, message));
 	}
 
-	void SessionBase::OnSendMessage(std::string * message)
+	void SessionBase::SendHandler(std::string *message)
     {
         if (!this->IsActive())
         {
@@ -129,10 +132,15 @@ namespace Sentry
                                       {
                                           this->OnError(error_code);
                                       }
-                                      this->mTaskScheduler.AddMainTask(
-                                              NewMethodProxy(&ISocketHandler::OnSendMessage, this->mHandler,
-                                                             this, message, error_code));
+                                      this->OnSendMessage(message, error_code);
                                   });
+    }
+
+    void SessionBase::OnSendMessage(std::string * message, const asio::error_code &err)
+    {
+        this->mTaskScheduler.AddMainTask(
+                NewMethodProxy(&ISocketHandler::OnSendMessage, this->mHandler,
+                               this, message, err));
     }
 
 	void SessionBase::OnClose()

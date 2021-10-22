@@ -18,19 +18,25 @@ namespace Sentry
 		}    
     }
 
-	void TcpClientSession::OnStartReceive()
+    void TcpClientSession::OnSessionEnable()
+    {
+        SessionBase::OnSessionEnable();
+        if (this->mRecvMsgBuffer == nullptr)
+        {
+            this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
+        }
+        this->StartReceive();
+    }
+
+	void TcpClientSession::StartReceive()
 	{
-		if (this->mRecvMsgBuffer == nullptr)
-		{
-			this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
-		}
 		this->mSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			if (error_code)
 			{
 				this->OnClose();
-				SayNoDebugError(error_code.message());			
+				SayNoDebugError(error_code.message());
 			}
 			else
 			{
