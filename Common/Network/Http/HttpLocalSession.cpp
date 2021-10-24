@@ -57,7 +57,7 @@ namespace Sentry
 			asio::ip::tcp::resolver::iterator end;
 			for (auto iter = iterator; iter != end; iter++)
 			{
-				asio::ip::tcp::endpoint & point = (*iter).endpoint();
+				const asio::ip::tcp::endpoint & point = (*iter).endpoint();
 				SayNoDebugInfo(host << " = " << point.address().to_string() << ":" << point.port());
 			}
 			if (this->mHttpRequest.OnReceive(this->mStream, err))

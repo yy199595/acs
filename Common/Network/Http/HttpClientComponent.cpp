@@ -36,7 +36,7 @@ namespace Sentry
 	{
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
-		//this->Get("http://www.baidu.com", json);
+		//this->Get("http://www.qq.com", json);
 		this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
 
 		SayNoDebugFatal(json);
