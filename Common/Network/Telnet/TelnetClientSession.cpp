@@ -14,7 +14,7 @@ namespace Sentry
 
 	}
 
-	void TelnetClientSession::OnStartReceive()
+	void TelnetClientSession::OnSessionEnable()
 	{
 		if (!this->mSocket->is_open())
 		{

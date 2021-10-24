@@ -3,20 +3,28 @@
 #include <Component/Component.h>
 namespace Sentry
 {
-	class TelnetClientComponent : public Component, public ScoketHandler<TelnetClientSession>
-	{
-	public:
-		TelnetClientComponent();
-		~TelnetClientComponent();
-	public:
-		bool Awake() override;
-		SessionBase * CreateSocket() override;
-	protected:		
-		 void OnCloseSession(TelnetClientSession * session) override;
-		 bool OnListenNewSession(TelnetClientSession * session) override;
-		 bool OnReceiveMessage(TelnetClientSession * session, const std::string & message) override;
-		 void OnSessionError(TelnetClientSession * session, const asio::error_code & err) override;
-		 void OnConnectRemoteAfter(TelnetClientSession * session, const asio::error_code & err) override;
-	};
+    class TelnetClientComponent : public Component, public SocketHandler<TelnetClientSession>
+    {
+    public:
+        TelnetClientComponent();
+
+        ~TelnetClientComponent();
+
+    public:
+        bool Awake() override;
+
+        SessionBase *CreateSocket() override;
+
+    protected:
+        void OnCloseSession(TelnetClientSession *session) override;
+
+        void OnListenNewSession(TelnetClientSession *session, const asio::error_code &err) override;
+
+        void OnSessionError(TelnetClientSession *session, const asio::error_code &err) override;
+
+        bool OnReceiveMessage(TelnetClientSession *session, const std::string &message) override;
+
+        void OnConnectRemoteAfter(TelnetClientSession *session, const asio::error_code &err) override;
+    };
 }
 

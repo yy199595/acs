@@ -24,14 +24,14 @@ namespace Sentry
 namespace Sentry
 {
     typedef std::istream HttpResponseStream;
-    class IHttpReponseHandler
+    class IHttpResponseHandler
     {
     public:
         virtual void Run(EHttpError code, std::istream & response) = 0;
     };
 
     template<typename T>
-    class HttpResponseHandler : public IHttpReponseHandler
+    class HttpResponseHandler : public IHttpResponseHandler
     {
     public:
         typedef void (T::*HandlerFunc)(EHttpError, HttpResponseStream &);
@@ -56,7 +56,7 @@ namespace Sentry
     class HttpClientSession : public SessionBase
     {
     public:
-        HttpClientSession(ISocketHandler * handler, HttpRequestTask & httpTask);
+        HttpClientSession(ISocketHandler * handler);
 
         ~HttpClientSession();
 
@@ -73,9 +73,6 @@ namespace Sentry
         void OnSessionEnable() override;
 
         void OnConnect(const asio::error_code &err) override;
-
-    private:
-        HttpRequestTask & mHttpTask;
     private:
         asio::streambuf mResponseBuf;
         HttpResponseStream mResponseStream;

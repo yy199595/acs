@@ -30,7 +30,8 @@ namespace Sentry
     public:
         XCode GetCode() { return this->mCode;}
         const std::string & GetData() { return this->mData;}
-
+    public:
+        void OnHandler(asio::streambuf & buffer, const asio::error_code & err);
     public:
         bool Run() final; //在线程池执行的任务
         void RunFinish() final;

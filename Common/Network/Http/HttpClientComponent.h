@@ -5,7 +5,7 @@
 
 namespace Sentry
 {
-    class HttpClientComponent : public Component//, public ScoketHandler<HttpClientSession>
+    class HttpClientComponent : public Component//, public SocketHandler<HttpClientSession>
     {
     public:
         HttpClientComponent()

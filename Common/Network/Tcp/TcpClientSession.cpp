@@ -6,31 +6,31 @@ namespace Sentry
     TcpClientSession::TcpClientSession(ISocketHandler * handler)
             : SessionBase(handler)
     {      
-		this->mRecvBufferSize = 1024;
-		this->mRecvMsgBuffer = nullptr;
+		this->mReceiveBufferSize = 1024;
+		this->mReceiveMsgBuffer = nullptr;
     }
 
     TcpClientSession::~TcpClientSession()
     {
-		if (this->mRecvMsgBuffer != nullptr)
+		if (this->mReceiveMsgBuffer != nullptr)
 		{
-			delete[]this->mRecvMsgBuffer;
+			delete[]this->mReceiveMsgBuffer;
 		}    
     }
 
     void TcpClientSession::OnSessionEnable()
     {
         SessionBase::OnSessionEnable();
-        if (this->mRecvMsgBuffer == nullptr)
+        if (this->mReceiveMsgBuffer == nullptr)
         {
-            this->mRecvMsgBuffer = new char[this->mRecvBufferSize];
+            this->mReceiveMsgBuffer = new char[this->mReceiveBufferSize];
         }
         this->StartReceive();
     }
 
 	void TcpClientSession::StartReceive()
 	{
-		this->mSocket->async_read_some(asio::buffer(this->mRecvMsgBuffer, sizeof(unsigned int)),
+		this->mSocket->async_read_some(asio::buffer(this->mReceiveMsgBuffer, sizeof(unsigned int)),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			if (error_code)
@@ -41,7 +41,7 @@ namespace Sentry
 			else
 			{
 				size_t packageSize = 0;
-				memcpy(&packageSize, this->mRecvMsgBuffer, t);
+				memcpy(&packageSize, this->mReceiveMsgBuffer, t);
 				if (packageSize >= 1024 * 10) //最大为10k
 				{
 					this->OnClose();
@@ -54,8 +54,8 @@ namespace Sentry
 
 	void TcpClientSession::ReadMessageBody(const size_t allSize)
 	{
-		char *nMessageBuffer = this->mRecvMsgBuffer;
-		if (allSize > this->mRecvBufferSize)
+		char *nMessageBuffer = this->mReceiveMsgBuffer;
+		if (allSize > this->mReceiveBufferSize)
 		{
 			nMessageBuffer = new char[allSize];
 		}
@@ -72,7 +72,7 @@ namespace Sentry
 			{
 				this->OnReceiveMessage(nMessageBuffer, messageSize);				
 			}	
-			if (nMessageBuffer != this->mRecvMsgBuffer)
+			if (nMessageBuffer != this->mReceiveMsgBuffer)
 			{
 				delete[]nMessageBuffer;
 			}

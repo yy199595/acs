@@ -20,8 +20,8 @@ namespace Sentry
         void StartReceive();
         void ReadMessageBody(const size_t allSize);
     private:
-        char *mRecvMsgBuffer;
-        unsigned int mRecvBufferSize;
+        char *mReceiveMsgBuffer;
+        unsigned int mReceiveBufferSize;
     };
 
     typedef shared_ptr<TcpClientSession> SharedTcpSession;

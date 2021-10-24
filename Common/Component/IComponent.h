@@ -94,26 +94,26 @@ namespace Sentry
     };
 
     template<typename T>
-    class ScoketHandler : public ISocketHandler
+    class SocketHandler : public ISocketHandler
     {
     public:
-        void OnClose(SessionBase * socket) override
+        void OnClose(SessionBase * socket) final
         {
             this->OnCloseSession(static_cast<T*>(socket));
         };
-        void OnSessionErr(SessionBase * session, const asio::error_code & err) override
+        void OnSessionErr(SessionBase * session, const asio::error_code & err) final
         {
             this->OnSessionError(static_cast<T*>(session), err);
         }
-        void OnConnectRemote(SessionBase * session, const asio::error_code & err) override
+        void OnConnectRemote(SessionBase * session, const asio::error_code & err) final
         {
             this->OnConnectRemoteAfter(static_cast<T*>(session), err);
         }
-        void OnListenConnect(SessionBase * session, const asio::error_code & err) override
+        void OnListenConnect(SessionBase * session, const asio::error_code & err) final
         {
-            this->OnListenNewSession(static_cast<T*>(session, err));
+            this->OnListenNewSession(static_cast<T*>(session), err);
         }
-        void OnReceiveNewMessage(SessionBase * session, string * message) override
+        void OnReceiveNewMessage(SessionBase * session, string * message) final
         {
             if(!this->OnReceiveMessage(static_cast<T*>(session), *message))
             {
@@ -122,7 +122,7 @@ namespace Sentry
             this->mStringPool.Destory(message);
         }
 
-        void OnSendMessage(SessionBase *session, string * message, const asio::error_code &err) override
+        void OnSendMessage(SessionBase *session, string * message, const asio::error_code &err) final
         {
             this->OnSendMessageAfter(static_cast<T*>(session), *message, err);
             this->mStringPool.Destory(message);

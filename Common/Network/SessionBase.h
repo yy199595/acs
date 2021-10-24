@@ -64,7 +64,7 @@ namespace Sentry
     protected:
         virtual void OnClose();
 
-        virtual void OnSessionEnable() = 0;
+        virtual void OnSessionEnable() { };
 
         virtual void OnError(const asio::error_code &err);
 

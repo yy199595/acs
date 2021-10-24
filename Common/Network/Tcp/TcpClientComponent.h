@@ -8,7 +8,7 @@
 namespace Sentry
 {
 	// 管理所有session
-	class TcpClientComponent : public Component, public ScoketHandler<TcpClientSession>
+	class TcpClientComponent : public Component, public SocketHandler<TcpClientSession>
 	{
 	public:
 		TcpClientComponent();

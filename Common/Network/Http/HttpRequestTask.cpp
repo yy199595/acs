@@ -139,9 +139,9 @@ namespace Sentry
         char buffer[1024] = {0};
         size_t size = sprintf(buffer, "GET %s HTTP/1.0\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n\r\n", path.c_str(), host.c_str());
 
-        this->mHttpClient = new HttpClientSession(this->mAsioContext, host, port);
-        IHttpReponseHandler * handler = new HttpResponseHandler<HttpRequestTask>(&HttpRequestTask::OnResponse, this);
-        this->mHttpClient->Request(std::make_shared<std::string>(buffer, size), handler);
+        //this->mHttpClient = new HttpClientSession(this->mAsioContext, host, port);
+        IHttpResponseHandler * handler = new HttpResponseHandler<HttpRequestTask>(&HttpRequestTask::OnResponse, this);
+        //this->mHttpClient->Request(std::make_shared<std::string>(buffer, size), handler);
         return false;
     }
 
