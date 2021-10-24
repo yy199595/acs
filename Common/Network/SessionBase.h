@@ -1,7 +1,7 @@
 #pragma once
 #include<atomic>
+#include"NetworkHelper.h"
 #include<Method/MethodProxy.h>
-#include<Define/CommonTypeDef.h>
 
 namespace Sentry
 {
@@ -10,92 +10,86 @@ namespace Sentry
 		TYPE_REQUEST = 1,
 		TYPE_RESPONSE = 2
 	};
+	enum SocketType
+	{
+		NoneSocket,
+		LocalSocket,
+		RemoteSocket
+	};
 }
 
 namespace Sentry
 {
-    class ISocketHandler;
+	class ISocketHandler;
 
-    class MainTaskScheduler;
+	class MainTaskScheduler;
 
-    class SessionBase
-    {
-    public:
-        SessionBase(ISocketHandler *handler);
+	class SessionBase
+	{
+	public:
+		SessionBase(ISocketHandler *handler);
 
-        ~SessionBase()
-        {}
+		~SessionBase()
+		{}
 
-    public:
-        void Close();
+	public:
+		void Close();
 
-        AsioTcpSocket &GetSocket()
-        { return *mSocket; }
+		AsioTcpSocket &GetSocket() { return *mSocket; }
 
-        AsioContext &GetContext()
-        { return this->mContext; }
+		AsioContext &GetContext() { return this->mContext; }
 
-    public:
-        const std::string &GetName()
-        { return this->mName; }
+	public:
+		const std::string &GetName() { return this->mName; }
 
-        const std::string &GetLocalAddress()
-        { return this->mLocalAddress; };
+		const std::string &GetLocalAddress() { return this->mLocalAddress; };
 
-        const std::string &GetRemoteAddress()
-        { return this->mRemoteAddress; };
+		const std::string &GetRemoteAddress() { return this->mRemoteAddress; };
 
-        void StartConnect(std::string name, std::string host, unsigned short port);
+		const std::string &GetAddress() { return this->mRemoteAddress; }
 
-        const std::string &GetAddress()
-        { return this->mIsConnected ? this->mLocalAddress : this->mRemoteAddress; }
+	public:
+		void OnListenDone(const asio::error_code & err);
 
-    public:
-        void OnListenDone(const asio::error_code & err);
+		bool SendNetMessage(std::string *message);
 
-        bool SendNetMessage(std::string *message);
+		bool IsActive() { return this->mIsOpen; }
 
-        bool IsActive()
-        { return this->mIsOpen; }
+		SocketType GetSocketType() { return this->mSocketType; }
 
-        bool IsConnected()
-        { return this->mIsConnected; }
+	protected:
+		virtual void OnClose();
 
-    protected:
-        virtual void OnClose();
+		virtual void OnSessionEnable() { };
 
-        virtual void OnSessionEnable() { };
+		virtual void OnError(const asio::error_code &err);
 
-        virtual void OnError(const asio::error_code &err);
+		virtual void OnConnect(const asio::error_code &err);
 
-        virtual void OnConnect(const asio::error_code &err);
+		virtual void OnReceiveMessage(const char *msg, size_t size); //子类调用
 
-        virtual void OnReceiveMessage(const char *msg, size_t size); //子类调用
+		virtual void OnSendByString(std::string *msg, const asio::error_code &err);
 
-        virtual void OnSendMessage(std::string *msg, const asio::error_code &err);
+		virtual void OnSendByStream(asio::streambuf *msg, const asio::error_code &err);
 
-    private:
+	protected:
 
-        void InitMember(bool isConnect);
+		void InitMember(bool isConnect);
 
-        void SendHandler(std::string *message);
+		void SendByString(std::string *message);
 
-        void ConnectHandler(const asio::error_code &err);
-
-        void ConnectRemoteHandler(std::string name, std::string ip, unsigned short port);
-
-    protected:
-        std::string mName;
-        SharedTcpSocket mSocket;
-    private:
-        std::string mLocalAddress;
-        std::string mRemoteAddress;
-    private:
-        bool mIsConnected;
-        int mConnectCount;
-        AsioContext &mContext;
-        ISocketHandler *mHandler;
-        MainTaskScheduler &mTaskScheduler;
-        std::atomic_bool mIsOpen;
-    };
+		void SendByStream(asio::streambuf * message);
+	protected:
+		std::string mName;
+		SharedTcpSocket mSocket;
+		ISocketHandler *mHandler;
+		MainTaskScheduler &mTaskScheduler;
+	private:
+		std::string mLocalAddress;
+		std::string mRemoteAddress;
+	private:
+		SocketType mSocketType;
+		AsioContext &mContext;
+		std::atomic_bool mIsOpen;
+	};
 }

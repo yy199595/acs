@@ -75,7 +75,13 @@ namespace Sentry
     public:
         void AddTask(TaskProxy * task) final;
 		void AddTask(StaticMethod * task);
+		
 		AsioContext & GetContext() { return *mAsioContext; }
+	public:
+		template<typename F, typename T, typename ... Args>
+		void AddTask(F && f, T * o, Args &&... args) {
+			this->AddTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
+		}
     protected:
         void Update() final;
     private:
@@ -95,6 +101,11 @@ namespace Sentry
 		int Run();
 		void Stop();
 		void AddMainTask(StaticMethod * task);		
+
+		template<typename F, typename T, typename ... Args>
+		void AddMainTask(F && f, T * o, Args &&... args) {
+			this->AddMainTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
+		}
 	private:
 		bool mIsStop;
 		StaticMethod * mMainMethod;

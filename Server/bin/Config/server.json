@@ -21,6 +21,10 @@
             "count":10000,
             "handler":"TcpClientComponent"
         },
+        "http":
+        {
+            "handler":"HttpClientComponent"  
+        },
         "telnet":
         {
             "port":1995,

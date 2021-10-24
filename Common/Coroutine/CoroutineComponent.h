@@ -26,6 +26,8 @@ namespace Sentry
 	public:
 		void YieldReturn();
 
+		void YieldReturn(unsigned int & mCorId);
+
 		void Sleep(long long ms);
 
 		void YieldNextLoop();

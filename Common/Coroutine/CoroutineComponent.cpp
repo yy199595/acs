@@ -255,7 +255,13 @@ namespace Sentry
 #endif
     }
 
-    Coroutine *CoroutineComponent::GetCoroutine()
+	void CoroutineComponent::YieldReturn(unsigned int & mCorId)
+	{
+		mCorId = this->mCurrentCorId;
+		this->YieldReturn();
+	}
+
+	Coroutine *CoroutineComponent::GetCoroutine()
     {
 		if (this->mCurrentCorId == 0)
 		{

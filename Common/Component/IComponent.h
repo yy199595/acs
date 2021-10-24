@@ -68,7 +68,9 @@ namespace Sentry
     class ISocketHandler
     {
     public:
-
+		ISocketHandler() { this->mNetThread = nullptr; }
+		virtual ~ISocketHandler() { }
+	public:
         virtual SessionBase * CreateSocket() = 0;
         virtual void OnClose(SessionBase * socket) = 0;
         virtual void OnSessionErr(SessionBase * session, const asio::error_code & err) = 0;
@@ -129,10 +131,10 @@ namespace Sentry
         }
     protected:
         virtual void OnCloseSession(T * session) = 0;
-        virtual bool OnReceiveMessage(T * session, const string & message) = 0;
-        virtual void OnSessionError(T * session, const asio::error_code & err) = 0;
+		virtual bool OnReceiveMessage(T * session, const string & message) { return false; };
+		virtual void OnSessionError(T * session, const asio::error_code & err) { };
         virtual void OnListenNewSession(T * session, const asio::error_code & err) = 0;
-        virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) = 0;
+		virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) { };
         virtual void OnSendMessageAfter(T * session, const std::string & message, const asio::error_code & err) { };
     };
 }

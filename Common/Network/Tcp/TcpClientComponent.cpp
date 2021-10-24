@@ -44,7 +44,7 @@ namespace Sentry
 		{
 			const std::string & address = clientSession->GetAddress();
 			SayNoDebugError("[" << address << "]" << " error" << err.message());
-			if (clientSession->IsConnected())
+			if (clientSession->GetSocketType() == LocalSocket)
 			{
 				std::string ip;
 				unsigned short port;
