@@ -1,7 +1,6 @@
 #include "SessionBase.h"
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
-#include <regex>
 #include <Pool/StringPool.h>
 namespace Sentry
 {

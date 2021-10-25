@@ -7,7 +7,6 @@
 #include "Component/Scene/TaskPoolComponent.h"
 #include <Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Util/JsonHelper.h>
 #include <Network/Http/HttpLocalSession.h>
 #include<Network/Http/HttpRequest.h>
 namespace Sentry
@@ -36,7 +35,7 @@ namespace Sentry
 	{
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
-		//this->Get("http://www.qq.com", json);
+		//this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
 		this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
 
 		SayNoDebugFatal(json);

@@ -12,7 +12,7 @@ namespace Sentry
 	protected:
 		void OnConnect(const asio::error_code &err) override;		
 		void OnSendByStream(asio::streambuf *msg, const asio::error_code &err) override;
-		void OnReceive(asio::streambuf & stream, const asio::error_code & err) override;
+		bool OnReceive(asio::streambuf & stream, const asio::error_code & err) override;
 	private:
 		void ConnectHostHandler(const std::string & host, unsigned short port);		
 	public:

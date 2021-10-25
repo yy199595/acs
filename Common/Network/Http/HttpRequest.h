@@ -2,34 +2,61 @@
 #include<string>
 #include<XCode/XCode.h>
 #include<Define/CommonTypeDef.h>
-#include<Network/Http/HttpResponse.h>
 namespace Sentry
 {
-	class ISocketHandler;
-	class MainTaskScheduler;
-	class CoroutineComponent;
-	class HttpLocalSession;
-	class HttpRequest
-	{
-	public:
-		HttpRequest(ISocketHandler * handler, const std::string & name);
-		virtual ~HttpRequest() { }
-	public:
-		bool Connect(const std::string & host, unsigned short port);
-		virtual void GetRquestParame(asio::streambuf & strem) = 0;
-		virtual bool OnReceive(asio::streambuf & strem, const asio::error_code & err) = 0;
-		
-	public:
-		unsigned short GetPort() { this->mPort; }
-		const std::string & GetName() { return this->mName; }
-		const std::string & GetHost() { return this->mHost; }
-		
-	protected:
-		std::string mHost;
-		unsigned short mPort;
-		const std::string mName;
-		HttpLocalSession * mHttpSession;
-	};
+    class ISocketHandler;
+
+    class MainTaskScheduler;
+
+    class CoroutineComponent;
+
+    class HttpLocalSession;
+
+    class HttpRequest
+    {
+    public:
+        HttpRequest(ISocketHandler *handler, const std::string &name);
+
+        virtual ~HttpRequest();
+
+    public:
+        virtual void GetRquestParame(asio::streambuf &strem) = 0;
+
+        bool Connect(const std::string &host, unsigned short port);
+
+        bool OnReceive(asio::streambuf &strem, const asio::error_code &err);
+
+        virtual void OnReceiveDone(bool hasError) = 0;
+    protected:
+
+        virtual void OnReceiveBody(asio::streambuf &strem) = 0;
+
+    public:
+        unsigned short GetPort()
+        { this->mPort; }
+
+        int GetHttpCode()
+        { return this->mHttpCode; }
+
+        const std::string &GetName()
+        { return this->mName; }
+
+        const std::string &GetHost()
+        { return this->mHost; }
+
+    protected:
+        std::string mHost;
+        unsigned short mPort;
+        const std::string mName;
+        HttpLocalSession *mHttpSession;
+    private:
+        bool mIsEnd;
+        int mHttpCode;
+        int mReadCount;
+        std::string mHeard;
+        std::string mError;
+        std::string mVersion;
+    };
 }
 
 namespace Sentry
@@ -41,14 +68,15 @@ namespace Sentry
 		HttpGetRequest(ISocketHandler * handler);
 	public:
 		XCode Get(const std::string & url, std::string & response);
-	public:	
-		void GetRquestParame(asio::streambuf & strem) override;
-		bool OnReceive(asio::streambuf & strem, const asio::error_code & err) override;
-	private:
+    protected:
+        void OnReceiveDone(bool hasError) override;
+        void OnReceiveBody(asio::streambuf &strem) override;
+        void GetRquestParame(asio::streambuf & strem) override;
+    private:
 		XCode mCode;
 		std::string mPath;
 		std::string mName;
-		HttpResponse mResponse;
+        std::string mData;
 		unsigned int mCoroutineId;
 		MainTaskScheduler & mMainTaskPool;
 		CoroutineComponent * mCorComponent;

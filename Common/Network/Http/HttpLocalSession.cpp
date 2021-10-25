@@ -1,5 +1,4 @@
 #include "HttpLocalSession.h"
-#include <Core/App.h>
 #include "HttpRequest.h"
 #include <Component/IComponent.h>
 namespace Sentry
@@ -26,26 +25,35 @@ namespace Sentry
 
 	void HttpLocalSession::OnConnect(const asio::error_code &err)
 	{
-		if (this->mHttpRequest.OnReceive(this->mStream, err))
-		{
-			this->mHttpRequest.GetRquestParame(this->mStream);
-			this->SendByStream(&mStream);
-		}
+        if(err)
+        {
+            SayNoDebugError(err.message());
+            this->mHttpRequest.OnReceiveDone(true);
+        }
+        else
+        {
+            this->mHttpRequest.GetRquestParame(this->mStream);
+            this->SendByStream(&mStream);
+        }
 	}
 
-	void HttpLocalSession::OnReceive(asio::streambuf & stream, const asio::error_code & err)
+	bool HttpLocalSession::OnReceive(asio::streambuf & stream, const asio::error_code & err)
 	{
-		this->mHttpRequest.OnReceive(stream, err);
+		return this->mHttpRequest.OnReceive(stream, err);
 	}
 
 	void HttpLocalSession::OnSendByStream(asio::streambuf *msg, const asio::error_code &err)
 	{
-		if (this->mHttpRequest.OnReceive(this->mStream, err))
-		{
-			this->StartReceive();
-		}
+        if(err)
+        {
+            SayNoDebugError(err.message());
+            this->mHttpRequest.OnReceiveDone(true);
+        }
+        else
+        {
+            this->StartReceive();
+        }
 	}
-
 
 	void HttpLocalSession::ConnectHostHandler(const std::string & host, unsigned short port)
 	{		
@@ -60,12 +68,16 @@ namespace Sentry
 				const asio::ip::tcp::endpoint & point = (*iter).endpoint();
 				SayNoDebugInfo(host << " = " << point.address().to_string() << ":" << point.port());
 			}
-			if (this->mHttpRequest.OnReceive(this->mStream, err))
-			{
-				asio::async_connect(this->GetSocket(), iterator,
-					std::bind(&HttpLocalSession::OnConnect, this, args1));
-			}
-			
+            if(err)
+            {
+                SayNoDebugError(err.message());
+                this->mHttpRequest.OnReceiveDone(true);
+            }
+            else
+            {
+                asio::async_connect(this->GetSocket(), iterator,
+                                    std::bind(&HttpLocalSession::OnConnect, this, args1));
+            }
 		});
 	}
 

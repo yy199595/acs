@@ -9,10 +9,11 @@ namespace Sentry
 		virtual ~HttpSessionBase() { }
 	protected:
 		void StartReceive();
-		virtual void OnReceive(asio::streambuf & stream, const asio::error_code & err) = 0;
+		virtual bool OnReceive(asio::streambuf & stream, const asio::error_code & err) = 0;
 	private:
 		void ReadCallback(const asio::error_code & err, size_t size);
 	protected:
+        int mCount;
 		asio::streambuf mStreamBuf;
 	};
 }
