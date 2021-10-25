@@ -23,7 +23,7 @@ namespace Sentry
         void Start() final;
     public:
         XCode Get(const std::string &url, std::string &json, int timeout = 5);
-
+        XCode DownLoad(const std::string & url, const std::string & path);
     private:
         class TaskPoolComponent *mTaskComponent;
         class CoroutineComponent *mCorComponent;

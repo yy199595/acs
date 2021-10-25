@@ -8,7 +8,8 @@
 #include <Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Http/HttpLocalSession.h>
-#include<Network/Http/HttpRequest.h>
+#include <Network/Http/HttpGetRequest.h>
+#include <Network/Http/HttpDownLoadRequest.h>
 namespace Sentry
 {
     bool HttpClientComponent::Awake()
@@ -35,8 +36,9 @@ namespace Sentry
 	{
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
-		//this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
-		this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
+        const std::string path = "/Users/zmhy0073/yjz/Sentry/Server/bin/download/boy.png";
+		this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
+		//this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
 
 		SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
@@ -46,5 +48,11 @@ namespace Sentry
     {
 		HttpGetRequest httpRequest(this);
 		return httpRequest.Get(url, json);
+    }
+
+    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path)
+    {
+        HttpDownLoadRequest downLoadRequest(this);
+        return downLoadRequest.DownLoad(url, path);
     }
 }
