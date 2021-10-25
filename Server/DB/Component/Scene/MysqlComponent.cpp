@@ -40,7 +40,7 @@ namespace Sentry
     bool MysqlComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
-		this->mSqlPath = App::Get().GetConfigDir() + "sql.json";
+		this->mSqlPath = App::Get().GetConfigPath() + "sql.json";
         SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 

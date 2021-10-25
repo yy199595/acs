@@ -148,15 +148,36 @@ namespace DirectoryHelper
         return false;
     }
 
-    bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName)
+	bool GetDirByPath(const std::string path, std::string & director)
+	{
+		/*std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
+		std::regex nRegex(pattern);
+		if (!std::regex_match(path, nRegex))
+		{
+			return false;
+		}*/
+		size_t pos = path.find_last_of("/\\");
+		if (pos == std::string::npos)
+		{
+			return false;
+		}	
+		director = path.substr(0, pos + 1);
+		return true;
+	}
+
+	bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName)
     {
-        std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
+       /* std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
         std::regex nRegex(pattern);
         if (!std::regex_match(path, nRegex))
         {
             return false;
-        }
+        }*/
         size_t pos = path.find_last_of("/\\");
+		if (pos == std::string::npos)
+		{
+			return false;
+		}
         director = path.substr(0, pos);
         fileName = path.substr(pos + 1);
         return true;

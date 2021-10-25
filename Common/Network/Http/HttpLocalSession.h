@@ -1,6 +1,7 @@
 #pragma once
 #include <XCode/XCode.h>
 #include "HttpSessionBase.h"
+#define HTTP_BUFFER_SIZE 1024
 namespace Sentry
 {
 	class HttpRequest;
@@ -27,5 +28,6 @@ namespace Sentry
 		asio::streambuf mStream;
 		unsigned int mCoroutineId;
 		HttpRequest & mHttpRequest;	
+		char mHttpBuffer[HTTP_BUFFER_SIZE];
 	};
 }

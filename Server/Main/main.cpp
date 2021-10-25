@@ -61,10 +61,8 @@ int main(int argc, char **argv)
     __register_component__(ClusterService);
     __register_component__(GatewayService);
 
-    std::string serverName = argc == 3 ? argv[1] : "server";
-    std::string configPath = argc == 3 ? argv[2] : "./Config/";
 
-    App app(serverName, configPath);
+    App app(argc, argv);
 
     return app.Run();
 }

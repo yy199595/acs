@@ -8,6 +8,7 @@
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Scene/TaskPoolComponent.h>
+#include<Util/DirectoryHelper.h>
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -15,27 +16,25 @@ namespace Sentry
 {
 	App *App::mApp = nullptr;
 
-	App::App(const std::string srvName, const std::string cfgDir)
-
-		: mConfig(cfgDir + srvName + ".json"),
-		GameObject(0), mStartTime(TimeHelper::GetMilTimestamp()),
+	App::App(int argc, char ** argv)
+		:GameObject(0), 
+		mStartTime(TimeHelper::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		mApp = this;
 		this->mDelatime = 0;
 		this->mIsClose = false;
-		this->mServerName = srvName;
 		this->mLogicRunCount = 0;
 		this->mSystemRunCount = 0;
 		this->mIsInitComplate = false;
-		this->mConfigDir = cfgDir;
 
-		this->mTcpContext = new AsioContext(1);
-		this->mHttpContext = new AsioContext(1);
-		this->mTcpWork = new AsioWork(*this->mTcpContext);
-		this->mHttpWork = new AsioWork(*this->mHttpContext);
-		LogHelper::Init("./Logs", this->mServerName);
+		this->mServerName = argc == 1 ? "server" : argv[1];
+		DirectoryHelper::GetDirByPath(argv[0], this->mWorkPath);
+		this->mConfigPath = this->mWorkPath + "Config/";
+
+		LogHelper::Init(this->mWorkPath + "Logs/", this->mServerName);
 		this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
+		this->mConfig = new ServerConfig(this->mConfigPath + this->mServerName + ".json");
 
 	}
 
@@ -71,13 +70,13 @@ namespace Sentry
 
 		std::vector<std::string> services;
 		std::vector<std::string> components;
-		if (!mConfig.GetValue("Scene", components))
+		if (!mConfig->GetValue("Scene", components))
 		{
 			SayNoDebugError("not find field : Managers");
 			return false;
 		}
 
-		if (!mConfig.GetValue("Service", services))
+		if (!mConfig->GetValue("Service", services))
 		{
 			SayNoDebugError("not find field : Service");
 			return false;
@@ -181,11 +180,11 @@ namespace Sentry
 
 	int App::Run()
 	{
-		if (!mConfig.InitConfig() || !this->LoadComponent() || !this->InitComponent())
+		if (!mConfig->InitConfig() || !this->LoadComponent() || !this->InitComponent())
 		{
 			return this->Stop();
 		}
-		mConfig.GetValue("LogicFps", this->mFps);
+		mConfig->GetValue("LogicFps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = TimeHelper::GetMilTimestamp();
 		this->mSecondTimer = TimeHelper::GetMilTimestamp();

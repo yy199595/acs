@@ -17,11 +17,11 @@ namespace Sentry
 	bool ProtocolComponent::Awake()
     {
 		rapidjson::Document jsonMapper;
-		const std::string & dir = App::Get().GetConfigDir();	
+		const std::string & dir = App::Get().GetConfigPath();	
 		if (!FileHelper::ReadJsonFile(dir + "rpc.json", jsonMapper))
 		{
-			SayNoDebugFatal("not find file : rpc.json");
-			return false;
+			SayNoDebugFatal("not find file : " << dir << "");
+			return false;///
 		}
 
 		auto iter1 = jsonMapper.MemberBegin();

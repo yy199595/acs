@@ -25,7 +25,7 @@ namespace Sentry
 	class App : public GameObject
 	{
 	public:
-		App(const std::string srvName, const std::string cfgDir);
+		App(int argc, char ** argv);
 
 		virtual ~App()
 		{};
@@ -33,7 +33,7 @@ namespace Sentry
 	public:
 		ServerConfig &GetConfig()
 		{
-			return this->mConfig;
+			return *mConfig;
 		}
 
 		inline float GetDelaTime()
@@ -51,16 +51,6 @@ namespace Sentry
 			return this->mServerName;
 		}
 
-		inline AsioContext &GetTcpContext()
-		{
-			return *mTcpContext;
-		}
-
-        inline AsioContext &GetHttpContext()
-        {
-            return *mHttpContext;
-        }
-
 		inline MainTaskScheduler & GetTaskScheduler()
 		{
 			return this->mTaskScheduler;
@@ -71,25 +61,14 @@ namespace Sentry
 			return TimeHelper::GetMilTimestamp() - this->mStartTime;
 		}
 
-		inline const std::string &GetConfigDir()
-		{
-			return this->mConfigDir;
-		}
+		const std::string & GetWorkPath() { return this->mWorkPath; }
+
+		const std::string & GetConfigPath() { return this->mConfigPath; }
 
 		inline bool IsMainThread()
 		{
 			return std::this_thread::get_id() == this->mMainThreadId;
 		}
-
-		inline bool IsTcpThread()
-		{
-			return std::this_thread::get_id() == this->mTcpThreadId;
-		}
-
-        inline bool IsHttpThread()
-        {
-            return std::this_thread::get_id() == this->mHttpThreadId;
-        }
 
 	public:
 		static App &Get()
@@ -121,19 +100,11 @@ namespace Sentry
 	private:
 		void LogicMainLoop();
 	private:
-		
+		std::string mWorkPath;
+		std::string mConfigPath;
         long long mNextRefreshTime;
 		std::thread::id mMainThreadId;
-		std::thread::id mTcpThreadId;
-        std::thread::id mHttpThreadId;
 		class MainTaskScheduler mTaskScheduler;
-    private:
-        AsioWork * mTcpWork;
-        AsioWork * mHttpWork;
-        AsioContext * mTcpContext;
-        AsioContext * mHttpContext;
-        std::thread * mTcpWorkThread;
-        std::thread * mHttpWoekThread;
 	private:
 		int mFps;
 		long long mStartTimer;
@@ -143,12 +114,10 @@ namespace Sentry
 		bool mIsClose;
 		bool mIsInitComplate;
 		long long mStartTime;
-		ServerConfig mConfig;
+		ServerConfig * mConfig;
 		std::string mServerName;
 		long long mLastUpdateTime;
 		long long mLastSystemTime;
-		std::string mConfigDir;
-
 	private:
 		float mLogicFps;
 		float mDelatime;
