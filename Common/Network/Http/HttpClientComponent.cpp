@@ -11,6 +11,7 @@
 #include <Network/Http/HttpGetRequest.h>
 #include <Network/Http/HttpDownLoadRequest.h>
 #include <Network/Http/HttpRemoteSession.h>
+#include <Network/Http/HttpGetRequestTask.h>
 namespace Sentry
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -30,17 +31,21 @@ namespace Sentry
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
         const std::string path = App::Get().GetWorkPath() + "download/";
-		this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
+		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
 
-        this->DownLoad("http://timor.tech/api/holiday/year/2021", path);
+        this->Get("http://timor.tech/api/holiday/year/2021", json);
 		SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
 	}
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
-		HttpGetRequest httpRequest(this);
-		return httpRequest.Get(url, json);
+        HttpGetRequestTask httpGetRequestTask(url);
+        if(!this->mTaskComponent->StartTask(&httpGetRequestTask))
+        {
+            return XCode::HttpTaskStarFail;
+        }
+        return httpGetRequestTask.Get(json);
     }
 
     XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path)

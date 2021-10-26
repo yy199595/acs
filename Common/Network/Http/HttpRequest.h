@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<XCode/XCode.h>
+#include<Thread/TaskProxy.h>
 #include<Define/CommonTypeDef.h>
 namespace Sentry
 {
@@ -18,7 +19,7 @@ namespace Sentry
         HttpRequest(ISocketHandler *handler, const std::string &name);
 
         virtual ~HttpRequest();
-
+        
     public:
         bool ConnectRemote();
 

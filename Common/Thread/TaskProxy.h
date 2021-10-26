@@ -3,7 +3,9 @@
 #include <memory>
 namespace Sentry
 {
+
     class TaskPoolComponent;
+    class CoroutineComponent;
 
     class TaskProxy
     {
@@ -20,6 +22,18 @@ namespace Sentry
     private:
         long long mStartTime;
         unsigned int mTaskId;
+    };
+
+    class CoroutineAsyncTask : public TaskProxy
+    {
+    public:
+        CoroutineAsyncTask();
+    public:
+        void RunFinish() override;
+        bool AwaitInvoke();
+    private:
+        unsigned int mCorId;
+        CoroutineComponent * mCorComponent;
     };
 
 	template<typename T>
