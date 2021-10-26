@@ -17,94 +17,94 @@ namespace Sentry
     }
 
 
-    bool HttpRequestTask::Run()
-    {
-        unsigned short port;
-        if (!NetworkHelper::ParseHttpUrl(this->mUrl, this->mHost, port, this->mPath))
-        {
-            this->mCode = XCode::HttpUrlParseError;
-            return true;
-        }
-        asio::io_context io;
-        asio::error_code err;
-        asio::ip::tcp::resolver resolver(io);
-        asio::ip::tcp::resolver::query query(this->mHost, std::to_string(port));
-        auto iterator = resolver.resolve(query, err);
-        if (err)
-        {
-            SayNoDebugError(err.message());
-            this->mCode = XCode::HostResolverError;
-            return true;
-        }
+	XCode HttpRequestTask::Invoke()
+	{
+		unsigned short port;
+		if (!NetworkHelper::ParseHttpUrl(this->mUrl, this->mHost, port, this->mPath))
+		{
+			return XCode::HttpUrlParseError;
+		}
+		asio::io_context io;
+		asio::error_code err;
+		asio::ip::tcp::resolver resolver(io);
+		asio::ip::tcp::resolver::query query(this->mHost, std::to_string(port));
+		auto iterator = resolver.resolve(query, err);
+		if (err)
+		{
+			SayNoDebugError(err.message());
+			return XCode::HostResolverError;
+		}
 
-        asio::ip::tcp::socket socket(io);
-        asio::connect(socket, iterator, err);
-        if (err)
-        {
-            SayNoDebugError(err.message());
-            this->mCode = XCode::HttpNetWorkError;
-            return true;
-        }
-        asio::streambuf httpStreamBuf;
-        this->GetSendData(httpStreamBuf);
+		asio::ip::tcp::socket socket(io);
+		asio::connect(socket, iterator, err);
+		if (err)
+		{
+			SayNoDebugError(err.message());
+			return XCode::HttpNetWorkError;
+		}
+		asio::streambuf httpStreamBuf;
+		this->GetSendData(httpStreamBuf);
 
-        asio::write(socket, httpStreamBuf, err);
+		asio::write(socket, httpStreamBuf, err);
 
-        if (err)
-        {
-            SayNoDebugError(err.message());
-            this->mCode = XCode::HttpNetWorkError;
-            return true;
-        }
+		if (err)
+		{
+			SayNoDebugError(err.message());
+			return XCode::HttpNetWorkError;
+		}
 
-        while(asio::read(socket, httpStreamBuf, asio::transfer_at_least(1), err))
-        {
-            SayNoDebugError(httpStreamBuf.size());
-            if (err == asio::error::eof)
-            {
-                this->mCode = XCode::Successful;
-                return true;
-            }
-            else if(err)
-            {
-                SayNoDebugError(err.message());
-                this->mCode = XCode::HttpNetWorkError;
-                return true;
-            }
-            if(this->mReadCount == 0)
-            {
-                this->mReadCount ++;
-                std::istream is(&httpStreamBuf);
-                is >> this->mVersion >> this->mHttpCode >> this->mError;
-            }
-            if(!this->mIsReadBody)
-            {
-                const char *data = asio::buffer_cast<const char *>(httpStreamBuf.data());
-                const char *pos = strstr(data, "\r\n\r\n");
-                if(pos == nullptr)
-                {
-                    continue;
-                }
-                size_t size = pos - data + strlen("\r\n\r\n");
-                if (size != 0)
-                {
-                    this->mIsReadBody = true;
-                    std::istream(&httpStreamBuf).ignore(size);
-                    this->ParseHeard(std::string(data, size));
-                }
-            }
-            if(this->mIsReadBody)
-            {
-                this->OnReceiveBody(httpStreamBuf);
-            }
-        }
+		while (asio::read(socket, httpStreamBuf, asio::transfer_at_least(1), err))
+		{
+			if (err == asio::error::eof)
+			{
+				return XCode::Successful;
+			}
+			else if (err)
+			{
+				SayNoDebugError(err.message());
+				return XCode::HttpNetWorkError;
+			}
+			if (this->mReadCount == 0)
+			{
+				this->mReadCount++;
+				std::istream is(&httpStreamBuf);
+				is >> this->mVersion >> this->mHttpCode >> this->mError;
+			}
+			if (!this->mIsReadBody)
+			{
+				const char *data = asio::buffer_cast<const char *>(httpStreamBuf.data());
+				const char *pos = strstr(data, "\r\n\r\n");
+				if (pos == nullptr)
+				{
+					continue;
+				}
+				size_t size = pos - data + strlen("\r\n\r\n");
+				if (size != 0)
+				{
+					this->mIsReadBody = true;
+					std::istream(&httpStreamBuf).ignore(size);
+					if (!this->OnReceiveHeard(std::string(data, size)))
+					{
+						return XCode::HttpNetWorkError;
+					}
+				}
+			}
+			if (this->mIsReadBody)
+			{
+				this->OnReceiveBody(httpStreamBuf);
+			}
+		}
+		socket.close(err);
+		return XCode::Successful;
+	}
 
-        socket.close(err);
-        this->mCode = XCode::Successful;
-        return true;
-    }
+	bool HttpRequestTask::Run()
+	{
+		this->mCode = this->Invoke();
+		return true;
+	}
 
-    void HttpRequestTask::ParseHeard(const std::string &heard)
+    bool HttpRequestTask::OnReceiveHeard(const std::string &heard)
     {
         std::vector<std::string> tempArray1;
         std::vector<std::string> tempArray2;
@@ -119,17 +119,18 @@ namespace Sentry
                 this->mHeardMap.insert(std::make_pair(key, val));
             }
         }
+		return true;
     }
 
-    bool HttpRequestTask::GetHeardData(const std::string &key, std::string &value)
-    {
-        auto iter = this->mHeardMap.find(key);
-        if(iter != this->mHeardMap.end())
-        {
-            value = iter->second;
-            return true;
-        }
-        return false;
-    }
+	bool HttpRequestTask::GetHeardData(const std::string &key, std::string &value)
+	{
+		auto iter = this->mHeardMap.find(key);
+		if (iter != this->mHeardMap.end())
+		{
+			value = iter->second;
+			return true;
+		}
+		return false;
+	}
 
 }

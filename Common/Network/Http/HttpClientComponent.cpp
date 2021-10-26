@@ -12,6 +12,7 @@
 #include <Network/Http/HttpDownLoadRequest.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/HttpGetRequestTask.h>
+#include <Network/Http/HttpDownloadRequestTask.h>
 namespace Sentry
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -31,10 +32,10 @@ namespace Sentry
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
         const std::string path = App::Get().GetWorkPath() + "download/";
-		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
+		this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
 
         this->Get("http://timor.tech/api/holiday/year/2022", json);
-		SayNoDebugFatal(json);
+		//SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
 	}
 
@@ -53,6 +54,12 @@ namespace Sentry
 
     XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path)
     {
+		HttpDownloadRequestTask dowloadRequest(url);
+		if (!this->mTaskComponent->StartTask(&dowloadRequest))
+		{
+			return XCode::HttpTaskStarFail;
+		}
+		return dowloadRequest.Download(path);
         HttpDownLoadRequest downLoadRequest(this);
         return downLoadRequest.DownLoad(url, path);
     }

@@ -60,8 +60,10 @@ if(MSVC)
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 
+    
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql)
+   
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl)

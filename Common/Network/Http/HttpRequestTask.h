@@ -5,9 +5,9 @@
 #ifndef SENTRY_HTTPREQUESTTASK_H
 #define SENTRY_HTTPREQUESTTASK_H
 #include <XCode/XCode.h>
-#include <asio.hpp>
 #include <unordered_map>
 #include <Thread/TaskProxy.h>
+#include <Define/CommonTypeDef.h>
 namespace Sentry
 {
     class CoroutineComponent;
@@ -17,6 +17,7 @@ namespace Sentry
         HttpRequestTask(const std::string & url);
         virtual ~HttpRequestTask() {}
     protected:
+		virtual bool OnReceiveHeard(const std::string & heard);
         virtual void GetSendData(asio::streambuf & streambuf) = 0;
         virtual void OnReceiveBody(asio::streambuf & streambuf) = 0;
 
@@ -24,9 +25,8 @@ namespace Sentry
     public:
         bool Run() override;
         bool GetHeardData(const std::string & key, std::string & value);
-    private:
-        void ParseHeard(const std::string & heard);
-
+	private:
+		XCode Invoke();
     protected:
         XCode mCode;
         int mHttpCode;

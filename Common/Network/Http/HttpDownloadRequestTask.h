@@ -8,19 +8,22 @@
 #include "HttpRequestTask.h"
 namespace Sentry
 {
-    class HttpDownloadRequestTask : HttpRequestTask
+    class HttpDownloadRequestTask : public HttpRequestTask
     {
     public:
         using HttpRequestTask::HttpRequestTask;
-    public:
         XCode Download(const std::string & path);
     protected:
         void GetSendData(asio::streambuf &streambuf) override;
         void OnReceiveBody(asio::streambuf &streambuf) override;
-
+		bool OnReceiveHeard(const std::string & heard) override;
     private:
+		size_t mReadSize;
+		size_t mFileSize;
+		std::string mSavePath;
         std::string mFileName;
         std::fstream mFstream;
+		char mFileBuffer[1024];
     };
 }
 
