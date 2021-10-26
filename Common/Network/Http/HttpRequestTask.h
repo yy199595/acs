@@ -19,6 +19,8 @@ namespace Sentry
     protected:
         virtual void GetSendData(asio::streambuf & streambuf) = 0;
         virtual void OnReceiveBody(asio::streambuf & streambuf) = 0;
+
+        const std::string mUrl;
     public:
         bool Run() override;
         bool GetHeardData(const std::string & key, std::string & value);
@@ -35,7 +37,6 @@ namespace Sentry
         bool mIsReadBody;
         std::string mError;
         std::string mVersion;
-        const std::string mUrl;
         std::unordered_map<std::string, std::string> mHeardMap;
     };
 }

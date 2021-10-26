@@ -33,13 +33,16 @@ namespace Sentry
         const std::string path = App::Get().GetWorkPath() + "download/";
 		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
 
-        this->Get("http://timor.tech/api/holiday/year/2021", json);
+        this->Get("http://timor.tech/api/holiday/year/2022", json);
 		SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
 	}
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
+//        HttpGetRequest getRequest(this);
+//        return getRequest.Get(url, json);
+
         HttpGetRequestTask httpGetRequestTask(url);
         if(!this->mTaskComponent->StartTask(&httpGetRequestTask))
         {
