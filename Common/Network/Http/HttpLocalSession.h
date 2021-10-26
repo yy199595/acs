@@ -27,7 +27,6 @@ namespace Sentry
 		unsigned short mPort;
 		asio::streambuf mStream;
 		unsigned int mCoroutineId;
-		HttpRequest & mHttpRequest;	
-		char mHttpBuffer[HTTP_BUFFER_SIZE];
+		HttpRequest & mHttpRequest;
 	};
 }

@@ -130,10 +130,10 @@ namespace Sentry
             this->mStringPool.Destory(message);
         }
     protected:
-        virtual void OnCloseSession(T * session) = 0;
+        virtual void OnCloseSession(T * session) { };
 		virtual bool OnReceiveMessage(T * session, const string & message) { return false; };
 		virtual void OnSessionError(T * session, const asio::error_code & err) { };
-        virtual void OnListenNewSession(T * session, const asio::error_code & err) = 0;
+        virtual void OnListenNewSession(T * session, const asio::error_code & err) { };
 		virtual void OnConnectRemoteAfter(T * session, const asio::error_code & err) { };
         virtual void OnSendMessageAfter(T * session, const std::string & message, const asio::error_code & err) { };
     };

@@ -56,7 +56,7 @@ namespace Sentry
             {
                 is.ignore(size);
                 this->mIsEnd = true;
-                this->OnReceiveHeard(std::string(data, size));
+                this->ParseHeard(std::string(data, size));
             }
         }
         if (this->mIsEnd && strem.size() > 0)
@@ -64,6 +64,35 @@ namespace Sentry
             this->OnReceiveBody(strem);
         }
         return true;
+    }
+
+    void HttpRequest::ParseHeard(const std::string &heard)
+    {
+        std::vector<std::string> tempArray1;
+        std::vector<std::string> tempArray2;
+        StringHelper::SplitString(heard, "\n", tempArray1);
+        for(const std::string & line : tempArray1)
+        {
+            StringHelper::SplitString(line, ":", tempArray2);
+            if(tempArray2.size() == 2)
+            {
+                const std::string & key = tempArray2[0];
+                const std::string & val = tempArray2[1];
+                this->mHeardMap.insert(std::make_pair(key, val));
+            }
+        }
+        this->OnParseHeardDone();
+    }
+
+    bool HttpRequest::GetHeardData(const std::string &key, std::string &value)
+    {
+        auto iter = this->mHeardMap.find(key);
+        if(iter != this->mHeardMap.end())
+        {
+            value = iter->second;
+            return true;
+        }
+        return false;
     }
 
     bool HttpRequest::ConnectRemote()

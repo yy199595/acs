@@ -197,7 +197,6 @@ namespace Sentry
     void LuaScriptComponent::PushClassToLua()
     {
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
-        ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetRunTime", &App::GetRunTime);
         ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetDelaTime", &App::GetDelaTime);     
 
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
@@ -234,10 +233,6 @@ namespace Sentry
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Error", LuaAPIExtension::DebugError);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
 
-
-        lua_newtable(this->mLuaEnv);
-        lua_pushtablefunction(this->mLuaEnv, "Serialization", LuaProtocExtension::Serialization);
-        lua_setglobal(this->mLuaEnv, "ProtocUtil");
 
         lua_getglobal(this->mLuaEnv, "coroutine");
         lua_pushtablefunction(this->mLuaEnv, "sleep", CoroutineExtension::Sleep);

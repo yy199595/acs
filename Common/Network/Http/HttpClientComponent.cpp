@@ -10,8 +10,14 @@
 #include <Network/Http/HttpLocalSession.h>
 #include <Network/Http/HttpGetRequest.h>
 #include <Network/Http/HttpDownLoadRequest.h>
+#include <Network/Http/HttpRemoteSession.h>
 namespace Sentry
 {
+    SessionBase *HttpClientComponent::CreateSocket()
+    {
+        return new HttpRemoteSession(this);
+    }
+
     bool HttpClientComponent::Awake()
     {
         this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
@@ -19,27 +25,14 @@ namespace Sentry
         return true;
     }
 
-	void HttpClientComponent::OnCloseSession(HttpSessionBase * session)
-	{
-
-	}
-	bool HttpClientComponent::OnReceiveMessage(HttpSessionBase * session, const string & message)
-	{
-		return true;
-	}
-	void HttpClientComponent::OnListenNewSession(HttpSessionBase * session, const asio::error_code & err)
-	{
-
-	}
-
 	void HttpClientComponent::Start()
 	{
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
-        const std::string path = App::Get().GetWorkPath() + "download/boy.png";
+        const std::string path = App::Get().GetWorkPath() + "download/";
 		this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
-		//this->Get("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
 
+        this->DownLoad("http://timor.tech/api/holiday/year/2021", path);
 		SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
 	}

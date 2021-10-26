@@ -8,12 +8,13 @@
 #include <Global/ServerConfig.h>
 #include <Util/TimeHelper.h>
 #include <Object/GameObject.h>
-
+#include <Global/ServerPath.h>
 #include <Timer/TimerComponent.h>
 #include <Thread/TaskThread.h>
 #include <Coroutine/CoroutineComponent.h>
 using namespace std;
 using namespace asio::ip;
+
 
 namespace Sentry
 {
@@ -27,8 +28,7 @@ namespace Sentry
 	public:
 		App(int argc, char ** argv);
 
-		virtual ~App()
-		{};
+		virtual ~App() {};
 
 	public:
 		ServerConfig &GetConfig()
@@ -56,14 +56,9 @@ namespace Sentry
 			return this->mTaskScheduler;
 		}
 
-		long long GetRunTime()
-		{
-			return TimeHelper::GetMilTimestamp() - this->mStartTime;
-		}
+		const std::string & GetWorkPath() { return this->mServerPath.GetWorkPath(); }
 
-		const std::string & GetWorkPath() { return this->mWorkPath; }
-
-		const std::string & GetConfigPath() { return this->mConfigPath; }
+		const std::string & GetConfigPath() { return this->mServerPath.GetConfigPath(); }
 
 		inline bool IsMainThread()
 		{
@@ -100,8 +95,7 @@ namespace Sentry
 	private:
 		void LogicMainLoop();
 	private:
-		std::string mWorkPath;
-		std::string mConfigPath;
+        ServerPath mServerPath;
         long long mNextRefreshTime;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
@@ -117,14 +111,12 @@ namespace Sentry
 		ServerConfig * mConfig;
 		std::string mServerName;
 		long long mLastUpdateTime;
-		long long mLastSystemTime;
 	private:
 		float mLogicFps;
 		float mDelatime;
 
 	private:
 		long long mLogicRunCount;
-		long long mSystemRunCount;
 		long long mMainLoopStartTime;
 
 	private:

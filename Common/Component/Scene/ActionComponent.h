@@ -6,10 +6,6 @@
 namespace Sentry
 {
     // 注册本地Lua服务，管理远程回来的回调
-    class NetLuaAction;
-
-    class LocalActionProxy;
-
     class LocalRetActionProxy;
 
 	class PacketMapper;

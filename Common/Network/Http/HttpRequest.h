@@ -27,11 +27,13 @@ namespace Sentry
         bool OnReceive(asio::streambuf &strem, const asio::error_code &err);
 
         virtual void OnReceiveDone(bool hasError) = 0;
+
+        bool GetHeardData(const std::string & key, std::string & value);
     protected:
-
+        virtual void OnParseHeardDone() { }
         virtual void OnReceiveBody(asio::streambuf &strem) = 0;
-        virtual void OnReceiveHeard(const std::string & heard) { };
-
+    private:
+        void ParseHeard(const std::string & heard);
     public:
         unsigned short GetPort()
         { this->mPort; }
@@ -57,5 +59,6 @@ namespace Sentry
         int mReadCount;
         std::string mError;
         std::string mVersion;
+        std::unordered_map<std::string, std::string> mHeardMap;
     };
 }

@@ -14,10 +14,7 @@ namespace Sentry
         {}
 
     protected:
-         SessionBase * CreateSocket() override { return nullptr; }
-         void OnCloseSession(HttpSessionBase * session) override;
-         bool OnReceiveMessage(HttpSessionBase * session, const string & message) override;
-		 void OnListenNewSession(HttpSessionBase * session, const asio::error_code & err) override;
+         SessionBase * CreateSocket() override;
     public:
         bool Awake() final;
         void Start() final;

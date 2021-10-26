@@ -1,7 +1,5 @@
 ﻿
 #include "App.h"
-
-#include <Util/FileHelper.h>
 #include <Scene/ActionComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Network/Tcp/TcpClientComponent.h>
@@ -17,7 +15,7 @@ namespace Sentry
 	App *App::mApp = nullptr;
 
 	App::App(int argc, char ** argv)
-		:GameObject(0), 
+		:GameObject(0), mServerPath(argc, argv),
 		mStartTime(TimeHelper::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
@@ -25,17 +23,11 @@ namespace Sentry
 		this->mDelatime = 0;
 		this->mIsClose = false;
 		this->mLogicRunCount = 0;
-		this->mSystemRunCount = 0;
 		this->mIsInitComplate = false;
-
 		this->mServerName = argc == 1 ? "server" : argv[1];
-		DirectoryHelper::GetDirByPath(argv[0], this->mWorkPath);
-		this->mConfigPath = this->mWorkPath + "Config/";
-
-		LogHelper::Init(this->mWorkPath + "Logs/", this->mServerName);
-		this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
-		this->mConfig = new ServerConfig(this->mConfigPath + this->mServerName + ".json");
-
+        this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
+		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
+		this->mConfig = new ServerConfig(this->mServerPath.GetConfigPath() + this->mServerName + ".json");
 	}
 
 	void App::OnZeroRefresh()
