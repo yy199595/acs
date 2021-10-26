@@ -20,7 +20,6 @@ namespace Sentry
     bool HttpRequestTask::Run()
     {
         unsigned short port;
-        long long t1 = TimeHelper::GetMilTimestamp();
         if (!NetworkHelper::ParseHttpUrl(this->mUrl, this->mHost, port, this->mPath))
         {
             this->mCode = XCode::HttpUrlParseError;
@@ -64,8 +63,6 @@ namespace Sentry
             if (err == asio::error::eof)
             {
                 this->mCode = XCode::Successful;
-                long long t2 = TimeHelper::GetMilTimestamp();
-                SayNoDebugWarning("tt = " << ((t2 - t1) / 1000.0f) << "s");
                 return true;
             }
             else if(err)
@@ -88,7 +85,6 @@ namespace Sentry
                 {
                     continue;
                 }
-                std::istream is(&httpStreamBuf);
                 size_t size = pos - data + strlen("\r\n\r\n");
                 if (size != 0)
                 {
@@ -102,6 +98,10 @@ namespace Sentry
                 this->OnReceiveBody(httpStreamBuf);
             }
         }
+
+        socket.close(err);
+        this->mCode = XCode::Successful;
+        return true;
     }
 
     void HttpRequestTask::ParseHeard(const std::string &heard)
