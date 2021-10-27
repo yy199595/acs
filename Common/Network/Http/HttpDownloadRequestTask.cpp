@@ -65,6 +65,7 @@ namespace Sentry
                 return XCode::Failure;
             }
         }
+        this->mSavePath = path;
         size_t pos = this->mUrl.find_last_of('/');
         this->mFileName = this->mUrl.substr(pos +1, this->mUrl.size() - pos);
         if(!this->AwaitInvoke())

@@ -7,9 +7,6 @@
 #include "Component/Scene/TaskPoolComponent.h"
 #include <Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Network/Http/HttpLocalSession.h>
-#include <Network/Http/HttpGetRequest.h>
-#include <Network/Http/HttpDownLoadRequest.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/HttpGetRequestTask.h>
 #include <Network/Http/HttpDownloadRequestTask.h>
@@ -32,18 +29,15 @@ namespace Sentry
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
         const std::string path = App::Get().GetWorkPath() + "download/";
-		this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
+		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
 
-        this->Get("http://timor.tech/api/holiday/year/2022", json);
+        this->DownLoad("http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json", path);
 		//SayNoDebugFatal(json);
-		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f);
+		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
 	}
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
-//        HttpGetRequest getRequest(this);
-//        return getRequest.Get(url, json);
-
         HttpGetRequestTask httpGetRequestTask(url);
         if(!this->mTaskComponent->StartTask(&httpGetRequestTask))
         {
@@ -60,7 +54,5 @@ namespace Sentry
 			return XCode::HttpTaskStarFail;
 		}
 		return dowloadRequest.Download(path);
-        HttpDownLoadRequest downLoadRequest(this);
-        return downLoadRequest.DownLoad(url, path);
     }
 }
