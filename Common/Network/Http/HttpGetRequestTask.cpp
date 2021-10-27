@@ -4,6 +4,7 @@
 
 #include "HttpGetRequestTask.h"
 #include <ostream>
+#include <Define/CommonDef.h>
 #include <Network/NetworkHelper.h>
 namespace Sentry
 {
@@ -24,7 +25,12 @@ namespace Sentry
         {
             return this->mCode;
         }
-        return this->mHttpCode == 200 ? XCode::Successful : XCode::HttpResponseError;
+        if(this->GetHttpCode() != HttpStatus::OK)
+        {
+            SayNoDebugError(this->GetError());
+            return XCode::HttpResponseError;
+        }
+        return XCode::Successful;
     }
 
     void HttpGetRequestTask::GetSendData(asio::streambuf &streambuf)

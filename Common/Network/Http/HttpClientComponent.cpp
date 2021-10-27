@@ -9,6 +9,7 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/HttpGetRequestTask.h>
+#include <Network/Http/HttpPostRequestTask.h>
 #include <Network/Http/HttpDownloadRequestTask.h>
 namespace Sentry
 {
@@ -31,8 +32,10 @@ namespace Sentry
         const std::string path = App::Get().GetWorkPath() + "download/";
 		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
 
-        this->DownLoad("http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json", path);
-		//SayNoDebugFatal(json);
+        std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
+        this->Post("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
+
+        SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
 	}
 
@@ -46,7 +49,7 @@ namespace Sentry
         return httpGetRequestTask.Get(json);
     }
 
-    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path)
+    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path, int timeout)
     {
 		HttpDownloadRequestTask dowloadRequest(url);
 		if (!this->mTaskComponent->StartTask(&dowloadRequest))
@@ -55,4 +58,48 @@ namespace Sentry
 		}
 		return dowloadRequest.Download(path);
     }
+
+    XCode HttpClientComponent::Post(const std::string &url, const std::string & data, std::string &response, int timeout)
+    {
+        HttpPostRequestTask postRequestTask(url);
+        if(!this->mTaskComponent->StartTask(&postRequestTask))
+        {
+            return XCode::HttpTaskStarFail;
+        }
+        return postRequestTask.Post(data, response);
+    }
+
+    XCode HttpClientComponent::Post(const std::string &url, std::string &response, int timeout)
+    {
+        const size_t pos = url.find('?');
+        if (pos == std::string::npos)
+        {
+            return XCode::HttpUrlParseError;
+        }
+        std::string heard = url.substr(0, pos);
+        std::string data = url.substr(pos + 1, url.size() - pos);
+        return this->Post(heard, data, response);
+    }
+
+    XCode HttpClientComponent::Post(const std::string &url, const std::unordered_map<std::string, std::string> &data,
+                                    std::string &response, int timeout)
+    {
+        if(data.size() == 0)
+        {
+            return XCode::HttpUrlParseError;
+        }
+        std::string parameter;
+        for(auto iter = data.begin(); iter != data.end(); iter++)
+        {
+            if(iter != data.begin())
+            {
+                parameter.append("&");
+            }
+            const std::string & key = iter->first;
+            const std::string & val = iter->second;
+            parameter.append(key + '=' + val);
+        }
+        return this->Post(url, parameter, response);
+    }
+
 }

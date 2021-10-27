@@ -19,15 +19,14 @@ namespace Sentry
 
 	XCode HttpRequestTask::Invoke()
 	{
-		unsigned short port;
-		if (!NetworkHelper::ParseHttpUrl(this->mUrl, this->mHost, port, this->mPath))
+		if (!NetworkHelper::ParseHttpUrl(this->mUrl, this->mHost, this->mPort, this->mPath))
 		{
 			return XCode::HttpUrlParseError;
 		}
 		asio::io_context io;
 		asio::error_code err;
 		asio::ip::tcp::resolver resolver(io);
-		asio::ip::tcp::resolver::query query(this->mHost, std::to_string(port));
+		asio::ip::tcp::resolver::query query(this->mHost, this->mPort);
 		auto iterator = resolver.resolve(query, err);
 		if (err)
 		{
@@ -69,6 +68,7 @@ namespace Sentry
 				this->mReadCount++;
 				std::istream is(&httpStreamBuf);
 				is >> this->mVersion >> this->mHttpCode >> this->mError;
+                SayNoDebugLog("version = " << this->mVersion << "  code = " << this->mHttpCode << " err = " << this->mError);
 			}
 			if (!this->mIsReadBody)
 			{
@@ -117,6 +117,7 @@ namespace Sentry
                 const std::string & key = tempArray2[0];
                 const std::string & val = tempArray2[1];
                 this->mHeardMap.insert(std::make_pair(key, val));
+                SayNoDebugWarning(key << "  =  " << val);
             }
         }
 		return true;

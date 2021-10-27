@@ -9,7 +9,7 @@ namespace Sentry
 		return std::regex_match(ip, regExpress);
 	}
 
-	bool NetworkHelper::ParseHttpUrl(const std::string & url, std::string & host, unsigned short & port, std::string & path)
+	bool NetworkHelper::ParseHttpUrl(const std::string & url, std::string & host, std::string & port, std::string & path)
 	{
 		std::cmatch what;
 		std::string protocol;
@@ -19,13 +19,12 @@ namespace Sentry
 			host = std::string(what[2].first, what[2].second);		
 			path = std::string(what[4].first, what[4].second);
 			protocol = std::string(what[1].first, what[1].second);
-			std::string portstr = std::string(what[3].first, what[3].second);
+			port = std::string(what[3].first, what[3].second);
 
-			if (0 == portstr.length())
+			if (0 == port.length())
 			{
-				portstr = "http" == protocol ? "80" : "443";		
+				port = "http" == protocol ? "80" : "443";
 			}
-			port = (unsigned short)std::stoul(portstr);
 			return true;
 		}
 		return false;

@@ -77,8 +77,9 @@ namespace Sentry
         {
             return this->mCode;
         }
-        if(this->mHttpCode != 200)
+        if(this->GetHttpCode() != HttpStatus::OK)
         {
+            SayNoDebugError(this->GetError());
             return XCode::HttpResponseError;
         }
         return XCode::Successful;
