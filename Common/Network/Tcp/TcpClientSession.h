@@ -11,17 +11,16 @@ namespace Sentry
     class TcpClientSession : public SessionBase
     {
     public:
-        TcpClientSession(ISocketHandler *handler);     
+        TcpClientSession(ISocketHandler *handler);
         virtual ~TcpClientSession();
 	public:
-		bool StartConnect(const std::string & name, const std::string & ip, unsigned short port);
+        virtual SocketType GetSocketType() override { return SocketType::RemoteSocket;}
+
 	protected:
 		void OnSessionEnable() override;
     private:
         void StartReceive();
         void ReadMessageBody(const size_t allSize);
-		void ConnectCallback(const asio::error_code &err);
-		void ConnectHandler(const std::string & ip, unsigned short port);
     private:
         char *mReceiveMsgBuffer;
         unsigned int mReceiveBufferSize;

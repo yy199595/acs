@@ -6,7 +6,7 @@ namespace Sentry
 {
     RedisTask::RedisTask(const std::string &cmd) : RedisTaskBase(cmd)
     {
-		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
 		SayNoAssertRet_F(this->mCoreoutineId = corComponent->GetCurrentCorId());
     }
 
@@ -16,7 +16,7 @@ namespace Sentry
         {
             SayNoDebugError(this->GetErrorStr());
         }
-		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
 		if (this->mCoreoutineId != 0)
 		{
 			corComponent->Resume(this->mCoreoutineId);

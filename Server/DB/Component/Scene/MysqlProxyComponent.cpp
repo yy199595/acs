@@ -10,7 +10,7 @@ namespace Sentry
     bool MysqlProxyComponent::Awake()
     {
         this->mMysqlProxyNodeId = -1;
-		this->mCorComponent = App::Get().GetCoroutineComponent();     
+		this->mCorComponent = App::Get().GetCorComponent();
         SayNoAssertRetFalse_F(this->mNodeManager = this->GetComponent<ServiceNodeComponent>());
 
         return true;
@@ -48,7 +48,11 @@ namespace Sentry
         ServiceNode *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
-            long long id = this->mCorComponent->GetCurrentCorId();
+            unsigned int id = this->mCorComponent->GetCurrentCorId();
+            if(id == 0)
+            {
+                return XCode::NoCoroutineContext;
+            }
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
@@ -68,7 +72,11 @@ namespace Sentry
         ServiceNode *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
-            long long id = this->mCorComponent->GetCurrentCorId();
+            unsigned int id = this->mCorComponent->GetCurrentCorId();
+            if(id == 0)
+            {
+                return XCode::NoCoroutineContext;
+            }
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
@@ -101,7 +109,11 @@ namespace Sentry
         ServiceNode *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
-            long long id = this->mCorComponent->GetCurrentCorId();
+            unsigned int id = this->mCorComponent->GetCurrentCorId();
+            if(id == 0)
+            {
+                return XCode::NoCoroutineContext;
+            }
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
@@ -120,7 +132,11 @@ namespace Sentry
         ServiceNode *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
-            long long id = this->mCorComponent->GetCurrentCorId();
+            unsigned int id = this->mCorComponent->GetCurrentCorId();
+            if(id == 0)
+            {
+                return XCode::NoCoroutineContext;
+            }
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }

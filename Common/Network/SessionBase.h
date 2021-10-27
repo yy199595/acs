@@ -55,7 +55,7 @@ namespace Sentry
 
 		bool IsActive() { return this->mIsOpen; }
 
-		SocketType GetSocketType() { return this->mSocketType; }
+        virtual SocketType GetSocketType() = 0;
 
 	protected:
 		virtual void OnClose();
@@ -74,7 +74,7 @@ namespace Sentry
 
 	protected:
 
-		void InitMember(bool isConnect);
+		void InitMember();
 
 		void SendByString(std::string *message);
 
@@ -88,7 +88,6 @@ namespace Sentry
 		std::string mLocalAddress;
 		std::string mRemoteAddress;
 	private:
-		SocketType mSocketType;
 		AsioContext &mContext;
 		std::atomic_bool mIsOpen;
 	};

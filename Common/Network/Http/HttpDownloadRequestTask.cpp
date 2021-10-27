@@ -58,6 +58,15 @@ namespace Sentry
 
     XCode HttpDownloadRequestTask::Download(const std::string &path)
     {
+        size_t pos = this->mUrl.find_last_of('/');
+        std::string file = this->mUrl.substr(pos +1, this->mUrl.size() - pos);
+        return this->Download(path, file);
+    }
+
+    XCode HttpDownloadRequestTask::Download(const std::string & path, const std::string & fileName)
+    {
+        this->mSavePath = path;
+        this->mFileName = fileName;
         if (!DirectoryHelper::DirectorIsExist(path))
         {
             if (!DirectoryHelper::MakeDir(path))
@@ -65,9 +74,7 @@ namespace Sentry
                 return XCode::Failure;
             }
         }
-        this->mSavePath = path;
-        size_t pos = this->mUrl.find_last_of('/');
-        this->mFileName = this->mUrl.substr(pos +1, this->mUrl.size() - pos);
+
         if(!this->AwaitInvoke())
         {
             return XCode::NoCoroutineContext;

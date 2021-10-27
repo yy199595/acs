@@ -6,7 +6,7 @@
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <Network/Tcp/TcpClientSession.h>
+#include <Network/Tcp/TcpLocalSession.h>
 namespace Sentry
 {
     TcpClientComponent::TcpClientComponent()
@@ -50,7 +50,7 @@ namespace Sentry
 				unsigned short port;
                 const std::string & name = clientSession->GetName();
 				StringHelper::ParseIpAddress(address, ip, port);
-				clientSession->StartConnect(name, ip, port);
+                (static_cast<TcpLocalSession*>(clientSession))->ConnectByAddress(name, ip, port);
 			}
 			else
 			{
@@ -133,11 +133,9 @@ namespace Sentry
 		AsioContext & io = this->GetNetThread()->GetContext();
 		SharedTcpSocket socket = make_shared<AsioTcpSocket>(io);
 
-		auto clientSession = new TcpClientSession(this);
-		clientSession->StartConnect(name, ip, port);
+		auto clientSession = new TcpLocalSession(this);
+		clientSession->ConnectByAddress(name, ip, port);
 		return clientSession;
-
-
 	}
 
     void TcpClientComponent::OnDestory()

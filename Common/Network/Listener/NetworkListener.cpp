@@ -25,10 +25,8 @@ namespace Sentry
 	bool NetworkListener::StartListen(ISocketHandler * handler)
 	{
 		this->mSessionHandler = handler;
-        this->mTaskThread->AddTask(NewMethodProxy(&NetworkListener::ListenConnect, this));
-
-        this->mCorId = App::Get().GetCoroutineComponent()->GetCurrentCorId();
-        App::Get().GetCoroutineComponent()->YieldReturn();
+        this->mTaskThread->AddTask(&NetworkListener::ListenConnect, this);
+        App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 		return this->mIsListen;
 	}
 
@@ -51,8 +49,8 @@ namespace Sentry
                                           << this->mConfig.Port << " failure" << err.what());
 				return;
             }
-            CoroutineComponent * component = App::Get().GetCoroutineComponent();
-            this->mTaskScheduler.AddMainTask(NewMethodProxy(&CoroutineComponent::Resume, component, this->mCorId));
+            CoroutineComponent * component = App::Get().GetCorComponent();
+            this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, this->mCorId);
         }
 		this->mSessionSocket = this->mSessionHandler->CreateSocket();
 		this->mBindAcceptor->async_accept(this->mSessionSocket->GetSocket(), std::bind(&NetworkListener::OnConnectHandler, this, args1));

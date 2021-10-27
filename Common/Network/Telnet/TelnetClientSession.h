@@ -9,6 +9,9 @@ namespace Sentry
 	public:
 		TelnetClientSession(ISocketHandler * handler);
 		~TelnetClientSession();
+
+    public:
+        SocketType GetSocketType() override { return SocketType::RemoteSocket;}
 	protected:
 		void OnSessionEnable() override;
 	private:

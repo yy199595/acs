@@ -16,7 +16,7 @@ namespace Sentry
 #ifdef __COROUTINE_ASM__
 	void MainEntry(tb_context_from_t parame)
 	{
-		CoroutineComponent *pCoroutineMgr = App::Get().GetCoroutineComponent();
+		CoroutineComponent *pCoroutineMgr = App::Get().GetCorComponent();
 		((Coroutine*)parame.priv)->mCorContext = parame.ctx;
 #else
 #if _WIN32

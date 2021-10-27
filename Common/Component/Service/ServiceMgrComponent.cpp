@@ -13,7 +13,7 @@ namespace Sentry
     bool ServiceMgrComponent::Awake()
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
-		this->mCorComponent = App::Get().GetCoroutineComponent();
+		this->mCorComponent = App::Get().GetCorComponent();
         SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
 
         SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());

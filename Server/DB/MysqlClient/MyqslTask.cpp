@@ -9,13 +9,13 @@ namespace Sentry
     MyqslTask::MyqslTask(const std::string &db, const std::string &sql)
         : mDataBaseName(db), mSqlCommand(sql)
     {	
-		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
         this->mCoroutineId = corComponent->GetCurrentCorId();
     }
 
     void MyqslTask::RunFinish()
     {
-		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
         if (this->mCoroutineId != 0)
         {
 			corComponent->Resume(this->mCoroutineId);

@@ -5,6 +5,7 @@
 #include <Method/NetWorkRetAction.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
+#include <Network/Tcp/TcpClientComponent.h>
 #include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
@@ -14,6 +15,7 @@ namespace Sentry
         SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
         SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
+        SayNoAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
         SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 	}
 
@@ -30,6 +32,7 @@ namespace Sentry
 
     TcpClientSession * ServiceNode::GetTcpSession()
     {
+        //this->mTcpClientComponent->()
         return nullptr;
     }
 
@@ -60,6 +63,13 @@ namespace Sentry
 
     XCode ServiceNode::Notice(const std::string &service, const std::string &method)
     {
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+        this->mRequestData.Clear();
+        this->mRequestData.set_methodid(config->MethodId);
         return XCode::Successful;
     }
 

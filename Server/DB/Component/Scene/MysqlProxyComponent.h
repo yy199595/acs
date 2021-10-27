@@ -29,7 +29,7 @@ namespace Sentry
         class ServiceNode *GetServiceNode();
 
     private:
-        std::queue<long long> mWakeUpQueue;
+        std::queue<unsigned int> mWakeUpQueue;
     private:
         int mMysqlProxyNodeId;
         std::string mMessageBuffer;

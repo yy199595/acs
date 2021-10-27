@@ -12,6 +12,9 @@ namespace Sentry
     {
     public:
         HttpRemoteSession(ISocketHandler * socketHandler);
+
+    public:
+        SocketType GetSocketType() override { return SocketType::RemoteSocket;}
     protected:
         bool OnReceive(asio::streambuf &stream, const asio::error_code &err) override;
     private:

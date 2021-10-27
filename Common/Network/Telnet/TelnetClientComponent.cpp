@@ -29,7 +29,7 @@ namespace Sentry
 
 	void TelnetClientComponent::OnListenNewSession(TelnetClientSession *session, const asio::error_code &err)
 	{
-		std::string * message = new std::string("welcome sentry server\n请输入用户名和密码:");
+		std::string * message = new std::string("welcome sentry server\n enter user and password:\n>>");
 		session->SendNetMessage(message);
 	}
 

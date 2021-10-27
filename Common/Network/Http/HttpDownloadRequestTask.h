@@ -13,6 +13,7 @@ namespace Sentry
     public:
         using HttpRequestTask::HttpRequestTask;
         XCode Download(const std::string & path);
+        XCode Download(const std::string & path, const std::string & fileName);
     protected:
         void GetSendData(asio::streambuf &streambuf) override;
         void OnReceiveBody(asio::streambuf &streambuf) override;

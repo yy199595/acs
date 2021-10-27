@@ -72,7 +72,7 @@ namespace Sentry
 		}
 	public:	
 		inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
-		inline CoroutineComponent * GetCoroutineComponent() { return this->mCoroutienComponent; }
+		inline CoroutineComponent * GetCorComponent() { return this->mCorComponent; }
 	private:
 		bool LoadComponent();
 
@@ -123,7 +123,7 @@ namespace Sentry
 		static App * mApp;
 	private:
 		TimerComponent * mTimerComponent;
-		CoroutineComponent * mCoroutienComponent;
+		CoroutineComponent * mCorComponent;
 		std::vector<Component *> mSceneComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;

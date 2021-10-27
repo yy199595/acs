@@ -45,7 +45,7 @@ namespace Sentry
 
 	shared_ptr<NetWorkWaitCorAction> NetWorkWaitCorAction::Create()
     {
-		CoroutineComponent * corComponent = App::Get().GetCoroutineComponent();
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
         if (corComponent->IsInMainCoroutine())
         {
             return nullptr;

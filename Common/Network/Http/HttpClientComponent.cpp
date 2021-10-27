@@ -29,11 +29,13 @@ namespace Sentry
 	{
 		std::string json;
 		long long t1 = TimeHelper::GetMilTimestamp();
+        const std::string name = "新闻.json";
         const std::string path = App::Get().GetWorkPath() + "download/";
-		//this->DownLoad("http://lrs-oss.whitewolvesx.com/app/default/boy.png", path);
+        const std::string url = R"(http:\/\/dfzximg02.dftoutiao.com\/news\/20211022\/20211022133828_1291a0e2ecd603a257e94b55673e5738_1_mwpm_03201609.jpeg)";
+		this->DownLoad(url, path);
 
-        std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-        this->Post("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
+        //std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
+        //this->Post("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
 
         SayNoDebugFatal(json);
 		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
@@ -57,6 +59,16 @@ namespace Sentry
 			return XCode::HttpTaskStarFail;
 		}
 		return dowloadRequest.Download(path);
+    }
+
+    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path, const std::string &name, int timeout)
+    {
+        HttpDownloadRequestTask dowloadRequest(url);
+        if (!this->mTaskComponent->StartTask(&dowloadRequest))
+        {
+            return XCode::HttpTaskStarFail;
+        }
+        return dowloadRequest.Download(path, name);
     }
 
     XCode HttpClientComponent::Post(const std::string &url, const std::string & data, std::string &response, int timeout)

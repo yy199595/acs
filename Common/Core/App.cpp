@@ -56,7 +56,7 @@ namespace Sentry
 		this->AddComponent<ServiceMgrComponent>();
 
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mCoroutienComponent = this->GetComponent<CoroutineComponent>();
+		this->mCorComponent = this->GetComponent<CoroutineComponent>();
 
 
 
@@ -113,7 +113,7 @@ namespace Sentry
 				return false;
 			}
 		}
-		this->mCoroutienComponent->StartCoroutine(&App::StartComponent, this);
+		this->mCorComponent->StartCoroutine(&App::StartComponent, this);
 		return true;
 	}
 
@@ -124,15 +124,15 @@ namespace Sentry
 			return false;
 		}
 
-		if (IFrameUpdate *manager1 = dynamic_cast<IFrameUpdate *>(component))
+		if (auto manager1 = dynamic_cast<IFrameUpdate *>(component))
 		{
 			this->mFrameUpdateManagers.push_back(manager1);
 		}
-		if (ISystemUpdate *manager2 = dynamic_cast<ISystemUpdate *>(component))
+		if (auto manager2 = dynamic_cast<ISystemUpdate *>(component))
 		{
 			this->mSystemUpdateManagers.push_back(manager2);
 		}
-		if (ISecondUpdate *manager3 = dynamic_cast<ISecondUpdate *>(component))
+		if (auto *manager3 = dynamic_cast<ISecondUpdate *>(component))
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}
@@ -159,15 +159,13 @@ namespace Sentry
 
 		for (Component *component : this->mSceneComponents)
 		{
-			if (ILoadData *loadComponent = dynamic_cast<ILoadData *>(component))
+			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
 			{
 				loadComponent->OnLodaData();
 				SayNoDebugLog("load " << component->GetTypeName() << " data");
 			}
 		}
-
 		SayNoDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
-
 	}
 
 	int App::Run()

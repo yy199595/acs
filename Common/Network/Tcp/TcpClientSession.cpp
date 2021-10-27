@@ -12,26 +12,11 @@ namespace Sentry
 
     TcpClientSession::~TcpClientSession()
     {
-		if (this->mReceiveMsgBuffer != nullptr)
+		if (this->mReceiveMsgBuffer)
 		{
 			delete[]this->mReceiveMsgBuffer;
 		}    
     }
-
-	bool TcpClientSession::StartConnect(const std::string & name, const std::string & ip, unsigned short port)
-	{
-		if (!NetworkHelper::IsIp(ip))
-		{
-			SayNoDebugError(ip << " is not ip");
-			return false;
-		}
-		if (this->IsActive())
-		{
-			return true;
-		}
-		this->mName = name;
-		this->mHandler->GetNetThread()->AddTask(&TcpClientSession::ConnectHandler, this, ip, port);
-	}
 
 	void TcpClientSession::OnSessionEnable()
     {
@@ -91,18 +76,6 @@ namespace Sentry
 				delete[]nMessageBuffer;
 			}
 		});
-	}
-	void TcpClientSession::ConnectCallback(const asio::error_code & err)
-	{
-		this->OnConnect(err);
-	}
-
-	void TcpClientSession::ConnectHandler(const std::string & ip, unsigned short port)
-	{
-		auto address = asio::ip::make_address_v4(ip);
-		asio::ip::tcp::endpoint endPoint(address, port);
-		SayNoDebugLog(this->mName << " start connect " << ip << port);
-		this->mSocket->async_connect(endPoint, std::bind(&TcpClientSession::ConnectCallback, this, args1));
 	}
 
 }

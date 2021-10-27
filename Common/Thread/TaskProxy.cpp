@@ -13,7 +13,7 @@ namespace Sentry
     CoroutineAsyncTask::CoroutineAsyncTask()
     {
         this->mCorId = 0;
-        this->mCorComponent = App::Get().GetCoroutineComponent();
+        this->mCorComponent = App::Get().GetCorComponent();
     }
 
     bool CoroutineAsyncTask::AwaitInvoke()

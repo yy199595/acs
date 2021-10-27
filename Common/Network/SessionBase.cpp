@@ -11,7 +11,6 @@ namespace Sentry
 		mContext(handler->GetNetThread()->GetContext())
 	{
 		this->mIsOpen = false;
-		this->mSocketType = NoneSocket;
         this->mSocket = make_shared<AsioTcpSocket>(this->mContext);
 	}
 
@@ -25,10 +24,9 @@ namespace Sentry
 		this->mTaskScheduler.AddMainTask(NewMethodProxy(&SessionBase::OnClose, this));
 	}
 
-    void SessionBase::InitMember(bool isConnect)
+    void SessionBase::InitMember()
     {
         this->mIsOpen = this->mSocket->is_open();
-		this->mSocketType = isConnect ? LocalSocket : RemoteSocket;
         this->mLocalAddress = this->mSocket->local_endpoint().address().to_string()
                               + ":" + std::to_string(this->mSocket->local_endpoint().port());
 
@@ -40,7 +38,7 @@ namespace Sentry
     {
         if(!err)
         {
-            this->InitMember(false);
+            this->InitMember();
             this->OnSessionEnable();
         }	
         this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnListenConnect, this->mHandler, this, err));
