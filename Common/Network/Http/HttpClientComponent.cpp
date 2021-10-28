@@ -26,20 +26,15 @@ namespace Sentry
     }
 
 	void HttpClientComponent::Start()
-	{
-		std::string json;
-		long long t1 = TimeHelper::GetMilTimestamp();
-        const std::string name = "新闻.json";
-        const std::string path = App::Get().GetWorkPath() + "download/";
-        const std::string url = R"(http:\/\/dfzximg02.dftoutiao.com\/news\/20211022\/20211022133828_1291a0e2ecd603a257e94b55673e5738_1_mwpm_03201609.jpeg)";
-		this->DownLoad(url, path);
-
-        //std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-        //this->Post("http://apis.juhe.cn/xzqh/query?fid=0&key=f5c417a28abf995d7ce6312b29556fd9", json);
+    {
+        std::string json;
+        long long t1 = TimeHelper::GetMilTimestamp();
+        std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
+        this->Post("http://apis.juhe.cn/xzqh/query", data, json);
 
         SayNoDebugFatal(json);
-		SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
-	}
+        SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
+    }
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {

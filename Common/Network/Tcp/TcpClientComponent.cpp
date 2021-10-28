@@ -42,7 +42,7 @@ namespace Sentry
     {
 #ifdef __DEBUG__
         const std::string & address = session->GetAddress();
-        DataMessageType type = (DataMessageType)message.at(sizeof(unsigned int));
+        auto type = (DataMessageType)message.at(sizeof(unsigned int));
         if(type == DataMessageType::TYPE_REQUEST)
         {
             SayNoDebugWarning(address << " send request message successful size = " << message.size());
