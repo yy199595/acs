@@ -57,6 +57,7 @@ namespace Sentry
                 this->mResponse.set_code(code);
                 this->mResponse.set_rpcid(request.rpcid());
                 this->mResponse.set_userid(request.userid());
+                this->mResponse.set_methodid(request.methodid());
                 this->mResponse.set_messagedata(responseContent);
                 this->mNetSessionComponent->SendByAddress(request.address(), this->mResponse);
             }
@@ -75,16 +76,18 @@ namespace Sentry
 
 	void ServiceMgrComponent::Invoke(ServiceMethod * method, com::DataPacket_Request * request)
     {
-        std::string content;
+        std::string responseContent;
         method->SetAddress(request->address());
-        XCode code = method->Invoke(*request, content);
+        XCode code = method->Invoke(*request, responseContent);
         if (request->rpcid() != 0)
         {
-            com::DataPacket_Response response;
-            response.set_code(code);
-            response.set_messagedata(content);
-            response.set_userid(request->userid());
-            this->mNetSessionComponent->SendByAddress(request->address(), response);
+            this->mResponse.Clear();
+            this->mResponse.set_code(code);
+            this->mResponse.set_rpcid(request->rpcid());
+            this->mResponse.set_userid(request->userid());
+            this->mResponse.set_methodid(request->methodid());
+            this->mResponse.set_messagedata(responseContent);
+            this->mNetSessionComponent->SendByAddress(request->address(), this->mResponse);
 
 			this->mRequestDataPool.Destory(request);
         }

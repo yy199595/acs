@@ -17,9 +17,9 @@ namespace Sentry
         virtual SocketType GetSocketType() override { return SocketType::RemoteSocket;}
 
 	protected:
+        void StartReceive();
 		void OnSessionEnable() override;
     private:
-        void StartReceive();
         void ReadMessageBody(const size_t allSize);
     private:
         char *mReceiveMsgBuffer;

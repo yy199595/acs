@@ -24,7 +24,7 @@ namespace Sentry
 
     public:
         long long GetCoroutineId() { return mCoreoutineId; }
-
+        
     protected:
         void RunFinish() final;  //执行完成之后在主线程调用
     private:

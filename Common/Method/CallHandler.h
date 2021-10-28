@@ -38,7 +38,8 @@ namespace Sentry
     class LuaCallHandler : public CallHandler
     {
     public:
-        LuaCallHandler(lua_State *lua, lua_State * cor) : mCoroutine(cor), luaEnv(lua) {}
+        LuaCallHandler(lua_State *lua, lua_State * cor)
+            : mCoroutine(cor), luaEnv(lua) {}
     public:
         void Invoke(const com::DataPacket_Response & backData) override;
 

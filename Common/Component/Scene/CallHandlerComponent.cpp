@@ -5,6 +5,9 @@
 #include<Method/CallHandler.h>
 #include<Timer/ActionTimeoutTimer.h>
 
+#ifdef __DEBUG__
+#include <Scene/ProtocolComponent.h>
+#endif
 namespace Sentry
 {
     CallHandlerComponent::CallHandlerComponent()
@@ -46,9 +49,17 @@ namespace Sentry
         {
             return false;
         }
-        iter->second->Invoke(response);
+        CallHandler *callHandler = iter->second;
+#ifdef __DEBUG__
+        unsigned short methodId = response.methodid();
+        auto component = this->GetComponent<ProtocolComponent>();
+        auto config = component->GetProtocolConfig(methodId);
+        double second = (TimeHelper::GetMilTimestamp() - callHandler->GetCreateTime()) / 1000.f;
+        SayNoDebugLog("call " << config->ServiceName << "." << config->Method << " use time = " << second << "s");
+#endif
         this->mNumberPool.Push(rpcId);
-        this->mRetActionMap.erase(iter);     
+        callHandler->Invoke(response);
+        this->mRetActionMap.erase(iter);
         return true;
     }
 }

@@ -48,6 +48,7 @@ namespace Sentry
             {
                 this->mIsOpen = true;
                 this->mConnectCount = 0;
+                this->OnSessionEnable();
             }
             this->OnConnect(err);
         });
@@ -64,6 +65,7 @@ namespace Sentry
             {
                 this->mIsOpen = true;
                 this->mConnectCount = 0;
+                this->OnSessionEnable();
             }
             this->OnConnect(err);
             CoroutineComponent *component = App::Get().GetCorComponent();

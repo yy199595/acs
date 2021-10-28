@@ -64,3 +64,16 @@ namespace Sentry
 	template<typename T>
 	struct SayNoTypeProxy<std::shared_ptr<T>> { typedef T Type; };
 }
+
+namespace Sentry
+{
+    template<typename T>
+    class LocalObject
+    {
+    public:
+        LocalObject(const T * t) : mData(t) {}
+        ~LocalObject() { delete this->mData;}
+    private:
+        const T * mData;
+    };
+}

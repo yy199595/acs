@@ -61,7 +61,8 @@ message DataPacket
      {
           int32 Code = 1;
           uint32 UserId = 2;
-          int64 RpcId = 3;
+          int32 RpcId = 3;
+          int32 MethodId = 5;
           bytes MessageData = 4;
      }
 }

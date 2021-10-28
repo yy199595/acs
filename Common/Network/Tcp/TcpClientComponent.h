@@ -22,6 +22,7 @@ namespace Sentry
         void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
         void OnListenNewSession(TcpClientSession * session, const asio::error_code & err) override;
         void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
+        void OnSendMessageAfter(TcpClientSession *session, const std::string &message, const asio::error_code &err) override;
 	public:
         TcpLocalSession * GetLocalSession(const std::string & address);
         TcpClientSession * GetRemoteSession(const std::string & address);
@@ -40,8 +41,6 @@ namespace Sentry
     public:
         std::string * Serialize(const com::DataPacket_Request & message);
         std::string * Serialize(const com::DataPacket_Response & message);
-	private:
-		bool SendByAddress(const std::string & address, DataMessageType type, Message & message);
     private:
 
 		TcpClientSession *GetSession(const std::string &address);

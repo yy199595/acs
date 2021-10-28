@@ -1,8 +1,10 @@
 ﻿#include "CallHandler.h"
-#include <Coroutine/CoroutineComponent.h>
 #include <Util/TimeHelper.h>
 #include <Core/App.h>
+#include <Define/CommonTypeDef.h>
 #include <Scene/LuaScriptComponent.h>
+#include <Scene/ProtocolComponent.h>
+#include <Pool/MessagePool.h>
 namespace Sentry
 {
     CallHandler::CallHandler()
@@ -12,29 +14,40 @@ namespace Sentry
 
 	void LuaCallHandler::Invoke(const com::DataPacket_Response & response)
     {
-//		auto config = backData->GetProConfig();
-//		lua_pushinteger(this->mCoroutine, (int)backData->GetCode());
-//
-//		if (!backData->GetMsgBody().empty())
-//		{
-//			const char * json = backData->GetMsgBody().c_str();
-//			const size_t size = backData->GetMsgBody().size();
-//			auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
-//			lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
-//			if (lua_isfunction(this->luaEnv, -1))
-//			{
-//				lua_pushlstring(this->luaEnv, json, size);
-//				if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
-//				{
-//					SayNoDebugError(lua_tostring(this->luaEnv, -1));
-//					return;
-//				}
-//				lua_xmove(this->luaEnv, this->mCoroutine, 1);
-//				lua_presume(this->mCoroutine, this->luaEnv, 2);
-//				return;
-//			}
-//		}
-//		lua_presume(this->mCoroutine, this->luaEnv, 1);
+        LocalObject<com::DataPacket_Response> lock(&response);
+        auto component = App::Get().GetComponent<ProtocolComponent>();
+
+        unsigned short methodId = response.methodid();
+        auto config = component->GetProtocolConfig(methodId);
+		lua_pushinteger(this->mCoroutine, (int)response.code());
+
+        if(!config->ResponseMessage.empty())
+        {
+            const std::string & data = response.messagedata();
+            Message * messageData = MessagePool::NewByData(config->ResponseMessage, data);
+            if(messageData != nullptr)
+            {
+                std::string json;
+                if(util::MessageToJsonString(*messageData, &json).ok())
+                {
+                    auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
+                    lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
+                    if (lua_isfunction(this->luaEnv, -1))
+                    {
+                        lua_pushlstring(this->luaEnv, json.c_str(), json.size());
+                        if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
+                        {
+                            SayNoDebugError(lua_tostring(this->luaEnv, -1));
+                            return;
+                        }
+                        lua_xmove(this->luaEnv, this->mCoroutine, 1);
+                        lua_presume(this->mCoroutine, this->luaEnv, 2);
+                        return;
+                    }
+                }
+            }
+        }
+		lua_presume(this->mCoroutine, this->luaEnv, 1);
     }
 
     CppCallHandler::CppCallHandler()

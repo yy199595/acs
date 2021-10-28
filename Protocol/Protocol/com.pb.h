@@ -1469,11 +1469,17 @@ class DataPacket_Response :
   ::google::protobuf::uint32 userid() const;
   void set_userid(::google::protobuf::uint32 value);
 
-  // int64 RpcId = 3;
+  // int32 RpcId = 3;
   void clear_rpcid();
   static const int kRpcIdFieldNumber = 3;
-  ::google::protobuf::int64 rpcid() const;
-  void set_rpcid(::google::protobuf::int64 value);
+  ::google::protobuf::int32 rpcid() const;
+  void set_rpcid(::google::protobuf::int32 value);
+
+  // int32 MethodId = 5;
+  void clear_methodid();
+  static const int kMethodIdFieldNumber = 5;
+  ::google::protobuf::int32 methodid() const;
+  void set_methodid(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:com.DataPacket.Response)
  private:
@@ -1483,7 +1489,8 @@ class DataPacket_Response :
   ::google::protobuf::internal::ArenaStringPtr messagedata_;
   ::google::protobuf::int32 code_;
   ::google::protobuf::uint32 userid_;
-  ::google::protobuf::int64 rpcid_;
+  ::google::protobuf::int32 rpcid_;
+  ::google::protobuf::int32 methodid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -2080,18 +2087,32 @@ inline void DataPacket_Response::set_userid(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:com.DataPacket.Response.UserId)
 }
 
-// int64 RpcId = 3;
+// int32 RpcId = 3;
 inline void DataPacket_Response::clear_rpcid() {
-  rpcid_ = PROTOBUF_LONGLONG(0);
+  rpcid_ = 0;
 }
-inline ::google::protobuf::int64 DataPacket_Response::rpcid() const {
+inline ::google::protobuf::int32 DataPacket_Response::rpcid() const {
   // @@protoc_insertion_point(field_get:com.DataPacket.Response.RpcId)
   return rpcid_;
 }
-inline void DataPacket_Response::set_rpcid(::google::protobuf::int64 value) {
+inline void DataPacket_Response::set_rpcid(::google::protobuf::int32 value) {
   
   rpcid_ = value;
   // @@protoc_insertion_point(field_set:com.DataPacket.Response.RpcId)
+}
+
+// int32 MethodId = 5;
+inline void DataPacket_Response::clear_methodid() {
+  methodid_ = 0;
+}
+inline ::google::protobuf::int32 DataPacket_Response::methodid() const {
+  // @@protoc_insertion_point(field_get:com.DataPacket.Response.MethodId)
+  return methodid_;
+}
+inline void DataPacket_Response::set_methodid(::google::protobuf::int32 value) {
+  
+  methodid_ = value;
+  // @@protoc_insertion_point(field_set:com.DataPacket.Response.MethodId)
 }
 
 // bytes MessageData = 4;

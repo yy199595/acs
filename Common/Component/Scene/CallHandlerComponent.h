@@ -29,7 +29,7 @@ namespace Sentry
         int mMessageTimeout;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;
-		std::unordered_map<unsigned int, shared_ptr<CallHandler>> mRetActionMap;
+		std::unordered_map<unsigned int, CallHandler *> mRetActionMap;
     private:
         
     };

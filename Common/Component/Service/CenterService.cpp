@@ -41,7 +41,7 @@ namespace Sentry
             delete serviceNode;
 			return XCode::Failure;
 		}
-		ProtocolComponent * protoComponent = this->gameObject->GetComponent<ProtocolComponent>();
+		ProtocolComponent * protoComponent = this->GetComponent<ProtocolComponent>();
 
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{

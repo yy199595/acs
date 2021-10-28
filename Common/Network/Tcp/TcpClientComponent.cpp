@@ -6,6 +6,9 @@
 #include <Scene/ProtocolComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Network/Tcp/TcpLocalSession.h>
+#ifdef __DEBUG__
+#include <Pool/MessagePool.h>
+#endif
 namespace Sentry
 {
     TcpClientComponent::TcpClientComponent() = default;
@@ -33,6 +36,25 @@ namespace Sentry
 			delete socket;
 		}
 	}
+
+    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, const std::string &message,
+                                                const asio::error_code &err)
+    {
+#ifdef __DEBUG__
+        const std::string & address = session->GetAddress();
+        DataMessageType type = (DataMessageType)message.at(sizeof(unsigned int));
+        if(type == DataMessageType::TYPE_REQUEST)
+        {
+            SayNoDebugWarning(address << " send request message successful size = " << message.size());
+        }
+        else if(type == DataMessageType::TYPE_RESPONSE)
+        {
+            SayNoDebugWarning(address << " send response message successful size = " << message.size());
+        }
+#endif
+        SocketHandler<TcpClientSession>::OnSendMessageAfter(session, message, err);
+    }
+
 
 	void TcpClientComponent::OnSessionError(TcpClientSession * clientSession, const  asio::error_code & err)
 	{
@@ -96,7 +118,7 @@ namespace Sentry
 	{
         const char * body = message.c_str() + 1;
         const size_t bodySize = message.size() - 1;
-		const std::string & address = session->GetAddress();
+        const std::string & address = session->GetAddress();
 		auto messageType = (DataMessageType)message.at(0);
 		if (messageType == DataMessageType::TYPE_REQUEST)
         {
@@ -106,10 +128,22 @@ namespace Sentry
                 return false;
             }
             unsigned short methodId = this->mRequestData.methodid();
-            if (this->mProtocolComponent->GetProtocolConfig(methodId) == nullptr)
+            auto config = this->mProtocolComponent->GetProtocolConfig(methodId);
+            if (config == nullptr)
             {
                 return false;
             }
+#ifdef __DEBUG__
+            std::string json;
+            const std::string & data = this->mRequestData.messagedata();
+            const std::string method = config->ServiceName + "." + config->Method;
+            if(!config->RequestMessage.empty())
+            {
+               Message * msg = MessagePool::NewByData(config->RequestMessage, data);
+               util::MessageToJsonString(*msg, &json);
+            }
+            SayNoDebugLog("[request " << method << "] json = " << json);
+#endif
             this->mRequestData.set_address(address);
             return this->mServiceComponent->OnRequestMessage(mRequestData);
         }
@@ -120,6 +154,23 @@ namespace Sentry
             {
                 return false;
             }
+            unsigned short methodId = this->mResponseData.methodid();
+            auto config = this->mProtocolComponent->GetProtocolConfig(methodId);
+            if (config == nullptr)
+            {
+                return false;
+            }
+#ifdef __DEBUG__
+            std::string json;
+            const std::string & data = this->mRequestData.messagedata();
+            const std::string method = config->ServiceName + "." + config->Method;
+            if(!config->ResponseMessage.empty())
+            {
+                Message * msg = MessagePool::NewByData(config->ResponseMessage, data);
+                util::MessageToJsonString(*msg, &json);
+            }
+            SayNoDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);
+#endif
             return this->mCallHandlerComponent->OnResponseMessage(mResponseData);
 		}
         return false;
@@ -197,25 +248,22 @@ namespace Sentry
 
 	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Request & message)
 	{
-		return this->SendByAddress(address, TYPE_REQUEST, message);
+        std::string * data = this->Serialize(message);
+        if(data== nullptr)
+        {
+            return false;
+        }
+        return this->SendByAddress(address, data);
 	}
 
 	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Response & message)
 	{
-		return this->SendByAddress(address, TYPE_RESPONSE, message);
-	}
-
-	bool TcpClientComponent::SendByAddress(const std::string & address, DataMessageType type, Message & message)
-	{
-		// size + type + + body
-		const size_t size = message.ByteSizeLong() + 5;
-		memcpy(this->mMessageBuffer, &size, sizeof(char));
-		memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
-		if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
-		{
-			return false;
-		}
-		return this->SendByAddress(address, this->mStringPool.New(this->mMessageBuffer, size));
+        std::string * data = this->Serialize(message);
+        if(data== nullptr)
+        {
+            return false;
+        }
+		return this->SendByAddress(address, data);
 	}
 
     std::string *TcpClientComponent::Serialize(const com::DataPacket_Request &message)
