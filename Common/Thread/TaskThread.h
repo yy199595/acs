@@ -26,14 +26,13 @@ namespace Sentry
         {}
 
     public:
-        void Stop()
-        { this->mIsClose = true; }
+        void Stop() { this->mIsClose = true; }
 
         virtual void AddTask(TaskProxy *task) = 0;
 
-        const std::thread::id GetThreadId()
-        { return this->mThreadId; }
+        std::thread::id GetThreadId() { return this->mThreadId; }
 
+        bool IsCurrentThread() { return std::this_thread::get_id() == this->mThreadId; }
     protected:
         virtual void Update() { };
 

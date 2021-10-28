@@ -33,6 +33,13 @@ namespace Sentry
 
 	void SessionBase::OnListenDone(const asio::error_code & err)
     {
+#ifdef __DEBUG__
+        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        {
+            SayNoDebugFatal("not in net thread call");
+            return;
+        }
+#endif
         if(!err)
         {
             this->InitMember();
@@ -47,11 +54,25 @@ namespace Sentry
 		{
 			return false;
 		}
+#ifdef __DEBUG__
+        if(!App::Get().IsMainThread())
+        {
+            SayNoDebugFatal("not in main thread call");
+            return false;
+        }
+#endif
 		this->mHandler->GetNetThread()->AddTask(&SessionBase::SendByString, this, message);
 	}
 
 	void SessionBase::SendByString(std::string *message)
     {
+#ifdef __DEBUG__
+        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        {
+            SayNoDebugFatal("not in net thread call");
+            return;
+        }
+#endif
         if (!this->IsActive())
         {
             return;

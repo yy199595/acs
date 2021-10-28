@@ -24,6 +24,7 @@ namespace Sentry
 		this->mIsClose = false;
 		this->mLogicRunCount = 0;
 		this->mIsInitComplate = false;
+        this->mMainThreadId = std::this_thread::get_id();
 		this->mServerName = argc == 1 ? "server" : argv[1];
         this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
 		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
