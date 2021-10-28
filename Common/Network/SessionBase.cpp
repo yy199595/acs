@@ -63,25 +63,12 @@ namespace Sentry
                                   });
     }
 
-	void SessionBase::SendByStream(asio::streambuf * message)
-	{		
-		asio::async_write(this->GetSocket(), *message, [message, this](const asio::error_code & err, size_t size)
-		{
-			this->OnSendByStream(message, err);
-		});
-	}
-
 	void SessionBase::OnSendByString(std::string * message, const asio::error_code &err)
     {
         this->mTaskScheduler.AddMainTask(
                 NewMethodProxy(&ISocketHandler::OnSendMessage, this->mHandler,
                                this, message, err));
     }
-
-	void SessionBase::OnSendByStream(asio::streambuf *msg, const asio::error_code &err)
-	{
-
-	}
 
 	void SessionBase::OnClose()
 	{	

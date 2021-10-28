@@ -65,8 +65,6 @@ namespace Sentry
 
 		virtual void OnSendByString(std::string *msg, const asio::error_code &err);
 
-		virtual void OnSendByStream(asio::streambuf *msg, const asio::error_code &err);
-
 	protected:
 
 		void SendByString(std::string *message);
