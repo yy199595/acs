@@ -11,11 +11,8 @@ namespace Sentry
     class NodeMaperComponent : public Component
     {
     public:
-        NodeMaperComponent()
-        {};
-
-        ~NodeMaperComponent()
-        {};
+		NodeMaperComponent() = default;
+        ~NodeMaperComponent() = default;
     public:
         void AddService(class ServiceNode * node);
         class ServiceNode * GetService(const std::string & service);

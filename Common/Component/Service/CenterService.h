@@ -32,9 +32,8 @@ namespace Sentry
     class CenterService : public LocalServiceComponent
     {
     public:
-        CenterService();
-
-        ~CenterService() {}
+		CenterService() = default;
+        ~CenterService() = default;
 
     protected:
         bool Awake() final;

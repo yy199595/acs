@@ -13,9 +13,9 @@ namespace Sentry
     class ClusterService : public LocalServiceComponent
     {
     public:
-        ClusterService() {}
+		ClusterService() = default;
 
-        ~ClusterService() {}
+        ~ClusterService() = default;
 
     public:
         bool Awake() final;

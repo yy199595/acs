@@ -94,7 +94,7 @@ namespace Sentry
 		}
 		return false;
 #else
-        return this->mQeue.template try_dequeue(item);
+        return this->mQeue.try_dequeue(item);
 #endif
 	}
 }// namespace Sentry

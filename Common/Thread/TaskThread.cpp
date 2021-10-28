@@ -21,7 +21,7 @@ namespace Sentry
         while(!this->mIsClose)
         {
             this->Update();
-            std::this_thread::sleep_for(time);
+            //std::this_thread::sleep_for(time);
         }
     }
 }

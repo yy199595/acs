@@ -7,11 +7,8 @@ namespace Sentry
     class HttpClientComponent : public Component, public SocketHandler<HttpSessionBase>
     {
     public:
-        HttpClientComponent()
-        {}
-
-        ~HttpClientComponent()
-        {}
+        HttpClientComponent() = default;
+        ~HttpClientComponent() = default;
 
     protected:
          SessionBase * CreateSocket() override;

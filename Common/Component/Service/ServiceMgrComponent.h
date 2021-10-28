@@ -17,9 +17,8 @@ namespace Sentry
     class ServiceMgrComponent : public Component, public IRequestMessageHandler
     {
     public:
-        ServiceMgrComponent() {}
-
-        ~ServiceMgrComponent() {}
+		ServiceMgrComponent() = default;
+        ~ServiceMgrComponent() = default;
 
     protected:
         bool Awake() final;

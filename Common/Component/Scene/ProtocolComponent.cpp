@@ -8,12 +8,6 @@
 #include <Pool/MessagePool.h>
 namespace Sentry
 {
-
-	ProtocolComponent::ProtocolComponent()
-	{
-
-	}
-
 	bool ProtocolComponent::Awake()
     {
 		rapidjson::Document jsonMapper;

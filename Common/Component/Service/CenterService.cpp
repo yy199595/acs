@@ -5,10 +5,6 @@
 #include <Scene/ProtocolComponent.h>
 namespace Sentry
 {
-    CenterService::CenterService()
-    {
-    }
-
 	bool CenterService::Awake()
 	{
 		__add_method(CenterService::Add);

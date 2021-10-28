@@ -34,8 +34,7 @@ namespace Sentry
 	{
 	public:
 		Component();
-
-		virtual ~Component() {}
+		virtual ~Component() = default;
 
 	public:
 		friend class GameObject;

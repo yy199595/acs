@@ -4,8 +4,9 @@
 
 #ifndef SENTRY_HTTPHANDLER_H
 #define SENTRY_HTTPHANDLER_H
-#include <asio.hpp>
+
 #include <unordered_map>
+#include <Define/CommonTypeDef.h>
 namespace Sentry
 {
     class HttpRemoteSession;

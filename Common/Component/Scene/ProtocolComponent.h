@@ -8,9 +8,8 @@ namespace Sentry
     class ProtocolComponent : public Component
     {
     public:
-		ProtocolComponent();
-
-        ~ProtocolComponent() {}
+		ProtocolComponent() = default;
+        ~ProtocolComponent() = default;
 
     protected:
         bool Awake() final;

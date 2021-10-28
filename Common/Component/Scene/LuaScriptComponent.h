@@ -11,7 +11,7 @@ namespace Sentry
     public:
         LuaScriptComponent();
 
-        virtual ~LuaScriptComponent() {}
+		virtual ~LuaScriptComponent() = default;
 
     public:
         struct lua_State *GetLuaEnv() { return this->mLuaEnv; }

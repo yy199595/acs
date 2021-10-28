@@ -8,8 +8,8 @@ namespace Sentry
 	class GameObjectComponent : public Component
 	{
 	public:
-		GameObjectComponent() {}
-		~GameObjectComponent() {}
+		GameObjectComponent() = default;
+		~GameObjectComponent() = default;
 	public:
 		bool Awake() { return true; }
 	public:

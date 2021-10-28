@@ -21,11 +21,7 @@ namespace Sentry
         bool OnResponseMessage(const com::DataPacket_Response & message) final;
     protected:
         bool Awake() override;
-
     private:
-#ifdef _DEBUG
-		char mBuffer[100];
-#endif
         int mMessageTimeout;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;

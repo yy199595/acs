@@ -28,7 +28,7 @@ namespace Sentry
 	public:
 		App(int argc, char ** argv);
 
-		virtual ~App() {};
+		virtual ~App() = default;
 
 	public:
 		ServerConfig &GetConfig()

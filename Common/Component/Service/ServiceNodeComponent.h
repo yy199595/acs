@@ -9,9 +9,8 @@ namespace Sentry
     class ServiceNodeComponent : public Component, public ISecondUpdate
     {
     public:
-        ServiceNodeComponent() {}
-
-        ~ServiceNodeComponent() {}
+        ServiceNodeComponent() = default;
+        ~ServiceNodeComponent() = default;
 
     public:
         bool DelNode(int nodeId);

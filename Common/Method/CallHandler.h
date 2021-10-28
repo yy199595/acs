@@ -11,8 +11,7 @@ namespace Sentry
     {
     public:
 		CallHandler();
-
-        virtual ~CallHandler() {}
+        virtual ~CallHandler() = default;
 
     public:
         long long GetCreateTime() { return this->mCreateTime; }
