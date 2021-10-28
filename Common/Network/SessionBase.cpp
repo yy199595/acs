@@ -6,7 +6,7 @@ namespace Sentry
 {
 
 	SessionBase::SessionBase(ISocketHandler * handler)
-		: mHandler(handler),
+		: mHandler(*handler),
 		mTaskScheduler(App::Get().GetTaskScheduler()),
 		mContext(handler->GetNetThread()->GetContext())
 	{
@@ -34,7 +34,7 @@ namespace Sentry
 	void SessionBase::OnListenDone(const asio::error_code & err)
     {
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
@@ -45,7 +45,7 @@ namespace Sentry
             this->InitMember();
             this->OnSessionEnable();
         }	
-        this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnListenConnect, this->mHandler, this, err));
+        this->mTaskScheduler.AddMainTask(&ISocketHandler::OnListenConnect, &mHandler, this, err);
     }
 
 	bool SessionBase::SendNetMessage(std::string * message)
@@ -61,13 +61,13 @@ namespace Sentry
             return false;
         }
 #endif
-		this->mHandler->GetNetThread()->AddTask(&SessionBase::SendByString, this, message);
+		this->mHandler.GetNetThread()->AddTask(&SessionBase::SendByString, this, message);
 	}
 
 	void SessionBase::SendByString(std::string *message)
     {
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
@@ -85,23 +85,22 @@ namespace Sentry
     }
 
 	void SessionBase::OnSendByString(std::string * message, const asio::error_code &err)
-    {
+	{
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
-        {
-            SayNoDebugFatal("not in net thread call");
-            return;
-        }
+		if (!this->mHandler.GetNetThread()->IsCurrentThread())
+		{
+			SayNoDebugFatal("not in net thread call");
+			return;
+		}
 #endif
-        this->mTaskScheduler.AddMainTask(
-                NewMethodProxy(&ISocketHandler::OnSendMessage, this->mHandler,
-                               this, message, err));
-    }
+		this->mTaskScheduler.AddMainTask(
+			&ISocketHandler::OnSendMessage, &this->mHandler, this, message, err);
+	}
 
 	void SessionBase::OnClose()
 	{
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
@@ -114,37 +113,38 @@ namespace Sentry
             this->mSocket->close(err);
 		}
 		SayNoDebugError("remove socket " << this->GetAddress());
-		this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnClose, this->mHandler, this));
+		this->mTaskScheduler.AddMainTask(&ISocketHandler::OnClose, &mHandler, this);
 	}
 
 	void SessionBase::OnError(const asio::error_code & err)
 	{
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
         }
 #endif
-		this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnSessionErr, this->mHandler, this, err));
+		this->mTaskScheduler.AddMainTask(&ISocketHandler::OnSessionErr, &mHandler, this, err);
 	}
 
 	void SessionBase::OnConnect(const asio::error_code & err)
 	{
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+		SayNoDebugFatal(std::this_thread::get_id());
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
         }
 #endif
-		this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnConnectRemote, this->mHandler, this, err));
+		this->mTaskScheduler.AddMainTask(&ISocketHandler::OnConnectRemote, &mHandler, this, err);
 	}
 
 	void SessionBase::OnReceiveMessage(const char * msg, size_t size)
     {
 #ifdef __DEBUG__
-        if(!this->mHandler->GetNetThread()->IsCurrentThread())
+        if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
@@ -154,7 +154,7 @@ namespace Sentry
         {
             return;
         }
-        std::string *message = this->mHandler->GetStringPool().New(msg, size);
-        this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnReceiveNewMessage, this->mHandler, this, message));
+        std::string *message = this->mHandler.GetStringPool().New(msg, size);
+        this->mTaskScheduler.AddMainTask(&ISocketHandler::OnReceiveNewMessage, &mHandler, this, message);
     }
 }

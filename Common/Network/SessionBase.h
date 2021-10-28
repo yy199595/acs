@@ -68,15 +68,13 @@ namespace Sentry
 	protected:
 
 		void SendByString(std::string *message);
-
-		void SendByStream(asio::streambuf * message);
-
+			
     private:
         void InitMember();
 	protected:
         std::string mAddress;
 		SharedTcpSocket mSocket;
-		ISocketHandler *mHandler;
+		ISocketHandler &mHandler;
         std::atomic_bool mIsOpen;
 		MainTaskScheduler &mTaskScheduler;
 	private:

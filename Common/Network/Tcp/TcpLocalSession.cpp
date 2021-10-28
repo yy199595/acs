@@ -22,7 +22,7 @@ namespace Sentry
         {
             return;
         }
-        this->mHandler->GetNetThread()->AddTask(&TcpLocalSession::ConnectHandler, this);
+        this->mHandler.GetNetThread()->AddTask(&TcpLocalSession::ConnectHandler, this);
     }
 
     void TcpLocalSession::AsyncConnectRemote()
@@ -32,7 +32,7 @@ namespace Sentry
             return;
         }
         unsigned int id = App::Get().GetCorComponent()->GetCurrentCorId();
-        this->mHandler->GetNetThread()->AddTask(&TcpLocalSession::AsyncConnectHandler, this, id);
+        this->mHandler.GetNetThread()->AddTask(&TcpLocalSession::AsyncConnectHandler, this, id);
         App::Get().GetCorComponent()->YieldReturn();
     }
 

@@ -17,8 +17,11 @@ namespace Sentry
 
 		for (int index = 0; index < this->mThreadCount; index++)
 		{
-			TaskThread *taskThread = new TaskThread(this);
-			mThreadArray.push_back(taskThread);
+			mThreadArray.push_back(new TaskThread(this));
+		}
+		for (TaskThread * taskThread : this->mThreadArray)
+		{
+			taskThread->Start();
 		}
 		return true;
 	}

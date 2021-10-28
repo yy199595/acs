@@ -181,7 +181,7 @@ namespace Sentry
 		this->mSecondTimer = TimeHelper::GetMilTimestamp();
 		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
 
-		return this->mTaskScheduler.Run();
+		return this->mTaskScheduler.Start();
 	}
 
 	int App::Stop()

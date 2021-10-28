@@ -6,11 +6,11 @@
     "NodeName": "Server",
     "rpc": "./Rpc/rpc.csv",
     "ProxyAddress": {
-        "ip": "127.0.0.1",
+        "ip": "114.115.167.51",
         "port": 1995
     },
     "CenterAddress": {
-        "ip": "127.0.0.1",
+        "ip": "114.115.167.51",
         "port": 7788
     },
     "Listener": {

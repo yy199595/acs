@@ -6,23 +6,10 @@ using namespace std::chrono;
 
 namespace Sentry
 {
-    IThread::IThread(TaskPoolComponent * task)
-    {
-		this->mIsClose = false;
-        this->mTaskComponent = task;
-        this->mThread = new std::thread(std::bind(&IThread::Run, this));
-        this->mThreadId = this->mThread->get_id();
-        this->mThread->detach();   
-    }
-
-    void IThread::Run()
-    {
-        std::chrono::milliseconds time(1);
-        while(!this->mIsClose)
-        {
-            this->Update();
-            //std::this_thread::sleep_for(time);
-        }
+	IThread::IThread(TaskPoolComponent * task)
+		: mIsClose(false), mTaskComponent(task)
+    {		
+		
     }
 }
 
@@ -32,9 +19,26 @@ namespace Sentry
         : IThread(taskComponent)
     {
         this->mTaskState = Idle;
+		this->mThread = nullptr;
     }
 
-    void TaskThread::AddTask(TaskProxy * task)
+	int TaskThread::Start()
+	{
+		this->mThread = new std::thread([this]()
+		{
+			std::chrono::milliseconds time(1);
+			while (!this->mIsClose)
+			{
+				this->Update();
+				//std::this_thread::sleep_for(time);
+			}
+		});
+		this->mThread->detach();
+		this->mThreadId = this->mThread->get_id();
+		return 0;
+	}
+
+	void TaskThread::AddTask(TaskProxy * task)
     {
         this->mTaskState = ThreadState::Run;
         this->mWaitInvokeTask.Add(task);
@@ -70,13 +74,29 @@ namespace Sentry
 namespace Sentry
 {
     NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, StaticMethod * method)
-        : IThread(taskComponent), mMethodProxy(method)
+        : IThread(taskComponent), mMethodProxy(method), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
     }
 
-    void NetWorkThread::AddTask(TaskProxy *task)
+	int NetWorkThread::Start()
+	{
+		this->mThread = new std::thread([this]()
+		{
+			std::chrono::milliseconds time(1);
+			while (!this->mIsClose)
+			{
+				this->Update();
+				//std::this_thread::sleep_for(time);
+			}
+		});
+		this->mThread->detach();
+		this->mThreadId = this->mThread->get_id();
+		return 0;
+	}
+
+	void NetWorkThread::AddTask(TaskProxy *task)
     {
         this->mWaitInvokeTask.Add(task);
     }
@@ -106,7 +126,8 @@ namespace Sentry
         {
             if(taskProxy->Run())
             {
-                this->mFinishTasks.push(taskProxy->GetTaskId());
+				unsigned int id = taskProxy->GetTaskId();
+				this->mTaskComponent->PushFinishTask(id);
             }
         }
 
@@ -114,46 +135,41 @@ namespace Sentry
 		{
 			taskMethod->run();
             delete taskMethod;
-		}
-
-        while (!this->mFinishTasks.empty())
-        {
-            unsigned int id = this->mFinishTasks.front();
-            this->mFinishTasks.pop();
-            this->mTaskComponent->PushFinishTask(id);
-        }
+		}     
     }
 }
 
 namespace Sentry
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
-		: mMainMethod(method)
+		: IThread(nullptr), mMainMethod(method)
 	{
-		this->mIsStop = false;
+		
 	}
 
-	int MainTaskScheduler::Run()
-	{
-		StaticMethod * task = nullptr;
+	int MainTaskScheduler::Start()
+	{		
 		std::chrono::milliseconds time(1);
-		while (!this->mIsStop)
+		while (!this->mIsClose)
 		{
-			this_thread::sleep_for(time);
-			this->mMainMethod->run();
-			this->mTaskQueue.SwapQueueData();
-			while (this->mTaskQueue.PopItem(task))
-			{
-				task->run();
-				delete task;
-			}
+			this->Update();
+			this_thread::sleep_for(time);			
 		}
 		return 0;
 	}
-	void MainTaskScheduler::Stop()
+
+	void MainTaskScheduler::Update()
 	{
-		this->mIsStop = true;
+		this->mMainMethod->run();
+		StaticMethod * task = nullptr;
+		this->mTaskQueue.SwapQueueData();
+		while (this->mTaskQueue.PopItem(task))
+		{
+			task->run();
+			delete task;
+		}
 	}
+	
 	void MainTaskScheduler::AddMainTask(StaticMethod * task)
 	{
 		if (task == nullptr)

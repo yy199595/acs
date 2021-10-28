@@ -86,6 +86,7 @@ namespace Sentry
 		void SetNetThread(NetWorkThread * t)
         {
             this->mNetThread = t;
+			this->mNetThread->Start();
         };
         StringPool & GetStringPool() { return this->mStringPool;}
         AsioContext & GetContext() { return mNetThread->GetContext();}

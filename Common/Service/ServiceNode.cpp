@@ -66,8 +66,8 @@ namespace Sentry
             TcpLocalSession * tcpLocalSession = this->GetTcpSession();
             if(tcpLocalSession == nullptr)
             {
-                SayNoDebugError("node session [" << tcpLocalSession->GetName()
-                                                 << ":" << tcpLocalSession->GetAddress() << " error");
+                SayNoDebugError("node session [" << this->GetNodeName()
+                                                 << ":" << this->GetAddress() << "] connect error");
                 this->mCorComponent->YieldReturn();
                 continue;
             }
