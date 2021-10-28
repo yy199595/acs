@@ -6,18 +6,18 @@
 namespace Sentry
 {
     // 注册本地Lua服务，管理远程回来的回调
-    class LocalRetActionProxy;
+    class CallHandler;
 
 	class PacketMapper;
-    class ActionComponent : public Component, public IResponseMessageHandler
+    class CallHandlerComponent : public Component, public IResponseMessageHandler
     {
     public:
-        ActionComponent();
+        CallHandlerComponent();
 
-        virtual ~ActionComponent() {}
+        virtual ~CallHandlerComponent() {}
 
     public:
-        unsigned int AddCallback(shared_ptr<LocalRetActionProxy> rpcAction);
+        bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
         bool OnResponseMessage(const com::DataPacket_Response & message) final;
     protected:
         bool Awake() override;
@@ -29,7 +29,7 @@ namespace Sentry
         int mMessageTimeout;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;
-		std::unordered_map<unsigned int, shared_ptr<LocalRetActionProxy>> mRetActionMap;
+		std::unordered_map<unsigned int, shared_ptr<CallHandler>> mRetActionMap;
     private:
         
     };

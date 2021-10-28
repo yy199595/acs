@@ -1,8 +1,8 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
-#include <Scene/ActionComponent.h>
+#include <Scene/CallHandlerComponent.h>
 #include <Service/ServiceMgrComponent.h>
-#include <Method/NetWorkRetAction.h>
+#include <Method/CallHandler.h>
 #include <Service/LuaServiceComponent.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
@@ -90,10 +90,10 @@ int SystemExtension::Call(lua_State *lua)
 //		}
 //	}
 //
-//	auto actionComponent = App::Get().GetComponent<ActionComponent>();
-//	auto cb = std::make_shared<LocalWaitRetActionProxy>(lua, coroutine);
+//	auto actionComponent = App::Get().GetComponent<CallHandlerComponent>();
+//	auto cb = std::make_shared<LuaCallHandler>(lua, coroutine);
 //
-//	if (!packetMapper->SetRpcId(actionComponent->AddCallback(cb)))
+//	if (!packetMapper->SetRpcId(actionComponent->AddCallHandler(cb)))
 //	{
 //		lua_pushinteger(lua, (int)XCode::Failure);
 //		return 1;

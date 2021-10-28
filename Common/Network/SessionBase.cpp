@@ -27,10 +27,7 @@ namespace Sentry
     void SessionBase::InitMember()
     {
         this->mIsOpen = this->mSocket->is_open();
-        this->mLocalAddress = this->mSocket->local_endpoint().address().to_string()
-                              + ":" + std::to_string(this->mSocket->local_endpoint().port());
-
-        this->mRemoteAddress = this->mSocket->remote_endpoint().address().to_string()
+        this->mAddress = this->mSocket->remote_endpoint().address().to_string()
                                + ":" + std::to_string(this->mSocket->remote_endpoint().port());
     }
 
@@ -94,7 +91,7 @@ namespace Sentry
             this->mIsOpen = false;
             this->mSocket->close(err);
 		}
-		SayNoDebugError("remove socket " << this->GetRemoteAddress());
+		SayNoDebugError("remove socket " << this->GetAddress());
 		this->mTaskScheduler.AddMainTask(NewMethodProxy(&ISocketHandler::OnClose, this->mHandler, this));
 	}
 

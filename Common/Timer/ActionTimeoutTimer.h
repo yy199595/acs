@@ -4,18 +4,18 @@
 
 namespace Sentry
 {
-    class ActionComponent;
+    class CallHandlerComponent;
 
     class ActionTimeoutTimer : public TimerBase
     {
     public:
-        ActionTimeoutTimer(long long ms, long long callbackId, ActionComponent *mgr);
+        ActionTimeoutTimer(long long ms, long long callbackId, CallHandlerComponent *mgr);
 
     public:
         bool Invoke() final;
 
     private:
         long long mCallbackId;
-        ActionComponent *mActionManager;
+        CallHandlerComponent *mActionManager;
     };
 }

@@ -1,22 +1,23 @@
 ﻿#include "ServiceNode.h"
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/ActionComponent.h>
-#include <Method/NetWorkRetAction.h>
+#include <Scene/CallHandlerComponent.h>
+#include <Method/CallHandler.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
 #include <Network/Tcp/TcpClientComponent.h>
 #include <google/protobuf/util/json_util.h>
 namespace Sentry
 {
-	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string name, const std::string address)
+	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
         SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
-		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<ActionComponent>());
+		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<CallHandlerComponent>());
         SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
         SayNoAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
         SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
+        this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::LoopSendMessage, this);
 	}
 
 	bool ServiceNode::AddService(const std::string &service)
@@ -30,26 +31,67 @@ namespace Sentry
 		return false;
 	}
 
-    TcpClientSession * ServiceNode::GetTcpSession()
+    TcpLocalSession * ServiceNode::GetTcpSession()
     {
-        //this->mTcpClientComponent->()
-        return nullptr;
+        auto localSession = this->mTcpClientComponent->GetLocalSession(this->mAddress);
+        if (localSession == nullptr)
+        {
+            localSession = this->mTcpClientComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
+            if (localSession == nullptr)
+            {
+                return nullptr;
+            }
+            for (int index = 0; index < 3; index++)
+            {
+                localSession->AsyncConnectRemote();
+                if(localSession->IsActive())
+                {
+                    return localSession;
+                }
+            }
+            return nullptr;
+        }
+        return localSession;
+    }
+
+    void ServiceNode::LoopSendMessage()
+    {
+        while(!this->mIsClose)
+        {
+            int count = 0;
+            if(this->mWaitSendQueue.empty())
+            {
+                this->mCorComponent->YieldReturn();
+            }
+            TcpLocalSession * tcpLocalSession = this->GetTcpSession();
+            if(tcpLocalSession == nullptr)
+            {
+                SayNoDebugError("node session [" << tcpLocalSession->GetName()
+                                                 << ":" << tcpLocalSession->GetAddress() << " error");
+                this->mCorComponent->YieldReturn();
+                continue;
+            }
+            while(!this->mWaitSendQueue.empty() && count < 100)
+            {
+                count++;
+                std::string * message = this->mWaitSendQueue.front();
+                this->mWaitSendQueue.pop();
+                tcpLocalSession->SendNetMessage(message);
+            }
+        }
+        delete this;
+    }
+
+    void ServiceNode::Destory()
+    {
+        this->mIsClose = true;
+        this->mCorComponent->Resume(this->mCorId);
     }
 
     bool ServiceNode::HasService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		return iter != this->mServiceArray.end();
-	}
-
-	void ServiceNode::OnConnectNodeAfter()
-	{
-		while(!this->mCoroutines.empty())
-        {
-            unsigned int corId = this->mCoroutines.front();
-            this->mCoroutines.pop();
-            this->mCorComponent->Resume(corId);
-        }
 	}
 
     void ServiceNode::GetServicers(std::vector<std::string> & services)
@@ -70,98 +112,160 @@ namespace Sentry
         }
         this->mRequestData.Clear();
         this->mRequestData.set_methodid(config->MethodId);
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
         return XCode::Successful;
     }
 
 	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
 	{
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+        this->mRequestData.Clear();
+        this->mRequestData.set_methodid(config->MethodId);
+        if(!request.SerializeToString(&mMessageBuffer))
+        {
+            return XCode::SerializationFailure;
+        }
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
         return XCode::Successful;
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
 	{
-        return XCode::Successful;
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+
+        unsigned int handlerId = 0;
+        CppCallHandler cppCallHandler;
+        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        {
+            return XCode::Failure;
+        }
+
+        this->mRequestData.Clear();
+        this->mRequestData.set_rpcid(handlerId);
+        this->mRequestData.set_methodid(config->MethodId);
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
+        return cppCallHandler.StartCall();
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, Message &response)
 	{
-        return XCode::Successful;
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+
+        unsigned int handlerId = 0;
+        CppCallHandler cppCallHandler;
+        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        {
+            return XCode::Failure;
+        }
+
+        this->mRequestData.Clear();
+        this->mRequestData.set_rpcid(handlerId);
+        this->mRequestData.set_methodid(config->MethodId);
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
+        return cppCallHandler.StartCall(response);
 	}
 
 	XCode ServiceNode::Invoke(const std::string &service, const std::string &method, const Message &request)
 	{
-        return XCode::Successful;
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+
+        unsigned int handlerId = 0;
+        CppCallHandler cppCallHandler;
+        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        {
+            return XCode::Failure;
+        }
+
+        if(!request.SerializeToString(&mMessageBuffer))
+        {
+            return XCode::SerializationFailure;
+        }
+
+        this->mRequestData.Clear();
+        this->mRequestData.set_rpcid(handlerId);
+        this->mRequestData.set_methodid(config->MethodId);
+        this->mRequestData.set_messagedata(mMessageBuffer);
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
+        return cppCallHandler.StartCall();
 	}
 
 	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
     {
-//        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-//        if (config == nullptr)
-//        {
-//            return XCode::CallFunctionNotExist;
-//        }
-//        TcpClientSession *tcpProxySession = this->GetTcpSession();
-//        if (!tcpProxySession->IsActive())
-//        {
-//            return XCode::SendMessageFail;
-//        }
-//        if (!request.SerializeToString(&mMessageBuffer))
-//        {
-//            return XCode::SerializationFailure;
-//        }
-//        size_t size = 0;
-//        com::DataPacket_Request requestData;
-//        requestData.set_messagedata(mMessageBuffer);
-//        auto rpcCallback = NetWorkWaitCorAction::Create();
-//        requestData.set_rpcid(this->mActionManager->AddCallback(rpcCallback));
-//
-//        MessageStream &messageStream = this->mNetProxyComponent->GetSendStream();
-//        messageStream << DataMessageType::TYPE_REQUEST << config->MethodId << requestData;
-//
-//		const char * message = messageStream.Serialize(size);
-//        if(!tcpProxySession->SendMessageData(message, size))
-//        {
-//            return XCode::SendMessageFail;
-//        }
-//        this->mCorComponent->YieldReturn();
-//
-//        if(rpcCallback->GetCode() == XCode::Successful)
-//        {
-//            response.ParseFromString(rpcCallback->GetMsgData());
-//            return XCode::Successful;
-//        }
-//        return rpcCallback->GetCode();
-        return XCode::Successful;
+        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        if(config == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
+
+        unsigned int handlerId = 0;
+        CppCallHandler cppCallHandler;
+        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        {
+            return XCode::Failure;
+        }
+
+        if(!request.SerializeToString(&mMessageBuffer))
+        {
+            return XCode::SerializationFailure;
+        }
+
+        this->mRequestData.Clear();
+        this->mRequestData.set_rpcid(handlerId);
+        this->mRequestData.set_methodid(config->MethodId);
+        this->mRequestData.set_messagedata(mMessageBuffer);
+        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        if(message == nullptr)
+        {
+            return XCode::SerializationFailure;
+        }
+        this->PushMessage(message);
+        return cppCallHandler.StartCall(response);
     }
 
-	XCode ServiceNode::SendRpcMessage(SharedMessage message)
-	{
-		auto rpcCallback = NetWorkWaitCorAction::Create();
-//		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
-//		{
-//			return XCode::Failure;
-//		}
-		//this->AddMessageToQueue(message);
-		return rpcCallback->GetCode();
-	}
-
-	XCode ServiceNode::SendRpcMessage(SharedMessage message, Message & response)
-	{
-		auto rpcCallback = NetWorkWaitCorAction::Create();
-//		if (!message->SetRpcId(this->mActionManager->AddCallback(rpcCallback)))
-//		{
-//			return XCode::Failure;
-//		}
-		//this->AddMessageToQueue(message);
-		if (rpcCallback->GetCode() == XCode::Successful)
-		{
-			const std::string & data = rpcCallback->GetMsgData();
-			if (!response.ParseFromString(data))
-			{
-				SayNoDebugFatal("parse response message error type : " << response.GetTypeName());
-				return XCode::ParseMessageError;
-			}
-		}
-		return rpcCallback->GetCode();
-	}
+    void ServiceNode::PushMessage(std::string *msg)
+    {
+        this->mWaitSendQueue.push(msg);
+        this->mCorComponent->Resume(this->mCorId);
+    }
 }// namespace Sentry

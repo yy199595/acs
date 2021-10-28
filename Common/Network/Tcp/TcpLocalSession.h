@@ -10,11 +10,13 @@ namespace Sentry
     class TcpLocalSession : public TcpClientSession
     {
     public:
-        using TcpClientSession::TcpClientSession;
+        TcpLocalSession(ISocketHandler * handler, const std::string & name, const std::string ip, const unsigned short port);
     public:
+        const std::string & GetName() { return this->mName;}
         SocketType GetSocketType() override { return SocketType::LocalSocket; }
-        void ConnectByAddress(const std::string & name, const std::string & ip, unsigned short port);
-        void AsyncConnectByAddress(const std::string & name, const std::string & ip, unsigned short port);
+    public:
+        void ConnecRemote();
+        void AsyncConnectRemote();
     private:
         void ConnectHandler();
         void AsyncConnectHandler(unsigned int od);
@@ -22,6 +24,7 @@ namespace Sentry
         std::string mIp;
         std::string mName;
         unsigned int mPort;
+        unsigned int mConnectCount;
     };
 }
 

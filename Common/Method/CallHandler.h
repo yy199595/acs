@@ -7,12 +7,12 @@
 using namespace com;
 namespace Sentry
 {
-    class LocalRetActionProxy
+    class CallHandler
     {
     public:
-		LocalRetActionProxy();
+		CallHandler();
 
-        virtual ~LocalRetActionProxy() {}
+        virtual ~CallHandler() {}
 
     public:
         long long GetCreateTime() { return this->mCreateTime; }
@@ -23,6 +23,7 @@ namespace Sentry
     private:
         long long mCreateTime;
         std::string mFunctionName;
+        class CoroutineComponent * mCorComponent;
     public:
 #ifdef SOEASY_DEBUG
         std::string mService;
@@ -34,10 +35,10 @@ namespace Sentry
 
 namespace Sentry
 {
-    class LocalWaitRetActionProxy : public LocalRetActionProxy
+    class LuaCallHandler : public CallHandler
     {
     public:
-        LocalWaitRetActionProxy(lua_State *lua, lua_State * cor) : mCoroutine(cor), luaEnv(lua) {}
+        LuaCallHandler(lua_State *lua, lua_State * cor) : mCoroutine(cor), luaEnv(lua) {}
     public:
         void Invoke(const com::DataPacket_Response & backData) override;
 
@@ -49,26 +50,20 @@ namespace Sentry
 
     class CoroutineComponent;
 
-    class NetWorkWaitCorAction : public LocalRetActionProxy
+    class CppCallHandler : public CallHandler
     {
     public:
-        NetWorkWaitCorAction(CoroutineComponent *);
-
-		~NetWorkWaitCorAction();
-
-        static shared_ptr<NetWorkWaitCorAction> Create();
-
+        CppCallHandler();
+		~CppCallHandler();
     public:
         void Invoke(const com::DataPacket_Response & backData) override;
     public:
-        XCode GetCode() { return this->mCode; }
-
-        const std::string &GetMsgData() { return this->mMessage; }
-
+        XCode StartCall();
+        XCode StartCall(google::protobuf::Message & message);
     private:
         XCode mCode;
-        std::string mMessage;
 		unsigned int mCoroutineId;
         CoroutineComponent *mScheduler;
+        google::protobuf::Message * mMessage;
     };
 }

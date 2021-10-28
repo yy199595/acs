@@ -40,13 +40,8 @@ namespace Sentry
 		AsioContext &GetContext() { return this->mContext; }
 
 	public:
-		const std::string &GetName() { return this->mName; }
 
-		const std::string &GetLocalAddress() { return this->mLocalAddress; };
-
-		const std::string &GetRemoteAddress() { return this->mRemoteAddress; };
-
-		const std::string &GetAddress() { return this->mRemoteAddress; }
+		const std::string &GetAddress() { return this->mAddress; }
 
 	public:
 		void OnListenDone(const asio::error_code & err);
@@ -74,21 +69,20 @@ namespace Sentry
 
 	protected:
 
-		void InitMember();
-
 		void SendByString(std::string *message);
 
 		void SendByStream(asio::streambuf * message);
+
+    private:
+        void InitMember();
 	protected:
-		std::string mName;
+        std::string mAddress;
 		SharedTcpSocket mSocket;
 		ISocketHandler *mHandler;
+        std::atomic_bool mIsOpen;
 		MainTaskScheduler &mTaskScheduler;
 	private:
-		std::string mLocalAddress;
-		std::string mRemoteAddress;
-	private:
 		AsioContext &mContext;
-		std::atomic_bool mIsOpen;
+
 	};
 }

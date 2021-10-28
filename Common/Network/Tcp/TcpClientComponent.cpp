@@ -1,24 +1,20 @@
 ﻿#include "TcpClientComponent.h"
 
 #include <Core/App.h>
-#include <Scene/ActionComponent.h>
-#include <Scene/LuaScriptComponent.h>
+#include <Scene/CallHandlerComponent.h>
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Network/Tcp/TcpLocalSession.h>
 namespace Sentry
 {
-    TcpClientComponent::TcpClientComponent()
-    {
-
-    }
-
+    TcpClientComponent::TcpClientComponent() = default;
     bool TcpClientComponent::Awake()
     {
-		SayNoAssertRetFalse_F(this->mActionComponent = this->GetComponent<ActionComponent>());
 		SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
 		SayNoAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
+        SayNoAssertRetFalse_F(this->mCallHandlerComponent = this->GetComponent<CallHandlerComponent>());
+
         return true;
     }
 
@@ -43,15 +39,15 @@ namespace Sentry
 		if (err)
 		{
 			const std::string & address = clientSession->GetAddress();
-			SayNoDebugError("[" << address << "]" << " error" << err.message());
 			if (clientSession->GetSocketType() == LocalSocket)
-			{
-				std::string ip;
-				unsigned short port;
-                const std::string & name = clientSession->GetName();
-				StringHelper::ParseIpAddress(address, ip, port);
-                (static_cast<TcpLocalSession*>(clientSession))->ConnectByAddress(name, ip, port);
-			}
+            {
+                auto localSession = static_cast<TcpLocalSession *>(clientSession);
+                if (localSession != nullptr)
+                {
+                    SayNoDebugError(
+                            "[" << localSession->GetName() << ":" << address << "]" << " error" << err.message());
+                }
+            }
 			else
 			{
 				auto iter = this->mSessionAdressMap.find(address);
@@ -71,8 +67,15 @@ namespace Sentry
 		const std::string & address = session->GetAddress();
 		if (err)
 		{
-			SayNoDebugError(err.message());
+			SayNoDebugError("connect to " << address << " failure : " << err.message());
 		}
+        else
+        {
+            auto localSession = static_cast<TcpLocalSession *>(session);
+            SayNoDebugInfo(
+                    "connect to [" << localSession->GetName() << ":" << localSession->GetAddress() << "] successful");
+            this->mSessionAdressMap.emplace(address, session);
+        }
 	}
 
 	void TcpClientComponent::OnListenNewSession(TcpClientSession *clientSession, const asio::error_code & err)
@@ -117,25 +120,44 @@ namespace Sentry
             {
                 return false;
             }
-            return this->mActionComponent->OnResponseMessage(mResponseData);
+            return this->mCallHandlerComponent->OnResponseMessage(mResponseData);
 		}
         return false;
 	}
 
-	TcpClientSession *TcpClientComponent::ConnectRemote(const std::string &name, const std::string & ip, unsigned short port)
+    TcpLocalSession *TcpClientComponent::GetLocalSession(const std::string &address)
+    {
+        auto iter = this->mSessionAdressMap.find(address);
+        if(iter == this->mSessionAdressMap.end())
+        {
+            return nullptr;
+        }
+        TcpClientSession * session = iter->second;
+        if(session->GetSocketType() == SocketType::RemoteSocket)
+        {
+            return nullptr;
+        }
+        return static_cast<TcpLocalSession*>(session);
+    }
+
+    TcpClientSession *TcpClientComponent::GetRemoteSession(const std::string &address)
+    {
+        auto iter = this->mSessionAdressMap.find(address);
+        return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
+    }
+
+    TcpLocalSession *TcpClientComponent::NewSession(const std::string &name, const std::string &ip,
+                                                     unsigned short port)
 	{
 		std::string address = ip + ":" + std::to_string(port);
 		auto iter = this->mSessionAdressMap.find(address);
 		if (iter != this->mSessionAdressMap.end())
 		{
-			return iter->second;
+			return static_cast<TcpLocalSession*>(iter->second);
 		}
 		AsioContext & io = this->GetNetThread()->GetContext();
 		SharedTcpSocket socket = make_shared<AsioTcpSocket>(io);
-
-		auto clientSession = new TcpLocalSession(this);
-		clientSession->ConnectByAddress(name, ip, port);
-		return clientSession;
+		return new TcpLocalSession(this, name, ip, port);
 	}
 
     void TcpClientComponent::OnDestory()
@@ -189,10 +211,37 @@ namespace Sentry
 		const size_t size = message.ByteSizeLong() + 5;
 		memcpy(this->mMessageBuffer, &size, sizeof(char));
 		memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
-		if (!message.ParseFromArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
+		if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
 		{
 			return false;
 		}
-		return true;//this->SendByAddress(address, this->mStringPool.New(this->mMessageBuffer, size));
+		return this->SendByAddress(address, this->mStringPool.New(this->mMessageBuffer, size));
 	}
+
+    std::string *TcpClientComponent::Serialize(const com::DataPacket_Request &message)
+    {
+        DataMessageType type = TYPE_REQUEST;
+        const size_t size = message.ByteSizeLong() + 5;
+        memcpy(this->mMessageBuffer, &size, sizeof(unsigned int));
+        memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
+        if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
+        {
+            return nullptr;
+        }
+        return this->mStringPool.New(this->mMessageBuffer, size);
+    }
+
+    std::string *TcpClientComponent::Serialize(const com::DataPacket_Response &message)
+    {
+        DataMessageType type = TYPE_RESPONSE;
+        const size_t size = message.ByteSizeLong() + 5;
+        memcpy(this->mMessageBuffer, &size, sizeof(unsigned int));
+        memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
+        if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
+        {
+            return nullptr;
+        }
+        return this->mStringPool.New(this->mMessageBuffer, size);
+    }
+
 }// namespace Sentry

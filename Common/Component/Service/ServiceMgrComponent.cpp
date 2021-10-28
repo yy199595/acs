@@ -53,13 +53,12 @@ namespace Sentry
             XCode code = method->Invoke(request, responseContent);
             if (request.rpcid() != 0)
             {
-                com::DataPacket_Response responseMessage;
-
-                responseMessage.set_code(code);
-                responseMessage.set_rpcid(request.rpcid());
-                responseMessage.set_userid(request.userid());
-                responseMessage.set_messagedata(responseContent);
-                this->mNetSessionComponent->SendByAddress(request.address(), responseMessage);
+                this->mResponse.Clear();
+                this->mResponse.set_code(code);
+                this->mResponse.set_rpcid(request.rpcid());
+                this->mResponse.set_userid(request.userid());
+                this->mResponse.set_messagedata(responseContent);
+                this->mNetSessionComponent->SendByAddress(request.address(), this->mResponse);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步

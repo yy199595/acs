@@ -88,7 +88,12 @@ namespace Sentry
 
 	void NetWorkThread::Update()
     {
-		this->mAsioContext->poll();
+        asio::error_code err;
+		this->mAsioContext->poll(err);
+        if(err)
+        {
+            SayNoDebugError(err.message());
+        }
         if(this->mMethodProxy)
         {
             this->mMethodProxy->run();

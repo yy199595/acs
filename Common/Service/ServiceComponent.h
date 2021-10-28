@@ -10,7 +10,7 @@ using namespace com;
 namespace Sentry
 {
 	class ServiceMethod;
-	class NetWorkWaitCorAction;
+	class CppCallHandler;
 
 	class ServiceComponent : public Component
 	{

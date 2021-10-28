@@ -1,18 +1,19 @@
-﻿#include"ActionComponent.h"
+﻿#include"CallHandlerComponent.h"
 #include<Util/StringHelper.h>
 #include<Core/App.h>
 #include<Util/NumberHelper.h>
-#include<Method/NetWorkRetAction.h>
+#include<Method/CallHandler.h>
 #include<Timer/ActionTimeoutTimer.h>
 
 namespace Sentry
 {
-    ActionComponent::ActionComponent()
+    CallHandlerComponent::CallHandlerComponent()
+        : mNumberPool(100)
     {
         this->mMessageTimeout = 0;
     }
 
-    bool ActionComponent::Awake()
+    bool CallHandlerComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mTimerComponent = App::Get().GetTimerComponent();
@@ -20,13 +21,13 @@ namespace Sentry
         return true;
     }
 
-	unsigned int ActionComponent::AddCallback(shared_ptr<LocalRetActionProxy> rpcAction)
+	bool CallHandlerComponent::AddCallHandler(CallHandler * rpcAction, unsigned int & id)
     {
         if (rpcAction == nullptr)
         {
-            return 0;
+            return false;
         }
-		unsigned int id = this->mNumberPool.Pop();
+		id = this->mNumberPool.Pop();
         if (this->mMessageTimeout != 0)// 添加超时
         {
             shared_ptr<ActionTimeoutTimer> timer = 
@@ -34,10 +35,10 @@ namespace Sentry
             this->mTimerComponent->AddTimer(timer);
         }
         this->mRetActionMap.emplace(id, rpcAction);
-        return id;
+        return true;
     }
 
-    bool ActionComponent::OnResponseMessage(const com::DataPacket_Response & response)
+    bool CallHandlerComponent::OnResponseMessage(const com::DataPacket_Response & response)
     {
         unsigned int rpcId = response.rpcid();
         auto iter = this->mRetActionMap.find(rpcId);

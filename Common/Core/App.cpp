@@ -1,6 +1,6 @@
 ﻿
 #include "App.h"
-#include <Scene/ActionComponent.h>
+#include <Scene/CallHandlerComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Network/Tcp/TcpClientComponent.h>
 #include <Service/ServiceNodeComponent.h>
@@ -47,7 +47,7 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 		this->AddComponent<TimerComponent>();
-		this->AddComponent<ActionComponent>();
+		this->AddComponent<CallHandlerComponent>();
 		this->AddComponent<ProtocolComponent>();
 		this->AddComponent<CoroutineComponent>();
 		this->AddComponent<TcpClientComponent>();

@@ -1,5 +1,5 @@
 ﻿#include <Core/App.h>
-#include <Scene/ActionComponent.h>
+#include <Scene/CallHandlerComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     __register_component__(ServiceMgrComponent);
     __register_component__(RedisComponent);
     __register_component__(MysqlComponent);
-    __register_component__(ActionComponent);
+    __register_component__(CallHandlerComponent);
     __register_component__(LuaScriptComponent);
     __register_component__(ProtocolComponent);
     __register_component__(MysqlProxyComponent);

@@ -6,27 +6,31 @@
 #include <Core/App.h>
 namespace Sentry
 {
-    void TcpLocalSession::ConnectByAddress(const std::string &name, const std::string &ip, unsigned short port)
+    TcpLocalSession::TcpLocalSession(ISocketHandler *handler, const std::string &name, const std::string ip,
+                                     const unsigned short port)
+                                     : TcpClientSession(handler)
+    {
+        this->mIp = ip;
+        this->mName = name;
+        this->mPort = port;
+        this->mAddress = ip + ":" + std::to_string(port);
+    }
+
+    void TcpLocalSession::ConnecRemote()
     {
         if(this->IsActive())
         {
             return;
         }
-        this->mIp = ip;
-        this->mName = name;
-        this->mPort = port;
         this->mHandler->GetNetThread()->AddTask(&TcpLocalSession::ConnectHandler, this);
     }
 
-    void TcpLocalSession::AsyncConnectByAddress(const std::string &name, const std::string &ip, unsigned short port)
+    void TcpLocalSession::AsyncConnectRemote()
     {
         if(this->IsActive())
         {
             return;
         }
-        this->mIp = ip;
-        this->mName = name;
-        this->mPort = port;
         unsigned int id = App::Get().GetCorComponent()->GetCurrentCorId();
         this->mHandler->GetNetThread()->AddTask(&TcpLocalSession::AsyncConnectHandler, this, id);
         App::Get().GetCorComponent()->YieldReturn();
@@ -34,14 +38,16 @@ namespace Sentry
 
     void TcpLocalSession::ConnectHandler()
     {
+        this->mConnectCount++;
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        SayNoDebugLog(this->mName << " start connect " << this->mIp << this->mPort);
+        SayNoDebugLog(this->mName << " start connect " << this->GetAddress());
         this->mSocket->async_connect(endPoint, [this](const asio::error_code &err)
         {
             if(!err)
             {
-                this->InitMember();
+                this->mIsOpen = true;
+                this->mConnectCount = 0;
             }
             this->OnConnect(err);
         });
@@ -51,14 +57,16 @@ namespace Sentry
     {
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        SayNoDebugLog(this->mName << " start connect " << this->mIp << this->mPort);
+        SayNoDebugLog(this->mName << " start connect " << this->GetAddress());
         this->mSocket->async_connect(endPoint, [this, id](const asio::error_code &err)
         {
-            if(!err)
+            if (!err)
             {
-                this->InitMember();
+                this->mIsOpen = true;
+                this->mConnectCount = 0;
             }
-            CoroutineComponent * component = App::Get().GetCorComponent();
+            this->OnConnect(err);
+            CoroutineComponent *component = App::Get().GetCorComponent();
             this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);
         });
     }

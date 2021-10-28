@@ -32,6 +32,8 @@ namespace Sentry
         void Invoke(ServiceMethod * method, com::DataPacket_Request * request);
     private:
         int mNodeId;
+        std::string mMessageBuffer;
+        com::DataPacket_Response mResponse;
         class CoroutineComponent *mCorComponent;
         class ProtocolComponent * mProtocolComponent;
 		class TcpClientComponent *mNetSessionComponent;
