@@ -2,8 +2,6 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Coroutine/CoroutineComponent.h>
-
 
 namespace Sentry
 {
@@ -25,7 +23,7 @@ namespace Sentry
     {
         while (!this->mWakeUpQueue.empty() && this->GetServiceNode())
         {
-            const long long id = this->mWakeUpQueue.front();
+            unsigned int id = this->mWakeUpQueue.front();
             this->mCorComponent->Resume(id);
             this->mWakeUpQueue.pop();
         }
@@ -41,6 +39,26 @@ namespace Sentry
             return proxyNode;
         }
         return proxyNode;
+    }
+
+    void MysqlProxyComponent::OnLodaData()
+    {
+//        db::UserAccountData userAccountData;
+//        userAccountData.set_userid(12345678);
+//        userAccountData.set_account("123456@qq.com");
+//        userAccountData.set_devicemac("ios_qq");
+//        userAccountData.set_token("sadhaihdi2h3ihdisaxnkfjs");
+//        userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+//
+//        XCode code = this->Add(userAccountData);
+//
+//        db::UserAccountData userAccountData2;
+//        userAccountData2.set_userid(12345678);
+//        userAccountData2.set_account("123456@qq.com");
+//
+//        XCode code2 = this->Query(userAccountData2, userAccountData2);
+//
+//        SayNoDebugLogProtocBuf(userAccountData2);
     }
 
     XCode MysqlProxyComponent::Add(const Message &data)

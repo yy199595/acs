@@ -133,7 +133,7 @@ namespace Sentry
 		{
 			this->mSystemUpdateManagers.push_back(manager2);
 		}
-		if (auto *manager3 = dynamic_cast<ISecondUpdate *>(component))
+		if (auto manager3 = dynamic_cast<ISecondUpdate *>(component))
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}

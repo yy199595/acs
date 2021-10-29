@@ -2,7 +2,7 @@
 #include <Pool/ObjectPool.h>
 namespace Sentry
 {
-    class MysqlProxyComponent : public Component, public IFrameUpdate
+    class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData
     {
     public:
         MysqlProxyComponent() {}
@@ -13,6 +13,8 @@ namespace Sentry
         bool Awake() final;
 
         void Start() final;
+
+        void OnLodaData() override;
 
         void OnFrameUpdate(float t) final;
 

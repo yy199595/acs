@@ -22,12 +22,11 @@
 #include <Service/ClusterService.h>
 #include <Service/CenterService.h>
 #include <Service/GatewayService.h>
-
-
+#include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
 #include <Pool/StringPool.h>
-
 using namespace Sentry;
+
 int main(int argc, char **argv)
 {
     for (int index = 0; index < argc; index++)
@@ -52,6 +51,7 @@ int main(int argc, char **argv)
     __register_component__(TcpServerComponent);
     __register_component__(TcpClientComponent);
     __register_component__(TelnetClientComponent);
+    __register_component__(DeamonComponent);
 
     __register_component__(LuaServiceMgrComponent);
 
@@ -63,6 +63,5 @@ int main(int argc, char **argv)
 
 
     App app(argc, argv);
-
     return app.Run();
 }
