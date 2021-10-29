@@ -13,12 +13,13 @@ namespace Sentry
 
 		~TcpServerComponent() {}
 
+        int GetPriority() { return 2; }
 	protected:
 		bool Awake() override;
 		void Start() override;
 	private:
         std::string mHostIp;
 		std::set<std::string> mWhiteList;    //白名单
-		std::unordered_map<std::string, NetworkListener *> mListenerMap;
+        std::vector<NetworkListener *> mListeners;
 	};
 }

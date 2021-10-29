@@ -25,21 +25,26 @@ namespace Sentry
 		virtual ~IThread() = default;
 
     public:
+
+        void Stop();
+
+        void HangUp();
+
 		virtual int Start() = 0;
 
-        void Stop() { this->mIsClose = true; }	
+        const std::thread::id & GetThreadId() { return this->mThreadId;};
 
-       
-
-        std::thread::id GetThreadId() { return this->mThreadId; }
 
         bool IsCurrentThread() { return std::this_thread::get_id() == this->mThreadId; }
+
 	protected:
 		virtual void Update() = 0;
     protected:
 		bool mIsClose;
-		std::thread::id mThreadId;
+        std::mutex mThreadLock;
+        std::thread::id mThreadId;
         TaskPoolComponent *mTaskComponent;
+        std::condition_variable mThreadVariable;
     };
 
     class TaskThread : public IThread
@@ -49,17 +54,19 @@ namespace Sentry
 
     public:
 		int Start() final;
+
         void AddTask(TaskProxy * task);
+
         ThreadState GetTaskState() { return this->mTaskState; }
+
         bool IsRunning() { return this->mTaskState == ThreadState::Run; }
+
 	private:
 		void Update() final;
     private:
 		std::thread * mThread;
-        std::mutex mThreadLock;
         ThreadState mTaskState;
 		std::queue<unsigned int> mFinishTasks;
-        std::condition_variable mThreadVariable;
         MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
     };
 
@@ -73,12 +80,14 @@ namespace Sentry
 		void AddTask(StaticMethod * task);
 		
 		AsioContext & GetContext() { return *mAsioContext; }
+
 	public:
 		template<typename F, typename T, typename ... Args>
 		void AddTask(F && f, T * o, Args &&... args) {
 			this->AddTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 		}
 	protected:
+        void Loop();
 		void Update() final;
     private:		
 		AsioWork * mAsioWork;

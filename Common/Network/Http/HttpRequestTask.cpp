@@ -117,7 +117,9 @@ namespace Sentry
                 const std::string & key = tempArray2[0];
                 const std::string & val = tempArray2[1];
                 this->mHeardMap.insert(std::make_pair(key, val));
+#ifdef __DEBUG__
                 SayNoDebugWarning(key << "  =  " << val);
+#endif
             }
         }
 		return true;

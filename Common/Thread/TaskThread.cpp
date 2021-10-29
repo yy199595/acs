@@ -11,6 +11,19 @@ namespace Sentry
     {		
 		
     }
+
+    void IThread::HangUp()
+    {
+        std::unique_lock<std::mutex> waitLock(this->mThreadLock);
+        this->mThreadVariable.wait(waitLock);
+    }
+
+    void IThread::Stop()
+    {
+        this->mIsClose = true;
+        this->mThreadVariable.notify_one();
+    }
+
 }
 
 namespace Sentry
@@ -20,53 +33,49 @@ namespace Sentry
     {
         this->mTaskState = Idle;
 		this->mThread = nullptr;
+        this->mThread = new std::thread(std::bind(&TaskThread::Update, this));
+        this->mThread->detach();
     }
 
 	int TaskThread::Start()
 	{
-		this->mThread = new std::thread([this]()
-		{
-			std::chrono::milliseconds time(1);
-			while (!this->mIsClose)
-			{
-				this->Update();
-				//std::this_thread::sleep_for(time);
-			}
-		});
-		this->mThread->detach();
-		this->mThreadId = this->mThread->get_id();
+        this->mThreadVariable.notify_one();
 		return 0;
 	}
 
 	void TaskThread::AddTask(TaskProxy * task)
     {
-        this->mTaskState = ThreadState::Run;
         this->mWaitInvokeTask.Add(task);
         this->mThreadVariable.notify_one();
+        this->mTaskState = ThreadState::Run;
     }
 
     void TaskThread::Update()
     {
+        this->mThreadId = std::this_thread::get_id();
+
+        this->HangUp();
         TaskProxy *task = nullptr;
-        this->mWaitInvokeTask.SwapQueueData();
-        while (this->mWaitInvokeTask.PopItem(task))
+        while(!this->mIsClose)
         {
-            if(task->Run())
+            this->mWaitInvokeTask.SwapQueueData();
+            while (this->mWaitInvokeTask.PopItem(task))
             {
-                this->mFinishTasks.push(task->GetTaskId());
+                if (task->Run())
+                {
+                    this->mFinishTasks.push(task->GetTaskId());
+                }
             }
-        }
 
-        while (!this->mFinishTasks.empty())
-        {
-            unsigned int id = this->mFinishTasks.front();
-            this->mFinishTasks.pop();
-            this->mTaskComponent->PushFinishTask(id);
+            while (!this->mFinishTasks.empty())
+            {
+                unsigned int id = this->mFinishTasks.front();
+                this->mFinishTasks.pop();
+                this->mTaskComponent->PushFinishTask(id);
+            }
+            this->HangUp();
+            this->mTaskState = ThreadState::Idle;
         }
-
-        this->mTaskState = ThreadState::Idle;
-        std::unique_lock<std::mutex> waitLock(this->mThreadLock);
-        this->mThreadVariable.wait(waitLock);
 
     }
 }
@@ -78,21 +87,13 @@ namespace Sentry
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
+        this->mThread = new std::thread(std::bind(&NetWorkThread::Update, this));
+        this->mThread->detach();
     }
 
 	int NetWorkThread::Start()
 	{
-		this->mThread = new std::thread([this]()
-		{
-			std::chrono::milliseconds time(1);
-			while (!this->mIsClose)
-			{
-				this->Update();
-				//std::this_thread::sleep_for(time);
-			}
-		});
-		this->mThread->detach();
-		this->mThreadId = this->mThread->get_id();
+        this->mThreadVariable.notify_one();
 		return 0;
 	}
 
@@ -106,36 +107,45 @@ namespace Sentry
 		this->mWaitInvokeMethod.Add(task);
 	}
 
-	void NetWorkThread::Update()
+    void NetWorkThread::Update()
     {
-        asio::error_code err;
-		this->mAsioContext->poll(err);
-        if(err)
-        {
-            SayNoDebugError(err.message());
-        }
-        if(this->mMethodProxy)
-        {
-            this->mMethodProxy->run();
-        }
-        TaskProxy * taskProxy = nullptr;
-		StaticMethod * taskMethod = nullptr;
-        this->mWaitInvokeTask.SwapQueueData();
-		this->mWaitInvokeMethod.SwapQueueData();
-        while(this->mWaitInvokeTask.PopItem(taskProxy))
-        {
-            if(taskProxy->Run())
-            {
-				unsigned int id = taskProxy->GetTaskId();
-				this->mTaskComponent->PushFinishTask(id);
-            }
-        }
+        this->mThreadId = std::this_thread::get_id();
 
-		while (this->mWaitInvokeMethod.PopItem(taskMethod))
-		{
-			taskMethod->run();
-            delete taskMethod;
-		}     
+        this->HangUp();
+        asio::error_code err;
+        std::chrono::milliseconds time(1);
+        while(!this->mIsClose)
+        {
+            std::this_thread::sleep_for(time);
+            this->mAsioContext->poll(err);
+            if(err)
+            {
+                SayNoDebugError(err.message());
+            }
+            if(this->mMethodProxy)
+            {
+                this->mMethodProxy->run();
+            }
+            TaskProxy * taskProxy = nullptr;
+            StaticMethod * taskMethod = nullptr;
+            this->mWaitInvokeTask.SwapQueueData();
+            this->mWaitInvokeMethod.SwapQueueData();
+            while(this->mWaitInvokeTask.PopItem(taskProxy))
+            {
+                if(taskProxy->Run())
+                {
+                    unsigned int id = taskProxy->GetTaskId();
+                    this->mTaskComponent->PushFinishTask(id);
+                }
+            }
+
+            while (this->mWaitInvokeMethod.PopItem(taskMethod))
+            {
+                taskMethod->run();
+                delete taskMethod;
+            }
+
+        }
     }
 }
 
@@ -144,7 +154,7 @@ namespace Sentry
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
 		: IThread(nullptr), mMainMethod(method)
 	{
-		
+		this->mThreadId = std::this_thread::get_id();
 	}
 
 	int MainTaskScheduler::Start()

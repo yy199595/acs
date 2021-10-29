@@ -25,6 +25,7 @@ namespace Sentry
 		bool IsOpen() { return this->mBindAcceptor->is_open(); }
         const ListenConfig & GetConfig() { return this->mConfig;}
 	private:
+        void InitListener();
 		void ListenConnect();
 		void OnConnectHandler(const asio::error_code & err);
 	private:

@@ -129,17 +129,16 @@ namespace Sentry
 	}
 
 	void SessionBase::OnConnect(const asio::error_code & err)
-	{
+    {
 #ifdef __DEBUG__
-		SayNoDebugFatal(std::this_thread::get_id());
-        if(!this->mHandler.GetNetThread()->IsCurrentThread())
+        if (!this->mHandler.GetNetThread()->IsCurrentThread())
         {
             SayNoDebugFatal("not in net thread call");
             return;
         }
 #endif
-		this->mTaskScheduler.AddMainTask(&ISocketHandler::OnConnectRemote, &mHandler, this, err);
-	}
+        this->mTaskScheduler.AddMainTask(&ISocketHandler::OnConnectRemote, &mHandler, this, err);
+    }
 
 	void SessionBase::OnReceiveMessage(const char * msg, size_t size)
     {

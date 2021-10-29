@@ -25,33 +25,35 @@ namespace Sentry
 	bool NetworkListener::StartListen(ISocketHandler * handler)
 	{
 		this->mSessionHandler = handler;
-        this->mTaskThread->AddTask(&NetworkListener::ListenConnect, this);
+        this->mTaskThread->AddTask(&NetworkListener::InitListener, this);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 		return this->mIsListen;
 	}
 
+    void NetworkListener::InitListener()
+    {
+        try
+        {
+            asio::io_service & io = this->mTaskThread->GetContext();
+            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
+            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+
+            this->mBindAcceptor->listen(this->mConfig.Count);
+            io.post(std::bind(&NetworkListener::ListenConnect, this));
+            this->mIsListen = true;
+        }
+        catch (std::system_error & err)
+        {
+            this->mIsListen = false;
+            SayNoDebugFatal("listen " << this->mConfig.Ip << ":"
+                                      << this->mConfig.Port << " failure" << err.what());
+        }
+        CoroutineComponent * component = App::Get().GetCorComponent();
+        this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, this->mCorId);
+    }
+
 	void NetworkListener::ListenConnect()
 	{
-        if(this->mBindAcceptor == nullptr)
-        {
-			try
-			{
-				AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
-				this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread->GetContext(), endPoint);
-
-				this->mBindAcceptor->listen(this->mConfig.Count);
-				this->mIsListen = true;
-			}
-            catch (std::system_error & err)
-            {
-                this->mIsListen = false;
-                SayNoDebugFatal("listen " << this->mConfig.Ip << ":"
-                                          << this->mConfig.Port << " failure" << err.what());
-				return;
-            }
-            CoroutineComponent * component = App::Get().GetCorComponent();
-            this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, this->mCorId);
-        }
 		this->mSessionSocket = this->mSessionHandler->CreateSocket();
 		this->mBindAcceptor->async_accept(this->mSessionSocket->GetSocket(), std::bind(&NetworkListener::OnConnectHandler, this, args1));
 	}

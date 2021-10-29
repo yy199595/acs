@@ -13,7 +13,7 @@ namespace Sentry
 		ServerConfig & config = App::Get().GetConfig();
 		config.GetValue("WhiteList", this->mWhiteList);
         config.GetValue("Listener","ip", this->mHostIp);
-        TaskPoolComponent * taskComponent = this->GetComponent<TaskPoolComponent>();
+        auto taskComponent = this->GetComponent<TaskPoolComponent>();
 		rapidjson::Value * jsonValue = config.GetJsonValue("Listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
@@ -53,7 +53,7 @@ namespace Sentry
             if(listenConfig.Port !=0)
             {
                 auto listener = new NetworkListener(netThread, listenConfig);
-                this->mListenerMap.insert(std::make_pair(listenConfig.Name, listener));
+                this->mListeners.push_back(listener);
             }
             socketHandler->SetNetThread(netThread);
 		}
@@ -62,17 +62,16 @@ namespace Sentry
 
     void TcpServerComponent::Start()
     {
-		auto iter = this->mListenerMap.begin();
-		for (; iter != this->mListenerMap.end(); iter++)
-		{
-            const ListenConfig & config = iter->second->GetConfig();
-			Component * component = this->gameObject->GetComponentByName(config.Handler);
-            if(auto handler = dynamic_cast<ISocketHandler*>(component))
+        for (size_t index = 0; index < this->mListeners.size(); index++)
+        {
+            NetworkListener *listener = this->mListeners[index];
+            const ListenConfig &config = listener->GetConfig();
+            Component *component = this->gameObject->GetComponentByName(config.Handler);
+            if (auto handler = dynamic_cast<ISocketHandler *>(component))
             {
-                NetworkListener * listener = iter->second;
-                if(listener->StartListen(handler))
+                if (listener->StartListen(handler))
                 {
-                    const ListenConfig & config = listener->GetConfig();
+                    const ListenConfig &config = listener->GetConfig();
                     SayNoDebugLog(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
                 }
                 else
@@ -80,6 +79,6 @@ namespace Sentry
                     App::Get().Stop();
                 }
             }
-		}
+        }
     }
 }

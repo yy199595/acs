@@ -18,8 +18,7 @@ namespace Sentry
     public:
         HttpRequestTask(const std::string &url);
 
-        virtual ~HttpRequestTask()
-        {}
+        virtual ~HttpRequestTask() = default;
 
     protected:
         virtual bool OnReceiveHeard(const std::string &heard);
