@@ -5,7 +5,6 @@
 #ifndef SENTRY_DEAMONCOMPONENT_H
 #define SENTRY_DEAMONCOMPONENT_H
 #include "Component.h"
-#include <Process/process.hpp>
 namespace Sentry
 {
     class DeamonComponent : public Component, public ISecondUpdate
@@ -21,8 +20,7 @@ namespace Sentry
         void Update();
         void ReadStdOut(const char * str, size_t);
         void ReadStdErr(const char * str, size_t);
-    private:
-        Sentry::Process * mDeamon;
+    private:     
         long long mLastRefreshTime;
     };
 }

@@ -9,8 +9,6 @@ namespace Sentry
 {
     bool DeamonComponent::Awake()
     {
-        this->mDeamon = new Process(
-                std::bind(&DeamonComponent::Update, this));
         return true;
     }
 
