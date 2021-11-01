@@ -7,14 +7,14 @@ namespace GameKeeper
     RedisTask::RedisTask(const std::string &cmd) : RedisTaskBase(cmd)
     {
 		CoroutineComponent * corComponent = App::Get().GetCorComponent();
-		SayNoAssertRet_F(this->mCoreoutineId = corComponent->GetCurrentCorId());
+		GKAssertRet_F(this->mCoreoutineId = corComponent->GetCurrentCorId());
     }
 
     void RedisTask::RunFinish()
     {
         if(this->GetErrorCode() != XCode::Successful)
         {
-            SayNoDebugError(this->GetErrorStr());
+            GKDebugError(this->GetErrorStr());
         }
 		CoroutineComponent * corComponent = App::Get().GetCorComponent();
 		if (this->mCoreoutineId != 0)

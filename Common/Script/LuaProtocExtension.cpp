@@ -10,13 +10,13 @@ namespace LuaProtocExtension
 {
     int Serialization(lua_State *lua)
     {
-        SayNoAssertRetZero_F(lua_istable(lua, -1));
-        SayNoAssertRetZero_F(lua_isstring(lua, -2));
+        GKAssertRetZero_F(lua_istable(lua, -1));
+        GKAssertRetZero_F(lua_isstring(lua, -2));
         const char *name = lua_tostring(lua, -2);
 
         const Descriptor *desc = DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-        SayNoAssertRetVal(desc, "nod find protoc name : " << name, 0);
-        SayNoAssertRetZero_F(lua_getfunction(lua, "JsonUtil", "Encode"));
+        GKAssertRetVal(desc, "nod find protoc name : " << name, 0);
+        GKAssertRetZero_F(lua_getfunction(lua, "JsonUtil", "Encode"));
 
         lua_pushvalue(lua, -3);
         if (lua_pcall(lua, 1, 1, 0) == 0)
@@ -56,7 +56,7 @@ namespace LuaProtocExtension
         lua_pushvalue(lua, 2);
         if (lua_pcall(lua, 1, 1, 0) != 0)
         {
-            SayNoDebugError(lua_tostring(lua, -1));
+            GKDebugError(lua_tostring(lua, -1));
             lua_pushnil(lua);
             return 1;
         }

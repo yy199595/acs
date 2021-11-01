@@ -26,7 +26,7 @@ namespace GameKeeper
 #ifdef __COROUTINE_ASM__
 		int sid;
 		char * mStackTop;
-		std::string mStack;
+		std::string * mStack;
 		tb_context_t mCorContext;
 #elif __linux__
 		void * mContextStack;

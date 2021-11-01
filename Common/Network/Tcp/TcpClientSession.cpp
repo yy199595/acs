@@ -35,7 +35,7 @@ namespace GameKeeper
 			if (error_code)
 			{
 				this->OnClose();
-				SayNoDebugError(error_code.message());
+				GKDebugError(error_code.message());
 			}
 			else
 			{
@@ -65,7 +65,7 @@ namespace GameKeeper
 			if (error_code)
 			{
 				this->OnClose();
-				SayNoDebugError(error_code.message());
+				GKDebugError(error_code.message());
 			}
 			else
 			{

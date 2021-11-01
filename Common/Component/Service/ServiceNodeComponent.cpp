@@ -38,7 +38,7 @@ namespace GameKeeper
 			this->mServiceNodeArray.push_back(serviceNode);
 			this->mServiceNodeMap2.emplace(address, serviceNode);
             this->mServiceNodeMap1.emplace(serviceNode->GetNodeUId(), serviceNode);
-            SayNoDebugInfo("create new service " << name << "  [" << address << "]");
+            GKDebugInfo("create new service " << name << "  [" << address << "]");
 		}
 		return serviceNode;
 	}
@@ -46,10 +46,10 @@ namespace GameKeeper
     bool ServiceNodeComponent::Awake()
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
-		SayNoAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
-		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
-		SayNoAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-		SayNoAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		GKAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
+		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
+		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
+		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtocolComponent>());
         const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
 		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
     }

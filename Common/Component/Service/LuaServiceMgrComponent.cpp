@@ -13,8 +13,8 @@ namespace GameKeeper
 		ProtocolComponent * protoComponent = this->GetComponent<ProtocolComponent>();
 
 		string servicePath;
-		SayNoAssertRetFalse_F(protoComponent);
-		SayNoAssertRetFalse_F(scriptComponent);
+		GKAssertRetFalse_F(protoComponent);
+		GKAssertRetFalse_F(scriptComponent);
 		lua_State * lua = scriptComponent->GetLuaEnv();
 
 		std::vector<std::string> services;
@@ -39,12 +39,12 @@ namespace GameKeeper
 				LuaServiceComponent * luaSerivce = new LuaServiceComponent();
 				if (App::Get().AddComponent(service, localService))
 				{
-					SayNoDebugError("add service " << service << " failure");
+					GKDebugError("add service " << service << " failure");
 					return false;
 				}
 				if (!luaSerivce->Init(service) || !luaSerivce->InitService(service, lua))
 				{
-					SayNoDebugFatal("Init lua service [" << service << "] failure");
+					GKDebugFatal("Init lua service [" << service << "] failure");
 					return false;
 				}
 				localService = luaSerivce;
@@ -61,7 +61,7 @@ namespace GameKeeper
 				}
 				int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
 				localService->AddMethod(new LuaServiceMethod(method, lua, idx));
-				SayNoDebugInfo("add new lua service method : " << service << "." << method);
+				GKDebugInfo("add new lua service method : " << service << "." << method);
 			}
 		}
 		return true;

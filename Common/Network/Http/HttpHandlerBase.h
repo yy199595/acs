@@ -10,7 +10,7 @@ namespace GameKeeper
 		HttpHandlerBase() = default;
 		virtual ~HttpHandlerBase() = default;
 	public:
-		virtual bool WriterToBuffer(std::ostream & os) { }
+		virtual bool WriterToBuffer(std::ostream & os) { return true; }
         virtual bool OnReceiveBody(asio::streambuf & buf) = 0;
 		virtual bool OnSessionError(const asio::error_code & code) = 0;
 		virtual bool OnReceiveHeard(asio::streambuf & buf, size_t size) = 0;

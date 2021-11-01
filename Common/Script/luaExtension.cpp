@@ -9,8 +9,8 @@ namespace LuaAPIExtension
 {
     int GameObjectGetComponent(lua_State *lua)
     {
-        SayNoAssertRetZero_F(lua_isuserdata(lua, 1));
-        SayNoAssertRetZero_F(lua_isstring(lua, 2));
+        GKAssertRetZero_F(lua_isuserdata(lua, 1));
+        GKAssertRetZero_F(lua_isstring(lua, 2));
         GameObject *gameObject = PtrProxy<GameObject>::Read(lua, 1);
         if (gameObject)
         {
@@ -79,8 +79,8 @@ namespace LuaAPIExtension
 
     int GetComponent(lua_State *lua)
     {
-        SayNoAssertRetZero_F(lua_isuserdata(lua, -2));
-        SayNoAssertRetZero_F(lua_isstring(lua, -1));
+        GKAssertRetZero_F(lua_isuserdata(lua, -2));
+        GKAssertRetZero_F(lua_isstring(lua, -1));
         const char *name = lua_tostring(lua, -1);
         GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
         if (gameObject)
@@ -99,8 +99,8 @@ namespace LuaAPIExtension
 
     int AddComponent(lua_State *lua)
     {
-        SayNoAssertRetZero_F(lua_isuserdata(lua, -2));
-        SayNoAssertRetZero_F(lua_isstring(lua, -1));
+        GKAssertRetZero_F(lua_isuserdata(lua, -2));
+        GKAssertRetZero_F(lua_isstring(lua, -1));
         const char *name = lua_tostring(lua, -1);
         GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
         if (gameObject)
@@ -167,7 +167,7 @@ namespace LuaAPIExtension
     {
         std::string printString;
         GetLuaString(luaEnv, printString);
-        SayNoCommonLog(printString);
+        GK_CommonLog(printString);
         return 0;
     }
 
@@ -175,7 +175,7 @@ namespace LuaAPIExtension
     {
         std::string printString;
         GetLuaString(luaEnv, printString);
-        SayNoCommonInfo(printString);
+        GKCommonInfo(printString);
         return 0;
     }
 
@@ -183,7 +183,7 @@ namespace LuaAPIExtension
     {
         std::string printString;
         GetLuaString(luaEnv, printString);
-        SayNoCommonError(printString);
+        GKCommonError(printString);
         return 0;
     }
 
@@ -191,7 +191,7 @@ namespace LuaAPIExtension
     {
         std::string printString;
         GetLuaString(luaEnv, printString);
-        SayNoCommonWarning(printString);
+        GKCommonWarning(printString);
         return 0;
     }
 }// namespace LuaAPIExtension

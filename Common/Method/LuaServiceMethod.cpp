@@ -12,7 +12,7 @@ namespace GameKeeper
 	{
 		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
 		this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>();
-		SayNoAssertBreakFatal_F(this->mProtocolComponent);
+		GKAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
 	XCode LuaServiceMethod::Invoke(const com::DataPacket_Request &messageData, std::string &response)
@@ -50,7 +50,7 @@ namespace GameKeeper
 			}
 			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
 			{
-				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				GKDebugError(lua_tostring(this->mLuaEnv, -1));
 				return XCode::CallLuaFunctionFail;
 			}
 			lua_remove(this->mLuaEnv, -2);
@@ -58,7 +58,7 @@ namespace GameKeeper
 
 		if (lua_pcall(this->mLuaEnv, 2, 2, 0) != 0)
 		{
-			SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+			GKDebugError(lua_tostring(this->mLuaEnv, -1));
 			return XCode::CallLuaFunctionFail;
 		}
 
@@ -71,7 +71,7 @@ namespace GameKeeper
 			lua_pushvalue(this->mLuaEnv, -3);
 			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
 			{
-				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				GKDebugError(lua_tostring(this->mLuaEnv, -1));
 				return XCode::CallLuaFunctionFail;
 			}
 			size_t size = 0;
@@ -125,7 +125,7 @@ namespace GameKeeper
 //			Message * message = MessagePool::NewByData(name, data);
 //			if (message == nullptr)
 //			{
-//				SayNoDebugFatal("Init request message failure");
+//				GKDebugFatal("Init request message failure");
 //				return XCode::ParseMessageError;
 //			}
 //			if (!util::MessageToJsonString(*message, &mMessageJson).ok())
@@ -159,8 +159,8 @@ namespace GameKeeper
 //			Message * message = MessagePool::NewByJson(responseName, json, size);
 //			if (message != nullptr)
 //			{
-//				SayNoAssertBreakFatal_F(message);
-//				SayNoAssertBreakFatal_F(responseData->SetMessage(message));
+//				GKAssertBreakFatal_F(message);
+//				GKAssertBreakFatal_F(responseData->SetMessage(message));
 //			}
 //			else
 //			{

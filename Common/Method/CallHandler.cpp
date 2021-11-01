@@ -37,7 +37,7 @@ namespace GameKeeper
                         lua_pushlstring(this->luaEnv, json.c_str(), json.size());
                         if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
                         {
-                            SayNoDebugError(lua_tostring(this->luaEnv, -1));
+                            GKDebugError(lua_tostring(this->luaEnv, -1));
                             return;
                         }
                         lua_xmove(this->luaEnv, this->mCoroutine, 1);

@@ -28,7 +28,7 @@ namespace GameKeeper
         }
         if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
         {
-            SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+            GKDebugError(lua_tostring(this->mLuaEnv, -1));
             return true;
         }
         this->mInvokeCount++;

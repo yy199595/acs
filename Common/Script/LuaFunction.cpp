@@ -39,6 +39,6 @@ void LuaFunction::Action()
     if (lua_isfunction(this->luaEnv, -1))
     {
         int status = lua_pcall(this->luaEnv, 0, 0, 0);
-        SayNoAssertRet(status == 0, lua_tostring(luaEnv, -1));
+        GKAssertRet(status == 0, lua_tostring(luaEnv, -1));
     }
 }

@@ -137,7 +137,7 @@ namespace GameKeeper
                 return true;
             }
         }
-        SayNoDebugError("add timer " << timer->GetTimerId() << " failure");
+        GKDebugError("add timer " << timer->GetTimerId() << " failure");
         return false;
     }
 }// namespace GameKeeper

@@ -29,13 +29,13 @@ namespace GameKeeper
 		this->PushClassToLua();
 		this->RegisterExtension();
         this->OnPushGlobalObject();    
-		SayNoAssertRetFalse_F(this->LoadAllFile());
+		GKAssertRetFalse_F(this->LoadAllFile());
 		
 		if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{
 			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
 			{
-				SayNoDebugError(lua_tostring(this->mLuaEnv, -1));
+				GKDebugError(lua_tostring(this->mLuaEnv, -1));
 				return false;
 			}
 			return (bool)lua_toboolean(this->mLuaEnv, -1);
@@ -47,7 +47,7 @@ namespace GameKeeper
 	{
 		std::string luaDir;
 		ServerConfig & config = App::Get().GetConfig();
-		SayNoAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
+		GKAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
 
 		std::vector<std::string> luaFiles;
 		DirectoryHelper::GetFilePaths(luaDir, "*.lua",luaFiles);
@@ -63,7 +63,7 @@ namespace GameKeeper
 				if (iter == this->mLuaFileMd5s.end())
 				{
 					mLuaFileMd5s.emplace(name, md5.toString());
-					SayNoAssertRetFalse_F(this->LoadLuaScript(path));
+					GKAssertRetFalse_F(this->LoadLuaScript(path));
 				}
 				else
 				{
@@ -72,7 +72,7 @@ namespace GameKeeper
 					if (oldMd5 != newMd5)
 					{
 						mLuaFileMd5s[name] = newMd5;
-						SayNoAssertRetFalse_F(this->LoadLuaScript(path));
+						GKAssertRetFalse_F(this->LoadLuaScript(path));
 					}
 				}
 			}
@@ -110,13 +110,13 @@ namespace GameKeeper
 		lua_getglobal(this->mLuaEnv, tab.c_str());
 		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			SayNoDebugError("find lua object fail " << tab);
+			GKDebugError("find lua object fail " << tab);
 			return 0;
 		}
 		lua_getfield(this->mLuaEnv, -1, field.c_str());
 		if (lua_isnil(this->mLuaEnv, -1))
 		{
-			SayNoDebugError("find lua object field fail " << field);
+			GKDebugError("find lua object field fail " << field);
 			return 0;
 		}
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
@@ -134,7 +134,7 @@ namespace GameKeeper
 		lua_getglobal(this->mLuaEnv, name.c_str());
 		if (lua_isnil(this->mLuaEnv, -1))
 		{
-			SayNoDebugError("find lua object field fail " << name);
+			GKDebugError("find lua object field fail " << name);
 			return 0;
 		}
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
@@ -150,11 +150,11 @@ namespace GameKeeper
         if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
         {
             lua_pcall(mLuaEnv, 0, 1, errfunc);
-            SayNoDebugLog("load lua script success path :" << filePath);
+            GKDebugLog("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
 			return true;
         }
-        SayNoDebugError("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
+        GKDebugError("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }

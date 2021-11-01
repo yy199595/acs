@@ -65,13 +65,13 @@ namespace GameKeeper
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("Scene", components))
 		{
-			SayNoDebugError("not find field : Managers");
+			GKDebugError("not find field : Managers");
 			return false;
 		}
 
 		if (!mConfig->GetValue("Service", services))
 		{
-			SayNoDebugError("not find field : Service");
+			GKDebugError("not find field : Service");
 			return false;
 		}
 
@@ -79,7 +79,7 @@ namespace GameKeeper
 		{
 			if (!this->AddComponent(name))
 			{
-				SayNoDebugFatal("add " << name << " to service failure");
+				GKDebugFatal("add " << name << " to service failure");
 				return false;
 			}
 		}
@@ -88,7 +88,7 @@ namespace GameKeeper
 		{
 			if (!this->AddComponent(name))
 			{
-				SayNoDebugFatal("add " << name << " to scene failure");
+				GKDebugFatal("add " << name << " to scene failure");
 				return false;
 			}
 		}
@@ -110,7 +110,7 @@ namespace GameKeeper
 		{
 			if (!this->InitComponent(component))
 			{
-				SayNoDebugFatal("Init " << component->GetTypeName() << " failure");
+				GKDebugFatal("Init " << component->GetTypeName() << " failure");
 				return false;
 			}
 		}
@@ -148,14 +148,14 @@ namespace GameKeeper
 			if (component != nullptr)
 			{
 				float process = index / (float)this->mSceneComponents.size();
-				SayNoDebugInfo("[" << process * 100 << "%]"
+				GKDebugInfo("[" << process * 100 << "%]"
 					<< " start component " << component->GetTypeName());
 				component->Start();
 			}
 		}
 		this->mIsInitComplate = true;
 		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-		SayNoDebugLog("start all scene component successful ......");
+		GKDebugLog("start all scene component successful ......");
 		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 
 		for (Component *component : this->mSceneComponents)
@@ -163,10 +163,10 @@ namespace GameKeeper
 			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
 			{
 				loadComponent->OnLodaData();
-				SayNoDebugLog("load " << component->GetTypeName() << " data");
+				GKDebugLog("load " << component->GetTypeName() << " data");
 			}
 		}
-		SayNoDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
+		GKDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}
 
 	int App::Run()
@@ -259,7 +259,7 @@ namespace GameKeeper
         sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
         SetConsoleTitle(buffer);
 #else
-        //SayNoDebugInfo("fps = " << this->mLogicFps);
+        //GKDebugInfo("fps = " << this->mLogicFps);
 #endif
     }
 }

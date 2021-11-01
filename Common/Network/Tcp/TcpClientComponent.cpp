@@ -14,9 +14,9 @@ namespace GameKeeper
     TcpClientComponent::TcpClientComponent() = default;
     bool TcpClientComponent::Awake()
     {
-		SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
-		SayNoAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
-        SayNoAssertRetFalse_F(this->mCallHandlerComponent = this->GetComponent<CallHandlerComponent>());
+		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		GKAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
+        GKAssertRetFalse_F(this->mCallHandlerComponent = this->GetComponent<CallHandlerComponent>());
 
         return true;
     }
@@ -32,7 +32,7 @@ namespace GameKeeper
 		if (iter != this->mSessionAdressMap.end())
 		{
 			this->mSessionAdressMap.erase(iter);
-			SayNoDebugError("remove tcp socket " << address);
+			GKDebugError("remove tcp socket " << address);
 			delete socket;
 		}
 	}
@@ -45,11 +45,11 @@ namespace GameKeeper
         auto type = (DataMessageType)message.at(sizeof(unsigned int));
         if(type == DataMessageType::TYPE_REQUEST)
         {
-            SayNoDebugWarning(address << " send request message successful size = " << message.size());
+            GKDebugWarning(address << " send request message successful size = " << message.size());
         }
         else if(type == DataMessageType::TYPE_RESPONSE)
         {
-            SayNoDebugWarning(address << " send response message successful size = " << message.size());
+            GKDebugWarning(address << " send response message successful size = " << message.size());
         }
 #endif
         SocketHandler<TcpClientSession>::OnSendMessageAfter(session, message, err);
@@ -66,7 +66,7 @@ namespace GameKeeper
                 auto localSession = static_cast<TcpLocalSession *>(clientSession);
                 if (localSession != nullptr)
                 {
-                    SayNoDebugError(
+                    GKDebugError(
                             "[" << localSession->GetName() << ":" << address << "]" << " error" << err.message());
                 }
             }
@@ -76,7 +76,7 @@ namespace GameKeeper
 				if (iter != this->mSessionAdressMap.end())
 				{
 					this->mSessionAdressMap.erase(iter);
-					SayNoDebugError("remove tcp socket " << address);
+					GKDebugError("remove tcp socket " << address);
 					delete clientSession;
 				}
 			}
@@ -89,12 +89,12 @@ namespace GameKeeper
 		const std::string & address = session->GetAddress();
 		if (err)
 		{
-			SayNoDebugError("connect to " << address << " failure : " << err.message());
+			GKDebugError("connect to " << address << " failure : " << err.message());
 		}
         else
         {
             auto localSession = static_cast<TcpLocalSession *>(session);
-            SayNoDebugInfo(
+            GKDebugInfo(
                     "connect to [" << localSession->GetName() << ":" << localSession->GetAddress() << "] successful");
             this->mSessionAdressMap.emplace(address, session);
         }
@@ -105,7 +105,7 @@ namespace GameKeeper
         if(err)
         {
             delete clientSession;
-            SayNoDebugError(err.message());
+            GKDebugError(err.message());
         }
         else
         {
@@ -142,7 +142,7 @@ namespace GameKeeper
                Message * msg = MessagePool::NewByData(config->RequestMessage, data);
                util::MessageToJsonString(*msg, &json);
             }
-            SayNoDebugLog("[request " << method << "] json = " << json);
+            GKDebugLog("[request " << method << "] json = " << json);
 #endif
             this->mRequestData.set_address(address);
             return this->mServiceComponent->OnRequestMessage(mRequestData);
@@ -169,7 +169,7 @@ namespace GameKeeper
                 Message * msg = MessagePool::NewByData(config->ResponseMessage, data);
                 util::MessageToJsonString(*msg, &json);
             }
-            SayNoDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);
+            GKDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);
 #endif
             return this->mCallHandlerComponent->OnResponseMessage(mResponseData);
 		}

@@ -42,7 +42,7 @@ inline void LuaFunction::Action(Args... args)
     {
         LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
         int status = lua_pcall(this->luaEnv, sizeof...(Args), 0, 0);
-        SayNoAssertRet(status == 0, lua_tostring(luaEnv, -1));
+        GKAssertRet(status == 0, lua_tostring(luaEnv, -1));
     }
 }
 
@@ -55,7 +55,7 @@ inline Ret LuaFunction::Func(Args... args)
     {
         LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
         int status = lua_pcall(this->luaEnv, sizeof...(Args), 1, 0);
-        SayNoAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
+        GKAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
         return LuaParameter::Read<Ret>(this->luaEnv, -1);
     }
     return Ret();
@@ -68,7 +68,7 @@ inline Ret LuaFunction::Func()
     if (lua_isfunction(this->luaEnv, -1))
     {
         int status = lua_pcall(this->luaEnv, 0, 1, 0);
-        SayNoAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
+        GKAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
         return LuaParameter::Read<Ret>(this->luaEnv, -1);
     }
     return Ret();

@@ -6,11 +6,11 @@ namespace GameKeeper
 {
     bool HttpRemoteGetRequest::OnReceiveBody(asio::streambuf &buf)
     {
-
+		return true;
     }
 
     bool HttpRemoteGetRequest::WriterToBuffer(std::ostream &os)
     {
-        
+		return true;
     }
 }

@@ -79,7 +79,7 @@ namespace GameKeeper
             asio::ip::tcp::resolver::iterator end;
             for (auto iter = iterator; iter != end; iter++)
             {
-                SayNoDebugInfo(this->mHost << " : "
+                GKDebugInfo(this->mHost << " : "
                                            << (*iter).endpoint().address().to_string());
             }
 			asio::async_connect(this->GetSocket(), iterator,

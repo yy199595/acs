@@ -120,7 +120,7 @@ namespace GameKeeper
             this->mAsioContext->poll(err);
             if(err)
             {
-                SayNoDebugError(err.message());
+                GKDebugError(err.message());
             }
             if(this->mMethodProxy)
             {

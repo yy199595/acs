@@ -54,15 +54,15 @@ typedef std::shared_ptr<std::string> SharedMessage;
 namespace GameKeeper
 {
 	template<typename T>
-	struct SayNoTypeProxy { typedef T Type; };
+	struct GKTypeProxy { typedef T Type; };
 	template<typename T>
-	struct SayNoTypeProxy<T *> { typedef T Type; };
+	struct GKTypeProxy<T *> { typedef T Type; };
 
 	template<typename T>
-	struct SayNoTypeProxy<T &> { typedef T Type; };
+	struct GKTypeProxy<T &> { typedef T Type; };
 
 	template<typename T>
-	struct SayNoTypeProxy<std::shared_ptr<T>> { typedef T Type; };
+	struct GKTypeProxy<std::shared_ptr<T>> { typedef T Type; };
 }
 
 namespace GameKeeper

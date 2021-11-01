@@ -18,9 +18,9 @@ namespace GameKeeper
     bool MysqlService::Awake()
     {
 		this->mCorComponent = App::Get().GetCorComponent();
-        SayNoAssertRetFalse_F(this->mMysqlManager = this->GetComponent<MysqlComponent>());
-        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        SayNoAssertRetFalse_F(this->mProtocolManager = this->GetComponent<ProtocolComponent>());
+        GKAssertRetFalse_F(this->mMysqlManager = this->GetComponent<MysqlComponent>());
+        GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        GKAssertRetFalse_F(this->mProtocolManager = this->GetComponent<ProtocolComponent>());
 
 		__add_method(MysqlService::Add);
 		__add_method(MysqlService::Save);
@@ -53,7 +53,7 @@ namespace GameKeeper
             return XCode::CallArgsError;
         }
 #ifdef _DEBUG
-        SayNoDebugInfo(sql);
+        GKDebugInfo(sql);
 #endif
         MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
@@ -66,7 +66,7 @@ namespace GameKeeper
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        SayNoDebugWarning("add sql use time [" << t / 1000.0f << "s]");
+        GKDebugWarning("add sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
         return mysqlTask.GetErrorCode();
     }
@@ -87,7 +87,7 @@ namespace GameKeeper
             return XCode::CallArgsError;
         }
 #ifdef _DEBUG
-        SayNoDebugInfo(sql);
+        GKDebugInfo(sql);
 #endif
 		MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
         if (!this->mTaskManager->StartTask(&mysqlTask))
@@ -99,7 +99,7 @@ namespace GameKeeper
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        SayNoDebugWarning("save sql use time [" << t / 1000.0f << "s]");
+        GKDebugWarning("save sql use time [" << t / 1000.0f << "s]");
 #endif
         return mysqlTask.GetErrorCode();
     }
@@ -119,7 +119,7 @@ namespace GameKeeper
             return XCode::CallArgsError;
         }
 #ifdef _DEBUG
-        SayNoDebugInfo(sql);
+        GKDebugInfo(sql);
 #endif
         MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
@@ -131,7 +131,7 @@ namespace GameKeeper
         response.set_errorstr(mysqlTask.GetErrorStr());
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        SayNoDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
+        GKDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
 #endif// SOEASY_DEBUG
         return mysqlTask.GetErrorCode();
     }
@@ -179,7 +179,7 @@ namespace GameKeeper
         response.set_errotstr(mysqlTask.GetErrorStr());
 #ifdef SOEASY_DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        SayNoDebugWarning("query sql use time [" << t / 1000.0f << "s]");
+        GKDebugWarning("query sql use time [" << t / 1000.0f << "s]");
 #endif
         return code;
     }

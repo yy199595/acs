@@ -12,11 +12,11 @@ namespace GameKeeper
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
 	{
-        SayNoAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
-		SayNoAssertRet_F(this->mActionManager = App::Get().GetComponent<CallHandlerComponent>());
-        SayNoAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
-        SayNoAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
-        SayNoAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
+        GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
+		GKAssertRet_F(this->mActionManager = App::Get().GetComponent<CallHandlerComponent>());
+        GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
+        GKAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
+        GKAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
         this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::LoopSendMessage, this);
 	}
 
@@ -66,7 +66,7 @@ namespace GameKeeper
             TcpLocalSession * tcpLocalSession = this->GetTcpSession();
             if(tcpLocalSession == nullptr)
             {
-                SayNoDebugError("node session [" << this->GetNodeName()
+                GKDebugError("node session [" << this->GetNodeName()
                                                  << ":" << this->GetAddress() << "] connect error");
                 this->mCorComponent->YieldReturn();
                 continue;

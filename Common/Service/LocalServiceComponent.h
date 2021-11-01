@@ -63,5 +63,5 @@ namespace GameKeeper
 			return this->AddMethod(new ServiceMethod4<T, T1>(name, (T*)this, func));
 		}
     };
-#define __add_method(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
+#define __add_method(func) GKAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
 }// namespace GameKeeper

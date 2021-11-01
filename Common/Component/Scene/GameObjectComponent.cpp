@@ -27,7 +27,7 @@ namespace GameKeeper
 		{
 			if (!component->Awake())
 			{
-				SayNoDebugError("Init " << component->GetTypeName() << " failure");
+				GKDebugError("Init " << component->GetTypeName() << " failure");
 				return false;
 			}
 		}

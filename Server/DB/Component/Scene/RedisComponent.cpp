@@ -46,12 +46,12 @@ namespace GameKeeper
     bool RedisComponent::Awake()
     {
         ServerConfig &config = App::Get().GetConfig();
-        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
 
-        SayNoAssertRetFalse_F(config.GetValue("Redis", "ip", this->mRedisIp));
-        SayNoAssertRetFalse_F(config.GetValue("Redis", "port", this->mRedisPort));
+        GKAssertRetFalse_F(config.GetValue("Redis", "ip", this->mRedisIp));
+        GKAssertRetFalse_F(config.GetValue("Redis", "port", this->mRedisPort));
 
         int second = 3;
         const std::vector<TaskThread *> &threads = this->mTaskManager->GetThreads();
@@ -65,7 +65,7 @@ namespace GameKeeper
                 return false;
             }
             this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
-            SayNoDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
+            GKDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
         }
         return true;
     }
@@ -79,7 +79,7 @@ namespace GameKeeper
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
-            SayNoDebugFatal(
+            GKDebugFatal(
                     "connect redis fail " << mRedisIp << ":" << mRedisPort << " error:" << pRedisContext->errstr);
             return nullptr;
         }
@@ -90,7 +90,7 @@ namespace GameKeeper
             redisReply *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
             {
-                SayNoDebugError("redis Authentication failed " << reply->str);
+                GKDebugError("redis Authentication failed " << reply->str);
                 return nullptr;
             }
             freeReplyObject(reply);

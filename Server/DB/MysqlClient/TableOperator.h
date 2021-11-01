@@ -14,7 +14,7 @@ namespace GameKeeper
     class TableOperator
     {
     public:
-        TableOperator(SayNoMysqlSocket *socket, const std::string db, rapidjson::Document &doc);
+        TableOperator(GKMysqlSocket *socket, const std::string db, rapidjson::Document &doc);
 
     public:
         bool InitMysqlTable();
@@ -30,7 +30,7 @@ namespace GameKeeper
     private:
         std::string mDataBase;
         rapidjson::Document &mDocument;
-        SayNoMysqlSocket *mMysqlSocket;
+        GKMysqlSocket *mMysqlSocket;
 
     };
 }

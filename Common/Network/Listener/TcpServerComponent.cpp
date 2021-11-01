@@ -41,13 +41,13 @@ namespace GameKeeper
 			auto socketHandler = dynamic_cast<ISocketHandler*>(component);
 			if(socketHandler == nullptr)
             {
-                SayNoDebugError("not find socket handler " << listenConfig.Handler);
+                GKDebugError("not find socket handler " << listenConfig.Handler);
                 return false;
             }
 			NetWorkThread * netThread = taskComponent->NewNetworkThread(listenConfig.Name, nullptr);
 			if (netThread == nullptr)
 			{
-                SayNoDebugError("create " << listenConfig.Name << " thread failure");
+                GKDebugError("create " << listenConfig.Name << " thread failure");
 				return false;
 			}
             if(listenConfig.Port !=0)
@@ -72,7 +72,7 @@ namespace GameKeeper
                 if (listener->StartListen(handler))
                 {
                     const ListenConfig &config = listener->GetConfig();
-                    SayNoDebugLog(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
+                    GKDebugLog(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
                 }
                 else
                 {

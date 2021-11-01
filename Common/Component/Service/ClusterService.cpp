@@ -14,7 +14,7 @@ namespace GameKeeper
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
-		SayNoAssertRetFalse_F(this->mNodeComponent = this->GetComponent<ServiceNodeComponent>());
+		GKAssertRetFalse_F(this->mNodeComponent = this->GetComponent<ServiceNodeComponent>());
 		return true;
     }
 
@@ -43,10 +43,10 @@ namespace GameKeeper
 		XCode code = centerNode->Call("CenterService", "Add", registerInfo, responseInfo);
 		if (code != XCode::Successful)
 		{
-			SayNoDebugError("register local service node fail");
+			GKDebugError("register local service node fail");
 			return;
 		}
-		SayNoDebugLog("register all service to center successful");
+		GKDebugLog("register all service to center successful");
 
 	}
 
@@ -75,7 +75,7 @@ namespace GameKeeper
 			const std::string &service = nodeInfo.services(index);
 			if (serviceNode->AddService(service))
 			{
-				SayNoDebugLog(nodeInfo.servername() << " add new service " << service);
+				GKDebugLog(nodeInfo.servername() << " add new service " << service);
 			}
 		}
 		// 通知所有服务

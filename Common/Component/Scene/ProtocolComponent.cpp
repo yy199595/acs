@@ -14,7 +14,7 @@ namespace GameKeeper
 		const std::string & dir = App::Get().GetConfigPath();	
 		if (!FileHelper::ReadJsonFile(dir + "rpc.json", jsonMapper))
 		{
-			SayNoDebugFatal("not find file : " << dir << "");
+			GKDebugFatal("not find file : " << dir << "");
 			return false;///
 		}
 
@@ -23,8 +23,8 @@ namespace GameKeeper
 		{
 			const std::string service = iter1->name.GetString();
 			rapidjson::Value& jsonValue = iter1->value;
-			SayNoAssertRetFalse_F(jsonValue.IsObject());
-			SayNoAssertRetFalse_F(jsonValue.HasMember("ID"));
+			GKAssertRetFalse_F(jsonValue.IsObject());
+			GKAssertRetFalse_F(jsonValue.HasMember("ID"));
 
 			std::vector<ProtocolConfig *> methods;
 			auto iter2 = jsonValue.MemberBegin();
@@ -38,7 +38,7 @@ namespace GameKeeper
 
 				protocolConfig->ServiceName = service;
                 protocolConfig->Method = iter2->name.GetString();
-                SayNoAssertRetFalse_F(iter2->value.HasMember("ID"));
+                GKAssertRetFalse_F(iter2->value.HasMember("ID"));
 
 				protocolConfig->IsAsync = iter2->value["Async"].GetBool();
                 protocolConfig->MethodId = (unsigned short) iter2->value["ID"].GetUint();
@@ -57,7 +57,7 @@ namespace GameKeeper
                         Message *message = MessagePool::New(protocolConfig->RequestMessage);
                         if (message == nullptr)
                         {
-                            SayNoDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
+                            GKDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
                             return false;
                         }
                     }
@@ -80,7 +80,7 @@ namespace GameKeeper
                         Message *message = MessagePool::New(protocolConfig->ResponseMessage);
                         if (message == nullptr)
                         {
-                            SayNoDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
+                            GKDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
                             return false;
                         }
                     }

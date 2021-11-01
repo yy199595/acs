@@ -18,13 +18,13 @@ namespace GameKeeper
         this->mConfigDocument = make_shared<rapidjson::Document>();
         if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
         {
-            SayNoDebugError("not find config " << mConfigPath);
+            GKDebugError("not find config " << mConfigPath);
             return false;
         }
         mConfigDocument->Parse(outString.c_str(), outString.size());
         if (this->mConfigDocument->HasParseError())
         {
-            SayNoDebugFatal("parse " << mConfigPath << " fail");
+            GKDebugFatal("parse " << mConfigPath << " fail");
             return false;
         }
 
@@ -35,9 +35,9 @@ namespace GameKeeper
             rapidjson::Value *value = &iter->value;
             this->mMapConfigData.emplace(key, value);
         }
-        SayNoAssertRetFalse_F(this->GetValue("AreaId", this->mAreaId));
-        SayNoAssertRetFalse_F(this->GetValue("NodeId", this->mNodeId));
-        SayNoAssertRetFalse_F(this->GetValue("NodeName", this->mNodeName));
+        GKAssertRetFalse_F(this->GetValue("AreaId", this->mAreaId));
+        GKAssertRetFalse_F(this->GetValue("NodeId", this->mNodeId));
+        GKAssertRetFalse_F(this->GetValue("NodeName", this->mNodeName));
         return true;
     }
 

@@ -22,15 +22,15 @@ namespace GameKeeper
         }
         if(this->mErrorCode != XCode::Successful)
         {
-            SayNoDebugError(this->mSqlCommand);
-            SayNoDebugError(this->mErrorString);
+            GKDebugError(this->mSqlCommand);
+            GKDebugError(this->mErrorString);
         }
     }
 
     bool MyqslTask::Run()
     {
         MysqlComponent *pMysqlManager = App::Get().GetComponent<MysqlComponent>();
-        SayNoMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
+        GKMysqlSocket *mysqlSocket = pMysqlManager->GetMysqlSocket();
         if (mysqlSocket == nullptr)
         {
             this->mErrorCode = MysqlSocketIsNull;

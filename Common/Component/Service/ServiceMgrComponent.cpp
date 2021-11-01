@@ -14,11 +14,11 @@ namespace GameKeeper
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		this->mCorComponent = App::Get().GetCorComponent();
-        SayNoAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
+        GKAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
 
-        SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-        SayNoAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
-		SayNoAssertRetFalse_F(this->mNetSessionComponent = this->GetComponent<TcpClientComponent>());
+        GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		GKAssertRetFalse_F(this->mNetSessionComponent = this->GetComponent<TcpClientComponent>());
         return true;
     }
 
@@ -34,7 +34,7 @@ namespace GameKeeper
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)
         {
-            SayNoDebugFatal("call service not exist : [" << service << "]");
+            GKDebugFatal("call service not exist : [" << service << "]");
             return false;
         }
 
@@ -42,7 +42,7 @@ namespace GameKeeper
         ServiceMethod *method = logicService->GetMethod(methodName);
         if (service == nullptr)
         {
-            SayNoDebugFatal("call method not exist : [" << service << "." << methodName << "]");
+            GKDebugFatal("call method not exist : [" << service << "." << methodName << "]");
             return false;
         }
 

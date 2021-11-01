@@ -41,7 +41,7 @@ namespace GameKeeper
         this->mConnectCount++;
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        SayNoDebugLog(this->mName << " start connect " << this->GetAddress());
+        GKDebugLog(this->mName << " start connect " << this->GetAddress());
         this->mSocket->async_connect(endPoint, [this](const asio::error_code &err)
         {
             if(!err)
@@ -58,7 +58,7 @@ namespace GameKeeper
     {
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        SayNoDebugLog(this->mName << " start connect " << this->GetAddress());
+        GKDebugLog(this->mName << " start connect " << this->GetAddress());
         this->mSocket->async_connect(endPoint, [this, id](const asio::error_code &err)
         {
             if (!err)

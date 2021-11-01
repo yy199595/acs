@@ -39,8 +39,8 @@ namespace GameKeeper
         ~MysqlComponent() {}
 
     public:
-        SayNoMysqlSocket *GetMysqlSocket();
-		SayNoMysqlSocket * ConnectMysql();
+        GKMysqlSocket *GetMysqlSocket();
+		GKMysqlSocket * ConnectMysql();
         const std::string &GetDataBaseName() { return this->mDataBaseName; }
 
     public:
@@ -76,12 +76,12 @@ namespace GameKeeper
         std::string mDataBaseUser;     //用户名
         std::string mDataBasePasswd; //密码
         std::string mDataBaseName;     //数据库名字      
-        SayNoMysqlSocket *mMysqlSockt;
+        GKMysqlSocket *mMysqlSockt;
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;
         std::unordered_map<std::string, std::string> mTablePbMap;
         std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
-        std::unordered_map<std::thread::id, SayNoMysqlSocket *> mMysqlSocketMap; //线程id和 socket
+        std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
         class TaskPoolComponent *mTaskManager;
         class CoroutineComponent *mCorComponent;

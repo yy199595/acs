@@ -24,7 +24,7 @@ namespace GameKeeper
 
     void DeamonComponent::ReadStdOut(const char *str, size_t size)
     {
-        //SayNoDebugWarning(std::string(str, size) << "  " << this->mLastRefreshTime);
+        //GKDebugWarning(std::string(str, size) << "  " << this->mLastRefreshTime);
     }
 
     void DeamonComponent::ReadStdErr(const char *str, size_t)

@@ -38,7 +38,7 @@ namespace GameKeeper
         {
             NetWorkThread * thread = new NetWorkThread(this, method);
             this->mNetThread.emplace(name, thread);
-            SayNoDebugLog("start new network thread [" <<  name << "]");
+            GKDebugLog("start new network thread [" <<  name << "]");
             return thread;
         }
         return iter->second;

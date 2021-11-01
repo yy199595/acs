@@ -33,34 +33,46 @@ namespace GameKeeper
 	}
 	Coroutine * CoroutinePool::Pop()
 	{
+		Coroutine * coroutine = nullptr;
 		if (!this->mIdleCoroutines.empty())
 		{
 			unsigned int id = this->mIdleCoroutines.front();
 			this->mIdleCoroutines.pop();
-			Coroutine * coroutine = this->mAllCoroutine[id];
-			return coroutine;
+			coroutine = this->mAllCoroutine[id];
 		}
 		else
 		{
-			Coroutine *coroutine = new Coroutine();
+			coroutine = new Coroutine();
 			if (coroutine != nullptr)
 			{
 				coroutine->mCoroutineId = mId++;
 #ifdef __COROUTINE_ASM__
-				coroutine->sid = coroutine->mCoroutineId & 7;
+				coroutine->sid = coroutine->mCoroutineId & 7;				
 #endif
 				coroutine->mState = CorState::Ready;
 				this->mAllCoroutine.push_back(coroutine);
 			}
-			return coroutine;
 		}
+#ifdef __COROUTINE_ASM__
+		coroutine->mStack = this->GetStack();
+#endif
+		return coroutine;
 	}
 	void CoroutinePool::Push(Coroutine * coroutine)
 	{
 		if (coroutine != nullptr)
 		{
 #ifdef __COROUTINE_ASM__
-			coroutine->mStack.clear();
+			if (this->mStringPool.size() < 100)
+			{
+				coroutine->mStack->clear();
+				this->mStringPool.push(coroutine->mStack);			
+			}
+			else
+			{
+				delete coroutine->mStack;
+			}
+			coroutine->mStack = nullptr;
 #endif
 			if (coroutine->mFunction != nullptr)
 			{
@@ -78,6 +90,17 @@ namespace GameKeeper
 			return nullptr;
 		}
 		return this->mAllCoroutine[id];	
+	}
+
+	std::string * CoroutinePool::GetStack()
+	{
+		if (!this->mStringPool.empty())
+		{
+			std::string * data = this->mStringPool.front();
+			this->mStringPool.pop();
+			return data;
+		}
+		return new std::string();
 	}
 	
 }

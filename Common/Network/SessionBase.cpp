@@ -36,7 +36,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif
@@ -57,7 +57,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!App::Get().IsMainThread())
         {
-            SayNoDebugFatal("not in main thread call");
+            GKDebugFatal("not in main thread call");
             return false;
         }
 #endif
@@ -69,7 +69,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif
@@ -89,7 +89,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
 		if (!this->mHandler.GetNetThread()->IsCurrentThread())
 		{
-			SayNoDebugFatal("not in net thread call");
+			GKDebugFatal("not in net thread call");
 			return;
 		}
 #endif
@@ -102,7 +102,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif
@@ -112,7 +112,7 @@ namespace GameKeeper
             this->mIsOpen = false;
             this->mSocket->close(err);
 		}
-		SayNoDebugError("remove socket " << this->GetAddress());
+		GKDebugError("remove socket " << this->GetAddress());
 		this->mTaskScheduler.AddMainTask(&ISocketHandler::OnClose, &mHandler, this);
 	}
 
@@ -121,7 +121,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif
@@ -133,7 +133,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if (!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif
@@ -145,7 +145,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if(!this->mHandler.GetNetThread()->IsCurrentThread())
         {
-            SayNoDebugFatal("not in net thread call");
+            GKDebugFatal("not in net thread call");
             return;
         }
 #endif

@@ -44,15 +44,15 @@ namespace GameKeeper
 			const std::string & service = nodeInfo.services(index);
 			if (!protoComponent->HasService(service))
 			{
-				SayNoDebugError("register [ " << service << " ] failure");
+				GKDebugError("register [ " << service << " ] failure");
 				return XCode::Failure;
 			}
 			serviceNode->AddService(service);
-			SayNoDebugLog(nodeName << " add new service [ " << service << " ]");
+			GKDebugLog(nodeName << " add new service [ " << service << " ]");
 		}
 		response.set_uid(key);
 		this->mServiceNodeMap.emplace(key, serviceNode);
-		SayNoDebugLog(nodeName << " [" << address << "] register successful ......");
+		GKDebugLog(nodeName << " [" << address << "] register successful ......");
 
 		return XCode::Successful;
 	}

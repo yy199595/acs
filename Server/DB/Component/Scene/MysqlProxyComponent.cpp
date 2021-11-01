@@ -9,7 +9,7 @@ namespace GameKeeper
     {
         this->mMysqlProxyNodeId = -1;
 		this->mCorComponent = App::Get().GetCorComponent();
-        SayNoAssertRetFalse_F(this->mNodeManager = this->GetComponent<ServiceNodeComponent>());
+        GKAssertRetFalse_F(this->mNodeManager = this->GetComponent<ServiceNodeComponent>());
 
         return true;
     }
@@ -58,7 +58,7 @@ namespace GameKeeper
 //
 //        XCode code2 = this->Query(userAccountData2, userAccountData2);
 //
-//        SayNoDebugLogProtocBuf(userAccountData2);
+//        GKDebugLogProtocBuf(userAccountData2);
     }
 
     XCode MysqlProxyComponent::Add(const Message &data)

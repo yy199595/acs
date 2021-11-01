@@ -32,8 +32,8 @@ namespace GameKeeper
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
         this->Get(url, json);
 
-        SayNoDebugFatal(json.size());
-        SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
+        GKDebugFatal(json.size());
+        GKDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
     }
 
     HttpHandlerBase *HttpClientComponent::CreateMethodHandler(const std::string &method)

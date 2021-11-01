@@ -65,7 +65,7 @@ inline bool LuaTable::Function(const char *func, Ret &retValue, Args &&...args)
     LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 1, 0) != 0)
     {
-        SayNoDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
+        GKDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
         return false;
     }
     retValue = LuaParameter::Read<Ret>(this->luaEnv, -1);
@@ -88,7 +88,7 @@ inline bool LuaTable::Action(const char *func, Args &&...args)
     LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 0, 0) != 0)
     {
-        SayNoDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
+        GKDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
         return false;
     }
     return true;

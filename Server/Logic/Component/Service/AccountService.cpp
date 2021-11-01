@@ -49,7 +49,7 @@ namespace GameKeeper
         {
             db::UserAccountData queryData;
             this->mRedisComponent->GetValue("user", userAccountData.account(), queryData);
-            SayNoDebugLogProtocBuf(queryData);
+            GKDebugLogProtocBuf(queryData);
         }
 
 		userAccountData.Clear();
@@ -60,7 +60,7 @@ namespace GameKeeper
 
         if(responseCode == XCode::Successful)
         {
-            SayNoDebugLogProtocBuf(response);
+            GKDebugLogProtocBuf(response);
         }
     }
 

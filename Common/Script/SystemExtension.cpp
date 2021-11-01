@@ -27,7 +27,7 @@ int SystemExtension::Call(lua_State *lua)
 	if (lua_pushthread(lua) == 1)
 	{
 		lua_pushinteger(lua, XCode::NoCoroutineContext);
-		SayNoDebugError("call " << service << "." << method << " not coroutine context");
+		GKDebugError("call " << service << "." << method << " not coroutine context");
 		return 1;
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
@@ -68,7 +68,7 @@ int SystemExtension::Call(lua_State *lua)
 //		lua_pushvalue(lua, index);
 //		if (lua_pcall(lua, 1, 1, 0) != 0)
 //		{
-//			SayNoDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
+//			GKDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
 //			lua_pushinteger(lua, (int)XCode::Failure);
 //			return 1;
 //		}
@@ -136,7 +136,7 @@ extern bool SystemExtension::RequireLua(lua_State *luaEnv, const char *name)
         lua_pushstring(luaEnv, name);
         if (lua_pcall(luaEnv, 1, 1, 0) != 0)
         {
-            SayNoDebugError(lua_tostring(luaEnv, -1));
+            GKDebugError(lua_tostring(luaEnv, -1));
             return false;
         }
         return lua_istable(luaEnv, -1);

@@ -21,5 +21,5 @@ namespace GameKeeper
     class MysqlComponent;
 
     typedef MYSQL_RES MysqlQueryResult;
-    typedef MYSQL SayNoMysqlSocket;
+    typedef MYSQL GKMysqlSocket;
 }

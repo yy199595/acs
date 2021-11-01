@@ -36,7 +36,7 @@ namespace GameKeeper
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			SayNoDebugError("add " << name << "failure");
+			GKDebugError("add " << name << "failure");
 			return false;
 		}
 		component->gameObject = this;

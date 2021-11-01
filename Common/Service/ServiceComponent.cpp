@@ -14,7 +14,7 @@ namespace GameKeeper
 		const std::string & name = method->GetName();
 		if (procolComponent->GetProtocolConfig(this->GetServiceName(), name) == nullptr)
 		{
-			SayNoDebugFatal(this->GetServiceName() << "." << name << " not config");
+			GKDebugFatal(this->GetServiceName() << "." << name << " not config");
 			return false;
 		}
 		if (method->IsLuaMethod())
@@ -22,7 +22,7 @@ namespace GameKeeper
 			auto iter = this->mLuaMethodMap.find(name);
 			if (iter != this->mLuaMethodMap.end())
 			{
-				SayNoDebugFatal(this->GetServiceName() << "." << name << " add failure");
+				GKDebugFatal(this->GetServiceName() << "." << name << " add failure");
 				return false;
 			}
 			this->mLuaMethodMap.emplace(name, method);
@@ -32,7 +32,7 @@ namespace GameKeeper
 			auto iter = this->mMethodMap.find(name);
 			if (iter != this->mMethodMap.end())
 			{
-				SayNoDebugFatal(this->GetServiceName() << "." << name << " add failure");
+				GKDebugFatal(this->GetServiceName() << "." << name << " add failure");
 				return false;
 			}
 			this->mMethodMap.emplace(name, method);

@@ -84,7 +84,7 @@ namespace GameKeeper
 
   //      if (!lua_isfunction(this->mLuaEnv, -1))
   //      {
-  //          SayNoDebugError("not find function " << luaAction);
+  //          GKDebugError("not find function " << luaAction);
   //          return XCode::CallFunctionNotExist;
   //      }
   //      lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mServiceIndex);
@@ -118,7 +118,7 @@ namespace GameKeeper
   //      /*if (lua_pcall(this->mLuaEnv, 5, 1, 0) != 0)
   //      {
   //          const char * err = lua_tostring(this->mLuaEnv, -1);
-  //          SayNoDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
+  //          GKDebugError("call lua " << this->GetServiceName() << "." << method << "fail " << err);
   //          return XCode::CallLuaFunctionFail;
   //      }*/
 		//return XCode::NotResponseMessage;

@@ -20,7 +20,7 @@ namespace GameKeeper
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mTimerComponent = App::Get().GetTimerComponent();
-		SayNoAssertRetFalse_F(config.GetValue("NetWork", "MsgTimeout", this->mMessageTimeout));
+		GKAssertRetFalse_F(config.GetValue("NetWork", "MsgTimeout", this->mMessageTimeout));
         return true;
     }
 
@@ -55,7 +55,7 @@ namespace GameKeeper
         auto component = this->GetComponent<ProtocolComponent>();
         auto config = component->GetProtocolConfig(methodId);
         double second = (TimeHelper::GetMilTimestamp() - callHandler->GetCreateTime()) / 1000.f;
-        SayNoDebugLog("call " << config->ServiceName << "." << config->Method << " use time = " << second << "s");
+        GKDebugLog("call " << config->ServiceName << "." << config->Method << " use time = " << second << "s");
 #endif
         this->mNumberPool.Push(rpcId);
         callHandler->Invoke(response);

@@ -109,7 +109,7 @@ inline int lua_reffunction(lua_State *lua, const char *tab, const char *func)
 	int code = lua_resume(cor, lua, args); \
 	if(code != 0 && code != LUA_YIELD) \
 	{	\
-		SayNoDebugError(lua_tostring(cor, -1);)\
+		GKDebugError(lua_tostring(cor, -1);)\
 	} \
 }\
 

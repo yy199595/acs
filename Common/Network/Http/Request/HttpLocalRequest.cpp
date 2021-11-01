@@ -62,7 +62,7 @@ namespace GameKeeper
         is >> this->mVersion >> this->mHttpCode >> this->mError;
         size_t size2 = size - (size1 - buf.size());
 #ifdef __DEBUG__
-        SayNoDebugWarning(this->mVersion << " " << this->mHttpCode << " " << this->mError);
+        GKDebugWarning(this->mVersion << " " << this->mHttpCode << " " << this->mError);
 #endif
         this->ParseHeard(buf, size2);
         return true;

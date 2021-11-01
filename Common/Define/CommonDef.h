@@ -36,45 +36,45 @@ inline std::string FromatFileLine(const char * file, const int line)
 	return std::string(buffer, size);	
 }
 
-#define SAYNO_LOG(type, msg) {std::stringstream ss; ss << msg; GameKeeper::LogHelper::AddLog(type, ss.str());}
+#define GK_LOG(type, msg) {std::stringstream ss; ss << msg; GameKeeper::LogHelper::AddLog(type, ss.str());}
 
 #define TypeLimit(base,child) typename std::enable_if<std::is_base_of<base, child>::value, T>::type
 
-#define SayNoCommonLog(msg)		SAYNO_LOG(GameKeeper::ELogType::debug, msg)
-#define SayNoCommonError(msg)	SAYNO_LOG(GameKeeper::ELogType::err, msg)
-#define SayNoCommonWarning(msg) SAYNO_LOG(GameKeeper::ELogType::warn, msg)
-#define SayNoCommonFatal(msg)	SAYNO_LOG(GameKeeper::ELogType::critical, msg)
-#define SayNoCommonInfo(msg)	SAYNO_LOG(GameKeeper::ELogType::info, msg)
+#define GK_CommonLog(msg)		GK_LOG(GameKeeper::ELogType::debug, msg)
+#define GKCommonError(msg)	GK_LOG(GameKeeper::ELogType::err, msg)
+#define GKCommonWarning(msg) GK_LOG(GameKeeper::ELogType::warn, msg)
+#define GKCommonFatal(msg)	GK_LOG(GameKeeper::ELogType::critical, msg)
+#define GKCommonInfo(msg)	GK_LOG(GameKeeper::ELogType::info, msg)
 
-#define SayNoDebugLog(msg)		SAYNO_LOG(GameKeeper::ELogType::debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugWarning(msg)	SAYNO_LOG(GameKeeper::ELogType::warn, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugError(msg)	SAYNO_LOG(GameKeeper::ELogType::err, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugFatal(msg)	SAYNO_LOG(GameKeeper::ELogType::critical, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
-#define SayNoDebugInfo(msg)		SAYNO_LOG(GameKeeper::ELogType::info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define GKDebugLog(msg)		GK_LOG(GameKeeper::ELogType::debug, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define GKDebugWarning(msg)	GK_LOG(GameKeeper::ELogType::warn, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define GKDebugError(msg)	GK_LOG(GameKeeper::ELogType::err, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define GKDebugFatal(msg)	GK_LOG(GameKeeper::ELogType::critical, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
+#define GKDebugInfo(msg)		GK_LOG(GameKeeper::ELogType::info, FromatFileLine(__FILE__, __LINE__) << "  " << msg)
 
 
-#define SayNoAssertError(obj, msg, val) { bool bCode = !(obj); if(bCode) { SayNoDebugError(#obj<< "  "  << msg); val; } }
-#define SayNoAssertFatal(obj, msg, val) { bool bCode = !(obj); if(bCode) { SayNoDebugFatal(#obj<< "  "  << msg); val; } }
+#define GKAssertError(obj, msg, val) { bool bCode = !(obj); if(bCode) { GKDebugError(#obj<< "  "  << msg); val; } }
+#define GKAssertFatal(obj, msg, val) { bool bCode = !(obj); if(bCode) { GKDebugFatal(#obj<< "  "  << msg); val; } }
 
-#define SayNoAssertRetWarning(obj, msg)	{bool bResult = !(obj); if(bResult) { SayNoDebugWarning(#obj << "  " << msg);return;} }
+#define GKAssertRetWarning(obj, msg)	{bool bResult = !(obj); if(bResult) { GKDebugWarning(#obj << "  " << msg);return;} }
 
-#define SayNoAssertRet(obj, msg)			SayNoAssertError(obj, msg, return)
-#define SayNoAssertRetVal(obj, msg, val)	SayNoAssertError(obj, msg, return val)
-#define SayNoAssertRetNull(obj, msg)		SayNoAssertError(obj, msg, return nullptr)
-#define SayNoAssertRetFail(obj, msg)		SayNoAssertError(obj, msg, return XCode::Failure)
+#define GKAssertRet(obj, msg)			GKAssertError(obj, msg, return)
+#define GKAssertRetVal(obj, msg, val)	GKAssertError(obj, msg, return val)
+#define GKAssertRetNull(obj, msg)		GKAssertError(obj, msg, return nullptr)
+#define GKAssertRetFail(obj, msg)		GKAssertError(obj, msg, return XCode::Failure)
 
-#define SayNoAssertRetCode_F(obj) SayNoAssertRetVal(obj, "", XCode::Failure)
-#define SayNoAssertRetCode(obj,code) SayNoAssertRetVal(obj, "", code)
-#define SayNoAssertRetZero_F(obj)	SayNoAssertRetVal(obj, "", 0)
-#define SayNoAssertRet_F(obj)		SayNoAssertRet(obj, "")
-#define SayNoAssertRetFail_F(obj)	SayNoAssertRetFail(obj, "")
-#define SayNoAssertRetNull_F(obj)	SayNoAssertRetNull(obj, "")
-#define SayNoAssertRetFalse_F(obj)	SayNoAssertRetVal(obj, "", false)
-#define SayNoAssertBreakFatal_F(obj) { bool bCode = !(obj); if(bCode) { SayNoDebugFatal(#obj)  cin.get(); exit(-1);}  }
+#define GKAssertRetCode_F(obj) GKAssertRetVal(obj, "", XCode::Failure)
+#define GKAssertRetCode(obj,code) GKAssertRetVal(obj, "", code)
+#define GKAssertRetZero_F(obj)	GKAssertRetVal(obj, "", 0)
+#define GKAssertRet_F(obj)		GKAssertRet(obj, "")
+#define GKAssertRetFail_F(obj)	GKAssertRetFail(obj, "")
+#define GKAssertRetNull_F(obj)	GKAssertRetNull(obj, "")
+#define GKAssertRetFalse_F(obj)	GKAssertRetVal(obj, "", false)
+#define GKAssertBreakFatal_F(obj) { bool bCode = !(obj); if(bCode) { GKDebugFatal(#obj)  cin.get(); exit(-1);}  }
 
-#define SayNoAssertLog(obj, msg){ bool bCode = !(obj);if (bCode) { SayNoDebugError(#obj<< "  "  << msg); } }
-#define SayNoAssertWarning(obj, msg){bool bCode = !(obj);	if (bCode) { SayNoDebugWarning(#obj<< "  "  << msg); } }
+#define GKAssertLog(obj, msg){ bool bCode = !(obj);if (bCode) { GKDebugError(#obj<< "  "  << msg); } }
+#define GKAssertWarning(obj, msg){bool bCode = !(obj);	if (bCode) { GKDebugWarning(#obj<< "  "  << msg); } }
 
-#define SayNoDebugLogProtocBuf(msg) { std::string str; ProtocHelper::GetJsonString(msg, str); SayNoDebugLog(str);}
+#define GKDebugLogProtocBuf(msg) { std::string str; ProtocHelper::GetJsonString(msg, str); GKDebugLog(str);}
 
 #define SOEASY_DEBUG

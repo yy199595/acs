@@ -41,6 +41,7 @@ namespace GameKeeper
         os << "Content-Type: application/x-www-form-urlencoded\r\n";
         os << "Connection: close\r\n\r\n";
         os << (*this->mPostData);
+		return true;
     }
 
 }

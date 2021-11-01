@@ -23,7 +23,7 @@ namespace GameKeeper
         {
             sss << str << " ";
         }
-        SayNoDebugLog(sss.str() << "}");
+        GKDebugLog(sss.str() << "}");
     }
 
     bool RedisTaskBase::Run()

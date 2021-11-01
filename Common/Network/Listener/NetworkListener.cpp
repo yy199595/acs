@@ -45,7 +45,7 @@ namespace GameKeeper
         catch (std::system_error & err)
         {
             this->mIsListen = false;
-            SayNoDebugFatal("listen " << this->mConfig.Ip << ":"
+            GKDebugFatal("listen " << this->mConfig.Ip << ":"
                                       << this->mConfig.Port << " failure" << err.what());
         }
         CoroutineComponent * component = App::Get().GetCorComponent();
@@ -63,7 +63,7 @@ namespace GameKeeper
         this->mSessionSocket->OnListenDone(code);
         if(!code)
         {
-            SayNoDebugInfo(this->mConfig.Name << " listen new socket " << this->mSessionSocket->GetAddress());
+            GKDebugInfo(this->mConfig.Name << " listen new socket " << this->mSessionSocket->GetAddress());
         }
         this->mTaskThread->GetContext().post(std::bind(&NetworkListener::ListenConnect, this));
 	}

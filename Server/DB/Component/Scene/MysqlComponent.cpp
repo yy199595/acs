@@ -41,50 +41,50 @@ namespace GameKeeper
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mSqlPath = App::Get().GetConfigPath() + "sql.json";
-        SayNoAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        SayNoAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
-        SayNoAssertRetFalse_F(config.GetValue("Mysql", "ip", this->mMysqlIp));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql", "port",this->mMysqlPort));
-		SayNoAssertRetFalse_F(config.GetValue("Mysql", "db", this->mDataBaseName));
-        SayNoAssertRetFalse_F(config.GetValue("Mysql","user",this->mDataBaseUser));    
-		SayNoAssertRetFalse_F(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
+        GKAssertRetFalse_F(config.GetValue("Mysql", "ip", this->mMysqlIp));
+        GKAssertRetFalse_F(config.GetValue("Mysql", "port",this->mMysqlPort));
+		GKAssertRetFalse_F(config.GetValue("Mysql", "db", this->mDataBaseName));
+        GKAssertRetFalse_F(config.GetValue("Mysql","user",this->mDataBaseUser));    
+		GKAssertRetFalse_F(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
 
-        SayNoAssertRetFalse_F(this->StartConnect());
-        SayNoAssertRetFalse_F(this->InitMysqlTable());
+        GKAssertRetFalse_F(this->StartConnect());
+        GKAssertRetFalse_F(this->InitMysqlTable());
         return true;
     }
 
-    SayNoMysqlSocket *MysqlComponent::GetMysqlSocket()
+    GKMysqlSocket *MysqlComponent::GetMysqlSocket()
     {
         if(App::Get().IsMainThread())
         {
-            SayNoDebugError("try in main thread invoke sql");
+            GKDebugError("try in main thread invoke sql");
             return nullptr;
         }
 		auto id = std::this_thread::get_id();
-        SayNoDebugWarning(id);
+        GKDebugWarning(id);
         auto iter = this->mMysqlSocketMap.find(id);
         return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
     }
 
-	SayNoMysqlSocket * MysqlComponent::ConnectMysql()
+	GKMysqlSocket * MysqlComponent::ConnectMysql()
 	{
 		const char *ip = this->mMysqlIp.c_str();
 		const unsigned short port = this->mMysqlPort;
 		const char *passWd = this->mDataBasePasswd.c_str();
 		const char *userName = this->mDataBaseUser.c_str();
 
-		SayNoMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
+		GKMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
 		this->mMysqlSockt  = mysql_real_connect(mysqlSocket1, ip, userName, passWd, NULL, port, NULL,
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSockt == nullptr)
 		{
-			SayNoDebugError("connect mysql failure "
+			GKDebugError("connect mysql failure "
 				<< ip << ":" << port << "  " << userName << " " << passWd);
 			return nullptr;
 		}
-		SayNoDebugInfo("connect mysql successful [" << ip << ":" << port << "]");
+		GKDebugInfo("connect mysql successful [" << ip << ":" << port << "]");
 		return this->mMysqlSockt;
 	}
 
@@ -116,7 +116,7 @@ namespace GameKeeper
         std::fstream fs(this->mSqlPath, std::ios::in);
         if (!fs.is_open())
         {
-            SayNoDebugError("not find file " << this->mSqlPath);
+            GKDebugError("not find file " << this->mSqlPath);
             return false;
         }
         std::string json;
@@ -129,26 +129,26 @@ namespace GameKeeper
         document.Parse(json.c_str(), json.size());
         if (document.HasParseError())
         {
-            SayNoDebugError("parse " << mSqlPath << " json fail");
+            GKDebugError("parse " << mSqlPath << " json fail");
             return false;
         }
         for (auto iter = document.MemberBegin(); iter != document.MemberEnd(); iter++)
         {
             if (!iter->name.IsString() || !iter->value.IsObject())
             {
-                SayNoDebugError(mSqlPath << " error");
+                GKDebugError(mSqlPath << " error");
                 return false;
             }
             auto iter1 = iter->value.FindMember("keys");
             auto iter2 = iter->value.FindMember("protobuf");
             if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
             {
-                SayNoDebugError(mSqlPath << " error");
+                GKDebugError(mSqlPath << " error");
 				return false;
             }
             if (iter2 == iter->value.MemberEnd() || !iter2->value.IsString())
             {
-                SayNoDebugError(mSqlPath << " error");
+                GKDebugError(mSqlPath << " error");
 				return false;
             }
             const std::string tab = iter->name.GetString();
@@ -195,7 +195,7 @@ namespace GameKeeper
     {
         std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+        GKAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
 
         this->mSqlCommandStream.str("");
 
@@ -266,10 +266,10 @@ namespace GameKeeper
     {
         std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+        GKAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
 
         SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        SayNoAssertRetFalse_F(tableConfig);
+        GKAssertRetFalse_F(tableConfig);
 
 
         const Descriptor *pDescriptor = messageData.GetDescriptor();
@@ -384,10 +384,10 @@ namespace GameKeeper
     {
         std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+        GKAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
 
         SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        SayNoAssertRetFalse_F(tableConfig);
+        GKAssertRetFalse_F(tableConfig);
 
         mSqlCommandStream.str("");
 
@@ -459,10 +459,10 @@ namespace GameKeeper
     {
         std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        SayNoAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
+        GKAssertRetFalse_F(this->GetTableNameByProtocolName(typeName, tableName));
 
         SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        SayNoAssertRetFalse_F(tableConfig);
+        GKAssertRetFalse_F(tableConfig);
 
         this->mSqlCommandStream.str("");
 

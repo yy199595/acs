@@ -4,7 +4,7 @@
 
 namespace GameKeeper
 {
-    TableOperator::TableOperator(SayNoMysqlSocket *socket, const std::string db, rapidjson::Document &doc)
+    TableOperator::TableOperator(GKMysqlSocket *socket, const std::string db, rapidjson::Document &doc)
             : mDocument(doc)
     {
         this->mDataBase = db;
@@ -19,12 +19,12 @@ namespace GameKeeper
 			if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
 			{
 				const char * err = mysql_error(mMysqlSocket);
-				SayNoDebugError("create " << this->mDataBase << " db fail : " << err);
+				GKDebugError("create " << this->mDataBase << " db fail : " << err);
 				return false;
 			}
 			if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) == 0)
 			{
-				SayNoDebugInfo("create db " << this->mDataBase << " successful");
+				GKDebugInfo("create db " << this->mDataBase << " successful");
 			}
 		}
 
@@ -32,7 +32,7 @@ namespace GameKeeper
 		{
 			if (!iter->name.IsString() || !iter->value.IsObject())
 			{
-				SayNoDebugError("json config error");
+				GKDebugError("json config error");
 				return false;
 			}
 			const std::string table = iter->name.GetString();
@@ -40,7 +40,7 @@ namespace GameKeeper
 			auto iter1 = iter->value.FindMember("keys");
 			if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
 			{
-				SayNoDebugError(table << " sql table config error");
+				GKDebugError(table << " sql table config error");
 				return false;
 			}
 			std::vector<std::string> keys;
@@ -54,10 +54,10 @@ namespace GameKeeper
 			{
 				if (!this->CreateMysqlTable(table, name, keys))
 				{
-					SayNoDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
+					GKDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
 					return false;
 				}
-				SayNoDebugInfo("create new table success " << table);
+				GKDebugInfo("create new table success " << table);
 			}
 			else
 			{
@@ -76,7 +76,7 @@ namespace GameKeeper
         {
             if (pDescriptor->FindFieldByName(key) == nullptr)
             {
-                SayNoDebugError("create " << name << " error 'key' not find");
+                GKDebugError("create " << name << " error 'key' not find");
                 return false;
             }
         }
@@ -111,11 +111,11 @@ namespace GameKeeper
             {
                 if (!this->AddNewField(table, fileDesc))
                 {
-                    SayNoDebugError("[mysql error ] " << mysql_error(this->mMysqlSocket));
-                    SayNoDebugError("add field " << fileDesc->name() << " to " << table << " fail");
+                    GKDebugError("[mysql error ] " << mysql_error(this->mMysqlSocket));
+                    GKDebugError("add field " << fileDesc->name() << " to " << table << " fail");
                     return false;
                 }
-                SayNoDebugLog("add field " << fileDesc->name() << " to " << table << " successful");
+                GKDebugLog("add field " << fileDesc->name() << " to " << table << " successful");
             }
         }
         return true;
@@ -155,10 +155,10 @@ namespace GameKeeper
         const std::string sql = sqlStream.str();
         if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
         {
-            SayNoDebugError(mysql_error(mMysqlSocket));
+            GKDebugError(mysql_error(mMysqlSocket));
             return false;
         }
-        SayNoDebugInfo("\n"
+        GKDebugInfo("\n"
                                << sql);
         return true;
     }
@@ -173,7 +173,7 @@ namespace GameKeeper
         {
             if (pDescriptor->FindFieldByName(key) == nullptr)
             {
-                SayNoDebugError("create " << name << " error 'key' not find");
+                GKDebugError("create " << name << " error 'key' not find");
                 return false;
             }
         }
@@ -225,11 +225,11 @@ namespace GameKeeper
                 sqlCommand << "BIGINT(32) DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_FLOAT)
             {
-                SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
+                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
                 sqlCommand << "FLOAT(20) NOT NULL DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_DOUBLE)
             {
-                SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
+                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
                 sqlCommand << "DOUBLE(32) DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_STRING)
             {
@@ -241,7 +241,7 @@ namespace GameKeeper
                 sqlCommand << "VARCHAR(64) DEFAULT NULL,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_BYTES)
             {
-                SayNoAssertRetFalse_F(IsHasField(fileDesc->name()));
+                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
                 sqlCommand << "BLOB(64) DEFAULT NULL,\n";
             } else
             {
@@ -263,10 +263,10 @@ namespace GameKeeper
         const std::string sql = sqlCommand.str();
         if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
         {
-            SayNoDebugError(mysql_error(mMysqlSocket));
+            GKDebugError(mysql_error(mMysqlSocket));
             return false;
         }
-        SayNoDebugInfo("\n" << sql);
+        GKDebugInfo("\n" << sql);
         return true;
     }
 }
