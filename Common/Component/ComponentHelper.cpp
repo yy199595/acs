@@ -6,7 +6,7 @@ namespace GameKeeper
 	std::unordered_map<std::string, Type *> ComponentHelper::mTypeInfoMap;
 	std::unordered_map<size_t, std::queue<Component *>> ComponentHelper::mComponentPool;
 
-	GameKeeper::Type * ComponentHelper::GetType(const std::string name)
+	GameKeeper::Type * ComponentHelper::GetType(const std::string & name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		return iter != mTypeInfoMap.end() ? iter->second : nullptr;

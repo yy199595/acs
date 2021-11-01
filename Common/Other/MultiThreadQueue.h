@@ -14,8 +14,7 @@ namespace GameKeeper
 	class MultiThreadQueue
 	{
 	public:
-		MultiThreadQueue()
-		{}
+		MultiThreadQueue() = default;
 
 	public:
 		void Add(const T &item);

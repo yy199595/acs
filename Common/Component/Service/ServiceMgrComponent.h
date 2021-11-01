@@ -26,7 +26,7 @@ namespace GameKeeper
     public:
         bool OnRequestMessage(const com::DataPacket_Request & message) final;
 
-        virtual int GetPriority() { return 500; }
+        virtual int GetPriority() const { return 500; }
 	private:
         void Invoke(ServiceMethod * method, com::DataPacket_Request * request);
     private:

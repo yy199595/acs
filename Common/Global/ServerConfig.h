@@ -46,11 +46,9 @@ namespace GameKeeper
 		rapidjson::Value *GetJsonValue(const std::string k1, const std::string k2);
 
     public:
-        short GetNodeId()
-        { return this->mNodeId; }
+        short GetNodeId() const { return this->mNodeId; }
 
-        short GetAreaId()
-        { return this->mAreaId; }
+        short GetAreaId() const { return this->mAreaId; }
 
         const std::string &GetNodeName()
         { return this->mNodeName; }

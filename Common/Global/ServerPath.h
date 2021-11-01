@@ -12,9 +12,9 @@ namespace GameKeeper
     public:
         ServerPath(int argc, char ** argv);
     public:
-        const std::string & GetLogPath() { return this->mLogsPath;}
-        const std::string & GetWorkPath() { return this->mWorkPath;}
-        const std::string & GetConfigPath() { return this->mConfigPath;}
+        const std::string & GetLogPath() const { return this->mLogsPath;}
+        const std::string & GetWorkPath() const { return this->mWorkPath;}
+        const std::string & GetConfigPath() const { return this->mConfigPath;}
     private:
         std::string mLogsPath;
         std::string mWorkPath;

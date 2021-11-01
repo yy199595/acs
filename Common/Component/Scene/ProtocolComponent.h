@@ -17,7 +17,7 @@ namespace GameKeeper
     public:
 		bool HasService(const std::string & service);
 		void GetServices(std::vector<std::string> & services);
-		bool GetMethods(const std::string service, std::vector<std::string> & methods);
+		bool GetMethods(const std::string & service, std::vector<std::string> & methods);
         const ProtocolConfig *GetProtocolConfig(unsigned short id) const;
 
         const ProtocolConfig *GetProtocolConfig(const std::string &service, const std::string &method) const;

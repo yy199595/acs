@@ -17,7 +17,7 @@ namespace GameKeeper
     public:
         LocalServiceComponent();
 
-        virtual ~LocalServiceComponent() {}
+       ~LocalServiceComponent() override = default;
 
     public:
 		const std::string &GetServiceName()final { return this->GetTypeName(); }

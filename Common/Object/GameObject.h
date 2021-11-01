@@ -38,7 +38,7 @@ namespace GameKeeper
 		void OnDestory() override;
         void GetComponents(std::vector<Component *> & components) const;
     public:
-		inline const long long GetId() const { return this->mGameObjectId; }
+		inline long long GetId() const { return this->mGameObjectId; }
         inline const std::string &GetAddress() { return this->mSessionAddress; }
 
     private:

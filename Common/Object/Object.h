@@ -17,9 +17,10 @@ namespace GameKeeper
         bool Init(const std::string &name);
 
     public:
-        inline bool IsActive() { return this->mIsActive; }
+        inline bool IsActive() const { return this->mIsActive; }
 
-        inline long long GetIntanceID() { return mIntanceID; }
+        inline long long GetIntanceID() const { return mIntanceID; }
+        
         inline void SetActive(bool isActive) { this->mIsActive = isActive; }
 
         inline const std::string &GetTypeName() { return this->mClassName; }

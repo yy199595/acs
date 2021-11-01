@@ -121,7 +121,7 @@ namespace GameKeeper
 		}
 	}
 
-	bool ProtocolComponent::GetMethods(const std::string service, std::vector<std::string> & methods)
+	bool ProtocolComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())

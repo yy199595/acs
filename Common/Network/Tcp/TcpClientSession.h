@@ -11,7 +11,7 @@ namespace GameKeeper
     class TcpClientSession : public SessionBase
     {
     public:
-        TcpClientSession(ISocketHandler *handler);
+        explicit TcpClientSession(ISocketHandler *handler);
         virtual ~TcpClientSession();
 	public:
         virtual SocketType GetSocketType() override { return SocketType::RemoteSocket;}

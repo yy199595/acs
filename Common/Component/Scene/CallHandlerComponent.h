@@ -14,7 +14,7 @@ namespace GameKeeper
     public:
         CallHandlerComponent();
 
-        virtual ~CallHandlerComponent() {}
+        ~CallHandlerComponent() override = default;
 
     public:
         bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);

@@ -18,14 +18,14 @@ namespace GameKeeper
     class ObjectFactory
     {
     private:
-        ObjectFactory(size_t size) : mQueueCount(size) {}
+        explicit ObjectFactory(size_t size) : mQueueCount(size) {}
 
     public:
         static ObjectFactory *Get();
 
     public:
         template<typename... Args>
-        Object *CreateObjectByName(std::string name, Args &&...args);
+        Object *CreateObjectByName(const std::string& name, Args &&...args);
 
         template<typename T, typename... Args>
         T *CreateObject(Args &&...args);
@@ -40,7 +40,7 @@ namespace GameKeeper
     };
 
     template<typename... Args>
-    inline Object *ObjectFactory::CreateObjectByName(std::string name, Args &&...args)
+    inline Object *ObjectFactory::CreateObjectByName(const std::string& name, Args &&...args)
     {
 
         return nullptr;

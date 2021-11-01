@@ -10,7 +10,7 @@ namespace GameKeeper
     {
     public:
         ServiceNodeComponent() = default;
-        ~ServiceNodeComponent() = default;
+        ~ServiceNodeComponent() override = default;
 
     public:
         bool DelNode(int nodeId);

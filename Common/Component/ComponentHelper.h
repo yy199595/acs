@@ -53,7 +53,7 @@ namespace GameKeeper
 		static Component * CreateComponent(bool fromPool = true);
 		static Component * CreateComponent(const std::string & name, bool fromPool = true);
 
-		static Type * GetType(const std::string name);
+		static Type * GetType(const std::string & name);
 	private:
 		static std::unordered_map<size_t, Type *> mTypeInfoMap1;
 		static std::unordered_map<std::string, Type *> mTypeInfoMap;

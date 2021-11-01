@@ -49,7 +49,7 @@ namespace GameKeeper
 
         void OnSecondUpdate() final;
 
-		int GetPriority() override { return 1; }
+		int GetPriority() override { return 2; }
 
 	public:
 
@@ -59,7 +59,7 @@ namespace GameKeeper
 
 		Coroutine *GetCoroutine(unsigned int id);
 
-		unsigned int GetCurrentCorId()
+		unsigned int GetCurrentCorId() const
 		{
 			return this->mCurrentCorId;
 		}

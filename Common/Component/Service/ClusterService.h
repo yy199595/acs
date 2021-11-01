@@ -15,7 +15,7 @@ namespace GameKeeper
     public:
 		ClusterService() = default;
 
-        ~ClusterService() = default;
+        ~ClusterService() override = default;
 
     public:
         bool Awake() final;

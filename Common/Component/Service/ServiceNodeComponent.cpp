@@ -31,7 +31,7 @@ namespace GameKeeper
 
 	ServiceNode * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
 	{
-		ServiceNode * serviceNode = new ServiceNode(areaId, nodeId, name, address);
+		auto serviceNode = new ServiceNode(areaId, nodeId, name, address);
 		if (serviceNode != nullptr)
 		{
 			serviceNode->Init(name);

@@ -18,7 +18,7 @@ namespace GameKeeper
     class StringPool
     {
     public:
-        StringPool(size_t size = 100);
+        explicit StringPool(size_t size = 100);
         ~StringPool();
     public:
         std::string * New();

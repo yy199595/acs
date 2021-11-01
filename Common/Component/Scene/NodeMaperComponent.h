@@ -12,7 +12,7 @@ namespace GameKeeper
     {
     public:
 		NodeMaperComponent() = default;
-        ~NodeMaperComponent() = default;
+        ~NodeMaperComponent() override = default;
     public:
         void AddService(class ServiceNode * node);
         class ServiceNode * GetService(const std::string & service);

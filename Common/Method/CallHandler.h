@@ -14,7 +14,7 @@ namespace GameKeeper
         virtual ~CallHandler() = default;
 
     public:
-        long long GetCreateTime() { return this->mCreateTime; }
+        long long GetCreateTime() const { return this->mCreateTime; }
 
     public:
         virtual void Invoke(const com::DataPacket_Response & backData) = 0;

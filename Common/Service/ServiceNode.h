@@ -18,11 +18,11 @@ namespace GameKeeper
 
         const std::string &GetNodeName() { return this->mNodeName; }
 
-        int GetAreaId() { return this->mAreaId; }
+        int GetAreaId() const { return this->mAreaId; }
 
-        int GetNodeId() { return this->mNodeId; }
+        int GetNodeId() const { return this->mNodeId; }
 
-        int GetNodeUId() { return this->mAreaId * 10000 + this->mNodeId; }
+        int GetNodeUId() const { return this->mAreaId * 10000 + this->mNodeId; }
 
     public:
         void Destory();

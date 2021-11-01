@@ -17,7 +17,7 @@ namespace GameKeeper
         std::string mActionName;      //action名字
         std::string mListenerAddress; //监听地址
     public:
-        bool operator==(ActionProxyInfo &actionInfo)
+        bool operator==(ActionProxyInfo &actionInfo) const
         {
             return this->mAreaId == actionInfo.mAreaId && this->mActionName == actionInfo.mActionName &&
                    this->mListenerAddress == actionInfo.mListenerAddress;
@@ -33,7 +33,7 @@ namespace GameKeeper
     {
     public:
 		CenterService() = default;
-        ~CenterService() = default;
+        ~CenterService() override = default;
 
     protected:
         bool Awake() final;

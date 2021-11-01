@@ -13,7 +13,7 @@ namespace GameKeeper
 	public:
 		TcpClientComponent();
 
-		virtual ~TcpClientComponent() {}
+		~TcpClientComponent() override {}
 
     protected:
 

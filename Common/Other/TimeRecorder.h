@@ -34,7 +34,7 @@ namespace GameKeeper
 
         CostTimeInfo *GetLatencyInfo(std::string &name);
 
-        long long GetLastClearTime() { return this->mLastClearTime; }
+        long long GetLastClearTime() const { return this->mLastClearTime; }
 
     public:
         void Clear();
