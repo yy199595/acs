@@ -5,7 +5,7 @@
 #include "NodeMaperComponent.h"
 #include <Service/ServiceNode.h>
 #include <Service/ServiceNodeComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     bool NodeMaperComponent::Awake()
     {

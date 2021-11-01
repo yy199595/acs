@@ -1,7 +1,7 @@
 #include "CoroutineExtension.h"
 #include <Core/App.h>
 
-using namespace Sentry;
+using namespace GameKeeper;
 namespace CoroutineExtension
 {
     int Sleep(lua_State *lua)

@@ -11,7 +11,7 @@
 #include <Define/CommonDef.h>
 #include <Method/MethodProxy.h>
 #include <Define/CommonTypeDef.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class Component;
 	class Type
@@ -27,7 +27,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	class GameObject;
 	class Component : public Object

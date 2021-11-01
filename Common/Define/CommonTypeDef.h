@@ -51,7 +51,7 @@ typedef std::shared_ptr<std::string> SharedMessage;
 
 
 
-namespace Sentry
+namespace GameKeeper
 {
 	template<typename T>
 	struct SayNoTypeProxy { typedef T Type; };
@@ -65,7 +65,7 @@ namespace Sentry
 	struct SayNoTypeProxy<std::shared_ptr<T>> { typedef T Type; };
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     template<typename T>
     class LocalObject

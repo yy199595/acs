@@ -4,7 +4,7 @@
 #include "HttpLocalPostRequest.h"
 #include <Network/NetworkHelper.h>
 #include <Network/Http/HttpLocalsession.h>
-namespace Sentry
+namespace GameKeeper
 {
 
     HttpLocalPostRequest::HttpLocalPostRequest(HttpClientComponent *component)

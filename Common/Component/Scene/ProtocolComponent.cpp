@@ -6,7 +6,7 @@
 #include <google/protobuf/util/json_util.h>
 #include <rapidjson/document.h>
 #include <Pool/MessagePool.h>
-namespace Sentry
+namespace GameKeeper
 {
 	bool ProtocolComponent::Awake()
     {

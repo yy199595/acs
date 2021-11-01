@@ -3,7 +3,7 @@
 #include <Protocol/c2s.pb.h>
 #include <Service/LocalServiceComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
 
     class RedisComponent;
@@ -37,4 +37,4 @@ namespace Sentry
         RedisComponent *mRedisComponent;
         MysqlProxyComponent *mMysqlComponent;
     };
-}// namespace Sentry
+}// namespace GameKeeper

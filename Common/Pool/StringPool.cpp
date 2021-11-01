@@ -5,7 +5,7 @@
 #include "StringPool.h"
 #include <thread>
 
-namespace Sentry
+namespace GameKeeper
 {
     StringPool::StringPool(size_t size)
         : mMaxSize(size)

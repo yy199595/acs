@@ -2,7 +2,7 @@
 #include <fstream>
 #include <Protocol/db.pb.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     TableOperator::TableOperator(SayNoMysqlSocket *socket, const std::string db, rapidjson::Document &doc)
             : mDocument(doc)

@@ -2,8 +2,8 @@
 // Created by zmhy0073 on 2021/10/27.
 //
 
-#ifndef SENTRY_HTTP_H
-#define SENTRY_HTTP_H
+#ifndef GameKeeper_HTTP_H
+#define GameKeeper_HTTP_H
 
 /* Status Codes */
 #define HTTP_STATUS_MAP(XX)                                                 \
@@ -76,4 +76,4 @@ enum class HttpStatus {
 #undef XX
 };
 
-#endif //SENTRY_HTTP_H
+#endif //GameKeeper_HTTP_H

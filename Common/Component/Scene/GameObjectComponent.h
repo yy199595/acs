@@ -2,7 +2,7 @@
 
 #include "Component.h"
 
-namespace Sentry
+namespace GameKeeper
 {
 	class GameObject;
 	class GameObjectComponent : public Component

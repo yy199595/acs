@@ -1,7 +1,7 @@
 ﻿#include"TcpClientSession.h"
 #include<Component/IComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     TcpClientSession::TcpClientSession(ISocketHandler * handler)
             : SessionBase(handler)

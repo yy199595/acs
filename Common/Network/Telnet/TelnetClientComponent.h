@@ -1,7 +1,7 @@
 #pragma once
 #include "TelnetClientSession.h"
 #include <Component/Component.h>
-namespace Sentry
+namespace GameKeeper
 {
     class TelnetClientComponent : public Component, public SocketHandler<TelnetClientSession>
     {

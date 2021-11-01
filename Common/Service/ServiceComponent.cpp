@@ -2,7 +2,7 @@
 #include<Core/App.h>
 #include <Method/LuaServiceMethod.h>
 #include<Scene/ProtocolComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
 	bool ServiceComponent::AddMethod(ServiceMethod * method)
 	{

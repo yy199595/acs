@@ -4,7 +4,7 @@
 #include <Define/CommonDef.h>
 #include <Define/CommonTypeDef.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class Object
     {
@@ -38,4 +38,4 @@ namespace Sentry
         long long mIntanceID;
         std::string mClassName;
     };
-}// namespace Sentry
+}// namespace GameKeeper

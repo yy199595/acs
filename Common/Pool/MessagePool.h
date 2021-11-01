@@ -4,7 +4,7 @@
 #include<google/protobuf/util/json_util.h>
 using namespace google::protobuf;
 using namespace google::protobuf::util;
-namespace Sentry
+namespace GameKeeper
 {
 	class MessagePool
 	{

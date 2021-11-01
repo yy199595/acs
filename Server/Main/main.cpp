@@ -25,7 +25,7 @@
 #include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
 #include <Pool/StringPool.h>
-using namespace Sentry;
+using namespace GameKeeper;
 
 int main(int argc, char **argv)
 {

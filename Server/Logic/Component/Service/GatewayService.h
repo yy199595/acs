@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/10/11.
 //
 
-#ifndef SENTRY_GATEWAYSERVICE_H
-#define SENTRY_GATEWAYSERVICE_H
+#ifndef GameKeeper_GATEWAYSERVICE_H
+#define GameKeeper_GATEWAYSERVICE_H
 #include <Service/LocalServiceComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     class GatewayService : public LocalServiceComponent
     {
@@ -25,4 +25,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_GATEWAYSERVICE_H
+#endif //GameKeeper_GATEWAYSERVICE_H

@@ -4,7 +4,7 @@
 #include <Util/MathHelper.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     AccountService::AccountService()
     {
@@ -141,4 +141,4 @@ namespace Sentry
         MD5 md5(buffer, size);
         return md5.toString();
     }
-}// namespace Sentry
+}// namespace GameKeeper

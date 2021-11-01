@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
-namespace Sentry
+namespace GameKeeper
 {
 
     class TaskPoolComponent;

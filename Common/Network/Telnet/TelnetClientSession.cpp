@@ -1,7 +1,7 @@
 
 #include"TelnetClientSession.h"
 #include <Define/CommonDef.h>
-namespace Sentry
+namespace GameKeeper
 {
 	TelnetClientSession::TelnetClientSession(ISocketHandler * hanlder)
 		:SessionBase(hanlder),mDelim("\r\n")

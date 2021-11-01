@@ -8,7 +8,7 @@
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
 #include <Network/Tcp/TcpClientComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     bool ServiceMgrComponent::Awake()
     {
@@ -92,4 +92,4 @@ namespace Sentry
 			this->mRequestDataPool.Destory(request);
         }
     }
-}// namespace Sentry
+}// namespace GameKeeper

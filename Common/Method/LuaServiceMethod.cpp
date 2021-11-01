@@ -4,7 +4,7 @@
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
-namespace Sentry
+namespace GameKeeper
 {
 
 	LuaServiceMethod::LuaServiceMethod(const std::string & name, lua_State * lua, int idx)

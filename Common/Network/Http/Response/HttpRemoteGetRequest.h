@@ -2,11 +2,11 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#ifndef SENTRY_HTTPREMOTEGETREQUEST_H
-#define SENTRY_HTTPREMOTEGETREQUEST_H
+#ifndef GameKeeper_HTTPREMOTEGETREQUEST_H
+#define GameKeeper_HTTPREMOTEGETREQUEST_H
 #include "HttpRemoteRequest.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     class HttpRemoteGetRequest : public HttpRemoteRequest
     {
@@ -22,4 +22,4 @@ namespace Sentry
         std::string mParamater;
     };
 }
-#endif //SENTRY_HTTPREMOTEGETREQUEST_H
+#endif //GameKeeper_HTTPREMOTEGETREQUEST_H

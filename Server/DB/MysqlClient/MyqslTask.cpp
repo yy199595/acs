@@ -4,7 +4,7 @@
 #include <Scene/MysqlComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     MyqslTask::MyqslTask(const std::string &db, const std::string &sql)
         : mDataBaseName(db), mSqlCommand(sql)
@@ -131,4 +131,4 @@ namespace Sentry
                 break;
         }
     }
-}// namespace Sentry
+}// namespace GameKeeper

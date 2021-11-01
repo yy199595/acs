@@ -3,7 +3,7 @@
 #include "ServiceComponent.h"
 #include <Method/ServiceMethod.h>
 
-namespace Sentry
+namespace GameKeeper
 {
 
 	inline std::string GetFunctionName(const std::string func)
@@ -64,4 +64,4 @@ namespace Sentry
 		}
     };
 #define __add_method(func) SayNoAssertRetFalse_F(this->Bind(GetFunctionName(#func), &func))
-}// namespace Sentry
+}// namespace GameKeeper

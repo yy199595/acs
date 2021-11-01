@@ -9,7 +9,7 @@
 #ifdef __DEBUG__
 #include <Pool/MessagePool.h>
 #endif
-namespace Sentry
+namespace GameKeeper
 {
     TcpClientComponent::TcpClientComponent() = default;
     bool TcpClientComponent::Awake()
@@ -292,4 +292,4 @@ namespace Sentry
         return this->mStringPool.New(this->mMessageBuffer, size);
     }
 
-}// namespace Sentry
+}// namespace GameKeeper

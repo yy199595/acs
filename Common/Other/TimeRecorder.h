@@ -5,7 +5,7 @@
 #include <cstring>
 #include <unordered_map>
 
-namespace Sentry
+namespace GameKeeper
 {
     struct CostTimeInfo {
     public:
@@ -49,4 +49,4 @@ namespace Sentry
         long long mLastClearTime;//(毫秒)
         std::unordered_map<std::string, CostTimeInfo> mCallFuncInfoMap;
     };
-}// namespace Sentry
+}// namespace GameKeeper

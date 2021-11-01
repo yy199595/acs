@@ -2,7 +2,7 @@
 
 #include<Component/Component.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class ServiceNode;
 

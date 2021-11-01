@@ -3,7 +3,7 @@
 #include<Component/Component.h>
 #include<Other/TimeRecorder.h>
 #include <Util/NumberBuilder.h>
-namespace Sentry
+namespace GameKeeper
 {
     // 注册本地Lua服务，管理远程回来的回调
     class CallHandler;

@@ -4,7 +4,7 @@
 #include <Component/Component.h>
 #include <Util/NumberBuilder.h>
 #include <Method/MethodProxy.h>
-namespace Sentry
+namespace GameKeeper
 {
     class TimerComponent : public Component, public ISystemUpdate
     {
@@ -64,4 +64,4 @@ namespace Sentry
         std::shared_ptr<T> timer = std::make_shared<T>(std::forward<Args>(args)...);
         return this->AddTimer(timer) ? timer : nullptr;
     }
-}// namespace Sentry
+}// namespace GameKeeper

@@ -6,7 +6,7 @@
 #include <MysqlClient/MysqlDefine.h>
 #include <QueryResult/InvokeResultData.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class SqlTableConfig
     {
@@ -25,7 +25,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     class MysqlTaskAction;
 

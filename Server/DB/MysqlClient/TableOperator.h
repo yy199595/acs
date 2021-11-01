@@ -3,7 +3,7 @@
 #include<string>
 #include<Scene/MysqlComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
 
     /*

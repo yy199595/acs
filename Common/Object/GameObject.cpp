@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <Define/CommonDef.h>
 #include <Component/Component.h>
-namespace Sentry
+namespace GameKeeper
 {
     GameObject::GameObject(const long long id)
         : mGameObjectId(id)
@@ -85,4 +85,4 @@ namespace Sentry
         }
         return false;
     }
-}// namespace Sentry
+}// namespace GameKeeper

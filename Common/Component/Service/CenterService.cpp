@@ -3,7 +3,7 @@
 #include <Util/StringHelper.h>
 #include <Service/ServiceNode.h>
 #include <Scene/ProtocolComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
 	bool CenterService::Awake()
 	{

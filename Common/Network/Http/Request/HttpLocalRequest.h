@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#ifndef SENTRY_HTTPLOCALREQUEST_H
-#define SENTRY_HTTPLOCALREQUEST_H
+#ifndef GameKeeper_HTTPLOCALREQUEST_H
+#define GameKeeper_HTTPLOCALREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
-namespace Sentry
+namespace GameKeeper
 {
     class HttpClientComponent;
     class HttpLocalRequest : public HttpHandlerBase
@@ -47,4 +47,4 @@ namespace Sentry
         HttpClientComponent * mHttpComponent;
     };
 }
-#endif //SENTRY_HTTPLOCALREQUEST_H
+#endif //GameKeeper_HTTPLOCALREQUEST_H

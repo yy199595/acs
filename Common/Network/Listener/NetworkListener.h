@@ -1,7 +1,7 @@
 #pragma once
 #include<Define/CommonTypeDef.h>
 #include<Thread/TaskThread.h>
-namespace Sentry
+namespace GameKeeper
 {
 
     struct ListenConfig

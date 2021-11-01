@@ -16,7 +16,7 @@ using namespace std;
 using namespace asio::ip;
 
 
-namespace Sentry
+namespace GameKeeper
 {
 	class Manager;
 
@@ -130,4 +130,4 @@ namespace Sentry
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
     };
-}// namespace Sentry
+}// namespace GameKeeper

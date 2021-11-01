@@ -7,10 +7,10 @@
 #include <Service/ServiceMgrComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include<Util/DirectoryHelper.h>
-using namespace Sentry;
+using namespace GameKeeper;
 using namespace std::chrono;
 
-namespace Sentry
+namespace GameKeeper
 {
 	App *App::mApp = nullptr;
 

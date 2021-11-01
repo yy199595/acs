@@ -1,6 +1,6 @@
 #pragma once
 #include <Define/CommonTypeDef.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class NetworkHelper
 	{

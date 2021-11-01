@@ -11,7 +11,7 @@ using namespace std::chrono;
 #ifdef _WIN32
 #include<Windows.h>
 #endif
-namespace Sentry
+namespace GameKeeper
 {
 #ifdef __COROUTINE_ASM__
 	void MainEntry(tb_context_from_t parame)

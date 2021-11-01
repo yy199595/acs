@@ -4,7 +4,7 @@
 #include <Network/SessionBase.h>
 
 
-namespace Sentry
+namespace GameKeeper
 {
     class ISocketHandler;
 
@@ -28,4 +28,4 @@ namespace Sentry
 
     typedef shared_ptr<TcpClientSession> SharedTcpSession;
 
-}// namespace Sentry
+}// namespace GameKeeper

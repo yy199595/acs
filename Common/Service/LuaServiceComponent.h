@@ -3,7 +3,7 @@
 #include "ServiceComponent.h"
 #include <Script/LuaInclude.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class LuaScriptComponent;
 
@@ -27,4 +27,4 @@ namespace Sentry
 		lua_State * mLuaEnv;
 		std::string mServiceName;
     };
-}// namespace Sentry
+}// namespace GameKeeper

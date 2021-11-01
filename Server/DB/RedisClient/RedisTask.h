@@ -4,7 +4,7 @@
 #include<QueryResult/InvokeResultData.h>
 
 
-namespace Sentry
+namespace GameKeeper
 {
     class RedisInvokeResult
     {
@@ -13,7 +13,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     class CoroutineComponent;
 

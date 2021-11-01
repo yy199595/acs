@@ -5,7 +5,7 @@
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Pool/MessagePool.h>
-namespace Sentry
+namespace GameKeeper
 {
     CallHandler::CallHandler()
     {
@@ -92,4 +92,4 @@ namespace Sentry
 
 
 
-}// namespace Sentry
+}// namespace GameKeeper

@@ -5,7 +5,7 @@
 
 using namespace google::protobuf;
 using namespace google::protobuf::util;
-using namespace Sentry;
+using namespace GameKeeper;
 namespace LuaProtocExtension
 {
     int Serialization(lua_State *lua)

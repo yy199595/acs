@@ -2,7 +2,7 @@
 
 #include <istream>
 #include <Network/SessionBase.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class TelnetClientSession : public SessionBase
 	{

@@ -4,15 +4,15 @@
 #include <hiredis/hiredis.h>
 #include <memory>
 
-using namespace Sentry;
-namespace Sentry
+using namespace GameKeeper;
+namespace GameKeeper
 {
     class RedisComponent;
 
     typedef redisContext RedisSocket;
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
 
 }

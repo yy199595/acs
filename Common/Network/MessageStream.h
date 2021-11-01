@@ -2,12 +2,12 @@
 // Created by zmhy0073 on 2021/10/14.
 //
 
-#ifndef SENTRY_MESSAGESTREAM_H
-#define SENTRY_MESSAGESTREAM_H
+#ifndef GameKeeper_MESSAGESTREAM_H
+#define GameKeeper_MESSAGESTREAM_H
 #include <Define/CommonDef.h>
 #include <Define/CommonTypeDef.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     enum DataMessageType
     {
@@ -34,4 +34,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_MESSAGESTREAM_H
+#endif //GameKeeper_MESSAGESTREAM_H

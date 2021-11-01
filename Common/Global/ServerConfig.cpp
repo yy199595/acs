@@ -3,7 +3,7 @@
 #include <Define/CommonDef.h>
 #include <Util/FileHelper.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     ServerConfig::ServerConfig(const std::string path)
             : mConfigPath(path)

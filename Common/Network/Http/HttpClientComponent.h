@@ -2,7 +2,7 @@
 #pragma once
 #include<Component/Component.h>
 #include <Network/Http/HttpSessionBase.h>
-namespace Sentry
+namespace GameKeeper
 {
     class HttpClientComponent : public Component, public SocketHandler<HttpSessionBase>
     {

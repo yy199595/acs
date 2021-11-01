@@ -5,7 +5,7 @@
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/DirectoryHelper.h>
-namespace Sentry
+namespace GameKeeper
 {
 	bool LuaServiceMgrComponent::Awake()
 	{

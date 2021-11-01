@@ -3,7 +3,7 @@
 #include <Util/DirectoryHelper.h>
 #include <spdlog/sinks/daily_file_sink.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     std::shared_ptr<spdlog::logger> LogHelper::mErrorLog;
     std::shared_ptr<spdlog::logger> LogHelper::mFatalLog;
@@ -84,4 +84,4 @@ namespace Sentry
         return true;
     }
 
-}// namespace Sentry
+}// namespace GameKeeper

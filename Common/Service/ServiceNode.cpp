@@ -7,7 +7,7 @@
 #include <Util/StringHelper.h>
 #include <Network/Tcp/TcpClientComponent.h>
 #include <google/protobuf/util/json_util.h>
-namespace Sentry
+namespace GameKeeper
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
@@ -268,4 +268,4 @@ namespace Sentry
         this->mWaitSendQueue.push(msg);
         this->mCorComponent->Resume(this->mCorId);
     }
-}// namespace Sentry
+}// namespace GameKeeper

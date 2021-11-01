@@ -10,7 +10,7 @@
 #include "Component/Scene/TaskPoolComponent.h"
 #include <Network/Http/Request/HttpLolcalGetRequest.h>
 #include <Network/Http/Request/HttpLocalPostRequest.h>
-namespace Sentry
+namespace GameKeeper
 {
     SessionBase *HttpClientComponent::CreateSocket()
     {

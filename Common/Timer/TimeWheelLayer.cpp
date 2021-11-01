@@ -1,6 +1,6 @@
 #include "TimeWheelLayer.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int start, int end)
         : mLayerId(layerId), mMaxCount(count), mStart(start), mEnd(end)
@@ -49,4 +49,4 @@ namespace Sentry
         }
         return false;
     }
-}// namespace Sentry
+}// namespace GameKeeper

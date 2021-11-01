@@ -3,7 +3,7 @@
 
 #include <Object/Object.h>
 #include <Component/Service/ServiceNodeComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     class CallHandler;
 
@@ -72,4 +72,4 @@ namespace Sentry
         class ProtocolComponent *mProtocolComponent;
         class TcpClientComponent * mTcpClientComponent;
     };
-}// namespace Sentry
+}// namespace GameKeeper

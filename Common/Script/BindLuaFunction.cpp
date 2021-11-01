@@ -3,7 +3,7 @@
 #include <Define/ClassStatement.h>
 #include <google/protobuf/util/json_util.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class GameObject;
 
@@ -33,10 +33,10 @@ namespace Sentry
         SayNoDebugError(lua_tostring(this->mLua, -1));
         return false;
     }
-}// namespace Sentry
+}// namespace GameKeeper
 
 
-namespace Sentry
+namespace GameKeeper
 {
     bool BindClientLuaFunction::Invoke(GameObject *gameObject, const std::string &data)
     {
@@ -50,4 +50,4 @@ namespace Sentry
         return BindLuaFunction::Invoke(gameObject, jsonData);
     }
 
-}// namespace Sentry
+}// namespace GameKeeper

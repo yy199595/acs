@@ -12,7 +12,7 @@
 
 #include <Manager/ProtocolManager.h>
 
-using namespace Sentry;
+using namespace GameKeeper;
 using namespace Client;
 
 int main(int argc, char ** argv)

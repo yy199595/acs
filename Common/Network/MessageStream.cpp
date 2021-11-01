@@ -4,7 +4,7 @@
 
 #include "MessageStream.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     const char * MessageStream::Serialize(size_t & size)
     {

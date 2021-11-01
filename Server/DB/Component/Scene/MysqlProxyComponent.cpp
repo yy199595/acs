@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     bool MysqlProxyComponent::Awake()
     {

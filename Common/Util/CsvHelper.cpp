@@ -2,7 +2,7 @@
 #include "FileHelper.h"
 #include "StringHelper.h"
 #include <fstream>
-namespace Sentry
+namespace GameKeeper
 {
     void CsvLine::Add(const std::string &value)
     {
@@ -23,8 +23,8 @@ namespace Sentry
         return (*this);
     }
 
-}// namespace Sentry
-namespace Sentry
+}// namespace GameKeeper
+namespace GameKeeper
 {
     CsvFileReader::CsvFileReader(const std::string &path)
         : mPath(path)
@@ -65,9 +65,9 @@ namespace Sentry
         }
         return nullptr;
     }
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
     CsvFileWriter::CsvFileWriter()
     {
@@ -105,4 +105,4 @@ namespace Sentry
         fs.close();
         return true;
     }
-}// namespace Sentry
+}// namespace GameKeeper

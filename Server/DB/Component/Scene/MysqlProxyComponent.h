@@ -1,6 +1,6 @@
 ﻿#include<Component/Component.h>
 #include <Pool/ObjectPool.h>
-namespace Sentry
+namespace GameKeeper
 {
     class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData
     {

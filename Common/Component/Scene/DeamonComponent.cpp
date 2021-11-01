@@ -5,7 +5,7 @@
 
 #include "DeamonComponent.h"
 #include <Util/TimeHelper.h>
-namespace Sentry
+namespace GameKeeper
 {
     bool DeamonComponent::Awake()
     {

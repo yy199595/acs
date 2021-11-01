@@ -2,7 +2,7 @@
 #include <Define/CommonDef.h>
 #include <istream>
 #include <Network/Http/HttpHandlerBase.h>
-namespace Sentry
+namespace GameKeeper
 {
 	HttpSessionBase::HttpSessionBase(ISocketHandler *  handler)
 		: SessionBase(handler)

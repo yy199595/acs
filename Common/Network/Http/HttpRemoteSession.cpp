@@ -5,7 +5,7 @@
 #include "HttpRemoteSession.h"
 #include <Network/Http/HttpHandlerBase.h>
 #include <Network/Http/HttpClientComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
         : HttpSessionBase(component)

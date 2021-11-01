@@ -1,7 +1,7 @@
 #include "GameObjectComponent.h"
 #include <Object/GameObject.h>
 #include <Coroutine/CoroutineComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
 	bool GameObjectComponent::Add(GameObject * gameObject)
 	{

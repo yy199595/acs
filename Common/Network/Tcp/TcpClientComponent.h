@@ -5,7 +5,7 @@
 #include <Script/LuaTable.h>
 #include <Other/MultiThreadQueue.h>
 #include <Network/Tcp/TcpLocalSession.h>
-namespace Sentry
+namespace GameKeeper
 {
 	// 管理所有session
 	class TcpClientComponent : public Component, public SocketHandler<TcpClientSession>

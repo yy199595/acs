@@ -2,7 +2,7 @@
 #include <XCode/XCode.h>
 #include <Define/CommonTypeDef.h>
 #include <Network/Http/Http.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class HttpHandlerBase
 	{

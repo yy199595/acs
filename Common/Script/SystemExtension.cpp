@@ -13,7 +13,7 @@
 
 #include <Service/ServiceNode.h>
 #include <Pool/MessagePool.h>
-using namespace Sentry;
+using namespace GameKeeper;
 
 int SystemExtension::Call(lua_State *lua)
 {

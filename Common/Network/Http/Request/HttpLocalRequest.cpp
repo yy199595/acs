@@ -7,7 +7,7 @@
 #include <Core/App.h>
 #include <Network/Http/HttpLocalsession.h>
 #include <Network/NetworkHelper.h>
-namespace Sentry
+namespace GameKeeper
 {
     HttpLocalRequest::HttpLocalRequest(HttpClientComponent *component)
             : mHttpComponent(component)

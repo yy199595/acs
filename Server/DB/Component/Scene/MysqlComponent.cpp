@@ -5,7 +5,7 @@
 #include <MysqlClient/TableOperator.h>
 #include <Coroutine/CoroutineComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     SqlTableConfig::SqlTableConfig(const std::string tab, const std::string pb)
             : mTableName(tab), mProtobufName(pb)
@@ -30,7 +30,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     MysqlComponent::MysqlComponent()
     {

@@ -2,7 +2,7 @@
 
 #include<Service/LocalServiceComponent.h>
 using namespace com;
-namespace Sentry
+namespace GameKeeper
 {
     class ServiceMgrComponent;
 

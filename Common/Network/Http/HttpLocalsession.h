@@ -2,11 +2,11 @@
 // Created by zmhy0073 on 2021/10/29.
 //
 
-#ifndef SENTRY_HTTPLOCALSESSION_H
-#define SENTRY_HTTPLOCALSESSION_H
+#ifndef GameKeeper_HTTPLOCALSESSION_H
+#define GameKeeper_HTTPLOCALSESSION_H
 #include <Network/Http/HttpHandlerBase.h>
 #include <Network/Http/HttpSessionBase.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class HttpClientComponent;
 	class HttpLocalSession : public HttpSessionBase
@@ -36,4 +36,4 @@ namespace Sentry
 		asio::ip::tcp::resolver::query * mQuery;
 	};
 }
-#endif //SENTRY_HTTPLOCALSESSION_H
+#endif //GameKeeper_HTTPLOCALSESSION_H

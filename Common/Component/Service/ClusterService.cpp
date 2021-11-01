@@ -5,7 +5,7 @@
 #include <Service/ServiceNodeComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     bool ClusterService::Awake()
     {      
@@ -91,4 +91,4 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-}// namespace Sentry
+}// namespace GameKeeper

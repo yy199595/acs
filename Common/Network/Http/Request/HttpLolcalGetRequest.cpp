@@ -1,6 +1,6 @@
 #include "HttpLolcalGetRequest.h"
 #include <Network/NetworkHelper.h>
-namespace Sentry
+namespace GameKeeper
 {
 	HttpLolcalGetRequest::HttpLolcalGetRequest(HttpClientComponent * component)
 		:HttpLocalRequest(component)

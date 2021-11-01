@@ -1,7 +1,7 @@
 ﻿#include "RedisTaskBase.h"
 #include <Scene/RedisComponent.h>
 #include <Core/App.h>
-namespace Sentry
+namespace GameKeeper
 {
 
     RedisTaskBase::RedisTaskBase(const std::string &cmd)
@@ -122,4 +122,4 @@ namespace Sentry
         value = this->mQueryDatas[0];
         return true;
     }
-}// namespace Sentry
+}// namespace GameKeeper

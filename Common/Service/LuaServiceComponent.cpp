@@ -4,7 +4,7 @@
 #include<Method/LuaServiceMethod.h>
 #include<Scene/LuaScriptComponent.h>
 #include<Scene/ProtocolComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     LuaServiceComponent::LuaServiceComponent()
 		: mIdx(0), mLuaEnv(nullptr)

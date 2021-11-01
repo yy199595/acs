@@ -5,7 +5,7 @@
 #include<Protocol/com.pb.h>
 
 using namespace com;
-namespace Sentry
+namespace GameKeeper
 {
     class CallHandler
     {
@@ -32,7 +32,7 @@ namespace Sentry
 
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     class LuaCallHandler : public CallHandler
     {

@@ -3,7 +3,7 @@
 #ifdef _WIN32
 #include<Windows.h>
 #endif
-namespace Sentry
+namespace GameKeeper
 {
 	Coroutine::Coroutine()
 	{

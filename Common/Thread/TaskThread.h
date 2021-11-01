@@ -7,7 +7,7 @@
 #include <thread>
 #include <Define/CommonDef.h>
 #include <Other/MultiThreadQueue.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class StaticMethod;
     class TaskPoolComponent;
@@ -116,4 +116,4 @@ namespace Sentry
 		StaticMethod * mMainMethod;
 		MultiThreadQueue<StaticMethod *> mTaskQueue;
 	};
-}// namespace Sentry
+}// namespace GameKeeper

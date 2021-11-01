@@ -2,11 +2,11 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#ifndef SENTRY_HTTPREMOTEREQUEST_H
-#define SENTRY_HTTPREMOTEREQUEST_H
+#ifndef GameKeeper_HTTPREMOTEREQUEST_H
+#define GameKeeper_HTTPREMOTEREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class HttpRemoteSession;
 
@@ -34,4 +34,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_HTTPREMOTEREQUEST_H
+#endif //GameKeeper_HTTPREMOTEREQUEST_H

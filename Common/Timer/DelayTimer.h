@@ -2,7 +2,7 @@
 
 #include "TimerBase.h"
 #include<Method/MethodProxy.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class DelayTimer : public TimerBase
 	{
@@ -21,4 +21,4 @@ namespace Sentry
 	private:
 		StaticMethod * mFunc;
 	};
-}// namespace Sentry
+}// namespace GameKeeper

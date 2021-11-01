@@ -4,7 +4,7 @@
 #include<Define/CommonTypeDef.h>
 #include<spdlog/sinks/basic_file_sink.h>
 #include<spdlog/sinks/stdout_color_sinks.h>
-namespace Sentry
+namespace GameKeeper
 {
 
     typedef spdlog::level::level_enum ELogType;

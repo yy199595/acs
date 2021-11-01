@@ -19,10 +19,10 @@
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fstruct_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto;
 namespace google {
 namespace protobuf {
-class Struct_FieldsEntry_DoNotUseDefaultTypeInternal {
+class Struct_FieldGameKeeper_DoNotUseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Struct_FieldsEntry_DoNotUse> _instance;
-} _Struct_FieldsEntry_DoNotUse_default_instance_;
+  ::google::protobuf::internal::ExplicitlyConstructed<Struct_FieldGameKeeper_DoNotUse> _instance;
+} _Struct_FieldGameKeeper_DoNotUse_default_instance_;
 class StructDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Struct> _instance;
@@ -47,8 +47,8 @@ static void InitDefaultsListValue_google_2fprotobuf_2fstruct_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::google::protobuf::_Struct_FieldsEntry_DoNotUse_default_instance_;
-    new (ptr) ::google::protobuf::Struct_FieldsEntry_DoNotUse();
+    void* ptr = &::google::protobuf::_Struct_FieldGameKeeper_DoNotUse_default_instance_;
+    new (ptr) ::google::protobuf::Struct_FieldGameKeeper_DoNotUse();
   }
   {
     void* ptr = &::google::protobuf::_Struct_default_instance_;
@@ -65,7 +65,7 @@ static void InitDefaultsListValue_google_2fprotobuf_2fstruct_2eproto() {
     new (ptr) ::google::protobuf::ListValue();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::google::protobuf::Struct_FieldsEntry_DoNotUse::InitAsDefaultInstance();
+  ::google::protobuf::Struct_FieldGameKeeper_DoNotUse::InitAsDefaultInstance();
   ::google::protobuf::Struct::InitAsDefaultInstance();
   ::google::protobuf::Value::InitAsDefaultInstance();
   ::google::protobuf::ListValue::InitAsDefaultInstance();
@@ -83,13 +83,13 @@ const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_google_2fp
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_google_2fprotobuf_2fstruct_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldsEntry_DoNotUse, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldsEntry_DoNotUse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldGameKeeper_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldGameKeeper_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldsEntry_DoNotUse, key_),
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldsEntry_DoNotUse, value_),
+  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldGameKeeper_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::google::protobuf::Struct_FieldGameKeeper_DoNotUse, value_),
   0,
   1,
   ~0u,  // no _has_bits_
@@ -118,14 +118,14 @@ const ::google::protobuf::uint32 TableStruct_google_2fprotobuf_2fstruct_2eproto:
   PROTOBUF_FIELD_OFFSET(::google::protobuf::ListValue, values_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 7, sizeof(::google::protobuf::Struct_FieldsEntry_DoNotUse)},
+  { 0, 7, sizeof(::google::protobuf::Struct_FieldGameKeeper_DoNotUse)},
   { 9, -1, sizeof(::google::protobuf::Struct)},
   { 15, -1, sizeof(::google::protobuf::Value)},
   { 27, -1, sizeof(::google::protobuf::ListValue)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_Struct_FieldsEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_Struct_FieldGameKeeper_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_Struct_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_Value_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_ListValue_default_instance_),
@@ -140,8 +140,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_google_2fprotobuf_2fstruct_2eproto[] =
   "\n\034google/protobuf/struct.proto\022\017google.p"
   "rotobuf\"\204\001\n\006Struct\0223\n\006fields\030\001 \003(\0132#.goo"
-  "gle.protobuf.Struct.FieldsEntry\032E\n\013Field"
-  "sEntry\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.goo"
+  "gle.protobuf.Struct.FieldGameKeeper\032E\n\013Field"
+  "GameKeeper\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.goo"
   "gle.protobuf.Value:\0028\001\"\352\001\n\005Value\0220\n\nnull"
   "_value\030\001 \001(\0162\032.google.protobuf.NullValue"
   "H\000\022\026\n\014number_value\030\002 \001(\001H\000\022\026\n\014string_val"
@@ -189,25 +189,25 @@ bool NullValue_IsValid(int value) {
 
 // ===================================================================
 
-Struct_FieldsEntry_DoNotUse::Struct_FieldsEntry_DoNotUse() {}
-Struct_FieldsEntry_DoNotUse::Struct_FieldsEntry_DoNotUse(::google::protobuf::Arena* arena)
+Struct_FieldGameKeeper_DoNotUse::Struct_FieldGameKeeper_DoNotUse() {}
+Struct_FieldGameKeeper_DoNotUse::Struct_FieldGameKeeper_DoNotUse(::google::protobuf::Arena* arena)
     : SuperType(arena) {}
-void Struct_FieldsEntry_DoNotUse::MergeFrom(const Struct_FieldsEntry_DoNotUse& other) {
+void Struct_FieldGameKeeper_DoNotUse::MergeFrom(const Struct_FieldGameKeeper_DoNotUse& other) {
   MergeFromInternal(other);
 }
-::google::protobuf::Metadata Struct_FieldsEntry_DoNotUse::GetMetadata() const {
+::google::protobuf::Metadata Struct_FieldGameKeeper_DoNotUse::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_google_2fprotobuf_2fstruct_2eproto);
   return ::file_level_metadata_google_2fprotobuf_2fstruct_2eproto[0];
 }
-void Struct_FieldsEntry_DoNotUse::MergeFrom(
+void Struct_FieldGameKeeper_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
   ::google::protobuf::Message::MergeFrom(other);
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool Struct_FieldsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+bool Struct_FieldGameKeeper_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
   using MF = ::google::protobuf::internal::MapField<
-      Struct_FieldsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      Struct_FieldGameKeeper_DoNotUse, EntryKeyType, EntryValueType,
       kEntryKeyFieldType, kEntryValueFieldType,
       kEntryDefaultEnumValue>;
   auto mf = static_cast<MF*>(object);
@@ -217,7 +217,7 @@ bool Struct_FieldsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, 
   DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
     parser.key().data(), static_cast<int>(parser.key().length()),
     ::google::protobuf::internal::WireFormatLite::PARSE,
-    "google.protobuf.Struct.FieldsEntry.key"));
+    "google.protobuf.Struct.FieldGameKeeper.key"));
 #undef DO_
   return true;
 }
@@ -316,7 +316,7 @@ const char* Struct::_InternalParse(const char* begin, const char* end, void* obj
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
           parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
-          auto parse_map = ::google::protobuf::Struct_FieldsEntry_DoNotUse::_ParseMap;
+          auto parse_map = ::google::protobuf::Struct_FieldGameKeeper_DoNotUse::_ParseMap;
           ctx->extra_parse_data().payload.clear();
           ctx->extra_parse_data().parse_map = parse_map;
           object = &msg->fields_;
@@ -361,8 +361,8 @@ bool Struct::MergePartialFromCodedStream(
       // map<string, .google.protobuf.Value> fields = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          Struct_FieldsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
-              Struct_FieldsEntry_DoNotUse,
+          Struct_FieldGameKeeper_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              Struct_FieldGameKeeper_DoNotUse,
               ::std::string, ::google::protobuf::Value,
               ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
               ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
@@ -373,7 +373,7 @@ bool Struct::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             parser.key().data(), static_cast<int>(parser.key().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "google.protobuf.Struct.FieldsEntry.key"));
+            "google.protobuf.Struct.FieldGameKeeper.key"));
         } else {
           goto handle_unusual;
         }
@@ -418,7 +418,7 @@ void Struct::SerializeWithCachedSizes(
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->first.data(), static_cast<int>(p->first.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "google.protobuf.Struct.FieldsEntry.key");
+          "google.protobuf.Struct.FieldGameKeeper.key");
       }
     };
 
@@ -434,7 +434,7 @@ void Struct::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::std::unique_ptr<Struct_FieldsEntry_DoNotUse> entry;
+      ::std::unique_ptr<Struct_FieldGameKeeper_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
         entry.reset(fields_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
         ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(1, *entry, output);
@@ -444,7 +444,7 @@ void Struct::SerializeWithCachedSizes(
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::std::unique_ptr<Struct_FieldsEntry_DoNotUse> entry;
+      ::std::unique_ptr<Struct_FieldGameKeeper_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::google::protobuf::Value >::const_iterator
           it = this->fields().begin();
           it != this->fields().end(); ++it) {
@@ -482,7 +482,7 @@ void Struct::SerializeWithCachedSizes(
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->first.data(), static_cast<int>(p->first.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "google.protobuf.Struct.FieldsEntry.key");
+          "google.protobuf.Struct.FieldGameKeeper.key");
       }
     };
 
@@ -498,7 +498,7 @@ void Struct::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::std::unique_ptr<Struct_FieldsEntry_DoNotUse> entry;
+      ::std::unique_ptr<Struct_FieldGameKeeper_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
         entry.reset(fields_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
         target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(1, *entry, target);
@@ -508,7 +508,7 @@ void Struct::SerializeWithCachedSizes(
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::std::unique_ptr<Struct_FieldsEntry_DoNotUse> entry;
+      ::std::unique_ptr<Struct_FieldGameKeeper_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::google::protobuf::Value >::const_iterator
           it = this->fields().begin();
           it != this->fields().end(); ++it) {
@@ -547,7 +547,7 @@ size_t Struct::ByteSizeLong() const {
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->fields_size());
   {
-    ::std::unique_ptr<Struct_FieldsEntry_DoNotUse> entry;
+    ::std::unique_ptr<Struct_FieldGameKeeper_DoNotUse> entry;
     for (::google::protobuf::Map< ::std::string, ::google::protobuf::Value >::const_iterator
         it = this->fields().begin();
         it != this->fields().end(); ++it) {
@@ -1635,8 +1635,8 @@ void ListValue::InternalSwap(ListValue* other) {
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::google::protobuf::Struct_FieldsEntry_DoNotUse* Arena::CreateMaybeMessage< ::google::protobuf::Struct_FieldsEntry_DoNotUse >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::Struct_FieldsEntry_DoNotUse >(arena);
+template<> PROTOBUF_NOINLINE ::google::protobuf::Struct_FieldGameKeeper_DoNotUse* Arena::CreateMaybeMessage< ::google::protobuf::Struct_FieldGameKeeper_DoNotUse >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::Struct_FieldGameKeeper_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::google::protobuf::Struct* Arena::CreateMaybeMessage< ::google::protobuf::Struct >(Arena* arena) {
   return Arena::CreateMessageInternal< ::google::protobuf::Struct >(arena);

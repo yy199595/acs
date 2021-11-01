@@ -1,6 +1,6 @@
 #include "TelnetClientComponent.h"
 
-namespace Sentry
+namespace GameKeeper
 {
 	TelnetClientComponent::TelnetClientComponent()
 	{
@@ -17,7 +17,7 @@ namespace Sentry
 		return true;
 	}
 
-	Sentry::SessionBase * TelnetClientComponent::CreateSocket()
+	GameKeeper::SessionBase * TelnetClientComponent::CreateSocket()
 	{
 		return new TelnetClientSession(this);
 	}
@@ -29,7 +29,7 @@ namespace Sentry
 
 	void TelnetClientComponent::OnListenNewSession(TelnetClientSession *session, const asio::error_code &err)
 	{
-		std::string * message = new std::string("welcome sentry server\n enter user and password:\n>>");
+		std::string * message = new std::string("welcome GameKeeper server\n enter user and password:\n>>");
 		session->SendNetMessage(message);
 	}
 

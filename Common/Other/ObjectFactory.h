@@ -5,7 +5,7 @@
 #include <Protocol/s2s.pb.h>
 
 using namespace google::protobuf;
-namespace Sentry
+namespace GameKeeper
 {
     template<typename T>
     inline Object *CreateNullArgcObject()
@@ -71,4 +71,4 @@ namespace Sentry
         this->mRegisterClassMap.insert(std::make_pair(name, action));
         return true;
     }
-}// namespace Sentry
+}// namespace GameKeeper

@@ -1,7 +1,7 @@
 #include "HttpHandlerBase.h"
 #include<Util/StringHelper.h>
 #include<Define/CommonDef.h>
-namespace Sentry
+namespace GameKeeper
 {
 	void HttpHandlerBase::ParseHeard(asio::streambuf & buf, size_t size)
     {

@@ -1,7 +1,7 @@
 #pragma once
 #include <fstream>
 #include <string>
-namespace Sentry
+namespace GameKeeper
 {
     class TableWriter
     {
@@ -11,4 +11,4 @@ namespace Sentry
     private:
         const std::string mPath;
     };
-}// namespace Sentry
+}// namespace GameKeeper

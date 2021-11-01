@@ -5,7 +5,7 @@
 #include <Scene/ProtocolComponent.h>
 #include <Network/Tcp/TcpClientComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     bool ServiceNodeComponent::DelNode(int nodeId)
     {
@@ -147,4 +147,4 @@ namespace Sentry
         return newServiceNode;
     }
 
-}// namespace Sentry
+}// namespace GameKeeper

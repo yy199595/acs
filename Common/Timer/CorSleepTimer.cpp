@@ -1,6 +1,6 @@
 #include "CorSleepTimer.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     CorSleepTimer::CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms)
         : TimerBase(ms)
@@ -15,4 +15,4 @@ namespace Sentry
         this->mScheduler->Resume(this->mCoroutineId);
         return true;
     }
-}// namespace Sentry
+}// namespace GameKeeper

@@ -2,7 +2,7 @@
 
 #include"TimerBase.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     class CallHandlerComponent;
 

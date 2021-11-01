@@ -2,7 +2,7 @@
 #include"CoroutineComponent.h"
 #include"Coroutine.h"
 #include<Core/App.h>
-namespace Sentry
+namespace GameKeeper
 {
 	CoroutinePool::CoroutinePool(int count)
 		:mId(0)
@@ -82,7 +82,7 @@ namespace Sentry
 	
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	
 	CoroutineGroup::CoroutineGroup(CoroutineComponent * cor)

@@ -3,7 +3,7 @@
 #include<Network/SessionBase.h>
 #include<Protocol/com.pb.h>
 #include<Pool/StringPool.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class IFrameUpdate
 	{
@@ -60,7 +60,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	class NetWorkThread;
     class TcpClientSession;

@@ -277,9 +277,9 @@ MapReflectionTester::MapReflectionTester(
   map_string_string_val_ = pool->FindFieldByName(
       "protobuf_unittest.TestMap.MapStringStringEntry.value");
   map_int32_bytes_key_ = pool->FindFieldByName(
-      "protobuf_unittest.TestMap.MapInt32BytesEntry.key");
+      "protobuf_unittest.TestMap.MapInt32ByteGameKeeper.key");
   map_int32_bytes_val_ = pool->FindFieldByName(
-      "protobuf_unittest.TestMap.MapInt32BytesEntry.value");
+      "protobuf_unittest.TestMap.MapInt32ByteGameKeeper.value");
   map_int32_enum_key_ = pool->FindFieldByName(
       "protobuf_unittest.TestMap.MapInt32EnumEntry.key");
   map_int32_enum_val_ = pool->FindFieldByName(

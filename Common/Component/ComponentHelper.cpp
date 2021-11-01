@@ -1,12 +1,12 @@
 #include "ComponentHelper.h"
-namespace Sentry
+namespace GameKeeper
 {
 
 	std::unordered_map<size_t, Type *> ComponentHelper::mTypeInfoMap1;
 	std::unordered_map<std::string, Type *> ComponentHelper::mTypeInfoMap;
 	std::unordered_map<size_t, std::queue<Component *>> ComponentHelper::mComponentPool;
 
-	Sentry::Type * ComponentHelper::GetType(const std::string name)
+	GameKeeper::Type * ComponentHelper::GetType(const std::string name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		return iter != mTypeInfoMap.end() ? iter->second : nullptr;
@@ -35,7 +35,7 @@ namespace Sentry
 		return true;
 	}
 
-	Sentry::Component * ComponentHelper::CreateComponent(const std::string & name, bool fromPool /*= true*/)
+	GameKeeper::Component * ComponentHelper::CreateComponent(const std::string & name, bool fromPool /*= true*/)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		if (iter == mTypeInfoMap.end())

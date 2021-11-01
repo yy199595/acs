@@ -1,6 +1,6 @@
 #pragma once
 #include <Network/SessionBase.h>
-namespace Sentry
+namespace GameKeeper
 {
 	class HttpHandlerBase;
 	class HttpSessionBase : public SessionBase

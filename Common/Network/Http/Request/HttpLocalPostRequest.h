@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#ifndef SENTRY_HTTPLOCALPOSTREQUEST_H
-#define SENTRY_HTTPLOCALPOSTREQUEST_H
+#ifndef GameKeeper_HTTPLOCALPOSTREQUEST_H
+#define GameKeeper_HTTPLOCALPOSTREQUEST_H
 #include "HttpLocalRequest.h"
-namespace Sentry
+namespace GameKeeper
 {
     class HttpLocalPostRequest : public HttpLocalRequest
     {
@@ -23,4 +23,4 @@ namespace Sentry
         const std::string * mPostData;
     };
 }
-#endif //SENTRY_HTTPLOCALPOSTREQUEST_H
+#endif //GameKeeper_HTTPLOCALPOSTREQUEST_H

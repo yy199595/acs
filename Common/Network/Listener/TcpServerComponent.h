@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Component/Component.h>
-namespace Sentry
+namespace GameKeeper
 {
 	// 处理外部连接进来的session
 	class NetworkListener;

@@ -4,7 +4,7 @@
 #include <Method/MethodProxy.h>
 using namespace std::chrono;
 
-namespace Sentry
+namespace GameKeeper
 {
 	IThread::IThread(TaskPoolComponent * task)
 		: mIsClose(false), mTaskComponent(task)
@@ -26,7 +26,7 @@ namespace Sentry
 
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     TaskThread::TaskThread(TaskPoolComponent * taskComponent)
         : IThread(taskComponent)
@@ -80,7 +80,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace GameKeeper
 {
     NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, StaticMethod * method)
         : IThread(taskComponent), mMethodProxy(method), mAsioContext(nullptr)
@@ -149,7 +149,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
 		: IThread(nullptr), mMainMethod(method)
@@ -190,4 +190,4 @@ namespace Sentry
 	}
 }
 
-// namespace Sentry
+// namespace GameKeeper

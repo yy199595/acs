@@ -2,7 +2,7 @@
 #include <Scene/CallHandlerComponent.h>
 #include <Method/CallHandler.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, CallHandlerComponent *mgr)
         : TimerBase(ms)
@@ -16,4 +16,4 @@ namespace Sentry
         // TODO
         return false;
     }
-}// namespace Sentry
+}// namespace GameKeeper

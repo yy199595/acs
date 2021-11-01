@@ -6,7 +6,7 @@
 #include <Scene/GameObjectComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Scene/NodeMaperComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     bool GatewayComponent::Awake()
     {

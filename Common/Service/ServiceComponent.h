@@ -7,7 +7,7 @@ using namespace std;
 using namespace com;
 
 
-namespace Sentry
+namespace GameKeeper
 {
 	class ServiceMethod;
 	class CppCallHandler;

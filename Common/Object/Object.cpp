@@ -1,7 +1,7 @@
 #include"Object.h"
 #include<Util/NumberHelper.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     Object::Object()
     {

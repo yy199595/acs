@@ -2,7 +2,7 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Core/App.h>
-namespace Sentry
+namespace GameKeeper
 {
     RedisTask::RedisTask(const std::string &cmd) : RedisTaskBase(cmd)
     {
@@ -23,4 +23,4 @@ namespace Sentry
 		}
         this->DebugInvokeInfo();
     }
-}// namespace Sentry
+}// namespace GameKeeper

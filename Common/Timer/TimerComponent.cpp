@@ -1,7 +1,7 @@
 ﻿#include "TimerComponent.h"
 #include <Timer/DelayTimer.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     TimerComponent::TimerComponent()
     {
@@ -140,4 +140,4 @@ namespace Sentry
         SayNoDebugError("add timer " << timer->GetTimerId() << " failure");
         return false;
     }
-}// namespace Sentry
+}// namespace GameKeeper

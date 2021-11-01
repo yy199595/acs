@@ -1,6 +1,6 @@
 #include "NetworkHelper.h"
 #include <regex>
-namespace Sentry
+namespace GameKeeper
 {
 	bool NetworkHelper::IsIp(const std::string & ip)
 	{

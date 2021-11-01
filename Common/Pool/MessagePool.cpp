@@ -1,5 +1,5 @@
 #include "MessagePool.h"
-namespace Sentry
+namespace GameKeeper
 {
 	std::unordered_map<std::string, Message *> MessagePool::mMessageMap;
 	Message * MessagePool::New(const std::string & name)

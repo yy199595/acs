@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/10/26.
 //
 
-#ifndef SENTRY_HTTPREMOTESESSION_H
-#define SENTRY_HTTPREMOTESESSION_H
+#ifndef GameKeeper_HTTPREMOTESESSION_H
+#define GameKeeper_HTTPREMOTESESSION_H
 #include "HttpSessionBase.h"
-namespace Sentry
+namespace GameKeeper
 {
     class HttpHandlerBase;
     class HttpClientComponent;
@@ -26,4 +26,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_HTTPREMOTESESSION_H
+#endif //GameKeeper_HTTPREMOTESESSION_H

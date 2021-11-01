@@ -3,7 +3,7 @@
 #include"NetworkHelper.h"
 #include<Method/MethodProxy.h>
 
-namespace Sentry
+namespace GameKeeper
 {
 	enum DataMessageType
 	{
@@ -18,7 +18,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	class ISocketHandler;
 

@@ -2,7 +2,7 @@
 
 #include<Manager/ScriptManager.h>
 #include<Manager/NetProxyManager.h>
-using namespace Sentry;
+using namespace GameKeeper;
 using namespace google::protobuf;
 namespace Client
 {

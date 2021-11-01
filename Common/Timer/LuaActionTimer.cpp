@@ -2,7 +2,7 @@
 #include <Define/CommonDef.h>
 #include <Util/MathHelper.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     LuaActionTimer::LuaActionTimer(lua_State *luaEnv, int ref, int interval, int count)
         : TimerBase(interval)
@@ -39,4 +39,4 @@ namespace Sentry
         }
         return this->mInvokeCount >= this->mMaxInvokeCount;
     }
-}// namespace Sentry
+}// namespace GameKeeper

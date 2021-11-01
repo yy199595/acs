@@ -4,7 +4,7 @@
 #include<Coroutine/CoroutineComponent.h>
 #include<Script/ClassProxyHelper.h>
 #include <Core/App.h>
-namespace Sentry
+namespace GameKeeper
 {
     RedisComponent::RedisComponent()
     {

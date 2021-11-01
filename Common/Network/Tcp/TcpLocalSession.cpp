@@ -4,7 +4,7 @@
 
 #include "TcpLocalSession.h"
 #include <Core/App.h>
-namespace Sentry
+namespace GameKeeper
 {
     TcpLocalSession::TcpLocalSession(ISocketHandler *handler, const std::string &name, const std::string ip,
                                      const unsigned short port)

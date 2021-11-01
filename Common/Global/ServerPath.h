@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/10/26.
 //
 #include<string>
-#ifndef SENTRY_SERVERPATH_H
-#define SENTRY_SERVERPATH_H
+#ifndef GameKeeper_SERVERPATH_H
+#define GameKeeper_SERVERPATH_H
 
-namespace Sentry
+namespace GameKeeper
 {
     class ServerPath
     {
@@ -22,4 +22,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_SERVERPATH_H
+#endif //GameKeeper_SERVERPATH_H

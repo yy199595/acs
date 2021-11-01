@@ -2,7 +2,7 @@
 #include <Util/NumberHelper.h>
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
-namespace Sentry
+namespace GameKeeper
 {
     TaskPoolComponent::TaskPoolComponent()
     {

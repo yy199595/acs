@@ -5,7 +5,7 @@
 #include <Scene/RedisComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     RedisLuaTask::RedisLuaTask(const std::string &cmd, lua_State *lua, int ref)
         : RedisTaskBase(cmd)
@@ -54,4 +54,4 @@ namespace Sentry
         }
         return new RedisLuaTask(cmd, lua, ref);
     }
-}// namespace Sentry
+}// namespace GameKeeper

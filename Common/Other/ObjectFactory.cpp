@@ -1,11 +1,11 @@
 ﻿#include "ObjectFactory.h"
 #include <Define/CommonDef.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     ObjectFactory *ObjectFactory::Get()
     {
         static ObjectFactory factory(10);
         return &factory;
     }
-}// namespace Sentry
+}// namespace GameKeeper

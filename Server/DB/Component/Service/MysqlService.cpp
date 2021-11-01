@@ -7,7 +7,7 @@
 #include <Core/App.h>
 #include <Util/TimeHelper.h>
 #include <Pool/MessagePool.h>
-namespace Sentry
+namespace GameKeeper
 {
     MysqlService::MysqlService()
     {
@@ -183,4 +183,4 @@ namespace Sentry
 #endif
         return code;
     }
-}// namespace Sentry
+}// namespace GameKeeper

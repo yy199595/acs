@@ -4,7 +4,7 @@
 #include<Component/Component.h>
 #include<Other/MultiThreadQueue.h>
 #include<Pool/ObjectPool.h>
-namespace Sentry
+namespace GameKeeper
 {
     class ServiceComponent;
 

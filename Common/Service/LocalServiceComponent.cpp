@@ -4,7 +4,7 @@
 #include <Scene/CallHandlerComponent.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/ProtocolComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
     LocalServiceComponent::LocalServiceComponent()
     {

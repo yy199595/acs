@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Sentry
+namespace GameKeeper
 {
     class ProtocolConfig
     {
@@ -16,4 +16,4 @@ namespace Sentry
         std::string RequestHandler;
         std::string ResponseHandler;
     };
-}// namespace Sentry
+}// namespace GameKeeper

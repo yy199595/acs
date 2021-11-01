@@ -5,8 +5,8 @@
 #include<RedisClient/RedisTask.h>
 #include <Coroutine/CoroutineComponent.h>
 #include<QueryResult/InvokeResultData.h>
-using namespace Sentry;
-namespace Sentry
+using namespace GameKeeper;
+namespace GameKeeper
 {
 	class TaskPoolComponent;
 

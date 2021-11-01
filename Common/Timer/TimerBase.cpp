@@ -1,6 +1,6 @@
 #include "TimerBase.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     TimerBase::TimerBase(long long ms)
     {
@@ -8,4 +8,4 @@ namespace Sentry
         this->mTimerId = NumberHelper::Create();
         this->mTriggerTime = TimeHelper::GetMilTimestamp() + ms;
     }
-}// namespace Sentry
+}// namespace GameKeeper

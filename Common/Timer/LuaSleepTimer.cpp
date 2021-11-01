@@ -1,6 +1,6 @@
 #include "LuaSleepTimer.h"
 #include <Define/CommonDef.h>
-namespace Sentry
+namespace GameKeeper
 {
     LuaSleepTimer::LuaSleepTimer(lua_State *lua, int ref, long long ms)
         : TimerBase(ms)
@@ -30,4 +30,4 @@ namespace Sentry
 		lua_presume(co, this->mLuaEnv, 0);
         return true;
     }
-}// namespace Sentry
+}// namespace GameKeeper

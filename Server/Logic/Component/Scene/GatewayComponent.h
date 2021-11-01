@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <Component/Component.h>
-namespace Sentry
+namespace GameKeeper
 {
     // 网关
     class GatewayComponent : public Component
@@ -18,4 +18,4 @@ namespace Sentry
         class ServiceNodeComponent * mNodeComponent;
         class GameObjectComponent * mGameObjComponent;
     };
-}// namespace Sentry
+}// namespace GameKeeper

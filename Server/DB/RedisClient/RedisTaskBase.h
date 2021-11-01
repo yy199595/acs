@@ -8,7 +8,7 @@
 #include <vector>
 
 #define RedisLuaArgvSize 10
-namespace Sentry
+namespace GameKeeper
 {
     class RedisComponent;
 
@@ -81,4 +81,4 @@ namespace Sentry
     {
         this->Encode(std::forward<Args>(args)...);
     }
-}// namespace Sentry
+}// namespace GameKeeper

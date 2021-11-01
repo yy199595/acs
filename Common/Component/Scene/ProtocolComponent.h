@@ -3,7 +3,7 @@
 #include <Component/Component.h>
 #include <Other/ProtocolConfig.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class ProtocolComponent : public Component
     {
@@ -27,4 +27,4 @@ namespace Sentry
         std::unordered_map<std::string, ProtocolConfig *> mProtocolNameMap;
 		std::unordered_map<std::string, std::vector<ProtocolConfig *>> mServiceMap;
     };
-}// namespace Sentry
+}// namespace GameKeeper

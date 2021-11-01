@@ -21,7 +21,7 @@
 #endif
 
 
-namespace Sentry
+namespace GameKeeper
 {
 	struct Coroutine;
 	class CoroutinePool
@@ -42,7 +42,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 	class CoroutineComponent;
 	class CoroutineGroup

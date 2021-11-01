@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/10/29.
 //
 
-#ifndef SENTRY_DEAMONCOMPONENT_H
-#define SENTRY_DEAMONCOMPONENT_H
+#ifndef GameKeeper_DEAMONCOMPONENT_H
+#define GameKeeper_DEAMONCOMPONENT_H
 #include "Component.h"
-namespace Sentry
+namespace GameKeeper
 {
     class DeamonComponent : public Component, public ISecondUpdate
     {
@@ -24,4 +24,4 @@ namespace Sentry
         long long mLastRefreshTime;
     };
 }
-#endif //SENTRY_DEAMONCOMPONENT_H
+#endif //GameKeeper_DEAMONCOMPONENT_H

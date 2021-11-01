@@ -1,6 +1,6 @@
 ﻿#include "InvokeResultData.h"
 
-namespace Sentry
+namespace GameKeeper
 {
     bool QuertJsonWritre::StartWriteObject()
     {
@@ -109,7 +109,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace GameKeeper
 {
 
     QuertJsonWritre::QuertJsonWritre()

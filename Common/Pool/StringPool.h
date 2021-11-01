@@ -2,8 +2,8 @@
 // Created by zmhy0073 on 2021/10/20.
 //
 
-#ifndef SENTRY_STRINGPOOL_H
-#define SENTRY_STRINGPOOL_H
+#ifndef GameKeeper_STRINGPOOL_H
+#define GameKeeper_STRINGPOOL_H
 
 #include <string>
 #include <atomic>
@@ -13,7 +13,7 @@
 #else
 #include<Define/ThreadQueue.h>
 #endif
-namespace Sentry
+namespace GameKeeper
 {
     class StringPool
     {
@@ -39,4 +39,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_STRINGPOOL_H
+#endif //GameKeeper_STRINGPOOL_H

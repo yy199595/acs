@@ -4,7 +4,7 @@
 
 #include "HttpLocalsession.h"
 #include <Network/Http/HttpClientComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
 	HttpLocalSession::HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler)
 		: HttpSessionBase(component), mHttpHandler(handler)

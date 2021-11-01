@@ -4,7 +4,7 @@
 #include <Thread/TaskThread.h>
 #include <Other/MultiThreadQueue.h>
 #include <Util/NumberBuilder.h>
-namespace Sentry
+namespace GameKeeper
 {
     class TaskProxy;
 

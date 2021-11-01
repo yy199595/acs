@@ -6,7 +6,7 @@
 
 using namespace com;
 
-namespace Sentry
+namespace GameKeeper
 {
     class ServiceNode;
 

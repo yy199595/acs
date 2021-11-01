@@ -3,7 +3,7 @@
 #include <Protocol/s2s.pb.h>
 #include <Service/LocalServiceComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class MysqlService : public LocalServiceComponent
     {
@@ -36,4 +36,4 @@ namespace Sentry
 
         class ProtocolComponent * mProtocolManager;
     };
-}// namespace Sentry
+}// namespace GameKeeper

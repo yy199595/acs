@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/10/27.
 //
 
-#ifndef SENTRY_TCPLOCALSESSION_H
-#define SENTRY_TCPLOCALSESSION_H
+#ifndef GameKeeper_TCPLOCALSESSION_H
+#define GameKeeper_TCPLOCALSESSION_H
 #include "TcpClientSession.h"
-namespace Sentry
+namespace GameKeeper
 {
     class TcpLocalSession : public TcpClientSession
     {
@@ -28,4 +28,4 @@ namespace Sentry
     };
 }
 
-#endif //SENTRY_TCPLOCALSESSION_H
+#endif //GameKeeper_TCPLOCALSESSION_H

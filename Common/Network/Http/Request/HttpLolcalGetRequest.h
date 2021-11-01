@@ -1,6 +1,6 @@
 #pragma once
 #include "HttpLocalRequest.h"
-namespace Sentry
+namespace GameKeeper
 {
 	class HttpClientComponent;
 	class HttpLolcalGetRequest : public HttpLocalRequest

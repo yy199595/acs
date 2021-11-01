@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
-namespace Sentry
+namespace GameKeeper
 {
     class CsvLine
     {
@@ -16,9 +16,9 @@ namespace Sentry
     private:
         std::vector<std::string> mLineDatas;
     };
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
     class CsvFileReader
     {
@@ -34,9 +34,9 @@ namespace Sentry
         const std::string &mPath;
         std::vector<CsvLine *> mAllLines;
     };
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
     class CsvFileWriter
     {
@@ -51,4 +51,4 @@ namespace Sentry
     private:
         std::vector<CsvLine *> mAllLines;
     };
-}// namespace Sentry
+}// namespace GameKeeper

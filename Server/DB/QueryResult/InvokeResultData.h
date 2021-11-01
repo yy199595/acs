@@ -7,7 +7,7 @@
 #include<rapidjson/document.h>
 #include<rapidjson/stringbuffer.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class QuertJsonWritre
     {

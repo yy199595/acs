@@ -4,7 +4,7 @@
 
 #include"ServerPath.h"
 #include<Util/DirectoryHelper.h>
-namespace Sentry
+namespace GameKeeper
 {
     ServerPath::ServerPath(int argc, char **argv)
     {

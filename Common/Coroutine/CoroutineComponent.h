@@ -7,7 +7,7 @@
 #include<functional>
 #include"Coroutine.h"
 #include<Component/Component.h>
-namespace Sentry
+namespace GameKeeper
 {
     class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
 	{

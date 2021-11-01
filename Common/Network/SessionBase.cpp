@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
 #include <Pool/StringPool.h>
-namespace Sentry
+namespace GameKeeper
 {
 
 	SessionBase::SessionBase(ISocketHandler * handler)

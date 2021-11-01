@@ -4,7 +4,7 @@
 #include<Define/CommonDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
-namespace Sentry
+namespace GameKeeper
 {
 	NetworkListener::NetworkListener(NetWorkThread * t, ListenConfig & config)
 		: mTaskThread(t), mConfig(config),

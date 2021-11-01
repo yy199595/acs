@@ -3,7 +3,7 @@
 #include "TimerBase.h"
 #include <Coroutine/CoroutineComponent.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class CorSleepTimer : public TimerBase
     {
@@ -20,4 +20,4 @@ namespace Sentry
         long long mNextInvokeTime;
         CoroutineComponent *mScheduler;
     };
-}// namespace Sentry
+}// namespace GameKeeper

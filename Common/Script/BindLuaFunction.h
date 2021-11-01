@@ -3,7 +3,7 @@
 #include <Define/CommonTypeDef.h>
 #include <Script/LuaInclude.h>
 
-namespace Sentry
+namespace GameKeeper
 {
     class GameObject;
 
@@ -22,9 +22,9 @@ namespace Sentry
         const int mRef;
         lua_State *mLua;
     };
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
     class BindServerLuaFunction : public BindLuaFunction
     {
@@ -33,9 +33,9 @@ namespace Sentry
 
         ~BindServerLuaFunction() { luaL_unref(mLua, LUA_REGISTRYINDEX, this->mRef); }
     };
-}// namespace Sentry
+}// namespace GameKeeper
 
-namespace Sentry
+namespace GameKeeper
 {
     class BindClientLuaFunction : public BindLuaFunction
     {
@@ -50,4 +50,4 @@ namespace Sentry
     private:
         const std::string mPbName;
     };
-}// namespace Sentry
+}// namespace GameKeeper

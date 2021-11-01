@@ -8,7 +8,7 @@
 #ifdef __DEBUG__
 #include <Scene/ProtocolComponent.h>
 #endif
-namespace Sentry
+namespace GameKeeper
 {
     CallHandlerComponent::CallHandlerComponent()
         : mNumberPool(100)
