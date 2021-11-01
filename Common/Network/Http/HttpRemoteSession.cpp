@@ -3,14 +3,13 @@
 //
 
 #include "HttpRemoteSession.h"
+#include <Network/Http/HttpHandlerBase.h>
 #include <Network/Http/HttpClientComponent.h>
 namespace Sentry
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
         : HttpSessionBase(component)
     {
-        this->mReadCount = 0;
-        this->mIsReadBody = false;
         this->mHttpHandler = nullptr;
         this->mHttpComponent = component;
     }
@@ -23,11 +22,28 @@ namespace Sentry
 
     bool HttpRemoteSession::OnReceiveBody(asio::streambuf &buf, const asio::error_code &code)
     {
-        return true;
+        if(code)
+        {
+            this->OnSocketError(code);
+            return false;
+        }
+        if (this->mHttpHandler == nullptr)
+        {
+            return false;
+        }
+        return this->mHttpHandler->OnReceiveBody(buf);
     }
 
     bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size, const asio::error_code &code)
     {
-        return true;
+        std::istream is(&buf);
+        is >> this->mMethod;
+        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(this->mMethod);
+        if (this->mHttpHandler == nullptr)
+        {
+            return false;
+        }
+        size_t size1 = size - (size - buf.size());
+        return this->mHttpHandler->OnReceiveHeard(buf, size1);;
     }
 }

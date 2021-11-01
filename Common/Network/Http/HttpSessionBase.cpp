@@ -72,6 +72,7 @@ namespace Sentry
                 return;
             }
             size_t size = pos - data + strlen("\r\n\r\n");
+            SayNoDebugLog("http heard legth = " << size);
             if (size != 0)
             {
                 this->mIsReadBody = true;

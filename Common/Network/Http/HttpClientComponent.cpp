@@ -28,11 +28,17 @@ namespace Sentry
     {
         std::string json;
         long long t1 = TimeHelper::GetMilTimestamp();
+        const std::string url = "http://lrs-oss.whitewolvesx.com/app/default/boy.png";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-        this->Post("http://apis.juhe.cn/xzqh/query", data, json);
+        this->Get(url, json);
 
-        SayNoDebugFatal(json);
+        SayNoDebugFatal(json.size());
         SayNoDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
+    }
+
+    HttpHandlerBase *HttpClientComponent::CreateMethodHandler(const std::string &method)
+    {
+        return nullptr;
     }
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)

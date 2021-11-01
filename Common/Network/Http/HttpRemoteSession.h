@@ -7,12 +7,12 @@
 #include "HttpSessionBase.h"
 namespace Sentry
 {
-    class HttpHandler;
+    class HttpHandlerBase;
     class HttpClientComponent;
     class HttpRemoteSession : public HttpSessionBase
     {
     public:
-        HttpRemoteSession(HttpClientComponent * socketHandler);
+        explicit HttpRemoteSession(HttpClientComponent * socketHandler);
     public:
         SocketType GetSocketType() override { return SocketType::RemoteSocket;}
     protected:
@@ -20,12 +20,8 @@ namespace Sentry
         bool OnReceiveBody(asio::streambuf &buf, const asio::error_code &code) override;
         bool OnReceiveHeard(asio::streambuf &buf,size_t size, const asio::error_code &code) override;
     private:
-        int mReadCount;
-        bool mIsReadBody;
-        std::string mPath;
         std::string mMethod;
-        std::string mVersion;
-        HttpHandler * mHttpHandler;
+        HttpHandlerBase * mHttpHandler;
         HttpClientComponent * mHttpComponent;
     };
 }

@@ -21,6 +21,8 @@ namespace Sentry
         XCode Post(const std::string & url, const std::string & data, std::string & response, int timeout = 5);
         XCode Post(const std::string & url, const std::unordered_map<std::string, std::string> & data, std::string & response, int timeout = 5);
 
+    public:
+        HttpHandlerBase * CreateMethodHandler(const std::string & method);
     private:
         class TaskPoolComponent *mTaskComponent;
         class CoroutineComponent *mCorComponent;
