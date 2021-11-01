@@ -13,14 +13,17 @@ namespace Sentry
 	{
 	public:
 		HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler);
-		~HttpLocalSession();
+		~HttpLocalSession() override;
 	public:	
-		SocketType GetSocketType() { return SocketType::LocalSocket; }
+		SocketType GetSocketType() override { return SocketType::LocalSocket; }
 		void StartConnectHost(const std::string & host, const std::string & port);
 	protected:
-		bool WriterToBuffer(std::ostream & os) override;
-		bool OnReceiveBody(asio::streambuf & buf, const asio::error_code & code) override;
-		bool OnReceiveHeard(asio::streambuf & buf, const asio::error_code & code) override;
+        void OnSendHttpMessageAfter() override;
+        bool WriterToBuffer(std::ostream & os) override;
+        void OnSocketError(const asio::error_code &err) override;
+        bool OnReceiveBody(asio::streambuf & buf, const asio::error_code & code) override;
+		bool OnReceiveHeard(asio::streambuf & buf,size_t  size, const asio::error_code & code) override;
+
 	private:
 		void Resolver();
 		void ConnectHandler(const asio::error_code & err);

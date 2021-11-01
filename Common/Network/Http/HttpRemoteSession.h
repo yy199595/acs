@@ -8,17 +8,17 @@
 namespace Sentry
 {
     class HttpHandler;
+    class HttpClientComponent;
     class HttpRemoteSession : public HttpSessionBase
     {
     public:
-        HttpRemoteSession(ISocketHandler * socketHandler);
-
+        HttpRemoteSession(HttpClientComponent * socketHandler);
     public:
         SocketType GetSocketType() override { return SocketType::RemoteSocket;}
     protected:
-        bool OnReceive(asio::streambuf &stream, const asio::error_code &err) override;
-    private:
-        HttpHandler * CreateHttpHandler(const std::string & method);
+        bool WriterToBuffer(std::ostream &os) override;
+        bool OnReceiveBody(asio::streambuf &buf, const asio::error_code &code) override;
+        bool OnReceiveHeard(asio::streambuf &buf,size_t size, const asio::error_code &code) override;
     private:
         int mReadCount;
         bool mIsReadBody;
@@ -26,6 +26,7 @@ namespace Sentry
         std::string mMethod;
         std::string mVersion;
         HttpHandler * mHttpHandler;
+        HttpClientComponent * mHttpComponent;
     };
 }
 

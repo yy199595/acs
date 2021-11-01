@@ -20,6 +20,10 @@
             "port":7788,
             "count":10000,
             "handler":"TcpClientComponent"
+        },
+        "http":
+        {
+            "handler":"HttpClientComponent"
         }
     },
     "NetWork": {

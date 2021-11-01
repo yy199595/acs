@@ -4,13 +4,12 @@
 #include <Core/App.h>
 #include <Thread/TaskThread.h>
 #include "HttpClientComponent.h"
-#include "Component/Scene/TaskPoolComponent.h"
 #include <Util/StringHelper.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpGetRequestTask.h>
-#include <Network/Http/HttpPostRequestTask.h>
-#include <Network/Http/HttpDownloadRequestTask.h>
+#include "Component/Scene/TaskPoolComponent.h"
+#include <Network/Http/Request/HttpLolcalGetRequest.h>
+#include <Network/Http/Request/HttpLocalPostRequest.h>
 namespace Sentry
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -38,42 +37,15 @@ namespace Sentry
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
-        HttpGetRequestTask httpGetRequestTask(url);
-        if(!this->mTaskComponent->StartTask(&httpGetRequestTask))
-        {
-            return XCode::HttpTaskStarFail;
-        }
-        return httpGetRequestTask.Get(json);
+        HttpLolcalGetRequest httpGetRequest(this);
+        return httpGetRequest.Get(url, json);
     }
 
-    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path, int timeout)
-    {
-		HttpDownloadRequestTask dowloadRequest(url);
-		if (!this->mTaskComponent->StartTask(&dowloadRequest))
-		{
-			return XCode::HttpTaskStarFail;
-		}
-		return dowloadRequest.Download(path);
-    }
-
-    XCode HttpClientComponent::DownLoad(const std::string &url, const std::string &path, const std::string &name, int timeout)
-    {
-        HttpDownloadRequestTask dowloadRequest(url);
-        if (!this->mTaskComponent->StartTask(&dowloadRequest))
-        {
-            return XCode::HttpTaskStarFail;
-        }
-        return dowloadRequest.Download(path, name);
-    }
 
     XCode HttpClientComponent::Post(const std::string &url, const std::string & data, std::string &response, int timeout)
     {
-        HttpPostRequestTask postRequestTask(url);
-        if(!this->mTaskComponent->StartTask(&postRequestTask))
-        {
-            return XCode::HttpTaskStarFail;
-        }
-        return postRequestTask.Post(data, response);
+        HttpLocalPostRequest localPostRequest(this);
+        return localPostRequest.Post(url, data, response);
     }
 
     XCode HttpClientComponent::Post(const std::string &url, std::string &response, int timeout)
@@ -98,13 +70,13 @@ namespace Sentry
         std::string parameter;
         for(auto iter = data.begin(); iter != data.end(); iter++)
         {
-            if(iter != data.begin())
+            if (iter != data.begin())
             {
                 parameter.append("&");
             }
-            const std::string & key = iter->first;
-            const std::string & val = iter->second;
-            parameter.append(key + '=' + val);
+            const std::string &key = iter->first;
+            const std::string &val = iter->second;
+            parameter += (key + '=' + val);
         }
         return this->Post(url, parameter, response);
     }

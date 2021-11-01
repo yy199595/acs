@@ -24,15 +24,26 @@ namespace Sentry
 		{
 			if (err)
 			{
-				asio::error_code code;
-				this->GetSocket().close(code);
+                this->OnSocketError(err);
+                return ;
 			}
-			else if (!isDone)
+			if(!isDone)
 			{
 				this->GetContext().post(std::bind(&HttpSessionBase::StartSendHttpMessage, this));
+                return ;
 			}
+            this->OnSendHttpMessageAfter();
 		});
 	}
+
+    void HttpSessionBase::OnSocketError(const asio::error_code &err)
+    {
+        if(this->mSocket->is_open())
+        {
+            asio::error_code code;
+            this->mSocket->close(code);
+        }
+    }
 
 	void HttpSessionBase::StartReceive()
     {
@@ -46,28 +57,33 @@ namespace Sentry
 
 	void HttpSessionBase::ReadCallback(const asio::error_code &err, size_t size)
     {
+        if(err)
+        {
+            this->OnSocketError(err);
+            return;
+        }
 		if (!this->mIsReadBody)
-		{
-			const char *data = asio::buffer_cast<const char *>(this->mStreamBuf.data());
-			const char *pos = strstr(data, "\r\n\r\n");
-			if (pos == nullptr)
-			{
-				this->GetContext().post(std::bind(&HttpSessionBase::StartReceive, this));
-				return;
-			}
-			size_t size = pos - data + strlen("\r\n\r\n");
-			if (size != 0)
-			{
-				this->mIsReadBody = true;
-				if (!this->OnReceiveHeard(mStreamBuf, err))
-				{
-					asio::error_code code;
-					this->mSocket->close(code);
-					return;
-				}
-			}
-		}
-		if (this->mIsReadBody)
+        {
+            const char *data = asio::buffer_cast<const char *>(this->mStreamBuf.data());
+            const char *pos = strstr(data, "\r\n\r\n");
+            if (pos == nullptr)
+            {
+                this->GetContext().post(std::bind(&HttpSessionBase::StartReceive, this));
+                return;
+            }
+            size_t size = pos - data + strlen("\r\n\r\n");
+            if (size != 0)
+            {
+                this->mIsReadBody = true;
+                if (!this->OnReceiveHeard(mStreamBuf, size, err))
+                {
+                    asio::error_code code;
+                    this->mSocket->close(code);
+                    return;
+                }
+            }
+        }
+		if (this->mIsReadBody && mStreamBuf.size() > 0)
 		{
 			if (!this->OnReceiveBody(mStreamBuf, err))
 			{

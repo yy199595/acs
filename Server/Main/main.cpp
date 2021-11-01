@@ -61,7 +61,6 @@ int main(int argc, char **argv)
     __register_component__(ClusterService);
     __register_component__(GatewayService);
 
-
     App app(argc, argv);
     return app.Run();
 }
