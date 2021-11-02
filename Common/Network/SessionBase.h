@@ -29,7 +29,7 @@ namespace GameKeeper
 	public:
 		explicit SessionBase(ISocketHandler *handler);
 
-		virtual ~SessionBase() = default;
+		virtual ~SessionBase();
 
 	public:
 		void Close();

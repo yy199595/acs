@@ -4,6 +4,7 @@
 
 #ifndef GameKeeper_HTTPREMOTEGETREQUEST_H
 #define GameKeeper_HTTPREMOTEGETREQUEST_H
+#include "HttpContent.h"
 #include "HttpRemoteRequest.h"
 
 namespace GameKeeper
@@ -11,15 +12,18 @@ namespace GameKeeper
     class HttpRemoteGetRequest : public HttpRemoteRequest
     {
     public:
-        HttpRemoteGetRequest() = default;
-        ~HttpRemoteGetRequest() override = default;
+      using HttpRemoteRequest::HttpRemoteRequest;
+    public:
+        const std::string & GetPath() { return this->mPath;}
+        bool GetParameter(const std::string & key, std::string & val);
     protected:
-         bool WriterToBuffer(std::ostream & os) override;
-         bool OnReceiveBody(asio::streambuf & buf) override;
 
-    private:
-        std::string mPage;
-        std::string mParamater;
+        bool OnReceiveBody(asio::streambuf &buf) override;
+
+        bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
+
+    private: // 请求参数
+        std::unordered_map<std::string, std::string> mParameMap;
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

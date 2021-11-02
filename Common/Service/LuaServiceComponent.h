@@ -12,9 +12,9 @@ namespace GameKeeper
     public:
         LuaServiceComponent();
 
-        ~LuaServiceComponent();
+        ~LuaServiceComponent() override;
 	public:
-		bool InitService(const std::string name, lua_State * luaEnv);
+		bool InitService(const std::string & name, lua_State * luaEnv);
 
     public:
         bool Awake() final;

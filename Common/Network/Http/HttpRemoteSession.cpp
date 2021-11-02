@@ -3,8 +3,8 @@
 //
 
 #include "HttpRemoteSession.h"
-#include <Network/Http/HttpHandlerBase.h>
 #include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/Response/HttpRemoteRequest.h>
 namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
@@ -16,14 +16,29 @@ namespace GameKeeper
 
     bool HttpRemoteSession::WriterToBuffer(std::ostream &os)
     {
+        if(this->mHttpHandler == nullptr)
+        {
+            return true;
+        }
+        return this->mHttpHandler->WriterToBuffer(os);
+    }
 
-        return true;
+    void HttpRemoteSession::OnSendHttpMessageAfter()
+    {
+        this->DestoryHandler();
+    }
+
+    void HttpRemoteSession::DestoryHandler()
+    {
+        delete this->mHttpHandler;
+        delete this;
     }
 
     bool HttpRemoteSession::OnReceiveBody(asio::streambuf &buf, const asio::error_code &code)
     {
         if(code)
         {
+            this->DestoryHandler();
             this->OnSocketError(code);
             return false;
         }
@@ -34,11 +49,16 @@ namespace GameKeeper
         return this->mHttpHandler->OnReceiveBody(buf);
     }
 
+    void HttpRemoteSession::OnSessionEnable()
+    {
+        this->StartReceive();
+    }
+
     bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size, const asio::error_code &code)
     {
         std::istream is(&buf);
         is >> this->mMethod;
-        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(this->mMethod);
+        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(this->mMethod, this);
         if (this->mHttpHandler == nullptr)
         {
             return false;

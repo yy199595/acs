@@ -10,6 +10,9 @@
 #include "Component/Scene/TaskPoolComponent.h"
 #include <Network/Http/Request/HttpLolcalGetRequest.h>
 #include <Network/Http/Request/HttpLocalPostRequest.h>
+
+#include <Network/Http/Response/HttpContent.h>
+#include <Network/Http/Response/HttpRemoteGetRequest.h>
 namespace GameKeeper
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -27,24 +30,44 @@ namespace GameKeeper
 	void HttpClientComponent::Start()
     {
         std::string json;
-        long long t1 = TimeHelper::GetMilTimestamp();
         const std::string url = "http://lrs-oss.whitewolvesx.com/app/default/boy.png";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
         this->Get(url, json);
 
         GKDebugFatal(json.size());
-        GKDebugError("time = " << (TimeHelper::GetMilTimestamp() - t1) / 1000.0f << "s");
+        this->Get("http://127.0.0.1:80/api/account/login?account=646585122@qq.com&passwd=11223344", json);
+
+        GKDebugFatal(json.size());
     }
 
-    HttpHandlerBase *HttpClientComponent::CreateMethodHandler(const std::string &method)
+    HttpRemoteRequest *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
     {
+        if (method == "GET")
+        {
+            return new HttpRemoteGetRequest(this, session);
+        }
         return nullptr;
     }
+
+    void HttpClientComponent::HandlerHttpRequest(HttpRemoteRequest *remoteRequest)
+    {
+        remoteRequest->SetCode(HttpStatus::OK);
+        remoteRequest->SetContent(new HttpStringContent(TimeHelper::GetDateString()));
+    }
+
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
         HttpLolcalGetRequest httpGetRequest(this);
+#ifdef __DEBUG__
+        long long t1 = TimeHelper::GetMilTimestamp();
+        XCode code = httpGetRequest.Get(url, json);
+        long long t2 = TimeHelper::GetMilTimestamp();
+        GKDebugInfo("get " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
+        return code;
+#else
         return httpGetRequest.Get(url, json);
+#endif
     }
 
 
@@ -69,7 +92,7 @@ namespace GameKeeper
     XCode HttpClientComponent::Post(const std::string &url, const std::unordered_map<std::string, std::string> &data,
                                     std::string &response, int timeout)
     {
-        if(data.size() == 0)
+        if(data.empty())
         {
             return XCode::HttpUrlParseError;
         }

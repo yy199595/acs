@@ -9,7 +9,7 @@ namespace GameKeeper
     {
     public:
 		ProtocolComponent() = default;
-        ~ProtocolComponent() = default;
+        ~ProtocolComponent() override = default;
 
     protected:
         bool Awake() final;

@@ -14,6 +14,16 @@ namespace GameKeeper
         this->mSocket = make_shared<AsioTcpSocket>(this->mContext);
 	}
 
+    SessionBase::~SessionBase()
+    {
+        if(this->mSocket->is_open())
+        {
+            asio::error_code err;
+            this->mSocket->close(err);
+        }
+        GKDebugError("remove new session " << this->GetAddress());
+    }
+
 	void SessionBase::Close()
 	{
 		if (!App::Get().IsMainThread())

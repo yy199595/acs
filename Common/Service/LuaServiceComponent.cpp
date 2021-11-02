@@ -2,7 +2,6 @@
 
 #include<Core/App.h>
 #include<Method/LuaServiceMethod.h>
-#include<Scene/LuaScriptComponent.h>
 #include<Scene/ProtocolComponent.h>
 namespace GameKeeper
 {
@@ -24,7 +23,7 @@ namespace GameKeeper
         luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
     }
 
-	bool LuaServiceComponent::InitService(const std::string name, lua_State * luaEnv)
+	bool LuaServiceComponent::InitService(const std::string & name, lua_State * luaEnv)
 	{
 		this->mServiceName = name;
 		lua_getglobal(luaEnv, name.c_str());
@@ -34,10 +33,9 @@ namespace GameKeeper
 		}
 		this->mLuaEnv = luaEnv;
 		this->mIdx = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		ProtocolComponent * protocolComponent = App::Get().GetComponent<ProtocolComponent>();
+		auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
 
-        return true;
-		
+        return protocolComponent->HasService(this->mServiceName);
 	}
 
     bool LuaServiceComponent::Awake()

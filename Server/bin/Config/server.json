@@ -23,6 +23,8 @@
         },
         "http":
         {
+            "port":80,
+            "count":1000,
             "handler":"HttpClientComponent"
         }
     },

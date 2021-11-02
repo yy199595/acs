@@ -19,6 +19,10 @@ namespace GameKeeper
 		}
 		std::ostream os(&this->mStreamBuf);
 		bool isDone = this->WriterToBuffer(os);
+        if(this->mStreamBuf.size() == 0)
+        {
+            return;
+        }
 		asio::async_write(this->GetSocket(), this->mStreamBuf, [this, isDone](
 			const asio::error_code & err, size_t size)
 		{
@@ -71,28 +75,18 @@ namespace GameKeeper
                 this->GetContext().post(std::bind(&HttpSessionBase::StartReceive, this));
                 return;
             }
-            size_t size = pos - data + strlen("\r\n\r\n");
-            GKDebugLog("http heard legth = " << size);
-            if (size != 0)
+            size_t pos1 = pos - data + strlen("\r\n\r\n");
+            GKDebugLog("http heard legth = " << pos1);
+
+            this->mIsReadBody = true;
+            if (!this->OnReceiveHeard(mStreamBuf, pos1, err))
             {
-                this->mIsReadBody = true;
-                if (!this->OnReceiveHeard(mStreamBuf, size, err))
-                {
-                    asio::error_code code;
-                    this->mSocket->close(code);
-                    return;
-                }
+                return;
             }
         }
-		if (this->mIsReadBody && mStreamBuf.size() > 0)
-		{
-			if (!this->OnReceiveBody(mStreamBuf, err))
-			{
-				asio::error_code code;
-				this->mSocket->close(code);
-				return;
-			}
-		}
-        this->GetContext().post(std::bind(&HttpSessionBase::StartReceive, this));
+        if(this->OnReceiveBody(mStreamBuf, err))
+        {
+            this->GetContext().post(std::bind(&HttpSessionBase::StartReceive, this));
+        }
     }
 }

@@ -4,6 +4,8 @@
 #include <Network/Http/HttpSessionBase.h>
 namespace GameKeeper
 {
+    class HttpRemoteRequest;
+    class HttpRemoteSession;
     class HttpClientComponent : public Component, public SocketHandler<HttpSessionBase>
     {
     public:
@@ -22,8 +24,11 @@ namespace GameKeeper
         XCode Post(const std::string & url, const std::unordered_map<std::string, std::string> & data, std::string & response, int timeout = 5);
 
     public:
-        HttpHandlerBase * CreateMethodHandler(const std::string & method);
+        void HandlerHttpRequest(HttpRemoteRequest * remoteRequest);
+    public:
+        HttpRemoteRequest * CreateMethodHandler(const std::string & method,HttpRemoteSession * session);
     private:
+        class NetWorkThread * mHttpThread;
         class TaskPoolComponent *mTaskComponent;
         class CoroutineComponent *mCorComponent;
     };

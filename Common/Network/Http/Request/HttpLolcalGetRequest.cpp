@@ -11,6 +11,7 @@ namespace GameKeeper
 
 	XCode HttpLolcalGetRequest::Get(const std::string & url, std::string & response)
 	{
+        response.clear();
 		this->mResponse = &response;
         return this->StartHttpRequest(url);
 	}
