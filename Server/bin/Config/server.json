@@ -70,7 +70,8 @@
         "MysqlService",
         "CenterService", 
         "ClusterService",
-        "GatewayService"
+        "GatewayService",
+        "HttpDownloadService"
     ],
     "WhiteList": [
         "127.0.0.1"

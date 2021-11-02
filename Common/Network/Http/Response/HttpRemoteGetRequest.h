@@ -15,7 +15,10 @@ namespace GameKeeper
       using HttpRemoteRequest::HttpRemoteRequest;
     public:
         const std::string & GetPath() { return this->mPath;}
+
         bool GetParameter(const std::string & key, std::string & val);
+
+        HttpMethodType GetMethodType() override { return HttpMethodType::GET; }
     protected:
 
         bool OnReceiveBody(asio::streambuf &buf) override;

@@ -44,7 +44,7 @@ namespace GameKeeper
     {
         if(this->mFileStream.is_open())
         {
-            size_t size = this->mFileStream.readsome(this->mBuffer, 1024);
+            size_t size = this->mFileStream.read(this->mBuffer, 1024).gcount();
             os.write(this->mBuffer, size);
             return this->mFileStream.eof();
         }
@@ -53,15 +53,16 @@ namespace GameKeeper
 
     size_t HttpFileContent::GetContentSize()
     {
+        size_t  size = 0;
         if(!this->mFileStream.is_open())
         {
-            this->mFileStream.open(this->mPath, std::ios::in);
+            this->mFileStream.open(this->mPath, std::ios::binary);
             if(this->mFileStream.is_open())
             {
-                this->mFileStream.seekg(0, std::ios_base::end);
-                return this->mFileStream.tellg();
+                size = this->mFileStream.seekg(0, std::ios_base::end).tellg();
+                this->mFileStream.seekg(0, std::ios_base::beg);
             }
         }
-        return 0;
+        return size;
     }
 }

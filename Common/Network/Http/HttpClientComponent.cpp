@@ -10,9 +10,10 @@
 #include "Component/Scene/TaskPoolComponent.h"
 #include <Network/Http/Request/HttpLolcalGetRequest.h>
 #include <Network/Http/Request/HttpLocalPostRequest.h>
-
+#include <Method/HttpServiceMethod.h>
 #include <Network/Http/Response/HttpContent.h>
 #include <Network/Http/Response/HttpRemoteGetRequest.h>
+#include <HttpService/HttpServiceComponent.h>
 namespace GameKeeper
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -35,9 +36,9 @@ namespace GameKeeper
         this->Get(url, json);
 
         GKDebugFatal(json.size());
-        this->Get("http://127.0.0.1:80/api/account/login?account=646585122@qq.com&passwd=11223344", json);
+        this->Get("http://yjz199595.com/api/account/login?account=646585122@qq.com&passwd=11223344", json);
 
-        GKDebugFatal(json.size());
+        GKDebugFatal(json);
     }
 
     HttpRemoteRequest *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
@@ -51,8 +52,33 @@ namespace GameKeeper
 
     void HttpClientComponent::HandlerHttpRequest(HttpRemoteRequest *remoteRequest)
     {
-        remoteRequest->SetCode(HttpStatus::OK);
-        remoteRequest->SetContent(new HttpStringContent(TimeHelper::GetDateString()));
+        HttpServiceMethod * method = this->GetHttpMethod(remoteRequest->GetPath());
+        if(method != nullptr)
+        {
+            HttpStatus code = method->Invoke(remoteRequest);
+            remoteRequest->SetCode(code);
+        }
+        else
+        {
+            remoteRequest->SetCode(HttpStatus::NOT_FOUND);
+        }
+    }
+
+    HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &path)
+    {
+        std::vector<std::string> tempArray;
+        StringHelper::SplitString(path, "/", tempArray);
+        if (tempArray.size() != 4)
+        {
+            return nullptr;
+        }
+        const std::string &service = tempArray[2];
+        auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
+        if (httpService == nullptr)
+        {
+            return nullptr;
+        }
+        return httpService->GetMethod(path);
     }
 
 
@@ -74,7 +100,14 @@ namespace GameKeeper
     XCode HttpClientComponent::Post(const std::string &url, const std::string & data, std::string &response, int timeout)
     {
         HttpLocalPostRequest localPostRequest(this);
+#ifdef __DEBUG__
+        long long t1 = TimeHelper::GetMilTimestamp();
+        XCode code = localPostRequest.Post(url, data, response);
+        long long t2 = TimeHelper::GetMilTimestamp();
+        GKDebugInfo("post " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
+#else
         return localPostRequest.Post(url, data, response);
+#endif
     }
 
     XCode HttpClientComponent::Post(const std::string &url, std::string &response, int timeout)

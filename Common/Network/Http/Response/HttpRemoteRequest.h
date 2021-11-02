@@ -6,6 +6,9 @@
 #define GameKeeper_HTTPREMOTEREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
 #include <Network/Http/Response/HttpContent.h>
+
+
+
 namespace GameKeeper
 {
     class HttpRemoteSession;
@@ -25,6 +28,7 @@ namespace GameKeeper
 
         bool SetHeard(const std::string &key, const std::string &val);
 
+        virtual HttpMethodType GetMethodType() = 0;
     public:
 
         bool WriterToBuffer(std::ostream &os) override;

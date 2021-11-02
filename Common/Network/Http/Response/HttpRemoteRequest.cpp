@@ -53,6 +53,7 @@ namespace GameKeeper
             {
                 size_t size = this->mHttpContent->GetContentSize();
                 os << "Content-Length:" << size << "\r\n";
+                GKDebugWarning("content size = " << size);
             }
             auto iter = this->mHeardMap.begin();
             for (; iter != this->mHeardMap.end(); iter++)

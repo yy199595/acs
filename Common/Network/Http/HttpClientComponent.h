@@ -25,8 +25,10 @@ namespace GameKeeper
 
     public:
         void HandlerHttpRequest(HttpRemoteRequest * remoteRequest);
-    public:
         HttpRemoteRequest * CreateMethodHandler(const std::string & method,HttpRemoteSession * session);
+
+    private:
+       class HttpServiceMethod * GetHttpMethod(const std::string & path);
     private:
         class NetWorkThread * mHttpThread;
         class TaskPoolComponent *mTaskComponent;
