@@ -2,6 +2,9 @@
 // Created by zmhy0073 on 2021/11/2.
 //
 #include "HttpContent.h"
+#ifdef __DEBUG__
+#include <Define/CommonDef.h>
+#endif // __DEBUG__
 
 namespace GameKeeper
 {
@@ -12,8 +15,8 @@ namespace GameKeeper
     }
 
     bool HttpStringContent::GetContent(std::ostream &os)
-    {
-        os << mContent;
+    {      
+		os.write(mContent.c_str(), mContent.size());
         return true;
     }
 
@@ -28,7 +31,8 @@ namespace GameKeeper
     HttpFileContent::HttpFileContent(const std::string &path)
         : mPath(path)
     {
-
+		this->mFileSize = 0;
+		this->mSendSize = 0;
     }
 
     HttpFileContent::~HttpFileContent() noexcept
@@ -44,8 +48,13 @@ namespace GameKeeper
     {
         if(this->mFileStream.is_open())
         {
-            size_t size = this->mFileStream.read(this->mBuffer, 1024).gcount();
-            os.write(this->mBuffer, size);
+            size_t size = this->mFileStream.read(this->mBuffer, 2048).gcount();
+            os.write(this->mBuffer, size);	
+#ifdef __DEBUG__
+			this->mSendSize += size;
+			double process = this->mSendSize / (double)this->mFileSize;
+			GKDebugError("send " << this->mPath << " [" << process * 100 << "%]");
+#endif
             return this->mFileStream.eof();
         }
         return true;
@@ -53,16 +62,15 @@ namespace GameKeeper
 
     size_t HttpFileContent::GetContentSize()
     {
-        size_t  size = 0;
         if(!this->mFileStream.is_open())
         {
             this->mFileStream.open(this->mPath, std::ios::binary);
             if(this->mFileStream.is_open())
             {
-                size = this->mFileStream.seekg(0, std::ios_base::end).tellg();
+                this->mFileSize = this->mFileStream.seekg(0, std::ios_base::end).tellg();
                 this->mFileStream.seekg(0, std::ios_base::beg);
             }
         }
-        return size;
+        return this->mFileSize;
     }
 }

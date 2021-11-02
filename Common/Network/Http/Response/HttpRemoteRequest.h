@@ -39,12 +39,19 @@ namespace GameKeeper
 
         HttpRemoteSession * GetSession() { return this->mHttpSession; }
 
+		const std::string & GetMethodName() { return this->mMethod; }
+
+		const std::string & GetServiceName() { return this->mService; }
+
     protected:
 
-        void NoticeMainThread();
+        bool NoticeMainThread();
 
         bool OnSessionError(const asio::error_code &code) override;
 
+	protected:
+		std::string mMethod;
+		std::string mService;
     protected:
         std::string mPath;
         std::string mVersion;

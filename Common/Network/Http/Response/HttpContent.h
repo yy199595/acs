@@ -47,7 +47,9 @@ namespace GameKeeper
 
         bool GetContent(std::ostream &os) override;
     private:
-        char mBuffer[1024];
+		size_t mFileSize;
+		size_t mSendSize;
+        char mBuffer[2048];
         const std::string mPath;
         std::ifstream mFileStream;
     };

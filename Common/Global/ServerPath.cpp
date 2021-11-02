@@ -12,5 +12,6 @@ namespace GameKeeper
 
         this->mLogsPath = this->mWorkPath + "Logs/";
         this->mConfigPath = this->mWorkPath + "Config/";
+		this->mDownloadPath = this->mWorkPath + "Download/";
     }
 }

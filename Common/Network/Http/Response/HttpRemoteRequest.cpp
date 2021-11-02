@@ -25,15 +25,16 @@ namespace GameKeeper
     {
         if(code == asio::error::eof)
         {
-            NoticeMainThread();
+            return NoticeMainThread();
         }
         return false;
     }
 
-    void HttpRemoteRequest::NoticeMainThread()
+    bool HttpRemoteRequest::NoticeMainThread()
     {
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
+		return false;
     }
 
     void HttpRemoteRequest::SetCode(HttpStatus code)

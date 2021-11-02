@@ -51,14 +51,13 @@ namespace GameKeeper
 			return this->mServerName;
 		}
 
-		inline MainTaskScheduler & GetTaskScheduler()
-		{
-			return this->mTaskScheduler;
-		}
+		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
 
 		const std::string & GetWorkPath() { return this->mServerPath.GetWorkPath(); }
 
 		const std::string & GetConfigPath() { return this->mServerPath.GetConfigPath(); }
+
+		const std::string & GetDownloadPath() { return this->mServerPath.GetDownloadPath(); }
 
 		inline bool IsMainThread()
 		{

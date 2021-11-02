@@ -16,17 +16,23 @@ namespace GameKeeper
     public:
         const std::string & GetPath() { return this->mPath;}
 
-        bool GetParameter(const std::string & key, std::string & val);
+		bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
         HttpMethodType GetMethodType() override { return HttpMethodType::GET; }
+
+		const std::string & GetParamater() { return this->mParamater; }
+
     protected:
 
         bool OnReceiveBody(asio::streambuf &buf) override;
 
         bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
 
+	private:
+		bool ParseUrl(const std::string & path);
+
     private: // 请求参数
-        std::unordered_map<std::string, std::string> mParameMap;
+		std::string mParamater;		
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

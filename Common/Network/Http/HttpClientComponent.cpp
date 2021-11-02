@@ -52,27 +52,35 @@ namespace GameKeeper
 
     void HttpClientComponent::HandlerHttpRequest(HttpRemoteRequest *remoteRequest)
     {
-        HttpServiceMethod * method = this->GetHttpMethod(remoteRequest->GetPath());
-        if(method != nullptr)
-        {
-            HttpStatus code = method->Invoke(remoteRequest);
-            remoteRequest->SetCode(code);
-        }
-        else
-        {
-            remoteRequest->SetCode(HttpStatus::NOT_FOUND);
-        }
+		const std::string & method = remoteRequest->GetMethodName();
+		const std::string & service = remoteRequest->GetServiceName();
+		auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
+		if (httpService == nullptr)
+		{
+			remoteRequest->SetCode(HttpStatus::NOT_FOUND);
+			return;
+		}
+
+		HttpServiceMethod * httpMethod = httpService->GetMethod(method);
+		if (httpMethod == nullptr)
+		{
+			remoteRequest->SetCode(HttpStatus::NOT_FOUND);
+			return;
+		}
+
+		HttpStatus code = httpMethod->Invoke(remoteRequest);
+		remoteRequest->SetCode(code);
     }
 
     HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &path)
     {
-        std::vector<std::string> tempArray;
-        StringHelper::SplitString(path, "/", tempArray);
-        if (tempArray.size() != 4)
-        {
-            return nullptr;
-        }
-        const std::string &service = tempArray[2];
+		std::vector<std::string> tempArray;
+		StringHelper::SplitString(path, "/", tempArray);
+		if (tempArray.size() != 3)
+		{
+			return nullptr;
+		}
+		const std::string & service = tempArray[1];
         auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
         if (httpService == nullptr)
         {
@@ -105,6 +113,7 @@ namespace GameKeeper
         XCode code = localPostRequest.Post(url, data, response);
         long long t2 = TimeHelper::GetMilTimestamp();
         GKDebugInfo("post " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
+		return code;
 #else
         return localPostRequest.Post(url, data, response);
 #endif

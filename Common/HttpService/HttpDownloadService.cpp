@@ -9,26 +9,45 @@ namespace GameKeeper
 {
     bool HttpDownloadService::Awake()
     {
-        this->Add("/App/HttpDownloadService/Download", &HttpDownloadService::Download, this);
+		this->Add("Files", &HttpDownloadService::Files, this);
+        this->Add("Download", &HttpDownloadService::Download, this);
         return true;
     }
 
-    HttpStatus HttpDownloadService::Download(HttpRemoteRequest *handler)
+	HttpStatus HttpDownloadService::Files(HttpRemoteRequest * handler)
+	{
+		auto getRequest = dynamic_cast<HttpRemoteGetRequest *>(handler);
+		if (getRequest == nullptr)
+		{
+			return HttpStatus::BAD_REQUEST;
+		}
+
+		std::stringstream streamBuf;
+		std::vector<std::string> files;
+		const std::string & dir = App::Get().GetDownloadPath();
+		const std::string & format = getRequest->GetParamater();
+		if (!DirectoryHelper::GetFilePaths(dir, format, files))
+		{
+			return HttpStatus::NOT_FOUND;
+		}
+		for (const std::string & file : files)
+		{
+			streamBuf << file.substr(dir.size() + 1) << "\n";
+		}
+		handler->SetContent(new HttpStringContent(streamBuf.str()));
+		return HttpStatus::OK;
+	}
+
+	HttpStatus HttpDownloadService::Download(HttpRemoteRequest *handler)
     {
         auto getRequest = dynamic_cast<HttpRemoteGetRequest *>(handler);
-
         if (getRequest == nullptr)
         {
             return HttpStatus::BAD_REQUEST;
         }
-
-        std::string fileName;
-        if (!getRequest->GetParameter("file", fileName))
-        {
-            return HttpStatus::BAD_REQUEST;
-        }
-
-        const std::string dir = App::Get().GetConfigPath() + fileName;
+      
+		const std::string & fileName = getRequest->GetParamater();
+        const std::string dir = App::Get().GetDownloadPath() + fileName;
         if (!DirectoryHelper::DirectorIsExist(dir))
         {
             return HttpStatus::NOT_FOUND;

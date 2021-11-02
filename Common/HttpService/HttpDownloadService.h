@@ -13,6 +13,7 @@ namespace GameKeeper
         HttpDownloadService() = default;
         ~HttpDownloadService() override = default;
     private:
+		HttpStatus Files(HttpRemoteRequest * handler);
         HttpStatus Download(HttpRemoteRequest * handler);
     protected:
         bool Awake() override;
