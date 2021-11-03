@@ -7,7 +7,7 @@
 namespace GameKeeper
 {
 	HttpLocalSession::HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler)
-		: HttpSessionBase(component), mHttpHandler(handler)
+		: HttpSessionBase(component, "LocalHttpSession"), mHttpHandler(handler)
 	{
 		this->mQuery = nullptr;
 		this->mResolver = nullptr;
@@ -35,29 +35,19 @@ namespace GameKeeper
 		return this->mHttpHandler->WriterToBuffer(os);
 	}
 
-	bool HttpLocalSession::OnReceiveBody(asio::streambuf & buf, const asio::error_code & code)
+	void HttpLocalSession::OnReceiveBody(asio::streambuf & buf)
 	{
 		if (this->mHttpHandler == nullptr)
 		{
-			return false;
+			return;
 		}
-        if(code)
-        {
-            this->mHttpHandler->OnSessionError(code);
-            return false;
-        }
-		return this->mHttpHandler->OnReceiveBody(buf);
+        this->mHttpHandler->OnReceiveBody(buf);
 	}
 
-	bool HttpLocalSession::OnReceiveHeard(asio::streambuf & buf, size_t size, const asio::error_code & code)
+	bool HttpLocalSession::OnReceiveHeard(asio::streambuf & buf, size_t size)
     {
         if (this->mHttpHandler == nullptr)
         {
-            return false;
-        }
-        if(code)
-        {
-            this->mHttpHandler->OnSessionError(code);
             return false;
         }
         return this->mHttpHandler->OnReceiveHeard(buf, size);
@@ -89,11 +79,11 @@ namespace GameKeeper
 
     void HttpLocalSession::OnSocketError(const asio::error_code &err)
     {
-        if (this->mHttpHandler != nullptr)
+        if (this->mHttpHandler == nullptr)
         {
-            this->mHttpHandler->OnSessionError(err);
+            return;
         }
-        HttpSessionBase::OnSocketError(err);
+        this->mHttpHandler->OnSessionError(err);
     }
 
 	void HttpLocalSession::ConnectHandler(const asio::error_code & err)
@@ -106,9 +96,9 @@ namespace GameKeeper
         this->StartSendHttpMessage();
     }
 
-    void HttpLocalSession::OnSendHttpMessageAfter()
+    void HttpLocalSession::OnWriteAfter()
     {
-        this->StartReceive();
+        this->StartReceiveHeard();
     }
 
 }

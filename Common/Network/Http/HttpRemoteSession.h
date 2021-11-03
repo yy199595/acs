@@ -7,8 +7,9 @@
 #include "HttpSessionBase.h"
 namespace GameKeeper
 {
-    class HttpRemoteRequest;
+
     class HttpClientComponent;
+    class HttpRemoteRequestHandler;
     class HttpRemoteSession : public HttpSessionBase
     {
     public:
@@ -16,17 +17,16 @@ namespace GameKeeper
     public:
         SocketType GetSocketType() override { return SocketType::RemoteSocket;}
     protected:
+        void OnWriteAfter() override;
         void OnSessionEnable() override;
-        void OnSendHttpMessageAfter() override;
         bool WriterToBuffer(std::ostream &os) override;
-        bool OnReceiveBody(asio::streambuf &buf, const asio::error_code &code) override;
-        bool OnReceiveHeard(asio::streambuf &buf,size_t size, const asio::error_code &code) override;
-    private:
-        void DestoryHandler();
+        void OnReceiveBody(asio::streambuf &buf) override;
+        void OnSocketError(const asio::error_code &err) override;
+        bool OnReceiveHeard(asio::streambuf &buf,size_t size) override;
     private:
         std::string mMethod;
-        HttpRemoteRequest * mHttpHandler;
         HttpClientComponent * mHttpComponent;
+        HttpRemoteRequestHandler * mHttpHandler;
     };
 }
 

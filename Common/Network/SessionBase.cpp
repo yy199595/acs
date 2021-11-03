@@ -5,14 +5,14 @@
 namespace GameKeeper
 {
 
-	SessionBase::SessionBase(ISocketHandler * handler)
-		: mHandler(*handler),
+	SessionBase::SessionBase(ISocketHandler * handler, const std::string & name)
+		: mHandler(*handler) , mName(name),
 		mTaskScheduler(App::Get().GetTaskScheduler()),
 		mContext(handler->GetNetThread()->GetContext())
-	{
-		this->mIsOpen = false;
+    {
+        this->mIsOpen = false;
         this->mSocket = make_shared<AsioTcpSocket>(this->mContext);
-	}
+    }
 
     SessionBase::~SessionBase()
     {
@@ -21,7 +21,7 @@ namespace GameKeeper
             asio::error_code err;
             this->mSocket->close(err);
         }
-        GKDebugError("remove new session " << this->GetAddress());
+        GKDebugError("remove [" << this->GetName()  << "] [" << this->GetAddress() << "]");
     }
 
 	void SessionBase::Close()

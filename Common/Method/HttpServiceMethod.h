@@ -8,15 +8,15 @@
 #include <Network/Http/HttpRemoteSession.h>
 namespace GameKeeper
 {
-    class HttpRemoteRequest;
+    class HttpRemoteRequestHandler;
 
     template<typename T>
-    using HttpServiceMethodType = HttpStatus(T::*)(HttpRemoteRequest *);
+    using HttpServiceMethodType = HttpStatus(T::*)(HttpRemoteRequestHandler *);
 
     class HttpServiceMethod
     {
     public:
-        virtual HttpStatus Invoke(HttpRemoteRequest *handler) = 0;
+        virtual HttpStatus Invoke(HttpRemoteRequestHandler *handler) = 0;
     };
 
     template<typename T>
@@ -27,7 +27,7 @@ namespace GameKeeper
                 : _o(o), _func(func){}
 
     public:
-        HttpStatus Invoke(HttpRemoteRequest *handler) override
+        HttpStatus Invoke(HttpRemoteRequestHandler *handler) override
         {
             return (_o->*_func)(handler);
         }

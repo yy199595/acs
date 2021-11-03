@@ -4,11 +4,11 @@
 
 #include "HttpRemoteSession.h"
 #include <Network/Http/HttpClientComponent.h>
-#include <Network/Http/Response/HttpRemoteRequest.h>
+#include <Network/Http/Response/HttpRemoteRequestHandler.h>
 namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
-        : HttpSessionBase(component)
+        : HttpSessionBase(component, "RemoteHttpSession")
     {
         this->mHttpHandler = nullptr;
         this->mHttpComponent = component;
@@ -23,38 +23,39 @@ namespace GameKeeper
         return this->mHttpHandler->WriterToBuffer(os);
     }
 
-    void HttpRemoteSession::OnSendHttpMessageAfter()
+    void HttpRemoteSession::OnWriteAfter()
     {
-        this->DestoryHandler();
-    }
-
-    void HttpRemoteSession::DestoryHandler()
-    {
-        delete this->mHttpHandler;
-        delete this;
-    }
-
-    bool HttpRemoteSession::OnReceiveBody(asio::streambuf &buf, const asio::error_code &code)
-    {
-        if(code)
+        if(this->mHttpHandler == nullptr)
         {
-            this->DestoryHandler();
-            this->OnSocketError(code);
-            return false;
+            assert(false);
         }
+        this->mHttpHandler->OnWriterAfter();
+    }
+
+    void HttpRemoteSession::OnReceiveBody(asio::streambuf &buf)
+    {
         if (this->mHttpHandler == nullptr)
         {
-            return false;
+            return;
         }
-        return this->mHttpHandler->OnReceiveBody(buf);
+        this->mHttpHandler->OnReceiveBody(buf);
     }
 
     void HttpRemoteSession::OnSessionEnable()
     {
-        this->StartReceive();
+        this->StartReceiveHeard();
     }
 
-    bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size, const asio::error_code &code)
+    void HttpRemoteSession::OnSocketError(const asio::error_code &err)
+    {
+        if(this->mHttpHandler== nullptr)
+        {
+            return;
+        }
+        this->mHttpHandler->OnSessionError(err);
+    }
+
+    bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {
         std::istream is(&buf);
         is >> this->mMethod;

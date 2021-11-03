@@ -25,7 +25,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool HttpLolcalGetRequest::OnReceiveBody(asio::streambuf & buf)
+	void HttpLolcalGetRequest::OnReceiveBody(asio::streambuf & buf)
 	{
         std::istream is(&buf);
         while(buf.size() > 0)
@@ -33,6 +33,5 @@ namespace GameKeeper
             size_t size = is.readsome(this->mHandlerBuffer, 1024);
             this->mResponse->append(this->mHandlerBuffer, size);
         }
-        return true;
 	}
 }

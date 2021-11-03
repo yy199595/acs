@@ -11,8 +11,9 @@ namespace GameKeeper
     class RapidJsonWriter
     {
     public:
-        RapidJsonWriter() : jsonWriter(nullptr) { this->StartAddParameter(); }
-        const std::string &Serialization();
+        RapidJsonWriter();
+        ~RapidJsonWriter() = default;
+    public:
         bool AddParameter(const char *key);
         bool AddParameter(const char *key, const int value);
         bool AddParameter(const char *key, const double value);
@@ -29,13 +30,13 @@ namespace GameKeeper
     public:
         bool SaveJsonToFile(const char *path);
 
-    public:
-        bool StartAddParameter();
+        bool WriterToStream(std::string & os);
+        bool WriterToStream(std::ostream & os);
 
+        size_t GetJsonSize() { return this->strBuf.GetLength();}
     private:
-        std::string mTempString;
         rapidjson::StringBuffer strBuf;
-        rapidjson::Writer<rapidjson::StringBuffer> *jsonWriter;
+        rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;
     };
 }// namespace GameKeeper
 

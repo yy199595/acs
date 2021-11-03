@@ -11,9 +11,9 @@ namespace GameKeeper
 	class TcpClientComponent : public Component, public SocketHandler<TcpClientSession>
 	{
 	public:
-		TcpClientComponent();
+		TcpClientComponent() = default;
 
-		~TcpClientComponent() override {}
+		~TcpClientComponent() override = default;
 
     protected:
 
@@ -26,7 +26,7 @@ namespace GameKeeper
 	public:
         TcpLocalSession * GetLocalSession(const std::string & address);
         TcpClientSession * GetRemoteSession(const std::string & address);
-        SessionBase * CreateSocket() { return new TcpClientSession(this);}
+        SessionBase * CreateSocket() override { return new TcpClientSession(this, "TcpRemoteSession");}
         TcpLocalSession * NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;

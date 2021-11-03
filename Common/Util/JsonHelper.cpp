@@ -2,150 +2,96 @@
 
 namespace GameKeeper
 {
-    bool RapidJsonWriter::StartAddParameter()
+    RapidJsonWriter::RapidJsonWriter()
+        : jsonWriter(strBuf)
     {
-        if (this->jsonWriter)
-        {
-            delete this->jsonWriter;
-            this->jsonWriter = nullptr;
-        }
-        this->strBuf.Clear();
-        this->jsonWriter = new rapidjson::Writer<rapidjson::StringBuffer>(strBuf);
-        return this->jsonWriter->StartObject();
+        this->jsonWriter.StartObject();
     }
+
 
     bool RapidJsonWriter::AddParameter(const char *key, const int value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->Int(value);
-            return true;
-        }
-        return false;
+        return jsonWriter.Key(key) && jsonWriter.Int(value);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const double value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->Double(value);
-            return true;
-        }
-        return false;
+        return jsonWriter.Key(key) &&
+               jsonWriter.Double(value);
+
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const char *value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            this->jsonWriter->Key(key);
-            this->jsonWriter->String(value);
-            return true;
-        }
-        return false;
+        return this->jsonWriter.Key(key) &&
+               this->jsonWriter.String(value);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const long long value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->Int64(value);
-            return true;
-        }
-        return false;
+        return jsonWriter.Key(key) &&
+               jsonWriter.Int64(value);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const std::string value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->String(value.c_str(), value.length());
-            return true;
-        }
-        return false;
+        return jsonWriter.Key(key) &&
+               jsonWriter.String(value.c_str(), value.length());
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const unsigned int value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->Uint(value);
-            return true;
-        }
-        return false;
+
+        return jsonWriter.Key(key) &&
+               jsonWriter.Uint(value);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const char *value, size_t size)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            this->jsonWriter->Key(key);
-            this->jsonWriter->String(value, size);
-            return true;
-        }
-        return false;
+        return this->jsonWriter.Key(key) &&
+               this->jsonWriter.String(value, size);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const unsigned long long value)
     {
-        if (this->jsonWriter != nullptr)
-        {
-            jsonWriter->Key(key);
-            jsonWriter->Uint64(value);
-            return true;
-        }
-        return false;
+
+        return jsonWriter.Key(key) &&
+               jsonWriter.Uint64(value);
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const std::set<std::string> &value)
     {
-        if (this->jsonWriter != nullptr)
+        if (jsonWriter.Key(key) && jsonWriter.StartArray())
         {
-            jsonWriter->Key(key);
-            jsonWriter->StartArray();
-            for (auto iter = value.begin(); iter != value.end(); iter++)
+            for (const auto &str: value)
             {
-                const std::string &str = (*iter);
-                jsonWriter->String(str.c_str(), str.size());
+                jsonWriter.String(str.c_str(), str.size());
             }
-            jsonWriter->EndArray();
-            return true;
+            return jsonWriter.EndArray();
         }
         return false;
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const std::vector<std::string> &value)
     {
-        if (this->jsonWriter != nullptr)
+        if (jsonWriter.Key(key) && jsonWriter.StartArray())
         {
-            jsonWriter->Key(key);
-            jsonWriter->StartArray();
-            for (size_t index = 0; index < value.size(); index++)
+            for (const auto & str : value)
             {
-                const std::string &str = value[index];
-                jsonWriter->String(str.c_str(), str.size());
+                jsonWriter.String(str.c_str(), str.size());
             }
-            jsonWriter->EndArray();
-            return true;
+            return jsonWriter.EndArray();
         }
         return false;
     }
 
     bool RapidJsonWriter::AddParameter(const char *key, const google::protobuf::Message &value)
     {
-        if (this->jsonWriter != nullptr)
+        std::string buffer;
+        if (value.SerializePartialToString(&buffer))
         {
-            if (value.SerializePartialToString(&mTempString))
-            {
-                this->jsonWriter->Key(key);
-                this->jsonWriter->String(mTempString.c_str(), mTempString.size());
-                return true;
-            }
+            return this->jsonWriter.Key(key) &&
+                   this->jsonWriter.String(buffer.c_str(), buffer.size());
         }
         return false;
     }
@@ -153,36 +99,44 @@ namespace GameKeeper
     bool RapidJsonWriter::SaveJsonToFile(const char *path)
     {
         std::ofstream savefile(path, ios::out | ios::binary);
-        if (savefile)
+        if (savefile.is_open())
         {
-            const std::string &data = this->Serialization();
-            savefile << data;
+            this->WriterToStream(savefile);
             savefile.close();
             return true;
         }
         return false;
     }
 
-    const std::string &RapidJsonWriter::Serialization()
+    bool RapidJsonWriter::WriterToStream(std::ostream & os)
     {
-        this->jsonWriter->EndObject();
-        const char *str = this->strBuf.GetString();
-        const size_t lenght = this->strBuf.GetSize();
-        mTempString.clear();
-        mTempString.append(str, lenght);
-        delete this->jsonWriter;
-        this->jsonWriter = nullptr;
-        return mTempString;
-    }
-    bool RapidJsonWriter::AddParameter(const char *key)
-    {
-        if (this->jsonWriter != nullptr)
+        if(this->jsonWriter.EndObject())
         {
-            jsonWriter->Key(key);
-            jsonWriter->Null();
+            const char *str = this->strBuf.GetString();
+            const size_t lenght = this->strBuf.GetSize();
+            os.write(str, lenght);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool RapidJsonWriter::WriterToStream(std::string &os)
+    {
+        if (this->jsonWriter.EndObject())
+        {
+            os.clear();
+            const char *str = this->strBuf.GetString();
+            const size_t lenght = this->strBuf.GetSize();
+            os.append(str, lenght);
             return true;
         }
         return false;
+    }
+    bool RapidJsonWriter::AddParameter(const char *key)
+    {
+        return jsonWriter.Key(key) &&
+               jsonWriter.Null();
     }
 }// namespace GameKeeper
 

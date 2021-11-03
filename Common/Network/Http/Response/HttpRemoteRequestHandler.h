@@ -5,33 +5,32 @@
 #ifndef GameKeeper_HTTPREMOTEREQUEST_H
 #define GameKeeper_HTTPREMOTEREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
-#include <Network/Http/Response/HttpContent.h>
-
-
+#include <Network/Http/Content/HttpWriteContent.h>
 
 namespace GameKeeper
 {
     class HttpRemoteSession;
     class HttpClientComponent;
 
-    class HttpRemoteRequest : public HttpHandlerBase
+    class HttpRemoteRequestHandler : public HttpHandlerBase
     {
     public:
-        HttpRemoteRequest(HttpClientComponent *component, HttpRemoteSession *session);
+        explicit HttpRemoteRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
 
-        virtual ~HttpRemoteRequest();
+         ~HttpRemoteRequestHandler() ;
 
     public:
         void SetCode(HttpStatus code);
 
-        bool SetContent(HttpContent * httpContent);
+        bool SetContent(HttpWriteContent * httpContent);
 
         bool SetHeard(const std::string &key, const std::string &val);
 
-        virtual HttpMethodType GetMethodType() = 0;
     public:
 
         bool WriterToBuffer(std::ostream &os) override;
+
+        void OnSessionError(const asio::error_code &code) override;
 
         const std::string & GetPath() { return this->mPath;}
 
@@ -43,11 +42,13 @@ namespace GameKeeper
 
 		const std::string & GetServiceName() { return this->mService; }
 
+        XCode GetErrorCode() { return this->mCode; }
+
+        void OnWriterAfter() override;
+
     protected:
 
-        bool NoticeMainThread();
-
-        bool OnSessionError(const asio::error_code &code) override;
+        void SetCode(XCode code);
 
 	protected:
 		std::string mMethod;
@@ -58,9 +59,13 @@ namespace GameKeeper
         HttpRemoteSession *mHttpSession;
         HttpClientComponent *mHttpComponent;
     private:
+#ifdef __DEBUG__
+      long long mStartTime;
+#endif
+        XCode mCode;
         int mWriteCount;
         HttpStatus mHttpCode;
-        HttpContent * mHttpContent;
+        HttpWriteContent * mHttpContent;
         std::unordered_map<std::string, std::string> mHeardMap;
     };
 }

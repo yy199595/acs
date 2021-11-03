@@ -18,11 +18,11 @@ namespace GameKeeper
 		SocketType GetSocketType() override { return SocketType::LocalSocket; }
 		void StartConnectHost(const std::string & host, const std::string & port);
 	protected:
-        void OnSendHttpMessageAfter() override;
+        void OnWriteAfter() override;
         bool WriterToBuffer(std::ostream & os) override;
+        void OnReceiveBody(asio::streambuf & buf) override;
         void OnSocketError(const asio::error_code &err) override;
-        bool OnReceiveBody(asio::streambuf & buf, const asio::error_code & code) override;
-		bool OnReceiveHeard(asio::streambuf & buf,size_t  size, const asio::error_code & code) override;
+		bool OnReceiveHeard(asio::streambuf & buf,size_t  size) override;
 
 	private:
 		void Resolver();

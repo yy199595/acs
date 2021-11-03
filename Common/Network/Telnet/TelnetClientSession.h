@@ -7,8 +7,8 @@ namespace GameKeeper
 	class TelnetClientSession : public SessionBase
 	{
 	public:
-		TelnetClientSession(ISocketHandler * handler);
-		~TelnetClientSession();
+		 explicit TelnetClientSession(ISocketHandler * handler);
+		~TelnetClientSession() override = default;
 
     public:
         SocketType GetSocketType() override { return SocketType::RemoteSocket;}

@@ -4,12 +4,7 @@
 namespace GameKeeper
 {
 	TelnetClientSession::TelnetClientSession(ISocketHandler * hanlder)
-		:SessionBase(hanlder),mDelim("\r\n")
-	{
-
-	}
-
-	TelnetClientSession::~TelnetClientSession()
+		:SessionBase(hanlder, "RemoteTelnetSession"),mDelim("\r\n")
 	{
 
 	}

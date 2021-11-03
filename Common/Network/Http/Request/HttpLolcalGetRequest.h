@@ -12,7 +12,7 @@ namespace GameKeeper
 		XCode Get(const std::string & url, std::string & response);
 	protected:
 		bool WriterToBuffer(std::ostream & os) override;
-        bool OnReceiveBody(asio::streambuf & buf) override;
+        void OnReceiveBody(asio::streambuf & buf) override;
 	private:
 		std::string * mResponse;
 	};

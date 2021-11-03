@@ -11,7 +11,6 @@
 #endif
 namespace GameKeeper
 {
-    TcpClientComponent::TcpClientComponent() = default;
     bool TcpClientComponent::Awake()
     {
 		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());

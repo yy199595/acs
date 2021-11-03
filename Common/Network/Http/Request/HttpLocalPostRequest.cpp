@@ -12,24 +12,23 @@ namespace GameKeeper
     {
         this->mCorId = 0;
         this->mResponse = nullptr;
-        this->mPostData = nullptr;
+        this->mPostContent = nullptr;
     }
-    XCode HttpLocalPostRequest::Post(const std::string &url, const std::string &data, std::string &response)
+    XCode HttpLocalPostRequest::Post(const std::string &url, HttpWriteContent & content, std::string &response)
     {
-        this->mPostData = &data;
         this->mResponse = &response;
+        this->mPostContent = &content;
         return this->StartHttpRequest(url);
     }
 
-    bool HttpLocalPostRequest::OnReceiveBody(asio::streambuf &buf)
+    void HttpLocalPostRequest::OnReceiveBody(asio::streambuf &buf)
     {
         std::istream is(&buf);
-        while(buf.size() > 0)
+        while(buf.size() > 0 && this->mPostContent)
         {
            size_t size = is.readsome(this->mHandlerBuffer, 1024);
            this->mResponse->append(this->mHandlerBuffer, size);
         }
-        return true;
     }
 
     bool HttpLocalPostRequest::WriterToBuffer(std::ostream &os)
@@ -37,11 +36,9 @@ namespace GameKeeper
         os << "POST " << this->mPath << " HTTP/1.0\r\n";
         os << "Host: " << this->mHost << ":" << this->mPort << "\r\n";
         os << "Accept: */*\r\n";
-        os << "Content-Length: " << this->mPostData->length() << "\r\n";
+        os << "Content-Length: " << this->mPostContent->GetContentSize() << "\r\n";
         os << "Content-Type: application/x-www-form-urlencoded\r\n";
         os << "Connection: close\r\n\r\n";
-        os << (*this->mPostData);
-		return true;
+		return this->mPostContent->GetContent(os);
     }
-
 }

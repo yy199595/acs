@@ -32,7 +32,7 @@ namespace GameKeeper
                 const std::string &val = tempArray2[1];
                 this->mHeardMap.insert(std::make_pair(key, val));
 #ifdef __DEBUG__
-                GKDebugWarning(key << "  =  " << val);
+                //GKDebugWarning(key << "  =  " << val);
 #endif
             }
         }

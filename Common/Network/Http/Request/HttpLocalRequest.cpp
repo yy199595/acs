@@ -44,15 +44,10 @@ namespace GameKeeper
         taskScheduler.AddMainTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
     }
 
-    bool HttpLocalRequest::OnSessionError(const asio::error_code &code)
+    void HttpLocalRequest::OnSessionError(const asio::error_code &code)
     {
-        if (code == asio::error::eof)
-        {
-            this->SetCode(XCode::Successful);
-            return false;
-        }
-        this->SetCode(XCode::HttpNetWorkError);
-        return false;
+        this->SetCode(code == asio::error::eof
+                      ? XCode::Successful : XCode::HttpNetWorkError);
     }
 
     bool HttpLocalRequest::OnReceiveHeard(asio::streambuf &buf, size_t size)

@@ -27,7 +27,7 @@ namespace GameKeeper
 	class SessionBase
 	{
 	public:
-		explicit SessionBase(ISocketHandler *handler);
+		explicit SessionBase(ISocketHandler *handler, const std::string & name);
 
 		virtual ~SessionBase();
 
@@ -40,6 +40,7 @@ namespace GameKeeper
 
 	public:
 
+        const std::string & GetName() { return this->mName;}
 		const std::string &GetAddress() { return this->mAddress; }
 
 	public:
@@ -77,6 +78,7 @@ namespace GameKeeper
         std::atomic_bool mIsOpen;
 		MainTaskScheduler &mTaskScheduler;
 	private:
+        std::string mName;
 		AsioContext &mContext;
 
 	};

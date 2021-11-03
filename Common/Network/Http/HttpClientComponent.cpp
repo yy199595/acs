@@ -11,8 +11,8 @@
 #include <Network/Http/Request/HttpLolcalGetRequest.h>
 #include <Network/Http/Request/HttpLocalPostRequest.h>
 #include <Method/HttpServiceMethod.h>
-#include <Network/Http/Response/HttpContent.h>
-#include <Network/Http/Response/HttpRemoteGetRequest.h>
+#include <Network/Http/Content/HttpWriteContent.h>
+#include <Network/Http/Response/HttpRemoteGetRequestHandler.h>
 #include <HttpService/HttpServiceComponent.h>
 namespace GameKeeper
 {
@@ -23,7 +23,6 @@ namespace GameKeeper
 
     bool HttpClientComponent::Awake()
     {
-        this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
         this->mCorComponent = this->GetComponent<CoroutineComponent>();
         return true;
     }
@@ -36,59 +35,45 @@ namespace GameKeeper
         this->Get(url, json);
 
         GKDebugFatal(json.size());
-        this->Get("http://yjz199595.com/api/account/login?account=646585122@qq.com&passwd=11223344", json);
+        //this->Get("http://127.0.0.1:80/App/HttpDownloadService/Files/*", json);
 
         GKDebugFatal(json);
     }
 
-    HttpRemoteRequest *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
+    HttpRemoteRequestHandler *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
     {
         if (method == "GET")
         {
-            return new HttpRemoteGetRequest(this, session);
+            return new HttpRemoteGetRequestHandler(this, session);
         }
         return nullptr;
     }
 
-    void HttpClientComponent::HandlerHttpRequest(HttpRemoteRequest *remoteRequest)
+    void HttpClientComponent::HandlerHttpRequest(HttpRemoteRequestHandler *remoteRequest)
     {
-		const std::string & method = remoteRequest->GetMethodName();
-		const std::string & service = remoteRequest->GetServiceName();
-		auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
-		if (httpService == nullptr)
-		{
-			remoteRequest->SetCode(HttpStatus::NOT_FOUND);
-			return;
-		}
-
-		HttpServiceMethod * httpMethod = httpService->GetMethod(method);
-		if (httpMethod == nullptr)
-		{
-			remoteRequest->SetCode(HttpStatus::NOT_FOUND);
-			return;
-		}
-
-		HttpStatus code = httpMethod->Invoke(remoteRequest);
-		remoteRequest->SetCode(code);
-    }
-
-    HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &path)
-    {
-		std::vector<std::string> tempArray;
-		StringHelper::SplitString(path, "/", tempArray);
-		if (tempArray.size() != 3)
-		{
-			return nullptr;
-		}
-		const std::string & service = tempArray[1];
+        if(remoteRequest->GetErrorCode() != XCode::Successful)
+        {
+            delete remoteRequest;
+            return;
+        }
+        const std::string &method = remoteRequest->GetMethodName();
+        const std::string &service = remoteRequest->GetServiceName();
         auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
         if (httpService == nullptr)
         {
-            return nullptr;
+            remoteRequest->SetCode(HttpStatus::NOT_FOUND);
+            return;
         }
-        return httpService->GetMethod(path);
-    }
 
+        HttpServiceMethod *httpMethod = httpService->GetMethod(method);
+        if (httpMethod == nullptr)
+        {
+            remoteRequest->SetCode(HttpStatus::NOT_FOUND);
+            return;
+        }
+        remoteRequest->SetCode(httpMethod->Invoke(remoteRequest));
+        //this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, httpMethod, remoteRequest);
+    }
 
     XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
     {
@@ -107,49 +92,47 @@ namespace GameKeeper
 
     XCode HttpClientComponent::Post(const std::string &url, const std::string & data, std::string &response, int timeout)
     {
-        HttpLocalPostRequest localPostRequest(this);
-#ifdef __DEBUG__
-        long long t1 = TimeHelper::GetMilTimestamp();
-        XCode code = localPostRequest.Post(url, data, response);
-        long long t2 = TimeHelper::GetMilTimestamp();
-        GKDebugInfo("post " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
-		return code;
-#else
-        return localPostRequest.Post(url, data, response);
-#endif
-    }
-
-    XCode HttpClientComponent::Post(const std::string &url, std::string &response, int timeout)
-    {
-        const size_t pos = url.find('?');
-        if (pos == std::string::npos)
-        {
-            return XCode::HttpUrlParseError;
-        }
-        std::string heard = url.substr(0, pos);
-        std::string data = url.substr(pos + 1, url.size() - pos);
-        return this->Post(heard, data, response);
+        HttpWriteStringContent content(data);
+        return this->Post(url, content, response, timeout);
     }
 
     XCode HttpClientComponent::Post(const std::string &url, const std::unordered_map<std::string, std::string> &data,
                                     std::string &response, int timeout)
     {
-        if(data.empty())
+        if (data.empty())
         {
             return XCode::HttpUrlParseError;
         }
-        std::string parameter;
-        for(auto iter = data.begin(); iter != data.end(); iter++)
+        HttpJsonContent jsonContent;
+        for (const auto &iter: data)
         {
-            if (iter != data.begin())
-            {
-                parameter.append("&");
-            }
-            const std::string &key = iter->first;
-            const std::string &val = iter->second;
-            parameter += (key + '=' + val);
+            const std::string &key = iter.first;
+            const std::string &val = iter.second;
+            jsonContent.AddParameter(key.c_str(), val);
         }
-        return this->Post(url, parameter, response);
+        return this->Post(url, jsonContent, response, timeout);
+    }
+
+    XCode HttpClientComponent::Post(const std::string & url, HttpWriteContent & content, std::string & response, int timeout)
+    {
+        HttpLocalPostRequest localPostRequest(this);
+#ifdef __DEBUG__
+        long long t1 = TimeHelper::GetMilTimestamp();
+        XCode code = localPostRequest.Post(url, content, response);
+        long long t2 = TimeHelper::GetMilTimestamp();
+        GKDebugInfo("post " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
+        return code;
+#else
+        return localPostRequest.Post(url, content, response);
+#endif
+    }
+
+    void HttpClientComponent::Invoke(HttpServiceMethod *method, HttpRemoteRequestHandler *remoteRequest)
+    {
+        HttpStatus code = method->Invoke(remoteRequest);
+        this->mCorComponent->YieldReturn();
+        remoteRequest->SetCode(code);
+
     }
 
 }

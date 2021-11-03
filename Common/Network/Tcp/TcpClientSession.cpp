@@ -3,8 +3,8 @@
 
 namespace GameKeeper
 {
-    TcpClientSession::TcpClientSession(ISocketHandler * handler)
-            : SessionBase(handler)
+    TcpClientSession::TcpClientSession(ISocketHandler * handler, const std::string & name)
+            : SessionBase(handler, name)
     {      
 		this->mReceiveBufferSize = 1024;
 		this->mReceiveMsgBuffer = nullptr;
