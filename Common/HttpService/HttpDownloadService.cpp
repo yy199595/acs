@@ -4,7 +4,6 @@
 #include "HttpDownloadService.h"
 #include <Core/App.h>
 #include <Util/DirectoryHelper.h>
-#include <Util/JsonHelper.h>
 #include <Network/Http/Response/HttpRemoteGetRequestHandler.h>
 namespace GameKeeper
 {

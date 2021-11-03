@@ -104,6 +104,10 @@ namespace GameKeeper
             //GKDebugLog("http heard legth = " << pos1);
             if(this->OnReceiveHeard(mStreamBuf, pos1))
             {
+                if(this->mStreamBuf.size() > 0)
+                {
+                    this->OnReceiveBody(this->mStreamBuf);
+                }
                 this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
             }
         }
@@ -114,6 +118,7 @@ namespace GameKeeper
         if(err)
         {
             this->OnSocketError(err);
+            GKDebugError(err.message());
             return;
         }
         this->OnReceiveBody(this->mStreamBuf);

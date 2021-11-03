@@ -64,14 +64,15 @@ namespace GameKeeper
             if (err)
             {
                 this->mHttpHandler->OnSessionError(err);
+                GKDebugError("resolver " << this->mHost << ":" << this->mPort << " failure : " << err.message());
                 return;
             }
-            asio::ip::tcp::resolver::iterator end;
-            for (auto iter = iterator; iter != end; iter++)
-            {
-                GKDebugInfo(this->mHost << " : "
-                                           << (*iter).endpoint().address().to_string());
-            }
+//            asio::ip::tcp::resolver::iterator end;
+//            for (auto iter = iterator; iter != end; iter++)
+//            {
+//                GKDebugInfo(this->mHost << " : "
+//                                           << (*iter).endpoint().address().to_string());
+//            }
 			asio::async_connect(this->GetSocket(), iterator,
 				std::bind(&HttpLocalSession::ConnectHandler, this, args1));
         });
@@ -91,8 +92,12 @@ namespace GameKeeper
         if (err)
         {
             this->mHttpHandler->OnSessionError(err);
+            GKDebugError("connect " << this->mHost << ":" << this->mPort << " failure : " << err.message());
             return;
         }
+        this->mAddress = this->mSocket->remote_endpoint().address().to_string()
+                         + ":" + std::to_string(this->mSocket->remote_endpoint().port());
+        GKDebugLog("connect to " << this->mHost << ":" << this->mPort << " successful");
         this->StartSendHttpMessage();
     }
 

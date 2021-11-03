@@ -9,9 +9,8 @@ namespace GameKeeper
 		this->mResponse = nullptr;
 	}
 
-	XCode HttpLolcalGetRequest::Get(const std::string & url, std::string & response)
+	XCode HttpLolcalGetRequest::Get(const std::string & url, HttpReadContent & response)
 	{
-        response.clear();
 		this->mResponse = &response;
         return this->StartHttpRequest(url);
 	}
@@ -31,7 +30,7 @@ namespace GameKeeper
         while(buf.size() > 0)
         {
             size_t size = is.readsome(this->mHandlerBuffer, 1024);
-            this->mResponse->append(this->mHandlerBuffer, size);
+            this->mResponse->OnReadContent(this->mHandlerBuffer, size);
         }
 	}
 }

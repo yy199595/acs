@@ -146,8 +146,6 @@ namespace GameKeeper
     {
         if (!document.Parse(str, size).HasParseError())
         {
-            this->mJsonString = "";
-            this->mJsonString.append(str, size);
             return true;
         }
         return false;
@@ -165,10 +163,10 @@ namespace GameKeeper
     }
     bool RapidJsonReader::TryParse(const std::string &str)
     {
-        if (!document.Parse(str.c_str(), str.size()).HasParseError())
+        const char * data = str.c_str();
+        const size_t size = str.length();
+        if (!document.Parse(data, size).HasParseError())
         {
-            this->mJsonString = "";
-            this->mJsonString.append(str);
             return true;
         }
         return false;

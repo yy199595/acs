@@ -57,7 +57,7 @@ namespace GameKeeper
 
     bool HttpRemoteRequestHandler::WriterToBuffer(std::ostream &os)
     {
-        if(this->mWriteCount == 0)
+        if (this->mWriteCount == 0)
         {
             os << this->mVersion << " " << (int) this->mHttpCode
                << " " << HttpStatusToString(this->mHttpCode) << "\r\n";
@@ -67,6 +67,8 @@ namespace GameKeeper
                 os << "Content-Length:" << size << "\r\n";
                 GKDebugWarning("content size = " << size);
             }
+            os << "Server:" << "GameKeeper" << "\r\n";
+            os << "Connection:close" << "\r\n";
             auto iter = this->mHeardMap.begin();
             for (; iter != this->mHeardMap.end(); iter++)
             {
@@ -77,7 +79,7 @@ namespace GameKeeper
             os << "\r\n";
         }
         this->mWriteCount++;
-        if(this->mHttpContent == nullptr)
+        if (this->mHttpContent == nullptr)
         {
             return true;
         }

@@ -4,7 +4,6 @@
 #include <Pool/StringPool.h>
 namespace GameKeeper
 {
-
 	SessionBase::SessionBase(ISocketHandler * handler, const std::string & name)
 		: mHandler(*handler) , mName(name),
 		mTaskScheduler(App::Get().GetTaskScheduler()),

@@ -14,6 +14,7 @@
 #include <Network/Http/Content/HttpWriteContent.h>
 #include <Network/Http/Response/HttpRemoteGetRequestHandler.h>
 #include <HttpService/HttpServiceComponent.h>
+
 namespace GameKeeper
 {
     SessionBase *HttpClientComponent::CreateSocket()
@@ -30,14 +31,15 @@ namespace GameKeeper
 	void HttpClientComponent::Start()
     {
         std::string json;
-        const std::string url = "http://lrs-oss.whitewolvesx.com/app/default/boy.png";
+        const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
         this->Get(url, json);
 
         GKDebugFatal(json.size());
-        //this->Get("http://127.0.0.1:80/App/HttpDownloadService/Files/*", json);
+        const std::string path = App::Get().GetDownloadPath() + "3344.jpg";
+        this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/1122.jpg", path);
 
-        GKDebugFatal(json);
+        //GKDebugFatal(json);
     }
 
     HttpRemoteRequestHandler *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
@@ -75,17 +77,37 @@ namespace GameKeeper
         //this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, httpMethod, remoteRequest);
     }
 
-    XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
+    XCode HttpClientComponent::Download(const std::string &url, const std::string &path, int timeout)
     {
+        HttpReadFileContent content(path);
+        if(!content.OpenFile())
+        {
+            return XCode::Failure;
+        }
         HttpLolcalGetRequest httpGetRequest(this);
 #ifdef __DEBUG__
         long long t1 = TimeHelper::GetMilTimestamp();
-        XCode code = httpGetRequest.Get(url, json);
+        XCode code = httpGetRequest.Get(url, content);
         long long t2 = TimeHelper::GetMilTimestamp();
         GKDebugInfo("get " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
         return code;
 #else
-        return httpGetRequest.Get(url, json);
+        return httpGetRequest.Get(url, content);
+#endif
+    }
+
+    XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
+    {
+        HttpReadStringContent content(json);
+        HttpLolcalGetRequest httpGetRequest(this);
+#ifdef __DEBUG__
+        long long t1 = TimeHelper::GetMilTimestamp();
+        XCode code = httpGetRequest.Get(url, content);
+        long long t2 = TimeHelper::GetMilTimestamp();
+        GKDebugInfo("get " << url << " use time [" << (t2 - t1) / 1000.f << "s]");
+        return code;
+#else
+        return httpGetRequest.Get(url, content);
 #endif
     }
 

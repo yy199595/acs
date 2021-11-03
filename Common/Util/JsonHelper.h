@@ -63,10 +63,7 @@ namespace GameKeeper
         bool TryGetValue(const char *key, std::vector<std::string> &data);
         bool TryGetValue(const char *key, google::protobuf::Message &data);
 
-        std::string &GetJsonString() { return this->mJsonString; }
-
     private:
-        std::string mJsonString;
         rapidjson::Document document;
         typedef rapidjson::Document::MemberIterator MemberIter;
     };
