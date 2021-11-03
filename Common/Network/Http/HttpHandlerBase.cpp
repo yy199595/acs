@@ -22,7 +22,7 @@ namespace GameKeeper
 
         std::vector<std::string> tempArray1;
         std::vector<std::string> tempArray2;
-        StringHelper::SplitString(heard, "\n", tempArray1);
+        StringHelper::SplitString(heard, "\r\n", tempArray1);
         for (const std::string &line: tempArray1)
         {
             StringHelper::SplitString(line, ":", tempArray2);
@@ -36,6 +36,12 @@ namespace GameKeeper
 #endif
             }
         }
+		std::string data;
+		this->mContentLength = 0;
+		if (this->GetHeardData("Content-Length", data))
+		{
+			this->mContentLength = std::stoul(data);
+		}
     }
 	bool HttpHandlerBase::GetHeardData(const std::string & key, std::string & value)
 	{

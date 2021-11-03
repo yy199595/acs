@@ -33,11 +33,11 @@ namespace GameKeeper
         std::string json;
         const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-        this->Get(url, json);
+        //this->Get(url, json);
 
         GKDebugFatal(json.size());
-        const std::string path = App::Get().GetDownloadPath() + "3344.jpg";
-        this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/1122.jpg", path);
+        const std::string path = App::Get().GetDownloadPath() + "1122.mp4";
+        //this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/1-2.mp4", path);
 
         //GKDebugFatal(json);
     }
@@ -60,6 +60,7 @@ namespace GameKeeper
         }
         const std::string &method = remoteRequest->GetMethodName();
         const std::string &service = remoteRequest->GetServiceName();
+		GKDebugWarning("http call " << service << "." << method);
         auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
         if (httpService == nullptr)
         {

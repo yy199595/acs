@@ -41,13 +41,8 @@ namespace GameKeeper
             GKDebugError("create dir " << dir << " failure");
             return false;
         }
-        this->mFileStream.open(this->mPath);
-        if(!this->mFileStream.is_open())
-        {
-            GKDebugError("open or create " << this->mPath << " failure");
-            return false;
-        }
-        return true;
+		return true;
+       
     }
 
 
@@ -61,12 +56,16 @@ namespace GameKeeper
 
     void HttpReadFileContent::OnReadContent(const char *data, size_t size)
     {
-        if(!this->mFileStream.is_open())
-        {
-            GKDebugError("writer file to " << this->mPath << " failure");
-            return;
-        }
-        this->mFileStream.write(data, size);
-        GKDebugWarning("writer to file " << size);
+		if (!this->mFileStream.is_open())
+		{
+			this->mFileStream.open(this->mPath, std::ios::out | std::ios::binary);
+		}		
+		if (!this->mFileStream.is_open())
+		{
+			GKDebugError("open or create " << this->mPath << " failure");
+			return;
+		}
+		this->mFileStream.write(data, size);
+        //GKDebugWarning("writer to file " << size);
     }
 }

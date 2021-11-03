@@ -44,6 +44,7 @@ namespace GameKeeper
 
     void HttpRemoteRequestHandler::SetCode(XCode code)
     {
+		this->mCode = code;
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
     }

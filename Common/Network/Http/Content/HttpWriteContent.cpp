@@ -51,12 +51,12 @@ namespace GameKeeper
             size_t size = this->mFileStream.read(this->mBuffer, 1024).gcount();
             os.write(this->mBuffer, size);
 #ifdef __DEBUG__
-//            this->mSendSize += size;
-//            size_t size1 = this->mSendSize / 1024;
-//            size_t size2 = this->mFileSize / 1024;
-//            double process = this->mSendSize / (double) this->mFileSize;
-//            GKDebugError("send " << this->mPath << "[" << size1 << "kb/" << size2
-//                                 << "kb] [" << process * 100 << "%]");
+           /* this->mSendSize += size;
+            size_t size1 = this->mSendSize / 1024;
+            size_t size2 = this->mFileSize / 1024;
+            double process = this->mSendSize / (double) this->mFileSize;
+            GKDebugError("send " << this->mPath << "[" << size1 << "kb/" << size2
+                                 << "kb] [" << process * 100 << "%]");*/
         if(this->mFileStream.eof())
         {
             double mb = this->mFileSize / (1024.0f * 1024);
@@ -73,7 +73,7 @@ namespace GameKeeper
     {
         if(!this->mFileStream.is_open())
         {
-            this->mFileStream.open(this->mPath, std::ios::binary);
+            this->mFileStream.open(this->mPath, std::ios::in | std::ios::binary);
             if(this->mFileStream.is_open())
             {
                 this->mFileSize = this->mFileStream.seekg(0, std::ios_base::end).tellg();

@@ -16,5 +16,9 @@ namespace GameKeeper
         void OnReceiveBody(asio::streambuf & buf) override;
 	private:
         HttpReadContent * mResponse;
+#ifdef __DEBUG__
+		size_t mCurrentLength;
+#endif // __DEBUG__
+
 	};
 }
