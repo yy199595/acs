@@ -66,6 +66,7 @@ namespace GameKeeper
         ~HttpJsonContent() override = default;
     public:
         size_t GetContentSize() override;
+    public:
         bool GetContent(std::ostream &os) override;
     };
 }

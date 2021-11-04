@@ -133,6 +133,7 @@ namespace GameKeeper
         }
         return false;
     }
+
     bool RapidJsonWriter::AddParameter(const char *key)
     {
         return jsonWriter.Key(key) &&
@@ -275,7 +276,7 @@ namespace GameKeeper
                 {
                     const char *str = arrayIter->value.GetString();
                     const size_t size = arrayIter->value.GetStringLength();
-                    data.push_back(std::string(str, size));
+                    data.emplace_back(str, size);
                 }
             }
             return true;
@@ -291,7 +292,6 @@ namespace GameKeeper
             const size_t size = iter->value.GetStringLength();
             return data.ParseFromArray(str, size);
         }
-        return false;
         return false;
     }
     bool RapidJsonReader::TryGetValue(const char *key, std::string &data)

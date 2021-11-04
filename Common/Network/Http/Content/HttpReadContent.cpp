@@ -66,6 +66,5 @@ namespace GameKeeper
 			return;
 		}
 		this->mFileStream.write(data, size);
-        //GKDebugWarning("writer to file " << size);
     }
 }

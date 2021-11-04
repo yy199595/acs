@@ -18,6 +18,8 @@ namespace GameKeeper
         HttpStatus Download(HttpRemoteRequestHandler * handler);
     protected:
         bool Awake() override;
+    private:
+        std::unordered_map<std::string, std::string> mFileMd5Map;
     };
 }
 

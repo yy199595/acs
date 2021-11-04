@@ -38,9 +38,10 @@ namespace GameKeeper
     {
     public:
         explicit HttpReadFileContent(const std::string & path);
-        ~HttpReadFileContent();
+        ~HttpReadFileContent() override;
     public:
         bool OpenFile();
+        const std::string & GetPaht() { return this->mPath;}
         void OnReadContent(const char *data, size_t size) override;
     private:
         const std::string & mPath;

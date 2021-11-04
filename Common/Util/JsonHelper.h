@@ -29,12 +29,10 @@ namespace GameKeeper
 
     public:
         bool SaveJsonToFile(const char *path);
+        virtual bool WriterToStream(std::string & os);
+        virtual bool WriterToStream(std::ostream & os);
 
-        bool WriterToStream(std::string & os);
-        bool WriterToStream(std::ostream & os);
-
-        size_t GetJsonSize() { return this->strBuf.GetLength();}
-    private:
+    protected:
         rapidjson::StringBuffer strBuf;
         rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;
     };

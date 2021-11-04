@@ -46,9 +46,14 @@ namespace GameKeeper
 
         void OnWriterAfter() override;
 
+        bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
+
     protected:
 
-        void SetCode(XCode code);
+        virtual void SetCode(XCode code);
+
+        virtual bool ParseUrl(const std::string & path);
+
 
 	protected:
 		std::string mMethod;

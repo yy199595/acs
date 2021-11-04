@@ -14,7 +14,7 @@ namespace GameKeeper
         using HttpRemoteRequestHandler::HttpRemoteRequestHandler;
         ~HttpRemoteGetRequestHandler() override = default;
     public:
-        const std::string & GetPath() { return this->mPath;}
+
 
 		bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
@@ -24,10 +24,7 @@ namespace GameKeeper
 
         void OnReceiveBody(asio::streambuf &buf) override { }
 
-        bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
-
-	private:
-		bool ParseUrl(const std::string & path);
+        bool ParseUrl(const std::string &path) override;
 
     private: // 请求参数
 		std::string mParamater;		

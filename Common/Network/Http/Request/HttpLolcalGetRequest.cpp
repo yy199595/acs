@@ -29,23 +29,25 @@ namespace GameKeeper
 	}
 
 	void HttpLolcalGetRequest::OnReceiveBody(asio::streambuf & buf)
-	{
-		std::istream is(&buf);
-		while (buf.size() > 0)
-		{
-			size_t size = is.readsome(this->mHandlerBuffer, 1024);
-			this->mResponse->OnReadContent(this->mHandlerBuffer, size);
+    {
+        std::istream is(&buf);
+        while (buf.size() > 0)
+        {
+            size_t size = is.readsome(this->mHandlerBuffer, 1024);
+            this->mResponse->OnReadContent(this->mHandlerBuffer, size);
 #ifdef __DEBUG__
-			/*size_t dataLength = this->GetContentLength();
-			if (dataLength > 0)
-			{
-				this->mCurrentLength += size;
-				double sum = dataLength / (1024 * 1024.0f);
-				double mb = this->mCurrentLength / (1024 * 1024.0f);
-				GKDebugInfo("load data [" << mb << "mb/" << sum << "mb]");
-			}*/
+            auto fileContent = dynamic_cast<HttpReadFileContent *>(this->mResponse);
+            if (fileContent != nullptr)
+            {
+                size_t dataLength = this->GetContentLength();
+                if (dataLength > 0)
+                {
+                    this->mCurrentLength += size;
+                    size_t process = this->mCurrentLength * 1000 / dataLength;
+                    GKDebugInfo("download file " << fileContent->GetPaht() << " [" << process / 10.0f << "%]");
+                }
+            }
 #endif // __DEBUG__
-
-		}
-	}
+        }
+    }
 }

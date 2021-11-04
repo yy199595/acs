@@ -98,6 +98,22 @@ namespace GameKeeper
         return false;
     }
 
+    bool HttpRemoteRequestHandler::OnReceiveHeard(asio::streambuf &buf, size_t size)
+    {
+        std::string path;
+        std::istream is(&buf);
+        is >> path >> this->mVersion;
+        this->ParseHeard(buf, size - (size - buf.size()));
+
+        if (!this->ParseUrl(path))
+        {
+            this->SetCode(HttpStatus::NOT_FOUND);
+            return false;
+        }
+        this->SetCode(XCode::Successful);
+        return false;
+    }
+
     bool HttpRemoteRequestHandler::SetContent(HttpWriteContent *httpContent)
     {
         if (this->mHttpContent != nullptr || httpContent == nullptr)
@@ -105,6 +121,30 @@ namespace GameKeeper
             return false;
         }
         this->mHttpContent = httpContent;
+        return true;
+    }
+
+    bool HttpRemoteRequestHandler::ParseUrl(const std::string & path)
+    {
+        const static std::string & app = "App/";
+        size_t pos1 = path.find(app, 1);
+        if (pos1 == std::string::npos)
+        {
+            return false;
+        }
+        size_t pos2 = path.find('/', pos1 + app.size());
+        if (pos2 == std::string::npos)
+        {
+            return false;
+        }
+        size_t pos3 = path.find('/', pos2);
+        size_t pos4 = path.find('/', pos3 + 1);
+        if (pos3 == std::string::npos)
+        {
+            return false;
+        }
+        this->mService = path.substr(pos1 + app.size(), pos2 - app.size() - 1);
+        this->mMethod = path.substr(pos3 + 1, pos4 - pos3 - 1);
         return true;
     }
 }

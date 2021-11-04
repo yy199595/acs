@@ -36,8 +36,8 @@ namespace GameKeeper
         //this->Get(url, json);
 
         GKDebugFatal(json.size());
-        const std::string path = App::Get().GetDownloadPath() + "1122.mp4";
-        //this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/1-2.mp4", path);
+        const std::string path = App::Get().GetDownloadPath() + "1995.xlsx";
+        this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/3344.xlsx", path);
 
         //GKDebugFatal(json);
     }
@@ -74,8 +74,7 @@ namespace GameKeeper
             remoteRequest->SetCode(HttpStatus::NOT_FOUND);
             return;
         }
-        remoteRequest->SetCode(httpMethod->Invoke(remoteRequest));
-        //this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, httpMethod, remoteRequest);
+        this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, httpMethod, remoteRequest);
     }
 
     XCode HttpClientComponent::Download(const std::string &url, const std::string &path, int timeout)
@@ -152,10 +151,7 @@ namespace GameKeeper
 
     void HttpClientComponent::Invoke(HttpServiceMethod *method, HttpRemoteRequestHandler *remoteRequest)
     {
-        HttpStatus code = method->Invoke(remoteRequest);
-        this->mCorComponent->YieldReturn();
-        remoteRequest->SetCode(code);
-
+        remoteRequest->SetCode(method->Invoke(remoteRequest));
     }
 
 }
