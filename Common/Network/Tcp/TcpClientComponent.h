@@ -8,54 +8,54 @@
 namespace GameKeeper
 {
 	// 管理所有session
-	class TcpClientComponent : public Component, public SocketHandler<TcpClientSession>
+	class TcpClientComponent : public Component, public ISocketListen
 	{
 	public:
+		friend TcpClientSession;
 		TcpClientComponent() = default;
 
 		~TcpClientComponent() override = default;
-
-    protected:
-
-        void OnCloseSession(TcpClientSession * socket) override;
-        bool OnReceiveMessage(TcpClientSession * session, const string & message) override;
-        void OnSessionError(TcpClientSession * session, const asio::error_code & err) override;
-        void OnListenNewSession(TcpClientSession * session, const asio::error_code & err) override;
-        void OnConnectRemoteAfter(TcpClientSession * session, const asio::error_code & err) override;
-        void OnSendMessageAfter(TcpClientSession *session, const std::string &message, const asio::error_code &err) override;
 	public:
-        TcpLocalSession * GetLocalSession(const std::string & address);
-        TcpClientSession * GetRemoteSession(const std::string & address);
-        SessionBase * CreateSocket() override { return new TcpClientSession(this, "TcpRemoteSession");}
-        TcpLocalSession * NewSession(const std::string &name, const std::string & ip, unsigned short port);
+		void OnCloseSession(TcpClientSession * socket);
+		void OnReceiveMessage(TcpClientSession * session, string * message);
+		void OnSendMessageAfter(TcpClientSession *session, std::string * message, bool);
+		void OnConnectRemoteAfter(TcpLocalSession * session, const asio::error_code & err);
+    protected:
+		void OnListen(SocketProxy * socket); 
+	public:
+        TcpLocalSession * GetLocalSession(long long id);
+        TcpClientSession * GetRemoteSession(long long id);
+        long long NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;
 		void OnDestory() override;
 
 	public:
-		bool CloseSession(const std::string &address);
-		bool SendByAddress(const std::string & address, std::string * message);
-		bool SendByAddress(const std::string & address, com::DataPacket_Request & message);
-		bool SendByAddress(const std::string & address, com::DataPacket_Response & message);
+		bool CloseSession(long long id);
+		bool SendByAddress(long long id, std::string * message);
+		bool SendByAddress(long long id, com::DataPacket_Request & message);
+		bool SendByAddress(long long id, com::DataPacket_Response & message);
 
     public:
         std::string * Serialize(const com::DataPacket_Request & message);
         std::string * Serialize(const com::DataPacket_Response & message);
     private:
-
-		TcpClientSession *GetSession(const std::string &address);
+		
+		TcpClientSession *GetSession(long long id);
+		bool OnReceive(TcpClientSession *, const std::string & message);
 
 	private:
+		class TaskPoolComponent * mTaskComponent;
 		class TcpClientComponent *mNetWorkManager;
 		class ProtocolComponent *mProtocolComponent;
         class ServiceMgrComponent * mServiceComponent;
         class CallHandlerComponent * mCallHandlerComponent;
-	private:
+	private:		
         char mMessageBuffer[1024 * 1024];
         com::DataPacket_Request mRequestData;
         com::DataPacket_Response mResponseData;
 		std::queue<std::string> mRecvSessionQueue;
-        std::vector<TcpClientSession *> mSessionArray;
-        std::unordered_map<std::string, TcpClientSession *> mSessionAdressMap;
+		std::queue<TcpClientSession *> mSessionQueue;		
+        std::unordered_map<long long, TcpClientSession *> mSessionAdressMap;
 	};
 }

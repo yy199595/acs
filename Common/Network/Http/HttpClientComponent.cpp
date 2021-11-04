@@ -14,13 +14,10 @@
 #include <Network/Http/Content/HttpWriteContent.h>
 #include <Network/Http/Response/HttpRemoteGetRequestHandler.h>
 #include <HttpService/HttpServiceComponent.h>
+#include <Other/ProtocolConfig.h>
 
 namespace GameKeeper
 {
-    SessionBase *HttpClientComponent::CreateSocket()
-    {
-        return new HttpRemoteSession(this);
-    }
 
     bool HttpClientComponent::Awake()
     {
@@ -58,17 +55,16 @@ namespace GameKeeper
             delete remoteRequest;
             return;
         }
-        const std::string &method = remoteRequest->GetMethodName();
-        const std::string &service = remoteRequest->GetServiceName();
-		GKDebugWarning("http call " << service << "." << method);
-        auto httpService = App::Get().GetComponent<HttpServiceComponent>(service);
+		const HttpServiceConfig * config =  remoteRequest->GetHttpConfig();    
+		GKDebugWarning("http call " << config->Service << "." << config->Method);
+        auto httpService = App::Get().GetComponent<HttpServiceComponent>(config->Service);
         if (httpService == nullptr)
         {
             remoteRequest->SetCode(HttpStatus::NOT_FOUND);
             return;
         }
 
-        HttpServiceMethod *httpMethod = httpService->GetMethod(method);
+        HttpServiceMethod *httpMethod = httpService->GetMethod(config->Method);
         if (httpMethod == nullptr)
         {
             remoteRequest->SetCode(HttpStatus::NOT_FOUND);

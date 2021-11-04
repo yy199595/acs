@@ -345,7 +345,7 @@ const ::google::protobuf::uint32 TableStruct_com_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, userid_),
   PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, rpcid_),
   PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, methodid_),
-  PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, address_),
+  PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, socketid_),
   PROTOBUF_FIELD_OFFSET(::com::DataPacket_Request, messagedata_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com::DataPacket_Response, _internal_metadata_),
@@ -410,18 +410,18 @@ const char descriptor_table_protodef_com_2eproto[] =
   "\n\tfloatData\022\014\n\004Data\030\001 \001(\002\"\032\n\nDoubleData\022"
   "\014\n\004Data\030\001 \001(\001\"`\n\tStringMap\022&\n\004Data\030\001 \003(\013"
   "2\030.com.StringMap.DataEntry\032+\n\tDataEntry\022"
-  "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\316\001\n\nData"
-  "Packet\032`\n\007Request\022\016\n\006UserId\030\001 \001(\003\022\r\n\005Rpc"
-  "Id\030\002 \001(\r\022\020\n\010MethodId\030\003 \001(\005\022\017\n\007Address\030\004 "
-  "\001(\t\022\023\n\013MessageData\030\005 \001(\014\032^\n\010Response\022\014\n\004"
-  "Code\030\001 \001(\005\022\016\n\006UserId\030\002 \001(\r\022\r\n\005RpcId\030\003 \001("
-  "\005\022\020\n\010MethodId\030\005 \001(\005\022\023\n\013MessageData\030\004 \001(\014"
-  "b\006proto3"
+  "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\317\001\n\nData"
+  "Packet\032a\n\007Request\022\016\n\006UserId\030\001 \001(\003\022\r\n\005Rpc"
+  "Id\030\002 \001(\r\022\020\n\010MethodId\030\003 \001(\005\022\020\n\010SocketId\030\004"
+  " \001(\003\022\023\n\013MessageData\030\005 \001(\014\032^\n\010Response\022\014\n"
+  "\004Code\030\001 \001(\005\022\016\n\006UserId\030\002 \001(\r\022\r\n\005RpcId\030\003 \001"
+  "(\005\022\020\n\010MethodId\030\005 \001(\005\022\023\n\013MessageData\030\004 \001("
+  "\014b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_com_2eproto = {
   false, InitDefaults_com_2eproto, 
   descriptor_table_protodef_com_2eproto,
-  "com.proto", &assign_descriptors_table_com_2eproto, 568,
+  "com.proto", &assign_descriptors_table_com_2eproto, 569,
 };
 
 void AddDescriptors_com_2eproto() {
@@ -3091,7 +3091,7 @@ class DataPacket_Request::HasBitSetters {
 const int DataPacket_Request::kUserIdFieldNumber;
 const int DataPacket_Request::kRpcIdFieldNumber;
 const int DataPacket_Request::kMethodIdFieldNumber;
-const int DataPacket_Request::kAddressFieldNumber;
+const int DataPacket_Request::kSocketIdFieldNumber;
 const int DataPacket_Request::kMessageDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -3104,28 +3104,23 @@ DataPacket_Request::DataPacket_Request(const DataPacket_Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
   messagedata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.messagedata().size() > 0) {
     messagedata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.messagedata_);
   }
   ::memcpy(&userid_, &from.userid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&methodid_) -
-    reinterpret_cast<char*>(&userid_)) + sizeof(methodid_));
+    static_cast<size_t>(reinterpret_cast<char*>(&socketid_) -
+    reinterpret_cast<char*>(&userid_)) + sizeof(socketid_));
   // @@protoc_insertion_point(copy_constructor:com.DataPacket.Request)
 }
 
 void DataPacket_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_DataPacket_Request_com_2eproto.base);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   messagedata_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&userid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&methodid_) -
-      reinterpret_cast<char*>(&userid_)) + sizeof(methodid_));
+      reinterpret_cast<char*>(&socketid_) -
+      reinterpret_cast<char*>(&userid_)) + sizeof(socketid_));
 }
 
 DataPacket_Request::~DataPacket_Request() {
@@ -3134,7 +3129,6 @@ DataPacket_Request::~DataPacket_Request() {
 }
 
 void DataPacket_Request::SharedDtor() {
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   messagedata_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
@@ -3153,11 +3147,10 @@ void DataPacket_Request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&userid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&methodid_) -
-      reinterpret_cast<char*>(&userid_)) + sizeof(methodid_));
+      reinterpret_cast<char*>(&socketid_) -
+      reinterpret_cast<char*>(&userid_)) + sizeof(socketid_));
   _internal_metadata_.Clear();
 }
 
@@ -3195,20 +3188,11 @@ const char* DataPacket_Request::_InternalParse(const char* begin, const char* en
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string Address = 4;
+      // int64 SocketId = 4;
       case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        msg->set_socketid(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("com.DataPacket.Request.Address");
-        object = msg->mutable_address();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
         break;
       }
       // bytes MessageData = 5;
@@ -3299,15 +3283,13 @@ bool DataPacket_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // string Address = 4;
+      // int64 SocketId = 4;
       case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "com.DataPacket.Request.Address"));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &socketid_)));
         } else {
           goto handle_unusual;
         }
@@ -3367,14 +3349,9 @@ void DataPacket_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->methodid(), output);
   }
 
-  // string Address = 4;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "com.DataPacket.Request.Address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->address(), output);
+  // int64 SocketId = 4;
+  if (this->socketid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->socketid(), output);
   }
 
   // bytes MessageData = 5;
@@ -3411,15 +3388,9 @@ void DataPacket_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->methodid(), target);
   }
 
-  // string Address = 4;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "com.DataPacket.Request.Address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->address(), target);
+  // int64 SocketId = 4;
+  if (this->socketid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->socketid(), target);
   }
 
   // bytes MessageData = 5;
@@ -3450,13 +3421,6 @@ size_t DataPacket_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string Address = 4;
-  if (this->address().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
-  }
-
   // bytes MessageData = 5;
   if (this->messagedata().size() > 0) {
     total_size += 1 +
@@ -3483,6 +3447,13 @@ size_t DataPacket_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->methodid());
+  }
+
+  // int64 SocketId = 4;
+  if (this->socketid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->socketid());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -3512,10 +3483,6 @@ void DataPacket_Request::MergeFrom(const DataPacket_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.address().size() > 0) {
-
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
   if (from.messagedata().size() > 0) {
 
     messagedata_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.messagedata_);
@@ -3528,6 +3495,9 @@ void DataPacket_Request::MergeFrom(const DataPacket_Request& from) {
   }
   if (from.methodid() != 0) {
     set_methodid(from.methodid());
+  }
+  if (from.socketid() != 0) {
+    set_socketid(from.socketid());
   }
 }
 
@@ -3556,13 +3526,12 @@ void DataPacket_Request::Swap(DataPacket_Request* other) {
 void DataPacket_Request::InternalSwap(DataPacket_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
   messagedata_.Swap(&other->messagedata_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(userid_, other->userid_);
   swap(rpcid_, other->rpcid_);
   swap(methodid_, other->methodid_);
+  swap(socketid_, other->socketid_);
 }
 
 ::google::protobuf::Metadata DataPacket_Request::GetMetadata() const {

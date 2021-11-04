@@ -19,8 +19,8 @@ namespace GameKeeper
     {
         this->mContent = &content;
         this->mHttpSession->StartReceiveBody();
-        NetWorkThread *netWorkThread = this->mHttpComponent->GetNetThread();
-        netWorkThread->AddTask(&HttpRemoteSession::StartReceiveBody, this->mHttpSession);
+		NetWorkThread & netWorkThread = this->GetSession()->GetThread();
+        netWorkThread.AddTask(&HttpRemoteSession::StartReceiveBody, this->mHttpSession);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
         return this->GetErrorCode();
     }

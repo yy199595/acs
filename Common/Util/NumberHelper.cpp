@@ -1,4 +1,5 @@
 #include "NumberHelper.h"
+#include <atomic>
 #include <Util/TimeHelper.h>
 namespace NumberHelper
 {
@@ -19,4 +20,17 @@ namespace NumberHelper
         }
         return lastTime << 32 | (int) serverId << 16 | (++index);
     }
+
+	long long Create()
+	{
+		static std::atomic_int index = 0;
+		long long nowTime = TimeHelper::GetSecTimeStamp();
+		static long long lastTime = TimeHelper::GetSecTimeStamp();
+		if (lastTime != nowTime)
+		{
+			index = 0;
+			lastTime = nowTime;
+		}
+		return lastTime << 32 | index;
+	}
 }// namespace NumberHelper

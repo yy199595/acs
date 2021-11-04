@@ -10,15 +10,15 @@ namespace GameKeeper
     class TcpLocalSession : public TcpClientSession
     {
     public:
-        TcpLocalSession(ISocketHandler * handler, const std::string & name, const std::string ip, const unsigned short port);
+        TcpLocalSession(TcpClientComponent * component, const std::string & ip, const unsigned short port);
     public:
         SocketType GetSocketType() override { return SocketType::LocalSocket; }
     public:
-        void ConnecRemote();
-        void AsyncConnectRemote();
+        void StartConnect();
+        void StartAsyncConnect();
     private:
         void ConnectHandler();
-        void AsyncConnectHandler(unsigned int od);
+        void AsyncConnectHandler(unsigned int id);
     private:
         std::string mIp;
         unsigned int mPort;

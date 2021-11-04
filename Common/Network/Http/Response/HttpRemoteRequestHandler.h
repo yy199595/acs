@@ -18,7 +18,7 @@ namespace GameKeeper
     public:
         explicit HttpRemoteRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
 
-         virtual ~HttpRemoteRequestHandler() ;
+         virtual ~HttpRemoteRequestHandler() = default ;
 
     public:
         void SetCode(HttpStatus code);
@@ -39,10 +39,6 @@ namespace GameKeeper
 
         void OnWriterAfter(XCode code) override;
 
-    protected:
-
-        virtual bool ParseUrl(const std::string & path);
-
 	protected:
         XCode mCode;
     protected:
@@ -55,6 +51,7 @@ namespace GameKeeper
 #endif
         int mWriteCount;
         HttpStatus mHttpCode;
+		std::string mVersion;
         HttpWriteContent * mHttpContent;
         std::unordered_map<std::string, std::string> mHeardMap;
     };

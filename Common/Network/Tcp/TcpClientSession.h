@@ -1,29 +1,40 @@
 ﻿#pragma once
 #include<array>
 #include <Define/CommonDef.h>
-#include <Network/SessionBase.h>
-
+#include <Network/SocketProxy.h>
+#define TCP_BUFFER_COUNT 1024
 
 namespace GameKeeper
 {
-    class ISocketHandler;
+    class TcpClientComponent;
 
-    class TcpClientSession : public SessionBase
+    class TcpClientSession
     {
     public:
-        explicit TcpClientSession(ISocketHandler *handler, const std::string & name);
+        explicit TcpClientSession(TcpClientComponent *component);
         virtual ~TcpClientSession();
 	public:
-        virtual SocketType GetSocketType() override { return SocketType::RemoteSocket;}
-
-	protected:
-        void StartReceive();
-		void OnSessionEnable() override;
+		void SetSocket(SocketProxy * socketProxy);
+		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
+		const std::string & GetAddress() const { return this->mAddress; }
+        virtual SocketType GetSocketType() { return SocketType::RemoteSocket;}
+	public:
+		void StartClose();
+		void StartReceive();
+		void StartSendByString(std::string * message);
+	public:
+		SocketProxy & GetSocketProxy() { return *mSocketProxy; }
     private:
+		void CloseSocket();
+		void ReceiveMessage();
+		void SendByString(std::string * message);
         void ReadMessageBody(const size_t allSize);
+	protected:
+		std::string mAddress;
+		SocketProxy * mSocketProxy;
+		TcpClientComponent * mTcpComponent;
     private:
-        char *mReceiveMsgBuffer;
-        unsigned int mReceiveBufferSize;
+		char *mReceiveMsgBuffer;		
     };
 
     typedef shared_ptr<TcpClientSession> SharedTcpSession;

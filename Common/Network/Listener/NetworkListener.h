@@ -14,28 +14,27 @@ namespace GameKeeper
         unsigned short Port = 0;
     };
 
-	class ISocketHandler;
+	class ISocketListen;
 	class NetworkListener
 	{
 	public:
-		NetworkListener(NetWorkThread * thread, ListenConfig & config);
+		NetworkListener(NetWorkThread & thread, ListenConfig & config);
 		~NetworkListener();
 	public:
-		bool StartListen(ISocketHandler * handler);
+		bool StartListen(ISocketListen * handler);
 		bool IsOpen() { return this->mBindAcceptor->is_open(); }
         const ListenConfig & GetConfig() { return this->mConfig;}
 	private:
         void InitListener();
 		void ListenConnect();
-		void OnConnectHandler(const asio::error_code & err);
 	private:
         bool mIsListen;
         unsigned int mCorId;
         ListenConfig mConfig;
-		NetWorkThread * mTaskThread;
+		NetWorkThread & mTaskThread;
 		AsioTcpAcceptor *mBindAcceptor;	
-		ISocketHandler * mSessionHandler;
-		class SessionBase * mSessionSocket;
+		ISocketListen * mListenHandler;
+		TaskPoolComponent * mTaskComponent;
 		class MainTaskScheduler & mTaskScheduler;
 	};
 }

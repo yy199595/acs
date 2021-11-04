@@ -38,24 +38,18 @@ namespace GameKeeper
 
             Component * component = this->gameObject->GetComponentByName(listenConfig.Handler);
 
-			auto socketHandler = dynamic_cast<ISocketHandler*>(component);
+			auto socketHandler = dynamic_cast<ISocketListen*>(component);
 			if(socketHandler == nullptr)
             {
                 GKDebugError("not find socket handler " << listenConfig.Handler);
                 return false;
             }
-			NetWorkThread * netThread = taskComponent->NewNetworkThread(listenConfig.Name, nullptr);
-			if (netThread == nullptr)
-			{
-                GKDebugError("create " << listenConfig.Name << " thread failure");
-				return false;
-			}
+			NetWorkThread & netThread = taskComponent->GetNetThread();
             if(listenConfig.Port !=0)
             {
                 auto listener = new NetworkListener(netThread, listenConfig);
                 this->mListeners.push_back(listener);
             }
-            socketHandler->SetNetThread(netThread);
 		}
 		return true;
     }
@@ -67,7 +61,7 @@ namespace GameKeeper
             NetworkListener *listener = this->mListeners[index];
             const ListenConfig &config = listener->GetConfig();
             Component *component = this->gameObject->GetComponentByName(config.Handler);
-            if (auto handler = dynamic_cast<ISocketHandler *>(component))
+            if (auto handler = dynamic_cast<ISocketListen *>(component))
             {
                 if (listener->StartListen(handler))
                 {

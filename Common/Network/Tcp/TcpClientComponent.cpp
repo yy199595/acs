@@ -4,6 +4,7 @@
 #include <Scene/CallHandlerComponent.h>
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
+#include <Scene/TaskPoolComponent.h>
 #include <Service/ServiceMgrComponent.h>
 #include <Network/Tcp/TcpLocalSession.h>
 #ifdef __DEBUG__
@@ -13,6 +14,7 @@ namespace GameKeeper
 {
     bool TcpClientComponent::Awake()
     {
+		GKAssertRetFalse_F(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
 		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
 		GKAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
         GKAssertRetFalse_F(this->mCallHandlerComponent = this->GetComponent<CallHandlerComponent>());
@@ -27,7 +29,8 @@ namespace GameKeeper
 			return;
 		}
 		const std::string & address = socket->GetAddress();
-		auto iter = this->mSessionAdressMap.find(address);
+		long long id = socket->GetSocketProxy().GetSocketId();
+		auto iter = this->mSessionAdressMap.find(id);
 		if (iter != this->mSessionAdressMap.end())
 		{
 			this->mSessionAdressMap.erase(iter);
@@ -36,84 +39,63 @@ namespace GameKeeper
 		}
 	}
 
-    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, const std::string &message,
-                                                const asio::error_code &err)
+	void TcpClientComponent::OnReceiveMessage(TcpClientSession * session, string * message)
+	{
+		if (!this->OnReceive(session, *message))
+		{
+			session->StartClose();
+		}
+		GStringPool.Destory(message);
+	}
+
+    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, std::string * message, bool)
     {
 #ifdef __DEBUG__
         const std::string & address = session->GetAddress();
-        auto type = (DataMessageType)message.at(sizeof(unsigned int));
+        auto type = (DataMessageType)message->at(sizeof(unsigned int));
         if(type == DataMessageType::TYPE_REQUEST)
         {
-            GKDebugWarning(address << " send request message successful size = " << message.size());
+            GKDebugWarning(address << " send request message successful size = " << message->size());
         }
         else if(type == DataMessageType::TYPE_RESPONSE)
         {
-            GKDebugWarning(address << " send response message successful size = " << message.size());
+            GKDebugWarning(address << " send response message successful size = " << message->size());
         }
 #endif
-        SocketHandler<TcpClientSession>::OnSendMessageAfter(session, message, err);
+		GStringPool.Destory(message);
     }
 
-
-	void TcpClientComponent::OnSessionError(TcpClientSession * clientSession, const  asio::error_code & err)
-	{
-		if (err)
-		{
-			const std::string & address = clientSession->GetAddress();
-			if (clientSession->GetSocketType() == LocalSocket)
-            {
-                auto localSession = static_cast<TcpLocalSession *>(clientSession);
-                if (localSession != nullptr)
-                {
-                    GKDebugError(
-                            "[" << localSession->GetName() << ":" << address << "]" << " error" << err.message());
-                }
-            }
-			else
-			{
-				auto iter = this->mSessionAdressMap.find(address);
-				if (iter != this->mSessionAdressMap.end())
-				{
-					this->mSessionAdressMap.erase(iter);
-					GKDebugError("remove tcp socket " << address);
-					delete clientSession;
-				}
-			}
-		}
-	}
-
-
-	void TcpClientComponent::OnConnectRemoteAfter(TcpClientSession *session, const asio::error_code &err)
+	void TcpClientComponent::OnConnectRemoteAfter(TcpLocalSession *session, const asio::error_code &err)
 	{
 		const std::string & address = session->GetAddress();
 		if (err)
 		{
 			GKDebugError("connect to " << address << " failure : " << err.message());
 		}
-        else
-        {
-            auto localSession = static_cast<TcpLocalSession *>(session);
-            GKDebugInfo(
-                    "connect to [" << localSession->GetName() << ":" << localSession->GetAddress() << "] successful");
-            this->mSessionAdressMap.emplace(address, session);
-        }
+		else
+		{
+			long long id = session->GetSocketProxy().GetSocketId();
+			const std::string & name = session->GetSocketProxy().GetName();
+			GKDebugInfo(
+				"connect to [" << name << ":" << address << "] successful");
+			this->mSessionAdressMap.emplace(id, session);
+		}
 	}
 
-	void TcpClientComponent::OnListenNewSession(TcpClientSession *clientSession, const asio::error_code & err)
+	void TcpClientComponent::OnListen(SocketProxy * socket)
 	{
-        if(err)
-        {
-            delete clientSession;
-            GKDebugError(err.message());
-        }
-        else
-        {
-            const std::string & address = clientSession->GetAddress();
-            this->mSessionAdressMap.emplace(address, clientSession);
-        }
+		long long id = socket->GetSocketId();
+		auto iter = this->mSessionAdressMap.find(id);
+		if (iter == this->mSessionAdressMap.end())
+		{
+			TcpClientSession * tcpSession = new TcpClientSession(this);
+			tcpSession->SetSocket(socket);
+			this->mSessionAdressMap.emplace(id, tcpSession);
+		}
 	}
 
-	bool TcpClientComponent::OnReceiveMessage(TcpClientSession *session, const string & message)
+
+	bool TcpClientComponent::OnReceive(TcpClientSession *session, const std::string & message)
 	{
         const char * body = message.c_str() + 1;
         const size_t bodySize = message.size() - 1;
@@ -175,9 +157,9 @@ namespace GameKeeper
         return false;
 	}
 
-    TcpLocalSession *TcpClientComponent::GetLocalSession(const std::string &address)
+    TcpLocalSession *TcpClientComponent::GetLocalSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(address);
+        auto iter = this->mSessionAdressMap.find(id);
         if(iter == this->mSessionAdressMap.end())
         {
             return nullptr;
@@ -190,79 +172,74 @@ namespace GameKeeper
         return static_cast<TcpLocalSession*>(session);
     }
 
-    TcpClientSession *TcpClientComponent::GetRemoteSession(const std::string &address)
+    TcpClientSession *TcpClientComponent::GetRemoteSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(address);
+        auto iter = this->mSessionAdressMap.find(id);
         return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
     }
 
-    TcpLocalSession *TcpClientComponent::NewSession(const std::string &name, const std::string &ip,
+    long long TcpClientComponent::NewSession(const std::string &name, const std::string &ip,
                                                      unsigned short port)
 	{
-		std::string address = ip + ":" + std::to_string(port);
-		auto iter = this->mSessionAdressMap.find(address);
-		if (iter != this->mSessionAdressMap.end())
-		{
-			return static_cast<TcpLocalSession*>(iter->second);
-		}
-		AsioContext & io = this->GetNetThread()->GetContext();
-		SharedTcpSocket socket = make_shared<AsioTcpSocket>(io);
-		return new TcpLocalSession(this, name, ip, port);
+		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
+		SocketProxy * socketProxy = new SocketProxy(nThread, name);
+		TcpLocalSession * localSession = new TcpLocalSession(this, ip, port);
+		this->mSessionAdressMap.emplace(socketProxy->GetSocketId(), localSession);
+		return socketProxy->GetSocketId();		
 	}
 
     void TcpClientComponent::OnDestory()
     {
     }
 
-    TcpClientSession *TcpClientComponent::GetSession(const std::string &address)
+    TcpClientSession *TcpClientComponent::GetSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(address);
+        auto iter = this->mSessionAdressMap.find(id);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
     }
 
-    bool TcpClientComponent::CloseSession(const std::string &address)
+    bool TcpClientComponent::CloseSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(address);
+        auto iter = this->mSessionAdressMap.find(id);
         if (iter != this->mSessionAdressMap.end())
         {
-            TcpClientSession *session = iter->second;
-            if (session != nullptr && session->IsActive())
-            {
-                session->Close();
-            }			
+			iter->second->StartClose();           
             return true;
         }
         return false;
     }
 
-	bool TcpClientComponent::SendByAddress(const std::string & address, std::string * message)
+	bool TcpClientComponent::SendByAddress(long long id, std::string * message)
 	{
-		TcpClientSession * tcpSession = this->GetSession(address);
+		TcpClientSession * tcpSession = this->GetSession(id);
 		if (tcpSession == nullptr)
 		{
 			return false;
 		}
-		return tcpSession->SendNetMessage(message);
+		tcpSession->StartSendByString(message);
+		return true;
 	}
 
-	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Request & message)
+	bool TcpClientComponent::SendByAddress(long long id, com::DataPacket_Request & message)
 	{
         std::string * data = this->Serialize(message);
         if(data== nullptr)
         {
             return false;
         }
-        return this->SendByAddress(address, data);
+        this->SendByAddress(id, data);
+		return true;
 	}
 
-	bool TcpClientComponent::SendByAddress(const std::string & address, com::DataPacket_Response & message)
+	bool TcpClientComponent::SendByAddress(long long id, com::DataPacket_Response & message)
 	{
-        std::string * data = this->Serialize(message);
-        if(data== nullptr)
-        {
-            return false;
-        }
-		return this->SendByAddress(address, data);
+		std::string * data = this->Serialize(message);
+		if (data == nullptr)
+		{
+			return false;
+		}
+		this->SendByAddress(id, data);
+		return true;
 	}
 
     std::string *TcpClientComponent::Serialize(const com::DataPacket_Request &message)
@@ -275,7 +252,7 @@ namespace GameKeeper
         {
             return nullptr;
         }
-        return this->mStringPool.New(this->mMessageBuffer, size);
+        return GStringPool.New(this->mMessageBuffer, size);
     }
 
     std::string *TcpClientComponent::Serialize(const com::DataPacket_Response &message)
@@ -288,7 +265,7 @@ namespace GameKeeper
         {
             return nullptr;
         }
-        return this->mStringPool.New(this->mMessageBuffer, size);
+        return GStringPool.New(this->mMessageBuffer, size);
     }
 
 }// namespace GameKeeper

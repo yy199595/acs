@@ -1,18 +1,21 @@
 #include"NetworkListener.h"
 #include<Core/App.h>
+#include<Network/SocketProxy.h>
 #include<Method/MethodProxy.h>
 #include<Define/CommonDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
+#include<Scene/TaskPoolComponent.h>
 namespace GameKeeper
 {
-	NetworkListener::NetworkListener(NetWorkThread * t, ListenConfig & config)
+	NetworkListener::NetworkListener(NetWorkThread & t, ListenConfig & config)
 		: mTaskThread(t), mConfig(config),
         mTaskScheduler(App::Get().GetTaskScheduler())
     {
         this->mIsListen = false;
         this->mBindAcceptor = nullptr;
-        this->mSessionHandler = nullptr;
+        this->mListenHandler = nullptr;
+		mTaskComponent = App::Get().GetComponent<TaskPoolComponent>();
     }
 
 	NetworkListener::~NetworkListener()
@@ -22,10 +25,10 @@ namespace GameKeeper
 		delete this->mBindAcceptor;
 	}
 
-	bool NetworkListener::StartListen(ISocketHandler * handler)
+	bool NetworkListener::StartListen(ISocketListen * handler)
 	{
-		this->mSessionHandler = handler;
-        this->mTaskThread->AddTask(&NetworkListener::InitListener, this);
+		this->mListenHandler = handler;
+        this->mTaskThread.AddTask(&NetworkListener::InitListener, this);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 		return this->mIsListen;
 	}
@@ -34,7 +37,7 @@ namespace GameKeeper
     {
         try
         {
-            asio::io_service & io = this->mTaskThread->GetContext();
+            asio::io_service & io = this->mTaskThread.GetContext();
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
@@ -53,18 +56,27 @@ namespace GameKeeper
     }
 
 	void NetworkListener::ListenConnect()
-	{
-		this->mSessionSocket = this->mSessionHandler->CreateSocket();
-		this->mBindAcceptor->async_accept(this->mSessionSocket->GetSocket(), std::bind(&NetworkListener::OnConnectHandler, this, args1));
-	}
-
-	void NetworkListener::OnConnectHandler(const asio::error_code & code)
-	{
-        this->mSessionSocket->OnListenDone(code);
-        if(!code)
-        {
-            GKDebugInfo(this->mConfig.Name << " listen new socket " << this->mSessionSocket->GetAddress());
-        }
-        this->mTaskThread->GetContext().post(std::bind(&NetworkListener::ListenConnect, this));
+	{		
+		auto socketProxy = new SocketProxy(this->mTaskComponent->GetNetThread(), this->mConfig.Name);
+		this->mBindAcceptor->async_accept(socketProxy->GetSocket(), 
+			[this, socketProxy](const asio::error_code & code)
+		{
+			if (!code)
+			{
+#ifdef __DEBUG__
+				AsioTcpSocket & socket = socketProxy->GetSocket();
+				unsigned short port = socket.remote_endpoint().port();
+				const std::string ip = socket.remote_endpoint().address().to_string();
+				GKDebugInfo(this->mConfig.Name << " listen new socket " << ip << ":" << port);
+#endif // __DEBUG__
+				mTaskScheduler.AddMainTask(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
+			}
+			else
+			{
+				delete socketProxy;
+			}
+			AsioContext & context = this->mTaskThread.GetContext();
+			context.post(std::bind(&NetworkListener::ListenConnect, this));
+		});
 	}
 }

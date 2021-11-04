@@ -4,52 +4,47 @@
 
 #include "TcpLocalSession.h"
 #include <Core/App.h>
+#include<Network/Tcp/TcpClientComponent.h>
 namespace GameKeeper
 {
-    TcpLocalSession::TcpLocalSession(ISocketHandler *handler, const std::string &name, const std::string ip,
-                                     const unsigned short port)
-                                     : TcpClientSession(handler, name)
-    {
-        this->mIp = ip;
-        this->mPort = port;
-        this->mAddress = ip + ":" + std::to_string(port);
+	TcpLocalSession::TcpLocalSession(TcpClientComponent * component, const std::string & ip, const unsigned short port)
+		:TcpClientSession(component), mIp(ip), mPort(port)
+	{
+		this->mAddress = ip + ":" + std::to_string(mPort);
+	}
+
+    void TcpLocalSession::StartConnect()
+    {		
+		GKAssertRet_F(this->mSocketProxy);
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+		nThread.AddTask(&TcpLocalSession::ConnectHandler, this);
     }
 
-    void TcpLocalSession::ConnecRemote()
+    void TcpLocalSession::StartAsyncConnect()
     {
-        if(this->IsActive())
-        {
-            return;
-        }
-        this->mHandler.GetNetThread()->AddTask(&TcpLocalSession::ConnectHandler, this);
-    }
-
-    void TcpLocalSession::AsyncConnectRemote()
-    {
-        if(this->IsActive())
-        {
-            return;
-        }
+		GKAssertRet_F(this->mSocketProxy);
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
         unsigned int id = App::Get().GetCorComponent()->GetCurrentCorId();
-        this->mHandler.GetNetThread()->AddTask(&TcpLocalSession::AsyncConnectHandler, this, id);
+		nThread.AddTask(&TcpLocalSession::AsyncConnectHandler, this, id);
         App::Get().GetCorComponent()->YieldReturn();
     }
 
-    void TcpLocalSession::ConnectHandler()
+	void TcpLocalSession::ConnectHandler()
     {
         this->mConnectCount++;
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        GKDebugLog(this->GetName() << " start connect " << this->GetAddress());
-        this->mSocket->async_connect(endPoint, [this](const asio::error_code &err)
+		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+        GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+		nSocket.async_connect(endPoint, [this](const asio::error_code &err)
         {
             if(!err)
             {
-                this->mIsOpen = true;
-                this->mConnectCount = 0;
-                this->OnSessionEnable();
+				this->StartReceive();
+                this->mConnectCount = 0;			
             }
-            this->OnConnect(err);
+			NetWorkThread & nThread = this->mSocketProxy->GetThread();
+			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, err);
         });
     }
 
@@ -57,18 +52,20 @@ namespace GameKeeper
     {
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
-        GKDebugLog(this->GetName() << " start connect " << this->GetAddress());
-        this->mSocket->async_connect(endPoint, [this, id](const asio::error_code &err)
+		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+		GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+		nSocket.async_connect(endPoint, [this, id](const asio::error_code &err)
         {
             if (!err)
             {
-                this->mIsOpen = true;
-                this->mConnectCount = 0;
-                this->OnSessionEnable();
-            }
-            this->OnConnect(err);
-            CoroutineComponent *component = App::Get().GetCorComponent();
-            this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);
+				this->StartReceive();
+				this->mConnectCount = 0;
+            }		
+			NetWorkThread & nThread = this->mSocketProxy->GetThread();
+			CoroutineComponent *component = App::Get().GetCorComponent();
+			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();       
+			taskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);	
+			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, err);
         });
     }
 }

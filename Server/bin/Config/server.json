@@ -5,6 +5,11 @@
     "SystemFps": 100,
     "NodeName": "Server",
     "rpc": "./Rpc/rpc.csv",
+    "Thread":
+    {
+        "task":1,
+        "network":2
+    },
     "ProxyAddress": {
         "ip": "114.115.167.51",
         "port": 1995

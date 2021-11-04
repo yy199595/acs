@@ -6,6 +6,7 @@
 #include <Core/App.h>
 #include <Network/Http/HttpClientComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
+#include <Other/ProtocolConfig.h>
 namespace GameKeeper
 {
 
@@ -26,7 +27,7 @@ namespace GameKeeper
         delete this->mHttpContent;
 #ifdef __DEBUG__
         long long endTime = TimeHelper::GetMilTimestamp();
-        GKDebugLog("http call " << this->mHttpConfig-> << "." << this->mMethod
+        GKDebugLog("http call " << this->mHttpConfig->Service << "." << this->mHttpConfig->Method
                                 << " use time = " << ((endTime - this->mStartTime) / 1000.0f) << "s");
 #endif
     }
@@ -39,8 +40,8 @@ namespace GameKeeper
     void HttpRemoteRequestHandler::SetCode(HttpStatus code)
     {
         this->mHttpCode = code;
-        NetWorkThread * httpThread = this->mHttpComponent->GetNetThread();
-        httpThread->AddTask(&HttpRemoteSession::StartSendHttpMessage, this->mHttpSession);
+		NetWorkThread & httpThread = this->GetSession()->GetThread();
+        httpThread.AddTask(&HttpRemoteSession::StartSendHttpMessage, this->mHttpSession);
     }
 
     bool HttpRemoteRequestHandler::WriterToBuffer(std::ostream &os)
@@ -84,26 +85,6 @@ namespace GameKeeper
         return false;
     }
 
-    bool HttpRemoteRequestHandler::OnReceiveHeard(asio::streambuf &buf, size_t size)
-    {
-        const std::string & url = this->mHttpSession->GetPath();
-        this->ParseHeard(buf, size - (size - buf.size()));
-
-        size_t pos = url.find('?');
-        if(pos != std::string::npos)
-        {
-            std::string path = url.substr(0, pos);
-            this->mp
-        }
-
-        if (!this->ParseUrl(path))
-        {
-            this->SetCode(HttpStatus::NOT_FOUND);
-            return false;
-        }
-        this->OnReceiveHeardAfter(XCode::Successful);
-        return false;
-    }
 
     bool HttpRemoteRequestHandler::SetContent(HttpWriteContent *httpContent)
     {
@@ -112,30 +93,6 @@ namespace GameKeeper
             return false;
         }
         this->mHttpContent = httpContent;
-        return true;
-    }
-
-    bool HttpRemoteRequestHandler::ParseUrl(const std::string & path)
-    {
-        const static std::string & app = "App/";
-        size_t pos1 = path.find(app, 1);
-        if (pos1 == std::string::npos)
-        {
-            return false;
-        }
-        size_t pos2 = path.find('/', pos1 + app.size());
-        if (pos2 == std::string::npos)
-        {
-            return false;
-        }
-        size_t pos3 = path.find('/', pos2);
-        size_t pos4 = path.find('/', pos3 + 1);
-        if (pos3 == std::string::npos)
-        {
-            return false;
-        }
-        this->mService = path.substr(pos1 + app.size(), pos2 - app.size() - 1);
-        this->mMethod = path.substr(pos3 + 1, pos4 - pos3 - 1);
         return true;
     }
 }

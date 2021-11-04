@@ -9,7 +9,7 @@
 namespace GameKeeper
 {
 	HttpLocalSession::HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler)
-		: HttpSessionBase(component, "LocalHttpSession"), mHttpHandler(handler)
+		: HttpSessionBase(component), mHttpHandler(handler)
 	{
 		this->mQuery = nullptr;
 		this->mResolver = nullptr;
@@ -21,11 +21,21 @@ namespace GameKeeper
         delete this->mResolver;
     }
 
+	void HttpLocalSession::SetSocketProxy(SocketProxy * socketProxy)
+	{
+	}
+
 	void HttpLocalSession::StartConnectHost(const std::string & host, const std::string & port)
 	{
 		this->mHost = host;
 		this->mPort = port;
-		this->mHandler.GetNetThread()->AddTask(&HttpLocalSession::Resolver, this);
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+		if (nThread.IsCurrentThread())
+		{
+			this->Resolver();
+			return;
+		}
+		nThread.AddTask(&HttpLocalSession::Resolver, this);
 	}
 
 	bool HttpLocalSession::WriterToBuffer(std::ostream & os)
@@ -48,7 +58,7 @@ namespace GameKeeper
 
 	void HttpLocalSession::Resolver()
     {
-        asio::io_context &ctx = this->mHandler.GetContext();
+		asio::io_context &ctx = this->mSocketProxy->GetContext();
         this->mResolver = new asio::ip::tcp::resolver(ctx);
         this->mQuery = new asio::ip::tcp::resolver::query(this->mHost, this->mPort);
         this->mResolver->async_resolve(*this->mQuery, [this](
@@ -60,7 +70,8 @@ namespace GameKeeper
                 GKDebugError("resolver " << this->mHost << ":" << this->mPort << " failure : " << err.message());
                 return;
             }
-			asio::async_connect(this->GetSocket(), std::move(iterator),
+			AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+			asio::async_connect(socket, std::move(iterator),
 				std::bind(&HttpLocalSession::ConnectHandler, this, args1));
         });
     }
@@ -85,8 +96,9 @@ namespace GameKeeper
             GKDebugError("connect " << this->mHost << ":" << this->mPort << " failure : " << err.message());
             return;
         }
-        this->mAddress = this->mSocket->remote_endpoint().address().to_string()
-                         + ":" + std::to_string(this->mSocket->remote_endpoint().port());
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+        this->mAddress = socket.remote_endpoint().address().to_string()
+                         + ":" + std::to_string(socket.remote_endpoint().port());
         GKDebugLog("connect to " << this->mHost << ":" << this->mPort << " successful");
         this->StartSendHttpMessage();
     }

@@ -10,7 +10,7 @@
 namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
-        : HttpSessionBase(component, "RemoteHttpSession")
+        : HttpSessionBase(component)
     {
         this->mHttpHandler = nullptr;
         this->mHttpComponent = component;
@@ -46,10 +46,15 @@ namespace GameKeeper
         this->mHttpHandler->OnReceiveHeardAfter(code);
     }
 
-    void HttpRemoteSession::OnSessionEnable()
-    {
-        this->StartReceiveHeard();
-    }
+	void HttpRemoteSession::SetSocketProxy(SocketProxy * scoketProxy)
+	{
+		if (this->mSocketProxy != nullptr)
+		{
+			delete this->mSocketProxy;
+		}
+		this->mSocketProxy = scoketProxy;
+		this->StartReceiveHeard();
+	}
 
     bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {

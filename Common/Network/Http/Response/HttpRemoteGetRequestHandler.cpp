@@ -28,20 +28,12 @@ namespace GameKeeper
 		return true;
 	}
 
-    bool HttpRemoteGetRequestHandler::ParseUrl(const std::string &path)
-    {
-        if (!HttpRemoteRequestHandler::ParseUrl(path))
-        {
-            return false;
-        }
-        size_t pos4 = path.find_last_of("/");
-        size_t pos5 = path.find('?');
-        if (pos5 == std::string::npos)
-        {
-            this->mParamater = path.substr(pos4 + 1);
-            return true;
-        }
-        this->mParamater = path.substr(pos5 + 1);
-        return true;
-    }
+	void HttpRemoteGetRequestHandler::OnReceiveHeardAfter(XCode code)
+	{
+	}
+
+	bool HttpRemoteGetRequestHandler::OnReceiveHeard(asio::streambuf & buf, size_t size)
+	{
+		return false;
+	}
 }

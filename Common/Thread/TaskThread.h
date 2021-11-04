@@ -7,6 +7,7 @@
 #include <thread>
 #include <Define/CommonDef.h>
 #include <Other/MultiThreadQueue.h>
+#include <Method/MethodProxy.h>
 namespace GameKeeper
 {
 	class StaticMethod;
@@ -73,10 +74,9 @@ namespace GameKeeper
     class NetWorkThread : public IThread
     {
     public:
-        NetWorkThread(TaskPoolComponent * taskComponent, class StaticMethod * method = nullptr);
+        NetWorkThread(TaskPoolComponent * taskComponent);
     public:
 		int Start();
-        void AddTask(TaskProxy * task);
 		void AddTask(StaticMethod * task);
 		
 		AsioContext & GetContext() { return *mAsioContext; }
@@ -87,14 +87,11 @@ namespace GameKeeper
 			this->AddTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 		}
 	protected:
-        void Loop();
 		void Update() final;
     private:		
 		AsioWork * mAsioWork;
 		std::thread * mThread;
 		AsioContext * mAsioContext;
-        StaticMethod * mMethodProxy;
-        MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
 		MultiThreadQueue<StaticMethod *> mWaitInvokeMethod;
     };
 

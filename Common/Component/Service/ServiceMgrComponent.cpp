@@ -49,7 +49,7 @@ namespace GameKeeper
         if (!protocolConfig->IsAsync)
         {
             std::string responseContent;
-            method->SetAddress(request.address());
+            //method->SetAddress(request.address()); //TODO
             XCode code = method->Invoke(request, responseContent);
             if (request.rpcid() != 0)
             {
@@ -59,7 +59,7 @@ namespace GameKeeper
                 this->mResponse.set_userid(request.userid());
                 this->mResponse.set_methodid(request.methodid());
                 this->mResponse.set_messagedata(responseContent);
-                this->mNetSessionComponent->SendByAddress(request.address(), this->mResponse);
+                this->mNetSessionComponent->SendByAddress(request.socketid(), this->mResponse);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步
@@ -77,7 +77,7 @@ namespace GameKeeper
 	void ServiceMgrComponent::Invoke(ServiceMethod * method, com::DataPacket_Request * request)
     {
         std::string responseContent;
-        method->SetAddress(request->address());
+        //method->SetAddress(request->address());
         XCode code = method->Invoke(*request, responseContent);
         if (request->rpcid() != 0)
         {
@@ -87,7 +87,7 @@ namespace GameKeeper
             this->mResponse.set_userid(request->userid());
             this->mResponse.set_methodid(request->methodid());
             this->mResponse.set_messagedata(responseContent);
-            this->mNetSessionComponent->SendByAddress(request->address(), this->mResponse);
+            this->mNetSessionComponent->SendByAddress(request->socketid(), this->mResponse);
 
 			this->mRequestDataPool.Destory(request);
         }

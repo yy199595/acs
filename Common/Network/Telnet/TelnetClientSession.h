@@ -1,19 +1,18 @@
 #pragma once
 
 #include <istream>
-#include <Network/SessionBase.h>
+#include <Network/SocketProxy.h>
 namespace GameKeeper
 {
-	class TelnetClientSession : public SessionBase
+	class TelnetClientComponent;
+	class TelnetClientSession
 	{
 	public:
-		 explicit TelnetClientSession(ISocketHandler * handler);
-		~TelnetClientSession() override = default;
+		 explicit TelnetClientSession(TelnetClientComponent * handler);
+		~TelnetClientSession() = default;
 
     public:
-        SocketType GetSocketType() override { return SocketType::RemoteSocket;}
-	protected:
-		void OnSessionEnable() override;
+        SocketType GetSocketType() { return SocketType::RemoteSocket;}
 	private:
 		void ReadHandler(const asio::error_code & err, const size_t size);
 	private:

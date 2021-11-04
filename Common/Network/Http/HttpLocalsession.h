@@ -15,7 +15,7 @@ namespace GameKeeper
 		HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler);
 		~HttpLocalSession() override;
 	public:	
-		SocketType GetSocketType() override { return SocketType::LocalSocket; }
+		void SetSocketProxy(SocketProxy * socketProxy) override;
 		void StartConnectHost(const std::string & host, const std::string & port);
 	protected:
         void OnWriteAfter(XCode code) override;

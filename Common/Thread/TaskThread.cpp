@@ -82,8 +82,8 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent, StaticMethod * method)
-        : IThread(taskComponent), mMethodProxy(method), mAsioContext(nullptr)
+    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent)
+        : IThread(taskComponent), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
@@ -96,11 +96,6 @@ namespace GameKeeper
         this->mThreadVariable.notify_one();
 		return 0;
 	}
-
-	void NetWorkThread::AddTask(TaskProxy *task)
-    {
-        this->mWaitInvokeTask.Add(task);
-    }
 
 	void NetWorkThread::AddTask(StaticMethod * task)
 	{
@@ -121,24 +116,8 @@ namespace GameKeeper
             if(err)
             {
                 GKDebugError(err.message());
-            }
-            if(this->mMethodProxy)
-            {
-                this->mMethodProxy->run();
-            }
-            TaskProxy * taskProxy = nullptr;
+            }           
             StaticMethod * taskMethod = nullptr;
-            this->mWaitInvokeTask.SwapQueueData();
-            this->mWaitInvokeMethod.SwapQueueData();
-            while(this->mWaitInvokeTask.PopItem(taskProxy))
-            {
-                if(taskProxy->Run())
-                {
-                    unsigned int id = taskProxy->GetTaskId();
-                    this->mTaskComponent->PushFinishTask(id);
-                }
-            }
-
             while (this->mWaitInvokeMethod.PopItem(taskMethod))
             {
                 taskMethod->run();

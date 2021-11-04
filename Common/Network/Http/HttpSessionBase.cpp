@@ -5,23 +5,21 @@
 #include <Network/Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
-    HttpSessionBase::HttpSessionBase(ISocketHandler *handler, const std::string & name)
-            : SessionBase(handler, name)
+    HttpSessionBase::HttpSessionBase(HttpClientComponent * component)
+            : mHttpComponent(component)
     {
-        this->mCount = 0;
+        this->mCount = 0;	
         this->mIsReadBody = false;
+		this->mSocketProxy = nullptr;
     }
 
     void HttpSessionBase::StartSendHttpMessage()
     {
-#ifdef __DEBUG__
-        if (!this->mHandler.GetNetThread()->IsCurrentThread())
-        {
-            GKDebugFatal("use in not http thread");
-            return;
-        }
-#endif
-        if (!this->mSocket->is_open())
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+		GKAssertRet_F(nThread.IsCurrentThread());
+		
+        if (!socket.is_open())
         {
             this->OnWriteAfter(XCode::HttpNetWorkError);
             return;
@@ -32,7 +30,7 @@ namespace GameKeeper
         {
             return;
         }
-        asio::async_write(this->GetSocket(), this->mStreamBuf, [this, isDone](
+        asio::async_write(socket, this->mStreamBuf, [this, isDone](
                 const asio::error_code &err, size_t size)
         {
             if (err)
@@ -42,7 +40,8 @@ namespace GameKeeper
             }
             if (!isDone)
             {
-                this->GetContext().post(std::bind(&HttpSessionBase::StartSendHttpMessage, this));
+				AsioContext & context = this->mSocketProxy->GetContext();
+				context.post(std::bind(&HttpSessionBase::StartSendHttpMessage, this));
                 return;
             }
             this->OnWriteAfter(XCode::Successful);
@@ -51,39 +50,55 @@ namespace GameKeeper
 
     void HttpSessionBase::StartReceiveBody()
     {
-#ifdef __DEBUG__
-        if(!this->mHandler.GetNetThread()->IsCurrentThread())
-        {
-            GKDebugFatal("use int not http thread");
-            return;
-        }
-#endif
-        if(!this->mSocket->is_open() || !this->mIsReadBody)
-        {
-            this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
-            return;
-        }
-        asio::async_read(this->GetSocket(), this->mStreamBuf, asio::transfer_at_least(1),
-                         std::bind(&HttpSessionBase::ReadBodyCallback, this, args1, args2));
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+		GKAssertRet_F(this->mSocketProxy && this->mSocketProxy->IsOpen());
+		if (nThread.IsCurrentThread())
+		{
+			this->ReceiveBody();
+			return;
+		}
+		nThread.AddTask(&HttpSessionBase::ReceiveBody, this);      
     }
 
     void HttpSessionBase::StartReceiveHeard()
     {
-#ifdef __DEBUG__
-        if(!this->mHandler.GetNetThread()->IsCurrentThread())
-        {
-            GKDebugFatal("use int not http thread");
-            return;
-        }
-#endif
-        if (!this->mSocket->is_open() || this->mIsReadBody)
-        {
-            GKDebugFatal("logic error");
-            return;
-        }
-        asio::async_read(this->GetSocket(), this->mStreamBuf, asio::transfer_at_least(1),
-                         std::bind(&HttpSessionBase::ReadHeardCallback, this, args1, args2));
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+		GKAssertRet_F(this->mSocketProxy && this->mSocketProxy->IsOpen());
+		if (nThread.IsCurrentThread())
+		{
+			this->ReceiveHeard();
+			return;
+		}
+		nThread.AddTask(&HttpSessionBase::ReceiveHeard, this);
+
+      
     }
+
+	void HttpSessionBase::ReceiveBody()
+	{
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+		if (!socket.is_open() || !this->mIsReadBody)
+		{
+			this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
+			return;
+		}
+		asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
+			std::bind(&HttpSessionBase::ReadBodyCallback, this, args1, args2));
+	}
+
+	void HttpSessionBase::ReceiveHeard()
+	{
+		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+		if (!socket.is_open() || this->mIsReadBody)
+		{
+			GKDebugFatal("logic error");
+			return;
+		}
+		asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
+			std::bind(&HttpSessionBase::ReadHeardCallback, this, args1, args2));
+	}
 
     void HttpSessionBase::ReadHeardCallback(const asio::error_code &err, size_t size)
     {
@@ -103,7 +118,8 @@ namespace GameKeeper
                 const char *pos = strstr(data, "\r\n\r\n");
                 if (pos == nullptr)
                 {
-                    this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveHeard, this));
+					AsioContext & context = this->mSocketProxy->GetContext();
+					context.post(std::bind(&HttpSessionBase::StartReceiveHeard, this));
                     return;
                 }
 
@@ -115,7 +131,8 @@ namespace GameKeeper
                     {
                         this->OnReceiveBody(this->mStreamBuf);
                     }
-                    this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+					AsioContext & context = this->mSocketProxy->GetContext();
+					context.post(std::bind(&HttpSessionBase::StartReceiveBody, this));
                 }
                 this->OnReceiveBodyAfter(XCode::Successful);
                 this->mIsReadBody = true;
@@ -136,7 +153,8 @@ namespace GameKeeper
         else
         {
             this->OnReceiveBody(this->mStreamBuf);
-            this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+			AsioContext & context = this->mSocketProxy->GetContext();
+			context.post(std::bind(&HttpSessionBase::StartReceiveBody, this));
         }
     }
 }

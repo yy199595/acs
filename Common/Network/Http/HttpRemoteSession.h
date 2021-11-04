@@ -15,9 +15,8 @@ namespace GameKeeper
     public:
         explicit HttpRemoteSession(HttpClientComponent * socketHandler);
     public:
-        SocketType GetSocketType() override { return SocketType::RemoteSocket;}
-    protected:
-        void OnSessionEnable() override;
+		void SetSocketProxy(SocketProxy * socketProxy) override;
+    protected:        
         void OnWriteAfter(XCode code) override;
         void OnReceiveBodyAfter(XCode code) override;
         void OnReceiveHeardAfter(XCode code) override;

@@ -8,16 +8,12 @@ namespace GameKeeper
     class HttpRemoteSession;
     class HttpServiceMethod;
     class HttpRemoteRequestHandler;
-    class HttpClientComponent : public Component, public SocketHandler<HttpSessionBase>
+    class HttpClientComponent : public Component
     {
     public:
         HttpClientComponent() = default;
 
         ~HttpClientComponent() = default;
-
-    protected:
-        SessionBase *CreateSocket() override;
-
     public:
         bool Awake() final;
 

@@ -6,20 +6,32 @@ namespace GameKeeper
 {
     TaskPoolComponent::TaskPoolComponent()
     {
-        this->mThreadCount = 0;
+       
     }
 
 	bool TaskPoolComponent::Awake()
 	{
-		int count = 0;
-		App::Get().GetConfig().GetValue("ThreadCount", count);
-		this->mThreadCount = count != 0 ? count : (int)std::thread::hardware_concurrency();
+		int taskCount = 0;
+		int networkCount = 0;
+		App::Get().GetConfig().GetValue("Thread", "task", taskCount);
+		App::Get().GetConfig().GetValue("Thread", "network", networkCount);
 
-		for (int index = 0; index < this->mThreadCount; index++)
+		for (int index = 0; index < taskCount; index++)
 		{
 			mThreadArray.push_back(new TaskThread(this));
 		}
-		for (TaskThread * taskThread : this->mThreadArray)
+
+		for (int index = 0; index < networkCount; index++)
+		{
+			this->mNetThreads.push_back(new NetWorkThread(this));
+		}
+
+		for (auto taskThread : this->mThreadArray)
+		{
+			taskThread->Start();
+		}
+
+		for (auto taskThread : this->mNetThreads)
 		{
 			taskThread->Start();
 		}
@@ -28,22 +40,22 @@ namespace GameKeeper
 
     void TaskPoolComponent::Start()
     {
-		
+		for (auto thread : this->mNetThreads)
+		{
+			thread->Start();
+		}
+
+		for (auto thread : mThreadArray)
+		{
+			thread->Start();
+		}
     }
 
-    NetWorkThread * TaskPoolComponent::NewNetworkThread(const std::string & name,StaticMethod * method)
-    {
-        auto iter = this->mNetThread.find(name);
-        if(iter == this->mNetThread.end())
-        {
-            NetWorkThread * thread = new NetWorkThread(this, method);
-            this->mNetThread.emplace(name, thread);
-            GKDebugLog("start new network thread [" <<  name << "]");
-            return thread;
-        }
-        return iter->second;
-    }
-
+	NetWorkThread & TaskPoolComponent::GetNetThread()
+	{
+		return *mNetThreads[0];
+	}
+	
     void TaskPoolComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
@@ -70,30 +82,8 @@ namespace GameKeeper
         {
             task->mTaskId = mTaskNumberPool.Pop();
             this->mTaskMap.emplace(task->GetTaskId(), task);
-            size_t index = task->GetTaskId() % mThreadCount;
+            size_t index = task->GetTaskId() % this->mThreadArray.size();
             this->mThreadArray[index]->AddTask(task);
-            return true;
-        }
-        return false;
-    }
-
-    bool TaskPoolComponent::StartTask(const std::string & name, TaskProxy * task)
-    {
-        if(task== nullptr)
-        {
-            return false;
-        }
-        auto iter1 = this->mNetThread.find(name);
-        if(iter1 == this->mNetThread.end())
-        {
-            return false;
-        }
-        auto iter = this->mTaskMap.find(task->GetTaskId());
-        if (iter == this->mTaskMap.end())
-        {
-            task->mTaskId = mTaskNumberPool.Pop();
-            this->mTaskMap.emplace(task->GetTaskId(), task);
-            iter1->second->AddTask(task);
             return true;
         }
         return false;

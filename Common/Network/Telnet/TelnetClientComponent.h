@@ -3,7 +3,7 @@
 #include <Component/Component.h>
 namespace GameKeeper
 {
-    class TelnetClientComponent : public Component, public SocketHandler<TelnetClientSession>
+    class TelnetClientComponent : public Component
     {
     public:
         TelnetClientComponent();
@@ -13,18 +13,6 @@ namespace GameKeeper
     public:
         bool Awake() override;
 
-        SessionBase *CreateSocket() override;
-
-    protected:
-        void OnCloseSession(TelnetClientSession *session) override;
-
-        void OnListenNewSession(TelnetClientSession *session, const asio::error_code &err) override;
-
-        void OnSessionError(TelnetClientSession *session, const asio::error_code &err) override;
-
-        bool OnReceiveMessage(TelnetClientSession *session, const std::string &message) override;
-
-        void OnConnectRemoteAfter(TelnetClientSession *session, const asio::error_code &err) override;
     };
 }
 
