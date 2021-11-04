@@ -23,6 +23,7 @@ namespace GameKeeper
 #endif
         if (!this->mSocket->is_open())
         {
+            this->OnWriteAfter(XCode::HttpNetWorkError);
             return;
         }
         std::ostream os(&this->mStreamBuf);
@@ -36,7 +37,7 @@ namespace GameKeeper
         {
             if (err)
             {
-                this->OnSocketError(err);
+                this->OnWriteAfter(XCode::HttpNetWorkError);
                 return;
             }
             if (!isDone)
@@ -44,7 +45,7 @@ namespace GameKeeper
                 this->GetContext().post(std::bind(&HttpSessionBase::StartSendHttpMessage, this));
                 return;
             }
-            this->OnWriteAfter();
+            this->OnWriteAfter(XCode::Successful);
         });
     }
 
@@ -59,6 +60,7 @@ namespace GameKeeper
 #endif
         if(!this->mSocket->is_open() || !this->mIsReadBody)
         {
+            this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
             return;
         }
         asio::async_read(this->GetSocket(), this->mStreamBuf, asio::transfer_at_least(1),
@@ -85,44 +87,56 @@ namespace GameKeeper
 
     void HttpSessionBase::ReadHeardCallback(const asio::error_code &err, size_t size)
     {
-        if (err)
+        if(err == asio::error::eof)
         {
-            this->OnSocketError(err);
-            return;
+            this->OnReceiveBodyAfter(XCode::Successful);
         }
-        if (!this->mIsReadBody)
+        else if(err)
         {
-            const char *data = asio::buffer_cast<const char *>(this->mStreamBuf.data());
-            const char *pos = strstr(data, "\r\n\r\n");
-            if (pos == nullptr)
+            this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
+        }
+        else
+        {
+            if (!this->mIsReadBody)
             {
-                this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveHeard, this));
-                return;
-            }
-            this->mIsReadBody = true;
-            size_t pos1 = pos - data + strlen("\r\n\r\n");
-            //GKDebugLog("http heard legth = " << pos1);
-            if(this->OnReceiveHeard(mStreamBuf, pos1))
-            {
-                if(this->mStreamBuf.size() > 0)
+                const char *data = asio::buffer_cast<const char *>(this->mStreamBuf.data());
+                const char *pos = strstr(data, "\r\n\r\n");
+                if (pos == nullptr)
                 {
-                    this->OnReceiveBody(this->mStreamBuf);
+                    this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveHeard, this));
+                    return;
                 }
-                this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+
+                size_t pos1 = pos - data + strlen("\r\n\r\n");
+                if (this->OnReceiveHeard(mStreamBuf, pos1))
+                {
+                    this->mIsReadBody = true;
+                    if (this->mStreamBuf.size() > 0)
+                    {
+                        this->OnReceiveBody(this->mStreamBuf);
+                    }
+                    this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+                }
+                this->OnReceiveBodyAfter(XCode::Successful);
+                this->mIsReadBody = true;
             }
         }
     }
 
     void HttpSessionBase::ReadBodyCallback(const asio::error_code &err, size_t size)
     {
-        if(err)
+        if(err == asio::error::eof)
         {
-            this->OnSocketError(err);
-            GKDebugError(err.message());
-            return;
+            this->OnReceiveBodyAfter(XCode::Successful);
         }
-        this->OnReceiveBody(this->mStreamBuf);
-        this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+        else if(err)
+        {
+            this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
+        }
+        else
+        {
+            this->OnReceiveBody(this->mStreamBuf);
+            this->GetContext().post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+        }
     }
-
 }

@@ -16,4 +16,14 @@ namespace GameKeeper
         std::string RequestHandler;
         std::string ResponseHandler;
     };
+
+    class HttpServiceConfig
+    {
+    public:
+        std::string Path;
+        std::string Method;
+        std::string Service;
+        std::string ContentType;
+        std::set<std::string> HeardFields;
+    };
 }// namespace GameKeeper

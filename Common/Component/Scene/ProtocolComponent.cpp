@@ -10,37 +10,45 @@ namespace GameKeeper
 {
 	bool ProtocolComponent::Awake()
     {
-		rapidjson::Document jsonMapper;
-		const std::string & dir = App::Get().GetConfigPath();	
-		if (!FileHelper::ReadJsonFile(dir + "rpc.json", jsonMapper))
-		{
-			GKDebugFatal("not find file : " << dir << "");
-			return false;///
-		}
+        const std::string path1 = App::Get().GetConfigPath() + "rpc.json";
+        const std::string path2 = App::Get().GetConfigPath() + "http.json";
+        GKAssertRetFalse_F(this->LoadTcpServiceConfig(path1));
+        GKAssertRetFalse_F(this->LoadHttpServiceConfig(path2));
+        return true;
+    }
 
-		auto iter1 = jsonMapper.MemberBegin();
-		for (; iter1 != jsonMapper.MemberEnd(); iter1++)
-		{
-			const std::string service = iter1->name.GetString();
-			rapidjson::Value& jsonValue = iter1->value;
-			GKAssertRetFalse_F(jsonValue.IsObject());
-			GKAssertRetFalse_F(jsonValue.HasMember("ID"));
+    bool ProtocolComponent::LoadTcpServiceConfig(const std::string &path)
+    {
+        rapidjson::Document jsonMapper;
+        if (!FileHelper::ReadJsonFile(path, jsonMapper))
+        {
+            GKDebugFatal("not find file : " << path << "");
+            return false;///
+        }
 
-			std::vector<ProtocolConfig *> methods;
-			auto iter2 = jsonValue.MemberBegin();
-			for (; iter2 != jsonValue.MemberEnd(); iter2++)
+        auto iter1 = jsonMapper.MemberBegin();
+        for (; iter1 != jsonMapper.MemberEnd(); iter1++)
+        {
+            const std::string service = iter1->name.GetString();
+            rapidjson::Value& jsonValue = iter1->value;
+            GKAssertRetFalse_F(jsonValue.IsObject());
+            GKAssertRetFalse_F(jsonValue.HasMember("ID"));
+
+            std::vector<ProtocolConfig *> methods;
+            auto iter2 = jsonValue.MemberBegin();
+            for (; iter2 != jsonValue.MemberEnd(); iter2++)
             {
                 if (!iter2->value.IsObject())
                 {
                     continue;
                 }
-                ProtocolConfig *protocolConfig = new ProtocolConfig();
+                auto protocolConfig = new ProtocolConfig();
 
-				protocolConfig->ServiceName = service;
+                protocolConfig->ServiceName = service;
                 protocolConfig->Method = iter2->name.GetString();
                 GKAssertRetFalse_F(iter2->value.HasMember("ID"));
 
-				protocolConfig->IsAsync = iter2->value["Async"].GetBool();
+                protocolConfig->IsAsync = iter2->value["Async"].GetBool();
                 protocolConfig->MethodId = (unsigned short) iter2->value["ID"].GetUint();
 
 
@@ -95,15 +103,51 @@ namespace GameKeeper
                 this->mProtocolNameMap.insert(std::make_pair(name, protocolConfig));
                 this->mProtocolMap.insert(std::make_pair(protocolConfig->MethodId, protocolConfig));
             }
-			this->mServiceMap.emplace(service, methods);
-		}
+            this->mServiceMap.emplace(service, methods);
+        }
         return true;
     }
 
-	void ProtocolComponent::Start()
-	{
-			
-	}
+    const HttpServiceConfig *ProtocolComponent::GetHttpConfig(const std::string &path) const
+    {
+        auto iter = this->mHttpConfigMap.find(path);
+        return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
+    }
+
+    bool ProtocolComponent::LoadHttpServiceConfig(const std::string &path)
+    {
+        rapidjson::Document jsonMapper;
+        if (!FileHelper::ReadJsonFile(path, jsonMapper))
+        {
+            GKDebugFatal("not find file : " << path << "");
+            return false;
+        }
+
+        auto iter1 = jsonMapper.MemberBegin();
+        for (; iter1 != jsonMapper.MemberEnd(); iter1++)
+        {
+            rapidjson::Value & jsonValue = iter1->value;
+            if(!jsonValue.IsObject())
+            {
+                return false;
+            }
+            auto httpServiceConfig = new HttpServiceConfig();
+            httpServiceConfig->Path = iter1->name.GetString();
+            httpServiceConfig->Method = jsonValue["Method"].GetString();
+            httpServiceConfig->Service = jsonValue["Service"].GetString();
+            httpServiceConfig->ContentType = jsonValue["ContentType"].GetString();
+
+            if(jsonValue.HasMember("Fields") && jsonValue["Fields"].IsArray())
+            {
+               for(unsigned int index = 0; index < jsonValue["Fields"].Size();index++)
+               {
+                  httpServiceConfig->HeardFields.insert(jsonValue["Fields"][index].GetString());
+               }
+            }
+            this->mHttpConfigMap.emplace(httpServiceConfig->Path, httpServiceConfig);
+        }
+        return true;
+    }
 
 
 	bool ProtocolComponent::HasService(const std::string & service)

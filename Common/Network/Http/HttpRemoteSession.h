@@ -17,14 +17,14 @@ namespace GameKeeper
     public:
         SocketType GetSocketType() override { return SocketType::RemoteSocket;}
     protected:
-        void OnWriteAfter() override;
         void OnSessionEnable() override;
+        void OnWriteAfter(XCode code) override;
+        void OnReceiveBodyAfter(XCode code) override;
+        void OnReceiveHeardAfter(XCode code) override;
         bool WriterToBuffer(std::ostream &os) override;
         void OnReceiveBody(asio::streambuf &buf) override;
-        void OnSocketError(const asio::error_code &err) override;
         bool OnReceiveHeard(asio::streambuf &buf,size_t size) override;
     private:
-        std::string mMethod;
         HttpClientComponent * mHttpComponent;
         HttpRemoteRequestHandler * mHttpHandler;
     };

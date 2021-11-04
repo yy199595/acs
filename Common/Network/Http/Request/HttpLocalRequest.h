@@ -29,7 +29,11 @@ namespace GameKeeper
 
         void SetCode(XCode code);
 
-        void OnSessionError(const asio::error_code &code) override;
+        void OnReceiveBodyAfter(XCode code) override;
+
+        void OnReceiveHeardAfter(XCode code) override;
+
+        void OnWriterAfter(XCode code) override { }
 
         bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
 

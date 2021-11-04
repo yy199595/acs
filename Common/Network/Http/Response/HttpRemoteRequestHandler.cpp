@@ -13,6 +13,7 @@ namespace GameKeeper
         : mHttpSession(session), mHttpComponent(component)
     {
         this->mWriteCount = 0;
+        this->mHttpConfig = nullptr;
         this->mHttpContent = nullptr;
 #ifdef __DEBUG__
         this->mStartTime = TimeHelper::GetMilTimestamp();
@@ -25,28 +26,14 @@ namespace GameKeeper
         delete this->mHttpContent;
 #ifdef __DEBUG__
         long long endTime = TimeHelper::GetMilTimestamp();
-        GKDebugLog("http call " << this->mService << "." << this->mMethod
+        GKDebugLog("http call " << this->mHttpConfig-> << "." << this->mMethod
                                 << " use time = " << ((endTime - this->mStartTime) / 1000.0f) << "s");
 #endif
     }
 
-    void HttpRemoteRequestHandler::OnSessionError(const asio::error_code &err)
-    {
-        XCode code = err == asio::error::eof
-                ? XCode::Successful : XCode::HttpNetWorkError;
-        this->SetCode(code);
-    }
-
-    void HttpRemoteRequestHandler::OnWriterAfter()
+    void HttpRemoteRequestHandler::OnWriterAfter(XCode code)
     {
         delete this;
-    }
-
-    void HttpRemoteRequestHandler::SetCode(XCode code)
-    {
-		this->mCode = code;
-        MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
     }
 
     void HttpRemoteRequestHandler::SetCode(HttpStatus code)
@@ -64,9 +51,8 @@ namespace GameKeeper
                << " " << HttpStatusToString(this->mHttpCode) << "\r\n";
             if (this->mHttpContent != nullptr)
             {
-                size_t size = this->mHttpContent->GetContentSize();
-                os << "Content-Length:" << size << "\r\n";
-                GKDebugWarning("content size = " << size);
+                this->mHttpContent->GetContentType(os);
+                os << "Content-Length:" << this->mHttpContent->GetContentSize() << "\r\n";
             }
             os << "Server:" << "GameKeeper" << "\r\n";
             os << "Connection:close" << "\r\n";
@@ -100,17 +86,22 @@ namespace GameKeeper
 
     bool HttpRemoteRequestHandler::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {
-        std::string path;
-        std::istream is(&buf);
-        is >> path >> this->mVersion;
+        const std::string & url = this->mHttpSession->GetPath();
         this->ParseHeard(buf, size - (size - buf.size()));
+
+        size_t pos = url.find('?');
+        if(pos != std::string::npos)
+        {
+            std::string path = url.substr(0, pos);
+            this->mp
+        }
 
         if (!this->ParseUrl(path))
         {
             this->SetCode(HttpStatus::NOT_FOUND);
             return false;
         }
-        this->SetCode(XCode::Successful);
+        this->OnReceiveHeardAfter(XCode::Successful);
         return false;
     }
 

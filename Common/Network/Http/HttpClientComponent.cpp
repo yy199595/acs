@@ -37,7 +37,7 @@ namespace GameKeeper
 
         GKDebugFatal(json.size());
         const std::string path = App::Get().GetDownloadPath() + "1995.xlsx";
-        this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/3344.xlsx", path);
+        //this->Download("http://127.0.0.1:80/App/HttpDownloadService/Download/3344.xlsx", path);
 
         //GKDebugFatal(json);
     }
@@ -74,7 +74,7 @@ namespace GameKeeper
             remoteRequest->SetCode(HttpStatus::NOT_FOUND);
             return;
         }
-        this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, httpMethod, remoteRequest);
+        remoteRequest->SetCode(httpMethod->Invoke(remoteRequest));
     }
 
     XCode HttpClientComponent::Download(const std::string &url, const std::string &path, int timeout)

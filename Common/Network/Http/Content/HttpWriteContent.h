@@ -19,6 +19,7 @@ namespace GameKeeper
     public:
         virtual size_t GetContentSize() = 0;
         virtual bool GetContent(std::ostream &os) = 0;
+        virtual void GetContentType(std::ostream & is) {}
     };
 }
 
@@ -46,6 +47,7 @@ namespace GameKeeper
     public:
         size_t GetContentSize() override;
         bool GetContent(std::ostream &os) override;
+        void GetContentType(std::ostream &is) override;
     private:
 		size_t mFileSize;
 #ifdef __DEBUG__

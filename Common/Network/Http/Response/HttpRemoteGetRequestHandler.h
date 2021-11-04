@@ -14,15 +14,16 @@ namespace GameKeeper
         using HttpRemoteRequestHandler::HttpRemoteRequestHandler;
         ~HttpRemoteGetRequestHandler() override = default;
     public:
-
-
+        
 		bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
 		const std::string & GetParamater() { return this->mParamater; }
 
     protected:
 
-        void OnReceiveBody(asio::streambuf &buf) override { }
+        void OnReceiveBodyAfter(XCode code) override { assert(false); }
+
+        void OnReceiveBody(asio::streambuf &buf) override { assert(false);}
 
         bool ParseUrl(const std::string &path) override;
 

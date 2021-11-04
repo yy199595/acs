@@ -3,6 +3,8 @@
 //
 
 #include "HttpRemoteSession.h"
+#include <Core/App.h>
+#include <Scene/ProtocolComponent.h>
 #include <Network/Http/HttpClientComponent.h>
 #include <Network/Http/Response/HttpRemoteRequestHandler.h>
 namespace GameKeeper
@@ -16,29 +18,32 @@ namespace GameKeeper
 
     bool HttpRemoteSession::WriterToBuffer(std::ostream &os)
     {
-        if(this->mHttpHandler == nullptr)
-        {
-            return true;
-        }
+        GKAssertRetFalse_F(this->mHttpHandler);
         return this->mHttpHandler->WriterToBuffer(os);
     }
 
-    void HttpRemoteSession::OnWriteAfter()
+    void HttpRemoteSession::OnWriteAfter(XCode code)
     {
-        if(this->mHttpHandler == nullptr)
-        {
-            assert(false);
-        }
-        this->mHttpHandler->OnWriterAfter();
+        GKAssertRet_F(this->mHttpHandler);
+        this->mHttpHandler->OnWriterAfter(code);
     }
 
     void HttpRemoteSession::OnReceiveBody(asio::streambuf &buf)
     {
-        if (this->mHttpHandler == nullptr)
-        {
-            return;
-        }
+        GKAssertRet_F(this->mHttpHandler);
         this->mHttpHandler->OnReceiveBody(buf);
+    }
+
+    void HttpRemoteSession::OnReceiveBodyAfter(XCode code)
+    {
+        GKAssertRet_F(this->mHttpHandler);
+        this->mHttpHandler->OnReceiveBodyAfter(code);
+    }
+
+    void HttpRemoteSession::OnReceiveHeardAfter(XCode code)
+    {
+        GKAssertRet_F(this->mHttpHandler);
+        this->mHttpHandler->OnReceiveHeardAfter(code);
     }
 
     void HttpRemoteSession::OnSessionEnable()
@@ -46,22 +51,15 @@ namespace GameKeeper
         this->StartReceiveHeard();
     }
 
-    void HttpRemoteSession::OnSocketError(const asio::error_code &err)
-    {
-        if(this->mHttpHandler== nullptr)
-        {
-            return;
-        }
-        this->mHttpHandler->OnSessionError(err);
-    }
-
     bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {
+        std::string method;
         std::istream is(&buf);
-        is >> this->mMethod;
-        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(this->mMethod, this);
-        if (this->mHttpHandler == nullptr)
+        is >> method >> this->mPath >> this->mVersion;
+        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(method, this);
+        if(this->mHttpHandler == nullptr)
         {
+            GKDebugFatal("create http method " << method << " handler failure");
             return false;
         }
         size_t size1 = size - (size - buf.size());

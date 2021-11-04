@@ -15,10 +15,11 @@ namespace GameKeeper
         ~HttpRemotePostRequestHandler() override = default;
     public:
         XCode GetContent(HttpReadContent & content);
+        void OnReceiveBodyAfter(XCode code) override;
     protected:
         unsigned int mCorId;
         HttpReadContent * mContent;
-        void OnReceiveBody(asio::streambuf &buf) override { }
+        void OnReceiveBody(asio::streambuf &buf) override;
     };
 }
 #endif //GAMEKEEPER_HTTPREMOTEPOSTREQUESTHANDLER_H

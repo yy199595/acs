@@ -9,6 +9,7 @@
 
 namespace GameKeeper
 {
+    class HttpServiceConfig;
     class HttpRemoteSession;
     class HttpClientComponent;
 
@@ -17,7 +18,7 @@ namespace GameKeeper
     public:
         explicit HttpRemoteRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
 
-         ~HttpRemoteRequestHandler() ;
+         virtual ~HttpRemoteRequestHandler() ;
 
     public:
         void SetCode(HttpStatus code);
@@ -30,44 +31,28 @@ namespace GameKeeper
 
         bool WriterToBuffer(std::ostream &os) override;
 
-        void OnSessionError(const asio::error_code &code) override;
-
-        const std::string & GetPath() { return this->mPath;}
-
-        const std::string & GetVersion() { return this->mVersion;}
+        XCode GetErrorCode() const { return this->mCode; }
 
         HttpRemoteSession * GetSession() { return this->mHttpSession; }
 
-		const std::string & GetMethodName() { return this->mMethod; }
+        const HttpServiceConfig * GetHttpConfig() const { return this->mHttpConfig;}
 
-		const std::string & GetServiceName() { return this->mService; }
-
-        XCode GetErrorCode() { return this->mCode; }
-
-        void OnWriterAfter() override;
-
-        bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
+        void OnWriterAfter(XCode code) override;
 
     protected:
-
-        virtual void SetCode(XCode code);
 
         virtual bool ParseUrl(const std::string & path);
 
-
 	protected:
-		std::string mMethod;
-		std::string mService;
+        XCode mCode;
     protected:
-        std::string mPath;
-        std::string mVersion;
         HttpRemoteSession *mHttpSession;
+        const HttpServiceConfig * mHttpConfig;
         HttpClientComponent *mHttpComponent;
     private:
 #ifdef __DEBUG__
       long long mStartTime;
 #endif
-        XCode mCode;
         int mWriteCount;
         HttpStatus mHttpCode;
         HttpWriteContent * mHttpContent;

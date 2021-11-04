@@ -5,7 +5,7 @@
 #ifdef __DEBUG__
 #include <Define/CommonDef.h>
 #endif // __DEBUG__
-
+#include <Util/DirectoryHelper.h>
 namespace GameKeeper
 {
     HttpWriteStringContent::HttpWriteStringContent(const std::string &content)
@@ -67,6 +67,17 @@ namespace GameKeeper
             return this->mFileStream.eof();
         }
         return true;
+    }
+
+    void HttpWriteFileContent::GetContentType(std::ostream & os)
+    {
+        size_t pos = this->mPath.find_last_of('/\\');
+        if(pos != std::string::npos)
+        {
+            const std::string name = this->mPath.substr(pos + 1);
+            os << "Content-Type:" << "application/octet-stream" << "\r\n";
+            os << "Content-Disposition:" << "attachment;filename=" << name << "\r\n";
+        }
     }
 
     size_t HttpWriteFileContent::GetContentSize()

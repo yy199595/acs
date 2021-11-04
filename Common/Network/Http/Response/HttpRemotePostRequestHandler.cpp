@@ -22,6 +22,25 @@ namespace GameKeeper
         NetWorkThread *netWorkThread = this->mHttpComponent->GetNetThread();
         netWorkThread->AddTask(&HttpRemoteSession::StartReceiveBody, this->mHttpSession);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
+        return this->GetErrorCode();
+    }
+
+    void HttpRemotePostRequestHandler::OnReceiveBodyAfter(XCode code)
+    {
+        this->mCode = code;
+        MainTaskScheduler & taskScheduler =  App::Get().GetTaskScheduler();
+        CoroutineComponent * coroutineComponent = App::Get().GetCorComponent();
+        taskScheduler.AddMainTask(&CoroutineComponent::Resume, coroutineComponent, this->mCorId);
+    }
+
+    void HttpRemotePostRequestHandler::OnReceiveBody(asio::streambuf &buf)
+    {
+        std::istream is(&buf);
+        while(buf.size() > 0)
+        {
+            size_t size = is.readsome(this->mHandlerBuffer, 1024);
+            this->mContent->OnReadContent(this->mHandlerBuffer, size);
+        }
     }
 }
 

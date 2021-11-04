@@ -36,7 +36,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    void HttpLocalRequest::SetCode(XCode code)
+    void HttpLocalRequest::OnReceiveBodyAfter(XCode code)
     {
         this->mCode = code;
         CoroutineComponent *corComponent = App::Get().GetCorComponent();
@@ -44,10 +44,12 @@ namespace GameKeeper
         taskScheduler.AddMainTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
     }
 
-    void HttpLocalRequest::OnSessionError(const asio::error_code &code)
+    void HttpLocalRequest::OnReceiveHeardAfter(XCode code)
     {
-        this->SetCode(code == asio::error::eof
-                      ? XCode::Successful : XCode::HttpNetWorkError);
+        if(code != XCode::Successful)
+        {
+            this->OnReceiveHeardAfter(code);
+        }
     }
 
     bool HttpLocalRequest::OnReceiveHeard(asio::streambuf &buf, size_t size)
