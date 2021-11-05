@@ -2,6 +2,8 @@
 #include <XCode/XCode.h>
 #include <Define/CommonTypeDef.h>
 #include <Network/Http/Http.h>
+
+
 namespace GameKeeper
 {
 	class HttpHandlerBase
@@ -10,6 +12,7 @@ namespace GameKeeper
 		HttpHandlerBase() = default;
 		virtual ~HttpHandlerBase() = default;
 	public:
+        virtual HttpMethodType GetType() = 0;
         virtual void OnWriterAfter(XCode code) = 0;
         virtual void OnReceiveBodyAfter(XCode code) = 0;
         virtual void OnReceiveHeardAfter(XCode code) = 0;

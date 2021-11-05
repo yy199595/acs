@@ -44,7 +44,7 @@ namespace GameKeeper
                 this->mConnectCount = 0;			
             }
 			NetWorkThread & nThread = this->mSocketProxy->GetThread();
-			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, err);
+			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, this, err);
         });
     }
 
@@ -65,7 +65,7 @@ namespace GameKeeper
 			CoroutineComponent *component = App::Get().GetCorComponent();
 			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();       
 			taskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);	
-			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, err);
+			nThread.AddTask(&TcpClientComponent::OnConnectRemoteAfter, this->mTcpComponent, this, err);
         });
     }
 }

@@ -64,8 +64,13 @@ namespace GameKeeper
 	protected:
 		template<typename T>
 		T * GetComponent();
+
+        template<typename T>
+        T * GetComponent(const std::string & name);
+
+        Component * GetByName(const std::string & name);
 	private:
-		Component * GetComponentByHash(const size_t hash);
+		Component * GetByHash(size_t hash);
 	protected:
 		Type * mType;
 		long long gameObjectID;
@@ -76,6 +81,18 @@ namespace GameKeeper
 	inline T * Component::GetComponent()
 	{
 		const size_t hash = typeid(T).hash_code();
-		return static_cast<T*>(this->GetComponentByHash(hash));
+		return static_cast<T*>(this->GetByHash(hash));
 	}
+
+    template<typename T>
+    inline T * Component::GetComponent(const std::string & name)
+    {
+        Component *component = this->GetByName(name);
+        if (component == nullptr)
+        {
+            return nullptr;
+        }
+        return static_cast<T *>(component);
+    }
+
 }

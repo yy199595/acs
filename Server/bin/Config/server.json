@@ -68,7 +68,6 @@
         "MysqlProxyComponent",
         "GatewayComponent",
         "HttpClientComponent",
-        "LuaServiceMgrComponent",
         "TelnetClientComponent"
     ],
     "Service": [
@@ -76,7 +75,8 @@
         "CenterService", 
         "ClusterService",
         "GatewayService",
-        "HttpDownloadService"
+        "HttpLoginService",
+        "HttpResourceComponent"
     ],
     "WhiteList": [
         "127.0.0.1"

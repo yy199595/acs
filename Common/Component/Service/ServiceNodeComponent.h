@@ -15,12 +15,14 @@ namespace GameKeeper
     public:
         bool DelNode(int nodeId);
 
-		virtual int GetPriority() { return 0; }
+        int GetPriority() final { return 1; }
 
 		ServiceNode * CreateNode(int areaId, int nodeId, std::string name, std::string address);
 	
     protected:
         bool Awake() final;
+
+        void Start() override;
 
         void OnSecondUpdate() final;
 

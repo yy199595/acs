@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#include "HttpRemoteRequestHandler.h"
+#include "HttpRequestHandler.h"
 #include <Core/App.h>
 #include <Network/Http/HttpClientComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
@@ -10,7 +10,7 @@
 namespace GameKeeper
 {
 
-    HttpRemoteRequestHandler::HttpRemoteRequestHandler(HttpClientComponent *component, HttpRemoteSession *session)
+    HttpRequestHandler::HttpRequestHandler(HttpClientComponent *component, HttpRemoteSession *session)
         : mHttpSession(session), mHttpComponent(component)
     {
         this->mWriteCount = 0;
@@ -21,30 +21,38 @@ namespace GameKeeper
 #endif
     }
 
-    HttpRemoteRequestHandler::~HttpRemoteRequestHandler() noexcept
+    HttpRequestHandler::~HttpRequestHandler() noexcept
     {
         delete this->mHttpSession;
         delete this->mHttpContent;
 #ifdef __DEBUG__
-        long long endTime = TimeHelper::GetMilTimestamp();
-        GKDebugLog("http call " << this->mHttpConfig->Service << "." << this->mHttpConfig->Method
-                                << " use time = " << ((endTime - this->mStartTime) / 1000.0f) << "s");
+        if(this->mHttpConfig != nullptr)
+        {
+            long long endTime = TimeHelper::GetMilTimestamp();
+            GKDebugLog("http call " << this->mHttpConfig->Service << "." << this->mHttpConfig->Method
+                                    << " use time = " << ((endTime - this->mStartTime) / 1000.0f) << "s");
+        }
 #endif
     }
 
-    void HttpRemoteRequestHandler::OnWriterAfter(XCode code)
+    void HttpRequestHandler::OnWriterAfter(XCode code)
     {
         delete this;
     }
 
-    void HttpRemoteRequestHandler::SetCode(HttpStatus code)
+    void HttpRequestHandler::SetCode(HttpStatus code)
     {
         this->mHttpCode = code;
 		NetWorkThread & httpThread = this->GetSession()->GetThread();
+        if(httpThread.IsCurrentThread())
+        {
+            this->mHttpSession->StartSendHttpMessage();
+            return;
+        }
         httpThread.AddTask(&HttpRemoteSession::StartSendHttpMessage, this->mHttpSession);
     }
 
-    bool HttpRemoteRequestHandler::WriterToBuffer(std::ostream &os)
+    bool HttpRequestHandler::WriterToBuffer(std::ostream &os)
     {
         if (this->mWriteCount == 0)
         {
@@ -74,7 +82,7 @@ namespace GameKeeper
         return this->mHttpContent->GetContent(os);
     }
 
-    bool HttpRemoteRequestHandler::SetHeard(const std::string &key, const std::string &val)
+    bool HttpRequestHandler::SetHeard(const std::string &key, const std::string &val)
     {
         auto iter = this->mHeardMap.find(key);
         if(iter == this->mHeardMap.end())
@@ -86,7 +94,7 @@ namespace GameKeeper
     }
 
 
-    bool HttpRemoteRequestHandler::SetContent(HttpWriteContent *httpContent)
+    bool HttpRequestHandler::SetContent(HttpWriteContent *httpContent)
     {
         if (this->mHttpContent != nullptr || httpContent == nullptr)
         {

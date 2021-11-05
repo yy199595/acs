@@ -6,6 +6,16 @@
 
 namespace GameKeeper
 {
+    HttpServiceComponent::~HttpServiceComponent() noexcept
+    {
+        auto iter = this->mMethodMap.begin();
+        for (; iter != this->mMethodMap.end(); iter++)
+        {
+            delete iter->second;
+        }
+        this->mMethodMap.clear();
+    }
+
     bool HttpServiceComponent::Awake()
     {
         return true;

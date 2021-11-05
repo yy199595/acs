@@ -1,16 +1,22 @@
 #include "HttpSessionBase.h"
 #include <Define/CommonDef.h>
 #include <istream>
-#include <Component/IComponent.h>
+#include <Util/TimeHelper.h>
 #include <Network/Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
     HttpSessionBase::HttpSessionBase(HttpClientComponent * component)
             : mHttpComponent(component)
     {
-        this->mCount = 0;	
+        this->mCount = 0;
+        this->mTimer = nullptr;
         this->mIsReadBody = false;
 		this->mSocketProxy = nullptr;
+    }
+
+    HttpSessionBase::~HttpSessionBase()
+    {
+        delete this->mTimer;
     }
 
     void HttpSessionBase::StartSendHttpMessage()
@@ -48,10 +54,12 @@ namespace GameKeeper
         });
     }
 
+
     void HttpSessionBase::StartReceiveBody()
     {
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
+
 		GKAssertRet_F(this->mSocketProxy && this->mSocketProxy->IsOpen());
 		if (nThread.IsCurrentThread())
 		{
@@ -59,6 +67,17 @@ namespace GameKeeper
 			return;
 		}
 		nThread.AddTask(&HttpSessionBase::ReceiveBody, this);      
+    }
+
+    void HttpSessionBase::CreateTimer(int second)
+    {
+        if(this->mTimer == nullptr)
+        {
+            NetWorkThread &nThread = this->mSocketProxy->GetThread();
+            this->mTimer = new asio::system_timer(nThread.GetContext());
+            this->mTimer->expires_at(std::chrono::system_clock::now() + std::chrono::seconds(5));
+            this->mTimer->async_wait(std::bind(&HttpSessionBase::OnTimeout, this, args1));
+        }
     }
 
     void HttpSessionBase::StartReceiveHeard()
@@ -72,12 +91,11 @@ namespace GameKeeper
 			return;
 		}
 		nThread.AddTask(&HttpSessionBase::ReceiveHeard, this);
-
-      
     }
 
 	void HttpSessionBase::ReceiveBody()
 	{
+        this->mLastTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		if (!socket.is_open() || !this->mIsReadBody)
 		{
@@ -90,11 +108,14 @@ namespace GameKeeper
 
 	void HttpSessionBase::ReceiveHeard()
 	{
-		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+        this->CreateTimer();
+        this->mLastTime = TimeHelper::GetSecTimeStamp();
+        AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		if (!socket.is_open() || this->mIsReadBody)
 		{
 			GKDebugFatal("logic error");
-			return;
+            this->OnReceiveHeardAfter(XCode::HttpNetWorkError);
+            return;
 		}
 		asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
 			std::bind(&HttpSessionBase::ReadHeardCallback, this, args1, args2));
@@ -102,13 +123,14 @@ namespace GameKeeper
 
     void HttpSessionBase::ReadHeardCallback(const asio::error_code &err, size_t size)
     {
+        this->mLastTime = TimeHelper::GetSecTimeStamp();
         if(err == asio::error::eof)
         {
-            this->OnReceiveBodyAfter(XCode::Successful);
+            this->OnReceiveHeardAfter(XCode::Successful);
         }
         else if(err)
         {
-            this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
+            this->OnReceiveHeardAfter(XCode::HttpNetWorkError);
         }
         else
         {
@@ -119,7 +141,7 @@ namespace GameKeeper
                 if (pos == nullptr)
                 {
 					AsioContext & context = this->mSocketProxy->GetContext();
-					context.post(std::bind(&HttpSessionBase::StartReceiveHeard, this));
+					context.post(std::bind(&HttpSessionBase::ReceiveHeard, this));
                     return;
                 }
 
@@ -132,9 +154,9 @@ namespace GameKeeper
                         this->OnReceiveBody(this->mStreamBuf);
                     }
 					AsioContext & context = this->mSocketProxy->GetContext();
-					context.post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+					context.post(std::bind(&HttpSessionBase::ReceiveBody, this));
                 }
-                this->OnReceiveBodyAfter(XCode::Successful);
+                this->OnReceiveHeardAfter(XCode::Successful);
                 this->mIsReadBody = true;
             }
         }
@@ -142,6 +164,7 @@ namespace GameKeeper
 
     void HttpSessionBase::ReadBodyCallback(const asio::error_code &err, size_t size)
     {
+        this->mLastTime = TimeHelper::GetSecTimeStamp();
         if(err == asio::error::eof)
         {
             this->OnReceiveBodyAfter(XCode::Successful);
@@ -154,7 +177,17 @@ namespace GameKeeper
         {
             this->OnReceiveBody(this->mStreamBuf);
 			AsioContext & context = this->mSocketProxy->GetContext();
-			context.post(std::bind(&HttpSessionBase::StartReceiveBody, this));
+			context.post(std::bind(&HttpSessionBase::ReceiveBody, this));
         }
+    }
+
+    void HttpSessionBase::OnTimeout(const asio::error_code &err)
+    {
+        if(!this->mIsReadBody)
+        {
+            this->OnReceiveHeardAfter(XCode::HttpNetWorkError);
+            return;
+        }
+        this->OnReceiveBodyAfter(XCode::HttpNetWorkError);
     }
 }

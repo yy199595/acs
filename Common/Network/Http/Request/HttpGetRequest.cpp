@@ -1,10 +1,10 @@
-#include "HttpLolcalGetRequest.h"
+#include "HttpGetRequest.h"
 #include <Network/NetworkHelper.h>
 #include<Define/CommonDef.h>
 namespace GameKeeper
 {
-	HttpLolcalGetRequest::HttpLolcalGetRequest(HttpClientComponent * component)
-		:HttpLocalRequest(component)
+	HttpGetRequest::HttpGetRequest(HttpClientComponent * component)
+		:HttpRequest(component)
 	{
 		this->mCorId = 0;
 #ifdef __DEBUG__
@@ -13,13 +13,13 @@ namespace GameKeeper
 		this->mResponse = nullptr;
 	}
 
-	XCode HttpLolcalGetRequest::Get(const std::string & url, HttpReadContent & response)
+	XCode HttpGetRequest::Get(const std::string & url, HttpReadContent & response)
 	{
 		this->mResponse = &response;
         return this->StartHttpRequest(url);
 	}
 
-	bool HttpLolcalGetRequest::WriterToBuffer(std::ostream & os)
+	bool HttpGetRequest::WriterToBuffer(std::ostream & os)
 	{
 		os << "GET " << mPath << " HTTP/1.0\r\n";
 		os << "Host: " << mHost << "\r\n";
@@ -28,7 +28,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	void HttpLolcalGetRequest::OnReceiveBody(asio::streambuf & buf)
+	void HttpGetRequest::OnReceiveBody(asio::streambuf & buf)
     {
         std::istream is(&buf);
         while (buf.size() > 0)

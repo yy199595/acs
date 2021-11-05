@@ -14,9 +14,9 @@ namespace GameKeeper
 	public:
 		HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler);
 		~HttpLocalSession() override;
-	public:	
-		void SetSocketProxy(SocketProxy * socketProxy) override;
-		void StartConnectHost(const std::string & host, const std::string & port);
+	public:
+        void SetSocketProxy(SocketProxy * socketProxy) override { }
+		void StartConnectHost(const std::string & host, const std::string & port, SocketProxy * socketProxy);
 	protected:
         void OnWriteAfter(XCode code) override;
         void OnReceiveBodyAfter(XCode code) override;
@@ -24,6 +24,7 @@ namespace GameKeeper
         bool WriterToBuffer(std::ostream & os) override;
         void OnReceiveBody(asio::streambuf & buf) override;
 		bool OnReceiveHeard(asio::streambuf & buf,size_t  size) override;
+
 	private:
 		void Resolver();
 		void ConnectHandler(const asio::error_code & err);

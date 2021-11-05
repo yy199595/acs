@@ -10,7 +10,7 @@ namespace GameKeeper
     class ServiceNode : public Object
     {
     public:
-        ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address);
+        ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId = 0);
 
     public:
 
@@ -60,6 +60,7 @@ namespace GameKeeper
         int mNodeId;
         bool mIsClose;
         std::string mIp;
+        long long mSocketId;
         unsigned int mCorId;
         unsigned short mPort;
         const std::string mAddress;         //监听地址

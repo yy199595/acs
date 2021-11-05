@@ -1,19 +1,19 @@
 //
 // Created by zmhy0073 on 2021/11/2.
 //
-#include "HttpDownloadService.h"
+#include "HttpResourceComponent.h"
 #include <Core/App.h>
 #include <Util/DirectoryHelper.h>
 #include <Util/MD5.h>
-#include <Network/Http/Response/HttpRemoteGetRequestHandler.h>
+#include <Network/Http/Response/HttpGettHandler.h>
 namespace GameKeeper
 {
-    bool HttpDownloadService::Awake()
+    bool HttpResourceComponent::Awake()
     {
         char buffer[1024] = {0};
         std::vector<std::string> files;
-        this->Add("Files", &HttpDownloadService::Files, this);
-        this->Add("Download", &HttpDownloadService::Download, this);
+        this->Add("Files", &HttpResourceComponent::Files, this);
+        this->Add("Download", &HttpResourceComponent::Download, this);
 
         const std::string & downloadPath = App::Get().GetDownloadPath();
         if (!DirectoryHelper::GetFilePaths(downloadPath, files))
@@ -36,9 +36,9 @@ namespace GameKeeper
         return true;
     }
 
-	HttpStatus HttpDownloadService::Files(HttpRemoteRequestHandler * handler)
+	HttpStatus HttpResourceComponent::Files(HttpRequestHandler * handler)
     {
-        auto getRequest = dynamic_cast<HttpRemoteGetRequestHandler *>(handler);
+        auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
         if (getRequest == nullptr)
         {
             return HttpStatus::BAD_REQUEST;
@@ -55,14 +55,14 @@ namespace GameKeeper
         return HttpStatus::OK;
     }
 
-	HttpStatus HttpDownloadService::Download(HttpRemoteRequestHandler *handler)
+	HttpStatus HttpResourceComponent::Download(HttpRequestHandler *handler)
     {
-        auto getRequest = dynamic_cast<HttpRemoteGetRequestHandler *>(handler);
+        auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
         if (getRequest == nullptr)
         {
             return HttpStatus::BAD_REQUEST;
         }
-        const std::string & fileName = getRequest->GetParamater();
+        const std::string & fileName = getRequest->GetParameter();
         auto iter = this->mFileMd5Map.find(fileName);
         if(iter == this->mFileMd5Map.end())
         {

@@ -87,11 +87,11 @@ namespace GameKeeper
 		long long id = socket->GetSocketId();
 		auto iter = this->mSessionAdressMap.find(id);
 		if (iter == this->mSessionAdressMap.end())
-		{
-			TcpClientSession * tcpSession = new TcpClientSession(this);
-			tcpSession->SetSocket(socket);
-			this->mSessionAdressMap.emplace(id, tcpSession);
-		}
+        {
+            auto tcpSession = new TcpClientSession(this);
+            tcpSession->SetSocket(socket);
+            this->mSessionAdressMap.emplace(id, tcpSession);
+        }
 	}
 
 
@@ -125,7 +125,7 @@ namespace GameKeeper
             }
             GKDebugLog("[request " << method << "] json = " << json);
 #endif
-            this->mRequestData.set_address(address);
+            this->mRequestData.set_socketid(session->GetSocketProxy().GetSocketId());
             return this->mServiceComponent->OnRequestMessage(mRequestData);
         }
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
@@ -182,10 +182,10 @@ namespace GameKeeper
                                                      unsigned short port)
 	{
 		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
-		SocketProxy * socketProxy = new SocketProxy(nThread, name);
-		TcpLocalSession * localSession = new TcpLocalSession(this, ip, port);
-		this->mSessionAdressMap.emplace(socketProxy->GetSocketId(), localSession);
-		return socketProxy->GetSocketId();		
+		auto localSession = new TcpLocalSession(this, ip, port);
+        localSession->SetSocket(new SocketProxy(nThread, name));
+		this->mSessionAdressMap.emplace(localSession->GetSocketProxy().GetSocketId(), localSession);
+		return localSession->GetSocketProxy().GetSocketId();
 	}
 
     void TcpClientComponent::OnDestory()

@@ -9,14 +9,19 @@
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
-	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address)
-		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false)
+	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId)
+		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false), mSocketId(socketId)
 	{
         GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
 		GKAssertRet_F(this->mActionManager = App::Get().GetComponent<CallHandlerComponent>());
         GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
         GKAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
         GKAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
+
+        if(this->mSocketId == 0)
+        {
+            this->mSocketId = this->mTcpClientComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
+        }
         this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::LoopSendMessage, this);
 	}
 
@@ -33,18 +38,14 @@ namespace GameKeeper
 
     TcpLocalSession * ServiceNode::GetTcpSession()
     {
-        auto localSession = this->mTcpClientComponent->GetLocalSession(this->mAddress);
-        if (localSession == nullptr)
+        auto localSession = this->mTcpClientComponent->GetLocalSession(this->mSocketId);
+
+        if (!localSession->IsOpen())
         {
-            localSession = this->mTcpClientComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
-            if (localSession == nullptr)
-            {
-                return nullptr;
-            }
             for (int index = 0; index < 1; index++)
             {
-                localSession->AsyncConnectRemote();
-                if(localSession->IsActive())
+                localSession->StartAsyncConnect();
+                if (localSession->IsOpen())
                 {
                     return localSession;
                 }
@@ -56,27 +57,25 @@ namespace GameKeeper
 
     void ServiceNode::LoopSendMessage()
     {
-        while(!this->mIsClose)
+        while (!this->mIsClose)
         {
-            int count = 0;
-            if(this->mWaitSendQueue.empty())
+            if (this->mWaitSendQueue.empty())
             {
                 this->mCorComponent->YieldReturn();
             }
-            TcpLocalSession * tcpLocalSession = this->GetTcpSession();
-            if(tcpLocalSession == nullptr)
+            TcpLocalSession *tcpLocalSession = this->GetTcpSession();
+            if (tcpLocalSession == nullptr)
             {
                 GKDebugError("node session [" << this->GetNodeName()
-                                                 << ":" << this->GetAddress() << "] connect error");
+                                              << ":" << this->GetAddress() << "] connect error");
                 this->mCorComponent->YieldReturn();
                 continue;
             }
-            while(!this->mWaitSendQueue.empty() && count < 100)
+            for (int index = 0; index < 100 && !this->mWaitSendQueue.empty(); index++)
             {
-                count++;
-                std::string * message = this->mWaitSendQueue.front();
+                std::string *message = this->mWaitSendQueue.front();
+                tcpLocalSession->StartSendByString(message);
                 this->mWaitSendQueue.pop();
-                tcpLocalSession->SendNetMessage(message);
             }
         }
         delete this;

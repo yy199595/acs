@@ -8,12 +8,12 @@
 namespace GameKeeper
 {
     class HttpClientComponent;
-    class HttpLocalRequest : public HttpHandlerBase
+    class HttpRequest : public HttpHandlerBase
     {
     public:
-        HttpLocalRequest(HttpClientComponent * component);
+        HttpRequest(HttpClientComponent * component);
 
-        ~HttpLocalRequest() override = default;
+        ~HttpRequest() override = default;
 
     public:
 

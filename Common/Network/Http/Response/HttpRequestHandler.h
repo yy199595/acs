@@ -5,6 +5,7 @@
 #ifndef GameKeeper_HTTPREMOTEREQUEST_H
 #define GameKeeper_HTTPREMOTEREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
+#include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/Content/HttpWriteContent.h>
 
 namespace GameKeeper
@@ -13,12 +14,12 @@ namespace GameKeeper
     class HttpRemoteSession;
     class HttpClientComponent;
 
-    class HttpRemoteRequestHandler : public HttpHandlerBase
+    class HttpRequestHandler : public HttpHandlerBase
     {
     public:
-        explicit HttpRemoteRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
+        explicit HttpRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
 
-         virtual ~HttpRemoteRequestHandler() = default ;
+         virtual ~HttpRequestHandler() override ;
 
     public:
         void SetCode(HttpStatus code);
@@ -26,6 +27,10 @@ namespace GameKeeper
         bool SetContent(HttpWriteContent * httpContent);
 
         bool SetHeard(const std::string &key, const std::string &val);
+
+        virtual const std::string & GetPath() = 0;
+
+        virtual const std::string & GetParameter() = 0;
 
     public:
 

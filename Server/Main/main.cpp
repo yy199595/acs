@@ -24,8 +24,9 @@
 #include <Service/GatewayService.h>
 #include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
-#include <HttpService/HttpDownloadService.h>
+#include <HttpService/HttpResourceComponent.h>
 #include <Pool/StringPool.h>
+#include <Service/HttpLoginService.h>
 using namespace GameKeeper;
 
 int main(int argc, char **argv)
@@ -61,7 +62,8 @@ int main(int argc, char **argv)
     __register_component__(CenterService);
     __register_component__(ClusterService);
     __register_component__(GatewayService);
-    __register_component__(HttpDownloadService);
+    __register_component__(HttpLoginService);
+    __register_component__(HttpResourceComponent);
 
     App app(argc, argv);
     return app.Run();

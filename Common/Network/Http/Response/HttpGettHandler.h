@@ -4,33 +4,37 @@
 
 #ifndef GameKeeper_HTTPREMOTEGETREQUEST_H
 #define GameKeeper_HTTPREMOTEGETREQUEST_H
-#include "HttpRemoteRequestHandler.h"
+#include "HttpRequestHandler.h"
 
 namespace GameKeeper
 {
-    class HttpRemoteGetRequestHandler : public HttpRemoteRequestHandler
+    class HttpGettHandler : public HttpRequestHandler
     {
     public:
-        using HttpRemoteRequestHandler::HttpRemoteRequestHandler;
-        ~HttpRemoteGetRequestHandler() override = default;
+        using HttpRequestHandler::HttpRequestHandler;
+        ~HttpGettHandler() override = default;
     public:
-        
+
+        HttpMethodType GetType() final { return HttpMethodType::GET; }
+
 		bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
-		const std::string & GetParamater() { return this->mParamater; }
+        const std::string & GetParameter() override { return this->mParamater;}
 
 		void OnReceiveHeardAfter(XCode code) override;
 
 		bool OnReceiveHeard(asio::streambuf & buf, size_t size) override;
 
+        const std::string & GetPath() override { return this->mPath; }
     protected:
 
         void OnReceiveBodyAfter(XCode code) override { assert(false); }
 
         void OnReceiveBody(asio::streambuf &buf) override { assert(false);}
-      
+
     private: // 请求参数
-		std::string mParamater;		
+        std::string mPath;
+        std::string mParamater;
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

@@ -23,14 +23,14 @@ namespace NumberHelper
 
 	long long Create()
 	{
-		static std::atomic_int index = 0;
+		static std::atomic_int index(1);
 		long long nowTime = TimeHelper::GetSecTimeStamp();
 		static long long lastTime = TimeHelper::GetSecTimeStamp();
 		if (lastTime != nowTime)
 		{
-			index = 0;
+			index = 1;
 			lastTime = nowTime;
 		}
-		return lastTime << 32 | index;
+		return lastTime << 32 | (index++);
 	}
 }// namespace NumberHelper

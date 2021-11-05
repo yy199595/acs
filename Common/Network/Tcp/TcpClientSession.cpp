@@ -12,38 +12,22 @@ namespace GameKeeper
 
     TcpClientSession::~TcpClientSession()
     {
-		delete this->mSocketProxy;
-		if (this->mReceiveMsgBuffer)
-		{
-			delete[]this->mReceiveMsgBuffer;
-		}
+        delete this->mSocketProxy;
+        delete[]this->mReceiveMsgBuffer;
     }
 
-	bool TcpClientSession::IsOpen()
-	{
-		if (this->mSocketProxy == nullptr)
-		{
-			return false;
-		}
-		std::lock_guard<std::mutex> lock(this->mLock);
-		return this->mSocketProxy->GetSocket().is_open();
-	}
-
 	void TcpClientSession::SetSocket(SocketProxy * socketProxy)
-	{
-		if (this->mSocketProxy != nullptr)
-		{
-			delete this->mSocketProxy;
-		}
-		this->mSocketProxy = socketProxy;
-		AsioTcpSocket & nScoket = this->mSocketProxy->GetSocket();
-		if (nScoket.is_open())
-		{
-			this->StartReceive();
-			this->mAddress = nScoket.remote_endpoint().address().to_string()
-				+ ":" + std::to_string(nScoket.remote_endpoint().port());
-		}
-	}
+    {
+        delete this->mSocketProxy;
+        this->mSocketProxy = socketProxy;
+        AsioTcpSocket &nScoket = this->mSocketProxy->GetSocket();
+        if (nScoket.is_open())
+        {
+            this->StartReceive();
+            this->mAddress = nScoket.remote_endpoint().address().to_string()
+                             + ":" + std::to_string(nScoket.remote_endpoint().port());
+        }
+    }
 
 
 	void TcpClientSession::StartClose()
@@ -126,11 +110,10 @@ namespace GameKeeper
 			return;
 		}
 		char *nMessageBuffer = this->mReceiveMsgBuffer;
-		if (allSize > this->mReceiveBufferSize)
+		if (allSize > TCP_BUFFER_COUNT)
 		{
 			nMessageBuffer = new char[allSize];
 		}
-		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
 		nSocket.async_read_some(asio::buffer(nMessageBuffer, allSize),
 			[this, nMessageBuffer](const asio::error_code &error_code,
 				const std::size_t size) {
@@ -167,7 +150,8 @@ namespace GameKeeper
 		nSocket.async_send(asio::buffer(message->c_str(), message->size()),
 			[message, this](const asio::error_code &error_code, std::size_t size)
 		{
-			bool isSuccess = error_code.operator bool;
+
+			bool isSuccess = error_code ? true : false;
 			NetWorkThread & nThread = this->mSocketProxy->GetThread();
 			nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,
 				this->mTcpComponent, this, message, isSuccess);

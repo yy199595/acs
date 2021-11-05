@@ -4,72 +4,65 @@
 #include <Method/MethodProxy.h>
 namespace GameKeeper
 {
-    TaskPoolComponent::TaskPoolComponent()
-    {
-       
-    }
-
 	bool TaskPoolComponent::Awake()
-	{
-		int taskCount = 0;
-		int networkCount = 0;
-		App::Get().GetConfig().GetValue("Thread", "task", taskCount);
-		App::Get().GetConfig().GetValue("Thread", "network", networkCount);
+    {
+        this->mIndex = 0;
+        int taskCount = 1;
+        int networkCount = 1;
+        App::Get().GetConfig().GetValue("Thread", "task", taskCount);
+        App::Get().GetConfig().GetValue("Thread", "network", networkCount);
 
-		for (int index = 0; index < taskCount; index++)
-		{
-			mThreadArray.push_back(new TaskThread(this));
-		}
+        for (int index = 0; index < taskCount; index++)
+        {
+            mThreadArray.push_back(new TaskThread(this));
+        }
 
-		for (int index = 0; index < networkCount; index++)
-		{
-			this->mNetThreads.push_back(new NetWorkThread(this));
-		}
+        for (int index = 0; index < networkCount; index++)
+        {
+            this->mNetThreads.push_back(new NetWorkThread(this));
+        }
 
-		for (auto taskThread : this->mThreadArray)
-		{
-			taskThread->Start();
-		}
+        for (auto taskThread: this->mNetThreads)
+        {
+            taskThread->Start();
+        }
 
-		for (auto taskThread : this->mNetThreads)
-		{
-			taskThread->Start();
-		}
-		return true;
-	}
+        for (auto taskThread: this->mThreadArray)
+        {
+            taskThread->Start();
+        }
+
+
+        return true;
+    }
 
     void TaskPoolComponent::Start()
     {
-		for (auto thread : this->mNetThreads)
-		{
-			thread->Start();
-		}
-
-		for (auto thread : mThreadArray)
-		{
-			thread->Start();
-		}
+//		for (auto thread : this->mNetThreads)
+//		{
+//			thread->Start();
+//		}
+//
+//		for (auto thread : mThreadArray)
+//		{
+//			thread->Start();
+//		}
     }
 
 	NetWorkThread & TaskPoolComponent::GetNetThread()
-	{
-		return *mNetThreads[0];
-	}
+    {
+        std::lock_guard<std::mutex> lock(this->mLock);
+        if (this->mIndex >= mNetThreads.size())
+        {
+            this->mIndex = 0;
+        }
+        return *(mNetThreads[this->mIndex++]);
+    }
 	
     void TaskPoolComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
 	}
-
-	void TaskPoolComponent::PushFinishTask(std::queue<unsigned int> & tasks)
-	{
-		this->mFinishTaskQueue.AddRange(tasks);
-	}
-
-    long long TaskPoolComponent::CreateTaskId()
-    {
-        return NumberHelper::Create();
-    }
 
     bool TaskPoolComponent::StartTask(TaskProxy * task)
     {

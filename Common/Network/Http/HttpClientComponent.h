@@ -7,13 +7,13 @@ namespace GameKeeper
     class HttpWriteContent;
     class HttpRemoteSession;
     class HttpServiceMethod;
-    class HttpRemoteRequestHandler;
-    class HttpClientComponent : public Component
+    class HttpRequestHandler;
+    class HttpClientComponent : public Component, public ISocketListen
     {
     public:
         HttpClientComponent() = default;
 
-        ~HttpClientComponent() = default;
+        ~HttpClientComponent() final = default;
     public:
         bool Awake() final;
 
@@ -29,15 +29,19 @@ namespace GameKeeper
         XCode Post(const std::string &url, const std::unordered_map<std::string, std::string> &data, std::string &response,
              int timeout = 5);
 
-    public:
-        void HandlerHttpRequest(HttpRemoteRequestHandler *remoteRequest);
-
-        HttpRemoteRequestHandler *CreateMethodHandler(const std::string &method, HttpRemoteSession *session);
-
-    private:
         XCode Post(const std::string &url, HttpWriteContent &content, std::string &response, int timeout);
 
-        void Invoke(HttpServiceMethod *method, HttpRemoteRequestHandler *remoteRequest);
+    public:
+        void OnListen(SocketProxy *socket) final;
+
+        void HandlerHttpRequest(HttpRequestHandler *remoteRequest);
+
+        HttpRequestHandler *CreateMethodHandler(const std::string &method, HttpRemoteSession *session);
+
+        HttpServiceMethod * GetHttpMethod(const std::string & service, const std::string & method);
+    private:
+
+        void Invoke(HttpRequestHandler *remoteRequest);
 
     private:
         class CoroutineComponent *mCorComponent;

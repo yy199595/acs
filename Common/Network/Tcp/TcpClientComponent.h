@@ -21,7 +21,7 @@ namespace GameKeeper
 		void OnSendMessageAfter(TcpClientSession *session, std::string * message, bool);
 		void OnConnectRemoteAfter(TcpLocalSession * session, const asio::error_code & err);
     protected:
-		void OnListen(SocketProxy * socket); 
+		void OnListen(SocketProxy * socket) final;
 	public:
         TcpLocalSession * GetLocalSession(long long id);
         TcpClientSession * GetRemoteSession(long long id);

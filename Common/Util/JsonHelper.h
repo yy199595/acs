@@ -12,25 +12,50 @@ namespace GameKeeper
     {
     public:
         RapidJsonWriter();
+
         ~RapidJsonWriter() = default;
+
     public:
         bool AddParameter(const char *key);
-        bool AddParameter(const char *key, const int value);
-        bool AddParameter(const char *key, const double value);
+
+        bool AddParameter(const char *key, int value);
+
+        bool AddParameter(const char *key, double value);
+
         bool AddParameter(const char *key, const char *value);
-        bool AddParameter(const char *key, const long long value);
-        bool AddParameter(const char *key, const std::string value);
-        bool AddParameter(const char *key, const unsigned int value);
+
+        bool AddParameter(const char *key, long long value);
+
+        bool AddParameter(const char *key, const std::string &value);
+
+        bool AddParameter(const char *key, unsigned int value);
+
         bool AddParameter(const char *key, const char *value, size_t size);
-        bool AddParameter(const char *key, const unsigned long long value);
+
+        bool AddParameter(const char *key, unsigned long long value);
+
         bool AddParameter(const char *key, const std::set<std::string> &value);
+
         bool AddParameter(const char *key, const std::vector<std::string> &value);
+
         bool AddParameter(const char *key, const google::protobuf::Message &value);
 
     public:
+        bool StartArray(const char *key);
+
+        bool StartObject(const char *key);
+
+    public:
+        bool EndArray() { this->jsonWriter.EndArray(); }
+
+        bool EndObject() { return this->jsonWriter.EndObject(); }
+
+    public:
         bool SaveJsonToFile(const char *path);
-        virtual bool WriterToStream(std::string & os);
-        virtual bool WriterToStream(std::ostream & os);
+
+        virtual bool WriterToStream(std::string &os);
+
+        virtual bool WriterToStream(std::ostream &os);
 
     protected:
         rapidjson::StringBuffer strBuf;
@@ -63,6 +88,7 @@ namespace GameKeeper
 
     private:
         rapidjson::Document document;
+        rapidjson::Value * mJsonValue;
         typedef rapidjson::Document::MemberIterator MemberIter;
     };
 }// namespace GameKeeper

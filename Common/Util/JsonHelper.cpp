@@ -9,12 +9,12 @@ namespace GameKeeper
     }
 
 
-    bool RapidJsonWriter::AddParameter(const char *key, const int value)
+    bool RapidJsonWriter::AddParameter(const char *key, int value)
     {
         return jsonWriter.Key(key) && jsonWriter.Int(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const double value)
+    bool RapidJsonWriter::AddParameter(const char *key, double value)
     {
         return jsonWriter.Key(key) &&
                jsonWriter.Double(value);
@@ -27,19 +27,19 @@ namespace GameKeeper
                this->jsonWriter.String(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const long long value)
+    bool RapidJsonWriter::AddParameter(const char *key, long long value)
     {
         return jsonWriter.Key(key) &&
                jsonWriter.Int64(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const std::string value)
+    bool RapidJsonWriter::AddParameter(const char *key, const std::string & value)
     {
         return jsonWriter.Key(key) &&
                jsonWriter.String(value.c_str(), value.length());
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const unsigned int value)
+    bool RapidJsonWriter::AddParameter(const char *key, unsigned int value)
     {
 
         return jsonWriter.Key(key) &&
@@ -52,7 +52,7 @@ namespace GameKeeper
                this->jsonWriter.String(value, size);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const unsigned long long value)
+    bool RapidJsonWriter::AddParameter(const char *key, unsigned long long value)
     {
 
         return jsonWriter.Key(key) &&
@@ -94,6 +94,18 @@ namespace GameKeeper
                    this->jsonWriter.String(buffer.c_str(), buffer.size());
         }
         return false;
+    }
+
+    bool RapidJsonWriter::StartArray(const char *key)
+    {
+        return this->jsonWriter.Key(key) &&
+               this->jsonWriter.StartArray();
+    }
+
+    bool RapidJsonWriter::StartObject(const char *key)
+    {
+        return this->jsonWriter.Key(key) &&
+               this->jsonWriter.StartObject();
     }
 
     bool RapidJsonWriter::SaveJsonToFile(const char *path)

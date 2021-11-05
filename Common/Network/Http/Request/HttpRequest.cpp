@@ -2,41 +2,47 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#include "HttpLocalRequest.h"
+#include "HttpRequest.h"
 #include <Define/CommonDef.h>
 #include <Core/App.h>
 #include <Network/Http/HttpLocalsession.h>
 #include <Network/NetworkHelper.h>
+#include <Scene/TaskPoolComponent.h>
 namespace GameKeeper
 {
-    HttpLocalRequest::HttpLocalRequest(HttpClientComponent *component)
+    HttpRequest::HttpRequest(HttpClientComponent *component)
             : mHttpComponent(component)
     {
 
     }
 
-    XCode HttpLocalRequest::StartHttpRequest(const std::string & url)
+    XCode HttpRequest::StartHttpRequest(const std::string & url)
     {
         if (!NetworkHelper::ParseHttpUrl(url, this->mHost, this->mPort, this->mPath))
         {
             return XCode::HttpUrlParseError;
         }
+
+        auto taskComponent = App::Get().GetComponent<TaskPoolComponent>();
+        NetWorkThread &netWorkThread = taskComponent->GetNetThread();
+
         HttpLocalSession httpSession(mHttpComponent, this);
-        httpSession.StartConnectHost(this->mHost, this->mPort);
+        SocketProxy socketProxy(netWorkThread, "HttpGet");
+        httpSession.StartConnectHost(this->mHost, this->mPort, &socketProxy);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 
-        if(this->mCode != XCode::Successful)
+        if (this->mCode != XCode::Successful)
         {
             return this->mCode;
         }
-        if(this->mHttpCode != 200)
+        if (this->mHttpCode != 200)
         {
             return XCode::HttpResponseError;
         }
         return XCode::Successful;
     }
 
-    void HttpLocalRequest::OnReceiveBodyAfter(XCode code)
+    void HttpRequest::OnReceiveBodyAfter(XCode code)
     {
         this->mCode = code;
         CoroutineComponent *corComponent = App::Get().GetCorComponent();
@@ -44,15 +50,15 @@ namespace GameKeeper
         taskScheduler.AddMainTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
     }
 
-    void HttpLocalRequest::OnReceiveHeardAfter(XCode code)
+    void HttpRequest::OnReceiveHeardAfter(XCode code)
     {
         if(code != XCode::Successful)
         {
-            this->OnReceiveHeardAfter(code);
+            this->OnReceiveBodyAfter(code);
         }
     }
 
-    bool HttpLocalRequest::OnReceiveHeard(asio::streambuf &buf, size_t size)
+    bool HttpRequest::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {
         std::istream is(&buf);
         size_t size1 = buf.size();

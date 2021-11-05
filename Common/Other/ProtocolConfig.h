@@ -20,10 +20,10 @@ namespace GameKeeper
     class HttpServiceConfig
     {
     public:
+        bool IsAsync;
         std::string Path;
         std::string Method;
         std::string Service;
-        std::string ContentType;
-        std::set<std::string> HeardFields;
+        std::vector<std::string> HeardFields;
     };
 }// namespace GameKeeper

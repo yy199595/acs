@@ -12,7 +12,7 @@ namespace GameKeeper
     {
     public:
         HttpServiceComponent() = default;
-        virtual ~HttpServiceComponent() = default;
+        virtual ~HttpServiceComponent() override;
     public:
         HttpServiceMethod * GetMethod(const std::string & path);
     protected:
@@ -27,6 +27,18 @@ namespace GameKeeper
                 return false;
             }
             this->mMethodMap.emplace(path, new HttpServiceMethod1<T>(o, func));
+            return true;
+        }
+
+        template<typename T>
+        bool Add(const std::string & path, HttpServiceJsonMethodType<T> func, T * o)
+        {
+            auto iter = this->mMethodMap.find(path);
+            if (iter != this->mMethodMap.end())
+            {
+                return false;
+            }
+            this->mMethodMap.emplace(path, new HttpServiceJsonMethod<T>(o, func));
             return true;
         }
 

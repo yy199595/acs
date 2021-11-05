@@ -134,14 +134,13 @@ namespace GameKeeper
             auto httpServiceConfig = new HttpServiceConfig();
             httpServiceConfig->Path = iter1->name.GetString();
             httpServiceConfig->Method = jsonValue["Method"].GetString();
-            httpServiceConfig->Service = jsonValue["Service"].GetString();
-            httpServiceConfig->ContentType = jsonValue["ContentType"].GetString();
-
+            httpServiceConfig->IsAsync = jsonValue["IsAsync"].GetBool();
+            httpServiceConfig->Service = jsonValue["Component"].GetString();
             if(jsonValue.HasMember("Fields") && jsonValue["Fields"].IsArray())
             {
                for(unsigned int index = 0; index < jsonValue["Fields"].Size();index++)
                {
-                  httpServiceConfig->HeardFields.insert(jsonValue["Fields"][index].GetString());
+                  httpServiceConfig->HeardFields.emplace_back(jsonValue["Fields"][index].GetString());
                }
             }
             this->mHttpConfigMap.emplace(httpServiceConfig->Path, httpServiceConfig);

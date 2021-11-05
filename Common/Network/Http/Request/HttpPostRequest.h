@@ -4,16 +4,17 @@
 
 #ifndef GameKeeper_HTTPLOCALPOSTREQUEST_H
 #define GameKeeper_HTTPLOCALPOSTREQUEST_H
-#include "HttpLocalRequest.h"
+#include "HttpRequest.h"
 #include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
-    class HttpLocalPostRequest : public HttpLocalRequest
+    class HttpPostRequest : public HttpRequest
     {
     public:
-        explicit HttpLocalPostRequest(HttpClientComponent * component);
-        ~HttpLocalPostRequest() override = default;
+        explicit HttpPostRequest(HttpClientComponent * component);
+        ~HttpPostRequest() override = default;
     public:
+        HttpMethodType GetType() final { return HttpMethodType::POST; }
         XCode Post(const std::string & url, HttpWriteContent & content , std::string & response);
     protected:
         bool WriterToBuffer(std::ostream & os) override;

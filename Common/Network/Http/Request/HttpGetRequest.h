@@ -1,16 +1,17 @@
 #pragma once
-#include "HttpLocalRequest.h"
+#include "HttpRequest.h"
 #include <Network/Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
 	class HttpClientComponent;
-	class HttpLolcalGetRequest : public HttpLocalRequest
+	class HttpGetRequest : public HttpRequest
 	{
 	public:
-		explicit HttpLolcalGetRequest(HttpClientComponent * component);
-		~HttpLolcalGetRequest() override = default;
+		explicit HttpGetRequest(HttpClientComponent * component);
+		~HttpGetRequest() override = default;
 	public:
-		XCode Get(const std::string & url, HttpReadContent & response);
+        HttpMethodType GetType() final { return HttpMethodType::GET; }
+        XCode Get(const std::string & url, HttpReadContent & response);
 	protected:
 		bool WriterToBuffer(std::ostream & os) override;
         void OnReceiveBody(asio::streambuf & buf) override;

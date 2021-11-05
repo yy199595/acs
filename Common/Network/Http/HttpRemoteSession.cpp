@@ -6,7 +6,7 @@
 #include <Core/App.h>
 #include <Scene/ProtocolComponent.h>
 #include <Network/Http/HttpClientComponent.h>
-#include <Network/Http/Response/HttpRemoteRequestHandler.h>
+#include <Network/Http/Response/HttpRequestHandler.h>
 namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
@@ -47,14 +47,11 @@ namespace GameKeeper
     }
 
 	void HttpRemoteSession::SetSocketProxy(SocketProxy * scoketProxy)
-	{
-		if (this->mSocketProxy != nullptr)
-		{
-			delete this->mSocketProxy;
-		}
-		this->mSocketProxy = scoketProxy;
-		this->StartReceiveHeard();
-	}
+    {
+        delete this->mSocketProxy;
+        this->mSocketProxy = scoketProxy;
+        this->StartReceiveHeard();
+    }
 
     bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size)
     {

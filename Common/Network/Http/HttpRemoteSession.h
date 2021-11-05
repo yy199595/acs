@@ -9,7 +9,7 @@ namespace GameKeeper
 {
 
     class HttpClientComponent;
-    class HttpRemoteRequestHandler;
+    class HttpRequestHandler;
     class HttpRemoteSession : public HttpSessionBase
     {
     public:
@@ -25,7 +25,7 @@ namespace GameKeeper
         bool OnReceiveHeard(asio::streambuf &buf,size_t size) override;
     private:
         HttpClientComponent * mHttpComponent;
-        HttpRemoteRequestHandler * mHttpHandler;
+        HttpRequestHandler * mHttpHandler;
     };
 }
 

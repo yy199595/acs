@@ -21,14 +21,11 @@ namespace GameKeeper
         delete this->mResolver;
     }
 
-	void HttpLocalSession::SetSocketProxy(SocketProxy * socketProxy)
-	{
-	}
-
-	void HttpLocalSession::StartConnectHost(const std::string & host, const std::string & port)
+	void HttpLocalSession::StartConnectHost(const std::string & host, const std::string & port, SocketProxy * socketProxy)
 	{
 		this->mHost = host;
 		this->mPort = port;
+        this->mSocketProxy = socketProxy;
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
 		{

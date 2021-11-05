@@ -50,8 +50,13 @@ namespace GameKeeper
 		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
 		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtocolComponent>());
+        return true;
+    }
+
+    void ServiceNodeComponent::Start()
+    {
         const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
-		return this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
+        this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
     }
 
 	void ServiceNodeComponent::OnSecondUpdate()

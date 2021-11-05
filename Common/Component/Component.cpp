@@ -9,7 +9,7 @@ namespace GameKeeper
 		this->gameObjectID = 0;
 	}
 	
-	Component * Component::GetComponentByHash(const size_t hash)
+	Component * Component::GetByHash(size_t hash)
 	{
 		Type * type = ComponentHelper::GetType(hash);
 		if (type == nullptr)
@@ -18,4 +18,9 @@ namespace GameKeeper
 		}
 		return this->gameObject->GetComponentByName(type->Name);
 	}
+
+    Component *Component::GetByName(const std::string &name)
+    {
+        return this->gameObject->GetComponentByName(name);
+    }
 }
