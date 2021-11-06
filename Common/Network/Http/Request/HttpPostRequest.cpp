@@ -4,6 +4,7 @@
 #include "HttpPostRequest.h"
 #include <Network/NetworkHelper.h>
 #include <Network/Http/HttpLocalsession.h>
+#include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
 
@@ -24,7 +25,7 @@ namespace GameKeeper
     void HttpPostRequest::OnReceiveBody(asio::streambuf &buf)
     {
         std::istream is(&buf);
-        while(buf.size() > 0 && this->mPostContent)
+        while(buf.size() > 0)
         {
            size_t size = is.readsome(this->mHandlerBuffer, 1024);
            this->mResponse->append(this->mHandlerBuffer, size);

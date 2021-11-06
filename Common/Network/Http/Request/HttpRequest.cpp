@@ -13,8 +13,13 @@ namespace GameKeeper
     HttpRequest::HttpRequest(HttpClientComponent *component)
             : mHttpComponent(component)
     {
-
+		this->mLocalSession = nullptr;
     }
+
+	HttpRequest::~HttpRequest()
+	{
+		delete this->mLocalSession;
+	}
 
     XCode HttpRequest::StartHttpRequest(const std::string & url)
     {
@@ -22,13 +27,14 @@ namespace GameKeeper
         {
             return XCode::HttpUrlParseError;
         }
-
+		
         auto taskComponent = App::Get().GetComponent<TaskPoolComponent>();
-        NetWorkThread &netWorkThread = taskComponent->GetNetThread();
+		NetWorkThread & nThread = taskComponent->GetNetThread();
 
-        HttpLocalSession httpSession(mHttpComponent, this);
-        SocketProxy socketProxy(netWorkThread, "HttpGet");
-        httpSession.StartConnectHost(this->mHost, this->mPort, &socketProxy);
+        SocketProxy * socketProxy = new SocketProxy(nThread, "HttpGet");
+		this->mLocalSession = new HttpLocalSession(this->mHttpComponent, this);
+        this->mLocalSession->StartConnectHost(this->mHost, this->mPort, socketProxy);
+
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 
         if (this->mCode != XCode::Successful)
@@ -42,7 +48,12 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    void HttpRequest::OnReceiveBodyAfter(XCode code)
+	void HttpRequest::OnWriterAfter(XCode code)
+	{
+		this->mLocalSession->StartReceiveHeard();
+	}
+
+	void HttpRequest::OnReceiveBodyAfter(XCode code)
     {
         this->mCode = code;
         CoroutineComponent *corComponent = App::Get().GetCorComponent();
@@ -56,18 +67,17 @@ namespace GameKeeper
         {
             this->OnReceiveBodyAfter(code);
         }
+		GKDebugWarning(this->PrintHeard());
     }
 
-    bool HttpRequest::OnReceiveHeard(asio::streambuf &buf, size_t size)
+    bool HttpRequest::OnReceiveHeard(asio::streambuf &streamBuf)
     {
-        std::istream is(&buf);
-        size_t size1 = buf.size();
+        std::istream is(&streamBuf);
         is >> this->mVersion >> this->mHttpCode >> this->mError;
-        size_t size2 = size - (size1 - buf.size());
 #ifdef __DEBUG__
         GKDebugWarning(this->mVersion << " " << this->mHttpCode << " " << this->mError);
 #endif
-        this->ParseHeard(buf, size2);
+        this->ParseHeard(streamBuf);
         return true;
     }
 }

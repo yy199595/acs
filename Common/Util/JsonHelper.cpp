@@ -3,109 +3,114 @@
 namespace GameKeeper
 {
     RapidJsonWriter::RapidJsonWriter()
-        : jsonWriter(strBuf)
+        : mJsonWriter(mStringBuf)
     {
-        this->jsonWriter.StartObject();
+        this->mJsonWriter.StartObject();
     }
 
 
-    bool RapidJsonWriter::AddParameter(const char *key, int value)
+    bool RapidJsonWriter::Add(const char *key, int value)
     {
-        return jsonWriter.Key(key) && jsonWriter.Int(value);
+        return mJsonWriter.Key(key) && mJsonWriter.Int(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, double value)
+    bool RapidJsonWriter::Add(const char *key, double value)
     {
-        return jsonWriter.Key(key) &&
-               jsonWriter.Double(value);
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.Double(value);
 
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const char *value)
+    bool RapidJsonWriter::Add(const char *key, const char *value)
     {
-        return this->jsonWriter.Key(key) &&
-               this->jsonWriter.String(value);
+        return this->mJsonWriter.Key(key) &&
+               this->mJsonWriter.String(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, long long value)
+    bool RapidJsonWriter::Add(const char *key, long long value)
     {
-        return jsonWriter.Key(key) &&
-               jsonWriter.Int64(value);
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.Int64(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const std::string & value)
+    bool RapidJsonWriter::Add(const char *key, const std::string & value)
     {
-        return jsonWriter.Key(key) &&
-               jsonWriter.String(value.c_str(), value.length());
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.String(value.c_str(), value.length());
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, unsigned int value)
+    bool RapidJsonWriter::Add(const char *key, unsigned int value)
     {
 
-        return jsonWriter.Key(key) &&
-               jsonWriter.Uint(value);
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.Uint(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const char *value, size_t size)
+    bool RapidJsonWriter::Add(const char *key, const char *value, size_t size)
     {
-        return this->jsonWriter.Key(key) &&
-               this->jsonWriter.String(value, size);
+        return this->mJsonWriter.Key(key) &&
+               this->mJsonWriter.String(value, size);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, unsigned long long value)
+    bool RapidJsonWriter::Add(const char *key, unsigned long long value)
     {
 
-        return jsonWriter.Key(key) &&
-               jsonWriter.Uint64(value);
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.Uint64(value);
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const std::set<std::string> &value)
+    bool RapidJsonWriter::Add(const char *key, const std::set<std::string> &value)
     {
-        if (jsonWriter.Key(key) && jsonWriter.StartArray())
+        if (mJsonWriter.Key(key) && mJsonWriter.StartArray())
         {
             for (const auto &str: value)
             {
-                jsonWriter.String(str.c_str(), str.size());
+                mJsonWriter.String(str.c_str(), str.size());
             }
-            return jsonWriter.EndArray();
+            return mJsonWriter.EndArray();
         }
         return false;
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const std::vector<std::string> &value)
+    bool RapidJsonWriter::Add(const char *key, const std::vector<std::string> &value)
     {
-        if (jsonWriter.Key(key) && jsonWriter.StartArray())
+        if (mJsonWriter.Key(key) && mJsonWriter.StartArray())
         {
             for (const auto & str : value)
             {
-                jsonWriter.String(str.c_str(), str.size());
+                mJsonWriter.String(str.c_str(), str.size());
             }
-            return jsonWriter.EndArray();
+            return mJsonWriter.EndArray();
         }
         return false;
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key, const google::protobuf::Message &value)
+    bool RapidJsonWriter::Add(const char *key, const google::protobuf::Message &value)
     {
         std::string buffer;
         if (value.SerializePartialToString(&buffer))
         {
-            return this->jsonWriter.Key(key) &&
-                   this->jsonWriter.String(buffer.c_str(), buffer.size());
+            return this->mJsonWriter.Key(key) &&
+                   this->mJsonWriter.String(buffer.c_str(), buffer.size());
         }
         return false;
     }
 
     bool RapidJsonWriter::StartArray(const char *key)
     {
-        return this->jsonWriter.Key(key) &&
-               this->jsonWriter.StartArray();
+        return this->mJsonWriter.Key(key) &&
+               this->mJsonWriter.StartArray();
     }
+
+	bool RapidJsonWriter::StartObject()
+	{
+		return this->mJsonWriter.StartObject();
+	}
 
     bool RapidJsonWriter::StartObject(const char *key)
     {
-        return this->jsonWriter.Key(key) &&
-               this->jsonWriter.StartObject();
+        return this->mJsonWriter.Key(key) &&
+               this->mJsonWriter.StartObject();
     }
 
     bool RapidJsonWriter::SaveJsonToFile(const char *path)
@@ -122,10 +127,10 @@ namespace GameKeeper
 
     bool RapidJsonWriter::WriterToStream(std::ostream & os)
     {
-        if(this->jsonWriter.EndObject())
+        if(this->mJsonWriter.EndObject())
         {
-            const char *str = this->strBuf.GetString();
-            const size_t lenght = this->strBuf.GetSize();
+            const char *str = this->mStringBuf.GetString();
+            const size_t lenght = this->mStringBuf.GetSize();
             os.write(str, lenght);
             return true;
         }
@@ -135,21 +140,21 @@ namespace GameKeeper
 
     bool RapidJsonWriter::WriterToStream(std::string &os)
     {
-        if (this->jsonWriter.EndObject())
+        if (this->mJsonWriter.EndObject())
         {
             os.clear();
-            const char *str = this->strBuf.GetString();
-            const size_t lenght = this->strBuf.GetSize();
+            const char *str = this->mStringBuf.GetString();
+            const size_t lenght = this->mStringBuf.GetSize();
             os.append(str, lenght);
             return true;
         }
         return false;
     }
 
-    bool RapidJsonWriter::AddParameter(const char *key)
+    bool RapidJsonWriter::Add(const char *key)
     {
-        return jsonWriter.Key(key) &&
-               jsonWriter.Null();
+        return mJsonWriter.Key(key) &&
+               mJsonWriter.Null();
     }
 }// namespace GameKeeper
 
@@ -157,7 +162,7 @@ namespace GameKeeper
 {
     bool RapidJsonReader::TryParse(const char *str, size_t size)
     {
-        if (!document.Parse(str, size).HasParseError())
+        if (!mDdocument.Parse(str, size).HasParseError())
         {
             return true;
         }
@@ -178,36 +183,36 @@ namespace GameKeeper
     {
         const char * data = str.c_str();
         const size_t size = str.length();
-        if (!document.Parse(data, size).HasParseError())
+        if (!mDdocument.Parse(data, size).HasParseError())
         {
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, int &data)
+    bool RapidJsonReader::TryGetValue(const char *key, int &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsInt())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsInt())
         {
             data = iter->value.GetInt();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, bool &data)
+    bool RapidJsonReader::TryGetValue(const char *key, bool &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsBool())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsBool())
         {
             data = iter->value.GetBool();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, short &data)
+    bool RapidJsonReader::TryGetValue(const char *key, short &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsNumber())
+		auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsNumber())
         {
             data = (short) iter->value.GetInt();
             return true;
@@ -215,10 +220,10 @@ namespace GameKeeper
         return false;
     }
 
-    bool RapidJsonReader::TryGetValue(const char *key, unsigned short &data)
+    bool RapidJsonReader::TryGetValue(const char *key, unsigned short &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsNumber())
+		auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsNumber())
         {
             data = (unsigned short) iter->value.GetInt();
             return true;
@@ -226,62 +231,62 @@ namespace GameKeeper
         return false;
     }
 
-    bool RapidJsonReader::TryGetValue(const char *key, float &data)
+    bool RapidJsonReader::TryGetValue(const char *key, float &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsFloat())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsFloat())
         {
             data = iter->value.GetFloat();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, double &data)
+    bool RapidJsonReader::TryGetValue(const char *key, double &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsDouble())
+		auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsDouble())
         {
             data = iter->value.GetDouble();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, unsigned int &data)
+    bool RapidJsonReader::TryGetValue(const char *key, unsigned int &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsUint())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsUint())
         {
             data = iter->value.GetUint();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, long long &data)
+    bool RapidJsonReader::TryGetValue(const char *key, long long &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsInt64())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsInt64())
         {
             data = iter->value.GetInt64();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, unsigned long long &data)
+    bool RapidJsonReader::TryGetValue(const char *key, unsigned long long &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsUint64())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsUint64())
         {
             data = iter->value.GetUint64();
             return true;
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, std::vector<std::string> &data)
+    bool RapidJsonReader::TryGetValue(const char *key, std::vector<std::string> &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsArray())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsArray())
         {
-            MemberIter arrayIter = iter->value.MemberBegin();
+            auto arrayIter = iter->value.MemberBegin();
             for (; arrayIter != iter->value.MemberEnd(); arrayIter++)
             {
                 if (arrayIter->value.IsString())
@@ -295,10 +300,10 @@ namespace GameKeeper
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, google::protobuf::Message &data)
+    bool RapidJsonReader::TryGetValue(const char *key, google::protobuf::Message &data) const
     {
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsString())
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsString())
         {
             const char *str = iter->value.GetString();
             const size_t size = iter->value.GetStringLength();
@@ -306,12 +311,12 @@ namespace GameKeeper
         }
         return false;
     }
-    bool RapidJsonReader::TryGetValue(const char *key, std::string &data)
-    {
-        data = "";
-        MemberIter iter = document.FindMember(key);
-        if (iter != document.MemberEnd() && iter->value.IsString())
+    bool RapidJsonReader::TryGetValue(const char *key, std::string &data) const
+    {	
+        auto iter = mDdocument.FindMember(key);
+        if (iter != mDdocument.MemberEnd() && iter->value.IsString())
         {
+			data.clear();
             data.append(iter->value.GetString(), iter->value.GetStringLength());
             return true;
         }

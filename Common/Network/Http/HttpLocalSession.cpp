@@ -4,11 +4,11 @@
 
 #include "HttpLocalsession.h"
 #include <Network/Http/HttpClientComponent.h>
-
+#include<Network/Http/Request/HttpRequest.h>
 #include <utility>
 namespace GameKeeper
 {
-	HttpLocalSession::HttpLocalSession(HttpClientComponent * component, HttpHandlerBase * handler)
+	HttpLocalSession::HttpLocalSession(HttpClientComponent * component, HttpRequest * handler)
 		: HttpSessionBase(component), mHttpHandler(handler)
 	{
 		this->mQuery = nullptr;
@@ -16,7 +16,7 @@ namespace GameKeeper
 	}
 
 	HttpLocalSession::~HttpLocalSession()
-    {
+    {		
         delete this->mQuery;
         delete this->mResolver;
     }
@@ -25,7 +25,7 @@ namespace GameKeeper
 	{
 		this->mHost = host;
 		this->mPort = port;
-        this->mSocketProxy = socketProxy;
+		this->mSocketProxy = socketProxy;
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
 		{
@@ -35,22 +35,15 @@ namespace GameKeeper
 		nThread.AddTask(&HttpLocalSession::Resolver, this);
 	}
 
-	bool HttpLocalSession::WriterToBuffer(std::ostream & os)
+	HttpHandlerBase * HttpLocalSession::GetHandler()
 	{
-        GKAssertRetFalse_F(this->mHttpHandler);
-        return this->mHttpHandler->WriterToBuffer(os);
+		return this->mHttpHandler;
 	}
 
-	void HttpLocalSession::OnReceiveBody(asio::streambuf & buf)
-	{
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveBody(buf);
-	}
-
-	bool HttpLocalSession::OnReceiveHeard(asio::streambuf & buf, size_t size)
+	bool HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
     {
         GKAssertRetFalse_F(this->mHttpHandler);
-        return this->mHttpHandler->OnReceiveHeard(buf, size);
+        return this->mHttpHandler->OnReceiveHeard(buf);
     }
 
 	void HttpLocalSession::Resolver()
@@ -73,17 +66,6 @@ namespace GameKeeper
         });
     }
 
-    void HttpLocalSession::OnReceiveBodyAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveBodyAfter(code);
-    }
-
-    void HttpLocalSession::OnReceiveHeardAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveHeardAfter(code);
-    }
 
 	void HttpLocalSession::ConnectHandler(const asio::error_code & err)
     {
@@ -98,15 +80,5 @@ namespace GameKeeper
                          + ":" + std::to_string(socket.remote_endpoint().port());
         GKDebugLog("connect to " << this->mHost << ":" << this->mPort << " successful");
         this->StartSendHttpMessage();
-    }
-
-    void HttpLocalSession::OnWriteAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        if(code == XCode::Successful)
-        {
-            this->StartReceiveHeard();
-        }
-        this->mHttpHandler->OnWriterAfter(code);
     }
 }

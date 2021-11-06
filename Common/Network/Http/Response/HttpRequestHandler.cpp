@@ -4,9 +4,11 @@
 
 #include "HttpRequestHandler.h"
 #include <Core/App.h>
-#include <Network/Http/HttpClientComponent.h>
-#include <Network/Http/HttpRemoteSession.h>
 #include <Other/ProtocolConfig.h>
+#include <Network/Http/HttpRemoteSession.h>
+#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/Content/HttpReadContent.h>
+#include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
 

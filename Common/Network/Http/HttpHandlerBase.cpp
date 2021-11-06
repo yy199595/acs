@@ -3,39 +3,46 @@
 #include<Define/CommonDef.h>
 namespace GameKeeper
 {
-	void HttpHandlerBase::ParseHeard(asio::streambuf & buf, size_t size)
-    {
-        std::string heard = "";
-        std::istream is(&buf);
-        char *buffer = this->mHandlerBuffer;
-        if (size > 1024)
-        {
-            buffer = new char[size];
-        }
-
-        is.readsome(buffer, size);
-        heard.append(buffer, size);
-        if (buffer != this->mHandlerBuffer)
-        {
-            delete[]buffer;
-        }
-
-        std::vector<std::string> tempArray1;
-        std::vector<std::string> tempArray2;
-        StringHelper::SplitString(heard, "\r\n", tempArray1);
-        for (const std::string &line: tempArray1)
-        {
-            StringHelper::SplitString(line, ":", tempArray2);
-            if (tempArray2.size() == 2)
-            {
-                const std::string &key = tempArray2[0];
-                const std::string &val = tempArray2[1];
-                this->mHeardMap.insert(std::make_pair(key, val));
 #ifdef __DEBUG__
-                GKDebugWarning(key << "  =  " << val);
-#endif
-            }
-        }
+	std::string HttpHandlerBase::PrintHeard()
+	{
+		std::stringstream ss;
+		ss << "\n================================\n";
+		auto iter = this->mHeardMap.begin();
+		for (; iter != this->mHeardMap.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			const std::string & val = iter->second;
+			ss << key << "=" << val << "\n";
+		}
+		ss << "================================\n";
+		return ss.str();
+	}
+#endif // __DEBUG__
+
+	
+
+	void HttpHandlerBase::ParseHeard(asio::streambuf & buf)
+    {
+		std::string line;
+		std::istream is(&buf);
+		std::getline(is, line);
+
+		while (std::getline(is, line))
+		{
+			if (line == "\r")
+			{
+				break;
+			}
+			size_t pos = line.find(':');
+			if (pos != std::string::npos)
+			{
+				size_t length = line.size() - pos - 2;
+				std::string key = line.substr(0, pos);
+				std::string val = line.substr(pos + 1, length);
+				this->mHeardMap.insert(std::make_pair(key, val));
+			}		
+		}
 		std::string data;
 		this->mContentLength = 0;
 		if (this->GetHeardData("Content-Length", data))

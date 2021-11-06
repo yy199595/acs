@@ -6,7 +6,8 @@
 #include <Core/App.h>
 #include <Scene/ProtocolComponent.h>
 #include <Network/Http/HttpClientComponent.h>
-#include <Network/Http/Response/HttpRequestHandler.h>
+#include <Network/Http/Response/HttpGettHandler.h>
+#include <Network/Http/Response/HttpPostHandler.h>
 namespace GameKeeper
 {
     HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
@@ -16,36 +17,6 @@ namespace GameKeeper
         this->mHttpComponent = component;
     }
 
-    bool HttpRemoteSession::WriterToBuffer(std::ostream &os)
-    {
-        GKAssertRetFalse_F(this->mHttpHandler);
-        return this->mHttpHandler->WriterToBuffer(os);
-    }
-
-    void HttpRemoteSession::OnWriteAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnWriterAfter(code);
-    }
-
-    void HttpRemoteSession::OnReceiveBody(asio::streambuf &buf)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveBody(buf);
-    }
-
-    void HttpRemoteSession::OnReceiveBodyAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveBodyAfter(code);
-    }
-
-    void HttpRemoteSession::OnReceiveHeardAfter(XCode code)
-    {
-        GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveHeardAfter(code);
-    }
-
 	void HttpRemoteSession::SetSocketProxy(SocketProxy * scoketProxy)
     {
         delete this->mSocketProxy;
@@ -53,18 +24,27 @@ namespace GameKeeper
         this->StartReceiveHeard();
     }
 
-    bool HttpRemoteSession::OnReceiveHeard(asio::streambuf &buf, size_t size)
-    {
-        std::string method;
-        std::istream is(&buf);
-        is >> method >> this->mPath >> this->mVersion;
-        this->mHttpHandler = this->mHttpComponent->CreateMethodHandler(method, this);
-        if(this->mHttpHandler == nullptr)
-        {
-            GKDebugFatal("create http method " << method << " handler failure");
-            return false;
-        }
-        size_t size1 = size - (size - buf.size());
-        return this->mHttpHandler->OnReceiveHeard(buf, size1);;
-    }
+	HttpHandlerBase * HttpRemoteSession::GetHandler()
+	{
+		return this->mHttpHandler;
+	}
+
+	bool HttpRemoteSession::OnReceiveHeard(asio::streambuf & streamBuf)
+	{
+		std::istream is(&streamBuf);
+		is >> this->mMethod;
+		if (this->mMethod == "GET")
+		{
+			this->mHttpHandler = new HttpGettHandler(this->mHttpComponent, this);
+		}
+		else if (this->mMethod == "POST")
+		{
+			this->mHttpHandler = new HttpPostHandler(this->mHttpComponent, this);
+		}
+		if (this->mHttpHandler == nullptr)
+		{
+			return false;
+		}
+		return this->mHttpHandler->OnReceiveHeard(streamBuf);
+	}
 }

@@ -9,6 +9,7 @@
 #include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/Response/HttpRequestHandler.h>
+#include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
     class HttpRequestHandler;
@@ -17,7 +18,7 @@ namespace GameKeeper
     using HttpServiceMethodType = HttpStatus(T::*)(HttpRequestHandler *);
 
     template<typename T>
-    using HttpServiceJsonMethodType = XCode(T::*)(RapidJsonReader & request, RapidJsonWriter & response);
+    using HttpServiceJsonMethodType = XCode(T::*)(const RapidJsonReader & request, RapidJsonWriter & response);
 
     class HttpServiceMethod
     {
@@ -59,7 +60,7 @@ namespace GameKeeper
             }
 
             XCode code = (_o->*_func)(request, *response);
-            response->AddParameter("code", code);
+            response->Add("code", code);
             handler->SetContent(response);
             return HttpStatus::OK;
         }

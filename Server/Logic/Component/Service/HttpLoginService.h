@@ -16,7 +16,7 @@ namespace GameKeeper
     protected:
         bool Awake() override;
     private:
-        XCode Login(RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
     };
 }
 #endif //GAMEKEEPER_HTTPLOGINSERVICE_H

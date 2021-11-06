@@ -16,39 +16,40 @@ namespace GameKeeper
         ~RapidJsonWriter() = default;
 
     public:
-        bool AddParameter(const char *key);
+        bool Add(const char *key);
 
-        bool AddParameter(const char *key, int value);
+        bool Add(const char *key, int value);
 
-        bool AddParameter(const char *key, double value);
+        bool Add(const char *key, double value);
 
-        bool AddParameter(const char *key, const char *value);
+        bool Add(const char *key, const char *value);
 
-        bool AddParameter(const char *key, long long value);
+        bool Add(const char *key, long long value);
 
-        bool AddParameter(const char *key, const std::string &value);
+        bool Add(const char *key, const std::string &value);
 
-        bool AddParameter(const char *key, unsigned int value);
+        bool Add(const char *key, unsigned int value);
 
-        bool AddParameter(const char *key, const char *value, size_t size);
+        bool Add(const char *key, const char *value, size_t size);
 
-        bool AddParameter(const char *key, unsigned long long value);
+        bool Add(const char *key, unsigned long long value);
 
-        bool AddParameter(const char *key, const std::set<std::string> &value);
+        bool Add(const char *key, const std::set<std::string> &value);
 
-        bool AddParameter(const char *key, const std::vector<std::string> &value);
+        bool Add(const char *key, const std::vector<std::string> &value);
 
-        bool AddParameter(const char *key, const google::protobuf::Message &value);
+        bool Add(const char *key, const google::protobuf::Message &value);
 
     public:
         bool StartArray(const char *key);
 
+		bool StartObject();
         bool StartObject(const char *key);
 
     public:
-        bool EndArray() { this->jsonWriter.EndArray(); }
+        bool EndArray() { return this->mJsonWriter.EndArray(); }
 
-        bool EndObject() { return this->jsonWriter.EndObject(); }
+        bool EndObject() { return this->mJsonWriter.EndObject(); }
 
     public:
         bool SaveJsonToFile(const char *path);
@@ -58,8 +59,8 @@ namespace GameKeeper
         virtual bool WriterToStream(std::ostream &os);
 
     protected:
-        rapidjson::StringBuffer strBuf;
-        rapidjson::Writer<rapidjson::StringBuffer> jsonWriter;
+        rapidjson::StringBuffer mStringBuf;
+        rapidjson::Writer<rapidjson::StringBuffer> mJsonWriter;
     };
 }// namespace GameKeeper
 
@@ -73,22 +74,21 @@ namespace GameKeeper
         bool ReadFromFile(const char *path);
 
     public:
-        bool TryGetValue(const char *key, int &data);
-        bool TryGetValue(const char *key, bool &data);
-        bool TryGetValue(const char *key, short &data);
-        bool TryGetValue(const char *key, float &data);
-        bool TryGetValue(const char *key, double &data);
-        bool TryGetValue(const char *key, long long &data);
-        bool TryGetValue(const char *key, std::string &data);
-        bool TryGetValue(const char *key, unsigned int &data);
-        bool TryGetValue(const char *key, unsigned short &data);
-        bool TryGetValue(const char *key, unsigned long long &data);
-        bool TryGetValue(const char *key, std::vector<std::string> &data);
-        bool TryGetValue(const char *key, google::protobuf::Message &data);
+        bool TryGetValue(const char *key, int &data) const;
+        bool TryGetValue(const char *key, bool &data) const;
+        bool TryGetValue(const char *key, short &data) const;
+        bool TryGetValue(const char *key, float &data) const;
+        bool TryGetValue(const char *key, double &data) const;
+        bool TryGetValue(const char *key, long long &data) const;
+        bool TryGetValue(const char *key, std::string &data) const;
+        bool TryGetValue(const char *key, unsigned int &data) const;
+        bool TryGetValue(const char *key, unsigned short &data) const;
+        bool TryGetValue(const char *key, unsigned long long &data) const;
+        bool TryGetValue(const char *key, std::vector<std::string> &data) const;
+        bool TryGetValue(const char *key, google::protobuf::Message &data) const;
 
     private:
-        rapidjson::Document document;
         rapidjson::Value * mJsonValue;
-        typedef rapidjson::Document::MemberIterator MemberIter;
+		rapidjson::Document mDdocument;
     };
 }// namespace GameKeeper

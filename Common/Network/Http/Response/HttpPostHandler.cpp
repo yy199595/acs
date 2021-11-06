@@ -13,7 +13,7 @@ namespace GameKeeper
     HttpPostHandler::HttpPostHandler(HttpClientComponent *component, HttpRemoteSession *session)
                                                                : HttpRequestHandler(component, session)
     {
-        this->mContent = nullptr;
+		this->mParamater.clear();
     }
 
     void HttpPostHandler::OnReceiveBodyAfter(XCode code)
@@ -30,50 +30,54 @@ namespace GameKeeper
 
     const std::string &HttpPostHandler::GetPath()
     {
-        return this->mHttpSession->GetPath();
+		return this->mPath;
     }
 
-    bool HttpPostHandler::OnReceiveHeard(asio::streambuf &buf, size_t size)
-    {
-        auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
-        this->mHttpConfig = protocolComponent->GetHttpConfig(this->GetPath());
-        if (this->mHttpConfig == nullptr)
-        {
-            this->SetCode(HttpStatus::NOT_FOUND);
-            return false;
-        }
-        const std::string &method = this->mHttpConfig->Method;
-        const std::string &service = this->mHttpConfig->Service;
-        if(!this->mHttpComponent->GetHttpMethod(service, method))
-        {
-            this->SetCode(HttpStatus::NOT_FOUND);
-            return false;
-        }
-        this->ParseHeard(buf, size);
-        if (this->GetContentLength() == 0)
-        {
-            this->SetCode(HttpStatus::LENGTH_REQUIRED);
-            return false;
-        }
-        std::string disposltion;
-        if(this->GetHeardData("Content-Disposition", disposltion))
-        {
-            const std::string ss = "filename=";
-            size_t pos = disposltion.find(ss);
-            if (pos == std::string::npos)
-            {
-                this->SetCode(HttpStatus::PRECONDITION_FAILED);
-                return false;
-            }
-            size_t offset = pos + ss.size();
-            std::string file = disposltion.substr(offset, disposltion.size() - offset);
-            const std::string path = App::Get().GetDownloadPath() + file;
-            this->mContent = new HttpReadFileContent(path);
-            return true;
-        }
-        this->mContent = new HttpReadStringContent();
-        return true;
-    }
+	bool HttpPostHandler::OnReceiveHeard(asio::streambuf &streamBuf)
+	{
+		std::istream is(&streamBuf);
+		is >> this->mPath >> this->mVersion;
+		auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
+		this->mHttpConfig = protocolComponent->GetHttpConfig(this->GetPath());
+		if (this->mHttpConfig == nullptr)
+		{
+			this->SetCode(HttpStatus::NOT_FOUND);
+			GKDebugError("not find url " << this->GetPath());
+			return false;
+		}
+		const std::string &method = this->mHttpConfig->Method;
+		const std::string &service = this->mHttpConfig->Service;
+		if (!this->mHttpComponent->GetHttpMethod(service, method))
+		{
+			this->SetCode(HttpStatus::NOT_FOUND);
+			GKDebugError("not find method " << service << "." << method);
+			return false;
+		}
+		this->ParseHeard(streamBuf);
+
+		this->mDataLength = this->GetContentLength();
+		if (this->mDataLength == 0)
+		{
+			this->SetCode(HttpStatus::LENGTH_REQUIRED);
+			return false;
+		}
+		/*std::string disposltion;
+		if(this->GetHeardData("Content-Disposition", disposltion))
+		{
+			const std::string ss = "filename=";
+			size_t pos = disposltion.find(ss);
+			if (pos == std::string::npos)
+			{
+				this->SetCode(HttpStatus::PRECONDITION_FAILED);
+				return false;
+			}
+			size_t offset = pos + ss.size();
+			std::string file = disposltion.substr(offset, disposltion.size() - offset);
+			const std::string path = App::Get().GetDownloadPath() + file;
+			return true;
+		}*/
+		return true;
+	}
 
     void HttpPostHandler::OnReceiveHeardAfter(XCode code)
     {
@@ -82,6 +86,7 @@ namespace GameKeeper
         {
             this->OnWriterAfter(code);
         }
+		GKDebugInfo(this->PrintHeard());
     }
 
 
@@ -91,7 +96,7 @@ namespace GameKeeper
         while(buf.size() > 0)
         {
             size_t size = is.readsome(this->mHandlerBuffer, 1024);
-            this->mContent->OnReadContent(this->mHandlerBuffer, size);
+			this->mParamater.append(this->mHandlerBuffer, size);
         }
     }
 }

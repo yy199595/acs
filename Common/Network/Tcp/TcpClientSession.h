@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include<array>
+#include<XCode/XCode.h>
 #include <Define/CommonDef.h>
 #include <Network/SocketProxy.h>
 #define TCP_BUFFER_COUNT 1024
@@ -16,8 +16,9 @@ namespace GameKeeper
 	public:
 		void SetSocket(SocketProxy * socketProxy);
 		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
+		long long GetLastOperTime() const { return this->mLastOperTime; }
 		const std::string & GetAddress() const { return this->mAddress; }
-        virtual SocketType GetSocketType() { return SocketType::RemoteSocket;}
+        virtual SocketType GetSocketType() { return SocketType::RemoteSocket;}		
 	public:
 		void StartClose();
 		void StartReceive();
@@ -25,8 +26,8 @@ namespace GameKeeper
 	public:
 		SocketProxy & GetSocketProxy() { return *mSocketProxy; }
     private:
-		void CloseSocket();
 		void ReceiveMessage();
+		void CloseSocket(XCode code);
 		void SendByString(std::string * message);
         void ReadMessageBody(const size_t allSize);
 	protected:
@@ -34,7 +35,8 @@ namespace GameKeeper
 		SocketProxy * mSocketProxy;
 		TcpClientComponent * mTcpComponent;
     private:
-		char *mReceiveMsgBuffer;		
+		char *mReceiveMsgBuffer;
+		long long mLastOperTime;
     };
 
     typedef shared_ptr<TcpClientSession> SharedTcpSession;

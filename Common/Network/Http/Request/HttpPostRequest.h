@@ -5,9 +5,9 @@
 #ifndef GameKeeper_HTTPLOCALPOSTREQUEST_H
 #define GameKeeper_HTTPLOCALPOSTREQUEST_H
 #include "HttpRequest.h"
-#include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
+	class HttpWriteContent;
     class HttpPostRequest : public HttpRequest
     {
     public:

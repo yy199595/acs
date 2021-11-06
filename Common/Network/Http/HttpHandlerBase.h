@@ -18,9 +18,13 @@ namespace GameKeeper
         virtual void OnReceiveHeardAfter(XCode code) = 0;
 		virtual bool WriterToBuffer(std::ostream & os) = 0;
         virtual void OnReceiveBody(asio::streambuf & buf) = 0;
-		virtual bool OnReceiveHeard(asio::streambuf & buf, size_t size) = 0;
+		virtual bool OnReceiveHeard(asio::streambuf & buf) = 0;
+
+#ifdef __DEBUG__
+		std::string PrintHeard();
+#endif // __DEBUG__	
 	protected:
-		void ParseHeard(asio::streambuf & buf, size_t size);
+		void ParseHeard(asio::streambuf & buf);
 	public:
 		size_t GetContentLength() const { return this->mContentLength; }
 		bool GetHeardData(const std::string & key, std::string & value);

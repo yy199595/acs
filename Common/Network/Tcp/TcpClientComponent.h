@@ -16,10 +16,11 @@ namespace GameKeeper
 
 		~TcpClientComponent() override = default;
 	public:
-		void OnCloseSession(TcpClientSession * socket);
+		void OnCloseSession(TcpClientSession * socket, XCode code);
+		void OnConnectRemoteAfter(TcpLocalSession * session, XCode code);
 		void OnReceiveMessage(TcpClientSession * session, string * message);
-		void OnSendMessageAfter(TcpClientSession *session, std::string * message, bool);
-		void OnConnectRemoteAfter(TcpLocalSession * session, const asio::error_code & err);
+		void OnSendMessageAfter(TcpClientSession *session, std::string * message, XCode code);
+		
     protected:
 		void OnListen(SocketProxy * socket) final;
 	public:

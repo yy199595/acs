@@ -1,6 +1,12 @@
 Name	Desc
 Successful	成功
 Failure	失败
+NetTimeout	网络超时
+NetReceiveFailure	接收网络消息失败
+NetSendFailure	发送网络消息失败
+NetConnectFailure	连接服务器失败
+NetActiveShutdown	主动关闭连接
+NetBigDataShutdown	数据包过大
 ParseMessageError	解析protobuf失败
 CallServiceNotFound	调用服务未发现
 NotFoundRpcConfig	没有rpc配置

@@ -6,6 +6,7 @@
 #include <Util/DirectoryHelper.h>
 #include <Util/MD5.h>
 #include <Network/Http/Response/HttpGettHandler.h>
+#include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
     bool HttpResourceComponent::Awake()
@@ -49,7 +50,7 @@ namespace GameKeeper
         {
             const std::string & path = iter->first;
             const std::string & md5 = iter->second;
-            jsonContent->AddParameter(path.c_str(), md5);
+            jsonContent->Add(path.c_str(), md5);
         }
         handler->SetContent(jsonContent);
         return HttpStatus::OK;

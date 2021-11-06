@@ -1,4 +1,5 @@
 ﻿#include"TcpClientSession.h"
+#include<Util/TimeHelper.h>
 #include<Network/Tcp/TcpClientComponent.h>
 
 namespace GameKeeper
@@ -6,6 +7,7 @@ namespace GameKeeper
     TcpClientSession::TcpClientSession(TcpClientComponent *component)
             :mTcpComponent(component)
     {      		
+		this->mLastOperTime = 0;
 		this->mSocketProxy = nullptr;
 		this->mReceiveMsgBuffer = new char[TCP_BUFFER_COUNT];
     }
@@ -19,11 +21,11 @@ namespace GameKeeper
 	void TcpClientSession::SetSocket(SocketProxy * socketProxy)
     {
         delete this->mSocketProxy;
-        this->mSocketProxy = socketProxy;
-        AsioTcpSocket &nScoket = this->mSocketProxy->GetSocket();
-        if (nScoket.is_open())
+        this->mSocketProxy = socketProxy;     
+        if (this->mSocketProxy->IsOpen())
         {
             this->StartReceive();
+			AsioTcpSocket &nScoket = this->mSocketProxy->GetSocket();
             this->mAddress = nScoket.remote_endpoint().address().to_string()
                              + ":" + std::to_string(nScoket.remote_endpoint().port());
         }
@@ -33,47 +35,52 @@ namespace GameKeeper
 	void TcpClientSession::StartClose()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		if (!nThread.IsCurrentThread())
+		if (nThread.IsCurrentThread())
 		{
-			nThread.AddTask(&TcpClientSession::CloseSocket, this);
+			this->CloseSocket(XCode::NetActiveShutdown);
 			return;
 		}
-		this->CloseSocket();
+		nThread.AddTask(&TcpClientSession::CloseSocket, this, XCode::NetActiveShutdown);
+		
 	}
 
 	void TcpClientSession::StartReceive()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		if (!nThread.IsCurrentThread())
+		if (nThread.IsCurrentThread())
 		{
-			nThread.AddTask(&TcpClientSession::ReceiveMessage, this);
+			this->ReceiveMessage();
 			return;
 		}
-		this->ReceiveMessage();
+		nThread.AddTask(&TcpClientSession::ReceiveMessage, this);
+		
 	}
 
 	void TcpClientSession::StartSendByString(std::string * message)
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		if (!nThread.IsCurrentThread())
+		if (nThread.IsCurrentThread())
 		{
-			nThread.AddTask(&TcpClientSession::SendByString, this, message);
+			this->SendByString(message);
 			return;
 		}
-		this->SendByString(message);
+		nThread.AddTask(&TcpClientSession::SendByString, this, message);
+		
 	}
 
 
 	void TcpClientSession::ReceiveMessage()
 	{
+		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
+
 		socket.async_read_some(asio::buffer(this->mReceiveMsgBuffer, sizeof(unsigned int)),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			if (error_code)
 			{
-				this->CloseSocket();
 				GKDebugError(error_code.message());
+				this->CloseSocket(XCode::NetReceiveFailure);		
 			}
 			else
 			{
@@ -81,32 +88,31 @@ namespace GameKeeper
 				memcpy(&packageSize, this->mReceiveMsgBuffer, t);
 				if (packageSize >= 1024 * 10) //最大为10k
 				{
-					this->CloseSocket();
+					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
 				this->ReadMessageBody(packageSize);
 			}
+			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
 	}
 
-	void TcpClientSession::CloseSocket()
+	void TcpClientSession::CloseSocket(XCode code)
 	{		
-		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-		if (nSocket.is_open())
+		if (this->mSocketProxy->IsOpen())
 		{
-			asio::error_code code;
-			nSocket.close(code);
+			asio::error_code err;
+			this->mSocketProxy->GetSocket().close(err);
 		}
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		nThread.AddTask(&TcpClientComponent::OnCloseSession, this->mTcpComponent, this);
+		nThread.AddTask(&TcpClientComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
 	void TcpClientSession::ReadMessageBody(const size_t allSize)
-	{
-		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-		if (!nSocket.is_open())
+	{	
+		if (!this->mSocketProxy->IsOpen())
 		{
-			this->CloseSocket();
+			this->CloseSocket(XCode::NetWorkError);
 			return;
 		}
 		char *nMessageBuffer = this->mReceiveMsgBuffer;
@@ -114,13 +120,22 @@ namespace GameKeeper
 		{
 			nMessageBuffer = new char[allSize];
 		}
+		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+
+		asio::error_code code;
+		if (allSize < nSocket.available(code))
+		{
+			this->CloseSocket(XCode::NetReceiveFailure);
+			return;
+		}
 		nSocket.async_read_some(asio::buffer(nMessageBuffer, allSize),
 			[this, nMessageBuffer](const asio::error_code &error_code,
 				const std::size_t size) {
 			if (error_code)
 			{
-				this->CloseSocket();
 				GKDebugError(error_code.message());
+				this->CloseSocket(XCode::NetReceiveFailure);			
 			}
 			else
 			{
@@ -132,30 +147,36 @@ namespace GameKeeper
 			{
 				delete[]nMessageBuffer;
 			}
+			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
 	}
 
 	void TcpClientSession::SendByString(std::string * message)
 	{		
-		
+		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-		if (!nSocket.is_open())
+		if (!this->mSocketProxy->IsOpen())
 		{
-			this->CloseSocket();
+			this->CloseSocket(XCode::HttpNetWorkError);
 			NetWorkThread & nThread = this->mSocketProxy->GetThread();
 			nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,
-				this->mTcpComponent, this, message, false);
-			return;
+				this->mTcpComponent, this, message, XCode::NetWorkError);
 		}
-		nSocket.async_send(asio::buffer(message->c_str(), message->size()),
-			[message, this](const asio::error_code &error_code, std::size_t size)
+		else
 		{
-
-			bool isSuccess = error_code ? true : false;
-			NetWorkThread & nThread = this->mSocketProxy->GetThread();
-			nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,
-				this->mTcpComponent, this, message, isSuccess);
-		});
+			nSocket.async_send(asio::buffer(message->c_str(), message->size()),
+				[message, this](const asio::error_code &error_code, std::size_t size)
+			{
+				XCode code = XCode::Successful;
+				if (error_code)
+				{
+					code = XCode::NetSendFailure;
+					this->CloseSocket(XCode::NetSendFailure);
+				}
+				this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+				NetWorkThread & nThread = this->mSocketProxy->GetThread();
+				nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,  this->mTcpComponent, this, message, code);
+			});
+		}		
 	}
-
 }

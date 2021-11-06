@@ -70,6 +70,8 @@ namespace GameKeeper
         size_t GetContentSize() override;
     public:
         bool GetContent(std::ostream &os) override;
+	private:
+		size_t mIndex;
     };
 }
 #endif //GAMEKEEPER_HTTPWRITECONTENT_H

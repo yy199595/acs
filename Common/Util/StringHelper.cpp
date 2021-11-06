@@ -47,6 +47,54 @@ namespace StringHelper
         pos = path.find_last_of('/');
         return path.substr(pos + 1, path.size());
     }
+	std::string FormatJson(const std::string & json)
+	{
+		auto getLevelStr = [](int level, std::string & str)
+		{
+			for (int i = 0; i < level; i++)
+			{
+				str += "\t"; //这里可以\t换成你所需要缩进的空格数
+			}
+		};
+		
+		int level = 0;
+		std::string format;
+		for (string::size_type index = 0; index < json.size(); index++)
+		{
+			char c = json[index];
+
+			if (level > 0 && '\n' == json[json.size() - 1])
+			{
+				getLevelStr(level, format);
+			}
+
+			switch (c)
+			{
+			case '{':
+			case '[':
+				format = format + c + "\n";
+				level++;
+				getLevelStr(level, format);
+				break;
+			case ',':
+				format = format + c + "\n";
+				getLevelStr(level, format);
+				break;
+			case '}':
+			case ']':
+				format += "\n";
+				level--;
+				getLevelStr(level, format);
+				format += c;
+				break;
+			default:
+				format += c;
+				break;
+			}
+		}
+		return format;
+	}
+
     std::string RandomString(size_t size)
     {
         std::stringstream ss;

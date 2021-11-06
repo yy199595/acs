@@ -36,6 +36,7 @@ namespace GameKeeper
 	void HttpGettHandler::OnReceiveHeardAfter(XCode code)
     {
         this->mCode = code;
+		GKDebugInfo(this->PrintHeard());
         auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
         this->mHttpConfig = protocolComponent->GetHttpConfig(this->mPath);
         if (this->mHttpConfig == nullptr)
@@ -55,10 +56,13 @@ namespace GameKeeper
         taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
     }
 
-	bool HttpGettHandler::OnReceiveHeard(asio::streambuf & buf, size_t size)
+	bool HttpGettHandler::OnReceiveHeard(asio::streambuf & streamBuf)
     {
-        this->ParseHeard(buf, size);
-        const std::string &url = this->GetSession()->GetPath();
+		std::string url;
+		std::istream is(&streamBuf);
+		is >> url >> this->mVersion;
+		this->ParseHeard(streamBuf);
+
         size_t pos = url.find('?');
         if (pos != std::string::npos)
         {
@@ -67,11 +71,6 @@ namespace GameKeeper
             GKDebugLog(this->mPath);
             GKDebugInfo(this->mParamater);
             return false;
-        }
-        pos == url.find_last_of('/');
-        if(pos != std::string::npos)
-        {
-
         }
         this->mPath = url;
         return false;

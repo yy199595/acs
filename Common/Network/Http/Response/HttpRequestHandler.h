@@ -5,21 +5,21 @@
 #ifndef GameKeeper_HTTPREMOTEREQUEST_H
 #define GameKeeper_HTTPREMOTEREQUEST_H
 #include <Network/Http/HttpHandlerBase.h>
-#include <Network/Http/Content/HttpReadContent.h>
-#include <Network/Http/Content/HttpWriteContent.h>
-
 namespace GameKeeper
 {
+	class HttpReadContent;
+	class HttpWriteContent;
     class HttpServiceConfig;
     class HttpRemoteSession;
     class HttpClientComponent;
+	
 
     class HttpRequestHandler : public HttpHandlerBase
     {
     public:
         explicit HttpRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
 
-         virtual ~HttpRequestHandler() override ;
+         virtual ~HttpRequestHandler() override;
 
     public:
         void SetCode(HttpStatus code);
@@ -48,8 +48,8 @@ namespace GameKeeper
         XCode mCode;
     protected:
         HttpRemoteSession *mHttpSession;
-        const HttpServiceConfig * mHttpConfig;
         HttpClientComponent *mHttpComponent;
+		const HttpServiceConfig * mHttpConfig;
     private:
 #ifdef __DEBUG__
       long long mStartTime;

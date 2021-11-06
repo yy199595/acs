@@ -7,13 +7,14 @@
 #include <Network/Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
+	class HttpLocalSession;
     class HttpClientComponent;
     class HttpRequest : public HttpHandlerBase
     {
     public:
         HttpRequest(HttpClientComponent * component);
 
-        ~HttpRequest() override = default;
+		~HttpRequest() override;
 
     public:
 
@@ -23,19 +24,21 @@ namespace GameKeeper
 
         HttpStatus GetHttpCode() const { return (HttpStatus) mHttpCode; }
 
-    protected:
+    public:
 
         XCode StartHttpRequest(const std::string & url);
 
         void SetCode(XCode code);
 
+		void OnWriterAfter(XCode code) override;
+
         void OnReceiveBodyAfter(XCode code) override;
 
         void OnReceiveHeardAfter(XCode code) override;
 
-        void OnWriterAfter(XCode code) override { }
+		
 
-        bool OnReceiveHeard(asio::streambuf &buf, size_t size) override;
+        bool OnReceiveHeard(asio::streambuf &buf) override;
 
     protected:
         std::string mHost;
@@ -47,6 +50,7 @@ namespace GameKeeper
         int mHttpCode;
         std::string mError;
         std::string mVersion;
+		HttpLocalSession * mLocalSession;
         HttpClientComponent * mHttpComponent;
     };
 }

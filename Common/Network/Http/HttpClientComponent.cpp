@@ -15,7 +15,7 @@
 #include <Network/Http/Response/HttpPostHandler.h>
 #include <HttpService/HttpServiceComponent.h>
 #include <Other/ProtocolConfig.h>
-
+#include<Util/StringHelper.h>
 namespace GameKeeper
 {
 
@@ -36,11 +36,11 @@ namespace GameKeeper
         //GKDebugFatal(json.size());
 
         HttpJsonContent jsonContent;
-        this->Post("http://127.0.0.1:80/app/account/login", jsonContent, json, 5);
+        this->Get("http://127.0.0.1:80/app/account/login?{}", json, 5);
 
-        //this->Get("http://127.0.0.1:80/App/HttpDownloadService/Files?*", json);
-
-        GKDebugFatal(json);
+        //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
+	
+        GKDebugFatal(StringHelper::FormatJson(json));
     }
 
     HttpRequestHandler *HttpClientComponent::CreateMethodHandler(const std::string &method, HttpRemoteSession * session)
@@ -142,7 +142,7 @@ namespace GameKeeper
         {
             const std::string &key = iter.first;
             const std::string &val = iter.second;
-            jsonContent.AddParameter(key.c_str(), val);
+            jsonContent.Add(key.c_str(), val);
         }
         return this->Post(url, jsonContent, response, timeout);
     }

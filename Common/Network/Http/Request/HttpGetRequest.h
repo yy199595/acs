@@ -1,8 +1,8 @@
 #pragma once
 #include "HttpRequest.h"
-#include <Network/Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
+	class HttpReadContent;
 	class HttpClientComponent;
 	class HttpGetRequest : public HttpRequest
 	{

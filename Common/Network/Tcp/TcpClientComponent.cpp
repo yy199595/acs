@@ -22,7 +22,7 @@ namespace GameKeeper
         return true;
     }
 
-	void TcpClientComponent::OnCloseSession(TcpClientSession * socket)
+	void TcpClientComponent::OnCloseSession(TcpClientSession * socket, XCode code)
 	{
 		if (socket == nullptr)
 		{
@@ -48,7 +48,7 @@ namespace GameKeeper
 		GStringPool.Destory(message);
 	}
 
-    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, std::string * message, bool)
+    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, std::string * message, XCode code)
     {
 #ifdef __DEBUG__
         const std::string & address = session->GetAddress();
@@ -65,12 +65,12 @@ namespace GameKeeper
 		GStringPool.Destory(message);
     }
 
-	void TcpClientComponent::OnConnectRemoteAfter(TcpLocalSession *session, const asio::error_code &err)
+	void TcpClientComponent::OnConnectRemoteAfter(TcpLocalSession *session, XCode code)
 	{
 		const std::string & address = session->GetAddress();
-		if (err)
+		if (code != XCode::Successful)
 		{
-			GKDebugError("connect to " << address << " failure : " << err.message());
+			GKDebugError("connect to " << address << " failure ");
 		}
 		else
 		{

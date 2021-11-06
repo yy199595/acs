@@ -17,13 +17,19 @@ namespace GameKeeper
         const std::string & GetPath() override;
         void OnReceiveBodyAfter(XCode code) override;
         void OnReceiveHeardAfter(XCode code) override;
+		void OnReceiveBody(asio::streambuf & buf) override;
         HttpMethodType GetType() final { return HttpMethodType::POST; }
-        bool OnReceiveHeard(asio::streambuf & buf, size_t size) override;
 
-        const std::string & GetParameter() override { return this->mContent->GetContent(); }
-    protected:
-        HttpReadContent * mContent;
-        void OnReceiveBody(asio::streambuf &buf) override;
+        bool OnReceiveHeard(asio::streambuf & buf) override;
+
+        const std::string & GetParameter() override { return this->mParamater; }
+    private:
+		std::string mPath;
+		size_t mDataLength;
+		std::string mVersion;
+		std::string mParamater;
+		
+        
     };
 }
 #endif //GAMEKEEPER_HTTPPOSTHANDLER_H

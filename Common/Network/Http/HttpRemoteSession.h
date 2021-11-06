@@ -15,15 +15,14 @@ namespace GameKeeper
     public:
         explicit HttpRemoteSession(HttpClientComponent * socketHandler);
     public:
-		void SetSocketProxy(SocketProxy * socketProxy) override;
-    protected:        
-        void OnWriteAfter(XCode code) override;
-        void OnReceiveBodyAfter(XCode code) override;
-        void OnReceiveHeardAfter(XCode code) override;
-        bool WriterToBuffer(std::ostream &os) override;
-        void OnReceiveBody(asio::streambuf &buf) override;
-        bool OnReceiveHeard(asio::streambuf &buf,size_t size) override;
+		void SetSocketProxy(SocketProxy * socketProxy) final;
+	protected:
+		HttpHandlerBase * GetHandler() final;
+		bool OnReceiveHeard(asio::streambuf & buf) final;
+	
+		
     private:
+		std::string mMethod;
         HttpClientComponent * mHttpComponent;
         HttpRequestHandler * mHttpHandler;
     };
