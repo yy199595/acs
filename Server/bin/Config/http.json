@@ -1,0 +1,20 @@
+{
+    "/app/res/download":
+    {
+        "IsAsync":false,
+        "Method":"Download",
+        "Component":"HttpResourceComponent"
+    },
+    "/app/res/files":
+    {
+        "IsAsync":false,
+        "Method":"Files",
+        "Component":"HttpResourceComponent"
+    },
+    "/app/account/login":
+    {
+        "IsAsync":true,
+        "Method":"Login",
+        "Component":"HttpLoginService"
+    }
+}
