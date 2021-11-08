@@ -25,9 +25,13 @@ namespace GameKeeper
 			{
 				response.StartObject();
 				std::ifstream fs(dir, std::ios::in);
+                fs.seekg(0, std::ios_base::beg);
+                size_t size  = fs.seekg(0, std::ios_base::end).tellg();
+
 
 				MD5 md5(fs);
 				response.Add("name", dir);
+                response.Add("size", (unsigned int)size);
 				response.Add("md5", md5.toString());
 				response.EndObject();
 			}

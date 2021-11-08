@@ -12,12 +12,12 @@
 namespace GameKeeper
 {
 
-    HttpRequestHandler::HttpRequestHandler(HttpClientComponent *component, HttpRemoteSession *session)
-        : mHttpSession(session), mHttpComponent(component)
+    HttpRequestHandler::HttpRequestHandler(HttpClientComponent *component)
+        : mHttpComponent(component)
     {
         this->mWriteCount = 0;
         this->mHttpConfig = nullptr;
-        this->mHttpContent = nullptr;
+        this->mResponseContent = nullptr;
 #ifdef __DEBUG__
         this->mStartTime = TimeHelper::GetMilTimestamp();
 #endif
@@ -25,8 +25,7 @@ namespace GameKeeper
 
     HttpRequestHandler::~HttpRequestHandler() noexcept
     {
-        delete this->mHttpSession;
-        delete this->mHttpContent;
+        delete this->mResponseContent;
 #ifdef __DEBUG__
         if(this->mHttpConfig != nullptr)
         {
@@ -37,21 +36,9 @@ namespace GameKeeper
 #endif
     }
 
-    void HttpRequestHandler::OnWriterAfter(XCode code)
-    {
-        delete this;
-    }
-
-    void HttpRequestHandler::SetCode(HttpStatus code)
+    void HttpRequestHandler::SetResponseCode(HttpStatus code)
     {
         this->mHttpCode = code;
-		NetWorkThread & httpThread = this->GetSession()->GetThread();
-        if(httpThread.IsCurrentThread())
-        {
-            this->mHttpSession->StartSendHttpMessage();
-            return;
-        }
-        httpThread.AddTask(&HttpRemoteSession::StartSendHttpMessage, this->mHttpSession);
     }
 
     bool HttpRequestHandler::WriterToBuffer(std::ostream &os)
@@ -60,10 +47,10 @@ namespace GameKeeper
         {
             os << this->mVersion << " " << (int) this->mHttpCode
                << " " << HttpStatusToString(this->mHttpCode) << "\r\n";
-            if (this->mHttpContent != nullptr)
+            if (this->mResponseContent != nullptr)
             {
-                this->mHttpContent->GetContentType(os);
-                os << "Content-Length:" << this->mHttpContent->GetContentSize() << "\r\n";
+                this->mResponseContent->GetContentType(os);
+                os << "Content-Length:" << this->mResponseContent->GetContentSize() << "\r\n";
             }
             os << "Server:" << "GameKeeper" << "\r\n";
             os << "Connection:close" << "\r\n";
@@ -77,14 +64,14 @@ namespace GameKeeper
             os << "\r\n";
         }
         this->mWriteCount++;
-        if (this->mHttpContent == nullptr)
+        if (this->mResponseContent == nullptr)
         {
             return true;
         }
-        return this->mHttpContent->GetContent(os);
+        return this->mResponseContent->GetContent(os);
     }
 
-    bool HttpRequestHandler::SetHeard(const std::string &key, const std::string &val)
+    bool HttpRequestHandler::AddResponseHeard(const std::string &key, const std::string &val)
     {
         auto iter = this->mHeardMap.find(key);
         if(iter == this->mHeardMap.end())
@@ -95,14 +82,21 @@ namespace GameKeeper
         return false;
     }
 
-
-    bool HttpRequestHandler::SetContent(HttpWriteContent *httpContent)
+    void HttpRequestHandler::Clear()
     {
-        if (this->mHttpContent != nullptr || httpContent == nullptr)
-        {
-            return false;
-        }
-        this->mHttpContent = httpContent;
-        return true;
+        HttpHandlerBase::Clear();
+        this->mWriteCount = 0;
+        this->mVersion.clear();
+        this->mHeardMap.clear();
+        this->mHttpConfig = nullptr;
+       delete this->mResponseContent;
+       this->mResponseContent = nullptr;
+    }
+
+
+    void HttpRequestHandler::SetResponseContent(HttpWriteContent *httpContent)
+    {
+        delete this->mResponseContent;
+        this->mResponseContent = httpContent;
     }
 }

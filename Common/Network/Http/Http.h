@@ -91,7 +91,8 @@ inline const char* HttpStatusToString(const HttpStatus& s) {
 enum HttpMethodType
 {
     GET,
-    POST
+    POST,
+    UNKNOW
 };
 
 #endif //GameKeeper_HTTP_H

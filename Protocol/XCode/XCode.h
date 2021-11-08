@@ -48,5 +48,6 @@ enum XCode
 	HttpUrlParseError = 44,//HttpUrl解析失败
 	HostResolverError = 45,//Host主机没发现
 	HttpNetWorkError = 46,//Http网络错误
-	HttpResponseError = 47//Http服务器返回错误
+	HttpResponseError = 47,//Http服务器返回错误
+	HttpMethodNotFound = 48//Http方法没发现
 };

@@ -10,8 +10,9 @@ namespace GameKeeper
 		explicit HttpGetRequest(HttpClientComponent * component);
 		~HttpGetRequest() override = default;
 	public:
+        void Clear() override;
+        bool Init(const std::string & url, HttpReadContent & response);
         HttpMethodType GetType() final { return HttpMethodType::GET; }
-        XCode Get(const std::string & url, HttpReadContent & response);
 	protected:
 		bool WriterToBuffer(std::ostream & os) override;
         void OnReceiveBody(asio::streambuf & buf) override;

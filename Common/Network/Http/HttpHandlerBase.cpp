@@ -20,7 +20,12 @@ namespace GameKeeper
 	}
 #endif // __DEBUG__
 
-	
+    void HttpHandlerBase::Clear()
+    {
+        this->mHeardMap.clear();
+        this->mContentLength = 0;
+        memset(this->mHandlerBuffer, 0, 1024);
+    }
 
 	void HttpHandlerBase::ParseHeard(asio::streambuf & buf)
     {

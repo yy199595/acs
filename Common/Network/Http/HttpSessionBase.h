@@ -15,7 +15,6 @@ namespace GameKeeper
         virtual ~HttpSessionBase();
 
     public:
-        void StartReceiveBody();
 
         void StartReceiveHeard();
 
@@ -26,36 +25,34 @@ namespace GameKeeper
         NetWorkThread &GetThread() { return this->mSocketProxy->GetThread(); }
 	public:
 
-		//virtual const std::string & GetMethod() = 0;
+        virtual void Clear();
 
 		virtual SocketType GetSocketType() = 0;
 
-		virtual void SetSocketProxy(SocketProxy *socketProxy) = 0;
-	
     protected:
 		virtual HttpHandlerBase * GetHandler() = 0;
+
+        virtual void OnWriterAfter(XCode code) = 0;
+
+        virtual void OnReceiveHeardAfter(XCode code) = 0;
 
 		virtual bool OnReceiveHeard(asio::streambuf & buf) = 0;
 
     private:
- 
-        void ReadBodyCallback(const asio::error_code &err, size_t size);
 
         void ReadHeardCallback(const asio::error_code &err, size_t size);
-
-    private:
-        void ReceiveBody();
-
+        
         void ReceiveHeard();
 
-		
     protected:
+        XCode mCode;
         std::string mAddress;
         SocketProxy *mSocketProxy;
+        asio::streambuf mStreamBuf;
         HttpClientComponent *mHttpComponent;
     private:
         int mCount;
         bool mIsReadBody;
-        asio::streambuf mStreamBuf;
+
     };
 }

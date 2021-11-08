@@ -52,7 +52,7 @@ namespace GameKeeper
             const std::string & md5 = iter->second;
             jsonContent->Add(path.c_str(), md5);
         }
-        handler->SetContent(jsonContent);
+        //handler->SetContent(jsonContent);
         return HttpStatus::OK;
     }
 
@@ -63,14 +63,14 @@ namespace GameKeeper
         {
             return HttpStatus::BAD_REQUEST;
         }
-        const std::string & fileName = getRequest->GetParameter();
-        auto iter = this->mFileMd5Map.find(fileName);
-        if(iter == this->mFileMd5Map.end())
-        {
-            return HttpStatus::NOT_FOUND;
-        }
-        const std::string dir = App::Get().GetDownloadPath() + fileName;
-        getRequest->SetContent(new HttpWriteFileContent(dir));
+//        const std::string & fileName = getRequest->GetParameter();
+//        auto iter = this->mFileMd5Map.find(fileName);
+//        if(iter == this->mFileMd5Map.end())
+//        {
+//            return HttpStatus::NOT_FOUND;
+//        }
+//        const std::string dir = App::Get().GetDownloadPath() + fileName;
+        //getRequest->SetContent(new HttpWriteFileContent(dir));
         return HttpStatus::OK;
     }
 }

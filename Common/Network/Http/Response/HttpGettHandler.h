@@ -15,27 +15,21 @@ namespace GameKeeper
         ~HttpGettHandler() override = default;
     public:
 
+        void Clear() final;
+
         HttpMethodType GetType() final { return HttpMethodType::GET; }
 
-		bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
+		//bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
-        const std::string & GetParameter() override { return this->mParamater;}
-
-		void OnReceiveHeardAfter(XCode code) override;
+        size_t ReadFromStream(char *buffer, size_t size) override;
 
 		bool OnReceiveHeard(asio::streambuf & buf) override;
 
         const std::string & GetPath() override { return this->mPath; }
-    protected:
-
-        void OnReceiveBodyAfter(XCode code) override { assert(false); }
-
-		void OnReceiveBody(asio::streambuf &buf) override { assert(false); }
-
     private: // 请求参数
         std::string mPath;
 		std::string mVersion;
-        std::string mParamater;
+        asio::streambuf mStreamBuf;
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

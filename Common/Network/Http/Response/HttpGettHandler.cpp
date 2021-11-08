@@ -12,48 +12,37 @@
 namespace GameKeeper
 {
 
-	bool HttpGettHandler::SplitParameter(std::unordered_map<std::string, std::string>& parames)
-	{
-		parames.clear();
-		std::vector<std::string> tempArray1;
-		std::vector<std::string> tempArray2;
-		StringHelper::SplitString(this->mParamater, "&", tempArray1);
-		for (const std::string & data : tempArray1)
-		{
-			StringHelper::SplitString(data, "=", tempArray2);
-			if (tempArray2.size() != 2)
-			{
-				return false;
-			}
-			const std::string &key = tempArray2[0];
-			const std::string &val = tempArray2[1];
-			parames.insert(std::make_pair(key, val));
-			GKDebugError("get parameter " << key << " = " << val);
-		}
-		return true;
-	}
+//	bool HttpGettHandler::SplitParameter(std::unordered_map<std::string, std::string>& parames)
+//	{
+//		parames.clear();
+//		std::vector<std::string> tempArray1;
+//		std::vector<std::string> tempArray2;
+//		StringHelper::SplitString(this->mParamater, "&", tempArray1);
+//		for (const std::string & data : tempArray1)
+//		{
+//			StringHelper::SplitString(data, "=", tempArray2);
+//			if (tempArray2.size() != 2)
+//			{
+//				return false;
+//			}
+//			const std::string &key = tempArray2[0];
+//			const std::string &val = tempArray2[1];
+//			parames.insert(std::make_pair(key, val));
+//			GKDebugError("get parameter " << key << " = " << val);
+//		}
+//		return true;
+//	}
 
-	void HttpGettHandler::OnReceiveHeardAfter(XCode code)
+    void HttpGettHandler::Clear()
     {
-        this->mCode = code;
-		GKDebugInfo(this->PrintHeard());
-        auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
-        this->mHttpConfig = protocolComponent->GetHttpConfig(this->mPath);
-        if (this->mHttpConfig == nullptr)
+        this->mPath.clear();
+        this->mVersion.clear();
+        HttpRequestHandler::Clear();
+        if(this->mStreamBuf.size() > 0)
         {
-            this->SetCode(HttpStatus::NOT_FOUND);
-            return;
+            std::istream is(&this->mStreamBuf);
+            is.ignore(this->mStreamBuf.size());
         }
-        const std::string &method = this->mHttpConfig->Method;
-        const std::string &service = this->mHttpConfig->Service;
-        auto httpMethod = this->mHttpComponent->GetHttpMethod(service, method);
-        if (httpMethod == nullptr)
-        {
-            this->SetCode(HttpStatus::NOT_FOUND);
-            return;
-        }
-        MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
     }
 
 	bool HttpGettHandler::OnReceiveHeard(asio::streambuf & streamBuf)
@@ -64,15 +53,28 @@ namespace GameKeeper
 		this->ParseHeard(streamBuf);
 
         size_t pos = url.find('?');
-        if (pos != std::string::npos)
+        if (pos == std::string::npos)
+        {
+            this->mPath = url;
+        }
+        else
         {
             this->mPath = url.substr(0, pos);
-            this->mParamater = url.substr(pos + 1);
-            GKDebugLog(this->mPath);
-            GKDebugInfo(this->mParamater);
-            return false;
+            std::ostream os(&this->mStreamBuf);
+            os << url.substr(pos + 1);
         }
-        this->mPath = url;
+        auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
+        this->mHttpConfig = protocolComponent->GetHttpConfig(this->mPath);
         return false;
+    }
+
+    size_t HttpGettHandler::ReadFromStream(char *buffer, size_t size)
+    {
+        if(this->mStreamBuf.size() > 0)
+        {
+            std::istream is(&this->mStreamBuf);
+            return is.readsome(buffer, size);
+        }
+        return 0;
     }
 }

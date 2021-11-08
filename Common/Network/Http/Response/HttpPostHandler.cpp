@@ -10,22 +10,10 @@
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
-    HttpPostHandler::HttpPostHandler(HttpClientComponent *component, HttpRemoteSession *session)
-                                                               : HttpRequestHandler(component, session)
+    HttpPostHandler::HttpPostHandler(HttpClientComponent *component)
+        : HttpRequestHandler(component)
     {
-		this->mParamater.clear();
-    }
 
-    void HttpPostHandler::OnReceiveBodyAfter(XCode code)
-    {
-        this->mCode = code;
-        if (this->mCode != XCode::Successful)
-        {
-            this->OnWriterAfter(code);
-            return;
-        }
-        MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&HttpClientComponent::HandlerHttpRequest, this->mHttpComponent, this);
     }
 
     const std::string &HttpPostHandler::GetPath()
@@ -33,71 +21,45 @@ namespace GameKeeper
 		return this->mPath;
     }
 
+    void HttpPostHandler::Clear()
+    {
+        HttpRequestHandler::Clear();
+        this->mPath.clear();
+        this->mVersion.clear();
+        if(this->mStreamBuf.size() > 0)
+        {
+            std::istream is(&this->mStreamBuf);
+            is.ignore(this->mStreamBuf.size());
+        }
+    }
+
 	bool HttpPostHandler::OnReceiveHeard(asio::streambuf &streamBuf)
 	{
 		std::istream is(&streamBuf);
 		is >> this->mPath >> this->mVersion;
+        this->ParseHeard(streamBuf);
+
+        if(streamBuf.size() > 0)
+        {
+            std::ostream os(&this->mStreamBuf);
+            os.write(asio::buffer_cast<const char *>(streamBuf.data()), streamBuf.size());
+
+            is.ignore(streamBuf.size());
+        }
+
 		auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
 		this->mHttpConfig = protocolComponent->GetHttpConfig(this->GetPath());
-		if (this->mHttpConfig == nullptr)
-		{
-			this->SetCode(HttpStatus::NOT_FOUND);
-			GKDebugError("not find url " << this->GetPath());
-			return false;
-		}
-		const std::string &method = this->mHttpConfig->Method;
-		const std::string &service = this->mHttpConfig->Service;
-		if (!this->mHttpComponent->GetHttpMethod(service, method))
-		{
-			this->SetCode(HttpStatus::NOT_FOUND);
-			GKDebugError("not find method " << service << "." << method);
-			return false;
-		}
-		this->ParseHeard(streamBuf);
-
-		this->mDataLength = this->GetContentLength();
-		if (this->mDataLength == 0)
-		{
-			this->SetCode(HttpStatus::LENGTH_REQUIRED);
-			return false;
-		}
-		/*std::string disposltion;
-		if(this->GetHeardData("Content-Disposition", disposltion))
-		{
-			const std::string ss = "filename=";
-			size_t pos = disposltion.find(ss);
-			if (pos == std::string::npos)
-			{
-				this->SetCode(HttpStatus::PRECONDITION_FAILED);
-				return false;
-			}
-			size_t offset = pos + ss.size();
-			std::string file = disposltion.substr(offset, disposltion.size() - offset);
-			const std::string path = App::Get().GetDownloadPath() + file;
-			return true;
-		}*/
 		return true;
 	}
 
-    void HttpPostHandler::OnReceiveHeardAfter(XCode code)
+    size_t HttpPostHandler::ReadFromStream(char *buffer, size_t size)
     {
-        this->mCode = code;
-        if(this->mCode != XCode::Successful)
+        if(this->mStreamBuf.size() > 0)
         {
-            this->OnWriterAfter(code);
+            std::istream is(&this->mStreamBuf);
+            return is.readsome(buffer, size);
         }
-		GKDebugInfo(this->PrintHeard());
-    }
-
-
-    void HttpPostHandler::OnReceiveBody(asio::streambuf &buf)
-    {
-        std::istream is(&buf);
-        while(buf.size() > 0)
-        {
-            size_t size = is.readsome(this->mHandlerBuffer, 1024);
-			this->mParamater.append(this->mHandlerBuffer, size);
-        }
+        return 0;
     }
 }
 

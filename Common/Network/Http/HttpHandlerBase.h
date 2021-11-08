@@ -12,12 +12,9 @@ namespace GameKeeper
 		HttpHandlerBase() = default;
 		virtual ~HttpHandlerBase() = default;
 	public:
+        virtual void Clear();
         virtual HttpMethodType GetType() = 0;
-        virtual void OnWriterAfter(XCode code) = 0;
-        virtual void OnReceiveBodyAfter(XCode code) = 0;
-        virtual void OnReceiveHeardAfter(XCode code) = 0;
 		virtual bool WriterToBuffer(std::ostream & os) = 0;
-        virtual void OnReceiveBody(asio::streambuf & buf) = 0;
 		virtual bool OnReceiveHeard(asio::streambuf & buf) = 0;
 
 #ifdef __DEBUG__
@@ -29,10 +26,9 @@ namespace GameKeeper
 		size_t GetContentLength() const { return this->mContentLength; }
 		bool GetHeardData(const std::string & key, std::string & value);
 	private:
+        size_t mContentLength;
 		std::unordered_map<std::string, std::string> mHeardMap;
     protected:
         char mHandlerBuffer[1024];
-	private:
-		size_t mContentLength;
 	};
 }

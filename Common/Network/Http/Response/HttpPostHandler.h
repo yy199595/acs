@@ -8,28 +8,24 @@
 #include <Network/Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
+    class HttpClientComponent;
     class HttpPostHandler : public HttpRequestHandler
     {
     public:
-        explicit HttpPostHandler(HttpClientComponent *component, HttpRemoteSession *session);
+        explicit HttpPostHandler(HttpClientComponent *component);
         ~HttpPostHandler() override = default;
     public:
-        const std::string & GetPath() override;
-        void OnReceiveBodyAfter(XCode code) override;
-        void OnReceiveHeardAfter(XCode code) override;
-		void OnReceiveBody(asio::streambuf & buf) override;
+        void Clear() final;
+        const std::string & GetPath() final;
+        bool OnReceiveHeard(asio::streambuf & buf) final;
+        size_t ReadFromStream(char *buffer, size_t size) final;
         HttpMethodType GetType() final { return HttpMethodType::POST; }
 
-        bool OnReceiveHeard(asio::streambuf & buf) override;
-
-        const std::string & GetParameter() override { return this->mParamater; }
     private:
 		std::string mPath;
 		size_t mDataLength;
 		std::string mVersion;
-		std::string mParamater;
-		
-        
+		asio::streambuf mStreamBuf;
     };
 }
 #endif //GAMEKEEPER_HTTPPOSTHANDLER_H

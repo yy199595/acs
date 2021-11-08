@@ -47,3 +47,4 @@ HttpUrlParseError	HttpUrl解析失败
 HostResolverError	Host主机没发现
 HttpNetWorkError	Http网络错误
 HttpResponseError	Http服务器返回错误
+HttpMethodNotFound	Http方法没发现

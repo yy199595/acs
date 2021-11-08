@@ -7,27 +7,36 @@ namespace GameKeeper
 	HttpGetRequest::HttpGetRequest(HttpClientComponent * component)
 		:HttpRequest(component)
 	{
-		this->mCorId = 0;
 #ifdef __DEBUG__
 		this->mCurrentLength = 0;
 #endif // __DEBUG__	
 		this->mResponse = nullptr;
 	}
 
-	XCode HttpGetRequest::Get(const std::string & url, HttpReadContent & response)
-	{
-		this->mResponse = &response;
-        return this->StartHttpRequest(url);
-	}
+    bool HttpGetRequest::Init(const std::string &url, HttpReadContent &response)
+    {
+        if(!this->ParseUrl(url))
+        {
+            return false;
+        }
+        this->mResponse = &response;
+        return true;
+    }
 
 	bool HttpGetRequest::WriterToBuffer(std::ostream & os)
 	{
-		os << "GET " << mPath << " HTTP/1.0\r\n";
-		os << "Host: " << mHost << "\r\n";
+		os << "GET " << this->GetPath() << " HTTP/1.0\r\n";
+		os << "Host: " << this->GetHost() << "\r\n";
 		os << "Accept: */*\r\n";
 		os << "Connection: close\r\n\r\n";
 		return true;
 	}
+
+    void HttpGetRequest::Clear()
+    {
+        HttpRequest::Clear();
+        this->mResponse = nullptr;
+    }
 
 	void HttpGetRequest::OnReceiveBody(asio::streambuf & buf)
     {

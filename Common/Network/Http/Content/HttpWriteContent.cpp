@@ -100,17 +100,20 @@ namespace GameKeeper
     size_t HttpJsonContent::GetContentSize()
     {
 		this->mIndex = 0;
-        this->mJsonWriter.EndObject();
+        if(!this->mJsonWriter.IsComplete())
+        {
+            this->mJsonWriter.EndObject();
+        }
         return this->mStringBuf.GetLength();
     }
 
 	bool HttpJsonContent::GetContent(std::ostream &os)
 	{
-		const char * data = this->mStringBuf.GetString();
-		const size_t size = this->mStringBuf.GetLength();
-
-		const size_t count = size < 1024 ? size : 1024;
-		os.write(data + this->mIndex, count);
-		return (this->mIndex += count) >= size;
+        if(!this->mJsonWriter.IsComplete())
+        {
+            this->mJsonWriter.EndObject();
+        }
+        os.write(this->mStringBuf.GetString(), this->mStringBuf.GetLength());
+		return true;
 	}
 }

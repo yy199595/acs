@@ -52,16 +52,7 @@ namespace GameKeeper
     public:
         HttpStatus Invoke(HttpRequestHandler *handler) override
         {
-            RapidJsonReader request;
-            auto response = new HttpJsonContent();
-            if (!request.TryParse(handler->GetParameter()))
-            {
-                assert(false);
-            }
 
-            XCode code = (_o->*_func)(request, *response);
-            response->Add("code", code);
-            handler->SetContent(response);
             return HttpStatus::OK;
         }
     private:

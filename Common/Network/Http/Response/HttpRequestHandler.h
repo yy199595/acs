@@ -17,37 +17,31 @@ namespace GameKeeper
     class HttpRequestHandler : public HttpHandlerBase
     {
     public:
-        explicit HttpRequestHandler(HttpClientComponent *component, HttpRemoteSession *session);
+        explicit HttpRequestHandler(HttpClientComponent *component);
 
          virtual ~HttpRequestHandler() override;
 
     public:
-        void SetCode(HttpStatus code);
 
-        bool SetContent(HttpWriteContent * httpContent);
+        void Clear() override;
 
-        bool SetHeard(const std::string &key, const std::string &val);
+        void SetResponseCode(HttpStatus code);
+
+        void SetResponseContent(HttpWriteContent * httpContent);
+
+        bool AddResponseHeard(const std::string &key, const std::string &val);
 
         virtual const std::string & GetPath() = 0;
 
-        virtual const std::string & GetParameter() = 0;
+        virtual size_t ReadFromStream(char * buffer, size_t size) = 0;
 
     public:
 
         bool WriterToBuffer(std::ostream &os) override;
-
-        XCode GetErrorCode() const { return this->mCode; }
-
-        HttpRemoteSession * GetSession() { return this->mHttpSession; }
-
+        
         const HttpServiceConfig * GetHttpConfig() const { return this->mHttpConfig;}
 
-        void OnWriterAfter(XCode code) override;
-
-	protected:
-        XCode mCode;
     protected:
-        HttpRemoteSession *mHttpSession;
         HttpClientComponent *mHttpComponent;
 		const HttpServiceConfig * mHttpConfig;
     private:
@@ -57,7 +51,7 @@ namespace GameKeeper
         int mWriteCount;
         HttpStatus mHttpCode;
 		std::string mVersion;
-        HttpWriteContent * mHttpContent;
+        HttpWriteContent * mResponseContent;
         std::unordered_map<std::string, std::string> mHeardMap;
     };
 }

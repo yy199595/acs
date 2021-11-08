@@ -7,6 +7,7 @@
 #include "HttpRequest.h"
 namespace GameKeeper
 {
+    class HttpReadContent;
 	class HttpWriteContent;
     class HttpPostRequest : public HttpRequest
     {
@@ -14,15 +15,15 @@ namespace GameKeeper
         explicit HttpPostRequest(HttpClientComponent * component);
         ~HttpPostRequest() override = default;
     public:
+        void Clear() override;
         HttpMethodType GetType() final { return HttpMethodType::POST; }
-        XCode Post(const std::string & url, HttpWriteContent & content , std::string & response);
+        bool Init(const std::string & url, HttpWriteContent & request, HttpReadContent & response);
     protected:
-        bool WriterToBuffer(std::ostream & os) override;
-        void OnReceiveBody(asio::streambuf & buf) override;
+        bool WriterToBuffer(std::ostream & os) final;
+        void OnReceiveBody(asio::streambuf & buf) final;
     private:
-        unsigned int mCorId;
-        std::string * mResponse;
-        HttpWriteContent * mPostContent;
+        HttpReadContent * mReadContent;
+        HttpWriteContent * mWriteContent;
     };
 }
 #endif //GameKeeper_HTTPLOCALPOSTREQUEST_H

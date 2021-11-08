@@ -4,6 +4,7 @@
 namespace GameKeeper
 {
 	class HttpSessionBase;
+    class HttpReadContent;
     class HttpWriteContent;
     class HttpRemoteSession;
     class HttpServiceMethod;
@@ -24,11 +25,9 @@ namespace GameKeeper
     public:
         XCode Get(const std::string &url, std::string &json, int timeout = 5);
 
-        XCode Download(const std::string & url, const std::string & path, int timeout = 5);
-
         XCode Post(const std::string &url, const std::string &data, std::string &response, int timeout = 5);
 
-        XCode Post(const std::string &url, HttpWriteContent &content, std::string &response, int timeout);
+        XCode Post(const std::string &url, HttpWriteContent &content, HttpReadContent &response, int timeout);
 
     public:
 
@@ -38,19 +37,21 @@ namespace GameKeeper
 
         void OnListen(SocketProxy *socket) final;
 
-        void HandlerHttpRequest(HttpRequestHandler *remoteRequest);
-
-        HttpRequestHandler *CreateMethodHandler(const std::string &method, HttpRemoteSession *session);
-
         HttpServiceMethod * GetHttpMethod(const std::string & service, const std::string & method);
 
     private:
-
         void Invoke(HttpRequestHandler *remoteRequest);
 
+    public:
+        HttpLocalSession * CreateLocalSession();
+        HttpRemoteSession * CreateRemoteSession();
+        void DeleteSession(HttpLocalSession * session);
+        void DeleteSession(HttpRemoteSession * session);
     private:
         class CoroutineComponent *mCorComponent;
 		class TaskPoolComponent * mTaskComponent;
+        std::queue<HttpLocalSession *> mLocalSessionPool;
+        std::queue<HttpRemoteSession *> mRemoteSessionPool;
 		std::unordered_map<long long, HttpSessionBase *> mSessionMap;
     };
 }
