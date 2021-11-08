@@ -63,7 +63,9 @@ namespace GameKeeper
 
 	void HttpLocalSession::Resolver()
     {
-		asio::io_context &ctx = this->mSocketProxy->GetContext();
+        delete this->mQuery;
+        delete this->mResolver;
+		asio::io_context &ctx = mSocketProxy->GetContext();
         this->mResolver = new asio::ip::tcp::resolver(ctx);
         this->mQuery = new asio::ip::tcp::resolver::query(this->mHost, this->mPort);
         this->mResolver->async_resolve(*this->mQuery, [this](
