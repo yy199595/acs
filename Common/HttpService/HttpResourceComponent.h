@@ -7,15 +7,15 @@
 #include"HttpServiceComponent.h"
 namespace GameKeeper
 {
-    class HttpRequestHandler;
+    class HttpRemoteSession;
     class HttpResourceComponent : public HttpServiceComponent
     {
     public:
         HttpResourceComponent() = default;
         ~HttpResourceComponent() override = default;
     private:
-		HttpStatus Files(HttpRequestHandler * handler);
-        HttpStatus Download(HttpRequestHandler * handler);
+		HttpStatus Files(HttpRemoteSession * remoteSession);
+		HttpStatus Download(HttpRemoteSession * remoteSession);
     protected:
         bool Awake() override;
     private:

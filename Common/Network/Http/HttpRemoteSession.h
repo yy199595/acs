@@ -18,12 +18,13 @@ namespace GameKeeper
     public:
         void Start(SocketProxy * socketProxy);
 		SocketType GetSocketType() final { return SocketType::LocalSocket; }
-
+		HttpRequestHandler * GetReuqestHandler() { return this->mHttpHandler; }
     public:
         void Clear() final;
+		HttpHandlerBase * GetHandler() final;
         size_t ReadFromStream(char * buffer, size_t count);
 	protected:
-		HttpHandlerBase * GetHandler() final;
+		
         void OnWriterAfter(XCode code) final;
         void OnReceiveHeardAfter(XCode code) final;
         bool OnReceiveHeard(asio::streambuf & buf) final;
@@ -37,7 +38,6 @@ namespace GameKeeper
         unsigned int mCorId;
     private:
 		std::string mMethod;
-        SocketProxy * mSocketProxy;
         HttpRequestHandler * mHttpHandler;
         HttpClientComponent * mHttpComponent;
         std::unordered_map<std::string, HttpRequestHandler *> mHandlerMap;

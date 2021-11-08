@@ -29,40 +29,8 @@
 #include <Service/HttpLoginService.h>
 using namespace GameKeeper;
 
-asio::steady_timer * timer1 = nullptr;
-asio::steady_timer * timer2 = nullptr;
-void func1(const asio::error_code & err)
-{
-	printf("line = %s\n", __LINE__);
-}
-
-void func2(const asio::error_code & err)
-{
-	asio::error_code code;
-	timer1->cancel_one(code);
-	if (code)
-	{
-		printf("err : %s\n", code.message().c_str());
-	}
-}
-
 int main(int argc, char **argv)
 {
-	/*asio::io_context io;
-
-	timer1 = new asio::steady_timer(io);
-	timer1->expires_from_now(std::chrono::seconds(2));
-	timer1->async_wait(func1);
-
-
-	timer1 = new asio::steady_timer(io);
-	timer1->expires_from_now(std::chrono::seconds(1));
-	timer1->async_wait(func2);
-
-
-	io.run();*/
-
-
 
     for (int index = 0; index < argc; index++)
     {

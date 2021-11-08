@@ -82,16 +82,16 @@ namespace GameKeeper
         return false;
     }
 
-    void HttpRequestHandler::Clear()
-    {
-        HttpHandlerBase::Clear();
-        this->mWriteCount = 0;
-        this->mVersion.clear();
-        this->mHeardMap.clear();
-        this->mHttpConfig = nullptr;
-       delete this->mResponseContent;
-       this->mResponseContent = nullptr;
-    }
+	void HttpRequestHandler::Clear()
+	{
+		HttpHandlerBase::Clear();
+		this->mWriteCount = 0;
+		this->mVersion.clear();
+		this->mHeardMap.clear();
+		this->mHttpConfig = nullptr;
+		delete this->mResponseContent;
+		this->mResponseContent = nullptr;
+	}
 
 
     void HttpRequestHandler::SetResponseContent(HttpWriteContent *httpContent)

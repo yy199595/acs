@@ -37,7 +37,7 @@ namespace GameKeeper
         return true;
     }
 
-	HttpStatus HttpResourceComponent::Files(HttpRequestHandler * handler)
+	HttpStatus HttpResourceComponent::Files(HttpRemoteSession * handler)
     {
         auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
         if (getRequest == nullptr)
@@ -56,7 +56,7 @@ namespace GameKeeper
         return HttpStatus::OK;
     }
 
-	HttpStatus HttpResourceComponent::Download(HttpRequestHandler *handler)
+	HttpStatus HttpResourceComponent::Download(HttpRemoteSession *handler)
     {
         auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
         if (getRequest == nullptr)

@@ -39,6 +39,7 @@ namespace GameKeeper
         HttpJsonContent jsonContent;
         //this->Get("http://127.0.0.1:80/app/account/login?{}", json, 5);
 
+		GKDebugInfo(json);
         //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
 	
         //GKDebugFatal(StringHelper::FormatJson(json));
@@ -52,6 +53,16 @@ namespace GameKeeper
             httpSession->Start(socket);
         }
     }
+
+	void HttpClientComponent::OnRequest(HttpRemoteSession * remoteSession)
+	{
+		if (remoteSession->GetCode() != XCode::Successful)
+		{
+			this->DeleteSession(remoteSession);
+			return;
+		}
+		this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, remoteSession);
+	}
 
     HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &service, const std::string &method)
     {
@@ -99,11 +110,17 @@ namespace GameKeeper
 #endif
     }
 
-    void HttpClientComponent::Invoke(HttpRequestHandler *remoteRequest)
-    {
-        const HttpServiceConfig *config = remoteRequest->GetHttpConfig();
-        HttpServiceMethod *httpMethod = this->GetHttpMethod(config->Service, config->Method);
-        //remoteRequest->SetCode(httpMethod->Invoke(remoteRequest));
+    void HttpClientComponent::Invoke(HttpRemoteSession *remoteRequest)
+    {			
+		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
+		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();
+		 if (requestHandler != nullptr)
+		 {		
+			 const std::string & method = httpConfig->Method;
+			 const std::string & service = httpConfig->Service;	
+			 auto httpMethod = this->GetHttpMethod(service, method);
+			 requestHandler->SetResponseCode(httpMethod->Invoke(remoteRequest));
+		 }	
     }
 
     HttpLocalSession *HttpClientComponent::CreateLocalSession()

@@ -37,10 +37,12 @@ namespace GameKeeper
 
         void OnListen(SocketProxy *socket) final;
 
+		void OnRequest(HttpRemoteSession * remoteSession);
+
         HttpServiceMethod * GetHttpMethod(const std::string & service, const std::string & method);
 
     private:
-        void Invoke(HttpRequestHandler *remoteRequest);
+        void Invoke(HttpRemoteSession *remoteRequest);
 
     public:
         HttpLocalSession * CreateLocalSession();

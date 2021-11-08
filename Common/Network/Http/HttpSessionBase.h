@@ -29,6 +29,7 @@ namespace GameKeeper
 
 		virtual SocketType GetSocketType() = 0;
 
+		XCode GetCode() const { return this->mCode; }
     protected:
 		virtual HttpHandlerBase * GetHandler() = 0;
 

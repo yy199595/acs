@@ -12,10 +12,8 @@
 #include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
-    class HttpRequestHandler;
-
     template<typename T>
-    using HttpServiceMethodType = HttpStatus(T::*)(HttpRequestHandler *);
+    using HttpServiceMethodType = HttpStatus(T::*)(HttpRemoteSession *);
 
     template<typename T>
     using HttpServiceJsonMethodType = XCode(T::*)(const RapidJsonReader & request, RapidJsonWriter & response);
@@ -23,7 +21,7 @@ namespace GameKeeper
     class HttpServiceMethod
     {
     public:
-        virtual HttpStatus Invoke(HttpRequestHandler *handler) = 0;
+        virtual HttpStatus Invoke(HttpRemoteSession *session) = 0;
     };
 
     template<typename T>
@@ -34,9 +32,9 @@ namespace GameKeeper
                 : _o(o), _func(func){}
 
     public:
-        HttpStatus Invoke(HttpRequestHandler *handler) override
+		HttpStatus Invoke(HttpRemoteSession * session) override
         {
-            return (_o->*_func)(handler);
+            return (_o->*_func)(session);
         }
     private:
         T *_o;
@@ -50,13 +48,30 @@ namespace GameKeeper
                 : _o(o), _func(func){}
 
     public:
-        HttpStatus Invoke(HttpRequestHandler *handler) override
-        {
+		HttpStatus Invoke(HttpRemoteSession *session) override
+		{
+			this->mJsonString.clear();
+			size_t size = session->ReadFromStream(this->mBuffer, 512);
+			while (size > 0)
+			{
+				this->mJsonString.append(this->mBuffer, size);
+				size = session->ReadFromStream(this->mBuffer, 512);
+			}
+			RapidJsonReader jsonReader;
+			HttpJsonContent * jsonWriter = new HttpJsonContent();
 
-            return HttpStatus::OK;
-        }
+			XCode code = jsonReader.TryParse(this->mJsonString)
+				? XCode::ParseJsonFailure : (_o->*_func)(jsonReader, *jsonWriter);
+
+			jsonWriter->Add("code", code);
+			HttpRequestHandler * requestHandler = session->GetReuqestHandler();
+			requestHandler->SetResponseContent(jsonWriter);
+			return HttpStatus::OK;
+		}
     private:
         T * _o;
+		char mBuffer[512];
+		std::string mJsonString;
         HttpServiceJsonMethodType<T> _func;
     };
 }

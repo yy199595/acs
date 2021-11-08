@@ -55,9 +55,11 @@ namespace GameKeeper
     
     void HttpSessionBase::StartReceiveHeard()
     {
+		/*GKAssertRet_F(this->mSocketProxy);
+		GKAssertRet_F(this->mSocketProxy->IsOpen());*/
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		GKAssertRet_F(this->mSocketProxy && this->mSocketProxy->IsOpen());
+		
 		if (nThread.IsCurrentThread())
 		{
 			this->ReceiveHeard();

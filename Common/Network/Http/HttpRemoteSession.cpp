@@ -77,6 +77,9 @@ namespace GameKeeper
             this->mCode = XCode::HttpMethodNotFound;
         }
         //通知到主线程处理
+		CoroutineComponent * corComponent = App::Get().GetCorComponent();
+		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+		taskScheduler.AddMainTask(&HttpClientComponent::OnRequest, this->mHttpComponent, this);
     }
 
     size_t HttpRemoteSession::ReadFromStream(char *buffer, size_t count)
@@ -114,9 +117,10 @@ namespace GameKeeper
 
     void HttpRemoteSession::StartReceiveBody()
     {
-        asio::error_code code;
-        AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
-        if (!this->mSocketProxy->IsOpen() || socket.available(code) == 0)
+        asio::error_code code;   
+		GKAssertRet_F(this->mSocketProxy->IsOpen());
+		AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
+        if (socket.available(code) == 0)
         {
             auto corComponent = App::Get().GetCorComponent();
             NetWorkThread &netWorkThread = this->mSocketProxy->GetThread();
