@@ -17,6 +17,7 @@ namespace GameKeeper
 		~HttpLocalSession() final;
 	public:
 		void SetSocketProxy(SocketProxy * socketProxy) { };
+		SocketType GetSocketType() final { return SocketType::LocalSocket; }
 		void StartConnectHost(const std::string & host, const std::string & port, SocketProxy * socketProxy);
 	protected:    
 		HttpHandlerBase * GetHandler() final;

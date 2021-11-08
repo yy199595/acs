@@ -16,6 +16,7 @@ namespace GameKeeper
         explicit HttpRemoteSession(HttpClientComponent * socketHandler);
     public:
 		void SetSocketProxy(SocketProxy * socketProxy) final;
+		SocketType GetSocketType() final { return SocketType::LocalSocket; }
 	protected:
 		HttpHandlerBase * GetHandler() final;
 		bool OnReceiveHeard(asio::streambuf & buf) final;

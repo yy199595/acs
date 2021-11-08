@@ -16,12 +16,15 @@
 #include <HttpService/HttpServiceComponent.h>
 #include <Other/ProtocolConfig.h>
 #include<Util/StringHelper.h>
+#include<Network/Http/HttpLocalsession.h>
+#include<Network/Http/HttpRemoteSession.h>
 namespace GameKeeper
 {
 
     bool HttpClientComponent::Awake()
     {
         this->mCorComponent = this->GetComponent<CoroutineComponent>();
+		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
         return true;
     }
 
@@ -130,23 +133,6 @@ namespace GameKeeper
         return this->Post(url, content, response, timeout);
     }
 
-    XCode HttpClientComponent::Post(const std::string &url, const std::unordered_map<std::string, std::string> &data,
-                                    std::string &response, int timeout)
-    {
-        if (data.empty())
-        {
-            return XCode::HttpUrlParseError;
-        }
-        HttpJsonContent jsonContent;
-        for (const auto &iter: data)
-        {
-            const std::string &key = iter.first;
-            const std::string &val = iter.second;
-            jsonContent.Add(key.c_str(), val);
-        }
-        return this->Post(url, jsonContent, response, timeout);
-    }
-
     XCode HttpClientComponent::Post(const std::string & url, HttpWriteContent & content, std::string & response, int timeout)
     {
         HttpPostRequest localPostRequest(this);
@@ -167,5 +153,17 @@ namespace GameKeeper
         HttpServiceMethod *httpMethod = this->GetHttpMethod(config->Service, config->Method);
         remoteRequest->SetCode(httpMethod->Invoke(remoteRequest));
     }
+
+	HttpLocalSession * HttpClientComponent::NewLocalSession()
+	{
+		NetWorkThread & netThread = this->mTaskComponent->GetNetThread();
+		HttpLocalSession * localSession = new HttpLocalSession(this)
+		return nullptr;
+	}
+
+	HttpRemoteSession * HttpClientComponent::NewRemoteSession()
+	{
+		return nullptr;
+	}
 
 }

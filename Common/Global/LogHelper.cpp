@@ -69,9 +69,9 @@ namespace GameKeeper
 
     bool LogHelper::Init(const std::string path, const std::string name)
     {
-//#if _WIN32
-//		system("chcp 65001");
-//#endif // _Win32
+#if _WIN32
+		system("chcp 65001");
+#endif // _Win32
 
         std::string logPath = path + "/" + TimeHelper::GetYearMonthDayString();
         mFatalLog = spdlog::basic_logger_mt(name + ".fatal", logPath + "/fatal.log");

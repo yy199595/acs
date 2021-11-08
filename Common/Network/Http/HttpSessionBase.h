@@ -28,7 +28,10 @@ namespace GameKeeper
 
 		//virtual const std::string & GetMethod() = 0;
 
+		virtual SocketType GetSocketType() = 0;
+
 		virtual void SetSocketProxy(SocketProxy *socketProxy) = 0;
+	
     protected:
 		virtual HttpHandlerBase * GetHandler() = 0;
 
