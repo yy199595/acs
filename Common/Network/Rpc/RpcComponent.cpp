@@ -6,7 +6,7 @@
 #include <Scene/ProtocolComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <Service/RpcRequestComponent.h>
-#include <Network/Rpc/RpcLocalSession.h>
+#include <Network/Rpc/RpcConnector.h>
 #ifdef __DEBUG__
 #include <Pool/MessagePool.h>
 #endif
@@ -23,7 +23,7 @@ namespace GameKeeper
         return true;
     }
 
-	void RpcComponent::OnCloseSession(RpcClientSession * socket, XCode code)
+	void RpcComponent::OnCloseSession(RpcClient * socket, XCode code)
 	{
 		if (socket == nullptr)
 		{
@@ -40,7 +40,7 @@ namespace GameKeeper
 		}
 	}
 
-	void RpcComponent::OnReceiveMessage(RpcClientSession * session, string * message)
+	void RpcComponent::OnReceiveMessage(RpcClient * session, string * message)
 	{
 		if (!this->OnReceive(session, *message))
 		{
@@ -49,7 +49,7 @@ namespace GameKeeper
 		GStringPool.Destory(message);
 	}
 
-    void RpcComponent::OnSendMessageAfter(RpcClientSession *session, std::string * message, XCode code)
+    void RpcComponent::OnSendMessageAfter(RpcClient *session, std::string * message, XCode code)
     {
 #ifdef __DEBUG__
         const std::string & address = session->GetAddress();
@@ -66,7 +66,7 @@ namespace GameKeeper
 		GStringPool.Destory(message);
     }
 
-	void RpcComponent::OnConnectRemoteAfter(RpcLocalSession *session, XCode code)
+	void RpcComponent::OnConnectRemoteAfter(RpcConnector *session, XCode code)
 	{
 		const std::string & address = session->GetAddress();
 		if (code != XCode::Successful)
@@ -89,14 +89,14 @@ namespace GameKeeper
 		auto iter = this->mSessionAdressMap.find(id);
 		if (iter == this->mSessionAdressMap.end())
         {
-            auto tcpSession = new RpcClientSession(this);
+            auto tcpSession = new RpcClient(this);
             tcpSession->SetSocket(socket);
             this->mSessionAdressMap.emplace(id, tcpSession);
         }
 	}
 
 
-	bool RpcComponent::OnReceive(RpcClientSession *session, const std::string & message)
+	bool RpcComponent::OnReceive(RpcClient *session, const std::string & message)
 	{
         const char * body = message.c_str() + 1;
         const size_t bodySize = message.size() - 1;
@@ -158,22 +158,22 @@ namespace GameKeeper
         return false;
 	}
 
-    RpcLocalSession *RpcComponent::GetLocalSession(long long id)
+    RpcConnector *RpcComponent::GetLocalSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         if(iter == this->mSessionAdressMap.end())
         {
             return nullptr;
         }
-        RpcClientSession * session = iter->second;
+        RpcClient * session = iter->second;
         if(session->GetSocketType() == SocketType::RemoteSocket)
         {
             return nullptr;
         }
-        return static_cast<RpcLocalSession*>(session);
+        return static_cast<RpcConnector*>(session);
     }
 
-    RpcClientSession *RpcComponent::GetRemoteSession(long long id)
+    RpcClient *RpcComponent::GetRemoteSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
@@ -183,7 +183,7 @@ namespace GameKeeper
                                                      unsigned short port)
 	{
 		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
-		auto localSession = new RpcLocalSession(this, ip, port);
+		auto localSession = new RpcConnector(this, ip, port);
         localSession->SetSocket(new SocketProxy(nThread, name));
 		this->mSessionAdressMap.emplace(localSession->GetSocketProxy().GetSocketId(), localSession);
 		return localSession->GetSocketProxy().GetSocketId();
@@ -193,7 +193,7 @@ namespace GameKeeper
     {
     }
 
-    RpcClientSession *RpcComponent::GetSession(long long id)
+    RpcClient *RpcComponent::GetSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
@@ -212,7 +212,7 @@ namespace GameKeeper
 
 	bool RpcComponent::SendByAddress(long long id, std::string * message)
 	{
-		RpcClientSession * tcpSession = this->GetSession(id);
+		RpcClient * tcpSession = this->GetSession(id);
 		if (tcpSession == nullptr)
 		{
 			return false;

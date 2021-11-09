@@ -36,7 +36,7 @@ namespace GameKeeper
 		return false;
 	}
 
-    RpcLocalSession * ServiceNode::GetTcpSession()
+    RpcConnector * ServiceNode::GetTcpSession()
     {
         auto localSession = this->mRpcComponent->GetLocalSession(this->mSocketId);
 
@@ -63,7 +63,7 @@ namespace GameKeeper
             {
                 this->mCorComponent->YieldReturn();
             }
-            RpcLocalSession *tcpLocalSession = this->GetTcpSession();
+            RpcConnector *tcpLocalSession = this->GetTcpSession();
             if (tcpLocalSession == nullptr)
             {
                 GKDebugError("node session [" << this->GetNodeName()

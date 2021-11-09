@@ -49,7 +49,7 @@ namespace GameKeeper
     private:
         void LoopSendMessage();
         void PushMessage(std::string * msg);
-        class RpcLocalSession *GetTcpSession();
+        class RpcConnector *GetTcpSession();
 
     private:
         std::string mMessageBuffer;

@@ -2,7 +2,7 @@
 #pragma once
 
 #include<Service/LocalServiceComponent.h>
-#include<Network/Rpc/RpcClientSession.h>
+#include<Network/Rpc/RpcClient.h>
 
 using namespace com;
 

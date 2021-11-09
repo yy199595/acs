@@ -4,28 +4,28 @@
 #include <Component/Component.h>
 #include <Script/LuaTable.h>
 #include <Other/MultiThreadQueue.h>
-#include <Network/Rpc/RpcLocalSession.h>
+#include <Network/Rpc/RpcConnector.h>
 namespace GameKeeper
 {
 	// 管理所有session
 	class RpcComponent : public Component, public ISocketListen
 	{
 	public:
-		friend RpcClientSession;
+		friend RpcClient;
 		RpcComponent() = default;
 
 		~RpcComponent() override = default;
 	public:
-		void OnCloseSession(RpcClientSession * socket, XCode code);
-		void OnConnectRemoteAfter(RpcLocalSession * session, XCode code);
-		void OnReceiveMessage(RpcClientSession * session, string * message);
-		void OnSendMessageAfter(RpcClientSession *session, std::string * message, XCode code);
+		void OnCloseSession(RpcClient * socket, XCode code);
+		void OnConnectRemoteAfter(RpcConnector * session, XCode code);
+		void OnReceiveMessage(RpcClient * session, string * message);
+		void OnSendMessageAfter(RpcClient *session, std::string * message, XCode code);
 		
     protected:
 		void OnListen(SocketProxy * socket) final;
 	public:
-        RpcLocalSession * GetLocalSession(long long id);
-        RpcClientSession * GetRemoteSession(long long id);
+        RpcConnector * GetLocalSession(long long id);
+        RpcClient * GetRemoteSession(long long id);
         long long NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;
@@ -42,8 +42,8 @@ namespace GameKeeper
         std::string * Serialize(const com::DataPacket_Response & message);
     private:
 		
-		RpcClientSession *GetSession(long long id);
-		bool OnReceive(RpcClientSession *, const std::string & message);
+		RpcClient *GetSession(long long id);
+		bool OnReceive(RpcClient *, const std::string & message);
 
 	private:
 		class TaskPoolComponent * mTaskComponent;
@@ -56,7 +56,7 @@ namespace GameKeeper
         com::DataPacket_Request mRequestData;
         com::DataPacket_Response mResponseData;
 		std::queue<std::string> mRecvSessionQueue;
-		std::queue<RpcClientSession *> mSessionQueue;
-        std::unordered_map<long long, RpcClientSession *> mSessionAdressMap;
+		std::queue<RpcClient *> mSessionQueue;
+        std::unordered_map<long long, RpcClient *> mSessionAdressMap;
 	};
 }

@@ -2,34 +2,34 @@
 // Created by zmhy0073 on 2021/10/27.
 //
 
-#include "RpcLocalSession.h"
+#include "RpcConnector.h"
 #include <Core/App.h>
 #include<Network/Rpc/RpcComponent.h>
 namespace GameKeeper
 {
-	RpcLocalSession::RpcLocalSession(RpcComponent * component, const std::string & ip, const unsigned short port)
-		:RpcClientSession(component), mIp(ip), mPort(port)
+	RpcConnector::RpcConnector(RpcComponent * component, const std::string & ip, const unsigned short port)
+		:RpcClient(component), mIp(ip), mPort(port)
 	{
 		this->mAddress = ip + ":" + std::to_string(mPort);
 	}
 
-    void RpcLocalSession::StartConnect()
+    void RpcConnector::StartConnect()
     {		
 		GKAssertRet_F(this->mSocketProxy);
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		nThread.AddTask(&RpcLocalSession::ConnectHandler, this);
+		nThread.AddTask(&RpcConnector::ConnectHandler, this);
     }
 
-    void RpcLocalSession::StartAsyncConnect()
+    void RpcConnector::StartAsyncConnect()
     {
 		GKAssertRet_F(this->mSocketProxy);
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
         unsigned int id = App::Get().GetCorComponent()->GetCurrentCorId();
-		nThread.AddTask(&RpcLocalSession::AsyncConnectHandler, this, id);
+		nThread.AddTask(&RpcConnector::AsyncConnectHandler, this, id);
         App::Get().GetCorComponent()->YieldReturn();
     }
 
-	void RpcLocalSession::ConnectHandler()
+	void RpcConnector::ConnectHandler()
     {
         this->mConnectCount++;
         auto address = asio::ip::make_address_v4(this->mIp);
@@ -50,7 +50,7 @@ namespace GameKeeper
         });
     }
 
-    void RpcLocalSession::AsyncConnectHandler(unsigned int id)
+    void RpcConnector::AsyncConnectHandler(unsigned int id)
     {
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);

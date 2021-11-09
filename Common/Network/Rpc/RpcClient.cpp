@@ -1,10 +1,10 @@
-﻿#include"RpcClientSession.h"
+﻿#include"RpcClient.h"
 #include<Util/TimeHelper.h>
 #include<Network/Rpc/RpcComponent.h>
 
 namespace GameKeeper
 {
-    RpcClientSession::RpcClientSession(RpcComponent *component)
+    RpcClient::RpcClient(RpcComponent *component)
             :mTcpComponent(component)
     {      		
 		this->mLastOperTime = 0;
@@ -12,13 +12,13 @@ namespace GameKeeper
 		this->mReceiveMsgBuffer = new char[TCP_BUFFER_COUNT];
     }
 
-    RpcClientSession::~RpcClientSession()
+    RpcClient::~RpcClient()
     {
         delete this->mSocketProxy;
         delete[]this->mReceiveMsgBuffer;
     }
 
-	void RpcClientSession::SetSocket(SocketProxy * socketProxy)
+	void RpcClient::SetSocket(SocketProxy * socketProxy)
     {
         delete this->mSocketProxy;
         this->mSocketProxy = socketProxy;     
@@ -32,7 +32,7 @@ namespace GameKeeper
     }
 
 
-	void RpcClientSession::StartClose()
+	void RpcClient::StartClose()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -40,11 +40,11 @@ namespace GameKeeper
 			this->CloseSocket(XCode::NetActiveShutdown);
 			return;
 		}
-		nThread.AddTask(&RpcClientSession::CloseSocket, this, XCode::NetActiveShutdown);
+		nThread.AddTask(&RpcClient::CloseSocket, this, XCode::NetActiveShutdown);
 		
 	}
 
-	void RpcClientSession::StartReceive()
+	void RpcClient::StartReceive()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -52,11 +52,11 @@ namespace GameKeeper
 			this->ReceiveMessage();
 			return;
 		}
-		nThread.AddTask(&RpcClientSession::ReceiveMessage, this);
+		nThread.AddTask(&RpcClient::ReceiveMessage, this);
 		
 	}
 
-	void RpcClientSession::StartSendByString(std::string * message)
+	void RpcClient::StartSendByString(std::string * message)
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -64,12 +64,12 @@ namespace GameKeeper
 			this->SendByString(message);
 			return;
 		}
-		nThread.AddTask(&RpcClientSession::SendByString, this, message);
+		nThread.AddTask(&RpcClient::SendByString, this, message);
 		
 	}
 
 
-	void RpcClientSession::ReceiveMessage()
+	void RpcClient::ReceiveMessage()
 	{
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
@@ -97,7 +97,7 @@ namespace GameKeeper
 		});
 	}
 
-	void RpcClientSession::CloseSocket(XCode code)
+	void RpcClient::CloseSocket(XCode code)
 	{		
 		if (this->mSocketProxy->IsOpen())
 		{
@@ -108,7 +108,7 @@ namespace GameKeeper
 		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
-	void RpcClientSession::ReadMessageBody(const size_t allSize)
+	void RpcClient::ReadMessageBody(const size_t allSize)
 	{	
 		if (!this->mSocketProxy->IsOpen())
 		{
@@ -151,7 +151,7 @@ namespace GameKeeper
 		});
 	}
 
-	void RpcClientSession::SendByString(std::string * message)
+	void RpcClient::SendByString(std::string * message)
 	{		
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();

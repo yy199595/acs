@@ -8,11 +8,11 @@ namespace GameKeeper
 {
     class RpcComponent;
 
-    class RpcClientSession
+    class RpcClient
     {
     public:
-        explicit RpcClientSession(RpcComponent *component);
-        virtual ~RpcClientSession();
+        explicit RpcClient(RpcComponent *component);
+        virtual ~RpcClient();
 	public:
 		void SetSocket(SocketProxy * socketProxy);
 		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
@@ -39,6 +39,6 @@ namespace GameKeeper
 		long long mLastOperTime;
     };
 
-    typedef shared_ptr<RpcClientSession> SharedTcpSession;
+    typedef shared_ptr<RpcClient> SharedTcpSession;
 
 }// namespace GameKeeper
