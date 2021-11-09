@@ -24,6 +24,11 @@ namespace GameKeeper
     {
         return mContent.size();
     }
+
+    void HttpWriteStringContent::GetContentType(std::ostream & os)
+    {
+        os << "Content-Type: " << "text/plain" << "\r\n";
+    }
 }
 
 namespace GameKeeper
@@ -116,4 +121,9 @@ namespace GameKeeper
         os.write(this->mStringBuf.GetString(), this->mStringBuf.GetLength());
 		return true;
 	}
+
+    void HttpJsonContent::GetContentType(std::ostream &os)
+    {
+        os << "Content-Type: " << "applocation/json" << "\r\n";
+    }
 }

@@ -19,7 +19,7 @@ namespace GameKeeper
     public:
         virtual size_t GetContentSize() = 0;
         virtual bool GetContent(std::ostream &os) = 0;
-        virtual void GetContentType(std::ostream & is) {}
+        virtual void GetContentType(std::ostream & is) = 0;
     };
 }
 
@@ -30,8 +30,9 @@ namespace GameKeeper
     public:
         explicit HttpWriteStringContent(const std::string & content);
     public:
-        size_t GetContentSize() override;
-        bool GetContent(std::ostream & os) override;
+        size_t GetContentSize() final;
+        bool GetContent(std::ostream & os) final;
+        void GetContentType(std::ostream &is) final;
     private:
         const std::string mContent;
     };
@@ -45,9 +46,9 @@ namespace GameKeeper
         explicit HttpWriteFileContent(const std::string &path);
         ~HttpWriteFileContent() override;
     public:
-        size_t GetContentSize() override;
-        bool GetContent(std::ostream &os) override;
-        void GetContentType(std::ostream &is) override;
+        size_t GetContentSize() final;
+        bool GetContent(std::ostream &os) final;
+        void GetContentType(std::ostream &is) final;
     private:
 		size_t mFileSize;
 #ifdef __DEBUG__
@@ -69,7 +70,8 @@ namespace GameKeeper
     public:
         size_t GetContentSize() override;
     public:
-        bool GetContent(std::ostream &os) override;
+        bool GetContent(std::ostream &os) final;
+        void GetContentType(std::ostream &os) final;
 	private:
 		size_t mIndex;
     };
