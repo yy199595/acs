@@ -7,7 +7,7 @@
 #include <Core/App.h>
 #include <Scene/ProtocolComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
@@ -37,43 +37,45 @@ namespace GameKeeper
     {
         this->mPath.clear();
         this->mVersion.clear();
+        this->mParamater.clear();
         HttpRequestHandler::Clear();
-        if(this->mStreamBuf.size() > 0)
-        {
-            std::istream is(&this->mStreamBuf);
-            is.ignore(this->mStreamBuf.size());
-        }
     }
 
 	bool HttpGettHandler::OnReceiveHeard(asio::streambuf & streamBuf)
     {
-		std::string url;
-		std::istream is(&streamBuf);
-		is >> url >> this->mVersion;
-		this->ParseHeard(streamBuf);
+        std::string url;
+        std::istream is(&streamBuf);
+        is >> url >> this->mVersion;
+        this->ParseHeard(streamBuf);
+        const std::string & app = "App/";
 
-        size_t pos = url.find('?');
-        if (pos == std::string::npos)
+        size_t pos1 = url.find(app) + app.length();
+        GKAssertRetFalse_F(pos1 != std::string::npos);
+        size_t pos2 = url.find('/', pos1 + 1);
+        GKAssertRetFalse_F(pos2 != std::string::npos);
+
+        size_t pos3 = url.find('/', pos2 + 1);
+        if(pos3 == std::string::npos)
         {
-            this->mPath = url;
+            pos3 = url.find('?', pos2 + 1);
         }
-        else
+        if(pos3 != std::string::npos)
         {
-            this->mPath = url.substr(0, pos);
-            std::ostream os(&this->mStreamBuf);
-            os << url.substr(pos + 1);
+            this->mParamater = url.substr(pos3 + 1);
         }
-        auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
-        this->mHttpConfig = protocolComponent->GetHttpConfig(this->mPath);
-        return false;
+        this->mComponent = url.substr(pos1, pos2 - pos1);
+        this->mMethod = url.substr(pos2 + 1, pos3 - pos2 - 1);
+        GKDebugLog("[http GET] " << this->mComponent << "." << this->mMethod << " data " << this->mParamater);
+        return true;
     }
 
-    size_t HttpGettHandler::ReadFromStream(char *buffer, size_t size)
+    size_t HttpGettHandler::ReadFromStream(std::string & stringBuf)
     {
-        if(this->mStreamBuf.size() > 0)
+        if(!this->mParamater.empty())
         {
-            std::istream is(&this->mStreamBuf);
-            return is.readsome(buffer, size);
+            stringBuf.append(this->mParamater);
+            this->mParamater.clear();
+            return stringBuf.size();
         }
         return 0;
     }

@@ -1,7 +1,7 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
-#include <Scene/CallHandlerComponent.h>
-#include <Service/ServiceMgrComponent.h>
+#include <Scene/RpcResponseComponent.h>
+#include <Service/RpcRequestComponent.h>
 #include <Method/CallHandler.h>
 #include <Service/LuaServiceComponent.h>
 #include <Timer/LuaActionTimer.h>
@@ -90,7 +90,7 @@ int SystemExtension::Call(lua_State *lua)
 //		}
 //	}
 //
-//	auto actionComponent = App::Get().GetComponent<CallHandlerComponent>();
+//	auto actionComponent = App::Get().GetComponent<RpcResponseComponent>();
 //	auto cb = std::make_shared<LuaCallHandler>(lua, coroutine);
 //
 //	if (!packetMapper->SetRpcId(actionComponent->AddCallHandler(cb)))

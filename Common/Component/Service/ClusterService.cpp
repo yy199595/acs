@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
 #include <Service/ServiceNodeComponent.h>
-#include <Service/ServiceMgrComponent.h>
+#include <Service/RpcRequestComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
 namespace GameKeeper
 {

@@ -4,7 +4,7 @@
 #include<Network/Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
-	HttpGetRequest::HttpGetRequest(HttpClientComponent * component)
+	HttpGetRequest::HttpGetRequest(HttpComponent * component)
 		:HttpRequest(component)
 	{
 #ifdef __DEBUG__

@@ -6,17 +6,17 @@
 #include <Core/App.h>
 #include <Other/ProtocolConfig.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
 
-    HttpRequestHandler::HttpRequestHandler(HttpClientComponent *component)
+    HttpRequestHandler::HttpRequestHandler(HttpComponent *component)
         : mHttpComponent(component)
     {
         this->mWriteCount = 0;
-        this->mHttpConfig = nullptr;
+        //this->mHttpConfig = nullptr;
         this->mResponseContent = nullptr;
 #ifdef __DEBUG__
         this->mStartTime = TimeHelper::GetMilTimestamp();
@@ -27,12 +27,11 @@ namespace GameKeeper
     {
         delete this->mResponseContent;
 #ifdef __DEBUG__
-        if(this->mHttpConfig != nullptr)
-        {
+
             long long endTime = TimeHelper::GetMilTimestamp();
-            GKDebugLog("http call " << this->mHttpConfig->Service << "." << this->mHttpConfig->Method
+            GKDebugLog("http call " << this->mComponent << "." << this->mMethod
                                     << " use time = " << ((endTime - this->mStartTime) / 1000.0f) << "s");
-        }
+
 #endif
     }
 
@@ -88,7 +87,8 @@ namespace GameKeeper
 		this->mWriteCount = 0;
 		this->mVersion.clear();
 		this->mHeardMap.clear();
-		this->mHttpConfig = nullptr;
+        this->mMethod.clear();
+        this->mComponent.clear();
 		delete this->mResponseContent;
 		this->mResponseContent = nullptr;
 	}

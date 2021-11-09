@@ -9,16 +9,16 @@ namespace GameKeeper
     class CallHandler;
 
 	class PacketMapper;
-    class CallHandlerComponent : public Component, public IResponseMessageHandler
+    class RpcResponseComponent : public Component, public IProtoResponse
     {
     public:
-        CallHandlerComponent();
+        RpcResponseComponent();
 
-        ~CallHandlerComponent() override = default;
+        ~RpcResponseComponent() override = default;
 
     public:
         bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
-        bool OnResponseMessage(const com::DataPacket_Response & message) final;
+        bool OnResponse(const com::DataPacket_Response & message) final;
     protected:
         bool Awake() override;
     private:

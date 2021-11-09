@@ -11,12 +11,12 @@ namespace GameKeeper
     class HttpRequestHandler;	
 	class HttpLocalSession;
 
-    class HttpClientComponent : public Component, public ISocketListen
+    class HttpComponent : public Component, public ISocketListen
     {
     public:
-        HttpClientComponent() = default;
+        HttpComponent() = default;
 
-        ~HttpClientComponent() final = default;
+        ~HttpComponent() final = default;
     public:
         bool Awake() final;
 

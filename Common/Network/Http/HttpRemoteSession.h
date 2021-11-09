@@ -7,13 +7,12 @@
 #include "HttpSessionBase.h"
 namespace GameKeeper
 {
-    class HttpNullHandler;
-    class HttpClientComponent;
+    class HttpComponent;
     class HttpRequestHandler;
     class HttpRemoteSession : public HttpSessionBase
     {
     public:
-        explicit HttpRemoteSession(HttpClientComponent * socketHandler);
+        explicit HttpRemoteSession(HttpComponent * socketHandler);
         ~HttpRemoteSession() final;
     public:
         void Start(SocketProxy * socketProxy);
@@ -22,24 +21,22 @@ namespace GameKeeper
     public:
         void Clear() final;
 		HttpHandlerBase * GetHandler() final;
-        size_t ReadFromStream(char * buffer, size_t count);
 	protected:
-		
         void OnWriterAfter(XCode code) final;
         void OnReceiveHeardAfter(XCode code) final;
-        bool OnReceiveHeard(asio::streambuf & buf) final;
+        void OnReceiveHeard(asio::streambuf & buf) final;
 
     private:
         void StartReceiveBody();
+        void SetCode(XCode code);
         void ReadBodyCallback(const asio::error_code & err, size_t size);
-
     private:
         size_t mReadSize;
         unsigned int mCorId;
     private:
 		std::string mMethod;
         HttpRequestHandler * mHttpHandler;
-        HttpClientComponent * mHttpComponent;
+        HttpComponent * mHttpComponent;
         std::unordered_map<std::string, HttpRequestHandler *> mHandlerMap;
     };
 }

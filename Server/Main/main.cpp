@@ -1,20 +1,20 @@
 ﻿#include <Core/App.h>
-#include <Scene/CallHandlerComponent.h>
+#include <Scene/RpcResponseComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
 
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Network/Tcp/TcpClientComponent.h>
+#include <Network/Rpc/RpcComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include <Network/Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
-#include <Service/ServiceMgrComponent.h>
+#include <Service/RpcRequestComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <Scene/ProtocolComponent.h>
@@ -38,21 +38,21 @@ int main(int argc, char **argv)
     }
     __register_component__(GatewayComponent);
     __register_component__(TimerComponent);
-    __register_component__(ServiceMgrComponent);
+    __register_component__(RpcRequestComponent);
     __register_component__(RedisComponent);
     __register_component__(MysqlComponent);
-    __register_component__(CallHandlerComponent);
+    __register_component__(RpcResponseComponent);
     __register_component__(LuaScriptComponent);
     __register_component__(ProtocolComponent);
     __register_component__(MysqlProxyComponent);
     __register_component__(GatewayComponent);
-    __register_component__(HttpClientComponent);
+    __register_component__(HttpComponent);
 
     __register_component__(TaskPoolComponent);
     __register_component__(CoroutineComponent);
     __register_component__(ServiceNodeComponent);
     __register_component__(TcpServerComponent);
-    __register_component__(TcpClientComponent);
+    __register_component__(RpcComponent);
     __register_component__(TelnetClientComponent);
     __register_component__(DeamonComponent);
 

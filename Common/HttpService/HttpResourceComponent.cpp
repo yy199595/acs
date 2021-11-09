@@ -37,23 +37,16 @@ namespace GameKeeper
         return true;
     }
 
-	HttpStatus HttpResourceComponent::Files(HttpRemoteSession * handler)
+	XCode HttpResourceComponent::Files(RapidJsonWriter & jsonResponse)
     {
-        auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
-        if (getRequest == nullptr)
-        {
-            return HttpStatus::BAD_REQUEST;
-        }
-        auto jsonContent = new HttpJsonContent();
         auto iter = this->mFileMd5Map.begin();
         for(;iter != this->mFileMd5Map.end();iter++)
         {
             const std::string & path = iter->first;
             const std::string & md5 = iter->second;
-            jsonContent->Add(path.c_str(), md5);
+            jsonResponse.Add(path.c_str(), md5);
         }
-        //handler->SetContent(jsonContent);
-        return HttpStatus::OK;
+        return XCode::Successful;
     }
 
 	HttpStatus HttpResourceComponent::Download(HttpRemoteSession *handler)
@@ -63,14 +56,14 @@ namespace GameKeeper
         {
             return HttpStatus::BAD_REQUEST;
         }
-//        const std::string & fileName = getRequest->GetParameter();
-//        auto iter = this->mFileMd5Map.find(fileName);
-//        if(iter == this->mFileMd5Map.end())
-//        {
-//            return HttpStatus::NOT_FOUND;
-//        }
-//        const std::string dir = App::Get().GetDownloadPath() + fileName;
-        //getRequest->SetContent(new HttpWriteFileContent(dir));
+        const std::string & fileName = getRequest->GetParamater();
+        auto iter = this->mFileMd5Map.find(fileName);
+        if(iter == this->mFileMd5Map.end())
+        {
+            return HttpStatus::NOT_FOUND;
+        }
+        const std::string dir = App::Get().GetDownloadPath() + fileName;
+        getRequest->SetResponseContent(new HttpWriteFileContent(dir));
         return HttpStatus::OK;
     }
 }

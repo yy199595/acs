@@ -1,26 +1,26 @@
 ﻿#include "ServiceNode.h"
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
-#include <Scene/CallHandlerComponent.h>
+#include <Scene/RpcResponseComponent.h>
 #include <Method/CallHandler.h>
 #include <Scene/ProtocolComponent.h>
 #include <Util/StringHelper.h>
-#include <Network/Tcp/TcpClientComponent.h>
+#include <Network/Rpc/RpcComponent.h>
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
 	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false), mSocketId(socketId)
 	{
+        GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<RpcComponent>());
         GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
-		GKAssertRet_F(this->mActionManager = App::Get().GetComponent<CallHandlerComponent>());
         GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
-        GKAssertRet_F(this->mTcpClientComponent = App::Get().GetComponent<TcpClientComponent>());
+        GKAssertRet_F(this->mResponseComponent = App::Get().GetComponent<RpcResponseComponent>());
         GKAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 
         if(this->mSocketId == 0)
         {
-            this->mSocketId = this->mTcpClientComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
+            this->mSocketId = this->mRpcComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
         }
         this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::LoopSendMessage, this);
 	}
@@ -36,9 +36,9 @@ namespace GameKeeper
 		return false;
 	}
 
-    TcpLocalSession * ServiceNode::GetTcpSession()
+    RpcLocalSession * ServiceNode::GetTcpSession()
     {
-        auto localSession = this->mTcpClientComponent->GetLocalSession(this->mSocketId);
+        auto localSession = this->mRpcComponent->GetLocalSession(this->mSocketId);
 
         if (!localSession->IsOpen())
         {
@@ -63,7 +63,7 @@ namespace GameKeeper
             {
                 this->mCorComponent->YieldReturn();
             }
-            TcpLocalSession *tcpLocalSession = this->GetTcpSession();
+            RpcLocalSession *tcpLocalSession = this->GetTcpSession();
             if (tcpLocalSession == nullptr)
             {
                 GKDebugError("node session [" << this->GetNodeName()
@@ -111,7 +111,7 @@ namespace GameKeeper
         }
         this->mRequestData.Clear();
         this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;
@@ -133,7 +133,7 @@ namespace GameKeeper
         {
             return XCode::SerializationFailure;
         }
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;
@@ -152,7 +152,7 @@ namespace GameKeeper
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
-        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
@@ -160,7 +160,7 @@ namespace GameKeeper
         this->mRequestData.Clear();
         this->mRequestData.set_rpcid(handlerId);
         this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;
@@ -179,7 +179,7 @@ namespace GameKeeper
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
-        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
@@ -187,7 +187,7 @@ namespace GameKeeper
         this->mRequestData.Clear();
         this->mRequestData.set_rpcid(handlerId);
         this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;
@@ -206,7 +206,7 @@ namespace GameKeeper
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
-        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
@@ -220,7 +220,7 @@ namespace GameKeeper
         this->mRequestData.set_rpcid(handlerId);
         this->mRequestData.set_methodid(config->MethodId);
         this->mRequestData.set_messagedata(mMessageBuffer);
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;
@@ -239,7 +239,7 @@ namespace GameKeeper
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
-        if(!this->mActionManager->AddCallHandler(&cppCallHandler,handlerId))
+        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
@@ -253,7 +253,7 @@ namespace GameKeeper
         this->mRequestData.set_rpcid(handlerId);
         this->mRequestData.set_methodid(config->MethodId);
         this->mRequestData.set_messagedata(mMessageBuffer);
-        std::string * message = this->mTcpClientComponent->Serialize(this->mRequestData);
+        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
         if(message == nullptr)
         {
             return XCode::SerializationFailure;

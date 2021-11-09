@@ -10,10 +10,14 @@
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/Response/HttpRequestHandler.h>
 #include<Network/Http/Content/HttpWriteContent.h>
+#include <Util/TimeHelper.h>
 namespace GameKeeper
 {
     template<typename T>
     using HttpServiceMethodType = HttpStatus(T::*)(HttpRemoteSession *);
+
+    template<typename T>
+    using HttpServiceJsonMethodRequestType = XCode(T::*)(RapidJsonWriter & response);
 
     template<typename T>
     using HttpServiceJsonMethodType = XCode(T::*)(const RapidJsonReader & request, RapidJsonWriter & response);
@@ -49,30 +53,47 @@ namespace GameKeeper
 
     public:
 		HttpStatus Invoke(HttpRemoteSession *session) override
-		{
-			this->mJsonString.clear();
-			size_t size = session->ReadFromStream(this->mBuffer, 512);
-			while (size > 0)
-			{
-				this->mJsonString.append(this->mBuffer, size);
-				size = session->ReadFromStream(this->mBuffer, 512);
-			}
-			RapidJsonReader jsonReader;
-			HttpJsonContent * jsonWriter = new HttpJsonContent();
+        {
+            const std::string & json = session->GetReuqestHandler()->GetParamater();
 
-			XCode code = jsonReader.TryParse(this->mJsonString)
-				? XCode::ParseJsonFailure : (_o->*_func)(jsonReader, *jsonWriter);
+            RapidJsonReader jsonReader;
+            auto jsonWriter = new HttpJsonContent();
+            XCode code = !jsonReader.TryParse(json)
+                         ? XCode::ParseJsonFailure : (_o->*_func)(jsonReader, *jsonWriter);
 
-			jsonWriter->Add("code", code);
-			HttpRequestHandler * requestHandler = session->GetReuqestHandler();
-			requestHandler->SetResponseContent(jsonWriter);
-			return HttpStatus::OK;
-		}
+            jsonWriter->Add("code", code);
+            HttpRequestHandler *requestHandler = session->GetReuqestHandler();
+            requestHandler->SetResponseContent(jsonWriter);
+            return HttpStatus::OK;
+        }
     private:
         T * _o;
-		char mBuffer[512];
-		std::string mJsonString;
         HttpServiceJsonMethodType<T> _func;
+    };
+
+
+
+    template<typename T>
+    class HttpServiceJsonRequestMethod : public HttpServiceMethod
+    {
+    public:
+        HttpServiceJsonRequestMethod(T * o, HttpServiceJsonMethodRequestType<T> func)
+                : _o(o), _func(func){}
+
+    public:
+        HttpStatus Invoke(HttpRemoteSession *session) override
+        {
+            auto jsonWriter = new HttpJsonContent();
+            XCode code = (_o->*_func)(*jsonWriter);
+
+            jsonWriter->Add("code", code);
+            HttpRequestHandler *requestHandler = session->GetReuqestHandler();
+            requestHandler->SetResponseContent(jsonWriter);
+            return HttpStatus::OK;
+        }
+    private:
+        T * _o;
+        HttpServiceJsonMethodRequestType<T> _func;
     };
 }
 #endif //GAMEKEEPER_HTTPSERVICEMETHOD_H

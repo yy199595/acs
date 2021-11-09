@@ -14,17 +14,17 @@ namespace GameKeeper
 
 	class ServiceMethod;
 
-    class ServiceMgrComponent : public Component, public IRequestMessageHandler
+    class RpcRequestComponent : public Component, public IProtoRequest
     {
     public:
-		ServiceMgrComponent() = default;
-        ~ServiceMgrComponent() = default;
+		RpcRequestComponent() = default;
+        ~RpcRequestComponent() = default;
 
     protected:
         bool Awake() final;
 
     public:
-        bool OnRequestMessage(const com::DataPacket_Request & message) final;
+        bool OnRequest(const com::DataPacket_Request & message) final;
 
         virtual int GetPriority() const { return 500; }
 	private:
@@ -32,10 +32,10 @@ namespace GameKeeper
     private:
         int mNodeId;
         std::string mMessageBuffer;
+        class RpcComponent *mRpcComponent;
         com::DataPacket_Response mResponse;
         class CoroutineComponent *mCorComponent;
         class ProtocolComponent * mProtocolComponent;
-		class TcpClientComponent *mNetSessionComponent;
 		ObjectPool<com::DataPacket_Request> mRequestDataPool;
     };
 }

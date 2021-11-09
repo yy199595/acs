@@ -9,7 +9,7 @@
 namespace GameKeeper
 {
 
-    HttpPostRequest::HttpPostRequest(HttpClientComponent *component)
+    HttpPostRequest::HttpPostRequest(HttpComponent *component)
         : HttpRequest(component)
     {
 

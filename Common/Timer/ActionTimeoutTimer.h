@@ -4,18 +4,18 @@
 
 namespace GameKeeper
 {
-    class CallHandlerComponent;
+    class RpcResponseComponent;
 
     class ActionTimeoutTimer : public TimerBase
     {
     public:
-        ActionTimeoutTimer(long long ms, long long callbackId, CallHandlerComponent *mgr);
+        ActionTimeoutTimer(long long ms, long long callbackId, RpcResponseComponent *mgr);
 
     public:
         bool Invoke() final;
 
     private:
         long long mCallbackId;
-        CallHandlerComponent *mActionManager;
+        RpcResponseComponent *mActionManager;
     };
 }

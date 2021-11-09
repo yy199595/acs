@@ -6,7 +6,6 @@
 namespace GameKeeper
 {
     class CallHandler;
-
     class ServiceNode : public Object
     {
     public:
@@ -50,7 +49,7 @@ namespace GameKeeper
     private:
         void LoopSendMessage();
         void PushMessage(std::string * msg);
-        class TcpLocalSession *GetTcpSession();
+        class RpcLocalSession *GetTcpSession();
 
     private:
         std::string mMessageBuffer;
@@ -63,14 +62,15 @@ namespace GameKeeper
         long long mSocketId;
         unsigned int mCorId;
         unsigned short mPort;
+
         const std::string mAddress;         //监听地址
         const std::string mNodeName;        //进程名字
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
         std::queue<unsigned int> mCoroutines;
+        class RpcComponent * mRpcComponent;
         std::queue<std::string *> mWaitSendQueue;
-        class CallHandlerComponent *mActionManager;
         class ProtocolComponent *mProtocolComponent;
-        class TcpClientComponent * mTcpClientComponent;
+        class RpcResponseComponent *mResponseComponent;
     };
 }// namespace GameKeeper

@@ -14,11 +14,11 @@ namespace GameKeeper
     class HttpGetRequest;
     class HttpPostRequest;
 	class HttpHandlerBase;
-	class HttpClientComponent;
+	class HttpComponent;
 	class HttpLocalSession : public HttpSessionBase
 	{
 	public:
-		explicit HttpLocalSession(HttpClientComponent * component);
+		explicit HttpLocalSession(HttpComponent * component);
 		~HttpLocalSession() final;
 	public:
 		void Clear() override;
@@ -34,7 +34,7 @@ namespace GameKeeper
 
         void OnReceiveHeardAfter(XCode code) final;
 
-		bool OnReceiveHeard(asio::streambuf & buf) final;
+		void OnReceiveHeard(asio::streambuf & buf) final;
 
     private:
         void StartReceiveBody();
@@ -53,7 +53,7 @@ namespace GameKeeper
 		std::string mHost;
 		std::string mPort;
         unsigned int mCorId;
-		HttpClientComponent * mComponent;
+		HttpComponent * mComponent;
 		asio::ip::tcp::resolver * mResolver;
 		asio::ip::tcp::resolver::query * mQuery;
 	};

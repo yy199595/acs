@@ -22,6 +22,7 @@ namespace GameKeeper
     public:
         bool IsAsync;
         std::string Path;
+        bool IsMainThread;
         std::string Method;
         std::string Service;
         std::vector<std::string> HeardFields;

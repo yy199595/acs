@@ -4,13 +4,13 @@
 
 #ifndef GameKeeper_TCPLOCALSESSION_H
 #define GameKeeper_TCPLOCALSESSION_H
-#include "TcpClientSession.h"
+#include "RpcClientSession.h"
 namespace GameKeeper
 {
-    class TcpLocalSession : public TcpClientSession
+    class RpcLocalSession : public RpcClientSession
     {
     public:
-        TcpLocalSession(TcpClientComponent * component, const std::string & ip, const unsigned short port);
+        RpcLocalSession(RpcComponent * component, const std::string & ip, const unsigned short port);
     public:
         SocketType GetSocketType() override { return SocketType::LocalSocket; }
     public:

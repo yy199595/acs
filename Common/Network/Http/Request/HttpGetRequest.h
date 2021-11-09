@@ -3,11 +3,11 @@
 namespace GameKeeper
 {
 	class HttpReadContent;
-	class HttpClientComponent;
+	class HttpComponent;
 	class HttpGetRequest : public HttpRequest
 	{
 	public:
-		explicit HttpGetRequest(HttpClientComponent * component);
+		explicit HttpGetRequest(HttpComponent * component);
 		~HttpGetRequest() override = default;
 	public:
         void Clear() override;

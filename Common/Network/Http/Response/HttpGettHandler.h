@@ -21,15 +21,17 @@ namespace GameKeeper
 
 		//bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
 
-        size_t ReadFromStream(char *buffer, size_t size) override;
+        size_t ReadFromStream(std::string & stringBuf) override;
 
 		bool OnReceiveHeard(asio::streambuf & buf) override;
 
         const std::string & GetPath() override { return this->mPath; }
+
+        void OnReceiveBody(asio::streambuf & streamBuf) final { assert(false); };
+
     private: // 请求参数
         std::string mPath;
 		std::string mVersion;
-        asio::streambuf mStreamBuf;
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

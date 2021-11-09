@@ -52,7 +52,7 @@ namespace GameKeeper
 			return false;
 		}
 
-		port = 80;
+		port = "80";
 		size_t pos1 = content.find(':');
 		size_t pos2 = content.find('/');
 		if (pos2 != std::string::npos)
@@ -62,7 +62,7 @@ namespace GameKeeper
 			if (pos1 != std::string::npos)
 			{
 				host = content.substr(0, pos1);
-				port = std::stoul(content.substr(pos1 + 1, pos2 - pos1 - 1));
+				port = std::to_string(std::stoul(content.substr(pos1 + 1, pos2 - pos1 - 1)));
 			}
 		}
 		else
@@ -72,7 +72,7 @@ namespace GameKeeper
 			if (pos1 != std::string::npos)
 			{
 				host = content.substr(0, pos1);
-				port = std::stoul(content.substr(pos1 + 1, pos2 - pos1 - 1));
+				port = std::to_string(std::stoul(content.substr(pos1 + 1, pos2 - pos1 - 1)));
 			}
 		}
 		return true;

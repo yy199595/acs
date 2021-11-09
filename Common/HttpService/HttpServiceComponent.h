@@ -42,6 +42,18 @@ namespace GameKeeper
             return true;
         }
 
+        template<typename T>
+        bool Add(const std::string & path, HttpServiceJsonMethodRequestType<T> func, T * o)
+        {
+            auto iter = this->mMethodMap.find(path);
+            if (iter != this->mMethodMap.end())
+            {
+                return false;
+            }
+            this->mMethodMap.emplace(path, new HttpServiceJsonRequestMethod<T>(o, func));
+            return true;
+        }
+
     private:
         std::unordered_map<std::string, HttpServiceMethod *> mMethodMap;
     };

@@ -14,7 +14,7 @@ namespace GameKeeper
 
     bool ServerConfig::InitConfig()
     {
-        std::string outString = "";
+        std::string outString;
         this->mConfigDocument = make_shared<rapidjson::Document>();
         if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
         {

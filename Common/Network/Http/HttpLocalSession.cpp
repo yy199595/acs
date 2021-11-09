@@ -3,7 +3,7 @@
 //
 
 #include "HttpLocalsession.h"
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include<Network/Http/Request/HttpGetRequest.h>
 #include<Network/Http/Request/HttpPostRequest.h>
 
@@ -14,7 +14,7 @@
 
 namespace GameKeeper
 {
-	HttpLocalSession::HttpLocalSession(HttpClientComponent * component)
+	HttpLocalSession::HttpLocalSession(HttpComponent * component)
 		: HttpSessionBase(component)
 	{
         this->mCorId = 0;
@@ -55,10 +55,10 @@ namespace GameKeeper
 		return this->mHttpHandler;
 	}
 
-	bool HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
+	void HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
     {
-        GKAssertRetFalse_F(this->mHttpHandler);
-        return this->mHttpHandler->OnReceiveHeard(buf);
+        GKAssertRet_F(this->mHttpHandler);
+        this->mHttpHandler->OnReceiveHeard(buf);
     }
 
 	void HttpLocalSession::Resolver()

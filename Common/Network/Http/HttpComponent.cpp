@@ -3,7 +3,7 @@
 //
 #include <Core/App.h>
 #include <Thread/TaskThread.h>
-#include "HttpClientComponent.h"
+#include "HttpComponent.h"
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include "Component/Scene/TaskPoolComponent.h"
@@ -19,14 +19,14 @@
 namespace GameKeeper
 {
 
-    bool HttpClientComponent::Awake()
+    bool HttpComponent::Awake()
     {
         this->mCorComponent = this->GetComponent<CoroutineComponent>();
 		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
         return true;
     }
 
-	void HttpClientComponent::Start()
+	void HttpComponent::Start()
     {
         std::string json;
         const std::string path = App::Get().GetDownloadPath();
@@ -45,7 +45,7 @@ namespace GameKeeper
         //GKDebugFatal(StringHelper::FormatJson(json));
     }
 
-    void HttpClientComponent::OnListen(SocketProxy *socket)
+    void HttpComponent::OnListen(SocketProxy *socket)
     {
         auto httpSession = this->CreateRemoteSession();
         if(httpSession != nullptr)
@@ -54,17 +54,25 @@ namespace GameKeeper
         }
     }
 
-	void HttpClientComponent::OnRequest(HttpRemoteSession * remoteSession)
+	void HttpComponent::OnRequest(HttpRemoteSession * remoteSession)
 	{
-		if (remoteSession->GetCode() != XCode::Successful)
-		{
-			this->DeleteSession(remoteSession);
-			return;
-		}
-		this->mCorComponent->StartCoroutine(&HttpClientComponent::Invoke, this, remoteSession);
+        auto requestHandler = remoteSession->GetReuqestHandler();
+        const std::string & method = requestHandler->GetMethod();
+        const std::string & service = requestHandler->GetComponent();
+        auto httpMethod = this->GetHttpMethod(service, method);
+
+        if(httpMethod == nullptr)
+        {
+            requestHandler->SetResponseCode(HttpStatus::NOT_FOUND);
+        }
+        else
+        {
+            requestHandler->SetResponseCode(httpMethod->Invoke(remoteSession));
+        }
+        remoteSession->StartSendHttpMessage();
 	}
 
-    HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &service, const std::string &method)
+    HttpServiceMethod *HttpComponent::GetHttpMethod(const std::string &service, const std::string &method)
     {
         auto component = this->GetComponent<HttpServiceComponent>(service);
         if(component == nullptr)
@@ -74,7 +82,7 @@ namespace GameKeeper
         return component->GetMethod(method);
     }
 
-    XCode HttpClientComponent::Get(const std::string &url, std::string &json, int timeout)
+    XCode HttpComponent::Get(const std::string &url, std::string &json, int timeout)
     {
         HttpReadStringContent content(json);
         HttpLocalSession httpLocalSession(this);
@@ -89,7 +97,7 @@ namespace GameKeeper
     }
 
 
-    XCode HttpClientComponent::Post(const std::string &url, const std::string & request, std::string &response, int timeout)
+    XCode HttpComponent::Post(const std::string &url, const std::string & request, std::string &response, int timeout)
     {
         HttpWriteStringContent writeContent(request);
         HttpReadStringContent readContent(response);
@@ -97,7 +105,7 @@ namespace GameKeeper
         return this->Post(url, writeContent, readContent, timeout);
     }
 
-    XCode HttpClientComponent::Post(const std::string & url, HttpWriteContent & content, HttpReadContent & response, int timeout)
+    XCode HttpComponent::Post(const std::string & url, HttpWriteContent & content, HttpReadContent & response, int timeout)
     {
         HttpLocalSession httpLocalSession(this);
 #ifdef __DEBUG__
@@ -110,20 +118,20 @@ namespace GameKeeper
 #endif
     }
 
-    void HttpClientComponent::Invoke(HttpRemoteSession *remoteRequest)
+    void HttpComponent::Invoke(HttpRemoteSession *remoteRequest)
     {			
-		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
-		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();
-		 if (requestHandler != nullptr)
-		 {		
-			 const std::string & method = httpConfig->Method;
-			 const std::string & service = httpConfig->Service;	
-			 auto httpMethod = this->GetHttpMethod(service, method);
-			 requestHandler->SetResponseCode(httpMethod->Invoke(remoteRequest));
-		 }	
+//		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
+//		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();
+//		 if (requestHandler != nullptr)
+//		 {
+//			 const std::string & method = httpConfig->Method;
+//			 const std::string & service = httpConfig->Service;
+//			 auto httpMethod = this->GetHttpMethod(service, method);
+//			 requestHandler->SetResponseCode(httpMethod->Invoke(remoteRequest));
+//		 }
     }
 
-    HttpLocalSession *HttpClientComponent::CreateLocalSession()
+    HttpLocalSession *HttpComponent::CreateLocalSession()
     {
         HttpLocalSession * httpLocalSession = nullptr;
         if(!this->mLocalSessionPool.empty())
@@ -135,7 +143,7 @@ namespace GameKeeper
         return new HttpLocalSession(this);
     }
 
-    HttpRemoteSession *HttpClientComponent::CreateRemoteSession()
+    HttpRemoteSession *HttpComponent::CreateRemoteSession()
     {
         HttpRemoteSession * remoteSession = nullptr;
         if(!this->mRemoteSessionPool.empty())
@@ -147,7 +155,7 @@ namespace GameKeeper
         return new HttpRemoteSession(this);
     }
 
-    void HttpClientComponent::DeleteSession(HttpLocalSession *session)
+    void HttpComponent::DeleteSession(HttpLocalSession *session)
     {
         if(this->mLocalSessionPool.size() >= 10)
         {
@@ -158,7 +166,7 @@ namespace GameKeeper
         this->mLocalSessionPool.push(session);
     }
 
-    void HttpClientComponent::DeleteSession(HttpRemoteSession *session)
+    void HttpComponent::DeleteSession(HttpRemoteSession *session)
     {
         if(this->mRemoteSessionPool.size() >= 10)
         {

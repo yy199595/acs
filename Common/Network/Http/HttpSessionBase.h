@@ -5,12 +5,12 @@ namespace GameKeeper
 {
     class HttpHandlerBase;
 
-    class HttpClientComponent;
+    class HttpComponent;
 
     class HttpSessionBase
     {
     public:
-        explicit HttpSessionBase(HttpClientComponent *component);
+        explicit HttpSessionBase(HttpComponent *component);
 
         virtual ~HttpSessionBase();
 
@@ -37,7 +37,7 @@ namespace GameKeeper
 
         virtual void OnReceiveHeardAfter(XCode code) = 0;
 
-		virtual bool OnReceiveHeard(asio::streambuf & buf) = 0;
+		virtual void OnReceiveHeard(asio::streambuf & buf) = 0;
 
     private:
 
@@ -45,12 +45,14 @@ namespace GameKeeper
         
         void ReceiveHeard();
 
+        void SendHttpMessage();
+
     protected:
         XCode mCode;
         std::string mAddress;
         SocketProxy *mSocketProxy;
         asio::streambuf mStreamBuf;
-        HttpClientComponent *mHttpComponent;
+        HttpComponent *mHttpComponent;
     private:
         int mCount;
         bool mIsReadBody;

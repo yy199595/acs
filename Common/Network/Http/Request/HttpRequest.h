@@ -9,12 +9,12 @@ namespace GameKeeper
 {
     class HttpLocalSession;
 
-    class HttpClientComponent;
+    class HttpComponent;
 
     class HttpRequest : public HttpHandlerBase
     {
     public:
-        HttpRequest(HttpClientComponent *component);
+        HttpRequest(HttpComponent *component);
 
         ~HttpRequest() override = default;
 
@@ -45,7 +45,7 @@ namespace GameKeeper
         int mHttpCode;
         std::string mError;
         std::string mVersion;
-        HttpClientComponent *mHttpComponent;
+        HttpComponent *mHttpComponent;
     private:
         std::string mPath;
         std::string mHost;

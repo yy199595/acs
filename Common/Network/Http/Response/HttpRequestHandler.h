@@ -11,13 +11,13 @@ namespace GameKeeper
 	class HttpWriteContent;
     class HttpServiceConfig;
     class HttpRemoteSession;
-    class HttpClientComponent;
+    class HttpComponent;
 	
 
     class HttpRequestHandler : public HttpHandlerBase
     {
     public:
-        explicit HttpRequestHandler(HttpClientComponent *component);
+        explicit HttpRequestHandler(HttpComponent *component);
 
          virtual ~HttpRequestHandler() override;
 
@@ -33,17 +33,24 @@ namespace GameKeeper
 
         virtual const std::string & GetPath() = 0;
 
-        virtual size_t ReadFromStream(char * buffer, size_t size) = 0;
+        virtual size_t ReadFromStream(std::string & stringBuf) = 0;
 
+        virtual void OnReceiveBody(asio::streambuf & streamBuf) = 0;
     public:
 
         bool WriterToBuffer(std::ostream &os) override;
-        
-        const HttpServiceConfig * GetHttpConfig() const { return this->mHttpConfig;}
 
+        const std::string & GetMethod() const { return this->mMethod;}
+
+        const std::string & GetComponent() const { return this->mComponent;}
+
+        const std::string & GetParamater() const { return this->mParamater;}
     protected:
-        HttpClientComponent *mHttpComponent;
-		const HttpServiceConfig * mHttpConfig;
+        std::string mMethod;
+        std::string mComponent;
+        std::string mParamater;
+        HttpComponent *mHttpComponent;
+		//const HttpServiceConfig * mHttpConfig;
     private:
 #ifdef __DEBUG__
       long long mStartTime;
@@ -51,6 +58,7 @@ namespace GameKeeper
         int mWriteCount;
         HttpStatus mHttpCode;
 		std::string mVersion;
+
         HttpWriteContent * mResponseContent;
         std::unordered_map<std::string, std::string> mHeardMap;
     };

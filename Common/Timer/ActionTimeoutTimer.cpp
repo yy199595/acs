@@ -1,10 +1,10 @@
 ﻿#include "ActionTimeoutTimer.h"
-#include <Scene/CallHandlerComponent.h>
+#include <Scene/RpcResponseComponent.h>
 #include <Method/CallHandler.h>
 
 namespace GameKeeper
 {
-    ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, CallHandlerComponent *mgr)
+    ActionTimeoutTimer::ActionTimeoutTimer(long long ms, long long callbackId, RpcResponseComponent *mgr)
         : TimerBase(ms)
     {
         this->mActionManager = mgr;

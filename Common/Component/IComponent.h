@@ -46,17 +46,31 @@ namespace GameKeeper
         virtual void OnZeroRefresh() = 0;
     };
 
-    class IRequestMessageHandler
+    class IProtoRequest
     {
     public:
-        virtual bool OnRequestMessage(const com::DataPacket_Request & message) = 0;
+        virtual bool OnRequest(const com::DataPacket_Request & message) = 0;
     };
 
-    class IResponseMessageHandler
+    class IProtoResponse
     {
     public:
-        virtual bool OnResponseMessage(const com::DataPacket_Response & message) = 0;
+        virtual bool OnResponse(const com::DataPacket_Response & message) = 0;
     };
+
+    class IJsonRequest
+    {
+    public:
+        virtual bool OnRequest() = 0;
+    };
+
+    class IJsonResponse
+    {
+    public:
+        virtual bool OnResponse() = 0;
+    };
+
+
 	class SocketProxy;
 	class ISocketListen
 	{

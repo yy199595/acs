@@ -7,7 +7,7 @@
 #include <Network/NetworkHelper.h>
 namespace GameKeeper
 {
-    HttpRequest::HttpRequest(HttpClientComponent *component)
+    HttpRequest::HttpRequest(HttpComponent *component)
             : mHttpComponent(component)
     {
 

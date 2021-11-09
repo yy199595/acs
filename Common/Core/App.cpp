@@ -1,10 +1,10 @@
 ﻿
 #include "App.h"
-#include <Scene/CallHandlerComponent.h>
+#include <Scene/RpcResponseComponent.h>
 #include <Scene/ProtocolComponent.h>
-#include <Network/Tcp/TcpClientComponent.h>
+#include <Network/Rpc/RpcComponent.h>
 #include <Service/ServiceNodeComponent.h>
-#include <Service/ServiceMgrComponent.h>
+#include <Service/RpcRequestComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include<Util/DirectoryHelper.h>
 using namespace GameKeeper;
@@ -48,13 +48,13 @@ namespace GameKeeper
 	bool App::LoadComponent()
 	{
 		this->AddComponent<TimerComponent>();
-		this->AddComponent<CallHandlerComponent>();
+		this->AddComponent<RpcResponseComponent>();
 		this->AddComponent<ProtocolComponent>();
 		this->AddComponent<CoroutineComponent>();
-		this->AddComponent<TcpClientComponent>();
+		this->AddComponent<RpcComponent>();
 
 		this->AddComponent<ServiceNodeComponent>();
-		this->AddComponent<ServiceMgrComponent>();
+		this->AddComponent<RpcRequestComponent>();
 
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mCorComponent = this->GetComponent<CoroutineComponent>();

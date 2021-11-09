@@ -5,7 +5,7 @@
 #include <Network/Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
-    HttpSessionBase::HttpSessionBase(HttpClientComponent * component)
+    HttpSessionBase::HttpSessionBase(HttpComponent * component)
             : mHttpComponent(component)
     {
         this->mCount = 0;
@@ -20,9 +20,20 @@ namespace GameKeeper
 
     void HttpSessionBase::StartSendHttpMessage()
     {
+        NetWorkThread & nThread = this->mSocketProxy->GetThread();
+        if(nThread.IsCurrentThread())
+        {
+            this->SendHttpMessage();
+            return;
+        }
+        nThread.AddTask(&HttpSessionBase::SendHttpMessage, this);
+    }
+
+    void HttpSessionBase::SendHttpMessage()
+    {
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		GKAssertRet_F(nThread.IsCurrentThread() && this->GetHandler());
+
+		GKAssertRet_F(this->GetHandler());
 		
         if (!socket.is_open())
         {

@@ -187,6 +187,7 @@ namespace GameKeeper
         {
             return true;
         }
+        std::cout << "json : " << str << " parse error" << std::endl;
         return false;
     }
     bool RapidJsonReader::TryGetValue(const char *key, int &data) const

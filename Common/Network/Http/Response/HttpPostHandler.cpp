@@ -5,12 +5,12 @@
 #include "HttpPostHandler.h"
 #include <Core/App.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include <Scene/ProtocolComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
-    HttpPostHandler::HttpPostHandler(HttpClientComponent *component)
+    HttpPostHandler::HttpPostHandler(HttpComponent *component)
         : HttpRequestHandler(component)
     {
 
@@ -23,14 +23,10 @@ namespace GameKeeper
 
     void HttpPostHandler::Clear()
     {
-        HttpRequestHandler::Clear();
         this->mPath.clear();
         this->mVersion.clear();
-        if(this->mStreamBuf.size() > 0)
-        {
-            std::istream is(&this->mStreamBuf);
-            is.ignore(this->mStreamBuf.size());
-        }
+        this->mParamater.clear();
+        HttpRequestHandler::Clear();
     }
 
 	bool HttpPostHandler::OnReceiveHeard(asio::streambuf &streamBuf)
@@ -39,25 +35,40 @@ namespace GameKeeper
 		is >> this->mPath >> this->mVersion;
         this->ParseHeard(streamBuf);
 
-        if(streamBuf.size() > 0)
+        const std::string app = "App/";
+        size_t pos1 = this->mPath.find(app) + app.length();
+        size_t pos2 = this->mPath.find('/', pos1 + 1);
+        GKAssertRetFalse_F(pos2 != std::string::npos);
+
+        this->mMethod = this->mPath.substr(pos2 + 1);
+        this->mComponent = this->mPath.substr(pos1, pos2 - pos1);
+        GKDebugLog("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
+
+        while(streamBuf.size() > 0)
         {
-            std::ostream os(&this->mStreamBuf);
-            os.write(asio::buffer_cast<const char *>(streamBuf.data()), streamBuf.size());
-
-            is.ignore(streamBuf.size());
+           size_t size = is.readsome(this->mHandlerBuffer, 1024);
+           this->mParamater.append(this->mHandlerBuffer, size);
         }
-
-		auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
-		this->mHttpConfig = protocolComponent->GetHttpConfig(this->GetPath());
 		return true;
 	}
 
-    size_t HttpPostHandler::ReadFromStream(char *buffer, size_t size)
+    void HttpPostHandler::OnReceiveBody(asio::streambuf &streamBuf)
     {
-        if(this->mStreamBuf.size() > 0)
+        std::istream is(&streamBuf);
+        while(streamBuf.size() > 0)
         {
-            std::istream is(&this->mStreamBuf);
-            return is.readsome(buffer, size);
+            size_t size = is.readsome(this->mHandlerBuffer, 1024);
+            this->mParamater.append(this->mHandlerBuffer, size);
+        }
+    }
+
+    size_t HttpPostHandler::ReadFromStream(std::string & stringBuf)
+    {
+        if(!this->mParamater.empty())
+        {
+            stringBuf.append(this->mParamater);
+            this->mParamater.clear();
+            return stringBuf.size();
         }
         return 0;
     }

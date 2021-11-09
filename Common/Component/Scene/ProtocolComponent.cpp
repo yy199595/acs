@@ -13,7 +13,7 @@ namespace GameKeeper
         const std::string path1 = App::Get().GetConfigPath() + "rpc.json";
         const std::string path2 = App::Get().GetConfigPath() + "http.json";
         GKAssertRetFalse_F(this->LoadTcpServiceConfig(path1));
-        GKAssertRetFalse_F(this->LoadHttpServiceConfig(path2));
+        //GKAssertRetFalse_F(this->LoadHttpServiceConfig(path2));
         return true;
     }
 
@@ -108,45 +108,46 @@ namespace GameKeeper
         return true;
     }
 
-    const HttpServiceConfig *ProtocolComponent::GetHttpConfig(const std::string &path) const
-    {
-        auto iter = this->mHttpConfigMap.find(path);
-        return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
-    }
+//    const HttpServiceConfig *ProtocolComponent::GetHttpConfig(const std::string &path) const
+//    {
+//        auto iter = this->mHttpConfigMap.find(path);
+//        return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
+//    }
 
-    bool ProtocolComponent::LoadHttpServiceConfig(const std::string &path)
-    {
-        rapidjson::Document jsonMapper;
-        if (!FileHelper::ReadJsonFile(path, jsonMapper))
-        {
-            GKDebugFatal("not find file : " << path << "");
-            return false;
-        }
-
-        auto iter1 = jsonMapper.MemberBegin();
-        for (; iter1 != jsonMapper.MemberEnd(); iter1++)
-        {
-            rapidjson::Value & jsonValue = iter1->value;
-            if(!jsonValue.IsObject())
-            {
-                return false;
-            }
-            auto httpServiceConfig = new HttpServiceConfig();
-            httpServiceConfig->Path = iter1->name.GetString();
-            httpServiceConfig->Method = jsonValue["Method"].GetString();
-            httpServiceConfig->IsAsync = jsonValue["IsAsync"].GetBool();
-            httpServiceConfig->Service = jsonValue["Component"].GetString();
-            if(jsonValue.HasMember("Fields") && jsonValue["Fields"].IsArray())
-            {
-               for(unsigned int index = 0; index < jsonValue["Fields"].Size();index++)
-               {
-                  httpServiceConfig->HeardFields.emplace_back(jsonValue["Fields"][index].GetString());
-               }
-            }
-            this->mHttpConfigMap.emplace(httpServiceConfig->Path, httpServiceConfig);
-        }
-        return true;
-    }
+//    bool ProtocolComponent::LoadHttpServiceConfig(const std::string &path)
+//    {
+//        rapidjson::Document jsonMapper;
+//        if (!FileHelper::ReadJsonFile(path, jsonMapper))
+//        {
+//            GKDebugFatal("not find file : " << path << "");
+//            return false;
+//        }
+//
+//        auto iter1 = jsonMapper.MemberBegin();
+//        for (; iter1 != jsonMapper.MemberEnd(); iter1++)
+//        {
+//            rapidjson::Value & jsonValue = iter1->value;
+//            if(!jsonValue.IsObject())
+//            {
+//                return false;
+//            }
+//            auto httpServiceConfig = new HttpServiceConfig();
+//            httpServiceConfig->Path = iter1->name.GetString();
+//            httpServiceConfig->Method = jsonValue["Method"].GetString();
+//            httpServiceConfig->IsAsync = jsonValue["IsAsync"].GetBool();
+//            httpServiceConfig->Service = jsonValue["Component"].GetString();
+//            httpServiceConfig->IsMainThread = jsonValue["IsMainThread"].GetBool();
+//            if(jsonValue.HasMember("Fields") && jsonValue["Fields"].IsArray())
+//            {
+//               for(unsigned int index = 0; index < jsonValue["Fields"].Size();index++)
+//               {
+//                  httpServiceConfig->HeardFields.emplace_back(jsonValue["Fields"][index].GetString());
+//               }
+//            }
+//            this->mHttpConfigMap.emplace(httpServiceConfig->Path, httpServiceConfig);
+//        }
+//        return true;
+//    }
 
 
 	bool ProtocolComponent::HasService(const std::string & service)

@@ -12,7 +12,7 @@ namespace GameKeeper
     class HttpPostRequest : public HttpRequest
     {
     public:
-        explicit HttpPostRequest(HttpClientComponent * component);
+        explicit HttpPostRequest(HttpComponent * component);
         ~HttpPostRequest() override = default;
     public:
         void Clear() override;

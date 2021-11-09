@@ -1,28 +1,29 @@
-﻿#include "TcpClientComponent.h"
+﻿#include "RpcComponent.h"
 
 #include <Core/App.h>
-#include <Scene/CallHandlerComponent.h>
+#include <Scene/RpcResponseComponent.h>
 #include <Util/StringHelper.h>
 #include <Scene/ProtocolComponent.h>
 #include <Scene/TaskPoolComponent.h>
-#include <Service/ServiceMgrComponent.h>
-#include <Network/Tcp/TcpLocalSession.h>
+#include <Service/RpcRequestComponent.h>
+#include <Network/Rpc/RpcLocalSession.h>
 #ifdef __DEBUG__
 #include <Pool/MessagePool.h>
 #endif
 namespace GameKeeper
 {
-    bool TcpClientComponent::Awake()
+    bool RpcComponent::Awake()
     {
+
 		GKAssertRetFalse_F(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
 		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
-		GKAssertRetFalse_F(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
-        GKAssertRetFalse_F(this->mCallHandlerComponent = this->GetComponent<CallHandlerComponent>());
+		GKAssertRetFalse_F(this->mRequestComponent = this->GetComponent<RpcRequestComponent>());
+        GKAssertRetFalse_F(this->mResponseComponent = this->GetComponent<RpcResponseComponent>());
 
         return true;
     }
 
-	void TcpClientComponent::OnCloseSession(TcpClientSession * socket, XCode code)
+	void RpcComponent::OnCloseSession(RpcClientSession * socket, XCode code)
 	{
 		if (socket == nullptr)
 		{
@@ -39,7 +40,7 @@ namespace GameKeeper
 		}
 	}
 
-	void TcpClientComponent::OnReceiveMessage(TcpClientSession * session, string * message)
+	void RpcComponent::OnReceiveMessage(RpcClientSession * session, string * message)
 	{
 		if (!this->OnReceive(session, *message))
 		{
@@ -48,7 +49,7 @@ namespace GameKeeper
 		GStringPool.Destory(message);
 	}
 
-    void TcpClientComponent::OnSendMessageAfter(TcpClientSession *session, std::string * message, XCode code)
+    void RpcComponent::OnSendMessageAfter(RpcClientSession *session, std::string * message, XCode code)
     {
 #ifdef __DEBUG__
         const std::string & address = session->GetAddress();
@@ -65,7 +66,7 @@ namespace GameKeeper
 		GStringPool.Destory(message);
     }
 
-	void TcpClientComponent::OnConnectRemoteAfter(TcpLocalSession *session, XCode code)
+	void RpcComponent::OnConnectRemoteAfter(RpcLocalSession *session, XCode code)
 	{
 		const std::string & address = session->GetAddress();
 		if (code != XCode::Successful)
@@ -82,20 +83,20 @@ namespace GameKeeper
 		}
 	}
 
-	void TcpClientComponent::OnListen(SocketProxy * socket)
+	void RpcComponent::OnListen(SocketProxy * socket)
 	{
 		long long id = socket->GetSocketId();
 		auto iter = this->mSessionAdressMap.find(id);
 		if (iter == this->mSessionAdressMap.end())
         {
-            auto tcpSession = new TcpClientSession(this);
+            auto tcpSession = new RpcClientSession(this);
             tcpSession->SetSocket(socket);
             this->mSessionAdressMap.emplace(id, tcpSession);
         }
 	}
 
 
-	bool TcpClientComponent::OnReceive(TcpClientSession *session, const std::string & message)
+	bool RpcComponent::OnReceive(RpcClientSession *session, const std::string & message)
 	{
         const char * body = message.c_str() + 1;
         const size_t bodySize = message.size() - 1;
@@ -126,7 +127,7 @@ namespace GameKeeper
             GKDebugLog("[request " << method << "] json = " << json);
 #endif
             this->mRequestData.set_socketid(session->GetSocketProxy().GetSocketId());
-            return this->mServiceComponent->OnRequestMessage(mRequestData);
+            return this->mRequestComponent->OnRequest(mRequestData);
         }
 		else if (messageType == DataMessageType::TYPE_RESPONSE)
 		{
@@ -152,53 +153,53 @@ namespace GameKeeper
             }
             GKDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);
 #endif
-            return this->mCallHandlerComponent->OnResponseMessage(mResponseData);
+            return this->mResponseComponent->OnResponse(mResponseData);
 		}
         return false;
 	}
 
-    TcpLocalSession *TcpClientComponent::GetLocalSession(long long id)
+    RpcLocalSession *RpcComponent::GetLocalSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         if(iter == this->mSessionAdressMap.end())
         {
             return nullptr;
         }
-        TcpClientSession * session = iter->second;
+        RpcClientSession * session = iter->second;
         if(session->GetSocketType() == SocketType::RemoteSocket)
         {
             return nullptr;
         }
-        return static_cast<TcpLocalSession*>(session);
+        return static_cast<RpcLocalSession*>(session);
     }
 
-    TcpClientSession *TcpClientComponent::GetRemoteSession(long long id)
+    RpcClientSession *RpcComponent::GetRemoteSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
     }
 
-    long long TcpClientComponent::NewSession(const std::string &name, const std::string &ip,
+    long long RpcComponent::NewSession(const std::string &name, const std::string &ip,
                                                      unsigned short port)
 	{
 		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
-		auto localSession = new TcpLocalSession(this, ip, port);
+		auto localSession = new RpcLocalSession(this, ip, port);
         localSession->SetSocket(new SocketProxy(nThread, name));
 		this->mSessionAdressMap.emplace(localSession->GetSocketProxy().GetSocketId(), localSession);
 		return localSession->GetSocketProxy().GetSocketId();
 	}
 
-    void TcpClientComponent::OnDestory()
+    void RpcComponent::OnDestory()
     {
     }
 
-    TcpClientSession *TcpClientComponent::GetSession(long long id)
+    RpcClientSession *RpcComponent::GetSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
     }
 
-    bool TcpClientComponent::CloseSession(long long id)
+    bool RpcComponent::CloseSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         if (iter != this->mSessionAdressMap.end())
@@ -209,9 +210,9 @@ namespace GameKeeper
         return false;
     }
 
-	bool TcpClientComponent::SendByAddress(long long id, std::string * message)
+	bool RpcComponent::SendByAddress(long long id, std::string * message)
 	{
-		TcpClientSession * tcpSession = this->GetSession(id);
+		RpcClientSession * tcpSession = this->GetSession(id);
 		if (tcpSession == nullptr)
 		{
 			return false;
@@ -220,7 +221,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool TcpClientComponent::SendByAddress(long long id, com::DataPacket_Request & message)
+	bool RpcComponent::SendByAddress(long long id, com::DataPacket_Request & message)
 	{
         std::string * data = this->Serialize(message);
         if(data== nullptr)
@@ -231,7 +232,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool TcpClientComponent::SendByAddress(long long id, com::DataPacket_Response & message)
+	bool RpcComponent::SendByAddress(long long id, com::DataPacket_Response & message)
 	{
 		std::string * data = this->Serialize(message);
 		if (data == nullptr)
@@ -242,7 +243,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    std::string *TcpClientComponent::Serialize(const com::DataPacket_Request &message)
+    std::string *RpcComponent::Serialize(const com::DataPacket_Request &message)
     {
         DataMessageType type = TYPE_REQUEST;
         const size_t size = message.ByteSizeLong() + 5;
@@ -255,7 +256,7 @@ namespace GameKeeper
         return GStringPool.New(this->mMessageBuffer, size);
     }
 
-    std::string *TcpClientComponent::Serialize(const com::DataPacket_Response &message)
+    std::string *RpcComponent::Serialize(const com::DataPacket_Response &message)
     {
         DataMessageType type = TYPE_RESPONSE;
         const size_t size = message.ByteSizeLong() + 5;

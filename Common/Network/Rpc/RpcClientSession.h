@@ -6,13 +6,13 @@
 
 namespace GameKeeper
 {
-    class TcpClientComponent;
+    class RpcComponent;
 
-    class TcpClientSession
+    class RpcClientSession
     {
     public:
-        explicit TcpClientSession(TcpClientComponent *component);
-        virtual ~TcpClientSession();
+        explicit RpcClientSession(RpcComponent *component);
+        virtual ~RpcClientSession();
 	public:
 		void SetSocket(SocketProxy * socketProxy);
 		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
@@ -33,12 +33,12 @@ namespace GameKeeper
 	protected:
 		std::string mAddress;
 		SocketProxy * mSocketProxy;
-		TcpClientComponent * mTcpComponent;
+		RpcComponent * mTcpComponent;
     private:
 		char *mReceiveMsgBuffer;
 		long long mLastOperTime;
     };
 
-    typedef shared_ptr<TcpClientSession> SharedTcpSession;
+    typedef shared_ptr<RpcClientSession> SharedTcpSession;
 
 }// namespace GameKeeper

@@ -3,18 +3,21 @@
     {
         "IsAsync":false,
         "Method":"Download",
+        "IsMainThread":true,
         "Component":"HttpResourceComponent"
     },
     "/app/res/files":
     {
         "IsAsync":false,
         "Method":"Files",
+        "IsMainThread":true,
         "Component":"HttpResourceComponent"
     },
     "/app/account/login":
     {
         "IsAsync":true,
         "Method":"Login",
+        "IsMainThread":true,
         "Component":"HttpLoginService"
     }
 }

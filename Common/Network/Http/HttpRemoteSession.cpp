@@ -5,12 +5,13 @@
 #include "HttpRemoteSession.h"
 #include <Core/App.h>
 #include <Scene/ProtocolComponent.h>
-#include <Network/Http/HttpClientComponent.h>
+#include <Network/Http/HttpComponent.h>
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>
+#include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
-    HttpRemoteSession::HttpRemoteSession(HttpClientComponent *component)
+    HttpRemoteSession::HttpRemoteSession(HttpComponent *component)
         : HttpSessionBase(component)
     {
         this->mReadSize = 0;
@@ -54,7 +55,7 @@ namespace GameKeeper
 		return this->mHttpHandler;
 	}
 
-	bool HttpRemoteSession::OnReceiveHeard(asio::streambuf & streamBuf)
+	void HttpRemoteSession::OnReceiveHeard(asio::streambuf & streamBuf)
     {
         std::istream is(&streamBuf);
         is >> this->mMethod;
@@ -63,56 +64,48 @@ namespace GameKeeper
         if (iter == this->mHandlerMap.end())
         {
             GKDebugError("not find http method " << this->mMethod);
-            return false;
+            return;
         }
         this->mHttpHandler = iter->second;
-        return this->mHttpHandler->OnReceiveHeard(streamBuf);
+        if(!this->mHttpHandler->OnReceiveHeard(streamBuf))
+        {
+            this->mHttpHandler->SetResponseCode(HttpStatus::BAD_REQUEST);
+            this->StartSendHttpMessage();
+        }
+        else
+        {
+            const std::string & method = this->mHttpHandler->GetMethod();
+            const std::string & service = this->mHttpHandler->GetComponent();
+            if(this->mHttpComponent->GetHttpMethod(service, method) == nullptr)
+            {
+                this->mHttpHandler->SetResponseCode(HttpStatus::NOT_FOUND);
+                this->StartSendHttpMessage();
+            }
+        }
+    }
+
+    void HttpRemoteSession::SetCode(XCode code)
+    {
+        this->mCode = code;
+        CoroutineComponent * corComponent = App::Get().GetCorComponent();
+        MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+        taskScheduler.AddMainTask(&HttpComponent::OnRequest, this->mHttpComponent, this);
     }
 
     void HttpRemoteSession::OnReceiveHeardAfter(XCode code)
     {
-        this->mCode = code;
-        if(code == XCode::Successful && this->mHttpHandler == nullptr)
+        if(code != XCode::Successful || this->mHttpHandler == nullptr)
         {
-            this->mCode = XCode::HttpMethodNotFound;
+            this->SetCode(code);
         }
-        //通知到主线程处理
-		CoroutineComponent * corComponent = App::Get().GetCorComponent();
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-		taskScheduler.AddMainTask(&HttpClientComponent::OnRequest, this->mHttpComponent, this);
-    }
-
-    size_t HttpRemoteSession::ReadFromStream(char *buffer, size_t count)
-    {
-        if(this->mHttpHandler == nullptr)
+        else if(this->mHttpHandler->GetType() == HttpMethodType::GET)
         {
-            return 0;
+            this->SetCode(XCode::Successful);
         }
-        size_t size = this->mHttpHandler->ReadFromStream(buffer, count);
-        if(size != 0)
+        else
         {
-            return size;
+            this->StartReceiveBody();
         }
-        if (this->mStreamBuf.size() > 0)
-        {
-            std::istream is(&this->mStreamBuf);
-            return is.readsome(buffer, count);
-        }
-
-        if (!this->mSocketProxy->IsOpen())
-        {
-            return 0;
-        }
-        NetWorkThread &netWorkThread = this->mSocketProxy->GetThread();
-        netWorkThread.AddTask(&HttpRemoteSession::StartReceiveBody, this);
-        App::Get().GetCorComponent()->YieldReturn(this->mCorId);
-
-        if(this->mStreamBuf.size() > 0)
-        {
-            std::istream is(&this->mStreamBuf);
-            return is.readsome(buffer, count);
-        }
-        return 0;
     }
 
     void HttpRemoteSession::StartReceiveBody()
@@ -122,9 +115,7 @@ namespace GameKeeper
 		AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
         if (socket.available(code) == 0)
         {
-            auto corComponent = App::Get().GetCorComponent();
-            NetWorkThread &netWorkThread = this->mSocketProxy->GetThread();
-            netWorkThread.AddTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
+            this->SetCode(XCode::Successful);
         }
         else
         {
@@ -135,19 +126,24 @@ namespace GameKeeper
 
     void HttpRemoteSession::ReadBodyCallback(const asio::error_code &err, size_t size)
     {
-        if(err)
+        if(err == asio::error::eof)
         {
-            this->mCode = XCode::NetReceiveFailure;
+            this->SetCode(XCode::Successful);
         }
-        auto corComponent = App::Get().GetCorComponent();
-        NetWorkThread &netWorkThread = this->mSocketProxy->GetThread();
-        netWorkThread.AddTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
+        else if(err)
+        {
+            this->SetCode(XCode::NetReceiveFailure);
+        }
+        else
+        {
+            this->mHttpHandler->OnReceiveBody(this->mStreamBuf);
+            AsioContext  & context = this->mSocketProxy->GetContext();
+            context.post(std::bind(&HttpRemoteSession::StartReceiveBody, this));
+        }
     }
-
 
     void HttpRemoteSession::OnWriterAfter(XCode code)
     {
 
     }
-
 }

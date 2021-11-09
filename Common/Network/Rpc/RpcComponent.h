@@ -4,28 +4,28 @@
 #include <Component/Component.h>
 #include <Script/LuaTable.h>
 #include <Other/MultiThreadQueue.h>
-#include <Network/Tcp/TcpLocalSession.h>
+#include <Network/Rpc/RpcLocalSession.h>
 namespace GameKeeper
 {
 	// 管理所有session
-	class TcpClientComponent : public Component, public ISocketListen
+	class RpcComponent : public Component, public ISocketListen
 	{
 	public:
-		friend TcpClientSession;
-		TcpClientComponent() = default;
+		friend RpcClientSession;
+		RpcComponent() = default;
 
-		~TcpClientComponent() override = default;
+		~RpcComponent() override = default;
 	public:
-		void OnCloseSession(TcpClientSession * socket, XCode code);
-		void OnConnectRemoteAfter(TcpLocalSession * session, XCode code);
-		void OnReceiveMessage(TcpClientSession * session, string * message);
-		void OnSendMessageAfter(TcpClientSession *session, std::string * message, XCode code);
+		void OnCloseSession(RpcClientSession * socket, XCode code);
+		void OnConnectRemoteAfter(RpcLocalSession * session, XCode code);
+		void OnReceiveMessage(RpcClientSession * session, string * message);
+		void OnSendMessageAfter(RpcClientSession *session, std::string * message, XCode code);
 		
     protected:
 		void OnListen(SocketProxy * socket) final;
 	public:
-        TcpLocalSession * GetLocalSession(long long id);
-        TcpClientSession * GetRemoteSession(long long id);
+        RpcLocalSession * GetLocalSession(long long id);
+        RpcClientSession * GetRemoteSession(long long id);
         long long NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;
@@ -42,21 +42,21 @@ namespace GameKeeper
         std::string * Serialize(const com::DataPacket_Response & message);
     private:
 		
-		TcpClientSession *GetSession(long long id);
-		bool OnReceive(TcpClientSession *, const std::string & message);
+		RpcClientSession *GetSession(long long id);
+		bool OnReceive(RpcClientSession *, const std::string & message);
 
 	private:
 		class TaskPoolComponent * mTaskComponent;
-		class TcpClientComponent *mNetWorkManager;
+		class RpcComponent *mNetWorkManager;
 		class ProtocolComponent *mProtocolComponent;
-        class ServiceMgrComponent * mServiceComponent;
-        class CallHandlerComponent * mCallHandlerComponent;
+        class RpcRequestComponent * mRequestComponent;
+        class RpcResponseComponent * mResponseComponent;
 	private:		
         char mMessageBuffer[1024 * 1024];
         com::DataPacket_Request mRequestData;
         com::DataPacket_Response mResponseData;
 		std::queue<std::string> mRecvSessionQueue;
-		std::queue<TcpClientSession *> mSessionQueue;		
-        std::unordered_map<long long, TcpClientSession *> mSessionAdressMap;
+		std::queue<RpcClientSession *> mSessionQueue;
+        std::unordered_map<long long, RpcClientSession *> mSessionAdressMap;
 	};
 }

@@ -20,17 +20,17 @@
     },
     "Listener": {
         "ip":"127.0.0.1",
-        "service":
+        "rpc":
         {
             "port":7788,
             "count":10000,
-            "handler":"TcpClientComponent"
+            "handler":"RpcComponent"
         },
         "http":
         {
             "port":80,
             "count":1000,
-            "handler":"HttpClientComponent"
+            "handler":"HttpComponent"
         }
     },
     "NetWork": {
@@ -67,7 +67,7 @@
         "RedisComponent",
         "MysqlProxyComponent",
         "GatewayComponent",
-        "HttpClientComponent",
+        "HttpComponent",
         "TelnetClientComponent"
     ],
     "Service": [

@@ -1,10 +1,10 @@
-﻿#include"TcpClientSession.h"
+﻿#include"RpcClientSession.h"
 #include<Util/TimeHelper.h>
-#include<Network/Tcp/TcpClientComponent.h>
+#include<Network/Rpc/RpcComponent.h>
 
 namespace GameKeeper
 {
-    TcpClientSession::TcpClientSession(TcpClientComponent *component)
+    RpcClientSession::RpcClientSession(RpcComponent *component)
             :mTcpComponent(component)
     {      		
 		this->mLastOperTime = 0;
@@ -12,13 +12,13 @@ namespace GameKeeper
 		this->mReceiveMsgBuffer = new char[TCP_BUFFER_COUNT];
     }
 
-    TcpClientSession::~TcpClientSession()
+    RpcClientSession::~RpcClientSession()
     {
         delete this->mSocketProxy;
         delete[]this->mReceiveMsgBuffer;
     }
 
-	void TcpClientSession::SetSocket(SocketProxy * socketProxy)
+	void RpcClientSession::SetSocket(SocketProxy * socketProxy)
     {
         delete this->mSocketProxy;
         this->mSocketProxy = socketProxy;     
@@ -32,7 +32,7 @@ namespace GameKeeper
     }
 
 
-	void TcpClientSession::StartClose()
+	void RpcClientSession::StartClose()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -40,11 +40,11 @@ namespace GameKeeper
 			this->CloseSocket(XCode::NetActiveShutdown);
 			return;
 		}
-		nThread.AddTask(&TcpClientSession::CloseSocket, this, XCode::NetActiveShutdown);
+		nThread.AddTask(&RpcClientSession::CloseSocket, this, XCode::NetActiveShutdown);
 		
 	}
 
-	void TcpClientSession::StartReceive()
+	void RpcClientSession::StartReceive()
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -52,11 +52,11 @@ namespace GameKeeper
 			this->ReceiveMessage();
 			return;
 		}
-		nThread.AddTask(&TcpClientSession::ReceiveMessage, this);
+		nThread.AddTask(&RpcClientSession::ReceiveMessage, this);
 		
 	}
 
-	void TcpClientSession::StartSendByString(std::string * message)
+	void RpcClientSession::StartSendByString(std::string * message)
 	{		
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
@@ -64,12 +64,12 @@ namespace GameKeeper
 			this->SendByString(message);
 			return;
 		}
-		nThread.AddTask(&TcpClientSession::SendByString, this, message);
+		nThread.AddTask(&RpcClientSession::SendByString, this, message);
 		
 	}
 
 
-	void TcpClientSession::ReceiveMessage()
+	void RpcClientSession::ReceiveMessage()
 	{
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
@@ -97,7 +97,7 @@ namespace GameKeeper
 		});
 	}
 
-	void TcpClientSession::CloseSocket(XCode code)
+	void RpcClientSession::CloseSocket(XCode code)
 	{		
 		if (this->mSocketProxy->IsOpen())
 		{
@@ -105,10 +105,10 @@ namespace GameKeeper
 			this->mSocketProxy->GetSocket().close(err);
 		}
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		nThread.AddTask(&TcpClientComponent::OnCloseSession, this->mTcpComponent, this, code);
+		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
-	void TcpClientSession::ReadMessageBody(const size_t allSize)
+	void RpcClientSession::ReadMessageBody(const size_t allSize)
 	{	
 		if (!this->mSocketProxy->IsOpen())
 		{
@@ -141,7 +141,7 @@ namespace GameKeeper
 			{
 				NetWorkThread & thread = this->mSocketProxy->GetThread();		
 				std::string * data = GStringPool.New(nMessageBuffer, size);
-				thread.AddTask(&TcpClientComponent::OnReceiveMessage, this->mTcpComponent, this, data);					
+				thread.AddTask(&RpcComponent::OnReceiveMessage, this->mTcpComponent, this, data);
 			}
 			if (nMessageBuffer != this->mReceiveMsgBuffer)
 			{
@@ -151,7 +151,7 @@ namespace GameKeeper
 		});
 	}
 
-	void TcpClientSession::SendByString(std::string * message)
+	void RpcClientSession::SendByString(std::string * message)
 	{		
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
@@ -159,7 +159,7 @@ namespace GameKeeper
 		{
 			this->CloseSocket(XCode::HttpNetWorkError);
 			NetWorkThread & nThread = this->mSocketProxy->GetThread();
-			nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,
+			nThread.AddTask(&RpcComponent::OnSendMessageAfter,
 				this->mTcpComponent, this, message, XCode::NetWorkError);
 		}
 		else
@@ -175,7 +175,7 @@ namespace GameKeeper
 				}
 				this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 				NetWorkThread & nThread = this->mSocketProxy->GetThread();
-				nThread.AddTask(&TcpClientComponent::OnSendMessageAfter,  this->mTcpComponent, this, message, code);
+				nThread.AddTask(&RpcComponent::OnSendMessageAfter,  this->mTcpComponent, this, message, code);
 			});
 		}		
 	}

@@ -1,4 +1,4 @@
-﻿#include"CallHandlerComponent.h"
+﻿#include"RpcResponseComponent.h"
 #include<Util/StringHelper.h>
 #include<Core/App.h>
 #include<Util/NumberHelper.h>
@@ -10,13 +10,13 @@
 #endif
 namespace GameKeeper
 {
-    CallHandlerComponent::CallHandlerComponent()
+    RpcResponseComponent::RpcResponseComponent()
         : mNumberPool(100)
     {
         this->mMessageTimeout = 0;
     }
 
-    bool CallHandlerComponent::Awake()
+    bool RpcResponseComponent::Awake()
     {
 		ServerConfig & config = App::Get().GetConfig();
 		this->mTimerComponent = App::Get().GetTimerComponent();
@@ -24,7 +24,7 @@ namespace GameKeeper
         return true;
     }
 
-	bool CallHandlerComponent::AddCallHandler(CallHandler * rpcAction, unsigned int & id)
+	bool RpcResponseComponent::AddCallHandler(CallHandler * rpcAction, unsigned int & id)
     {
         if (rpcAction == nullptr)
         {
@@ -41,7 +41,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool CallHandlerComponent::OnResponseMessage(const com::DataPacket_Response & response)
+    bool RpcResponseComponent::OnResponse(const com::DataPacket_Response & response)
     {
         unsigned int rpcId = response.rpcid();
         auto iter = this->mRetActionMap.find(rpcId);

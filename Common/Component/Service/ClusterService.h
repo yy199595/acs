@@ -4,7 +4,7 @@
 using namespace com;
 namespace GameKeeper
 {
-    class ServiceMgrComponent;
+    class RpcRequestComponent;
 
     class CoroutineComponent;
 

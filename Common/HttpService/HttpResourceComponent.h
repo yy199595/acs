@@ -14,7 +14,7 @@ namespace GameKeeper
         HttpResourceComponent() = default;
         ~HttpResourceComponent() override = default;
     private:
-		HttpStatus Files(HttpRemoteSession * remoteSession);
+		XCode Files(RapidJsonWriter & response);
 		HttpStatus Download(HttpRemoteSession * remoteSession);
     protected:
         bool Awake() override;
