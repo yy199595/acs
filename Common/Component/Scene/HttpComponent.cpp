@@ -3,7 +3,7 @@
 //
 #include <Core/App.h>
 #include <Thread/TaskThread.h>
-#include "HttpComponent.h"
+#include "Component/Scene/HttpComponent.h"
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include "Component/Scene/TaskPoolComponent.h"

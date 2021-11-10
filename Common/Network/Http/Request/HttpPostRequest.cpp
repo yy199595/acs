@@ -42,14 +42,21 @@ namespace GameKeeper
         return true;
     }
 
-    bool HttpPostRequest::WriterToBuffer(std::ostream &os)
+    void HttpPostRequest::WriteHead(std::ostream &os)
     {
-        os << "POST " << this->GetPath() << " HTTP/1.0\r\n";
+        os << "POST " << this->GetPath() << " " << HttpVersion << "\r\n";
         os << "Host: " << this->GetHost() << ":" << this->GetPort() << "\r\n";
         os << "Accept: */*\r\n";
-        os << "Content-Length: " << this->mWriteContent->GetContentSize() << "\r\n";
-        os << "Content-Type: application/x-www-form-urlencoded\r\n";
+        this->mWriteContent->WriteHead(os);
         os << "Connection: close\r\n\r\n";
-		return this->mWriteContent->GetContent(os);
+    }
+
+    bool HttpPostRequest::WriteBody(std::ostream &os)
+    {
+        if(this->mWriteContent == nullptr)
+        {
+            return true;
+        }
+        return this->mWriteContent->WriteBody(os);
     }
 }

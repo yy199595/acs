@@ -14,7 +14,8 @@ namespace GameKeeper
         bool Init(const std::string & url, HttpReadContent & response);
         HttpMethodType GetType() final { return HttpMethodType::GET; }
 	protected:
-		bool WriterToBuffer(std::ostream & os) override;
+        void WriteHead(std::ostream &os) final;
+        bool WriteBody(std::ostream &os) final;
         void OnReceiveBody(asio::streambuf & buf) override;
 	private:
         HttpReadContent * mResponse;

@@ -7,7 +7,7 @@
 #include <Core/App.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpComponent.h>
+#include <Component/Scene/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
@@ -39,6 +39,11 @@ namespace GameKeeper
         this->mVersion.clear();
         this->mParamater.clear();
         HttpRequestHandler::Clear();
+    }
+
+    bool HttpGettHandler::OnReceiveBody(asio::streambuf &streamBuf)
+    {
+        return false;
     }
 
 	bool HttpGettHandler::OnReceiveHead(asio::streambuf & streamBuf)

@@ -3,7 +3,7 @@
 //
 
 #include "HttpLocalsession.h"
-#include <Network/Http/HttpComponent.h>
+#include <Component/Scene/HttpComponent.h>
 #include<Network/Http/Request/HttpGetRequest.h>
 #include<Network/Http/Request/HttpPostRequest.h>
 
@@ -15,12 +15,12 @@
 namespace GameKeeper
 {
 	HttpLocalSession::HttpLocalSession(HttpComponent * component)
-		: HttpSessionBase(component)
 	{
         this->mCorId = 0;
 		this->mQuery = nullptr;
 		this->mResolver = nullptr;
         this->mHttpHandler = nullptr;
+        this->mHttpComponent = component;
         this->mGetHandler = new HttpGetRequest(component);
         this->mPostHandler = new HttpPostRequest(component);
 	}
@@ -49,11 +49,6 @@ namespace GameKeeper
         }
         netWorkThread.AddTask(&HttpLocalSession::Resolver, this);
     }
-
-	HttpHandlerBase * HttpLocalSession::GetHandler()
-	{
-		return this->mHttpHandler;
-	}
 
 	void HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
     {
@@ -205,6 +200,11 @@ namespace GameKeeper
             asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
                              std::bind(&HttpLocalSession::ReadBodyCallback, this, args1, args2));
         }
+    }
+
+    bool HttpLocalSession::WriterToBuffer(std::ostream & os)
+    {
+        return this->mHttpHandler->WriterToBuffer(os);
     }
 
     void HttpLocalSession::ReadBodyCallback(const asio::error_code &err, size_t size)

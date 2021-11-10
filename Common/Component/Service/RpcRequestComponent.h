@@ -18,7 +18,7 @@ namespace GameKeeper
     {
     public:
 		RpcRequestComponent() = default;
-        ~RpcRequestComponent() = default;
+        ~RpcRequestComponent() final = default;
 
     protected:
         bool Awake() final;

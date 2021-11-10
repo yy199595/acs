@@ -38,6 +38,12 @@ namespace GameKeeper
 
         virtual void OnReceiveBody(asio::streambuf & buf) = 0;
 
+        bool WriterToBuffer(std::ostream &os) final;
+    protected:
+
+        virtual void WriteHead(std::ostream & os) = 0;
+        virtual bool WriteBody(std::ostream & os) = 0;
+
     public:
         bool OnReceiveHead(asio::streambuf &buf) override;
 
@@ -50,6 +56,7 @@ namespace GameKeeper
         std::string mPath;
         std::string mHost;
         std::string mPort;
+        size_t mWriteCount;
     };
 }
 #endif //GameKeeper_HTTPLOCALREQUEST_H

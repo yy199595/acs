@@ -95,4 +95,8 @@ enum HttpMethodType
     UNKNOW
 };
 
+#define HttpVersion "HTTP/1.0"
+#define HttpHeadMaxCount 2048
+#define HttpPostMaxCount 10240
+
 #endif //GameKeeper_HTTP_H

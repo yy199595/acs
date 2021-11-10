@@ -11,7 +11,6 @@ namespace GameKeeper
 {
     bool HttpResourceComponent::Awake()
     {
-        char buffer[1024] = {0};
         std::vector<std::string> files;
         this->Add("Files", &HttpResourceComponent::Files, this);
         this->Add("Download", &HttpResourceComponent::Download, this);
@@ -33,6 +32,7 @@ namespace GameKeeper
             MD5 md5(fs);
             const std::string dir = path.substr(downloadPath.size() +1);
             this->mFileMd5Map.insert(std::make_pair(dir, md5.toString()));
+            GKDebugInfo(dir << "   " << md5.toString());
         }
         return true;
     }
@@ -51,11 +51,7 @@ namespace GameKeeper
 
 	HttpStatus HttpResourceComponent::Download(HttpRemoteSession *handler)
     {
-        auto getRequest = dynamic_cast<HttpGettHandler *>(handler);
-        if (getRequest == nullptr)
-        {
-            return HttpStatus::BAD_REQUEST;
-        }
+        auto getRequest = handler->GetReuqestHandler();
         const std::string & fileName = getRequest->GetParamater();
         auto iter = this->mFileMd5Map.find(fileName);
         if(iter == this->mFileMd5Map.end())

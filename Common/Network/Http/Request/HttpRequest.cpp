@@ -10,7 +10,7 @@ namespace GameKeeper
     HttpRequest::HttpRequest(HttpComponent *component)
             : mHttpComponent(component)
     {
-
+        this->mWriteCount = 0;
     }
 
     bool HttpRequest::ParseUrl(const std::string &url)
@@ -28,6 +28,17 @@ namespace GameKeeper
         this->mPort.clear();
         this->mHost.clear();
         this->mVersion.clear();
+        this->mWriteCount = 0;
+    }
+
+    bool HttpRequest::WriterToBuffer(std::ostream &os)
+    {
+        if(this->mWriteCount == 0)
+        {
+            this->WriteHead(os);
+        }
+        this->mWriteCount++;
+        return this->WriteBody(os);
     }
 
     bool HttpRequest::OnReceiveHead(asio::streambuf &streamBuf)

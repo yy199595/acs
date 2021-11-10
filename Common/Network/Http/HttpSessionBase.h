@@ -10,7 +10,7 @@ namespace GameKeeper
     class HttpSessionBase
     {
     public:
-        explicit HttpSessionBase(HttpComponent *component);
+        explicit HttpSessionBase();
 
         virtual ~HttpSessionBase();
 
@@ -30,14 +30,17 @@ namespace GameKeeper
 		virtual SocketType GetSocketType() = 0;
 
 		XCode GetCode() const { return this->mCode; }
+
+
     protected:
-		virtual HttpHandlerBase * GetHandler() = 0;
 
         virtual void OnWriterAfter(XCode code) = 0;
 
         virtual void OnReceiveHeadAfter(XCode code) = 0;
 
 		virtual void OnReceiveHeard(asio::streambuf & buf) = 0;
+
+        virtual bool WriterToBuffer(std::ostream &) = 0;
 
     private:
 

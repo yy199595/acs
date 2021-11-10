@@ -27,7 +27,7 @@ namespace GameKeeper
 
         const std::string & GetPath() override { return this->mPath; }
 
-        void OnReceiveBody(asio::streambuf & streamBuf) final { assert(false); };
+        bool OnReceiveBody(asio::streambuf & streamBuf) final;
 
     private: // 请求参数
         std::string mPath;

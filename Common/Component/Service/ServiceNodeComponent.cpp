@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
 #include <Scene/RpcProtoComponent.h>
-#include <Network/Rpc/RpcComponent.h>
+#include <Component/Scene/RpcComponent.h>
 
 namespace GameKeeper
 {

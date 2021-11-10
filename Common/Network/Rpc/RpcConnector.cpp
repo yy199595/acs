@@ -4,7 +4,7 @@
 
 #include "RpcConnector.h"
 #include <Core/App.h>
-#include<Network/Rpc/RpcComponent.h>
+#include<Component/Scene/RpcComponent.h>
 namespace GameKeeper
 {
 	RpcConnector::RpcConnector(RpcComponent * component, const std::string & ip, const unsigned short port)

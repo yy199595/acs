@@ -14,19 +14,16 @@ namespace GameKeeper
 
     }
 
-    bool HttpWriteStringContent::GetContent(std::ostream &os)
+    bool HttpWriteStringContent::WriteBody(std::ostream &os)
     {      
 		os.write(mContent.c_str(), mContent.size());
         return true;
     }
 
-    size_t HttpWriteStringContent::GetContentSize()
+    void HttpWriteStringContent::WriteHead(std::ostream &os)
     {
-        return mContent.size();
-    }
-
-    void HttpWriteStringContent::GetContentType(std::ostream & os)
-    {
+        size_t size = mContent.size();
+        os << "Content-Length: " << size << "\r\n";
         os << "Content-Type: " << "text/plain" << "\r\n";
     }
 }
@@ -49,7 +46,7 @@ namespace GameKeeper
     }
 
 
-    bool HttpWriteFileContent::GetContent(std::ostream &os)
+    bool HttpWriteFileContent::WriteBody(std::ostream &os)
     {
         if(this->mFileStream.is_open())
         {
@@ -74,45 +71,33 @@ namespace GameKeeper
         return true;
     }
 
-    void HttpWriteFileContent::GetContentType(std::ostream & os)
+    void HttpWriteFileContent::WriteHead(std::ostream & os)
     {
-        size_t pos = this->mPath.find_last_of('/\\');
-        if(pos != std::string::npos)
-        {
-            const std::string name = this->mPath.substr(pos + 1);
-            os << "Content-Type:" << "application/octet-stream" << "\r\n";
-            os << "Content-Disposition:" << "attachment;filename=" << name << "\r\n";
-        }
-    }
-
-    size_t HttpWriteFileContent::GetContentSize()
-    {
+        this->mFileSize = 0;
         if(!this->mFileStream.is_open())
         {
             this->mFileStream.open(this->mPath, std::ios::in | std::ios::binary);
-            if(this->mFileStream.is_open())
+            if (this->mFileStream.is_open())
             {
                 this->mFileSize = this->mFileStream.seekg(0, std::ios_base::end).tellg();
                 this->mFileStream.seekg(0, std::ios_base::beg);
             }
+
+            size_t pos = this->mPath.find_last_of('/\\');
+            if (pos != std::string::npos)
+            {
+                const std::string name = this->mPath.substr(pos + 1);
+                os << "Content-Disposition:" << "attachment;filename=" << name << "\r\n";
+            }
+            os << "Content-Length: " << this->mFileSize << "\r\n";
+            os << "Content-Type:" << "application/octet-stream" << "\r\n";
         }
-        return this->mFileSize;
     }
 }
 
 namespace GameKeeper
 {
-    size_t HttpJsonContent::GetContentSize()
-    {
-		this->mIndex = 0;
-        if(!this->mJsonWriter.IsComplete())
-        {
-            this->mJsonWriter.EndObject();
-        }
-        return this->mStringBuf.GetLength();
-    }
-
-	bool HttpJsonContent::GetContent(std::ostream &os)
+	bool HttpJsonContent::WriteBody(std::ostream &os)
 	{
         if(!this->mJsonWriter.IsComplete())
         {
@@ -122,8 +107,13 @@ namespace GameKeeper
 		return true;
 	}
 
-    void HttpJsonContent::GetContentType(std::ostream &os)
+    void HttpJsonContent::WriteHead(std::ostream &os)
     {
+        if(!this->mJsonWriter.IsComplete())
+        {
+            this->mJsonWriter.EndObject();
+        }
         os << "Content-Type: " << "applocation/json" << "\r\n";
+        os << "Content-Length: " << this->mStringBuf.GetLength() << "\r\n";
     }
 }

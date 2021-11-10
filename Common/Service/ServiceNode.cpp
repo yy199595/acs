@@ -5,7 +5,7 @@
 #include <Method/CallHandler.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Util/StringHelper.h>
-#include <Network/Rpc/RpcComponent.h>
+#include <Component/Scene/RpcComponent.h>
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {

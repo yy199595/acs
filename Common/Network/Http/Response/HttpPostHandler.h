@@ -19,7 +19,7 @@ namespace GameKeeper
         const std::string & GetPath() final;
         bool OnReceiveHead(asio::streambuf & buf) final;
         size_t ReadFromStream(std::string & stringBuf) final;
-        void OnReceiveBody(asio::streambuf &streamBuf) final;
+        bool OnReceiveBody(asio::streambuf &streamBuf) final;
         HttpMethodType GetType() final { return HttpMethodType::POST; }
     private:
 		std::string mPath;

@@ -28,13 +28,14 @@ namespace GameKeeper
         XCode Get(const std::string & url, HttpReadContent & response);
         XCode Post(const std::string & url, HttpWriteContent & request, HttpReadContent & response);
 	protected:
-		HttpHandlerBase * GetHandler() final;
 
         void OnWriterAfter(XCode code) final;
 
         void OnReceiveHeadAfter(XCode code) final;
 
-		void OnReceiveHeard(asio::streambuf & buf) final;
+        bool WriterToBuffer(std::ostream &) final;
+
+        void OnReceiveHeard(asio::streambuf & buf) final;
 
     private:
         void StartReceiveBody();

@@ -2,7 +2,7 @@
 #include "App.h"
 #include <Scene/RpcResponseComponent.h>
 #include <Scene/RpcProtoComponent.h>
-#include <Network/Rpc/RpcComponent.h>
+#include <Component/Scene/RpcComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/RpcRequestComponent.h>
 #include <Scene/TaskPoolComponent.h>

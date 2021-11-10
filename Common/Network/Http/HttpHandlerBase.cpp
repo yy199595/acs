@@ -1,6 +1,5 @@
 #include "HttpHandlerBase.h"
 #include<Util/StringHelper.h>
-#include<Define/CommonDef.h>
 namespace GameKeeper
 {
 #ifdef __DEBUG__

@@ -6,11 +6,11 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Network/Rpc/RpcComponent.h>
+#include <Component/Scene/RpcComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Network/Http/HttpComponent.h>
+#include <Component/Scene/HttpComponent.h>
 #include <Network/Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>

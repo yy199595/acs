@@ -35,16 +35,26 @@ namespace GameKeeper
 
         virtual size_t ReadFromStream(std::string & stringBuf) = 0;
 
-        virtual void OnReceiveBody(asio::streambuf & streamBuf) = 0;
+        virtual bool OnReceiveBody(asio::streambuf & streamBuf) = 0;
+
+#ifdef __DEBUG__
+        long long GetStartTime() const { return this->mStartTime;}
+#endif
     public:
 
         bool WriterToBuffer(std::ostream &os) override;
+
+        HttpStatus GetResponseCode() { return this->mHttpCode; }
 
         const std::string & GetMethod() const { return this->mMethod;}
 
         const std::string & GetComponent() const { return this->mComponent;}
 
         const std::string & GetParamater() const { return this->mParamater;}
+
+    private:
+         void WriteHead(std::ostream & os);
+         bool WriteBody(std::ostream & os);
     protected:
         std::string mMethod;
         std::string mComponent;

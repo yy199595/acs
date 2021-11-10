@@ -16,14 +16,14 @@ namespace GameKeeper
         ~HttpRemoteSession() final;
     public:
         void Start(SocketProxy * socketProxy);
-		SocketType GetSocketType() final { return SocketType::LocalSocket; }
+		SocketType GetSocketType() final { return SocketType::RemoteSocket; }
 		HttpRequestHandler * GetReuqestHandler() { return this->mHttpHandler; }
     public:
         void Clear() final;
-		HttpHandlerBase * GetHandler() final;
 	protected:
         void OnWriterAfter(XCode code) final;
         void OnReceiveHeadAfter(XCode code) final;
+        bool WriterToBuffer(std::ostream &) final;
         void OnReceiveHeard(asio::streambuf & buf) final;
 
     private:
@@ -31,7 +31,7 @@ namespace GameKeeper
         void SetCode(XCode code);
         void ReadBodyCallback(const asio::error_code & err, size_t size);
     private:
-        size_t mReadSize;
+        size_t mWriterCount;
         unsigned int mCorId;
     private:
 		std::string mMethod;

@@ -5,7 +5,7 @@
 #include "HttpPostHandler.h"
 #include <Core/App.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/HttpComponent.h>
+#include <Component/Scene/HttpComponent.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
@@ -52,7 +52,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    void HttpPostHandler::OnReceiveBody(asio::streambuf &streamBuf)
+    bool HttpPostHandler::OnReceiveBody(asio::streambuf &streamBuf)
     {
         std::istream is(&streamBuf);
         while(streamBuf.size() > 0)
@@ -60,6 +60,12 @@ namespace GameKeeper
             size_t size = is.readsome(this->mHandlerBuffer, 1024);
             this->mParamater.append(this->mHandlerBuffer, size);
         }
+        if(this->mParamater.size() >= HttpPostMaxCount)
+        {
+            GKDebugError("http post data failure");
+            return false;
+        }
+        return this->mParamater.size() == this->GetContentLength();
     }
 
     size_t HttpPostHandler::ReadFromStream(std::string & stringBuf)

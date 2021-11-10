@@ -1,6 +1,6 @@
 ﻿#include"RpcClient.h"
 #include<Util/TimeHelper.h>
-#include<Network/Rpc/RpcComponent.h>
+#include<Component/Scene/RpcComponent.h>
 
 namespace GameKeeper
 {

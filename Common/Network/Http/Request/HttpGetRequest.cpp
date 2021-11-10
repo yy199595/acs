@@ -23,14 +23,18 @@ namespace GameKeeper
         return true;
     }
 
-	bool HttpGetRequest::WriterToBuffer(std::ostream & os)
+	void HttpGetRequest::WriteHead(std::ostream &os)
 	{
-		os << "GET " << this->GetPath() << " HTTP/1.0\r\n";
+		os << "GET " << this->GetPath() << " " << HttpVersion << "\r\n";
 		os << "Host: " << this->GetHost() << "\r\n";
 		os << "Accept: */*\r\n";
 		os << "Connection: close\r\n\r\n";
-		return true;
 	}
+
+    bool HttpGetRequest::WriteBody(std::ostream &os)
+    {
+        return true;
+    }
 
     void HttpGetRequest::Clear()
     {

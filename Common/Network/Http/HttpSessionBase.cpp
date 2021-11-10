@@ -5,8 +5,8 @@
 #include <Network/Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
-    HttpSessionBase::HttpSessionBase(HttpComponent * component)
-            : mHttpComponent(component)
+    HttpSessionBase::HttpSessionBase()
+            : mHttpComponent(nullptr)
     {
         this->mCount = 0;
         this->mIsReadBody = false;
@@ -33,15 +33,13 @@ namespace GameKeeper
     {
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 
-		GKAssertRet_F(this->GetHandler());
-		
         if (!socket.is_open())
         {
             this->OnWriterAfter(XCode::NetSendFailure);
             return;
         }
         std::ostream os(&this->mStreamBuf);
-        bool isDone = this->GetHandler()->WriterToBuffer(os);
+        bool isDone = this->WriterToBuffer(os);
         if (this->mStreamBuf.size() == 0)
         {
             return;
@@ -66,8 +64,6 @@ namespace GameKeeper
     
     void HttpSessionBase::StartReceiveHead()
     {
-		/*GKAssertRet_F(this->mSocketProxy);
-		GKAssertRet_F(this->mSocketProxy->IsOpen());*/
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		
@@ -126,6 +122,11 @@ namespace GameKeeper
                 const char *pos = strstr(data, "\r\n\r\n");
                 if (pos == nullptr)
                 {
+                    if(this->mStreamBuf.size() >= HttpHeadMaxCount)
+                    {
+                        this->OnReceiveHeadAfter(XCode::NetBigDataShutdown);
+                        return;
+                    }
 					AsioContext & context = this->mSocketProxy->GetContext();
 					context.post(std::bind(&HttpSessionBase::ReceiveHeard, this));
                     return;
