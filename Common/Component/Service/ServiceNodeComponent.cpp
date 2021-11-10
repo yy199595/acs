@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/ServiceNode.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Network/Rpc/RpcComponent.h>
 
 namespace GameKeeper
@@ -49,7 +49,7 @@ namespace GameKeeper
 		GKAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
 		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
 		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
-		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<RpcProtoComponent>());
         return true;
     }
 

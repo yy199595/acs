@@ -32,7 +32,7 @@ namespace GameKeeper
 
         void OnWriterAfter(XCode code) final;
 
-        void OnReceiveHeardAfter(XCode code) final;
+        void OnReceiveHeadAfter(XCode code) final;
 
 		void OnReceiveHeard(asio::streambuf & buf) final;
 

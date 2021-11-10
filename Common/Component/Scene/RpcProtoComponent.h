@@ -5,31 +5,32 @@
 
 namespace GameKeeper
 {
-    class ProtocolComponent : public Component
+    class RpcProtoComponent : public Component
     {
     public:
-		ProtocolComponent() = default;
-        ~ProtocolComponent() override = default;
+		RpcProtoComponent() = default;
+        ~RpcProtoComponent() override = default;
 
     protected:
         bool Awake() final;
     public:
 		bool HasService(const std::string & service);
 		void GetServices(std::vector<std::string> & services);
-		bool GetMethods(const std::string & service, std::vector<std::string> & methods);
         const ProtocolConfig *GetProtocolConfig(unsigned short id) const;
-
+        bool GetMethods(const std::string & service, std::vector<std::string> & methods);
         const ProtocolConfig *GetProtocolConfig(const std::string &service, const std::string &method) const;
 
-        //const HttpServiceConfig * GetHttpConfig(const std::string & path) const;
-
+    public:
+        Message * NewProtoMessage(const std::string & name);
     private:
+        bool AddProto(const std::string & name);
         bool LoadTcpServiceConfig(const std::string & path);
-        //bool LoadHttpServiceConfig(const std::string & path);
     private:
+        std::mutex mLock;
+        std::unordered_map<std::string, Message *> mProtoMap;
         std::unordered_map<unsigned short, ProtocolConfig *> mProtocolMap;
         std::unordered_map<std::string, ProtocolConfig *> mProtocolNameMap;
-        //std::unordered_map<std::string, HttpServiceConfig *> mHttpConfigMap;
 		std::unordered_map<std::string, std::vector<ProtocolConfig *>> mServiceMap;
+
     };
 }// namespace GameKeeper

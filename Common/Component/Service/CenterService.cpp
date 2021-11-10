@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Util/StringHelper.h>
 #include <Service/ServiceNode.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 namespace GameKeeper
 {
 	bool CenterService::Awake()
@@ -37,7 +37,7 @@ namespace GameKeeper
             delete serviceNode;
 			return XCode::Failure;
 		}
-		ProtocolComponent * protoComponent = this->GetComponent<ProtocolComponent>();
+		RpcProtoComponent * protoComponent = this->GetComponent<RpcProtoComponent>();
 
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{

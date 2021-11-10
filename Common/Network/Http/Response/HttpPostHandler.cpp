@@ -6,7 +6,7 @@
 #include <Core/App.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/HttpComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
@@ -29,7 +29,7 @@ namespace GameKeeper
         HttpRequestHandler::Clear();
     }
 
-	bool HttpPostHandler::OnReceiveHeard(asio::streambuf &streamBuf)
+	bool HttpPostHandler::OnReceiveHead(asio::streambuf &streamBuf)
 	{
 		std::istream is(&streamBuf);
 		is >> this->mPath >> this->mVersion;

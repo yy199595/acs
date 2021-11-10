@@ -32,14 +32,14 @@ namespace GameKeeper
         const std::string path = App::Get().GetDownloadPath();
         const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-        XCode code = this->Get(url, json);
+        //XCode code = this->Get(url, json);
 
-        GKDebugFatal(code << "\n" << json.size());
+        //GKDebugFatal(code << "\n" << json.size());
 
         HttpJsonContent jsonContent;
         //this->Get("http://127.0.0.1:80/app/account/login?{}", json, 5);
 
-		GKDebugInfo(json);
+		//GKDebugInfo(json);
         //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
 	
         //GKDebugFatal(StringHelper::FormatJson(json));

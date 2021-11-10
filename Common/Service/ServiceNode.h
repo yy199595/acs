@@ -53,7 +53,7 @@ namespace GameKeeper
 
     private:
         std::string mMessageBuffer;
-        com::DataPacket_Request mRequestData;
+        com::Rpc_Request mRequestData;
     private:
         int mAreaId;
         int mNodeId;
@@ -70,7 +70,7 @@ namespace GameKeeper
         std::queue<unsigned int> mCoroutines;
         class RpcComponent * mRpcComponent;
         std::queue<std::string *> mWaitSendQueue;
-        class ProtocolComponent *mProtocolComponent;
+        class RpcProtoComponent *mProtocolComponent;
         class RpcResponseComponent *mResponseComponent;
     };
 }// namespace GameKeeper

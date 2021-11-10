@@ -18,7 +18,7 @@ namespace GameKeeper
 
     public:
         bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
-        bool OnResponse(const com::DataPacket_Response & message) final;
+        bool OnResponse(const com::Rpc_Response & message) final;
     protected:
         bool Awake() override;
     private:

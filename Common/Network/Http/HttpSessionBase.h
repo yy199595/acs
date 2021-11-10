@@ -16,7 +16,7 @@ namespace GameKeeper
 
     public:
 
-        void StartReceiveHeard();
+        void StartReceiveHead();
 
         void StartSendHttpMessage();
 
@@ -35,7 +35,7 @@ namespace GameKeeper
 
         virtual void OnWriterAfter(XCode code) = 0;
 
-        virtual void OnReceiveHeardAfter(XCode code) = 0;
+        virtual void OnReceiveHeadAfter(XCode code) = 0;
 
 		virtual void OnReceiveHeard(asio::streambuf & buf) = 0;
 

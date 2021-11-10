@@ -4,7 +4,7 @@
 
 #include "HttpRemoteSession.h"
 #include <Core/App.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Network/Http/HttpComponent.h>
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>
@@ -47,7 +47,7 @@ namespace GameKeeper
     {
         delete this->mSocketProxy;
         this->mSocketProxy = socketProxy;
-        this->StartReceiveHeard();
+        this->StartReceiveHead();
     }
 
 	HttpHandlerBase * HttpRemoteSession::GetHandler()
@@ -67,7 +67,7 @@ namespace GameKeeper
             return;
         }
         this->mHttpHandler = iter->second;
-        if(!this->mHttpHandler->OnReceiveHeard(streamBuf))
+        if(!this->mHttpHandler->OnReceiveHead(streamBuf))
         {
             this->mHttpHandler->SetResponseCode(HttpStatus::BAD_REQUEST);
             this->StartSendHttpMessage();
@@ -92,7 +92,7 @@ namespace GameKeeper
         taskScheduler.AddMainTask(&HttpComponent::OnRequest, this->mHttpComponent, this);
     }
 
-    void HttpRemoteSession::OnReceiveHeardAfter(XCode code)
+    void HttpRemoteSession::OnReceiveHeadAfter(XCode code)
     {
         if(code != XCode::Successful || this->mHttpHandler == nullptr)
         {

@@ -6,7 +6,7 @@
 #include<Timer/ActionTimeoutTimer.h>
 
 #ifdef __DEBUG__
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #endif
 namespace GameKeeper
 {
@@ -41,7 +41,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool RpcResponseComponent::OnResponse(const com::DataPacket_Response & response)
+    bool RpcResponseComponent::OnResponse(const com::Rpc_Response & response)
     {
         unsigned int rpcId = response.rpcid();
         auto iter = this->mRetActionMap.find(rpcId);
@@ -52,7 +52,7 @@ namespace GameKeeper
         CallHandler *callHandler = iter->second;
 #ifdef __DEBUG__
         unsigned short methodId = response.methodid();
-        auto component = this->GetComponent<ProtocolComponent>();
+        auto component = this->GetComponent<RpcProtoComponent>();
         auto config = component->GetProtocolConfig(methodId);
         double second = (TimeHelper::GetMilTimestamp() - callHandler->GetCreateTime()) / 1000.f;
         GKDebugLog("call " << config->ServiceName << "." << config->Method << " use time = " << second << "s");

@@ -34,12 +34,12 @@ namespace GameKeeper
 	public:
 		bool CloseSession(long long id);
 		bool SendByAddress(long long id, std::string * message);
-		bool SendByAddress(long long id, com::DataPacket_Request & message);
-		bool SendByAddress(long long id, com::DataPacket_Response & message);
+		bool SendByAddress(long long id, com::Rpc_Request & message);
+		bool SendByAddress(long long id, com::Rpc_Response & message);
 
     public:
-        std::string * Serialize(const com::DataPacket_Request & message);
-        std::string * Serialize(const com::DataPacket_Response & message);
+        std::string * Serialize(const com::Rpc_Request & message);
+        std::string * Serialize(const com::Rpc_Response & message);
     private:
 		
 		RpcClient *GetSession(long long id);
@@ -47,14 +47,13 @@ namespace GameKeeper
 
 	private:
 		class TaskPoolComponent * mTaskComponent;
-		class RpcComponent *mNetWorkManager;
-		class ProtocolComponent *mProtocolComponent;
+		class RpcProtoComponent *mProtocolComponent;
         class RpcRequestComponent * mRequestComponent;
         class RpcResponseComponent * mResponseComponent;
 	private:		
         char mMessageBuffer[1024 * 1024];
-        com::DataPacket_Request mRequestData;
-        com::DataPacket_Response mResponseData;
+        com::Rpc_Request mRequestData;
+        com::Rpc_Response mResponseData;
 		std::queue<std::string> mRecvSessionQueue;
 		std::queue<RpcClient *> mSessionQueue;
         std::unordered_map<long long, RpcClient *> mSessionAdressMap;

@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Scene/RpcResponseComponent.h>
 #include <Util/StringHelper.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <Service/RpcRequestComponent.h>
 #include <Network/Rpc/RpcConnector.h>
@@ -16,7 +16,7 @@ namespace GameKeeper
     {
 
 		GKAssertRetFalse_F(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
-		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+		GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<RpcProtoComponent>());
 		GKAssertRetFalse_F(this->mRequestComponent = this->GetComponent<RpcRequestComponent>());
         GKAssertRetFalse_F(this->mResponseComponent = this->GetComponent<RpcResponseComponent>());
 
@@ -221,7 +221,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool RpcComponent::SendByAddress(long long id, com::DataPacket_Request & message)
+	bool RpcComponent::SendByAddress(long long id, com::Rpc_Request & message)
 	{
         std::string * data = this->Serialize(message);
         if(data== nullptr)
@@ -232,7 +232,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool RpcComponent::SendByAddress(long long id, com::DataPacket_Response & message)
+	bool RpcComponent::SendByAddress(long long id, com::Rpc_Response & message)
 	{
 		std::string * data = this->Serialize(message);
 		if (data == nullptr)
@@ -243,7 +243,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    std::string *RpcComponent::Serialize(const com::DataPacket_Request &message)
+    std::string *RpcComponent::Serialize(const com::Rpc_Request &message)
     {
         DataMessageType type = TYPE_REQUEST;
         const size_t size = message.ByteSizeLong() + 5;
@@ -256,7 +256,7 @@ namespace GameKeeper
         return GStringPool.New(this->mMessageBuffer, size);
     }
 
-    std::string *RpcComponent::Serialize(const com::DataPacket_Response &message)
+    std::string *RpcComponent::Serialize(const com::Rpc_Response &message)
     {
         DataMessageType type = TYPE_RESPONSE;
         const size_t size = message.ByteSizeLong() + 5;

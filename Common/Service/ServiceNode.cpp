@@ -3,7 +3,7 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/RpcResponseComponent.h>
 #include <Method/CallHandler.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Util/StringHelper.h>
 #include <Network/Rpc/RpcComponent.h>
 #include <google/protobuf/util/json_util.h>
@@ -14,7 +14,7 @@ namespace GameKeeper
 	{
         GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<RpcComponent>());
         GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
-        GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>());
+        GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<RpcProtoComponent>());
         GKAssertRet_F(this->mResponseComponent = App::Get().GetComponent<RpcResponseComponent>());
         GKAssertRet_F(StringHelper::ParseIpAddress(address, this->mIp, this->mPort));
 

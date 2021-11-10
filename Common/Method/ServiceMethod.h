@@ -39,11 +39,11 @@ namespace GameKeeper
 	class ServiceMethod
 	{
 	public:
-		ServiceMethod(const std::string name) : mName(name) { }
+		ServiceMethod(const std::string name) : mName(name) {}
 	public:
 		virtual bool IsLuaMethod() = 0;
         virtual void SetAddress(const std::string & address) { };
-        virtual XCode Invoke(const com::DataPacket_Request & request, std::string & response) = 0;
+        virtual XCode Invoke(const com::Rpc_Request & request, std::string & response) = 0;
 		const std::string & GetName() { return this->mName; }
 	private:
 		std::string mName;
@@ -62,7 +62,7 @@ namespace GameKeeper
 	public:
         void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
 
-        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
+        XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
 			long long userId = request.userid();
             if (userId == 0) {
@@ -88,7 +88,7 @@ namespace GameKeeper
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
         void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
-        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
+        XCode Invoke(const com::Rpc_Request & request, std::string & response) override
         {
             T1 *req = mReqMessagePool.Create();
             if (!req->ParseFromString(request.messagedata()))
@@ -121,7 +121,7 @@ namespace GameKeeper
 			: ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
         void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
-        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
+        XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
             T1 * req = mReqMessagePool.Create();
 			if (!req->ParseFromString(request.messagedata()))
@@ -162,7 +162,7 @@ namespace GameKeeper
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
         void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
-        XCode Invoke(const com::DataPacket_Request & request, std::string & response) override
+        XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
             T1 * res = mResMessagePool.Create();
 

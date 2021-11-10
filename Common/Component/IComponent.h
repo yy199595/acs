@@ -49,13 +49,13 @@ namespace GameKeeper
     class IProtoRequest
     {
     public:
-        virtual bool OnRequest(const com::DataPacket_Request & message) = 0;
+        virtual bool OnRequest(const com::Rpc_Request & message) = 0;
     };
 
     class IProtoResponse
     {
     public:
-        virtual bool OnResponse(const com::DataPacket_Response & message) = 0;
+        virtual bool OnResponse(const com::Rpc_Response & message) = 0;
     };
 
     class IJsonRequest

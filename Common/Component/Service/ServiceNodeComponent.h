@@ -40,8 +40,8 @@ namespace GameKeeper
         std::string mCenterIp;
         unsigned short mCenterPort;
         std::list<ServiceNode *> mServiceNodeArray;
+        class RpcProtoComponent * mProtocolComponent;
         std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
         std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;
-		class ProtocolComponent * mProtocolComponent;
     };
 }

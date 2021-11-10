@@ -1,12 +1,12 @@
 ﻿#include"ServiceComponent.h"
 #include<Core/App.h>
 #include <Method/LuaServiceMethod.h>
-#include<Scene/ProtocolComponent.h>
+#include<Scene/RpcProtoComponent.h>
 namespace GameKeeper
 {
 	bool ServiceComponent::AddMethod(ServiceMethod * method)
 	{
-		ProtocolComponent * procolComponent = App::Get().GetComponent<ProtocolComponent>();
+		RpcProtoComponent * procolComponent = App::Get().GetComponent<RpcProtoComponent>();
 		if (procolComponent == nullptr)
 		{
 			return false;

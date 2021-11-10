@@ -24,18 +24,18 @@ namespace GameKeeper
         bool Awake() final;
 
     public:
-        bool OnRequest(const com::DataPacket_Request & message) final;
+        bool OnRequest(const com::Rpc_Request & message) final;
 
         virtual int GetPriority() const { return 500; }
 	private:
-        void Invoke(ServiceMethod * method, com::DataPacket_Request * request);
+        void Invoke(ServiceMethod * method, com::Rpc_Request * request);
     private:
         int mNodeId;
         std::string mMessageBuffer;
+        com::Rpc_Response mResponse;
         class RpcComponent *mRpcComponent;
-        com::DataPacket_Response mResponse;
         class CoroutineComponent *mCorComponent;
-        class ProtocolComponent * mProtocolComponent;
-		ObjectPool<com::DataPacket_Request> mRequestDataPool;
+        class RpcProtoComponent * mProtocolComponent;
+		ObjectPool<com::Rpc_Request> mRequestDataPool;
     };
 }

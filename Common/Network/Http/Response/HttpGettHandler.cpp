@@ -5,7 +5,7 @@
 #include <Util/StringHelper.h>
 #include <Define/CommonDef.h>
 #include <Core/App.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Network/Http/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
@@ -41,7 +41,7 @@ namespace GameKeeper
         HttpRequestHandler::Clear();
     }
 
-	bool HttpGettHandler::OnReceiveHeard(asio::streambuf & streamBuf)
+	bool HttpGettHandler::OnReceiveHead(asio::streambuf & streamBuf)
     {
         std::string url;
         std::istream is(&streamBuf);

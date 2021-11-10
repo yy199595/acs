@@ -64,7 +64,7 @@ namespace GameKeeper
         });
     }
     
-    void HttpSessionBase::StartReceiveHeard()
+    void HttpSessionBase::StartReceiveHead()
     {
 		/*GKAssertRet_F(this->mSocketProxy);
 		GKAssertRet_F(this->mSocketProxy->IsOpen());*/
@@ -87,7 +87,7 @@ namespace GameKeeper
 		if (!socket.is_open() || this->mIsReadBody)
 		{
 			GKDebugFatal("logic error");
-			this->OnReceiveHeardAfter(XCode::NetReceiveFailure);
+            this->OnReceiveHeadAfter(XCode::NetReceiveFailure);
             return;
 		}
 		
@@ -112,11 +112,11 @@ namespace GameKeeper
     {
         if(err == asio::error::eof)
         {
-			this->OnReceiveHeardAfter(XCode::Successful);
+            this->OnReceiveHeadAfter(XCode::Successful);
         }
         else if(err)
         {
-			this->OnReceiveHeardAfter(XCode::NetReceiveFailure);
+            this->OnReceiveHeadAfter(XCode::NetReceiveFailure);
         }
         else
         {
@@ -132,7 +132,7 @@ namespace GameKeeper
                 }
                 this->mIsReadBody = true;
                 this->OnReceiveHeard(mStreamBuf);
-				this->OnReceiveHeardAfter(XCode::Successful);
+                this->OnReceiveHeadAfter(XCode::Successful);
             }
         }
     }

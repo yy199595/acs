@@ -10,7 +10,7 @@ namespace GameKeeper
     public:
         MysqlService();
 
-        ~MysqlService() {}
+        ~MysqlService()  final = default;
 
     public:
         XCode Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response);
@@ -33,7 +33,5 @@ namespace GameKeeper
         class CoroutineComponent *mCorComponent;
 
         class TaskPoolComponent *mTaskManager;
-
-        class ProtocolComponent * mProtocolManager;
     };
 }// namespace GameKeeper

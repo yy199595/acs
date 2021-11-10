@@ -28,8 +28,8 @@ namespace GameKeeper
     private:
 		void ReceiveMessage();
 		void CloseSocket(XCode code);
-		void SendByString(std::string * message);
-        void ReadMessageBody(const size_t allSize);
+        void ReadMessageBody(size_t allSize);
+        void SendByString(std::string * message);
 	protected:
 		std::string mAddress;
 		SocketProxy * mSocketProxy;

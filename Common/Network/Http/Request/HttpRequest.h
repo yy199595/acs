@@ -14,7 +14,7 @@ namespace GameKeeper
     class HttpRequest : public HttpHandlerBase
     {
     public:
-        HttpRequest(HttpComponent *component);
+        explicit HttpRequest(HttpComponent *component);
 
         ~HttpRequest() override = default;
 
@@ -39,7 +39,7 @@ namespace GameKeeper
         virtual void OnReceiveBody(asio::streambuf & buf) = 0;
 
     public:
-        bool OnReceiveHeard(asio::streambuf &buf) override;
+        bool OnReceiveHead(asio::streambuf &buf) override;
 
     protected:
         int mHttpCode;

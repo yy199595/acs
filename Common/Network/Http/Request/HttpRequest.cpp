@@ -30,7 +30,7 @@ namespace GameKeeper
         this->mVersion.clear();
     }
 
-    bool HttpRequest::OnReceiveHeard(asio::streambuf &streamBuf)
+    bool HttpRequest::OnReceiveHead(asio::streambuf &streamBuf)
     {
         std::istream is(&streamBuf);
         is >> this->mVersion >> this->mHttpCode >> this->mError;

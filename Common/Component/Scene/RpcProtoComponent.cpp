@@ -1,23 +1,21 @@
-﻿#include "ProtocolComponent.h"
+﻿#include "RpcProtoComponent.h"
 
 #include <Core/App.h>
 #include <Util/FileHelper.h>
 #include <Util/StringHelper.h>
-#include <google/protobuf/util/json_util.h>
 #include <rapidjson/document.h>
-#include <Pool/MessagePool.h>
+#include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
-	bool ProtocolComponent::Awake()
+	bool RpcProtoComponent::Awake()
     {
         const std::string path1 = App::Get().GetConfigPath() + "rpc.json";
         const std::string path2 = App::Get().GetConfigPath() + "http.json";
         GKAssertRetFalse_F(this->LoadTcpServiceConfig(path1));
-        //GKAssertRetFalse_F(this->LoadHttpServiceConfig(path2));
         return true;
     }
 
-    bool ProtocolComponent::LoadTcpServiceConfig(const std::string &path)
+    bool RpcProtoComponent::LoadTcpServiceConfig(const std::string &path)
     {
         rapidjson::Document jsonMapper;
         if (!FileHelper::ReadJsonFile(path, jsonMapper))
@@ -62,8 +60,7 @@ namespace GameKeeper
                     if(jsonValue.HasMember("Message"))
                     {
                         protocolConfig->RequestMessage = jsonValue["Message"].GetString();
-                        Message *message = MessagePool::New(protocolConfig->RequestMessage);
-                        if (message == nullptr)
+                        if(!this->AddProto(protocolConfig->RequestMessage))
                         {
                             GKDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
                             return false;
@@ -85,8 +82,7 @@ namespace GameKeeper
                     if(jsonValue.HasMember("Message"))
                     {
                         protocolConfig->ResponseMessage = jsonValue["Message"].GetString();
-                        Message *message = MessagePool::New(protocolConfig->ResponseMessage);
-                        if (message == nullptr)
+                        if(!this->AddProto(protocolConfig->ResponseMessage))
                         {
                             GKDebugFatal("create " << protocolConfig->ResponseMessage << " failure");
                             return false;
@@ -108,55 +104,32 @@ namespace GameKeeper
         return true;
     }
 
-//    const HttpServiceConfig *ProtocolComponent::GetHttpConfig(const std::string &path) const
-//    {
-//        auto iter = this->mHttpConfigMap.find(path);
-//        return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
-//    }
+    Message *RpcProtoComponent::NewProtoMessage(const std::string &name)
+    {
+        if(name.empty())
+        {
+            return nullptr;
+        }
+        if(this->mLock.try_lock())
+        {
+            std::lock_guard<std::mutex> lock(this->mLock);
+            auto iter = this->mProtoMap.find(name);
+            if (iter != this->mProtoMap.end())
+            {
+                Message *message = iter->second;
+                return message->New();
+            }
+        }
+        return nullptr;
+    }
 
-//    bool ProtocolComponent::LoadHttpServiceConfig(const std::string &path)
-//    {
-//        rapidjson::Document jsonMapper;
-//        if (!FileHelper::ReadJsonFile(path, jsonMapper))
-//        {
-//            GKDebugFatal("not find file : " << path << "");
-//            return false;
-//        }
-//
-//        auto iter1 = jsonMapper.MemberBegin();
-//        for (; iter1 != jsonMapper.MemberEnd(); iter1++)
-//        {
-//            rapidjson::Value & jsonValue = iter1->value;
-//            if(!jsonValue.IsObject())
-//            {
-//                return false;
-//            }
-//            auto httpServiceConfig = new HttpServiceConfig();
-//            httpServiceConfig->Path = iter1->name.GetString();
-//            httpServiceConfig->Method = jsonValue["Method"].GetString();
-//            httpServiceConfig->IsAsync = jsonValue["IsAsync"].GetBool();
-//            httpServiceConfig->Service = jsonValue["Component"].GetString();
-//            httpServiceConfig->IsMainThread = jsonValue["IsMainThread"].GetBool();
-//            if(jsonValue.HasMember("Fields") && jsonValue["Fields"].IsArray())
-//            {
-//               for(unsigned int index = 0; index < jsonValue["Fields"].Size();index++)
-//               {
-//                  httpServiceConfig->HeardFields.emplace_back(jsonValue["Fields"][index].GetString());
-//               }
-//            }
-//            this->mHttpConfigMap.emplace(httpServiceConfig->Path, httpServiceConfig);
-//        }
-//        return true;
-//    }
-
-
-	bool ProtocolComponent::HasService(const std::string & service)
+	bool RpcProtoComponent::HasService(const std::string & service)
 	{
 		auto iter = this->mServiceMap.find(service);
 		return iter != this->mServiceMap.end();
 	}
 
-	void ProtocolComponent::GetServices(std::vector<std::string> & services)
+	void RpcProtoComponent::GetServices(std::vector<std::string> & services)
 	{
 		auto iter = this->mServiceMap.begin();
 		for (; iter != this->mServiceMap.end(); iter++)
@@ -165,7 +138,7 @@ namespace GameKeeper
 		}
 	}
 
-	bool ProtocolComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)
+	bool RpcProtoComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())
@@ -179,14 +152,29 @@ namespace GameKeeper
 		return true;
 	}
 
-	const ProtocolConfig *ProtocolComponent::GetProtocolConfig(unsigned short id) const
+	const ProtocolConfig *RpcProtoComponent::GetProtocolConfig(unsigned short id) const
     {
         auto iter = this->mProtocolMap.find(id);
         return iter != this->mProtocolMap.end() ? iter->second : nullptr;
     }
 
+    bool RpcProtoComponent::AddProto(const std::string &name)
+    {
+        const DescriptorPool *pDescriptorPool = DescriptorPool::generated_pool();
+        const Descriptor *pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
+        if (pDescriptor == nullptr)
+        {
+            return false;
+        }
+        MessageFactory *factory = MessageFactory::generated_factory();
+        const Message *pMessage = factory->GetPrototype(pDescriptor);
+        this->mProtoMap.emplace(name, pMessage->New());
+        return true;
+    }
+
+
     const ProtocolConfig *
-    ProtocolComponent::GetProtocolConfig(const std::string &service, const std::string &method) const
+    RpcProtoComponent::GetProtocolConfig(const std::string &service, const std::string &method) const
     {
         std::string name = service + "." + method;
         auto iter = this->mProtocolNameMap.find(name);

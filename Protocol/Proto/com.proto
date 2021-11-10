@@ -47,7 +47,7 @@ message StringMap
      map<string, string> Data = 1;
 }
 
-message DataPacket
+message Rpc
 {
      message Request
      {
@@ -64,5 +64,13 @@ message DataPacket
           int32 RpcId = 3;
           int32 MethodId = 5;
           bytes MessageData = 4;
+     }
+     message ReqHead
+     {
+
+     }
+     message RespHead
+     {
+
      }
 }

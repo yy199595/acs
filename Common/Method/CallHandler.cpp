@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Define/CommonTypeDef.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
@@ -12,10 +12,10 @@ namespace GameKeeper
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
 
-	void LuaCallHandler::Invoke(const com::DataPacket_Response & response)
+	void LuaCallHandler::Invoke(const com::Rpc_Response & response)
     {
-        LocalObject<com::DataPacket_Response> lock(&response);
-        auto component = App::Get().GetComponent<ProtocolComponent>();
+        LocalObject<com::Rpc_Response> lock(&response);
+        auto component = App::Get().GetComponent<RpcProtoComponent>();
 
         unsigned short methodId = response.methodid();
         auto config = component->GetProtocolConfig(methodId);
@@ -62,7 +62,7 @@ namespace GameKeeper
 
 	}
 
-    void CppCallHandler::Invoke(const com::DataPacket_Response & response)
+    void CppCallHandler::Invoke(const com::Rpc_Response & response)
     {
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr)

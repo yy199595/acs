@@ -3,14 +3,14 @@
 #include <Method/LuaServiceMethod.h>
 #include <Service/LuaServiceComponent.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Util/DirectoryHelper.h>
 namespace GameKeeper
 {
 	bool LuaServiceMgrComponent::Awake()
 	{
 		LuaScriptComponent * scriptComponent = this->GetComponent<LuaScriptComponent>();
-		ProtocolComponent * protoComponent = this->GetComponent<ProtocolComponent>();
+		RpcProtoComponent * protoComponent = this->GetComponent<RpcProtoComponent>();
 
 		string servicePath;
 		GKAssertRetFalse_F(protoComponent);

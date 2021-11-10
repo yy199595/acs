@@ -23,7 +23,7 @@ namespace GameKeeper
 
         size_t ReadFromStream(std::string & stringBuf) override;
 
-		bool OnReceiveHeard(asio::streambuf & buf) override;
+		bool OnReceiveHead(asio::streambuf & buf) override;
 
         const std::string & GetPath() override { return this->mPath; }
 

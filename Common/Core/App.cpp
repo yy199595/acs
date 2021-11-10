@@ -1,7 +1,7 @@
 ﻿
 #include "App.h"
 #include <Scene/RpcResponseComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Network/Rpc/RpcComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/RpcRequestComponent.h>
@@ -49,7 +49,7 @@ namespace GameKeeper
 	{
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<RpcResponseComponent>();
-		this->AddComponent<ProtocolComponent>();
+		this->AddComponent<RpcProtoComponent>();
 		this->AddComponent<CoroutineComponent>();
 		this->AddComponent<RpcComponent>();
 

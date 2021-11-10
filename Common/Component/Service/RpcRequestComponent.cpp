@@ -4,7 +4,7 @@
 #include <Util/StringHelper.h>
 #include <Core/App.h>
 #include <Util/JsonHelper.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
 #include <Network/Rpc/RpcComponent.h>
@@ -17,11 +17,11 @@ namespace GameKeeper
         GKAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
         GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<RpcComponent>());
         GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-        GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<ProtocolComponent>());
+        GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<RpcProtoComponent>());
         return true;
     }
 
-    bool RpcRequestComponent::OnRequest(const com::DataPacket_Request & request)
+    bool RpcRequestComponent::OnRequest(const com::Rpc_Request & request)
     {
         unsigned short methodId = request.methodid();
         const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
@@ -67,13 +67,13 @@ namespace GameKeeper
         }
         else
         {
-			com::DataPacket_Request * requestData = this->mRequestDataPool.CopyFrom(request);
+			com::Rpc_Request * requestData = this->mRequestDataPool.CopyFrom(request);
             this->mCorComponent->StartCoroutine(&RpcRequestComponent::Invoke, this, method, requestData);
         }
         return true;
     }
 
-	void RpcRequestComponent::Invoke(ServiceMethod * method, com::DataPacket_Request * request)
+	void RpcRequestComponent::Invoke(ServiceMethod * method, com::Rpc_Request * request)
     {
         std::string responseContent;
         //method->SetAddress(request->address());

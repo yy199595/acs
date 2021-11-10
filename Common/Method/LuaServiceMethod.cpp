@@ -2,7 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
@@ -11,11 +11,11 @@ namespace GameKeeper
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		this->mProtocolComponent = App::Get().GetComponent<ProtocolComponent>();
+		this->mProtocolComponent = App::Get().GetComponent<RpcProtoComponent>();
 		GKAssertBreakFatal_F(this->mProtocolComponent);
 	}
 
-	XCode LuaServiceMethod::Invoke(const com::DataPacket_Request &messageData, std::string &response)
+	XCode LuaServiceMethod::Invoke(const com::Rpc_Request &messageData, std::string &response)
 	{
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, mIdx);
 		luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
@@ -83,7 +83,7 @@ namespace GameKeeper
 		return code;
 	}
 
-	XCode LuaServiceMethod::AsyncInvoke(const com::DataPacket_Request &request)
+	XCode LuaServiceMethod::AsyncInvoke(const com::Rpc_Request &request)
 	{
 //		lua_State *coroutine = lua_newthread(this->mLuaEnv);
 //		int ref = this->mScriptComponent->GetLuaRef("ServiceName", "Invoke");
@@ -147,7 +147,7 @@ namespace GameKeeper
 	int LuaServiceMethod::Response(lua_State * lua)
 	{
 //		XCode code = (XCode)lua_tointeger(lua, 2);
-//        com::DataPacket_Request * responseData = (com::DataPacket_Request*)lua_touserdata(lua, 1);
+//        com::Rpc_Request * responseData = (com::Rpc_Request*)lua_touserdata(lua, 1);
 //
 //		TcpNetProxyComponent * sessionComponent = App::Get().GetComponent<TcpNetProxyComponent>();
 //		responseData->ClearMessage();

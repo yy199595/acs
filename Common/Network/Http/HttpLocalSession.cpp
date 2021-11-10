@@ -58,7 +58,7 @@ namespace GameKeeper
 	void HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
     {
         GKAssertRet_F(this->mHttpHandler);
-        this->mHttpHandler->OnReceiveHeard(buf);
+        this->mHttpHandler->OnReceiveHead(buf);
     }
 
 	void HttpLocalSession::Resolver()
@@ -132,10 +132,10 @@ namespace GameKeeper
             this->SetCode(code);
             return;
         }
-        this->StartReceiveHeard();
+        this->StartReceiveHead();
     }
 
-    void HttpLocalSession::OnReceiveHeardAfter(XCode code)
+    void HttpLocalSession::OnReceiveHeadAfter(XCode code)
     {
         if(code != XCode::Successful)
         {

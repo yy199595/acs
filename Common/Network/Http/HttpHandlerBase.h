@@ -15,7 +15,7 @@ namespace GameKeeper
         virtual void Clear();
         virtual HttpMethodType GetType() = 0;
 		virtual bool WriterToBuffer(std::ostream & os) = 0;
-		virtual bool OnReceiveHeard(asio::streambuf & buf) = 0;
+		virtual bool OnReceiveHead(asio::streambuf & buf) = 0;
 
 #ifdef __DEBUG__
 		std::string PrintHeard();

@@ -2,7 +2,7 @@
 
 #include<Core/App.h>
 #include<Method/LuaServiceMethod.h>
-#include<Scene/ProtocolComponent.h>
+#include<Scene/RpcProtoComponent.h>
 namespace GameKeeper
 {
     LuaServiceComponent::LuaServiceComponent()
@@ -33,7 +33,7 @@ namespace GameKeeper
 		}
 		this->mLuaEnv = luaEnv;
 		this->mIdx = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		auto protocolComponent = App::Get().GetComponent<ProtocolComponent>();
+		auto protocolComponent = App::Get().GetComponent<RpcProtoComponent>();
 
         return protocolComponent->HasService(this->mServiceName);
 	}

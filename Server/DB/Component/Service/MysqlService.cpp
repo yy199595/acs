@@ -1,7 +1,7 @@
 ﻿#include "MysqlService.h"
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <MysqlClient/MyqslTask.h>
 #include <Core/App.h>
@@ -20,8 +20,6 @@ namespace GameKeeper
 		this->mCorComponent = App::Get().GetCorComponent();
         GKAssertRetFalse_F(this->mMysqlManager = this->GetComponent<MysqlComponent>());
         GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        GKAssertRetFalse_F(this->mProtocolManager = this->GetComponent<ProtocolComponent>());
-
 		__add_method(MysqlService::Add);
 		__add_method(MysqlService::Save);
 		__add_method(MysqlService::Query);

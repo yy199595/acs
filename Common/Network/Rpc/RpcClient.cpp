@@ -108,7 +108,7 @@ namespace GameKeeper
 		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
-	void RpcClient::ReadMessageBody(const size_t allSize)
+	void RpcClient::ReadMessageBody(size_t allSize)
 	{	
 		if (!this->mSocketProxy->IsOpen())
 		{

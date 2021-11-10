@@ -11,8 +11,8 @@ namespace GameKeeper
 		LuaServiceMethod(const std::string & name, lua_State * lua, int idx);
 	public:
 		bool IsLuaMethod() final { return true; }
-		 XCode Invoke(const com::DataPacket_Request & request, std::string & response) final;
-         XCode AsyncInvoke(const com::DataPacket_Request & request);
+		 XCode Invoke(const com::Rpc_Request & request, std::string & response) final;
+         XCode AsyncInvoke(const com::Rpc_Request & request);
 	private:
 		static int Response(lua_State * lua);
 	private:
@@ -20,6 +20,6 @@ namespace GameKeeper
 		lua_State * mLuaEnv;
 		std::string mMessageJson;
 		class LuaScriptComponent * mScriptComponent;
-		class ProtocolComponent * mProtocolComponent;
+		class RpcProtoComponent * mProtocolComponent;
 	};
 }

@@ -17,7 +17,7 @@ namespace GameKeeper
         long long GetCreateTime() const { return this->mCreateTime; }
 
     public:
-        virtual void Invoke(const com::DataPacket_Response & backData) = 0;
+        virtual void Invoke(const com::Rpc_Response & backData) = 0;
 
     private:
         long long mCreateTime;
@@ -40,7 +40,7 @@ namespace GameKeeper
         LuaCallHandler(lua_State *lua, lua_State * cor)
             : mCoroutine(cor), luaEnv(lua) {}
     public:
-        void Invoke(const com::DataPacket_Response & backData) override;
+        void Invoke(const com::Rpc_Response & backData) override;
 
     private:
 		int ref;
@@ -54,9 +54,9 @@ namespace GameKeeper
     {
     public:
         CppCallHandler();
-		~CppCallHandler();
+		~CppCallHandler() final;
     public:
-        void Invoke(const com::DataPacket_Response & backData) override;
+        void Invoke(const com::Rpc_Response & backData) override;
     public:
         XCode StartCall();
         XCode StartCall(google::protobuf::Message & message);

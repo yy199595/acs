@@ -17,7 +17,7 @@
 #include <Service/RpcRequestComponent.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Scene/TaskPoolComponent.h>
-#include <Scene/ProtocolComponent.h>
+#include <Scene/RpcProtoComponent.h>
 #include <Service/AccountService.h>
 #include <Service/ClusterService.h>
 #include <Service/CenterService.h>
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     __register_component__(MysqlComponent);
     __register_component__(RpcResponseComponent);
     __register_component__(LuaScriptComponent);
-    __register_component__(ProtocolComponent);
+    __register_component__(RpcProtoComponent);
     __register_component__(MysqlProxyComponent);
     __register_component__(GatewayComponent);
     __register_component__(HttpComponent);
