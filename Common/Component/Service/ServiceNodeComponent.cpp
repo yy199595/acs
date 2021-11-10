@@ -1,7 +1,7 @@
 #include "ServiceNodeComponent.h"
 
 #include <Core/App.h>
-#include <Service/ServiceNode.h>
+#include <Service/NodeProxy.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Component/Scene/RpcComponent.h>
 
@@ -12,7 +12,7 @@ namespace GameKeeper
         auto iter = this->mServiceNodeMap1.find(nodeId);
         if (iter != this->mServiceNodeMap1.end())
         {
-            ServiceNode *serviceNode = iter->second;
+            NodeProxy *serviceNode = iter->second;
             if (serviceNode != nullptr)
             {
                 serviceNode->SetActive(false);
@@ -29,9 +29,9 @@ namespace GameKeeper
         return false;
     }
 
-	ServiceNode * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
+	NodeProxy * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
 	{
-		auto serviceNode = new ServiceNode(areaId, nodeId, name, address);
+		auto serviceNode = new NodeProxy(areaId, nodeId, name, address);
 		if (serviceNode != nullptr)
 		{
 			serviceNode->Init(name);
@@ -64,7 +64,7 @@ namespace GameKeeper
 		auto iter = this->mServiceNodeArray.begin();
 		for (; iter != this->mServiceNodeArray.end();)
 		{
-			ServiceNode *serviceNode = (*iter);
+			NodeProxy *serviceNode = (*iter);
 			if (serviceNode == nullptr || !serviceNode->IsActive())
 			{
 				serviceNode->OnDestory();
@@ -76,12 +76,12 @@ namespace GameKeeper
 		}
 	}
 
-    ServiceNode *ServiceNodeComponent::GetServiceNode(const int nodeId)
+    NodeProxy *ServiceNodeComponent::GetServiceNode(const int nodeId)
     {
         auto iter = this->mServiceNodeMap1.find(nodeId);
         if (iter != this->mServiceNodeMap1.end())
         {
-            ServiceNode *serviceNode = iter->second;
+            NodeProxy *serviceNode = iter->second;
             if (serviceNode != nullptr && serviceNode->IsActive())
             {
                 return serviceNode;
@@ -91,12 +91,12 @@ namespace GameKeeper
         return nullptr;
     }
 
-    ServiceNode *ServiceNodeComponent::GetServiceNode(const std::string &address)
+    NodeProxy *ServiceNodeComponent::GetServiceNode(const std::string &address)
     {
         auto iter = this->mServiceNodeMap2.find(address);
         if (iter != this->mServiceNodeMap2.end())
         {
-            ServiceNode *serviceNode = iter->second;
+            NodeProxy *serviceNode = iter->second;
             if (serviceNode != nullptr && serviceNode->IsActive())
             {
                 return serviceNode;
@@ -105,9 +105,9 @@ namespace GameKeeper
         return nullptr;
     }
 
-    ServiceNode *ServiceNodeComponent::GetNodeByNodeName(const std::string &nodeName)
+    NodeProxy *ServiceNodeComponent::GetNodeByNodeName(const std::string &nodeName)
     {
-        for (ServiceNode *serviceNode : this->mServiceNodeArray)
+        for (NodeProxy *serviceNode : this->mServiceNodeArray)
         {
             if (serviceNode->IsActive() && serviceNode->GetNodeName() == nodeName)
             {
@@ -119,9 +119,9 @@ namespace GameKeeper
         return nullptr;
     }
 
-	ServiceNode *ServiceNodeComponent::GetNodeByServiceName(const std::string &service)
+	NodeProxy *ServiceNodeComponent::GetNodeByServiceName(const std::string &service)
     {
-        for (ServiceNode *serviceNode: this->mServiceNodeArray)
+        for (NodeProxy *serviceNode: this->mServiceNodeArray)
         {
             if (serviceNode->IsActive() && serviceNode->HasService(service))
             {
@@ -133,10 +133,10 @@ namespace GameKeeper
         s2s::NodeQuery_Response response;
         request.set_areaid(this->mAreaId);
         request.set_servicename(service);
-        ServiceNode *centerNode = this->GetServiceNode(0);
+        NodeProxy *centerNode = this->GetServiceNode(0);
         XCode code = centerNode->Call("CenterService", "Query", request, response);
 
-        ServiceNode * newServiceNode = nullptr;
+        NodeProxy * newServiceNode = nullptr;
         if (code == XCode::Successful && response.nodeinfos_size() > 0)
         {
             for (int index = 0; index < response.nodeinfos_size(); index++)

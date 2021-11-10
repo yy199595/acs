@@ -1,4 +1,4 @@
-﻿#include "ServiceNode.h"
+﻿#include "NodeProxy.h"
 #include <Core/App.h>
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/RpcResponseComponent.h>
@@ -9,7 +9,7 @@
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
-	ServiceNode::ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId)
+	NodeProxy::NodeProxy(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId)
 		: mAreaId(areaId), mNodeId(nodeId), mAddress(address), mNodeName(name), mIsClose(false), mSocketId(socketId)
 	{
         GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<RpcComponent>());
@@ -22,10 +22,10 @@ namespace GameKeeper
         {
             this->mSocketId = this->mRpcComponent->NewSession(this->mNodeName, this->mIp, this->mPort);
         }
-        this->mCorId = this->mCorComponent->StartCoroutine(&ServiceNode::LoopSendMessage, this);
+        this->mCorId = this->mCorComponent->StartCoroutine(&NodeProxy::LoopSendMessage, this);
 	}
 
-	bool ServiceNode::AddService(const std::string &service)
+	bool NodeProxy::AddService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		if (iter == this->mServiceArray.end())
@@ -36,7 +36,7 @@ namespace GameKeeper
 		return false;
 	}
 
-    RpcConnector * ServiceNode::GetTcpSession()
+    RpcConnector * NodeProxy::GetTcpSession()
     {
         auto localSession = this->mRpcComponent->GetLocalSession(this->mSocketId);
 
@@ -55,7 +55,7 @@ namespace GameKeeper
         return localSession;
     }
 
-    void ServiceNode::LoopSendMessage()
+    void NodeProxy::LoopSendMessage()
     {
         while (!this->mIsClose)
         {
@@ -81,19 +81,19 @@ namespace GameKeeper
         delete this;
     }
 
-    void ServiceNode::Destory()
+    void NodeProxy::Destory()
     {
         this->mIsClose = true;
         this->mCorComponent->Resume(this->mCorId);
     }
 
-    bool ServiceNode::HasService(const std::string &service)
+    bool NodeProxy::HasService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		return iter != this->mServiceArray.end();
 	}
 
-    void ServiceNode::GetServicers(std::vector<std::string> & services)
+    void NodeProxy::GetServicers(std::vector<std::string> & services)
     {
         services.clear();
         for(const std::string & name : this->mServiceArray)
@@ -102,7 +102,7 @@ namespace GameKeeper
         }
     }
 
-    XCode ServiceNode::Notice(const std::string &service, const std::string &method)
+    XCode NodeProxy::Notice(const std::string &service, const std::string &method)
     {
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -120,7 +120,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-	XCode ServiceNode::Notice(const std::string &service, const std::string &method, const Message &request)
+	XCode NodeProxy::Notice(const std::string &service, const std::string &method, const Message &request)
 	{
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -142,7 +142,7 @@ namespace GameKeeper
         return XCode::Successful;
 	}
 
-	XCode ServiceNode::Invoke(const std::string &service, const std::string &method)
+	XCode NodeProxy::Invoke(const std::string &service, const std::string &method)
 	{
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -169,7 +169,7 @@ namespace GameKeeper
         return cppCallHandler.StartCall();
 	}
 
-	XCode ServiceNode::Call(const std::string &service, const std::string &method, Message &response)
+	XCode NodeProxy::Call(const std::string &service, const std::string &method, Message &response)
 	{
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -196,7 +196,7 @@ namespace GameKeeper
         return cppCallHandler.StartCall(response);
 	}
 
-	XCode ServiceNode::Invoke(const std::string &service, const std::string &method, const Message &request)
+	XCode NodeProxy::Invoke(const std::string &service, const std::string &method, const Message &request)
 	{
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -229,7 +229,7 @@ namespace GameKeeper
         return cppCallHandler.StartCall();
 	}
 
-	XCode ServiceNode::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
+	XCode NodeProxy::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
     {
         auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
         if(config == nullptr)
@@ -262,7 +262,7 @@ namespace GameKeeper
         return cppCallHandler.StartCall(response);
     }
 
-    void ServiceNode::PushMessage(std::string *msg)
+    void NodeProxy::PushMessage(std::string *msg)
     {
         this->mWaitSendQueue.push(msg);
         this->mCorComponent->Resume(this->mCorId);

@@ -1,6 +1,6 @@
 ﻿#include "GatewayComponent.h"
 #include <Object/GameObject.h>
-#include <Service/ServiceNode.h>
+#include <Service/NodeProxy.h>
 #include <Scene/RedisComponent.h>
 #include <Service/GatewayService.h>
 #include <Scene/GameObjectComponent.h>

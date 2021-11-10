@@ -37,7 +37,14 @@ namespace GameKeeper
         //GKDebugFatal(code << "\n" << json.size());
 
         HttpJsonContent jsonContent;
-        //this->Get("http://127.0.0.1:80/app/account/login?{}", json, 5);
+		HttpReadStringContent stringContent;
+		jsonContent.Add("account", "646585122@qq.com");
+		jsonContent.Add("password", "11223344566");
+		while (true)
+		{
+			this->Post("http://127.0.0.1:80/app/account/login?{}", jsonContent, stringContent, 5);
+		}
+       
 
 		//GKDebugInfo(json);
         //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
@@ -62,8 +69,9 @@ namespace GameKeeper
         auto httpMethod = this->GetHttpMethod(service, method);
 
         if(httpMethod == nullptr)
-        {
+        {		
             requestHandler->SetResponseCode(HttpStatus::NOT_FOUND);
+			GKDebugError("not find http method " << service << "." << method);
         }
         else
         {

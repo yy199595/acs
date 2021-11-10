@@ -4,7 +4,7 @@
 
 namespace GameKeeper
 {
-    class ServiceNode;
+    class NodeProxy;
 
     class ServiceNodeComponent : public Component, public ISecondUpdate
     {
@@ -17,7 +17,7 @@ namespace GameKeeper
 
         int GetPriority() final { return 1; }
 
-		ServiceNode * CreateNode(int areaId, int nodeId, std::string name, std::string address);
+		NodeProxy * CreateNode(int areaId, int nodeId, std::string name, std::string address);
 	
     protected:
         bool Awake() final;
@@ -27,21 +27,21 @@ namespace GameKeeper
         void OnSecondUpdate() final;
 
     public:
-        ServiceNode *GetServiceNode(const int nodeId);
+        NodeProxy *GetServiceNode(const int nodeId);
 
-        ServiceNode *GetServiceNode(const std::string &address);
+        NodeProxy *GetServiceNode(const std::string &address);
 
-        ServiceNode *GetNodeByNodeName(const std::string &nodeName);
+        NodeProxy *GetNodeByNodeName(const std::string &nodeName);
 
-        ServiceNode *GetNodeByServiceName(const std::string &service);
+        NodeProxy *GetNodeByServiceName(const std::string &service);
 
     private:
 		int mAreaId;
         std::string mCenterIp;
         unsigned short mCenterPort;
-        std::list<ServiceNode *> mServiceNodeArray;
+        std::list<NodeProxy *> mServiceNodeArray;
         class RpcProtoComponent * mProtocolComponent;
-        std::unordered_map<int, ServiceNode *> mServiceNodeMap1;
-        std::unordered_map<std::string, ServiceNode *> mServiceNodeMap2;
+        std::unordered_map<int, NodeProxy *> mServiceNodeMap1;
+        std::unordered_map<std::string, NodeProxy *> mServiceNodeMap2;
     };
 }

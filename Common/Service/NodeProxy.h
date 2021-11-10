@@ -6,10 +6,10 @@
 namespace GameKeeper
 {
     class CallHandler;
-    class ServiceNode : public Object
+    class NodeProxy : public Object
     {
     public:
-        ServiceNode(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId = 0);
+        NodeProxy(int areaId, int nodeId, const std::string & name, const std::string & address, long long socketId = 0);
 
     public:
 

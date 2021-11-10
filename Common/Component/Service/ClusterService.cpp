@@ -1,7 +1,7 @@
 ﻿#include "ClusterService.h"
 
 #include <Core/App.h>
-#include <Service/ServiceNode.h>
+#include <Service/NodeProxy.h>
 #include <Service/ServiceNodeComponent.h>
 #include <Service/RpcRequestComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
@@ -33,7 +33,7 @@ namespace GameKeeper
         }
 
 		s2s::NodeRegister_Response responseInfo;
-		ServiceNode *centerNode = this->mNodeComponent->GetServiceNode(0);
+		NodeProxy *centerNode = this->mNodeComponent->GetServiceNode(0);
 		TcpServerComponent * listenComponent = this->GetComponent<TcpServerComponent>();
 
 		registerInfo.set_areaid(this->mAreaId);
@@ -60,14 +60,14 @@ namespace GameKeeper
 	XCode ClusterService::Add(const s2s::NodeInfo & nodeInfo)
 	{
 		const int uid = nodeInfo.uid();
-		ServiceNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
+		NodeProxy *serviceNode = this->mNodeComponent->GetServiceNode(uid);
 		if (serviceNode == nullptr)
         {
             const int areaId = uid / 10000;
             const int nodeId = uid % 10000;
             const std::string &name = nodeInfo.servername();
             const std::string &address = nodeInfo.address();
-            serviceNode = new ServiceNode(areaId, nodeId, name, address);
+            serviceNode = new NodeProxy(areaId, nodeId, name, address);
         }
 
 		for (int index = 0; index < nodeInfo.services_size(); index++)

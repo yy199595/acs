@@ -47,7 +47,7 @@ namespace GameKeeper
     {
         if(this->mHttpHandler == nullptr)
         {
-            HttpStatus code = HttpStatus::METHOD_NOT_ALLOWED;
+            HttpStatus code = HttpStatus::BAD_REQUEST;
             os << HttpVersion << (int) code << " " << HttpStatusToString(code) << "\r\n";
             os << "Server: " << "GameKeeper" << "\r\n";
             os << "Connection: " << "close" << "\r\n\r\n";
@@ -71,26 +71,15 @@ namespace GameKeeper
         auto iter = this->mHandlerMap.find(this->mMethod);
         if (iter == this->mHandlerMap.end())
         {
-            this->StartSendHttpMessage();
+			this->mCode = XCode::HttpMethodNotFound;
             GKDebugError("not find http method " << this->mMethod);
             return;
         }
         this->mHttpHandler = iter->second;
         if(!this->mHttpHandler->OnReceiveHead(streamBuf))
         {
-            this->mHttpHandler->SetResponseCode(HttpStatus::BAD_REQUEST);
-            this->StartSendHttpMessage();
-        }
-        else
-        {
-            const std::string & method = this->mHttpHandler->GetMethod();
-            const std::string & service = this->mHttpHandler->GetComponent();
-            if(this->mHttpComponent->GetHttpMethod(service, method) == nullptr)
-            {
-                this->mHttpHandler->SetResponseCode(HttpStatus::NOT_FOUND);
-                this->StartSendHttpMessage();
-            }
-        }
+			this->mCode = XCode::HttpHeadParseFailure;         
+        }      
     }
 
     void HttpRemoteSession::SetCode(XCode code)
@@ -105,7 +94,7 @@ namespace GameKeeper
     {
         if(code != XCode::Successful || this->mHttpHandler == nullptr)
         {
-            this->SetCode(code);
+            this->StartSendHttpMessage();
         }
         else if(this->mHttpHandler->GetType() == HttpMethodType::GET)
         {

@@ -14,8 +14,8 @@ namespace GameKeeper
 		NodeMaperComponent() = default;
         ~NodeMaperComponent() override = default;
     public:
-        void AddService(class ServiceNode * node);
-        class ServiceNode * GetService(const std::string & service);
+        void AddService(class NodeProxy * node);
+        class NodeProxy * GetService(const std::string & service);
     protected:
         bool Awake() override;
 

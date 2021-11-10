@@ -28,7 +28,7 @@ namespace GameKeeper
         XCode Query(const Message &data, Message &queryData);
 
     private:
-        class ServiceNode *GetServiceNode();
+        class NodeProxy *GetServiceNode();
 
     private:
         std::queue<unsigned int> mWakeUpQueue;

@@ -48,3 +48,4 @@ HostResolverError	Host主机没发现
 HttpNetWorkError	Http网络错误
 HttpResponseError	Http服务器返回错误
 HttpMethodNotFound	Http方法没发现
+HttpHeadParseFailure	Http协议头解析失败

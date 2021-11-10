@@ -8,7 +8,7 @@ using namespace com;
 
 namespace GameKeeper
 {
-    class ServiceNode;
+    class NodeProxy;
 
     struct ActionProxyInfo
     {
@@ -49,6 +49,6 @@ namespace GameKeeper
     private:
         void NoticeAllNode(const s2s::NodeInfo & nodeInfo);
     private:
-        std::unordered_map<int, ServiceNode *> mServiceNodeMap;
+        std::unordered_map<int, NodeProxy *> mServiceNodeMap;
     };
 }

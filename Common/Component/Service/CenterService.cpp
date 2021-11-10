@@ -1,7 +1,7 @@
 ﻿#include "CenterService.h"
 #include <Core/App.h>
 #include <Util/StringHelper.h>
-#include <Service/ServiceNode.h>
+#include <Service/NodeProxy.h>
 #include <Scene/RpcProtoComponent.h>
 namespace GameKeeper
 {
@@ -28,7 +28,7 @@ namespace GameKeeper
 			return XCode::Failure;
 		}
 
-        ServiceNode *serviceNode = new ServiceNode(areaId, nodeId, nodeName, address);
+        NodeProxy *serviceNode = new NodeProxy(areaId, nodeId, nodeName, address);
 
         const int key = serviceNode->GetNodeUId();
 		auto iter = this->mServiceNodeMap.find(key);
@@ -65,7 +65,7 @@ namespace GameKeeper
         auto iter = this->mServiceNodeMap.begin();
         for(; iter != this->mServiceNodeMap.end(); iter++)
         {
-            ServiceNode * node = iter->second;
+            NodeProxy * node = iter->second;
             if(node->GetAreaId() == areaId && node->HasService(service))
             {
                s2s::NodeInfo * nodeInfo = response.add_nodeinfos();
