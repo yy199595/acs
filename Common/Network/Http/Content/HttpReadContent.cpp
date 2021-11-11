@@ -37,7 +37,7 @@ namespace GameKeeper
     HttpReadFileContent::HttpReadFileContent(const std::string &path)
         : mPath(path)
     {
-
+        this->mFileSize=0;
     }
 
     bool HttpReadFileContent::OpenFile()
@@ -49,13 +49,12 @@ namespace GameKeeper
             return false;
         }
         GKDebugWarning(dir);
-        if(!DirectoryHelper::MakeDir(dir))
+        if (!DirectoryHelper::MakeDir(dir))
         {
             GKDebugError("create dir " << dir << " failure");
             return false;
         }
-		return true;
-		
+        return true;
     }
 
 
@@ -69,15 +68,16 @@ namespace GameKeeper
 
     void HttpReadFileContent::OnReadContent(const char *data, size_t size)
     {
-		if (!this->mFileStream.is_open())
-		{
-			this->mFileStream.open(this->mPath, std::ios::out | std::ios::binary);
-		}		
-		if (!this->mFileStream.is_open())
-		{
-			GKDebugError("open or create " << this->mPath << " failure");
-			return;
-		}
-		this->mFileStream.write(data, size);
+        if (!this->mFileStream.is_open())
+        {
+            this->mFileStream.open(this->mPath, std::ios::out | std::ios::binary);
+        }
+        if (!this->mFileStream.is_open())
+        {
+            GKDebugError("open or create " << this->mPath << " failure");
+            return;
+        }
+        this->mFileSize += size;
+        this->mFileStream.write(data, size);
     }
 }

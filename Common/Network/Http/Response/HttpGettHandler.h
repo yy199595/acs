@@ -8,6 +8,7 @@
 
 namespace GameKeeper
 {
+    class HttpReadStringContent;
     class HttpGettHandler : public HttpRequestHandler
     {
     public:
@@ -20,18 +21,19 @@ namespace GameKeeper
         HttpMethodType GetType() final { return HttpMethodType::GET; }
 
 		//bool SplitParameter(std::unordered_map<std::string, std::string> & parames);
-
-        size_t ReadFromStream(std::string & stringBuf) override;
-
+        
 		bool OnReceiveHead(asio::streambuf & buf) override;
 
         const std::string & GetPath() override { return this->mPath; }
 
         bool OnReceiveBody(asio::streambuf & streamBuf) final;
 
+        HttpReadContent * GetContent() final;
+
     private: // 请求参数
         std::string mPath;
 		std::string mVersion;
+        HttpReadStringContent * mContent;
     };
 }
 #endif //GameKeeper_HTTPREMOTEGETREQUEST_H

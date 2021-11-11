@@ -9,7 +9,7 @@ namespace GameKeeper
 	{
 		__add_method(CenterService::Add);
 		__add_method(CenterService::Query);
-		return LocalServiceComponent::Awake();
+		return true;
 	}
 
     void CenterService::Start()
@@ -28,7 +28,7 @@ namespace GameKeeper
 			return XCode::Failure;
 		}
 
-        NodeProxy *serviceNode = new NodeProxy(areaId, nodeId, nodeName, address);
+        auto serviceNode = new NodeProxy(areaId, nodeId, nodeName, address);
 
         const int key = serviceNode->GetNodeUId();
 		auto iter = this->mServiceNodeMap.find(key);
@@ -37,8 +37,7 @@ namespace GameKeeper
             delete serviceNode;
 			return XCode::Failure;
 		}
-		RpcProtoComponent * protoComponent = this->GetComponent<RpcProtoComponent>();
-
+		auto protoComponent = this->GetComponent<RpcProtoComponent>();
 		for (int index = 0; index < nodeInfo.services_size(); index++)
 		{
 			const std::string & service = nodeInfo.services(index);

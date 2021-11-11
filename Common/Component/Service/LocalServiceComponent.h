@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "ServiceComponent.h"
+#include "Service/ServiceComponent.h"
 #include <Method/ServiceMethod.h>
 
 namespace GameKeeper

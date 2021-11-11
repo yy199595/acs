@@ -104,16 +104,16 @@ public:
     return thread_call_stack::contains(this) != 0;
   }
 
-  // RequestMessage invocation of the given operation and return immediately. Assumes
+  // Request invocation of the given operation and return immediately. Assumes
   // that work_started() has not yet been called for the operation.
   ASIO_DECL void post_immediate_completion(
       operation* op, bool is_continuation);
 
-  // RequestMessage invocation of the given operation and return immediately. Assumes
+  // Request invocation of the given operation and return immediately. Assumes
   // that work_started() was previously called for the operation.
   ASIO_DECL void post_deferred_completion(operation* op);
 
-  // RequestMessage invocation of the given operations and return immediately. Assumes
+  // Request invocation of the given operations and return immediately. Assumes
   // that work_started() was previously called for each operation.
   ASIO_DECL void post_deferred_completions(op_queue<operation>& ops);
 

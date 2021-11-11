@@ -6,7 +6,6 @@ namespace GameKeeper
 	std::string HttpHandlerBase::PrintHeard()
 	{
 		std::stringstream ss;
-		ss << "\n================================\n";
 		auto iter = this->mHeardMap.begin();
 		for (; iter != this->mHeardMap.end(); iter++)
 		{
@@ -14,7 +13,6 @@ namespace GameKeeper
 			const std::string & val = iter->second;
 			ss << key << "=" << val << "\n";
 		}
-		ss << "================================\n";
 		return ss.str();
 	}
 #endif // __DEBUG__
@@ -24,6 +22,17 @@ namespace GameKeeper
         this->mHeardMap.clear();
         this->mContentLength = 0;
         memset(this->mHandlerBuffer, 0, 1024);
+    }
+
+    bool HttpHandlerBase::GetContentType(std::string &content)
+    {
+        auto iter = this->mHeardMap.find("Content-Type");
+        if(iter != this->mHeardMap.end())
+        {
+            content = iter->second;
+            return true;
+        }
+        return false;
     }
 
 	void HttpHandlerBase::ParseHeard(asio::streambuf & buf)

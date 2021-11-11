@@ -55,7 +55,7 @@ namespace GameKeeper
         auto component = this->GetComponent<RpcProtoComponent>();
         auto config = component->GetProtocolConfig(methodId);
         double second = (TimeHelper::GetMilTimestamp() - callHandler->GetCreateTime()) / 1000.f;
-        GKDebugLog("call " << config->ServiceName << "." << config->Method << " use time = " << second << "s");
+        GKDebugLog("call " << config->Service << "." << config->Method << " use time = " << second << "s");
 #endif
         this->mNumberPool.Push(rpcId);
         callHandler->Invoke(response);

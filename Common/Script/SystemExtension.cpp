@@ -1,13 +1,13 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
 #include <Scene/RpcResponseComponent.h>
-#include <Service/RpcRequestComponent.h>
+#include <Component/Scene/RpcRequestComponent.h>
 #include <Method/CallHandler.h>
 #include <Service/LuaServiceComponent.h>
 #include <Timer/LuaActionTimer.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include <Service/ServiceNodeComponent.h>
+#include <Service/NodeProxyComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/RpcProtoComponent.h>
 
@@ -32,7 +32,7 @@ int SystemExtension::Call(lua_State *lua)
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
 
-	ServiceNodeComponent * nodeComponent = App::Get().GetComponent<ServiceNodeComponent>();
+	NodeProxyComponent * nodeComponent = App::Get().GetComponent<NodeProxyComponent>();
 
 	NodeProxy * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
@@ -75,7 +75,7 @@ int SystemExtension::Call(lua_State *lua)
 //
 //		size_t size = 0;
 //		const char * json = lua_tolstring(lua, -1, &size);
-//		Message * message = MessagePool::NewByJson(config->RequestMessage, json, size);
+//		Message * message = MessagePool::NewByJson(config->Request, json, size);
 //		if (message != nullptr)
 //		{
 //			if (!packetMapper->SetMessage(message))

@@ -85,17 +85,17 @@ public:
   // Create a new strand_executor implementation.
   ASIO_DECL implementation_type create_implementation();
 
-  // RequestMessage invocation of the given function.
+  // Request invocation of the given function.
   template <typename Executor, typename Function, typename Allocator>
   static void dispatch(const implementation_type& impl, Executor& ex,
       ASIO_MOVE_ARG(Function) function, const Allocator& a);
 
-  // RequestMessage invocation of the given function and return immediately.
+  // Request invocation of the given function and return immediately.
   template <typename Executor, typename Function, typename Allocator>
   static void post(const implementation_type& impl, Executor& ex,
       ASIO_MOVE_ARG(Function) function, const Allocator& a);
 
-  // RequestMessage invocation of the given function and return immediately.
+  // Request invocation of the given function and return immediately.
   template <typename Executor, typename Function, typename Allocator>
   static void defer(const implementation_type& impl, Executor& ex,
       ASIO_MOVE_ARG(Function) function, const Allocator& a);

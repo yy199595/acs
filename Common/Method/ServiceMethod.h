@@ -39,10 +39,10 @@ namespace GameKeeper
 	class ServiceMethod
 	{
 	public:
-		ServiceMethod(const std::string name) : mName(name) {}
+		explicit ServiceMethod(const std::string name) : mName(name) {}
 	public:
 		virtual bool IsLuaMethod() = 0;
-        virtual void SetAddress(const std::string & address) { };
+        virtual void SetSocketId(long long id) { };
         virtual XCode Invoke(const com::Rpc_Request & request, std::string & response) = 0;
 		const std::string & GetName() { return this->mName; }
 	private:
@@ -60,7 +60,7 @@ namespace GameKeeper
 		ServiceMethod1(const std::string name, T * o, ServiceMethodType11<T> func)
 			: ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
 
         XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
@@ -87,7 +87,7 @@ namespace GameKeeper
 		ServiceMethod2(const std::string name, T * o, ServiceMethodType22<T, T1> func)
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, std::string & response) override
         {
             T1 *req = mReqMessagePool.Create();
@@ -120,7 +120,7 @@ namespace GameKeeper
 		ServiceMethod3(const std::string name, T * o, ServiceMethodType33<T, T1, T2> func)
 			: ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
             T1 * req = mReqMessagePool.Create();
@@ -161,7 +161,7 @@ namespace GameKeeper
 		ServiceMethod4(const std::string name, T * o, ServiceMethodType44<T, T1> func)
 			:ServiceMethod(name), _o(o), _objfunc(func) { }
 	public:
-        void SetAddress(const std::string & address) {_o->SetCurAddress(address); };
+        void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, std::string & response) override
 		{
             T1 * res = mResMessagePool.Create();

@@ -9,8 +9,8 @@ namespace GameKeeper
 {
 	bool LuaServiceMgrComponent::Awake()
 	{
-		LuaScriptComponent * scriptComponent = this->GetComponent<LuaScriptComponent>();
-		RpcProtoComponent * protoComponent = this->GetComponent<RpcProtoComponent>();
+		auto scriptComponent = this->GetComponent<LuaScriptComponent>();
+		auto protoComponent = this->GetComponent<RpcProtoComponent>();
 
 		string servicePath;
 		GKAssertRetFalse_F(protoComponent);
@@ -33,10 +33,10 @@ namespace GameKeeper
 				continue;
 			}
 		
-			ServiceComponent * localService = App::Get().GetComponent<ServiceComponent>(service);
+			auto localService = App::Get().GetComponent<ServiceComponent>(service);
 			if (localService == nullptr)
 			{
-				LuaServiceComponent * luaSerivce = new LuaServiceComponent();
+				auto luaSerivce = new LuaServiceComponent();
 				if (App::Get().AddComponent(service, localService))
 				{
 					GKDebugError("add service " << service << " failure");

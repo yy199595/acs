@@ -2,9 +2,9 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 #include "HttpPostRequest.h"
-#include <Network/NetworkHelper.h>
-#include <Network/Http/HttpLocalsession.h>
-#include<Network/Http/Content/HttpReadContent.h>
+#include <NetworkHelper.h>
+#include <Http/HttpLocalsession.h>
+#include<Http/Content/HttpReadContent.h>
 #include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {

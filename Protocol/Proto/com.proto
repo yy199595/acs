@@ -55,22 +55,11 @@ message Rpc
           uint32 RpcId = 2;
           int32 MethodId = 3;
           int64 SocketId = 4;
-          bytes MessageData = 5;
      }
      message Response
      {
           int32 Code = 1;
-          uint32 UserId = 2;
-          int32 RpcId = 3;
-          int32 MethodId = 5;
-          bytes MessageData = 4;
-     }
-     message ReqHead
-     {
-
-     }
-     message RespHead
-     {
-
+          uint32 RpcId = 2;
+          int64 UserId = 3;
      }
 }

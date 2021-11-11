@@ -2,27 +2,13 @@
 #pragma once
 
 #include<Service/LocalServiceComponent.h>
-#include<Network/Rpc/RpcClient.h>
+#include<Rpc/RpcClient.h>
 
 using namespace com;
 
 namespace GameKeeper
 {
     class NodeProxy;
-
-    struct ActionProxyInfo
-    {
-    public:
-        int mAreaId;                  //服务器组id
-        std::string mActionName;      //action名字
-        std::string mListenerAddress; //监听地址
-    public:
-        bool operator==(ActionProxyInfo &actionInfo) const
-        {
-            return this->mAreaId == actionInfo.mAreaId && this->mActionName == actionInfo.mActionName &&
-                   this->mListenerAddress == actionInfo.mListenerAddress;
-        }
-    };
 
     class ProxyService;
 

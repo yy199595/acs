@@ -1169,7 +1169,7 @@ public:
     /*! \pre IsObject() == true */
     MemberIterator MemberEnd()              { RAPIDJSON_ASSERT(IsObject()); return MemberIterator(GetMembersPointer() + data_.o.size); }
 
-    //! RequestMessage the object to have enough capacity to store members.
+    //! Request the object to have enough capacity to store members.
     /*! \param newCapacity  The capacity that the object at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
@@ -1605,7 +1605,7 @@ public:
     /*! \pre IsArray() == true */
     ConstValueIterator End() const { return const_cast<GenericValue&>(*this).End(); }
 
-    //! RequestMessage the array to have enough capacity to store elements.
+    //! Request the array to have enough capacity to store elements.
     /*! \param newCapacity  The capacity that the array at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.

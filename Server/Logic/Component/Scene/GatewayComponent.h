@@ -6,16 +6,16 @@ namespace GameKeeper
     class GatewayComponent : public Component
     {
     public:
-        GatewayComponent() {}
+        GatewayComponent() = default;
 
-        ~GatewayComponent() {}
+        ~GatewayComponent() final = default;
 
     protected:
         bool Awake() override;
     private:
         class GatewayService * mGateService;
         class RedisComponent * mRedisComponent;
-        class ServiceNodeComponent * mNodeComponent;
+        class NodeProxyComponent * mNodeComponent;
         class GameObjectComponent * mGameObjComponent;
     };
 }// namespace GameKeeper

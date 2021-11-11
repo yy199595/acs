@@ -2,8 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/NodeProxy.h>
-#include <Service/ServiceNodeComponent.h>
-#include <Service/RpcRequestComponent.h>
+#include <Service/NodeProxyComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
 namespace GameKeeper
 {
@@ -14,7 +13,7 @@ namespace GameKeeper
 		ServerConfig & config = App::Get().GetConfig();
 		this->mAreaId = App::Get().GetConfig().GetAreaId();
 		this->mNodeId = App::Get().GetConfig().GetNodeId();
-		GKAssertRetFalse_F(this->mNodeComponent = this->GetComponent<ServiceNodeComponent>());
+		GKAssertRetFalse_F(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
 		return true;
     }
 

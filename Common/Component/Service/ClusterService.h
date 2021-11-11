@@ -8,7 +8,7 @@ namespace GameKeeper
 
     class CoroutineComponent;
 
-    class ServiceNodeComponent;
+    class NodeProxyComponent;
 
     class ClusterService : public LocalServiceComponent
     {
@@ -29,6 +29,6 @@ namespace GameKeeper
     private:
         short mAreaId;
         short mNodeId;
-        ServiceNodeComponent * mNodeComponent;
+        NodeProxyComponent * mNodeComponent;
     };
 }

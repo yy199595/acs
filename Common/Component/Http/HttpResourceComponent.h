@@ -8,7 +8,7 @@
 namespace GameKeeper
 {
     class HttpRemoteSession;
-    class HttpResourceComponent : public HttpServiceComponent
+    class HttpResourceComponent : public HttpServiceComponent, public ILoadConfig
     {
     public:
         HttpResourceComponent() = default;
@@ -17,7 +17,8 @@ namespace GameKeeper
 		XCode Files(RapidJsonWriter & response);
 		HttpStatus Download(HttpRemoteSession * remoteSession);
     protected:
-        bool Awake() override;
+        bool Awake() final;
+        bool OnLoadConfig() final;
     private:
         std::unordered_map<std::string, std::string> mFileMd5Map;
     };

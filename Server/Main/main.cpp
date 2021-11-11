@@ -4,18 +4,18 @@
 #include <Timer/TimerComponent.h>
 
 #include <Coroutine/CoroutineComponent.h>
-#include <Network/Listener/TcpServerComponent.h>
+#include <Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Component/Scene/RpcComponent.h>
+#include <Scene/RpcComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Component/Scene/HttpComponent.h>
-#include <Network/Telnet/TelnetClientComponent.h>
+#include <Scene/HttpComponent.h>
+#include <Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
-#include <Service/RpcRequestComponent.h>
-#include <Service/ServiceNodeComponent.h>
+#include <Scene/RpcRequestComponent.h>
+#include <Service/NodeProxyComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Service/AccountService.h>
@@ -24,9 +24,10 @@
 #include <Service/GatewayService.h>
 #include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
-#include <HttpService/HttpResourceComponent.h>
+#include <Http/HttpResourceComponent.h>
 #include <Pool/StringPool.h>
 #include <Service/HttpLoginService.h>
+#include <Http/HttpOperComponent.h>
 using namespace GameKeeper;
 
 int main(int argc, char **argv)
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
 
     __register_component__(TaskPoolComponent);
     __register_component__(CoroutineComponent);
-    __register_component__(ServiceNodeComponent);
+    __register_component__(NodeProxyComponent);
     __register_component__(TcpServerComponent);
     __register_component__(RpcComponent);
     __register_component__(TelnetClientComponent);
@@ -64,7 +65,9 @@ int main(int argc, char **argv)
     __register_component__(ClusterService);
     __register_component__(GatewayService);
     __register_component__(HttpLoginService);
+    __register_component__(HttpOperComponent);
     __register_component__(HttpResourceComponent);
+
 
     App app(argc, argv);
     return app.Run();

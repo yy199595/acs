@@ -79,7 +79,7 @@ namespace GameKeeper
         if(!this->mHttpHandler->OnReceiveHead(streamBuf))
         {
 			this->mCode = XCode::HttpHeadParseFailure;         
-        }      
+        }
     }
 
     void HttpRemoteSession::SetCode(XCode code)

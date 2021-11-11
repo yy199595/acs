@@ -2,7 +2,7 @@
 
 
 #include <Object/Object.h>
-#include <Component/Service/ServiceNodeComponent.h>
+#include <Component/Service/NodeProxyComponent.h>
 namespace GameKeeper
 {
     class CallHandler;

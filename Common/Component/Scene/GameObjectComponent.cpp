@@ -32,11 +32,6 @@ namespace GameKeeper
 			}
 		}
 		this->mGameObjects.emplace(id, gameObject);
-        const std::string & address = gameObject->GetAddress();
-        if(!address.empty())
-        {
-            this->mAddressGameObjects.emplace(address, gameObject);
-        }
 		this->mCorComponent->StartCoroutine(&GameObjectComponent::StartComponents, this, components);
 		return true;
 	}
@@ -50,15 +45,6 @@ namespace GameKeeper
     bool GameObjectComponent::Del(GameObject * gameObject)
 	{
 		long long id = gameObject->GetId();
-        const std::string & address = gameObject->GetAddress();
-        if(!address.empty())
-        {
-            auto iter = this->mAddressGameObjects.find(address);
-            if(iter != this->mAddressGameObjects.end())
-            {
-                this->mAddressGameObjects.erase(iter);
-            }
-        }
 		return this->Del(id);
 	}
 	bool GameObjectComponent::Del(long long id)

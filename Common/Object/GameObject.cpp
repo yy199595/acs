@@ -3,15 +3,15 @@
 #include <Component/Component.h>
 namespace GameKeeper
 {
-    GameObject::GameObject(const long long id)
-        : mGameObjectId(id)
+    GameObject::GameObject(long long id)
+        : mGameObjectId(id), mSocketId(0)
     {
     }
 
-    GameObject::GameObject(const long long id, const std::string &address)
-        : mGameObjectId(id)
+    GameObject::GameObject(long long id, long long socketId)
+        : mGameObjectId(id), mSocketId(socketId)
     {
-        mSessionAddress = address;
+
     }
 
 
@@ -27,7 +27,7 @@ namespace GameKeeper
 		return this->AddComponent(name, component);
 	}
 
-	bool GameObject::AddComponent(const std::string name, Component * component)
+	bool GameObject::AddComponent(const std::string & name, Component * component)
 	{
 		if (component == nullptr)
 		{

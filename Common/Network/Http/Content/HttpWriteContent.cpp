@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2021/11/2.
 //
-#include "Network/Http/Content/HttpWriteContent.h"
+#include "Http/Content/HttpWriteContent.h"
 #ifdef __DEBUG__
 #include <Define/CommonDef.h>
 #endif // __DEBUG__
@@ -82,15 +82,9 @@ namespace GameKeeper
                 this->mFileSize = this->mFileStream.seekg(0, std::ios_base::end).tellg();
                 this->mFileStream.seekg(0, std::ios_base::beg);
             }
-
-            size_t pos = this->mPath.find_last_of('/\\');
-            if (pos != std::string::npos)
-            {
-                const std::string name = this->mPath.substr(pos + 1);
-                os << "Content-Disposition:" << "attachment;filename=" << name << "\r\n";
-            }
+            os << "Content-Path: " << this->mPath << "\r\n";
             os << "Content-Length: " << this->mFileSize << "\r\n";
-            os << "Content-Type:" << "application/octet-stream" << "\r\n";
+            os << "Content-Type:" << "multipart/form-data" << "\r\n";
         }
     }
 }

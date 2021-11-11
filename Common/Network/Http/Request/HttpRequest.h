@@ -4,7 +4,7 @@
 
 #ifndef GameKeeper_HTTPLOCALREQUEST_H
 #define GameKeeper_HTTPLOCALREQUEST_H
-#include <Network/Http/HttpHandlerBase.h>
+#include <Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
     class HttpLocalSession;

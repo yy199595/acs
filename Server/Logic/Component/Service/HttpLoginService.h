@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_HTTPLOGINSERVICE_H
 #define GAMEKEEPER_HTTPLOGINSERVICE_H
-#include <HttpService/HttpServiceComponent.h>
+#include <Http/HttpServiceComponent.h>
 namespace GameKeeper
 {
     class HttpLoginService : public HttpServiceComponent

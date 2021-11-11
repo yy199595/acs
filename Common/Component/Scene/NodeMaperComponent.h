@@ -21,7 +21,7 @@ namespace GameKeeper
 
     private:
         std::set<std::string> mServices;
-        class ServiceNodeComponent * mServiceNodeComponent;
+        class NodeProxyComponent * mNodeProxyComponent;
         std::unordered_map<std::string, int> mServiceMappers;
     };
 }

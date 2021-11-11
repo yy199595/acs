@@ -142,7 +142,7 @@ execution_context::service* service_registry::do_use_service(
     service = service->next_;
   }
 
-  // ServiceName was successfully initialised, pass ownership to registry.
+  // Service was successfully initialised, pass ownership to registry.
   new_service.ptr_->next_ = first_service_;
   first_service_ = new_service.ptr_;
   new_service.ptr_ = 0;

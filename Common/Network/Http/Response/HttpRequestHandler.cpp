@@ -33,18 +33,12 @@ namespace GameKeeper
         this->mHttpCode = code;
     }
 
-    void HttpRequestHandler::WriteHead(std::ostream &os)
-    {
-
-    }
-
-
     bool HttpRequestHandler::WriterToBuffer(std::ostream &os)
     {
         if (this->mWriteCount == 0)
         {
             HttpStatus code = this->mHttpCode;
-            os << HttpVersion << (int) code << " " << HttpStatusToString(code) << "\r\n";
+            os << HttpVersion << " " << (int) code << " " << HttpStatusToString(code) << "\r\n";
 
             auto iter = this->mHeardMap.begin();
             for (; iter != this->mHeardMap.end(); iter++)

@@ -762,7 +762,7 @@ class NodeQuery_Request :
 
   // accessors -------------------------------------------------------
 
-  // string ServiceName = 2;
+  // string Service = 2;
   void clear_servicename();
   static const int kServiceNameFieldNumber = 2;
   const ::std::string& servicename() const;
@@ -2214,46 +2214,46 @@ inline void NodeQuery_Request::set_areaid(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:s2s.NodeQuery.Request.AreaId)
 }
 
-// string ServiceName = 2;
+// string Service = 2;
 inline void NodeQuery_Request::clear_servicename() {
   servicename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& NodeQuery_Request::servicename() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_get:s2s.NodeQuery.Request.Service)
   return servicename_.GetNoArena();
 }
 inline void NodeQuery_Request::set_servicename(const ::std::string& value) {
   
   servicename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_set:s2s.NodeQuery.Request.Service)
 }
 #if LANG_CXX11
 inline void NodeQuery_Request::set_servicename(::std::string&& value) {
   
   servicename_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeQuery.Request.Service)
 }
 #endif
 inline void NodeQuery_Request::set_servicename(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   servicename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_set_char:s2s.NodeQuery.Request.Service)
 }
 inline void NodeQuery_Request::set_servicename(const char* value, size_t size) {
   
   servicename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_set_pointer:s2s.NodeQuery.Request.Service)
 }
 inline ::std::string* NodeQuery_Request::mutable_servicename() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_mutable:s2s.NodeQuery.Request.Service)
   return servicename_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* NodeQuery_Request::release_servicename() {
-  // @@protoc_insertion_point(field_release:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_release:s2s.NodeQuery.Request.Service)
   
   return servicename_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2264,7 +2264,7 @@ inline void NodeQuery_Request::set_allocated_servicename(::std::string* servicen
     
   }
   servicename_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), servicename);
-  // @@protoc_insertion_point(field_set_allocated:s2s.NodeQuery.Request.ServiceName)
+  // @@protoc_insertion_point(field_set_allocated:s2s.NodeQuery.Request.Service)
 }
 
 // -------------------------------------------------------------------

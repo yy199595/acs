@@ -30,9 +30,9 @@ namespace GameKeeper
 			luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 
 			const std::string & data = messageData.messagedata();
-			if (!config->RequestMessage.empty())
+			if (!config->Request.empty())
 			{
-				Message * message = MessagePool::NewByData(config->RequestMessage, data);
+				Message * message = MessagePool::NewByData(config->Request, data);
 				if (message == nullptr)
 				{
 					return XCode::ParseMessageError;
@@ -76,7 +76,7 @@ namespace GameKeeper
 			}
 			size_t size = 0;
 			const char * json = lua_tolstring(this->mLuaEnv, -1, &size);
-			Message * message = MessagePool::NewByJson(config->ResponseMessage, json, size);
+			Message * message = MessagePool::NewByJson(config->Response, json, size);
 			message->SerializeToString(&response);
 		}
 
@@ -86,8 +86,8 @@ namespace GameKeeper
 	XCode LuaServiceMethod::AsyncInvoke(const com::Rpc_Request &request)
 	{
 //		lua_State *coroutine = lua_newthread(this->mLuaEnv);
-//		int ref = this->mScriptComponent->GetLuaRef("ServiceName", "Invoke");
-//		//lua_getfunction(mLuaEnv, "ServiceName", "Invoke");
+//		int ref = this->mScriptComponent->GetLuaRef("Service", "Invoke");
+//		//lua_getfunction(mLuaEnv, "Service", "Invoke");
 //		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 //		//luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 //
@@ -117,10 +117,10 @@ namespace GameKeeper
 //		lua_pushlightuserdata(coroutine, request.New());
 //		lua_pushinteger(coroutine, request.userid());
 //		const ProtocolConfig * protocolConfig = this->mProtocolComponent->GetProtocolConfig(request.methodid());
-//		if (!protocolConfig->RequestMessage.empty())
+//		if (!protocolConfig->Request.empty())
 //		{
 //			const std::string & data = messageData->GetMsgBody();
-//			const std::string & name = protocolConfig->RequestMessage;
+//			const std::string & name = protocolConfig->Request;
 //
 //			Message * message = MessagePool::NewByData(name, data);
 //			if (message == nullptr)
@@ -155,7 +155,7 @@ namespace GameKeeper
 //		{
 //			size_t size = 0;
 //			const char * json = lua_tolstring(lua, 3, &size);
-//			const std::string & responseName = responseData->GetProConfig()->ResponseMessage;
+//			const std::string & responseName = responseData->GetProConfig()->Response;
 //			Message * message = MessagePool::NewByJson(responseName, json, size);
 //			if (message != nullptr)
 //			{

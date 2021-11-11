@@ -4,12 +4,12 @@
 
 #include "NodeMaperComponent.h"
 #include <Service/NodeProxy.h>
-#include <Service/ServiceNodeComponent.h>
+#include <Service/NodeProxyComponent.h>
 namespace GameKeeper
 {
     bool NodeMaperComponent::Awake()
     {
-        this->mServiceNodeComponent = this->GetComponent<ServiceNodeComponent>();
+        this->mNodeProxyComponent = this->GetComponent<NodeProxyComponent>();
         return true;
     }
 
@@ -28,7 +28,7 @@ namespace GameKeeper
         auto iter = this->mServiceMappers.find(service);
         if(iter == this->mServiceMappers.end())
         {
-            NodeProxy * node = this->mServiceNodeComponent->GetNodeByServiceName(service);
+            NodeProxy * node = this->mNodeProxyComponent->GetNodeByServiceName(service);
             if(node != nullptr)
             {
                 this->AddService(node);
@@ -37,6 +37,6 @@ namespace GameKeeper
             return nullptr;
         }
         const int uid = iter->second;
-        return this->mServiceNodeComponent->GetServiceNode(uid);
+        return this->mNodeProxyComponent->GetServiceNode(uid);
     }
 }

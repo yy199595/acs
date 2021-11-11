@@ -1,6 +1,6 @@
 #pragma once
 #include <XCode/XCode.h>
-#include <Network/SocketProxy.h>
+#include <SocketProxy.h>
 namespace GameKeeper
 {
     class HttpHandlerBase;

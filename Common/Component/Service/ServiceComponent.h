@@ -15,15 +15,12 @@ namespace GameKeeper
 	class ServiceComponent : public Component
 	{
 	public:
-		ServiceComponent() {}
+		ServiceComponent() = default;
 
-		virtual ~ServiceComponent() {}
+		virtual ~ServiceComponent() override = default;
 
 	public:
-
-		virtual void Start() {};
-		virtual bool Awake() { return true; }
-		virtual int GetPriority() { return 1000; }
+		int GetPriority() override { return 1000; }
 		virtual bool IsLuaService() { return false; };
 	
 	public:
@@ -33,10 +30,10 @@ namespace GameKeeper
 		bool AddMethod(ServiceMethod * method);
 		bool HasMethod(const std::string &method);
 		ServiceMethod * GetMethod(const std::string &method);
-        const std::string & GetCurAddress() { return this->mCurSessionAddress;}
-        void SetCurAddress(const std::string & address) { this->mCurSessionAddress = address;}
+        long long GetCurSocketId() const { return this->mCurSocketId;}
+        void SetCurSocketId(long long socketId) { this->mCurSocketId = socketId;}
 	private:
-        std::string mCurSessionAddress;
+        long long mCurSocketId;
 		std::unordered_map<std::string, ServiceMethod *> mMethodMap;
 		std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
 	};

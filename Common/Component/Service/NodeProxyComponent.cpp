@@ -1,4 +1,4 @@
-#include "ServiceNodeComponent.h"
+#include "NodeProxyComponent.h"
 
 #include <Core/App.h>
 #include <Service/NodeProxy.h>
@@ -7,7 +7,7 @@
 
 namespace GameKeeper
 {
-    bool ServiceNodeComponent::DelNode(int nodeId)
+    bool NodeProxyComponent::DelNode(int nodeId)
     {
         auto iter = this->mServiceNodeMap1.find(nodeId);
         if (iter != this->mServiceNodeMap1.end())
@@ -29,7 +29,7 @@ namespace GameKeeper
         return false;
     }
 
-	NodeProxy * ServiceNodeComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
+	NodeProxy * NodeProxyComponent::CreateNode(int areaId, int nodeId, std::string name, std::string address)
 	{
 		auto serviceNode = new NodeProxy(areaId, nodeId, name, address);
 		if (serviceNode != nullptr)
@@ -43,7 +43,7 @@ namespace GameKeeper
 		return serviceNode;
 	}
 
-    bool ServiceNodeComponent::Awake()
+    bool NodeProxyComponent::Awake()
     {
 		ServerConfig & ServerCfg = App::Get().GetConfig();
 		GKAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
@@ -53,13 +53,13 @@ namespace GameKeeper
         return true;
     }
 
-    void ServiceNodeComponent::Start()
+    void NodeProxyComponent::Start()
     {
         const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
         this->CreateNode(0, 0, "Center", centerAddress)->AddService("CenterService");
     }
 
-	void ServiceNodeComponent::OnSecondUpdate()
+	void NodeProxyComponent::OnSecondUpdate()
 	{
 		auto iter = this->mServiceNodeArray.begin();
 		for (; iter != this->mServiceNodeArray.end();)
@@ -76,7 +76,7 @@ namespace GameKeeper
 		}
 	}
 
-    NodeProxy *ServiceNodeComponent::GetServiceNode(const int nodeId)
+    NodeProxy *NodeProxyComponent::GetServiceNode(const int nodeId)
     {
         auto iter = this->mServiceNodeMap1.find(nodeId);
         if (iter != this->mServiceNodeMap1.end())
@@ -91,7 +91,7 @@ namespace GameKeeper
         return nullptr;
     }
 
-    NodeProxy *ServiceNodeComponent::GetServiceNode(const std::string &address)
+    NodeProxy *NodeProxyComponent::GetServiceNode(const std::string &address)
     {
         auto iter = this->mServiceNodeMap2.find(address);
         if (iter != this->mServiceNodeMap2.end())
@@ -105,7 +105,7 @@ namespace GameKeeper
         return nullptr;
     }
 
-    NodeProxy *ServiceNodeComponent::GetNodeByNodeName(const std::string &nodeName)
+    NodeProxy *NodeProxyComponent::GetNodeByNodeName(const std::string &nodeName)
     {
         for (NodeProxy *serviceNode : this->mServiceNodeArray)
         {
@@ -119,7 +119,7 @@ namespace GameKeeper
         return nullptr;
     }
 
-	NodeProxy *ServiceNodeComponent::GetNodeByServiceName(const std::string &service)
+	NodeProxy *NodeProxyComponent::GetNodeByServiceName(const std::string &service)
     {
         for (NodeProxy *serviceNode: this->mServiceNodeArray)
         {

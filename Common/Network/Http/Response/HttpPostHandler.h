@@ -5,10 +5,11 @@
 #ifndef GAMEKEEPER_HTTPPOSTHANDLER_H
 #define GAMEKEEPER_HTTPPOSTHANDLER_H
 #include "HttpRequestHandler.h"
-#include <Network/Http/Content/HttpReadContent.h>
+#include <Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
     class HttpComponent;
+    class HttpReadContent;
     class HttpPostHandler : public HttpRequestHandler
     {
     public:
@@ -18,13 +19,14 @@ namespace GameKeeper
         void Clear() final;
         const std::string & GetPath() final;
         bool OnReceiveHead(asio::streambuf & buf) final;
-        size_t ReadFromStream(std::string & stringBuf) final;
         bool OnReceiveBody(asio::streambuf &streamBuf) final;
+        HttpReadContent * GetContent() final { return this->mContent; }
         HttpMethodType GetType() final { return HttpMethodType::POST; }
+
     private:
 		std::string mPath;
-		size_t mDataLength;
 		std::string mVersion;
+        HttpReadContent * mContent;
     };
 }
 #endif //GAMEKEEPER_HTTPPOSTHANDLER_H

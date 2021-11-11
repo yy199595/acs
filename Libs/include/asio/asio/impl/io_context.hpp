@@ -34,7 +34,7 @@ namespace asio {
 template <typename Service>
 inline Service& use_service(io_context& ioc)
 {
-  // Check that ServiceName meets the necessary type requirements.
+  // Check that Service meets the necessary type requirements.
   (void)static_cast<execution_context::service*>(static_cast<Service*>(0));
   (void)static_cast<const execution_context::id*>(&Service::id);
 

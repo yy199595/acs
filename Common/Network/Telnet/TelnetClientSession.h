@@ -1,7 +1,7 @@
 #pragma once
 
 #include <istream>
-#include <Network/SocketProxy.h>
+#include <SocketProxy.h>
 namespace GameKeeper
 {
 	class TelnetClientComponent;

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<XCode/XCode.h>
 #include <Define/CommonDef.h>
-#include <Network/SocketProxy.h>
+#include <SocketProxy.h>
 #define TCP_BUFFER_COUNT 1024
 
 namespace GameKeeper

@@ -5,7 +5,7 @@
 #include<Scene/TaskPoolComponent.h>
 
 #include<Thread/TaskThread.h>
-#include<Network/Listener/NetworkListener.h>
+#include<Listener/NetworkListener.h>
 namespace GameKeeper
 {
     bool TcpServerComponent::Awake()

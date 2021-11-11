@@ -7,16 +7,16 @@ namespace GameKeeper
     class GameObject : public Object
     {
     public:
-        GameObject(const long long id);
+        GameObject(long long id);
 
-        GameObject(const long long id, const std::string &address);
+        GameObject(long long id, long long socketId);
 
-        virtual ~GameObject() {};
+        virtual ~GameObject() = default;
     public:
         template<typename T>
         inline bool AddComponent();
 		bool AddComponent(const std::string & name);
-		bool AddComponent(const std::string name, Component * component);
+		bool AddComponent(const std::string & name, Component * component);
 		
         template<typename T>
         inline T *GetComponent() const;
@@ -39,11 +39,11 @@ namespace GameKeeper
         void GetComponents(std::vector<Component *> & components) const;
     public:
 		inline long long GetId() const { return this->mGameObjectId; }
-        inline const std::string &GetAddress() { return this->mSessionAddress; }
+        inline long long GetSocketId() const { return this->mSocketId; }
 
     private:
+        long long mSocketId;
         long long mGameObjectId;
-        std::string mSessionAddress;    
         std::unordered_map<std::string, Component *> mComponentMap;
     };
     template<typename T>

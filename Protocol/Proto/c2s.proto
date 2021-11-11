@@ -9,6 +9,21 @@ message ServerInfo
     int32 ServerState = 3;
 }
 
+message Rpc
+{
+    message Request
+    {
+        int64 RpcId = 1;
+        string MethodName = 2;
+        uint16 MessageIndex = 3;
+    }
+    message Response
+    {
+        int32 Code = 1;
+        int64 RpcId = 2;
+    }
+}
+
 message AccountLogin
 {
     message Request

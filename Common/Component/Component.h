@@ -68,6 +68,8 @@ namespace GameKeeper
         template<typename T>
         T * GetComponent(const std::string & name);
 
+        void GetComponents(std::vector<Component *> & components);
+
         Component * GetByName(const std::string & name);
 	private:
 		Component * GetByHash(size_t hash);

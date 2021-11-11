@@ -407,7 +407,7 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "NodeInfo\022\013\n\003Uid\030\001 \001(\005\022\017\n\007Address\030\002 \001(\t\022\022"
   "\n\nServerName\030\003 \001(\t\022\020\n\010Services\030\004 \003(\t\"i\n\t"
   "NodeQuery\032.\n\007Request\022\016\n\006AreaId\030\001 \001(\005\022\023\n\013"
-  "ServiceName\030\002 \001(\t\032,\n\010Response\022 \n\tNodeInf"
+  "Service\030\002 \001(\t\032,\n\010Response\022 \n\tNodeInf"
   "os\030\001 \003(\0132\r.s2s.NodeInfo\"x\n\nMysqlQuery\0328\n"
   "\007Request\022\024\n\014ProtocolName\030\001 \001(\t\022\027\n\017Protoc"
   "olMessage\030\002 \001(\014\0320\n\010Response\022\020\n\010ErrotStr\030"
@@ -2002,12 +2002,12 @@ const char* NodeQuery_Request::_InternalParse(const char* begin, const char* end
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string ServiceName = 2;
+      // string Service = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.ServiceName");
+        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.Service");
         object = msg->mutable_servicename();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -2065,7 +2065,7 @@ bool NodeQuery_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // string ServiceName = 2;
+      // string Service = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
@@ -2073,7 +2073,7 @@ bool NodeQuery_Request::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->servicename().data(), static_cast<int>(this->servicename().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeQuery.Request.ServiceName"));
+            "s2s.NodeQuery.Request.Service"));
         } else {
           goto handle_unusual;
         }
@@ -2112,12 +2112,12 @@ void NodeQuery_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
   }
 
-  // string ServiceName = 2;
+  // string Service = 2;
   if (this->servicename().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->servicename().data(), static_cast<int>(this->servicename().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.ServiceName");
+      "s2s.NodeQuery.Request.Service");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       2, this->servicename(), output);
   }
@@ -2140,12 +2140,12 @@ void NodeQuery_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
   }
 
-  // string ServiceName = 2;
+  // string Service = 2;
   if (this->servicename().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->servicename().data(), static_cast<int>(this->servicename().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.ServiceName");
+      "s2s.NodeQuery.Request.Service");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->servicename(), target);
@@ -2172,7 +2172,7 @@ size_t NodeQuery_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string ServiceName = 2;
+  // string Service = 2;
   if (this->servicename().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(

@@ -24,13 +24,13 @@ namespace GameKeeper
     {
         std::string queryData;
         const std::string & token = request.token();
-        const std::string address = this->GetCurAddress();
+        long long socketId  = this->GetCurSocketId();
         if(!this->mRedisComponent->GetValue(token,queryData))
         {
             return XCode::Failure;
         }
         long long userId = std::stoll(queryData);
-        GameObject * gameObject = new GameObject(userId, address);
+        auto gameObject = new GameObject(userId, socketId);
         if(!this->mGameObjComponent->Add(gameObject))
         {
             return XCode::Failure;
@@ -43,12 +43,6 @@ namespace GameKeeper
 
     XCode GatewayService::Logout(long long id, c2s::GateLogout_Request & request)
     {
-        const std::string address = this->GetCurAddress();
-        GameObject * gameObject = this->mGameObjComponent->Find(address);
-        if(gameObject == nullptr)
-        {
-            return XCode::Failure;
-        }
         this->mGameObjComponent->Del(gameObject);
         return XCode::Successful;
     }

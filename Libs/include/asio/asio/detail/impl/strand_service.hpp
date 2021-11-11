@@ -89,7 +89,7 @@ void strand_service::dispatch(strand_service::implementation_type& impl,
   }
 }
 
-// RequestMessage the io_context to invoke the given handler and return immediately.
+// Request the io_context to invoke the given handler and return immediately.
 template <typename Handler>
 void strand_service::post(strand_service::implementation_type& impl,
     Handler& handler)

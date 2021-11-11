@@ -4,12 +4,12 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICEMETHOD_H
 #define GAMEKEEPER_HTTPSERVICEMETHOD_H
-#include <Network/Http/Http.h>
+#include <Http/Http.h>
 #include <Util/JsonHelper.h>
-#include <Network/Http/Content/HttpReadContent.h>
-#include <Network/Http/HttpRemoteSession.h>
-#include <Network/Http/Response/HttpRequestHandler.h>
-#include<Network/Http/Content/HttpWriteContent.h>
+#include <Http/Content/HttpReadContent.h>
+#include <Http/HttpRemoteSession.h>
+#include <Http/Response/HttpRequestHandler.h>
+#include<Http/Content/HttpWriteContent.h>
 #include <Util/TimeHelper.h>
 namespace GameKeeper
 {
@@ -54,15 +54,15 @@ namespace GameKeeper
     public:
 		HttpStatus Invoke(HttpRemoteSession *session) override
         {
-            const std::string & json = session->GetReuqestHandler()->GetParamater();
+            auto requestHandler = session->GetReuqestHandler();
+            auto content = dynamic_cast<HttpReadStringContent *>(requestHandler->GetContent());
 
             RapidJsonReader jsonReader;
             auto jsonWriter = new HttpJsonContent();
-            XCode code = !jsonReader.TryParse(json)
+            XCode code = !jsonReader.TryParse(content->GetContent())
                          ? XCode::ParseJsonFailure : (_o->*_func)(jsonReader, *jsonWriter);
 
             jsonWriter->Add("code", code);
-            HttpRequestHandler *requestHandler = session->GetReuqestHandler();
             requestHandler->SetResponseContent(jsonWriter);
             return HttpStatus::OK;
         }

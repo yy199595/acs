@@ -17,6 +17,7 @@ include_directories(${PROJECT_SOURCE_DIR}/DB)
 include_directories(${PROJECT_SOURCE_DIR}/Logic)
 include_directories(${PROJECT_COMMON_DIR}/Common)
 include_directories(${PROJECT_COMMON_DIR}/Protocol)
+include_directories(${PROJECT_COMMON_DIR}/Common/Network)
 
 include_directories(${PROJECT_SOURCE_DIR}/DB/Component)
 include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)

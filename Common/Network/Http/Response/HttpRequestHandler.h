@@ -32,11 +32,10 @@ namespace GameKeeper
         bool AddResponseHeard(const std::string &key, const std::string &val);
 
         virtual const std::string & GetPath() = 0;
-
-        virtual size_t ReadFromStream(std::string & stringBuf) = 0;
-
+        
         virtual bool OnReceiveBody(asio::streambuf & streamBuf) = 0;
 
+        virtual HttpReadContent * GetContent() = 0;
 #ifdef __DEBUG__
         long long GetStartTime() const { return this->mStartTime;}
 #endif
@@ -50,15 +49,9 @@ namespace GameKeeper
 
         const std::string & GetComponent() const { return this->mComponent;}
 
-        const std::string & GetParamater() const { return this->mParamater;}
-
-    private:
-         void WriteHead(std::ostream & os);
-         bool WriteBody(std::ostream & os);
     protected:
         std::string mMethod;
         std::string mComponent;
-        std::string mParamater;
         HttpComponent *mHttpComponent;
 		//const HttpServiceConfig * mHttpConfig;
     private:
@@ -68,7 +61,6 @@ namespace GameKeeper
         int mWriteCount;
         HttpStatus mHttpCode;
 		std::string mVersion;
-
         HttpWriteContent * mResponseContent;
         std::unordered_map<std::string, std::string> mHeardMap;
     };

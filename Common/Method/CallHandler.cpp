@@ -21,10 +21,10 @@ namespace GameKeeper
         auto config = component->GetProtocolConfig(methodId);
 		lua_pushinteger(this->mCoroutine, (int)response.code());
 
-        if(!config->ResponseMessage.empty())
+        if(!config->Response.empty())
         {
             const std::string & data = response.messagedata();
-            Message * messageData = MessagePool::NewByData(config->ResponseMessage, data);
+            Message * messageData = MessagePool::NewByData(config->Response, data);
             if(messageData != nullptr)
             {
                 std::string json;

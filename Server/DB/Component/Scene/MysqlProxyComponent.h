@@ -37,7 +37,7 @@ namespace GameKeeper
         std::string mMessageBuffer;
         class CoroutineComponent *mCorComponent;
 
-        class ServiceNodeComponent *mNodeManager;
+        class NodeProxyComponent *mNodeComponent;
 
         ObjectPool<s2s::MysqlOper_Request> mMysqlOperReqPool;
         ObjectPool<s2s::MysqlOper_Response> mMysqlOperResPool;

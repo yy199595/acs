@@ -43,7 +43,7 @@ public:
   /// address and no name resolution should be attempted.
   static const flags numeric_host = implementation_defined;
 
-  /// ServiceName name should be treated as a numeric string defining a port number
+  /// Service name should be treated as a numeric string defining a port number
   /// and no name resolution should be attempted.
   static const flags numeric_service = implementation_defined;
 

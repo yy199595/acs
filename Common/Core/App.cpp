@@ -3,8 +3,8 @@
 #include <Scene/RpcResponseComponent.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Component/Scene/RpcComponent.h>
-#include <Service/ServiceNodeComponent.h>
-#include <Service/RpcRequestComponent.h>
+#include <Service/NodeProxyComponent.h>
+#include <Component/Scene/RpcRequestComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include<Util/DirectoryHelper.h>
 using namespace GameKeeper;
@@ -53,7 +53,7 @@ namespace GameKeeper
 		this->AddComponent<CoroutineComponent>();
 		this->AddComponent<RpcComponent>();
 
-		this->AddComponent<ServiceNodeComponent>();
+		this->AddComponent<NodeProxyComponent>();
 		this->AddComponent<RpcRequestComponent>();
 
 		this->mTimerComponent = this->GetComponent<TimerComponent>();

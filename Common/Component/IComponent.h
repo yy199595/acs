@@ -40,6 +40,12 @@ namespace GameKeeper
         virtual void OnLodaData() = 0;
     };
 
+    class ILoadConfig
+    {
+    public:
+        virtual bool OnLoadConfig() = 0;
+    };
+
     class IZeroRefresh
     {
     public:

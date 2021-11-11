@@ -9,7 +9,7 @@ namespace GameKeeper
     {
         this->mMysqlProxyNodeId = -1;
 		this->mCorComponent = App::Get().GetCorComponent();
-        GKAssertRetFalse_F(this->mNodeManager = this->GetComponent<ServiceNodeComponent>());
+        GKAssertRetFalse_F(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
 
         return true;
     }
@@ -31,10 +31,10 @@ namespace GameKeeper
 
     NodeProxy *MysqlProxyComponent::GetServiceNode()
     {
-        NodeProxy *proxyNode = this->mNodeManager->GetServiceNode(this->mMysqlProxyNodeId);
+        NodeProxy *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlProxyNodeId);
         if (proxyNode == nullptr)
         {
-            proxyNode = this->mNodeManager->GetNodeByServiceName("MysqlService");
+            proxyNode = this->mNodeComponent->GetNodeByServiceName("MysqlService");
             this->mMysqlProxyNodeId = proxyNode != nullptr ? proxyNode->GetNodeUId() : -1;
             return proxyNode;
         }

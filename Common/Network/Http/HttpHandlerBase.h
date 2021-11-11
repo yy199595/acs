@@ -23,6 +23,7 @@ namespace GameKeeper
 	protected:
 		void ParseHeard(asio::streambuf & buf);
 	public:
+        bool GetContentType(std::string & content);
 		size_t GetContentLength() const { return this->mContentLength; }
 		bool GetHeardData(const std::string & key, std::string & value);
 	private:

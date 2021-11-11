@@ -5,7 +5,7 @@
 #include <Util/StringHelper.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Scene/TaskPoolComponent.h>
-#include <Service/RpcRequestComponent.h>
+#include <Component/Scene/RpcRequestComponent.h>
 #include <Network/Rpc/RpcConnector.h>
 #ifdef __DEBUG__
 #include <Pool/MessagePool.h>
@@ -118,10 +118,10 @@ namespace GameKeeper
 #ifdef __DEBUG__
             std::string json;
             const std::string & data = this->mRequestData.messagedata();
-            const std::string method = config->ServiceName + "." + config->Method;
-            if(!config->RequestMessage.empty())
+            const std::string method = config->Service + "." + config->Method;
+            if(!config->Request.empty())
             {
-               Message * msg = MessagePool::NewByData(config->RequestMessage, data);
+               Message * msg = MessagePool::NewByData(config->Request, data);
                util::MessageToJsonString(*msg, &json);
             }
             GKDebugLog("[request " << method << "] json = " << json);
@@ -145,10 +145,10 @@ namespace GameKeeper
 #ifdef __DEBUG__
             std::string json;
             const std::string & data = this->mRequestData.messagedata();
-            const std::string method = config->ServiceName + "." + config->Method;
-            if(!config->ResponseMessage.empty())
+            const std::string method = config->Service + "." + config->Method;
+            if(!config->Response.empty())
             {
-                Message * msg = MessagePool::NewByData(config->ResponseMessage, data);
+                Message * msg = MessagePool::NewByData(config->Response, data);
                 util::MessageToJsonString(*msg, &json);
             }
             GKDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);

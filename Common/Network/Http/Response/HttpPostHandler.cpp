@@ -6,14 +6,13 @@
 #include <Core/App.h>
 #include <Network/Http/HttpRemoteSession.h>
 #include <Component/Scene/HttpComponent.h>
-#include <Scene/RpcProtoComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
     HttpPostHandler::HttpPostHandler(HttpComponent *component)
         : HttpRequestHandler(component)
     {
-
+        this->mContent = nullptr;
     }
 
     const std::string &HttpPostHandler::GetPath()
@@ -25,18 +24,51 @@ namespace GameKeeper
     {
         this->mPath.clear();
         this->mVersion.clear();
-        this->mParamater.clear();
+        delete this->mContent;
+        this->mContent = nullptr;
         HttpRequestHandler::Clear();
     }
 
 	bool HttpPostHandler::OnReceiveHead(asio::streambuf &streamBuf)
-	{
-		std::istream is(&streamBuf);
-		is >> this->mPath >> this->mVersion;
+    {
+        std::istream is(&streamBuf);
+        is >> this->mPath >> this->mVersion;
         this->ParseHeard(streamBuf);
 
+        std::string content;
+        if (this->GetContentType(content))
+        {
+            if (content.find("text/plain") != std::string::npos ||
+                content.find("applocation/json") != std::string::npos)
+            {
+                this->mContent = new HttpReadStringContent();
+            }
+            else if (content.find("multipart/form-data"))
+            {
+                std::string fullPath;
+                if(!this->GetHeardData("Content-Path", fullPath))
+                {
+                    return false;
+                }
+                auto fileContent = new HttpReadFileContent(fullPath);
+                if (!fileContent->OpenFile())
+                {
+                    delete fileContent;
+                    GKDebugError("not open file " << fullPath);
+                    return false;
+                }
+                this->mContent = fileContent;
+            }
+        }
+        if (this->mContent == nullptr)
+        {
+            return false;
+        }
+
         const std::string app = "App/";
-        size_t pos1 = this->mPath.find(app) + app.length();
+        size_t pos1 = this->mPath.find(app);
+        GKAssertRetFalse_F(pos1 != std::string::npos);
+        pos1 = pos1 + app.length();
         size_t pos2 = this->mPath.find('/', pos1 + 1);
         GKAssertRetFalse_F(pos2 != std::string::npos);
 
@@ -44,13 +76,20 @@ namespace GameKeeper
         this->mComponent = this->mPath.substr(pos1, pos2 - pos1);
         GKDebugLog("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
 
-        while(streamBuf.size() > 0)
+        while (streamBuf.size() > 0)
         {
-           size_t size = is.readsome(this->mHandlerBuffer, 1024);
-           this->mParamater.append(this->mHandlerBuffer, size);
+            size_t size = is.readsome(this->mHandlerBuffer, 1024);
+            this->mContent->OnReadContent(this->mHandlerBuffer, size);
         }
-		return true;
-	}
+#ifdef __DEBUG__
+        std::stringstream sss;
+        sss << "\n========== http post ==========\n";
+        sss << this->PrintHeard();
+        sss << "==================================";
+        GKDebugInfo(sss.str());
+#endif
+        return true;
+    }
 
     bool HttpPostHandler::OnReceiveBody(asio::streambuf &streamBuf)
     {
@@ -58,25 +97,17 @@ namespace GameKeeper
         while(streamBuf.size() > 0)
         {
             size_t size = is.readsome(this->mHandlerBuffer, 1024);
-            this->mParamater.append(this->mHandlerBuffer, size);
+            this->mContent->OnReadContent(this->mHandlerBuffer, size);
         }
-        if(this->mParamater.size() >= HttpPostMaxCount)
+        if(dynamic_cast<HttpReadStringContent *>(this->mContent))
         {
-            GKDebugError("http post data failure");
-            return false;
+            if (this->mContent->GetContentSize() >= HttpPostMaxCount)
+            {
+                GKDebugError("http post data failure");
+                return false;
+            }
         }
-        return this->mParamater.size() == this->GetContentLength();
-    }
-
-    size_t HttpPostHandler::ReadFromStream(std::string & stringBuf)
-    {
-        if(!this->mParamater.empty())
-        {
-            stringBuf.append(this->mParamater);
-            this->mParamater.clear();
-            return stringBuf.size();
-        }
-        return 0;
+        return this->mContent->GetContentSize() == this->GetContentLength();
     }
 }
 

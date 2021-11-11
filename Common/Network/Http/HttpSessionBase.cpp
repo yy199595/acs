@@ -2,7 +2,7 @@
 #include <Define/CommonDef.h>
 #include <istream>
 #include <Util/TimeHelper.h>
-#include <Network/Http/HttpHandlerBase.h>
+#include <Http/HttpHandlerBase.h>
 namespace GameKeeper
 {
     HttpSessionBase::HttpSessionBase()

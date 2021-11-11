@@ -71,7 +71,7 @@ public:
   std::string message(int value) const
   {
     if (value == error::service_not_found)
-      return "ServiceName not found";
+      return "Service not found";
     if (value == error::socket_type_not_supported)
       return "Socket type not supported";
     return "asio.addrinfo error";

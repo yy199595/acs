@@ -23,4 +23,10 @@ namespace GameKeeper
     {
         return this->gameObject->GetComponentByName(name);
     }
+
+    void Component::GetComponents(std::vector<Component *> &components)
+    {
+        this->gameObject->GetComponents(components);
+    }
+
 }

@@ -14,7 +14,7 @@ namespace GameKeeper
         virtual ~HttpReadContent() = default;
 
     public:
-        virtual const std::string & GetContent() = 0;
+        virtual size_t GetContentSize() = 0;
         virtual void OnReadContent(const char * data, size_t size) = 0;
     };
 }
@@ -28,8 +28,9 @@ namespace GameKeeper
         explicit HttpReadStringContent(std::string & response);
         ~HttpReadStringContent() final;
     public:
+        const std::string & GetContent() { return *mResponse;}
         void OnReadContent(const char *data, size_t size) override;
-        const std::string & GetContent() final { return *mResponse;}
+        size_t GetContentSize() final { return this->mResponse->size(); }
     private:
         bool mIsDelete;
         std::string * mResponse;
@@ -46,9 +47,10 @@ namespace GameKeeper
     public:
         bool OpenFile();
         const std::string & GetPaht() { return this->mPath;}
-        const std::string & GetContent() override { return this->mPath; }
+        size_t GetContentSize() final { return this->mFileSize;}
         void OnReadContent(const char *data, size_t size) override;
     private:
+        size_t mFileSize;
         const std::string & mPath;
         std::ofstream mFileStream;
     };

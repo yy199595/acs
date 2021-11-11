@@ -5,17 +5,16 @@
 #include <Thread/TaskThread.h>
 #include "Component/Scene/HttpComponent.h"
 #include <Coroutine/CoroutineComponent.h>
-#include <Network/Http/HttpRemoteSession.h>
+#include <Http/HttpRemoteSession.h>
 #include "Component/Scene/TaskPoolComponent.h"
-#include <Network/Http/Request/HttpGetRequest.h>
-#include <Network/Http/Request/HttpPostRequest.h>
+#include <Http/Request/HttpGetRequest.h>
+#include <Http/Request/HttpPostRequest.h>
 #include <Method/HttpServiceMethod.h>
-#include <Network/Http/Content/HttpWriteContent.h>
-#include <Network/Http/Response/HttpGettHandler.h>
-#include <Network/Http/Response/HttpPostHandler.h>
-#include <HttpService/HttpServiceComponent.h>
+#include <Http/Content/HttpWriteContent.h>
+#include <Http/Response/HttpPostHandler.h>
+#include <Http/HttpServiceComponent.h>
 #include <Other/ProtocolConfig.h>
-#include<Network/Http/HttpLocalsession.h>
+#include<Http/HttpLocalsession.h>
 namespace GameKeeper
 {
 
@@ -36,14 +35,14 @@ namespace GameKeeper
 
         //GKDebugFatal(code << "\n" << json.size());
 
-        HttpJsonContent jsonContent;
-		HttpReadStringContent stringContent;
-		jsonContent.Add("account", "646585122@qq.com");
-		jsonContent.Add("password", "11223344566");
-		while (true)
-		{
-			this->Post("http://127.0.0.1:80/app/account/login?{}", jsonContent, stringContent, 5);
-		}
+//        HttpJsonContent jsonContent;
+//		HttpReadStringContent stringContent;
+//		jsonContent.Add("account", "646585122@qq.com");
+//		jsonContent.Add("password", "11223344566");
+//		while (true)
+//		{
+//			this->Post("http://127.0.0.1:80/App/HttpLoginService/Login", jsonContent, stringContent, 5);
+//		}
        
 
 		//GKDebugInfo(json);

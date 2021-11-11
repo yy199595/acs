@@ -6,11 +6,11 @@ namespace GameKeeper
 {
     class NodeProxy;
 
-    class ServiceNodeComponent : public Component, public ISecondUpdate
+    class NodeProxyComponent : public Component, public ISecondUpdate
     {
     public:
-        ServiceNodeComponent() = default;
-        ~ServiceNodeComponent() override = default;
+        NodeProxyComponent() = default;
+        ~NodeProxyComponent() override = default;
 
     public:
         bool DelNode(int nodeId);

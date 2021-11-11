@@ -150,7 +150,7 @@ namespace GameKeeper
         if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
         {
             lua_pcall(mLuaEnv, 0, 1, errfunc);
-            GKDebugLog("load lua script success path :" << filePath);
+            //GKDebugLog("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
 			return true;
         }

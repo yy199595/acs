@@ -4,7 +4,7 @@
 
 #include "HttpRequest.h"
 #include <Define/CommonDef.h>
-#include <Network/NetworkHelper.h>
+#include <NetworkHelper.h>
 namespace GameKeeper
 {
     HttpRequest::HttpRequest(HttpComponent *component)

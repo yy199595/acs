@@ -6,7 +6,7 @@
 #include <Define/CommonDef.h>
 #include <Core/App.h>
 #include <Scene/RpcProtoComponent.h>
-#include <Network/Http/HttpRemoteSession.h>
+#include <Http/HttpRemoteSession.h>
 #include <Component/Scene/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
@@ -37,7 +37,8 @@ namespace GameKeeper
     {
         this->mPath.clear();
         this->mVersion.clear();
-        this->mParamater.clear();
+        delete this->mContent;
+        this->mContent = nullptr;
         HttpRequestHandler::Clear();
     }
 
@@ -59,29 +60,33 @@ namespace GameKeeper
         size_t pos2 = url.find('/', pos1 + 1);
         GKAssertRetFalse_F(pos2 != std::string::npos);
 
-        size_t pos3 = url.find('/', pos2 + 1);
+        size_t pos3 = url.find('?', pos2 + 1);
         if(pos3 == std::string::npos)
         {
-            pos3 = url.find('?', pos2 + 1);
+            pos3 = url.find('/', pos2 + 1);
         }
         if(pos3 != std::string::npos)
         {
-            this->mParamater = url.substr(pos3 + 1);
+            size_t size = url.size() - (pos3 + 1);
+            this->mContent = new HttpReadStringContent();
+            this->mContent->OnReadContent(url.c_str() + pos3 + 1, size);
         }
         this->mComponent = url.substr(pos1, pos2 - pos1);
         this->mMethod = url.substr(pos2 + 1, pos3 - pos2 - 1);
-        GKDebugLog("[http GET] " << this->mComponent << "." << this->mMethod << " data " << this->mParamater);
+        GKDebugLog("[http GET] " << this->mComponent << "." << this->mMethod);
+
+#ifdef __DEBUG__
+        std::stringstream sss;
+        sss << "\n==========  http get  ==========\n";
+        sss << this->PrintHeard();
+        sss << "==================================\n";
+        GKDebugInfo(sss.str());
+#endif
         return true;
     }
 
-    size_t HttpGettHandler::ReadFromStream(std::string & stringBuf)
+    HttpReadContent *HttpGettHandler::GetContent()
     {
-        if(!this->mParamater.empty())
-        {
-            stringBuf.append(this->mParamater);
-            this->mParamater.clear();
-            return stringBuf.size();
-        }
-        return 0;
+        return this->mContent;
     }
 }
