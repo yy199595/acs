@@ -40,15 +40,6 @@ namespace GameKeeper
 		}
 	}
 
-	void RpcComponent::OnReceiveMessage(RpcClient * session, string * message)
-	{
-		if (!this->OnReceive(session, *message))
-		{
-			session->StartClose();
-		}
-		GStringPool.Destory(message);
-	}
-
     void RpcComponent::OnSendMessageAfter(RpcClient *session, std::string * message, XCode code)
     {
 #ifdef __DEBUG__
@@ -95,68 +86,38 @@ namespace GameKeeper
         }
 	}
 
-
-	bool RpcComponent::OnReceive(RpcClient *session, const std::string & message)
-	{
-        const char * body = message.c_str() + 1;
-        const size_t bodySize = message.size() - 1;
-        const std::string & address = session->GetAddress();
-		auto messageType = (DataMessageType)message.at(0);
-		if (messageType == DataMessageType::TYPE_REQUEST)
+    void RpcComponent::OnRequest(RpcClient *session, com::Rpc_Request *request)
+    {
+        const int methodId = request->methodid();
+        const ProtocolConfig * config = this->mProtocolComponent->GetProtocolConfig(methodId);
+        if(config == nullptr)
         {
-            this->mRequestData.Clear();
-            if (!this->mRequestData.ParseFromArray(body, bodySize))
-            {
-                return false;
-            }
-            unsigned short methodId = this->mRequestData.methodid();
-            auto config = this->mProtocolComponent->GetProtocolConfig(methodId);
-            if (config == nullptr)
-            {
-                return false;
-            }
-#ifdef __DEBUG__
-            std::string json;
-            const std::string & data = this->mRequestData.messagedata();
-            const std::string method = config->Service + "." + config->Method;
-            if(!config->Request.empty())
-            {
-               Message * msg = MessagePool::NewByData(config->Request, data);
-               util::MessageToJsonString(*msg, &json);
-            }
-            GKDebugLog("[request " << method << "] json = " << json);
-#endif
-            this->mRequestData.set_socketid(session->GetSocketProxy().GetSocketId());
-            return this->mRequestComponent->OnRequest(mRequestData);
+            session->StartClose();
+            RequestPool.Destory(request);
+            return;
         }
-		else if (messageType == DataMessageType::TYPE_RESPONSE)
-		{
-            this->mResponseData.Clear();
-            if(!this->mResponseData.ParseFromArray(body, bodySize))
-            {
-                return false;
-            }
-            unsigned short methodId = this->mResponseData.methodid();
-            auto config = this->mProtocolComponent->GetProtocolConfig(methodId);
-            if (config == nullptr)
-            {
-                return false;
-            }
 #ifdef __DEBUG__
-            std::string json;
-            const std::string & data = this->mRequestData.messagedata();
-            const std::string method = config->Service + "." + config->Method;
-            if(!config->Response.empty())
-            {
-                Message * msg = MessagePool::NewByData(config->Response, data);
-                util::MessageToJsonString(*msg, &json);
-            }
-            GKDebugLog("[response " << method << "] code:" << this->mResponseData.code() << "  json = " << json);
+        std::string json;
+        if(util::MessageToJsonString(*request, &json).ok())
+        {
+            GKDebugLog(session->GetAddress() << " request  json = " << json);
+        }
 #endif
-            return this->mResponseComponent->OnResponse(mResponseData);
-		}
-        return false;
-	}
+        this->mRequestComponent->OnRequest(*request);
+    }
+
+    void RpcComponent::OnResponse(RpcClient *session, com::Rpc_Response *response)
+    {
+#ifdef __DEBUG__
+        std::string json;
+        if(util::MessageToJsonString(*response, &json).ok())
+        {
+            GKDebugLog(session->GetAddress() << " response  json = " << json);
+        }
+#endif
+        this->mResponseComponent->OnResponse(*response);
+        ResponsePool.Destory(response);
+    }
 
     RpcConnector *RpcComponent::GetLocalSession(long long id)
     {
@@ -221,7 +182,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool RpcComponent::SendByAddress(long long id, com::Rpc_Request & message)
+	bool RpcComponent::SendByAddress(long long id, com::Rpc_Request * message)
 	{
         std::string * data = this->Serialize(message);
         if(data== nullptr)
@@ -232,7 +193,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	bool RpcComponent::SendByAddress(long long id, com::Rpc_Response & message)
+	bool RpcComponent::SendByAddress(long long id, com::Rpc_Response * message)
 	{
 		std::string * data = this->Serialize(message);
 		if (data == nullptr)
@@ -242,31 +203,5 @@ namespace GameKeeper
 		this->SendByAddress(id, data);
 		return true;
 	}
-
-    std::string *RpcComponent::Serialize(const com::Rpc_Request &message)
-    {
-        DataMessageType type = TYPE_REQUEST;
-        const size_t size = message.ByteSizeLong() + 5;
-        memcpy(this->mMessageBuffer, &size, sizeof(unsigned int));
-        memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
-        if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
-        {
-            return nullptr;
-        }
-        return GStringPool.New(this->mMessageBuffer, size);
-    }
-
-    std::string *RpcComponent::Serialize(const com::Rpc_Response &message)
-    {
-        DataMessageType type = TYPE_RESPONSE;
-        const size_t size = message.ByteSizeLong() + 5;
-        memcpy(this->mMessageBuffer, &size, sizeof(unsigned int));
-        memcpy(this->mMessageBuffer + 4, &type, sizeof(char));
-        if (!message.SerializeToArray(this->mMessageBuffer + 5, 1024 * 1024 - 5))
-        {
-            return nullptr;
-        }
-        return GStringPool.New(this->mMessageBuffer, size);
-    }
 
 }// namespace GameKeeper

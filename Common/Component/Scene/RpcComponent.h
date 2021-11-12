@@ -18,9 +18,10 @@ namespace GameKeeper
 	public:
 		void OnCloseSession(RpcClient * socket, XCode code);
 		void OnConnectRemoteAfter(RpcConnector * session, XCode code);
-		void OnReceiveMessage(RpcClient * session, string * message);
 		void OnSendMessageAfter(RpcClient *session, std::string * message, XCode code);
-		
+    public:
+		void OnRequest(RpcClient * session, com::Rpc_Request * request);
+        void OnResponse(RpcClient * session, com::Rpc_Response * response);
     protected:
 		void OnListen(SocketProxy * socket) final;
 	public:
@@ -34,27 +35,16 @@ namespace GameKeeper
 	public:
 		bool CloseSession(long long id);
 		bool SendByAddress(long long id, std::string * message);
-		bool SendByAddress(long long id, com::Rpc_Request & message);
-		bool SendByAddress(long long id, com::Rpc_Response & message);
-
-    public:
-        std::string * Serialize(const com::Rpc_Request & message);
-        std::string * Serialize(const com::Rpc_Response & message);
+		bool SendByAddress(long long id, com::Rpc_Request * message);
+		bool SendByAddress(long long id, com::Rpc_Response * message);
     private:
-		
 		RpcClient *GetSession(long long id);
-		bool OnReceive(RpcClient *, const std::string & message);
-
 	private:
 		class TaskPoolComponent * mTaskComponent;
 		class RpcProtoComponent *mProtocolComponent;
         class RpcRequestComponent * mRequestComponent;
         class RpcResponseComponent * mResponseComponent;
-	private:		
-        char mMessageBuffer[1024 * 1024];
-        com::Rpc_Request mRequestData;
-        com::Rpc_Response mResponseData;
-		std::queue<std::string> mRecvSessionQueue;
+	private:
 		std::queue<RpcClient *> mSessionQueue;
         std::unordered_map<long long, RpcClient *> mSessionAdressMap;
 	};

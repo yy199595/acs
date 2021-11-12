@@ -2,7 +2,7 @@
 
 #include <Component/Component.h>
 #include <Other/ProtocolConfig.h>
-
+#include <shared_mutex>
 namespace GameKeeper
 {
     class RpcProtoComponent : public Component, public ILoadConfig
@@ -17,19 +17,13 @@ namespace GameKeeper
     public:
 		bool HasService(const std::string & service);
 		void GetServices(std::vector<std::string> & services);
-        const ProtocolConfig *GetProtocolConfig(const std::string & fullName) const;
         bool GetMethods(const std::string & service, std::vector<std::string> & methods);
-
-        Message * CreateResquest(const std::string & fullName);
-        Message * CreateResponse(const std::string & fullName);
-
     public:
-        Message * NewProtoMessage(const std::string & name);
-    private:
-        bool AddProto(const std::string & name);
+        const ProtocolConfig *GetProtocolConfig(int methodId) const;
+        const ProtocolConfig *GetProtocolConfig(const std::string & fullName) const;
     private:
         std::mutex mLock;
-        std::unordered_map<std::string, const Message *> mProtoMap;
+        std::unordered_map<int, ProtocolConfig> mProtocolIdMap;
         std::unordered_map<std::string, ProtocolConfig> mProtocolNameMap;
 		std::unordered_map<std::string, std::vector<ProtocolConfig>> mServiceMap;
 

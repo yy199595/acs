@@ -1,7 +1,8 @@
 ﻿#pragma once
+#include<Rpc.h>
 #include<XCode/XCode.h>
-#include <Define/CommonDef.h>
-#include <SocketProxy.h>
+#include<Define/CommonDef.h>
+#include<SocketProxy.h>
 #define TCP_BUFFER_COUNT 1024
 
 namespace GameKeeper
@@ -28,9 +29,10 @@ namespace GameKeeper
     private:
 		void ReceiveMessage();
 		void CloseSocket(XCode code);
-        void ReadMessageBody(size_t allSize);
         void SendByString(std::string * message);
-	protected:
+        void ReadMessageBody(size_t allSize, int type);
+
+    protected:
 		std::string mAddress;
 		SocketProxy * mSocketProxy;
 		RpcComponent * mTcpComponent;

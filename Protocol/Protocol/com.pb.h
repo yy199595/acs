@@ -34,6 +34,7 @@
 #include <google/protobuf/map_entry.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_com_2eproto
@@ -1287,19 +1288,14 @@ class Rpc_Request :
 
   // accessors -------------------------------------------------------
 
-  // bytes MessageData = 5;
-  void clear_messagedata();
-  static const int kMessageDataFieldNumber = 5;
-  const ::std::string& messagedata() const;
-  void set_messagedata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_messagedata(::std::string&& value);
-  #endif
-  void set_messagedata(const char* value);
-  void set_messagedata(const void* value, size_t size);
-  ::std::string* mutable_messagedata();
-  ::std::string* release_messagedata();
-  void set_allocated_messagedata(::std::string* messagedata);
+  // .google.protobuf.Any RequestData = 5;
+  bool has_requestdata() const;
+  void clear_requestdata();
+  static const int kRequestDataFieldNumber = 5;
+  const ::google::protobuf::Any& requestdata() const;
+  ::google::protobuf::Any* release_requestdata();
+  ::google::protobuf::Any* mutable_requestdata();
+  void set_allocated_requestdata(::google::protobuf::Any* requestdata);
 
   // int64 UserId = 1;
   void clear_userid();
@@ -1330,7 +1326,7 @@ class Rpc_Request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr messagedata_;
+  ::google::protobuf::Any* requestdata_;
   ::google::protobuf::int64 userid_;
   ::google::protobuf::uint32 rpcid_;
   ::google::protobuf::int32 methodid_;
@@ -1435,19 +1431,14 @@ class Rpc_Response :
 
   // accessors -------------------------------------------------------
 
-  // bytes MessageData = 4;
-  void clear_messagedata();
-  static const int kMessageDataFieldNumber = 4;
-  const ::std::string& messagedata() const;
-  void set_messagedata(const ::std::string& value);
-  #if LANG_CXX11
-  void set_messagedata(::std::string&& value);
-  #endif
-  void set_messagedata(const char* value);
-  void set_messagedata(const void* value, size_t size);
-  ::std::string* mutable_messagedata();
-  ::std::string* release_messagedata();
-  void set_allocated_messagedata(::std::string* messagedata);
+  // .google.protobuf.Any RequestData = 4;
+  bool has_requestdata() const;
+  void clear_requestdata();
+  static const int kRequestDataFieldNumber = 4;
+  const ::google::protobuf::Any& requestdata() const;
+  ::google::protobuf::Any* release_requestdata();
+  ::google::protobuf::Any* mutable_requestdata();
+  void set_allocated_requestdata(::google::protobuf::Any* requestdata);
 
   // int32 Code = 1;
   void clear_code();
@@ -1455,34 +1446,27 @@ class Rpc_Response :
   ::google::protobuf::int32 code() const;
   void set_code(::google::protobuf::int32 value);
 
-  // uint32 UserId = 2;
-  void clear_userid();
-  static const int kUserIdFieldNumber = 2;
-  ::google::protobuf::uint32 userid() const;
-  void set_userid(::google::protobuf::uint32 value);
-
-  // int32 RpcId = 3;
+  // uint32 RpcId = 2;
   void clear_rpcid();
-  static const int kRpcIdFieldNumber = 3;
-  ::google::protobuf::int32 rpcid() const;
-  void set_rpcid(::google::protobuf::int32 value);
+  static const int kRpcIdFieldNumber = 2;
+  ::google::protobuf::uint32 rpcid() const;
+  void set_rpcid(::google::protobuf::uint32 value);
 
-  // int32 MethodId = 5;
-  void clear_methodid();
-  static const int kMethodIdFieldNumber = 5;
-  ::google::protobuf::int32 methodid() const;
-  void set_methodid(::google::protobuf::int32 value);
+  // int64 UserId = 3;
+  void clear_userid();
+  static const int kUserIdFieldNumber = 3;
+  ::google::protobuf::int64 userid() const;
+  void set_userid(::google::protobuf::int64 value);
 
   // @@protoc_insertion_point(class_scope:com.Rpc.Response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr messagedata_;
+  ::google::protobuf::Any* requestdata_;
   ::google::protobuf::int32 code_;
-  ::google::protobuf::uint32 userid_;
-  ::google::protobuf::int32 rpcid_;
-  ::google::protobuf::int32 methodid_;
+  ::google::protobuf::uint32 rpcid_;
+  ::google::protobuf::int64 userid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -1955,57 +1939,49 @@ inline void Rpc_Request::set_socketid(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Request.SocketId)
 }
 
-// bytes MessageData = 5;
-inline void Rpc_Request::clear_messagedata() {
-  messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .google.protobuf.Any RequestData = 5;
+inline bool Rpc_Request::has_requestdata() const {
+  return this != internal_default_instance() && requestdata_ != nullptr;
 }
-inline const ::std::string& Rpc_Request::messagedata() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Request.MessageData)
-  return messagedata_.GetNoArena();
+inline const ::google::protobuf::Any& Rpc_Request::requestdata() const {
+  const ::google::protobuf::Any* p = requestdata_;
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.RequestData)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
 }
-inline void Rpc_Request::set_messagedata(const ::std::string& value) {
+inline ::google::protobuf::Any* Rpc_Request::release_requestdata() {
+  // @@protoc_insertion_point(field_release:com.Rpc.Request.RequestData)
   
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:com.Rpc.Request.MessageData)
+  ::google::protobuf::Any* temp = requestdata_;
+  requestdata_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void Rpc_Request::set_messagedata(::std::string&& value) {
+inline ::google::protobuf::Any* Rpc_Request::mutable_requestdata() {
   
-  messagedata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Request.MessageData)
+  if (requestdata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    requestdata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Request.RequestData)
+  return requestdata_;
 }
-#endif
-inline void Rpc_Request::set_messagedata(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:com.Rpc.Request.MessageData)
-}
-inline void Rpc_Request::set_messagedata(const void* value, size_t size) {
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Request.MessageData)
-}
-inline ::std::string* Rpc_Request::mutable_messagedata() {
-  
-  // @@protoc_insertion_point(field_mutable:com.Rpc.Request.MessageData)
-  return messagedata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Rpc_Request::release_messagedata() {
-  // @@protoc_insertion_point(field_release:com.Rpc.Request.MessageData)
-  
-  return messagedata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Rpc_Request::set_allocated_messagedata(::std::string* messagedata) {
-  if (messagedata != nullptr) {
+inline void Rpc_Request::set_allocated_requestdata(::google::protobuf::Any* requestdata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(requestdata_);
+  }
+  if (requestdata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      requestdata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, requestdata, submessage_arena);
+    }
     
   } else {
     
   }
-  messagedata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), messagedata);
-  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Request.MessageData)
+  requestdata_ = requestdata;
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Request.RequestData)
 }
 
 // -------------------------------------------------------------------
@@ -2026,99 +2002,77 @@ inline void Rpc_Response::set_code(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Response.Code)
 }
 
-// uint32 UserId = 2;
-inline void Rpc_Response::clear_userid() {
-  userid_ = 0u;
-}
-inline ::google::protobuf::uint32 Rpc_Response::userid() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Response.UserId)
-  return userid_;
-}
-inline void Rpc_Response::set_userid(::google::protobuf::uint32 value) {
-  
-  userid_ = value;
-  // @@protoc_insertion_point(field_set:com.Rpc.Response.UserId)
-}
-
-// int32 RpcId = 3;
+// uint32 RpcId = 2;
 inline void Rpc_Response::clear_rpcid() {
-  rpcid_ = 0;
+  rpcid_ = 0u;
 }
-inline ::google::protobuf::int32 Rpc_Response::rpcid() const {
+inline ::google::protobuf::uint32 Rpc_Response::rpcid() const {
   // @@protoc_insertion_point(field_get:com.Rpc.Response.RpcId)
   return rpcid_;
 }
-inline void Rpc_Response::set_rpcid(::google::protobuf::int32 value) {
+inline void Rpc_Response::set_rpcid(::google::protobuf::uint32 value) {
   
   rpcid_ = value;
   // @@protoc_insertion_point(field_set:com.Rpc.Response.RpcId)
 }
 
-// int32 MethodId = 5;
-inline void Rpc_Response::clear_methodid() {
-  methodid_ = 0;
+// int64 UserId = 3;
+inline void Rpc_Response::clear_userid() {
+  userid_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int32 Rpc_Response::methodid() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Response.MethodId)
-  return methodid_;
+inline ::google::protobuf::int64 Rpc_Response::userid() const {
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.UserId)
+  return userid_;
 }
-inline void Rpc_Response::set_methodid(::google::protobuf::int32 value) {
+inline void Rpc_Response::set_userid(::google::protobuf::int64 value) {
   
-  methodid_ = value;
-  // @@protoc_insertion_point(field_set:com.Rpc.Response.MethodId)
+  userid_ = value;
+  // @@protoc_insertion_point(field_set:com.Rpc.Response.UserId)
 }
 
-// bytes MessageData = 4;
-inline void Rpc_Response::clear_messagedata() {
-  messagedata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .google.protobuf.Any RequestData = 4;
+inline bool Rpc_Response::has_requestdata() const {
+  return this != internal_default_instance() && requestdata_ != nullptr;
 }
-inline const ::std::string& Rpc_Response::messagedata() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Response.MessageData)
-  return messagedata_.GetNoArena();
+inline const ::google::protobuf::Any& Rpc_Response::requestdata() const {
+  const ::google::protobuf::Any* p = requestdata_;
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.RequestData)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
 }
-inline void Rpc_Response::set_messagedata(const ::std::string& value) {
+inline ::google::protobuf::Any* Rpc_Response::release_requestdata() {
+  // @@protoc_insertion_point(field_release:com.Rpc.Response.RequestData)
   
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:com.Rpc.Response.MessageData)
+  ::google::protobuf::Any* temp = requestdata_;
+  requestdata_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void Rpc_Response::set_messagedata(::std::string&& value) {
+inline ::google::protobuf::Any* Rpc_Response::mutable_requestdata() {
   
-  messagedata_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Response.MessageData)
+  if (requestdata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    requestdata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Response.RequestData)
+  return requestdata_;
 }
-#endif
-inline void Rpc_Response::set_messagedata(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:com.Rpc.Response.MessageData)
-}
-inline void Rpc_Response::set_messagedata(const void* value, size_t size) {
-  
-  messagedata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Response.MessageData)
-}
-inline ::std::string* Rpc_Response::mutable_messagedata() {
-  
-  // @@protoc_insertion_point(field_mutable:com.Rpc.Response.MessageData)
-  return messagedata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Rpc_Response::release_messagedata() {
-  // @@protoc_insertion_point(field_release:com.Rpc.Response.MessageData)
-  
-  return messagedata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Rpc_Response::set_allocated_messagedata(::std::string* messagedata) {
-  if (messagedata != nullptr) {
+inline void Rpc_Response::set_allocated_requestdata(::google::protobuf::Any* requestdata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(requestdata_);
+  }
+  if (requestdata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      requestdata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, requestdata, submessage_arena);
+    }
     
   } else {
     
   }
-  messagedata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), messagedata);
-  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Response.MessageData)
+  requestdata_ = requestdata;
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Response.RequestData)
 }
 
 // -------------------------------------------------------------------

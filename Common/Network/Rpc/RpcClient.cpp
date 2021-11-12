@@ -73,8 +73,8 @@ namespace GameKeeper
 	{
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-
-		socket.async_read_some(asio::buffer(this->mReceiveMsgBuffer, sizeof(unsigned int)),
+        const size_t count = sizeof(unsigned int) + sizeof(char);
+        socket.async_read_some(asio::buffer(this->mReceiveMsgBuffer, count),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			if (error_code)
@@ -91,7 +91,15 @@ namespace GameKeeper
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
-				this->ReadMessageBody(packageSize);
+                int type = (int)this->mReceiveMsgBuffer[sizeof(unsigned int)];
+                if(type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
+                {
+                    this->ReadMessageBody(packageSize, type);
+                }
+                else
+                {
+                    this->CloseSocket(XCode::NetReceiveFailure);
+                }
 			}
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
@@ -108,7 +116,7 @@ namespace GameKeeper
 		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
-	void RpcClient::ReadMessageBody(size_t allSize)
+	void RpcClient::ReadMessageBody(size_t allSize, int type)
 	{	
 		if (!this->mSocketProxy->IsOpen())
 		{
@@ -130,7 +138,7 @@ namespace GameKeeper
 			return;
 		}
 		nSocket.async_read_some(asio::buffer(nMessageBuffer, allSize),
-			[this, nMessageBuffer](const asio::error_code &error_code,
+			[this, nMessageBuffer, type](const asio::error_code &error_code,
 				const std::size_t size) {
 			if (error_code)
 			{
@@ -139,7 +147,38 @@ namespace GameKeeper
 			}
 			else
 			{
-				NetWorkThread & thread = this->mSocketProxy->GetThread();		
+                if(type == RPC_TYPE_REQUEST)
+                {
+                    com::Rpc_Request * request = RequestPool.Create();
+                    if(!request->ParseFromArray(nMessageBuffer, size))
+                    {
+                        RequestPool.Destory(request);
+                        this->CloseSocket(XCode::NetWorkError);
+                        GKDebugError(this->GetAddress() << " parse request message error");
+                    }
+                    else  //通知主线程处理
+                    {
+                        request->set_socketid(this->GetSocketProxy().GetSocketId());
+                        NetWorkThread & netThread = this->mSocketProxy->GetThread();
+                        netThread.AddTask(&RpcComponent::OnRequest, this->mTcpComponent, this, request);
+                    }
+                }
+                else if(type == RPC_TYPE_RESPONSE)
+                {
+                    com::Rpc_Response * response = ResponsePool.Create();
+                    if(!response->ParseFromArray(nMessageBuffer, size))
+                    {
+                        ResponsePool.Destory(response);
+                        this->CloseSocket(XCode::NetWorkError);
+                        GKDebugError(this->GetAddress() << " parse response message error");
+                    }
+                    else  //通知主线程处理
+                    {
+                        NetWorkThread & netThread = this->mSocketProxy->GetThread();
+                        netThread.AddTask(&RpcComponent::OnResponse, this->mTcpComponent, this, response);
+                    }
+                }
+
 				std::string * data = GStringPool.New(nMessageBuffer, size);
 				thread.AddTask(&RpcComponent::OnReceiveMessage, this->mTcpComponent, this, data);
 			}

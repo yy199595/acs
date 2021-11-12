@@ -1,6 +1,7 @@
 
 syntax = "proto3";
 package com;
+import "google/protobuf/any.proto";
 
 message StringArray
 {
@@ -47,6 +48,7 @@ message StringMap
      map<string, string> Data = 1;
 }
 
+
 message Rpc
 {
      message Request
@@ -55,11 +57,13 @@ message Rpc
           uint32 RpcId = 2;
           int32 MethodId = 3;
           int64 SocketId = 4;
+          google.protobuf.Any RequestData = 5;
      }
      message Response
      {
           int32 Code = 1;
           uint32 RpcId = 2;
           int64 UserId = 3;
+          google.protobuf.Any RequestData = 4;
      }
 }

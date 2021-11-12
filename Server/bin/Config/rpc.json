@@ -1,11 +1,13 @@
 {
     "CenterService": {
         "Add": {
+            "Id":101,
             "Async":false,
             "Request": "s2s.NodeRegister.Request",
             "Response":"s2s.NodeRegister.Response"
         },
         "Query": {
+            "Id":102,
             "Async":false,
             "Request":"s2s.NodeQuery.Request",
             "Response":"s2s.NodeQuery.Response"
@@ -13,31 +15,37 @@
     },
     "ClusterService": {
         "Add": {
+            "Id":111,
             "Async":false,
             "Request":"s2s.NodeInfo"
         },
         "Del": {
+            "Id":112,
             "Async":false,
             "Request":"com.Int32Data"
         }
     },
     "MysqlService": {
         "Add": {
+            "Id":121,
             "Async":true,
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
         "Save": {
+            "Id":122,
             "Async":true,
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
         "Delete": {
+            "Id":123,
             "Async":true,
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
         "Query": {
+            "Id":124,
             "Async":true,
             "Request":"s2s.MysqlQuery.Request",
             "Response":"s2s.MysqlQuery.Response"
@@ -48,11 +56,13 @@
     },
     "GatewayService":{
         "Login":{
+            "Id":131,
             "Async":true,
             "Request":"c2s.GateLogin.Request",
             "Response":"c2s.GateLogin.Response"
         },
         "Logout":{
+            "Id":132,
             "Async":false,
             "Request":"c2s.GateLogout.Request"
         }

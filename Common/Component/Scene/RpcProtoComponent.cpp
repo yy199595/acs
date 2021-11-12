@@ -4,6 +4,7 @@
 #include <Util/FileHelper.h>
 #include <Util/StringHelper.h>
 #include <rapidjson/document.h>
+#include <Pool/MessagePool.h>
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
@@ -22,7 +23,6 @@ namespace GameKeeper
             return false;///
         }
 
-        this->mProtoMap.clear();
         this->mServiceMap.clear();
         this->mProtocolNameMap.clear();
 
@@ -44,13 +44,14 @@ namespace GameKeeper
                 ProtocolConfig protocolConfig;
                 protocolConfig.Service = service;
                 protocolConfig.Method = iter2->name.GetString();
+                protocolConfig.MethodId = iter2->value["Id"].GetInt();
                 protocolConfig.IsAsync = iter2->value["Async"].GetBool();
                 if (iter2->value.HasMember("Request"))
                 {
                     const rapidjson::Value &jsonValue = iter2->value["Request"];
                     GKAssertRetFalse_F(jsonValue.IsString());
                     protocolConfig.Request = jsonValue.GetString();
-                    if(!this->AddProto(protocolConfig.Request))
+                    if(MessagePool::New(protocolConfig.Request) == nullptr)
                     {
                         GKDebugFatal("create " << protocolConfig.Response << " failure");
                         return false;
@@ -63,7 +64,7 @@ namespace GameKeeper
                     GKAssertRetFalse_F(jsonValue.IsString());
                     protocolConfig.Response = jsonValue.GetString();
                     protocolConfig.Response = jsonValue["Message"].GetString();
-                    if (!this->AddProto(protocolConfig.Response))
+                    if (MessagePool::New(protocolConfig.Response) == nullptr)
                     {
                         GKDebugFatal("create " << protocolConfig.Response << " failure");
                         return false;
@@ -72,29 +73,19 @@ namespace GameKeeper
 
                 methods.push_back(protocolConfig);
                 std::string name = service + "." + protocolConfig.Method;
-                this->mProtocolNameMap.emplace(std::make_pair(name, protocolConfig));
+
+                this->mProtocolNameMap.emplace(name, protocolConfig);
+                this->mProtocolIdMap.emplace(protocolConfig.MethodId, protocolConfig);
             }
             this->mServiceMap.emplace(service, methods);
         }
         return true;
     }
 
-    Message *RpcProtoComponent::NewProtoMessage(const std::string &name)
+    const ProtocolConfig *RpcProtoComponent::GetProtocolConfig(int methodId) const
     {
-        if(name.empty())
-        {
-            return nullptr;
-        }
-        if(this->mLock.try_lock())
-        {
-            std::lock_guard<std::mutex> lock(this->mLock);
-            auto iter = this->mProtoMap.find(name);
-            if (iter != this->mProtoMap.end())
-            {
-                return iter->second->New();
-            }
-        }
-        return nullptr;
+        auto iter = this->mProtocolIdMap.find(methodId);
+        return iter == this->mProtocolIdMap.end() ? &iter->second : nullptr;
     }
 
 	bool RpcProtoComponent::HasService(const std::string & service)
@@ -125,20 +116,6 @@ namespace GameKeeper
 		}
 		return true;
 	}
-
-    bool RpcProtoComponent::AddProto(const std::string &name)
-    {
-        const DescriptorPool *pDescriptorPool = DescriptorPool::generated_pool();
-        const Descriptor *pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
-        if (pDescriptor == nullptr)
-        {
-            return false;
-        }
-        MessageFactory *factory = MessageFactory::generated_factory();
-        this->mProtoMap.emplace(name, factory->GetPrototype(pDescriptor));
-        return true;
-    }
-
 
     const ProtocolConfig * RpcProtoComponent::GetProtocolConfig(const std::string &fullName) const
     {

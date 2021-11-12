@@ -8,6 +8,7 @@ namespace GameKeeper
     {
     public:
         bool IsAsync;
+        int MethodId;
         std::string Method;
         std::string Service;
         std::string Request;
