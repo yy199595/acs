@@ -11,7 +11,7 @@ include_directories(${PROJECT_COMMON_DIR}/Libs/include/lua5.3)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/mysql)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/redis)
-include_directories(${PROJECT_COMMON_DIR}/Libs/include/tcmalloc)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/jemalloc)
 #公共组件
 
 include_directories(${PROJECT_SOURCE_DIR}/DB)
