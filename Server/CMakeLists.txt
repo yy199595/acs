@@ -11,6 +11,7 @@ include_directories(${PROJECT_COMMON_DIR}/Libs/include/lua5.3)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/mysql)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/redis)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/tcmalloc)
 #公共组件
 
 include_directories(${PROJECT_SOURCE_DIR}/DB)
@@ -63,7 +64,7 @@ if(MSVC)
 
     
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
-    TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql)
+    TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql libtcmalloc_minimal)
    
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})

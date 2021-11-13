@@ -21,15 +21,18 @@ namespace FileHelper
     bool ReadTxtFile(const std::string path, std::string &outFile)
     {
         std::fstream fs;
+		printf("fs = %p\n", &fs);
         fs.open(path, std::ios::in);
         if (fs.is_open())
         {
-            std::string tempString = "";
-            while (std::getline(fs, tempString))
-            {
-                outFile.append(tempString);
-                tempString = "";
-            }
+			char buffer[512] = { 0 };
+			size_t size = fs.readsome(buffer, 512);
+			while (size > 0)
+			{
+				outFile.append(buffer, size);
+				size = fs.readsome(buffer, 512);
+			}         
+			fs.close();
             return true;
         }
         return false;

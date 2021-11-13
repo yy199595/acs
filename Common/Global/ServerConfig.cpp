@@ -15,21 +15,20 @@ namespace GameKeeper
     bool ServerConfig::InitConfig()
     {
         std::string outString;
-        this->mConfigDocument = make_shared<rapidjson::Document>();
         if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
         {
             GKDebugError("not find config " << mConfigPath);
             return false;
         }
-        mConfigDocument->Parse(outString.c_str(), outString.size());
-        if (this->mConfigDocument->HasParseError())
+        mConfigDocument.Parse(outString.c_str(), outString.size());
+        if (this->mConfigDocument.HasParseError())
         {
             GKDebugFatal("parse " << mConfigPath << " fail");
             return false;
         }
 
-        auto iter = this->mConfigDocument->MemberBegin();
-        for (; iter != this->mConfigDocument->MemberEnd(); iter++)
+        auto iter = this->mConfigDocument.MemberBegin();
+        for (; iter != this->mConfigDocument.MemberEnd(); iter++)
         {
             const std::string key = iter->name.GetString();
             rapidjson::Value *value = &iter->value;

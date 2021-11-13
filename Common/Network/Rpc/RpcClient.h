@@ -23,14 +23,14 @@ namespace GameKeeper
 	public:
 		void StartClose();
 		void StartReceive();
-		void StartSendByString(std::string * message);
+		void StartSendProtocol(char type, const Message * message);
 	public:
 		SocketProxy & GetSocketProxy() { return *mSocketProxy; }
     private:
 		void ReceiveMessage();
 		void CloseSocket(XCode code);
-        void SendByString(std::string * message);
         void ReadMessageBody(size_t allSize, int type);
+		void SendProtocol(char type, const Message * message);
 
     protected:
 		std::string mAddress;
@@ -39,6 +39,7 @@ namespace GameKeeper
     private:
 		char *mReceiveMsgBuffer;
 		long long mLastOperTime;
+		std::queue<const Message *> mMessageQueue;
     };
 
     typedef shared_ptr<RpcClient> SharedTcpSession;

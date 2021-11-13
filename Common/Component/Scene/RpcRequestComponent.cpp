@@ -46,18 +46,15 @@ namespace GameKeeper
 
         if (!protocolConfig->IsAsync)
         {
-            std::string responseContent;
             method->SetSocketId(request.socketid()); //TODO
-            XCode code = method->Invoke(request, responseContent);
+			com::Rpc_Response * response = new com::Rpc_Response();
+            XCode code = method->Invoke(request, *response);
             if (request.rpcid() != 0)
-            {
-                this->mResponse.Clear();
-                this->mResponse.set_code(code);
-                this->mResponse.set_rpcid(request.rpcid());
-                this->mResponse.set_userid(request.userid());
-                this->mResponse.set_methodid(request.methodid());
-                this->mResponse.set_messagedata(responseContent);
-                this->mRpcComponent->SendByAddress(request.socketid(), this->mResponse);
+            {              
+				response->set_code(code);
+				response->set_rpcid(request.rpcid());
+				response->set_userid(request.userid());
+                this->mRpcComponent->SendByAddress(request.socketid(), response);
             }
         }
         else if(method->IsLuaMethod()) //lua 异步
@@ -65,29 +62,22 @@ namespace GameKeeper
 
         }
         else
-        {
-			com::Rpc_Request * requestData = this->mRequestDataPool.CopyFrom(request);
-            this->mCorComponent->StartCoroutine(&RpcRequestComponent::Invoke, this, method, requestData);
+        {			
+            this->mCorComponent->StartCoroutine(&RpcRequestComponent::Invoke, this, method, &request);
         }
         return true;
     }
 
-	void RpcRequestComponent::Invoke(ServiceMethod * method, com::Rpc_Request * request)
-    {
-        std::string responseContent;
-        //method->SetAddress(request->address());
-        XCode code = method->Invoke(*request, responseContent);
-        if (request->rpcid() != 0)
-        {
-            this->mResponse.Clear();
-            this->mResponse.set_code(code);
-            this->mResponse.set_rpcid(request->rpcid());
-            this->mResponse.set_userid(request->userid());
-            this->mResponse.set_methodid(request->methodid());
-            this->mResponse.set_messagedata(responseContent);
-            this->mRpcComponent->SendByAddress(request->socketid(), this->mResponse);
-
-			this->mRequestDataPool.Destory(request);
-        }
+	void RpcRequestComponent::Invoke(ServiceMethod * method, const com::Rpc_Request * request)
+    {        
+		com::Rpc_Response * response = new com::Rpc_Response();
+        XCode code = method->Invoke(*request, *response);
+		if (request->rpcid() != 0)
+		{
+			response->set_code(code);
+			response->set_rpcid(request->rpcid());
+			response->set_userid(request->userid());
+			this->mRpcComponent->SendByAddress(request->socketid(), response);
+		}
     }
 }// namespace GameKeeper

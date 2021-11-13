@@ -12,7 +12,7 @@ namespace GameKeeper
 			return false;
 		}
 		const std::string & name = method->GetName();
-		if (procolComponent->GetProtocolConfig(this->GetServiceName(), name) == nullptr)
+		if (procolComponent->GetProtocolConfig(name) == nullptr)
 		{
 			GKDebugFatal(this->GetServiceName() << "." << name << " not config");
 			return false;

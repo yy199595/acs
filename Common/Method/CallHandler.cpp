@@ -14,7 +14,7 @@ namespace GameKeeper
 
 	void LuaCallHandler::Invoke(const com::Rpc_Response & response)
     {
-        LocalObject<com::Rpc_Response> lock(&response);
+       /* LocalObject<com::Rpc_Response> lock(&response);
         auto component = App::Get().GetComponent<RpcProtoComponent>();
 
         unsigned short methodId = response.methodid();
@@ -47,7 +47,7 @@ namespace GameKeeper
                 }
             }
         }
-		lua_presume(this->mCoroutine, this->luaEnv, 1);
+		lua_presume(this->mCoroutine, this->luaEnv, 1);*/
     }
 
     CppCallHandler::CppCallHandler()
@@ -67,10 +67,10 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr)
         {
-            if(!this->mMessage->ParseFromString(response.messagedata()))
-            {
-                this->mCode = XCode::ParseMessageError;
-            }
+			if (!response.responsedata().UnpackTo(this->mMessage))
+			{
+				this->mCode = XCode::ParseMessageError;
+			}          
         }
         this->mScheduler->Resume(mCoroutineId);
     }

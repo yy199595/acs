@@ -34,26 +34,25 @@ namespace GameKeeper
 
     public:
 
-        XCode Notice(const std::string &service, const std::string &method);                        //不回应
-        XCode Notice(const std::string &service, const std::string &method, const Message &request);//不回应
+        XCode Notice(const std::string &method);                        //不回应
+        XCode Notice(const std::string &method, const Message &request);//不回应
     public:
-        XCode Invoke(const std::string &service, const std::string &method);
+        XCode Invoke(const std::string &method);
 
-        XCode Invoke(const std::string &service, const std::string &method, const Message &request);
+        XCode Invoke(const std::string &method, const Message &request);
 
     public:// c++ 使用
-        XCode Call(const std::string &service, const std::string &method, Message &response);
+        XCode Call(const std::string &method, Message &response);
 
-        XCode Call(const std::string &service, const std::string &method, const Message &request, Message &response);
+        XCode Call(const std::string &method, const Message &request, Message &response);
 
     private:
         void LoopSendMessage();
-        void PushMessage(std::string * msg);
         class RpcConnector *GetTcpSession();
-
+		void AddRequestDataToQueue(const com::Rpc_Request * message);
+		com::Rpc_Request * CreateRequest(const std::string & method);
     private:
         std::string mMessageBuffer;
-        com::Rpc_Request mRequestData;
     private:
         int mAreaId;
         int mNodeId;
@@ -69,7 +68,7 @@ namespace GameKeeper
         class CoroutineComponent *mCorComponent;//协程
         std::queue<unsigned int> mCoroutines;
         class RpcComponent * mRpcComponent;
-        std::queue<std::string *> mWaitSendQueue;
+        std::queue<const Message *> mWaitSendQueue;
         class RpcProtoComponent *mProtocolComponent;
         class RpcResponseComponent *mResponseComponent;
     };

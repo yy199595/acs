@@ -22,10 +22,12 @@ namespace GameKeeper
 		mApp = this;
 		this->mDelatime = 0;
 		this->mIsClose = false;
+		this->mConfig = nullptr;
 		this->mLogicRunCount = 0;
 		this->mIsInitComplate = false;
+		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
-		this->mServerName = argc == 1 ? "server" : argv[1];
+		this->mServerName = argc == 1 ? "server" : argv[1];	
         this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
 		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
 		this->mConfig = new ServerConfig(this->mServerPath.GetConfigPath() + this->mServerName + ".json");

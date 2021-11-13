@@ -1,4 +1,7 @@
-﻿#include <Core/App.h>
+﻿
+#include <Core/App.h>
+#include<src/libc_override.h>
+#include<gperftools/tcmalloc.h>
 #include <Scene/RpcResponseComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>

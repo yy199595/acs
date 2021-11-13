@@ -28,14 +28,12 @@ namespace GameKeeper
 
         virtual int GetPriority() const { return 500; }
 	private:
-        void Invoke(ServiceMethod * method, com::Rpc_Request * request);
+        void Invoke(ServiceMethod * method, const com::Rpc_Request * request);
     private:
         int mNodeId;
         std::string mMessageBuffer;
-        com::Rpc_Response mResponse;
         class RpcComponent *mRpcComponent;
         class CoroutineComponent *mCorComponent;
         class RpcProtoComponent * mProtocolComponent;
-		ObjectPool<com::Rpc_Request> mRequestDataPool;
     };
 }

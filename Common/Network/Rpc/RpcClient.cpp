@@ -1,7 +1,9 @@
 ﻿#include"RpcClient.h"
 #include<Util/TimeHelper.h>
 #include<Component/Scene/RpcComponent.h>
-
+#ifdef __DEBUG__
+#include<google/protobuf/util/json_util.h>
+#endif
 namespace GameKeeper
 {
     RpcClient::RpcClient(RpcComponent *component)
@@ -56,16 +58,15 @@ namespace GameKeeper
 		
 	}
 
-	void RpcClient::StartSendByString(std::string * message)
-	{		
+	void RpcClient::StartSendProtocol(char type, const Message * message)
+	{
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
 		if (nThread.IsCurrentThread())
 		{
-			this->SendByString(message);
+			this->SendProtocol(type, message);
 			return;
 		}
-		nThread.AddTask(&RpcClient::SendByString, this, message);
-		
+		nThread.AddTask(&RpcClient::SendProtocol, this, type, message);
 	}
 
 
@@ -149,10 +150,10 @@ namespace GameKeeper
 			{
                 if(type == RPC_TYPE_REQUEST)
                 {
-                    com::Rpc_Request * request = RequestPool.Create();
+					com::Rpc_Request * request = new com::Rpc_Request();
                     if(!request->ParseFromArray(nMessageBuffer, size))
                     {
-                        RequestPool.Destory(request);
+						delete request;
                         this->CloseSocket(XCode::NetWorkError);
                         GKDebugError(this->GetAddress() << " parse request message error");
                     }
@@ -165,10 +166,10 @@ namespace GameKeeper
                 }
                 else if(type == RPC_TYPE_RESPONSE)
                 {
-                    com::Rpc_Response * response = ResponsePool.Create();
+					com::Rpc_Response * response = new com::Rpc_Response();
                     if(!response->ParseFromArray(nMessageBuffer, size))
                     {
-                        ResponsePool.Destory(response);
+						delete response;
                         this->CloseSocket(XCode::NetWorkError);
                         GKDebugError(this->GetAddress() << " parse response message error");
                     }
@@ -178,9 +179,6 @@ namespace GameKeeper
                         netThread.AddTask(&RpcComponent::OnResponse, this->mTcpComponent, this, response);
                     }
                 }
-
-				std::string * data = GStringPool.New(nMessageBuffer, size);
-				thread.AddTask(&RpcComponent::OnReceiveMessage, this->mTcpComponent, this, data);
 			}
 			if (nMessageBuffer != this->mReceiveMsgBuffer)
 			{
@@ -190,21 +188,35 @@ namespace GameKeeper
 		});
 	}
 
-	void RpcClient::SendByString(std::string * message)
-	{		
+	void RpcClient::SendProtocol(char type, const Message * message)
+	{
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
 		if (!this->mSocketProxy->IsOpen())
 		{
 			this->CloseSocket(XCode::HttpNetWorkError);
-			NetWorkThread & nThread = this->mSocketProxy->GetThread();
-			nThread.AddTask(&RpcComponent::OnSendMessageAfter,
-				this->mTcpComponent, this, message, XCode::NetWorkError);
+#ifdef __DEBUG__
+			std::string json;
+			util::MessageToJsonString(*message, &json);
+			GKDebugError("send to " << this->GetAddress() << " failure : " << json);
+#endif // __DEBUG__
 		}
 		else
-		{
-			nSocket.async_send(asio::buffer(message->c_str(), message->size()),
-				[message, this](const asio::error_code &error_code, std::size_t size)
+		{			
+			size_t size = message->ByteSizeLong();
+			char * buffer = new char[size + 1];
+			if (!message->SerializePartialToArray(buffer + 1, size))
+			{
+#ifdef __DEBUG__
+				std::string json;
+				util::MessageToJsonString(*message, &json);
+				GKDebugError("Serialize " << "failure : " << json);
+#endif // __DEBUG__
+				delete[] buffer;
+			}
+			buffer[0] = type;
+			nSocket.async_send(asio::buffer(buffer, size),
+				[buffer, this](const asio::error_code &error_code, std::size_t size)
 			{
 				XCode code = XCode::Successful;
 				if (error_code)
@@ -212,10 +224,10 @@ namespace GameKeeper
 					code = XCode::NetSendFailure;
 					this->CloseSocket(XCode::NetSendFailure);
 				}
+				delete[]buffer;
 				this->mLastOperTime = TimeHelper::GetSecTimeStamp();
-				NetWorkThread & nThread = this->mSocketProxy->GetThread();
-				nThread.AddTask(&RpcComponent::OnSendMessageAfter,  this->mTcpComponent, this, message, code);
 			});
+			delete message;
 		}		
 	}
 }

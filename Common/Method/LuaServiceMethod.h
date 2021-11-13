@@ -3,7 +3,7 @@
 struct lua_State;
 namespace GameKeeper
 {
-	
+
 	class ProtocolConfig;
 	class LuaServiceMethod : public ServiceMethod
 	{
@@ -11,8 +11,8 @@ namespace GameKeeper
 		LuaServiceMethod(const std::string & name, lua_State * lua, int idx);
 	public:
 		bool IsLuaMethod() final { return true; }
-		 XCode Invoke(const com::Rpc_Request & request, std::string & response) final;
-         XCode AsyncInvoke(const com::Rpc_Request & request);
+		XCode AsyncInvoke(const com::Rpc_Request & request);
+		XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) final;
 	private:
 		static int Response(lua_State * lua);
 	private:

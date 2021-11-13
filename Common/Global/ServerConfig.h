@@ -58,7 +58,7 @@ namespace GameKeeper
         unsigned short mNodeId;
         std::string mNodeName;
         const std::string mConfigPath;
-        shared_ptr<rapidjson::Document> mConfigDocument;
+        rapidjson::Document mConfigDocument;
         std::unordered_map<std::string, rapidjson::Value *> mMapConfigData;
     };
 }

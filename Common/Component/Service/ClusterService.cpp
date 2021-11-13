@@ -39,7 +39,7 @@ namespace GameKeeper
 		registerInfo.set_nodeid(this->mNodeId);
 		//TODO
 		registerInfo.set_servername(App::Get().GetServerName());
-		XCode code = centerNode->Call("CenterService", "Add", registerInfo, responseInfo);
+		XCode code = centerNode->Call("CenterService.Add", registerInfo, responseInfo);
 		if (code != XCode::Successful)
 		{
 			GKDebugError("register local service node fail");

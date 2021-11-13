@@ -82,7 +82,7 @@ namespace GameKeeper
         s2s::MysqlOper_Request requestData;
         requestData.set_protocolname(data.GetTypeName());
         requestData.set_protocolmessage(this->mMessageBuffer);
-        return proxyNode->Invoke("MysqlService", "Add", requestData);
+        return proxyNode->Invoke("MysqlService.Add", requestData);
     }
 
     XCode MysqlProxyComponent::Query(const Message &data, Message &queryData)
@@ -110,7 +110,7 @@ namespace GameKeeper
         requestData.set_protocolname(data.GetTypeName());
         requestData.set_protocolmessage(this->mMessageBuffer);
 
-        XCode code = proxyNode->Call("MysqlService", "Query", requestData, responseData);
+        XCode code = proxyNode->Call("MysqlService.Add", requestData, responseData);
         if (code == XCode::Successful && responseData.querydatas_size() > 0)
         {
             const std::string &data = responseData.querydatas(0);
@@ -142,7 +142,7 @@ namespace GameKeeper
         s2s::MysqlOper_Request requestData;
         requestData.set_protocolname(data.GetTypeName());
         requestData.set_protocolmessage(this->mMessageBuffer);
-        return proxyNode->Invoke("MysqlService", "Save", requestData);
+        return proxyNode->Invoke("MysqlService.Add", requestData);
     }
 
     XCode MysqlProxyComponent::Delete(const Message &data)
@@ -166,6 +166,6 @@ namespace GameKeeper
 
         requestData.set_protocolname(data.GetTypeName());
         requestData.set_protocolmessage(this->mMessageBuffer);
-        return proxyNode->Invoke("MysqlService", "Delete", requestData);
+        return proxyNode->Invoke("MysqlService.Delete",requestData);
     }
 }

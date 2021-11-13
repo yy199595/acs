@@ -92,8 +92,8 @@ namespace GameKeeper
         const ProtocolConfig * config = this->mProtocolComponent->GetProtocolConfig(methodId);
         if(config == nullptr)
         {
+			delete request;
             session->StartClose();
-            RequestPool.Destory(request);
             return;
         }
 #ifdef __DEBUG__
@@ -116,7 +116,7 @@ namespace GameKeeper
         }
 #endif
         this->mResponseComponent->OnResponse(*response);
-        ResponsePool.Destory(response);
+		delete response;
     }
 
     RpcConnector *RpcComponent::GetLocalSession(long long id)
@@ -171,36 +171,25 @@ namespace GameKeeper
         return false;
     }
 
-	bool RpcComponent::SendByAddress(long long id, std::string * message)
+	bool RpcComponent::SendByAddress(long long id, com::Rpc_Request * message)
 	{
-		RpcClient * tcpSession = this->GetSession(id);
-		if (tcpSession == nullptr)
+		RpcClient * clientSession = this->GetSession(id);
+		if (clientSession == nullptr || !clientSession->IsOpen())
 		{
 			return false;
 		}
-		tcpSession->StartSendByString(message);
-		return true;
-	}
-
-	bool RpcComponent::SendByAddress(long long id, com::Rpc_Request * message)
-	{
-        std::string * data = this->Serialize(message);
-        if(data== nullptr)
-        {
-            return false;
-        }
-        this->SendByAddress(id, data);
+		clientSession->StartSendProtocol(RPC_TYPE_REQUEST, message);
 		return true;
 	}
 
 	bool RpcComponent::SendByAddress(long long id, com::Rpc_Response * message)
 	{
-		std::string * data = this->Serialize(message);
-		if (data == nullptr)
+		RpcClient * clientSession = this->GetSession(id);
+		if (clientSession == nullptr || !clientSession->IsOpen())
 		{
 			return false;
 		}
-		this->SendByAddress(id, data);
+		clientSession->StartSendProtocol(RPC_TYPE_RESPONSE, message);
 		return true;
 	}
 

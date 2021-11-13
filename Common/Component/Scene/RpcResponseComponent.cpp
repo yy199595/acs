@@ -49,16 +49,12 @@ namespace GameKeeper
         {
             return false;
         }
+		this->mNumberPool.Push(rpcId);
         CallHandler *callHandler = iter->second;
-#ifdef __DEBUG__
-        unsigned short methodId = response.methodid();
-        auto component = this->GetComponent<RpcProtoComponent>();
-        auto config = component->GetProtocolConfig(methodId);
-        double second = (TimeHelper::GetMilTimestamp() - callHandler->GetCreateTime()) / 1000.f;
-        GKDebugLog("call " << config->Service << "." << config->Method << " use time = " << second << "s");
-#endif
-        this->mNumberPool.Push(rpcId);
-        callHandler->Invoke(response);
+		if (callHandler != nullptr)
+		{
+			callHandler->Invoke(response);
+		}      
         this->mRetActionMap.erase(iter);
         return true;
     }

@@ -132,9 +132,9 @@ namespace GameKeeper
         s2s::NodeQuery_Request request;
         s2s::NodeQuery_Response response;
         request.set_areaid(this->mAreaId);
-        request.set_servicename(service);
+       
         NodeProxy *centerNode = this->GetServiceNode(0);
-        XCode code = centerNode->Call("CenterService", "Query", request, response);
+        XCode code = centerNode->Call("CenterService.Query", request, response);
 
         NodeProxy * newServiceNode = nullptr;
         if (code == XCode::Successful && response.nodeinfos_size() > 0)

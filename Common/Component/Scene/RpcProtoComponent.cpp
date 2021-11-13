@@ -62,8 +62,7 @@ namespace GameKeeper
                 {
                     const rapidjson::Value &jsonValue = iter2->value["Response"];
                     GKAssertRetFalse_F(jsonValue.IsString());
-                    protocolConfig.Response = jsonValue.GetString();
-                    protocolConfig.Response = jsonValue["Message"].GetString();
+                    protocolConfig.Response = jsonValue.GetString();               
                     if (MessagePool::New(protocolConfig.Response) == nullptr)
                     {
                         GKDebugFatal("create " << protocolConfig.Response << " failure");

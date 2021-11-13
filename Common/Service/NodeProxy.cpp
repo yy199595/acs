@@ -73,8 +73,8 @@ namespace GameKeeper
             }
             for (int index = 0; index < 100 && !this->mWaitSendQueue.empty(); index++)
             {
-                std::string *message = this->mWaitSendQueue.front();
-                tcpLocalSession->StartSendByString(message);
+                auto message = this->mWaitSendQueue.front();
+                tcpLocalSession->StartSendProtocol(RPC_TYPE_REQUEST, message);
                 this->mWaitSendQueue.pop();
             }
         }
@@ -102,80 +102,71 @@ namespace GameKeeper
         }
     }
 
-    XCode NodeProxy::Notice(const std::string &service, const std::string &method)
+    XCode NodeProxy::Notice(const std::string &method)
     {
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        auto config = this->mProtocolComponent->GetProtocolConfig(method);
         if(config == nullptr)
         {
             return XCode::CallFunctionNotExist;
         }
-        this->mRequestData.Clear();
-        this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		com::Rpc_Request * request = new com::Rpc_Request();
+		request->set_methodid(config->MethodId);   
+        this->AddRequestDataToQueue(request);
         return XCode::Successful;
     }
 
-	XCode NodeProxy::Notice(const std::string &service, const std::string &method, const Message &request)
+	XCode NodeProxy::Notice(const std::string &method, const Message &request)
 	{
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
+        auto config = this->mProtocolComponent->GetProtocolConfig(method);
         if(config == nullptr)
         {
             return XCode::CallFunctionNotExist;
         }
-        this->mRequestData.Clear();
-        this->mRequestData.set_methodid(config->MethodId);
-        if(!request.SerializeToString(&mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		com::Rpc_Request * data = new com::Rpc_Request();
+		data->set_methodid(config->MethodId);
+		data->mutable_requestdata()->PackFrom(request);      
+        this->AddRequestDataToQueue(data);
         return XCode::Successful;
 	}
 
-	XCode NodeProxy::Invoke(const std::string &service, const std::string &method)
+	com::Rpc_Request * NodeProxy::CreateRequest(const std::string & method)
 	{
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-        if(config == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
+		auto config = this->mProtocolComponent->GetProtocolConfig(method);
+		if (config == nullptr)
+		{
+			return nullptr;
+		}
+		com::Rpc_Request * request = new com::Rpc_Request();
+		request->set_methodid(config->MethodId);
+		return request;
+	}
+
+	XCode NodeProxy::Invoke(const std::string &method)
+	{      
+		com::Rpc_Request * request = this->CreateRequest(method);
+		if (request == nullptr)
+		{
+			return XCode::NotFoundRpcConfig;
+		}
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
-        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
+        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler, handlerId))
         {
             return XCode::Failure;
         }
-
-        this->mRequestData.Clear();
-        this->mRequestData.set_rpcid(handlerId);
-        this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		request->set_rpcid(handlerId);     
+        this->AddRequestDataToQueue(request);
         return cppCallHandler.StartCall();
 	}
 
-	XCode NodeProxy::Call(const std::string &service, const std::string &method, Message &response)
+	XCode NodeProxy::Call(const std::string &method, Message &response)
 	{
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-        if(config == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
+		com::Rpc_Request * request = this->CreateRequest(method);
+		if (request == nullptr)
+		{
+			return XCode::NotFoundRpcConfig;
+		}
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
@@ -183,26 +174,19 @@ namespace GameKeeper
         {
             return XCode::Failure;
         }
-
-        this->mRequestData.Clear();
-        this->mRequestData.set_rpcid(handlerId);
-        this->mRequestData.set_methodid(config->MethodId);
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		request->set_rpcid(handlerId);		
+        this->AddRequestDataToQueue(request);
         return cppCallHandler.StartCall(response);
 	}
 
-	XCode NodeProxy::Invoke(const std::string &service, const std::string &method, const Message &request)
+	XCode NodeProxy::Invoke(const std::string &method, const Message &request)
 	{
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-        if(config == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
+		com::Rpc_Request * requestData = this->CreateRequest(method);
+		if (requestData == nullptr)
+		{
+			delete requestData;
+			return XCode::NotFoundRpcConfig;
+		}
 
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
@@ -210,61 +194,37 @@ namespace GameKeeper
         {
             return XCode::Failure;
         }
-
-        if(!request.SerializeToString(&mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-
-        this->mRequestData.Clear();
-        this->mRequestData.set_rpcid(handlerId);
-        this->mRequestData.set_methodid(config->MethodId);
-        this->mRequestData.set_messagedata(mMessageBuffer);
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		requestData->set_rpcid(handlerId);
+		requestData->mutable_requestdata()->PackFrom(request);	
+      
+        this->AddRequestDataToQueue(requestData);
         return cppCallHandler.StartCall();
 	}
 
-	XCode NodeProxy::Call(const std::string &service, const std::string &method, const Message &request, Message &response)
+	XCode NodeProxy::Call(const std::string &method, const Message &request, Message &response)
     {
-        auto config = this->mProtocolComponent->GetProtocolConfig(service, method);
-        if(config == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
-
+		com::Rpc_Request * requestData = this->CreateRequest(method);
+		if (requestData == nullptr)
+		{
+			delete requestData;
+			return XCode::NotFoundRpcConfig;
+		}
         unsigned int handlerId = 0;
         CppCallHandler cppCallHandler;
         if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
-
-        if(!request.SerializeToString(&mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-
-        this->mRequestData.Clear();
-        this->mRequestData.set_rpcid(handlerId);
-        this->mRequestData.set_methodid(config->MethodId);
-        this->mRequestData.set_messagedata(mMessageBuffer);
-        std::string * message = this->mRpcComponent->Serialize(this->mRequestData);
-        if(message == nullptr)
-        {
-            return XCode::SerializationFailure;
-        }
-        this->PushMessage(message);
+		requestData->set_rpcid(handlerId);
+		requestData->mutable_requestdata()->PackFrom(request);
+       
+        this->AddRequestDataToQueue(requestData);
         return cppCallHandler.StartCall(response);
     }
 
-    void NodeProxy::PushMessage(std::string *msg)
+    void NodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)
     {
-        this->mWaitSendQueue.push(msg);
+        this->mWaitSendQueue.push(requestData);
         this->mCorComponent->Resume(this->mCorId);
     }
 }// namespace GameKeeper

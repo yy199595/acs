@@ -64,6 +64,6 @@ message Rpc
           int32 Code = 1;
           uint32 RpcId = 2;
           int64 UserId = 3;
-          google.protobuf.Any RequestData = 4;
+          google.protobuf.Any ResponseData = 4;
      }
 }
