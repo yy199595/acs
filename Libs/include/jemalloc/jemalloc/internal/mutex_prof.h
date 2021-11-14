@@ -7,14 +7,8 @@
 
 #define MUTEX_PROF_GLOBAL_MUTEXES					\
     OP(background_thread)						\
-    OP(max_per_bg_thd)							\
     OP(ctl)								\
-    OP(prof)								\
-    OP(prof_thds_data)							\
-    OP(prof_dump)							\
-    OP(prof_recent_alloc)						\
-    OP(prof_recent_dump)						\
-    OP(prof_stats)
+    OP(prof)
 
 typedef enum {
 #define OP(mtx) global_prof_mutex_##mtx,
@@ -32,10 +26,7 @@ typedef enum {
     OP(decay_dirty)							\
     OP(decay_muzzy)							\
     OP(base)								\
-    OP(tcache_list)							\
-    OP(hpa_shard)							\
-    OP(hpa_shard_grow)							\
-    OP(hpa_sec)
+    OP(tcache_list)
 
 typedef enum {
 #define OP(mtx) arena_prof_mutex_##mtx,

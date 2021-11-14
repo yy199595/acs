@@ -9,7 +9,7 @@
 #pragma warning(disable : 4996)
 namespace FileHelper
 {
-    bool FileIsExist(const std::string path)
+    bool FileIsExist(const std::string& path)
     {
 #ifdef _WIN32
         return _access(path.c_str(), 0) == 0;
@@ -18,42 +18,39 @@ namespace FileHelper
 #endif
     }
 
-    bool ReadTxtFile(const std::string path, std::string &outFile)
+    bool ReadTxtFile(const std::string& path, std::string &outFile)
     {
         std::fstream fs;
-		printf("fs = %p\n", &fs);
         fs.open(path, std::ios::in);
         if (fs.is_open())
         {
-			char buffer[512] = { 0 };
-			size_t size = fs.readsome(buffer, 512);
-			while (size > 0)
-			{
-				outFile.append(buffer, size);
-				size = fs.readsome(buffer, 512);
-			}         
+            std::string line;
+            while(std::getline(fs, line))
+            {
+                outFile.append(line);
+            }
 			fs.close();
             return true;
         }
         return false;
     }
-    bool ReadJsonFile(const std::string path, rapidjson::Document &document)
+    bool ReadJsonFile(const std::string& path, rapidjson::Document &document)
     {
-        std::string outString = "";
+        std::string outString;
         if (FileHelper::ReadTxtFile(path, outString))
         {
             document.Parse(outString.c_str(), outString.size());
-            return document.HasParseError() == false;
+            return !document.HasParseError();
         }
         return false;
     }
-    bool ReadTxtFile(const std::string path, std::vector<std::string> &outLines)
+    bool ReadTxtFile(const std::string& path, std::vector<std::string> &outLines)
     {
         std::fstream fs;
         fs.open(path, std::ios::in);
         if (fs.is_open())
         {
-            std::string tempString = "";
+            std::string tempString;
             while (std::getline(fs, tempString))
             {
                 outLines.push_back(tempString);
@@ -64,7 +61,7 @@ namespace FileHelper
         return false;
     }
 
-    bool WriterFile(const std::string path, const std::string &fileContent)
+    bool WriterFile(const std::string& path, const std::string &fileContent)
     {
         std::string nDirector;
         std::string nFileName;

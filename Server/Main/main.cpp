@@ -1,7 +1,6 @@
 ﻿
 #include <Core/App.h>
-#include<src/libc_override.h>
-#include<gperftools/tcmalloc.h>
+#include <jemalloc/jemalloc.h>
 #include <Scene/RpcResponseComponent.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
@@ -32,10 +31,9 @@
 #include <Service/HttpLoginService.h>
 #include <Http/HttpOperComponent.h>
 using namespace GameKeeper;
-
+#include <set>
 int main(int argc, char **argv)
 {
-
     for (int index = 0; index < argc; index++)
     {
         printf("%s\n", argv[index]);

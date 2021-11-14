@@ -36,12 +36,12 @@ namespace GameKeeper
 			return *mConfig;
 		}
 
-		inline float GetDelaTime()
+		inline float GetDelaTime() const
 		{
 			return this->mDelatime;
 		}
 
-		inline long long GetStartTime()
+		inline long long GetStartTime() const
 		{
 			return this->mStartTime;
 		}

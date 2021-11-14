@@ -23,7 +23,7 @@ namespace GameKeeper
         mConfigDocument.Parse(outString.c_str(), outString.size());
         if (this->mConfigDocument.HasParseError())
         {
-            GKDebugFatal("parse " << mConfigPath << " fail");
+            GKDebugFatal("parse " << mConfigPath << " failure");
             return false;
         }
 
