@@ -54,7 +54,7 @@ namespace GameKeeper
 			}
 		}
 #ifdef __COROUTINE_ASM__
-		coroutine->mStack = this->GetStack();
+		coroutine->mStack.clear();
 #endif
 		return coroutine;
 	}
@@ -63,16 +63,7 @@ namespace GameKeeper
 		if (coroutine != nullptr)
 		{
 #ifdef __COROUTINE_ASM__
-			if (this->mStringPool.size() < 100)
-			{
-				coroutine->mStack->clear();
-				this->mStringPool.push(coroutine->mStack);			
-			}
-			else
-			{
-				delete coroutine->mStack;
-			}
-			coroutine->mStack = nullptr;
+			coroutine->mStack.clear();
 #endif
 			if (coroutine->mFunction != nullptr)
 			{
@@ -91,18 +82,6 @@ namespace GameKeeper
 		}
 		return this->mAllCoroutine[id];	
 	}
-
-	std::string * CoroutinePool::GetStack()
-	{
-		if (!this->mStringPool.empty())
-		{
-			std::string * data = this->mStringPool.front();
-			this->mStringPool.pop();
-			return data;
-		}
-		return new std::string();
-	}
-	
 }
 
 namespace GameKeeper

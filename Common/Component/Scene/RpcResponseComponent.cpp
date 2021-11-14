@@ -45,7 +45,7 @@ namespace GameKeeper
 	const CallHandler * RpcResponseComponent::GetRpcHandler(unsigned int rpcId) const
 	{	
 		auto iter = this->mRetActionMap.find(rpcId);
-		return iter == this->mRetActionMap.end() ? nullptr : iter->second;
+		return iter != this->mRetActionMap.end() ? iter->second : nullptr;
 	}
 
 	bool RpcResponseComponent::OnResponse(const com::Rpc_Response & response)

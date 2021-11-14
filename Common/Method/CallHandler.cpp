@@ -13,6 +13,11 @@ namespace GameKeeper
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
 
+	CallHandler::~CallHandler()
+	{
+		GKDebugError("destory rpc action");
+	}
+
 	void LuaCallHandler::Invoke(const com::Rpc_Response & response)
     {
        /* LocalObject<com::Rpc_Response> lock(&response);
@@ -55,8 +60,7 @@ namespace GameKeeper
 		:CallHandler(method)
     {		
         this->mCoroutineId = 0;
-        this->mScheduler = nullptr;
-
+		this->mScheduler = App::Get().GetCorComponent();
     }
 
 	CppCallHandler::~CppCallHandler()
@@ -67,7 +71,7 @@ namespace GameKeeper
     void CppCallHandler::Invoke(const com::Rpc_Response & response)
     {
 		this->mCode = (XCode)response.code();
-        if(this->mMessage != nullptr)
+        if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
 			if (!response.data().UnpackTo(this->mMessage))
 			{
@@ -78,8 +82,7 @@ namespace GameKeeper
     }
 
     XCode CppCallHandler::StartCall()
-    {
-        this->mScheduler = App::Get().GetCorComponent();
+    {    
         this->mScheduler->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }
@@ -87,11 +90,7 @@ namespace GameKeeper
     XCode CppCallHandler::StartCall(google::protobuf::Message &message)
     {
         this->mMessage = &message;
-        this->mScheduler = App::Get().GetCorComponent();
         this->mScheduler->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }
-
-
-
 }// namespace GameKeeper

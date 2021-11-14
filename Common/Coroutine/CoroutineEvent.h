@@ -36,10 +36,7 @@ namespace GameKeeper
 	public:
 		Coroutine * Get(unsigned int id);
 	private:
-		std::string * GetStack();
-	private:
 		unsigned int mId;
-		std::queue<std::string *> mStringPool;
 		std::vector<Coroutine *> mAllCoroutine;
 		std::queue<unsigned int> mIdleCoroutines;
 		

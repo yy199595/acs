@@ -13,7 +13,7 @@ namespace GameKeeper
 	{
 	public:
 		CoroutineComponent();
-
+		~CoroutineComponent();
 	public:
 		template<typename F, typename T, typename ... Args>
 		unsigned int StartCoroutine(F && f, T * o, Args &&... args) {
