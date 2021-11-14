@@ -31,13 +31,9 @@
 #include <Service/HttpLoginService.h>
 #include <Http/HttpOperComponent.h>
 using namespace GameKeeper;
-#include <set>
+
 int main(int argc, char **argv)
 {
-    for (int index = 0; index < argc; index++)
-    {
-        printf("%s\n", argv[index]);
-    }
     __register_component__(GatewayComponent);
     __register_component__(TimerComponent);
     __register_component__(RpcRequestComponent);

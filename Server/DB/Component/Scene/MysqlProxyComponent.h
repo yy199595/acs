@@ -34,7 +34,6 @@ namespace GameKeeper
         std::queue<unsigned int> mWakeUpQueue;
     private:
         int mMysqlProxyNodeId;
-        std::string mMessageBuffer;
         class CoroutineComponent *mCorComponent;
 
         class NodeProxyComponent *mNodeComponent;

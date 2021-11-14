@@ -28,11 +28,10 @@ namespace GameKeeper
         {
             this->StartReceive();
 			AsioTcpSocket &nScoket = this->mSocketProxy->GetSocket();
-            this->mAddress = nScoket.remote_endpoint().address().to_string()
-                             + ":" + std::to_string(nScoket.remote_endpoint().port());
+			this->mIp = nScoket.remote_endpoint().address().to_string();
+            this->mAddress = this->mIp + ":" + std::to_string(nScoket.remote_endpoint().port());
         }
     }
-
 
 	void RpcClient::StartClose()
 	{		
@@ -85,22 +84,23 @@ namespace GameKeeper
 			}
 			else
 			{
-				size_t packageSize = 0;
-				memcpy(&packageSize, this->mReceiveMsgBuffer, t);
-				if (packageSize >= 1024 * 10) //最大为10k
+				unsigned int length = 0;
+				char type = this->mReceiveMsgBuffer[0];
+				memcpy(&length, this->mReceiveMsgBuffer + sizeof(char), sizeof(unsigned int));
+				if (length >= 1024 * 10) //最大为10k
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
-                int type = (int)this->mReceiveMsgBuffer[sizeof(unsigned int)];
-                if(type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
-                {
-                    this->ReadMessageBody(packageSize, type);
-                }
-                else
-                {
-                    this->CloseSocket(XCode::NetReceiveFailure);
-                }
+
+				if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
+				{
+					this->ReadMessageBody(length, type);
+				}
+				else
+				{
+					this->CloseSocket(XCode::NetReceiveFailure);
+				}
 			}
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
@@ -117,7 +117,7 @@ namespace GameKeeper
 		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
-	void RpcClient::ReadMessageBody(size_t allSize, int type)
+	void RpcClient::ReadMessageBody(unsigned int allSize, int type)
 	{	
 		if (!this->mSocketProxy->IsOpen())
 		{
@@ -202,21 +202,25 @@ namespace GameKeeper
 #endif // __DEBUG__
 		}
 		else
-		{			
-			size_t size = message->ByteSizeLong();
-			char * buffer = new char[size + 1];
-			if (!message->SerializePartialToArray(buffer + 1, size))
+		{						
+			unsigned int body = message->ByteSizeLong();
+			size_t head = sizeof(char) + sizeof(unsigned int);
+			char * messageBuffer = new char[head + body];
+
+			messageBuffer[0] = type;
+			memcpy(messageBuffer + sizeof(char), &body, sizeof(unsigned int));
+			if (!message->SerializePartialToArray(messageBuffer + head, body))
 			{
 #ifdef __DEBUG__
 				std::string json;
 				util::MessageToJsonString(*message, &json);
 				GKDebugError("Serialize " << "failure : " << json);
 #endif // __DEBUG__
-				delete[] buffer;
+				delete[] messageBuffer;
 			}
-			buffer[0] = type;
-			nSocket.async_send(asio::buffer(buffer, size),
-				[buffer, this](const asio::error_code &error_code, std::size_t size)
+			
+			nSocket.async_send(asio::buffer(messageBuffer, head + body),
+				[messageBuffer, this](const asio::error_code &error_code, std::size_t size)
 			{
 				XCode code = XCode::Successful;
 				if (error_code)
@@ -224,10 +228,10 @@ namespace GameKeeper
 					code = XCode::NetSendFailure;
 					this->CloseSocket(XCode::NetSendFailure);
 				}
-				delete[]buffer;
+				delete[]messageBuffer;
 				this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 			});
-			delete message;
 		}		
+		delete message;
 	}
 }

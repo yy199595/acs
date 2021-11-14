@@ -19,16 +19,17 @@ namespace GameKeeper
 
 	XCode CenterService::Add(const s2s::NodeRegister_Request &nodeInfo, s2s::NodeRegister_Response & response)
 	{
+		
 		const int areaId = nodeInfo.areaid();
 		const int nodeId = nodeInfo.nodeid();
+		long long socketId = this->GetCurSocketId();
 		const std::string &address = nodeInfo.address();
 		const std::string &nodeName = nodeInfo.servername();
 		if (address.empty() || nodeName.empty())
 		{
 			return XCode::Failure;
 		}
-
-        auto serviceNode = new NodeProxy(areaId, nodeId, nodeName, address);
+        auto serviceNode = new NodeProxy(areaId, nodeId, nodeName, address, socketId);
 
         const int key = serviceNode->GetNodeUId();
 		auto iter = this->mServiceNodeMap.find(key);

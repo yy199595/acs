@@ -74,14 +74,9 @@ namespace GameKeeper
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
-
-        if (!data.SerializeToString(&mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-        s2s::MysqlOper_Request requestData;
-        requestData.set_protocolname(data.GetTypeName());
-        requestData.set_protocolmessage(this->mMessageBuffer);
+      
+		s2s::MysqlOper_Request requestData;
+		requestData.mutable_data()->PackFrom(data);
         return proxyNode->Invoke("MysqlService.Add", requestData);
     }
 
@@ -98,26 +93,18 @@ namespace GameKeeper
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
         }
-
-        if (!data.SerializeToString(&this->mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-
+      
         s2s::MysqlQuery_Request requestData;
         s2s::MysqlQuery_Response responseData;
-
-        requestData.set_protocolname(data.GetTypeName());
-        requestData.set_protocolmessage(this->mMessageBuffer);
-
+		requestData.mutable_data()->PackFrom(data);
         XCode code = proxyNode->Call("MysqlService.Add", requestData, responseData);
         if (code == XCode::Successful && responseData.querydatas_size() > 0)
         {
-            const std::string &data = responseData.querydatas(0);
-            if(!queryData.ParseFromString(data))
-            {
-                return XCode::ParseMessageError;
-            }
+            const Any & data = responseData.querydatas(0);
+			if (!data.UnpackTo(&queryData))
+			{
+				return XCode::ParseMessageError;
+			}          
         }
         return code;
     }
@@ -134,14 +121,9 @@ namespace GameKeeper
             }
             this->mWakeUpQueue.push(id);
             this->mCorComponent->YieldReturn();
-        }
-        if(!data.SerializeToString(&this->mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
+        }       
         s2s::MysqlOper_Request requestData;
-        requestData.set_protocolname(data.GetTypeName());
-        requestData.set_protocolmessage(this->mMessageBuffer);
+		requestData.mutable_data()->PackFrom(data);
         return proxyNode->Invoke("MysqlService.Add", requestData);
     }
 
@@ -159,13 +141,7 @@ namespace GameKeeper
             this->mCorComponent->YieldReturn();
         }
         s2s::MysqlOper_Request requestData;
-        if (!data.SerializeToString(&this->mMessageBuffer))
-        {
-            return XCode::SerializationFailure;
-        }
-
-        requestData.set_protocolname(data.GetTypeName());
-        requestData.set_protocolmessage(this->mMessageBuffer);
+		requestData.mutable_data()->PackFrom(data);   
         return proxyNode->Invoke("MysqlService.Delete",requestData);
     }
 }

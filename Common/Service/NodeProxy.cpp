@@ -117,14 +117,12 @@ namespace GameKeeper
 
 	XCode NodeProxy::Notice(const std::string &method, const Message &request)
 	{
-        auto config = this->mProtocolComponent->GetProtocolConfig(method);
-        if(config == nullptr)
+		com::Rpc_Request * data = this->CreateRequest(method);
+        if(data == nullptr)
         {
-            return XCode::CallFunctionNotExist;
-        }
-		com::Rpc_Request * data = new com::Rpc_Request();
-		data->set_methodid(config->MethodId);
-		data->mutable_requestdata()->PackFrom(request);      
+            return XCode::NotFoundRpcConfig;
+        }		
+		data->mutable_data()->PackFrom(request);      
         this->AddRequestDataToQueue(data);
         return XCode::Successful;
 	}
@@ -150,7 +148,7 @@ namespace GameKeeper
 		}
 
         unsigned int handlerId = 0;
-        CppCallHandler cppCallHandler;
+		CppCallHandler cppCallHandler(request->methodid());
         if(!this->mResponseComponent->AddCallHandler(&cppCallHandler, handlerId))
         {
             return XCode::Failure;
@@ -169,7 +167,7 @@ namespace GameKeeper
 		}
 
         unsigned int handlerId = 0;
-        CppCallHandler cppCallHandler;
+		CppCallHandler cppCallHandler(request->methodid());
         if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
@@ -189,13 +187,13 @@ namespace GameKeeper
 		}
 
         unsigned int handlerId = 0;
-        CppCallHandler cppCallHandler;
+		CppCallHandler cppCallHandler(requestData->methodid());
         if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
 		requestData->set_rpcid(handlerId);
-		requestData->mutable_requestdata()->PackFrom(request);	
+		requestData->mutable_data()->PackFrom(request);
       
         this->AddRequestDataToQueue(requestData);
         return cppCallHandler.StartCall();
@@ -210,13 +208,13 @@ namespace GameKeeper
 			return XCode::NotFoundRpcConfig;
 		}
         unsigned int handlerId = 0;
-        CppCallHandler cppCallHandler;
+		CppCallHandler cppCallHandler(requestData->methodid());
         if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
         {
             return XCode::Failure;
         }
 		requestData->set_rpcid(handlerId);
-		requestData->mutable_requestdata()->PackFrom(request);
+		requestData->mutable_data()->PackFrom(request);
        
         this->AddRequestDataToQueue(requestData);
         return cppCallHandler.StartCall(response);

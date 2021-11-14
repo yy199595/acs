@@ -64,7 +64,7 @@ if(MSVC)
 
     
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
-    TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql libtcmalloc_minimal)
+    TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql jemalloc)
    
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})

@@ -17,8 +17,9 @@ namespace GameKeeper
         ~RpcResponseComponent() override = default;
 
     public:
-        bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
-        bool OnResponse(const com::Rpc_Response & message) final;
+		const CallHandler * GetRpcHandler(unsigned int id) const;
+		bool OnResponse(const com::Rpc_Response & message) final;
+        bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);	
     protected:
         bool Awake() override;
     private:

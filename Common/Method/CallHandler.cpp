@@ -7,8 +7,9 @@
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
-    CallHandler::CallHandler()
+    CallHandler::CallHandler(int method)
     {
+		this->mMethodId = method;
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
 
@@ -50,8 +51,9 @@ namespace GameKeeper
 		lua_presume(this->mCoroutine, this->luaEnv, 1);*/
     }
 
-    CppCallHandler::CppCallHandler()
-    {
+    CppCallHandler::CppCallHandler(int method)
+		:CallHandler(method)
+    {		
         this->mCoroutineId = 0;
         this->mScheduler = nullptr;
 
@@ -67,10 +69,10 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr)
         {
-			if (!response.responsedata().UnpackTo(this->mMessage))
+			if (!response.data().UnpackTo(this->mMessage))
 			{
 				this->mCode = XCode::ParseMessageError;
-			}          
+			}
         }
         this->mScheduler->Resume(mCoroutineId);
     }

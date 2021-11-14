@@ -351,7 +351,7 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, rpcid_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, methodname_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, messageindex_),
-  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, requestdata_),
+  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -359,7 +359,7 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, code_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, rpcid_),
-  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, responsedata_),
+  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -486,28 +486,27 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_c2s_2eproto[] =
   "\n\tc2s.proto\022\003c2s\032\031google/protobuf/any.pr"
   "oto\"G\n\nServerInfo\022\020\n\010ServerId\030\001 \001(\t\022\022\n\nS"
-  "erverName\030\002 \001(\t\022\023\n\013ServerState\030\003 \001(\005\"\311\001\n"
-  "\003Rpc\032m\n\007Request\022\r\n\005RpcId\030\001 \001(\003\022\022\n\nMethod"
-  "Name\030\002 \001(\t\022\024\n\014MessageIndex\030\003 \001(\r\022)\n\013Requ"
-  "estData\030\004 \001(\0132\024.google.protobuf.Any\032S\n\010R"
-  "esponse\022\014\n\004Code\030\001 \001(\005\022\r\n\005RpcId\030\002 \001(\003\022*\n\014"
-  "ResponseData\030\003 \001(\0132\024.google.protobuf.Any"
-  "\"\305\001\n\014AccountLogin\032K\n\007Request\022\017\n\007Account\030"
-  "\001 \001(\t\022\r\n\005Token\030\002 \001(\t\022\016\n\006Passwd\030\003 \001(\t\022\020\n\010"
-  "LoginDev\030\004 \001(\t\032h\n\010Response\022\r\n\005Token\030\001 \001("
-  "\t\022\021\n\tGateToken\030\002 \001(\t\022\025\n\rLastLoginTime\030\004 "
-  "\001(\003\022#\n\nServerList\030\005 \003(\0132\017.c2s.ServerInfo"
-  "\"j\n\017AccountRegister\032<\n\007Request\022\017\n\007Accoun"
-  "t\030\001 \001(\t\022\016\n\006Passwd\030\002 \001(\t\022\020\n\010LoginDev\030\003 \001("
-  "\t\032\031\n\010Response\022\r\n\005Token\030\001 \001(\t\"1\n\tGateLogi"
-  "n\032\030\n\007Request\022\r\n\005Token\030\001 \001(\t\032\n\n\010Response\""
-  "#\n\nGateLogout\032\t\n\007Request\032\n\n\010Responseb\006pr"
-  "oto3"
+  "erverName\030\002 \001(\t\022\023\n\013ServerState\030\003 \001(\005\"\272\001\n"
+  "\003Rpc\032f\n\007Request\022\r\n\005RpcId\030\001 \001(\003\022\022\n\nMethod"
+  "Name\030\002 \001(\t\022\024\n\014MessageIndex\030\003 \001(\r\022\"\n\004Data"
+  "\030\004 \001(\0132\024.google.protobuf.Any\032K\n\010Response"
+  "\022\014\n\004Code\030\001 \001(\005\022\r\n\005RpcId\030\002 \001(\003\022\"\n\004Data\030\003 "
+  "\001(\0132\024.google.protobuf.Any\"\305\001\n\014AccountLog"
+  "in\032K\n\007Request\022\017\n\007Account\030\001 \001(\t\022\r\n\005Token\030"
+  "\002 \001(\t\022\016\n\006Passwd\030\003 \001(\t\022\020\n\010LoginDev\030\004 \001(\t\032"
+  "h\n\010Response\022\r\n\005Token\030\001 \001(\t\022\021\n\tGateToken\030"
+  "\002 \001(\t\022\025\n\rLastLoginTime\030\004 \001(\003\022#\n\nServerLi"
+  "st\030\005 \003(\0132\017.c2s.ServerInfo\"j\n\017AccountRegi"
+  "ster\032<\n\007Request\022\017\n\007Account\030\001 \001(\t\022\016\n\006Pass"
+  "wd\030\002 \001(\t\022\020\n\010LoginDev\030\003 \001(\t\032\031\n\010Response\022\r"
+  "\n\005Token\030\001 \001(\t\"1\n\tGateLogin\032\030\n\007Request\022\r\n"
+  "\005Token\030\001 \001(\t\032\n\n\010Response\"#\n\nGateLogout\032\t"
+  "\n\007Request\032\n\n\010Responseb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_c2s_2eproto = {
   false, InitDefaults_c2s_2eproto, 
   descriptor_table_protodef_c2s_2eproto,
-  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 724,
+  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 709,
 };
 
 void AddDescriptors_c2s_2eproto() {
@@ -940,29 +939,29 @@ void ServerInfo::InternalSwap(ServerInfo* other) {
 // ===================================================================
 
 void Rpc_Request::InitAsDefaultInstance() {
-  ::c2s::_Rpc_Request_default_instance_._instance.get_mutable()->requestdata_ = const_cast< ::google::protobuf::Any*>(
+  ::c2s::_Rpc_Request_default_instance_._instance.get_mutable()->data_ = const_cast< ::google::protobuf::Any*>(
       ::google::protobuf::Any::internal_default_instance());
 }
 class Rpc_Request::HasBitSetters {
  public:
-  static const ::google::protobuf::Any& requestdata(const Rpc_Request* msg);
+  static const ::google::protobuf::Any& data(const Rpc_Request* msg);
 };
 
 const ::google::protobuf::Any&
-Rpc_Request::HasBitSetters::requestdata(const Rpc_Request* msg) {
-  return *msg->requestdata_;
+Rpc_Request::HasBitSetters::data(const Rpc_Request* msg) {
+  return *msg->data_;
 }
-void Rpc_Request::clear_requestdata() {
-  if (GetArenaNoVirtual() == nullptr && requestdata_ != nullptr) {
-    delete requestdata_;
+void Rpc_Request::clear_data() {
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
   }
-  requestdata_ = nullptr;
+  data_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Rpc_Request::kRpcIdFieldNumber;
 const int Rpc_Request::kMethodNameFieldNumber;
 const int Rpc_Request::kMessageIndexFieldNumber;
-const int Rpc_Request::kRequestDataFieldNumber;
+const int Rpc_Request::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Rpc_Request::Rpc_Request()
@@ -978,10 +977,10 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
   if (from.methodname().size() > 0) {
     methodname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.methodname_);
   }
-  if (from.has_requestdata()) {
-    requestdata_ = new ::google::protobuf::Any(*from.requestdata_);
+  if (from.has_data()) {
+    data_ = new ::google::protobuf::Any(*from.data_);
   } else {
-    requestdata_ = nullptr;
+    data_ = nullptr;
   }
   ::memcpy(&rpcid_, &from.rpcid_,
     static_cast<size_t>(reinterpret_cast<char*>(&messageindex_) -
@@ -993,9 +992,9 @@ void Rpc_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Request_c2s_2eproto.base);
   methodname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&requestdata_, 0, static_cast<size_t>(
+  ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&messageindex_) -
-      reinterpret_cast<char*>(&requestdata_)) + sizeof(messageindex_));
+      reinterpret_cast<char*>(&data_)) + sizeof(messageindex_));
 }
 
 Rpc_Request::~Rpc_Request() {
@@ -1005,7 +1004,7 @@ Rpc_Request::~Rpc_Request() {
 
 void Rpc_Request::SharedDtor() {
   methodname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete requestdata_;
+  if (this != internal_default_instance()) delete data_;
 }
 
 void Rpc_Request::SetCachedSize(int size) const {
@@ -1024,10 +1023,10 @@ void Rpc_Request::Clear() {
   (void) cached_has_bits;
 
   methodname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == nullptr && requestdata_ != nullptr) {
-    delete requestdata_;
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
   }
-  requestdata_ = nullptr;
+  data_ = nullptr;
   ::memset(&rpcid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&messageindex_) -
       reinterpret_cast<char*>(&rpcid_)) + sizeof(messageindex_));
@@ -1077,13 +1076,13 @@ const char* Rpc_Request::_InternalParse(const char* begin, const char* end, void
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // .google.protobuf.Any RequestData = 4;
+      // .google.protobuf.Any Data = 4;
       case 4: {
         if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::google::protobuf::Any::_InternalParse;
-        object = msg->mutable_requestdata();
+        object = msg->mutable_data();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1165,11 +1164,11 @@ bool Rpc_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Any RequestData = 4;
+      // .google.protobuf.Any Data = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_requestdata()));
+               input, mutable_data()));
         } else {
           goto handle_unusual;
         }
@@ -1223,10 +1222,10 @@ void Rpc_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->messageindex(), output);
   }
 
-  // .google.protobuf.Any RequestData = 4;
-  if (this->has_requestdata()) {
+  // .google.protobuf.Any Data = 4;
+  if (this->has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, HasBitSetters::requestdata(this), output);
+      4, HasBitSetters::data(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1263,11 +1262,11 @@ void Rpc_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->messageindex(), target);
   }
 
-  // .google.protobuf.Any RequestData = 4;
-  if (this->has_requestdata()) {
+  // .google.protobuf.Any Data = 4;
+  if (this->has_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        4, HasBitSetters::requestdata(this), target);
+        4, HasBitSetters::data(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1298,11 +1297,11 @@ size_t Rpc_Request::ByteSizeLong() const {
         this->methodname());
   }
 
-  // .google.protobuf.Any RequestData = 4;
-  if (this->has_requestdata()) {
+  // .google.protobuf.Any Data = 4;
+  if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *requestdata_);
+        *data_);
   }
 
   // int64 RpcId = 1;
@@ -1350,8 +1349,8 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
 
     methodname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.methodname_);
   }
-  if (from.has_requestdata()) {
-    mutable_requestdata()->::google::protobuf::Any::MergeFrom(from.requestdata());
+  if (from.has_data()) {
+    mutable_data()->::google::protobuf::Any::MergeFrom(from.data());
   }
   if (from.rpcid() != 0) {
     set_rpcid(from.rpcid());
@@ -1388,7 +1387,7 @@ void Rpc_Request::InternalSwap(Rpc_Request* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   methodname_.Swap(&other->methodname_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(requestdata_, other->requestdata_);
+  swap(data_, other->data_);
   swap(rpcid_, other->rpcid_);
   swap(messageindex_, other->messageindex_);
 }
@@ -1402,28 +1401,28 @@ void Rpc_Request::InternalSwap(Rpc_Request* other) {
 // ===================================================================
 
 void Rpc_Response::InitAsDefaultInstance() {
-  ::c2s::_Rpc_Response_default_instance_._instance.get_mutable()->responsedata_ = const_cast< ::google::protobuf::Any*>(
+  ::c2s::_Rpc_Response_default_instance_._instance.get_mutable()->data_ = const_cast< ::google::protobuf::Any*>(
       ::google::protobuf::Any::internal_default_instance());
 }
 class Rpc_Response::HasBitSetters {
  public:
-  static const ::google::protobuf::Any& responsedata(const Rpc_Response* msg);
+  static const ::google::protobuf::Any& data(const Rpc_Response* msg);
 };
 
 const ::google::protobuf::Any&
-Rpc_Response::HasBitSetters::responsedata(const Rpc_Response* msg) {
-  return *msg->responsedata_;
+Rpc_Response::HasBitSetters::data(const Rpc_Response* msg) {
+  return *msg->data_;
 }
-void Rpc_Response::clear_responsedata() {
-  if (GetArenaNoVirtual() == nullptr && responsedata_ != nullptr) {
-    delete responsedata_;
+void Rpc_Response::clear_data() {
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
   }
-  responsedata_ = nullptr;
+  data_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Rpc_Response::kCodeFieldNumber;
 const int Rpc_Response::kRpcIdFieldNumber;
-const int Rpc_Response::kResponseDataFieldNumber;
+const int Rpc_Response::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Rpc_Response::Rpc_Response()
@@ -1435,10 +1434,10 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  if (from.has_responsedata()) {
-    responsedata_ = new ::google::protobuf::Any(*from.responsedata_);
+  if (from.has_data()) {
+    data_ = new ::google::protobuf::Any(*from.data_);
   } else {
-    responsedata_ = nullptr;
+    data_ = nullptr;
   }
   ::memcpy(&rpcid_, &from.rpcid_,
     static_cast<size_t>(reinterpret_cast<char*>(&code_) -
@@ -1449,9 +1448,9 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
 void Rpc_Response::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Response_c2s_2eproto.base);
-  ::memset(&responsedata_, 0, static_cast<size_t>(
+  ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&code_) -
-      reinterpret_cast<char*>(&responsedata_)) + sizeof(code_));
+      reinterpret_cast<char*>(&data_)) + sizeof(code_));
 }
 
 Rpc_Response::~Rpc_Response() {
@@ -1460,7 +1459,7 @@ Rpc_Response::~Rpc_Response() {
 }
 
 void Rpc_Response::SharedDtor() {
-  if (this != internal_default_instance()) delete responsedata_;
+  if (this != internal_default_instance()) delete data_;
 }
 
 void Rpc_Response::SetCachedSize(int size) const {
@@ -1478,10 +1477,10 @@ void Rpc_Response::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == nullptr && responsedata_ != nullptr) {
-    delete responsedata_;
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
   }
-  responsedata_ = nullptr;
+  data_ = nullptr;
   ::memset(&rpcid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&code_) -
       reinterpret_cast<char*>(&rpcid_)) + sizeof(code_));
@@ -1515,13 +1514,13 @@ const char* Rpc_Response::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // .google.protobuf.Any ResponseData = 3;
+      // .google.protobuf.Any Data = 3;
       case 3: {
         if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::google::protobuf::Any::_InternalParse;
-        object = msg->mutable_responsedata();
+        object = msg->mutable_data();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1584,11 +1583,11 @@ bool Rpc_Response::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Any ResponseData = 3;
+      // .google.protobuf.Any Data = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_responsedata()));
+               input, mutable_data()));
         } else {
           goto handle_unusual;
         }
@@ -1632,10 +1631,10 @@ void Rpc_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->rpcid(), output);
   }
 
-  // .google.protobuf.Any ResponseData = 3;
-  if (this->has_responsedata()) {
+  // .google.protobuf.Any Data = 3;
+  if (this->has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, HasBitSetters::responsedata(this), output);
+      3, HasBitSetters::data(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1661,11 +1660,11 @@ void Rpc_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->rpcid(), target);
   }
 
-  // .google.protobuf.Any ResponseData = 3;
-  if (this->has_responsedata()) {
+  // .google.protobuf.Any Data = 3;
+  if (this->has_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, HasBitSetters::responsedata(this), target);
+        3, HasBitSetters::data(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1689,11 +1688,11 @@ size_t Rpc_Response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .google.protobuf.Any ResponseData = 3;
-  if (this->has_responsedata()) {
+  // .google.protobuf.Any Data = 3;
+  if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *responsedata_);
+        *data_);
   }
 
   // int64 RpcId = 2;
@@ -1737,8 +1736,8 @@ void Rpc_Response::MergeFrom(const Rpc_Response& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_responsedata()) {
-    mutable_responsedata()->::google::protobuf::Any::MergeFrom(from.responsedata());
+  if (from.has_data()) {
+    mutable_data()->::google::protobuf::Any::MergeFrom(from.data());
   }
   if (from.rpcid() != 0) {
     set_rpcid(from.rpcid());
@@ -1773,7 +1772,7 @@ void Rpc_Response::Swap(Rpc_Response* other) {
 void Rpc_Response::InternalSwap(Rpc_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(responsedata_, other->responsedata_);
+  swap(data_, other->data_);
   swap(rpcid_, other->rpcid_);
   swap(code_, other->code_);
 }

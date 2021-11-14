@@ -36,11 +36,8 @@ namespace GameKeeper
     }
 
     XCode MysqlService::Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
-    {
-		const std::string & name = request.protocolname();
-        const std::string & data = request.protocolmessage();
-		
-		Message * message = MessagePool::NewByData(name, data);
+    {		
+		Message * message = MessagePool::New(request.data());
         if (message == nullptr)
         {
 			return XCode::ParseMessageError;
@@ -71,9 +68,7 @@ namespace GameKeeper
 
     XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-		const std::string & name = request.protocolname();
-        const std::string & data = request.protocolmessage();
-		Message * message = MessagePool::NewByData(name, data);
+		Message * message = MessagePool::New(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;
@@ -104,9 +99,7 @@ namespace GameKeeper
 
     XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-		const std::string & name = request.protocolname();
-        const std::string & data = request.protocolmessage();
-		Message * message = MessagePool::NewByData(name, data);
+		Message * message = MessagePool::New(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;
@@ -136,13 +129,10 @@ namespace GameKeeper
 
     XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
     {
-		const std::string & name = request.protocolname();
-		const std::string & data = request.protocolmessage();
-		Message * message = MessagePool::NewByData(name, data);
+		Message * message = MessagePool::New(request.data());
         if (message == nullptr)
         {
-            response.set_errotstr("create " + request.protocolname() + " fail");
-            return XCode::CreatePorotbufFail;
+            return XCode::ParseMessageError;
         }
        
         std::string sql;
@@ -161,6 +151,7 @@ namespace GameKeeper
         XCode code = mysqlTask.GetErrorCode();
         if (code == XCode::Successful)
         {	
+			const std::string name = request.data().GetTypeName();
             const std::vector<std::string> &jsonArray = mysqlTask.GetQueryDatas();
 			for (const std::string &json : jsonArray)
 			{
@@ -168,9 +159,8 @@ namespace GameKeeper
 				if (message == nullptr)
 				{
 					return XCode::JsonCastProtocbufFail;
-				}
-				std::string *jsonData = response.add_querydatas();
-				jsonData->append(message->SerializeAsString());
+				}			
+				response.add_querydatas()->PackFrom(*message);
 			}
             return XCode::Successful;
         }

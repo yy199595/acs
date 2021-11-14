@@ -2,6 +2,18 @@
 namespace GameKeeper
 {
 	std::unordered_map<std::string, Message *> MessagePool::mMessageMap;
+
+	Message * MessagePool::New(const Any & any)
+	{
+		const std::string & name = any.GetTypeName();
+		Message * message = MessagePool::New(name);
+		if (message == nullptr || !any.UnpackTo(message))
+		{
+			return nullptr;
+		}
+		return message;
+	}
+
 	Message * MessagePool::New(const std::string & name)
 	{
 		if (name.empty())

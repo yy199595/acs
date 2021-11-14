@@ -16,13 +16,13 @@ message Rpc
         int64 RpcId = 1;
         string MethodName = 2;
         uint32 MessageIndex = 3;
-        google.protobuf.Any RequestData = 4;
+        google.protobuf.Any Data = 4;
     }
     message Response
     {
         int32 Code = 1;
         int64 RpcId = 2;
-        google.protobuf.Any ResponseData = 3;
+        google.protobuf.Any Data = 3;
     }
 }
 

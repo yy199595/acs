@@ -56,25 +56,28 @@ namespace GameKeeper
 	{
 	public:
 		ServiceMethod1(const std::string name, T * o, ServiceMethodType1<T> func)
-			: ServiceMethod(name) ,_o(o), _func(func) { }
+			: ServiceMethod(name) ,_o(o), _func(func), mHasUserId(false){ }
 
 		ServiceMethod1(const std::string name, T * o, ServiceMethodType11<T> func)
-			: ServiceMethod(name), _o(o), _objfunc(func) { }
+			: ServiceMethod(name), _o(o), _objfunc(func)，mHasUserId(true) { }
 	public:
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
 
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
 			long long userId = request.userid();
-            if (userId == 0) {
-				return (_o->*_func)();
+			if (this->mHasUserId)
+			{
+				GKAssertRetCode_F(userId != 0);
+				return (_o->*_objfunc)(userId, request);
 			}
-			return (_o->*_objfunc)(userId);
+			return (_o->*_func)(request);
 		}
 
         bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
+		bool mHasUserId;
 		ServiceMethodType1<T> _func;
 		ServiceMethodType11<T> _objfunc;
 	};
@@ -83,26 +86,29 @@ namespace GameKeeper
 	{
 	public:
 		ServiceMethod2(const std::string name, T * o, ServiceMethodType2<T, T1> func)
-			:ServiceMethod(name), _o(o), _func(func) { }
+			:ServiceMethod(name), _o(o), _func(func), mHasUserId(false){ }
 
 		ServiceMethod2(const std::string name, T * o, ServiceMethodType22<T, T1> func)
-			:ServiceMethod(name), _o(o), _objfunc(func) { }
+			:ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true){ }
 	public:
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
         {
 			T1 requestData;
 			long long userId = request.userid();
-			GKAssertRetCode_F(request.requestdata().Is<T1>());
-			GKAssertRetCode_F(request.requestdata().UnpackTo(&requestData));
-
-            return userId == 0 
-				? (_o->*_func)(requestData) 
-				: (_o->*_objfunc)(request.userid(), requestData);
+			GKAssertRetCode_F(request.data().Is<T1>());
+			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
+			if(this->mHasUserId)
+			{
+				GKAssertRetCode_F(userId != 0);
+				return (_o->*_objfunc)(userId, requestData);
+			}
+			return (_o->*_func)(requestData);
         }
 		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
+		bool mHasUserId;
 		ServiceMethodType2<T, T1> _func;
 		ServiceMethodType22<T, T1> _objfunc;
 	};
@@ -113,33 +119,34 @@ namespace GameKeeper
 	public:
 		typedef XCode(T::*ServerFunc)(long long, const T1 &, T2 &);
 		ServiceMethod3(const std::string name, T * o, ServiceMethodType3<T, T1, T2> func)
-			: ServiceMethod(name),_o(o), _func(func) { }
+			: ServiceMethod(name),_o(o), _func(func), mHasUserId(false){ }
 
 		ServiceMethod3(const std::string name, T * o, ServiceMethodType33<T, T1, T2> func)
-			: ServiceMethod(name), _o(o), _objfunc(func) { }
+			: ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true){ }
 	public:
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
 			T1 requestData;
-			T2 responseData;
+			T2 responseData;		
 			long long userId = request.userid();
-			GKAssertRetCode_F(request.requestdata().Is<T1>());
-			GKAssertRetCode_F(request.requestdata().UnpackTo(&requestData));
-           
-			XCode code = userId == 0 
-				? (_o->*_func)(requestData, responseData) 
+			GKAssertRetCode_F(request.data().Is<T1>());
+			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
+			
+			XCode code = !this->mHasUserId
+				? (_o->*_func)(requestData, responseData)
 				: (_o->*_objfunc)(userId, requestData, responseData);
 
 			if (code == XCode::Successful)
 			{
-				response.mutable_responsedata()->PackFrom(responseData);
+				response.mutable_data()->PackFrom(responseData);
 			}	
 			return code;
 		}
 		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
+		bool mHasUserId;
 		ServiceMethodType3<T, T1, T2> _func;
 		ServiceMethodType33<T, T1, T2> _objfunc;
 	};
@@ -149,26 +156,29 @@ namespace GameKeeper
 	{
 	public:
 		ServiceMethod4(const std::string name, T * o, ServiceMethodType4<T, T1> func)
-			:ServiceMethod(name), _o(o), _func(func) { }
+			:ServiceMethod(name), _o(o), _func(func), mHasUserId(false){ }
 
 		ServiceMethod4(const std::string name, T * o, ServiceMethodType44<T, T1> func)
-			:ServiceMethod(name), _o(o), _objfunc(func) { }
+			:ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true) { }
 	public:
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
 			T1 requestData;
 			long long userId = request.userid();
-			GKAssertRetCode_F(request.requestdata().Is<T1>());
-			GKAssertRetCode_F(request.requestdata().UnpackTo(&requestData));
-
-            return userId == 0 
-				? (_o->*_func)(requestData)
-				: (_o->*_objfunc)(userId, requestData);
+			GKAssertRetCode_F(request.data().Is<T1>());
+			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
+			if (this->mHasUserId) 
+			{
+				GKAssertRetCode_F(userId != 0);
+				return (_o->*_objfunc)(userId, requestData);
+			}
+			return (_o->*_func)(requestData);
 		}
 		bool IsLuaMethod() override { return false; };
 	private:
 		T * _o;
+		bool mHasUserId;
 		ServiceMethodType4<T, T1> _func;
 		ServiceMethodType44<T, T1> _objfunc;
 	};

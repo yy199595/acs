@@ -16,7 +16,7 @@ namespace GameKeeper
 	}
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request &messageData, com::Rpc_Response & response)
-	{
+	{		
 		//lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, mIdx);
 		//luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 		//lua_pushinteger(this->mLuaEnv, messageData.userid());

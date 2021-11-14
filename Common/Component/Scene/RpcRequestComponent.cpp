@@ -50,12 +50,13 @@ namespace GameKeeper
 			com::Rpc_Response * response = new com::Rpc_Response();
             XCode code = method->Invoke(request, *response);
             if (request.rpcid() != 0)
-            {              
+            {       			
 				response->set_code(code);
 				response->set_rpcid(request.rpcid());
 				response->set_userid(request.userid());
                 this->mRpcComponent->SendByAddress(request.socketid(), response);
             }
+			delete &request;
         }
         else if(method->IsLuaMethod()) //lua 异步
         {
@@ -79,5 +80,6 @@ namespace GameKeeper
 			response->set_userid(request->userid());
 			this->mRpcComponent->SendByAddress(request->socketid(), response);
 		}
+		delete request;
     }
 }// namespace GameKeeper

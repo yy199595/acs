@@ -20,7 +20,6 @@ namespace GameKeeper
         void ConnectHandler();
         void AsyncConnectHandler(unsigned int id);
     private:
-        std::string mIp;
         unsigned int mPort;
         unsigned int mConnectCount;
     };

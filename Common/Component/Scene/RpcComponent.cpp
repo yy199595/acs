@@ -8,7 +8,8 @@
 #include <Component/Scene/RpcRequestComponent.h>
 #include <Network/Rpc/RpcConnector.h>
 #ifdef __DEBUG__
-#include <Pool/MessagePool.h>
+#include<Pool/MessagePool.h>
+#include<Method/CallHandler.h>
 #endif
 namespace GameKeeper
 {
@@ -98,10 +99,13 @@ namespace GameKeeper
         }
 #ifdef __DEBUG__
         std::string json;
-        if(util::MessageToJsonString(*request, &json).ok())
-        {
-            GKDebugLog(session->GetAddress() << " request  json = " << json);
-        }
+		const std::string & method = config->Method;
+		const std::string & service = config->Service;
+		if (util::MessageToJsonString(*request, &json).ok())
+		{
+			GKDebugLog("[" << session->GetAddress() << " request] "
+				<< service << "." << method << "  json = \n" << StringHelper::FormatJson(json));
+		}
 #endif
         this->mRequestComponent->OnRequest(*request);
     }
@@ -111,8 +115,22 @@ namespace GameKeeper
 #ifdef __DEBUG__
         std::string json;
         if(util::MessageToJsonString(*response, &json).ok())
-        {
-            GKDebugLog(session->GetAddress() << " response  json = " << json);
+        {			
+			long long rpcId = response->rpcid();
+			auto rpc = this->mResponseComponent->GetRpcHandler(rpcId);
+			if (rpc != nullptr)
+			{
+				auto config = this->mProtocolComponent->GetProtocolConfig(rpc->GetMethodId());
+				if (config != nullptr)
+				{					
+					const std::string & method = config->Method;
+					const std::string & service = config->Service;
+					long long nowTime = TimeHelper::GetMilTimestamp();
+					float time = (nowTime - rpc->GetCreateTime()) / 1000.0f;
+					GKDebugLog("[" << session->GetAddress() << " response]  [time = " 
+						<< time <<"]  "<< service << "." << method <<  " json = \n" << StringHelper::FormatJson(json));
+				}
+			}         
         }
 #endif
         this->mResponseComponent->OnResponse(*response);

@@ -8,8 +8,10 @@
 namespace GameKeeper
 {
 	RpcConnector::RpcConnector(RpcComponent * component, const std::string & ip, const unsigned short port)
-		:RpcClient(component), mIp(ip), mPort(port)
+		:RpcClient(component)
 	{
+		this->mIp = ip;
+		this->mPort = port;
 		this->mAddress = ip + ":" + std::to_string(mPort);
 	}
 

@@ -84,7 +84,7 @@ namespace GameKeeper
     const ProtocolConfig *RpcProtoComponent::GetProtocolConfig(int methodId) const
     {
         auto iter = this->mProtocolIdMap.find(methodId);
-        return iter == this->mProtocolIdMap.end() ? &iter->second : nullptr;
+        return iter != this->mProtocolIdMap.end() ? &iter->second : nullptr;
     }
 
 	bool RpcProtoComponent::HasService(const std::string & service)
@@ -100,6 +100,23 @@ namespace GameKeeper
 		{
 			services.push_back(iter->first);
 		}
+	}
+
+	bool RpcProtoComponent::HasServiceMethod(const std::string & service, const std::string & method)
+	{
+		auto iter = this->mServiceMap.find(service);
+		if (iter == this->mServiceMap.end())
+		{
+			return false;
+		}
+		for (auto config : iter->second)
+		{
+			if (config.Method == method)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	bool RpcProtoComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)

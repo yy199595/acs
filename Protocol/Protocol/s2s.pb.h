@@ -31,6 +31,7 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_s2s_2eproto
@@ -1115,41 +1116,21 @@ class MysqlQuery_Request :
 
   // accessors -------------------------------------------------------
 
-  // string ProtocolName = 1;
-  void clear_protocolname();
-  static const int kProtocolNameFieldNumber = 1;
-  const ::std::string& protocolname() const;
-  void set_protocolname(const ::std::string& value);
-  #if LANG_CXX11
-  void set_protocolname(::std::string&& value);
-  #endif
-  void set_protocolname(const char* value);
-  void set_protocolname(const char* value, size_t size);
-  ::std::string* mutable_protocolname();
-  ::std::string* release_protocolname();
-  void set_allocated_protocolname(::std::string* protocolname);
-
-  // bytes ProtocolMessage = 2;
-  void clear_protocolmessage();
-  static const int kProtocolMessageFieldNumber = 2;
-  const ::std::string& protocolmessage() const;
-  void set_protocolmessage(const ::std::string& value);
-  #if LANG_CXX11
-  void set_protocolmessage(::std::string&& value);
-  #endif
-  void set_protocolmessage(const char* value);
-  void set_protocolmessage(const void* value, size_t size);
-  ::std::string* mutable_protocolmessage();
-  ::std::string* release_protocolmessage();
-  void set_allocated_protocolmessage(::std::string* protocolmessage);
+  // .google.protobuf.Any Data = 1;
+  bool has_data() const;
+  void clear_data();
+  static const int kDataFieldNumber = 1;
+  const ::google::protobuf::Any& data() const;
+  ::google::protobuf::Any* release_data();
+  ::google::protobuf::Any* mutable_data();
+  void set_allocated_data(::google::protobuf::Any* data);
 
   // @@protoc_insertion_point(class_scope:s2s.MysqlQuery.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr protocolname_;
-  ::google::protobuf::internal::ArenaStringPtr protocolmessage_;
+  ::google::protobuf::Any* data_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -1250,27 +1231,17 @@ class MysqlQuery_Response :
 
   // accessors -------------------------------------------------------
 
-  // repeated bytes QueryDatas = 2;
+  // repeated .google.protobuf.Any QueryDatas = 2;
   int querydatas_size() const;
   void clear_querydatas();
   static const int kQueryDatasFieldNumber = 2;
-  const ::std::string& querydatas(int index) const;
-  ::std::string* mutable_querydatas(int index);
-  void set_querydatas(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_querydatas(int index, ::std::string&& value);
-  #endif
-  void set_querydatas(int index, const char* value);
-  void set_querydatas(int index, const void* value, size_t size);
-  ::std::string* add_querydatas();
-  void add_querydatas(const ::std::string& value);
-  #if LANG_CXX11
-  void add_querydatas(::std::string&& value);
-  #endif
-  void add_querydatas(const char* value);
-  void add_querydatas(const void* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& querydatas() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_querydatas();
+  ::google::protobuf::Any* mutable_querydatas(int index);
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
+      mutable_querydatas();
+  const ::google::protobuf::Any& querydatas(int index) const;
+  ::google::protobuf::Any* add_querydatas();
+  const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+      querydatas() const;
 
   // string ErrotStr = 1;
   void clear_errotstr();
@@ -1291,7 +1262,7 @@ class MysqlQuery_Response :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> querydatas_;
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any > querydatas_;
   ::google::protobuf::internal::ArenaStringPtr errotstr_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
@@ -1501,41 +1472,21 @@ class MysqlOper_Request :
 
   // accessors -------------------------------------------------------
 
-  // string ProtocolName = 1;
-  void clear_protocolname();
-  static const int kProtocolNameFieldNumber = 1;
-  const ::std::string& protocolname() const;
-  void set_protocolname(const ::std::string& value);
-  #if LANG_CXX11
-  void set_protocolname(::std::string&& value);
-  #endif
-  void set_protocolname(const char* value);
-  void set_protocolname(const char* value, size_t size);
-  ::std::string* mutable_protocolname();
-  ::std::string* release_protocolname();
-  void set_allocated_protocolname(::std::string* protocolname);
-
-  // bytes ProtocolMessage = 2;
-  void clear_protocolmessage();
-  static const int kProtocolMessageFieldNumber = 2;
-  const ::std::string& protocolmessage() const;
-  void set_protocolmessage(const ::std::string& value);
-  #if LANG_CXX11
-  void set_protocolmessage(::std::string&& value);
-  #endif
-  void set_protocolmessage(const char* value);
-  void set_protocolmessage(const void* value, size_t size);
-  ::std::string* mutable_protocolmessage();
-  ::std::string* release_protocolmessage();
-  void set_allocated_protocolmessage(::std::string* protocolmessage);
+  // .google.protobuf.Any Data = 1;
+  bool has_data() const;
+  void clear_data();
+  static const int kDataFieldNumber = 1;
+  const ::google::protobuf::Any& data() const;
+  ::google::protobuf::Any* release_data();
+  ::google::protobuf::Any* mutable_data();
+  void set_allocated_data(::google::protobuf::Any* data);
 
   // @@protoc_insertion_point(class_scope:s2s.MysqlOper.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr protocolname_;
-  ::google::protobuf::internal::ArenaStringPtr protocolmessage_;
+  ::google::protobuf::Any* data_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -2309,110 +2260,49 @@ NodeQuery_Response::nodeinfos() const {
 
 // MysqlQuery_Request
 
-// string ProtocolName = 1;
-inline void MysqlQuery_Request::clear_protocolname() {
-  protocolname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .google.protobuf.Any Data = 1;
+inline bool MysqlQuery_Request::has_data() const {
+  return this != internal_default_instance() && data_ != nullptr;
 }
-inline const ::std::string& MysqlQuery_Request::protocolname() const {
-  // @@protoc_insertion_point(field_get:s2s.MysqlQuery.Request.ProtocolName)
-  return protocolname_.GetNoArena();
+inline const ::google::protobuf::Any& MysqlQuery_Request::data() const {
+  const ::google::protobuf::Any* p = data_;
+  // @@protoc_insertion_point(field_get:s2s.MysqlQuery.Request.Data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
 }
-inline void MysqlQuery_Request::set_protocolname(const ::std::string& value) {
+inline ::google::protobuf::Any* MysqlQuery_Request::release_data() {
+  // @@protoc_insertion_point(field_release:s2s.MysqlQuery.Request.Data)
   
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.MysqlQuery.Request.ProtocolName)
+  ::google::protobuf::Any* temp = data_;
+  data_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void MysqlQuery_Request::set_protocolname(::std::string&& value) {
+inline ::google::protobuf::Any* MysqlQuery_Request::mutable_data() {
   
-  protocolname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.MysqlQuery.Request.ProtocolName)
+  if (data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:s2s.MysqlQuery.Request.Data)
+  return data_;
 }
-#endif
-inline void MysqlQuery_Request::set_protocolname(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.MysqlQuery.Request.ProtocolName)
-}
-inline void MysqlQuery_Request::set_protocolname(const char* value, size_t size) {
-  
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.MysqlQuery.Request.ProtocolName)
-}
-inline ::std::string* MysqlQuery_Request::mutable_protocolname() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.MysqlQuery.Request.ProtocolName)
-  return protocolname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* MysqlQuery_Request::release_protocolname() {
-  // @@protoc_insertion_point(field_release:s2s.MysqlQuery.Request.ProtocolName)
-  
-  return protocolname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void MysqlQuery_Request::set_allocated_protocolname(::std::string* protocolname) {
-  if (protocolname != nullptr) {
+inline void MysqlQuery_Request::set_allocated_data(::google::protobuf::Any* data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
+  }
+  if (data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data, submessage_arena);
+    }
     
   } else {
     
   }
-  protocolname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), protocolname);
-  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlQuery.Request.ProtocolName)
-}
-
-// bytes ProtocolMessage = 2;
-inline void MysqlQuery_Request::clear_protocolmessage() {
-  protocolmessage_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& MysqlQuery_Request::protocolmessage() const {
-  // @@protoc_insertion_point(field_get:s2s.MysqlQuery.Request.ProtocolMessage)
-  return protocolmessage_.GetNoArena();
-}
-inline void MysqlQuery_Request::set_protocolmessage(const ::std::string& value) {
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.MysqlQuery.Request.ProtocolMessage)
-}
-#if LANG_CXX11
-inline void MysqlQuery_Request::set_protocolmessage(::std::string&& value) {
-  
-  protocolmessage_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.MysqlQuery.Request.ProtocolMessage)
-}
-#endif
-inline void MysqlQuery_Request::set_protocolmessage(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.MysqlQuery.Request.ProtocolMessage)
-}
-inline void MysqlQuery_Request::set_protocolmessage(const void* value, size_t size) {
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.MysqlQuery.Request.ProtocolMessage)
-}
-inline ::std::string* MysqlQuery_Request::mutable_protocolmessage() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.MysqlQuery.Request.ProtocolMessage)
-  return protocolmessage_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* MysqlQuery_Request::release_protocolmessage() {
-  // @@protoc_insertion_point(field_release:s2s.MysqlQuery.Request.ProtocolMessage)
-  
-  return protocolmessage_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void MysqlQuery_Request::set_allocated_protocolmessage(::std::string* protocolmessage) {
-  if (protocolmessage != nullptr) {
-    
-  } else {
-    
-  }
-  protocolmessage_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), protocolmessage);
-  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlQuery.Request.ProtocolMessage)
+  data_ = data;
+  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlQuery.Request.Data)
 }
 
 // -------------------------------------------------------------------
@@ -2472,73 +2362,31 @@ inline void MysqlQuery_Response::set_allocated_errotstr(::std::string* errotstr)
   // @@protoc_insertion_point(field_set_allocated:s2s.MysqlQuery.Response.ErrotStr)
 }
 
-// repeated bytes QueryDatas = 2;
+// repeated .google.protobuf.Any QueryDatas = 2;
 inline int MysqlQuery_Response::querydatas_size() const {
   return querydatas_.size();
 }
-inline void MysqlQuery_Response::clear_querydatas() {
-  querydatas_.Clear();
-}
-inline const ::std::string& MysqlQuery_Response::querydatas(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.MysqlQuery.Response.QueryDatas)
-  return querydatas_.Get(index);
-}
-inline ::std::string* MysqlQuery_Response::mutable_querydatas(int index) {
+inline ::google::protobuf::Any* MysqlQuery_Response::mutable_querydatas(int index) {
   // @@protoc_insertion_point(field_mutable:s2s.MysqlQuery.Response.QueryDatas)
   return querydatas_.Mutable(index);
 }
-inline void MysqlQuery_Response::set_querydatas(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:s2s.MysqlQuery.Response.QueryDatas)
-  querydatas_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void MysqlQuery_Response::set_querydatas(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:s2s.MysqlQuery.Response.QueryDatas)
-  querydatas_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void MysqlQuery_Response::set_querydatas(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  querydatas_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:s2s.MysqlQuery.Response.QueryDatas)
-}
-inline void MysqlQuery_Response::set_querydatas(int index, const void* value, size_t size) {
-  querydatas_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:s2s.MysqlQuery.Response.QueryDatas)
-}
-inline ::std::string* MysqlQuery_Response::add_querydatas() {
-  // @@protoc_insertion_point(field_add_mutable:s2s.MysqlQuery.Response.QueryDatas)
-  return querydatas_.Add();
-}
-inline void MysqlQuery_Response::add_querydatas(const ::std::string& value) {
-  querydatas_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:s2s.MysqlQuery.Response.QueryDatas)
-}
-#if LANG_CXX11
-inline void MysqlQuery_Response::add_querydatas(::std::string&& value) {
-  querydatas_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:s2s.MysqlQuery.Response.QueryDatas)
-}
-#endif
-inline void MysqlQuery_Response::add_querydatas(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  querydatas_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:s2s.MysqlQuery.Response.QueryDatas)
-}
-inline void MysqlQuery_Response::add_querydatas(const void* value, size_t size) {
-  querydatas_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:s2s.MysqlQuery.Response.QueryDatas)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-MysqlQuery_Response::querydatas() const {
-  // @@protoc_insertion_point(field_list:s2s.MysqlQuery.Response.QueryDatas)
-  return querydatas_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
+inline ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
 MysqlQuery_Response::mutable_querydatas() {
   // @@protoc_insertion_point(field_mutable_list:s2s.MysqlQuery.Response.QueryDatas)
   return &querydatas_;
+}
+inline const ::google::protobuf::Any& MysqlQuery_Response::querydatas(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.MysqlQuery.Response.QueryDatas)
+  return querydatas_.Get(index);
+}
+inline ::google::protobuf::Any* MysqlQuery_Response::add_querydatas() {
+  // @@protoc_insertion_point(field_add:s2s.MysqlQuery.Response.QueryDatas)
+  return querydatas_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+MysqlQuery_Response::querydatas() const {
+  // @@protoc_insertion_point(field_list:s2s.MysqlQuery.Response.QueryDatas)
+  return querydatas_;
 }
 
 // -------------------------------------------------------------------
@@ -2549,110 +2397,49 @@ MysqlQuery_Response::mutable_querydatas() {
 
 // MysqlOper_Request
 
-// string ProtocolName = 1;
-inline void MysqlOper_Request::clear_protocolname() {
-  protocolname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .google.protobuf.Any Data = 1;
+inline bool MysqlOper_Request::has_data() const {
+  return this != internal_default_instance() && data_ != nullptr;
 }
-inline const ::std::string& MysqlOper_Request::protocolname() const {
-  // @@protoc_insertion_point(field_get:s2s.MysqlOper.Request.ProtocolName)
-  return protocolname_.GetNoArena();
+inline const ::google::protobuf::Any& MysqlOper_Request::data() const {
+  const ::google::protobuf::Any* p = data_;
+  // @@protoc_insertion_point(field_get:s2s.MysqlOper.Request.Data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
 }
-inline void MysqlOper_Request::set_protocolname(const ::std::string& value) {
+inline ::google::protobuf::Any* MysqlOper_Request::release_data() {
+  // @@protoc_insertion_point(field_release:s2s.MysqlOper.Request.Data)
   
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.MysqlOper.Request.ProtocolName)
+  ::google::protobuf::Any* temp = data_;
+  data_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void MysqlOper_Request::set_protocolname(::std::string&& value) {
+inline ::google::protobuf::Any* MysqlOper_Request::mutable_data() {
   
-  protocolname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.MysqlOper.Request.ProtocolName)
+  if (data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:s2s.MysqlOper.Request.Data)
+  return data_;
 }
-#endif
-inline void MysqlOper_Request::set_protocolname(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.MysqlOper.Request.ProtocolName)
-}
-inline void MysqlOper_Request::set_protocolname(const char* value, size_t size) {
-  
-  protocolname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.MysqlOper.Request.ProtocolName)
-}
-inline ::std::string* MysqlOper_Request::mutable_protocolname() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.MysqlOper.Request.ProtocolName)
-  return protocolname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* MysqlOper_Request::release_protocolname() {
-  // @@protoc_insertion_point(field_release:s2s.MysqlOper.Request.ProtocolName)
-  
-  return protocolname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void MysqlOper_Request::set_allocated_protocolname(::std::string* protocolname) {
-  if (protocolname != nullptr) {
+inline void MysqlOper_Request::set_allocated_data(::google::protobuf::Any* data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
+  }
+  if (data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data, submessage_arena);
+    }
     
   } else {
     
   }
-  protocolname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), protocolname);
-  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlOper.Request.ProtocolName)
-}
-
-// bytes ProtocolMessage = 2;
-inline void MysqlOper_Request::clear_protocolmessage() {
-  protocolmessage_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& MysqlOper_Request::protocolmessage() const {
-  // @@protoc_insertion_point(field_get:s2s.MysqlOper.Request.ProtocolMessage)
-  return protocolmessage_.GetNoArena();
-}
-inline void MysqlOper_Request::set_protocolmessage(const ::std::string& value) {
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.MysqlOper.Request.ProtocolMessage)
-}
-#if LANG_CXX11
-inline void MysqlOper_Request::set_protocolmessage(::std::string&& value) {
-  
-  protocolmessage_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.MysqlOper.Request.ProtocolMessage)
-}
-#endif
-inline void MysqlOper_Request::set_protocolmessage(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.MysqlOper.Request.ProtocolMessage)
-}
-inline void MysqlOper_Request::set_protocolmessage(const void* value, size_t size) {
-  
-  protocolmessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.MysqlOper.Request.ProtocolMessage)
-}
-inline ::std::string* MysqlOper_Request::mutable_protocolmessage() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.MysqlOper.Request.ProtocolMessage)
-  return protocolmessage_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* MysqlOper_Request::release_protocolmessage() {
-  // @@protoc_insertion_point(field_release:s2s.MysqlOper.Request.ProtocolMessage)
-  
-  return protocolmessage_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void MysqlOper_Request::set_allocated_protocolmessage(::std::string* protocolmessage) {
-  if (protocolmessage != nullptr) {
-    
-  } else {
-    
-  }
-  protocolmessage_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), protocolmessage);
-  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlOper.Request.ProtocolMessage)
+  data_ = data;
+  // @@protoc_insertion_point(field_set_allocated:s2s.MysqlOper.Request.Data)
 }
 
 // -------------------------------------------------------------------

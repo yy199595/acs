@@ -1,5 +1,6 @@
 #pragma once
 #include<queue>
+#include<google/protobuf/any.pb.h>
 #include<google/protobuf/message.h>
 #include<google/protobuf/util/json_util.h>
 using namespace google::protobuf;
@@ -9,7 +10,9 @@ namespace GameKeeper
 	class MessagePool
 	{
 	public:
+		static Message * New(const Any & any);
 		static Message * New(const std::string & name);
+		
 		static Message * NewByJson(const std::string & name, const std::string & json);
 		static Message * NewByJson(const std::string & name, const char * json, size_t size);
 	public:

@@ -6,7 +6,6 @@
 #include "Component/Scene/HttpComponent.h"
 #include <Coroutine/CoroutineComponent.h>
 #include <Http/HttpRemoteSession.h>
-#include "Component/Scene/TaskPoolComponent.h"
 #include <Http/Request/HttpGetRequest.h>
 #include <Http/Request/HttpPostRequest.h>
 #include <Method/HttpServiceMethod.h>
@@ -15,13 +14,14 @@
 #include <Http/HttpServiceComponent.h>
 #include <Other/ProtocolConfig.h>
 #include<Http/HttpLocalsession.h>
+
+#include<Scene/MysqlProxyComponent.h>
 namespace GameKeeper
 {
 
     bool HttpComponent::Awake()
     {
         this->mCorComponent = this->GetComponent<CoroutineComponent>();
-		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
         return true;
     }
 
@@ -31,6 +31,16 @@ namespace GameKeeper
         const std::string path = App::Get().GetDownloadPath();
         const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
+		/*db::UserAccountData userAccount;
+		userAccount.set_account("646585122@11.com");
+		userAccount.set_userid(TimeHelper::GetMilTimestamp());
+		userAccount.set_passwd("1122334455");
+		userAccount.set_phonenum(1371601995);
+		userAccount.set_lastlogintime(TimeHelper::GetSecTimeStamp());
+		XCode code = this->GetComponent<MysqlProxyComponent>()->Add(userAccount);
+
+		GKDebugError("code = " << code);*/
+
         //XCode code = this->Get(url, json);
 
         //GKDebugFatal(code << "\n" << json.size());

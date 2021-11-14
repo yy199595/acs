@@ -51,7 +51,6 @@ namespace GameKeeper
         void DeleteSession(HttpRemoteSession * session);
     private:
         class CoroutineComponent *mCorComponent;
-		class TaskPoolComponent * mTaskComponent;
         std::queue<HttpLocalSession *> mLocalSessionPool;
         std::queue<HttpRemoteSession *> mRemoteSessionPool;
 		std::unordered_map<long long, HttpSessionBase *> mSessionMap;

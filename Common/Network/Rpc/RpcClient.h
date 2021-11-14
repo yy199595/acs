@@ -8,7 +8,6 @@
 namespace GameKeeper
 {
     class RpcComponent;
-
     class RpcClient
     {
     public:
@@ -17,6 +16,7 @@ namespace GameKeeper
 	public:
 		void SetSocket(SocketProxy * socketProxy);
 		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
+		const std::string & GetIp() const { return this->mIp; }
 		long long GetLastOperTime() const { return this->mLastOperTime; }
 		const std::string & GetAddress() const { return this->mAddress; }
         virtual SocketType GetSocketType() { return SocketType::RemoteSocket;}		
@@ -29,10 +29,11 @@ namespace GameKeeper
     private:
 		void ReceiveMessage();
 		void CloseSocket(XCode code);
-        void ReadMessageBody(size_t allSize, int type);
+        void ReadMessageBody(unsigned int allSize, int type);
 		void SendProtocol(char type, const Message * message);
 
     protected:
+		std::string mIp;
 		std::string mAddress;
 		SocketProxy * mSocketProxy;
 		RpcComponent * mTcpComponent;

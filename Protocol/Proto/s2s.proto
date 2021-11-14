@@ -1,6 +1,6 @@
 syntax = "proto3";
 package s2s;
-
+import "google/protobuf/any.proto";
 message NodeRegister
 {
     message Request
@@ -42,13 +42,12 @@ message MysqlQuery
 {
     message Request
     {
-        string ProtocolName = 1;
-        bytes ProtocolMessage = 2;
+        google.protobuf.Any Data = 1;
     }
     message Response
     {
         string ErrotStr = 1;
-        repeated bytes QueryDatas = 2;
+        repeated google.protobuf.Any QueryDatas = 2;
     }
 }
 
@@ -56,8 +55,7 @@ message MysqlOper
 {
     message Request
     {
-        string ProtocolName = 1;
-        bytes ProtocolMessage =2;
+        google.protobuf.Any Data = 1;
     }
     message Response
     {

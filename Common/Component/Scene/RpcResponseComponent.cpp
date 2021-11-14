@@ -6,6 +6,7 @@
 #include<Timer/ActionTimeoutTimer.h>
 
 #ifdef __DEBUG__
+#include<Method/CallHandler.h>
 #include <Scene/RpcProtoComponent.h>
 #endif
 namespace GameKeeper
@@ -41,7 +42,13 @@ namespace GameKeeper
         return true;
     }
 
-    bool RpcResponseComponent::OnResponse(const com::Rpc_Response & response)
+	const CallHandler * RpcResponseComponent::GetRpcHandler(unsigned int rpcId) const
+	{	
+		auto iter = this->mRetActionMap.find(rpcId);
+		return iter == this->mRetActionMap.end() ? nullptr : iter->second;
+	}
+
+	bool RpcResponseComponent::OnResponse(const com::Rpc_Response & response)
     {
         unsigned int rpcId = response.rpcid();
         auto iter = this->mRetActionMap.find(rpcId);

@@ -10,24 +10,18 @@ namespace GameKeeper
     class CallHandler
     {
     public:
-		CallHandler();
+		CallHandler(int method);
         virtual ~CallHandler() = default;
 
     public:
-        long long GetCreateTime() const { return this->mCreateTime; }
-
+		int GetMethodId() const { return this->mMethodId; }
+        long long GetCreateTime() const { return this->mCreateTime; }	
     public:
         virtual void Invoke(const com::Rpc_Response & backData) = 0;
-
     private:
+		int mMethodId;
         long long mCreateTime;
-        std::string mFunctionName;
         class CoroutineComponent * mCorComponent;
-    public:
-#ifdef SOEASY_DEBUG
-        std::string mService;
-        std::string mMethod;
-#endif
     };
 
 }
@@ -37,8 +31,8 @@ namespace GameKeeper
     class LuaCallHandler : public CallHandler
     {
     public:
-        LuaCallHandler(lua_State *lua, lua_State * cor)
-            : mCoroutine(cor), luaEnv(lua) {}
+        LuaCallHandler(int method, lua_State *lua, lua_State * cor)
+            :CallHandler(method), mCoroutine(cor), luaEnv(lua) {}
     public:
         void Invoke(const com::Rpc_Response & backData) override;
 
@@ -53,7 +47,7 @@ namespace GameKeeper
     class CppCallHandler : public CallHandler
     {
     public:
-        CppCallHandler();
+        CppCallHandler(int method);
 		~CppCallHandler() final;
     public:
         void Invoke(const com::Rpc_Response & backData) override;
