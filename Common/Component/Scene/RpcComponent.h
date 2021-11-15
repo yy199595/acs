@@ -25,8 +25,8 @@ namespace GameKeeper
     protected:
 		void OnListen(SocketProxy * socket) final;
 	public:
+        RpcClient * GetRpcSession(long long id);
         RpcConnector * GetLocalSession(long long id);
-        RpcClient * GetRemoteSession(long long id);
         long long NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;

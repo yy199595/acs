@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
@@ -42,7 +45,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[13]
+  static const ::google::protobuf::internal::ParseTable schema[15]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -50,6 +53,9 @@ struct TableStruct_s2s_2eproto {
 };
 void AddDescriptors_s2s_2eproto();
 namespace s2s {
+class Listener;
+class ListenerDefaultTypeInternal;
+extern ListenerDefaultTypeInternal _Listener_default_instance_;
 class MysqlOper;
 class MysqlOperDefaultTypeInternal;
 extern MysqlOperDefaultTypeInternal _MysqlOper_default_instance_;
@@ -71,6 +77,9 @@ extern MysqlQuery_ResponseDefaultTypeInternal _MysqlQuery_Response_default_insta
 class NodeInfo;
 class NodeInfoDefaultTypeInternal;
 extern NodeInfoDefaultTypeInternal _NodeInfo_default_instance_;
+class NodeInfo_ListenersEntry_DoNotUse;
+class NodeInfo_ListenersEntry_DoNotUseDefaultTypeInternal;
+extern NodeInfo_ListenersEntry_DoNotUseDefaultTypeInternal _NodeInfo_ListenersEntry_DoNotUse_default_instance_;
 class NodeQuery;
 class NodeQueryDefaultTypeInternal;
 extern NodeQueryDefaultTypeInternal _NodeQuery_default_instance_;
@@ -92,6 +101,7 @@ extern NodeRegister_ResponseDefaultTypeInternal _NodeRegister_Response_default_i
 }  // namespace s2s
 namespace google {
 namespace protobuf {
+template<> ::s2s::Listener* Arena::CreateMaybeMessage<::s2s::Listener>(Arena*);
 template<> ::s2s::MysqlOper* Arena::CreateMaybeMessage<::s2s::MysqlOper>(Arena*);
 template<> ::s2s::MysqlOper_Request* Arena::CreateMaybeMessage<::s2s::MysqlOper_Request>(Arena*);
 template<> ::s2s::MysqlOper_Response* Arena::CreateMaybeMessage<::s2s::MysqlOper_Response>(Arena*);
@@ -99,6 +109,7 @@ template<> ::s2s::MysqlQuery* Arena::CreateMaybeMessage<::s2s::MysqlQuery>(Arena
 template<> ::s2s::MysqlQuery_Request* Arena::CreateMaybeMessage<::s2s::MysqlQuery_Request>(Arena*);
 template<> ::s2s::MysqlQuery_Response* Arena::CreateMaybeMessage<::s2s::MysqlQuery_Response>(Arena*);
 template<> ::s2s::NodeInfo* Arena::CreateMaybeMessage<::s2s::NodeInfo>(Arena*);
+template<> ::s2s::NodeInfo_ListenersEntry_DoNotUse* Arena::CreateMaybeMessage<::s2s::NodeInfo_ListenersEntry_DoNotUse>(Arena*);
 template<> ::s2s::NodeQuery* Arena::CreateMaybeMessage<::s2s::NodeQuery>(Arena*);
 template<> ::s2s::NodeQuery_Request* Arena::CreateMaybeMessage<::s2s::NodeQuery_Request>(Arena*);
 template<> ::s2s::NodeQuery_Response* Arena::CreateMaybeMessage<::s2s::NodeQuery_Response>(Arena*);
@@ -110,6 +121,345 @@ template<> ::s2s::NodeRegister_Response* Arena::CreateMaybeMessage<::s2s::NodeRe
 namespace s2s {
 
 // ===================================================================
+
+class Listener :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Listener) */ {
+ public:
+  Listener();
+  virtual ~Listener();
+
+  Listener(const Listener& from);
+
+  inline Listener& operator=(const Listener& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Listener(Listener&& from) noexcept
+    : Listener() {
+    *this = ::std::move(from);
+  }
+
+  inline Listener& operator=(Listener&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Listener& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Listener* internal_default_instance() {
+    return reinterpret_cast<const Listener*>(
+               &_Listener_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  void Swap(Listener* other);
+  friend void swap(Listener& a, Listener& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Listener* New() const final {
+    return CreateMaybeMessage<Listener>(nullptr);
+  }
+
+  Listener* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Listener>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Listener& from);
+  void MergeFrom(const Listener& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Listener* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string Name = 1;
+  void clear_name();
+  static const int kNameFieldNumber = 1;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_name(::std::string&& value);
+  #endif
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
+
+  // uint32 Port = 2;
+  void clear_port();
+  static const int kPortFieldNumber = 2;
+  ::google::protobuf::uint32 port() const;
+  void set_port(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.Listener)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::uint32 port_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class NodeInfo_ListenersEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<NodeInfo_ListenersEntry_DoNotUse, 
+    ::std::string, ::google::protobuf::int32,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<NodeInfo_ListenersEntry_DoNotUse, 
+    ::std::string, ::google::protobuf::int32,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+    0 > SuperType;
+  NodeInfo_ListenersEntry_DoNotUse();
+  NodeInfo_ListenersEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const NodeInfo_ListenersEntry_DoNotUse& other);
+  static const NodeInfo_ListenersEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const NodeInfo_ListenersEntry_DoNotUse*>(&_NodeInfo_ListenersEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
+class NodeInfo :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.NodeInfo) */ {
+ public:
+  NodeInfo();
+  virtual ~NodeInfo();
+
+  NodeInfo(const NodeInfo& from);
+
+  inline NodeInfo& operator=(const NodeInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NodeInfo(NodeInfo&& from) noexcept
+    : NodeInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline NodeInfo& operator=(NodeInfo&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NodeInfo& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NodeInfo* internal_default_instance() {
+    return reinterpret_cast<const NodeInfo*>(
+               &_NodeInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(NodeInfo* other);
+  friend void swap(NodeInfo& a, NodeInfo& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NodeInfo* New() const final {
+    return CreateMaybeMessage<NodeInfo>(nullptr);
+  }
+
+  NodeInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NodeInfo>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NodeInfo& from);
+  void MergeFrom(const NodeInfo& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NodeInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+
+  // accessors -------------------------------------------------------
+
+  // repeated string Services = 5;
+  int services_size() const;
+  void clear_services();
+  static const int kServicesFieldNumber = 5;
+  const ::std::string& services(int index) const;
+  ::std::string* mutable_services(int index);
+  void set_services(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_services(int index, ::std::string&& value);
+  #endif
+  void set_services(int index, const char* value);
+  void set_services(int index, const char* value, size_t size);
+  ::std::string* add_services();
+  void add_services(const ::std::string& value);
+  #if LANG_CXX11
+  void add_services(::std::string&& value);
+  #endif
+  void add_services(const char* value);
+  void add_services(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& services() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_services();
+
+  // map<string, int32> Listeners = 6;
+  int listeners_size() const;
+  void clear_listeners();
+  static const int kListenersFieldNumber = 6;
+  const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
+      listeners() const;
+  ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
+      mutable_listeners();
+
+  // string ServerIp = 3;
+  void clear_serverip();
+  static const int kServerIpFieldNumber = 3;
+  const ::std::string& serverip() const;
+  void set_serverip(const ::std::string& value);
+  #if LANG_CXX11
+  void set_serverip(::std::string&& value);
+  #endif
+  void set_serverip(const char* value);
+  void set_serverip(const char* value, size_t size);
+  ::std::string* mutable_serverip();
+  ::std::string* release_serverip();
+  void set_allocated_serverip(::std::string* serverip);
+
+  // string ServerName = 4;
+  void clear_servername();
+  static const int kServerNameFieldNumber = 4;
+  const ::std::string& servername() const;
+  void set_servername(const ::std::string& value);
+  #if LANG_CXX11
+  void set_servername(::std::string&& value);
+  #endif
+  void set_servername(const char* value);
+  void set_servername(const char* value, size_t size);
+  ::std::string* mutable_servername();
+  ::std::string* release_servername();
+  void set_allocated_servername(::std::string* servername);
+
+  // int32 AreaId = 1;
+  void clear_areaid();
+  static const int kAreaIdFieldNumber = 1;
+  ::google::protobuf::int32 areaid() const;
+  void set_areaid(::google::protobuf::int32 value);
+
+  // int32 NodeId = 2;
+  void clear_nodeid();
+  static const int kNodeIdFieldNumber = 2;
+  ::google::protobuf::int32 nodeid() const;
+  void set_nodeid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.NodeInfo)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> services_;
+  ::google::protobuf::internal::MapField<
+      NodeInfo_ListenersEntry_DoNotUse,
+      ::std::string, ::google::protobuf::int32,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+      0 > listeners_;
+  ::google::protobuf::internal::ArenaStringPtr serverip_;
+  ::google::protobuf::internal::ArenaStringPtr servername_;
+  ::google::protobuf::int32 areaid_;
+  ::google::protobuf::int32 nodeid_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
 
 class NodeRegister_Request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.NodeRegister.Request) */ {
@@ -149,7 +499,7 @@ class NodeRegister_Request :
                &_NodeRegister_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    3;
 
   void Swap(NodeRegister_Request* other);
   friend void swap(NodeRegister_Request& a, NodeRegister_Request& b) {
@@ -206,78 +556,21 @@ class NodeRegister_Request :
 
   // accessors -------------------------------------------------------
 
-  // repeated string Services = 5;
-  int services_size() const;
-  void clear_services();
-  static const int kServicesFieldNumber = 5;
-  const ::std::string& services(int index) const;
-  ::std::string* mutable_services(int index);
-  void set_services(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_services(int index, ::std::string&& value);
-  #endif
-  void set_services(int index, const char* value);
-  void set_services(int index, const char* value, size_t size);
-  ::std::string* add_services();
-  void add_services(const ::std::string& value);
-  #if LANG_CXX11
-  void add_services(::std::string&& value);
-  #endif
-  void add_services(const char* value);
-  void add_services(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& services() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_services();
-
-  // string Address = 3;
-  void clear_address();
-  static const int kAddressFieldNumber = 3;
-  const ::std::string& address() const;
-  void set_address(const ::std::string& value);
-  #if LANG_CXX11
-  void set_address(::std::string&& value);
-  #endif
-  void set_address(const char* value);
-  void set_address(const char* value, size_t size);
-  ::std::string* mutable_address();
-  ::std::string* release_address();
-  void set_allocated_address(::std::string* address);
-
-  // string ServerName = 4;
-  void clear_servername();
-  static const int kServerNameFieldNumber = 4;
-  const ::std::string& servername() const;
-  void set_servername(const ::std::string& value);
-  #if LANG_CXX11
-  void set_servername(::std::string&& value);
-  #endif
-  void set_servername(const char* value);
-  void set_servername(const char* value, size_t size);
-  ::std::string* mutable_servername();
-  ::std::string* release_servername();
-  void set_allocated_servername(::std::string* servername);
-
-  // int32 AreaId = 1;
-  void clear_areaid();
-  static const int kAreaIdFieldNumber = 1;
-  ::google::protobuf::int32 areaid() const;
-  void set_areaid(::google::protobuf::int32 value);
-
-  // int32 NodeId = 2;
-  void clear_nodeid();
-  static const int kNodeIdFieldNumber = 2;
-  ::google::protobuf::int32 nodeid() const;
-  void set_nodeid(::google::protobuf::int32 value);
+  // .s2s.NodeInfo nodeInfo = 1;
+  bool has_nodeinfo() const;
+  void clear_nodeinfo();
+  static const int kNodeInfoFieldNumber = 1;
+  const ::s2s::NodeInfo& nodeinfo() const;
+  ::s2s::NodeInfo* release_nodeinfo();
+  ::s2s::NodeInfo* mutable_nodeinfo();
+  void set_allocated_nodeinfo(::s2s::NodeInfo* nodeinfo);
 
   // @@protoc_insertion_point(class_scope:s2s.NodeRegister.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> services_;
-  ::google::protobuf::internal::ArenaStringPtr address_;
-  ::google::protobuf::internal::ArenaStringPtr servername_;
-  ::google::protobuf::int32 areaid_;
-  ::google::protobuf::int32 nodeid_;
+  ::s2s::NodeInfo* nodeinfo_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -321,7 +614,7 @@ class NodeRegister_Response :
                &_NodeRegister_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    4;
 
   void Swap(NodeRegister_Response* other);
   friend void swap(NodeRegister_Response& a, NodeRegister_Response& b) {
@@ -378,6 +671,20 @@ class NodeRegister_Response :
 
   // accessors -------------------------------------------------------
 
+  // string AreaName = 2;
+  void clear_areaname();
+  static const int kAreaNameFieldNumber = 2;
+  const ::std::string& areaname() const;
+  void set_areaname(const ::std::string& value);
+  #if LANG_CXX11
+  void set_areaname(::std::string&& value);
+  #endif
+  void set_areaname(const char* value);
+  void set_areaname(const char* value, size_t size);
+  ::std::string* mutable_areaname();
+  ::std::string* release_areaname();
+  void set_allocated_areaname(::std::string* areaname);
+
   // int32 Uid = 1;
   void clear_uid();
   static const int kUidFieldNumber = 1;
@@ -389,6 +696,7 @@ class NodeRegister_Response :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr areaname_;
   ::google::protobuf::int32 uid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
@@ -433,7 +741,7 @@ class NodeRegister :
                &_NodeRegister_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    5;
 
   void Swap(NodeRegister* other);
   friend void swap(NodeRegister& a, NodeRegister& b) {
@@ -503,171 +811,6 @@ class NodeRegister :
 };
 // -------------------------------------------------------------------
 
-class NodeInfo :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.NodeInfo) */ {
- public:
-  NodeInfo();
-  virtual ~NodeInfo();
-
-  NodeInfo(const NodeInfo& from);
-
-  inline NodeInfo& operator=(const NodeInfo& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  NodeInfo(NodeInfo&& from) noexcept
-    : NodeInfo() {
-    *this = ::std::move(from);
-  }
-
-  inline NodeInfo& operator=(NodeInfo&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const NodeInfo& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const NodeInfo* internal_default_instance() {
-    return reinterpret_cast<const NodeInfo*>(
-               &_NodeInfo_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    3;
-
-  void Swap(NodeInfo* other);
-  friend void swap(NodeInfo& a, NodeInfo& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline NodeInfo* New() const final {
-    return CreateMaybeMessage<NodeInfo>(nullptr);
-  }
-
-  NodeInfo* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<NodeInfo>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const NodeInfo& from);
-  void MergeFrom(const NodeInfo& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(NodeInfo* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // repeated string Services = 4;
-  int services_size() const;
-  void clear_services();
-  static const int kServicesFieldNumber = 4;
-  const ::std::string& services(int index) const;
-  ::std::string* mutable_services(int index);
-  void set_services(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_services(int index, ::std::string&& value);
-  #endif
-  void set_services(int index, const char* value);
-  void set_services(int index, const char* value, size_t size);
-  ::std::string* add_services();
-  void add_services(const ::std::string& value);
-  #if LANG_CXX11
-  void add_services(::std::string&& value);
-  #endif
-  void add_services(const char* value);
-  void add_services(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& services() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_services();
-
-  // string Address = 2;
-  void clear_address();
-  static const int kAddressFieldNumber = 2;
-  const ::std::string& address() const;
-  void set_address(const ::std::string& value);
-  #if LANG_CXX11
-  void set_address(::std::string&& value);
-  #endif
-  void set_address(const char* value);
-  void set_address(const char* value, size_t size);
-  ::std::string* mutable_address();
-  ::std::string* release_address();
-  void set_allocated_address(::std::string* address);
-
-  // string ServerName = 3;
-  void clear_servername();
-  static const int kServerNameFieldNumber = 3;
-  const ::std::string& servername() const;
-  void set_servername(const ::std::string& value);
-  #if LANG_CXX11
-  void set_servername(::std::string&& value);
-  #endif
-  void set_servername(const char* value);
-  void set_servername(const char* value, size_t size);
-  ::std::string* mutable_servername();
-  ::std::string* release_servername();
-  void set_allocated_servername(::std::string* servername);
-
-  // int32 Uid = 1;
-  void clear_uid();
-  static const int kUidFieldNumber = 1;
-  ::google::protobuf::int32 uid() const;
-  void set_uid(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:s2s.NodeInfo)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> services_;
-  ::google::protobuf::internal::ArenaStringPtr address_;
-  ::google::protobuf::internal::ArenaStringPtr servername_;
-  ::google::protobuf::int32 uid_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_s2s_2eproto;
-};
-// -------------------------------------------------------------------
-
 class NodeQuery_Request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.NodeQuery.Request) */ {
  public:
@@ -706,7 +849,7 @@ class NodeQuery_Request :
                &_NodeQuery_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    6;
 
   void Swap(NodeQuery_Request* other);
   friend void swap(NodeQuery_Request& a, NodeQuery_Request& b) {
@@ -833,7 +976,7 @@ class NodeQuery_Response :
                &_NodeQuery_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    7;
 
   void Swap(NodeQuery_Response* other);
   friend void swap(NodeQuery_Response& a, NodeQuery_Response& b) {
@@ -951,7 +1094,7 @@ class NodeQuery :
                &_NodeQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    8;
 
   void Swap(NodeQuery* other);
   friend void swap(NodeQuery& a, NodeQuery& b) {
@@ -1059,7 +1202,7 @@ class MysqlQuery_Request :
                &_MysqlQuery_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    9;
 
   void Swap(MysqlQuery_Request* other);
   friend void swap(MysqlQuery_Request& a, MysqlQuery_Request& b) {
@@ -1174,7 +1317,7 @@ class MysqlQuery_Response :
                &_MysqlQuery_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    10;
 
   void Swap(MysqlQuery_Response* other);
   friend void swap(MysqlQuery_Response& a, MysqlQuery_Response& b) {
@@ -1307,7 +1450,7 @@ class MysqlQuery :
                &_MysqlQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    11;
 
   void Swap(MysqlQuery* other);
   friend void swap(MysqlQuery& a, MysqlQuery& b) {
@@ -1415,7 +1558,7 @@ class MysqlOper_Request :
                &_MysqlOper_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   void Swap(MysqlOper_Request* other);
   friend void swap(MysqlOper_Request& a, MysqlOper_Request& b) {
@@ -1530,7 +1673,7 @@ class MysqlOper_Response :
                &_MysqlOper_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    13;
 
   void Swap(MysqlOper_Response* other);
   friend void swap(MysqlOper_Response& a, MysqlOper_Response& b) {
@@ -1650,7 +1793,7 @@ class MysqlOper :
                &_MysqlOper_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    14;
 
   void Swap(MysqlOper* other);
   friend void swap(MysqlOper& a, MysqlOper& b) {
@@ -1727,305 +1870,163 @@ class MysqlOper :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// NodeRegister_Request
+// Listener
 
-// int32 AreaId = 1;
-inline void NodeRegister_Request::clear_areaid() {
-  areaid_ = 0;
+// string Name = 1;
+inline void Listener::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::google::protobuf::int32 NodeRegister_Request::areaid() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.AreaId)
-  return areaid_;
+inline const ::std::string& Listener::name() const {
+  // @@protoc_insertion_point(field_get:s2s.Listener.Name)
+  return name_.GetNoArena();
 }
-inline void NodeRegister_Request::set_areaid(::google::protobuf::int32 value) {
+inline void Listener::set_name(const ::std::string& value) {
   
-  areaid_ = value;
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.AreaId)
-}
-
-// int32 NodeId = 2;
-inline void NodeRegister_Request::clear_nodeid() {
-  nodeid_ = 0;
-}
-inline ::google::protobuf::int32 NodeRegister_Request::nodeid() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.NodeId)
-  return nodeid_;
-}
-inline void NodeRegister_Request::set_nodeid(::google::protobuf::int32 value) {
-  
-  nodeid_ = value;
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.NodeId)
-}
-
-// string Address = 3;
-inline void NodeRegister_Request::clear_address() {
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& NodeRegister_Request::address() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.Address)
-  return address_.GetNoArena();
-}
-inline void NodeRegister_Request::set_address(const ::std::string& value) {
-  
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.Address)
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.Listener.Name)
 }
 #if LANG_CXX11
-inline void NodeRegister_Request::set_address(::std::string&& value) {
+inline void Listener::set_name(::std::string&& value) {
   
-  address_.SetNoArena(
+  name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeRegister.Request.Address)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Listener.Name)
 }
 #endif
-inline void NodeRegister_Request::set_address(const char* value) {
+inline void Listener::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.NodeRegister.Request.Address)
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.Listener.Name)
 }
-inline void NodeRegister_Request::set_address(const char* value, size_t size) {
+inline void Listener::set_name(const char* value, size_t size) {
   
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeRegister.Request.Address)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Listener.Name)
 }
-inline ::std::string* NodeRegister_Request::mutable_address() {
+inline ::std::string* Listener::mutable_name() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Request.Address)
-  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:s2s.Listener.Name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* NodeRegister_Request::release_address() {
-  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Request.Address)
+inline ::std::string* Listener::release_name() {
+  // @@protoc_insertion_point(field_release:s2s.Listener.Name)
   
-  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void NodeRegister_Request::set_allocated_address(::std::string* address) {
-  if (address != nullptr) {
+inline void Listener::set_allocated_name(::std::string* name) {
+  if (name != nullptr) {
     
   } else {
     
   }
-  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Request.Address)
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:s2s.Listener.Name)
 }
 
-// string ServerName = 4;
-inline void NodeRegister_Request::clear_servername() {
-  servername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// uint32 Port = 2;
+inline void Listener::clear_port() {
+  port_ = 0u;
 }
-inline const ::std::string& NodeRegister_Request::servername() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.ServerName)
-  return servername_.GetNoArena();
+inline ::google::protobuf::uint32 Listener::port() const {
+  // @@protoc_insertion_point(field_get:s2s.Listener.Port)
+  return port_;
 }
-inline void NodeRegister_Request::set_servername(const ::std::string& value) {
+inline void Listener::set_port(::google::protobuf::uint32 value) {
   
-  servername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.ServerName)
-}
-#if LANG_CXX11
-inline void NodeRegister_Request::set_servername(::std::string&& value) {
-  
-  servername_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeRegister.Request.ServerName)
-}
-#endif
-inline void NodeRegister_Request::set_servername(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  servername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.NodeRegister.Request.ServerName)
-}
-inline void NodeRegister_Request::set_servername(const char* value, size_t size) {
-  
-  servername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeRegister.Request.ServerName)
-}
-inline ::std::string* NodeRegister_Request::mutable_servername() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Request.ServerName)
-  return servername_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NodeRegister_Request::release_servername() {
-  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Request.ServerName)
-  
-  return servername_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NodeRegister_Request::set_allocated_servername(::std::string* servername) {
-  if (servername != nullptr) {
-    
-  } else {
-    
-  }
-  servername_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), servername);
-  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Request.ServerName)
-}
-
-// repeated string Services = 5;
-inline int NodeRegister_Request::services_size() const {
-  return services_.size();
-}
-inline void NodeRegister_Request::clear_services() {
-  services_.Clear();
-}
-inline const ::std::string& NodeRegister_Request::services(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.Services)
-  return services_.Get(index);
-}
-inline ::std::string* NodeRegister_Request::mutable_services(int index) {
-  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Request.Services)
-  return services_.Mutable(index);
-}
-inline void NodeRegister_Request::set_services(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.Services)
-  services_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void NodeRegister_Request::set_services(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Request.Services)
-  services_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void NodeRegister_Request::set_services(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  services_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:s2s.NodeRegister.Request.Services)
-}
-inline void NodeRegister_Request::set_services(int index, const char* value, size_t size) {
-  services_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeRegister.Request.Services)
-}
-inline ::std::string* NodeRegister_Request::add_services() {
-  // @@protoc_insertion_point(field_add_mutable:s2s.NodeRegister.Request.Services)
-  return services_.Add();
-}
-inline void NodeRegister_Request::add_services(const ::std::string& value) {
-  services_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:s2s.NodeRegister.Request.Services)
-}
-#if LANG_CXX11
-inline void NodeRegister_Request::add_services(::std::string&& value) {
-  services_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:s2s.NodeRegister.Request.Services)
-}
-#endif
-inline void NodeRegister_Request::add_services(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  services_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:s2s.NodeRegister.Request.Services)
-}
-inline void NodeRegister_Request::add_services(const char* value, size_t size) {
-  services_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:s2s.NodeRegister.Request.Services)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-NodeRegister_Request::services() const {
-  // @@protoc_insertion_point(field_list:s2s.NodeRegister.Request.Services)
-  return services_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-NodeRegister_Request::mutable_services() {
-  // @@protoc_insertion_point(field_mutable_list:s2s.NodeRegister.Request.Services)
-  return &services_;
+  port_ = value;
+  // @@protoc_insertion_point(field_set:s2s.Listener.Port)
 }
 
 // -------------------------------------------------------------------
-
-// NodeRegister_Response
-
-// int32 Uid = 1;
-inline void NodeRegister_Response::clear_uid() {
-  uid_ = 0;
-}
-inline ::google::protobuf::int32 NodeRegister_Response::uid() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.Uid)
-  return uid_;
-}
-inline void NodeRegister_Response::set_uid(::google::protobuf::int32 value) {
-  
-  uid_ = value;
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.Uid)
-}
-
-// -------------------------------------------------------------------
-
-// NodeRegister
 
 // -------------------------------------------------------------------
 
 // NodeInfo
 
-// int32 Uid = 1;
-inline void NodeInfo::clear_uid() {
-  uid_ = 0;
+// int32 AreaId = 1;
+inline void NodeInfo::clear_areaid() {
+  areaid_ = 0;
 }
-inline ::google::protobuf::int32 NodeInfo::uid() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeInfo.Uid)
-  return uid_;
+inline ::google::protobuf::int32 NodeInfo::areaid() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeInfo.AreaId)
+  return areaid_;
 }
-inline void NodeInfo::set_uid(::google::protobuf::int32 value) {
+inline void NodeInfo::set_areaid(::google::protobuf::int32 value) {
   
-  uid_ = value;
-  // @@protoc_insertion_point(field_set:s2s.NodeInfo.Uid)
+  areaid_ = value;
+  // @@protoc_insertion_point(field_set:s2s.NodeInfo.AreaId)
 }
 
-// string Address = 2;
-inline void NodeInfo::clear_address() {
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// int32 NodeId = 2;
+inline void NodeInfo::clear_nodeid() {
+  nodeid_ = 0;
 }
-inline const ::std::string& NodeInfo::address() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeInfo.Address)
-  return address_.GetNoArena();
+inline ::google::protobuf::int32 NodeInfo::nodeid() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeInfo.NodeId)
+  return nodeid_;
 }
-inline void NodeInfo::set_address(const ::std::string& value) {
+inline void NodeInfo::set_nodeid(::google::protobuf::int32 value) {
   
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.NodeInfo.Address)
+  nodeid_ = value;
+  // @@protoc_insertion_point(field_set:s2s.NodeInfo.NodeId)
+}
+
+// string ServerIp = 3;
+inline void NodeInfo::clear_serverip() {
+  serverip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeInfo::serverip() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeInfo.ServerIp)
+  return serverip_.GetNoArena();
+}
+inline void NodeInfo::set_serverip(const ::std::string& value) {
+  
+  serverip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.NodeInfo.ServerIp)
 }
 #if LANG_CXX11
-inline void NodeInfo::set_address(::std::string&& value) {
+inline void NodeInfo::set_serverip(::std::string&& value) {
   
-  address_.SetNoArena(
+  serverip_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeInfo.Address)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeInfo.ServerIp)
 }
 #endif
-inline void NodeInfo::set_address(const char* value) {
+inline void NodeInfo::set_serverip(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.NodeInfo.Address)
+  serverip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.NodeInfo.ServerIp)
 }
-inline void NodeInfo::set_address(const char* value, size_t size) {
+inline void NodeInfo::set_serverip(const char* value, size_t size) {
   
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  serverip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeInfo.Address)
+  // @@protoc_insertion_point(field_set_pointer:s2s.NodeInfo.ServerIp)
 }
-inline ::std::string* NodeInfo::mutable_address() {
+inline ::std::string* NodeInfo::mutable_serverip() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.NodeInfo.Address)
-  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:s2s.NodeInfo.ServerIp)
+  return serverip_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* NodeInfo::release_address() {
-  // @@protoc_insertion_point(field_release:s2s.NodeInfo.Address)
+inline ::std::string* NodeInfo::release_serverip() {
+  // @@protoc_insertion_point(field_release:s2s.NodeInfo.ServerIp)
   
-  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return serverip_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void NodeInfo::set_allocated_address(::std::string* address) {
-  if (address != nullptr) {
+inline void NodeInfo::set_allocated_serverip(::std::string* serverip) {
+  if (serverip != nullptr) {
     
   } else {
     
   }
-  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:s2s.NodeInfo.Address)
+  serverip_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), serverip);
+  // @@protoc_insertion_point(field_set_allocated:s2s.NodeInfo.ServerIp)
 }
 
-// string ServerName = 3;
+// string ServerName = 4;
 inline void NodeInfo::clear_servername() {
   servername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2078,7 +2079,7 @@ inline void NodeInfo::set_allocated_servername(::std::string* servername) {
   // @@protoc_insertion_point(field_set_allocated:s2s.NodeInfo.ServerName)
 }
 
-// repeated string Services = 4;
+// repeated string Services = 5;
 inline int NodeInfo::services_size() const {
   return services_.size();
 }
@@ -2146,6 +2147,154 @@ NodeInfo::mutable_services() {
   // @@protoc_insertion_point(field_mutable_list:s2s.NodeInfo.Services)
   return &services_;
 }
+
+// map<string, int32> Listeners = 6;
+inline int NodeInfo::listeners_size() const {
+  return listeners_.size();
+}
+inline void NodeInfo::clear_listeners() {
+  listeners_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >&
+NodeInfo::listeners() const {
+  // @@protoc_insertion_point(field_map:s2s.NodeInfo.Listeners)
+  return listeners_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >*
+NodeInfo::mutable_listeners() {
+  // @@protoc_insertion_point(field_mutable_map:s2s.NodeInfo.Listeners)
+  return listeners_.MutableMap();
+}
+
+// -------------------------------------------------------------------
+
+// NodeRegister_Request
+
+// .s2s.NodeInfo nodeInfo = 1;
+inline bool NodeRegister_Request::has_nodeinfo() const {
+  return this != internal_default_instance() && nodeinfo_ != nullptr;
+}
+inline void NodeRegister_Request::clear_nodeinfo() {
+  if (GetArenaNoVirtual() == nullptr && nodeinfo_ != nullptr) {
+    delete nodeinfo_;
+  }
+  nodeinfo_ = nullptr;
+}
+inline const ::s2s::NodeInfo& NodeRegister_Request::nodeinfo() const {
+  const ::s2s::NodeInfo* p = nodeinfo_;
+  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Request.nodeInfo)
+  return p != nullptr ? *p : *reinterpret_cast<const ::s2s::NodeInfo*>(
+      &::s2s::_NodeInfo_default_instance_);
+}
+inline ::s2s::NodeInfo* NodeRegister_Request::release_nodeinfo() {
+  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Request.nodeInfo)
+  
+  ::s2s::NodeInfo* temp = nodeinfo_;
+  nodeinfo_ = nullptr;
+  return temp;
+}
+inline ::s2s::NodeInfo* NodeRegister_Request::mutable_nodeinfo() {
+  
+  if (nodeinfo_ == nullptr) {
+    auto* p = CreateMaybeMessage<::s2s::NodeInfo>(GetArenaNoVirtual());
+    nodeinfo_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Request.nodeInfo)
+  return nodeinfo_;
+}
+inline void NodeRegister_Request::set_allocated_nodeinfo(::s2s::NodeInfo* nodeinfo) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete nodeinfo_;
+  }
+  if (nodeinfo) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      nodeinfo = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, nodeinfo, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  nodeinfo_ = nodeinfo;
+  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Request.nodeInfo)
+}
+
+// -------------------------------------------------------------------
+
+// NodeRegister_Response
+
+// int32 Uid = 1;
+inline void NodeRegister_Response::clear_uid() {
+  uid_ = 0;
+}
+inline ::google::protobuf::int32 NodeRegister_Response::uid() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.Uid)
+  return uid_;
+}
+inline void NodeRegister_Response::set_uid(::google::protobuf::int32 value) {
+  
+  uid_ = value;
+  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.Uid)
+}
+
+// string AreaName = 2;
+inline void NodeRegister_Response::clear_areaname() {
+  areaname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeRegister_Response::areaname() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.AreaName)
+  return areaname_.GetNoArena();
+}
+inline void NodeRegister_Response::set_areaname(const ::std::string& value) {
+  
+  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.AreaName)
+}
+#if LANG_CXX11
+inline void NodeRegister_Response::set_areaname(::std::string&& value) {
+  
+  areaname_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeRegister.Response.AreaName)
+}
+#endif
+inline void NodeRegister_Response::set_areaname(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.NodeRegister.Response.AreaName)
+}
+inline void NodeRegister_Response::set_areaname(const char* value, size_t size) {
+  
+  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.NodeRegister.Response.AreaName)
+}
+inline ::std::string* NodeRegister_Response::mutable_areaname() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Response.AreaName)
+  return areaname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeRegister_Response::release_areaname() {
+  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Response.AreaName)
+  
+  return areaname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeRegister_Response::set_allocated_areaname(::std::string* areaname) {
+  if (areaname != nullptr) {
+    
+  } else {
+    
+  }
+  areaname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), areaname);
+  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Response.AreaName)
+}
+
+// -------------------------------------------------------------------
+
+// NodeRegister
 
 // -------------------------------------------------------------------
 
@@ -2506,6 +2655,10 @@ inline void MysqlOper_Response::set_allocated_errorstr(::std::string* errorstr) 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

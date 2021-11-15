@@ -3,7 +3,7 @@
 //
 
 #include "NodeMaperComponent.h"
-#include <Service/NodeProxy.h>
+#include <Service/RpcNodeProxy.h>
 #include <Service/NodeProxyComponent.h>
 namespace GameKeeper
 {
@@ -13,7 +13,7 @@ namespace GameKeeper
         return true;
     }
 
-    void NodeMaperComponent::AddService(NodeProxy * node)
+    void NodeMaperComponent::AddService(RpcNodeProxy * node)
     {
         std::vector<std::string> services;
         node->GetServicers(services);
@@ -23,12 +23,12 @@ namespace GameKeeper
         }
     }
 
-    NodeProxy * NodeMaperComponent::GetService(const std::string & service)
+    RpcNodeProxy * NodeMaperComponent::GetService(const std::string & service)
     {
         auto iter = this->mServiceMappers.find(service);
         if(iter == this->mServiceMappers.end())
         {
-            NodeProxy * node = this->mNodeProxyComponent->GetNodeByServiceName(service);
+            RpcNodeProxy * node = this->mNodeProxyComponent->GetNodeByServiceName(service);
             if(node != nullptr)
             {
                 this->AddService(node);

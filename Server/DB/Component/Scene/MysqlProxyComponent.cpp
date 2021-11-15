@@ -1,7 +1,7 @@
 #include "MysqlProxyComponent.h"
 
 #include <Core/App.h>
-#include <Service/NodeProxy.h>
+#include <Service/RpcNodeProxy.h>
 
 namespace GameKeeper
 {
@@ -29,9 +29,9 @@ namespace GameKeeper
         }
     }
 
-    NodeProxy *MysqlProxyComponent::GetServiceNode()
+    RpcNodeProxy *MysqlProxyComponent::GetServiceNode()
     {
-        NodeProxy *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlProxyNodeId);
+        RpcNodeProxy *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlProxyNodeId);
         if (proxyNode == nullptr)
         {
             proxyNode = this->mNodeComponent->GetNodeByServiceName("MysqlService");
@@ -63,7 +63,7 @@ namespace GameKeeper
 
     XCode MysqlProxyComponent::Add(const Message &data)
     {
-        NodeProxy *proxyNode = this->GetServiceNode();
+        RpcNodeProxy *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
             unsigned int id = this->mCorComponent->GetCurrentCorId();
@@ -82,7 +82,7 @@ namespace GameKeeper
 
     XCode MysqlProxyComponent::Query(const Message &data, Message &queryData)
     {
-        NodeProxy *proxyNode = this->GetServiceNode();
+        RpcNodeProxy *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
             unsigned int id = this->mCorComponent->GetCurrentCorId();
@@ -111,7 +111,7 @@ namespace GameKeeper
 
     XCode MysqlProxyComponent::Save(const Message &data)
     {
-        NodeProxy *proxyNode = this->GetServiceNode();
+        RpcNodeProxy *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
             unsigned int id = this->mCorComponent->GetCurrentCorId();
@@ -129,7 +129,7 @@ namespace GameKeeper
 
     XCode MysqlProxyComponent::Delete(const Message &data)
     {
-        NodeProxy *proxyNode = this->GetServiceNode();
+        RpcNodeProxy *proxyNode = this->GetServiceNode();
         if (proxyNode == nullptr)
         {
             unsigned int id = this->mCorComponent->GetCurrentCorId();

@@ -152,7 +152,7 @@ namespace GameKeeper
         return static_cast<RpcConnector*>(session);
     }
 
-    RpcClient *RpcComponent::GetRemoteSession(long long id)
+    RpcClient *RpcComponent::GetRpcSession(long long id)
     {
         auto iter = this->mSessionAdressMap.find(id);
         return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;

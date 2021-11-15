@@ -1,7 +1,7 @@
 ﻿#include "ClusterService.h"
 
 #include <Core/App.h>
-#include <Service/NodeProxy.h>
+#include <Service/RpcNodeProxy.h>
 #include <Service/NodeProxyComponent.h>
 #include <Network/Listener/TcpServerComponent.h>
 namespace GameKeeper
@@ -22,23 +22,23 @@ namespace GameKeeper
 		std::vector<Component *> components;
 		s2s::NodeRegister_Request registerInfo;
 		this->gameObject->GetComponents(components);
+        s2s::NodeInfo * nodeInfo = registerInfo.mutable_nodeinfo();
 
+        nodeInfo->set_areaid(App::Get().GetConfig().GetAreaId());
+        nodeInfo->set_nodeid(App::Get().GetConfig().GetNodeId());
+        nodeInfo->set_servername(App::Get().GetConfig().GetNodeName());
 		for (Component * component : components)
 		{
-            if (ServiceComponent *service = dynamic_cast<ServiceComponent *>(component))
+            if (auto *service = dynamic_cast<ServiceComponent *>(component))
             {
-                registerInfo.add_services(service->GetTypeName());
+                nodeInfo->add_services(service->GetTypeName());
             }
         }
 
-		s2s::NodeRegister_Response responseInfo;
-		NodeProxy *centerNode = this->mNodeComponent->GetServiceNode(0);
-		TcpServerComponent * listenComponent = this->GetComponent<TcpServerComponent>();
 
-		registerInfo.set_areaid(this->mAreaId);
-		registerInfo.set_nodeid(this->mNodeId);
-		//TODO
-		registerInfo.set_servername(App::Get().GetServerName());
+		s2s::NodeRegister_Response responseInfo;
+		RpcNodeProxy *centerNode = this->mNodeComponent->GetServiceNode(0);
+		auto * listenComponent = this->GetComponent<TcpServerComponent>();
 		XCode code = centerNode->Call("CenterService.Add", registerInfo, responseInfo);
 		if (code != XCode::Successful)
 		{
@@ -59,14 +59,14 @@ namespace GameKeeper
 	XCode ClusterService::Add(const s2s::NodeInfo & nodeInfo)
 	{
 		const int uid = nodeInfo.uid();
-		NodeProxy *serviceNode = this->mNodeComponent->GetServiceNode(uid);
+		RpcNodeProxy *serviceNode = this->mNodeComponent->GetServiceNode(uid);
 		if (serviceNode == nullptr)
         {
             const int areaId = uid / 10000;
             const int nodeId = uid % 10000;
             const std::string &name = nodeInfo.servername();
             const std::string &address = nodeInfo.address();
-            serviceNode = new NodeProxy(areaId, nodeId, name, address);
+            serviceNode = new RpcNodeProxy(areaId, nodeId, name, address);
         }
 
 		for (int index = 0; index < nodeInfo.services_size(); index++)
@@ -82,7 +82,7 @@ namespace GameKeeper
 		this->gameObject->GetComponents(components);
 		for (Component * component : components)
 		{
-			if (ServiceComponent * serviceComponent = dynamic_cast<ServiceComponent*>(component))
+			if (auto serviceComponent = dynamic_cast<ServiceComponent*>(component))
 			{
 				serviceComponent->OnRefreshService();
 			}

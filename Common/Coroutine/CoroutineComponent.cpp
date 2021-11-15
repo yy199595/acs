@@ -57,10 +57,6 @@ namespace GameKeeper
     bool CoroutineComponent::Awake()
     {
 		GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
-		for (int index = 0; index < 1000; index++)
-		{
-			this->StartCoroutine(&CoroutineComponent::Loop, this);
-		}
         return true;
     }
 
@@ -354,19 +350,19 @@ namespace GameKeeper
 
     void CoroutineComponent::OnSecondUpdate() {
 
-		size_t index = 1;
-		long long size = 0;
-		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
-		{
-			Coroutine * cor = mCorPool.Get(index);
-            if(cor != nullptr)
-            {
-                size += cor->mStack.size();
-            }
-		}
-		
-		double memory = size / 1024.0f / 1024.0f;
-		GKDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
-			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
+//		size_t index = 1;
+//		long long size = 0;
+//		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
+//		{
+//			Coroutine * cor = mCorPool.Get(index);
+//            if(cor != nullptr)
+//            {
+//                size += cor->mStack.size();
+//            }
+//		}
+//
+//		double memory = size / 1024.0f / 1024.0f;
+//		GKDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+//			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
     }
 }

@@ -17,8 +17,21 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fany_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Any_google_2fprotobuf_2fany_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_s2s_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_NodeInfo_s2s_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_s2s_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_NodeInfo_ListenersEntry_DoNotUse_s2s_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_s2s_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_NodeInfo_s2s_2eproto;
 namespace s2s {
+class ListenerDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<Listener> _instance;
+} _Listener_default_instance_;
+class NodeInfo_ListenersEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<NodeInfo_ListenersEntry_DoNotUse> _instance;
+} _NodeInfo_ListenersEntry_DoNotUse_default_instance_;
+class NodeInfoDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<NodeInfo> _instance;
+} _NodeInfo_default_instance_;
 class NodeRegister_RequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<NodeRegister_Request> _instance;
@@ -31,10 +44,6 @@ class NodeRegisterDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<NodeRegister> _instance;
 } _NodeRegister_default_instance_;
-class NodeInfoDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<NodeInfo> _instance;
-} _NodeInfo_default_instance_;
 class NodeQuery_RequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<NodeQuery_Request> _instance;
@@ -72,6 +81,48 @@ class MysqlOperDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<MysqlOper> _instance;
 } _MysqlOper_default_instance_;
 }  // namespace s2s
+static void InitDefaultsListener_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_Listener_default_instance_;
+    new (ptr) ::s2s::Listener();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::Listener::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_Listener_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsListener_s2s_2eproto}, {}};
+
+static void InitDefaultsNodeInfo_ListenersEntry_DoNotUse_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_NodeInfo_ListenersEntry_DoNotUse_default_instance_;
+    new (ptr) ::s2s::NodeInfo_ListenersEntry_DoNotUse();
+  }
+  ::s2s::NodeInfo_ListenersEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_NodeInfo_ListenersEntry_DoNotUse_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsNodeInfo_ListenersEntry_DoNotUse_s2s_2eproto}, {}};
+
+static void InitDefaultsNodeInfo_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_NodeInfo_default_instance_;
+    new (ptr) ::s2s::NodeInfo();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::NodeInfo::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_NodeInfo_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsNodeInfo_s2s_2eproto}, {
+      &scc_info_NodeInfo_ListenersEntry_DoNotUse_s2s_2eproto.base,}};
+
 static void InitDefaultsNodeRegister_Request_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -83,8 +134,9 @@ static void InitDefaultsNodeRegister_Request_s2s_2eproto() {
   ::s2s::NodeRegister_Request::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_NodeRegister_Request_s2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsNodeRegister_Request_s2s_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<1> scc_info_NodeRegister_Request_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsNodeRegister_Request_s2s_2eproto}, {
+      &scc_info_NodeInfo_s2s_2eproto.base,}};
 
 static void InitDefaultsNodeRegister_Response_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -113,20 +165,6 @@ static void InitDefaultsNodeRegister_s2s_2eproto() {
 
 ::google::protobuf::internal::SCCInfo<0> scc_info_NodeRegister_s2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsNodeRegister_s2s_2eproto}, {}};
-
-static void InitDefaultsNodeInfo_s2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::s2s::_NodeInfo_default_instance_;
-    new (ptr) ::s2s::NodeInfo();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::s2s::NodeInfo::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_NodeInfo_s2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsNodeInfo_s2s_2eproto}, {}};
 
 static void InitDefaultsNodeQuery_Request_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -259,10 +297,12 @@ static void InitDefaultsMysqlOper_s2s_2eproto() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsMysqlOper_s2s_2eproto}, {}};
 
 void InitDefaults_s2s_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_Listener_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_NodeInfo_ListenersEntry_DoNotUse_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_NodeInfo_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeRegister_Request_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeRegister_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeRegister_s2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_NodeInfo_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_Request_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_s2s_2eproto.base);
@@ -274,41 +314,56 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_MysqlOper_s2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2eproto[13];
+::google::protobuf::Metadata file_level_metadata_s2s_2eproto[15];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::Listener, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::Listener, name_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Listener, port_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo_ListenersEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo_ListenersEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo_ListenersEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo_ListenersEntry_DoNotUse, value_),
+  0,
+  1,
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, areaid_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, nodeid_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, serverip_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, servername_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, services_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, listeners_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, areaid_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, nodeid_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, address_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, servername_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, services_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Request, nodeinfo_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Response, uid_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister_Response, areaname_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeRegister, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, uid_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, address_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, servername_),
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeInfo, services_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -364,26 +419,30 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::s2s::NodeRegister_Request)},
-  { 10, -1, sizeof(::s2s::NodeRegister_Response)},
-  { 16, -1, sizeof(::s2s::NodeRegister)},
-  { 21, -1, sizeof(::s2s::NodeInfo)},
-  { 30, -1, sizeof(::s2s::NodeQuery_Request)},
-  { 37, -1, sizeof(::s2s::NodeQuery_Response)},
-  { 43, -1, sizeof(::s2s::NodeQuery)},
-  { 48, -1, sizeof(::s2s::MysqlQuery_Request)},
-  { 54, -1, sizeof(::s2s::MysqlQuery_Response)},
-  { 61, -1, sizeof(::s2s::MysqlQuery)},
-  { 66, -1, sizeof(::s2s::MysqlOper_Request)},
-  { 72, -1, sizeof(::s2s::MysqlOper_Response)},
-  { 78, -1, sizeof(::s2s::MysqlOper)},
+  { 0, -1, sizeof(::s2s::Listener)},
+  { 7, 14, sizeof(::s2s::NodeInfo_ListenersEntry_DoNotUse)},
+  { 16, -1, sizeof(::s2s::NodeInfo)},
+  { 27, -1, sizeof(::s2s::NodeRegister_Request)},
+  { 33, -1, sizeof(::s2s::NodeRegister_Response)},
+  { 40, -1, sizeof(::s2s::NodeRegister)},
+  { 45, -1, sizeof(::s2s::NodeQuery_Request)},
+  { 52, -1, sizeof(::s2s::NodeQuery_Response)},
+  { 58, -1, sizeof(::s2s::NodeQuery)},
+  { 63, -1, sizeof(::s2s::MysqlQuery_Request)},
+  { 69, -1, sizeof(::s2s::MysqlQuery_Response)},
+  { 76, -1, sizeof(::s2s::MysqlQuery)},
+  { 81, -1, sizeof(::s2s::MysqlOper_Request)},
+  { 87, -1, sizeof(::s2s::MysqlOper_Response)},
+  { 93, -1, sizeof(::s2s::MysqlOper)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Listener_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeInfo_ListenersEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeInfo_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeRegister_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeRegister_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeRegister_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeInfo_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_default_instance_),
@@ -398,30 +457,34 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2eproto = {
   {}, AddDescriptors_s2s_2eproto, "s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2eproto::offsets,
-  file_level_metadata_s2s_2eproto, 13, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
+  file_level_metadata_s2s_2eproto, 15, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2eproto[] =
   "\n\ts2s.proto\022\003s2s\032\031google/protobuf/any.pr"
-  "oto\"\211\001\n\014NodeRegister\032`\n\007Request\022\016\n\006AreaI"
-  "d\030\001 \001(\005\022\016\n\006NodeId\030\002 \001(\005\022\017\n\007Address\030\003 \001(\t"
-  "\022\022\n\nServerName\030\004 \001(\t\022\020\n\010Services\030\005 \003(\t\032\027"
-  "\n\010Response\022\013\n\003Uid\030\001 \001(\005\"N\n\010NodeInfo\022\013\n\003U"
-  "id\030\001 \001(\005\022\017\n\007Address\030\002 \001(\t\022\022\n\nServerName\030"
-  "\003 \001(\t\022\020\n\010Services\030\004 \003(\t\"e\n\tNodeQuery\032*\n\007"
-  "Request\022\016\n\006AreaId\030\001 \001(\005\022\017\n\007Service\030\002 \001(\t"
-  "\032,\n\010Response\022 \n\tNodeInfos\030\001 \003(\0132\r.s2s.No"
-  "deInfo\"\203\001\n\nMysqlQuery\032-\n\007Request\022\"\n\004Data"
-  "\030\001 \001(\0132\024.google.protobuf.Any\032F\n\010Response"
-  "\022\020\n\010ErrotStr\030\001 \001(\t\022(\n\nQueryDatas\030\002 \003(\0132\024"
-  ".google.protobuf.Any\"X\n\tMysqlOper\032-\n\007Req"
-  "uest\022\"\n\004Data\030\001 \001(\0132\024.google.protobuf.Any"
-  "\032\034\n\010Response\022\020\n\010ErrorStr\030\001 \001(\tb\006proto3"
+  "oto\"&\n\010Listener\022\014\n\004Name\030\001 \001(\t\022\014\n\004Port\030\002 "
+  "\001(\r\"\305\001\n\010NodeInfo\022\016\n\006AreaId\030\001 \001(\005\022\016\n\006Node"
+  "Id\030\002 \001(\005\022\020\n\010ServerIp\030\003 \001(\t\022\022\n\nServerName"
+  "\030\004 \001(\t\022\020\n\010Services\030\005 \003(\t\022/\n\tListeners\030\006 "
+  "\003(\0132\034.s2s.NodeInfo.ListenersEntry\0320\n\016Lis"
+  "tenersEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\005:"
+  "\0028\001\"e\n\014NodeRegister\032*\n\007Request\022\037\n\010nodeIn"
+  "fo\030\001 \001(\0132\r.s2s.NodeInfo\032)\n\010Response\022\013\n\003U"
+  "id\030\001 \001(\005\022\020\n\010AreaName\030\002 \001(\t\"e\n\tNodeQuery\032"
+  "*\n\007Request\022\016\n\006AreaId\030\001 \001(\005\022\017\n\007Service\030\002 "
+  "\001(\t\032,\n\010Response\022 \n\tNodeInfos\030\001 \003(\0132\r.s2s"
+  ".NodeInfo\"\203\001\n\nMysqlQuery\032-\n\007Request\022\"\n\004D"
+  "ata\030\001 \001(\0132\024.google.protobuf.Any\032F\n\010Respo"
+  "nse\022\020\n\010ErrotStr\030\001 \001(\t\022(\n\nQueryDatas\030\002 \003("
+  "\0132\024.google.protobuf.Any\"X\n\tMysqlOper\032-\n\007"
+  "Request\022\"\n\004Data\030\001 \001(\0132\024.google.protobuf."
+  "Any\032\034\n\010Response\022\020\n\010ErrorStr\030\001 \001(\tb\006proto"
+  "3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 598,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 721,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -438,92 +501,74 @@ namespace s2s {
 
 // ===================================================================
 
-void NodeRegister_Request::InitAsDefaultInstance() {
+void Listener::InitAsDefaultInstance() {
 }
-class NodeRegister_Request::HasBitSetters {
+class Listener::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int NodeRegister_Request::kAreaIdFieldNumber;
-const int NodeRegister_Request::kNodeIdFieldNumber;
-const int NodeRegister_Request::kAddressFieldNumber;
-const int NodeRegister_Request::kServerNameFieldNumber;
-const int NodeRegister_Request::kServicesFieldNumber;
+const int Listener::kNameFieldNumber;
+const int Listener::kPortFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-NodeRegister_Request::NodeRegister_Request()
+Listener::Listener()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:s2s.NodeRegister.Request)
+  // @@protoc_insertion_point(constructor:s2s.Listener)
 }
-NodeRegister_Request::NodeRegister_Request(const NodeRegister_Request& from)
+Listener::Listener(const Listener& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      services_(from.services_) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.name().size() > 0) {
+    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.servername().size() > 0) {
-    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
-  }
-  ::memcpy(&areaid_, &from.areaid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&nodeid_) -
-    reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
-  // @@protoc_insertion_point(copy_constructor:s2s.NodeRegister.Request)
+  port_ = from.port_;
+  // @@protoc_insertion_point(copy_constructor:s2s.Listener)
 }
 
-void NodeRegister_Request::SharedCtor() {
+void Listener::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_NodeRegister_Request_s2s_2eproto.base);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&areaid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&nodeid_) -
-      reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
+      &scc_info_Listener_s2s_2eproto.base);
+  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  port_ = 0u;
 }
 
-NodeRegister_Request::~NodeRegister_Request() {
-  // @@protoc_insertion_point(destructor:s2s.NodeRegister.Request)
+Listener::~Listener() {
+  // @@protoc_insertion_point(destructor:s2s.Listener)
   SharedDtor();
 }
 
-void NodeRegister_Request::SharedDtor() {
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void Listener::SharedDtor() {
+  name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void NodeRegister_Request::SetCachedSize(int size) const {
+void Listener::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const NodeRegister_Request& NodeRegister_Request::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_NodeRegister_Request_s2s_2eproto.base);
+const Listener& Listener::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_Listener_s2s_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void NodeRegister_Request::Clear() {
-// @@protoc_insertion_point(message_clear_start:s2s.NodeRegister.Request)
+void Listener::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.Listener)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  services_.Clear();
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&areaid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&nodeid_) -
-      reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  port_ = 0u;
   _internal_metadata_.Clear();
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* NodeRegister_Request::_InternalParse(const char* begin, const char* end, void* object,
+const char* Listener::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<NodeRegister_Request*>(object);
+  auto msg = static_cast<Listener*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -533,69 +578,27 @@ const char* NodeRegister_Request::_InternalParse(const char* begin, const char* 
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // int32 AreaId = 1;
+      // string Name = 1;
       case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_areaid(::google::protobuf::internal::ReadVarint(&ptr));
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.Listener.Name");
+        object = msg->mutable_name();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
-      // int32 NodeId = 2;
+      // uint32 Port = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_nodeid(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_port(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string Address = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeRegister.Request.Address");
-        object = msg->mutable_address();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string ServerName = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeRegister.Request.ServerName");
-        object = msg->mutable_servername();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // repeated string Services = 5;
-      case 5: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.NodeRegister.Request.Services");
-          object = msg->add_services();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
         break;
       }
       default: {
@@ -622,11 +625,472 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool NodeRegister_Request::MergePartialFromCodedStream(
+bool Listener::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:s2s.NodeRegister.Request)
+  // @@protoc_insertion_point(parse_start:s2s.Listener)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string Name = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_name()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->name().data(), static_cast<int>(this->name().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Listener.Name"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // uint32 Port = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &port_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.Listener)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.Listener)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void Listener::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.Listener)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string Name = 1;
+  if (this->name().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->name().data(), static_cast<int>(this->name().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Listener.Name");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->name(), output);
+  }
+
+  // uint32 Port = 2;
+  if (this->port() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->port(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.Listener)
+}
+
+::google::protobuf::uint8* Listener::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.Listener)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string Name = 1;
+  if (this->name().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->name().data(), static_cast<int>(this->name().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Listener.Name");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->name(), target);
+  }
+
+  // uint32 Port = 2;
+  if (this->port() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->port(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.Listener)
+  return target;
+}
+
+size_t Listener::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.Listener)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string Name = 1;
+  if (this->name().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->name());
+  }
+
+  // uint32 Port = 2;
+  if (this->port() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->port());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Listener::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.Listener)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Listener* source =
+      ::google::protobuf::DynamicCastToGenerated<Listener>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Listener)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Listener)
+    MergeFrom(*source);
+  }
+}
+
+void Listener::MergeFrom(const Listener& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Listener)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.name().size() > 0) {
+
+    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+  }
+  if (from.port() != 0) {
+    set_port(from.port());
+  }
+}
+
+void Listener::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.Listener)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Listener::CopyFrom(const Listener& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Listener)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Listener::IsInitialized() const {
+  return true;
+}
+
+void Listener::Swap(Listener* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void Listener::InternalSwap(Listener* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(port_, other->port_);
+}
+
+::google::protobuf::Metadata Listener::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+NodeInfo_ListenersEntry_DoNotUse::NodeInfo_ListenersEntry_DoNotUse() {}
+NodeInfo_ListenersEntry_DoNotUse::NodeInfo_ListenersEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void NodeInfo_ListenersEntry_DoNotUse::MergeFrom(const NodeInfo_ListenersEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata NodeInfo_ListenersEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[1];
+}
+void NodeInfo_ListenersEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool NodeInfo_ListenersEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      NodeInfo_ListenersEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "s2s.NodeInfo.ListenersEntry.key"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+
+// ===================================================================
+
+void NodeInfo::InitAsDefaultInstance() {
+}
+class NodeInfo::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int NodeInfo::kAreaIdFieldNumber;
+const int NodeInfo::kNodeIdFieldNumber;
+const int NodeInfo::kServerIpFieldNumber;
+const int NodeInfo::kServerNameFieldNumber;
+const int NodeInfo::kServicesFieldNumber;
+const int NodeInfo::kListenersFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+NodeInfo::NodeInfo()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.NodeInfo)
+}
+NodeInfo::NodeInfo(const NodeInfo& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      services_(from.services_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  listeners_.MergeFrom(from.listeners_);
+  serverip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.serverip().size() > 0) {
+    serverip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.serverip_);
+  }
+  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.servername().size() > 0) {
+    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
+  }
+  ::memcpy(&areaid_, &from.areaid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&nodeid_) -
+    reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
+  // @@protoc_insertion_point(copy_constructor:s2s.NodeInfo)
+}
+
+void NodeInfo::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_NodeInfo_s2s_2eproto.base);
+  serverip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&areaid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&nodeid_) -
+      reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
+}
+
+NodeInfo::~NodeInfo() {
+  // @@protoc_insertion_point(destructor:s2s.NodeInfo)
+  SharedDtor();
+}
+
+void NodeInfo::SharedDtor() {
+  serverip_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servername_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void NodeInfo::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const NodeInfo& NodeInfo::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_NodeInfo_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void NodeInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.NodeInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  services_.Clear();
+  listeners_.Clear();
+  serverip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  servername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&areaid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&nodeid_) -
+      reinterpret_cast<char*>(&areaid_)) + sizeof(nodeid_));
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* NodeInfo::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<NodeInfo*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // int32 AreaId = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_areaid(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // int32 NodeId = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_nodeid(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string ServerIp = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.ServerIp");
+        object = msg->mutable_serverip();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string ServerName = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.ServerName");
+        object = msg->mutable_servername();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // repeated string Services = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.Services");
+          object = msg->add_services();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
+        break;
+      }
+      // map<string, int32> Listeners = 6;
+      case 6: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::s2s::NodeInfo_ListenersEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->listeners_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 50 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool NodeInfo::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.NodeInfo)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -658,15 +1122,15 @@ bool NodeRegister_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // string Address = 3;
+      // string ServerIp = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
+                input, this->mutable_serverip()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
+            this->serverip().data(), static_cast<int>(this->serverip().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeRegister.Request.Address"));
+            "s2s.NodeInfo.ServerIp"));
         } else {
           goto handle_unusual;
         }
@@ -681,7 +1145,7 @@ bool NodeRegister_Request::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->servername().data(), static_cast<int>(this->servername().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeRegister.Request.ServerName"));
+            "s2s.NodeInfo.ServerName"));
         } else {
           goto handle_unusual;
         }
@@ -697,7 +1161,538 @@ bool NodeRegister_Request::MergePartialFromCodedStream(
             this->services(this->services_size() - 1).data(),
             static_cast<int>(this->services(this->services_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeRegister.Request.Services"));
+            "s2s.NodeInfo.Services"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // map<string, int32> Listeners = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
+          NodeInfo_ListenersEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              NodeInfo_ListenersEntry_DoNotUse,
+              ::std::string, ::google::protobuf::int32,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_INT32,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 > > parser(&listeners_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.NodeInfo.ListenersEntry.key"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.NodeInfo)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.NodeInfo)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void NodeInfo::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.NodeInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 AreaId = 1;
+  if (this->areaid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
+  }
+
+  // int32 NodeId = 2;
+  if (this->nodeid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->nodeid(), output);
+  }
+
+  // string ServerIp = 3;
+  if (this->serverip().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->serverip().data(), static_cast<int>(this->serverip().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.ServerIp");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->serverip(), output);
+  }
+
+  // string ServerName = 4;
+  if (this->servername().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->servername().data(), static_cast<int>(this->servername().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.ServerName");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->servername(), output);
+  }
+
+  // repeated string Services = 5;
+  for (int i = 0, n = this->services_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->services(i).data(), static_cast<int>(this->services(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.Services");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->services(i), output);
+  }
+
+  // map<string, int32> Listeners = 6;
+  if (!this->listeners().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "s2s.NodeInfo.ListenersEntry.key");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->listeners().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->listeners().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_iterator
+          it = this->listeners().begin();
+          it != this->listeners().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<NodeInfo_ListenersEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(listeners_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(6, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<NodeInfo_ListenersEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_iterator
+          it = this->listeners().begin();
+          it != this->listeners().end(); ++it) {
+        entry.reset(listeners_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(6, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.NodeInfo)
+}
+
+::google::protobuf::uint8* NodeInfo::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.NodeInfo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 AreaId = 1;
+  if (this->areaid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
+  }
+
+  // int32 NodeId = 2;
+  if (this->nodeid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->nodeid(), target);
+  }
+
+  // string ServerIp = 3;
+  if (this->serverip().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->serverip().data(), static_cast<int>(this->serverip().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.ServerIp");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->serverip(), target);
+  }
+
+  // string ServerName = 4;
+  if (this->servername().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->servername().data(), static_cast<int>(this->servername().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.ServerName");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->servername(), target);
+  }
+
+  // repeated string Services = 5;
+  for (int i = 0, n = this->services_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->services(i).data(), static_cast<int>(this->services(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeInfo.Services");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(5, this->services(i), target);
+  }
+
+  // map<string, int32> Listeners = 6;
+  if (!this->listeners().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "s2s.NodeInfo.ListenersEntry.key");
+      }
+    };
+
+    if (false &&
+        this->listeners().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->listeners().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_iterator
+          it = this->listeners().begin();
+          it != this->listeners().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<NodeInfo_ListenersEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(listeners_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(6, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<NodeInfo_ListenersEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_iterator
+          it = this->listeners().begin();
+          it != this->listeners().end(); ++it) {
+        entry.reset(listeners_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(6, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.NodeInfo)
+  return target;
+}
+
+size_t NodeInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.NodeInfo)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string Services = 5;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->services_size());
+  for (int i = 0, n = this->services_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->services(i));
+  }
+
+  // map<string, int32> Listeners = 6;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->listeners_size());
+  {
+    ::std::unique_ptr<NodeInfo_ListenersEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::google::protobuf::int32 >::const_iterator
+        it = this->listeners().begin();
+        it != this->listeners().end(); ++it) {
+      entry.reset(listeners_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
+
+  // string ServerIp = 3;
+  if (this->serverip().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->serverip());
+  }
+
+  // string ServerName = 4;
+  if (this->servername().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->servername());
+  }
+
+  // int32 AreaId = 1;
+  if (this->areaid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->areaid());
+  }
+
+  // int32 NodeId = 2;
+  if (this->nodeid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->nodeid());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void NodeInfo::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.NodeInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  const NodeInfo* source =
+      ::google::protobuf::DynamicCastToGenerated<NodeInfo>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.NodeInfo)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.NodeInfo)
+    MergeFrom(*source);
+  }
+}
+
+void NodeInfo::MergeFrom(const NodeInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.NodeInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  services_.MergeFrom(from.services_);
+  listeners_.MergeFrom(from.listeners_);
+  if (from.serverip().size() > 0) {
+
+    serverip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.serverip_);
+  }
+  if (from.servername().size() > 0) {
+
+    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
+  }
+  if (from.areaid() != 0) {
+    set_areaid(from.areaid());
+  }
+  if (from.nodeid() != 0) {
+    set_nodeid(from.nodeid());
+  }
+}
+
+void NodeInfo::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.NodeInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void NodeInfo::CopyFrom(const NodeInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.NodeInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool NodeInfo::IsInitialized() const {
+  return true;
+}
+
+void NodeInfo::Swap(NodeInfo* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void NodeInfo::InternalSwap(NodeInfo* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  services_.InternalSwap(CastToBase(&other->services_));
+  listeners_.Swap(&other->listeners_);
+  serverip_.Swap(&other->serverip_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  servername_.Swap(&other->servername_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(areaid_, other->areaid_);
+  swap(nodeid_, other->nodeid_);
+}
+
+::google::protobuf::Metadata NodeInfo::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void NodeRegister_Request::InitAsDefaultInstance() {
+  ::s2s::_NodeRegister_Request_default_instance_._instance.get_mutable()->nodeinfo_ = const_cast< ::s2s::NodeInfo*>(
+      ::s2s::NodeInfo::internal_default_instance());
+}
+class NodeRegister_Request::HasBitSetters {
+ public:
+  static const ::s2s::NodeInfo& nodeinfo(const NodeRegister_Request* msg);
+};
+
+const ::s2s::NodeInfo&
+NodeRegister_Request::HasBitSetters::nodeinfo(const NodeRegister_Request* msg) {
+  return *msg->nodeinfo_;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int NodeRegister_Request::kNodeInfoFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+NodeRegister_Request::NodeRegister_Request()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.NodeRegister.Request)
+}
+NodeRegister_Request::NodeRegister_Request(const NodeRegister_Request& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_nodeinfo()) {
+    nodeinfo_ = new ::s2s::NodeInfo(*from.nodeinfo_);
+  } else {
+    nodeinfo_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:s2s.NodeRegister.Request)
+}
+
+void NodeRegister_Request::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_NodeRegister_Request_s2s_2eproto.base);
+  nodeinfo_ = nullptr;
+}
+
+NodeRegister_Request::~NodeRegister_Request() {
+  // @@protoc_insertion_point(destructor:s2s.NodeRegister.Request)
+  SharedDtor();
+}
+
+void NodeRegister_Request::SharedDtor() {
+  if (this != internal_default_instance()) delete nodeinfo_;
+}
+
+void NodeRegister_Request::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const NodeRegister_Request& NodeRegister_Request::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_NodeRegister_Request_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void NodeRegister_Request::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.NodeRegister.Request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaNoVirtual() == nullptr && nodeinfo_ != nullptr) {
+    delete nodeinfo_;
+  }
+  nodeinfo_ = nullptr;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* NodeRegister_Request::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<NodeRegister_Request*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .s2s.NodeInfo nodeInfo = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::s2s::NodeInfo::_InternalParse;
+        object = msg->mutable_nodeinfo();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool NodeRegister_Request::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.NodeRegister.Request)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .s2s.NodeInfo nodeInfo = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_nodeinfo()));
         } else {
           goto handle_unusual;
         }
@@ -731,44 +1726,10 @@ void NodeRegister_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
-  }
-
-  // int32 NodeId = 2;
-  if (this->nodeid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->nodeid(), output);
-  }
-
-  // string Address = 3;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.Address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->address(), output);
-  }
-
-  // string ServerName = 4;
-  if (this->servername().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->servername().data(), static_cast<int>(this->servername().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.ServerName");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->servername(), output);
-  }
-
-  // repeated string Services = 5;
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->services(i).data(), static_cast<int>(this->services(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.Services");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      5, this->services(i), output);
+  // .s2s.NodeInfo nodeInfo = 1;
+  if (this->has_nodeinfo()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, HasBitSetters::nodeinfo(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -784,46 +1745,11 @@ void NodeRegister_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
-  }
-
-  // int32 NodeId = 2;
-  if (this->nodeid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->nodeid(), target);
-  }
-
-  // string Address = 3;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.Address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->address(), target);
-  }
-
-  // string ServerName = 4;
-  if (this->servername().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->servername().data(), static_cast<int>(this->servername().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.ServerName");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->servername(), target);
-  }
-
-  // repeated string Services = 5;
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->services(i).data(), static_cast<int>(this->services(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeRegister.Request.Services");
+  // .s2s.NodeInfo nodeInfo = 1;
+  if (this->has_nodeinfo()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(5, this->services(i), target);
+      InternalWriteMessageToArray(
+        1, HasBitSetters::nodeinfo(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -847,40 +1773,11 @@ size_t NodeRegister_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string Services = 5;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->services_size());
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->services(i));
-  }
-
-  // string Address = 3;
-  if (this->address().size() > 0) {
+  // .s2s.NodeInfo nodeInfo = 1;
+  if (this->has_nodeinfo()) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
-  }
-
-  // string ServerName = 4;
-  if (this->servername().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->servername());
-  }
-
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->areaid());
-  }
-
-  // int32 NodeId = 2;
-  if (this->nodeid() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->nodeid());
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *nodeinfo_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -910,20 +1807,8 @@ void NodeRegister_Request::MergeFrom(const NodeRegister_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  services_.MergeFrom(from.services_);
-  if (from.address().size() > 0) {
-
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
-  if (from.servername().size() > 0) {
-
-    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
-  }
-  if (from.areaid() != 0) {
-    set_areaid(from.areaid());
-  }
-  if (from.nodeid() != 0) {
-    set_nodeid(from.nodeid());
+  if (from.has_nodeinfo()) {
+    mutable_nodeinfo()->::s2s::NodeInfo::MergeFrom(from.nodeinfo());
   }
 }
 
@@ -952,13 +1837,7 @@ void NodeRegister_Request::Swap(NodeRegister_Request* other) {
 void NodeRegister_Request::InternalSwap(NodeRegister_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  services_.InternalSwap(CastToBase(&other->services_));
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  servername_.Swap(&other->servername_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(areaid_, other->areaid_);
-  swap(nodeid_, other->nodeid_);
+  swap(nodeinfo_, other->nodeinfo_);
 }
 
 ::google::protobuf::Metadata NodeRegister_Request::GetMetadata() const {
@@ -977,6 +1856,7 @@ class NodeRegister_Response::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int NodeRegister_Response::kUidFieldNumber;
+const int NodeRegister_Response::kAreaNameFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 NodeRegister_Response::NodeRegister_Response()
@@ -988,11 +1868,18 @@ NodeRegister_Response::NodeRegister_Response(const NodeRegister_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  areaname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.areaname().size() > 0) {
+    areaname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.areaname_);
+  }
   uid_ = from.uid_;
   // @@protoc_insertion_point(copy_constructor:s2s.NodeRegister.Response)
 }
 
 void NodeRegister_Response::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_NodeRegister_Response_s2s_2eproto.base);
+  areaname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   uid_ = 0;
 }
 
@@ -1002,6 +1889,7 @@ NodeRegister_Response::~NodeRegister_Response() {
 }
 
 void NodeRegister_Response::SharedDtor() {
+  areaname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void NodeRegister_Response::SetCachedSize(int size) const {
@@ -1019,6 +1907,7 @@ void NodeRegister_Response::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  areaname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   uid_ = 0;
   _internal_metadata_.Clear();
 }
@@ -1043,6 +1932,22 @@ const char* NodeRegister_Response::_InternalParse(const char* begin, const char*
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
+      // string AreaName = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.NodeRegister.Response.AreaName");
+        object = msg->mutable_areaname();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -1058,6 +1963,13 @@ const char* NodeRegister_Response::_InternalParse(const char* begin, const char*
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool NodeRegister_Response::MergePartialFromCodedStream(
@@ -1077,6 +1989,21 @@ bool NodeRegister_Response::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &uid_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string AreaName = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_areaname()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->areaname().data(), static_cast<int>(this->areaname().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.NodeRegister.Response.AreaName"));
         } else {
           goto handle_unusual;
         }
@@ -1115,6 +2042,16 @@ void NodeRegister_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->uid(), output);
   }
 
+  // string AreaName = 2;
+  if (this->areaname().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->areaname().data(), static_cast<int>(this->areaname().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeRegister.Response.AreaName");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->areaname(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1131,6 +2068,17 @@ void NodeRegister_Response::SerializeWithCachedSizes(
   // int32 Uid = 1;
   if (this->uid() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->uid(), target);
+  }
+
+  // string AreaName = 2;
+  if (this->areaname().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->areaname().data(), static_cast<int>(this->areaname().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.NodeRegister.Response.AreaName");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->areaname(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1153,6 +2101,13 @@ size_t NodeRegister_Response::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string AreaName = 2;
+  if (this->areaname().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->areaname());
+  }
 
   // int32 Uid = 1;
   if (this->uid() != 0) {
@@ -1188,6 +2143,10 @@ void NodeRegister_Response::MergeFrom(const NodeRegister_Response& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.areaname().size() > 0) {
+
+    areaname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.areaname_);
+  }
   if (from.uid() != 0) {
     set_uid(from.uid());
   }
@@ -1218,6 +2177,8 @@ void NodeRegister_Response::Swap(NodeRegister_Response* other) {
 void NodeRegister_Response::InternalSwap(NodeRegister_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  areaname_.Swap(&other->areaname_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(uid_, other->uid_);
 }
 
@@ -1431,489 +2392,6 @@ void NodeRegister::InternalSwap(NodeRegister* other) {
 }
 
 ::google::protobuf::Metadata NodeRegister::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
-  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void NodeInfo::InitAsDefaultInstance() {
-}
-class NodeInfo::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int NodeInfo::kUidFieldNumber;
-const int NodeInfo::kAddressFieldNumber;
-const int NodeInfo::kServerNameFieldNumber;
-const int NodeInfo::kServicesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-NodeInfo::NodeInfo()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:s2s.NodeInfo)
-}
-NodeInfo::NodeInfo(const NodeInfo& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      services_(from.services_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
-  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.servername().size() > 0) {
-    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
-  }
-  uid_ = from.uid_;
-  // @@protoc_insertion_point(copy_constructor:s2s.NodeInfo)
-}
-
-void NodeInfo::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_NodeInfo_s2s_2eproto.base);
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  uid_ = 0;
-}
-
-NodeInfo::~NodeInfo() {
-  // @@protoc_insertion_point(destructor:s2s.NodeInfo)
-  SharedDtor();
-}
-
-void NodeInfo::SharedDtor() {
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void NodeInfo::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const NodeInfo& NodeInfo::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_NodeInfo_s2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void NodeInfo::Clear() {
-// @@protoc_insertion_point(message_clear_start:s2s.NodeInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  services_.Clear();
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  servername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  uid_ = 0;
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* NodeInfo::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<NodeInfo*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // int32 Uid = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_uid(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string Address = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.Address");
-        object = msg->mutable_address();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string ServerName = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.ServerName");
-        object = msg->mutable_servername();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // repeated string Services = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.NodeInfo.Services");
-          object = msg->add_services();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool NodeInfo::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:s2s.NodeInfo)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 Uid = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &uid_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string Address = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeInfo.Address"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string ServerName = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_servername()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->servername().data(), static_cast<int>(this->servername().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeInfo.ServerName"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated string Services = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_services()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->services(this->services_size() - 1).data(),
-            static_cast<int>(this->services(this->services_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeInfo.Services"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:s2s.NodeInfo)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:s2s.NodeInfo)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void NodeInfo::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:s2s.NodeInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 Uid = 1;
-  if (this->uid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->uid(), output);
-  }
-
-  // string Address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.Address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->address(), output);
-  }
-
-  // string ServerName = 3;
-  if (this->servername().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->servername().data(), static_cast<int>(this->servername().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.ServerName");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->servername(), output);
-  }
-
-  // repeated string Services = 4;
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->services(i).data(), static_cast<int>(this->services(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.Services");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      4, this->services(i), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:s2s.NodeInfo)
-}
-
-::google::protobuf::uint8* NodeInfo::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:s2s.NodeInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 Uid = 1;
-  if (this->uid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->uid(), target);
-  }
-
-  // string Address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.Address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->address(), target);
-  }
-
-  // string ServerName = 3;
-  if (this->servername().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->servername().data(), static_cast<int>(this->servername().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.ServerName");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->servername(), target);
-  }
-
-  // repeated string Services = 4;
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->services(i).data(), static_cast<int>(this->services(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeInfo.Services");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(4, this->services(i), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:s2s.NodeInfo)
-  return target;
-}
-
-size_t NodeInfo::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:s2s.NodeInfo)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated string Services = 4;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->services_size());
-  for (int i = 0, n = this->services_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->services(i));
-  }
-
-  // string Address = 2;
-  if (this->address().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
-  }
-
-  // string ServerName = 3;
-  if (this->servername().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->servername());
-  }
-
-  // int32 Uid = 1;
-  if (this->uid() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->uid());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void NodeInfo::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:s2s.NodeInfo)
-  GOOGLE_DCHECK_NE(&from, this);
-  const NodeInfo* source =
-      ::google::protobuf::DynamicCastToGenerated<NodeInfo>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.NodeInfo)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.NodeInfo)
-    MergeFrom(*source);
-  }
-}
-
-void NodeInfo::MergeFrom(const NodeInfo& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:s2s.NodeInfo)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  services_.MergeFrom(from.services_);
-  if (from.address().size() > 0) {
-
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
-  if (from.servername().size() > 0) {
-
-    servername_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.servername_);
-  }
-  if (from.uid() != 0) {
-    set_uid(from.uid());
-  }
-}
-
-void NodeInfo::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:s2s.NodeInfo)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void NodeInfo::CopyFrom(const NodeInfo& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:s2s.NodeInfo)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool NodeInfo::IsInitialized() const {
-  return true;
-}
-
-void NodeInfo::Swap(NodeInfo* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void NodeInfo::InternalSwap(NodeInfo* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  services_.InternalSwap(CastToBase(&other->services_));
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  servername_.Swap(&other->servername_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(uid_, other->uid_);
-}
-
-::google::protobuf::Metadata NodeInfo::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
   return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
 }
@@ -4415,6 +4893,15 @@ void MysqlOper::InternalSwap(MysqlOper* other) {
 }  // namespace s2s
 namespace google {
 namespace protobuf {
+template<> PROTOBUF_NOINLINE ::s2s::Listener* Arena::CreateMaybeMessage< ::s2s::Listener >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::Listener >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::NodeInfo_ListenersEntry_DoNotUse* Arena::CreateMaybeMessage< ::s2s::NodeInfo_ListenersEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::NodeInfo_ListenersEntry_DoNotUse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::NodeInfo* Arena::CreateMaybeMessage< ::s2s::NodeInfo >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::NodeInfo >(arena);
+}
 template<> PROTOBUF_NOINLINE ::s2s::NodeRegister_Request* Arena::CreateMaybeMessage< ::s2s::NodeRegister_Request >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::NodeRegister_Request >(arena);
 }
@@ -4423,9 +4910,6 @@ template<> PROTOBUF_NOINLINE ::s2s::NodeRegister_Response* Arena::CreateMaybeMes
 }
 template<> PROTOBUF_NOINLINE ::s2s::NodeRegister* Arena::CreateMaybeMessage< ::s2s::NodeRegister >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::NodeRegister >(arena);
-}
-template<> PROTOBUF_NOINLINE ::s2s::NodeInfo* Arena::CreateMaybeMessage< ::s2s::NodeInfo >(Arena* arena) {
-  return Arena::CreateInternal< ::s2s::NodeInfo >(arena);
 }
 template<> PROTOBUF_NOINLINE ::s2s::NodeQuery_Request* Arena::CreateMaybeMessage< ::s2s::NodeQuery_Request >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::NodeQuery_Request >(arena);

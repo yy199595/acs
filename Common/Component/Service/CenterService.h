@@ -8,12 +8,7 @@ using namespace com;
 
 namespace GameKeeper
 {
-    class NodeProxy;
-
-    class ProxyService;
-
-    class TcpSessionListener;
-
+    class RpcNodeProxy;
     // 所有方法都注册到这里(全局唯一)
     class CenterService : public LocalServiceComponent
     {
@@ -34,7 +29,9 @@ namespace GameKeeper
 
     private:
         void NoticeAllNode(const s2s::NodeInfo & nodeInfo);
+        void AddNewNode(unsigned short areaId, unsigned int nodeId);
     private:
-        std::unordered_map<int, NodeProxy *> mServiceNodeMap;
+        class NodeProxyComponent * mNodeComponent;
+        std::unordered_map<unsigned short , std::set<unsigned int>> mServiceNodeMap;
     };
 }

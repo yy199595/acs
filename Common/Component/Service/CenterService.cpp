@@ -1,14 +1,17 @@
 ﻿#include "CenterService.h"
 #include <Core/App.h>
 #include <Util/StringHelper.h>
-#include <Service/NodeProxy.h>
+#include <Service/RpcNodeProxy.h>
+#include <Scene/RpcComponent.h>
 #include <Scene/RpcProtoComponent.h>
+#include <Service/NodeProxyComponent.h>
 namespace GameKeeper
 {
 	bool CenterService::Awake()
 	{
 		__add_method(CenterService::Add);
 		__add_method(CenterService::Query);
+        this->mNodeComponent = this->GetComponent<NodeProxyComponent>();
 		return true;
 	}
 
@@ -18,65 +21,65 @@ namespace GameKeeper
     }
 
 	XCode CenterService::Add(const s2s::NodeRegister_Request &nodeInfo, s2s::NodeRegister_Response & response)
-	{
-		
-		const int areaId = nodeInfo.areaid();
-		const int nodeId = nodeInfo.nodeid();
-		long long socketId = this->GetCurSocketId();
-		const std::string &address = nodeInfo.address();
-		const std::string &nodeName = nodeInfo.servername();
-		if (address.empty() || nodeName.empty())
-		{
-			return XCode::Failure;
-		}
-        auto serviceNode = new NodeProxy(areaId, nodeId, nodeName, address, socketId);
+    {
+        const unsigned short areaId = nodeInfo.nodeinfo().areaid();
+        const unsigned short nodeId = nodeInfo.nodeinfo().nodeid();
+        unsigned int globalId = (unsigned int) areaId << 32 | nodeId;
 
-        const int key = serviceNode->GetNodeUId();
-		auto iter = this->mServiceNodeMap.find(key);
-		if (iter != this->mServiceNodeMap.end())
-		{
-            delete serviceNode;
-			return XCode::Failure;
-		}
-		auto protoComponent = this->GetComponent<RpcProtoComponent>();
-		for (int index = 0; index < nodeInfo.services_size(); index++)
-		{
-			const std::string & service = nodeInfo.services(index);
-			if (!protoComponent->HasService(service))
-			{
-				GKDebugError("register [ " << service << " ] failure");
-				return XCode::Failure;
-			}
-			serviceNode->AddService(service);
-			GKDebugLog(nodeName << " add new service [ " << service << " ]");
-		}
-		response.set_uid(key);
-		this->mServiceNodeMap.emplace(key, serviceNode);
-		GKDebugLog(nodeName << " [" << address << "] register successful ......");
+        long long socketId = this->GetCurSocketId();
+        auto nodeProxy = this->mNodeComponent->Create(globalId);
+        if (!nodeProxy->UpdateNodeProxy(nodeInfo.nodeinfo(), socketId))
+        {
+            return XCode::Failure;
+        }
+        this->NoticeAllNode(nodeInfo.nodeinfo());
+        this->AddNewNode(areaId, globalId);
+        return XCode::Successful;
+    }
 
-		return XCode::Successful;
-	}
+    void CenterService::AddNewNode(unsigned short areaId, unsigned int nodeId)
+    {
+        auto iter = this->mServiceNodeMap.find(areaId);
+        if(iter == this->mServiceNodeMap.end())
+        {
+            std::set<unsigned int> temp;
+            this->mServiceNodeMap.emplace(areaId, temp);
+        }
+        this->mServiceNodeMap[areaId].insert(nodeId);
+    }
 
 	XCode CenterService::Query(const s2s::NodeQuery_Request & request, s2s::NodeQuery_Response & response)
 	{
-        const int areaId = request.areaid();
-       /* const std::string & service = request.servicename();
-
-        auto iter = this->mServiceNodeMap.begin();
-        for(; iter != this->mServiceNodeMap.end(); iter++)
+        auto areaId = (unsigned short)request.areaid();
+        const std::string & service = request.service();
+        auto iter = this->mServiceNodeMap.find(areaId);
+        if(iter == this->mServiceNodeMap.end())
         {
-            NodeProxy * node = iter->second;
-            if(node->GetAreaId() == areaId && node->HasService(service))
+            return XCode::Failure;
+        }
+        for(unsigned int id : iter->second)
+        {
+            auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
+            if(nodeProxy!= nullptr && nodeProxy->HasService(service))
             {
-               s2s::NodeInfo * nodeInfo = response.add_nodeinfos();
-                nodeInfo->set_address(node->GetAddress());
+               auto nodeInfo = response.add_nodeinfos();
+               nodeInfo->CopyFrom(nodeProxy->GetNodeInfo());
             }
-        }*/
-		return XCode::Successful;
+        }
+        return XCode::Successful;
 	}
 
     void CenterService::NoticeAllNode(const s2s::NodeInfo & nodeInfo)
     {
-
+        auto areaId = (unsigned short)nodeInfo.areaid();
+        auto iter = this->mServiceNodeMap.find(areaId);
+        if(iter != this->mServiceNodeMap.end())
+        {
+            for(unsigned int id : iter->second)
+            {
+               auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
+               nodeProxy->Notice("ClusterService.Add", nodeInfo);
+            }
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace GameKeeper
 
 	bool CoroutineGroup::Add(unsigned int id)
 	{
-		if (this->mIsYield == false)
+		if (!this->mIsYield)
 		{
 			this->mCoroutines.insert(id);
 			return true;
@@ -77,7 +77,7 @@ namespace GameKeeper
 	}
 	void CoroutineGroup::AwaitAll()
 	{
-		if (this->mIsYield == false)
+		if (!this->mIsYield)
 		{
 			this->mIsYield = true;
 			this->mCorComponent->YieldReturn();

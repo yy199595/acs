@@ -74,8 +74,7 @@
         "CenterService", 
         "ClusterService",
         "HttpLoginService",
-        "HttpOperComponent",
-        "HttpResourceComponent"
+        "HttpOperComponent"
     ],
     "WhiteList": [
         "127.0.0.1"

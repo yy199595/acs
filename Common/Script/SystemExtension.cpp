@@ -11,7 +11,7 @@
 #include <Scene/LuaScriptComponent.h>
 #include <Scene/RpcProtoComponent.h>
 
-#include <Service/NodeProxy.h>
+#include <Service/RpcNodeProxy.h>
 #include <Pool/MessagePool.h>
 using namespace GameKeeper;
 
@@ -34,7 +34,7 @@ int SystemExtension::Call(lua_State *lua)
 
 	NodeProxyComponent * nodeComponent = App::Get().GetComponent<NodeProxyComponent>();
 
-	NodeProxy * serviceNode = nodeComponent->GetServiceNode(nodeId);
+	RpcNodeProxy * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
 	{
 		lua_pushinteger(lua, XCode::CallServiceNotFound);

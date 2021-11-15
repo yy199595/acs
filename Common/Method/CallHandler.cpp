@@ -15,40 +15,30 @@ namespace GameKeeper
 
 	void LuaCallHandler::Invoke(const com::Rpc_Response & response)
     {
-       /* LocalObject<com::Rpc_Response> lock(&response);
-        auto component = App::Get().GetComponent<RpcProtoComponent>();
-
-        unsigned short methodId = response.methodid();
-        auto config = component->GetProtocolConfig(methodId);
-		lua_pushinteger(this->mCoroutine, (int)response.code());
-
-        if(!config->Response.empty())
+        LocalObject<com::Rpc_Response> lock(&response);
+        lua_pushinteger(this->mCoroutine, (int)response.code());
+        if((XCode)response.code() == XCode::Successful)
         {
-            const std::string & data = response.messagedata();
-            Message * messageData = MessagePool::NewByData(config->Response, data);
-            if(messageData != nullptr)
+            std::string json;
+            Message *responseMessage = MessagePool::New(response.data());
+            GKAssertRet_F(responseMessage && util::MessageToJsonString(*responseMessage, &json).ok());
+
+            auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
+            lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
+            if (lua_isfunction(this->luaEnv, -1))
             {
-                std::string json;
-                if(util::MessageToJsonString(*messageData, &json).ok())
+                lua_pushlstring(this->luaEnv, json.c_str(), json.size());
+                if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
                 {
-                    auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
-                    lua_getref(this->luaEnv, scriptCom->GetLuaRef("Json", "ToObject"));
-                    if (lua_isfunction(this->luaEnv, -1))
-                    {
-                        lua_pushlstring(this->luaEnv, json.c_str(), json.size());
-                        if (lua_pcall(this->luaEnv, 1, 1, 0) != 0)
-                        {
-                            GKDebugError(lua_tostring(this->luaEnv, -1));
-                            return;
-                        }
-                        lua_xmove(this->luaEnv, this->mCoroutine, 1);
-                        lua_presume(this->mCoroutine, this->luaEnv, 2);
-                        return;
-                    }
+                    GKDebugError(lua_tostring(this->luaEnv, -1));
+                    return;
                 }
+                lua_xmove(this->luaEnv, this->mCoroutine, 1);
+                lua_presume(this->mCoroutine, this->luaEnv, 2);
+                return;
             }
         }
-		lua_presume(this->mCoroutine, this->luaEnv, 1);*/
+        lua_presume(this->mCoroutine, this->luaEnv, 1);
     }
 
     CppCallHandler::CppCallHandler(int method)
@@ -70,10 +60,10 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
-//			if (!response.data().UnpackTo(this->mMessage))
-//			{
-//				this->mCode = XCode::ParseMessageError;
-//			}
+			if (!response.data().UnpackTo(this->mMessage))
+			{
+				this->mCode = XCode::ParseMessageError;
+			}
         }
         this->mScheduler->Resume(mCoroutineId);
     }
