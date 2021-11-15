@@ -13,7 +13,7 @@ namespace GameKeeper
 	{
 	public:
 		CoroutineComponent();
-		~CoroutineComponent();
+		~CoroutineComponent() final;
 	public:
 		template<typename F, typename T, typename ... Args>
 		unsigned int StartCoroutine(F && f, T * o, Args &&... args) {
@@ -64,12 +64,12 @@ namespace GameKeeper
 			return this->mCurrentCorId;
 		}
 
-		bool IsInMainCoroutine()
+		bool IsInMainCoroutine() const
 		{
 			return this->mCurrentCorId == 0;
 		}
 
-		bool IsInLogicCoroutine()
+		bool IsInLogicCoroutine() const
 		{
 			return this->mCurrentCorId != 0;
 		}
@@ -82,7 +82,6 @@ namespace GameKeeper
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
-		std::string mMessageBuffer;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLateUpdateCors;
 	private:

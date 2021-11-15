@@ -10,12 +10,12 @@ namespace GameKeeper
     public:
         LuaSleepTimer(lua_State *lua, int ref, long long ms);
 
-        ~LuaSleepTimer() { luaL_unref(mLuaEnv, LUA_REGISTRYINDEX, this->mRef); }
+        ~LuaSleepTimer() final { luaL_unref(mLuaEnv, LUA_REGISTRYINDEX, this->mRef); }
 
-        static shared_ptr<LuaSleepTimer> Create(lua_State *lua, int index, long long ms);
+        static LuaSleepTimer * Create(lua_State *lua, int index, long long ms);
 
     public:
-        bool Invoke() override;//����֮��ִ�еĲ���
+        bool Invoke() override;
     private:
         int mRef;
         lua_State *mLuaEnv;

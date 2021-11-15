@@ -10,10 +10,10 @@ namespace GameKeeper
     public:
         LuaActionTimer(lua_State *luaEnv, int ref, int interval, int count = 1);
 
-        ~LuaActionTimer();
+        ~LuaActionTimer() final;
 
     public:
-        bool Invoke() override;//����֮��ִ�еĲ���
+        bool Invoke() final;
     private:
         int mRef;
         int mInterval;

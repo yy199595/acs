@@ -27,7 +27,6 @@
 #include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
 #include <Http/HttpResourceComponent.h>
-#include <Pool/StringPool.h>
 #include <Service/HttpLoginService.h>
 #include <Http/HttpOperComponent.h>
 using namespace GameKeeper;

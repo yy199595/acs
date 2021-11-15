@@ -12,10 +12,6 @@ file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "
 
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 
-foreach(file ${CommonFiles})
-    message(${file})
-endforeach()
-
 set(CMAKE_CXX_STANDARD 11)
 set(PROJECT_COMMON_DIR ${PROJECT_SOURCE_DIR})
 if(MSVC)

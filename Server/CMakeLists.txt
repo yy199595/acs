@@ -33,13 +33,6 @@ LINK_DIRECTORIES(${PROJECT_COMMON_DIR}/Libs/lib)
 SET(CMAKE_BUILD_TYPE Debug)
 list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
 
-foreach(file ${CommonFiles})
-    message(${file})
-endforeach()
-
-foreach(file ${ServerFiles})
-    message(${file})
-endforeach()
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -68,7 +61,7 @@ if(MSVC)
    
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
-    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl jemalloc)
+    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl jemalloc)
 endif()
 target_compile_definitions(Server PRIVATE __DEBUG__)
 target_compile_definitions(Server PRIVATE __COROUTINE_ASM__)

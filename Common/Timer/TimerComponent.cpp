@@ -3,25 +3,23 @@
 
 namespace GameKeeper
 {
-    TimerComponent::TimerComponent()
-    {
-    }
-
     bool TimerComponent::Awake()
     {
         for (int index = 0; index < this->LayerCount; index++)
         {
-            int count = index == 0 ? this->FirstLayerCount : this->OtherLayerCount;
+            int count = index == 0
+                    ? this->FirstLayerCount : this->OtherLayerCount;
             int end = FirstLayerCount * std::pow(OtherLayerCount, index);
-            int start = index == 0 ? 0 : FirstLayerCount * std::pow(OtherLayerCount, index - 1);
-            TimeWheelLayer *timerLayer = new TimeWheelLayer(index, count, start, end);
-            this->mTimerLayers.push_back(timerLayer);
+
+            int start = index == 0 ? 0 :
+                    FirstLayerCount * std::pow(OtherLayerCount, index - 1);
+            this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
         }
         this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
         return true;
     }
 
-    bool TimerComponent::AddTimer(shared_ptr<TimerBase> timer)
+    bool TimerComponent::AddTimer(TimerBase * timer)
     {
         if (timer == nullptr)
         {
@@ -46,7 +44,7 @@ namespace GameKeeper
 			delete func;
             return true;
         }
-        return this->AddTimer(make_shared<DelayTimer>(ms, func));
+        return this->AddTimer(new DelayTimer(ms, func));
     }
 
     bool TimerComponent::RemoveTimer(long long id)
@@ -54,14 +52,14 @@ namespace GameKeeper
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
         {
-            shared_ptr<TimerBase> pTimer = iter->second;
+            delete iter->second;
             this->mTimerMap.erase(iter);
             return true;
         }
         return false;
     }
 
-    shared_ptr<TimerBase> TimerComponent::GetTimer(long long id)
+    TimerBase * TimerComponent::GetTimer(long long id)
     {
         auto iter = this->mTimerMap.find(id);
         return iter != this->mTimerMap.end() ? iter->second : nullptr;
@@ -72,7 +70,7 @@ namespace GameKeeper
         long long nowTime = TimeHelper::GetMilTimestamp();
         long long subTime = nowTime - this->mNextUpdateTime;
 
-        if (subTime <= (this->TimerPrecision - 2))
+        if (subTime <= (this->TimerPrecision - 2)) //2毫秒误差
         {
             return;
         }
@@ -112,26 +110,30 @@ namespace GameKeeper
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
         {
-            iter->second->Invoke();
-            this->mTimerMap.erase(iter);
-            return true;
+            TimerBase * timer = iter->second;
+            if(timer->Invoke())
+            {
+                delete timer;
+                this->mTimerMap.erase(iter);
+                return true;
+            }
+            return this->AddTimerToWheel(timer);
         }
         return false;
     }
 
-    bool TimerComponent::AddTimerToWheel(shared_ptr<TimerBase> timer)
+    bool TimerComponent::AddTimerToWheel(TimerBase * timer)
     {
         auto iter = this->mTimerMap.find(timer->GetTimerId());
         if (iter == this->mTimerMap.end())
         {
+            GKDebugError("add timer not exist : " << timer->GetTimerId());
             return false;
         }
         long long nowTime = TimeHelper::GetMilTimestamp();
-
         int tick = (timer->GetTriggerTime() - nowTime) / this->TimerPrecision;
-        for (size_t index = 0; index < this->mTimerLayers.size(); index++)
+        for (auto timerLayer : this->mTimerLayers)
         {
-            TimeWheelLayer *timerLayer = this->mTimerLayers[index];
             if (timerLayer->AddTimer(tick, timer))
             {
                 return true;

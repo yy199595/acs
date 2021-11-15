@@ -9,13 +9,11 @@ namespace GameKeeper
 	public:
 		DelayTimer(long long ms, StaticMethod * func)
 			: TimerBase(ms), mFunc(func) {}
-
+        ~DelayTimer() final { delete this->mFunc;}
 	public:
 		bool Invoke() final
 		{
 			this->mFunc->run();
-			delete mFunc;
-			this->mFunc = nullptr;
 			return true;
 		}
 	private:

@@ -148,11 +148,11 @@ int SystemExtension::Sleep(lua_State *luaEnv)
 {
     long long ms = lua_tointeger(luaEnv, 1);
     lua_pushthread(luaEnv);
-    TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
+    auto *pTimerManager = App::Get().GetComponent<TimerComponent>();
     if (pTimerManager != nullptr)
     {
-        shared_ptr<TimerBase> pTimer = LuaSleepTimer::Create(luaEnv, -1, ms);
-        pTimerManager->AddTimer(pTimer);
+        auto timer = LuaSleepTimer::Create(luaEnv, -1, ms);
+        //TODO pTimerManager->AddTimer(pTimer);
     }
     return lua_yield(luaEnv, 1);
 }
@@ -173,8 +173,8 @@ int SystemExtension::AddTimer(lua_State *lua)
     {
         count = lua_tointeger(lua, 3);
     }
-    TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
-    if (pTimerManager != nullptr)
+    auto timerComponent = App::Get().GetComponent<TimerComponent>();
+    if (timerComponent != nullptr)
     {
         lua_pushvalue(lua, 1);
         if (!lua_isfunction(lua, -1))
@@ -182,10 +182,11 @@ int SystemExtension::AddTimer(lua_State *lua)
             return 0;
         }
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        shared_ptr<LuaActionTimer> sharedTimer = pTimerManager->CreateTimer<LuaActionTimer>(lua, ref, interval, count);
-        if (sharedTimer != nullptr)
+        //TODO
+        //shared_ptr<LuaActionTimer> sharedTimer = pTimerManager->CreateTimer<LuaActionTimer>(lua, ref, interval, count);
+        //if (sharedTimer != nullptr)
         {
-            lua_pushinteger(lua, sharedTimer->GetTimerId());
+            //lua_pushinteger(lua, sharedTimer->GetTimerId());
             return 1;
         }
     }

@@ -11,14 +11,14 @@ namespace GameKeeper
     public:
         TimerBase(long long ms);
 
-        virtual ~TimerBase() {}
+        virtual ~TimerBase() = default;
 
     public:
-        virtual bool Invoke() = 0;//
+        virtual bool Invoke() = 0;// true 表示完成 false 表示继续放进时间轮
     public:
-        const long long GetTimerId() { return mTimerId; }
+        long long GetTimerId() const { return mTimerId; }
 
-        const long long GetTriggerTime() { return this->mTriggerTime; }
+        long long GetTriggerTime() const { return this->mTriggerTime; }
 
     protected:
         long long mTimerId;

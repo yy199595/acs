@@ -11,7 +11,7 @@ namespace GameKeeper
     {
     public:
 		CallHandler(int method);
-		virtual ~CallHandler();
+		virtual ~CallHandler() = default;
 
     public:
 		int GetMethodId() const { return this->mMethodId; }

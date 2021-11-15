@@ -4,83 +4,40 @@
 #include<Core/App.h>
 namespace GameKeeper
 {
-	CoroutinePool::CoroutinePool(int count)
-		:mId(0)
-	{
-		for (int index = 0; index < count; index++)
-		{
-			Coroutine *coroutine = new Coroutine();
-			if (coroutine != nullptr)
-			{
-				coroutine->mCoroutineId = mId++;
-#ifdef __COROUTINE_ASM__
-				coroutine->sid = coroutine->mCoroutineId & 7;
-#endif
-				this->mAllCoroutine.push_back(coroutine);
-				this->mIdleCoroutines.push(coroutine->mCoroutineId);
-			}
-		}
-	}
-
 	CoroutinePool::~CoroutinePool()
 	{
-		for (size_t index = 0; index < this->mAllCoroutine.size(); index++)
-		{
-			Coroutine *coroutine = this->mAllCoroutine[index];
-			delete coroutine;
-		}
-		this->mAllCoroutine.clear();
+        auto iter = this->mCorMap.begin();
+        for(;iter != this->mCorMap.end(); iter++)
+        {
+            delete iter->second;
+        }
+        this->mCorMap.clear();
 	}
 	Coroutine * CoroutinePool::Pop()
 	{
-		Coroutine * coroutine = nullptr;
-		if (!this->mIdleCoroutines.empty())
-		{
-			unsigned int id = this->mIdleCoroutines.front();
-			this->mIdleCoroutines.pop();
-			coroutine = this->mAllCoroutine[id];
-		}
-		else
-		{
-			coroutine = new Coroutine();
-			if (coroutine != nullptr)
-			{
-				coroutine->mCoroutineId = mId++;
+		 auto coroutine = new Coroutine();
+         coroutine->mCoroutineId = this->mNumPool.Pop();
 #ifdef __COROUTINE_ASM__
-				coroutine->sid = coroutine->mCoroutineId & 7;				
+        coroutine->sid = coroutine->mCoroutineId & 7;
 #endif
-				coroutine->mState = CorState::Ready;
-				this->mAllCoroutine.push_back(coroutine);
-			}
-		}
-#ifdef __COROUTINE_ASM__
-		coroutine->mStack.clear();
-#endif
+        this->mCorMap.emplace(coroutine->mCoroutineId, coroutine);
 		return coroutine;
 	}
 	void CoroutinePool::Push(Coroutine * coroutine)
 	{
-		if (coroutine != nullptr)
-		{
-#ifdef __COROUTINE_ASM__
-			coroutine->mStack.clear();
-#endif
-			if (coroutine->mFunction != nullptr)
-			{
-				delete coroutine->mFunction;
-				coroutine->mFunction = nullptr;
-			}
-			coroutine->mState = CorState::Finish;
-			this->mIdleCoroutines.push(coroutine->mCoroutineId);
-		}
+        unsigned int id = coroutine->mCoroutineId;
+        auto iter = this->mCorMap.find(id);
+        if(iter != this->mCorMap.end())
+        {
+            this->mNumPool.Push(id);
+            this->mCorMap.erase(iter);
+        }
+        delete coroutine;
 	}
 	Coroutine * CoroutinePool::Get(unsigned int id)
 	{
-		if (id >= this->mAllCoroutine.size())
-		{
-			return nullptr;
-		}
-		return this->mAllCoroutine[id];	
+        auto iter = this->mCorMap.find(id);
+        return iter != this->mCorMap.end() ? iter->second : nullptr;
 	}
 }
 

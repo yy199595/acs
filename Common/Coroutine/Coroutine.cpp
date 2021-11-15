@@ -15,11 +15,13 @@ namespace GameKeeper
 #elif _WIN32
 		this->mContextStack = nullptr;
 #endif
+        this->mState = CorState::Ready;
 	}
 	Coroutine::~Coroutine()
 	{
 #ifdef __COROUTINE_ASM__
-		
+		delete this->mFunction;
+        this->mFunction = nullptr;
 #elif __linux__
 		free(this->mContextStack);
 #elif _WIN32

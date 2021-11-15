@@ -9,6 +9,8 @@
 #define __COROUTINE_ASM__
 #endif // !1
 #endif
+#include <unordered_map>
+#include <Util/NumberBuilder.h>
 #include<Method/MethodProxy.h>
 #ifdef __COROUTINE_ASM__
 	#include"Context/context.h"	
@@ -27,20 +29,19 @@ namespace GameKeeper
 	class CoroutinePool
 	{
 	public:
-		CoroutinePool(int count);
+		explicit CoroutinePool() = default;
 		virtual ~CoroutinePool();
 	public:
 		Coroutine * Pop();
 		void Push(Coroutine * coroutine);
-        size_t GetCorCount() { return this->mAllCoroutine.size();}
+        size_t GetCorCount() { return this->mCorMap.size();}
 	public:
 		Coroutine * Get(unsigned int id);
 	private:
-		unsigned int mId;
-		std::vector<Coroutine *> mAllCoroutine;
+        NumberBuilder<unsigned int> mNumPool;
 		std::queue<unsigned int> mIdleCoroutines;
-		
-	};
+        std::unordered_map<unsigned int , Coroutine *> mCorMap;
+    };
 }
 
 namespace GameKeeper
@@ -49,7 +50,7 @@ namespace GameKeeper
 	class CoroutineGroup
 	{
 	public:
-		CoroutineGroup(CoroutineComponent *);
+		explicit CoroutineGroup(CoroutineComponent *);
 	public:
 		bool Add(unsigned int id);
 		bool Remove(unsigned int id);

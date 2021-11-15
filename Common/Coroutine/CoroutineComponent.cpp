@@ -6,7 +6,6 @@
 #include<Util/NumberHelper.h>
 #include<Timer/TimerComponent.h>
 #include<Timer/CorSleepTimer.h>
-
 using namespace std::chrono;
 #ifdef _WIN32
 #include<Windows.h>
@@ -41,7 +40,6 @@ namespace GameKeeper
 	}
 
     CoroutineComponent::CoroutineComponent()
-		:mCorPool(100)
     {		
 		this->mCurrentCorId = 0;
 		this->mMainCoroutine = this->mCorPool.Pop();
@@ -54,15 +52,12 @@ namespace GameKeeper
 #endif	
     }
 
-	CoroutineComponent::~CoroutineComponent()
-	{
-
-	}
+	CoroutineComponent::~CoroutineComponent() = default;
 
     bool CoroutineComponent::Awake()
     {
 		GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
-		for (int index = 0; index < 10000; index++)
+		for (int index = 0; index < 1000; index++)
 		{
 			this->StartCoroutine(&CoroutineComponent::Loop, this);
 		}
@@ -136,7 +131,7 @@ namespace GameKeeper
 		Stack & stack = mSharedStack[logicCoroutine->sid];
 		if (stack.p == nullptr)
 		{
-			stack.p = (char*)malloc(STACK_SIZE);
+			stack.p = new char[STACK_SIZE];
 			stack.top = stack.p + STACK_SIZE;
 			stack.co = logicCoroutine;
 		}
@@ -364,8 +359,10 @@ namespace GameKeeper
 		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
 		{
 			Coroutine * cor = mCorPool.Get(index);
-			size += cor->mStack.size();
-			cor = mCorPool.Get(index);
+            if(cor != nullptr)
+            {
+                size += cor->mStack.size();
+            }
 		}
 		
 		double memory = size / 1024.0f / 1024.0f;

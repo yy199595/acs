@@ -35,7 +35,7 @@ namespace GameKeeper
 		void * mContextStack;
 #endif
         CorState mState;		
-        long long mCoroutineId;
+        unsigned int mCoroutineId;
     };
 
 	struct Stack

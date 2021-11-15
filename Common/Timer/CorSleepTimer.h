@@ -10,7 +10,7 @@ namespace GameKeeper
     public:
         CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms);
 
-        ~CorSleepTimer() { this->mScheduler = nullptr; }
+        ~CorSleepTimer() final { this->mScheduler = nullptr; }
 
     public:
         bool Invoke() override;

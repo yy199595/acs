@@ -9,14 +9,14 @@ namespace GameKeeper
     class TimerComponent : public Component, public ISystemUpdate
     {
     public:
-        TimerComponent();
+        TimerComponent() = default;
 
-        ~TimerComponent() {}
+        ~TimerComponent() override = default;
 
     public:
         bool RemoveTimer(long long id);
 
-        bool AddTimer(shared_ptr<TimerBase> timer);
+        bool AddTimer(TimerBase * timer);
 
 		template<typename F,typename O, typename ... Args>
 		bool AddTimer(long long ms, F && f, O * o, Args &&... args) {
@@ -26,22 +26,22 @@ namespace GameKeeper
 			return this->AddTimer(ms, methodProxy);
 		}
 
-        shared_ptr<TimerBase> GetTimer(long long id);
+        TimerBase * GetTimer(long long id);
 	private:
 		bool AddTimer(long long ms, StaticMethod * func);
 
     public:
         template<typename T, typename... Args>
-        shared_ptr<T> CreateTimer(Args &&...args);
+        T * CreateTimer(Args &&...args);
 
     protected:
-        bool Awake();
+        bool Awake() final;
 
         void OnSystemUpdate() final;//处理系统事件
 
         bool InvokeTimer(long long id);
 
-        bool AddTimerToWheel(shared_ptr<TimerBase> timer);
+        bool AddTimerToWheel(TimerBase * timer);
 
 		int GetPriority() override { return 1; }
     private:
@@ -52,16 +52,15 @@ namespace GameKeeper
 
     private:
         long long mNextUpdateTime;
+        std::queue<TimerBase *> mTimers;
         NumberBuilder<long long> mTimerIdPool;
-        std::queue<shared_ptr<TimerBase>> mTimers;
         std::vector<TimeWheelLayer *> mTimerLayers;
-        std::unordered_map<long long, shared_ptr<TimerBase>> mTimerMap;//所有timer的列表
+        std::unordered_map<long long, TimerBase *> mTimerMap;//所有timer的列表
     };
 
     template<typename T, typename... Args>
-    inline shared_ptr<T> TimerComponent::CreateTimer(Args &&...args)
+    inline T * TimerComponent::CreateTimer(Args &&...args)
     {
-        std::shared_ptr<T> timer = std::make_shared<T>(std::forward<Args>(args)...);
-        return this->AddTimer(timer) ? timer : nullptr;
+        return new T(std::forward<Args>(args)...);
     }
 }// namespace GameKeeper

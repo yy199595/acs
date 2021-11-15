@@ -13,11 +13,6 @@ namespace GameKeeper
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
 
-	CallHandler::~CallHandler()
-	{
-		GKDebugError("destory rpc action");
-	}
-
 	void LuaCallHandler::Invoke(const com::Rpc_Response & response)
     {
        /* LocalObject<com::Rpc_Response> lock(&response);
@@ -64,19 +59,21 @@ namespace GameKeeper
     }
 
 	CppCallHandler::~CppCallHandler()
-	{
-
-	}
+    {
+        auto protoConfig = App::Get().GetComponent<RpcProtoComponent>();
+        auto config = protoConfig->GetProtocolConfig(this->GetMethodId());
+        GKDebugError("destory rpc action : " << config->Service << "." << config->Method);
+    }
 
     void CppCallHandler::Invoke(const com::Rpc_Response & response)
     {
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
-			if (!response.data().UnpackTo(this->mMessage))
-			{
-				this->mCode = XCode::ParseMessageError;
-			}
+//			if (!response.data().UnpackTo(this->mMessage))
+//			{
+//				this->mCode = XCode::ParseMessageError;
+//			}
         }
         this->mScheduler->Resume(mCoroutineId);
     }

@@ -34,8 +34,8 @@ namespace GameKeeper
 		id = this->mNumberPool.Pop();
         if (this->mMessageTimeout != 0)// 添加超时
         {
-            shared_ptr<ActionTimeoutTimer> timer = 
-				make_shared<ActionTimeoutTimer>(this->mMessageTimeout, id,                                                                                 this);
+            auto timer =
+				new ActionTimeoutTimer(this->mMessageTimeout, id,                                                                                 this);
             this->mTimerComponent->AddTimer(timer);
         }
         this->mRetActionMap.emplace(id, rpcAction);

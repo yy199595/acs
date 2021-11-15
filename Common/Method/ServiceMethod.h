@@ -59,7 +59,7 @@ namespace GameKeeper
 			: ServiceMethod(name) ,_o(o), _func(func), mHasUserId(false){ }
 
 		ServiceMethod1(const std::string name, T * o, ServiceMethodType11<T> func)
-			: ServiceMethod(name), _o(o), _objfunc(func)，mHasUserId(true) { }
+			: ServiceMethod(name), _o(o), _objfunc(func),mHasUserId(true) { }
 	public:
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
 
