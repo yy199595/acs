@@ -77,19 +77,21 @@ namespace GameKeeper
 		void Loop();
 		void ResumeCoroutine();
 #ifdef __COROUTINE_ASM__
-		void SaveStack(Coroutine *);
+		void SaveStack(unsigned int id);
 #else
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
 		class TimerComponent *mTimerManager;
-		std::queue<unsigned int> mLateUpdateCors;
+		std::queue<unsigned int> mLastQueues1;
+		std::queue<unsigned int> mLastQueues2;
 	private:
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;
 		unsigned int mCurrentCorId;
 #ifdef __COROUTINE_ASM__
-		Stack * mSharedStack;
+		Stack mSharedStack[8];
+		Coroutine * mRuningCoroutine;
 #else
 		char * mTop;
 		char mSharedStack[STACK_SIZE];

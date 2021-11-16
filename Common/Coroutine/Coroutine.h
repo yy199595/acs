@@ -25,7 +25,6 @@ namespace GameKeeper
 		StaticMethod * mFunction;
 #ifdef __COROUTINE_ASM__
 		int sid;
-		char * mStackTop;
 		std::string mStack;
 		tb_context_t mCorContext;
 #elif __linux__
@@ -42,8 +41,6 @@ namespace GameKeeper
 	{
 		char * p;
 		char * top;
-		Coroutine * co;
+		unsigned int co;
 	};
-	
-
-};
+}

@@ -13,7 +13,7 @@ namespace GameKeeper
 
     public:
 
-        unsigned int GetGlobalId() const { this->mGlobalId; }
+        unsigned int GetGlobalId() const { return this->mGlobalId; }
 
         const std::string &GetNodeName() { return this->mNodeName; }
 

@@ -139,6 +139,11 @@ namespace GameKeeper
 		{
 			this->mSecondUpdateManagers.push_back(manager3);
 		}
+
+		if (auto manager4 = dynamic_cast<ILastFrameUpdate *>(component))
+		{
+			this->mLastFrameUpdateManager.push_back(manager4);
+		}
 		return true;
 	}
 

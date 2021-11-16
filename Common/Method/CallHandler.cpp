@@ -54,7 +54,7 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
-			if (!response.data().UnpackTo(this->mMessage))
+			if (response.has_data() && !response.data().UnpackTo(this->mMessage))
 			{
 				this->mCode = XCode::ParseMessageError;
 			}

@@ -1,4 +1,5 @@
 ﻿#include"RpcClient.h"
+#include<Core/App.h>
 #include<Util/TimeHelper.h>
 #include<Component/Scene/RpcComponent.h>
 #ifdef __DEBUG__
@@ -156,9 +157,9 @@ namespace GameKeeper
                     }
                     else  //通知主线程处理
                     {
-                        NetWorkThread & netThread = this->mSocketProxy->GetThread();
-                        request->set_socketid(this->GetSocketProxy().GetSocketId());
-                        netThread.AddTask(&RpcComponent::OnRequest, this->mTcpComponent, this, request);
+						request->set_socketid(this->GetSocketProxy().GetSocketId());
+						MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();                                  
+						taskScheduler.AddMainTask(&RpcComponent::OnRequest, this->mTcpComponent, this, request);
                     }
                 }
                 else if(type == RPC_TYPE_RESPONSE)
@@ -172,8 +173,8 @@ namespace GameKeeper
                     }
                     else  //通知主线程处理
                     {
-                        NetWorkThread & netThread = this->mSocketProxy->GetThread();
-                        netThread.AddTask(&RpcComponent::OnResponse, this->mTcpComponent, this, response);
+						MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+						taskScheduler.AddMainTask(&RpcComponent::OnResponse, this->mTcpComponent, this, response);
                     }
                 }
 			}

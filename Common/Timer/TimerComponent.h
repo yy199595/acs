@@ -25,10 +25,11 @@ namespace GameKeeper
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);
 		}
+		bool AddTimer(long long ms, StaticMethod * func);
 
         TimerBase * GetTimer(long long id);
 	private:
-		bool AddTimer(long long ms, StaticMethod * func);
+		
 
     public:
         template<typename T, typename... Args>

@@ -27,12 +27,12 @@ namespace GameKeeper
 	{
 		CoroutineComponent *pCoroutineMgr = (CoroutineComponent *)manager;
 #endif
-#endif		
+#endif
 		Coroutine * logicCoroutine = pCoroutineMgr->GetCoroutine();
 		if (logicCoroutine != nullptr)
 		{
 			logicCoroutine->mFunction->run();
-			pCoroutineMgr->Destory(logicCoroutine);
+			pCoroutineMgr->Destory(logicCoroutine);		
 		}
 #ifdef __COROUTINE_ASM__		
 		tb_context_jump(parame.ctx, nullptr);
@@ -42,9 +42,16 @@ namespace GameKeeper
     CoroutineComponent::CoroutineComponent()
     {		
 		this->mCurrentCorId = 0;
+		
 		this->mMainCoroutine = this->mCorPool.Pop();
 #ifdef __COROUTINE_ASM__
-		this->mSharedStack = (Stack*)calloc(8, sizeof(Stack));
+		this->mRuningCoroutine = nullptr;
+		for (size_t index = 0; index < 8; index++)
+		{
+			this->mSharedStack[index].co = 0;
+			this->mSharedStack[index].p = nullptr;	
+			this->mSharedStack[index].top = nullptr;
+		}
 #elif _WIN32		
 		this->mMainCoroutine->mContextStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
 #else
@@ -64,7 +71,7 @@ namespace GameKeeper
     void CoroutineComponent::Start()
     {
 		long long t1 = TimeHelper::GetMilTimestamp();
-		for (size_t index = 0; index < 10000; index++)
+		for (size_t index = 0; index < 10; index++)
         {
             this->StartCoroutine(&CoroutineComponent::Loop, this);
         }
@@ -79,7 +86,7 @@ namespace GameKeeper
 		std::string str = __FUNCTION__;
         for (int i = 0; i < 10; ++i) 
 		{
-            this->YieldNextFrame();
+            this->Sleep(100);
         }
         GKDebugFatal("==============");
 	}
@@ -106,7 +113,7 @@ namespace GameKeeper
 		Coroutine *logicCoroutine = this->GetCoroutine();
 		if (logicCoroutine != nullptr)
 		{
-			this->mLateUpdateCors.push(logicCoroutine->mCoroutineId);
+			this->mLastQueues1.push(logicCoroutine->mCoroutineId);
 			this->YieldReturn();
 		}
 	}
@@ -122,19 +129,21 @@ namespace GameKeeper
 		tb_context_from_t from;
 		Stack & stack = mSharedStack[logicCoroutine->sid];
 		if (stack.p == nullptr)
-		{
+		{		
 			stack.p = new char[STACK_SIZE];
 			stack.top = stack.p + STACK_SIZE;
-			stack.co = logicCoroutine;
+			stack.co = logicCoroutine->mCoroutineId;
 		}
+		this->mRuningCoroutine = logicCoroutine;
 #endif
+		
 		if (logicCoroutine->mState == CorState::Ready)
 		{
 #ifdef __COROUTINE_ASM__
-			if (stack.co != logicCoroutine)
+			if (stack.co != logicCoroutine->mCoroutineId)
 			{
 				this->SaveStack(stack.co);
-				stack.co = logicCoroutine;
+				stack.co = logicCoroutine->mCoroutineId;
 			}
 			logicCoroutine->mCorContext =
 				tb_context_make(stack.p, STACK_SIZE, MainEntry);
@@ -151,19 +160,19 @@ namespace GameKeeper
 			makecontext(&logicCoroutine->mCorContext, (void(*)(void)) MainEntry, 1, this);
 			swapcontext(&this->mMainCoroutine->mCorContext, &logicCoroutine->mCorContext);
 #endif
-			}
+		}
 		else if (logicCoroutine->mState == CorState::Suspend)
 		{
 			logicCoroutine->mState = CorState::Running;
 #ifdef __COROUTINE_ASM__
-			if (stack.co != logicCoroutine)
+			if (stack.co != logicCoroutine->mCoroutineId)
 			{
 				this->SaveStack(stack.co);
-                const std::string & data = logicCoroutine->mStack;
-                assert(stack.top == (char*)logicCoroutine->mCorContext + logicCoroutine->mStack.size());
-				memcpy(logicCoroutine->mCorContext, data.c_str(), data.size()); // restore stack data
-				stack.co = logicCoroutine;
+				stack.co = logicCoroutine->mCoroutineId;
+				const std::string & data = logicCoroutine->mStack;
+				memcpy(logicCoroutine->mCorContext, data.c_str(), data.size());
 			}
+
 			from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
 #elif _WIN32
 			SwitchToFiber(logicCoroutine->mContextStack);
@@ -174,7 +183,36 @@ namespace GameKeeper
 #endif
 		}
 #ifdef __COROUTINE_ASM__
-		logicCoroutine->mCorContext = from.ctx;
+		if (from.priv)
+		{
+			assert(this->mRuningCoroutine == from.priv);
+			this->mRuningCoroutine->mCorContext = from.ctx;
+		}
+#endif
+	}
+
+	void CoroutineComponent::YieldReturn()
+	{
+		Coroutine *logicCoroutine = this->GetCoroutine();
+		if (logicCoroutine == nullptr)
+		{
+			GKDebugFatal("not find coroutine context");
+			return;
+		}
+		if (logicCoroutine->mCoroutineId == 0)
+		{
+			GKDebugFatal("try yield main coroutine");
+			return;
+		}
+		this->mCurrentCorId = 0;
+		logicCoroutine->mState = CorState::Suspend;
+#ifdef __COROUTINE_ASM__
+		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
+#elif _WIN32
+		SwitchToFiber(this->mMainCoroutine->mContextStack);
+#else
+		this->SaveStack(logicCoroutine, this->mTop);
+		swapcontext(&logicCoroutine->mCorContext, &this->mMainCoroutine->mCorContext);
 #endif
 	}
 
@@ -227,30 +265,6 @@ namespace GameKeeper
 		return 0;
 	}
 
-	void CoroutineComponent::YieldReturn()
-    {
-        Coroutine *logicCoroutine = this->GetCoroutine();
-        if (logicCoroutine == nullptr)
-        {
-            GKDebugFatal("not find coroutine context");
-            return;
-        }
-		if (logicCoroutine->mCoroutineId == 0)
-		{
-			GKDebugFatal("try yield main coroutine");
-			return;
-		}
-        this->mCurrentCorId = 0;
-        logicCoroutine->mState = CorState::Suspend;
-#ifdef __COROUTINE_ASM__
-		tb_context_jump(this->mMainCoroutine->mCorContext, this);
-#elif _WIN32
-        SwitchToFiber(this->mMainCoroutine->mContextStack);
-#else
-        this->SaveStack(logicCoroutine, this->mTop);
-        swapcontext(&logicCoroutine->mCorContext, &this->mMainCoroutine->mCorContext);
-#endif
-    }
 
 	void CoroutineComponent::YieldReturn(unsigned int & mCorId)
 	{
@@ -301,12 +315,16 @@ namespace GameKeeper
 	}
 
 #ifdef __COROUTINE_ASM__
-	void CoroutineComponent::SaveStack(Coroutine * cor)
+	void CoroutineComponent::SaveStack(unsigned int id)
 	{
-		cor->mStack.clear();
-		char * top = this->mSharedStack[cor->sid].top;
-		cor->mStackSize = top - (char*)cor->mCorContext;
-		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
+		Coroutine * coroutine = this->GetCoroutine(id);
+		if (coroutine != nullptr)
+		{
+			coroutine->mStack.clear();
+			char * top = this->mSharedStack[coroutine->sid].top;
+			coroutine->mStackSize = top - (char*)coroutine->mCorContext;
+			coroutine->mStack.append((char *)coroutine->mCorContext, coroutine->mStackSize);
+		}
 	}
 #else
     void CoroutineComponent::SaveStack(Coroutine *cor, char *top)
@@ -335,13 +353,15 @@ namespace GameKeeper
     }
 	void CoroutineComponent::OnLastFrameUpdate()
 	{
-		while (!this->mLateUpdateCors.empty())
+		if (!this->mLastQueues1.empty())
 		{
-			this->mCurrentCorId = this->mLateUpdateCors.front();
-			this->ResumeCoroutine();
-			this->mLateUpdateCors.pop();
+			std::swap(this->mLastQueues1, this->mLastQueues2);
+			while (!this->mLastQueues2.empty())
+			{
+				this->Resume(this->mLastQueues2.front());
+				this->mLastQueues2.pop();
+			}
 		}
-		this->mCurrentCorId = 0;
 	}
 
     void CoroutineComponent::OnSecondUpdate()
@@ -354,7 +374,7 @@ namespace GameKeeper
 			Coroutine * cor = mCorPool.Get(index);
             if(cor != nullptr)
             {
-                size += cor->mStack.size();
+                //size += cor->mStack.size();
             }
 		}
 
