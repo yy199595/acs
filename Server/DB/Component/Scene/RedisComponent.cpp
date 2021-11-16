@@ -45,7 +45,7 @@ namespace GameKeeper
 
     bool RedisComponent::Awake()
     {
-        ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get().GetConfig();
         GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
         GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
@@ -75,7 +75,7 @@ namespace GameKeeper
         struct timeval tv;
         tv.tv_sec = 3;
         tv.tv_usec = tv.tv_sec * timeout * 1000;
-        ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get().GetConfig();
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
@@ -87,7 +87,7 @@ namespace GameKeeper
         if (config.GetValue("Redis", "passwd", redisPasswd) && !redisPasswd.empty())
         {
             void *p = redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
-            redisReply *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
+            auto *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
             {
                 GKDebugError("redis Authentication failed " << reply->str);

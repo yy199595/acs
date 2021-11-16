@@ -11,8 +11,8 @@ namespace GameKeeper
 {
     bool RpcRequestComponent::Awake()
     {
-		ServerConfig & ServerCfg = App::Get().GetConfig();
-		this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetCorComponent();
+        const ServerConfig & ServerCfg = App::Get().GetConfig();
         GKAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
         GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<RpcComponent>());
         GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
@@ -28,6 +28,9 @@ namespace GameKeeper
         {
             return false;
         }
+#ifdef __DEBUG__
+        GKDebugWarning("call " << protocolConfig->Service << "." << protocolConfig->Method);
+#endif
         const std::string &service = protocolConfig->Service;
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)
@@ -46,8 +49,8 @@ namespace GameKeeper
 
         if (!protocolConfig->IsAsync)
         {
-            method->SetSocketId(request.socketid()); //TODO
-			com::Rpc_Response * response = new com::Rpc_Response();
+            method->SetSocketId(request.socketid());
+			auto response = new com::Rpc_Response();
             XCode code = method->Invoke(request, *response);
             if (request.rpcid() != 0)
             {       			
@@ -71,7 +74,7 @@ namespace GameKeeper
 
 	void RpcRequestComponent::Invoke(ServiceMethod * method, const com::Rpc_Request * request)
     {        
-		com::Rpc_Response * response = new com::Rpc_Response();
+		auto response = new com::Rpc_Response();
         XCode code = method->Invoke(*request, *response);
 		if (request->rpcid() != 0)
 		{

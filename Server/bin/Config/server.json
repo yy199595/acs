@@ -1,5 +1,5 @@
 {
-    "AreaId": 0,
+    "AreaId": 1,
     "NodeId": 1,
     "LogicFps": 30,
     "SystemFps": 100,
@@ -71,8 +71,8 @@
     ],
     "Service": [
         "MysqlService",
-        "CenterService", 
-        "ClusterService",
+        "NodeCenter", 
+        "NodeServer",
         "HttpLoginService",
         "HttpOperComponent"
     ],

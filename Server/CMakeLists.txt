@@ -61,7 +61,7 @@ if(MSVC)
    
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
-    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl jemalloc)
+    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl jemalloc)
 endif()
 target_compile_definitions(Server PRIVATE __DEBUG__)
 target_compile_definitions(Server PRIVATE __COROUTINE_ASM__)

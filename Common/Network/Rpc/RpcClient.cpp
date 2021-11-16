@@ -87,7 +87,7 @@ namespace GameKeeper
 				unsigned int length = 0;
 				char type = this->mReceiveMsgBuffer[0];
 				memcpy(&length, this->mReceiveMsgBuffer + sizeof(char), sizeof(unsigned int));
-				if (length >= 1024 * 10) //最大为10k
+				if (length >= MAX_DATA_COUNT) //最大为10k
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
@@ -99,8 +99,10 @@ namespace GameKeeper
 				}
 				else
 				{
+                    GKDebugFatal("receive err type = " << type);
 					this->CloseSocket(XCode::NetReceiveFailure);
 				}
+                this->StartReceive();
 			}
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
@@ -118,12 +120,7 @@ namespace GameKeeper
 	}
 
 	void RpcClient::ReadMessageBody(unsigned int allSize, int type)
-	{	
-		if (!this->mSocketProxy->IsOpen())
-		{
-			this->CloseSocket(XCode::NetWorkError);
-			return;
-		}
+	{
 		char *nMessageBuffer = this->mReceiveMsgBuffer;
 		if (allSize > TCP_BUFFER_COUNT)
 		{
@@ -150,7 +147,7 @@ namespace GameKeeper
 			{
                 if(type == RPC_TYPE_REQUEST)
                 {
-					com::Rpc_Request * request = new com::Rpc_Request();
+					auto request = new com::Rpc_Request();
                     if(!request->ParseFromArray(nMessageBuffer, size))
                     {
 						delete request;
@@ -159,14 +156,14 @@ namespace GameKeeper
                     }
                     else  //通知主线程处理
                     {
-                        request->set_socketid(this->GetSocketProxy().GetSocketId());
                         NetWorkThread & netThread = this->mSocketProxy->GetThread();
+                        request->set_socketid(this->GetSocketProxy().GetSocketId());
                         netThread.AddTask(&RpcComponent::OnRequest, this->mTcpComponent, this, request);
                     }
                 }
                 else if(type == RPC_TYPE_RESPONSE)
                 {
-					com::Rpc_Response * response = new com::Rpc_Response();
+					auto response = new com::Rpc_Response();
                     if(!response->ParseFromArray(nMessageBuffer, size))
                     {
 						delete response;
@@ -202,7 +199,12 @@ namespace GameKeeper
 #endif // __DEBUG__
 		}
 		else
-		{						
+		{
+#ifdef __DEBUG__
+            std::string json;
+            util::MessageToJsonString(*message, &json);
+            GKDebugLog("send request message " << json);
+#endif
 			unsigned int body = message->ByteSizeLong();
 			size_t head = sizeof(char) + sizeof(unsigned int);
 			char * messageBuffer = new char[head + body];
@@ -226,6 +228,7 @@ namespace GameKeeper
 				if (error_code)
 				{
 					code = XCode::NetSendFailure;
+                    GKDebugError(error_code.message());
 					this->CloseSocket(XCode::NetSendFailure);
 				}
 				delete[]messageBuffer;

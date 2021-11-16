@@ -18,6 +18,14 @@ message NodeInfo
     map<string, int32> Listeners = 6; //所有监听器
 }
 
+message GroupConfigData
+{
+    uint32 GroupId = 1;     //组id
+    int64 OpenTime = 2;     // 开启时间
+    string Token = 3;       //验证token
+    string GroupName = 4;
+}
+
 message NodeRegister
 {
     message Request
@@ -27,7 +35,7 @@ message NodeRegister
     message Response
     {
         uint32 globalId = 1;
-        string AreaName = 2;
+        GroupConfigData GroupData = 2;
     }
 }
 

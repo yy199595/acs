@@ -1,12 +1,13 @@
 ﻿#include <fstream>
+#include <utility>
 #include "ServerConfig.h"
 #include <Define/CommonDef.h>
 #include <Util/FileHelper.h>
 
 namespace GameKeeper
 {
-    ServerConfig::ServerConfig(const std::string path)
-            : mConfigPath(path)
+    ServerConfig::ServerConfig(std::string  path)
+            : mConfigPath(std::move(path))
     {
         this->mAreaId = 0;
         this->mNodeId = 0;
@@ -40,13 +41,13 @@ namespace GameKeeper
         return true;
     }
 
-    bool ServerConfig::HasValue(const std::string k2)
+    bool ServerConfig::HasValue(const std::string & k2) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
-        return value != nullptr && value->IsNull() == false;
+        return value != nullptr && !value->IsNull();
     }
 
-    bool ServerConfig::GetValue(const std::string k2, int &data)
+    bool ServerConfig::GetValue(const std::string & k2, int &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value && value->IsInt())
@@ -57,7 +58,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, bool &data)
+    bool ServerConfig::GetValue(const std::string & k2, bool &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value && value->IsBool())
@@ -68,7 +69,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, std::string &data)
+    bool ServerConfig::GetValue(const std::string & k2, std::string &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value && value->IsString())
@@ -82,7 +83,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, unsigned short &data)
+    bool ServerConfig::GetValue(const std::string & k2, unsigned short &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value && value->IsUint())
@@ -93,7 +94,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, std::set<std::string> &data)
+    bool ServerConfig::GetValue(const std::string & k2, std::set<std::string> &data) const
     {
         data.clear();
         rapidjson::Value *value = this->GetJsonValue(k2);
@@ -112,7 +113,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, std::vector<std::string> &data)
+    bool ServerConfig::GetValue(const std::string & k2, std::vector<std::string> &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value && value->IsArray())
@@ -130,7 +131,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool ServerConfig::GetValue(const std::string k2, std::unordered_map<std::string, std::string> &data)
+    bool ServerConfig::GetValue(const std::string & k2, std::unordered_map<std::string, std::string> &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k2);
         if (value == nullptr || !value->IsObject())
@@ -150,7 +151,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool ServerConfig::GetValue(const std::string k1, const std::string k2, int &data)
+    bool ServerConfig::GetValue(const std::string & k1, const std::string & k2, int &data) const
     {
         rapidjson::Value *value = this->GetJsonValue(k1);
         if (value == nullptr || !value->IsObject())
@@ -167,7 +168,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool ServerConfig::GetValue(const std::string k1, const std::string k2, std::vector<std::string> & value)
+    bool ServerConfig::GetValue(const std::string & k1, const std::string & k2, std::vector<std::string> & value) const
     {
         rapidjson::Value *json = this->GetJsonValue(k1);
         if (json == nullptr || !json->IsObject())
@@ -186,13 +187,13 @@ namespace GameKeeper
             {
                 return false;
             }
-            value.push_back(iter1->GetString());
+            value.emplace_back(iter1->GetString());
         }
 
         return true;
     }
 
-    bool ServerConfig::GetValue(const std::string k1, const std::string k2, std::string &value)
+    bool ServerConfig::GetValue(const std::string & k1, const std::string & k2, std::string &value) const
     {
         rapidjson::Value  * json = this->GetJsonValue(k1);
         if(json== nullptr || !json->IsObject())
@@ -208,7 +209,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool ServerConfig::GetValue(const std::string k1, const std::string k2, unsigned short & value)
+    bool ServerConfig::GetValue(const std::string & k1, const std::string & k2, unsigned short & value) const
     {
         rapidjson::Value  * json = this->GetJsonValue(k1);
         if(json== nullptr || !json->IsObject())
@@ -224,13 +225,13 @@ namespace GameKeeper
         return true;
     }
 
-    rapidjson::Value *ServerConfig::GetJsonValue(const std::string k2)
+    rapidjson::Value *ServerConfig::GetJsonValue(const std::string & k2) const
     {
         auto iter = this->mMapConfigData.find(k2);
         return iter != this->mMapConfigData.end() ? iter->second : nullptr;
     }
 
-	rapidjson::Value *ServerConfig::GetJsonValue(const std::string k1, const std::string k2)
+	rapidjson::Value *ServerConfig::GetJsonValue(const std::string & k1, const std::string & k2) const
 	{
 		auto iter = this->mMapConfigData.find(k2);
 		if (iter != this->mMapConfigData.end())

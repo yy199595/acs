@@ -1,8 +1,8 @@
 方法id	服务	方法	请求	回复
 101	ServiceRegistry	RegisterNode	s2s.NodeRegister_Request	
 102	ServiceRegistry	QueryNodes	com.Int32Data	s2s.NodeData_Array
-201	ClusterService	AddNode	com.Int32Data	
-202	ClusterService	DelNode	s2s.NodeData_NodeInfo	
+201	NodeServer	AddNode	com.Int32Data
+202	NodeServer	DelNode	s2s.NodeData_NodeInfo
 301	MysqlProxy	Add	s2s.MysqlOper_Request	s2s.MysqlOper_Response
 302	MysqlProxy	Save	s2s.MysqlOper_Request	s2s.MysqlOper_Response
 303	MysqlProxy	Delete	s2s.MysqlOper_Request	s2s.MysqlOper_Response

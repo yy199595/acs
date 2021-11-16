@@ -45,7 +45,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[15]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -53,6 +53,9 @@ struct TableStruct_s2s_2eproto {
 };
 void AddDescriptors_s2s_2eproto();
 namespace s2s {
+class GroupConfigData;
+class GroupConfigDataDefaultTypeInternal;
+extern GroupConfigDataDefaultTypeInternal _GroupConfigData_default_instance_;
 class Listener;
 class ListenerDefaultTypeInternal;
 extern ListenerDefaultTypeInternal _Listener_default_instance_;
@@ -101,6 +104,7 @@ extern NodeRegister_ResponseDefaultTypeInternal _NodeRegister_Response_default_i
 }  // namespace s2s
 namespace google {
 namespace protobuf {
+template<> ::s2s::GroupConfigData* Arena::CreateMaybeMessage<::s2s::GroupConfigData>(Arena*);
 template<> ::s2s::Listener* Arena::CreateMaybeMessage<::s2s::Listener>(Arena*);
 template<> ::s2s::MysqlOper* Arena::CreateMaybeMessage<::s2s::MysqlOper>(Arena*);
 template<> ::s2s::MysqlOper_Request* Arena::CreateMaybeMessage<::s2s::MysqlOper_Request>(Arena*);
@@ -461,6 +465,155 @@ class NodeInfo :
 };
 // -------------------------------------------------------------------
 
+class GroupConfigData :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.GroupConfigData) */ {
+ public:
+  GroupConfigData();
+  virtual ~GroupConfigData();
+
+  GroupConfigData(const GroupConfigData& from);
+
+  inline GroupConfigData& operator=(const GroupConfigData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GroupConfigData(GroupConfigData&& from) noexcept
+    : GroupConfigData() {
+    *this = ::std::move(from);
+  }
+
+  inline GroupConfigData& operator=(GroupConfigData&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GroupConfigData& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GroupConfigData* internal_default_instance() {
+    return reinterpret_cast<const GroupConfigData*>(
+               &_GroupConfigData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(GroupConfigData* other);
+  friend void swap(GroupConfigData& a, GroupConfigData& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GroupConfigData* New() const final {
+    return CreateMaybeMessage<GroupConfigData>(nullptr);
+  }
+
+  GroupConfigData* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GroupConfigData>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GroupConfigData& from);
+  void MergeFrom(const GroupConfigData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GroupConfigData* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string Token = 3;
+  void clear_token();
+  static const int kTokenFieldNumber = 3;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // string GroupName = 4;
+  void clear_groupname();
+  static const int kGroupNameFieldNumber = 4;
+  const ::std::string& groupname() const;
+  void set_groupname(const ::std::string& value);
+  #if LANG_CXX11
+  void set_groupname(::std::string&& value);
+  #endif
+  void set_groupname(const char* value);
+  void set_groupname(const char* value, size_t size);
+  ::std::string* mutable_groupname();
+  ::std::string* release_groupname();
+  void set_allocated_groupname(::std::string* groupname);
+
+  // int64 OpenTime = 2;
+  void clear_opentime();
+  static const int kOpenTimeFieldNumber = 2;
+  ::google::protobuf::int64 opentime() const;
+  void set_opentime(::google::protobuf::int64 value);
+
+  // uint32 GroupId = 1;
+  void clear_groupid();
+  static const int kGroupIdFieldNumber = 1;
+  ::google::protobuf::uint32 groupid() const;
+  void set_groupid(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.GroupConfigData)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::internal::ArenaStringPtr groupname_;
+  ::google::protobuf::int64 opentime_;
+  ::google::protobuf::uint32 groupid_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class NodeRegister_Request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.NodeRegister.Request) */ {
  public:
@@ -499,7 +652,7 @@ class NodeRegister_Request :
                &_NodeRegister_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(NodeRegister_Request* other);
   friend void swap(NodeRegister_Request& a, NodeRegister_Request& b) {
@@ -614,7 +767,7 @@ class NodeRegister_Response :
                &_NodeRegister_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(NodeRegister_Response* other);
   friend void swap(NodeRegister_Response& a, NodeRegister_Response& b) {
@@ -671,33 +824,28 @@ class NodeRegister_Response :
 
   // accessors -------------------------------------------------------
 
-  // string AreaName = 2;
-  void clear_areaname();
-  static const int kAreaNameFieldNumber = 2;
-  const ::std::string& areaname() const;
-  void set_areaname(const ::std::string& value);
-  #if LANG_CXX11
-  void set_areaname(::std::string&& value);
-  #endif
-  void set_areaname(const char* value);
-  void set_areaname(const char* value, size_t size);
-  ::std::string* mutable_areaname();
-  ::std::string* release_areaname();
-  void set_allocated_areaname(::std::string* areaname);
+  // .s2s.GroupConfigData GroupData = 2;
+  bool has_groupdata() const;
+  void clear_groupdata();
+  static const int kGroupDataFieldNumber = 2;
+  const ::s2s::GroupConfigData& groupdata() const;
+  ::s2s::GroupConfigData* release_groupdata();
+  ::s2s::GroupConfigData* mutable_groupdata();
+  void set_allocated_groupdata(::s2s::GroupConfigData* groupdata);
 
-  // int32 Uid = 1;
-  void clear_uid();
-  static const int kUidFieldNumber = 1;
-  ::google::protobuf::int32 uid() const;
-  void set_uid(::google::protobuf::int32 value);
+  // uint32 globalId = 1;
+  void clear_globalid();
+  static const int kGlobalIdFieldNumber = 1;
+  ::google::protobuf::uint32 globalid() const;
+  void set_globalid(::google::protobuf::uint32 value);
 
   // @@protoc_insertion_point(class_scope:s2s.NodeRegister.Response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr areaname_;
-  ::google::protobuf::int32 uid_;
+  ::s2s::GroupConfigData* groupdata_;
+  ::google::protobuf::uint32 globalid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -741,7 +889,7 @@ class NodeRegister :
                &_NodeRegister_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(NodeRegister* other);
   friend void swap(NodeRegister& a, NodeRegister& b) {
@@ -849,7 +997,7 @@ class NodeQuery_Request :
                &_NodeQuery_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(NodeQuery_Request* other);
   friend void swap(NodeQuery_Request& a, NodeQuery_Request& b) {
@@ -976,7 +1124,7 @@ class NodeQuery_Response :
                &_NodeQuery_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(NodeQuery_Response* other);
   friend void swap(NodeQuery_Response& a, NodeQuery_Response& b) {
@@ -1094,7 +1242,7 @@ class NodeQuery :
                &_NodeQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(NodeQuery* other);
   friend void swap(NodeQuery& a, NodeQuery& b) {
@@ -1202,7 +1350,7 @@ class MysqlQuery_Request :
                &_MysqlQuery_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(MysqlQuery_Request* other);
   friend void swap(MysqlQuery_Request& a, MysqlQuery_Request& b) {
@@ -1317,7 +1465,7 @@ class MysqlQuery_Response :
                &_MysqlQuery_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(MysqlQuery_Response* other);
   friend void swap(MysqlQuery_Response& a, MysqlQuery_Response& b) {
@@ -1450,7 +1598,7 @@ class MysqlQuery :
                &_MysqlQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(MysqlQuery* other);
   friend void swap(MysqlQuery& a, MysqlQuery& b) {
@@ -1558,7 +1706,7 @@ class MysqlOper_Request :
                &_MysqlOper_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(MysqlOper_Request* other);
   friend void swap(MysqlOper_Request& a, MysqlOper_Request& b) {
@@ -1673,7 +1821,7 @@ class MysqlOper_Response :
                &_MysqlOper_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(MysqlOper_Response* other);
   friend void swap(MysqlOper_Response& a, MysqlOper_Response& b) {
@@ -1793,7 +1941,7 @@ class MysqlOper :
                &_MysqlOper_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(MysqlOper* other);
   friend void swap(MysqlOper& a, MysqlOper& b) {
@@ -2168,6 +2316,144 @@ NodeInfo::mutable_listeners() {
 
 // -------------------------------------------------------------------
 
+// GroupConfigData
+
+// uint32 GroupId = 1;
+inline void GroupConfigData::clear_groupid() {
+  groupid_ = 0u;
+}
+inline ::google::protobuf::uint32 GroupConfigData::groupid() const {
+  // @@protoc_insertion_point(field_get:s2s.GroupConfigData.GroupId)
+  return groupid_;
+}
+inline void GroupConfigData::set_groupid(::google::protobuf::uint32 value) {
+  
+  groupid_ = value;
+  // @@protoc_insertion_point(field_set:s2s.GroupConfigData.GroupId)
+}
+
+// int64 OpenTime = 2;
+inline void GroupConfigData::clear_opentime() {
+  opentime_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 GroupConfigData::opentime() const {
+  // @@protoc_insertion_point(field_get:s2s.GroupConfigData.OpenTime)
+  return opentime_;
+}
+inline void GroupConfigData::set_opentime(::google::protobuf::int64 value) {
+  
+  opentime_ = value;
+  // @@protoc_insertion_point(field_set:s2s.GroupConfigData.OpenTime)
+}
+
+// string Token = 3;
+inline void GroupConfigData::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GroupConfigData::token() const {
+  // @@protoc_insertion_point(field_get:s2s.GroupConfigData.Token)
+  return token_.GetNoArena();
+}
+inline void GroupConfigData::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.GroupConfigData.Token)
+}
+#if LANG_CXX11
+inline void GroupConfigData::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.GroupConfigData.Token)
+}
+#endif
+inline void GroupConfigData::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.GroupConfigData.Token)
+}
+inline void GroupConfigData::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.GroupConfigData.Token)
+}
+inline ::std::string* GroupConfigData::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.GroupConfigData.Token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GroupConfigData::release_token() {
+  // @@protoc_insertion_point(field_release:s2s.GroupConfigData.Token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GroupConfigData::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:s2s.GroupConfigData.Token)
+}
+
+// string GroupName = 4;
+inline void GroupConfigData::clear_groupname() {
+  groupname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GroupConfigData::groupname() const {
+  // @@protoc_insertion_point(field_get:s2s.GroupConfigData.GroupName)
+  return groupname_.GetNoArena();
+}
+inline void GroupConfigData::set_groupname(const ::std::string& value) {
+  
+  groupname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.GroupConfigData.GroupName)
+}
+#if LANG_CXX11
+inline void GroupConfigData::set_groupname(::std::string&& value) {
+  
+  groupname_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.GroupConfigData.GroupName)
+}
+#endif
+inline void GroupConfigData::set_groupname(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  groupname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.GroupConfigData.GroupName)
+}
+inline void GroupConfigData::set_groupname(const char* value, size_t size) {
+  
+  groupname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.GroupConfigData.GroupName)
+}
+inline ::std::string* GroupConfigData::mutable_groupname() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.GroupConfigData.GroupName)
+  return groupname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GroupConfigData::release_groupname() {
+  // @@protoc_insertion_point(field_release:s2s.GroupConfigData.GroupName)
+  
+  return groupname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GroupConfigData::set_allocated_groupname(::std::string* groupname) {
+  if (groupname != nullptr) {
+    
+  } else {
+    
+  }
+  groupname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), groupname);
+  // @@protoc_insertion_point(field_set_allocated:s2s.GroupConfigData.GroupName)
+}
+
+// -------------------------------------------------------------------
+
 // NodeRegister_Request
 
 // .s2s.NodeInfo nodeInfo = 1;
@@ -2225,71 +2511,69 @@ inline void NodeRegister_Request::set_allocated_nodeinfo(::s2s::NodeInfo* nodein
 
 // NodeRegister_Response
 
-// int32 Uid = 1;
-inline void NodeRegister_Response::clear_uid() {
-  uid_ = 0;
+// uint32 globalId = 1;
+inline void NodeRegister_Response::clear_globalid() {
+  globalid_ = 0u;
 }
-inline ::google::protobuf::int32 NodeRegister_Response::uid() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.Uid)
-  return uid_;
+inline ::google::protobuf::uint32 NodeRegister_Response::globalid() const {
+  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.globalId)
+  return globalid_;
 }
-inline void NodeRegister_Response::set_uid(::google::protobuf::int32 value) {
+inline void NodeRegister_Response::set_globalid(::google::protobuf::uint32 value) {
   
-  uid_ = value;
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.Uid)
+  globalid_ = value;
+  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.globalId)
 }
 
-// string AreaName = 2;
-inline void NodeRegister_Response::clear_areaname() {
-  areaname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .s2s.GroupConfigData GroupData = 2;
+inline bool NodeRegister_Response::has_groupdata() const {
+  return this != internal_default_instance() && groupdata_ != nullptr;
 }
-inline const ::std::string& NodeRegister_Response::areaname() const {
-  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.AreaName)
-  return areaname_.GetNoArena();
+inline void NodeRegister_Response::clear_groupdata() {
+  if (GetArenaNoVirtual() == nullptr && groupdata_ != nullptr) {
+    delete groupdata_;
+  }
+  groupdata_ = nullptr;
 }
-inline void NodeRegister_Response::set_areaname(const ::std::string& value) {
+inline const ::s2s::GroupConfigData& NodeRegister_Response::groupdata() const {
+  const ::s2s::GroupConfigData* p = groupdata_;
+  // @@protoc_insertion_point(field_get:s2s.NodeRegister.Response.GroupData)
+  return p != nullptr ? *p : *reinterpret_cast<const ::s2s::GroupConfigData*>(
+      &::s2s::_GroupConfigData_default_instance_);
+}
+inline ::s2s::GroupConfigData* NodeRegister_Response::release_groupdata() {
+  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Response.GroupData)
   
-  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.NodeRegister.Response.AreaName)
+  ::s2s::GroupConfigData* temp = groupdata_;
+  groupdata_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void NodeRegister_Response::set_areaname(::std::string&& value) {
+inline ::s2s::GroupConfigData* NodeRegister_Response::mutable_groupdata() {
   
-  areaname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.NodeRegister.Response.AreaName)
+  if (groupdata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::s2s::GroupConfigData>(GetArenaNoVirtual());
+    groupdata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Response.GroupData)
+  return groupdata_;
 }
-#endif
-inline void NodeRegister_Response::set_areaname(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.NodeRegister.Response.AreaName)
-}
-inline void NodeRegister_Response::set_areaname(const char* value, size_t size) {
-  
-  areaname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.NodeRegister.Response.AreaName)
-}
-inline ::std::string* NodeRegister_Response::mutable_areaname() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.NodeRegister.Response.AreaName)
-  return areaname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* NodeRegister_Response::release_areaname() {
-  // @@protoc_insertion_point(field_release:s2s.NodeRegister.Response.AreaName)
-  
-  return areaname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void NodeRegister_Response::set_allocated_areaname(::std::string* areaname) {
-  if (areaname != nullptr) {
+inline void NodeRegister_Response::set_allocated_groupdata(::s2s::GroupConfigData* groupdata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete groupdata_;
+  }
+  if (groupdata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      groupdata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, groupdata, submessage_arena);
+    }
     
   } else {
     
   }
-  areaname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), areaname);
-  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Response.AreaName)
+  groupdata_ = groupdata;
+  // @@protoc_insertion_point(field_set_allocated:s2s.NodeRegister.Response.GroupData)
 }
 
 // -------------------------------------------------------------------
@@ -2655,6 +2939,8 @@ inline void MysqlOper_Response::set_allocated_errorstr(::std::string* errorstr) 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

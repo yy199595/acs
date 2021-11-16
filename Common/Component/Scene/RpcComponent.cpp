@@ -98,14 +98,17 @@ namespace GameKeeper
             return;
         }
 #ifdef __DEBUG__
-        std::string json;
-		const std::string & method = config->Method;
-		const std::string & service = config->Service;
-		if (util::MessageToJsonString(*request, &json).ok())
-		{
-			GKDebugLog("[" << session->GetAddress() << " request] "
-				<< service << "." << method << "  json = \n" << StringHelper::FormatJson(json));
-		}
+        GKDebugInfo("*****************[request]******************");
+        GKDebugLog("func = " << config->Service << "." << config->Method);
+        if(request->has_data())
+        {
+            std::string json;
+            if(util::MessageToJsonString(request->data(), &json).ok())
+            {
+                GKDebugLog("json = " << StringHelper::FormatJson(json));
+            }
+        }
+        GKDebugInfo("*********************************************");
 #endif
         this->mRequestComponent->OnRequest(*request);
     }
@@ -113,25 +116,35 @@ namespace GameKeeper
     void RpcComponent::OnResponse(RpcClient *session, com::Rpc_Response *response)
     {
 #ifdef __DEBUG__
-        std::string json;
-        if(util::MessageToJsonString(*response, &json).ok())
-        {			
 			long long rpcId = response->rpcid();
 			auto rpc = this->mResponseComponent->GetRpcHandler(rpcId);
 			if (rpc != nullptr)
-			{
-				auto config = this->mProtocolComponent->GetProtocolConfig(rpc->GetMethodId());
-				if (config != nullptr)
-				{					
-					const std::string & method = config->Method;
-					const std::string & service = config->Service;
-					long long nowTime = TimeHelper::GetMilTimestamp();
-					float time = (nowTime - rpc->GetCreateTime()) / 1000.0f;
-					GKDebugLog("[" << session->GetAddress() << " response]  [time = " 
-						<< time <<"]  "<< service << "." << method <<  " json = \n" << StringHelper::FormatJson(json));
-				}
-			}         
-        }
+            {
+                auto config = this->mProtocolComponent->GetProtocolConfig(rpc->GetMethodId());
+                if (config != nullptr)
+                {
+                    long long nowTime = TimeHelper::GetMilTimestamp();
+                    float time = (nowTime - rpc->GetCreateTime()) / 1000.0f;
+
+                    GKDebugLog("*****************[response]******************");
+                    GKDebugLog("func = " << config->Service << "." << config->Method);
+                    GKDebugLog("time = " << time << "s");
+                    if ((XCode) response->code() != XCode::Successful)
+                    {
+                        auto codeConfig = this->mProtocolComponent->GetCodeConfig(response->code());
+                        GKDebugError("code = " << codeConfig->Name << ":" << codeConfig->Desc);
+                    }
+                    else if (response->has_data())
+                    {
+                        std::string json;
+                        if (util::MessageToJsonString(response->data(), &json).ok())
+                        {
+                            GKDebugLog("json = \n" << StringHelper::FormatJson(json));
+                        }
+                    }
+                    GKDebugLog("*********************************************");
+                }
+            }
 #endif
         this->mResponseComponent->OnResponse(*response);
 		delete response;

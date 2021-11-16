@@ -10,10 +10,13 @@ namespace GameKeeper
     class CallHandler
     {
     public:
-		CallHandler(int method);
+		explicit CallHandler(int method);
 		virtual ~CallHandler() = default;
 
     public:
+        void SetTimerId(unsigned int id) { this->mTimerId = id;}
+        unsigned int GetTimerId() const { return this->mTimerId;}
+
 		int GetMethodId() const { return this->mMethodId; }
         long long GetCreateTime() const { return this->mCreateTime; }	
     public:
@@ -21,6 +24,7 @@ namespace GameKeeper
     private:
 		int mMethodId;
         long long mCreateTime;
+        unsigned int mTimerId;
         class CoroutineComponent * mCorComponent;
     };
 
@@ -47,8 +51,8 @@ namespace GameKeeper
     class CppCallHandler : public CallHandler
     {
     public:
-        CppCallHandler(int method);
-		~CppCallHandler() final;
+        explicit CppCallHandler(int method);
+		~CppCallHandler() final = default;
     public:
         void Invoke(const com::Rpc_Response & backData) override;
     public:

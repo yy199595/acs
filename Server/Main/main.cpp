@@ -21,8 +21,8 @@
 #include <Scene/TaskPoolComponent.h>
 #include <Scene/RpcProtoComponent.h>
 #include <Service/AccountService.h>
-#include <Service/ClusterService.h>
-#include <Service/CenterService.h>
+#include <Service/NodeServer.h>
+#include <Service/NodeCenter.h>
 #include <Service/GatewayService.h>
 #include <Scene/DeamonComponent.h>
 #include <Service/MysqlService.h>
@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 
     __register_component__(MysqlService);
     __register_component__(AccountService);
-    __register_component__(CenterService);
-    __register_component__(ClusterService);
+    __register_component__(NodeCenter);
+    __register_component__(NodeServer);
     __register_component__(GatewayService);
     __register_component__(HttpLoginService);
     __register_component__(HttpOperComponent);

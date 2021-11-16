@@ -15,7 +15,7 @@ namespace GameKeeper
     class LocalServiceComponent : public ServiceComponent
     {
     public:
-        LocalServiceComponent();
+        LocalServiceComponent() = default;
 
        ~LocalServiceComponent() override = default;
 

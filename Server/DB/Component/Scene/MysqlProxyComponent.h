@@ -5,9 +5,9 @@ namespace GameKeeper
     class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData
     {
     public:
-        MysqlProxyComponent() {}
+        MysqlProxyComponent() = default;
 
-        ~MysqlProxyComponent() {}
+        ~MysqlProxyComponent() final = default;
 
     protected:
         bool Awake() final;
@@ -28,7 +28,7 @@ namespace GameKeeper
         XCode Query(const Message &data, Message &queryData);
 
     private:
-        class NodeProxy *GetServiceNode();
+        class RpcNodeProxy *GetServiceNode();
 
     private:
         std::queue<unsigned int> mWakeUpQueue;

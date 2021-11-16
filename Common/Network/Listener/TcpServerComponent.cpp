@@ -10,7 +10,7 @@ namespace GameKeeper
 {
     bool TcpServerComponent::Awake()
     {
-		ServerConfig & config = App::Get().GetConfig();
+		const ServerConfig & config = App::Get().GetConfig();
 		config.GetValue("WhiteList", this->mWhiteList);
         config.GetValue("Listener","ip", this->mHostIp);
         auto taskComponent = this->GetComponent<TaskPoolComponent>();
@@ -54,11 +54,19 @@ namespace GameKeeper
 		return true;
     }
 
+    void TcpServerComponent::GetListeners(std::vector<const NetworkListener *> &listeners)
+    {
+        listeners.clear();
+        for(auto listener : this->mListeners)
+        {
+            listeners.emplace_back(listener);
+        }
+    }
+
     void TcpServerComponent::Start()
     {
-        for (size_t index = 0; index < this->mListeners.size(); index++)
+        for (auto listener : this->mListeners)
         {
-            NetworkListener *listener = this->mListeners[index];
             const ListenConfig &config = listener->GetConfig();
             Component *component = this->gameObject->GetComponentByName(config.Handler);
             if (auto handler = dynamic_cast<ISocketListen *>(component))

@@ -9,6 +9,7 @@ namespace GameKeeper
 {
     CallHandler::CallHandler(int method)
     {
+        this->mTimerId = 0;
 		this->mMethodId = method;
         this->mCreateTime = TimeHelper::GetMilTimestamp();
     }
@@ -46,13 +47,6 @@ namespace GameKeeper
     {		
         this->mCoroutineId = 0;
 		this->mScheduler = App::Get().GetCorComponent();
-    }
-
-	CppCallHandler::~CppCallHandler()
-    {
-        auto protoConfig = App::Get().GetComponent<RpcProtoComponent>();
-        auto config = protoConfig->GetProtocolConfig(this->GetMethodId());
-        GKDebugError("destory rpc action : " << config->Service << "." << config->Method);
     }
 
     void CppCallHandler::Invoke(const com::Rpc_Response & response)

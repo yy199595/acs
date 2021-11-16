@@ -56,21 +56,20 @@ namespace GameKeeper
 
     bool CoroutineComponent::Awake()
     {
-		GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
+        GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
+
         return true;
     }
 
     void CoroutineComponent::Start()
     {
-		/*long long t1 = TimeHelper::GetMilTimestamp();
-		CoroutineGroup * group = this->NewCoroutineGroup();
-		for (size_t index = 0; index < 10; index++)
-		{
-			group->Add(this->StartCoroutine(&CoroutineComponent::Loop, this));
-		}
-		group->AwaitAll();
+		long long t1 = TimeHelper::GetMilTimestamp();
+		for (size_t index = 0; index < 10000; index++)
+        {
+            this->StartCoroutine(&CoroutineComponent::Loop, this);
+        }
 		long long t2 = TimeHelper::GetMilTimestamp();
-		GKDebugError("时间 = " << t2 - t1);*/
+		GKDebugError("时间 = " << t2 - t1);
 		
     }
 
@@ -80,19 +79,16 @@ namespace GameKeeper
 		std::string str = __FUNCTION__;
         for (int i = 0; i < 10; ++i) 
 		{
-            this->Sleep(1000);
+            this->YieldNextFrame();
         }
+        GKDebugFatal("==============");
 	}
 
     void CoroutineComponent::Sleep(long long ms)
     {
-        Coroutine *logicCoroutine = this->GetCoroutine();
-        if (logicCoroutine != nullptr)
-        {
-            const long long id = logicCoroutine->mCoroutineId;
-            this->mTimerManager->CreateTimer<CorSleepTimer>(this, id, ms);
-            this->YieldReturn();
-        }
+        GKAssertRet_F(this->IsInLogicCoroutine());
+        this->mTimerManager->AddTimer(new CorSleepTimer(this, this->mCurrentCorId, ms));
+        this->YieldReturn();
     }
 
 	void CoroutineComponent::YieldNextLoop()
@@ -163,7 +159,8 @@ namespace GameKeeper
 			if (stack.co != logicCoroutine)
 			{
 				this->SaveStack(stack.co);
-				const std::string & data = logicCoroutine->mStack;
+                const std::string & data = logicCoroutine->mStack;
+                assert(stack.top == (char*)logicCoroutine->mCorContext + logicCoroutine->mStack.size());
 				memcpy(logicCoroutine->mCorContext, data.c_str(), data.size()); // restore stack data
 				stack.co = logicCoroutine;
 			}
@@ -309,7 +306,6 @@ namespace GameKeeper
 		cor->mStack.clear();
 		char * top = this->mSharedStack[cor->sid].top;
 		cor->mStackSize = top - (char*)cor->mCorContext;
-		//GKDebugWarning("size = " << cor->mStackSize);
 		cor->mStack.append((char *)cor->mCorContext, cor->mStackSize);
 	}
 #else
@@ -348,21 +344,22 @@ namespace GameKeeper
 		this->mCurrentCorId = 0;
 	}
 
-    void CoroutineComponent::OnSecondUpdate() {
+    void CoroutineComponent::OnSecondUpdate()
+    {
 
-//		size_t index = 1;
-//		long long size = 0;
-//		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
-//		{
-//			Coroutine * cor = mCorPool.Get(index);
-//            if(cor != nullptr)
-//            {
-//                size += cor->mStack.size();
-//            }
-//		}
-//
-//		double memory = size / 1024.0f / 1024.0f;
-//		GKDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
-//			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
+		size_t index = 1;
+		long long size = 0;
+		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
+		{
+			Coroutine * cor = mCorPool.Get(index);
+            if(cor != nullptr)
+            {
+                size += cor->mStack.size();
+            }
+		}
+
+		double memory = size / 1024.0f / 1024.0f;
+		GKDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
     }
 }

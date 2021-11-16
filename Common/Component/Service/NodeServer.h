@@ -10,12 +10,12 @@ namespace GameKeeper
 
     class NodeProxyComponent;
 
-    class ClusterService : public LocalServiceComponent
+    class NodeServer : public LocalServiceComponent
     {
     public:
-		ClusterService() = default;
+		NodeServer() = default;
 
-        ~ClusterService() override = default;
+        ~NodeServer() override = default;
 
     public:
         bool Awake() final;
@@ -27,8 +27,9 @@ namespace GameKeeper
         XCode Del(const com::Int32Data &node);
 		XCode Add(const s2s::NodeInfo & nodeInfo);
     private:
-        short mAreaId;
-        short mNodeId;
+        std::string mToken;
+        long long mOpenTime;
+        std::string mGroupName;
         NodeProxyComponent * mNodeComponent;
     };
 }

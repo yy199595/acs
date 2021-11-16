@@ -39,7 +39,6 @@ namespace GameKeeper
 		Coroutine * Get(unsigned int id);
 	private:
         NumberBuilder<unsigned int> mNumPool;
-		std::queue<unsigned int> mIdleCoroutines;
         std::unordered_map<unsigned int , Coroutine *> mCorMap;
     };
 }

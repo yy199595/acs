@@ -14,7 +14,10 @@ RpcTypeError	rpc类型错误
 InitMessageFail	初始化消息失败
 CallFunctionNotExist	调用方法不存在
 CallArgsError	调用参数错误
-TimeoutAutoCall	超时自动调用
+CallTimeout	超时自动调用
+NotServerGroupConfig	没有服务器组配置
+InitNodeProxyFailure	初始化节点失败
+AddRpcCallbackFailure	添加rpc回调失败
 LuaCoroutineWait	等待lua协程返回
 CallLuaFunctionFail	调用lua方法错误
 NotResponseMessage	不返回数据

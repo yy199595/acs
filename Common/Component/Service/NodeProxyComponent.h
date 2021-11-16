@@ -19,8 +19,8 @@ namespace GameKeeper
 
         RpcNodeProxy * Create(unsigned int uid);
 
-		RpcNodeProxy * CreateNode(unsigned int uid, std::string name, std::string address);
-	
+		RpcNodeProxy * CreateNode(unsigned int uid, const s2s::NodeInfo & nodeInfo);
+
     protected:
         bool Awake() final;
 
@@ -43,7 +43,6 @@ namespace GameKeeper
         unsigned short mCenterPort;
         std::list<RpcNodeProxy *> mServiceNodeArray;
         class RpcProtoComponent * mProtocolComponent;
-        std::unordered_map<int, RpcNodeProxy *> mServiceNodeMap1;
-        std::unordered_map<std::string, RpcNodeProxy *> mServiceNodeMap2;
+        std::unordered_map<int, RpcNodeProxy *> mServiceNodeMap;
     };
 }

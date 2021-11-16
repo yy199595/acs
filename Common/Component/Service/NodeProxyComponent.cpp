@@ -9,54 +9,69 @@ namespace GameKeeper
 {
     bool NodeProxyComponent::DelNode(int nodeId)
     {
-        auto iter = this->mServiceNodeMap1.find(nodeId);
-        if (iter != this->mServiceNodeMap1.end())
+        auto iter = this->mServiceNodeMap.find(nodeId);
+        if (iter != this->mServiceNodeMap.end())
         {
             RpcNodeProxy *serviceNode = iter->second;
-            if (serviceNode != nullptr)
+            mServiceNodeMap.erase(iter);
+            if(serviceNode != nullptr)
             {
-                serviceNode->SetActive(false);
-                const std::string &address = serviceNode->GetAddress();
-                auto iter1 = this->mServiceNodeMap2.find(address);
-                if (iter1 != this->mServiceNodeMap2.end())
-                {
-                    this->mServiceNodeMap2.erase(iter1);
-                }
+                serviceNode->Destory();
             }
-            this->mServiceNodeMap1.erase(iter);
             return true;
         }
         return false;
     }
 
-	RpcNodeProxy * NodeProxyComponent::CreateNode(unsigned int uid, std::string name, std::string address)
+    RpcNodeProxy *NodeProxyComponent::Create(unsigned int uid)
+    {
+        auto nodeProxy = this->GetServiceNode(uid);
+        if (nodeProxy == nullptr)
+        {
+            nodeProxy = new RpcNodeProxy(uid);
+            this->mServiceNodeMap.emplace(uid, nodeProxy);
+        }
+        return nodeProxy;
+    }
+
+	RpcNodeProxy * NodeProxyComponent::CreateNode(unsigned int uid, const s2s::NodeInfo & nodeInfo)
 	{
-		auto serviceNode = new RpcNodeProxy(uid, name, address);
-		if (serviceNode != nullptr)
-		{
-			serviceNode->Init(name);
-			this->mServiceNodeArray.push_back(serviceNode);
-			this->mServiceNodeMap2.emplace(address, serviceNode);
-            this->mServiceNodeMap1.emplace(serviceNode->GetNodeUId(), serviceNode);
-            GKDebugInfo("create new service " << name << "  [" << address << "]");
-		}
-		return serviceNode;
+        auto nodeProxy = this->GetServiceNode(uid);
+        if(nodeProxy == nullptr)
+        {
+            nodeProxy = new RpcNodeProxy(uid);
+        }
+        if(!nodeProxy->UpdateNodeProxy(nodeInfo))
+        {
+            delete nodeProxy;
+#ifdef __DEBUG__
+
+#endif
+            return nullptr;
+        }
+        this->mServiceNodeMap[uid] = nodeProxy;
+		return nodeProxy;
 	}
 
     bool NodeProxyComponent::Awake()
     {
-		ServerConfig & ServerCfg = App::Get().GetConfig();
-		GKAssertRetFalse_F(ServerCfg.GetValue("AreaId", this->mAreaId));
-		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "ip", this->mCenterIp));
-		GKAssertRetFalse_F(ServerCfg.GetValue("CenterAddress", "port", this->mCenterPort));
+		const ServerConfig & serverConfig = App::Get().GetConfig();
+		GKAssertRetFalse_F(serverConfig.GetValue("AreaId", this->mAreaId));
+		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "ip", this->mCenterIp));
+		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "port", this->mCenterPort));
 		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<RpcProtoComponent>());
         return true;
     }
 
     void NodeProxyComponent::Start()
     {
-        const std::string centerAddress = this->mCenterIp + ":" + std::to_string(this->mCenterPort);
-        this->CreateNode(0, "Center", centerAddress)->AddService("CenterService");
+        s2s::NodeInfo centerNodeInfo;
+        centerNodeInfo.set_servername("Center");
+        centerNodeInfo.set_serverip(this->mCenterIp);
+        centerNodeInfo.add_services("NodeCenter");
+        centerNodeInfo.mutable_listeners()->insert({"rpc", this->mCenterPort});
+
+        GKAssertRet_F(this->CreateNode(0, centerNodeInfo));
     }
 
 	void NodeProxyComponent::OnSecondUpdate()
@@ -78,8 +93,8 @@ namespace GameKeeper
 
     RpcNodeProxy *NodeProxyComponent::GetServiceNode(unsigned int nodeId)
     {
-        auto iter = this->mServiceNodeMap1.find(nodeId);
-        if (iter != this->mServiceNodeMap1.end())
+        auto iter = this->mServiceNodeMap.find(nodeId);
+        if (iter != this->mServiceNodeMap.end())
         {
             RpcNodeProxy *serviceNode = iter->second;
             if (serviceNode != nullptr && serviceNode->IsActive())
@@ -91,19 +106,6 @@ namespace GameKeeper
         return nullptr;
     }
 
-    RpcNodeProxy *NodeProxyComponent::GetServiceNode(const std::string &address)
-    {
-        auto iter = this->mServiceNodeMap2.find(address);
-        if (iter != this->mServiceNodeMap2.end())
-        {
-            RpcNodeProxy *serviceNode = iter->second;
-            if (serviceNode != nullptr && serviceNode->IsActive())
-            {
-                return serviceNode;
-            }
-        }
-        return nullptr;
-    }
 
     RpcNodeProxy *NodeProxyComponent::GetNodeByNodeName(const std::string &nodeName)
     {
@@ -134,18 +136,16 @@ namespace GameKeeper
         request.set_areaid(this->mAreaId);
        
         RpcNodeProxy *centerNode = this->GetServiceNode(0);
-        XCode code = centerNode->Call("CenterService.Query", request, response);
+        XCode code = centerNode->Call("NodeCenter.Query", request, response);
 
         RpcNodeProxy * newServiceNode = nullptr;
         if (code == XCode::Successful && response.nodeinfos_size() > 0)
         {
             for (int index = 0; index < response.nodeinfos_size(); index++)
             {
-                const int uid = response.nodeinfos(index).uid();
-                const std::string &address = response.nodeinfos(index).address();
-                const std::string &nodeName = response.nodeinfos(index).servername();
-                newServiceNode = this->CreateNode(uid, nodeName, address);
-
+                const s2s::NodeInfo & nodeInfo = response.nodeinfos(index);
+                unsigned int uid = nodeInfo.areaid() * 10000 + nodeInfo.nodeid();
+                newServiceNode = this->CreateNode(uid, nodeInfo);
             }
         }
         return newServiceNode;

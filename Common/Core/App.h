@@ -28,10 +28,10 @@ namespace GameKeeper
 	public:
 		App(int argc, char ** argv);
 
-		virtual ~App() = default;
+		virtual ~App() final = default;
 
 	public:
-		ServerConfig &GetConfig()
+		const ServerConfig &GetConfig()
 		{
 			return *mConfig;
 		}

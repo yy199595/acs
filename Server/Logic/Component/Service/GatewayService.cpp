@@ -7,7 +7,6 @@
 #include <Scene/RedisComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/GameObjectComponent.h>
-#include <Scene/NodeMaperComponent.h>
 namespace GameKeeper
 {
     bool GatewayService::Awake()
@@ -36,7 +35,6 @@ namespace GameKeeper
             return XCode::Failure;
         }
         // 给连接到网关的对象加组件
-        gameObject->AddComponent<NodeMaperComponent>();
 
         return XCode::Successful;
     }

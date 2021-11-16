@@ -12,33 +12,37 @@ namespace GameKeeper
 	{
 		this->mIp = ip;
 		this->mPort = port;
+        this->mIsConnect = false;
 		this->mAddress = ip + ":" + std::to_string(mPort);
 	}
 
-    void RpcConnector::StartConnect()
-    {		
+    void RpcConnector::StartConnect(StaticMethod * method)
+    {
+        this->mIsConnect = true;
 		GKAssertRet_F(this->mSocketProxy);
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		nThread.AddTask(&RpcConnector::ConnectHandler, this);
+		nThread.AddTask(&RpcConnector::ConnectHandler, this, method);
     }
 
-    void RpcConnector::StartAsyncConnect()
+    bool RpcConnector::StartAsyncConnect()
     {
-		GKAssertRet_F(this->mSocketProxy);
+        this->mIsConnect = true;
+		GKAssertRetFalse_F(this->mSocketProxy);
 		NetWorkThread & nThread = this->mSocketProxy->GetThread();
         unsigned int id = App::Get().GetCorComponent()->GetCurrentCorId();
 		nThread.AddTask(&RpcConnector::AsyncConnectHandler, this, id);
         App::Get().GetCorComponent()->YieldReturn();
+        return this->mSocketProxy->IsOpen();
     }
 
-	void RpcConnector::ConnectHandler()
+	void RpcConnector::ConnectHandler(StaticMethod * method)
     {
         this->mConnectCount++;
         auto address = asio::ip::make_address_v4(this->mIp);
         asio::ip::tcp::endpoint endPoint(address, this->mPort);
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
         GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
-		nSocket.async_connect(endPoint, [this](const asio::error_code &err)
+		nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
         {
 			XCode code = XCode::Successful;
             if(!err)
@@ -47,8 +51,14 @@ namespace GameKeeper
                 this->mConnectCount = 0;
 				code = XCode::NetConnectFailure;
             }
-			NetWorkThread & nThread = this->mSocketProxy->GetThread();
-			nThread.AddTask(&RpcComponent::OnConnectRemoteAfter, this->mTcpComponent, this, code);
+            this->mIsConnect = false;
+            MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+            if(method != nullptr)
+            {
+                taskScheduler.AddMainTask(method);
+                return;
+            }
+            taskScheduler.AddMainTask(&RpcComponent::OnConnectRemoteAfter, this->mTcpComponent, this, code);
         });
     }
 
@@ -60,18 +70,16 @@ namespace GameKeeper
 		GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
 		nSocket.async_connect(endPoint, [this, id](const asio::error_code &err)
         {
-			//XCode code = XCode::Successful;
             if (!err)
             {
 				this->StartReceive();
 				this->mConnectCount = 0;
-				//code = XCode::NetConnectFailure;
-            }		
+            }
+            this->mIsConnect = false;
 			NetWorkThread & nThread = this->mSocketProxy->GetThread();
 			CoroutineComponent *component = App::Get().GetCorComponent();
 			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();       
-			taskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);	
-			//nThread.AddTask(&RpcComponent::OnConnectRemoteAfter, this->mTcpComponent, this, code);
+			taskScheduler.AddMainTask(&CoroutineComponent::Resume, component, id);
         });
     }
 }

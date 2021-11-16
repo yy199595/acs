@@ -39,7 +39,7 @@ namespace GameKeeper
 
     bool MysqlComponent::Awake()
     {
-		ServerConfig & config = App::Get().GetConfig();
+		const ServerConfig & config = App::Get().GetConfig();
 		this->mSqlPath = App::Get().GetConfigPath() + "sql.json";
         GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
         GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());

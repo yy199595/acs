@@ -9,11 +9,13 @@ namespace GameKeeper
 	class TcpServerComponent : public Component
 	{
 	public:
-		TcpServerComponent() {}
+		TcpServerComponent() = default;
+		~TcpServerComponent() final =default;
 
-		~TcpServerComponent() {}
-
-        int GetPriority() { return 2; }
+    public:
+        int GetPriority() final { return 2; }
+        const std::string & GetHostIp() const { return this->mHostIp;}
+        void GetListeners(std::vector<const NetworkListener *> & listeners);
 	protected:
 		bool Awake() override;
 		void Start() override;

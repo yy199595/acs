@@ -10,17 +10,19 @@ namespace GameKeeper
     class RpcConnector : public RpcClient
     {
     public:
-        RpcConnector(RpcComponent * component, const std::string & ip, const unsigned short port);
+        RpcConnector(RpcComponent * component, const std::string & ip, unsigned short port);
     public:
+        bool IsConnected() const { return this->mIsConnect; } //是不是正在连接
         SocketType GetSocketType() override { return SocketType::LocalSocket; }
     public:
-        void StartConnect();
-        void StartAsyncConnect();
+        void StartConnect(StaticMethod * method = nullptr);
+        bool StartAsyncConnect();
     private:
-        void ConnectHandler();
+        void ConnectHandler(StaticMethod * method);
         void AsyncConnectHandler(unsigned int id);
     private:
         unsigned int mPort;
+        atomic_bool mIsConnect;
         unsigned int mConnectCount;
     };
 }

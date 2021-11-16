@@ -4,7 +4,7 @@
 #include<Define/CommonDef.h>
 #include<SocketProxy.h>
 #define TCP_BUFFER_COUNT 1024
-
+#define MAX_DATA_COUNT 1204 * 10 //接受最大数据包
 namespace GameKeeper
 {
     class RpcComponent;

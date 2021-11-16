@@ -42,10 +42,15 @@ namespace GameKeeper
                     continue;
                 }
                 ProtocolConfig protocolConfig;
+                protocolConfig.Timeout = 0;
                 protocolConfig.Service = service;
                 protocolConfig.Method = iter2->name.GetString();
                 protocolConfig.MethodId = iter2->value["Id"].GetInt();
                 protocolConfig.IsAsync = iter2->value["Async"].GetBool();
+                if(iter2->value.HasMember("Timeout"))
+                {
+                    protocolConfig.Timeout = iter2->value["Timeout"].GetInt();
+                }
                 if (iter2->value.HasMember("Request"))
                 {
                     const rapidjson::Value &jsonValue = iter2->value["Request"];
@@ -78,6 +83,33 @@ namespace GameKeeper
             }
             this->mServiceMap.emplace(service, methods);
         }
+        return this->LoadCodeConfig();
+    }
+
+    bool RpcProtoComponent::LoadCodeConfig()
+    {
+        std::vector<std::string> lines;
+        const std::string path = App::Get().GetWorkPath();
+        if (!FileHelper::ReadTxtFile(path + "XCode/XCode.csv", lines))
+        {
+            GKDebugError("not find file " << path + "XCode/XCode.csv");
+            return false;
+        }
+        std::vector<std::string> res;
+        for (int index = 1; index < lines.size(); index++)
+        {
+            res.clear();
+            const std::string &line = lines[index];
+            StringHelper::SplitString(line, "\t", res);
+            if (res.size() == 2)
+            {
+                CodeConfig codeConfig;
+                codeConfig.Name = res[0];
+                codeConfig.Desc = res[1];
+                codeConfig.Code = index - 1;
+                this->mCodeDescMap.emplace(codeConfig.Code, codeConfig);
+            }
+        }
         return true;
     }
 
@@ -85,6 +117,12 @@ namespace GameKeeper
     {
         auto iter = this->mProtocolIdMap.find(methodId);
         return iter != this->mProtocolIdMap.end() ? &iter->second : nullptr;
+    }
+
+    const CodeConfig *RpcProtoComponent::GetCodeConfig(int code) const
+    {
+        auto iter = this->mCodeDescMap.find(code);
+        return iter != this->mCodeDescMap.end() ? &iter->second : nullptr;
     }
 
 	bool RpcProtoComponent::HasService(const std::string & service)
@@ -102,6 +140,15 @@ namespace GameKeeper
 		}
 	}
 
+    void RpcProtoComponent::DebugCode(XCode code)
+    {
+        auto iter = this->mCodeDescMap.find(code);
+        if(iter != this->mCodeDescMap.end())
+        {
+            GKDebugError("code = [" << iter->second.Name << ":" << iter->second.Desc <<"]");
+        }
+    }
+
 	bool RpcProtoComponent::HasServiceMethod(const std::string & service, const std::string & method)
 	{
 		auto iter = this->mServiceMap.find(service);
@@ -109,7 +156,7 @@ namespace GameKeeper
 		{
 			return false;
 		}
-		for (auto config : iter->second)
+		for (const auto& config : iter->second)
 		{
 			if (config.Method == method)
 			{

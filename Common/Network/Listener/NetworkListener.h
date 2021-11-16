@@ -23,7 +23,7 @@ namespace GameKeeper
 	public:
 		bool StartListen(ISocketListen * handler);
 		bool IsOpen() { return this->mBindAcceptor->is_open(); }
-        const ListenConfig & GetConfig() { return this->mConfig;}
+        const ListenConfig & GetConfig() const { return this->mConfig;}
 	private:
         void InitListener();
 		void ListenConnect();

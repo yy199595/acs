@@ -6,7 +6,7 @@ namespace GameKeeper
 {
 	bool ServiceComponent::AddMethod(ServiceMethod * method)
 	{
-		RpcProtoComponent * procolComponent = App::Get().GetComponent<RpcProtoComponent>();
+		auto * procolComponent = App::Get().GetComponent<RpcProtoComponent>();
 		if (procolComponent == nullptr)
 		{
 			return false;

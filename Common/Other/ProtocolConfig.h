@@ -7,6 +7,7 @@ namespace GameKeeper
     class ProtocolConfig
     {
     public:
+        int Timeout;
         bool IsAsync;
         int MethodId;
         std::string Method;

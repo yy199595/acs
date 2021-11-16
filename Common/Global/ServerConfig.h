@@ -11,47 +11,46 @@ namespace GameKeeper
     class ServerConfig
     {
     public:
-        ServerConfig(const std::string path);
+        explicit ServerConfig(std::string  path);
 
     public:
         bool InitConfig();
 
     public:
-        bool HasValue(const std::string k2);
+        bool HasValue(const std::string & k2) const;
 
-        bool GetValue(const std::string k2, int &data);
+        bool GetValue(const std::string & k2, int &data) const;
 
-        bool GetValue(const std::string k2, bool &data);
+        bool GetValue(const std::string & k2, bool &data) const;
 
-        bool GetValue(const std::string k2, std::string &data);
+        bool GetValue(const std::string & k2, std::string &data) const;
 
-        bool GetValue(const std::string k2, unsigned short &data);
+        bool GetValue(const std::string & k2, unsigned short &data) const;
 
-        bool GetValue(const std::string k2, std::set<std::string> &data);
+        bool GetValue(const std::string & k2, std::set<std::string> &data) const;
 
-        bool GetValue(const std::string k2, std::vector<std::string> &data);
+        bool GetValue(const std::string & k2, std::vector<std::string> &data) const;
 
-        bool GetValue(const std::string k2, std::unordered_map<std::string, std::string> &data);
+        bool GetValue(const std::string & k2, std::unordered_map<std::string, std::string> &data) const;
 
     public:
-        bool GetValue(const std::string k1, const std::string k2, int &value);
+        bool GetValue(const std::string & k1, const std::string & k2, int &value) const;
 
-        bool GetValue(const std::string k1, const std::string k2, std::string &value);
+        bool GetValue(const std::string & k1, const std::string & k2, std::string &value) const;
 
-        bool GetValue(const std::string k1, const std::string k2, unsigned short & value);
-        bool GetValue(const std::string k1, const std::string k2, std::vector<std::string> & value);
+        bool GetValue(const std::string & k1, const std::string & k2, unsigned short & value) const;
+        bool GetValue(const std::string & k1, const std::string & k2, std::vector<std::string> & value) const;
 
 
-		rapidjson::Value *GetJsonValue(const std::string k1);
-		rapidjson::Value *GetJsonValue(const std::string k1, const std::string k2);
+		rapidjson::Value *GetJsonValue(const std::string & k1) const;
+		rapidjson::Value *GetJsonValue(const std::string & k1, const std::string & k2) const;
 
     public:
         short GetNodeId() const { return this->mNodeId; }
 
         short GetAreaId() const { return this->mAreaId; }
 
-        const std::string &GetNodeName()
-        { return this->mNodeName; }
+        const std::string &GetNodeName() const { return this->mNodeName; }
 
     private:
         unsigned short mAreaId;

@@ -19,13 +19,17 @@ namespace GameKeeper
     public:
 		const CallHandler * GetRpcHandler(unsigned int id) const;
 		bool OnResponse(const com::Rpc_Response & message) final;
-        bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);	
+        bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
+
+    private:
+        void OnTimeout(unsigned int id);
     protected:
         bool Awake() override;
     private:
-        int mMessageTimeout;
+        com::Rpc_Response mTimeoutResponse;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;
+        class RpcProtoComponent * mProtoComponent;
 		std::unordered_map<unsigned int, CallHandler *> mRetActionMap;
     private:
         

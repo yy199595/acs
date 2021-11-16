@@ -14,32 +14,52 @@ namespace GameKeeper
     RpcResponseComponent::RpcResponseComponent()
         : mNumberPool(100)
     {
-        this->mMessageTimeout = 0;
+
     }
 
     bool RpcResponseComponent::Awake()
     {
-		ServerConfig & config = App::Get().GetConfig();
-		this->mTimerComponent = App::Get().GetTimerComponent();
-		GKAssertRetFalse_F(config.GetValue("NetWork", "MsgTimeout", this->mMessageTimeout));
+        mTimeoutResponse.set_code((int)XCode::CallTimeout);
+        GKAssertRetFalse_F(this->mTimerComponent = this->GetComponent<TimerComponent>());
+        GKAssertRetFalse_F(this->mProtoComponent = this->GetComponent<RpcProtoComponent>());
         return true;
     }
 
 	bool RpcResponseComponent::AddCallHandler(CallHandler * rpcAction, unsigned int & id)
     {
-        if (rpcAction == nullptr)
+        GKAssertRetCode_F(rpcAction);
+        int methodId = rpcAction->GetMethodId();
+        auto config = this->mProtoComponent->GetProtocolConfig(methodId);
+        if(config == nullptr)
         {
             return false;
         }
-		id = this->mNumberPool.Pop();
-        if (this->mMessageTimeout != 0)// 添加超时
+        id = this->mNumberPool.Pop();
+        if(config->Timeout != 0)
         {
-            auto timer =
-				new ActionTimeoutTimer(this->mMessageTimeout, id,                                                                                 this);
-            this->mTimerComponent->AddTimer(timer);
+            this->mTimerComponent->AddTimer(config->Timeout, &RpcResponseComponent::OnTimeout, this, id);
         }
+        rpcAction->SetTimerId(id);
         this->mRetActionMap.emplace(id, rpcAction);
-        return true;
+        return id;
+    }
+
+    void RpcResponseComponent::OnTimeout(unsigned int id)
+    {
+        auto iter = this->mRetActionMap.find(id);
+        if(iter != this->mRetActionMap.end())
+        {
+            CallHandler * callHandler = iter->second;
+
+            this->mRetActionMap.erase(iter);
+            if(callHandler != nullptr)
+            {
+                int methodId = callHandler->GetMethodId();
+                callHandler->Invoke(this->mTimeoutResponse);
+                auto config = this->mProtoComponent->GetProtocolConfig(methodId);
+                GKDebugError("call ["<<config->Service << "." << config->Method << "] time out");
+            }
+        }
     }
 
 	const CallHandler * RpcResponseComponent::GetRpcHandler(unsigned int rpcId) const
@@ -61,7 +81,8 @@ namespace GameKeeper
 		if (callHandler != nullptr)
 		{
 			callHandler->Invoke(response);
-		}      
+            this->mTimerComponent->RemoveTimer(callHandler->GetTimerId());
+        }
         this->mRetActionMap.erase(iter);
         return true;
     }

@@ -55,7 +55,7 @@ namespace GameKeeper
         }
 
         CostTimeInfo &pLatencyInfo = this->mCallFuncInfoMap[func];
-        if (code == XCode::TimeoutAutoCall)
+        if (code == XCode::CallTimeout)
         {
             pLatencyInfo.mTimeoutCount++;
         } else
@@ -66,9 +66,9 @@ namespace GameKeeper
 
     void TimeRecorder::Clear()
     {
-        for (auto iter = this->mCallFuncInfoMap.begin(); iter != this->mCallFuncInfoMap.end(); iter++)
+        for (auto & iter : this->mCallFuncInfoMap)
         {
-            CostTimeInfo &pLatencyInfo = iter->second;
+            CostTimeInfo &pLatencyInfo = iter.second;
             pLatencyInfo.Clear();
         }
         this->mLastClearTime = TimeHelper::GetMilTimestamp();

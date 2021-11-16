@@ -35,8 +35,11 @@ namespace GameKeeper
         if (proxyNode == nullptr)
         {
             proxyNode = this->mNodeComponent->GetNodeByServiceName("MysqlService");
-            this->mMysqlProxyNodeId = proxyNode != nullptr ? proxyNode->GetNodeUId() : -1;
-            return proxyNode;
+            if(proxyNode != nullptr)
+            {
+                this->mMysqlProxyNodeId = proxyNode->GetGlobalId();
+                return proxyNode;
+            }
         }
         return proxyNode;
     }

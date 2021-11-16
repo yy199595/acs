@@ -46,7 +46,7 @@ namespace GameKeeper
 	bool LuaScriptComponent::LoadAllFile()
 	{
 		std::string luaDir;
-		ServerConfig & config = App::Get().GetConfig();
+		const ServerConfig & config = App::Get().GetConfig();
 		GKAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
 
 		std::vector<std::string> luaFiles;

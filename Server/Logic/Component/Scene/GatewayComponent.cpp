@@ -5,7 +5,6 @@
 #include <Service/GatewayService.h>
 #include <Scene/GameObjectComponent.h>
 #include <Service/NodeProxyComponent.h>
-#include <Scene/NodeMaperComponent.h>
 namespace GameKeeper
 {
     bool GatewayComponent::Awake()
