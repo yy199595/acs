@@ -10,9 +10,10 @@ namespace GameKeeper
 	{
 	public:
 		SocketProxy(NetWorkThread & thread, const std::string & name);
-		~SocketProxy();
+		~SocketProxy() = default;
 	public:
-		bool IsOpen();
+		void Close();
+		bool IsOpen();	
 		AsioTcpSocket & GetSocket() { return this->mSocket; }
 		AsioContext & GetContext() { return this->mContext; }
 		NetWorkThread & GetThread() { return this->mNetThread; }

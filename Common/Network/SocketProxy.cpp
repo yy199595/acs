@@ -9,15 +9,16 @@ namespace GameKeeper
 	{
 		this->mSocketId = NumberHelper::Create();
 	}
-	SocketProxy::~SocketProxy()
+	
+	void SocketProxy::Close()
 	{
 		if (this->IsOpen())
 		{
-			asio::error_code err;
-			this->mSocket.shutdown(asio::socket_base::shutdown_both, err);
-			this->mSocket.close(err);
-		}
+			asio::error_code code;
+			this->mSocket.close(code);
+		}	
 	}
+
 	bool SocketProxy::IsOpen()
 	{
 		std::lock_guard<std::mutex> lock(this->mLock);

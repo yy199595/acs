@@ -10,6 +10,7 @@ namespace GameKeeper
     RpcClient::RpcClient(RpcComponent *component)
             :mTcpComponent(component)
     {      		
+		this->mSocketId = 0;
 		this->mLastOperTime = 0;
 		this->mSocketProxy = nullptr;
 		this->mReceiveMsgBuffer = new char[TCP_BUFFER_COUNT];
@@ -110,14 +111,10 @@ namespace GameKeeper
 	}
 
 	void RpcClient::CloseSocket(XCode code)
-	{		
-		if (this->mSocketProxy->IsOpen())
-		{
-			asio::error_code err;
-			this->mSocketProxy->GetSocket().close(err);
-		}
+	{				
+		this->mSocketProxy->Close();
         MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
+        taskScheduler.AddMainTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this->mSocketId, code);
 	}
 
 	void RpcClient::ReadMessageBody(unsigned int allSize, int type)

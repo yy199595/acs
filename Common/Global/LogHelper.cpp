@@ -70,7 +70,7 @@ namespace GameKeeper
     bool LogHelper::Init(const std::string path, const std::string name)
     {
 #if _WIN32
-		system("chcp 65001");
+		//system("chcp 65001");
 #endif // _Win32
 
         std::string logPath = path + "/" + TimeHelper::GetYearMonthDayString();

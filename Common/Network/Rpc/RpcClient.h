@@ -38,6 +38,7 @@ namespace GameKeeper
 		SocketProxy * mSocketProxy;
 		RpcComponent * mTcpComponent;
     private:
+		long long mSocketId;
 		char *mReceiveMsgBuffer;
 		long long mLastOperTime;
 		std::queue<const Message *> mMessageQueue;

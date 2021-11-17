@@ -16,7 +16,7 @@ namespace GameKeeper
 
 		~RpcComponent() override = default;
 	public:
-		void OnCloseSession(RpcClient * socket, XCode code);
+		void OnCloseSession(long long socketId, XCode code);
 		void OnConnectRemoteAfter(RpcConnector * session, XCode code);
 		void OnSendMessageAfter(RpcClient *session, std::string * message, XCode code);
     public:

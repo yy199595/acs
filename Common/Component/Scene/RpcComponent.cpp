@@ -24,21 +24,16 @@ namespace GameKeeper
         return true;
     }
 
-	void RpcComponent::OnCloseSession(RpcClient * socket, XCode code)
+	void RpcComponent::OnCloseSession(long long socketId, XCode code)
 	{
-		if (socket == nullptr)
-		{
-			return;
-		}
-		const std::string & address = socket->GetAddress();
-		long long id = socket->GetSocketProxy().GetSocketId();
-		auto iter = this->mSessionAdressMap.find(id);
+		auto iter = this->mSessionAdressMap.find(socketId);
 		if (iter != this->mSessionAdressMap.end())
 		{
+			RpcClient * client = iter->second;
 			this->mSessionAdressMap.erase(iter);
-			GKDebugError("remove tcp socket " << address);
-			delete socket;
-		}
+			GKDebugError("remove tcp socket " << client->GetAddress());
+			delete client;
+		}		
 	}
 
     void RpcComponent::OnSendMessageAfter(RpcClient *session, std::string * message, XCode code)
