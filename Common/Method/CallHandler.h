@@ -52,7 +52,7 @@ namespace GameKeeper
     {
     public:
         explicit CppCallHandler(int method);
-		~CppCallHandler() final = default;
+		~CppCallHandler() final;
     public:
         void Invoke(const com::Rpc_Response & backData) override;
     public:
@@ -61,7 +61,7 @@ namespace GameKeeper
     private:
         XCode mCode;
 		unsigned int mCoroutineId;
-        CoroutineComponent *mScheduler;
+        CoroutineComponent *mCorComponent;
         google::protobuf::Message * mMessage;
     };
 }

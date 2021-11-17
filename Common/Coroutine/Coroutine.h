@@ -29,7 +29,7 @@ namespace GameKeeper
 		tb_context_t mCorContext;
 #elif __linux__
 		void * mContextStack;
-		ucontext_t mCorContext;
+		ucontext_t mContext;
 #elif _WIN32
 		void * mContextStack;
 #endif

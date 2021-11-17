@@ -58,7 +58,9 @@ namespace GameKeeper
         TaskProxy *task = nullptr;
         while(!this->mIsClose)
         {
+#ifdef __THREAD_LOCK__
             this->mWaitInvokeTask.SwapQueueData();
+#endif
             while (this->mWaitInvokeTask.PopItem(task))
             {
                 if (task->Run())
@@ -118,6 +120,9 @@ namespace GameKeeper
                 GKDebugError(err.message());
             }           
             StaticMethod * taskMethod = nullptr;
+#ifdef __THREAD_LOCK__
+            this->mWaitInvokeMethod.SwapQueueData();
+#endif
             while (this->mWaitInvokeMethod.PopItem(taskMethod))
             {
                 taskMethod->run();
@@ -151,7 +156,9 @@ namespace GameKeeper
 	{
 		this->mMainMethod->run();
 		StaticMethod * task = nullptr;
+#ifdef __THREAD_LOCK__
 		this->mTaskQueue.SwapQueueData();
+#endif
 		while (this->mTaskQueue.PopItem(task))
 		{
 			task->run();

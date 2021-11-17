@@ -30,7 +30,7 @@ file(GLOB_RECURSE LogicSource "Logic/*.h" "Logic/*.cpp" "Logic/*.hpp" "Logic/*.c
 
 LINK_DIRECTORIES(${PROJECT_COMMON_DIR}/Libs/lib)
 
-SET(CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE "Debug")
 list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
 
 

@@ -33,6 +33,7 @@ using namespace GameKeeper;
 
 int main(int argc, char **argv)
 {
+    //je_malloc(100);
     __register_component__(GatewayComponent);
     __register_component__(TimerComponent);
     __register_component__(RpcRequestComponent);

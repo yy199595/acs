@@ -49,7 +49,7 @@ namespace GameKeeper
 		for (size_t index = 0; index < 8; index++)
 		{
 			this->mSharedStack[index].co = 0;
-			this->mSharedStack[index].p = nullptr;	
+			this->mSharedStack[index].p = nullptr;
 			this->mSharedStack[index].top = nullptr;
 		}
 #elif _WIN32		
@@ -136,7 +136,6 @@ namespace GameKeeper
 		}
 		this->mRuningCoroutine = logicCoroutine;
 #endif
-		
 		if (logicCoroutine->mState == CorState::Ready)
 		{
 #ifdef __COROUTINE_ASM__
@@ -172,7 +171,6 @@ namespace GameKeeper
 				const std::string & data = logicCoroutine->mStack;
 				memcpy(logicCoroutine->mCorContext, data.c_str(), data.size());
 			}
-
 			from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
 #elif _WIN32
 			SwitchToFiber(logicCoroutine->mContextStack);

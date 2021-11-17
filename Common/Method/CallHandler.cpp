@@ -43,10 +43,16 @@ namespace GameKeeper
     }
 
     CppCallHandler::CppCallHandler(int method)
-		:CallHandler(method)
+		:CallHandler(method), mMessage(nullptr)
     {		
         this->mCoroutineId = 0;
-		this->mScheduler = App::Get().GetCorComponent();
+		this->mCorComponent = App::Get().GetCorComponent();
+        this->mCoroutineId = this->mCorComponent->GetCurrentCorId();
+    }
+
+    CppCallHandler::~CppCallHandler() noexcept
+    {
+        GKDebugError("destory handler id = " << this->mCoroutineId);
     }
 
     void CppCallHandler::Invoke(const com::Rpc_Response & response)
@@ -54,24 +60,26 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
+            std::string str1 = response.data().type_url();
+            std::string str2 = this->mMessage->GetTypeName();
 			if (response.has_data() && !response.data().UnpackTo(this->mMessage))
 			{
 				this->mCode = XCode::ParseMessageError;
 			}
         }
-        this->mScheduler->Resume(mCoroutineId);
+        this->mCorComponent->Resume(mCoroutineId);
     }
 
     XCode CppCallHandler::StartCall()
     {    
-        this->mScheduler->YieldReturn(this->mCoroutineId);
+        this->mCorComponent->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }
 
     XCode CppCallHandler::StartCall(google::protobuf::Message &message)
     {
         this->mMessage = &message;
-        this->mScheduler->YieldReturn(this->mCoroutineId);
+        this->mCorComponent->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }
 }// namespace GameKeeper

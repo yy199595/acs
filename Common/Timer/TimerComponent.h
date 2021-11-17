@@ -14,7 +14,7 @@ namespace GameKeeper
         ~TimerComponent() override = default;
 
     public:
-        bool RemoveTimer(long long id);
+        bool RemoveTimer(unsigned int id);
 
         bool AddTimer(TimerBase * timer);
 
@@ -27,7 +27,7 @@ namespace GameKeeper
 		}
 		bool AddTimer(long long ms, StaticMethod * func);
 
-        TimerBase * GetTimer(long long id);
+        TimerBase * GetTimer(unsigned int id);
 	private:
 		
 
@@ -54,9 +54,9 @@ namespace GameKeeper
     private:
         long long mNextUpdateTime;
         std::queue<TimerBase *> mTimers;
-        NumberBuilder<long long> mTimerIdPool;
+        NumberBuilder<unsigned int> mTimerIdPool;
         std::vector<TimeWheelLayer *> mTimerLayers;
-        std::unordered_map<long long, TimerBase *> mTimerMap;//所有timer的列表
+        std::unordered_map<unsigned int, TimerBase *> mTimerMap;//所有timer的列表
     };
 
     template<typename T, typename... Args>

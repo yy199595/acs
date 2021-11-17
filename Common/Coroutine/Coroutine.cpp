@@ -11,7 +11,7 @@ namespace GameKeeper
 		this->mCoroutineId = 0;	
 #ifdef __COROUTINE_ASM__
 		this->mFunction = nullptr;
-		this->mCorContext = nullptr;		
+		this->mCorContext = nullptr;
 #elif _WIN32
 		this->mContextStack = nullptr;
 #endif

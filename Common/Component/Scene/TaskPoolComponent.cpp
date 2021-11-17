@@ -32,21 +32,12 @@ namespace GameKeeper
             taskThread->Start();
         }
 
-
         return true;
     }
 
     void TaskPoolComponent::Start()
     {
-//		for (auto thread : this->mNetThreads)
-//		{
-//			thread->Start();
-//		}
-//
-//		for (auto thread : mThreadArray)
-//		{
-//			thread->Start();
-//		}
+
     }
 
 	NetWorkThread & TaskPoolComponent::GetNetThread()

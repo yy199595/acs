@@ -21,7 +21,7 @@ namespace GameKeeper
     class IThread
     {
     public:
-        IThread(TaskPoolComponent *taskComponent);
+        explicit IThread(TaskPoolComponent *taskComponent);
 
 		virtual ~IThread() = default;
 
@@ -51,7 +51,7 @@ namespace GameKeeper
     class TaskThread : public IThread
     {
     public:
-        TaskThread(TaskPoolComponent * taskComponent);
+        explicit TaskThread(TaskPoolComponent * taskComponent);
 
     public:
 		int Start() final;
@@ -74,7 +74,7 @@ namespace GameKeeper
     class NetWorkThread : public IThread
     {
     public:
-        NetWorkThread(TaskPoolComponent * taskComponent);
+        explicit NetWorkThread(TaskPoolComponent * taskComponent);
     public:
 		int Start();
 		void AddTask(StaticMethod * task);

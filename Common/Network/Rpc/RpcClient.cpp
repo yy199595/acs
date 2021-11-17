@@ -116,8 +116,8 @@ namespace GameKeeper
 			asio::error_code err;
 			this->mSocketProxy->GetSocket().close(err);
 		}
-		NetWorkThread & nThread = this->mSocketProxy->GetThread();
-		nThread.AddTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
+        MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+        taskScheduler.AddMainTask(&RpcComponent::OnCloseSession, this->mTcpComponent, this, code);
 	}
 
 	void RpcClient::ReadMessageBody(unsigned int allSize, int type)

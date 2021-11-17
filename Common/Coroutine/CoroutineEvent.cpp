@@ -32,7 +32,7 @@ namespace GameKeeper
             this->mNumPool.Push(id);
             this->mCorMap.erase(iter);
         }
-        //delete coroutine;
+        delete coroutine;
 	}
 	Coroutine * CoroutinePool::Get(unsigned int id)
 	{

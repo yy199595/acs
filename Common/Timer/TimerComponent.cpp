@@ -25,15 +25,8 @@ namespace GameKeeper
         {
             return false;
         }
-
-        long long id = timer->GetTimerId();
-        auto iter = this->mTimerMap.find(id);
-        if (iter == this->mTimerMap.end())
-        {
-            this->mTimerMap.emplace(id, timer);
-            return this->AddTimerToWheel(timer);
-        }
-        return false;
+        timer->mTimerId = this->mTimerIdPool.Pop();
+        return this->AddTimerToWheel(timer);
     }
 
     bool TimerComponent::AddTimer(long long ms, StaticMethod * func)
@@ -47,7 +40,7 @@ namespace GameKeeper
         return this->AddTimer(new DelayTimer(ms, func));
     }
 
-    bool TimerComponent::RemoveTimer(long long id)
+    bool TimerComponent::RemoveTimer(unsigned int id)
     {
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
@@ -59,7 +52,7 @@ namespace GameKeeper
         return false;
     }
 
-    TimerBase * TimerComponent::GetTimer(long long id)
+    TimerBase * TimerComponent::GetTimer(unsigned int id)
     {
         auto iter = this->mTimerMap.find(id);
         return iter != this->mTimerMap.end() ? iter->second : nullptr;
@@ -111,10 +104,10 @@ namespace GameKeeper
         if (iter != this->mTimerMap.end())
         {
             TimerBase * timer = iter->second;
+            this->mTimerMap.erase(iter);
             if(timer->Invoke())
             {
                 delete timer;
-                this->mTimerMap.erase(iter);
                 return true;
             }
             return this->AddTimerToWheel(timer);
@@ -124,21 +117,17 @@ namespace GameKeeper
 
     bool TimerComponent::AddTimerToWheel(TimerBase * timer)
     {
-        auto iter = this->mTimerMap.find(timer->GetTimerId());
-        if (iter == this->mTimerMap.end())
-        {
-            GKDebugError("add timer not exist : " << timer->GetTimerId());
-            return false;
-        }
         long long nowTime = TimeHelper::GetMilTimestamp();
         int tick = (timer->GetTriggerTime() - nowTime) / this->TimerPrecision;
         for (auto timerLayer : this->mTimerLayers)
         {
             if (timerLayer->AddTimer(tick, timer))
             {
+                this->mTimerMap.emplace(timer->mTimerId, timer);
                 return true;
             }
         }
+        delete timer;
         GKDebugError("add timer " << timer->GetTimerId() << " failure");
         return false;
     }
