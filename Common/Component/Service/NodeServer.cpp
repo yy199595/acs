@@ -64,7 +64,7 @@ namespace GameKeeper
             if (code != XCode::Successful)
             {
                 GKDebugCode(code);
-                corComponent->Sleep(3000);
+                //corComponent->Sleep(3000);
                 GKDebugError("register local service node fail " << code);
             }
         }

@@ -116,6 +116,7 @@ namespace GameKeeper
 				return false;
 			}
 		}
+        
 		this->mCorComponent->StartCoroutine(&App::StartComponent, this);
 		return true;
 	}

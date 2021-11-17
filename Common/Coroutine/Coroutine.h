@@ -22,6 +22,7 @@ namespace GameKeeper
         ~Coroutine();
     public:
         size_t mStackSize;
+        unsigned int mGroupId;
 		StaticMethod * mFunction;
 #ifdef __COROUTINE_ASM__
 		int sid;

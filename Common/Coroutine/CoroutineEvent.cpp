@@ -29,7 +29,7 @@ namespace GameKeeper
         auto iter = this->mCorMap.find(id);
         if(iter != this->mCorMap.end())
         {
-            this->mNumPool.Push(id);
+            //this->mNumPool.Push(id);
             this->mCorMap.erase(iter);
         }
         delete coroutine;
@@ -45,42 +45,36 @@ namespace GameKeeper
 {
 	
 	CoroutineGroup::CoroutineGroup(CoroutineComponent * cor)
-	{
-		this->mIsYield = false;
-		this->mCorComponent = cor;
-		this->mCoroutineId = cor->GetCurrentCorId();
-	}
+    {
+        this->mCount = 0;
+        this->mCorComponent = cor;
+        this->mCoroutineId = cor->GetCurrentCorId();
+    }
 
 	bool CoroutineGroup::Add(unsigned int id)
-	{
-		if (!this->mIsYield)
-		{
-			this->mCoroutines.insert(id);
-			return true;
-		}
-		return false;
+    {
+        Coroutine *coroutine = this->mCorComponent->GetCoroutine(id);
+        if (coroutine == nullptr)
+        {
+            return false;
+        }
+        this->mCount++;
+        coroutine->mGroupId = this->mCoroutineId;
+        return true;
 	}
-	bool CoroutineGroup::Remove(unsigned int id)
-	{
-		auto iter = this->mCoroutines.find(id);
-		if (iter == this->mCoroutines.end())
-		{
-			return false;
-		}
-		this->mCoroutines.erase(iter);
-		if (this->mCoroutines.empty())
-		{
-			this->mCorComponent->Resume(this->mCoroutineId);
-			return true;
-		}
-		return false;
-	}
+	bool CoroutineGroup::SubCount()
+    {
+        this->mCount--;
+        if(this->mCount == 0)
+        {
+            this->mCorComponent->Resume(this->mCoroutineId);
+            return true;
+        }
+        return false;
+    }
+
 	void CoroutineGroup::AwaitAll()
-	{
-		if (!this->mIsYield)
-		{
-			this->mIsYield = true;
-			this->mCorComponent->YieldReturn();
-		}
-	}
+    {
+        this->mCorComponent->YieldReturn();
+    }
 }

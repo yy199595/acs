@@ -51,13 +51,13 @@ namespace GameKeeper
 	public:
 		explicit CoroutineGroup(CoroutineComponent *);
 	public:
+        bool SubCount();
+        void AwaitAll();
 		bool Add(unsigned int id);
-		bool Remove(unsigned int id);
-		void AwaitAll();
+        unsigned int GetGroupId() const { return this->mCoroutineId;}
 	private:
-		bool mIsYield;
+        unsigned int mCount;
 		unsigned int mCoroutineId;
 		CoroutineComponent * mCorComponent;
-		std::set<unsigned int> mCoroutines;
 	};
 }

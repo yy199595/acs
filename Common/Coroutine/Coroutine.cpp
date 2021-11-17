@@ -7,6 +7,7 @@ namespace GameKeeper
 {
 	Coroutine::Coroutine()
 	{
+        this->mGroupId = 0;
 		this->mStackSize = 0;
 		this->mCoroutineId = 0;	
 #ifdef __COROUTINE_ASM__

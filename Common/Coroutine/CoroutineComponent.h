@@ -90,13 +90,12 @@ namespace GameKeeper
 		Coroutine * mMainCoroutine;
 		unsigned int mCurrentCorId;
 #ifdef __COROUTINE_ASM__
-		Stack mSharedStack[8];
-		Coroutine * mRuningCoroutine;
+		Stack mSharedStack;
 #else
 		char * mTop;
 		char mSharedStack[STACK_SIZE];
 #endif
 		std::queue<unsigned int> mResumeCors;
-		std::list<CoroutineGroup *> mCoroutineGroups;
+        std::unordered_map<unsigned int, CoroutineGroup *> mCoroutineGroups;
 	};
 }
