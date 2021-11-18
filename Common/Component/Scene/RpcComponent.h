@@ -27,7 +27,7 @@ namespace GameKeeper
 	public:
         RpcClient * GetRpcSession(long long id);
         RpcConnector * GetLocalSession(long long id);
-        long long NewSession(const std::string &name, const std::string & ip, unsigned short port);
+        RpcConnector * NewSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
 		bool Awake() override;
 		void OnDestory() override;

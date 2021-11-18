@@ -7,7 +7,7 @@ LuaFunction::LuaFunction(lua_State *luaEnv, int ref)
     this->ref = ref;
 }
 
-LuaFunction *LuaFunction::Create(lua_State *luaEnv, const std::string name)
+LuaFunction *LuaFunction::Create(lua_State *luaEnv, const std::string & name)
 {
     lua_getglobal(luaEnv, name.c_str());
     if (lua_isfunction(luaEnv, -1))
@@ -18,7 +18,7 @@ LuaFunction *LuaFunction::Create(lua_State *luaEnv, const std::string name)
     return nullptr;
 }
 
-LuaFunction *LuaFunction::Create(lua_State *luaEnv, const std::string tabName, const std::string name)
+LuaFunction *LuaFunction::Create(lua_State *luaEnv, const std::string & tabName, const std::string & name)
 {
     lua_getglobal(luaEnv, tabName.c_str());
     if (lua_istable(luaEnv, -1))

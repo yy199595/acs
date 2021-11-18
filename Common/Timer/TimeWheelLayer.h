@@ -13,9 +13,9 @@ namespace GameKeeper
         ~TimeWheelLayer();
 
     public:
-        bool AddTimer(int tick, TimerBase * timer);
+        bool AddTimer(int tick, unsigned int timer);
 
-        bool MoveIndex(std::queue<TimerBase *> &timers);
+        bool MoveIndex(std::queue<unsigned int> &timers);
 
     private:
         const int mLayerId;
@@ -25,6 +25,6 @@ namespace GameKeeper
 
     private:
         size_t mCurIndex;
-        std::vector<std::queue<TimerBase *>> mTimerSlot;
+        std::vector<std::queue<unsigned int>> mTimerSlot;
     };
 }

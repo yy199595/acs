@@ -17,7 +17,6 @@ namespace GameKeeper
         GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
         GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<RpcProtoComponent>());
         GKAssertRet_F(this->mResponseComponent = App::Get().GetComponent<RpcResponseComponent>());
-        this->mCorId = this->mCorComponent->StartCoroutine(&RpcNodeProxy::LoopSendMessage, this);
 	}
 
 	bool RpcNodeProxy::AddService(const std::string &service)
@@ -53,8 +52,10 @@ namespace GameKeeper
             this->mServiceArray.insert(name);
         }
         this->mNodeInfo.CopyFrom(nodeInfo);
-        this->mIsConnected = socketId == 0;
-        this->mCorComponent->Resume(this->mCorId);
+        if(this->mSocketId != 0)
+        {
+            this->OnNodeSessionRefresh();
+        }
         return true;
     }
 
@@ -62,60 +63,42 @@ namespace GameKeeper
     {
         if(this->mSocketId == 0)
         {
-           this->mSocketId = this->mRpcComponent->NewSession(this->mNodeName, this->mNodeIp, this->mNodePort);
-           auto localRpcSession = this->mRpcComponent->GetLocalSession(this->mSocketId);
-           if(localRpcSession != nullptr && localRpcSession->StartAsyncConnect())
+           auto rpcClient = this->mRpcComponent->NewSession(this->mNodeName, this->mNodeIp, this->mNodePort);
+           if(rpcClient != nullptr)
            {
-               GKDebugError("connect " << this->mNodeName << " successful");
-               return localRpcSession;
+               this->mSocketId = rpcClient->GetSocketProxy().GetSocketId();
+               rpcClient->StartConnect(NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this));
            }
-            return nullptr;
-        }
-        auto rpcClient = this->mRpcComponent->GetRpcSession(this->mSocketId);
-        if(rpcClient != nullptr && rpcClient->IsOpen())
-        {
             return rpcClient;
         }
-
-        if(this->mIsConnected)
-        {
-            auto localRpcSession = this->mRpcComponent->GetLocalSession(this->mSocketId);
-            if(localRpcSession != nullptr && localRpcSession->StartAsyncConnect())
-            {
-                return localRpcSession;
-            }
-        }
-        return nullptr;
+        return this->mRpcComponent->GetRpcSession(this->mSocketId);
     }
 
-    void RpcNodeProxy::LoopSendMessage()
+    void RpcNodeProxy::OnNodeSessionRefresh()
     {
-        while (!this->mIsClose)
+        RpcClient *tcpLocalSession = this->GetTcpSession();
+        if(!tcpLocalSession->IsOpen())
         {
-            if (this->mWaitSendQueue.empty())
-            {
-                this->mCorComponent->YieldReturn();
-            }
-            RpcClient *tcpLocalSession = this->GetTcpSession();
-            while(tcpLocalSession == nullptr)
-            {
-                this->mCorComponent->Sleep(3000);
-                tcpLocalSession = this->GetTcpSession();
-            }
-            for (int index = 0; index < 100 && !this->mWaitSendQueue.empty(); index++)
-            {
-                auto message = this->mWaitSendQueue.front();
-                tcpLocalSession->StartSendProtocol(RPC_TYPE_REQUEST, message);
-                this->mWaitSendQueue.pop();
-            }
+            GKDebugError(this->mNodeName << " socket error");
+            return;
         }
-        delete this;
+        while(!this->mWaitSendQueue.empty())
+        {
+            const Message * message = this->mWaitSendQueue.front();
+            tcpLocalSession->StartSendProtocol(TYPE_REQUEST, message);
+            this->mWaitSendQueue.pop();
+        }
     }
 
     void RpcNodeProxy::Destory()
     {
-        this->mIsClose = true;
-        this->mCorComponent->Resume(this->mCorId);
+        size_t size = this->mWaitSendQueue.size();
+        this->mRpcComponent->CloseSession(this->mSocketId);
+        if(size > 0)
+        {
+            GKDebugError("send queue has " << size << " data");
+        }
+        delete this;
     }
 
     bool RpcNodeProxy::HasService(const std::string &service)
@@ -252,9 +235,23 @@ namespace GameKeeper
         return cppCallHandler.StartCall(response);
     }
 
-    void RpcNodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)
+    bool RpcNodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)
     {
+        RpcClient * rpcClient = this->GetTcpSession();
+        if(rpcClient != nullptr || rpcClient->IsOpen())
+        {
+            rpcClient->StartSendProtocol(TYPE_REQUEST, requestData);
+            return true;
+        }
+        if(rpcClient->GetSocketType() == SocketType::LocalSocket)
+        {
+            auto rpcConnector = (RpcConnector*)rpcClient;
+            if(!rpcConnector->IsConnected())
+            {
+                rpcConnector->StartConnect(NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this));
+            }
+        }
         this->mWaitSendQueue.push(requestData);
-        this->mCorComponent->Resume(this->mCorId);
+        return false;
     }
 }// namespace GameKeeper

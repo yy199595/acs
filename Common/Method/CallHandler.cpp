@@ -46,8 +46,7 @@ namespace GameKeeper
 		:CallHandler(method), mMessage(nullptr)
     {		
         this->mCoroutineId = 0;
-		this->mCorComponent = App::Get().GetCorComponent();
-        this->mCoroutineId = this->mCorComponent->GetCurrentCorId();
+		this->mCorComponent = nullptr;
     }
 
     CppCallHandler::~CppCallHandler() noexcept
@@ -71,7 +70,8 @@ namespace GameKeeper
     }
 
     XCode CppCallHandler::StartCall()
-    {    
+    {
+        this->mCorComponent = App::Get().GetCorComponent();
         this->mCorComponent->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }
@@ -79,6 +79,7 @@ namespace GameKeeper
     XCode CppCallHandler::StartCall(google::protobuf::Message &message)
     {
         this->mMessage = &message;
+        this->mCorComponent = App::Get().GetCorComponent();
         this->mCorComponent->YieldReturn(this->mCoroutineId);
         return this->mCode;
     }

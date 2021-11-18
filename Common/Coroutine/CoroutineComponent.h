@@ -2,6 +2,7 @@
 
 #include<list>
 #include<queue>
+#include<stack>
 #include<memory>
 #include<tuple>
 #include<functional>
@@ -30,18 +31,12 @@ namespace GameKeeper
 
 		void Sleep(long long ms);
 
-		void YieldNextLoop();
-
-		void YieldNextFrame();
-
 		void Resume(unsigned int id);
 
 		CoroutineGroup * NewCoroutineGroup();
 
 	protected:
 		bool Awake() final;
-
-		void Start() final;
 
 		void OnSystemUpdate() final;
 
@@ -55,13 +50,13 @@ namespace GameKeeper
 
 		void Destory(Coroutine * coroutine);
 
-		Coroutine *GetCoroutine();
-
 		Coroutine *GetCoroutine(unsigned int id);
+
+        Coroutine * GetCurCoroutine();
 
 		unsigned int GetCurrentCorId() const
 		{
-			return this->mCurrentCorId;
+            this->mCurrentCorId;
 		}
 
 		bool IsInMainCoroutine() const
@@ -74,28 +69,28 @@ namespace GameKeeper
 			return this->mCurrentCorId != 0;
 		}
 	private:
-		void Loop();
-		void ResumeCoroutine();
+		void ResumeCoroutine(unsigned int id);
 #ifdef __COROUTINE_ASM__
 		void SaveStack(unsigned int id);
 #else
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
+        std::stack<unsigned int> mCorStacks;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
 		std::queue<unsigned int> mLastQueues2;
 	private:
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;
-		unsigned int mCurrentCorId;
+        unsigned int mCurrentCorId;
 #ifdef __COROUTINE_ASM__
-		Stack mSharedStack;
+		Stack mSharedStack[SHARED_STACK_NUM];
 #else
 		char * mTop;
 		char mSharedStack[STACK_SIZE];
 #endif
-		std::queue<unsigned int> mResumeCors;
+		std::queue<unsigned int> mResumeCoroutines;
         std::unordered_map<unsigned int, CoroutineGroup *> mCoroutineGroups;
 	};
 }

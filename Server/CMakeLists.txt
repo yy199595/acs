@@ -55,14 +55,15 @@ if(MSVC)
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 
-    
+    target_compile_definitions(Server PRIVATE WIN32_LEAN_AND_MEAN)
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql jemalloc)
    
 else()
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
-    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl jemalloc)
+    TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl jemalloc)
 endif()
+target_compile_definitions(Server PRIVATE ASIO_STANDALONE)
 target_compile_definitions(Server PRIVATE __DEBUG__)
 target_compile_definitions(Server PRIVATE __COROUTINE_ASM__)
 #target_compile_definitions(Server PRIVATE __THREAD_LOCK__)

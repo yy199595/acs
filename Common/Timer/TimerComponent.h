@@ -40,7 +40,7 @@ namespace GameKeeper
 
         void OnSystemUpdate() final;//处理系统事件
 
-        bool InvokeTimer(long long id);
+        bool InvokeTimer(unsigned int id);
 
         bool AddTimerToWheel(TimerBase * timer);
 
@@ -53,7 +53,7 @@ namespace GameKeeper
 
     private:
         long long mNextUpdateTime;
-        std::queue<TimerBase *> mTimers;
+        std::queue<unsigned int> mTimers;
         NumberBuilder<unsigned int> mTimerIdPool;
         std::vector<TimeWheelLayer *> mTimerLayers;
         std::unordered_map<unsigned int, TimerBase *> mTimerMap;//所有timer的列表

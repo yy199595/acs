@@ -1,12 +1,12 @@
 ﻿
-#include "App.h"
-#include <Scene/RpcResponseComponent.h>
-#include <Scene/RpcProtoComponent.h>
-#include <Component/Scene/RpcComponent.h>
-#include <Service/NodeProxyComponent.h>
-#include <Component/Scene/RpcRequestComponent.h>
-#include <Scene/TaskPoolComponent.h>
-#include<Util/DirectoryHelper.h>
+#include"App.h"
+#include"Scene/RpcResponseComponent.h"
+#include"Scene/RpcProtoComponent.h"
+#include"Component/Scene/RpcComponent.h"
+#include"Service/NodeProxyComponent.h"
+#include"Scene/RpcRequestComponent.h"
+#include"Scene/TaskPoolComponent.h"
+#include"Util/DirectoryHelper.h"
 using namespace GameKeeper;
 using namespace std::chrono;
 
@@ -99,7 +99,6 @@ namespace GameKeeper
 
 	bool App::InitComponent()
 	{
-
 		// 初始化scene组件
 		this->GetComponents(this->mSceneComponents);
 		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
@@ -116,7 +115,6 @@ namespace GameKeeper
 				return false;
 			}
 		}
-        
 		this->mCorComponent->StartCoroutine(&App::StartComponent, this);
 		return true;
 	}
@@ -150,30 +148,47 @@ namespace GameKeeper
 
 	void App::StartComponent()
 	{
-		for (int index = 0; index < this->mSceneComponents.size(); index++)
-		{
-			Component *component = this->mSceneComponents[index];
-			if (component != nullptr)
-			{
-				float process = index / (float)this->mSceneComponents.size();
-				GKDebugInfo("[" << process * 100 << "%]"
-					<< " start component " << component->GetTypeName());
-				component->Start();
-			}
-		}
-		this->mIsInitComplate = true;
-		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-		GKDebugLog("start all scene component successful ......");
-		long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
+        auto coroutineGroup1 = this->mCorComponent->NewCoroutineGroup();
+        for(Component * component : this->mSceneComponents)
+        {
+            GKDebugFatal("start component " << component->GetTypeName());
+            coroutineGroup1->Add(this->mCorComponent->StartCoroutine(&Component::Start, component));
+        }
 
-		for (Component *component : this->mSceneComponents)
-		{
-			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
-			{
-				loadComponent->OnLodaData();
-				GKDebugLog("load " << component->GetTypeName() << " data");
-			}
-		}
+        for (Component *component : this->mSceneComponents)
+        {
+            if (auto loadComponent = dynamic_cast<ILoadData *>(component))
+            {
+                coroutineGroup1->Add(this->mCorComponent->StartCoroutine(&ILoadData::OnLodaData, loadComponent));
+            }
+        }
+        coroutineGroup1->AwaitAll();
+
+//		for (int index = 0; index < this->mSceneComponents.size(); index++)
+//		{
+//			Component *component = this->mSceneComponents[index];
+//			if (component != nullptr)
+//			{
+//				float process = index / (float)this->mSceneComponents.size();
+//				GKDebugInfo("[" << process * 100 << "%]"
+//					<< " start component " << component->GetTypeName());
+//				component->Start();
+//			}
+//		}
+//		this->mIsInitComplate = true;
+//		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
+//		GKDebugLog("start all scene component successful ......");
+//
+//
+//		for (Component *component : this->mSceneComponents)
+//		{
+//			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
+//			{
+//				loadComponent->OnLodaData();
+//				GKDebugLog("load " << component->GetTypeName() << " data");
+//			}
+//		}
+        long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 		GKDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}
 

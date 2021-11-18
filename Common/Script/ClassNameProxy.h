@@ -21,10 +21,10 @@ namespace ClassNameProxy
     inline void OnClassRegister(const std::string name)
     {
         size_t hash = typeid(T).hash_code();
-        ClassNameMapIter iter = classNameMap.find(hash);
+        auto iter = classNameMap.find(hash);
         if (iter == classNameMap.end())
         {
-            ClassRegisterInfo *info = new ClassRegisterInfo();
+            auto info = new ClassRegisterInfo();
             info->mName = name;
             classNameMap.emplace(hash, info);
         }
@@ -34,7 +34,7 @@ namespace ClassNameProxy
     inline const char *GetLuaClassName()
     {
         size_t hash = typeid(T).hash_code();
-        ClassNameMapIter iter = classNameMap.find(hash);
+        auto iter = classNameMap.find(hash);
         if (iter != classNameMap.end())
         {
             ClassRegisterInfo *info = iter->second;
@@ -48,12 +48,12 @@ namespace ClassNameProxy
     inline bool OnPushParent()
     {
         size_t hash = typeid(T).hash_code();
-        ClassNameMapIter iter = classNameMap.find(hash);
+        auto iter = classNameMap.find(hash);
         if (iter != classNameMap.end())
         {
             ClassRegisterInfo *info = iter->second;
             const char *name = GetLuaClassName<BC>();
-            info->mParentNames.push_back(name);
+            info->mParentNames.emplace_back(name);
             return true;
         }
         return false;
@@ -63,7 +63,7 @@ namespace ClassNameProxy
     inline bool HasRegisterClass()
     {
         size_t hash = typeid(T).hash_code();
-        ClassNameMapIter iter = classNameMap.find(hash);
+        auto iter = classNameMap.find(hash);
         return iter != classNameMap.end();
     }
 
@@ -71,7 +71,7 @@ namespace ClassNameProxy
     inline std::vector<std::string> *GetParents()
     {
         size_t hash = typeid(T).hash_code();
-        ClassNameMapIter iter = classNameMap.find(hash);
+        auto iter = classNameMap.find(hash);
         if (iter != classNameMap.end())
         {
             ClassRegisterInfo *info = iter->second;

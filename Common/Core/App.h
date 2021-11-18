@@ -1,17 +1,13 @@
 ﻿#pragma once
 
-#ifndef ASIO_STANDALONE
-#define ASIO_STANDALONE
-#endif
-
-#include <Define/CommonTypeDef.h>
-#include <Global/ServerConfig.h>
-#include <Util/TimeHelper.h>
-#include <Object/GameObject.h>
-#include <Global/ServerPath.h>
-#include <Timer/TimerComponent.h>
-#include <Thread/TaskThread.h>
-#include <Coroutine/CoroutineComponent.h>
+#include"Define/CommonTypeDef.h"
+#include"Global/ServerConfig.h"
+#include"Util/TimeHelper.h"
+#include"Object/GameObject.h"
+#include"Global/ServerPath.h"
+#include"Timer/TimerComponent.h"
+#include"Thread/TaskThread.h"
+#include"Coroutine/CoroutineComponent.h"
 using namespace std;
 using namespace asio::ip;
 

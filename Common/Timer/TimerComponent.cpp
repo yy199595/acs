@@ -79,9 +79,20 @@ namespace GameKeeper
             bool res = timerLayer->MoveIndex(this->mTimers);
             while (!this->mTimers.empty())
             {
-                auto timer = this->mTimers.front();
+                auto id = this->mTimers.front();
+                auto iter = this->mTimerMap.find(id);
+                if (iter != this->mTimerMap.end())
+                {
+                    auto timer = iter->second;
+                    this->mTimerMap.erase(iter);
+                    if(timer->Invoke())
+                    {
+                        delete timer;
+                        continue;
+                    }
+                    this->AddTimerToWheel(timer);
+                }
                 this->mTimers.pop();
-                this->InvokeTimer(timer->GetTimerId());
             }
             for (size_t i = 1; i < this->mTimerLayers.size() && res; i++)
             {
@@ -90,15 +101,20 @@ namespace GameKeeper
 
                 while (!this->mTimers.empty())
                 {
-                    auto timer = this->mTimers.front();
+                    auto id = this->mTimers.front();
+                    auto timer = this->GetTimer(id);
+                    if(timer != nullptr)
+                    {
+                        this->AddTimerToWheel(timer);
+                    }
                     this->mTimers.pop();
-                    this->AddTimerToWheel(timer);
+
                 }
             }
         }
     }
 
-    bool TimerComponent::InvokeTimer(long long id)
+    bool TimerComponent::InvokeTimer(unsigned int id)
     {
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
@@ -121,7 +137,7 @@ namespace GameKeeper
         int tick = (timer->GetTriggerTime() - nowTime) / this->TimerPrecision;
         for (auto timerLayer : this->mTimerLayers)
         {
-            if (timerLayer->AddTimer(tick, timer))
+            if (timerLayer->AddTimer(tick, timer->mTimerId))
             {
                 this->mTimerMap.emplace(timer->mTimerId, timer);
                 return true;

@@ -40,7 +40,6 @@ else()
 	SET(AsmFiles ${ContextPath}/context.S)
 endif()
 
-
 macro(source_group_by_dir dir source_files)
     if(MSVC)
         set(sgbd_cur_dir ${dir})

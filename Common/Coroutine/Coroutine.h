@@ -34,7 +34,7 @@ namespace GameKeeper
 #elif _WIN32
 		void * mContextStack;
 #endif
-        CorState mState;		
+        CorState mState;
         unsigned int mCoroutineId;
     };
 

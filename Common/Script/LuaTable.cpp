@@ -22,7 +22,7 @@ LuaTable::~LuaTable()
     luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->ref);
 }
 
-LuaTable *LuaTable::Create(lua_State *luaEnv, const std::string name)
+LuaTable *LuaTable::Create(lua_State *luaEnv, const std::string & name)
 {
     lua_getglobal(luaEnv, name.c_str());
     if (lua_istable(luaEnv, -1))

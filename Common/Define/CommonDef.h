@@ -32,8 +32,8 @@ inline std::string FromatFileLine(const char * file, const int line)
 	size_t size = sprintf_s(buffer, "%s:%d", fileName, line);
 #else
 	size_t size = sprintf(buffer, "%s:%d", fileName, line);
-#endif // _MSG
-	return std::string(buffer, size);	
+#endif // _MSC_VER
+	return {buffer, size};
 }
 
 #define GK_LOG(type, msg) {std::stringstream ss; ss << msg; GameKeeper::LogHelper::AddLog(type, ss.str());}

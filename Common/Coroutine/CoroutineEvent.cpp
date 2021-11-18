@@ -18,7 +18,7 @@ namespace GameKeeper
 		 auto coroutine = new Coroutine();
          coroutine->mCoroutineId = this->mNumPool.Pop();
 #ifdef __COROUTINE_ASM__
-        coroutine->sid = coroutine->mCoroutineId & 7;
+        coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
 #endif
         this->mCorMap.emplace(coroutine->mCoroutineId, coroutine);
 		return coroutine;
@@ -65,6 +65,7 @@ namespace GameKeeper
 	bool CoroutineGroup::SubCount()
     {
         this->mCount--;
+        GKDebugLog("await " << this->mCount << " coroutine");
         if(this->mCount == 0)
         {
             this->mCorComponent->Resume(this->mCoroutineId);
@@ -75,6 +76,10 @@ namespace GameKeeper
 
 	void CoroutineGroup::AwaitAll()
     {
-        this->mCorComponent->YieldReturn();
+        if(this->mCount > 0)
+        {
+            GKDebugInfo("await " << this->mCount << " coroutine");
+            this->mCorComponent->YieldReturn();
+        }
     }
 }

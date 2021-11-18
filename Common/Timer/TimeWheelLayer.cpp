@@ -8,14 +8,14 @@ namespace GameKeeper
         this->mCurIndex = 0;
         for (int index = 0; index < count; index++)
         {
-            std::queue<TimerBase *> timers;
+            std::queue<unsigned int> timers;
             this->mTimerSlot.push_back(timers);
         }
     }
 
-    bool TimeWheelLayer::AddTimer(int tick, TimerBase * timer)
+    bool TimeWheelLayer::AddTimer(int tick, unsigned int timer)
     {
-        if (timer == nullptr)
+        if (timer == 0)
         {
             return false;
         }
@@ -39,7 +39,7 @@ namespace GameKeeper
         return false;
     }
 
-    bool TimeWheelLayer::MoveIndex(std::queue<TimerBase *> &timers)
+    bool TimeWheelLayer::MoveIndex(std::queue<unsigned int> &timers)
     {
         timers = this->mTimerSlot[this->mCurIndex];
         if ((++this->mCurIndex) >= this->mMaxCount)

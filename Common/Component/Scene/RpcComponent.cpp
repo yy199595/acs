@@ -166,14 +166,16 @@ namespace GameKeeper
         return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
     }
 
-    long long RpcComponent::NewSession(const std::string &name, const std::string &ip,
+     RpcConnector * RpcComponent::NewSession(const std::string &name, const std::string &ip,
                                                      unsigned short port)
 	{
 		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
+
+        auto * socketProxy = new SocketProxy(nThread, name);
 		auto localSession = new RpcConnector(this, ip, port);
-        localSession->SetSocket(new SocketProxy(nThread, name));
-		this->mSessionAdressMap.emplace(localSession->GetSocketProxy().GetSocketId(), localSession);
-		return localSession->GetSocketProxy().GetSocketId();
+        localSession->SetSocket(socketProxy);
+		this->mSessionAdressMap.emplace(socketProxy->GetSocketId(), localSession);
+		return localSession;
 	}
 
     void RpcComponent::OnDestory()

@@ -9,7 +9,7 @@ namespace GameKeeper
 	{
         this->mGroupId = 0;
 		this->mStackSize = 0;
-		this->mCoroutineId = 0;	
+		this->mCoroutineId = 0;
 #ifdef __COROUTINE_ASM__
 		this->mFunction = nullptr;
 		this->mCorContext = nullptr;

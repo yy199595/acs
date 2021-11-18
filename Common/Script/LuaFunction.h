@@ -11,9 +11,9 @@ public:
     ~LuaFunction() { luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->ref); }
 
 public:
-    static LuaFunction *Create(lua_State *luaEnv, const std::string name);
+    static LuaFunction *Create(lua_State *luaEnv, const std::string & name);
 
-    static LuaFunction *Create(lua_State *luaEnv, const std::string tabName, const std::string name);
+    static LuaFunction *Create(lua_State *luaEnv, const std::string & tabName, const std::string & name);
 
 public:
     template<typename Ret>
@@ -27,7 +27,7 @@ public:
     template<typename... Args>
     void Action(Args... args);
 
-    inline int GetFunctionRef() { return this->ref; }
+    inline int GetFunctionRef() const { return this->ref; }
 
 private:
     int ref;

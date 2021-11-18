@@ -13,7 +13,7 @@ public:
     ~LuaTable();
 
 public:
-    static LuaTable *Create(lua_State *luaEnv, const std::string name);
+    static LuaTable *Create(lua_State *luaEnv, const std::string & name);
 
 public:
     template<typename T>

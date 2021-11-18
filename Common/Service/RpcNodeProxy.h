@@ -48,9 +48,9 @@ namespace GameKeeper
         XCode Call(const std::string &method, const Message &request, Message &response);
 
     private:
-        void LoopSendMessage();
+        void OnNodeSessionRefresh();
         class RpcClient *GetTcpSession();
-		void AddRequestDataToQueue(const com::Rpc_Request * message);
+		bool AddRequestDataToQueue(const com::Rpc_Request * message);
 		com::Rpc_Request * CreateRequest(const std::string & method);
     private:
         std::string mNodeIp;
@@ -64,9 +64,7 @@ namespace GameKeeper
 
     private:
         bool mIsClose;
-        bool mIsConnected;
         long long mSocketId;
-        unsigned int mCorId;
         class RpcComponent * mRpcComponent;
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
