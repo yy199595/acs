@@ -76,8 +76,6 @@ void MainEntry(void *manager)
         Coroutine * logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
-
-        this->mCorStacks.push(this->mCurrentCorId);
 #ifdef __COROUTINE_ASM__
 		tb_context_from_t from;
 		Stack & stack = mSharedStack[logicCoroutine->sid];
@@ -237,27 +235,24 @@ void MainEntry(void *manager)
 
 	void CoroutineComponent::Destory(Coroutine * coroutine)
 	{
-		if (!this->mCoroutineGroups.empty())
+		if (coroutine->mGroupId != 0)
 		{
-            unsigned int id = coroutine->mGroupId;
-            if(coroutine->mGroupId != 0)
-            {
-                auto iter = this->mCoroutineGroups.find(coroutine->mGroupId);
-                if(iter != this->mCoroutineGroups.end())
-                {
-                    if(iter->second->SubCount())
-                    {
-                        delete iter->second;
-                        this->mCoroutineGroups.erase(iter);
-                    }
-                }
-            }
+			auto iter = this->mCoroutineGroups.find(coroutine->mGroupId);
+			if (iter != this->mCoroutineGroups.end())
+			{
+				if (iter->second->SubCount())
+				{
+					delete iter->second;
+					this->mCoroutineGroups.erase(iter);
+				}
+			}
 		}
-        this->mCurrentCorId = this->mCorStacks.top();
-        this->mCorStacks.pop();
+
+		this->mCurrentCorId = this->mCorStacks.top();
+		this->mCorStacks.pop();
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
-		
+
 #elif _WIN32
 		SwitchToFiber(this->mMainCoroutine->mContextStack);
 #else

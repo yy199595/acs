@@ -55,7 +55,6 @@ if(MSVC)
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 
-    target_compile_definitions(Server PRIVATE WIN32_LEAN_AND_MEAN)
     ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql jemalloc)
    

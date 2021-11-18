@@ -56,7 +56,7 @@ namespace GameKeeper
 
 		unsigned int GetCurrentCorId() const
 		{
-            this->mCurrentCorId;
+            return this->mCurrentCorId;
 		}
 
 		bool IsInMainCoroutine() const
