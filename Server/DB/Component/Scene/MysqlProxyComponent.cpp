@@ -47,7 +47,7 @@ namespace GameKeeper
 //        }
 
         std::vector<Message *> responses;
-        XCode code3 = this->Invoke("tb_player_account", "select * from tb_player_account ORDER BY UserID", responses);
+        XCode code3 = this->Sort("tb_player_account", "UserID", 10, responses, true);
         if (code3 == XCode::Successful)
         {
             for (const Message *message: responses)
@@ -182,5 +182,14 @@ namespace GameKeeper
         s2s::MysqlOper_Request requestData;
         requestData.mutable_data()->PackFrom(data);
         return proxyNode->Invoke("MysqlService.Delete", requestData);
+    }
+
+    XCode MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count,
+                                    std::vector<Message *> &queryDatas, bool reverse)
+    {
+        std::stringstream sqlCommand;
+        const char * type = !reverse ? "ASC" : "DESC";
+        sqlCommand << "select * from " << tab << " ORDER BY " << field << " " << type << " LIMIT " << count;
+        return this->Invoke(tab, sqlCommand.str(), queryDatas);
     }
 }
