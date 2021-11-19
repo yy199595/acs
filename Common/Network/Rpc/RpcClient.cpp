@@ -122,6 +122,7 @@ namespace GameKeeper
 		if (allSize > TCP_BUFFER_COUNT)
 		{
 			nMessageBuffer = new char[allSize];
+            GKDebugWarning("receive message count = " << allSize);
 		}
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();

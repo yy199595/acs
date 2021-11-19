@@ -1,11 +1,8 @@
 ﻿#include "MysqlService.h"
-#include <Coroutine/CoroutineComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/RpcProtoComponent.h>
 #include <Scene/TaskPoolComponent.h>
 #include <MysqlClient/MyqslTask.h>
 #include <Core/App.h>
-#include <Util/TimeHelper.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
@@ -24,6 +21,7 @@ namespace GameKeeper
 		__add_method(MysqlService::Save);
 		__add_method(MysqlService::Query);
 		__add_method(MysqlService::Delete);
+        __add_method(MysqlService::Invoke);
 		
         return true;
     }
@@ -41,7 +39,7 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-		Message * message = MessagePool::New(request.data());
+		Message * message = MessagePool::NewByData(request.data());
         if (message == nullptr)
         {
 			return XCode::ParseMessageError;
@@ -51,9 +49,6 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-#ifdef _DEBUG
-        GKDebugInfo(sql);
-#endif
         MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
         if (!this->mTaskManager->StartTask(&mysqlTask))
@@ -63,10 +58,6 @@ namespace GameKeeper
 
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
-#ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        GKDebugWarning("add sql use time [" << t / 1000.0f << "s]");
-#endif// _DEBUG
         return mysqlTask.GetErrorCode();
     }
 
@@ -87,9 +78,6 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-#ifdef _DEBUG
-        GKDebugInfo(sql);
-#endif
 		MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
         if (!this->mTaskManager->StartTask(&mysqlTask))
         {
@@ -98,10 +86,6 @@ namespace GameKeeper
 
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
-#ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        GKDebugWarning("save sql use time [" << t / 1000.0f << "s]");
-#endif
         return mysqlTask.GetErrorCode();
     }
 
@@ -117,9 +101,6 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-#ifdef _DEBUG
-        GKDebugInfo(sql);
-#endif
         MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), sql);
 
         if (!this->mTaskManager->StartTask(&mysqlTask))
@@ -128,11 +109,45 @@ namespace GameKeeper
         }
         this->mCorComponent->YieldReturn();
         response.set_errorstr(mysqlTask.GetErrorStr());
-#ifdef _DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        GKDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
-#endif// _DEBUG
         return mysqlTask.GetErrorCode();
+    }
+
+    XCode MysqlService::Invoke(const s2s::MysqlAnyOper_Request &request, s2s::MysqlAnyOper_Response &response)
+    {
+        if(request.sql().empty())
+        {
+            return XCode::CallArgsError;
+        }
+        const SqlTableConfig * sqlTableConfig = this->mMysqlManager->GetTableConfig(request.tab());
+        if(sqlTableConfig == nullptr)
+        {
+            return XCode::CallArgsError;
+        }
+        MyqslTask mysqlTask(this->mMysqlManager->GetDataBaseName(), request.sql());
+        if (!this->mTaskManager->StartTask(&mysqlTask))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
+
+        this->mCorComponent->YieldReturn();
+        XCode code = mysqlTask.GetErrorCode();
+        if (code == XCode::Successful && !mysqlTask.GetQueryDatas().empty())
+        {
+            const std::string & name = sqlTableConfig->mProtobufName;
+            const std::vector<std::string> &jsonArray = mysqlTask.GetQueryDatas();
+            for (const std::string &json : jsonArray)
+            {
+                Message * message = MessagePool::NewByJson(name, json);
+                if(message == nullptr)
+                {
+                    return XCode::JsonCastProtocbufFail;
+                }
+                response.add_querydatas()->PackFrom(*message);
+            }
+            return XCode::Successful;
+        }
+        response.set_errotstr(mysqlTask.GetErrorStr());
+        return code;
     }
 
     XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
@@ -176,10 +191,6 @@ namespace GameKeeper
             return XCode::Successful;
         }
         response.set_errotstr(mysqlTask.GetErrorStr());
-#ifdef SOEASY_DEBUG
-        long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
-        GKDebugWarning("query sql use time [" << t / 1000.0f << "s]");
-#endif
         return code;
     }
 }// namespace GameKeeper

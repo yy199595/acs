@@ -12,8 +12,8 @@ namespace GameKeeper
     public:
         ElapsedTimer() : mStartTime(TimeHelper::GetMilTimestamp()) { }
     public:
-        double GetMs() const;
-        double GetSecond() const;
+        inline double GetMs() const;
+        inline double GetSecond() const;
     private:
         const long long mStartTime;
     };

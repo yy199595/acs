@@ -21,6 +21,7 @@ namespace GameKeeper
 
         XCode Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response);
 
+        XCode Invoke(const s2s::MysqlAnyOper_Request & request, s2s::MysqlAnyOper_Response & response);
     public:
         bool Awake() final;
 

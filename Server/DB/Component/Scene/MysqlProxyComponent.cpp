@@ -2,7 +2,9 @@
 
 #include <Core/App.h>
 #include <Service/RpcNodeProxy.h>
-
+#include"Pool/MessagePool.h"
+#include"Util/StringHelper.h"
+#include "Util/MathHelper.h"
 namespace GameKeeper
 {
     bool MysqlProxyComponent::Awake()
@@ -29,22 +31,32 @@ namespace GameKeeper
 
     void MysqlProxyComponent::OnLodaData()
     {
-        db::UserAccountData userAccountData;
-        userAccountData.set_userid(12345678);
-        userAccountData.set_account("123456@qq.com");
-        userAccountData.set_devicemac("ios_qq");
-        userAccountData.set_token("sadhaihdi2h3ihdisaxnkfjs");
-        userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+//        XCode code0 = this->Invoke("tb_player_account", "delete from tb_player_account");
+//
+//        long long userId = 10000;
+//        for (int index = 0; index < 100; index++)
+//        {
+//            int random = MathHelper::Random<int>(100, 100000);
+//            db::UserAccountData userAccountData;
+//            userAccountData.set_userid(userId + random);
+//            userAccountData.set_account(std::to_string(userId + index) + "@qq.com");
+//            userAccountData.set_devicemac("ios_qq");
+//            userAccountData.set_token(StringHelper::CreateNewToken());
+//            userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+//            XCode code = this->Add(userAccountData);
+//        }
 
-        XCode code = this->Add(userAccountData);
-
-        db::UserAccountData userAccountData2;
-        userAccountData2.set_userid(12345678);
-        userAccountData2.set_account("123456@qq.com");
-
-        XCode code2 = this->Query(userAccountData2, userAccountData2);
-
-        GKDebugLogProtocBuf(userAccountData2);
+        std::vector<Message *> responses;
+        XCode code3 = this->Invoke("tb_player_account", "select * from tb_player_account ORDER BY UserID", responses);
+        if (code3 == XCode::Successful)
+        {
+            for (const Message *message: responses)
+            {
+                std::string json;
+                util::MessageToJsonString(*message, &json);
+                GKDebugWarning(json);
+            }
+        }
     }
 
     void MysqlProxyComponent::OnAddProxyNode(RpcNodeProxy *node)
@@ -92,6 +104,57 @@ namespace GameKeeper
             if (!data.UnpackTo(&queryData))
             {
                 return XCode::ParseMessageError;
+            }
+        }
+        return code;
+    }
+
+    XCode MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
+    {
+        RpcNodeProxy *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        if (proxyNode == nullptr)
+        {
+            return XCode::CallServiceNotFound;
+        }
+        s2s::MysqlAnyOper_Request requestData;
+        s2s::MysqlAnyOper_Response responseData;
+
+        requestData.set_sql(sql);
+        requestData.set_tab(tab);
+        return proxyNode->Call("MysqlService.Invoke", requestData, responseData);
+    }
+
+    XCode MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql,
+                                      std::vector<Message *> &queryDatas)
+    {
+        RpcNodeProxy *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        if (proxyNode == nullptr)
+        {
+            return XCode::CallServiceNotFound;
+        }
+        s2s::MysqlAnyOper_Request requestData;
+        s2s::MysqlAnyOper_Response responseData;
+
+        requestData.set_sql(sql);
+        requestData.set_tab(tab);
+        XCode code = proxyNode->Call("MysqlService.Invoke", requestData, responseData);
+        if (code == XCode::Successful && responseData.querydatas_size() > 0)
+        {
+            for (int index = 0; index < responseData.querydatas_size(); index++)
+            {
+                const Any &any = responseData.querydatas(index);
+                Message *message = MessagePool::New(any);
+                if(message == nullptr)
+                {
+                    return XCode::ParseMessageError;
+                }
+                Message * newMessage = message->New();
+                if(!any.UnpackTo(newMessage))
+                {
+                    delete newMessage;
+                    return XCode::ParseMessageError;
+                }
+                queryDatas.emplace_back(newMessage);
             }
         }
         return code;

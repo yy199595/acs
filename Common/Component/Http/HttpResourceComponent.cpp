@@ -14,7 +14,7 @@ namespace GameKeeper
         this->Add("Files", &HttpResourceComponent::Files, this);
         this->Add("Download", &HttpResourceComponent::Download, this);
 
-        return this->OnLoadConfig();
+        return true;
     }
 
     bool HttpResourceComponent::OnLoadConfig()

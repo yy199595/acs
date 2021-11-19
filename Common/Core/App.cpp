@@ -28,24 +28,15 @@ namespace GameKeeper
 		this->mIsInitComplate = false;
 		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
-		this->mServerName = argc == 1 ? "server" : argv[1];	
-        this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
+		this->mServerName = argc == 1 ? "server" : argv[1];
 		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
 		this->mConfig = new ServerConfig(this->mServerPath.GetConfigPath() + this->mServerName + ".json");
 	}
 
-	void App::OnZeroRefresh()
+	void App::OnNewDay()
 	{
 		spdlog::drop_all();
-		LogHelper::Init("./Logs", this->mServerName);
-		for (Component * component : this->mSceneComponents)
-
-		{
-			if (auto zeroComponent = dynamic_cast<IZeroRefresh*>(component))
-			{
-				zeroComponent->OnZeroRefresh();
-			}
-		}
+		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
 	}
 
 	bool App::LoadComponent()
@@ -61,8 +52,6 @@ namespace GameKeeper
 
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mCorComponent = this->GetComponent<CoroutineComponent>();
-
-
 
 		std::vector<std::string> services;
 		std::vector<std::string> components;
@@ -205,17 +194,6 @@ namespace GameKeeper
 		return -1;
 	}
 
-	void App::Hotfix()
-	{
-		for (Component * component : this->mSceneComponents)
-		{
-			if (auto hotfix = dynamic_cast<IHotfix*>(component))
-			{
-				hotfix->OnHotFix();
-			}
-		}
-	}
-
 	void App::LogicMainLoop()
 	{
 		this->mStartTimer = TimeHelper::GetMilTimestamp();
@@ -251,11 +229,6 @@ namespace GameKeeper
 			}
 			this->UpdateConsoleTitle();
 			this->mSecondTimer = TimeHelper::GetMilTimestamp();
-			if (this->mSecondTimer - this->mNextRefreshTime >= 0)
-			{
-				this->OnZeroRefresh();
-				this->mNextRefreshTime = TimeHelper::GetTomorrowZeroTime() * 1000;
-			}
 		}
 	}
 

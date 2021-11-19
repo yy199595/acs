@@ -29,6 +29,7 @@
 #include <Http/HttpResourceComponent.h>
 #include <Service/HttpLoginService.h>
 #include <Http/HttpOperComponent.h>
+#include "Scene/OperatorComponent.h"
 using namespace GameKeeper;
 
 int main(int argc, char **argv)
@@ -45,6 +46,7 @@ int main(int argc, char **argv)
     __register_component__(MysqlProxyComponent);
     __register_component__(GatewayComponent);
     __register_component__(HttpComponent);
+    __register_component__(OperatorComponent);
 
     __register_component__(TaskPoolComponent);
     __register_component__(CoroutineComponent);

@@ -52,7 +52,7 @@ namespace GameKeeper
     {
     public:
         explicit CppCallHandler(int method);
-		~CppCallHandler() final;
+		~CppCallHandler() final = default;
     public:
         void Invoke(const com::Rpc_Response & backData) override;
     public:

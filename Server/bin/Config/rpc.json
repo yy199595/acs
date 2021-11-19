@@ -57,6 +57,13 @@
             "Timeout":0,
             "Request":"s2s.MysqlQuery.Request",
             "Response":"s2s.MysqlQuery.Response"
+        },
+        "Invoke":{
+            "Id":215,
+            "Async":true,
+            "Timeout":0,
+            "Request":"s2s.MysqlAnyOper.Request",
+            "Response":"s2s.MysqlAnyOper.Response"
         }
     },
     "LoginService":{

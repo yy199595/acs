@@ -34,7 +34,7 @@ message NodeRegister
     }
     message Response
     {
-        uint32 globalId = 1;
+        int32 globalId = 1;
         GroupConfigData GroupData = 2;
     }
 }
@@ -59,6 +59,19 @@ message MysqlQuery
     message Request
     {
         google.protobuf.Any Data = 1;
+    }
+    message Response
+    {
+        string ErrotStr = 1;
+        repeated google.protobuf.Any QueryDatas = 2;
+    }
+}
+message MysqlAnyOper
+{
+    message Request
+    {
+        string sql = 1;
+        string tab = 2;
     }
     message Response
     {

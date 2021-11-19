@@ -24,7 +24,7 @@ namespace GameKeeper
 	public:
 		App(int argc, char ** argv);
 
-		virtual ~App() final = default;
+		~App() final = default;
 
 	public:
 		const ServerConfig &GetConfig()
@@ -77,13 +77,12 @@ namespace GameKeeper
 
 		void StartComponent();
 
-        void OnZeroRefresh();
 	public:
 		int Run();
 
 		int Stop();
 
-		void Hotfix();
+        void OnNewDay();
 
 	private:
 		void UpdateConsoleTitle();
@@ -91,7 +90,6 @@ namespace GameKeeper
 		void LogicMainLoop();
 	private:
         ServerPath mServerPath;
-        long long mNextRefreshTime;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	private:

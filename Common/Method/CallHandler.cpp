@@ -49,11 +49,6 @@ namespace GameKeeper
 		this->mCorComponent = nullptr;
     }
 
-    CppCallHandler::~CppCallHandler() noexcept
-    {
-        GKDebugError("destory handler id = " << this->mCoroutineId);
-    }
-
     void CppCallHandler::Invoke(const com::Rpc_Response & response)
     {
 		this->mCode = (XCode)response.code();

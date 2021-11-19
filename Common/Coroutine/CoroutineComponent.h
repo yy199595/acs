@@ -54,10 +54,10 @@ namespace GameKeeper
 
         Coroutine * GetCurCoroutine();
 
-		unsigned int GetCurrentCorId() const
-		{
+        unsigned int GetCurrentCorId() const
+        {
             return this->mCurrentCorId;
-		}
+        }
 
 		bool IsInMainCoroutine() const
 		{
@@ -76,7 +76,6 @@ namespace GameKeeper
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
-        std::stack<unsigned int> mCorStacks;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
 		std::queue<unsigned int> mLastQueues2;

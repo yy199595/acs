@@ -7,6 +7,7 @@
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
 #include <Component/Scene/RpcComponent.h>
+#include "Other/ElapsedTimer.h"
 namespace GameKeeper
 {
     bool RpcRequestComponent::Awake()
@@ -41,7 +42,7 @@ namespace GameKeeper
 
         const std::string &methodName = protocolConfig->Method;
         ServiceMethod *method = logicService->GetMethod(methodName);
-        if (service == nullptr)
+        if (method == nullptr)
         {
             GKDebugFatal("call method not exist : [" << service << "." << methodName << "]");
             return false;
@@ -49,17 +50,24 @@ namespace GameKeeper
 
         if (!protocolConfig->IsAsync)
         {
+#ifdef __DEBUG__
+            ElapsedTimer elapsedTimer;
+#endif
             method->SetSocketId(request.socketid());
-			auto response = new com::Rpc_Response();
+            auto response = new com::Rpc_Response();
             XCode code = method->Invoke(request, *response);
             if (request.rpcid() != 0)
-            {       			
-				response->set_code(code);
-				response->set_rpcid(request.rpcid());
-				response->set_userid(request.userid());
+            {
+                response->set_code(code);
+                response->set_rpcid(request.rpcid());
+                response->set_userid(request.userid());
                 this->mRpcComponent->SendByAddress(request.socketid(), response);
             }
-			delete &request;
+#ifdef __DEBUG__
+            GKDebugInfo("Sync Invoke " << protocolConfig->Service
+                                  << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
+#endif
+            delete &request;
         }
         else if(method->IsLuaMethod()) //lua 异步
         {
@@ -73,7 +81,10 @@ namespace GameKeeper
     }
 
 	void RpcRequestComponent::Invoke(ServiceMethod * method, const com::Rpc_Request * request)
-    {        
+    {
+#ifdef __DEBUG__
+        ElapsedTimer elapsedTimer;
+#endif
 		auto response = new com::Rpc_Response();
         XCode code = method->Invoke(*request, *response);
 		if (request->rpcid() != 0)
@@ -83,6 +94,11 @@ namespace GameKeeper
 			response->set_userid(request->userid());
 			this->mRpcComponent->SendByAddress(request->socketid(), response);
 		}
+#ifdef __DEBUG__
+        const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(request->methodid());
+        GKDebugInfo("Async Invoke " << protocolConfig->Service
+                                   << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
+#endif
 		delete request;
     }
 }// namespace GameKeeper

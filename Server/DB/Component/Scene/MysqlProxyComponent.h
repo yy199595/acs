@@ -32,6 +32,10 @@ namespace GameKeeper
 
         XCode Query(const Message &data, Message &queryData);
 
+        XCode Invoke(const std::string & tab, const std::string & sql);
+
+        XCode Invoke(const std::string & tab, const std::string & sql, std::vector<Message *> & queryDatas);
+
     private:
         std::queue<unsigned int> mWakeUpQueue;
     private:

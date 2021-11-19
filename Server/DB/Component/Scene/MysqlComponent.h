@@ -11,12 +11,12 @@ namespace GameKeeper
     class SqlTableConfig
     {
     public:
-        SqlTableConfig(const std::string tab, const std::string pb);
+        SqlTableConfig(std::string  tab, std::string pb);
 
     public:
-        void AddKey(const std::string key);
+        void AddKey(std::string key);
 
-        bool HasKey(const std::string &key);
+        bool HasKey(const std::string &key) const;
 
     public:
         const std::string mTableName;
@@ -36,7 +36,7 @@ namespace GameKeeper
     public:
         MysqlComponent();
 
-        ~MysqlComponent() {}
+        ~MysqlComponent() final = default;
 
     public:
         GKMysqlSocket *GetMysqlSocket();
@@ -44,7 +44,7 @@ namespace GameKeeper
         const std::string &GetDataBaseName() { return this->mDataBaseName; }
 
     public:
-        SqlTableConfig *GetTableConfig(const std::string &tab);
+        const SqlTableConfig *GetTableConfig(const std::string &tab) const;
 
         bool GetTableName(const std::string &pb, std::string &table);
 

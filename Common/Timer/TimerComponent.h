@@ -9,23 +9,23 @@ namespace GameKeeper
     class TimerComponent : public Component, public ISystemUpdate
     {
     public:
-        TimerComponent() = default;
+        TimerComponent() : mTimerIdPool(1) {};
 
         ~TimerComponent() override = default;
 
     public:
         bool RemoveTimer(unsigned int id);
 
-        bool AddTimer(TimerBase * timer);
+        unsigned int AddTimer(TimerBase * timer);
 
 		template<typename F,typename O, typename ... Args>
-		bool AddTimer(long long ms, F && f, O * o, Args &&... args) {
+		unsigned int AddTimer(long long ms, F && f, O * o, Args &&... args) {
 
 			StaticMethod * methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);
 		}
-		bool AddTimer(long long ms, StaticMethod * func);
+		unsigned int AddTimer(long long ms, StaticMethod * func);
 
         TimerBase * GetTimer(unsigned int id);
 	private:

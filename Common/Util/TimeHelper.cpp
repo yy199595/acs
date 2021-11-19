@@ -39,7 +39,7 @@ long long TimeHelper::GetToDayZeroTime()
     t->tm_hour = 0;
     t->tm_min = 0;
     t->tm_sec = 0;
-    return mktime(t);
+    return mktime(t) + 86400;
 }
 
 long long TimeHelper::GetTomorrowZeroTime()

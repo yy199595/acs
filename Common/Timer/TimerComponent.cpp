@@ -19,23 +19,24 @@ namespace GameKeeper
         return true;
     }
 
-    bool TimerComponent::AddTimer(TimerBase * timer)
+    unsigned int TimerComponent::AddTimer(TimerBase * timer)
     {
         if (timer == nullptr)
         {
             return false;
         }
         timer->mTimerId = this->mTimerIdPool.Pop();
-        return this->AddTimerToWheel(timer);
+        GKAssertRetZero_F(this->AddTimerToWheel(timer));
+        return timer->mTimerId;
     }
 
-    bool TimerComponent::AddTimer(long long ms, StaticMethod * func)
+    unsigned int TimerComponent::AddTimer(long long ms, StaticMethod * func)
     {
         if (ms == 0)
         {
             func->run();
 			delete func;
-            return true;
+            return 0;
         }
         return this->AddTimer(new DelayTimer(ms, func));
     }

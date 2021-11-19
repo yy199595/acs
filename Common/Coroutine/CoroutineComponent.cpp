@@ -38,7 +38,6 @@ void MainEntry(void *manager)
 
     CoroutineComponent::CoroutineComponent()
     {
-        this->mCurrentCorId = 0;
         this->mMainCoroutine = this->mCorPool.Pop();
 #ifdef __COROUTINE_ASM__
         for(Stack & stack : this->mSharedStack)
@@ -65,15 +64,13 @@ void MainEntry(void *manager)
     void CoroutineComponent::Sleep(long long ms)
     {
         GKAssertRet_F(this->IsInLogicCoroutine());
-        unsigned int curCoroutineId = this->mCurrentCorId;
-        StaticMethod * sleepMethod = NewMethodProxy(&CoroutineComponent::Resume, this, curCoroutineId);
+        StaticMethod * sleepMethod = NewMethodProxy(&CoroutineComponent::Resume, this, this->mCurrentCorId);
         this->mTimerManager->AddTimer(ms, sleepMethod);
         this->YieldReturn();
     }
 
 	void CoroutineComponent::ResumeCoroutine(unsigned int id)
 	{
-        this->mCorStacks.push(this->mCurrentCorId);
         Coroutine * logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
@@ -156,8 +153,6 @@ void MainEntry(void *manager)
 		}
 		logicCoroutine->mState = CorState::Suspend;
 #ifdef __COROUTINE_ASM__
-        this->mCurrentCorId = this->mCorStacks.top();
-        this->mCorStacks.pop();
 		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
 #elif _WIN32
 		SwitchToFiber(this->mMainCoroutine->mContextStack);
@@ -248,9 +243,6 @@ void MainEntry(void *manager)
 				}
 			}
 		}
-
-		this->mCurrentCorId = this->mCorStacks.top();
-		this->mCorStacks.pop();
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
 
@@ -271,7 +263,6 @@ void MainEntry(void *manager)
             coroutine->mStack.clear();
             char *top = this->mSharedStack[coroutine->sid].top;
             coroutine->mStackSize = top - (char *) coroutine->mCorContext;
-            //GKDebugInfo("coroutine " << id << " save stack size = " << coroutine->mStackSize);
             coroutine->mStack.append((char *) coroutine->mCorContext, coroutine->mStackSize);
         }
     }

@@ -11,6 +11,7 @@
 #include <Define/CommonDef.h>
 #include <Method/MethodProxy.h>
 #include <Define/CommonTypeDef.h>
+
 namespace GameKeeper
 {
 	class Component;
@@ -18,7 +19,7 @@ namespace GameKeeper
 	{
 	public:
 		Type(size_t hash, std::string name) :
-			Hash(hash), Name(name) { }
+			Hash(hash), Name(std::move(name)) { }
 	public:
 		virtual Component * New() = 0;
 	public:
@@ -34,7 +35,7 @@ namespace GameKeeper
 	{
 	public:
 		Component();
-		virtual ~Component() = default;
+		~Component() override = default;
 
 	public:
 		friend class GameObject;
