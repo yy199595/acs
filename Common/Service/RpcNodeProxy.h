@@ -9,17 +9,17 @@ namespace GameKeeper
     class RpcNodeProxy : public Object
     {
     public:
-        explicit RpcNodeProxy(unsigned int id);
+        explicit RpcNodeProxy(int id);
 
     public:
 
-        unsigned int GetGlobalId() const { return this->mGlobalId; }
+        int GetGlobalId() const { return this->mGlobalId; }
 
         const std::string &GetNodeName() { return this->mNodeName; }
 
-        unsigned short GetAreaId() const { return this->mAreaId; }
+        short GetAreaId() const { return this->mAreaId; }
 
-        unsigned short GetNodeId() const { return this->mNodeId; }
+        short GetNodeId() const { return this->mNodeId; }
 
         bool UpdateNodeProxy(const s2s::NodeInfo & nodeInfo,long long socketId = 0);
 
@@ -53,12 +53,12 @@ namespace GameKeeper
 		bool AddRequestDataToQueue(const com::Rpc_Request * message);
 		com::Rpc_Request * CreateRequest(const std::string & method);
     private:
+        int mGlobalId;
+        short mAreaId;
+        short mNodeId;
         std::string mNodeIp;
         std::string mAddress;
-        unsigned int mGlobalId;
         std::string mNodeName;        //进程名字
-        unsigned short mAreaId;
-        unsigned short mNodeId;
         unsigned short mNodePort;
         s2s::NodeInfo mNodeInfo;
 

@@ -10,7 +10,7 @@
 
 namespace GameKeeper
 {
-	RpcNodeProxy::RpcNodeProxy(unsigned int id)
+	RpcNodeProxy::RpcNodeProxy(int id)
 		:  mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
         GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<RpcComponent>());

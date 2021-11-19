@@ -22,6 +22,7 @@
 #elif _WIN32
 	#define STACK_SIZE 1024 * 2
 #endif
+#define COR_POOL_COUNT 100
 
 
 namespace GameKeeper
@@ -35,10 +36,14 @@ namespace GameKeeper
 	public:
 		Coroutine * Pop();
 		void Push(Coroutine * coroutine);
+
+    public:
+        size_t GetMemorySize();
         size_t GetCorCount() { return this->mCorMap.size();}
 	public:
 		Coroutine * Get(unsigned int id);
 	private:
+        std::queue<Coroutine *> mCorPool;
         NumberBuilder<unsigned int> mNumPool;
         std::unordered_map<unsigned int , Coroutine *> mCorMap;
     };

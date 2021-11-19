@@ -28,16 +28,22 @@ namespace GameKeeper
 
         bool StartTask(TaskProxy * taskAction);
 
+        void GetAllThread(std::vector<const IThread *> & threads);
+
         const std::vector<TaskThread *> & GetThreads() { return this->mThreadArray;}
 
+    private:
+        void Update();
+
 	public:	
-		NetWorkThread & GetNetThread();		
+		NetWorkThread & AllocateNetThread();
     private:
         MultiThreadQueue<unsigned int> mFinishTaskQueue;                 //在其他线程完成的任务存储
         std::unordered_map<unsigned int, TaskProxy *> mTaskMap;
     private:
         size_t mIndex;
         std::mutex mLock;
+        std::thread * mMonitorThread;
         std::vector<TaskThread *> mThreadArray;
 		std::vector<NetWorkThread *> mNetThreads;
 		NumberBuilder<unsigned int> mTaskNumberPool;       

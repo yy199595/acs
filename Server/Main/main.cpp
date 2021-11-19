@@ -24,7 +24,7 @@
 #include <Service/NodeServer.h>
 #include <Service/NodeCenter.h>
 #include <Service/GatewayService.h>
-#include <Scene/DeamonComponent.h>
+#include <Scene/MonitorComponent.h>
 #include <Service/MysqlService.h>
 #include <Http/HttpResourceComponent.h>
 #include <Service/HttpLoginService.h>
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     __register_component__(TcpServerComponent);
     __register_component__(RpcComponent);
     __register_component__(TelnetClientComponent);
-    __register_component__(DeamonComponent);
+    __register_component__(MonitorComponent);
 
     __register_component__(LuaServiceMgrComponent);
 

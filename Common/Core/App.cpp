@@ -7,6 +7,7 @@
 #include"Scene/RpcRequestComponent.h"
 #include"Scene/TaskPoolComponent.h"
 #include"Util/DirectoryHelper.h"
+#include"Other/ElapsedTimer.h"
 using namespace GameKeeper;
 using namespace std::chrono;
 
@@ -148,46 +149,32 @@ namespace GameKeeper
 
 	void App::StartComponent()
 	{
-        auto coroutineGroup1 = this->mCorComponent->NewCoroutineGroup();
-        for(Component * component : this->mSceneComponents)
+		for (int index = 0; index < this->mSceneComponents.size(); index++)
         {
-            GKDebugFatal("start component " << component->GetTypeName());
-            coroutineGroup1->Add(this->mCorComponent->StartCoroutine(&Component::Start, component));
-        }
-
-        for (Component *component : this->mSceneComponents)
-        {
-            if (auto loadComponent = dynamic_cast<ILoadData *>(component))
+            ElapsedTimer elapsedTimer;
+            Component *component = this->mSceneComponents[index];
+            if (component != nullptr)
             {
-                coroutineGroup1->Add(this->mCorComponent->StartCoroutine(&ILoadData::OnLodaData, loadComponent));
+                component->Start();
+                float process = (index + 1) / (float) this->mSceneComponents.size();
+                GKDebugInfo("[" << process * 100 << "%]" << " start component "
+                                << component->GetTypeName() << " time = " << elapsedTimer.GetMs() << "ms");
             }
         }
-        coroutineGroup1->AwaitAll();
+		this->mIsInitComplate = true;
+		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
+		GKDebugLog("start all component successful ......");
 
-//		for (int index = 0; index < this->mSceneComponents.size(); index++)
-//		{
-//			Component *component = this->mSceneComponents[index];
-//			if (component != nullptr)
-//			{
-//				float process = index / (float)this->mSceneComponents.size();
-//				GKDebugInfo("[" << process * 100 << "%]"
-//					<< " start component " << component->GetTypeName());
-//				component->Start();
-//			}
-//		}
-//		this->mIsInitComplate = true;
-//		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-//		GKDebugLog("start all scene component successful ......");
-//
-//
-//		for (Component *component : this->mSceneComponents)
-//		{
-//			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
-//			{
-//				loadComponent->OnLodaData();
-//				GKDebugLog("load " << component->GetTypeName() << " data");
-//			}
-//		}
+		for (Component *component : this->mSceneComponents)
+		{
+            ElapsedTimer elapsedTimer;
+			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
+            {
+                loadComponent->OnLodaData();
+                GKDebugLog("load " << component->GetTypeName()
+                                   << " data use time = " << elapsedTimer.GetMs() << "ms");
+            }
+		}
         long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
 		GKDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}

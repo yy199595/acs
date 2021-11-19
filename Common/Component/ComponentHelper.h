@@ -7,7 +7,7 @@ namespace GameKeeper
 	class TypeProxy : public Type
 	{
 	public:
-		TypeProxy(std::string name) : Type(typeid(T).hash_code(), name) { }
+		explicit TypeProxy(std::string name) : Type(typeid(T).hash_code(), name) { }
 	public:
 		Component * New() final { return new T(); }
 	};
@@ -23,7 +23,7 @@ namespace GameKeeper
 			{
 				return false;
 			}
-			TypeProxy<T> * type = new TypeProxy<T>(name);
+			auto type = new TypeProxy<T>(name);
 			if (type != nullptr)
 			{
 				std::queue<Component *> components;

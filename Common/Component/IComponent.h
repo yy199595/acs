@@ -76,6 +76,13 @@ namespace GameKeeper
         virtual bool OnResponse() = 0;
     };
 
+    class INodeProxyRefresh
+    {
+    public:
+        virtual void OnAddProxyNode(class RpcNodeProxy * node) = 0; //添加服务节点
+        virtual void OnDelProxyNode(class RpcNodeProxy * node) = 0; //删除服务节点
+    };
+
 
 	class SocketProxy;
 	class ISocketListen

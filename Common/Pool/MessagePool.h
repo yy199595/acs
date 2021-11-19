@@ -12,8 +12,10 @@ namespace GameKeeper
 	public:
 		static Message * New(const Any & any);
 		static Message * New(const std::string & name);
-		
-		static Message * NewByJson(const std::string & name, const std::string & json);
+
+        static Message * NewByData(const Any & any);
+        static Message * NewByJson(const Any & any, const std::string & json);
+        static Message * NewByJson(const std::string & name, const std::string & json);
 		static Message * NewByJson(const std::string & name, const char * json, size_t size);
 	public:
 		static Message * NewByData(const std::string & name, const std::string & data);

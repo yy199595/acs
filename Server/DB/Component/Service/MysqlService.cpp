@@ -36,7 +36,11 @@ namespace GameKeeper
     }
 
     XCode MysqlService::Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
-    {		
+    {
+        if(!request.has_data())
+        {
+            return XCode::CallArgsError;
+        }
 		Message * message = MessagePool::New(request.data());
         if (message == nullptr)
         {
@@ -62,12 +66,16 @@ namespace GameKeeper
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         GKDebugWarning("add sql use time [" << t / 1000.0f << "s]");
-#endif// SOEASY_DEBUG
+#endif// _DEBUG
         return mysqlTask.GetErrorCode();
     }
 
     XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
+        if(!request.has_data())
+        {
+            return XCode::CallArgsError;
+        }
 		Message * message = MessagePool::New(request.data());
 		if (message == nullptr)
 		{
@@ -123,18 +131,22 @@ namespace GameKeeper
 #ifdef _DEBUG
         long long t = TimeHelper::GetMilTimestamp() - mysqlTask.GetStartTime();
         GKDebugWarning("delete sql use time [" << t / 1000.0f << "s]");
-#endif// SOEASY_DEBUG
+#endif// _DEBUG
         return mysqlTask.GetErrorCode();
     }
 
     XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
     {
-		Message * message = MessagePool::New(request.data());
+        if(!request.has_data())
+        {
+            return XCode::CallArgsError;
+        }
+		Message * message = MessagePool::NewByData(request.data());
         if (message == nullptr)
         {
             return XCode::ParseMessageError;
         }
-       
+
         std::string sql;
         if (!this->mMysqlManager->GetQuerySqlCommand(*message, sql))
         {
@@ -150,12 +162,11 @@ namespace GameKeeper
         this->mCorComponent->YieldReturn();
         XCode code = mysqlTask.GetErrorCode();
         if (code == XCode::Successful)
-        {	
-			const std::string name = request.data().GetTypeName();
+        {
             const std::vector<std::string> &jsonArray = mysqlTask.GetQueryDatas();
 			for (const std::string &json : jsonArray)
 			{
-				Message * message = MessagePool::NewByJson(name, json);
+				Message * message = MessagePool::NewByJson(request.data(), json);
 				if (message == nullptr)
 				{
 					return XCode::JsonCastProtocbufFail;

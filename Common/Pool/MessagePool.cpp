@@ -4,15 +4,39 @@ namespace GameKeeper
 	std::unordered_map<std::string, Message *> MessagePool::mMessageMap;
 
 	Message * MessagePool::New(const Any & any)
-	{
-		const std::string & name = any.GetTypeName();
-		Message * message = MessagePool::New(name);
-		if (message == nullptr || !any.UnpackTo(message))
-		{
-			return nullptr;
-		}
-		return message;
-	}
+    {
+        std::string fullName;
+        if(!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
+        {
+            return nullptr;
+        }
+        return MessagePool::New(fullName);
+    }
+
+    Message *MessagePool::NewByData(const Any &any)
+    {
+        std::string fullName;
+        if(!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
+        {
+            return nullptr;
+        }
+        Message *message = MessagePool::New(fullName);
+        if (message == nullptr || !any.UnpackTo(message))
+        {
+            return nullptr;
+        }
+        return message;
+    }
+
+    Message *MessagePool::NewByJson(const Any &any, const std::string &json)
+    {
+        Message * message = MessagePool::New(any);
+        if(message == nullptr)
+        {
+            return nullptr;
+        }
+        return util::JsonStringToMessage(json, message).ok() ? message : nullptr;
+    }
 
 	Message * MessagePool::New(const std::string & name)
 	{

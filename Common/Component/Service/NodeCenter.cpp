@@ -68,8 +68,8 @@ namespace GameKeeper
             return XCode::InitNodeProxyFailure;
         }
 
-        this->NoticeAllNode(registerNodeInfo);
         this->AddNewNode(areaId, globalId);
+        this->NoticeAllNode(registerNodeInfo);
 
         response.set_globalid(globalId);
         response.mutable_groupdata()->set_token(groupConfig->mToken);

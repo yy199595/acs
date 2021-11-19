@@ -64,7 +64,7 @@ namespace GameKeeper
             if (code != XCode::Successful)
             {
                 GKDebugCode(code);
-                //corComponent->Sleep(3000);
+                corComponent->Sleep(3000);
                 GKDebugError("register local service node fail " << code);
             }
         }
@@ -77,6 +77,20 @@ namespace GameKeeper
     XCode NodeServer::Del(const Int32Data &serviceData)
     {
         const int nodeId = serviceData.data();
+        RpcNodeProxy *nodeProxy = this->mNodeComponent->GetServiceNode(nodeId);
+        if(nodeProxy != nullptr)
+        {
+            std::vector<Component *> components;
+            this->GetComponents(components);
+            for (Component * component : components)
+            {
+                if (auto serviceComponent = dynamic_cast<INodeProxyRefresh*>(component))
+                {
+                    serviceComponent->OnDelProxyNode(nodeProxy);
+                }
+            }
+            GKDebugError("remove node " << nodeProxy->GetNodeName());
+        }
         bool res = this->mNodeComponent->DelNode(nodeId);
         return nodeId ? XCode::Successful : XCode::Failure;
     }
@@ -92,9 +106,9 @@ namespace GameKeeper
         this->GetComponents(components);
 		for (Component * component : components)
 		{
-			if (auto serviceComponent = dynamic_cast<ServiceComponent*>(component))
+			if (auto serviceComponent = dynamic_cast<INodeProxyRefresh*>(component))
 			{
-				serviceComponent->OnRefreshService();
+				serviceComponent->OnAddProxyNode(serviceNode);
 			}
 		}
 		return XCode::Successful;

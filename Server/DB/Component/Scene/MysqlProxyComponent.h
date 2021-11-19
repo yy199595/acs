@@ -1,8 +1,9 @@
 ﻿#include<Component/Component.h>
 #include <Pool/ObjectPool.h>
+#include"Protocol/s2s.pb.h"
 namespace GameKeeper
 {
-    class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData
+    class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData, public INodeProxyRefresh
     {
     public:
         MysqlProxyComponent() = default;
@@ -18,6 +19,10 @@ namespace GameKeeper
 
         void OnFrameUpdate(float t) final;
 
+        void OnAddProxyNode(class RpcNodeProxy *node) final;
+
+        void OnDelProxyNode(class RpcNodeProxy *node) final;
+
     public:
         XCode Add(const Message &data);
 
@@ -28,19 +33,10 @@ namespace GameKeeper
         XCode Query(const Message &data, Message &queryData);
 
     private:
-        class RpcNodeProxy *GetServiceNode();
-
-    private:
         std::queue<unsigned int> mWakeUpQueue;
     private:
-        int mMysqlProxyNodeId;
+        int mMysqlNodeId;
         class CoroutineComponent *mCorComponent;
-
         class NodeProxyComponent *mNodeComponent;
-
-        ObjectPool<s2s::MysqlOper_Request> mMysqlOperReqPool;
-        ObjectPool<s2s::MysqlOper_Response> mMysqlOperResPool;
-        ObjectPool<s2s::MysqlQuery_Request> mMysqlQueryReqPool;
-        ObjectPool<s2s::MysqlQuery_Response> mMysqlQueryResPool;
     };
 }

@@ -44,7 +44,7 @@ namespace GameKeeper
                 GKDebugError("not find socket handler " << listenConfig.Handler);
                 return false;
             }
-			NetWorkThread & netThread = taskComponent->GetNetThread();
+			NetWorkThread & netThread = taskComponent->AllocateNetThread();
             if(listenConfig.Port !=0)
             {
                 auto listener = new NetworkListener(netThread, listenConfig);

@@ -16,17 +16,16 @@ namespace GameKeeper
 	{
 	public:
 		ServiceComponent() = default;
-
-		virtual ~ServiceComponent() override = default;
+		~ServiceComponent() override = default;
 
 	public:
 		int GetPriority() override { return 1000; }
 		virtual bool IsLuaService() { return false; };
 	
 	public:
-		virtual void OnRefreshService() {}; //刷新服务表调用
-		virtual const std::string &GetServiceName() = 0;
+        virtual const std::string &GetServiceName() = 0;
 	public:
+
 		bool AddMethod(ServiceMethod * method);
 		bool HasMethod(const std::string &method);
 		ServiceMethod * GetMethod(const std::string &method);

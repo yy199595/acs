@@ -21,7 +21,11 @@ namespace GameKeeper
         {
             this->mNetThreads.push_back(new NetWorkThread(this));
         }
+        return true;
+    }
 
+    void TaskPoolComponent::Start()
+    {
         for (auto taskThread: this->mNetThreads)
         {
             taskThread->Start();
@@ -31,16 +35,24 @@ namespace GameKeeper
         {
             taskThread->Start();
         }
-
-        return true;
     }
 
-    void TaskPoolComponent::Start()
+    void TaskPoolComponent::GetAllThread(std::vector<const IThread *> &threads)
     {
-
+        threads.clear();
+        MainTaskScheduler & mainTask = App::Get().GetTaskScheduler();
+        for(const IThread * taskThread : this->mNetThreads)
+        {
+            threads.emplace_back(taskThread);
+        }
+        for(const IThread * taskThread : this->mThreadArray)
+        {
+            threads.emplace_back(taskThread);
+        }
+        threads.emplace_back(&mainTask);
     }
 
-	NetWorkThread & TaskPoolComponent::GetNetThread()
+	NetWorkThread & TaskPoolComponent::AllocateNetThread()
     {
         std::lock_guard<std::mutex> lock(this->mLock);
         if (this->mIndex >= mNetThreads.size())

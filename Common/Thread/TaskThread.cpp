@@ -1,19 +1,20 @@
 ﻿#include "TaskThread.h"
 #include <Scene/TaskPoolComponent.h>
-#include <functional>
 #include <Method/MethodProxy.h>
+#include"Util/TimeHelper.h"
 using namespace std::chrono;
 
 namespace GameKeeper
 {
-	IThread::IThread(TaskPoolComponent * task)
-		: mIsClose(false), mTaskComponent(task)
+	IThread::IThread(std::string  name,TaskPoolComponent * task)
+		: mName(std::move(name)), mIsClose(false), mTaskComponent(task)
     {		
-		
+		this->mIsWork = false;
     }
 
     void IThread::HangUp()
     {
+        this->mIsWork = false;
         std::unique_lock<std::mutex> waitLock(this->mThreadLock);
         this->mThreadVariable.wait(waitLock);
     }
@@ -29,7 +30,7 @@ namespace GameKeeper
 namespace GameKeeper
 {
     TaskThread::TaskThread(TaskPoolComponent * taskComponent)
-        : IThread(taskComponent)
+        : IThread("task", taskComponent)
     {
         this->mTaskState = Idle;
 		this->mThread = nullptr;
@@ -39,6 +40,7 @@ namespace GameKeeper
 
 	int TaskThread::Start()
 	{
+        this->mIsWork = true;
         this->mThreadVariable.notify_one();
 		return 0;
 	}
@@ -61,8 +63,10 @@ namespace GameKeeper
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeTask.SwapQueueData();
 #endif
+            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
             while (this->mWaitInvokeTask.PopItem(task))
             {
+                this->mIsWork = true;
                 if (task->Run())
                 {
                     this->mFinishTasks.push(task->GetTaskId());
@@ -85,7 +89,7 @@ namespace GameKeeper
 namespace GameKeeper
 {
     NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent)
-        : IThread(taskComponent), mAsioContext(nullptr)
+        : IThread("net", taskComponent), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
@@ -95,6 +99,7 @@ namespace GameKeeper
 
 	int NetWorkThread::Start()
 	{
+        this->mIsWork = true;
         this->mThreadVariable.notify_one();
 		return 0;
 	}
@@ -114,6 +119,7 @@ namespace GameKeeper
         while(!this->mIsClose)
         {
             std::this_thread::sleep_for(time);
+            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
             this->mAsioContext->poll(err);
             if(err)
             {
@@ -136,13 +142,14 @@ namespace GameKeeper
 namespace GameKeeper
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
-		: IThread(nullptr), mMainMethod(method)
+		: IThread("main", nullptr), mMainMethod(method)
 	{
 		this->mThreadId = std::this_thread::get_id();
 	}
 
 	int MainTaskScheduler::Start()
-	{		
+	{
+        this->mIsWork = true;
 		std::chrono::milliseconds time(1);
 		while (!this->mIsClose)
 		{
@@ -154,6 +161,7 @@ namespace GameKeeper
 
 	void MainTaskScheduler::Update()
 	{
+        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		this->mMainMethod->run();
 		StaticMethod * task = nullptr;
 #ifdef __THREAD_LOCK__

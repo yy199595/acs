@@ -60,7 +60,7 @@
     "ScriptPath":"./Script/",
     "Scene": [
         "TaskPoolComponent",
-        "DeamonComponent",
+        "MonitorComponent",
         "TcpServerComponent",
         "LuaScriptComponent",
         "MysqlComponent",

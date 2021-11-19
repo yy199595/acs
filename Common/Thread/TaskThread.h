@@ -21,7 +21,7 @@ namespace GameKeeper
     class IThread
     {
     public:
-        explicit IThread(TaskPoolComponent *taskComponent);
+        explicit IThread(std::string  name, TaskPoolComponent *taskComponent);
 
 		virtual ~IThread() = default;
 
@@ -33,19 +33,28 @@ namespace GameKeeper
 
 		virtual int Start() = 0;
 
-        const std::thread::id & GetThreadId() { return this->mThreadId;};
+        bool IsWork() const { return this->mIsWork; };
 
+        const std::string & GetName() const { return this->mName;}
 
-        bool IsCurrentThread() { return std::this_thread::get_id() == this->mThreadId; }
+        long long GetLastOperTime() const { return this->mLastOperTime; };
+
+        const std::thread::id & GetThreadId() const { return this->mThreadId;};
+
+        bool IsCurrentThread() const { return std::this_thread::get_id() == this->mThreadId; }
 
 	protected:
 		virtual void Update() = 0;
     protected:
+        bool mIsWork;
 		bool mIsClose;
         std::mutex mThreadLock;
+        long long mLastOperTime;
         std::thread::id mThreadId;
         TaskPoolComponent *mTaskComponent;
         std::condition_variable mThreadVariable;
+    private:
+        std::string mName;
     };
 
     class TaskThread : public IThread
@@ -76,7 +85,7 @@ namespace GameKeeper
     public:
         explicit NetWorkThread(TaskPoolComponent * taskComponent);
     public:
-		int Start();
+		int Start() final;
 		void AddTask(StaticMethod * task);
 		
 		AsioContext & GetContext() { return *mAsioContext; }
@@ -98,7 +107,7 @@ namespace GameKeeper
 	class MainTaskScheduler : public IThread
 	{
 	public:
-		MainTaskScheduler(StaticMethod * method);
+		explicit MainTaskScheduler(StaticMethod * method);
 	public:
 		int Start() final;
 		void AddMainTask(StaticMethod * task);		

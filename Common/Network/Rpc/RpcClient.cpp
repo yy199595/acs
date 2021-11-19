@@ -82,30 +82,29 @@ namespace GameKeeper
 			if (error_code)
 			{
 				GKDebugError(error_code.message());
-				this->CloseSocket(XCode::NetReceiveFailure);		
+				this->CloseSocket(XCode::NetReceiveFailure);
 			}
 			else
-			{
-				unsigned int length = 0;
-				char type = this->mReceiveMsgBuffer[0];
-				memcpy(&length, this->mReceiveMsgBuffer + sizeof(char), sizeof(unsigned int));
-				if (length >= MAX_DATA_COUNT) //最大为10k
-				{
-					this->CloseSocket(XCode::NetBigDataShutdown);
-					return;
-				}
+            {
+                unsigned int length = 0;
+                char type = this->mReceiveMsgBuffer[0];
+                memcpy(&length, this->mReceiveMsgBuffer + sizeof(char), sizeof(unsigned int));
+                if (length >= MAX_DATA_COUNT) //最大为10k
+                {
+                    this->CloseSocket(XCode::NetBigDataShutdown);
+                    return;
+                }
 
-				if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
-				{
-					this->ReadMessageBody(length, type);
-				}
-				else
-				{
+                if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
+                {
+                    this->ReadMessageBody(length, type);
+                }
+                else
+                {
                     GKDebugFatal("receive err type = " << type);
-					this->CloseSocket(XCode::NetReceiveFailure);
-				}
-                this->StartReceive();
-			}
+                    this->CloseSocket(XCode::NetReceiveFailure);
+                }
+            }
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
 	}
@@ -128,9 +127,10 @@ namespace GameKeeper
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
 
 		asio::error_code code;
-		if (allSize < nSocket.available(code))
+		if (allSize > nSocket.available(code))
 		{
 			this->CloseSocket(XCode::NetReceiveFailure);
+            GKDebugError("available data less " << allSize);
 			return;
 		}
 		nSocket.async_read_some(asio::buffer(nMessageBuffer, allSize),
@@ -174,6 +174,8 @@ namespace GameKeeper
 						taskScheduler.AddMainTask(&RpcComponent::OnResponse, this->mTcpComponent, this, response);
                     }
                 }
+                AsioContext &context = this->mSocketProxy->GetContext();
+                context.post(std::bind(&RpcClient::ReceiveMessage, this));
 			}
 			if (nMessageBuffer != this->mReceiveMsgBuffer)
 			{
@@ -201,7 +203,14 @@ namespace GameKeeper
 #ifdef __DEBUG__
             std::string json;
             util::MessageToJsonString(*message, &json);
-            GKDebugLog("send request message " << json);
+            if(type == RPC_TYPE_REQUEST)
+            {
+                GKDebugLog("send request message " << json);
+            }
+            else if(type == RPC_TYPE_RESPONSE)
+            {
+                GKDebugLog("send reaponse message " << json);
+            }
 #endif
 			unsigned int body = message->ByteSizeLong();
 			size_t head = sizeof(char) + sizeof(unsigned int);

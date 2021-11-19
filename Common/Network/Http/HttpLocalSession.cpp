@@ -39,7 +39,7 @@ namespace GameKeeper
         this->mPort = port;
         delete this->mSocketProxy;
         auto taskComponent = App::Get().GetComponent<TaskPoolComponent>();
-        NetWorkThread &netWorkThread = taskComponent->GetNetThread();
+        NetWorkThread &netWorkThread = taskComponent->AllocateNetThread();
         this->mSocketProxy = new SocketProxy(netWorkThread, "HttpGet");
 
         if (netWorkThread.IsCurrentThread())

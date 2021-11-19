@@ -57,7 +57,7 @@ namespace GameKeeper
 
 	void NetworkListener::ListenConnect()
 	{		
-		auto socketProxy = new SocketProxy(this->mTaskComponent->GetNetThread(), this->mConfig.Name);
+		auto socketProxy = new SocketProxy(this->mTaskComponent->AllocateNetThread(), this->mConfig.Name);
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(), 
 			[this, socketProxy](const asio::error_code & code)
 		{

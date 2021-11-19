@@ -169,7 +169,7 @@ namespace GameKeeper
      RpcConnector * RpcComponent::NewSession(const std::string &name, const std::string &ip,
                                                      unsigned short port)
 	{
-		NetWorkThread &  nThread = mTaskComponent->GetNetThread();
+		NetWorkThread &  nThread = mTaskComponent->AllocateNetThread();
 
         auto * socketProxy = new SocketProxy(nThread, name);
 		auto localSession = new RpcConnector(this, ip, port);

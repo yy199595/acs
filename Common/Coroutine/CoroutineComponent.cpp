@@ -66,7 +66,8 @@ void MainEntry(void *manager)
     {
         GKAssertRet_F(this->IsInLogicCoroutine());
         unsigned int curCoroutineId = this->mCurrentCorId;
-        this->mTimerManager->AddTimer(new CorSleepTimer(this, curCoroutineId, ms));
+        StaticMethod * sleepMethod = NewMethodProxy(&CoroutineComponent::Resume, this, curCoroutineId);
+        this->mTimerManager->AddTimer(ms, sleepMethod);
         this->YieldReturn();
     }
 
@@ -312,20 +313,9 @@ void MainEntry(void *manager)
 
     void CoroutineComponent::OnSecondUpdate()
     {
-
-//		size_t index = 1;
-//		long long size = 0;
-//		for (size_t index = 1; index < mCorPool.GetCorCount(); index++)
-//		{
-//			Coroutine * cor = mCorPool.Get(index);
-//            if(cor != nullptr)
-//            {
-//                size += cor->mStack.size();
-//            }
-//		}
-//
-//		double memory = size / 1024.0f / 1024.0f;
-//		GKDebugWarning("使用内存" << memory << "M" << "  协程总数 ：" << mCorPool.GetCorCount()
+//        size_t size = this->mCorPool.GetMemorySize();
+//		double memory = size / 1024.0f;
+//		GKDebugWarning("使用内存" << memory << "kb" << "  协程总数 ：" << mCorPool.GetCorCount()
 //			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
     }
 }
