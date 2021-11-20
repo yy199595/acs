@@ -7,7 +7,7 @@
 
 #ifdef __DEBUG__
 #include<Method/CallHandler.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/RpcConfigComponent.h>
 #endif
 namespace GameKeeper
 {
@@ -21,7 +21,7 @@ namespace GameKeeper
     {
         mTimeoutResponse.set_code((int)XCode::CallTimeout);
         GKAssertRetFalse_F(this->mTimerComponent = this->GetComponent<TimerComponent>());
-        GKAssertRetFalse_F(this->mProtoComponent = this->GetComponent<RpcProtoComponent>());
+        GKAssertRetFalse_F(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
 
@@ -29,7 +29,7 @@ namespace GameKeeper
     {
         GKAssertRetCode_F(rpcAction);
         int methodId = rpcAction->GetMethodId();
-        auto config = this->mProtoComponent->GetProtocolConfig(methodId);
+        auto config = this->mRpcConfigComponent->GetProtocolConfig(methodId);
         if(config == nullptr)
         {
             return false;
@@ -56,7 +56,7 @@ namespace GameKeeper
             {
                 int methodId = callHandler->GetMethodId();
                 callHandler->Invoke(this->mTimeoutResponse);
-                auto config = this->mProtoComponent->GetProtocolConfig(methodId);
+                auto config = this->mRpcConfigComponent->GetProtocolConfig(methodId);
                 GKDebugError("call ["<<config->Service << "." << config->Method << "] time out");
             }
         }
@@ -86,4 +86,8 @@ namespace GameKeeper
         this->mRetActionMap.erase(iter);
         return true;
     }
+	bool RpcResponseComponent::OnResponse(const RapidJsonWriter & message)
+	{
+		return false;
+	}
 }

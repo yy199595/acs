@@ -5,7 +5,7 @@
 #include <Util/StringHelper.h>
 #include <Define/CommonDef.h>
 #include <Core/App.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Http/HttpRemoteSession.h>
 #include <Component/Scene/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>

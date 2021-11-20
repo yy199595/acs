@@ -1,4 +1,4 @@
-﻿#include "RpcProtoComponent.h"
+﻿#include "RpcConfigComponent.h"
 
 #include <Core/App.h>
 #include <Util/FileHelper.h>
@@ -8,12 +8,12 @@
 #include <google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
-	bool RpcProtoComponent::Awake()
+	bool RpcConfigComponent::Awake()
     {
         return this->OnLoadConfig();
     }
 
-    bool RpcProtoComponent::OnLoadConfig()
+    bool RpcConfigComponent::OnLoadConfig()
     {
         rapidjson::Document jsonMapper;
         const std::string path = App::Get().GetConfigPath() + "rpc.json";
@@ -86,7 +86,7 @@ namespace GameKeeper
         return this->LoadCodeConfig();
     }
 
-    bool RpcProtoComponent::LoadCodeConfig()
+    bool RpcConfigComponent::LoadCodeConfig()
     {
         std::vector<std::string> lines;
         const std::string path = App::Get().GetWorkPath();
@@ -113,25 +113,25 @@ namespace GameKeeper
         return true;
     }
 
-    const ProtocolConfig *RpcProtoComponent::GetProtocolConfig(int methodId) const
+    const ProtocolConfig *RpcConfigComponent::GetProtocolConfig(int methodId) const
     {
         auto iter = this->mProtocolIdMap.find(methodId);
         return iter != this->mProtocolIdMap.end() ? &iter->second : nullptr;
     }
 
-    const CodeConfig *RpcProtoComponent::GetCodeConfig(int code) const
+    const CodeConfig *RpcConfigComponent::GetCodeConfig(int code) const
     {
         auto iter = this->mCodeDescMap.find(code);
         return iter != this->mCodeDescMap.end() ? &iter->second : nullptr;
     }
 
-	bool RpcProtoComponent::HasService(const std::string & service)
+	bool RpcConfigComponent::HasService(const std::string & service)
 	{
 		auto iter = this->mServiceMap.find(service);
 		return iter != this->mServiceMap.end();
 	}
 
-	void RpcProtoComponent::GetServices(std::vector<std::string> & services)
+	void RpcConfigComponent::GetServices(std::vector<std::string> & services)
 	{
 		auto iter = this->mServiceMap.begin();
 		for (; iter != this->mServiceMap.end(); iter++)
@@ -140,7 +140,7 @@ namespace GameKeeper
 		}
 	}
 
-    void RpcProtoComponent::DebugCode(XCode code)
+    void RpcConfigComponent::DebugCode(XCode code)
     {
         auto iter = this->mCodeDescMap.find(code);
         if(iter != this->mCodeDescMap.end())
@@ -149,7 +149,7 @@ namespace GameKeeper
         }
     }
 
-	bool RpcProtoComponent::HasServiceMethod(const std::string & service, const std::string & method)
+	bool RpcConfigComponent::HasServiceMethod(const std::string & service, const std::string & method)
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())
@@ -166,7 +166,7 @@ namespace GameKeeper
 		return false;
 	}
 
-	bool RpcProtoComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)
+	bool RpcConfigComponent::GetMethods(const std::string & service, std::vector<std::string> & methods)
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())
@@ -180,7 +180,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    const ProtocolConfig * RpcProtoComponent::GetProtocolConfig(const std::string &fullName) const
+    const ProtocolConfig * RpcConfigComponent::GetProtocolConfig(const std::string &fullName) const
     {
         auto iter = this->mProtocolNameMap.find(fullName);
         return iter != this->mProtocolNameMap.end() ? &iter->second : nullptr;

@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Define/CommonTypeDef.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {

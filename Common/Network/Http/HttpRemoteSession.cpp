@@ -4,7 +4,7 @@
 
 #include "HttpRemoteSession.h"
 #include <Core/App.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Component/Scene/HttpComponent.h>
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>

@@ -9,7 +9,7 @@ namespace GameKeeper
     class CallHandler;
 
 	class PacketMapper;
-    class RpcResponseComponent : public Component, public IProtoResponse
+    class RpcResponseComponent : public Component, public IProtoResponse, IJsonResponse
     {
     public:
         RpcResponseComponent();
@@ -18,9 +18,11 @@ namespace GameKeeper
 
     public:
 		const CallHandler * GetRpcHandler(unsigned int id) const;
-		bool OnResponse(const com::Rpc_Response & message) final;
+		
         bool AddCallHandler(CallHandler * rpcAction, unsigned int & id);
-
+	public:
+		bool OnResponse(const com::Rpc_Response & message) final;
+		bool OnResponse(const class RapidJsonWriter & message) final;
     private:
         void OnTimeout(unsigned int id);
     protected:
@@ -29,7 +31,7 @@ namespace GameKeeper
         com::Rpc_Response mTimeoutResponse;
         class TimerComponent *mTimerComponent;
 		NumberBuilder<unsigned int> mNumberPool;
-        class RpcProtoComponent * mProtoComponent;
+        class RpcConfigComponent * mRpcConfigComponent;
 		std::unordered_map<unsigned int, CallHandler *> mRetActionMap;
     private:
         

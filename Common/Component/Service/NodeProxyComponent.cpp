@@ -2,8 +2,8 @@
 
 #include <Core/App.h>
 #include <Service/RpcNodeProxy.h>
-#include <Scene/RpcProtoComponent.h>
-#include <Component/Scene/RpcComponent.h>
+#include <Scene/ProtoRpcComponent.h>
+#include <Component/Scene/ProtoRpcComponent.h>
 
 namespace GameKeeper
 {
@@ -59,7 +59,7 @@ namespace GameKeeper
 		GKAssertRetFalse_F(serverConfig.GetValue("AreaId", this->mAreaId));
 		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "ip", this->mCenterIp));
 		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "port", this->mCenterPort));
-		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<RpcProtoComponent>());
+		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtoRpcComponent>());
         return true;
     }
 

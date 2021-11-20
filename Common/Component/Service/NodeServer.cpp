@@ -5,7 +5,7 @@
 #include <Service/NodeProxyComponent.h>
 #include <Network/Listener/NetworkListener.h>
 #include <Network/Listener/TcpServerComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/RpcConfigComponent.h>
 namespace GameKeeper
 {
     bool NodeServer::Awake()

@@ -24,7 +24,7 @@
         {
             "port":7788,
             "count":10000,
-            "handler":"RpcComponent"
+            "handler":"ProtoRpcComponent"
         },
         "http":
         {

@@ -8,7 +8,7 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
-#include <Scene/RpcComponent.h>
+#include <Scene/RpcConfigComponent.h>
 #include <Scene/GatewayComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
@@ -19,7 +19,7 @@
 #include <Scene/RpcRequestComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/TaskPoolComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Service/AccountService.h>
 #include <Service/NodeServer.h>
 #include <Service/NodeCenter.h>
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     __register_component__(MysqlComponent);
     __register_component__(RpcResponseComponent);
     __register_component__(LuaScriptComponent);
-    __register_component__(RpcProtoComponent);
+    __register_component__(RpcConfigComponent);
     __register_component__(MysqlProxyComponent);
     __register_component__(GatewayComponent);
     __register_component__(HttpComponent);
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     __register_component__(CoroutineComponent);
     __register_component__(NodeProxyComponent);
     __register_component__(TcpServerComponent);
-    __register_component__(RpcComponent);
+    __register_component__(ProtoRpcComponent);
     __register_component__(TelnetClientComponent);
     __register_component__(MonitorComponent);
 

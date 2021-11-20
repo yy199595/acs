@@ -1,16 +1,17 @@
-#include "LuaServiceMgrComponent.h"
-#include <Core/App.h>
-#include <Method/LuaServiceMethod.h>
-#include <Service/LuaServiceComponent.h>
-#include <Scene/LuaScriptComponent.h>
-#include <Scene/RpcProtoComponent.h>
-#include <Util/DirectoryHelper.h>
+#include"LuaServiceMgrComponent.h"
+#include"Core/App.h"
+#include"Method/LuaServiceMethod.h"
+#include"Service/LuaServiceComponent.h"
+#include"Scene/LuaScriptComponent.h"
+#include"Scene/RpcConfigComponent.h"
+#include"Util/DirectoryHelper.h"
 namespace GameKeeper
 {
 	bool LuaServiceMgrComponent::Awake()
 	{
+		auto protoComponent = this->GetComponent<RpcConfigComponent>();
 		auto scriptComponent = this->GetComponent<LuaScriptComponent>();
-		auto protoComponent = this->GetComponent<RpcProtoComponent>();
+		
 
 		string servicePath;
 		GKAssertRetFalse_F(protoComponent);

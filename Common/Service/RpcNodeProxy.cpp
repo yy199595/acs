@@ -3,9 +3,9 @@
 #include <Coroutine/CoroutineComponent.h>
 #include <Scene/RpcResponseComponent.h>
 #include <Method/CallHandler.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Util/StringHelper.h>
-#include <Component/Scene/RpcComponent.h>
+#include <Scene/RpcConfigComponent.h>
 #include <google/protobuf/util/json_util.h>
 
 namespace GameKeeper
@@ -13,9 +13,9 @@ namespace GameKeeper
 	RpcNodeProxy::RpcNodeProxy(int id)
 		:  mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
-        GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<RpcComponent>());
+        GKAssertRet_F(this->mRpcComponent = App::Get().GetComponent<ProtoRpcComponent>());
         GKAssertRet_F(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
-        GKAssertRet_F(this->mProtocolComponent = App::Get().GetComponent<RpcProtoComponent>());
+        GKAssertRet_F(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
         GKAssertRet_F(this->mResponseComponent = App::Get().GetComponent<RpcResponseComponent>());
 	}
 
@@ -59,15 +59,16 @@ namespace GameKeeper
         return true;
     }
 
-    RpcClient * RpcNodeProxy::GetTcpSession()
+    ProtoRpcClient * RpcNodeProxy::GetTcpSession()
     {
         if(this->mSocketId == 0)
         {
-           auto rpcClient = this->mRpcComponent->NewSession(this->mNodeName, this->mNodeIp, this->mNodePort);
+           auto rpcClient = this->mRpcComponent->NewSession(this->mNodeName);
            if(rpcClient != nullptr)
            {
                this->mSocketId = rpcClient->GetSocketProxy().GetSocketId();
-               rpcClient->StartConnect(NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this));
+			   auto method = NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this);
+               rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
            }
             return rpcClient;
         }
@@ -76,7 +77,7 @@ namespace GameKeeper
 
     void RpcNodeProxy::OnNodeSessionRefresh()
     {
-        RpcClient *tcpLocalSession = this->GetTcpSession();
+        ProtoRpcClient *tcpLocalSession = this->GetTcpSession();
         if(!tcpLocalSession->IsOpen())
         {
             GKDebugError(this->mNodeName << " socket error");
@@ -118,7 +119,7 @@ namespace GameKeeper
 
     XCode RpcNodeProxy::Notice(const std::string &method)
     {
-        auto config = this->mProtocolComponent->GetProtocolConfig(method);
+        auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
         if(config == nullptr)
         {
             return XCode::CallFunctionNotExist;
@@ -143,7 +144,7 @@ namespace GameKeeper
 
 	com::Rpc_Request * RpcNodeProxy::CreateRequest(const std::string & method)
 	{
-		auto config = this->mProtocolComponent->GetProtocolConfig(method);
+		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
 		if (config == nullptr)
 		{
 			return nullptr;
@@ -237,7 +238,7 @@ namespace GameKeeper
 
     bool RpcNodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)
     {
-        RpcClient * rpcClient = this->GetTcpSession();
+        ProtoRpcClient * rpcClient = this->GetTcpSession();
         if(rpcClient != nullptr || rpcClient->IsOpen())
         {
             rpcClient->StartSendProtocol(TYPE_REQUEST, requestData);
@@ -245,10 +246,11 @@ namespace GameKeeper
         }
         if(rpcClient->GetSocketType() == SocketType::LocalSocket)
         {
-            auto rpcConnector = (RpcConnector*)rpcClient;
+            auto rpcConnector = (ProtoRpcConnector*)rpcClient;
             if(!rpcConnector->IsConnected())
             {
-                rpcConnector->StartConnect(NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this));
+				auto method = NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this);
+                rpcConnector->StartConnect(this->mNodeIp, this->mNodePort, method);
             }
         }
         this->mWaitSendQueue.push(requestData);

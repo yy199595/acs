@@ -2,7 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
@@ -11,7 +11,7 @@ namespace GameKeeper
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		this->mProtocolComponent = App::Get().GetComponent<RpcProtoComponent>();
+		this->mProtocolComponent = App::Get().GetComponent<ProtoRpcComponent>();
 		GKAssertBreakFatal_F(this->mProtocolComponent);
 	}
 

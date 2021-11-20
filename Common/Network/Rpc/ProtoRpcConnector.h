@@ -4,22 +4,20 @@
 
 #ifndef GameKeeper_TCPLOCALSESSION_H
 #define GameKeeper_TCPLOCALSESSION_H
-#include "RpcClient.h"
+#include "ProtoRpcClient.h"
 namespace GameKeeper
 {
-    class RpcConnector : public RpcClient
+    class ProtoRpcConnector : public ProtoRpcClient
     {
     public:
-        RpcConnector(RpcComponent * component, const std::string & ip, unsigned short port);
+        ProtoRpcConnector(ProtoRpcComponent * component, SocketProxy * socket);
     public:
         bool IsConnected() const { return this->mIsConnect; } //是不是正在连接
         SocketType GetSocketType() override { return SocketType::LocalSocket; }
     public:
-        void StartConnect(StaticMethod * method = nullptr);
-        bool StartAsyncConnect();
-    private:
-        void ConnectHandler(StaticMethod * method);
-        void AsyncConnectHandler(unsigned int id);
+        void StartConnect(std::string & ip, unsigned short port, StaticMethod * method = nullptr);
+    private:  
+		void ConnectHandler(std::string & ip, unsigned short port, StaticMethod * method);
     private:
         unsigned int mPort;
         atomic_bool mIsConnect;

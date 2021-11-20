@@ -1,8 +1,8 @@
 ﻿
 #include"App.h"
 #include"Scene/RpcResponseComponent.h"
-#include"Scene/RpcProtoComponent.h"
-#include"Component/Scene/RpcComponent.h"
+#include"Scene/ProtoRpcComponent.h"
+#include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
 #include"Scene/RpcRequestComponent.h"
 #include"Scene/TaskPoolComponent.h"
@@ -43,9 +43,9 @@ namespace GameKeeper
 	{
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<RpcResponseComponent>();
-		this->AddComponent<RpcProtoComponent>();
+		this->AddComponent<ProtoRpcComponent>();
 		this->AddComponent<CoroutineComponent>();
-		this->AddComponent<RpcComponent>();
+		this->AddComponent<RpcConfigComponent>();
 
 		this->AddComponent<NodeProxyComponent>();
 		this->AddComponent<RpcRequestComponent>();

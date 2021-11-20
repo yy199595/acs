@@ -9,7 +9,7 @@
 #include <Timer/TimerComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 
 #include <Service/RpcNodeProxy.h>
 #include <Pool/MessagePool.h>

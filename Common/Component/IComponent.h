@@ -2,6 +2,7 @@
 #include<Thread/TaskThread.h>
 #include<Protocol/com.pb.h>
 #include<Pool/StringPool.h>
+
 namespace GameKeeper
 {
 	class IFrameUpdate
@@ -52,6 +53,14 @@ namespace GameKeeper
         virtual void OnZeroRefresh() = 0;
     };
 
+	template<typename T, typename T1, typename T2>
+	class IRpc
+	{
+	public:
+		virtual void OnRequest(T * session, T1 * t1) = 0;
+		virtual void OnResponse(T * session, T2 * t2) = 0;
+	};
+
     class IProtoRequest
     {
     public:
@@ -63,17 +72,17 @@ namespace GameKeeper
     public:
         virtual bool OnResponse(const com::Rpc_Response & message) = 0;
     };
-
+	 
     class IJsonRequest
     {
     public:
-        virtual bool OnRequest() = 0;
+        virtual bool OnRequest(const class RapidJsonReader & message) = 0;
     };
 
     class IJsonResponse
     {
     public:
-        virtual bool OnResponse() = 0;
+        virtual bool OnResponse(const class RapidJsonWriter & message) = 0;
     };
 
     class INodeProxyRefresh

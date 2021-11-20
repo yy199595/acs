@@ -1,49 +1,44 @@
-ï»¿#pragma once
-#include<Rpc.h>
-#include<XCode/XCode.h>
-#include<Define/CommonDef.h>
-#include<SocketProxy.h>
+#pragma once
+#include"Rpc.h"
+#include"XCode/XCode.h"
+#include"Network/SocketProxy.h"
 #define TCP_BUFFER_COUNT 1024
-#define MAX_DATA_COUNT 1204 * 10 //æŽ¥å—æœ€å¤§æ•°æ®åŒ…
+#define MAX_DATA_COUNT 1024 * 20 //½ÓÊÜ×î´óÊý¾Ý°ü
 namespace GameKeeper
 {
-    class RpcComponent;
-    class RpcClient
-    {
-    public:
-        explicit RpcClient(RpcComponent *component);
-        virtual ~RpcClient();
+	class RpcClient
+	{
 	public:
-		void SetSocket(SocketProxy * socketProxy);
+		RpcClient(SocketProxy * socket);
+		virtual ~RpcClient() { }
+	public:
+		void StartReceive();
+		
 		bool IsOpen() { return this->mSocketProxy->IsOpen(); }
 		const std::string & GetIp() const { return this->mIp; }
-		long long GetLastOperTime() const { return this->mLastOperTime; }
-		const std::string & GetAddress() const { return this->mAddress; }
-        virtual SocketType GetSocketType() { return SocketType::RemoteSocket;}		
-	public:
-		void StartClose();
-		void StartReceive();
-		void StartSendProtocol(char type, const Message * message);
-	public:
 		SocketProxy & GetSocketProxy() { return *mSocketProxy; }
-    private:
-		void ReceiveMessage();
-		void CloseSocket(XCode code);
-        void ReadMessageBody(unsigned int allSize, int type);
-		void SendProtocol(char type, const Message * message);
-
-    protected:
-		std::string mIp;
-		std::string mAddress;
+		long long GetSocketId() const { return this->mSocketId; }
+		const std::string & GetAddress() const { return this->mAddress; }
+	public:
+		virtual SocketType GetSocketType() = 0;
+	protected:
+		void ReceiveHead();
+		void ReceiveBody(char type, size_t size);
+		bool AsyncSendMessage(char * buffer, size_t size);
+	protected:
+		virtual void CloseSocket(XCode code) = 0;
+		virtual bool OnRequest(char * buffer, size_t size) = 0;
+		virtual bool OnResponse(char * buffer, size_t size) = 0;
+		
+	protected:
+		AsioContext & mContext;
 		SocketProxy * mSocketProxy;
-		RpcComponent * mTcpComponent;
-    private:
+		NetWorkThread & mNetWorkThread;
+	private:
+		std::string mIp;
+		char * mRecvBuffer;
 		long long mSocketId;
-		char *mReceiveMsgBuffer;
+		std::string mAddress;	
 		long long mLastOperTime;
-		std::queue<const Message *> mMessageQueue;
-    };
-
-    typedef shared_ptr<RpcClient> SharedTcpSession;
-
-}// namespace GameKeeper
+	};
+}

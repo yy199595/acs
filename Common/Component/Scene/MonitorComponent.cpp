@@ -13,8 +13,8 @@ namespace GameKeeper
     {
         this->mIsClose = false;
         const ServerConfig & serverConfig = App::Get().GetConfig();
-        this->mThread = new std::thread(&MonitorComponent::Update, this);
-        GKAssertRetFalse_F(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
+		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
+        this->mThread = new std::thread(&MonitorComponent::Update, this);     
         return true;
     }
 
@@ -28,6 +28,7 @@ namespace GameKeeper
             long long nowTime = TimeHelper::GetSecTimeStamp();
             std::this_thread::sleep_for(std::chrono::seconds(1));
             this->mStartTime += 1;
+			GKDebugFatal(this->mStartTime << "  " << TimeHelper::GetSecTimeStamp());
             for (const IThread *taskThread: threads)
             {
                 if (!taskThread->IsWork())

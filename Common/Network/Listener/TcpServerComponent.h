@@ -5,7 +5,7 @@ namespace GameKeeper
 {
 	// 处理外部连接进来的session
 	class NetworkListener;
-	class RpcComponent;
+	class ProtoRpcComponent;
 	class TcpServerComponent : public Component
 	{
 	public:

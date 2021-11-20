@@ -6,8 +6,9 @@
 #include <Scene/RpcProtoComponent.h>
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
-#include <Component/Scene/RpcComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include "Other/ElapsedTimer.h"
+#include"Util/JsonHelper.h"
 namespace GameKeeper
 {
     bool RpcRequestComponent::Awake()
@@ -15,16 +16,21 @@ namespace GameKeeper
         this->mCorComponent = App::Get().GetCorComponent();
         const ServerConfig & ServerCfg = App::Get().GetConfig();
         GKAssertRetFalse_F(ServerCfg.GetValue("NodeId", this->mNodeId));
-        GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<RpcComponent>());
+        GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
         GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-        GKAssertRetFalse_F(this->mProtocolComponent = this->GetComponent<RpcProtoComponent>());
+        GKAssertRetFalse_F(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
 
-    bool RpcRequestComponent::OnRequest(const com::Rpc_Request & request)
+	bool RpcRequestComponent::OnRequest(const RapidJsonReader & request)
+	{
+		return false;
+	}
+
+	bool RpcRequestComponent::OnRequest(const com::Rpc_Request & request)
     {
         unsigned short methodId = request.methodid();
-        const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(methodId);
+        const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
         if (protocolConfig == nullptr)
         {
             return false;
@@ -95,7 +101,7 @@ namespace GameKeeper
 			this->mRpcComponent->SendByAddress(request->socketid(), response);
 		}
 #ifdef __DEBUG__
-        const ProtocolConfig *protocolConfig = this->mProtocolComponent->GetProtocolConfig(request->methodid());
+        const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(request->methodid());
         GKDebugInfo("Async Invoke " << protocolConfig->Service
                                    << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif

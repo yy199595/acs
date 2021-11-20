@@ -2,7 +2,7 @@
 #pragma once
 
 #include<Service/LocalServiceComponent.h>
-#include<Rpc/RpcClient.h>
+#include<Rpc/ProtoRpcClient.h>
 
 #include <utility>
 
@@ -44,7 +44,7 @@ namespace GameKeeper
         void AddNewNode(unsigned short areaId, unsigned int nodeId);
         const ServerGroupConfig * GetGroupConfig(unsigned int groupId);
     private:
-        class RpcComponent * mRpcComponent;
+        class ProtoRpcComponent * mRpcComponent;
         class NodeProxyComponent * mNodeComponent;
         std::unordered_map<unsigned int, ServerGroupConfig> mGroupNodeMap;
         std::unordered_map<unsigned short , std::set<unsigned int>> mServiceNodeMap;

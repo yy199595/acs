@@ -49,7 +49,7 @@ namespace GameKeeper
 
     private:
         void OnNodeSessionRefresh();
-        class RpcClient *GetTcpSession();
+        class ProtoRpcClient *GetTcpSession();
 		bool AddRequestDataToQueue(const com::Rpc_Request * message);
 		com::Rpc_Request * CreateRequest(const std::string & method);
     private:
@@ -65,12 +65,12 @@ namespace GameKeeper
     private:
         bool mIsClose;
         long long mSocketId;
-        class RpcComponent * mRpcComponent;
+        class ProtoRpcComponent * mRpcComponent;
         std::set<std::string> mServiceArray;//服务列表
         class CoroutineComponent *mCorComponent;//协程
         std::queue<unsigned int> mCoroutines;
         std::queue<const Message *> mWaitSendQueue;
-        class RpcProtoComponent *mProtocolComponent;
+        class RpcConfigComponent *mRpcConfigComponent;
         class RpcResponseComponent *mResponseComponent;
     };
 }// namespace GameKeeper

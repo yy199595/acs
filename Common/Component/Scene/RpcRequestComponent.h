@@ -14,7 +14,7 @@ namespace GameKeeper
 
 	class ServiceMethod;
 
-    class RpcRequestComponent : public Component, public IProtoRequest
+    class RpcRequestComponent : public Component, public IProtoRequest, IJsonRequest
     {
     public:
 		RpcRequestComponent() = default;
@@ -25,15 +25,16 @@ namespace GameKeeper
 
     public:
         bool OnRequest(const com::Rpc_Request & message) final;
-
+		bool OnRequest(const class RapidJsonReader & request) final;
+		
         virtual int GetPriority() const { return 500; }
 	private:
         void Invoke(ServiceMethod * method, const com::Rpc_Request * request);
     private:
         int mNodeId;
         std::string mMessageBuffer;
-        class RpcComponent *mRpcComponent;
+        class ProtoRpcComponent *mRpcComponent;
         class CoroutineComponent *mCorComponent;
-        class RpcProtoComponent * mProtocolComponent;
+        class RpcConfigComponent * mPpcConfigComponent;
     };
 }

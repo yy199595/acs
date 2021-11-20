@@ -2,8 +2,8 @@
 #include <Core/App.h>
 #include <Util/StringHelper.h>
 #include <Service/RpcNodeProxy.h>
-#include <Scene/RpcComponent.h>
-#include <Scene/RpcProtoComponent.h>
+#include <Scene/ProtoRpcComponent.h>
+#include <Scene/ProtoRpcComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Util/FileHelper.h>
 namespace GameKeeper
@@ -12,7 +12,7 @@ namespace GameKeeper
     {
         __add_method(NodeCenter::Add);
         __add_method(NodeCenter::Query);
-        GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<RpcComponent>());
+        GKAssertRetFalse_F(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
         GKAssertRetFalse_F(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
         return this->OnLoadConfig();
     }
