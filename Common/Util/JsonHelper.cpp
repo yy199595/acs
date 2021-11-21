@@ -130,12 +130,18 @@ namespace GameKeeper
         if(this->mJsonWriter.EndObject())
         {
             const char *str = this->mStringBuf.GetString();
-            const size_t lenght = this->mStringBuf.GetSize();
-            os.write(str, lenght);
+            const size_t size = this->mStringBuf.GetSize();
+            os.write(str, size);
             return true;
         }
 
         return false;
+    }
+
+    const char *RapidJsonWriter::GetData(size_t & size) const
+    {
+        size = this->mStringBuf.GetSize();
+        return this->mStringBuf.GetString();
     }
 
     bool RapidJsonWriter::WriterToStream(std::string &os)

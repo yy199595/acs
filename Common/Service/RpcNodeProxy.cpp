@@ -246,11 +246,10 @@ namespace GameKeeper
         }
         if(rpcClient->GetSocketType() == SocketType::LocalSocket)
         {
-            auto rpcConnector = (ProtoRpcConnector*)rpcClient;
-            if(!rpcConnector->IsConnected())
+            if(!rpcClient->IsConnected())
             {
 				auto method = NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this);
-                rpcConnector->StartConnect(this->mNodeIp, this->mNodePort, method);
+                rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
             }
         }
         this->mWaitSendQueue.push(requestData);

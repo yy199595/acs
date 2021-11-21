@@ -5,6 +5,7 @@
 #include<Util/NumberHelper.h>
 #include<Timer/TimerComponent.h>
 #include<Timer/CorSleepTimer.h>
+#include<fstream>
 using namespace std::chrono;
 #ifdef _WIN32
 #include<Windows.h>
@@ -254,6 +255,7 @@ void MainEntry(void *manager)
 	}
 
 #ifdef __COROUTINE_ASM__
+    std::fstream fs;
 	void CoroutineComponent::SaveStack(unsigned int id)
 	{
         assert(id != 0);
@@ -264,6 +266,12 @@ void MainEntry(void *manager)
             char *top = this->mSharedStack[coroutine->sid].top;
             coroutine->mStackSize = top - (char *) coroutine->mCorContext;
             coroutine->mStack.append((char *) coroutine->mCorContext, coroutine->mStackSize);
+            if(!fs.is_open())
+            {
+                fs.open(App::Get().GetWorkPath() + "cor.txt");
+            }
+            fs << "coroutine " << id << " stack size = " << coroutine->mStackSize << "\n";
+            fs.close();
         }
     }
 #else

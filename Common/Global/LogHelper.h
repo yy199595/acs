@@ -10,7 +10,7 @@ namespace GameKeeper
     typedef spdlog::level::level_enum ELogType;
 	class LogHelper{
 	public:
-		static bool Init(const std::string path, const std::string name);
+		static bool Init(std::string path, std::string name);
 	public:
 		static void AddLog(ELogType type, const std::string & log);
 	private:

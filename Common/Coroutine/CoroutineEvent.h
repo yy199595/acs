@@ -15,7 +15,7 @@
 #ifdef __COROUTINE_ASM__
 	#include"Context/context.h"	
 	#define STACK_SIZE 1024 * 10
-    #define SHARED_STACK_NUM 8 //共享栈个数
+    #define SHARED_STACK_NUM 1 //共享栈个数
 #elif __linux__
 	#include<ucontext.h>
 	#define STACK_SIZE 1024 * 1024

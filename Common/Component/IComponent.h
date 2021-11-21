@@ -2,7 +2,7 @@
 #include<Thread/TaskThread.h>
 #include<Protocol/com.pb.h>
 #include<Pool/StringPool.h>
-
+#include"XCode/XCode.h"
 namespace GameKeeper
 {
 	class IFrameUpdate
@@ -53,13 +53,16 @@ namespace GameKeeper
         virtual void OnZeroRefresh() = 0;
     };
 
-	template<typename T, typename T1, typename T2>
+	template<typename T1, typename T2>
 	class IRpc
 	{
 	public:
-		virtual void OnRequest(T * session, T1 * t1) = 0;
-		virtual void OnResponse(T * session, T2 * t2) = 0;
-	};
+        virtual void StartClose(long long id) = 0;
+		virtual void OnRequest(long long id, T1 * t1) = 0;
+		virtual void OnResponse(long long id, T2 * t2) = 0;
+        virtual void OnCloseSocket(long long id, XCode code) = 0;
+        virtual void OnConnectAfter(long long id, XCode code) = 0;
+    };
 
     class IProtoRequest
     {

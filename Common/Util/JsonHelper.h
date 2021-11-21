@@ -52,6 +52,8 @@ namespace GameKeeper
         bool EndObject() { return this->mJsonWriter.EndObject(); }
 
     public:
+        const char * GetData(size_t & size) const;
+    public:
         bool SaveJsonToFile(const char *path);
 
         virtual bool WriterToStream(std::string &os);
@@ -70,9 +72,8 @@ namespace GameKeeper
     {
     public:
         bool TryParse(const std::string &str);
-        bool TryParse(const char *str, const size_t size);
+        bool TryParse(const char *str, size_t size);
         bool ReadFromFile(const char *path);
-
     public:
         bool TryGetValue(const char *key, int &data) const;
         bool TryGetValue(const char *key, bool &data) const;

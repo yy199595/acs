@@ -1,12 +1,14 @@
 #include"RpcClient.h"
+#include"Core/App.h"
 #include"Util/TimeHelper.h"
 namespace GameKeeper
 {
-	RpcClient::RpcClient(SocketProxy * socket)
-		: mSocketProxy(socket), mContext(socket->GetContext()),
+	RpcClient::RpcClient(SocketProxy * socket, SocketType type)
+		: mType(type), mSocketProxy(socket),
+        mContext(socket->GetContext()),
 		mNetWorkThread(socket->GetThread())
 	{
-		this->mRecvBuffer = 0;
+		this->mRecvBuffer = nullptr;
 		this->mSocketId = socket->GetSocketId();
 	}
 
@@ -90,7 +92,7 @@ namespace GameKeeper
 		}
 		nSocket.async_read_some(asio::buffer(messageBuffer, size),
 			[this, messageBuffer, type](const asio::error_code &error_code,
-				const std::size_t size) 
+				const std::size_t size)
 		{
 			if (error_code)
 			{
@@ -113,6 +115,7 @@ namespace GameKeeper
 					GKDebugError(this->GetAddress() << " parse response message error");
 				}
 			}
+           this->ReceiveHead();
 		});
 	}
 
@@ -127,10 +130,8 @@ namespace GameKeeper
 		nSocket.async_send(asio::buffer(buffer, size), [buffer, this]
 				(const asio::error_code &error_code, std::size_t size)
 		{
-			XCode code = XCode::Successful;
 			if (error_code)
 			{
-				code = XCode::NetSendFailure;
 				GKDebugError(error_code.message());
 				this->CloseSocket(XCode::NetSendFailure);
 			}
@@ -139,5 +140,44 @@ namespace GameKeeper
 		});
 		return true;
 	}
+
+    bool RpcClient::StartConnect(std::string & ip, unsigned short port, StaticMethod * method)
+    {
+        GKAssertRetFalse_F(this->GetSocketType() != SocketType::RemoteSocket);
+        if(this->IsConnected())
+        {
+            return true;
+        }
+        this->mIsConnect = true;
+        GKAssertRetFalse_F(this->mSocketProxy);
+        NetWorkThread & nThread = this->mSocketProxy->GetThread();
+        nThread.AddTask(&RpcClient::ConnectHandler, this, ip, port, method);
+    }
+
+    void RpcClient::ConnectHandler(std::string & ip, unsigned short port,  StaticMethod * method)
+    {
+        this->mConnectCount++;
+        auto address = asio::ip::make_address_v4(ip);
+        asio::ip::tcp::endpoint endPoint(address, port);
+        AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+        GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+        nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
+        {
+            XCode code = XCode::Successful;
+            if(!err)
+            {
+                this->StartReceive();
+                this->mConnectCount = 0;
+                code = XCode::NetConnectFailure;
+            }
+            this->mIsConnect = false;
+            MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+            if(method != nullptr)
+            {
+                taskScheduler.AddMainTask(method);
+            }
+            this->OnConnect(code);
+        });
+    }
 
 }

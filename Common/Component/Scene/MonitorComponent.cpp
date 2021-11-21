@@ -28,7 +28,7 @@ namespace GameKeeper
             long long nowTime = TimeHelper::GetSecTimeStamp();
             std::this_thread::sleep_for(std::chrono::seconds(1));
             this->mStartTime += 1;
-			GKDebugFatal(this->mStartTime << "  " << TimeHelper::GetSecTimeStamp());
+			//GKDebugFatal(this->mStartTime << "  " << TimeHelper::GetSecTimeStamp());
             for (const IThread *taskThread: threads)
             {
                 if (!taskThread->IsWork())

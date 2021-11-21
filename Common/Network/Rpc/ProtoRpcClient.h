@@ -8,20 +8,22 @@ namespace GameKeeper
 	class ProtoRpcClient : public RpcClient
 	{
 	public:
-		explicit ProtoRpcClient(ProtoRpcComponent *component, SocketProxy * socket);
-		virtual ~ProtoRpcClient() override = default;
+		explicit ProtoRpcClient(ProtoRpcComponent *component, SocketProxy * socket, SocketType type);
+		~ProtoRpcClient() override = default;
 	public:
 		void StartClose();
-		void StartSendProtocol(char type, const Message * message);
-		virtual SocketType GetSocketType() { return SocketType::RemoteSocket; }
+		bool StartSendProtocol(char type, const Message * message);
+
 	protected:
-		void CloseSocket(XCode code) final;
-		bool OnRequest(char * buffer, size_t size)final;
-		bool OnResponse(char * buffer, size_t size)final;
+        void OnConnect(XCode code) final;
+        void CloseSocket(XCode code) final;
+		bool OnRequest(const char * buffer, size_t size)final;
+		bool OnResponse(const char * buffer, size_t size)final;
 	private:
 		void SendProtocol(char type, const Message * message);
-	protected:
-		ProtoRpcComponent * mTcpComponent;
+    private:
+
+        ProtoRpcComponent * mTcpComponent;
 		std::queue<const Message *> mMessageQueue;
 	};
 }// namespace GameKeeper
