@@ -35,9 +35,6 @@ namespace GameKeeper
         {
             return false;
         }
-#ifdef __DEBUG__
-        GKDebugWarning("call " << protocolConfig->Service << "." << protocolConfig->Method);
-#endif
         const std::string &service = protocolConfig->Service;
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)

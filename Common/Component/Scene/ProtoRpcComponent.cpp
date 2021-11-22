@@ -186,10 +186,9 @@ namespace GameKeeper
 	bool ProtoRpcComponent::SendByAddress(long long id, com::Rpc_Request * message)
 	{
 		ProtoRpcClient * clientSession = this->GetSession(id);
-		if (clientSession == nullptr || !clientSession->IsOpen())
-		{
-			return false;
-		}
+
+        GKAssertRetFalse_F(clientSession);
+        GKAssertRetFalse_F(clientSession->IsOpen());
 		clientSession->StartSendProtocol(RPC_TYPE_REQUEST, message);
 		return true;
 	}
@@ -197,10 +196,9 @@ namespace GameKeeper
 	bool ProtoRpcComponent::SendByAddress(long long id, com::Rpc_Response * message)
 	{
 		ProtoRpcClient * clientSession = this->GetSession(id);
-		if (clientSession == nullptr || !clientSession->IsOpen())
-		{
-			return false;
-		}
+
+        GKAssertRetFalse_F(clientSession);
+        GKAssertRetFalse_F(clientSession->IsOpen());
 		clientSession->StartSendProtocol(RPC_TYPE_RESPONSE, message);
 		return true;
 	}
