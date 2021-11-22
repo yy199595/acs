@@ -48,7 +48,7 @@ namespace GameKeeper
 		}
         const size_t count = sizeof(TCP_HEAD) + sizeof(char);
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-		socket.async_read_some(asio::buffer(this->mRecvBuffer, count),
+		socket.async_read_some(asio::buffer(this->mReceiveBuffer, count),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
@@ -60,8 +60,8 @@ namespace GameKeeper
 			else
 			{
 				unsigned int length = 0;
-				char type = this->mRecvBuffer[0];
-				memcpy(&length, this->mRecvBuffer + sizeof(char), sizeof(TCP_HEAD));
+				char type = this->mReceiveBuffer[0];
+				memcpy(&length, this->mReceiveBuffer + sizeof(char), sizeof(TCP_HEAD));
 				if (length >= MAX_DATA_COUNT)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
@@ -81,13 +81,12 @@ namespace GameKeeper
 
 	void RpcClient::ReceiveBody(char type, size_t size)
 	{
-		char * messageBuffer = this->mRecvBuffer;
+		char * messageBuffer = this->mReceiveBuffer;
 		if (size > TCP_BUFFER_COUNT)
 		{
 			messageBuffer = new char[size];
 			GKDebugWarning("receive message count = " << size);
 		}
-		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
 

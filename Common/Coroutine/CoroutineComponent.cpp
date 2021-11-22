@@ -58,6 +58,7 @@ void MainEntry(void *manager)
 
     bool CoroutineComponent::Awake()
     {
+		this->mCurrentCorId = 0;
         GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
         return true;
     }
@@ -155,6 +156,7 @@ void MainEntry(void *manager)
 		}
 		logicCoroutine->mState = CorState::Suspend;
 #ifdef __COROUTINE_ASM__
+		assert(!this->mCallStacks.empty());
         this->mCurrentCorId = this->mCallStacks.top();
         this->mCallStacks.pop();
 		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
@@ -247,6 +249,7 @@ void MainEntry(void *manager)
 				}
 			}
 		}
+		assert(!this->mCallStacks.empty());
         this->mCurrentCorId = this->mCallStacks.top();
         this->mCallStacks.pop();
 		this->mCorPool.Push(coroutine);

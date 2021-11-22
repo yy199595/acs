@@ -22,11 +22,10 @@ namespace GameKeeper
         bool OnResponse(const char *buffer, size_t size) final;
         void OnSendAfter(XCode code, const char *buffer, size_t size) final;
     private:
-        void SendJsonData(char type, const RapidJsonWriter * jsonData);
-    protected:
-        JsonRpcComponent * mRpcComponent;
+        void SendJsonData(char type, const RapidJsonWriter * jsonData);     
     private:
         std::stack<char> mJsonRecords;
+		JsonRpcComponent * mRpcComponent;
     };
 }
 #endif //GAMEKEEPER_JSONRPCCLIENT_H
