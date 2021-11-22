@@ -26,7 +26,7 @@ namespace GameKeeper
             this->SendHttpMessage();
             return;
         }
-        nThread.AddTask(&HttpSessionBase::SendHttpMessage, this);
+        nThread.Invoke(&HttpSessionBase::SendHttpMessage, this);
     }
 
     void HttpSessionBase::SendHttpMessage()
@@ -72,7 +72,7 @@ namespace GameKeeper
 			this->ReceiveHeard();
 			return;
 		}
-		nThread.AddTask(&HttpSessionBase::ReceiveHeard, this);
+        nThread.Invoke(&HttpSessionBase::ReceiveHeard, this);
     }
 
 	void HttpSessionBase::ReceiveHeard()

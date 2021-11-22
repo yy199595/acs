@@ -239,7 +239,7 @@ namespace GameKeeper
     bool RpcNodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)
     {
         ProtoRpcClient * rpcClient = this->GetTcpSession();
-        if(rpcClient != nullptr || rpcClient->IsOpen())
+        if(rpcClient != nullptr && rpcClient->IsOpen())
         {
             rpcClient->StartSendProtocol(TYPE_REQUEST, requestData);
             return true;

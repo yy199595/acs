@@ -61,6 +61,7 @@ namespace GameKeeper
 #endif
             method->SetSocketId(request.socketid());
             auto response = new com::Rpc_Response();
+            LocalObject<com::Rpc_Request> lock(&request);
             XCode code = method->Invoke(request, *response);
             if (request.rpcid() != 0)
             {
@@ -73,7 +74,6 @@ namespace GameKeeper
             GKDebugInfo("Sync Invoke " << protocolConfig->Service
                                   << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
-            delete &request;
         }
         else if(method->IsLuaMethod()) //lua 异步
         {

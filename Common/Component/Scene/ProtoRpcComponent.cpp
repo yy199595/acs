@@ -50,8 +50,7 @@ namespace GameKeeper
 		{
             rpcClient->StartReceive();
 			const std::string & name = rpcClient->GetSocketProxy().GetName();
-			GKDebugInfo(
-				"connect to [" << name << ":" << address << "] successful");
+			GKDebugInfo("connect to [" << name << ":" << address << "] successful");
 		}
 	}
 
@@ -60,11 +59,12 @@ namespace GameKeeper
 		long long id = socket->GetSocketId();
 		auto iter = this->mSessionAdressMap.find(id);
 		GKAssertRet_F(iter == this->mSessionAdressMap.end());
-		auto tcpSession = new ProtoRpcClient(this, socket, SocketType::RemoteSocket);
-
-		tcpSession->StartReceive();
-		this->mSessionAdressMap.emplace(id, tcpSession);
-
+		auto tcpSession = this->mClientPool.New(this, socket, SocketType::RemoteSocket);
+        if(tcpSession != nullptr)
+        {
+            tcpSession->StartReceive();
+            this->mSessionAdressMap.emplace(id, tcpSession);
+        }
 	}
 
     void ProtoRpcComponent::StartClose(long long id)
@@ -109,38 +109,38 @@ namespace GameKeeper
     void ProtoRpcComponent::OnResponse(long long id, com::Rpc_Response *response)
     {
 #ifdef __DEBUG__
-			long long rpcId = response->rpcid();
-			auto rpc = this->mResponseComponent->GetRpcHandler(rpcId);
-			if (rpc != nullptr)
+        long long rpcId = response->rpcid();
+        auto rpc = this->mResponseComponent->GetRpcHandler(rpcId);
+        if (rpc != nullptr)
+        {
+            auto config = this->mProtocolComponent->GetProtocolConfig(rpc->GetMethodId());
+            if (config != nullptr)
             {
-                auto config = this->mProtocolComponent->GetProtocolConfig(rpc->GetMethodId());
-                if (config != nullptr)
-                {
-                    long long nowTime = TimeHelper::GetMilTimestamp();
-                    float time = (nowTime - rpc->GetCreateTime()) / 1000.0f;
+                long long nowTime = TimeHelper::GetMilTimestamp();
+                float time = (nowTime - rpc->GetCreateTime()) / 1000.0f;
 
-                    GKDebugLog("*****************[response]******************");
-                    GKDebugLog("func = " << config->Service << "." << config->Method);
-                    GKDebugLog("time = " << time << "s");
-                    if ((XCode) response->code() != XCode::Successful)
-                    {
-                        auto codeConfig = this->mProtocolComponent->GetCodeConfig(response->code());
-                        GKDebugError("code = " << codeConfig->Name << ":" << codeConfig->Desc);
-                    }
-                    else if (response->has_data())
-                    {
-                        std::string json;
-                        if (util::MessageToJsonString(response->data(), &json).ok())
-                        {
-                            GKDebugLog("json = \n" << StringHelper::FormatJson(json));
-                        }
-                    }
-                    GKDebugLog("*********************************************");
+                GKDebugLog("*****************[response]******************");
+                GKDebugLog("func = " << config->Service << "." << config->Method);
+                GKDebugLog("time = " << time << "s");
+                if ((XCode) response->code() != XCode::Successful)
+                {
+                    auto codeConfig = this->mProtocolComponent->GetCodeConfig(response->code());
+                    GKDebugError("code = " << codeConfig->Name << ":" << codeConfig->Desc);
                 }
+                else if (response->has_data())
+                {
+                    std::string json;
+                    if (util::MessageToJsonString(response->data(), &json).ok())
+                    {
+                        GKDebugLog("json = \n" << StringHelper::FormatJson(json));
+                    }
+                }
+                GKDebugLog("*********************************************");
             }
+        }
 #endif
+        LocalObject<com::Rpc_Response> lock(response);
         this->mResponseComponent->OnResponse(*response);
-		delete response;
     }
 
     ProtoRpcClient *ProtoRpcComponent::GetRpcSession(long long id)
@@ -151,10 +151,13 @@ namespace GameKeeper
 
     ProtoRpcClient * ProtoRpcComponent::NewSession(const std::string &name)
 	{
-		NetWorkThread &  nThread = mTaskComponent->AllocateNetThread();
-
-        auto socketProxy = new SocketProxy(nThread, name);
-		auto localSession = new ProtoRpcClient(this, socketProxy, SocketType::LocalSocket);
+        auto socketProxy = new SocketProxy(mTaskComponent->AllocateNetThread(), name);
+        auto localSession = this->mClientPool.New(this, socketProxy, SocketType::LocalSocket);
+        if(localSession == nullptr)
+        {
+            delete socketProxy;
+            return nullptr;
+        }
 		this->mSessionAdressMap.emplace(socketProxy->GetSocketId(), localSession);
 		return localSession;
 	}

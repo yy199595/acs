@@ -47,7 +47,7 @@ namespace GameKeeper
             this->Resolver();
             return;
         }
-        netWorkThread.AddTask(&HttpLocalSession::Resolver, this);
+        netWorkThread.Invoke(&HttpLocalSession::Resolver, this);
     }
 
 	void HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
@@ -145,7 +145,7 @@ namespace GameKeeper
         this->mCode = code;
         CoroutineComponent *corComponent = App::Get().GetCorComponent();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&CoroutineComponent::Resume, corComponent, this->mCorId);
+        taskScheduler.Invoke(&CoroutineComponent::Resume, corComponent, this->mCorId);
     }
 
     void HttpLocalSession::Clear()

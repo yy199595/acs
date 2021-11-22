@@ -20,7 +20,7 @@ namespace GameKeeper
 			this->CloseSocket(XCode::NetActiveShutdown);
 			return;
 		}
-		this->mNetWorkThread.AddTask(&ProtoRpcClient::CloseSocket, this, XCode::NetActiveShutdown);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::CloseSocket, this, XCode::NetActiveShutdown);
 	}
 
 	bool ProtoRpcClient::StartSendProtocol(char type, const Message * message)
@@ -34,7 +34,7 @@ namespace GameKeeper
 			this->SendProtocol(type, message);
 			return true;
 		}
-		this->mNetWorkThread.AddTask(&ProtoRpcClient::SendProtocol, this, type, message);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendProtocol, this, type, message);
         return true;
 	}
 
@@ -43,7 +43,7 @@ namespace GameKeeper
 		this->mSocketProxy->Close();
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-		taskScheduler.AddMainTask(&ProtoRpcComponent::OnCloseSocket, this->mTcpComponent, id, code);
+        taskScheduler.Invoke(&ProtoRpcComponent::OnCloseSocket, this->mTcpComponent, id, code);
 	}
 
 	bool ProtoRpcClient::OnRequest(const char * buffer, size_t size)
@@ -56,7 +56,7 @@ namespace GameKeeper
 		}
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-		taskScheduler.AddMainTask(&ProtoRpcComponent::OnRequest, mTcpComponent, id, requestData);
+        taskScheduler.Invoke(&ProtoRpcComponent::OnRequest, mTcpComponent, id, requestData);
 		return true;
 	}
 
@@ -70,7 +70,7 @@ namespace GameKeeper
 		}
         long long id = this->mSocketProxy->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-		taskScheduler.AddMainTask(&ProtoRpcComponent::OnResponse, mTcpComponent, id, responseData);
+        taskScheduler.Invoke(&ProtoRpcComponent::OnResponse, mTcpComponent, id, responseData);
 		return true;
 	}
 
@@ -93,7 +93,8 @@ namespace GameKeeper
 		char * messageBuffer = new char[head + body];
 
 		messageBuffer[0] = type;
-		memcpy(messageBuffer + sizeof(char), &body, sizeof(unsigned int));
+        LocalObject<Message> lock(message);
+		memcpy(messageBuffer + sizeof(char), &body, sizeof(TCP_HEAD));
 		if (!message->SerializePartialToArray(messageBuffer + head, body))
 		{
 #ifdef __DEBUG__
@@ -101,21 +102,21 @@ namespace GameKeeper
 			util::MessageToJsonString(*message, &json);
 			GKDebugError("Serialize " << "failure : " << json);
 #endif // __DEBUG__
-			delete message;
 			delete[] messageBuffer;
 			return;
-		}		
-		if (!this->AsyncSendMessage(messageBuffer, head + body))
-		{
-			delete message;
-			delete[]messageBuffer;
 		}
+		this->AsyncSendMessage(messageBuffer, head + body);
 	}
 
     void ProtoRpcClient::OnConnect(XCode code)
     {
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&ProtoRpcComponent::OnConnectAfter, this->mTcpComponent, id, code);
+        taskScheduler.Invoke(&ProtoRpcComponent::OnConnectAfter, this->mTcpComponent, id, code);
+    }
+
+    void ProtoRpcClient::OnSendAfter(XCode code, const char *buffer, size_t size)
+    {
+        delete []buffer;
     }
 }

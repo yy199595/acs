@@ -76,6 +76,7 @@ namespace GameKeeper
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
+        stack<unsigned int> mCallStacks;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
 		std::queue<unsigned int> mLastQueues2;

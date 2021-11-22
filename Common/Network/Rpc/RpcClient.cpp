@@ -8,27 +8,35 @@ namespace GameKeeper
         mContext(socket->GetContext()),
 		mNetWorkThread(socket->GetThread())
 	{
-		this->mRecvBuffer = nullptr;
+        this->mIp.clear();
+        this->mIsConnect = false;
+        this->mConnectCount = 0;
 		this->mSocketId = socket->GetSocketId();
-	}
+        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+    }
+
+    void RpcClient::Clear()
+    {
+        this->mSocketId = 0;
+        this->mLastOperTime = 0;
+        this->mSocketProxy->Close();
+        delete this->mSocketProxy;
+    }
 
 	void RpcClient::StartReceive()
 	{
+        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-		if (this->mRecvBuffer == nullptr)
-		{
-			this->mRecvBuffer = new char[TCP_BUFFER_COUNT];			
-		}
-		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		unsigned short port = socket.remote_endpoint().port();
 		this->mIp = socket.remote_endpoint().address().to_string();
 		this->mAddress = this->mIp + ":" + std::to_string(port);
+        GKDebugInfo(this->mAddress << " start receive message");
 		if (mNetWorkThread.IsCurrentThread())
 		{
 			this->ReceiveHead();
 			return;
 		}
-		mNetWorkThread.AddTask(&RpcClient::ReceiveHead, this);
+        mNetWorkThread.Invoke(&RpcClient::ReceiveHead, this);
 	}
 
 	void RpcClient::ReceiveHead()
@@ -38,8 +46,8 @@ namespace GameKeeper
 			this->CloseSocket(XCode::NetWorkError);
 			return;
 		}
+        const size_t count = sizeof(TCP_HEAD) + sizeof(char);
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-		const size_t count = sizeof(unsigned int) + sizeof(char);
 		socket.async_read_some(asio::buffer(this->mRecvBuffer, count),
 			[this](const asio::error_code &error_code, const std::size_t t)
 		{
@@ -53,7 +61,7 @@ namespace GameKeeper
 			{
 				unsigned int length = 0;
 				char type = this->mRecvBuffer[0];
-				memcpy(&length, this->mRecvBuffer + sizeof(char), sizeof(unsigned int));
+				memcpy(&length, this->mRecvBuffer + sizeof(char), sizeof(TCP_HEAD));
 				if (length >= MAX_DATA_COUNT)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
@@ -115,7 +123,7 @@ namespace GameKeeper
 					GKDebugError(this->GetAddress() << " parse response message error");
 				}
 			}
-           this->ReceiveHead();
+            mContext.post(std::bind(&RpcClient::ReceiveHead, this));
 		});
 	}
 
@@ -130,12 +138,14 @@ namespace GameKeeper
 		nSocket.async_send(asio::buffer(buffer, size), [buffer, this]
 				(const asio::error_code &error_code, std::size_t size)
 		{
+            XCode code = XCode::Successful;
 			if (error_code)
 			{
+                code = XCode::NetSendFailure;
 				GKDebugError(error_code.message());
 				this->CloseSocket(XCode::NetSendFailure);
 			}
-			delete[]buffer;
+            this->OnSendAfter(code, buffer, size);
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
 		return true;
@@ -151,7 +161,7 @@ namespace GameKeeper
         this->mIsConnect = true;
         GKAssertRetFalse_F(this->mSocketProxy);
         NetWorkThread & nThread = this->mSocketProxy->GetThread();
-        nThread.AddTask(&RpcClient::ConnectHandler, this, ip, port, method);
+        nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port, method);
     }
 
     void RpcClient::ConnectHandler(std::string & ip, unsigned short port,  StaticMethod * method)
@@ -163,20 +173,19 @@ namespace GameKeeper
         GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
         nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
         {
-            XCode code = XCode::Successful;
+            XCode code = XCode::Failure;
             if(!err)
             {
-                this->StartReceive();
                 this->mConnectCount = 0;
-                code = XCode::NetConnectFailure;
+                code = XCode::Successful;
             }
+            this->OnConnect(code);
             this->mIsConnect = false;
             MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
             if(method != nullptr)
             {
-                taskScheduler.AddMainTask(method);
+                taskScheduler.Invoke(method);
             }
-            this->OnConnect(code);
         });
     }
 

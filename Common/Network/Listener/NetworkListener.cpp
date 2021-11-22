@@ -28,7 +28,7 @@ namespace GameKeeper
 	bool NetworkListener::StartListen(ISocketListen * handler)
 	{
 		this->mListenHandler = handler;
-        this->mTaskThread.AddTask(&NetworkListener::InitListener, this);
+        this->mTaskThread.Invoke(&NetworkListener::InitListener, this);
         App::Get().GetCorComponent()->YieldReturn(this->mCorId);
 		return this->mIsListen;
 	}
@@ -52,7 +52,7 @@ namespace GameKeeper
                                       << this->mConfig.Port << " failure" << err.what());
         }
         CoroutineComponent * component = App::Get().GetCorComponent();
-        this->mTaskScheduler.AddMainTask(&CoroutineComponent::Resume, component, this->mCorId);
+        this->mTaskScheduler.Invoke(&CoroutineComponent::Resume, component, this->mCorId);
     }
 
 	void NetworkListener::ListenConnect()
@@ -69,7 +69,7 @@ namespace GameKeeper
 				const std::string ip = socket.remote_endpoint().address().to_string();
 				GKDebugInfo(this->mConfig.Name << " listen new socket " << ip << ":" << port);
 #endif // __DEBUG__
-				mTaskScheduler.AddMainTask(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
+                mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}
 			else
 			{

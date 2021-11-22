@@ -72,6 +72,7 @@ void MainEntry(void *manager)
 
 	void CoroutineComponent::ResumeCoroutine(unsigned int id)
 	{
+        this->mCallStacks.push(this->mCurrentCorId);
         Coroutine * logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
@@ -154,6 +155,8 @@ void MainEntry(void *manager)
 		}
 		logicCoroutine->mState = CorState::Suspend;
 #ifdef __COROUTINE_ASM__
+        this->mCurrentCorId = this->mCallStacks.top();
+        this->mCallStacks.pop();
 		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
 #elif _WIN32
 		SwitchToFiber(this->mMainCoroutine->mContextStack);
@@ -244,6 +247,8 @@ void MainEntry(void *manager)
 				}
 			}
 		}
+        this->mCurrentCorId = this->mCallStacks.top();
+        this->mCallStacks.pop();
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
 

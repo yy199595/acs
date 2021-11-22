@@ -87,7 +87,7 @@ namespace GameKeeper
         this->mCode = code;
         CoroutineComponent * corComponent = App::Get().GetCorComponent();
         MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&HttpComponent::OnRequest, this->mHttpComponent, this);
+        taskScheduler.Invoke(&HttpComponent::OnRequest, this->mHttpComponent, this);
     }
 
     void HttpRemoteSession::OnReceiveHeadAfter(XCode code)

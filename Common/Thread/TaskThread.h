@@ -92,7 +92,7 @@ namespace GameKeeper
 
 	public:
 		template<typename F, typename T, typename ... Args>
-		void AddTask(F && f, T * o, Args &&... args) {
+		void Invoke(F && f, T * o, Args &&... args) {
 			this->AddTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 		}
 	protected:
@@ -110,11 +110,11 @@ namespace GameKeeper
 		explicit MainTaskScheduler(StaticMethod * method);
 	public:
 		int Start() final;
-		void AddMainTask(StaticMethod * task);		
+		void Invoke(StaticMethod * task);
 
 		template<typename F, typename T, typename ... Args>
-		void AddMainTask(F && f, T * o, Args &&... args) {
-			this->AddMainTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
+		void Invoke(F && f, T * o, Args &&... args) {
+            this->Invoke(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 		}
 	private:
 		void Update() final;

@@ -3,6 +3,7 @@
 //
 #include"Core/App.h"
 #include"JsonRpcClient.h"
+#include"Define/CommonTypeDef.h"
 #include"Scene/JsonRpcComponent.h"
 namespace GameKeeper
 {
@@ -22,7 +23,7 @@ namespace GameKeeper
         }
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&JsonRpcComponent::OnRequest, this->mRpcComponent, id, jsonReader);
+        taskScheduler.Invoke(&JsonRpcComponent::OnRequest, this->mRpcComponent, id, jsonReader);
         return true;
     }
 
@@ -30,7 +31,7 @@ namespace GameKeeper
     {
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&JsonRpcComponent::OnConnectAfter, this->mRpcComponent, id, code);
+        taskScheduler.Invoke(&JsonRpcComponent::OnConnectAfter, this->mRpcComponent, id, code);
     }
 
     bool JsonRpcClient::OnResponse(const char *buffer, size_t size)
@@ -43,7 +44,7 @@ namespace GameKeeper
         }
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.AddMainTask(&JsonRpcComponent::OnResponse, this->mRpcComponent, id, jsonReader);
+        taskScheduler.Invoke(&JsonRpcComponent::OnResponse, this->mRpcComponent, id, jsonReader);
         return true;
     }
 
@@ -64,24 +65,26 @@ namespace GameKeeper
            this->StartSendJson(type, jsonData);
             return true;
         }
-        mNetWorkThread.AddTask(&JsonRpcClient::SendJsonData, this, type, jsonData);
+        mNetWorkThread.Invoke(&JsonRpcClient::SendJsonData, this, type, jsonData);
         return true;
     }
 
     void JsonRpcClient::SendJsonData(char type, const RapidJsonWriter *jsonData)
     {
         size_t size = 0;
+        LocalObject<RapidJsonWriter> lock(jsonData);
         const char *json = jsonData->GetData(size);
         AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
-        char *sendBuffer = new char[sizeof(char) + sizeof(unsigned int) + size];
+        char *sendBuffer = new char[sizeof(char) + sizeof(TCP_HEAD) + size];
 
         sendBuffer[0] = type;
-        memcpy(sendBuffer + 1, &size, sizeof(unsigned int));
-        memcpy(sendBuffer + 1 + sizeof(unsigned int), json, size);
-        if(!this->AsyncSendMessage(sendBuffer, 1 + sizeof(unsigned int) + size))
-        {
-            delete[] sendBuffer;
-        }
-        delete jsonData;
+        memcpy(sendBuffer + 1, &size, sizeof(TCP_HEAD));
+        memcpy(sendBuffer + 1 + sizeof(TCP_HEAD), json, size);
+        this->AsyncSendMessage(sendBuffer, 1 + sizeof(unsigned int) + size);
+    }
+
+    void JsonRpcClient::OnSendAfter(XCode code, const char *buffer, size_t size)
+    {
+        delete []buffer;
     }
 }

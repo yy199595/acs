@@ -174,7 +174,7 @@ namespace GameKeeper
 		}
 	}
 	
-	void MainTaskScheduler::AddMainTask(StaticMethod * task)
+	void MainTaskScheduler::Invoke(StaticMethod * task)
 	{
 		if (task == nullptr)
 		{

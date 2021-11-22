@@ -20,6 +20,7 @@ namespace GameKeeper
         void CloseSocket(XCode code) final;
         bool OnRequest(const char *buffer, size_t size) final;
         bool OnResponse(const char *buffer, size_t size) final;
+        void OnSendAfter(XCode code, const char *buffer, size_t size) final;
     private:
         void SendJsonData(char type, const RapidJsonWriter * jsonData);
     protected:

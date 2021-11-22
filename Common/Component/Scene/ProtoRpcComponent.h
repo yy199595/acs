@@ -4,6 +4,7 @@
 #include<Script/LuaTable.h>
 #include<Other/MultiThreadQueue.h>
 #include"Network/Rpc/ProtoRpcClient.h"
+#include"Pool/AllotorPool.h"
 namespace GameKeeper
 {
 	// 管理所有session
@@ -35,12 +36,11 @@ namespace GameKeeper
 	private:
 		ProtoRpcClient *GetSession(long long id);
 	private:
-		class TaskPoolComponent * mTaskComponent{};
-		class RpcConfigComponent *mProtocolComponent{};
-		class RpcRequestComponent * mRequestComponent{};
-		class RpcResponseComponent * mResponseComponent{};
-	private:
-		std::queue<RpcClient *> mSessionQueue;
+        AllotorPool<ProtoRpcClient> mClientPool;
+        class TaskPoolComponent * mTaskComponent;
+        class RpcConfigComponent *mProtocolComponent;
+		class RpcRequestComponent * mRequestComponent;
+		class RpcResponseComponent * mResponseComponent;
 		std::unordered_map<long long, ProtoRpcClient *> mSessionAdressMap;
 	};
 }

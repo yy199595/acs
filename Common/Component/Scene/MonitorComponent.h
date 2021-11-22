@@ -14,14 +14,14 @@ namespace GameKeeper
         ~MonitorComponent() final = default;
 
     public:
-        long long GetNowTime() const { return this->mStartTime;}
+        unsigned int GetRunTime() const { return this->mSecond;}
     protected:
         bool Awake() override;
     private:
         void Update();
     private:
         bool mIsClose;
-        long long mStartTime;
+        unsigned int mSecond;
         std::thread * mThread;
         TaskPoolComponent * mTaskComponent;
     };
