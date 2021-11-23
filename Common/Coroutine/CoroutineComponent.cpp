@@ -73,7 +73,6 @@ void MainEntry(void *manager)
 
 	void CoroutineComponent::ResumeCoroutine(unsigned int id)
 	{
-        this->mCallStacks.push(this->mCurrentCorId);
         Coroutine * logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
@@ -88,30 +87,31 @@ void MainEntry(void *manager)
 		}
         if(logicCoroutine->mCorContext == nullptr)
         {
-            if(stack.co != logicCoroutine->mCoroutineId)
-            {
-                this->SaveStack(stack.co);
-                stack.co = logicCoroutine->mCoroutineId;
-            }
+//            if(stack.co != logicCoroutine->mCoroutineId)
+//            {
+//                this->SaveStack(stack.co);
+//                stack.co = logicCoroutine->mCoroutineId;
+//            }
             logicCoroutine->mCorContext =
                     tb_context_make(stack.p, STACK_SIZE, MainEntry);
             from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
         }
         else
         {
-            if(stack.co != logicCoroutine->mCoroutineId)
-            {
-                this->SaveStack(stack.co);
-                stack.co = logicCoroutine->mCoroutineId;
-                const std::string & data = logicCoroutine->mStack;
-                memcpy(logicCoroutine->mCorContext, data.c_str(), data.size());
-            }
+//            if(stack.co != logicCoroutine->mCoroutineId)
+//            {
+//                this->SaveStack(stack.co);
+//                stack.co = logicCoroutine->mCoroutineId;
+//            }
+            const std::string & data = logicCoroutine->mStack;
+            memcpy(logicCoroutine->mCorContext, data.c_str(), data.size());
             from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
         }
         if (from.priv)
         {
             assert(logicCoroutine == from.priv);
             logicCoroutine->mCorContext = from.ctx;
+            this->SaveStack(logicCoroutine->mCoroutineId);
             return;
         }
         this->Destory(logicCoroutine);
@@ -156,9 +156,7 @@ void MainEntry(void *manager)
 		}
 		logicCoroutine->mState = CorState::Suspend;
 #ifdef __COROUTINE_ASM__
-		assert(!this->mCallStacks.empty());
-        this->mCurrentCorId = this->mCallStacks.top();
-        this->mCallStacks.pop();
+        //this->SaveStack(logicCoroutine->mCoroutineId);
 		tb_context_jump(this->mMainCoroutine->mCorContext, logicCoroutine);
 #elif _WIN32
 		SwitchToFiber(this->mMainCoroutine->mContextStack);
@@ -249,9 +247,7 @@ void MainEntry(void *manager)
 				}
 			}
 		}
-		assert(!this->mCallStacks.empty());
-        this->mCurrentCorId = this->mCallStacks.top();
-        this->mCallStacks.pop();
+        delete coroutine->mFunction;
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
 

@@ -64,7 +64,6 @@ namespace GameKeeper
             return nullptr;
         }
 		auto id = std::this_thread::get_id();
-        GKDebugWarning(id);
         auto iter = this->mMysqlSocketMap.find(id);
         return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
     }
@@ -76,8 +75,8 @@ namespace GameKeeper
 		const char *passWd = this->mDataBasePasswd.c_str();
 		const char *userName = this->mDataBaseUser.c_str();
 
-		GKMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)0);
-		this->mMysqlSockt  = mysql_real_connect(mysqlSocket1, ip, userName, passWd, NULL, port, NULL,
+		GKMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)nullptr);
+		this->mMysqlSockt  = mysql_real_connect(mysqlSocket1, ip, userName, passWd, nullptr, port, nullptr,
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSockt == nullptr)
 		{

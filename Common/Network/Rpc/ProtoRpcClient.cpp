@@ -55,6 +55,7 @@ namespace GameKeeper
 			return false;
 		}
         long long id = this->GetSocketId();
+        requestData->set_socketid(id);
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&ProtoRpcComponent::OnRequest, mTcpComponent, id, requestData);
 		return true;
