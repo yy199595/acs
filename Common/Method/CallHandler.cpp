@@ -54,8 +54,6 @@ namespace GameKeeper
 		this->mCode = (XCode)response.code();
         if(this->mMessage != nullptr && this->mCode == XCode::Successful)
         {
-            std::string str1 = response.data().type_url();
-            std::string str2 = this->mMessage->GetTypeName();
 			if (response.has_data() && !response.data().UnpackTo(this->mMessage))
 			{
 				this->mCode = XCode::ParseMessageError;

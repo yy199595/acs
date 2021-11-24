@@ -39,7 +39,7 @@ namespace GameKeeper
         auto iter = this->mCorMap.begin();
         for(; iter != this->mCorMap.end(); iter++)
         {
-            size += iter->second->mStack.size();
+            size += iter->second->mStack.size;
         }
         return size;
     }
@@ -61,7 +61,6 @@ namespace GameKeeper
         coroutine->sid = 0;
         coroutine->mGroupId = 0;
         coroutine->mStackSize = 0;
-        coroutine->mStack.clear();
         coroutine->mCoroutineId = 0;
         coroutine->mFunction = nullptr;
         coroutine->mCorContext = nullptr;

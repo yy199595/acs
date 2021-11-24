@@ -81,6 +81,7 @@ namespace GameKeeper
             while (!this->mTimers.empty())
             {
                 auto id = this->mTimers.front();
+                this->mTimers.pop();
                 auto iter = this->mTimerMap.find(id);
                 if (iter != this->mTimerMap.end())
                 {
@@ -93,7 +94,6 @@ namespace GameKeeper
                     }
                     this->AddTimerToWheel(timer);
                 }
-                this->mTimers.pop();
             }
             for (size_t i = 1; i < this->mTimerLayers.size() && res; i++)
             {
@@ -103,13 +103,12 @@ namespace GameKeeper
                 while (!this->mTimers.empty())
                 {
                     auto id = this->mTimers.front();
+                    this->mTimers.pop();
                     auto timer = this->GetTimer(id);
                     if(timer != nullptr)
                     {
                         this->AddTimerToWheel(timer);
                     }
-                    this->mTimers.pop();
-
                 }
             }
         }

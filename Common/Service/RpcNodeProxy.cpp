@@ -223,8 +223,8 @@ namespace GameKeeper
 			return XCode::NotFoundRpcConfig;
 		}
         unsigned int handlerId = 0;
-		CppCallHandler cppCallHandler(requestData->methodid());
-        if(!this->mResponseComponent->AddCallHandler(&cppCallHandler,handlerId))
+		CppCallHandler * cppCallHandler = new CppCallHandler(requestData->methodid());
+        if(!this->mResponseComponent->AddCallHandler(cppCallHandler,handlerId))
         {
             return XCode::AddRpcCallbackFailure;
         }
@@ -233,7 +233,7 @@ namespace GameKeeper
 		requestData->mutable_data()->PackFrom(request);
 
         this->AddRequestDataToQueue(requestData);
-        return cppCallHandler.StartCall(response);
+        return cppCallHandler->StartCall(response);
     }
 
     bool RpcNodeProxy::AddRequestDataToQueue(const com::Rpc_Request * requestData)

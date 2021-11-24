@@ -6,6 +6,7 @@
 #include<Timer/TimerComponent.h>
 #include<Timer/CorSleepTimer.h>
 #include<fstream>
+#include"jemalloc/jemalloc.h"
 using namespace std::chrono;
 #ifdef _WIN32
 #include<Windows.h>
@@ -18,11 +19,7 @@ namespace GameKeeper
 		CoroutineComponent *pCoroutineMgr = App::Get().GetCorComponent();
 
         ((Coroutine*)parame.priv)->mCorContext = parame.ctx;
-        Coroutine * logicCoroutine = pCoroutineMgr->GetCurCoroutine();
-        if (logicCoroutine != nullptr)
-        {
-            logicCoroutine->mFunction->run();
-        }
+        pCoroutineMgr->GetCurCoroutine()->mFunction->run();
         tb_context_jump(parame.ctx, nullptr);
 #elif _WIN32
         void __stdcall MainEntry(LPVOID manager)
@@ -43,7 +40,6 @@ void MainEntry(void *manager)
 #ifdef __COROUTINE_ASM__
         for(Stack & stack : this->mSharedStack)
         {
-            stack.co = 0;
             stack.p = nullptr;
             stack.top = nullptr;
         }
@@ -58,9 +54,24 @@ void MainEntry(void *manager)
 
     bool CoroutineComponent::Awake()
     {
-		this->mCurrentCorId = 0;
-        GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
+        this->mCurrentCorId = 0;
+        for (int index = 10; index < 100; index++)
+        {
+            this->StartCoroutine(&CoroutineComponent::SleepTest, this, index);
+        }
+       GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
+//        for(int index = 10; index < 1000; index++)
+//        {
+//            StaticMethod * sleepMethod = NewMethodProxy(&CoroutineComponent::SleepTest, this, index * 100);
+//            this->mTimerManager->AddTimer(index * 100, sleepMethod);
+//        }
         return true;
+    }
+
+    void CoroutineComponent::SleepTest(int ms)
+    {
+        this->Sleep(ms * 10);
+        GKDebugWarning(TimeHelper::GetMilTimestamp() << "  " << ms);
     }
 
     void CoroutineComponent::Sleep(long long ms)
@@ -73,6 +84,7 @@ void MainEntry(void *manager)
 
 	void CoroutineComponent::ResumeCoroutine(unsigned int id)
 	{
+        this->mCorStack.push(this->mCurrentCorId);
         Coroutine * logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
@@ -81,37 +93,39 @@ void MainEntry(void *manager)
 		Stack & stack = mSharedStack[logicCoroutine->sid];
 		if (stack.p == nullptr)
 		{
-			stack.p = new char[STACK_SIZE];
-			stack.top = stack.p + STACK_SIZE;
-			stack.co = logicCoroutine->mCoroutineId;
+            stack.size = STACK_SIZE;
+            stack.p = new char[STACK_SIZE];
+			stack.top = (char *)stack.p + STACK_SIZE;
 		}
+        logicCoroutine->mState = CorState::Running;
         if(logicCoroutine->mCorContext == nullptr)
         {
-//            if(stack.co != logicCoroutine->mCoroutineId)
-//            {
-//                this->SaveStack(stack.co);
-//                stack.co = logicCoroutine->mCoroutineId;
-//            }
             logicCoroutine->mCorContext =
-                    tb_context_make(stack.p, STACK_SIZE, MainEntry);
+                    tb_context_make(stack.p, stack.size, MainEntry);
             from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
         }
         else
         {
-//            if(stack.co != logicCoroutine->mCoroutineId)
-//            {
-//                this->SaveStack(stack.co);
-//                stack.co = logicCoroutine->mCoroutineId;
-//            }
-            const std::string & data = logicCoroutine->mStack;
-            memcpy(logicCoroutine->mCorContext, data.c_str(), data.size());
+            Stack & ss = logicCoroutine->mStack;
+            memcpy(logicCoroutine->mCorContext, ss.p, ss.size);
             from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
         }
-        if (from.priv)
+
+        this->mCurrentCorId = this->mCorStack.top();
+        this->mCorStack.pop();
+
+        size_t size = stack.top - (char *)logicCoroutine->mCorContext;
+        GKDebugFatal(logicCoroutine->mCoroutineId << "   stack size = " << size);
+
+        if (from.priv != nullptr)
         {
-            assert(logicCoroutine == from.priv);
-            logicCoroutine->mCorContext = from.ctx;
-            this->SaveStack(logicCoroutine->mCoroutineId);
+             auto lastCoroutine = (Coroutine*)from.priv;
+             if(lastCoroutine != nullptr)
+             {
+                 lastCoroutine->mCorContext = from.ctx;
+                 lastCoroutine->mState = CorState::Suspend;
+                 this->SaveStack(lastCoroutine->mCoroutineId);
+             }
             return;
         }
         this->Destory(logicCoroutine);
@@ -171,8 +185,6 @@ void MainEntry(void *manager)
         GKAssertRet_F(id != 0);
         Coroutine *logicCoroutine = this->GetCoroutine(id);
         GKAssertRet(logicCoroutine, "not find coroutine id " << id);
-        GKAssertRet_F(logicCoroutine->mState == CorState::Suspend
-                      || logicCoroutine->mState == CorState::Ready);
 
         //this->ResumeCoroutine(id);
         this->mResumeCoroutines.push(id);
@@ -247,7 +259,7 @@ void MainEntry(void *manager)
 				}
 			}
 		}
-        delete coroutine->mFunction;
+        //delete coroutine->mFunction;
 		this->mCorPool.Push(coroutine);
 #ifdef __COROUTINE_ASM__
 
@@ -259,24 +271,23 @@ void MainEntry(void *manager)
 	}
 
 #ifdef __COROUTINE_ASM__
-    std::fstream fs;
 	void CoroutineComponent::SaveStack(unsigned int id)
-	{
-        assert(id != 0);
-		Coroutine * coroutine = this->GetCoroutine(id);
-		if (coroutine != nullptr)
+    {
+        Coroutine *coroutine = this->GetCoroutine(id);
+        if(coroutine == nullptr)
         {
-            coroutine->mStack.clear();
-            char *top = this->mSharedStack[coroutine->sid].top;
-            coroutine->mStackSize = top - (char *) coroutine->mCorContext;
-            coroutine->mStack.append((char *) coroutine->mCorContext, coroutine->mStackSize);
-            if(!fs.is_open())
-            {
-                fs.open(App::Get().GetWorkPath() + "cor.txt");
-            }
-            fs << "coroutine " << id << " stack size = " << coroutine->mStackSize << "\n";
-            fs.close();
+            return;
         }
+        char *top = this->mSharedStack[coroutine->sid].top;
+        size_t size = top - (char *) coroutine->mCorContext;
+        if(coroutine->mStack.size < size)
+        {
+            je_free(coroutine->mStack.p);
+            coroutine->mStack.p = (char *)je_malloc(size);
+        }
+        coroutine->mStack.size = size;
+        GKDebugError("save stack size = " << size << "  id = " << id);
+        memcpy(coroutine->mStack.p, coroutine->mCorContext, size);
     }
 #else
     void CoroutineComponent::SaveStack(Coroutine *cor, char *top)

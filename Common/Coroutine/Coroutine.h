@@ -13,6 +13,12 @@ namespace GameKeeper
 
     class CoroutineComponent;
 
+    struct Stack
+    {
+        char * p;
+        char * top;
+        size_t size = 0;
+    };
 	
 
     struct Coroutine
@@ -26,7 +32,7 @@ namespace GameKeeper
 		StaticMethod * mFunction;
 #ifdef __COROUTINE_ASM__
 		int sid;
-		std::string mStack;
+		Stack mStack;
 		tb_context_t mCorContext;
 #elif __linux__
 		void * mContextStack;
@@ -37,11 +43,4 @@ namespace GameKeeper
         CorState mState;
         unsigned int mCoroutineId;
     };
-
-	struct Stack
-	{
-		char * p;
-		char * top;
-		unsigned int co;
-	};
 }

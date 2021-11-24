@@ -69,6 +69,7 @@ namespace GameKeeper
 			return this->mCurrentCorId != 0;
 		}
 	private:
+        void SleepTest(int ms);
 		void ResumeCoroutine(unsigned int id);
 #ifdef __COROUTINE_ASM__
 		void SaveStack(unsigned int id);
@@ -76,6 +77,7 @@ namespace GameKeeper
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
+        std::stack<unsigned int> mCorStack;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
 		std::queue<unsigned int> mLastQueues2;

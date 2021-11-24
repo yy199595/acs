@@ -41,7 +41,7 @@ namespace GameKeeper
 
     bool TimeWheelLayer::MoveIndex(std::queue<unsigned int> &timers)
     {
-        timers = this->mTimerSlot[this->mCurIndex];
+        std::swap(timers, this->mTimerSlot[this->mCurIndex]);
         if ((++this->mCurIndex) >= this->mMaxCount)
         {
             this->mCurIndex = 0;
