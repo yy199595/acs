@@ -6,7 +6,9 @@
 #include<Timer/TimerComponent.h>
 #include<Timer/CorSleepTimer.h>
 #include<fstream>
+#ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
+#endif
 using namespace std::chrono;
 #ifdef _WIN32
 #include<Windows.h>
@@ -18,6 +20,10 @@ namespace GameKeeper
 	{
 		CoroutineComponent *pCoroutineMgr = App::Get().GetCorComponent();
 
+		Coroutine * logicCoroutine = pCoroutineMgr->GetCurCoroutine();
+		Coroutine * mainCoroutine = pCoroutineMgr->GetMainCoroutine();
+		Coroutine * fromCoroutine = (Coroutine*)parame.priv;
+		assert(mainCoroutine == fromCoroutine);
         ((Coroutine*)parame.priv)->mCorContext = parame.ctx;
         pCoroutineMgr->GetCurCoroutine()->mFunction->run();
         tb_context_jump(parame.ctx, nullptr);
@@ -55,9 +61,11 @@ void MainEntry(void *manager)
     bool CoroutineComponent::Awake()
     {
         this->mCurrentCorId = 0;
-        for (int index = 10; index < 100; index++)
+        for (int index = 10; index < 20; index++)
         {
             this->StartCoroutine(&CoroutineComponent::SleepTest, this, index);
+			this->StartCoroutine(&CoroutineComponent::SleepTest1, this, index);
+			this->StartCoroutine(&CoroutineComponent::SleepTest2, this, index);
         }
        GKAssertRetFalse_F(this->mTimerManager = this->GetComponent<TimerComponent>());
 //        for(int index = 10; index < 1000; index++)
@@ -74,6 +82,20 @@ void MainEntry(void *manager)
         GKDebugWarning(TimeHelper::GetMilTimestamp() << "  " << ms);
     }
 
+	void CoroutineComponent::SleepTest1(int ms)
+	{
+		long long num1 = 10;
+		std::string str;
+		int ni;
+		this->Sleep(ms * 10);
+	}
+	void CoroutineComponent::SleepTest2(int ms)
+	{
+		float num;
+		db::UserAccountData userData;
+		this->Sleep(ms * 20);
+	}
+
     void CoroutineComponent::Sleep(long long ms)
     {
         GKAssertRet_F(this->IsInLogicCoroutine());
@@ -89,33 +111,35 @@ void MainEntry(void *manager)
         GKAssertRet(logicCoroutine, "not find coroutine : " << id);
         this->mCurrentCorId = logicCoroutine->mCoroutineId;
 #ifdef __COROUTINE_ASM__
-		tb_context_from_t from;
 		Stack & stack = mSharedStack[logicCoroutine->sid];
 		if (stack.p == nullptr)
 		{
             stack.size = STACK_SIZE;
             stack.p = new char[STACK_SIZE];
+			stack.co = logicCoroutine->mCoroutineId;
 			stack.top = (char *)stack.p + STACK_SIZE;
 		}
         logicCoroutine->mState = CorState::Running;
         if(logicCoroutine->mCorContext == nullptr)
-        {
+        {			
             logicCoroutine->mCorContext =
-                    tb_context_make(stack.p, stack.size, MainEntry);
-            from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
+                    tb_context_make(stack.p, stack.size, MainEntry);           
         }
         else
-        {
-            Stack & ss = logicCoroutine->mStack;
-            memcpy(logicCoroutine->mCorContext, ss.p, ss.size);
-            from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
+        {			
+			Stack & ss = logicCoroutine->mStack;
+			memcpy(logicCoroutine->mCorContext, ss.p, ss.size);
         }
+		tb_context_from_t from = tb_context_jump(logicCoroutine->mCorContext, this->mMainCoroutine);
 
         this->mCurrentCorId = this->mCorStack.top();
         this->mCorStack.pop();
 
-        size_t size = stack.top - (char *)logicCoroutine->mCorContext;
-        GKDebugFatal(logicCoroutine->mCoroutineId << "   stack size = " << size);
+		if (stack.co != logicCoroutine->mCoroutineId)
+		{
+			this->SaveStack(stack.co);
+			stack.co = logicCoroutine->mCoroutineId;
+		}
 
         if (from.priv != nullptr)
         {
@@ -124,7 +148,7 @@ void MainEntry(void *manager)
              {
                  lastCoroutine->mCorContext = from.ctx;
                  lastCoroutine->mState = CorState::Suspend;
-                 this->SaveStack(lastCoroutine->mCoroutineId);
+                 //this->SaveStack(lastCoroutine->mCoroutineId);
              }
             return;
         }
@@ -282,8 +306,13 @@ void MainEntry(void *manager)
         size_t size = top - (char *) coroutine->mCorContext;
         if(coroutine->mStack.size < size)
         {
+#ifdef JE_MALLOC
             je_free(coroutine->mStack.p);
             coroutine->mStack.p = (char *)je_malloc(size);
+#else
+			free(coroutine->mStack.p);
+			coroutine->mStack.p = (char *)malloc(size);
+#endif
         }
         coroutine->mStack.size = size;
         GKDebugError("save stack size = " << size << "  id = " << id);

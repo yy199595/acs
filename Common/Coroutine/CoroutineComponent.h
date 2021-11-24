@@ -54,6 +54,8 @@ namespace GameKeeper
 
         Coroutine * GetCurCoroutine();
 
+		Coroutine * GetMainCoroutine() { return this->mMainCoroutine; }
+
         unsigned int GetCurrentCorId() const
         {
             return this->mCurrentCorId;
@@ -70,6 +72,8 @@ namespace GameKeeper
 		}
 	private:
         void SleepTest(int ms);
+		void SleepTest1(int ms);
+		void SleepTest2(int ms);
 		void ResumeCoroutine(unsigned int id);
 #ifdef __COROUTINE_ASM__
 		void SaveStack(unsigned int id);
