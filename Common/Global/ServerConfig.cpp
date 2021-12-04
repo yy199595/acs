@@ -1,16 +1,15 @@
 ﻿#include <fstream>
 #include <utility>
 #include "ServerConfig.h"
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Util/FileHelper.h>
-
+#include<iostream>
 namespace GameKeeper
 {
     ServerConfig::ServerConfig(std::string  path)
             : mConfigPath(std::move(path))
     {
-        this->mAreaId = 0;
-        this->mNodeId = 0;
+		std::cout << "config path = " << this->mConfigPath << std::endl;
     }
 
     bool ServerConfig::InitConfig()
@@ -18,13 +17,13 @@ namespace GameKeeper
         std::string outString;
         if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
         {
-            GKDebugError("not find config " << mConfigPath);
+			std::cerr << "not find config : " << mConfigPath << std::endl;
             return false;
         }
         mConfigDocument.Parse(outString.c_str(), outString.size());
         if (this->mConfigDocument.HasParseError())
         {
-            GKDebugFatal("parse " << mConfigPath << " failure");
+			std::cerr << "parse json : " << mConfigPath << " failure" << std::endl;
             return false;
         }
 
@@ -35,9 +34,6 @@ namespace GameKeeper
             rapidjson::Value *value = &iter->value;
             this->mMapConfigData.emplace(key, value);
         }
-        GKAssertRetFalse_F(this->GetValue("AreaId", this->mAreaId));
-        GKAssertRetFalse_F(this->GetValue("NodeId", this->mNodeId));
-        GKAssertRetFalse_F(this->GetValue("NodeName", this->mNodeName));
         return true;
     }
 

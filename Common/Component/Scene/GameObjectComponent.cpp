@@ -1,6 +1,8 @@
-#include "GameObjectComponent.h"
-#include <Object/GameObject.h>
-#include <Coroutine/CoroutineComponent.h>
+#include"GameObjectComponent.h"
+#include"Core/App.h"
+#include"Object/GameObject.h"
+#include"Coroutine/CoroutineComponent.h"
+
 namespace GameKeeper
 {
 	bool GameObjectComponent::Add(GameObject * gameObject)
@@ -16,18 +18,12 @@ namespace GameKeeper
 			return false;
 		}
 		std::vector<Component *> components;
-		std::sort(components.begin(), components.end(), 
-			[](Component * c1, Component * c2)
-		{
-			return c1->GetPriority() < c2->GetPriority();
-		});
-
-		gameObject->GetComponents(components);
+		gameObject->GetComponents(components, true);
 		for (Component * component : components)
 		{
 			if (!component->Awake())
 			{
-				GKDebugError("Init " << component->GetTypeName() << " failure");
+				LOG_ERROR("Init " << component->GetTypeName() << " failure");
 				return false;
 			}
 		}

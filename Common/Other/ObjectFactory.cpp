@@ -1,5 +1,5 @@
 ﻿#include "ObjectFactory.h"
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 
 namespace GameKeeper
 {

@@ -20,6 +20,7 @@ namespace GameKeeper
         bool Awake() final;
         bool OnLoadConfig() final;
     private:
+        std::string mDownloadPath;
         std::unordered_map<std::string, std::string> mFileMd5Map;
     };
 }

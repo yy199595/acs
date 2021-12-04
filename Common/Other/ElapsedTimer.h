@@ -21,13 +21,13 @@ namespace GameKeeper
     double ElapsedTimer::GetMs() const
     {
         long long nowTime = TimeHelper::GetMilTimestamp();
-        return (nowTime - this->mStartTime) / 1000.0f;
+        return (double)(nowTime - this->mStartTime);
     }
 
     double ElapsedTimer::GetSecond() const
     {
         long long nowTime = TimeHelper::GetMilTimestamp();
-        return (nowTime - this->mStartTime) / 1000000.0f;
+        return (nowTime - this->mStartTime) / 1000.0f;
     }
 
 }

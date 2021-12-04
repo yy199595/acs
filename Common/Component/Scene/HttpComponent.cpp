@@ -15,7 +15,8 @@
 #include <Other/ProtocolConfig.h>
 #include<Http/HttpLocalsession.h>
 
-#include<Scene/MysqlProxyComponent.h>
+#include"Core/App.h"
+#include"Scene/LoggerComponent.h"
 namespace GameKeeper
 {
 
@@ -28,7 +29,6 @@ namespace GameKeeper
 	void HttpComponent::Start()
     {
         std::string json;
-        const std::string path = App::Get().GetDownloadPath();
         const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
         std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
 		/*db::UserAccountData userAccount;
@@ -39,11 +39,11 @@ namespace GameKeeper
 		userAccount.set_lastlogintime(TimeHelper::GetSecTimeStamp());
 		XCode code = this->GetComponent<MysqlProxyComponent>()->Add(userAccount);
 
-		GKDebugError("code = " << code);*/
+		LOG_ERROR("code = " << code);*/
 
         //XCode code = this->Get(url, json);
 
-        //GKDebugFatal(code << "\n" << json.size());
+        //LOG_FATAL(code << "\n" << json.size());
 
 //        HttpJsonContent jsonContent;
 //		HttpReadStringContent stringContent;
@@ -55,10 +55,10 @@ namespace GameKeeper
 //		}
        
 
-		//GKDebugInfo(json);
+		//LOG_INFO(json);
         //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
 	
-        //GKDebugFatal(StringHelper::FormatJson(json));
+        //LOG_FATAL(StringHelper::FormatJson(json));
     }
 
     void HttpComponent::OnListen(SocketProxy *socket)
@@ -80,7 +80,7 @@ namespace GameKeeper
         if(httpMethod == nullptr)
         {		
             requestHandler->SetResponseCode(HttpStatus::NOT_FOUND);
-			GKDebugError("not find http method " << service << "." << method);
+			LOG_ERROR("not find http method " << service << "." << method);
         }
         else
         {
@@ -106,7 +106,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         long long t1 = TimeHelper::GetMilTimestamp();
         XCode code = httpLocalSession.Get(url, content);
-        GKDebugInfo("get " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
+        LOG_INFO("get " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
         return code;
 #else
         return httpLocalSession.Get(url, content);
@@ -128,7 +128,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         long long t1 = TimeHelper::GetMilTimestamp();
         XCode code = httpLocalSession.Post(url, content, response);
-        GKDebugInfo("post " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
+        LOG_INFO("post " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
         return code;
 #else
         return httpLocalSession.Post(url, content, response);
@@ -144,7 +144,7 @@ namespace GameKeeper
 //			 const std::string & method = httpConfig->Method;
 //			 const std::string & service = httpConfig->Service;
 //			 auto httpMethod = this->GetHttpMethod(service, method);
-//			 requestHandler->SetResponseCode(httpMethod->Invoke(remoteRequest));
+//			 requestHandler->SetResponseCode(httpMethod->OnResponse(remoteRequest));
 //		 }
     }
 

@@ -3,7 +3,8 @@
 //
 
 #include "HttpOperComponent.h"
-
+#include"Core/App.h"
+#include"Scene/LoggerComponent.h"
 namespace GameKeeper
 {
     bool HttpOperComponent::Awake()
@@ -28,7 +29,7 @@ namespace GameKeeper
             if(auto hotfix = dynamic_cast<IHotfix*>(component))
             {
                 hotfix->OnHotFix();
-                GKDebugLog("========== " << component->GetTypeName() << " hotfix ==========");
+                LOG_DEBUG("========== " << component->GetTypeName() << " hotfix ==========");
             }
         }
         return XCode::Successful;
@@ -50,7 +51,7 @@ namespace GameKeeper
                 if(auto configModule = dynamic_cast<ILoadConfig*>(component))
                 {
                     configModule->OnLoadConfig();
-                    GKDebugLog("========== " <<component->GetTypeName() << " load config ==========");
+                    LOG_DEBUG("========== " << component->GetTypeName() << " load config ==========");
                 }
             }
         }
@@ -63,7 +64,7 @@ namespace GameKeeper
                 if(auto configModule = dynamic_cast<ILoadConfig*>(component))
                 {
                     configModule->OnLoadConfig();
-                    GKDebugLog(component->GetTypeName() << " load config");
+                    LOG_DEBUG(component->GetTypeName() << " load config");
                 }
             }
         }
@@ -82,12 +83,12 @@ namespace GameKeeper
         auto iter = this->mOperAccountMap.find(account);
         if(iter == this->mOperAccountMap.end())
         {
-            GKDebugError(account << " does not exist");
+            LOG_ERROR(account << " does not exist");
             return XCode::AccountNotExists;
         }
         if(iter->second != password)
         {
-            GKDebugError(account << " password error");
+            LOG_ERROR(account << " password error");
             return XCode::Failure;
         }
         return XCode::Successful;

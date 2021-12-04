@@ -1,125 +1,95 @@
 ﻿#include "RedisTaskBase.h"
 #include <Scene/RedisComponent.h>
 #include <Core/App.h>
+
+#ifdef REDIS_SAVE_JSON
+#include<google/protobuf/util/json_util.h>
+#endif
 namespace GameKeeper
 {
 
     RedisTaskBase::RedisTaskBase(const std::string &cmd)
-    {       
-        this->mCommand.push_back(cmd);
+    {
+        this->mCommand.emplace_back(cmd);
         this->mStartTime = TimeHelper::GetMilTimestamp();
+        this->mRedisComponent = App::Get().GetComponent<RedisComponent>();
     }
 
-    float RedisTaskBase::GetCostTime()
+    RedisTaskBase::~RedisTaskBase()
     {
-        return (TimeHelper::GetMilTimestamp() - this->mStartTime) / 1000.0f;
-    }
-
-    void RedisTaskBase::DebugInvokeInfo()
-    {
-        std::stringstream sss;
-        sss << "[" << this->GetCostTime() << "s] {";
-        for (const std::string &str: this->mCommand)
-        {
-            sss << str << " ";
-        }
-        GKDebugLog(sss.str() << "}");
+        this->mCommand.clear();
     }
 
     bool RedisTaskBase::Run()
     {
-		RedisComponent * redisManager = App::Get().GetComponent<RedisComponent>();
-        RedisSocket *redisSocket = redisManager->GetRedisSocket();
+        RedisSocket *redisSocket = this->mRedisComponent->GetRedisSocket();
         if (redisSocket == nullptr)
         {
-            this->mErrorStr = "redis scoket null";
-            this->mErrorCode = XCode::RedisSocketIsNull;
+            const std::string &err = "redis socket null";
+            this->mResponse = std::make_shared<RedisResponse>(RedisSocketIsNull, err);
             return true;
         }
+        size_t size = (int) this->mCommand.size();
+        std::unique_ptr<size_t[]> sizeArray(new size_t[size]);
+        std::unique_ptr<const char *[]> dataArray(new const char *[size]);
 
-        const char **argvArray = new const char *[this->mCommand.size()];
-        size_t *argvSizeArray = new size_t[this->mCommand.size()];
-
+#ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
+        std::cout << "redis cmd : ";
+#endif
         for (size_t index = 0; index < this->mCommand.size(); index++)
         {
-            argvArray[index] = this->mCommand[index].c_str();
-            argvSizeArray[index] = this->mCommand[index].size();
+            sizeArray[index] = this->mCommand[index].size();
+            dataArray[index] = this->mCommand[index].c_str();
+#ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
+            std::cout << this->mCommand[index] << " ";
+#endif
         }
-        const int size = (int) this->mCommand.size();
-        redisReply *replay = (redisReply *) redisCommandArgv(redisSocket, size, argvArray, argvSizeArray);
+#ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
+        std::cout << std::endl;
+#endif
 
-        delete[] argvArray;
-        delete[] argvSizeArray;
+        auto reply = (redisReply *) redisCommandArgv(
+                redisSocket, (int) size, dataArray.get(), sizeArray.get());
 
-        //redisReply * replay = (redisReply*)redisvCommand(redisSocket, this->mFormat.c_str(), this->mCommand);
-        if (replay == nullptr)
+        if (reply == nullptr)
         {
-            this->mErrorStr = "redis replay null";
-            this->mErrorCode = XCode::RedisReplyIsNull;
+            const std::string err = "redis replay null";
+            this->mResponse = std::make_shared<RedisResponse>(RedisReplyIsNull, err);
             return true;
         }
-        switch (replay->type)
+        if (reply->type == REDIS_REPLY_ERROR)
         {
-            case REDIS_REPLY_STATUS:
-                this->mErrorCode = XCode::Successful;
-                this->mQueryDatas.push_back(std::string(replay->str, replay->len));
-                break;
-            case REDIS_REPLY_ERROR:
-                this->mErrorCode = RedisInvokeFailure;
-                this->mErrorStr.assign(replay->str, replay->len);
-                break;
-            case REDIS_REPLY_INTEGER:
-                this->mErrorCode = XCode::Successful;
-                this->mQueryDatas.push_back(std::to_string(replay->integer));
-                break;
-            case REDIS_REPLY_NIL:
-                this->mErrorCode = XCode::Successful;
-                break;
-            case REDIS_REPLY_STRING:
-                this->mErrorCode = XCode::Successful;
-                this->mQueryDatas.push_back(std::string (replay->str, replay->len));
-                break;
-            case REDIS_REPLY_ARRAY:
-                this->mErrorCode = XCode::Successful;
-                for (size_t index = 0; index < replay->elements; index++)
-                {
-                    redisReply *redisData = replay->element[index];
-                    if(redisData->type == REDIS_REPLY_INTEGER)
-                    {
-                        this->mQueryDatas.push_back(std::to_string(redisData->integer));
-                    }
-                    else if(redisData->type == REDIS_REPLY_STRING)
-                    {
-                        this->mQueryDatas.push_back(std::string(redisData->str, redisData->len));
-                    }
-                }
-                break;
+            const std::string err(reply->str, reply->len);
+            this->mResponse = std::make_shared<RedisResponse>(RedisInvokeFailure, err);
+            return true;
         }
-        freeReplyObject(replay);
+        this->mResponse = std::make_shared<RedisResponse>(reply);
         return true;
     }
 
     void RedisTaskBase::AddCommandArgv(const std::string &argv)
     {
-        this->mCommand.push_back(argv);
+        this->mCommand.emplace_back(argv);
     }
 
     void RedisTaskBase::AddCommandArgv(const char *str, const size_t size)
     {
-        this->mCommand.push_back(std::string(str, size));
+        this->mCommand.emplace_back(str, size);
     }
 
-    bool RedisTaskBase::GetOnceData(std::string &value)
+    void RedisTaskBase::AddCommand(const Message &value)
     {
-        if (this->mErrorCode != XCode::Successful)
+#ifdef REDIS_SAVE_JSON
+        std::string json;
+        util::MessageToJsonString(value, &json);
+        this->mCommand.emplace_back(json);
+#else
+        std::string message;
+        if(value.SerializeToString(&message))
         {
-            return false;
+            this->mCommand.emplace_back(message);
         }
-        if (this->mQueryDatas.empty())
-        {
-            return false;
-        }
-        value = this->mQueryDatas[0];
-        return true;
+#endif
     }
+
 }// namespace GameKeeper

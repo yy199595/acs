@@ -54,7 +54,7 @@ namespace GameKeeper
                 if (!fileContent->OpenFile())
                 {
                     delete fileContent;
-                    GKDebugError("not open file " << fullPath);
+                    LOG_ERROR("not open file " << fullPath);
                     return false;
                 }
                 this->mContent = fileContent;
@@ -67,14 +67,14 @@ namespace GameKeeper
 
         const std::string app = "App/";
         size_t pos1 = this->mPath.find(app);
-        GKAssertRetFalse_F(pos1 != std::string::npos);
+        LOG_CHECK_RET_FALSE(pos1 != std::string::npos);
         pos1 = pos1 + app.length();
         size_t pos2 = this->mPath.find('/', pos1 + 1);
-        GKAssertRetFalse_F(pos2 != std::string::npos);
+        LOG_CHECK_RET_FALSE(pos2 != std::string::npos);
 
         this->mMethod = this->mPath.substr(pos2 + 1);
         this->mComponent = this->mPath.substr(pos1, pos2 - pos1);
-        GKDebugLog("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
+        LOG_DEBUG("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
 
         while (streamBuf.size() > 0)
         {
@@ -86,7 +86,7 @@ namespace GameKeeper
         sss << "\n========== http post ==========\n";
         sss << this->PrintHeard();
         sss << "==================================";
-        GKDebugInfo(sss.str());
+        LOG_INFO(sss.str());
 #endif
         return true;
     }
@@ -103,7 +103,7 @@ namespace GameKeeper
         {
             if (this->mContent->GetContentSize() >= HttpPostMaxCount)
             {
-                GKDebugError("http post data failure");
+                LOG_ERROR("http post data failure");
                 return false;
             }
         }

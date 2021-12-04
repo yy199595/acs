@@ -67,23 +67,19 @@ namespace GameKeeper
 		this->mFinishTaskQueue.Add(taskId);
 	}
 
-    bool TaskPoolComponent::StartTask(TaskProxy * task)
-    {
-        if (task == nullptr)
-        {
-            return false;
-        }
-        auto iter = this->mTaskMap.find(task->GetTaskId());
-        if (iter == this->mTaskMap.end())
-        {
-            task->mTaskId = mTaskNumberPool.Pop();
-            this->mTaskMap.emplace(task->GetTaskId(), task);
-            size_t index = task->GetTaskId() % this->mThreadArray.size();
-            this->mThreadArray[index]->AddTask(task);
-            return true;
-        }
-        return false;
-    }
+	bool TaskPoolComponent::StartTask(TaskProxy * task)
+	{
+		if (task == nullptr)
+		{
+			return false;
+		}
+
+		task->mTaskId = mTaskNumberPool.Pop();
+		this->mTaskMap.emplace(task->GetTaskId(), task);
+		size_t index = task->GetTaskId() % this->mThreadArray.size();
+		this->mThreadArray[index]->AddTask(task);
+		return true;
+	}
 
     void TaskPoolComponent::OnSystemUpdate()
     {

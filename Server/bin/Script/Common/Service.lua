@@ -1,6 +1,6 @@
 
 Service = {}
-function Service.Invoke(method, response, message, id, json)
+function Service.OnResponse(method, response, message, id, json)
     local request = nil
     if type(json) == 'string' then
         request = Json.ToObject(json)

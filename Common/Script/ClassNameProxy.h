@@ -40,7 +40,6 @@ namespace ClassNameProxy
             ClassRegisterInfo *info = iter->second;
             return info->mName.c_str();
         }
-        printf("Get Class Name Null : %s\n", typeid(T).name());
         return nullptr;
     }
 

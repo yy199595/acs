@@ -252,7 +252,7 @@ void io_context::executor_type::dispatch(
 {
   typedef typename decay<Function>::type function_type;
 
-  // Invoke immediately if we are already inside the thread pool.
+  // OnResponse immediately if we are already inside the thread pool.
   if (io_context_.impl_.can_dispatch())
   {
     // Make a local, non-const copy of the function.

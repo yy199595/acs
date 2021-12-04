@@ -18,14 +18,14 @@ namespace GameKeeper {
 		public:
 			StaticMethod0(F && f, T* o) : _func(std::forward<F>(f)), _o(o) {}
 
-			virtual void run() {
+            void run() final {
 				(_o->*_func)();
 			}
 
 		private:
 			T* _o;
 			F _func;
-			virtual ~StaticMethod0() {}
+			 ~StaticMethod0() final = default;
 		};
 
 		template<typename F, typename T, typename P>
@@ -35,7 +35,7 @@ namespace GameKeeper {
 				: _func(std::forward<F>(f)), _o(o), _p(std::forward<P>(p)) {
 			}
 
-			virtual void run() {
+            void run() final {
 				(_o->*_func)(_p);
 			}
 
@@ -43,8 +43,7 @@ namespace GameKeeper {
 			T* _o;
 			F _func;
 			typename std::remove_reference<P>::type _p;
-
-			virtual ~StaticMethod1() {}
+            ~StaticMethod1() final = default;
 		};
 
 		template<typename F, typename T, typename P1, typename P2>
@@ -57,7 +56,7 @@ namespace GameKeeper {
 
 			}
 
-			virtual void run() {
+            void run() final {
 				(_o->*_func)(_p1, _p2);
 			}
 
@@ -67,7 +66,7 @@ namespace GameKeeper {
 			typename std::remove_reference<P1>::type _p1;
 			typename std::remove_reference<P2>::type _p2;
 
-			virtual ~StaticMethod2() {}
+            ~StaticMethod2() final = default;
 		};
 
 		template<typename F, typename T, typename P1, typename P2, typename P3>
@@ -80,7 +79,7 @@ namespace GameKeeper {
 
 			}
 
-			virtual void run() {
+            void run() final {
 				(_o->*_func)(_p1, _p2, _p3);
 			}
 
@@ -91,7 +90,7 @@ namespace GameKeeper {
 			typename std::remove_reference<P2>::type _p2;
 			typename std::remove_reference<P3>::type _p3;
 
-			virtual ~StaticMethod3() {}
+            ~StaticMethod3() final = default;
 		};
 
 	template<typename T, typename F>

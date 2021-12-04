@@ -11,9 +11,10 @@ namespace GameKeeper
 {
     bool HttpResourceComponent::Awake()
     {
+        const ServerPath &serverPath = App::Get().GetServerPath();
+        this->mDownloadPath = serverPath.GetDownloadPath();
         this->Add("Files", &HttpResourceComponent::Files, this);
         this->Add("Download", &HttpResourceComponent::Download, this);
-
         return true;
     }
 
@@ -21,10 +22,9 @@ namespace GameKeeper
     {
         this->mFileMd5Map.clear();
         std::vector<std::string> files;
-        const std::string & downloadPath = App::Get().GetDownloadPath();
-        if (!DirectoryHelper::GetFilePaths(downloadPath, files))
+        if (!DirectoryHelper::GetFilePaths(this->mDownloadPath, files))
         {
-            GKDebugError("not find dir : " << downloadPath);
+            LOG_ERROR("not find dir : " << mDownloadPath);
             return false;
         }
         for (const std::string &path: files)
@@ -32,11 +32,11 @@ namespace GameKeeper
             std::ifstream fs(path, std::ios::in);
             if (!fs.is_open())
             {
-                GKDebugError("not open file : " << path);
+                LOG_ERROR("not open file : " << path);
                 return false;
             }
             MD5 md5(fs);
-            const std::string dir = path.substr(downloadPath.size() +1);
+            const std::string dir = path.substr(mDownloadPath.size() +1);
             this->mFileMd5Map.insert(std::make_pair(dir, md5.toString()));
         }
         return true;
@@ -64,7 +64,7 @@ namespace GameKeeper
         {
             return HttpStatus::NOT_FOUND;
         }
-        const std::string dir = App::Get().GetDownloadPath() + fileName;
+        const std::string dir = this->mDownloadPath + fileName;
         getRequest->SetResponseContent(new HttpWriteFileContent(dir));
         return HttpStatus::OK;
     }

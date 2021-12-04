@@ -1,5 +1,6 @@
 #include "GameObject.h"
-#include <Define/CommonDef.h>
+#include"Core/App.h"
+#include <Define/CommonLogDef.h>
 #include <Component/Component.h>
 namespace GameKeeper
 {
@@ -36,7 +37,7 @@ namespace GameKeeper
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			GKDebugError("add " << name << "failure");
+			LOG_ERROR("add " << name << "failure");
 			return false;
 		}
 		component->gameObject = this;
@@ -45,7 +46,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	void GameObject::GetComponents(std::vector<Component*>& components) const
+	void GameObject::GetComponents(std::vector<Component*>& components, bool sort) const
 	{
 		components.clear();
 		auto iter = this->mComponentMap.begin();
@@ -53,6 +54,14 @@ namespace GameKeeper
 		{
 			Component *component = iter->second;
 			components.push_back(component);
+		}
+		if (sort)
+		{
+			std::sort(components.begin(), components.end(),
+				[](Component * c1, Component * c2)
+			{
+				return c1->GetPriority() < c2->GetPriority();
+			});
 		}
 	}
 
@@ -62,8 +71,14 @@ namespace GameKeeper
 		for (; iter != this->mComponentMap.end(); iter++)
 		{
 			Component * component = iter->second;
-			component->OnDestory();
+			if (component != nullptr)
+			{
+				component->OnDestory();
+				component->SetActive(false);
+				ComponentHelper::DestoryComponent(component);
+			}			
 		}
+		this->mComponentMap.clear();
     }
 
 	Component * GameObject::GetComponentByName(const std::string & name)
@@ -78,10 +93,14 @@ namespace GameKeeper
         if (iter != this->mComponentMap.end())
         {
             Component *component = iter->second;
-            component->SetActive(false);
 			this->mComponentMap.erase(iter);
-			ComponentHelper::DestoryComponent(component);
-            return true;
+			if (component != nullptr)
+			{
+				component->OnDestory();
+				component->SetActive(false);
+				ComponentHelper::DestoryComponent(component);
+				return true;
+			}
         }
         return false;
     }

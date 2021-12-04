@@ -1,6 +1,7 @@
 #include"HttpGetRequest.h"
-#include<Define/CommonDef.h>
+#include<Define/CommonLogDef.h>
 #include<NetworkHelper.h>
+#include"Core/App.h"
 #include<Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
@@ -58,7 +59,7 @@ namespace GameKeeper
                 {
                     this->mCurrentLength += size;
                     size_t process = this->mCurrentLength * 1000 / dataLength;
-                    GKDebugInfo("download file " << fileContent->GetPaht() << " [" << process / 10.0f << "%]");
+                    LOG_INFO("download file " << fileContent->GetPaht() << " [" << process / 10.0f << "%]");
                 }
             }
 #endif // __DEBUG__

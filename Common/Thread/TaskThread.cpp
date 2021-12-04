@@ -9,14 +9,17 @@ namespace GameKeeper
 	IThread::IThread(std::string  name,TaskPoolComponent * task)
 		: mName(std::move(name)), mIsClose(false), mTaskComponent(task)
     {		
-		this->mIsWork = false;
+		this->mIsWork = true;
     }
 
     void IThread::HangUp()
     {
-        this->mIsWork = false;
-        std::unique_lock<std::mutex> waitLock(this->mThreadLock);
-        this->mThreadVariable.wait(waitLock);
+        if(this->mIsWork)
+        {
+            this->mIsWork = false;
+            std::unique_lock<std::mutex> waitLock(this->mThreadLock);
+            this->mThreadVariable.wait(waitLock);
+        }
     }
 
     void IThread::Stop()
@@ -47,8 +50,12 @@ namespace GameKeeper
 
 	void TaskThread::AddTask(TaskProxy * task)
     {
+        if(!this->mIsWork)
+        {
+            this->mIsWork = true;
+            this->mThreadVariable.notify_one();
+        }
         this->mWaitInvokeTask.Add(task);
-        this->mThreadVariable.notify_one();
         this->mTaskState = ThreadState::Run;
     }
 
@@ -64,25 +71,17 @@ namespace GameKeeper
             this->mWaitInvokeTask.SwapQueueData();
 #endif
             this->mLastOperTime = TimeHelper::GetSecTimeStamp();
-            while (this->mWaitInvokeTask.PopItem(task))
+            if (this->mWaitInvokeTask.PopItem(task))
             {
-                this->mIsWork = true;
                 if (task->Run())
                 {
-                    this->mFinishTasks.push(task->GetTaskId());
+                    unsigned int id = task->GetTaskId();
+                    this->mTaskComponent->PushFinishTask(id);
                 }
-            }
-
-            while (!this->mFinishTasks.empty())
-            {
-                unsigned int id = this->mFinishTasks.front();
-                this->mFinishTasks.pop();
-                this->mTaskComponent->PushFinishTask(id);
+                continue;
             }
             this->HangUp();
-            this->mTaskState = ThreadState::Idle;
         }
-
     }
 }
 
@@ -119,22 +118,17 @@ namespace GameKeeper
         while(!this->mIsClose)
         {
             std::this_thread::sleep_for(time);
-            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
-            this->mAsioContext->poll(err);
-            if(err)
-            {
-                GKDebugError(err.message());
-            }           
+            this->mAsioContext->poll(err);                  
             StaticMethod * taskMethod = nullptr;
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeMethod.SwapQueueData();
 #endif
+            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
             while (this->mWaitInvokeMethod.PopItem(taskMethod))
             {
                 taskMethod->run();
                 delete taskMethod;
             }
-
         }
     }
 }

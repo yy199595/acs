@@ -1,10 +1,11 @@
 ﻿#include "TimerComponent.h"
 #include <Timer/DelayTimer.h>
-
+#include"Core/App.h"
 namespace GameKeeper
 {
     bool TimerComponent::Awake()
     {
+		this->mNextUpdateTime = 0;
         for (int index = 0; index < this->LayerCount; index++)
         {
             int count = index == 0
@@ -15,9 +16,14 @@ namespace GameKeeper
                     FirstLayerCount * std::pow(OtherLayerCount, index - 1);
             this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
         }
-        this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
+        
         return true;
     }
+
+	void TimerComponent::Start()
+	{
+		this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
+	}
 
     unsigned int TimerComponent::AddTimer(TimerBase * timer)
     {
@@ -26,7 +32,7 @@ namespace GameKeeper
             return false;
         }
         timer->mTimerId = this->mTimerIdPool.Pop();
-        GKAssertRetZero_F(this->AddTimerToWheel(timer));
+        LOG_CHECK_RET_ZERO(this->AddTimerToWheel(timer));
         return timer->mTimerId;
     }
 
@@ -61,6 +67,10 @@ namespace GameKeeper
 
     void TimerComponent::OnSystemUpdate()
     {
+		if (this->mNextUpdateTime == 0)
+		{
+			return;
+		}
         long long nowTime = TimeHelper::GetMilTimestamp();
         long long subTime = nowTime - this->mNextUpdateTime;
 
@@ -144,7 +154,7 @@ namespace GameKeeper
             }
         }
         delete timer;
-        GKDebugError("add timer " << timer->GetTimerId() << " failure");
+        LOG_ERROR("add timer " << timer->GetTimerId() << " failure");
         return false;
     }
 }// namespace GameKeeper

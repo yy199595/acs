@@ -1,18 +1,14 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
-#include <Scene/RpcResponseComponent.h>
-#include <Component/Scene/RpcRequestComponent.h>
-#include <Method/CallHandler.h>
-#include <Service/LuaServiceComponent.h>
-#include <Timer/LuaActionTimer.h>
+#include <ProtoRpc/ProtoRpcComponent.h>
+#include <Async/RpcTask/ProtoRpcTask.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/ProtoRpcComponent.h>
+#include <ProtoRpc/ProtoRpcClientComponent.h>
 
 #include <Service/RpcNodeProxy.h>
-#include <Pool/MessagePool.h>
 using namespace GameKeeper;
 
 int SystemExtension::Call(lua_State *lua)
@@ -27,7 +23,7 @@ int SystemExtension::Call(lua_State *lua)
 	if (lua_pushthread(lua) == 1)
 	{
 		lua_pushinteger(lua, XCode::NoCoroutineContext);
-		GKDebugError("call " << service << "." << method << " not coroutine context");
+		LOG_ERROR("call " << service << "." << method << " not coroutine context");
 		return 1;
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
@@ -41,7 +37,6 @@ int SystemExtension::Call(lua_State *lua)
 		return 1;
 	}
 	int index = 4;
-	PacketMapper * packetMapper = nullptr;
 	if (lua_isinteger(lua, index))
 	{
 		const long long userId = lua_tointeger(lua, index);
@@ -63,12 +58,12 @@ int SystemExtension::Call(lua_State *lua)
 //	if (lua_istable(lua, index))
 //	{
 //		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-//		int ref = scriptComponent->GetLuaRef("Json", "ToString");
+//		int ref = scriptComponent->GetLuaRef("JsonRpc", "ToString");
 //		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 //		lua_pushvalue(lua, index);
 //		if (lua_pcall(lua, 1, 1, 0) != 0)
 //		{
-//			GKDebugError("call " << service << "." << method << " " << lua_tostring(lua, -1));
+//			LOG_ERROR("call " << service << "." << method << " " << lua_tostring(lua, -1));
 //			lua_pushinteger(lua, (int)XCode::Failure);
 //			return 1;
 //		}
@@ -90,8 +85,8 @@ int SystemExtension::Call(lua_State *lua)
 //		}
 //	}
 //
-//	auto actionComponent = App::Get().GetComponent<RpcResponseComponent>();
-//	auto cb = std::make_shared<LuaCallHandler>(lua, coroutine);
+//	auto actionComponent = App::Get().GetComponent<ProtoResponseComponent>();
+//	auto cb = std::make_shared<LuaProtoRpcTask>(lua, coroutine);
 //
 //	if (!packetMapper->SetRpcId(actionComponent->AddCallHandler(cb)))
 //	{
@@ -136,7 +131,7 @@ extern bool SystemExtension::RequireLua(lua_State *luaEnv, const char *name)
         lua_pushstring(luaEnv, name);
         if (lua_pcall(luaEnv, 1, 1, 0) != 0)
         {
-            GKDebugError(lua_tostring(luaEnv, -1));
+            LOG_ERROR(lua_tostring(luaEnv, -1));
             return false;
         }
         return lua_istable(luaEnv, -1);
@@ -152,7 +147,7 @@ int SystemExtension::Sleep(lua_State *luaEnv)
     if (pTimerManager != nullptr)
     {
         auto timer = LuaSleepTimer::Create(luaEnv, -1, ms);
-        //TODO pTimerManager->AddTimer(pTimer);
+        //TODO pTimerManager->AsyncWait(pTimer);
     }
     return lua_yield(luaEnv, 1);
 }

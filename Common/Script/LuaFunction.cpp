@@ -1,6 +1,5 @@
 #include "LuaFunction.h"
-#include <Define/CommonDef.h>
-
+#include <Define/CommonLogDef.h>
 LuaFunction::LuaFunction(lua_State *luaEnv, int ref)
 {
     this->luaEnv = luaEnv;
@@ -38,7 +37,9 @@ void LuaFunction::Action()
     lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
     if (lua_isfunction(this->luaEnv, -1))
     {
-        int status = lua_pcall(this->luaEnv, 0, 0, 0);
-        GKAssertRet(status == 0, lua_tostring(luaEnv, -1));
+        if(lua_pcall(this->luaEnv, 0, 0, 0) != 0)
+        {
+            LOG_ERROR(lua_tostring(luaEnv, -1));
+        }
     }
 }

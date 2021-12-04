@@ -1,5 +1,6 @@
 #include "LuaSleepTimer.h"
-#include <Define/CommonDef.h>
+#include"Core/App.h"
+#include <Define/CommonLogDef.h>
 namespace GameKeeper
 {
     LuaSleepTimer::LuaSleepTimer(lua_State *lua, int ref, long long ms)

@@ -13,13 +13,13 @@ namespace GameKeeper
 		static Message * New(const Any & any);
 		static Message * New(const std::string & name);
 
-        static Message * NewByData(const Any & any);
-        static Message * NewByJson(const Any & any, const std::string & json);
-        static Message * NewByJson(const std::string & name, const std::string & json);
-		static Message * NewByJson(const std::string & name, const char * json, size_t size);
+        static Message * NewByData(const Any & any,bool clone = false);
+        static Message * NewByJson(const Any & any, const std::string & json,bool clone = false);
+        static Message * NewByJson(const std::string & name, const std::string & json,bool clone = false);
+		static Message * NewByJson(const std::string & name, const char * json, size_t size,bool clone = false);
 	public:
-		static Message * NewByData(const std::string & name, const std::string & data);
-		static Message * NewByData(const std::string & name, const char * json, size_t size);
+		static Message * NewByData(const std::string & name, const std::string & data,bool clone = false);
+		static Message * NewByData(const std::string & name, const char * json, size_t size,bool clone = false);
 	private:
 		static std::unordered_map<std::string, Message *> mMessageMap;
 	};

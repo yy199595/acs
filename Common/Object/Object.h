@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Define/ClassStatement.h>
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Define/CommonTypeDef.h>
 
 namespace GameKeeper
@@ -19,8 +19,6 @@ namespace GameKeeper
     public:
         inline bool IsActive() const { return this->mIsActive; }
 
-        inline long long GetIntanceID() const { return mIntanceID; }
-        
         inline void SetActive(bool isActive) { this->mIsActive = isActive; }
 
         inline const std::string &GetTypeName() { return this->mClassName; }
@@ -36,7 +34,6 @@ namespace GameKeeper
 
     private:
         bool mIsActive;
-        long long mIntanceID;
         std::string mClassName;
     };
 }// namespace GameKeeper

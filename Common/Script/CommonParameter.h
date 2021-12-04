@@ -88,9 +88,7 @@ namespace CommonParameter
     {
         size_t size = 0;
         static std::string str = "";
-        str.clear();
-        const char *p = lua_tolstring(lua, index, &size);
-        str.append(p, size);
+		str.assign(lua_tolstring(lua, index, &size), size);
         return str;
     }
 
@@ -99,9 +97,7 @@ namespace CommonParameter
     {
         size_t size = 0;
         static std::string str = "";
-        str.clear();
-        const char *p = lua_tolstring(lua, index, &size);
-        str.append(p, size);
+        str.assign(lua_tolstring(lua, index, &size), size);
         return str;
     }
 

@@ -11,6 +11,8 @@ namespace FileHelper
 
     extern bool ReadJsonFile(const std::string& path, rapidjson::Document &document);
 
+    extern bool ReadJsonFile(const std::string& path, rapidjson::Document &document, std::string & md5);
+
     extern bool ReadTxtFile(const std::string& path, std::vector<std::string> &outLines);
 
     extern bool WriterFile(const std::string& path, const std::string &fileContent);

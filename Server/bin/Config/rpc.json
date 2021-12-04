@@ -1,9 +1,10 @@
 {
-    "NodeCenter": {
+    "CenterHostService": {
         "Add": {
             "Id":101,
             "Async":false,
             "Timeout":0,
+            "Type":"Server",
             "Request": "s2s.NodeRegister.Request",
             "Response":"s2s.NodeRegister.Response"
         },
@@ -11,22 +12,44 @@
             "Id":102,
             "Async":false,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.NodeQuery.Request",
             "Response":"s2s.NodeQuery.Response"
+        },
+        "QueryHosts":{
+            "Id":103,
+            "Async":false,
+            "Timeout":0,
+            "Type":"Server",
+            "Response":"s2s.HostQuery.Response"
         }
     },
-    "NodeServer": {
+    "LocalHostService": {
         "Add": {
             "Id":111,
             "Async":false,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.NodeInfo"
         },
         "Del": {
             "Id":112,
             "Async":false,
             "Timeout":0,
+            "Type":"Server",
             "Request":"com.Int32Data"
+        },
+        "Hotfix":{
+            "Id":113,
+            "Async":false,
+            "Timeout":0,
+            "Type":"Server"
+        },
+        "ReLoadConfig":{
+            "Id":114,
+            "Async":false,
+            "Timeout":0,
+            "Type":"Server"
         }
     },
     "MysqlService": {
@@ -34,6 +57,7 @@
             "Id":121,
             "Async":true,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
@@ -41,6 +65,7 @@
             "Id":122,
             "Async":true,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
@@ -48,6 +73,7 @@
             "Id":123,
             "Async":true,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
             "Response":"s2s.MysqlOper.Response"
         },
@@ -55,6 +81,7 @@
             "Id":124,
             "Async":true,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.MysqlQuery.Request",
             "Response":"s2s.MysqlQuery.Response"
         },
@@ -62,26 +89,40 @@
             "Id":215,
             "Async":true,
             "Timeout":0,
+            "Type":"Server",
             "Request":"s2s.MysqlAnyOper.Request",
             "Response":"s2s.MysqlAnyOper.Response"
         }
     },
-    "LoginService":{
-        
-    },
-    "GatewayService":{
-        "Login":{
-            "Id":131,
-            "Async":true,
-            "Timeout":0,
-            "Request":"c2s.GateLogin.Request",
-            "Response":"c2s.GateLogin.Response"
+    "AccountService":{
+        "Register": {
+            "Id": 310,
+            "Async": true,
+            "Timeout": 0,
+            "Type":"Client",
+            "Request": "c2s.AccountRegister.Request",
+            "Response": "c2s.AccountRegister.Response"
         },
-        "Logout":{
-            "Id":132,
-            "Async":false,
-            "Timeout":0,
-            "Request":"c2s.GateLogout.Request"
+        "Login": {
+            "Id": 311,
+            "Async": true,
+            "Timeout": 0,
+            "Type":"Client",
+            "Request": "c2s.AccountLogin.Request",
+            "Response": "c2s.AccountLogin.Response"
+        }
+    },
+    "ProxyService": {
+        "Ping": {
+            "Id": 410,
+            "Async": false,
+            "Type":"Client"
+        },
+        "Login": {
+            "Id": 411,
+            "Async": false,
+            "Type":"Client",
+            "Request": "c2s.ProxyLogin.Request"
         }
     }
 }

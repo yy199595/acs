@@ -54,6 +54,14 @@ message NodeQuery
     }
 }
 
+message HostQuery
+{
+    message Response
+    {
+        repeated string Hosts = 1;
+    }
+}
+
 message MysqlQuery
 {
     message Request

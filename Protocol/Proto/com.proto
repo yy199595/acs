@@ -54,7 +54,7 @@ message Rpc
      message Request
      {
           int64 UserId = 1;
-          uint32 RpcId = 2;
+          int64 RpcId = 2;
           int32 MethodId = 3;
           int64 SocketId = 4;
           google.protobuf.Any Data = 5;
@@ -62,7 +62,7 @@ message Rpc
      message Response
      {
           int32 Code = 1;
-          uint32 RpcId = 2;
+          int64 RpcId = 2;
           int64 UserId = 3;
           google.protobuf.Any Data = 4;
      }

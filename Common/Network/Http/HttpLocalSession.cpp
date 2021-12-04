@@ -52,7 +52,7 @@ namespace GameKeeper
 
 	void HttpLocalSession::OnReceiveHeard(asio::streambuf & buf)
     {
-        GKAssertRet_F(this->mHttpHandler);
+        LOG_CHECK_RET(this->mHttpHandler);
         this->mHttpHandler->OnReceiveHead(buf);
     }
 
@@ -69,7 +69,7 @@ namespace GameKeeper
             if (err)
             {
                 this->SetCode(XCode::HttpNetWorkError);
-                GKDebugError("resolver " << this->mHost << ":" << this->mPort << " failure : " << err.message());
+                LOG_ERROR("resolver " << this->mHost << ":" << this->mPort << " failure : " << err.message());
                 return;
             }
 			AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
@@ -87,7 +87,7 @@ namespace GameKeeper
         this->mHttpHandler = this->mGetHandler;
         this->StartConnectHost(this->mGetHandler->GetHost(), this->mGetHandler->GetPort());
 
-        App::Get().GetCorComponent()->YieldReturn(this->mCorId);
+        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
         if(this->mCode != XCode::Successful)
         {
             return this->mCode;
@@ -108,7 +108,7 @@ namespace GameKeeper
         this->mHttpHandler = this->mPostHandler;
         this->StartConnectHost(this->mPostHandler->GetHost(), this->mPostHandler->GetPort());
 
-        App::Get().GetCorComponent()->YieldReturn(this->mCorId);
+        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
         if(this->mCode != XCode::Successful)
         {
             return this->mCode;
@@ -173,13 +173,13 @@ namespace GameKeeper
         if (err)
         {
             this->SetCode(XCode::HttpNetWorkError);
-            GKDebugError("connect " << this->mHost << ":" << this->mPort << " failure : " << err.message());
+            LOG_ERROR("connect " << this->mHost << ":" << this->mPort << " failure : " << err.message());
             return;
         }
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
         this->mAddress = socket.remote_endpoint().address().to_string()
                          + ":" + std::to_string(socket.remote_endpoint().port());
-        GKDebugLog("connect to " << this->mHost << ":" << this->mPort << " successful");
+        LOG_DEBUG("connect to " << this->mHost << ":" << this->mPort << " successful");
         this->StartSendHttpMessage();
     }
 
@@ -209,7 +209,7 @@ namespace GameKeeper
 
     void HttpLocalSession::ReadBodyCallback(const asio::error_code &err, size_t size)
     {
-        GKAssertRet_F(this->mHttpHandler);
+        LOG_CHECK_RET(this->mHttpHandler);
         if(err == asio::error::eof)
         {
             this->SetCode(XCode::Successful);

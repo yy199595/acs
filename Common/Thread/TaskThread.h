@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "TaskProxy.h"
-#include <condition_variable>
-#include <mutex>
-#include <queue>
-#include <thread>
-#include <Define/CommonDef.h>
-#include <Other/MultiThreadQueue.h>
-#include <Method/MethodProxy.h>
+#include<condition_variable>
+#include<mutex>
+#include<queue>
+#include<thread>
+#include<atomic>
+#include<Define/CommonLogDef.h>
+#include<Other/MultiThreadQueue.h>
+#include<Method/MethodProxy.h>
 namespace GameKeeper
 {
 	class StaticMethod;
@@ -46,11 +47,11 @@ namespace GameKeeper
 	protected:
 		virtual void Update() = 0;
     protected:
-        bool mIsWork;
-		bool mIsClose;
+		bool mIsClose;		
         std::mutex mThreadLock;
         long long mLastOperTime;
         std::thread::id mThreadId;
+		std::atomic_bool mIsWork;
         TaskPoolComponent *mTaskComponent;
         std::condition_variable mThreadVariable;
     private:
@@ -66,17 +67,11 @@ namespace GameKeeper
 		int Start() final;
 
         void AddTask(TaskProxy * task);
-
-        ThreadState GetTaskState() { return this->mTaskState; }
-
-        bool IsRunning() { return this->mTaskState == ThreadState::Run; }
-
 	private:
 		void Update() final;
     private:
 		std::thread * mThread;
         ThreadState mTaskState;
-		std::queue<unsigned int> mFinishTasks;
         MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
     };
 

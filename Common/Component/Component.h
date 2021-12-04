@@ -8,10 +8,10 @@
 #include <Protocol/c2s.pb.h>
 #include <Protocol/com.pb.h>
 #include <Protocol/s2s.pb.h>
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Method/MethodProxy.h>
 #include <Define/CommonTypeDef.h>
-
+using namespace google::protobuf;
 namespace GameKeeper
 {
 	class Component;
@@ -57,11 +57,13 @@ namespace GameKeeper
 			return true;
 		}
 	public:
-		virtual bool Awake() = 0;
+
+		virtual bool Awake() = 0; //创建的时候调用一次
 
 		virtual void Start() { };
-
+		
 		virtual int GetPriority() { return 100; }
+
 	protected:
 		template<typename T>
 		T * GetComponent();

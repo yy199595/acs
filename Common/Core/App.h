@@ -5,8 +5,9 @@
 #include"Util/TimeHelper.h"
 #include"Object/GameObject.h"
 #include"Global/ServerPath.h"
-#include"Timer/TimerComponent.h"
 #include"Thread/TaskThread.h"
+#include"Timer/TimerComponent.h"
+#include"Scene/LoggerComponent.h"
 #include"Coroutine/CoroutineComponent.h"
 using namespace std;
 using namespace asio::ip;
@@ -14,18 +15,27 @@ using namespace asio::ip;
 
 namespace GameKeeper
 {
+	enum ExitCode
+	{
+		Exit,
+		AddError,
+		InitError,
+		StartError,
+		ConfigError			
+	};
+}
+
+namespace GameKeeper
+{
 	class Manager;
 
 	class ServiceComponent;
 	class MainTaskScheduler;
-
 	class App : public GameObject
 	{
 	public:
-		App(int argc, char ** argv);
-
+		explicit App();
 		~App() final = default;
-
 	public:
 		const ServerConfig &GetConfig()
 		{
@@ -47,13 +57,9 @@ namespace GameKeeper
 			return this->mServerName;
 		}
 
+        inline ServerPath & GetServerPath() const { return *mServerPath;}
+
 		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
-
-		const std::string & GetWorkPath() { return this->mServerPath.GetWorkPath(); }
-
-		const std::string & GetConfigPath() { return this->mServerPath.GetConfigPath(); }
-
-		const std::string & GetDownloadPath() { return this->mServerPath.GetDownloadPath(); }
 
 		inline bool IsMainThread()
 		{
@@ -66,30 +72,31 @@ namespace GameKeeper
 			return *mApp;
 		}
 	public:	
+		inline LoggerComponent * GetLogger() { return this->mLogComponent; }
 		inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
 		inline CoroutineComponent * GetCorComponent() { return this->mCorComponent; }
 	private:
-		bool LoadComponent();
-
+		
 		bool InitComponent();
+
+		bool AddComponentFormConfig();
 
 		bool InitComponent(Component * component);
 
 		void StartComponent();
 
 	public:
-		int Run();
+		
+		int Stop(ExitCode code);
 
-		int Stop();
-
-        void OnNewDay();
+		int Run(int argc, char ** argv);
 
 	private:
 		void UpdateConsoleTitle();
 	private:
 		void LogicMainLoop();
 	private:
-        ServerPath mServerPath;
+        ServerPath * mServerPath;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	private:
@@ -115,6 +122,7 @@ namespace GameKeeper
 	private:
 		static App * mApp;
 	private:
+		LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
 		CoroutineComponent * mCorComponent;
 		std::vector<Component *> mSceneComponents;

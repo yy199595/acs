@@ -7,25 +7,25 @@ namespace CoroutineExtension
     int Sleep(lua_State *lua)
     {
         /*const long long ms = lua_tointeger(lua, -1);
-        GKAssertRetZero_F(lua_getfunction(lua, "coroutine", "running"));
+        LOG_CHECK_RET_ZERO(lua_getfunction(lua, "coroutine", "running"));
         if (lua_pcall(lua, 0, 1, 0) != 0)
         {
-            GKDebugError(lua_tostring(lua, -1));
+            LOG_ERROR(lua_tostring(lua, -1));
             return 0;
         }
-        GKAssertRetZero_F(lua_isthread(lua, -1));
+        LOG_CHECK_RET_ZERO(lua_isthread(lua, -1));
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
         App * frameWork = App::Get();
         GKTimerManager * timerManager = frameWork->GetTimerManager();
         GKLuaSleepTimer * timer = Object::CreateObject<GKLuaSleepTimer>(lua, ref, ms);
-        timerManager->AddTimer(timer);
+        timerManager->AsyncWait(timer);
         return lua_yield(lua, 01);*/
         return 0;
     }
 
     int Start(lua_State *lua)
     {
-        GKAssertRetZero_F(lua_isfunction(lua, 1));
+        LOG_CHECK_RET_ZERO(lua_isfunction(lua, 1));
         lua_State *coroutine = lua_newthread(lua);
         lua_pushvalue(lua, 1);
         lua_xmove(lua, coroutine, 1);

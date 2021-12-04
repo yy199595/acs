@@ -3,8 +3,9 @@
 //
 
 #include "HttpReadContent.h"
+#include"Core/App.h"
 #include <Util/DirectoryHelper.h>
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 namespace GameKeeper
 {
     HttpReadStringContent::HttpReadStringContent(std::string &response)
@@ -45,13 +46,13 @@ namespace GameKeeper
         std::string dir;
         if (!DirectoryHelper::GetDirByPath(this->mPath, dir))
         {
-            GKDebugError("parse " << this->mPath << " failure");
+            LOG_ERROR("parse " << this->mPath << " failure");
             return false;
         }
-        GKDebugWarning(dir);
+        LOG_WARN(dir);
         if (!DirectoryHelper::MakeDir(dir))
         {
-            GKDebugError("create dir " << dir << " failure");
+            LOG_ERROR("create dir " << dir << " failure");
             return false;
         }
         return true;
@@ -74,7 +75,7 @@ namespace GameKeeper
         }
         if (!this->mFileStream.is_open())
         {
-            GKDebugError("open or create " << this->mPath << " failure");
+            LOG_ERROR("open or create " << this->mPath << " failure");
             return;
         }
         this->mFileSize += size;

@@ -13,29 +13,45 @@ namespace GameKeeper
         return MessagePool::New(fullName);
     }
 
-    Message *MessagePool::NewByData(const Any &any)
+    Message *MessagePool::NewByData(const Any &any, bool clone)
     {
         std::string fullName;
-        if(!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
+        if (!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
         {
             return nullptr;
         }
         Message *message = MessagePool::New(fullName);
-        if (message == nullptr || !any.UnpackTo(message))
+        if (message != nullptr && any.UnpackTo(message))
         {
-            return nullptr;
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
+            return message;
         }
-        return message;
+        return nullptr;
     }
 
-    Message *MessagePool::NewByJson(const Any &any, const std::string &json)
+    Message *MessagePool::NewByJson(const Any &any, const std::string &json,bool clone)
     {
         Message * message = MessagePool::New(any);
         if(message == nullptr)
         {
             return nullptr;
         }
-        return util::JsonStringToMessage(json, message).ok() ? message : nullptr;
+        if(util::JsonStringToMessage(json, message).ok())
+        {
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
+            return message;
+        }
+        return nullptr;
     }
 
 	Message * MessagePool::New(const std::string & name)
@@ -69,17 +85,27 @@ namespace GameKeeper
 		return nullptr;
 	}
 
-	Message * MessagePool::NewByJson(const std::string & name, const std::string & json)
+	Message * MessagePool::NewByJson(const std::string & name, const std::string & json,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
 		{
 			return nullptr;
 		}
-		return util::JsonStringToMessage(json, message).ok() ? message : nullptr;
+        if(util::JsonStringToMessage(json, message).ok())
+        {
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
+            return message;
+        }
+		return nullptr;
 	}
 
-	Message * MessagePool::NewByJson(const std::string & name, const char * json, size_t size)
+	Message * MessagePool::NewByJson(const std::string & name, const char * json, size_t size,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
@@ -88,37 +114,55 @@ namespace GameKeeper
 		}
 		if (util::JsonStringToMessage(StringPiece(json, size), message).ok())
 		{
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
 			return message;
 		}
 		return nullptr;
 	}
 
-	Message * MessagePool::NewByData(const std::string & name, const std::string & data)
+	Message * MessagePool::NewByData(const std::string & name, const std::string & data,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
 		{
 			return nullptr;
 		}
-		if (!message->ParseFromString(data))
+		if (message->ParseFromString(data))
 		{
-			return nullptr;
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
+            return message;
 		}
-		return message;
+        return nullptr;
 	}
 
-	Message * MessagePool::NewByData(const std::string & name, const char * json, size_t size)
-	{
-		Message * message = New(name);
-		if (message == nullptr)
-		{
-			return nullptr;
-		}
-		if (!message->ParseFromArray(json, size))
-		{
-			return nullptr;
-		}
-		return message;
-	}
+	Message * MessagePool::NewByData(const std::string & name, const char * json, size_t size,bool clone)
+    {
+        Message *message = New(name);
+        if (message == nullptr)
+        {
+            return nullptr;
+        }
+        if (message->ParseFromArray(json, size))
+        {
+            if(clone)
+            {
+                auto obj = message->New();
+                obj->CopyFrom(*message);
+                return obj;
+            }
+            return message;
+        }
+        return nullptr;
+    }
 
 }

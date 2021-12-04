@@ -1,6 +1,7 @@
-﻿#include "TableOperator.h"
-#include <fstream>
-#include <Protocol/db.pb.h>
+﻿#include"TableOperator.h"
+#include"fstream"
+#include"Core/App.h"
+#include"Protocol/db.pb.h"
 
 namespace GameKeeper
 {
@@ -19,12 +20,12 @@ namespace GameKeeper
 			if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
 			{
 				const char * err = mysql_error(mMysqlSocket);
-				GKDebugError("create " << this->mDataBase << " db fail : " << err);
+				LOG_ERROR("create " << this->mDataBase << " db fail : " << err);
 				return false;
 			}
 			if (mysql_select_db(this->mMysqlSocket, this->mDataBase.c_str()) == 0)
 			{
-				GKDebugInfo("create db " << this->mDataBase << " successful");
+				LOG_INFO("create db " << this->mDataBase << " successful");
 			}
 		}
 
@@ -32,7 +33,7 @@ namespace GameKeeper
 		{
 			if (!iter->name.IsString() || !iter->value.IsObject())
 			{
-				GKDebugError("json config error");
+				LOG_ERROR("json config error");
 				return false;
 			}
 			const std::string table = iter->name.GetString();
@@ -40,7 +41,7 @@ namespace GameKeeper
 			auto iter1 = iter->value.FindMember("keys");
 			if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
 			{
-				GKDebugError(table << " sql table config error");
+				LOG_ERROR(table << " sql table config error");
 				return false;
 			}
 			std::vector<std::string> keys;
@@ -54,10 +55,10 @@ namespace GameKeeper
 			{
 				if (!this->CreateMysqlTable(table, name, keys))
 				{
-					GKDebugError("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
+					LOG_ERROR("create new table " << table << " fail " << mysql_error(this->mMysqlSocket));
 					return false;
 				}
-				GKDebugInfo("create new table success " << table);
+				LOG_INFO("create new table success " << table);
 			}
 			else
 			{
@@ -67,7 +68,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    bool TableOperator::UpdateMysqlTable(const std::string table, const std::string name,
+    bool TableOperator::UpdateMysqlTable(const std::string& table, const std::string name,
                                          const std::vector<std::string> &keys)
     {
         const DescriptorPool *pDescriptorPool = DescriptorPool::generated_pool();
@@ -76,7 +77,7 @@ namespace GameKeeper
         {
             if (pDescriptor->FindFieldByName(key) == nullptr)
             {
-                GKDebugError("create " << name << " error 'key' not find");
+                LOG_ERROR("create " << name << " error 'key' not find");
                 return false;
             }
         }
@@ -111,17 +112,17 @@ namespace GameKeeper
             {
                 if (!this->AddNewField(table, fileDesc))
                 {
-                    GKDebugError("[mysql error ] " << mysql_error(this->mMysqlSocket));
-                    GKDebugError("add field " << fileDesc->name() << " to " << table << " fail");
+                    LOG_ERROR("[mysql error ] " << mysql_error(this->mMysqlSocket));
+                    LOG_ERROR("add field " << fileDesc->name() << " to " << table << " fail");
                     return false;
                 }
-                GKDebugLog("add field " << fileDesc->name() << " to " << table << " successful");
+                LOG_DEBUG("add field " << fileDesc->name() << " to " << table << " successful");
             }
         }
         return true;
     }
 
-    bool TableOperator::AddNewField(const std::string table, const FieldDescriptor *fieldDesc)
+    bool TableOperator::AddNewField(const std::string& table, const FieldDescriptor *fieldDesc)
     {
         std::stringstream sqlStream;
         sqlStream << "alter table " << table << " add " << fieldDesc->name();
@@ -155,15 +156,15 @@ namespace GameKeeper
         const std::string sql = sqlStream.str();
         if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
         {
-            GKDebugError(mysql_error(mMysqlSocket));
+            LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        GKDebugInfo("\n"
+        LOG_INFO("\n"
                                << sql);
         return true;
     }
 
-    bool TableOperator::CreateMysqlTable(const std::string table, const std::string name,
+    bool TableOperator::CreateMysqlTable(const std::string& table, const std::string name,
                                          const std::vector<std::string> &keys)
     {
         db::UserAccountData account;
@@ -173,7 +174,7 @@ namespace GameKeeper
         {
             if (pDescriptor->FindFieldByName(key) == nullptr)
             {
-                GKDebugError("create " << name << " error 'key' not find");
+                LOG_ERROR("create " << name << " error 'key' not find");
                 return false;
             }
         }
@@ -225,11 +226,11 @@ namespace GameKeeper
                 sqlCommand << "BIGINT(32) DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_FLOAT)
             {
-                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
+                LOG_CHECK_RET_FALSE(IsHasField(fileDesc->name()));
                 sqlCommand << "FLOAT(20) NOT NULL DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_DOUBLE)
             {
-                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
+                LOG_CHECK_RET_FALSE(IsHasField(fileDesc->name()));
                 sqlCommand << "DOUBLE(32) DEFAULT 0,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_STRING)
             {
@@ -241,7 +242,7 @@ namespace GameKeeper
                 sqlCommand << "VARCHAR(64) DEFAULT NULL,\n";
             } else if (fileDesc->type() == FieldDescriptor::TYPE_BYTES)
             {
-                GKAssertRetFalse_F(IsHasField(fileDesc->name()));
+                LOG_CHECK_RET_FALSE(IsHasField(fileDesc->name()));
                 sqlCommand << "BLOB(64) DEFAULT NULL,\n";
             } else
             {
@@ -263,10 +264,10 @@ namespace GameKeeper
         const std::string sql = sqlCommand.str();
         if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
         {
-            GKDebugError(mysql_error(mMysqlSocket));
+            LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        GKDebugInfo("\n" << sql);
+        LOG_INFO("\n" << sql);
         return true;
     }
 }

@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 
-#include <Object/Object.h>
-#include <Service/NodeProxyComponent.h>
+#include<Object/Object.h>
+#include<Async/RpcTask/ProtoRpcTask.h>
+#include<Coroutine/Coroutine.h>
+#include"Protocol/s2s.pb.h"
+using namespace google::protobuf;
 namespace GameKeeper
 {
-    class CallHandler;
     class RpcNodeProxy : public Object
     {
     public:
@@ -24,6 +26,10 @@ namespace GameKeeper
         bool UpdateNodeProxy(const s2s::NodeInfo & nodeInfo,long long socketId = 0);
 
         const s2s::NodeInfo & GetNodeInfo() const { return this->mNodeInfo; }
+
+        bool SendRequestData(const com::Rpc_Request * message);
+
+        com::Rpc_Request * CreateProtoRequest(const std::string & method, int & methodId);
     public:
         void Destory();
 
@@ -31,33 +37,26 @@ namespace GameKeeper
 
         bool HasService(const std::string &service);
 
-        void GetServicers(std::vector<std::string> &services);
+        void GetServices(std::vector<std::string> &services);
 
     public:
 
         XCode Notice(const std::string &method);                        //不回应
         XCode Notice(const std::string &method, const Message &request);//不回应
     public:
-        XCode Invoke(const std::string &method);
 
-        XCode Invoke(const std::string &method, const Message &request);
+       std::shared_ptr<CppProtoRpcTask> SpawnProtoTask(const std::string & method);
 
-    public:// c++ 使用
-        XCode Call(const std::string &method, Message &response);
-
-        XCode Call(const std::string &method, const Message &request, Message &response);
+       std::shared_ptr<CppProtoRpcTask> SpawnProtoTask(const std::string & method, const Message & message);
 
     private:
         void OnNodeSessionRefresh();
         class ProtoRpcClient *GetTcpSession();
-		bool AddRequestDataToQueue(const com::Rpc_Request * message);
-		com::Rpc_Request * CreateRequest(const std::string & method);
     private:
         int mGlobalId;
         short mAreaId;
         short mNodeId;
         std::string mNodeIp;
-        std::string mAddress;
         std::string mNodeName;        //进程名字
         unsigned short mNodePort;
         s2s::NodeInfo mNodeInfo;
@@ -65,12 +64,12 @@ namespace GameKeeper
     private:
         bool mIsClose;
         long long mSocketId;
-        class ProtoRpcComponent * mRpcComponent;
+
         std::set<std::string> mServiceArray;//服务列表
-        class CoroutineComponent *mCorComponent;//协程
-        std::queue<unsigned int> mCoroutines;
+        CoroutineComponent *mCorComponent;//协程
+        class ProtoRpcComponent * mRpcComponent;
         std::queue<const Message *> mWaitSendQueue;
         class RpcConfigComponent *mRpcConfigComponent;
-        class RpcResponseComponent *mResponseComponent;
+        class ProtoRpcClientComponent * mRpcClientComponent;
     };
 }// namespace GameKeeper

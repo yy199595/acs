@@ -5,7 +5,8 @@
 #else
 #include <unistd.h>
 #endif
-#include "DirectoryHelper.h"
+#include"MD5.h"
+#include"DirectoryHelper.h"
 #pragma warning(disable : 4996)
 namespace FileHelper
 {
@@ -44,6 +45,20 @@ namespace FileHelper
         }
         return false;
     }
+
+    bool ReadJsonFile(const std::string& path, rapidjson::Document &document, std::string & md5)
+    {
+        std::string outString;
+        if (FileHelper::ReadTxtFile(path, outString))
+        {
+            MD5 md5Encode(outString);
+            md5 = md5Encode.toString();
+            document.Parse(outString.c_str(), outString.size());
+            return !document.HasParseError();
+        }
+        return false;
+    }
+
     bool ReadTxtFile(const std::string& path, std::vector<std::string> &outLines)
     {
         std::fstream fs;

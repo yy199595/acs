@@ -1303,23 +1303,23 @@ class Rpc_Request :
   ::google::protobuf::int64 userid() const;
   void set_userid(::google::protobuf::int64 value);
 
-  // uint32 RpcId = 2;
+  // int64 RpcId = 2;
   void clear_rpcid();
   static const int kRpcIdFieldNumber = 2;
-  ::google::protobuf::uint32 rpcid() const;
-  void set_rpcid(::google::protobuf::uint32 value);
-
-  // int32 MethodId = 3;
-  void clear_methodid();
-  static const int kMethodIdFieldNumber = 3;
-  ::google::protobuf::int32 methodid() const;
-  void set_methodid(::google::protobuf::int32 value);
+  ::google::protobuf::int64 rpcid() const;
+  void set_rpcid(::google::protobuf::int64 value);
 
   // int64 SocketId = 4;
   void clear_socketid();
   static const int kSocketIdFieldNumber = 4;
   ::google::protobuf::int64 socketid() const;
   void set_socketid(::google::protobuf::int64 value);
+
+  // int32 MethodId = 3;
+  void clear_methodid();
+  static const int kMethodIdFieldNumber = 3;
+  ::google::protobuf::int32 methodid() const;
+  void set_methodid(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:com.Rpc.Request)
  private:
@@ -1328,9 +1328,9 @@ class Rpc_Request :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 userid_;
-  ::google::protobuf::uint32 rpcid_;
-  ::google::protobuf::int32 methodid_;
+  ::google::protobuf::int64 rpcid_;
   ::google::protobuf::int64 socketid_;
+  ::google::protobuf::int32 methodid_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -1440,17 +1440,11 @@ class Rpc_Response :
   ::google::protobuf::Any* mutable_data();
   void set_allocated_data(::google::protobuf::Any* data);
 
-  // int32 Code = 1;
-  void clear_code();
-  static const int kCodeFieldNumber = 1;
-  ::google::protobuf::int32 code() const;
-  void set_code(::google::protobuf::int32 value);
-
-  // uint32 RpcId = 2;
+  // int64 RpcId = 2;
   void clear_rpcid();
   static const int kRpcIdFieldNumber = 2;
-  ::google::protobuf::uint32 rpcid() const;
-  void set_rpcid(::google::protobuf::uint32 value);
+  ::google::protobuf::int64 rpcid() const;
+  void set_rpcid(::google::protobuf::int64 value);
 
   // int64 UserId = 3;
   void clear_userid();
@@ -1458,15 +1452,21 @@ class Rpc_Response :
   ::google::protobuf::int64 userid() const;
   void set_userid(::google::protobuf::int64 value);
 
+  // int32 Code = 1;
+  void clear_code();
+  static const int kCodeFieldNumber = 1;
+  ::google::protobuf::int32 code() const;
+  void set_code(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:com.Rpc.Response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::Any* data_;
-  ::google::protobuf::int32 code_;
-  ::google::protobuf::uint32 rpcid_;
+  ::google::protobuf::int64 rpcid_;
   ::google::protobuf::int64 userid_;
+  ::google::protobuf::int32 code_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -1897,15 +1897,15 @@ inline void Rpc_Request::set_userid(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Request.UserId)
 }
 
-// uint32 RpcId = 2;
+// int64 RpcId = 2;
 inline void Rpc_Request::clear_rpcid() {
-  rpcid_ = 0u;
+  rpcid_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::uint32 Rpc_Request::rpcid() const {
+inline ::google::protobuf::int64 Rpc_Request::rpcid() const {
   // @@protoc_insertion_point(field_get:com.Rpc.Request.RpcId)
   return rpcid_;
 }
-inline void Rpc_Request::set_rpcid(::google::protobuf::uint32 value) {
+inline void Rpc_Request::set_rpcid(::google::protobuf::int64 value) {
   
   rpcid_ = value;
   // @@protoc_insertion_point(field_set:com.Rpc.Request.RpcId)
@@ -2002,15 +2002,15 @@ inline void Rpc_Response::set_code(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Response.Code)
 }
 
-// uint32 RpcId = 2;
+// int64 RpcId = 2;
 inline void Rpc_Response::clear_rpcid() {
-  rpcid_ = 0u;
+  rpcid_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::uint32 Rpc_Response::rpcid() const {
+inline ::google::protobuf::int64 Rpc_Response::rpcid() const {
   // @@protoc_insertion_point(field_get:com.Rpc.Response.RpcId)
   return rpcid_;
 }
-inline void Rpc_Response::set_rpcid(::google::protobuf::uint32 value) {
+inline void Rpc_Response::set_rpcid(::google::protobuf::int64 value) {
   
   rpcid_ = value;
   // @@protoc_insertion_point(field_set:com.Rpc.Response.RpcId)

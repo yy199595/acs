@@ -2,7 +2,7 @@
 
 #include<string>
 #include<Scene/MysqlComponent.h>
-
+#include<rapidjson/document.h>
 namespace GameKeeper
 {
 
@@ -14,18 +14,18 @@ namespace GameKeeper
     class TableOperator
     {
     public:
-        TableOperator(GKMysqlSocket *socket, const std::string db, rapidjson::Document &doc);
+        TableOperator(GKMysqlSocket *socket, std::string db, rapidjson::Document &doc);
 
     public:
         bool InitMysqlTable();
 
     private:
-        bool CreateMysqlTable(const std::string table, const std::string name, const std::vector<std::string> &keys);
+        bool CreateMysqlTable(const std::string& table, std::string name, const std::vector<std::string> &keys);
 
-        bool UpdateMysqlTable(const std::string table, const std::string name, const std::vector<std::string> &keys);
+        bool UpdateMysqlTable(const std::string& table, std::string name, const std::vector<std::string> &keys);
 
     private:
-        bool AddNewField(const std::string table, const FieldDescriptor *fieldDesc);
+        bool AddNewField(const std::string& table, const FieldDescriptor *fieldDesc);
 
     private:
         std::string mDataBase;

@@ -2,7 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <Scene/ProtoRpcComponent.h>
+#include <ProtoRpc/ProtoRpcClientComponent.h>
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
@@ -11,8 +11,7 @@ namespace GameKeeper
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		this->mProtocolComponent = App::Get().GetComponent<ProtoRpcComponent>();
-		GKAssertBreakFatal_F(this->mProtocolComponent);
+		this->mProtocolComponent = App::Get().GetComponent<ProtoRpcClientComponent>();
 	}
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request &messageData, com::Rpc_Response & response)
@@ -25,7 +24,7 @@ namespace GameKeeper
 		//const ProtocolConfig * config = this->mProtocolComponent->GetProtocolConfig(messageData.methodid());
 		//if (!messageData.messagedata().empty())
 		//{
-		//	int ref = this->mScriptComponent->GetLuaRef("Json", "ToObject");
+		//	int ref = this->mScriptComponent->GetLuaRef("JsonRpc", "ToObject");
 		//	lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 		//	luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 
@@ -50,7 +49,7 @@ namespace GameKeeper
 		//	}
 		//	if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
 		//	{
-		//		GKDebugError(lua_tostring(this->mLuaEnv, -1));
+		//		LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 		//		return XCode::CallLuaFunctionFail;
 		//	}
 		//	lua_remove(this->mLuaEnv, -2);
@@ -58,20 +57,20 @@ namespace GameKeeper
 
 		//if (lua_pcall(this->mLuaEnv, 2, 2, 0) != 0)
 		//{
-		//	GKDebugError(lua_tostring(this->mLuaEnv, -1));
+		//	LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 		//	return XCode::CallLuaFunctionFail;
 		//}
 
 		//XCode code = (XCode)lua_tointeger(this->mLuaEnv, -2);
 		//if (lua_istable(this->mLuaEnv, -1) && code == XCode::Successful)
 		//{
-		//	int ref = this->mScriptComponent->GetLuaRef("Json", "ToString");
+		//	int ref = this->mScriptComponent->GetLuaRef("JsonRpc", "ToString");
 		//	lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 		//	luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 		//	lua_pushvalue(this->mLuaEnv, -3);
 		//	if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
 		//	{
-		//		GKDebugError(lua_tostring(this->mLuaEnv, -1));
+		//		LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 		//		return XCode::CallLuaFunctionFail;
 		//	}
 		//	size_t size = 0;
@@ -86,8 +85,8 @@ namespace GameKeeper
 	XCode LuaServiceMethod::AsyncInvoke(const com::Rpc_Request &request)
 	{
 //		lua_State *coroutine = lua_newthread(this->mLuaEnv);
-//		int ref = this->mScriptComponent->GetLuaRef("Service", "Invoke");
-//		//lua_getfunction(mLuaEnv, "Service", "Invoke");
+//		int ref = this->mScriptComponent->GetLuaRef("Service", "OnResponse");
+//		//lua_getfunction(mLuaEnv, "Service", "OnResponse");
 //		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 //		//luaL_checktype(this->mLuaEnv, -1, LUA_TFUNCTION);
 //
@@ -125,7 +124,7 @@ namespace GameKeeper
 //			Message * message = MessagePool::NewByData(name, data);
 //			if (message == nullptr)
 //			{
-//				GKDebugFatal("Init request message failure");
+//				LOG_FATAL("Init request message failure");
 //				return XCode::ParseMessageError;
 //			}
 //			if (!util::MessageToJsonString(*message, &mMessageJson).ok())

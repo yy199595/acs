@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Script/LuaFunction.h>
-
+#include<google/protobuf/message.h>
+using namespace google::protobuf;
 class LuaTable
 {
 public:
@@ -65,7 +66,7 @@ inline bool LuaTable::Function(const char *func, Ret &retValue, Args &&...args)
     LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 1, 0) != 0)
     {
-        GKDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
+        LOG_ERROR(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
         return false;
     }
     retValue = LuaParameter::Read<Ret>(this->luaEnv, -1);
@@ -88,7 +89,7 @@ inline bool LuaTable::Action(const char *func, Args &&...args)
     LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
     if (lua_pcall(this->luaEnv, sizeof...(Args), 0, 0) != 0)
     {
-        GKDebugError(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
+        LOG_ERROR(this->tableName << "." << func << ":" << lua_tostring(this->luaEnv, -1));
         return false;
     }
     return true;

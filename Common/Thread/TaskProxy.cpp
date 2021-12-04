@@ -22,7 +22,7 @@ namespace GameKeeper
         {
             return false;
         }
-        this->mCorComponent->YieldReturn(this->mCorId);
+        this->mCorComponent->WaitForYield(this->mCorId);
         return true;
     }
 

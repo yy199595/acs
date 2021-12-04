@@ -5,6 +5,8 @@
 #include<XCode/XCode.h>
 #include<google/protobuf/any.h>
 #include<google/protobuf/any.pb.h>
+
+#include <utility>
 namespace GameKeeper
 {
 	template<typename T>
@@ -40,7 +42,7 @@ namespace GameKeeper
 	class ServiceMethod
 	{
 	public:
-		explicit ServiceMethod(const std::string name) : mName(name) {}
+		explicit ServiceMethod(std::string  name) : mName(std::move(name)) {}
 	public:
 		virtual bool IsLuaMethod() = 0;
         virtual void SetSocketId(long long id) { };
@@ -65,13 +67,12 @@ namespace GameKeeper
 
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
-			long long userId = request.userid();
 			if (this->mHasUserId)
-			{
-				GKAssertRetCode_F(userId != 0);
-				return (_o->*_objfunc)(userId, request);
-			}
-			return (_o->*_func)(request);
+            {
+                return request.userid() == 0 ?
+                       XCode::NotFindUser : (_o->*_objfunc)(request.userid());
+            }
+			return (_o->*_func)();
 		}
 
         bool IsLuaMethod() override { return false; };
@@ -94,16 +95,24 @@ namespace GameKeeper
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
         {
-			T1 requestData;
-			long long userId = request.userid();
-			GKAssertRetCode_F(request.data().Is<T1>());
-			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
+            if(!request.data().template Is<T1>())
+            {
+                return XCode::CallArgsError;
+            }
+            if(this->mHasUserId && request.userid() == 0)
+            {
+                return XCode::NotFindUser;
+            }
+            std::shared_ptr<T1> requestData(new T1());
+            if(!request.data().UnpackTo(requestData.get()))
+            {
+                return XCode::CallArgsError;
+            }
 			if(this->mHasUserId)
-			{
-				GKAssertRetCode_F(userId != 0);
-				return (_o->*_objfunc)(userId, requestData);
-			}
-			return (_o->*_func)(requestData);
+            {
+                return (_o->*_objfunc)(request.userid(), *requestData);
+            }
+			return (_o->*_func)(*requestData);
         }
 		bool IsLuaMethod() override { return false; };
 	private:
@@ -127,20 +136,34 @@ namespace GameKeeper
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
-			T1 requestData;
-			T2 responseData;		
-			long long userId = request.userid();
-			GKAssertRetCode_F(request.data().Is<T1>());
-			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
-			
-			XCode code = !this->mHasUserId
-				? (_o->*_func)(requestData, responseData)
-				: (_o->*_objfunc)(userId, requestData, responseData);
-
-			if (code == XCode::Successful)
-			{
-				response.mutable_data()->PackFrom(responseData);
-			}	
+            if(!request.data().Is<T1>())
+            {
+                return XCode::CallTypeError;
+            }
+			std::shared_ptr<T1> requestData(new T1());
+            if(!request.data().UnpackTo(requestData.get()))
+            {
+                return XCode::CallTypeError;
+            }
+            if(this->mHasUserId  && request.userid() == 0)
+            {
+                return XCode::NotFindUser;
+            }
+            std::shared_ptr<T2> responseData(new T2());
+			if(this->mHasUserId)
+            {
+                XCode code = (_o->*_objfunc)(request.userid(), *requestData, *responseData);
+                if (code == XCode::Successful)
+                {
+                    response.mutable_data()->PackFrom(*responseData);
+                }
+                return code;
+            }
+            XCode code = (_o->*_func)(*requestData, *responseData);
+            if(code == XCode::Successful)
+            {
+                response.mutable_data()->PackFrom(*responseData);
+            }
 			return code;
 		}
 		bool IsLuaMethod() override { return false; };
@@ -164,16 +187,26 @@ namespace GameKeeper
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
-			T1 requestData;
-			long long userId = request.userid();
-			GKAssertRetCode_F(request.data().Is<T1>());
-			GKAssertRetCode_F(request.data().UnpackTo(&requestData));
+            if(this->mHasUserId && request.userid() == 0)
+            {
+                return XCode::NotFindUser;
+            }
+			std::shared_ptr<T1> responseData(new T1());
 			if (this->mHasUserId) 
 			{
-				GKAssertRetCode_F(userId != 0);
-				return (_o->*_objfunc)(userId, requestData);
+				XCode code = (_o->*_objfunc)(request.userid(), *responseData);
+                if(code == XCode::Successful)
+                {
+                    response.mutable_data()->PackFrom(*responseData);
+                }
+                return code;
 			}
-			return (_o->*_func)(requestData);
+			XCode code = (_o->*_func)(*responseData);
+            if(code == XCode::Successful)
+            {
+                response.mutable_data()->PackFrom(*responseData);
+            }
+            return code;
 		}
 		bool IsLuaMethod() override { return false; };
 	private:

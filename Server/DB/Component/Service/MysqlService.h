@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Protocol/s2s.pb.h>
-#include <Service/LocalServiceComponent.h>
+#include <Service/ProtoServiceComponent.h>
 
 namespace GameKeeper
 {
-    class MysqlService : public LocalServiceComponent
+    class MysqlService : public ProtoServiceComponent
     {
     public:
         MysqlService();

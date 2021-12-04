@@ -45,17 +45,7 @@ namespace GameKeeper
 		rapidjson::Value *GetJsonValue(const std::string & k1) const;
 		rapidjson::Value *GetJsonValue(const std::string & k1, const std::string & k2) const;
 
-    public:
-        short GetNodeId() const { return this->mNodeId; }
-
-        short GetAreaId() const { return this->mAreaId; }
-
-        const std::string &GetNodeName() const { return this->mNodeName; }
-
-    private:
-        unsigned short mAreaId;
-        unsigned short mNodeId;
-        std::string mNodeName;
+    private:   
         const std::string mConfigPath;
         rapidjson::Document mConfigDocument;
         std::unordered_map<std::string, rapidjson::Value *> mMapConfigData;

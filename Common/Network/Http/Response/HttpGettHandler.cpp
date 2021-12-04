@@ -3,10 +3,8 @@
 //
 #include "HttpGettHandler.h"
 #include <Util/StringHelper.h>
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Core/App.h>
-#include <Scene/ProtoRpcComponent.h>
-#include <Http/HttpRemoteSession.h>
 #include <Component/Scene/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
@@ -28,7 +26,7 @@ namespace GameKeeper
 //			const std::string &key = tempArray2[0];
 //			const std::string &val = tempArray2[1];
 //			parames.insert(std::make_pair(key, val));
-//			GKDebugError("get parameter " << key << " = " << val);
+//			LOG_ERROR("get parameter " << key << " = " << val);
 //		}
 //		return true;
 //	}
@@ -56,9 +54,9 @@ namespace GameKeeper
         const std::string & app = "App/";
 
         size_t pos1 = url.find(app) + app.length();
-        GKAssertRetFalse_F(pos1 != std::string::npos);
+        LOG_CHECK_RET_FALSE(pos1 != std::string::npos);
         size_t pos2 = url.find('/', pos1 + 1);
-        GKAssertRetFalse_F(pos2 != std::string::npos);
+        LOG_CHECK_RET_FALSE(pos2 != std::string::npos);
 
         size_t pos3 = url.find('?', pos2 + 1);
         if(pos3 == std::string::npos)
@@ -73,14 +71,14 @@ namespace GameKeeper
         }
         this->mComponent = url.substr(pos1, pos2 - pos1);
         this->mMethod = url.substr(pos2 + 1, pos3 - pos2 - 1);
-        GKDebugLog("[http GET] " << this->mComponent << "." << this->mMethod);
+        LOG_DEBUG("[http GET] " << this->mComponent << "." << this->mMethod);
 
 #ifdef __DEBUG__
         std::stringstream sss;
         sss << "\n==========  http get  ==========\n";
         sss << this->PrintHeard();
         sss << "==================================\n";
-        GKDebugInfo(sss.str());
+        LOG_INFO(sss.str());
 #endif
         return true;
     }

@@ -109,7 +109,7 @@ inline int lua_reffunction(lua_State *lua, const char *tab, const char *func)
 	int code = lua_resume(cor, lua, args); \
 	if(code != 0 && code != LUA_YIELD) \
 	{	\
-		GKDebugError(lua_tostring(cor, -1);)\
+		LOG_ERROR(lua_tostring(cor, -1);)\
 	} \
 }\
 
@@ -125,25 +125,25 @@ inline void lua_pushglobalfunction(lua_State *lua, const char *name, lua_CFuncti
     lua_setglobal(lua, name);
 }
 
-template<typename T>
-struct TypeProxy {
-    typedef T Type;
-};
-
-template<typename T>
-struct TypeProxy<T *> {
-    typedef T Type;
-};
-
-template<typename T>
-struct TypeProxy<T &> {
-    typedef T Type;
-};
-
-template<typename T>
-struct TypeProxy<std::shared_ptr<T>> {
-    typedef T Type;
-};
+//template<typename T>
+//struct TypeProxy {
+//    typedef T Type;
+//};
+//
+//template<typename T>
+//struct TypeProxy<T *> {
+//    typedef T Type;
+//};
+//
+//template<typename T>
+//struct TypeProxy<T &> {
+//    typedef T Type;
+//};
+//
+//template<typename T>
+//struct TypeProxy<std::shared_ptr<T>> {
+//    typedef T Type;
+//};
 
 namespace LuaParameter
 {

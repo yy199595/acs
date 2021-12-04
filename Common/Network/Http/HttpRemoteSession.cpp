@@ -4,8 +4,7 @@
 
 #include "HttpRemoteSession.h"
 #include <Core/App.h>
-#include <Scene/ProtoRpcComponent.h>
-#include <Component/Scene/HttpComponent.h>
+#include <Scene/HttpComponent.h>
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>
 #include <Method/HttpServiceMethod.h>
@@ -72,7 +71,7 @@ namespace GameKeeper
         if (iter == this->mHandlerMap.end())
         {
 			this->mCode = XCode::HttpMethodNotFound;
-            GKDebugError("not find http method " << this->mMethod);
+            LOG_ERROR("not find http method " << this->mMethod);
             return;
         }
         this->mHttpHandler = iter->second;
@@ -109,7 +108,7 @@ namespace GameKeeper
     void HttpRemoteSession::StartReceiveBody()
     {
         asio::error_code code;   
-		GKAssertRet_F(this->mSocketProxy->IsOpen());
+		LOG_CHECK_RET(this->mSocketProxy->IsOpen());
 		AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
         if (socket.available(code) == 0)
         {
@@ -148,9 +147,9 @@ namespace GameKeeper
         if (this->mHttpHandler != nullptr)
         {
             long long endTime = TimeHelper::GetMilTimestamp();
-            GKDebugLog("http call " << this->mHttpHandler->GetComponent() << "."
-                                    << this->mHttpHandler->GetMethod() << " use time = "
-                                    << ((endTime - this->mHttpHandler->GetStartTime()) / 1000.0f) << "s");
+            LOG_DEBUG("http call " << this->mHttpHandler->GetComponent() << "."
+                                   << this->mHttpHandler->GetMethod() << " use time = "
+                                   << ((endTime - this->mHttpHandler->GetStartTime()) / 1000.0f) << "s");
         }
 #endif
         if(this->mHttpHandler != nullptr)

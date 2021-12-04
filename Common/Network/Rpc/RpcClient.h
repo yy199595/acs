@@ -23,6 +23,7 @@ namespace GameKeeper
 	public:
 		virtual void Clear();
 		SocketType GetSocketType() { return this->mType; }
+        long long GetLastOperatorTime() const { return this->mLastOperTime;}
 		bool StartConnect(std::string & ip, unsigned short port, StaticMethod * method = nullptr);
 	private:
 		void ReceiveHead();
@@ -31,10 +32,9 @@ namespace GameKeeper
 	protected:
 		virtual void OnConnect(XCode code) = 0;
 		virtual void CloseSocket(XCode code) = 0;
-		bool AsyncSendMessage(char * buffer, size_t size);
-		virtual bool OnRequest(const char * buffer, size_t size) = 0;
-		virtual bool OnResponse(const char * buffer, size_t size) = 0;
-		virtual void OnSendAfter(XCode code, const char * buffer, size_t size) = 0;
+		virtual XCode OnRequest(const char * buffer, size_t size) = 0;
+		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
+        bool AsyncSendMessage(const char * buffer, size_t size);
 	protected:
 		AsioContext & mContext;
 		SocketProxy * mSocketProxy;

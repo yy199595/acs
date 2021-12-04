@@ -2,7 +2,7 @@
 #include<Core/App.h>
 #include<Network/SocketProxy.h>
 #include<Method/MethodProxy.h>
-#include<Define/CommonDef.h>
+#include<Define/CommonLogDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
 #include<Scene/TaskPoolComponent.h>
@@ -29,7 +29,7 @@ namespace GameKeeper
 	{
 		this->mListenHandler = handler;
         this->mTaskThread.Invoke(&NetworkListener::InitListener, this);
-        App::Get().GetCorComponent()->YieldReturn(this->mCorId);
+        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
 		return this->mIsListen;
 	}
 
@@ -48,8 +48,8 @@ namespace GameKeeper
         catch (std::system_error & err)
         {
             this->mIsListen = false;
-            GKDebugFatal("listen " << this->mConfig.Ip << ":"
-                                      << this->mConfig.Port << " failure" << err.what());
+            LOG_FATAL("listen " << this->mConfig.Ip << ":"
+                                << this->mConfig.Port << " failure" << err.what());
         }
         CoroutineComponent * component = App::Get().GetCorComponent();
         this->mTaskScheduler.Invoke(&CoroutineComponent::Resume, component, this->mCorId);
@@ -67,7 +67,7 @@ namespace GameKeeper
 				AsioTcpSocket & socket = socketProxy->GetSocket();
 				unsigned short port = socket.remote_endpoint().port();
 				const std::string ip = socket.remote_endpoint().address().to_string();
-				GKDebugInfo(this->mConfig.Name << " listen new socket " << ip << ":" << port);
+				LOG_INFO(this->mConfig.Name << " listen new socket " << ip << ":" << port);
 #endif // __DEBUG__
                 mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}

@@ -4,7 +4,6 @@
 #include <Component/Component.h>
 #include <Util/NumberHelper.h>
 #include <MysqlClient/MysqlDefine.h>
-#include <QueryResult/InvokeResultData.h>
 
 namespace GameKeeper
 {
@@ -14,7 +13,7 @@ namespace GameKeeper
         SqlTableConfig(std::string  tab, std::string pb);
 
     public:
-        void AddKey(std::string key);
+        void AddKey(const std::string& key);
 
         bool HasKey(const std::string &key) const;
 
@@ -29,7 +28,7 @@ namespace GameKeeper
 {
     class MysqlTaskAction;
 
-    class MyqslTask;
+    class MysqlTaskProxy;
 
     class MysqlComponent : public Component
     {
@@ -62,12 +61,11 @@ namespace GameKeeper
     protected:
         bool Awake() final;
 
-        void Start() final;
-
     private:
 
 		bool StartConnect();
         bool InitMysqlTable();
+        bool DropTable(const std::string & name);
 
     private:
 		std::string mSqlPath;
@@ -76,14 +74,14 @@ namespace GameKeeper
         std::string mDataBaseUser;     //用户名
         std::string mDataBasePasswd; //密码
         std::string mDataBaseName;     //数据库名字      
-        GKMysqlSocket *mMysqlSockt;
+        GKMysqlSocket *mMysqlSockt{};
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;
         std::unordered_map<std::string, std::string> mTablePbMap;
         std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
         std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
-        class TaskPoolComponent *mTaskManager;
-        class CoroutineComponent *mCorComponent;
+        class TaskPoolComponent *mTaskManager{};
+        class CoroutineComponent *mCorComponent{};
     };
 }

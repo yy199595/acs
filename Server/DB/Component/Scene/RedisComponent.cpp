@@ -3,12 +3,16 @@
 #include<Scene/TaskPoolComponent.h>
 #include<Coroutine/CoroutineComponent.h>
 #include<Script/ClassProxyHelper.h>
-#include <Core/App.h>
+#include<Core/App.h>
+#include"Other/ElapsedTimer.h"
 namespace GameKeeper
 {
     RedisComponent::RedisComponent()
     {
         this->mRedisPort = 0;
+        this->mTaskManager = nullptr;
+        this->mCorComponent = nullptr;
+        this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
     }
 
     bool RedisComponent::CloseRedisSocket()
@@ -17,8 +21,7 @@ namespace GameKeeper
         auto iter = this->mRedisContextMap.find(id);
         if (iter != this->mRedisContextMap.end())
         {
-            RedisSocket *socket = iter->second;
-            redisFree(socket);
+            redisFree(iter->second);
             this->mRedisContextMap.erase(iter);
             return true;
         }
@@ -28,12 +31,11 @@ namespace GameKeeper
     void RedisComponent::ClearAllData()
     {
         auto iter = this->mRedisContextMap.begin();
-        for(; iter!=this->mRedisContextMap.end();iter++)
-        {
-            RedisSocket * c = iter->second;
-            redisCommand(c, "FLUSHALL");
-            return;
-        }
+		for (; iter != this->mRedisContextMap.end(); iter++)
+		{
+			redisCommand(iter->second, "FLUSHALL");
+			return;
+		}
     }
 
     RedisSocket *RedisComponent::GetRedisSocket()
@@ -46,17 +48,16 @@ namespace GameKeeper
     bool RedisComponent::Awake()
     {
         const ServerConfig &config = App::Get().GetConfig();
-        GKAssertRetFalse_F(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        GKAssertRetFalse_F(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+		LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
+		LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
-
-        GKAssertRetFalse_F(config.GetValue("Redis", "ip", this->mRedisIp));
-        GKAssertRetFalse_F(config.GetValue("Redis", "port", this->mRedisPort));
 
         int second = 3;
+		config.GetValue("Redis", "timeout", second);
         const std::vector<TaskThread *> &threads = this->mTaskManager->GetThreads();
-        config.GetValue("Redis", "timeout", second);
-
+       
         for (TaskThread *taskThread: threads)
         {
             redisContext *redisSocket = this->ConnectRedis(second);
@@ -65,32 +66,31 @@ namespace GameKeeper
                 return false;
             }
             this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
-            GKDebugLog("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
+            LOG_DEBUG("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
         }
         return true;
     }
 
     redisContext *RedisComponent::ConnectRedis(int timeout)
     {
-        struct timeval tv;
+        struct timeval tv{};
         tv.tv_sec = 3;
         tv.tv_usec = tv.tv_sec * timeout * 1000;
         const ServerConfig &config = App::Get().GetConfig();
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
-            GKDebugFatal(
+            LOG_FATAL(
                     "connect redis fail " << mRedisIp << ":" << mRedisPort << " error:" << pRedisContext->errstr);
             return nullptr;
         }
         std::string redisPasswd;
         if (config.GetValue("Redis", "passwd", redisPasswd) && !redisPasswd.empty())
         {
-            void *p = redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             auto *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
             {
-                GKDebugError("redis Authentication failed " << reply->str);
+                LOG_ERROR("redis Authentication failed " << reply->str);
                 return nullptr;
             }
             freeReplyObject(reply);
@@ -100,208 +100,34 @@ namespace GameKeeper
 
     void RedisComponent::Start()
     {
+        std::string json;
+        db::UserAccountData userAccountData;
+        userAccountData.set_account("646586122@qq.com");
+        userAccountData.set_token("sjfjsdiofjiowejfow");
+        userAccountData.set_passwd("199595yjz.");
+        userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
+        userAccountData.set_userid(1995);
+
+        this->ClearAllData();
 
     }
-
-    bool RedisComponent::HasValue(const std::string &key)
+    std::shared_ptr<RedisResponse> RedisComponent::StartTask(std::shared_ptr<RedisTaskProxy> redisTask)
     {
-        RedisTask redisTask("GET");
-        redisTask.InitCommand(key);
-        if (this->mTaskManager->StartTask(&redisTask) == 0)
+
+        this->mTaskManager->StartTask(redisTask.get());
+        this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
+
+        this->mCorComponent->WaitForYield();
+        auto redisResponse = redisTask->GetResponse();
+        if(redisResponse->HasError())
         {
-            return false;
+            LOG_ERROR(redisResponse->GetError());
         }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
+        return redisResponse;
     }
 
-    bool RedisComponent::HasValue(const std::string &tab, const std::string &key)
+    long long RedisComponent::AddCounter(const string &key)
     {
-        RedisTask redisTask("HEXISTS");
-        redisTask.InitCommand(tab, key);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::DelValue(const std::string &key)
-    {
-        RedisTask redisTask("DEL");
-        redisTask.InitCommand(key);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::DelValue(const std::string &tab, const std::string &key)
-    {
-        RedisTask redisTask("HDEL");
-        redisTask.InitCommand(tab, key);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::SetValue(const std::string &key, const std::string &value, int second)
-    {
-        RedisTask redisTask("EXPIRE");
-        redisTask.InitCommand(value, second);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::SetValue(const std::string &key, const std::string &value)
-    {
-        RedisTask redisTask("SET");
-        redisTask.InitCommand(key, value);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::SetValue(const std::string &tab, const std::string &key, const std::string &value)
-    {
-        RedisTask redisTask("HSET");
-        redisTask.InitCommand(tab, key, value);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::SetJsonValue(const std::string & key, const Message & value)
-    {
-        std::string jsonData;
-        if(!util::MessageToJsonString(value, & jsonData).ok())
-        {
-            return false;
-        }
-        return this->SetValue(key, jsonData);
-    }
-
-    bool RedisComponent::SetJsonValue(const std::string &tab, const std::string &key, const Message & value)
-    {
-        std::string jsonData;
-        if (!util::MessageToJsonString(value, &jsonData).ok())
-        {
-            return false;
-        }
-        return this->SetValue(tab, key, jsonData);
-    }
-
-    bool RedisComponent::SetValue(const std::string & key, const Message & value)
-    {
-        std::string valueData;
-        if(!value.SerializeToString(&valueData))
-        {
-            return false;
-        }
-        return this->SetValue(key, valueData);
-    }
-
-    bool RedisComponent::SetValue(const std::string &tab, const std::string &key, const Message &value)
-    {
-        std::string valueData;
-        if(!value.SerializeToString(&valueData))
-        {
-            return false;
-        }
-        return this->SetValue(tab, key, valueData);
-    }
-
-    bool RedisComponent::GetValue(const std::string &key, std::string &value)
-    {
-        RedisTask redisTask("GET");
-        redisTask.InitCommand(key);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetOnceData(value);
-    }
-
-    bool RedisComponent::GetValue(const std::string &tab, const std::string &key, std::string &value)
-    {
-        RedisTask redisTask("HGET");
-        redisTask.InitCommand(tab, key);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetOnceData(value);
-    }
-
-    bool RedisComponent::GetValue(const std::string &tab, const std::string &key, Message &value)
-    {
-        std::string message;
-        if (!this->GetValue(tab, key, message))
-        {
-            return false;
-        }
-        return value.ParseFromString(message);
-    }
-
-    bool RedisComponent::GetJsonValue(const std::string & key, Message & value)
-    {
-        std::string jsonValue;
-        if(!this->GetValue(key, jsonValue))
-        {
-            return false;
-        }
-        return util::JsonStringToMessage(jsonValue, &value).ok();
-    }
-
-    bool RedisComponent::GetJsonValue(const std::string &tab, const std::string &key, Message & value)
-    {
-        std::string jsonValue;
-        if (!this->GetValue(tab, key, jsonValue))
-        {
-            return false;
-        }
-        return util::JsonStringToMessage(jsonValue, &value).ok();
-    }
-
-    bool RedisComponent::AddToSet(const std::string & set, const std::string &member)
-    {
-        RedisTask redisTask("SADD");
-        redisTask.InitCommand(set, member);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
-    }
-
-    bool RedisComponent::DelFromSet(const std::string & set, const std::string & member)
-    {
-        RedisTask redisTask("SREM");
-        redisTask.InitCommand(set, member);
-        if (!this->mTaskManager->StartTask(&redisTask))
-        {
-            return false;
-        }
-        this->mCorComponent->YieldReturn();
-        return redisTask.GetErrorCode() == XCode::Successful;
+       return this->Invoke("INCR", key)->GetNumber();
     }
 }

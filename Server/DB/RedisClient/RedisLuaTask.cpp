@@ -11,17 +11,17 @@ namespace GameKeeper
         : RedisTaskBase(cmd)
     {
         this->mLuaEnv = lua;
-        this->mCoroutienRef = ref;
+        this->mCoroutineRef = ref;
     }
 
     RedisLuaTask::~RedisLuaTask()
     {
-        luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);
+        luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutineRef);
     }
 
     void RedisLuaTask::RunFinish()
     {
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutienRef);
+        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mCoroutineRef);
         if (lua_isthread(this->mLuaEnv, -1))
         {
             lua_State *coroutine = lua_tothread(this->mLuaEnv, -1);
@@ -32,7 +32,7 @@ namespace GameKeeper
                 lua_pushlstring(this->mLuaEnv, json, size);
                 if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
                 {
-                    GKDebugError("[lua error] " << lua_tostring(mLuaEnv, -1));
+                    LOG_ERROR("[lua error] " << lua_tostring(mLuaEnv, -1));
                 }
             }
 			lua_presume(coroutine, this->mLuaEnv, 1);
@@ -47,7 +47,7 @@ namespace GameKeeper
         }       
         lua_State *coroutine = lua_tothread(lua, index);
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        RedisComponent *redisManager = App::Get().GetComponent<RedisComponent>();
+        auto redisManager = App::Get().GetComponent<RedisComponent>();
         if (redisManager == nullptr)
         {
             return nullptr;

@@ -1,6 +1,7 @@
 #include"RpcClient.h"
 #include"Core/App.h"
 #include"Util/TimeHelper.h"
+#include<iostream>
 namespace GameKeeper
 {
 	RpcClient::RpcClient(SocketProxy * socket, SocketType type)
@@ -30,7 +31,6 @@ namespace GameKeeper
 		unsigned short port = socket.remote_endpoint().port();
 		this->mIp = socket.remote_endpoint().address().to_string();
 		this->mAddress = this->mIp + ":" + std::to_string(port);
-        GKDebugInfo(this->mAddress << " start receive message");
 		if (mNetWorkThread.IsCurrentThread())
 		{
 			this->ReceiveHead();
@@ -46,7 +46,7 @@ namespace GameKeeper
 			this->CloseSocket(XCode::NetWorkError);
 			return;
 		}
-        const size_t count = sizeof(TCP_HEAD) + sizeof(char);
+        const size_t count = sizeof(int) + sizeof(char);
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		socket.async_read_some(asio::buffer(this->mReceiveBuffer, count),
 			[this](const asio::error_code &error_code, const std::size_t t)
@@ -54,27 +54,26 @@ namespace GameKeeper
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 			if (error_code)
 			{
-				GKDebugError(error_code.message());
 				this->CloseSocket(XCode::NetReceiveFailure);
 			}
 			else
 			{
-				unsigned int length = 0;
+                int length = 0;
 				char type = this->mReceiveBuffer[0];
-				memcpy(&length, this->mReceiveBuffer + sizeof(char), sizeof(TCP_HEAD));
+				memcpy(&length, this->mReceiveBuffer + sizeof(char), sizeof(int));
 				if (length >= MAX_DATA_COUNT)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
 
-				if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE)
+				if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE
+                    || type == RPC_TYPE_CLIENT_REQUEST)
 				{
 					this->ReceiveBody(type, length);
 					return;
 				}
-				GKDebugFatal("receive err type = " << type);
-				this->CloseSocket(XCode::NetReceiveFailure);
+				this->CloseSocket(XCode::UnKnowPacket);
 			}
 		});
 	}
@@ -84,67 +83,73 @@ namespace GameKeeper
 		char * messageBuffer = this->mReceiveBuffer;
 		if (size > TCP_BUFFER_COUNT)
 		{
+			if (size > MAX_DATA_COUNT)
+			{
+				this->CloseSocket(XCode::NetBigDataShutdown);
+				return;
+			}
 			messageBuffer = new char[size];
-			GKDebugWarning("receive message count = " << size);
 		}
-		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
-		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-
 		asio::error_code code;
+		this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();	
 		if (size > nSocket.available(code))
 		{
 			this->CloseSocket(XCode::NetReceiveFailure);
-			GKDebugError("available data less " << size);
 			return;
 		}
 		nSocket.async_read_some(asio::buffer(messageBuffer, size),
-			[this, messageBuffer, type](const asio::error_code &error_code,
-				const std::size_t size)
+			[this, messageBuffer, type]
+            (const asio::error_code &error_code, const std::size_t size)
 		{
+            XCode code = XCode::Successful;
 			if (error_code)
 			{
-				GKDebugError(error_code.message());
-				this->CloseSocket(XCode::NetReceiveFailure);
+                code = XCode::NetReceiveFailure;
+                std::cout << error_code.message() << std::endl;
 			}
-			else if(type == RPC_TYPE_REQUEST)
+            switch(type)
+            {
+                case RPC_TYPE_REQUEST:
+                    code = this->OnRequest(messageBuffer, size);
+                    break;
+                case RPC_TYPE_RESPONSE:
+                    code = this->OnResponse(messageBuffer, size);
+                    break;
+                default:
+                    assert(false);
+                    break;
+            }
+			if (messageBuffer != this->mReceiveBuffer)
 			{
-				if (!this->OnRequest(messageBuffer, size))
-				{
-					this->CloseSocket(XCode::ParseMessageError);
-					GKDebugError(this->GetAddress() << " parse request message error");
-				}
+				delete[] messageBuffer;
 			}
-			else if (type == RPC_TYPE_RESPONSE)
-			{
-				if (!this->OnResponse(messageBuffer, size))
-				{
-					this->CloseSocket(XCode::ParseMessageError);
-					GKDebugError(this->GetAddress() << " parse response message error");
-				}
-			}
-            mContext.post(std::bind(&RpcClient::ReceiveHead, this));
+            if(code == XCode::Successful)
+            {
+                mContext.post(std::bind(&RpcClient::ReceiveHead, this));
+                return;
+            }
+            this->CloseSocket(code);
 		});
 	}
 
-	bool RpcClient::AsyncSendMessage(char * buffer, size_t size)
+	bool RpcClient::AsyncSendMessage(const char * buffer, size_t size)
 	{
 		if (!this->mSocketProxy->IsOpen())
 		{
+			delete buffer;
 			this->CloseSocket(XCode::NetWorkError);
 			return false;
 		}
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
 		nSocket.async_send(asio::buffer(buffer, size), [buffer, this]
-				(const asio::error_code &error_code, std::size_t size)
+				(const asio::error_code &error_code, std::size_t size) mutable
 		{
-            XCode code = XCode::Successful;
 			if (error_code)
 			{
-                code = XCode::NetSendFailure;
-				GKDebugError(error_code.message());
+				LOG_ERROR(error_code.message());
 				this->CloseSocket(XCode::NetSendFailure);
 			}
-            this->OnSendAfter(code, buffer, size);
 			this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		});
 		return true;
@@ -152,13 +157,13 @@ namespace GameKeeper
 
     bool RpcClient::StartConnect(std::string & ip, unsigned short port, StaticMethod * method)
     {
-        GKAssertRetFalse_F(this->GetSocketType() != SocketType::RemoteSocket);
+        LOG_CHECK_RET_FALSE(this->GetSocketType() != SocketType::RemoteSocket);
         if(this->IsConnected())
         {
             return true;
         }
         this->mIsConnect = true;
-        GKAssertRetFalse_F(this->mSocketProxy);
+        LOG_CHECK_RET_FALSE(this->mSocketProxy);
         NetWorkThread & nThread = this->mSocketProxy->GetThread();
         nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port, method);
     }
@@ -169,7 +174,7 @@ namespace GameKeeper
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
         AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-        GKDebugLog(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+        LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
         nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
         {
             XCode code = XCode::Failure;

@@ -2,8 +2,9 @@
 // Created by zmhy0073 on 2021/11/2.
 //
 #include "Http/Content/HttpWriteContent.h"
+#include"Core/App.h"
 #ifdef __DEBUG__
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #endif // __DEBUG__
 #include <Util/DirectoryHelper.h>
 namespace GameKeeper
@@ -34,7 +35,9 @@ namespace GameKeeper
         : mPath(path)
     {
 		this->mFileSize = 0;
+#ifdef __DEBUG__
 		this->mSendSize = 0;
+#endif // __DEBUG__	
     }
 
     HttpWriteFileContent::~HttpWriteFileContent() noexcept
@@ -57,12 +60,12 @@ namespace GameKeeper
             size_t size1 = this->mSendSize / 1024;
             size_t size2 = this->mFileSize / 1024;
             double process = this->mSendSize / (double) this->mFileSize;
-            GKDebugError("send " << this->mPath << "[" << size1 << "kb/" << size2
+            LOG_ERROR("send " << this->mPath << "[" << size1 << "kb/" << size2
                                  << "kb] [" << process * 100 << "%]");*/
         if(this->mFileStream.eof())
         {
             double mb = this->mFileSize / (1024.0f * 1024);
-            GKDebugLog("send file " << this->mPath << " successful " << " size = " << mb << "mb");
+            LOG_DEBUG("send file " << this->mPath << " successful " << " size = " << mb << "mb");
             return true;
         }
 #endif

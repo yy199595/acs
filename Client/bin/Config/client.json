@@ -1,0 +1,24 @@
+{
+    "NodeName": "Client",
+    "Log":
+    {
+        "save":1,
+        "path":"./Log/",
+        "hour":0,
+        "min":0
+    },
+    "Thread":
+    {
+        "network":1
+    },
+    "IsOpenRecoder": true,
+    "ScriptPath":"./Script/",
+    "Scene": [
+        "ClientComponent",
+        "TaskPoolComponent"
+    ],
+    "Service":[],
+    "WhiteList": [
+        "127.0.0.1"
+    ]
+}

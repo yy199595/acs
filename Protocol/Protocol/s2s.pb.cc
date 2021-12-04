@@ -61,6 +61,14 @@ class NodeQueryDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<NodeQuery> _instance;
 } _NodeQuery_default_instance_;
+class HostQuery_ResponseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<HostQuery_Response> _instance;
+} _HostQuery_Response_default_instance_;
+class HostQueryDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<HostQuery> _instance;
+} _HostQuery_default_instance_;
 class MysqlQuery_RequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<MysqlQuery_Request> _instance;
@@ -241,6 +249,34 @@ static void InitDefaultsNodeQuery_s2s_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_NodeQuery_s2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsNodeQuery_s2s_2eproto}, {}};
 
+static void InitDefaultsHostQuery_Response_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_HostQuery_Response_default_instance_;
+    new (ptr) ::s2s::HostQuery_Response();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::HostQuery_Response::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_HostQuery_Response_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsHostQuery_Response_s2s_2eproto}, {}};
+
+static void InitDefaultsHostQuery_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_HostQuery_default_instance_;
+    new (ptr) ::s2s::HostQuery();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::HostQuery::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_HostQuery_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsHostQuery_s2s_2eproto}, {}};
+
 static void InitDefaultsMysqlQuery_Request_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -382,6 +418,8 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_Request_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeQuery_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_HostQuery_Response_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_HostQuery_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MysqlQuery_Request_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MysqlQuery_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MysqlQuery_s2s_2eproto.base);
@@ -393,7 +431,7 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_MysqlOper_s2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2eproto[19];
+::google::protobuf::Metadata file_level_metadata_s2s_2eproto[21];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2eproto = nullptr;
 
@@ -471,6 +509,17 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::HostQuery_Response, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::HostQuery_Response, hosts_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::HostQuery, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::MysqlQuery_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -536,15 +585,17 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 54, -1, sizeof(::s2s::NodeQuery_Request)},
   { 61, -1, sizeof(::s2s::NodeQuery_Response)},
   { 67, -1, sizeof(::s2s::NodeQuery)},
-  { 72, -1, sizeof(::s2s::MysqlQuery_Request)},
-  { 78, -1, sizeof(::s2s::MysqlQuery_Response)},
-  { 85, -1, sizeof(::s2s::MysqlQuery)},
-  { 90, -1, sizeof(::s2s::MysqlAnyOper_Request)},
-  { 97, -1, sizeof(::s2s::MysqlAnyOper_Response)},
-  { 104, -1, sizeof(::s2s::MysqlAnyOper)},
-  { 109, -1, sizeof(::s2s::MysqlOper_Request)},
-  { 115, -1, sizeof(::s2s::MysqlOper_Response)},
-  { 121, -1, sizeof(::s2s::MysqlOper)},
+  { 72, -1, sizeof(::s2s::HostQuery_Response)},
+  { 78, -1, sizeof(::s2s::HostQuery)},
+  { 83, -1, sizeof(::s2s::MysqlQuery_Request)},
+  { 89, -1, sizeof(::s2s::MysqlQuery_Response)},
+  { 96, -1, sizeof(::s2s::MysqlQuery)},
+  { 101, -1, sizeof(::s2s::MysqlAnyOper_Request)},
+  { 108, -1, sizeof(::s2s::MysqlAnyOper_Response)},
+  { 115, -1, sizeof(::s2s::MysqlAnyOper)},
+  { 120, -1, sizeof(::s2s::MysqlOper_Request)},
+  { 126, -1, sizeof(::s2s::MysqlOper_Response)},
+  { 132, -1, sizeof(::s2s::MysqlOper)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -558,6 +609,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_NodeQuery_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_HostQuery_Response_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_HostQuery_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_MysqlQuery_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_MysqlQuery_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_MysqlQuery_default_instance_),
@@ -572,7 +625,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2eproto = {
   {}, AddDescriptors_s2s_2eproto, "s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2eproto::offsets,
-  file_level_metadata_s2s_2eproto, 19, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
+  file_level_metadata_s2s_2eproto, 21, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2eproto[] =
@@ -591,7 +644,8 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "\0132\024.s2s.GroupConfigData\"e\n\tNodeQuery\032*\n\007"
   "Request\022\016\n\006AreaId\030\001 \001(\005\022\017\n\007Service\030\002 \001(\t"
   "\032,\n\010Response\022 \n\tNodeInfos\030\001 \003(\0132\r.s2s.No"
-  "deInfo\"\203\001\n\nMysqlQuery\032-\n\007Request\022\"\n\004Data"
+  "deInfo\"&\n\tHostQuery\032\031\n\010Response\022\r\n\005Hosts"
+  "\030\001 \003(\t\"\203\001\n\nMysqlQuery\032-\n\007Request\022\"\n\004Data"
   "\030\001 \001(\0132\024.google.protobuf.Any\032F\n\010Response"
   "\022\020\n\010ErrotStr\030\001 \001(\t\022(\n\nQueryDatas\030\002 \003(\0132\024"
   ".google.protobuf.Any\"{\n\014MysqlAnyOper\032#\n\007"
@@ -605,7 +659,7 @@ const char descriptor_table_protodef_s2s_2eproto[] =
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 963,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 1003,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -3805,6 +3859,507 @@ void NodeQuery::InternalSwap(NodeQuery* other) {
 
 // ===================================================================
 
+void HostQuery_Response::InitAsDefaultInstance() {
+}
+class HostQuery_Response::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int HostQuery_Response::kHostsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+HostQuery_Response::HostQuery_Response()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.HostQuery.Response)
+}
+HostQuery_Response::HostQuery_Response(const HostQuery_Response& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      hosts_(from.hosts_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:s2s.HostQuery.Response)
+}
+
+void HostQuery_Response::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_HostQuery_Response_s2s_2eproto.base);
+}
+
+HostQuery_Response::~HostQuery_Response() {
+  // @@protoc_insertion_point(destructor:s2s.HostQuery.Response)
+  SharedDtor();
+}
+
+void HostQuery_Response::SharedDtor() {
+}
+
+void HostQuery_Response::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const HostQuery_Response& HostQuery_Response::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_HostQuery_Response_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void HostQuery_Response::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.HostQuery.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  hosts_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* HostQuery_Response::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<HostQuery_Response*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated string Hosts = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("s2s.HostQuery.Response.Hosts");
+          object = msg->add_hosts();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool HostQuery_Response::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.HostQuery.Response)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated string Hosts = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_hosts()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->hosts(this->hosts_size() - 1).data(),
+            static_cast<int>(this->hosts(this->hosts_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.HostQuery.Response.Hosts"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.HostQuery.Response)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.HostQuery.Response)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void HostQuery_Response::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.HostQuery.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string Hosts = 1;
+  for (int i = 0, n = this->hosts_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hosts(i).data(), static_cast<int>(this->hosts(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.HostQuery.Response.Hosts");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->hosts(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.HostQuery.Response)
+}
+
+::google::protobuf::uint8* HostQuery_Response::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.HostQuery.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string Hosts = 1;
+  for (int i = 0, n = this->hosts_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hosts(i).data(), static_cast<int>(this->hosts(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.HostQuery.Response.Hosts");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(1, this->hosts(i), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.HostQuery.Response)
+  return target;
+}
+
+size_t HostQuery_Response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.HostQuery.Response)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string Hosts = 1;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->hosts_size());
+  for (int i = 0, n = this->hosts_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->hosts(i));
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void HostQuery_Response::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.HostQuery.Response)
+  GOOGLE_DCHECK_NE(&from, this);
+  const HostQuery_Response* source =
+      ::google::protobuf::DynamicCastToGenerated<HostQuery_Response>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.HostQuery.Response)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.HostQuery.Response)
+    MergeFrom(*source);
+  }
+}
+
+void HostQuery_Response::MergeFrom(const HostQuery_Response& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.HostQuery.Response)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  hosts_.MergeFrom(from.hosts_);
+}
+
+void HostQuery_Response::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.HostQuery.Response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void HostQuery_Response::CopyFrom(const HostQuery_Response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.HostQuery.Response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool HostQuery_Response::IsInitialized() const {
+  return true;
+}
+
+void HostQuery_Response::Swap(HostQuery_Response* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void HostQuery_Response::InternalSwap(HostQuery_Response* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  hosts_.InternalSwap(CastToBase(&other->hosts_));
+}
+
+::google::protobuf::Metadata HostQuery_Response::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void HostQuery::InitAsDefaultInstance() {
+}
+class HostQuery::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+HostQuery::HostQuery()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.HostQuery)
+}
+HostQuery::HostQuery(const HostQuery& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:s2s.HostQuery)
+}
+
+void HostQuery::SharedCtor() {
+}
+
+HostQuery::~HostQuery() {
+  // @@protoc_insertion_point(destructor:s2s.HostQuery)
+  SharedDtor();
+}
+
+void HostQuery::SharedDtor() {
+}
+
+void HostQuery::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const HostQuery& HostQuery::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_HostQuery_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void HostQuery::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.HostQuery)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* HostQuery::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<HostQuery*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool HostQuery::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.HostQuery)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.HostQuery)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.HostQuery)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void HostQuery::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.HostQuery)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.HostQuery)
+}
+
+::google::protobuf::uint8* HostQuery::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.HostQuery)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.HostQuery)
+  return target;
+}
+
+size_t HostQuery::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.HostQuery)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void HostQuery::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.HostQuery)
+  GOOGLE_DCHECK_NE(&from, this);
+  const HostQuery* source =
+      ::google::protobuf::DynamicCastToGenerated<HostQuery>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.HostQuery)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.HostQuery)
+    MergeFrom(*source);
+  }
+}
+
+void HostQuery::MergeFrom(const HostQuery& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.HostQuery)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void HostQuery::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.HostQuery)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void HostQuery::CopyFrom(const HostQuery& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.HostQuery)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool HostQuery::IsInitialized() const {
+  return true;
+}
+
+void HostQuery::Swap(HostQuery* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void HostQuery::InternalSwap(HostQuery* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata HostQuery::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void MysqlQuery_Request::InitAsDefaultInstance() {
   ::s2s::_MysqlQuery_Request_default_instance_._instance.get_mutable()->data_ = const_cast< ::google::protobuf::Any*>(
       ::google::protobuf::Any::internal_default_instance());
@@ -6436,6 +6991,12 @@ template<> PROTOBUF_NOINLINE ::s2s::NodeQuery_Response* Arena::CreateMaybeMessag
 }
 template<> PROTOBUF_NOINLINE ::s2s::NodeQuery* Arena::CreateMaybeMessage< ::s2s::NodeQuery >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::NodeQuery >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::HostQuery_Response* Arena::CreateMaybeMessage< ::s2s::HostQuery_Response >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::HostQuery_Response >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::HostQuery* Arena::CreateMaybeMessage< ::s2s::HostQuery >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::HostQuery >(arena);
 }
 template<> PROTOBUF_NOINLINE ::s2s::MysqlQuery_Request* Arena::CreateMaybeMessage< ::s2s::MysqlQuery_Request >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::MysqlQuery_Request >(arena);

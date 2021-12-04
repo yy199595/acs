@@ -15,11 +15,14 @@ namespace GameKeeper
 
     protected:
         bool Awake() override;
-        void StartRefreshDay();
+        void StartRefreshDay(const std::string & component);
     public:
         void StartHotfix();
-        bool StartLoadConnfig();
+        bool StartLoadConfig();
         int GetPriority() final { return 1000000;}
+
+    private:
+        void AddRefreshTimer(Component * component);
 
     private:
         unsigned int mRefreshTimerId;

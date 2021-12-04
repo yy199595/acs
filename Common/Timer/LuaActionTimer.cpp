@@ -1,7 +1,7 @@
 ﻿#include "LuaActionTimer.h"
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Util/MathHelper.h>
-
+#include"Core/App.h"
 namespace GameKeeper
 {
     LuaActionTimer::LuaActionTimer(lua_State *luaEnv, int ref, int interval, int count)
@@ -28,7 +28,7 @@ namespace GameKeeper
         }
         if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
         {
-            GKDebugError(lua_tostring(this->mLuaEnv, -1));
+			std::cerr << lua_tostring(this->mLuaEnv, -1) << std::endl;
             return true;
         }
         this->mInvokeCount++;

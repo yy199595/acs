@@ -20,6 +20,6 @@ namespace GameKeeper
 		lua_State * mLuaEnv;
 		std::string mMessageJson;
 		class LuaScriptComponent * mScriptComponent;
-		class ProtoRpcComponent * mProtocolComponent;
+		class ProtoRpcClientComponent * mProtocolComponent;
 	};
 }

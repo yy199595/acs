@@ -49,11 +49,11 @@ end
 
 local lua_write = io.output("../Script/Common/XCode.lua")
 local cpp_write = io.output("../../../Protocol/XCode/XCode.h")
---local csharp_write = io.output("./XCode.cs")
+local csharp_write = io.output("./XCode.cs")
 
 lua_write:write(string.format("%s%s%s", "XCode =\n{", lua_string, "\n}\nreturn XCode"))
---csharp_write:write(string.format("%s%s%s", "public enum XCode\n{", cpp_string, "\n};"))
+csharp_write:write(string.format("%s%s%s", "public enum XCode\n{", cpp_string, "\n};"))
 cpp_write:write(string.format("%s%s%s", "#pragma once\nenum XCode\n{", csharp_string, "\n};"))
 lua_write:close()
 cpp_write:close()
---csharp_write:close()
+csharp_write:close()

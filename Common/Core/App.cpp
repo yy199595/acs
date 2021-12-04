@@ -1,10 +1,7 @@
 ﻿
 #include"App.h"
-#include"Scene/RpcResponseComponent.h"
-#include"Scene/ProtoRpcComponent.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
-#include"Scene/RpcRequestComponent.h"
 #include"Scene/TaskPoolComponent.h"
 #include"Util/DirectoryHelper.h"
 #include"Other/ElapsedTimer.h"
@@ -15,8 +12,7 @@ namespace GameKeeper
 {
 	App *App::mApp = nullptr;
 
-	App::App(int argc, char ** argv)
-		:GameObject(0), mServerPath(argc, argv),
+	App::App() :GameObject(0), mServerPath(nullptr),
 		mStartTime(TimeHelper::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
@@ -28,28 +24,15 @@ namespace GameKeeper
 		this->mIsInitComplate = false;
 		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
-		this->mServerName = argc == 1 ? "server" : argv[1];
-		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
-		this->mConfig = new ServerConfig(this->mServerPath.GetConfigPath() + this->mServerName + ".json");
 	}
 
-	void App::OnNewDay()
-	{
-		spdlog::drop_all();
-		LogHelper::Init(this->mServerPath.GetLogPath(), this->mServerName);
-	}
-
-	bool App::LoadComponent()
+	bool App::AddComponentFormConfig()
 	{
 		this->AddComponent<TimerComponent>();
-		this->AddComponent<RpcResponseComponent>();
-		this->AddComponent<ProtoRpcComponent>();
+		this->AddComponent<LoggerComponent>();
 		this->AddComponent<CoroutineComponent>();
-		this->AddComponent<RpcConfigComponent>();
 
-		this->AddComponent<NodeProxyComponent>();
-		this->AddComponent<RpcRequestComponent>();
-
+		this->mLogComponent = this->GetComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mCorComponent = this->GetComponent<CoroutineComponent>();
 
@@ -57,13 +40,13 @@ namespace GameKeeper
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("Scene", components))
 		{
-			GKDebugError("not find field : Managers");
+			LOG_ERROR("not find field : Scene");
 			return false;
 		}
 
 		if (!mConfig->GetValue("Service", services))
 		{
-			GKDebugError("not find field : Service");
+			LOG_ERROR("not find field : Service");
 			return false;
 		}
 
@@ -71,7 +54,7 @@ namespace GameKeeper
 		{
 			if (!this->AddComponent(name))
 			{
-				GKDebugFatal("add " << name << " to service failure");
+				LOG_FATAL("add " << name << " to service failure");
 				return false;
 			}
 		}
@@ -80,7 +63,7 @@ namespace GameKeeper
 		{
 			if (!this->AddComponent(name))
 			{
-				GKDebugFatal("add " << name << " to scene failure");
+				LOG_FATAL("add " << name << " to scene failure");
 				return false;
 			}
 		}
@@ -101,7 +84,7 @@ namespace GameKeeper
 		{
 			if (!this->InitComponent(component))
 			{
-				GKDebugFatal("Init " << component->GetTypeName() << " failure");
+				LOG_FATAL("Init " << component->GetTypeName() << " failure");
 				return false;
 			}
 		}
@@ -145,35 +128,54 @@ namespace GameKeeper
             if (component != nullptr)
             {
                 component->Start();
-                float process = (index + 1) / (float) this->mSceneComponents.size();
-                GKDebugInfo("[" << process * 100 << "%]" << " start component "
-                                << component->GetTypeName() << " time = " << elapsedTimer.GetMs() << "ms");
+                float process = (float)(index + 1) / (float) this->mSceneComponents.size();
+                LOG_INFO("[" << process * 100 << "%]" << " start component "
+                             << component->GetTypeName() << " use time = " << elapsedTimer.GetMs() << "ms");
+
+                //LOG_DEBUG("start " << component->GetTypeName() << " use time " << elapsedTimer.GetMs() << "ms");
             }
         }
 		this->mIsInitComplate = true;
 		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
-		GKDebugLog("start all component successful ......");
+		LOG_DEBUG("start all component successful ......");
 
 		for (Component *component : this->mSceneComponents)
 		{
             ElapsedTimer elapsedTimer;
 			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
             {
-                loadComponent->OnLodaData();
-                GKDebugLog("load " << component->GetTypeName()
-                                   << " data use time = " << elapsedTimer.GetMs() << "ms");
+                loadComponent->OnLoadData();
+                LOG_DEBUG("load " << component->GetTypeName()
+                                  << " data use time = " << elapsedTimer.GetMs() << "ms");
             }
 		}
+
+
         long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
-		GKDebugLog("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
+		LOG_DEBUG("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}
 
-	int App::Run()
+	int App::Run(int argc, char ** argv)
 	{
-		if (!mConfig->InitConfig() || !this->LoadComponent() || !this->InitComponent())
-		{
-			return this->Stop();
+		std::string config(argv[1]);
+		this->mConfig = new ServerConfig(config);
+		this->mServerPath = new ServerPath(argc, argv);		
+
+		if (!mConfig->InitConfig())
+		{			
+			return this->Stop(ExitCode::ConfigError);
 		}
+
+		if (!this->AddComponentFormConfig())
+		{
+			return this->Stop(ExitCode::AddError);
+		}
+
+		if (!this->InitComponent())
+		{
+			return this->Stop(ExitCode::InitError);
+		}
+
 		mConfig->GetValue("LogicFps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = TimeHelper::GetMilTimestamp();
@@ -183,15 +185,14 @@ namespace GameKeeper
 		return this->mTaskScheduler.Start();
 	}
 
-	int App::Stop()
+	int App::Stop(ExitCode code)
 	{
 		this->OnDestory();
 		this->mIsClose = true;
-		spdlog::drop_all();
 #ifdef _WIN32
 		return getchar();
 #endif
-		return -1;
+		return (int)code;
 	}
 
 	void App::LogicMainLoop()
@@ -235,14 +236,14 @@ namespace GameKeeper
     void App::UpdateConsoleTitle()
     {
         long long nowTime = TimeHelper::GetMilTimestamp();
-        float seconds = (nowTime - this->mMainLoopStartTime) / 1000.0f;
-        this->mLogicFps = this->mLogicRunCount / seconds;
+        long long seconds = (nowTime - this->mMainLoopStartTime) / 1000;
+        this->mLogicFps = this->mLogicRunCount / (float)seconds;
 #ifdef _WIN32
         char buffer[100] = {0};
         sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
         SetConsoleTitle(buffer);
 #else
-        //GKDebugInfo("fps = " << this->mLogicFps);
+        //LOG_INFO("fps = " << this->mLogicFps);
 #endif
     }
 }

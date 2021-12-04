@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <string>
-#include"CoroutineEvent.h"
+#include"CoroutineDef.h"
 namespace GameKeeper
 {
     enum CorState
@@ -22,19 +22,21 @@ namespace GameKeeper
     };
 	
 
-    struct Coroutine
+    class Coroutine
     {
     public:
-		Coroutine();
+		explicit Coroutine();
         ~Coroutine();
     public:
         size_t mStackSize;
         unsigned int mGroupId;
 		StaticMethod * mFunction;
+        unsigned int mSwitchCount;
+		unsigned int mLastCoroutineId;
 #ifdef __COROUTINE_ASM__
 		int sid;
 		Stack mStack;
-		tb_context_t mCorContext;
+		tb_context_t mContext;
 #elif __linux__
 		void * mContextStack;
 		ucontext_t mContext;

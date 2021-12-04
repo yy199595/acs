@@ -4,28 +4,32 @@ PROJECT(Client)
 
 #第三方库包含
 
-include_directories(${PROJECT_INIT_PATH}/Libs/include/rapidjson)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/protobuf)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/asio)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/lua5.3)
-include_directories(${PROJECT_INIT_PATH}/Libs/include/spdlog)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/rapidjson)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/protobuf)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/asio)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/lua5.3)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
 #公共组件
 
-include_directories(${PROJECT_INIT_PATH}/Common)
-include_directories(${PROJECT_INIT_PATH}/Protocol)
-include_directories(${PROJECT_SOURCE_DIR}/Manager)
+include_directories(${PROJECT_COMMON_DIR}/Common)
+include_directories(${PROJECT_COMMON_DIR}/Protocol)
+include_directories(${PROJECT_COMMON_DIR}/Common/NetWork)
+include_directories(${PROJECT_COMMON_DIR}/Common/Component)
+
+include_directories(${PROJECT_SOURCE_DIR}/Component)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
-file(GLOB_RECURSE ManagerSource "Manager/*.h" "Manager/*.cpp" "Manager/*.hpp" "Manager/*.cc")
+file(GLOB_RECURSE ManagerSource "Component/*.h" "Component/*.cpp" "Component/*.hpp" "Component/*.cc")
+file(GLOB_RECURSE NetworkSource "Network/*.h" "Network/*.cpp" "Network/*.hpp" "Network/*.cc")
 
-LINK_DIRECTORIES(${PROJECT_INIT_PATH}/Libs/lib)
+LINK_DIRECTORIES(${PROJECT_COMMON_DIR}/Libs/lib)
 
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_BUILD_TYPE Debug)
 
-list(APPEND ClientFiles ${MainSource} ${ManagerSource})
+list(APPEND ClientFiles ${MainSource} ${ManagerSource} ${NetworkSource})
 
 if(MSVC)
     
@@ -33,19 +37,27 @@ if(MSVC)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
    
     foreach(file_name ${CommonFiles})
-        source_group_by_dir(${PROJECT_INIT_PATH} ${file_name})
+        source_group_by_dir(${PROJECT_COMMON_DIR} ${file_name})
     endforeach()
 
     foreach(file_name ${ClientFiles})
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 
-    ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
+	  foreach(file_name ${Network})
+        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
+    endforeach()
+
+    ADD_EXECUTABLE(Client ${AsmFiles} ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 libprotobufd)
 else()
-    ADD_EXECUTABLE(Client ${CommonFiles} ${ClientFiles})
+    ADD_EXECUTABLE(Client ${AsmFiles} ${CommonFiles} ${ClientFiles})
     TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
 endif()
+
+target_compile_definitions(Client PRIVATE __DEBUG__)
+target_compile_definitions(Client PRIVATE ASIO_STANDALONE)
+target_compile_definitions(Client PRIVATE __COROUTINE_ASM__)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

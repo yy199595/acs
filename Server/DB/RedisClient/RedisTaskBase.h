@@ -1,13 +1,12 @@
 ﻿#pragma once
 
 #include "RedisDefine.h"
-#include <Thread/TaskProxy.h>
-#include <XCode/XCode.h>
-#include <memory>
-#include <string>
-#include <vector>
-
-#define RedisLuaArgvSize 10
+#include<Thread/TaskProxy.h>
+#include<XCode/XCode.h>
+#include<memory>
+#include<string>
+#include<queue>
+#include<google/protobuf/message.h>
 namespace GameKeeper
 {
     class RedisComponent;
@@ -17,27 +16,27 @@ namespace GameKeeper
     class RedisTaskBase : public TaskProxy
     {
     public:
-        RedisTaskBase(const std::string &cmd);
+        explicit RedisTaskBase(const std::string &cmd);
+        ~RedisTaskBase() override;
     public:
         bool Run() final;//在线程池执行的任务
     public:
         template<typename... Args>
-        void InitCommand(Args &&...args);
-        float GetCostTime();
-
+        void InitCommand(Args &&...args);      
     private:
         //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
 
-        inline void AddCommand(const std::string &value) { this->mCommand.push_back(value); }
+        inline void AddCommand(const std::string &value) { this->mCommand.emplace_back(value); }
 
-        inline void AddCommand(const int value) { this->mCommand.push_back(std::to_string(value)); }
+        inline void AddCommand(const int value) { this->mCommand.emplace_back(std::to_string(value)); }
 
-        inline void AddCommand(const float value) { this->mCommand.push_back(std::to_string(value)); }
+        inline void AddCommand(const float value) { this->mCommand.emplace_back(std::to_string(value)); }
 
-        inline void AddCommand(const double value) { this->mCommand.push_back(std::to_string(value)); }
+        inline void AddCommand(const double value) { this->mCommand.emplace_back(std::to_string(value)); }
 
-        inline void AddCommand(const long long value) { this->mCommand.push_back(std::to_string(value)); }
+        inline void AddCommand(const long long value) { this->mCommand.emplace_back(std::to_string(value)); }
 
+        void AddCommand(const google::protobuf::Message & value);
     private:
         void Encode() {}
 
@@ -51,29 +50,14 @@ namespace GameKeeper
     public:
         void AddCommandArgv(const std::string &argv);
 
-        void AddCommandArgv(const char *str, const size_t size);
+        void AddCommandArgv(const char *str, size_t size);
 
-    public:
-
-        void DebugInvokeInfo();
-
-        bool GetOnceData(std::string &value);
-
-        XCode GetErrorCode() { return this->mErrorCode; }
-
-        const std::string &GetErrorStr() { return this->mErrorStr; }
-
-        std::vector<std::string> &GetQueryDatas() { return this->mQueryDatas; }
-
-    private:
-        long long mStartTime;
-        std::vector<std::string> mCommand;
-    private:
-        XCode mErrorCode;
-        std::string mErrorStr;
-
-    private:       
-        std::vector<std::string> mQueryDatas;
+        std::shared_ptr<RedisResponse> GetResponse() { return this->mResponse;}
+	private:
+		long long mStartTime;
+        RedisComponent * mRedisComponent;
+		std::vector<std::string> mCommand;
+        std::shared_ptr<RedisResponse> mResponse;
     };
 
     template<typename... Args>

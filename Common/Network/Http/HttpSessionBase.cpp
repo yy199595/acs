@@ -1,8 +1,9 @@
 #include "HttpSessionBase.h"
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <istream>
-#include <Util/TimeHelper.h>
-#include <Http/HttpHandlerBase.h>
+#include"Core/App.h"
+#include"Util/TimeHelper.h"
+#include"Http/HttpHandlerBase.h"
 namespace GameKeeper
 {
     HttpSessionBase::HttpSessionBase()
@@ -82,7 +83,7 @@ namespace GameKeeper
         AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		if (!socket.is_open() || this->mIsReadBody)
 		{
-			GKDebugFatal("logic error");
+			LOG_FATAL("logic error");
             this->OnReceiveHeadAfter(XCode::NetReceiveFailure);
             return;
 		}

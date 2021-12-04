@@ -28,11 +28,13 @@ namespace GameKeeper
 
     public:
         RpcNodeProxy *GetServiceNode(int nodeId);
+
+        RpcNodeProxy * AllotService(const std::string & name);
     private:
 		int mAreaId;
         std::string mCenterIp;
         unsigned short mCenterPort;
-        class ProtoRpcComponent * mProtocolComponent;
+        class ProtoRpcClientComponent * mProtocolComponent;
         std::unordered_map<int, RpcNodeProxy *> mServiceNodeMap;
     };
 }

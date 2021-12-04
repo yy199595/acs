@@ -15,23 +15,28 @@ namespace GameKeeper
 
     bool RpcConfigComponent::OnLoadConfig()
     {
+        std::string md5;
         rapidjson::Document jsonMapper;
-        const std::string path = App::Get().GetConfigPath() + "rpc.json";
-        if (!FileHelper::ReadJsonFile(path, jsonMapper))
+        const std::string path = App::Get().GetServerPath().GetConfigPath() + "rpc.json";
+        if (!FileHelper::ReadJsonFile(path, jsonMapper, md5))
         {
-            GKDebugFatal("not find file : " << path << "");
+            LOG_FATAL("not find file : " << path << "");
             return false;///
+        }
+        if(this->mConfigFileMd5 == md5)
+        {
+            return true;
         }
 
         this->mServiceMap.clear();
+        this->mConfigFileMd5 = md5;
         this->mProtocolNameMap.clear();
-
         auto iter1 = jsonMapper.MemberBegin();
         for (; iter1 != jsonMapper.MemberEnd(); iter1++)
         {
-            const std::string service = iter1->name.GetString();
             rapidjson::Value &jsonValue = iter1->value;
-            GKAssertRetFalse_F(jsonValue.IsObject());
+            LOG_CHECK_RET_FALSE(jsonValue.IsObject());
+            const std::string service = iter1->name.GetString();
 
             std::vector<ProtocolConfig> methods;
             auto iter2 = jsonValue.MemberBegin();
@@ -54,11 +59,11 @@ namespace GameKeeper
                 if (iter2->value.HasMember("Request"))
                 {
                     const rapidjson::Value &jsonValue = iter2->value["Request"];
-                    GKAssertRetFalse_F(jsonValue.IsString());
+                    LOG_CHECK_RET_FALSE(jsonValue.IsString());
                     protocolConfig.Request = jsonValue.GetString();
                     if(MessagePool::New(protocolConfig.Request) == nullptr)
                     {
-                        GKDebugFatal("create " << protocolConfig.Response << " failure");
+                        LOG_FATAL("create " << protocolConfig.Request << " failure");
                         return false;
                     }
                 }
@@ -66,11 +71,11 @@ namespace GameKeeper
                 if (iter2->value.HasMember("Response"))
                 {
                     const rapidjson::Value &jsonValue = iter2->value["Response"];
-                    GKAssertRetFalse_F(jsonValue.IsString());
+                    LOG_CHECK_RET_FALSE(jsonValue.IsString());
                     protocolConfig.Response = jsonValue.GetString();               
                     if (MessagePool::New(protocolConfig.Response) == nullptr)
                     {
-                        GKDebugFatal("create " << protocolConfig.Response << " failure");
+                        LOG_FATAL("create " << protocolConfig.Response << " failure");
                         return false;
                     }
                 }
@@ -89,10 +94,10 @@ namespace GameKeeper
     bool RpcConfigComponent::LoadCodeConfig()
     {
         std::vector<std::string> lines;
-        const std::string path = App::Get().GetWorkPath();
+        const std::string path = App::Get().GetServerPath().GetWorkPath();
         if (!FileHelper::ReadTxtFile(path + "XCode/XCode.csv", lines))
         {
-            GKDebugError("not find file " << path + "XCode/XCode.csv");
+            LOG_ERROR("not find file " << path + "XCode/XCode.csv");
             return false;
         }
         std::vector<std::string> res;
@@ -139,15 +144,27 @@ namespace GameKeeper
 			services.push_back(iter->first);
 		}
 	}
-
+#ifdef __DEBUG__
     void RpcConfigComponent::DebugCode(XCode code)
     {
         auto iter = this->mCodeDescMap.find(code);
         if(iter != this->mCodeDescMap.end())
         {
-            GKDebugError("code = [" << iter->second.Name << ":" << iter->second.Desc <<"]");
+            LOG_ERROR("code = [" << iter->second.Name << ":" << iter->second.Desc << "]");
         }
     }
+
+    std::string RpcConfigComponent::GetCodeDesc(XCode code)
+    {
+        auto iter = this->mCodeDescMap.find(code);
+        if(iter != this->mCodeDescMap.end())
+        {
+            return iter->second.Name + ":" + iter->second.Desc;
+        }
+        return std::string("");
+    }
+
+#endif
 
 	bool RpcConfigComponent::HasServiceMethod(const std::string & service, const std::string & method)
 	{

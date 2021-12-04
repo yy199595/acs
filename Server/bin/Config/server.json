@@ -4,11 +4,18 @@
     "LogicFps": 30,
     "SystemFps": 100,
     "NodeName": "Server",
-    "rpc": "./Rpc/rpc.csv",
+    "Deadloop":30,
+    "Log":
+    {
+        "save":1,
+        "path":"./Log/",
+        "hour":0,
+        "min":0
+    },
     "Thread":
     {
         "task":1,
-        "network":2
+        "network":1
     },
     "ProxyAddress": {
         "ip": "114.115.167.51",
@@ -24,7 +31,13 @@
         {
             "port":7788,
             "count":10000,
-            "handler":"ProtoRpcComponent"
+            "handler":"ProtoRpcClientComponent"
+        },
+        "proxy":
+        {
+            "port":1995,
+            "count": 10000,
+            "handler": "ProtoProxyClientComponent"
         },
         "http":
         {
@@ -33,26 +46,17 @@
             "handler":"HttpComponent"
         }
     },
-    "NetWork": {
-        "MsgTimeout": 0,
-        "ReConnectTime": 3,
-        "ReConnectCount": 5,
-        "RecvBufferCount": 1024
-    },
     "IsOpenRecoder": true,
-    "CommandPort": 1020,
-    "ThreadCount": 1,
-    "CoroutinePoolMaxSize": 100,
     "Mysql": {
-        "ip": "8.136.213.239",
+        "ip": "127.0.0.1",
         "port": 3306,
-        "user": "yjz",
+        "user": "root",
         "passwd": "199595yjz.",
         "db": "player_db",
         "sql": "./sql/sql.json"
     },
     "Redis": {
-        "ip": "8.136.213.239",
+        "ip": "127.0.0.1",
         "port": 6379,
         "timeout": 3,
         "passwd": ""
@@ -64,16 +68,22 @@
         "TcpServerComponent",
         "LuaScriptComponent",
         "MysqlComponent",
-        "RedisComponent",
         "MysqlProxyComponent",
         "HttpComponent",
+        "ProtoRpcComponent",
+        "ProtoRpcClientComponent",
         "OperatorComponent",
-        "TelnetClientComponent"
+        "ProtoProxyComponent",
+        "RpcConfigComponent",
+        "NodeProxyComponent",
+        "ProtoProxyClientComponent"
     ],
     "Service": [
         "MysqlService",
-        "NodeCenter", 
-        "NodeServer",
+        "ProxyService",
+        "AccountService",
+        "LocalHostService",
+        "CenterHostService",
         "HttpLoginService",
         "HttpOperComponent"
     ],

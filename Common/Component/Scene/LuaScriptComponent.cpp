@@ -2,13 +2,13 @@
 #include<Script/luadebug.h>
 #include<Script/luaExtension.h>
 #include<Script/SystemExtension.h>
-#include<Script/LuaProtocExtension.h>
 #include<Script/CoroutineExtension.h>
 
 #include <Core/App.h>
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
+#include"Core/App.h"
 
 #include <Service/LuaServiceComponent.h>
 namespace GameKeeper
@@ -29,13 +29,13 @@ namespace GameKeeper
 		this->PushClassToLua();
 		this->RegisterExtension();
         this->OnPushGlobalObject();    
-		GKAssertRetFalse_F(this->LoadAllFile());
+		LOG_CHECK_RET_FALSE(this->LoadAllFile());
 		
 		if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{
 			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
 			{
-				GKDebugError(lua_tostring(this->mLuaEnv, -1));
+				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 				return false;
 			}
 			return (bool)lua_toboolean(this->mLuaEnv, -1);
@@ -47,7 +47,7 @@ namespace GameKeeper
 	{
 		std::string luaDir;
 		const ServerConfig & config = App::Get().GetConfig();
-		GKAssertRetFalse_F(config.GetValue("ScriptPath", luaDir));
+		LOG_CHECK_RET_FALSE(config.GetValue("ScriptPath", luaDir));
 
 		std::vector<std::string> luaFiles;
 		DirectoryHelper::GetFilePaths(luaDir, "*.lua",luaFiles);
@@ -63,7 +63,7 @@ namespace GameKeeper
 				if (iter == this->mLuaFileMd5s.end())
 				{
 					mLuaFileMd5s.emplace(name, md5.toString());
-					GKAssertRetFalse_F(this->LoadLuaScript(path));
+					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 				}
 				else
 				{
@@ -72,7 +72,7 @@ namespace GameKeeper
 					if (oldMd5 != newMd5)
 					{
 						mLuaFileMd5s[name] = newMd5;
-						GKAssertRetFalse_F(this->LoadLuaScript(path));
+						LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 					}
 				}
 			}
@@ -110,13 +110,13 @@ namespace GameKeeper
 		lua_getglobal(this->mLuaEnv, tab.c_str());
 		if (!lua_istable(this->mLuaEnv, -1))
 		{
-			GKDebugError("find lua object fail " << tab);
+			LOG_ERROR("find lua object fail " << tab);
 			return 0;
 		}
 		lua_getfield(this->mLuaEnv, -1, field.c_str());
 		if (lua_isnil(this->mLuaEnv, -1))
 		{
-			GKDebugError("find lua object field fail " << field);
+			LOG_ERROR("find lua object field fail " << field);
 			return 0;
 		}
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
@@ -134,7 +134,7 @@ namespace GameKeeper
 		lua_getglobal(this->mLuaEnv, name.c_str());
 		if (lua_isnil(this->mLuaEnv, -1))
 		{
-			GKDebugError("find lua object field fail " << name);
+			LOG_ERROR("find lua object field fail " << name);
 			return 0;
 		}
 		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
@@ -150,11 +150,11 @@ namespace GameKeeper
         if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
         {
             lua_pcall(mLuaEnv, 0, 1, errfunc);
-            //GKDebugLog("load lua script success path :" << filePath);
+            //LOG_DEBUG("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
 			return true;
         }
-        GKDebugError("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
+        LOG_ERROR("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }
@@ -208,13 +208,11 @@ namespace GameKeeper
                                              TimeHelper::GetYearMonthDayString);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Call", SystemExtension::Call);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Sleep", SystemExtension::Sleep);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AddTimer", SystemExtension::AddTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "WaitForSleep", SystemExtension::Sleep);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AsyncWait", SystemExtension::AddTimer);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "RemoveTimer", SystemExtension::RemoveTimer);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "GetManager", SystemExtension::GetManager);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "CreateByTable",LuaProtocExtension::CreateByTable);
-
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Debug", LuaAPIExtension::DebugLog);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper","Warning",LuaAPIExtension::DebugWarning);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"GameKeeper","Error",LuaAPIExtension::DebugError);

@@ -19,7 +19,6 @@ namespace GameKeeper
         {
             this->SetActive(true);
             this->mClassName = name;
-            this->mIntanceID = NumberHelper::Create();
             return true;
         }
         return false;

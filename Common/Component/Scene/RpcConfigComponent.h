@@ -30,11 +30,16 @@ namespace GameKeeper
         const CodeConfig * GetCodeConfig(int code) const;
         const ProtocolConfig *GetProtocolConfig(int methodId) const;
         const ProtocolConfig *GetProtocolConfig(const std::string & fullName) const;
+
+#ifdef __DEBUG__
         void DebugCode(XCode code);
+        std::string GetCodeDesc(XCode code);
+#endif
     private:
         bool LoadCodeConfig();
     private:
         std::mutex mLock;
+        std::string mConfigFileMd5;
         std::unordered_map<int, CodeConfig> mCodeDescMap;
         std::unordered_map<int, ProtocolConfig> mProtocolIdMap;
         std::unordered_map<std::string, ProtocolConfig> mProtocolNameMap;

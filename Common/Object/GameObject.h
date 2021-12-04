@@ -36,7 +36,7 @@ namespace GameKeeper
 
     public:
 		void OnDestory() override;
-        void GetComponents(std::vector<Component *> & components) const;
+        void GetComponents(std::vector<Component *> & components, bool sort = false) const;
     public:
 		inline long long GetId() const { return this->mGameObjectId; }
         inline long long GetSocketId() const { return this->mSocketId; }

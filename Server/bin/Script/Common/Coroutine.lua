@@ -13,5 +13,5 @@ end
 --     if coroutine.running() == nil then
 --         assert(false, "sleep not in coroutine")
 --     end
---     return SoEasy.Sleep(ms)
+--     return SoEasy.WaitForSleep(ms)
 -- end

@@ -14,7 +14,7 @@ namespace GameKeeper
     public:
         RedisLuaTask(const std::string &cmd, lua_State *lua, int ref);
 
-        ~RedisLuaTask();
+        ~RedisLuaTask() final;
 
     protected:
         void RunFinish() final;  //执行完成之后在主线程调用
@@ -22,7 +22,7 @@ namespace GameKeeper
         static RedisLuaTask * Create(lua_State *lua, int index, const char *cmd);
 
     private:
-        int mCoroutienRef;
+        int mCoroutineRef;
         lua_State *mLuaEnv;
     private:
         std::string mQueryJsonData;

@@ -17,19 +17,24 @@ namespace GameKeeper
 		~CoroutineComponent() final;
 	public:
 		template<typename F, typename T, typename ... Args>
-		unsigned int StartCoroutine(F && f, T * o, Args &&... args) {
-			return this->StartCoroutine(
-				NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
-		}
-
-	private:
-		unsigned int StartCoroutine(StaticMethod * func);
+		Coroutine * StartCoroutine(F && f, T * o, Args &&... args)
+        {
+            Coroutine *co = this->CreateCoroutine(
+                    NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
+            if(co != nullptr)
+            {
+                this->Resume(co->mCoroutineId);
+                return co;
+            }
+            return nullptr;
+        }
+        Coroutine * CreateCoroutine(StaticMethod * func);
 	public:
-		void YieldReturn();
+		void WaitForYield();
 
-		void YieldReturn(unsigned int & mCorId);
+		void WaitForYield(unsigned int & mCorId);
 
-		void Sleep(long long ms);
+		void WaitForSleep(long long ms);
 
 		void Resume(unsigned int id);
 
@@ -37,6 +42,8 @@ namespace GameKeeper
 
 	protected:
 		bool Awake() final;
+
+		//void Start() final;
 
 		void OnSystemUpdate() final;
 
@@ -71,24 +78,21 @@ namespace GameKeeper
 			return this->mCurrentCorId != 0;
 		}
 	private:
-        void SleepTest(int ms);
-		void SleepTest1(int ms);
-		void SleepTest2(int ms);
-		void ResumeCoroutine(unsigned int id);
+        void SleepTest();
+		void ResumeCoroutine(Coroutine * co);
 #ifdef __COROUTINE_ASM__
 		void SaveStack(unsigned int id);
 #else
 		void SaveStack(Coroutine *, char *top);
 #endif
 	private:
-        std::stack<unsigned int> mCorStack;
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
 		std::queue<unsigned int> mLastQueues2;
 	private:
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;
-        unsigned int mCurrentCorId;
+        unsigned int mCurrentCorId{};
 #ifdef __COROUTINE_ASM__
 		Stack mSharedStack[SHARED_STACK_NUM];
 #else

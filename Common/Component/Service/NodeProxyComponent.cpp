@@ -2,8 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/RpcNodeProxy.h>
-#include <Scene/ProtoRpcComponent.h>
-#include <Component/Scene/ProtoRpcComponent.h>
+#include <ProtoRpc/ProtoRpcClientComponent.h>
 
 namespace GameKeeper
 {
@@ -56,10 +55,10 @@ namespace GameKeeper
     bool NodeProxyComponent::Awake()
     {
 		const ServerConfig & serverConfig = App::Get().GetConfig();
-		GKAssertRetFalse_F(serverConfig.GetValue("AreaId", this->mAreaId));
-		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "ip", this->mCenterIp));
-		GKAssertRetFalse_F(serverConfig.GetValue("CenterAddress", "port", this->mCenterPort));
-		GKAssertRetFalse_F(mProtocolComponent = this->GetComponent<ProtoRpcComponent>());
+		LOG_CHECK_RET_FALSE(serverConfig.GetValue("AreaId", this->mAreaId));
+		LOG_CHECK_RET_FALSE(serverConfig.GetValue("CenterAddress", "ip", this->mCenterIp));
+		LOG_CHECK_RET_FALSE(serverConfig.GetValue("CenterAddress", "port", this->mCenterPort));
+		LOG_CHECK_RET_FALSE(mProtocolComponent = this->GetComponent<ProtoRpcClientComponent>());
         return true;
     }
 
@@ -68,15 +67,29 @@ namespace GameKeeper
         s2s::NodeInfo centerNodeInfo;
         centerNodeInfo.set_servername("Center");
         centerNodeInfo.set_serverip(this->mCenterIp);
-        centerNodeInfo.add_services("NodeCenter");
+        centerNodeInfo.add_services("CenterHostService");
         centerNodeInfo.mutable_listeners()->insert({"rpc", this->mCenterPort});
 
-        GKAssertRet_F(this->CreateNode(0, centerNodeInfo));
+        LOG_CHECK_RET(this->CreateNode(0, centerNodeInfo));
     }
 
     RpcNodeProxy *NodeProxyComponent::GetServiceNode(int nodeId)
     {
         auto iter = this->mServiceNodeMap.find(nodeId);
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
+    }
+
+    // 分配服务  TODO
+    RpcNodeProxy *NodeProxyComponent::AllotService(const string &name)
+    {
+        auto iter = this->mServiceNodeMap.begin();
+        for(; iter != this->mServiceNodeMap.end(); iter++)
+        {
+            if(iter->second->HasService(name))
+            {
+                return iter->second;
+            }
+        }
+        return nullptr;
     }
 }// namespace GameKeeper

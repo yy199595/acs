@@ -39,13 +39,20 @@ long long TimeHelper::GetToDayZeroTime()
     t->tm_hour = 0;
     t->tm_min = 0;
     t->tm_sec = 0;
-    return mktime(t) + 86400;
+    return mktime(t) + _DaySecond;
 }
 
 long long TimeHelper::GetTomorrowZeroTime()
 {
     long long t = GetToDayZeroTime();
-    return t + 24 * 60 * 60;
+    return t + _DaySecond;
+}
+
+void TimeHelper::GetHourMinSecond(const long long sec, int &hour, int &min, int &second)
+{
+    hour = sec / _HourSecond;
+    min = (sec - hour * _HourSecond) / _MinSecond;
+    second = sec % 60;
 }
 
 std::string TimeHelper::GetDateString(long long time)
@@ -54,7 +61,7 @@ std::string TimeHelper::GetDateString(long long time)
     time_t t = GetSecTimeStamp();
     struct tm *pt = localtime(&t);
     size_t size = strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", pt);
-    return std::string(str, size);
+    return {str, size};
 }
 
 std::string TimeHelper::GetYearMonthDayString()
@@ -63,5 +70,5 @@ std::string TimeHelper::GetYearMonthDayString()
     time_t t = GetSecTimeStamp();
     struct tm *pt = localtime(&t);
     size_t size = strftime(str, sizeof(str), "%Y-%m-%d", pt);
-    return std::string(str, size);
+    return {str, size};
 }

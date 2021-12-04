@@ -12,7 +12,7 @@ namespace GameKeeper
     {
     public:
         HttpServiceComponent() = default;
-        virtual ~HttpServiceComponent() override;
+        ~HttpServiceComponent() override;
     public:
         HttpServiceMethod * GetMethod(const std::string & path);
     protected:

@@ -2,9 +2,10 @@
 // Created by zmhy0073 on 2021/11/1.
 //
 
-#include "HttpRequest.h"
-#include <Define/CommonDef.h>
-#include <NetworkHelper.h>
+#include"HttpRequest.h"
+#include<Define/CommonLogDef.h>
+#include<NetworkHelper.h>
+#include"Core/App.h"
 namespace GameKeeper
 {
     HttpRequest::HttpRequest(HttpComponent *component)
@@ -48,8 +49,8 @@ namespace GameKeeper
 
         this->ParseHeard(streamBuf);
 #ifdef __DEBUG__
-        GKDebugWarning(this->PrintHeard());
-        GKDebugWarning(this->mVersion << " " << this->mHttpCode << " " << this->mError);
+        LOG_WARN(this->PrintHeard());
+        LOG_WARN(this->mVersion << " " << this->mHttpCode << " " << this->mError);
 #endif
         return true;
     }

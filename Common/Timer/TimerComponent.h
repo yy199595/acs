@@ -19,7 +19,7 @@ namespace GameKeeper
         unsigned int AddTimer(TimerBase * timer);
 
 		template<typename F,typename O, typename ... Args>
-		unsigned int AddTimer(long long ms, F && f, O * o, Args &&... args) {
+		unsigned int AsyncWait(long long ms, F && f, O * o, Args &&... args) {
 
 			StaticMethod * methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
@@ -37,6 +37,8 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
+
+		void Start() final;
 
         void OnSystemUpdate() final;//处理系统事件
 

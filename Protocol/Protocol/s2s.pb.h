@@ -45,7 +45,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[19]
+  static const ::google::protobuf::internal::ParseTable schema[21]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +56,12 @@ namespace s2s {
 class GroupConfigData;
 class GroupConfigDataDefaultTypeInternal;
 extern GroupConfigDataDefaultTypeInternal _GroupConfigData_default_instance_;
+class HostQuery;
+class HostQueryDefaultTypeInternal;
+extern HostQueryDefaultTypeInternal _HostQuery_default_instance_;
+class HostQuery_Response;
+class HostQuery_ResponseDefaultTypeInternal;
+extern HostQuery_ResponseDefaultTypeInternal _HostQuery_Response_default_instance_;
 class Listener;
 class ListenerDefaultTypeInternal;
 extern ListenerDefaultTypeInternal _Listener_default_instance_;
@@ -114,6 +120,8 @@ extern NodeRegister_ResponseDefaultTypeInternal _NodeRegister_Response_default_i
 namespace google {
 namespace protobuf {
 template<> ::s2s::GroupConfigData* Arena::CreateMaybeMessage<::s2s::GroupConfigData>(Arena*);
+template<> ::s2s::HostQuery* Arena::CreateMaybeMessage<::s2s::HostQuery>(Arena*);
+template<> ::s2s::HostQuery_Response* Arena::CreateMaybeMessage<::s2s::HostQuery_Response>(Arena*);
 template<> ::s2s::Listener* Arena::CreateMaybeMessage<::s2s::Listener>(Arena*);
 template<> ::s2s::MysqlAnyOper* Arena::CreateMaybeMessage<::s2s::MysqlAnyOper>(Arena*);
 template<> ::s2s::MysqlAnyOper_Request* Arena::CreateMaybeMessage<::s2s::MysqlAnyOper_Request>(Arena*);
@@ -1324,6 +1332,241 @@ class NodeQuery :
 };
 // -------------------------------------------------------------------
 
+class HostQuery_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.HostQuery.Response) */ {
+ public:
+  HostQuery_Response();
+  virtual ~HostQuery_Response();
+
+  HostQuery_Response(const HostQuery_Response& from);
+
+  inline HostQuery_Response& operator=(const HostQuery_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  HostQuery_Response(HostQuery_Response&& from) noexcept
+    : HostQuery_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline HostQuery_Response& operator=(HostQuery_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const HostQuery_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const HostQuery_Response* internal_default_instance() {
+    return reinterpret_cast<const HostQuery_Response*>(
+               &_HostQuery_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(HostQuery_Response* other);
+  friend void swap(HostQuery_Response& a, HostQuery_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline HostQuery_Response* New() const final {
+    return CreateMaybeMessage<HostQuery_Response>(nullptr);
+  }
+
+  HostQuery_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<HostQuery_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const HostQuery_Response& from);
+  void MergeFrom(const HostQuery_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(HostQuery_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string Hosts = 1;
+  int hosts_size() const;
+  void clear_hosts();
+  static const int kHostsFieldNumber = 1;
+  const ::std::string& hosts(int index) const;
+  ::std::string* mutable_hosts(int index);
+  void set_hosts(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_hosts(int index, ::std::string&& value);
+  #endif
+  void set_hosts(int index, const char* value);
+  void set_hosts(int index, const char* value, size_t size);
+  ::std::string* add_hosts();
+  void add_hosts(const ::std::string& value);
+  #if LANG_CXX11
+  void add_hosts(::std::string&& value);
+  #endif
+  void add_hosts(const char* value);
+  void add_hosts(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& hosts() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_hosts();
+
+  // @@protoc_insertion_point(class_scope:s2s.HostQuery.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> hosts_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class HostQuery :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.HostQuery) */ {
+ public:
+  HostQuery();
+  virtual ~HostQuery();
+
+  HostQuery(const HostQuery& from);
+
+  inline HostQuery& operator=(const HostQuery& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  HostQuery(HostQuery&& from) noexcept
+    : HostQuery() {
+    *this = ::std::move(from);
+  }
+
+  inline HostQuery& operator=(HostQuery&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const HostQuery& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const HostQuery* internal_default_instance() {
+    return reinterpret_cast<const HostQuery*>(
+               &_HostQuery_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(HostQuery* other);
+  friend void swap(HostQuery& a, HostQuery& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline HostQuery* New() const final {
+    return CreateMaybeMessage<HostQuery>(nullptr);
+  }
+
+  HostQuery* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<HostQuery>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const HostQuery& from);
+  void MergeFrom(const HostQuery& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(HostQuery* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef HostQuery_Response Response;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:s2s.HostQuery)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MysqlQuery_Request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.MysqlQuery.Request) */ {
  public:
@@ -1362,7 +1605,7 @@ class MysqlQuery_Request :
                &_MysqlQuery_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   void Swap(MysqlQuery_Request* other);
   friend void swap(MysqlQuery_Request& a, MysqlQuery_Request& b) {
@@ -1477,7 +1720,7 @@ class MysqlQuery_Response :
                &_MysqlQuery_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    13;
 
   void Swap(MysqlQuery_Response* other);
   friend void swap(MysqlQuery_Response& a, MysqlQuery_Response& b) {
@@ -1610,7 +1853,7 @@ class MysqlQuery :
                &_MysqlQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    14;
 
   void Swap(MysqlQuery* other);
   friend void swap(MysqlQuery& a, MysqlQuery& b) {
@@ -1718,7 +1961,7 @@ class MysqlAnyOper_Request :
                &_MysqlAnyOper_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    15;
 
   void Swap(MysqlAnyOper_Request* other);
   friend void swap(MysqlAnyOper_Request& a, MysqlAnyOper_Request& b) {
@@ -1853,7 +2096,7 @@ class MysqlAnyOper_Response :
                &_MysqlAnyOper_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    16;
 
   void Swap(MysqlAnyOper_Response* other);
   friend void swap(MysqlAnyOper_Response& a, MysqlAnyOper_Response& b) {
@@ -1986,7 +2229,7 @@ class MysqlAnyOper :
                &_MysqlAnyOper_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    17;
 
   void Swap(MysqlAnyOper* other);
   friend void swap(MysqlAnyOper& a, MysqlAnyOper& b) {
@@ -2094,7 +2337,7 @@ class MysqlOper_Request :
                &_MysqlOper_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   void Swap(MysqlOper_Request* other);
   friend void swap(MysqlOper_Request& a, MysqlOper_Request& b) {
@@ -2209,7 +2452,7 @@ class MysqlOper_Response :
                &_MysqlOper_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   void Swap(MysqlOper_Response* other);
   friend void swap(MysqlOper_Response& a, MysqlOper_Response& b) {
@@ -2329,7 +2572,7 @@ class MysqlOper :
                &_MysqlOper_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   void Swap(MysqlOper* other);
   friend void swap(MysqlOper& a, MysqlOper& b) {
@@ -3079,6 +3322,83 @@ NodeQuery_Response::nodeinfos() const {
 
 // -------------------------------------------------------------------
 
+// HostQuery_Response
+
+// repeated string Hosts = 1;
+inline int HostQuery_Response::hosts_size() const {
+  return hosts_.size();
+}
+inline void HostQuery_Response::clear_hosts() {
+  hosts_.Clear();
+}
+inline const ::std::string& HostQuery_Response::hosts(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.HostQuery.Response.Hosts)
+  return hosts_.Get(index);
+}
+inline ::std::string* HostQuery_Response::mutable_hosts(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.HostQuery.Response.Hosts)
+  return hosts_.Mutable(index);
+}
+inline void HostQuery_Response::set_hosts(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.HostQuery.Response.Hosts)
+  hosts_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void HostQuery_Response::set_hosts(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.HostQuery.Response.Hosts)
+  hosts_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void HostQuery_Response::set_hosts(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  hosts_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.HostQuery.Response.Hosts)
+}
+inline void HostQuery_Response::set_hosts(int index, const char* value, size_t size) {
+  hosts_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.HostQuery.Response.Hosts)
+}
+inline ::std::string* HostQuery_Response::add_hosts() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.HostQuery.Response.Hosts)
+  return hosts_.Add();
+}
+inline void HostQuery_Response::add_hosts(const ::std::string& value) {
+  hosts_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.HostQuery.Response.Hosts)
+}
+#if LANG_CXX11
+inline void HostQuery_Response::add_hosts(::std::string&& value) {
+  hosts_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.HostQuery.Response.Hosts)
+}
+#endif
+inline void HostQuery_Response::add_hosts(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  hosts_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.HostQuery.Response.Hosts)
+}
+inline void HostQuery_Response::add_hosts(const char* value, size_t size) {
+  hosts_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.HostQuery.Response.Hosts)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+HostQuery_Response::hosts() const {
+  // @@protoc_insertion_point(field_list:s2s.HostQuery.Response.Hosts)
+  return hosts_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+HostQuery_Response::mutable_hosts() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.HostQuery.Response.Hosts)
+  return &hosts_;
+}
+
+// -------------------------------------------------------------------
+
+// HostQuery
+
+// -------------------------------------------------------------------
+
 // MysqlQuery_Request
 
 // .google.protobuf.Any Data = 1;
@@ -3525,6 +3845,10 @@ inline void MysqlOper_Response::set_allocated_errorstr(::std::string* errorstr) 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

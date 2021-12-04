@@ -1,5 +1,4 @@
 #include "TimeRecorder.h"
-#include <Global/LogHelper.h>
 #include <Util/DirectoryHelper.h>
 #include <Util/MathHelper.h>
 #include <Util/TimeHelper.h>

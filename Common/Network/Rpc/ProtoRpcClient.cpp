@@ -1,13 +1,13 @@
 ﻿#include"ProtoRpcClient.h"
 #include<Core/App.h>
 #include<Util/TimeHelper.h>
-#include<Component/Scene/ProtoRpcComponent.h>
+#include<ProtoRpc/ProtoRpcClientComponent.h>
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
 {
-	ProtoRpcClient::ProtoRpcClient(ProtoRpcComponent *component, SocketProxy * socket, SocketType type)
+	ProtoRpcClient::ProtoRpcClient(ProtoRpcClientComponent *component, SocketProxy * socket, SocketType type)
 		:RpcClient(socket, type), mTcpComponent(component)
 	{
 
@@ -43,81 +43,57 @@ namespace GameKeeper
 		this->mSocketProxy->Close();
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcComponent::OnCloseSocket, this->mTcpComponent, id, code);
+        taskScheduler.Invoke(&ProtoRpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
 	}
 
-	bool ProtoRpcClient::OnRequest(const char * buffer, size_t size)
+	XCode ProtoRpcClient::OnRequest(const char * buffer, size_t size)
 	{
 		auto requestData = new com::Rpc_Request();
 		if (!requestData->ParseFromArray(buffer, size))
 		{
 			delete requestData;
-			return false;
+			return XCode::ParseRequestDataError;
 		}
-        long long id = this->GetSocketId();
-        requestData->set_socketid(id);
+        requestData->set_socketid(this->GetSocketId());
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcComponent::OnRequest, mTcpComponent, id, requestData);
-		return true;
+        taskScheduler.Invoke(&ProtoRpcClientComponent::OnRequest, mTcpComponent, requestData);
+		return XCode::Successful;
 	}
 
-	bool ProtoRpcClient::OnResponse(const char * buffer, size_t size)
+	XCode ProtoRpcClient::OnResponse(const char * buffer, size_t size)
 	{
 		auto responseData = new com::Rpc_Response();
 		if (!responseData->ParseFromArray(buffer, size))
 		{
 			delete responseData;
-			return false;
+			return XCode::ParseResponseDataError;
 		}
-        long long id = this->mSocketProxy->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcComponent::OnResponse, mTcpComponent, id, responseData);
-		return true;
+        taskScheduler.Invoke(&ProtoRpcClientComponent::OnResponse, mTcpComponent, responseData);
+		return XCode::Successful;
 	}
 
 	void ProtoRpcClient::SendProtocol(char type, const Message * message)
 	{
-#ifdef __DEBUG__
-		std::string json;
-		util::MessageToJsonString(*message, &json);
-		if (type == RPC_TYPE_REQUEST)
-		{
-			GKDebugLog("send request message " << json);
-		}
-		else if (type == RPC_TYPE_RESPONSE)
-		{
-			GKDebugLog("send response message " << json);
-		}
-#endif
-		unsigned int body = message->ByteSizeLong();
-		size_t head = sizeof(char) + sizeof(unsigned int);
-		char * messageBuffer = new char[head + body];
-
-		messageBuffer[0] = type;
         LocalObject<Message> lock(message);
-		memcpy(messageBuffer + sizeof(char), &body, sizeof(TCP_HEAD));
-		if (!message->SerializePartialToArray(messageBuffer + head, body))
+		const int body = message->ByteSize();
+		size_t head = sizeof(char) + sizeof(int);
+		char * buffer = new char[head + body];
+       
+
+		buffer[0] = type;
+		memcpy(buffer + sizeof(char), &body, sizeof(body));
+		if (!message->SerializePartialToArray(buffer + head, body))
 		{
-#ifdef __DEBUG__
-			std::string json;
-			util::MessageToJsonString(*message, &json);
-			GKDebugError("Serialize " << "failure : " << json);
-#endif // __DEBUG__
-			delete[] messageBuffer;
-			return;
+            return;
 		}
-		this->AsyncSendMessage(messageBuffer, head + body);
+		this->AsyncSendMessage(std::move(buffer), head + body);
 	}
 
     void ProtoRpcClient::OnConnect(XCode code)
     {
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcComponent::OnConnectAfter, this->mTcpComponent, id, code);
-    }
-
-    void ProtoRpcClient::OnSendAfter(XCode code, const char *buffer, size_t size)
-    {
-        delete []buffer;
+        taskScheduler.Invoke(&ProtoRpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
     }
 }

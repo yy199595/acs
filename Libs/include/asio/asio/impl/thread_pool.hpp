@@ -55,7 +55,7 @@ void thread_pool::executor_type::dispatch(
 {
   typedef typename decay<Function>::type function_type;
 
-  // Invoke immediately if we are already inside the thread pool.
+  // OnResponse immediately if we are already inside the thread pool.
   if (pool_.scheduler_.can_dispatch())
   {
     // Make a local, non-const copy of the function.

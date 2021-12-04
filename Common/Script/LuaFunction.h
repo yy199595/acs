@@ -1,8 +1,10 @@
 #pragma once
 
-#include <Define/CommonDef.h>
+#include <Define/CommonLogDef.h>
 #include <Script/LuaInclude.h>
-
+#include"Core/App.h"
+#include<iostream>
+using namespace GameKeeper;
 class LuaFunction
 {
 public:
@@ -41,8 +43,10 @@ inline void LuaFunction::Action(Args... args)
     if (lua_isfunction(this->luaEnv, -1))
     {
         LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
-        int status = lua_pcall(this->luaEnv, sizeof...(Args), 0, 0);
-        GKAssertRet(status == 0, lua_tostring(luaEnv, -1));
+        if (lua_pcall(this->luaEnv, sizeof...(Args), 0, 0) != 0)
+        {
+            LOG_ERROR(lua_tostring(luaEnv, -1) << std::endl);
+        }
     }
 }
 
@@ -55,7 +59,7 @@ inline Ret LuaFunction::Func(Args... args)
     {
         LuaParameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
         int status = lua_pcall(this->luaEnv, sizeof...(Args), 1, 0);
-        GKAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
+        LOG_CHECK_ERROR_RET_VAL(status == 0, lua_tostring(luaEnv, -1), Ret());
         return LuaParameter::Read<Ret>(this->luaEnv, -1);
     }
     return Ret();
@@ -68,8 +72,9 @@ inline Ret LuaFunction::Func()
     if (lua_isfunction(this->luaEnv, -1))
     {
         int status = lua_pcall(this->luaEnv, 0, 1, 0);
-        GKAssertRetVal(status == 0, lua_tostring(luaEnv, -1), Ret());
+        LOG_CHECK_ERROR_RET_VAL(status == 0, lua_tostring(luaEnv, -1), Ret());
         return LuaParameter::Read<Ret>(this->luaEnv, -1);
     }
     return Ret();
 }
+

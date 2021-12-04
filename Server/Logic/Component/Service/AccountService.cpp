@@ -4,18 +4,20 @@
 #include <Util/MathHelper.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
+#include"MysqlClient/MysqlRpcTask.h"
+#include<google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
     AccountService::AccountService()
     {
+        this->mRedisComponent = nullptr;
+        this->mMysqlComponent = nullptr;
     }
 
     bool AccountService::Awake()
     {
-        __add_method(AccountService::Register);
-        __add_method(AccountService::LoginByToken);
-        __add_method(AccountService::LoginByPasswd);
-
+        BIND_RPC_FUNCTION(AccountService::Login);
+        BIND_RPC_FUNCTION(AccountService::Register);
         this->mRedisComponent = this->GetComponent<RedisComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
 		return true;
@@ -26,109 +28,53 @@ namespace GameKeeper
 
     }
 
-    void AccountService::OnLodaData()
+    XCode AccountService::Login(const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
     {
-        db::UserAccountData userAccountData;
-        userAccountData.set_userid(112233445);
-        userAccountData.set_passwd("199595yjz");
-        userAccountData.set_devicemac("ios_qq");
-        userAccountData.set_account("646585122@qq.com");
-        userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
 
-
-        XCode code = this->mMysqlComponent->Add(userAccountData);
-
-        this->mRedisComponent->ClearAllData();
-        this->mRedisComponent->AddToSet("user", userAccountData.account());
-        this->mRedisComponent->DelFromSet("user", userAccountData.account());
-
-        this->mRedisComponent->AddToSet("user", userAccountData.account());
-
-
-        if(this->mRedisComponent->SetValue("user", userAccountData.account(), userAccountData))
-        {
-            db::UserAccountData queryData;
-            this->mRedisComponent->GetValue("user", userAccountData.account(), queryData);
-            GKDebugLogProtocBuf(queryData);
-        }
-
-		userAccountData.Clear();
-		userAccountData.set_account("646585122@qq.com");
-
-        db::UserAccountData response;
-        XCode responseCode = this->mMysqlComponent->Query(userAccountData, response);
-
-        if(responseCode == XCode::Successful)
-        {
-            GKDebugLogProtocBuf(response);
-        }
-    }
-
-    XCode AccountService::LoginByToken(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
-    {
-        if (request.account().empty() || request.token().empty())
-        {
-            return XCode::Failure;
-        }
-        db::UserAccountData userAccountData;
-        userAccountData.set_account(request.account());
-        if (!this->mMysqlComponent->Query(userAccountData, userAccountData))
-        {
-            return XCode::AccountNotExists;
-        }
-        if (userAccountData.lastlogintime() != 0)
-        {
-            if(request.logindev() != userAccountData.devicemac())
-            {
-                return XCode::Successful;
-            }
-            const long long nowTime = TimeHelper::GetSecTimeStamp();
-            if (nowTime - userAccountData.lastlogintime() >= 3 * 24 * 60 * 60)
-            {
-                return XCode::Failure; // token过期
-            }
-        }
-        if(userAccountData.token() != request.token())
-        {
-            return XCode::Failure;
-        }
-        userAccountData.set_devicemac(request.logindev());
-        userAccountData.set_token(this->NewToken(request.account()));
-        userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
-        response.set_token(userAccountData.token());
         return XCode::Successful;
     }
 
-    XCode AccountService::LoginByPasswd(long long operId, const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
-    {
-        if (request.account().empty() || request.passwd().empty())
-        {
-            return XCode::Failure;
-        }
-
-    }
-
-    XCode AccountService::Register(long long operId, const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response)
+    XCode AccountService::Register(const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response)
     {
         const std::string &account = request.account();
-        if (!this->mRedisComponent->AddToSet("Account", account))
+        const std::string &password = request.passwd();
+        if (account.empty() || password.empty())
+        {
+            return XCode::CallArgsError;
+        }
+
+        auto queryResponse = this->mRedisComponent->Invoke("HEXISTS", "user", account);
+        if (queryResponse->GetNumber() == 1)
         {
             return XCode::AccountAlreadyExists;
         }
+        long long userId = USER_ID_START + this->mRedisComponent->AddCounter("userid");
 
         db::UserAccountData userAccountData;
-        userAccountData.set_account(account);
-        userAccountData.set_passwd(request.passwd());
-        userAccountData.set_devicemac(request.logindev());
-        userAccountData.set_token(this->NewToken(account));
-        userAccountData.set_userid(NumberHelper::Create());
-        userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
 
-        if (this->mMysqlComponent->Add(userAccountData) != XCode::Successful)
-        {
-            return XCode::AccountAlreadyExists;
-        }
+        std::string token = this->NewToken(account);
+
+        userAccountData.set_token(token);
+        userAccountData.set_userid(userId);
+        userAccountData.set_account(account);
+        userAccountData.set_passwd(password);
+        userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+#ifdef __DEBUG__
+        std::string json;
+        util::MessageToJsonString(userAccountData, &json);
+        LOG_DEBUG("register new player json = " << json);
+#endif
+        const int second = 7 * 24 * 60 * 60;
         response.set_token(userAccountData.token());
+        this->mRedisComponent->Invoke("SETEX", token, second, account);
+        this->mRedisComponent->Invoke("HSET", "user", account, userAccountData);
+        XCode code = this->mMysqlComponent->Add(userAccountData)->AwakeGetCode();
+        if(code != XCode::Successful)
+        {
+            LOG_ERROR(account << " register failure");
+            return code;
+        }
+        LOG_INFO(account << " register successful");
         return XCode::Successful;
     }
 
