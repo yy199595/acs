@@ -3,7 +3,7 @@
 #include"ClientComponent.h"
 #include"Scene/TaskPoolComponent.h"
 #include"Coroutine/CoroutineComponent.h"
-
+#include<iostream>
 constexpr size_t HeadCount = sizeof(char) + sizeof(int);
 namespace Client
 {
@@ -32,36 +32,37 @@ namespace Client
 
 	bool TcpRpcClient::AwaitConnect(const std::string & ip, unsigned short port)
 	{
+        this->mIsConnectSuccessful = false;
 		auto address = asio::ip::make_address_v4(ip);
 		asio::ip::tcp::endpoint endPoint(address, port);
-		this->mAddress = ip + ":" + std::to_string(port);
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+        CoroutineComponent * corComponent = App::Get().GetCorComponent();
 		LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
-		TaskPoolComponent * taskComponent = App::Get().GetComponent<TaskPoolComponent>();
-		nSocket.async_connect(endPoint, [this, taskComponent](const asio::error_code &err)
+		nSocket.async_connect(endPoint, [this, corComponent](const asio::error_code &err)
 		{
-			XCode code = XCode::Successful;
+            this->mIsConnectSuccessful = true;
 			if (err)
 			{
-				code = XCode::Failure;
-				LOG_ERROR(err.message());			
+                this->mIsConnectSuccessful = false;
+                std::cout << "connect error : " << err.message() << std::endl;
 			}
 			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-			taskScheduler.Invoke(&TcpRpcClient::ConnectHandler, this, code);
+            taskScheduler.Invoke(&CoroutineComponent::Resume, corComponent, this->mCoroutineId);
 		});
-		App::Get().GetCorComponent()->WaitForYield(this->mCoroutineId);
-		return this->mSocketProxy->IsOpen();
+        corComponent->WaitForYield(this->mCoroutineId);
+		return this->mIsConnectSuccessful;
 	}
 
-	void TcpRpcClient::CloseSocket(XCode code)
-	{
-		this->mSocketProxy->Close();
-		MainTaskScheduler & taskScheduller = App::Get().GetTaskScheduler();
-	}
+	void TcpRpcClient::OnClose(XCode code)
+    {
+        long long id = this->GetSocketId();
+        MainTaskScheduler &taskScheduller = App::Get().GetTaskScheduler();
+        taskScheduller.Invoke(&ClientComponent::OnCloseSocket, this->mClientComponent, id, code);
+    }
 
 	XCode TcpRpcClient::OnRequest(const char * buffer, size_t size)
 	{
-		c2s::Rpc_Request * request = new c2s::Rpc_Request();
+		 auto request = new c2s::Rpc_Request();
 		if (!request->ParseFromArray(buffer, size))
 		{
 			return XCode::ParseMessageError;
@@ -73,7 +74,7 @@ namespace Client
 
 	XCode TcpRpcClient::OnResponse(const char * buffer, size_t size)
 	{
-		c2s::Rpc_Response * response = new c2s::Rpc_Response();
+		 auto response = new c2s::Rpc_Response();
 		if (!response->ParseFromArray(buffer, size))
 		{
 			return XCode::ParseMessageError;
@@ -81,11 +82,6 @@ namespace Client
 		MainTaskScheduler & taskScheduller = App::Get().GetTaskScheduler();
 		taskScheduller.Invoke(&ClientComponent::OnResponse, this->mClientComponent, response);
 		return XCode();
-	}
-
-	void TcpRpcClient::ConnectHandler(XCode code)
-	{
-		App::Get().GetCorComponent()->Resume(this->mCoroutineId);
 	}
 
 	void TcpRpcClient::SendProtoData(const c2s::Rpc_Request * request)

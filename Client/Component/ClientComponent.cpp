@@ -1,11 +1,11 @@
 ﻿
 #include"Core/App.h"
 #include"ClientComponent.h"
-#include<Util/MathHelper.h>
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
 #include"Scene/TaskPoolComponent.h"
 #include"Network/ClientRpcTask.h"
+#include"Other/ElapsedTimer.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -59,27 +59,26 @@ namespace Client
 	{
 		NetWorkThread & netThread = this->mTaskComponent->AllocateNetThread();
 		this->mTcpClient = new TcpRpcClient(new SocketProxy(netThread, "Client"), this);
-
 		if (!this->mTcpClient->AwaitConnect("127.0.0.1", 1995))
 		{
-			LOG_ERROR("connect server failure");
+			LOG_FATAL("connect server failure");
 			return;
 		}
 		this->mTcpClient->StartReceive();
-		LOG_DEBUG("connect server successful");	
-		c2s::Rpc_Request * requestMessage = new c2s::Rpc_Request();
+		LOG_DEBUG("connect server successful");
+
+        ElapsedTimer timer;
+		auto requestMessage = new c2s::Rpc_Request();
 		const std::string method = "AccountService.Register";
 
-		c2s::AccountLogin_Request loginRequest;
-		loginRequest.set_account("112233@qq.com");
-		loginRequest.set_passwd("==================");
+		c2s::AccountRegister_Request registerRequest;
+        registerRequest.set_account("112233@qq.com");
+        registerRequest.set_passwd("==================");
 
 
 		requestMessage->set_rpcid(1);
 		requestMessage->set_methodname(method);
-		requestMessage->mutable_data()->PackFrom(loginRequest);
-		
-
+		requestMessage->mutable_data()->PackFrom(registerRequest);
 		std::shared_ptr<ClientRpcTask> rpcTask(new ClientRpcTask(method, 1));
 		this->mTcpClient->StartSendProtoData(requestMessage);
 
@@ -89,6 +88,8 @@ namespace Client
 		{
 
 		}
+
+        LOG_INFO("use time = " << timer.GetMs() << "ms");
 		
 	}
 	void ClientComponent::OnTimeout(long long rpcId)

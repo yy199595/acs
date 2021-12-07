@@ -176,6 +176,7 @@ namespace GameKeeper
 			return this->Stop(ExitCode::InitError);
 		}
 
+        this->mFps = 15;
 		mConfig->GetValue("LogicFps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = TimeHelper::GetMilTimestamp();

@@ -8,7 +8,7 @@ namespace GameKeeper
 {
     ServerPath::ServerPath(int argc, char **argv)
     {
-        DirectoryHelper::GetDirByPath(argv[0], this->mWorkPath);
+       DirectoryHelper::GetDirByPath(argv[0], this->mWorkPath);
 
         this->mLogsPath = this->mWorkPath + "Logs/";
         this->mConfigPath = this->mWorkPath + "Config/";

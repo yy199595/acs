@@ -16,15 +16,14 @@ namespace Client
 		bool StartSendProtoData(const c2s::Rpc_Request * request);
 		bool AwaitConnect(const std::string & ip, unsigned short port);
 	protected:
-		void OnConnect(XCode code) { }
-		void CloseSocket(XCode code);
-		XCode OnRequest(const char * buffer, size_t size);
-		XCode OnResponse(const char * buffer, size_t size);
+        void OnClose(XCode code) final;
+		void OnConnect(XCode code) final { }
+		XCode OnRequest(const char * buffer, size_t size) final;
+		XCode OnResponse(const char * buffer, size_t size) final;
 	private:
-		void ConnectHandler(XCode code);
 		void SendProtoData(const c2s::Rpc_Request * request);
 	private:
-		std::string mAddress;
+        bool mIsConnectSuccessful;
 		unsigned int mCoroutineId;
 		ClientComponent * mClientComponent;
 

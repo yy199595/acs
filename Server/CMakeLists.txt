@@ -59,7 +59,7 @@ if(MSVC)
     TARGET_LINK_LIBRARIES(Server Lua53 libprotobufd hiredis libmysql jemalloc)
    
 else()
-    ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles} ../Common/Network/Rpc/JsonRpcClient.h ../Common/Component/Scene/JsonRpcComponent.h ../Common/Component/Scene/JsonRpcComponent.cpp ../Common/Network/Rpc/JsonRpcClient.cpp)
+    ADD_EXECUTABLE(Server ${AsmFiles} ${CommonFiles} ${ServerFiles})
     TARGET_LINK_LIBRARIES(Server Lua53 protobuf pthread hiredis mysqlclient yassl dl jemalloc)
 endif()
 #target_compile_definitions(Server PRIVATE JE_MALLOC)

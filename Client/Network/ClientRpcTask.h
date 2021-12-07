@@ -37,6 +37,6 @@ namespace Client
 	{
 		this->mTimeout = ms;
 		this->AsyncAwaitTask();
-		return dynamic_pointer_cast<T>(this->mMessage);
+		return std::dynamic_pointer_cast<T>(this->mMessage);
 	}
 }

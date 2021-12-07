@@ -10,10 +10,18 @@ namespace GameKeeper
 		mNetWorkThread(socket->GetThread())
 	{
         this->mIp.clear();
+        this->mIsOpen = false;
         this->mIsConnect = false;
         this->mConnectCount = 0;
 		this->mSocketId = socket->GetSocketId();
         this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+    }
+
+    void RpcClient::CloseSocket(XCode code)
+    {
+        this->mIsOpen = false;
+        this->mSocketProxy->Close();
+        this->OnClose(code);
     }
 
     void RpcClient::Clear()
@@ -26,6 +34,7 @@ namespace GameKeeper
 
 	void RpcClient::StartReceive()
 	{
+        this->mIsOpen = true;
         this->mLastOperTime = TimeHelper::GetSecTimeStamp();
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
 		unsigned short port = socket.remote_endpoint().port();
@@ -155,7 +164,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    bool RpcClient::StartConnect(std::string & ip, unsigned short port, StaticMethod * method)
+    bool RpcClient::StartConnect(const std::string & ip, unsigned short port, StaticMethod * method)
     {
         LOG_CHECK_RET_FALSE(this->GetSocketType() != SocketType::RemoteSocket);
         if(this->IsConnected())
@@ -166,9 +175,10 @@ namespace GameKeeper
         LOG_CHECK_RET_FALSE(this->mSocketProxy);
         NetWorkThread & nThread = this->mSocketProxy->GetThread();
         nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port, method);
+        return true;
     }
 
-    void RpcClient::ConnectHandler(std::string & ip, unsigned short port,  StaticMethod * method)
+    void RpcClient::ConnectHandler(const std::string & ip, unsigned short port,  StaticMethod * method)
     {
         this->mConnectCount++;
         auto address = asio::ip::make_address_v4(ip);

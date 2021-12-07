@@ -33,40 +33,37 @@ using namespace GameKeeper;
 
 int main(int argc, char **argv)
 {
-#ifdef __DEBUG__ && _WIN32
-	system("chcp 936");
-#endif // __DEBUF__ && _WIN32
-    __register_component__(TimerComponent);
-    __register_component__(ProtoRpcComponent);
-    __register_component__(RedisComponent);
-    __register_component__(MysqlComponent);
-    __register_component__(LuaScriptComponent);
-    __register_component__(RpcConfigComponent);
-    __register_component__(MysqlProxyComponent);
-    __register_component__(HttpComponent);
-    __register_component__(OperatorComponent);
-	__register_component__(LoggerComponent);
+    REGISTER_COMPONENT(TimerComponent);
+    REGISTER_COMPONENT(ProtoRpcComponent);
+    REGISTER_COMPONENT(RedisComponent);
+    REGISTER_COMPONENT(MysqlComponent);
+    REGISTER_COMPONENT(LuaScriptComponent);
+    REGISTER_COMPONENT(RpcConfigComponent);
+    REGISTER_COMPONENT(MysqlProxyComponent);
+    REGISTER_COMPONENT(HttpComponent);
+    REGISTER_COMPONENT(OperatorComponent);
+	REGISTER_COMPONENT(LoggerComponent);
 
-    __register_component__(TaskPoolComponent);
-    __register_component__(CoroutineComponent);
-    __register_component__(NodeProxyComponent);
-    __register_component__(TcpServerComponent);
-    __register_component__(ProtoRpcClientComponent);
-    __register_component__(TelnetClientComponent);
-    __register_component__(MonitorComponent);
+    REGISTER_COMPONENT(TaskPoolComponent);
+    REGISTER_COMPONENT(CoroutineComponent);
+    REGISTER_COMPONENT(NodeProxyComponent);
+    REGISTER_COMPONENT(TcpServerComponent);
+    REGISTER_COMPONENT(ProtoRpcClientComponent);
+    REGISTER_COMPONENT(TelnetClientComponent);
+    REGISTER_COMPONENT(MonitorComponent);
 
-    __register_component__(LuaServiceMgrComponent);
-    __register_component__(ProtoProxyComponent);
-    __register_component__(ProtoProxyClientComponent);
+    REGISTER_COMPONENT(LuaServiceMgrComponent);
+    REGISTER_COMPONENT(ProtoProxyComponent);
+    REGISTER_COMPONENT(ProtoProxyClientComponent);
 
-    __register_component__(MysqlService);
-    __register_component__(ProxyService);
-    __register_component__(AccountService);
-    __register_component__(CenterHostService);
-    __register_component__(LocalHostService);
-    __register_component__(HttpLoginService);
-    __register_component__(HttpOperComponent);
-    __register_component__(HttpResourceComponent);
+    REGISTER_COMPONENT(MysqlService);
+    REGISTER_COMPONENT(ProxyService);
+    REGISTER_COMPONENT(AccountService);
+    REGISTER_COMPONENT(CenterHostService);
+    REGISTER_COMPONENT(LocalHostService);
+    REGISTER_COMPONENT(HttpLoginService);
+    REGISTER_COMPONENT(HttpOperComponent);
+    REGISTER_COMPONENT(HttpResourceComponent);
 
 	if (argc == 1)
 	{

@@ -46,9 +46,8 @@ namespace GameKeeper
         return XCode::UnKnowPacket;
     }
 
-    void RpcProxyClient::CloseSocket(XCode code)
+    void RpcProxyClient::OnClose(XCode code)
     {
-        this->mSocketProxy->Close();
         long long id = this->GetSocketId();
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
         mainTaskScheduler.Invoke(&ProtoProxyClientComponent::OnCloseSocket, this->mProxyComponent, id, code);

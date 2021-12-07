@@ -73,5 +73,5 @@ namespace GameKeeper
 		Type * type = iter->second;
 		return CreateComponent(type->Name);
 	}
-#define __register_component__(type) ComponentHelper::Add<type>(#type)
+#define REGISTER_COMPONENT(type) ComponentHelper::Add<type>(#type)
 }// namespace GameKeeper

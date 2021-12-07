@@ -38,9 +38,8 @@ namespace GameKeeper
         return true;
 	}
 
-	void ProtoRpcClient::CloseSocket(XCode code)
+	void ProtoRpcClient::OnClose(XCode code)
 	{
-		this->mSocketProxy->Close();
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&ProtoRpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);

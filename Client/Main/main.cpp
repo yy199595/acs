@@ -11,16 +11,12 @@ using namespace GameKeeper;
 
 int main(int argc, char ** argv)
 {
-#ifdef __DEBUG__ && _WIN32
-	system("chcp 936");
-#endif // __DEBUF__ && _WIN32
+	REGISTER_COMPONENT(TimerComponent);
+	REGISTER_COMPONENT(LoggerComponent);
+	REGISTER_COMPONENT(TaskPoolComponent);
+	REGISTER_COMPONENT(CoroutineComponent);
 
-	__register_component__(TimerComponent);
-	__register_component__(LoggerComponent);
-	__register_component__(TaskPoolComponent);
-	__register_component__(CoroutineComponent);
-
-	__register_component__(ClientComponent);
+	REGISTER_COMPONENT(ClientComponent);
 
 	if (argc == 1)
 	{

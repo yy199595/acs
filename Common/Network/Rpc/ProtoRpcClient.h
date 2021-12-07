@@ -16,8 +16,8 @@ namespace GameKeeper
 		bool StartSendProtocol(char type, const Message * message);
 
 	protected:
+        void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
-        void CloseSocket(XCode code) final;
 		XCode OnRequest(const char * buffer, size_t size)final;
 		XCode OnResponse(const char * buffer, size_t size)final;
 	private:

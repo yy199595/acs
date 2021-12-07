@@ -113,7 +113,6 @@ namespace GameKeeper
     }
     std::shared_ptr<RedisResponse> RedisComponent::StartTask(std::shared_ptr<RedisTaskProxy> redisTask)
     {
-
         this->mTaskManager->StartTask(redisTask.get());
         this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
 

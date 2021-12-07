@@ -22,8 +22,8 @@ namespace GameKeeper
         bool StartSendData(char type, const Message * message);
         unsigned int GetCallCount() const { return this->mCallCount;}
     protected:
+        void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
-        void CloseSocket(XCode code) final;
         XCode OnRequest(const char *buffer, size_t size) final;
         XCode OnResponse(const char *buffer, size_t size) final;
     private:
