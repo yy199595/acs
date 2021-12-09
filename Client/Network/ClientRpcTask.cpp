@@ -40,7 +40,7 @@ namespace Client
 	XCode ClientRpcTask::AwaitGetCode(int ms)
 	{
 		this->mTimeout = ms;
-		this->AsyncAwaitTask();
+        this->AwaitTask();
 		return this->mCode;
 	}
 	void ClientRpcTask::OnTaskAwait()

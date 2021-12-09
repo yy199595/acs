@@ -177,7 +177,7 @@ namespace GameKeeper
         return false;
     }
 
-    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::SpawnProtoTask(const std::string &method)
+    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::NewRpcTask(const std::string &method)
     {
         int methodId = 0;
         auto requestData = this->CreateProtoRequest(method, methodId);
@@ -189,7 +189,7 @@ namespace GameKeeper
         return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
     }
 
-    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::SpawnProtoTask(const std::string &method, const Message &message)
+    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::NewRpcTask(const std::string &method, const Message &message)
     {
         int methodId = 0;
         auto requestData = this->CreateProtoRequest(method, methodId);
@@ -200,5 +200,27 @@ namespace GameKeeper
         requestData->mutable_data()->PackFrom(message);
         this->SendRequestData(requestData);
         return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
+    }
+
+    XCode RpcNodeProxy::Call(const string &func)
+    {
+        return this->NewRpcTask(func)->Await();
+    }
+
+    XCode RpcNodeProxy::Call(const string &func, const Message &request)
+    {
+        return this->NewRpcTask(func, request)->Await();
+    }
+
+    XCode RpcNodeProxy::Call(const string &func, std::shared_ptr<Message> response)
+    {
+        auto rpcTask = this->NewRpcTask(func);
+        return rpcTask->Await(std::move(response));
+    }
+
+    XCode RpcNodeProxy::Call(const string &func, const Message &request, std::shared_ptr<Message> response)
+    {
+        auto rpcTask = this->NewRpcTask(func, request);
+        return rpcTask->Await(std::move(response));
     }
 }// namespace GameKeeper

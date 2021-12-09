@@ -25,7 +25,7 @@ namespace GameKeeper
     public:
         long long GetCreateTime() const { return this->mCreateTime;}
     protected:
-        bool AsyncAwaitTask();
+        bool AwaitTask();
         bool RestoreAsyncTask();
         virtual void OnTaskAwait() = 0;
     protected:

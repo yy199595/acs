@@ -23,7 +23,7 @@ namespace GameKeeper
         template<typename T>
         std::shared_ptr<T> AwaitGetData(size_t index = 0)
         {
-            this->AsyncAwaitTask();
+            this->AwaitTask();
             if(index < 0 || index >= this->mResponseValues.size())
             {
                 return nullptr;
@@ -33,7 +33,7 @@ namespace GameKeeper
         void OnResponse(const com::Rpc_Response *backData) final;
         size_t AwaitGetDataSize()
         {
-            this->AsyncAwaitTask();
+            this->AwaitTask();
             return this->mResponseValues.size();
         }
 

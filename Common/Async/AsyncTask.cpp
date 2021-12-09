@@ -16,7 +16,7 @@ namespace GameKeeper
         this->mTaskState = code == XCode::Successful ? TaskReady : TaskError;
     }
 
-    bool AsyncTask::AsyncAwaitTask()
+    bool AsyncTask::AwaitTask()
     {
         if(this->mTaskState == TaskReady)
         {

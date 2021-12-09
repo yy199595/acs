@@ -55,14 +55,10 @@ namespace GameKeeper
     public:
         void OnResponse(const com::Rpc_Response * backData) final;
 
-        XCode AwaitGetCode();
+        XCode Await();
 
-        template<typename T>
-        std::shared_ptr<T> AwaitGetData()
-        {
-            this->AsyncAwaitTask();
-            return dynamic_pointer_cast<T>(this->mMessage);
-        }
+        XCode Await(std::shared_ptr<Message> response);
+
     private:
         std::shared_ptr<Message> mMessage;
         ProtoResponseComponent * mResponseComponent;

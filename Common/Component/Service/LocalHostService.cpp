@@ -14,10 +14,9 @@ namespace GameKeeper
 		BIND_RPC_FUNCTION(LocalHostService::Del);
         BIND_RPC_FUNCTION(LocalHostService::Hotfix);
         BIND_RPC_FUNCTION(LocalHostService::ReLoadConfig);
-        const ServerConfig & config = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetValue("AreaId", this->mAreaId));
-		LOG_CHECK_RET_FALSE(config.GetValue("NodeId", this->mNodeId));
-		LOG_CHECK_RET_FALSE(config.GetValue("NodeName", this->mNodeName));
+		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("AreaId", this->mAreaId));
+		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeId", this->mNodeId));
+		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeName", this->mNodeName));
 		LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
 		return true;
     }
@@ -56,14 +55,12 @@ namespace GameKeeper
         }
 
         RpcNodeProxy *centerNode = this->mNodeComponent->GetServiceNode(0);
-        auto response = centerNode->SpawnProtoTask("CenterHostService.Add",
-                                                   registerInfo)->AwaitGetData<s2s::NodeRegister_Response>();
-        if (response == nullptr)
+        std::shared_ptr<s2s::NodeRegister_Response> response(new s2s::NodeRegister_Response());
+        while(centerNode->Call("CenterHostService.Add", registerInfo, response) != XCode::Successful)
         {
-            assert(response);
-            LOG_ERROR("register local service node fail count = ");
+            LOG_ERROR("register to center failure");
+            App::Get().GetCorComponent()->WaitForSleep(3000);
         }
-
         this->mToken = response->groupdata().token();
         this->mOpenTime = response->groupdata().opentime();
         this->mGroupName = response->groupdata().groupname();

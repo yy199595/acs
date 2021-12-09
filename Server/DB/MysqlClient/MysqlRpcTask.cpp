@@ -95,7 +95,7 @@ namespace GameKeeper
 
     XCode MysqlRpcTask::AwakeGetCode()
     {
-        this->AsyncAwaitTask();
+        this->AwaitTask();
         return this->mCode;
     }
 }

@@ -28,14 +28,15 @@ namespace GameKeeper
     void ProtoProxyTask::OnResponse(const com::Rpc_Response *response)
     {
         auto responseMessage = new c2s::Rpc_Response();
-        responseMessage->set_rpcid(this->mClientRpcId);
+
         responseMessage->set_code(response->code());
+        responseMessage->set_rpcid(this->mClientRpcId);
         if (response->has_data())
         {
             responseMessage->mutable_data()->CopyFrom(response->data());
         }
-        if (this->mProxyComponent->OnResponse(
-                this->mClientSockId, responseMessage) != XCode::Successful)
+        XCode code = this->mProxyComponent->OnResponse(this->mClientRpcId, responseMessage);
+        if(code != XCode::Successful)
         {
             delete responseMessage;
         }

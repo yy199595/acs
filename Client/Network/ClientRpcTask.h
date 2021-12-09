@@ -36,7 +36,7 @@ namespace Client
 	inline std::shared_ptr<T> ClientRpcTask::AwaitGetData(int ms)
 	{
 		this->mTimeout = ms;
-		this->AsyncAwaitTask();
+        this->AwaitTask();
 		return std::dynamic_pointer_cast<T>(this->mMessage);
 	}
 }

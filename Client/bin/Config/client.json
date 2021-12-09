@@ -1,5 +1,6 @@
 {
     "NodeName": "Client",
+    "LogicFps": 30,
     "Log":
     {
         "save":1,

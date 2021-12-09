@@ -86,7 +86,7 @@ namespace GameKeeper
 		{
             return;
 		}
-		this->AsyncSendMessage(std::move(buffer), head + body);
+		this->AsyncSendMessage(buffer, head + body);
 	}
 
     void ProtoRpcClient::OnConnect(XCode code)

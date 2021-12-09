@@ -48,9 +48,9 @@
     },
     "IsOpenRecoder": true,
     "Mysql": {
-        "ip": "127.0.0.1",
+        "ip": "8.136.213.239",
         "port": 3306,
-        "user": "root",
+        "user": "yjz",
         "passwd": "199595yjz.",
         "db": "player_db",
         "sql": "./sql/sql.json"

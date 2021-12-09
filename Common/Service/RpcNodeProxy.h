@@ -43,11 +43,16 @@ namespace GameKeeper
 
         XCode Notice(const std::string &method);                        //不回应
         XCode Notice(const std::string &method, const Message &request);//不回应
+
+        XCode Call(const std::string & func);
+        XCode Call(const std::string & func, const Message & request);
+        XCode Call(const std::string & func, std::shared_ptr<Message> response);
+        XCode Call(const std::string & func, const Message & request, std::shared_ptr<Message> response);
     public:
 
-       std::shared_ptr<CppProtoRpcTask> SpawnProtoTask(const std::string & method);
+       std::shared_ptr<CppProtoRpcTask> NewRpcTask(const std::string & method);
 
-       std::shared_ptr<CppProtoRpcTask> SpawnProtoTask(const std::string & method, const Message & message);
+       std::shared_ptr<CppProtoRpcTask> NewRpcTask(const std::string & method, const Message & message);
 
     private:
         void OnNodeSessionRefresh();

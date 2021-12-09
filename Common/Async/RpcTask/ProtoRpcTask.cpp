@@ -117,9 +117,15 @@ namespace GameKeeper
         this->RestoreAsyncTask();
     }
 
-    XCode CppProtoRpcTask::AwaitGetCode()
+    XCode CppProtoRpcTask::Await()
     {
-        this->AsyncAwaitTask();
+        this->AwaitTask();
         return this->mCode;
+    }
+
+    XCode CppProtoRpcTask::Await(std::shared_ptr<Message> response)
+    {
+        this->mMessage = std::move(response);
+        return this->Await();
     }
 }

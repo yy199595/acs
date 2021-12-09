@@ -1,6 +1,5 @@
 ﻿
 #include"App.h"
-#include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
 #include"Scene/TaskPoolComponent.h"
 #include"Util/DirectoryHelper.h"
