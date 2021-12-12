@@ -64,6 +64,11 @@ void MainEntry(void *manager)
     bool CoroutineComponent::Awake()
     {
         this->mCurrentCorId = 0;
+        return true;
+    }
+
+    bool CoroutineComponent::LateAwake()
+    {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
         return true;
     }

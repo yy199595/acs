@@ -14,7 +14,8 @@ namespace GameKeeper
         ~HttpLoginService() final = default;
 
     protected:
-        bool Awake() override;
+        bool Awake() final;
+        bool LateAwake() final;
     private:
         XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
     };

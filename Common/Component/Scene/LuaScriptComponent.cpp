@@ -8,39 +8,42 @@
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
-#include"Core/App.h"
 
 #include <Service/LuaServiceComponent.h>
 namespace GameKeeper
 {
-    LuaScriptComponent::LuaScriptComponent()
-    {
-        this->mLuaEnv = nullptr;     
-    }
-
     bool LuaScriptComponent::Awake()
     {
-        if (this->mLuaEnv == nullptr)
+        this->mLuaEnv = luaL_newstate();
+        luaL_openlibs(mLuaEnv);
+        return true;
+    }
+
+    bool LuaScriptComponent::LateAwake()
+    {
+        this->PushClassToLua();
+        this->RegisterExtension();
+        this->OnPushGlobalObject();
+        LOG_CHECK_RET_FALSE(this->LoadAllFile());
+
+        if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
         {
-            this->mLuaEnv = luaL_newstate();
-            luaL_openlibs(mLuaEnv);
+            if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+            return (bool) lua_toboolean(this->mLuaEnv, -1);
         }
-		
-		this->PushClassToLua();
-		this->RegisterExtension();
-        this->OnPushGlobalObject();    
-		LOG_CHECK_RET_FALSE(this->LoadAllFile());
-		
-		if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
-		{
-			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
-			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-				return false;
-			}
-			return (bool)lua_toboolean(this->mLuaEnv, -1);
-		}
-		return true;
+        if (!lua_getfunction(this->mLuaEnv, "Main", "Start"))
+        {
+            return false;
+        }
+        lua_State *coroutine = lua_newthread(this->mLuaEnv);
+        lua_pushvalue(this->mLuaEnv, -2);
+        lua_xmove(this->mLuaEnv, coroutine, 1);
+        lua_presume(coroutine, this->mLuaEnv, 0);
+        return true;
     }
 
 	bool LuaScriptComponent::LoadAllFile()
@@ -86,17 +89,6 @@ namespace GameKeeper
         {
             lua_close(this->mLuaEnv);
         }
-    }
-
-    void LuaScriptComponent::Start()
-    {
-		if (lua_getfunction(this->mLuaEnv, "Main", "Start"))
-		{			
-			lua_State * coroutine = lua_newthread(this->mLuaEnv);	
-			lua_pushvalue(this->mLuaEnv, -2);
-			lua_xmove(this->mLuaEnv, coroutine, 1);
-			lua_presume(coroutine, this->mLuaEnv, 0);
-		}
     }
 
 	int LuaScriptComponent::GetLuaRef(const std::string & tab, const std::string & field)

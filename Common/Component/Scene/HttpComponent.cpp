@@ -22,43 +22,14 @@ namespace GameKeeper
 
     bool HttpComponent::Awake()
     {
-        this->mCorComponent = this->GetComponent<CoroutineComponent>();
+        this->mCorComponent = nullptr;
         return true;
     }
 
-	void HttpComponent::Start()
+    bool HttpComponent::LateAwake()
     {
-        std::string json;
-        const std::string url = "http://langrensha01.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
-        std::string data = "fid=0&key=f5c417a28abf995d7ce6312b29556fd9";
-		/*db::UserAccountData userAccount;
-		userAccount.set_account("646585122@11.com");
-		userAccount.set_userid(TimeHelper::GetMilTimestamp());
-		userAccount.set_passwd("1122334455");
-		userAccount.set_phonenum(1371601995);
-		userAccount.set_lastlogintime(TimeHelper::GetSecTimeStamp());
-		XCode code = this->GetComponent<MysqlProxyComponent>()->Add(userAccount);
-
-		LOG_ERROR("code = " << code);*/
-
-        //XCode code = this->Get(url, json);
-
-        //LOG_FATAL(code << "\n" << json.size());
-
-//        HttpJsonContent jsonContent;
-//		HttpReadStringContent stringContent;
-//		jsonContent.Add("account", "646585122@qq.com");
-//		jsonContent.Add("password", "11223344566");
-//		while (true)
-//		{
-//			this->Post("http://127.0.0.1:80/App/HttpLoginService/Login", jsonContent, stringContent, 5);
-//		}
-       
-
-		//LOG_INFO(json);
-        //this->Get("http://lrs-oss.whitewolvesx.com/app/default/boy.png", json);
-	
-        //LOG_FATAL(StringHelper::FormatJson(json));
+        this->mCorComponent = App::Get().GetCorComponent();
+        return true;
     }
 
     void HttpComponent::OnListen(SocketProxy *socket)

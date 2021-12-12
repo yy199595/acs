@@ -8,7 +8,7 @@ namespace GameKeeper
     class MysqlService : public ProtoServiceComponent
     {
     public:
-        MysqlService();
+        MysqlService() = default;
 
         ~MysqlService()  final = default;
 
@@ -25,7 +25,7 @@ namespace GameKeeper
     public:
         bool Awake() final;
 
-        void Start() final;
+        bool LateAwake() final;
 
     private:
 

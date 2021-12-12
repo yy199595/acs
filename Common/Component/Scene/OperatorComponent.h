@@ -14,7 +14,8 @@ namespace GameKeeper
         ~OperatorComponent() final = default;
 
     protected:
-        bool Awake() override;
+        bool Awake() final;
+        bool LateAwake() final;
         void StartRefreshDay(const std::string & component);
     public:
         void StartHotfix();

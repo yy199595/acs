@@ -5,13 +5,14 @@
 namespace GameKeeper
 {
 	class GameObject;
-	class GameObjectComponent : public Component
+    class  GameObjectComponent : public Component
 	{
 	public:
 		GameObjectComponent() = default;
-		~GameObjectComponent() = default;
+		~GameObjectComponent() final = default;
 	public:
-		bool Awake() { return true; }
+		bool Awake() final;
+        bool LateAwake() final;
 	public:
 		GameObject * Find(long long id);
         GameObject * Find(const std::string & address);
@@ -22,7 +23,7 @@ namespace GameKeeper
 		
 		void GetGameObjects(std::vector<GameObject *> & gameObjects);
 	private:
-		void StartComponents(std::vector<Component *>  & components);
+		void StartComponents(long long objectId);
 	private:
 		class CoroutineComponent * mCorComponent;
 		std::unordered_map<long long, GameObject *> mGameObjects;

@@ -11,11 +11,16 @@ namespace GameKeeper
 {
     bool MonitorComponent::Awake()
     {
-		this->mDeadloop = 30;
-        this->mIsClose = false;	
-		App::Get().GetConfig().GetValue("Deadloop", this->mDeadloop);
-		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
-        this->mThread = new std::thread(&MonitorComponent::Update, this);     
+        this->mIsClose = false;
+        this->mThread = nullptr;
+        this->mTaskComponent = nullptr;
+        return true;
+    }
+
+     bool MonitorComponent::LateAwake()
+    {
+        this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
+        this->mThread = new std::thread(&MonitorComponent::Update, this);
         return true;
     }
 
@@ -25,11 +30,11 @@ namespace GameKeeper
         this->mTaskComponent->GetAllThread(threads);
         while (!this->mIsClose)
         {
-            std::this_thread::sleep_for(std::chrono::seconds(this->mDeadloop));
+            std::this_thread::sleep_for(std::chrono::seconds(10));
             long long nowTime = TimeHelper::GetSecTimeStamp();
             for (const IThread *taskThread: threads)
             {
-                if (taskThread->IsWork() && nowTime - taskThread->GetLastOperTime() >= this->mDeadloop)
+                if (taskThread->IsWork() && nowTime - taskThread->GetLastOperTime() >= 10)
                 {
                     const std::string &name = taskThread->GetName();
                     LOG_FATAL(name << " thread no response for a long time " << taskThread->GetThreadId());

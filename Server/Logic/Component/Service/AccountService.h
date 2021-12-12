@@ -13,13 +13,14 @@ namespace GameKeeper
     class AccountService : public ProtoServiceComponent
     {
     public:
-        AccountService();
+        AccountService() = default;
         ~AccountService()  final = default;
 
     protected:
-        bool Awake() override;
+        bool Awake() final;
+        bool LateAwake() final;
 
-        void Start() final;
+
     private:
         XCode Login(const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response);
 

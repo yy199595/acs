@@ -9,7 +9,7 @@ namespace GameKeeper
     class LuaScriptComponent : public Component
     {
     public:
-        LuaScriptComponent();
+        LuaScriptComponent() = default;
 
 		virtual ~LuaScriptComponent() = default;
 
@@ -24,10 +24,8 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
-
+        bool LateAwake() final;
         void OnDestory() final;
-
-        void Start() final;
 
     public:
 		

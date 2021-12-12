@@ -3,7 +3,6 @@
 #include<Thread/TaskThread.h>
 namespace GameKeeper
 {
-
     struct ListenConfig
     {
     public:

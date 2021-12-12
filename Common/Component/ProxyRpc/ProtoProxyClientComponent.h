@@ -25,6 +25,7 @@ namespace GameKeeper
         bool SendProtoMessage(long long sockId, const c2s::Rpc_Response * message);
     protected:
         bool Awake() final;
+        bool LateAwake() final;
         void OnListen(SocketProxy *socket) final;
 
     private:

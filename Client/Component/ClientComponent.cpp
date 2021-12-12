@@ -12,6 +12,7 @@ namespace Client
 	{		
 		this->mTcpClient = nullptr;
 		this->mTaskComponent = nullptr;
+        this->mTimerComponent = nullptr;
 	}
 
 	void ClientComponent::StartClose(long long id)

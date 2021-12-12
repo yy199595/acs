@@ -15,13 +15,10 @@ namespace GameKeeper
     {
     public:
         HttpComponent() = default;
-
         ~HttpComponent() final = default;
     public:
         bool Awake() final;
-
-        void Start() final;
-
+        bool LateAwake() final;
     public:
         XCode Get(const std::string &url, std::string &json, int timeout = 5);
 

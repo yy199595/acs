@@ -68,4 +68,9 @@ namespace GameKeeper
         getRequest->SetResponseContent(new HttpWriteFileContent(dir));
         return HttpStatus::OK;
     }
+
+    bool HttpResourceComponent::LateAwake()
+    {
+        return true;
+    }
 }

@@ -21,7 +21,7 @@ namespace GameKeeper
         XCode VerifyAccount(const RapidJsonReader & jsonData);
     protected:
         bool Awake() final;
-
+        bool LateAwake() final;
     private:
         std::unordered_map<std::string, std::string> mOperAccountMap;
     };

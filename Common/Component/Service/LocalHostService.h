@@ -10,7 +10,7 @@ namespace GameKeeper
 
     class NodeProxyComponent;
 
-    class LocalHostService : public ProtoServiceComponent
+    class LocalHostService : public ProtoServiceComponent, public IStart
     {
     public:
 		LocalHostService() = default;
@@ -20,7 +20,9 @@ namespace GameKeeper
     public:
         bool Awake() final;
 
-        void Start() final;
+        void OnStart() final;
+        
+        bool LateAwake() final;
 
 		int GetPriority() final { return 1000; }
     private:

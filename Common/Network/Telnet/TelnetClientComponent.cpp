@@ -2,18 +2,13 @@
 
 namespace GameKeeper
 {
-	TelnetClientComponent::TelnetClientComponent()
-	{
-
-	}
-
-	TelnetClientComponent::~TelnetClientComponent()
-	{
-
-	}
-
 	bool TelnetClientComponent::Awake()
 	{
 		return true;
 	}
+
+    bool TelnetClientComponent::LateAwake()
+    {
+        return true;
+    }
 }

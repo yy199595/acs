@@ -6,13 +6,13 @@ namespace GameKeeper
     class TelnetClientComponent : public Component
     {
     public:
-        TelnetClientComponent();
+        TelnetClientComponent() = default;
 
-        ~TelnetClientComponent();
+        ~TelnetClientComponent() final = default;
 
     public:
-        bool Awake() override;
-
+        bool Awake() final;
+        bool LateAwake() final;
     };
 }
 

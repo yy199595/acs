@@ -13,6 +13,11 @@ namespace GameKeeper
         return true;
     }
 
+    bool HttpLoginService::LateAwake()
+    {
+        return true;
+    }
+
     XCode HttpLoginService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
     {
         std::string account;

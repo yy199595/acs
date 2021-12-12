@@ -7,14 +7,12 @@
 #include <Method/LuaServiceMethod.h>
 #include"Scene/RpcConfigComponent.h"
 #include"ProtoRpc/ProtoRpcClientComponent.h"
-#include"Service/JsonServiceComponent.h"
 #include "Other/ElapsedTimer.h"
-#include"Util/JsonHelper.h"
 #include"Async/RpcTask/ProtoRpcTask.h"
 namespace GameKeeper
 {
-    ProtoRpcComponent::ProtoRpcComponent()
-    {
+	bool ProtoRpcComponent::Awake()
+	{
         this->mTick = 1;
         this->mNodeId = 0;
         this->mCorComponent = nullptr;
@@ -22,19 +20,20 @@ namespace GameKeeper
         this->mPpcConfigComponent = nullptr;
         this->mRpcClientComponent = nullptr;
         this->mLastTime = TimeHelper::GetSecTimeStamp();
-    }
-
-	bool ProtoRpcComponent::Awake()
-	{
-		this->mCorComponent = App::Get().GetCorComponent();
 		const ServerConfig & ServerCfg = App::Get().GetConfig();
 		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("NodeId", this->mNodeId));
-        this->mTimerComponent = this->GetComponent<TimerComponent>();
-		LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
-		LOG_CHECK_RET_FALSE(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<ProtoRpcClientComponent>());
         return true;
 	}
+
+    bool ProtoRpcComponent::LateAwake()
+    {
+        this->mCorComponent = App::Get().GetCorComponent();
+        this->mTimerComponent = this->GetComponent<TimerComponent>();
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        LOG_CHECK_RET_FALSE(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<ProtoRpcClientComponent>());
+        return true;
+    }
 
 	bool ProtoRpcComponent::OnRequest(const com::Rpc_Request * request)
 	{

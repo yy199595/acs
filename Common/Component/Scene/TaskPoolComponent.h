@@ -17,7 +17,8 @@ namespace GameKeeper
     public:
         bool Awake() final;
 
-        void Start() final;
+
+        bool LateAwake() final;
 
         void OnSystemUpdate() final;
 

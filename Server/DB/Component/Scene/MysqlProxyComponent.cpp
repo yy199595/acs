@@ -13,15 +13,15 @@ namespace GameKeeper
     bool MysqlProxyComponent::Awake()
     {
         this->mMysqlNodeId = -1;
-		this->mCorComponent = App::Get().GetCorComponent();
-        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
-
+		this->mCorComponent = nullptr;
         return true;
     }
 
-    void MysqlProxyComponent::Start()
+    bool MysqlProxyComponent::LateAwake()
     {
-
+        this->mCorComponent = App::Get().GetCorComponent();
+        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
+        return true;
     }
 
     void MysqlProxyComponent::OnFrameUpdate(float t)

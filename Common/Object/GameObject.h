@@ -11,7 +11,7 @@ namespace GameKeeper
 
         GameObject(long long id, long long socketId);
 
-        virtual ~GameObject() = default;
+        ~GameObject() override = default;
     public:
         template<typename T>
         inline bool AddComponent();
@@ -36,6 +36,7 @@ namespace GameKeeper
 
     public:
 		void OnDestory() override;
+
         void GetComponents(std::vector<Component *> & components, bool sort = false) const;
     public:
 		inline long long GetId() const { return this->mGameObjectId; }

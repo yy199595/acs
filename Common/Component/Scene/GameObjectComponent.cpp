@@ -5,7 +5,19 @@
 
 namespace GameKeeper
 {
-	bool GameObjectComponent::Add(GameObject * gameObject)
+    bool GameObjectComponent::Awake()
+    {
+        this->mCorComponent = nullptr;
+        return true;
+    }
+
+    bool GameObjectComponent::LateAwake()
+    {
+        this->mCorComponent = App::Get().GetCorComponent();
+        return true;
+    }
+
+    bool GameObjectComponent::Add(GameObject * gameObject)
 	{
 		if (gameObject == nullptr)
 		{
@@ -21,14 +33,14 @@ namespace GameKeeper
 		gameObject->GetComponents(components, true);
 		for (Component * component : components)
 		{
-			if (!component->Awake())
+			if (!component->LateAwake())
 			{
 				LOG_ERROR("Init " << component->GetTypeName() << " failure");
 				return false;
 			}
 		}
 		this->mGameObjects.emplace(id, gameObject);
-		this->mCorComponent->StartCoroutine(&GameObjectComponent::StartComponents, this, components);
+		this->mCorComponent->StartCoroutine(&GameObjectComponent::StartComponents, this, id);
 		return true;
 	}
 
@@ -100,12 +112,21 @@ namespace GameKeeper
 		}
 	}
 
-	void GameObjectComponent::StartComponents(std::vector<Component *> & components)
+	void GameObjectComponent::StartComponents(long long objectId)
 	{
-		for (Component * component : components)
-		{
-			component->Start();
-		}
+        GameObject * gameObject = this->Find(objectId);
+        if(gameObject != nullptr)
+        {
+            std::vector<Component *> components;
+            gameObject->GetComponents(components);
+            for (Component *component: components)
+            {
+                auto startComponent = dynamic_cast<IStart *>(component);
+                if (startComponent != nullptr)
+                {
+                    startComponent->OnStart();
+                }
+            }
+        }
 	}
-
 }

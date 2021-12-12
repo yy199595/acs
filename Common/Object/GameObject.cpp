@@ -23,9 +23,7 @@ namespace GameKeeper
 		{
 			return false;
 		}
-
-		Component * component = ComponentHelper::CreateComponent(name);
-		return this->AddComponent(name, component);
+		return this->AddComponent(name, ComponentHelper::CreateComponent(name));
 	}
 
 	bool GameObject::AddComponent(const std::string & name, Component * component)
@@ -42,6 +40,10 @@ namespace GameKeeper
 		}
 		component->gameObject = this;
 		component->gameObjectID = mGameObjectId;
+        if(!component->Awake())
+        {
+            return false;
+        }
 		this->mComponentMap.emplace(name, component);
 		return true;
 	}

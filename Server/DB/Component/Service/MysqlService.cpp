@@ -6,31 +6,24 @@
 #include <Pool/MessagePool.h>
 namespace GameKeeper
 {
-    MysqlService::MysqlService()
+    bool MysqlService::Awake()
     {
         this->mCorComponent = nullptr;
         this->mMysqlManager = nullptr;
-    }
-
-    bool MysqlService::Awake()
-    {
 		BIND_RPC_FUNCTION(MysqlService::Add);
 		BIND_RPC_FUNCTION(MysqlService::Save);
 		BIND_RPC_FUNCTION(MysqlService::Query);
 		BIND_RPC_FUNCTION(MysqlService::Delete);
 		BIND_RPC_FUNCTION(MysqlService::Invoke);
-		this->mCorComponent = App::Get().GetCorComponent();
-        LOG_CHECK_RET_FALSE(this->mMysqlManager = this->GetComponent<MysqlComponent>());
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-		
         return true;
     }
 
-    void MysqlService::Start()
+    bool MysqlService::LateAwake()
     {
-        db::UserAccountData userData;
-        userData.set_account("646585122@qq.com");
-        userData.set_userid(420625199511045331);
+        this->mCorComponent = App::Get().GetCorComponent();
+        LOG_CHECK_RET_FALSE(this->mMysqlManager = this->GetComponent<MysqlComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        return true;
     }
 
     XCode MysqlService::Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)

@@ -14,6 +14,7 @@ namespace GameKeeper
         ~ProxyService() final = default;
     protected:
         bool Awake() final;
+        bool LateAwake() final;
         void OnAddProxyNode(class RpcNodeProxy *node) final;
         void OnDelProxyNode(class RpcNodeProxy *node) final;
     private:

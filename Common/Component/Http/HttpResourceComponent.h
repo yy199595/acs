@@ -18,6 +18,7 @@ namespace GameKeeper
 		HttpStatus Download(HttpRemoteSession * remoteSession);
     protected:
         bool Awake() final;
+        bool LateAwake() final;
         bool OnLoadConfig() final;
     private:
         std::string mDownloadPath;

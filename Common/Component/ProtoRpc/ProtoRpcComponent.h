@@ -21,7 +21,7 @@ namespace GameKeeper
             public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
     {
     public:
-		ProtoRpcComponent();
+		ProtoRpcComponent() = default;
         ~ProtoRpcComponent() final = default;
 
     public:
@@ -30,6 +30,7 @@ namespace GameKeeper
         std::shared_ptr<ProtoRpcTask> GetRpcTask(long long rpcId) const;
     protected:
         bool Awake() final;
+        bool LateAwake() final;
     public:
         bool OnRequest(const com::Rpc_Request * message) final;
         bool OnResponse(const com::Rpc_Response *response) final;

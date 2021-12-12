@@ -54,23 +54,25 @@ namespace GameKeeper
 
     bool NodeProxyComponent::Awake()
     {
+        this->mProtocolComponent = nullptr;
 		const ServerConfig & serverConfig = App::Get().GetConfig();
 		LOG_CHECK_RET_FALSE(serverConfig.GetValue("AreaId", this->mAreaId));
 		LOG_CHECK_RET_FALSE(serverConfig.GetValue("CenterAddress", "ip", this->mCenterIp));
 		LOG_CHECK_RET_FALSE(serverConfig.GetValue("CenterAddress", "port", this->mCenterPort));
-		LOG_CHECK_RET_FALSE(mProtocolComponent = this->GetComponent<ProtoRpcClientComponent>());
         return true;
     }
 
-    void NodeProxyComponent::Start()
+    bool NodeProxyComponent::LateAwake()
     {
         s2s::NodeInfo centerNodeInfo;
         centerNodeInfo.set_servername("Center");
         centerNodeInfo.set_serverip(this->mCenterIp);
         centerNodeInfo.add_services("CenterHostService");
         centerNodeInfo.mutable_listeners()->insert({"rpc", this->mCenterPort});
+        LOG_CHECK_RET_FALSE(mProtocolComponent = this->GetComponent<ProtoRpcClientComponent>());
 
-        LOG_CHECK_RET(this->CreateNode(0, centerNodeInfo));
+        this->CreateNode(0, centerNodeInfo);
+        return true;
     }
 
     RpcNodeProxy *NodeProxyComponent::GetServiceNode(int nodeId)

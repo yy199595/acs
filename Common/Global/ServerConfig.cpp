@@ -116,11 +116,11 @@ namespace GameKeeper
         {
             for (auto iter = value->Begin(); iter != value->End(); iter++)
             {
-                if (iter->IsString())
+                if (!iter->IsString())
                 {
-                    std::string str(iter->GetString(), iter->GetStringLength());
-                    data.push_back(str);
+                    return false;
                 }
+                data.emplace_back(iter->GetString(), iter->GetStringLength());
             }
             return true;
         }

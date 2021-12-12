@@ -93,4 +93,9 @@ namespace GameKeeper
         }
         return XCode::Successful;
     }
+
+    bool HttpOperComponent::LateAwake()
+    {
+        return true;
+    }
 }

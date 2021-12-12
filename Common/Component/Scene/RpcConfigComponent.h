@@ -20,6 +20,7 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
+        bool LateAwake() final;
         bool OnLoadConfig() final;
     public:
 		bool HasService(const std::string & service);		

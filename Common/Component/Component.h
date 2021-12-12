@@ -58,10 +58,10 @@ namespace GameKeeper
 		}
 	public:
 
-		virtual bool Awake() = 0; //创建的时候调用一次
+		virtual bool Awake() = 0; //组件创建的时候调用
+        
+        virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
 
-		virtual void Start() { };
-		
 		virtual int GetPriority() { return 100; }
 
 	protected:

@@ -14,7 +14,7 @@ namespace GameKeeper
     protected:
         bool Awake() final;
 
-        void Start() final;
+        bool LateAwake() final;
 
         void OnLoadData() override;
 
@@ -39,8 +39,6 @@ namespace GameKeeper
 
         std::shared_ptr<MysqlRpcTask> Sort(const std::string & tab, const std::string & field, int count, bool reverse = false);
 
-    private:
-        std::queue<unsigned int> mWakeUpQueue;
     private:
         int mMysqlNodeId;
         s2s::MysqlOper_Request mOperRequest;

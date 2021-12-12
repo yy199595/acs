@@ -27,8 +27,9 @@ namespace GameKeeper
 		ProtoRpcClient * GetRpcSession(long long id);
         ProtoRpcClient * NewSession(const std::string &name);
 	protected:
-		bool Awake() override;
-		void OnDestory() override;
+        bool Awake() final;
+        bool LateAwake() final;
+		void OnDestory() final;
 
 	public:
 		bool CloseSession(long long id);

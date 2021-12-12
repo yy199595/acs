@@ -48,4 +48,9 @@ namespace GameKeeper
     {
 		return XCode::Successful;
     }
+
+    bool ProxyService::LateAwake()
+    {
+        return true;
+    }
 }

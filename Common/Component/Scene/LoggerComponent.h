@@ -17,11 +17,12 @@ namespace GameKeeper
 		void AddLog(ELogType type, const std::stringstream & stream);
 	protected:	
 		bool Awake() final;
+        bool LateAwake() final;
 		void OnDestory() final;
 		void OnZeroRefresh() final;
 	private:
 		void CreateLogFile();
-		void AddInforLog(const std::stringstream & stream);
+		void AddInfoLog(const std::stringstream & stream);
 		void AddErrorLog(const std::stringstream & stream);
 		void AddDebugLog(const std::stringstream & stream);
 		void AddFatalLog(const std::stringstream & stream);

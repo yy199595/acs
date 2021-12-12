@@ -7,11 +7,19 @@
 #include"Util/DirectoryHelper.h"
 namespace GameKeeper
 {
-	bool LuaServiceMgrComponent::Awake()
+
+    bool LuaServiceMgrComponent::Awake()
+    {
+        return true;
+    }
+	bool LuaServiceMgrComponent::LateAwake()
 	{
-		auto protoComponent = this->GetComponent<RpcConfigComponent>();
+        auto protoComponent = this->GetComponent<RpcConfigComponent>();
 		auto scriptComponent = this->GetComponent<LuaScriptComponent>();
-		
+		if(protoComponent == nullptr || scriptComponent == nullptr)
+        {
+            return false;
+        }
 
 		string servicePath;
 		LOG_CHECK_RET_FALSE(protoComponent);

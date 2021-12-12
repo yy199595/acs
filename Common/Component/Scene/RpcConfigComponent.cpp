@@ -13,6 +13,11 @@ namespace GameKeeper
         return this->OnLoadConfig();
     }
 
+    bool RpcConfigComponent::LateAwake()
+    {
+        return true;
+    }
+
     bool RpcConfigComponent::OnLoadConfig()
     {
         std::string md5;

@@ -18,7 +18,7 @@ namespace GameKeeper
 
     public:
         bool Awake() final;
-		void Start() final;
+        bool LateAwake() final;
 		bool IsLuaService() final { return true; };
 		const std::string &GetServiceName()final { return this->mServiceName; }
         

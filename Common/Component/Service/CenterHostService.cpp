@@ -12,9 +12,14 @@ namespace GameKeeper
         BIND_RPC_FUNCTION(CenterHostService::Add);
         BIND_RPC_FUNCTION(CenterHostService::Query);
         BIND_RPC_FUNCTION(CenterHostService::QueryHosts);
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcClientComponent>());
-        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
         return this->OnLoadConfig();
+    }
+
+    bool CenterHostService::LateAwake()
+    {
+        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcClientComponent>());
+        return true;
     }
 
     bool CenterHostService::OnLoadConfig()

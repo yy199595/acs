@@ -6,6 +6,11 @@
 #include"XCode/XCode.h"
 namespace GameKeeper
 {
+    class IStart
+    {
+    public:
+        virtual void OnStart() = 0;
+    };
 	class IFrameUpdate
 	{
 	public:

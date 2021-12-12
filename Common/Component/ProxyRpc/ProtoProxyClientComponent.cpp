@@ -16,9 +16,17 @@ namespace GameKeeper
 {
     bool ProtoProxyClientComponent::Awake()
     {
-        this->mTimerComponent = App::Get().GetTimerComponent();
-        this->mRpcComponent = this->GetComponent<ProtoRpcComponent>();
-        this->mProxyComponent = this->GetComponent<ProtoProxyComponent>();
+        this->mRpcComponent = nullptr;
+        this->mTimerComponent = nullptr;
+        this->mProxyComponent = nullptr;
+        return true;
+    }
+
+    bool ProtoProxyClientComponent::LateAwake()
+    {
+        LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get().GetTimerComponent());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mProxyComponent = this->GetComponent<ProtoProxyComponent>());
         return true;
     }
 
@@ -128,5 +136,4 @@ namespace GameKeeper
         }
         this->mTimerComponent->AsyncWait(5000, &ProtoProxyClientComponent::CheckPlayerLogout, this, sockId);
     }
-
 }

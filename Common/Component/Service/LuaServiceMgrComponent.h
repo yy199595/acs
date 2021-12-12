@@ -7,8 +7,10 @@ namespace GameKeeper
 	class LuaServiceMgrComponent : public Component
 	{
 	public:
-		
+        LuaServiceMgrComponent() = default;
+        ~LuaServiceMgrComponent() final = default;
 	protected:
 		bool Awake() final;
+        bool LateAwake() final;
 	};
 }

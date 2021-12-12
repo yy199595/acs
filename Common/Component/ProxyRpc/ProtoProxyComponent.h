@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-member-init"
 //
 // Created by mac on 2021/11/28.
 //
@@ -11,10 +13,11 @@ namespace GameKeeper
         public IClientProtoRpc<c2s::Rpc_Request, c2s::Rpc_Response>
     {
     public:
-        ProtoProxyComponent();
+        ProtoProxyComponent() = default;
         ~ProtoProxyComponent() final = default;
     protected:
         bool Awake() final;
+        bool LateAwake() final;
     public:
         XCode OnRequest(const c2s::Rpc_Request *request) final;
         XCode OnResponse(long long sockId, const c2s::Rpc_Response *response) final;
@@ -29,3 +32,5 @@ namespace GameKeeper
 
 
 #endif //GAMEKEEPER_PROTOPROXYCOMPONENT_H
+
+#pragma clang diagnostic pop

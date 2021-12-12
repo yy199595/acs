@@ -12,8 +12,7 @@ namespace GameKeeper
 	class RedisComponent : public Component
 	{
 	public:
-		RedisComponent();
-
+		RedisComponent() = default;
 		~RedisComponent() final = default;
 
     public:
@@ -23,7 +22,7 @@ namespace GameKeeper
 
 	protected:
 		bool Awake() final;            //初始化管理器
-		void Start() override;                //初始化完成之后
+		bool LateAwake() final;                //初始化完成之后
 	private:
 		redisContext * ConnectRedis(int timeout = 3);
         std::shared_ptr<RedisResponse> StartTask(std::shared_ptr<RedisTaskProxy> task);
@@ -41,7 +40,7 @@ namespace GameKeeper
 		std::string mRedisIp;        //redis ip地址
 		unsigned short mRedisPort;    //端口号
         long long mLastOperatorTime;
-		TaskPoolComponent *mTaskManager;
+		TaskPoolComponent *mTaskComponent;
 		CoroutineComponent *mCorComponent;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};

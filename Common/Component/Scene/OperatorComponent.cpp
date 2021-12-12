@@ -8,6 +8,12 @@ namespace GameKeeper
 {
     bool OperatorComponent::Awake()
     {
+        this->mTimerComponent = nullptr;
+        return true;
+    }
+
+    bool OperatorComponent::LateAwake()
+    {
         this->mTimerComponent = this->GetComponent<TimerComponent>();
         std::vector<Component *> components;
         this->GetComponents(components);
@@ -38,9 +44,9 @@ namespace GameKeeper
         this->GetComponents(components);
         for(Component * component : components)
         {
-            if(auto loadCOnfig = dynamic_cast<ILoadConfig*>(component))
+            if(auto loadConfig = dynamic_cast<ILoadConfig*>(component))
             {
-                if(!loadCOnfig->OnLoadConfig())
+                if(!loadConfig->OnLoadConfig())
                 {
                     LOG_ERROR(component->GetTypeName() << " load config error");
                     return false;

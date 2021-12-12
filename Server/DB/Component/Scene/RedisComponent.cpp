@@ -7,12 +7,16 @@
 #include"Other/ElapsedTimer.h"
 namespace GameKeeper
 {
-    RedisComponent::RedisComponent()
+    bool RedisComponent::Awake()
     {
         this->mRedisPort = 0;
-        this->mTaskManager = nullptr;
         this->mCorComponent = nullptr;
+        this->mTaskComponent = nullptr;
+        const ServerConfig &config = App::Get().GetConfig();
         this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
+        LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
+        LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
+        return true;
     }
 
     bool RedisComponent::CloseRedisSocket()
@@ -45,18 +49,15 @@ namespace GameKeeper
         return iter != this->mRedisContextMap.end() ? iter->second : nullptr;
     }
 
-    bool RedisComponent::Awake()
+    bool RedisComponent::LateAwake()
     {
-        const ServerConfig &config = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
-		LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+
+        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
-
         int second = 3;
-		config.GetValue("Redis", "timeout", second);
-        const std::vector<TaskThread *> &threads = this->mTaskManager->GetThreads();
+        App::Get().GetConfig().GetValue("Redis", "timeout", second);
+        const std::vector<TaskThread *> &threads = this->mTaskComponent->GetThreads();
        
         for (TaskThread *taskThread: threads)
         {
@@ -97,23 +98,10 @@ namespace GameKeeper
         }
         return pRedisContext;
     }
-
-    void RedisComponent::Start()
-    {
-        std::string json;
-        db::UserAccountData userAccountData;
-        userAccountData.set_account("646586122@qq.com");
-        userAccountData.set_token("sjfjsdiofjiowejfow");
-        userAccountData.set_passwd("199595yjz.");
-        userAccountData.set_lastlogintime(TimeHelper::GetSecTimeStamp());
-        userAccountData.set_userid(1995);
-
-        this->ClearAllData();
-
-    }
+    
     std::shared_ptr<RedisResponse> RedisComponent::StartTask(std::shared_ptr<RedisTaskProxy> redisTask)
     {
-        this->mTaskManager->StartTask(redisTask.get());
+        this->mTaskComponent->StartTask(redisTask.get());
         this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
 
         this->mCorComponent->WaitForYield();

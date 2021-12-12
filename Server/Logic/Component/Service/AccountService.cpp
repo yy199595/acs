@@ -8,26 +8,22 @@
 #include<google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
-    AccountService::AccountService()
+    bool AccountService::Awake()
     {
         this->mRedisComponent = nullptr;
         this->mMysqlComponent = nullptr;
-    }
-
-    bool AccountService::Awake()
-    {
         BIND_RPC_FUNCTION(AccountService::Login);
         BIND_RPC_FUNCTION(AccountService::Register);
-        this->mRedisComponent = this->GetComponent<RedisComponent>();
-        this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
 		return true;
     }
 
-    void AccountService::Start()
+    bool AccountService::LateAwake()
     {
-
+        this->mRedisComponent = this->GetComponent<RedisComponent>();
+        this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
+        return true;
     }
-
+    
     XCode AccountService::Login(const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
     {
 

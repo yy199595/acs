@@ -14,9 +14,16 @@ namespace GameKeeper
 {
     bool ProtoRpcClientComponent::Awake()
     {
+        this->mRpcComponent = nullptr;
+        this->mTaskComponent = nullptr;
+        this->mProtoConfigComponent = nullptr;
+        return true;
+    }
+    bool ProtoRpcClientComponent::LateAwake()
+    {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
         LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
-		LOG_CHECK_RET_FALSE(this->mProtoConfigComponent = this->GetComponent<RpcConfigComponent>());
+        LOG_CHECK_RET_FALSE(this->mProtoConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
 

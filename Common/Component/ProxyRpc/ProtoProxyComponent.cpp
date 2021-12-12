@@ -16,14 +16,15 @@
 #endif
 namespace GameKeeper
 {
-    ProtoProxyComponent::ProtoProxyComponent()
+    bool ProtoProxyComponent::Awake()
     {
         this->mRpcConfigComponent = nullptr;
         this->mNodeProxyComponent = nullptr;
         this->mProxyClientComponent = nullptr;
+        return true;
     }
 
-    bool ProtoProxyComponent::Awake()
+    bool ProtoProxyComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());

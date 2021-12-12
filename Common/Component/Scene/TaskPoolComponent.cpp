@@ -24,7 +24,7 @@ namespace GameKeeper
         return true;
     }
 
-    void TaskPoolComponent::Start()
+    bool TaskPoolComponent::LateAwake()
     {
         for (auto taskThread: this->mNetThreads)
         {
@@ -35,6 +35,7 @@ namespace GameKeeper
         {
             taskThread->Start();
         }
+        return true;
     }
 
     void TaskPoolComponent::GetAllThread(std::vector<const IThread *> &threads)

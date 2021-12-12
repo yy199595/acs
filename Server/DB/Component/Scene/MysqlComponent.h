@@ -33,7 +33,7 @@ namespace GameKeeper
     class MysqlComponent : public Component
     {
     public:
-        MysqlComponent();
+        MysqlComponent() = default;
 
         ~MysqlComponent() final = default;
 
@@ -60,7 +60,7 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
-
+        bool LateAwake() final;
     private:
 
 		bool StartConnect();

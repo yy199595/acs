@@ -17,11 +17,15 @@ namespace GameKeeper
 		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("AreaId", this->mAreaId));
 		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeId", this->mNodeId));
 		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeName", this->mNodeName));
-		LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
 		return true;
     }
+    bool LocalHostService::LateAwake()
+    {
+        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
+        return true;
+    }
 
-	void LocalHostService::Start()
+	void LocalHostService::OnStart()
     {
         std::vector<Component *> components;
         s2s::NodeRegister_Request registerInfo;
@@ -107,7 +111,6 @@ namespace GameKeeper
             }
             LOG_ERROR("remove node " << nodeProxy->GetNodeName());
         }
-        bool res = this->mNodeComponent->DelNode(nodeId);
         return nodeId ? XCode::Successful : XCode::Failure;
     }
 

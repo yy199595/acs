@@ -23,6 +23,11 @@ namespace GameKeeper
 		return true;
 	}
 
+    bool LoggerComponent::LateAwake()
+    {
+        return true;
+    }
+
 	void LoggerComponent::OnZeroRefresh()
 	{
 		this->CreateLogFile();
@@ -33,7 +38,7 @@ namespace GameKeeper
 		switch (type)
 		{
 		case ELogType::info:
-			this->AddInforLog(stream);
+            this->AddInfoLog(stream);
 			break;
 		case ELogType::debug:
 			this->AddDebugLog(stream);
@@ -77,7 +82,7 @@ namespace GameKeeper
 #endif // LOG_THREAD_LOCK	
 	}
 
-	void LoggerComponent::AddInforLog(const std::stringstream & stream)
+	void LoggerComponent::AddInfoLog(const std::stringstream & stream)
 	{
 #ifdef _WIN32
 		std::string log = stream.str();

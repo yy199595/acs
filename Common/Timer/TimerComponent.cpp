@@ -20,9 +20,10 @@ namespace GameKeeper
         return true;
     }
 
-	void TimerComponent::Start()
+	bool TimerComponent::LateAwake()
 	{
 		this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
+        return true;
 	}
 
     unsigned int TimerComponent::AddTimer(TimerBase * timer)

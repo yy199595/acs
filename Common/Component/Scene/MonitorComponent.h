@@ -13,12 +13,12 @@ namespace GameKeeper
         MonitorComponent() = default;
         ~MonitorComponent() final = default;
     protected:
-        bool Awake() override;
+        bool Awake() final;
+        bool LateAwake() final;
     private:
         void Update();
     private:
         bool mIsClose;
-		int mDeadloop;
         std::thread * mThread;		
         TaskPoolComponent * mTaskComponent;
     };

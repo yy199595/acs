@@ -23,9 +23,7 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
-
-        void Start() override;
-
+        bool LateAwake() final;
     public:
         RpcNodeProxy *GetServiceNode(int nodeId);
 

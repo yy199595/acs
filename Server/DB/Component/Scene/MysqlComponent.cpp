@@ -33,27 +33,27 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    MysqlComponent::MysqlComponent()
-    {
-        this->mMysqlPort = 0;
-    }
-
     bool MysqlComponent::Awake()
     {
+        this->mMysqlPort = 0;
+        this->mTaskManager = nullptr;
+        this->mCorComponent = nullptr;
 		const ServerConfig & config = App::Get().GetConfig();
 		this->mSqlPath = App::Get().GetServerPath().GetConfigPath() + "sql.json";
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
-        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "ip", this->mMysqlIp));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "port", this->mMysqlPort));
 		LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "db", this->mDataBaseName));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "user", this->mDataBaseUser));
 		LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
-
-        LOG_CHECK_RET_FALSE(this->StartConnect());
-        LOG_CHECK_RET_FALSE(this->InitMysqlTable());
         return true;
+    }
+
+    bool MysqlComponent::LateAwake()
+    {
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        return this->StartConnect() && this->InitMysqlTable();
     }
 
     GKMysqlSocket *MysqlComponent::GetMysqlSocket()

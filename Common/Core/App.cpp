@@ -35,7 +35,6 @@ namespace GameKeeper
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mCorComponent = this->GetComponent<CoroutineComponent>();
 
-		std::vector<std::string> services;
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("Scene", components))
 		{
@@ -43,7 +42,7 @@ namespace GameKeeper
 			return false;
 		}
 
-		if (!mConfig->GetValue("Service", services))
+		if (!mConfig->GetValue("Service", components))
 		{
 			LOG_ERROR("not find field : Service");
 			return false;
@@ -54,15 +53,6 @@ namespace GameKeeper
 			if (!this->AddComponent(name))
 			{
 				LOG_FATAL("add " << name << " to service failure");
-				return false;
-			}
-		}
-
-		for (const std::string & name : services)
-		{
-			if (!this->AddComponent(name))
-			{
-				LOG_FATAL("add " << name << " to scene failure");
 				return false;
 			}
 		}
@@ -93,7 +83,7 @@ namespace GameKeeper
 
 	bool App::InitComponent(Component * component)
 	{
-		if (!component->IsActive() || !component->Awake())
+		if (!component->IsActive() || !component->LateAwake())
 		{
 			return false;
 		}
@@ -124,13 +114,13 @@ namespace GameKeeper
         {
             ElapsedTimer elapsedTimer;
             Component *component = this->mSceneComponents[index];
-            if (component != nullptr)
+            auto startComponent = dynamic_cast<IStart *>(component);
+            if (startComponent != nullptr)
             {
-                component->Start();
-                float process = (float)(index + 1) / (float) this->mSceneComponents.size();
+                startComponent->OnStart();
+                float process = (float) (index + 1) / (float) this->mSceneComponents.size();
                 LOG_INFO("[" << process * 100 << "%]" << " start component "
                              << component->GetTypeName() << " use time = " << elapsedTimer.GetMs() << "ms");
-
                 //LOG_DEBUG("start " << component->GetTypeName() << " use time " << elapsedTimer.GetMs() << "ms");
             }
         }
