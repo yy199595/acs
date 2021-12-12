@@ -32,7 +32,6 @@ namespace GameKeeper
 		int mAreaId;
         std::string mCenterIp;
         unsigned short mCenterPort;
-        class ProtoRpcClientComponent * mProtocolComponent;
         std::unordered_map<int, RpcNodeProxy *> mServiceNodeMap;
     };
 }

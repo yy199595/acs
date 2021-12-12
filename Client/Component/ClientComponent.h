@@ -7,7 +7,7 @@ namespace Client
 {
 	class ClientRpcTask;
 	class ClientComponent : public Component,
-		public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+                            public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>, public IStart
 	{
 	public:
 		ClientComponent();
@@ -21,8 +21,9 @@ namespace Client
 	public:
 		unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);
 	protected:
-		bool Awake() override;
-		void Start() override;
+		bool Awake() final;
+        void OnStart() final;
+		bool LateAwake() final;
 		void OnTimeout(long long rpcId);
 	private:
 		class TcpRpcClient * mTcpClient;

@@ -55,6 +55,7 @@ namespace GameKeeper
 				LOG_FATAL("add " << name << " to service failure");
 				return false;
 			}
+            LOG_DEBUG("add new component : " << name);
 		}
 		return true;
 	}
@@ -110,17 +111,15 @@ namespace GameKeeper
 
 	void App::StartComponent()
 	{
-		for (int index = 0; index < this->mSceneComponents.size(); index++)
+		for (auto component : this->mSceneComponents)
         {
             ElapsedTimer elapsedTimer;
-            Component *component = this->mSceneComponents[index];
             auto startComponent = dynamic_cast<IStart *>(component);
             if (startComponent != nullptr)
             {
                 startComponent->OnStart();
-                float process = (float) (index + 1) / (float) this->mSceneComponents.size();
-                LOG_INFO("[" << process * 100 << "%]" << " start component "
-                             << component->GetTypeName() << " use time = " << elapsedTimer.GetMs() << "ms");
+                LOG_INFO(" start component " << component->GetTypeName()
+                                             << " use time = " << elapsedTimer.GetMs() << "ms");
                 //LOG_DEBUG("start " << component->GetTypeName() << " use time " << elapsedTimer.GetMs() << "ms");
             }
         }

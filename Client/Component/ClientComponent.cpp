@@ -56,7 +56,7 @@ namespace Client
 		return true;
     }
 
-	void ClientComponent::Start()
+	void ClientComponent::OnStart()
 	{
 		NetWorkThread & netThread = this->mTaskComponent->AllocateNetThread();
 		this->mTcpClient = new TcpRpcClient(new SocketProxy(netThread, "Client"), this);
@@ -103,4 +103,9 @@ namespace Client
 			rpcTask->OnResponse(nullptr);
 		}
 	}
+
+    bool ClientComponent::LateAwake()
+    {
+        return true;
+    }
 }
