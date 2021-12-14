@@ -4,7 +4,7 @@
 namespace GameKeeper
 {
 
-    class TaskPoolComponent;
+    class ThreadPoolComponent;
     class CoroutineComponent;
 
     class TaskProxy
@@ -13,7 +13,7 @@ namespace GameKeeper
         TaskProxy();
         virtual ~TaskProxy() {}
     public:
-		friend class TaskPoolComponent;
+		friend class ThreadPoolComponent;
         virtual bool Run() = 0; //在线程池执行的任务
 		virtual void RunFinish() { };
 	public:

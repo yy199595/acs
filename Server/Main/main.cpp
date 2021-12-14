@@ -15,7 +15,7 @@
 #include <Service/LuaServiceMgrComponent.h>
 #include <ProtoRpc/ProtoRpcComponent.h>
 #include <Service/NodeProxyComponent.h>
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <ProtoRpc/ProtoRpcClientComponent.h>
 #include <Service/AccountService.h>
 #include <Service/LocalHostService.h>
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     REGISTER_COMPONENT(OperatorComponent);
 	REGISTER_COMPONENT(LoggerComponent);
 
-    REGISTER_COMPONENT(TaskPoolComponent);
+    REGISTER_COMPONENT(ThreadPoolComponent);
     REGISTER_COMPONENT(CoroutineComponent);
     REGISTER_COMPONENT(NodeProxyComponent);
     REGISTER_COMPONENT(TcpServerComponent);

@@ -1,6 +1,6 @@
 ﻿#include "MysqlService.h"
 #include <Scene/MysqlComponent.h>
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <MysqlClient/MysqlTaskProxy.h>
 #include <Core/App.h>
 #include <Pool/MessagePool.h>
@@ -22,7 +22,7 @@ namespace GameKeeper
     {
         this->mCorComponent = App::Get().GetCorComponent();
         LOG_CHECK_RET_FALSE(this->mMysqlManager = this->GetComponent<MysqlComponent>());
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
         return true;
     }
 

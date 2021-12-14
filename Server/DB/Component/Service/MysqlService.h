@@ -33,6 +33,6 @@ namespace GameKeeper
 
         class CoroutineComponent *mCorComponent;
 
-        class TaskPoolComponent *mTaskManager;
+        class ThreadPoolComponent *mTaskManager;
     };
 }// namespace GameKeeper

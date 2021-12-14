@@ -2,7 +2,7 @@
 #include"ClientComponent.h"
 #include"Scene/LoggerComponent.h"
 #include"Timer/TimerComponent.h"
-#include"Scene/TaskPoolComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 #include"Coroutine/CoroutineComponent.h"
 
 using namespace Client;
@@ -13,7 +13,7 @@ int main(int argc, char ** argv)
 {
 	REGISTER_COMPONENT(TimerComponent);
 	REGISTER_COMPONENT(LoggerComponent);
-	REGISTER_COMPONENT(TaskPoolComponent);
+	REGISTER_COMPONENT(ThreadPoolComponent);
 	REGISTER_COMPONENT(CoroutineComponent);
 
 	REGISTER_COMPONENT(ClientComponent);

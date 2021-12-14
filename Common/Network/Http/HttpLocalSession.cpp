@@ -9,7 +9,7 @@
 
 #include <Core/App.h>
 #include <Network/NetworkHelper.h>
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <Network/Http/Content/HttpReadContent.h>
 
 namespace GameKeeper
@@ -38,7 +38,7 @@ namespace GameKeeper
         this->mHost = host;
         this->mPort = port;
         delete this->mSocketProxy;
-        auto taskComponent = App::Get().GetComponent<TaskPoolComponent>();
+        auto taskComponent = App::Get().GetComponent<ThreadPoolComponent>();
         NetWorkThread &netWorkThread = taskComponent->AllocateNetThread();
         this->mSocketProxy = new SocketProxy(netWorkThread, "HttpGet");
 

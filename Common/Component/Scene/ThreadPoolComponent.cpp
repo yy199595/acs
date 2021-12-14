@@ -1,10 +1,10 @@
-﻿#include "TaskPoolComponent.h"
+﻿#include "ThreadPoolComponent.h"
 #include <Util/NumberHelper.h>
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
 namespace GameKeeper
 {
-	bool TaskPoolComponent::Awake()
+	bool ThreadPoolComponent::Awake()
     {
         this->mIndex = 0;
         int taskCount = 1;
@@ -24,7 +24,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool TaskPoolComponent::LateAwake()
+    bool ThreadPoolComponent::LateAwake()
     {
         for (auto taskThread: this->mNetThreads)
         {
@@ -38,7 +38,7 @@ namespace GameKeeper
         return true;
     }
 
-    void TaskPoolComponent::GetAllThread(std::vector<const IThread *> &threads)
+    void ThreadPoolComponent::GetAllThread(std::vector<const IThread *> &threads)
     {
         threads.clear();
         MainTaskScheduler & mainTask = App::Get().GetTaskScheduler();
@@ -53,7 +53,7 @@ namespace GameKeeper
         threads.emplace_back(&mainTask);
     }
 
-	NetWorkThread & TaskPoolComponent::AllocateNetThread()
+	NetWorkThread & ThreadPoolComponent::AllocateNetThread()
     {
         std::lock_guard<std::mutex> lock(this->mLock);
         if (this->mIndex >= mNetThreads.size())
@@ -63,12 +63,12 @@ namespace GameKeeper
         return *(mNetThreads[this->mIndex++]);
     }
 	
-    void TaskPoolComponent::PushFinishTask(unsigned int taskId)
+    void ThreadPoolComponent::PushFinishTask(unsigned int taskId)
 	{
 		this->mFinishTaskQueue.Add(taskId);
 	}
 
-	bool TaskPoolComponent::StartTask(TaskProxy * task)
+	bool ThreadPoolComponent::StartTask(TaskProxy * task)
 	{
 		if (task == nullptr)
 		{
@@ -82,7 +82,7 @@ namespace GameKeeper
 		return true;
 	}
 
-    void TaskPoolComponent::OnSystemUpdate()
+    void ThreadPoolComponent::OnSystemUpdate()
     {
         unsigned int taskId = 0;
         this->mFinishTaskQueue.SwapQueueData();

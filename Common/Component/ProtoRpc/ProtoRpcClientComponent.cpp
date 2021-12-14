@@ -3,7 +3,7 @@
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
-#include<Scene/TaskPoolComponent.h>
+#include<Scene/ThreadPoolComponent.h>
 #include"Network/SocketProxy.h"
 #include<ProtoRpc/ProtoRpcComponent.h>
 #ifdef __DEBUG__
@@ -22,7 +22,7 @@ namespace GameKeeper
     bool ProtoRpcClientComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
-        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mProtoConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }

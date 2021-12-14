@@ -1,12 +1,12 @@
 ﻿#include "TaskThread.h"
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <Method/MethodProxy.h>
 #include"Util/TimeHelper.h"
 using namespace std::chrono;
 
 namespace GameKeeper
 {
-	IThread::IThread(std::string  name,TaskPoolComponent * task)
+	IThread::IThread(std::string  name,ThreadPoolComponent * task)
 		: mName(std::move(name)), mIsClose(false), mTaskComponent(task)
     {		
 		this->mIsWork = true;
@@ -32,7 +32,7 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    TaskThread::TaskThread(TaskPoolComponent * taskComponent)
+    TaskThread::TaskThread(ThreadPoolComponent * taskComponent)
         : IThread("task", taskComponent)
     {
         this->mTaskState = Idle;
@@ -87,7 +87,7 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    NetWorkThread::NetWorkThread(TaskPoolComponent *taskComponent)
+    NetWorkThread::NetWorkThread(ThreadPoolComponent *taskComponent)
         : IThread("net", taskComponent), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);

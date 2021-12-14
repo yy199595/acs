@@ -20,7 +20,7 @@ namespace GameKeeper
     private:
         bool mIsClose;
         std::thread * mThread;		
-        TaskPoolComponent * mTaskComponent;
+        ThreadPoolComponent * mTaskComponent;
     };
 }
 #endif //GameKeeper_DEAMONCOMPONENT_H

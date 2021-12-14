@@ -2,7 +2,7 @@
 #include <fstream>
 #include <utility>
 #include <Core/App.h>
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <MysqlClient/TableOperator.h>
 #include <Coroutine/CoroutineComponent.h>
 
@@ -51,7 +51,7 @@ namespace GameKeeper
 
     bool MysqlComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
         return this->StartConnect() && this->InitMysqlTable();
     }

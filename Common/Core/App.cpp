@@ -1,7 +1,7 @@
 ﻿
 #include"App.h"
 #include"Service/NodeProxyComponent.h"
-#include"Scene/TaskPoolComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 #include"Util/DirectoryHelper.h"
 #include"Other/ElapsedTimer.h"
 using namespace GameKeeper;
@@ -55,7 +55,7 @@ namespace GameKeeper
 				LOG_FATAL("add " << name << " to service failure");
 				return false;
 			}
-            LOG_DEBUG("add new component : " << name);
+            //LOG_DEBUG("add new component : " << name);
 		}
 		return true;
 	}

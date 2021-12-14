@@ -3,7 +3,7 @@
 #include"ClientComponent.h"
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
-#include"Scene/TaskPoolComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 #include"Network/ClientRpcTask.h"
 #include"Other/ElapsedTimer.h"
 namespace Client
@@ -52,7 +52,7 @@ namespace Client
 	bool ClientComponent::Awake()
     {
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
+		this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
 		return true;
     }
 

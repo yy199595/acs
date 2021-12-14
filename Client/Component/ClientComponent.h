@@ -28,7 +28,7 @@ namespace Client
 	private:
 		class TcpRpcClient * mTcpClient;
 		class TimerComponent * mTimerComponent;
-		class TaskPoolComponent * mTaskComponent;
+		class ThreadPoolComponent * mTaskComponent;
 		std::unordered_map<long long, std::shared_ptr<ClientRpcTask>> mRpcTasks;
 	};
 }

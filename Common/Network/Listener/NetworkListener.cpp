@@ -5,7 +5,7 @@
 #include<Define/CommonLogDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
-#include<Scene/TaskPoolComponent.h>
+#include<Scene/ThreadPoolComponent.h>
 namespace GameKeeper
 {
 	NetworkListener::NetworkListener(NetWorkThread & t, ListenConfig & config)
@@ -15,7 +15,7 @@ namespace GameKeeper
         this->mIsListen = false;
         this->mBindAcceptor = nullptr;
         this->mListenHandler = nullptr;
-		mTaskComponent = App::Get().GetComponent<TaskPoolComponent>();
+		mTaskComponent = App::Get().GetComponent<ThreadPoolComponent>();
     }
 
 	NetworkListener::~NetworkListener()

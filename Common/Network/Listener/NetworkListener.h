@@ -33,7 +33,7 @@ namespace GameKeeper
 		NetWorkThread & mTaskThread;
 		AsioTcpAcceptor *mBindAcceptor;	
 		ISocketListen * mListenHandler;
-		TaskPoolComponent * mTaskComponent;
+		ThreadPoolComponent * mTaskComponent;
 		class MainTaskScheduler & mTaskScheduler;
 	};
 }

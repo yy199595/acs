@@ -81,7 +81,7 @@ namespace GameKeeper
         std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
         std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
-        class TaskPoolComponent *mTaskManager{};
+        class ThreadPoolComponent *mTaskManager{};
         class CoroutineComponent *mCorComponent{};
     };
 }

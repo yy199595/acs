@@ -63,7 +63,7 @@
     },
     "ScriptPath":"./Script/",
     "Scene": [
-        "TaskPoolComponent",
+        "ThreadPoolComponent",
         "MonitorComponent",
         "TcpServerComponent",
         "LuaScriptComponent",

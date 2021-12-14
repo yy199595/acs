@@ -6,7 +6,7 @@
 #include"MonitorComponent.h"
 #include"Util/TimeHelper.h"
 #include"Core/App.h"
-#include"Scene/TaskPoolComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 namespace GameKeeper
 {
     bool MonitorComponent::Awake()
@@ -19,7 +19,7 @@ namespace GameKeeper
 
      bool MonitorComponent::LateAwake()
     {
-        this->mTaskComponent = this->GetComponent<TaskPoolComponent>();
+        this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
         this->mThread = new std::thread(&MonitorComponent::Update, this);
         return true;
     }

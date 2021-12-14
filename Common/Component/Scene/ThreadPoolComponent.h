@@ -8,11 +8,11 @@ namespace GameKeeper
 {
     class TaskProxy;
 
-    class TaskPoolComponent : public Component, public ISystemUpdate
+    class ThreadPoolComponent : public Component, public ISystemUpdate
     {
     public:
-        TaskPoolComponent() = default;
-        ~TaskPoolComponent() final = default;
+        ThreadPoolComponent() = default;
+        ~ThreadPoolComponent() final = default;
 
     public:
         bool Awake() final;

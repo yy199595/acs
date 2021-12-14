@@ -1,7 +1,7 @@
 ﻿#include"TcpServerComponent.h"
 #include<Core/App.h>
 #include<Util/StringHelper.h>
-#include<Scene/TaskPoolComponent.h>
+#include<Scene/ThreadPoolComponent.h>
 #include<Thread/TaskThread.h>
 #include<Listener/NetworkListener.h>
 namespace GameKeeper
@@ -49,7 +49,7 @@ namespace GameKeeper
 
     bool TcpServerComponent::LateAwake()
     {
-        auto taskComponent = this->GetComponent<TaskPoolComponent>();
+        auto taskComponent = this->GetComponent<ThreadPoolComponent>();
         for(auto listenConfig : this->mListenerConfigs)
         {
             Component *component = this->gameObject->GetComponentByName(listenConfig->Handler);

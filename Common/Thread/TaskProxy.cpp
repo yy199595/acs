@@ -1,6 +1,6 @@
 #include "TaskProxy.h"
 #include <Util/TimeHelper.h>
-#include <Scene/TaskPoolComponent.h>
+#include <Scene/ThreadPoolComponent.h>
 #include <Core/App.h>
 namespace GameKeeper
 {

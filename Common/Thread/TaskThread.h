@@ -12,7 +12,7 @@
 namespace GameKeeper
 {
 	class StaticMethod;
-    class TaskPoolComponent;
+    class ThreadPoolComponent;
     enum ThreadState
     {
         Idle,
@@ -22,7 +22,7 @@ namespace GameKeeper
     class IThread
     {
     public:
-        explicit IThread(std::string  name, TaskPoolComponent *taskComponent);
+        explicit IThread(std::string  name, ThreadPoolComponent *taskComponent);
 
 		virtual ~IThread() = default;
 
@@ -52,7 +52,7 @@ namespace GameKeeper
         long long mLastOperTime;
         std::thread::id mThreadId;
 		std::atomic_bool mIsWork;
-        TaskPoolComponent *mTaskComponent;
+        ThreadPoolComponent *mTaskComponent;
         std::condition_variable mThreadVariable;
     private:
         std::string mName;
@@ -61,7 +61,7 @@ namespace GameKeeper
     class TaskThread : public IThread
     {
     public:
-        explicit TaskThread(TaskPoolComponent * taskComponent);
+        explicit TaskThread(ThreadPoolComponent * taskComponent);
 
     public:
 		int Start() final;
@@ -78,7 +78,7 @@ namespace GameKeeper
     class NetWorkThread : public IThread
     {
     public:
-        explicit NetWorkThread(TaskPoolComponent * taskComponent);
+        explicit NetWorkThread(ThreadPoolComponent * taskComponent);
     public:
 		int Start() final;
 		void AddTask(StaticMethod * task);

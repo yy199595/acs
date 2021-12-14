@@ -1,6 +1,6 @@
 ﻿#include"RedisComponent.h"
 #include<Util/StringHelper.h>
-#include<Scene/TaskPoolComponent.h>
+#include<Scene/ThreadPoolComponent.h>
 #include<Coroutine/CoroutineComponent.h>
 #include<Script/ClassProxyHelper.h>
 #include<Core/App.h>
@@ -52,7 +52,7 @@ namespace GameKeeper
     bool RedisComponent::LateAwake()
     {
 
-        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
 
         int second = 3;

@@ -41,7 +41,7 @@ namespace GameKeeper
 	private:
         AllotorPool<ProtoRpcClient> mClientPool;
         class ProtoRpcComponent * mRpcComponent;
-        class TaskPoolComponent * mTaskComponent;
+        class ThreadPoolComponent * mTaskComponent;
         class RpcConfigComponent * mProtoConfigComponent;
 		std::unordered_map<long long, ProtoRpcClient *> mSessionAdressMap;
 	};
