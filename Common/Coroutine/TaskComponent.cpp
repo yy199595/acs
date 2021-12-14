@@ -55,7 +55,7 @@ namespace GameKeeper
         this->Start([this]() {
             ElapsedTimer timer;
             CoroutineGroup *group = this->NewCoroutineGroup();
-            for (int index = 0; index < 10000; index++) {
+            for (int index = 0; index < 10; index++) {
                 group->Add(this->Start(&TaskComponent::Test, this, index));
             }
             group->AwaitAll();

@@ -36,29 +36,26 @@ namespace GameKeeper
     }
 
 	bool ProtoRpcComponent::OnRequest(const com::Rpc_Request * request)
-	{
-		unsigned short methodId = request->methodid();
-		const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
-		if (protocolConfig == nullptr)
-		{
-			return false;
-		}
+    {
+        unsigned short methodId = request->methodid();
+        const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
+        if (protocolConfig == nullptr) {
+            return false;
+        }
 
-		const std::string &service = protocolConfig->Service;
-		auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
-		if (logicService == nullptr)
-		{
-			LOG_FATAL("call service not exist : [" << service << "]");
-			return false;
-		}
+        const std::string &service = protocolConfig->Service;
+        auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
+        if (logicService == nullptr) {
+            LOG_FATAL("call service not exist : [" << service << "]");
+            return false;
+        }
 
-		const std::string &methodName = protocolConfig->Method;
-		ServiceMethod *method = logicService->GetProtoMethod(methodName);
-		if (method == nullptr)
-		{
-			LOG_FATAL("call method not exist : [" << service << "." << methodName << "]");
-			return false;
-		}
+        const std::string &methodName = protocolConfig->Method;
+        ServiceMethod *method = logicService->GetProtoMethod(methodName);
+        if (method == nullptr) {
+            LOG_FATAL("call method not exist : [" << service << "." << methodName << "]");
+            return false;
+        }
 
         if (!protocolConfig->Request.empty() && !request->has_data())
         {
@@ -74,35 +71,54 @@ namespace GameKeeper
             return true;
         }
 
-		if (!protocolConfig->IsAsync)
-		{
+        if (!protocolConfig->IsAsync) {
 #ifdef __DEBUG__
-			ElapsedTimer elapsedTimer;
+            ElapsedTimer elapsedTimer;
 #endif
-			method->SetSocketId(request->socketid());
-			auto response = new com::Rpc_Response();
-			LocalObject<com::Rpc_Request> lock(request);
-			XCode code = method->Invoke(*request, *response);
-			if (request->rpcid() != 0)
-			{
-				response->set_code(code);
-				response->set_rpcid(request->rpcid());
-				response->set_userid(request->userid());
-				this->mRpcClientComponent->SendByAddress(request->socketid(), response);
-			}
+            this->SyncInvoke(method, request);
 #ifdef __DEBUG__
-			LOG_INFO("Sync OnResponse " << protocolConfig->Service
-                                        << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
+            LOG_INFO("Sync OnResponse " << protocolConfig->Service
+                                        << "." << protocolConfig->Method << " [" << elapsedTimer.GetMs()
+                                        << "ms]");
 #endif
-			return true;
-		}
-		if (method->IsLuaMethod()) //lua 异步
-		{
-			return true;
-		}
-        this->mCorComponent->Start(&ProtoRpcComponent::AwaitInvoke, this, method, request);
-		return true;
-	}
+            return true;
+        }
+
+        if (method->IsLuaMethod()) //lua 异步
+        {
+            return true;
+        }
+        this->mCorComponent->Start([this, method, request, protocolConfig]()
+        {
+#ifdef __DEBUG__
+            ElapsedTimer elapsedTimer;
+#endif
+            this->AsyncInvoke(method, request);
+#ifdef __DEBUG__
+            LOG_INFO("Async call " << protocolConfig->Service
+                                   << "." << protocolConfig->Method << " [" << elapsedTimer.GetMs()
+                                   << "ms]");
+#endif
+        });
+        return true;
+    }
+
+    void ProtoRpcComponent::SyncInvoke(ServiceMethod *method, const com::Rpc_Request *request)
+    {
+        auto response = new com::Rpc_Response();
+        method->SetSocketId(request->socketid());
+        LocalObject<com::Rpc_Request> lock(request);
+        XCode code = method->Invoke(*request, *response);
+        if (request->rpcid() != 0)
+        {
+            response->set_code(code);
+            response->set_rpcid(request->rpcid());
+            response->set_userid(request->userid());
+            this->mRpcClientComponent->SendByAddress(request->socketid(), response);
+            return;
+        }
+        delete response;
+    }
 
     bool ProtoRpcComponent::OnResponse(const com::Rpc_Response *response)
     {
@@ -135,11 +151,8 @@ namespace GameKeeper
     }
 
 
-	void ProtoRpcComponent::AwaitInvoke(ServiceMethod *method, const com::Rpc_Request *request)
+	void ProtoRpcComponent::AsyncInvoke(ServiceMethod *method, const com::Rpc_Request *request)
     {
-#ifdef __DEBUG__
-        ElapsedTimer elapsedTimer;
-#endif
 		auto response = new com::Rpc_Response();
 		LocalObject<com::Rpc_Request> obj(request);
         XCode code = method->Invoke(*request, *response);
@@ -150,11 +163,6 @@ namespace GameKeeper
 			response->set_userid(request->userid());
 			this->mRpcClientComponent->SendByAddress(request->socketid(), response);
 		}
-#ifdef __DEBUG__
-        const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(request->methodid());
-        LOG_INFO("Async call " << protocolConfig->Service
-                               << "." << protocolConfig->Method << " use time = [" << elapsedTimer.GetMs() << "ms]");
-#endif
     }
 
     long long ProtoRpcComponent::GetRpcTaskId()

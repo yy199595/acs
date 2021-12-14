@@ -37,7 +37,8 @@ namespace GameKeeper
         virtual int GetPriority() const { return 500; }
 	private:
         void OnTaskTimeout(long long rpcId);
-        void AwaitInvoke(ServiceMethod * method, const com::Rpc_Request * request);
+        void SyncInvoke(ServiceMethod * method, const com::Rpc_Request * request);
+        void AsyncInvoke(ServiceMethod * method, const com::Rpc_Request * request);
     private:
         int mTick;
         int mNodeId;
