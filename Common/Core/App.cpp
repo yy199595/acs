@@ -29,11 +29,11 @@ namespace GameKeeper
 	{
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<LoggerComponent>();
-		this->AddComponent<CoroutineComponent>();
+		this->AddComponent<TaskComponent>();
 
-		this->mLogComponent = this->GetComponent<LoggerComponent>();
+        this->mTaskComponent = this->GetComponent<TaskComponent>();
+        this->mLogComponent = this->GetComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mCorComponent = this->GetComponent<CoroutineComponent>();
 
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("Scene", components))
@@ -78,7 +78,7 @@ namespace GameKeeper
 				return false;
 			}
 		}
-		this->mCorComponent->StartCoroutine(&App::StartComponent, this);
+        this->mTaskComponent->Start(&App::StartComponent, this);
 		return true;
 	}
 

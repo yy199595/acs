@@ -1,7 +1,7 @@
 ﻿#include"RedisComponent.h"
 #include<Util/StringHelper.h>
 #include<Scene/ThreadPoolComponent.h>
-#include<Coroutine/CoroutineComponent.h>
+#include<Coroutine/TaskComponent.h>
 #include<Script/ClassProxyHelper.h>
 #include<Core/App.h>
 #include"Other/ElapsedTimer.h"
@@ -53,7 +53,7 @@ namespace GameKeeper
     {
 
         LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
-        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
 
         int second = 3;
         App::Get().GetConfig().GetValue("Redis", "timeout", second);
@@ -104,7 +104,7 @@ namespace GameKeeper
         this->mTaskComponent->StartTask(redisTask.get());
         this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
 
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         auto redisResponse = redisTask->GetResponse();
         if(redisResponse->HasError())
         {

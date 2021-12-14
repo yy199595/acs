@@ -5,20 +5,20 @@ namespace GameKeeper
 {
 
     class ThreadPoolComponent;
-    class CoroutineComponent;
+    class TaskComponent;
 
     class TaskProxy
     {
     public:
         TaskProxy();
-        virtual ~TaskProxy() {}
+        virtual ~TaskProxy() = default;
     public:
 		friend class ThreadPoolComponent;
         virtual bool Run() = 0; //在线程池执行的任务
 		virtual void RunFinish() { };
 	public:
-		long long GetTaskId() { return this->mTaskId; }
-        long long GetStartTime() { return this->mStartTime; }
+		long long GetTaskId() const { return this->mTaskId; }
+        long long GetStartTime() const { return this->mStartTime; }
     private:
         long long mStartTime;
         unsigned int mTaskId;
@@ -33,7 +33,7 @@ namespace GameKeeper
         bool AwaitInvoke();
     private:
         unsigned int mCorId;
-        CoroutineComponent * mCorComponent;
+        TaskComponent * mCorComponent;
     };
 
 	template<typename T>

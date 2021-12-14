@@ -43,7 +43,7 @@ namespace GameKeeper
         int mNodeId;
         long long mLastTime;
         class TimerComponent * mTimerComponent;
-        class CoroutineComponent *mCorComponent;
+        class TaskComponent *mCorComponent;
         class RpcConfigComponent * mPpcConfigComponent;
         class ProtoRpcClientComponent *mRpcClientComponent;
         std::unordered_map<long long, std::shared_ptr<ProtoRpcTask>> mRpcTasks;

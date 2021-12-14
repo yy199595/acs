@@ -3,7 +3,7 @@
 #include <Core/App.h>
 #include <Util/NumberHelper.h>
 #include <Scene/RedisComponent.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 
 namespace GameKeeper
 {

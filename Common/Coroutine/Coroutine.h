@@ -11,7 +11,7 @@ namespace GameKeeper
         Finish,
     };
 
-    class CoroutineComponent;
+    class TaskComponent;
 
     struct Stack
     {
@@ -27,11 +27,13 @@ namespace GameKeeper
     public:
 		explicit Coroutine();
         ~Coroutine();
+
+    public:
+        void Invoke();
     public:
         int sid;
         Stack mStack;
         CorState mState;
-        size_t mStackSize;
         unsigned int mGroupId;
         tb_context_t mContext;
 		StaticMethod * mFunction;

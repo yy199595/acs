@@ -11,7 +11,7 @@ namespace GameKeeper
     {
         this->mCorId = 0;
         this->mCode = code;
-        this->mCorComponent = nullptr;
+        this->mTaskComponent = nullptr;
         this->mCreateTime = TimeHelper::GetMilTimestamp();
         this->mTaskState = code == XCode::Successful ? TaskReady : TaskError;
     }
@@ -22,8 +22,8 @@ namespace GameKeeper
         {
             this->OnTaskAwait();
             this->mTaskState = TaskAwait;
-            this->mCorComponent = App::Get().GetCorComponent();
-            this->mCorComponent->WaitForYield(this->mCorId);
+            this->mTaskComponent = App::Get().GetTaskComponent();
+            this->mTaskComponent->Await(this->mCorId);
             return true;
         }
         return false;
@@ -31,11 +31,11 @@ namespace GameKeeper
 
     bool AsyncTask::RestoreAsyncTask()
     {
-        if(this->mCorComponent == nullptr || this->mCorId == 0)
+        if(this->mTaskComponent == nullptr || this->mCorId == 0)
         {
             return false;
         }
-        this->mCorComponent->Resume(this->mCorId);
+        this->mTaskComponent->Resume(this->mCorId);
         this->mCorId = 0;
         return true;
     }

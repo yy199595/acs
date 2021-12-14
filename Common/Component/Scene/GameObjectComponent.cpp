@@ -1,7 +1,7 @@
 #include"GameObjectComponent.h"
 #include"Core/App.h"
 #include"Object/GameObject.h"
-#include"Coroutine/CoroutineComponent.h"
+#include"Coroutine/TaskComponent.h"
 
 namespace GameKeeper
 {
@@ -13,7 +13,7 @@ namespace GameKeeper
 
     bool GameObjectComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
         return true;
     }
 
@@ -40,7 +40,7 @@ namespace GameKeeper
 			}
 		}
 		this->mGameObjects.emplace(id, gameObject);
-		this->mCorComponent->StartCoroutine(&GameObjectComponent::StartComponents, this, id);
+        this->mCorComponent->Start(&GameObjectComponent::StartComponents, this, id);
 		return true;
 	}
 

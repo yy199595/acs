@@ -11,7 +11,7 @@ using namespace google::protobuf;
 namespace GameKeeper
 {
     class TimerComponent;
-    class CoroutineComponent;
+    class TaskComponent;
     class ProtoResponseComponent;
     class ProtoRpcTask : public AsyncTask,
         public std::enable_shared_from_this<ProtoRpcTask>

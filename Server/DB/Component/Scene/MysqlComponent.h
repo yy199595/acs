@@ -82,6 +82,6 @@ namespace GameKeeper
         std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
         class ThreadPoolComponent *mTaskManager{};
-        class CoroutineComponent *mCorComponent{};
+        class TaskComponent *mCorComponent{};
     };
 }

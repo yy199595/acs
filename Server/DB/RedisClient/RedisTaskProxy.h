@@ -14,7 +14,7 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    class CoroutineComponent;
+    class TaskComponent;
 
     class RedisTaskProxy : public RedisTaskBase
     {

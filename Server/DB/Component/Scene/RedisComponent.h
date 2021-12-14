@@ -3,7 +3,7 @@
 #include<Util/NumberHelper.h>
 #include <Component/Component.h>
 #include<RedisClient/RedisTaskProxy.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 using namespace GameKeeper;
 namespace GameKeeper
 {
@@ -41,7 +41,7 @@ namespace GameKeeper
 		unsigned short mRedisPort;    //端口号
         long long mLastOperatorTime;
 		ThreadPoolComponent *mTaskComponent;
-		CoroutineComponent *mCorComponent;
+		TaskComponent *mCorComponent;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

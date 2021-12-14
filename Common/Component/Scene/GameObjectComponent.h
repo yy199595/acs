@@ -25,7 +25,7 @@ namespace GameKeeper
 	private:
 		void StartComponents(long long objectId);
 	private:
-		class CoroutineComponent * mCorComponent;
+		class TaskComponent * mCorComponent;
 		std::unordered_map<long long, GameObject *> mGameObjects;
         std::unordered_map<std::string, GameObject *> mAddressGameObjects;
 	};

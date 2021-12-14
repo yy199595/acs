@@ -20,7 +20,7 @@ namespace GameKeeper
 
     bool MysqlService::LateAwake()
     {
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
         LOG_CHECK_RET_FALSE(this->mMysqlManager = this->GetComponent<MysqlComponent>());
         LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
         return true;
@@ -53,7 +53,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -86,7 +86,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -113,7 +113,7 @@ namespace GameKeeper
         {
             return XCode::MysqlStartTaskFail;
         }
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -139,7 +139,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         XCode code = mysqlTask->GetErrorCode();
 
         if (code == XCode::Successful)
@@ -188,7 +188,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->WaitForYield();
+        this->mCorComponent->Await();
         XCode code = mysqlTask->GetErrorCode();
         if (code == XCode::Successful)
         {

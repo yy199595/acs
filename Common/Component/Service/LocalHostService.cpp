@@ -63,7 +63,7 @@ namespace GameKeeper
         while(centerNode->Call("CenterHostService.Add", registerInfo, response) != XCode::Successful)
         {
             LOG_ERROR("register to center failure");
-            App::Get().GetCorComponent()->WaitForSleep(3000);
+            App::Get().GetTaskComponent()->AwaitSleep(3000);
         }
         this->mToken = response->groupdata().token();
         this->mOpenTime = response->groupdata().opentime();

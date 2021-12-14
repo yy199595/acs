@@ -34,7 +34,7 @@ namespace GameKeeper
     private:
         unsigned int mCorId;
         long long mCreateTime;
-        class CoroutineComponent * mCorComponent;
+        class TaskComponent * mTaskComponent;
     };
 }
 

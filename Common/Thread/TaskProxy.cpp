@@ -13,7 +13,7 @@ namespace GameKeeper
     CoroutineAsyncTask::CoroutineAsyncTask()
     {
         this->mCorId = 0;
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
     }
 
     bool CoroutineAsyncTask::AwaitInvoke()
@@ -22,7 +22,7 @@ namespace GameKeeper
         {
             return false;
         }
-        this->mCorComponent->WaitForYield(this->mCorId);
+        this->mCorComponent->Await(this->mCorId);
         return true;
     }
 

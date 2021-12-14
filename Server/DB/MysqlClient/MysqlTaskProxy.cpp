@@ -1,7 +1,7 @@
 #include"MysqlTaskProxy.h"
 #include<Core/App.h>
 #include<Scene/MysqlComponent.h>
-#include<Coroutine/CoroutineComponent.h>
+#include<Coroutine/TaskComponent.h>
 #include"Util/JsonHelper.h"
 
 namespace GameKeeper
@@ -9,7 +9,7 @@ namespace GameKeeper
     MysqlTaskProxy::MysqlTaskProxy(std::string db, std::string sql)
         : mDataBaseName(std::move(db)), mSqlCommand(std::move(sql))
     {	
-		CoroutineComponent * corComponent = App::Get().GetCorComponent();
+		TaskComponent * corComponent = App::Get().GetTaskComponent();
         this->mCoroutineId = corComponent->GetCurrentCorId();
         this->mMsqlComponent = App::Get().GetComponent<MysqlComponent>();
 
@@ -17,7 +17,7 @@ namespace GameKeeper
 
     void MysqlTaskProxy::RunFinish()
     {
-		CoroutineComponent * corComponent = App::Get().GetCorComponent();
+		TaskComponent * corComponent = App::Get().GetTaskComponent();
         if (this->mCoroutineId != 0)
         {
 			corComponent->Resume(this->mCoroutineId);

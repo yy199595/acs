@@ -31,7 +31,7 @@ namespace GameKeeper
 
         class MysqlComponent *mMysqlManager;
 
-        class CoroutineComponent *mCorComponent;
+        class TaskComponent *mCorComponent;
 
         class ThreadPoolComponent *mTaskManager;
     };

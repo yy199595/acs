@@ -6,7 +6,7 @@ namespace GameKeeper
     class NumberBuilder
     {
     public:
-        explicit NumberBuilder(const T num = 0) : mIndex(num) {}
+        explicit NumberBuilder(const T num = 1) : mIndex(num) {}
         inline const T Pop();
         inline void Push(T num);
 

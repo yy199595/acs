@@ -3,7 +3,7 @@
 #include"Scene/LoggerComponent.h"
 #include"Timer/TimerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
-#include"Coroutine/CoroutineComponent.h"
+#include"Coroutine/TaskComponent.h"
 
 using namespace Client;
 using namespace GameKeeper;
@@ -14,7 +14,7 @@ int main(int argc, char ** argv)
 	REGISTER_COMPONENT(TimerComponent);
 	REGISTER_COMPONENT(LoggerComponent);
 	REGISTER_COMPONENT(ThreadPoolComponent);
-	REGISTER_COMPONENT(CoroutineComponent);
+	REGISTER_COMPONENT(TaskComponent);
 
 	REGISTER_COMPONENT(ClientComponent);
 

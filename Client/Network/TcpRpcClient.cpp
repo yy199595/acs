@@ -2,7 +2,7 @@
 #include"Core/App.h"
 #include"ClientComponent.h"
 #include"Scene/ThreadPoolComponent.h"
-#include"Coroutine/CoroutineComponent.h"
+#include"Coroutine/TaskComponent.h"
 #include<iostream>
 constexpr size_t HeadCount = sizeof(char) + sizeof(int);
 namespace Client
@@ -36,7 +36,7 @@ namespace Client
 		auto address = asio::ip::make_address_v4(ip);
 		asio::ip::tcp::endpoint endPoint(address, port);
 		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-        CoroutineComponent * corComponent = App::Get().GetCorComponent();
+        TaskComponent * corComponent = App::Get().GetTaskComponent();
 		LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
 		nSocket.async_connect(endPoint, [this, corComponent](const asio::error_code &err)
 		{
@@ -47,9 +47,9 @@ namespace Client
                 std::cout << "connect error : " << err.message() << std::endl;
 			}
 			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-            taskScheduler.Invoke(&CoroutineComponent::Resume, corComponent, this->mCoroutineId);
+            taskScheduler.Invoke(&TaskComponent::Resume, corComponent, this->mCoroutineId);
 		});
-        corComponent->WaitForYield(this->mCoroutineId);
+        corComponent->Await(this->mCoroutineId);
 		return this->mIsConnectSuccessful;
 	}
 

@@ -71,7 +71,7 @@ namespace GameKeeper
         long long mSocketId;
 
         std::set<std::string> mServiceArray;//服务列表
-        CoroutineComponent *mCorComponent;//协程
+        TaskComponent *mCorComponent;//协程
         class ProtoRpcComponent * mRpcComponent;
         std::queue<const Message *> mWaitSendQueue;
         class RpcConfigComponent *mRpcConfigComponent;

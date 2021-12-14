@@ -6,7 +6,7 @@ namespace GameKeeper
 {
     class ProtoRpcComponent;
 
-    class CoroutineComponent;
+    class TaskComponent;
 
     class NodeProxyComponent;
 

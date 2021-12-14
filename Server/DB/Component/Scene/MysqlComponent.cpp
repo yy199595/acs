@@ -4,7 +4,7 @@
 #include <Core/App.h>
 #include <Scene/ThreadPoolComponent.h>
 #include <MysqlClient/TableOperator.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 
 namespace GameKeeper
 {
@@ -52,7 +52,7 @@ namespace GameKeeper
     bool MysqlComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
-        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
         return this->StartConnect() && this->InitMysqlTable();
     }
 

@@ -52,11 +52,11 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-	class CoroutineComponent;
+	class TaskComponent;
 	class CoroutineGroup
 	{
 	public:
-		explicit CoroutineGroup(CoroutineComponent *);
+		explicit CoroutineGroup(TaskComponent *);
 	public:
         bool SubCount();
         void AwaitAll();
@@ -65,6 +65,6 @@ namespace GameKeeper
 	private:
         unsigned int mCount;
 		unsigned int mCoroutineId;
-		CoroutineComponent * mCorComponent;
+		TaskComponent * mCorComponent;
 	};
 }

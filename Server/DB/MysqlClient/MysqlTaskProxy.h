@@ -9,7 +9,7 @@ namespace GameKeeper
 
     class RapidJsonWriter;
 
-    class CoroutineComponent;
+    class TaskComponent;
 
     class MysqlTaskProxy : public TaskProxy
     {

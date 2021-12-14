@@ -2,7 +2,7 @@
 
 namespace GameKeeper
 {
-    CorSleepTimer::CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms)
+    CorSleepTimer::CorSleepTimer(TaskComponent *sheduler, long long id, long long ms)
         : TimerBase(ms)
     {
         this->mCoroutineId = id;

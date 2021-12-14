@@ -1,14 +1,14 @@
 #pragma once
 
 #include "TimerBase.h"
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 
 namespace GameKeeper
 {
     class CorSleepTimer : public TimerBase
     {
     public:
-        CorSleepTimer(CoroutineComponent *sheduler, long long id, long long ms);
+        CorSleepTimer(TaskComponent *sheduler, long long id, long long ms);
 
         ~CorSleepTimer() final { this->mScheduler = nullptr; }
 
@@ -18,6 +18,6 @@ namespace GameKeeper
     private:
         long long mCoroutineId;
         long long mNextInvokeTime;
-        CoroutineComponent *mScheduler;
+        TaskComponent *mScheduler;
     };
 }// namespace GameKeeper

@@ -8,7 +8,7 @@
 #include"Thread/TaskThread.h"
 #include"Timer/TimerComponent.h"
 #include"Scene/LoggerComponent.h"
-#include"Coroutine/CoroutineComponent.h"
+#include"Coroutine/TaskComponent.h"
 using namespace std;
 using namespace asio::ip;
 
@@ -73,8 +73,8 @@ namespace GameKeeper
 		}
 	public:	
 		inline LoggerComponent * GetLogger() { return this->mLogComponent; }
-		inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
-		inline CoroutineComponent * GetCorComponent() { return this->mCorComponent; }
+        inline TaskComponent * GetTaskComponent() { return this->mTaskComponent; }
+        inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
 	private:
 		
 		bool InitComponent();
@@ -122,9 +122,9 @@ namespace GameKeeper
 	private:
 		static App * mApp;
 	private:
-		LoggerComponent * mLogComponent;
+        TaskComponent * mTaskComponent;
+        LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
-		CoroutineComponent * mCorComponent;
 		std::vector<Component *> mSceneComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;

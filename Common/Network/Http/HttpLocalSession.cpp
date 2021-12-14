@@ -87,7 +87,7 @@ namespace GameKeeper
         this->mHttpHandler = this->mGetHandler;
         this->StartConnectHost(this->mGetHandler->GetHost(), this->mGetHandler->GetPort());
 
-        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
+        App::Get().GetTaskComponent()->Await(this->mCorId);
         if(this->mCode != XCode::Successful)
         {
             return this->mCode;
@@ -108,7 +108,7 @@ namespace GameKeeper
         this->mHttpHandler = this->mPostHandler;
         this->StartConnectHost(this->mPostHandler->GetHost(), this->mPostHandler->GetPort());
 
-        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
+        App::Get().GetTaskComponent()->Await(this->mCorId);
         if(this->mCode != XCode::Successful)
         {
             return this->mCode;
@@ -143,9 +143,9 @@ namespace GameKeeper
     void HttpLocalSession::SetCode(XCode code)
     {
         this->mCode = code;
-        CoroutineComponent *corComponent = App::Get().GetCorComponent();
+        TaskComponent *corComponent = App::Get().GetTaskComponent();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&CoroutineComponent::Resume, corComponent, this->mCorId);
+        taskScheduler.Invoke(&TaskComponent::Resume, corComponent, this->mCorId);
     }
 
     void HttpLocalSession::Clear()

@@ -2,7 +2,7 @@
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 #include <Listener/TcpServerComponent.h>
 #include <Scene/MysqlComponent.h>
 #include <Scene/RpcConfigComponent.h>
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	REGISTER_COMPONENT(LoggerComponent);
 
     REGISTER_COMPONENT(ThreadPoolComponent);
-    REGISTER_COMPONENT(CoroutineComponent);
+    REGISTER_COMPONENT(TaskComponent);
     REGISTER_COMPONENT(NodeProxyComponent);
     REGISTER_COMPONENT(TcpServerComponent);
     REGISTER_COMPONENT(ProtoRpcClientComponent);

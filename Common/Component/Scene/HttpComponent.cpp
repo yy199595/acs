@@ -4,7 +4,7 @@
 #include <Core/App.h>
 #include <Thread/TaskThread.h>
 #include "Component/Scene/HttpComponent.h"
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 #include <Http/HttpRemoteSession.h>
 #include <Http/Request/HttpGetRequest.h>
 #include <Http/Request/HttpPostRequest.h>
@@ -28,7 +28,7 @@ namespace GameKeeper
 
     bool HttpComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
         return true;
     }
 

@@ -1,4 +1,4 @@
-﻿#include"CoroutineComponent.h"
+﻿#include"TaskComponent.h"
 #include<memory.h>
 #include<Core/App.h>
 #include"Coroutine.h"
@@ -13,23 +13,25 @@ namespace GameKeeper
 {
 	void MainEntry(tb_context_from_t parame)
 	{
-		CoroutineComponent *pCoroutineMgr = App::Get().GetCorComponent();
+		TaskComponent * taskComponent = App::Get().GetTaskComponent();
 
-		Coroutine * logicCoroutine = pCoroutineMgr->GetCurCoroutine();
-		Coroutine * mainCoroutine = pCoroutineMgr->GetMainCoroutine();
-		assert(mainCoroutine == parame.priv);
-        ((Coroutine*)parame.priv)->mContext = parame.ctx;
-		if (logicCoroutine != nullptr)
-		{
-			logicCoroutine->mFunction->run();
-			pCoroutineMgr->Destory(logicCoroutine);
-		}
-        tb_context_jump(mainCoroutine->mContext, nullptr);
+        taskComponent->RunTask(parame.ctx);
 	}
 
-    CoroutineComponent::CoroutineComponent()
+    void TaskComponent::RunTask(tb_context_t context)
     {
-        this->mMainCoroutine = this->mCorPool.Pop();
+        this->mMainContext = context;
+        Coroutine * coroutine = this->GetCurCoroutine();
+        if(coroutine != nullptr)
+        {
+            coroutine->Invoke();
+            this->Destory(coroutine);
+        }
+        tb_context_jump(this->mMainContext, nullptr);
+    }
+
+    TaskComponent::TaskComponent()
+    {
         for(Stack & stack : this->mSharedStack)
         {
             stack.co = 0;
@@ -39,44 +41,44 @@ namespace GameKeeper
         }
     }
 
-	CoroutineComponent::~CoroutineComponent() = default;
+	TaskComponent::~TaskComponent() = default;
 
-    bool CoroutineComponent::Awake()
+    bool TaskComponent::Awake()
     {
         this->mCurrentCorId = 0;
         return true;
     }
 
-    bool CoroutineComponent::LateAwake()
+    bool TaskComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
         for (int index = 0; index < 100; index++)
         {
-            this->StartCoroutine(&CoroutineComponent::Test, this, index);
+            this->Start(&TaskComponent::Test, this, index);
         }
         return true;
     }
 
-    void CoroutineComponent::Test(int index)
+    void TaskComponent::Test(int index)
     {
         ElapsedTimer timer;
         for (int x = 0; x < 10; x++)
         {
-            this->WaitForSleep(10 + 10 * index + 10 * x);
+            this->AwaitSleep(10 + 10 * index + 10 * x);
         }
         LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
 
 
-    void CoroutineComponent::WaitForSleep(long long ms)
+    void TaskComponent::AwaitSleep(long long ms)
     {
         StaticMethod * sleepMethod = NewMethodProxy(
-                &CoroutineComponent::Resume, this, this->mCurrentCorId);
+                &TaskComponent::Resume, this, this->mCurrentCorId);
         this->mTimerManager->AddTimer(ms, sleepMethod);
-        this->WaitForYield();
+        this->Await();
     }
 
-	void CoroutineComponent::ResumeCoroutine(Coroutine * co)
+	void TaskComponent::ResumeCoroutine(Coroutine * co)
 	{    
 		co->mLastCoroutineId = this->mCurrentCorId;
         this->mCurrentCorId = co->mCoroutineId;
@@ -100,20 +102,10 @@ namespace GameKeeper
             stack.co = this->mCurrentCorId;
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
         }
-		tb_context_from_t from = tb_context_jump(co->mContext, this->mMainCoroutine);
-		this->mCurrentCorId = co->mLastCoroutineId;
-        if (from.priv != nullptr)
-        {
-             auto lastCoroutine = (Coroutine*)from.priv;
-             if(lastCoroutine != nullptr)
-             {
-                 lastCoroutine->mContext = from.ctx;
-                 lastCoroutine->mState = CorState::Suspend;
-             }   
-        }
+		co->mContext = tb_context_jump(co->mContext, nullptr).ctx;
     }
 
-	void CoroutineComponent::WaitForYield()
+	void TaskComponent::Await()
 	{
 		Coroutine *logicCoroutine = this->GetCurCoroutine();
 		if (logicCoroutine == nullptr)
@@ -123,10 +115,10 @@ namespace GameKeeper
 		}
         logicCoroutine->mSwitchCount++;
 		logicCoroutine->mState = CorState::Suspend;
-		tb_context_jump(this->mMainCoroutine->mContext, logicCoroutine);
+		tb_context_jump(this->mMainContext, logicCoroutine);
 	}
 
-	void CoroutineComponent::Resume(unsigned int id)
+	void TaskComponent::Resume(unsigned int id)
     {
         LOG_CHECK_RET(id != 0);
         Coroutine *logicCoroutine = this->GetCoroutine(id);
@@ -134,7 +126,7 @@ namespace GameKeeper
         this->mResumeCoroutines.push(id);
     }
 
-	CoroutineGroup * CoroutineComponent::NewCoroutineGroup()
+	CoroutineGroup * TaskComponent::NewCoroutineGroup()
 	{
 		if (this->mCurrentCorId == 0)
 		{
@@ -145,7 +137,7 @@ namespace GameKeeper
 		return group;
 	}
 
-	Coroutine * CoroutineComponent::CreateCoroutine(StaticMethod *func)
+	Coroutine * TaskComponent::CreateCoroutine(StaticMethod *func)
 	{
 		Coroutine * coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
@@ -157,18 +149,18 @@ namespace GameKeeper
 	}
 
 
-	void CoroutineComponent::WaitForYield(unsigned int & mCorId)
+	void TaskComponent::Await(unsigned int & mCorId)
 	{
 		mCorId = this->mCurrentCorId;
-        this->WaitForYield();
+        this->Await();
 	}
 
-    Coroutine *CoroutineComponent::GetCoroutine(unsigned int id)
+    Coroutine *TaskComponent::GetCoroutine(unsigned int id)
     {
 		return this->mCorPool.Get(id);
     }
 
-    Coroutine * CoroutineComponent::GetCurCoroutine()
+    Coroutine * TaskComponent::GetCurCoroutine()
     {
         if(this->mCurrentCorId == 0)
         {
@@ -177,7 +169,7 @@ namespace GameKeeper
         return this->mCorPool.Get(this->mCurrentCorId);
     }
 
-	void CoroutineComponent::Destory(Coroutine * coroutine)
+	void TaskComponent::Destory(Coroutine * coroutine)
 	{
 		if (coroutine->mGroupId != 0)
 		{
@@ -195,7 +187,7 @@ namespace GameKeeper
 		this->mCorPool.Push(coroutine);
 	}
 
-	void CoroutineComponent::SaveStack(unsigned int id)
+	void TaskComponent::SaveStack(unsigned int id)
     {
         Coroutine *coroutine = this->GetCoroutine(id);
         if(coroutine == nullptr)
@@ -218,7 +210,7 @@ namespace GameKeeper
         memcpy(coroutine->mStack.p, coroutine->mContext, size);
     }
 
-	void CoroutineComponent::OnSystemUpdate()
+	void TaskComponent::OnSystemUpdate()
     {
 		while (!this->mResumeCoroutines.empty())
 		{
@@ -231,7 +223,7 @@ namespace GameKeeper
 			this->mResumeCoroutines.pop();
 		}
     }
-	void CoroutineComponent::OnLastFrameUpdate()
+	void TaskComponent::OnLastFrameUpdate()
 	{
 		if (!this->mLastQueues1.empty())
 		{
@@ -244,7 +236,7 @@ namespace GameKeeper
 		}
 	}
 
-    void CoroutineComponent::OnSecondUpdate()
+    void TaskComponent::OnSecondUpdate()
     {
         /*size_t size = this->mCorPool.GetMemorySize();
 		double memory = size / (1024.0f * 1024);

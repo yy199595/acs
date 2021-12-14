@@ -1,6 +1,6 @@
 ﻿#include "RpcNodeProxy.h"
 #include <Core/App.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 #include <Async/RpcTask/ProtoRpcTask.h>
 #include <ProtoRpc/ProtoRpcClientComponent.h>
 #include <Util/StringHelper.h>
@@ -14,7 +14,7 @@ namespace GameKeeper
 	{
         this->mRpcComponent = App::Get().GetComponent<ProtoRpcComponent>();
         this->mRpcClientComponent = App::Get().GetComponent<ProtoRpcClientComponent>();
-        LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<CoroutineComponent>());
+        LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<TaskComponent>());
         LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
 	}
 

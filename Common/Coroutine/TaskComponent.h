@@ -10,31 +10,27 @@
 #include<Component/Component.h>
 namespace GameKeeper
 {
-    class CoroutineComponent : public Component, public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
+    class TaskComponent : public Component, public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
 	{
 	public:
-		CoroutineComponent();
-		~CoroutineComponent() final;
+		TaskComponent();
+		~TaskComponent() final;
 	public:
 		template<typename F, typename T, typename ... Args>
-		Coroutine * StartCoroutine(F && f, T * o, Args &&... args)
+		void Start(F && f, T * o, Args &&... args)
         {
             Coroutine *co = this->CreateCoroutine(
-                    NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
-            if(co != nullptr)
-            {
-                this->Resume(co->mCoroutineId);
-                return co;
-            }
-            return nullptr;
+                    NewMethodProxy(std::forward<F>(f),
+                            o, std::forward<Args>(args)...));
+            this->Resume(co->mCoroutineId);
         }
         Coroutine * CreateCoroutine(StaticMethod * func);
 	public:
-		void WaitForYield();
+		void Await();
 
-		void WaitForYield(unsigned int & mCorId);
+		void Await(unsigned int & mCorId);
 
-		void WaitForSleep(long long ms);
+		void AwaitSleep(long long ms);
 
 		void Resume(unsigned int id);
 
@@ -61,12 +57,12 @@ namespace GameKeeper
 
         Coroutine * GetCurCoroutine();
 
-		Coroutine * GetMainCoroutine() { return this->mMainCoroutine; }
-
         unsigned int GetCurrentCorId() const
         {
             return this->mCurrentCorId;
         }
+
+        void RunTask(tb_context_t context);
 
 		bool IsInMainCoroutine() const
 		{
@@ -87,7 +83,7 @@ namespace GameKeeper
 		std::queue<unsigned int> mLastQueues2;
 	private:
 		CoroutinePool mCorPool;
-		Coroutine * mMainCoroutine;
+        tb_context_t mMainContext;
         unsigned int mCurrentCorId;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<unsigned int> mResumeCoroutines;

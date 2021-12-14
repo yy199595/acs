@@ -44,7 +44,7 @@ namespace GameKeeper
         s2s::MysqlOper_Request mOperRequest;
         s2s::MysqlQuery_Request mQueryRequest;
         s2s::MysqlAnyOper_Request mAnyOperRequest;
-        class CoroutineComponent *mCorComponent;
+        class TaskComponent *mCorComponent;
         class NodeProxyComponent *mNodeComponent;
     };
 }

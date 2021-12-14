@@ -19,7 +19,7 @@ namespace GameKeeper
 
     bool MysqlProxyComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
         LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
         return true;
     }
@@ -38,8 +38,8 @@ namespace GameKeeper
 //		auto group = this->mCorComponent->NewCoroutineGroup();
 //		for (int index = 0; index < 2; index++)
 //		{
-//			group->Add(this->mCorComponent->StartCoroutine(&MysqlProxyComponent::AddUserData, this));
-//			group->Add(this->mCorComponent->StartCoroutine(&MysqlProxyComponent::SortUserData, this));
+//			group->Add(this->mCorComponent->Start(&MysqlProxyComponent::AddUserData, this));
+//			group->Add(this->mCorComponent->Start(&MysqlProxyComponent::SortUserData, this));
 //		}
 //		group->AwaitAll();
 //		LOG_ERROR("use time = " << timer.GetSecond() << "s");
@@ -77,7 +77,7 @@ namespace GameKeeper
             {
                 LOG_WARN("add user data successful");
             }
-            //this->mCorComponent->WaitForSleep(100);
+            //this->mCorComponent->AwaitSleep(100);
         }
 	}
 
@@ -97,7 +97,7 @@ namespace GameKeeper
                     LOG_WARN(index++ << "  " << json);
                 }
             }
-			//this->mCorComponent->WaitForSleep(100);
+			//this->mCorComponent->AwaitSleep(100);
 		}
 	}
 

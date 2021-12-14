@@ -29,7 +29,7 @@ namespace GameKeeper
 	{
 		this->mListenHandler = handler;
         this->mTaskThread.Invoke(&NetworkListener::InitListener, this);
-        App::Get().GetCorComponent()->WaitForYield(this->mCorId);
+        App::Get().GetTaskComponent()->Await(this->mCorId);
 		return this->mIsListen;
 	}
 
@@ -51,8 +51,8 @@ namespace GameKeeper
             LOG_FATAL("listen " << this->mConfig.Ip << ":"
                                 << this->mConfig.Port << " failure" << err.what());
         }
-        CoroutineComponent * component = App::Get().GetCorComponent();
-        this->mTaskScheduler.Invoke(&CoroutineComponent::Resume, component, this->mCorId);
+        TaskComponent * component = App::Get().GetTaskComponent();
+        this->mTaskScheduler.Invoke(&TaskComponent::Resume, component, this->mCorId);
     }
 
 	void NetworkListener::ListenConnect()

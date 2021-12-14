@@ -1,6 +1,6 @@
 ﻿#include "ProtoRpcComponent.h"
 #include <Service/ProtoServiceComponent.h>
-#include <Coroutine/CoroutineComponent.h>
+#include <Coroutine/TaskComponent.h>
 #include <Util/StringHelper.h>
 #include"Core/App.h"
 #include <Pool/MessagePool.h>
@@ -27,9 +27,9 @@ namespace GameKeeper
 
     bool ProtoRpcComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetCorComponent();
+        this->mCorComponent = App::Get().GetTaskComponent();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<CoroutineComponent>());
+        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<ProtoRpcClientComponent>());
         return true;
@@ -100,7 +100,7 @@ namespace GameKeeper
 		{
 			return true;
 		}
-		this->mCorComponent->StartCoroutine(&ProtoRpcComponent::AwaitInvoke, this, method, request);
+        this->mCorComponent->Start(&ProtoRpcComponent::AwaitInvoke, this, method, request);
 		return true;
 	}
 

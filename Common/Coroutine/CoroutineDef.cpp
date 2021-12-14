@@ -1,5 +1,5 @@
 #include"CoroutineDef.h"
-#include"CoroutineComponent.h"
+#include"TaskComponent.h"
 #include"Coroutine.h"
 #include<Core/App.h>
 namespace GameKeeper
@@ -61,7 +61,6 @@ namespace GameKeeper
         }
         coroutine->sid = 0;
         coroutine->mGroupId = 0;
-        coroutine->mStackSize = 0;
         coroutine->mCoroutineId = 0;
         coroutine->mFunction = nullptr;
         coroutine->mContext = nullptr;
@@ -77,7 +76,7 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-	CoroutineGroup::CoroutineGroup(CoroutineComponent * cor)
+	CoroutineGroup::CoroutineGroup(TaskComponent * cor)
     {
         this->mCount = 0;
         this->mCorComponent = cor;
@@ -105,7 +104,7 @@ namespace GameKeeper
         if(this->mCount > 0)
         {
             unsigned int id = 0;
-            this->mCorComponent->WaitForYield(id);
+            this->mCorComponent->Await(id);
             LOG_INFO("coroutine group finish  id = " << id << "  corid = " << this->mCoroutineId);
         }
     }
