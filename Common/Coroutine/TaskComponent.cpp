@@ -52,21 +52,29 @@ namespace GameKeeper
     bool TaskComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
-        for (int index = 0; index < 100; index++)
-        {
-            this->Start(&TaskComponent::Test, this, index);
-        }
+        this->Start([this]() {
+            ElapsedTimer timer;
+            CoroutineGroup *group = this->NewCoroutineGroup();
+            for (int index = 0; index < 10000; index++) {
+                group->Add(this->Start(&TaskComponent::Test, this, index));
+            }
+            group->AwaitAll();
+            LOG_ERROR("use time = " << timer.GetMs() << "ms");
+        });
+
         return true;
     }
 
     void TaskComponent::Test(int index)
     {
         ElapsedTimer timer;
-        for (int x = 0; x < 10; x++)
+        for (int x = 0; x < 1000; x++)
         {
-            this->AwaitSleep(10 + 10 * index + 10 * x);
+            //this->AwaitSleep(10 + 10 * index + 10 * x);
+            this->mResumeCoroutines.push(this->mCurrentCorId);
+            this->Await();
         }
-        LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
+        //LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
 
 

@@ -17,12 +17,17 @@ namespace GameKeeper
 		~TaskComponent() final;
 	public:
 		template<typename F, typename T, typename ... Args>
-		void Start(F && f, T * o, Args &&... args)
-        {
+		Coroutine * Start(F && f, T * o, Args &&... args) {
             Coroutine *co = this->CreateCoroutine(
                     NewMethodProxy(std::forward<F>(f),
-                            o, std::forward<Args>(args)...));
+                                   o, std::forward<Args>(args)...));
             this->Resume(co->mCoroutineId);
+            return co;
+        }
+        Coroutine * Start(std::function<void()> func){
+            Coroutine * co = this->CreateCoroutine(new LambdaMethod(func));
+            this->Resume(co->mCoroutineId);
+            return co;
         }
         Coroutine * CreateCoroutine(StaticMethod * func);
 	public:
