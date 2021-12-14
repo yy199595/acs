@@ -4,17 +4,13 @@
 #include"Coroutine.h"
 #include<Util/NumberHelper.h>
 #include<Timer/TimerComponent.h>
-#include<fstream>
+#include"Other/ElapsedTimer.h"
 #ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
 using namespace std::chrono;
-#ifdef _WIN32
-#include<Windows.h>
-#endif
 namespace GameKeeper
 {
-#ifdef __COROUTINE_ASM__
 	void MainEntry(tb_context_from_t parame)
 	{
 		CoroutineComponent *pCoroutineMgr = App::Get().GetCorComponent();
@@ -29,34 +25,18 @@ namespace GameKeeper
 			pCoroutineMgr->Destory(logicCoroutine);
 		}
         tb_context_jump(mainCoroutine->mContext, nullptr);
-		
-#elif _WIN32
-        void __stdcall MainEntry(LPVOID manager)
-	    {
-		    CoroutineComponent *pCoroutineMgr = (CoroutineComponent *)manager;
-        }
-#elif __linux__
-void MainEntry(void *manager)
-	{
-		CoroutineComponent *pCoroutineMgr = (CoroutineComponent *)manager;
-    }
-#endif
 	}
 
     CoroutineComponent::CoroutineComponent()
     {
         this->mMainCoroutine = this->mCorPool.Pop();
-#ifdef __COROUTINE_ASM__
         for(Stack & stack : this->mSharedStack)
         {
-            stack.p = nullptr;
-            stack.top = nullptr;
+            stack.co = 0;
+            stack.size = STACK_SIZE;
+            stack.p = new char[STACK_SIZE];
+            stack.top = (char *)stack.p + STACK_SIZE;
         }
-#elif _WIN32
-        this->mMainCoroutine->mContextStack = ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
-#else
-        this->mTop = this->mSharedStack + STACK_SIZE;
-#endif
     }
 
 	CoroutineComponent::~CoroutineComponent() = default;
@@ -70,35 +50,28 @@ void MainEntry(void *manager)
     bool CoroutineComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
+        for (int index = 0; index < 100; index++)
+        {
+            this->StartCoroutine(&CoroutineComponent::Test, this, index);
+        }
         return true;
     }
 
-//	void CoroutineComponent::Start()
-//	{
-//		long long t1 = TimeHelper::GetMilTimestamp();
-//		auto group = this->NewCoroutineGroup();
-//
-//		for (int index = 0; index < 10000; index++)
-//		{
-//			group->Add(this->StartCoroutine(&CoroutineComponent::SleepTest, this));
-//		}
-//		group->AwaitAll();
-//		LOG_ERROR("use time = " << TimeHelper::GetMilTimestamp() - t1);
-//	}
-
-    void CoroutineComponent::SleepTest()
+    void CoroutineComponent::Test(int index)
     {
-		for (int index = 0; index < 1000; index++)
-		{
-			this->Resume(this->mCurrentCorId);
-			this->WaitForYield();
-		}
+        ElapsedTimer timer;
+        for (int x = 0; x < 10; x++)
+        {
+            this->WaitForSleep(10 + 10 * index + 10 * x);
+        }
+        LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
+
 
     void CoroutineComponent::WaitForSleep(long long ms)
     {
-        LOG_CHECK_RET(this->IsInLogicCoroutine());
-        StaticMethod * sleepMethod = NewMethodProxy(&CoroutineComponent::Resume, this, this->mCurrentCorId);
+        StaticMethod * sleepMethod = NewMethodProxy(
+                &CoroutineComponent::Resume, this, this->mCurrentCorId);
         this->mTimerManager->AddTimer(ms, sleepMethod);
         this->WaitForYield();
     }
@@ -107,16 +80,11 @@ void MainEntry(void *manager)
 	{    
 		co->mLastCoroutineId = this->mCurrentCorId;
         this->mCurrentCorId = co->mCoroutineId;
-#ifdef __COROUTINE_ASM__
-		Stack & stack = mSharedStack[co->sid];
-		if (stack.p == nullptr)
-		{
-            stack.size = STACK_SIZE;
-            stack.co = co->mCoroutineId;
-            stack.p = new char[STACK_SIZE];
-			stack.top = (char *)stack.p + STACK_SIZE;
-		}
+
+
         co->mState = CorState::Running;
+		Stack & stack = mSharedStack[co->sid];
+
         if(co->mContext == nullptr)
         {
             if(stack.co != this->mCurrentCorId)
@@ -141,38 +109,8 @@ void MainEntry(void *manager)
              {
                  lastCoroutine->mContext = from.ctx;
                  lastCoroutine->mState = CorState::Suspend;
-                 //this->SaveStack(lastCoroutine->mCoroutineId);
              }   
         }
-#elif _WIN32
-        if (logicCoroutine->mState == CorState::Ready)
-        {
-            logicCoroutine->mContextStack = CreateFiber(STACK_SIZE, MainEntry, this);
-            SwitchToFiber(logicCoroutine->mContextStack);
-        }
-        else if (logicCoroutine->mState == CorState::Suspend)
-        {
-            logicCoroutine->mState = CorState::Running;
-            SwitchToFiber(logicCoroutine->mContextStack);
-        }
-#elif __linux__
-        if (logicCoroutine->mState == CorState::Ready)
-        {
-            getcontext(&logicCoroutine->mContext);
-            logicCoroutine->mState = CorState::Running;
-            logicCoroutine->mContext.uc_stack.ss_size = STACK_SIZE;
-            logicCoroutine->mContext.uc_stack.ss_sp = this->mSharedStack;
-            logicCoroutine->mContext.uc_link = &this->mMainCoroutine->mContext;
-            makecontext(&logicCoroutine->mContext, (void (*)(void)) MainEntry, 1, this);
-            swapcontext(&this->mMainCoroutine->mContext, &logicCoroutine->mContext);
-        }
-        else if (logicCoroutine->mState == CorState::Suspend)
-        {
-            void *start = this->mSharedStack + STACK_SIZE - logicCoroutine->mStackSize;
-            memcpy(start, logicCoroutine->mContextStack, logicCoroutine->mStackSize);
-            swapcontext(&this->mMainCoroutine->mContext, &logicCoroutine->mContext);
-        }
-#endif
     }
 
 	void CoroutineComponent::WaitForYield()
@@ -185,15 +123,7 @@ void MainEntry(void *manager)
 		}
         logicCoroutine->mSwitchCount++;
 		logicCoroutine->mState = CorState::Suspend;
-#ifdef __COROUTINE_ASM__
-        //this->SaveStack(logicCoroutine->mCoroutineId);
 		tb_context_jump(this->mMainCoroutine->mContext, logicCoroutine);
-#elif _WIN32
-		SwitchToFiber(this->mMainCoroutine->mContextStack);
-#elif __linux__
-		this->SaveStack(logicCoroutine, this->mTop);
-		swapcontext(&logicCoroutine->mContext, &this->mMainCoroutine->mContext);
-#endif
 	}
 
 	void CoroutineComponent::Resume(unsigned int id)
@@ -220,16 +150,6 @@ void MainEntry(void *manager)
 		Coroutine * coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
 		{
-#ifndef __COROUTINE_ASM__
-	#ifdef _WIN32
-			if (coroutine->mContextStack != nullptr)
-			{
-				DeleteFiber(coroutine->mContextStack);
-				coroutine->mStackSize = 0;
-				coroutine->mContextStack = nullptr;
-			}
-	#endif
-#endif
 			coroutine->mFunction = func;
 			coroutine->mState = CorState::Ready;
 		}
@@ -271,19 +191,10 @@ void MainEntry(void *manager)
 				}
 			}
 		}
-        //LOG_ERROR(coroutine->mCoroutineId << " switch count " << coroutine->mSwitchCount);
         delete coroutine->mFunction;
 		this->mCorPool.Push(coroutine);
-#ifdef __COROUTINE_ASM__
-
-#elif _WIN32
-		SwitchToFiber(this->mMainCoroutine->mContextStack);
-#else
-		setcontext(&this->mMainCoroutine->mContext);
-#endif
 	}
 
-#ifdef __COROUTINE_ASM__
 	void CoroutineComponent::SaveStack(unsigned int id)
     {
         Coroutine *coroutine = this->GetCoroutine(id);
@@ -304,23 +215,8 @@ void MainEntry(void *manager)
 #endif
         }
         coroutine->mStack.size = size;
-        //LOG_ERROR("save stack size = " << size << "  id = " << id);
         memcpy(coroutine->mStack.p, coroutine->mContext, size);
     }
-#else
-    void CoroutineComponent::SaveStack(Coroutine *cor, char *top)
-	{		
-		char dummy = 0;
-		size_t size = top - &dummy;
-		if (cor->mStackSize < size)
-		{
-			free(cor->mContextStack);
-			cor->mContextStack = malloc(size);
-		}
-		cor->mStackSize = size;
-		memcpy(cor->mContextStack, &dummy, size);
-    }
-#endif 
 
 	void CoroutineComponent::OnSystemUpdate()
     {

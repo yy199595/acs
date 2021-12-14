@@ -28,22 +28,15 @@ namespace GameKeeper
 		explicit Coroutine();
         ~Coroutine();
     public:
+        int sid;
+        Stack mStack;
+        CorState mState;
         size_t mStackSize;
         unsigned int mGroupId;
+        tb_context_t mContext;
 		StaticMethod * mFunction;
         unsigned int mSwitchCount;
-		unsigned int mLastCoroutineId;
-#ifdef __COROUTINE_ASM__
-		int sid;
-		Stack mStack;
-		tb_context_t mContext;
-#elif __linux__
-		void * mContextStack;
-		ucontext_t mContext;
-#elif _WIN32
-		void * mContextStack;
-#endif
-        CorState mState;
         unsigned int mCoroutineId;
+        unsigned int mLastCoroutineId;
     };
 }

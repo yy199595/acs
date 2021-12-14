@@ -78,13 +78,9 @@ namespace GameKeeper
 			return this->mCurrentCorId != 0;
 		}
 	private:
-        void SleepTest();
-		void ResumeCoroutine(Coroutine * co);
-#ifdef __COROUTINE_ASM__
-		void SaveStack(unsigned int id);
-#else
-		void SaveStack(Coroutine *, char *top);
-#endif
+        void Test(int index);
+        void SaveStack(unsigned int id);
+        void ResumeCoroutine(Coroutine * co);
 	private:
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues1;
@@ -92,13 +88,8 @@ namespace GameKeeper
 	private:
 		CoroutinePool mCorPool;
 		Coroutine * mMainCoroutine;
-        unsigned int mCurrentCorId{};
-#ifdef __COROUTINE_ASM__
+        unsigned int mCurrentCorId;
 		Stack mSharedStack[SHARED_STACK_NUM];
-#else
-		char * mTop;
-		char mSharedStack[STACK_SIZE];
-#endif
 		std::queue<unsigned int> mResumeCoroutines;
         std::unordered_map<unsigned int, CoroutineGroup *> mCoroutineGroups;
 	};

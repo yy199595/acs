@@ -28,7 +28,7 @@
 namespace GameKeeper
 {
 
-	struct Coroutine;
+	class Coroutine;
 	class CoroutinePool
 	{
 	public:
