@@ -14,8 +14,8 @@ namespace GameKeeper
         ~HttpOperComponent() final = default;
 
     private:
-        XCode Hotfix(const RapidJsonReader & request, RapidJsonWriter & response);
-        XCode LoadConfig(const RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Hotfix(RapidJsonWriter & response);
+        XCode LoadConfig(RapidJsonWriter & response);
 
     private:
         XCode VerifyAccount(const RapidJsonReader & jsonData);

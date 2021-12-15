@@ -38,12 +38,6 @@
             "port":1995,
             "count": 10000,
             "handler": "ProtoGateClientComponent"
-        },
-        "http":
-        {
-            "port":80,
-            "count":1000,
-            "handler":"HttpComponent"
         }
     },
     "IsOpenRecoder": true,
@@ -69,7 +63,6 @@
         "LuaScriptComponent",
         "MysqlComponent",
         "MysqlProxyComponent",
-        "HttpComponent",
         "ProtoRpcComponent",
         "ProtoRpcClientComponent",
         "OperatorComponent",
@@ -83,9 +76,7 @@
         "GateService",
         "AccountService",
         "LocalHostService",
-        "CenterHostService",
-        "HttpLoginService",
-        "HttpOperComponent"
+        "CenterHostService"
     ],
     "WhiteList": [
         "127.0.0.1"

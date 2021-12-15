@@ -159,8 +159,7 @@ namespace GameKeeper
 
     bool RapidJsonWriter::Add(const char *key)
     {
-        return mJsonWriter.Key(key) &&
-               mJsonWriter.Null();
+        return mJsonWriter.Key(key);
     }
 }// namespace GameKeeper
 

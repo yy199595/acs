@@ -15,59 +15,44 @@ namespace GameKeeper
         return true;
     }
 
-    XCode HttpOperComponent::Hotfix(const RapidJsonReader & request, RapidJsonWriter & response)
+    bool HttpOperComponent::LateAwake()
     {
-        XCode code = this->VerifyAccount(request);
-        if(code != XCode::Successful)
-        {
-            return code;
-        }
+        return true;
+    }
+
+    XCode HttpOperComponent::Hotfix(RapidJsonWriter & response)
+    {
         std::vector<Component *> components;
         this->GetComponents(components);
+        response.StartArray("components");
         for(Component * component : components)
         {
             if(auto hotfix = dynamic_cast<IHotfix*>(component))
             {
                 hotfix->OnHotFix();
+                response.Add(component->GetTypeName().c_str());
                 LOG_DEBUG("========== " << component->GetTypeName() << " hotfix ==========");
             }
         }
+        response.EndArray();
         return XCode::Successful;
     }
 
-    XCode HttpOperComponent::LoadConfig(const RapidJsonReader & request, RapidJsonWriter & response)
+    XCode HttpOperComponent::LoadConfig(RapidJsonWriter & response)
     {
-        XCode code = this->VerifyAccount(request);
-        if(code != XCode::Successful)
+        response.StartArray("components");
+        std::vector<Component *> allComponent;
+        this->GetComponents(allComponent);
+        for (Component *component: allComponent)
         {
-            return code;
-        }
-        std::vector<std::string> components;
-        if(request.TryGetValue("components", components))
-        {
-            for(const std::string & name : components)
+            if (auto configModule = dynamic_cast<ILoadConfig *>(component))
             {
-                auto component = this->GetComponent<Component>(name);
-                if(auto configModule = dynamic_cast<ILoadConfig*>(component))
-                {
-                    configModule->OnLoadConfig();
-                    LOG_DEBUG("========== " << component->GetTypeName() << " load config ==========");
-                }
+                configModule->OnLoadConfig();
+                response.Add(component->GetTypeName().c_str());
+                LOG_DEBUG(component->GetTypeName() << " load config");
             }
         }
-        else
-        {
-            std::vector<Component *> allComponent;
-            this->GetComponents(allComponent);
-            for(Component * component : allComponent)
-            {
-                if(auto configModule = dynamic_cast<ILoadConfig*>(component))
-                {
-                    configModule->OnLoadConfig();
-                    LOG_DEBUG(component->GetTypeName() << " load config");
-                }
-            }
-        }
+        response.EndArray();
         return XCode::Successful;
     }
 
@@ -92,10 +77,5 @@ namespace GameKeeper
             return XCode::Failure;
         }
         return XCode::Successful;
-    }
-
-    bool HttpOperComponent::LateAwake()
-    {
-        return true;
     }
 }

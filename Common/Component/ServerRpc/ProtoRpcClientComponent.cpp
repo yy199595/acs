@@ -31,12 +31,16 @@ namespace GameKeeper
 	{
 		auto iter = this->mSessionAdressMap.find(socketId);
 		if (iter != this->mSessionAdressMap.end())
-		{
-			ProtoRpcClient * client = iter->second;
-			this->mSessionAdressMap.erase(iter);
-			LOG_ERROR("remove tcp socket " << client->GetAddress());
-			delete client;
-		}		
+        {
+            ProtoRpcClient *client = iter->second;
+            this->mSessionAdressMap.erase(iter);
+#ifdef __DEBUG__
+            auto component = App::Get().GetComponent<RpcConfigComponent>();
+            LOG_ERROR("remove tcp socket " << client->GetAddress() <<
+                                           " error :" << component->GetCodeDesc(code));
+#endif
+            delete client;
+        }
 	}
 
 	void ProtoRpcClientComponent::OnConnectAfter(long long id, XCode code)

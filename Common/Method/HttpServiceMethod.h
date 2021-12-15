@@ -48,14 +48,19 @@ namespace GameKeeper
     class HttpServiceJsonMethod : public HttpServiceMethod
     {
     public:
-        HttpServiceJsonMethod(T * o, HttpServiceJsonMethodType<T> func)
-                : _o(o), _func(func){}
+        HttpServiceJsonMethod(T *o, HttpServiceJsonMethodType<T> func)
+                : _o(o), _func(func)
+        {}
 
     public:
-		HttpStatus Invoke(HttpRemoteSession *session) override
+        HttpStatus Invoke(HttpRemoteSession *session) override
         {
             auto requestHandler = session->GetReuqestHandler();
             auto content = dynamic_cast<HttpReadStringContent *>(requestHandler->GetContent());
+            if (content == nullptr)
+            {
+                return HttpStatus::BAD_REQUEST;
+            }
 
             RapidJsonReader jsonReader;
             auto jsonWriter = new HttpJsonContent();
@@ -66,8 +71,9 @@ namespace GameKeeper
             requestHandler->SetResponseContent(jsonWriter);
             return HttpStatus::OK;
         }
+
     private:
-        T * _o;
+        T *_o;
         HttpServiceJsonMethodType<T> _func;
     };
 
