@@ -3,8 +3,8 @@
 //
 
 #include"ProtoProxyTask.h"
-#include"ProtoRpc/ProtoRpcComponent.h"
-#include"ProxyRpc/ProtoProxyComponent.h"
+#include"ServerRpc/ProtoRpcComponent.h"
+#include"ClientProxy/ProtoProxyComponent.h"
 namespace GameKeeper
 {
     ProtoProxyTask::ProtoProxyTask(int methodId, long long int rpcId)

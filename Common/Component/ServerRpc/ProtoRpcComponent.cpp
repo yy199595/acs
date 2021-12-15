@@ -6,7 +6,7 @@
 #include <Pool/MessagePool.h>
 #include <Method/LuaServiceMethod.h>
 #include"Scene/RpcConfigComponent.h"
-#include"ProtoRpc/ProtoRpcClientComponent.h"
+#include"ServerRpc/ProtoRpcClientComponent.h"
 #include "Other/ElapsedTimer.h"
 #include"Async/RpcTask/ProtoRpcTask.h"
 namespace GameKeeper

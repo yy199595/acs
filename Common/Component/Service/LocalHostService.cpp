@@ -1,6 +1,6 @@
 ﻿#include "LocalHostService.h"
 #include <Core/App.h>
-#include <Service/RpcNodeProxy.h>
+#include <Service/RpcNode.h>
 #include <Service/NodeProxyComponent.h>
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
@@ -58,7 +58,7 @@ namespace GameKeeper
             }
         }
 
-        RpcNodeProxy *centerNode = this->mNodeComponent->GetServiceNode(0);
+        RpcNode *centerNode = this->mNodeComponent->GetServiceNode(0);
         std::shared_ptr<s2s::NodeRegister_Response> response(new s2s::NodeRegister_Response());
         while(centerNode->Call("CenterHostService.Add", registerInfo, response) != XCode::Successful)
         {
@@ -97,16 +97,16 @@ namespace GameKeeper
     XCode LocalHostService::Del(const Int32Data &serviceData)
     {
         const int nodeId = serviceData.data();
-        RpcNodeProxy *nodeProxy = this->mNodeComponent->GetServiceNode(nodeId);
+        RpcNode *nodeProxy = this->mNodeComponent->GetServiceNode(nodeId);
         if(nodeProxy != nullptr)
         {
             std::vector<Component *> components;
             this->GetComponents(components);
             for (Component * component : components)
             {
-                if (auto serviceComponent = dynamic_cast<INodeProxyRefresh*>(component))
+                if (auto serviceComponent = dynamic_cast<INodeRefresh*>(component))
                 {
-                    serviceComponent->OnDelProxyNode(nodeProxy);
+                    serviceComponent->OnDelRpcNode(nodeProxy);
                 }
             }
             LOG_ERROR("remove node " << nodeProxy->GetNodeName());
@@ -117,7 +117,7 @@ namespace GameKeeper
 	XCode LocalHostService::Add(const s2s::NodeInfo & nodeInfo)
 	{
 		const int uid = nodeInfo.areaid() * 10000 + nodeInfo.nodeid();
-		RpcNodeProxy *serviceNode = this->mNodeComponent->GetServiceNode(uid);
+		RpcNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
 
         serviceNode->UpdateNodeProxy(nodeInfo);
 		// 通知所有服务
@@ -125,9 +125,9 @@ namespace GameKeeper
         this->GetComponents(components);
 		for (Component * component : components)
 		{
-			if (auto serviceComponent = dynamic_cast<INodeProxyRefresh*>(component))
+			if (auto serviceComponent = dynamic_cast<INodeRefresh*>(component))
 			{
-				serviceComponent->OnAddProxyNode(serviceNode);
+                serviceComponent->OnAddRpcNode(serviceNode);
 			}
 		}
 		return XCode::Successful;

@@ -3,7 +3,7 @@
 
 #include<Pool/MessagePool.h>
 #include<Scene/LuaScriptComponent.h>
-#include"ProtoRpc/ProtoRpcComponent.h"
+#include"ServerRpc/ProtoRpcComponent.h"
 #ifdef __DEBUG__
 #include"Scene/RpcConfigComponent.h"
 

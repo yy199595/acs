@@ -1,17 +1,15 @@
 ﻿#pragma once
 
-
-#include<Object/Object.h>
-#include<Async/RpcTask/ProtoRpcTask.h>
-#include<Coroutine/Coroutine.h>
 #include"Protocol/s2s.pb.h"
+#include<Async/RpcTask/ProtoRpcTask.h>
+
 using namespace google::protobuf;
 namespace GameKeeper
 {
-    class RpcNodeProxy : public Object
+    class RpcNode
     {
     public:
-        explicit RpcNodeProxy(int id);
+        explicit RpcNode(int id);
 
     public:
 
@@ -23,13 +21,13 @@ namespace GameKeeper
 
         short GetNodeId() const { return this->mNodeId; }
 
-        bool UpdateNodeProxy(const s2s::NodeInfo & nodeInfo,long long socketId = 0);
+        bool UpdateNodeProxy(const s2s::NodeInfo & nodeInfo);
 
         const s2s::NodeInfo & GetNodeInfo() const { return this->mNodeInfo; }
 
-        bool SendRequestData(const com::Rpc_Request * message);
+        bool SendRequestData(com::Rpc_Request * message);
 
-        com::Rpc_Request * CreateProtoRequest(const std::string & method, int & methodId);
+        com::Rpc_Request * NewRequest(const std::string & method, int & methodId);
     public:
         void Destory();
 
@@ -55,7 +53,7 @@ namespace GameKeeper
        std::shared_ptr<CppProtoRpcTask> NewRpcTask(const std::string & method, const Message & message);
 
     private:
-        void OnNodeSessionRefresh();
+        void OnConnectAfter();
         class ProtoRpcClient *GetTcpSession();
     private:
         int mGlobalId;
@@ -73,8 +71,8 @@ namespace GameKeeper
         std::set<std::string> mServiceArray;//服务列表
         TaskComponent *mCorComponent;//协程
         class ProtoRpcComponent * mRpcComponent;
-        std::queue<const Message *> mWaitSendQueue;
         class RpcConfigComponent *mRpcConfigComponent;
+        std::queue<com::Rpc_Request *> mWaitSendQueue;
         class ProtoRpcClientComponent * mRpcClientComponent;
     };
 }// namespace GameKeeper

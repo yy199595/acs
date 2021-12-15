@@ -21,7 +21,7 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    class RpcNodeProxy;
+    class RpcNode;
     // 所有方法都注册到这里(全局唯一)
     class CenterHostService : public ProtoServiceComponent, public ILoadConfig
     {
@@ -43,7 +43,7 @@ namespace GameKeeper
 
         XCode QueryHosts(s2s::HostQuery_Response & response);
     private:
-        void NoticeAllNode(const s2s::NodeInfo & nodeInfo);
+        XCode NoticeAllNode(const s2s::NodeInfo & nodeInfo);
         void AddNewNode(unsigned short areaId, unsigned int nodeId);
         const ServerGroupConfig * GetGroupConfig(unsigned int groupId);
 

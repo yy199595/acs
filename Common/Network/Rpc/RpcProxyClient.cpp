@@ -8,7 +8,7 @@
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
-#include"ProxyRpc/ProtoProxyClientComponent.h"
+#include"ClientProxy/ProtoProxyClientComponent.h"
 namespace GameKeeper
 {
     RpcProxyClient::RpcProxyClient(SocketProxy * socket, SocketType type,
@@ -63,7 +63,8 @@ namespace GameKeeper
         this->mNetWorkThread.Invoke(&RpcProxyClient::CloseSocket, this, code);
     }
 
-    bool RpcProxyClient::StartSendData(char type, const Message *message)
+
+    bool RpcProxyClient::SendToClient(const c2s::Rpc_Request *message)
     {
         if(!this->IsOpen())
         {
@@ -71,27 +72,38 @@ namespace GameKeeper
         }
         if(this->mNetWorkThread.IsCurrentThread())
         {
-            this->SendData(type, message);
+            this->SendData(RPC_TYPE_REQUEST, message);
             return true;
         }
-        this->mNetWorkThread.Invoke(&RpcProxyClient::SendData, this, type, message);
+        this->mNetWorkThread.Invoke(&RpcProxyClient::SendData, this, RPC_TYPE_REQUEST, message);
         return true;
     }
 
-    void RpcProxyClient::SendData(char type, const Message *message)
+    bool RpcProxyClient::SendToClient(const c2s::Rpc_Response *message)
     {
-        LocalObject<Message> lock(message);
-        const int body = message->ByteSize();
-        size_t head = sizeof(char) + sizeof(int);
-		
-		char * buffer = new char[head + body];
-
-        buffer[0] = type;
-        memcpy(buffer + sizeof(char), &body, sizeof(body));
-        if (!message->SerializePartialToArray(buffer + head, body))
+        if(!this->IsOpen())
         {
-            return;
+            return false;
         }
-        this->AsyncSendMessage(std::move(buffer), head + body);
+        if(this->mNetWorkThread.IsCurrentThread())
+        {
+            this->SendData(RPC_TYPE_RESPONSE, message);
+            return true;
+        }
+        this->mNetWorkThread.Invoke(&RpcProxyClient::SendData, this, RPC_TYPE_RESPONSE, message);
+        return true;
+    }
+
+    void RpcProxyClient::OnSendData(XCode code, const Message * message)
+    {
+#ifdef __DEBUG__
+        if(code != XCode::Successful)
+        {
+            std::string json;
+            util::MessageToJsonString(*message, &json);
+            std::cout << "send message to client error : " << json << std::endl;
+        }
+#endif
+        delete message;
     }
 }

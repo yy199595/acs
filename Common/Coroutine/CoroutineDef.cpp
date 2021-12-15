@@ -26,9 +26,7 @@ namespace GameKeeper
             coroutine = new Coroutine();
         }
         coroutine->mCoroutineId = this->mNumPool.Pop();
-#ifdef __COROUTINE_ASM__
         coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
-#endif
         this->mCorMap.emplace(coroutine->mCoroutineId, coroutine);
         return coroutine;
     }

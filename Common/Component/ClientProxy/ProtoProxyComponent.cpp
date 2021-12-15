@@ -4,13 +4,13 @@
 
 #include"ProtoProxyComponent.h"
 #include"Core/App.h"
-#include"Service/RpcNodeProxy.h"
+#include"Service/RpcNode.h"
+#include"Rpc/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
 #include"Async/RpcTask/ProtoProxyTask.h"
-#include"ProtoRpc/ProtoRpcComponent.h"
-#include"Rpc/RpcProxyClient.h"
-#include"ProxyRpc/ProtoProxyClientComponent.h"
+#include"ServerRpc/ProtoRpcComponent.h"
+#include"ClientProxy/ProtoProxyClientComponent.h"
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
@@ -63,7 +63,7 @@ namespace GameKeeper
         }
 
         int methodId = 0;
-        auto requestMessage = nodeService->CreateProtoRequest(request->methodname(), methodId);
+        auto requestMessage = nodeService->NewRequest(request->methodname(), methodId);
         if (request->has_data())
         {
             requestMessage->mutable_data()->CopyFrom(request->data());
@@ -90,7 +90,7 @@ namespace GameKeeper
         LOG_WARN("json = " << json);
         LOG_WARN("*****************************************");
 #endif
-        if(proxyClient == nullptr || !proxyClient->StartSendData(RPC_TYPE_RESPONSE, response))
+        if(proxyClient == nullptr || !proxyClient->SendToClient(response))
         {
             return XCode::NetWorkError;
         }

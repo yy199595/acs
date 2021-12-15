@@ -1,15 +1,15 @@
-﻿#include "RpcNodeProxy.h"
-#include <Core/App.h>
-#include <Coroutine/TaskComponent.h>
-#include <Async/RpcTask/ProtoRpcTask.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
-#include <Util/StringHelper.h>
-#include <Scene/RpcConfigComponent.h>
-#include <google/protobuf/util/json_util.h>
-#include"ProtoRpc//ProtoRpcComponent.h"
+﻿#include "RpcNode.h"
+#include<Core/App.h>
+#include<Coroutine/TaskComponent.h>
+#include<Async/RpcTask/ProtoRpcTask.h>
+#include<ServerRpc/ProtoRpcClientComponent.h>
+#include<Util/StringHelper.h>
+#include<Scene/RpcConfigComponent.h>
+#include<google/protobuf/util/json_util.h>
+#include"ServerRpc/ProtoRpcComponent.h"
 namespace GameKeeper
 {
-	RpcNodeProxy::RpcNodeProxy(int id)
+	RpcNode::RpcNode(int id)
 		:  mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
         this->mRpcComponent = App::Get().GetComponent<ProtoRpcComponent>();
@@ -18,7 +18,7 @@ namespace GameKeeper
         LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
 	}
 
-	bool RpcNodeProxy::AddService(const std::string &service)
+	bool RpcNode::AddService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		if (iter == this->mServiceArray.end())
@@ -29,7 +29,7 @@ namespace GameKeeper
 		return false;
 	}
 
-    bool RpcNodeProxy::UpdateNodeProxy(const s2s::NodeInfo &nodeInfo,long long socketId)
+    bool RpcNode::UpdateNodeProxy(const s2s::NodeInfo &nodeInfo)
     {
         auto iter = nodeInfo.listeners().find("rpc");
         if(iter == nodeInfo.listeners().end())
@@ -37,60 +37,51 @@ namespace GameKeeper
             return false;
         }
 
-        this->mSocketId = socketId;
         this->mServiceArray.clear();
         this->mAreaId = nodeInfo.areaid();
         this->mNodeId = nodeInfo.nodeid();
         this->mNodeIp = nodeInfo.serverip();
         this->mNodeName = nodeInfo.servername();
 
-        this->Init(nodeInfo.servername());
         this->mNodePort = (unsigned short)iter->second;
         for(const std::string & name : nodeInfo.services())
         {
             this->mServiceArray.insert(name);
         }
         this->mNodeInfo.CopyFrom(nodeInfo);
-        if(this->mSocketId != 0)
-        {
-            this->OnNodeSessionRefresh();
-        }
         return true;
     }
 
-    ProtoRpcClient * RpcNodeProxy::GetTcpSession()
+    ProtoRpcClient * RpcNode::GetTcpSession()
     {
-        if(this->mSocketId == 0)
+        auto rpcClient = this->mRpcClientComponent->GetRpcSession(this->mSocketId);
+        if(rpcClient == nullptr)
         {
-           auto rpcClient = this->mRpcClientComponent->NewSession(this->mNodeName);
-           if(rpcClient != nullptr)
-           {
-               this->mSocketId = rpcClient->GetSocketProxy().GetSocketId();
-			   auto method = NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this);
-               rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
-           }
-            return rpcClient;
+            rpcClient = this->mRpcClientComponent->NewSession(this->mNodeName);
         }
-        return this->mRpcClientComponent->GetRpcSession(this->mSocketId);
+        if(!rpcClient->IsOpen())
+        {
+            this->mSocketId = rpcClient->GetSocketProxy().GetSocketId();
+            auto method = NewMethodProxy(&RpcNode::OnConnectAfter, this);
+            rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
+        }
+        return rpcClient;
     }
 
-    void RpcNodeProxy::OnNodeSessionRefresh()
+    void RpcNode::OnConnectAfter()
     {
-        ProtoRpcClient *tcpLocalSession = this->GetTcpSession();
-        if(!tcpLocalSession->IsOpen())
-        {
-            LOG_ERROR(this->mNodeName << " socket error");
-            return;
-        }
         while(!this->mWaitSendQueue.empty())
         {
-            const Message * message = this->mWaitSendQueue.front();
-            tcpLocalSession->StartSendProtocol(TYPE_REQUEST, message);
+            auto message  = this->mWaitSendQueue.front();
+            if(!this->mRpcClientComponent->SendByAddress(this->mSocketId, message))
+            {
+                break;
+            }
             this->mWaitSendQueue.pop();
         }
     }
 
-    void RpcNodeProxy::Destory()
+    void RpcNode::Destory()
     {
         size_t size = this->mWaitSendQueue.size();
         this->mRpcClientComponent->CloseSession(this->mSocketId);
@@ -101,13 +92,13 @@ namespace GameKeeper
         delete this;
     }
 
-    bool RpcNodeProxy::HasService(const std::string &service)
+    bool RpcNode::HasService(const std::string &service)
 	{
 		auto iter = this->mServiceArray.find(service);
 		return iter != this->mServiceArray.end();
 	}
 
-    void RpcNodeProxy::GetServices(std::vector<std::string> & services)
+    void RpcNode::GetServices(std::vector<std::string> & services)
     {
         services.clear();
         for(const std::string & name : this->mServiceArray)
@@ -116,7 +107,7 @@ namespace GameKeeper
         }
     }
 
-    XCode RpcNodeProxy::Notice(const std::string &method)
+    XCode RpcNode::Notice(const std::string &method)
     {
         auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
         if (config == nullptr)
@@ -130,7 +121,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-	XCode RpcNodeProxy::Notice(const std::string &method, const Message &request)
+	XCode RpcNode::Notice(const std::string &method, const Message &request)
 	{
         auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
         if (config == nullptr)
@@ -144,7 +135,7 @@ namespace GameKeeper
         return XCode::Successful;
 	}
 
-	com::Rpc_Request * RpcNodeProxy::CreateProtoRequest(const std::string & method, int & methodId)
+	com::Rpc_Request * RpcNode::NewRequest(const std::string & method, int & methodId)
 	{
 		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
 		if (config == nullptr)
@@ -158,43 +149,37 @@ namespace GameKeeper
 		return request;
 	}
 
-    bool RpcNodeProxy::SendRequestData(const com::Rpc_Request * message)
+    bool RpcNode::SendRequestData(com::Rpc_Request * message)
     {
-        ProtoRpcClient *rpcClient = this->GetTcpSession();
-        if (rpcClient != nullptr && rpcClient->IsOpen())
+        auto rpcClient = this->GetTcpSession();
+        if(!rpcClient->SendToServer(message))
         {
-            rpcClient->StartSendProtocol(TYPE_REQUEST, message);
-            return true;
-        } else if (rpcClient->GetSocketType() == SocketType::LocalSocket)
-        {
-            if (!rpcClient->IsConnected())
-            {
-                auto method = NewMethodProxy(&RpcNodeProxy::OnNodeSessionRefresh, this);
-                rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
-            }
+            this->mWaitSendQueue.push(message);
+            return false;
         }
-        this->mWaitSendQueue.push(message);
-        return false;
+        return true;
     }
 
-    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::NewRpcTask(const std::string &method)
+    std::shared_ptr<CppProtoRpcTask> RpcNode::NewRpcTask(const std::string &method)
     {
         int methodId = 0;
-        auto requestData = this->CreateProtoRequest(method, methodId);
+        auto requestData = this->NewRequest(method, methodId);
         if (requestData == nullptr)
         {
+            LOG_ERROR("not find rpc config " << method);
             return std::make_shared<CppProtoRpcTask>(XCode::NotFoundRpcConfig);
         }
         this->SendRequestData(requestData);
         return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
     }
 
-    std::shared_ptr<CppProtoRpcTask> RpcNodeProxy::NewRpcTask(const std::string &method, const Message &message)
+    std::shared_ptr<CppProtoRpcTask> RpcNode::NewRpcTask(const std::string &method, const Message &message)
     {
         int methodId = 0;
-        auto requestData = this->CreateProtoRequest(method, methodId);
+        auto requestData = this->NewRequest(method, methodId);
         if (requestData == nullptr)
         {
+            LOG_ERROR("not find rpc config " << method);
             return std::make_shared<CppProtoRpcTask>(XCode::NotFoundRpcConfig);
         }
         requestData->mutable_data()->PackFrom(message);
@@ -202,23 +187,23 @@ namespace GameKeeper
         return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
     }
 
-    XCode RpcNodeProxy::Call(const string &func)
+    XCode RpcNode::Call(const string &func)
     {
         return this->NewRpcTask(func)->Await();
     }
 
-    XCode RpcNodeProxy::Call(const string &func, const Message &request)
+    XCode RpcNode::Call(const string &func, const Message &request)
     {
         return this->NewRpcTask(func, request)->Await();
     }
 
-    XCode RpcNodeProxy::Call(const string &func, std::shared_ptr<Message> response)
+    XCode RpcNode::Call(const string &func, std::shared_ptr<Message> response)
     {
         auto rpcTask = this->NewRpcTask(func);
         return rpcTask->Await(std::move(response));
     }
 
-    XCode RpcNodeProxy::Call(const string &func, const Message &request, std::shared_ptr<Message> response)
+    XCode RpcNode::Call(const string &func, const Message &request, std::shared_ptr<Message> response)
     {
         auto rpcTask = this->NewRpcTask(func, request);
         return rpcTask->Await(std::move(response));

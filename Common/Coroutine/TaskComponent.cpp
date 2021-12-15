@@ -55,7 +55,7 @@ namespace GameKeeper
         this->Start([this]() {
             ElapsedTimer timer;
             CoroutineGroup *group = this->NewCoroutineGroup();
-            for (int index = 0; index < 10; index++) {
+            for (int index = 0; index < 1000; index++) {
                 group->Add(this->Start(&TaskComponent::Test, this, index));
             }
             group->AwaitAll();
@@ -68,11 +68,9 @@ namespace GameKeeper
     void TaskComponent::Test(int index)
     {
         ElapsedTimer timer;
-        for (int x = 0; x < 1000; x++)
+        for (int x = 0; x < 10; x++)
         {
-            //this->AwaitSleep(10 + 10 * index + 10 * x);
-            this->mResumeCoroutines.push(this->mCurrentCorId);
-            this->Await();
+            this->AwaitSleep(10 + 5 * index + x);
         }
         //LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
@@ -111,6 +109,7 @@ namespace GameKeeper
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
         }
 		co->mContext = tb_context_jump(co->mContext, nullptr).ctx;
+        this->mCurrentCorId = co->mLastCoroutineId;
     }
 
 	void TaskComponent::Await()

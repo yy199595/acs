@@ -2,8 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
-#include <Pool/MessagePool.h>
+#include <ServerRpc/ProtoRpcClientComponent.h>
 namespace GameKeeper
 {
 

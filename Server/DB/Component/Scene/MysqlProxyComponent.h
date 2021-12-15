@@ -4,7 +4,8 @@
 namespace GameKeeper
 {
     class MysqlRpcTask;
-    class MysqlProxyComponent : public Component, public IFrameUpdate, public ILoadData, public INodeProxyRefresh
+    class MysqlProxyComponent : public Component,
+            public IFrameUpdate, public ILoadData, public INodeRefresh
     {
     public:
         MysqlProxyComponent() = default;
@@ -20,9 +21,9 @@ namespace GameKeeper
 
         void OnFrameUpdate(float t) final;
 
-        void OnAddProxyNode(class RpcNodeProxy *node) final;
+        void OnAddRpcNode(class RpcNode *node) final;
 
-        void OnDelProxyNode(class RpcNodeProxy *node) final;
+        void OnDelRpcNode(class RpcNode *node) final;
 	private:
 		void AddUserData();
 		void SortUserData();

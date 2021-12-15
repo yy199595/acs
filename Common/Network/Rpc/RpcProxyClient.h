@@ -19,15 +19,15 @@ namespace GameKeeper
     public:
         void StartClose();
         unsigned int GetQps() const { return this->mQps;}
-        bool StartSendData(char type, const Message * message);
+        bool SendToClient(const c2s::Rpc_Request * message);
+        bool SendToClient(const c2s::Rpc_Response * message);
         unsigned int GetCallCount() const { return this->mCallCount;}
     protected:
         void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
+        void OnSendData(XCode code, const Message *) final;
         XCode OnRequest(const char *buffer, size_t size) final;
         XCode OnResponse(const char *buffer, size_t size) final;
-    private:
-        void SendData(char type, const Message * message);
     private:
         unsigned int mQps;
         unsigned int mCallCount;

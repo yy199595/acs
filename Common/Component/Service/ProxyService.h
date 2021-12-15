@@ -7,7 +7,7 @@
 #include"ProtoServiceComponent.h"
 namespace GameKeeper
 {
-    class ProxyService : public ProtoServiceComponent, public INodeProxyRefresh
+    class ProxyService : public ProtoServiceComponent, public INodeRefresh
     {
     public:
         ProxyService();
@@ -15,8 +15,8 @@ namespace GameKeeper
     protected:
         bool Awake() final;
         bool LateAwake() final;
-        void OnAddProxyNode(class RpcNodeProxy *node) final;
-        void OnDelProxyNode(class RpcNodeProxy *node) final;
+        void OnAddRpcNode(class RpcNode *node) final;
+        void OnDelRpcNode(class RpcNode *node) final;
     private:
         XCode Ping();
         XCode Login(const c2s::ProxyLogin_Request & request);

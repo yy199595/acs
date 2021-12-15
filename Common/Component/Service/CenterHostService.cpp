@@ -1,10 +1,12 @@
-﻿#include "CenterHostService.h"
-#include <Core/App.h>
-#include <Util/StringHelper.h>
-#include <Service/RpcNodeProxy.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
-#include <Service/NodeProxyComponent.h>
-#include <Util/FileHelper.h>
+﻿#include"CenterHostService.h"
+#include<Core/App.h>
+#include<Util/StringHelper.h>
+#include<Service/RpcNode.h>
+#include<Util/FileHelper.h>
+#include<Service/NodeProxyComponent.h>
+#include<ServerRpc/ProtoRpcClientComponent.h>
+
+
 namespace GameKeeper
 {
 	bool CenterHostService::Awake()
@@ -41,24 +43,21 @@ namespace GameKeeper
             return XCode::NotServerGroupConfig;
         }
 
-        long long socketId = this->GetCurSocketId();
-        unsigned short nodeId = registerNodeInfo.nodeid();
+        int nodeId = registerNodeInfo.nodeid();
         const int globalId = areaId * 10000 + nodeId;
 
         auto nodeProxy = this->mNodeComponent->Create(globalId);
-        if (!nodeProxy->UpdateNodeProxy(nodeInfo.nodeinfo(), socketId))
+        if (!nodeProxy->UpdateNodeProxy(nodeInfo.nodeinfo()))
         {
             return XCode::InitNodeProxyFailure;
         }
 
-        this->AddNewNode(areaId, globalId);
-        this->NoticeAllNode(registerNodeInfo);
-
         response.set_globalid(globalId);
+        this->AddNewNode(areaId, globalId);
         response.mutable_groupdata()->set_token(groupConfig->mToken);
         response.mutable_groupdata()->set_groupname(groupConfig->mName);
         response.mutable_groupdata()->set_groupid(groupConfig->mGroupId);
-        return XCode::Successful;
+        return this->NoticeAllNode(registerNodeInfo);
     }
 
     XCode CenterHostService::QueryHosts(s2s::HostQuery_Response &response)
@@ -103,7 +102,7 @@ namespace GameKeeper
         return XCode::Successful;
 	}
 
-    void CenterHostService::NoticeAllNode(const s2s::NodeInfo & nodeInfo)
+    XCode CenterHostService::NoticeAllNode(const s2s::NodeInfo & nodeInfo)
     {
         auto areaId = (unsigned short)nodeInfo.areaid();
         auto iter = this->mServiceNodeMap.find(areaId);
@@ -111,10 +110,16 @@ namespace GameKeeper
         {
             for(unsigned int id : iter->second)
             {
-               auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
-               nodeProxy->Notice("LocalHostService.Add", nodeInfo);
+                auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
+                XCode code = nodeProxy->Call("LocalHostService.Add", nodeInfo);
+                if(code != XCode::Successful)
+                {
+                    return code;
+                }
+                LOG_DEBUG("add rpc node to " << nodeInfo.servername());
             }
         }
+        return XCode::Successful;
     }
 
     const ServerGroupConfig *CenterHostService::GetGroupConfig(unsigned int groupId)

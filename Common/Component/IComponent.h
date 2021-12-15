@@ -72,6 +72,10 @@ namespace GameKeeper
         virtual void StartClose(long long id) = 0;
         virtual void OnCloseSocket(long long id, XCode code) = 0;
         virtual void OnConnectAfter(long long id, XCode code) = 0;
+        virtual void OnSendFailure(long long id, const google::protobuf::Message * message)
+        {
+            delete message;
+        };
     };
 
     template<typename T1, typename T2>
@@ -108,11 +112,11 @@ namespace GameKeeper
         virtual bool OnResponse(const class RapidJsonReader * message) = 0;
     };
 
-    class INodeProxyRefresh
+    class INodeRefresh
     {
     public:
-        virtual void OnAddProxyNode(class RpcNodeProxy * node) = 0; //添加服务节点
-        virtual void OnDelProxyNode(class RpcNodeProxy * node) = 0; //删除服务节点
+        virtual void OnAddRpcNode(class RpcNode * node) = 0; //添加服务节点
+        virtual void OnDelRpcNode(class RpcNode * node) = 0; //删除服务节点
     };
 
 

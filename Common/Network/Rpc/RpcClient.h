@@ -2,6 +2,8 @@
 #include"Rpc.h"
 #include"XCode/XCode.h"
 #include"Network/SocketProxy.h"
+#include<google/protobuf/message.h>
+using namespace google::protobuf;
 #define TCP_BUFFER_COUNT 1024
 #define MAX_DATA_COUNT 1024 * 20 //处理的最大数据
 namespace GameKeeper
@@ -32,9 +34,11 @@ namespace GameKeeper
         void CloseSocket(XCode code);
         virtual void OnClose(XCode code) = 0;
         virtual void OnConnect(XCode code) = 0;
-		virtual XCode OnRequest(const char * buffer, size_t size) = 0;
+        virtual void OnSendData(XCode code, const Message *) = 0;
+        virtual XCode OnRequest(const char * buffer, size_t size) = 0;
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
-        bool AsyncSendMessage(const char * buffer, size_t size);
+    protected:
+        void SendData(char type, const Message * message);
 	protected:
 		AsioContext & mContext;
 		SocketProxy * mSocketProxy;
@@ -48,6 +52,7 @@ namespace GameKeeper
 		atomic_bool mIsConnect;
 		const SocketType mType;
 		long long mLastOperTime;
-		char mReceiveBuffer[TCP_BUFFER_COUNT];
+        char mSendBuffer[TCP_BUFFER_COUNT];
+        char mReceiveBuffer[TCP_BUFFER_COUNT];
 	};
 }

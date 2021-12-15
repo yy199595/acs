@@ -1,7 +1,7 @@
 {
     "AreaId": 1,
     "NodeId": 1,
-    "LogicFps": 30,
+    "Fps": 30,
     "SystemFps": 100,
     "NodeName": "Server",
     "Deadloop":30,

@@ -13,10 +13,10 @@
 #include <Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
-#include <ProtoRpc/ProtoRpcComponent.h>
+#include <ServerRpc/ProtoRpcComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/ThreadPoolComponent.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
+#include <ServerRpc/ProtoRpcClientComponent.h>
 #include <Service/AccountService.h>
 #include <Service/LocalHostService.h>
 #include <Service/CenterHostService.h>
@@ -27,8 +27,8 @@
 #include <Http/HttpOperComponent.h>
 #include "Scene/OperatorComponent.h"
 #include"Scene/LoggerComponent.h"
-#include"ProxyRpc/ProtoProxyComponent.h"
-#include"ProxyRpc/ProtoProxyClientComponent.h"
+#include"ClientProxy/ProtoProxyComponent.h"
+#include"ClientProxy/ProtoProxyClientComponent.h"
 using namespace GameKeeper;
 
 int main(int argc, char **argv)

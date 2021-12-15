@@ -27,9 +27,9 @@ namespace GameKeeper
 
 	bool App::AddComponentFormConfig()
 	{
+        this->AddComponent<TaskComponent>();
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<LoggerComponent>();
-		this->AddComponent<TaskComponent>();
 
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
@@ -165,7 +165,7 @@ namespace GameKeeper
 		}
 
         this->mFps = 15;
-		mConfig->GetValue("LogicFps", this->mFps);
+		mConfig->GetValue("Fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = TimeHelper::GetMilTimestamp();
 		this->mSecondTimer = TimeHelper::GetMilTimestamp();

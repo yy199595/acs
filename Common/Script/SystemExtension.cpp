@@ -1,14 +1,12 @@
 ﻿#include "SystemExtension.h"
 #include <Core/App.h>
-#include <ProtoRpc/ProtoRpcComponent.h>
 #include <Async/RpcTask/ProtoRpcTask.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/LuaScriptComponent.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
 
-#include <Service/RpcNodeProxy.h>
+#include <Service/RpcNode.h>
 using namespace GameKeeper;
 
 int SystemExtension::Call(lua_State *lua)
@@ -30,7 +28,7 @@ int SystemExtension::Call(lua_State *lua)
 
 	NodeProxyComponent * nodeComponent = App::Get().GetComponent<NodeProxyComponent>();
 
-	RpcNodeProxy * serviceNode = nodeComponent->GetServiceNode(nodeId);
+	RpcNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
 	{
 		lua_pushinteger(lua, XCode::CallServiceNotFound);

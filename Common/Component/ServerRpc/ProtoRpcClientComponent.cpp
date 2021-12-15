@@ -5,7 +5,7 @@
 #include<Scene/RpcConfigComponent.h>
 #include<Scene/ThreadPoolComponent.h>
 #include"Network/SocketProxy.h"
-#include<ProtoRpc/ProtoRpcComponent.h>
+#include<ServerRpc/ProtoRpcComponent.h>
 #ifdef __DEBUG__
 #include<Pool/MessagePool.h>
 #include<Async/RpcTask/ProtoRpcTask.h>
@@ -188,7 +188,6 @@ namespace GameKeeper
 		ProtoRpcClient * clientSession = this->GetSession(id);
 
         LOG_CHECK_RET_FALSE(clientSession);
-        LOG_CHECK_RET_FALSE(clientSession->IsOpen());
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(*message, &json);
@@ -199,8 +198,7 @@ namespace GameKeeper
         LOG_DEBUG("json = " << json);
         LOG_DEBUG("==============================================");
 #endif
-		clientSession->StartSendProtocol(RPC_TYPE_REQUEST, message);
-		return true;
+        return clientSession->SendToServer(message);
 	}
 
 	bool ProtoRpcClientComponent::SendByAddress(long long id, com::Rpc_Response * message)
@@ -208,7 +206,6 @@ namespace GameKeeper
 		ProtoRpcClient * clientSession = this->GetSession(id);
 
         LOG_CHECK_RET_FALSE(clientSession);
-        LOG_CHECK_RET_FALSE(clientSession->IsOpen());
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(*message, &json);
@@ -216,7 +213,6 @@ namespace GameKeeper
         LOG_DEBUG("json = " << json);
         LOG_DEBUG("==============================================");
 #endif
-		clientSession->StartSendProtocol(RPC_TYPE_RESPONSE, message);
-		return true;
+        return clientSession->SendToServer(message);
 	}
 }// namespace GameKeeper

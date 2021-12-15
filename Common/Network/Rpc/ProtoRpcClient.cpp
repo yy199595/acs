@@ -1,7 +1,6 @@
 ﻿#include"ProtoRpcClient.h"
 #include<Core/App.h>
-#include<Util/TimeHelper.h>
-#include<ProtoRpc/ProtoRpcClientComponent.h>
+#include<ServerRpc/ProtoRpcClientComponent.h>
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
@@ -23,20 +22,46 @@ namespace GameKeeper
         this->mNetWorkThread.Invoke(&ProtoRpcClient::CloseSocket, this, XCode::NetActiveShutdown);
 	}
 
-	bool ProtoRpcClient::StartSendProtocol(char type, const Message * message)
-	{
+    bool ProtoRpcClient::SendToServer(const com::Rpc_Response *message)
+    {
         if(!this->IsOpen())
         {
             return false;
         }
-		if (this->mNetWorkThread.IsCurrentThread())
-		{
-			this->SendProtocol(type, message);
-			return true;
-		}
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendProtocol, this, type, message);
+        if(this->mNetWorkThread.IsCurrentThread())
+        {
+            this->SendData(RPC_TYPE_RESPONSE, message);
+            return true;
+        }
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_RESPONSE, message);
         return true;
-	}
+    }
+
+    bool ProtoRpcClient::SendToServer(const com::Rpc_Request *message)
+    {
+        if(!this->IsOpen())
+        {
+            return false;
+        }
+        if(this->mNetWorkThread.IsCurrentThread())
+        {
+            this->SendData(RPC_TYPE_REQUEST, message);
+            return true;
+        }
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_REQUEST, message);
+        return true;
+    }
+
+    void ProtoRpcClient::OnSendData(XCode code, const Message * message)
+    {
+        if (code != XCode::Successful)
+        {
+            long long id = this->GetSocketId();
+            this->mNetWorkThread.Invoke(&ProtoRpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
+            return;
+        }
+        delete message;
+    }
 
 	void ProtoRpcClient::OnClose(XCode code)
 	{
@@ -70,23 +95,6 @@ namespace GameKeeper
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&ProtoRpcClientComponent::OnResponse, mTcpComponent, responseData);
 		return XCode::Successful;
-	}
-
-	void ProtoRpcClient::SendProtocol(char type, const Message * message)
-	{
-        LocalObject<Message> lock(message);
-		const int body = message->ByteSize();
-		size_t head = sizeof(char) + sizeof(int);
-		char * buffer = new char[head + body];
-       
-
-		buffer[0] = type;
-		memcpy(buffer + sizeof(char), &body, sizeof(body));
-		if (!message->SerializePartialToArray(buffer + head, body))
-		{
-            return;
-		}
-		this->AsyncSendMessage(buffer, head + body);
 	}
 
     void ProtoRpcClient::OnConnect(XCode code)

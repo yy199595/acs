@@ -4,9 +4,9 @@
 
 #include"ProxyService.h"
 #include"Core/App.h"
-#include"Service/RpcNodeProxy.h"
+#include"Service/RpcNode.h"
 #include"Rpc/RpcProxyClient.h"
-#include"ProxyRpc/ProtoProxyClientComponent.h"
+#include"ClientProxy/ProtoProxyClientComponent.h"
 namespace GameKeeper
 {
     ProxyService::ProxyService()
@@ -22,12 +22,12 @@ namespace GameKeeper
         return true;
     }
 
-    void ProxyService::OnAddProxyNode(RpcNodeProxy *node)
+    void ProxyService::OnAddRpcNode(RpcNode *node)
     {
 
     }
 
-    void ProxyService::OnDelProxyNode(RpcNodeProxy *node)
+    void ProxyService::OnDelRpcNode(RpcNode *node)
     {
 
     }

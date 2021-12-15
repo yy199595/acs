@@ -1,8 +1,8 @@
 #include "NodeProxyComponent.h"
 
 #include <Core/App.h>
-#include <Service/RpcNodeProxy.h>
-#include <ProtoRpc/ProtoRpcClientComponent.h>
+#include <Service/RpcNode.h>
+#include <ServerRpc/ProtoRpcClientComponent.h>
 
 namespace GameKeeper
 {
@@ -11,7 +11,7 @@ namespace GameKeeper
         auto iter = this->mServiceNodeMap.find(nodeId);
         if (iter != this->mServiceNodeMap.end())
         {
-            RpcNodeProxy *serviceNode = iter->second;
+            RpcNode *serviceNode = iter->second;
             mServiceNodeMap.erase(iter);
             if(serviceNode != nullptr)
             {
@@ -22,23 +22,23 @@ namespace GameKeeper
         return false;
     }
 
-    RpcNodeProxy *NodeProxyComponent::Create(int uid)
+    RpcNode *NodeProxyComponent::Create(int uid)
     {
         auto nodeProxy = this->GetServiceNode(uid);
         if (nodeProxy == nullptr)
         {
-            nodeProxy = new RpcNodeProxy(uid);
+            nodeProxy = new RpcNode(uid);
             this->mServiceNodeMap.emplace(uid, nodeProxy);
         }
         return nodeProxy;
     }
 
-	RpcNodeProxy * NodeProxyComponent::CreateNode(int uid, const s2s::NodeInfo & nodeInfo)
+	RpcNode * NodeProxyComponent::CreateNode(int uid, const s2s::NodeInfo & nodeInfo)
 	{
         auto nodeProxy = this->GetServiceNode(uid);
         if(nodeProxy == nullptr)
         {
-            nodeProxy = new RpcNodeProxy(uid);
+            nodeProxy = new RpcNode(uid);
         }
         if(!nodeProxy->UpdateNodeProxy(nodeInfo))
         {
@@ -72,14 +72,14 @@ namespace GameKeeper
         return true;
     }
 
-    RpcNodeProxy *NodeProxyComponent::GetServiceNode(int nodeId)
+    RpcNode *NodeProxyComponent::GetServiceNode(int nodeId)
     {
         auto iter = this->mServiceNodeMap.find(nodeId);
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
     }
 
     // 分配服务  TODO
-    RpcNodeProxy *NodeProxyComponent::AllotService(const string &name)
+    RpcNode *NodeProxyComponent::AllotService(const string &name)
     {
         auto iter = this->mServiceNodeMap.begin();
         for(; iter != this->mServiceNodeMap.end(); iter++)

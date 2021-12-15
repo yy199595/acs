@@ -4,7 +4,7 @@
 
 namespace GameKeeper
 {
-    class RpcNodeProxy;
+    class RpcNode;
 
     class NodeProxyComponent : public Component
     {
@@ -17,21 +17,21 @@ namespace GameKeeper
 
         int GetPriority() final { return 1; }
 
-        RpcNodeProxy * Create(int uid);
+        RpcNode * Create(int uid);
 
-		RpcNodeProxy * CreateNode(int uid, const s2s::NodeInfo & nodeInfo);
+		RpcNode * CreateNode(int uid, const s2s::NodeInfo & nodeInfo);
 
     protected:
         bool Awake() final;
         bool LateAwake() final;
     public:
-        RpcNodeProxy *GetServiceNode(int nodeId);
+        RpcNode *GetServiceNode(int nodeId);
 
-        RpcNodeProxy * AllotService(const std::string & name);
+        RpcNode * AllotService(const std::string & name);
     private:
 		int mAreaId;
         std::string mCenterIp;
         unsigned short mCenterPort;
-        std::unordered_map<int, RpcNodeProxy *> mServiceNodeMap;
+        std::unordered_map<int, RpcNode *> mServiceNodeMap;
     };
 }

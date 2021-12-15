@@ -5,8 +5,8 @@
 #include "ProtoProxyClientComponent.h"
 #include"Core/App.h"
 #include"Network/Rpc/RpcProxyClient.h"
-#include"ProxyRpc/ProtoProxyComponent.h"
-#include"ProtoRpc/ProtoRpcComponent.h"
+#include"ClientProxy/ProtoProxyComponent.h"
+#include"ServerRpc/ProtoRpcComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"Scene/RpcConfigComponent.h"
@@ -99,11 +99,11 @@ namespace GameKeeper
     bool ProtoProxyClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
     {
         auto proxyClient = this->GetProxyClient(sockId);
-        if(proxyClient == nullptr || !proxyClient->IsOpen())
+        if(proxyClient == nullptr)
         {
             return false;
         }
-        return proxyClient->StartSendData(RPC_TYPE_RESPONSE, message);
+        return proxyClient->SendToClient(message);
     }
 
     RpcProxyClient *ProtoProxyClientComponent::GetProxyClient(long long int sockId)

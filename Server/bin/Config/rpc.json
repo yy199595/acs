@@ -2,7 +2,7 @@
     "CenterHostService": {
         "Add": {
             "Id":101,
-            "Async":false,
+            "Async":true,
             "Timeout":0,
             "Type":"Server",
             "Request": "s2s.NodeRegister.Request",
