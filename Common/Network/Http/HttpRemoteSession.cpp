@@ -4,7 +4,7 @@
 
 #include "HttpRemoteSession.h"
 #include <Core/App.h>
-#include <Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>
 #include <Method/HttpServiceMethod.h>

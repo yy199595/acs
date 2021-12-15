@@ -6,7 +6,7 @@
 #include <Core/App.h>
 #include <Other/ProtocolConfig.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Component/Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper

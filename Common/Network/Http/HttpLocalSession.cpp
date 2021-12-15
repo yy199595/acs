@@ -3,7 +3,7 @@
 //
 
 #include "HttpLocalsession.h"
-#include <Component/Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include<Network/Http/Request/HttpGetRequest.h>
 #include<Network/Http/Request/HttpPostRequest.h>
 
@@ -78,7 +78,7 @@ namespace GameKeeper
         });
     }
 
-    XCode HttpLocalSession::Get(const std::string &url, HttpReadContent &response)
+    XCode HttpLocalSession::Get(const std::string &url, HttpReadContent *response)
     {
         if(!this->mGetHandler->Init(url, response))
         {
@@ -99,14 +99,16 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    XCode HttpLocalSession::Post(const std::string &url, HttpWriteContent &request, HttpReadContent &response)
+    XCode HttpLocalSession::Post(const std::string &url, HttpWriteContent * request, HttpReadContent *response)
     {
         if(!this->mPostHandler->Init(url, request, response))
         {
             return XCode::HttpUrlParseError;
         }
         this->mHttpHandler = this->mPostHandler;
-        this->StartConnectHost(this->mPostHandler->GetHost(), this->mPostHandler->GetPort());
+        const std::string & host = this->mPostHandler->GetHost();
+        const std::string & port = this->mPostHandler->GetPort();
+        this->StartConnectHost(host, port);
 
         App::Get().GetTaskComponent()->Await(this->mCorId);
         if(this->mCode != XCode::Successful)

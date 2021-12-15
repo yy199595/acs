@@ -8,7 +8,7 @@
 #include <Scene/RpcConfigComponent.h>
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
-#include <Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include"../Gate/Service/GateService.h"
 #include <Telnet/TelnetClientComponent.h>
 

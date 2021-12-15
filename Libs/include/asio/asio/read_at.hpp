@@ -2,7 +2,7 @@
 // read_at.hpp
 // ~~~~~~~~~~~
 //
-// Copyright (c) 2003-2019 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -457,14 +457,30 @@ std::size_t read_at(SyncRandomAccessReadDevice& d,
  *     d, 42, buffers,
  *     asio::transfer_all(),
  *     handler); @endcode
+ *
+ * @par Per-Operation Cancellation
+ * This asynchronous operation supports cancellation for the following
+ * asio::cancellation_type values:
+ *
+ * @li @c cancellation_type::terminal
+ *
+ * @li @c cancellation_type::partial
+ *
+ * if they are also supported by the @c AsyncRandomAccessReadDevice type's
+ * async_read_some_at operation.
  */
 template <typename AsyncRandomAccessReadDevice, typename MutableBufferSequence,
-    typename ReadHandler>
-ASIO_INITFN_RESULT_TYPE(ReadHandler,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) ReadHandler
+        ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
+          typename AsyncRandomAccessReadDevice::executor_type)>
+ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
     void (asio::error_code, std::size_t))
 async_read_at(AsyncRandomAccessReadDevice& d, uint64_t offset,
     const MutableBufferSequence& buffers,
-    ASIO_MOVE_ARG(ReadHandler) handler);
+    ASIO_MOVE_ARG(ReadHandler) handler
+      ASIO_DEFAULT_COMPLETION_TOKEN(
+        typename AsyncRandomAccessReadDevice::executor_type));
 
 /// Start an asynchronous operation to read a certain amount of data at the
 /// specified offset.
@@ -530,15 +546,32 @@ async_read_at(AsyncRandomAccessReadDevice& d, uint64_t offset,
  * See the @ref buffer documentation for information on reading into multiple
  * buffers in one go, and how to use it with arrays, boost::array or
  * std::vector.
+ *
+ * @par Per-Operation Cancellation
+ * This asynchronous operation supports cancellation for the following
+ * asio::cancellation_type values:
+ *
+ * @li @c cancellation_type::terminal
+ *
+ * @li @c cancellation_type::partial
+ *
+ * if they are also supported by the @c AsyncRandomAccessReadDevice type's
+ * async_read_some_at operation.
  */
-template <typename AsyncRandomAccessReadDevice, typename MutableBufferSequence,
-    typename CompletionCondition, typename ReadHandler>
-ASIO_INITFN_RESULT_TYPE(ReadHandler,
+template <typename AsyncRandomAccessReadDevice,
+    typename MutableBufferSequence, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) ReadHandler
+        ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
+          typename AsyncRandomAccessReadDevice::executor_type)>
+ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
     void (asio::error_code, std::size_t))
 async_read_at(AsyncRandomAccessReadDevice& d,
     uint64_t offset, const MutableBufferSequence& buffers,
     CompletionCondition completion_condition,
-    ASIO_MOVE_ARG(ReadHandler) handler);
+    ASIO_MOVE_ARG(ReadHandler) handler
+      ASIO_DEFAULT_COMPLETION_TOKEN(
+        typename AsyncRandomAccessReadDevice::executor_type));
 
 #if !defined(ASIO_NO_EXTENSIONS)
 #if !defined(ASIO_NO_IOSTREAM)
@@ -587,13 +620,30 @@ async_read_at(AsyncRandomAccessReadDevice& d,
  *     d, 42, b,
  *     asio::transfer_all(),
  *     handler); @endcode
+ *
+ * @par Per-Operation Cancellation
+ * This asynchronous operation supports cancellation for the following
+ * asio::cancellation_type values:
+ *
+ * @li @c cancellation_type::terminal
+ *
+ * @li @c cancellation_type::partial
+ *
+ * if they are also supported by the @c AsyncRandomAccessReadDevice type's
+ * async_read_some_at operation.
  */
 template <typename AsyncRandomAccessReadDevice, typename Allocator,
-    typename ReadHandler>
-ASIO_INITFN_RESULT_TYPE(ReadHandler,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) ReadHandler
+        ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
+          typename AsyncRandomAccessReadDevice::executor_type)>
+ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
     void (asio::error_code, std::size_t))
-async_read_at(AsyncRandomAccessReadDevice& d, uint64_t offset,
-    basic_streambuf<Allocator>& b, ASIO_MOVE_ARG(ReadHandler) handler);
+async_read_at(AsyncRandomAccessReadDevice& d,
+    uint64_t offset, basic_streambuf<Allocator>& b,
+    ASIO_MOVE_ARG(ReadHandler) handler
+      ASIO_DEFAULT_COMPLETION_TOKEN(
+        typename AsyncRandomAccessReadDevice::executor_type));
 
 /// Start an asynchronous operation to read a certain amount of data at the
 /// specified offset.
@@ -647,15 +697,32 @@ async_read_at(AsyncRandomAccessReadDevice& d, uint64_t offset,
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
  * manner equivalent to using asio::post().
+ *
+ * @par Per-Operation Cancellation
+ * This asynchronous operation supports cancellation for the following
+ * asio::cancellation_type values:
+ *
+ * @li @c cancellation_type::terminal
+ *
+ * @li @c cancellation_type::partial
+ *
+ * if they are also supported by the @c AsyncRandomAccessReadDevice type's
+ * async_read_some_at operation.
  */
-template <typename AsyncRandomAccessReadDevice, typename Allocator,
-    typename CompletionCondition, typename ReadHandler>
-ASIO_INITFN_RESULT_TYPE(ReadHandler,
+template <typename AsyncRandomAccessReadDevice,
+    typename Allocator, typename CompletionCondition,
+    ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
+      std::size_t)) ReadHandler
+        ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
+          typename AsyncRandomAccessReadDevice::executor_type)>
+ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
     void (asio::error_code, std::size_t))
 async_read_at(AsyncRandomAccessReadDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b,
     CompletionCondition completion_condition,
-    ASIO_MOVE_ARG(ReadHandler) handler);
+    ASIO_MOVE_ARG(ReadHandler) handler
+      ASIO_DEFAULT_COMPLETION_TOKEN(
+        typename AsyncRandomAccessReadDevice::executor_type));
 
 #endif // !defined(ASIO_NO_IOSTREAM)
 #endif // !defined(ASIO_NO_EXTENSIONS)

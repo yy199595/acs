@@ -17,7 +17,7 @@ namespace GameKeeper
     public:
         void Clear() override;
         HttpMethodType GetType() final { return HttpMethodType::POST; }
-        bool Init(const std::string & url, HttpWriteContent & request, HttpReadContent & response);
+        bool Init(const std::string & url, HttpWriteContent * request, HttpReadContent * response);
     protected:
         void WriteHead(std::ostream &os) final;
         bool WriteBody(std::ostream &os) final;

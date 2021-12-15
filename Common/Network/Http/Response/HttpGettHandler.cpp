@@ -5,7 +5,7 @@
 #include <Util/StringHelper.h>
 #include <Define/CommonLogDef.h>
 #include <Core/App.h>
-#include <Component/Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {

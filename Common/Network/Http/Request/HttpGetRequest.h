@@ -11,7 +11,7 @@ namespace GameKeeper
 		~HttpGetRequest() override = default;
 	public:
         void Clear() override;
-        bool Init(const std::string & url, HttpReadContent & response);
+        bool Init(const std::string & url, HttpReadContent * response);
         HttpMethodType GetType() final { return HttpMethodType::GET; }
 	protected:
         void WriteHead(std::ostream &os) final;

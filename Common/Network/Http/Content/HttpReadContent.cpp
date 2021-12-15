@@ -8,28 +8,9 @@
 #include <Define/CommonLogDef.h>
 namespace GameKeeper
 {
-    HttpReadStringContent::HttpReadStringContent(std::string &response)
-        : mResponse(&response), mIsDelete(false)
-    {
-
-    }
-
-    HttpReadStringContent::HttpReadStringContent()
-            : mResponse(new std::string()), mIsDelete(true)
-    {
-
-    }
-    HttpReadStringContent::~HttpReadStringContent() noexcept
-    {
-        if(this->mIsDelete)
-        {
-            delete this->mResponse;
-        }
-    }
-
     void HttpReadStringContent::OnReadContent(const char *data, size_t size)
     {
-        this->mResponse->append(data, size);
+        this->mResponse.append(data, size);
     }
 }
 

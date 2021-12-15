@@ -14,13 +14,13 @@ namespace GameKeeper
 		this->mResponse = nullptr;
 	}
 
-    bool HttpGetRequest::Init(const std::string &url, HttpReadContent &response)
+    bool HttpGetRequest::Init(const std::string &url, HttpReadContent *response)
     {
         if(!this->ParseUrl(url))
         {
             return false;
         }
-        this->mResponse = &response;
+        this->mResponse = response;
         return true;
     }
 

@@ -31,14 +31,14 @@ namespace GameKeeper
         }
     }
 
-    bool HttpPostRequest::Init(const std::string &url, HttpWriteContent &request, HttpReadContent &response)
+    bool HttpPostRequest::Init(const std::string &url, HttpWriteContent *request, HttpReadContent *response)
     {
         if(!this->ParseUrl(url))
         {
             return false;
         }
-        this->mReadContent = &response;
-        this->mWriteContent = &request;
+        this->mReadContent = response;
+        this->mWriteContent = request;
         return true;
     }
 

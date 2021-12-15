@@ -5,7 +5,7 @@
 #include "HttpPostHandler.h"
 #include <Core/App.h>
 #include <Network/Http/HttpRemoteSession.h>
-#include <Component/Scene/HttpComponent.h>
+#include <Component/Http/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {

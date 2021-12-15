@@ -24,16 +24,14 @@ namespace GameKeeper
     class HttpReadStringContent : public HttpReadContent
     {
     public:
-        explicit HttpReadStringContent();
-        explicit HttpReadStringContent(std::string & response);
-        ~HttpReadStringContent() final;
+        explicit HttpReadStringContent() = default;
+        ~HttpReadStringContent() final = default;
     public:
-        const std::string & GetContent() { return *mResponse;}
+        const std::string & GetContent() { return mResponse;}
         void OnReadContent(const char *data, size_t size) override;
         size_t GetContentSize() final { return this->mResponse->size(); }
     private:
-        bool mIsDelete;
-        std::string * mResponse;
+       std::string mResponse;
     };
 }
 

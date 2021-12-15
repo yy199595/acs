@@ -25,8 +25,8 @@ namespace GameKeeper
 		SocketType GetSocketType() final { return SocketType::LocalSocket; }
 
     public:
-        XCode Get(const std::string & url, HttpReadContent & response);
-        XCode Post(const std::string & url, HttpWriteContent & request, HttpReadContent & response);
+        XCode Get(const std::string & url, HttpReadContent * response);
+        XCode Post(const std::string & url, HttpWriteContent * request, HttpReadContent * response);
 	protected:
 
         void OnWriterAfter(XCode code) final;

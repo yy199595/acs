@@ -2,7 +2,7 @@
 // detail/is_buffer_sequence.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2019 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,8 @@ namespace asio {
 
 class mutable_buffer;
 class const_buffer;
+class mutable_registered_buffer;
+class const_registered_buffer;
 
 namespace detail {
 
@@ -53,18 +55,21 @@ struct buffer_sequence_memfns_check
 {
 };
 
-template <typename>
-char (&buffer_sequence_begin_helper(...))[2];
-
 #if defined(ASIO_HAS_DECLTYPE)
 
+template <typename>
+char buffer_sequence_begin_helper(...);
+
 template <typename T>
-char buffer_sequence_begin_helper(T* t,
+char (&buffer_sequence_begin_helper(T* t,
     typename enable_if<!is_same<
       decltype(asio::buffer_sequence_begin(*t)),
-        void>::value>::type*);
+        void>::value>::type*))[2];
 
 #else // defined(ASIO_HAS_DECLTYPE)
+
+template <typename>
+char (&buffer_sequence_begin_helper(...))[2];
 
 template <typename T>
 char buffer_sequence_begin_helper(T* t,
@@ -74,18 +79,21 @@ char buffer_sequence_begin_helper(T* t,
 
 #endif // defined(ASIO_HAS_DECLTYPE)
 
-template <typename>
-char (&buffer_sequence_end_helper(...))[2];
-
 #if defined(ASIO_HAS_DECLTYPE)
 
+template <typename>
+char buffer_sequence_end_helper(...);
+
 template <typename T>
-char buffer_sequence_end_helper(T* t,
+char (&buffer_sequence_end_helper(T* t,
     typename enable_if<!is_same<
       decltype(asio::buffer_sequence_end(*t)),
-        void>::value>::type*);
+        void>::value>::type*))[2];
 
 #else // defined(ASIO_HAS_DECLTYPE)
+
+template <typename>
+char (&buffer_sequence_end_helper(...))[2];
 
 template <typename T>
 char buffer_sequence_end_helper(T* t,
@@ -214,8 +222,8 @@ char mutable_buffers_type_typedef_helper(
 template <typename T, typename Buffer>
 struct is_buffer_sequence_class
   : integral_constant<bool,
-      sizeof(buffer_sequence_begin_helper<T>(0)) != 1 &&
-      sizeof(buffer_sequence_end_helper<T>(0)) != 1 &&
+      sizeof(buffer_sequence_begin_helper<T>(0, 0)) != 1 &&
+      sizeof(buffer_sequence_end_helper<T>(0, 0)) != 1 &&
       sizeof(buffer_sequence_element_type_helper<T, Buffer>(0, 0)) == 1>
 {
 };
@@ -248,6 +256,30 @@ struct is_buffer_sequence<const_buffer, const_buffer>
 
 template <>
 struct is_buffer_sequence<const_buffer, mutable_buffer>
+  : false_type
+{
+};
+
+template <>
+struct is_buffer_sequence<mutable_registered_buffer, mutable_buffer>
+  : true_type
+{
+};
+
+template <>
+struct is_buffer_sequence<mutable_registered_buffer, const_buffer>
+  : true_type
+{
+};
+
+template <>
+struct is_buffer_sequence<const_registered_buffer, const_buffer>
+  : true_type
+{
+};
+
+template <>
+struct is_buffer_sequence<const_registered_buffer, mutable_buffer>
   : false_type
 {
 };
