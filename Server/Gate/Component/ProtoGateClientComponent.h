@@ -2,18 +2,18 @@
 // Created by mac on 2021/11/28.
 //
 
-#ifndef GAMEKEEPER_PROTOPROXYCLIENTCOMPONENT_H
-#define GAMEKEEPER_PROTOPROXYCLIENTCOMPONENT_H
+#ifndef GAMEKEEPER_PROTOGATECLIENTCOMPONENT_H
+#define GAMEKEEPER_PROTOGATECLIENTCOMPONENT_H
 #include"Component.h"
 namespace GameKeeper
 {
     class RpcProxyClient;
-    class ProtoProxyClientComponent : public Component, public ISocketListen,
+    class ProtoGateClientComponent : public Component, public ISocketListen,
         public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>
     {
     public:
-        ProtoProxyClientComponent() = default;
-        ~ProtoProxyClientComponent() final= default;
+        ProtoGateClientComponent() = default;
+        ~ProtoGateClientComponent() final= default;
     public:
         void StartClose(long long id) final;
         void OnRequest(c2s::Rpc_Request * request) final;
@@ -34,10 +34,10 @@ namespace GameKeeper
         std::set<std::string> mBlackList;
         class TimerComponent * mTimerComponent;
         class ProtoRpcComponent * mRpcComponent;
-        class ProtoProxyComponent * mProxyComponent;
+        class ProtoGateComponent * mGateComponent;
         std::unordered_map<long long, RpcProxyClient *> mProxyClientMap;
     };
 }
 
 
-#endif //GAMEKEEPER_PROTOPROXYCLIENTCOMPONENT_H
+#endif //GAMEKEEPER_PROTOGATECLIENTCOMPONENT_H

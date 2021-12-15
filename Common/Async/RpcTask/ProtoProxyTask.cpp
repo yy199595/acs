@@ -4,7 +4,7 @@
 
 #include"ProtoProxyTask.h"
 #include"ServerRpc/ProtoRpcComponent.h"
-#include"ClientProxy/ProtoProxyComponent.h"
+#include"Component/ProtoGateComponent.h"
 namespace GameKeeper
 {
     ProtoProxyTask::ProtoProxyTask(int methodId, long long int rpcId)
@@ -16,7 +16,7 @@ namespace GameKeeper
         this->mProxyComponent = nullptr;
     }
 
-    void ProtoProxyTask::InitProxyTask(long long rpcId, long long sockId, ProtoProxyComponent *component,
+    void ProtoProxyTask::InitProxyTask(long long rpcId, long long sockId, ProtoGateComponent *component,
                                        ProtoRpcComponent *rpcComponent)
     {
         this->mClientRpcId = rpcId;

@@ -9,7 +9,7 @@
 namespace GameKeeper
 {
     class ProtoRpcComponent;
-    class ProtoProxyComponent;
+    class ProtoGateComponent;
     class ProtoProxyTask : public ProtoRpcTask
     {
     public:
@@ -18,13 +18,13 @@ namespace GameKeeper
 
     public:
         void InitProxyTask(long long rpcId, long long sockId,
-                           ProtoProxyComponent * component, ProtoRpcComponent * rpcComponent );
+                           ProtoGateComponent * component, ProtoRpcComponent * rpcComponent );
     protected:
         void OnResponse(const com::Rpc_Response *response) final;
     private:
         long long mClientRpcId;
         long long mClientSockId;
-        ProtoProxyComponent * mProxyComponent;
+        ProtoGateComponent * mProxyComponent;
     };
 }
 

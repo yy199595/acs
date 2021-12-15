@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"ProtoProxyComponent.h"
+#include"ProtoGateComponent.h"
 #include"Core/App.h"
 #include"Service/RpcNode.h"
 #include"Rpc/RpcProxyClient.h"
@@ -10,30 +10,30 @@
 #include"Service/NodeProxyComponent.h"
 #include"Async/RpcTask/ProtoProxyTask.h"
 #include"ServerRpc/ProtoRpcComponent.h"
-#include"ClientProxy/ProtoProxyClientComponent.h"
+#include"ProtoGateClientComponent.h"
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
 {
-    bool ProtoProxyComponent::Awake()
+    bool ProtoGateComponent::Awake()
     {
         this->mRpcConfigComponent = nullptr;
         this->mNodeProxyComponent = nullptr;
-        this->mProxyClientComponent = nullptr;
+        this->mGateClientComponent = nullptr;
         return true;
     }
 
-    bool ProtoProxyComponent::LateAwake()
+    bool ProtoGateComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         LOG_CHECK_RET_FALSE(this->mNodeProxyComponent = this->GetComponent<NodeProxyComponent>());
-        LOG_CHECK_RET_FALSE(this->mProxyClientComponent = this->GetComponent<ProtoProxyClientComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<ProtoGateClientComponent>());
         return true;
     }
 
-    XCode ProtoProxyComponent::OnRequest(const c2s::Rpc_Request *request)
+    XCode ProtoGateComponent::OnRequest(const c2s::Rpc_Request *request)
     {
         auto config = this->mRpcConfigComponent->GetProtocolConfig(request->methodname());
         if (config == nullptr)
@@ -80,9 +80,9 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    XCode ProtoProxyComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
+    XCode ProtoGateComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
     {
-        RpcProxyClient * proxyClient = this->mProxyClientComponent->GetProxyClient(sockId);
+        RpcProxyClient * proxyClient = this->mGateClientComponent->GetProxyClient(sockId);
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(*response, &json);

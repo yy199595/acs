@@ -33,11 +33,11 @@
             "count":10000,
             "handler":"ProtoRpcClientComponent"
         },
-        "proxy":
+        "gate":
         {
             "port":1995,
             "count": 10000,
-            "handler": "ProtoProxyClientComponent"
+            "handler": "ProtoGateClientComponent"
         },
         "http":
         {
@@ -73,14 +73,14 @@
         "ProtoRpcComponent",
         "ProtoRpcClientComponent",
         "OperatorComponent",
-        "ProtoProxyComponent",
+        "ProtoGateComponent",
         "RpcConfigComponent",
         "NodeProxyComponent",
-        "ProtoProxyClientComponent"
+        "ProtoGateClientComponent"
     ],
     "Service": [
         "MysqlService",
-        "ProxyService",
+        "GateService",
         "AccountService",
         "LocalHostService",
         "CenterHostService",

@@ -9,11 +9,11 @@
 using namespace google::protobuf;
 namespace GameKeeper
 {
-    class ProtoProxyClientComponent;
+    class ProtoGateClientComponent;
     class RpcProxyClient : public RpcClient
     {
     public:
-        RpcProxyClient(SocketProxy * socket,SocketType type, ProtoProxyClientComponent * component);
+        RpcProxyClient(SocketProxy * socket,SocketType type, ProtoGateClientComponent * component);
         ~RpcProxyClient() final =default;
 
     public:
@@ -31,7 +31,7 @@ namespace GameKeeper
     private:
         unsigned int mQps;
         unsigned int mCallCount;
-        ProtoProxyClientComponent * mProxyComponent;
+        ProtoGateClientComponent * mProxyComponent;
     };
 }
 

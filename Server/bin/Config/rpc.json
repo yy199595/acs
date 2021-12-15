@@ -112,7 +112,7 @@
             "Response": "c2s.AccountLogin.Response"
         }
     },
-    "ProxyService": {
+    "GateService": {
         "Ping": {
             "Id": 410,
             "Async": false,

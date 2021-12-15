@@ -9,7 +9,7 @@
 #include <Scene/RedisComponent.h>
 #include <Scene/MysqlProxyComponent.h>
 #include <Scene/HttpComponent.h>
-#include"Service/ProxyService.h"
+#include"../Gate/Service/GateService.h"
 #include <Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
@@ -27,8 +27,8 @@
 #include <Http/HttpOperComponent.h>
 #include "Scene/OperatorComponent.h"
 #include"Scene/LoggerComponent.h"
-#include"ClientProxy/ProtoProxyComponent.h"
-#include"ClientProxy/ProtoProxyClientComponent.h"
+#include"Component/ProtoGateComponent.h"
+#include"Component/ProtoGateClientComponent.h"
 using namespace GameKeeper;
 
 int main(int argc, char **argv)
@@ -53,11 +53,11 @@ int main(int argc, char **argv)
     REGISTER_COMPONENT(MonitorComponent);
 
     REGISTER_COMPONENT(LuaServiceMgrComponent);
-    REGISTER_COMPONENT(ProtoProxyComponent);
-    REGISTER_COMPONENT(ProtoProxyClientComponent);
+    REGISTER_COMPONENT(ProtoGateComponent);
+    REGISTER_COMPONENT(ProtoGateClientComponent);
 
     REGISTER_COMPONENT(MysqlService);
-    REGISTER_COMPONENT(ProxyService);
+    REGISTER_COMPONENT(GateService);
     REGISTER_COMPONENT(AccountService);
     REGISTER_COMPONENT(CenterHostService);
     REGISTER_COMPONENT(LocalHostService);

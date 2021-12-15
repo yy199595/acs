@@ -9,12 +9,12 @@
 #include"Component.h"
 namespace GameKeeper
 {
-    class ProtoProxyComponent : public Component,
+    class ProtoGateComponent : public Component,
         public IClientProtoRpc<c2s::Rpc_Request, c2s::Rpc_Response>
     {
     public:
-        ProtoProxyComponent() = default;
-        ~ProtoProxyComponent() final = default;
+        ProtoGateComponent() = default;
+        ~ProtoGateComponent() final = default;
     protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -26,7 +26,7 @@ namespace GameKeeper
         class ProtoRpcComponent * mRpcComponent;
         class RpcConfigComponent * mRpcConfigComponent;
         class NodeProxyComponent * mNodeProxyComponent;
-        class ProtoProxyClientComponent * mProxyClientComponent;
+        class ProtoGateClientComponent * mGateClientComponent;
     };
 }
 

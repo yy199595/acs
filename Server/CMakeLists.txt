@@ -15,6 +15,7 @@ include_directories(${PROJECT_COMMON_DIR}/Libs/include/jemalloc)
 #公共组件
 
 include_directories(${PROJECT_SOURCE_DIR}/DB)
+include_directories(${PROJECT_SOURCE_DIR}/Gate)
 include_directories(${PROJECT_SOURCE_DIR}/Logic)
 include_directories(${PROJECT_COMMON_DIR}/Common)
 include_directories(${PROJECT_COMMON_DIR}/Protocol)
@@ -25,13 +26,14 @@ include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)
 include_directories(${PROJECT_COMMON_DIR}/Common/Component)
 
 file(GLOB_RECURSE DBSource "DB/*.h" "DB/*.cpp" "DB/*.hpp" "DB/*.cc")
+file(GLOB_RECURSE GateSource "Gate/*.h" "Gate/*.cpp" "Gate/*.hpp" "Gate/*.cc")
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 file(GLOB_RECURSE LogicSource "Logic/*.h" "Logic/*.cpp" "Logic/*.hpp" "Logic/*.cc")
 
 LINK_DIRECTORIES(${PROJECT_COMMON_DIR}/Libs/lib)
 
 SET(CMAKE_BUILD_TYPE "Debug")
-list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource})
+list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource} ${GateSource})
 
 
 find_program(CCACHE_PROGRAM ccache)

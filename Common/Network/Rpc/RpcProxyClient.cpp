@@ -8,11 +8,11 @@
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
-#include"ClientProxy/ProtoProxyClientComponent.h"
+#include"Component/ProtoGateClientComponent.h"
 namespace GameKeeper
 {
     RpcProxyClient::RpcProxyClient(SocketProxy * socket, SocketType type,
-                                   ProtoProxyClientComponent *component)
+                                   ProtoGateClientComponent *component)
         : RpcClient(socket, type), mProxyComponent(component)
     {
         this->mQps = 0;
@@ -37,7 +37,7 @@ namespace GameKeeper
         std::cout << "receive player message count = " << this->mCallCount << std::endl;
         request->set_sockid(this->GetSocketId());
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&ProtoProxyClientComponent::OnRequest, this->mProxyComponent, request);
+        mainTaskScheduler.Invoke(&ProtoGateClientComponent::OnRequest, this->mProxyComponent, request);
         return XCode::Successful;
     }
     
@@ -50,7 +50,7 @@ namespace GameKeeper
     {
         long long id = this->GetSocketId();
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&ProtoProxyClientComponent::OnCloseSocket, this->mProxyComponent, id, code);
+        mainTaskScheduler.Invoke(&ProtoGateClientComponent::OnCloseSocket, this->mProxyComponent, id, code);
     }
 
     void RpcProxyClient::StartClose()

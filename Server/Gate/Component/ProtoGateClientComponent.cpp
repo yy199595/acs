@@ -2,10 +2,10 @@
 // Created by mac on 2021/11/28.
 //
 
-#include "ProtoProxyClientComponent.h"
+#include "ProtoGateClientComponent.h"
 #include"Core/App.h"
 #include"Network/Rpc/RpcProxyClient.h"
-#include"ClientProxy/ProtoProxyComponent.h"
+#include"ProtoGateComponent.h"
 #include"ServerRpc/ProtoRpcComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
@@ -14,23 +14,23 @@
 #endif
 namespace GameKeeper
 {
-    bool ProtoProxyClientComponent::Awake()
+    bool ProtoGateClientComponent::Awake()
     {
         this->mRpcComponent = nullptr;
         this->mTimerComponent = nullptr;
-        this->mProxyComponent = nullptr;
+        this->mGateComponent = nullptr;
         return true;
     }
 
-    bool ProtoProxyClientComponent::LateAwake()
+    bool ProtoGateClientComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get().GetTimerComponent());
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
-        LOG_CHECK_RET_FALSE(this->mProxyComponent = this->GetComponent<ProtoProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<ProtoGateComponent>());
         return true;
     }
 
-    void ProtoProxyClientComponent::OnListen(SocketProxy *socket)
+    void ProtoGateClientComponent::OnListen(SocketProxy *socket)
     {
         long long id = socket->GetSocketId();
         auto iter = this->mProxyClientMap.find(id);
@@ -44,13 +44,13 @@ namespace GameKeeper
 #endif
             rpcClient->StartReceive();
             this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
-            //this->mTimerComponent->AsyncWait(5000, &ProtoProxyClientComponent::CheckPlayerLogout, this, id);
+            //this->mTimerComponent->AsyncWait(5000, &ProtoGateClientComponent::CheckPlayerLogout, this, id);
             return;
         }
         delete socket;
     }
 
-    void ProtoProxyClientComponent::OnRequest(c2s::Rpc_Request *request) //客户端调过来的
+    void ProtoGateClientComponent::OnRequest(c2s::Rpc_Request *request) //客户端调过来的
     {
 #ifdef __DEBUG__
         std::string json;
@@ -62,7 +62,7 @@ namespace GameKeeper
 #endif
 
         LocalObject<c2s::Rpc_Request> local(request);
-        XCode code = this->mProxyComponent->OnRequest(request);
+        XCode code = this->mGateComponent->OnRequest(request);
         if(code != XCode::Successful)
         {
             auto responseMessage = new c2s::Rpc_Response();
@@ -77,7 +77,7 @@ namespace GameKeeper
         }
     }
 
-    void ProtoProxyClientComponent::OnCloseSocket(long long id, XCode code)
+    void ProtoGateClientComponent::OnCloseSocket(long long id, XCode code)
     {
         auto iter = this->mProxyClientMap.find(id);
         if(iter != this->mProxyClientMap.end())
@@ -96,7 +96,7 @@ namespace GameKeeper
         }
     }
 
-    bool ProtoProxyClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
+    bool ProtoGateClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
     {
         auto proxyClient = this->GetProxyClient(sockId);
         if(proxyClient == nullptr)
@@ -106,13 +106,13 @@ namespace GameKeeper
         return proxyClient->SendToClient(message);
     }
 
-    RpcProxyClient *ProtoProxyClientComponent::GetProxyClient(long long int sockId)
+    RpcProxyClient *ProtoGateClientComponent::GetProxyClient(long long int sockId)
     {
         auto iter = this->mProxyClientMap.find(sockId);
         return iter != this->mProxyClientMap.end() ? iter->second : nullptr;
     }
 
-    void ProtoProxyClientComponent::StartClose(long long int id)
+    void ProtoGateClientComponent::StartClose(long long int id)
     {
         RpcProxyClient * proxyClient = this->GetProxyClient(id);
         if(proxyClient != nullptr)
@@ -121,7 +121,7 @@ namespace GameKeeper
         }
     }
 
-    void ProtoProxyClientComponent::CheckPlayerLogout(long long sockId)
+    void ProtoGateClientComponent::CheckPlayerLogout(long long sockId)
     {
         RpcProxyClient * proxyClient = this->GetProxyClient(sockId);
         if(proxyClient != nullptr)
@@ -134,6 +134,6 @@ namespace GameKeeper
                 return;
             }
         }
-        this->mTimerComponent->AsyncWait(5000, &ProtoProxyClientComponent::CheckPlayerLogout, this, sockId);
+        this->mTimerComponent->AsyncWait(5000, &ProtoGateClientComponent::CheckPlayerLogout, this, sockId);
     }
 }
