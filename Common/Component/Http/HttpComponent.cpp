@@ -101,9 +101,9 @@ namespace GameKeeper
         HttpLocalSession httpLocalSession(this);
 #ifdef __DEBUG__
         long long t1 = TimeHelper::GetMilTimestamp();
-        XCode code = httpLocalSession.Post(url, content, response);
+        //XCode code = httpLocalSession.Post(url, content, response);
         LOG_INFO("post " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
-        return code;
+        return XCode::Successful;
 #else
         return httpLocalSession.Post(url, content, response);
 #endif

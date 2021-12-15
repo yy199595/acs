@@ -29,7 +29,7 @@ namespace GameKeeper
     public:
         const std::string & GetContent() { return mResponse;}
         void OnReadContent(const char *data, size_t size) override;
-        size_t GetContentSize() final { return this->mResponse->size(); }
+        size_t GetContentSize() final { return this->mResponse.size(); }
     private:
        std::string mResponse;
     };
