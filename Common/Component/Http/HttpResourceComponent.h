@@ -7,7 +7,7 @@
 #include"HttpServiceComponent.h"
 namespace GameKeeper
 {
-    class HttpRemoteSession;
+    class HttpRespSession;
     class HttpResourceComponent : public HttpServiceComponent, public ILoadConfig
     {
     public:
@@ -15,7 +15,7 @@ namespace GameKeeper
         ~HttpResourceComponent() override = default;
     private:
 		XCode Files(RapidJsonWriter & response);
-		HttpStatus Download(HttpRemoteSession * remoteSession);
+		HttpStatus Download(HttpRespSession * remoteSession);
     protected:
         bool Awake() final;
         bool LateAwake() final;

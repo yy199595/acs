@@ -4,7 +4,7 @@
 
 #include "HttpPostHandler.h"
 #include <Core/App.h>
-#include <Network/Http/HttpRemoteSession.h>
+#include <Network/Http/HttpRespSession.h>
 #include <Component/Http/HttpComponent.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
@@ -76,10 +76,11 @@ namespace GameKeeper
         this->mComponent = this->mPath.substr(pos1, pos2 - pos1);
         LOG_DEBUG("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
 
+        char buffer[256] = { 0 };
         while (streamBuf.size() > 0)
         {
-            size_t size = is.readsome(this->mHandlerBuffer, 1024);
-            this->mContent->OnReadContent(this->mHandlerBuffer, size);
+            size_t size = is.readsome(buffer, 256);
+            this->mContent->OnReadContent(buffer, size);
         }
 #ifdef __DEBUG__
         std::stringstream sss;
@@ -93,11 +94,12 @@ namespace GameKeeper
 
     bool HttpPostHandler::OnReceiveBody(asio::streambuf &streamBuf)
     {
+        char buffer[256] = { 0 };
         std::istream is(&streamBuf);
         while(streamBuf.size() > 0)
         {
-            size_t size = is.readsome(this->mHandlerBuffer, 1024);
-            this->mContent->OnReadContent(this->mHandlerBuffer, size);
+            size_t size = is.readsome(buffer, 256);
+            this->mContent->OnReadContent(buffer, size);
         }
         if(dynamic_cast<HttpReadStringContent *>(this->mContent))
         {

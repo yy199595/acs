@@ -9,27 +9,21 @@ namespace GameKeeper
 {
     class HttpComponent;
     class HttpRequestHandler;
-    class HttpRemoteSession : public HttpSessionBase
+    class HttpRespSession : public HttpSessionBase
     {
     public:
-        explicit HttpRemoteSession(HttpComponent * socketHandler);
-        ~HttpRemoteSession() final;
+        explicit HttpRespSession(HttpComponent * socketHandler);
+        ~HttpRespSession() final;
     public:
         void Start(SocketProxy * socketProxy);
 		SocketType GetSocketType() final { return SocketType::RemoteSocket; }
 		HttpRequestHandler * GetReuqestHandler() { return this->mHttpHandler; }
-    public:
-        void Clear() final;
 	protected:
+        void OnComplete(XCode code) final;
         void OnWriterAfter(XCode code) final;
-        void OnReceiveHeadAfter(XCode code) final;
-        bool WriterToBuffer(std::ostream &) final;
-        void OnReceiveHeard(asio::streambuf & buf) final;
-
-    private:
-        void StartReceiveBody();
-        void SetCode(XCode code);
-        void ReadBodyCallback(const asio::error_code & err, size_t size);
+        void WriterToBuffer(std::ostream & os) final;
+        bool OnReceiveHead(asio::streambuf &buf) final;
+        bool OnReceiveBody(asio::streambuf &buf) final;
     private:
         size_t mWriterCount;
         unsigned int mCorId;

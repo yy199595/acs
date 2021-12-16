@@ -4,19 +4,17 @@
 #include <Core/App.h>
 #include <Thread/TaskThread.h>
 #include "HttpComponent.h"
-#include <Coroutine/TaskComponent.h>
-#include <Http/HttpRemoteSession.h>
-#include <Http/Request/HttpGetRequest.h>
-#include <Http/Request/HttpPostRequest.h>
+#include <Http/HttpRespSession.h>
+#include"Http/Request/HttpGetRequest.h"
+#include"Http/Request/HttpPostRequest.h"
 #include <Method/HttpServiceMethod.h>
-#include <Http/Content/HttpWriteContent.h>
-#include <Http/Response/HttpPostHandler.h>
 #include <Http/HttpServiceComponent.h>
 #include <Other/ProtocolConfig.h>
-#include<Http/HttpLocalsession.h>
+#include"Other/ElapsedTimer.h"
+#include<Http/HttpReqSession.h>
 
-#include"Core/App.h"
 #include"Scene/LoggerComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 namespace GameKeeper
 {
 
@@ -29,19 +27,22 @@ namespace GameKeeper
     bool HttpComponent::LateAwake()
     {
         this->mCorComponent = App::Get().GetTaskComponent();
+        this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
+
+        std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
+        this->mCorComponent->Start([this, url1]() {
+            std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
+            this->Post(url1 ,"?chars=13716061995&key=1c937a17cc7fc4a5c4d142ea55169b03");
+        });
         return true;
     }
 
     void HttpComponent::OnListen(SocketProxy *socket)
     {
-        auto httpSession = this->CreateRemoteSession();
-        if(httpSession != nullptr)
-        {
-            httpSession->Start(socket);
-        }
+
     }
 
-	void HttpComponent::OnRequest(HttpRemoteSession * remoteSession)
+	void HttpComponent::OnRequest(HttpRespSession * remoteSession)
 	{
         auto requestHandler = remoteSession->GetReuqestHandler();
         const std::string & method = requestHandler->GetMethod();
@@ -70,46 +71,48 @@ namespace GameKeeper
         return component->GetMethod(method);
     }
 
-    XCode HttpComponent::Get(const std::string &url, std::string &json, int timeout)
+    XCode HttpComponent::Get(const std::string &url, int timeout)
     {
-        std::shared_ptr<HttpReadStringContent> content(new HttpReadStringContent());
-        std::shared_ptr<HttpLocalSession> httpLocalSession(new HttpLocalSession(this));
-        XCode code = httpLocalSession->Get(url, content.get());
-#ifdef __DEBUG__
-        long long t1 = TimeHelper::GetMilTimestamp();
-        LOG_INFO("get " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
-#endif
-        if(code == XCode::Successful)
+        ElapsedTimer timer;
+        std::shared_ptr<HttpGetRequest> getRequest(new HttpGetRequest(url));
+        if (getRequest->HasParseError())
         {
-            json = content->GetContent();
-            return XCode::Successful;
+            return XCode::HttpUrlParseError;
         }
-        return code;
-    }
+        NetWorkThread &netWorkThread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
+        auto httpRespTask = httpLocalSession->NewTask<HttpGetRequest, HttpRespTask>(getRequest);
 
+        HttpStatus code = httpRespTask->AwaitGetCode();
 
-    XCode HttpComponent::Post(const std::string &url, const std::string & request, std::string &response, int timeout)
-    {
-        std::shared_ptr<HttpReadStringContent> readContent(new HttpReadStringContent());
-        std::shared_ptr<HttpLocalSession> httpLocalSession(new HttpLocalSession(this));
-        std::shared_ptr<HttpWriteStringContent> writeContent(new HttpWriteStringContent(request));
-        return httpLocalSession->Post(url, writeContent.get(), readContent.get());
-    }
+        LOG_ERROR(httpRespTask->GetData());
 
-    XCode HttpComponent::Post(const std::string & url, HttpWriteContent & content, HttpReadContent & response, int timeout)
-    {
-        HttpLocalSession httpLocalSession(this);
-#ifdef __DEBUG__
-        long long t1 = TimeHelper::GetMilTimestamp();
-        //XCode code = httpLocalSession.Post(url, content, response);
-        LOG_INFO("post " << url << " use time [" << (TimeHelper::GetMilTimestamp() - t1) / 1000.f << "s]");
+        LOG_DEBUG("time = " << timer.GetSecond() << "s");
         return XCode::Successful;
-#else
-        return httpLocalSession.Post(url, content, response);
-#endif
     }
 
-    void HttpComponent::Invoke(HttpRemoteSession *remoteRequest)
+
+    XCode HttpComponent::Post(const std::string &url, const std::string & data, int timeout)
+    {
+        ElapsedTimer timer;
+        std::shared_ptr<HttpPostRequest> postRequest(new HttpPostRequest(url, data));
+        if (postRequest->HasParseError())
+        {
+            return XCode::HttpUrlParseError;
+        }
+        NetWorkThread &netWorkThread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
+        auto httpRespTask = httpLocalSession->NewTask<HttpPostRequest, HttpRespTask>(postRequest);
+
+        HttpStatus code = httpRespTask->AwaitGetCode();
+
+        LOG_ERROR(httpRespTask->GetData());
+
+        LOG_DEBUG("time = " << timer.GetSecond() << "s");
+        return XCode::Successful;
+    }
+
+    void HttpComponent::Invoke(HttpRespSession *remoteRequest)
     {			
 //		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
 //		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();
@@ -121,51 +124,4 @@ namespace GameKeeper
 //			 requestHandler->SetResponseCode(httpMethod->OnResponse(remoteRequest));
 //		 }
     }
-
-    HttpLocalSession *HttpComponent::CreateLocalSession()
-    {
-        HttpLocalSession * httpLocalSession = nullptr;
-        if(!this->mLocalSessionPool.empty())
-        {
-            httpLocalSession = this->mLocalSessionPool.front();
-            this->mLocalSessionPool.pop();
-            return  httpLocalSession;
-        }
-        return new HttpLocalSession(this);
-    }
-
-    HttpRemoteSession *HttpComponent::CreateRemoteSession()
-    {
-        HttpRemoteSession * remoteSession = nullptr;
-        if(!this->mRemoteSessionPool.empty())
-        {
-            remoteSession = this->mRemoteSessionPool.front();
-            this->mRemoteSessionPool.pop();
-            return remoteSession;
-        }
-        return new HttpRemoteSession(this);
-    }
-
-    void HttpComponent::DeleteSession(HttpLocalSession *session)
-    {
-        if(this->mLocalSessionPool.size() >= 10)
-        {
-            delete session;
-            return;
-        }
-        session->Clear();
-        this->mLocalSessionPool.push(session);
-    }
-
-    void HttpComponent::DeleteSession(HttpRemoteSession *session)
-    {
-        if(this->mRemoteSessionPool.size() >= 10)
-        {
-            delete session;
-            return;
-        }
-        session->Clear();
-        this->mRemoteSessionPool.push(session);
-    }
-
 }

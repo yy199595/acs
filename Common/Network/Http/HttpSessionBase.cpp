@@ -7,7 +7,6 @@
 namespace GameKeeper
 {
     HttpSessionBase::HttpSessionBase()
-            : mHttpComponent(nullptr)
     {
         this->mCount = 0;
         this->mIsReadBody = false;
@@ -40,12 +39,12 @@ namespace GameKeeper
             return;
         }
         std::ostream os(&this->mStreamBuf);
-        bool isDone = this->WriterToBuffer(os);
+        this->WriterToBuffer(os);
         if (this->mStreamBuf.size() == 0)
         {
             return;
         }
-        asio::async_write(socket, this->mStreamBuf, [this, isDone](
+        asio::async_write(socket, this->mStreamBuf, [this](
                 const asio::error_code &err, size_t size)
         {
             if (err)
@@ -53,16 +52,10 @@ namespace GameKeeper
 				this->OnWriterAfter(XCode::NetSendFailure);
                 return;
             }
-            if (!isDone)
-            {
-				AsioContext & context = this->mSocketProxy->GetContext();
-				context.post(std::bind(&HttpSessionBase::StartSendHttpMessage, this));
-                return;
-            }
 			this->OnWriterAfter(XCode::Successful);
         });
     }
-    
+
     void HttpSessionBase::StartReceiveHead()
     {
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
@@ -70,50 +63,37 @@ namespace GameKeeper
 		
 		if (nThread.IsCurrentThread())
 		{
-			this->ReceiveHeard();
+			this->ReceiveHead();
 			return;
 		}
-        nThread.Invoke(&HttpSessionBase::ReceiveHeard, this);
+        nThread.Invoke(&HttpSessionBase::ReceiveHead, this);
     }
 
-	void HttpSessionBase::ReceiveHeard()
-	{
-        asio::ip::tcp::iostream io;
-
-        AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
-		if (!socket.is_open() || this->mIsReadBody)
-		{
-			LOG_FATAL("logic error");
-            this->OnReceiveHeadAfter(XCode::NetReceiveFailure);
-            return;
-		}
-		
-		asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
-			std::bind(&HttpSessionBase::ReadHeardCallback, this, args1, args2));
-	}
-
-    void HttpSessionBase::Clear()
+	void HttpSessionBase::ReceiveHead()
     {
-        this->mCount = 0;
-        this->mAddress.clear();
-        this->mIsReadBody = false;
-        delete this->mSocketProxy;
-        size_t size = this->mStreamBuf.size();
-        if(size > 0)
-        {
-            std::istream(&this->mStreamBuf).ignore(size);
-        }
+        asio::error_code code;
+        AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
+        asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
+                         std::bind(&HttpSessionBase::OnRecvHead, this, args1, args2));
     }
 
-    void HttpSessionBase::ReadHeardCallback(const asio::error_code &err, size_t size)
+    void HttpSessionBase::ReceiveBody()
+    {
+        asio::error_code code;
+        AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
+        asio::async_read(socket, this->mStreamBuf, asio::transfer_at_least(1),
+                         std::bind(&HttpSessionBase::OnRecvBody, this, args1, args2));
+    }
+
+    void HttpSessionBase::OnRecvHead(const asio::error_code &err, size_t size)
     {
         if(err == asio::error::eof)
         {
-            this->OnReceiveHeadAfter(XCode::Successful);
+            this->OnComplete(XCode::Successful);
         }
         else if(err)
         {
-            this->OnReceiveHeadAfter(XCode::NetReceiveFailure);
+            this->OnComplete(XCode::NetReceiveFailure);
         }
         else
         {
@@ -125,17 +105,42 @@ namespace GameKeeper
                 {
                     if(this->mStreamBuf.size() >= HttpHeadMaxCount)
                     {
-                        this->OnReceiveHeadAfter(XCode::NetBigDataShutdown);
+                        this->OnComplete(XCode::NetBigDataShutdown);
                         return;
                     }
 					AsioContext & context = this->mSocketProxy->GetContext();
-					context.post(std::bind(&HttpSessionBase::ReceiveHeard, this));
+					context.post(std::bind(&HttpSessionBase::ReceiveHead, this));
                     return;
                 }
                 this->mIsReadBody = true;
-                this->OnReceiveHeard(mStreamBuf);
-                this->OnReceiveHeadAfter(XCode::Successful);
+                if(this->OnReceiveHead(mStreamBuf))
+                {
+                    if(this->mStreamBuf.size() > 0)
+                    {
+                        if(!this->OnReceiveBody(this->mStreamBuf))
+                        {
+                            this->OnComplete(XCode::Successful);
+                            return;
+                        }
+                    }
+                    this->ReceiveBody();
+                }
             }
         }
+    }
+
+    void HttpSessionBase::OnRecvBody(const asio::error_code &err, size_t size)
+    {
+        if(err)
+        {
+            this->OnComplete(XCode::HttpNetWorkError);
+            return;
+        }
+        if(this->OnReceiveBody(this->mStreamBuf))
+        {
+            this->ReceiveBody();
+            return;
+        }
+        this->OnComplete(XCode::Successful);
     }
 }

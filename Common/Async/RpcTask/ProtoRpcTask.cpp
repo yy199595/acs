@@ -13,6 +13,7 @@ namespace GameKeeper
     ProtoRpcTask::ProtoRpcTask(int method, long long rpcId)
         :  mMethod(method), mRpcId(rpcId), mTimerId(0)
     {
+        this->mCode = XCode::Successful;
 #ifdef __DEBUG__
         auto configComponent = App::Get().GetComponent<RpcConfigComponent>();
         auto config = configComponent->GetProtocolConfig(this->mMethod);
@@ -22,9 +23,9 @@ namespace GameKeeper
     }
 
     ProtoRpcTask::ProtoRpcTask(XCode code)
-        : AsyncTask(code), mMethod(0), mTimerId(0), mRpcId(0)
+        : mMethod(0), mTimerId(0), mRpcId(0)
     {
-
+        this->mCode = code;
     }
 
     void ProtoRpcTask::OnTaskAwait()
@@ -89,32 +90,30 @@ namespace GameKeeper
     }
 
     void CppProtoRpcTask::OnResponse(const com::Rpc_Response  * backData)
-    {		
-        if(backData == nullptr)
+    {
+        if (backData == nullptr)
         {
-            this->mTaskState = TaskTimeout;
-            this->mCode = XCode::CallTimeout;
+
 #ifdef __DEBUG__
-			int methodId = this->GetMethodId();
-			auto configComponent = App::Get().GetComponent<RpcConfigComponent>();
-			const ProtocolConfig * config = configComponent->GetProtocolConfig(methodId);
-			LOG_ERROR(config->Service << "." << config->Method << " call time out");
+            int methodId = this->GetMethodId();
+            auto configComponent = App::Get().GetComponent<RpcConfigComponent>();
+            const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
+            LOG_ERROR(config->Service << "." << config->Method << " call time out");
 #endif // __DEBUG__
+            this->RestoreTask(TaskTimeout);
+            return;
         }
-        else if(this->mTaskState == TaskAwait)
+
+        this->mCode = (XCode) backData->code();
+        if (this->mCode == XCode::Successful && backData->has_data())
         {
-            this->mTaskState = TaskFinish;
-            this->mCode = (XCode) backData->code();
-            if(this->mCode == XCode::Successful && backData->has_data())
+            Message *message = MessagePool::NewByData(backData->data(), true);
+            if (message != nullptr)
             {
-				Message * message = MessagePool::NewByData(backData->data(), true);
-				if (message != nullptr)
-				{
-                    this->mMessage = std::shared_ptr<Message>(message);
-				}              
+                this->mMessage = std::shared_ptr<Message>(message);
             }
         }
-        this->RestoreAsyncTask();
+        this->RestoreTask(TaskFinish);
     }
 
     XCode CppProtoRpcTask::Await()

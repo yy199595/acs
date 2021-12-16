@@ -27,30 +27,28 @@ namespace GameKeeper
 
     void MysqlRpcTask::OnResponse(const com::Rpc_Response *backData)
     {
-        if(backData == nullptr)
+        if (backData == nullptr)
         {
-            this->mTaskState = TaskTimeout;
             this->mCode = XCode::CallTimeout;
 #ifdef __DEBUG__
             int methodId = this->GetMethodId();
             auto configComponent = App::Get().GetComponent<RpcConfigComponent>();
-            const ProtocolConfig * config = configComponent->GetProtocolConfig(methodId);
+            const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
             LOG_ERROR(config->Service << "." << config->Method << " call time out");
 #endif // __DEBUG__
+            this->RestoreTask(AsyncTaskState::TaskTimeout);
+            return;
         }
-        else if(this->mTaskState == TaskAwait)
+
+        this->mCode = (XCode) backData->code();
+        if (this->mCode == XCode::Successful && backData->has_data())
         {
-            this->mTaskState = TaskFinish;
-            this->mCode = (XCode)backData->code();
-            if(this->mCode == XCode::Successful && backData->has_data())
+            if (!this->ParseOperResponse(backData->data()))
             {
-                if(!this->ParseOperResponse(backData->data()))
-                {
-                    this->ParseQueryResponse(backData->data());
-                }
+                this->ParseQueryResponse(backData->data());
             }
         }
-        this->RestoreAsyncTask();
+        this->RestoreTask(AsyncTaskState::TaskFinish);
     }
 
     bool MysqlRpcTask::ParseOperResponse(const google::protobuf::Any &any)

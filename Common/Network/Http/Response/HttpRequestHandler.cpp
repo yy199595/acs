@@ -5,7 +5,7 @@
 #include "HttpRequestHandler.h"
 #include <Core/App.h>
 #include <Other/ProtocolConfig.h>
-#include <Network/Http/HttpRemoteSession.h>
+#include <Network/Http/HttpRespSession.h>
 #include <Component/Http/HttpComponent.h>
 #include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/Content/HttpWriteContent.h>
@@ -33,34 +33,28 @@ namespace GameKeeper
         this->mHttpCode = code;
     }
 
-    bool HttpRequestHandler::WriterToBuffer(std::ostream &os)
+    void HttpRequestHandler::WriterToBuffer(std::ostream &os)
     {
-        if (this->mWriteCount == 0)
+
+        HttpStatus code = this->mHttpCode;
+        os << HttpVersion << " " << (int) code << " " << HttpStatusToString(code) << "\r\n";
+
+        auto iter = this->mHeardMap.begin();
+        for (; iter != this->mHeardMap.end(); iter++)
         {
-            HttpStatus code = this->mHttpCode;
-            os << HttpVersion << " " << (int) code << " " << HttpStatusToString(code) << "\r\n";
-
-            auto iter = this->mHeardMap.begin();
-            for (; iter != this->mHeardMap.end(); iter++)
-            {
-                const std::string &key = iter->first;
-                const std::string &val = iter->second;
-                os << key << ": " << val << "\r\n";
-            }
-            if (this->mResponseContent != nullptr)
-            {
-                this->mResponseContent->WriteHead(os);
-            }
-
-            os << "Server: " << "GameKeeper" << "\r\n";
-            os << "Connection: " << "close" << "\r\n\r\n";
+            const std::string &key = iter->first;
+            const std::string &val = iter->second;
+            os << key << ": " << val << "\r\n";
         }
+        if (this->mResponseContent != nullptr)
+        {
+            this->mResponseContent->WriteHead(os);
+        }
+
+        os << "Server: " << "GameKeeper" << "\r\n";
+        os << "Connection: " << "close" << "\r\n\r\n";
         this->mWriteCount++;
-        if (this->mResponseContent == nullptr)
-        {
-            return true;
-        }
-        return this->mResponseContent->WriteBody(os);
+        this->mResponseContent->WriteBody(os);
     }
 
     bool HttpRequestHandler::AddResponseHeard(const std::string &key, const std::string &val)

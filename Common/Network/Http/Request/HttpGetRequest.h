@@ -1,5 +1,5 @@
 #pragma once
-#include "HttpRequest.h"
+#include"HttpRequest.h"
 namespace GameKeeper
 {
 	class HttpReadContent;
@@ -7,21 +7,11 @@ namespace GameKeeper
 	class HttpGetRequest : public HttpRequest
 	{
 	public:
-		explicit HttpGetRequest(HttpComponent * component);
+		explicit HttpGetRequest(const std::string & url);
 		~HttpGetRequest() override = default;
-	public:
-        void Clear() override;
-        bool Init(const std::string & url, HttpReadContent * response);
-        HttpMethodType GetType() final { return HttpMethodType::GET; }
 	protected:
-        void WriteHead(std::ostream &os) final;
-        bool WriteBody(std::ostream &os) final;
-        void OnReceiveBody(asio::streambuf & buf) override;
+        void WriteToSendBuffer(std::ostream &os) final;
 	private:
-        HttpReadContent * mResponse;
-#ifdef __DEBUG__
-		size_t mCurrentLength;
-#endif // __DEBUG__
-
+        std::string mResponse;
 	};
 }

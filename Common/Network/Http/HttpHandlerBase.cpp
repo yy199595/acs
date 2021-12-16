@@ -21,7 +21,6 @@ namespace GameKeeper
     {
         this->mHeardMap.clear();
         this->mContentLength = 0;
-        memset(this->mHandlerBuffer, 0, 1024);
     }
 
     bool HttpHandlerBase::GetContentType(std::string &content)

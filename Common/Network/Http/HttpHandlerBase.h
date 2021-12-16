@@ -14,7 +14,7 @@ namespace GameKeeper
 	public:
         virtual void Clear();
         virtual HttpMethodType GetType() = 0;
-        virtual bool WriterToBuffer(std::ostream &os) = 0;
+        virtual void WriterToBuffer(std::ostream &os) = 0;
 		virtual bool OnReceiveHead(asio::streambuf & buf) = 0;
 
 #ifdef __DEBUG__
@@ -29,7 +29,5 @@ namespace GameKeeper
 	private:
         size_t mContentLength;
 		std::unordered_map<std::string, std::string> mHeardMap;
-    protected:
-        char mHandlerBuffer[1024];
 	};
 }

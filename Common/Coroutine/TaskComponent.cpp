@@ -129,7 +129,11 @@ namespace GameKeeper
     {
         LOG_CHECK_RET(id != 0);
         Coroutine *logicCoroutine = this->GetCoroutine(id);
-        LOG_CHECK_ERROR_RET(logicCoroutine, "not find coroutine id " << id);
+        if(logicCoroutine == nullptr)
+        {
+            LOG_FATAL("not find coroutine : " << id);
+            return;
+        }
         this->mResumeCoroutines.push(id);
     }
 

@@ -10,7 +10,7 @@ namespace GameKeeper
 	class HttpReadContent;
 	class HttpWriteContent;
     class HttpServiceConfig;
-    class HttpRemoteSession;
+    class HttpRespSession;
     class HttpComponent;
 	
 
@@ -41,7 +41,7 @@ namespace GameKeeper
 #endif
     public:
 
-        bool WriterToBuffer(std::ostream &os) override;
+        void WriterToBuffer(std::ostream &os) override;
 
         HttpStatus GetResponseCode() { return this->mHttpCode; }
 

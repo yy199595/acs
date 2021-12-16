@@ -29,6 +29,7 @@ namespace GameKeeper
         int mMethod;
         long long mRpcId;
     protected:
+        XCode mCode;
         unsigned int mTimerId;
     };
 
@@ -60,6 +61,7 @@ namespace GameKeeper
         XCode Await(std::shared_ptr<Message> response);
 
     private:
+        XCode mRespCode;
         std::shared_ptr<Message> mMessage;
         ProtoResponseComponent * mResponseComponent;
     };

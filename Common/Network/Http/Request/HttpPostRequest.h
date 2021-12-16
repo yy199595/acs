@@ -12,19 +12,13 @@ namespace GameKeeper
     class HttpPostRequest : public HttpRequest
     {
     public:
-        explicit HttpPostRequest(HttpComponent * component);
+        explicit HttpPostRequest(const std::string & url, const std::string & content);
         ~HttpPostRequest() override = default;
-    public:
-        void Clear() override;
-        HttpMethodType GetType() final { return HttpMethodType::POST; }
-        bool Init(const std::string & url, HttpWriteContent * request, HttpReadContent * response);
     protected:
-        void WriteHead(std::ostream &os) final;
-        bool WriteBody(std::ostream &os) final;
-        void OnReceiveBody(asio::streambuf & buf) final;
+        void WriteToSendBuffer(std::ostream &os) final;
     private:
-        HttpReadContent * mReadContent;
-        HttpWriteContent * mWriteContent;
+        std::string mResponse;
+        std::string mWriteContent;
     };
 }
 #endif //GameKeeper_HTTPLOCALPOSTREQUEST_H

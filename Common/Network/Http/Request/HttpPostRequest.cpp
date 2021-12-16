@@ -3,60 +3,23 @@
 //
 #include "HttpPostRequest.h"
 #include <NetworkHelper.h>
-#include <Http/HttpLocalsession.h>
+#include <Http/HttpReqSession.h>
 #include<Http/Content/HttpReadContent.h>
 #include<Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
-
-    HttpPostRequest::HttpPostRequest(HttpComponent *component)
-        : HttpRequest(component)
+    HttpPostRequest::HttpPostRequest(const std::string &url, const std::string &content)
+        : HttpRequest(url)
     {
-
+        this->mWriteContent = std::move(content);
     }
 
-    void HttpPostRequest::Clear()
-    {
-        this->mReadContent = nullptr;
-        this->mWriteContent = nullptr;
-    }
-
-    void HttpPostRequest::OnReceiveBody(asio::streambuf &buf)
-    {
-        std::istream is(&buf);
-        while(buf.size() > 0)
-        {
-           size_t size = is.readsome(this->mHandlerBuffer, 1024);
-           this->mReadContent->OnReadContent(this->mHandlerBuffer, size);
-        }
-    }
-
-    bool HttpPostRequest::Init(const std::string &url, HttpWriteContent *request, HttpReadContent *response)
-    {
-        if(!this->ParseUrl(url))
-        {
-            return false;
-        }
-        this->mReadContent = response;
-        this->mWriteContent = request;
-        return true;
-    }
-
-    void HttpPostRequest::WriteHead(std::ostream &os)
+    void HttpPostRequest::WriteToSendBuffer(std::ostream &os)
     {
         os << "POST " << this->GetPath() << " " << HttpVersion << "\r\n";
         os << "Host: " << this->GetHost() << ":" << this->GetPort() << "\r\n";
         os << "Accept: */*\r\n";
-        this->mWriteContent->WriteHead(os);
         os << "Connection: close\r\n\r\n";
-    }
-
-    bool HttpPostRequest::WriteBody(std::ostream &os)
-    {
-        if(this->mWriteContent == nullptr)
-        {
-            return true;
-        }
-        return this->mWriteContent->WriteBody(os);
+        os.write(this->mWriteContent.c_str(), this->mWriteContent.size());
     }
 }

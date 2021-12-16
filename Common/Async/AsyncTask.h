@@ -19,21 +19,21 @@ namespace GameKeeper
     class AsyncTask
     {
     public:
-        explicit AsyncTask(XCode code = XCode::Successful);
+        explicit AsyncTask();
         virtual ~AsyncTask() = default;
 
     public:
+        AsyncTaskState GetState() const { return this->mTaskState; }
         long long GetCreateTime() const { return this->mCreateTime;}
+        bool IsComplete() { return this->mTaskState == AsyncTaskState::TaskFinish;}
     protected:
         bool AwaitTask();
-        bool RestoreAsyncTask();
         virtual void OnTaskAwait() = 0;
-    protected:
-        XCode mCode;
-        AsyncTaskState mTaskState;
+        bool RestoreTask(AsyncTaskState state);
     private:
         unsigned int mCorId;
         long long mCreateTime;
+        AsyncTaskState mTaskState;
         class TaskComponent * mTaskComponent;
     };
 }

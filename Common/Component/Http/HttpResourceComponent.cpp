@@ -54,7 +54,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-	HttpStatus HttpResourceComponent::Download(HttpRemoteSession *handler)
+	HttpStatus HttpResourceComponent::Download(HttpRespSession *handler)
     {
         auto getRequest = handler->GetReuqestHandler();
         auto content = dynamic_cast<HttpReadStringContent*>(getRequest->GetContent());

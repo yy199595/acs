@@ -7,14 +7,14 @@
 #include <Http/Http.h>
 #include <Util/JsonHelper.h>
 #include <Http/Content/HttpReadContent.h>
-#include <Http/HttpRemoteSession.h>
+#include <Http/HttpRespSession.h>
 #include <Http/Response/HttpRequestHandler.h>
 #include<Http/Content/HttpWriteContent.h>
 #include <Util/TimeHelper.h>
 namespace GameKeeper
 {
     template<typename T>
-    using HttpServiceMethodType = HttpStatus(T::*)(HttpRemoteSession *);
+    using HttpServiceMethodType = HttpStatus(T::*)(HttpRespSession *);
 
     template<typename T>
     using HttpServiceJsonMethodRequestType = XCode(T::*)(RapidJsonWriter & response);
@@ -25,7 +25,7 @@ namespace GameKeeper
     class HttpServiceMethod
     {
     public:
-        virtual HttpStatus Invoke(HttpRemoteSession *session) = 0;
+        virtual HttpStatus Invoke(HttpRespSession *session) = 0;
     };
 
     template<typename T>
@@ -36,7 +36,7 @@ namespace GameKeeper
                 : _o(o), _func(func){}
 
     public:
-		HttpStatus Invoke(HttpRemoteSession * session) override
+		HttpStatus Invoke(HttpRespSession * session) override
         {
             return (_o->*_func)(session);
         }
@@ -53,7 +53,7 @@ namespace GameKeeper
         {}
 
     public:
-        HttpStatus Invoke(HttpRemoteSession *session) override
+        HttpStatus Invoke(HttpRespSession *session) override
         {
             auto requestHandler = session->GetReuqestHandler();
             auto content = dynamic_cast<HttpReadStringContent *>(requestHandler->GetContent());
@@ -87,7 +87,7 @@ namespace GameKeeper
                 : _o(o), _func(func){}
 
     public:
-        HttpStatus Invoke(HttpRemoteSession *session) override
+        HttpStatus Invoke(HttpRespSession *session) override
         {
             auto jsonWriter = new HttpJsonContent();
             XCode code = (_o->*_func)(*jsonWriter);

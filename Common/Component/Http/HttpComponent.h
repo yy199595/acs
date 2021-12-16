@@ -6,10 +6,10 @@ namespace GameKeeper
 	class HttpSessionBase;
     class HttpReadContent;
     class HttpWriteContent;
-    class HttpRemoteSession;
+    class HttpRespSession;
     class HttpServiceMethod;
     class HttpRequestHandler;	
-	class HttpLocalSession;
+	class HttpReqSession;
 
     class HttpComponent : public Component, public ISocketListen
     {
@@ -20,36 +20,22 @@ namespace GameKeeper
         bool Awake() final;
         bool LateAwake() final;
     public:
-        XCode Get(const std::string &url, std::string &json, int timeout = 5);
+        XCode Get(const std::string &url, int timeout = 5);
 
-        XCode Post(const std::string &url, const std::string &data, std::string &response, int timeout = 5);
-
-        XCode Post(const std::string &url, HttpWriteContent &content, HttpReadContent &response, int timeout);
+        XCode Post(const std::string &url, const std::string &data, int timeout = 5);
 
     public:
 
-		HttpLocalSession * NewLocalSession();
-
-		HttpRemoteSession * NewRemoteSession();
-
         void OnListen(SocketProxy *socket) final;
 
-		void OnRequest(HttpRemoteSession * remoteSession);
+		void OnRequest(HttpRespSession * remoteSession);
 
         HttpServiceMethod * GetHttpMethod(const std::string & service, const std::string & method);
 
     private:
-        void Invoke(HttpRemoteSession *remoteRequest);
-
-    public:
-        HttpLocalSession * CreateLocalSession();
-        HttpRemoteSession * CreateRemoteSession();
-        void DeleteSession(HttpLocalSession * session);
-        void DeleteSession(HttpRemoteSession * session);
+        void Invoke(HttpRespSession *remoteRequest);
     private:
         class TaskComponent *mCorComponent;
-        std::queue<HttpLocalSession *> mLocalSessionPool;
-        std::queue<HttpRemoteSession *> mRemoteSessionPool;
-		std::unordered_map<long long, HttpSessionBase *> mSessionMap;
+        class ThreadPoolComponent * mThreadComponent;
     };
 }
