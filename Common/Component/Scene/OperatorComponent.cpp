@@ -83,7 +83,7 @@ namespace GameKeeper
                                          component->GetTypeName());
 #ifdef __DEBUG__
         int hour, min, second = 0;
-        TimeHelper::GetHourMinSecond(nextTime, hour,min, second);
+        Helper::Time::GetHourMinSecond(nextTime, hour,min, second);
         LOG_DEBUG("Refresh the new day after " << hour << "h" << min << "m" << second << "s");
 #endif
     }

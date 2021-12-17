@@ -12,7 +12,7 @@ namespace GameKeeper
 	App *App::mApp = nullptr;
 
 	App::App() :GameObject(0), mServerPath(nullptr),
-		mStartTime(TimeHelper::GetMilTimestamp()),
+		mStartTime(Helper::Time::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		mApp = this;
@@ -124,7 +124,7 @@ namespace GameKeeper
             }
         }
 		this->mIsInitComplate = true;
-		this->mMainLoopStartTime = TimeHelper::GetMilTimestamp();
+		this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();
 		LOG_DEBUG("start all component successful ......");
 
 		for (Component *component : this->mSceneComponents)
@@ -139,7 +139,7 @@ namespace GameKeeper
 		}
 
 
-        long long t = TimeHelper::GetMilTimestamp() - this->mStartTime;
+        long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
 		LOG_DEBUG("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}
 
@@ -167,9 +167,9 @@ namespace GameKeeper
         this->mFps = 15;
 		mConfig->GetValue("Fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
-		this->mStartTime = TimeHelper::GetMilTimestamp();
-		this->mSecondTimer = TimeHelper::GetMilTimestamp();
-		this->mLastUpdateTime = TimeHelper::GetMilTimestamp();
+		this->mStartTime = Helper::Time::GetMilTimestamp();
+		this->mSecondTimer = Helper::Time::GetMilTimestamp();
+		this->mLastUpdateTime = Helper::Time::GetMilTimestamp();
 
 		return this->mTaskScheduler.Start();
 	}
@@ -186,7 +186,7 @@ namespace GameKeeper
 
 	void App::LogicMainLoop()
 	{
-		this->mStartTimer = TimeHelper::GetMilTimestamp();
+		this->mStartTimer = Helper::Time::GetMilTimestamp();
 		for (ISystemUpdate *component : this->mSystemUpdateManagers)
 		{
 			component->OnSystemUpdate();
@@ -208,7 +208,7 @@ namespace GameKeeper
 			{
 				component->OnLastFrameUpdate();
 			}
-			this->mStartTimer = mLastUpdateTime = TimeHelper::GetMilTimestamp();
+			this->mStartTimer = mLastUpdateTime = Helper::Time::GetMilTimestamp();
 		}
 
 		if (this->mStartTimer - this->mSecondTimer >= 1000)
@@ -218,13 +218,13 @@ namespace GameKeeper
 				component->OnSecondUpdate();
 			}
 			this->UpdateConsoleTitle();
-			this->mSecondTimer = TimeHelper::GetMilTimestamp();
+			this->mSecondTimer = Helper::Time::GetMilTimestamp();
 		}
 	}
 
     void App::UpdateConsoleTitle()
     {
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         long long seconds = (nowTime - this->mMainLoopStartTime) / 1000;
         this->mLogicFps = this->mLogicRunCount / (float)seconds;
 #ifdef _WIN32

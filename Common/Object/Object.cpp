@@ -1,5 +1,5 @@
 #include"Object.h"
-#include<Util/NumberHelper.h>
+#include<Util/Guid.h>
 
 namespace GameKeeper
 {

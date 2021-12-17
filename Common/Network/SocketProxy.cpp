@@ -1,13 +1,12 @@
-#include "SocketProxy.h"
-#include<Util/NumberHelper.h>
+#include"SocketProxy.h"
+#include<Util/Guid.h>
 namespace GameKeeper
 {
-	StringPool GStringPool;
 	SocketProxy::SocketProxy(NetWorkThread & thread, const std::string & name)
 		: mNetThread(thread), mContext(thread.GetContext()),
 		mSocket(thread.GetContext()), mName(name)
 	{
-		this->mSocketId = NumberHelper::Create();
+		this->mSocketId = Helper::ThreadGuid::Create();
 	}
 	
 	void SocketProxy::Close()

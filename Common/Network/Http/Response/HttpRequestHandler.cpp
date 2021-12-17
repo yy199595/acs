@@ -19,7 +19,7 @@ namespace GameKeeper
         //this->mHttpConfig = nullptr;
         this->mResponseContent = nullptr;
 #ifdef __DEBUG__
-        this->mStartTime = TimeHelper::GetMilTimestamp();
+        this->mStartTime = Helper::Time::GetMilTimestamp();
 #endif
     }
 

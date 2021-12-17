@@ -191,13 +191,13 @@ namespace GameKeeper
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
         ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetDelaTime", &App::GetDelaTime);     
 
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateStr", TimeHelper::GetDateStr);
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetDateString", TimeHelper::GetDateString);
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetSecTimeStamp", TimeHelper::GetSecTimeStamp);
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMilTimestamp", TimeHelper::GetMilTimestamp);
-        //ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetMicTimeStamp", TimeHelper::GetMicTimeStamp);
-        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "TimeHelper", "GetYearMonthDayString",
-                                             TimeHelper::GetYearMonthDayString);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetDateStr", Helper::Time::GetDateStr);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetDateString", Helper::Time::GetDateString);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetSecTimeStamp", Helper::Time::GetSecTimeStamp);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetMilTimestamp", Helper::Time::GetMilTimestamp);
+        //ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetMicTimeStamp", Helper::Time::GetMicTimeStamp);
+        ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetYearMonthDayString",
+                                             Helper::Time::GetYearMonthDayString);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Call", SystemExtension::Call);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AwaitSleep", SystemExtension::Sleep);

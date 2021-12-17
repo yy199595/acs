@@ -123,7 +123,7 @@ namespace GameKeeper
             auto config = this->mProtoConfigComponent->GetProtocolConfig(rpcTask->GetMethodId());
             if (config != nullptr)
             {
-                long long t = TimeHelper::GetMilTimestamp() - rpcTask->GetCreateTime();
+                long long t = Helper::Time::GetMilTimestamp() - rpcTask->GetCreateTime();
                 LOG_DEBUG("*****************[receive response]******************");
                 LOG_DEBUG("func = " << config->Service << "." << config->Method);
                 LOG_DEBUG("time = " << (t / 1000.0f) << "s");

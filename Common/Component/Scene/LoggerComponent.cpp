@@ -64,7 +64,7 @@ namespace GameKeeper
 	{
 		spdlog::shutdown();
 		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
-		std::string logPath = this->mLogSavePath + TimeHelper::GetYearMonthDayString();
+		std::string logPath = this->mLogSavePath + Helper::Time::GetYearMonthDayString();
 #ifdef LOG_THREAD_LOCK
 		this->mInfoLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mDebugLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
@@ -86,14 +86,14 @@ namespace GameKeeper
 	{
 #ifdef _WIN32
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_BLUE | FOREGROUND_GREEN |
 			FOREGROUND_INTENSITY);
 		printf("%s [Info  ] %s\n", time.c_str(), log.c_str());
 #else
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Info  ] %s\e[34m\n", "\e[1m", time.c_str(), log.c_str());
 #endif
 		if (this->mInfoLog)
@@ -107,13 +107,13 @@ namespace GameKeeper
 		
 #ifdef _WIN32
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | 4);
 		printf("%s [Error ] %s\n", time.c_str(), log.c_str());
 #else
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Error ] %s\e[0m\n", "\e[31m", time.c_str(), log.c_str());
 #endif
 
@@ -133,13 +133,13 @@ namespace GameKeeper
 		
 #ifdef _WIN32
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | 2);
 		printf("%s [Debug ] %s\n", time.c_str(), log.c_str());
 #else
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Debug ] %s\e[0m\n", "\e[32m", time.c_str(), log.c_str());
 #endif
 		if (this->mDebugLog)
@@ -152,14 +152,14 @@ namespace GameKeeper
 	{		
 #ifdef _WIN32
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | FOREGROUND_BLUE |
 			FOREGROUND_RED);
 		printf("%s [Fatal ] %s\n", time.c_str(), log.c_str());
 #else
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Fatal ] %s\e[0m\n", "\e[35m", time.c_str(), log.c_str());
 #endif
 		if (this->mFatalLog)
@@ -178,13 +178,13 @@ namespace GameKeeper
 		
 #ifdef _WIN32
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | 6);
 		printf("%s [Warning] %s\n", time.c_str(), log.c_str());
 #else
 		std::string log = stream.str();
-		std::string time = TimeHelper::GetDateString();
+		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Warning] %s\e[0m\n", "\e[33m", time.c_str(), log.c_str());
 #endif
 		if (this->mWarningLog)

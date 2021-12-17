@@ -13,7 +13,7 @@ namespace GameKeeper
         this->mCorComponent = nullptr;
         this->mTaskComponent = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
-        this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
         LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
         return true;
@@ -102,7 +102,7 @@ namespace GameKeeper
     std::shared_ptr<RedisResponse> RedisComponent::StartTask(std::shared_ptr<RedisTaskProxy> redisTask)
     {
         this->mTaskComponent->StartTask(redisTask.get());
-        this->mLastOperatorTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
 
         this->mCorComponent->Await();
         auto redisResponse = redisTask->GetResponse();

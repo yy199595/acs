@@ -8,7 +8,7 @@ namespace GameKeeper
 {
     TimeRecorder::TimeRecorder()
     {
-        this->mLastClearTime = TimeHelper::GetMilTimestamp();
+        this->mLastClearTime = Helper::Time::GetMilTimestamp();
     }
 
     CostTimeInfo *TimeRecorder::GetLatencyInfo()
@@ -25,7 +25,7 @@ namespace GameKeeper
 
     void TimeRecorder::AddCostTimeInfo(const std::string &func, long long lastTime)
     {
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         auto iter = this->mCallFuncInfoMap.find(func);
         if (iter == this->mCallFuncInfoMap.end())
         {
@@ -70,7 +70,7 @@ namespace GameKeeper
             CostTimeInfo &pLatencyInfo = iter.second;
             pLatencyInfo.Clear();
         }
-        this->mLastClearTime = TimeHelper::GetMilTimestamp();
+        this->mLastClearTime = Helper::Time::GetMilTimestamp();
     }
 
     bool TimeRecorder::SaveDataToFile(const std::string path)
@@ -97,7 +97,7 @@ namespace GameKeeper
             return false;
         }
 
-        const std::string date = TimeHelper::GetDateString();
+        const std::string date = Helper::Time::GetDateString();
         for (auto iter = this->mCallFuncInfoMap.begin(); iter != this->mCallFuncInfoMap.end(); iter++)
         {
             const std::string &func = iter->first;

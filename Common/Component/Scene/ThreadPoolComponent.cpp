@@ -1,5 +1,5 @@
 ﻿#include "ThreadPoolComponent.h"
-#include <Util/NumberHelper.h>
+#include <Util/Guid.h>
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
 namespace GameKeeper

@@ -19,7 +19,7 @@ namespace GameKeeper
         this->mTimerComponent = nullptr;
         this->mPpcConfigComponent = nullptr;
         this->mRpcClientComponent = nullptr;
-        this->mLastTime = TimeHelper::GetSecTimeStamp();
+        this->mLastTime = Helper::Time::GetSecTimeStamp();
 		const ServerConfig & ServerCfg = App::Get().GetConfig();
 		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("NodeId", this->mNodeId));
         return true;
@@ -170,7 +170,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         return mTick++;
 #else
-        long long nowTime = TimeHelper::GetSecTimeStamp();
+        long long nowTime = Helper::Time::GetSecTimeStamp();
         if(nowTime != this->mLastTime)
         {
             this->mTick = 0;

@@ -11,7 +11,7 @@ namespace GameKeeper
     RedisTaskBase::RedisTaskBase(const std::string &cmd)
     {
         this->mCommand.emplace_back(cmd);
-        this->mStartTime = TimeHelper::GetMilTimestamp();
+        this->mStartTime = Helper::Time::GetMilTimestamp();
         this->mRedisComponent = App::Get().GetComponent<RedisComponent>();
     }
 

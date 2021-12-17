@@ -84,7 +84,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         if (this->mHttpHandler != nullptr)
         {
-            long long endTime = TimeHelper::GetMilTimestamp();
+            long long endTime = Helper::Time::GetMilTimestamp();
             LOG_DEBUG("http call " << this->mHttpHandler->GetComponent() << "."
                                    << this->mHttpHandler->GetMethod() << " use time = "
                                    << ((endTime - this->mHttpHandler->GetStartTime()) / 1000.0f) << "s");

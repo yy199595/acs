@@ -14,7 +14,7 @@ namespace GameKeeper
         this->mIsConnect = false;
         this->mConnectCount = 0;
         this->mSocketId = socket->GetSocketId();
-        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
     }
 
     void RpcClient::CloseSocket(XCode code)
@@ -35,7 +35,7 @@ namespace GameKeeper
     void RpcClient::StartReceive()
     {
         this->mIsOpen = true;
-        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
         AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
         unsigned short port = socket.remote_endpoint().port();
         this->mIp = socket.remote_endpoint().address().to_string();
@@ -60,7 +60,7 @@ namespace GameKeeper
         socket.async_read_some(asio::buffer(this->mReceiveBuffer, count),
                                [this](const asio::error_code &error_code, const std::size_t t)
                                {
-                                   this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+                                   this->mLastOperTime = Helper::Time::GetSecTimeStamp();
                                    if (error_code)
                                    {
                                        this->CloseSocket(XCode::NetReceiveFailure);
@@ -99,7 +99,7 @@ namespace GameKeeper
             messageBuffer = new char[size];
         }
         asio::error_code code;
-        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
         if (size > nSocket.available(code))
         {
@@ -225,7 +225,7 @@ namespace GameKeeper
                                    delete[]buffer;
                                }
                                this->OnSendData(code, message);
-                               this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+                               this->mLastOperTime = Helper::Time::GetSecTimeStamp();
                            });
     }
 }

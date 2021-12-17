@@ -4,6 +4,7 @@
 
 #include"AsyncTask.h"
 #include"Core/App.h"
+#include"Util/Guid.h"
 #include"Util/TimeHelper.h"
 namespace GameKeeper
 {
@@ -11,7 +12,8 @@ namespace GameKeeper
     {
         this->mCorId = 0;
         this->mTaskState = TaskReady;
-        this->mCreateTime = TimeHelper::GetMilTimestamp();
+        this->mTaskId = Helper::Guid::Create();
+        this->mCreateTime = Helper::Time::GetMilTimestamp();
         this->mTaskComponent = App::Get().GetTaskComponent();
     }
 

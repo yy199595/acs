@@ -54,7 +54,7 @@ namespace GameKeeper
         userAccountData.set_userid(userId);
         userAccountData.set_account(account);
         userAccountData.set_passwd(password);
-        userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+        userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(userAccountData, &json);
@@ -78,7 +78,7 @@ namespace GameKeeper
     {
         char buffer[100] = {0};
         int number = MathHelper::Random<int>();
-        long long now = TimeHelper::GetSecTimeStamp();
+        long long now = Helper::Time::GetSecTimeStamp();
         size_t size = sprintf(buffer, "%s:%lld:%d", account.c_str(), now, number);
         MD5 md5(buffer, size);
         return md5.toString();

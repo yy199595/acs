@@ -126,7 +126,7 @@ namespace GameKeeper
         RpcProxyClient * proxyClient = this->GetProxyClient(sockId);
         if(proxyClient != nullptr)
         {
-            long long nowTime = TimeHelper::GetSecTimeStamp();
+            long long nowTime = Helper::Time::GetSecTimeStamp();
             if(nowTime - proxyClient->GetLastOperatorTime() >= 5)
             {
                 proxyClient->StartClose();

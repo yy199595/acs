@@ -27,8 +27,6 @@ namespace GameKeeper
 		const std::string mName;
 		NetWorkThread & mNetThread;
 	};
-	extern StringPool GStringPool;
-
 }
 
 namespace GameKeeper

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<Util/NumberHelper.h>
+#include<Util/Guid.h>
 #include <Component/Component.h>
 #include<RedisClient/RedisTaskProxy.h>
 #include <Coroutine/TaskComponent.h>

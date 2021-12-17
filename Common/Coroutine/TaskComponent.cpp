@@ -2,7 +2,7 @@
 #include<memory.h>
 #include<Core/App.h>
 #include"Coroutine.h"
-#include<Util/NumberHelper.h>
+#include<Util/Guid.h>
 #include<Timer/TimerComponent.h>
 #include"Other/ElapsedTimer.h"
 #ifdef JE_MALLOC

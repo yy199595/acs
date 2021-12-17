@@ -7,7 +7,7 @@ namespace GameKeeper
     TaskProxy::TaskProxy()
     {
 		this->mTaskId = 0;
-        this->mStartTime = TimeHelper::GetMilTimestamp();
+        this->mStartTime = Helper::Time::GetMilTimestamp();
     }
 
     CoroutineAsyncTask::CoroutineAsyncTask()

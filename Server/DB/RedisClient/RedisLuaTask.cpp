@@ -1,7 +1,7 @@
 ﻿#include "RedisLuaTask.h"
 
 #include <Core/App.h>
-#include <Util/NumberHelper.h>
+#include <Util/Guid.h>
 #include <Scene/RedisComponent.h>
 #include <Coroutine/TaskComponent.h>
 

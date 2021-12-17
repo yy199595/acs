@@ -10,7 +10,7 @@ namespace GameKeeper
     class ElapsedTimer
     {
     public:
-        ElapsedTimer() : mStartTime(TimeHelper::GetMilTimestamp()) { }
+        ElapsedTimer() : mStartTime(Helper::Time::GetMilTimestamp()) { }
     public:
         inline double GetMs() const;
         inline double GetSecond() const;
@@ -20,13 +20,13 @@ namespace GameKeeper
 
     double ElapsedTimer::GetMs() const
     {
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         return (double)(nowTime - this->mStartTime);
     }
 
     double ElapsedTimer::GetSecond() const
     {
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         return (nowTime - this->mStartTime) / 1000.0f;
     }
 

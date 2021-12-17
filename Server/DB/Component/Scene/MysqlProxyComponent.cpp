@@ -72,7 +72,7 @@ namespace GameKeeper
             userAccountData.set_account(std::to_string(userId + index) + "@qq.com");
             userAccountData.set_devicemac("ios_qq");
             userAccountData.set_token(StringHelper::CreateNewToken());
-            userAccountData.set_registertime(TimeHelper::GetSecTimeStamp());
+            userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
             if (this->Add(userAccountData)->AwakeGetCode() == XCode::Successful)
             {
                 LOG_WARN("add user data successful");

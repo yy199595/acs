@@ -70,7 +70,7 @@ namespace GameKeeper
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeTask.SwapQueueData();
 #endif
-            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
             if (this->mWaitInvokeTask.PopItem(task))
             {
                 if (task->Run())
@@ -123,7 +123,7 @@ namespace GameKeeper
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeMethod.SwapQueueData();
 #endif
-            this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
             while (this->mWaitInvokeMethod.PopItem(taskMethod))
             {
                 taskMethod->run();
@@ -155,7 +155,7 @@ namespace GameKeeper
 
 	void MainTaskScheduler::Update()
 	{
-        this->mLastOperTime = TimeHelper::GetSecTimeStamp();
+        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
 		this->mMainMethod->run();
 		StaticMethod * task = nullptr;
 #ifdef __THREAD_LOCK__

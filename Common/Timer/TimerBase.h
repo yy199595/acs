@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Util/NumberHelper.h>
+#include <Util/Guid.h>
 #include <Util/TimeHelper.h>
 #include <functional>
 

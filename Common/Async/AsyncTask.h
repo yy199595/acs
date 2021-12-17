@@ -23,6 +23,7 @@ namespace GameKeeper
         virtual ~AsyncTask() = default;
 
     public:
+        long long GetTaskId() const { return this->mTaskId;}
         AsyncTaskState GetState() const { return this->mTaskState; }
         long long GetCreateTime() const { return this->mCreateTime;}
         bool IsComplete() { return this->mTaskState == AsyncTaskState::TaskFinish;}
@@ -31,6 +32,7 @@ namespace GameKeeper
         virtual void OnTaskAwait() = 0;
         bool RestoreTask(AsyncTaskState state);
     private:
+        long long mTaskId;
         unsigned int mCorId;
         long long mCreateTime;
         AsyncTaskState mTaskState;

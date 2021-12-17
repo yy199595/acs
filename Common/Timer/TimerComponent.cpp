@@ -22,7 +22,7 @@ namespace GameKeeper
 
 	bool TimerComponent::LateAwake()
 	{
-		this->mNextUpdateTime = TimeHelper::GetMilTimestamp() + this->TimerPrecision;
+		this->mNextUpdateTime = Helper::Time::GetMilTimestamp() + this->TimerPrecision;
         return true;
 	}
 
@@ -72,7 +72,7 @@ namespace GameKeeper
 		{
 			return;
 		}
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         long long subTime = nowTime - this->mNextUpdateTime;
 
         if (subTime <= (this->TimerPrecision - 2)) //2毫秒误差
@@ -144,7 +144,7 @@ namespace GameKeeper
 
     bool TimerComponent::AddTimerToWheel(TimerBase * timer)
     {
-        long long nowTime = TimeHelper::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetMilTimestamp();
         int tick = (timer->GetTriggerTime() - nowTime) / this->TimerPrecision;
         for (auto timerLayer : this->mTimerLayers)
         {

@@ -11,7 +11,7 @@ namespace Client
 		this->mTimerId = 0;
 		this->mTimeout = 0;
 		this->mMessage = nullptr;
-		this->mStartTime = TimeHelper::GetMilTimestamp();
+		this->mStartTime = Helper::Time::GetMilTimestamp();
 	}
 
 	void ClientRpcTask::OnResponse(const c2s::Rpc_Response * response)
@@ -30,7 +30,7 @@ namespace Client
 				auto message = MessagePool::NewByData(response->data(), true);
 				this->mMessage = std::shared_ptr<Message>(message);
 			}
-			long long t1 = TimeHelper::GetMilTimestamp();
+			long long t1 = Helper::Time::GetMilTimestamp();
 			float second = (t1 - this->mStartTime) / 1000.0f;
 			LOG_INFO("call " << this->mMethod << " successful time = " << second << "s");
 		}

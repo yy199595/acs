@@ -31,7 +31,7 @@ namespace GameKeeper
         while (!this->mIsClose)
         {
             std::this_thread::sleep_for(std::chrono::seconds(10));
-            long long nowTime = TimeHelper::GetSecTimeStamp();
+            long long nowTime = Helper::Time::GetSecTimeStamp();
             for (const IThread *taskThread: threads)
             {
                 if (taskThread->IsWork() && nowTime - taskThread->GetLastOperTime() >= 10)
