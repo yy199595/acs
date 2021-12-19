@@ -30,7 +30,6 @@ namespace GameKeeper
         this->AddComponent<TaskComponent>();
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<LoggerComponent>();
-
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();

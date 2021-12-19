@@ -6,7 +6,7 @@ namespace GameKeeper
 	// 处理外部连接进来的session
     struct ListenConfig;
 	class NetworkListener;
-	class ProtoRpcClientComponent;
+	class RpcClientComponent;
     class TcpServerComponent : public Component, public IStart
 	{
 	public:

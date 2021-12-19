@@ -1,10 +1,10 @@
 ﻿#include "MysqlComponent.h"
 #include <fstream>
 #include <utility>
-#include <Core/App.h>
-#include <Scene/ThreadPoolComponent.h>
-#include <MysqlClient/TableOperator.h>
-#include <Coroutine/TaskComponent.h>
+#include "Core/App.h"
+#include "Component/Scene/ThreadPoolComponent.h"
+#include "MysqlClient/TableOperator.h"
+#include "Coroutine/TaskComponent.h"
 
 namespace GameKeeper
 {

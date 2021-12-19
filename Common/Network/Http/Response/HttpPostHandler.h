@@ -8,12 +8,12 @@
 #include <Http/Content/HttpReadContent.h>
 namespace GameKeeper
 {
-    class HttpComponent;
+    class HttpClientComponent;
     class HttpReadContent;
     class HttpPostHandler : public HttpRequestHandler
     {
     public:
-        explicit HttpPostHandler(HttpComponent *component);
+        explicit HttpPostHandler(HttpClientComponent *component);
         ~HttpPostHandler() override = default;
     public:
         void Clear() final;

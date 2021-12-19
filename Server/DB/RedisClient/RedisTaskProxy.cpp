@@ -1,6 +1,6 @@
 ﻿#include "RedisTaskProxy.h"
 #include <Coroutine/TaskComponent.h>
-#include <Scene/RedisComponent.h>
+#include "Component/RedisComponent.h"
 #include <Core/App.h>
 namespace GameKeeper
 {

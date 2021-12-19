@@ -4,7 +4,7 @@
 #include<Service/RpcNode.h>
 #include<Util/FileHelper.h>
 #include<Service/NodeProxyComponent.h>
-#include<ServerRpc/ProtoRpcClientComponent.h>
+#include<ServerRpc/RpcClientComponent.h>
 
 
 namespace GameKeeper
@@ -20,7 +20,7 @@ namespace GameKeeper
     bool CenterHostService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcClientComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcClientComponent>());
         return true;
     }
 
@@ -111,7 +111,7 @@ namespace GameKeeper
             for(unsigned int id : iter->second)
             {
                 auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
-                XCode code = nodeProxy->Call("LocalHostService.Add", nodeInfo);
+                XCode code = nodeProxy->Invoke("LocalHostService.Add", nodeInfo);
                 if(code != XCode::Successful)
                 {
                     return code;

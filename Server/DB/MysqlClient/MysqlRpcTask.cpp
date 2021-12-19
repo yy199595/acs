@@ -9,13 +9,13 @@
 namespace GameKeeper
 {
     MysqlRpcTask::MysqlRpcTask(XCode code)
-        : ProtoRpcTask(code)
+        : RpcTaskBase(code)
     {
 
     }
 
-    MysqlRpcTask::MysqlRpcTask(int methodId, unsigned int rpcId)
-            : ProtoRpcTask(methodId, rpcId)
+    MysqlRpcTask::MysqlRpcTask(int methodId)
+            : RpcTaskBase(methodId)
     {
 
     }
@@ -27,19 +27,6 @@ namespace GameKeeper
 
     void MysqlRpcTask::OnResponse(const com::Rpc_Response *backData)
     {
-        if (backData == nullptr)
-        {
-            this->mCode = XCode::CallTimeout;
-#ifdef __DEBUG__
-            int methodId = this->GetMethodId();
-            auto configComponent = App::Get().GetComponent<RpcConfigComponent>();
-            const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
-            LOG_ERROR(config->Service << "." << config->Method << " call time out");
-#endif // __DEBUG__
-            this->RestoreTask(AsyncTaskState::TaskTimeout);
-            return;
-        }
-
         this->mCode = (XCode) backData->code();
         if (this->mCode == XCode::Successful && backData->has_data())
         {
@@ -48,7 +35,6 @@ namespace GameKeeper
                 this->ParseQueryResponse(backData->data());
             }
         }
-        this->RestoreTask(AsyncTaskState::TaskFinish);
     }
 
     bool MysqlRpcTask::ParseOperResponse(const google::protobuf::Any &any)

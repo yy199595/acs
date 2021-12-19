@@ -7,12 +7,12 @@
 #include "HttpSessionBase.h"
 namespace GameKeeper
 {
-    class HttpComponent;
+    class HttpClientComponent;
     class HttpRequestHandler;
     class HttpRespSession : public HttpSessionBase
     {
     public:
-        explicit HttpRespSession(HttpComponent * socketHandler);
+        explicit HttpRespSession(HttpClientComponent * socketHandler);
         ~HttpRespSession() final;
     public:
         void Start(SocketProxy * socketProxy);
@@ -30,7 +30,7 @@ namespace GameKeeper
     private:
 		std::string mMethod;
         HttpRequestHandler * mHttpHandler;
-        HttpComponent * mHttpComponent;
+        HttpClientComponent * mHttpComponent;
         std::unordered_map<std::string, HttpRequestHandler *> mHandlerMap;
     };
 }

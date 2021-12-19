@@ -3,7 +3,7 @@
 namespace GameKeeper
 {
 	class HttpReadContent;
-	class HttpComponent;
+	class HttpClientComponent;
 	class HttpGetRequest : public HttpRequest
 	{
 	public:

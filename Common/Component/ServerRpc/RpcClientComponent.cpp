@@ -1,39 +1,39 @@
 ﻿
-#include"ProtoRpcClientComponent.h"
+#include"RpcClientComponent.h"
 #include<Core/App.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include<Scene/ThreadPoolComponent.h>
 #include"Network/SocketProxy.h"
-#include<ServerRpc/ProtoRpcComponent.h>
+#include<ServerRpc/RpcComponent.h>
 #ifdef __DEBUG__
 #include<Pool/MessagePool.h>
-#include<Async/RpcTask/ProtoRpcTask.h>
+#include<Async/RpcTask/RpcTask.h>
 #endif
 namespace GameKeeper
 {
-    bool ProtoRpcClientComponent::Awake()
+    bool RpcClientComponent::Awake()
     {
         this->mRpcComponent = nullptr;
         this->mTaskComponent = nullptr;
         this->mProtoConfigComponent = nullptr;
         return true;
     }
-    bool ProtoRpcClientComponent::LateAwake()
+    bool RpcClientComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
         LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mProtoConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
 
-	void ProtoRpcClientComponent::OnCloseSocket(long long socketId, XCode code)
+	void RpcClientComponent::OnCloseSocket(long long socketId, XCode code)
 	{
-		auto iter = this->mSessionAdressMap.find(socketId);
-		if (iter != this->mSessionAdressMap.end())
+		auto iter = this->mRpcClientMap.find(socketId);
+		if (iter != this->mRpcClientMap.end())
         {
             ProtoRpcClient *client = iter->second;
-            this->mSessionAdressMap.erase(iter);
+            this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
             auto component = App::Get().GetComponent<RpcConfigComponent>();
             LOG_ERROR("remove tcp socket " << client->GetAddress() <<
@@ -43,10 +43,10 @@ namespace GameKeeper
         }
 	}
 
-	void ProtoRpcClientComponent::OnConnectAfter(long long id, XCode code)
+	void RpcClientComponent::OnConnectAfter(long long id, XCode code)
 	{
-        auto iter = this->mSessionAdressMap.find(id);
-        LOG_CHECK_RET(iter != this->mSessionAdressMap.end());
+        auto iter = this->mRpcClientMap.find(id);
+        LOG_CHECK_RET(iter != this->mRpcClientMap.end());
 
         auto rpcClient = iter->second;
 		const std::string & address = rpcClient->GetAddress();
@@ -62,24 +62,24 @@ namespace GameKeeper
 		}
 	}
 
-	void ProtoRpcClientComponent::OnListen(SocketProxy * socket)
+	void RpcClientComponent::OnListen(SocketProxy * socket)
 	{
         // 判断是不是服务器根据 白名单
 		long long id = socket->GetSocketId();
-		auto iter = this->mSessionAdressMap.find(id);
-		LOG_CHECK_RET(iter == this->mSessionAdressMap.end());
+		auto iter = this->mRpcClientMap.find(id);
+		LOG_CHECK_RET(iter == this->mRpcClientMap.end());
 		auto tcpSession = this->mClientPool.New(this, socket, SocketType::RemoteSocket);
         if(tcpSession != nullptr)
         {
             tcpSession->StartReceive();
-            this->mSessionAdressMap.emplace(id, tcpSession);
+            this->mRpcClientMap.emplace(id, tcpSession);
         }
 	}
 
-    void ProtoRpcClientComponent::StartClose(long long id)
+    void RpcClientComponent::StartClose(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(id);
-        if(iter != this->mSessionAdressMap.end())
+        auto iter = this->mRpcClientMap.find(id);
+        if(iter != this->mRpcClientMap.end())
         {
             ProtoRpcClient * rpcClient = iter->second;
             if(rpcClient->IsOpen())
@@ -89,22 +89,8 @@ namespace GameKeeper
         }
     }
 
-    void ProtoRpcClientComponent::OnRequest(com::Rpc_Request *request)
+    void RpcClientComponent::OnRequest(com::Rpc_Request *request)
     {
-#ifdef __DEBUG__
-        auto config = this->mProtoConfigComponent->GetProtocolConfig(request->methodid());
-        LOG_INFO("*****************[receive request]******************");
-        LOG_DEBUG("func = " << config->Service << "." << config->Method);
-        if(request->has_data())
-        {
-            std::string json;
-            if(util::MessageToJsonString(request->data(), &json).ok())
-            {
-                LOG_DEBUG("json = " << json);
-            }
-        }
-        LOG_INFO("*********************************************");
-#endif
         long long socketId = request->socketid();
         if(!this->mRpcComponent->OnRequest(request))
         {
@@ -113,7 +99,7 @@ namespace GameKeeper
         }
     }
 
-    void ProtoRpcClientComponent::OnResponse(com::Rpc_Response *response)
+    void RpcClientComponent::OnResponse(com::Rpc_Response *response)
     {
 #ifdef __DEBUG__
         long long rpcId = response->rpcid();
@@ -123,10 +109,9 @@ namespace GameKeeper
             auto config = this->mProtoConfigComponent->GetProtocolConfig(rpcTask->GetMethodId());
             if (config != nullptr)
             {
-                long long t = Helper::Time::GetMilTimestamp() - rpcTask->GetCreateTime();
                 LOG_DEBUG("*****************[receive response]******************");
                 LOG_DEBUG("func = " << config->Service << "." << config->Method);
-                LOG_DEBUG("time = " << (t / 1000.0f) << "s");
+                LOG_DEBUG("time = " << rpcTask->GetCostTime() << "ms");
                 if ((XCode) response->code() != XCode::Successful)
                 {
                     auto codeConfig = this->mProtoConfigComponent->GetCodeConfig(response->code());
@@ -147,13 +132,13 @@ namespace GameKeeper
         this->mRpcComponent->OnResponse(response);
     }
 
-    ProtoRpcClient *ProtoRpcClientComponent::GetRpcSession(long long id)
+    ProtoRpcClient *RpcClientComponent::GetRpcSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(id);
-        return iter == this->mSessionAdressMap.end() ? nullptr : iter->second;
+        auto iter = this->mRpcClientMap.find(id);
+        return iter == this->mRpcClientMap.end() ? nullptr : iter->second;
     }
 
-    ProtoRpcClient * ProtoRpcClientComponent::NewSession(const std::string &name)
+    ProtoRpcClient * RpcClientComponent::NewSession(const std::string &name)
 	{
         auto socketProxy = new SocketProxy(mTaskComponent->AllocateNetThread(), name);
         auto localSession = this->mClientPool.New(this, socketProxy, SocketType::LocalSocket);
@@ -162,24 +147,24 @@ namespace GameKeeper
             delete socketProxy;
             return nullptr;
         }
-		this->mSessionAdressMap.emplace(socketProxy->GetSocketId(), localSession);
+		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
 		return localSession;
 	}
 
-    void ProtoRpcClientComponent::OnDestory()
+    void RpcClientComponent::OnDestory()
     {
     }
 
-    ProtoRpcClient *ProtoRpcClientComponent::GetSession(long long id)
+    ProtoRpcClient *RpcClientComponent::GetSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(id);
-        return iter != this->mSessionAdressMap.end() ? iter->second : nullptr;
+        auto iter = this->mRpcClientMap.find(id);
+        return iter != this->mRpcClientMap.end() ? iter->second : nullptr;
     }
 
-    bool ProtoRpcClientComponent::CloseSession(long long id)
+    bool RpcClientComponent::CloseSession(long long id)
     {
-        auto iter = this->mSessionAdressMap.find(id);
-        if (iter != this->mSessionAdressMap.end())
+        auto iter = this->mRpcClientMap.find(id);
+        if (iter != this->mRpcClientMap.end())
         {
 			iter->second->StartClose();           
             return true;
@@ -187,11 +172,13 @@ namespace GameKeeper
         return false;
     }
 
-	bool ProtoRpcClientComponent::SendByAddress(long long id, com::Rpc_Request * message)
+	bool RpcClientComponent::SendByAddress(long long id, com::Rpc_Request * message)
 	{
 		ProtoRpcClient * clientSession = this->GetSession(id);
-
-        LOG_CHECK_RET_FALSE(clientSession);
+        if(clientSession == nullptr || !clientSession->IsOpen())
+        {
+            return false;
+        }
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(*message, &json);
@@ -205,7 +192,7 @@ namespace GameKeeper
         return clientSession->SendToServer(message);
 	}
 
-	bool ProtoRpcClientComponent::SendByAddress(long long id, com::Rpc_Response * message)
+	bool RpcClientComponent::SendByAddress(long long id, com::Rpc_Response * message)
 	{
 		ProtoRpcClient * clientSession = this->GetSession(id);
 

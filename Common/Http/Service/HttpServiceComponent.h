@@ -4,8 +4,8 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICECOMPONENT_H
 #define GAMEKEEPER_HTTPSERVICECOMPONENT_H
-#include <Component/Component.h>
-#include <Method/HttpServiceMethod.h>
+#include "Component/Component.h"
+#include "Method/HttpServiceMethod.h"
 namespace GameKeeper
 {
     class HttpServiceComponent : public Component

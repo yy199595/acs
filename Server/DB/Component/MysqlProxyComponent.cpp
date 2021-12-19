@@ -1,7 +1,7 @@
 #include "MysqlProxyComponent.h"
 
-#include<Core/App.h>
-#include<Service/RpcNode.h>
+#include"Core/App.h"
+#include"Service/RpcNode.h"
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
 #include"Util/MathHelper.h"
@@ -116,11 +116,14 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service method MysqlService.Add");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
+
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+
         this->mOperRequest.Clear();
+        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        proxyNode->SendRequestData(requestMessage);
-        return std::make_shared<MysqlRpcTask>(methodId, requestMessage->rpcid());
+        return rpcTask;
     }
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Query(const Message &data)
@@ -138,11 +141,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service method MysqlService.Query");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+
         this->mQueryRequest.Clear();
+        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mQueryRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mQueryRequest);
-        mysqlServiceNode->SendRequestData(requestMessage);
-        return std::make_shared<MysqlRpcTask>(requestMessage->methodid(), requestMessage->rpcid());
+        return rpcTask;
     }
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
@@ -160,12 +165,14 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service method MysqlService.Invoke");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+
         this->mAnyOperRequest.Clear();
         this->mAnyOperRequest.set_sql(sql);
         this->mAnyOperRequest.set_tab(tab);
+        requestMessage->set_rpcid(rpcTask->GetTaskId());
         requestMessage->mutable_data()->PackFrom(this->mAnyOperRequest);
-        mysqlServiceNode->SendRequestData(requestMessage);
-        return std::make_shared<MysqlRpcTask>(methodId, requestMessage->rpcid());
+        return rpcTask;
     }
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Save(const Message &data)
@@ -183,11 +190,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service method MysqlService.Save");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+
         this->mOperRequest.Clear();
+        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        mysqlServiceNode->SendRequestData(requestMessage);
-        return std::make_shared<MysqlRpcTask>(methodId, requestMessage->rpcid());
+        return rpcTask;
     }
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Delete(const Message &data)
@@ -205,10 +214,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service method MysqlService.Delete");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+
         this->mOperRequest.Clear();
+        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        return std::make_shared<MysqlRpcTask>(methodId, requestMessage->rpcid());
+        return rpcTask;
     }
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse)

@@ -4,13 +4,13 @@
 
 #include "HttpRespSession.h"
 #include <Core/App.h>
-#include <Component/Http/HttpComponent.h>
+#include "Http/Component/HttpClientComponent.h"
 #include <Network/Http/Response/HttpGettHandler.h>
 #include <Network/Http/Response/HttpPostHandler.h>
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
-    HttpRespSession::HttpRespSession(HttpComponent *component)
+    HttpRespSession::HttpRespSession(HttpClientComponent *component)
     {
         this->mWriterCount = 0;
         this->mHttpHandler = nullptr;

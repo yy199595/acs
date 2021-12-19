@@ -9,7 +9,7 @@ namespace GameKeeper
 {
     class HttpReqSession;
 
-    class HttpComponent;
+    class HttpClientComponent;
 
     class HttpRequest
     {

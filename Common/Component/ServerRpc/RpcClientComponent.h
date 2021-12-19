@@ -8,12 +8,12 @@
 namespace GameKeeper
 {
 	// 管理所有session
-	class ProtoRpcClientComponent : public Component, public ISocketListen,
-		public IRpc<com::Rpc_Request, com::Rpc_Response>
+	class RpcClientComponent : public Component, public ISocketListen,
+                               public IRpc<com::Rpc_Request, com::Rpc_Response>
 	{
 	public:
-		ProtoRpcClientComponent() = default;
-		~ProtoRpcClientComponent() override = default;
+		RpcClientComponent() = default;
+		~RpcClientComponent() override = default;
 	public:
         void StartClose(long long id) final;
         void OnRequest(com::Rpc_Request * request) final;
@@ -36,13 +36,12 @@ namespace GameKeeper
 		bool SendByAddress(long long id, com::Rpc_Request * message);
 		bool SendByAddress(long long id, com::Rpc_Response * message);
 	private:
-        void Ping(long long id);
 		ProtoRpcClient *GetSession(long long id);
 	private:
+        class RpcComponent * mRpcComponent;
         AllotorPool<ProtoRpcClient> mClientPool;
-        class ProtoRpcComponent * mRpcComponent;
         class ThreadPoolComponent * mTaskComponent;
         class RpcConfigComponent * mProtoConfigComponent;
-		std::unordered_map<long long, ProtoRpcClient *> mSessionAdressMap;
+		std::unordered_map<long long, ProtoRpcClient *> mRpcClientMap;
 	};
 }

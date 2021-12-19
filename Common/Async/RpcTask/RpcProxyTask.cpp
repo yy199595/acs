@@ -2,30 +2,29 @@
 // Created by zmhy0073 on 2021/12/1.
 //
 
-#include"ProtoProxyTask.h"
-#include"ServerRpc/ProtoRpcComponent.h"
-#include"Component/ProtoGateComponent.h"
+#include"RpcProxyTask.h"
+#include"ServerRpc/RpcComponent.h"
+#include"Component/GateComponent.h"
 namespace GameKeeper
 {
-    ProtoProxyTask::ProtoProxyTask(int methodId, long long int rpcId)
-        : ProtoRpcTask(methodId, rpcId)
+    RpcProxyTask::RpcProxyTask(int methodId)
+        : RpcTaskBase(methodId)
     {
-        this->mTimerId = 0;
         this->mClientRpcId = 0;
         this->mClientSockId = 0;
         this->mProxyComponent = nullptr;
     }
 
-    void ProtoProxyTask::InitProxyTask(long long rpcId, long long sockId, ProtoGateComponent *component,
-                                       ProtoRpcComponent *rpcComponent)
+    void RpcProxyTask::InitProxyTask(long long rpcId, long long sockId, GateComponent *component,
+                                     RpcComponent *rpcComponent)
     {
         this->mClientRpcId = rpcId;
         this->mClientSockId = sockId;
         this->mProxyComponent = component;
-        this->mTimerId = rpcComponent->AddRpcTask(this->shared_from_this());
+        rpcComponent->AddRpcTask(this->shared_from_this());
     }
 
-    void ProtoProxyTask::OnResponse(const com::Rpc_Response *response)
+    void RpcProxyTask::OnResponse(const com::Rpc_Response *response)
     {
         auto responseMessage = new c2s::Rpc_Response();
 

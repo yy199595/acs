@@ -21,7 +21,7 @@ namespace GameKeeper
         XCode Ping();
         XCode Login(const c2s::ProxyLogin_Request & request);
     private:
-        class ProtoGateClientComponent * mGateComponent;
+        class GateClientComponent * mGateComponent;
     };
 
 }

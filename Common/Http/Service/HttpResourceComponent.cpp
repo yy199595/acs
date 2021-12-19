@@ -2,11 +2,11 @@
 // Created by zmhy0073 on 2021/11/2.
 //
 #include "HttpResourceComponent.h"
-#include <Core/App.h>
-#include <Util/DirectoryHelper.h>
-#include <Util/MD5.h>
-#include <Network/Http/Response/HttpGettHandler.h>
-#include<Network/Http/Content/HttpWriteContent.h>
+#include "Core/App.h"
+#include "Util/DirectoryHelper.h"
+#include "Util/MD5.h"
+#include "Network/Http/Response/HttpGettHandler.h"
+#include"Network/Http/Content/HttpWriteContent.h"
 namespace GameKeeper
 {
     bool HttpResourceComponent::Awake()

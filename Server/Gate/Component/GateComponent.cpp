@@ -2,21 +2,21 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"ProtoGateComponent.h"
+#include"GateComponent.h"
 #include"Core/App.h"
 #include"Service/RpcNode.h"
 #include"Rpc/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
-#include"Async/RpcTask/ProtoProxyTask.h"
-#include"ServerRpc/ProtoRpcComponent.h"
-#include"ProtoGateClientComponent.h"
+#include"Async/RpcTask/RpcProxyTask.h"
+#include"ServerRpc/RpcComponent.h"
+#include"GateClientComponent.h"
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
 {
-    bool ProtoGateComponent::Awake()
+    bool GateComponent::Awake()
     {
         this->mRpcConfigComponent = nullptr;
         this->mNodeProxyComponent = nullptr;
@@ -24,37 +24,33 @@ namespace GameKeeper
         return true;
     }
 
-    bool ProtoGateComponent::LateAwake()
+    bool GateComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         LOG_CHECK_RET_FALSE(this->mNodeProxyComponent = this->GetComponent<NodeProxyComponent>());
-        LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<ProtoGateClientComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
         return true;
     }
 
-    XCode ProtoGateComponent::OnRequest(const c2s::Rpc_Request *request)
+    XCode GateComponent::OnRequest(const c2s::Rpc_Request *request)
     {
         auto config = this->mRpcConfigComponent->GetProtocolConfig(request->methodname());
-        if (config == nullptr)
-        {
+        if (config == nullptr) {
             LOG_ERROR("call function " << request->methodname() << " not find");
             return XCode::NotFoundRpcConfig;
         }
         auto nodeService = this->mNodeProxyComponent->AllotService(config->Service);
-        if (nodeService == nullptr)
-        {
+        if (nodeService == nullptr) {
             return XCode::CallServiceNotFound;
         }
-        if (!config->Request.empty())
-        {
+        if (!config->Request.empty()) {
             if (!request->has_data()) //没有正确的消息体
             {
                 return XCode::CallArgsError;
             }
             this->mProtoName.clear();
-            if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName))
-            {
+            if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName)) {
                 if (this->mProtoName != config->Request) //请求的消息不正确
                 {
                     return XCode::CallArgsError;
@@ -64,23 +60,17 @@ namespace GameKeeper
 
         int methodId = 0;
         auto requestMessage = nodeService->NewRequest(request->methodname(), methodId);
-        if (request->has_data())
-        {
+        if (request->has_data()) {
             requestMessage->mutable_data()->CopyFrom(request->data());
         }
 
-        if(request->rpcid() != 0)
-        {
-            long long rpcId = requestMessage->rpcid();
-            std::shared_ptr<ProtoProxyTask> proxyTask(new ProtoProxyTask(methodId, rpcId));
-            proxyTask->InitProxyTask(request->rpcid(), request->sockid(), this, this->mRpcComponent);
-        }
 
-        nodeService->SendRequestData(requestMessage);
+        std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask(methodId));
+        proxyTask->InitProxyTask(request->rpcid(), request->sockid(), this, this->mRpcComponent);
         return XCode::Successful;
     }
 
-    XCode ProtoGateComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
+    XCode GateComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
     {
         RpcProxyClient * proxyClient = this->mGateClientComponent->GetProxyClient(sockId);
 #ifdef __DEBUG__

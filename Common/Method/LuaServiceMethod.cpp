@@ -2,7 +2,7 @@
 #include <Script/LuaInclude.h>
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
-#include <ServerRpc/ProtoRpcClientComponent.h>
+#include <ServerRpc/RpcClientComponent.h>
 namespace GameKeeper
 {
 
@@ -10,7 +10,7 @@ namespace GameKeeper
 		:ServiceMethod(name), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		this->mProtocolComponent = App::Get().GetComponent<ProtoRpcClientComponent>();
+		this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
 	}
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request &messageData, com::Rpc_Response & response)

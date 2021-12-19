@@ -2,8 +2,8 @@
 #include <Core/App.h>
 #include <Util/MD5.h>
 #include <Util/MathHelper.h>
-#include <Scene/RedisComponent.h>
-#include <Scene/MysqlProxyComponent.h>
+#include "Component/RedisComponent.h"
+#include "Component/MysqlProxyComponent.h"
 #include"MysqlClient/MysqlRpcTask.h"
 #include<google/protobuf/util/json_util.h>
 namespace GameKeeper

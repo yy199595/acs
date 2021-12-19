@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Util/Guid.h>
-#include <Scene/RedisComponent.h>
+#include "Component/RedisComponent.h"
 #include <Coroutine/TaskComponent.h>
 
 namespace GameKeeper

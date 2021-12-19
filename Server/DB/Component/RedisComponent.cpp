@@ -1,9 +1,9 @@
 ﻿#include"RedisComponent.h"
-#include<Util/StringHelper.h>
-#include<Scene/ThreadPoolComponent.h>
-#include<Coroutine/TaskComponent.h>
-#include<Script/ClassProxyHelper.h>
-#include<Core/App.h>
+#include"Util/StringHelper.h"
+#include"Component/Scene/ThreadPoolComponent.h"
+#include"Coroutine/TaskComponent.h"
+#include"Script/ClassProxyHelper.h"
+#include"Core/App.h"
 #include"Other/ElapsedTimer.h"
 namespace GameKeeper
 {

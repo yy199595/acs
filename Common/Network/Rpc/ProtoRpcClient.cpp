@@ -1,12 +1,12 @@
 ﻿#include"ProtoRpcClient.h"
 #include<Core/App.h>
-#include<ServerRpc/ProtoRpcClientComponent.h>
+#include<ServerRpc/RpcClientComponent.h>
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
 {
-	ProtoRpcClient::ProtoRpcClient(ProtoRpcClientComponent *component, SocketProxy * socket, SocketType type)
+	ProtoRpcClient::ProtoRpcClient(RpcClientComponent *component, SocketProxy * socket, SocketType type)
 		:RpcClient(socket, type), mTcpComponent(component)
 	{
 
@@ -57,7 +57,7 @@ namespace GameKeeper
         if (code != XCode::Successful)
         {
             long long id = this->GetSocketId();
-            this->mNetWorkThread.Invoke(&ProtoRpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
+            this->mNetWorkThread.Invoke(&RpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
             return;
         }
         delete message;
@@ -67,7 +67,7 @@ namespace GameKeeper
 	{
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
+        taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
 	}
 
 	XCode ProtoRpcClient::OnRequest(const char * buffer, size_t size)
@@ -80,7 +80,7 @@ namespace GameKeeper
 		}
         requestData->set_socketid(this->GetSocketId());
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcClientComponent::OnRequest, mTcpComponent, requestData);
+        taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
 		return XCode::Successful;
 	}
 
@@ -93,7 +93,7 @@ namespace GameKeeper
 			return XCode::ParseResponseDataError;
 		}
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcClientComponent::OnResponse, mTcpComponent, responseData);
+        taskScheduler.Invoke(&RpcClientComponent::OnResponse, mTcpComponent, responseData);
 		return XCode::Successful;
 	}
 
@@ -101,6 +101,6 @@ namespace GameKeeper
     {
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-        taskScheduler.Invoke(&ProtoRpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
+        taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
     }
 }

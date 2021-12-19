@@ -5,11 +5,11 @@
 #include "HttpPostHandler.h"
 #include <Core/App.h>
 #include <Network/Http/HttpRespSession.h>
-#include <Component/Http/HttpComponent.h>
+#include "Http/Component/HttpClientComponent.h"
 #include <Method/HttpServiceMethod.h>
 namespace GameKeeper
 {
-    HttpPostHandler::HttpPostHandler(HttpComponent *component)
+    HttpPostHandler::HttpPostHandler(HttpClientComponent *component)
         : HttpRequestHandler(component)
     {
         this->mContent = nullptr;

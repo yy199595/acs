@@ -5,7 +5,7 @@ namespace GameKeeper
 {
     class HttpHandlerBase;
 
-    class HttpComponent;
+    class HttpClientComponent;
 
     class HttpSessionBase
     {

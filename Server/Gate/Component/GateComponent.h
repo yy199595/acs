@@ -9,12 +9,12 @@
 #include"Component.h"
 namespace GameKeeper
 {
-    class ProtoGateComponent : public Component,
-        public IClientProtoRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+    class GateComponent : public Component,
+                          public IClientProtoRpc<c2s::Rpc_Request, c2s::Rpc_Response>
     {
     public:
-        ProtoGateComponent() = default;
-        ~ProtoGateComponent() final = default;
+        GateComponent() = default;
+        ~GateComponent() final = default;
     protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -23,10 +23,10 @@ namespace GameKeeper
         XCode OnResponse(long long sockId, const c2s::Rpc_Response *response) final;
     private:
         std::string mProtoName;
-        class ProtoRpcComponent * mRpcComponent;
+        class RpcComponent * mRpcComponent;
         class RpcConfigComponent * mRpcConfigComponent;
         class NodeProxyComponent * mNodeProxyComponent;
-        class ProtoGateClientComponent * mGateClientComponent;
+        class GateClientComponent * mGateClientComponent;
     };
 }
 

@@ -11,13 +11,13 @@ namespace GameKeeper
 	class HttpWriteContent;
     class HttpServiceConfig;
     class HttpRespSession;
-    class HttpComponent;
+    class HttpClientComponent;
 	
 
     class HttpRequestHandler : public HttpHandlerBase
     {
     public:
-        explicit HttpRequestHandler(HttpComponent *component);
+        explicit HttpRequestHandler(HttpClientComponent *component);
 
          virtual ~HttpRequestHandler() override;
 
@@ -52,7 +52,7 @@ namespace GameKeeper
     protected:
         std::string mMethod;
         std::string mComponent;
-        HttpComponent *mHttpComponent;
+        HttpClientComponent *mHttpComponent;
 		//const HttpServiceConfig * mHttpConfig;
     private:
 #ifdef __DEBUG__

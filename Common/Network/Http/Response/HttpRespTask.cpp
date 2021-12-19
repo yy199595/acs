@@ -39,11 +39,6 @@ namespace GameKeeper
         }
     }
 
-    void HttpRespTask::OnTaskAwait()
-    {
-
-    }
-
     void HttpRespTask::OnComplete(XCode code)
     {
         this->mCode = code;
@@ -51,7 +46,7 @@ namespace GameKeeper
         {
             LOG_ERROR(this->mError);
         }
-        this->RestoreTask(TaskFinish);
+        this->SetResult(std::move(this->mResponse));
         auto iter = this->mHeadMap.begin();
         for(; iter != this->mHeadMap.end(); iter++)
         {
@@ -62,7 +57,6 @@ namespace GameKeeper
 
     HttpStatus HttpRespTask::AwaitGetCode()
     {
-        this->AwaitTask();
         return this->mHttpCode;
     }
 

@@ -42,28 +42,24 @@ namespace GameKeeper
         tcpServer->GetListeners(listeners);
         nodeInfo->set_serverip(tcpServer->GetHostIp());
 
-        for (auto listener: listeners)
-        {
+        for (auto listener: listeners) {
             const auto &listenerConfig = listener->GetConfig();
             const std::string &name = listenerConfig.Name;
             const unsigned short port = listenerConfig.Port;
             nodeInfo->mutable_listeners()->insert({name, port});
         }
 
-        for (Component *component: components)
-        {
-            if (auto *service = dynamic_cast<ServiceComponent *>(component))
-            {
+        for (Component *component: components) {
+            if (auto *service = dynamic_cast<ServiceComponent *>(component)) {
                 nodeInfo->add_services(service->GetTypeName());
             }
         }
 
         RpcNode *centerNode = this->mNodeComponent->GetServiceNode(0);
-        std::shared_ptr<s2s::NodeRegister_Response> response(new s2s::NodeRegister_Response());
-        while(centerNode->Call("CenterHostService.Add", registerInfo, response) != XCode::Successful)
-        {
+        auto response = centerNode->Call<
+                s2s::NodeRegister_Response>("CenterHostService.Add", registerInfo);
+        if (response == nullptr) {
             LOG_ERROR("register to center failure");
-            App::Get().GetTaskComponent()->AwaitSleep(3000);
         }
         this->mToken = response->groupdata().token();
         this->mOpenTime = response->groupdata().opentime();

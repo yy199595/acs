@@ -1,5 +1,5 @@
 ﻿#include "RedisTaskBase.h"
-#include <Scene/RedisComponent.h>
+#include "Component/RedisComponent.h"
 #include <Core/App.h>
 
 #ifdef REDIS_SAVE_JSON

@@ -4,7 +4,7 @@
 using namespace com;
 namespace GameKeeper
 {
-    class ProtoRpcComponent;
+    class RpcComponent;
 
     class TaskComponent;
 

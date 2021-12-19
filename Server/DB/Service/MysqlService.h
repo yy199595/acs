@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Protocol/s2s.pb.h>
-#include <Service/ProtoServiceComponent.h>
+#include "Protocol/s2s.pb.h"
+#include "Component/Service/ProtoServiceComponent.h"
 
 namespace GameKeeper
 {

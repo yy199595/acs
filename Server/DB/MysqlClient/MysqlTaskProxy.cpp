@@ -1,6 +1,6 @@
 #include"MysqlTaskProxy.h"
 #include<Core/App.h>
-#include<Scene/MysqlComponent.h>
+#include"Component/MysqlComponent.h"
 #include<Coroutine/TaskComponent.h>
 #include"Util/JsonHelper.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-#include"Async/AsyncTask.h"
+#include"Async/Task.h"
 #include"Protocol/c2s.pb.h"
 #include<google/protobuf/message.h>
 
@@ -9,7 +9,7 @@ using namespace GameKeeper;
 using namespace google::protobuf;
 namespace Client
 {
-	class ClientRpcTask : public AsyncTask, public std::enable_shared_from_this<ClientRpcTask>
+	class ClientRpcTask : public Task, public std::enable_shared_from_this<ClientRpcTask>
 	{
 	public:
 		ClientRpcTask(const std::string & method, long long rpcId);

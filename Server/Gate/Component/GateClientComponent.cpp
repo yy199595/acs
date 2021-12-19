@@ -2,11 +2,11 @@
 // Created by mac on 2021/11/28.
 //
 
-#include "ProtoGateClientComponent.h"
+#include "GateClientComponent.h"
 #include"Core/App.h"
 #include"Network/Rpc/RpcProxyClient.h"
-#include"ProtoGateComponent.h"
-#include"ServerRpc/ProtoRpcComponent.h"
+#include"GateComponent.h"
+#include"ServerRpc/RpcComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"Scene/RpcConfigComponent.h"
@@ -14,7 +14,7 @@
 #endif
 namespace GameKeeper
 {
-    bool ProtoGateClientComponent::Awake()
+    bool GateClientComponent::Awake()
     {
         this->mRpcComponent = nullptr;
         this->mTimerComponent = nullptr;
@@ -22,15 +22,15 @@ namespace GameKeeper
         return true;
     }
 
-    bool ProtoGateClientComponent::LateAwake()
+    bool GateClientComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get().GetTimerComponent());
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ProtoRpcComponent>());
-        LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<ProtoGateComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
         return true;
     }
 
-    void ProtoGateClientComponent::OnListen(SocketProxy *socket)
+    void GateClientComponent::OnListen(SocketProxy *socket)
     {
         long long id = socket->GetSocketId();
         auto iter = this->mProxyClientMap.find(id);
@@ -44,13 +44,13 @@ namespace GameKeeper
 #endif
             rpcClient->StartReceive();
             this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
-            //this->mTimerComponent->AsyncWait(5000, &ProtoGateClientComponent::CheckPlayerLogout, this, id);
+            //this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, id);
             return;
         }
         delete socket;
     }
 
-    void ProtoGateClientComponent::OnRequest(c2s::Rpc_Request *request) //客户端调过来的
+    void GateClientComponent::OnRequest(c2s::Rpc_Request *request) //客户端调过来的
     {
 #ifdef __DEBUG__
         std::string json;
@@ -77,7 +77,7 @@ namespace GameKeeper
         }
     }
 
-    void ProtoGateClientComponent::OnCloseSocket(long long id, XCode code)
+    void GateClientComponent::OnCloseSocket(long long id, XCode code)
     {
         auto iter = this->mProxyClientMap.find(id);
         if(iter != this->mProxyClientMap.end())
@@ -96,7 +96,7 @@ namespace GameKeeper
         }
     }
 
-    bool ProtoGateClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
+    bool GateClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
     {
         auto proxyClient = this->GetProxyClient(sockId);
         if(proxyClient == nullptr)
@@ -106,13 +106,13 @@ namespace GameKeeper
         return proxyClient->SendToClient(message);
     }
 
-    RpcProxyClient *ProtoGateClientComponent::GetProxyClient(long long int sockId)
+    RpcProxyClient *GateClientComponent::GetProxyClient(long long int sockId)
     {
         auto iter = this->mProxyClientMap.find(sockId);
         return iter != this->mProxyClientMap.end() ? iter->second : nullptr;
     }
 
-    void ProtoGateClientComponent::StartClose(long long int id)
+    void GateClientComponent::StartClose(long long int id)
     {
         RpcProxyClient * proxyClient = this->GetProxyClient(id);
         if(proxyClient != nullptr)
@@ -121,7 +121,7 @@ namespace GameKeeper
         }
     }
 
-    void ProtoGateClientComponent::CheckPlayerLogout(long long sockId)
+    void GateClientComponent::CheckPlayerLogout(long long sockId)
     {
         RpcProxyClient * proxyClient = this->GetProxyClient(sockId);
         if(proxyClient != nullptr)
@@ -134,6 +134,6 @@ namespace GameKeeper
                 return;
             }
         }
-        this->mTimerComponent->AsyncWait(5000, &ProtoGateClientComponent::CheckPlayerLogout, this, sockId);
+        this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, sockId);
     }
 }

@@ -1,19 +1,19 @@
 ﻿#include "RpcNode.h"
 #include<Core/App.h>
 #include<Coroutine/TaskComponent.h>
-#include<Async/RpcTask/ProtoRpcTask.h>
-#include<ServerRpc/ProtoRpcClientComponent.h>
+#include<Async/RpcTask/RpcTask.h>
+#include<ServerRpc/RpcClientComponent.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include<google/protobuf/util/json_util.h>
-#include"ServerRpc/ProtoRpcComponent.h"
+#include"ServerRpc/RpcComponent.h"
 namespace GameKeeper
 {
 	RpcNode::RpcNode(int id)
 		:  mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
-        this->mRpcComponent = App::Get().GetComponent<ProtoRpcComponent>();
-        this->mRpcClientComponent = App::Get().GetComponent<ProtoRpcClientComponent>();
+        this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
+        this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
         LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<TaskComponent>());
         LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
 	}
@@ -52,7 +52,7 @@ namespace GameKeeper
         return true;
     }
 
-    ProtoRpcClient * RpcNode::GetTcpSession()
+    void RpcNode::ConnectToNode()
     {
         auto rpcClient = this->mRpcClientComponent->GetRpcSession(this->mSocketId);
         if(rpcClient == nullptr)
@@ -65,7 +65,6 @@ namespace GameKeeper
             auto method = NewMethodProxy(&RpcNode::OnConnectAfter, this);
             rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
         }
-        return rpcClient;
     }
 
     void RpcNode::OnConnectAfter()
@@ -116,8 +115,6 @@ namespace GameKeeper
         }
         auto requestMessage = new com::Rpc_Request();
         requestMessage->set_methodid(config->MethodId);
-
-        this->SendRequestData(requestMessage);
         return XCode::Successful;
     }
 
@@ -131,7 +128,6 @@ namespace GameKeeper
         auto requestMessage = new com::Rpc_Request();
         requestMessage->set_methodid(config->MethodId);
         requestMessage->mutable_data()->PackFrom(request);
-        this->SendRequestData(requestMessage);
         return XCode::Successful;
 	}
 
@@ -145,67 +141,51 @@ namespace GameKeeper
         methodId = config->MethodId;
         auto request = new com::Rpc_Request();
 		request->set_methodid(config->MethodId);
-        request->set_rpcid(this->mRpcComponent->GetRpcTaskId());
-		return request;
+        if(!this->mRpcClientComponent->SendByAddress(this->mSocketId, request))
+        {
+            this->ConnectToNode();
+            this->mWaitSendQueue.push(request);
+        }
+        return request;
 	}
 
-    bool RpcNode::SendRequestData(com::Rpc_Request * message)
-    {
-        auto rpcClient = this->GetTcpSession();
-        if(!rpcClient->SendToServer(message))
-        {
-            this->mWaitSendQueue.push(message);
-            return false;
-        }
-        return true;
-    }
-
-    std::shared_ptr<CppProtoRpcTask> RpcNode::NewRpcTask(const std::string &method)
+    std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method)
     {
         int methodId = 0;
         auto requestData = this->NewRequest(method, methodId);
         if (requestData == nullptr)
         {
             LOG_ERROR("not find rpc config " << method);
-            return std::make_shared<CppProtoRpcTask>(XCode::NotFoundRpcConfig);
+            return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
         }
-        this->SendRequestData(requestData);
-        return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
+        std::shared_ptr<RpcTask> rpcTask(new RpcTask(methodId));
+        requestData->set_rpcid(rpcTask->GetTaskId());
+        return rpcTask;
     }
 
-    std::shared_ptr<CppProtoRpcTask> RpcNode::NewRpcTask(const std::string &method, const Message &message)
+    std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method, const Message &message)
     {
         int methodId = 0;
         auto requestData = this->NewRequest(method, methodId);
         if (requestData == nullptr)
         {
             LOG_ERROR("not find rpc config " << method);
-            return std::make_shared<CppProtoRpcTask>(XCode::NotFoundRpcConfig);
+            return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
         }
+        std::shared_ptr<RpcTask> rpcTask(new RpcTask(methodId));
+
         requestData->mutable_data()->PackFrom(message);
-        this->SendRequestData(requestData);
-        return std::make_shared<CppProtoRpcTask>(methodId, requestData->rpcid());
+        requestData->set_rpcid(rpcTask->GetTaskId());
+        return rpcTask;
     }
 
-    XCode RpcNode::Call(const string &func)
+    XCode RpcNode::Invoke(const string &func)
     {
-        return this->NewRpcTask(func)->Await();
+        return this->NewRpcTask(func)->GetCode();
     }
 
-    XCode RpcNode::Call(const string &func, const Message &request)
+    XCode RpcNode::Invoke(const string &func, const Message &request)
     {
-        return this->NewRpcTask(func, request)->Await();
-    }
-
-    XCode RpcNode::Call(const string &func, std::shared_ptr<Message> response)
-    {
-        auto rpcTask = this->NewRpcTask(func);
-        return rpcTask->Await(std::move(response));
-    }
-
-    XCode RpcNode::Call(const string &func, const Message &request, std::shared_ptr<Message> response)
-    {
-        auto rpcTask = this->NewRpcTask(func, request);
-        return rpcTask->Await(std::move(response));
+        return this->NewRpcTask(func, request)->GetCode();
     }
 }// namespace GameKeeper

@@ -6,7 +6,7 @@
 #include"Core/App.h"
 #include"Service/RpcNode.h"
 #include"Rpc/RpcProxyClient.h"
-#include"Component/ProtoGateClientComponent.h"
+#include"Component/GateClientComponent.h"
 namespace GameKeeper
 {
     GateService::GateService()
@@ -18,7 +18,7 @@ namespace GameKeeper
     {
         BIND_RPC_FUNCTION(GateService::Ping);
         BIND_RPC_FUNCTION(GateService::Login);
-        this->mGateComponent= this->GetComponent<ProtoGateClientComponent>();
+        this->mGateComponent= this->GetComponent<GateClientComponent>();
         return true;
     }
 

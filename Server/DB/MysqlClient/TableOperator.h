@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include<string>
-#include<Scene/MysqlComponent.h>
+#include"Component/MysqlComponent.h"
 #include<rapidjson/document.h>
 namespace GameKeeper
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <XCode/XCode.h>
-#include <Component/Component.h>
-#include <Util/Guid.h>
-#include <MysqlClient/MysqlDefine.h>
+#include "XCode/XCode.h"
+#include "Component/Component.h"
+#include "Util/Guid.h"
+#include "MysqlClient/MysqlDefine.h"
 
 namespace GameKeeper
 {

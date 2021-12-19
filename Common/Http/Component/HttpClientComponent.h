@@ -1,6 +1,6 @@
 
 #pragma once
-#include<Component/Component.h>
+#include"Component/Component.h"
 namespace GameKeeper
 {
 	class HttpSessionBase;
@@ -11,11 +11,11 @@ namespace GameKeeper
     class HttpRequestHandler;	
 	class HttpReqSession;
 
-    class HttpComponent : public Component, public ISocketListen
+    class HttpClientComponent : public Component, public ISocketListen
     {
     public:
-        HttpComponent() = default;
-        ~HttpComponent() final = default;
+        HttpClientComponent() = default;
+        ~HttpClientComponent() final = default;
     public:
         bool Awake() final;
         bool LateAwake() final;

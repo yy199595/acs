@@ -1,9 +1,9 @@
 ﻿#include "MysqlService.h"
-#include <Scene/MysqlComponent.h>
-#include <Scene/ThreadPoolComponent.h>
-#include <MysqlClient/MysqlTaskProxy.h>
-#include <Core/App.h>
-#include <Pool/MessagePool.h>
+#include "Component/MysqlComponent.h"
+#include "Component/Scene/ThreadPoolComponent.h"
+#include "MysqlClient/MysqlTaskProxy.h"
+#include "Core/App.h"
+#include "Pool/MessagePool.h"
 namespace GameKeeper
 {
     bool MysqlService::Awake()

@@ -1,30 +1,30 @@
 //
 // Created by 64658 on 2021/8/5.
 //
-#include <Core/App.h>
-#include <Thread/TaskThread.h>
-#include "HttpComponent.h"
-#include <Http/HttpRespSession.h>
+#include "Core/App.h"
+#include "Thread/TaskThread.h"
+#include "HttpClientComponent.h"
+#include "Network/Http/HttpRespSession.h"
 #include"Http/Request/HttpGetRequest.h"
 #include"Http/Request/HttpPostRequest.h"
-#include <Method/HttpServiceMethod.h>
-#include <Http/HttpServiceComponent.h>
-#include <Other/ProtocolConfig.h>
+#include "Method/HttpServiceMethod.h"
+#include "Http/Service/HttpServiceComponent.h"
+#include "Other/ProtocolConfig.h"
 #include"Other/ElapsedTimer.h"
-#include<Http/HttpReqSession.h>
+#include"Network/Http/HttpReqSession.h"
 
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
 namespace GameKeeper
 {
 
-    bool HttpComponent::Awake()
+    bool HttpClientComponent::Awake()
     {
         this->mCorComponent = nullptr;
         return true;
     }
 
-    bool HttpComponent::LateAwake()
+    bool HttpClientComponent::LateAwake()
     {
         this->mCorComponent = App::Get().GetTaskComponent();
         this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
@@ -37,12 +37,12 @@ namespace GameKeeper
         return true;
     }
 
-    void HttpComponent::OnListen(SocketProxy *socket)
+    void HttpClientComponent::OnListen(SocketProxy *socket)
     {
 
     }
 
-	void HttpComponent::OnRequest(HttpRespSession * remoteSession)
+	void HttpClientComponent::OnRequest(HttpRespSession * remoteSession)
 	{
         auto requestHandler = remoteSession->GetReuqestHandler();
         const std::string & method = requestHandler->GetMethod();
@@ -61,7 +61,7 @@ namespace GameKeeper
         remoteSession->StartSendHttpMessage();
 	}
 
-    HttpServiceMethod *HttpComponent::GetHttpMethod(const std::string &service, const std::string &method)
+    HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &service, const std::string &method)
     {
         auto component = this->GetComponent<HttpServiceComponent>(service);
         if(component == nullptr)
@@ -71,7 +71,7 @@ namespace GameKeeper
         return component->GetMethod(method);
     }
 
-    XCode HttpComponent::Get(const std::string &url, int timeout)
+    XCode HttpClientComponent::Get(const std::string &url, int timeout)
     {
         ElapsedTimer timer;
         std::shared_ptr<HttpGetRequest> getRequest(new HttpGetRequest(url));
@@ -92,7 +92,7 @@ namespace GameKeeper
     }
 
 
-    XCode HttpComponent::Post(const std::string &url, const std::string & data, int timeout)
+    XCode HttpClientComponent::Post(const std::string &url, const std::string & data, int timeout)
     {
         ElapsedTimer timer;
         std::shared_ptr<HttpPostRequest> postRequest(new HttpPostRequest(url, data));
@@ -112,7 +112,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    void HttpComponent::Invoke(HttpRespSession *remoteRequest)
+    void HttpClientComponent::Invoke(HttpRespSession *remoteRequest)
     {			
 //		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
 //		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();

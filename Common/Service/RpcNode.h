@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"Protocol/s2s.pb.h"
-#include<Async/RpcTask/ProtoRpcTask.h>
+#include<Async/RpcTask/RpcTask.h>
 
 using namespace google::protobuf;
 namespace GameKeeper
@@ -25,8 +25,6 @@ namespace GameKeeper
 
         const s2s::NodeInfo & GetNodeInfo() const { return this->mNodeInfo; }
 
-        bool SendRequestData(com::Rpc_Request * message);
-
         com::Rpc_Request * NewRequest(const std::string & method, int & methodId);
     public:
         void Destory();
@@ -42,19 +40,23 @@ namespace GameKeeper
         XCode Notice(const std::string &method);                        //不回应
         XCode Notice(const std::string &method, const Message &request);//不回应
 
-        XCode Call(const std::string & func);
-        XCode Call(const std::string & func, const Message & request);
-        XCode Call(const std::string & func, std::shared_ptr<Message> response);
-        XCode Call(const std::string & func, const Message & request, std::shared_ptr<Message> response);
+        XCode Invoke(const std::string & func);
+        XCode Invoke(const std::string & func, const Message & request);
+
+        template<typename T>
+        std::shared_ptr<T> Call(const std::string & func);
+
+        template<typename T>
+        std::shared_ptr<T> Call(const std::string & func, const Message & request);
     public:
 
-       std::shared_ptr<CppProtoRpcTask> NewRpcTask(const std::string & method);
+       std::shared_ptr<RpcTask> NewRpcTask(const std::string & method);
 
-       std::shared_ptr<CppProtoRpcTask> NewRpcTask(const std::string & method, const Message & message);
+       std::shared_ptr<RpcTask> NewRpcTask(const std::string & method, const Message & message);
 
     private:
+        void ConnectToNode();
         void OnConnectAfter();
-        class ProtoRpcClient *GetTcpSession();
     private:
         int mGlobalId;
         short mAreaId;
@@ -70,9 +72,21 @@ namespace GameKeeper
 
         std::set<std::string> mServiceArray;//服务列表
         TaskComponent *mCorComponent;//协程
-        class ProtoRpcComponent * mRpcComponent;
+        class RpcComponent * mRpcComponent;
         class RpcConfigComponent *mRpcConfigComponent;
         std::queue<com::Rpc_Request *> mWaitSendQueue;
-        class ProtoRpcClientComponent * mRpcClientComponent;
+        class RpcClientComponent * mRpcClientComponent;
     };
+
+    template<typename T>
+    std::shared_ptr<T> RpcNode::Call(const std::string &func)
+    {
+        return this->NewRpcTask(func)->GetData<T>();
+    }
+
+    template<typename T>
+    std::shared_ptr<T> RpcNode::Call(const std::string &func, const Message &request)
+    {
+        return this->NewRpcTask(func, request)->GetData<T>();
+    }
 }// namespace GameKeeper

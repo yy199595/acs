@@ -7,15 +7,15 @@
 #include<memory>
 #include"XCode/XCode.h"
 #include"Protocol/db.pb.h"
-#include"Async/RpcTask/ProtoRpcTask.h"
+#include"Async/RpcTask/RpcTask.h"
 using namespace google::protobuf;
 namespace GameKeeper
 {
-    class MysqlRpcTask : public ProtoRpcTask
+    class MysqlRpcTask : public RpcTaskBase
     {
     public:
         explicit MysqlRpcTask(XCode code);
-        explicit MysqlRpcTask(int methodId, unsigned int rpcId);
+        explicit MysqlRpcTask(int methodId);
         ~MysqlRpcTask() final;
     public:
         XCode AwakeGetCode();

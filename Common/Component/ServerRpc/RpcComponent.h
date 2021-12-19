@@ -16,18 +16,17 @@ namespace GameKeeper
 
     class JsonServiceMethod;
 
-    class ProtoRpcTask;
-    class ProtoRpcComponent : public Component,
-            public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
+    class RpcTaskBase;
+    class RpcComponent : public Component,
+                         public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
     {
     public:
-		ProtoRpcComponent() = default;
-        ~ProtoRpcComponent() final = default;
+		RpcComponent() = default;
+        ~RpcComponent() final = default;
 
     public:
-        long long GetRpcTaskId();
-        unsigned int AddRpcTask(std::shared_ptr<ProtoRpcTask> task);
-        std::shared_ptr<ProtoRpcTask> GetRpcTask(long long rpcId) const;
+        unsigned int AddRpcTask(std::shared_ptr<RpcTaskBase> task);
+        std::shared_ptr<RpcTaskBase> GetRpcTask(long long rpcId) const;
     protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -37,16 +36,14 @@ namespace GameKeeper
         virtual int GetPriority() const { return 500; }
 	private:
         void OnTaskTimeout(long long rpcId);
-        void SyncInvoke(ServiceMethod * method, const com::Rpc_Request * request);
-        void AsyncInvoke(ServiceMethod * method, const com::Rpc_Request * request);
     private:
         int mTick;
         int mNodeId;
         long long mLastTime;
-        class TimerComponent * mTimerComponent;
         class TaskComponent *mCorComponent;
+        class TimerComponent * mTimerComponent;
+        class RpcClientComponent *mRpcClientComponent;
         class RpcConfigComponent * mPpcConfigComponent;
-        class ProtoRpcClientComponent *mRpcClientComponent;
-        std::unordered_map<long long, std::shared_ptr<ProtoRpcTask>> mRpcTasks;
+        std::unordered_map<long long, std::shared_ptr<RpcTaskBase>> mRpcTasks;
     };
 }

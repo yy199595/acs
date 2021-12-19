@@ -6,13 +6,13 @@
 #include <Core/App.h>
 #include <Other/ProtocolConfig.h>
 #include <Network/Http/HttpRespSession.h>
-#include <Component/Http/HttpComponent.h>
+#include "Http/Component/HttpClientComponent.h"
 #include <Network/Http/Content/HttpReadContent.h>
 #include <Network/Http/Content/HttpWriteContent.h>
 namespace GameKeeper
 {
 
-    HttpRequestHandler::HttpRequestHandler(HttpComponent *component)
+    HttpRequestHandler::HttpRequestHandler(HttpClientComponent *component)
         : mHttpComponent(component)
     {
         this->mWriteCount = 0;

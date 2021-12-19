@@ -7,10 +7,10 @@
 #include<asio.hpp>
 #include"Http/Http.h"
 #include<unordered_map>
-#include"Async/AsyncTask.h"
+#include"Async/Task.h"
 namespace GameKeeper
 {
-    class HttpRespTask : public AsyncTask
+    class HttpRespTask : public Task<std::string>
     {
     public:
         HttpRespTask() = default;
@@ -19,8 +19,6 @@ namespace GameKeeper
         void OnComplete(XCode code);
         void OnReceiveHead(asio::streambuf & buf);
         virtual bool OnReceiveBody(asio::streambuf & buf);
-    protected:
-        void OnTaskAwait() final;
     public:
         HttpStatus AwaitGetCode();
         const std::string & GetData() const { return this->mResponse;}
