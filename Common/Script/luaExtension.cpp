@@ -146,7 +146,7 @@ namespace LuaAPIExtension
             const char *file = ar.short_src;
 
 
-            stringBuffer << StringHelper::GetFileName(ar.short_src) << ":" << ar.currentline << "  ";
+            stringBuffer << Helper::String::GetFileName(ar.short_src) << ":" << ar.currentline << "  ";
             for (int i = 1; i <= n; i++)
             {
                 size_t size;

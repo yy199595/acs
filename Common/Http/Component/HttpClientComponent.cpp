@@ -85,7 +85,7 @@ namespace GameKeeper
 
         HttpStatus code = httpRespTask->AwaitGetCode();
 
-        LOG_ERROR(httpRespTask->GetData());
+        LOG_ERROR(httpRespTask->Await());
 
         LOG_DEBUG("time = " << timer.GetSecond() << "s");
         return XCode::Successful;
@@ -104,9 +104,7 @@ namespace GameKeeper
         std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
         auto httpRespTask = httpLocalSession->NewTask<HttpPostRequest, HttpRespTask>(postRequest);
 
-        HttpStatus code = httpRespTask->AwaitGetCode();
-
-        LOG_ERROR(httpRespTask->GetData());
+        LOG_ERROR(httpRespTask->Await());
 
         LOG_DEBUG("time = " << timer.GetSecond() << "s");
         return XCode::Successful;

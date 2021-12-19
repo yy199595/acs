@@ -25,13 +25,13 @@ namespace GameKeeper
     bool HttpReadFileContent::OpenFile()
     {
         std::string dir;
-        if (!DirectoryHelper::GetDirByPath(this->mPath, dir))
+        if (!Helper::Directory::GetDirByPath(this->mPath, dir))
         {
             LOG_ERROR("parse " << this->mPath << " failure");
             return false;
         }
         LOG_WARN(dir);
-        if (!DirectoryHelper::MakeDir(dir))
+        if (!Helper::Directory::MakeDir(dir))
         {
             LOG_ERROR("create dir " << dir << " failure");
             return false;

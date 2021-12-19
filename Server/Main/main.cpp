@@ -22,7 +22,6 @@
 #include <Service/CenterHostService.h>
 #include <Scene/MonitorComponent.h>
 #include "Service/MysqlService.h"
-#include "Http/Service/HttpResourceComponent.h"
 #include <Service/HttpLoginService.h>
 #include "Http/Service/HttpOperComponent.h"
 #include "Scene/OperatorComponent.h"
@@ -63,7 +62,6 @@ int main(int argc, char **argv)
     REGISTER_COMPONENT(LocalHostService);
     REGISTER_COMPONENT(HttpLoginService);
     REGISTER_COMPONENT(HttpOperComponent);
-    REGISTER_COMPONENT(HttpResourceComponent);
 
 	if (argc == 1)
 	{

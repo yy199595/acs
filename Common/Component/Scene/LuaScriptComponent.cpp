@@ -53,15 +53,15 @@ namespace GameKeeper
 		LOG_CHECK_RET_FALSE(config.GetValue("ScriptPath", luaDir));
 
 		std::vector<std::string> luaFiles;
-		DirectoryHelper::GetFilePaths(luaDir, "*.lua",luaFiles);
+		Helper::Directory::GetFilePaths(luaDir, "*.lua",luaFiles);
 
 		std::string dir, name, luaFile;
 		for (std::string & path : luaFiles)
 		{
-			if (FileHelper::ReadTxtFile(path, luaFile)
-				&& DirectoryHelper::GetDirAndFileName(path, dir, name))
+			if (Helper::File::ReadTxtFile(path, luaFile)
+				&& Helper::Directory::GetDirAndFileName(path, dir, name))
 			{
-				MD5 md5(luaFile.c_str(), luaFile.size());
+				Helper::Md5::MD5 md5(luaFile.c_str(), luaFile.size());
 				auto iter = this->mLuaFileMd5s.find(name);
 				if (iter == this->mLuaFileMd5s.end())
 				{
@@ -162,7 +162,7 @@ namespace GameKeeper
     void LuaScriptComponent::AddRequirePath(const std::string path)
     {
 		std::vector<std::string> luaFiles;
-		if (DirectoryHelper::GetFilePaths(path, "*.lua",luaFiles))
+		if (Helper::Directory::GetFilePaths(path, "*.lua",luaFiles))
 		{
 			for (std::string & file : luaFiles)
 			{

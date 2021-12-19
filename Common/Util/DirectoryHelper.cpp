@@ -19,25 +19,24 @@
 #define MakeDirectory(path) mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IXOTH)
 #endif
 #define PATH_MAX_LENGHT 1024
-namespace DirectoryHelper
+namespace Helper
 {
-    bool MakeDir(const std::string dir)
+    namespace Directory
     {
-        if (DirectoryHelper::DirectorIsExist(dir))
+        bool MakeDir(const std::string dir)
         {
-            return true;
-        }
-
-        for (size_t index = 0; index < dir.size(); index++)
-        {
-            if (dir[index] == '/' || dir[index] == '\\')
-            {
-                const std::string path = dir.substr(0, index);
-                MakeDirectory(path);
+            if (Directory::DirectorIsExist(dir)) {
+                return true;
             }
+
+            for (size_t index = 0; index < dir.size(); index++) {
+                if (dir[index] == '/' || dir[index] == '\\') {
+                    const std::string path = dir.substr(0, index);
+                    MakeDirectory(path);
+                }
+            }
+            return MakeDirectory(dir) != -1;
         }
-        return MakeDirectory(dir) != -1;
-    }
 
     bool DeleteDir(const std::string dir)
     {
@@ -182,4 +181,5 @@ namespace DirectoryHelper
         fileName = path.substr(pos + 1);
         return true;
     }
-}// namespace DirectoryHelper
+    }
+}

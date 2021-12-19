@@ -23,7 +23,7 @@ namespace GameKeeper
         std::string md5;
         rapidjson::Document jsonMapper;
         const std::string path = App::Get().GetServerPath().GetConfigPath() + "rpc.json";
-        if (!FileHelper::ReadJsonFile(path, jsonMapper, md5))
+        if (!Helper::File::ReadJsonFile(path, jsonMapper, md5))
         {
             LOG_FATAL("not find file : " << path << "");
             return false;///
@@ -100,7 +100,7 @@ namespace GameKeeper
     {
         std::vector<std::string> lines;
         const std::string path = App::Get().GetServerPath().GetWorkPath();
-        if (!FileHelper::ReadTxtFile(path + "XCode/XCode.csv", lines))
+        if (!Helper::File::ReadTxtFile(path + "XCode/XCode.csv", lines))
         {
             LOG_ERROR("not find file " << path + "XCode/XCode.csv");
             return false;
@@ -110,7 +110,7 @@ namespace GameKeeper
         {
             res.clear();
             const std::string &line = lines[index];
-            StringHelper::SplitString(line, "\t", res);
+            Helper::String::SplitString(line, "\t", res);
             if (res.size() == 2)
             {
                 CodeConfig codeConfig;

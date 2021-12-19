@@ -69,7 +69,8 @@
         "RpcConfigComponent",
         "NodeProxyComponent",
         "GateComponent",
-        "GateClientComponent"
+        "GateClientComponent",
+        "HttpClientComponent"
     ],
     "Service": [
         "MysqlService",

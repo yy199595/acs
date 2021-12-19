@@ -15,7 +15,7 @@ namespace GameKeeper
     bool ServerConfig::InitConfig()
     {
         std::string outString;
-        if (!FileHelper::ReadTxtFile(this->mConfigPath, outString))
+        if (!Helper::File::ReadTxtFile(this->mConfigPath, outString))
         {
 			std::cerr << "not find config : " << mConfigPath << std::endl;
             return false;

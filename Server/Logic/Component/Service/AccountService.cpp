@@ -77,10 +77,10 @@ namespace GameKeeper
     const std::string AccountService::NewToken(const std::string & account)
     {
         char buffer[100] = {0};
-        int number = MathHelper::Random<int>();
+        int number = Helper::Math::Random<int>();
         long long now = Helper::Time::GetSecTimeStamp();
         size_t size = sprintf(buffer, "%s:%lld:%d", account.c_str(), now, number);
-        MD5 md5(buffer, size);
+        Helper::Md5::MD5 md5(buffer, size);
         return md5.toString();
     }
 }// namespace GameKeeper

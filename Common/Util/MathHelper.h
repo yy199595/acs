@@ -2,8 +2,9 @@
 
 #include <Define/CommonTypeDef.h>
 #include <random>
-namespace MathHelper
+namespace Helper
 {
+namespace Math {
     template<typename T>
     struct IsIntegerType {
         constexpr static bool value = false;
@@ -60,8 +61,7 @@ namespace MathHelper
     template<typename T>
     inline const T &Clamp(const T &num, const T &min, const T &max)
     {
-        if (num >= min && num <= max)
-        {
+        if (num >= min && num <= max) {
             return num;
         }
         return num < min ? min : max;
@@ -71,16 +71,16 @@ namespace MathHelper
     inline const T &MinZero(const T &t1, const T &t2)
     {
         return t1 == 0 ? t2 : t2 == 0 ? t1
-                      : t1 < t2       ? t1
-                                      : t2;
+                                      : t1 < t2 ? t1
+                                                : t2;
     }
 
     template<typename T>
     inline const T &MaxZero(const T &t1, const T &t2)
     {
         return t1 == 0 ? t2 : t2 == 0 ? t1
-                      : t1 > t2       ? t1
-                                      : t2;
+                                      : t1 > t2 ? t1
+                                                : t2;
     }
 
     template<typename T>
@@ -118,4 +118,5 @@ namespace MathHelper
         std::uniform_real_distribution<T> dis(min, max);
         return dis(gen);
     }
+}
 }// namespace MathHelper

@@ -39,8 +39,8 @@ namespace GameKeeper
 
         pLatencyInfo.mCallCount++;
         pLatencyInfo.mSumLatency += delay;
-        pLatencyInfo.mMaxLatency = MathHelper::MaxZero(delay, pLatencyInfo.mMaxLatency);
-        pLatencyInfo.mMinLatency = MathHelper::MinZero(delay, pLatencyInfo.mMinLatency);
+        pLatencyInfo.mMaxLatency = Helper::Math::MaxZero(delay, pLatencyInfo.mMaxLatency);
+        pLatencyInfo.mMinLatency = Helper::Math::MinZero(delay, pLatencyInfo.mMinLatency);
         pLatencyInfo.mAverageLatency = pLatencyInfo.mSumLatency / pLatencyInfo.mCallCount;
     }
 
@@ -81,14 +81,14 @@ namespace GameKeeper
         }
         std::string fileName;
         std::string directory;
-        if (!DirectoryHelper::GetDirAndFileName(path, directory, fileName))
+        if (!Helper::Directory::GetDirAndFileName(path, directory, fileName))
         {
             return false;
         }
 
-        if (!DirectoryHelper::DirectorIsExist(path))
+        if (!Helper::Directory::DirectorIsExist(path))
         {
-            DirectoryHelper::MakeDir(directory);
+            Helper::Directory::MakeDir(directory);
         }
 
         std::fstream fs(path, std::ios::ate | std::ios::out | std::ios::in);

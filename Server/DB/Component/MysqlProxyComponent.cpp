@@ -63,15 +63,15 @@ namespace GameKeeper
 
 	void MysqlProxyComponent::AddUserData()
 	{
-		long long userId = MathHelper::Random(10000, 10000000);
+		long long userId = Helper::Math::Random(10000, 10000000);
 		for (int index = 0; index < 10; index++)
         {
-            int random = MathHelper::Random<int>(100, 100000);
+            int random = Helper::Math::Random<int>(100, 100000);
             db::UserAccountData userAccountData;
             userAccountData.set_userid(userId + random);
             userAccountData.set_account(std::to_string(userId + index) + "@qq.com");
             userAccountData.set_devicemac("ios_qq");
-            userAccountData.set_token(StringHelper::CreateNewToken());
+            userAccountData.set_token(Helper::String::CreateNewToken());
             userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
             if (this->Add(userAccountData)->AwakeGetCode() == XCode::Successful)
             {
@@ -85,7 +85,7 @@ namespace GameKeeper
 	{
 		for (int index = 0; index < 100; index++)
 		{
-			int count = MathHelper::Random(3, 20);
+			int count = Helper::Math::Random(3, 20);
 			auto sortTask = this->Sort("tb_player_account", "UserID", count);
 			if (sortTask->AwakeGetCode() == XCode::Successful)
             {

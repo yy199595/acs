@@ -29,7 +29,7 @@ namespace GameKeeper
             : mMethod(0)
     {
         this->mCode = code;
-        this->mState = TaskError;
+        this->mState = TaskFinish;
         this->mTaskId = Helper::Guid::Create();
         this->mTaskComponent = App::Get().GetTaskComponent();
         if(mRpcComponent == nullptr)

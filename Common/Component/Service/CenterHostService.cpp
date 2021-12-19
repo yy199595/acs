@@ -132,7 +132,7 @@ namespace GameKeeper
     {
         std::string md5;
         rapidjson::Document document;
-        if (!FileHelper::ReadJsonFile(path, document, this->mHostConfigMd5))
+        if (!Helper::File::ReadJsonFile(path, document, this->mHostConfigMd5))
         {
             LOG_ERROR("not find config " << path);
             return false;
@@ -157,7 +157,7 @@ namespace GameKeeper
     {
         std::string md5;
         rapidjson::Document  document;
-        if (!FileHelper::ReadJsonFile(path, document, md5))
+        if (!Helper::File::ReadJsonFile(path, document, md5))
         {
             LOG_ERROR("not find config " << path);
             return false;
@@ -180,7 +180,7 @@ namespace GameKeeper
 
             groupNodeInfo.mName = name;
             groupNodeInfo.mGroupId = jsonData["Id"].GetUint();
-            groupNodeInfo.mToken = StringHelper::CreateNewToken();
+            groupNodeInfo.mToken = Helper::String::CreateNewToken();
             this->mGroupNodeMap.emplace(groupNodeInfo.mGroupId, groupNodeInfo);
         }
         return true;

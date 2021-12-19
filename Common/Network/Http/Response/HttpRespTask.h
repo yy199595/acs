@@ -21,7 +21,6 @@ namespace GameKeeper
         virtual bool OnReceiveBody(asio::streambuf & buf);
     public:
         HttpStatus AwaitGetCode();
-        const std::string & GetData() const { return this->mResponse;}
         bool GetHead(const std::string & key, std::string & value) const;
     private:
         XCode mCode;

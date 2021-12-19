@@ -13,9 +13,7 @@ namespace GameKeeper
     enum TaskState
     {
         TaskReady,
-        TaskError,
         TaskAwait,
-        TaskTimeout,
         TaskFinish,
     };
 
@@ -39,7 +37,7 @@ namespace GameKeeper
         bool IsComplete() { return this->mTaskState == TaskState::TaskFinish;}
 
     public:
-        T Await();
+        const T & Await();
         virtual bool SetResult(T && result);
     private:
         T mData;
@@ -51,9 +49,9 @@ namespace GameKeeper
     };
 
     template<typename T>
-    T Task<T>::Await()
+    const T & Task<T>::Await()
     {
-        if(this->mState == TaskAwait)
+        if(this->mState == TaskReady)
         {
             this->mState = TaskAwait;
             this->mTaskComponent->Await(this->mCorId);
