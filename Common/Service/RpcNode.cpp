@@ -1,11 +1,10 @@
-﻿#include "RpcNode.h"
+﻿#include"RpcNode.h"
 #include<Core/App.h>
 #include<Coroutine/TaskComponent.h>
 #include<Async/RpcTask/RpcTask.h>
 #include<ServerRpc/RpcClientComponent.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
-#include<google/protobuf/util/json_util.h>
 #include"ServerRpc/RpcComponent.h"
 namespace GameKeeper
 {
@@ -42,7 +41,6 @@ namespace GameKeeper
         this->mNodeId = nodeInfo.nodeid();
         this->mNodeIp = nodeInfo.serverip();
         this->mNodeName = nodeInfo.servername();
-
         this->mNodePort = (unsigned short)iter->second;
         for(const std::string & name : nodeInfo.services())
         {

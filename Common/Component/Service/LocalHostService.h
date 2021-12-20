@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<Service/ProtoServiceComponent.h>
+#include<Service/ServiceComponent.h>
 using namespace com;
 namespace GameKeeper
 {
@@ -10,7 +10,7 @@ namespace GameKeeper
 
     class NodeProxyComponent;
 
-    class LocalHostService : public ProtoServiceComponent, public IStart
+    class LocalHostService : public ServiceComponent, public IStart
     {
     public:
 		LocalHostService() = default;

@@ -4,13 +4,13 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/Service/ProtoServiceComponent.h"
+#include"Component/Service/ServiceComponent.h"
 namespace GameKeeper
 {
-    class GateService : public ProtoServiceComponent, public INodeRefresh
+    class GateService : public ServiceComponent, public INodeRefresh
     {
     public:
-        GateService();
+        GateService() = default;
         ~GateService() final = default;
     protected:
         bool Awake() final;

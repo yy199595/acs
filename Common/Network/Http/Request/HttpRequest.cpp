@@ -10,7 +10,7 @@ namespace GameKeeper
 {
     HttpRequest::HttpRequest(const std::string &url)
     {
-        this->mHasParseError = !NetworkHelper::ParseHttpUrl(
+        this->mHasParseError = !Helper::Net::ParseHttpUrl(
                 url, this->mHost, this->mPort, this->mPath);
     }
 }

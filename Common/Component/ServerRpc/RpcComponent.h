@@ -8,8 +8,6 @@ namespace GameKeeper
 {
     class ServiceComponent;
 
-    class ProtoServiceComponent;
-    
     class LuaServiceComponent;
 
 	class ServiceMethod;

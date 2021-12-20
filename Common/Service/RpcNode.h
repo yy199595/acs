@@ -69,10 +69,9 @@ namespace GameKeeper
     private:
         bool mIsClose;
         long long mSocketId;
-
-        std::set<std::string> mServiceArray;//服务列表
         TaskComponent *mCorComponent;//协程
         class RpcComponent * mRpcComponent;
+        std::set<std::string> mServiceArray;//服务列表
         class RpcConfigComponent *mRpcConfigComponent;
         std::queue<com::Rpc_Request *> mWaitSendQueue;
         class RpcClientComponent * mRpcClientComponent;

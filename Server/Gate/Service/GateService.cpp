@@ -9,11 +9,6 @@
 #include"Component/GateClientComponent.h"
 namespace GameKeeper
 {
-    GateService::GateService()
-    {
-
-    }
-
     bool GateService::Awake()
     {
         BIND_RPC_FUNCTION(GateService::Ping);

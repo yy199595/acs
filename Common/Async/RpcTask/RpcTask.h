@@ -13,8 +13,8 @@ using namespace com;
 using namespace google::protobuf;
 namespace GameKeeper
 {
-    class TimerComponent;
     class TaskComponent;
+    class TimerComponent;
     class ProtoResponseComponent;
     class RpcTaskBase : public std::enable_shared_from_this<RpcTaskBase>
     {

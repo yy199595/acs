@@ -1,16 +1,14 @@
 ﻿#pragma once
 
 #include<Protocol/c2s.pb.h>
-#include<Service/ProtoServiceComponent.h>
+#include<Service/ServiceComponent.h>
 #define USER_ID_START 7788
 namespace GameKeeper
 {
 
     class RedisComponent;
     class MysqlProxyComponent;
-
-
-    class AccountService : public ProtoServiceComponent
+    class AccountService : public ServiceComponent
     {
     public:
         AccountService() = default;

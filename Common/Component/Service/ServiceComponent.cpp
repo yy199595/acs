@@ -18,7 +18,6 @@ namespace GameKeeper
         }
         const std::string &name = method->GetName();
         const std::string &service = this->GetServiceName();
-
         if (!rpcConfigComponent->HasServiceMethod(service, name))
         {
             LOG_FATAL(this->GetServiceName() << "." << name << " not config");

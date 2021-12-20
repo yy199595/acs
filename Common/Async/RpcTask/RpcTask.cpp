@@ -6,7 +6,6 @@
 #include"ServerRpc/RpcComponent.h"
 #ifdef __DEBUG__
 #include"Scene/RpcConfigComponent.h"
-
 #endif
 namespace GameKeeper
 {
@@ -25,8 +24,7 @@ namespace GameKeeper
         }
     }
 
-    RpcTaskBase::RpcTaskBase(XCode code)
-            : mMethod(0)
+    RpcTaskBase::RpcTaskBase(XCode code) : mMethod(0)
     {
         this->mCode = code;
         this->mState = TaskFinish;
@@ -41,21 +39,21 @@ namespace GameKeeper
 
     bool RpcTaskBase::SetResult(const Rpc_Response *result)
     {
-        if(result == nullptr)
-        {
-            this->mCode = XCode::CallTimeout;
-#ifdef __DEBUG__
-            int methodId = this->GetMethodId();
-            auto configComponent =
-                    App::Get().GetComponent<RpcConfigComponent>();
-            const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
-            LOG_ERROR(config->Service << "." << config->Method << " call time out");
-#endif // __DEBUG__
-            this->mTaskComponent->Resume(this->mCorId);
-            return true;
-        }
         if(this->mState == TaskAwait)
         {
+            if (result == nullptr)
+            {
+                this->mCode = XCode::CallTimeout;
+#ifdef __DEBUG__
+                int methodId = this->GetMethodId();
+                auto configComponent =
+                        App::Get().GetComponent<RpcConfigComponent>();
+                const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
+                LOG_ERROR(config->Service << "." << config->Method << " call time out");
+#endif // __DEBUG__
+                this->mTaskComponent->Resume(this->mCorId);
+                return true;
+            }
             this->OnResponse(result);
             this->mTaskComponent->Resume(this->mCorId);
             return true;

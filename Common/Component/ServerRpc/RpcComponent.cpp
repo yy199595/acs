@@ -1,5 +1,5 @@
 ﻿#include"RpcComponent.h"
-#include<Service/ProtoServiceComponent.h>
+#include<Service/ServiceComponent.h>
 #include<Coroutine/TaskComponent.h>
 #include<Util/StringHelper.h>
 #include"Core/App.h"

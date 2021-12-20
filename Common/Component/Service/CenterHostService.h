@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 
-#include<Service/ProtoServiceComponent.h>
+#include<Service/ServiceComponent.h>
 #include<Rpc/ProtoRpcClient.h>
 
 #include <utility>
@@ -23,7 +23,7 @@ namespace GameKeeper
 {
     class RpcNode;
     // 所有方法都注册到这里(全局唯一)
-    class CenterHostService : public ProtoServiceComponent, public ILoadConfig
+    class CenterHostService : public ServiceComponent, public ILoadConfig
     {
     public:
 		CenterHostService() = default;
