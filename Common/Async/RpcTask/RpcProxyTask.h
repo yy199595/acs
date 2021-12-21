@@ -22,8 +22,8 @@ namespace GameKeeper
     protected:
         void OnResponse(const com::Rpc_Response *response) final;
     private:
-        long long mClientRpcId;
-        long long mClientSockId;
+        long long mRpcId;
+        long long mSockId;
         GateComponent * mProxyComponent;
     };
 }

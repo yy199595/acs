@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include<Protocol/c2s.pb.h>
-#include<Service/ServiceComponent.h>
+#include<Component/ServiceBase/ServiceComponent.h>
 #define USER_ID_START 7788
 namespace GameKeeper
 {

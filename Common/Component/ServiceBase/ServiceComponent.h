@@ -19,18 +19,12 @@ namespace GameKeeper
     public:
         int GetPriority() override { return 1000; }
 
-        virtual bool IsLuaService() { return false; };
-
         virtual const std::string & GetServiceName() { return this->GetTypeName();}
 
-        com::Rpc_Response *Invoke(const std::string &method, const com::Rpc_Request *request);
+        virtual com::Rpc_Response *Invoke(const std::string &method, const com::Rpc_Request *request);
 
     public:
         bool AddMethod(ServiceMethod *method);
-
-        bool HasProtoMethod(const std::string &method);
-
-        ServiceMethod *GetProtoMethod(const std::string &method);
 
         long long GetCurSocketId() const { return this->mCurSocketId; }
 

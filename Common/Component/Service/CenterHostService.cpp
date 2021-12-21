@@ -3,8 +3,9 @@
 #include<Util/StringHelper.h>
 #include<Service/RpcNode.h>
 #include<Util/FileHelper.h>
+#include<Rpc/RpcClientComponent.h>
 #include<Service/NodeProxyComponent.h>
-#include<ServerRpc/RpcClientComponent.h>
+
 
 
 namespace GameKeeper

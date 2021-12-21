@@ -73,6 +73,7 @@ namespace GameKeeper
     public:
         explicit LocalObject(const T * t) : mData(t) {}
         ~LocalObject() { delete this->mData;}
+        void Cancel() { this->mData = nullptr; }
     private:
         const T * mData;
     };

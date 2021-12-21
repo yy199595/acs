@@ -6,7 +6,7 @@
 #include"Core/App.h"
 #include"Network/Rpc/RpcProxyClient.h"
 #include"GateComponent.h"
-#include"ServerRpc/RpcComponent.h"
+#include"Rpc/RpcComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"Scene/RpcConfigComponent.h"
@@ -73,7 +73,7 @@ namespace GameKeeper
 #endif
             responseMessage->set_code(code);
             responseMessage->set_rpcid(request->rpcid());
-            this->SendProtoMessage(request->sockid(), responseMessage);
+            this->SendToClient(request->sockid(), responseMessage);
         }
     }
 
@@ -96,9 +96,9 @@ namespace GameKeeper
         }
     }
 
-    bool GateClientComponent::SendProtoMessage(long long sockId, const c2s::Rpc_Response *message)
+    bool GateClientComponent::SendToClient(long long sockId, const c2s::Rpc_Response *message)
     {
-        auto proxyClient = this->GetProxyClient(sockId);
+        auto proxyClient = this->GetGateClient(sockId);
         if(proxyClient == nullptr)
         {
             return false;
@@ -106,7 +106,7 @@ namespace GameKeeper
         return proxyClient->SendToClient(message);
     }
 
-    RpcProxyClient *GateClientComponent::GetProxyClient(long long int sockId)
+    RpcProxyClient *GateClientComponent::GetGateClient(long long int sockId)
     {
         auto iter = this->mProxyClientMap.find(sockId);
         return iter != this->mProxyClientMap.end() ? iter->second : nullptr;
@@ -114,7 +114,7 @@ namespace GameKeeper
 
     void GateClientComponent::StartClose(long long int id)
     {
-        RpcProxyClient * proxyClient = this->GetProxyClient(id);
+        RpcProxyClient * proxyClient = this->GetGateClient(id);
         if(proxyClient != nullptr)
         {
             proxyClient->StartClose();
@@ -123,7 +123,7 @@ namespace GameKeeper
 
     void GateClientComponent::CheckPlayerLogout(long long sockId)
     {
-        RpcProxyClient * proxyClient = this->GetProxyClient(sockId);
+        RpcProxyClient * proxyClient = this->GetGateClient(sockId);
         if(proxyClient != nullptr)
         {
             long long nowTime = Helper::Time::GetSecTimeStamp();

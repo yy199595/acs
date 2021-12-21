@@ -1,16 +1,17 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
-#include "TimeHelper.h"
-#include <chrono>
-#include <time.h>
+#include"TimeHelper.h"
+#include<chrono>
+#include<time.h>
 using namespace std::chrono;
 
 namespace Helper
 {
     std::string Time::GetDateStr(long long time)
     {
-        time_t t = (time_t) (time == 0 ? Time::GetSecTimeStamp() : time);
-        struct tm *pt = gmtime(&t);
         char str[100] = {0};
+        time_t t = (time_t) (time == 0
+                ? Time::GetSecTimeStamp() : time);
+        struct tm *pt = gmtime(&t);
         size_t size = strftime(str, sizeof(str), "%Y%m%d%H%M%S", pt);
         return std::string(str, size);
     }

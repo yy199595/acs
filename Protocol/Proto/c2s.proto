@@ -23,7 +23,9 @@ message Rpc
     {
         int32 Code = 1;
         int64 RpcId = 2;
-        google.protobuf.Any Data = 3;
+        int64 SockId = 3;
+        string Error = 4;
+        google.protobuf.Any Data = 5;
     }
 }
 

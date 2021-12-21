@@ -21,13 +21,12 @@ namespace GameKeeper
         void OnResponse(c2s::Rpc_Response * response) final { }
         void OnConnectAfter(long long id, XCode code) final { }
     public:
-        RpcProxyClient * GetProxyClient(long long sockId);
-        bool SendProtoMessage(long long sockId, const c2s::Rpc_Response * message);
+        RpcProxyClient * GetGateClient(long long sockId);
+        bool SendToClient(long long sockId, const c2s::Rpc_Response * message);
     protected:
         bool Awake() final;
         bool LateAwake() final;
         void OnListen(SocketProxy *socket) final;
-
     private:
         void CheckPlayerLogout(long long sockId);
     private:

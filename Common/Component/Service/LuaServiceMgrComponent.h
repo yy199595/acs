@@ -4,13 +4,17 @@ struct lua_State;
 namespace GameKeeper
 {
 	class LuaServiceMethod;
-	class LuaServiceMgrComponent : public Component
+    class LuaServiceMgrComponent : public Component, public IHotfix
 	{
 	public:
         LuaServiceMgrComponent() = default;
         ~LuaServiceMgrComponent() final = default;
 	protected:
 		bool Awake() final;
+        void OnHotFix() final;
         bool LateAwake() final;
+    private:
+        class LuaScriptComponent * mLuaComponent;
+        class RpcConfigComponent * mRpcConfigComponent;
 	};
 }

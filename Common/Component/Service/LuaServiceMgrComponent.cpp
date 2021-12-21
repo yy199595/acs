@@ -1,7 +1,7 @@
 #include"LuaServiceMgrComponent.h"
 #include"Core/App.h"
 #include"Method/LuaServiceMethod.h"
-#include"Service/LuaServiceComponent.h"
+#include"Component/ServiceBase/LuaServiceComponent.h"
 #include"Scene/LuaScriptComponent.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Util/DirectoryHelper.h"
@@ -10,24 +10,23 @@ namespace GameKeeper
 
     bool LuaServiceMgrComponent::Awake()
     {
+        LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaScriptComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
+
+    void LuaServiceMgrComponent::OnHotFix()
+    {
+
+    }
+
 	bool LuaServiceMgrComponent::LateAwake()
 	{
-        auto protoComponent = this->GetComponent<RpcConfigComponent>();
-		auto scriptComponent = this->GetComponent<LuaScriptComponent>();
-		if(protoComponent == nullptr || scriptComponent == nullptr)
-        {
-            return false;
-        }
-
 		string servicePath;
-		LOG_CHECK_RET_FALSE(protoComponent);
-		LOG_CHECK_RET_FALSE(scriptComponent);
-		lua_State * lua = scriptComponent->GetLuaEnv();
+		lua_State * lua = this->mLuaComponent->GetLuaEnv();
 
 		std::vector<std::string> services;
-		protoComponent->GetServices(services);
+		this->mRpcConfigComponent->GetServices(services);
 
 		for (std::string & service : services)
 		{
@@ -37,7 +36,7 @@ namespace GameKeeper
 				continue;
 			}
 			std::vector<std::string> methods;
-			if (!protoComponent->GetMethods(service, methods))
+			if (!this->mRpcConfigComponent->GetMethods(service, methods))
 			{
 				continue;
 			}

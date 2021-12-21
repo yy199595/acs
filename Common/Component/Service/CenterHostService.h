@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 
-#include<Service/ServiceComponent.h>
+#include<Component/ServiceBase/ServiceComponent.h>
 #include<Rpc/ProtoRpcClient.h>
 
 #include <utility>

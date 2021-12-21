@@ -47,7 +47,7 @@ namespace GameKeeper
         for (int index = 0; index < response.querydatas_size(); index++)
         {
             const Any &data = response.querydatas(index);
-            Message *message = MessagePool::NewByData(data, true);
+            Message *message = Helper::Proto::NewByData(data, true);
             if (message != nullptr)
             {
                 std::shared_ptr<Message> data(message);
@@ -67,7 +67,7 @@ namespace GameKeeper
         for (int index = 0; index < response.querydatas_size(); index++)
         {
             const Any &data = response.querydatas(index);
-            Message *message = MessagePool::NewByData(data, true);
+            Message *message = Helper::Proto::NewByData(data, true);
             if (message != nullptr)
             {
                 std::shared_ptr<Message> data(message);

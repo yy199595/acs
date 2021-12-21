@@ -9,7 +9,7 @@
 #include"Scene/RpcConfigComponent.h"
 #include"Service/NodeProxyComponent.h"
 #include"Async/RpcTask/RpcProxyTask.h"
-#include"ServerRpc/RpcComponent.h"
+#include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
@@ -44,13 +44,15 @@ namespace GameKeeper
         if (nodeService == nullptr) {
             return XCode::CallServiceNotFound;
         }
-        if (!config->Request.empty()) {
+        if (!config->Request.empty())
+        {
             if (!request->has_data()) //没有正确的消息体
             {
                 return XCode::CallArgsError;
             }
             this->mProtoName.clear();
-            if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName)) {
+            if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName))
+            {
                 if (this->mProtoName != config->Request) //请求的消息不正确
                 {
                     return XCode::CallArgsError;
@@ -58,21 +60,18 @@ namespace GameKeeper
             }
         }
 
-        int methodId = 0;
-        auto requestMessage = nodeService->NewRequest(request->methodname(), methodId);
+        auto requestMessage = nodeService->NewRequest(request->methodname());
+        std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask(requestMessage->methodid()));
         if (request->has_data()) {
             requestMessage->mutable_data()->CopyFrom(request->data());
         }
-
-
-        std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask(methodId));
+        requestMessage->set_rpcid(proxyTask->GetTaskId());
         proxyTask->InitProxyTask(request->rpcid(), request->sockid(), this, this->mRpcComponent);
         return XCode::Successful;
     }
 
     XCode GateComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
     {
-        RpcProxyClient * proxyClient = this->mGateClientComponent->GetProxyClient(sockId);
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(*response, &json);
@@ -80,7 +79,7 @@ namespace GameKeeper
         LOG_WARN("json = " << json);
         LOG_WARN("*****************************************");
 #endif
-        if(proxyClient == nullptr || !proxyClient->SendToClient(response))
+        if(this->mGateClientComponent->SendToClient(sockId, response))
         {
             return XCode::NetWorkError;
         }

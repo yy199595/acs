@@ -1,9 +1,9 @@
 ﻿#include "RpcTask.h"
 #include<Core/App.h>
-
+#include"Rpc/RpcComponent.h"
 #include<Pool/MessagePool.h>
 #include<Scene/LuaScriptComponent.h>
-#include"ServerRpc/RpcComponent.h"
+
 #ifdef __DEBUG__
 #include"Scene/RpcConfigComponent.h"
 #endif
@@ -97,7 +97,7 @@ namespace GameKeeper
         if ((XCode) response->code() == XCode::Successful)
         {
             std::string json;
-            Message *responseMessage = MessagePool::New(response->data());
+            Message *responseMessage = Helper::Proto::New(response->data());
             LOG_CHECK_RET(responseMessage && util::MessageToJsonString(*responseMessage, &json).ok());
 
             auto scriptCom = App::Get().GetComponent<LuaScriptComponent>();
@@ -139,7 +139,7 @@ namespace GameKeeper
         this->mCode = (XCode) backData->code();
         if (this->mCode == XCode::Successful && backData->has_data())
         {
-            Message *message = MessagePool::NewByData(backData->data(), true);
+            Message *message = Helper::Proto::NewByData(backData->data(), true);
             if (message != nullptr) {
                 this->mMessage = std::shared_ptr<Message>(message);
             }

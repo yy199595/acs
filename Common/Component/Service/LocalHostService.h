@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<Service/ServiceComponent.h>
+#include<Component/ServiceBase/ServiceComponent.h>
 using namespace com;
 namespace GameKeeper
 {

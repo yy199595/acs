@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/Service/ServiceComponent.h"
+#include"Component/ServiceBase/ServiceComponent.h"
 namespace GameKeeper
 {
     class GateService : public ServiceComponent, public INodeRefresh

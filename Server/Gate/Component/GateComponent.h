@@ -10,7 +10,7 @@
 namespace GameKeeper
 {
     class GateComponent : public Component,
-                          public IClientProtoRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+                          public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>
     {
     public:
         GateComponent() = default;

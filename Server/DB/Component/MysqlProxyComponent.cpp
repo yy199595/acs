@@ -109,15 +109,14 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
-        int methodId = 0;
-        auto requestMessage = proxyNode->NewRequest("MysqlService.Add", methodId);
+        auto requestMessage = proxyNode->NewRequest("MysqlService.Add");
         if(requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Add");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
 
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mOperRequest.Clear();
         requestMessage->set_rpcid(rpcTask->GetTaskId());
@@ -134,14 +133,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
-        int methodId = 0;
-        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Query", methodId);
+        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Query");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Query");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mQueryRequest.Clear();
         requestMessage->set_rpcid(rpcTask->GetTaskId());
@@ -158,14 +156,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
-        int methodId = 0;
-        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Invoke", methodId);
+        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Invoke");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Invoke");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mAnyOperRequest.Clear();
         this->mAnyOperRequest.set_sql(sql);
@@ -183,14 +180,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
-        int methodId = 0;
-        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Save", methodId);
+        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Save");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Save");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mOperRequest.Clear();
         requestMessage->set_rpcid(rpcTask->GetTaskId());
@@ -207,14 +203,13 @@ namespace GameKeeper
             LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
-        int methodId = 0;
-        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Delete", methodId);
+        auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Delete");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Delete");
             return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(methodId));
+        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mOperRequest.Clear();
         requestMessage->set_rpcid(rpcTask->GetTaskId());

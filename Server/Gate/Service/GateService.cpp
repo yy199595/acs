@@ -30,7 +30,7 @@ namespace GameKeeper
     XCode GateService::Ping()
     {
         long long sockId = this->GetCurSocketId();
-        auto gateClient = this->mGateComponent->GetProxyClient(sockId);
+        auto gateClient = this->mGateComponent->GetGateClient(sockId);
         if (gateClient != nullptr)
         {
             LOG_WARN(gateClient->GetAddress() << " ping");

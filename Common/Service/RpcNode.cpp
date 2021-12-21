@@ -2,10 +2,10 @@
 #include<Core/App.h>
 #include<Coroutine/TaskComponent.h>
 #include<Async/RpcTask/RpcTask.h>
-#include<ServerRpc/RpcClientComponent.h>
+#include<Rpc/RpcClientComponent.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
-#include"ServerRpc/RpcComponent.h"
+#include"Rpc/RpcComponent.h"
 namespace GameKeeper
 {
 	RpcNode::RpcNode(int id)
@@ -129,14 +129,13 @@ namespace GameKeeper
         return XCode::Successful;
 	}
 
-	com::Rpc_Request * RpcNode::NewRequest(const std::string & method, int & methodId)
+	com::Rpc_Request * RpcNode::NewRequest(const std::string & method)
 	{
 		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
 		if (config == nullptr)
 		{
 			return nullptr;
 		}
-        methodId = config->MethodId;
         auto request = new com::Rpc_Request();
 		request->set_methodid(config->MethodId);
         if(!this->mRpcClientComponent->SendByAddress(this->mSocketId, request))
@@ -149,31 +148,29 @@ namespace GameKeeper
 
     std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method)
     {
-        int methodId = 0;
-        auto requestData = this->NewRequest(method, methodId);
+        auto requestData = this->NewRequest(method);
         if (requestData == nullptr)
         {
             LOG_ERROR("not find rpc config " << method);
             return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<RpcTask> rpcTask(new RpcTask(methodId));
+        std::shared_ptr<RpcTask> rpcTask(new RpcTask(requestData->methodid()));
         requestData->set_rpcid(rpcTask->GetTaskId());
         return rpcTask;
     }
 
     std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method, const Message &message)
     {
-        int methodId = 0;
-        auto requestData = this->NewRequest(method, methodId);
+        auto requestData = this->NewRequest(method);
         if (requestData == nullptr)
         {
             LOG_ERROR("not find rpc config " << method);
             return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
         }
-        std::shared_ptr<RpcTask> rpcTask(new RpcTask(methodId));
+        std::shared_ptr<RpcTask> rpcTask(new RpcTask(requestData->methodid()));
 
-        requestData->mutable_data()->PackFrom(message);
         requestData->set_rpcid(rpcTask->GetTaskId());
+        requestData->mutable_data()->PackFrom(message);
         return rpcTask;
     }
 

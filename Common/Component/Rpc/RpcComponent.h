@@ -29,8 +29,8 @@ namespace GameKeeper
         bool Awake() final;
         bool LateAwake() final;
     public:
-        bool OnRequest(const com::Rpc_Request * message) final;
-        bool OnResponse(const com::Rpc_Response *response) final;
+        XCode OnRequest(const com::Rpc_Request * message) final;
+        XCode OnResponse(const com::Rpc_Response *response) final;
         virtual int GetPriority() const { return 500; }
 	private:
         void OnTaskTimeout(long long rpcId);

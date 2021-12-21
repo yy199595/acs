@@ -13,10 +13,10 @@
 #include <Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>
-#include <ServerRpc/RpcComponent.h>
+#include <Rpc/RpcComponent.h>
 #include <Service/NodeProxyComponent.h>
 #include <Scene/ThreadPoolComponent.h>
-#include <ServerRpc/RpcClientComponent.h>
+#include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
 #include <Service/LocalHostService.h>
 #include <Service/CenterHostService.h>

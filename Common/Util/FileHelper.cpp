@@ -48,9 +48,9 @@ namespace Helper
         bool ReadJsonFile(const std::string &path, rapidjson::Document &document, std::string &md5)
         {
             std::string outString;
-            if (File::ReadTxtFile(path, outString)) {
-                Md5::MD5 md5Encode(outString);
-                md5 = md5Encode.toString();
+            if (File::ReadTxtFile(path, outString))
+            {
+                md5 = Helper::Md5::GetMd5(outString);
                 document.Parse(outString.c_str(), outString.size());
                 return !document.HasParseError();
             }

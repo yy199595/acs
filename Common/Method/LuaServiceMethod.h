@@ -11,7 +11,6 @@ namespace GameKeeper
 		LuaServiceMethod(const std::string & name, lua_State * lua, int idx);
 	public:
 		bool IsLuaMethod() final { return true; }
-		XCode AsyncInvoke(const com::Rpc_Request & request);
 		XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) final;
 	private:
 		static int Response(lua_State * lua);

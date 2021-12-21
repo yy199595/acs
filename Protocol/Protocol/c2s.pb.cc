@@ -341,6 +341,8 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, code_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, rpcid_),
+  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, sockid_),
+  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, error_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Response, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc, _internal_metadata_),
@@ -420,18 +422,18 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 0, -1, sizeof(::c2s::ServerInfo)},
   { 8, -1, sizeof(::c2s::Rpc_Request)},
   { 18, -1, sizeof(::c2s::Rpc_Response)},
-  { 26, -1, sizeof(::c2s::Rpc)},
-  { 31, -1, sizeof(::c2s::AccountLogin_Request)},
-  { 40, -1, sizeof(::c2s::AccountLogin_Response)},
-  { 49, -1, sizeof(::c2s::AccountLogin)},
-  { 54, -1, sizeof(::c2s::AccountRegister_Request)},
-  { 62, -1, sizeof(::c2s::AccountRegister_Response)},
-  { 68, -1, sizeof(::c2s::AccountRegister)},
-  { 73, -1, sizeof(::c2s::ProxyLogin_Request)},
-  { 79, -1, sizeof(::c2s::ProxyLogin)},
-  { 84, -1, sizeof(::c2s::GateLogout_Request)},
-  { 89, -1, sizeof(::c2s::GateLogout_Response)},
-  { 94, -1, sizeof(::c2s::GateLogout)},
+  { 28, -1, sizeof(::c2s::Rpc)},
+  { 33, -1, sizeof(::c2s::AccountLogin_Request)},
+  { 42, -1, sizeof(::c2s::AccountLogin_Response)},
+  { 51, -1, sizeof(::c2s::AccountLogin)},
+  { 56, -1, sizeof(::c2s::AccountRegister_Request)},
+  { 64, -1, sizeof(::c2s::AccountRegister_Response)},
+  { 70, -1, sizeof(::c2s::AccountRegister)},
+  { 75, -1, sizeof(::c2s::ProxyLogin_Request)},
+  { 81, -1, sizeof(::c2s::ProxyLogin)},
+  { 86, -1, sizeof(::c2s::GateLogout_Request)},
+  { 91, -1, sizeof(::c2s::GateLogout_Response)},
+  { 96, -1, sizeof(::c2s::GateLogout)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -461,27 +463,28 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_c2s_2eproto[] =
   "\n\tc2s.proto\022\003c2s\032\031google/protobuf/any.pr"
   "oto\"G\n\nServerInfo\022\020\n\010ServerId\030\001 \001(\t\022\022\n\nS"
-  "erverName\030\002 \001(\t\022\023\n\013ServerState\030\003 \001(\005\"\312\001\n"
+  "erverName\030\002 \001(\t\022\023\n\013ServerState\030\003 \001(\005\"\351\001\n"
   "\003Rpc\032v\n\007Request\022\r\n\005RpcId\030\001 \001(\003\022\016\n\006SockId"
   "\030\002 \001(\003\022\022\n\nMethodName\030\003 \001(\t\022\024\n\014MessageInd"
   "ex\030\004 \001(\r\022\"\n\004Data\030\005 \001(\0132\024.google.protobuf"
-  ".Any\032K\n\010Response\022\014\n\004Code\030\001 \001(\005\022\r\n\005RpcId\030"
-  "\002 \001(\003\022\"\n\004Data\030\003 \001(\0132\024.google.protobuf.An"
-  "y\"\305\001\n\014AccountLogin\032K\n\007Request\022\017\n\007Account"
-  "\030\001 \001(\t\022\r\n\005Token\030\002 \001(\t\022\016\n\006Passwd\030\003 \001(\t\022\020\n"
-  "\010LoginDev\030\004 \001(\t\032h\n\010Response\022\r\n\005Token\030\001 \001"
-  "(\t\022\021\n\tGateToken\030\002 \001(\t\022\025\n\rLastLoginTime\030\004"
-  " \001(\003\022#\n\nServerList\030\005 \003(\0132\017.c2s.ServerInf"
-  "o\"j\n\017AccountRegister\032<\n\007Request\022\017\n\007Accou"
-  "nt\030\001 \001(\t\022\016\n\006Passwd\030\002 \001(\t\022\020\n\010LoginDev\030\003 \001"
-  "(\t\032\031\n\010Response\022\r\n\005Token\030\001 \001(\t\"&\n\nProxyLo"
-  "gin\032\030\n\007Request\022\r\n\005Token\030\001 \001(\t\"#\n\nGateLog"
-  "out\032\t\n\007Request\032\n\n\010Responseb\006proto3"
+  ".Any\032j\n\010Response\022\014\n\004Code\030\001 \001(\005\022\r\n\005RpcId\030"
+  "\002 \001(\003\022\016\n\006SockId\030\003 \001(\003\022\r\n\005Error\030\004 \001(\t\022\"\n\004"
+  "Data\030\005 \001(\0132\024.google.protobuf.Any\"\305\001\n\014Acc"
+  "ountLogin\032K\n\007Request\022\017\n\007Account\030\001 \001(\t\022\r\n"
+  "\005Token\030\002 \001(\t\022\016\n\006Passwd\030\003 \001(\t\022\020\n\010LoginDev"
+  "\030\004 \001(\t\032h\n\010Response\022\r\n\005Token\030\001 \001(\t\022\021\n\tGat"
+  "eToken\030\002 \001(\t\022\025\n\rLastLoginTime\030\004 \001(\003\022#\n\nS"
+  "erverList\030\005 \003(\0132\017.c2s.ServerInfo\"j\n\017Acco"
+  "untRegister\032<\n\007Request\022\017\n\007Account\030\001 \001(\t\022"
+  "\016\n\006Passwd\030\002 \001(\t\022\020\n\010LoginDev\030\003 \001(\t\032\031\n\010Res"
+  "ponse\022\r\n\005Token\030\001 \001(\t\"&\n\nProxyLogin\032\030\n\007Re"
+  "quest\022\r\n\005Token\030\001 \001(\t\"#\n\nGateLogout\032\t\n\007Re"
+  "quest\032\n\n\010Responseb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_c2s_2eproto = {
   false, InitDefaults_c2s_2eproto, 
   descriptor_table_protodef_c2s_2eproto,
-  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 714,
+  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 745,
 };
 
 void AddDescriptors_c2s_2eproto() {
@@ -1439,6 +1442,8 @@ void Rpc_Response::clear_data() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Rpc_Response::kCodeFieldNumber;
 const int Rpc_Response::kRpcIdFieldNumber;
+const int Rpc_Response::kSockIdFieldNumber;
+const int Rpc_Response::kErrorFieldNumber;
 const int Rpc_Response::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -1451,6 +1456,10 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  error_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.error().size() > 0) {
+    error_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_);
+  }
   if (from.has_data()) {
     data_ = new ::google::protobuf::Any(*from.data_);
   } else {
@@ -1465,6 +1474,7 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
 void Rpc_Response::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Response_c2s_2eproto.base);
+  error_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&code_) -
       reinterpret_cast<char*>(&data_)) + sizeof(code_));
@@ -1476,6 +1486,7 @@ Rpc_Response::~Rpc_Response() {
 }
 
 void Rpc_Response::SharedDtor() {
+  error_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
 
@@ -1494,6 +1505,7 @@ void Rpc_Response::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  error_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
   }
@@ -1531,9 +1543,32 @@ const char* Rpc_Response::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // .google.protobuf.Any Data = 3;
+      // int64 SockId = 3;
       case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_sockid(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string Error = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("c2s.Rpc.Response.Error");
+        object = msg->mutable_error();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .google.protobuf.Any Data = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::google::protobuf::Any::_InternalParse;
@@ -1559,6 +1594,10 @@ const char* Rpc_Response::_InternalParse(const char* begin, const char* end, voi
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -1600,9 +1639,37 @@ bool Rpc_Response::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Any Data = 3;
+      // int64 SockId = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &sockid_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string Error = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_error()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->error().data(), static_cast<int>(this->error().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "c2s.Rpc.Response.Error"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .google.protobuf.Any Data = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_data()));
         } else {
@@ -1648,10 +1715,25 @@ void Rpc_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->rpcid(), output);
   }
 
-  // .google.protobuf.Any Data = 3;
+  // int64 SockId = 3;
+  if (this->sockid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->sockid(), output);
+  }
+
+  // string Error = 4;
+  if (this->error().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->error().data(), static_cast<int>(this->error().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "c2s.Rpc.Response.Error");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->error(), output);
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, HasBitSetters::data(this), output);
+      5, HasBitSetters::data(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1677,11 +1759,27 @@ void Rpc_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->rpcid(), target);
   }
 
-  // .google.protobuf.Any Data = 3;
+  // int64 SockId = 3;
+  if (this->sockid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->sockid(), target);
+  }
+
+  // string Error = 4;
+  if (this->error().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->error().data(), static_cast<int>(this->error().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "c2s.Rpc.Response.Error");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->error(), target);
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, HasBitSetters::data(this), target);
+        5, HasBitSetters::data(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1705,7 +1803,14 @@ size_t Rpc_Response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .google.protobuf.Any Data = 3;
+  // string Error = 4;
+  if (this->error().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->error());
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -1717,6 +1822,13 @@ size_t Rpc_Response::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->rpcid());
+  }
+
+  // int64 SockId = 3;
+  if (this->sockid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->sockid());
   }
 
   // int32 Code = 1;
@@ -1753,11 +1865,18 @@ void Rpc_Response::MergeFrom(const Rpc_Response& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.error().size() > 0) {
+
+    error_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_);
+  }
   if (from.has_data()) {
     mutable_data()->::google::protobuf::Any::MergeFrom(from.data());
   }
   if (from.rpcid() != 0) {
     set_rpcid(from.rpcid());
+  }
+  if (from.sockid() != 0) {
+    set_sockid(from.sockid());
   }
   if (from.code() != 0) {
     set_code(from.code());
@@ -1789,8 +1908,11 @@ void Rpc_Response::Swap(Rpc_Response* other) {
 void Rpc_Response::InternalSwap(Rpc_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  error_.Swap(&other->error_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(data_, other->data_);
   swap(rpcid_, other->rpcid_);
+  swap(sockid_, other->sockid_);
   swap(code_, other->code_);
 }
 

@@ -26,12 +26,12 @@ namespace GameKeeper
         int GetMethodId() const { return this->mMethod;}
         long long GetTaskId() const { return this->mTaskId;}
         double GetCostTime() const { return this->mTimer.GetMs();}
-        bool SetResult(const Rpc_Response * result);
+        bool SetResult(const com::Rpc_Response * result);
     public:
         XCode GetCode();
     protected:
         void AwaitTask();
-        virtual void OnResponse(const Rpc_Response * response) = 0;
+        virtual void OnResponse(const com::Rpc_Response * response) = 0;
     protected:
         XCode mCode;
     private:

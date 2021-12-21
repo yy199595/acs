@@ -5,7 +5,7 @@
 #include<Scene/RpcConfigComponent.h>
 #include<Scene/ThreadPoolComponent.h>
 #include"Network/SocketProxy.h"
-#include<ServerRpc/RpcComponent.h>
+#include<Rpc/RpcComponent.h>
 #ifdef __DEBUG__
 #include<Pool/MessagePool.h>
 #include<Async/RpcTask/RpcTask.h>
@@ -92,10 +92,16 @@ namespace GameKeeper
     void RpcClientComponent::OnRequest(com::Rpc_Request *request)
     {
         long long socketId = request->socketid();
-        if(!this->mRpcComponent->OnRequest(request))
+        XCode code = this->mRpcComponent->OnRequest(request);
+        if(code != XCode::Successful)
         {
-            delete request;
-            this->StartClose(socketId);
+            LocalObject<com::Rpc_Request> local(request);
+            com::Rpc_Response * response = new com::Rpc_Response();
+
+            response->set_code((int)code);
+            response->set_rpcid(request->rpcid());
+            response->set_userid(request->userid());
+            this->SendByAddress(socketId, response);
         }
     }
 
@@ -112,18 +118,13 @@ namespace GameKeeper
                 LOG_DEBUG("*****************[receive response]******************");
                 LOG_DEBUG("func = " << config->Service << "." << config->Method);
                 LOG_DEBUG("time = " << rpcTask->GetCostTime() << "ms");
-                if ((XCode) response->code() != XCode::Successful)
+
+                std::string json;
+                auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
+                LOG_DEBUG("code = " << codeConfig->Name << ":" << codeConfig->Desc);
+                if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
                 {
-                    auto codeConfig = this->mProtoConfigComponent->GetCodeConfig(response->code());
-                    LOG_ERROR("code = " << codeConfig->Name << ":" << codeConfig->Desc);
-                }
-                else if (response->has_data())
-                {
-                    std::string json;
-                    if (util::MessageToJsonString(response->data(), &json).ok())
-                    {
-                        LOG_DEBUG("json = " << json);
-                    }
+                    LOG_DEBUG("json = " << json);
                 }
                 LOG_DEBUG("*********************************************");
             }
@@ -173,9 +174,13 @@ namespace GameKeeper
     }
 
 	bool RpcClientComponent::SendByAddress(long long id, com::Rpc_Request * message)
-	{
-		ProtoRpcClient * clientSession = this->GetSession(id);
-        if(clientSession == nullptr || !clientSession->IsOpen())
+    {
+        if (message == nullptr)
+        {
+            return false;
+        }
+        ProtoRpcClient *clientSession = this->GetSession(id);
+        if (clientSession == nullptr || !clientSession->IsOpen())
         {
             return false;
         }
@@ -190,11 +195,15 @@ namespace GameKeeper
         LOG_DEBUG("==============================================");
 #endif
         return clientSession->SendToServer(message);
-	}
+    }
 
 	bool RpcClientComponent::SendByAddress(long long id, com::Rpc_Response * message)
-	{
-		ProtoRpcClient * clientSession = this->GetSession(id);
+    {
+        if (message == nullptr)
+        {
+            return false;
+        }
+        ProtoRpcClient *clientSession = this->GetSession(id);
 
         LOG_CHECK_RET_FALSE(clientSession);
 #ifdef __DEBUG__
@@ -205,5 +214,5 @@ namespace GameKeeper
         LOG_DEBUG("==============================================");
 #endif
         return clientSession->SendToServer(message);
-	}
+    }
 }// namespace GameKeeper

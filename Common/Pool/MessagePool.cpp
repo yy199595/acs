@@ -1,26 +1,26 @@
 #include "MessagePool.h"
-namespace GameKeeper
+namespace Helper
 {
-	std::unordered_map<std::string, Message *> MessagePool::mMessageMap;
+	std::unordered_map<std::string, Message *> Proto::mMessageMap;
 
-	Message * MessagePool::New(const Any & any)
+	Message * Proto::New(const Any & any)
     {
         std::string fullName;
         if(!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
         {
             return nullptr;
         }
-        return MessagePool::New(fullName);
+        return Proto::New(fullName);
     }
 
-    Message *MessagePool::NewByData(const Any &any, bool clone)
+    Message *Proto::NewByData(const Any &any, bool clone)
     {
         std::string fullName;
         if (!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
         {
             return nullptr;
         }
-        Message *message = MessagePool::New(fullName);
+        Message *message = Proto::New(fullName);
         if (message != nullptr && any.UnpackTo(message))
         {
             if(clone)
@@ -34,9 +34,9 @@ namespace GameKeeper
         return nullptr;
     }
 
-    Message *MessagePool::NewByJson(const Any &any, const std::string &json,bool clone)
+    Message *Proto::NewByJson(const Any &any, const std::string &json,bool clone)
     {
-        Message * message = MessagePool::New(any);
+        Message * message = Proto::New(any);
         if(message == nullptr)
         {
             return nullptr;
@@ -54,7 +54,7 @@ namespace GameKeeper
         return nullptr;
     }
 
-	Message * MessagePool::New(const std::string & name)
+	Message * Proto::New(const std::string & name)
 	{
 		if (name.empty())
 		{
@@ -85,7 +85,7 @@ namespace GameKeeper
 		return nullptr;
 	}
 
-	Message * MessagePool::NewByJson(const std::string & name, const std::string & json,bool clone)
+	Message * Proto::NewByJson(const std::string & name, const std::string & json,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
@@ -105,7 +105,7 @@ namespace GameKeeper
 		return nullptr;
 	}
 
-	Message * MessagePool::NewByJson(const std::string & name, const char * json, size_t size,bool clone)
+	Message * Proto::NewByJson(const std::string & name, const char * json, size_t size,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
@@ -125,7 +125,7 @@ namespace GameKeeper
 		return nullptr;
 	}
 
-	Message * MessagePool::NewByData(const std::string & name, const std::string & data,bool clone)
+	Message * Proto::NewByData(const std::string & name, const std::string & data,bool clone)
 	{
 		Message * message = New(name);
 		if (message == nullptr)
@@ -145,7 +145,7 @@ namespace GameKeeper
         return nullptr;
 	}
 
-	Message * MessagePool::NewByData(const std::string & name, const char * json, size_t size,bool clone)
+	Message * Proto::NewByData(const std::string & name, const char * json, size_t size,bool clone)
     {
         Message *message = New(name);
         if (message == nullptr)
@@ -165,4 +165,19 @@ namespace GameKeeper
         return nullptr;
     }
 
+    bool Proto::GetJson(const Any &message, std::string &json)
+    {
+        json.clear();
+        Message * pb = Proto::New(message);
+        if(pb == nullptr)
+        {
+            return false;
+        }
+        return message.UnpackTo(pb) && util::MessageToJsonString(*pb, &json).ok();
+    }
+
+    bool Proto::GetJson(const Message &message, std::string &json)
+    {
+        return util::MessageToJsonString(message, &json).ok();
+    }
 }

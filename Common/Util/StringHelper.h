@@ -4,7 +4,12 @@
 #include <vector>
 namespace Helper
 {
-    namespace String {
+    namespace String
+    {
+        extern std::string EmptyStr;
+
+        extern const std::string & Empty();
+
         extern std::string CreateNewToken();
 
         extern void ClearBlank(std::string &input);

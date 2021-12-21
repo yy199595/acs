@@ -66,7 +66,7 @@ namespace GameKeeper
                     const rapidjson::Value &jsonValue = iter2->value["Request"];
                     LOG_CHECK_RET_FALSE(jsonValue.IsString());
                     protocolConfig.Request = jsonValue.GetString();
-                    if(MessagePool::New(protocolConfig.Request) == nullptr)
+                    if(Helper::Proto::New(protocolConfig.Request) == nullptr)
                     {
                         LOG_FATAL("create " << protocolConfig.Request << " failure");
                         return false;
@@ -78,7 +78,7 @@ namespace GameKeeper
                     const rapidjson::Value &jsonValue = iter2->value["Response"];
                     LOG_CHECK_RET_FALSE(jsonValue.IsString());
                     protocolConfig.Response = jsonValue.GetString();               
-                    if (MessagePool::New(protocolConfig.Response) == nullptr)
+                    if (Helper::Proto::New(protocolConfig.Response) == nullptr)
                     {
                         LOG_FATAL("create " << protocolConfig.Response << " failure");
                         return false;

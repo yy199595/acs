@@ -80,7 +80,6 @@ namespace GameKeeper
         int number = Helper::Math::Random<int>();
         long long now = Helper::Time::GetSecTimeStamp();
         size_t size = sprintf(buffer, "%s:%lld:%d", account.c_str(), now, number);
-        Helper::Md5::MD5 md5(buffer, size);
-        return md5.toString();
+        return Helper::Md5::GetMd5(buffer, size);
     }
 }// namespace GameKeeper

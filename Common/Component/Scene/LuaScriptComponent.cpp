@@ -9,7 +9,7 @@
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
 
-#include <Service/LuaServiceComponent.h>
+#include <Component/ServiceBase/LuaServiceComponent.h>
 namespace GameKeeper
 {
     bool LuaScriptComponent::Awake()
@@ -61,20 +61,19 @@ namespace GameKeeper
 			if (Helper::File::ReadTxtFile(path, luaFile)
 				&& Helper::Directory::GetDirAndFileName(path, dir, name))
 			{
-				Helper::Md5::MD5 md5(luaFile.c_str(), luaFile.size());
+                const std::string & md5 = Helper::Md5::GetMd5(luaFile);
 				auto iter = this->mLuaFileMd5s.find(name);
 				if (iter == this->mLuaFileMd5s.end())
 				{
-					mLuaFileMd5s.emplace(name, md5.toString());
+					mLuaFileMd5s.emplace(name, md5);
 					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 				}
 				else
 				{
 					const std::string & oldMd5 = iter->second;
-					const std::string & newMd5 = md5.toString();
-					if (oldMd5 != newMd5)
+					if (oldMd5 != md5)
 					{
-						mLuaFileMd5s[name] = newMd5;
+						mLuaFileMd5s[name] = md5;
 						LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 					}
 				}

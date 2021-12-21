@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Service/ServiceComponent.h"
+#include "Component/ServiceBase/ServiceComponent.h"
 #include <Script/LuaInclude.h>
 
 namespace GameKeeper
@@ -11,17 +11,13 @@ namespace GameKeeper
     {
     public:
         LuaServiceComponent();
-
         ~LuaServiceComponent() override;
 	public:
 		bool InitService(const std::string & name, lua_State * luaEnv);
-
     public:
         bool Awake() final;
         bool LateAwake() final;
-		bool IsLuaService() final { return true; };
 		const std::string &GetServiceName()final { return this->mServiceName; }
-        
     private:
 		int mIdx;
 		lua_State * mLuaEnv;

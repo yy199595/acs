@@ -25,7 +25,7 @@ namespace GameKeeper
 
         const s2s::NodeInfo & GetNodeInfo() const { return this->mNodeInfo; }
 
-        com::Rpc_Request * NewRequest(const std::string & method, int & methodId);
+        com::Rpc_Request * NewRequest(const std::string & method);
     public:
         void Destory();
 

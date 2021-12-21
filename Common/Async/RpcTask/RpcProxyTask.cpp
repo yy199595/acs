@@ -3,23 +3,23 @@
 //
 
 #include"RpcProxyTask.h"
-#include"ServerRpc/RpcComponent.h"
+#include"Rpc/RpcComponent.h"
 #include"Component/GateComponent.h"
 namespace GameKeeper
 {
     RpcProxyTask::RpcProxyTask(int methodId)
         : RpcTaskBase(methodId)
     {
-        this->mClientRpcId = 0;
-        this->mClientSockId = 0;
+        this->mRpcId = 0;
+        this->mSockId = 0;
         this->mProxyComponent = nullptr;
     }
 
     void RpcProxyTask::InitProxyTask(long long rpcId, long long sockId, GateComponent *component,
                                      RpcComponent *rpcComponent)
     {
-        this->mClientRpcId = rpcId;
-        this->mClientSockId = sockId;
+        this->mRpcId = rpcId;
+        this->mSockId = sockId;
         this->mProxyComponent = component;
         rpcComponent->AddRpcTask(this->shared_from_this());
     }
@@ -27,14 +27,20 @@ namespace GameKeeper
     void RpcProxyTask::OnResponse(const com::Rpc_Response *response)
     {
         auto responseMessage = new c2s::Rpc_Response();
-
-        responseMessage->set_code(response->code());
-        responseMessage->set_rpcid(this->mClientRpcId);
-        if (response->has_data())
+        if(response == nullptr)
         {
-            responseMessage->mutable_data()->CopyFrom(response->data());
+            responseMessage->set_code((int)XCode::CallTimeout);
         }
-        XCode code = this->mProxyComponent->OnResponse(this->mClientRpcId, responseMessage);
+        else
+        {
+            responseMessage->set_code(response->code());
+            responseMessage->set_rpcid(this->mRpcId);
+            if (response->has_data())
+            {
+                responseMessage->mutable_data()->CopyFrom(response->data());
+            }
+        }
+        XCode code = this->mProxyComponent->OnResponse(this->mSockId, responseMessage);
         if(code != XCode::Successful)
         {
             delete responseMessage;

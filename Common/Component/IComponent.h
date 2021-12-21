@@ -82,8 +82,16 @@ namespace GameKeeper
     class IProtoRpc
     {
     public:
-        virtual bool OnRequest(const T1 * request) = 0;
-        virtual bool OnResponse(const T2 * response) = 0;
+        virtual XCode OnRequest(const T1 * request) = 0;
+        virtual XCode OnResponse(const T2 * response) = 0;
+    };
+
+    template<typename T1, typename T2>
+    class IClientRpc
+    {
+    public:
+        virtual XCode OnRequest(const T1 * request) = 0;
+        virtual XCode OnResponse(long long sockId, const T2 * response) = 0;
     };
 
     template<typename T1, typename T2>

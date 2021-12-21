@@ -1,12 +1,12 @@
 ﻿#include"RpcComponent.h"
-#include<Service/ServiceComponent.h>
+#include<Component/ServiceBase/ServiceComponent.h>
 #include<Coroutine/TaskComponent.h>
 #include<Util/StringHelper.h>
 #include"Core/App.h"
 #include<Pool/MessagePool.h>
 #include<Method/LuaServiceMethod.h>
 #include"Scene/RpcConfigComponent.h"
-#include"ServerRpc/RpcClientComponent.h"
+#include"Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Async/RpcTask/RpcTask.h"
 namespace GameKeeper
@@ -35,41 +35,42 @@ namespace GameKeeper
         return true;
     }
 
-	bool RpcComponent::OnRequest(const com::Rpc_Request * request)
+	XCode RpcComponent::OnRequest(const com::Rpc_Request * request)
     {
         unsigned short methodId = request->methodid();
         const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
-        if (protocolConfig == nullptr) {
-            return false;
+        if (protocolConfig == nullptr)
+        {
+            return XCode::NotFoundRpcConfig;
         }
 
         const std::string &service = protocolConfig->Service;
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
-        if (logicService == nullptr) {
+        if (logicService == nullptr)
+        {
             LOG_FATAL("call service not exist : [" << service << "]");
-            return false;
+            return XCode::CallServiceNotFound;
         }
 
-        if(!protocolConfig->IsAsync)
+        if (!protocolConfig->IsAsync)
         {
             long long socketId = request->socketid();
             const std::string &method = protocolConfig->Method;
             auto response = logicService->Invoke(method, request);
             this->mRpcClientComponent->SendByAddress(socketId, response);
-            return true;
+            return XCode::Successful;
         }
-        else {
-            this->mCorComponent->Start([request, this, logicService, protocolConfig]() {
-                long long socketId = request->socketid();
-                const std::string &method = protocolConfig->Method;
-                auto response = logicService->Invoke(method, request);
-                this->mRpcClientComponent->SendByAddress(socketId, response);
-            });
-            return true;
-        }
+        this->mCorComponent->Start([request, this, logicService, protocolConfig]()
+        {
+            long long socketId = request->socketid();
+            const std::string &method = protocolConfig->Method;
+            auto response = logicService->Invoke(method, request);
+            this->mRpcClientComponent->SendByAddress(socketId, response);
+        });
+        return XCode::Successful;
     }
 
-    bool RpcComponent::OnResponse(const com::Rpc_Response *response)
+    XCode RpcComponent::OnResponse(const com::Rpc_Response *response)
     {
         LocalObject<com::Rpc_Response> local(response);
         long long rpcId = response->rpcid();
@@ -77,12 +78,12 @@ namespace GameKeeper
         if(iter == this->mRpcTasks.end())
         {
             LOG_WARN("not find rpc task : " << rpcId)
-            return false;
+            return XCode::Failure;
         }
         auto rpcTask = iter->second;
         this->mRpcTasks.erase(iter);
         rpcTask->SetResult(response);
-        return true;
+        return XCode::Successful;
     }
 
     unsigned int RpcComponent::AddRpcTask(std::shared_ptr<RpcTaskBase> task)

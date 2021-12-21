@@ -2,7 +2,7 @@
 
 #include <Core/App.h>
 #include <Service/RpcNode.h>
-#include <ServerRpc/RpcClientComponent.h>
+#include <Rpc/RpcClientComponent.h>
 
 namespace GameKeeper
 {

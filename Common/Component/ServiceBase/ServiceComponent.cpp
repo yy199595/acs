@@ -1,11 +1,10 @@
-﻿#include"Service/ServiceComponent.h"
+﻿#include"ServiceComponent.h"
 #include<Core/App.h>
 #include <Method/LuaServiceMethod.h>
-#include"Method/JsonServiceMethod.h"
 #include<Scene/RpcConfigComponent.h>
 #ifdef __DEBUG__
 #include"Other/ElapsedTimer.h"
-#include<google/protobuf/util/json_util.h>
+#include"Pool/MessagePool.h"
 #endif
 namespace GameKeeper
 {
@@ -33,22 +32,13 @@ namespace GameKeeper
         this->mMethodMap.emplace(name, method);
         return true;
     }
-	bool ServiceComponent::HasProtoMethod(const std::string & method)
-	{
-		auto iter1 = this->mMethodMap.find(method);
-		return iter1 != this->mMethodMap.end();
-	}
-	ServiceMethod * ServiceComponent::GetProtoMethod(const std::string & method)
-	{
-		auto iter1 = this->mMethodMap.find(method);
-		return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
-	}
 
     com::Rpc_Response *ServiceComponent::Invoke(const string &method, const com::Rpc_Request * request)
     {
         LocalObject<com::Rpc_Request> local(request);
         auto iter = this->mMethodMap.find(method);
-        if (iter == this->mMethodMap.end()) {
+        if (iter == this->mMethodMap.end())
+        {
             return nullptr;
         }
 #ifdef __DEBUG__
@@ -57,7 +47,8 @@ namespace GameKeeper
         ServiceMethod *serviceMethod = iter->second;
         com::Rpc_Response *response = new com::Rpc_Response();
         XCode code = serviceMethod->Invoke(*request, *response);
-        if (request->rpcid() == 0) {
+        if (request->rpcid() == 0)
+        {
             delete response;
             return nullptr;
         }
@@ -65,21 +56,22 @@ namespace GameKeeper
         response->set_rpcid(request->rpcid());
         response->set_userid(request->userid());
 #ifdef __DEBUG__
+        std::string json;
         LOG_DEBUG("===============[rpc request]===============");
-        LOG_DEBUG("func = " << this->GetServiceName() << "." << method);
-        if(request->has_data())
+        LOG_DEBUG("[func] = " << this->GetServiceName() << "." << method);
+        LOG_DEBUG("[time] = " << elapsedTimer.GetMs() << "ms");
+        if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
         {
-            std::string json;
-            util::MessageToJsonString(request->data(), &json);
-            LOG_DEBUG("request = " << json);
+            LOG_DEBUG("[request] = " << json);
         }
         if(response->has_data())
         {
-            std::string json;
-            util::MessageToJsonString(response->data(), &json);
-            LOG_DEBUG("response = " << json);
+            json.clear();
+            if (Helper::Proto::GetJson(response->data(), json))
+            {
+                LOG_DEBUG("[response] = " << json);
+            }
         }
-        LOG_DEBUG("time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
         return response;
     }

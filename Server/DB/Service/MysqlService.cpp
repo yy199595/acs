@@ -32,7 +32,7 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-		Message * message = MessagePool::NewByData(request.data());
+		Message * message = Helper::Proto::NewByData(request.data());
         if (message == nullptr)
         {
 			return XCode::ParseMessageError;
@@ -64,7 +64,7 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-		Message * message = MessagePool::New(request.data());
+		Message * message = Helper::Proto::New(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;
@@ -93,7 +93,7 @@ namespace GameKeeper
 
     XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
     {
-		Message * message = MessagePool::New(request.data());
+		Message * message = Helper::Proto::New(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;
@@ -148,7 +148,7 @@ namespace GameKeeper
             const std::string & name = sqlTableConfig->mProtobufName;
             while(mysqlTask->GetQueryData(json))
             {
-                Message * message = MessagePool::NewByJson(name, json);
+                Message * message = Helper::Proto::NewByJson(name, json);
                 if(message == nullptr)
                 {
                     return XCode::JsonCastProtocbufFail;
@@ -167,7 +167,7 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-		Message * message = MessagePool::NewByData(request.data());
+		Message * message = Helper::Proto::NewByData(request.data());
         if (message == nullptr)
         {
             return XCode::ParseMessageError;
@@ -195,7 +195,7 @@ namespace GameKeeper
             std::string json;
             while(mysqlTask->GetQueryData(json))
             {
-                Message * message = MessagePool::NewByJson(request.data(), json);
+                Message * message = Helper::Proto::NewByJson(request.data(), json);
                 if (message == nullptr)
                 {
                     return XCode::JsonCastProtocbufFail;
