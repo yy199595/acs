@@ -3,9 +3,9 @@
 #include"Protocol/s2s.pb.h"
 namespace GameKeeper
 {
+    class NodeHelper;
     class MysqlRpcTask;
-    class MysqlProxyComponent : public Component,
-            public IFrameUpdate, public ILoadData, public INodeRefresh
+    class MysqlProxyComponent : public Component, public ILoadData, public INodeRefresh
     {
     public:
         MysqlProxyComponent() = default;
@@ -18,8 +18,6 @@ namespace GameKeeper
         bool LateAwake() final;
 
         void OnLoadData() override;
-
-        void OnFrameUpdate(float t) final;
 
         void OnAddRpcNode(class RpcNode *node) final;
 
@@ -41,11 +39,11 @@ namespace GameKeeper
         std::shared_ptr<MysqlRpcTask> Sort(const std::string & tab, const std::string & field, int count, bool reverse = false);
 
     private:
-        int mMysqlNodeId;
+        int mNodeId;
+        class TaskComponent *mCorComponent;
+        class RpcNodeComponent *mNodeComponent;
         s2s::MysqlOper_Request mOperRequest;
         s2s::MysqlQuery_Request mQueryRequest;
         s2s::MysqlAnyOper_Request mAnyOperRequest;
-        class TaskComponent *mCorComponent;
-        class NodeProxyComponent *mNodeComponent;
     };
 }

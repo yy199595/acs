@@ -54,8 +54,8 @@ namespace GameKeeper
         std::string mHostConfigMd5;
         std::string mGroupConfigMd5;
         std::set<std::string> mServiceHosts;
+        class RpcNodeComponent * mNodeComponent;
         class RpcClientComponent * mRpcComponent;
-        class NodeProxyComponent * mNodeComponent;
         std::unordered_map<unsigned int, ServerGroupConfig> mGroupNodeMap;
         std::unordered_map<unsigned short , std::set<unsigned int>> mServiceNodeMap;
     };

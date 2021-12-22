@@ -67,7 +67,6 @@
         "RpcClientComponent",
         "OperatorComponent",
         "RpcConfigComponent",
-        "NodeProxyComponent",
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent"

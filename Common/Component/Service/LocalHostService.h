@@ -8,7 +8,7 @@ namespace GameKeeper
 
     class TaskComponent;
 
-    class NodeProxyComponent;
+    class RpcNodeComponent;
 
     class LocalHostService : public ServiceComponent, public IStart
     {
@@ -37,6 +37,6 @@ namespace GameKeeper
         long long mOpenTime;
 		std::string mNodeName;
         std::string mGroupName;
-        NodeProxyComponent * mNodeComponent;
+        RpcNodeComponent * mNodeComponent;
     };
 }

@@ -1,11 +1,12 @@
 ﻿#include "LocalHostService.h"
 #include <Core/App.h>
 #include <Service/RpcNode.h>
-#include <Service/NodeProxyComponent.h>
+#include <Service/RpcNodeComponent.h>
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Scene/OperatorComponent.h"
 #include<Scene/RpcConfigComponent.h>
+#include"Service/NodeHelper.h"
 namespace GameKeeper
 {
     bool LocalHostService::Awake()
@@ -21,7 +22,7 @@ namespace GameKeeper
     }
     bool LocalHostService::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<RpcNodeComponent>());
         return true;
     }
 
@@ -55,9 +56,8 @@ namespace GameKeeper
             }
         }
 
-        RpcNode *centerNode = this->mNodeComponent->GetServiceNode(0);
-        auto response = centerNode->Call<
-                s2s::NodeRegister_Response>("CenterHostService.Add", registerInfo);
+        NodeHelper nodeHelper(0);
+        auto response = nodeHelper.Call<s2s::NodeRegister_Response>("CenterHostService.Add", registerInfo);
         if (response == nullptr) {
             LOG_ERROR("register to center failure");
         }

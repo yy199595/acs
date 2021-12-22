@@ -1,9 +1,10 @@
 ﻿
 #include"App.h"
-#include"Service/NodeProxyComponent.h"
-#include"Scene/ThreadPoolComponent.h"
-#include"Util/DirectoryHelper.h"
 #include"Other/ElapsedTimer.h"
+#include"Util/DirectoryHelper.h"
+#include"Service/RpcNodeComponent.h"
+#include"Scene/ThreadPoolComponent.h"
+
 using namespace GameKeeper;
 using namespace std::chrono;
 
@@ -30,6 +31,7 @@ namespace GameKeeper
         this->AddComponent<TaskComponent>();
 		this->AddComponent<TimerComponent>();
 		this->AddComponent<LoggerComponent>();
+        this->AddComponent<RpcNodeComponent>();
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();

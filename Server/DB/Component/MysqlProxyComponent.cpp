@@ -5,14 +5,14 @@
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
 #include"Util/MathHelper.h"
-#include"Service/NodeProxyComponent.h"
+#include"Service/RpcNodeComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"MysqlClient/MysqlRpcTask.h"
 namespace GameKeeper
 {
     bool MysqlProxyComponent::Awake()
     {
-        this->mMysqlNodeId = -1;
+        this->mNodeId = -1;
 		this->mCorComponent = nullptr;
         return true;
     }
@@ -20,17 +20,10 @@ namespace GameKeeper
     bool MysqlProxyComponent::LateAwake()
     {
         this->mCorComponent = App::Get().GetTaskComponent();
-        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<NodeProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<RpcNodeComponent>());
         return true;
     }
 
-    void MysqlProxyComponent::OnFrameUpdate(float t)
-    {
-        if(this->mMysqlNodeId == -1)
-        {
-            return;
-        }
-    }
 
     void MysqlProxyComponent::OnLoadData()
     {
@@ -49,15 +42,15 @@ namespace GameKeeper
     {
         if(node->HasService("MysqlService"))
         {
-            this->mMysqlNodeId = node->GetGlobalId();
+            this->mNodeId = node->GetGlobalId();
         }
     }
 
     void MysqlProxyComponent::OnDelRpcNode(RpcNode *node)
     {
-        if(this->mMysqlNodeId == node->GetGlobalId())
+        if(this->mNodeId == node->GetGlobalId())
         {
-            this->mMysqlNodeId = -1;
+            this->mNodeId = -1;
         }
     }
 
@@ -103,10 +96,10 @@ namespace GameKeeper
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Add(const Message &data)
     {
-        RpcNode *proxyNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        RpcNode *proxyNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (proxyNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
+            LOG_ERROR("not find mysql service node " << this->mNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
         auto requestMessage = proxyNode->NewRequest("MysqlService.Add");
@@ -127,10 +120,10 @@ namespace GameKeeper
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Query(const Message &data)
     {
-        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
+            LOG_ERROR("not find mysql service node " << this->mNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Query");
@@ -150,10 +143,10 @@ namespace GameKeeper
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
     {
-        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
+            LOG_ERROR("not find mysql service node " << this->mNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Invoke");
@@ -174,10 +167,10 @@ namespace GameKeeper
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Save(const Message &data)
     {
-        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
+            LOG_ERROR("not find mysql service node " << this->mNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Save");
@@ -197,10 +190,10 @@ namespace GameKeeper
 
     std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Delete(const Message &data)
     {
-        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mMysqlNodeId);
+        RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mMysqlNodeId);
+            LOG_ERROR("not find mysql service node " << this->mNodeId);
             return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Delete");

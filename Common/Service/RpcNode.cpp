@@ -6,11 +6,13 @@
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
+#include"Service/NodeHelper.h"
 namespace GameKeeper
 {
 	RpcNode::RpcNode(int id)
-		:  mGlobalId(id), mIsClose(false), mSocketId(0)
+		: mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
+        this->mCallHelper = new NodeHelper(id);
         this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
         this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
         LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<TaskComponent>());
@@ -104,31 +106,6 @@ namespace GameKeeper
         }
     }
 
-    XCode RpcNode::Notice(const std::string &method)
-    {
-        auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
-        if (config == nullptr)
-        {
-            return XCode::NotFoundRpcConfig;
-        }
-        auto requestMessage = new com::Rpc_Request();
-        requestMessage->set_methodid(config->MethodId);
-        return XCode::Successful;
-    }
-
-	XCode RpcNode::Notice(const std::string &method, const Message &request)
-	{
-        auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
-        if (config == nullptr)
-        {
-            return XCode::NotFoundRpcConfig;
-        }
-        auto requestMessage = new com::Rpc_Request();
-        requestMessage->set_methodid(config->MethodId);
-        requestMessage->mutable_data()->PackFrom(request);
-        return XCode::Successful;
-	}
-
 	com::Rpc_Request * RpcNode::NewRequest(const std::string & method)
 	{
 		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
@@ -172,15 +149,5 @@ namespace GameKeeper
         requestData->set_rpcid(rpcTask->GetTaskId());
         requestData->mutable_data()->PackFrom(message);
         return rpcTask;
-    }
-
-    XCode RpcNode::Invoke(const string &func)
-    {
-        return this->NewRpcTask(func)->GetCode();
-    }
-
-    XCode RpcNode::Invoke(const string &func, const Message &request)
-    {
-        return this->NewRpcTask(func, request)->GetCode();
     }
 }// namespace GameKeeper

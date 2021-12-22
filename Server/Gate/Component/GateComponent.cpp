@@ -7,7 +7,7 @@
 #include"Service/RpcNode.h"
 #include"Rpc/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Service/NodeProxyComponent.h"
+#include"Service/RpcNodeComponent.h"
 #include"Async/RpcTask/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -18,8 +18,8 @@ namespace GameKeeper
 {
     bool GateComponent::Awake()
     {
+        this->mRpcNodeComponent = nullptr;
         this->mRpcConfigComponent = nullptr;
-        this->mNodeProxyComponent = nullptr;
         this->mGateClientComponent = nullptr;
         return true;
     }
@@ -27,8 +27,8 @@ namespace GameKeeper
     bool GateComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcNodeComponent = this->GetComponent<RpcNodeComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
-        LOG_CHECK_RET_FALSE(this->mNodeProxyComponent = this->GetComponent<NodeProxyComponent>());
         LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
         return true;
     }
@@ -40,7 +40,7 @@ namespace GameKeeper
             LOG_ERROR("call function " << request->methodname() << " not find");
             return XCode::NotFoundRpcConfig;
         }
-        auto nodeService = this->mNodeProxyComponent->AllotService(config->Service);
+        auto nodeService = this->mRpcNodeComponent->AllotService(config->Service);
         if (nodeService == nullptr) {
             return XCode::CallServiceNotFound;
         }

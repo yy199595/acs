@@ -1,4 +1,4 @@
-#include "NodeProxyComponent.h"
+#include "RpcNodeComponent.h"
 
 #include <Core/App.h>
 #include <Service/RpcNode.h>
@@ -6,7 +6,7 @@
 
 namespace GameKeeper
 {
-    bool NodeProxyComponent::DelNode(int nodeId)
+    bool RpcNodeComponent::DelNode(int nodeId)
     {
         auto iter = this->mServiceNodeMap.find(nodeId);
         if (iter != this->mServiceNodeMap.end())
@@ -22,7 +22,7 @@ namespace GameKeeper
         return false;
     }
 
-    RpcNode *NodeProxyComponent::Create(int uid)
+    RpcNode *RpcNodeComponent::Create(int uid)
     {
         auto nodeProxy = this->GetServiceNode(uid);
         if (nodeProxy == nullptr)
@@ -33,7 +33,7 @@ namespace GameKeeper
         return nodeProxy;
     }
 
-	RpcNode * NodeProxyComponent::CreateNode(int uid, const s2s::NodeInfo & nodeInfo)
+	RpcNode * RpcNodeComponent::CreateNode(int uid, const s2s::NodeInfo & nodeInfo)
 	{
         auto nodeProxy = this->GetServiceNode(uid);
         if(nodeProxy == nullptr)
@@ -52,7 +52,7 @@ namespace GameKeeper
 		return nodeProxy;
 	}
 
-    bool NodeProxyComponent::Awake()
+    bool RpcNodeComponent::Awake()
     {
 		const ServerConfig & serverConfig = App::Get().GetConfig();
 		LOG_CHECK_RET_FALSE(serverConfig.GetValue("AreaId", this->mAreaId));
@@ -61,7 +61,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool NodeProxyComponent::LateAwake()
+    bool RpcNodeComponent::LateAwake()
     {
         s2s::NodeInfo centerNodeInfo;
         centerNodeInfo.set_servername("Center");
@@ -72,14 +72,14 @@ namespace GameKeeper
         return true;
     }
 
-    RpcNode *NodeProxyComponent::GetServiceNode(int nodeId)
+    RpcNode *RpcNodeComponent::GetServiceNode(int nodeId)
     {
         auto iter = this->mServiceNodeMap.find(nodeId);
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
     }
 
     // 分配服务  TODO
-    RpcNode *NodeProxyComponent::AllotService(const string &name)
+    RpcNode *RpcNodeComponent::AllotService(const string &name)
     {
         auto iter = this->mServiceNodeMap.begin();
         for(; iter != this->mServiceNodeMap.end(); iter++)

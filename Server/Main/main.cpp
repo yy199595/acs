@@ -14,7 +14,7 @@
 
 #include <Service/LuaServiceMgrComponent.h>
 #include <Rpc/RpcComponent.h>
-#include <Service/NodeProxyComponent.h>
+#include <Service/RpcNodeComponent.h>
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
     REGISTER_COMPONENT(ThreadPoolComponent);
     REGISTER_COMPONENT(TaskComponent);
-    REGISTER_COMPONENT(NodeProxyComponent);
+    REGISTER_COMPONENT(RpcNodeComponent);
     REGISTER_COMPONENT(TcpServerComponent);
     REGISTER_COMPONENT(RpcClientComponent);
     REGISTER_COMPONENT(TelnetClientComponent);

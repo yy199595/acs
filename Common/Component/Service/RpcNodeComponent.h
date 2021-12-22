@@ -6,11 +6,11 @@ namespace GameKeeper
 {
     class RpcNode;
 
-    class NodeProxyComponent : public Component
+    class RpcNodeComponent : public Component
     {
     public:
-        NodeProxyComponent() = default;
-        ~NodeProxyComponent() override = default;
+        RpcNodeComponent() = default;
+        ~RpcNodeComponent() override = default;
 
     public:
         bool DelNode(int nodeId);

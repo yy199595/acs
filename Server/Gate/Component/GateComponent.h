@@ -24,8 +24,8 @@ namespace GameKeeper
     private:
         std::string mProtoName;
         class RpcComponent * mRpcComponent;
+        class RpcNodeComponent * mRpcNodeComponent;
         class RpcConfigComponent * mRpcConfigComponent;
-        class NodeProxyComponent * mNodeProxyComponent;
         class GateClientComponent * mGateClientComponent;
     };
 }

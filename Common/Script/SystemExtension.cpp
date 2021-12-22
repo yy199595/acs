@@ -3,7 +3,7 @@
 #include <Async/RpcTask/RpcTask.h>
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include <Service/NodeProxyComponent.h>
+#include <Service/RpcNodeComponent.h>
 #include <Scene/LuaScriptComponent.h>
 
 #include <Service/RpcNode.h>
@@ -26,7 +26,7 @@ int SystemExtension::Call(lua_State *lua)
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);
 
-	NodeProxyComponent * nodeComponent = App::Get().GetComponent<NodeProxyComponent>();
+	RpcNodeComponent * nodeComponent = App::Get().GetComponent<RpcNodeComponent>();
 
 	RpcNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
