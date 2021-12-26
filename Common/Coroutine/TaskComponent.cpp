@@ -30,8 +30,9 @@ namespace GameKeeper
         tb_context_jump(this->mMainContext, nullptr);
     }
 
-    TaskComponent::TaskComponent()
+    bool TaskComponent::Awake()
     {
+        this->mRunCoroutine = nullptr;
         for(Stack & stack : this->mSharedStack)
         {
             stack.co = 0;
@@ -39,28 +40,21 @@ namespace GameKeeper
             stack.p = new char[STACK_SIZE];
             stack.top = (char *)stack.p + STACK_SIZE;
         }
-    }
-
-	TaskComponent::~TaskComponent() = default;
-
-    bool TaskComponent::Awake()
-    {
-        this->mRunCoroutine = nullptr;
         return true;
     }
 
     bool TaskComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
-        this->Start([this]() {
-            ElapsedTimer timer;
-            CoroutineGroup *group = this->NewCoroutineGroup();
-            for (int index = 0; index < 1000; index++) {
-                group->Add(this->Start(&TaskComponent::Test, this, index));
-            }
-            group->AwaitAll();
-            LOG_ERROR("use time = " << timer.GetMs() << "ms");
-        });
+//        this->Start([this]() {
+//            ElapsedTimer timer;
+//            CoroutineGroup *group = this->NewCoroutineGroup();
+//            for (int index = 0; index < 1000; index++) {
+//                group->Add(this->Start(&TaskComponent::Test, this, index));
+//            }
+//            group->AwaitAll();
+//            LOG_ERROR("use time = " << timer.GetMs() << "ms");
+//        });
 
         return true;
     }
@@ -233,15 +227,15 @@ namespace GameKeeper
     }
 	void TaskComponent::OnLastFrameUpdate()
 	{
-		if (!this->mLastQueues1.empty())
-		{
-			std::swap(this->mLastQueues1, this->mLastQueues2);
-			while (!this->mLastQueues2.empty())
-			{
-				this->Resume(this->mLastQueues2.front());
-				this->mLastQueues2.pop();
-			}
-		}
+        while(!this->mLastQueues.empty())
+        {
+            unsigned int id = this->mLastQueues.front();
+            Coroutine *coroutine = this->GetCoroutine(id);
+            if (coroutine != nullptr) {
+                this->mResumeCoroutines.push(coroutine);
+            }
+            this->mLastQueues.pop();
+        }
 	}
 
     void TaskComponent::OnSecondUpdate()

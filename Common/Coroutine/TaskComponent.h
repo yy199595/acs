@@ -10,11 +10,12 @@
 #include<Component/Component.h>
 namespace GameKeeper
 {
-    class TaskComponent : public Component, public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
+    class TaskComponent : public Component,
+            public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
 	{
 	public:
-		TaskComponent();
-		~TaskComponent() final;
+		TaskComponent() = default;
+		~TaskComponent() final = default;
 	public:
 		template<typename F, typename T, typename ... Args>
 		Coroutine * Start(F && f, T * o, Args &&... args) {
@@ -84,8 +85,7 @@ namespace GameKeeper
         void ResumeCoroutine(Coroutine * co);
 	private:
 		class TimerComponent *mTimerManager;
-		std::queue<unsigned int> mLastQueues1;
-		std::queue<unsigned int> mLastQueues2;
+		std::queue<unsigned int> mLastQueues;
 	private:
 		CoroutinePool mCorPool;
         tb_context_t mMainContext;

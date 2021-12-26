@@ -106,7 +106,6 @@ namespace GameKeeper
 		long long mLogicUpdateInterval;
 	private:
 		bool mIsClose;
-		bool mIsInitComplate;
 		long long mStartTime;
 		ServerConfig * mConfig;
 		std::string mServerName;
@@ -114,7 +113,6 @@ namespace GameKeeper
 	private:
 		float mLogicFps;
 		float mDelatime;
-
 	private:
 		long long mLogicRunCount;
 		long long mMainLoopStartTime;

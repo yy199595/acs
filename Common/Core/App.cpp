@@ -21,7 +21,6 @@ namespace GameKeeper
 		this->mIsClose = false;
 		this->mConfig = nullptr;
 		this->mLogicRunCount = 0;
-		this->mIsInitComplate = false;
 		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
 	}
@@ -124,7 +123,6 @@ namespace GameKeeper
                 //LOG_DEBUG("start " << component->GetTypeName() << " use time " << elapsedTimer.GetMs() << "ms");
             }
         }
-		this->mIsInitComplate = true;
 		this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();
 		LOG_DEBUG("start all component successful ......");
 
@@ -193,10 +191,6 @@ namespace GameKeeper
 			component->OnSystemUpdate();
 		}
 
-		if (!this->mIsInitComplate)
-		{
-			return;
-		}
 		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
 		{
 			this->mLogicRunCount++;
