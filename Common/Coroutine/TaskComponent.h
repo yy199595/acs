@@ -64,20 +64,20 @@ namespace GameKeeper
 
         unsigned int GetCurrentCorId() const
         {
-            return this->mCurrentCorId;
+            if(this->mRunCoroutine == nullptr)
+            {
+                return 0;
+            }
+            return this->mRunCoroutine->mCoroutineId;
         }
 
         void RunTask(tb_context_t context);
 
 		bool IsInMainCoroutine() const
 		{
-			return this->mCurrentCorId == 0;
+			return this->mRunCoroutine == nullptr;
 		}
 
-		bool IsInLogicCoroutine() const
-		{
-			return this->mCurrentCorId != 0;
-		}
 	private:
         void Test(int index);
         void SaveStack(unsigned int id);
@@ -89,9 +89,9 @@ namespace GameKeeper
 	private:
 		CoroutinePool mCorPool;
         tb_context_t mMainContext;
-        unsigned int mCurrentCorId;
+        Coroutine * mRunCoroutine;
 		Stack mSharedStack[SHARED_STACK_NUM];
-		std::queue<unsigned int> mResumeCoroutines;
+		std::queue<Coroutine *> mResumeCoroutines;
         std::unordered_map<unsigned int, CoroutineGroup *> mCoroutineGroups;
 	};
 }

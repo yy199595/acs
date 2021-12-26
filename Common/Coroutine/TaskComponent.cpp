@@ -13,19 +13,19 @@ namespace GameKeeper
 {
 	void MainEntry(tb_context_from_t parame)
 	{
-		TaskComponent * taskComponent = App::Get().GetTaskComponent();
-
-        taskComponent->RunTask(parame.ctx);
+		TaskComponent * taskComponent = (TaskComponent*)parame.priv;
+        if(taskComponent != nullptr) {
+            taskComponent->RunTask(parame.ctx);
+        }
 	}
 
     void TaskComponent::RunTask(tb_context_t context)
     {
         this->mMainContext = context;
-        Coroutine * coroutine = this->GetCurCoroutine();
-        if(coroutine != nullptr)
+        if (this->mRunCoroutine != nullptr)
         {
-            coroutine->Invoke();
-            this->Destory(coroutine);
+            this->mRunCoroutine->Invoke();
+            this->Destory(this->mRunCoroutine);
         }
         tb_context_jump(this->mMainContext, nullptr);
     }
@@ -45,7 +45,7 @@ namespace GameKeeper
 
     bool TaskComponent::Awake()
     {
-        this->mCurrentCorId = 0;
+        this->mRunCoroutine = nullptr;
         return true;
     }
 
@@ -71,6 +71,10 @@ namespace GameKeeper
         for (int x = 0; x < 10; x++)
         {
             this->AwaitSleep(10 + 5 * index + x);
+            this->Start([this, x]() {
+                this->AwaitSleep(100 + x * 100);
+                LOG_ERROR(__FUNCTION__ << "  " << __LINE__);
+            });
         }
         //LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
@@ -78,68 +82,61 @@ namespace GameKeeper
 
     void TaskComponent::AwaitSleep(long long ms)
     {
+        unsigned int id = this->mRunCoroutine->mCoroutineId;
         StaticMethod * sleepMethod = NewMethodProxy(
-                &TaskComponent::Resume, this, this->mCurrentCorId);
+                &TaskComponent::Resume, this, id);
         this->mTimerManager->AddTimer(ms, sleepMethod);
         this->Await();
     }
 
 	void TaskComponent::ResumeCoroutine(Coroutine * co)
-	{    
-		co->mLastCoroutineId = this->mCurrentCorId;
-        this->mCurrentCorId = co->mCoroutineId;
-
-
+    {
         co->mState = CorState::Running;
-		Stack & stack = mSharedStack[co->sid];
-
-        if(co->mContext == nullptr)
-        {
-            if(stack.co != this->mCurrentCorId)
-            {
+        Stack &stack = mSharedStack[co->sid];
+        if (co->mContext == nullptr) {
+            if (stack.co != co->mCoroutineId) {
                 this->SaveStack(stack.co);
-                stack.co = this->mCurrentCorId;
+                stack.co = co->mCoroutineId;
             }
-            co->mContext = tb_context_make(stack.p, stack.size, MainEntry);
-        }
-        else if(stack.co != this->mCurrentCorId)
-        {
+            this->mRunCoroutine->mContext = tb_context_make(stack.p, stack.size, MainEntry);
+        } else if (stack.co != co->mCoroutineId) {
             this->SaveStack(stack.co);
-            stack.co = this->mCurrentCorId;
+            stack.co = co->mCoroutineId;
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
         }
-		co->mContext = tb_context_jump(co->mContext, nullptr).ctx;
-        this->mCurrentCorId = co->mLastCoroutineId;
+        tb_context_from_t from = tb_context_jump(co->mContext, this);
+        if(from.priv != nullptr){
+            this->mRunCoroutine->mContext = from.ctx;
+        }
     }
 
 	void TaskComponent::Await()
 	{
-		Coroutine *logicCoroutine = this->GetCurCoroutine();
-		if (logicCoroutine == nullptr)
-		{
-			LOG_FATAL("not find coroutine context");
-			return;
-		}
-        logicCoroutine->mSwitchCount++;
-		logicCoroutine->mState = CorState::Suspend;
-		tb_context_jump(this->mMainContext, logicCoroutine);
+        if(this->mRunCoroutine == nullptr)
+        {
+            LOG_FATAL("not find coroutine context");
+            return;
+        }
+
+        this->mRunCoroutine->mSwitchCount++;
+		this->mRunCoroutine->mState = CorState::Suspend;
+		tb_context_jump(this->mMainContext, this->mRunCoroutine);
 	}
 
 	void TaskComponent::Resume(unsigned int id)
     {
-        LOG_CHECK_RET(id != 0);
         Coroutine *logicCoroutine = this->GetCoroutine(id);
         if(logicCoroutine == nullptr)
         {
             LOG_FATAL("not find coroutine : " << id);
             return;
         }
-        this->mResumeCoroutines.push(id);
+        this->mResumeCoroutines.push(logicCoroutine);
     }
 
 	CoroutineGroup * TaskComponent::NewCoroutineGroup()
 	{
-		if (this->mCurrentCorId == 0)
+		if (this->mRunCoroutine == nullptr)
 		{
 			return nullptr;
 		}
@@ -162,8 +159,11 @@ namespace GameKeeper
 
 	void TaskComponent::Await(unsigned int & mCorId)
 	{
-		mCorId = this->mCurrentCorId;
-        this->Await();
+        if(this->mRunCoroutine != nullptr)
+        {
+            mCorId = this->mRunCoroutine->mCoroutineId;
+            this->Await();
+        }
 	}
 
     Coroutine *TaskComponent::GetCoroutine(unsigned int id)
@@ -173,11 +173,7 @@ namespace GameKeeper
 
     Coroutine * TaskComponent::GetCurCoroutine()
     {
-        if(this->mCurrentCorId == 0)
-        {
-            return nullptr;
-        }
-        return this->mCorPool.Get(this->mCurrentCorId);
+        return this->mRunCoroutine;
     }
 
 	void TaskComponent::Destory(Coroutine * coroutine)
@@ -225,14 +221,15 @@ namespace GameKeeper
     {
 		while (!this->mResumeCoroutines.empty())
 		{
-            unsigned int id = this->mResumeCoroutines.front();
-            Coroutine * coroutine = this->GetCoroutine(id);
+            Coroutine * coroutine = this->mResumeCoroutines.front();
             if(coroutine != nullptr)
             {
+                this->mRunCoroutine = coroutine;
                 this->ResumeCoroutine(coroutine);
             }
-			this->mResumeCoroutines.pop();
-		}
+            this->mResumeCoroutines.pop();
+            this->mRunCoroutine = nullptr;
+        }
     }
 	void TaskComponent::OnLastFrameUpdate()
 	{
