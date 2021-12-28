@@ -6,15 +6,19 @@
 namespace GameKeeper
 {
 	Coroutine::Coroutine()
-	{
+    {
         memset(this, 0, (sizeof(Coroutine)));
-        this->mState = CorState::Ready;
-	}
+    }
 
     void Coroutine::Invoke()
     {
         this->mState = Running;
         this->mFunction->run();
+        if(this->mGroup != nullptr)
+        {
+            this->mGroup->FinishAny();
+        }
+        this->mGroup = nullptr;
         this->mState = CorState::Finish;
     }
 	Coroutine::~Coroutine()

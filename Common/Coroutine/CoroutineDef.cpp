@@ -58,7 +58,6 @@ namespace GameKeeper
             return;
         }
         coroutine->sid = 0;
-        coroutine->mGroupId = 0;
         coroutine->mCoroutineId = 0;
         coroutine->mFunction = nullptr;
         coroutine->mContext = nullptr;
@@ -74,36 +73,21 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-	CoroutineGroup::CoroutineGroup(TaskComponent * cor)
+	CoroutineGroup::CoroutineGroup(size_t size)
     {
-        this->mCount = 0;
-        this->mCorComponent = cor;
-        this->mCoroutineId = cor->GetCurrentCorId();
+        this->mCount = size;
+        this->mCoroutineId = 0;
+        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCoroutineId = this->mCorComponent->GetCurrentCorId();
     }
 
-	void CoroutineGroup::Add(Coroutine * coroutine)
-    {
-        this->mCount++;
-        coroutine->mGroupId = this->mCoroutineId;
-	}
-	bool CoroutineGroup::SubCount()
+    void CoroutineGroup::FinishAny()
     {
         this->mCount--;
         if(this->mCount == 0)
         {
             this->mCorComponent->Resume(this->mCoroutineId);
-            return true;
-        }
-        return false;
-    }
-
-	void CoroutineGroup::AwaitAll()
-    {
-        if(this->mCount > 0)
-        {
-            unsigned int id = 0;
-            this->mCorComponent->Await(id);
-            LOG_INFO("coroutine group finish  id = " << id << "  corid = " << this->mCoroutineId);
+            delete this;
         }
     }
 }

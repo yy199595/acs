@@ -108,7 +108,6 @@ namespace GameKeeper
 
 	void App::StartComponent()
 	{
-		auto taskGroup = this->mTaskComponent->NewCoroutineGroup();
 		for (auto component : this->mSceneComponents)
         {
             ElapsedTimer elapsedTimer;

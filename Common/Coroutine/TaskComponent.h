@@ -40,8 +40,6 @@ namespace GameKeeper
 
 		void Resume(unsigned int id);
 
-		CoroutineGroup * NewCoroutineGroup();
-
 	protected:
 		bool Awake() final;
 
@@ -92,6 +90,5 @@ namespace GameKeeper
         Coroutine * mRunCoroutine;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<Coroutine *> mResumeCoroutines;
-        std::unordered_map<unsigned int, CoroutineGroup *> mCoroutineGroups;
 	};
 }

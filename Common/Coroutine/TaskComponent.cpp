@@ -8,6 +8,7 @@
 #ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
+#include"Coroutine/Helper/CoroutineHelper.h"
 using namespace std::chrono;
 namespace GameKeeper
 {
@@ -46,15 +47,15 @@ namespace GameKeeper
     bool TaskComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
-//        this->Start([this]() {
-//            ElapsedTimer timer;
-//            CoroutineGroup *group = this->NewCoroutineGroup();
-//            for (int index = 0; index < 1000; index++) {
-//                group->Add(this->Start(&TaskComponent::Test, this, index));
-//            }
-//            group->AwaitAll();
-//            LOG_ERROR("use time = " << timer.GetMs() << "ms");
-//        });
+        this->Start([this]() {
+            ElapsedTimer timer;
+            std::vector<Coroutine *> tasks;
+            for (int index = 0; index < 100; index++) {
+                tasks.push_back(this->Start(&TaskComponent::Test, this, index));
+            }
+            CoroutineHelper::WhenAll(tasks);
+            LOG_ERROR("use time = " << timer.GetMs() << "ms");
+        });
 
         return true;
     }
@@ -67,7 +68,7 @@ namespace GameKeeper
             this->AwaitSleep(10 + 5 * index + x);
             this->Start([this, x]() {
                 this->AwaitSleep(100 + x * 100);
-                LOG_ERROR(__FUNCTION__ << "  " << __LINE__);
+                //LOG_ERROR(__FUNCTION__ << "  " << __LINE__);
             });
         }
         //LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
@@ -87,19 +88,24 @@ namespace GameKeeper
     {
         co->mState = CorState::Running;
         Stack &stack = mSharedStack[co->sid];
-        if (co->mContext == nullptr) {
-            if (stack.co != co->mCoroutineId) {
+        if (co->mContext == nullptr)
+        {
+            if (stack.co != co->mCoroutineId)
+            {
                 this->SaveStack(stack.co);
                 stack.co = co->mCoroutineId;
             }
             this->mRunCoroutine->mContext = tb_context_make(stack.p, stack.size, MainEntry);
-        } else if (stack.co != co->mCoroutineId) {
+        }
+        else if (stack.co != co->mCoroutineId)
+        {
             this->SaveStack(stack.co);
             stack.co = co->mCoroutineId;
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
         }
         tb_context_from_t from = tb_context_jump(co->mContext, this);
-        if(from.priv != nullptr){
+        if (from.priv != nullptr)
+        {
             this->mRunCoroutine->mContext = from.ctx;
         }
     }
@@ -127,17 +133,6 @@ namespace GameKeeper
         }
         this->mResumeCoroutines.push(logicCoroutine);
     }
-
-	CoroutineGroup * TaskComponent::NewCoroutineGroup()
-	{
-		if (this->mRunCoroutine == nullptr)
-		{
-			return nullptr;
-		}
-        auto group = new CoroutineGroup(this);
-        this->mCoroutineGroups.emplace(group->GetGroupId(), group);
-		return group;
-	}
 
 	Coroutine * TaskComponent::CreateCoroutine(StaticMethod *func)
 	{
@@ -172,18 +167,7 @@ namespace GameKeeper
 
 	void TaskComponent::Destory(Coroutine * coroutine)
 	{
-		if (coroutine->mGroupId != 0)
-		{
-			auto iter = this->mCoroutineGroups.find(coroutine->mGroupId);
-			if (iter != this->mCoroutineGroups.end())
-			{
-				if (iter->second->SubCount())
-				{
-					delete iter->second;
-					this->mCoroutineGroups.erase(iter);
-				}
-			}
-		}
+        //coroutine->mGroup = nullptr;
         delete coroutine->mFunction;
 		this->mCorPool.Push(coroutine);
 	}

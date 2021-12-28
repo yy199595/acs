@@ -118,5 +118,21 @@ namespace Math {
         std::uniform_real_distribution<T> dis(min, max);
         return dis(gen);
     }
+
+    template<typename T>
+    inline T ToNumber(const std::string & str)
+    {
+        return T();
+    }
+    template<>
+    inline int ToNumber(const std::string & str)
+    {
+        return std::stoi(str);
+    }
+    template<>
+    inline float ToNumber(const std::string & str)
+    {
+        return std::stof(str);
+    }
 }
 }// namespace MathHelper

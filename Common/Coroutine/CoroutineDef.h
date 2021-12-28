@@ -56,14 +56,12 @@ namespace GameKeeper
 	class CoroutineGroup
 	{
 	public:
-		explicit CoroutineGroup(TaskComponent *);
-	public:
-        bool SubCount();
-        void AwaitAll();
-		void Add(Coroutine * coroutine);
-        unsigned int GetGroupId() const { return this->mCoroutineId;}
+		explicit CoroutineGroup(size_t count);
+        ~CoroutineGroup() = default;
+    public:
+        void FinishAny();
 	private:
-        unsigned int mCount;
+        size_t mCount;
 		unsigned int mCoroutineId;
 		TaskComponent * mCorComponent;
 	};
