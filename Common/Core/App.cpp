@@ -84,11 +84,8 @@ namespace GameKeeper
 
 	bool App::InitComponent(Component * component)
 	{
-		if (!component->IsActive() || !component->LateAwake())
-		{
-			return false;
-		}
-
+		LOG_CHECK_RET_FALSE(component->IsActive());
+		LOG_CHECK_RET_FALSE(component->LateAwake());
 		if (auto manager1 = dynamic_cast<IFrameUpdate *>(component))
 		{
 			this->mFrameUpdateManagers.push_back(manager1);
@@ -111,6 +108,7 @@ namespace GameKeeper
 
 	void App::StartComponent()
 	{
+		auto taskGroup = this->mTaskComponent->NewCoroutineGroup();
 		for (auto component : this->mSceneComponents)
         {
             ElapsedTimer elapsedTimer;
@@ -136,8 +134,6 @@ namespace GameKeeper
                                   << " data use time = " << elapsedTimer.GetMs() << "ms");
             }
 		}
-
-
         long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
 		LOG_DEBUG("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
 	}
@@ -199,29 +195,29 @@ namespace GameKeeper
 				component->OnFrameUpdate(this->mDelatime);
 			}
 
+			if (this->mStartTimer - this->mSecondTimer >= 1000)
+			{
+				this->UpdateConsoleTitle();
+				for (ISecondUpdate* component : this->mSecondUpdateManagers)
+				{
+					component->OnSecondUpdate();
+				}
+				this->mSecondTimer = Helper::Time::GetMilTimestamp();
+			}
+
 			for (ILastFrameUpdate *component : this->mLastFrameUpdateManager)
 			{
 				component->OnLastFrameUpdate();
 			}
 			this->mStartTimer = mLastUpdateTime = Helper::Time::GetMilTimestamp();
 		}
-
-		if (this->mStartTimer - this->mSecondTimer >= 1000)
-		{
-			for (ISecondUpdate *component : this->mSecondUpdateManagers)
-			{
-				component->OnSecondUpdate();
-			}
-			this->UpdateConsoleTitle();
-			this->mSecondTimer = Helper::Time::GetMilTimestamp();
-		}
 	}
 
     void App::UpdateConsoleTitle()
     {
         long long nowTime = Helper::Time::GetMilTimestamp();
-        long long seconds = (nowTime - this->mMainLoopStartTime) / 1000;
-        this->mLogicFps = this->mLogicRunCount / (float)seconds;
+        float seconds = (nowTime - this->mSecondTimer) / 1000.0f;
+        this->mLogicFps = (float)this->mLogicRunCount / seconds;
 #ifdef _WIN32
         char buffer[100] = {0};
         sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
@@ -229,5 +225,6 @@ namespace GameKeeper
 #else
         //LOG_INFO("fps = " << this->mLogicFps);
 #endif
+		this->mLogicRunCount = 0;
     }
 }
