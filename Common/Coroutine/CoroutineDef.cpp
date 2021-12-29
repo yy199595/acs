@@ -16,14 +16,17 @@ namespace GameKeeper
 	Coroutine * CoroutinePool::Pop()
     {
         Coroutine *coroutine = nullptr;
-        if (!this->mCorPool.empty())
+        if(this->mCorPool.empty())
         {
-            coroutine = this->mCorPool.front();
-            this->mCorPool.pop();
+            coroutine = new Coroutine();
         }
         else
         {
-            coroutine = new Coroutine();
+            coroutine = this->mCorPool.front();
+            coroutine->mContext = nullptr;
+            coroutine->mFunction = nullptr;
+            coroutine->mState = CorState::Ready;
+            this->mCorPool.pop();
         }
         coroutine->mCoroutineId = this->mNumPool.Pop();
         coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
@@ -45,11 +48,10 @@ namespace GameKeeper
 	void CoroutinePool::Push(Coroutine * coroutine)
 	{
         unsigned int id = coroutine->mCoroutineId;
-        //LOG_FATAL("destory coroutine : " << id);
         auto iter = this->mCorMap.find(id);
         if(iter != this->mCorMap.end())
         {
-            //this->mNumPool.Push(id);
+            this->mNumPool.Push(id);
             this->mCorMap.erase(iter);
         }
         if(this->mCorPool.size() >=COR_POOL_COUNT)
@@ -57,11 +59,6 @@ namespace GameKeeper
             delete coroutine;
             return;
         }
-        coroutine->sid = 0;
-        coroutine->mCoroutineId = 0;
-        coroutine->mFunction = nullptr;
-        coroutine->mContext = nullptr;
-        coroutine->mState = CorState::Ready;
         this->mCorPool.push(coroutine);
 	}
 	Coroutine * CoroutinePool::Get(unsigned int id)

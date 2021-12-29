@@ -32,7 +32,7 @@ namespace GameKeeper
         std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
         this->mCorComponent->Start([this, url1]() {
             std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
-            this->Post(url1 ,"chars=13716061995&key=1c937a17cc7fc4a5c4d142ea55169b03");
+            this->Get(url);
         });
         return true;
     }

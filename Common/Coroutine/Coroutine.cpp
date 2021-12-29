@@ -12,7 +12,6 @@ namespace GameKeeper
 
     void Coroutine::Invoke()
     {
-        this->mState = Running;
         this->mFunction->run();
         if(this->mGroup != nullptr)
         {

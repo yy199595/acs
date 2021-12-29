@@ -136,11 +136,8 @@ namespace GameKeeper
 
 	bool TaskComponent::Yield()
 	{
-        if(this->mRunCoroutine == nullptr)
-        {
-            LOG_FATAL("not find coroutine context");
-            return false;
-        }
+        LOG_CHECK_RET_FALSE(this->mRunCoroutine);
+        LOG_CHECK_RET_FALSE(this->mRunCoroutine->mState == CorState::Running);
 
         this->mRunCoroutine->mSwitchCount++;
 		this->mRunCoroutine->mState = CorState::Suspend;
@@ -151,12 +148,14 @@ namespace GameKeeper
 	void TaskComponent::Resume(unsigned int id)
     {
         Coroutine *logicCoroutine = this->GetCoroutine(id);
-        if(logicCoroutine == nullptr)
+        LOG_CHECK_RET(logicCoroutine);
+        if(logicCoroutine->mState == CorState::Ready
+            || logicCoroutine->mState == CorState::Suspend)
         {
-            LOG_FATAL("not find coroutine : " << id);
+            this->mResumeCoroutines.push(logicCoroutine);
             return;
         }
-        this->mResumeCoroutines.push(logicCoroutine);
+        LOG_FATAL("coroutine " << id << " state is not resume");
     }
 
 	Coroutine * TaskComponent::CreateCoroutine(StaticMethod *func)
@@ -172,10 +171,7 @@ namespace GameKeeper
 
 	bool TaskComponent::Yield(unsigned int & mCorId)
     {
-        if (this->mRunCoroutine == nullptr)
-        {
-            return false;
-        }
+        LOG_CHECK_RET_FALSE(mRunCoroutine);
         mCorId = this->mRunCoroutine->mCoroutineId;
         return this->Yield();
     }
@@ -187,7 +183,6 @@ namespace GameKeeper
 
 	void TaskComponent::Destory(Coroutine * coroutine)
 	{
-        //coroutine->mGroup = nullptr;
         delete coroutine->mFunction;
 		this->mCorPool.Push(coroutine);
 	}
