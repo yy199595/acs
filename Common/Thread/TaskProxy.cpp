@@ -18,11 +18,7 @@ namespace GameKeeper
 
     bool CoroutineAsyncTask::AwaitInvoke()
     {
-        if(this->mCorComponent->IsInMainCoroutine())
-        {
-            return false;
-        }
-        this->mCorComponent->Await(this->mCorId);
+        this->mCorComponent->Yield(this->mCorId);
         return true;
     }
 

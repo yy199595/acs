@@ -53,7 +53,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->Await();
+        this->mCorComponent->Yield();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -86,7 +86,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->Await();
+        this->mCorComponent->Yield();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -113,7 +113,7 @@ namespace GameKeeper
         {
             return XCode::MysqlStartTaskFail;
         }
-        this->mCorComponent->Await();
+        this->mCorComponent->Yield();
         response.set_errorstr(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
@@ -139,7 +139,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->Await();
+        this->mCorComponent->Yield();
         XCode code = mysqlTask->GetErrorCode();
 
         if (code == XCode::Successful)
@@ -188,7 +188,7 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
 
-        this->mCorComponent->Await();
+        this->mCorComponent->Yield();
         XCode code = mysqlTask->GetErrorCode();
         if (code == XCode::Successful)
         {

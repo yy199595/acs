@@ -32,13 +32,17 @@ namespace GameKeeper
         }
         Coroutine * CreateCoroutine(StaticMethod * func);
 	public:
-		void Await();
+		bool Yield();
 
-		void Await(unsigned int & mCorId);
+		bool Yield(unsigned int & mCorId);
 
-		void AwaitSleep(long long ms);
+		void Sleep(long long ms);
 
 		void Resume(unsigned int id);
+
+        void WhenAny(Coroutine * coroutine);
+
+        void WhenAll(std::vector<Coroutine*> & coroutines);
 
 	protected:
 		bool Awake() final;
@@ -59,8 +63,6 @@ namespace GameKeeper
 
 		Coroutine *GetCoroutine(unsigned int id);
 
-        Coroutine * GetCurCoroutine();
-
         unsigned int GetCurrentCorId() const
         {
             if(this->mRunCoroutine == nullptr)
@@ -71,11 +73,6 @@ namespace GameKeeper
         }
 
         void RunTask(tb_context_t context);
-
-		bool IsInMainCoroutine() const
-		{
-			return this->mRunCoroutine == nullptr;
-		}
 
 	private:
         void Test(int index);

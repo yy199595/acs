@@ -54,7 +54,7 @@ namespace GameKeeper
         if(this->mState == TaskReady)
         {
             this->mState = TaskAwait;
-            this->mTaskComponent->Await(this->mCorId);
+            this->mTaskComponent->Yield(this->mCorId);
         }
         return this->mData;
     }

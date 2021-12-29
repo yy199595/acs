@@ -74,7 +74,7 @@ namespace GameKeeper
             const ProtocolConfig *config = configComponent->GetProtocolConfig(methodId);
             LOG_ERROR("await rpc [" << config->Service << "." << config->Method << "]");
 #endif
-            this->mTaskComponent->Await(this->mCorId);
+            this->mTaskComponent->Yield(this->mCorId);
         }
     }
 

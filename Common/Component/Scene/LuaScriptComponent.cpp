@@ -199,7 +199,7 @@ namespace GameKeeper
                                              Helper::Time::GetYearMonthDayString);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Call", SystemExtension::Call);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AwaitSleep", SystemExtension::Sleep);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Sleep", SystemExtension::Sleep);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AsyncWait", SystemExtension::AddTimer);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "RemoveTimer", SystemExtension::RemoveTimer);
 

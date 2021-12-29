@@ -70,7 +70,7 @@ namespace GameKeeper
             {
                 LOG_WARN("add user data successful");
             }
-            //this->mCorComponent->AwaitSleep(100);
+            //this->mCorComponent->Sleep(100);
         }
 	}
 
@@ -90,7 +90,7 @@ namespace GameKeeper
                     LOG_WARN(index++ << "  " << json);
                 }
             }
-			//this->mCorComponent->AwaitSleep(100);
+			//this->mCorComponent->Sleep(100);
 		}
 	}
 

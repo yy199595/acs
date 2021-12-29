@@ -29,7 +29,7 @@ namespace GameKeeper
 	{
 		this->mListenHandler = handler;
         this->mTaskThread.Invoke(&NetworkListener::InitListener, this);
-        App::Get().GetTaskComponent()->Await(this->mCorId);
+        App::Get().GetTaskComponent()->Yield(this->mCorId);
 		return this->mIsListen;
 	}
 

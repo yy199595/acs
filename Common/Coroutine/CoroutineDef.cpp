@@ -76,7 +76,6 @@ namespace GameKeeper
 	CoroutineGroup::CoroutineGroup(size_t size)
     {
         this->mCount = size;
-        this->mCoroutineId = 0;
         this->mCorComponent = App::Get().GetTaskComponent();
         this->mCoroutineId = this->mCorComponent->GetCurrentCorId();
     }

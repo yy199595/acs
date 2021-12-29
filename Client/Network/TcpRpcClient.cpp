@@ -49,7 +49,7 @@ namespace Client
 			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
             taskScheduler.Invoke(&TaskComponent::Resume, corComponent, this->mCoroutineId);
 		});
-        corComponent->Await(this->mCoroutineId);
+        corComponent->Yield(this->mCoroutineId);
 		return this->mIsConnectSuccessful;
 	}
 

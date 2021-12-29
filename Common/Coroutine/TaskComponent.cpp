@@ -8,7 +8,6 @@
 #ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
-#include"Coroutine/Helper/CoroutineHelper.h"
 using namespace std::chrono;
 namespace GameKeeper
 {
@@ -53,10 +52,9 @@ namespace GameKeeper
             for (int index = 0; index < 100; index++) {
                 tasks.push_back(this->Start(&TaskComponent::Test, this, index));
             }
-            CoroutineHelper::WhenAll(tasks);
-            LOG_ERROR("use time = " << timer.GetMs() << "ms");
+            this->WhenAll(tasks);
+            LOG_ERROR("use time = " << timer.GetSecond() << "s");
         });
-
         return true;
     }
 
@@ -65,23 +63,49 @@ namespace GameKeeper
         ElapsedTimer timer;
         for (int x = 0; x < 10; x++)
         {
-            this->AwaitSleep(10 + 5 * index + x);
+            this->Sleep(10 + 5 * index + x);
             this->Start([this, x]() {
-                this->AwaitSleep(100 + x * 100);
+                this->Sleep(100 + x * 100);
                 //LOG_ERROR(__FUNCTION__ << "  " << __LINE__);
             });
         }
         //LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
     }
 
+    void TaskComponent::WhenAny(Coroutine *coroutine)
+    {
+        if(this->mRunCoroutine == nullptr)
+        {
+            LOG_FATAL("please in coroutine wait");
+            return;
+        }
+        coroutine->mGroup = new CoroutineGroup(1);
+        this->Yield();
+    }
 
-    void TaskComponent::AwaitSleep(long long ms)
+    void TaskComponent::WhenAll(std::vector<Coroutine *> &coroutines)
+    {
+        if(this->mRunCoroutine == nullptr)
+        {
+            LOG_FATAL("please in coroutine wait");
+            return;
+        }
+        auto group = new CoroutineGroup(coroutines.size());
+        for(auto coroutine : coroutines)
+        {
+            coroutine->mGroup = group;
+        }
+        this->Yield();
+    }
+
+
+    void TaskComponent::Sleep(long long ms)
     {
         unsigned int id = this->mRunCoroutine->mCoroutineId;
         StaticMethod * sleepMethod = NewMethodProxy(
                 &TaskComponent::Resume, this, id);
         this->mTimerManager->AddTimer(ms, sleepMethod);
-        this->Await();
+        this->Yield();
     }
 
 	void TaskComponent::ResumeCoroutine(Coroutine * co)
@@ -110,17 +134,18 @@ namespace GameKeeper
         }
     }
 
-	void TaskComponent::Await()
+	bool TaskComponent::Yield()
 	{
         if(this->mRunCoroutine == nullptr)
         {
             LOG_FATAL("not find coroutine context");
-            return;
+            return false;
         }
 
         this->mRunCoroutine->mSwitchCount++;
 		this->mRunCoroutine->mState = CorState::Suspend;
 		tb_context_jump(this->mMainContext, this->mRunCoroutine);
+        return true;
 	}
 
 	void TaskComponent::Resume(unsigned int id)
@@ -145,24 +170,19 @@ namespace GameKeeper
 		return coroutine;
 	}
 
-
-	void TaskComponent::Await(unsigned int & mCorId)
-	{
-        if(this->mRunCoroutine != nullptr)
+	bool TaskComponent::Yield(unsigned int & mCorId)
+    {
+        if (this->mRunCoroutine == nullptr)
         {
-            mCorId = this->mRunCoroutine->mCoroutineId;
-            this->Await();
+            return false;
         }
-	}
+        mCorId = this->mRunCoroutine->mCoroutineId;
+        return this->Yield();
+    }
 
     Coroutine *TaskComponent::GetCoroutine(unsigned int id)
     {
 		return this->mCorPool.Get(id);
-    }
-
-    Coroutine * TaskComponent::GetCurCoroutine()
-    {
-        return this->mRunCoroutine;
     }
 
 	void TaskComponent::Destory(Coroutine * coroutine)
