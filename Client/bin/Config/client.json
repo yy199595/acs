@@ -16,7 +16,7 @@
     "ScriptPath":"./Script/",
     "Scene": [
         "ClientComponent",
-        "TaskPoolComponent"
+        "ThreadPoolComponent"
     ],
     "Service":[],
     "WhiteList": [

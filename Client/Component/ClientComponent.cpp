@@ -51,9 +51,14 @@ namespace Client
 
 	bool ClientComponent::Awake()
     {
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
 		return true;
+    }
+
+    bool ClientComponent::LateAwake()
+    {
+        this->mTimerComponent = this->GetComponent<TimerComponent>();
+        this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
+        return true;
     }
 
 	void ClientComponent::OnStart()
@@ -80,15 +85,10 @@ namespace Client
 		requestMessage->set_rpcid(1);
 		requestMessage->set_methodname(method);
 		requestMessage->mutable_data()->PackFrom(registerRequest);
-		std::shared_ptr<ClientRpcTask> rpcTask(new ClientRpcTask(method, 1));
+		std::shared_ptr<ClientRpcTask> rpcTask(new ClientRpcTask(method));
 		this->mTcpClient->StartSendProtoData(requestMessage);
 
-		auto response = rpcTask->AwaitGetData<c2s::AccountLogin_Response>();
 
-		if (response != nullptr)
-		{
-
-		}
 
         LOG_INFO("use time = " << timer.GetMs() << "ms");
 		
@@ -103,9 +103,4 @@ namespace Client
 			rpcTask->OnResponse(nullptr);
 		}
 	}
-
-    bool ClientComponent::LateAwake()
-    {
-        return true;
-    }
 }

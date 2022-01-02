@@ -14,6 +14,9 @@ include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
 include_directories(${PROJECT_COMMON_DIR}/Common)
 include_directories(${PROJECT_COMMON_DIR}/Protocol)
 include_directories(${PROJECT_COMMON_DIR}/Common/NetWork)
+
+include_directories(${PROJECT_SOURCE_DIR}/DB/Component)
+include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)
 include_directories(${PROJECT_COMMON_DIR}/Common/Component)
 
 include_directories(${PROJECT_SOURCE_DIR}/Component)

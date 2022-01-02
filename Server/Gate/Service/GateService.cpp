@@ -5,7 +5,7 @@
 #include"GateService.h"
 #include"Core/App.h"
 #include"Service/RpcNode.h"
-#include"Rpc/RpcProxyClient.h"
+#include"NetWork/RpcProxyClient.h"
 #include"Component/GateClientComponent.h"
 namespace GameKeeper
 {

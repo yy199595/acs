@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
 
-#include"RpcClient.h"
+#include"Network/Rpc/RpcClient.h"
 using namespace google::protobuf;
 namespace GameKeeper
 {

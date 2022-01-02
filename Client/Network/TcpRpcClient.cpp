@@ -14,6 +14,11 @@ namespace Client
 		this->mClientComponent = component;
 	}
 
+    void TcpRpcClient::OnSendData(XCode code, const Message *)
+    {
+
+    }
+
 
 	bool TcpRpcClient::StartSendProtoData(const c2s::Rpc_Request * request)
 	{
@@ -79,23 +84,13 @@ namespace Client
 		{
 			return XCode::ParseMessageError;
 		}
-		MainTaskScheduler & taskScheduller = App::Get().GetTaskScheduler();
-		taskScheduller.Invoke(&ClientComponent::OnResponse, this->mClientComponent, response);
+		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+        taskScheduler.Invoke(&ClientComponent::OnResponse, this->mClientComponent, response);
 		return XCode();
 	}
 
 	void TcpRpcClient::SendProtoData(const c2s::Rpc_Request * request)
 	{
-		int size = request->ByteSize();
-		char * buffer = new char[HeadCount + size];
-
-		buffer[0] = RPC_TYPE_REQUEST;
-		memcpy(buffer + sizeof(char), &size, sizeof(int));
-		if (!request->SerializePartialToArray(buffer + HeadCount, 2048))
-		{
-			std::cerr << "serialize message failure";
-			return;
-		}
-		this->AsyncSendMessage(buffer, HeadCount + size);
+        this->SendData(RPC_TYPE_REQUEST, request);
 	}
 }

@@ -10,7 +10,7 @@
 #include"Core/App.h"
 namespace GameKeeper
 {
-    enum TaskState
+    enum class TaskState
     {
         TaskReady,
         TaskAwait,
@@ -24,7 +24,7 @@ namespace GameKeeper
         explicit Task()
         {
             this->mCorId = 0;
-            this->mState = TaskReady;
+            this->mState = TaskState::TaskReady;
             this->mTaskId = Helper::Guid::Create();
             this->mCreateTime = Helper::Time::GetMilTimestamp();
             this->mTaskComponent = App::Get().GetTaskComponent();
@@ -51,9 +51,9 @@ namespace GameKeeper
     template<typename T>
     const T & Task<T>::Await()
     {
-        if(this->mState == TaskReady)
+        if(this->mState == TaskState::TaskReady)
         {
-            this->mState = TaskAwait;
+            this->mState = TaskState::TaskAwait;
             this->mTaskComponent->Yield(this->mCorId);
         }
         return this->mData;
@@ -62,7 +62,7 @@ namespace GameKeeper
     template<typename T>
     bool Task<T>::SetResult(T && result)
     {
-        if(this->mState == TaskAwait)
+        if(this->mState == TaskState::TaskAwait)
         {
             this->mData =  std::move(result);
             this->mTaskComponent->Resume(this->mCorId);

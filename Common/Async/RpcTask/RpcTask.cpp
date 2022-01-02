@@ -13,8 +13,8 @@ namespace GameKeeper
     RpcTaskBase::RpcTaskBase(int method)
             : mMethod(method)
     {
-        this->mState = TaskReady;
         this->mCode = XCode::Successful;
+        this->mState = TaskState::TaskReady;
         this->mTaskId = Helper::Guid::Create();
         this->mTaskComponent = App::Get().GetTaskComponent();
         if(mRpcComponent == nullptr)
@@ -27,7 +27,7 @@ namespace GameKeeper
     RpcTaskBase::RpcTaskBase(XCode code) : mMethod(0)
     {
         this->mCode = code;
-        this->mState = TaskFinish;
+        this->mState = TaskState::TaskFinish;
         this->mTaskId = Helper::Guid::Create();
         this->mTaskComponent = App::Get().GetTaskComponent();
         if(mRpcComponent == nullptr)
@@ -39,7 +39,7 @@ namespace GameKeeper
 
     bool RpcTaskBase::SetResult(const Rpc_Response *result)
     {
-        if(this->mState == TaskAwait)
+        if(this->mState == TaskState::TaskAwait)
         {
             if (result == nullptr)
             {
@@ -63,9 +63,9 @@ namespace GameKeeper
 
     void RpcTaskBase::AwaitTask()
     {
-        if(this->mState == TaskReady)
+        if(this->mState == TaskState::TaskReady)
         {
-            this->mState = TaskAwait;
+            this->mState = TaskState::TaskAwait;
             mRpcComponent->AddRpcTask(this->shared_from_this());
 #ifdef __DEBUG__
             int methodId = this->GetMethodId();

@@ -5,10 +5,10 @@
 #include"GateComponent.h"
 #include"Core/App.h"
 #include"Service/RpcNode.h"
-#include"Rpc/RpcProxyClient.h"
+#include"NetWork/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Service/RpcNodeComponent.h"
-#include"Async/RpcTask/RpcProxyTask.h"
+#include"Task/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
 #ifdef __DEBUG__

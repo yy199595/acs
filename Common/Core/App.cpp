@@ -86,23 +86,18 @@ namespace GameKeeper
 	{
 		LOG_CHECK_RET_FALSE(component->IsActive());
 		LOG_CHECK_RET_FALSE(component->LateAwake());
-		if (auto manager1 = dynamic_cast<IFrameUpdate *>(component))
-		{
-			this->mFrameUpdateManagers.push_back(manager1);
-		}
-		if (auto manager2 = dynamic_cast<ISystemUpdate *>(component))
-		{
-			this->mSystemUpdateManagers.push_back(manager2);
-		}
-		if (auto manager3 = dynamic_cast<ISecondUpdate *>(component))
-		{
-			this->mSecondUpdateManagers.push_back(manager3);
-		}
-
-		if (auto manager4 = dynamic_cast<ILastFrameUpdate *>(component))
-		{
-			this->mLastFrameUpdateManager.push_back(manager4);
-		}
+		if (auto manager1 = dynamic_cast<IFrameUpdate *>(component)) {
+            this->mFrameUpdateManagers.push_back(manager1);
+        }
+		if (auto manager2 = dynamic_cast<ISystemUpdate *>(component)) {
+            this->mSystemUpdateManagers.push_back(manager2);
+        }
+		if (auto manager3 = dynamic_cast<ISecondUpdate *>(component)) {
+            this->mSecondUpdateManagers.push_back(manager3);
+        }
+		if (auto manager4 = dynamic_cast<ILastFrameUpdate *>(component)) {
+            this->mLastFrameUpdateManager.push_back(manager4);
+        }
 		return true;
 	}
 

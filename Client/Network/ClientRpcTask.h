@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
-#include"Async/Task.h"
 #include"Protocol/c2s.pb.h"
+#include"Async/Task.h"
 #include<google/protobuf/message.h>
 
 
@@ -9,34 +9,38 @@ using namespace GameKeeper;
 using namespace google::protobuf;
 namespace Client
 {
-	class ClientRpcTask : public Task, public std::enable_shared_from_this<ClientRpcTask>
+    class ClientRpcTask : public std::enable_shared_from_this<ClientRpcTask>
 	{
 	public:
-		ClientRpcTask(const std::string & method, long long rpcId);
+		ClientRpcTask(const std::string & method);
 	public:
-		void OnResponse(const c2s::Rpc_Response * resoinse);
+		void OnResponse(const c2s::Rpc_Response * response);
 		long long GetRpcTaskId() const { return this->mRpcId; }
 	public:
-		XCode AwaitGetCode(int ms = 5000);
-		template<typename T>
-		std::shared_ptr<T> AwaitGetData(int ms = 5000);
-	protected:
-		void OnTaskAwait() final;
+        XCode GetCode();
+        template<typename T>
+		std::shared_ptr<T> GetData();
+
+    private:
+        bool YieldTask();
 	private:
 		XCode mCode;
 		int mTimeout;
-		unsigned int mTimerId;
+        long long mRpcId;
+        TaskState mState;
+        unsigned int mTimerId;
 		long long mStartTime;
-		const long long mRpcId;
+        unsigned int mCoroutineId;
 		const std::string mMethod;
-		std::shared_ptr<Message> mMessage;
-		
-	};
-	template<typename T>
-	inline std::shared_ptr<T> ClientRpcTask::AwaitGetData(int ms)
-	{
-		this->mTimeout = ms;
-        this->AwaitTask();
-		return std::dynamic_pointer_cast<T>(this->mMessage);
-	}
+        TaskComponent * mTaskComponent;
+        std::shared_ptr<Message> mMessage;
+        class ClientComponent * mClientComponent;
+    };
+
+    template<typename T>
+    std::shared_ptr<T> ClientRpcTask::GetData()
+    {
+        this->YieldTask();
+        return dynamic_pointer_cast<T>(mMessage);
+    }
 }

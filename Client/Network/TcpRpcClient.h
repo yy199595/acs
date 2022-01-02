@@ -18,7 +18,8 @@ namespace Client
 	protected:
         void OnClose(XCode code) final;
 		void OnConnect(XCode code) final { }
-		XCode OnRequest(const char * buffer, size_t size) final;
+        void OnSendData(XCode code, const Message *) final;
+        XCode OnRequest(const char * buffer, size_t size) final;
 		XCode OnResponse(const char * buffer, size_t size) final;
 	private:
 		void SendProtoData(const c2s::Rpc_Request * request);
