@@ -63,11 +63,8 @@ namespace GameKeeper
 
         unsigned int GetContextId() const
         {
-            if(this->mRunContext == nullptr)
-            {
-                return 0;
-            }
-            return this->mRunContext->mCoroutineId;
+            return this->mRunContext == nullptr ? 0 :
+                   this->mRunContext->mCoroutineId;
         }
 
         void RunTask(tb_context_t context);
@@ -85,5 +82,5 @@ namespace GameKeeper
         TaskContext * mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<TaskContext *> mResumeContexts;
-	};
+    };
 }

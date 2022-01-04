@@ -22,6 +22,7 @@ namespace GameKeeper
     {
     public:
         explicit TaskSource()
+            : mTaskScheduler(App::Get().GetTaskScheduler())
         {
             this->mCorId = 0;
             this->mState = TaskState::TaskReady;
@@ -46,6 +47,7 @@ namespace GameKeeper
         unsigned int mCorId;
         long long mCreateTime;
         TaskComponent * mTaskComponent;
+        MainTaskScheduler & mTaskScheduler;
     };
 
     template<typename T>
@@ -65,13 +67,12 @@ namespace GameKeeper
         if (this->mState == TaskState::TaskAwait)
         {
             this->mData = std::move(result);
-            MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-            if (mainTaskScheduler.IsCurrentThread())
+            if (this->mTaskScheduler.IsCurrentThread())
             {
                 this->mTaskComponent->Resume(this->mCorId);
                 return true;
             }
-            mainTaskScheduler.Invoke(&TaskComponent::Resume, this->mTaskComponent, this->mCorId);
+            this->mTaskScheduler.Invoke(&TaskComponent::Resume, this->mTaskComponent, this->mCorId);
             return true;
         }
         return false;
