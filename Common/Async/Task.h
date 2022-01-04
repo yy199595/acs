@@ -62,10 +62,16 @@ namespace GameKeeper
     template<typename T>
     bool Task<T>::SetResult(T && result)
     {
-        if(this->mState == TaskState::TaskAwait)
+        if (this->mState == TaskState::TaskAwait)
         {
-            this->mData =  std::move(result);
-            this->mTaskComponent->Resume(this->mCorId);
+            this->mData = std::move(result);
+            MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
+            if (mainTaskScheduler.IsCurrentThread())
+            {
+                this->mTaskComponent->Resume(this->mCorId);
+                return true;
+            }
+            mainTaskScheduler.Invoke(&TaskComponent::Resume, this->mTaskComponent, this->mCorId);
             return true;
         }
         return false;

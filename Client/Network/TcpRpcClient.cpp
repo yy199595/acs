@@ -10,7 +10,6 @@ namespace Client
 	TcpRpcClient::TcpRpcClient(SocketProxy * socket, ClientComponent * component)
 		: RpcClient(socket, SocketType::LocalSocket)
 	{
-		this->mCoroutineId = 0;
 		this->mClientComponent = component;
 	}
 
@@ -35,28 +34,25 @@ namespace Client
 		return true;
 	}
 
-	bool TcpRpcClient::AwaitConnect(const std::string & ip, unsigned short port)
-	{
-        this->mIsConnectSuccessful = false;
-		auto address = asio::ip::make_address_v4(ip);
-		asio::ip::tcp::endpoint endPoint(address, port);
-		AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-        TaskComponent * corComponent = App::Get().GetTaskComponent();
-		LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
-		nSocket.async_connect(endPoint, [this, corComponent](const asio::error_code &err)
-		{
-            this->mIsConnectSuccessful = true;
-			if (err)
-			{
-                this->mIsConnectSuccessful = false;
+    std::shared_ptr<Task<bool>> TcpRpcClient::ConnectAsync(const std::string &ip, unsigned short port)
+    {
+        auto address = asio::ip::make_address_v4(ip);
+        asio::ip::tcp::endpoint endPoint(address, port);
+        AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
+        std::shared_ptr<Task<bool>> connectTask = std::make_shared<Task<bool>>();
+        LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+        nSocket.async_connect(endPoint, [this, connectTask](const asio::error_code &err)
+        {
+            if (err)
+            {
+                connectTask->SetResult(false);
                 std::cout << "connect error : " << err.message() << std::endl;
-			}
-			MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
-            taskScheduler.Invoke(&TaskComponent::Resume, corComponent, this->mCoroutineId);
-		});
-        corComponent->Yield(this->mCoroutineId);
-		return this->mIsConnectSuccessful;
-	}
+                return;
+            }
+            connectTask->SetResult(true);
+        });
+        return connectTask;
+    }
 
 	void TcpRpcClient::OnClose(XCode code)
     {
