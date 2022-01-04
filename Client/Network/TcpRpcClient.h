@@ -1,6 +1,6 @@
 #pragma once
 #include"XCode/XCode.h"
-#include"Async/Task.h"
+#include"Async/TaskSource.h"
 #include"Protocol/c2s.pb.h"
 #include"Network/Rpc/RpcClient.h"
 
@@ -15,7 +15,7 @@ namespace Client
 		TcpRpcClient(SocketProxy * socket, ClientComponent * component);
 	public:
 		bool StartSendProtoData(const c2s::Rpc_Request * request);
-        std::shared_ptr<Task<bool>> ConnectAsync(const std::string & ip, unsigned short port);
+        std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 	protected:
         void OnClose(XCode code) final;
 		void OnConnect(XCode code) final { }

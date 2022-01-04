@@ -22,7 +22,7 @@ namespace GameKeeper
         bool Run() final;//在线程池执行的任务
     public:
         template<typename... Args>
-        void InitCommand(Args &&...args);      
+        void InitCommand(Args &&...args);
     private:
         //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
 
@@ -52,12 +52,12 @@ namespace GameKeeper
 
         void AddCommandArgv(const char *str, size_t size);
 
-        std::shared_ptr<RedisResponse> GetResponse() { return this->mResponse;}
-	private:
+    protected:
+        std::shared_ptr<RedisResponse> mResponse;
+    private:
 		long long mStartTime;
         RedisComponent * mRedisComponent;
 		std::vector<std::string> mCommand;
-        std::shared_ptr<RedisResponse> mResponse;
     };
 
     template<typename... Args>

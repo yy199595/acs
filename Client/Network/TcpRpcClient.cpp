@@ -34,12 +34,12 @@ namespace Client
 		return true;
 	}
 
-    std::shared_ptr<Task<bool>> TcpRpcClient::ConnectAsync(const std::string &ip, unsigned short port)
+    std::shared_ptr<TaskSource<bool>> TcpRpcClient::ConnectAsync(const std::string &ip, unsigned short port)
     {
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
         AsioTcpSocket & nSocket = this->mSocketProxy->GetSocket();
-        std::shared_ptr<Task<bool>> connectTask = std::make_shared<Task<bool>>();
+        std::shared_ptr<TaskSource<bool>> connectTask = std::make_shared<TaskSource<bool>>();
         LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
         nSocket.async_connect(endPoint, [this, connectTask](const asio::error_code &err)
         {

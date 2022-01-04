@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"RedisTaskBase.h"
-
+#include"Async/TaskSource.h"
 
 namespace GameKeeper
 {
@@ -16,17 +16,15 @@ namespace GameKeeper
 {
     class TaskComponent;
 
-    class RedisTaskProxy : public RedisTaskBase
+class RedisTaskProxy : public RedisTaskBase
     {
     public:
         explicit RedisTaskProxy(const std::string &cmd);
 
-    public:
-        long long GetCoroutineId() const { return mCoroutineId; }
-        
+public:
+    std::shared_ptr<RedisResponse> GetResponse() { return mTask.Await();}
     protected:
         void RunFinish() final;  //执行完成之后在主线程调用
-    private:
-        unsigned int mCoroutineId;
+        TaskSource<std::shared_ptr<RedisResponse>> mTask;
     };
 }

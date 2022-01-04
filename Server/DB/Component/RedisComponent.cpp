@@ -103,8 +103,6 @@ namespace GameKeeper
     {
         this->mTaskComponent->StartTask(redisTask.get());
         this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
-
-        this->mCorComponent->Yield();
         auto redisResponse = redisTask->GetResponse();
         if(redisResponse->HasError())
         {

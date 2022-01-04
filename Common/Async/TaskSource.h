@@ -2,8 +2,8 @@
 // Created by zmhy0073 on 2021/11/29.
 //
 
-#ifndef GAMEKEEPER_TASK_H
-#define GAMEKEEPER_TASK_H
+#ifndef GAMEKEEPER_TASKSOURCE_H
+#define GAMEKEEPER_TASKSOURCE_H
 #include<XCode/XCode.h>
 #include"Util/Guid.h"
 #include"Util/TimeHelper.h"
@@ -18,10 +18,10 @@ namespace GameKeeper
     };
 
     template<typename T>
-    class Task
+    class TaskSource
     {
     public:
-        explicit Task()
+        explicit TaskSource()
         {
             this->mCorId = 0;
             this->mState = TaskState::TaskReady;
@@ -29,7 +29,7 @@ namespace GameKeeper
             this->mCreateTime = Helper::Time::GetMilTimestamp();
             this->mTaskComponent = App::Get().GetTaskComponent();
         }
-        virtual ~Task() = default;
+        virtual ~TaskSource() = default;
     public:
         long long GetTaskId() const { return this->mTaskId;}
         TaskState GetState() const { return this->mTaskState; }
@@ -49,7 +49,7 @@ namespace GameKeeper
     };
 
     template<typename T>
-    const T & Task<T>::Await()
+    const T & TaskSource<T>::Await()
     {
         if(this->mState == TaskState::TaskReady)
         {
@@ -60,7 +60,7 @@ namespace GameKeeper
     }
 
     template<typename T>
-    bool Task<T>::SetResult(T && result)
+    bool TaskSource<T>::SetResult(T && result)
     {
         if (this->mState == TaskState::TaskAwait)
         {
@@ -78,4 +78,4 @@ namespace GameKeeper
     }
 }
 
-#endif //GAMEKEEPER_TASK_H
+#endif //GAMEKEEPER_TASKSOURCE_H

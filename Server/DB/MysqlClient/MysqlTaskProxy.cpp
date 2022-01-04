@@ -10,7 +10,7 @@ namespace GameKeeper
         : mDataBaseName(std::move(db)), mSqlCommand(std::move(sql))
     {	
 		TaskComponent * corComponent = App::Get().GetTaskComponent();
-        this->mCoroutineId = corComponent->GetCurrentCorId();
+        this->mCoroutineId = corComponent->GetContextId();
         this->mMsqlComponent = App::Get().GetComponent<MysqlComponent>();
 
     }

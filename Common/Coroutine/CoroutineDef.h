@@ -28,25 +28,25 @@
 namespace GameKeeper
 {
 
-	class Coroutine;
-	class CoroutinePool
+	class TaskContext;
+	class TaskContextPool
 	{
 	public:
-		explicit CoroutinePool() = default;
-		virtual ~CoroutinePool();
+		explicit TaskContextPool() = default;
+		virtual ~TaskContextPool();
 	public:
-		Coroutine * Pop();
-		void Push(Coroutine * coroutine);
+		TaskContext * Pop();
+		void Push(TaskContext * coroutine);
 
     public:
         size_t GetMemorySize();
         size_t GetCorCount() { return this->mCorMap.size();}
 	public:
-		Coroutine * Get(unsigned int id);
+		TaskContext * Get(unsigned int id);
 	private:
-        std::queue<Coroutine *> mCorPool;
+        std::queue<TaskContext *> mCorPool;
         NumberBuilder<unsigned int> mNumPool;
-        std::unordered_map<unsigned int , Coroutine *> mCorMap;
+        std::unordered_map<unsigned int , TaskContext *> mCorMap;
     };
 }
 

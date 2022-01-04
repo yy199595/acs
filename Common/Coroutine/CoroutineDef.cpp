@@ -1,10 +1,10 @@
 #include"CoroutineDef.h"
 #include"TaskComponent.h"
-#include"Coroutine.h"
+#include"TaskContext.h"
 #include<Core/App.h>
 namespace GameKeeper
 {
-	CoroutinePool::~CoroutinePool()
+	TaskContextPool::~TaskContextPool()
 	{
         auto iter = this->mCorMap.begin();
         for(;iter != this->mCorMap.end(); iter++)
@@ -13,12 +13,12 @@ namespace GameKeeper
         }
         this->mCorMap.clear();
 	}
-	Coroutine * CoroutinePool::Pop()
+	TaskContext * TaskContextPool::Pop()
     {
-        Coroutine *coroutine = nullptr;
+        TaskContext *coroutine = nullptr;
         if(this->mCorPool.empty())
         {
-            coroutine = new Coroutine();
+            coroutine = new TaskContext();
         }
         else
         {
@@ -34,7 +34,7 @@ namespace GameKeeper
         return coroutine;
     }
 
-    size_t CoroutinePool::GetMemorySize()
+    size_t TaskContextPool::GetMemorySize()
     {
         size_t size = 0;
         auto iter = this->mCorMap.begin();
@@ -45,7 +45,7 @@ namespace GameKeeper
         return size;
     }
 
-	void CoroutinePool::Push(Coroutine * coroutine)
+	void TaskContextPool::Push(TaskContext * coroutine)
 	{
         unsigned int id = coroutine->mCoroutineId;
         auto iter = this->mCorMap.find(id);
@@ -61,7 +61,7 @@ namespace GameKeeper
         }
         this->mCorPool.push(coroutine);
 	}
-	Coroutine * CoroutinePool::Get(unsigned int id)
+	TaskContext * TaskContextPool::Get(unsigned int id)
 	{
         auto iter = this->mCorMap.find(id);
         return iter != this->mCorMap.end() ? iter->second : nullptr;
@@ -74,7 +74,7 @@ namespace GameKeeper
     {
         this->mCount = size;
         this->mCorComponent = App::Get().GetTaskComponent();
-        this->mCoroutineId = this->mCorComponent->GetCurrentCorId();
+        this->mCoroutineId = this->mCorComponent->GetContextId();
     }
 
     void CoroutineGroup::FinishAny()

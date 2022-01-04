@@ -6,7 +6,7 @@
 #include<memory>
 #include<tuple>
 #include<functional>
-#include"Coroutine.h"
+#include"TaskContext.h"
 #include<Component/Component.h>
 namespace GameKeeper
 {
@@ -18,19 +18,19 @@ namespace GameKeeper
 		~TaskComponent() final = default;
 	public:
 		template<typename F, typename T, typename ... Args>
-		Coroutine * Start(F && f, T * o, Args &&... args) {
-            Coroutine *co = this->CreateCoroutine(
+		TaskContext * Start(F && f, T * o, Args &&... args) {
+            TaskContext *co = this->MakeContext(
                     NewMethodProxy(std::forward<F>(f),
                                    o, std::forward<Args>(args)...));
             this->Resume(co->mCoroutineId);
             return co;
         }
-        Coroutine * Start(std::function<void()> func){
-            Coroutine * co = this->CreateCoroutine(new LambdaMethod(func));
+        TaskContext * Start(std::function<void()> func){
+            TaskContext * co = this->MakeContext(new LambdaMethod(func));
             this->Resume(co->mCoroutineId);
             return co;
         }
-        Coroutine * CreateCoroutine(StaticMethod * func);
+        TaskContext * MakeContext(StaticMethod * func);
 	public:
 		bool Yield();
 
@@ -40,9 +40,9 @@ namespace GameKeeper
 
 		void Resume(unsigned int id);
 
-        void WhenAny(Coroutine * coroutine);
+        void WhenAny(TaskContext * coroutine);
 
-        void WhenAll(std::vector<Coroutine*> & coroutines);
+        void WhenAll(std::vector<TaskContext*> & coroutines);
 
 	protected:
 		bool Awake() final;
@@ -59,17 +59,15 @@ namespace GameKeeper
 
 	public:
 
-		void Destory(Coroutine * coroutine);
+		TaskContext *GetContext(unsigned int id);
 
-		Coroutine *GetCoroutine(unsigned int id);
-
-        unsigned int GetCurrentCorId() const
+        unsigned int GetContextId() const
         {
-            if(this->mRunCoroutine == nullptr)
+            if(this->mRunContext == nullptr)
             {
                 return 0;
             }
-            return this->mRunCoroutine->mCoroutineId;
+            return this->mRunContext->mCoroutineId;
         }
 
         void RunTask(tb_context_t context);
@@ -77,15 +75,15 @@ namespace GameKeeper
 	private:
         void Test(int index);
         void SaveStack(unsigned int id);
-        void ResumeCoroutine(Coroutine * co);
+        void ResumeContext(TaskContext * co);
 	private:
 		class TimerComponent *mTimerManager;
 		std::queue<unsigned int> mLastQueues;
 	private:
-		CoroutinePool mCorPool;
+		TaskContextPool mCorPool;
         tb_context_t mMainContext;
-        Coroutine * mRunCoroutine;
+        TaskContext * mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
-		std::queue<Coroutine *> mResumeCoroutines;
+		std::queue<TaskContext *> mResumeContexts;
 	};
 }

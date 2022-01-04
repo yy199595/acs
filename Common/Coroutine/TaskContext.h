@@ -23,14 +23,12 @@ namespace GameKeeper
     class CoroutineGroup;
 	
 
-    class Coroutine
+    class TaskContext
     {
     public:
-		explicit Coroutine();
-        ~Coroutine();
-
+		explicit TaskContext();
+        ~TaskContext();
     public:
-        void Clear();
         void Invoke();
     public:
         int sid;

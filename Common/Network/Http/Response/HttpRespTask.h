@@ -7,10 +7,10 @@
 #include<asio.hpp>
 #include"Http/Http.h"
 #include<unordered_map>
-#include"Async/Task.h"
+#include"Async/TaskSource.h"
 namespace GameKeeper
 {
-    class HttpRespTask : public Task<std::string>
+    class HttpRespTask : public TaskSource<std::string>
     {
     public:
         HttpRespTask() = default;
