@@ -66,7 +66,7 @@ namespace Client
 		NetWorkThread & netThread = this->mTaskComponent->AllocateNetThread();
 		this->mTcpClient = new TcpRpcClient(new SocketProxy(netThread, "Client"), this);
 
-        if(!this->mTcpClient->ConnectAsync("127.0.0.1", 1995)->Await())
+        if(!this->mTcpClient->ConnectAsync("114.115.167.51", 1995)->Await())
         {
             LOG_FATAL("connect server failure");
             return;

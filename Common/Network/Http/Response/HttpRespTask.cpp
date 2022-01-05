@@ -46,7 +46,7 @@ namespace GameKeeper
         {
             LOG_ERROR(this->mError);
         }
-        this->SetResult(std::move(this->mResponse));
+        this->SetResult(this->mResponse);
         auto iter = this->mHeadMap.begin();
         for(; iter != this->mHeadMap.end(); iter++)
         {

@@ -1,78 +1,107 @@
 //
-// Created by zmhy0073 on 2021/11/29.
+// Created by yjz on 2022/1/5.
 //
 
 #ifndef GAMEKEEPER_TASKSOURCE_H
 #define GAMEKEEPER_TASKSOURCE_H
-#include<XCode/XCode.h>
-#include"Util/Guid.h"
-#include"Util/TimeHelper.h"
-#include"Core/App.h"
+#include"TaskSourceBase.h"
 namespace GameKeeper
 {
-    enum class TaskState
-    {
-        TaskReady,
-        TaskAwait,
-        TaskFinish,
-    };
-
     template<typename T>
-    class TaskSource
+    class TaskSource : public TaskSourceBase
     {
-    public:
-        explicit TaskSource()
-            : mTaskScheduler(App::Get().GetTaskScheduler())
-        {
-            this->mCorId = 0;
-            this->mState = TaskState::TaskReady;
-            this->mTaskId = Helper::Guid::Create();
-            this->mCreateTime = Helper::Time::GetMilTimestamp();
-            this->mTaskComponent = App::Get().GetTaskComponent();
-        }
-        virtual ~TaskSource() = default;
-    public:
-        long long GetTaskId() const { return this->mTaskId;}
-        TaskState GetState() const { return this->mTaskState; }
-        long long GetCreateTime() const { return this->mCreateTime;}
-        bool IsComplete() { return this->mTaskState == TaskState::TaskFinish;}
-
     public:
         const T & Await();
-        virtual bool SetResult(T && result);
+        bool SetResult(const T & data);
     private:
         T mData;
-        TaskState mState;
-        long long mTaskId;
-        unsigned int mCorId;
-        long long mCreateTime;
-        TaskComponent * mTaskComponent;
-        MainTaskScheduler & mTaskScheduler;
     };
 
     template<typename T>
     const T & TaskSource<T>::Await()
     {
-        if(this->mState == TaskState::TaskReady)
-        {
-            this->mState = TaskState::TaskAwait;
-            this->mTaskComponent->Yield(this->mCorId);
-        }
+        this->YieldTask();
         return this->mData;
     }
 
     template<typename T>
-    bool TaskSource<T>::SetResult(T && result)
+    bool TaskSource<T>::SetResult(const T &data)
     {
-        if (this->mState == TaskState::TaskAwait)
+        if(this->ResumeTask())
         {
-            this->mData = std::move(result);
-            if (this->mTaskScheduler.IsCurrentThread())
-            {
-                this->mTaskComponent->Resume(this->mCorId);
-                return true;
-            }
-            this->mTaskScheduler.Invoke(&TaskComponent::Resume, this->mTaskComponent, this->mCorId);
+            this->mData = data;
+            return true;
+        }
+        return false;
+    }
+}
+
+namespace GameKeeper
+{
+    template<typename T>
+    class TaskSource<T *> : public TaskSourceBase
+    {
+    public:
+        TaskSource();
+        ~TaskSource();
+    public:
+        const T * Await();
+        bool SetResult(const T * data);
+    private:
+        const T * mData;
+    };
+    template<typename T>
+    TaskSource<T*>::TaskSource()
+    {
+        this->mData = nullptr;
+    }
+    template<typename T>
+    TaskSource<T*>::~TaskSource()
+    {
+        delete this->mData;
+    }
+
+    template<typename T>
+    const T * TaskSource<T *>::Await()
+    {
+        this->YieldTask();
+        return this->mData;
+    }
+    template<typename T>
+    bool TaskSource<T*>::SetResult(const T * data)
+    {
+        if(this->ResumeTask())
+        {
+            this->mData = data;
+            return true;
+        }
+        return false;
+    }
+}
+
+namespace GameKeeper
+{
+    template<typename T>
+    class TaskSource<std::shared_ptr<T>> : public TaskSourceBase
+    {
+    public:
+        std::shared_ptr<T> Await();
+        bool SetResult(std::shared_ptr<T> data);
+    private:
+        std::shared_ptr<T> mData;
+    };
+    template<typename T>
+    std::shared_ptr<T> TaskSource<std::shared_ptr<T>>::Await()
+    {
+        this->YieldTask();
+        return this->mData;
+    }
+    template<typename T>
+    bool TaskSource<std::shared_ptr<T>>::SetResult(std::shared_ptr<T> data)
+    {
+        if(this->ResumeTask())
+        {
+            this->mData = data;
             return true;
         }
         return false;
