@@ -38,6 +38,16 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
+    template<> class TaskSource<void> : public TaskSourceBase
+    {
+    public:
+        void Await() {this->YieldTask();}
+        bool SetResult() { return this->ResumeTask();}
+    };
+}
+
+namespace GameKeeper
+{
     template<typename T>
     class TaskSource<T *> : public TaskSourceBase
     {
