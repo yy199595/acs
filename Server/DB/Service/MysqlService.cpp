@@ -26,7 +26,7 @@ namespace GameKeeper
         return true;
     }
 
-    XCode MysqlService::Add(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlService::Add(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
     {
         if(!request.has_data())
         {
@@ -54,11 +54,11 @@ namespace GameKeeper
         }
 
         this->mCorComponent->Yield();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstring(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
     {
         if(!request.has_data())
         {
@@ -87,11 +87,11 @@ namespace GameKeeper
         }
 
         this->mCorComponent->Yield();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstring(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlOper_Response &response)
+    XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
     {
 		Message * message = Helper::Proto::New(request.data());
 		if (message == nullptr)
@@ -114,11 +114,11 @@ namespace GameKeeper
             return XCode::MysqlStartTaskFail;
         }
         this->mCorComponent->Yield();
-        response.set_errorstr(mysqlTask->GetErrorStr());
+        response.set_errorstring(mysqlTask->GetErrorStr());
         return mysqlTask->GetErrorCode();
     }
 
-    XCode MysqlService::Invoke(const s2s::MysqlAnyOper_Request &request, s2s::MysqlAnyOper_Response &response)
+    XCode MysqlService::Invoke(const s2s::MysqlAnyOper_Request &request, s2s::MysqlResponse &response)
     {
         if(request.sql().empty())
         {
@@ -153,15 +153,15 @@ namespace GameKeeper
                 {
                     return XCode::JsonCastProtocbufFail;
                 }
-                response.add_querydatas()->PackFrom(*message);
+                response.add_datas()->PackFrom(*message);
             }
             return XCode::Successful;
         }
-        response.set_errotstr(mysqlTask->GetErrorStr());
+        response.set_errorstring(mysqlTask->GetErrorStr());
         return code;
     }
 
-    XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlQuery_Response &response)
+    XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlResponse &response)
     {
         if(!request.has_data())
         {
@@ -200,11 +200,11 @@ namespace GameKeeper
                 {
                     return XCode::JsonCastProtocbufFail;
                 }
-                response.add_querydatas()->PackFrom(*message);
+                response.add_datas()->PackFrom(*message);
             }
             return XCode::Successful;
         }
-        response.set_errotstr(mysqlTask->GetErrorStr());
+        response.set_errorstring(mysqlTask->GetErrorStr());
         return code;
     }
 }// namespace GameKeeper

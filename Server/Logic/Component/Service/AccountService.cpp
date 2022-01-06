@@ -4,7 +4,7 @@
 #include <Util/MathHelper.h>
 #include "Component/RedisComponent.h"
 #include "Component/MysqlProxyComponent.h"
-#include"MysqlClient/MysqlRpcTask.h"
+#include"MysqlClient/MysqlRpcTaskSource.h"
 #include<google/protobuf/util/json_util.h>
 namespace GameKeeper
 {
@@ -64,7 +64,7 @@ namespace GameKeeper
         response.set_token(userAccountData.token());
         this->mRedisComponent->Invoke("SETEX", token, second, account);
         this->mRedisComponent->Invoke("HSET", "user", account, userAccountData);
-        XCode code = this->mMysqlComponent->Add(userAccountData)->AwakeGetCode();
+        XCode code = this->mMysqlComponent->Add(userAccountData, std::make_shared<MysqlRpcTaskSource>());
         if(code != XCode::Successful)
         {
             LOG_ERROR(account << " register failure");

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     REGISTER_COMPONENT(MysqlProxyComponent);
     REGISTER_COMPONENT(HttpClientComponent);
     REGISTER_COMPONENT(OperatorComponent);
-	REGISTER_COMPONENT(LoggerComponent);
+    REGISTER_COMPONENT(LoggerComponent);
 
     REGISTER_COMPONENT(ThreadPoolComponent);
     REGISTER_COMPONENT(TaskComponent);
@@ -63,11 +63,10 @@ int main(int argc, char **argv)
     REGISTER_COMPONENT(HttpLoginService);
     REGISTER_COMPONENT(HttpOperComponent);
 
-	if (argc == 1)
-	{
-		argv[1] = new char[100];
-		argv[1] = "./Config/server.json";
-	}
+    if (argc == 1) {
+        argv[1] = new char[100];
+        argv[1] = "./Config/server.json";
+    }
 
 
     App app;

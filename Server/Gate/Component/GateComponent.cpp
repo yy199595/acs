@@ -61,11 +61,11 @@ namespace GameKeeper
         }
 
         auto requestMessage = nodeService->NewRequest(request->methodname());
-        std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask(requestMessage->methodid()));
+        std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
         if (request->has_data()) {
             requestMessage->mutable_data()->CopyFrom(request->data());
         }
-        requestMessage->set_rpcid(proxyTask->GetTaskId());
+        requestMessage->set_rpcid(proxyTask->GetRpcId());
         proxyTask->InitProxyTask(request->rpcid(), request->sockid(), this, this->mRpcComponent);
         return XCode::Successful;
     }

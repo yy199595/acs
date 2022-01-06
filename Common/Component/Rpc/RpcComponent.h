@@ -12,9 +12,15 @@ namespace GameKeeper
 
 	class ServiceMethod;
 
-    class JsonServiceMethod;
+#ifdef __DEBUG__
+    struct RpcTaskInfo
+    {
+        int MethodId;
+        long long Time;
+    };
+#endif
 
-    class RpcTaskBase;
+    class IRpcTask;
     class RpcComponent : public Component,
                          public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
     {
@@ -23,8 +29,11 @@ namespace GameKeeper
         ~RpcComponent() final = default;
 
     public:
-        unsigned int AddRpcTask(std::shared_ptr<RpcTaskBase> task);
-        std::shared_ptr<RpcTaskBase> GetRpcTask(long long rpcId) const;
+        void AddRpcTask(std::shared_ptr<IRpcTask> task);
+#ifdef __DEBUG__
+        void AddRpcInfo(long long rpcId, int methodId);
+        bool GetRpcInfo(long long rpcId, int & methodId, long long & time) const;
+#endif
     protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -35,13 +44,12 @@ namespace GameKeeper
 	private:
         void OnTaskTimeout(long long rpcId);
     private:
-        int mTick;
         int mNodeId;
-        long long mLastTime;
         class TaskComponent *mCorComponent;
         class TimerComponent * mTimerComponent;
         class RpcClientComponent *mRpcClientComponent;
         class RpcConfigComponent * mPpcConfigComponent;
-        std::unordered_map<long long, std::shared_ptr<RpcTaskBase>> mRpcTasks;
+        std::unordered_map<long long, RpcTaskInfo> mRpcInfoMap;
+        std::unordered_map<long long, std::shared_ptr<IRpcTask>> mRpcTasks;
     };
 }

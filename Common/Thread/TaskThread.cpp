@@ -55,7 +55,7 @@ namespace GameKeeper
             this->mIsWork = true;
             this->mThreadVariable.notify_one();
         }
-        this->mWaitInvokeTask.Add(task);
+        this->mWaitInvokeTask.Push(task);
         this->mTaskState = ThreadState::Run;
     }
 
@@ -70,8 +70,9 @@ namespace GameKeeper
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeTask.SwapQueueData();
 #endif
+            this->mWaitInvokeTask.Swap();
             this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-            if (this->mWaitInvokeTask.PopItem(task))
+            if (this->mWaitInvokeTask.Pop(task))
             {
                 if (task->Run())
                 {
@@ -105,7 +106,7 @@ namespace GameKeeper
 
 	void NetWorkThread::AddTask(StaticMethod * task)
 	{
-		this->mWaitInvokeMethod.Add(task);
+		this->mWaitInvokeMethod.Push(task);
 	}
 
     void NetWorkThread::Update()
@@ -114,17 +115,18 @@ namespace GameKeeper
 
         this->HangUp();
         asio::error_code err;
+        StaticMethod * taskMethod = nullptr;
         std::chrono::milliseconds time(1);
         while(!this->mIsClose)
         {
             std::this_thread::sleep_for(time);
             this->mAsioContext->poll(err);                  
-            StaticMethod * taskMethod = nullptr;
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeMethod.SwapQueueData();
 #endif
+            this->mWaitInvokeMethod.Swap();
             this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-            while (this->mWaitInvokeMethod.PopItem(taskMethod))
+            while (this->mWaitInvokeMethod.Pop(taskMethod))
             {
                 taskMethod->run();
                 delete taskMethod;
@@ -161,7 +163,8 @@ namespace GameKeeper
 #ifdef __THREAD_LOCK__
 		this->mTaskQueue.SwapQueueData();
 #endif
-		while (this->mTaskQueue.PopItem(task))
+        this->mTaskQueue.Swap();
+		while (this->mTaskQueue.Pop(task))
 		{
 			task->run();
 			delete task;
@@ -174,7 +177,7 @@ namespace GameKeeper
 		{
 			return;
 		}
-		this->mTaskQueue.Add(task);
+		this->mTaskQueue.Push(task);
 	}
 }
 

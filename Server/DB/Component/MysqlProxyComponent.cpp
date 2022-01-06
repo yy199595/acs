@@ -5,9 +5,10 @@
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
 #include"Util/MathHelper.h"
+#include"Rpc/RpcComponent.h"
 #include"Service/RpcNodeComponent.h"
 #include"Other/ElapsedTimer.h"
-#include"MysqlClient/MysqlRpcTask.h"
+#include"MysqlClient/MysqlRpcTaskSource.h"
 namespace GameKeeper
 {
     bool MysqlProxyComponent::Awake()
@@ -20,6 +21,7 @@ namespace GameKeeper
     bool MysqlProxyComponent::LateAwake()
     {
         this->mCorComponent = App::Get().GetTaskComponent();
+        this->mRpcComponent = this->GetComponent<RpcComponent>();
         LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<RpcNodeComponent>());
         return true;
     }
@@ -66,11 +68,8 @@ namespace GameKeeper
             userAccountData.set_devicemac("ios_qq");
             userAccountData.set_token(Helper::String::CreateNewToken());
             userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
-            if (this->Add(userAccountData)->AwakeGetCode() == XCode::Successful)
-            {
-                LOG_WARN("add user data successful");
-            }
-            //this->mCorComponent->Sleep(100);
+
+            this->Add(userAccountData);
         }
 	}
 
@@ -79,143 +78,164 @@ namespace GameKeeper
 		for (int index = 0; index < 100; index++)
 		{
 			int count = Helper::Math::Random(3, 20);
-			auto sortTask = this->Sort("tb_player_account", "UserID", count);
-			if (sortTask->AwakeGetCode() == XCode::Successful)
-            {
-                for (size_t index = 0; index < sortTask->AwaitGetDataSize(); index++)
-                {
-                    std::string json;
-                    auto userData = sortTask->AwaitGetData<db::UserAccountData>();
-                    util::MessageToJsonString(*userData, &json);
-                    LOG_WARN(index++ << "  " << json);
-                }
-            }
-			//this->mCorComponent->Sleep(100);
+            std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
+			XCode code = this->Sort("tb_player_account", "UserID", count, false, rpcTaskSource);
 		}
 	}
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Add(const Message &data)
+    XCode MysqlProxyComponent::Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         RpcNode *proxyNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (proxyNode == nullptr)
         {
             LOG_ERROR("not find mysql service node " << this->mNodeId);
-            return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
+            return XCode::CallServiceNotFound;
         }
+
         auto requestMessage = proxyNode->NewRequest("MysqlService.Add");
         if(requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Add");
-            return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
+            return XCode::NotFoundRpcConfig;
         }
 
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
-
         this->mOperRequest.Clear();
-        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestMessage->set_rpcid(taskSource->GetRpcId());
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Query(const Message &data)
+    XCode MysqlProxyComponent::Query(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
             LOG_ERROR("not find mysql service node " << this->mNodeId);
-            return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
+            return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Query");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Query");
-            return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mQueryRequest.Clear();
-        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mQueryRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mQueryRequest);
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestMessage->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
+    XCode MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
             LOG_ERROR("not find mysql service node " << this->mNodeId);
-            return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
+            return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Invoke");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Invoke");
-            return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mAnyOperRequest.Clear();
         this->mAnyOperRequest.set_sql(sql);
         this->mAnyOperRequest.set_tab(tab);
-        requestMessage->set_rpcid(rpcTask->GetTaskId());
-        requestMessage->mutable_data()->PackFrom(this->mAnyOperRequest);
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestMessage->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Save(const Message &data)
+    XCode MysqlProxyComponent::Save(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
             LOG_ERROR("not find mysql service node " << this->mNodeId);
-            return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
+            return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Save");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Save");
-            return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mOperRequest.Clear();
-        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestMessage->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Delete(const Message &data)
+    XCode MysqlProxyComponent::Delete(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
             LOG_ERROR("not find mysql service node " << this->mNodeId);
-            return std::make_shared<MysqlRpcTask>(XCode::CallServiceNotFound);
+            return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Delete");
         if (requestMessage == nullptr)
         {
             LOG_ERROR("not find mysql service method MysqlService.Delete");
-            return std::make_shared<MysqlRpcTask>(XCode::NotFoundRpcConfig);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<MysqlRpcTask> rpcTask(new MysqlRpcTask(requestMessage->methodid()));
 
         this->mOperRequest.Clear();
-        requestMessage->set_rpcid(rpcTask->GetTaskId());
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        return rpcTask;
+        if(taskSource!= nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestMessage->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<MysqlRpcTask> MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse)
+    XCode MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
         std::stringstream sqlCommand;
         const char * type = !reverse ? "ASC" : "DESC";
         sqlCommand << "select * from " << tab << " ORDER BY " << field << " " << type << " LIMIT " << count;
-        return this->Invoke(tab, sqlCommand.str());
+        return this->Invoke(tab, sqlCommand.str(), taskSource);
     }
 }

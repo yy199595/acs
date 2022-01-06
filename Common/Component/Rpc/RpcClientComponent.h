@@ -33,7 +33,7 @@ namespace GameKeeper
 
 	public:
 		bool CloseSession(long long id);
-		bool SendByAddress(long long id, com::Rpc_Request * message);
+        bool SendByAddress(long long id, com::Rpc_Request * message);
 		bool SendByAddress(long long id, com::Rpc_Response * message);
 	private:
 		ProtoRpcClient *GetSession(long long id);

@@ -59,7 +59,7 @@
             "Timeout":0,
             "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlOper.Response"
+            "Response":"s2s.MysqlResponse"
         },
         "Save": {
             "Id":122,
@@ -67,7 +67,7 @@
             "Timeout":0,
             "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlOper.Response"
+            "Response":"s2s.MysqlResponse"
         },
         "Delete": {
             "Id":123,
@@ -75,7 +75,7 @@
             "Timeout":0,
             "Type":"Server",
             "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlOper.Response"
+            "Response":"s2s.MysqlResponse"
         },
         "Query": {
             "Id":124,
@@ -83,7 +83,7 @@
             "Timeout":0,
             "Type":"Server",
             "Request":"s2s.MysqlQuery.Request",
-            "Response":"s2s.MysqlQuery.Response"
+            "Response":"s2s.MysqlResponse"
         },
         "Invoke":{
             "Id":215,
@@ -91,7 +91,7 @@
             "Timeout":0,
             "Type":"Server",
             "Request":"s2s.MysqlAnyOper.Request",
-            "Response":"s2s.MysqlAnyOper.Response"
+            "Response":"s2s.MysqlResponse"
         }
     },
     "AccountService":{

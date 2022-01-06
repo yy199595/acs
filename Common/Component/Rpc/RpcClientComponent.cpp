@@ -8,7 +8,7 @@
 #include<Rpc/RpcComponent.h>
 #ifdef __DEBUG__
 #include<Pool/MessagePool.h>
-#include<Async/RpcTask/RpcTask.h>
+#include"Async/RpcTask/RpcTaskSource.h"
 #endif
 namespace GameKeeper
 {
@@ -108,26 +108,24 @@ namespace GameKeeper
     void RpcClientComponent::OnResponse(com::Rpc_Response *response)
     {
 #ifdef __DEBUG__
+        int methodId = 0;
+        long long costTime = 0;
         long long rpcId = response->rpcid();
-        auto rpcTask = this->mRpcComponent->GetRpcTask(rpcId);
-        if (rpcTask != nullptr)
+        this->mRpcComponent->GetRpcInfo(rpcId, methodId, costTime);
+        auto config = this->mProtoConfigComponent->GetProtocolConfig(methodId);
+        if (config != nullptr)
         {
-            auto config = this->mProtoConfigComponent->GetProtocolConfig(rpcTask->GetMethodId());
-            if (config != nullptr)
-            {
-                LOG_DEBUG("*****************[receive response]******************");
-                LOG_DEBUG("func = " << config->Service << "." << config->Method);
-                LOG_DEBUG("time = " << rpcTask->GetCostTime() << "ms");
+            LOG_DEBUG("*****************[receive response]******************");
+            LOG_DEBUG("func = " << config->Service << "." << config->Method);
+            LOG_DEBUG("time = " << costTime << "ms");
 
-                std::string json;
-                auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
-                LOG_DEBUG("code = " << codeConfig->Name << ":" << codeConfig->Desc);
-                if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
-                {
-                    LOG_DEBUG("json = " << json);
-                }
-                LOG_DEBUG("*********************************************");
+            std::string json;
+            auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
+            LOG_DEBUG("code = " << codeConfig->Name << ":" << codeConfig->Desc);
+            if (response->has_data() && Helper::Proto::GetJson(response->data(), json)) {
+                LOG_DEBUG("json = " << json);
             }
+            LOG_DEBUG("*********************************************");
         }
 #endif
         this->mRpcComponent->OnResponse(response);

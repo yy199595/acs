@@ -8,18 +8,16 @@
 #include"Scene/RpcConfigComponent.h"
 #include"Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
-#include"Async/RpcTask/RpcTask.h"
+#include"Async/RpcTask/RpcTaskSource.h"
 namespace GameKeeper
 {
 	bool RpcComponent::Awake()
 	{
-        this->mTick = 1;
         this->mNodeId = 0;
         this->mCorComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mPpcConfigComponent = nullptr;
         this->mRpcClientComponent = nullptr;
-        this->mLastTime = Helper::Time::GetSecTimeStamp();
 		const ServerConfig & ServerCfg = App::Get().GetConfig();
 		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("NodeId", this->mNodeId));
         return true;
@@ -72,39 +70,51 @@ namespace GameKeeper
 
     XCode RpcComponent::OnResponse(const com::Rpc_Response *response)
     {
-        LocalObject<com::Rpc_Response> local(response);
         long long rpcId = response->rpcid();
         auto iter = this->mRpcTasks.find(rpcId);
         if(iter == this->mRpcTasks.end())
         {
+            delete response;
             LOG_WARN("not find rpc task : " << rpcId)
             return XCode::Failure;
         }
         auto rpcTask = iter->second;
         this->mRpcTasks.erase(iter);
-        rpcTask->SetResult(response);
+        rpcTask->OnResponse(response);
         return XCode::Successful;
     }
 
-    unsigned int RpcComponent::AddRpcTask(std::shared_ptr<RpcTaskBase> task)
+    void RpcComponent::AddRpcTask(std::shared_ptr<IRpcTask> task)
     {
-        int methodId = task->GetMethodId();
-        long long rpcId = task->GetTaskId();
+        long long rpcId = task->GetRpcId();
         this->mRpcTasks.emplace(rpcId, task);
-        auto config = this->mPpcConfigComponent->GetProtocolConfig(methodId);
-        if (config != nullptr && config->Timeout > 0)
+        if (task->GetTimeout() > 0)
         {
-            return this->mTimerComponent->AsyncWait(
-                    config->Timeout, &RpcComponent::OnTaskTimeout, this, rpcId);
+            this->mTimerComponent->AsyncWait(
+                    task->GetTimeout(), &RpcComponent::OnTaskTimeout, this, rpcId);
         }
-        return 0;
+    }
+#ifdef __DEBUG__
+    void RpcComponent::AddRpcInfo(long long rpcId, int methodId)
+    {
+        RpcTaskInfo taskInfo;
+        taskInfo.MethodId = methodId;
+        taskInfo.Time = Helper::Time::GetMilTimestamp();
+        this->mRpcInfoMap.emplace(rpcId, taskInfo);
     }
 
-    std::shared_ptr<RpcTaskBase> RpcComponent::GetRpcTask(long long int rpcId) const
+    bool RpcComponent::GetRpcInfo(long long int rpcId, int &methodId, long long int &time) const
     {
-        auto iter = this->mRpcTasks.find(rpcId);
-        return iter != this->mRpcTasks.end() ? iter->second : nullptr;
+        auto iter = this->mRpcInfoMap.find(rpcId);
+        if(iter == this->mRpcInfoMap.end())
+        {
+            return false;
+        }
+        methodId = iter->second.MethodId;
+        time = Helper::Time::GetMilTimestamp() - iter->second.Time;
+        return true;
     }
+#endif
 
     void RpcComponent::OnTaskTimeout(long long int rpcId)
     {
@@ -113,7 +123,7 @@ namespace GameKeeper
         {
             auto rpcTask = iter->second;
             this->mRpcTasks.erase(iter);
-            rpcTask->SetResult(nullptr);
+            rpcTask->OnResponse(nullptr);
         }
     }
 }// namespace GameKeeper

@@ -4,26 +4,28 @@
 
 #ifndef GAMEKEEPER_RPCPROXYTASK_H
 #define GAMEKEEPER_RPCPROXYTASK_H
-#include"Async/RpcTask/RpcTask.h"
+#include"Async/RpcTask/RpcTaskSource.h"
 
 namespace GameKeeper
 {
     class RpcComponent;
     class GateComponent;
-    class RpcProxyTask : public RpcTaskBase
+    class RpcProxyTask : public IRpcTask
     {
     public:
-        RpcProxyTask(int methodId);
-        ~RpcProxyTask() final = default;
-
+        RpcProxyTask();
+        ~RpcProxyTask() = default;
     public:
         void InitProxyTask(long long rpcId, long long sockId,
                            GateComponent * component, RpcComponent * rpcComponent );
+        long long GetRpcId() final { return this->mTaskRpcId; }
     protected:
+        int GetTimeout() final { return 0;}
         void OnResponse(const com::Rpc_Response *response) final;
     private:
         long long mRpcId;
         long long mSockId;
+        long long mTaskRpcId;
         GateComponent * mProxyComponent;
     };
 }

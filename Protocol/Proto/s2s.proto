@@ -62,16 +62,17 @@ message HostQuery
     }
 }
 
+message MysqlResponse
+{
+    string ErrorString = 1;
+    repeated google.protobuf.Any Datas = 2;
+}
+
 message MysqlQuery
 {
     message Request
     {
         google.protobuf.Any Data = 1;
-    }
-    message Response
-    {
-        string ErrotStr = 1;
-        repeated google.protobuf.Any QueryDatas = 2;
     }
 }
 message MysqlAnyOper
@@ -81,11 +82,6 @@ message MysqlAnyOper
         string sql = 1;
         string tab = 2;
     }
-    message Response
-    {
-        string ErrotStr = 1;
-        repeated google.protobuf.Any QueryDatas = 2;
-    }
 }
 
 message MysqlOper
@@ -93,9 +89,5 @@ message MysqlOper
     message Request
     {
         google.protobuf.Any Data = 1;
-    }
-    message Response
-    {
-        string ErrorStr = 1;
     }
 }

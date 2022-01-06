@@ -7,8 +7,9 @@
 #include<thread>
 #include<atomic>
 #include<Define/CommonLogDef.h>
-#include<Other/MultiThreadQueue.h>
 #include<Method/MethodProxy.h>
+#include<Other/DoubleBlockQueue.h>
+
 namespace GameKeeper
 {
 	class StaticMethod;
@@ -72,7 +73,7 @@ namespace GameKeeper
     private:
 		std::thread * mThread;
         ThreadState mTaskState;
-        MultiThreadQueue<TaskProxy *> mWaitInvokeTask;
+        DoubleBlockQueue<TaskProxy *> mWaitInvokeTask;
     };
 
     class NetWorkThread : public IThread
@@ -96,7 +97,7 @@ namespace GameKeeper
 		AsioWork * mAsioWork;
 		std::thread * mThread;
 		AsioContext * mAsioContext;
-		MultiThreadQueue<StaticMethod *> mWaitInvokeMethod;
+        DoubleBlockQueue<StaticMethod *> mWaitInvokeMethod;
     };
 
 	class MainTaskScheduler : public IThread
@@ -115,6 +116,6 @@ namespace GameKeeper
 		void Update() final;
 	private:
 		StaticMethod * mMainMethod;
-		MultiThreadQueue<StaticMethod *> mTaskQueue;
+        DoubleBlockQueue<StaticMethod*> mTaskQueue;
 	};
 }// namespace GameKeeper

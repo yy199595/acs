@@ -4,7 +4,7 @@
 namespace GameKeeper
 {
     class NodeHelper;
-    class MysqlRpcTask;
+    class MysqlRpcTaskSource;
     class MysqlProxyComponent : public Component, public ILoadData, public INodeRefresh
     {
     public:
@@ -26,20 +26,21 @@ namespace GameKeeper
 		void AddUserData();
 		void SortUserData();
     public:
-        std::shared_ptr<MysqlRpcTask> Add(const Message &data);
+        XCode Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
-        std::shared_ptr<MysqlRpcTask> Save(const Message &data);
+        XCode Save(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
-        std::shared_ptr<MysqlRpcTask> Delete(const Message &data);
+        XCode Delete(const Message &data,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
-        std::shared_ptr<MysqlRpcTask> Query(const Message &data);
+        XCode Query(const Message &data,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
-        std::shared_ptr<MysqlRpcTask> Invoke(const std::string & tab, const std::string & sql);
+        XCode Invoke(const std::string & tab, const std::string & sql,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
-        std::shared_ptr<MysqlRpcTask> Sort(const std::string & tab, const std::string & field, int count, bool reverse = false);
+        XCode Sort(const std::string & tab, const std::string & field, int count, bool reverse = false,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
     private:
         int mNodeId;
+        class RpcComponent * mRpcComponent;
         class TaskComponent *mCorComponent;
         class RpcNodeComponent *mNodeComponent;
         s2s::MysqlOper_Request mOperRequest;

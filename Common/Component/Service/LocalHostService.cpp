@@ -6,7 +6,6 @@
 #include"Network/Listener/TcpServerComponent.h"
 #include"Scene/OperatorComponent.h"
 #include<Scene/RpcConfigComponent.h>
-#include"Service/NodeHelper.h"
 namespace GameKeeper
 {
     bool LocalHostService::Awake()
@@ -55,9 +54,11 @@ namespace GameKeeper
                 nodeInfo->add_services(service->GetTypeName());
             }
         }
+        std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
+        auto rpcNode = this->mNodeComponent->GetServiceNode(0);
+        XCode code = rpcNode->Call("CenterHostService.Add", registerInfo, taskSource);
 
-        NodeHelper nodeHelper(0);
-        auto response = nodeHelper.Call<s2s::NodeRegister_Response>("CenterHostService.Add", registerInfo);
+        auto response = taskSource->GetData<s2s::NodeRegister_Response>();
         if (response == nullptr) {
             LOG_ERROR("register to center failure");
         }

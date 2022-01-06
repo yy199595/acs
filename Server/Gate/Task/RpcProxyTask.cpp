@@ -7,12 +7,12 @@
 #include"Component/GateComponent.h"
 namespace GameKeeper
 {
-    RpcProxyTask::RpcProxyTask(int methodId)
-        : RpcTaskBase(methodId)
+    RpcProxyTask::RpcProxyTask()
     {
         this->mRpcId = 0;
         this->mSockId = 0;
         this->mProxyComponent = nullptr;
+        this->mTaskRpcId = Helper::Guid::Create();
     }
 
     void RpcProxyTask::InitProxyTask(long long rpcId, long long sockId, GateComponent *component,

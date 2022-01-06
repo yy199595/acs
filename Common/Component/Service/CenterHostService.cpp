@@ -5,7 +5,6 @@
 #include<Util/FileHelper.h>
 #include<Rpc/RpcClientComponent.h>
 #include<Service/RpcNodeComponent.h>
-#include"Service/NodeHelper.h"
 
 
 namespace GameKeeper
@@ -111,8 +110,9 @@ namespace GameKeeper
         {
             for(unsigned int id : iter->second)
             {
-                NodeHelper callHelper(id);
-                XCode code = callHelper.Invoke("LocalHostService.Add", nodeInfo);
+                std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
+                RpcNode * rpcNode = this->mNodeComponent->GetServiceNode(id);
+                XCode code = rpcNode->Call("LocalHostService.Add", nodeInfo, taskSource);
                 if(code != XCode::Successful)
                 {
                     return code;

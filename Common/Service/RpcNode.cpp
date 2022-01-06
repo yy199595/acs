@@ -1,18 +1,16 @@
 ﻿#include"RpcNode.h"
 #include<Core/App.h>
 #include<Coroutine/TaskComponent.h>
-#include<Async/RpcTask/RpcTask.h>
+#include"Async/RpcTask/RpcTaskSource.h"
 #include<Rpc/RpcClientComponent.h>
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
-#include"Service/NodeHelper.h"
 namespace GameKeeper
 {
 	RpcNode::RpcNode(int id)
 		: mGlobalId(id), mIsClose(false), mSocketId(0)
 	{
-        this->mCallHelper = new NodeHelper(id);
         this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
         this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
         LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<TaskComponent>());
@@ -123,31 +121,44 @@ namespace GameKeeper
         return request;
 	}
 
-    std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method)
+    XCode RpcNode::Call(const string &func, std::shared_ptr<RpcTaskSource> taskSource)
     {
-        auto requestData = this->NewRequest(method);
+        auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
         {
-            LOG_ERROR("not find rpc config " << method);
-            return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
+            LOG_ERROR("not find rpc config " << func);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<RpcTask> rpcTask(new RpcTask(requestData->methodid()));
-        requestData->set_rpcid(rpcTask->GetTaskId());
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestData->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 
-    std::shared_ptr<RpcTask> RpcNode::NewRpcTask(const std::string &method, const Message &message)
+    XCode RpcNode::Call(const string &func, const Message &message, std::shared_ptr<RpcTaskSource> taskSource)
     {
-        auto requestData = this->NewRequest(method);
+        auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
         {
-            LOG_ERROR("not find rpc config " << method);
-            return std::make_shared<RpcTask>(XCode::NotFoundRpcConfig);
+            LOG_ERROR("not find rpc config " << func);
+            return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<RpcTask> rpcTask(new RpcTask(requestData->methodid()));
-
-        requestData->set_rpcid(rpcTask->GetTaskId());
         requestData->mutable_data()->PackFrom(message);
-        return rpcTask;
+        if(taskSource != nullptr)
+        {
+            this->mRpcComponent->AddRpcTask(taskSource);
+            requestData->set_rpcid(taskSource->GetRpcId());
+#ifdef __DEBUG__
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->methodid());
+#endif
+            return taskSource->GetCode();
+        }
+        return XCode::Successful;
     }
 }// namespace GameKeeper

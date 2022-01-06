@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"Protocol/s2s.pb.h"
-#include<Async/RpcTask/RpcTask.h>
+#include"Async/RpcTask/RpcTaskSource.h"
 
 using namespace google::protobuf;
 namespace GameKeeper
@@ -36,10 +36,9 @@ namespace GameKeeper
 
         void GetServices(std::vector<std::string> &services);
 
-    public:
-        NodeHelper & GetCallHelper() const { return *mCallHelper;}
-       std::shared_ptr<RpcTask> NewRpcTask(const std::string & method);
-       std::shared_ptr<RpcTask> NewRpcTask(const std::string & method, const Message & message);
+        XCode Call(const std::string & func, std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+        XCode Call(const std::string & func, const Message & message, std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+
     private:
         void ConnectToNode();
         void OnConnectAfter();
