@@ -11,16 +11,16 @@ namespace GameKeeper
 	class RpcClient
 	{
 	public:
-		explicit RpcClient(SocketProxy * socket, SocketType type);
+		explicit RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type);
 		virtual ~RpcClient() = default;
 	public:
 		void StartReceive();
         inline bool IsOpen() const { return this->mIsOpen; }
         inline bool IsConnected() { return this->mIsConnect; }
 		inline const std::string & GetIp() const { return this->mIp; }
-		inline SocketProxy & GetSocketProxy() { return *mSocketProxy; }
 		inline long long GetSocketId() const { return this->mSocketId; }
 		inline const std::string & GetAddress() const { return this->mAddress; }
+        std::shared_ptr<SocketProxy> GetSocketProxy() const { return this->mSocketProxy;}
 	public:
 		virtual void Clear();
 		SocketType GetSocketType() { return this->mType; }
@@ -34,16 +34,16 @@ namespace GameKeeper
         void CloseSocket(XCode code);
         virtual void OnClose(XCode code) = 0;
         virtual void OnConnect(XCode code) = 0;
-        virtual void OnSendData(XCode code, const Message *) = 0;
         virtual XCode OnRequest(const char * buffer, size_t size) = 0;
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
+        virtual void OnSendData(XCode code, std::shared_ptr<Message> ) = 0;
     protected:
-        void SendData(char type, const Message * message);
+        void SendData(char type, std::shared_ptr<Message> message);
 	protected:
 		AsioContext & mContext;
-		SocketProxy * mSocketProxy;
 		NetWorkThread & mNetWorkThread;
-	private:
+        std::shared_ptr<SocketProxy> mSocketProxy;
+    private:
         bool mIsOpen;
 		std::string mIp;
 		int mConnectCount;

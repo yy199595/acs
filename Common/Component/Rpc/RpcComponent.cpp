@@ -33,7 +33,7 @@ namespace GameKeeper
         return true;
     }
 
-	XCode RpcComponent::OnRequest(const com::Rpc_Request * request)
+	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
     {
         unsigned short methodId = request->methodid();
         const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
@@ -55,7 +55,7 @@ namespace GameKeeper
             long long socketId = request->socketid();
             const std::string &method = protocolConfig->Method;
             auto response = logicService->Invoke(method, request);
-            this->mRpcClientComponent->SendByAddress(socketId, response);
+            this->mRpcClientComponent->Send(socketId, response);
             return XCode::Successful;
         }
         this->mCorComponent->Start([request, this, logicService, protocolConfig]()
@@ -63,18 +63,17 @@ namespace GameKeeper
             long long socketId = request->socketid();
             const std::string &method = protocolConfig->Method;
             auto response = logicService->Invoke(method, request);
-            this->mRpcClientComponent->SendByAddress(socketId, response);
+            this->mRpcClientComponent->Send(socketId, response);
         });
         return XCode::Successful;
     }
 
-    XCode RpcComponent::OnResponse(const com::Rpc_Response *response)
+    XCode RpcComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
         long long rpcId = response->rpcid();
         auto iter = this->mRpcTasks.find(rpcId);
         if(iter == this->mRpcTasks.end())
         {
-            delete response;
             LOG_WARN("not find rpc task : " << rpcId)
             return XCode::Failure;
         }

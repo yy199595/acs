@@ -13,7 +13,7 @@ namespace GameKeeper
         this->mRpcId = Helper::Guid::Create();
     }
 
-    void LuaRpcTaskSource::OnResponse(const Rpc_Response *response)
+    void LuaRpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
 
     }
@@ -22,14 +22,14 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    void RpcTaskSource::OnResponse(const com::Rpc_Response  * response)
+    void RpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
         this->mTaskSource.SetResult(response);
     }
 
     XCode RpcTaskSource::GetCode()
     {
-        const com::Rpc_Response *response = this->mTaskSource.Await();
+        auto response = this->mTaskSource.Await();
         if (response == nullptr) {
             return XCode::CallTimeout;
         }

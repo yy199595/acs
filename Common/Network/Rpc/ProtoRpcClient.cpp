@@ -6,7 +6,8 @@
 #endif
 namespace GameKeeper
 {
-	ProtoRpcClient::ProtoRpcClient(RpcClientComponent *component, SocketProxy * socket, SocketType type)
+	ProtoRpcClient::ProtoRpcClient(RpcClientComponent *component,
+                                   std::shared_ptr<SocketProxy> socket, SocketType type)
 		:RpcClient(socket, type), mTcpComponent(component)
 	{
 
@@ -22,7 +23,7 @@ namespace GameKeeper
         this->mNetWorkThread.Invoke(&ProtoRpcClient::CloseSocket, this, XCode::NetActiveShutdown);
 	}
 
-    bool ProtoRpcClient::SendToServer(const com::Rpc_Response *message)
+    bool ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Response> message)
     {
         if(!this->IsOpen())
         {
@@ -37,7 +38,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool ProtoRpcClient::SendToServer(const com::Rpc_Request *message)
+    bool ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Request> message)
     {
         if(!this->IsOpen())
         {
@@ -52,15 +53,14 @@ namespace GameKeeper
         return true;
     }
 
-    void ProtoRpcClient::OnSendData(XCode code, const Message * message)
+    void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<Message> message)
     {
         if (code != XCode::Successful)
         {
             long long id = this->GetSocketId();
-            this->mNetWorkThread.Invoke(&RpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
-            return;
+            MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+            taskScheduler.Invoke(&RpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
         }
-        delete message;
     }
 
 	void ProtoRpcClient::OnClose(XCode code)
@@ -72,10 +72,9 @@ namespace GameKeeper
 
 	XCode ProtoRpcClient::OnRequest(const char * buffer, size_t size)
 	{
-		auto requestData = new com::Rpc_Request();
-		if (!requestData->ParseFromArray(buffer, size))
+        std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
+        if (!requestData->ParseFromArray(buffer, size))
 		{
-			delete requestData;
 			return XCode::ParseRequestDataError;
 		}
         requestData->set_socketid(this->GetSocketId());
@@ -86,10 +85,9 @@ namespace GameKeeper
 
 	XCode ProtoRpcClient::OnResponse(const char * buffer, size_t size)
 	{
-		auto responseData = new com::Rpc_Response();
+		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
 		if (!responseData->ParseFromArray(buffer, size))
 		{
-			delete responseData;
 			return XCode::ParseResponseDataError;
 		}
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();

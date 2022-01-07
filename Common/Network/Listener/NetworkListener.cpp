@@ -25,15 +25,15 @@ namespace GameKeeper
 		delete this->mBindAcceptor;
 	}
 
-	bool NetworkListener::StartListen(ISocketListen * handler)
+	std::shared_ptr<TaskSource<bool>> NetworkListener::StartListen(ISocketListen * handler)
 	{
 		this->mListenHandler = handler;
-        this->mTaskThread.Invoke(&NetworkListener::InitListener, this);
-        App::Get().GetTaskComponent()->Yield(this->mCorId);
-		return this->mIsListen;
+        std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+        this->mTaskThread.Invoke(&NetworkListener::InitListener, this, taskSource);
+		return taskSource;
 	}
 
-    void NetworkListener::InitListener()
+    void NetworkListener::InitListener(std::shared_ptr<TaskSource<bool>> taskSource)
     {
         try
         {
@@ -43,22 +43,21 @@ namespace GameKeeper
 
             this->mBindAcceptor->listen(this->mConfig.Count);
             io.post(std::bind(&NetworkListener::ListenConnect, this));
-            this->mIsListen = true;
+            taskSource->SetResult(true);
         }
         catch (std::system_error & err)
         {
-            this->mIsListen = false;
+            taskSource->SetResult(false);
             LOG_FATAL("listen " << this->mConfig.Ip << ":"
                                 << this->mConfig.Port << " failure" << err.what());
         }
-        TaskComponent * component = App::Get().GetTaskComponent();
-        this->mTaskScheduler.Invoke(&TaskComponent::Resume, component, this->mCorId);
     }
 
 	void NetworkListener::ListenConnect()
-	{		
-		auto socketProxy = new SocketProxy(this->mTaskComponent->AllocateNetThread(), this->mConfig.Name);
-		this->mBindAcceptor->async_accept(socketProxy->GetSocket(), 
+	{
+        NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, this->mConfig.Name));
+		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{
 			if (!code)
@@ -70,10 +69,6 @@ namespace GameKeeper
 				LOG_INFO(this->mConfig.Name << " listen new socket " << ip << ":" << port);
 #endif // __DEBUG__
                 mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
-			}
-			else
-			{
-				delete socketProxy;
 			}
 			AsioContext & context = this->mTaskThread.GetContext();
 			context.post(std::bind(&NetworkListener::ListenConnect, this));

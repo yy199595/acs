@@ -67,14 +67,14 @@ namespace GameKeeper
         while(message.size() > 0)
         {
             size_t size = is.readsome(buffer, 256);
-            for(size_t index = 0; index < size; index++)
-            {
-                if (buffer[index] != '\n' && buffer[index] != ' ')
-                {
-                    this->mResponse += buffer[index];
-                }
-            }
-            //this->mResponse.append(buffer, size);
+//            for(size_t index = 0; index < size; index++)
+//            {
+//                if (buffer[index] != '\n' && buffer[index] != ' ')
+//                {
+//                    this->mResponse += buffer[index];
+//                }
+//            }
+            this->mResponse.append(buffer, size);
         }
         return this->mResponse.size() < this->mContentLength;
     }

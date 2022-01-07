@@ -12,7 +12,7 @@
 #include "Other/ProtocolConfig.h"
 #include"Other/ElapsedTimer.h"
 #include"Network/Http/HttpReqSession.h"
-
+#include"Util/StringHelper.h"
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
 namespace GameKeeper
@@ -32,12 +32,20 @@ namespace GameKeeper
         std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
         this->mCorComponent->Start([this, url1]() {
             std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
-            this->Get(url);
+
+            std::string json;
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("End", 100);
+            jsonWriter.Add("Start", 0);
+            jsonWriter.Add("RankId", 103000);
+
+            jsonWriter.WriterToStream(json);
+            this->Post("http://10.10.14.104:7683/logic/QueryRankData", json);
         });
         return true;
     }
 
-    void HttpClientComponent::OnListen(SocketProxy *socket)
+    void HttpClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
 
     }
@@ -104,7 +112,7 @@ namespace GameKeeper
         std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
         auto httpRespTask = httpLocalSession->NewTask<HttpPostRequest, HttpRespTask>(postRequest);
 
-        LOG_ERROR(httpRespTask->Await());
+        LOG_ERROR(Helper::String::FormatJson(httpRespTask->Await()));
 
         LOG_DEBUG("time = " << timer.GetSecond() << "s");
         return XCode::Successful;

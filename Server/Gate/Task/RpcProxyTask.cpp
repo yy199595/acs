@@ -24,9 +24,9 @@ namespace GameKeeper
         rpcComponent->AddRpcTask(this->shared_from_this());
     }
 
-    void RpcProxyTask::OnResponse(const com::Rpc_Response *response)
+    void RpcProxyTask::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
-        auto responseMessage = new c2s::Rpc_Response();
+        std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
         if(response == nullptr)
         {
             responseMessage->set_code((int)XCode::CallTimeout);
@@ -40,11 +40,7 @@ namespace GameKeeper
                 responseMessage->mutable_data()->CopyFrom(response->data());
             }
         }
-        XCode code = this->mProxyComponent->OnResponse(this->mSockId, responseMessage);
-        if(code != XCode::Successful)
-        {
-            delete responseMessage;
-        }
+        this->mProxyComponent->OnResponse(this->mSockId, responseMessage);
     }
 
 }

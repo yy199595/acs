@@ -30,7 +30,7 @@ namespace GameKeeper
         return true;
     }
 
-    void GateClientComponent::OnListen(SocketProxy *socket)
+    void GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         long long id = socket->GetSocketId();
         auto iter = this->mProxyClientMap.find(id);
@@ -44,13 +44,10 @@ namespace GameKeeper
 #endif
             rpcClient->StartReceive();
             this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
-            //this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, id);
-            return;
         }
-        delete socket;
     }
 
-    void GateClientComponent::OnRequest(c2s::Rpc_Request *request) //客户端调过来的
+    void GateClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request) //客户端调过来的
     {
 #ifdef __DEBUG__
         std::string json;
@@ -60,12 +57,10 @@ namespace GameKeeper
         LOG_WARN("json = " << json);
         LOG_WARN("*****************************************");
 #endif
-
-        LocalObject<c2s::Rpc_Request> local(request);
         XCode code = this->mGateComponent->OnRequest(request);
         if(code != XCode::Successful)
         {
-            auto responseMessage = new c2s::Rpc_Response();
+            std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
             LOG_ERROR("player call " << request->methodname() << " failure "
@@ -96,7 +91,7 @@ namespace GameKeeper
         }
     }
 
-    bool GateClientComponent::SendToClient(long long sockId, const c2s::Rpc_Response *message)
+    bool GateClientComponent::SendToClient(long long sockId, std::shared_ptr<c2s::Rpc_Response> message)
     {
         auto proxyClient = this->GetGateClient(sockId);
         if(proxyClient == nullptr)

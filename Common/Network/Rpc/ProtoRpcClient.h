@@ -10,18 +10,18 @@ namespace GameKeeper
 	class ProtoRpcClient : public RpcClient
 	{
 	public:
-		explicit ProtoRpcClient(RpcClientComponent *component, SocketProxy * socket, SocketType type);
+		explicit ProtoRpcClient(RpcClientComponent *component, std::shared_ptr<SocketProxy> socket, SocketType type);
 		~ProtoRpcClient() override = default;
 	public:
 		void StartClose();
-        bool SendToServer(const com::Rpc_Request * message);
-        bool SendToServer(const com::Rpc_Response * message);
+        bool SendToServer(std::shared_ptr<com::Rpc_Request> message);
+        bool SendToServer(std::shared_ptr<com::Rpc_Response> message);
 	protected:
         void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
-        void OnSendData(XCode code, const Message *) final;
 		XCode OnRequest(const char * buffer, size_t size)final;
 		XCode OnResponse(const char * buffer, size_t size)final;
+        void OnSendData(XCode code, std::shared_ptr<Message> ) final;
     private:
 
         RpcClientComponent * mTcpComponent;

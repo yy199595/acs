@@ -25,13 +25,13 @@ namespace GameKeeper
         std::shared_ptr<T> GetData(size_t index = 0);
     public:
         int GetTimeout() final { return this->mTimeout;}
-        void OnResponse(const com::Rpc_Response * response) final;
         long long GetRpcId() final { return mTaskSource.GetTaskId();}
+        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
     private:
         XCode mCode;
         int mTimeout;
         RpcComponent * mRpcComponent;
-        TaskSource<s2s::MysqlResponse *> mTaskSource;
+        TaskSource<std::shared_ptr<s2s::MysqlResponse>> mTaskSource;
     };
 
     template<typename T>

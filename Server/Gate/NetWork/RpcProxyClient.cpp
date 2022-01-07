@@ -11,7 +11,7 @@
 #include"Component/GateClientComponent.h"
 namespace GameKeeper
 {
-    RpcProxyClient::RpcProxyClient(SocketProxy * socket, SocketType type,
+    RpcProxyClient::RpcProxyClient(std::shared_ptr<SocketProxy> socket, SocketType type,
                                    GateClientComponent *component)
         : RpcClient(socket, type), mProxyComponent(component)
     {
@@ -26,10 +26,9 @@ namespace GameKeeper
 
     XCode RpcProxyClient::OnRequest(const char *buffer, size_t size)
     {
-        auto request = new c2s::Rpc_Request();
+        std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
         if (!request->ParseFromArray(buffer, (int)size))
         {
-            delete request;
             return XCode::ParseRequestDataError;
         }
         this->mCallCount++;
@@ -64,7 +63,7 @@ namespace GameKeeper
     }
 
 
-    bool RpcProxyClient::SendToClient(const c2s::Rpc_Request *message)
+    bool RpcProxyClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
     {
         if(!this->IsOpen())
         {
@@ -79,7 +78,7 @@ namespace GameKeeper
         return true;
     }
 
-    bool RpcProxyClient::SendToClient(const c2s::Rpc_Response *message)
+    bool RpcProxyClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
     {
         if(!this->IsOpen())
         {
@@ -94,7 +93,7 @@ namespace GameKeeper
         return true;
     }
 
-    void RpcProxyClient::OnSendData(XCode code, const Message * message)
+    void RpcProxyClient::OnSendData(XCode code, std::shared_ptr<Message> message)
     {
 #ifdef __DEBUG__
         if(code != XCode::Successful)
@@ -104,6 +103,5 @@ namespace GameKeeper
             std::cout << "send message to client error : " << json << std::endl;
         }
 #endif
-        delete message;
     }
 }

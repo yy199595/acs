@@ -59,7 +59,7 @@ namespace GameKeeper
         }
         if(!rpcClient->IsOpen())
         {
-            this->mSocketId = rpcClient->GetSocketProxy().GetSocketId();
+            this->mSocketId = rpcClient->GetSocketProxy()->GetSocketId();
             auto method = NewMethodProxy(&RpcNode::OnConnectAfter, this);
             rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
         }
@@ -70,7 +70,7 @@ namespace GameKeeper
         while(!this->mWaitSendQueue.empty())
         {
             auto message  = this->mWaitSendQueue.front();
-            if(!this->mRpcClientComponent->SendByAddress(this->mSocketId, message))
+            if(!this->mRpcClientComponent->Send(this->mSocketId, message))
             {
                 break;
             }
@@ -104,16 +104,16 @@ namespace GameKeeper
         }
     }
 
-	com::Rpc_Request * RpcNode::NewRequest(const std::string & method)
+	std::shared_ptr<com::Rpc_Request> RpcNode::NewRequest(const std::string & method)
 	{
 		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
 		if (config == nullptr)
 		{
 			return nullptr;
 		}
-        auto request = new com::Rpc_Request();
+        std::shared_ptr<com::Rpc_Request> request(new com::Rpc_Request());
 		request->set_methodid(config->MethodId);
-        if(!this->mRpcClientComponent->SendByAddress(this->mSocketId, request))
+        if(!this->mRpcClientComponent->Send(this->mSocketId, request))
         {
             this->ConnectToNode();
             this->mWaitSendQueue.push(request);

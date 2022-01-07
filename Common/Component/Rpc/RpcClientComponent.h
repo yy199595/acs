@@ -16,13 +16,13 @@ namespace GameKeeper
 		~RpcClientComponent() override = default;
 	public:
         void StartClose(long long id) final;
-        void OnRequest(com::Rpc_Request * request) final;
-        void OnResponse(com::Rpc_Response * response) final;
         void OnConnectAfter(long long id, XCode code) final;
         void OnCloseSocket(long long socketId, XCode code) final;
+        void OnRequest(std::shared_ptr<com::Rpc_Request> request) final;
+        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
 
 	protected:
-		void OnListen(SocketProxy * socket) final;
+		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	public:
 		ProtoRpcClient * GetRpcSession(long long id);
         ProtoRpcClient * NewSession(const std::string &name);
@@ -33,8 +33,8 @@ namespace GameKeeper
 
 	public:
 		bool CloseSession(long long id);
-        bool SendByAddress(long long id, com::Rpc_Request * message);
-		bool SendByAddress(long long id, com::Rpc_Response * message);
+        bool Send(long long id, std::shared_ptr<com::Rpc_Request> message);
+		bool Send(long long id, std::shared_ptr<com::Rpc_Response> message);
 	private:
 		ProtoRpcClient *GetSession(long long id);
 	private:

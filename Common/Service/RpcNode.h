@@ -26,7 +26,7 @@ namespace GameKeeper
 
         const s2s::NodeInfo & GetNodeInfo() const { return this->mNodeInfo; }
 
-        com::Rpc_Request * NewRequest(const std::string & method);
+        std::shared_ptr<com::Rpc_Request> NewRequest(const std::string & method);
     public:
         void Destory();
 
@@ -58,7 +58,7 @@ namespace GameKeeper
         class RpcComponent * mRpcComponent;
         std::set<std::string> mServiceArray;//服务列表
         class RpcConfigComponent *mRpcConfigComponent;
-        std::queue<com::Rpc_Request *> mWaitSendQueue;
         class RpcClientComponent * mRpcClientComponent;
+        std::queue<std::shared_ptr<com::Rpc_Request>> mWaitSendQueue;
     };
 }// namespace GameKeeper

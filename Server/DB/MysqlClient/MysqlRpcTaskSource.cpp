@@ -16,10 +16,10 @@ namespace GameKeeper
         return response->datas_size();
     }
 
-    void MysqlRpcTaskSource::OnResponse(const com::Rpc_Response * response)
+    void MysqlRpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
         this->mCode = XCode::CallTimeout;
-        s2s::MysqlResponse * data = nullptr;
+        std::shared_ptr<s2s::MysqlResponse> data;
         if(response != nullptr)
         {
             this->mCode = (XCode)response->code();
@@ -27,8 +27,8 @@ namespace GameKeeper
             {
                 if(response->data().Is<s2s::MysqlResponse>())
                 {
-                    data = new s2s::MysqlResponse();
-                    response->data().UnpackTo(data);
+                    data = std::shared_ptr<s2s::MysqlResponse>(new s2s::MysqlResponse());
+                    response->data().UnpackTo(data.get());
                 }
             }
         }

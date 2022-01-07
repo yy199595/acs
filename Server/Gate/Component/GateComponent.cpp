@@ -33,7 +33,7 @@ namespace GameKeeper
         return true;
     }
 
-    XCode GateComponent::OnRequest(const c2s::Rpc_Request *request)
+    XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
     {
         auto config = this->mRpcConfigComponent->GetProtocolConfig(request->methodname());
         if (config == nullptr) {
@@ -70,7 +70,7 @@ namespace GameKeeper
         return XCode::Successful;
     }
 
-    XCode GateComponent::OnResponse(long long sockId, const c2s::Rpc_Response *response)
+    XCode GateComponent::OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response)
     {
 #ifdef __DEBUG__
         std::string json;

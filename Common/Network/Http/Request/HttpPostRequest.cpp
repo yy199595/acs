@@ -18,6 +18,8 @@ namespace GameKeeper
     {
         os << "POST " << this->GetPath() << " " << HttpVersion << "\r\n";
         os << "Host: " << this->GetHost() << ":" << this->GetPort() << "\r\n";
+        os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
+        os << "Content-Length: " << this->mWriteContent.size()<< "\r\n";
         os << "Accept: */*\r\n";
         os << "Connection: close\r\n\r\n";
         os.write(this->mWriteContent.c_str(), this->mWriteContent.size());

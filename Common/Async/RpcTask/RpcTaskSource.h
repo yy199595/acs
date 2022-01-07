@@ -18,7 +18,7 @@ namespace GameKeeper
     public:
         virtual int GetTimeout() = 0;
         virtual long long GetRpcId() = 0;
-        virtual void OnResponse(const com::Rpc_Response * response) = 0;
+        virtual void OnResponse(std::shared_ptr<com::Rpc_Response> response) = 0;
     };
 
     class LuaRpcTaskSource : public IRpcTask
@@ -28,7 +28,7 @@ namespace GameKeeper
     public:
         int GetTimeout() final { return 0;}
         long long GetRpcId() final { return this->mRpcId;}
-        void OnResponse(const Rpc_Response *response) final;
+        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
     private:
         int ref;
         long long mRpcId;
@@ -44,7 +44,7 @@ namespace GameKeeper
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
         int GetTimeout() final { return this->mTimeout;}
-        void OnResponse(const com::Rpc_Response *response) final;
+        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
     public:
         XCode GetCode();
         template<typename T>
@@ -52,12 +52,12 @@ namespace GameKeeper
     private:
         int mTimeout;
         RpcComponent * mRpcComponent;
-        TaskSource<com::Rpc_Response *> mTaskSource;
+        TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
     template<typename T>
     std::shared_ptr<T> RpcTaskSource::GetData()
     {
-        const com::Rpc_Response * response = mTaskSource.Await();
+        auto response = mTaskSource.Await();
         if(response == nullptr || !response->has_data())
         {
             return nullptr;

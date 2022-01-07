@@ -77,9 +77,11 @@ namespace GameKeeper
             Component *component = this->gameObject->GetComponentByName(config.Handler);
             if (auto handler = dynamic_cast<ISocketListen *>(component))
             {
-                assert(listener->StartListen(handler));
-                const ListenConfig &config = listener->GetConfig();
-                LOG_DEBUG(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
+                if(listener->StartListen(handler)->Await())
+                {
+                    const ListenConfig &config = listener->GetConfig();
+                    LOG_DEBUG(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
+                }
             }
         }
     }

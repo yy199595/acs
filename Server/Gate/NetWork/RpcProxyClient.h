@@ -13,21 +13,21 @@ namespace GameKeeper
     class RpcProxyClient : public RpcClient
     {
     public:
-        RpcProxyClient(SocketProxy * socket, SocketType type, GateClientComponent * component);
+        RpcProxyClient(std::shared_ptr<SocketProxy> socket, SocketType type, GateClientComponent * component);
         ~RpcProxyClient() final =default;
 
     public:
         void StartClose();
         unsigned int GetQps() const { return this->mQps;}
-        bool SendToClient(const c2s::Rpc_Request * message);
-        bool SendToClient(const c2s::Rpc_Response * message);
+        bool SendToClient(std::shared_ptr<c2s::Rpc_Request> message);
+        bool SendToClient(std::shared_ptr<c2s::Rpc_Response> message);
         unsigned int GetCallCount() const { return this->mCallCount;}
     protected:
         void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
-        void OnSendData(XCode code, const Message *) final;
         XCode OnRequest(const char *buffer, size_t size) final;
         XCode OnResponse(const char *buffer, size_t size) final;
+        void OnSendData(XCode code,  std::shared_ptr<Message>) final;
     private:
         unsigned int mQps;
         unsigned int mCallCount;

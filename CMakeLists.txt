@@ -58,4 +58,4 @@ macro(source_group_by_dir dir source_files)
 endmacro(source_group_by_dir)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Server)
-add_subdirectory(${PROJECT_SOURCE_DIR}/Client)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/Client)

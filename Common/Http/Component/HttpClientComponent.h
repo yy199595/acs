@@ -3,7 +3,7 @@
 #include"Component/Component.h"
 namespace GameKeeper
 {
-	class HttpSessionBase;
+	class HttpStringClient;
     class HttpReadContent;
     class HttpWriteContent;
     class HttpRespSession;
@@ -26,7 +26,7 @@ namespace GameKeeper
 
     public:
 
-        void OnListen(SocketProxy *socket) final;
+        void OnListen(std::shared_ptr<SocketProxy> socket) final;
 
 		void OnRequest(HttpRespSession * remoteSession);
 

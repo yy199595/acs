@@ -1,4 +1,5 @@
 #pragma once
+#include"Async/TaskSource.h"
 #include<Define/CommonTypeDef.h>
 #include<Thread/TaskThread.h>
 namespace GameKeeper
@@ -20,13 +21,13 @@ namespace GameKeeper
 		NetworkListener(NetWorkThread & thread, ListenConfig & config);
 		~NetworkListener();
 	public:
-		bool StartListen(ISocketListen * handler);
-		bool IsOpen() { return this->mBindAcceptor->is_open(); }
+        bool IsOpen() { return this->mBindAcceptor->is_open(); }
         const ListenConfig & GetConfig() const { return this->mConfig;}
+		std::shared_ptr<TaskSource<bool>> StartListen(ISocketListen * handler);
 	private:
-        void InitListener();
 		void ListenConnect();
-	private:
+        void InitListener(std::shared_ptr<TaskSource<bool>> taskSource);
+    private:
         bool mIsListen;
         unsigned int mCorId;
         ListenConfig mConfig;

@@ -4,7 +4,7 @@
 #include<iostream>
 namespace GameKeeper
 {
-    RpcClient::RpcClient(SocketProxy *socket, SocketType type)
+    RpcClient::RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type)
             : mType(type), mSocketProxy(socket),
               mContext(socket->GetContext()),
               mNetWorkThread(socket->GetThread())
@@ -29,7 +29,7 @@ namespace GameKeeper
         this->mSocketId = 0;
         this->mLastOperTime = 0;
         this->mSocketProxy->Close();
-        delete this->mSocketProxy;
+        this->mSocketProxy = nullptr;
     }
 
     void RpcClient::StartReceive()
@@ -107,9 +107,8 @@ namespace GameKeeper
             return;
         }
         nSocket.async_read_some(asio::buffer(messageBuffer, size),
-                                [this, messageBuffer, type]
-                                        (const asio::error_code &error_code, const std::size_t size)
-                                {
+                                [this, messageBuffer, type](const asio::error_code &error_code,
+                                                            const std::size_t size) {
                                     XCode code = XCode::Successful;
                                     if (error_code)
                                     {
@@ -180,7 +179,7 @@ namespace GameKeeper
         });
     }
 
-    void RpcClient::SendData(char type, const Message *message)
+    void RpcClient::SendData(char type, std::shared_ptr<Message> message)
     {
         if (!this->mSocketProxy->IsOpen() || message == nullptr)
         {

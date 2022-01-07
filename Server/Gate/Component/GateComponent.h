@@ -19,8 +19,8 @@ namespace GameKeeper
         bool Awake() final;
         bool LateAwake() final;
     public:
-        XCode OnRequest(const c2s::Rpc_Request *request) final;
-        XCode OnResponse(long long sockId, const c2s::Rpc_Response *response) final;
+        XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
+        XCode OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response) final;
     private:
         std::string mProtoName;
         class RpcComponent * mRpcComponent;

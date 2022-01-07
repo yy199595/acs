@@ -21,7 +21,7 @@ namespace GameKeeper
 
         virtual const std::string & GetServiceName() { return this->GetTypeName();}
 
-        virtual com::Rpc_Response *Invoke(const std::string &method, const com::Rpc_Request *request);
+        virtual std::shared_ptr<com::Rpc_Response> Invoke(const std::string &method, std::shared_ptr<com::Rpc_Request> request);
 
     public:
         bool AddMethod(ServiceMethod *method);

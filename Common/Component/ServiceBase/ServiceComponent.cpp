@@ -33,9 +33,8 @@ namespace GameKeeper
         return true;
     }
 
-    com::Rpc_Response *ServiceComponent::Invoke(const string &method, const com::Rpc_Request * request)
+    std::shared_ptr<com::Rpc_Response> ServiceComponent::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
-        LocalObject<com::Rpc_Request> local(request);
         auto iter = this->mMethodMap.find(method);
         if (iter == this->mMethodMap.end())
         {
@@ -45,11 +44,10 @@ namespace GameKeeper
         ElapsedTimer elapsedTimer;
 #endif
         ServiceMethod *serviceMethod = iter->second;
-        com::Rpc_Response *response = new com::Rpc_Response();
+        std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
         XCode code = serviceMethod->Invoke(*request, *response);
         if (request->rpcid() == 0)
         {
-            delete response;
             return nullptr;
         }
         response->set_code((int) code);

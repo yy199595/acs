@@ -16,17 +16,17 @@ namespace GameKeeper
         ~GateClientComponent() final= default;
     public:
         void StartClose(long long id) final;
-        void OnRequest(c2s::Rpc_Request * request) final;
         void OnCloseSocket(long long id, XCode code) final;
-        void OnResponse(c2s::Rpc_Response * response) final { }
         void OnConnectAfter(long long id, XCode code) final { }
+        void OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
+        void OnResponse(std::shared_ptr<c2s::Rpc_Response> response) final { }
     public:
         RpcProxyClient * GetGateClient(long long sockId);
-        bool SendToClient(long long sockId, const c2s::Rpc_Response * message);
+        bool SendToClient(long long sockId, std::shared_ptr<c2s::Rpc_Response> message);
     protected:
         bool Awake() final;
         bool LateAwake() final;
-        void OnListen(SocketProxy *socket) final;
+        void OnListen(std::shared_ptr<SocketProxy> socket) final;
     private:
         void CheckPlayerLogout(long long sockId);
     private:

@@ -67,39 +67,28 @@ namespace GameKeeper
 	class IRpc
 	{
 	public:
-        virtual void OnRequest(T1 * t1) = 0;
-        virtual void OnResponse(T2 * t2) = 0;
         virtual void StartClose(long long id) = 0;
+        virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
+        virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
         virtual void OnCloseSocket(long long id, XCode code) = 0;
         virtual void OnConnectAfter(long long id, XCode code) = 0;
-        virtual void OnSendFailure(long long id, const google::protobuf::Message * message)
-        {
-            delete message;
-        };
+        virtual void OnSendFailure(long long id, std::shared_ptr<google::protobuf::Message> message) { }
     };
 
     template<typename T1, typename T2>
     class IProtoRpc
     {
     public:
-        virtual XCode OnRequest(const T1 * request) = 0;
-        virtual XCode OnResponse(const T2 * response) = 0;
+        virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
+        virtual XCode OnResponse(std::shared_ptr<T2> response) = 0;
     };
 
     template<typename T1, typename T2>
     class IClientRpc
     {
     public:
-        virtual XCode OnRequest(const T1 * request) = 0;
-        virtual XCode OnResponse(long long sockId, const T2 * response) = 0;
-    };
-
-    template<typename T1, typename T2>
-    class IClientProtoRpc
-    {
-    public:
-        virtual XCode OnRequest(const T1 * request) = 0;
-        virtual XCode OnResponse(long long sockId, const T2 * response) = 0;
+        virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
+        virtual XCode OnResponse(long long sockId, const std::shared_ptr<T2> response) = 0;
     };
 
     class IProtoResponse
@@ -132,6 +121,6 @@ namespace GameKeeper
 	class ISocketListen
 	{
 	public:
-		virtual void OnListen(SocketProxy * socket) = 0;
+		virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
 	};
 }
