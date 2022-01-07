@@ -32,7 +32,7 @@ namespace GameKeeper
         void AddRpcTask(std::shared_ptr<IRpcTask> task);
 #ifdef __DEBUG__
         void AddRpcInfo(long long rpcId, int methodId);
-        bool GetRpcInfo(long long rpcId, int & methodId, long long & time) const;
+        bool GetRpcInfo(long long rpcId, int & methodId, long long & time);
 #endif
     protected:
         bool Awake() final;

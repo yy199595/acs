@@ -15,8 +15,8 @@ namespace GameKeeper
     class MysqlRpcTaskSource : public IRpcTask
     {
     public:
-        explicit MysqlRpcTaskSource(int timeout = 0)
-            : mTimeout(timeout) { }
+        explicit MysqlRpcTaskSource(float timeout = 5.0f)
+            : mTimeout(timeout * 1000) { }
         ~MysqlRpcTaskSource() = default;
     public:
         XCode GetCode();
@@ -29,7 +29,7 @@ namespace GameKeeper
         void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
     private:
         XCode mCode;
-        int mTimeout;
+        const int mTimeout;
         RpcComponent * mRpcComponent;
         TaskSource<std::shared_ptr<s2s::MysqlResponse>> mTaskSource;
     };
@@ -38,8 +38,7 @@ namespace GameKeeper
     std::shared_ptr<T> MysqlRpcTaskSource::GetData(size_t index)
     {
         auto response = this->mTaskSource.Await();
-        if(response == nullptr || index < 0 || response->datas_size()
-           || index >= response->datas_size())
+        if(response == nullptr || index < 0 || index >= response->datas_size())
         {
             return nullptr;
         }

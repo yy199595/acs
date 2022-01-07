@@ -40,7 +40,7 @@ namespace GameKeeper
     class RpcTaskSource : public IRpcTask
     {
     public:
-        RpcTaskSource(int timeout = 0) : mTimeout(timeout) { }
+        RpcTaskSource(float timeout = 5.0f) : mTimeout(timeout * 1000) { }
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
         int GetTimeout() final { return this->mTimeout;}
@@ -50,7 +50,7 @@ namespace GameKeeper
         template<typename T>
         std::shared_ptr<T> GetData();
     private:
-        int mTimeout;
+        const int mTimeout;
         RpcComponent * mRpcComponent;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };

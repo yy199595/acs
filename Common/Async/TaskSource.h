@@ -49,44 +49,13 @@ namespace GameKeeper
 namespace GameKeeper
 {
     template<typename T>
-    class TaskSource<T *> : public TaskSourceBase
-    {
-    public:
-        TaskSource();
-        ~TaskSource();
-    public:
-        const T * Await();
-        bool SetResult(const T * data);
-    private:
-        const T * mData;
-    };
+    class TaskSource<T *> { };
     template<typename T>
-    TaskSource<T*>::TaskSource()
-    {
-        this->mData = nullptr;
-    }
+    class TaskSource<T &> { };
     template<typename T>
-    TaskSource<T*>::~TaskSource()
-    {
-        delete this->mData;
-    }
-
+    class TaskSource<const T *> { };
     template<typename T>
-    const T * TaskSource<T *>::Await()
-    {
-        this->YieldTask();
-        return this->mData;
-    }
-    template<typename T>
-    bool TaskSource<T*>::SetResult(const T * data)
-    {
-        if(this->ResumeTask())
-        {
-            this->mData = data;
-            return true;
-        }
-        return false;
-    }
+    class TaskSource<const T &> { };
 }
 
 namespace GameKeeper

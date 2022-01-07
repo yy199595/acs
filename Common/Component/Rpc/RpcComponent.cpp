@@ -102,7 +102,7 @@ namespace GameKeeper
         this->mRpcInfoMap.emplace(rpcId, taskInfo);
     }
 
-    bool RpcComponent::GetRpcInfo(long long int rpcId, int &methodId, long long int &time) const
+    bool RpcComponent::GetRpcInfo(long long int rpcId, int &methodId, long long int &time)
     {
         auto iter = this->mRpcInfoMap.find(rpcId);
         if(iter == this->mRpcInfoMap.end())
@@ -111,6 +111,7 @@ namespace GameKeeper
         }
         methodId = iter->second.MethodId;
         time = Helper::Time::GetMilTimestamp() - iter->second.Time;
+        this->mRpcInfoMap.erase(iter);
         return true;
     }
 #endif
@@ -124,5 +125,14 @@ namespace GameKeeper
             this->mRpcTasks.erase(iter);
             rpcTask->OnResponse(nullptr);
         }
+#ifdef __DEBUG__
+        int methodId = 0;
+        long long costTime = 0;
+        if(this->GetRpcInfo(rpcId, methodId, costTime))
+        {
+            auto config = this->mPpcConfigComponent->GetProtocolConfig(methodId);
+            LOG_ERROR("call " << config->Service << "." << config->Method << " time out");
+        }
+#endif
     }
 }// namespace GameKeeper

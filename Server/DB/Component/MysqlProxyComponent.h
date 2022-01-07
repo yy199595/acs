@@ -24,7 +24,6 @@ namespace GameKeeper
         void OnDelRpcNode(class RpcNode *node) final;
 	private:
 		void AddUserData();
-		void SortUserData();
     public:
         XCode Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 

@@ -29,6 +29,7 @@ namespace GameKeeper
 
     void MysqlProxyComponent::OnLoadData()
     {
+        this->AddUserData();
 //		ElapsedTimer timer;
 //		auto group = this->mCorComponent->NewCoroutineGroup();
 //		for (int index = 0; index < 2; index++)
@@ -69,18 +70,26 @@ namespace GameKeeper
             userAccountData.set_token(Helper::String::CreateNewToken());
             userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
 
-            this->Add(userAccountData);
+            std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
+            if(this->Add(userAccountData, taskSource) == XCode::Successful)
+            {
+                LOG_ERROR("add data successful " << index);
+            }
         }
-	}
 
-	void MysqlProxyComponent::SortUserData()
-	{
-		for (int index = 0; index < 100; index++)
-		{
-			int count = Helper::Math::Random(3, 20);
-            std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
-			XCode code = this->Sort("tb_player_account", "UserID", count, false, rpcTaskSource);
-		}
+        std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
+        XCode code = this->Sort("tb_player_account", "UserID", 10, false, rpcTaskSource);
+        if(code == XCode::Successful)
+        {
+            size_t size = rpcTaskSource->GetDataSize();
+            for(size_t index = 0; index < size; index++)
+            {
+                std::string json;
+                auto data = rpcTaskSource->GetData<db::UserAccountData>(index);
+                Helper::Proto::GetJson(*data, json);
+                LOG_WARN(json);
+            }
+        }
 	}
 
     XCode MysqlProxyComponent::Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
@@ -159,6 +168,7 @@ namespace GameKeeper
         this->mAnyOperRequest.Clear();
         this->mAnyOperRequest.set_sql(sql);
         this->mAnyOperRequest.set_tab(tab);
+        requestMessage->mutable_data()->PackFrom(this->mAnyOperRequest);
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
