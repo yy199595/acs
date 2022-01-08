@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <XCode/XCode.h>
 #include <Component/Component.h>
-#include <Other/ProtocolConfig.h>
+#include <Other/ProtoConfig.h>
 #include <shared_mutex>
 namespace GameKeeper
 {
@@ -29,8 +29,8 @@ namespace GameKeeper
         bool GetMethods(const std::string & service, std::vector<std::string> & methods);
     public:
         const CodeConfig * GetCodeConfig(int code) const;
-        const ProtocolConfig *GetProtocolConfig(int methodId) const;
-        const ProtocolConfig *GetProtocolConfig(const std::string & fullName) const;
+        const ProtoConfig *GetProtocolConfig(int methodId) const;
+        const ProtoConfig *GetProtocolConfig(const std::string & fullName) const;
 
 #ifdef __DEBUG__
         void DebugCode(XCode code);
@@ -42,9 +42,9 @@ namespace GameKeeper
         std::mutex mLock;
         std::string mConfigFileMd5;
         std::unordered_map<int, CodeConfig> mCodeDescMap;
-        std::unordered_map<int, ProtocolConfig> mProtocolIdMap;
-        std::unordered_map<std::string, ProtocolConfig> mProtocolNameMap;
-		std::unordered_map<std::string, std::vector<ProtocolConfig>> mServiceMap;
+        std::unordered_map<int, ProtoConfig> mProtocolIdMap;
+        std::unordered_map<std::string, ProtoConfig> mProtocolNameMap;
+		std::unordered_map<std::string, std::vector<ProtoConfig>> mServiceMap;
 
     };
 

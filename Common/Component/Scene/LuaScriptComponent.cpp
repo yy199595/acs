@@ -8,7 +8,7 @@
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
-
+#include"Async/LuaTaskSource.h"
 #include <Component/ServiceBase/LuaServiceComponent.h>
 namespace GameKeeper
 {
@@ -16,16 +16,17 @@ namespace GameKeeper
     {
         this->mLuaEnv = luaL_newstate();
         luaL_openlibs(mLuaEnv);
+
+        this->PushClassToLua();
+        this->RegisterExtension();
+        LOG_CHECK_RET_FALSE(this->LoadAllFile());
         return true;
     }
 
     bool LuaScriptComponent::LateAwake()
     {
-        this->PushClassToLua();
-        this->RegisterExtension();
-        this->OnPushGlobalObject();
-        LOG_CHECK_RET_FALSE(this->LoadAllFile());
 
+        this->OnPushGlobalObject();
         if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
         {
             if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
@@ -187,6 +188,9 @@ namespace GameKeeper
 
     void LuaScriptComponent::PushClassToLua()
     {
+        ClassProxyHelper::BeginRegister<LuaTaskSource>(this->mLuaEnv, "LuaTaskSource");
+        ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaTaskSource::SetResult);
+
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
         ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetDelaTime", &App::GetDelaTime);     
 

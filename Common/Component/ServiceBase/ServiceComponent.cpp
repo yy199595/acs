@@ -23,6 +23,18 @@ namespace GameKeeper
             return false;
         }
 
+        if(method->IsLuaMethod())
+        {
+            auto iter = this->mLuaMethodMap.find(name);
+            if(iter != this->mLuaMethodMap.end())
+            {
+                delete iter->second;
+                this->mLuaMethodMap.erase(iter);
+            }
+            this->mLuaMethodMap.emplace(name, method);
+            return true;
+        }
+
         auto iter = this->mMethodMap.find(name);
         if (iter != this->mMethodMap.end())
         {
@@ -33,17 +45,27 @@ namespace GameKeeper
         return true;
     }
 
+    ServiceMethod *ServiceComponent::GetMethod(const std::string &name)
+    {
+        auto iter = this->mLuaMethodMap.find(name);
+        if(iter != this->mLuaMethodMap.end())
+        {
+            return iter->second;
+        }
+        auto iter1 = this->mMethodMap.find(name);
+        return iter != this->mMethodMap.end() ? iter->second : nullptr;
+    }
+
     std::shared_ptr<com::Rpc_Response> ServiceComponent::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
-        auto iter = this->mMethodMap.find(method);
-        if (iter == this->mMethodMap.end())
+        ServiceMethod *serviceMethod = this->GetMethod(method);
+        if(serviceMethod == nullptr)
         {
             return nullptr;
         }
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
-        ServiceMethod *serviceMethod = iter->second;
         std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
         XCode code = serviceMethod->Invoke(*request, *response);
         if (request->rpcid() == 0)

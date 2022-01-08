@@ -21,7 +21,7 @@ namespace GameKeeper
 
         virtual const std::string & GetServiceName() { return this->GetTypeName();}
 
-        virtual std::shared_ptr<com::Rpc_Response> Invoke(const std::string &method, std::shared_ptr<com::Rpc_Request> request);
+        std::shared_ptr<com::Rpc_Response> Invoke(const std::string &method, std::shared_ptr<com::Rpc_Request> request);
 
     public:
         bool AddMethod(ServiceMethod *method);
@@ -80,8 +80,12 @@ namespace GameKeeper
         }
 
     private:
+        ServiceMethod * GetMethod(const std::string & name);
+
+    private:
         long long mCurSocketId;
         std::unordered_map<std::string, ServiceMethod *> mMethodMap;
+        std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
     };
 
     inline std::string GetFunctionName(const std::string func)

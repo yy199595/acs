@@ -43,7 +43,7 @@ namespace GameKeeper
             LOG_CHECK_RET_FALSE(jsonValue.IsObject());
             const std::string service = iter1->name.GetString();
 
-            std::vector<ProtocolConfig> methods;
+            std::vector<ProtoConfig> methods;
             auto iter2 = jsonValue.MemberBegin();
             for (; iter2 != jsonValue.MemberEnd(); iter2++)
             {
@@ -51,7 +51,7 @@ namespace GameKeeper
                 {
                     continue;
                 }
-                ProtocolConfig protocolConfig;
+                ProtoConfig protocolConfig;
                 protocolConfig.Timeout = 0;
                 protocolConfig.Service = service;
                 protocolConfig.Method = iter2->name.GetString();
@@ -123,7 +123,7 @@ namespace GameKeeper
         return true;
     }
 
-    const ProtocolConfig *RpcConfigComponent::GetProtocolConfig(int methodId) const
+    const ProtoConfig *RpcConfigComponent::GetProtocolConfig(int methodId) const
     {
         auto iter = this->mProtocolIdMap.find(methodId);
         return iter != this->mProtocolIdMap.end() ? &iter->second : nullptr;
@@ -195,14 +195,14 @@ namespace GameKeeper
 		{
 			return false;
 		}
-		for (const ProtocolConfig & config : iter->second)
+		for (const ProtoConfig & config : iter->second)
 		{
 			methods.push_back(config.Method);
 		}
 		return true;
 	}
 
-    const ProtocolConfig * RpcConfigComponent::GetProtocolConfig(const std::string &fullName) const
+    const ProtoConfig * RpcConfigComponent::GetProtocolConfig(const std::string &fullName) const
     {
         auto iter = this->mProtocolNameMap.find(fullName);
         return iter != this->mProtocolNameMap.end() ? &iter->second : nullptr;

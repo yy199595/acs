@@ -9,7 +9,7 @@
 #include"Http/Request/HttpPostRequest.h"
 #include "Method/HttpServiceMethod.h"
 #include "Http/Service/HttpServiceComponent.h"
-#include "Other/ProtocolConfig.h"
+#include "Other/ProtoConfig.h"
 #include"Other/ElapsedTimer.h"
 #include"Network/Http/HttpReqSession.h"
 #include"Util/StringHelper.h"

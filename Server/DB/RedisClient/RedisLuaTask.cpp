@@ -8,7 +8,7 @@
 namespace GameKeeper
 {
     RedisLuaTask::RedisLuaTask(const std::string &cmd, lua_State *lua, int ref)
-        : RedisTaskBase(cmd)
+        : RedisTaskSource(cmd)
     {
         this->mLuaEnv = lua;
         this->mCoroutineRef = ref;

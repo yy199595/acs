@@ -4,11 +4,11 @@ struct lua_State;
 namespace GameKeeper
 {
 
-	class ProtocolConfig;
+	class ProtoConfig;
 	class LuaServiceMethod : public ServiceMethod
 	{
 	public:
-		LuaServiceMethod(const std::string & name, lua_State * lua, int idx);
+		LuaServiceMethod(const ProtoConfig * config, lua_State * lua, int idx);
 	public:
 		bool IsLuaMethod() final { return true; }
 		XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) final;
@@ -18,6 +18,7 @@ namespace GameKeeper
 		int mIdx;
 		lua_State * mLuaEnv;
 		std::string mMessageJson;
+        const ProtoConfig * mProtoConfig;
 		class LuaScriptComponent * mScriptComponent;
 		class RpcClientComponent * mRpcClientComponent;
 	};

@@ -33,9 +33,7 @@ namespace GameKeeper
 		}
 		this->mLuaEnv = luaEnv;
 		this->mIdx = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-		auto protocolComponent = App::Get().GetComponent<RpcConfigComponent>();
-
-        return protocolComponent->HasService(this->mServiceName);
+        return App::Get().GetComponent<RpcConfigComponent>()->HasService(this->mServiceName);
 	}
 
     bool LuaServiceComponent::Awake()
@@ -45,10 +43,6 @@ namespace GameKeeper
 		{
 			return false;
 		}
-        if (!lua_istable(this->mLuaEnv, -1))
-        {
-            return false;
-        }
         lua_getfield(this->mLuaEnv, -1, "Awake");
         if (lua_isfunction(this->mLuaEnv, -1))
         {
@@ -63,17 +57,32 @@ namespace GameKeeper
 
 	bool LuaServiceComponent::LateAwake()
     {
+        this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>();
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-        lua_getfield(this->mLuaEnv, -1, "Start");
+        lua_getfield(this->mLuaEnv, -1, "LateAwake");
         if (lua_isfunction(this->mLuaEnv, -1))
         {
-            return false;
+            lua_pcall(this->mLuaEnv, 0, 0, 0);
+            if (!lua_toboolean(this->mLuaEnv, -1))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void LuaServiceComponent::OnStart()
+    {
+        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
+        lua_getfield(this->mLuaEnv, -1, "OnStart");
+        if (lua_isfunction(this->mLuaEnv, -1))
+        {
+            return;
         }
         lua_State *coroutine = lua_newthread(this->mLuaEnv);
         lua_pushvalue(this->mLuaEnv, -2);
         lua_xmove(this->mLuaEnv, coroutine, 1);
         lua_resume(coroutine, this->mLuaEnv, 0);
-        return true;
     }
 
   //  XCode LuaServiceComponent::InvokeMethod(PacketMapper *messageData)

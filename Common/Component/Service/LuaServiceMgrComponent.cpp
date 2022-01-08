@@ -10,8 +10,7 @@ namespace GameKeeper
 
     bool LuaServiceMgrComponent::Awake()
     {
-        LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaScriptComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
+
         return true;
     }
 
@@ -22,11 +21,16 @@ namespace GameKeeper
 
 	bool LuaServiceMgrComponent::LateAwake()
 	{
-		string servicePath;
-		lua_State * lua = this->mLuaComponent->GetLuaEnv();
+        LuaScriptComponent * luaComponent = nullptr;
+        RpcConfigComponent * configComponent = nullptr;
+        LOG_CHECK_RET_FALSE(luaComponent = this->GetComponent<LuaScriptComponent>());
+        LOG_CHECK_RET_FALSE(configComponent = this->GetComponent<RpcConfigComponent>());
+
+
+		lua_State * lua = luaComponent->GetLuaEnv();
 
 		std::vector<std::string> services;
-		this->mRpcConfigComponent->GetServices(services);
+        configComponent->GetServices(services);
 
 		for (std::string & service : services)
 		{
@@ -36,7 +40,7 @@ namespace GameKeeper
 				continue;
 			}
 			std::vector<std::string> methods;
-			if (!this->mRpcConfigComponent->GetMethods(service, methods))
+			if (!configComponent->GetMethods(service, methods))
 			{
 				continue;
 			}
@@ -55,6 +59,7 @@ namespace GameKeeper
 					LOG_FATAL("Init lua service [" << service << "] failure");
 					return false;
 				}
+                luaSerivce->LateAwake();
 				localService = luaSerivce;
 			}
 
@@ -68,7 +73,9 @@ namespace GameKeeper
 					continue;
 				}
 				int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
-				localService->AddMethod(new LuaServiceMethod(method, lua, idx));
+                auto config = configComponent
+                        ->GetProtocolConfig(service + "." + method);
+				localService->AddMethod(new LuaServiceMethod(config, lua, idx));
 				LOG_INFO("add new lua service method : " << service << "." << method);
 			}
 		}

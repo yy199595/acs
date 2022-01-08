@@ -4,7 +4,7 @@
 
 namespace GameKeeper
 {
-    class ProtocolConfig
+    class ProtoConfig
     {
     public:
         int Timeout;

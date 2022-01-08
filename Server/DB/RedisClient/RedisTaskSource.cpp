@@ -1,32 +1,40 @@
-﻿#include "RedisTaskBase.h"
+﻿#include "RedisTaskSource.h"
 #include "Component/RedisComponent.h"
 #include <Core/App.h>
-
+#include"Scene/ThreadPoolComponent.h"
 #ifdef REDIS_SAVE_JSON
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
 {
 
-    RedisTaskBase::RedisTaskBase(const std::string &cmd)
+    RedisTaskSource::RedisTaskSource(const std::string &cmd)
     {
         this->mCommand.emplace_back(cmd);
         this->mStartTime = Helper::Time::GetMilTimestamp();
         this->mRedisComponent = App::Get().GetComponent<RedisComponent>();
     }
 
-    RedisTaskBase::~RedisTaskBase()
+    RedisTaskSource::~RedisTaskSource()
     {
         this->mCommand.clear();
     }
 
-    bool RedisTaskBase::Run()
+    std::shared_ptr<RedisResponse> RedisTaskSource::Await()
+    {
+        auto threadComponent =
+                App::Get().GetComponent<ThreadPoolComponent>();
+        threadComponent->StartTask(this);
+        return this->mTaskSource.Await();
+    }
+
+    bool RedisTaskSource::Run()
     {
         RedisSocket *redisSocket = this->mRedisComponent->GetRedisSocket();
         if (redisSocket == nullptr)
         {
             const std::string &err = "redis socket null";
-            this->mResponse = std::make_shared<RedisResponse>(RedisSocketIsNull, err);
+            this->mTaskSource.SetResult(std::make_shared<RedisResponse>(XCode::RedisSocketIsNull, err));
             return true;
         }
         size_t size = (int) this->mCommand.size();
@@ -54,30 +62,30 @@ namespace GameKeeper
         if (reply == nullptr)
         {
             const std::string err = "redis replay null";
-            this->mResponse = std::make_shared<RedisResponse>(RedisReplyIsNull, err);
+            this->mTaskSource.SetResult(std::make_shared<RedisResponse>(RedisReplyIsNull, err));
             return true;
         }
         if (reply->type == REDIS_REPLY_ERROR)
         {
             const std::string err(reply->str, reply->len);
-            this->mResponse = std::make_shared<RedisResponse>(RedisInvokeFailure, err);
+            this->mTaskSource.SetResult(std::make_shared<RedisResponse>(XCode::RedisInvokeFailure, err));
             return true;
         }
-        this->mResponse = std::make_shared<RedisResponse>(reply);
+        this->mTaskSource.SetResult(std::make_shared<RedisResponse>(reply));
         return true;
     }
 
-    void RedisTaskBase::AddCommandArgv(const std::string &argv)
+    void RedisTaskSource::AddCommandArgv(const std::string &argv)
     {
         this->mCommand.emplace_back(argv);
     }
 
-    void RedisTaskBase::AddCommandArgv(const char *str, const size_t size)
+    void RedisTaskSource::AddCommandArgv(const char *str, const size_t size)
     {
         this->mCommand.emplace_back(str, size);
     }
 
-    void RedisTaskBase::AddCommand(const Message &value)
+    void RedisTaskSource::AddCommand(const Message &value)
     {
 #ifdef REDIS_SAVE_JSON
         std::string json;

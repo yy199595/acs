@@ -1,15 +1,29 @@
 
 Service = {}
-function Service.OnResponse(method, response, message, id, json)
-    local request = nil
-    if type(json) == 'string' then
-        request = Json.ToObject(json)
+
+
+function Service.Call(func, id, json)
+    
+    if json ~= nil then
+        local request = Json.ToObject(json)
+        if request == nil then
+            return XCode.CallArgsError, ""
+        end
+        local code, response = func(id, request)
+        if code == XCode.Successful and response then
+            return code, Json.ToString(response)
+        end
+        return code or XCode.CallLuaFunctionFail, response or ""
     end
-    local code, res = method(id, request)
-    if code == XCode.Successful and res then
-        res = Json.ToString(res)
-    end
-    return response(message, code, res)
+    local code, response = func(id)
+
+    return func(id);
 end
 
-return Service
+function Service.CallAsync(func, taskSouce, id, json)
+
+    coroutine.start(function()
+        local code, response = Service.Call(func, id, json)
+        taskSouce:SetResult(code or XCode.CallLuaFunctionFail, responseJson)
+    end)
+end

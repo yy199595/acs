@@ -36,7 +36,7 @@ namespace GameKeeper
 	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
     {
         unsigned short methodId = request->methodid();
-        const ProtocolConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
+        const ProtoConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
         if (protocolConfig == nullptr)
         {
             return XCode::NotFoundRpcConfig;

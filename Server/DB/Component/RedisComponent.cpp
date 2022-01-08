@@ -1,22 +1,28 @@
 ﻿#include"RedisComponent.h"
-#include"Util/StringHelper.h"
-#include"Component/Scene/ThreadPoolComponent.h"
-#include"Coroutine/TaskComponent.h"
-#include"Script/ClassProxyHelper.h"
+
 #include"Core/App.h"
-#include"Other/ElapsedTimer.h"
+#include"Util/StringHelper.h"
+#include"Script/ClassProxyHelper.h"
+#include"Component/Scene/ThreadPoolComponent.h"
+
 namespace GameKeeper
 {
     bool RedisComponent::Awake()
     {
         this->mRedisPort = 0;
-        this->mCorComponent = nullptr;
-        this->mTaskComponent = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
-        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
         LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
         return true;
+    }
+
+    void RedisComponent::OnStart()
+    {
+        for (int index = 0; index < 10; index++)
+        {
+            long long num = this->AddCounter("UserIdCounter");
+            LOG_ERROR("number = " << num);
+        }
     }
 
     bool RedisComponent::CloseRedisSocket()
@@ -51,13 +57,10 @@ namespace GameKeeper
 
     bool RedisComponent::LateAwake()
     {
-
-        LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
-        LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
-
         int second = 3;
         App::Get().GetConfig().GetValue("Redis", "timeout", second);
-        const std::vector<TaskThread *> &threads = this->mTaskComponent->GetThreads();
+        auto threadComponent = this->GetComponent<ThreadPoolComponent>();
+        const std::vector<TaskThread *> &threads = threadComponent->GetThreads();
        
         for (TaskThread *taskThread: threads)
         {
@@ -97,18 +100,6 @@ namespace GameKeeper
             freeReplyObject(reply);
         }
         return pRedisContext;
-    }
-    
-    std::shared_ptr<RedisResponse> RedisComponent::StartTask(std::shared_ptr<RedisTaskProxy> redisTask)
-    {
-        this->mTaskComponent->StartTask(redisTask.get());
-        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
-        auto redisResponse = redisTask->GetResponse();
-        if(redisResponse->HasError())
-        {
-            LOG_ERROR(redisResponse->GetError());
-        }
-        return redisResponse;
     }
 
     long long RedisComponent::AddCounter(const string &key)

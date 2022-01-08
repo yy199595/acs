@@ -7,22 +7,26 @@
 #include<string>
 #include<queue>
 #include<google/protobuf/message.h>
+#include"Async/TaskSource.h"
 namespace GameKeeper
 {
     class RedisComponent;
 
     class QuertJsonWritre;
 
-    class RedisTaskBase : public TaskProxy
+    class RedisTaskSource : public TaskProxy
     {
     public:
-        explicit RedisTaskBase(const std::string &cmd);
-        ~RedisTaskBase() override;
+        explicit RedisTaskSource(const std::string &cmd);
+        ~RedisTaskSource() override;
     public:
         bool Run() final;//在线程池执行的任务
     public:
         template<typename... Args>
         void InitCommand(Args &&...args);
+
+        std::shared_ptr<RedisResponse> Await();
+
     private:
         //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
 
@@ -47,21 +51,21 @@ namespace GameKeeper
             this->Encode(std::forward<Args>(args)...);
         }
 
+
     public:
         void AddCommandArgv(const std::string &argv);
 
         void AddCommandArgv(const char *str, size_t size);
 
-    protected:
-        std::shared_ptr<RedisResponse> mResponse;
     private:
 		long long mStartTime;
         RedisComponent * mRedisComponent;
 		std::vector<std::string> mCommand;
+        TaskSource<std::shared_ptr<RedisResponse>> mTaskSource;
     };
 
     template<typename... Args>
-    inline void RedisTaskBase::InitCommand(Args &&...args)
+    inline void RedisTaskSource::InitCommand(Args &&...args)
     {
         this->Encode(std::forward<Args>(args)...);
     }

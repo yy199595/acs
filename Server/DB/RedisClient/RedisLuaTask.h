@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"RedisDefine.h"
-#include"RedisTaskBase.h"
+#include"RedisTaskSource.h"
 #include<Script/LuaInclude.h>
 
 #define RedisLuaArgvSize 10
@@ -9,7 +9,7 @@ namespace GameKeeper
 {
     class QuertJsonWritre;
 
-    class RedisLuaTask : public RedisTaskBase
+    class RedisLuaTask : public RedisTaskSource
     {
     public:
         RedisLuaTask(const std::string &cmd, lua_State *lua, int ref);

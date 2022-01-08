@@ -52,7 +52,7 @@ int SystemExtension::Call(lua_State *lua)
 		//packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2S_REQUEST, service, method);
 	}
 //
-//	const ProtocolConfig * config = packetMapper->GetProConfig();
+//	const ProtoConfig * config = packetMapper->GetProConfig();
 //	if (lua_istable(lua, index))
 //	{
 //		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
