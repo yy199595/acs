@@ -1,6 +1,10 @@
 ﻿{
-    "tb_player_account": {
-        "protobuf": "db.UserAccountData",
-        "keys":["Account", "UserID"]
+    "account":
+    {
+        "tb_player_account": 
+        {
+            "protobuf": "db.UserAccountData",
+            "keys":["Account", "UserID"]
+        }
     }
 }

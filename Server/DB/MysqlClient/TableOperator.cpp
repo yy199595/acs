@@ -5,7 +5,7 @@
 
 namespace GameKeeper
 {
-    TableOperator::TableOperator(GKMysqlSocket *socket, const std::string db, rapidjson::Document &doc)
+    TableOperator::TableOperator(GKMysqlSocket *socket, const std::string db, rapidjson::Value &doc)
             : mDocument(doc)
     {
         this->mDataBase = db;

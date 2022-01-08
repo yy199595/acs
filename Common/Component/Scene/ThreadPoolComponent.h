@@ -8,7 +8,7 @@ namespace GameKeeper
 {
     class TaskProxy;
 
-    class ThreadPoolComponent : public Component, public ISystemUpdate
+    class ThreadPoolComponent : public Component
     {
     public:
         ThreadPoolComponent() = default;
@@ -17,15 +17,10 @@ namespace GameKeeper
     public:
         bool Awake() final;
 
-
         bool LateAwake() final;
-
-        void OnSystemUpdate() final;
 
 		int GetPriority() final { return 0; }
     public:
-
-        void PushFinishTask(unsigned int taskId);
 
         bool StartTask(TaskProxy * taskAction);
 
@@ -38,9 +33,6 @@ namespace GameKeeper
 
 	public:	
 		NetWorkThread & AllocateNetThread();
-    private:
-        MultiThreadQueue<unsigned int> mFinishTaskQueue;                 //在其他线程完成的任务存储
-        std::unordered_map<unsigned int, TaskProxy *> mTaskMap;
     private:
         size_t mIndex;
         std::mutex mLock;

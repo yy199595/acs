@@ -46,15 +46,15 @@ namespace GameKeeper
     bool TaskComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
-        this->Start([this]() {
-            ElapsedTimer timer;
-            std::vector<TaskContext *> tasks;
-            for (int index = 0; index < 100; index++) {
-                tasks.push_back(this->Start(&TaskComponent::Test, this, index));
-            }
-            this->WhenAll(tasks);
-            LOG_ERROR("use time = " << timer.GetSecond() << "s");
-        });
+//        this->Start([this]() {
+//            ElapsedTimer timer;
+//            std::vector<TaskContext *> tasks;
+//            for (int index = 0; index < 100; index++) {
+//                tasks.push_back(this->Start(&TaskComponent::Test, this, index));
+//            }
+//            this->WhenAll(tasks);
+//            LOG_ERROR("use time = " << timer.GetSecond() << "s");
+//        });
         return true;
     }
 
@@ -147,6 +147,9 @@ namespace GameKeeper
 
 	void TaskComponent::Resume(unsigned int id)
     {
+#ifdef __DEBUG__
+        LOG_CHECK_RET(App::Get().IsMainThread());
+#endif
         TaskContext *logicCoroutine = this->GetContext(id);
         LOG_CHECK_RET(logicCoroutine);
         if(logicCoroutine->mState == CorState::Ready

@@ -78,7 +78,7 @@ namespace GameKeeper
         }
 
         std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
-        XCode code = this->Sort("tb_player_account", "UserID", 10, false, rpcTaskSource);
+        XCode code = this->Sort("account.tb_player_account", "UserID", 10, false, rpcTaskSource);
         if(code == XCode::Successful)
         {
             size_t size = rpcTaskSource->GetDataSize();

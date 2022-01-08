@@ -6,8 +6,8 @@ using namespace std::chrono;
 
 namespace GameKeeper
 {
-	IThread::IThread(std::string  name,ThreadPoolComponent * task)
-		: mName(std::move(name)), mIsClose(false), mTaskComponent(task)
+	IThread::IThread(std::string  name)
+		: mName(std::move(name)), mIsClose(false)
     {		
 		this->mIsWork = true;
     }
@@ -32,8 +32,8 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    TaskThread::TaskThread(ThreadPoolComponent * taskComponent)
-        : IThread("task", taskComponent)
+    TaskThread::TaskThread()
+        : IThread("task")
     {
         this->mTaskState = Idle;
 		this->mThread = nullptr;
@@ -71,15 +71,10 @@ namespace GameKeeper
             this->mWaitInvokeTask.SwapQueueData();
 #endif
             this->mWaitInvokeTask.Swap();
-            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-            if (this->mWaitInvokeTask.Pop(task))
+            while(this->mWaitInvokeTask.Pop(task))
             {
-                if (task->Run())
-                {
-                    unsigned int id = task->GetTaskId();
-                    this->mTaskComponent->PushFinishTask(id);
-                }
-                continue;
+                task->Run();
+                this->mLastOperTime = Helper::Time::GetSecTimeStamp();
             }
             this->HangUp();
         }
@@ -88,8 +83,8 @@ namespace GameKeeper
 
 namespace GameKeeper
 {
-    NetWorkThread::NetWorkThread(ThreadPoolComponent *taskComponent)
-        : IThread("net", taskComponent), mAsioContext(nullptr)
+    NetWorkThread::NetWorkThread()
+        : IThread("net"), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
@@ -125,12 +120,13 @@ namespace GameKeeper
             this->mWaitInvokeMethod.SwapQueueData();
 #endif
             this->mWaitInvokeMethod.Swap();
-            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
             while (this->mWaitInvokeMethod.Pop(taskMethod))
             {
                 taskMethod->run();
                 delete taskMethod;
+                this->mLastOperTime = Helper::Time::GetSecTimeStamp();
             }
+            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
         }
     }
 }
@@ -138,7 +134,7 @@ namespace GameKeeper
 namespace GameKeeper
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
-		: IThread("main", nullptr), mMainMethod(method)
+		: IThread("main"), mMainMethod(method)
 	{
 		this->mThreadId = std::this_thread::get_id();
 	}

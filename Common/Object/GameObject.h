@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Component/ComponentHelper.h>
+#include<Component/ComponentFactory.h>
 namespace GameKeeper
 {
     class Component;
@@ -50,7 +50,7 @@ namespace GameKeeper
     template<typename T>
     inline T *GameObject::GetComponent() const
     {
-        Type *type = ComponentHelper::GetType<T>();
+        Type *type = ComponentFactory::GetType<T>();
         if (type == nullptr)
         {
             return nullptr;
@@ -89,7 +89,7 @@ namespace GameKeeper
 	{
 		if (this->GetComponent<T>() == nullptr)
 		{			
-			Component * component = ComponentHelper::CreateComponent<T>();		
+			Component * component = ComponentFactory::CreateComponent<T>();
 			return this->AddComponent(component->GetTypeName(), component);
 		}
 		return false;
@@ -98,7 +98,7 @@ namespace GameKeeper
 	template<typename T>
     inline bool GameObject::RemoveComponent()
     {
-		Type * type = ComponentHelper::GetType<T>();
+		Type * type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
 		{
 			return false;

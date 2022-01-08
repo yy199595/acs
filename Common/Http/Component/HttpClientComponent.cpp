@@ -37,10 +37,10 @@ namespace GameKeeper
             RapidJsonWriter jsonWriter;
             jsonWriter.Add("End", 100);
             jsonWriter.Add("Start", 0);
-            jsonWriter.Add("RankId", 103000);
+            jsonWriter.Add("RankId", 301000);
 
             jsonWriter.WriterToStream(json);
-            this->Post("http://10.10.14.104:7683/logic/QueryRankData", json);
+            this->Post("http://baidu.com/logic/QueryRankData", json);
         });
         return true;
     }

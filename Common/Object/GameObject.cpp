@@ -23,7 +23,7 @@ namespace GameKeeper
 		{
 			return false;
 		}
-		return this->AddComponent(name, ComponentHelper::CreateComponent(name));
+		return this->AddComponent(name, ComponentFactory::CreateComponent(name));
 	}
 
 	bool GameObject::AddComponent(const std::string & name, Component * component)
@@ -77,7 +77,7 @@ namespace GameKeeper
 			{
 				component->OnDestory();
 				component->SetActive(false);
-				ComponentHelper::DestoryComponent(component);
+				ComponentFactory::DestoryComponent(component);
 			}			
 		}
 		this->mComponentMap.clear();
@@ -100,7 +100,7 @@ namespace GameKeeper
 			{
 				component->OnDestory();
 				component->SetActive(false);
-				ComponentHelper::DestoryComponent(component);
+				ComponentFactory::DestoryComponent(component);
 				return true;
 			}
         }

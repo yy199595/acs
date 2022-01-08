@@ -1,15 +1,14 @@
 ﻿#include "MysqlService.h"
 #include "Component/MysqlComponent.h"
 #include "Component/Scene/ThreadPoolComponent.h"
-#include "MysqlClient/MysqlTaskProxy.h"
+#include "MysqlClient/MysqlTaskSource.h"
 #include "Core/App.h"
 #include "Pool/MessagePool.h"
+#include"Other/ElapsedTimer.h"
 namespace GameKeeper
 {
     bool MysqlService::Awake()
     {
-        this->mCorComponent = nullptr;
-        this->mMysqlManager = nullptr;
 		BIND_RPC_FUNCTION(MysqlService::Add);
 		BIND_RPC_FUNCTION(MysqlService::Save);
 		BIND_RPC_FUNCTION(MysqlService::Query);
@@ -20,9 +19,7 @@ namespace GameKeeper
 
     bool MysqlService::LateAwake()
     {
-        this->mCorComponent = App::Get().GetTaskComponent();
-        LOG_CHECK_RET_FALSE(this->mMysqlManager = this->GetComponent<MysqlComponent>());
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
+        LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlComponent>());
         return true;
     }
 
@@ -37,25 +34,29 @@ namespace GameKeeper
         {
 			return XCode::ParseMessageError;
         }
+        std::string db;
         std::string sql;
-        if (!this->mMysqlManager->GetAddSqlCommand(*message, sql))
+        if (!this->mMysqlComponent->GetAddSqlCommand(*message, db, sql))
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout <<"sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        ElapsedTimer timer;
 #endif
-        std::shared_ptr<MysqlTaskProxy> mysqlTask =
-                std::shared_ptr<MysqlTaskProxy>(new MysqlTaskProxy(this->mMysqlManager->GetDataBaseName(), sql));
 
-        if (!this->mTaskManager->StartTask(mysqlTask.get()))
+        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+
+        XCode code = taskSource->Await(db, sql);
+
+#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
+        std::cout << "[" << timer.GetMs() << "ms] sql = " << sql << std::endl;
+#endif
+        if(code != XCode::Successful)
         {
-            return XCode::MysqlStartTaskFail;
+            response.set_errorstring(taskSource->GetErrorStr());
+            return code;
         }
-
-        this->mCorComponent->Yield();
-        response.set_errorstring(mysqlTask->GetErrorStr());
-        return mysqlTask->GetErrorCode();
+        return XCode::Successful;
     }
 
     XCode MysqlService::Save(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
@@ -69,26 +70,30 @@ namespace GameKeeper
 		{
 			return XCode::ParseMessageError;
 		}
-        
+
+        std::string db;
         std::string sql;
-        if (!this->mMysqlManager->GetSaveSqlCommand(*message, sql))
+        if (!this->mMysqlComponent->GetSaveSqlCommand(*message, db, sql))
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout <<"sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        ElapsedTimer elapsedTimer;
 #endif
-        std::shared_ptr<MysqlTaskProxy> mysqlTask =
-                std::shared_ptr<MysqlTaskProxy>(new MysqlTaskProxy(this->mMysqlManager->GetDataBaseName(), sql));
 
-        if (!this->mTaskManager->StartTask(mysqlTask.get()))
+        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+
+        XCode code = taskSource->Await(db, sql);
+
+#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
+        std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
+#endif
+        if(code != XCode::Successful)
         {
-            return XCode::MysqlStartTaskFail;
+            response.set_errorstring(taskSource->GetErrorStr());
+            return code;
         }
-
-        this->mCorComponent->Yield();
-        response.set_errorstring(mysqlTask->GetErrorStr());
-        return mysqlTask->GetErrorCode();
+        return XCode::Successful;
     }
 
     XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
@@ -98,113 +103,113 @@ namespace GameKeeper
 		{
 			return XCode::ParseMessageError;
 		}
+        std::string db;
         std::string sql;
-        if (!this->mMysqlManager->GetDeleteSqlCommand(*message, sql))
+        if (!this->mMysqlComponent->GetDeleteSqlCommand(*message, db, sql))
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout <<"sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        ElapsedTimer elapsedTimer;
 #endif
-        std::shared_ptr<MysqlTaskProxy> mysqlTask =
-                std::shared_ptr<MysqlTaskProxy>(new MysqlTaskProxy(this->mMysqlManager->GetDataBaseName(), sql));
+        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        if (!this->mTaskManager->StartTask(mysqlTask.get()))
+        XCode code = taskSource->Await(db, sql);
+
+#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
+        std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
+#endif
+        if(code != XCode::Successful)
         {
-            return XCode::MysqlStartTaskFail;
+            response.set_errorstring(taskSource->GetErrorStr());
+            return code;
         }
-        this->mCorComponent->Yield();
-        response.set_errorstring(mysqlTask->GetErrorStr());
-        return mysqlTask->GetErrorCode();
+        return XCode::Successful;
     }
 
     XCode MysqlService::Invoke(const s2s::MysqlAnyOper_Request &request, s2s::MysqlResponse &response)
     {
-        if(request.sql().empty())
+        if (request.sql().empty())
         {
             return XCode::CallArgsError;
         }
-        const SqlTableConfig * sqlTableConfig = this->mMysqlManager->GetTableConfig(request.tab());
-        if(sqlTableConfig == nullptr)
+        const SqlTableConfig *sqlTableConfig = this->mMysqlComponent->GetConfigByTab(request.tab());
+        if (sqlTableConfig == nullptr)
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout <<"sql = " << request.sql() << std::endl;
+#ifdef __DEBUG__
+      ElapsedTimer elapsedTimer;
 #endif
-        std::shared_ptr<MysqlTaskProxy> mysqlTask = std::make_shared<MysqlTaskProxy>
-                (this->mMysqlManager->GetDataBaseName(), request.sql());
-        if (!this->mTaskManager->StartTask(mysqlTask.get()))
+
+        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+
+        XCode code = taskSource->Await(sqlTableConfig->mDb, request.sql());
+
+#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
+        std::cout << "["<< elapsedTimer.GetMs() << "ms] sql = " << request.sql() << std::endl;
+#endif
+        if (code != XCode::Successful)
         {
-            return XCode::MysqlStartTaskFail;
+            response.set_errorstring(taskSource->GetErrorStr());
+            return code;
         }
 
-        this->mCorComponent->Yield();
-        XCode code = mysqlTask->GetErrorCode();
-
-        if (code == XCode::Successful)
+        std::string json;
+        const std::string &name = sqlTableConfig->mProtobufName;
+        while (taskSource->GetQueryData(json))
         {
-            std::string json;
-            const std::string & name = sqlTableConfig->mProtobufName;
-            while(mysqlTask->GetQueryData(json))
+            Message *message = Helper::Proto::NewByJson(name, json);
+            if (message == nullptr)
             {
-                Message * message = Helper::Proto::NewByJson(name, json);
-                if(message == nullptr)
-                {
-                    return XCode::JsonCastProtocbufFail;
-                }
-                response.add_datas()->PackFrom(*message);
+                return XCode::JsonCastProtocbufFail;
             }
-            return XCode::Successful;
+            response.add_datas()->PackFrom(*message);
         }
-        response.set_errorstring(mysqlTask->GetErrorStr());
-        return code;
+        return XCode::Successful;
     }
 
     XCode MysqlService::Query(const s2s::MysqlQuery_Request &request, s2s::MysqlResponse &response)
     {
-        if(!request.has_data())
+        if (!request.has_data())
         {
             return XCode::CallArgsError;
         }
-		Message * message = Helper::Proto::NewByData(request.data());
+        Message *message = Helper::Proto::NewByData(request.data());
         if (message == nullptr)
         {
             return XCode::ParseMessageError;
         }
 
+        std::string db;
         std::string sql;
-        if (!this->mMysqlManager->GetQuerySqlCommand(*message, sql))
+        if (!this->mMysqlComponent->GetQuerySqlCommand(*message, db, sql))
         {
             return XCode::CallArgsError;
         }
 #ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout <<"sql = " << sql << std::endl;
+        std::cout << "sql = " << sql << std::endl;
 #endif
-        std::shared_ptr<MysqlTaskProxy> mysqlTask =
-                std::shared_ptr<MysqlTaskProxy>(new MysqlTaskProxy(this->mMysqlManager->GetDataBaseName(), sql));
-        if (!this->mTaskManager->StartTask(mysqlTask.get()))
+        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+
+        XCode code = taskSource->Await(db, sql);
+
+        if (code != XCode::Successful)
         {
-            return XCode::MysqlStartTaskFail;
+            response.set_errorstring(taskSource->GetErrorStr());
+            return code;
         }
 
-        this->mCorComponent->Yield();
-        XCode code = mysqlTask->GetErrorCode();
-        if (code == XCode::Successful)
+        std::string json;
+        while (taskSource->GetQueryData(json))
         {
-            std::string json;
-            while(mysqlTask->GetQueryData(json))
+            Message *message = Helper::Proto::NewByJson(request.data(), json);
+            if (message == nullptr)
             {
-                Message * message = Helper::Proto::NewByJson(request.data(), json);
-                if (message == nullptr)
-                {
-                    return XCode::JsonCastProtocbufFail;
-                }
-                response.add_datas()->PackFrom(*message);
+                return XCode::JsonCastProtocbufFail;
             }
-            return XCode::Successful;
+            response.add_datas()->PackFrom(*message);
         }
-        response.set_errorstring(mysqlTask->GetErrorStr());
-        return code;
+        return XCode::Successful;
     }
 }// namespace GameKeeper

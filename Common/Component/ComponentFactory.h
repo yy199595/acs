@@ -3,16 +3,19 @@
 #include <Component/Component.h>
 namespace GameKeeper
 {
-	template<typename T>
-	class TypeProxy : public Type
-	{
-	public:
-		explicit TypeProxy(std::string name) : Type(typeid(T).hash_code(), name) { }
-	public:
-		Component * New() final { return new T(); }
-	};
+    template<typename T>
+    class TypeProxy : public Type
+    {
+    public:
+        explicit TypeProxy(std::string name) : Type(typeid(T).hash_code(), name) {}
 
-	class ComponentHelper
+    public:
+        Component *New() final { return new T(); }
+    };
+}
+namespace GameKeeper
+{
+	class ComponentFactory
 	{
 	public:
 		template<typename T>
@@ -62,7 +65,7 @@ namespace GameKeeper
 	};
 
 	template<typename T>
-	Component * GameKeeper::ComponentHelper::CreateComponent(bool fromPool /*= true*/)
+	Component * GameKeeper::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);
@@ -73,5 +76,5 @@ namespace GameKeeper
 		Type * type = iter->second;
 		return CreateComponent(type->Name);
 	}
-#define REGISTER_COMPONENT(type) ComponentHelper::Add<type>(#type)
+#define REGISTER_COMPONENT(type) ComponentFactory::Add<type>(#type)
 }// namespace GameKeeper

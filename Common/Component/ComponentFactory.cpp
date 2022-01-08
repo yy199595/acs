@@ -1,18 +1,18 @@
-#include "ComponentHelper.h"
+#include "ComponentFactory.h"
 namespace GameKeeper
 {
 
-	std::unordered_map<size_t, Type *> ComponentHelper::mTypeInfoMap1;
-	std::unordered_map<std::string, Type *> ComponentHelper::mTypeInfoMap;
-	std::unordered_map<size_t, std::queue<Component *>> ComponentHelper::mComponentPool;
+	std::unordered_map<size_t, Type *> ComponentFactory::mTypeInfoMap1;
+	std::unordered_map<std::string, Type *> ComponentFactory::mTypeInfoMap;
+	std::unordered_map<size_t, std::queue<Component *>> ComponentFactory::mComponentPool;
 
-	GameKeeper::Type * ComponentHelper::GetType(const std::string & name)
+	GameKeeper::Type * ComponentFactory::GetType(const std::string & name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		return iter != mTypeInfoMap.end() ? iter->second : nullptr;
 	}
 
-	bool ComponentHelper::DestoryComponent(Component * component)
+	bool ComponentFactory::DestoryComponent(Component * component)
 	{
 		if (component == nullptr)
 		{
@@ -27,6 +27,7 @@ namespace GameKeeper
 				component->OnDestory();
 				component->gameObjectID = 0;
 				component->gameObject = nullptr;
+                component->SetActive(false);
 				iter->second.push(component);
 				return false;
 			}
@@ -35,7 +36,7 @@ namespace GameKeeper
 		return true;
 	}
 
-	GameKeeper::Component * ComponentHelper::CreateComponent(const std::string & name, bool fromPool /*= true*/)
+	Component * ComponentFactory::CreateComponent(const std::string & name, bool fromPool /*= true*/)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		if (iter == mTypeInfoMap.end())
@@ -43,7 +44,6 @@ namespace GameKeeper
 			return nullptr;
 		}
 		Type * type = iter->second;
-
 		auto iter1 = mComponentPool.find(type->Hash);
 		if (iter1 != mComponentPool.end())
 		{
@@ -51,8 +51,13 @@ namespace GameKeeper
 			if (!components.empty())
 			{
 				Component * component = components.front();
-				components.pop();
-				return component;
+                components.pop();
+                if(component != nullptr)
+                {
+                    component->mType = type;
+                    component->Init(type->Name);
+                    return component;
+                }
 			}
 		}
 

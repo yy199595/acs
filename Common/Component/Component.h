@@ -39,7 +39,7 @@ namespace GameKeeper
 
 	public:
 		friend class GameObject;
-		friend class ComponentHelper;
+		friend class ComponentFactory;
 		inline long long GetGameObjectID() const
 		{
 			return gameObjectID;

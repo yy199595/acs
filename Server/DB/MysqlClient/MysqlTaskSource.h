@@ -1,8 +1,8 @@
 #pragma once
-
-#include"MysqlDefine.h"
 #include<queue>
-#include <Thread/TaskProxy.h>
+#include"MysqlDefine.h"
+#include"Async/TaskSource.h"
+#include<Thread/TaskProxy.h>
 namespace GameKeeper
 {
     class SqlTableConfig;
@@ -11,19 +11,17 @@ namespace GameKeeper
 
     class TaskComponent;
 
-    class MysqlTaskProxy : public TaskProxy
+    class MysqlTaskSource : public TaskProxy
     {
     public:
-        MysqlTaskProxy(std::string db, std::string sql);
+        MysqlTaskSource(MysqlComponent * component);
 
-        ~MysqlTaskProxy() final = default;
+        ~MysqlTaskSource() final = default;
 
     protected:
-        void RunFinish() final;
-
         bool Run() final; //在其他线程查询
     public:
-        XCode GetErrorCode() { return this->mErrorCode; }
+        XCode Await(const std::string & db, const std::string & sql);
 
         const std::string &GetErrorStr() { return this->mErrorString; }
 
@@ -33,12 +31,11 @@ namespace GameKeeper
         void WriteValue(RapidJsonWriter &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
 
     private:
-        const std::string mSqlCommand;
-        const std::string mDataBaseName;
+         std::string mSqlCommand;
+         std::string mDataBaseName;
     private:
-        XCode mErrorCode;
-        long long mCoroutineId;
         std::string mErrorString;
+        TaskSource<XCode> mTaskSource;
         MysqlComponent * mMsqlComponent;
         std::queue<std::string> mQueryDatas;
     private:

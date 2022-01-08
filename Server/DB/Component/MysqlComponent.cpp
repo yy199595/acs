@@ -8,26 +8,20 @@
 
 namespace GameKeeper
 {
-    SqlTableConfig::SqlTableConfig(std::string  tab, const std::string pb)
-            : mTableName(std::move(tab)), mProtobufName(pb)
+    SqlTableConfig::SqlTableConfig(const std::string db, std::string  tab, const std::string pb)
+            : mDb(db), mTableName(std::move(tab)), mProtobufName(pb)
     {
     }
 
     void SqlTableConfig::AddKey(const std::string& key)
     {
-        this->mKeys.push_back(key);
+        this->mKeys.insert(key);
     }
 
     bool SqlTableConfig::HasKey(const std::string &key) const
     {
-        for (const std::string &k : this->mKeys)
-        {
-            if (k == key)
-            {
-                return true;
-            }
-        }
-        return false;
+        auto iter = this->mKeys.find(key);
+        return iter != this->mKeys.end();
     }
 }
 
@@ -43,7 +37,6 @@ namespace GameKeeper
 
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "ip", this->mMysqlIp));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "port", this->mMysqlPort));
-		LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "db", this->mDataBaseName));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "user", this->mDataBaseUser));
 		LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
         return true;
@@ -68,10 +61,10 @@ namespace GameKeeper
         return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
     }
 
-    bool MysqlComponent::DropTable(const std::string &name)
+    bool MysqlComponent::DropTable(const std::string & db,const std::string &name)
     {
         const std::string sql = "drop table " + name;
-        if (mysql_select_db(this->mMysqlSockt, this->mDataBaseName.c_str()) != 0)
+        if (mysql_select_db(this->mMysqlSockt, db.c_str()) != 0)
         {
             return false;
         }
@@ -103,21 +96,16 @@ namespace GameKeeper
 		return this->mMysqlSockt;
 	}
 
-    bool MysqlComponent::GetTableName(const std::string &pb, std::string &table)
-    {
-        auto iter = this->mTablePbMap.find(pb);
-        if (iter != this->mTablePbMap.end())
-        {
-            table = iter->second;
-            return true;
-        }
-        return false;
-    }
-
-    const SqlTableConfig *MysqlComponent::GetTableConfig(const std::string &tab) const
+    const SqlTableConfig *MysqlComponent::GetConfigByTab(const std::string &tab) const
     {
         auto iter = this->mSqlConfigMap.find(tab);
         return iter != this->mSqlConfigMap.end() ? iter->second : nullptr;
+    }
+
+    const SqlTableConfig *MysqlComponent::GetCondifByProto(const std::string &proro) const
+    {
+        auto iter = this->mTablePbMap.find(proro);
+        return iter != this->mTablePbMap.end() ? iter->second : nullptr;
     }
 
     bool MysqlComponent::InitMysqlTable()
@@ -148,33 +136,34 @@ namespace GameKeeper
                 LOG_ERROR(mSqlPath << " error");
                 return false;
             }
-            auto iter1 = iter->value.FindMember("keys");
-            auto iter2 = iter->value.FindMember("protobuf");
-            if (iter1 == iter->value.MemberEnd() || !iter1->value.IsArray())
+            rapidjson::Value  & jsonObject = iter->value;
+            const std::string db(iter->name.GetString());
+
+            for(auto iter1 = jsonObject.MemberBegin(); iter1 != jsonObject.MemberEnd(); iter1++)
             {
-                LOG_ERROR(mSqlPath << " error");
-				return false;
-            }
-            if (iter2 == iter->value.MemberEnd() || !iter2->value.IsString())
-            {
-                LOG_ERROR(mSqlPath << " error");
-				return false;
-            }
-            const std::string tab = iter->name.GetString();
-            const std::string pb = iter2->value.GetString();
-            auto tabConfig = new SqlTableConfig(tab, pb);
-            for (unsigned int index = 0; index < iter1->value.Size(); index++)
-            {
-                tabConfig->AddKey(iter1->value[index].GetString());
-            }
-            this->mTablePbMap.emplace(pb, tab);
-            this->mSqlConfigMap.emplace(tab, tabConfig);
+                const std::string tab(iter1->name.GetString());
+                const std::string proto(iter1->value["protobuf"].GetString());
+
+                SqlTableConfig * tableConfig = new SqlTableConfig(db, db + "." + tab, proto);
+                rapidjson::Value::Array jsonArray = iter1->value["keys"].GetArray();
+
+                for (int index = 0; index < jsonArray.Size(); index++)
+                {
+                    tableConfig->AddKey(jsonArray[index].GetString());
+                }
+                this->mTablePbMap.emplace(proto, tableConfig);
+                this->mSqlConfigMap.emplace(tableConfig->mTableName, tableConfig);
 #ifdef __DEBUG__
-            this->DropTable(tab);
+                this->DropTable(db, tab);
 #endif
+            }
+            TableOperator tableOper(this->mMysqlSockt, db, jsonObject);
+            if(!tableOper.InitMysqlTable())
+            {
+                return false;
+            }
         }
-        TableOperator tableOper(this->mMysqlSockt, this->mDataBaseName, document);
-        return tableOper.InitMysqlTable();
+        return true;
     }
 
     bool MysqlComponent::StartConnect()
@@ -192,30 +181,25 @@ namespace GameKeeper
         return true;
     }
 
-    bool MysqlComponent::GetTableNameByProtocolName(const std::string &name, std::string &tableName)
+    bool MysqlComponent::GetAddSqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand)
     {
-        auto iter = this->mTablePbMap.find(name);
-        if (iter != this->mTablePbMap.end())
-        {
-            tableName = iter->second;
-            return true;
-        }
-        return false;
-    }
-
-    bool MysqlComponent::GetAddSqlCommand(const Message &messageData, std::string &sqlCommand)
-    {
-        std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        LOG_CHECK_RET_FALSE(this->GetTableNameByProtocolName(typeName, tableName));
+        const SqlTableConfig * sqlTableConfig = this->GetCondifByProto(typeName);
+        if(sqlTableConfig == nullptr)
+        {
+            LOG_ERROR("get sql config by " << typeName << " failure");
+            return false;
+        }
 
+        db = sqlTableConfig->mDb;
         this->mSqlCommandStream.str("");
-
         std::vector<const FieldDescriptor *> fieldList;
+        const std::string & tableName = sqlTableConfig->mTableName;
+
         const Reflection *pReflection = messageData.GetReflection();
         pReflection->ListFields(messageData, &fieldList);
 
-        mSqlCommandStream << "insert into " << tableName << "(";
+        mSqlCommandStream << "insert into " << sqlTableConfig->mTableName << "(";
         for (size_t index = 0; index < fieldList.size(); index++)
         {
             if (index < fieldList.size() - 1)
@@ -272,16 +256,17 @@ namespace GameKeeper
 
     }
 
-    bool MysqlComponent::GetSaveSqlCommand(const Message &messageData, std::string &sqlCommand)
+    bool MysqlComponent::GetSaveSqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand)
     {
-        std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        LOG_CHECK_RET_FALSE(this->GetTableNameByProtocolName(typeName, tableName));
+        const SqlTableConfig * sqlTableConfig = this->GetCondifByProto(typeName);
+        if(sqlTableConfig == nullptr)
+        {
+            LOG_ERROR("get sql config by " << typeName << " failure");
+            return false;
+        }
 
-        const SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        LOG_CHECK_RET_FALSE(tableConfig);
-
-
+        db = sqlTableConfig->mDb;
         const Descriptor *pDescriptor = messageData.GetDescriptor();
         const Reflection *pReflection = messageData.GetReflection();
 
@@ -290,11 +275,11 @@ namespace GameKeeper
         pReflection->ListFields(messageData, &fieldList);
 
         mSqlCommandStream2 << " where ";
-        mSqlCommandStream << "update " << tableName << " set ";
+        mSqlCommandStream << "update " << sqlTableConfig->mTableName << " set ";
 
-        for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+        int index =0;
+        for(const std::string & key : sqlTableConfig->mKeys)
         {
-            const std::string &key = tableConfig->mKeys[index];
             const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
             mSqlCommandStream2 << key << "=";
             if (fieldDesc->type() == FieldDescriptor::TYPE_STRING)
@@ -305,7 +290,8 @@ namespace GameKeeper
                     return false;
                 }
                 mSqlCommandStream2 << "'" << key << "'";
-            } else if (fieldDesc->type() == FieldDescriptor::TYPE_INT64)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::TYPE_INT64)
             {
                 long long key = pReflection->GetInt64(messageData, fieldDesc);
                 if (key == fieldDesc->default_value_int64())
@@ -313,7 +299,8 @@ namespace GameKeeper
                     return false;
                 }
                 mSqlCommandStream2 << key;
-            } else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT64)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT64)
             {
                 unsigned long long key = pReflection->GetUInt64(messageData, fieldDesc);
                 if (key == fieldDesc->default_value_uint64())
@@ -321,7 +308,8 @@ namespace GameKeeper
                     return false;
                 }
                 mSqlCommandStream2 << key;
-            } else if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::TYPE_INT32)
             {
                 int key = pReflection->GetInt32(messageData, fieldDesc);
                 if (key == fieldDesc->default_value_int32())
@@ -329,7 +317,8 @@ namespace GameKeeper
                     return false;
                 }
                 mSqlCommandStream2 << key;
-            } else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT32)
+            }
+            else if (fieldDesc->type() == FieldDescriptor::TYPE_UINT32)
             {
                 unsigned int key = pReflection->GetUInt32(messageData, fieldDesc);
                 if (key == fieldDesc->default_value_uint32())
@@ -337,19 +326,21 @@ namespace GameKeeper
                     return false;
                 }
                 mSqlCommandStream2 << key;
-            } else
+            }
+            else
             {
                 return false;
             }
-            if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+            if (sqlTableConfig->mKeys.size() > 1 && index < sqlTableConfig->mKeys.size() - 1)
             {
                 mSqlCommandStream2 << " and ";
             }
+            index++;
         }
 
         for (auto fieldDesc : fieldList)
         {
-            if (tableConfig->HasKey(fieldDesc->name()))
+            if (sqlTableConfig->HasKey(fieldDesc->name()))
             {
                 continue;
             }
@@ -389,20 +380,22 @@ namespace GameKeeper
         return true;
     }
 
-    bool MysqlComponent::GetQuerySqlCommand(const Message &messageData, std::string &sqlCommand)
+    bool MysqlComponent::GetQuerySqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand)
     {
-        std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        LOG_CHECK_RET_FALSE(this->GetTableNameByProtocolName(typeName, tableName));
+        const SqlTableConfig * sqlTableConfig = this->GetCondifByProto(typeName);
+        if(sqlTableConfig == nullptr)
+        {
+            LOG_ERROR("get sql config by " << typeName << " failure");
+            return false;
+        }
 
-        const SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        LOG_CHECK_RET_FALSE(tableConfig);
-
+        db = sqlTableConfig->mDb;
         mSqlCommandStream.str("");
 
         const Descriptor *pDescriptor = messageData.GetDescriptor();
         const Reflection *pReflection = messageData.GetReflection();
-        mSqlCommandStream << "select * from " << tableName << " where ";
+        mSqlCommandStream << "select * from " << sqlTableConfig->mTableName << " where ";
         std::vector<const FieldDescriptor *> fieldList;
         pReflection->ListFields(messageData, &fieldList);
         if (fieldList.empty())
@@ -459,7 +452,7 @@ namespace GameKeeper
                 }
                 mSqlCommandStream << key << "=" << val;
             }
-            if (tableConfig->mKeys.size() > 1 && index < fieldList.size() - 1)
+            if (sqlTableConfig->mKeys.size() > 1 && index < fieldList.size() - 1)
             {
                 mSqlCommandStream << " and ";
             }
@@ -468,25 +461,25 @@ namespace GameKeeper
         return true;
     }
 
-    bool MysqlComponent::GetDeleteSqlCommand(const Message &messageData, std::string &sqlCommand)
+    bool MysqlComponent::GetDeleteSqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand)
     {
-        std::string tableName;
         const std::string typeName = messageData.GetTypeName();
-        LOG_CHECK_RET_FALSE(this->GetTableNameByProtocolName(typeName, tableName));
+        const SqlTableConfig * sqlTableConfig = this->GetCondifByProto(typeName);
+        if(sqlTableConfig == nullptr)
+        {
+            LOG_ERROR("get sql config by " << typeName << " failure");
+            return false;
+        }
 
-        const SqlTableConfig *tableConfig = this->GetTableConfig(tableName);
-        LOG_CHECK_RET_FALSE(tableConfig);
-
+        db = sqlTableConfig->mDb;
         this->mSqlCommandStream.str("");
-
-
-        mSqlCommandStream << "delete from " << tableName << " where ";
+        mSqlCommandStream << "delete from " << sqlTableConfig->mTableName << " where ";
         const Descriptor *pDescriptor = messageData.GetDescriptor();
         const Reflection *pReflection = messageData.GetReflection();
 
-        for (size_t index = 0; index < tableConfig->mKeys.size(); index++)
+        int index = 0;
+        for(const std::string & key : sqlTableConfig->mKeys)
         {
-            const std::string &key = tableConfig->mKeys[index];
             const FieldDescriptor *fieldDesc = pDescriptor->FindFieldByName(key);
             mSqlCommandStream << key << "=";
             if (fieldDesc->type() == FieldDescriptor::Type::TYPE_STRING)
@@ -534,10 +527,11 @@ namespace GameKeeper
                 return false;
             }
 
-            if (tableConfig->mKeys.size() > 1 && index < tableConfig->mKeys.size() - 1)
+            if (sqlTableConfig->mKeys.size() > 1 && index < sqlTableConfig->mKeys.size() - 1)
             {
                 mSqlCommandStream << " and ";
             }
+            index++;
         }
         sqlCommand = mSqlCommandStream.str();
         return true;

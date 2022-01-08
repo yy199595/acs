@@ -28,11 +28,6 @@ namespace GameKeeper
         bool LateAwake() final;
 
     private:
-
-        class MysqlComponent *mMysqlManager;
-
-        class TaskComponent *mCorComponent;
-
-        class ThreadPoolComponent *mTaskManager;
+        class MysqlComponent *mMysqlComponent;
     };
 }// namespace GameKeeper

@@ -11,7 +11,7 @@ namespace GameKeeper
 	
 	Component * Component::GetByHash(size_t hash)
 	{
-		Type * type = ComponentHelper::GetType(hash);
+		Type * type = ComponentFactory::GetType(hash);
 		if (type == nullptr)
 		{
 			return nullptr;

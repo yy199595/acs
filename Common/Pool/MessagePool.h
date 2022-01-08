@@ -1,5 +1,6 @@
 #pragma once
 #include<queue>
+#include"Define/ThreadQueue.h"
 #include<google/protobuf/any.pb.h>
 #include<google/protobuf/message.h>
 #include<google/protobuf/util/json_util.h>

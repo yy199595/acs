@@ -1,58 +1,45 @@
-#include"MysqlTaskProxy.h"
+#include"MysqlTaskSource.h"
 #include<Core/App.h>
 #include"Component/MysqlComponent.h"
 #include<Coroutine/TaskComponent.h>
 #include"Util/JsonHelper.h"
-
+#include"Scene/ThreadPoolComponent.h"
 namespace GameKeeper
 {
-    MysqlTaskProxy::MysqlTaskProxy(std::string db, std::string sql)
-        : mDataBaseName(std::move(db)), mSqlCommand(std::move(sql))
-    {	
-		TaskComponent * corComponent = App::Get().GetTaskComponent();
-        this->mCoroutineId = corComponent->GetContextId();
-        this->mMsqlComponent = App::Get().GetComponent<MysqlComponent>();
-
-    }
-
-    void MysqlTaskProxy::RunFinish()
+    MysqlTaskSource::MysqlTaskSource(MysqlComponent * component)
+       : mMsqlComponent(component)
     {
-		TaskComponent * corComponent = App::Get().GetTaskComponent();
-        if (this->mCoroutineId != 0)
-        {
-			corComponent->Resume(this->mCoroutineId);
-        }
-        if(this->mErrorCode != XCode::Successful)
-        {
-            LOG_ERROR(this->mSqlCommand);
-            LOG_ERROR(this->mErrorString);
-        }
+
     }
 
-    bool MysqlTaskProxy::Run()
+    XCode MysqlTaskSource::Await(const std::string &db, const std::string &sql)
+    {
+        this->mSqlCommand = std::move(sql);
+        this->mDataBaseName = std::move(db);
+        auto threadComponent = App::Get().GetComponent<ThreadPoolComponent>();
+        if(!threadComponent->StartTask(this))
+        {
+            return XCode::MysqlStartTaskFail;
+        }
+        return this->mTaskSource.Await();
+    }
+
+    bool MysqlTaskSource::Run()
     {
         GKMysqlSocket *mysqlSocket = this->mMsqlComponent->GetMysqlSocket();
         if (mysqlSocket == nullptr)
         {
-            this->mErrorCode = MysqlSocketIsNull;
             this->mErrorString = "mysql socket is null";
-            return true;
-        }
-
-        if (mysql_select_db(mysqlSocket, this->mDataBaseName.c_str()) != 0)
-        {
-            this->mErrorCode = MysqlSelectDbFailure;
-            this->mErrorString = "select " + this->mDataBaseName + " fail";
+            this->mTaskSource.SetResult(XCode::MysqlSocketIsNull);
             return true;
         }
 
         if (mysql_real_query(mysqlSocket, mSqlCommand.c_str(), mSqlCommand.size()) != 0)
         {
-            this->mErrorCode = MysqlInvokeFailure;
             this->mErrorString = mysql_error(mysqlSocket);
+            this->mTaskSource.SetResult(XCode::MysqlInvokeFailure);
             return true;
         }
-        this->mErrorCode = XCode::Successful;
         MysqlQueryResult *queryResult = mysql_store_result(mysqlSocket);
         if (queryResult != nullptr)
         {
@@ -100,10 +87,11 @@ namespace GameKeeper
             }
             mysql_free_result(queryResult);
         }
+        this->mTaskSource.SetResult(XCode::Successful);
         return true;
     }
 
-    bool MysqlTaskProxy::GetQueryData(std::string &data)
+    bool MysqlTaskSource::GetQueryData(std::string &data)
     {
         if(this->mQueryDatas.empty())
         {
@@ -114,7 +102,7 @@ namespace GameKeeper
         return true;
     }
 
-    void MysqlTaskProxy::WriteValue(RapidJsonWriter &jsonWriter, MYSQL_FIELD *field, const char *data, long size)
+    void MysqlTaskSource::WriteValue(RapidJsonWriter &jsonWriter, MYSQL_FIELD *field, const char *data, long size)
     {
         switch (field->type)
         {

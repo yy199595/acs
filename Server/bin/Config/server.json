@@ -46,7 +46,6 @@
         "port": 3306,
         "user": "yjz",
         "passwd": "199595yjz.",
-        "db": "player_db",
         "sql": "./sql/sql.json"
     },
     "Redis": {
