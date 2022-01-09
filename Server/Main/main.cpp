@@ -1,4 +1,6 @@
-﻿
+﻿#ifdef JE_MALLOC
+#include"jemalloc/jemalloc.h"
+#endif
 #include <Core/App.h>
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
@@ -9,7 +11,7 @@
 #include "Component/RedisComponent.h"
 #include "Component/MysqlProxyComponent.h"
 #include "Http/Component/HttpClientComponent.h"
-#include"../Gate/Service/GateService.h"
+#include"Service/GateService.h"
 #include <Telnet/TelnetClientComponent.h>
 
 #include <Service/LuaServiceMgrComponent.h>

@@ -20,17 +20,6 @@ namespace GameKeeper
         return true;
     }
 
-    void TimerComponent::OnStart()
-    {
-        for (int index = 1; index < 100; index++) {
-
-            auto func = []() {
-
-            };
-            this->AddTimer(index * 100, new LambdaMethod(func));
-        }
-    }
-
 	bool TimerComponent::LateAwake()
     {
         this->mNextUpdateTime = Helper::Time::GetMilTimestamp();

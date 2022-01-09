@@ -5,7 +5,7 @@
 #include<Method/MethodProxy.h>
 namespace GameKeeper
 {
-    class TimerComponent : public Component, public ISystemUpdate, public IStart
+    class TimerComponent : public Component, public ISystemUpdate
     {
     public:
         TimerComponent() = default;
@@ -32,8 +32,6 @@ namespace GameKeeper
 
     protected:
         bool Awake() final;
-
-        void OnStart() final;
 
 		bool LateAwake() final;
 
