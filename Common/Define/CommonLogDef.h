@@ -60,12 +60,12 @@ inline std::string FormatFileLine(const char * file, const int line)
 		val;									\
 	}											\
 }
-#define LOG_CHECK_FATAL(obj, msg, val)			\
+
+#define LOG_CHECK_FATAL(obj)			\
 {												\
 	if(!(obj))									\
 	{											\
-		LOG_FATAL(#obj<< "  "  << msg);		\
-		val;									\
+		LOG_FATAL(#obj);		                \
 	}											\
 }
 

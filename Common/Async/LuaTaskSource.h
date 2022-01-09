@@ -10,14 +10,15 @@ namespace GameKeeper
     class LuaTaskSource
     {
     public:
-        LuaTaskSource() = default;
+        LuaTaskSource();
         ~LuaTaskSource() = default;
     public:
-        void SetResult(int code, std::string json);
+        void SetResult(int code, std::string & json);
     public:
         XCode Await();
         const std::string & GetJson() { return this->mJson;}
     private:
+        XCode mCode;
         std::string mJson;
         TaskSource<XCode> mTaskSource;
     };

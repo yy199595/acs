@@ -8,10 +8,3 @@ function coroutine.start(func, ...)
     local cor = coroutine.create(func)
     return coroutine.wakeup(cor, ...)
 end
-
-function coroutine.sleep(ms)
-    if coroutine.running() == nil then
-        assert(false, "sleep not in coroutine")
-    end
-    return SoEasy.Sleep(ms)
-end

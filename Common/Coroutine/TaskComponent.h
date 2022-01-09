@@ -25,8 +25,8 @@ namespace GameKeeper
             this->Resume(co->mCoroutineId);
             return co;
         }
-        TaskContext * Start(std::function<void()> func){
-            TaskContext * co = this->MakeContext(new LambdaMethod(func));
+        TaskContext * Start(std::function<void()> && func){
+            TaskContext * co = this->MakeContext(new LambdaMethod(std::move(func)));
             this->Resume(co->mCoroutineId);
             return co;
         }

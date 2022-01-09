@@ -18,11 +18,11 @@ namespace GameKeeper
 
     void RedisComponent::OnStart()
     {
-        for (int index = 0; index < 10; index++)
-        {
-            long long num = this->AddCounter("UserIdCounter");
-            LOG_ERROR("number = " << num);
-        }
+//        for (int index = 0; index < 10; index++)
+//        {
+//            long long num = this->AddCounter("UserIdCounter");
+//            LOG_ERROR("number = " << num);
+//        }
     }
 
     bool RedisComponent::CloseRedisSocket()

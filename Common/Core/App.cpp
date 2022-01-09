@@ -105,14 +105,11 @@ namespace GameKeeper
 	{
 		for (auto component : this->mSceneComponents)
         {
-            ElapsedTimer elapsedTimer;
             auto startComponent = dynamic_cast<IStart *>(component);
             if (startComponent != nullptr)
             {
+                LOG_DEBUG("start component " << component->GetTypeName());
                 startComponent->OnStart();
-                LOG_INFO(" start component " << component->GetTypeName()
-                                             << " use time = " << elapsedTimer.GetMs() << "ms");
-                //LOG_DEBUG("start " << component->GetTypeName() << " use time " << elapsedTimer.GetMs() << "ms");
             }
         }
 		this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();

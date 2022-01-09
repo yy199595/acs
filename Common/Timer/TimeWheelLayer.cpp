@@ -1,47 +1,46 @@
-#include "TimeWheelLayer.h"
-
+#include"TimeWheelLayer.h"
+#include"Core/App.h"
+#include"Define/CommonLogDef.h"
 namespace GameKeeper
 {
-    TimeWheelLayer::TimeWheelLayer(int layerId, int count, int start, int end)
-        : mLayerId(layerId), mMaxCount(count), mStart(start), mEnd(end)
+    TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)
+        : mLayerId(layerId), mMaxCount(count), mMin(min), mMax(max)
     {
         this->mCurIndex = 0;
         for (int index = 0; index < count; index++)
         {
-            std::queue<unsigned int> timers;
+            std::queue<long long> timers;
             this->mTimerSlot.push_back(timers);
         }
     }
 
-    bool TimeWheelLayer::AddTimer(int tick, unsigned int timer)
+    bool TimeWheelLayer::AddTimer(int tick, long long timerId)
     {
-        if (timer == 0)
+        if (tick >= this->mMin && tick < this->mMax)
         {
-            return false;
-        }
-
-        if (tick >= this->mStart && tick < this->mEnd)
-        {
-            int index = this->mStart == 0 ? tick
-                                          : (tick - this->mStart) / this->mStart;
+            int index = this->mMin == 0 ? tick
+                                          : (tick - this->mMin) / this->mMin;
 
             if (index + this->mCurIndex < this->mMaxCount)
             {
                 index += this->mCurIndex;
-                this->mTimerSlot[index].push(timer);
+                this->mTimerSlot[index].push(timerId);
             } else
             {
                 index = index + this->mCurIndex - this->mMaxCount;
-                this->mTimerSlot[index].push(timer);
+                this->mTimerSlot[index].push(timerId);
             }
             return true;
         }
         return false;
     }
 
-    bool TimeWheelLayer::MoveIndex(std::queue<unsigned int> &timers)
+    bool TimeWheelLayer::MoveIndex(std::queue<long long> &timers)
     {
-        std::swap(timers, this->mTimerSlot[this->mCurIndex]);
+        std::queue<long long > & slotTimers = this->mTimerSlot[this->mCurIndex];
+        if(!slotTimers.empty()) {
+            std::swap(timers, slotTimers);
+        }
         if ((++this->mCurIndex) >= this->mMaxCount)
         {
             this->mCurIndex = 0;

@@ -16,7 +16,7 @@ namespace GameKeeper {
 
     class LambdaMethod : public StaticMethod {
     public:
-        LambdaMethod(std::function<void(void)> & func)
+        LambdaMethod(std::function<void(void)> && func)
                 : mFunc(func) {}
         void run() final {
             this->mFunc();

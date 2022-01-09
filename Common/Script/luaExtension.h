@@ -14,7 +14,7 @@ namespace LuaAPIExtension
 
     extern int DebugWarning(lua_State *luaEnv);
 
-    extern void GetLuaString(lua_State *luaEnv, std::string &outstring);
+    extern std::string GetLuaString(lua_State *luaEnv);
 
     extern int GameObjectGetComponent(lua_State *lua);
 

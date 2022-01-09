@@ -40,7 +40,7 @@ namespace GameKeeper
     class RpcTaskSource : public IRpcTask
     {
     public:
-        RpcTaskSource(float timeout = 5.0f) : mTimeout(timeout * 1000) { }
+        RpcTaskSource(float timeout = 0) : mTimeout(timeout * 1000) { }
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
         int GetTimeout() final { return this->mTimeout;}

@@ -8,23 +8,22 @@ namespace GameKeeper
     class TimeWheelLayer
     {
     public:
-        TimeWheelLayer(int layerId, int count, int start, int end);
+        TimeWheelLayer(int layerId, int count, int min, int max);
 
         ~TimeWheelLayer();
 
     public:
-        bool AddTimer(int tick, unsigned int timer);
+        bool AddTimer(int tick, long long timerId);
 
-        bool MoveIndex(std::queue<unsigned int> &timers);
+        bool MoveIndex(std::queue<long long> &timers);
 
     private:
+        const int mMin;
+        const int mMax;
         const int mLayerId;
         const int mMaxCount;
-        const int mEnd;
-        const int mStart;
-
     private:
         size_t mCurIndex;
-        std::vector<std::queue<unsigned int>> mTimerSlot;
+        std::vector<std::queue<long long>> mTimerSlot;
     };
 }

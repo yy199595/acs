@@ -3,7 +3,7 @@
 #include <Component/Component.h>
 #include <Object/GameObject.h>
 #include <Util/StringHelper.h>
-
+#include"Util/DirectoryHelper.h"
 using namespace GameKeeper;
 namespace LuaAPIExtension
 {
@@ -133,7 +133,7 @@ namespace LuaAPIExtension
         return 0;
     }
 
-    extern void GetLuaString(lua_State *luaEnv, std::string &outstring)
+    extern std::string GetLuaString(lua_State *luaEnv)
     {
         lua_Debug ar;
         if (lua_getstack(luaEnv, 1, &ar) == 1)
@@ -143,10 +143,8 @@ namespace LuaAPIExtension
             lua_getglobal(luaEnv, "tostring");
             std::stringstream stringBuffer;
 
-            const char *file = ar.short_src;
-
-
-            stringBuffer << Helper::String::GetFileName(ar.short_src) << ":" << ar.currentline << "  ";
+            stringBuffer << Helper::String::GetFileName(ar.short_src)
+                << ":" << ar.currentline << "  ";
             for (int i = 1; i <= n; i++)
             {
                 size_t size;
@@ -154,44 +152,35 @@ namespace LuaAPIExtension
                 lua_pushvalue(luaEnv, i);
                 lua_call(luaEnv, 1, 1);
                 const char *str = lua_tolstring(luaEnv, -1, &size);
-                outstring.append(str, size);
-                outstring.append(" ");
                 lua_pop(luaEnv, 1);
                 stringBuffer << str << " ";
             }
-            outstring = stringBuffer.str();
+            return stringBuffer.str();
         }
+        return std::string();
     }
 
     int DebugLog(lua_State *luaEnv)
     {
-        std::string printString;
-        GetLuaString(luaEnv, printString);
-        GK_CommonLog(printString);
+        GK_CommonLog(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugInfo(lua_State *luaEnv)
     {
-        std::string printString;
-        GetLuaString(luaEnv, printString);
-        GKCommonInfo(printString);
+        GKCommonInfo(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugError(lua_State *luaEnv)
     {
-        std::string printString;
-        GetLuaString(luaEnv, printString);
-        GKCommonError(printString);
+        GKCommonError(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugWarning(lua_State *luaEnv)
     {
-        std::string printString;
-        GetLuaString(luaEnv, printString);
-        GKCommonWarning(printString);
+        GKCommonWarning(GetLuaString(luaEnv));
         return 0;
     }
 }// namespace LuaAPIExtension

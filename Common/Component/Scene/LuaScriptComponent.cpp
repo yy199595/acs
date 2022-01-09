@@ -189,6 +189,7 @@ namespace GameKeeper
     void LuaScriptComponent::PushClassToLua()
     {
         ClassProxyHelper::BeginRegister<LuaTaskSource>(this->mLuaEnv, "LuaTaskSource");
+        ClassProxyHelper::PushCtor<LuaTaskSource>(this->mLuaEnv);
         ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaTaskSource::SetResult);
 
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
@@ -208,10 +209,13 @@ namespace GameKeeper
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "RemoveTimer", SystemExtension::RemoveTimer);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "GetManager", SystemExtension::GetManager);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Debug", LuaAPIExtension::DebugLog);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper","Warning",LuaAPIExtension::DebugWarning);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"GameKeeper","Error",LuaAPIExtension::DebugError);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"GameKeeper","Info", LuaAPIExtension::DebugInfo);
+
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Debug", LuaAPIExtension::DebugLog);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log","Warning",LuaAPIExtension::DebugWarning);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"Log","Error",LuaAPIExtension::DebugError);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv,"Log","Info", LuaAPIExtension::DebugInfo);
+
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "coroutine", "sleep", CoroutineExtension::Sleep);
     }
 
     void LuaScriptComponent::OnPushGlobalObject()

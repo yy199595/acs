@@ -32,7 +32,6 @@ namespace GameKeeper
             return true;
         }
         this->mInvokeCount++;
-        this->mDelayTime = mInterval;
         if (this->mMaxInvokeCount == -1)
         {
             return false;

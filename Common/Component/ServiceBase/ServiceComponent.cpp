@@ -53,7 +53,7 @@ namespace GameKeeper
             return iter->second;
         }
         auto iter1 = this->mMethodMap.find(name);
-        return iter != this->mMethodMap.end() ? iter->second : nullptr;
+        return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
     }
 
     std::shared_ptr<com::Rpc_Response> ServiceComponent::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)

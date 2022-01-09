@@ -1,29 +1,46 @@
 
 Service = {}
 
-
 function Service.Call(func, id, json)
-    
-    if json ~= nil then
-        local request = Json.ToObject(json)
-        if request == nil then
-            return XCode.CallArgsError, ""
-        end
-        local code, response = func(id, request)
-        if code == XCode.Successful and response then
-            return code, Json.ToString(response)
-        end
-        return code or XCode.CallLuaFunctionFail, response or ""
-    end
-    local code, response = func(id)
 
-    return func(id);
+    local tab = #json > 0 and Json.ToObject(json) or nil
+    local state, error, response = pcall(func, id, tab)
+
+    if not state then
+        Log.Error(error)
+        return XCode.CallLuaFunctionFail
+    end
+    assert(type(error) == 'number')
+    assert(type(response) == 'table' or type(response) == 'nil')
+
+    if error ~= XCode.Successful then
+        return code
+    end
+    return code, Json.ToObject(response)
 end
 
-function Service.CallAsync(func, taskSouce, id, json)
+function Service.CallAsync(func, id, json)
 
-    coroutine.start(function()
-        local code, response = Service.Call(func, id, json)
-        taskSouce:SetResult(code or XCode.CallLuaFunctionFail, responseJson)
-    end)
+    print(coroutine.running())
+    local context = function(luaTaskSource)
+        local tab = #json > 0 and Json.ToObject(json) or nil
+        local state, error, response = pcall(func, id, tab)
+        if not state then
+            Log.Error(error)
+            return luaTaskSource:SetResult(XCode.CallLuaFunctionFail, error)
+        end
+        assert(type(error) == 'number')
+        assert(type(response) == 'table' or type(response) == 'nil')
+
+        if error == XCode.Successful then
+            if type(response) == 'table' then
+                local str = Json.ToString(response)
+                return luaTaskSource:SetResult(error, str)
+            end
+        end
+        return luaTaskSource:SetResult(error, StringUtil.Empty)
+    end
+    local taskSource = LuaTaskSource.New();
+    coroutine.start(context, taskSource)
+    return taskSource;
 end

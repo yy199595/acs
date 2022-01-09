@@ -20,24 +20,34 @@ namespace GameKeeper
         return true;
     }
 
-	bool TimerComponent::LateAwake()
-	{
-		this->mNextUpdateTime = Helper::Time::GetMilTimestamp() + this->TimerPrecision;
-        return true;
-	}
-
-    unsigned int TimerComponent::AddTimer(TimerBase * timer)
+    void TimerComponent::OnStart()
     {
-        if (timer == nullptr)
-        {
-            return false;
+        for (int index = 1; index < 100; index++) {
+
+            auto func = []() {
+
+            };
+            this->AddTimer(index * 100, new LambdaMethod(func));
         }
-        timer->mTimerId = this->mTimerIdPool.Pop();
-        LOG_CHECK_RET_ZERO(this->AddTimerToWheel(timer));
-        return timer->mTimerId;
     }
 
-    unsigned int TimerComponent::AddTimer(long long ms, StaticMethod * func)
+	bool TimerComponent::LateAwake()
+    {
+        this->mNextUpdateTime = Helper::Time::GetMilTimestamp();
+        return true;
+    }
+
+    long long TimerComponent::AddTimer(TimerBase * timer)
+    {
+        LOG_CHECK_FATAL(this->mNextUpdateTime > 0);
+        if (timer == nullptr || !this->AddTimerToWheel(timer))
+        {
+            return 0;
+        }
+        return timer->GetTimerId();
+    }
+
+    long long TimerComponent::AddTimer(unsigned int ms, StaticMethod * func)
     {
         if (ms == 0)
         {
@@ -48,7 +58,7 @@ namespace GameKeeper
         return this->AddTimer(new DelayTimer(ms, func));
     }
 
-    bool TimerComponent::RemoveTimer(unsigned int id)
+    bool TimerComponent::RemoveTimer(long long id)
     {
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
@@ -60,7 +70,7 @@ namespace GameKeeper
         return false;
     }
 
-    TimerBase * TimerComponent::GetTimer(unsigned int id)
+    TimerBase * TimerComponent::GetTimer(long long id)
     {
         auto iter = this->mTimerMap.find(id);
         return iter != this->mTimerMap.end() ? iter->second : nullptr;
@@ -68,26 +78,17 @@ namespace GameKeeper
 
     void TimerComponent::OnSystemUpdate()
     {
-		if (this->mNextUpdateTime == 0)
-		{
-			return;
-		}
         long long nowTime = Helper::Time::GetMilTimestamp();
         long long subTime = nowTime - this->mNextUpdateTime;
+        const int tick = subTime / this->TimerPrecision;
 
-        if (subTime <= (this->TimerPrecision - 2)) //2毫秒误差
-        {
-            return;
-        }
-        int count = subTime / this->TimerPrecision;
-        count = count == 0 ? 1 : count;
+        if(tick <= 0) return;
 
-        this->mNextUpdateTime = nowTime + this->TimerPrecision - subTime;
 
-        for (int index = 0; index < count; index++)
+        this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
+        for (int index = 0; index < tick; index++)
         {
             TimeWheelLayer *timerLayer = this->mTimerLayers[0];
-
             bool res = timerLayer->MoveIndex(this->mTimers);
             while (!this->mTimers.empty())
             {
@@ -125,27 +126,10 @@ namespace GameKeeper
         }
     }
 
-    bool TimerComponent::InvokeTimer(unsigned int id)
-    {
-        auto iter = this->mTimerMap.find(id);
-        if (iter != this->mTimerMap.end())
-        {
-            TimerBase * timer = iter->second;
-            this->mTimerMap.erase(iter);
-            if(timer->Invoke())
-            {
-                delete timer;
-                return true;
-            }
-            return this->AddTimerToWheel(timer);
-        }
-        return false;
-    }
-
     bool TimerComponent::AddTimerToWheel(TimerBase * timer)
     {
         long long nowTime = Helper::Time::GetMilTimestamp();
-        int tick = (timer->GetTriggerTime() - nowTime) / this->TimerPrecision;
+        int tick = (timer->GetTargetTime() - nowTime) / this->TimerPrecision;
         for (auto timerLayer : this->mTimerLayers)
         {
             if (timerLayer->AddTimer(tick, timer->mTimerId))

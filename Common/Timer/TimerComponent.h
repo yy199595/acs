@@ -1,35 +1,30 @@
 ﻿#pragma once
 
-#include "TimeWheelLayer.h"
-#include <Component/Component.h>
-#include <Util/NumberBuilder.h>
-#include <Method/MethodProxy.h>
+#include"TimeWheelLayer.h"
+#include<Component/Component.h>
+#include<Method/MethodProxy.h>
 namespace GameKeeper
 {
-    class TimerComponent : public Component, public ISystemUpdate
+    class TimerComponent : public Component, public ISystemUpdate, public IStart
     {
     public:
-        TimerComponent() : mTimerIdPool(1) {};
+        TimerComponent() = default;
 
         ~TimerComponent() override = default;
 
     public:
-        bool RemoveTimer(unsigned int id);
-
-        unsigned int AddTimer(TimerBase * timer);
+        bool RemoveTimer(long long id);
 
 		template<typename F,typename O, typename ... Args>
-		unsigned int AsyncWait(long long ms, F && f, O * o, Args &&... args) {
+		unsigned int AsyncWait(unsigned int ms, F && f, O * o, Args &&... args) {
 
 			StaticMethod * methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);
 		}
-		unsigned int AddTimer(long long ms, StaticMethod * func);
-
-        TimerBase * GetTimer(unsigned int id);
-	private:
-		
+        TimerBase * GetTimer(long long id);
+        long long AddTimer(TimerBase * timer);
+		long long AddTimer(unsigned int ms, StaticMethod * func);
 
     public:
         template<typename T, typename... Args>
@@ -38,11 +33,11 @@ namespace GameKeeper
     protected:
         bool Awake() final;
 
+        void OnStart() final;
+
 		bool LateAwake() final;
 
         void OnSystemUpdate() final;//处理系统事件
-
-        bool InvokeTimer(unsigned int id);
 
         bool AddTimerToWheel(TimerBase * timer);
 
@@ -52,13 +47,11 @@ namespace GameKeeper
         const int TimerPrecision = 20;
         const int OtherLayerCount = 32;
         const int FirstLayerCount = 256;
-
     private:
         long long mNextUpdateTime;
-        std::queue<unsigned int> mTimers;
-        NumberBuilder<unsigned int> mTimerIdPool;
+        std::queue<long long> mTimers;
         std::vector<TimeWheelLayer *> mTimerLayers;
-        std::unordered_map<unsigned int, TimerBase *> mTimerMap;//所有timer的列表
+        std::unordered_map<long long, TimerBase *> mTimerMap;//所有timer的列表
     };
 
     template<typename T, typename... Args>

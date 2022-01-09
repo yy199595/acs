@@ -17,108 +17,72 @@ namespace GameKeeper
 		this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
 	}
 
-	XCode LuaServiceMethod::Invoke(const com::Rpc_Request & request, com::Rpc_Response & response)
+    tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::Call(long long id, const std::string &json)
     {
-        int count = 2;
-        if (!this->mProtoConfig->IsAsync)
-        {
-            lua_getfunction(this->mLuaEnv, "Service", "Call");
-            lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-            if (!lua_isfunction(this->mLuaEnv, -1))
-            {
-                return XCode::CallLuaFunctionFail;
-            }
-            lua_pushinteger(this->mLuaEnv, request.userid());
-            if (request.has_data() && Helper::Proto::GetJson(request.data(), this->mMessageJson))
-            {
-                count++;
-                const char *json = this->mMessageJson.c_str();
-                const size_t size = this->mMessageJson.size();
-                lua_pushlstring(this->mLuaEnv, json, size);
-            }
-            if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
-            {
-                return XCode::CallLuaFunctionFail;
-            }
-            XCode code = (XCode) lua_tointeger(this->mLuaEnv, -1);
-            if (code != XCode::Successful)
-            {
-                return code;
-            }
-            size_t size = 0;
-            const char *json = lua_tolstring(this->mLuaEnv, -2, &size);
-            Message *message = Helper::Proto::NewByJson(this->mProtoConfig->Response, json, size);
-            if (message != nullptr)
-            {
-                response.mutable_data()->PackFrom(*message);
-            }
-            return XCode::Successful;
-        }
-
-
-        count = 3;
-        std::shared_ptr<LuaTaskSource> luaTaskSource(new LuaTaskSource());
-        lua_getfunction(this->mLuaEnv, "Service", "CallAsync");
+        lua_getfunction(this->mLuaEnv, "Service", "Call");
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-        if (!lua_isfunction(this->mLuaEnv, -1))
-        {
-            return XCode::CallLuaFunctionFail;
+        if (!lua_isfunction(this->mLuaEnv, -1)) {
+            return make_tuple(XCode::CallLuaFunctionFail, nullptr);
         }
-        UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
-        lua_pushinteger(this->mLuaEnv, request.userid());
-        if (request.has_data() && Helper::Proto::GetJson(request.data(), this->mMessageJson))
-        {
-            count++;
-            const char *json = this->mMessageJson.c_str();
-            const size_t size = this->mMessageJson.size();
-            lua_pushlstring(this->mLuaEnv, json, size);
-        }
-        if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
-        {
+        LuaParameter::WriteArgs(this->mLuaEnv, id, json);
+        if (lua_pcall(this->mLuaEnv, 3, 2, 0) != 0) {
             LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-            return XCode::CallLuaFunctionFail;
+            return make_tuple(XCode::CallLuaFunctionFail, nullptr);
+        }
+        XCode code = (XCode) lua_tointeger(this->mLuaEnv, -1);
+        const std::string &name = this->mProtoConfig->Response;
+        if (code != XCode::Successful || name.empty()) {
+            return make_tuple(code, nullptr);
         }
 
-        XCode code = luaTaskSource->Await();
-        if(code != XCode::Successful)
-        {
-            return code;
-        }
-
-        Message * message = Helper::Proto::NewByJson(this->mProtoConfig->Response, luaTaskSource->GetJson());
-        if(message != nullptr)
-        {
-            response.mutable_data()->PackFrom(*message);
-        }
-
-        return XCode::Successful;
+        size_t size = 0;
+        const char *str = lua_tolstring(this->mLuaEnv, -2, &size);
+        Message *message = Helper::Proto::NewByJson(name, str, size, true);
+        return make_tuple(XCode::Successful, std::shared_ptr<Message>(message));
     }
 
-	int LuaServiceMethod::Response(lua_State * lua)
-	{
-//		XCode code = (XCode)lua_tointeger(lua, 2);
-//        com::Rpc_Request * responseData = (com::Rpc_Request*)lua_touserdata(lua, 1);
-//
-//		TcpNetProxyComponent * sessionComponent = App::Get().GetComponent<TcpNetProxyComponent>();
-//		responseData->ClearMessage();
-//		if (lua_isstring(lua, 3))
-//		{
-//			size_t size = 0;
-//			const char * json = lua_tolstring(lua, 3, &size);
-//			const std::string & responseName = responseData->GetProConfig()->Response;
-//			Message * message = MessagePool::NewByJson(responseName, json, size);
-//			if (message != nullptr)
-//			{
-//				GKAssertBreakFatal_F(message);
-//				GKAssertBreakFatal_F(responseData->SetMessage(message));
-//			}
-//			else
-//			{
-//				responseData->SetMessage(json, size);
-//			}
-//		}
-//		sessionComponent->SendNetMessage(responseData);
+    tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::CallAsync(long long id, const std::string &json)
+    {
+        lua_getfunction(this->mLuaEnv, "Service", "CallAsync");
+        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
+        if (!lua_isfunction(this->mLuaEnv, -1)) {
+            return make_tuple(XCode::CallLuaFunctionFail, nullptr);
+        }
+        lua_pushinteger(this->mLuaEnv, id);
+        lua_pushlstring(this->mLuaEnv, json.c_str(), json.size());
+        if (lua_pcall(this->mLuaEnv, 3, 1, 0) != 0) {
+            LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+            return make_tuple(XCode::CallLuaFunctionFail, nullptr);
+        }
+        LuaTaskSource * luaTaskSource = PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
+        if(luaTaskSource == nullptr)
+        {
+            return make_tuple(XCode::CallLuaFunctionFail, nullptr);
+        }
+        XCode code = luaTaskSource->Await();
+        const std::string &name = this->mProtoConfig->Response;
+        if (code != XCode::Successful || name.empty()) {
+            return make_tuple(code, nullptr);
+        }
+        const std::string &response = luaTaskSource->GetJson();
+        Message *message = Helper::Proto::NewByJson(name, response, true);
+        return make_tuple(XCode::Successful, std::shared_ptr<Message>(message));
+    }
 
-		return 0;
-	}
+	XCode LuaServiceMethod::Invoke(const com::Rpc_Request & request, com::Rpc_Response & response)
+    {
+        std::string json;
+        if(request.has_data() && !Helper::Proto::GetJson(request.data(), json))
+        {
+            return XCode::ProtocbufCastJsonFail;
+        }
+        auto luaResponse = this->mProtoConfig->IsAsync
+                ? this->CallAsync(request.userid(), json) : this->Call(request.userid(), json);
+        if(std::get<1>(luaResponse) != nullptr)
+        {
+            auto message = std::get<1>(luaResponse);
+            response.mutable_data()->PackFrom(*message);
+        }
+        return std::get<0>(luaResponse);
+    }
 }

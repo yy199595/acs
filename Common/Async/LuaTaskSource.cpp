@@ -6,15 +6,22 @@
 #include"Pool/MessagePool.h"
 namespace GameKeeper
 {
+    LuaTaskSource::LuaTaskSource()
+    {
+        this->mCode = XCode::LuaCoroutineWait;
+    }
     XCode LuaTaskSource::Await()
     {
-        return this->mTaskSource.Await();
+        if(this->mCode == XCode::LuaCoroutineWait) {
+            return this->mTaskSource.Await();
+        }
+        return this->mCode;
     }
 
-    void LuaTaskSource::SetResult(int result, std::string json)
+    void LuaTaskSource::SetResult(int result, std::string & json)
     {
-        XCode code = (XCode)code;
+        this->mCode = (XCode) result;
         this->mJson = std::move(json);
-        this->mTaskSource.SetResult(code);
+        this->mTaskSource.SetResult(this->mCode);
     }
 }
