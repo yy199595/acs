@@ -60,7 +60,6 @@ endif()
 
 target_compile_definitions(Client PRIVATE __DEBUG__)
 target_compile_definitions(Client PRIVATE ASIO_STANDALONE)
-target_compile_definitions(Client PRIVATE __COROUTINE_ASM__)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
