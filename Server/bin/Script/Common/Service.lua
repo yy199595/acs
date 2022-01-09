@@ -35,6 +35,7 @@ function Service.CallAsync(func, id, json)
         if error == XCode.Successful then
             if type(response) == 'table' then
                 local str = Json.ToString(response)
+                print("response = ", str)
                 return luaTaskSource:SetResult(error, str)
             end
         end

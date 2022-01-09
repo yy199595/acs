@@ -87,9 +87,11 @@ namespace CommonParameter
     inline std::string &Read(lua_State *lua, int index)
     {
         size_t size = 0;
-        static std::string str = "";
-		str.assign(lua_tolstring(lua, index, &size), size);
-        return str;
+        static std::string data = "";
+        data.clear();
+        const char * str = lua_tolstring(lua, index, &size);
+        data.append(str, size);
+        return data;
     }
 
     template<>

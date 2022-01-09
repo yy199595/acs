@@ -1,5 +1,4 @@
 ﻿#include"TaskComponent.h"
-#include<memory.h>
 #include<Core/App.h>
 #include"TaskContext.h"
 #include<Util/Guid.h>
@@ -13,7 +12,7 @@ namespace GameKeeper
 {
 	void MainEntry(tb_context_from_t parame)
 	{
-		TaskComponent * taskComponent = (TaskComponent*)parame.priv;
+		auto taskComponent = (TaskComponent*)parame.priv;
         if(taskComponent != nullptr) {
             taskComponent->RunTask(parame.ctx);
         }
@@ -195,13 +194,8 @@ namespace GameKeeper
         size_t size = top - (char *) coroutine->mContext;
         if(coroutine->mStack.size < size)
         {
-#ifdef JE_MALLOC
-            je_free(coroutine->mStack.p);
-            coroutine->mStack.p = (char *)je_malloc(size);
-#else
 			free(coroutine->mStack.p);
 			coroutine->mStack.p = (char *)malloc(size);
-#endif
         }
         coroutine->mStack.size = size;
         memcpy(coroutine->mStack.p, coroutine->mContext, size);
