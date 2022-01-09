@@ -34,15 +34,12 @@ using namespace GameKeeper;
 
 int main(int argc, char **argv)
 {
-    //assert(argc <= 1);
     if(argc <= 1)
     {
         std::cout << "not find config start failure" << std::endl;
         return -1;
     }
 
-    std::cout << "path = " << argv[0] << std::endl;
-    std::cout << "config = " << argv[1] << std::endl;
     REGISTER_COMPONENT(TimerComponent);
     REGISTER_COMPONENT(RpcComponent);
     REGISTER_COMPONENT(RedisComponent);
