@@ -1,32 +1,27 @@
-﻿#include <fstream>
-#include <utility>
+﻿#include <utility>
 #include "ServerConfig.h"
 #include <Define/CommonLogDef.h>
 #include <Util/FileHelper.h>
-#include<iostream>
 namespace GameKeeper
 {
     ServerConfig::ServerConfig(std::string  path)
             : mConfigPath(std::move(path))
     {
-		std::cout << "config path = " << this->mConfigPath << std::endl;
-    }
-
-    bool ServerConfig::InitConfig()
-    {
         std::string outString;
         if (!Helper::File::ReadTxtFile(this->mConfigPath, outString))
         {
-			std::cerr << "not find config : " << mConfigPath << std::endl;
-            return false;
+            throw std::logic_error("not find config : " + mConfigPath);
         }
         mConfigDocument.Parse(outString.c_str(), outString.size());
         if (this->mConfigDocument.HasParseError())
         {
-			std::cerr << "parse json : " << mConfigPath << " failure" << std::endl;
-            return false;
+            throw std::logic_error("parse json : " + mConfigPath + " failure");
         }
+        this->InitConfig();
+    }
 
+    bool ServerConfig::InitConfig()
+    {
         auto iter = this->mConfigDocument.MemberBegin();
         for (; iter != this->mConfigDocument.MemberEnd(); iter++)
         {

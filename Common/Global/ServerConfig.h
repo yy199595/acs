@@ -14,7 +14,7 @@ namespace GameKeeper
         explicit ServerConfig(std::string  path);
 
     public:
-        bool InitConfig();
+
 
     public:
         bool HasValue(const std::string & k2) const;
@@ -45,6 +45,8 @@ namespace GameKeeper
 		rapidjson::Value *GetJsonValue(const std::string & k1) const;
 		rapidjson::Value *GetJsonValue(const std::string & k1, const std::string & k2) const;
 
+    private:
+        bool InitConfig();
     private:   
         const std::string mConfigPath;
         rapidjson::Document mConfigDocument;

@@ -11,14 +11,13 @@ namespace GameKeeper
 {
 	App *App::mApp = nullptr;
 
-	App::App() :GameObject(0), mServerPath(nullptr),
-		mStartTime(Helper::Time::GetMilTimestamp()),
+	App::App(ServerConfig * config) :GameObject(0), mServerPath(nullptr),
+        mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		mApp = this;
 		this->mDelatime = 0;
 		this->mIsClose = false;
-		this->mConfig = nullptr;
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
@@ -130,15 +129,7 @@ namespace GameKeeper
 
 	int App::Run(int argc, char ** argv)
 	{
-		std::string config(argv[1]);
-		this->mConfig = new ServerConfig(config);
-		this->mServerPath = new ServerPath(argc, argv);		
-
-		if (!mConfig->InitConfig())
-		{			
-			return this->Stop(ExitCode::ConfigError);
-		}
-
+		this->mServerPath = new ServerPath(argc, argv);
 		if (!this->AddComponentFormConfig())
 		{
 			return this->Stop(ExitCode::AddError);

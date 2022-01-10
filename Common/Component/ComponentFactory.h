@@ -24,6 +24,7 @@ namespace GameKeeper
 			auto iter = mTypeInfoMap.find(name);
 			if (iter != mTypeInfoMap.end())
 			{
+                throw std::logic_error("add " + name + " failure");
 				return false;
 			}
 			auto type = new TypeProxy<T>(name);

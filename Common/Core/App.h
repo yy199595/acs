@@ -34,7 +34,7 @@ namespace GameKeeper
 	class App : public GameObject
 	{
 	public:
-		explicit App();
+		explicit App(ServerConfig * config);
 		~App() final = default;
 	public:
 		const ServerConfig &GetConfig()

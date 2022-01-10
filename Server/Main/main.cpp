@@ -32,66 +32,67 @@
 #include"Component/GateClientComponent.h"
 using namespace GameKeeper;
 
-int add(int x, int y)
+void RegisterComponent()
 {
-    if(y == 0)
-    {
-        throw std::logic_error ("y = 0");
-        return -1;
-    }
-    return x / y;
+// rpc
+    ComponentFactory::Add<RpcComponent>("RpcComponent");
+    ComponentFactory::Add<RpcNodeComponent>("RpcNodeComponent");
+    ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
+
+// common
+    ComponentFactory::Add<TaskComponent>("TaskComponent");
+    ComponentFactory::Add<TimerComponent>("TimerComponent");
+    ComponentFactory::Add<LoggerComponent>("LoggerComponent");
+    ComponentFactory::Add<MonitorComponent>("MonitorComponent");
+    ComponentFactory::Add<OperatorComponent>("OperatorComponent");
+    ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
+
+//server
+    ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
+    ComponentFactory::Add<RpcClientComponent>("RpcClientComponent");
+    ComponentFactory::Add<TelnetClientComponent>("TelnetClientComponent");
+
+// gate
+    ComponentFactory::Add<GateComponent>("GateComponent");
+    ComponentFactory::Add<GateClientComponent>("GateClientComponent");
+
+// db
+    ComponentFactory::Add<RedisComponent>("RedisComponent");
+    ComponentFactory::Add<MysqlComponent>("MysqlComponent");
+    ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
+
+//http
+    ComponentFactory::Add<HttpClientComponent>("HttpClientComponent");
+// lua
+    ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
+    ComponentFactory::Add<LuaServiceMgrComponent>("LuaServiceMgrComponent");
+}
+
+void RegisterServiceComponent()
+{
+    ComponentFactory::Add<GateService>("GateService");
+    ComponentFactory::Add<MysqlService>("MysqlService");
+    ComponentFactory::Add<AccountService>("AccountService");
+    ComponentFactory::Add<LocalHostService>("LocalHostService");
+    ComponentFactory::Add<HttpLoginService>("HttpLoginService");
+    ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
+    ComponentFactory::Add<CenterHostService>("CenterHostService");
 }
 
 int main(int argc, char **argv)
 {
-    if(argc <= 1)
-    {
-        std::cout << "not find config start failure" << std::endl;
-        return -1;
-    }
-
     try
     {
-        int value = add(10, 0);
-        std::cout << value << std::endl;
+        RegisterComponent();
+        RegisterServiceComponent();
+        const std::string path(argv[1]);
+        ServerConfig * serverConfig = new ServerConfig(path);
+        return (new App(serverConfig))->Run(argc, argv);
     }
-    catch (std::logic_error & error)
+    catch(std::logic_error & err)
     {
-        std::cout << "error = " << error.what() << std::endl;
+        std::cerr << err.what() << std::endl;
+        return -1;
     }
-
-    REGISTER_COMPONENT(TimerComponent);
-    REGISTER_COMPONENT(RpcComponent);
-    REGISTER_COMPONENT(RedisComponent);
-    REGISTER_COMPONENT(MysqlComponent);
-    REGISTER_COMPONENT(LuaScriptComponent);
-    REGISTER_COMPONENT(RpcConfigComponent);
-    REGISTER_COMPONENT(MysqlProxyComponent);
-    REGISTER_COMPONENT(HttpClientComponent);
-    REGISTER_COMPONENT(OperatorComponent);
-    REGISTER_COMPONENT(LoggerComponent);
-
-    REGISTER_COMPONENT(ThreadPoolComponent);
-    REGISTER_COMPONENT(TaskComponent);
-    REGISTER_COMPONENT(RpcNodeComponent);
-    REGISTER_COMPONENT(TcpServerComponent);
-    REGISTER_COMPONENT(RpcClientComponent);
-    REGISTER_COMPONENT(TelnetClientComponent);
-    REGISTER_COMPONENT(MonitorComponent);
-
-    REGISTER_COMPONENT(LuaServiceMgrComponent);
-    REGISTER_COMPONENT(GateComponent);
-    REGISTER_COMPONENT(GateClientComponent);
-
-    REGISTER_COMPONENT(MysqlService);
-    REGISTER_COMPONENT(GateService);
-    REGISTER_COMPONENT(AccountService);
-    REGISTER_COMPONENT(CenterHostService);
-    REGISTER_COMPONENT(LocalHostService);
-    REGISTER_COMPONENT(HttpLoginService);
-    REGISTER_COMPONENT(HttpOperComponent);
-
-
-    App app;
-    return app.Run(argc, argv);
+    return -1;
 }
