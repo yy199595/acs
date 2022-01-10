@@ -2,50 +2,49 @@
 syntax = "proto3";
 package com;
 import "google/protobuf/any.proto";
-
 message StringArray
 {
-     repeated string DataArray = 1;
+     repeated string array = 1;
 }
 
 message Int32Array
 {
-     repeated int32 DataArray = 1;
+     repeated int32 array = 1;
 }
 
 message Int64Array
 {
-     repeated int64 DataArray = 1;
+     repeated int64 array = 1;
 }
 
 message StringData
 {
-     string Data = 1;
+     string value = 1;
 }
 
 message Int32Data
 {
-     int32 Data = 1;
+     int32 value = 1;
 }
 
 message Int64Data
 {
-     int64 Data = 1;
+     int64 value = 1;
 }
 
-message floatData
+message FloatData
 {
-     float Data = 1;
+     float value = 1;
 }
 
 message DoubleData
 {
-     double Data = 1;
+     double value = 1;
 }
 
 message StringMap
 {
-     map<string, string> Data = 1;
+     map<string, string> dict = 1;
 }
 
 
@@ -53,17 +52,17 @@ message Rpc
 {
      message Request
      {
-          int64 UserId = 1;
-          int64 RpcId = 2;
-          int32 MethodId = 3;
-          int64 SocketId = 4;
+          int64 user_id = 1;
+          int64 rpc_id = 2;
+          int32 method_id = 3;
+          int64 socket_id = 4;
           google.protobuf.Any Data = 5;
      }
      message Response
      {
-          int32 Code = 1;
-          int64 RpcId = 2;
-          int64 UserId = 3;
+          int32 code = 1;
+          int64 rpc_id = 2;
+          int64 user_id = 3;
           google.protobuf.Any Data = 4;
      }
 }

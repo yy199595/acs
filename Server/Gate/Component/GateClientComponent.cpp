@@ -53,7 +53,7 @@ namespace GameKeeper
         std::string json;
         util::MessageToJsonString(*request, &json);
         LOG_WARN("**********[client request]**********");
-        LOG_WARN("func = " << request->methodname());
+        LOG_WARN("func = " << request->method_name());
         LOG_WARN("json = " << json);
         LOG_WARN("*****************************************");
 #endif
@@ -63,12 +63,12 @@ namespace GameKeeper
             std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR("player call " << request->methodname() << " failure "
+            LOG_ERROR("player call " << request->method_name() << " failure "
                                      << "error = " << configCom->GetCodeDesc(code));
 #endif
-            responseMessage->set_code(code);
-            responseMessage->set_rpcid(request->rpcid());
-            this->SendToClient(request->sockid(), responseMessage);
+            responseMessage->set_code((int)code);
+            responseMessage->set_rpc_id(request->rpc_id());
+            this->SendToClient(request->sock_id(), responseMessage);
         }
     }
 

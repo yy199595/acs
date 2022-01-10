@@ -69,8 +69,8 @@ namespace GameKeeper
 		{
 			if (this->mHasUserId)
             {
-                return request.userid() == 0 ?
-                       XCode::NotFindUser : (_o->*_objfunc)(request.userid());
+                return request.user_id() == 0 ?
+                       XCode::NotFindUser : (_o->*_objfunc)(request.user_id());
             }
 			return (_o->*_func)();
 		}
@@ -99,7 +99,7 @@ namespace GameKeeper
             {
                 return XCode::CallArgsError;
             }
-            if(this->mHasUserId && request.userid() == 0)
+            if(this->mHasUserId && request.user_id() == 0)
             {
                 return XCode::NotFindUser;
             }
@@ -110,7 +110,7 @@ namespace GameKeeper
             }
 			if(this->mHasUserId)
             {
-                return (_o->*_objfunc)(request.userid(), *requestData);
+                return (_o->*_objfunc)(request.user_id(), *requestData);
             }
 			return (_o->*_func)(*requestData);
         }
@@ -145,14 +145,14 @@ namespace GameKeeper
             {
                 return XCode::CallTypeError;
             }
-            if(this->mHasUserId  && request.userid() == 0)
+            if(this->mHasUserId  && request.user_id() == 0)
             {
                 return XCode::NotFindUser;
             }
             std::shared_ptr<T2> responseData(new T2());
 			if(this->mHasUserId)
             {
-                XCode code = (_o->*_objfunc)(request.userid(), *requestData, *responseData);
+                XCode code = (_o->*_objfunc)(request.user_id(), *requestData, *responseData);
                 if (code == XCode::Successful)
                 {
                     response.mutable_data()->PackFrom(*responseData);
@@ -187,14 +187,14 @@ namespace GameKeeper
         void SetSocketId(long long id) override {_o->SetCurSocketId(id); };
         XCode Invoke(const com::Rpc_Request & request, com::Rpc_Response & response) override
 		{
-            if(this->mHasUserId && request.userid() == 0)
+            if(this->mHasUserId && request.user_id() == 0)
             {
                 return XCode::NotFindUser;
             }
 			std::shared_ptr<T1> responseData(new T1());
 			if (this->mHasUserId) 
 			{
-				XCode code = (_o->*_objfunc)(request.userid(), *responseData);
+				XCode code = (_o->*_objfunc)(request.user_id(), *responseData);
                 if(code == XCode::Successful)
                 {
                     response.mutable_data()->PackFrom(*responseData);

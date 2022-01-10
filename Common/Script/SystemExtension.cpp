@@ -3,7 +3,7 @@
 #include "Async/RpcTask/RpcTaskSource.h"
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include <Service/RpcNodeComponent.h>
+#include "Component/Scene/RpcNodeComponent.h"
 #include <Scene/LuaScriptComponent.h>
 
 #include <Service/RpcNode.h>
@@ -20,7 +20,7 @@ int SystemExtension::Call(lua_State *lua)
 
 	if (lua_pushthread(lua) == 1)
 	{
-		lua_pushinteger(lua, XCode::NoCoroutineContext);
+		lua_pushinteger(lua, (int)XCode::NoCoroutineContext);
 		LOG_ERROR("call " << service << "." << method << " not coroutine context");
 		return 1;
 	}
@@ -31,7 +31,7 @@ int SystemExtension::Call(lua_State *lua)
 	RpcNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
 	if (serviceNode == nullptr || !serviceNode->HasService(service))
 	{
-		lua_pushinteger(lua, XCode::CallServiceNotFound);
+		lua_pushinteger(lua, (int)XCode::CallServiceNotFound);
 		return 1;
 	}
 	int index = 4;

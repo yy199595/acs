@@ -1,8 +1,8 @@
 #include "RpcNodeComponent.h"
 
-#include <Core/App.h>
-#include <Service/RpcNode.h>
-#include <Rpc/RpcClientComponent.h>
+#include "Core/App.h"
+#include "Service/RpcNode.h"
+#include "Component/Rpc/RpcClientComponent.h"
 
 namespace GameKeeper
 {
@@ -64,8 +64,8 @@ namespace GameKeeper
     bool RpcNodeComponent::LateAwake()
     {
         s2s::NodeInfo centerNodeInfo;
-        centerNodeInfo.set_servername("Center");
-        centerNodeInfo.set_serverip(this->mCenterIp);
+        centerNodeInfo.set_server_name("Center");
+        centerNodeInfo.set_server_ip(this->mCenterIp);
         centerNodeInfo.add_services("CenterHostService");
         centerNodeInfo.mutable_listeners()->insert({"rpc", this->mCenterPort});
         this->CreateNode(0, centerNodeInfo);

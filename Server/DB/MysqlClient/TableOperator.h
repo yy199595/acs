@@ -14,23 +14,21 @@ namespace GameKeeper
     class TableOperator
     {
     public:
-        TableOperator(GKMysqlSocket *socket, std::string db, rapidjson::Value & doc);
+        TableOperator(GKMysqlSocket *socket);
 
     public:
-        bool InitMysqlTable();
+        bool InitDb(const std::string & name);
+        bool InitTable(const Descriptor * descriptor);
 
     private:
-        bool CreateMysqlTable(const std::string& table, std::string name, const std::vector<std::string> &keys);
+        bool CreateMysqlTable(const Descriptor * descriptor);
 
-        bool UpdateMysqlTable(const std::string& table, std::string name, const std::vector<std::string> &keys);
+        bool UpdateMysqlTable(const Descriptor * descriptor);
 
     private:
         bool AddNewField(const std::string& table, const FieldDescriptor *fieldDesc);
 
     private:
-        std::string mDataBase;
-        rapidjson::Value &mDocument;
         GKMysqlSocket *mMysqlSocket;
-
     };
 }

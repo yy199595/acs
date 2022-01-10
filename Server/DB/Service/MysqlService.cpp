@@ -34,9 +34,8 @@ namespace GameKeeper
         {
 			return XCode::ParseMessageError;
         }
-        std::string db;
         std::string sql;
-        if (!this->mMysqlComponent->GetAddSqlCommand(*message, db, sql))
+        if (!this->mMysqlComponent->GetAddSqlCommand(*message, sql))
         {
             return XCode::CallArgsError;
         }
@@ -46,7 +45,7 @@ namespace GameKeeper
 
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        XCode code = taskSource->Await(db, sql);
+        XCode code = taskSource->Await(sql);
 
 #ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
         std::cout << "[" << timer.GetMs() << "ms] sql = " << sql << std::endl;
@@ -71,9 +70,8 @@ namespace GameKeeper
 			return XCode::ParseMessageError;
 		}
 
-        std::string db;
         std::string sql;
-        if (!this->mMysqlComponent->GetSaveSqlCommand(*message, db, sql))
+        if (!this->mMysqlComponent->GetSaveSqlCommand(*message, sql))
         {
             return XCode::CallArgsError;
         }
@@ -83,7 +81,7 @@ namespace GameKeeper
 
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        XCode code = taskSource->Await(db, sql);
+        XCode code = taskSource->Await(sql);
 
 #ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
         std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
@@ -103,9 +101,8 @@ namespace GameKeeper
 		{
 			return XCode::ParseMessageError;
 		}
-        std::string db;
         std::string sql;
-        if (!this->mMysqlComponent->GetDeleteSqlCommand(*message, db, sql))
+        if (!this->mMysqlComponent->GetDeleteSqlCommand(*message, sql))
         {
             return XCode::CallArgsError;
         }
@@ -114,7 +111,7 @@ namespace GameKeeper
 #endif
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        XCode code = taskSource->Await(db, sql);
+        XCode code = taskSource->Await(sql);
 
 #ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
         std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
@@ -133,18 +130,12 @@ namespace GameKeeper
         {
             return XCode::CallArgsError;
         }
-        const SqlTableConfig *sqlTableConfig = this->mMysqlComponent->GetConfigByTab(request.tab());
-        if (sqlTableConfig == nullptr)
-        {
-            return XCode::CallArgsError;
-        }
 #ifdef __DEBUG__
       ElapsedTimer elapsedTimer;
 #endif
-
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        XCode code = taskSource->Await(sqlTableConfig->mDb, request.sql());
+        XCode code = taskSource->Await(request.sql());
 
 #ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
         std::cout << "["<< elapsedTimer.GetMs() << "ms] sql = " << request.sql() << std::endl;
@@ -156,7 +147,7 @@ namespace GameKeeper
         }
 
         std::string json;
-        const std::string &name = sqlTableConfig->mProtobufName;
+        const std::string name = "db.Account.UserAccountData";
         while (taskSource->GetQueryData(json))
         {
             Message *message = Helper::Proto::NewByJson(name, json);
@@ -181,9 +172,8 @@ namespace GameKeeper
             return XCode::ParseMessageError;
         }
 
-        std::string db;
         std::string sql;
-        if (!this->mMysqlComponent->GetQuerySqlCommand(*message, db, sql))
+        if (!this->mMysqlComponent->GetQuerySqlCommand(*message, sql))
         {
             return XCode::CallArgsError;
         }
@@ -192,7 +182,7 @@ namespace GameKeeper
 #endif
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
-        XCode code = taskSource->Await(db, sql);
+        XCode code = taskSource->Await(sql);
 
         if (code != XCode::Successful)
         {

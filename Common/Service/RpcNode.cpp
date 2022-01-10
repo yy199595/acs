@@ -37,10 +37,10 @@ namespace GameKeeper
         }
 
         this->mServiceArray.clear();
-        this->mAreaId = nodeInfo.areaid();
-        this->mNodeId = nodeInfo.nodeid();
-        this->mNodeIp = nodeInfo.serverip();
-        this->mNodeName = nodeInfo.servername();
+        this->mAreaId = nodeInfo.area_id();
+        this->mNodeId = nodeInfo.node_id();
+        this->mNodeIp = nodeInfo.server_ip();
+        this->mNodeName = nodeInfo.server_name();
         this->mNodePort = (unsigned short)iter->second;
         for(const std::string & name : nodeInfo.services())
         {
@@ -112,7 +112,7 @@ namespace GameKeeper
 			return nullptr;
 		}
         std::shared_ptr<com::Rpc_Request> request(new com::Rpc_Request());
-		request->set_methodid(config->MethodId);
+		request->set_method_id(config->MethodId);
         if(!this->mRpcClientComponent->Send(this->mSocketId, request))
         {
             this->ConnectToNode();
@@ -132,9 +132,9 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestData->set_rpcid(taskSource->GetRpcId());
+            requestData->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
 #endif
             return taskSource->GetCode();
         }
@@ -153,9 +153,9 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestData->set_rpcid(taskSource->GetRpcId());
+            requestData->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
 #endif
             return taskSource->GetCode();
         }

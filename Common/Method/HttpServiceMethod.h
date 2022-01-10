@@ -67,7 +67,7 @@ namespace GameKeeper
             XCode code = !jsonReader.TryParse(content->GetContent())
                          ? XCode::ParseJsonFailure : (_o->*_func)(jsonReader, *jsonWriter);
 
-            jsonWriter->Add("code", code);
+            jsonWriter->Add("code", (int)code);
             requestHandler->SetResponseContent(jsonWriter);
             return HttpStatus::OK;
         }
@@ -92,7 +92,7 @@ namespace GameKeeper
             auto jsonWriter = new HttpJsonContent();
             XCode code = (_o->*_func)(*jsonWriter);
 
-            jsonWriter->Add("code", code);
+            jsonWriter->Add("code", (int)code);
             HttpRequestHandler *requestHandler = session->GetReuqestHandler();
             requestHandler->SetResponseContent(jsonWriter);
             return HttpStatus::OK;

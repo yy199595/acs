@@ -6,7 +6,7 @@
 #include"Util/StringHelper.h"
 #include"Util/MathHelper.h"
 #include"Rpc/RpcComponent.h"
-#include"Service/RpcNodeComponent.h"
+#include"Component/Scene/RpcNodeComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
 namespace GameKeeper
@@ -63,12 +63,12 @@ namespace GameKeeper
 		for (int index = 0; index < 10; index++)
         {
             int random = Helper::Math::Random<int>(100, 100000);
-            db::UserAccountData userAccountData;
+            db::db_account::tab_user_account userAccountData;
             userAccountData.set_userid(userId + random);
             userAccountData.set_account(std::to_string(userId + index) + "@qq.com");
-            userAccountData.set_devicemac("ios_qq");
+            userAccountData.set_device_mac("ios_qq");
             userAccountData.set_token(Helper::String::CreateNewToken());
-            userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
+            userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
 
             std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
             if(this->Add(userAccountData, taskSource) == XCode::Successful)
@@ -85,7 +85,7 @@ namespace GameKeeper
             for(size_t index = 0; index < size; index++)
             {
                 std::string json;
-                auto data = rpcTaskSource->GetData<db::UserAccountData>(index);
+                auto data = rpcTaskSource->GetData<db::db_account_tab_user_account>(index);
                 Helper::Proto::GetJson(*data, json);
                 LOG_WARN(json);
             }
@@ -114,7 +114,7 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpcid(taskSource->GetRpcId());
+            requestMessage->set_rpc_id(taskSource->GetRpcId());
             return taskSource->GetCode();
         }
         return XCode::Successful;
@@ -141,9 +141,9 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpcid(taskSource->GetRpcId());
+            requestMessage->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
 #endif
             return taskSource->GetCode();
         }
@@ -172,9 +172,9 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpcid(taskSource->GetRpcId());
+            requestMessage->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
 #endif
             return taskSource->GetCode();
         }
@@ -202,9 +202,9 @@ namespace GameKeeper
         if(taskSource != nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpcid(taskSource->GetRpcId());
+            requestMessage->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
 #endif
             return taskSource->GetCode();
         }
@@ -232,9 +232,9 @@ namespace GameKeeper
         if(taskSource!= nullptr)
         {
             this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpcid(taskSource->GetRpcId());
+            requestMessage->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->methodid());
+            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
 #endif
             return taskSource->GetCode();
         }

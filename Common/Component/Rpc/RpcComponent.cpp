@@ -35,7 +35,7 @@ namespace GameKeeper
 
 	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
     {
-        unsigned short methodId = request->methodid();
+        unsigned short methodId = request->method_id();
         const ProtoConfig *protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
         if (protocolConfig == nullptr)
         {
@@ -52,7 +52,7 @@ namespace GameKeeper
 
         if (!protocolConfig->IsAsync)
         {
-            long long socketId = request->socketid();
+            long long socketId = request->socket_id();
             const std::string &method = protocolConfig->Method;
             auto response = logicService->Invoke(method, request);
             this->mRpcClientComponent->Send(socketId, response);
@@ -60,7 +60,7 @@ namespace GameKeeper
         }
         this->mCorComponent->Start([request, this, logicService, protocolConfig]()
         {
-            long long socketId = request->socketid();
+            long long socketId = request->socket_id();
             const std::string &method = protocolConfig->Method;
             auto response = logicService->Invoke(method, request);
             this->mRpcClientComponent->Send(socketId, response);
@@ -70,7 +70,7 @@ namespace GameKeeper
 
     XCode RpcComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {
-        long long rpcId = response->rpcid();
+        long long rpcId = response->rpc_id();
         auto iter = this->mRpcTasks.find(rpcId);
         if(iter == this->mRpcTasks.end())
         {

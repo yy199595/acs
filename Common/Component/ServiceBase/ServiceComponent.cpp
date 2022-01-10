@@ -68,13 +68,13 @@ namespace GameKeeper
 #endif
         std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
         XCode code = serviceMethod->Invoke(*request, *response);
-        if (request->rpcid() == 0)
+        if (request->rpc_id() == 0)
         {
             return nullptr;
         }
         response->set_code((int) code);
-        response->set_rpcid(request->rpcid());
-        response->set_userid(request->userid());
+        response->set_rpc_id(request->rpc_id());
+        response->set_user_id(request->user_id());
 #ifdef __DEBUG__
         std::string json;
         LOG_DEBUG("===============[rpc request]===============");

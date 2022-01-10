@@ -77,7 +77,7 @@ namespace GameKeeper
             return XCode::ProtocbufCastJsonFail;
         }
         auto luaResponse = this->mProtoConfig->IsAsync
-                ? this->CallAsync(request.userid(), json) : this->Call(request.userid(), json);
+                ? this->CallAsync(request.user_id(), json) : this->Call(request.user_id(), json);
         if(std::get<1>(luaResponse) != nullptr)
         {
             auto message = std::get<1>(luaResponse);

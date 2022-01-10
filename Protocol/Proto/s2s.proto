@@ -4,38 +4,38 @@ import "google/protobuf/any.proto";
 
 message Listener
 {
-    string Name = 1;
-    uint32 Port = 2;
+    string name = 1;
+    uint32 port = 2;
 }
 
 message NodeInfo
 {
-    int32 AreaId = 1;   //区服id
-    int32 NodeId = 2;   //节点id
-    string ServerIp = 3;
-    string ServerName = 4;  //服务器名字
-    repeated string Services = 5;   //服务名列表
-    map<string, int32> Listeners = 6; //所有监听器
+    int32 area_id = 1;   //区服id
+    int32 node_id = 2;   //节点id
+    string server_ip = 3;
+    string server_name = 4;  //服务器名字
+    repeated string services = 5;   //服务名列表
+    map<string, int32> listeners = 6; //所有监听器
 }
 
 message GroupConfigData
 {
-    uint32 GroupId = 1;     //组id
-    int64 OpenTime = 2;     // 开启时间
-    string Token = 3;       //验证token
-    string GroupName = 4;
+    uint32 group_id = 1;     //组id
+    int64 open_time = 2;     // 开启时间
+    string token = 3;       //验证token
+    string group_name = 4;
 }
 
 message NodeRegister
 {
     message Request
     {
-        NodeInfo nodeInfo = 1;
+        NodeInfo node_info = 1;
     }
     message Response
     {
-        int32 globalId = 1;
-        GroupConfigData GroupData = 2;
+        int32 node_id = 1;
+        GroupConfigData group_data = 2;
     }
 }
 

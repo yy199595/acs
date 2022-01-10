@@ -1,7 +1,7 @@
 ﻿#include "LocalHostService.h"
 #include <Core/App.h>
 #include <Service/RpcNode.h>
-#include <Service/RpcNodeComponent.h>
+#include "Component/Scene/RpcNodeComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Scene/OperatorComponent.h"
@@ -30,17 +30,17 @@ namespace GameKeeper
         std::vector<Component *> components;
         s2s::NodeRegister_Request registerInfo;
         this->gameObject->GetComponents(components);
-        s2s::NodeInfo *nodeInfo = registerInfo.mutable_nodeinfo();
+        s2s::NodeInfo *nodeInfo = registerInfo.mutable_node_info();
 
-        nodeInfo->set_areaid(this->mAreaId);
-        nodeInfo->set_nodeid(this->mNodeId);
-        nodeInfo->set_servername(this->mNodeName);
+        nodeInfo->set_area_id(this->mAreaId);
+        nodeInfo->set_node_id(this->mNodeId);
+        nodeInfo->set_server_name(this->mNodeName);
 
         auto tcpServer = this->GetComponent<TcpServerComponent>();
 
         std::vector<const NetworkListener *> listeners;
         tcpServer->GetListeners(listeners);
-        nodeInfo->set_serverip(tcpServer->GetHostIp());
+        nodeInfo->set_server_ip(tcpServer->GetHostIp());
 
         for (auto listener: listeners) {
             const auto &listenerConfig = listener->GetConfig();
@@ -62,9 +62,9 @@ namespace GameKeeper
         if (response == nullptr) {
             LOG_ERROR("register to center failure");
         }
-        this->mToken = response->groupdata().token();
-        this->mOpenTime = response->groupdata().opentime();
-        this->mGroupName = response->groupdata().groupname();
+        this->mToken = response->group_data().token();
+        this->mOpenTime = response->group_data().open_time();
+        this->mGroupName = response->group_data().group_name();
         LOG_DEBUG("register all service to center successful");
     }
 
@@ -93,7 +93,7 @@ namespace GameKeeper
 
     XCode LocalHostService::Del(const Int32Data &serviceData)
     {
-        const int nodeId = serviceData.data();
+        const int nodeId = serviceData.value();
         RpcNode *nodeProxy = this->mNodeComponent->GetServiceNode(nodeId);
         if(nodeProxy != nullptr)
         {
@@ -113,7 +113,7 @@ namespace GameKeeper
 
 	XCode LocalHostService::Add(const s2s::NodeInfo & nodeInfo)
 	{
-		const int uid = nodeInfo.areaid() * 10000 + nodeInfo.nodeid();
+		const int uid = nodeInfo.area_id() * 10000 + nodeInfo.node_id();
 		RpcNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
 
         serviceNode->UpdateNodeProxy(nodeInfo);

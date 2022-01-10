@@ -138,6 +138,11 @@ namespace LuaParameter
         Encode(lua, std::forward<Args>(args)...);
     }
 
+    inline void WriteArgs(lua_State * lua)
+    {
+
+    }
+
     template<typename... Args>
     inline void WriteArgs(lua_State *lua, Args... args)
     {

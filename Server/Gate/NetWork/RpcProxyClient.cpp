@@ -34,7 +34,7 @@ namespace GameKeeper
         this->mCallCount++;
         this->mQps += size;
         std::cout << "receive player message count = " << this->mCallCount << std::endl;
-        request->set_sockid(this->GetSocketId());
+        request->set_sock_id(this->GetSocketId());
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
         mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mProxyComponent, request);
         return XCode::Successful;

@@ -44,8 +44,8 @@ namespace GameKeeper
 			{
 				continue;
 			}
-		
-			auto localService = App::Get().GetComponent<ServiceComponent>(service);
+
+			auto localService = this->GetComponent<ServiceComponent>(service);
 			if (localService == nullptr)
 			{
 				auto luaSerivce = new LuaServiceComponent();
@@ -59,7 +59,6 @@ namespace GameKeeper
 					LOG_FATAL("Init lua service [" << service << "] failure");
 					return false;
 				}
-                luaSerivce->LateAwake();
 				localService = luaSerivce;
 			}
 
@@ -78,6 +77,11 @@ namespace GameKeeper
 				localService->AddMethod(new LuaServiceMethod(config, lua, idx));
 				LOG_INFO("add new lua service method : " << service << "." << method);
 			}
+            auto luaServiceComponent = dynamic_cast<LuaServiceComponent*>(localService);
+            if(luaServiceComponent != nullptr && !luaServiceComponent->LateAwake())
+            {
+                return false;
+            }
 		}
 		return true;
 	}

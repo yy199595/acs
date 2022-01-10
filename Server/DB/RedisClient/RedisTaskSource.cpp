@@ -62,7 +62,7 @@ namespace GameKeeper
         if (reply == nullptr)
         {
             const std::string err = "redis replay null";
-            this->mTaskSource.SetResult(std::make_shared<RedisResponse>(RedisReplyIsNull, err));
+            this->mTaskSource.SetResult(std::make_shared<RedisResponse>(XCode::RedisReplyIsNull, err));
             return true;
         }
         if (reply->type == REDIS_REPLY_ERROR)

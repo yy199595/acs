@@ -33,7 +33,7 @@ namespace GameKeeper
     XCode AccountService::Register(const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response)
     {
         const std::string &account = request.account();
-        const std::string &password = request.passwd();
+        const std::string &password = request.password();
         if (account.empty() || password.empty())
         {
             return XCode::CallArgsError;
@@ -46,15 +46,15 @@ namespace GameKeeper
         }
         long long userId = USER_ID_START + this->mRedisComponent->AddCounter("userid");
 
-        db::UserAccountData userAccountData;
+        db::db_account_tab_user_account userAccountData;
 
         std::string token = this->NewToken(account);
 
         userAccountData.set_token(token);
         userAccountData.set_userid(userId);
         userAccountData.set_account(account);
-        userAccountData.set_passwd(password);
-        userAccountData.set_registertime(Helper::Time::GetSecTimeStamp());
+        userAccountData.set_password(password);
+        userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(userAccountData, &json);

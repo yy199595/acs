@@ -65,14 +65,18 @@ inline std::string FromatFileAndLine(const char *file, const int line)
 #define LuaAssertReturnZero(code, msg)                    \
     {                                                     \
         if (code) { LuaDebugLog(#code << msg) return 0; } \
-    }
+    }                                                     \
 
-inline bool lua_getfunction(lua_State *lua, const char *tab, const char *func)
+
+
+
+
+
+inline bool lua_getfunction(lua_State *lua, int idx, const char *func)
 {
-    lua_getglobal(lua, tab);
-    if (lua_istable(lua, -1))
+    if (lua_istable(lua, idx))
     {
-        lua_getfield(lua, -1, func);
+        lua_getfield(lua, idx, func);
         if (lua_isfunction(lua, -1))
         {
             lua_remove(lua, -2);
@@ -82,6 +86,12 @@ inline bool lua_getfunction(lua_State *lua, const char *tab, const char *func)
     }
     return false;
 }
+inline bool lua_getfunction(lua_State *lua, const char *tab, const char *func)
+{
+    lua_getglobal(lua, tab);
+    return lua_getfunction(lua, -1, func);
+}
+
 
 inline int lua_reffunction(lua_State *lua, const char *tab, const char *func)
 {

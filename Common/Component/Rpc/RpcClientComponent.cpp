@@ -91,15 +91,15 @@ namespace GameKeeper
 
     void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
     {
-        long long socketId = request->socketid();
+        long long socketId = request->socket_id();
         XCode code = this->mRpcComponent->OnRequest(request);
         if(code != XCode::Successful)
         {
             std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
 
             response->set_code((int)code);
-            response->set_rpcid(request->rpcid());
-            response->set_userid(request->userid());
+            response->set_rpc_id(request->rpc_id());
+            response->set_user_id(request->user_id());
             if(!this->Send(socketId, response))
             {
                 this->OnSendFailure(socketId, response);
@@ -112,7 +112,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         int methodId = 0;
         long long costTime = 0;
-        long long rpcId = response->rpcid();
+        long long rpcId = response->rpc_id();
         this->mRpcComponent->GetRpcInfo(rpcId, methodId, costTime);
         auto config = this->mProtoConfigComponent->GetProtocolConfig(methodId);
         if (config != nullptr)
@@ -188,7 +188,7 @@ namespace GameKeeper
         std::string json;
         util::MessageToJsonString(*message, &json);
         auto config = App::Get().GetComponent<RpcConfigComponent>()->
-                GetProtocolConfig(message->methodid());
+                GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
         LOG_DEBUG("func = " << config->Service << "." << config->Method);
         LOG_DEBUG("json = " << json);

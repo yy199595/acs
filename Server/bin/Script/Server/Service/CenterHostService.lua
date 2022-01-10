@@ -1,7 +1,7 @@
 
 CenterHostService = {}
 
-function CenterHostService.Add(id, request)
+function Add(id, request)
     local json = Json.ToString(request)
     print("request json = " , type(request), coroutine.running())
     coroutine.sleep(1000)

@@ -5,25 +5,6 @@
 #include "Util/Guid.h"
 #include "MysqlClient/MysqlDefine.h"
 
-namespace GameKeeper
-{
-    class SqlTableConfig
-    {
-    public:
-        SqlTableConfig(const std::string db, std::string  tab, std::string pb);
-
-    public:
-        void AddKey(const std::string& key);
-
-        bool HasKey(const std::string &key) const;
-
-    public:
-        const std::string mDb;
-        const std::string mTableName;
-        const std::string mProtobufName;
-        std::unordered_set<std::string> mKeys;
-    };
-}
 
 namespace GameKeeper
 {
@@ -43,19 +24,16 @@ namespace GameKeeper
 		GKMysqlSocket * ConnectMysql();
     public:
 
-        const SqlTableConfig *GetConfigByTab(const std::string &tab) const;
-        const SqlTableConfig *GetCondifByProto(const std::string & proro) const;
-
         bool GetTableName(const std::string &pb, std::string &table);
 
     public:
-        bool GetAddSqlCommand(const Message &messageData, std::string & db, std::string &sqlCommand);
+        bool GetAddSqlCommand(const Message &messageData, std::string &sqlCommand);
 
-        bool GetSaveSqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand);
+        bool GetSaveSqlCommand(const Message &messageData, std::string &sqlCommand);
 
-        bool GetQuerySqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand);
+        bool GetQuerySqlCommand(const Message &messageData, std::string &sqlCommand);
 
-        bool GetDeleteSqlCommand(const Message &messageData,std::string & db, std::string &sqlCommand);
+        bool GetDeleteSqlCommand(const Message &messageData, std::string &sqlCommand);
 
     protected:
         bool Awake() final;
@@ -75,8 +53,7 @@ namespace GameKeeper
         GKMysqlSocket *mMysqlSockt;
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;
-        std::unordered_map<std::string, SqlTableConfig *> mTablePbMap;
-        std::unordered_map<std::string, SqlTableConfig *> mSqlConfigMap;   //sql表配置
+        std::unordered_map<std::string, std::string> mSqlTabelMap;
         std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
         class TaskComponent *mCorComponent;

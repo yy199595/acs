@@ -1,5 +1,5 @@
 #pragma once
-#include <Component/Component.h>
+#include "Component/Component.h"
 struct lua_State;
 namespace GameKeeper
 {

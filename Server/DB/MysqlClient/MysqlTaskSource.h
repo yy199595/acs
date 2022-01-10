@@ -21,7 +21,7 @@ namespace GameKeeper
     protected:
         bool Run() final; //在其他线程查询
     public:
-        XCode Await(const std::string & db, const std::string & sql);
+        XCode Await(const std::string & sql);
 
         const std::string &GetErrorStr() { return this->mErrorString; }
 
@@ -29,11 +29,8 @@ namespace GameKeeper
 
     private:
         void WriteValue(RapidJsonWriter &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
-
     private:
-         std::string mSqlCommand;
-         std::string mDataBaseName;
-    private:
+        std::string mSqlCommand;
         std::string mErrorString;
         TaskSource<XCode> mTaskSource;
         MysqlComponent * mMsqlComponent;

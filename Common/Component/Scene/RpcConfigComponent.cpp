@@ -152,7 +152,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
     void RpcConfigComponent::DebugCode(XCode code)
     {
-        auto iter = this->mCodeDescMap.find(code);
+        auto iter = this->mCodeDescMap.find((int)code);
         if(iter != this->mCodeDescMap.end())
         {
             LOG_ERROR("code = [" << iter->second.Name << ":" << iter->second.Desc << "]");
@@ -161,7 +161,7 @@ namespace GameKeeper
 
     std::string RpcConfigComponent::GetCodeDesc(XCode code)
     {
-        auto iter = this->mCodeDescMap.find(code);
+        auto iter = this->mCodeDescMap.find((int)code);
         if(iter != this->mCodeDescMap.end())
         {
             return iter->second.Name + ":" + iter->second.Desc;

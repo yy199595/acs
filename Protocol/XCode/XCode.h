@@ -1,5 +1,5 @@
 #pragma once
-enum XCode
+enum class XCode
 {
 	Successful = 0,//成功
 	Failure = 1,//失败

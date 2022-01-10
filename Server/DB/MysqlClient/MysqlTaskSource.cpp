@@ -12,10 +12,9 @@ namespace GameKeeper
 
     }
 
-    XCode MysqlTaskSource::Await(const std::string &db, const std::string &sql)
+    XCode MysqlTaskSource::Await(const std::string &sql)
     {
         this->mSqlCommand = std::move(sql);
-        this->mDataBaseName = std::move(db);
         auto threadComponent = App::Get().GetComponent<ThreadPoolComponent>();
         if(!threadComponent->StartTask(this))
         {

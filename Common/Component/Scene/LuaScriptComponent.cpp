@@ -19,8 +19,7 @@ namespace GameKeeper
 
         this->PushClassToLua();
         this->RegisterExtension();
-        LOG_CHECK_RET_FALSE(this->LoadAllFile());
-        return true;
+        return this->LoadAllFile();
     }
 
     bool LuaScriptComponent::LateAwake()
@@ -49,16 +48,25 @@ namespace GameKeeper
 
 	bool LuaScriptComponent::LoadAllFile()
 	{
-		std::string luaDir;
+        std::vector<std::string> luaPaths;
+        std::vector<std::string> luaFiles;
 		const ServerConfig & config = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetValue("ScriptPath", luaDir));
-
-		std::vector<std::string> luaFiles;
-		Helper::Directory::GetFilePaths(luaDir, "*.lua",luaFiles);
+		LOG_CHECK_RET_FALSE(config.GetValue("ScriptPath", luaPaths));
+        const std::string & workPath = App::Get().GetServerPath().GetWorkPath();
+        for(const std::string & path : luaPaths)
+        {
+            std::string fullPath = workPath + path;
+            if(!Helper::Directory::GetFilePaths(fullPath, "*.lua",luaFiles))
+            {
+                LOG_ERROR("load " << path << " lua file failure");
+                return false;
+            }
+        }
 
 		std::string dir, name, luaFile;
 		for (std::string & path : luaFiles)
 		{
+            LOG_INFO("load lua file " << path);
 			if (Helper::File::ReadTxtFile(path, luaFile)
 				&& Helper::Directory::GetDirAndFileName(path, dir, name))
 			{
@@ -69,14 +77,10 @@ namespace GameKeeper
 					mLuaFileMd5s.emplace(name, md5);
 					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 				}
-				else
+				else if(iter->second != md5)
 				{
-					const std::string & oldMd5 = iter->second;
-					if (oldMd5 != md5)
-					{
-						mLuaFileMd5s[name] = md5;
-						LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
-					}
+                    mLuaFileMd5s[name] = md5;
+                    LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 				}
 			}
 		}

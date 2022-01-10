@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-#include "Component/ServiceBase/ServiceComponent.h"
-#include <Script/LuaInclude.h>
 
+#include<Script/LuaInclude.h>
+#include"ServiceBase/ServiceComponent.h"
+
+class LuaTable;
 namespace GameKeeper
 {
     class LuaScriptComponent;
@@ -23,6 +25,7 @@ namespace GameKeeper
 		int mIdx;
 		lua_State * mLuaEnv;
 		std::string mServiceName;
+        std::shared_ptr<LuaTable> mLuaTable;
         class RpcConfigComponent * mRpcConfigComponent;
         std::unordered_map<std::string, int> mMethodMap;
     };

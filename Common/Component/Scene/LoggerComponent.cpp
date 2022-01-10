@@ -11,10 +11,13 @@ namespace GameKeeper
 	bool LoggerComponent::Awake()
 	{
 		this->mLogSaveTime = 1;
-		this->mLogSavePath = "./Log/";
-		App::Get().GetConfig().GetValue("Log", "path", this->mLogSavePath);
-		App::Get().GetConfig().GetValue("Log", "save", this->mLogSaveTime);
-		if (!App::Get().GetConfig().GetValue("NodeName", this->mServerName))
+        std::string path = "log";
+		App::Get().GetConfig().GetValue("Log", "path", path);
+        App::Get().GetConfig().GetValue("Log", "save", this->mLogSaveTime);
+        const std::string & workPath = App::Get().GetServerPath().GetWorkPath();
+
+        this->mLogSavePath = workPath + path;
+        if (!App::Get().GetConfig().GetValue("NodeName", this->mServerName))
 		{
 			std::cerr << "not find config field : NodeName" << std::endl;
 			return false;

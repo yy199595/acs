@@ -4,7 +4,7 @@
 #include<Service/RpcNode.h>
 #include<Util/FileHelper.h>
 #include<Rpc/RpcClientComponent.h>
-#include<Service/RpcNodeComponent.h>
+#include"Component/Scene/RpcNodeComponent.h"
 
 
 namespace GameKeeper
@@ -34,8 +34,8 @@ namespace GameKeeper
 
 	XCode CenterHostService::Add(const s2s::NodeRegister_Request &nodeInfo, s2s::NodeRegister_Response & response)
     {
-        const s2s::NodeInfo & registerNodeInfo = nodeInfo.nodeinfo();
-        const unsigned short areaId = registerNodeInfo.areaid();
+        const s2s::NodeInfo & registerNodeInfo = nodeInfo.node_info();
+        const unsigned short areaId = registerNodeInfo.area_id();
 
         auto groupConfig = this->GetGroupConfig(areaId);
         if(groupConfig == nullptr)
@@ -43,20 +43,20 @@ namespace GameKeeper
             return XCode::NotServerGroupConfig;
         }
 
-        int nodeId = registerNodeInfo.nodeid();
+        int nodeId = registerNodeInfo.node_id();
         const int globalId = areaId * 10000 + nodeId;
 
         auto nodeProxy = this->mNodeComponent->Create(globalId);
-        if (!nodeProxy->UpdateNodeProxy(nodeInfo.nodeinfo()))
+        if (!nodeProxy->UpdateNodeProxy(nodeInfo.node_info()))
         {
             return XCode::InitNodeProxyFailure;
         }
 
-        response.set_globalid(globalId);
+        response.set_node_id(globalId);
         this->AddNewNode(areaId, globalId);
-        response.mutable_groupdata()->set_token(groupConfig->mToken);
-        response.mutable_groupdata()->set_groupname(groupConfig->mName);
-        response.mutable_groupdata()->set_groupid(groupConfig->mGroupId);
+        response.mutable_group_data()->set_token(groupConfig->mToken);
+        response.mutable_group_data()->set_group_name(groupConfig->mName);
+        response.mutable_group_data()->set_group_id(groupConfig->mGroupId);
         return this->NoticeAllNode(registerNodeInfo);
     }
 
@@ -104,7 +104,7 @@ namespace GameKeeper
 
     XCode CenterHostService::NoticeAllNode(const s2s::NodeInfo & nodeInfo)
     {
-        auto areaId = (unsigned short)nodeInfo.areaid();
+        auto areaId = (unsigned short)nodeInfo.area_id();
         auto iter = this->mServiceNodeMap.find(areaId);
         if(iter != this->mServiceNodeMap.end())
         {
@@ -117,7 +117,7 @@ namespace GameKeeper
                 {
                     return code;
                 }
-                LOG_DEBUG("add rpc node to " << nodeInfo.servername());
+                LOG_DEBUG("add rpc node to " << nodeInfo.server_name());
             }
         }
         return XCode::Successful;

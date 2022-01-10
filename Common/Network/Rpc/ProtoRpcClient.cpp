@@ -77,7 +77,7 @@ namespace GameKeeper
 		{
 			return XCode::ParseRequestDataError;
 		}
-        requestData->set_socketid(this->GetSocketId());
+        requestData->set_socket_id(this->GetSocketId());
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
 		return XCode::Successful;

@@ -34,7 +34,7 @@ namespace GameKeeper
         else
         {
             responseMessage->set_code(response->code());
-            responseMessage->set_rpcid(this->mRpcId);
+            responseMessage->set_rpc_id(this->mRpcId);
             if (response->has_data())
             {
                 responseMessage->mutable_data()->CopyFrom(response->data());

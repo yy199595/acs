@@ -4,28 +4,28 @@ package c2s;
 import "google/protobuf/any.proto";
 message ServerInfo
 {
-    string ServerId = 1;
-    string ServerName = 2;
-    int32 ServerState = 3;
+    string server_id = 1;
+    string server_name = 2;
+    int32 server_state = 3;
 }
 
 message Rpc
 {
     message Request
     {
-        int64 RpcId = 1;
-        int64 SockId = 2;
-        string MethodName = 3;
-        uint32 MessageIndex = 4;
-        google.protobuf.Any Data = 5;
+        int64 rpc_id = 1;
+        int64 sock_id = 2;
+        string method_name = 3;
+        uint32 message_idx = 4;
+        google.protobuf.Any data = 5;
     }
     message Response
     {
-        int32 Code = 1;
-        int64 RpcId = 2;
-        int64 SockId = 3;
-        string Error = 4;
-        google.protobuf.Any Data = 5;
+        int32 code = 1;
+        int64 rpc_id = 2;
+        int64 sock_id = 3;
+        string error = 4;
+        google.protobuf.Any data = 5;
     }
 }
 
@@ -33,17 +33,17 @@ message AccountLogin
 {
     message Request
     {
-        string Account = 1;
-        string Token = 2;
-        string Passwd = 3;   // 密码
-        string LoginDev = 4; //登陆设备
+        string account = 1;
+        string token = 2;
+        string passwrod = 3;   // 密码
+        string login_dev = 4; //登陆设备
     }
     message Response
     {
-        string Token = 1;  //重新生成的token
-        string GateToken = 2;  //登陆网关的token
-        int64 LastLoginTime = 4;    // 上次登陆时间
-        repeated ServerInfo ServerList = 5;    //服务器列表
+        string token = 1;  //重新生成的token
+        string gate_token = 2;  //登陆网关的token
+        int64 last_logintime = 4;    // 上次登陆时间
+        repeated ServerInfo server_infos = 5;    //服务器列表
     }
 }
 
@@ -51,13 +51,13 @@ message AccountRegister
 {
     message Request
     {
-        string Account = 1;
-        string Passwd = 2;
-        string LoginDev = 3;
+        string account = 1;
+        string password = 2;
+        string login_dev = 3;
     }
     message Response
     {
-        string Token = 1;
+        string token = 1;
     }
 }
 

@@ -8,7 +8,7 @@
     "Log":
     {
         "save":1,
-        "path":"./Log/",
+        "path":"Log/",
         "hour":0,
         "min":0
     },
@@ -46,7 +46,7 @@
         "port": 3306,
         "user": "yjz",
         "passwd": "199595yjz.",
-        "sql": "./sql/sql.json"
+        "sql": "Config/sql.json"
     },
     "Redis": {
         "ip": "127.0.0.1",
@@ -54,7 +54,10 @@
         "timeout": 3,
         "passwd": ""
     },
-    "ScriptPath":"./Script/",
+    "ScriptPath": [
+        "Script/Common/",
+        "Script/Server/"
+    ],
     "Scene": [
         "ThreadPoolComponent",
         "MonitorComponent",
@@ -73,8 +76,8 @@
         "HttpClientComponent"
     ],
     "Service": [
-        "MysqlService",
         "GateService",
+        "MysqlService",
         "AccountService",
         "LocalHostService",
         "CenterHostService"

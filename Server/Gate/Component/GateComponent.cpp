@@ -7,7 +7,7 @@
 #include"Service/RpcNode.h"
 #include"NetWork/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Service/RpcNodeComponent.h"
+#include"Component/Scene/RpcNodeComponent.h"
 #include"Task/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -35,9 +35,9 @@ namespace GameKeeper
 
     XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
     {
-        auto config = this->mRpcConfigComponent->GetProtocolConfig(request->methodname());
+        auto config = this->mRpcConfigComponent->GetProtocolConfig(request->method_name());
         if (config == nullptr) {
-            LOG_ERROR("call function " << request->methodname() << " not find");
+            LOG_ERROR("call function " << request->method_name() << " not find");
             return XCode::NotFoundRpcConfig;
         }
         auto nodeService = this->mRpcNodeComponent->AllotService(config->Service);
@@ -60,13 +60,13 @@ namespace GameKeeper
             }
         }
 
-        auto requestMessage = nodeService->NewRequest(request->methodname());
+        auto requestMessage = nodeService->NewRequest(request->method_name());
         std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
         if (request->has_data()) {
             requestMessage->mutable_data()->CopyFrom(request->data());
         }
-        requestMessage->set_rpcid(proxyTask->GetRpcId());
-        proxyTask->InitProxyTask(request->rpcid(), request->sockid(), this, this->mRpcComponent);
+        requestMessage->set_rpc_id(proxyTask->GetRpcId());
+        proxyTask->InitProxyTask(request->rpc_id(), request->sock_id(), this, this->mRpcComponent);
         return XCode::Successful;
     }
 

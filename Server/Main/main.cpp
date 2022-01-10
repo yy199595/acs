@@ -14,9 +14,9 @@
 #include"Service/GateService.h"
 #include <Telnet/TelnetClientComponent.h>
 
-#include <Service/LuaServiceMgrComponent.h>
+#include "Component/Scene/LuaServiceMgrComponent.h"
 #include <Rpc/RpcComponent.h>
-#include <Service/RpcNodeComponent.h>
+#include "Component/Scene/RpcNodeComponent.h"
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
@@ -32,12 +32,32 @@
 #include"Component/GateClientComponent.h"
 using namespace GameKeeper;
 
+int add(int x, int y)
+{
+    if(y == 0)
+    {
+        throw std::logic_error ("y = 0");
+        return -1;
+    }
+    return x / y;
+}
+
 int main(int argc, char **argv)
 {
     if(argc <= 1)
     {
         std::cout << "not find config start failure" << std::endl;
         return -1;
+    }
+
+    try
+    {
+        int value = add(10, 0);
+        std::cout << value << std::endl;
+    }
+    catch (std::logic_error & error)
+    {
+        std::cout << "error = " << error.what() << std::endl;
     }
 
     REGISTER_COMPONENT(TimerComponent);

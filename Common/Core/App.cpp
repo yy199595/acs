@@ -2,8 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Service/RpcNodeComponent.h"
-#include"Scene/ThreadPoolComponent.h"
+#include"Component/Scene/RpcNodeComponent.h"
 
 using namespace GameKeeper;
 using namespace std::chrono;
