@@ -51,7 +51,7 @@ namespace GameKeeper
         std::string token = this->NewToken(account);
 
         userAccountData.set_token(token);
-        userAccountData.set_userid(userId);
+        userAccountData.set_user_id(userId);
         userAccountData.set_account(account);
         userAccountData.set_password(password);
         userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());

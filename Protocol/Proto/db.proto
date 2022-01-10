@@ -6,7 +6,7 @@ message db_account
     message tab_user_account
     {
         string account = 1;     //账户
-        int64 userid = 2;      //用户id
+        int64 user_id = 2;      //用户id
         string password = 3;      //密码
         string platform = 4;    //平台
         int64 phone_num = 5;     //手机号

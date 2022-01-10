@@ -83,7 +83,7 @@ namespace GameKeeper
 
 	XCode CenterHostService::Query(const s2s::NodeQuery_Request & request, s2s::NodeQuery_Response & response)
 	{
-        auto areaId = (unsigned short)request.areaid();
+        auto areaId = (unsigned short)request.area_id();
         const std::string & service = request.service();
         auto iter = this->mServiceNodeMap.find(areaId);
         if(iter == this->mServiceNodeMap.end())
@@ -95,7 +95,7 @@ namespace GameKeeper
             auto nodeProxy = this->mNodeComponent->GetServiceNode(id);
             if(nodeProxy!= nullptr && nodeProxy->HasService(service))
             {
-               auto nodeInfo = response.add_nodeinfos();
+               auto nodeInfo = response.add_node_infos();
                nodeInfo->CopyFrom(nodeProxy->GetNodeInfo());
             }
         }

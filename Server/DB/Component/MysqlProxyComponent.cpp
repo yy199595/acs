@@ -59,13 +59,11 @@ namespace GameKeeper
 
 	void MysqlProxyComponent::AddUserData()
 	{
-		long long userId = Helper::Math::Random(10000, 10000000);
 		for (int index = 0; index < 10; index++)
         {
-            int random = Helper::Math::Random<int>(100, 100000);
             db::db_account::tab_user_account userAccountData;
-            userAccountData.set_userid(userId + random);
-            userAccountData.set_account(std::to_string(userId + index) + "@qq.com");
+            userAccountData.set_user_id(index + 10000);
+            userAccountData.set_account(std::to_string(index + 10000) + "@qq.com");
             userAccountData.set_device_mac("ios_qq");
             userAccountData.set_token(Helper::String::CreateNewToken());
             userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
@@ -76,9 +74,17 @@ namespace GameKeeper
                 LOG_ERROR("add data successful " << index);
             }
         }
+        db::db_account_tab_user_account userAccount;
+        userAccount.set_account("10000@qq.com");
+        std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
+
+       if(this->Query(userAccount, taskSource) == XCode::Successful)
+       {
+
+       }
 
         std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
-        XCode code = this->Sort("account.tb_player_account", "UserID", 10, false, rpcTaskSource);
+        XCode code = this->Sort("db_account.tab_user_account", "user_id", 10, false, rpcTaskSource);
         if(code == XCode::Successful)
         {
             size_t size = rpcTaskSource->GetDataSize();

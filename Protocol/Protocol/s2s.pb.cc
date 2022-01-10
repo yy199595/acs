@@ -456,14 +456,14 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, areaid_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, area_id_),
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Request, service_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Response, nodeinfos_),
+  PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery_Response, node_infos_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::NodeQuery, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -485,7 +485,7 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::s2s::MysqlResponse, errorstring_),
+  PROTOBUF_FIELD_OFFSET(::s2s::MysqlResponse, error_),
   PROTOBUF_FIELD_OFFSET(::s2s::MysqlResponse, datas_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::MysqlQuery_Request, _internal_metadata_),
@@ -585,22 +585,22 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "\n\ngroup_name\030\004 \001(\t\"\202\001\n\014NodeRegister\032+\n\007R"
   "equest\022 \n\tnode_info\030\001 \001(\0132\r.s2s.NodeInfo"
   "\032E\n\010Response\022\017\n\007node_id\030\001 \001(\005\022(\n\ngroup_d"
-  "ata\030\002 \001(\0132\024.s2s.GroupConfigData\"e\n\tNodeQ"
-  "uery\032*\n\007Request\022\016\n\006AreaId\030\001 \001(\005\022\017\n\007Servi"
-  "ce\030\002 \001(\t\032,\n\010Response\022 \n\tNodeInfos\030\001 \003(\0132"
-  "\r.s2s.NodeInfo\"&\n\tHostQuery\032\031\n\010Response\022"
-  "\r\n\005Hosts\030\001 \003(\t\"I\n\rMysqlResponse\022\023\n\013Error"
-  "String\030\001 \001(\t\022#\n\005Datas\030\002 \003(\0132\024.google.pro"
-  "tobuf.Any\";\n\nMysqlQuery\032-\n\007Request\022\"\n\004Da"
-  "ta\030\001 \001(\0132\024.google.protobuf.Any\"3\n\014MysqlA"
-  "nyOper\032#\n\007Request\022\013\n\003sql\030\001 \001(\t\022\013\n\003tab\030\002 "
-  "\001(\t\":\n\tMysqlOper\032-\n\007Request\022\"\n\004Data\030\001 \001("
-  "\0132\024.google.protobuf.Anyb\006proto3"
+  "ata\030\002 \001(\0132\024.s2s.GroupConfigData\"g\n\tNodeQ"
+  "uery\032+\n\007Request\022\017\n\007area_id\030\001 \001(\005\022\017\n\007serv"
+  "ice\030\002 \001(\t\032-\n\010Response\022!\n\nnode_infos\030\001 \003("
+  "\0132\r.s2s.NodeInfo\"&\n\tHostQuery\032\031\n\010Respons"
+  "e\022\r\n\005hosts\030\001 \003(\t\"C\n\rMysqlResponse\022\r\n\005err"
+  "or\030\001 \001(\t\022#\n\005datas\030\002 \003(\0132\024.google.protobu"
+  "f.Any\";\n\nMysqlQuery\032-\n\007Request\022\"\n\004data\030\001"
+  " \001(\0132\024.google.protobuf.Any\"3\n\014MysqlAnyOp"
+  "er\032#\n\007Request\022\013\n\003sql\030\001 \001(\t\022\013\n\003tab\030\002 \001(\t\""
+  ":\n\tMysqlOper\032-\n\007Request\022\"\n\004Data\030\001 \001(\0132\024."
+  "google.protobuf.Anyb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 911,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 907,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -2993,7 +2993,7 @@ NodeQuery_Request::NodeQuery_Request(const NodeQuery_Request& from)
   if (from.service().size() > 0) {
     service_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_);
   }
-  areaid_ = from.areaid_;
+  area_id_ = from.area_id_;
   // @@protoc_insertion_point(copy_constructor:s2s.NodeQuery.Request)
 }
 
@@ -3001,7 +3001,7 @@ void NodeQuery_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_NodeQuery_Request_s2s_2eproto.base);
   service_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  areaid_ = 0;
+  area_id_ = 0;
 }
 
 NodeQuery_Request::~NodeQuery_Request() {
@@ -3029,7 +3029,7 @@ void NodeQuery_Request::Clear() {
   (void) cached_has_bits;
 
   service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  areaid_ = 0;
+  area_id_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -3046,19 +3046,19 @@ const char* NodeQuery_Request::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // int32 AreaId = 1;
+      // int32 area_id = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_areaid(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_area_id(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // string Service = 2;
+      // string service = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.Service");
+        ctx->extra_parse_data().SetFieldName("s2s.NodeQuery.Request.service");
         object = msg->mutable_service();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -3103,20 +3103,20 @@ bool NodeQuery_Request::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 AreaId = 1;
+      // int32 area_id = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &areaid_)));
+                 input, &area_id_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // string Service = 2;
+      // string service = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
@@ -3124,7 +3124,7 @@ bool NodeQuery_Request::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->service().data(), static_cast<int>(this->service().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.NodeQuery.Request.Service"));
+            "s2s.NodeQuery.Request.service"));
         } else {
           goto handle_unusual;
         }
@@ -3158,17 +3158,17 @@ void NodeQuery_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->areaid(), output);
+  // int32 area_id = 1;
+  if (this->area_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->area_id(), output);
   }
 
-  // string Service = 2;
+  // string service = 2;
   if (this->service().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->service().data(), static_cast<int>(this->service().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.Service");
+      "s2s.NodeQuery.Request.service");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       2, this->service(), output);
   }
@@ -3186,17 +3186,17 @@ void NodeQuery_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->areaid(), target);
+  // int32 area_id = 1;
+  if (this->area_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->area_id(), target);
   }
 
-  // string Service = 2;
+  // string service = 2;
   if (this->service().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->service().data(), static_cast<int>(this->service().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.NodeQuery.Request.Service");
+      "s2s.NodeQuery.Request.service");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->service(), target);
@@ -3223,18 +3223,18 @@ size_t NodeQuery_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string Service = 2;
+  // string service = 2;
   if (this->service().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->service());
   }
 
-  // int32 AreaId = 1;
-  if (this->areaid() != 0) {
+  // int32 area_id = 1;
+  if (this->area_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->areaid());
+        this->area_id());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -3268,8 +3268,8 @@ void NodeQuery_Request::MergeFrom(const NodeQuery_Request& from) {
 
     service_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.service_);
   }
-  if (from.areaid() != 0) {
-    set_areaid(from.areaid());
+  if (from.area_id() != 0) {
+    set_area_id(from.area_id());
   }
 }
 
@@ -3300,7 +3300,7 @@ void NodeQuery_Request::InternalSwap(NodeQuery_Request* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   service_.Swap(&other->service_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(areaid_, other->areaid_);
+  swap(area_id_, other->area_id_);
 }
 
 ::google::protobuf::Metadata NodeQuery_Request::GetMetadata() const {
@@ -3329,7 +3329,7 @@ NodeQuery_Response::NodeQuery_Response()
 NodeQuery_Response::NodeQuery_Response(const NodeQuery_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      nodeinfos_(from.nodeinfos_) {
+      node_infos_(from.node_infos_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:s2s.NodeQuery.Response)
 }
@@ -3362,7 +3362,7 @@ void NodeQuery_Response::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  nodeinfos_.Clear();
+  node_infos_.Clear();
   _internal_metadata_.Clear();
 }
 
@@ -3379,14 +3379,14 @@ const char* NodeQuery_Response::_InternalParse(const char* begin, const char* en
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // repeated .s2s.NodeInfo NodeInfos = 1;
+      // repeated .s2s.NodeInfo node_infos = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
           parser_till_end = ::s2s::NodeInfo::_InternalParse;
-          object = msg->add_nodeinfos();
+          object = msg->add_node_infos();
           if (size > end - ptr) goto len_delim_till_end;
           ptr += size;
           GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -3425,11 +3425,11 @@ bool NodeQuery_Response::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .s2s.NodeInfo NodeInfos = 1;
+      // repeated .s2s.NodeInfo node_infos = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_nodeinfos()));
+                input, add_node_infos()));
         } else {
           goto handle_unusual;
         }
@@ -3463,12 +3463,12 @@ void NodeQuery_Response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .s2s.NodeInfo NodeInfos = 1;
+  // repeated .s2s.NodeInfo node_infos = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->nodeinfos_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->node_infos_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1,
-      this->nodeinfos(static_cast<int>(i)),
+      this->node_infos(static_cast<int>(i)),
       output);
   }
 
@@ -3485,12 +3485,12 @@ void NodeQuery_Response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .s2s.NodeInfo NodeInfos = 1;
+  // repeated .s2s.NodeInfo node_infos = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->nodeinfos_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->node_infos_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, this->nodeinfos(static_cast<int>(i)), target);
+        1, this->node_infos(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3514,14 +3514,14 @@ size_t NodeQuery_Response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .s2s.NodeInfo NodeInfos = 1;
+  // repeated .s2s.NodeInfo node_infos = 1;
   {
-    unsigned int count = static_cast<unsigned int>(this->nodeinfos_size());
+    unsigned int count = static_cast<unsigned int>(this->node_infos_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->nodeinfos(static_cast<int>(i)));
+          this->node_infos(static_cast<int>(i)));
     }
   }
 
@@ -3552,7 +3552,7 @@ void NodeQuery_Response::MergeFrom(const NodeQuery_Response& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  nodeinfos_.MergeFrom(from.nodeinfos_);
+  node_infos_.MergeFrom(from.node_infos_);
 }
 
 void NodeQuery_Response::CopyFrom(const ::google::protobuf::Message& from) {
@@ -3580,7 +3580,7 @@ void NodeQuery_Response::Swap(NodeQuery_Response* other) {
 void NodeQuery_Response::InternalSwap(NodeQuery_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&nodeinfos_)->InternalSwap(CastToBase(&other->nodeinfos_));
+  CastToBase(&node_infos_)->InternalSwap(CastToBase(&other->node_infos_));
 }
 
 ::google::protobuf::Metadata NodeQuery_Response::GetMetadata() const {
@@ -3868,13 +3868,13 @@ const char* HostQuery_Response::_InternalParse(const char* begin, const char* en
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // repeated string Hosts = 1;
+      // repeated string hosts = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.HostQuery.Response.Hosts");
+          ctx->extra_parse_data().SetFieldName("s2s.HostQuery.Response.hosts");
           object = msg->add_hosts();
           if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
             parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -3921,7 +3921,7 @@ bool HostQuery_Response::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated string Hosts = 1;
+      // repeated string hosts = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
@@ -3930,7 +3930,7 @@ bool HostQuery_Response::MergePartialFromCodedStream(
             this->hosts(this->hosts_size() - 1).data(),
             static_cast<int>(this->hosts(this->hosts_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.HostQuery.Response.Hosts"));
+            "s2s.HostQuery.Response.hosts"));
         } else {
           goto handle_unusual;
         }
@@ -3964,12 +3964,12 @@ void HostQuery_Response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated string Hosts = 1;
+  // repeated string hosts = 1;
   for (int i = 0, n = this->hosts_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->hosts(i).data(), static_cast<int>(this->hosts(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.HostQuery.Response.Hosts");
+      "s2s.HostQuery.Response.hosts");
     ::google::protobuf::internal::WireFormatLite::WriteString(
       1, this->hosts(i), output);
   }
@@ -3987,12 +3987,12 @@ void HostQuery_Response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated string Hosts = 1;
+  // repeated string hosts = 1;
   for (int i = 0, n = this->hosts_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->hosts(i).data(), static_cast<int>(this->hosts(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.HostQuery.Response.Hosts");
+      "s2s.HostQuery.Response.hosts");
     target = ::google::protobuf::internal::WireFormatLite::
       WriteStringToArray(1, this->hosts(i), target);
   }
@@ -4018,7 +4018,7 @@ size_t HostQuery_Response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string Hosts = 1;
+  // repeated string hosts = 1;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->hosts_size());
   for (int i = 0, n = this->hosts_size(); i < n; i++) {
@@ -4311,7 +4311,7 @@ void MysqlResponse::clear_datas() {
   datas_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int MysqlResponse::kErrorStringFieldNumber;
+const int MysqlResponse::kErrorFieldNumber;
 const int MysqlResponse::kDatasFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -4325,9 +4325,9 @@ MysqlResponse::MysqlResponse(const MysqlResponse& from)
       _internal_metadata_(nullptr),
       datas_(from.datas_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  errorstring_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.errorstring().size() > 0) {
-    errorstring_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.errorstring_);
+  error_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.error().size() > 0) {
+    error_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_);
   }
   // @@protoc_insertion_point(copy_constructor:s2s.MysqlResponse)
 }
@@ -4335,7 +4335,7 @@ MysqlResponse::MysqlResponse(const MysqlResponse& from)
 void MysqlResponse::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_MysqlResponse_s2s_2eproto.base);
-  errorstring_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  error_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 MysqlResponse::~MysqlResponse() {
@@ -4344,7 +4344,7 @@ MysqlResponse::~MysqlResponse() {
 }
 
 void MysqlResponse::SharedDtor() {
-  errorstring_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  error_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void MysqlResponse::SetCachedSize(int size) const {
@@ -4363,7 +4363,7 @@ void MysqlResponse::Clear() {
   (void) cached_has_bits;
 
   datas_.Clear();
-  errorstring_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  error_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -4380,13 +4380,13 @@ const char* MysqlResponse::_InternalParse(const char* begin, const char* end, vo
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string ErrorString = 1;
+      // string error = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.MysqlResponse.ErrorString");
-        object = msg->mutable_errorstring();
+        ctx->extra_parse_data().SetFieldName("s2s.MysqlResponse.error");
+        object = msg->mutable_error();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -4396,7 +4396,7 @@ const char* MysqlResponse::_InternalParse(const char* begin, const char* end, vo
         ptr += size;
         break;
       }
-      // repeated .google.protobuf.Any Datas = 2;
+      // repeated .google.protobuf.Any datas = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         do {
@@ -4446,22 +4446,22 @@ bool MysqlResponse::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string ErrorString = 1;
+      // string error = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_errorstring()));
+                input, this->mutable_error()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->errorstring().data(), static_cast<int>(this->errorstring().length()),
+            this->error().data(), static_cast<int>(this->error().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.MysqlResponse.ErrorString"));
+            "s2s.MysqlResponse.error"));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // repeated .google.protobuf.Any Datas = 2;
+      // repeated .google.protobuf.Any datas = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -4499,17 +4499,17 @@ void MysqlResponse::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string ErrorString = 1;
-  if (this->errorstring().size() > 0) {
+  // string error = 1;
+  if (this->error().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->errorstring().data(), static_cast<int>(this->errorstring().length()),
+      this->error().data(), static_cast<int>(this->error().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.MysqlResponse.ErrorString");
+      "s2s.MysqlResponse.error");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->errorstring(), output);
+      1, this->error(), output);
   }
 
-  // repeated .google.protobuf.Any Datas = 2;
+  // repeated .google.protobuf.Any datas = 2;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->datas_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -4531,18 +4531,18 @@ void MysqlResponse::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string ErrorString = 1;
-  if (this->errorstring().size() > 0) {
+  // string error = 1;
+  if (this->error().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->errorstring().data(), static_cast<int>(this->errorstring().length()),
+      this->error().data(), static_cast<int>(this->error().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.MysqlResponse.ErrorString");
+      "s2s.MysqlResponse.error");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->errorstring(), target);
+        1, this->error(), target);
   }
 
-  // repeated .google.protobuf.Any Datas = 2;
+  // repeated .google.protobuf.Any datas = 2;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->datas_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -4571,7 +4571,7 @@ size_t MysqlResponse::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .google.protobuf.Any Datas = 2;
+  // repeated .google.protobuf.Any datas = 2;
   {
     unsigned int count = static_cast<unsigned int>(this->datas_size());
     total_size += 1UL * count;
@@ -4582,11 +4582,11 @@ size_t MysqlResponse::ByteSizeLong() const {
     }
   }
 
-  // string ErrorString = 1;
-  if (this->errorstring().size() > 0) {
+  // string error = 1;
+  if (this->error().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->errorstring());
+        this->error());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -4617,9 +4617,9 @@ void MysqlResponse::MergeFrom(const MysqlResponse& from) {
   (void) cached_has_bits;
 
   datas_.MergeFrom(from.datas_);
-  if (from.errorstring().size() > 0) {
+  if (from.error().size() > 0) {
 
-    errorstring_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.errorstring_);
+    error_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_);
   }
 }
 
@@ -4649,7 +4649,7 @@ void MysqlResponse::InternalSwap(MysqlResponse* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&datas_)->InternalSwap(CastToBase(&other->datas_));
-  errorstring_.Swap(&other->errorstring_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  error_.Swap(&other->error_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
@@ -4751,7 +4751,7 @@ const char* MysqlQuery_Request::_InternalParse(const char* begin, const char* en
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .google.protobuf.Any Data = 1;
+      // .google.protobuf.Any data = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -4794,7 +4794,7 @@ bool MysqlQuery_Request::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .google.protobuf.Any Data = 1;
+      // .google.protobuf.Any data = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -4832,7 +4832,7 @@ void MysqlQuery_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .google.protobuf.Any Data = 1;
+  // .google.protobuf.Any data = 1;
   if (this->has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, HasBitSetters::data(this), output);
@@ -4851,7 +4851,7 @@ void MysqlQuery_Request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .google.protobuf.Any Data = 1;
+  // .google.protobuf.Any data = 1;
   if (this->has_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
@@ -4879,7 +4879,7 @@ size_t MysqlQuery_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .google.protobuf.Any Data = 1;
+  // .google.protobuf.Any data = 1;
   if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(

@@ -235,11 +235,11 @@ class db_account_tab_user_account :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
-  // int64 userid = 2;
-  void clear_userid();
-  static const int kUseridFieldNumber = 2;
-  ::google::protobuf::int64 userid() const;
-  void set_userid(::google::protobuf::int64 value);
+  // int64 user_id = 2;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 2;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
 
   // int64 phone_num = 5;
   void clear_phone_num();
@@ -269,7 +269,7 @@ class db_account_tab_user_account :
   ::google::protobuf::internal::ArenaStringPtr platform_;
   ::google::protobuf::internal::ArenaStringPtr device_mac_;
   ::google::protobuf::internal::ArenaStringPtr token_;
-  ::google::protobuf::int64 userid_;
+  ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 phone_num_;
   ::google::protobuf::int64 register_time_;
   ::google::protobuf::int64 lastlogin_time_;
@@ -575,18 +575,18 @@ inline void db_account_tab_user_account::set_allocated_account(::std::string* ac
   // @@protoc_insertion_point(field_set_allocated:db.db_account.tab_user_account.account)
 }
 
-// int64 userid = 2;
-inline void db_account_tab_user_account::clear_userid() {
-  userid_ = PROTOBUF_LONGLONG(0);
+// int64 user_id = 2;
+inline void db_account_tab_user_account::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 db_account_tab_user_account::userid() const {
-  // @@protoc_insertion_point(field_get:db.db_account.tab_user_account.userid)
-  return userid_;
+inline ::google::protobuf::int64 db_account_tab_user_account::user_id() const {
+  // @@protoc_insertion_point(field_get:db.db_account.tab_user_account.user_id)
+  return user_id_;
 }
-inline void db_account_tab_user_account::set_userid(::google::protobuf::int64 value) {
+inline void db_account_tab_user_account::set_user_id(::google::protobuf::int64 value) {
   
-  userid_ = value;
-  // @@protoc_insertion_point(field_set:db.db_account.tab_user_account.userid)
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:db.db_account.tab_user_account.user_id)
 }
 
 // string password = 3;

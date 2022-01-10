@@ -26,6 +26,7 @@ namespace GameKeeper
 
         bool GetTableName(const std::string &pb, std::string &table);
 
+        bool GetProtoByTable(const std::string & tab, std::string & proto);
     public:
         bool GetAddSqlCommand(const Message &messageData, std::string &sqlCommand);
 
@@ -42,8 +43,8 @@ namespace GameKeeper
 
 		bool StartConnect();
         bool InitMysqlTable();
-        bool DropTable(const std::string & db, const std::string & name);
-
+        bool DropTable(const std::string & db);
+        bool GetTableByProto(const Message & message, std::string & db);
     private:
 		std::string mSqlPath;
         std::string mMysqlIp;         //ip地址
@@ -53,7 +54,8 @@ namespace GameKeeper
         GKMysqlSocket *mMysqlSockt;
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;
-        std::unordered_map<std::string, std::string> mSqlTabelMap;
+        std::unordered_map<std::string, std::string> mSqlProtoMap;
+        std::unordered_map<std::string, std::string> mSqlTableMap;
         std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
     private:
         class TaskComponent *mCorComponent;

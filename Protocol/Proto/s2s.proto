@@ -45,12 +45,12 @@ message NodeQuery
 {
     message Request
     {
-        int32 AreaId = 1;
-        string Service = 2;
+        int32 area_id = 1;
+        string service = 2;
     }
     message Response
     {
-        repeated NodeInfo NodeInfos = 1;
+        repeated NodeInfo node_infos = 1;
     }
 }
 
@@ -58,21 +58,21 @@ message HostQuery
 {
     message Response
     {
-        repeated string Hosts = 1;
+        repeated string hosts = 1;
     }
 }
 
 message MysqlResponse
 {
-    string ErrorString = 1;
-    repeated google.protobuf.Any Datas = 2;
+    string error = 1;
+    repeated google.protobuf.Any datas = 2;
 }
 
 message MysqlQuery
 {
     message Request
     {
-        google.protobuf.Any Data = 1;
+        google.protobuf.Any data = 1;
     }
 }
 message MysqlAnyOper

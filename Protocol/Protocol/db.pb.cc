@@ -89,7 +89,7 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, account_),
-  PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, userid_),
+  PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, user_id_),
   PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, password_),
   PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, platform_),
   PROTOBUF_FIELD_OFFSET(::db::db_account_tab_user_account, phone_num_),
@@ -129,19 +129,19 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_db_2eproto[] =
-  "\n\010db.proto\022\002db\"\204\002\n\ndb_account\032\274\001\n\020tab_us"
-  "er_account\022\017\n\007account\030\001 \001(\t\022\016\n\006userid\030\002 "
-  "\001(\003\022\020\n\010password\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022"
-  "\021\n\tphone_num\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025"
-  "\n\rregister_time\030\007 \001(\003\022\026\n\016lastlogin_time\030"
-  "\010 \001(\003\022\r\n\005token\030\t \001(\t\0327\n\023tab_user_login_i"
-  "nfo\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\tb\006p"
-  "roto3"
+  "\n\010db.proto\022\002db\"\205\002\n\ndb_account\032\275\001\n\020tab_us"
+  "er_account\022\017\n\007account\030\001 \001(\t\022\017\n\007user_id\030\002"
+  " \001(\003\022\020\n\010password\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t"
+  "\022\021\n\tphone_num\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022"
+  "\025\n\rregister_time\030\007 \001(\003\022\026\n\016lastlogin_time"
+  "\030\010 \001(\003\022\r\n\005token\030\t \001(\t\0327\n\023tab_user_login_"
+  "info\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\tb\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 285,
+  "db.proto", &assign_descriptors_table_db_2eproto, 286,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -165,7 +165,7 @@ class db_account_tab_user_account::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int db_account_tab_user_account::kAccountFieldNumber;
-const int db_account_tab_user_account::kUseridFieldNumber;
+const int db_account_tab_user_account::kUserIdFieldNumber;
 const int db_account_tab_user_account::kPasswordFieldNumber;
 const int db_account_tab_user_account::kPlatformFieldNumber;
 const int db_account_tab_user_account::kPhoneNumFieldNumber;
@@ -204,9 +204,9 @@ db_account_tab_user_account::db_account_tab_user_account(const db_account_tab_us
   if (from.token().size() > 0) {
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
-  ::memcpy(&userid_, &from.userid_,
+  ::memcpy(&user_id_, &from.user_id_,
     static_cast<size_t>(reinterpret_cast<char*>(&lastlogin_time_) -
-    reinterpret_cast<char*>(&userid_)) + sizeof(lastlogin_time_));
+    reinterpret_cast<char*>(&user_id_)) + sizeof(lastlogin_time_));
   // @@protoc_insertion_point(copy_constructor:db.db_account.tab_user_account)
 }
 
@@ -218,9 +218,9 @@ void db_account_tab_user_account::SharedCtor() {
   platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&userid_, 0, static_cast<size_t>(
+  ::memset(&user_id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&lastlogin_time_) -
-      reinterpret_cast<char*>(&userid_)) + sizeof(lastlogin_time_));
+      reinterpret_cast<char*>(&user_id_)) + sizeof(lastlogin_time_));
 }
 
 db_account_tab_user_account::~db_account_tab_user_account() {
@@ -256,9 +256,9 @@ void db_account_tab_user_account::Clear() {
   platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&userid_, 0, static_cast<size_t>(
+  ::memset(&user_id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&lastlogin_time_) -
-      reinterpret_cast<char*>(&userid_)) + sizeof(lastlogin_time_));
+      reinterpret_cast<char*>(&user_id_)) + sizeof(lastlogin_time_));
   _internal_metadata_.Clear();
 }
 
@@ -291,10 +291,10 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         ptr += size;
         break;
       }
-      // int64 userid = 2;
+      // int64 user_id = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_userid(::google::protobuf::internal::ReadVarint(&ptr));
+        msg->set_user_id(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -432,13 +432,13 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
         break;
       }
 
-      // int64 userid = 2;
+      // int64 user_id = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &userid_)));
+                 input, &user_id_)));
         } else {
           goto handle_unusual;
         }
@@ -581,9 +581,9 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
       1, this->account(), output);
   }
 
-  // int64 userid = 2;
-  if (this->userid() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->userid(), output);
+  // int64 user_id = 2;
+  if (this->user_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->user_id(), output);
   }
 
   // string password = 3;
@@ -665,9 +665,9 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
         1, this->account(), target);
   }
 
-  // int64 userid = 2;
-  if (this->userid() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->userid(), target);
+  // int64 user_id = 2;
+  if (this->user_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->user_id(), target);
   }
 
   // string password = 3;
@@ -785,11 +785,11 @@ size_t db_account_tab_user_account::ByteSizeLong() const {
         this->token());
   }
 
-  // int64 userid = 2;
-  if (this->userid() != 0) {
+  // int64 user_id = 2;
+  if (this->user_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->userid());
+        this->user_id());
   }
 
   // int64 phone_num = 5;
@@ -860,8 +860,8 @@ void db_account_tab_user_account::MergeFrom(const db_account_tab_user_account& f
 
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
-  if (from.userid() != 0) {
-    set_userid(from.userid());
+  if (from.user_id() != 0) {
+    set_user_id(from.user_id());
   }
   if (from.phone_num() != 0) {
     set_phone_num(from.phone_num());
@@ -909,7 +909,7 @@ void db_account_tab_user_account::InternalSwap(db_account_tab_user_account* othe
     GetArenaNoVirtual());
   token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(userid_, other->userid_);
+  swap(user_id_, other->user_id_);
   swap(phone_num_, other->phone_num_);
   swap(register_time_, other->register_time_);
   swap(lastlogin_time_, other->lastlogin_time_);

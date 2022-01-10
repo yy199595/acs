@@ -52,7 +52,7 @@ namespace GameKeeper
 #endif
         if(code != XCode::Successful)
         {
-            response.set_errorstring(taskSource->GetErrorStr());
+            response.set_error(taskSource->GetErrorStr());
             return code;
         }
         return XCode::Successful;
@@ -88,7 +88,10 @@ namespace GameKeeper
 #endif
         if(code != XCode::Successful)
         {
-            response.set_errorstring(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+            LOG_ERROR(taskSource->GetErrorStr());
+#endif
+            response.set_error(taskSource->GetErrorStr());
             return code;
         }
         return XCode::Successful;
@@ -118,7 +121,10 @@ namespace GameKeeper
 #endif
         if(code != XCode::Successful)
         {
-            response.set_errorstring(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+            LOG_ERROR(taskSource->GetErrorStr());
+#endif
+            response.set_error(taskSource->GetErrorStr());
             return code;
         }
         return XCode::Successful;
@@ -133,6 +139,11 @@ namespace GameKeeper
 #ifdef __DEBUG__
       ElapsedTimer elapsedTimer;
 #endif
+        std::string protoFullName;
+        if(!this->mMysqlComponent->GetProtoByTable(request.tab(), protoFullName))
+        {
+            return XCode::CallArgsError;
+        }
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
         XCode code = taskSource->Await(request.sql());
@@ -142,15 +153,17 @@ namespace GameKeeper
 #endif
         if (code != XCode::Successful)
         {
-            response.set_errorstring(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+            LOG_ERROR(taskSource->GetErrorStr());
+#endif
+            response.set_error(taskSource->GetErrorStr());
             return code;
         }
 
         std::string json;
-        const std::string name = "db.Account.UserAccountData";
         while (taskSource->GetQueryData(json))
         {
-            Message *message = Helper::Proto::NewByJson(name, json);
+            Message *message = Helper::Proto::NewByJson(protoFullName, json);
             if (message == nullptr)
             {
                 return XCode::JsonCastProtocbufFail;
@@ -186,7 +199,10 @@ namespace GameKeeper
 
         if (code != XCode::Successful)
         {
-            response.set_errorstring(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+            LOG_ERROR(taskSource->GetErrorStr());
+#endif
+            response.set_error(taskSource->GetErrorStr());
             return code;
         }
 
