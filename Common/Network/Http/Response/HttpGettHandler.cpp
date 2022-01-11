@@ -71,7 +71,7 @@ namespace GameKeeper
         }
         this->mComponent = url.substr(pos1, pos2 - pos1);
         this->mMethod = url.substr(pos2 + 1, pos3 - pos2 - 1);
-        LOG_DEBUG("[http GET] " << this->mComponent << "." << this->mMethod);
+        LOG_DEBUG("[http GET] {0}.{1}", this->mComponent, this->mMethod);
 
 #ifdef __DEBUG__
         std::stringstream sss;

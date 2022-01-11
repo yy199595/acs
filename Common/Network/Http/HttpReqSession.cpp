@@ -68,7 +68,7 @@ namespace GameKeeper
             if (err)
             {
                 this->mHttpRespTask->OnComplete(XCode::HttpNetWorkError);
-                LOG_ERROR("resolver " << this->mHost << ":" << this->mPort << " failure : " << err.message());
+                LOG_ERROR("resolver {0}:{1} failure : {2}", this->mHost, this->mPort, err.message());
                 return;
             }
 			AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
@@ -92,13 +92,13 @@ namespace GameKeeper
         if (err)
         {
             this->mHttpRespTask->OnComplete(XCode::HttpNetWorkError);
-            LOG_ERROR("connect " << this->mHost << ":" << this->mPort << " failure : " << err.message());
+            LOG_ERROR("connect {0}:{1} failure : {2}", this->mHost, this->mPort, err.message());
             return;
         }
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
         this->mAddress = socket.remote_endpoint().address().to_string()
                          + ":" + std::to_string(socket.remote_endpoint().port());
-        LOG_DEBUG("connect to " << this->mHost << ":" << this->mPort << " successful");
+        LOG_DEBUG("connect to", this->mHost, ':', this->mPort, "successful");
         this->StartSendHttpMessage();
     }
 

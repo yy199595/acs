@@ -33,7 +33,7 @@ namespace GameKeeper
             if(auto hotfix = dynamic_cast<IHotfix*>(component))
             {
                 hotfix->OnHotFix();
-                LOG_INFO(component->GetTypeName() << " start hotfix");
+                LOG_INFO(component->GetTypeName()," start hotfix");
             }
         }
     }
@@ -48,10 +48,10 @@ namespace GameKeeper
             {
                 if(!loadConfig->OnLoadConfig())
                 {
-                    LOG_ERROR(component->GetTypeName() << " load config error");
+                    LOG_ERROR(component->GetTypeName(), " load config error");
                     return false;
                 }
-                LOG_INFO(component->GetTypeName() << " start hotfix");
+                LOG_INFO("{0} start hotfix", component->GetTypeName());
             }
         }
         return true;
@@ -59,32 +59,32 @@ namespace GameKeeper
 
     void OperatorComponent::AddRefreshTimer(Component * component)
     {
-         auto zeroRefresh = dynamic_cast<IZeroRefresh*>(component);
-        if(zeroRefresh == nullptr)
+        auto zeroRefresh = dynamic_cast<IZeroRefresh *>(component);
+        if (zeroRefresh == nullptr)
         {
             return;
         }
 
-        time_t  t = time(nullptr);
+        time_t t = time(nullptr);
         struct tm *pt = localtime(&t);
-        struct tm nextRefresh = *pt;		
+        struct tm nextRefresh = *pt;
         zeroRefresh->GetRefreshTime(nextRefresh.tm_hour, nextRefresh.tm_min);
-        if(pt->tm_hour > nextRefresh.tm_hour)
+        if (pt->tm_hour > nextRefresh.tm_hour)
         {
             nextRefresh.tm_mday += 1;
         }
-		else if (pt->tm_hour == nextRefresh.tm_hour && pt->tm_min > nextRefresh.tm_min)
-		{
-			nextRefresh.tm_mday += 1;
-		}
-		nextRefresh.tm_sec = 0;
+        else if (pt->tm_hour == nextRefresh.tm_hour && pt->tm_min > nextRefresh.tm_min)
+        {
+            nextRefresh.tm_mday += 1;
+        }
+        nextRefresh.tm_sec = 0;
         time_t nextTime = mktime(&nextRefresh) - time(nullptr);
         this->mTimerComponent->AsyncWait(nextTime * 1000, &OperatorComponent::StartRefreshDay, this,
                                          component->GetTypeName());
 #ifdef __DEBUG__
         int hour, min, second = 0;
-        Helper::Time::GetHourMinSecond(nextTime, hour,min, second);
-        LOG_DEBUG("Refresh the new day after " << hour << "h" << min << "m" << second << "s");
+        Helper::Time::GetHourMinSecond(nextTime, hour, min, second);
+        LOG_DEBUG("Refresh the new day after", hour, 'h', min, 'm', second, 's');
 #endif
     }
 

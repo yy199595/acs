@@ -25,7 +25,7 @@ namespace GameKeeper
         const std::string path = App::Get().GetServerPath().GetConfigPath() + "rpc.json";
         if (!Helper::File::ReadJsonFile(path, jsonMapper, md5))
         {
-            LOG_FATAL("not find file : " << path << "");
+            LOG_FATAL("not find file ", path);
             return false;///
         }
         if(this->mConfigFileMd5 == md5)
@@ -68,7 +68,7 @@ namespace GameKeeper
                     protocolConfig.Request = jsonValue.GetString();
                     if(Helper::Proto::New(protocolConfig.Request) == nullptr)
                     {
-                        LOG_FATAL("create " << protocolConfig.Request << " failure");
+                        LOG_FATAL("create", protocolConfig.Request,"failure");
                         return false;
                     }
                 }
@@ -80,7 +80,7 @@ namespace GameKeeper
                     protocolConfig.Response = jsonValue.GetString();               
                     if (Helper::Proto::New(protocolConfig.Response) == nullptr)
                     {
-                        LOG_FATAL("create " << protocolConfig.Response << " failure");
+                        LOG_FATAL("create", protocolConfig.Response, "failure");
                         return false;
                     }
                 }
@@ -102,7 +102,7 @@ namespace GameKeeper
         const std::string path = App::Get().GetServerPath().GetWorkPath();
         if (!Helper::File::ReadTxtFile(path + "XCode/XCode.csv", lines))
         {
-            LOG_ERROR("not find file " << path + "XCode/XCode.csv");
+            LOG_ERROR("not find file", path, "XCode/XCode.csv");
             return false;
         }
         std::vector<std::string> res;
@@ -155,7 +155,7 @@ namespace GameKeeper
         auto iter = this->mCodeDescMap.find((int)code);
         if(iter != this->mCodeDescMap.end())
         {
-            LOG_ERROR("code = [" << iter->second.Name << ":" << iter->second.Desc << "]");
+            LOG_ERROR("code = ", iter->second.Name, ':', iter->second.Desc);
         }
     }
 

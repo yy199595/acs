@@ -19,7 +19,7 @@ namespace GameKeeper
         const std::string &service = this->GetServiceName();
         if (!rpcConfigComponent->HasServiceMethod(service, name))
         {
-            LOG_FATAL(this->GetServiceName() << "." << name << " not config");
+            LOG_FATAL(this->GetServiceName(), '.', name, " add failure");
             return false;
         }
 
@@ -38,7 +38,7 @@ namespace GameKeeper
         auto iter = this->mMethodMap.find(name);
         if (iter != this->mMethodMap.end())
         {
-            LOG_FATAL(this->GetServiceName() << "." << name << " add failure");
+            LOG_FATAL(this->GetServiceName(), '.', name, " add failure");
             return false;
         }
         this->mMethodMap.emplace(name, method);
@@ -59,7 +59,7 @@ namespace GameKeeper
     std::shared_ptr<com::Rpc_Response> ServiceComponent::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
         ServiceMethod *serviceMethod = this->GetMethod(method);
-        if(serviceMethod == nullptr)
+        if (serviceMethod == nullptr)
         {
             return nullptr;
         }
@@ -76,21 +76,16 @@ namespace GameKeeper
         response->set_rpc_id(request->rpc_id());
         response->set_user_id(request->user_id());
 #ifdef __DEBUG__
-        std::string json;
         LOG_DEBUG("===============[rpc request]===============");
-        LOG_DEBUG("[func] = " << this->GetServiceName() << "." << method);
-        LOG_DEBUG("[time] = " << elapsedTimer.GetMs() << "ms");
-        if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
+        LOG_DEBUG("[func] =", this->GetServiceName(), '.', method);
+        LOG_DEBUG("[time] = ms", elapsedTimer.GetMs(), "ms");
+        if (request->has_data())
         {
-            LOG_DEBUG("[request] = " << json);
+            LOG_DEBUG("[request] = ", request->data());
         }
-        if(response->has_data())
+        if (response->has_data())
         {
-            json.clear();
-            if (Helper::Proto::GetJson(response->data(), json))
-            {
-                LOG_DEBUG("[response] = " << json);
-            }
+            LOG_DEBUG("[response] = ", response->data());
         }
 #endif
         return response;

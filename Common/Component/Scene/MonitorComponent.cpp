@@ -37,7 +37,7 @@ namespace GameKeeper
                 if (taskThread->IsWork() && nowTime - taskThread->GetLastOperTime() >= 10)
                 {
                     const std::string &name = taskThread->GetName();
-                    LOG_FATAL(name << " thread no response for a long time " << taskThread->GetThreadId());
+                    LOG_FATAL(name, " thread no response for a long time");
                 }
             }
         }

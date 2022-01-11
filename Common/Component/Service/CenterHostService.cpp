@@ -117,7 +117,7 @@ namespace GameKeeper
                 {
                     return code;
                 }
-                LOG_DEBUG("add rpc node to " << nodeInfo.server_name());
+                LOG_DEBUG("add rpc node to {0}", nodeInfo.server_name());
             }
         }
         return XCode::Successful;
@@ -135,7 +135,7 @@ namespace GameKeeper
         rapidjson::Document document;
         if (!Helper::File::ReadJsonFile(path, document, this->mHostConfigMd5))
         {
-            LOG_ERROR("not find config " << path);
+            LOG_ERROR("not find config {0}", path);
             return false;
         }
         if(this->mHostConfigMd5 == md5)
@@ -160,7 +160,7 @@ namespace GameKeeper
         rapidjson::Document  document;
         if (!Helper::File::ReadJsonFile(path, document, md5))
         {
-            LOG_ERROR("not find config " << path);
+            LOG_ERROR("not find config {0}", path);
             return false;
         }
         if(this->mGroupConfigMd5 == md5)

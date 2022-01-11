@@ -46,7 +46,6 @@ namespace GameKeeper
         bool DropTable(const std::string & db);
         bool GetTableByProto(const Message & message, std::string & db);
     private:
-		std::string mSqlPath;
         std::string mMysqlIp;         //ip地址
         unsigned short mMysqlPort;     //端口号
         std::string mDataBaseUser;     //用户名

@@ -58,7 +58,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         std::string json;
         util::MessageToJsonString(userAccountData, &json);
-        LOG_DEBUG("register new player json = " << json);
+        LOG_DEBUG("register new player json = {0}", json);
 #endif
         const int second = 7 * 24 * 60 * 60;
         response.set_token(userAccountData.token());
@@ -67,10 +67,10 @@ namespace GameKeeper
         XCode code = this->mMysqlComponent->Add(userAccountData, std::make_shared<MysqlRpcTaskSource>());
         if(code != XCode::Successful)
         {
-            LOG_ERROR(account << " register failure");
+            LOG_ERROR(account, "register failure");
             return code;
         }
-        LOG_INFO(account << " register successful");
+        LOG_INFO(account, "register successful");
         return XCode::Successful;
     }
 

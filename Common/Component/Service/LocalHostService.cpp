@@ -106,7 +106,7 @@ namespace GameKeeper
                     serviceComponent->OnDelRpcNode(nodeProxy);
                 }
             }
-            LOG_ERROR("remove node " << nodeProxy->GetNodeName());
+            LOG_ERROR("remove node {0}", nodeProxy->GetNodeName());
         }
         return nodeId ? XCode::Successful : XCode::Failure;
     }

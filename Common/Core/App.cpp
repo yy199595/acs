@@ -49,10 +49,10 @@ namespace GameKeeper
 		for (const std::string & name : components)
 		{
 			if (!this->AddComponent(name))
-			{
-				LOG_FATAL("add " << name << " to service failure");
-				return false;
-			}
+            {
+                LOG_FATAL("add", name, "to service failure");
+                return false;
+            }
             //LOG_DEBUG("add new component : " << name);
 		}
 		return true;
@@ -72,7 +72,7 @@ namespace GameKeeper
 		{
 			if (!this->InitComponent(component))
 			{
-				LOG_FATAL("Init " << component->GetTypeName() << " failure");
+                LOG_FATAL("Init", component->GetTypeName() ,"failure");
 				return false;
 			}
 		}
@@ -100,32 +100,31 @@ namespace GameKeeper
 	}
 
 	void App::StartComponent()
-	{
-		for (auto component : this->mSceneComponents)
+    {
+        for (auto component: this->mSceneComponents)
         {
             auto startComponent = dynamic_cast<IStart *>(component);
             if (startComponent != nullptr)
             {
-                LOG_DEBUG("start component " << component->GetTypeName());
+                LOG_DEBUG("start component ", component->GetTypeName());
                 startComponent->OnStart();
             }
         }
-		this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();
-		LOG_DEBUG("start all component successful ......");
+        this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();
+        LOG_DEBUG("start all component successful ......");
 
-		for (Component *component : this->mSceneComponents)
-		{
+        for (Component *component: this->mSceneComponents)
+        {
             ElapsedTimer elapsedTimer;
-			if (auto loadComponent = dynamic_cast<ILoadData *>(component))
+            if (auto loadComponent = dynamic_cast<ILoadData *>(component))
             {
                 loadComponent->OnLoadData();
-                LOG_DEBUG("load " << component->GetTypeName()
-                                  << " data use time = " << elapsedTimer.GetMs() << "ms");
+                LOG_DEBUG("load", component->GetTypeName(), "data use time = ", elapsedTimer.GetMs(), "ms");
             }
-		}
+        }
         long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
-		LOG_DEBUG("=====  start " << this->mServerName << " successful [" << t / 1000.0f << "s] ========");
-	}
+        LOG_DEBUG("===== start", this->mServerName, " successful [", this->mServerName, t / 1000.0f, "]s =======");
+    }
 
 	int App::Run(int argc, char ** argv)
 	{

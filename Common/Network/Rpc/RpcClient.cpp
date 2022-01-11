@@ -157,10 +157,10 @@ namespace GameKeeper
     void RpcClient::ConnectHandler(const std::string &ip, unsigned short port, StaticMethod *method)
     {
         this->mConnectCount++;
+        AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
-        AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
-        LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << this->GetAddress());
+        LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , this->GetAddress());
         nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
         {
             XCode code = XCode::Failure;

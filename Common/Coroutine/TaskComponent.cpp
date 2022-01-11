@@ -157,7 +157,7 @@ namespace GameKeeper
             this->mResumeContexts.push(logicCoroutine);
             return;
         }
-        LOG_FATAL("coroutine " << id << " state is not resume");
+        LOG_FATAL("coroutine {0} state is not resume", id);
     }
 
 	TaskContext * TaskComponent::MakeContext(StaticMethod *func)

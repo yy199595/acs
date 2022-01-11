@@ -49,7 +49,9 @@ namespace GameKeeper
         class TimerComponent * mTimerComponent;
         class RpcClientComponent *mRpcClientComponent;
         class RpcConfigComponent * mPpcConfigComponent;
+#ifdef __DEBUG__
         std::unordered_map<long long, RpcTaskInfo> mRpcInfoMap;
+#endif
         std::unordered_map<long long, std::shared_ptr<IRpcTask>> mRpcTasks;
     };
 }

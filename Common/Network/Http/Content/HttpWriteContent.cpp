@@ -65,7 +65,7 @@ namespace GameKeeper
         if(this->mFileStream.eof())
         {
             double mb = this->mFileSize / (1024.0f * 1024);
-            LOG_DEBUG("send file " << this->mPath << " successful " << " size = " << mb << "mb");
+            LOG_DEBUG("send file {0} successful size = {1}mb", this->mPath, mb);
             return true;
         }
 #endif

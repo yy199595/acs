@@ -18,12 +18,12 @@ namespace GameKeeper
             if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
             {
                 const char *err = mysql_error(mMysqlSocket);
-                LOG_ERROR("create " << db << " db fail : " << err);
+                LOG_ERROR("create db {0} failure : {1}", db , err);
                 return false;
             }
             if (mysql_select_db(this->mMysqlSocket, db.c_str()) == 0)
             {
-                LOG_INFO("create db " << db << " successful");
+                LOG_INFO("create db {0} successful",  db);
                 return true;
             }
             return false;
@@ -38,11 +38,11 @@ namespace GameKeeper
         {
             if (!this->CreateMysqlTable(typeDescriptor))
             {
-                LOG_ERROR("create new table " << typeDescriptor->name() << " fail "
-                                              << mysql_error(this->mMysqlSocket));
+                LOG_ERROR("create new table", typeDescriptor->name(), "failure",
+                          mysql_error(this->mMysqlSocket));
                 return false;
             }
-            LOG_DEBUG("create new table success " << typeDescriptor->name());
+            LOG_DEBUG("create new table success", typeDescriptor->name());
         }
         else if (!this->UpdateMysqlTable(typeDescriptor))
         {
@@ -84,11 +84,11 @@ namespace GameKeeper
             {
                 if (!this->AddNewField(descriptor->name(), fileDesc))
                 {
-                    LOG_ERROR("[mysql error ] " << mysql_error(this->mMysqlSocket));
-                    LOG_ERROR("add field " << fileDesc->name() << " to " << descriptor->name() << " fail");
+                    LOG_ERROR("[mysql error ] {0}", mysql_error(this->mMysqlSocket));
+                    LOG_ERROR("add field {0} to {1} failure", fileDesc->name(), descriptor->name());
                     return false;
                 }
-                LOG_DEBUG("add field " << fileDesc->name() << " to " << descriptor->name() << " successful");
+                LOG_DEBUG("add field {0} to {1} successful", fileDesc->name() , descriptor->name());
             }
         }
         return true;
@@ -131,8 +131,7 @@ namespace GameKeeper
             LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        LOG_INFO("\n"
-                         << sql);
+        LOG_INFO("\n{0}", sql);
         return true;
     }
 
@@ -188,7 +187,7 @@ namespace GameKeeper
             LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        LOG_INFO("\n" << sql);
+        LOG_INFO("\n{0}", sql);
         return true;
     }
 }

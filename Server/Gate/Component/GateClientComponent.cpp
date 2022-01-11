@@ -40,7 +40,7 @@ namespace GameKeeper
         {
             auto rpcClient = new RpcProxyClient(socket, LocalSocket, this);
 #ifdef __DEBUG__
-            LOG_INFO("new player connect proxy component ip : " << ip);
+            LOG_INFO("new player connect proxy component ip : {0}", ip);
 #endif
             rpcClient->StartReceive();
             this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
@@ -50,11 +50,9 @@ namespace GameKeeper
     void GateClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request) //客户端调过来的
     {
 #ifdef __DEBUG__
-        std::string json;
-        util::MessageToJsonString(*request, &json);
         LOG_WARN("**********[client request]**********");
-        LOG_WARN("func = " << request->method_name());
-        LOG_WARN("json = " << json);
+        LOG_WARN("func = ", request->method_name());
+        LOG_WARN("json = ", request);
         LOG_WARN("*****************************************");
 #endif
         XCode code = this->mGateComponent->OnRequest(request);
@@ -63,8 +61,7 @@ namespace GameKeeper
             std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR("player call " << request->method_name() << " failure "
-                                     << "error = " << configCom->GetCodeDesc(code));
+            LOG_ERROR("player call", request->method_name(), "failure error = ", configCom->GetCodeDesc(code));
 #endif
             responseMessage->set_code((int)code);
             responseMessage->set_rpc_id(request->rpc_id());
@@ -86,7 +83,7 @@ namespace GameKeeper
             delete proxyClient;
 #ifdef __DEBUG__
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_WARN("remove player session code = " << configCom->GetCodeDesc(code));
+            LOG_WARN("remove player session code = ", configCom->GetCodeDesc(code));
 #endif
         }
     }
@@ -125,7 +122,7 @@ namespace GameKeeper
             if(nowTime - proxyClient->GetLastOperatorTime() >= 5)
             {
                 proxyClient->StartClose();
-                LOG_ERROR(sockId << " logout ");
+                LOG_ERROR(sockId,  " logout ");
                 return;
             }
         }

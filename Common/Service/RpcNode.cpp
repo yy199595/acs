@@ -84,7 +84,7 @@ namespace GameKeeper
         this->mRpcClientComponent->CloseSession(this->mSocketId);
         if(size > 0)
         {
-            LOG_ERROR("send queue has " << size << " data");
+            LOG_ERROR("send queue has {0} data", size);
         }
         delete this;
     }
@@ -126,7 +126,7 @@ namespace GameKeeper
         auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
         {
-            LOG_ERROR("not find rpc config " << func);
+            LOG_ERROR("{0} not config ", func);
             return XCode::NotFoundRpcConfig;
         }
         if(taskSource != nullptr)
@@ -146,7 +146,7 @@ namespace GameKeeper
         auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
         {
-            LOG_ERROR("not find rpc config " << func);
+            LOG_ERROR("{0} not rpc config ", func);
             return XCode::NotFoundRpcConfig;
         }
         requestData->mutable_data()->PackFrom(message);

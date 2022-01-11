@@ -22,15 +22,14 @@ namespace GameKeeper
 
         inline std::string GetMainPath() { return this->mMainLuaPath; }
 
+    public:
+        bool GetLuaTable(const std::string & name);
+        bool GetLuaFunction(const std::string & tab, const std::string & func);
     protected:
         bool Awake() final;
         bool LateAwake() final;
         void OnDestory() final;
 
-    public:
-		
-		int GetLuaRef(const std::string & name);
-		int GetLuaRef(const std::string & tab, const std::string & field);
     private:
 		bool LoadAllFile();
 

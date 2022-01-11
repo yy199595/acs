@@ -50,9 +50,9 @@ namespace GameKeeper
         auto iter = this->mHeadMap.begin();
         for(; iter != this->mHeadMap.end(); iter++)
         {
-            LOG_WARN(iter->first << " " << iter->second);
+            LOG_WARN("{0} {1}", iter->first, iter->second);
         }
-        LOG_WARN("content-length " << this->mResponse.size());
+        LOG_WARN("content-length {0}", this->mResponse.size());
     }
 
     HttpStatus HttpRespTask::AwaitGetCode()

@@ -56,7 +56,7 @@ namespace GameKeeper
             auto socketHandler = dynamic_cast<ISocketListen *>(component);
             if (socketHandler == nullptr)
             {
-                LOG_ERROR("not find socket handler " << listenConfig->Handler);
+                LOG_ERROR("not find socket handler ", listenConfig->Handler);
                 return false;
             }
             NetWorkThread &netThread = taskComponent->AllocateNetThread();
@@ -77,10 +77,10 @@ namespace GameKeeper
             Component *component = this->gameObject->GetComponentByName(config.Handler);
             if (auto handler = dynamic_cast<ISocketListen *>(component))
             {
-                if(listener->StartListen(handler)->Await())
+                if (listener->StartListen(handler)->Await())
                 {
                     const ListenConfig &config = listener->GetConfig();
-                    LOG_DEBUG(config.Name << " listen [" << config.Ip << ":" << config.Port << "] successful");
+                    LOG_DEBUG(config.Name, " listen ", config.Ip, ':', config.Port, " successful");
                 }
             }
         }

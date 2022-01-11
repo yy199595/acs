@@ -12,8 +12,6 @@ namespace GameKeeper
         this->mTaskManager = nullptr;
         this->mCorComponent = nullptr;
 		const ServerConfig & config = App::Get().GetConfig();
-		this->mSqlPath = App::Get().GetServerPath().GetConfigPath() + "sql.json";
-
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "ip", this->mMysqlIp));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "port", this->mMysqlPort));
         LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "user", this->mDataBaseUser));
@@ -51,7 +49,7 @@ namespace GameKeeper
         {
             return false;
         }
-        LOG_WARN("drop db : " << db);
+        LOG_WARN("drop db : ", db);
         return true;
     }
 
@@ -66,12 +64,11 @@ namespace GameKeeper
 		this->mMysqlSockt  = mysql_real_connect(mysqlSocket1, ip, userName, passWd, nullptr, port, nullptr,
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSockt == nullptr)
-		{
-			LOG_ERROR("connect mysql failure "
-				<< ip << ":" << port << "  " << userName << " " << passWd);
-			return nullptr;
-		}
-		LOG_INFO("connect mysql successful [" << ip << ":" << port << "]");
+        {
+            LOG_ERROR("connect mysql failure ", ip, port, userName, passWd);
+            return nullptr;
+        }
+		LOG_INFO("connect mysql successful [", ip,':', port, "]");
 		return this->mMysqlSockt;
 	}
 

@@ -34,10 +34,10 @@ namespace GameKeeper
 		for (Component * component : components)
 		{
 			if (!component->LateAwake())
-			{
-				LOG_ERROR("Init " << component->GetTypeName() << " failure");
-				return false;
-			}
+            {
+                LOG_ERROR("Init", component->GetTypeName(), "failure");
+                return false;
+            }
 		}
 		this->mGameObjects.emplace(id, gameObject);
         this->mCorComponent->Start(&GameObjectComponent::StartComponents, this, id);
@@ -122,7 +122,7 @@ namespace GameKeeper
             for (Component *component: components)
             {
                 auto startComponent = dynamic_cast<IStart *>(component);
-                if (startComponent != nullptr)
+                if (startComponent != nullptr);
                 {
                     startComponent->OnStart();
                 }

@@ -58,9 +58,9 @@ namespace GameKeeper
         auto httpMethod = this->GetHttpMethod(service, method);
 
         if(httpMethod == nullptr)
-        {		
+        {
             requestHandler->SetResponseCode(HttpStatus::NOT_FOUND);
-			LOG_ERROR("not find http method " << service << "." << method);
+            LOG_ERROR("not find http method {0}.{1}", service, method);
         }
         else
         {
@@ -95,7 +95,7 @@ namespace GameKeeper
 
         LOG_ERROR(httpRespTask->Await());
 
-        LOG_DEBUG("time = " << timer.GetSecond() << "s");
+        LOG_DEBUG("time = {0}s", timer.GetSecond());
         return XCode::Successful;
     }
 
@@ -114,7 +114,7 @@ namespace GameKeeper
 
         LOG_ERROR(Helper::String::FormatJson(httpRespTask->Await()));
 
-        LOG_DEBUG("time = " << timer.GetSecond() << "s");
+        LOG_DEBUG("time = {0}s", timer.GetSecond());
         return XCode::Successful;
     }
 

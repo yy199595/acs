@@ -119,7 +119,7 @@ inline int lua_reffunction(lua_State *lua, const char *tab, const char *func)
 	int code = lua_resume(cor, lua, args); \
 	if(code != 0 && code != LUA_YIELD) \
 	{	\
-		LOG_ERROR(lua_tostring(cor, -1);)\
+		LOG_ERROR(lua_tostring(cor, -1))\
 	} \
 }\
 

@@ -8,6 +8,7 @@
 #include"Rpc/RpcComponent.h"
 #include"Component/Scene/RpcNodeComponent.h"
 #include"Other/ElapsedTimer.h"
+#include"Other/StringFmt.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
 namespace GameKeeper
 {
@@ -68,10 +69,11 @@ namespace GameKeeper
             userAccountData.set_token(Helper::String::CreateNewToken());
             userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
 
+
             std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
             if(this->Add(userAccountData, taskSource) == XCode::Successful)
             {
-                LOG_ERROR("add data successful " << index);
+                LOG_ERROR("add data successful {0}", index);
             }
         }
         db::db_account_tab_user_account userAccount;
@@ -90,10 +92,8 @@ namespace GameKeeper
             size_t size = rpcTaskSource->GetDataSize();
             for(size_t index = 0; index < size; index++)
             {
-                std::string json;
                 auto data = rpcTaskSource->GetData<db::db_account_tab_user_account>(index);
-                Helper::Proto::GetJson(*data, json);
-                LOG_WARN(json);
+                LOG_WARN("json = ", data);
             }
         }
 	}
@@ -103,7 +103,7 @@ namespace GameKeeper
         RpcNode *proxyNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (proxyNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mNodeId);
+            LOG_ERROR("not find mysql service node ", this->mNodeId);
             return XCode::CallServiceNotFound;
         }
 
@@ -131,7 +131,7 @@ namespace GameKeeper
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mNodeId);
+            LOG_ERROR("not find mysql service node ", this->mNodeId);
             return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Query");
@@ -161,7 +161,7 @@ namespace GameKeeper
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mNodeId);
+            LOG_ERROR("not find mysql service node ", this->mNodeId);
             return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Invoke");
@@ -192,7 +192,7 @@ namespace GameKeeper
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mNodeId);
+            LOG_ERROR("not find mysql service node ", this->mNodeId);
             return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Save");
@@ -222,7 +222,7 @@ namespace GameKeeper
         RpcNode *mysqlServiceNode = this->mNodeComponent->GetServiceNode(this->mNodeId);
         if (mysqlServiceNode == nullptr)
         {
-            LOG_ERROR("not find mysql service node " << this->mNodeId);
+            LOG_ERROR("not find mysql service node ", this->mNodeId);
             return XCode::CallServiceNotFound;
         }
         auto requestMessage = mysqlServiceNode->NewRequest("MysqlService.Delete");
@@ -249,9 +249,8 @@ namespace GameKeeper
 
     XCode MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse, std::shared_ptr<MysqlRpcTaskSource> taskSource)
     {
-        std::stringstream sqlCommand;
         const char * type = !reverse ? "ASC" : "DESC";
-        sqlCommand << "select * from " << tab << " ORDER BY " << field << " " << type << " LIMIT " << count;
-        return this->Invoke(tab, sqlCommand.str(), taskSource);
+        return this->Invoke(tab, fmt::format(
+                "select * from {0} ORDER BY {1} {2} LIMIT {3}", tab, field, type, count), taskSource);
     }
 }

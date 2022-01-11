@@ -128,7 +128,7 @@ namespace GameKeeper
             }
         }
         delete timer;
-        LOG_ERROR("add timer " << timer->GetTimerId() << " failure");
+        LOG_ERROR("add timer {0} failure", timer->GetTimerId());
         return false;
     }
 }// namespace GameKeeper

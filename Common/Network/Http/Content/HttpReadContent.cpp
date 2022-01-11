@@ -27,13 +27,13 @@ namespace GameKeeper
         std::string dir;
         if (!Helper::Directory::GetDirByPath(this->mPath, dir))
         {
-            LOG_ERROR("parse " << this->mPath << " failure");
+            LOG_ERROR("parse {0} failure", this->mPath);
             return false;
         }
         LOG_WARN(dir);
         if (!Helper::Directory::MakeDir(dir))
         {
-            LOG_ERROR("create dir " << dir << " failure");
+            LOG_ERROR("create dir {0} failure", dir);
             return false;
         }
         return true;
@@ -56,7 +56,7 @@ namespace GameKeeper
         }
         if (!this->mFileStream.is_open())
         {
-            LOG_ERROR("open or create " << this->mPath << " failure");
+            LOG_ERROR("open or create {0} failure", this->mPath);
             return;
         }
         this->mFileSize += size;

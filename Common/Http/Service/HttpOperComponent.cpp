@@ -31,7 +31,7 @@ namespace GameKeeper
             {
                 hotfix->OnHotFix();
                 response.Add(component->GetTypeName().c_str());
-                LOG_DEBUG("========== " << component->GetTypeName() << " hotfix ==========");
+                LOG_DEBUG("========== {0} hotfix ===========", component->GetTypeName());
             }
         }
         response.EndArray();
@@ -49,7 +49,7 @@ namespace GameKeeper
             {
                 configModule->OnLoadConfig();
                 response.Add(component->GetTypeName().c_str());
-                LOG_DEBUG(component->GetTypeName() << " load config");
+                LOG_DEBUG("{0} load config", component->GetTypeName());
             }
         }
         response.EndArray();
@@ -68,12 +68,12 @@ namespace GameKeeper
         auto iter = this->mOperAccountMap.find(account);
         if(iter == this->mOperAccountMap.end())
         {
-            LOG_ERROR(account << " does not exist");
+            LOG_ERROR("{0} does not exist", account);
             return XCode::AccountNotExists;
         }
         if(iter->second != password)
         {
-            LOG_ERROR(account << " password error");
+            LOG_ERROR("{0} password error", account);
             return XCode::Failure;
         }
         return XCode::Successful;

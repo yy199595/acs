@@ -70,7 +70,7 @@ namespace GameKeeper
                 return false;
             }
             this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
-            LOG_DEBUG("connect redis successful [" << mRedisIp << ":" << mRedisPort << "]");
+            LOG_DEBUG("connect redis successful [", mRedisIp, ':', mRedisPort, "]");
         }
         return true;
     }
@@ -84,8 +84,8 @@ namespace GameKeeper
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
-            LOG_FATAL(
-                    "connect redis fail " << mRedisIp << ":" << mRedisPort << " error:" << pRedisContext->errstr);
+            LOG_FATAL("connect redis fail {0}:{1} error = {1}",
+                      mRedisIp, mRedisPort, pRedisContext->errstr);
             return nullptr;
         }
         std::string redisPasswd;
@@ -94,7 +94,7 @@ namespace GameKeeper
             auto *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
             {
-                LOG_ERROR("redis Authentication failed " << reply->str);
+                LOG_ERROR("redis Authentication failed {0}", reply->str);
                 return nullptr;
             }
             freeReplyObject(reply);

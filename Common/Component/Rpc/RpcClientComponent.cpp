@@ -36,8 +36,7 @@ namespace GameKeeper
             this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
             auto component = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR("remove tcp socket " << client->GetAddress() <<
-                                           " error :" << component->GetCodeDesc(code));
+            LOG_ERROR("{0} connected code = {1}", client->GetAddress(), component->GetCodeDesc(code));
 #endif
             delete client;
         }
@@ -52,14 +51,14 @@ namespace GameKeeper
 		const std::string & address = rpcClient->GetAddress();
 		if (code != XCode::Successful)
 		{
-			LOG_ERROR("connect to " << address << " failure ");
+			LOG_ERROR("connect {1} failure", address);
 		}
 		else
-		{
+        {
             rpcClient->StartReceive();
-			const std::string & name = rpcClient->GetSocketProxy()->GetName();
-			LOG_INFO("connect to [" << name << ":" << address << "] successful");
-		}
+            const std::string &name = rpcClient->GetSocketProxy()->GetName();
+            LOG_INFO("connect to [", name, '=>', address, "] successful");
+        }
 	}
 
 	void RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
@@ -118,14 +117,14 @@ namespace GameKeeper
         if (config != nullptr)
         {
             LOG_DEBUG("*****************[receive response]******************");
-            LOG_DEBUG("func = " << config->Service << "." << config->Method);
-            LOG_DEBUG("time = " << costTime << "ms");
+            LOG_DEBUG("func = ", config->Service, '.', config->Method);
+            LOG_DEBUG("time = ", costTime, "ms");
 
             std::string json;
             auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
-            LOG_DEBUG("code = " << codeConfig->Name << ":" << codeConfig->Desc);
+            LOG_DEBUG("code =", codeConfig->Name, ':', codeConfig->Desc);
             if (response->has_data() && Helper::Proto::GetJson(response->data(), json)) {
-                LOG_DEBUG("json = " << json);
+                LOG_DEBUG("json = ", json);
             }
             LOG_DEBUG("*********************************************");
         }
@@ -185,13 +184,11 @@ namespace GameKeeper
             return false;
         }
 #ifdef __DEBUG__
-        std::string json;
-        util::MessageToJsonString(*message, &json);
         auto config = App::Get().GetComponent<RpcConfigComponent>()->
                 GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
-        LOG_DEBUG("func = " << config->Service << "." << config->Method);
-        LOG_DEBUG("json = " << json);
+        LOG_DEBUG("func = ", config->Service,'.', config->Method);
+        LOG_DEBUG("json = ", message);
         LOG_DEBUG("==============================================");
 #endif
         return clientSession->SendToServer(message);
@@ -207,10 +204,8 @@ namespace GameKeeper
 
         LOG_CHECK_RET_FALSE(clientSession);
 #ifdef __DEBUG__
-        std::string json;
-        util::MessageToJsonString(*message, &json);
         LOG_DEBUG("=============== [send response] ===============");
-        LOG_DEBUG("json = " << json);
+        LOG_DEBUG("json = ", message);
         LOG_DEBUG("==============================================");
 #endif
         return clientSession->SendToServer(message);

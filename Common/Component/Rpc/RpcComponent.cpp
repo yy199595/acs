@@ -46,7 +46,7 @@ namespace GameKeeper
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)
         {
-            LOG_FATAL("call service not exist : [" << service << "]");
+            LOG_FATAL("call service not exist : [{0}]");
             return XCode::CallServiceNotFound;
         }
 
@@ -74,7 +74,7 @@ namespace GameKeeper
         auto iter = this->mRpcTasks.find(rpcId);
         if(iter == this->mRpcTasks.end())
         {
-            LOG_WARN("not find rpc task : " << rpcId)
+            LOG_WARN("not find rpc task : ", rpcId)
             return XCode::Failure;
         }
         auto rpcTask = iter->second;
@@ -131,7 +131,10 @@ namespace GameKeeper
         if(this->GetRpcInfo(rpcId, methodId, costTime))
         {
             auto config = this->mPpcConfigComponent->GetProtocolConfig(methodId);
-            LOG_ERROR("call " << config->Service << "." << config->Method << " time out");
+            if(config != nullptr)
+            {
+                LOG_ERROR("call ", config->Service, '.', config->Method, " time out");
+            }
         }
 #endif
     }

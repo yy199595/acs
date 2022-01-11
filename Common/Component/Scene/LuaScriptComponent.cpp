@@ -58,7 +58,7 @@ namespace GameKeeper
             std::string fullPath = workPath + path;
             if(!Helper::Directory::GetFilePaths(fullPath, "*.lua",luaFiles))
             {
-                LOG_ERROR("load " << path << " lua file failure");
+                LOG_ERROR("load", path, "lua file failure");
                 return false;
             }
         }
@@ -66,7 +66,9 @@ namespace GameKeeper
 		std::string dir, name, luaFile;
 		for (std::string & path : luaFiles)
 		{
-            LOG_INFO("load lua file " << path);
+#ifdef __DEBUG__
+            LOG_INFO("load lua file " , path);
+#endif
 			if (Helper::File::ReadTxtFile(path, luaFile)
 				&& Helper::Directory::GetDirAndFileName(path, dir, name))
 			{
@@ -95,49 +97,41 @@ namespace GameKeeper
         }
     }
 
-	int LuaScriptComponent::GetLuaRef(const std::string & tab, const std::string & field)
-	{
-		const std::string key = tab + "." + field;
-		auto iter = this->mGlobalRefMap.find(key);
-		if (iter != this->mGlobalRefMap.end())
-		{
-			return iter->second;
-		}
-		lua_getglobal(this->mLuaEnv, tab.c_str());
-		if (!lua_istable(this->mLuaEnv, -1))
-		{
-			LOG_ERROR("find lua object fail " << tab);
-			return 0;
-		}
-		lua_getfield(this->mLuaEnv, -1, field.c_str());
-		if (lua_isnil(this->mLuaEnv, -1))
-		{
-			LOG_ERROR("find lua object field fail " << field);
-			return 0;
-		}
-		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-		this->mGlobalRefMap.emplace(key, ref);
-		return ref;
-	}
+    bool LuaScriptComponent::GetLuaTable(const std::string &name)
+    {
+        auto iter = this->mGlobalRefMap.find(name);
+        if(iter != this->mGlobalRefMap.end())
+        {
+            int ref = iter->second;
+            lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+            return (bool)lua_istable(this->mLuaEnv, -1);
+        }
+        lua_getglobal(this->mLuaEnv, name.c_str());
+        if(lua_istable(this->mLuaEnv, -1))
+        {
+            int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+            this->mGlobalRefMap.emplace(name, ref);
+            return true;
+        }
+        return false;
+    }
 
-	int LuaScriptComponent::GetLuaRef(const std::string &name)
-	{
-		auto iter = this->mGlobalRefMap.find(name);
-		if (iter != this->mGlobalRefMap.end())
-		{
-			return iter->second;
-		}
-		lua_getglobal(this->mLuaEnv, name.c_str());
-		if (lua_isnil(this->mLuaEnv, -1))
-		{
-			LOG_ERROR("find lua object field fail " << name);
-			return 0;
-		}
-		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-		this->mGlobalRefMap.emplace(name, ref);
-		return ref;
-	}
-
+    bool LuaScriptComponent::GetLuaFunction(const std::string &tab, const std::string &func)
+    {
+        if(!this->GetLuaTable(tab))
+        {
+            return false;
+        }
+        lua_getfield(this->mLuaEnv, -1, func.c_str());
+        if(lua_isfunction(this->mLuaEnv, -1))
+        {
+            int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+            const std::string name = fmt::format("{0}.{1}", tab, func);
+            this->mGlobalRefMap.emplace(name, ref);
+            return true;
+        }
+        return false;
+    }
 
     bool LuaScriptComponent::LoadLuaScript(const std::string filePath)
     {
@@ -148,9 +142,9 @@ namespace GameKeeper
             lua_pcall(mLuaEnv, 0, 1, errfunc);
             //LOG_DEBUG("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
-			return true;
+            return true;
         }
-        LOG_ERROR("load " << filePath << " failure : " << lua_tostring(mLuaEnv, -1));
+        LOG_ERROR("load", filePath, "failure : ", lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }

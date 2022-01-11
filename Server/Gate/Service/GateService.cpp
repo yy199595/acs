@@ -33,7 +33,7 @@ namespace GameKeeper
         auto gateClient = this->mGateComponent->GetGateClient(sockId);
         if (gateClient != nullptr)
         {
-            LOG_WARN(gateClient->GetAddress() << " ping");
+            LOG_WARN("{0} ping", gateClient->GetAddress());
             return XCode::Successful;
         }
         return XCode::Failure;

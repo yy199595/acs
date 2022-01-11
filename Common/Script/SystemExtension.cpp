@@ -21,7 +21,7 @@ int SystemExtension::Call(lua_State *lua)
 	if (lua_pushthread(lua) == 1)
 	{
 		lua_pushinteger(lua, (int)XCode::NoCoroutineContext);
-		LOG_ERROR("call " << service << "." << method << " not coroutine context");
+		LOG_ERROR("call {0}.{1} not coroutine context", service, method);
 		return 1;
 	}
 	lua_State * coroutine = lua_tothread(lua, -1);

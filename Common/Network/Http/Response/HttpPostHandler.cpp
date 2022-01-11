@@ -54,7 +54,7 @@ namespace GameKeeper
                 if (!fileContent->OpenFile())
                 {
                     delete fileContent;
-                    LOG_ERROR("not open file " << fullPath);
+                    LOG_ERROR("not open file {0}", fullPath);
                     return false;
                 }
                 this->mContent = fileContent;
@@ -74,7 +74,7 @@ namespace GameKeeper
 
         this->mMethod = this->mPath.substr(pos2 + 1);
         this->mComponent = this->mPath.substr(pos1, pos2 - pos1);
-        LOG_DEBUG("[http POST]" << this->mComponent << "." << this->mMethod << " length " << this->GetContentLength());
+        LOG_DEBUG("[http POST] {0}.{1} legth {2}", this->mComponent,this->mMethod ,this->GetContentLength());
 
         char buffer[256] = { 0 };
         while (streamBuf.size() > 0)

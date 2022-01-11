@@ -162,25 +162,25 @@ namespace LuaAPIExtension
 
     int DebugLog(lua_State *luaEnv)
     {
-        GK_CommonLog(GetLuaString(luaEnv));
+        LOG_DEBUG(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugInfo(lua_State *luaEnv)
     {
-        GKCommonInfo(GetLuaString(luaEnv));
+        LOG_INFO(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugError(lua_State *luaEnv)
     {
-        GKCommonError(GetLuaString(luaEnv));
+        LOG_ERROR(GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugWarning(lua_State *luaEnv)
     {
-        GKCommonWarning(GetLuaString(luaEnv));
+        LOG_WARN(GetLuaString(luaEnv));
         return 0;
     }
 }// namespace LuaAPIExtension

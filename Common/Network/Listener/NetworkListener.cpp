@@ -48,8 +48,8 @@ namespace GameKeeper
         catch (std::system_error & err)
         {
             taskSource->SetResult(false);
-            LOG_FATAL("listen " << this->mConfig.Ip << ":"
-                                << this->mConfig.Port << " failure" << err.what());
+            LOG_FATAL("listen {0}:{1} failure {2}",
+                      this->mConfig.Ip, this->mConfig.Port, err.what());
         }
     }
 
@@ -66,7 +66,7 @@ namespace GameKeeper
 				AsioTcpSocket & socket = socketProxy->GetSocket();
 				unsigned short port = socket.remote_endpoint().port();
 				const std::string ip = socket.remote_endpoint().address().to_string();
-				LOG_INFO(this->mConfig.Name << " listen new socket " << ip << ":" << port);
+                LOG_INFO("{0}:{1} connected {2}", ip, port, this->mConfig.Name);
 #endif // __DEBUG__
                 mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}

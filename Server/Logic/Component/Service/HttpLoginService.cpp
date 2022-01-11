@@ -30,7 +30,7 @@ namespace GameKeeper
         {
             return XCode::Failure;
         }
-        LOG_DEBUG(account << "   " << password);
+        LOG_DEBUG("{0}   {1}", account, password);
         return XCode::Successful;
     }
 }

@@ -56,7 +56,7 @@ namespace GameKeeper
         auto iter = this->mHandlerMap.find(this->mMethod);
         if (iter == this->mHandlerMap.end())
         {
-            LOG_ERROR("not find http method " << this->mMethod);
+            LOG_ERROR("not find http method {0}", this->mMethod);
             return false;
         }
         this->mHttpHandler = iter->second;
@@ -85,9 +85,9 @@ namespace GameKeeper
         if (this->mHttpHandler != nullptr)
         {
             long long endTime = Helper::Time::GetMilTimestamp();
-            LOG_DEBUG("http call " << this->mHttpHandler->GetComponent() << "."
-                                   << this->mHttpHandler->GetMethod() << " use time = "
-                                   << ((endTime - this->mHttpHandler->GetStartTime()) / 1000.0f) << "s");
+            LOG_DEBUG("http call {0}.{1} user time = {2}s",
+                      this->mHttpHandler->GetComponent(), this->mHttpHandler->GetMethod(),
+                      ((endTime - this->mHttpHandler->GetStartTime()) / 1000.0f));
         }
 #endif
         if(this->mHttpHandler != nullptr)

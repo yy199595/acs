@@ -7,6 +7,7 @@
 using namespace backward;
 namespace GameKeeper
 {
+    std::string thread_local LoggerComponent::mLogBuffer;
 	// 单线程  st  多线程  mt
 	bool LoggerComponent::Awake()
 	{
@@ -36,28 +37,6 @@ namespace GameKeeper
 		this->CreateLogFile();
 	}
 
-	void LoggerComponent::AddLog(ELogType type, const std::stringstream & stream)
-	{
-		switch (type)
-		{
-		case ELogType::info:
-            this->AddInfoLog(stream);
-			break;
-		case ELogType::debug:
-			this->AddDebugLog(stream);
-			break;
-		case ELogType::warn:
-			this->AddWarningLog(stream);
-			break;
-		case ELogType::err:
-			this->AddErrorLog(stream);
-			break;
-		case ELogType::critical:
-			this->AddFatalLog(stream);
-			break;
-		}
-	}
-
 	void LoggerComponent::OnDestory()
 	{
 		spdlog::drop_all();
@@ -85,27 +64,21 @@ namespace GameKeeper
 #endif // LOG_THREAD_LOCK	
 	}
 
-	void LoggerComponent::AddInfoLog(const std::stringstream & stream)
+	void LoggerComponent::AddInfoLog(const std::string & log)
 	{
 #ifdef _WIN32
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_BLUE | FOREGROUND_GREEN |
 			FOREGROUND_INTENSITY);
 		printf("%s [Info  ] %s\n", time.c_str(), log.c_str());
 #else
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Info  ] %s\e[34m\n", "\e[1m", time.c_str(), log.c_str());
 #endif
-		if (this->mInfoLog)
-		{
-			this->mInfoLog->info(stream.str());
-		}		
 	}
 
-	void LoggerComponent::AddErrorLog(const std::stringstream & stream)
+	void LoggerComponent::AddErrorLog(const std::string & log)
 	{
 		
 #ifdef _WIN32
@@ -115,60 +88,37 @@ namespace GameKeeper
 			FOREGROUND_INTENSITY | 4);
 		printf("%s [Error ] %s\n", time.c_str(), log.c_str());
 #else
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Error ] %s\e[0m\n", "\e[31m", time.c_str(), log.c_str());
 #endif
-
-		if (this->mErrorLog)
-		{
-			this->mErrorLog->error(stream.str());
-		}
-//        StackTrace st;
-//        st.load_here(64);
-//        Printer p;
-//        p.color_mode = ColorMode::always;
-//        p.print(st, stderr);
 	}
 
-	void LoggerComponent::AddDebugLog(const std::stringstream & stream)
+	void LoggerComponent::AddDebugLog(const std::string & log)
 	{
-		
+
 #ifdef _WIN32
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | 2);
 		printf("%s [Debug ] %s\n", time.c_str(), log.c_str());
 #else
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Debug ] %s\e[0m\n", "\e[32m", time.c_str(), log.c_str());
 #endif
-		if (this->mDebugLog)
-		{
-			this->mDebugLog->debug(stream.str());
-		}
 	}
 
-	void LoggerComponent::AddFatalLog(const std::stringstream & stream)
+	void LoggerComponent::AddFatalLog(const std::string & log)
 	{		
 #ifdef _WIN32
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | FOREGROUND_BLUE |
 			FOREGROUND_RED);
 		printf("%s [Fatal ] %s\n", time.c_str(), log.c_str());
 #else
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Fatal ] %s\e[0m\n", "\e[35m", time.c_str(), log.c_str());
 #endif
-		if (this->mFatalLog)
-		{
-			mFatalLog->critical(stream.str());
-		}
         StackTrace st;
         st.load_here(64);
         Printer p;
@@ -176,23 +126,17 @@ namespace GameKeeper
         p.print(st, stderr);
 	}
 
-	void LoggerComponent::AddWarningLog(const std::stringstream & stream)
+	void LoggerComponent::AddWarningLog(const std::string & log)
 	{		
 		
 #ifdef _WIN32
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
 			FOREGROUND_INTENSITY | 6);
 		printf("%s [Warning] %s\n", time.c_str(), log.c_str());
 #else
-		std::string log = stream.str();
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Warning] %s\e[0m\n", "\e[33m", time.c_str(), log.c_str());
 #endif
-		if (this->mWarningLog)
-		{
-			mWarningLog->warn(stream.str());
-		}
 	}
 }
