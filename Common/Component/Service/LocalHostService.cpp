@@ -10,18 +10,21 @@ namespace GameKeeper
 {
     bool LocalHostService::Awake()
     {
-		BIND_RPC_FUNCTION(LocalHostService::Add);
-		BIND_RPC_FUNCTION(LocalHostService::Del);
+        BIND_RPC_FUNCTION(LocalHostService::Add);
+        BIND_RPC_FUNCTION(LocalHostService::Del);
         BIND_RPC_FUNCTION(LocalHostService::Hotfix);
         BIND_RPC_FUNCTION(LocalHostService::ReLoadConfig);
-		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("AreaId", this->mAreaId));
-		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeId", this->mNodeId));
-		LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeName", this->mNodeName));
-		return true;
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("AreaId", this->mAreaId));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeId", this->mNodeId));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeName", this->mNodeName));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("CenterAddress", "ip", this->mCenterIp));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("CenterAddress", "port", this->mCenterPort));
+        return true;
     }
     bool LocalHostService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<RpcNodeComponent>());
+        LOG_CHECK_RET_FALSE(this->mNodeComponent->CreateNode(0, this->mNodeName, this->mCenterIp, this->mCenterPort));
         return true;
     }
 
@@ -57,7 +60,11 @@ namespace GameKeeper
         std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
         auto rpcNode = this->mNodeComponent->GetServiceNode(0);
         XCode code = rpcNode->Call("CenterHostService.Add", registerInfo, taskSource);
-
+        if(code != XCode::Successful)
+        {
+            LOG_ERROR("register to center failure");
+            return;
+        }
         auto response = taskSource->GetData<s2s::NodeRegister_Response>();
         if (response == nullptr) {
             LOG_ERROR("register to center failure");

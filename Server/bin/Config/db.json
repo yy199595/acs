@@ -1,0 +1,57 @@
+{
+    "AreaId": 1,
+    "NodeId": 1,
+    "Fps": 30,
+    "SystemFps": 100,
+    "NodeName": "DataServer",
+    "Deadloop":30,
+    "Log":
+    {
+        "save":1,
+        "path":"Log/",
+        "hour":0,
+        "min":0
+    },
+    "Thread":
+    {
+        "task":2,
+        "network":1
+    },
+    "CenterAddress": {
+        "ip": "127.0.0.1",
+        "port": 7788
+    },
+    "Listener": {
+        "ip":"127.0.0.1",
+        "rpc":
+        {
+            "port":7788,
+            "count":10000,
+            "handler":"RpcClientComponent"
+        }
+    },
+    "Mysql": {
+        "ip": "8.136.213.239",
+        "port": 3306,
+        "user": "yjz",
+        "passwd": "199595yjz.",
+        "sql": "Config/sql.json"
+    },
+    "Scene": [
+        "ThreadPoolComponent",
+        "MonitorComponent",
+        "TcpServerComponent",
+        "MysqlComponent",
+        "RpcComponent",
+        "RpcClientComponent",
+        "OperatorComponent",
+        "RpcConfigComponent"
+    ],
+    "Service": [
+        "MysqlService",
+        "LocalHostService"
+    ],
+    "WhiteList": [
+        "127.0.0.1"
+    ]
+}

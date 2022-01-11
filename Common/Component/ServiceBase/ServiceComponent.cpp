@@ -32,6 +32,7 @@ namespace GameKeeper
                 this->mLuaMethodMap.erase(iter);
             }
             this->mLuaMethodMap.emplace(name, method);
+            LOG_DEBUG("add new lua service ", service,'.', name);
             return true;
         }
 
@@ -42,6 +43,7 @@ namespace GameKeeper
             return false;
         }
         this->mMethodMap.emplace(name, method);
+        LOG_DEBUG("add new c++ service ", service,'.', name);
         return true;
     }
 

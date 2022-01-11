@@ -1,0 +1,50 @@
+{
+    "AreaId": 0,
+    "NodeId": 0,
+    "Fps": 30,
+    "SystemFps": 100,
+    "NodeName": "CenterServer",
+    "Deadloop":30,
+    "Log":
+    {
+        "save":1,
+        "path":"Log/",
+        "hour":0,
+        "min":0
+    },
+    "Thread":
+    {
+        "task":1,
+        "network":1
+    },
+    "Listener": {
+        "ip":"127.0.0.1",
+        "rpc":
+        {
+            "port":7788,
+            "count":10000,
+            "handler":"RpcClientComponent"
+        }
+    },
+    "ScriptPath": [
+        "Script/Common/",
+        "Script/Server/"
+    ],
+    "Scene": [
+        "ThreadPoolComponent",
+        "MonitorComponent",
+        "TcpServerComponent",
+        "LuaScriptComponent",
+        "LuaServiceMgrComponent",
+        "RpcComponent",
+        "RpcClientComponent",
+        "OperatorComponent",
+        "RpcConfigComponent"
+    ],
+    "Service": [
+        "CenterHostService"
+    ],
+    "WhiteList": [
+        "127.0.0.1"
+    ]
+}

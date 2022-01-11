@@ -21,6 +21,8 @@ namespace GameKeeper
 
 		RpcNode * CreateNode(int uid, const s2s::NodeInfo & nodeInfo);
 
+        RpcNode * CreateNode(int uid, const std::string & name, const std::string & ip, unsigned short port);
+
     protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -30,8 +32,6 @@ namespace GameKeeper
         RpcNode * AllotService(const std::string & name);
     private:
 		int mAreaId;
-        std::string mCenterIp;
-        unsigned short mCenterPort;
         std::unordered_map<int, RpcNode *> mServiceNodeMap;
     };
 }

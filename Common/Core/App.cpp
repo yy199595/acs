@@ -25,12 +25,12 @@ namespace GameKeeper
 
 	bool App::AddComponentFormConfig()
 	{
-        this->AddComponent<TaskComponent>();
-		this->AddComponent<TimerComponent>();
-		this->AddComponent<LoggerComponent>();
-        this->AddComponent<RpcNodeComponent>();
-        this->mTaskComponent = this->GetComponent<TaskComponent>();
+        this->AddComponent<LoggerComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
+        LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<RpcNodeComponent>());
+        this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
@@ -72,7 +72,7 @@ namespace GameKeeper
 		{
 			if (!this->InitComponent(component))
 			{
-                LOG_FATAL("Init", component->GetTypeName() ,"failure");
+                LOG_FATAL("Init ", component->GetTypeName() ," failure");
 				return false;
 			}
 		}

@@ -110,13 +110,8 @@ namespace GameKeeper
         {
             for(unsigned int id : iter->second)
             {
-                std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
                 RpcNode * rpcNode = this->mNodeComponent->GetServiceNode(id);
-                XCode code = rpcNode->Call("LocalHostService.Add", nodeInfo, taskSource);
-                if(code != XCode::Successful)
-                {
-                    return code;
-                }
+                XCode code = rpcNode->Call("LocalHostService.Add", nodeInfo);
                 LOG_DEBUG("add rpc node to {0}", nodeInfo.server_name());
             }
         }

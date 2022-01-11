@@ -37,6 +37,8 @@ namespace GameKeeper
         long long mOpenTime;
 		std::string mNodeName;
         std::string mGroupName;
+        std::string mCenterIp;
+        unsigned short mCenterPort;
         RpcNodeComponent * mNodeComponent;
     };
 }

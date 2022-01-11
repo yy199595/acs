@@ -46,7 +46,7 @@ namespace GameKeeper
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)
         {
-            LOG_FATAL("call service not exist : [{0}]");
+            LOG_FATAL("call service not exist : [", service , "]");
             return XCode::CallServiceNotFound;
         }
 
