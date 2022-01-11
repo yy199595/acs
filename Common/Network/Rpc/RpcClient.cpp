@@ -162,6 +162,7 @@ namespace GameKeeper
             XCode code = XCode::Failure;
             if (!err)
             {
+                this->mIsOpen = true;
                 code = XCode::Successful;
             }
             this->OnConnect(code);
