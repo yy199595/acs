@@ -38,7 +38,7 @@ namespace GameKeeper
         const std::string ip = socket->GetSocket().remote_endpoint().address().to_string();
         if(this->mBlackList.find(ip) == this->mBlackList.end())
         {
-            auto rpcClient = new RpcProxyClient(socket, LocalSocket, this);
+            auto rpcClient = new RpcProxyClient(socket, SocketType::RemoteSocket, this);
 #ifdef __DEBUG__
             LOG_INFO("new player connect proxy component ip : {0}", ip);
 #endif

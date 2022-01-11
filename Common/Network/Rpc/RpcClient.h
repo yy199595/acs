@@ -24,12 +24,12 @@ namespace GameKeeper
 	public:
 		virtual void Clear();
 		SocketType GetSocketType() { return this->mType; }
+        bool StartConnect(const std::string & ip, unsigned short port);
         long long GetLastOperatorTime() const { return this->mLastOperTime;}
-		bool StartConnect(const std::string & ip, unsigned short port, StaticMethod * method = nullptr);
 	private:
 		void ReceiveHead();
 		void ReceiveBody(char type, size_t size);
-		void ConnectHandler(const std::string & ip, unsigned short port, StaticMethod * method);
+		void ConnectHandler(const std::string & ip, unsigned short port);
 	protected:
         void CloseSocket(XCode code);
         virtual void OnClose(XCode code) = 0;
@@ -38,6 +38,8 @@ namespace GameKeeper
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
         virtual void OnSendData(XCode code, std::shared_ptr<Message> ) = 0;
     protected:
+        void ReConnection();
+        bool IsCanConnection();
         void SendData(char type, std::shared_ptr<Message> message);
 	protected:
 		AsioContext & mContext;
@@ -46,7 +48,7 @@ namespace GameKeeper
     private:
         bool mIsOpen;
 		std::string mIp;
-		int mConnectCount;
+        unsigned short mPort;
 		long long mSocketId;
 		std::string mAddress;
 		atomic_bool mIsConnect;

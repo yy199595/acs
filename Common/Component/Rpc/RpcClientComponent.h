@@ -25,7 +25,7 @@ namespace GameKeeper
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	public:
 		ProtoRpcClient * GetRpcSession(long long id);
-        ProtoRpcClient * NewSession(const std::string &name);
+        long long MakeSession(const std::string &name, const std::string & ip, unsigned short port);
 	protected:
         bool Awake() final;
         bool LateAwake() final;

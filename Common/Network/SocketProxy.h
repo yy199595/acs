@@ -37,7 +37,7 @@ namespace GameKeeper
 		TYPE_RESPONSE = 0X02,       //服务器返回
         TYPE_CLIENT_REQUEST = 0X03, //客户端请求
 	};
-	enum SocketType
+	enum class SocketType
 	{
 		NoneSocket,
 		LocalSocket,

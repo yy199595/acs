@@ -66,7 +66,7 @@ namespace GameKeeper
 				AsioTcpSocket & socket = socketProxy->GetSocket();
 				unsigned short port = socket.remote_endpoint().port();
 				const std::string ip = socket.remote_endpoint().address().to_string();
-                LOG_INFO("{0}:{1} connected {2}", ip, port, this->mConfig.Name);
+                LOG_INFO('[', ip, ':', port, "] connected ", this->mConfig.Name);
 #endif // __DEBUG__
                 mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}

@@ -36,7 +36,7 @@ namespace GameKeeper
             this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
             auto component = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR("{0} connected code = {1}", client->GetAddress(), component->GetCodeDesc(code));
+            LOG_ERROR(client->GetAddress(), " connected code =}", component->GetCodeDesc(code));
 #endif
             delete client;
         }
@@ -50,14 +50,14 @@ namespace GameKeeper
         auto rpcClient = iter->second;
 		const std::string & address = rpcClient->GetAddress();
 		if (code != XCode::Successful)
-		{
-			LOG_ERROR("connect {1} failure", address);
-		}
+        {
+            LOG_ERROR("connect ", address, " failure");
+        }
 		else
         {
             rpcClient->StartReceive();
             const std::string &name = rpcClient->GetSocketProxy()->GetName();
-            LOG_INFO("connect to [", name, '=>', address, "] successful");
+            LOG_INFO("connect to [", name, "=>", address, "] successful");
         }
 	}
 
@@ -138,17 +138,18 @@ namespace GameKeeper
         return iter == this->mRpcClientMap.end() ? nullptr : iter->second;
     }
 
-    ProtoRpcClient * RpcClientComponent::NewSession(const std::string &name)
+    long long RpcClientComponent::MakeSession(const std::string &name, const std::string &ip, unsigned short port)
 	{
         NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, name));
         auto localSession = this->mClientPool.New(this, socketProxy, SocketType::LocalSocket);
         if(localSession == nullptr)
         {
-            return nullptr;
+            return 0;
         }
+        localSession->StartConnect(ip, port);
 		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
-		return localSession;
+		return localSession->GetSocketId();
 	}
 
     void RpcClientComponent::OnDestory()
@@ -174,12 +175,8 @@ namespace GameKeeper
 
 	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Request> message)
     {
-        if (message == nullptr)
-        {
-            return false;
-        }
         ProtoRpcClient *clientSession = this->GetSession(id);
-        if (clientSession == nullptr || !clientSession->IsOpen())
+        if (message == nullptr || clientSession == nullptr)
         {
             return false;
         }
@@ -191,23 +188,23 @@ namespace GameKeeper
         LOG_DEBUG("json = ", message);
         LOG_DEBUG("==============================================");
 #endif
-        return clientSession->SendToServer(message);
+        clientSession->SendToServer(message);
+        return true;
     }
 
 	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Response> message)
     {
-        if (message == nullptr)
+        ProtoRpcClient *clientSession = this->GetSession(id);
+        if(clientSession == nullptr || message == nullptr)
         {
             return false;
         }
-        ProtoRpcClient *clientSession = this->GetSession(id);
-
-        LOG_CHECK_RET_FALSE(clientSession);
 #ifdef __DEBUG__
         LOG_DEBUG("=============== [send response] ===============");
         LOG_DEBUG("json = ", message);
         LOG_DEBUG("==============================================");
 #endif
-        return clientSession->SendToServer(message);
+        clientSession->SendToServer(message);
+        return true;
     }
 }// namespace GameKeeper

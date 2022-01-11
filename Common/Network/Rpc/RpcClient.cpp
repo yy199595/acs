@@ -12,7 +12,6 @@ namespace GameKeeper
         this->mIp.clear();
         this->mIsOpen = false;
         this->mIsConnect = false;
-        this->mConnectCount = 0;
         this->mSocketId = socket->GetSocketId();
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
     }
@@ -112,7 +111,7 @@ namespace GameKeeper
                                     XCode code = XCode::Successful;
                                     if (error_code)
                                     {
-                                        code = XCode::NetReceiveFailure;
+                                        code = XCode::NetWorkError;
                                         std::cout << error_code.message() << std::endl;
                                     }
                                     switch (type)
@@ -140,43 +139,48 @@ namespace GameKeeper
                                 });
     }
 
-    bool RpcClient::StartConnect(const std::string &ip, unsigned short port, StaticMethod *method)
+    bool RpcClient::StartConnect(const std::string &ip, unsigned short port)
     {
-        LOG_CHECK_RET_FALSE(this->GetSocketType() != SocketType::RemoteSocket);
-        if (this->IsConnected())
-        {
-            return true;
-        }
+        LOG_CHECK_RET_FALSE(this->IsCanConnection());
         this->mIsConnect = true;
         LOG_CHECK_RET_FALSE(this->mSocketProxy);
         NetWorkThread &nThread = this->mSocketProxy->GetThread();
-        nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port, method);
+        nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port);
         return true;
     }
 
-    void RpcClient::ConnectHandler(const std::string &ip, unsigned short port, StaticMethod *method)
+    void RpcClient::ConnectHandler(const std::string &ip, unsigned short port)
     {
-        this->mConnectCount++;
+        this->mIp = ip;
+        this->mPort = port;
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
         LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , this->GetAddress());
-        nSocket.async_connect(endPoint, [this, method](const asio::error_code &err)
+        nSocket.async_connect(endPoint, [this](const asio::error_code &err)
         {
             XCode code = XCode::Failure;
             if (!err)
             {
-                this->mConnectCount = 0;
                 code = XCode::Successful;
             }
             this->OnConnect(code);
             this->mIsConnect = false;
-            MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-            if (method != nullptr)
-            {
-                taskScheduler.Invoke(method);
-            }
         });
+    }
+
+    bool RpcClient::IsCanConnection()
+    {
+        return this->GetSocketType() == SocketType::LocalSocket
+               && !this->IsOpen() && !this->mIsConnect;
+    }
+
+    void RpcClient::ReConnection()
+    {
+        if(this->IsCanConnection())
+        {
+            this->ConnectHandler(this->mIp, this->mPort);
+        }
     }
 
     void RpcClient::SendData(char type, std::shared_ptr<Message> message)

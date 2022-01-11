@@ -84,8 +84,7 @@ namespace GameKeeper
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
-            LOG_FATAL("connect redis fail {0}:{1} error = {1}",
-                      mRedisIp, mRedisPort, pRedisContext->errstr);
+            LOG_FATAL("connect redis fail", mRedisIp, ':', mRedisPort, "error = ", pRedisContext->errstr);
             return nullptr;
         }
         std::string redisPasswd;

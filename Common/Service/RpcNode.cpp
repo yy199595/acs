@@ -50,42 +50,9 @@ namespace GameKeeper
         return true;
     }
 
-    void RpcNode::ConnectToNode()
-    {
-        auto rpcClient = this->mRpcClientComponent->GetRpcSession(this->mSocketId);
-        if(rpcClient == nullptr)
-        {
-            rpcClient = this->mRpcClientComponent->NewSession(this->mNodeName);
-        }
-        if(!rpcClient->IsOpen())
-        {
-            this->mSocketId = rpcClient->GetSocketProxy()->GetSocketId();
-            auto method = NewMethodProxy(&RpcNode::OnConnectAfter, this);
-            rpcClient->StartConnect(this->mNodeIp, this->mNodePort, method);
-        }
-    }
-
-    void RpcNode::OnConnectAfter()
-    {
-        while(!this->mWaitSendQueue.empty())
-        {
-            auto message  = this->mWaitSendQueue.front();
-            if(!this->mRpcClientComponent->Send(this->mSocketId, message))
-            {
-                break;
-            }
-            this->mWaitSendQueue.pop();
-        }
-    }
 
     void RpcNode::Destory()
     {
-        size_t size = this->mWaitSendQueue.size();
-        this->mRpcClientComponent->CloseSession(this->mSocketId);
-        if(size > 0)
-        {
-            LOG_ERROR("send queue has {0} data", size);
-        }
         delete this;
     }
 
@@ -113,11 +80,13 @@ namespace GameKeeper
 		}
         std::shared_ptr<com::Rpc_Request> request(new com::Rpc_Request());
 		request->set_method_id(config->MethodId);
-        if(!this->mRpcClientComponent->Send(this->mSocketId, request))
+        if(this->mRpcClientComponent->GetRpcSession(this->mSocketId) == nullptr)
         {
-            this->ConnectToNode();
-            this->mWaitSendQueue.push(request);
+            const std::string & ip = this->mNodeIp;
+            const unsigned short port = this->mNodePort;
+            this->mSocketId = this->mRpcClientComponent->MakeSession(this->mNodeName, ip, port);
         }
+        this->mRpcClientComponent->Send(this->mSocketId, request);
         return request;
 	}
 
