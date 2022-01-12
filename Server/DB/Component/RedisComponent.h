@@ -37,11 +37,29 @@ namespace GameKeeper
             std::shared_ptr<RedisTaskSource> redisTask
                     = std::make_shared<RedisTaskSource>(cmd);
             redisTask->InitCommand(std::forward<Args>(args) ...);
-            return redisTask->Await();
+            std::shared_ptr<RedisResponse> response = redisTask->Await();
+            if(response->GetCode() != XCode::Successful)
+            {
+                LOG_ERROR(response->GetError());
+            }
+            return response;
         }
-	private:
+
+
+        template<typename ... Args>
+        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, Args &&...args)
+        {
+            int size = sizeof ...(Args) + 2;
+            return this->Invoke("EVALSHA",this->mLuaCommand, size, tab, func, std::forward<Args>(args)...);
+        }
+
+        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, std::vector<std::string> & args);
+
+
+    private:
 		std::string mRedisIp;        //redis ip地址
-		unsigned short mRedisPort;    //端口号
+        std::string mLuaCommand;
+        unsigned short mRedisPort;    //端口号
         std::thread * mPubSubThread;
         redisContext * mPubSubContext;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;

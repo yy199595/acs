@@ -28,6 +28,7 @@ namespace Helper
                 std::string line;
                 while (std::getline(fs, line)) {
                     outFile.append(line);
+                    outFile += "\n";
                 }
                 fs.close();
                 return true;

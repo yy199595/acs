@@ -2,39 +2,78 @@
 
 #include"Core/App.h"
 #include"Util/StringHelper.h"
+#include"Util/FileHelper.h"
 #include"Script/ClassProxyHelper.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Scene/RpcConfigComponent.h"
+#include"Scene/ThreadPoolComponent.h"
 
 namespace GameKeeper
 {
     bool RedisComponent::Awake()
     {
+        std::string path;
         this->mRedisPort = 0;
         this->mPubSubThread = nullptr;
         this->mPubSubContext = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("redis", "lua", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path, this->mLuaCommand));
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
         return true;
     }
 
+    std::shared_ptr<RedisResponse>
+    RedisComponent::Call(const std::string &tab, const std::string &func, std::vector<std::string> &args)
+    {
+        std::shared_ptr<RedisTaskSource> redisTask
+                = std::make_shared<RedisTaskSource>("EVALSHA");
+        redisTask->AddCommand(this->mLuaCommand);
+        redisTask->AddCommand((int)args.size() + 2);
+        redisTask->AddCommand(tab);
+        redisTask->AddCommand(func);
+        for(const std::string & val : args)
+        {
+            redisTask->AddCommand(val);
+        }
+        auto response = redisTask->Await();
+        if(response->GetCode() != XCode::Successful)
+        {
+            LOG_ERROR(response->GetError());
+        }
+        return response;
+    }
+
     void RedisComponent::OnStart()
     {
+        auto response = this->Invoke("script", "load", this->mLuaCommand);
+        if(response->GetCode() != XCode::Successful)
+        {
+            LOG_ERROR(response->GetError());
+            return;
+        }
+
+        std::vector<std::string> services;
+        this->GetComponent<RpcConfigComponent>()->GetServices(services);
+
+        this->mLuaCommand.clear();
+        response->GetValue(this->mLuaCommand);
+        response = this->Call("Service", "Push", services);
+        if(response->GetCode() != XCode::Successful)
+        {
+
+        }
+//        redisReply * response = (redisReply*)redisCommand(this->mPubSubContext, "SCRIPT LOAD %s", this->mLuaCommand.c_str());
+//
+//        if(response->type == REDIS_REPLY_STRING)
+//        {
+//
+//        }
 //        for (int index = 0; index < 10; index++)
 //        {
 //            long long num = this->AddCounter("UserIdCounter");
 //            LOG_ERROR("number = " << num);
 //        }
-
-        std::string value;
-        std::string lua = "local val = redis.call('smembers',KEYS[1])"
-                          "print(type(val), val)"
-                          "return val";
-        std::shared_ptr<RedisResponse> response = this->Invoke("eval", lua, 1, "arr");
-        if(response->GetValue(value))
-        {
-            LOG_WARN(value);
-        }
     }
 
     void RedisComponent::StartPubSub()
@@ -103,7 +142,7 @@ namespace GameKeeper
         redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
         if (pRedisContext->err != 0)
         {
-            LOG_FATAL("connect redis fail", mRedisIp, ':', mRedisPort, "error = ", pRedisContext->errstr);
+            LOG_FATAL("connect redis fail =>[", mRedisIp, ':', mRedisPort, "] error = ", pRedisContext->errstr);
             return nullptr;
         }
         std::string redisPasswd;

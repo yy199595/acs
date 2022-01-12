@@ -47,6 +47,7 @@
         "ip": "127.0.0.1",
         "port": 6379,
         "timeout": 3,
+        "lua": "./Config/redis.lua",
         "passwd": ""
     },
     "lua_src": [

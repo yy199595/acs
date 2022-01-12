@@ -27,7 +27,7 @@ namespace GameKeeper
 
         std::shared_ptr<RedisResponse> Await();
 
-    private:
+    public:
         //inline void AddCommand(const char *value) { this->mCommand.push_back(value); }
 
         inline void AddCommand(const std::string &value) { this->mCommand.emplace_back(value); }
