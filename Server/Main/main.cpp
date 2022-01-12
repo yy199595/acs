@@ -20,8 +20,8 @@
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
-#include <Service/LocalHostService.h>
-#include <Service/CenterHostService.h>
+#include "Component/Service/LocalHostService.h"
+#include "Component/Service/CenterHostService.h"
 #include <Scene/MonitorComponent.h>
 #include "Service/MysqlService.h"
 #include <Service/HttpLoginService.h>

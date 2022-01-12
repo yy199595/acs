@@ -11,6 +11,7 @@ namespace GameKeeper
         std::string Ip;
         std::string Name;
         std::string Handler;
+        std::string mAddress;
         unsigned short Port = 0;
     };
 

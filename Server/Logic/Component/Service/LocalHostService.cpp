@@ -1,11 +1,13 @@
 ﻿#include "LocalHostService.h"
-#include <Core/App.h>
-#include <Service/RpcNode.h>
+#include "Core/App.h"
+#include "Service/RpcNode.h"
 #include "Component/Scene/RpcNodeComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Scene/OperatorComponent.h"
-#include<Scene/RpcConfigComponent.h>
+#include"Component/Scene/RpcConfigComponent.h"
+#include"Util/JsonHelper.h"
+#include"RedisComponent.h"
 namespace GameKeeper
 {
     bool LocalHostService::Awake()
@@ -31,49 +33,34 @@ namespace GameKeeper
 
 	void LocalHostService::OnStart()
     {
-        std::vector<Component *> components;
-        s2s::NodeRegister_Request registerInfo;
-        this->gameObject->GetComponents(components);
-        s2s::NodeInfo *nodeInfo = registerInfo.mutable_node_info();
-
-        nodeInfo->set_area_id(this->mAreaId);
-        nodeInfo->set_node_id(this->mNodeId);
-        nodeInfo->set_server_name(this->mNodeName);
-
-        auto tcpServer = this->GetComponent<TcpServerComponent>();
-
         std::vector<const NetworkListener *> listeners;
-        tcpServer->GetListeners(listeners);
-        nodeInfo->set_server_ip(tcpServer->GetHostIp());
+        auto redisComponent = this->GetComponent<RedisComponent>();
+        auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
 
-        for (auto listener: listeners) {
-            const auto &listenerConfig = listener->GetConfig();
-            const std::string &name = listenerConfig.Name;
-            const unsigned short port = listenerConfig.Port;
-            nodeInfo->mutable_listeners()->insert({name, port});
-        }
-
-        for (Component *component: components) {
-            if (auto *service = dynamic_cast<ServiceComponent *>(component)) {
-                nodeInfo->add_services(service->GetTypeName());
-            }
-        }
-        std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
-        auto rpcNode = this->mNodeComponent->GetServiceNode(0);
-        XCode code = rpcNode->Call("CenterHostService.Add", registerInfo, taskSource);
-        if(code != XCode::Successful)
+        const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
+        if (rpcListener == nullptr)
         {
-            LOG_ERROR("register to center failure");
             return;
         }
-        auto response = taskSource->GetData<s2s::NodeRegister_Response>();
-        if (response == nullptr) {
-            LOG_ERROR("register to center failure");
+        RapidJsonWriter jsonWriter;
+        const std::string &address = rpcListener->GetConfig().mAddress;
+        jsonWriter.Add("time", Helper::Time::GetSecTimeStamp());
+        jsonWriter.StartArray("service");
+        std::vector<Component *> components;
+        for (Component *component: components)
+        {
+            if (auto *service = dynamic_cast<ServiceComponent *>(component))
+            {
+                const std::string &name = component->GetTypeName();
+
+            }
         }
-        this->mToken = response->group_data().token();
-        this->mOpenTime = response->group_data().open_time();
-        this->mGroupName = response->group_data().group_name();
-        LOG_DEBUG("register all service to center successful");
+        jsonWriter.EndArray();
+    }
+
+    void LocalHostService::OnLoadData()
+    {
+
     }
 
     XCode LocalHostService::Hotfix()

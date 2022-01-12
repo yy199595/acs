@@ -29,7 +29,7 @@ namespace GameKeeper
 
     void MysqlProxyComponent::OnLoadData()
     {
-        this->AddUserData();
+        //this->AddUserData();
 //		ElapsedTimer timer;
 //		auto group = this->mCorComponent->NewCoroutineGroup();
 //		for (int index = 0; index < 2; index++)

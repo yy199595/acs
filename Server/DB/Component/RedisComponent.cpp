@@ -10,6 +10,8 @@ namespace GameKeeper
     bool RedisComponent::Awake()
     {
         this->mRedisPort = 0;
+        this->mPubSubThread = nullptr;
+        this->mPubSubContext = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
@@ -23,6 +25,21 @@ namespace GameKeeper
 //            long long num = this->AddCounter("UserIdCounter");
 //            LOG_ERROR("number = " << num);
 //        }
+
+        std::string value;
+        std::string lua = "local val = redis.call('smembers',KEYS[1])"
+                          "print(type(val), val)"
+                          "return val";
+        std::shared_ptr<RedisResponse> response = this->Invoke("eval", lua, 1, "arr");
+        if(response->GetValue(value))
+        {
+            LOG_WARN(value);
+        }
+    }
+
+    void RedisComponent::StartPubSub()
+    {
+
     }
 
     bool RedisComponent::CloseRedisSocket()
@@ -72,6 +89,8 @@ namespace GameKeeper
             this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
             LOG_DEBUG("connect redis successful [", mRedisIp, ':', mRedisPort, "]");
         }
+        this->mPubSubContext = this->ConnectRedis(second);
+        this->mPubSubThread = new std::thread(std::bind(&RedisComponent::StartPubSub, this));
         return true;
     }
 
@@ -98,6 +117,7 @@ namespace GameKeeper
             }
             freeReplyObject(reply);
         }
+
         return pRedisContext;
     }
 

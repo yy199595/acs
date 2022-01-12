@@ -42,7 +42,7 @@ namespace GameKeeper
                           mysql_error(this->mMysqlSocket));
                 return false;
             }
-            LOG_DEBUG("create new table success", typeDescriptor->name());
+            LOG_DEBUG("create new table ",typeDescriptor->name(),  " successful");
         }
         else if (!this->UpdateMysqlTable(typeDescriptor))
         {

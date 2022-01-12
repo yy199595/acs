@@ -33,9 +33,22 @@ namespace GameKeeper
             }
             listenConfig->Name = iter->name.GetString();
             listenConfig->Handler = iter->value["handler"].GetString();;
+            listenConfig->mAddress = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
             this->mListenerConfigs.emplace_back(listenConfig);
 		}
 		return true;
+    }
+
+    const NetworkListener *TcpServerComponent::GetListener(const std::string &name)
+    {
+        for(auto listener : this->mListeners)
+        {
+            if(listener->GetConfig().Name == name)
+            {
+                return listener;
+            }
+        }
+        return nullptr;
     }
 
     void TcpServerComponent::GetListeners(std::vector<const NetworkListener *> &listeners)

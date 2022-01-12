@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include"Util/Guid.h"
+#include"hiredis/hiredis.h"
 #include"Component/Component.h"
 #include"Coroutine/TaskComponent.h"
 #include"RedisClient/RedisTaskSource.h"
@@ -26,6 +27,8 @@ namespace GameKeeper
         void OnStart() override;
 	private:
 		redisContext * ConnectRedis(int timeout = 3);
+    private:
+        void StartPubSub();
 	public:
         long long AddCounter(const std::string & key);
         template<typename ... Args>
@@ -39,6 +42,8 @@ namespace GameKeeper
 	private:
 		std::string mRedisIp;        //redis ip地址
 		unsigned short mRedisPort;    //端口号
+        std::thread * mPubSubThread;
+        redisContext * mPubSubContext;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

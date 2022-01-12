@@ -16,6 +16,7 @@ namespace GameKeeper
     public:
         int GetPriority() final { return 2; }
         const std::string & GetHostIp() const { return this->mHostIp;}
+        const NetworkListener * GetListener(const std::string & name);
         void GetListeners(std::vector<const NetworkListener *> & listeners);
 	protected:
 		bool Awake() final;

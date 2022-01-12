@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<Component/ServiceBase/ServiceComponent.h>
+#include"Component/ServiceBase/ServiceComponent.h"
 using namespace com;
 namespace GameKeeper
 {
@@ -10,7 +10,7 @@ namespace GameKeeper
 
     class RpcNodeComponent;
 
-    class LocalHostService : public ServiceComponent, public IStart
+    class LocalHostService : public ServiceComponent, public IStart, public ILoadData
     {
     public:
 		LocalHostService() = default;
@@ -23,6 +23,8 @@ namespace GameKeeper
         void OnStart() final;
         
         bool LateAwake() final;
+
+        void OnLoadData() final;
 
 		int GetPriority() final { return 1000; }
     private:
