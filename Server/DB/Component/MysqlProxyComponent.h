@@ -38,7 +38,9 @@ namespace GameKeeper
         XCode Sort(const std::string & tab, const std::string & field, int count, bool reverse = false,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
     private:
-        int mNodeId;
+        RpcNode * GetMysqlNode();
+    private:
+        std::vector<int> mMysqlServices;
         class RpcComponent * mRpcComponent;
         class TaskComponent *mCorComponent;
         class RpcNodeComponent *mNodeComponent;

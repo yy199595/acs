@@ -34,17 +34,14 @@ namespace GameKeeper
         const s2s::NodeInfo & registerNodeInfo = nodeInfo.node_info();
         const unsigned short areaId = registerNodeInfo.area_id();
 
-        int nodeId = registerNodeInfo.node_id();
-        const int globalId = areaId * 10000 + nodeId;
-
-        auto nodeProxy = this->mNodeComponent->Create(globalId);
+        auto nodeProxy = this->mNodeComponent->Create(registerNodeInfo.node_id());
         if (!nodeProxy->UpdateNodeProxy(nodeInfo.node_info()))
         {
             return XCode::InitNodeProxyFailure;
         }
 
-        response.set_node_id(globalId);
-        this->AddNewNode(areaId, globalId);
+        response.set_node_id(registerNodeInfo.node_id());
+        this->AddNewNode(areaId, registerNodeInfo.node_id());
         return this->NoticeAllNode(registerNodeInfo);
     }
 

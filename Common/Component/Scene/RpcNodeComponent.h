@@ -19,7 +19,7 @@ namespace GameKeeper
 
         RpcNode * Create(int uid);
 
-		RpcNode * CreateNode(int uid, const s2s::NodeInfo & nodeInfo);
+		RpcNode * CreateNode(const s2s::NodeInfo & nodeInfo);
 
         RpcNode * CreateNode(int uid, const std::string & name, const std::string & ip, unsigned short port);
 

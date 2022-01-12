@@ -114,7 +114,7 @@ namespace GameKeeper
 
         LOG_ERROR(Helper::String::FormatJson(httpRespTask->Await()));
 
-        LOG_DEBUG("time = {0}s", timer.GetSecond());
+        LOG_DEBUG("time = ", timer.GetSecond(), "s");
         return XCode::Successful;
     }
 

@@ -121,9 +121,11 @@ namespace GameKeeper
 
 	XCode LocalHostService::Add(const s2s::NodeInfo & nodeInfo)
 	{
-		const int uid = nodeInfo.area_id() * 10000 + nodeInfo.node_id();
-		RpcNode *serviceNode = this->mNodeComponent->GetServiceNode(uid);
-
+		RpcNode *serviceNode = this->mNodeComponent->GetServiceNode(nodeInfo.node_id());
+        if(serviceNode == nullptr)
+        {
+            serviceNode = this->mNodeComponent->CreateNode(nodeInfo);
+        }
         serviceNode->UpdateNodeProxy(nodeInfo);
 		// 通知所有服务
 		std::vector<Component *> components;

@@ -14,8 +14,6 @@ namespace GameKeeper
 
     public:
 
-        int GetGlobalId() const { return this->mGlobalId; }
-
         const std::string &GetNodeName() { return this->mNodeName; }
 
         short GetAreaId() const { return this->mAreaId; }
@@ -42,9 +40,8 @@ namespace GameKeeper
     private:
         void LoopSend();
     private:
-        int mGlobalId;
+        int mNodeId;
         short mAreaId;
-        short mNodeId;
         std::string mNodeIp;
         std::string mNodeName;        //进程名字
         unsigned short mNodePort;

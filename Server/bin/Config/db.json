@@ -1,27 +1,28 @@
 {
-    "AreaId": 1,
-    "NodeId": 1,
-    "Fps": 30,
-    "SystemFps": 100,
-    "NodeName": "DataServer",
-    "Deadloop":30,
-    "Log":
+    "area_id": 1,
+    "node_id": 1,
+    "fps": 10,
+    "node_name": "DataServer",
+    "log":
     {
         "save":1,
-        "path":"Log/",
+        "path":"./Log",
         "hour":0,
         "min":0
     },
-    "Thread":
+    "thread":
     {
         "task":2,
         "network":1
     },
-    "CenterAddress": {
+    "rpc_path":"./Config/rpc.json",
+    "host_path": "./Config/host.json",
+    "code_path": "./XCode/XCode.csv",
+    "center_server": {
         "ip": "127.0.0.1",
         "port": 7788
     },
-    "Listener": {
+    "listener": {
         "ip":"127.0.0.1",
         "rpc":
         {
@@ -30,14 +31,13 @@
             "handler":"RpcClientComponent"
         }
     },
-    "Mysql": {
+    "mysql": {
         "ip": "8.136.213.239",
         "port": 3306,
         "user": "yjz",
-        "passwd": "199595yjz.",
-        "sql": "Config/sql.json"
+        "passwd": "199595yjz."
     },
-    "Scene": [
+    "component": [
         "ThreadPoolComponent",
         "MonitorComponent",
         "TcpServerComponent",
@@ -47,11 +47,11 @@
         "OperatorComponent",
         "RpcConfigComponent"
     ],
-    "Service": [
+    "service": [
         "MysqlService",
         "LocalHostService"
     ],
-    "WhiteList": [
+    "white_list": [
         "127.0.0.1"
     ]
 }

@@ -9,7 +9,7 @@
 namespace GameKeeper
 {
 	RpcNode::RpcNode(int id)
-		: mGlobalId(id), mIsClose(false), mSocketId(0)
+		: mNodeId(id), mIsClose(false), mSocketId(0)
 	{
         this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
         this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();

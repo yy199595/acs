@@ -43,7 +43,7 @@ namespace GameKeeper
             return false;
         }
         this->mMethodMap.emplace(name, method);
-        LOG_DEBUG("add new c++ service ", service,'.', name);
+        LOG_DEBUG("add new c++ service method", service,'.', name);
         return true;
     }
 
@@ -80,7 +80,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         LOG_DEBUG("===============[rpc request]===============");
         LOG_DEBUG("[func] =", this->GetServiceName(), '.', method);
-        LOG_DEBUG("[time] = ms", elapsedTimer.GetMs(), "ms");
+        LOG_DEBUG("[time] = [", elapsedTimer.GetMs(), "ms]");
         if (request->has_data())
         {
             LOG_DEBUG("[request] = ", Helper::Proto::ToJson(request->data()));

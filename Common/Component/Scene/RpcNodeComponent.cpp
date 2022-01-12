@@ -33,12 +33,12 @@ namespace GameKeeper
         return nodeProxy;
     }
 
-	RpcNode * RpcNodeComponent::CreateNode(int uid, const s2s::NodeInfo & nodeInfo)
+	RpcNode * RpcNodeComponent::CreateNode(const s2s::NodeInfo & nodeInfo)
 	{
-        auto nodeProxy = this->GetServiceNode(uid);
+        auto nodeProxy = this->GetServiceNode(nodeInfo.node_id());
         if(nodeProxy == nullptr)
         {
-            nodeProxy = new RpcNode(uid);
+            nodeProxy = new RpcNode(nodeInfo.node_id());
         }
         if(!nodeProxy->UpdateNodeProxy(nodeInfo))
         {
@@ -48,17 +48,18 @@ namespace GameKeeper
 #endif
             return nullptr;
         }
-        this->mServiceNodeMap[uid] = nodeProxy;
+        this->mServiceNodeMap[nodeInfo.node_id()] = nodeProxy;
 		return nodeProxy;
 	}
 
     RpcNode *RpcNodeComponent::CreateNode(int uid, const std::string &name, const std::string &ip, unsigned short port)
     {
         s2s::NodeInfo nodeInfo;
+        nodeInfo.set_node_id(0);
         nodeInfo.set_server_ip(ip);
         nodeInfo.set_server_name(name);
         nodeInfo.mutable_listeners()->insert({"rpc", port});
-        return this->CreateNode(uid, nodeInfo);
+        return this->CreateNode(nodeInfo);
     }
 
     bool RpcNodeComponent::Awake()

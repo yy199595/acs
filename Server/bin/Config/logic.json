@@ -1,8 +1,8 @@
 {
     "area_id": 1,
-    "node_id": 0,
-    "fps": 10,
-    "node_name": "CenterServer",
+    "node_id": 2,
+    "fps": 30,
+    "node_name": "LogicServer",
     "log":
     {
         "save":1,
@@ -26,22 +26,40 @@
         "ip":"127.0.0.1",
         "rpc":
         {
-            "port":7788,
+            "port":7790,
             "count":10000,
             "handler":"RpcClientComponent"
         }
     },
+    "redis": {
+        "ip": "127.0.0.1",
+        "port": 6379,
+        "timeout": 3,
+        "passwd": ""
+    },
+    "lua_src": [
+        "./Script/Common/",
+        "./Script/Server/"
+    ],
     "component": [
         "ThreadPoolComponent",
         "MonitorComponent",
         "TcpServerComponent",
+        "LuaScriptComponent",
+        "LuaServiceMgrComponent",
+        "RedisComponent",
+        "MysqlProxyComponent",
         "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",
-        "RpcConfigComponent"
+        "RpcConfigComponent",
+        "GateComponent",
+        "GateClientComponent",
+        "HttpClientComponent"
     ],
     "service": [
-        "CenterHostService"
+        "AccountService",
+        "LocalHostService"
     ],
     "white_list": [
         "127.0.0.1"
