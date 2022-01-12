@@ -27,15 +27,12 @@
         }
     },
     "ScriptPath": [
-        "Script/Common/",
-        "Script/Server/"
+        "Script/Common/"
     ],
     "Scene": [
         "ThreadPoolComponent",
         "MonitorComponent",
         "TcpServerComponent",
-        "LuaScriptComponent",
-        "LuaServiceMgrComponent",
         "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",

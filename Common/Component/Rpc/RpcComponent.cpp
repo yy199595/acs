@@ -19,7 +19,7 @@ namespace GameKeeper
         this->mPpcConfigComponent = nullptr;
         this->mRpcClientComponent = nullptr;
 		const ServerConfig & ServerCfg = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("NodeId", this->mNodeId));
+		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("node_id", this->mNodeId));
         return true;
 	}
 
@@ -46,7 +46,7 @@ namespace GameKeeper
         auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
         if (logicService == nullptr)
         {
-            LOG_FATAL("call service not exist : [", service , "]");
+            LOG_ERROR("call service not exist : [", service , "]");
             return XCode::CallServiceNotFound;
         }
 

@@ -25,7 +25,7 @@
         "ip":"127.0.0.1",
         "rpc":
         {
-            "port":7788,
+            "port":7789,
             "count":10000,
             "handler":"RpcClientComponent"
         }

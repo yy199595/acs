@@ -12,10 +12,10 @@ namespace GameKeeper
         this->mTaskManager = nullptr;
         this->mCorComponent = nullptr;
 		const ServerConfig & config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "ip", this->mMysqlIp));
-        LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "port", this->mMysqlPort));
-        LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "user", this->mDataBaseUser));
-		LOG_CHECK_RET_FALSE(config.GetValue("Mysql", "passwd", this->mDataBasePasswd));
+        LOG_CHECK_RET_FALSE(config.GetValue("mysql", "ip", this->mMysqlIp));
+        LOG_CHECK_RET_FALSE(config.GetValue("mysql", "port", this->mMysqlPort));
+        LOG_CHECK_RET_FALSE(config.GetValue("mysql", "user", this->mDataBaseUser));
+		LOG_CHECK_RET_FALSE(config.GetValue("mysql", "passwd", this->mDataBasePasswd));
         return true;
     }
 

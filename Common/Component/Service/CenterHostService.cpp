@@ -26,9 +26,6 @@ namespace GameKeeper
 
     bool CenterHostService::OnLoadConfig()
     {
-        const std::string &path = App::Get().GetServerPath().GetConfigPath();
-        LOG_CHECK_RET_FALSE(this->LoadHostConfig(path + "host.json"));
-        LOG_CHECK_RET_FALSE(this->LoadGroupConfig(path + "group.json"));
         return true;
     }
 
@@ -36,12 +33,6 @@ namespace GameKeeper
     {
         const s2s::NodeInfo & registerNodeInfo = nodeInfo.node_info();
         const unsigned short areaId = registerNodeInfo.area_id();
-
-        auto groupConfig = this->GetGroupConfig(areaId);
-        if(groupConfig == nullptr)
-        {
-            return XCode::NotServerGroupConfig;
-        }
 
         int nodeId = registerNodeInfo.node_id();
         const int globalId = areaId * 10000 + nodeId;
@@ -54,9 +45,6 @@ namespace GameKeeper
 
         response.set_node_id(globalId);
         this->AddNewNode(areaId, globalId);
-        response.mutable_group_data()->set_token(groupConfig->mToken);
-        response.mutable_group_data()->set_group_name(groupConfig->mName);
-        response.mutable_group_data()->set_group_id(groupConfig->mGroupId);
         return this->NoticeAllNode(registerNodeInfo);
     }
 
@@ -110,75 +98,14 @@ namespace GameKeeper
         {
             for(unsigned int id : iter->second)
             {
+                std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
                 RpcNode * rpcNode = this->mNodeComponent->GetServiceNode(id);
-                XCode code = rpcNode->Call("LocalHostService.Add", nodeInfo);
-                LOG_DEBUG("add rpc node to {0}", nodeInfo.server_name());
+                if(rpcNode->Call("LocalHostService.Add", nodeInfo, taskSource) == XCode::Successful)
+                {
+                    LOG_DEBUG("add rpc node to ", nodeInfo.server_name());
+                }
             }
         }
         return XCode::Successful;
-    }
-
-    const ServerGroupConfig *CenterHostService::GetGroupConfig(unsigned int groupId)
-    {
-        auto iter = this->mGroupNodeMap.find(groupId);
-        return iter != this->mGroupNodeMap.end() ? &iter->second : nullptr;
-    }
-
-    bool CenterHostService::LoadHostConfig(const std::string &path)
-    {
-        std::string md5;
-        rapidjson::Document document;
-        if (!Helper::File::ReadJsonFile(path, document, this->mHostConfigMd5))
-        {
-            LOG_ERROR("not find config {0}", path);
-            return false;
-        }
-        if(this->mHostConfigMd5 == md5)
-        {
-            return true;
-        }
-        this->mHostConfigMd5 = md5;
-        this->mServiceHosts.clear();
-        LOG_CHECK_RET_FALSE(document.HasMember("host") && document["host"].IsArray());
-
-        for (size_t index = 0; index < document["host"].Size(); index++)
-        {
-            std::string host = document["host"][index].GetString();
-            this->mServiceHosts.emplace(host);
-        }
-        return true;
-    }
-
-    bool CenterHostService::LoadGroupConfig(const std::string &path)
-    {
-        std::string md5;
-        rapidjson::Document  document;
-        if (!Helper::File::ReadJsonFile(path, document, md5))
-        {
-            LOG_ERROR("not find config {0}", path);
-            return false;
-        }
-        if(this->mGroupConfigMd5 == md5)
-        {
-            return true;
-        }
-        this->mGroupConfigMd5 = md5;
-        this->mGroupNodeMap.clear();
-        auto iter = document.MemberBegin();
-        for(; iter != document.MemberEnd(); iter++)
-        {
-            const std::string name = iter->name.GetString();
-            const rapidjson::Value &jsonData = iter->value;
-            LOG_CHECK_RET_FALSE(jsonData.IsObject())
-            LOG_CHECK_RET_FALSE(jsonData.HasMember("Id"));
-
-            ServerGroupConfig groupNodeInfo;
-
-            groupNodeInfo.mName = name;
-            groupNodeInfo.mGroupId = jsonData["Id"].GetUint();
-            groupNodeInfo.mToken = Helper::String::CreateNewToken();
-            this->mGroupNodeMap.emplace(groupNodeInfo.mGroupId, groupNodeInfo);
-        }
-        return true;
     }
 }

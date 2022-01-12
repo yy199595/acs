@@ -11,8 +11,8 @@ namespace GameKeeper
     {
         this->mRedisPort = 0;
         const ServerConfig &config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("Redis", "ip", this->mRedisIp));
-        LOG_CHECK_RET_FALSE(config.GetValue("Redis", "port", this->mRedisPort));
+        LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
+        LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
         return true;
     }
 

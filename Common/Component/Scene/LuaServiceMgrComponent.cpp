@@ -30,7 +30,7 @@ namespace GameKeeper
 		lua_State * lua = luaComponent->GetLuaEnv();
 
 		std::vector<std::string> services;
-        App::Get().GetConfig().GetValue("Service", services);
+        App::Get().GetConfig().GetValue("service", services);
 
 		for (std::string & service : services)
 		{

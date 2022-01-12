@@ -11,7 +11,7 @@ namespace GameKeeper
 {
 	App *App::mApp = nullptr;
 
-	App::App(ServerConfig * config) :GameObject(0), mServerPath(nullptr),
+	App::App(ServerConfig * config) :GameObject(0),
         mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
 		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
@@ -34,13 +34,13 @@ namespace GameKeeper
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
-		if (!mConfig->GetValue("Scene", components))
+		if (!mConfig->GetValue("component", components))
 		{
 			LOG_ERROR("not find field : Scene");
 			return false;
 		}
 
-		if (!mConfig->GetValue("Service", components))
+		if (!mConfig->GetValue("service", components))
 		{
 			LOG_ERROR("not find field : Service");
 			return false;
@@ -50,7 +50,7 @@ namespace GameKeeper
 		{
 			if (!this->AddComponent(name))
             {
-                LOG_FATAL("add", name, "to service failure");
+                LOG_FATAL("add ", name, " failure");
                 return false;
             }
             //LOG_DEBUG("add new component : " << name);
@@ -128,8 +128,7 @@ namespace GameKeeper
 
 	int App::Run(int argc, char ** argv)
 	{
-		this->mServerPath = new ServerPath(argc, argv);
-        this->mConfig->GetValue("NodeName", this->mServerName);
+        this->mConfig->GetValue("node_name", this->mServerName);
 		if (!this->AddComponentFormConfig())
 		{
 			return this->Stop(ExitCode::AddError);
@@ -141,7 +140,7 @@ namespace GameKeeper
 		}
 
         this->mFps = 15;
-		mConfig->GetValue("Fps", this->mFps);
+		mConfig->GetValue("fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = Helper::Time::GetMilTimestamp();
 		this->mSecondTimer = Helper::Time::GetMilTimestamp();

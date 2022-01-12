@@ -10,17 +10,6 @@ using namespace com;
 
 namespace GameKeeper
 {
-    class ServerGroupConfig
-    {
-    public:
-        std::string mName;
-        std::string mToken;
-        unsigned int mGroupId;
-    };
-}
-
-namespace GameKeeper
-{
     class RpcNode;
     // 所有方法都注册到这里(全局唯一)
     class CenterHostService : public ServiceComponent, public ILoadConfig
@@ -45,18 +34,10 @@ namespace GameKeeper
     private:
         XCode NoticeAllNode(const s2s::NodeInfo & nodeInfo);
         void AddNewNode(unsigned short areaId, unsigned int nodeId);
-        const ServerGroupConfig * GetGroupConfig(unsigned int groupId);
-
     private:
-        bool LoadGroupConfig(const std::string & path);
-        bool LoadHostConfig(const std::string & path);
-    private:
-        std::string mHostConfigMd5;
-        std::string mGroupConfigMd5;
         std::set<std::string> mServiceHosts;
         class RpcNodeComponent * mNodeComponent;
         class RpcClientComponent * mRpcComponent;
-        std::unordered_map<unsigned int, ServerGroupConfig> mGroupNodeMap;
         std::unordered_map<unsigned short , std::set<unsigned int>> mServiceNodeMap;
     };
 }

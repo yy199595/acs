@@ -51,12 +51,10 @@ namespace GameKeeper
         std::vector<std::string> luaPaths;
         std::vector<std::string> luaFiles;
 		const ServerConfig & config = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetValue("ScriptPath", luaPaths));
-        const std::string & workPath = App::Get().GetServerPath().GetWorkPath();
+		LOG_CHECK_RET_FALSE(config.GetValue("lua_src", luaPaths));
         for(const std::string & path : luaPaths)
         {
-            std::string fullPath = workPath + path;
-            if(!Helper::Directory::GetFilePaths(fullPath, "*.lua",luaFiles))
+            if(!Helper::Directory::GetFilePaths(path, "*.lua",luaFiles))
             {
                 LOG_ERROR("load", path, "lua file failure");
                 return false;

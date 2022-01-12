@@ -21,11 +21,12 @@ namespace GameKeeper
     bool RpcConfigComponent::OnLoadConfig()
     {
         std::string md5;
+        std::string rpcPath;
         rapidjson::Document jsonMapper;
-        const std::string path = App::Get().GetServerPath().GetConfigPath() + "rpc.json";
-        if (!Helper::File::ReadJsonFile(path, jsonMapper, md5))
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("rpc_path", rpcPath));
+        if (!Helper::File::ReadJsonFile(rpcPath, jsonMapper, md5))
         {
-            LOG_FATAL("not find file ", path);
+            LOG_FATAL("not find file ", rpcPath);
             return false;///
         }
         if(this->mConfigFileMd5 == md5)
@@ -98,13 +99,11 @@ namespace GameKeeper
 
     bool RpcConfigComponent::LoadCodeConfig()
     {
+        std::string path;
         std::vector<std::string> lines;
-        const std::string path = App::Get().GetServerPath().GetWorkPath();
-        if (!Helper::File::ReadTxtFile(path + "XCode/XCode.csv", lines))
-        {
-            LOG_ERROR("not find file", path, "XCode/XCode.csv");
-            return false;
-        }
+        auto & config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("code_path", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path , lines));
         std::vector<std::string> res;
         for (int index = 1; index < lines.size(); index++)
         {

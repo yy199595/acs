@@ -31,7 +31,7 @@ namespace GameKeeper
 
     void RpcNode::LoopSend()
     {
-        this->mLoopTaskSource = make_shared<LoopTaskSource>();
+        this->mLoopTaskSource = std::make_shared<LoopTaskSource>();
         while (!this->mIsClose)
         {
             if (!this->mSendQueue.empty())
@@ -118,7 +118,10 @@ namespace GameKeeper
            this->mSocketId = this->mRpcClientComponent->MakeSession(this->mNodeName);
         }
         this->mSendQueue.push(request);
-        mLoopTaskSource->SetResult();
+        if(this->mLoopTaskSource != nullptr)
+        {
+            this->mLoopTaskSource->SetResult();
+        }
         return request;
 	}
 

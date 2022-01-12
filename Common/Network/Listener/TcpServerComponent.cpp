@@ -9,9 +9,9 @@ namespace GameKeeper
     bool TcpServerComponent::Awake()
     {
 		const ServerConfig & config = App::Get().GetConfig();
-		config.GetValue("WhiteList", this->mWhiteList);
-        config.GetValue("Listener","ip", this->mHostIp);
-		rapidjson::Value * jsonValue = config.GetJsonValue("Listener");
+		config.GetValue("white_list", this->mWhiteList);
+        config.GetValue("listener","ip", this->mHostIp);
+		rapidjson::Value * jsonValue = config.GetJsonValue("listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
 			return false;

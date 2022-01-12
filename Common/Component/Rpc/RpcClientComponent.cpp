@@ -36,7 +36,7 @@ namespace GameKeeper
             this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
             auto component = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR(client->GetAddress(), " connected code =}", component->GetCodeDesc(code));
+            LOG_ERROR(client->GetAddress(), " connected code =", component->GetCodeDesc(code));
 #endif
             delete client;
         }

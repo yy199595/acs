@@ -10,22 +10,14 @@ namespace GameKeeper
     std::string thread_local LoggerComponent::mLogBuffer;
 	// 单线程  st  多线程  mt
 	bool LoggerComponent::Awake()
-	{
-		this->mLogSaveTime = 1;
-        std::string path = "log";
-		App::Get().GetConfig().GetValue("Log", "path", path);
-        App::Get().GetConfig().GetValue("Log", "save", this->mLogSaveTime);
-        const std::string & workPath = App::Get().GetServerPath().GetWorkPath();
-
-        this->mLogSavePath = workPath + path;
-        if (!App::Get().GetConfig().GetValue("NodeName", this->mServerName))
-		{
-			std::cerr << "not find config field : NodeName" << std::endl;
-			return false;
-		}
-		this->CreateLogFile();
-		return true;
-	}
+    {
+        const ServerConfig &config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("node_name", this->mServerName));
+        LOG_CHECK_RET_FALSE(config.GetValue("log", "path", this->mLogSavePath));
+        LOG_CHECK_RET_FALSE(config.GetValue("log", "save", this->mLogSaveTime));
+        this->CreateLogFile();
+        return true;
+    }
 
     bool LoggerComponent::LateAwake()
     {
@@ -46,7 +38,7 @@ namespace GameKeeper
 	{
 		spdlog::shutdown();
 		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
-		std::string logPath = this->mLogSavePath + Helper::Time::GetYearMonthDayString();
+		std::string logPath = fmt::format("{0}/{1}", this->mLogSavePath, Helper::Time::GetYearMonthDayString());
 #ifdef LOG_THREAD_LOCK
 		this->mInfoLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mDebugLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);

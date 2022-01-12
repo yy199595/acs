@@ -57,8 +57,6 @@ namespace GameKeeper
 			return this->mServerName;
 		}
 
-        inline ServerPath & GetServerPath() const { return *mServerPath;}
-
 		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
 
 		inline bool IsMainThread()
@@ -96,7 +94,6 @@ namespace GameKeeper
 	private:
 		void LogicMainLoop();
 	private:
-        ServerPath * mServerPath;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	private:

@@ -12,10 +12,6 @@ namespace GameKeeper
     {
     public:
         explicit ServerConfig(std::string  path);
-
-    public:
-
-
     public:
         bool HasValue(const std::string & k2) const;
 
@@ -50,6 +46,7 @@ namespace GameKeeper
     private:   
         const std::string mConfigPath;
         rapidjson::Document mConfigDocument;
+        std::unordered_map<std::string, rapidjson::Document> mConfigMap;
         std::unordered_map<std::string, rapidjson::Value *> mMapConfigData;
     };
 }

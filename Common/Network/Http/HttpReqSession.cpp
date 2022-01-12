@@ -92,13 +92,13 @@ namespace GameKeeper
         if (err)
         {
             this->mHttpRespTask->OnComplete(XCode::HttpNetWorkError);
-            LOG_ERROR("connect {0}:{1} failure : {2}", this->mHost, this->mPort, err.message());
+            LOG_ERROR("connect", this->mHost, ':', mPort, "failure :", err.message());
             return;
         }
 		AsioTcpSocket & socket = this->mSocketProxy->GetSocket();
         this->mAddress = socket.remote_endpoint().address().to_string()
                          + ":" + std::to_string(socket.remote_endpoint().port());
-        LOG_DEBUG("connect to", this->mHost, ':', this->mPort, "successful");
+        LOG_DEBUG("connect http => ", this->mHost, ':', this->mPort, " successful");
         this->StartSendHttpMessage();
     }
 

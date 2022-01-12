@@ -14,11 +14,11 @@ namespace GameKeeper
         BIND_RPC_FUNCTION(LocalHostService::Del);
         BIND_RPC_FUNCTION(LocalHostService::Hotfix);
         BIND_RPC_FUNCTION(LocalHostService::ReLoadConfig);
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("AreaId", this->mAreaId));
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeId", this->mNodeId));
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("NodeName", this->mNodeName));
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("CenterAddress", "ip", this->mCenterIp));
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("CenterAddress", "port", this->mCenterPort));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_id", this->mNodeId));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("center_server", "ip", this->mCenterIp));
+        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("center_server", "port", this->mCenterPort));
         return true;
     }
     bool LocalHostService::LateAwake()

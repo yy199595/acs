@@ -64,7 +64,7 @@ namespace GameKeeper
     bool RpcNodeComponent::Awake()
     {
 		const ServerConfig & serverConfig = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(serverConfig.GetValue("AreaId", this->mAreaId));
+		LOG_CHECK_RET_FALSE(serverConfig.GetValue("area_id", this->mAreaId));
         return true;
     }
 
