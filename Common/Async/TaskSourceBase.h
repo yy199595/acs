@@ -30,7 +30,7 @@ namespace GameKeeper
 
     protected:
         bool YieldTask();
-        bool ResumeTask();
+        bool ResumeTask(TaskState state = TaskState::TaskFinish);
     private:
         TaskState mState;
         long long mTaskId;

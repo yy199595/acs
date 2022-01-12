@@ -93,7 +93,7 @@ namespace GameKeeper
             for(size_t index = 0; index < size; index++)
             {
                 auto data = rpcTaskSource->GetData<db::db_account_tab_user_account>(index);
-                LOG_WARN("json = ", data);
+                LOG_WARN("json = ", Helper::Proto::ToJson(*data));
             }
         }
 	}

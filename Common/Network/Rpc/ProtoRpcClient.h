@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include"RpcClient.h"
 #include"Protocol/com.pb.h"
+#include"Async/TaskSource.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 
@@ -16,21 +17,16 @@ namespace GameKeeper
 		void StartClose();
         void SendToServer(std::shared_ptr<com::Rpc_Request> message);
         void SendToServer(std::shared_ptr<com::Rpc_Response> message);
+        std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 	protected:
         void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
 		XCode OnRequest(const char * buffer, size_t size)final;
 		XCode OnResponse(const char * buffer, size_t size)final;
         void OnSendData(XCode code, std::shared_ptr<Message> ) final;
-
-    private:
-        bool SendFromQueue();
-        bool ConnectInSecond(int second);
-        void Send(char type, std::shared_ptr<Message> message);
     private:
         int mConnectCount;
-        asio::steady_timer * mConnectTimer;
         RpcClientComponent * mTcpComponent;
-		std::queue<std::shared_ptr<Message>> mMessageQueue;
+        std::shared_ptr<TaskSource<bool>> mConnectTaskSource;
 	};
 }// namespace GameKeeper

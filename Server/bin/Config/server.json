@@ -1,9 +1,9 @@
 {
     "AreaId": 1,
-    "NodeId": 1,
-    "Fps": 30,
+    "NodeId": 2,
+    "Fps": 15,
     "SystemFps": 100,
-    "NodeName": "Server",
+    "NodeName": "SceneServer",
     "Deadloop":30,
     "Log":
     {
@@ -22,7 +22,7 @@
         "port": 1995
     },
     "CenterAddress": {
-        "ip": "127.0.0.1",
+        "ip": "114.115.167.51",
         "port": 7788
     },
     "Listener": {
@@ -32,12 +32,6 @@
             "port":7788,
             "count":10000,
             "handler":"RpcClientComponent"
-        },
-        "gate":
-        {
-            "port":1995,
-            "count": 10000,
-            "handler": "GateClientComponent"
         }
     },
     "IsOpenRecoder": true,
@@ -60,27 +54,17 @@
     ],
     "Scene": [
         "ThreadPoolComponent",
-        "MonitorComponent",
         "TcpServerComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
-        "MysqlComponent",
-        "RedisComponent",
         "MysqlProxyComponent",
         "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",
-        "RpcConfigComponent",
-        "GateComponent",
-        "GateClientComponent",
-        "HttpClientComponent"
+        "RpcConfigComponent"
     ],
     "Service": [
-        "GateService",
-        "MysqlService",
-        "AccountService",
-        "LocalHostService",
-        "CenterHostService"
+        "LocalHostService"
     ],
     "WhiteList": [
         "127.0.0.1"

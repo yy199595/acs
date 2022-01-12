@@ -12,6 +12,7 @@
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
 #ifdef __DEBUG__
+#include"Pool/MessagePool.h"
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace GameKeeper
@@ -74,7 +75,7 @@ namespace GameKeeper
     {
 #ifdef __DEBUG__
         LOG_WARN("**********[client response]**********");
-        LOG_WARN("json = ", response);
+        LOG_WARN("json = ", Helper::Proto::ToJson(*response));
         LOG_WARN("*****************************************");
 #endif
         if(this->mGateClientComponent->SendToClient(sockId, response))

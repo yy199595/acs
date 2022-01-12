@@ -123,12 +123,13 @@ namespace GameKeeper
             }
         }
         long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
-        LOG_DEBUG("===== start", this->mServerName, " successful [", this->mServerName, t / 1000.0f, "]s =======");
+        LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
     }
 
 	int App::Run(int argc, char ** argv)
 	{
 		this->mServerPath = new ServerPath(argc, argv);
+        this->mConfig->GetValue("NodeName", this->mServerName);
 		if (!this->AddComponentFormConfig())
 		{
 			return this->Stop(ExitCode::AddError);

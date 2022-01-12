@@ -10,6 +10,7 @@
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"Scene/RpcConfigComponent.h"
+#include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
 #endif
 namespace GameKeeper
@@ -40,7 +41,7 @@ namespace GameKeeper
         {
             auto rpcClient = new RpcProxyClient(socket, SocketType::RemoteSocket, this);
 #ifdef __DEBUG__
-            LOG_INFO("new player connect proxy component ip : {0}", ip);
+            LOG_INFO("new player connect proxy component ip : ", ip);
 #endif
             rpcClient->StartReceive();
             this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
@@ -52,7 +53,7 @@ namespace GameKeeper
 #ifdef __DEBUG__
         LOG_WARN("**********[client request]**********");
         LOG_WARN("func = ", request->method_name());
-        LOG_WARN("json = ", request);
+        LOG_WARN("json = ", Helper::Proto::ToJson(*request));
         LOG_WARN("*****************************************");
 #endif
         XCode code = this->mGateComponent->OnRequest(request);

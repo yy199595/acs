@@ -141,12 +141,15 @@ namespace GameKeeper
 
     bool RpcClient::StartConnect(const std::string &ip, unsigned short port)
     {
-        LOG_CHECK_RET_FALSE(this->IsCanConnection());
-        this->mIsConnect = true;
-        LOG_CHECK_RET_FALSE(this->mSocketProxy);
-        NetWorkThread &nThread = this->mSocketProxy->GetThread();
-        nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port);
-        return true;
+        if(this->IsCanConnection())
+        {
+            this->mIsConnect = true;
+            LOG_CHECK_RET_FALSE(this->mSocketProxy);
+            NetWorkThread &nThread = this->mSocketProxy->GetThread();
+            nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port);
+            return true;
+        }
+        return false;
     }
 
     void RpcClient::ConnectHandler(const std::string &ip, unsigned short port)
@@ -156,7 +159,7 @@ namespace GameKeeper
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
-        LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , this->GetAddress());
+        LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , ip, ':', port);
         nSocket.async_connect(endPoint, [this](const asio::error_code &err)
         {
             XCode code = XCode::Failure;
@@ -174,14 +177,6 @@ namespace GameKeeper
     {
         return this->GetSocketType() == SocketType::LocalSocket
                && !this->IsOpen() && !this->mIsConnect;
-    }
-
-    void RpcClient::ReConnection()
-    {
-        if(this->IsCanConnection())
-        {
-            this->ConnectHandler(this->mIp, this->mPort);
-        }
     }
 
     void RpcClient::SendData(char type, std::shared_ptr<Message> message)

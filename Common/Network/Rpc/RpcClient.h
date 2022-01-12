@@ -38,7 +38,6 @@ namespace GameKeeper
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
         virtual void OnSendData(XCode code, std::shared_ptr<Message> ) = 0;
     protected:
-        void ReConnection();
         bool IsCanConnection();
         void SendData(char type, std::shared_ptr<Message> message);
 	protected:

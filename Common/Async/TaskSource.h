@@ -7,6 +7,13 @@
 #include"TaskSourceBase.h"
 namespace GameKeeper
 {
+    class LoopTaskSource : public TaskSourceBase
+    {
+    public:
+        void Await() {this->YieldTask();}
+        bool SetResult() { return this->ResumeTask(TaskState::TaskReady);}
+    };
+
     template<typename T>
     class TaskSource : public TaskSourceBase
     {

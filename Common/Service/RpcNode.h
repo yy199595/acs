@@ -40,6 +40,8 @@ namespace GameKeeper
         XCode Call(const std::string & func, const Message & message, std::shared_ptr<RpcTaskSource> taskSource = nullptr);
 
     private:
+        void LoopSend();
+    private:
         int mGlobalId;
         short mAreaId;
         short mNodeId;
@@ -51,10 +53,12 @@ namespace GameKeeper
     private:
         bool mIsClose;
         long long mSocketId;
-        TaskComponent *mCorComponent;//协程
+        TaskComponent *mTaskComponent;//协程
         class RpcComponent * mRpcComponent;
         std::set<std::string> mServiceArray;//服务列表
         class RpcConfigComponent *mRpcConfigComponent;
         class RpcClientComponent * mRpcClientComponent;
+        std::shared_ptr<LoopTaskSource> mLoopTaskSource;
+        std::queue<std::shared_ptr<com::Rpc_Request>> mSendQueue;
     };
 }// namespace GameKeeper

@@ -83,11 +83,11 @@ namespace GameKeeper
         LOG_DEBUG("[time] = ms", elapsedTimer.GetMs(), "ms");
         if (request->has_data())
         {
-            LOG_DEBUG("[request] = ", request->data());
+            LOG_DEBUG("[request] = ", Helper::Proto::ToJson(request->data()));
         }
         if (response->has_data())
         {
-            LOG_DEBUG("[response] = ", response->data());
+            LOG_DEBUG("[response] = ", Helper::Proto::ToJson(response->data()));
         }
 #endif
         return response;

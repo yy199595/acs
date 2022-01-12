@@ -57,7 +57,7 @@ namespace GameKeeper
         {
             rpcClient->StartReceive();
             const std::string &name = rpcClient->GetSocketProxy()->GetName();
-            LOG_INFO("connect to [", name, "=>", address, "] successful");
+            LOG_INFO("[", name, " => ", address, "] start receive message");
         }
 	}
 
@@ -138,7 +138,7 @@ namespace GameKeeper
         return iter == this->mRpcClientMap.end() ? nullptr : iter->second;
     }
 
-    long long RpcClientComponent::MakeSession(const std::string &name, const std::string &ip, unsigned short port)
+    long long RpcClientComponent::MakeSession(const std::string &name)
 	{
         NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, name));
@@ -147,7 +147,6 @@ namespace GameKeeper
         {
             return 0;
         }
-        localSession->StartConnect(ip, port);
 		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
 		return localSession->GetSocketId();
 	}
@@ -185,7 +184,7 @@ namespace GameKeeper
                 GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
         LOG_DEBUG("func = ", config->Service,'.', config->Method);
-        LOG_DEBUG("json = ", message);
+        LOG_DEBUG("json = ", Helper::Proto::ToJson(*message));
         LOG_DEBUG("==============================================");
 #endif
         clientSession->SendToServer(message);
@@ -201,7 +200,7 @@ namespace GameKeeper
         }
 #ifdef __DEBUG__
         LOG_DEBUG("=============== [send response] ===============");
-        LOG_DEBUG("json = ", message);
+        LOG_DEBUG("json = ", Helper::Proto::ToJson(*message));
         LOG_DEBUG("==============================================");
 #endif
         clientSession->SendToServer(message);

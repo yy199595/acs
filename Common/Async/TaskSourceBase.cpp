@@ -15,10 +15,11 @@ namespace GameKeeper
         this->mTaskComponent = App::Get().GetTaskComponent();
     }
 
-    bool TaskSourceBase::ResumeTask()
+    bool TaskSourceBase::ResumeTask(TaskState state)
     {
         if (this->mState == TaskState::TaskAwait)
         {
+            this->mState = state;
             if (this->mTaskScheduler.IsCurrentThread())
             {
                 this->mTaskComponent->Resume(this->mCorId);

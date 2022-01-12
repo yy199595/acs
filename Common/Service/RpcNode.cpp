@@ -13,8 +13,9 @@ namespace GameKeeper
 	{
         this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
         this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
-        LOG_CHECK_RET(this->mCorComponent = App::Get().GetComponent<TaskComponent>());
+        LOG_CHECK_RET(this->mTaskComponent = App::Get().GetComponent<TaskComponent>());
         LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
+        this->mTaskComponent->Start(&RpcNode::LoopSend, this);
 	}
 
 	bool RpcNode::AddService(const std::string &service)
@@ -27,6 +28,38 @@ namespace GameKeeper
 		}
 		return false;
 	}
+
+    void RpcNode::LoopSend()
+    {
+        this->mLoopTaskSource = make_shared<LoopTaskSource>();
+        while (!this->mIsClose)
+        {
+            if (!this->mSendQueue.empty())
+            {
+                auto clientSession = this->mRpcClientComponent->GetRpcSession(this->mSocketId);
+                if (!clientSession->IsOpen())
+                {
+                    int connectCount = 0;
+                    const std::string &ip = this->mNodeIp;
+                    const unsigned short port = this->mNodePort;
+                    while (!clientSession->ConnectAsync(ip, port)->Await())
+                    {
+                        connectCount++;
+                        LOG_ERROR("connect ", this->mNodeName, " => ", ip, ':', port, " failure count = ",
+                                  connectCount);
+                        this->mTaskComponent->Sleep(3000);
+                    }
+                }
+                while (!this->mSendQueue.empty())
+                {
+                    auto requestMessage = this->mSendQueue.front();
+                    this->mSendQueue.pop();
+                    clientSession->SendToServer(requestMessage);
+                }
+            }
+            this->mLoopTaskSource->Await();
+        }
+    }
 
     bool RpcNode::UpdateNodeProxy(const s2s::NodeInfo &nodeInfo)
     {
@@ -80,13 +113,12 @@ namespace GameKeeper
 		}
         std::shared_ptr<com::Rpc_Request> request(new com::Rpc_Request());
 		request->set_method_id(config->MethodId);
-        if(this->mRpcClientComponent->GetRpcSession(this->mSocketId) == nullptr)
+        if(this->mSocketId == 0)
         {
-            const std::string & ip = this->mNodeIp;
-            const unsigned short port = this->mNodePort;
-            this->mSocketId = this->mRpcClientComponent->MakeSession(this->mNodeName, ip, port);
+           this->mSocketId = this->mRpcClientComponent->MakeSession(this->mNodeName);
         }
-        this->mRpcClientComponent->Send(this->mSocketId, request);
+        this->mSendQueue.push(request);
+        mLoopTaskSource->SetResult();
         return request;
 	}
 

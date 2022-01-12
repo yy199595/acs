@@ -24,7 +24,8 @@ namespace GameKeeper
     bool LocalHostService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mNodeComponent = this->GetComponent<RpcNodeComponent>());
-        LOG_CHECK_RET_FALSE(this->mNodeComponent->CreateNode(0, this->mNodeName, this->mCenterIp, this->mCenterPort));
+        RpcNode * centerNode = this->mNodeComponent->CreateNode(
+                0, this->mNodeName, this->mCenterIp, this->mCenterPort);
         return true;
     }
 

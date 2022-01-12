@@ -11,7 +11,6 @@ namespace GameKeeper
 		:RpcClient(socket, type), mTcpComponent(component)
 	{
         this->mConnectCount = 0;
-        this->mConnectTimer = nullptr;
 	}
 
 	void ProtoRpcClient::StartClose()
@@ -31,7 +30,7 @@ namespace GameKeeper
             this->SendData(RPC_TYPE_RESPONSE, message);
             return;
         }
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::Send, this, RPC_TYPE_RESPONSE, message);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_RESPONSE, message);
     }
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Request> message)
@@ -41,22 +40,8 @@ namespace GameKeeper
             this->SendData(RPC_TYPE_REQUEST, message);
             return;
         }
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::Send, this, RPC_TYPE_REQUEST, message);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_REQUEST, message);
         return;
-    }
-
-    void ProtoRpcClient::Send(char type, std::shared_ptr<Message> message)
-    {
-        if(this->IsOpen())
-        {
-            this->SendData(type, message);
-            return;
-        }
-        if(this->IsCanConnection())
-        {
-            this->ConnectInSecond(1);
-        }
-        this->mMessageQueue.emplace(message);
     }
 
     void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<Message> message)
@@ -67,19 +52,10 @@ namespace GameKeeper
             MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
             taskScheduler.Invoke(&RpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
         }
-        this->SendFromQueue();
     }
 
 	void ProtoRpcClient::OnClose(XCode code)
 	{
-        if(this->GetSocketType() == SocketType::LocalSocket)
-        {
-            if(code == XCode::NetWorkError)
-            {
-                this->ConnectInSecond(3);
-                return;
-            }
-        }
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
@@ -110,48 +86,25 @@ namespace GameKeeper
 		return XCode::Successful;
 	}
 
-    bool ProtoRpcClient::ConnectInSecond(int second)
+    std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync(const std::string &ip, unsigned short port)
     {
-        if(this->mConnectTimer != nullptr)
+        if(!this->StartConnect(ip, port))
         {
-            this->mConnectTimer->cancel();
-            delete this->mConnectTimer;
-            this->mConnectTimer = nullptr;
+            return nullptr;
         }
-        AsioContext & io = this->GetSocketProxy()->GetContext();
-        this->mConnectTimer = new asio::steady_timer(io, chrono::seconds(second));
-        mConnectTimer->async_wait(std::bind(&ProtoRpcClient::ReConnection, this));
+        this->mConnectTaskSource = std::make_shared<TaskSource<bool>>();
+        return this->mConnectTaskSource;
     }
 
     void ProtoRpcClient::OnConnect(XCode code)
     {
         this->mConnectCount++;
-        if(code != XCode::Successful && this->mConnectCount < 3)
+        if(this->mConnectTaskSource != nullptr)
         {
-            this->ConnectInSecond(3);
-            return;
+            this->mConnectTaskSource->SetResult(code == XCode::Successful);
         }
-        this->SendFromQueue();
-        this->mConnectCount = 0;
-        delete this->mConnectTimer;
-        this->mConnectTimer = nullptr;
         long long id = this->mSocketProxy->GetSocketId();
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
-    }
-
-    bool ProtoRpcClient::SendFromQueue()
-    {
-        if(!this->mMessageQueue.empty())
-        {
-            std::shared_ptr<Message> message = this->mMessageQueue.front();
-            char type = dynamic_pointer_cast<com::Rpc_Request>(message)
-                    != nullptr ? RPC_TYPE_REQUEST : RPC_TYPE_RESPONSE;
-
-            this->SendData(type, message);
-            this->mMessageQueue.pop();
-            return true;
-        }
-        return false;
     }
 }

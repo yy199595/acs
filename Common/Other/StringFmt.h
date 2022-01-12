@@ -69,28 +69,6 @@ namespace Helper
 
         static void AddValue(std::string &str, const unsigned long long value)
         { str.append(std::to_string(value)); }
-
-
-        static void AddValue(std::string &str, const Message &message)
-        {
-            std::string json;
-            if (util::MessageToJsonString(message, &json).ok())
-            {
-                str.append(json);
-            }
-        }
-
-        static void AddValue(std::string &str, const Message *message)
-        {
-            if (message == nullptr) return;
-            Fmt::AddValue(str, *message);
-        }
-
-        static void AddValue(std::string &str, const std::shared_ptr<Message> message)
-        {
-            if (message == nullptr) return;
-            Fmt::AddValue(str, *message);
-        }
     };
 }
 #endif //GAMEKEEPER_STRINGFMT_H
