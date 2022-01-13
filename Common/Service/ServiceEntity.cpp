@@ -23,7 +23,7 @@ namespace GameKeeper
             auto node = make_shared<ServiceNode>
                     (this->mServiceName, address);
             this->mServiceNodeMap.emplace(address, node);
-            LOG_WARN(this->mServiceName, " add new address ", address);
+            LOG_WARN(this->mServiceName, " add new address [", address, "]");
         }
     }
 
@@ -42,6 +42,27 @@ namespace GameKeeper
     {
         auto iter = this->mServiceNodeMap.find(address);
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
+    }
+
+    bool ServiceEntity::RemoveServiceNode(const std::string &address)
+    {
+        auto iter = this->mServiceNodeMap.find(address);
+        if(iter == this->mServiceNodeMap.end())
+        {
+            auto serviceNode = iter->second;
+            this->mServiceNodeMap.erase(iter);
+            std::shared_ptr<com::Rpc_Request> message = serviceNode->PopMessage();
+            while(message != nullptr)
+            {
+                int methodId = message->method_id();
+                auto methodConfig = this->mRpcConfigComponent->GetProtocolConfig(methodId);
+                if(methodConfig != nullptr)
+                {
+                    
+                }
+                message = serviceNode->PopMessage();
+            }
+        }
     }
 
     //从redis查询服务地址

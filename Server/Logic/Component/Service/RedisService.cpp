@@ -53,6 +53,17 @@ namespace GameKeeper
         }
     }
 
+    bool RedisService::RemoveNode(const std::string &address)
+    {
+        auto response = this->mRedisComponent->Call("Service", "Remove", this->mAreaId, address);
+        if(response->GetCode() != XCode::Successful)
+        {
+            return false;
+        }
+        LOG_WARN("remove [", address,"] count = ", response->GetNumber());
+        return true;
+    }
+
     std::vector<std::string> RedisService::QueryService(const std::string &name)
     {
         auto response = this->mRedisComponent->Call("Service", "Get", this->mAreaId, name);

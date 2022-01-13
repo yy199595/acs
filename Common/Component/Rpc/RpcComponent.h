@@ -44,7 +44,6 @@ namespace GameKeeper
 	private:
         void OnTaskTimeout(long long rpcId);
     private:
-        int mNodeId;
         class TaskComponent *mCorComponent;
         class TimerComponent * mTimerComponent;
         class RpcClientComponent *mRpcClientComponent;

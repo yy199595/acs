@@ -67,8 +67,6 @@ namespace GameKeeper
     private:
 		std::string mRedisIp;        //redis ip地址
         unsigned short mRedisPort;    //端口号
-        std::thread * mPubSubThread;
-        redisContext * mPubSubContext;
         std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};

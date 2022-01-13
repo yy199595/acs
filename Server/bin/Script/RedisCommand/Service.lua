@@ -12,10 +12,12 @@ Service.Add = function(keys)
     local id = keys[1]
     local service = keys[2]
     local address = keys[3]
+    print("time = ", redis.call('TIME')[1])
     local key = string.format("%d:rpc.%s",id, service)
     print(string.format("add new service [%s] %s %s",key, service, address))
     return redis.call('SADD', key , address)
 end
+
 
 Service.Get = function(array)
     local id = array[1]

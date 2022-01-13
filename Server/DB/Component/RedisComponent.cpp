@@ -14,10 +14,7 @@ namespace GameKeeper
     {
         std::string path;
         this->mRedisPort = 0;
-        this->mPubSubThread = nullptr;
-        this->mPubSubContext = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
-
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
         return true;
@@ -154,8 +151,6 @@ namespace GameKeeper
             this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
             LOG_DEBUG("connect redis successful [", mRedisIp, ':', mRedisPort, "]");
         }
-        this->mPubSubContext = this->ConnectRedis(second);
-        this->mPubSubThread = new std::thread(std::bind(&RedisComponent::StartPubSub, this));
         return true;
     }
 

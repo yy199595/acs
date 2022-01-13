@@ -13,13 +13,10 @@ namespace GameKeeper
 {
 	bool RpcComponent::Awake()
 	{
-        this->mNodeId = 0;
         this->mCorComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mPpcConfigComponent = nullptr;
         this->mRpcClientComponent = nullptr;
-		const ServerConfig & ServerCfg = App::Get().GetConfig();
-		LOG_CHECK_RET_FALSE(ServerCfg.GetValue("node_id", this->mNodeId));
         return true;
 	}
 

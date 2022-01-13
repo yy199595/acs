@@ -7,6 +7,14 @@
 #include"Rpc/RpcClientComponent.h"
 namespace GameKeeper
 {
+    enum class NodeState
+    {
+        None,
+        Connected, //正在连接
+        ConnectFailure, //连接失败
+        ConnectSuccessful, //连接成功
+    };
+
     class ServiceNode
     {
     public:
@@ -15,10 +23,16 @@ namespace GameKeeper
     private:
         void SendFromQueue();
     public:
+        NodeState GetState() { return this->mState; }
         const std::string & GetAddress() { return this->mAddress; }
         void PushMessage(std::shared_ptr<com::Rpc_Request> message);
+        std::shared_ptr<com::Rpc_Request> PopMessage();
+    private:
+        bool OnConnectFailure(int count);
     private:
         bool mIsClose;
+        NodeState mState;
+        int mConnectCount;
         std::string mAddress;
         std::string mServiceName;
         TaskComponent * mTaskComponent;

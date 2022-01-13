@@ -18,6 +18,7 @@ namespace GameKeeper
         ~RedisService() override = default;
 
     public:
+        bool RemoveNode(const std::string & address);
         std::vector<std::string> QueryService(const std::string & name);
     public:
         bool Awake() final;

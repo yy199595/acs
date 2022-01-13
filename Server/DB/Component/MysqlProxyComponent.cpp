@@ -4,7 +4,6 @@
 #include"Service/ServiceEntity.h"
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
-#include"Util/MathHelper.h"
 #include"Rpc/RpcComponent.h"
 #include"Scene/ServiceComponent.h"
 #include"Other/ElapsedTimer.h"
@@ -56,7 +55,7 @@ namespace GameKeeper
             std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
             if(this->Add(userAccountData, taskSource) == XCode::Successful)
             {
-                LOG_ERROR("add data successful {0}", index);
+                LOG_ERROR("add data successful ", index);
             }
         }
         db::db_account_tab_user_account userAccount;

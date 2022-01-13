@@ -20,6 +20,8 @@ namespace GameKeeper
 
         bool AllotServiceAddress(std::string &address);
 
+        bool RemoveServiceNode(const std::string & address);
+
         std::shared_ptr<ServiceNode> GetNode(const std::string & address);
 
         std::shared_ptr<com::Rpc_Request> NewRequest(const std::string &method);

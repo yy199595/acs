@@ -1,7 +1,6 @@
 {
     "area_id": 1,
-    "node_id": 2,
-    "fps": 30,
+    "fps": 15,
     "node_name": "LogicServer",
     "log":
     {
@@ -35,7 +34,8 @@
         "ip": "127.0.0.1",
         "port": 6379,
         "timeout": 3,
-        "passwd": ""
+        "passwd": "",
+        "lua": "./Script/RedisCommand"
     },
     "lua_src": [
         "./Script/Common/",
@@ -43,7 +43,6 @@
     ],
     "component": [
         "ThreadPoolComponent",
-        "MonitorComponent",
         "TcpServerComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
@@ -59,7 +58,7 @@
     ],
     "service": [
         "AccountService",
-        "LocalHostService"
+        "RedisService"
     ],
     "white_list": [
         "127.0.0.1"

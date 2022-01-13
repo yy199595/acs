@@ -1,6 +1,5 @@
 {
     "area_id": 1,
-    "node_id": 1,
     "fps": 10,
     "node_name": "DataServer",
     "log":
@@ -31,6 +30,13 @@
             "handler":"RpcClientComponent"
         }
     },
+    "redis": {
+        "ip": "127.0.0.1",
+        "port": 6379,
+        "timeout": 3,
+        "lua": "./Script/RedisCommand",
+        "passwd": ""
+    },
     "mysql": {
         "ip": "8.136.213.239",
         "port": 3306,
@@ -42,6 +48,7 @@
         "MonitorComponent",
         "TcpServerComponent",
         "MysqlComponent",
+        "RedisComponent",
         "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",
@@ -49,7 +56,7 @@
     ],
     "service": [
         "MysqlService",
-        "LocalHostService"
+        "RedisService"
     ],
     "white_list": [
         "127.0.0.1"
