@@ -40,11 +40,11 @@ namespace GameKeeper
                 {
                     connectCount++;
                     LOG_ERROR("connect ", this->mAddress, " failure count = ", connectCount);
-                    if(this->OnConnectFailure(connectCount))
+                    if(!this->OnConnectFailure(connectCount))
                     {
-                        this->mTaskComponent->Sleep(5000);
+                        return;
                     }
-                    return;
+                    this->mTaskComponent->Sleep(5000);
                 }
                 this->mState = NodeState::ConnectSuccessful;
             }
