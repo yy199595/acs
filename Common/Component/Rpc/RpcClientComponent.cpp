@@ -32,13 +32,17 @@ namespace GameKeeper
 		auto iter = this->mRpcClientMap.find(socketId);
 		if (iter != this->mRpcClientMap.end())
         {
-            ProtoRpcClient *client = iter->second;
-            this->mRpcClientMap.erase(iter);
+            std::shared_ptr<ProtoRpcClient> session = iter->second;
+            auto iter1 = this->mAddressClientMap.find(session->GetAddress());
+            if(iter1 != this->mAddressClientMap.end())
+            {
+                this->mAddressClientMap.erase(iter1);
+            }
 #ifdef __DEBUG__
             auto component = App::Get().GetComponent<RpcConfigComponent>();
-            LOG_ERROR(client->GetAddress(), " connected code =", component->GetCodeDesc(code));
+            LOG_ERROR(session->GetAddress(), " connected code =", component->GetCodeDesc(code));
 #endif
-            delete client;
+            this->mRpcClientMap.erase(iter);
         }
 	}
 
@@ -62,25 +66,26 @@ namespace GameKeeper
 	}
 
 	void RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
-	{
+    {
         // 判断是不是服务器根据 白名单
-		long long id = socket->GetSocketId();
-		auto iter = this->mRpcClientMap.find(id);
-		LOG_CHECK_RET(iter == this->mRpcClientMap.end());
-		auto tcpSession = this->mClientPool.New(this, socket, SocketType::RemoteSocket);
-        if(tcpSession != nullptr)
+        long long id = socket->GetSocketId();
+        auto iter = this->mRpcClientMap.find(id);
+        if(iter == this->mRpcClientMap.end())
         {
+            std::shared_ptr<ProtoRpcClient> tcpSession(
+                    new ProtoRpcClient(this, socket, SocketType::RemoteSocket));
+
             tcpSession->StartReceive();
             this->mRpcClientMap.emplace(id, tcpSession);
         }
-	}
+    }
 
     void RpcClientComponent::StartClose(long long id)
     {
         auto iter = this->mRpcClientMap.find(id);
         if(iter != this->mRpcClientMap.end())
         {
-            ProtoRpcClient * rpcClient = iter->second;
+            auto rpcClient = iter->second;
             if(rpcClient->IsOpen())
             {
                 rpcClient->StartClose();
@@ -120,9 +125,12 @@ namespace GameKeeper
             LOG_DEBUG("func = ", config->Service, '.', config->Method);
             LOG_DEBUG("time = ", costTime, "ms");
 
+            if(response->code() != (int)XCode::Successful)
+            {
+                auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
+                LOG_ERROR("code => ", codeConfig->Name, ':', codeConfig->Desc);
+            }
             std::string json;
-            auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
-            LOG_DEBUG("code =", codeConfig->Name, ':', codeConfig->Desc);
             if (response->has_data() && Helper::Proto::GetJson(response->data(), json)) {
                 LOG_DEBUG("json = ", json);
             }
@@ -132,33 +140,40 @@ namespace GameKeeper
         this->mRpcComponent->OnResponse(response);
     }
 
-    ProtoRpcClient *RpcClientComponent::GetRpcSession(long long id)
-    {
-        auto iter = this->mRpcClientMap.find(id);
-        return iter == this->mRpcClientMap.end() ? nullptr : iter->second;
-    }
-
-    long long RpcClientComponent::MakeSession(const std::string &name)
+    std::shared_ptr<ProtoRpcClient> RpcClientComponent::MakeSession(const std::string &name, const std::string & address)
 	{
+        auto localSession = this->GetSession(address);
+        if(localSession != nullptr)
+        {
+            return localSession;
+        }
         NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, name));
-        auto localSession = this->mClientPool.New(this, socketProxy, SocketType::LocalSocket);
-        if(localSession == nullptr)
-        {
-            return 0;
-        }
+        localSession = make_shared<ProtoRpcClient>(this, socketProxy, SocketType::LocalSocket);
+
+        this->mAddressClientMap.emplace(address, socketProxy->GetSocketId());
 		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
-		return localSession->GetSocketId();
+		return localSession;
 	}
 
     void RpcClientComponent::OnDestory()
     {
     }
 
-    ProtoRpcClient *RpcClientComponent::GetSession(long long id)
+    std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(long long id)
     {
         auto iter = this->mRpcClientMap.find(id);
         return iter != this->mRpcClientMap.end() ? iter->second : nullptr;
+    }
+
+    std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(const std::string &address)
+    {
+        auto iter = this->mAddressClientMap.find(address);
+        if(iter == this->mAddressClientMap.end())
+        {
+            return nullptr;
+        }
+        return this->GetSession(iter->second);
     }
 
     bool RpcClientComponent::CloseSession(long long id)
@@ -174,7 +189,7 @@ namespace GameKeeper
 
 	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Request> message)
     {
-        ProtoRpcClient *clientSession = this->GetSession(id);
+         auto clientSession = this->GetSession(id);
         if (message == nullptr || clientSession == nullptr)
         {
             return false;
@@ -193,7 +208,7 @@ namespace GameKeeper
 
 	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Response> message)
     {
-        ProtoRpcClient *clientSession = this->GetSession(id);
+        auto clientSession = this->GetSession(id);
         if(clientSession == nullptr || message == nullptr)
         {
             return false;

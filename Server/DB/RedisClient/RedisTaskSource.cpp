@@ -42,18 +42,18 @@ namespace GameKeeper
         std::unique_ptr<const char *[]> dataArray(new const char *[size]);
 
 #ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
-        std::cout << "redis cmd : ";
+        //std::cout << "redis cmd : ";
 #endif
         for (size_t index = 0; index < this->mCommand.size(); index++)
         {
             sizeArray[index] = this->mCommand[index].size();
             dataArray[index] = this->mCommand[index].c_str();
 #ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
-            std::cout << this->mCommand[index] << " ";
+            //std::cout << this->mCommand[index] << " ";
 #endif
         }
 #ifdef __DEBUG__ && __REDIS_DEBUG_LOG__
-        std::cout << std::endl;
+        //std::cout << std::endl;
 #endif
 
         auto reply = (redisReply *) redisCommandArgv(

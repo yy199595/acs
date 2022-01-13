@@ -4,10 +4,10 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/ServiceBase/ServiceComponent.h"
+#include"Component/ServiceBase/ServiceComponentBase.h"
 namespace GameKeeper
 {
-    class GateService : public ServiceComponent, public INodeRefresh
+    class GateService : public ServiceComponentBase
     {
     public:
         GateService() = default;
@@ -15,8 +15,6 @@ namespace GameKeeper
     protected:
         bool Awake() final;
         bool LateAwake() final;
-        void OnAddRpcNode(class RpcNode *node) final;
-        void OnDelRpcNode(class RpcNode *node) final;
     private:
         XCode Ping();
         XCode Login(const c2s::ProxyLogin_Request & request);

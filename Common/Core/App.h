@@ -29,7 +29,7 @@ namespace GameKeeper
 {
 	class Manager;
 
-	class ServiceComponent;
+	class ServiceComponentBase;
 	class MainTaskScheduler;
 	class App : public GameObject
 	{

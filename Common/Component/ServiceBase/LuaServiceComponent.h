@@ -2,14 +2,14 @@
 
 
 #include<Script/LuaInclude.h>
-#include"ServiceBase/ServiceComponent.h"
+#include"ServiceBase/ServiceComponentBase.h"
 
 class LuaTable;
 namespace GameKeeper
 {
     class LuaScriptComponent;
 
-    class LuaServiceComponent : public ServiceComponent, public IStart
+    class LuaServiceComponent : public ServiceComponentBase, public IStart
     {
     public:
         LuaServiceComponent();

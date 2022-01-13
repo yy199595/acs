@@ -88,7 +88,7 @@ namespace GameKeeper
         for (int index = 0; index < this->mResponse->elements; index++)
         {
             redisReply *reply = this->mResponse->element[index];
-            if (reply->type != REDIS_REPLY_INTEGER)
+            if(reply->type != REDIS_REPLY_STRING)
             {
                 return false;
             }

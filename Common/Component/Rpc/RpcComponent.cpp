@@ -1,5 +1,5 @@
 ﻿#include"RpcComponent.h"
-#include<Component/ServiceBase/ServiceComponent.h>
+#include<Component/ServiceBase/ServiceComponentBase.h>
 #include<Coroutine/TaskComponent.h>
 #include<Util/StringHelper.h>
 #include"Core/App.h"
@@ -43,7 +43,7 @@ namespace GameKeeper
         }
 
         const std::string &service = protocolConfig->Service;
-        auto logicService = this->gameObject->GetComponent<ServiceComponent>(service);
+        auto logicService = this->gameObject->GetComponent<ServiceComponentBase>(service);
         if (logicService == nullptr)
         {
             LOG_ERROR("call service not exist : [", service , "]");

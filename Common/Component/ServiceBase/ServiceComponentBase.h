@@ -10,11 +10,11 @@ using namespace com;
 namespace GameKeeper
 {
     class ServiceMethod;
-    class ServiceComponent : public Component {
+    class ServiceComponentBase : public Component {
     public:
-        ServiceComponent() = default;
+        ServiceComponentBase() = default;
 
-        ~ServiceComponent() override = default;
+        ~ServiceComponentBase() override = default;
 
     public:
         int GetPriority() override { return 1000; }

@@ -109,13 +109,6 @@ namespace GameKeeper
         virtual bool OnResponse(const class RapidJsonReader * message) = 0;
     };
 
-    class INodeRefresh
-    {
-    public:
-        virtual void OnAddRpcNode(class RpcNode * node) = 0; //添加服务节点
-        virtual void OnDelRpcNode(class RpcNode * node) = 0; //删除服务节点
-    };
-
 
 	class SocketProxy;
 	class ISocketListen

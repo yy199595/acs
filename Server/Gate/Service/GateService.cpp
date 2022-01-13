@@ -4,7 +4,7 @@
 
 #include"GateService.h"
 #include"Core/App.h"
-#include"Service/RpcNode.h"
+#include"Service/ServiceEntity.h"
 #include"NetWork/RpcProxyClient.h"
 #include"Component/GateClientComponent.h"
 namespace GameKeeper
@@ -15,16 +15,6 @@ namespace GameKeeper
         BIND_RPC_FUNCTION(GateService::Login);
         this->mGateComponent= this->GetComponent<GateClientComponent>();
         return true;
-    }
-
-    void GateService::OnAddRpcNode(RpcNode *node)
-    {
-
-    }
-
-    void GateService::OnDelRpcNode(RpcNode *node)
-    {
-
     }
 
     XCode GateService::Ping()

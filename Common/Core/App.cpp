@@ -2,7 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Component/Scene/RpcNodeComponent.h"
+#include"Component/Scene/ServiceComponent.h"
 
 using namespace GameKeeper;
 using namespace std::chrono;
@@ -29,7 +29,7 @@ namespace GameKeeper
         this->mLogComponent = this->GetComponent<LoggerComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<RpcNodeComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<ServiceComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
@@ -119,7 +119,7 @@ namespace GameKeeper
             if (auto loadComponent = dynamic_cast<ILoadData *>(component))
             {
                 loadComponent->OnLoadData();
-                LOG_DEBUG("load", component->GetTypeName(), "data use time = ", elapsedTimer.GetMs(), "ms");
+                LOG_DEBUG("load ", component->GetTypeName(), "data use time = ", elapsedTimer.GetMs(), "ms");
             }
         }
         long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;

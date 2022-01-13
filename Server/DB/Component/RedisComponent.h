@@ -49,19 +49,27 @@ namespace GameKeeper
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, Args &&...args)
         {
-            int size = sizeof ...(Args) + 2;
-            return this->Invoke("EVALSHA",this->mLuaCommand, size, tab, func, std::forward<Args>(args)...);
+            std::string script;
+            int size = sizeof ...(Args) + 1;
+            if(!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
+            {
+                LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
+                return nullptr;
+            }
+            return this->Invoke("EVALSHA",script, size, func, std::forward<Args>(args)...);
         }
 
         std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, std::vector<std::string> & args);
 
-
+    private:
+        bool LoadLuaScript(const std::string & path);
+        bool GetLuaScript(const std::string & file, std::string & command);
     private:
 		std::string mRedisIp;        //redis ip地址
-        std::string mLuaCommand;
         unsigned short mRedisPort;    //端口号
         std::thread * mPubSubThread;
         redisContext * mPubSubContext;
+        std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

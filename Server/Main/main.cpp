@@ -16,12 +16,11 @@
 
 #include "Component/Scene/LuaServiceMgrComponent.h"
 #include <Rpc/RpcComponent.h>
-#include "Component/Scene/RpcNodeComponent.h"
+#include "Component/Scene/ServiceComponent.h"
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
-#include "Component/Service/LocalHostService.h"
-#include "Component/Service/CenterHostService.h"
+#include "Component/Service/RedisService.h"
 #include <Scene/MonitorComponent.h>
 #include "Service/MysqlService.h"
 #include <Service/HttpLoginService.h>
@@ -36,7 +35,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcComponent>("RpcComponent");
-    ComponentFactory::Add<RpcNodeComponent>("RpcNodeComponent");
+    ComponentFactory::Add<ServiceComponent>("ServiceComponent");
     ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
 
 // common
@@ -73,10 +72,9 @@ void RegisterServiceComponent()
     ComponentFactory::Add<GateService>("GateService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<AccountService>("AccountService");
-    ComponentFactory::Add<LocalHostService>("LocalHostService");
+    ComponentFactory::Add<RedisService>("RedisService");
     ComponentFactory::Add<HttpLoginService>("HttpLoginService");
     ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
-    ComponentFactory::Add<CenterHostService>("CenterHostService");
 }
 
 int main(int argc, char **argv)

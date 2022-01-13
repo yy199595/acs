@@ -1,4 +1,4 @@
-﻿#include"ServiceComponent.h"
+﻿#include"ServiceComponentBase.h"
 #include<Core/App.h>
 #include <Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
@@ -8,7 +8,7 @@
 #endif
 namespace GameKeeper
 {
-	bool ServiceComponent::AddMethod(ServiceMethod * method)
+	bool ServiceComponentBase::AddMethod(ServiceMethod * method)
     {
         auto *rpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>();
         if (rpcConfigComponent == nullptr)
@@ -47,7 +47,7 @@ namespace GameKeeper
         return true;
     }
 
-    ServiceMethod *ServiceComponent::GetMethod(const std::string &name)
+    ServiceMethod *ServiceComponentBase::GetMethod(const std::string &name)
     {
         auto iter = this->mLuaMethodMap.find(name);
         if(iter != this->mLuaMethodMap.end())
@@ -58,7 +58,7 @@ namespace GameKeeper
         return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
     }
 
-    std::shared_ptr<com::Rpc_Response> ServiceComponent::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
+    std::shared_ptr<com::Rpc_Response> ServiceComponentBase::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
         ServiceMethod *serviceMethod = this->GetMethod(method);
         if (serviceMethod == nullptr)

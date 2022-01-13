@@ -18,10 +18,6 @@
     "rpc_path":"./Config/rpc.json",
     "host_path": "./Config/host.json",
     "code_path": "./XCode/XCode.csv",
-    "center_server": {
-        "ip": "127.0.0.1",
-        "port": 7788
-    },
     "listener": {
         "ip":"127.0.0.1",
         "rpc":
@@ -47,7 +43,7 @@
         "ip": "127.0.0.1",
         "port": 6379,
         "timeout": 3,
-        "lua": "./Config/redis.lua",
+        "lua": "./Script/RedisCommand",
         "passwd": ""
     },
     "lua_src": [
@@ -56,7 +52,6 @@
     ],
     "component": [
         "ThreadPoolComponent",
-        "MonitorComponent",
         "TcpServerComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
@@ -75,8 +70,7 @@
         "GateService",
         "MysqlService",
         "AccountService",
-        "LocalHostService",
-        "CenterHostService"
+        "RedisService"
     ],
     "white_list": [
         "127.0.0.1"

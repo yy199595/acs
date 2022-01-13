@@ -3,98 +3,16 @@
 #include "Async/RpcTask/RpcTaskSource.h"
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include "Component/Scene/RpcNodeComponent.h"
+#include "Component/Scene/ServiceComponent.h"
 #include <Scene/LuaScriptComponent.h>
 
-#include <Service/RpcNode.h>
+#include <Service/ServiceEntity.h>
 using namespace GameKeeper;
 
 int SystemExtension::Call(lua_State *lua)
 {
-	luaL_checktype(lua, 1, LUA_TNUMBER);
-	luaL_checktype(lua, 2, LUA_TSTRING);
-	luaL_checktype(lua, 3, LUA_TSTRING);
-	const int nodeId = lua_tointeger(lua, 1);
-	const char * service = lua_tostring(lua, 2);
-	const char * method = lua_tostring(lua, 3);
 
-	if (lua_pushthread(lua) == 1)
-	{
-		lua_pushinteger(lua, (int)XCode::NoCoroutineContext);
-		LOG_ERROR("call {0}.{1} not coroutine context", service, method);
-		return 1;
-	}
-	lua_State * coroutine = lua_tothread(lua, -1);
-
-	RpcNodeComponent * nodeComponent = App::Get().GetComponent<RpcNodeComponent>();
-
-	RpcNode * serviceNode = nodeComponent->GetServiceNode(nodeId);
-	if (serviceNode == nullptr || !serviceNode->HasService(service))
-	{
-		lua_pushinteger(lua, (int)XCode::CallServiceNotFound);
-		return 1;
-	}
-	int index = 4;
-	if (lua_isinteger(lua, index))
-	{
-		const long long userId = lua_tointeger(lua, index);
-//		packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2C_REQUEST, service, method);
-//		if (packetMapper == nullptr)
-//		{
-//			lua_pushinteger(lua, XCode::CallArgsError);
-//			return 1;
-//		}
-//		index++;
-//		packetMapper->SetUserId(userId);
-	}
-	else
-	{
-		//packetMapper = PacketMapper::Create(serviceNode->GetAddress(), S2S_REQUEST, service, method);
-	}
-//
-//	const ProtoConfig * config = packetMapper->GetProConfig();
-//	if (lua_istable(lua, index))
-//	{
-//		LuaScriptComponent * scriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-//		int ref = scriptComponent->GetLuaRef("JsonRpc", "ToString");
-//		lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-//		lua_pushvalue(lua, index);
-//		if (lua_pcall(lua, 1, 1, 0) != 0)
-//		{
-//			LOG_ERROR("call " << service << "." << method << " " << lua_tostring(lua, -1));
-//			lua_pushinteger(lua, (int)XCode::Failure);
-//			return 1;
-//		}
-//
-//		size_t size = 0;
-//		const char * json = lua_tolstring(lua, -1, &size);
-//		Message * message = MessagePool::NewByJson(config->Request, json, size);
-//		if (message != nullptr)
-//		{
-//			if (!packetMapper->SetMessage(message))
-//			{
-//				lua_pushinteger(lua, (int)XCode::ProtocbufCastJsonFail);
-//				return 1;
-//			}
-//		}
-//		else
-//		{
-//			packetMapper->SetMessage(json, size);
-//		}
-//	}
-//
-//	auto actionComponent = App::Get().GetComponent<ProtoResponseComponent>();
-//	auto cb = std::make_shared<LuaProtoRpcTask>(lua, coroutine);
-//
-//	if (!packetMapper->SetRpcId(actionComponent->AddCallHandler(cb)))
-//	{
-//		lua_pushinteger(lua, (int)XCode::Failure);
-//		return 1;
-//	}
-//
-//	serviceNode->AddMessageToQueue(packetMapper, false);
-	
-	return lua_yield(lua, 1);
+    return 0;
 }
 
 int SystemExtension::GetApp(lua_State *luaEnv)

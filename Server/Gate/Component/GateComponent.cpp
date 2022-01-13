@@ -4,10 +4,10 @@
 
 #include"GateComponent.h"
 #include"Core/App.h"
-#include"Service/RpcNode.h"
+#include"Service/ServiceEntity.h"
 #include"NetWork/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Component/Scene/RpcNodeComponent.h"
+#include"Component/Scene/ServiceComponent.h"
 #include"Task/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -19,7 +19,7 @@ namespace GameKeeper
 {
     bool GateComponent::Awake()
     {
-        this->mRpcNodeComponent = nullptr;
+        this->mServiceComponent = nullptr;
         this->mRpcConfigComponent = nullptr;
         this->mGateClientComponent = nullptr;
         return true;
@@ -28,7 +28,7 @@ namespace GameKeeper
     bool GateComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcNodeComponent = this->GetComponent<RpcNodeComponent>());
+        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
         LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
         return true;
@@ -41,10 +41,10 @@ namespace GameKeeper
             LOG_ERROR("call function", request->method_name(), "not find");
             return XCode::NotFoundRpcConfig;
         }
-        auto nodeService = this->mRpcNodeComponent->AllotService(config->Service);
-        if (nodeService == nullptr) {
-            return XCode::CallServiceNotFound;
-        }
+
+        //TODO
+        auto serviceEntity = this->mServiceComponent->GetServiceEntity(config->Service);
+
         if (!config->Request.empty())
         {
             if (!request->has_data()) //没有正确的消息体
@@ -61,7 +61,8 @@ namespace GameKeeper
             }
         }
 
-        auto requestMessage = nodeService->NewRequest(request->method_name());
+        // 分配地址
+        auto requestMessage = serviceEntity->NewRequest(request->method_name());
         std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
         if (request->has_data()) {
             requestMessage->mutable_data()->CopyFrom(request->data());

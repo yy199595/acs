@@ -24,8 +24,9 @@ namespace GameKeeper
 	protected:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	public:
-		ProtoRpcClient * GetRpcSession(long long id);
-        long long MakeSession(const std::string &name);
+        std::shared_ptr<ProtoRpcClient> GetSession(long long id);
+        std::shared_ptr<ProtoRpcClient> GetSession(const std::string & address);
+        std::shared_ptr<ProtoRpcClient> MakeSession(const std::string &name, const std::string & address);
 	protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -36,13 +37,10 @@ namespace GameKeeper
         bool Send(long long id, std::shared_ptr<com::Rpc_Request> message);
 		bool Send(long long id, std::shared_ptr<com::Rpc_Response> message);
 	private:
-		ProtoRpcClient *GetSession(long long id);
-	private:
         class RpcComponent * mRpcComponent;
-        AllotorPool<ProtoRpcClient> mClientPool;
         class ThreadPoolComponent * mTaskComponent;
         class RpcConfigComponent * mProtoConfigComponent;
         std::unordered_map<std::string, long long> mAddressClientMap;
-        std::unordered_map<long long, ProtoRpcClient *> mRpcClientMap;
+        std::unordered_map<long long, std::shared_ptr<ProtoRpcClient>> mRpcClientMap;
 	};
 }

@@ -45,7 +45,7 @@ namespace GameKeeper
 				continue;
 			}
 
-			auto localService = this->GetComponent<ServiceComponent>(service);
+			auto localService = this->GetComponent<ServiceComponentBase>(service);
 			if (localService == nullptr)
 			{
 				auto luaSerivce = new LuaServiceComponent();

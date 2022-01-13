@@ -6,7 +6,7 @@
 #include<Pool/ObjectPool.h>
 namespace GameKeeper
 {
-    class ServiceComponent;
+    class ServiceComponentBase;
 
     class LuaServiceComponent;
 

@@ -15,7 +15,7 @@ namespace GameKeeper
     class MysqlRpcTaskSource : public IRpcTask
     {
     public:
-        explicit MysqlRpcTaskSource(float timeout = 5.0f)
+        explicit MysqlRpcTaskSource(float timeout = 0)
             : mTimeout(timeout * 1000) { }
         ~MysqlRpcTaskSource() = default;
     public:

@@ -23,8 +23,10 @@ namespace Helper
         bool ReadTxtFile(const std::string &path, std::string &outFile)
         {
             std::fstream fs;
+            char buffer[256] = { 0 };
             fs.open(path, std::ios::in);
-            if (fs.is_open()) {
+            if (fs.is_open())
+            {
                 std::string line;
                 while (std::getline(fs, line)) {
                     outFile.append(line);

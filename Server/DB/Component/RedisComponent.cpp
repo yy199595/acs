@@ -3,6 +3,7 @@
 #include"Core/App.h"
 #include"Util/StringHelper.h"
 #include"Util/FileHelper.h"
+#include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
@@ -16,8 +17,7 @@ namespace GameKeeper
         this->mPubSubThread = nullptr;
         this->mPubSubContext = nullptr;
         const ServerConfig &config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("redis", "lua", path));
-        LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path, this->mLuaCommand));
+
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
         return true;
@@ -26,11 +26,16 @@ namespace GameKeeper
     std::shared_ptr<RedisResponse>
     RedisComponent::Call(const std::string &tab, const std::string &func, std::vector<std::string> &args)
     {
+        std::string script;
+        if(!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
+        {
+            LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
+            return nullptr;
+        }
         std::shared_ptr<RedisTaskSource> redisTask
                 = std::make_shared<RedisTaskSource>("EVALSHA");
-        redisTask->AddCommand(this->mLuaCommand);
-        redisTask->AddCommand((int)args.size() + 2);
-        redisTask->AddCommand(tab);
+        redisTask->AddCommand(script);
+        redisTask->AddCommand((int)args.size() + 1);
         redisTask->AddCommand(func);
         for(const std::string & val : args)
         {
@@ -44,36 +49,57 @@ namespace GameKeeper
         return response;
     }
 
-    void RedisComponent::OnStart()
+    bool RedisComponent::LoadLuaScript(const std::string &path)
     {
-        auto response = this->Invoke("script", "load", this->mLuaCommand);
+        std::string content;
+        if(!Helper::File::ReadTxtFile(path, content))
+        {
+            return false;
+        }
+        auto response = this->Invoke("script", "load", content);
         if(response->GetCode() != XCode::Successful)
         {
             LOG_ERROR(response->GetError());
-            return;
+            return false;
+        }
+        std::string fileName, luaCommand;
+        response->GetValue(luaCommand);
+        Helper::Directory::GetDirAndFileName(path, content, fileName);
+        this->mLuaCommandMap.emplace(fileName,  luaCommand);
+        return true;
+    }
+
+    bool RedisComponent::GetLuaScript(const std::string &file, std::string &command)
+    {
+        auto iter = this->mLuaCommandMap.find(file);
+        if(iter != this->mLuaCommandMap.end())
+        {
+            command = iter->second;
+            return true;
+        }
+        return false;
+    }
+
+    void RedisComponent::OnStart()
+    {
+        std::string path;
+        std::vector<std::string> luaFiles;
+        App::Get().GetConfig().GetValue("redis", "lua", path);
+        Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
+
+        for(const std::string & file : luaFiles)
+        {
+            LOG_CHECK_RET(this->LoadLuaScript(file));
+            LOG_INFO("load redis script ", file, " successful");
         }
 
         std::vector<std::string> services;
         this->GetComponent<RpcConfigComponent>()->GetServices(services);
-
-        this->mLuaCommand.clear();
-        response->GetValue(this->mLuaCommand);
-        response = this->Call("Service", "Push", services);
-        if(response->GetCode() != XCode::Successful)
+        std::shared_ptr<RedisResponse> response = this->Call("Service", "Push", services);
+        if(response->GetCode() == XCode::Successful)
         {
-
+            LOG_WARN("push new service count = ", response->GetNumber());
         }
-//        redisReply * response = (redisReply*)redisCommand(this->mPubSubContext, "SCRIPT LOAD %s", this->mLuaCommand.c_str());
-//
-//        if(response->type == REDIS_REPLY_STRING)
-//        {
-//
-//        }
-//        for (int index = 0; index < 10; index++)
-//        {
-//            long long num = this->AddCounter("UserIdCounter");
-//            LOG_ERROR("number = " << num);
-//        }
     }
 
     void RedisComponent::StartPubSub()

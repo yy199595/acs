@@ -3,9 +3,9 @@
 #include"Protocol/s2s.pb.h"
 namespace GameKeeper
 {
-    class NodeHelper;
+    class ServiceEntity;
     class MysqlRpcTaskSource;
-    class MysqlProxyComponent : public Component, public ILoadData, public INodeRefresh
+    class MysqlProxyComponent : public Component, public ILoadData
     {
     public:
         MysqlProxyComponent() = default;
@@ -19,11 +19,9 @@ namespace GameKeeper
 
         void OnLoadData() override;
 
-        void OnAddRpcNode(class RpcNode *node) final;
-
-        void OnDelRpcNode(class RpcNode *node) final;
 	private:
 		void AddUserData();
+        std::shared_ptr<com::Rpc_Request> NewMessage(const std::string & name);
     public:
         XCode Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
@@ -38,14 +36,11 @@ namespace GameKeeper
         XCode Sort(const std::string & tab, const std::string & field, int count, bool reverse = false,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
 
     private:
-        RpcNode * GetMysqlNode();
-    private:
-        std::vector<int> mMysqlServices;
         class RpcComponent * mRpcComponent;
         class TaskComponent *mCorComponent;
-        class RpcNodeComponent *mNodeComponent;
         s2s::MysqlOper_Request mOperRequest;
         s2s::MysqlQuery_Request mQueryRequest;
         s2s::MysqlAnyOper_Request mAnyOperRequest;
+        class ServiceComponent * mServiceComponent;
     };
 }

@@ -33,6 +33,8 @@ inline std::string FormatFileLine(const char * file, const int line)
 	return {buffer, size};
 }
 
+#define STD_ERROR_LOG(msg) std::cerr << FormatFileLine(__FILE__, __LINE__) << msg << std::endl;
+
 #define GK_LOG(type, f, ...)						\
 {												\
 	App::Get().GetLogger()->AddLog(type, f, __VA_ARGS__);	\
