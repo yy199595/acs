@@ -2,16 +2,15 @@
 // Created by yjz on 2022/1/6.
 //
 
-#ifndef GAMEKEEPER_DOUBLEBLOCKQUEUE_H
-#define GAMEKEEPER_DOUBLEBLOCKQUEUE_H
+#ifndef GAMEKEEPER_DOUBLEQUEUE_H
+#define GAMEKEEPER_DOUBLEQUEUE_H
 
-#endif //GAMEKEEPER_DOUBLEBLOCKQUEUE_H
 #include<queue>
 #include<mutex>
 namespace GameKeeper
 {
     template<typename T>
-    class DoubleBlockQueue
+    class DoubleQueue
     {
     public:
         void Swap();
@@ -23,7 +22,7 @@ namespace GameKeeper
         std::queue<T> mWriteQueue;
     };
     template<typename T>
-    void DoubleBlockQueue<T>::Push(T &value)
+    void DoubleQueue<T>::Push(T &value)
     {
         this->mLock.lock();
         this->mWriteQueue.emplace(value);
@@ -31,7 +30,7 @@ namespace GameKeeper
     }
 
     template<typename T>
-    bool DoubleBlockQueue<T>::Pop(T &value)
+    bool DoubleQueue<T>::Pop(T &value)
     {
         if(this->mReadQueue.empty())
         {
@@ -43,7 +42,7 @@ namespace GameKeeper
     }
 
     template<typename T>
-    void DoubleBlockQueue<T>::Swap()
+    void DoubleQueue<T>::Swap()
     {
         this->mLock.lock();
         if(this->mReadQueue.empty())
@@ -53,3 +52,4 @@ namespace GameKeeper
         this->mLock.unlock();
     }
 }
+#endif //GAMEKEEPER_DOUBLEQUEUE_H

@@ -8,6 +8,8 @@
 #include<functional>
 #include"TaskContext.h"
 #include<Component/Component.h>
+#include"Other/DoubleQueue.h"
+
 namespace GameKeeper
 {
     class TaskComponent : public Component,
@@ -81,6 +83,6 @@ namespace GameKeeper
         tb_context_t mMainContext;
         TaskContext * mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
-		std::queue<TaskContext *> mResumeContexts;
+        DoubleQueue<unsigned int> mResumeContexts;
     };
 }

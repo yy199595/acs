@@ -40,11 +40,11 @@
         "passwd": "199595yjz."
     },
     "redis": {
-        "ip": "127.0.0.1",
+        "ip": "8.136.213.239",
         "port": 6379,
         "timeout": 3,
         "lua": "./Script/RedisCommand",
-        "passwd": ""
+        "passwd": "199595yjz."
     },
     "lua_src": [
         "./Script/Common/",

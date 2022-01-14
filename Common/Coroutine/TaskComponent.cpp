@@ -146,18 +146,12 @@ namespace GameKeeper
 
 	void TaskComponent::Resume(unsigned int id)
     {
-#ifdef __DEBUG__
-        LOG_CHECK_RET(App::Get().IsMainThread());
-#endif
-        TaskContext *logicCoroutine = this->GetContext(id);
-        LOG_CHECK_RET(logicCoroutine);
-        if(logicCoroutine->mState == CorState::Ready
-            || logicCoroutine->mState == CorState::Suspend)
+        if(id != 0)
         {
-            this->mResumeContexts.push(logicCoroutine);
+            this->mResumeContexts.Push(id);
             return;
         }
-        LOG_FATAL("coroutine {0} state is not resume", id);
+        std::cerr << "try resume context id : " << id << std::endl;
     }
 
 	TaskContext * TaskComponent::MakeContext(StaticMethod *func)
@@ -203,15 +197,18 @@ namespace GameKeeper
 
 	void TaskComponent::OnSystemUpdate()
     {
-		while (!this->mResumeContexts.empty())
-		{
-            TaskContext * coroutine = this->mResumeContexts.front();
-            if(coroutine != nullptr)
+        unsigned int contextId = 0;
+        this->mResumeContexts.Swap();
+        while(this->mResumeContexts.Pop(contextId))
+        {
+            TaskContext *logicCoroutine = this->GetContext(contextId);
+            LOG_CHECK_RET(logicCoroutine);
+            if(logicCoroutine->mState == CorState::Ready
+               || logicCoroutine->mState == CorState::Suspend)
             {
-                this->mRunContext = coroutine;
-                this->ResumeContext(coroutine);
+                this->mRunContext = logicCoroutine;
+                this->ResumeContext(logicCoroutine);
             }
-            this->mResumeContexts.pop();
             this->mRunContext = nullptr;
         }
     }
@@ -222,7 +219,7 @@ namespace GameKeeper
             unsigned int id = this->mLastQueues.front();
             TaskContext *coroutine = this->GetContext(id);
             if (coroutine != nullptr) {
-                this->mResumeContexts.push(coroutine);
+                this->mResumeContexts.Push(id);
             }
             this->mLastQueues.pop();
         }

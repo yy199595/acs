@@ -20,12 +20,7 @@ namespace GameKeeper
         if (this->mState == TaskState::TaskAwait)
         {
             this->mState = state;
-            if (this->mTaskScheduler.IsCurrentThread())
-            {
-                this->mTaskComponent->Resume(this->mCorId);
-                return true;
-            }
-            this->mTaskScheduler.Invoke(&TaskComponent::Resume, this->mTaskComponent, this->mCorId);
+            this->mTaskComponent->Resume(this->mCorId);
             return true;
         }
         return false;
