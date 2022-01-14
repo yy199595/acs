@@ -1,21 +1,22 @@
 
 local Service = {}
 
-Service.Push = function(keys)
-    local key = "rpc.services"
-    assert(type(keys) == 'table')
-    print(table.concat(keys, ","))
-    return redis.call('SADD', key, table.concat(keys, ' '))
-end
-
 Service.Add = function(keys)
     local id = keys[1]
-    local service = keys[2]
-    local address = keys[3]
-    print("time = ", redis.call('TIME')[1])
-    local key = string.format("%d:rpc.%s",id, service)
-    print(string.format("add new service [%s] %s %s",key, service, address))
-    return redis.call('SADD', key , address)
+    local services = {}
+    local address = keys[2]
+    for index = 3, #keys do
+        table.insert(services, keys[index])
+    end
+
+    local count = 0
+    redis.call('SADD', address, table.concat(services, ' '))
+    for _, service in ipairs(services) do
+        local key = string.format("%d:rpc.%s",id, service)
+        count = count + redis.call('SADD', key , address)
+        print(string.format("add new service [%s] %s %s",key, service, address))
+    end
+    return count
 end
 
 
@@ -35,12 +36,13 @@ Service.Remove = function(keys)
     local count = 0
     local id = keys[1]
     local address = keys[2]
-    local services = redis.call('SMEMBERS','rpc.services')
+    local services = redis.call('SMEMBERS', address)
     for _, name in ipairs(services) do
         local key = string.format("%d:rpc.%s", id, name)
-        count = count + redis.call('SREM', key)
+        count = count + redis.call('SREM', key, address)
     end
     print("remove ", address, " count = ", count)
+    redis.call('SREM', address, table.concat(services, ' '))
     return count
 end
 

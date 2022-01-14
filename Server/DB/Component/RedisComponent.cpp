@@ -89,14 +89,6 @@ namespace GameKeeper
             LOG_CHECK_RET(this->LoadLuaScript(file));
             LOG_INFO("load redis script ", file, " successful");
         }
-
-        std::vector<std::string> services;
-        this->GetComponent<RpcConfigComponent>()->GetServices(services);
-        std::shared_ptr<RedisResponse> response = this->Call("Service", "Push", services);
-        if(response->GetCode() == XCode::Successful)
-        {
-            LOG_WARN("push new service count = ", response->GetNumber());
-        }
     }
 
     void RedisComponent::StartPubSub()

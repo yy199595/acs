@@ -23,6 +23,7 @@ namespace GameKeeper
     private:
         void SendFromQueue();
     public:
+        bool IsConnected();
         NodeState GetState() { return this->mState; }
         const std::string & GetAddress() { return this->mAddress; }
         void PushMessage(std::shared_ptr<com::Rpc_Request> message);
@@ -37,6 +38,7 @@ namespace GameKeeper
         std::string mServiceName;
         TaskComponent * mTaskComponent;
         RpcClientComponent * mRpcCliemComponent;
+        std::shared_ptr<ProtoRpcClient> mNodeClient;
         std::shared_ptr<LoopTaskSource> mLoopTaskSource;
         std::queue<std::shared_ptr<com::Rpc_Request>> mMessageQueue;
     };

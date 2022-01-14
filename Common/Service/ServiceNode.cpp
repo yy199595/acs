@@ -19,43 +19,53 @@ namespace GameKeeper
         this->mRpcCliemComponent = App::Get().GetComponent<RpcClientComponent>();
     }
 
+    bool ServiceNode::IsConnected()
+    {
+        if (this->mNodeClient == nullptr)
+        {
+            this->mNodeClient = this->mRpcCliemComponent->MakeSession
+                    (this->mServiceName, this->mAddress);
+        }
+        if (this->mNodeClient->IsOpen())
+        {
+            return true;
+        }
+        std::string ip;
+        unsigned short port = 0;
+        Helper::String::ParseIpAddress(this->mAddress, ip, port);
+        for (int index = 0; index < 3; index++)
+        {
+            if(this->mNodeClient->ConnectAsync(ip, port)->Await())
+            {
+                return true;
+            }
+            this->mTaskComponent->Sleep(1000);
+            LOG_ERROR("connect ", this->mAddress, " failure count = ", index);
+        }
+        return false;
+    }
+
     void ServiceNode::SendFromQueue()
     {
         this->mLoopTaskSource = std::make_shared<LoopTaskSource>();
-        auto clientSession = this->mRpcCliemComponent->MakeSession(this->mServiceName, this->mAddress);
         while (!this->mIsClose)
         {
             if (this->mMessageQueue.empty())
             {
                 this->mLoopTaskSource->Await();
             }
-            if (!clientSession->IsOpen())
+            if (!this->IsConnected())
             {
-                std::string ip;
-                int connectCount = 0;
-                unsigned short port = 0;
-                this->mState = NodeState::Connected;
-                Helper::String::ParseIpAddress(this->mAddress, ip, port);
-                while (!clientSession->ConnectAsync(ip, port)->Await())
-                {
-                    connectCount++;
-                    LOG_ERROR("connect ", this->mAddress, " failure count = ", connectCount);
-                    if(!this->OnConnectFailure(connectCount))
-                    {
-                        return;
-                    }
-                    this->mTaskComponent->Sleep(5000);
-                }
-                this->mState = NodeState::ConnectSuccessful;
+                return;
             }
             while (!this->mMessageQueue.empty())
             {
                 auto requestMessage = this->mMessageQueue.front();
                 this->mMessageQueue.pop();
-                clientSession->SendToServer(requestMessage);
+                this->mNodeClient->SendToServer(requestMessage);
             }
         }
-        long long id = clientSession->GetSocketId();
+        long long id = this->mNodeClient->GetSocketId();
         this->mRpcCliemComponent->StartClose(id);
     }
 

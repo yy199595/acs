@@ -19,6 +19,7 @@ namespace GameKeeper
 
     public:
         bool RemoveNode(const std::string & address);
+        bool AddService(const std::vector<std::string> & services);
         std::vector<std::string> QueryService(const std::string & name);
     public:
         bool Awake() final;

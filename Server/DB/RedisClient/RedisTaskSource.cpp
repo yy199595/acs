@@ -100,4 +100,12 @@ namespace GameKeeper
 #endif
     }
 
+    void RedisTaskSource::AddCommand(const std::vector<std::string> &commands)
+    {
+        for(const std::string & cmd : commands)
+        {
+            this->mCommand.emplace_back(std::move(cmd));
+        }
+    }
+
 }// namespace GameKeeper

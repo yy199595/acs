@@ -20,6 +20,7 @@ namespace GameKeeper
         auto iter = this->mServiceNodeMap.find(address);
         if(iter == this->mServiceNodeMap.end())
         {
+            this->mAllAddress.emplace(std::move(address));
             auto node = make_shared<ServiceNode>
                     (this->mServiceName, address);
             this->mServiceNodeMap.emplace(address, node);
@@ -33,7 +34,8 @@ namespace GameKeeper
         if(iter != this->mServiceNodeMap.end())
         {
             this->mServiceNodeMap.erase(iter);
-            return true;
+            RedisService * redisService = App::Get().GetComponent<RedisService>();
+            return redisService != nullptr && redisService->RemoveNode(address);
         }
         return false;
     }
@@ -81,15 +83,22 @@ namespace GameKeeper
                this->AddAddress(address);
            }
         }
-        if(this->mServiceNodeMap.empty())
+        if(this->mAllAddress.empty())
         {
             return false;
         }
-        auto iter = this->mServiceNodeMap.begin();
-        for(; iter != this->mServiceNodeMap.end(); iter ++)
+        while(!this->mAllAddress.empty())
         {
-            address = iter->first;
-            return true;
+            const std::string arr = this->mAllAddress.front();
+            this->mAllAddress.pop();
+            std::shared_ptr<ServiceNode> serviceNode = this->GetNode(arr);
+            if(serviceNode != nullptr && serviceNode->IsConnected())
+            {
+                address = serviceNode->GetAddress();
+                this->mAllAddress.emplace(address);
+                return true;
+            }
+            this->RemoveAddress(std::move(arr));
         }
         return false;
     }

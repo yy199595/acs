@@ -41,6 +41,8 @@ namespace GameKeeper
         inline void AddCommand(const long long value) { this->mCommand.emplace_back(std::to_string(value)); }
 
         void AddCommand(const google::protobuf::Message & value);
+        void AddCommand(const std::vector<std::string> & commands);
+
     private:
         void Encode() {}
 

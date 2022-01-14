@@ -44,6 +44,7 @@ namespace GameKeeper
         std::string mServiceName;
         TaskComponent * mTaskComponent;
         class RpcComponent *mRpcComponent;
+        std::queue<std::string> mAllAddress;
         class RedisComponent * mRedisComponent;
         class RpcConfigComponent *mRpcConfigComponent;
         std::unordered_map<std::string, std::shared_ptr<ServiceNode>> mServiceNodeMap;

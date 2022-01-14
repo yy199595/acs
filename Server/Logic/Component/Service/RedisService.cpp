@@ -35,8 +35,12 @@ namespace GameKeeper
         }
         std::vector<Component *> components;
         this->gameObject->GetComponents(components);
-        const std::string &address = rpcListener->GetConfig().mAddress;
 
+        std::vector<std::string> services
+        {
+            std::to_string(this->mAreaId),
+            rpcListener->GetConfig().mAddress,
+        };
         for(Component * component : components)
         {
             ServiceComponentBase *serviceComponent = dynamic_cast<ServiceComponentBase *>(component);
@@ -44,13 +48,18 @@ namespace GameKeeper
             {
                 continue;
             }
-            const std::string &name = serviceComponent->GetServiceName();
-            auto response = this->mRedisComponent->Call("Service", "Add", this->mAreaId, name, address);
-            if(response->GetCode() == XCode::Successful)
-            {
-                LOG_WARN("register service ", name, " Successful");
-            }
+            services.emplace_back(serviceComponent->GetServiceName());
         }
+        auto response = this->mRedisComponent->Call("Service", "Add", services);
+        if(response->GetCode() == XCode::Successful)
+        {
+            LOG_WARN("register all service to redis Successful");
+        }
+    }
+
+    bool RedisService::AddService(const std::vector<std::string> &services)
+    {
+
     }
 
     bool RedisService::RemoveNode(const std::string &address)
