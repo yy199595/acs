@@ -159,7 +159,7 @@ namespace GameKeeper
             return nullptr;
         }
         std::string redisPasswd;
-        if (config.GetValue("Redis", "passwd", redisPasswd) && !redisPasswd.empty())
+        if (config.GetValue("redis", "passwd", redisPasswd) && !redisPasswd.empty())
         {
             auto *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
             if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
@@ -167,6 +167,7 @@ namespace GameKeeper
                 LOG_ERROR("redis Authentication failed {0}", reply->str);
                 return nullptr;
             }
+            LOG_INFO("redis Authentication successful");
             freeReplyObject(reply);
         }
 

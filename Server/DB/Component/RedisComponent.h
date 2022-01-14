@@ -2,6 +2,7 @@
 
 #include"Util/Guid.h"
 #include"hiredis/hiredis.h"
+#include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
 #include"Coroutine/TaskComponent.h"
 #include"RedisClient/RedisTaskSource.h"
@@ -34,6 +35,9 @@ namespace GameKeeper
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Invoke(const std::string & cmd, Args &&...args)
         {
+#ifdef __DEBUG__
+            ElapsedTimer elapsedTimer;
+#endif
             std::shared_ptr<RedisTaskSource> redisTask
                     = std::make_shared<RedisTaskSource>(cmd);
             redisTask->InitCommand(std::forward<Args>(args) ...);
@@ -42,6 +46,9 @@ namespace GameKeeper
             {
                 LOG_ERROR(response->GetError());
             }
+#ifdef __DEBUG__
+            LOG_DEBUG("invoke redis command use time = ", elapsedTimer.GetMs());
+#endif
             return response;
         }
 

@@ -31,11 +31,11 @@
         }
     },
     "redis": {
-        "ip": "127.0.0.1",
+        "ip": "8.136.213.239",
         "port": 6379,
         "timeout": 3,
         "lua": "./Script/RedisCommand",
-        "passwd": ""
+        "passwd": "199595yjz."
     },
     "mysql": {
         "ip": "8.136.213.239",

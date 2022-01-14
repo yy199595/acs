@@ -14,8 +14,9 @@ Service.Add = function(keys)
     for _, service in ipairs(services) do
         local key = string.format("%d:rpc.%s",id, service)
         count = count + redis.call('SADD', key , address)
-        print(string.format("add new service [%s] %s %s",key, service, address))
     end
+    local str = table.concat(services, ",");
+    print(string.format("[%s] add %d service : (%s)", address, count, str))
     return count
 end
 
@@ -26,7 +27,7 @@ Service.Get = function(array)
     local key = string.format("%d:rpc.%s", id, service)
     local services = redis.call('SINTER', key)
     if services == nil then
-        key = string.format("0:rpc.%s", id, service)
+        key = string.format("0:rpc.%s", service)
         return redis.call('SINTER', key)
     end
     return services
