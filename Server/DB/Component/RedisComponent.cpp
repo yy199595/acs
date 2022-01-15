@@ -7,7 +7,7 @@
 #include"Script/ClassProxyHelper.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
-
+#include"RedisClient/NetWork/RedisClient.h"
 namespace GameKeeper
 {
     bool RedisComponent::Awake()
@@ -84,10 +84,18 @@ namespace GameKeeper
         App::Get().GetConfig().GetValue("redis", "lua", path);
         Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
 
-        for(const std::string & file : luaFiles)
+        for (const std::string &file: luaFiles)
         {
             LOG_CHECK_RET(this->LoadLuaScript(file));
             LOG_INFO("load redis script ", file, " successful");
+        }
+        auto threadComponent = this->GetComponent<ThreadPoolComponent>();
+        NetWorkThread &netWorkThread = threadComponent->AllocateNetThread();
+
+        RedisClient *redisClient = new RedisClient(std::make_shared<SocketProxy>(netWorkThread, "redis"));
+        if(redisClient->ConnectAsync(this->mRedisIp, this->mRedisPort)->Await())
+        {
+
         }
     }
 
