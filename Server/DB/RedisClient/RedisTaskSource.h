@@ -14,6 +14,7 @@ namespace GameKeeper
 
     class QuertJsonWritre;
 
+
     class RedisTaskSource : public TaskProxy
     {
     public:

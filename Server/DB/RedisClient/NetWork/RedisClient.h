@@ -14,7 +14,7 @@ namespace GameKeeper
         REDIS_STRING,
         REDIS_NUMBER,
         REDIS_ARRAY,
-        REDIS_STRING_ARRAY,
+        REDIS_BIN_STRING,
         REDIS_ERROR
     };
     class RedisClient
@@ -28,12 +28,22 @@ namespace GameKeeper
         void StartReceive();
         void OnReceiveComplete();
         void OnReceive(const asio::error_code & code, size_t size);
-        int OnReceiveFirstLine(char type, const std::string & lineData);
         void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
+    private:
+        void SendCommand();
+        void SendCommand(std::shared_ptr<std::list<std::string>> data);
 
     private:
-        void SendCommand(const std::string & data);
+        void OnDecodeHead(std::iostream & readStream);
+        void OnDecodeArray(std::iostream & readStream);
+        void OnDecodeBinString(std::iostream & readStream);
+        int OnReceiveFirstLine(char type, const std::string & lineData);
+    private:
+        int mDataSize;
+        char * mTempReadBuffer;
+        char mReadBuffer[10240];
     public:
+        bool mIsSend;
         int mLineCount;
         int mDataCount;
         std::string mIp;
@@ -42,8 +52,10 @@ namespace GameKeeper
         RedisRespType mRedisRespType;
         NetWorkThread & mNetworkThread;
         asio::streambuf mMessageBuffer;
+        asio::streambuf mSendDataBuffer;
         std::vector<std::string> mLineArray;
         std::shared_ptr<SocketProxy> mSocket;
+        std::queue<std::shared_ptr<std::list<std::string>>> mSendQueue;
     };
 }
 #endif //GAMEKEEPER_REDISCLIENT_H
