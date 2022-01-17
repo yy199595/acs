@@ -30,6 +30,8 @@ namespace GameKeeper
 
         int GetPriority() final { return 1000; }
 
+    private:
+        void Add(const rapidjson::Document & document);
 
     private:
         int mAreaId;

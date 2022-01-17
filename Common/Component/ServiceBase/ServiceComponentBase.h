@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include<memory>
+#include<Method/SubMethod.h>
 #include<Component/Component.h>
 #include<Method/ServiceMethod.h>
 
@@ -25,6 +26,10 @@ namespace GameKeeper
 
     public:
         bool AddMethod(ServiceMethod *method);
+
+        void Publish(const std::string & func, const std::string & message);
+
+        void GetSubMethods(std::vector<std::string> & methods);
 
         long long GetCurSocketId() const { return this->mCurSocketId; }
 
@@ -79,11 +84,38 @@ namespace GameKeeper
             return this->AddMethod(new ServiceMethod4<T, T1>(name, (T *) this, func));
         }
 
+        template<typename T>
+        bool Sub(std::string name, JsonSubFunction<T> func)
+        {
+            auto iter = this->mSubMethodMap.find(name);
+            if(iter != this->mSubMethodMap.end())
+            {
+                return false;
+            }
+            JsonSubMethod<T> * jsonSubMethod = new JsonSubMethod<T>((T*)this, func);
+            this->mSubMethodMap.emplace(name, jsonSubMethod);
+            return true;
+        }
+
+        template<typename T, typename T1>
+        bool Sub(std::string name, ProtoSubFuncrion<T,T1> func)
+        {
+            auto iter = this->mSubMethodMap.find(name);
+            if(iter != this->mSubMethodMap.end())
+            {
+                return false;
+            }
+            ProtoSubMethod<T, T1> * subMethod = new ProtoSubMethod<T, T1>((T*)this, func);
+            this->mSubMethodMap.emplace(name, subMethod);
+            return true;
+        }
+
     private:
         ServiceMethod * GetMethod(const std::string & name);
 
     private:
         long long mCurSocketId;
+        std::unordered_map<std::string, SubMethod *> mSubMethodMap;
         std::unordered_map<std::string, ServiceMethod *> mMethodMap;
         std::unordered_map<std::string, ServiceMethod *> mLuaMethodMap;
     };
@@ -94,5 +126,7 @@ namespace GameKeeper
         return func.substr(pos + 2);
     }
 
+#define BIND_SUB_FUNCTION(func) LOG_CHECK_RET_FALSE(this->Sub(GetFunctionName(#func), &func))
 #define BIND_RPC_FUNCTION(func) LOG_CHECK_RET_FALSE(this->Bind(GetFunctionName(#func), &func))
+
 }

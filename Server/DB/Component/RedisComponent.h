@@ -39,6 +39,8 @@ namespace GameKeeper
 	public:
         long long AddCounter(const std::string & key);
 
+        bool SubscribeChannel(const std::string & chanel);
+
         template<typename ... Args>
         std::shared_ptr<RedisCmdResponse> InvokeCommand(const std::string & cmd, Args && ... args)
         {

@@ -1,17 +1,15 @@
 ﻿#include "RedisService.h"
 #include "Core/App.h"
-#include "Service/ServiceEntity.h"
 #include "Component/Scene/ServiceComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
-#include"Scene/OperatorComponent.h"
-#include"Component/Scene/RpcConfigComponent.h"
 #include"Util/JsonHelper.h"
 #include"RedisComponent.h"
 namespace GameKeeper
 {
     bool RedisService::Awake()
     {
+        BIND_SUB_FUNCTION(RedisService::Add);
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
         return true;
@@ -21,6 +19,11 @@ namespace GameKeeper
     {
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
         return true;
+    }
+
+    void RedisService::Add(const rapidjson::Document &document)
+    {
+
     }
 
 	void RedisService::OnStart()

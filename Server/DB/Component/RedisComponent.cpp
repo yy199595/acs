@@ -7,6 +7,7 @@
 #include"Script/ClassProxyHelper.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
+#include"ServiceBase/ServiceComponentBase.h"
 #include"RedisClient/NetWork/RedisClient.h"
 namespace GameKeeper
 {
@@ -167,8 +168,36 @@ namespace GameKeeper
         return this->MakeRedisClient("Command");
     }
 
+    bool RedisComponent::SubscribeChannel(const std::string &chanel)
+    {
+        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
+        request->AddParamater(std::move(chanel));
+        auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
+        return !response->HasError();
+    }
+
     void RedisComponent::StartPubSub()
     {
+        std::vector<Component *> components;
+        this->GetComponents(components);
+
+        for(Component * component : components)
+        {
+            auto serviceBase = dynamic_cast<ServiceComponentBase *>(component);
+            if (serviceBase == nullptr) {
+                continue;
+            }
+            std::vector<std::string> methods;
+            serviceBase->GetSubMethods(methods);
+            for (const std::string &name: methods)
+            {
+                const std::string &service = serviceBase->GetServiceName();
+                if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
+                {
+                    LOG_INFO("subscribe chanel [", fmt::format("{0}.{1}", service, name), "] successful");
+                }
+            }
+        }
 
         auto response1 = this->InvokeCommand("AUTH", "199595yjz.");
         auto response2 = this->InvokeCommand("SADD", "yjz", 11223, 445345, "sajsaiojrioew");
@@ -200,12 +229,11 @@ namespace GameKeeper
                     }
                 }
             }
-            auto redisClientTask = this->mSubRedisClient->WaitRedisMessageResponse();
-
-            auto redisResponse = redisClientTask->Await();
-
-            if(!redisResponse->HasError())
+            auto redisResponse = this->mSubRedisClient->WaitRedisMessageResponse()->Await();
+            if(!redisResponse->HasError() && redisResponse->GetArraySize() == 3 && redisResponse->GetValue() == "message")
             {
+                const std::string & method = redisResponse->GetValue(1);
+                const std::string & message = redisResponse->GetValue(2);
                 for (size_t index = 0; index < redisResponse->GetArraySize(); index++)
                 {
                     LOG_ERROR(redisResponse->GetValue(index));
