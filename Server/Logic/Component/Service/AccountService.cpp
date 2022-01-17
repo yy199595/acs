@@ -39,7 +39,7 @@ namespace GameKeeper
             return XCode::CallArgsError;
         }
 
-        auto queryResponse = this->mRedisComponent->Invoke("HEXISTS", "user", account);
+        auto queryResponse = this->mRedisComponent->InvokeCommand("HEXISTS", "user", account);
         if (queryResponse->GetNumber() == 1)
         {
             return XCode::AccountAlreadyExists;
@@ -62,8 +62,8 @@ namespace GameKeeper
 #endif
         const int second = 7 * 24 * 60 * 60;
         response.set_token(userAccountData.token());
-        this->mRedisComponent->Invoke("SETEX", token, second, account);
-        this->mRedisComponent->Invoke("HSET", "user", account, userAccountData);
+        this->mRedisComponent->InvokeCommand("SETEX", token, second, account);
+        this->mRedisComponent->InvokeCommand("HSET", "user", account, userAccountData);
         XCode code = this->mMysqlComponent->Add(userAccountData, std::make_shared<MysqlRpcTaskSource>());
         if(code != XCode::Successful)
         {

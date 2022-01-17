@@ -30,7 +30,7 @@ namespace GameKeeper
 
     bool RedisTaskSource::Run()
     {
-        RedisSocket *redisSocket = this->mRedisComponent->GetRedisSocket();
+        RedisSocket *redisSocket = nullptr;
         if (redisSocket == nullptr)
         {
             const std::string &err = "redis socket null";

@@ -3,6 +3,92 @@
 //
 
 #include"RedisDefine.h"
+#include"Pool/MessagePool.h"
+namespace GameKeeper
+{
+    RedisCmdRequest::RedisCmdRequest(const std::string &cmd)
+    {
+        this->mConmand = std::move(cmd);
+    }
+
+    void RedisCmdRequest::AddParamater(int value)
+    {
+        this->mParamaters.emplace_back(std::to_string(value));
+    }
+
+    void RedisCmdRequest::AddParamater(long long value)
+    {
+        this->mParamaters.emplace_back(std::to_string(value));
+    }
+
+    void RedisCmdRequest::AddParamater(const Message &message)
+    {
+        std::string json;
+        Helper::Proto::GetJson(message, json);
+        this->AddParamater(json);
+    }
+
+    void RedisCmdRequest::AddParamater(const std::string &value)
+    {
+        this->mParamaters.emplace_back(std::move(value));
+    }
+
+    void RedisCmdRequest::GetCommand(std::iostream &readStream) const
+    {
+        readStream << "*" << this->mParamaters.size() + 1 << "\r\n";
+        readStream << "$" << this->mConmand.size() << "\r\n" << this->mConmand << "\r\n";
+        for(const std::string & paramater : this->mParamaters)
+        {
+            readStream << "$" << paramater.size() << "\r\n" << paramater << "\r\n";
+        }
+    }
+}
+
+namespace GameKeeper
+{
+    RedisCmdResponse::RedisCmdResponse()
+    {
+        this->mNumber = 0;
+        this->mType = RedisRespType::REDIS_NONE;
+    }
+
+    bool RedisCmdResponse::IsOk()
+    {
+        if (this->HasError())
+        {
+            return false;
+        }
+        return !this->mDatas.empty() &&
+               this->mDatas.front() == "OK";
+    }
+
+    void RedisCmdResponse::AddValue(long long value)
+    {
+        this->mNumber = value;
+        this->mType = RedisRespType::REDIS_NUMBER;
+    }
+
+    void RedisCmdResponse::AddValue(RedisRespType type)
+    {
+        this->mType = type;
+    }
+
+    void RedisCmdResponse::AddValue(const std::string &data)
+    {
+        this->mDatas.emplace_back(std::move(data));
+    }
+
+    void RedisCmdResponse::AddValue(const char *str, size_t size)
+    {
+        this->mDatas.emplace_back(str, size);
+    }
+
+    const std::string &RedisCmdResponse::GetValue(size_t index)
+    {
+        return this->mDatas[index];
+    }
+}
+
 namespace GameKeeper
 {
     RedisResponse::RedisResponse(redisReply *reply)
@@ -105,5 +191,63 @@ namespace GameKeeper
             return false;
         }
         return value.ParseFromArray(this->mResponse->str, this->mResponse->len);
+    }
+}
+
+namespace GameKeeper
+{
+    RedisAsioResp::RedisAsioResp()
+    {
+        this->mDataCount = 0;
+        this->mType = RedisRespType::REDIS_NONE;
+    }
+
+
+    void RedisAsioResp::OnDecodeArray(std::iostream &readStream)
+    {
+
+    }
+
+    void RedisAsioResp::OnDecodeBinString(std::iostream &readStream)
+    {
+
+    }
+
+    int RedisAsioResp::OnReceiveFirstLine(char type, const std::string &lineData)
+    {
+
+    }
+
+    int RedisAsioResp::OnDecodeHead(std::iostream &readStream)
+    {
+        std::string lineData;
+        char type = readStream.get();
+        if (std::getline(readStream, lineData))
+        {
+            lineData.pop_back(); //拿掉\r
+            switch(type)
+            {
+                case '+': //字符串类型
+                    this->mType = RedisRespType::REDIS_STRING;
+                    this->mResponse.emplace_back(std::move(lineData));
+                    return 0;
+                case '-': //错误
+                    this->mType = RedisRespType::REDIS_ERROR;
+                    this->mResponse.emplace_back(std::move(lineData));
+                    return 0;
+                case ':': //整型
+                    this->mNumber = std::stoll(lineData);
+                    this->mType = RedisRespType::REDIS_NUMBER;
+                    return 0;
+                case '$': //二进制字符串
+                    this->mType = RedisRespType::REDIS_BIN_STRING;
+                    return std::stoi(lineData);
+                    return 1;
+                case '*': //数组
+                    this->mType = RedisRespType::REDIS_ARRAY;
+                    return std::stoi(lineData);
+            }
+            return 0;
+        }
     }
 }

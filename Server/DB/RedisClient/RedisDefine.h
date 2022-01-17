@@ -3,6 +3,7 @@
 #include<Thread/TaskProxy.h>
 #include<hiredis/hiredis.h>
 #include<memory>
+#include<list>
 #include<string>
 #include<vector>
 #include"XCode/XCode.h"
@@ -19,6 +20,101 @@ namespace GameKeeper
 
     typedef redisContext RedisSocket;
 }// namespace GameKeeper
+
+namespace GameKeeper
+{
+    enum class RedisRespType
+    {
+        REDIS_NONE,
+        REDIS_STRING,
+        REDIS_ERROR,
+        REDIS_NUMBER,
+        REDIS_ARRAY,
+        REDIS_BIN_STRING,
+
+    };
+}
+
+namespace GameKeeper
+{
+    class RedisAsioResp
+    {
+    public:
+        RedisAsioResp();
+        RedisRespType GetType() const { return this->mType;}
+
+    public:
+        int OnDecodeHead(std::iostream & readStream);
+        void OnDecodeArray(std::iostream & readStream);
+        void OnDecodeBinString(std::iostream & readStream);
+        int OnReceiveFirstLine(char type, const std::string & lineData);
+    private:
+        int mDataCount;
+        long long mNumber;
+        RedisRespType mType;
+        std::vector<std::string> mResponse;
+    };
+}
+
+namespace GameKeeper
+{
+    class RedisCmdRequest
+    {
+    public:
+        RedisCmdRequest(const std::string & cmd);
+
+    public:
+        void GetCommand(std::iostream & readStream) const;
+
+        template<typename ... Args>
+        void InitParamater(Args &&... args);
+    public:
+        void AddParamater(int value);
+        void AddParamater(long long value);
+        void AddParamater(const Message & message);
+        void AddParamater(const std::string & value);
+    private:
+        void Encode() {}
+
+        template<typename T, typename... Args>
+        inline void Encode(const T &t, Args... args)
+        {
+            this->AddParamater(t);
+            this->Encode(std::forward<Args>(args)...);
+        }
+    private:
+        std::string mConmand;
+        std::list<std::string> mParamaters;
+    };
+
+    template<typename ... Args>
+    void RedisCmdRequest::InitParamater(Args &&...args)
+    {
+        this->Encode(std::forward<Args>(args)...);
+    }
+
+    class RedisCmdResponse
+    {
+    public:
+        bool IsOk();
+        RedisCmdResponse();
+        void AddValue(long long value);
+        void AddValue(RedisRespType type);
+        void AddValue(const std::string & data);
+        void AddValue(const char * str, size_t size);
+        const std::string & GetValue(size_t index = 0);
+
+        bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
+    public:
+        long long GetNumber() { return this->mNumber; }
+        RedisRespType GetType() { return this->mType; }
+        size_t GetArraySize() { return this->mDatas.size();}
+    private:
+        long long mNumber;
+        RedisRespType mType;
+        std::vector<std::string> mDatas;
+    };
+}
 
 namespace GameKeeper
 {

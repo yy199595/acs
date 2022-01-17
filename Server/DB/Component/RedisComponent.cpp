@@ -13,14 +13,15 @@ namespace GameKeeper
     bool RedisComponent::Awake()
     {
         std::string path;
-        this->mRedisPort = 0;
         const ServerConfig &config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisIp));
-        LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisPort));
+        config.GetValue("redis", "lua", this->mRedisConfig.mLuaFilePath);
+        config.GetValue("redis", "passwd", this->mRedisConfig.mPassword);
+        LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisConfig.mIp));
+        LOG_CHECK_RET_FALSE(config.GetValue("redis", "port", this->mRedisConfig.mPort));
         return true;
     }
 
-    std::shared_ptr<RedisResponse>
+    std::shared_ptr<RedisCmdResponse>
     RedisComponent::Call(const std::string &tab, const std::string &func, std::vector<std::string> &args)
     {
         std::string script;
@@ -29,20 +30,31 @@ namespace GameKeeper
             LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
             return nullptr;
         }
-        std::shared_ptr<RedisTaskSource> redisTask
-                = std::make_shared<RedisTaskSource>("EVALSHA");
-        redisTask->AddCommand(script);
-        redisTask->AddCommand((int)args.size() + 1);
-        redisTask->AddCommand(func);
+        std::shared_ptr<RedisCmdRequest> redisCmdRequest(new RedisCmdRequest("EVALSHA"));
+        redisCmdRequest->InitParamater(script, (int)args.size() + 1, func);
         for(const std::string & val : args)
         {
-            redisTask->AddCommand(val);
+            redisCmdRequest->AddParamater(val);
         }
-        auto response = redisTask->Await();
-        if(response->GetCode() != XCode::Successful)
+        return this->InvokeCommand(redisCmdRequest);
+    }
+
+    std::shared_ptr<RedisCmdResponse> RedisComponent::InvokeCommand(std::shared_ptr<RedisCmdRequest> request)
+    {
+       std::shared_ptr<RedisClient> redisClient =  this->AllotRedisClient();
+#ifdef __DEBUG__
+        ElapsedTimer elapsedTimer;
+#endif
+        if(redisClient == nullptr)
         {
-            LOG_ERROR(response->GetError());
+            LOG_ERROR("allot redis client failure");
+            return nullptr;
         }
+        auto response = redisClient->InvokeCommand(request)->Await();
+#ifdef __DEBUG__
+        LOG_INFO("invoke redis command use time : ", elapsedTimer.GetMs(), "ms");
+#endif
+        this->mWaitRedisClient.emplace(redisClient);
         return response;
     }
 
@@ -53,16 +65,16 @@ namespace GameKeeper
         {
             return false;
         }
-        auto response = this->Invoke("script", "load", content);
-        if(response->GetCode() != XCode::Successful)
+        auto response = this->InvokeCommand("script", "load", content);
+        if(response->HasError())
         {
-            LOG_ERROR(response->GetError());
+            LOG_ERROR(response->GetValue());
             return false;
         }
-        std::string fileName, luaCommand;
-        response->GetValue(luaCommand);
+        std::string fileName;
         Helper::Directory::GetDirAndFileName(path, content, fileName);
-        this->mLuaCommandMap.emplace(fileName,  luaCommand);
+        LOG_WARN(fileName, "  ", response->GetValue());
+        this->mLuaCommandMap.emplace(fileName,  response->GetValue());
         return true;
     }
 
@@ -84,106 +96,148 @@ namespace GameKeeper
         App::Get().GetConfig().GetValue("redis", "lua", path);
         Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
 
+        this->mSubRedisClient = this->MakeRedisClient("Subscribe");
+        if(this->mSubRedisClient != nullptr)
+        {
+            LOG_DEBUG("subscribe redis client connect successful");
+            this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
+        }
         for (const std::string &file: luaFiles)
         {
             LOG_CHECK_RET(this->LoadLuaScript(file));
             LOG_INFO("load redis script ", file, " successful");
         }
-        auto threadComponent = this->GetComponent<ThreadPoolComponent>();
-        NetWorkThread &netWorkThread = threadComponent->AllocateNetThread();
+    }
 
-        RedisClient *redisClient = new RedisClient(std::make_shared<SocketProxy>(netWorkThread, "redis"));
-        if(redisClient->ConnectAsync(this->mRedisIp, this->mRedisPort)->Await())
+    std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string & name)
+    {
+        NetWorkThread &workThread = this->mThreadComponent->AllocateNetThread();
+        auto socketProxy = std::make_shared<SocketProxy>(workThread, name);
+        auto redisCommandClient = std::make_shared<RedisClient>(socketProxy);
+
+        for (size_t index = 0; index < 3; index++)
         {
-
+            if (redisCommandClient->ConnectAsync(this->mRedisConfig.mIp, this->mRedisConfig.mPort)->Await())
+            {
+                this->mRedisCmdClients.emplace_back(redisCommandClient);
+                if(!this->mRedisConfig.mPassword.empty())
+                {
+                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    request->AddParamater(this->mRedisConfig.mPassword);
+                    auto response = redisCommandClient->InvokeCommand(request)->Await();
+                    if(!response->IsOk())
+                    {
+                        LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
+                        return nullptr;
+                    }
+                }
+                return redisCommandClient;
+            }
         }
+    }
+
+    std::shared_ptr<RedisClient> RedisComponent::AllotRedisClient()
+    {
+        if(!this->mWaitRedisClient.empty())
+        {
+            auto redisClinet = this->mWaitRedisClient.front();
+            this->mWaitRedisClient.pop();
+            if(!redisClinet->IsOpen())
+            {
+                const std::string & ip = this->mRedisConfig.mIp;
+                unsigned short port = this->mRedisConfig.mPort;
+                if(!redisClinet->ConnectAsync(ip, port)->Await())
+                {
+                    return nullptr;
+                }
+                if(!this->mRedisConfig.mPassword.empty())
+                {
+                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    request->AddParamater(this->mRedisConfig.mPassword);
+                    auto response = redisClinet->InvokeCommand(request)->Await();
+                    if(!response->IsOk())
+                    {
+                        LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
+                        return nullptr;
+                    }
+                }
+            }
+            return redisClinet;
+        }
+        return this->MakeRedisClient("Command");
     }
 
     void RedisComponent::StartPubSub()
     {
 
-    }
+        auto response1 = this->InvokeCommand("AUTH", "199595yjz.");
+        auto response2 = this->InvokeCommand("SADD", "yjz", 11223, 445345, "sajsaiojrioew");
 
-    bool RedisComponent::CloseRedisSocket()
-    {
-        auto id = std::this_thread::get_id();
-        auto iter = this->mRedisContextMap.find(id);
-        if (iter != this->mRedisContextMap.end())
+        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
+        request->AddParamater("chat");
+        this->mSubRedisClient->InvokeCommand(request)->Await();
+        while (this->mSubRedisClient)
         {
-            redisFree(iter->second);
-            this->mRedisContextMap.erase(iter);
-            return true;
+            if (!this->mSubRedisClient->IsOpen())
+            {
+                int count = 0;
+                const std::string & ip = this->mRedisConfig.mIp;
+                unsigned short port = this->mRedisConfig.mPort;
+                while (!this->mSubRedisClient->ConnectAsync(ip, port)->Await())
+                {
+                    LOG_ERROR("connect redis [", ip, ':', port, "] failure count = ", count++);
+                    this->mTaskComponent->Sleep(3000);
+                }
+                if(!this->mRedisConfig.mPassword.empty())
+                {
+                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    request->AddParamater(this->mRedisConfig.mPassword);
+                    auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
+                    if(response == nullptr || response->IsOk())
+                    {
+                        LOG_FATAL("auth redis passwd error", this->mRedisConfig.mPassword);
+                        return;
+                    }
+                }
+            }
+            auto redisClientTask = this->mSubRedisClient->WaitRedisMessageResponse();
+
+            auto redisResponse = redisClientTask->Await();
+
+            if(!redisResponse->HasError())
+            {
+                for (size_t index = 0; index < redisResponse->GetArraySize(); index++)
+                {
+                    LOG_ERROR(redisResponse->GetValue(index));
+                }
+            }
         }
-        return false;
     }
 
-    void RedisComponent::ClearAllData()
+    bool RedisComponent::Ping(std::shared_ptr<RedisClient> redisClient)
     {
-        auto iter = this->mRedisContextMap.begin();
-		for (; iter != this->mRedisContextMap.end(); iter++)
-		{
-			redisCommand(iter->second, "FLUSHALL");
-			return;
-		}
-    }
-
-    RedisSocket *RedisComponent::GetRedisSocket()
-    {
-        auto id = std::this_thread::get_id();
-        auto iter = this->mRedisContextMap.find(id);
-        return iter != this->mRedisContextMap.end() ? iter->second : nullptr;
+        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("PING"));
+        auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
+        if(response == nullptr)
+        {
+            LOG_ERROR("redis net error");
+            return false;
+        }
+        return true;
     }
 
     bool RedisComponent::LateAwake()
     {
         int second = 3;
+        this->mTaskComponent = this->GetComponent<TaskComponent>();
+        this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
         App::Get().GetConfig().GetValue("Redis", "timeout", second);
-        auto threadComponent = this->GetComponent<ThreadPoolComponent>();
-        const std::vector<TaskThread *> &threads = threadComponent->GetThreads();
-       
-        for (TaskThread *taskThread: threads)
-        {
-            redisContext *redisSocket = this->ConnectRedis(second);
-            if (redisSocket == nullptr)
-            {
-                return false;
-            }
-            this->mRedisContextMap.emplace(taskThread->GetThreadId(), redisSocket);
-            LOG_DEBUG("connect redis successful [", mRedisIp, ':', mRedisPort, "]");
-        }
         return true;
     }
 
-    redisContext *RedisComponent::ConnectRedis(int timeout)
-    {
-        struct timeval tv{};
-        tv.tv_sec = 3;
-        tv.tv_usec = tv.tv_sec * timeout * 1000;
-        const ServerConfig &config = App::Get().GetConfig();
-        redisContext *pRedisContext = redisConnectWithTimeout(mRedisIp.c_str(), mRedisPort, tv);
-        if (pRedisContext->err != 0)
-        {
-            LOG_FATAL("connect redis fail =>[", mRedisIp, ':', mRedisPort, "] error = ", pRedisContext->errstr);
-            return nullptr;
-        }
-        std::string redisPasswd;
-        if (config.GetValue("redis", "passwd", redisPasswd) && !redisPasswd.empty())
-        {
-            auto *reply = (redisReply *) redisCommand(pRedisContext, "auth %s", redisPasswd.c_str());
-            if (reply == nullptr || reply->type == REDIS_REPLY_ERROR)
-            {
-                LOG_ERROR("redis Authentication failed {0}", reply->str);
-                return nullptr;
-            }
-            LOG_INFO("redis Authentication successful");
-            freeReplyObject(reply);
-        }
-
-        return pRedisContext;
-    }
 
     long long RedisComponent::AddCounter(const string &key)
     {
-       return this->Invoke("INCR", key)->GetNumber();
+       return this->InvokeCommand("INCR", key)->GetNumber();
     }
 }

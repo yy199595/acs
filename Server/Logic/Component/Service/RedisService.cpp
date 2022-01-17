@@ -51,7 +51,7 @@ namespace GameKeeper
             services.emplace_back(serviceComponent->GetServiceName());
         }
         auto response = this->mRedisComponent->Call("Service", "Add", services);
-        if(response->GetCode() == XCode::Successful)
+        if(response != nullptr && response->HasError())
         {
             LOG_WARN("register all service to redis Successful");
         }
@@ -65,7 +65,7 @@ namespace GameKeeper
     bool RedisService::RemoveNode(const std::string &address)
     {
         auto response = this->mRedisComponent->Call("Service", "Remove", this->mAreaId, address);
-        if(response->GetCode() != XCode::Successful)
+        if(response->HasError())
         {
             return false;
         }
@@ -76,10 +76,13 @@ namespace GameKeeper
     std::vector<std::string> RedisService::QueryService(const std::string &name)
     {
         auto response = this->mRedisComponent->Call("Service", "Get", this->mAreaId, name);
-        if(response->GetCode() == XCode::Successful)
+        if(response->HasError())
         {
             std::vector<std::string> nodeList;
-            response->GetValue(nodeList);
+            for(int index = 0; index < response->GetArraySize(); index++)
+            {
+                nodeList.emplace_back(std::move(response->GetValue(index)));
+            }
             return nodeList;
         }
         return std::vector<std::string>();
