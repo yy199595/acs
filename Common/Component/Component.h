@@ -62,8 +62,7 @@ namespace GameKeeper
         
         virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
 
-		virtual int GetPriority() { return 100; }
-
+        virtual void OnComplete() { } //在所有组件的start load 都完成之后调用
 	protected:
 		template<typename T>
 		T * GetComponent();

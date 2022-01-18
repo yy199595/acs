@@ -20,7 +20,6 @@ namespace GameKeeper
     public:
         void StartHotfix();
         bool StartLoadConfig();
-        int GetPriority() final { return 1000000;}
 
     private:
         void AddRefreshTimer(Component * component);

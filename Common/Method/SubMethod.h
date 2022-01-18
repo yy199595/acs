@@ -5,14 +5,14 @@
 #ifndef GAMEKEEPER_SUBMETHOD_H
 #define GAMEKEEPER_SUBMETHOD_H
 #include<iostream>
-#include"rapidjson/document.h"
+#include"Util/JsonHelper.h"
 #include"Define/CommonLogDef.h"
 #include<google/protobuf/message.h>
 
 namespace GameKeeper
 {
     template<typename T>
-    using JsonSubFunction = void(T::*)(const rapidjson::Document & document);
+    using JsonSubFunction = void(T::*)(const RapidJsonReader & rapidJsonReader);
 
     template<typename T, typename T1>
     using ProtoSubFuncrion = void(T::*)(const T & message);
@@ -32,14 +32,13 @@ namespace GameKeeper
     public:
         void OnPublish(const std::string &message) final
         {
-            rapidjson::Document document;
-            document.Parse(message.c_str(), message.size());
-            if(document.HasParseError())
+            RapidJsonReader rapidJsonReader;
+            if(!rapidJsonReader.TryParse(message))
             {
                 std::cerr << "parse json error : json = " << message << std::endl;
                 return;
             }
-            (this->mObj->*mFunction)(document);
+            (this->mObj->*mFunction)(rapidJsonReader);
         }
     private:
         T * mObj;

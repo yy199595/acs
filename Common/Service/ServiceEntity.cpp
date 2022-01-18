@@ -4,7 +4,7 @@
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
-#include"Service/RedisService.h"
+#include"Service/NodeAddressService.h"
 namespace GameKeeper
 {
 	ServiceEntity::ServiceEntity(const std::string & name)
@@ -34,7 +34,7 @@ namespace GameKeeper
         if(iter != this->mServiceNodeMap.end())
         {
             this->mServiceNodeMap.erase(iter);
-            RedisService * redisService = App::Get().GetComponent<RedisService>();
+            NodeAddressService * redisService = App::Get().GetComponent<NodeAddressService>();
             return redisService != nullptr && redisService->RemoveNode(address);
         }
         return false;
@@ -67,22 +67,8 @@ namespace GameKeeper
         }
     }
 
-    //从redis查询服务地址
     bool ServiceEntity::AllotServiceAddress(std::string &address)
     {
-        if(this->mTaskComponent->GetContextId() != 0)
-        {
-           RedisService * redisService = App::Get().GetComponent<RedisService>();
-           if(redisService == nullptr)
-           {
-               return false;
-           }
-           std::vector<std::string> nodes = redisService->QueryService(this->mServiceName);
-           for(const std::string & address : nodes)
-           {
-               this->AddAddress(address);
-           }
-        }
         if(this->mAllAddress.empty())
         {
             return false;

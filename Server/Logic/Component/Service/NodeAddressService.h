@@ -10,28 +10,25 @@ namespace GameKeeper
 
     class ServiceComponent;
 
-    class RedisService : public ServiceComponentBase, public IStart
+    class NodeAddressService : public ServiceComponentBase, public IStart
     {
     public:
-		RedisService() = default;
+		NodeAddressService() = default;
 
-        ~RedisService() override = default;
+        ~NodeAddressService() override = default;
 
     public:
         bool RemoveNode(const std::string & address);
-        bool AddService(const std::vector<std::string> & services);
-        std::vector<std::string> QueryService(const std::string & name);
     public:
         bool Awake() final;
 
-        void OnStart() final;
-
         bool LateAwake() final;
 
-        int GetPriority() final { return 1000; }
+        void OnStart() final;
 
     private:
-        void Add(const rapidjson::Document & document);
+        void Add(const RapidJsonReader & jsonReader);
+        void Remove(const RapidJsonReader & jsonReader);
 
     private:
         int mAreaId;

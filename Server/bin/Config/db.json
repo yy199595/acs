@@ -54,8 +54,8 @@
         "RpcConfigComponent"
     ],
     "service": [
-        "MysqlService",
-        "RedisService"
+        "NodeAddressService",
+        "MysqlService"
     ],
     "white_list": [
         "127.0.0.1"

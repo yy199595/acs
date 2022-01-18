@@ -44,27 +44,22 @@ namespace GameKeeper
         {
             return false;
         }
+        this->mSortComponents.emplace_back(name);
 		this->mComponentMap.emplace(name, component);
 		return true;
 	}
 
-	void GameObject::GetComponents(std::vector<Component*>& components, bool sort) const
+	void GameObject::GetComponents(std::vector<Component*>& components) const
 	{
 		components.clear();
-		auto iter = this->mComponentMap.begin();
-		for (; iter != this->mComponentMap.end(); iter++)
-		{
-			Component *component = iter->second;
-			components.push_back(component);
-		}
-		if (sort)
-		{
-			std::sort(components.begin(), components.end(),
-				[](Component * c1, Component * c2)
-			{
-				return c1->GetPriority() < c2->GetPriority();
-			});
-		}
+        for(const std::string & name : this->mSortComponents)
+        {
+           Component * component = this->GetComponent<Component>(name);
+           if(component != nullptr)
+           {
+               components.emplace_back(component);
+           }
+        }
 	}
 
 	void GameObject::OnDestory()

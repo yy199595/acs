@@ -3,7 +3,7 @@
 //
 #include"ServiceNode.h"
 #include"Util/StringHelper.h"
-#include"Service/RedisService.h"
+#include"Service/NodeAddressService.h"
 #include"Scene/ServiceComponent.h"
 #include"Service/ServiceEntity.h"
 namespace GameKeeper
@@ -75,7 +75,7 @@ namespace GameKeeper
         {
             return true;
         }
-        RedisService *redisService = App::Get().GetComponent<RedisService>();
+        NodeAddressService *redisService = App::Get().GetComponent<NodeAddressService>();
         ServiceComponent *serviceComponent = App::Get().GetComponent<ServiceComponent>();
         redisService->RemoveNode(this->mAddress);
         auto serviceEntity = serviceComponent->GetServiceEntity(this->mServiceName);

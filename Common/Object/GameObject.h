@@ -37,7 +37,7 @@ namespace GameKeeper
     public:
 		void OnDestory() override;
 
-        void GetComponents(std::vector<Component *> & components, bool sort = false) const;
+        void GetComponents(std::vector<Component *> & components) const;
     public:
 		inline long long GetId() const { return this->mGameObjectId; }
         inline long long GetSocketId() const { return this->mSocketId; }
@@ -45,6 +45,7 @@ namespace GameKeeper
     private:
         long long mSocketId;
         long long mGameObjectId;
+        std::vector<std::string> mSortComponents;
         std::unordered_map<std::string, Component *> mComponentMap;
     };
     template<typename T>

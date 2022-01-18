@@ -157,9 +157,12 @@ namespace GameKeeper
             this->mResponse->AddValue(this->mReadTempBuffer, this->mDataSize);
 
             this->mLineCount++;
-            this->mDataSize = 0;
             readStream.ignore(2);
-            std::cout << "current receive line " << this->mLineCount << std::endl;
+#ifdef __DEBUG__
+            std::cout << "current receive line " << this->mLineCount <<
+                "[ " << std::string(this->mReadTempBuffer, this->mDataSize) <<"]" << std::endl;
+#endif
+            this->mDataSize = 0;
             if(this->mLineCount >= this->mDataCount)
             {
                 this->OnComplete();

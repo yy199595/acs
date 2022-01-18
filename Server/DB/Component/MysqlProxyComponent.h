@@ -5,7 +5,7 @@ namespace GameKeeper
 {
     class ServiceEntity;
     class MysqlRpcTaskSource;
-    class MysqlProxyComponent : public Component, public ILoadData
+    class MysqlProxyComponent : public Component
     {
     public:
         MysqlProxyComponent() = default;
@@ -17,8 +17,7 @@ namespace GameKeeper
 
         bool LateAwake() final;
 
-        void OnLoadData() override;
-
+        void OnComplete() final;
 	private:
 		void AddUserData();
         std::shared_ptr<com::Rpc_Request> NewMessage(const std::string & name);

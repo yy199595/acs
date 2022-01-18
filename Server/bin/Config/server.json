@@ -51,26 +51,26 @@
         "./Script/Server/"
     ],
     "component": [
+        "RpcComponent",
+        "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "LuaScriptComponent",
-        "LuaServiceMgrComponent",
         "MysqlComponent",
         "RedisComponent",
+        "LuaScriptComponent",
+        "LuaServiceMgrComponent",
         "MysqlProxyComponent",
-        "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",
-        "RpcConfigComponent",
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent"
     ],
     "service": [
+        "NodeAddressService",
         "GateService",
         "MysqlService",
-        "AccountService",
-        "RedisService"
+        "AccountService"
     ],
     "white_list": [
         "127.0.0.1"

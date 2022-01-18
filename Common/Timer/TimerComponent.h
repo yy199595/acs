@@ -39,7 +39,6 @@ namespace GameKeeper
 
         bool AddTimerToWheel(TimerBase * timer);
 
-		int GetPriority() override { return 1; }
     private:
         const int LayerCount = 5;
         const int TimerPrecision = 20;

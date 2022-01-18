@@ -35,6 +35,11 @@ namespace GameKeeper
 
     void RedisCmdRequest::GetCommand(std::iostream &readStream) const
     {
+        if(this->mParamaters.empty())
+        {
+            readStream << this->mConmand << "\r\n";
+            return;
+        }
         readStream << "*" << this->mParamaters.size() + 1 << "\r\n";
         readStream << "$" << this->mConmand.size() << "\r\n" << this->mConmand << "\r\n";
         for(const std::string & paramater : this->mParamaters)

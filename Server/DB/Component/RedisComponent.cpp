@@ -100,7 +100,9 @@ namespace GameKeeper
         this->mSubRedisClient = this->MakeRedisClient("Subscribe");
         if(this->mSubRedisClient != nullptr)
         {
+            this->SubscribeMessage();
             LOG_DEBUG("subscribe redis client connect successful");
+            this->mRedisCmdClients.emplace_back(this->mSubRedisClient);
             this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
         }
         for (const std::string &file: luaFiles)
@@ -108,6 +110,7 @@ namespace GameKeeper
             LOG_CHECK_RET(this->LoadLuaScript(file));
             LOG_INFO("load redis script ", file, " successful");
         }
+        this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
     }
 
     std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string & name)
@@ -168,6 +171,33 @@ namespace GameKeeper
         return this->MakeRedisClient("Command");
     }
 
+    long long RedisComponent::Publish(const std::string &channel, const std::string &message)
+    {
+        return this->InvokeCommand("PUBLISH", channel, message)->GetNumber();
+    }
+
+    void RedisComponent::CheckRedisClient()
+    {
+        while(!this->mRedisCmdClients.empty())
+        {
+            this->mTaskComponent->Sleep(5000);
+            const long long nowTime = Helper::Time::GetSecTimeStamp();
+            for(std::shared_ptr<RedisClient> redisClient : this->mRedisCmdClients)
+            {
+                if( nowTime - redisClient->GetLastOperatorTime() < 5) //十秒没进行操作了
+                {
+                    continue;
+                }
+//                std::string json;
+//                RapidJsonWriter jsonWriter;
+//                jsonWriter.Add("id", 10);
+//                jsonWriter.Add("key", "orjworj");
+//                jsonWriter.WriterToStream(json);
+//                this->Publish("NodeAddressService.Add", json);
+            }
+        }
+    }
+
     bool RedisComponent::SubscribeChannel(const std::string &chanel)
     {
         std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
@@ -176,15 +206,15 @@ namespace GameKeeper
         return !response->HasError();
     }
 
-    void RedisComponent::StartPubSub()
+    void RedisComponent::SubscribeMessage()
     {
         std::vector<Component *> components;
         this->GetComponents(components);
-
-        for(Component * component : components)
+        for (Component *component: components)
         {
             auto serviceBase = dynamic_cast<ServiceComponentBase *>(component);
-            if (serviceBase == nullptr) {
+            if (serviceBase == nullptr)
+            {
                 continue;
             }
             std::vector<std::string> methods;
@@ -198,61 +228,61 @@ namespace GameKeeper
                 }
             }
         }
+    }
 
-        auto response1 = this->InvokeCommand("AUTH", "199595yjz.");
-        auto response2 = this->InvokeCommand("SADD", "yjz", 11223, 445345, "sajsaiojrioew");
-
-        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
-        request->AddParamater("chat");
-        this->mSubRedisClient->InvokeCommand(request)->Await();
+    void RedisComponent::StartPubSub()
+    {
         while (this->mSubRedisClient)
         {
             if (!this->mSubRedisClient->IsOpen())
             {
                 int count = 0;
-                const std::string & ip = this->mRedisConfig.mIp;
+                const std::string &ip = this->mRedisConfig.mIp;
                 unsigned short port = this->mRedisConfig.mPort;
                 while (!this->mSubRedisClient->ConnectAsync(ip, port)->Await())
                 {
                     LOG_ERROR("connect redis [", ip, ':', port, "] failure count = ", count++);
                     this->mTaskComponent->Sleep(3000);
                 }
-                if(!this->mRedisConfig.mPassword.empty())
+                if (!this->mRedisConfig.mPassword.empty())
                 {
                     std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
                     request->AddParamater(this->mRedisConfig.mPassword);
                     auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
-                    if(response == nullptr || response->IsOk())
+                    if (response == nullptr || response->IsOk())
                     {
                         LOG_FATAL("auth redis passwd error", this->mRedisConfig.mPassword);
                         return;
                     }
                 }
             }
+
             auto redisResponse = this->mSubRedisClient->WaitRedisMessageResponse()->Await();
-            if(!redisResponse->HasError() && redisResponse->GetArraySize() == 3 && redisResponse->GetValue() == "message")
+            if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 &&
+                redisResponse->GetValue() == "message")
             {
-                const std::string & method = redisResponse->GetValue(1);
-                const std::string & message = redisResponse->GetValue(2);
-                for (size_t index = 0; index < redisResponse->GetArraySize(); index++)
+                const std::string &method = redisResponse->GetValue(1);
+                size_t pos = method.find('.');
+                if(pos != std::string::npos)
                 {
-                    LOG_ERROR(redisResponse->GetValue(index));
+                    string service = method.substr(0, pos);
+                    std::string funcName = method.substr(pos + 1);
+                    const std::string &message = redisResponse->GetValue(2);
+#ifdef __DEBUG__
+                    LOG_DEBUG("========= subscribe message =============");
+                    LOG_DEBUG("func = ", service, '.', method);
+                    LOG_DEBUG("message = ", message);
+#endif
+                    ServiceComponentBase *componentBase = this->GetComponent<ServiceComponentBase>(service);
+                    if (componentBase != nullptr)
+                    {
+                        componentBase->Publish(funcName, message);
+                    }
                 }
             }
         }
     }
 
-    bool RedisComponent::Ping(std::shared_ptr<RedisClient> redisClient)
-    {
-        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("PING"));
-        auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
-        if(response == nullptr)
-        {
-            LOG_ERROR("redis net error");
-            return false;
-        }
-        return true;
-    }
 
     bool RedisComponent::LateAwake()
     {

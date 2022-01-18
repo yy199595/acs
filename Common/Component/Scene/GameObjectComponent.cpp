@@ -30,7 +30,7 @@ namespace GameKeeper
 			return false;
 		}
 		std::vector<Component *> components;
-		gameObject->GetComponents(components, true);
+		gameObject->GetComponents(components);
 		for (Component * component : components)
 		{
 			if (!component->LateAwake())

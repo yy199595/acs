@@ -18,7 +18,6 @@ namespace GameKeeper
         ~ServiceComponentBase() override = default;
 
     public:
-        int GetPriority() override { return 1000; }
 
         virtual const std::string & GetServiceName() { return this->GetTypeName();}
 

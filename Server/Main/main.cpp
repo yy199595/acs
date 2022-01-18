@@ -20,7 +20,7 @@
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
-#include "Component/Service/RedisService.h"
+#include "Component/Service/NodeAddressService.h"
 #include <Scene/MonitorComponent.h>
 #include "Service/MysqlService.h"
 #include <Service/HttpLoginService.h>
@@ -72,7 +72,7 @@ void RegisterServiceComponent()
     ComponentFactory::Add<GateService>("GateService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<AccountService>("AccountService");
-    ComponentFactory::Add<RedisService>("RedisService");
+    ComponentFactory::Add<NodeAddressService>("NodeAddressService");
     ComponentFactory::Add<HttpLoginService>("HttpLoginService");
     ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
 }

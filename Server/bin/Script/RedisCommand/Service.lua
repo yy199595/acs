@@ -1,6 +1,33 @@
 
 local Service = {}
 
+local Json = {}
+function Json.ToString(t)
+    local function serialize(tbl)
+        local tmp = {}
+        for k, v in pairs(tbl) do
+            local k_type = type(k)
+            local v_type = type(v)
+            local key = (k_type == "string" and "\"" .. k .. "\":")
+                    or (k_type == "number" and "")
+            local value = (v_type == "table" and serialize(v))
+                    or (v_type == "boolean" and tostring(v))
+                    or (v_type == "string" and "\"" .. v .. "\"")
+                    or (v_type == "number" and v)
+            tmp[#tmp + 1] = key and value and tostring(key) .. tostring(value) or nil
+        end
+        if table.maxn(tbl) == 0 then
+            return "{" .. table.concat(tmp, ",") .. "}"
+        else
+            return "[" .. table.concat(tmp, ",") .. "]"
+        end
+    end
+    assert(type(t) == "table")
+    return serialize(t)
+end
+
+local AddFunction = "NodeAddressService.Add"
+
 Service.Add = function(keys)
     local id = keys[1]
     local services = {}
@@ -9,43 +36,51 @@ Service.Add = function(keys)
         table.insert(services, keys[index])
     end
 
+    local ret = {}
+    ret.services = {}
+    ret["address"] = address
+    ret["area_id"] = tonumber(id)
+
     local count = 0
     for index = 3, #keys do
         local service = keys[index]
+        table.insert(ret.services, service)
         redis.call('SADD', address, service)
-        local key = tostring(id) .. ':' .. service
-        count = count + redis.call('SADD', key , address)
     end
 
-    local str = table.concat(services, ",");
-    print(string.format("[%s] add %d service : (%s)", address, count, str))
+    redis.call("SADD", "area_" .. id, address)
+
+    local json = Json.ToString(ret)
+    redis.call("PUBLISH", AddFunction, json)
+    print("redis publish [" .. AddFunction .. "] json = ", json)
     return count
 end
 
 
-Service.Get = function(array)
+Service.Get = function(array) -- 区服拿到地址  地址拿到服务
     local id = array[1]
-    local service = array[2]
-    local key = tostring(id) .. ':' .. service
-    local services = redis.call('SINTER', key)
-    if services == nil then
-        local key1 = "0:"..service
-        return redis.call('SINTER', key1)
+
+    local ret = {}
+    local key = "area_" .. id
+    local addressArray = redis.call("SMEMBERS", key)
+    for _, address in ipairs(addressArray) do
+        local tab = {}
+        tab.address = address
+        tab.area_id = tonumber(id)
+        tab.services = redis.call("SMEMBERS", address)
+        table.insert(ret, Json.ToString(tab))
     end
-    return services
+    return ret
 end
 
 Service.Remove = function(keys)
     local count = 0
     local id = keys[1]
-    local address = keys[2]
-    local services = redis.call('SMEMBERS', address)
-    for _, name in ipairs(services) do
-        local key = tostring(id) .. ':' .. name
-        count = count + redis.call('SREM', key, address)
+    redis.call("SREM", "area_".. id, address)
+    local items = redis.call("SMEMBERS", address)
+    for _, item in ipairs(items) do
+        count = count + redis.call("SREM", address, item)
     end
-    print("remove ", address, " count = ", count)
-    redis.call('SREM', address, table.concat(services, ' '))
     return count
 end
 

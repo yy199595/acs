@@ -36,10 +36,14 @@ namespace GameKeeper
         void OnStart() override;
     private:
         void StartPubSub();
+        void SubscribeMessage();
+        void CheckRedisClient();
 	public:
         long long AddCounter(const std::string & key);
 
         bool SubscribeChannel(const std::string & chanel);
+
+        long long Publish(const std::string & channel, const std::string & message);
 
         template<typename ... Args>
         std::shared_ptr<RedisCmdResponse> InvokeCommand(const std::string & cmd, Args && ... args)
@@ -70,7 +74,6 @@ namespace GameKeeper
     private:
         bool LoadLuaScript(const std::string & path);
         std::shared_ptr<RedisClient> AllotRedisClient();
-        bool Ping(std::shared_ptr<RedisClient> redisClient);
         bool GetLuaScript(const std::string & file, std::string & command);
         std::shared_ptr<RedisClient> MakeRedisClient(const std::string & name);
     private:

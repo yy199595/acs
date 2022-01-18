@@ -57,8 +57,6 @@ namespace GameKeeper
 
         void OnSecondUpdate() final;
 
-		int GetPriority() override { return 2; }
-
 	public:
 
 		TaskContext *GetContext(unsigned int id);

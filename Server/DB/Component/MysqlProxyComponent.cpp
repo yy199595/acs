@@ -25,19 +25,10 @@ namespace GameKeeper
         return true;
     }
 
-
-    void MysqlProxyComponent::OnLoadData()
+    void MysqlProxyComponent::OnComplete()
     {
-        this->AddUserData();
-//		ElapsedTimer timer;
-//		auto group = this->mCorComponent->NewCoroutineGroup();
-//		for (int index = 0; index < 2; index++)
-//		{
-//			group->Add(this->mCorComponent->Start(&MysqlProxyComponent::AddUserData, this));
-//			group->Add(this->mCorComponent->Start(&MysqlProxyComponent::SortUserData, this));
-//		}
-//		group->AwaitAll();
-//		LOG_ERROR("use time = " << timer.GetSecond() << "s");
+        TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
+        taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
     }
 
 	void MysqlProxyComponent::AddUserData()

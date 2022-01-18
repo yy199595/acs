@@ -62,12 +62,6 @@ namespace GameKeeper
 	{
 		// 初始化scene组件
 		this->GetComponents(this->mSceneComponents);
-		std::sort(mSceneComponents.begin(), mSceneComponents.end(),
-			[](Component *m1, Component *m2) -> bool
-		{
-			return m1->GetPriority() < m2->GetPriority();
-		});
-
 		for (Component *component : mSceneComponents)
 		{
 			if (!this->InitComponent(component))
@@ -124,6 +118,11 @@ namespace GameKeeper
         }
         long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
         LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
+
+        for (Component *component: this->mSceneComponents)
+        {
+            component->OnComplete();
+        }
     }
 
 	int App::Run(int argc, char ** argv)

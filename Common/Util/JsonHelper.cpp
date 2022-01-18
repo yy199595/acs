@@ -292,14 +292,12 @@ namespace GameKeeper
         auto iter = mDdocument.FindMember(key);
         if (iter != mDdocument.MemberEnd() && iter->value.IsArray())
         {
-            auto arrayIter = iter->value.MemberBegin();
-            for (; arrayIter != iter->value.MemberEnd(); arrayIter++)
+            for (size_t index = 0; index < iter->value.Size(); index++)
             {
-                if (arrayIter->value.IsString())
+                const rapidjson::Value &jsonValue = iter->value[index];
+                if (jsonValue.IsString())
                 {
-                    const char *str = arrayIter->value.GetString();
-                    const size_t size = arrayIter->value.GetStringLength();
-                    data.emplace_back(str, size);
+                    data.emplace_back(jsonValue.GetString(), jsonValue.GetStringLength());
                 }
             }
             return true;

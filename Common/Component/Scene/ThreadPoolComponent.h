@@ -19,7 +19,6 @@ namespace GameKeeper
 
         bool LateAwake() final;
 
-		int GetPriority() final { return 0; }
     public:
 
         bool StartTask(TaskProxy * taskAction);

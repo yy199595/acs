@@ -9,7 +9,6 @@ namespace GameKeeper
 	public:
         LuaServiceMgrComponent() = default;
         ~LuaServiceMgrComponent() final = default;
-        int GetPriority() final { return 10000;}
 	protected:
 		bool Awake() final;
         void OnHotFix() final;
