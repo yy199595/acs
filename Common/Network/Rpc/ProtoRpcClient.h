@@ -19,8 +19,8 @@ namespace GameKeeper
         void SendToServer(std::shared_ptr<com::Rpc_Response> message);
         std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 	protected:
-        void OnClose(XCode code) final;
         void OnConnect(XCode code) final;
+        void OnClientError(XCode code) final;
 		XCode OnRequest(const char * buffer, size_t size)final;
 		XCode OnResponse(const char * buffer, size_t size)final;
         void OnSendData(XCode code, std::shared_ptr<Message> ) final;

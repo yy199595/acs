@@ -90,6 +90,7 @@ namespace GameKeeper
             {
                 rpcClient->StartClose();
             }
+            this->mRpcClientMap.erase(iter);
         }
     }
 

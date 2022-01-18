@@ -16,13 +16,6 @@ namespace GameKeeper
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
     }
 
-    void RpcClient::CloseSocket(XCode code)
-    {
-        this->mIsOpen = false;
-        this->mSocketProxy->Close();
-        this->OnClose(code);
-    }
-
     void RpcClient::Clear()
     {
         this->mSocketId = 0;
@@ -49,39 +42,43 @@ namespace GameKeeper
 
     void RpcClient::ReceiveHead()
     {
-        if (!this->mSocketProxy->IsOpen())
-        {
-            this->CloseSocket(XCode::NetWorkError);
-            return;
-        }
         const size_t count = sizeof(int) + sizeof(char);
         AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
-
-        auto cb = [this](const asio::error_code &error_code, const std::size_t t) {
-            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-            if (error_code)
+        std::shared_ptr<RpcClient> self = this->shared_from_this();
+        auto cb = [self, this](const asio::error_code &code, const std::size_t t) {
+            self->mLastOperTime = Helper::Time::GetSecTimeStamp();
+            if (code)
             {
-                STD_ERROR_LOG(error_code.message());
-                this->CloseSocket(XCode::NetReceiveFailure);
+                this->mIsOpen = false;
+                STD_ERROR_LOG(code.message());
+                this->OnClientError(XCode::NetWorkError);
                 return;
             }
 
             int length = 0;
-            char type = this->mReceiveBuffer[0];
-            memcpy(&length, this->mReceiveBuffer + sizeof(char), sizeof(int));
+            char type = self->mReceiveBuffer[0];
+            memcpy(&length, self->mReceiveBuffer + sizeof(char), sizeof(int));
             if (length >= MAX_DATA_COUNT)
             {
-                this->CloseSocket(XCode::NetBigDataShutdown);
+                this->mIsOpen = false;
+                this->mSocketProxy->Close();
+                this->OnClientError(XCode::NetBigDataShutdown);
                 return;
             }
 
-            if (type == RPC_TYPE_REQUEST || type == RPC_TYPE_RESPONSE
-                || type == RPC_TYPE_CLIENT_REQUEST)
+            switch(type)
             {
-                this->ReceiveBody(type, length);
-                return;
+                case RPC_TYPE_REQUEST:
+                case RPC_TYPE_RESPONSE:
+                case RPC_TYPE_CLIENT_REQUEST:
+                    this->ReceiveBody(type, length);
+                    break;
+                default:
+                    this->mIsOpen = false;
+                    this->mSocketProxy->Close();
+                    this->OnClientError(XCode::UnKnowPacket);
+                    break;
             }
-            this->CloseSocket(XCode::UnKnowPacket);
         };
         socket.async_read_some(asio::buffer(this->mReceiveBuffer, count), std::move(cb));
     }
@@ -93,37 +90,34 @@ namespace GameKeeper
         {
             if (size > MAX_DATA_COUNT)
             {
-                this->CloseSocket(XCode::NetBigDataShutdown);
+                this->mIsOpen = false;
+                this->mSocketProxy->Close();
+                this->OnClientError(XCode::NetBigDataShutdown);
                 return;
             }
             messageBuffer = new char[size];
         }
-        asio::error_code code;
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
-        if (size > nSocket.available(code))
-        {
-            this->CloseSocket(XCode::NetReceiveFailure);
-            return;
-        }
+        std::shared_ptr<RpcClient> self = this->shared_from_this();
 
-        auto cb = [this, messageBuffer, type]
+        auto cb = [self, this, messageBuffer, type]
                 (const asio::error_code & error_code, const size_t size)
         {
-            XCode code = XCode::Successful;
             if (error_code)
             {
-                code = XCode::NetWorkError;
-                std::cout << error_code.message() << std::endl;
+                this->mIsOpen = false;
+                this->mSocketProxy->Close();
+                this->OnClientError(XCode::NetWorkError);
                 return;
             }
             switch (type)
             {
                 case RPC_TYPE_REQUEST:
-                    code = this->OnRequest(messageBuffer, size);
+                    this->OnRequest(messageBuffer, size);
                     break;
                 case RPC_TYPE_RESPONSE:
-                    code = this->OnResponse(messageBuffer, size);
+                    this->OnResponse(messageBuffer, size);
                     break;
                 default:
                     assert(false);
@@ -133,12 +127,7 @@ namespace GameKeeper
             {
                 delete[] messageBuffer;
             }
-            if (code == XCode::Successful)
-            {
-                mContext.post(std::bind(&RpcClient::ReceiveHead, this));
-                return;
-            }
-            this->CloseSocket(code);
+            mContext.post(std::bind(&RpcClient::ReceiveHead, this));
         };
         nSocket.async_read_some(asio::buffer(messageBuffer, size), std::move(cb));
     }
@@ -161,10 +150,11 @@ namespace GameKeeper
         this->mIp = ip;
         this->mPort = port;
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
+        std::shared_ptr<RpcClient> self = this->shared_from_this();
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
         LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , ip, ':', port);
-        nSocket.async_connect(endPoint, [this](const asio::error_code &err)
+        nSocket.async_connect(endPoint, [self, this](const asio::error_code &err)
         {
             XCode code = XCode::Successful;
             if (err)
@@ -185,12 +175,6 @@ namespace GameKeeper
 
     void RpcClient::SendData(char type, std::shared_ptr<Message> message)
     {
-        if (!this->mSocketProxy->IsOpen() || message == nullptr)
-        {
-            this->CloseSocket(XCode::NetWorkError);
-            this->OnSendData(XCode::NetWorkError, message);
-            return;
-        }
         const int body = message->ByteSize();
         const int head = sizeof(char) + sizeof(int);
 
@@ -200,6 +184,7 @@ namespace GameKeeper
             buffer = new char[head + body];
         }
         buffer[0] = type;
+        std::shared_ptr<RpcClient> self = this->shared_from_this();
         memcpy(buffer + sizeof(char), &body, sizeof(int));
         if (!message->SerializePartialToArray(buffer + head, body))
         {
@@ -211,21 +196,23 @@ namespace GameKeeper
             return;
         }
 
-        auto cb = [message, this, buffer, type]
+        auto cb = [message, this, buffer, type, self]
                 (const asio::error_code &error_code, std::size_t size)
         {
-            XCode code = XCode::Successful;
-            if (error_code)
-            {
-                code = XCode::SendMessageFail;
-                STD_ERROR_LOG(error_code.message());
-                this->CloseSocket(XCode::NetSendFailure);
-            }
             if (buffer != this->mSendBuffer)
             {
                 delete[]buffer;
             }
-            this->OnSendData(code, message);
+            if (error_code)
+            {
+                STD_ERROR_LOG(error_code.message());
+                this->mIsOpen = false;
+                this->mSocketProxy->Close();
+                this->OnClientError(XCode::NetWorkError);
+                this->OnSendData(XCode::NetWorkError, message);
+                return;
+            }
+            this->OnSendData(XCode::Successful, message);
             this->mLastOperTime = Helper::Time::GetSecTimeStamp();
         };
 

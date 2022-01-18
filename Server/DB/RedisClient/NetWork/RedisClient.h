@@ -10,7 +10,7 @@
 
 namespace GameKeeper
 {
-    class RedisClient
+    class RedisClient : std::enable_shared_from_this<RedisClient>
     {
     public:
         RedisClient(std::shared_ptr<SocketProxy> socket);

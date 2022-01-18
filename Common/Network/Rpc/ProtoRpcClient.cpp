@@ -15,12 +15,7 @@ namespace GameKeeper
 
 	void ProtoRpcClient::StartClose()
 	{
-		if (this->mNetWorkThread.IsCurrentThread())
-		{
-			this->CloseSocket(XCode::NetActiveShutdown);
-			return;
-		}
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::CloseSocket, this, XCode::NetActiveShutdown);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::OnClientError, this, XCode::NetActiveShutdown);
 	}
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Response> message)
@@ -54,8 +49,14 @@ namespace GameKeeper
         }
     }
 
-	void ProtoRpcClient::OnClose(XCode code)
+	void ProtoRpcClient::OnClientError(XCode code)
 	{
+        if(code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
+        {
+            this->mIsOpen = false;
+            this->mSocketProxy->Close();
+            return;
+        }
         long long id = this->GetSocketId();
 		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);

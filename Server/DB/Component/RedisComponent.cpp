@@ -286,10 +286,8 @@ namespace GameKeeper
 
     bool RedisComponent::LateAwake()
     {
-        int second = 3;
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
-        App::Get().GetConfig().GetValue("Redis", "timeout", second);
         return true;
     }
 

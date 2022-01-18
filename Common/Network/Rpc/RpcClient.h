@@ -8,7 +8,7 @@ using namespace google::protobuf;
 #define MAX_DATA_COUNT 1024 * 20 //处理的最大数据
 namespace GameKeeper
 {
-	class RpcClient
+    class RpcClient : public std::enable_shared_from_this<RpcClient>
 	{
 	public:
 		explicit RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type);
@@ -31,9 +31,8 @@ namespace GameKeeper
 		void ReceiveBody(char type, size_t size);
 		void ConnectHandler(const std::string & ip, unsigned short port);
 	protected:
-        void CloseSocket(XCode code);
-        virtual void OnClose(XCode code) = 0;
         virtual void OnConnect(XCode code) = 0;
+        virtual void OnClientError(XCode code) = 0;
         virtual XCode OnRequest(const char * buffer, size_t size) = 0;
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
         virtual void OnSendData(XCode code, std::shared_ptr<Message> ) = 0;
@@ -41,11 +40,11 @@ namespace GameKeeper
         bool IsCanConnection();
         void SendData(char type, std::shared_ptr<Message> message);
 	protected:
-		AsioContext & mContext;
+        bool mIsOpen;
+        AsioContext & mContext;
 		NetWorkThread & mNetWorkThread;
         std::shared_ptr<SocketProxy> mSocketProxy;
     private:
-        bool mIsOpen;
 		std::string mIp;
         unsigned short mPort;
 		long long mSocketId;

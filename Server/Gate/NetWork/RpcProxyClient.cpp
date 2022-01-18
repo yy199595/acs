@@ -45,8 +45,14 @@ namespace GameKeeper
         return XCode::UnKnowPacket;
     }
 
-    void RpcProxyClient::OnClose(XCode code)
+    void RpcProxyClient::OnClientError(XCode code)
     {
+        if(code == XCode::NetActiveShutdown)
+        {
+            this->mIsOpen = false;
+            this->mSocketProxy->Close();
+            return;
+        }
         long long id = this->GetSocketId();
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
         mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mProxyComponent, id, code);
@@ -55,20 +61,13 @@ namespace GameKeeper
     void RpcProxyClient::StartClose()
     {
         XCode code = XCode::NetActiveShutdown;
-        if(this->mNetWorkThread.IsCurrentThread())
-        {
-            this->CloseSocket(code);
-        }
-        this->mNetWorkThread.Invoke(&RpcProxyClient::CloseSocket, this, code);
+        this->mNetWorkThread.Invoke(&RpcProxyClient::OnClientError, this, code);
     }
 
 
     bool RpcProxyClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
     {
-        if(!this->IsOpen())
-        {
-            return false;
-        }
+        if(!this->IsOpen()) return false;
         if(this->mNetWorkThread.IsCurrentThread())
         {
             this->SendData(RPC_TYPE_REQUEST, message);
@@ -80,10 +79,7 @@ namespace GameKeeper
 
     bool RpcProxyClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
     {
-        if(!this->IsOpen())
-        {
-            return false;
-        }
+        if(!this->IsOpen()) return false;
         if(this->mNetWorkThread.IsCurrentThread())
         {
             this->SendData(RPC_TYPE_RESPONSE, message);
