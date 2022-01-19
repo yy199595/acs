@@ -60,9 +60,7 @@ namespace GameKeeper
                 STD_ERROR_LOG(code.message());
                 return;
             }
-            HttpStatus httpStatus = httpContent->OnReceiveData(this->mReadBuffer);
-
-            switch(httpStatus)
+            switch(httpContent->OnReceiveData(this->mReadBuffer))
             {
                 case HttpStatus::OK:
                     taskSource->SetResult(true);
@@ -72,6 +70,7 @@ namespace GameKeeper
                     break;
                 default:
                     taskSource->SetResult(false);
+                    break;
             }
         });
     }

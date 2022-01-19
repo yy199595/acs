@@ -139,7 +139,7 @@ namespace GameKeeper
         if(this->mState == HttpDecodeState::FirstLine)
         {
             this->mState = HttpDecodeState::HeadLine;
-            io >> this->mMethod >> this->mUrl >> this->mUrl;
+            io >> this->mMethod >> this->mUrl >> this->mVersion;
             io.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
@@ -161,7 +161,7 @@ namespace GameKeeper
                     this->mHeadMap.insert(std::make_pair(key, val));
                 }
             }
-            if(this->mState == HttpDecodeState::Content && this->mMethod == "POST")
+            if(this->mState == HttpDecodeState::Content)
             {
                 if(this->mMethod == "GET")
                 {

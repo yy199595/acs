@@ -4,14 +4,10 @@
 #include "Core/App.h"
 #include "Thread/TaskThread.h"
 #include "HttpClientComponent.h"
-#include "Network/Http/HttpRespSession.h"
-#include"Http/Request/HttpGetRequest.h"
-#include"Http/Request/HttpPostRequest.h"
 #include "Method/HttpServiceMethod.h"
 #include "Http/Service/HttpServiceComponent.h"
 #include "Other/ProtoConfig.h"
 #include"Other/ElapsedTimer.h"
-#include"Network/Http/HttpReqSession.h"
 #include"Util/StringHelper.h"
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
@@ -33,53 +29,48 @@ namespace GameKeeper
 
         std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
         this->mCorComponent->Start([this, url1]() {
-            std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
 
-            NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
-
-            std::string json;
-            RapidJsonWriter jsonWriter;
-            jsonWriter.Add("End", 100);
-            jsonWriter.Add("Start", 0);
-            jsonWriter.Add("RankId", 301000);
-
-            jsonWriter.WriterToStream(json);
-
-            std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(std::make_shared<SocketProxy>(thread, "http")));
-
-            auto response = httpAsyncClient->Post("http://127.0.0.1:7683/logic/QueryRankData", json);
-            if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
-            {
-                LOG_ERROR(response->GetContent());
-            }
         });
         return true;
     }
 
+    void HttpClientComponent::OnLoadData()
+    {
+        std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
+
+        std::string json;
+        RapidJsonWriter jsonWriter;
+        jsonWriter.Add("End", 100);
+        jsonWriter.Add("Start", 0);
+        jsonWriter.Add("RankId", 301000);
+
+        jsonWriter.WriterToStream(json);
+        NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(std::make_shared<SocketProxy>(thread, "http")));
+
+        auto response = httpAsyncClient->Get("http://127.0.0.1:80/logic/QueryRankData?{1122334455}");
+        if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+        {
+            LOG_ERROR(response->GetContent());
+        }
+    }
+
     void HttpClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
-        this->mCorComponent->Start([socket](){
-            
-                                   });
+        std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(socket));
+        this->mCorComponent->Start(&HttpClientComponent::HandlerHttpData, this, handlerClient);
+    }
+
+    void HttpClientComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
+    {
+        std::shared_ptr<HttpHandlerRequest> requestData = httpClient->ReadHandlerContent();
+        LOG_WARN(requestData->GetMethod());
+        LOG_WARN(requestData->GetContent());
     }
 
 	void HttpClientComponent::OnRequest(HttpRespSession * remoteSession)
 	{
-        auto requestHandler = remoteSession->GetReuqestHandler();
-        const std::string & method = requestHandler->GetMethod();
-        const std::string & service = requestHandler->GetComponent();
-        auto httpMethod = this->GetHttpMethod(service, method);
 
-        if(httpMethod == nullptr)
-        {
-            requestHandler->SetResponseCode(HttpStatus::NOT_FOUND);
-            LOG_ERROR("not find http method {0}.{1}", service, method);
-        }
-        else
-        {
-            requestHandler->SetResponseCode(httpMethod->Invoke(remoteSession));
-        }
-        remoteSession->StartSendHttpMessage();
 	}
 
     HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &service, const std::string &method)
@@ -94,40 +85,13 @@ namespace GameKeeper
 
     XCode HttpClientComponent::Get(const std::string &url, int timeout)
     {
-        ElapsedTimer timer;
-        std::shared_ptr<HttpGetRequest> getRequest(new HttpGetRequest(url));
-        if (getRequest->HasParseError())
-        {
-            return XCode::HttpUrlParseError;
-        }
-        NetWorkThread &netWorkThread = this->mThreadComponent->AllocateNetThread();
-        std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
-        auto httpRespTask = httpLocalSession->NewTask<HttpGetRequest, HttpRespTask>(getRequest);
-
-        HttpStatus code = httpRespTask->AwaitGetCode();
-
-        LOG_ERROR(httpRespTask->Await());
-
-        LOG_DEBUG("time = {0}s", timer.GetSecond());
         return XCode::Successful;
     }
 
 
     XCode HttpClientComponent::Post(const std::string &url, const std::string & data, int timeout)
     {
-        ElapsedTimer timer;
-        std::shared_ptr<HttpPostRequest> postRequest(new HttpPostRequest(url, data));
-        if (postRequest->HasParseError())
-        {
-            return XCode::HttpUrlParseError;
-        }
-        NetWorkThread &netWorkThread = this->mThreadComponent->AllocateNetThread();
-        std::shared_ptr<HttpReqSession> httpLocalSession(new HttpReqSession(netWorkThread));
-        auto httpRespTask = httpLocalSession->NewTask<HttpPostRequest, HttpRespTask>(postRequest);
 
-        LOG_ERROR(Helper::String::FormatJson(httpRespTask->Await()));
-
-        LOG_DEBUG("time = ", timer.GetSecond(), "s");
         return XCode::Successful;
     }
 

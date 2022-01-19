@@ -3,15 +3,12 @@
 #include"Component/Component.h"
 namespace GameKeeper
 {
-	class HttpStringClient;
-    class HttpReadContent;
-    class HttpWriteContent;
     class HttpRespSession;
     class HttpServiceMethod;
     class HttpRequestHandler;	
 	class HttpReqSession;
-
-    class HttpClientComponent : public Component, public ISocketListen
+    class HttpHandlerClient;
+    class HttpClientComponent : public Component, public ISocketListen, public ILoadData
     {
     public:
         HttpClientComponent() = default;
@@ -19,6 +16,7 @@ namespace GameKeeper
     public:
         bool Awake() final;
         bool LateAwake() final;
+        void OnLoadData() final;
     public:
         XCode Get(const std::string &url, int timeout = 5);
 
@@ -34,6 +32,7 @@ namespace GameKeeper
 
     private:
         void Invoke(HttpRespSession *remoteRequest);
+        void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
         class TaskComponent *mCorComponent;
         class ThreadPoolComponent * mThreadComponent;

@@ -9,8 +9,6 @@ namespace GameKeeper
 {
     bool HttpOperComponent::Awake()
     {
-        this->Add("Hotfix", &HttpOperComponent::Hotfix, this);
-        this->Add("LoadConfig", &HttpOperComponent::LoadConfig, this);
         this->mOperAccountMap["root"] = "199595yjz";
         return true;
     }

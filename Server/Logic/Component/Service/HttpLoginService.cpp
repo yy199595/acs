@@ -9,7 +9,6 @@ namespace GameKeeper
 {
     bool HttpLoginService::Awake()
     {
-        this->Add("Login", &HttpLoginService::Login, this);
         return true;
     }
 

@@ -26,6 +26,12 @@
             "count":10000,
             "handler":"RpcClientComponent"
         },
+        "http":
+        {
+            "port":80,
+            "count": 1000,
+            "handler": "HttpClientComponent"
+        },
         "gate":
         {
             "port":1995,
@@ -59,7 +65,6 @@
         "RedisComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
-        "MysqlProxyComponent",
         "RpcClientComponent",
         "OperatorComponent",
         "GateComponent",

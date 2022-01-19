@@ -18,42 +18,6 @@ namespace GameKeeper
     protected:
         bool Awake() override;
 
-        template<typename T>
-        bool Add(const std::string & path, HttpServiceMethodType<T> func, T * o)
-        {
-            auto iter = this->mMethodMap.find(path);
-            if (iter != this->mMethodMap.end())
-            {
-                return false;
-            }
-            this->mMethodMap.emplace(path, new HttpServiceMethod1<T>(o, func));
-            return true;
-        }
-
-        template<typename T>
-        bool Add(const std::string & path, HttpServiceJsonMethodType<T> func, T * o)
-        {
-            auto iter = this->mMethodMap.find(path);
-            if (iter != this->mMethodMap.end())
-            {
-                return false;
-            }
-            this->mMethodMap.emplace(path, new HttpServiceJsonMethod<T>(o, func));
-            return true;
-        }
-
-        template<typename T>
-        bool Add(const std::string & path, HttpServiceJsonMethodRequestType<T> func, T * o)
-        {
-            auto iter = this->mMethodMap.find(path);
-            if (iter != this->mMethodMap.end())
-            {
-                return false;
-            }
-            this->mMethodMap.emplace(path, new HttpServiceJsonRequestMethod<T>(o, func));
-            return true;
-        }
-
     private:
         std::unordered_map<std::string, HttpServiceMethod *> mMethodMap;
     };
