@@ -15,6 +15,8 @@
 #include"Util/StringHelper.h"
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
+#include"Http/HttpRequestClient.h"
+#include"Http/HttpHandlerClient.h"
 namespace GameKeeper
 {
 
@@ -33,6 +35,8 @@ namespace GameKeeper
         this->mCorComponent->Start([this, url1]() {
             std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
 
+            NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
+
             std::string json;
             RapidJsonWriter jsonWriter;
             jsonWriter.Add("End", 100);
@@ -40,14 +44,23 @@ namespace GameKeeper
             jsonWriter.Add("RankId", 301000);
 
             jsonWriter.WriterToStream(json);
-            this->Post("http://baidu.com/logic/QueryRankData", json);
+
+            std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(std::make_shared<SocketProxy>(thread, "http")));
+
+            auto response = httpAsyncClient->Post("http://127.0.0.1:7683/logic/QueryRankData", json);
+            if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+            {
+                LOG_ERROR(response->GetContent());
+            }
         });
         return true;
     }
 
     void HttpClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
-
+        this->mCorComponent->Start([socket](){
+            
+                                   });
     }
 
 	void HttpClientComponent::OnRequest(HttpRespSession * remoteSession)

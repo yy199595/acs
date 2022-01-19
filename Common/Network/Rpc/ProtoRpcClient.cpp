@@ -53,7 +53,6 @@ namespace GameKeeper
 	{
         if(code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
         {
-            this->mIsOpen = false;
             this->mSocketProxy->Close();
             return;
         }

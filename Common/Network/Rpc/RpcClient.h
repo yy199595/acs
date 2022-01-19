@@ -15,13 +15,14 @@ namespace GameKeeper
 		virtual ~RpcClient() = default;
 	public:
 		void StartReceive();
-        inline bool IsOpen() const { return this->mIsOpen; }
         inline bool IsConnected() { return this->mIsConnect; }
 		inline const std::string & GetIp() const { return this->mIp; }
 		inline long long GetSocketId() const { return this->mSocketId; }
-		inline const std::string & GetAddress() const { return this->mAddress; }
+        inline bool IsOpen() const { return this->mSocketProxy->IsOpen(); }
         std::shared_ptr<SocketProxy> GetSocketProxy() const { return this->mSocketProxy;}
-	public:
+        inline const std::string & GetAddress() const { return this->mSocketProxy->GetAddress(); }
+
+    public:
 		virtual void Clear();
 		SocketType GetSocketType() { return this->mType; }
         bool StartConnect(const std::string & ip, unsigned short port);
@@ -40,7 +41,6 @@ namespace GameKeeper
         bool IsCanConnection();
         void SendData(char type, std::shared_ptr<Message> message);
 	protected:
-        bool mIsOpen;
         AsioContext & mContext;
 		NetWorkThread & mNetWorkThread;
         std::shared_ptr<SocketProxy> mSocketProxy;
@@ -48,7 +48,6 @@ namespace GameKeeper
 		std::string mIp;
         unsigned short mPort;
 		long long mSocketId;
-		std::string mAddress;
 		atomic_bool mIsConnect;
 		const SocketType mType;
 		long long mLastOperTime;

@@ -56,17 +56,15 @@ namespace GameKeeper
 	void NetworkListener::ListenConnect()
 	{
         NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, this->mConfig.Name));
-		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
-			[this, socketProxy](const asio::error_code & code)
+        std::shared_ptr<AsioTcpSocket> tcpSocket(new AsioTcpSocket(workThread.GetContext()));
+		this->mBindAcceptor->async_accept(*tcpSocket,
+			[this, &workThread, tcpSocket](const asio::error_code & code)
 		{
 			if (!code)
 			{
+                std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
 #ifdef __DEBUG__
-				AsioTcpSocket & socket = socketProxy->GetSocket();
-				unsigned short port = socket.remote_endpoint().port();
-				const std::string ip = socket.remote_endpoint().address().to_string();
-                LOG_INFO('[', ip, ':', port, "] connected ", this->mConfig.Name);
+                LOG_INFO('[', socketProxy->GetAddress(), "] connected ", this->mConfig.Name);
 #endif // __DEBUG__
                 mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}

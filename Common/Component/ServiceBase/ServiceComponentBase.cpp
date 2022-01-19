@@ -10,7 +10,7 @@ namespace GameKeeper
 {
 	bool ServiceComponentBase::AddMethod(ServiceMethod * method)
     {
-        auto *rpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>();
+        auto *rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
         if (rpcConfigComponent == nullptr)
         {
             return false;

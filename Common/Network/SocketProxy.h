@@ -9,23 +9,26 @@ namespace GameKeeper
 	class SocketProxy
 	{
 	public:
-		SocketProxy(NetWorkThread & thread, const std::string & name);
-		~SocketProxy() = default;
+        SocketProxy(NetWorkThread & thread, const std::string & name);
+        SocketProxy(NetWorkThread & thread, const std::string & name, std::shared_ptr<AsioTcpSocket> socket);
+        ~SocketProxy() = default;
 	public:
 		void Close();
-		bool IsOpen();	
-		AsioTcpSocket & GetSocket() { return this->mSocket; }
-		AsioContext & GetContext() { return this->mContext; }
+        void RefreshState();
+        bool IsOpen() { return this->mIsOpen; }
+		AsioTcpSocket & GetSocket() { return *mSocket; }
 		NetWorkThread & GetThread() { return this->mNetThread; }
 		long long GetSocketId() const { return this->mSocketId; }
 		const std::string & GetName() const { return this->mName; }
-	private:
-		std::mutex mLock;
+        const std::string & GetAddress() { return this->mAddress; }
+        AsioContext & GetContext() { return this->mNetThread.GetContext(); }
+    private:
 		long long mSocketId;
-		AsioTcpSocket mSocket;		
-		AsioContext & mContext;
+        std::string mAddress;
 		const std::string mName;
-		NetWorkThread & mNetThread;
+        std::atomic_bool mIsOpen;
+        NetWorkThread & mNetThread;
+        std::shared_ptr<AsioTcpSocket> mSocket;
 	};
 }
 

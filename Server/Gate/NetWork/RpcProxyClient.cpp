@@ -49,7 +49,6 @@ namespace GameKeeper
     {
         if(code == XCode::NetActiveShutdown)
         {
-            this->mIsOpen = false;
             this->mSocketProxy->Close();
             return;
         }

@@ -10,7 +10,6 @@ namespace GameKeeper
               mNetWorkThread(socket->GetThread())
     {
         this->mIp.clear();
-        this->mIsOpen = false;
         this->mIsConnect = false;
         this->mSocketId = socket->GetSocketId();
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
@@ -21,17 +20,11 @@ namespace GameKeeper
         this->mSocketId = 0;
         this->mLastOperTime = 0;
         this->mSocketProxy->Close();
-        this->mSocketProxy = nullptr;
     }
 
     void RpcClient::StartReceive()
     {
-        this->mIsOpen = true;
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-        AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
-        unsigned short port = socket.remote_endpoint().port();
-        this->mIp = socket.remote_endpoint().address().to_string();
-        this->mAddress = this->mIp + ":" + std::to_string(port);
         if (mNetWorkThread.IsCurrentThread())
         {
             this->ReceiveHead();
@@ -42,6 +35,7 @@ namespace GameKeeper
 
     void RpcClient::ReceiveHead()
     {
+        assert(this->mNetWorkThread.IsCurrentThread());
         const size_t count = sizeof(int) + sizeof(char);
         AsioTcpSocket &socket = this->mSocketProxy->GetSocket();
         std::shared_ptr<RpcClient> self = this->shared_from_this();
@@ -49,7 +43,6 @@ namespace GameKeeper
             self->mLastOperTime = Helper::Time::GetSecTimeStamp();
             if (code)
             {
-                this->mIsOpen = false;
                 STD_ERROR_LOG(code.message());
                 this->OnClientError(XCode::NetWorkError);
                 return;
@@ -60,7 +53,6 @@ namespace GameKeeper
             memcpy(&length, self->mReceiveBuffer + sizeof(char), sizeof(int));
             if (length >= MAX_DATA_COUNT)
             {
-                this->mIsOpen = false;
                 this->mSocketProxy->Close();
                 this->OnClientError(XCode::NetBigDataShutdown);
                 return;
@@ -74,7 +66,6 @@ namespace GameKeeper
                     this->ReceiveBody(type, length);
                     break;
                 default:
-                    this->mIsOpen = false;
                     this->mSocketProxy->Close();
                     this->OnClientError(XCode::UnKnowPacket);
                     break;
@@ -90,7 +81,6 @@ namespace GameKeeper
         {
             if (size > MAX_DATA_COUNT)
             {
-                this->mIsOpen = false;
                 this->mSocketProxy->Close();
                 this->OnClientError(XCode::NetBigDataShutdown);
                 return;
@@ -106,7 +96,6 @@ namespace GameKeeper
         {
             if (error_code)
             {
-                this->mIsOpen = false;
                 this->mSocketProxy->Close();
                 this->OnClientError(XCode::NetWorkError);
                 return;
@@ -149,6 +138,7 @@ namespace GameKeeper
     {
         this->mIp = ip;
         this->mPort = port;
+        assert(this->mNetWorkThread.IsCurrentThread());
         AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
         std::shared_ptr<RpcClient> self = this->shared_from_this();
         auto address = asio::ip::make_address_v4(ip);
@@ -164,6 +154,7 @@ namespace GameKeeper
             }
             this->OnConnect(code);
             this->mIsConnect = false;
+            this->mSocketProxy->RefreshState();
         });
     }
 
@@ -175,6 +166,7 @@ namespace GameKeeper
 
     void RpcClient::SendData(char type, std::shared_ptr<Message> message)
     {
+        assert(this->mNetWorkThread.IsCurrentThread());
         const int body = message->ByteSize();
         const int head = sizeof(char) + sizeof(int);
 
@@ -205,9 +197,8 @@ namespace GameKeeper
             }
             if (error_code)
             {
-                STD_ERROR_LOG(error_code.message());
-                this->mIsOpen = false;
                 this->mSocketProxy->Close();
+                STD_ERROR_LOG(error_code.message());
                 this->OnClientError(XCode::NetWorkError);
                 this->OnSendData(XCode::NetWorkError, message);
                 return;
