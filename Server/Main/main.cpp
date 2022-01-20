@@ -12,7 +12,7 @@
 #include "Component/MysqlProxyComponent.h"
 #include "Http/Component/HttpClientComponent.h"
 #include"Service/GateService.h"
-#include <Telnet/TelnetClientComponent.h>
+#include <Telnet/ConsoleComponent.h>
 
 #include "Component/Scene/LuaServiceMgrComponent.h"
 #include <Rpc/RpcComponent.h>
@@ -49,7 +49,7 @@ void RegisterComponent()
 //server
     ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
     ComponentFactory::Add<RpcClientComponent>("RpcClientComponent");
-    ComponentFactory::Add<TelnetClientComponent>("TelnetClientComponent");
+    ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
 
 // gate
     ComponentFactory::Add<GateComponent>("GateComponent");

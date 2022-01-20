@@ -37,6 +37,12 @@
             "port":1995,
             "count": 10000,
             "handler": "GateClientComponent"
+        },
+        "console":
+        {
+            "port": 8080,
+            "count": 1,
+            "handler" : "ConsoleComponent"
         }
     },
     "mysql": {
@@ -74,7 +80,6 @@
     "service": [
         "NodeAddressService",
         "GateService",
-        "MysqlService",
         "AccountService"
     ],
     "white_list": [

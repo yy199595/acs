@@ -91,7 +91,7 @@ namespace GameKeeper
     {
         if (this->mLuaEnv != nullptr)
         {
-            lua_close(this->mLuaEnv);
+            //lua_close(this->mLuaEnv);
         }
     }
 

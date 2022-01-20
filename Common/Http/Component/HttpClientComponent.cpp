@@ -43,14 +43,18 @@ namespace GameKeeper
         jsonWriter.Add("RankId", 301000);
 
         jsonWriter.WriterToStream(json);
-        NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
-        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
-
-        auto response = httpAsyncClient->Get("http://114.115.167.51/logic?11223");
-        if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+        //while(!json.empty())
         {
-            LOG_ERROR(response->GetContent());
+            ElapsedTimer elapsedTimer;
+            NetWorkThread &thread = this->mThreadComponent->AllocateNetThread();
+            std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+            std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+
+            auto response = httpAsyncClient->Get("http://114.115.167.51/logic?11223");
+            if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+            {
+                LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
+            }
         }
     }
 

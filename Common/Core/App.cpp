@@ -3,7 +3,9 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/ServiceComponent.h"
-
+#ifdef __DEBUG__
+#include"Telnet/ConsoleComponent.h"
+#endif
 using namespace GameKeeper;
 using namespace std::chrono;
 
@@ -32,6 +34,9 @@ namespace GameKeeper
         LOG_CHECK_RET_FALSE(this->AddComponent<ServiceComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
+#ifdef __DEBUG__
+      this->AddComponent<ConsoleComponent>();
+#endif
 
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("component", components))
@@ -152,6 +157,7 @@ namespace GameKeeper
 	{
 		this->OnDestory();
 		this->mIsClose = true;
+        this->mTaskScheduler.Stop();
 #ifdef _WIN32
 		return getchar();
 #endif
