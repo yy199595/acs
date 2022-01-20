@@ -4,7 +4,7 @@
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
-namespace GameKeeper
+namespace Sentry
 {
 	ProtoRpcClient::ProtoRpcClient(RpcClientComponent *component,
                                    std::shared_ptr<SocketProxy> socket, SocketType type)

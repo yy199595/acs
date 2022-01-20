@@ -4,7 +4,7 @@
 #include<memory>
 
 using namespace std;
-namespace GameKeeper
+namespace Sentry
 {
     enum SessionType
     {

@@ -6,7 +6,7 @@
 using namespace google::protobuf;
 #define TCP_BUFFER_COUNT 1024
 #define MAX_DATA_COUNT 1024 * 20 //处理的最大数据
-namespace GameKeeper
+namespace Sentry
 {
     class RpcClient : public std::enable_shared_from_this<RpcClient>
 	{

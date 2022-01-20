@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_OPERATORCOMPONENT_H
 #define GAMEKEEPER_OPERATORCOMPONENT_H
 #include"Component.h"
-namespace GameKeeper
+namespace Sentry
 {
     class OperatorComponent : public Component
     {

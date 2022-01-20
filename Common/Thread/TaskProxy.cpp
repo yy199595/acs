@@ -2,7 +2,7 @@
 #include <Util/TimeHelper.h>
 #include <Scene/ThreadPoolComponent.h>
 #include <Core/App.h>
-namespace GameKeeper
+namespace Sentry
 {
     TaskProxy::TaskProxy()
     {
@@ -26,4 +26,4 @@ namespace GameKeeper
     {
         this->mCorComponent->Resume(this->mCorId);
     }
-}// namespace GameKeeper
+}// namespace Sentry

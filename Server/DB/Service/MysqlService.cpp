@@ -5,7 +5,7 @@
 #include "Core/App.h"
 #include "Pool/MessagePool.h"
 #include"Other/ElapsedTimer.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool MysqlService::Awake()
     {
@@ -166,7 +166,7 @@ namespace GameKeeper
             Message *message = Helper::Proto::NewByJson(protoFullName, json);
             if (message == nullptr)
             {
-                return XCode::JsonCastProtocbufFail;
+                return XCode::JsonCastProtoFailure;
             }
             response.add_datas()->PackFrom(*message);
         }
@@ -212,10 +212,10 @@ namespace GameKeeper
             Message *message = Helper::Proto::NewByJson(request.data(), json);
             if (message == nullptr)
             {
-                return XCode::JsonCastProtocbufFail;
+                return XCode::JsonCastProtoFailure;
             }
             response.add_datas()->PackFrom(*message);
         }
         return XCode::Successful;
     }
-}// namespace GameKeeper
+}// namespace Sentry

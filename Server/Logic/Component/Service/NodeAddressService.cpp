@@ -6,7 +6,7 @@
 #include"Network/Listener/TcpServerComponent.h"
 #include"Util/JsonHelper.h"
 #include"RedisComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool NodeAddressService::Awake()
     {
@@ -111,4 +111,4 @@ namespace GameKeeper
         LOG_WARN("remove [", address,"] count = ", response->GetNumber());
         return true;
     }
-}// namespace GameKeeper
+}// namespace Sentry

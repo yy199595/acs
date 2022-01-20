@@ -7,7 +7,7 @@
 #ifndef GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #define GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #include"Component.h"
-namespace GameKeeper
+namespace Sentry
 {
     class GateComponent : public Component,
                           public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>

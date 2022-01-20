@@ -6,7 +6,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 using namespace std;
-namespace GameKeeper
+namespace Sentry
 {
     class RapidJsonWriter
     {
@@ -64,9 +64,9 @@ namespace GameKeeper
         rapidjson::StringBuffer mStringBuf;
         rapidjson::Writer<rapidjson::StringBuffer> mJsonWriter;
     };
-}// namespace GameKeeper
+}// namespace Sentry
 
-namespace GameKeeper
+namespace Sentry
 {
     class RapidJsonReader
     {
@@ -92,4 +92,4 @@ namespace GameKeeper
         rapidjson::Value * mJsonValue;
 		rapidjson::Document mDdocument;
     };
-}// namespace GameKeeper
+}// namespace Sentry

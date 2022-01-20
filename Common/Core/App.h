@@ -13,7 +13,7 @@ using namespace std;
 using namespace asio::ip;
 
 
-namespace GameKeeper
+namespace Sentry
 {
 	enum ExitCode
 	{
@@ -25,7 +25,7 @@ namespace GameKeeper
 	};
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	class Manager;
 
@@ -126,4 +126,4 @@ namespace GameKeeper
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
     };
-}// namespace GameKeeper
+}// namespace Sentry

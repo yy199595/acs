@@ -8,7 +8,7 @@
 #else
 #include<Define/ThreadQueue.h>
 #endif
-namespace GameKeeper
+namespace Sentry
 {
 	template<typename T>
 	class MultiThreadQueue
@@ -96,4 +96,4 @@ namespace GameKeeper
         return this->mQeue.try_dequeue(item);
 #endif
 	}
-}// namespace GameKeeper
+}// namespace Sentry

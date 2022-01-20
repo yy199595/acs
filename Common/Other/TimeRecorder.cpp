@@ -4,7 +4,7 @@
 #include <Util/TimeHelper.h>
 #include <fstream>
 
-namespace GameKeeper
+namespace Sentry
 {
     TimeRecorder::TimeRecorder()
     {
@@ -112,4 +112,4 @@ namespace GameKeeper
         fs.close();
         return true;
     }
-}// namespace GameKeeper
+}// namespace Sentry

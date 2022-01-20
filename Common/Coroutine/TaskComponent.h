@@ -10,7 +10,7 @@
 #include<Component/Component.h>
 #include"Other/DoubleQueue.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     class TaskComponent : public Component,
             public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate

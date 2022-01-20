@@ -8,7 +8,7 @@
 #include"jemalloc/jemalloc.h"
 #endif
 using namespace std::chrono;
-namespace GameKeeper
+namespace Sentry
 {
 	void MainEntry(tb_context_from_t parame)
 	{

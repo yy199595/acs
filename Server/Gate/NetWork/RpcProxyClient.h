@@ -7,7 +7,7 @@
 
 #include"Network/Rpc/RpcClient.h"
 using namespace google::protobuf;
-namespace GameKeeper
+namespace Sentry
 {
     class GateClientComponent;
     class RpcProxyClient : public RpcClient

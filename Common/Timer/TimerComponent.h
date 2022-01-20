@@ -3,7 +3,7 @@
 #include"TimeWheelLayer.h"
 #include<Component/Component.h>
 #include<Method/MethodProxy.h>
-namespace GameKeeper
+namespace Sentry
 {
     class TimerComponent : public Component, public ISystemUpdate
     {
@@ -56,4 +56,4 @@ namespace GameKeeper
     {
         return new T(std::forward<Args>(args)...);
     }
-}// namespace GameKeeper
+}// namespace Sentry

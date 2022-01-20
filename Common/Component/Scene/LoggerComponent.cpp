@@ -5,7 +5,7 @@
 #include"spdlog/sinks/rotating_file_sink.h"
 #include"Other/backward.hpp"
 using namespace backward;
-namespace GameKeeper
+namespace Sentry
 {
     std::string thread_local LoggerComponent::mLogBuffer;
 	// 单线程  st  多线程  mt

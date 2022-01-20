@@ -3,7 +3,7 @@
 #include "TimerBase.h"
 #include <Script/LuaInclude.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     class LuaActionTimer : public TimerBase
     {
@@ -21,4 +21,4 @@ namespace GameKeeper
         int mMaxInvokeCount;
         lua_State *mLuaEnv;
     };
-}// namespace GameKeeper
+}// namespace Sentry

@@ -5,7 +5,7 @@
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 
-namespace GameKeeper
+namespace Sentry
 {
 	class RpcClientComponent;
 	class ProtoRpcClient : public RpcClient
@@ -29,4 +29,4 @@ namespace GameKeeper
         RpcClientComponent * mTcpComponent;
         std::shared_ptr<TaskSource<bool>> mConnectTaskSource;
 	};
-}// namespace GameKeeper
+}// namespace Sentry

@@ -11,7 +11,7 @@
 #endif
 using namespace com;
 using namespace google::protobuf;
-namespace GameKeeper
+namespace Sentry
 {
     class IRpcTask : public std::enable_shared_from_this<IRpcTask>
     {

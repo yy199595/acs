@@ -7,7 +7,7 @@
 
 #include<queue>
 #include<mutex>
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class DoubleQueue

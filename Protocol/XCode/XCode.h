@@ -28,9 +28,9 @@ enum class XCode
 	LuaCoroutineWait = 24,//等待lua协程返回
 	CallLuaFunctionFail = 25,//调用lua方法错误
 	NotResponseMessage = 26,//不返回数据
-	JsonCastProtocbufFail = 27,//json转protobuf失败
-	ProtocbufCastJsonFail = 28,//protobuf转json失败
-	CreatePorotbufFail = 29,//创建protobuf失败
+	JsonCastProtoFailure = 27,//json转protobuf失败
+	ProtoCastJsonFailure = 28,//protobuf转json失败
+	CreateProtoFailure = 29,//创建protobuf失败
 	SerializationFailure = 30,//序列化失败
 	CommandArgsError = 31,//GM命令参数错误
 	SessionIsNull = 32,//Session是空
@@ -49,7 +49,7 @@ enum class XCode
 	RedisStartTaskFail = 45,//Redis任务启动失败
 	RedisSocketIsNull = 46,//Redis连接是空
 	RedisReplyIsNull = 47,//Redis回复是空
-	RedisInvokeFailure = 48,//Rsedis命令执行失败
+	RedisInvokeFailure = 48,//Redis命令执行失败
 	AccountAlreadyExists = 49,//账号已经存在
 	AccountNotExists = 50,//账号不存在
 	HttpTaskStarFail = 51,//Http任务启动失败

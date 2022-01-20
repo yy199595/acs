@@ -9,7 +9,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Other/StringFmt.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool MysqlProxyComponent::Awake()
     {

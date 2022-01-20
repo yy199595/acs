@@ -4,7 +4,7 @@
 #include <Object/GameObject.h>
 #include <Util/StringHelper.h>
 #include"Util/DirectoryHelper.h"
-using namespace GameKeeper;
+using namespace Sentry;
 namespace LuaAPIExtension
 {
     int GameObjectGetComponent(lua_State *lua)

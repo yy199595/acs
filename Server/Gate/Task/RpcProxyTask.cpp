@@ -5,7 +5,7 @@
 #include"RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"Component/GateComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     RpcProxyTask::RpcProxyTask()
     {

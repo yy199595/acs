@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 #include"Component.h"
-namespace GameKeeper
+namespace Sentry
 {
     class RpcProxyClient;
     class GateClientComponent : public Component, public ISocketListen,

@@ -6,7 +6,7 @@
 #include <rapidjson/document.h>
 #include <Pool/MessagePool.h>
 #include <google/protobuf/util/json_util.h>
-namespace GameKeeper
+namespace Sentry
 {
 	bool RpcConfigComponent::Awake()
     {

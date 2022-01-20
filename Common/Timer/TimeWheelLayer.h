@@ -3,7 +3,7 @@
 
 #include "TimerBase.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     class TimeWheelLayer
     {

@@ -12,7 +12,7 @@
 #define COR_POOL_COUNT 100
 
 
-namespace GameKeeper
+namespace Sentry
 {
 
 	class TaskContext;
@@ -37,7 +37,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	class TaskComponent;
 	class CoroutineGroup

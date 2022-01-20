@@ -2,7 +2,7 @@
 #include"Async/TaskSource.h"
 #include<Define/CommonTypeDef.h>
 #include<Thread/TaskThread.h>
-namespace GameKeeper
+namespace Sentry
 {
     struct ListenConfig
     {

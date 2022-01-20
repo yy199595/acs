@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include"CoroutineDef.h"
-namespace GameKeeper
+namespace Sentry
 {
     enum CorState
     {

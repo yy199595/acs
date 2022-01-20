@@ -10,7 +10,7 @@
 #include<Pool/MessagePool.h>
 #include"Async/RpcTask/RpcTaskSource.h"
 #endif
-namespace GameKeeper
+namespace Sentry
 {
     bool RpcClientComponent::Awake()
     {
@@ -222,4 +222,4 @@ namespace GameKeeper
         clientSession->SendToServer(message);
         return true;
     }
-}// namespace GameKeeper
+}// namespace Sentry

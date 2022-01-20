@@ -3,7 +3,7 @@
 //
 #include"TaskSourceBase.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     TaskSourceBase::TaskSourceBase()
             : mTaskScheduler(App::Get().GetTaskScheduler())

@@ -4,7 +4,7 @@
 #include"Util/TimeHelper.h"
 using namespace std::chrono;
 
-namespace GameKeeper
+namespace Sentry
 {
 	IThread::IThread(std::string  name)
 		: mName(std::move(name)), mIsClose(false)
@@ -30,7 +30,7 @@ namespace GameKeeper
 
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     TaskThread::TaskThread()
         : IThread("task")
@@ -81,7 +81,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     NetWorkThread::NetWorkThread()
         : IThread("net"), mAsioContext(nullptr)
@@ -131,7 +131,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
 		: IThread("main"), mMainMethod(method)
@@ -177,4 +177,4 @@ namespace GameKeeper
 	}
 }
 
-// namespace GameKeeper
+// namespace Sentry

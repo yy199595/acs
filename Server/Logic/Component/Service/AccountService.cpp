@@ -6,7 +6,7 @@
 #include "Component/MysqlProxyComponent.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
 #include<google/protobuf/util/json_util.h>
-namespace GameKeeper
+namespace Sentry
 {
     bool AccountService::Awake()
     {
@@ -82,4 +82,4 @@ namespace GameKeeper
         size_t size = sprintf(buffer, "%s:%lld:%d", account.c_str(), now, number);
         return Helper::Md5::GetMd5(buffer, size);
     }
-}// namespace GameKeeper
+}// namespace Sentry

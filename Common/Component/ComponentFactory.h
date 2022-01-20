@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <Component/Component.h>
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class TypeProxy : public Type
@@ -13,7 +13,7 @@ namespace GameKeeper
         Component *New() final { return new T(); }
     };
 }
-namespace GameKeeper
+namespace Sentry
 {
 	class ComponentFactory
 	{
@@ -66,7 +66,7 @@ namespace GameKeeper
 	};
 
 	template<typename T>
-	Component * GameKeeper::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
+	Component * Sentry::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);
@@ -78,4 +78,4 @@ namespace GameKeeper
 		return CreateComponent(type->Name);
 	}
 #define REGISTER_COMPONENT(type) ComponentFactory::Add<type>(#type)
-}// namespace GameKeeper
+}// namespace Sentry

@@ -6,7 +6,7 @@
 #include"Service/NodeAddressService.h"
 #include"Scene/ServiceComponent.h"
 #include"Service/ServiceEntity.h"
-namespace GameKeeper
+namespace Sentry
 {
     ServiceNode::ServiceNode(const std::string &name, const std::string &address)
     {

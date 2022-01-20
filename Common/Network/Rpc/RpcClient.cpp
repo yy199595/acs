@@ -2,7 +2,7 @@
 #include"Core/App.h"
 #include"Util/TimeHelper.h"
 #include<iostream>
-namespace GameKeeper
+namespace Sentry
 {
     RpcClient::RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type)
             : mType(type), mSocketProxy(socket),

@@ -3,7 +3,7 @@
 #include<istream>
 #include<SocketProxy.h>
 #include<Async/TaskSource.h>
-namespace GameKeeper
+namespace Sentry
 {
     class TelnetContent
     {
@@ -13,7 +13,7 @@ namespace GameKeeper
         std::string Paramater;
     };
 }
-namespace GameKeeper
+namespace Sentry
 {
 	class ConsoleComponent;
 	class TelnetClient

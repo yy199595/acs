@@ -8,7 +8,7 @@
 #include"Async/TaskSource.h"
 #include"RedisClient/RedisDefine.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     class RedisClient : std::enable_shared_from_this<RedisClient>
     {

@@ -5,7 +5,7 @@
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
 #include"Service/NodeAddressService.h"
-namespace GameKeeper
+namespace Sentry
 {
 	ServiceEntity::ServiceEntity(const std::string & name)
 		: mServiceName(name)
@@ -182,4 +182,4 @@ namespace GameKeeper
         serviceNode->PushMessage(requestData);
         return XCode::Successful;
     }
-}// namespace GameKeeper
+}// namespace Sentry

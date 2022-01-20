@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_SERVICENODE_H
 #define GAMEKEEPER_SERVICENODE_H
 #include"Rpc/RpcClientComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     enum class NodeState
     {

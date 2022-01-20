@@ -8,7 +8,7 @@
 using namespace std;
 using namespace com;
 
-namespace GameKeeper
+namespace Sentry
 {
     class ServiceMethod;
     class ServiceComponentBase : public Component {

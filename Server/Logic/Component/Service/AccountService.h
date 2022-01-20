@@ -3,7 +3,7 @@
 #include<Protocol/c2s.pb.h>
 #include<Component/ServiceBase/ServiceComponentBase.h>
 #define USER_ID_START 7788
-namespace GameKeeper
+namespace Sentry
 {
 
     class RedisComponent;
@@ -30,4 +30,4 @@ namespace GameKeeper
         RedisComponent *mRedisComponent;
         MysqlProxyComponent *mMysqlComponent;
     };
-}// namespace GameKeeper
+}// namespace Sentry

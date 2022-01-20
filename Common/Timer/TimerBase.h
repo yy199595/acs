@@ -4,7 +4,7 @@
 #include <Util/TimeHelper.h>
 #include <functional>
 
-namespace GameKeeper
+namespace Sentry
 {
     class TimerBase
     {
@@ -25,4 +25,4 @@ namespace GameKeeper
         long long mStartTime;
         long long mTargetTime;
     };
-}// namespace GameKeeper
+}// namespace Sentry

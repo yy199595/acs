@@ -7,7 +7,7 @@
 #include"Util/TimeHelper.h"
 #include"Core/App.h"
 #include"Scene/ThreadPoolComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool MonitorComponent::Awake()
     {

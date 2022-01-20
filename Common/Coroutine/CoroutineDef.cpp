@@ -2,7 +2,7 @@
 #include"TaskComponent.h"
 #include"TaskContext.h"
 #include<Core/App.h>
-namespace GameKeeper
+namespace Sentry
 {
 	TaskContextPool::~TaskContextPool()
 	{
@@ -68,7 +68,7 @@ namespace GameKeeper
 	}
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	CoroutineGroup::CoroutineGroup(size_t size)
     {

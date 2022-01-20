@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.3)
-project(GameKeeper)
+project(Sentry)
 if(MSVC)
     enable_language(C CXX ASM_MASM)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")

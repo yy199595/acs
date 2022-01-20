@@ -3,7 +3,7 @@
 #include"MysqlDefine.h"
 #include"Async/TaskSource.h"
 #include<Thread/TaskProxy.h>
-namespace GameKeeper
+namespace Sentry
 {
     class SqlTableConfig;
 

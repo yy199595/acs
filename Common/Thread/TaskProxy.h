@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
-namespace GameKeeper
+namespace Sentry
 {
 
     class ThreadPoolComponent;

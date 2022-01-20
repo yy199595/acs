@@ -4,7 +4,7 @@
 #include"OperatorComponent.h"
 #include"Timer/TimerComponent.h"
 #include"Core/App.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool OperatorComponent::Awake()
     {

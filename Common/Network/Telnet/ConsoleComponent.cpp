@@ -4,7 +4,7 @@
 #include"ServiceBase/ServiceComponentBase.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
-namespace GameKeeper
+namespace Sentry
 {
 	bool ConsoleComponent::Awake()
 	{

@@ -4,52 +4,52 @@
 
 #include"RedisDefine.h"
 #include"Pool/MessagePool.h"
-namespace GameKeeper
+namespace Sentry
 {
     RedisCmdRequest::RedisCmdRequest(const std::string &cmd)
     {
-        this->mConmand = std::move(cmd);
+        this->mCommand = std::move(cmd);
     }
 
-    void RedisCmdRequest::AddParamater(int value)
+    void RedisCmdRequest::AddParameter(int value)
     {
-        this->mParamaters.emplace_back(std::to_string(value));
+        this->mParameters.emplace_back(std::to_string(value));
     }
 
-    void RedisCmdRequest::AddParamater(long long value)
+    void RedisCmdRequest::AddParameter(long long value)
     {
-        this->mParamaters.emplace_back(std::to_string(value));
+        this->mParameters.emplace_back(std::to_string(value));
     }
 
-    void RedisCmdRequest::AddParamater(const Message &message)
+    void RedisCmdRequest::AddParameter(const Message &message)
     {
         std::string json;
         Helper::Proto::GetJson(message, json);
-        this->AddParamater(json);
+        this->AddParameter(json);
     }
 
-    void RedisCmdRequest::AddParamater(const std::string &value)
+    void RedisCmdRequest::AddParameter(const std::string &value)
     {
-        this->mParamaters.emplace_back(std::move(value));
+        this->mParameters.emplace_back(std::move(value));
     }
 
     void RedisCmdRequest::GetCommand(std::iostream &readStream) const
     {
-        if(this->mParamaters.empty())
+        if(this->mParameters.empty())
         {
-            readStream << this->mConmand << "\r\n";
+            readStream << this->mCommand << "\r\n";
             return;
         }
-        readStream << "*" << this->mParamaters.size() + 1 << "\r\n";
-        readStream << "$" << this->mConmand.size() << "\r\n" << this->mConmand << "\r\n";
-        for(const std::string & paramater : this->mParamaters)
+        readStream << "*" << this->mParameters.size() + 1 << "\r\n";
+        readStream << "$" << this->mCommand.size() << "\r\n" << this->mCommand << "\r\n";
+        for(const std::string & parameter : this->mParameters)
         {
-            readStream << "$" << paramater.size() << "\r\n" << paramater << "\r\n";
+            readStream << "$" << parameter.size() << "\r\n" << parameter << "\r\n";
         }
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     RedisCmdResponse::RedisCmdResponse()
     {
@@ -94,7 +94,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     RedisResponse::RedisResponse(redisReply *reply)
     {
@@ -199,7 +199,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     RedisAsioResp::RedisAsioResp()
     {

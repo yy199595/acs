@@ -9,7 +9,7 @@
 #include"Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Async/RpcTask/RpcTaskSource.h"
-namespace GameKeeper
+namespace Sentry
 {
 	bool RpcComponent::Awake()
 	{
@@ -135,4 +135,4 @@ namespace GameKeeper
         }
 #endif
     }
-}// namespace GameKeeper
+}// namespace Sentry

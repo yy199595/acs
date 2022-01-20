@@ -4,7 +4,7 @@
 #include"HttpRequestClient.h"
 #include"Http.h"
 #include<regex>
-namespace GameKeeper
+namespace Sentry
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy)
     {

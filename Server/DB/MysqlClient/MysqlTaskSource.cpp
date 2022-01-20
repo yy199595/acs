@@ -4,7 +4,7 @@
 #include<Coroutine/TaskComponent.h>
 #include"Util/JsonHelper.h"
 #include"Scene/ThreadPoolComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     MysqlTaskSource::MysqlTaskSource(MysqlComponent * component)
        : mMsqlComponent(component)
@@ -128,4 +128,4 @@ namespace GameKeeper
                 break;
         }
     }
-}// namespace GameKeeper
+}// namespace Sentry

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace GameKeeper
+namespace Sentry
 {
     class ProtoConfig
     {
@@ -15,4 +15,4 @@ namespace GameKeeper
         std::string Request;
         std::string Response;
     };
-}// namespace GameKeeper
+}// namespace Sentry

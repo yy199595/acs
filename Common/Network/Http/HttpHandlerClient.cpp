@@ -4,7 +4,7 @@
 
 #include"HttpHandlerClient.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     HttpHandlerClient::HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy)
     {

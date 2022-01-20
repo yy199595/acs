@@ -5,7 +5,7 @@
 #include<Other/MultiThreadQueue.h>
 #include"Network/Rpc/ProtoRpcClient.h"
 #include"Pool/AllotorPool.h"
-namespace GameKeeper
+namespace Sentry
 {
 	// 管理所有session
 	class RpcClientComponent : public Component, public ISocketListen,

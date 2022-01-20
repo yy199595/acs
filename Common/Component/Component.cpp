@@ -1,6 +1,6 @@
 #include"Component.h"
 #include<Object/GameObject.h>
-namespace GameKeeper
+namespace Sentry
 {
 	Component::Component()
 		: gameObject(nullptr)

@@ -3,7 +3,7 @@
 //
 #include"RedisClient.h"
 #include"Pool/MessagePool.h"
-namespace GameKeeper
+namespace Sentry
 {
     RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket)
         : mNetworkThread(socket->GetThread())

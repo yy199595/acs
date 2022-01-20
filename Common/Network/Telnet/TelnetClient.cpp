@@ -2,7 +2,7 @@
 #include"TelnetClient.h"
 #include"Util/StringHelper.h"
 #include <Define/CommonLogDef.h>
-namespace GameKeeper
+namespace Sentry
 {
 	TelnetClient::TelnetClient(std::shared_ptr<SocketProxy> socketProxy)
 	{

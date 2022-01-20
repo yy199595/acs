@@ -5,7 +5,7 @@
 #include<Script/LuaInclude.h>
 
 #define RedisLuaArgvSize 10
-namespace GameKeeper
+namespace Sentry
 {
     class QuertJsonWritre;
 

@@ -1,7 +1,7 @@
 #include"ServiceComponent.h"
 #include"RpcConfigComponent.h"
 #include"Service/ServiceEntity.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool ServiceComponent::Awake()
     {
@@ -30,4 +30,4 @@ namespace GameKeeper
         auto iter = this->mServiceEntityMap.find(name);
         return iter != this->mServiceEntityMap.end() ? iter->second : nullptr;
     }
-}// namespace GameKeeper
+}// namespace Sentry

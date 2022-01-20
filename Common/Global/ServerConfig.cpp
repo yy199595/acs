@@ -3,7 +3,7 @@
 #include<Define/CommonLogDef.h>
 #include<Util/FileHelper.h>
 #include"Util/DirectoryHelper.h"
-namespace GameKeeper
+namespace Sentry
 {
     ServerConfig::ServerConfig(std::string  path)
             : mConfigPath(std::move(path))

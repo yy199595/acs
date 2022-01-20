@@ -1,7 +1,7 @@
 #pragma once
 #include "ServiceMethod.h"
 struct lua_State;
-namespace GameKeeper
+namespace Sentry
 {
 
 	class ProtoConfig;

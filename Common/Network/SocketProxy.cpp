@@ -1,7 +1,7 @@
 #include"SocketProxy.h"
 #include<Util/Guid.h>
 #include<spdlog/fmt/fmt.h>
-namespace GameKeeper
+namespace Sentry
 {
     SocketProxy::SocketProxy(NetWorkThread &thread, const std::string &name, std::shared_ptr<AsioTcpSocket> socket)
         : mNetThread(thread), mName(name)

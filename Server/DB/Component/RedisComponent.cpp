@@ -9,7 +9,7 @@
 #include"Scene/ThreadPoolComponent.h"
 #include"ServiceBase/ServiceComponentBase.h"
 #include"RedisClient/NetWork/RedisClient.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool RedisComponent::Awake()
     {
@@ -32,10 +32,10 @@ namespace GameKeeper
             return nullptr;
         }
         std::shared_ptr<RedisCmdRequest> redisCmdRequest(new RedisCmdRequest("EVALSHA"));
-        redisCmdRequest->InitParamater(script, (int)args.size() + 1, func);
+        redisCmdRequest->InitParameter(script, (int) args.size() + 1, func);
         for(const std::string & val : args)
         {
-            redisCmdRequest->AddParamater(val);
+            redisCmdRequest->AddParameter(val);
         }
         return this->InvokeCommand(redisCmdRequest);
     }
@@ -127,7 +127,7 @@ namespace GameKeeper
                 if(!this->mRedisConfig.mPassword.empty())
                 {
                     std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
-                    request->AddParamater(this->mRedisConfig.mPassword);
+                    request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = redisCommandClient->InvokeCommand(request)->Await();
                     if(!response->IsOk())
                     {
@@ -157,7 +157,7 @@ namespace GameKeeper
                 if(!this->mRedisConfig.mPassword.empty())
                 {
                     std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
-                    request->AddParamater(this->mRedisConfig.mPassword);
+                    request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = redisClinet->InvokeCommand(request)->Await();
                     if(!response->IsOk())
                     {
@@ -201,7 +201,7 @@ namespace GameKeeper
     bool RedisComponent::SubscribeChannel(const std::string &chanel)
     {
         std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
-        request->AddParamater(std::move(chanel));
+        request->AddParameter(std::move(chanel));
         auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
         return !response->HasError();
     }
@@ -247,7 +247,7 @@ namespace GameKeeper
                 if (!this->mRedisConfig.mPassword.empty())
                 {
                     std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
-                    request->AddParamater(this->mRedisConfig.mPassword);
+                    request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
                     if (response == nullptr || response->IsOk())
                     {

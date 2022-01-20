@@ -4,7 +4,7 @@
 #include"Protocol/c2s.pb.h"
 #include<Pool/StringPool.h>
 #include"XCode/XCode.h"
-namespace GameKeeper
+namespace Sentry
 {
     class IStart
     {

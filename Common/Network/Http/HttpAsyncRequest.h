@@ -8,7 +8,7 @@
 #include<asio.hpp>
 #include<Http/Http.h>
 #include<unordered_map>
-namespace GameKeeper
+namespace Sentry
 {
     class IHttpStream
     {
@@ -17,7 +17,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class HttpAsyncRequest : public IHttpStream
     {
@@ -41,7 +41,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     enum class HttpDecodeState
     {
@@ -58,7 +58,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class HttpAsyncResponse : public IHttpContent
     {
@@ -79,7 +79,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class HttpHandlerRequest : public IHttpContent
     {
@@ -103,7 +103,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class HttpHandlerResponse : public IHttpStream
     {

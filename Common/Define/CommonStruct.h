@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-namespace GameKeeper
+namespace Sentry
 {
 	struct NetworkLatencyInfo
 	{

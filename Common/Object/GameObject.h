@@ -1,7 +1,7 @@
 #pragma once
 
 #include<Component/ComponentFactory.h>
-namespace GameKeeper
+namespace Sentry
 {
     class Component;
     class GameObject : public Object

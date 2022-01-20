@@ -8,7 +8,7 @@
 #include"Util/Guid.h"
 #include"Util/TimeHelper.h"
 #include"Core/App.h"
-namespace GameKeeper
+namespace Sentry
 {
     enum class TaskState
     {

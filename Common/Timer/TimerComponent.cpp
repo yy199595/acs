@@ -1,7 +1,7 @@
 ﻿#include "TimerComponent.h"
 #include <Timer/DelayTimer.h>
 #include"Core/App.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool TimerComponent::Awake()
     {
@@ -131,4 +131,4 @@ namespace GameKeeper
         LOG_ERROR("add timer {0} failure", timer->GetTimerId());
         return false;
     }
-}// namespace GameKeeper
+}// namespace Sentry

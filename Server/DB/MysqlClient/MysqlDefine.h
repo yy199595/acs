@@ -15,8 +15,8 @@
 #include<Thread/TaskProxy.h>
 
 using namespace std;
-using namespace GameKeeper;
-namespace GameKeeper
+using namespace Sentry;
+namespace Sentry
 {
     class MysqlComponent;
 

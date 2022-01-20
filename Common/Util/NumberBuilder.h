@@ -1,6 +1,6 @@
 #pragma once
 #include <Define/CommonTypeDef.h>
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class NumberBuilder
@@ -30,4 +30,4 @@ namespace GameKeeper
     {
         this->mNumberQueue.push(num);
     }
-}// namespace GameKeeper
+}// namespace Sentry

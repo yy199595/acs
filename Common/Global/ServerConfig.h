@@ -6,7 +6,7 @@
 #include <rapidjson/document.h>
 #include <Define/CommonTypeDef.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     class ServerConfig
     {

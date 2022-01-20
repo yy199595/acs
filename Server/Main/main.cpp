@@ -29,7 +29,7 @@
 #include"Scene/LoggerComponent.h"
 #include"Component/GateComponent.h"
 #include"Component/GateClientComponent.h"
-using namespace GameKeeper;
+using namespace Sentry;
 
 void RegisterComponent()
 {

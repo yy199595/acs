@@ -5,7 +5,7 @@
 #ifdef REDIS_SAVE_JSON
 #include<google/protobuf/util/json_util.h>
 #endif
-namespace GameKeeper
+namespace Sentry
 {
 
     RedisTaskSource::RedisTaskSource(const std::string &cmd)
@@ -108,4 +108,4 @@ namespace GameKeeper
         }
     }
 
-}// namespace GameKeeper
+}// namespace Sentry

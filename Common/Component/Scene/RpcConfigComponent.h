@@ -3,7 +3,7 @@
 #include <Component/Component.h>
 #include <Other/ProtoConfig.h>
 #include <shared_mutex>
-namespace GameKeeper
+namespace Sentry
 {
     struct CodeConfig
     {
@@ -49,4 +49,4 @@ namespace GameKeeper
     };
 
 #define GKDebugCode(code) { App::Get().GetComponent<RpcConfigComponent>()->DebugCode(code); }
-}// namespace GameKeeper
+}// namespace Sentry

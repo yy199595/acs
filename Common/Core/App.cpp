@@ -6,10 +6,10 @@
 #ifdef __DEBUG__
 #include"Telnet/ConsoleComponent.h"
 #endif
-using namespace GameKeeper;
+using namespace Sentry;
 using namespace std::chrono;
 
-namespace GameKeeper
+namespace Sentry
 {
 	App *App::mApp = nullptr;
 

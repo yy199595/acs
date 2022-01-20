@@ -6,7 +6,7 @@
 #include"Pool/MessagePool.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Async/LuaTaskSource.h"
-namespace GameKeeper
+namespace Sentry
 {
 
 	LuaServiceMethod::LuaServiceMethod(const ProtoConfig * config, lua_State * lua, int idx)
@@ -74,7 +74,7 @@ namespace GameKeeper
         std::string json;
         if(request.has_data() && !Helper::Proto::GetJson(request.data(), json))
         {
-            return XCode::ProtocbufCastJsonFail;
+            return XCode::ProtoCastJsonFailure;
         }
         auto luaResponse = this->mProtoConfig->IsAsync
                 ? this->CallAsync(request.user_id(), json) : this->Call(request.user_id(), json);

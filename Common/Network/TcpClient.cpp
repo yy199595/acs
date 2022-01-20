@@ -6,7 +6,7 @@
 #include<stdlib.h>
 #include"Util/StringHelper.h"
 #include"Define/CommonLogDef.h"
-namespace GameKeeper
+namespace Sentry
 {
     TcpClient::TcpClient(std::shared_ptr<SocketProxy> socket, SocketType type)
         : mContext(socket->GetContext()), mNetworkThread(socket->GetThread())

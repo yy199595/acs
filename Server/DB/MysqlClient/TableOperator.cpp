@@ -3,7 +3,7 @@
 #include"Core/App.h"
 #include"Protocol/db.pb.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     TableOperator::TableOperator(GKMysqlSocket *socket)
     {

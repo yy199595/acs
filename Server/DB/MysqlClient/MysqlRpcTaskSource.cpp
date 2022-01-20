@@ -5,7 +5,7 @@
 #include"MysqlRpcTaskSource.h"
 #include"Pool/MessagePool.h"
 #include"Rpc/RpcComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     size_t MysqlRpcTaskSource::GetDataSize()
     {

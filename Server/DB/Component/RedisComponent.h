@@ -7,8 +7,8 @@
 #include"Coroutine/TaskComponent.h"
 #include"RedisClient/RedisTaskSource.h"
 #include"RedisClient/NetWork/RedisClient.h"
-using namespace GameKeeper;
-namespace GameKeeper
+using namespace Sentry;
+namespace Sentry
 {
 	class ThreadPoolComponent;
 
@@ -49,7 +49,7 @@ namespace GameKeeper
         std::shared_ptr<RedisCmdResponse> InvokeCommand(const std::string & cmd, Args && ... args)
         {
             std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest(cmd));
-            request->InitParamater(std::forward<Args>(args) ...);
+            request->InitParameter(std::forward<Args>(args) ...);
             return this->InvokeCommand(request);
         }
 

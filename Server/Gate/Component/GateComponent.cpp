@@ -15,7 +15,7 @@
 #include"Pool/MessagePool.h"
 #include<google/protobuf/util/json_util.h>
 #endif
-namespace GameKeeper
+namespace Sentry
 {
     bool GateComponent::Awake()
     {

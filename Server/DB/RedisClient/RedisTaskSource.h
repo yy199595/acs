@@ -8,7 +8,7 @@
 #include<queue>
 #include<google/protobuf/message.h>
 #include"Async/TaskSource.h"
-namespace GameKeeper
+namespace Sentry
 {
     class RedisComponent;
 
@@ -72,4 +72,4 @@ namespace GameKeeper
     {
         this->Encode(std::forward<Args>(args)...);
     }
-}// namespace GameKeeper
+}// namespace Sentry

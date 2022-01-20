@@ -4,7 +4,7 @@
 #include"MysqlClient/TableOperator.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     bool MysqlComponent::Awake()
     {

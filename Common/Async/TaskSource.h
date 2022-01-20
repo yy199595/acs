@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_TASKSOURCE_H
 #define GAMEKEEPER_TASKSOURCE_H
 #include"TaskSourceBase.h"
-namespace GameKeeper
+namespace Sentry
 {
     class LoopTaskSource : public TaskSourceBase
     {
@@ -45,7 +45,7 @@ namespace GameKeeper
     using TaskSourceShared = std::shared_ptr<TaskSource<std::shared_ptr<T>>>;
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     template<> class TaskSource<void> : public TaskSourceBase
     {
@@ -55,7 +55,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class TaskSource<T *> { };
@@ -67,7 +67,7 @@ namespace GameKeeper
     class TaskSource<const T &> { };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class TaskSource<std::shared_ptr<T>> : public TaskSourceBase

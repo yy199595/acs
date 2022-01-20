@@ -2,7 +2,7 @@
 #include<Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Script/LuaTable.h"
-namespace GameKeeper
+namespace Sentry
 {
     LuaServiceComponent::LuaServiceComponent()
 		: mIdx(0), mLuaEnv(nullptr)

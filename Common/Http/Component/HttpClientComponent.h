@@ -1,7 +1,7 @@
 
 #pragma once
 #include"Component/Component.h"
-namespace GameKeeper
+namespace Sentry
 {
     class HttpRespSession;
     class HttpServiceMethod;

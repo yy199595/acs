@@ -12,7 +12,7 @@
 #include <Method/MethodProxy.h>
 #include <Define/CommonTypeDef.h>
 using namespace google::protobuf;
-namespace GameKeeper
+namespace Sentry
 {
 	class Component;
 	class Type
@@ -28,7 +28,7 @@ namespace GameKeeper
 	};
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	class GameObject;
 	class Component : public Object
@@ -79,7 +79,6 @@ namespace GameKeeper
 		Type * mType;
 		long long gameObjectID;
 		GameObject * gameObject;
-		std::unordered_map<std::string, void*> mEventMap;
 	};
 	template<typename T>
 	inline T * Component::GetComponent()

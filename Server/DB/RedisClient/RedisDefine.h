@@ -9,19 +9,19 @@
 #include"XCode/XCode.h"
 #include<google/protobuf/message.h>
 
-using namespace GameKeeper;
+using namespace Sentry;
 using namespace google::protobuf;
 
 #define REDIS_SAVE_JSON
 
-namespace GameKeeper
+namespace Sentry
 {
     class RedisComponent;
 
     typedef redisContext RedisSocket;
-}// namespace GameKeeper
+}// namespace Sentry
 
-namespace GameKeeper
+namespace Sentry
 {
     enum class RedisRespType
     {
@@ -35,7 +35,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class RedisAsioResp
     {
@@ -56,7 +56,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class RedisCmdRequest
     {
@@ -67,28 +67,28 @@ namespace GameKeeper
         void GetCommand(std::iostream & readStream) const;
 
         template<typename ... Args>
-        void InitParamater(Args &&... args);
+        void InitParameter(Args &&... args);
     public:
-        void AddParamater(int value);
-        void AddParamater(long long value);
-        void AddParamater(const Message & message);
-        void AddParamater(const std::string & value);
+        void AddParameter(int value);
+        void AddParameter(long long value);
+        void AddParameter(const Message & message);
+        void AddParameter(const std::string & value);
     private:
         void Encode() {}
 
         template<typename T, typename... Args>
         inline void Encode(const T &t, Args... args)
         {
-            this->AddParamater(t);
+            this->AddParameter(t);
             this->Encode(std::forward<Args>(args)...);
         }
     private:
-        std::string mConmand;
-        std::list<std::string> mParamaters;
+        std::string mCommand;
+        std::list<std::string> mParameters;
     };
 
     template<typename ... Args>
-    void RedisCmdRequest::InitParamater(Args &&...args)
+    void RedisCmdRequest::InitParameter(Args &&...args)
     {
         this->Encode(std::forward<Args>(args)...);
     }
@@ -116,7 +116,7 @@ namespace GameKeeper
     };
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     class RedisResponse
     {

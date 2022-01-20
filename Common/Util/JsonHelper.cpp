@@ -1,6 +1,6 @@
 ﻿#include "JsonHelper.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     RapidJsonWriter::RapidJsonWriter()
         : mJsonWriter(mStringBuf)
@@ -161,9 +161,9 @@ namespace GameKeeper
     {
         return mJsonWriter.Key(key);
     }
-}// namespace GameKeeper
+}// namespace Sentry
 
-namespace GameKeeper
+namespace Sentry
 {
     bool RapidJsonReader::TryParse(const char *str, size_t size)
     {
@@ -326,4 +326,4 @@ namespace GameKeeper
         }
         return false;
     }
-}// namespace GameKeeper
+}// namespace Sentry

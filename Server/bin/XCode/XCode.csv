@@ -26,9 +26,9 @@ AddRpcCallbackFailure	添加rpc回调失败
 LuaCoroutineWait	等待lua协程返回
 CallLuaFunctionFail	调用lua方法错误
 NotResponseMessage	不返回数据
-JsonCastProtocbufFail	json转protobuf失败
-ProtocbufCastJsonFail	protobuf转json失败
-CreatePorotbufFail	创建protobuf失败
+JsonCastProtoFailure	json转protobuf失败
+ProtoCastJsonFailure	protobuf转json失败
+CreateProtoFailure	创建protobuf失败
 SerializationFailure	序列化失败
 CommandArgsError	GM命令参数错误
 SessionIsNull	Session是空
@@ -47,7 +47,7 @@ RedisNotInCoroutine	Redis没有协程上下文
 RedisStartTaskFail	Redis任务启动失败
 RedisSocketIsNull	Redis连接是空
 RedisReplyIsNull	Redis回复是空
-RedisInvokeFailure	Rsedis命令执行失败
+RedisInvokeFailure	Redis命令执行失败
 AccountAlreadyExists	账号已经存在
 AccountNotExists	账号不存在
 HttpTaskStarFail	Http任务启动失败

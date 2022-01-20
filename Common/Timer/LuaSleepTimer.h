@@ -3,7 +3,7 @@
 #include "TimerBase.h"
 #include <Script/LuaInclude.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     class LuaSleepTimer : public TimerBase
     {
@@ -20,4 +20,4 @@ namespace GameKeeper
         int mRef;
         lua_State *mLuaEnv;
     };
-}// namespace GameKeeper
+}// namespace Sentry

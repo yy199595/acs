@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_HTTPLOGINSERVICE_H
 #define GAMEKEEPER_HTTPLOGINSERVICE_H
 #include "Http/Service/HttpServiceComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     class HttpLoginService : public HttpServiceComponent
     {

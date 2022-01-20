@@ -7,7 +7,7 @@
 #include"Service/ServiceEntity.h"
 #include"NetWork/RpcProxyClient.h"
 #include"Component/GateClientComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool GateService::Awake()
     {

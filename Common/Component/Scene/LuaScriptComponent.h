@@ -4,7 +4,7 @@
 #include<Script/ClassProxyHelper.h>
 #include<Script/LuaTable.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     class LuaScriptComponent : public Component
     {

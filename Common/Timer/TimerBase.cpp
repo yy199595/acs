@@ -1,5 +1,5 @@
 #include "TimerBase.h"
-namespace GameKeeper
+namespace Sentry
 {
     TimerBase::TimerBase(long long ms)
     {
@@ -7,4 +7,4 @@ namespace GameKeeper
         this->mTimerId = Helper::Guid::Create();
         this->mTargetTime = this->mStartTime + ms;
     }
-}// namespace GameKeeper
+}// namespace Sentry

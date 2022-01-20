@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_ELAPSEDTIMER_H
 #define GAMEKEEPER_ELAPSEDTIMER_H
 #include"Util/TimeHelper.h"
-namespace GameKeeper
+namespace Sentry
 {
     class ElapsedTimer
     {

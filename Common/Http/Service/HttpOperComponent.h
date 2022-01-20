@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_HTTPOPERCOMPONENT_H
 #define GAMEKEEPER_HTTPOPERCOMPONENT_H
 #include "HttpServiceComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     class HttpOperComponent : public HttpServiceComponent
     {

@@ -28,22 +28,22 @@ while true do
         break
     end
     local content = {}
-    local linedata = split(line, "\t")
-    content.name = linedata[1]
-    content.desc = linedata[2]
+    local lineData = split(line, "\t")
+    content.name = lineData[1]
+    content.desc = lineData[2]
     content.value = file_count
     file_count = file_count + 1
     table.insert(file_content, content)
 end
-for index, conetnt in ipairs(file_content) do
+for index, content in ipairs(file_content) do
     if index == file_count then
-        lua_string = string.format("%s\n\t%s = %s--%s", lua_string, conetnt.name, conetnt.value, conetnt.desc)
-        cpp_string = string.format("%s\n\t%s = %s//%s", cpp_string, conetnt.name, conetnt.value, conetnt.desc)
-        csharp_string = string.format("%s\n\t%s = %s//%s", csharp_string, conetnt.name, conetnt.value, conetnt.desc)
+        lua_string = string.format("%s\n\t%s = %s--%s", lua_string, content.name, content.value, content.desc)
+        cpp_string = string.format("%s\n\t%s = %s//%s", cpp_string, content.name, content.value, content.desc)
+        csharp_string = string.format("%s\n\t%s = %s//%s", csharp_string, content.name, content.value, content.desc)
     else
-        lua_string = string.format("%s\n\t%s = %s,--%s", lua_string, conetnt.name, conetnt.value, conetnt.desc)
-        cpp_string = string.format("%s\n\t%s = %s,//%s", cpp_string, conetnt.name, conetnt.value, conetnt.desc)
-        csharp_string = string.format("%s\n\t%s = %s,//%s", csharp_string, conetnt.name, conetnt.value, conetnt.desc)
+        lua_string = string.format("%s\n\t%s = %s,--%s", lua_string, content.name, content.value, content.desc)
+        cpp_string = string.format("%s\n\t%s = %s,//%s", cpp_string, content.name, content.value, content.desc)
+        csharp_string = string.format("%s\n\t%s = %s,//%s", csharp_string, content.name, content.value, content.desc)
     end
 end
 

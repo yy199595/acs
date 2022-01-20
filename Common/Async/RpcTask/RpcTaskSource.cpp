@@ -4,7 +4,7 @@
 #ifdef __DEBUG__
 #include"Scene/RpcConfigComponent.h"
 #endif
-namespace GameKeeper
+namespace Sentry
 {
     LuaRpcTaskSource::LuaRpcTaskSource(lua_State *lua, lua_State *coroutine)
     {
@@ -20,7 +20,7 @@ namespace GameKeeper
 }
 
 
-namespace GameKeeper
+namespace Sentry
 {
     void RpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)
     {

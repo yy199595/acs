@@ -1,7 +1,7 @@
 #include"Object.h"
 #include<Util/Guid.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     Object::Object()
     {

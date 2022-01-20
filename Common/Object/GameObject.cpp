@@ -2,7 +2,7 @@
 #include"Core/App.h"
 #include <Define/CommonLogDef.h>
 #include <Component/Component.h>
-namespace GameKeeper
+namespace Sentry
 {
     GameObject::GameObject(long long id)
         : mGameObjectId(id), mSocketId(0)
@@ -101,4 +101,4 @@ namespace GameKeeper
         }
         return false;
     }
-}// namespace GameKeeper
+}// namespace Sentry

@@ -2,7 +2,7 @@
 
 #include <queue>
 
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class ObjectPool
@@ -81,4 +81,4 @@ namespace GameKeeper
 		t->CopyFrom(data);
 		return t;
 	}
-}// namespace GameKeeper
+}// namespace Sentry

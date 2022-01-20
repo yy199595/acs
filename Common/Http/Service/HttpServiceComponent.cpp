@@ -4,7 +4,7 @@
 
 #include "HttpServiceComponent.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     HttpServiceComponent::~HttpServiceComponent() noexcept
     {

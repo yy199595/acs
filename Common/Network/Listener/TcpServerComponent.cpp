@@ -4,7 +4,7 @@
 #include<Scene/ThreadPoolComponent.h>
 #include<Thread/TaskThread.h>
 #include<Listener/NetworkListener.h>
-namespace GameKeeper
+namespace Sentry
 {
     bool TcpServerComponent::Awake()
     {

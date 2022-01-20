@@ -6,7 +6,7 @@
 #define GAMEKEEPER_ALLOTORPOOL_H
 #include<queue>
 
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     class AllotorPool

@@ -3,7 +3,7 @@
 #ifdef _WIN32
 #include<Windows.h>
 #endif
-namespace GameKeeper
+namespace Sentry
 {
 	TaskContext::TaskContext()
     {

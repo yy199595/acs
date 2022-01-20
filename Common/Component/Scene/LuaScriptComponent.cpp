@@ -10,7 +10,7 @@
 #include<Util/MD5.h>
 #include"Async/LuaTaskSource.h"
 #include <Component/ServiceBase/LuaServiceComponent.h>
-namespace GameKeeper
+namespace Sentry
 {
     bool LuaScriptComponent::Awake()
     {
@@ -199,12 +199,12 @@ namespace GameKeeper
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetYearMonthDayString",
                                              Helper::Time::GetYearMonthDayString);
 
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Call", SystemExtension::Call);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Sleep", SystemExtension::Sleep);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "AsyncWait", SystemExtension::AddTimer);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "RemoveTimer", SystemExtension::RemoveTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Call", SystemExtension::Call);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Sleep", SystemExtension::Sleep);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "AsyncWait", SystemExtension::AddTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
 
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "GetManager", SystemExtension::GetManager);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "GetManager", SystemExtension::GetManager);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Debug", LuaAPIExtension::DebugLog);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log","Warning",LuaAPIExtension::DebugWarning);
@@ -221,10 +221,10 @@ namespace GameKeeper
 
     void LuaScriptComponent::RegisterExtension()
     {
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Log", LuaAPIExtension::DebugLog);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Info", LuaAPIExtension::DebugInfo);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Error", LuaAPIExtension::DebugError);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "GameKeeper", "Warning", LuaAPIExtension::DebugWarning);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Log", LuaAPIExtension::DebugLog);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Info", LuaAPIExtension::DebugInfo);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Error", LuaAPIExtension::DebugError);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
 
 
         lua_getglobal(this->mLuaEnv, "coroutine");

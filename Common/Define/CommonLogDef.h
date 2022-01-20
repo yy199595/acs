@@ -43,31 +43,31 @@ inline std::string FormatFileLine(const char * file, const int line)
 #define LOG_INFO(...) \
 {                             \
        const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(GameKeeper::ELogType::info, f, __VA_ARGS__)        \
+       GK_LOG(Sentry::ELogType::info, f, __VA_ARGS__)        \
 }
 
 #define LOG_DEBUG(...) \
 {                             \
        const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(GameKeeper::ELogType::debug, f, __VA_ARGS__)        \
+       GK_LOG(Sentry::ELogType::debug, f, __VA_ARGS__)        \
 }
 
 #define LOG_WARN(...) \
 {                             \
        const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(GameKeeper::ELogType::warn, f, __VA_ARGS__)        \
+       GK_LOG(Sentry::ELogType::warn, f, __VA_ARGS__)        \
 }
 
 #define LOG_ERROR(...) \
 {                                      \
        const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(GameKeeper::ELogType::err, f, __VA_ARGS__)          \
+       GK_LOG(Sentry::ELogType::err, f, __VA_ARGS__)          \
 }                              \
 
 #define LOG_FATAL(...) \
 {                                      \
        const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(GameKeeper::ELogType::critical, f, __VA_ARGS__)          \
+       GK_LOG(Sentry::ELogType::critical, f, __VA_ARGS__)          \
 }                              \
 
 

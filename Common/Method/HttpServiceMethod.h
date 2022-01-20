@@ -7,7 +7,7 @@
 #include <Http/Http.h>
 #include <Util/JsonHelper.h>
 #include <Util/TimeHelper.h>
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     using HttpServiceJsonMethodRequestType = XCode(T::*)(RapidJsonWriter & response);

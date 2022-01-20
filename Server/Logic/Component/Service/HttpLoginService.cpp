@@ -5,7 +5,7 @@
 #include "HttpLoginService.h"
 #include<Util/DirectoryHelper.h>
 #include<Util/MD5.h>
-namespace GameKeeper
+namespace Sentry
 {
     bool HttpLoginService::Awake()
     {

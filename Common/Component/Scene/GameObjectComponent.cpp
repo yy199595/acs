@@ -3,7 +3,7 @@
 #include"Object/GameObject.h"
 #include"Coroutine/TaskComponent.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     bool GameObjectComponent::Awake()
     {

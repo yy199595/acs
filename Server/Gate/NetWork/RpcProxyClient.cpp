@@ -9,7 +9,7 @@
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"Component/GateClientComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     RpcProxyClient::RpcProxyClient(std::shared_ptr<SocketProxy> socket, SocketType type,
                                    GateClientComponent *component)

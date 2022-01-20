@@ -10,7 +10,7 @@
 #include<Method/MethodProxy.h>
 #include<Other/DoubleQueue.h>
 
-namespace GameKeeper
+namespace Sentry
 {
 	class StaticMethod;
     enum ThreadState
@@ -116,4 +116,4 @@ namespace GameKeeper
 		StaticMethod * mMainMethod;
         DoubleQueue<StaticMethod*> mTaskQueue;
 	};
-}// namespace GameKeeper
+}// namespace Sentry

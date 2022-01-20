@@ -2,7 +2,7 @@
 #include <Util/Guid.h>
 #include <Core/App.h>
 #include <Method/MethodProxy.h>
-namespace GameKeeper
+namespace Sentry
 {
 	bool ThreadPoolComponent::Awake()
     {

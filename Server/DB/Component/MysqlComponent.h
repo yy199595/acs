@@ -6,7 +6,7 @@
 #include "MysqlClient/MysqlDefine.h"
 
 
-namespace GameKeeper
+namespace Sentry
 {
     class MysqlTaskAction;
 

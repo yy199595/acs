@@ -1,7 +1,7 @@
 #include"TimeWheelLayer.h"
 #include"Core/App.h"
 #include"Define/CommonLogDef.h"
-namespace GameKeeper
+namespace Sentry
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)
         : mLayerId(layerId), mMaxCount(count), mMin(min), mMax(max)
@@ -48,4 +48,4 @@ namespace GameKeeper
         }
         return false;
     }
-}// namespace GameKeeper
+}// namespace Sentry

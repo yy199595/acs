@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Component/Component.h>
-namespace GameKeeper
+namespace Sentry
 {
 	// 处理外部连接进来的session
     struct ListenConfig;

@@ -6,7 +6,7 @@
 #define GAMEKEEPER_RPCPROXYTASK_H
 #include"Async/RpcTask/RpcTaskSource.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     class RpcComponent;
     class GateComponent;

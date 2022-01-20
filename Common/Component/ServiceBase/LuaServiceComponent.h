@@ -5,7 +5,7 @@
 #include"ServiceBase/ServiceComponentBase.h"
 
 class LuaTable;
-namespace GameKeeper
+namespace Sentry
 {
     class LuaScriptComponent;
 
@@ -29,4 +29,4 @@ namespace GameKeeper
         class RpcConfigComponent * mRpcConfigComponent;
         std::unordered_map<std::string, int> mMethodMap;
     };
-}// namespace GameKeeper
+}// namespace Sentry

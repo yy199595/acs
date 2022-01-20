@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_LUATASKSOURCE_H
 #define GAMEKEEPER_LUATASKSOURCE_H
 #include"TaskSource.h"
-namespace GameKeeper
+namespace Sentry
 {
     class LuaTaskSource
     {

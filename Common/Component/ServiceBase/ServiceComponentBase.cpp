@@ -6,7 +6,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Pool/MessagePool.h"
 #endif
-namespace GameKeeper
+namespace Sentry
 {
 	bool ServiceComponentBase::AddMethod(ServiceMethod * method)
     {

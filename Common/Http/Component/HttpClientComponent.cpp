@@ -11,7 +11,7 @@
 #include"Scene/ThreadPoolComponent.h"
 #include"Http/HttpRequestClient.h"
 #include"Http/HttpHandlerClient.h"
-namespace GameKeeper
+namespace Sentry
 {
 
     bool HttpClientComponent::Awake()
@@ -43,7 +43,7 @@ namespace GameKeeper
         jsonWriter.Add("RankId", 301000);
 
         jsonWriter.WriterToStream(json);
-        //while(!json.empty())
+        while(!json.empty())
         {
             ElapsedTimer elapsedTimer;
             NetWorkThread &thread = this->mThreadComponent->AllocateNetThread();

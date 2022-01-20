@@ -4,7 +4,7 @@
 #include <Define/CommonLogDef.h>
 #include <Define/CommonTypeDef.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     class Object
     {
@@ -36,4 +36,4 @@ namespace GameKeeper
         bool mIsActive;
         std::string mClassName;
     };
-}// namespace GameKeeper
+}// namespace Sentry

@@ -6,7 +6,7 @@
 #define GAMEKEEPER_HTTPSERVICECOMPONENT_H
 #include "Component/Component.h"
 #include "Method/HttpServiceMethod.h"
-namespace GameKeeper
+namespace Sentry
 {
     class HttpServiceComponent : public Component
     {

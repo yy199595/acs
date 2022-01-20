@@ -7,7 +7,7 @@
 #include"Http.h"
 #include<iostream>
 #include<spdlog/fmt/fmt.h>
-namespace GameKeeper
+namespace Sentry
 {
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
     {
@@ -61,7 +61,7 @@ namespace GameKeeper
 
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     HttpAsyncResponse::HttpAsyncResponse()
     {
@@ -127,7 +127,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     HttpHandlerRequest::HttpHandlerRequest()
     {
@@ -230,7 +230,7 @@ namespace GameKeeper
     }
 }
 
-namespace GameKeeper
+namespace Sentry
 {
     void HttpHandlerResponse::AddValue(HttpStatus status)
     {

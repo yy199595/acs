@@ -8,7 +8,7 @@ public:
 	static constexpr char * Name = nullptr;
 };
 
-namespace GameKeeper
+namespace Sentry
 {
 	template<typename T>
 	inline bool GetTypeName(std::string & name) 

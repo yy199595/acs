@@ -7,7 +7,7 @@
 #include<SocketProxy.h>
 #include<Async/TaskSource.h>
 #include"HttpAsyncRequest.h"
-namespace GameKeeper
+namespace Sentry
 {
     class HttpRequestClient : std::enable_shared_from_this<HttpRequestClient>
     {

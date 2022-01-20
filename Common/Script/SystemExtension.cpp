@@ -7,7 +7,7 @@
 #include <Scene/LuaScriptComponent.h>
 
 #include <Service/ServiceEntity.h>
-using namespace GameKeeper;
+using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)
 {

@@ -3,7 +3,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace GameKeeper {
+namespace Sentry {
 
     class StaticMethod {
     public:

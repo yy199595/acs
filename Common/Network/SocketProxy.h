@@ -4,7 +4,7 @@
 #include<Thread/TaskThread.h>
 #include<Pool/StringPool.h>
 
-namespace GameKeeper
+namespace Sentry
 {
 	class SocketProxy
 	{
@@ -32,7 +32,7 @@ namespace GameKeeper
 	};
 }
 
-namespace GameKeeper
+namespace Sentry
 {
 	enum DataMessageType
 	{

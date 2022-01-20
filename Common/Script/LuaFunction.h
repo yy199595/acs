@@ -3,7 +3,7 @@
 #include"Core/App.h"
 #include<Define/CommonLogDef.h>
 #include"Script/LuaParameter.h"
-using namespace GameKeeper;
+using namespace Sentry;
 class LuaFunction
 {
 public:

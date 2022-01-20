@@ -9,7 +9,7 @@
 #include"Define/CommonLogDef.h"
 #include<google/protobuf/message.h>
 
-namespace GameKeeper
+namespace Sentry
 {
     template<typename T>
     using JsonSubFunction = void(T::*)(const RapidJsonReader & rapidJsonReader);

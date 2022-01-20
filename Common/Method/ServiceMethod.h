@@ -7,7 +7,7 @@
 #include<google/protobuf/any.pb.h>
 
 #include <utility>
-namespace GameKeeper
+namespace Sentry
 {
 	template<typename T>
 	using ServiceMethodType1 = XCode(T::*)();
@@ -33,10 +33,10 @@ namespace GameKeeper
 	template<typename T, typename T1>
 	using ServiceMethodType44 = XCode(T::*)(long long, T1 &);
 
-}// namespace GameKeeper
+}// namespace Sentry
 
 
-namespace GameKeeper
+namespace Sentry
 {
 	
 	class ServiceMethod

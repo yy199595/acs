@@ -5,7 +5,7 @@
 #include"Async/RpcTask/RpcTaskSource.h"
 
 using namespace google::protobuf;
-namespace GameKeeper
+namespace Sentry
 {
     class NodeHelper;
     class ServiceEntity
@@ -49,4 +49,4 @@ namespace GameKeeper
         class RpcConfigComponent *mRpcConfigComponent;
         std::unordered_map<std::string, std::shared_ptr<ServiceNode>> mServiceNodeMap;
     };
-}// namespace GameKeeper
+}// namespace Sentry

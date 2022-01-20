@@ -2,7 +2,7 @@
 
 #include"Component/ServiceBase/ServiceComponentBase.h"
 using namespace com;
-namespace GameKeeper
+namespace Sentry
 {
     class RpcComponent;
 

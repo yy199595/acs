@@ -5,7 +5,7 @@
 #ifndef GameKeeper_SERVERPATH_H
 #define GameKeeper_SERVERPATH_H
 
-namespace GameKeeper
+namespace Sentry
 {
     class ServerPath
     {

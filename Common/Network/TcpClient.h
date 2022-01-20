@@ -7,7 +7,7 @@
 #include"XCode/XCode.h"
 #include"SocketProxy.h"
 #include<asio/coroutine.hpp>
-namespace GameKeeper
+namespace Sentry
 {
     class TcpClient
     {

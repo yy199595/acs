@@ -7,7 +7,7 @@
 #define LOG_FILE_MAX_SUM 10
 #define LOG_FILE_MAX_SIZE 1024 * 1024 * 100
 using namespace Helper;
-namespace GameKeeper
+namespace Sentry
 {
 	typedef spdlog::level::level_enum ELogType;
 	class LoggerComponent : public Component, public IZeroRefresh

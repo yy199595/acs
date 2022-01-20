@@ -4,7 +4,7 @@
 
 #include"LuaTaskSource.h"
 #include"Pool/MessagePool.h"
-namespace GameKeeper
+namespace Sentry
 {
     LuaTaskSource::LuaTaskSource()
     {

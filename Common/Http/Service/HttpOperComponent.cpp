@@ -5,7 +5,7 @@
 #include "HttpOperComponent.h"
 #include"Core/App.h"
 #include"Scene/LoggerComponent.h"
-namespace GameKeeper
+namespace Sentry
 {
     bool HttpOperComponent::Awake()
     {

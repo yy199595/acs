@@ -3,7 +3,7 @@
 #include"Protocol/s2s.pb.h"
 #include"Component/ServiceBase/ServiceComponentBase.h"
 
-namespace GameKeeper
+namespace Sentry
 {
     class MysqlService : public ServiceComponentBase
     {
@@ -30,4 +30,4 @@ namespace GameKeeper
     private:
         class MysqlComponent *mMysqlComponent;
     };
-}// namespace GameKeeper
+}// namespace Sentry

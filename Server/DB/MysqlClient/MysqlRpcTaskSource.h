@@ -9,7 +9,7 @@
 #include"Protocol/db.pb.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 using namespace google::protobuf;
-namespace GameKeeper
+namespace Sentry
 {
     class RpcComponent;
     class MysqlRpcTaskSource : public IRpcTask

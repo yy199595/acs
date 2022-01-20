@@ -1,7 +1,7 @@
 #pragma once
 #include "TelnetClient.h"
 #include <Component/Component.h>
-namespace GameKeeper
+namespace Sentry
 {
     class TelnetClient;
     using ConsoleFunction = std::function<bool(const std::string &, std::vector<std::string> &)>;

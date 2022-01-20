@@ -1,12 +1,12 @@
 #include "ComponentFactory.h"
-namespace GameKeeper
+namespace Sentry
 {
 
 	std::unordered_map<size_t, Type *> ComponentFactory::mTypeInfoMap1;
 	std::unordered_map<std::string, Type *> ComponentFactory::mTypeInfoMap;
 	std::unordered_map<size_t, std::queue<Component *>> ComponentFactory::mComponentPool;
 
-	GameKeeper::Type * ComponentFactory::GetType(const std::string & name)
+	Sentry::Type * ComponentFactory::GetType(const std::string & name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		return iter != mTypeInfoMap.end() ? iter->second : nullptr;
