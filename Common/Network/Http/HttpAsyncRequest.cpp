@@ -242,7 +242,7 @@ namespace GameKeeper
     void HttpHandlerResponse::AddValue(HttpStatus status, const std::string &content)
     {
         std::ostream os(&this->mStreamBuffer);
-        os << HttpVersion << (int)status << HttpStatusToString(status) << "\r\n";
+        os << HttpVersion << ' ' << (int)status << ' ' << HttpStatusToString(status) << "\r\n";
         os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
         os << "Content-Length: " << content.size()<< "\r\n";
         os << "\r\n";

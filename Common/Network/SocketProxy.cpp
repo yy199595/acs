@@ -42,5 +42,7 @@ namespace GameKeeper
             asio::error_code code;
             this->mSocket->close(code);
         }
+        asio::error_code code;
+        this->mSocket->cancel(code);
 	}
 }

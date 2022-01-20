@@ -105,19 +105,28 @@ namespace GameKeeper
     void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port, std::shared_ptr<TaskSource<XCode>> taskSource)
     {
         AsioContext & context = this->mSocket->GetContext();
+        std::shared_ptr<asio::system_timer> connectTimer(new asio::system_timer(context, std::chrono::seconds(5)));
+        connectTimer->async_wait([this, taskSource](const asio::error_code & code)
+        {
+            if(!code)
+            {
+                this->mSocket->Close();
+                taskSource->SetResult(XCode::NetTimeout);
+            }
+        });
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
-        resolver->async_resolve(*query, [this, resolver, query, taskSource]
+        resolver->async_resolve(*query, [this, resolver, query, taskSource, connectTimer]
             (const asio::error_code &err, asio::ip::tcp::resolver::iterator iterator)
         {
             if(err)
             {
                 STD_ERROR_LOG(err.message());
-                taskSource->SetResult(XCode::HttpNetWorkError);
+                taskSource->SetResult(XCode::HostResolverError);
                 return;
             }
             AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-            asio::async_connect(tcpSocket, iterator, [taskSource, this]
+            asio::async_connect(tcpSocket, iterator, [taskSource, this, connectTimer]
                 (const asio::error_code & code, asio::ip::tcp::resolver::iterator iter)
             {
                 if(code)
@@ -126,6 +135,7 @@ namespace GameKeeper
                     taskSource->SetResult(XCode::HttpNetWorkError);
                     return;
                 }
+                connectTimer->cancel();
                 this->mSocket->RefreshState();
                 taskSource->SetResult(XCode::Successful);
             });

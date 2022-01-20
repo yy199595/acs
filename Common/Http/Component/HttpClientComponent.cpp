@@ -44,12 +44,13 @@ namespace GameKeeper
 
         jsonWriter.WriterToStream(json);
         NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
-        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(std::make_shared<SocketProxy>(thread, "http")));
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 
-        auto response = httpAsyncClient->Get(url);
+        auto response = httpAsyncClient->Get("http://114.115.167.51/logic?11223");
         if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
         {
-            //LOG_ERROR(response->GetContent());
+            LOG_ERROR(response->GetContent());
         }
     }
 
@@ -62,8 +63,9 @@ namespace GameKeeper
     void HttpClientComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         ElapsedTimer elapsedTimer;
-        std::shared_ptr<HttpHandlerRequest> requestData = httpClient->ReadHandlerContent();
-        LOG_WARN(requestData->GetMethod(), "  ", requestData->GetUrl(), "  ", requestData->GetContent());
+        std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->ReadHandlerContent();
+        LOG_CHECK_RET(httpRequestData);
+        LOG_WARN(httpRequestData->GetMethod(), "  ", httpRequestData->GetUrl(), "  ", httpRequestData->GetContent());
         //LOG_WARN(requestData->GetContent());
 
         std::string json;
