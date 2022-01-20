@@ -24,6 +24,12 @@ namespace GameKeeper
         if (this->mRunContext != nullptr)
         {
             this->mRunContext->Invoke();
+            int sid = this->mRunContext->sid;
+            Stack & stack = this->mSharedStack[sid];
+            if(stack.co == this->mRunContext->mCoroutineId)
+            {
+                stack.co = 0;
+            }
             this->mCorPool.Push(this->mRunContext);
         }
         tb_context_jump(this->mMainContext, nullptr);
@@ -190,6 +196,7 @@ namespace GameKeeper
         {
 			free(coroutine->mStack.p);
 			coroutine->mStack.p = (char *)malloc(size);
+            assert(coroutine->mStack.p);
         }
         coroutine->mStack.size = size;
         memcpy(coroutine->mStack.p, coroutine->mContext, size);

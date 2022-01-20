@@ -5,10 +5,8 @@
 #include "Thread/TaskThread.h"
 #include "HttpClientComponent.h"
 #include "Method/HttpServiceMethod.h"
-#include "Http/Service/HttpServiceComponent.h"
 #include "Other/ProtoConfig.h"
 #include"Other/ElapsedTimer.h"
-#include"Util/StringHelper.h"
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
 #include"Http/HttpRequestClient.h"
@@ -48,10 +46,10 @@ namespace GameKeeper
         NetWorkThread & thread = this->mThreadComponent->AllocateNetThread();
         std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(std::make_shared<SocketProxy>(thread, "http")));
 
-        auto response = httpAsyncClient->Get("http://127.0.0.1:80/logic/QueryRankData?{1122334455}");
+        auto response = httpAsyncClient->Get(url);
         if(response != nullptr && response->GetHttpCode() == HttpStatus::OK)
         {
-            LOG_ERROR(response->GetContent());
+            //LOG_ERROR(response->GetContent());
         }
     }
 
@@ -63,24 +61,23 @@ namespace GameKeeper
 
     void HttpClientComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
     {
+        ElapsedTimer elapsedTimer;
         std::shared_ptr<HttpHandlerRequest> requestData = httpClient->ReadHandlerContent();
-        LOG_WARN(requestData->GetMethod());
-        LOG_WARN(requestData->GetContent());
-    }
+        LOG_WARN(requestData->GetMethod(), "  ", requestData->GetUrl(), "  ", requestData->GetContent());
+        //LOG_WARN(requestData->GetContent());
 
-	void HttpClientComponent::OnRequest(HttpRespSession * remoteSession)
-	{
+        std::string json;
+        RapidJsonWriter jsonWriter;
+        jsonWriter.Add("End", 100);
+        jsonWriter.Add("Start", 0);
+        jsonWriter.Add("RankId", 301000);
 
-	}
+        jsonWriter.WriterToStream(json);
 
-    HttpServiceMethod *HttpClientComponent::GetHttpMethod(const std::string &service, const std::string &method)
-    {
-        auto component = this->GetComponent<HttpServiceComponent>(service);
-        if(component == nullptr)
+        if(httpClient->SendResponse(HttpStatus::OK, json))
         {
-            return nullptr;
+            LOG_INFO("http data response successful [", elapsedTimer.GetMs(), "ms]");
         }
-        return component->GetMethod(method);
     }
 
     XCode HttpClientComponent::Get(const std::string &url, int timeout)

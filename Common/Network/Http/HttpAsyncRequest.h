@@ -37,6 +37,7 @@ namespace GameKeeper
         std::string mPort;
         std::string mPath;
         asio::streambuf mSendStream;
+        std::unordered_map<std::string, std::string> mHeadMap;
     };
 }
 
@@ -86,8 +87,11 @@ namespace GameKeeper
         HttpHandlerRequest();
     public:
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
+    public:
+        const std::string & GetUrl() { return this->mUrl;}
         const std::string & GetMethod() { return this->mMethod; }
         const std::string & GetContent() final { return this->mContent; }
+        bool GetHeadContent(const std::string & key, std::string & value);
     private:
         std::string mUrl;
         std::string mMethod;
@@ -96,6 +100,19 @@ namespace GameKeeper
         HttpDecodeState mState;
         size_t mContentLength;
         std::unordered_map<std::string, std::string> mHeadMap;
+    };
+}
+
+namespace GameKeeper
+{
+    class HttpHandlerResponse : public IHttpStream
+    {
+    public:
+        void AddValue(HttpStatus status);
+        void AddValue(HttpStatus status, const std::string & content);
+        asio::streambuf & GetStream() final { return this->mStreamBuffer;}
+    private:
+        asio::streambuf mStreamBuffer;
     };
 }
 #endif //GAMEKEEPER_HTTPASYNCREQUEST_H

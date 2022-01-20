@@ -23,12 +23,7 @@ namespace GameKeeper
         XCode Post(const std::string &url, const std::string &data, int timeout = 5);
 
     public:
-
         void OnListen(std::shared_ptr<SocketProxy> socket) final;
-
-		void OnRequest(HttpRespSession * remoteSession);
-
-        HttpServiceMethod * GetHttpMethod(const std::string & service, const std::string & method);
 
     private:
         void Invoke(HttpRespSession *remoteRequest);

@@ -5,6 +5,8 @@
 #include"HttpAsyncRequest.h"
 #include<regex>
 #include"Http.h"
+#include<iostream>
+#include<spdlog/fmt/fmt.h>
 namespace GameKeeper
 {
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
@@ -133,6 +135,17 @@ namespace GameKeeper
         this->mState = HttpDecodeState::FirstLine;
     }
 
+    bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
+    {
+        auto iter = this->mHeadMap.find(key);
+        if(iter != this->mHeadMap.end())
+        {
+            value = iter->second;
+            return true;
+        }
+        return false;
+    }
+
     HttpStatus HttpHandlerRequest::OnReceiveData(asio::streambuf &streamBuffer)
     {
         std::iostream io(&streamBuffer);
@@ -159,6 +172,7 @@ namespace GameKeeper
                     std::string key = lineData.substr(0, pos);
                     std::string val = lineData.substr(pos + 1, length);
                     this->mHeadMap.insert(std::make_pair(key, val));
+                    std::cout << fmt::format("key = {0}  value = {1}", key, val) << std::endl;
                 }
             }
             if(this->mState == HttpDecodeState::Content)
@@ -169,6 +183,8 @@ namespace GameKeeper
                     if(pos != std::string::npos)
                     {
                         this->mContent = mUrl.substr(pos + 1);
+                        this->mUrl = this->mUrl.substr(0, pos);
+                        return HttpStatus::OK;
                     }
                 }
                 else if(this->mMethod == "POST")
@@ -180,6 +196,10 @@ namespace GameKeeper
                     }
                     const std::string &str = iter->second;
                     this->mContentLength = std::stol(str);
+                    if(this->mContentLength <= 0)
+                    {
+                        return HttpStatus::LENGTH_REQUIRED;
+                    }
                 }
                 else
                 {
@@ -207,5 +227,25 @@ namespace GameKeeper
             }
         }
         return HttpStatus::CONTINUE;
+    }
+}
+
+namespace GameKeeper
+{
+    void HttpHandlerResponse::AddValue(HttpStatus status)
+    {
+        std::ostream os(&this->mStreamBuffer);
+        os << HttpVersion << (int)status << HttpStatusToString(status) << "\r\n";
+        os << "\r\n";
+    }
+
+    void HttpHandlerResponse::AddValue(HttpStatus status, const std::string &content)
+    {
+        std::ostream os(&this->mStreamBuffer);
+        os << HttpVersion << (int)status << HttpStatusToString(status) << "\r\n";
+        os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
+        os << "Content-Length: " << content.size()<< "\r\n";
+        os << "\r\n";
+        os.write(content.c_str(), content.size());
     }
 }

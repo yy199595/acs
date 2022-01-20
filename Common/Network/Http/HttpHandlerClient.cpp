@@ -24,6 +24,42 @@ namespace GameKeeper
         return handlerRequest;
     }
 
+    bool HttpHandlerClient::SendResponse(HttpStatus status)
+    {
+        this->mResponseData.AddValue(status);
+        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+        netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
+        return taskSource->Await();
+    }
+
+    bool HttpHandlerClient::SendResponse(HttpStatus status, const std::string &content)
+    {
+        this->mResponseData.AddValue(status, content);
+        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+        netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
+        return taskSource->Await();
+    }
+
+    void HttpHandlerClient::ResponseData(std::shared_ptr<TaskSource<bool>> taskSource)
+    {
+        AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
+        asio::streambuf & streambuf = this->mResponseData.GetStream();
+        std::shared_ptr<HttpHandlerClient> self = this->shared_from_this();
+        asio::async_write(tcpSocket, streambuf, [this, self, taskSource]
+                (const asio::error_code & code, size_t size)
+        {
+            if(code)
+            {
+                STD_ERROR_LOG(code.message());
+                taskSource->SetResult(false);
+                return;
+            }
+            taskSource->SetResult(true);
+        });
+    }
+
     void HttpHandlerClient::ReadHttpData(std::shared_ptr<TaskSource<bool>> taskSource,
                                          std::shared_ptr<HttpHandlerRequest> handlerRequest)
     {
@@ -37,7 +73,8 @@ namespace GameKeeper
                         taskSource->SetResult(false);
                         return;
                     }
-                    switch (handlerRequest->OnReceiveData(this->mStreamBuffer))
+                    HttpStatus httpCode = handlerRequest->OnReceiveData(this->mStreamBuffer);
+                    switch (httpCode)
                     {
                         case HttpStatus::CONTINUE:
                             this->ReadHttpData(taskSource, handlerRequest);
@@ -46,6 +83,7 @@ namespace GameKeeper
                             taskSource->SetResult(true);
                             break;
                         default:
+                            this->SendResponse(httpCode);
                             break;
                     }
                 });

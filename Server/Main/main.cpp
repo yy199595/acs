@@ -77,6 +77,9 @@ void RegisterServiceComponent()
     ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
 }
 
+
+
+
 int main(int argc, char **argv)
 {
     try
