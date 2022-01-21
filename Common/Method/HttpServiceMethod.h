@@ -4,21 +4,60 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICEMETHOD_H
 #define GAMEKEEPER_HTTPSERVICEMETHOD_H
-#include <Http/Http.h>
-#include <Util/JsonHelper.h>
-#include <Util/TimeHelper.h>
+#include<Http/Http.h>
+#include<Util/JsonHelper.h>
+#include<Util/TimeHelper.h>
 namespace Sentry
 {
     template<typename T>
-    using HttpServiceJsonMethodRequestType = XCode(T::*)(RapidJsonWriter & response);
+    using HttpJsonMethod1 = XCode(T::*)(RapidJsonWriter & response);
 
     template<typename T>
-    using HttpServiceJsonMethodType = XCode(T::*)(const RapidJsonReader & request, RapidJsonWriter & response);
+    using HttpJsonMethod2 = XCode(T::*)(const RapidJsonReader & request, RapidJsonWriter & response);
 
     class HttpServiceMethod
     {
     public:
-        virtual HttpStatus Invoke(const std::string & content) = 0;
+        virtual XCode Invoke(const std::string & content, std::shared_ptr<RapidJsonWriter> response) = 0;
+    };
+
+    template<typename T>
+    class HttpServiceJsonMethod1 : public HttpServiceMethod
+    {
+    public:
+        HttpServiceJsonMethod1(T *o, HttpJsonMethod1<T> func);
+
+    public:
+        XCode Invoke(const std::string &content, std::shared_ptr<RapidJsonWriter> reaponse)
+        {
+           return (this->mObj*mFunction)(*reaponse);
+        }
+
+    private:
+        T * mObj;
+        HttpJsonMethod1<T> mFunction;
+    };
+
+    template<typename T>
+    class HttpServiceJsonMethod2 : public HttpServiceMethod
+    {
+    public:
+        HttpServiceJsonMethod2(T *o, HttpJsonMethod2<T> func);
+
+    public:
+        XCode Invoke(const std::string &content, std::shared_ptr<RapidJsonWriter> reaponse)
+        {
+            std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
+            if(!jsonReader->TryParse(content))
+            {
+                return XCode::ParseJsonFailure;
+            }
+            return (this->mObj*mFunction)(*jsonReader, *reaponse);
+        }
+
+    private:
+        T * mObj;
+        HttpJsonMethod2<T> mFunction;
     };
 
 }

@@ -50,7 +50,7 @@ namespace Sentry
             std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
             std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 
-            auto response = httpAsyncClient->Get("http://114.115.167.51/logic?11223");
+            auto response = httpAsyncClient->Post("http://dev-lrs-tt.whitewolvesx.com/auth-server/user/login/phone", json);
             if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
             {
                 LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
