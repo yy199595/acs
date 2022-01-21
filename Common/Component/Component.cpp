@@ -1,12 +1,12 @@
 #include"Component.h"
-#include<Object/GameObject.h>
+#include<Object/Entity.h>
 namespace Sentry
 {
 	Component::Component()
-		: gameObject(nullptr)
+		: mEntity(nullptr)
 	{
-		this->mType = nullptr;
-		this->gameObjectID = 0;
+        this->mEntityId = 0;
+        this->mType = nullptr;
 	}
 	
 	Component * Component::GetByHash(size_t hash)
@@ -16,17 +16,17 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		return this->gameObject->GetComponentByName(type->Name);
+		return this->mEntity->GetComponentByName(type->Name);
 	}
 
     Component *Component::GetByName(const std::string &name)
     {
-        return this->gameObject->GetComponentByName(name);
+        return this->mEntity->GetComponentByName(name);
     }
 
     void Component::GetComponents(std::vector<Component *> &components)
     {
-        this->gameObject->GetComponents(components);
+        this->mEntity->GetComponents(components);
     }
 
 }

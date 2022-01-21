@@ -1,7 +1,7 @@
 #pragma once
 
 #include"Protocol/s2s.pb.h"
-#include"Component/ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 
 namespace Sentry
 {

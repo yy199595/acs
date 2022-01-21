@@ -3,7 +3,7 @@
 //
 
 #include "HttpOperComponent.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #include"Scene/LoggerComponent.h"
 namespace Sentry
 {

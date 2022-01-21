@@ -4,14 +4,14 @@
 namespace Sentry
 {
     class Component;
-    class GameObject : public Object
+    class Entity : public Object
     {
     public:
-        GameObject(long long id);
+        Entity(long long id);
 
-        GameObject(long long id, long long socketId);
+        Entity(long long id, long long socketId);
 
-        ~GameObject() override = default;
+        ~Entity() override = default;
     public:
         template<typename T>
         inline bool AddComponent();
@@ -49,7 +49,7 @@ namespace Sentry
         std::unordered_map<std::string, Component *> mComponentMap;
     };
     template<typename T>
-    inline T *GameObject::GetComponent() const
+    inline T *Entity::GetComponent() const
     {
         Type *type = ComponentFactory::GetType<T>();
         if (type == nullptr)
@@ -74,7 +74,7 @@ namespace Sentry
     }
 
 	template<typename T>
-	T * GameObject::GetComponent(const std::string & name) const
+	T * Entity::GetComponent(const std::string & name) const
     {
         auto iter = this->mComponentMap.find(name);
         if (iter != this->mComponentMap.end())
@@ -86,7 +86,7 @@ namespace Sentry
     }
 
 	template<typename T>
-	inline bool GameObject::AddComponent()
+	inline bool Entity::AddComponent()
 	{
 		if (this->GetComponent<T>() == nullptr)
 		{			
@@ -97,7 +97,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-    inline bool GameObject::RemoveComponent()
+    inline bool Entity::RemoveComponent()
     {
 		Type * type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
@@ -108,7 +108,7 @@ namespace Sentry
     }
 
     template<typename T>
-    inline T *GameObject::GetOrAddComponent()
+    inline T *Entity::GetOrAddComponent()
     {
         T *component = this->GetComponent<T>();
         return component == nullptr ? this->AddComponent<T>() : component;

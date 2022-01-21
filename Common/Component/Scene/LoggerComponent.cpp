@@ -1,5 +1,5 @@
 #include"LoggerComponent.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #include"spdlog/async.h"
 #include"spdlog/sinks/stdout_color_sinks.h"
 #include"spdlog/sinks/rotating_file_sink.h"

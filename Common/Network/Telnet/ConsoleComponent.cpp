@@ -1,7 +1,7 @@
 #include"ConsoleComponent.h"
 #include"Coroutine/TaskComponent.h"
 #include"Scene/OperatorComponent.h"
-#include"ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -84,7 +84,7 @@ namespace Sentry
         {
             return false;
         }
-        return this->gameObject->AddComponent(paramater);
+        return this->mEntity->AddComponent(paramater);
     }
 
     bool ConsoleComponent::Close(const std::string &paramater, std::vector<std::string> &response)

@@ -1,6 +1,6 @@
 ﻿#include "RedisTaskSource.h"
 #include "Component/RedisComponent.h"
-#include <Core/App.h>
+#include "Object/App.h"
 #include"Scene/ThreadPoolComponent.h"
 #ifdef REDIS_SAVE_JSON
 #include<google/protobuf/util/json_util.h>

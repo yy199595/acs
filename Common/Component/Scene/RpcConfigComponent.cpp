@@ -1,6 +1,6 @@
 ﻿#include "RpcConfigComponent.h"
 
-#include <Core/App.h>
+#include "Object/App.h"
 #include <Util/FileHelper.h>
 #include <Util/StringHelper.h>
 #include <rapidjson/document.h>

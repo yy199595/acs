@@ -1,5 +1,5 @@
 #include "LuaSleepTimer.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #include <Define/CommonLogDef.h>
 namespace Sentry
 {

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include"ServiceNode.h"
+#include"ProxyClient.h"
 #include"Protocol/s2s.pb.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 
@@ -8,10 +8,10 @@ using namespace google::protobuf;
 namespace Sentry
 {
     class NodeHelper;
-    class ServiceEntity
+    class ServiceProxy
     {
     public:
-        explicit ServiceEntity(const std::string &name);
+        explicit ServiceProxy(const std::string &name);
 
     public:
         void AddAddress(const std::string &address);
@@ -22,7 +22,7 @@ namespace Sentry
 
         bool RemoveServiceNode(const std::string & address);
 
-        std::shared_ptr<ServiceNode> GetNode(const std::string & address);
+        std::shared_ptr<ProxyClient> GetNode(const std::string & address);
 
         std::shared_ptr<com::Rpc_Request> NewRequest(const std::string &method);
 
@@ -47,6 +47,6 @@ namespace Sentry
         std::queue<std::string> mAllAddress;
         class RedisComponent * mRedisComponent;
         class RpcConfigComponent *mRpcConfigComponent;
-        std::unordered_map<std::string, std::shared_ptr<ServiceNode>> mServiceNodeMap;
+        std::unordered_map<std::string, std::shared_ptr<ProxyClient>> mServiceNodeMap;
     };
 }// namespace Sentry

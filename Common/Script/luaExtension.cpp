@@ -1,7 +1,7 @@
 ﻿#include "luaExtension.h"
-#include <Core/App.h>
+#include "Object/App.h"
 #include <Component/Component.h>
-#include <Object/GameObject.h>
+#include <Object/Entity.h>
 #include <Util/StringHelper.h>
 #include"Util/DirectoryHelper.h"
 using namespace Sentry;
@@ -11,7 +11,7 @@ namespace LuaAPIExtension
     {
         LOG_CHECK_RET_ZERO(lua_isuserdata(lua, 1));
         LOG_CHECK_RET_ZERO(lua_isstring(lua, 2));
-        GameObject *gameObject = PtrProxy<GameObject>::Read(lua, 1);
+        Entity *gameObject = PtrProxy<Entity>::Read(lua, 1);
         if (gameObject)
         {
             const char *moduleName = lua_tostring(lua, 2);
@@ -82,7 +82,7 @@ namespace LuaAPIExtension
         LOG_CHECK_RET_ZERO(lua_isuserdata(lua, -2));
         LOG_CHECK_RET_ZERO(lua_isstring(lua, -1));
         const char *name = lua_tostring(lua, -1);
-        GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
+        Entity *gameObject = PtrProxy<Entity>::Read(lua, -2);
         if (gameObject)
         {
             Component *component = gameObject->GetComponent<Component>(name);
@@ -102,7 +102,7 @@ namespace LuaAPIExtension
         LOG_CHECK_RET_ZERO(lua_isuserdata(lua, -2));
         LOG_CHECK_RET_ZERO(lua_isstring(lua, -1));
         const char *name = lua_tostring(lua, -1);
-        GameObject *gameObject = PtrProxy<GameObject>::Read(lua, -2);
+        Entity *gameObject = PtrProxy<Entity>::Read(lua, -2);
         if (gameObject)
         {        
             if (gameObject->AddComponent(name))

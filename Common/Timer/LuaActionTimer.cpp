@@ -1,7 +1,7 @@
 ﻿#include "LuaActionTimer.h"
 #include <Define/CommonLogDef.h>
 #include <Util/MathHelper.h>
-#include"Core/App.h"
+#include"Object/App.h"
 namespace Sentry
 {
     LuaActionTimer::LuaActionTimer(lua_State *luaEnv, int ref, int interval, int count)

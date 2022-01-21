@@ -1,6 +1,6 @@
 #include"LuaServiceMethod.h"
 #include"Script/LuaInclude.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #include"Rpc/RpcClientComponent.h"
 #include"Scene/LuaScriptComponent.h"
 #include"Pool/MessagePool.h"

@@ -1,22 +1,22 @@
-#include "GameObject.h"
-#include"Core/App.h"
+#include "Entity.h"
+#include"App.h"
 #include <Define/CommonLogDef.h>
 #include <Component/Component.h>
 namespace Sentry
 {
-    GameObject::GameObject(long long id)
+    Entity::Entity(long long id)
         : mGameObjectId(id), mSocketId(0)
     {
     }
 
-    GameObject::GameObject(long long id, long long socketId)
+    Entity::Entity(long long id, long long socketId)
         : mGameObjectId(id), mSocketId(socketId)
     {
 
     }
 
 
-	bool GameObject::AddComponent(const std::string & name)
+	bool Entity::AddComponent(const std::string & name)
 	{		
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
@@ -26,7 +26,7 @@ namespace Sentry
 		return this->AddComponent(name, ComponentFactory::CreateComponent(name));
 	}
 
-	bool GameObject::AddComponent(const std::string & name, Component * component)
+	bool Entity::AddComponent(const std::string & name, Component * component)
 	{
 		if (component == nullptr)
 		{
@@ -38,8 +38,8 @@ namespace Sentry
 			LOG_ERROR("add {0} failure", name);
 			return false;
 		}
-		component->gameObject = this;
-		component->gameObjectID = mGameObjectId;
+		component->mEntity = this;
+		component->mEntityId = mGameObjectId;
         if(!component->Awake())
         {
             return false;
@@ -49,7 +49,7 @@ namespace Sentry
 		return true;
 	}
 
-	void GameObject::GetComponents(std::vector<Component*>& components) const
+	void Entity::GetComponents(std::vector<Component*>& components) const
 	{
 		components.clear();
         for(const std::string & name : this->mSortComponents)
@@ -62,7 +62,7 @@ namespace Sentry
         }
 	}
 
-	void GameObject::OnDestory()
+	void Entity::OnDestory()
     {
 		auto iter = this->mComponentMap.begin();
 		for (; iter != this->mComponentMap.end(); iter++)
@@ -78,13 +78,13 @@ namespace Sentry
 		this->mComponentMap.clear();
     }
 
-	Component * GameObject::GetComponentByName(const std::string & name)
+	Component * Entity::GetComponentByName(const std::string & name)
 	{
 		auto iter = this->mComponentMap.find(name);
 		return iter != this->mComponentMap.end() ? iter->second : nullptr;
 	}
 
-	bool GameObject::RemoveComponent(const std::string &name)
+	bool Entity::RemoveComponent(const std::string &name)
     {
         auto iter = this->mComponentMap.find(name);
         if (iter != this->mComponentMap.end())

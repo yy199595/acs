@@ -1,7 +1,7 @@
 ﻿#include"NodeAddressService.h"
-#include"Core/App.h"
-#include"Service/ServiceEntity.h"
-#include"Component/Scene/ServiceComponent.h"
+#include"Object/App.h"
+#include"Service/ServiceProxy.h"
+#include"Component/Scene/ServiceProxyComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Util/JsonHelper.h"
@@ -35,12 +35,12 @@ namespace Sentry
             std::vector<std::string> services;
             jsonReader.TryGetValue("address", address);
             jsonReader.TryGetValue("services", services);
-            ServiceComponent * serviceComponent = this->GetComponent<ServiceComponent>();
+            ServiceProxyComponent * serviceComponent = this->GetComponent<ServiceProxyComponent>();
             if(serviceComponent != nullptr)
             {
                 for(const std::string & name : services)
                 {
-                   auto serviceEntity = serviceComponent->GetServiceEntity(name);
+                   auto serviceEntity = serviceComponent->GetServiceProxy(name);
                    if(serviceEntity != nullptr)
                    {
                        serviceEntity->AddAddress(address);
@@ -64,7 +64,7 @@ namespace Sentry
             return;
         }
         std::vector<Component *> components;
-        this->gameObject->GetComponents(components);
+        this->GetComponents(components);
 
         std::vector<std::string> services
                 {
@@ -99,6 +99,17 @@ namespace Sentry
                 }
             }
         }
+    }
+
+    void NodeAddressService::OnDestory()
+    {
+        auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
+        const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
+        if (rpcListener == nullptr)
+        {
+            return;
+        }
+        this->RemoveNode(rpcListener->GetConfig().mAddress);
     }
 
     bool NodeAddressService::RemoveNode(const std::string &address)

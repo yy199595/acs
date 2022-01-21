@@ -1,11 +1,11 @@
 #include "MysqlProxyComponent.h"
 
-#include"Core/App.h"
-#include"Service/ServiceEntity.h"
+#include"Object/App.h"
+#include"Service/ServiceProxy.h"
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
 #include"Rpc/RpcComponent.h"
-#include"Scene/ServiceComponent.h"
+#include"Scene/ServiceProxyComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Other/StringFmt.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
@@ -21,7 +21,7 @@ namespace Sentry
     {
         this->mCorComponent = App::Get().GetTaskComponent();
         this->mRpcComponent = this->GetComponent<RpcComponent>();
-        this->mServiceComponent = this->GetComponent<ServiceComponent>();
+        this->mServiceComponent = this->GetComponent<ServiceProxyComponent>();
         return true;
     }
 
@@ -73,7 +73,7 @@ namespace Sentry
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
     {
-        auto mysqlEntity = this->mServiceComponent->GetServiceEntity("MysqlService");
+        auto mysqlEntity = this->mServiceComponent->GetServiceProxy("MysqlService");
         if(mysqlEntity == nullptr)
         {
             return nullptr;
@@ -91,7 +91,7 @@ namespace Sentry
             LOG_ERROR("allot MysqlService address failure", address);
             return nullptr;
         }
-        std::shared_ptr<ServiceNode> serviceNode = mysqlEntity->GetNode(address);
+        std::shared_ptr<ProxyClient> serviceNode = mysqlEntity->GetNode(address);
         if(serviceNode == nullptr)
         {
             LOG_ERROR("not find node : ", address);

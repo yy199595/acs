@@ -4,7 +4,7 @@
 
 #include"RpcProxyClient.h"
 #include"Protocol/c2s.pb.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"
 #endif

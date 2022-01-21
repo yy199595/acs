@@ -3,11 +3,11 @@
 //
 
 #include"GateComponent.h"
-#include"Core/App.h"
-#include"Service/ServiceEntity.h"
+#include"Object/App.h"
+#include"Service/ServiceProxy.h"
 #include"NetWork/RpcProxyClient.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Component/Scene/ServiceComponent.h"
+#include"Component/Scene/ServiceProxyComponent.h"
 #include"Task/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -28,8 +28,8 @@ namespace Sentry
     bool GateComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
-        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
+        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceProxyComponent>());
         LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
         return true;
     }
@@ -43,7 +43,7 @@ namespace Sentry
         }
 
         //TODO
-        auto serviceEntity = this->mServiceComponent->GetServiceEntity(config->Service);
+        auto serviceEntity = this->mServiceComponent->GetServiceProxy(config->Service);
 
         if (!config->Request.empty())
         {

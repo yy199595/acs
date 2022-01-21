@@ -1,6 +1,6 @@
 ﻿#include "TimerComponent.h"
 #include <Timer/DelayTimer.h>
-#include"Core/App.h"
+#include"Object/App.h"
 namespace Sentry
 {
     bool TimerComponent::Awake()

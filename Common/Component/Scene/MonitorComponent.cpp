@@ -5,7 +5,7 @@
 
 #include"MonitorComponent.h"
 #include"Util/TimeHelper.h"
-#include"Core/App.h"
+#include"Object/App.h"
 #include"Scene/ThreadPoolComponent.h"
 namespace Sentry
 {

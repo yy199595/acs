@@ -25,8 +25,8 @@ namespace Sentry
 			if (iter->second.size() < 100)
 			{
 				component->OnDestory();
-				component->gameObjectID = 0;
-				component->gameObject = nullptr;
+				component->mEntityId = 0;
+				component->mEntity = nullptr;
                 component->SetActive(false);
 				iter->second.push(component);
 				return false;

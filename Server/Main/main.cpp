@@ -1,7 +1,7 @@
 ﻿#ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
-#include <Core/App.h>
+#include "Object/App.h"
 #include <Scene/LuaScriptComponent.h>
 #include <Timer/TimerComponent.h>
 #include <Coroutine/TaskComponent.h>
@@ -16,7 +16,7 @@
 
 #include "Component/Scene/LuaServiceMgrComponent.h"
 #include <Rpc/RpcComponent.h>
-#include "Component/Scene/ServiceComponent.h"
+#include "Component/Scene/ServiceProxyComponent.h"
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
@@ -35,7 +35,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcComponent>("RpcComponent");
-    ComponentFactory::Add<ServiceComponent>("ServiceComponent");
+    ComponentFactory::Add<ServiceProxyComponent>("ServiceProxyComponent");
     ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
 
 // common

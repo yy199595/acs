@@ -4,12 +4,12 @@
 #include<Script/SystemExtension.h>
 #include<Script/CoroutineExtension.h>
 
-#include <Core/App.h>
+#include "Object/App.h"
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
 #include"Async/LuaTaskSource.h"
-#include <Component/ServiceBase/LuaServiceComponent.h>
+#include <Service/LuaServiceComponent.h>
 namespace Sentry
 {
     bool LuaScriptComponent::Awake()

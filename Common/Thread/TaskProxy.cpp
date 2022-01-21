@@ -1,7 +1,7 @@
 #include "TaskProxy.h"
 #include <Util/TimeHelper.h>
 #include <Scene/ThreadPoolComponent.h>
-#include <Core/App.h>
+#include "Object/App.h"
 namespace Sentry
 {
     TaskProxy::TaskProxy()

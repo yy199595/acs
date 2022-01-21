@@ -1,6 +1,6 @@
 #include"GameObjectComponent.h"
-#include"Core/App.h"
-#include"Object/GameObject.h"
+#include"Object/App.h"
+#include"Object/Entity.h"
 #include"Coroutine/TaskComponent.h"
 
 namespace Sentry
@@ -17,7 +17,7 @@ namespace Sentry
         return true;
     }
 
-    bool GameObjectComponent::Add(GameObject * gameObject)
+    bool GameObjectComponent::Add(Entity * gameObject)
 	{
 		if (gameObject == nullptr)
 		{
@@ -44,13 +44,13 @@ namespace Sentry
 		return true;
 	}
 
-    GameObject * GameObjectComponent::Find(const std::string & address)
+    Entity * GameObjectComponent::Find(const std::string & address)
     {
         auto iter = this->mAddressGameObjects.find(address);
         return iter != this->mAddressGameObjects.end() ? iter->second : nullptr;
     }
 
-    bool GameObjectComponent::Del(GameObject * gameObject)
+    bool GameObjectComponent::Del(Entity * gameObject)
 	{
 		long long id = gameObject->GetId();
 		return this->Del(id);
@@ -62,7 +62,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		GameObject * gameObject = iter->second;
+		Entity * gameObject = iter->second;
 		if (gameObject != nullptr)
 		{
 			gameObject->OnDestory();
@@ -72,7 +72,7 @@ namespace Sentry
 		return true;
 	}
 
-	GameObject * GameObjectComponent::Find(long long id)
+	Entity * GameObjectComponent::Find(long long id)
 	{
 		auto iter = this->mGameObjects.find(id);
 		if (iter == this->mGameObjects.end())
@@ -80,7 +80,7 @@ namespace Sentry
 			return nullptr;
 		}
 		
-		GameObject * gameObject = iter->second;
+		Entity * gameObject = iter->second;
 		if (gameObject == nullptr)
 		{
 			return nullptr;
@@ -95,12 +95,12 @@ namespace Sentry
 		return gameObject;
 	}
 
-	void GameObjectComponent::GetGameObjects(std::vector<GameObject *> & gameObjects)
+	void GameObjectComponent::GetGameObjects(std::vector<Entity *> & gameObjects)
 	{
 		auto iter = this->mGameObjects.begin();
 		for (; iter != this->mGameObjects.end(); iter++)
 		{
-			GameObject * gameObject = iter->second;
+			Entity * gameObject = iter->second;
 			if (!gameObject->IsActive())
 			{
 				gameObject->OnDestory();
@@ -114,7 +114,7 @@ namespace Sentry
 
 	void GameObjectComponent::StartComponents(long long objectId)
 	{
-        GameObject * gameObject = this->Find(objectId);
+        Entity * gameObject = this->Find(objectId);
         if(gameObject != nullptr)
         {
             std::vector<Component *> components;

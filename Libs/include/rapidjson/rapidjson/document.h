@@ -543,7 +543,7 @@ template<typename ValueType>
 struct TypeHelper<ValueType, typename ValueType::Object> {
     typedef typename ValueType::Object ObjectType;
     static bool Is(const ValueType& v) { return v.IsObject(); }
-    static ObjectType Get(ValueType& v) { return v.GetObject(); }
+    static ObjectType Get(ValueType& v) { return v.GetEntity(); }
     static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
     static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
 };
@@ -552,7 +552,7 @@ template<typename ValueType>
 struct TypeHelper<ValueType, typename ValueType::ConstObject> {
     typedef typename ValueType::ConstObject ObjectType;
     static bool Is(const ValueType& v) { return v.IsObject(); }
-    static ObjectType Get(const ValueType& v) { return v.GetObject(); }
+    static ObjectType Get(const ValueType& v) { return v.GetEntity(); }
 };
 
 } // namespace internal
@@ -785,7 +785,7 @@ public:
 
     //! Constructor for Object.
     /*!
-        \param o An object obtained by \c GetObject().
+        \param o An object obtained by \c GetEntity().
         \note \c Object is always pass-by-value.
         \note the source object is moved into this value and the sourec object becomes empty.
     */
@@ -2560,7 +2560,7 @@ private:
 
 //! Helper class for accessing Value of object type.
 /*!
-    Instance of this helper class is obtained by \c GenericValue::GetObject().
+    Instance of this helper class is obtained by \c GenericValue::GetEntity().
     In addition to all APIs for array type, it provides range-based for loop if \c RAPIDJSON_HAS_CXX11_RANGE_FOR=1.
 */
 template <bool Const, typename ValueT>

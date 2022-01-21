@@ -3,7 +3,7 @@
 #include"Define/CommonTypeDef.h"
 #include"Global/ServerConfig.h"
 #include"Util/TimeHelper.h"
-#include"Object/GameObject.h"
+#include"Object/Entity.h"
 #include"Global/ServerPath.h"
 #include"Thread/TaskThread.h"
 #include"Timer/TimerComponent.h"
@@ -31,7 +31,7 @@ namespace Sentry
 
 	class ServiceComponentBase;
 	class MainTaskScheduler;
-	class App : public GameObject
+	class App : public Entity
 	{
 	public:
 		explicit App(ServerConfig * config);
@@ -85,7 +85,7 @@ namespace Sentry
 
 	public:
 		
-		int Stop(ExitCode code);
+		void Stop(ExitCode code);
 
 		int Run(int argc, char ** argv);
 

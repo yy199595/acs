@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include"Component/ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 using namespace com;
 namespace Sentry
 {
@@ -8,7 +8,7 @@ namespace Sentry
 
     class TaskComponent;
 
-    class ServiceComponent;
+    class ServiceProxyComponent;
 
     class NodeAddressService : public ServiceComponentBase, public IStart
     {
@@ -26,6 +26,7 @@ namespace Sentry
 
         void OnStart() final;
 
+        void OnDestory() final;
     private:
         void Add(const RapidJsonReader & jsonReader);
         void Remove(const RapidJsonReader & jsonReader);

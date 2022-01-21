@@ -1,12 +1,12 @@
 ﻿#include "SystemExtension.h"
-#include <Core/App.h>
+#include "Object/App.h"
 #include "Async/RpcTask/RpcTaskSource.h"
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include "Component/Scene/ServiceComponent.h"
+#include "Component/Scene/ServiceProxyComponent.h"
 #include <Scene/LuaScriptComponent.h>
 
-#include <Service/ServiceEntity.h>
+#include <Service/ServiceProxy.h>
 using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)

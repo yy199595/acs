@@ -1,6 +1,6 @@
 ﻿#include "ThreadPoolComponent.h"
 #include <Util/Guid.h>
-#include <Core/App.h>
+#include "Object/App.h"
 #include <Method/MethodProxy.h>
 namespace Sentry
 {

@@ -1,13 +1,13 @@
 ﻿#include"RedisComponent.h"
 
-#include"Core/App.h"
+#include"Object/App.h"
 #include"Util/StringHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
-#include"ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 #include"RedisClient/NetWork/RedisClient.h"
 namespace Sentry
 {

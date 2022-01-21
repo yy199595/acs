@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 namespace Sentry
 {
     class GateService : public ServiceComponentBase

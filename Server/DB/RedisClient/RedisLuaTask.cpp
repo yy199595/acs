@@ -1,6 +1,6 @@
 ﻿#include "RedisLuaTask.h"
 
-#include <Core/App.h>
+#include "Object/App.h"
 #include <Util/Guid.h>
 #include "Component/RedisComponent.h"
 #include <Coroutine/TaskComponent.h>

@@ -1,14 +1,14 @@
-#include"ServiceComponent.h"
+#include"ServiceProxyComponent.h"
 #include"RpcConfigComponent.h"
-#include"Service/ServiceEntity.h"
+#include"Service/ServiceProxy.h"
 namespace Sentry
 {
-    bool ServiceComponent::Awake()
+    bool ServiceProxyComponent::Awake()
     {
         return true;
     }
 
-    bool ServiceComponent::LateAwake()
+    bool ServiceProxyComponent::LateAwake()
     {
         RpcConfigComponent * component = this->GetComponent<RpcConfigComponent>();
         if(component == nullptr)
@@ -19,13 +19,13 @@ namespace Sentry
         component->GetServices(services);
         for(const std::string & name : services)
         {
-            std::shared_ptr<ServiceEntity> serviceEntity(new ServiceEntity(name));
+            std::shared_ptr<ServiceProxy> serviceEntity(new ServiceProxy(name));
             this->mServiceEntityMap.emplace(name, serviceEntity);
         }
         return true;
     }
 
-    std::shared_ptr<ServiceEntity> ServiceComponent::GetServiceEntity(const std::string &name)
+    std::shared_ptr<ServiceProxy> ServiceProxyComponent::GetServiceProxy(const std::string &name)
     {
         auto iter = this->mServiceEntityMap.find(name);
         return iter != this->mServiceEntityMap.end() ? iter->second : nullptr;

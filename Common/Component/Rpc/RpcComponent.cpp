@@ -1,8 +1,8 @@
 ﻿#include"RpcComponent.h"
-#include<Component/ServiceBase/ServiceComponentBase.h>
+#include<Service/ServiceComponentBase.h>
 #include<Coroutine/TaskComponent.h>
 #include<Util/StringHelper.h>
-#include"Core/App.h"
+#include"Object/App.h"
 #include<Pool/MessagePool.h>
 #include<Method/LuaServiceMethod.h>
 #include"Scene/RpcConfigComponent.h"
@@ -40,7 +40,7 @@ namespace Sentry
         }
 
         const std::string &service = protocolConfig->Service;
-        auto logicService = this->gameObject->GetComponent<ServiceComponentBase>(service);
+        auto logicService = this->GetComponent<ServiceComponentBase>(service);
         if (logicService == nullptr)
         {
             LOG_ERROR("call service not exist : [", service , "]");

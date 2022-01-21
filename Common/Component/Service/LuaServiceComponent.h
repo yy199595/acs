@@ -2,7 +2,7 @@
 
 
 #include<Script/LuaInclude.h>
-#include"ServiceBase/ServiceComponentBase.h"
+#include"Service/ServiceComponentBase.h"
 
 class LuaTable;
 namespace Sentry

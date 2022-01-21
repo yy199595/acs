@@ -15,10 +15,10 @@ namespace Sentry
         ConnectSuccessful, //连接成功
     };
 
-    class ServiceNode
+    class ProxyClient
     {
     public:
-        ServiceNode(const std::string & name, const std::string & address);
+        ProxyClient(const std::string & name, const std::string & address);
 
     private:
         void SendFromQueue();

@@ -1,5 +1,5 @@
 ﻿#include"TcpServerComponent.h"
-#include<Core/App.h>
+#include"Object/App.h"
 #include<Util/StringHelper.h>
 #include<Scene/ThreadPoolComponent.h>
 #include<Thread/TaskThread.h>
@@ -65,7 +65,7 @@ namespace Sentry
         auto taskComponent = this->GetComponent<ThreadPoolComponent>();
         for(auto listenConfig : this->mListenerConfigs)
         {
-            Component *component = this->gameObject->GetComponentByName(listenConfig->Handler);
+            Component *component = this->GetComponent<Component>(listenConfig->Handler);
             auto socketHandler = dynamic_cast<ISocketListen *>(component);
             if (socketHandler == nullptr)
             {
@@ -87,7 +87,7 @@ namespace Sentry
         for (auto listener : this->mListeners)
         {
             const ListenConfig &config = listener->GetConfig();
-            Component *component = this->gameObject->GetComponentByName(config.Handler);
+            Component *component = this->GetComponent<Component>(config.Handler);
             if (auto handler = dynamic_cast<ISocketListen *>(component))
             {
                 if (listener->StartListen(handler)->Await())

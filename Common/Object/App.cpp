@@ -2,7 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Component/Scene/ServiceComponent.h"
+#include"Component/Scene/ServiceProxyComponent.h"
 #ifdef __DEBUG__
 #include"Telnet/ConsoleComponent.h"
 #endif
@@ -13,9 +13,9 @@ namespace Sentry
 {
 	App *App::mApp = nullptr;
 
-	App::App(ServerConfig * config) :GameObject(0),
-        mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
-		mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
+	App::App(ServerConfig * config) : Entity(0),
+                                      mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
+                                      mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		mApp = this;
 		this->mDelatime = 0;
@@ -31,7 +31,7 @@ namespace Sentry
         this->mLogComponent = this->GetComponent<LoggerComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<ServiceComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<ServiceProxyComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 #ifdef __DEBUG__
@@ -135,12 +135,12 @@ namespace Sentry
         this->mConfig->GetValue("node_name", this->mServerName);
 		if (!this->AddComponentFormConfig())
 		{
-			return this->Stop(ExitCode::AddError);
+			return ExitCode::AddError;
 		}
 
 		if (!this->InitComponent())
 		{
-			return this->Stop(ExitCode::InitError);
+			return ExitCode::InitError;
 		}
 
         this->mFps = 15;
@@ -153,15 +153,20 @@ namespace Sentry
 		return this->mTaskScheduler.Start();
 	}
 
-	int App::Stop(ExitCode code)
+	void App::Stop(ExitCode code)
 	{
-		this->OnDestory();
-		this->mIsClose = true;
-        this->mTaskScheduler.Stop();
-#ifdef _WIN32
-		return getchar();
-#endif
-		return (int)code;
+        if(this->mTaskComponent != nullptr)
+        {
+            this->mTaskComponent->Start([this, code]()
+            {
+                LOG_WARN("start close server");
+                this->OnDestory();
+                this->mIsClose = true;
+                this->mTaskScheduler.Stop();
+                LOG_WARN("close server successful");
+                exit((int) code);
+            });
+        }
 	}
 
 	void App::LogicMainLoop()

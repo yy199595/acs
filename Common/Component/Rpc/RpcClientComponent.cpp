@@ -1,6 +1,6 @@
 ﻿
 #include"RpcClientComponent.h"
-#include<Core/App.h>
+#include"Object/App.h"
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include<Scene/ThreadPoolComponent.h>

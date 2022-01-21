@@ -30,7 +30,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	class GameObject;
+	class Entity;
 	class Component : public Object
 	{
 	public:
@@ -38,16 +38,16 @@ namespace Sentry
 		~Component() override = default;
 
 	public:
-		friend class GameObject;
+		friend class Entity;
 		friend class ComponentFactory;
-		inline long long GetGameObjectID() const
+		inline long long GetEntityId() const
 		{
-			return gameObjectID;
+			return this->mEntityId;
 		}
 
-		inline GameObject * GetObject()
+		inline Entity * GetEntity()
 		{
-			return this->gameObject;
+			return this->mEntity;
 		}
 		inline Type * GetType() { return this->mType; }
 
@@ -73,13 +73,14 @@ namespace Sentry
         void GetComponents(std::vector<Component *> & components);
 
         Component * GetByName(const std::string & name);
+
 	private:
 		Component * GetByHash(size_t hash);
 	protected:
 		Type * mType;
-		long long gameObjectID;
-		GameObject * gameObject;
-	};
+		Entity * mEntity;
+        long long mEntityId;
+    };
 	template<typename T>
 	inline T * Component::GetComponent()
 	{

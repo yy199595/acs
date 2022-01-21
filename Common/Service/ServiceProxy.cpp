@@ -1,5 +1,5 @@
-﻿#include"ServiceEntity.h"
-#include<Core/App.h>
+﻿#include"ServiceProxy.h"
+#include"Object/App.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
@@ -7,7 +7,7 @@
 #include"Service/NodeAddressService.h"
 namespace Sentry
 {
-	ServiceEntity::ServiceEntity(const std::string & name)
+	ServiceProxy::ServiceProxy(const std::string & name)
 		: mServiceName(name)
 	{
         this->mTaskComponent = App::Get().GetTaskComponent();
@@ -15,20 +15,20 @@ namespace Sentry
         LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
 	}
 
-    void ServiceEntity::AddAddress(const std::string &address)
+    void ServiceProxy::AddAddress(const std::string &address)
     {
         auto iter = this->mServiceNodeMap.find(address);
         if(iter == this->mServiceNodeMap.end())
         {
             this->mAllAddress.emplace(std::move(address));
-            auto node = make_shared<ServiceNode>
+            auto node = make_shared<ProxyClient>
                     (this->mServiceName, address);
             this->mServiceNodeMap.emplace(address, node);
             LOG_WARN(this->mServiceName, " add new address [", address, "]");
         }
     }
 
-    bool ServiceEntity::RemoveAddress(const std::string &address)
+    bool ServiceProxy::RemoveAddress(const std::string &address)
     {
         auto iter = this->mServiceNodeMap.find(address);
         if(iter != this->mServiceNodeMap.end())
@@ -40,13 +40,13 @@ namespace Sentry
         return false;
     }
 
-    std::shared_ptr<ServiceNode> ServiceEntity::GetNode(const std::string &address)
+    std::shared_ptr<ProxyClient> ServiceProxy::GetNode(const std::string &address)
     {
         auto iter = this->mServiceNodeMap.find(address);
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
     }
 
-    bool ServiceEntity::RemoveServiceNode(const std::string &address)
+    bool ServiceProxy::RemoveServiceNode(const std::string &address)
     {
         auto iter = this->mServiceNodeMap.find(address);
         if(iter == this->mServiceNodeMap.end())
@@ -67,7 +67,7 @@ namespace Sentry
         }
     }
 
-    bool ServiceEntity::AllotServiceAddress(std::string &address)
+    bool ServiceProxy::AllotServiceAddress(std::string &address)
     {
         if(this->mAllAddress.empty())
         {
@@ -77,7 +77,7 @@ namespace Sentry
         {
             const std::string arr = this->mAllAddress.front();
             this->mAllAddress.pop();
-            std::shared_ptr<ServiceNode> serviceNode = this->GetNode(arr);
+            std::shared_ptr<ProxyClient> serviceNode = this->GetNode(arr);
             if(serviceNode != nullptr && serviceNode->IsConnected())
             {
                 address = serviceNode->GetAddress();
@@ -89,7 +89,7 @@ namespace Sentry
         return false;
     }
 
-	std::shared_ptr<com::Rpc_Request> ServiceEntity::NewRequest(const std::string & method)
+	std::shared_ptr<com::Rpc_Request> ServiceProxy::NewRequest(const std::string & method)
 	{
 		auto config = this->mRpcConfigComponent->GetProtocolConfig(method);
 		if (config == nullptr)
@@ -101,7 +101,7 @@ namespace Sentry
         return request;
 	}
 
-    XCode ServiceEntity::Call(const string &func, std::shared_ptr<RpcTaskSource> taskSource)
+    XCode ServiceProxy::Call(const string &func, std::shared_ptr<RpcTaskSource> taskSource)
     {
         std::string address;
         if(this->AllotServiceAddress(address))
@@ -112,7 +112,7 @@ namespace Sentry
         return this->Call(address, func, taskSource);
     }
 
-    XCode ServiceEntity::Call(const string &func, const Message &message, std::shared_ptr<RpcTaskSource> taskSource)
+    XCode ServiceProxy::Call(const string &func, const Message &message, std::shared_ptr<RpcTaskSource> taskSource)
     {
         std::string address;
         if (this->AllotServiceAddress(address))
@@ -123,8 +123,8 @@ namespace Sentry
         return this->Call(address, func, message, taskSource);
     }
 
-    XCode ServiceEntity::Call(const std::string &address, const std::string &func,
-                              std::shared_ptr<RpcTaskSource> taskSource)
+    XCode ServiceProxy::Call(const std::string &address, const std::string &func,
+                             std::shared_ptr<RpcTaskSource> taskSource)
     {
         auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
@@ -133,7 +133,7 @@ namespace Sentry
             return XCode::NotFoundRpcConfig;
         }
 
-        std::shared_ptr<ServiceNode> serviceNode = this->GetNode(address);
+        std::shared_ptr<ProxyClient> serviceNode = this->GetNode(address);
         if(serviceNode == nullptr)
         {
             LOG_ERROR("not find node : ", address);
@@ -153,8 +153,8 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode ServiceEntity::Call(const std::string &address, const std::string &func, const Message &message,
-                              std::shared_ptr<RpcTaskSource> taskSource)
+    XCode ServiceProxy::Call(const std::string &address, const std::string &func, const Message &message,
+                             std::shared_ptr<RpcTaskSource> taskSource)
     {
         auto requestData = this->NewRequest(func);
         if (requestData == nullptr)
@@ -162,7 +162,7 @@ namespace Sentry
             LOG_ERROR("{0} not rpc config ", func);
             return XCode::NotFoundRpcConfig;
         }
-        std::shared_ptr<ServiceNode> serviceNode = this->GetNode(address);
+        std::shared_ptr<ProxyClient> serviceNode = this->GetNode(address);
         if(serviceNode == nullptr)
         {
             LOG_ERROR("not find node : ", address);

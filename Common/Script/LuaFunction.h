@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Core/App.h"
+#include"Object/App.h"
 #include<Define/CommonLogDef.h>
 #include"Script/LuaParameter.h"
 using namespace Sentry;

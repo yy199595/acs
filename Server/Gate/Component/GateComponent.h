@@ -24,8 +24,8 @@ namespace Sentry
     private:
         std::string mProtoName;
         class RpcComponent * mRpcComponent;
-        class ServiceComponent * mServiceComponent;
         class RpcConfigComponent * mRpcConfigComponent;
+        class ServiceProxyComponent * mServiceComponent;
         class GateClientComponent * mGateClientComponent;
     };
 }

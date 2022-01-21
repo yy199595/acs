@@ -1,5 +1,5 @@
 ﻿#include"ServiceComponentBase.h"
-#include<Core/App.h>
+#include"Object/App.h"
 #include <Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
 #ifdef __DEBUG__
