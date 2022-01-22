@@ -1,11 +1,9 @@
 ﻿#pragma once
 
 #include"Util/Guid.h"
-#include"hiredis/hiredis.h"
 #include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
 #include"Coroutine/TaskComponent.h"
-#include"RedisClient/RedisTaskSource.h"
 #include"RedisClient/NetWork/RedisClient.h"
 using namespace Sentry;
 namespace Sentry
@@ -46,18 +44,18 @@ namespace Sentry
         long long Publish(const std::string & channel, const std::string & message);
 
         template<typename ... Args>
-        std::shared_ptr<RedisCmdResponse> InvokeCommand(const std::string & cmd, Args && ... args)
+        std::shared_ptr<RedisResponse> InvokeCommand(const std::string & cmd, Args && ... args)
         {
-            std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest(cmd));
+            std::shared_ptr<RedisRequest> request(new RedisRequest(cmd));
             request->InitParameter(std::forward<Args>(args) ...);
             return this->InvokeCommand(request);
         }
 
-        std::shared_ptr<RedisCmdResponse> InvokeCommand(std::shared_ptr<RedisCmdRequest> request);
+        std::shared_ptr<RedisResponse> InvokeCommand(std::shared_ptr<RedisRequest> request);
 
 
         template<typename ... Args>
-        std::shared_ptr<RedisCmdResponse> Call(const std::string & tab, const std::string & func, Args &&...args)
+        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, Args &&...args)
         {
             std::string script;
             int size = sizeof ...(Args) + 1;
@@ -69,7 +67,7 @@ namespace Sentry
             return this->InvokeCommand("EVALSHA",script, size, func, std::forward<Args>(args)...);
         }
 
-        std::shared_ptr<RedisCmdResponse> Call(const std::string & tab, const std::string & func, std::vector<std::string> & args);
+        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, std::vector<std::string> & args);
 
     private:
         bool LoadLuaScript(const std::string & path);

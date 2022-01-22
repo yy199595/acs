@@ -26,8 +26,8 @@ namespace Sentry
         void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
 
     public:
-        TaskSourceShared<RedisCmdResponse> WaitRedisMessageResponse();
-        TaskSourceShared<RedisCmdResponse> InvokeCommand(std::shared_ptr<RedisCmdRequest> command);
+        TaskSourceShared<RedisResponse> WaitRedisMessageResponse();
+        TaskSourceShared<RedisResponse> InvokeCommand(std::shared_ptr<RedisRequest> command);
     private:
         void OnDecodeHead(std::iostream & readStream);
         void OnDecodeArray(std::iostream & readStream);
@@ -37,8 +37,8 @@ namespace Sentry
     private:
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
-        std::shared_ptr<RedisCmdResponse> mResponse;
-        TaskSourceShared<RedisCmdResponse> mRespTaskSource;
+        std::shared_ptr<RedisResponse> mResponse;
+        TaskSourceShared<RedisResponse> mRespTaskSource;
     private:
         int mDataSize;
         int mLineCount;

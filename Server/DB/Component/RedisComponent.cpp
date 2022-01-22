@@ -22,7 +22,7 @@ namespace Sentry
         return true;
     }
 
-    std::shared_ptr<RedisCmdResponse>
+    std::shared_ptr<RedisResponse>
     RedisComponent::Call(const std::string &tab, const std::string &func, std::vector<std::string> &args)
     {
         std::string script;
@@ -31,7 +31,7 @@ namespace Sentry
             LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
             return nullptr;
         }
-        std::shared_ptr<RedisCmdRequest> redisCmdRequest(new RedisCmdRequest("EVALSHA"));
+        std::shared_ptr<RedisRequest> redisCmdRequest(new RedisRequest("EVALSHA"));
         redisCmdRequest->InitParameter(script, (int) args.size() + 1, func);
         for(const std::string & val : args)
         {
@@ -40,7 +40,7 @@ namespace Sentry
         return this->InvokeCommand(redisCmdRequest);
     }
 
-    std::shared_ptr<RedisCmdResponse> RedisComponent::InvokeCommand(std::shared_ptr<RedisCmdRequest> request)
+    std::shared_ptr<RedisResponse> RedisComponent::InvokeCommand(std::shared_ptr<RedisRequest> request)
     {
        std::shared_ptr<RedisClient> redisClient =  this->AllotRedisClient();
 #ifdef __DEBUG__
@@ -126,7 +126,7 @@ namespace Sentry
                 this->mRedisCmdClients.emplace_back(redisCommandClient);
                 if(!this->mRedisConfig.mPassword.empty())
                 {
-                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
                     request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = redisCommandClient->InvokeCommand(request)->Await();
                     if(!response->IsOk())
@@ -156,7 +156,7 @@ namespace Sentry
                 }
                 if(!this->mRedisConfig.mPassword.empty())
                 {
-                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
                     request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = redisClinet->InvokeCommand(request)->Await();
                     if(!response->IsOk())
@@ -200,7 +200,7 @@ namespace Sentry
 
     bool RedisComponent::SubscribeChannel(const std::string &chanel)
     {
-        std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("SUBSCRIBE"));
+        std::shared_ptr<RedisRequest> request(new RedisRequest("SUBSCRIBE"));
         request->AddParameter(std::move(chanel));
         auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
         return !response->HasError();
@@ -246,7 +246,7 @@ namespace Sentry
                 }
                 if (!this->mRedisConfig.mPassword.empty())
                 {
-                    std::shared_ptr<RedisCmdRequest> request(new RedisCmdRequest("AUTH"));
+                    std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
                     request->AddParameter(this->mRedisConfig.mPassword);
                     auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
                     if (response == nullptr || response->IsOk())

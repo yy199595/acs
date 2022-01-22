@@ -1,26 +1,13 @@
 #pragma once
-
-#include<Thread/TaskProxy.h>
-#include<hiredis/hiredis.h>
 #include<memory>
 #include<list>
 #include<string>
 #include<vector>
 #include"XCode/XCode.h"
 #include<google/protobuf/message.h>
-
-using namespace Sentry;
 using namespace google::protobuf;
 
 #define REDIS_SAVE_JSON
-
-namespace Sentry
-{
-    class RedisComponent;
-
-    typedef redisContext RedisSocket;
-}// namespace Sentry
-
 namespace Sentry
 {
     enum class RedisRespType
@@ -37,31 +24,10 @@ namespace Sentry
 
 namespace Sentry
 {
-    class RedisAsioResp
+    class RedisRequest
     {
     public:
-        RedisAsioResp();
-        RedisRespType GetType() const { return this->mType;}
-
-    public:
-        int OnDecodeHead(std::iostream & readStream);
-        void OnDecodeArray(std::iostream & readStream);
-        void OnDecodeBinString(std::iostream & readStream);
-        int OnReceiveFirstLine(char type, const std::string & lineData);
-    private:
-        int mDataCount;
-        long long mNumber;
-        RedisRespType mType;
-        std::vector<std::string> mResponse;
-    };
-}
-
-namespace Sentry
-{
-    class RedisCmdRequest
-    {
-    public:
-        RedisCmdRequest(const std::string & cmd);
+        RedisRequest(const std::string & cmd);
 
     public:
         void GetCommand(std::iostream & readStream) const;
@@ -88,16 +54,16 @@ namespace Sentry
     };
 
     template<typename ... Args>
-    void RedisCmdRequest::InitParameter(Args &&...args)
+    void RedisRequest::InitParameter(Args &&...args)
     {
         this->Encode(std::forward<Args>(args)...);
     }
 
-    class RedisCmdResponse
+    class RedisResponse
     {
     public:
         bool IsOk();
-        RedisCmdResponse();
+        RedisResponse();
         void AddValue(long long value);
         void AddValue(RedisRespType type);
         void AddValue(const std::string & data);
@@ -116,30 +82,3 @@ namespace Sentry
     };
 }
 
-namespace Sentry
-{
-    class RedisResponse
-    {
-    public:
-         explicit RedisResponse(redisReply * reply);
-         RedisResponse(XCode code, const std::string & err);
-        ~RedisResponse();
-    public:
-        XCode GetCode() const { return this->mCode; }
-        const std::string & GetError() const { return this->mError; }
-        bool HasError() const { return this->mCode != XCode::Successful;}
-
-    public:
-        long long GetNumber();
-        bool GetValue(Message & value);
-        bool GetValue(long long & value);
-        bool GetValue(std::string & value);
-        bool GetValue(std::vector<long long> & value);
-        bool GetValue(std::vector<std::string> & value);
-
-    private:
-        XCode mCode;
-        std::string mError;
-        redisReply * mResponse;
-    };
-}

@@ -41,7 +41,7 @@ namespace Sentry
         });
     }
 
-    TaskSourceShared<RedisCmdResponse> RedisClient::InvokeCommand(std::shared_ptr<RedisCmdRequest> command)
+    TaskSourceShared<RedisResponse> RedisClient::InvokeCommand(std::shared_ptr<RedisRequest> command)
     {
         this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
@@ -69,11 +69,11 @@ namespace Sentry
         return this->WaitRedisMessageResponse();
     }
 
-    TaskSourceShared<RedisCmdResponse> RedisClient::WaitRedisMessageResponse()
+    TaskSourceShared<RedisResponse> RedisClient::WaitRedisMessageResponse()
     {
         this->mDataSize = 0;
-        this->mResponse = std::make_shared<RedisCmdResponse>();
-        this->mRespTaskSource = make_shared<TaskSource<std::shared_ptr<RedisCmdResponse>>>();
+        this->mResponse = std::make_shared<RedisResponse>();
+        this->mRespTaskSource = make_shared<TaskSource<std::shared_ptr<RedisResponse>>>();
         this->mNetworkThread.Invoke(&RedisClient::StartReceive, this);
         return mRespTaskSource;
     }
