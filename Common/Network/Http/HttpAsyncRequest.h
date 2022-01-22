@@ -8,6 +8,7 @@
 #include<asio.hpp>
 #include<Http/Http.h>
 #include<unordered_map>
+#include"Util/JsonHelper.h"
 namespace Sentry
 {
     class IHttpStream

@@ -1,13 +1,12 @@
 ﻿#include"RedisComponent.h"
 
 #include"Object/App.h"
-#include"Util/StringHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
-#include"Service/ServiceComponentBase.h"
+#include"Service/SubService.h"
 #include"RedisClient/NetWork/RedisClient.h"
 namespace Sentry
 {
@@ -193,7 +192,7 @@ namespace Sentry
 //                jsonWriter.Add("id", 10);
 //                jsonWriter.Add("key", "orjworj");
 //                jsonWriter.WriterToStream(json);
-//                this->Publish("NodeAddressService.Add", json);
+//                this->Publish("NodeService.Add", json);
             }
         }
     }
@@ -212,16 +211,16 @@ namespace Sentry
         this->GetComponents(components);
         for (Component *component: components)
         {
-            auto serviceBase = dynamic_cast<ServiceComponentBase *>(component);
-            if (serviceBase == nullptr)
+            auto subService = dynamic_cast<SubService *>(component);
+            if (subService == nullptr)
             {
                 continue;
             }
             std::vector<std::string> methods;
-            serviceBase->GetSubMethods(methods);
+            subService->GetSubMethods(methods);
             for (const std::string &name: methods)
             {
-                const std::string &service = serviceBase->GetServiceName();
+                const std::string &service = subService->GetName();
                 if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
                 {
                     LOG_INFO("subscribe chanel [", fmt::format("{0}.{1}", service, name), "] successful");
@@ -273,10 +272,10 @@ namespace Sentry
                     LOG_DEBUG("func = ", service, '.', method);
                     LOG_DEBUG("message = ", message);
 #endif
-                    ServiceComponentBase *componentBase = this->GetComponent<ServiceComponentBase>(service);
-                    if (componentBase != nullptr)
+                    auto subService = this->GetComponent<SubService>(service);
+                    if (subService != nullptr)
                     {
-                        componentBase->Publish(funcName, message);
+                        subService->Publish(funcName, message);
                     }
                 }
             }

@@ -1,7 +1,7 @@
 #include"LuaServiceMgrComponent.h"
 #include"Object/App.h"
 #include"Method/LuaServiceMethod.h"
-#include"Service/LuaServiceComponent.h"
+#include"Service/LuaRpcService.h"
 #include"Scene/LuaScriptComponent.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Util/DirectoryHelper.h"
@@ -45,10 +45,10 @@ namespace Sentry
 				continue;
 			}
 
-			auto localService = this->GetComponent<ServiceComponentBase>(service);
+			auto localService = this->GetComponent<RcpService>(service);
 			if (localService == nullptr)
 			{
-				auto luaSerivce = new LuaServiceComponent();
+				auto luaSerivce = new LuaRpcService();
 				if (App::Get().AddComponent(service, localService))
                 {
                     LOG_ERROR("add service", service, "failure");
@@ -77,7 +77,7 @@ namespace Sentry
                 localService->AddMethod(new LuaServiceMethod(config, lua, idx));
                 LOG_INFO("add new lua service method : ", service, '.', method);
             }
-            auto luaServiceComponent = dynamic_cast<LuaServiceComponent*>(localService);
+            auto luaServiceComponent = dynamic_cast<LuaRpcService*>(localService);
             if(luaServiceComponent != nullptr && !luaServiceComponent->LateAwake())
             {
                 return false;

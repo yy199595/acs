@@ -1,4 +1,4 @@
-﻿#include"ServiceComponentBase.h"
+﻿#include"RcpService.h"
 #include"Object/App.h"
 #include <Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
@@ -8,7 +8,7 @@
 #endif
 namespace Sentry
 {
-	bool ServiceComponentBase::AddMethod(ServiceMethod * method)
+	bool RcpService::AddMethod(ServiceMethod * method)
     {
         auto *rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
         if (rpcConfigComponent == nullptr)
@@ -16,10 +16,10 @@ namespace Sentry
             return false;
         }
         const std::string &name = method->GetName();
-        const std::string &service = this->GetServiceName();
+        const std::string &service = this->GetName();
         if (!rpcConfigComponent->HasServiceMethod(service, name))
         {
-            LOG_FATAL(this->GetServiceName(), '.', name, " add failure");
+            LOG_FATAL(this->GetName(), '.', name, " add failure");
             return false;
         }
 
@@ -39,7 +39,7 @@ namespace Sentry
         auto iter = this->mMethodMap.find(name);
         if (iter != this->mMethodMap.end())
         {
-            LOG_FATAL(this->GetServiceName(), '.', name, " add failure");
+            LOG_FATAL(this->GetName(), '.', name, " add failure");
             return false;
         }
         this->mMethodMap.emplace(name, method);
@@ -47,25 +47,7 @@ namespace Sentry
         return true;
     }
 
-    void ServiceComponentBase::GetSubMethods(std::vector<std::string> &methods)
-    {
-        auto iter = this->mSubMethodMap.begin();
-        for(; iter != this->mSubMethodMap.end(); iter++)
-        {
-            methods.emplace_back(iter->first);
-        }
-    }
-
-    void ServiceComponentBase::Publish(const std::string & func, const std::string &message)
-    {
-        auto iter = this->mSubMethodMap.find(func);
-        if(iter != this->mSubMethodMap.end())
-        {
-            iter->second->OnPublish(message);
-        }
-    }
-
-    ServiceMethod *ServiceComponentBase::GetMethod(const std::string &name)
+    ServiceMethod *RcpService::GetMethod(const std::string &name)
     {
         auto iter = this->mLuaMethodMap.find(name);
         if(iter != this->mLuaMethodMap.end())
@@ -76,7 +58,7 @@ namespace Sentry
         return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
     }
 
-    std::shared_ptr<com::Rpc_Response> ServiceComponentBase::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
+    std::shared_ptr<com::Rpc_Response> RcpService::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
         ServiceMethod *serviceMethod = this->GetMethod(method);
         if (serviceMethod == nullptr)
@@ -97,7 +79,7 @@ namespace Sentry
         response->set_user_id(request->user_id());
 #ifdef __DEBUG__
         LOG_DEBUG("===============[rpc request]===============");
-        LOG_DEBUG("[func] =", this->GetServiceName(), '.', method);
+        LOG_DEBUG("[func] =", this->GetName(), '.', method);
         LOG_DEBUG("[time] = [", elapsedTimer.GetMs(), "ms]");
         if (request->has_data())
         {

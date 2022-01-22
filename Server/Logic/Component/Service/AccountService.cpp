@@ -5,15 +5,14 @@
 #include "Component/RedisComponent.h"
 #include "Component/MysqlProxyComponent.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
-#include<google/protobuf/util/json_util.h>
 namespace Sentry
 {
     bool AccountService::Awake()
     {
         this->mRedisComponent = nullptr;
         this->mMysqlComponent = nullptr;
-        BIND_RPC_FUNCTION(AccountService::Login);
-        BIND_RPC_FUNCTION(AccountService::Register);
+        BIND_HTTP_FUNCTION(AccountService::Login);
+        BIND_HTTP_FUNCTION(AccountService::Register);
 		return true;
     }
 
@@ -23,54 +22,14 @@ namespace Sentry
         this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
         return true;
     }
-    
-    XCode AccountService::Login(const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response)
-    {
 
+    XCode AccountService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
+    {
         return XCode::Successful;
     }
 
-    XCode AccountService::Register(const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response)
+    XCode AccountService::Register(const RapidJsonReader &request, RapidJsonWriter &response)
     {
-        const std::string &account = request.account();
-        const std::string &password = request.password();
-        if (account.empty() || password.empty())
-        {
-            return XCode::CallArgsError;
-        }
-
-        auto queryResponse = this->mRedisComponent->InvokeCommand("HEXISTS", "user", account);
-        if (queryResponse->GetNumber() == 1)
-        {
-            return XCode::AccountAlreadyExists;
-        }
-        long long userId = USER_ID_START + this->mRedisComponent->AddCounter("userid");
-
-        db::db_account_tab_user_account userAccountData;
-
-        std::string token = this->NewToken(account);
-
-        userAccountData.set_token(token);
-        userAccountData.set_user_id(userId);
-        userAccountData.set_account(account);
-        userAccountData.set_password(password);
-        userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
-#ifdef __DEBUG__
-        std::string json;
-        util::MessageToJsonString(userAccountData, &json);
-        LOG_DEBUG("register new player json = {0}", json);
-#endif
-        const int second = 7 * 24 * 60 * 60;
-        response.set_token(userAccountData.token());
-        this->mRedisComponent->InvokeCommand("SETEX", token, second, account);
-        this->mRedisComponent->InvokeCommand("HSET", "user", account, userAccountData);
-        XCode code = this->mMysqlComponent->Add(userAccountData, std::make_shared<MysqlRpcTaskSource>());
-        if(code != XCode::Successful)
-        {
-            LOG_ERROR(account, "register failure");
-            return code;
-        }
-        LOG_INFO(account, "register successful");
         return XCode::Successful;
     }
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include"Service/ServiceComponentBase.h"
+#include"Service/SubService.h"
 using namespace com;
 namespace Sentry
 {
@@ -10,12 +10,11 @@ namespace Sentry
 
     class ServiceProxyComponent;
 
-    class NodeAddressService : public ServiceComponentBase, public IStart
+    class NodeService : public SubService, public IStart
     {
     public:
-		NodeAddressService() = default;
-
-        ~NodeAddressService() override = default;
+		NodeService() = default;
+        ~NodeService() override = default;
 
     public:
         bool RemoveNode(const std::string & address);

@@ -29,7 +29,7 @@ namespace Sentry
 {
 	class Manager;
 
-	class ServiceComponentBase;
+	class RcpService;
 	class MainTaskScheduler;
 	class App : public Entity
 	{

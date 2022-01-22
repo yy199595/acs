@@ -3,7 +3,7 @@
 //
 #include"ProxyClient.h"
 #include"Util/StringHelper.h"
-#include"Service/NodeAddressService.h"
+#include"Service/NodeService.h"
 #include"Scene/ServiceProxyComponent.h"
 #include"Service/ServiceProxy.h"
 namespace Sentry
@@ -75,7 +75,7 @@ namespace Sentry
         {
             return true;
         }
-        NodeAddressService *redisService = App::Get().GetComponent<NodeAddressService>();
+        NodeService *redisService = App::Get().GetComponent<NodeService>();
         ServiceProxyComponent *serviceComponent = App::Get().GetComponent<ServiceProxyComponent>();
         redisService->RemoveNode(this->mAddress);
         auto serviceEntity = serviceComponent->GetServiceProxy(this->mServiceName);

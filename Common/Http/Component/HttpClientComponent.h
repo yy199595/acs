@@ -1,12 +1,22 @@
 
 #pragma once
 #include"Component/Component.h"
+
+namespace Sentry
+{
+    class HttpConfig
+    {
+    public:
+        std::string mUrl;
+        std::string mType;
+        std::string mComponent;
+        std::string mMethodName;
+    };
+}
 namespace Sentry
 {
     class HttpRespSession;
     class HttpServiceMethod;
-    class HttpRequestHandler;	
-	class HttpReqSession;
     class HttpHandlerClient;
     class HttpClientComponent : public Component, public ISocketListen, public ILoadData
     {
@@ -31,5 +41,6 @@ namespace Sentry
     private:
         class TaskComponent *mCorComponent;
         class ThreadPoolComponent * mThreadComponent;
+        std::unordered_map<std::string, HttpConfig *> mHttpConfigMap;
     };
 }

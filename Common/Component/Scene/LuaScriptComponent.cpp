@@ -9,7 +9,7 @@
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
 #include"Async/LuaTaskSource.h"
-#include <Service/LuaServiceComponent.h>
+#include <Service/LuaRpcService.h>
 namespace Sentry
 {
     bool LuaScriptComponent::Awake()

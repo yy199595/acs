@@ -94,24 +94,6 @@
             "Response":"s2s.MysqlResponse"
         }
     },
-    "AccountService":{
-        "Register": {
-            "Id": 310,
-            "Async": true,
-            "Timeout": 0,
-            "Type":"Client",
-            "Request": "c2s.AccountRegister.Request",
-            "Response": "c2s.AccountRegister.Response"
-        },
-        "Login": {
-            "Id": 311,
-            "Async": true,
-            "Timeout": 0,
-            "Type":"Client",
-            "Request": "c2s.AccountLogin.Request",
-            "Response": "c2s.AccountLogin.Response"
-        }
-    },
     "GateService": {
         "Ping": {
             "Id": 410,

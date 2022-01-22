@@ -18,19 +18,20 @@ namespace Sentry
     class HttpServiceMethod
     {
     public:
-        virtual XCode Invoke(const std::string & content, std::shared_ptr<RapidJsonWriter> response) = 0;
+        virtual XCode Invoke(const std::shared_ptr<RapidJsonReader> request, std::shared_ptr<RapidJsonWriter> response) = 0;
     };
 
     template<typename T>
     class HttpServiceJsonMethod1 : public HttpServiceMethod
     {
     public:
-        HttpServiceJsonMethod1(T *o, HttpJsonMethod1<T> func);
+        HttpServiceJsonMethod1(T *o, HttpJsonMethod1<T> func)
+            : mObj(o), mFunction(std::move(func)) { }
 
     public:
-        XCode Invoke(const std::string &content, std::shared_ptr<RapidJsonWriter> reaponse)
+        XCode Invoke(const std::shared_ptr<RapidJsonReader> request, std::shared_ptr<RapidJsonWriter> response)
         {
-           return (this->mObj*mFunction)(*reaponse);
+           return (this->mObj->*mFunction)(*response);
         }
 
     private:
@@ -42,17 +43,13 @@ namespace Sentry
     class HttpServiceJsonMethod2 : public HttpServiceMethod
     {
     public:
-        HttpServiceJsonMethod2(T *o, HttpJsonMethod2<T> func);
+        HttpServiceJsonMethod2(T *o, HttpJsonMethod2<T> func)
+            : mObj(o), mFunction(std::move(func)) { }
 
     public:
-        XCode Invoke(const std::string &content, std::shared_ptr<RapidJsonWriter> reaponse)
+        XCode Invoke(std::shared_ptr<RapidJsonReader> request, std::shared_ptr<RapidJsonWriter> response)
         {
-            std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
-            if(!jsonReader->TryParse(content))
-            {
-                return XCode::ParseJsonFailure;
-            }
-            return (this->mObj*mFunction)(*jsonReader, *reaponse);
+            return (this->mObj->*mFunction)(*request, *response);
         }
 
     private:

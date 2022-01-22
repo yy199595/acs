@@ -1,5 +1,5 @@
 ﻿#include"RpcComponent.h"
-#include<Service/ServiceComponentBase.h>
+#include<Service/RcpService.h>
 #include<Coroutine/TaskComponent.h>
 #include<Util/StringHelper.h>
 #include"Object/App.h"
@@ -40,7 +40,7 @@ namespace Sentry
         }
 
         const std::string &service = protocolConfig->Service;
-        auto logicService = this->GetComponent<ServiceComponentBase>(service);
+        auto logicService = this->GetComponent<RcpService>(service);
         if (logicService == nullptr)
         {
             LOG_ERROR("call service not exist : [", service , "]");

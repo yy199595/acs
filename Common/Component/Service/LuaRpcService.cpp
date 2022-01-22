@@ -1,21 +1,21 @@
-﻿#include"LuaServiceComponent.h"
+﻿#include"LuaRpcService.h"
 #include<Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Script/LuaTable.h"
 namespace Sentry
 {
-    LuaServiceComponent::LuaServiceComponent()
+    LuaRpcService::LuaRpcService()
 		: mIdx(0), mLuaEnv(nullptr)
     {
 
     }
 
-    LuaServiceComponent::~LuaServiceComponent()
+    LuaRpcService::~LuaRpcService()
     {
         luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
     }
 
-	bool LuaServiceComponent::InitService(const std::string & name, lua_State * luaEnv)
+	bool LuaRpcService::InitService(const std::string & name, lua_State * luaEnv)
 	{
         this->mLuaEnv = luaEnv;
 		this->mServiceName = name;
@@ -23,19 +23,19 @@ namespace Sentry
         return this->mLuaTable != nullptr;
 	}
 
-    bool LuaServiceComponent::Awake()
+    bool LuaRpcService::Awake()
     {
         auto luaFunction = this->mLuaTable->GetFunction("Awake");
         return luaFunction == nullptr || luaFunction->Func<bool>();
     }
 
-    bool LuaServiceComponent::LateAwake()
+    bool LuaRpcService::LateAwake()
     {
         auto luaFunction = this->mLuaTable->GetFunction("LateAwake");
         return luaFunction == nullptr || luaFunction->Func<bool>();
     }
 
-    void LuaServiceComponent::OnStart()
+    void LuaRpcService::OnStart()
     {
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
         lua_getfield(this->mLuaEnv, -1, "OnStart");

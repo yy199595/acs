@@ -32,7 +32,7 @@ namespace Sentry
                 listenConfig->Count = iter->value["count"].GetInt();
             }
             listenConfig->Name = iter->name.GetString();
-            listenConfig->Handler = iter->value["handler"].GetString();;
+            listenConfig->Handler = iter->value["component"].GetString();;
             listenConfig->mAddress = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
             this->mListenerConfigs.emplace_back(listenConfig);
 		}

@@ -15,34 +15,37 @@
         "task":1,
         "network":1
     },
-    "rpc_path":"./Config/rpc.json",
-    "host_path": "./Config/host.json",
-    "code_path": "./XCode/XCode.csv",
+    "path":
+    {
+        "rpc": "./Config/rpc.json",
+        "code": "./XCode/XCode.csv",
+        "http": "./Config/Http.json"
+    },
     "listener": {
         "ip":"127.0.0.1",
         "rpc":
         {
             "port":7788,
             "count":10000,
-            "handler":"RpcClientComponent"
+            "component":"RpcClientComponent"
         },
         "http":
         {
             "port":80,
             "count": 1000,
-            "handler": "HttpClientComponent"
+            "component": "HttpClientComponent"
         },
         "gate":
         {
             "port":1995,
             "count": 10000,
-            "handler": "GateClientComponent"
+            "component": "GateClientComponent"
         },
         "console":
         {
             "port": 8080,
             "count": 1,
-            "handler" : "ConsoleComponent"
+            "component" : "ConsoleComponent"
         }
     },
     "mysql": {
@@ -78,7 +81,7 @@
         "HttpClientComponent"
     ],
     "service": [
-        "NodeAddressService",
+        "NodeService",
         "GateService",
         "AccountService"
     ],

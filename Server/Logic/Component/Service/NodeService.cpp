@@ -1,4 +1,4 @@
-﻿#include"NodeAddressService.h"
+﻿#include"NodeService.h"
 #include"Object/App.h"
 #include"Service/ServiceProxy.h"
 #include"Component/Scene/ServiceProxyComponent.h"
@@ -8,21 +8,21 @@
 #include"RedisComponent.h"
 namespace Sentry
 {
-    bool NodeAddressService::Awake()
+    bool NodeService::Awake()
     {
-        BIND_SUB_FUNCTION(NodeAddressService::Add);
+        BIND_SUB_FUNCTION(NodeService::Add);
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
         return true;
     }
 
-    bool NodeAddressService::LateAwake()
+    bool NodeService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
         return true;
     }
 
-    void NodeAddressService::Add(const RapidJsonReader &jsonReader)
+    void NodeService::Add(const RapidJsonReader &jsonReader)
     {
         int areaId = 0;
         if(jsonReader.TryGetValue("area_id", areaId))
@@ -50,12 +50,12 @@ namespace Sentry
         }
     }
 
-    void NodeAddressService::Remove(const RapidJsonReader &jsonReader)
+    void NodeService::Remove(const RapidJsonReader &jsonReader)
     {
 
     }
 
-    void NodeAddressService::OnStart() //把本机服务注册到redis
+    void NodeService::OnStart() //把本机服务注册到redis
     {
         auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
         const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
@@ -73,12 +73,12 @@ namespace Sentry
                 };
         for(Component * component : components)
         {
-            ServiceComponentBase *serviceComponent = dynamic_cast<ServiceComponentBase *>(component);
-            if (serviceComponent == nullptr)
+            SubService * subService = dynamic_cast<SubService *>(component);
+            if (subService == nullptr)
             {
                 continue;
             }
-            services.emplace_back(serviceComponent->GetServiceName());
+            services.emplace_back(subService->GetName());
         }
         auto response = this->mRedisComponent->Call("Service", "Add", services);
         if(response != nullptr && !response->HasError())
@@ -101,7 +101,7 @@ namespace Sentry
         }
     }
 
-    void NodeAddressService::OnDestory()
+    void NodeService::OnDestory()
     {
         auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
         const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
@@ -112,7 +112,7 @@ namespace Sentry
         this->RemoveNode(rpcListener->GetConfig().mAddress);
     }
 
-    bool NodeAddressService::RemoveNode(const std::string &address)
+    bool NodeService::RemoveNode(const std::string &address)
     {
         auto response = this->mRedisComponent->Call("Service", "Remove", this->mAreaId, address);
         if(response->HasError())

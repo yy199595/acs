@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include<Protocol/c2s.pb.h>
-#include<Service/ServiceComponentBase.h>
+#include<Service/HttpService.h>
 #define USER_ID_START 7788
 namespace Sentry
 {
 
     class RedisComponent;
     class MysqlProxyComponent;
-    class AccountService : public ServiceComponentBase
+    class AccountService : public HttpService
     {
     public:
         AccountService() = default;
@@ -20,9 +20,9 @@ namespace Sentry
 
 
     private:
-        XCode Login(const c2s::AccountLogin_Request& request, c2s::AccountLogin_Response & response);
+        XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
 
-        XCode Register(const c2s::AccountRegister_Request & request, c2s::AccountRegister_Response & response);
+        XCode Register(const RapidJsonReader & request, RapidJsonWriter & response);
 
     private:
         const std::string NewToken(const std::string & account);

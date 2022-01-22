@@ -11,12 +11,31 @@
 #include"Scene/ThreadPoolComponent.h"
 #include"Http/HttpRequestClient.h"
 #include"Http/HttpHandlerClient.h"
+#include"Util/FileHelper.h"
+#include"Service/HttpService.h"
 namespace Sentry
 {
 
     bool HttpClientComponent::Awake()
     {
+        std::string path;
         this->mCorComponent = nullptr;
+        rapidjson::Document jsonDocument;
+        const ServerConfig &config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("path", "http", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
+
+        auto iter = jsonDocument.MemberBegin();
+        for (; iter != jsonDocument.MemberEnd(); iter++)
+        {
+            HttpConfig * httpConfig = new HttpConfig();
+            httpConfig->mUrl = iter->name.GetString();
+            const rapidjson::Value & jsonValue = iter->value;
+            httpConfig->mType = jsonValue["Type"].GetString();
+            httpConfig->mMethodName = jsonValue["Method"].GetString();
+            httpConfig->mComponent = jsonValue["Component"].GetString();
+            this->mHttpConfigMap.emplace(httpConfig->mUrl, httpConfig);
+        }
         return true;
     }
 
@@ -50,7 +69,7 @@ namespace Sentry
             std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
             std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 
-            auto response = httpAsyncClient->Post("http://dev-lrs-tt.whitewolvesx.com/auth-server/user/login/phone", json);
+            auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
             if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
             {
                 LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
@@ -72,14 +91,32 @@ namespace Sentry
         LOG_WARN(httpRequestData->GetMethod(), "  ", httpRequestData->GetUrl(), "  ", httpRequestData->GetContent());
         //LOG_WARN(requestData->GetContent());
 
+        const std::string & url = httpRequestData->GetUrl();
+        auto iter = this->mHttpConfigMap.find(url);
+        if(iter == this->mHttpConfigMap.end())
+        {
+            httpClient->SendResponse(HttpStatus::NOT_FOUND);
+            return;
+        }
+        const std::string & content = httpRequestData->GetContent();
+        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
+        if(!jsonReader->TryParse(content))
+        {
+            httpClient->SendResponse(HttpStatus::BAD_REQUEST);
+            return;
+        }
+        HttpConfig * httpConfig = iter->second;
+        HttpService * httpService = this->GetComponent<HttpService>(httpConfig->mComponent);
+        if(httpService == nullptr)
+        {
+            httpClient->SendResponse(HttpStatus::NOT_FOUND);
+            return;
+        }
+        const std::string & method = httpConfig->mMethodName;
+        auto response = httpService->Invoke(method,jsonReader);
+
         std::string json;
-        RapidJsonWriter jsonWriter;
-        jsonWriter.Add("End", 100);
-        jsonWriter.Add("Start", 0);
-        jsonWriter.Add("RankId", 301000);
-
-        jsonWriter.WriterToStream(json);
-
+        response->WriterToStream(json);
         if(httpClient->SendResponse(HttpStatus::OK, json))
         {
             LOG_INFO("http data response successful [", elapsedTimer.GetMs(), "ms]");

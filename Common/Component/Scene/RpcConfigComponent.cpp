@@ -23,7 +23,8 @@ namespace Sentry
         std::string md5;
         std::string rpcPath;
         rapidjson::Document jsonMapper;
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("rpc_path", rpcPath));
+        const ServerConfig & config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("path", "rpc", rpcPath));
         if (!Helper::File::ReadJsonFile(rpcPath, jsonMapper, md5))
         {
             LOG_FATAL("not find file ", rpcPath);
@@ -102,7 +103,7 @@ namespace Sentry
         std::string path;
         std::vector<std::string> lines;
         auto & config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("code_path", path));
+        LOG_CHECK_RET_FALSE(config.GetValue("path", "code", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path , lines));
         std::vector<std::string> res;
         for (int index = 1; index < lines.size(); index++)

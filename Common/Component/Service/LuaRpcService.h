@@ -2,25 +2,25 @@
 
 
 #include<Script/LuaInclude.h>
-#include"Service/ServiceComponentBase.h"
+#include"Service/RcpService.h"
 
 class LuaTable;
 namespace Sentry
 {
     class LuaScriptComponent;
 
-    class LuaServiceComponent : public ServiceComponentBase, public IStart
+    class LuaRpcService : public RcpService, public IStart
     {
     public:
-        LuaServiceComponent();
-        ~LuaServiceComponent() override;
+        LuaRpcService();
+        ~LuaRpcService() override;
 	public:
 		bool InitService(const std::string & name, lua_State * luaEnv);
     public:
         bool Awake() final;
         void OnStart() final;
         bool LateAwake() final;
-		const std::string &GetServiceName()final { return this->mServiceName; }
+		const std::string &GetName()final { return this->mServiceName; }
     private:
 		int mIdx;
 		lua_State * mLuaEnv;

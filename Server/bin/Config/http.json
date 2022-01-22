@@ -1,23 +1,14 @@
 {
-    "/app/res/download":
+    "/logic/account/register":
     {
-        "IsAsync":false,
-        "Method":"Download",
-        "IsMainThread":true,
-        "Component":"HttpResourceComponent"
+        "Type": "POST",
+        "Method":"Register",
+        "Component":"AccountService"
     },
-    "/app/res/files":
+    "/logic/account/login":
     {
-        "IsAsync":false,
-        "Method":"Files",
-        "IsMainThread":true,
-        "Component":"HttpResourceComponent"
-    },
-    "/app/account/login":
-    {
-        "IsAsync":true,
+        "Type": "POST",
         "Method":"Login",
-        "IsMainThread":true,
-        "Component":"HttpLoginService"
+        "Component":"AccountService"
     }
 }

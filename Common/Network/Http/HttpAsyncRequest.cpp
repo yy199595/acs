@@ -172,7 +172,6 @@ namespace Sentry
                     std::string key = lineData.substr(0, pos);
                     std::string val = lineData.substr(pos + 1, length);
                     this->mHeadMap.insert(std::make_pair(key, val));
-                    std::cout << fmt::format("key = {0}  value = {1}", key, val) << std::endl;
                 }
             }
             if(this->mState == HttpDecodeState::Content)

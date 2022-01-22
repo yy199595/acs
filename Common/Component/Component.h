@@ -99,4 +99,11 @@ namespace Sentry
         return static_cast<T *>(component);
     }
 
+    inline std::string GetFunctionName(const std::string func)
+    {
+        size_t pos = func.find("::");
+        return func.substr(pos + 2);
+    }
+
+
 }

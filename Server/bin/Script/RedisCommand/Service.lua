@@ -26,7 +26,7 @@ function Json.ToString(t)
     return serialize(t)
 end
 
-local AddFunction = "NodeAddressService.Add"
+local AddFunction = "NodeService.Add"
 
 Service.Add = function(keys)
     local id = keys[1]

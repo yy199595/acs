@@ -6,9 +6,9 @@
 #include<Pool/ObjectPool.h>
 namespace Sentry
 {
-    class ServiceComponentBase;
+    class RcpService;
 
-    class LuaServiceComponent;
+    class LuaRpcService;
 
 	class ServiceMethod;
 
