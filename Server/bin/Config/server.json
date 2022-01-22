@@ -19,7 +19,7 @@
     {
         "rpc": "./Config/rpc.json",
         "code": "./XCode/XCode.csv",
-        "http": "./Config/Http.json"
+        "http": "./Config/http.json"
     },
     "listener": {
         "ip":"127.0.0.1",
