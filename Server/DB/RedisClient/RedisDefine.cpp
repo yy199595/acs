@@ -63,8 +63,8 @@ namespace Sentry
         {
             return false;
         }
-        return !this->mDatas.empty() &&
-               this->mDatas.front() == "OK";
+        return !this->mArray.empty() &&
+               this->mArray.front() == "OK";
     }
 
     void RedisResponse::AddValue(long long value)
@@ -80,16 +80,16 @@ namespace Sentry
 
     void RedisResponse::AddValue(const std::string &data)
     {
-        this->mDatas.emplace_back(std::move(data));
+        this->mArray.emplace_back(std::move(data));
     }
 
     void RedisResponse::AddValue(const char *str, size_t size)
     {
-        this->mDatas.emplace_back(str, size);
+        this->mArray.emplace_back(str, size);
     }
 
     const std::string &RedisResponse::GetValue(size_t index)
     {
-        return this->mDatas[index];
+        return this->mArray[index];
     }
 }

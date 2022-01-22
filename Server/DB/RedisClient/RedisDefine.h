@@ -1,5 +1,4 @@
 #pragma once
-#include<memory>
 #include<list>
 #include<string>
 #include<vector>
@@ -74,11 +73,11 @@ namespace Sentry
     public:
         long long GetNumber() { return this->mNumber; }
         RedisRespType GetType() { return this->mType; }
-        size_t GetArraySize() { return this->mDatas.size();}
+        size_t GetArraySize() { return this->mArray.size();}
     private:
         long long mNumber;
         RedisRespType mType;
-        std::vector<std::string> mDatas;
+        std::vector<std::string> mArray;
     };
 }
 

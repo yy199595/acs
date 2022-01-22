@@ -28,7 +28,11 @@ namespace Sentry
                 if(response->data().Is<s2s::MysqlResponse>())
                 {
                     data = std::shared_ptr<s2s::MysqlResponse>(new s2s::MysqlResponse());
-                    response->data().UnpackTo(data.get());
+                    if(!response->data().UnpackTo(data.get()))
+                    {
+                        std::move(data);
+                        LOG_ERROR("parse mysql response error");
+                    }
                 }
             }
         }
