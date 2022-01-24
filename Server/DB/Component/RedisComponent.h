@@ -13,6 +13,7 @@ namespace Sentry
     struct RedisConfig
     {
     public:
+        int mCount;
         std::string mIp;
         unsigned short mPort;
         std::string mPassword;
@@ -37,6 +38,7 @@ namespace Sentry
         void SubscribeMessage();
         void CheckRedisClient();
 	public:
+        void AddCorouterNum(const std::string & key);
         long long AddCounter(const std::string & key);
 
         bool SubscribeChannel(const std::string & chanel);
@@ -79,9 +81,9 @@ namespace Sentry
         TaskComponent * mTaskComponent;
         ThreadPoolComponent * mThreadComponent;
         std::shared_ptr<RedisClient> mSubRedisClient;
-        std::queue<std::shared_ptr<RedisClient>> mWaitRedisClient;
-        std::vector<std::shared_ptr<RedisClient>> mRedisCmdClients;
+        std::queue<std::shared_ptr<RedisClient>> mFreeClients;
         std::unordered_map<std::string, std::string> mLuaCommandMap;
-		//std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
+        std::queue<TaskSourceShared<RedisClient>> mWaitAllotClients;
+        //std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

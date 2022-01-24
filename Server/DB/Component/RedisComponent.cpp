@@ -13,7 +13,9 @@ namespace Sentry
     bool RedisComponent::Awake()
     {
         std::string path;
+        this->mRedisConfig.mCount = 3;
         const ServerConfig &config = App::Get().GetConfig();
+        config.GetValue("redis", "count", this->mRedisConfig.mCount);
         config.GetValue("redis", "lua", this->mRedisConfig.mLuaFilePath);
         config.GetValue("redis", "passwd", this->mRedisConfig.mPassword);
         LOG_CHECK_RET_FALSE(config.GetValue("redis", "ip", this->mRedisConfig.mIp));
@@ -41,11 +43,12 @@ namespace Sentry
 
     std::shared_ptr<RedisResponse> RedisComponent::InvokeCommand(std::shared_ptr<RedisRequest> request)
     {
-       std::shared_ptr<RedisClient> redisClient =  this->AllotRedisClient();
+        std::shared_ptr<RedisClient> redisClient = this->AllotRedisClient();
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
+        LOG_WARN("redis command name = ", redisClient->GetName());
 #endif
-        if(redisClient == nullptr)
+        if (redisClient == nullptr)
         {
             LOG_ERROR("allot redis client failure");
             return nullptr;
@@ -54,7 +57,14 @@ namespace Sentry
 #ifdef __DEBUG__
         LOG_INFO("invoke redis command use time : ", elapsedTimer.GetMs(), "ms");
 #endif
-        this->mWaitRedisClient.emplace(redisClient);
+        if (!this->mWaitAllotClients.empty())
+        {
+            auto taskClient = this->mWaitAllotClients.front();
+            this->mWaitAllotClients.pop();
+            taskClient->SetResult(redisClient);
+            return response;
+        }
+        this->mFreeClients.emplace(redisClient);
         return response;
     }
 
@@ -97,13 +107,25 @@ namespace Sentry
         Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
 
         this->mSubRedisClient = this->MakeRedisClient("Subscribe");
-        if(this->mSubRedisClient != nullptr)
+        if (this->mSubRedisClient != nullptr)
         {
             this->SubscribeMessage();
             LOG_DEBUG("subscribe redis client connect successful");
-            this->mRedisCmdClients.emplace_back(this->mSubRedisClient);
             this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
         }
+
+        for (size_t index = 0; index < this->mRedisConfig.mCount; index++)
+        {
+            string name = fmt::format("Command:{0}", index + 1);
+            std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(name);
+            if(redisClient == nullptr)
+            {
+                LOG_ERROR("connect redis ", this->mRedisConfig.mIp, ':', this->mRedisConfig.mPort, " failure");
+                return;
+            }
+            this->mFreeClients.emplace(redisClient);
+        }
+
         for (const std::string &file: luaFiles)
         {
             LOG_CHECK_RET(this->LoadLuaScript(file));
@@ -122,7 +144,6 @@ namespace Sentry
         {
             if (redisCommandClient->ConnectAsync(this->mRedisConfig.mIp, this->mRedisConfig.mPort)->Await())
             {
-                this->mRedisCmdClients.emplace_back(redisCommandClient);
                 if(!this->mRedisConfig.mPassword.empty())
                 {
                     std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
@@ -137,37 +158,47 @@ namespace Sentry
                 return redisCommandClient;
             }
         }
+        return nullptr;
     }
 
     std::shared_ptr<RedisClient> RedisComponent::AllotRedisClient()
     {
-        if(!this->mWaitRedisClient.empty())
+        std::shared_ptr<RedisClient> redisClient;
+        if (this->mFreeClients.empty())
         {
-            auto redisClinet = this->mWaitRedisClient.front();
-            this->mWaitRedisClient.pop();
-            if(!redisClinet->IsOpen())
+            std::shared_ptr<TaskSource<std::shared_ptr<RedisClient>>>
+                    taskSource(new TaskSource<std::shared_ptr<RedisClient>>());
+            this->mWaitAllotClients.push(taskSource);
+            redisClient = taskSource->Await();
+        }
+        else
+        {
+            redisClient = this->mFreeClients.front();
+            this->mFreeClients.pop();
+        }
+
+
+        if (!redisClient->IsOpen())
+        {
+            const std::string &ip = this->mRedisConfig.mIp;
+            unsigned short port = this->mRedisConfig.mPort;
+            if (!redisClient->ConnectAsync(ip, port)->Await())
             {
-                const std::string & ip = this->mRedisConfig.mIp;
-                unsigned short port = this->mRedisConfig.mPort;
-                if(!redisClinet->ConnectAsync(ip, port)->Await())
+                return nullptr;
+            }
+            if (!this->mRedisConfig.mPassword.empty())
+            {
+                std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
+                request->AddParameter(this->mRedisConfig.mPassword);
+                auto response = redisClient->InvokeCommand(request)->Await();
+                if (!response->IsOk())
                 {
+                    LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
                     return nullptr;
                 }
-                if(!this->mRedisConfig.mPassword.empty())
-                {
-                    std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
-                    request->AddParameter(this->mRedisConfig.mPassword);
-                    auto response = redisClinet->InvokeCommand(request)->Await();
-                    if(!response->IsOk())
-                    {
-                        LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
-                        return nullptr;
-                    }
-                }
             }
-            return redisClinet;
         }
-        return this->MakeRedisClient("Command");
+        return redisClient;
     }
 
     long long RedisComponent::Publish(const std::string &channel, const std::string &message)
@@ -177,24 +208,20 @@ namespace Sentry
 
     void RedisComponent::CheckRedisClient()
     {
-        while(!this->mRedisCmdClients.empty())
+        ElapsedTimer timer;
+        std::vector<TaskContext *> tasks;
+        for (int index = 0; index < 100; index++)
         {
-            this->mTaskComponent->Sleep(5000);
-            const long long nowTime = Helper::Time::GetSecTimeStamp();
-            for(std::shared_ptr<RedisClient> redisClient : this->mRedisCmdClients)
-            {
-                if( nowTime - redisClient->GetLastOperatorTime() < 5) //十秒没进行操作了
-                {
-                    continue;
-                }
-//                std::string json;
-//                RapidJsonWriter jsonWriter;
-//                jsonWriter.Add("id", 10);
-//                jsonWriter.Add("key", "orjworj");
-//                jsonWriter.WriterToStream(json);
-//                this->Publish("NodeService.Add", json);
-            }
+            string key = fmt::format("key:{0}", index);
+            tasks.push_back(this->mTaskComponent->Start(&RedisComponent::AddCorouterNum, this, key));
         }
+        this->mTaskComponent->WhenAll(tasks);
+        LOG_ERROR("user time = ", timer.GetMs(), "ms");
+    }
+
+    void RedisComponent::AddCorouterNum(const std::string &key)
+    {
+        long long value = this->AddCounter(key);
     }
 
     bool RedisComponent::SubscribeChannel(const std::string &chanel)

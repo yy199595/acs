@@ -58,6 +58,7 @@
         "ip": "8.136.213.239",
         "port": 6379,
         "timeout": 3,
+        "count": 5,
         "lua": "./Script/RedisCommand",
         "passwd": "199595yjz."
     },
