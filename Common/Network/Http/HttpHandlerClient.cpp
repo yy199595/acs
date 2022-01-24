@@ -83,7 +83,7 @@ namespace Sentry
                             taskSource->SetResult(true);
                             break;
                         default:
-                            this->SendResponse(httpCode);
+                            taskSource->SetResult(false);
                             break;
                     }
                 });

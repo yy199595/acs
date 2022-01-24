@@ -173,9 +173,13 @@ namespace Sentry
 
 	bool TaskComponent::Yield(unsigned int & mCorId)
     {
-        LOG_CHECK_RET_FALSE(mRunContext);
-        mCorId = this->mRunContext->mCoroutineId;
-        return this->Yield();
+        if(this->mRunContext != nullptr)
+        {
+            mCorId = this->mRunContext->mCoroutineId;
+            return this->Yield();
+        }
+        LOG_FATAL("not coroutine context");
+        return false;
     }
 
     TaskContext *TaskComponent::GetContext(unsigned int id)
@@ -185,6 +189,7 @@ namespace Sentry
 
 	void TaskComponent::SaveStack(unsigned int id)
     {
+        if(id == 0) return;
         TaskContext *coroutine = this->GetContext(id);
         if(coroutine == nullptr)
         {

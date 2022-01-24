@@ -62,19 +62,18 @@ namespace Sentry
         jsonWriter.Add("RankId", 301000);
 
         jsonWriter.WriterToStream(json);
-        while(!json.empty())
-        {
-            ElapsedTimer elapsedTimer;
-            NetWorkThread &thread = this->mThreadComponent->AllocateNetThread();
-            std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
-            std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 
-            auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
-            if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
-            {
-                LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
-            }
+        ElapsedTimer elapsedTimer;
+        NetWorkThread &thread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+
+        auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
+        if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+        {
+            LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
         }
+
     }
 
     void HttpClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
