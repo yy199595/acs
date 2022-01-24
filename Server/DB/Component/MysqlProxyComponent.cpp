@@ -43,24 +43,22 @@ namespace Sentry
             userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
 
 
-            std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
-            if(this->Add(userAccountData, taskSource) == XCode::Successful)
+            std::shared_ptr<MysqlRpcTaskSource> taskSource =  this->Add(userAccountData);
+            if(taskSource != nullptr && taskSource->GetCode() == XCode::Successful)
             {
                 LOG_ERROR("add data successful ", index);
             }
         }
         db::db_account_tab_user_account userAccount;
         userAccount.set_account("10000@qq.com");
-        std::shared_ptr<MysqlRpcTaskSource> taskSource(new MysqlRpcTaskSource());
+        std::shared_ptr<MysqlRpcTaskSource> taskSource = this->Query(userAccount);
+        if(taskSource != nullptr && taskSource->GetCode() == XCode::Successful)
+        {
 
-       if(this->Query(userAccount, taskSource) == XCode::Successful)
-       {
+        }
 
-       }
-
-        std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource(new MysqlRpcTaskSource());
-        XCode code = this->Sort("db_account.tab_user_account", "user_id", 10, false, rpcTaskSource);
-        if(code == XCode::Successful)
+        std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource =this->Sort("db_account.tab_user_account", "user_id", 10, false);
+        if(rpcTaskSource->GetCode() == XCode::Successful)
         {
             size_t size = rpcTaskSource->GetDataSize();
             for(size_t index = 0; index < size; index++)
@@ -101,122 +99,112 @@ namespace Sentry
         return requestMessage;
     }
 
-    XCode MysqlProxyComponent::Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Add(const Message &data)
     {
         auto requestMessage = this->NewMessage("Add");
-        if(requestMessage == nullptr)
-        {
-            return XCode::Failure;
+        if (requestMessage == nullptr) {
+            return nullptr;
         }
 
         this->mOperRequest.Clear();
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpc_id(taskSource->GetRpcId());
-            return taskSource->GetCode();
-        }
-        return XCode::Successful;
+        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
+
+
+        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
+        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
+#ifdef __DEBUG__
+        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
+#endif
+        return mysqlRpcTaskSource;
     }
 
-    XCode MysqlProxyComponent::Query(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Query(const Message &data)
     {
         auto requestMessage = this->NewMessage("Query");
-        if(requestMessage == nullptr)
-        {
-            return XCode::Failure;
+        if (requestMessage == nullptr) {
+            return nullptr;
         }
 
         this->mQueryRequest.Clear();
         this->mQueryRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mQueryRequest);
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
+
+        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
+        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
+        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
 #endif
-            return taskSource->GetCode();
-        }
-        return XCode::Successful;
+        return mysqlRpcTaskSource;
     }
 
-    XCode MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
     {
         auto requestMessage = this->NewMessage("Invoke");
-        if(requestMessage == nullptr)
-        {
-            return XCode::Failure;
+        if (requestMessage == nullptr) {
+            return nullptr;
         }
 
         this->mAnyOperRequest.Clear();
         this->mAnyOperRequest.set_sql(sql);
         this->mAnyOperRequest.set_tab(tab);
         requestMessage->mutable_data()->PackFrom(this->mAnyOperRequest);
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
+
+        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
+        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
+        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
 #endif
-            return taskSource->GetCode();
-        }
-        return XCode::Successful;
+        return mysqlRpcTaskSource;
     }
 
-    XCode MysqlProxyComponent::Save(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Save(const Message &data)
     {
         auto requestMessage = this->NewMessage("Save");
-        if(requestMessage == nullptr)
-        {
-            return XCode::Failure;
+        if (requestMessage == nullptr) {
+            return nullptr;
         }
 
         this->mOperRequest.Clear();
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
+
+        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
+        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
+        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
 #endif
-            return taskSource->GetCode();
-        }
-        return XCode::Successful;
+        return mysqlRpcTaskSource;
     }
 
-    XCode MysqlProxyComponent::Delete(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Delete(const Message &data)
     {
         auto requestMessage = this->NewMessage("Delete");
-        if(requestMessage == nullptr)
-        {
-            return XCode::Failure;
+        if (requestMessage == nullptr) {
+            return nullptr;
         }
         this->mOperRequest.Clear();
         this->mOperRequest.mutable_data()->PackFrom(data);
         requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        if(taskSource!= nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestMessage->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
+
+
+        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
+        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestMessage->method_id());
+        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
 #endif
-            return taskSource->GetCode();
-        }
-        return XCode::Successful;
+        return mysqlRpcTaskSource;
     }
 
-    XCode MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse, std::shared_ptr<MysqlRpcTaskSource> taskSource)
+    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse)
     {
         const char * type = !reverse ? "ASC" : "DESC";
         return this->Invoke(tab, fmt::format(
-                "select * from {0} ORDER BY {1} {2} LIMIT {3}", tab, field, type, count), taskSource);
+                "select * from {0} ORDER BY {1} {2} LIMIT {3}", tab, field, type, count));
     }
 }

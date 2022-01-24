@@ -27,16 +27,13 @@ namespace Sentry
         std::shared_ptr<com::Rpc_Request> NewRequest(const std::string &method);
 
     public:
-        XCode Call(const std::string &func, std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<RpcTaskSource> Call(const std::string &func);
 
-        XCode Call(const std::string &func, const Message &message,
-                   std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<RpcTaskSource> Call(const std::string &func, const Message &message);
 
-        XCode Call(const std::string &address, const std::string &func,
-                   std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<RpcTaskSource> Call(const std::string &address, const std::string &func);
 
-        XCode Call(const std::string &address, const std::string &func,
-                   const Message &message, std::shared_ptr<RpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<RpcTaskSource> Call(const std::string &address, const std::string &func, const Message &message);
 
     private:
         void Destory();

@@ -22,17 +22,17 @@ namespace Sentry
 		void AddUserData();
         std::shared_ptr<com::Rpc_Request> NewMessage(const std::string & name);
     public:
-        XCode Add(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Add(const Message &data);
 
-        XCode Save(const Message &data, std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Save(const Message &data);
 
-        XCode Delete(const Message &data,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Delete(const Message &data);
 
-        XCode Query(const Message &data,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Query(const Message &data);
 
-        XCode Invoke(const std::string & tab, const std::string & sql,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Invoke(const std::string & tab, const std::string & sql);
 
-        XCode Sort(const std::string & tab, const std::string & field, int count, bool reverse = false,std::shared_ptr<MysqlRpcTaskSource> taskSource = nullptr);
+        std::shared_ptr<MysqlRpcTaskSource> Sort(const std::string & tab, const std::string & field, int count, bool reverse = false);
 
     private:
         class RpcComponent * mRpcComponent;

@@ -101,85 +101,72 @@ namespace Sentry
         return request;
 	}
 
-    XCode ServiceProxy::Call(const string &func, std::shared_ptr<RpcTaskSource> taskSource)
+    std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const string &func)
     {
         std::string address;
         if(this->AllotServiceAddress(address))
         {
             LOG_ERROR("allot service address failure : ", this->mServiceName);
-            return XCode::CallServiceNotFound;
+            return nullptr;
         }
-        return this->Call(address, func, taskSource);
+        return this->Call(address, func);
     }
 
-    XCode ServiceProxy::Call(const string &func, const Message &message, std::shared_ptr<RpcTaskSource> taskSource)
+    std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const string &func, const Message &message)
     {
         std::string address;
         if (this->AllotServiceAddress(address))
         {
             LOG_ERROR("allot service address failure : ", this->mServiceName);
-            return XCode::CallServiceNotFound;
+            return nullptr;
         }
-        return this->Call(address, func, message, taskSource);
+        return this->Call(address, func, message);
     }
 
-    XCode ServiceProxy::Call(const std::string &address, const std::string &func,
-                             std::shared_ptr<RpcTaskSource> taskSource)
+    std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const std::string &address, const std::string &func)
     {
         auto requestData = this->NewRequest(func);
-        if (requestData == nullptr)
-        {
+        if (requestData == nullptr) {
             LOG_ERROR("{0} not config ", func);
-            return XCode::NotFoundRpcConfig;
+            return nullptr;
         }
 
         std::shared_ptr<ProxyClient> serviceNode = this->GetNode(address);
-        if(serviceNode == nullptr)
-        {
+        if (serviceNode == nullptr) {
             LOG_ERROR("not find node : ", address);
-            return XCode::CallServiceNotFound;
+            return nullptr;
         }
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestData->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
+        this->mRpcComponent->AddRpcTask(taskSource);
+        requestData->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
+        this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
 #endif
-            serviceNode->PushMessage(requestData);
-            return taskSource->GetCode();
-        }
         serviceNode->PushMessage(requestData);
-        return XCode::Successful;
+        return taskSource;
     }
 
-    XCode ServiceProxy::Call(const std::string &address, const std::string &func, const Message &message,
-                             std::shared_ptr<RpcTaskSource> taskSource)
+    std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const std::string &address, const std::string &func, const Message &message)
     {
         auto requestData = this->NewRequest(func);
-        if (requestData == nullptr)
-        {
+        if (requestData == nullptr) {
             LOG_ERROR("{0} not rpc config ", func);
-            return XCode::NotFoundRpcConfig;
+            return nullptr;
         }
         std::shared_ptr<ProxyClient> serviceNode = this->GetNode(address);
-        if(serviceNode == nullptr)
-        {
+        if (serviceNode == nullptr) {
             LOG_ERROR("not find node : ", address);
-            return XCode::CallServiceNotFound;
+            return nullptr;
         }
         requestData->mutable_data()->PackFrom(message);
-        if(taskSource != nullptr)
-        {
-            this->mRpcComponent->AddRpcTask(taskSource);
-            requestData->set_rpc_id(taskSource->GetRpcId());
+        std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
+
+        this->mRpcComponent->AddRpcTask(taskSource);
+        requestData->set_rpc_id(taskSource->GetRpcId());
 #ifdef __DEBUG__
-            this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
+        this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), requestData->method_id());
 #endif
-            serviceNode->PushMessage(requestData);
-            return taskSource->GetCode();
-        }
         serviceNode->PushMessage(requestData);
-        return XCode::Successful;
+        return taskSource;
     }
 }// namespace Sentry
