@@ -64,9 +64,6 @@ namespace Sentry
 		std::string dir, name, luaFile;
 		for (std::string & path : luaFiles)
 		{
-#ifdef __DEBUG__
-            LOG_INFO("load lua file " , path);
-#endif
 			if (Helper::File::ReadTxtFile(path, luaFile)
 				&& Helper::Directory::GetDirAndFileName(path, dir, name))
 			{

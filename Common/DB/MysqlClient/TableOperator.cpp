@@ -23,7 +23,7 @@ namespace Sentry
             }
             if (mysql_select_db(this->mMysqlSocket, db.c_str()) == 0)
             {
-                LOG_INFO("create db {0} successful",  db);
+                LOG_INFO("create db [", db, "] successful");
                 return true;
             }
             return false;
@@ -187,7 +187,6 @@ namespace Sentry
             LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        LOG_INFO("\n{0}", sql);
         return true;
     }
 }

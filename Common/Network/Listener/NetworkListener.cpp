@@ -48,8 +48,8 @@ namespace Sentry
         catch (std::system_error & err)
         {
             taskSource->SetResult(false);
-            LOG_FATAL("listen {0}:{1} failure {2}",
-                      this->mConfig.Ip, this->mConfig.Port, err.what());
+            LOG_FATAL(fmt::format("listen {0}:{1} failure {2}",
+                      this->mConfig.Ip, this->mConfig.Port, err.what()));
         }
     }
 

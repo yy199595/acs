@@ -141,7 +141,6 @@ namespace Sentry
         {
             lineData.pop_back(); //拿掉\r
             this->mDataCount = this->OnReceiveFirstLine(type, lineData);
-            std::cout << "receive sum line " << this->mDataCount << std::endl;
             if(this->mDataCount == 0)
             {
                 this->OnComplete();
@@ -157,12 +156,8 @@ namespace Sentry
             this->mResponse->AddValue(this->mReadTempBuffer, this->mDataSize);
 
             this->mLineCount++;
-            readStream.ignore(2);
-#ifdef __DEBUG__
-            std::cout << "current receive line " << this->mLineCount <<
-                "[ " << std::string(this->mReadTempBuffer, this->mDataSize) <<"]" << std::endl;
-#endif
             this->mDataSize = 0;
+            readStream.ignore(2);
             if(this->mLineCount >= this->mDataCount)
             {
                 this->OnComplete();
