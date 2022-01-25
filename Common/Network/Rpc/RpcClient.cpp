@@ -77,12 +77,6 @@ namespace Sentry
             int length = 0;
             char type = self->mReceiveBuffer[0];
             memcpy(&length, self->mReceiveBuffer + sizeof(char), sizeof(int));
-            if (length >= MAX_DATA_COUNT)
-            {
-                this->mSocketProxy->Close();
-                this->OnClientError(XCode::NetBigDataShutdown);
-                return;
-            }
 
             switch(type)
             {
