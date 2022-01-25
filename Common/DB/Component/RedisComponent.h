@@ -4,7 +4,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
 #include"Coroutine/TaskComponent.h"
-#include"RedisClient/NetWork/RedisClient.h"
+#include"DB/RedisClient/NetWork/RedisClient.h"
 using namespace Sentry;
 namespace Sentry
 {
@@ -38,7 +38,6 @@ namespace Sentry
         void SubscribeMessage();
         void CheckRedisClient();
 	public:
-        void AddCorouterNum(const std::string & key);
         long long AddCounter(const std::string & key);
 
         bool SubscribeChannel(const std::string & chanel);

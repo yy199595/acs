@@ -1,7 +1,7 @@
 ﻿#include "MysqlComponent.h"
 #include"Object/App.h"
 #include"Coroutine/TaskComponent.h"
-#include"MysqlClient/TableOperator.h"
+#include"DB/MysqlClient/TableOperator.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
 namespace Sentry

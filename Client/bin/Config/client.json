@@ -1,12 +1,10 @@
 {
-    "NodeName": "Client",
-    "LogicFps": 30,
-    "Log":
+    "node_name": "Client",
+    "fps": 30,
+    "log":
     {
         "save":1,
-        "path":"./Log/",
-        "hour":0,
-        "min":0
+        "path":"./Log/"
     },
     "Thread":
     {
@@ -14,12 +12,10 @@
     },
     "IsOpenRecoder": true,
     "ScriptPath":"./Script/",
-    "Scene": [
+    "component": [
         "ClientComponent",
+        "HttpClientComponent",
         "ThreadPoolComponent"
     ],
-    "Service":[],
-    "WhiteList": [
-        "127.0.0.1"
-    ]
+    "service":[]
 }

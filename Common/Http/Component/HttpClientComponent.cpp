@@ -22,19 +22,20 @@ namespace Sentry
         this->mCorComponent = nullptr;
         rapidjson::Document jsonDocument;
         const ServerConfig &config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("path", "http", path));
-        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
-
-        auto iter = jsonDocument.MemberBegin();
-        for (; iter != jsonDocument.MemberEnd(); iter++)
+        if(config.GetValue("path", "http", path))
         {
-            HttpConfig * httpConfig = new HttpConfig();
-            httpConfig->mUrl = iter->name.GetString();
-            const rapidjson::Value & jsonValue = iter->value;
-            httpConfig->mType = jsonValue["Type"].GetString();
-            httpConfig->mMethodName = jsonValue["Method"].GetString();
-            httpConfig->mComponent = jsonValue["Component"].GetString();
-            this->mHttpConfigMap.emplace(httpConfig->mUrl, httpConfig);
+            LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
+            auto iter = jsonDocument.MemberBegin();
+            for (; iter != jsonDocument.MemberEnd(); iter++)
+            {
+                HttpConfig *httpConfig = new HttpConfig();
+                httpConfig->mUrl = iter->name.GetString();
+                const rapidjson::Value &jsonValue = iter->value;
+                httpConfig->mType = jsonValue["Type"].GetString();
+                httpConfig->mMethodName = jsonValue["Method"].GetString();
+                httpConfig->mComponent = jsonValue["Component"].GetString();
+                this->mHttpConfigMap.emplace(httpConfig->mUrl, httpConfig);
+            }
         }
         return true;
     }

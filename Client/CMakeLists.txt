@@ -9,19 +9,22 @@ include_directories(${PROJECT_COMMON_DIR}/Libs/include/protobuf)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/asio)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/lua5.3)
 include_directories(${PROJECT_COMMON_DIR}/Libs/include/spdlog)
+include_directories(${PROJECT_COMMON_DIR}/Libs/include/mysql)
+
 #公共组件
 
 include_directories(${PROJECT_COMMON_DIR}/Common)
-include_directories(${PROJECT_COMMON_DIR}/Protocol)
-include_directories(${PROJECT_COMMON_DIR}/Common/NetWork)
+include_directories(${PROJECT_COMMON_DIR}/Common/DB)
+include_directories(${PROJECT_COMMON_DIR}/Common/DB/Component)
 
-include_directories(${PROJECT_SOURCE_DIR}/DB/Component)
-include_directories(${PROJECT_SOURCE_DIR}/Logic/Component)
+
+include_directories(${PROJECT_COMMON_DIR}/Protocol)
+include_directories(${PROJECT_COMMON_DIR}/Common/Network)
 include_directories(${PROJECT_COMMON_DIR}/Common/Component)
 
-include_directories(${PROJECT_SOURCE_DIR}/Component)
-
 include_directories(${PROJECT_SOURCE_DIR})
+
+
 
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 file(GLOB_RECURSE ManagerSource "Component/*.h" "Component/*.cpp" "Component/*.hpp" "Component/*.cc")
@@ -52,10 +55,10 @@ if(MSVC)
     endforeach()
 
     ADD_EXECUTABLE(Client ${AsmFiles} ${CommonFiles} ${ClientFiles})
-    TARGET_LINK_LIBRARIES(Client Lua53 libprotobufd)
+    TARGET_LINK_LIBRARIES(Client Lua53 libprotobufd libmysql)
 else()
     ADD_EXECUTABLE(Client ${AsmFiles} ${CommonFiles} ${ClientFiles})
-    TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread dl)
+    TARGET_LINK_LIBRARIES(Client Lua53 protobuf pthread mysqlclient dl)
 endif()
 
 target_compile_definitions(Client PRIVATE __DEBUG__)

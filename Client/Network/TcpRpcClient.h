@@ -9,21 +9,24 @@ using namespace Sentry;
 namespace Client
 {
 	class ClientComponent;
-	class TcpRpcClient
+    class TcpRpcClient : public RpcClient
 	{
 	public:
-		TcpRpcClient(ClientComponent * component);
+		TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
-		bool StartSendProtoData(std::shared_ptr<c2s::Rpc_Request> request);
+        std::shared_ptr<TaskSource<bool>> SendToGate(std::shared_ptr<c2s::Rpc_Request> request);
         std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 	protected:
-        XCode OnRequest(const char * buffer, size_t size);
-		XCode OnResponse(const char * buffer, size_t size);
-	private:
-		void SendProtoData(const c2s::Rpc_Request * request);
-	private:
+        void OnConnect(XCode code) final;
+        void OnClientError(XCode code) final;
+        XCode OnRequest(const char * buffer, size_t size) final;
+		XCode OnResponse(const char * buffer, size_t size) final;
+        void OnSendData(XCode code, std::shared_ptr<Message>) final;
+    private:
         char mRecvBuffer[4096];
         ClientComponent * mClientComponent;
-        std::shared_ptr<AsioTcpSocket> mTcpSocket;
+        std::shared_ptr<SocketProxy> mTcpSocket;
+        std::shared_ptr<TaskSource<bool>> mSendTask;
+        std::shared_ptr<TaskSource<bool>> mConnectTask;
     };
 }

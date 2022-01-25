@@ -2,7 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Component/Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceProxyComponent.h"
 #ifdef __DEBUG__
 #include"Telnet/ConsoleComponent.h"
 #endif
@@ -31,7 +31,6 @@ namespace Sentry
         this->mLogComponent = this->GetComponent<LoggerComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<ServiceProxyComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 #ifdef __DEBUG__
@@ -41,7 +40,7 @@ namespace Sentry
 		std::vector<std::string> components;
 		if (!mConfig->GetValue("component", components))
 		{
-			LOG_ERROR("not find field : Scene");
+			LOG_ERROR("not find field : component");
 			return false;
 		}
 

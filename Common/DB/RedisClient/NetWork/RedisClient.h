@@ -6,7 +6,7 @@
 #define GAMEKEEPER_REDISCLIENT_H
 #include"SocketProxy.h"
 #include"Async/TaskSource.h"
-#include"RedisClient/RedisDefine.h"
+#include"DB/RedisClient/RedisDefine.h"
 
 namespace Sentry
 {

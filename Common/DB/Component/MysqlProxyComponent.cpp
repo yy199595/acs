@@ -8,7 +8,7 @@
 #include"Scene/ServiceProxyComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Other/StringFmt.h"
-#include"MysqlClient/MysqlRpcTaskSource.h"
+#include"DB/MysqlClient/MysqlRpcTaskSource.h"
 namespace Sentry
 {
     bool MysqlProxyComponent::Awake()

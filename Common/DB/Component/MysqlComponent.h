@@ -3,7 +3,7 @@
 #include "XCode/XCode.h"
 #include "Component/Component.h"
 #include "Util/Guid.h"
-#include "MysqlClient/MysqlDefine.h"
+#include "DB/MysqlClient/MysqlDefine.h"
 
 
 namespace Sentry

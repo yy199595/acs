@@ -5,7 +5,7 @@
 #include"GateComponent.h"
 #include"Object/App.h"
 #include"Service/ServiceProxy.h"
-#include"NetWork/RpcProxyClient.h"
+#include"NetWork/RpcGateClient.h"
 #include"Scene/RpcConfigComponent.h"
 #include"Component/Scene/ServiceProxyComponent.h"
 #include"Task/RpcProxyTask.h"
@@ -38,7 +38,7 @@ namespace Sentry
     {
         auto config = this->mRpcConfigComponent->GetProtocolConfig(request->method_name());
         if (config == nullptr) {
-            LOG_ERROR("call function", request->method_name(), "not find");
+            LOG_ERROR("call function ", request->method_name(), " not find");
             return XCode::NotFoundRpcConfig;
         }
 

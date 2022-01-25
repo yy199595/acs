@@ -62,7 +62,6 @@ namespace Sentry
             {
                 case RPC_TYPE_REQUEST:
                 case RPC_TYPE_RESPONSE:
-                case RPC_TYPE_CLIENT_REQUEST:
                     this->ReceiveBody(type, length);
                     break;
                 default:
@@ -154,7 +153,10 @@ namespace Sentry
             }
             this->OnConnect(code);
             this->mIsConnect = false;
-            this->mSocketProxy->RefreshState();
+            if(code == XCode::Successful)
+            {
+                this->mSocketProxy->RefreshState();
+            }
         });
     }
 

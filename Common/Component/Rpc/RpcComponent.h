@@ -3,7 +3,6 @@
 #include<Protocol/s2s.pb.h>
 #include<Component/Component.h>
 #include<Other/MultiThreadQueue.h>
-#include<Pool/ObjectPool.h>
 namespace Sentry
 {
     class RcpService;

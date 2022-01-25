@@ -5,7 +5,7 @@
 #include"GateService.h"
 #include"Object/App.h"
 #include"Service/ServiceProxy.h"
-#include"NetWork/RpcProxyClient.h"
+#include"NetWork/RpcGateClient.h"
 #include"Component/GateClientComponent.h"
 namespace Sentry
 {

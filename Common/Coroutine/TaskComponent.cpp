@@ -4,9 +4,6 @@
 #include<Util/Guid.h>
 #include<Timer/TimerComponent.h>
 #include"Other/ElapsedTimer.h"
-#ifdef JE_MALLOC
-#include"jemalloc/jemalloc.h"
-#endif
 using namespace std::chrono;
 namespace Sentry
 {

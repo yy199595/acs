@@ -4,7 +4,7 @@
 
 #include "GateClientComponent.h"
 #include"Object/App.h"
-#include"NetWork/RpcProxyClient.h"
+#include"NetWork/RpcGateClient.h"
 #include"GateComponent.h"
 #include"Rpc/RpcComponent.h"
 #ifdef __DEBUG__
@@ -34,17 +34,18 @@ namespace Sentry
     void GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         long long id = socket->GetSocketId();
-        auto iter = this->mProxyClientMap.find(id);
-        LOG_CHECK_RET(iter == this->mProxyClientMap.end());
+        auto iter = this->mGateClientMap.find(id);
+        LOG_CHECK_RET(iter == this->mGateClientMap.end());
         const std::string ip = socket->GetSocket().remote_endpoint().address().to_string();
         if(this->mBlackList.find(ip) == this->mBlackList.end())
         {
-            auto rpcClient = new RpcProxyClient(socket, SocketType::RemoteSocket, this);
+            std::shared_ptr<RpcGateClient> gateClient(
+                    new RpcGateClient(socket, SocketType::RemoteSocket, this));
 #ifdef __DEBUG__
             LOG_INFO("new player connect proxy component ip : ", ip);
 #endif
-            rpcClient->StartReceive();
-            this->mProxyClientMap.insert(std::make_pair(id, rpcClient));
+            gateClient->StartReceive();
+            this->mGateClientMap.emplace(id, gateClient);
         }
     }
 
@@ -72,16 +73,9 @@ namespace Sentry
 
     void GateClientComponent::OnCloseSocket(long long id, XCode code)
     {
-        auto iter = this->mProxyClientMap.find(id);
-        if(iter != this->mProxyClientMap.end())
+        auto iter = this->mGateClientMap.find(id);
+        if(iter != this->mGateClientMap.end())
         {
-            RpcProxyClient *proxyClient = iter->second;
-            this->mProxyClientMap.erase(iter);
-            if (code == XCode::UnKnowPacket) //恶意消息
-            {
-                this->mBlackList.emplace(proxyClient->GetIp());
-            }
-            delete proxyClient;
 #ifdef __DEBUG__
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
             LOG_WARN("remove player session code = ", configCom->GetCodeDesc(code));
@@ -99,15 +93,15 @@ namespace Sentry
         return proxyClient->SendToClient(message);
     }
 
-    RpcProxyClient *GateClientComponent::GetGateClient(long long int sockId)
+    std::shared_ptr<RpcGateClient> GateClientComponent::GetGateClient(long long int sockId)
     {
-        auto iter = this->mProxyClientMap.find(sockId);
-        return iter != this->mProxyClientMap.end() ? iter->second : nullptr;
+        auto iter = this->mGateClientMap.find(sockId);
+        return iter != this->mGateClientMap.end() ? iter->second : nullptr;
     }
 
     void GateClientComponent::StartClose(long long int id)
     {
-        RpcProxyClient * proxyClient = this->GetGateClient(id);
+        auto proxyClient = this->GetGateClient(id);
         if(proxyClient != nullptr)
         {
             proxyClient->StartClose();
@@ -116,7 +110,7 @@ namespace Sentry
 
     void GateClientComponent::CheckPlayerLogout(long long sockId)
     {
-        RpcProxyClient * proxyClient = this->GetGateClient(sockId);
+        auto proxyClient = this->GetGateClient(sockId);
         if(proxyClient != nullptr)
         {
             long long nowTime = Helper::Time::GetSecTimeStamp();

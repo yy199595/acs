@@ -6,10 +6,10 @@
 #include <Timer/TimerComponent.h>
 #include <Coroutine/TaskComponent.h>
 #include <Listener/TcpServerComponent.h>
-#include "Component/MysqlComponent.h"
+#include "MysqlComponent.h"
 #include <Scene/RpcConfigComponent.h>
-#include "Component/RedisComponent.h"
-#include "Component/MysqlProxyComponent.h"
+#include "RedisComponent.h"
+#include "MysqlProxyComponent.h"
 #include "Http/Component/HttpClientComponent.h"
 #include"Service/GateService.h"
 #include <Telnet/ConsoleComponent.h>

@@ -7,7 +7,7 @@
 #include"Scene/RpcConfigComponent.h"
 #include"Scene/ThreadPoolComponent.h"
 #include"Service/SubService.h"
-#include"RedisClient/NetWork/RedisClient.h"
+#include"DB/RedisClient/NetWork/RedisClient.h"
 namespace Sentry
 {
     bool RedisComponent::Awake()
@@ -208,20 +208,7 @@ namespace Sentry
 
     void RedisComponent::CheckRedisClient()
     {
-        ElapsedTimer timer;
-        std::vector<TaskContext *> tasks;
-        for (int index = 0; index < 100; index++)
-        {
-            string key = fmt::format("key:{0}", index);
-            tasks.push_back(this->mTaskComponent->Start(&RedisComponent::AddCorouterNum, this, key));
-        }
-        this->mTaskComponent->WhenAll(tasks);
-        LOG_ERROR("user time = ", timer.GetMs(), "ms");
-    }
 
-    void RedisComponent::AddCorouterNum(const std::string &key)
-    {
-        long long value = this->AddCounter(key);
     }
 
     bool RedisComponent::SubscribeChannel(const std::string &chanel)

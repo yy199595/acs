@@ -5,7 +5,7 @@
 #include<google/protobuf/message.h>
 
 
-using namespace GameKeeper;
+using namespace Sentry;
 using namespace google::protobuf;
 namespace Client
 {

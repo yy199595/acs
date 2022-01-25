@@ -3,7 +3,6 @@
 #include"ClientComponent.h"
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
-#include"Scene/ThreadPoolComponent.h"
 #include"Network/ClientRpcTask.h"
 #include"Other/ElapsedTimer.h"
 namespace Client
@@ -11,18 +10,7 @@ namespace Client
 	ClientComponent::ClientComponent()
 	{		
 		this->mTcpClient = nullptr;
-		this->mTaskComponent = nullptr;
         this->mTimerComponent = nullptr;
-	}
-
-	void ClientComponent::StartClose(long long id)
-	{
-
-	}
-
-	void ClientComponent::OnCloseSocket(long long id, XCode code)
-	{
-		
 	}
 
 	unsigned int ClientComponent::AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms)
@@ -32,6 +20,16 @@ namespace Client
 		return ms > 0 ? this->mTimerComponent->AsyncWait(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
 	}
 
+    void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> t1)
+    {
+
+    }
+
+    void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc_Response> t2)
+    {
+
+    }
+
 	bool ClientComponent::Awake()
     {
 		return true;
@@ -40,16 +38,16 @@ namespace Client
     bool ClientComponent::LateAwake()
     {
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-        this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
         return true;
     }
 
 	void ClientComponent::OnStart()
 	{
-		NetWorkThread & netThread = this->mTaskComponent->AllocateNetThread();
-		this->mTcpClient = new TcpRpcClient(new SocketProxy(netThread, "Client"), this);
+		IAsioThread & netThread = App::Get().GetTaskScheduler();
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
+		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
-        if(!this->mTcpClient->ConnectAsync("114.115.167.51", 1995)->Await())
+        if(!this->mTcpClient->ConnectAsync("127.0.0.1", 1995)->Await())
         {
             LOG_FATAL("connect server failure");
             return;
@@ -59,23 +57,23 @@ namespace Client
 		LOG_DEBUG("connect server successful");
 
         ElapsedTimer timer;
-		auto requestMessage = new c2s::Rpc_Request();
+        std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 		const std::string method = "AccountService.Register";
 
 		c2s::AccountRegister_Request registerRequest;
         registerRequest.set_account("112233@qq.com");
-        registerRequest.set_passwd("==================");
+        registerRequest.set_password("==================");
 
 
-		requestMessage->set_rpcid(1);
-		requestMessage->set_methodname(method);
+		requestMessage->set_rpc_id(1);
+		requestMessage->set_method_name(method);
 		requestMessage->mutable_data()->PackFrom(registerRequest);
-		std::shared_ptr<ClientRpcTask> rpcTask(new ClientRpcTask(method));
-		this->mTcpClient->StartSendProtoData(requestMessage);
+
+        this->mTcpClient->SendToGate(requestMessage)->Await();
 
 
 
-        LOG_INFO("use time = " << timer.GetMs() << "ms");
+        LOG_INFO("use time = ", timer.GetMs() , "ms");
 		
 	}
 	void ClientComponent::OnTimeout(long long rpcId)
