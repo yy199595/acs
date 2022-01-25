@@ -7,7 +7,6 @@ namespace Sentry
         : mNetThread(thread), mName(name)
     {
         this->mSocket = socket;
-        this->RefreshState();
         this->mIsOpen = socket->is_open();
         this->mSocketId = Helper::ThreadGuid::Create();
 
