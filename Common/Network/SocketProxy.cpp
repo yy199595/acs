@@ -3,7 +3,7 @@
 #include<spdlog/fmt/fmt.h>
 namespace Sentry
 {
-    SocketProxy::SocketProxy(NetWorkThread &thread, const std::string &name, std::shared_ptr<AsioTcpSocket> socket)
+    SocketProxy::SocketProxy(IAsioThread &thread, const std::string &name, std::shared_ptr<AsioTcpSocket> socket)
         : mNetThread(thread), mName(name)
     {
         this->mSocket = socket;
@@ -25,7 +25,7 @@ namespace Sentry
         }
     }
 
-	SocketProxy::SocketProxy(NetWorkThread & thread, const std::string & name)
+	SocketProxy::SocketProxy(IAsioThread & thread, const std::string & name)
 		: mNetThread(thread), mName(name)
 	{
         this->mIsOpen = false;

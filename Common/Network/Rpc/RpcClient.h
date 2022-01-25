@@ -42,7 +42,7 @@ namespace Sentry
         void SendData(char type, std::shared_ptr<Message> message);
 	protected:
         AsioContext & mContext;
-		NetWorkThread & mNetWorkThread;
+        IAsioThread & mNetWorkThread;
         std::shared_ptr<SocketProxy> mSocketProxy;
     private:
 		std::string mIp;

@@ -64,7 +64,7 @@ namespace Sentry
         jsonWriter.WriterToStream(json);
 
         ElapsedTimer elapsedTimer;
-        NetWorkThread &thread = this->mThreadComponent->AllocateNetThread();
+        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
         std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 

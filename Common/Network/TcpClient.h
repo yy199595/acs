@@ -28,7 +28,7 @@ namespace Sentry
     protected:
         std::string mAddress;
         AsioContext & mContext;
-        NetWorkThread & mNetworkThread;
+        IAsioThread & mNetworkThread;
         std::shared_ptr<SocketProxy> mSocket;
     private:
         SocketType mSocketType;

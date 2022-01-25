@@ -1,30 +1,29 @@
 #pragma once
 #include"XCode/XCode.h"
-#include"Async/TaskSourceBase.h"
 #include"Protocol/c2s.pb.h"
+#include"Async/TaskSource.h"
 #include"Network/Rpc/RpcClient.h"
 
 
-using namespace GameKeeper;
+using namespace Sentry;
 namespace Client
 {
 	class ClientComponent;
-	class TcpRpcClient : public RpcClient
+	class TcpRpcClient
 	{
 	public:
-		TcpRpcClient(SocketProxy * socket, ClientComponent * component);
+		TcpRpcClient(ClientComponent * component);
 	public:
-		bool StartSendProtoData(const c2s::Rpc_Request * request);
+		bool StartSendProtoData(std::shared_ptr<c2s::Rpc_Request> request);
         std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 	protected:
-        void OnClose(XCode code) final;
-		void OnConnect(XCode code) final { }
-        void OnSendData(XCode code, const Message *) final;
-        XCode OnRequest(const char * buffer, size_t size) final;
-		XCode OnResponse(const char * buffer, size_t size) final;
+        XCode OnRequest(const char * buffer, size_t size);
+		XCode OnResponse(const char * buffer, size_t size);
 	private:
 		void SendProtoData(const c2s::Rpc_Request * request);
 	private:
+        char mRecvBuffer[4096];
         ClientComponent * mClientComponent;
+        std::shared_ptr<AsioTcpSocket> mTcpSocket;
     };
 }

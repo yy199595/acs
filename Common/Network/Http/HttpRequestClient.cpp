@@ -25,7 +25,7 @@ namespace Sentry
     {
         const std::string & host = httpRequest->GetHost();
         const std::string & port = httpRequest->GetPort();
-        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<XCode>> taskSource(new TaskSource<XCode>);
         netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port, taskSource);
         if(taskSource->Await() != XCode::Successful)

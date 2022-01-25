@@ -47,7 +47,7 @@ namespace Sentry
         std::string mIp;
         unsigned short mPort;
         std::atomic_bool mIsOpen;
-        NetWorkThread & mNetworkThread;
+        IAsioThread & mNetworkThread;
         asio::streambuf mRecvDataBuffer;
         asio::streambuf mSendDataBuffer;
         std::shared_ptr<SocketProxy> mSocket;

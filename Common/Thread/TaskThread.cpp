@@ -84,7 +84,7 @@ namespace Sentry
 namespace Sentry
 {
     NetWorkThread::NetWorkThread()
-        : IThread("net"), mAsioContext(nullptr)
+        : IAsioThread("net"), mAsioContext(nullptr)
     {
 		this->mAsioContext = new AsioContext(1);
 		this->mAsioWork = new AsioWork(*this->mAsioContext);
@@ -99,7 +99,7 @@ namespace Sentry
 		return 0;
 	}
 
-	void NetWorkThread::AddTask(StaticMethod * task)
+	void NetWorkThread::InvokeMethod(StaticMethod *task)
 	{
 		this->mWaitInvokeMethod.Push(task);
 	}
@@ -134,9 +134,11 @@ namespace Sentry
 namespace Sentry
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
-		: IThread("main"), mMainMethod(method)
+		: IAsioThread("main"), mMainMethod(method)
 	{
 		this->mThreadId = std::this_thread::get_id();
+        this->mAsioContext = new AsioContext(1);
+        this->mAsioWork = new AsioWork(*this->mAsioContext);
 	}
 
 	int MainTaskScheduler::Start()
@@ -153,7 +155,7 @@ namespace Sentry
 
 	void MainTaskScheduler::Update()
 	{
-        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+        mAsioContext->poll();
 		this->mMainMethod->run();
 		StaticMethod * task = nullptr;
 #ifdef __THREAD_LOCK__
@@ -165,14 +167,12 @@ namespace Sentry
 			task->run();
 			delete task;
 		}
-	}
+        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+    }
 	
-	void MainTaskScheduler::Invoke(StaticMethod * task)
+	void MainTaskScheduler::InvokeMethod(StaticMethod * task)
 	{
-		if (task == nullptr)
-		{
-			return;
-		}
+        if(task == nullptr) return;
 		this->mTaskQueue.Push(task);
 	}
 }

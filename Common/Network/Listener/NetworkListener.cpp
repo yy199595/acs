@@ -8,7 +8,7 @@
 #include<Scene/ThreadPoolComponent.h>
 namespace Sentry
 {
-	NetworkListener::NetworkListener(NetWorkThread & t, ListenConfig & config)
+	NetworkListener::NetworkListener(IAsioThread & t, ListenConfig & config)
 		: mTaskThread(t), mConfig(config),
         mTaskScheduler(App::Get().GetTaskScheduler())
     {
@@ -55,7 +55,7 @@ namespace Sentry
 
 	void NetworkListener::ListenConnect()
 	{
-        NetWorkThread & workThread = this->mTaskComponent->AllocateNetThread();
+        IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
         std::shared_ptr<AsioTcpSocket> tcpSocket(new AsioTcpSocket(workThread.GetContext()));
 		this->mBindAcceptor->async_accept(*tcpSocket,
 			[this, &workThread, tcpSocket](const asio::error_code & code)

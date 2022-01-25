@@ -6,11 +6,12 @@
 #include"Coroutine/TaskComponent.h"
 
 using namespace Client;
-using namespace GameKeeper;
+using namespace Sentry;
 
 
 int main(int argc, char ** argv)
 {
+    ComponentFactory::Add<TimerComponent>("");
 	REGISTER_COMPONENT(TimerComponent);
 	REGISTER_COMPONENT(LoggerComponent);
 	REGISTER_COMPONENT(ThreadPoolComponent);

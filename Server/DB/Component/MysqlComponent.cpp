@@ -123,6 +123,7 @@ namespace Sentry
     bool MysqlComponent::StartConnect()
     {
 		const std::vector<TaskThread *> & threadTasks = this->mTaskManager->GetThreads();
+        LOG_CHECK_RET_FALSE(threadTasks.size() > 0);
 		for (TaskThread * taskThread : threadTasks)
 		{
 			auto mysqlSocket = this->ConnectMysql();

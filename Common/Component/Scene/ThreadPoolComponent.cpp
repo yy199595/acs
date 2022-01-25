@@ -7,10 +7,11 @@ namespace Sentry
 	bool ThreadPoolComponent::Awake()
     {
         this->mIndex = 0;
-        int taskCount = 1;
-        int networkCount = 1;
-        App::Get().GetConfig().GetValue("Thread", "task", taskCount);
-        App::Get().GetConfig().GetValue("Thread", "network", networkCount);
+        int taskCount = 0;
+        int networkCount = 0;
+        const ServerConfig & config = App::Get().GetConfig();
+        config.GetValue("thread", "task", taskCount);
+        config.GetValue("thread", "network", networkCount);
 
         for (int index = 0; index < taskCount; index++)
         {
@@ -53,9 +54,13 @@ namespace Sentry
         threads.emplace_back(&mainTask);
     }
 
-	NetWorkThread & ThreadPoolComponent::AllocateNetThread()
+    IAsioThread & ThreadPoolComponent::AllocateNetThread()
     {
         std::lock_guard<std::mutex> lock(this->mLock);
+        if(this->mNetThreads.empty())
+        {
+            return App::Get().GetTaskScheduler();
+        }
         if (this->mIndex >= mNetThreads.size())
         {
             this->mIndex = 0;

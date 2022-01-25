@@ -13,7 +13,7 @@ namespace Sentry
 
     std::shared_ptr<HttpHandlerRequest> HttpHandlerClient::ReadHandlerContent()
     {
-        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         std::shared_ptr<HttpHandlerRequest> handlerRequest(new HttpHandlerRequest());
         netWorkThread.Invoke(&HttpHandlerClient::ReadHttpData, this, taskSource, handlerRequest);
@@ -27,7 +27,7 @@ namespace Sentry
     bool HttpHandlerClient::SendResponse(HttpStatus status)
     {
         this->mResponseData.AddValue(status);
-        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
         return taskSource->Await();
@@ -36,7 +36,7 @@ namespace Sentry
     bool HttpHandlerClient::SendResponse(HttpStatus status, const std::string &content)
     {
         this->mResponseData.AddValue(status, content);
-        NetWorkThread & netWorkThread = this->mSocket->GetThread();
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
         return taskSource->Await();

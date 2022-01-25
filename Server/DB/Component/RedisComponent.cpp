@@ -136,7 +136,7 @@ namespace Sentry
 
     std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string & name)
     {
-        NetWorkThread &workThread = this->mThreadComponent->AllocateNetThread();
+        IAsioThread &workThread = this->mThreadComponent->AllocateNetThread();
         auto socketProxy = std::make_shared<SocketProxy>(workThread, name);
         auto redisCommandClient = std::make_shared<RedisClient>(socketProxy);
 

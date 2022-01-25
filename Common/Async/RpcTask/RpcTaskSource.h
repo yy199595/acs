@@ -46,32 +46,23 @@ namespace Sentry
         int GetTimeout() final { return this->mTimeout;}
         void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
     public:
-        XCode GetCode();
+        XCode AwaitCode();
         template<typename T>
-        std::shared_ptr<T> GetData();
+        std::shared_ptr<T> AwaitData();
     private:
         const int mTimeout;
         RpcComponent * mRpcComponent;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
     template<typename T>
-    std::shared_ptr<T> RpcTaskSource::GetData()
+    std::shared_ptr<T> RpcTaskSource::AwaitData()
     {
         auto response = mTaskSource.Await();
-        if(response == nullptr || !response->has_data())
+        if(response == nullptr || !response->has_data() || !response->data().Is<T>())
         {
             return nullptr;
         }
-        const Any & any = response->data();
-        if(!response->data().Is<T>())
-        {
-            return nullptr;
-        }
-        std::shared_ptr<T> data(new T());
-        if(!response->data().UnpackTo(data.get()))
-        {
-            return nullptr;
-        }
-        return data;
+        std::shared_ptr<T> data = std::make_shared<T>();
+        return response->data().UnpackTo(data.get()) ? data : nullptr;
     }
 }

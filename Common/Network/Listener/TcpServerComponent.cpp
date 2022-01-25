@@ -72,7 +72,7 @@ namespace Sentry
                 LOG_ERROR("not find socket handler ", listenConfig->Handler);
                 return false;
             }
-            NetWorkThread &netThread = taskComponent->AllocateNetThread();
+            IAsioThread &netThread = taskComponent->AllocateNetThread();
             if (listenConfig->Port != 0)
             {
                 auto listener = new NetworkListener(netThread, *listenConfig);

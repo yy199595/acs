@@ -19,7 +19,7 @@ namespace Sentry
 	class NetworkListener
 	{
 	public:
-		NetworkListener(NetWorkThread & thread, ListenConfig & config);
+		NetworkListener(IAsioThread & thread, ListenConfig & config);
 		~NetworkListener();
 	public:
         bool IsOpen() { return this->mBindAcceptor->is_open(); }
@@ -32,7 +32,7 @@ namespace Sentry
         bool mIsListen;
         unsigned int mCorId;
         ListenConfig mConfig;
-		NetWorkThread & mTaskThread;
+        IAsioThread & mTaskThread;
 		AsioTcpAcceptor *mBindAcceptor;	
 		ISocketListen * mListenHandler;
 		ThreadPoolComponent * mTaskComponent;

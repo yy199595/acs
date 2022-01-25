@@ -30,8 +30,8 @@ namespace Sentry
     private:
         void Update();
 
-	public:	
-		NetWorkThread & AllocateNetThread();
+	public:
+        IAsioThread & AllocateNetThread();
     private:
         size_t mIndex;
         std::mutex mLock;

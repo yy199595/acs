@@ -74,46 +74,52 @@ namespace Sentry
         DoubleQueue<TaskProxy *> mWaitInvokeTask;
     };
 
-    class NetWorkThread : public IThread
+    class IAsioThread : public IThread
+    {
+    public:
+        using IThread::IThread;
+        virtual AsioContext & GetContext() = 0;
+        virtual void InvokeMethod(StaticMethod * task) = 0;
+    public:
+        template<typename F, typename T, typename ... Args>
+        void Invoke(F && f, T * o, Args &&... args) {
+            this->InvokeMethod(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
+        }
+    };
+
+    class NetWorkThread : public IAsioThread
     {
     public:
         explicit NetWorkThread();
     public:
 		int Start() final;
-		void AddTask(StaticMethod * task);
-		
-		AsioContext & GetContext() { return *mAsioContext; }
 
-	public:
-		template<typename F, typename T, typename ... Args>
-		void Invoke(F && f, T * o, Args &&... args) {
-			this->AddTask(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
-		}
+		void InvokeMethod(StaticMethod * task) final;
+
+		AsioContext & GetContext() final { return *mAsioContext; }
 	protected:
 		void Update() final;
-    private:		
+    private:
 		AsioWork * mAsioWork;
 		std::thread * mThread;
 		AsioContext * mAsioContext;
         DoubleQueue<StaticMethod *> mWaitInvokeMethod;
     };
 
-	class MainTaskScheduler : public IThread
+    class MainTaskScheduler : public IAsioThread
 	{
 	public:
 		explicit MainTaskScheduler(StaticMethod * method);
 	public:
 		int Start() final;
-		void Invoke(StaticMethod * task);
-
-		template<typename F, typename T, typename ... Args>
-		void Invoke(F && f, T * o, Args &&... args) {
-            this->Invoke(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
-		}
+		void InvokeMethod(StaticMethod * method) final;
+        AsioContext & GetContext() final { return *mAsioContext; }
 	private:
 		void Update() final;
 	private:
-		StaticMethod * mMainMethod;
+        AsioWork * mAsioWork;
+        AsioContext * mAsioContext;
+        StaticMethod * mMainMethod;
         DoubleQueue<StaticMethod*> mTaskQueue;
 	};
 }// namespace Sentry

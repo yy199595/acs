@@ -27,7 +27,7 @@ namespace Sentry
         this->mTaskSource.SetResult(response);
     }
 
-    XCode RpcTaskSource::GetCode()
+    XCode RpcTaskSource::AwaitCode()
     {
         auto response = this->mTaskSource.Await();
         if (response == nullptr) {

@@ -20,23 +20,6 @@ namespace Client
 
 	}
 
-	void ClientComponent::OnRequest(c2s::Rpc_Request * request)
-	{
-
-	}
-
-	void ClientComponent::OnResponse(c2s::Rpc_Response * response)
-	{
-		long long rpcId = response->rpcid();
-		auto iter = this->mRpcTasks.find(rpcId);
-		if (iter != this->mRpcTasks.end())
-		{
-			auto rpcTask = iter->second;
-			this->mRpcTasks.erase(iter);
-			rpcTask->OnResponse(response);
-		}
-	}
-
 	void ClientComponent::OnCloseSocket(long long id, XCode code)
 	{
 		
