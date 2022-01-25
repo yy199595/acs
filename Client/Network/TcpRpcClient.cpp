@@ -34,10 +34,7 @@ namespace Client
 
     void TcpRpcClient::OnSendData(XCode code, std::shared_ptr<Message>)
     {
-        if(this->mSendTask)
-        {
-            this->mSendTask->SetResult(code == XCode::Successful);
-        }
+        std::move(this->mSendTask)->SetResult(code == XCode::Successful);
     }
 
     void TcpRpcClient::OnConnect(XCode code)

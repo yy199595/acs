@@ -2,6 +2,31 @@
 #include"Object/App.h"
 #include"Util/TimeHelper.h"
 #include<iostream>
+
+namespace Sentry
+{
+    NetworkData::NetworkData(char type, std::shared_ptr<Message> message)
+    {
+        this->mType = type;
+        this->mMessage = message;
+    }
+
+    size_t NetworkData::GetByteSize()
+    {
+        return this->mMessage->ByteSize() + sizeof(char) + sizeof(int);
+    }
+
+    bool NetworkData::WriteToBuffer(asio::streambuf & streamBuffer)
+    {
+        int body = this->mMessage->ByteSize();
+        std::ostream stream(&streamBuffer);
+
+        stream.write(&this->mType, 1);
+        stream.write((char *)&body, sizeof(int));
+        return this->mMessage->SerializeToOstream(&stream);
+    }
+}
+
 namespace Sentry
 {
     RpcClient::RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type)
@@ -11,6 +36,7 @@ namespace Sentry
     {
         this->mIp.clear();
         this->mIsConnect = false;
+        this->mIsCanSendData = true;
         this->mSocketId = socket->GetSocketId();
         this->mLastOperTime = Helper::Time::GetSecTimeStamp();
     }
@@ -169,47 +195,24 @@ namespace Sentry
     void RpcClient::SendData(char type, std::shared_ptr<Message> message)
     {
         assert(this->mNetWorkThread.IsCurrentThread());
-        const int body = message->ByteSize();
-        const int head = sizeof(char) + sizeof(int);
+        std::shared_ptr<NetworkData> networkData(new NetworkData(type, message));
 
-        char *buffer = this->mSendBuffer;
-        if (head + body > TCP_BUFFER_COUNT)
-        {
-            buffer = new char[head + body];
-        }
-        buffer[0] = type;
+        networkData->WriteToBuffer(this->mSendBuffer);
         std::shared_ptr<RpcClient> self = this->shared_from_this();
-        memcpy(buffer + sizeof(char), &body, sizeof(int));
-        if (!message->SerializePartialToArray(buffer + head, body))
+        AsioTcpSocket & tcpSocket = this->mSocketProxy->GetSocket();
+        asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message]
+                (const asio::error_code & code, size_t size)
         {
-            if (buffer != this->mSendBuffer)
-            {
-                delete[]buffer;
-            }
-            this->OnSendData(XCode::SerializationFailure, message);
-            return;
-        }
-
-        auto cb = [message, this, buffer, type, self]
-                (const asio::error_code &error_code, std::size_t size)
-        {
-            if (buffer != this->mSendBuffer)
-            {
-                delete[]buffer;
-            }
-            if (error_code)
+            if (code)
             {
                 this->mSocketProxy->Close();
-                STD_ERROR_LOG(error_code.message());
+                STD_ERROR_LOG(code.message());
                 this->OnClientError(XCode::NetWorkError);
                 this->OnSendData(XCode::NetWorkError, message);
                 return;
             }
             this->OnSendData(XCode::Successful, message);
             this->mLastOperTime = Helper::Time::GetSecTimeStamp();
-        };
-
-        AsioTcpSocket &nSocket = this->mSocketProxy->GetSocket();
-        nSocket.async_send(asio::buffer(buffer, head + body), std::move(cb));
+        });
     }
 }

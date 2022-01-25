@@ -37,6 +37,7 @@ namespace Client
 
     bool ClientComponent::LateAwake()
     {
+        this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
         return true;
     }
@@ -47,16 +48,15 @@ namespace Client
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
-        if(!this->mTcpClient->ConnectAsync("127.0.0.1", 1995)->Await())
+        while(!this->mTcpClient->ConnectAsync("192.168.8.114", 1995)->Await())
         {
-            LOG_FATAL("connect server failure");
-            return;
+            LOG_ERROR("connect server failure");
+            this->mTaskComponent->Sleep(1000);
         }
 
 		this->mTcpClient->StartReceive();
 		LOG_DEBUG("connect server successful");
 
-        ElapsedTimer timer;
         std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 		const std::string method = "AccountService.Register";
 
@@ -69,12 +69,15 @@ namespace Client
 		requestMessage->set_method_name(method);
 		requestMessage->mutable_data()->PackFrom(registerRequest);
 
-        this->mTcpClient->SendToGate(requestMessage)->Await();
-
-
-
-        LOG_INFO("use time = ", timer.GetMs() , "ms");
-		
+        while(this->mTcpClient->IsOpen())
+        {
+            ElapsedTimer timer;
+            //this->mTaskComponent->Sleep(10);
+            if(this->mTcpClient->SendToGate(requestMessage)->Await())
+            {
+                LOG_INFO("use time = ", timer.GetMs() , "ms");
+            }
+        }
 	}
 	void ClientComponent::OnTimeout(long long rpcId)
 	{

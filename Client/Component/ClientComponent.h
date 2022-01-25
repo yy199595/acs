@@ -46,6 +46,7 @@ namespace Client
         void OnTimeout(long long rpcId);
 
     private:
+        TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
         std::shared_ptr<TcpRpcClient> mTcpClient;
         std::unordered_map<long long, std::shared_ptr<ClientRpcTask>> mRpcTasks;

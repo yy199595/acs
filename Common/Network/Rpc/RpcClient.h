@@ -8,6 +8,22 @@ using namespace google::protobuf;
 #define MAX_DATA_COUNT 1024 * 20 //处理的最大数据
 namespace Sentry
 {
+    class NetworkData
+    {
+    public:
+        NetworkData(char type, std::shared_ptr<Message> message);
+
+    public:
+        size_t GetByteSize();
+        bool WriteToBuffer(asio::streambuf & streamBuffer);
+    private:
+        char mType;
+        std::shared_ptr<Message> mMessage;
+    };
+}
+
+namespace Sentry
+{
     class RpcClient : public std::enable_shared_from_this<RpcClient>
 	{
 	public:
@@ -46,12 +62,14 @@ namespace Sentry
         std::shared_ptr<SocketProxy> mSocketProxy;
     private:
 		std::string mIp;
+        bool mIsCanSendData;
         unsigned short mPort;
 		long long mSocketId;
 		atomic_bool mIsConnect;
 		const SocketType mType;
 		long long mLastOperTime;
-        char mSendBuffer[TCP_BUFFER_COUNT];
+        asio::streambuf mSendBuffer;
         char mReceiveBuffer[TCP_BUFFER_COUNT];
+        std::queue<std::shared_ptr<NetworkData>> mWaitSendQueue;
 	};
 }
