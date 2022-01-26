@@ -38,7 +38,8 @@ namespace Sentry
         try
         {
             asio::io_service & io = this->mTaskThread.GetContext();
-            AsioTcpEndPoint endPoint(asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
+            //asio::ip::make_address(this->mConfig.Ip)
+            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
             this->mBindAcceptor->listen(this->mConfig.Count);
