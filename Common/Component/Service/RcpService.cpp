@@ -69,14 +69,24 @@ namespace Sentry
         ElapsedTimer elapsedTimer;
 #endif
         std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
-        XCode code = serviceMethod->Invoke(*request, *response);
-        if (request->rpc_id() == 0)
-        {
-            return nullptr;
-        }
-        response->set_code((int) code);
+
         response->set_rpc_id(request->rpc_id());
         response->set_user_id(request->user_id());
+        try
+        {
+            XCode code = serviceMethod->Invoke(*request, *response);
+            if (request->rpc_id() == 0)
+            {
+                return nullptr;
+            }
+            response->set_code((int) code);
+        }
+        catch(std::logic_error & logic_error)
+        {
+            response->set_code((int)XCode::ThrowError);
+            response->set_error_str(logic_error.what());
+        }
+
 #ifdef __DEBUG__
         LOG_DEBUG("===============[rpc request]===============");
         LOG_DEBUG("[func] =", this->GetName(), '.', method);

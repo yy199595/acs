@@ -30,7 +30,21 @@ namespace Sentry
 
     XCode AccountService::Register(const RapidJsonReader &request, RapidJsonWriter &response)
     {
-        return XCode::Successful;
+        long long phoneNumber = 0;
+        string user_account, user_password;
+        LOG_THROW_ERROR(request.TryGetValue("account", user_account));
+        LOG_THROW_ERROR(request.TryGetValue("password", user_password));
+        LOG_THROW_ERROR(request.TryGetValue("phone_num", phoneNumber));
+        long long userId = this->mRedisComponent->AddCounter("UserId");
+
+        db::db_account::tab_user_account userAccountData;
+
+        userAccountData.set_user_id(userId);
+        userAccountData.set_account(user_account);
+        userAccountData.set_phone_num(phoneNumber);
+        userAccountData.set_password(user_password);
+        userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
+        return this->mMysqlComponent->Add(userAccountData)->GetCode();
     }
 
     const std::string AccountService::NewToken(const std::string & account)

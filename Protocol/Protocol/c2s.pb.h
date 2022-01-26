@@ -507,19 +507,19 @@ class Rpc_Response :
 
   // accessors -------------------------------------------------------
 
-  // string error = 4;
-  void clear_error();
-  static const int kErrorFieldNumber = 4;
-  const ::std::string& error() const;
-  void set_error(const ::std::string& value);
+  // string error_str = 4;
+  void clear_error_str();
+  static const int kErrorStrFieldNumber = 4;
+  const ::std::string& error_str() const;
+  void set_error_str(const ::std::string& value);
   #if LANG_CXX11
-  void set_error(::std::string&& value);
+  void set_error_str(::std::string&& value);
   #endif
-  void set_error(const char* value);
-  void set_error(const char* value, size_t size);
-  ::std::string* mutable_error();
-  ::std::string* release_error();
-  void set_allocated_error(::std::string* error);
+  void set_error_str(const char* value);
+  void set_error_str(const char* value, size_t size);
+  ::std::string* mutable_error_str();
+  ::std::string* release_error_str();
+  void set_allocated_error_str(::std::string* error_str);
 
   // .google.protobuf.Any data = 5;
   bool has_data() const;
@@ -553,7 +553,7 @@ class Rpc_Response :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr error_;
+  ::google::protobuf::internal::ArenaStringPtr error_str_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 rpc_id_;
   ::google::protobuf::int64 sock_id_;
@@ -2341,57 +2341,57 @@ inline void Rpc_Response::set_sock_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:c2s.Rpc.Response.sock_id)
 }
 
-// string error = 4;
-inline void Rpc_Response::clear_error() {
-  error_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string error_str = 4;
+inline void Rpc_Response::clear_error_str() {
+  error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Rpc_Response::error() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.error)
-  return error_.GetNoArena();
+inline const ::std::string& Rpc_Response::error_str() const {
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.error_str)
+  return error_str_.GetNoArena();
 }
-inline void Rpc_Response::set_error(const ::std::string& value) {
+inline void Rpc_Response::set_error_str(const ::std::string& value) {
   
-  error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.error)
+  error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.error_str)
 }
 #if LANG_CXX11
-inline void Rpc_Response::set_error(::std::string&& value) {
+inline void Rpc_Response::set_error_str(::std::string&& value) {
   
-  error_.SetNoArena(
+  error_str_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Response.error)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Response.error_str)
 }
 #endif
-inline void Rpc_Response::set_error(const char* value) {
+inline void Rpc_Response::set_error_str(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Response.error)
+  error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Response.error_str)
 }
-inline void Rpc_Response::set_error(const char* value, size_t size) {
+inline void Rpc_Response::set_error_str(const char* value, size_t size) {
   
-  error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Response.error)
+  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Response.error_str)
 }
-inline ::std::string* Rpc_Response::mutable_error() {
+inline ::std::string* Rpc_Response::mutable_error_str() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.error)
-  return error_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.error_str)
+  return error_str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Rpc_Response::release_error() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.error)
+inline ::std::string* Rpc_Response::release_error_str() {
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.error_str)
   
-  return error_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return error_str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Rpc_Response::set_allocated_error(::std::string* error) {
-  if (error != nullptr) {
+inline void Rpc_Response::set_allocated_error_str(::std::string* error_str) {
+  if (error_str != nullptr) {
     
   } else {
     
   }
-  error_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.error)
+  error_str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error_str);
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.error_str)
 }
 
 // .google.protobuf.Any data = 5;

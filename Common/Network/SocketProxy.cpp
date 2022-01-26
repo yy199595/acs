@@ -14,7 +14,6 @@ namespace Sentry
 
     void SocketProxy::RefreshState()
     {
-        assert(this->mNetThread.IsCurrentThread());
         this->mIsOpen = this->mSocket->is_open();
         if(this->mIsOpen)
         {

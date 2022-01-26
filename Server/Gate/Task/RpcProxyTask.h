@@ -26,7 +26,7 @@ namespace Sentry
         long long mRpcId;
         long long mSockId;
         long long mTaskRpcId;
-        GateComponent * mProxyComponent;
+        GateComponent * mGateComponent;
     };
 }
 

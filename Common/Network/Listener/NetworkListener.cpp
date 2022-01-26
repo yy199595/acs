@@ -38,10 +38,11 @@ namespace Sentry
         try
         {
             asio::io_service & io = this->mTaskThread.GetContext();
-            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
+            AsioTcpEndPoint endPoint(asio::ip::make_address(this->mConfig.Ip), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
             this->mBindAcceptor->listen(this->mConfig.Count);
+            std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
             io.post(std::bind(&NetworkListener::ListenConnect, this));
             taskSource->SetResult(true);
         }
@@ -62,11 +63,13 @@ namespace Sentry
 		{
 			if (!code)
 			{
-                std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
+                std::shared_ptr<SocketProxy> socketProxy(
+                        new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
+                socketProxy->RefreshState();
 #ifdef __DEBUG__
-                LOG_INFO('[', socketProxy->GetAddress(), "] connected ", this->mConfig.Name);
+                LOG_INFO('[', socketProxy->GetAddress(), "] connected to ", this->mConfig.Name);
 #endif // __DEBUG__
-                mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
+                this->mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 			}
 			AsioContext & context = this->mTaskThread.GetContext();
 			context.post(std::bind(&NetworkListener::ListenConnect, this));

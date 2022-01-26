@@ -22,7 +22,7 @@
         "http": "./Config/http.json"
     },
     "listener": {
-        "ip":"127.0.0.1",
+        "ip":"10.10.0.0",
         "rpc":
         {
             "port":7788,
@@ -80,11 +80,13 @@
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent",
-        "ServiceProxyComponent"
+        "ServiceProxyComponent",
+        "MysqlProxyComponent"
     ],
     "service": [
         "NodeService",
         "GateService",
+        "MysqlService",
         "AccountService"
     ],
     "white_list": [

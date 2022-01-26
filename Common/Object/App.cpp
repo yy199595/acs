@@ -158,11 +158,11 @@ namespace Sentry
         {
             this->mTaskComponent->Start([this, code]()
             {
-                LOG_WARN("start close server");
+                ElapsedTimer elapsedTimer;
                 this->OnDestory();
                 this->mIsClose = true;
                 this->mTaskScheduler.Stop();
-                LOG_WARN("close server successful");
+                LOG_WARN("close server successful [", elapsedTimer.GetMs(), "ms]");
                 exit((int) code);
             });
         }

@@ -18,7 +18,6 @@ namespace Sentry
         bool Awake() final;
         bool LateAwake() final;
 
-
     private:
         XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
 

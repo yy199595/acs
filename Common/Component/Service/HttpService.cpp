@@ -16,8 +16,16 @@ namespace Sentry
             return response;
         }
         HttpServiceMethod * httpServiceMethod = iter->second;
-        XCode code = httpServiceMethod->Invoke(request, response);
-        response->Add("code", (int)code);
+        try
+        {
+            XCode code = httpServiceMethod->Invoke(request, response);
+            response->Add("code", (int)code);
+        }
+        catch(std::logic_error & logic_error)
+        {
+            response->Add("error", logic_error.what());
+            response->Add("code", (int)XCode::ThrowError);
+        }
         return response;
     }
 }

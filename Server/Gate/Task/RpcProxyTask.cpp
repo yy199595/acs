@@ -11,7 +11,7 @@ namespace Sentry
     {
         this->mRpcId = 0;
         this->mSockId = 0;
-        this->mProxyComponent = nullptr;
+        this->mGateComponent = nullptr;
         this->mTaskRpcId = Helper::Guid::Create();
     }
 
@@ -20,7 +20,7 @@ namespace Sentry
     {
         this->mRpcId = rpcId;
         this->mSockId = sockId;
-        this->mProxyComponent = component;
+        this->mGateComponent = component;
         rpcComponent->AddRpcTask(this->shared_from_this());
     }
 
@@ -33,14 +33,15 @@ namespace Sentry
         }
         else
         {
-            responseMessage->set_code(response->code());
             responseMessage->set_rpc_id(this->mRpcId);
+            responseMessage->set_code(response->code());
+            responseMessage->set_error_str(response->error_str());
             if (response->has_data())
             {
                 responseMessage->mutable_data()->CopyFrom(response->data());
             }
         }
-        this->mProxyComponent->OnResponse(this->mSockId, responseMessage);
+        this->mGateComponent->OnResponse(this->mSockId, responseMessage);
     }
 
 }

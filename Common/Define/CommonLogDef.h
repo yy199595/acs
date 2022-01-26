@@ -92,3 +92,11 @@ inline std::string FormatFileLine(const char * file, const int line)
 #define LOG_CHECK_RET_ZERO(obj){ \
     if(!(obj)) { LOG_ERROR(#obj); return 0; }    \
 }
+
+#define LOG_THROW_ERROR(obj){ \
+    if(!(obj))                \
+    {              \
+        LOG_ERROR(#obj);      \
+        throw std::logic_error(#obj);\
+        }    \
+}

@@ -358,6 +358,7 @@ const ::google::protobuf::uint32 TableStruct_com_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, code_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, rpc_id_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, user_id_),
+  PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, error_str_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com::Rpc, _internal_metadata_),
@@ -378,7 +379,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 57, -1, sizeof(::com::StringMap)},
   { 63, -1, sizeof(::com::Rpc_Request)},
   { 73, -1, sizeof(::com::Rpc_Response)},
-  { 82, -1, sizeof(::com::Rpc)},
+  { 83, -1, sizeof(::com::Rpc)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -413,17 +414,18 @@ const char descriptor_table_protodef_com_2eproto[] =
   " \001(\002\"\033\n\nDoubleData\022\r\n\005value\030\001 \001(\001\"`\n\tStr"
   "ingMap\022&\n\004dict\030\001 \003(\0132\030.com.StringMap.Dic"
   "tEntry\032+\n\tDictEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu"
-  "e\030\002 \001(\t:\0028\001\"\332\001\n\003Rpc\032t\n\007Request\022\017\n\007user_i"
+  "e\030\002 \001(\t:\0028\001\"\355\001\n\003Rpc\032t\n\007Request\022\017\n\007user_i"
   "d\030\001 \001(\003\022\016\n\006rpc_id\030\002 \001(\003\022\021\n\tmethod_id\030\003 \001"
   "(\005\022\021\n\tsocket_id\030\004 \001(\003\022\"\n\004Data\030\005 \001(\0132\024.go"
-  "ogle.protobuf.Any\032]\n\010Response\022\014\n\004code\030\001 "
-  "\001(\005\022\016\n\006rpc_id\030\002 \001(\003\022\017\n\007user_id\030\003 \001(\003\022\"\n\004"
-  "Data\030\004 \001(\0132\024.google.protobuf.Anyb\006proto3"
+  "ogle.protobuf.Any\032p\n\010Response\022\014\n\004code\030\001 "
+  "\001(\005\022\016\n\006rpc_id\030\002 \001(\003\022\017\n\007user_id\030\003 \001(\003\022\021\n\t"
+  "error_str\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132\024.google.p"
+  "rotobuf.Anyb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_com_2eproto = {
   false, InitDefaults_com_2eproto, 
   descriptor_table_protodef_com_2eproto,
-  "com.proto", &assign_descriptors_table_com_2eproto, 600,
+  "com.proto", &assign_descriptors_table_com_2eproto, 619,
 };
 
 void AddDescriptors_com_2eproto() {
@@ -3576,6 +3578,7 @@ void Rpc_Response::clear_data() {
 const int Rpc_Response::kCodeFieldNumber;
 const int Rpc_Response::kRpcIdFieldNumber;
 const int Rpc_Response::kUserIdFieldNumber;
+const int Rpc_Response::kErrorStrFieldNumber;
 const int Rpc_Response::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -3588,6 +3591,10 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  error_str_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.error_str().size() > 0) {
+    error_str_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_str_);
+  }
   if (from.has_data()) {
     data_ = new ::google::protobuf::Any(*from.data_);
   } else {
@@ -3602,6 +3609,7 @@ Rpc_Response::Rpc_Response(const Rpc_Response& from)
 void Rpc_Response::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Response_com_2eproto.base);
+  error_str_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&code_) -
       reinterpret_cast<char*>(&data_)) + sizeof(code_));
@@ -3613,6 +3621,7 @@ Rpc_Response::~Rpc_Response() {
 }
 
 void Rpc_Response::SharedDtor() {
+  error_str_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
 
@@ -3631,6 +3640,7 @@ void Rpc_Response::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
   }
@@ -3675,9 +3685,25 @@ const char* Rpc_Response::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // .google.protobuf.Any Data = 4;
+      // string error_str = 4;
       case 4: {
         if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("com.Rpc.Response.error_str");
+        object = msg->mutable_error_str();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .google.protobuf.Any Data = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::google::protobuf::Any::_InternalParse;
@@ -3703,6 +3729,10 @@ const char* Rpc_Response::_InternalParse(const char* begin, const char* end, voi
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -3757,9 +3787,24 @@ bool Rpc_Response::MergePartialFromCodedStream(
         break;
       }
 
-      // .google.protobuf.Any Data = 4;
+      // string error_str = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_error_str()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->error_str().data(), static_cast<int>(this->error_str().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "com.Rpc.Response.error_str"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .google.protobuf.Any Data = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_data()));
         } else {
@@ -3810,10 +3855,20 @@ void Rpc_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->user_id(), output);
   }
 
-  // .google.protobuf.Any Data = 4;
+  // string error_str = 4;
+  if (this->error_str().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->error_str().data(), static_cast<int>(this->error_str().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Response.error_str");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->error_str(), output);
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, HasBitSetters::data(this), output);
+      5, HasBitSetters::data(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3844,11 +3899,22 @@ void Rpc_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->user_id(), target);
   }
 
-  // .google.protobuf.Any Data = 4;
+  // string error_str = 4;
+  if (this->error_str().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->error_str().data(), static_cast<int>(this->error_str().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Response.error_str");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->error_str(), target);
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        4, HasBitSetters::data(this), target);
+        5, HasBitSetters::data(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3872,7 +3938,14 @@ size_t Rpc_Response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .google.protobuf.Any Data = 4;
+  // string error_str = 4;
+  if (this->error_str().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->error_str());
+  }
+
+  // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -3927,6 +4000,10 @@ void Rpc_Response::MergeFrom(const Rpc_Response& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.error_str().size() > 0) {
+
+    error_str_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_str_);
+  }
   if (from.has_data()) {
     mutable_data()->::google::protobuf::Any::MergeFrom(from.data());
   }
@@ -3966,6 +4043,8 @@ void Rpc_Response::Swap(Rpc_Response* other) {
 void Rpc_Response::InternalSwap(Rpc_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  error_str_.Swap(&other->error_str_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(data_, other->data_);
   swap(rpc_id_, other->rpc_id_);
   swap(user_id_, other->user_id_);

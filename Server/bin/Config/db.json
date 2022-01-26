@@ -11,15 +11,14 @@
     },
     "thread":
     {
-        "task":2,
-        "network":1
+        "task":4,
+        "network":2
     },
-    "rpc_path":"./Config/rpc.json",
-    "host_path": "./Config/host.json",
-    "code_path": "./XCode/XCode.csv",
-    "center_server": {
-        "ip": "127.0.0.1",
-        "port": 7788
+    "path":
+    {
+        "rpc": "./Config/rpc.json",
+        "code": "./XCode/XCode.csv",
+        "http": "./Config/http.json"
     },
     "listener": {
         "ip":"127.0.0.1",
@@ -27,14 +26,8 @@
         {
             "port":7789,
             "count":10000,
-            "handler":"RpcClientComponent"
+            "component":"RpcClientComponent"
         }
-    },
-    "redis": {
-        "ip": "127.0.0.1",
-        "port": 6379,
-        "lua": "./Script/RedisCommand",
-        "passwd": ""
     },
     "mysql": {
         "ip": "8.136.213.239",
@@ -42,9 +35,16 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
+    "redis": {
+        "ip": "8.136.213.239",
+        "port": 6379,
+        "timeout": 3,
+        "count": 5,
+        "lua": "./Script/RedisCommand",
+        "passwd": "199595yjz."
+    },
     "component": [
         "ThreadPoolComponent",
-        "MonitorComponent",
         "TcpServerComponent",
         "MysqlComponent",
         "RedisComponent",
@@ -54,7 +54,7 @@
         "RpcConfigComponent"
     ],
     "service": [
-        "NodeAddressService",
+        "NodeService",
         "MysqlService"
     ],
     "white_list": [

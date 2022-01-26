@@ -80,6 +80,7 @@ namespace Sentry
             auto configCom = App::Get().GetComponent<RpcConfigComponent>();
             LOG_WARN("remove player session code = ", configCom->GetCodeDesc(code));
 #endif
+            this->mGateClientMap.erase(iter);
         }
     }
 

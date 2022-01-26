@@ -20,6 +20,7 @@ CallArgsError	调用参数错误
 NotFindUser	没有找到玩家对象
 CallTypeError	调用参数类型错误
 CallTimeout	超时自动调用
+ThrowError	抛出一个错误
 NotServerGroupConfig	没有服务器组配置
 InitNodeProxyFailure	初始化节点失败
 AddRpcCallbackFailure	添加rpc回调失败

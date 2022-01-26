@@ -131,9 +131,9 @@ namespace Sentry
                 auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
                 LOG_ERROR("code => ", codeConfig->Name, ':', codeConfig->Desc);
             }
-            std::string json;
-            if (response->has_data() && Helper::Proto::GetJson(response->data(), json)) {
-                LOG_DEBUG("json = ", json);
+            if (response->has_data())
+            {
+                LOG_DEBUG("json = ", Helper::Proto::ToJson(response->data()));
             }
             LOG_DEBUG("*********************************************");
         }

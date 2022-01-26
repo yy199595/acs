@@ -63,6 +63,7 @@ message Rpc
           int32 code = 1;
           int64 rpc_id = 2;
           int64 user_id = 3;
-          google.protobuf.Any Data = 4;
+          string error_str = 4;
+          google.protobuf.Any Data = 5;
      }
 }
