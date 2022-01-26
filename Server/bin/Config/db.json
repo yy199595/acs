@@ -27,6 +27,12 @@
             "port":7789,
             "count":10000,
             "component":"RpcClientComponent"
+        },
+        "http":
+        {
+            "port": 80,
+            "count": 100,
+            "component": "HttpClientComponent"
         }
     },
     "mysql": {
@@ -51,7 +57,8 @@
         "RpcComponent",
         "RpcClientComponent",
         "OperatorComponent",
-        "RpcConfigComponent"
+        "RpcConfigComponent",
+        "HttpClientComponent"
     ],
     "service": [
         "LocalService",
