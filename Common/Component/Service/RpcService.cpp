@@ -1,4 +1,4 @@
-﻿#include"RcpService.h"
+﻿#include"RpcService.h"
 #include"Object/App.h"
 #include <Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
@@ -8,7 +8,7 @@
 #endif
 namespace Sentry
 {
-	bool RcpService::AddMethod(ServiceMethod * method)
+	bool RpcService::AddMethod(ServiceMethod * method)
     {
         auto *rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
         if (rpcConfigComponent == nullptr)
@@ -47,7 +47,7 @@ namespace Sentry
         return true;
     }
 
-    ServiceMethod *RcpService::GetMethod(const std::string &name)
+    ServiceMethod *RpcService::GetMethod(const std::string &name)
     {
         auto iter = this->mLuaMethodMap.find(name);
         if(iter != this->mLuaMethodMap.end())
@@ -58,7 +58,7 @@ namespace Sentry
         return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
     }
 
-    std::shared_ptr<com::Rpc_Response> RcpService::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
+    std::shared_ptr<com::Rpc_Response> RpcService::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
         ServiceMethod *serviceMethod = this->GetMethod(method);
         if (serviceMethod == nullptr)

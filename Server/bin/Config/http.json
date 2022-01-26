@@ -10,5 +10,11 @@
         "Type": "POST",
         "Method":"Login",
         "Component":"AccountService"
+    },
+    "/logic/service/push":
+    {
+        "Type": "POST",
+        "Method": "Push",
+        "Component": "HttpNodeService"
     }
 }

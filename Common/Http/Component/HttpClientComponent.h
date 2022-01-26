@@ -1,7 +1,7 @@
 
 #pragma once
 #include"Component/Component.h"
-
+#include"Util/JsonHelper.h"
 namespace Sentry
 {
     class HttpConfig
@@ -18,6 +18,7 @@ namespace Sentry
     class HttpRespSession;
     class HttpServiceMethod;
     class HttpHandlerClient;
+    class HttpAsyncResponse;
     class HttpClientComponent : public Component, public ISocketListen, public ILoadData
     {
     public:
@@ -28,9 +29,11 @@ namespace Sentry
         bool LateAwake() final;
         void OnLoadData() final;
     public:
-        XCode Get(const std::string &url, int timeout = 5);
+        std::shared_ptr<HttpAsyncResponse> Get(const std::string &url, int timeout = 5);
 
-        XCode Post(const std::string &url, const std::string &data, int timeout = 5);
+        std::shared_ptr<HttpAsyncResponse> Post(const std::string &url, const std::string &data, int timeout = 5);
+
+        std::shared_ptr<HttpAsyncResponse> Post(const std::string &url, RapidJsonWriter & jsonWriter, int timeout = 5);
 
     public:
         void OnListen(std::shared_ptr<SocketProxy> socket) final;

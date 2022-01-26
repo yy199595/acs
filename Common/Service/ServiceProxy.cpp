@@ -4,7 +4,7 @@
 #include<Util/StringHelper.h>
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
-#include"Service/NodeService.h"
+#include"Service/LocalService.h"
 namespace Sentry
 {
 	ServiceProxy::ServiceProxy(const std::string & name)
@@ -34,8 +34,6 @@ namespace Sentry
         if(iter != this->mServiceNodeMap.end())
         {
             this->mServiceNodeMap.erase(iter);
-            NodeService * redisService = App::Get().GetComponent<NodeService>();
-            return redisService != nullptr && redisService->RemoveNode(address);
         }
         return false;
     }

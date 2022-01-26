@@ -116,12 +116,12 @@ namespace Sentry
         });
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
-        resolver->async_resolve(*query, [this, resolver, query, taskSource, connectTimer]
+        resolver->async_resolve(*query, [this, resolver, query, taskSource, connectTimer, port, host]
             (const asio::error_code &err, asio::ip::tcp::resolver::iterator iterator)
         {
             if(err)
             {
-                STD_ERROR_LOG(err.message());
+                STD_ERROR_LOG(err.message() << " " << host << port);
                 taskSource->SetResult(XCode::HostResolverError);
                 return;
             }

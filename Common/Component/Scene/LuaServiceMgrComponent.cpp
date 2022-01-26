@@ -45,7 +45,7 @@ namespace Sentry
 				continue;
 			}
 
-			auto localService = this->GetComponent<RcpService>(service);
+			auto localService = this->GetComponent<RpcService>(service);
 			if (localService == nullptr)
 			{
 				auto luaSerivce = new LuaRpcService();

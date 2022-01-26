@@ -11,11 +11,12 @@ using namespace com;
 namespace Sentry
 {
     class ServiceMethod;
-    class RcpService : public Component {
+    class RpcService : public Component
+    {
     public:
-        RcpService() = default;
+        RpcService() = default;
 
-        ~RcpService() override = default;
+        ~RpcService() override = default;
 
     public:
 

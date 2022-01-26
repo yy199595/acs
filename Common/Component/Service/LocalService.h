@@ -10,14 +10,12 @@ namespace Sentry
 
     class ServiceProxyComponent;
 
-    class NodeService : public SubService, public IStart
+    class LocalService : public SubService, public IStart
     {
     public:
-		NodeService() = default;
-        ~NodeService() override = default;
+		LocalService() = default;
+        ~LocalService() override = default;
 
-    public:
-        bool RemoveNode(const std::string & address);
     public:
         bool Awake() final;
 
@@ -25,13 +23,11 @@ namespace Sentry
 
         void OnStart() final;
 
-        void OnDestory() final;
     private:
         void Add(const RapidJsonReader & jsonReader);
-        void Register(const RapidJsonReader & jsonReader);
+        void Push(const RapidJsonReader & jsonReader);
 
     private:
-        void RegisterService();
         bool GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         int mAreaId;

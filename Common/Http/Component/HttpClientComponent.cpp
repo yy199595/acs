@@ -56,24 +56,24 @@ namespace Sentry
     {
         std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
 
-        std::string json;
-        RapidJsonWriter jsonWriter;
-        jsonWriter.Add("End", 100);
-        jsonWriter.Add("Start", 0);
-        jsonWriter.Add("RankId", 301000);
-
-        jsonWriter.WriterToStream(json);
-
-        ElapsedTimer elapsedTimer;
-        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
-        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
-
-        auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
-        if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
-        {
-            LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
-        }
+//        std::string json;
+//        RapidJsonWriter jsonWriter;
+//        jsonWriter.Add("End", 100);
+//        jsonWriter.Add("Start", 0);
+//        jsonWriter.Add("RankId", 301000);
+//
+//        jsonWriter.WriterToStream(json);
+//
+//        ElapsedTimer elapsedTimer;
+//        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+//        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+//        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+//
+//        auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
+//        if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
+//        {
+//            LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
+//        }
 
     }
 
@@ -123,16 +123,29 @@ namespace Sentry
         }
     }
 
-    XCode HttpClientComponent::Get(const std::string &url, int timeout)
+    std::shared_ptr<HttpAsyncResponse> HttpClientComponent::Get(const std::string &url, int timeout)
     {
-        return XCode::Successful;
+        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+        return httpAsyncClient->Get(url);
     }
 
-
-    XCode HttpClientComponent::Post(const std::string &url, const std::string & data, int timeout)
+    std::shared_ptr<HttpAsyncResponse>
+    HttpClientComponent::Post(const std::string &url, const std::string &data, int timeout)
     {
+        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+        return httpAsyncClient->Post(url, data);
+    }
 
-        return XCode::Successful;
+    std::shared_ptr<HttpAsyncResponse>
+    HttpClientComponent::Post(const std::string &url, RapidJsonWriter &jsonWriter, int timeout)
+    {
+        std::string json;
+        jsonWriter.WriterToStream(json);
+        return this->Post(url, json);
     }
 
     void HttpClientComponent::Invoke(HttpRespSession *remoteRequest)

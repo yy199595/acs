@@ -22,7 +22,7 @@
         "http": "./Config/http.json"
     },
     "listener": {
-        "ip":"10.10.0.0",
+        "ip":"127.0.0.1",
         "rpc":
         {
             "port":7788,
@@ -72,6 +72,7 @@
         "ThreadPoolComponent",
         "TcpServerComponent",
         "RedisComponent",
+        "MysqlComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
         "RpcClientComponent",
@@ -83,9 +84,11 @@
         "MysqlProxyComponent"
     ],
     "service": [
-        "NodeService",
         "GateService",
-        "AccountService"
+        "LocalService",
+        "MysqlService",
+        "AccountService",
+        "HttpNodeService"
     ],
     "white_list": [
         "127.0.0.1"

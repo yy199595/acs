@@ -33,6 +33,7 @@ namespace Sentry
 
 	void MysqlProxyComponent::AddUserData()
 	{
+        this->mCorComponent->Sleep(3000);
 		for (int index = 0; index < 10; index++)
         {
             db::db_account::tab_user_account userAccountData;
@@ -58,7 +59,7 @@ namespace Sentry
         }
 
         std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource =this->Sort("db_account.tab_user_account", "user_id", 10, false);
-        if(rpcTaskSource->GetCode() == XCode::Successful)
+        if(rpcTaskSource != nullptr && rpcTaskSource->GetCode() == XCode::Successful)
         {
             size_t size = rpcTaskSource->GetDataSize();
             for(size_t index = 0; index < size; index++)

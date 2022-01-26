@@ -363,6 +363,7 @@ namespace Sentry
         {
             return false;
         }
+        data.clear();
         data.append(jsonValue->GetString(), jsonValue->GetStringLength());
         return true;
     }

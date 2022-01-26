@@ -2,14 +2,14 @@
 
 
 #include<Script/LuaInclude.h>
-#include"Service/RcpService.h"
+#include"Service/RpcService.h"
 
 class LuaTable;
 namespace Sentry
 {
     class LuaScriptComponent;
 
-    class LuaRpcService : public RcpService, public IStart
+    class LuaRpcService : public RpcService, public IStart
     {
     public:
         LuaRpcService();

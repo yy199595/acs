@@ -20,7 +20,7 @@
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
-#include "Component/Service/NodeService.h"
+#include "Component/Service/LocalService.h"
 #include <Scene/MonitorComponent.h>
 #include "Service/MysqlService.h"
 #include <Service/HttpLoginService.h>
@@ -29,6 +29,8 @@
 #include"Scene/LoggerComponent.h"
 #include"Component/GateComponent.h"
 #include"Component/GateClientComponent.h"
+
+#include"Service/HttpNodeService.h"
 using namespace Sentry;
 
 void RegisterComponent()
@@ -70,9 +72,10 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
+    ComponentFactory::Add<LocalService>("LocalService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<AccountService>("AccountService");
-    ComponentFactory::Add<NodeService>("NodeService");
+    ComponentFactory::Add<HttpNodeService>("HttpNodeService");
     ComponentFactory::Add<HttpLoginService>("HttpLoginService");
     ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
 }
