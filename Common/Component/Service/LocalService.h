@@ -33,5 +33,7 @@ namespace Sentry
         int mAreaId;
 		std::string mNodeName;
         class RedisComponent * mRedisComponent;
+        class HttpClientComponent * mHttpComponent;
+        class ServiceProxyComponent * mServiceComponent;
     };
 }

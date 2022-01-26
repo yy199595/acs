@@ -29,6 +29,8 @@ namespace Sentry
     bool LocalService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
+        LOG_CHECK_RET_FALSE(this->mHttpComponent = this->GetComponent<HttpClientComponent>());
+        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceProxyComponent>());
         return true;
     }
 
@@ -45,11 +47,9 @@ namespace Sentry
         LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "ip", ip));
         LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "port", port));
         LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "service", services));
-        ServiceProxyComponent * proxyComponent = this->GetComponent<ServiceProxyComponent>();
-        HttpClientComponent * httpClientComponent = this->GetComponent<HttpClientComponent>();
         for(const std::string & service : services)
         {
-            auto serviceProxy = proxyComponent->GetServiceProxy(service);
+            auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
             serviceProxy->AddAddress(fmt::format("{0}:{1}", ip, port));
         }
         RapidJsonWriter jsonWriter;
@@ -59,7 +59,7 @@ namespace Sentry
             LOG_CHECK_RET(jsonReader.TryGetValue("http", "ip", ip));
             LOG_CHECK_RET(jsonReader.TryGetValue("http", "port", port));
             string url = fmt::format("http://{0}:{1}/logic/service/push", ip, port);
-            if (httpClientComponent->Post(url, jsonWriter) != nullptr)
+            if (this->mHttpComponent->Post(url, jsonWriter) != nullptr)
             {
                 LOG_INFO("post service to ", ip, ':', port, " successful");
             }

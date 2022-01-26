@@ -58,7 +58,8 @@
         "RpcClientComponent",
         "OperatorComponent",
         "RpcConfigComponent",
-        "HttpClientComponent"
+        "HttpClientComponent",
+        "ServiceProxyComponent"
     ],
     "service": [
         "LocalService",
