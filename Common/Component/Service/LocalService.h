@@ -22,13 +22,12 @@ namespace Sentry
         bool LateAwake() final;
 
         void OnStart() final;
-
+        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         void Add(const RapidJsonReader & jsonReader);
         void Push(const RapidJsonReader & jsonReader);
 
     private:
-        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         int mAreaId;
 		std::string mNodeName;

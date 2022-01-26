@@ -13,6 +13,7 @@
 #include"Http/HttpHandlerClient.h"
 #include"Util/FileHelper.h"
 #include"Service/HttpService.h"
+#include"Service/LocalService.h"
 namespace Sentry
 {
 
@@ -55,6 +56,8 @@ namespace Sentry
     void HttpClientComponent::OnLoadData()
     {
         std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
+
+        //string url = "http://yjz199595.com/logic/service/push";
 
 //        std::string json;
 //        RapidJsonWriter jsonWriter;
