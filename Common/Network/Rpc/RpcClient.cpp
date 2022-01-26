@@ -186,12 +186,16 @@ namespace Sentry
                && !this->IsOpen() && !this->mIsConnect;
     }
 
-    void RpcClient::SendData(char type, std::shared_ptr<Message> message)
+    void RpcClient::SendData(std::shared_ptr<NetworkData> message)
     {
         assert(this->mNetWorkThread.IsCurrentThread());
-        std::shared_ptr<NetworkData> networkData(new NetworkData(type, message));
-
-        networkData->WriteToBuffer(this->mSendBuffer);
+        if(!this->mIsCanSendData)
+        {
+            this->mWaitSendQueue.emplace(message);
+            return;
+        }
+        this->mIsCanSendData = false;
+        message->WriteToBuffer(this->mSendBuffer);
         std::shared_ptr<RpcClient> self = this->shared_from_this();
         AsioTcpSocket & tcpSocket = this->mSocketProxy->GetSocket();
         asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message]
@@ -203,10 +207,23 @@ namespace Sentry
                 STD_ERROR_LOG(code.message());
                 this->OnClientError(XCode::NetWorkError);
                 this->OnSendData(XCode::NetWorkError, message);
-                return;
+                while(!this->mWaitSendQueue.empty())
+                {
+                    this->OnSendData(XCode::NetWorkError, this->mWaitSendQueue.front());
+                    this->mWaitSendQueue.pop();
+                }
             }
-            this->OnSendData(XCode::Successful, message);
-            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+            else
+            {
+                this->mIsCanSendData = true;
+                this->OnSendData(XCode::Successful, message);
+                if (!this->mWaitSendQueue.empty())
+                {
+                    this->SendData(this->mWaitSendQueue.front());
+                    this->mWaitSendQueue.pop();
+                }
+                this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+            }
         });
     }
 }

@@ -20,32 +20,35 @@ namespace Sentry
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Response> message)
     {
+        std::shared_ptr<NetworkData> networkData(
+                new NetworkData(RPC_TYPE_RESPONSE, message));
         if(this->mNetWorkThread.IsCurrentThread())
         {
-            this->SendData(RPC_TYPE_RESPONSE, message);
+            this->SendData(networkData);
             return;
         }
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_RESPONSE, message);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
     }
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Request> message)
     {
+        std::shared_ptr<NetworkData> networkData(
+                new NetworkData(RPC_TYPE_REQUEST, message));
         if(this->mNetWorkThread.IsCurrentThread())
         {
-            this->SendData(RPC_TYPE_REQUEST, message);
+            this->SendData(networkData);
             return;
         }
-        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, RPC_TYPE_REQUEST, message);
+        this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
         return;
     }
 
-    void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<Message> message)
+    void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
     {
-        if (code != XCode::Successful)
+        if(code != XCode::Successful)
         {
             long long id = this->GetSocketId();
             MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
-            taskScheduler.Invoke(&RpcClientComponent::OnSendFailure, this->mTcpComponent, id, message);
         }
     }
 

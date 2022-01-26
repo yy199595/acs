@@ -21,7 +21,7 @@ namespace Client
         void OnClientError(XCode code) final;
         XCode OnRequest(const char * buffer, size_t size) final;
 		XCode OnResponse(const char * buffer, size_t size) final;
-        void OnSendData(XCode code, std::shared_ptr<Message>) final;
+        void OnSendData(XCode code, std::shared_ptr<NetworkData> message) final;
     private:
         char mRecvBuffer[4096];
         ClientComponent * mClientComponent;

@@ -52,10 +52,10 @@ namespace Sentry
         virtual void OnClientError(XCode code) = 0;
         virtual XCode OnRequest(const char * buffer, size_t size) = 0;
 		virtual XCode OnResponse(const char * buffer, size_t size) = 0;
-        virtual void OnSendData(XCode code, std::shared_ptr<Message> ) = 0;
+        virtual void OnSendData(XCode code, std::shared_ptr<NetworkData> message) = 0;
     protected:
         bool IsCanConnection();
-        void SendData(char type, std::shared_ptr<Message> message);
+        void SendData(std::shared_ptr<NetworkData> message);
 	protected:
         AsioContext & mContext;
         IAsioThread & mNetWorkThread;

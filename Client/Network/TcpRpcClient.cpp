@@ -13,7 +13,7 @@ namespace Client
     std::shared_ptr<TaskSource<bool>> TcpRpcClient::SendToGate(std::shared_ptr<c2s::Rpc_Request> request)
     {
         this->mSendTask = make_shared<TaskSource<bool>>();
-        this->SendData(RPC_TYPE_REQUEST, request);
+        this->SendData(std::make_shared<NetworkData>(RPC_TYPE_REQUEST, request));
         return this->mSendTask;
     }
 
@@ -32,18 +32,14 @@ namespace Client
         return this->mConnectTask;
     }
 
-    void TcpRpcClient::OnSendData(XCode code, std::shared_ptr<Message>)
+    void TcpRpcClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
     {
         std::move(this->mSendTask)->SetResult(code == XCode::Successful);
     }
 
     void TcpRpcClient::OnConnect(XCode code)
     {
-        if(this->mConnectTask)
-        {
-            this->mConnectTask->SetResult(code == XCode::Successful);
-            std::move(this->mConnectTask);
-        }
+        std::move(this->mConnectTask)->SetResult(code == XCode::Successful);
     }
 
 	XCode TcpRpcClient::OnRequest(const char * buffer, size_t size)

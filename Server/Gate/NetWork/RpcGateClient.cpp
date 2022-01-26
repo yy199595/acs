@@ -67,35 +67,37 @@ namespace Sentry
     bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
     {
         if(!this->IsOpen()) return false;
+        std::shared_ptr<NetworkData> networkData(
+                new NetworkData(RPC_TYPE_REQUEST, message));
         if(this->mNetWorkThread.IsCurrentThread())
         {
-            this->SendData(RPC_TYPE_REQUEST, message);
+            this->SendData(networkData);
             return true;
         }
-        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, RPC_TYPE_REQUEST, message);
+        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
         return true;
     }
 
     bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
     {
         if(!this->IsOpen()) return false;
+        std::shared_ptr<NetworkData> networkData(
+                new NetworkData(RPC_TYPE_RESPONSE, message));
         if(this->mNetWorkThread.IsCurrentThread())
         {
-            this->SendData(RPC_TYPE_RESPONSE, message);
+            this->SendData(networkData);
             return true;
         }
-        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, RPC_TYPE_RESPONSE, message);
+        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
         return true;
     }
 
-    void RpcGateClient::OnSendData(XCode code, std::shared_ptr<Message> message)
+    void RpcGateClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
     {
 #ifdef __DEBUG__
         if(code != XCode::Successful)
         {
-            std::string json;
-            util::MessageToJsonString(*message, &json);
-            std::cout << "send message to client error : " << json << std::endl;
+
         }
 #endif
     }
