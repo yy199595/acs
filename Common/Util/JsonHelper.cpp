@@ -326,4 +326,63 @@ namespace Sentry
         }
         return false;
     }
+
+    const rapidjson::Value *RapidJsonReader::GetJsonValue(const char *key1) const
+    {
+        auto iter = mDdocument.FindMember(key1);
+        return iter != this->mDdocument.MemberEnd() ? &iter->value : nullptr;
+    }
+
+    const rapidjson::Value *RapidJsonReader::GetJsonValue(const char *key1, const char *key2) const
+    {
+        const rapidjson::Value  * jsonValue = this->GetJsonValue(key1);
+        if(jsonValue == nullptr || !jsonValue->IsObject())
+        {
+            return nullptr;
+        }
+        auto iter = jsonValue->FindMember(key2);
+        return iter != jsonValue->MemberEnd() ? &iter->value : nullptr;
+
+    }
+
+    bool RapidJsonReader::TryGetValue(const char *key1, const char *key2, int &data) const
+    {
+        const rapidjson::Value  * jsonValue = this->GetJsonValue(key1, key2);
+        if(jsonValue == nullptr || !jsonValue->IsInt())
+        {
+            return false;
+        }
+        data = jsonValue->GetInt();
+        return true;
+    }
+
+    bool RapidJsonReader::TryGetValue(const char *key1, const char *key2, std::string &data) const
+    {
+        const rapidjson::Value  * jsonValue = this->GetJsonValue(key1, key2);
+        if(jsonValue == nullptr || !jsonValue->IsString())
+        {
+            return false;
+        }
+        data.append(jsonValue->GetString(), jsonValue->GetStringLength());
+        return true;
+    }
+
+    bool RapidJsonReader::TryGetValue(const char *key1, const char *key2, std::vector<std::string> &data) const
+    {
+        const rapidjson::Value *jsonValue = this->GetJsonValue(key1, key2);
+        if (jsonValue == nullptr || !jsonValue->IsArray())
+        {
+            return false;
+        }
+        for (int index = 0; index < jsonValue->Size(); index++)
+        {
+            const rapidjson::Value & member = (*jsonValue)[index];
+            if(!member.IsString())
+            {
+                return false;
+            }
+            data.emplace_back(member.GetString(), member.GetStringLength());
+        }
+        return true;
+    }
 }// namespace Sentry

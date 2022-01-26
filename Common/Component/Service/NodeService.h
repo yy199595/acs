@@ -28,8 +28,11 @@ namespace Sentry
         void OnDestory() final;
     private:
         void Add(const RapidJsonReader & jsonReader);
-        void Remove(const RapidJsonReader & jsonReader);
+        void Register(const RapidJsonReader & jsonReader);
 
+    private:
+        void RegisterService();
+        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         int mAreaId;
 		std::string mNodeName;

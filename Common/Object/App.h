@@ -73,6 +73,19 @@ namespace Sentry
 		inline LoggerComponent * GetLogger() { return this->mLogComponent; }
         inline TaskComponent * GetTaskComponent() { return this->mTaskComponent; }
         inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
+
+        template<typename T>
+        void GetTypeComponents(std::list<T *> & components)
+        {
+            for(Component * component : this->mSceneComponents)
+            {
+                T * typeComponent = dynamic_cast<T*>(component);
+                if(typeComponent != nullptr)
+                {
+                    components.push_back(typeComponent);
+                }
+            }
+        }
 	private:
 		
 		bool InitComponent();

@@ -71,7 +71,6 @@
         "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "MysqlComponent",
         "RedisComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
@@ -86,7 +85,6 @@
     "service": [
         "NodeService",
         "GateService",
-        "MysqlService",
         "AccountService"
     ],
     "white_list": [

@@ -1,16 +1,25 @@
 ﻿#include"NodeService.h"
 #include"Object/App.h"
+#include"Service/RcpService.h"
 #include"Service/ServiceProxy.h"
-#include"Component/Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceProxyComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Util/JsonHelper.h"
 #include"RedisComponent.h"
+#include"Http/Component/HttpClientComponent.h"
 namespace Sentry
 {
+    struct NetAddressInfo
+    {
+        string Ip;
+        int Port;
+    };
+
     bool NodeService::Awake()
     {
         BIND_SUB_FUNCTION(NodeService::Add);
+        BIND_SUB_FUNCTION(NodeService::Register);
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
         return true;
@@ -24,80 +33,84 @@ namespace Sentry
 
     void NodeService::Add(const RapidJsonReader &jsonReader)
     {
-        int areaId = 0;
-        if(jsonReader.TryGetValue("area_id", areaId))
-        {
-            if(areaId != 0 && areaId != this->mAreaId)
-            {
-                return;
-            }
-            std::string address;
-            std::vector<std::string> services;
-            jsonReader.TryGetValue("address", address);
-            jsonReader.TryGetValue("services", services);
-            ServiceProxyComponent * serviceComponent = this->GetComponent<ServiceProxyComponent>();
-            if(serviceComponent != nullptr)
-            {
-                for(const std::string & name : services)
-                {
-                   auto serviceEntity = serviceComponent->GetServiceProxy(name);
-                   if(serviceEntity != nullptr)
-                   {
-                       serviceEntity->AddAddress(address);
-                   }
-                }
-            }
-        }
+
     }
 
-    void NodeService::Remove(const RapidJsonReader &jsonReader)
+    void NodeService::Register(const RapidJsonReader &jsonReader)
     {
-
+        NetAddressInfo rpcAddressInfo;
+        NetAddressInfo httpAddressInfo;
+        std::vector<std::string> services;
+        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "service", services));
+        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "ip", rpcAddressInfo.Ip));
+        LOG_CHECK_RET(jsonReader.TryGetValue("http", "ip", rpcAddressInfo.Ip));
+        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "port", rpcAddressInfo.Port));
+        LOG_CHECK_RET(jsonReader.TryGetValue("http", "port", rpcAddressInfo.Ip));
+        ServiceProxyComponent * proxyComponent = this->GetComponent<ServiceProxyComponent>();
+        HttpClientComponent * httpClientComponent = this->GetComponent<HttpClientComponent>();
+        for(const std::string & service : services)
+        {
+            std::shared_ptr<ServiceProxy> serviceProxy = proxyComponent->GetServiceProxy(service);
+            serviceProxy->AddAddress(fmt::format("{0}:{1}", rpcAddressInfo.Ip, rpcAddressInfo.Port));
+        }
+        RapidJsonWriter jsonWriter;
+        if(this->GetServiceInfo(jsonWriter))
+        {
+            std::string content;
+            jsonWriter.WriterToStream(content);
+            string url = fmt::format("http://{0}:{1}/logic/service/add");
+            httpClientComponent->Post(url, content);
+        }
     }
 
     void NodeService::OnStart() //把本机服务注册到redis
     {
+        this->RegisterService();
+    }
+
+    bool NodeService::GetServiceInfo(RapidJsonWriter &jsonWriter)
+    {
         auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
         const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
-        if (rpcListener == nullptr)
-        {
-            return;
-        }
-        std::vector<Component *> components;
-        this->GetComponents(components);
+        const NetworkListener *httpListener = tcpServerComponent->GetListener("http");
+        LOG_CHECK_RET_FALSE(rpcListener != nullptr && httpListener != nullptr);
 
-        std::vector<std::string> services
-                {
-                        std::to_string(this->mAreaId),
-                        rpcListener->GetConfig().mAddress,
-                };
-        for(Component * component : components)
-        {
-            SubService * subService = dynamic_cast<SubService *>(component);
-            if (subService == nullptr)
-            {
-                continue;
-            }
-            services.emplace_back(subService->GetName());
-        }
-        auto response = this->mRedisComponent->Call("Service", "Add", services);
-        if(response != nullptr && !response->HasError())
-        {
-            LOG_WARN("register all service to redis Successful");
-        }
+        jsonWriter.Add("rpc");
+        jsonWriter.StartObject();
+        jsonWriter.Add("ip", rpcListener->GetConfig().Ip);
+        jsonWriter.Add("port", (int)rpcListener->GetConfig().Port);
 
-        auto queryResponse = this->mRedisComponent->Call("Service", "Get", this->mAreaId);
-        if(queryResponse != nullptr && !queryResponse->HasError())
+        std::vector<std::string> tempArray;
+        std::list<RcpService *> rpcServices;
+        App::Get().GetTypeComponents(rpcServices);
+        for(RcpService * rpcService : rpcServices)
         {
-            RapidJsonReader jsonReader;
-            for(size_t index = 0; index < queryResponse->GetArraySize(); index++)
-            {
-                const std::string & json = queryResponse->GetValue(index);
-                if(jsonReader.TryParse(json))
-                {
-                    this->Add(jsonReader);
-                }
-            }
+            tempArray.emplace_back(rpcService->GetName());
+        }
+        jsonWriter.Add("service", tempArray);
+        jsonWriter.EndObject();
+
+
+        jsonWriter.Add("http");
+        jsonWriter.StartObject();
+        jsonWriter.Add("ip", httpListener->GetConfig().Ip);
+        jsonWriter.Add("port", httpListener->GetConfig().Port);
+        jsonWriter.EndObject();
+
+        jsonWriter.Add("area_id", this->mAreaId);
+        jsonWriter.Add("node_name", this->mNodeName);
+        return true;
+    }
+
+    void NodeService::RegisterService()
+    {
+        RapidJsonWriter jsonWriter;
+        if(this->GetServiceInfo(jsonWriter))
+        {
+            std::string jsonContent;
+            jsonWriter.WriterToStream(jsonContent);
+            long long number = this->mRedisComponent->Publish("NodeService.Add", jsonContent);
+            LOG_DEBUG("publish successful count = ", number);
         }
     }
 

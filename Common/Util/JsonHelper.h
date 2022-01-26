@@ -88,6 +88,14 @@ namespace Sentry
         bool TryGetValue(const char *key, std::vector<std::string> &data) const;
         bool TryGetValue(const char *key, google::protobuf::Message &data) const;
 
+    public:
+        bool TryGetValue(const char *key1, const char * key2, int &data) const;
+        bool TryGetValue(const char *key1, const char * key2, std::string &data) const;
+        bool TryGetValue(const char *key1, const char * key2, std::vector<std::string> &data) const;
+
+    private:
+        const rapidjson::Value * GetJsonValue(const char * key1) const;
+        const rapidjson::Value * GetJsonValue(const char * key1, const char * key2) const;
     private:
         rapidjson::Value * mJsonValue;
 		rapidjson::Document mDdocument;
