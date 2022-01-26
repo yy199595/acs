@@ -10,6 +10,11 @@
     {
         "network":1
     },
+    "gate":
+    {
+        "ip": "10.10.14.104",
+        "port": 1995
+    },
     "IsOpenRecoder": true,
     "ScriptPath":"./Script/",
     "component": [

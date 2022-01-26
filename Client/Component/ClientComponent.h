@@ -46,6 +46,8 @@ namespace Client
         void OnTimeout(long long rpcId);
 
     private:
+        std::string mIp;
+        unsigned short mPort;
         TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
         std::shared_ptr<TcpRpcClient> mTcpClient;

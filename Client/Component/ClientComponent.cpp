@@ -22,17 +22,24 @@ namespace Client
 
     void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> t1)
     {
-
+        std::string json;
+        util::MessageToJsonString(*t1, &json);
+        LOG_ERROR("request json = ", json);
     }
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc_Response> t2)
     {
-
+        std::string json;
+        util::MessageToJsonString(*t2, &json);
+        LOG_WARN("response json = ", json);
     }
 
 	bool ClientComponent::Awake()
     {
-		return true;
+        const ServerConfig &config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("gate", "ip", this->mIp));
+        LOG_CHECK_RET_FALSE(config.GetValue("gate", "port", this->mPort));
+        return true;
     }
 
     bool ClientComponent::LateAwake()
@@ -48,9 +55,10 @@ namespace Client
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
-        while(!this->mTcpClient->ConnectAsync("192.168.8.114", 1995)->Await())
+        int count = 0;
+        while(!this->mTcpClient->ConnectAsync(this->mIp, this->mPort)->Await())
         {
-            LOG_ERROR("connect server failure");
+            LOG_ERROR("connect server failure count = ", ++count);
             this->mTaskComponent->Sleep(1000);
         }
 
