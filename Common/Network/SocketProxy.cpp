@@ -14,11 +14,13 @@ namespace Sentry
 
     void SocketProxy::RefreshState()
     {
+        asio::error_code code;
         this->mIsOpen = this->mSocket->is_open();
-        if(this->mIsOpen)
+        auto endPoint = this->mSocket->remote_endpoint(code);
+        if(this->mIsOpen && !code)
         {
-            unsigned short port = this->mSocket->remote_endpoint().port();
-            std::string ip = this->mSocket->remote_endpoint().address().to_string();
+            unsigned int port = endPoint.port();
+            std::string ip = endPoint.address().to_string();
             this->mAddress = fmt::format("{0}:{1}", ip, port);
         }
     }
