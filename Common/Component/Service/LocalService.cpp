@@ -21,6 +21,7 @@ namespace Sentry
     {
         BIND_SUB_FUNCTION(LocalService::Add);
         BIND_SUB_FUNCTION(LocalService::Push);
+        BIND_SUB_FUNCTION(LocalService::Remove);
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
         LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
         return true;
@@ -37,6 +38,13 @@ namespace Sentry
     void LocalService::Add(const RapidJsonReader &jsonReader)
     {
 
+    }
+
+    void LocalService::RemoveByAddress(const std::string &address)
+    {
+        RapidJsonWriter jsonWriter;
+        jsonWriter.Add("address", address);
+        this->mRedisComponent->Publish("LocalService.Remove", jsonWriter);
     }
 
     void LocalService::Push(const RapidJsonReader &jsonReader)
@@ -85,6 +93,24 @@ namespace Sentry
             long long number = this->mRedisComponent->Publish("LocalService.Push", jsonContent);
             LOG_DEBUG("publish successful count = ", number);
         }
+    }
+
+    void LocalService::Remove(const RapidJsonReader &jsonReader)
+    {
+        std::string address;
+        LOG_CHECK_RET(jsonReader.TryGetValue("address", address));
+
+        auto iter = this->mAddressMap.find(address);
+        LOG_CHECK_RET(iter != this->mAddressMap.end());
+        for (const std::string &service: iter->second)
+        {
+            auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
+            if (serviceProxy != nullptr)
+            {
+                serviceProxy->RemoveAddress(address);
+            }
+        }
+        this->mAddressMap.erase(iter);
     }
 
     bool LocalService::GetServiceInfo(RapidJsonWriter &jsonWriter)

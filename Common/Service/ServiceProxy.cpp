@@ -5,6 +5,7 @@
 #include<Scene/RpcConfigComponent.h>
 #include"Rpc/RpcComponent.h"
 #include"Service/LocalService.h"
+#include"DB/Component/RedisComponent.h"
 namespace Sentry
 {
 	ServiceProxy::ServiceProxy(const std::string & name)
@@ -24,6 +25,15 @@ namespace Sentry
             auto node = make_shared<ProxyClient>
                     (this->mServiceName, address);
             this->mServiceNodeMap.emplace(address, node);
+            while(!this->mWaitTaskQueue.empty())
+            {
+                std::shared_ptr<TaskSource<bool>> taskSource = this->mWaitTaskQueue.front();
+                if(taskSource != nullptr)
+                {
+                    taskSource->SetResult(false);
+                }
+                this->mWaitTaskQueue.pop();
+            }
             LOG_WARN(this->mServiceName, " add new address [", address, "]");
         }
     }
@@ -34,6 +44,7 @@ namespace Sentry
         if(iter != this->mServiceNodeMap.end())
         {
             this->mServiceNodeMap.erase(iter);
+            return true;
         }
         return false;
     }
@@ -44,45 +55,36 @@ namespace Sentry
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
     }
 
-    bool ServiceProxy::RemoveServiceNode(const std::string &address)
-    {
-        auto iter = this->mServiceNodeMap.find(address);
-        if(iter == this->mServiceNodeMap.end())
-        {
-            auto serviceNode = iter->second;
-            this->mServiceNodeMap.erase(iter);
-            std::shared_ptr<com::Rpc_Request> message = serviceNode->PopMessage();
-            while(message != nullptr)
-            {
-                int methodId = message->method_id();
-                auto methodConfig = this->mRpcConfigComponent->GetProtocolConfig(methodId);
-                if(methodConfig != nullptr)
-                {
-                    
-                }
-                message = serviceNode->PopMessage();
-            }
-        }
-    }
-
     bool ServiceProxy::AllotServiceAddress(std::string &address)
     {
         if(this->mAllAddress.empty())
         {
-            return false;
+            std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+            this->mWaitTaskQueue.emplace(taskSource);
+#ifdef __DEBUG__
+            LOG_WARN("not find service wait for new service add");
+#endif
+            if(!taskSource->Await())
+            {
+                return false;
+            }
         }
         while(!this->mAllAddress.empty())
         {
             const std::string arr = this->mAllAddress.front();
             this->mAllAddress.pop();
             std::shared_ptr<ProxyClient> serviceNode = this->GetNode(arr);
-            if(serviceNode != nullptr && serviceNode->IsConnected())
+            if (serviceNode != nullptr && serviceNode->IsConnected())
             {
                 address = serviceNode->GetAddress();
                 this->mAllAddress.emplace(address);
                 return true;
             }
-            this->RemoveAddress(std::move(arr));
+            LocalService *localService = App::Get().GetComponent<LocalService>();
+            if (localService != nullptr)
+            {
+                localService->RemoveByAddress(arr);
+            }
         }
         return false;
     }

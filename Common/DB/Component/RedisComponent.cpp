@@ -231,15 +231,10 @@ namespace Sentry
 
     void RedisComponent::SubscribeMessage()
     {
-        std::vector<Component *> components;
-        this->GetComponents(components);
-        for (Component *component: components)
+        std::list<SubService *> components;
+        App::Get().GetTypeComponents<SubService>(components);
+        for (SubService *subService: components)
         {
-            auto subService = dynamic_cast<SubService *>(component);
-            if (subService == nullptr)
-            {
-                continue;
-            }
             std::vector<std::string> methods;
             subService->GetSubMethods(methods);
             for (const std::string &name: methods)
@@ -278,9 +273,11 @@ namespace Sentry
                         return;
                     }
                 }
+                this->SubscribeMessage();
+                LOG_DEBUG("subscribe redis client connect successful");
             }
 
-            auto redisResponse = this->mSubRedisClient->WaitRedisMessageResponse()->Await();
+            auto redisResponse = this->mSubRedisClient->WaitRedisMessage()->Await();
             if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 &&
                 redisResponse->GetValue() == "message")
             {

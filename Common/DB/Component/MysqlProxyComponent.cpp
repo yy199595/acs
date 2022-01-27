@@ -28,12 +28,11 @@ namespace Sentry
     void MysqlProxyComponent::OnComplete()
     {
         TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
-        //taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
+        taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
     }
 
 	void MysqlProxyComponent::AddUserData()
 	{
-        this->mCorComponent->Sleep(3000);
 		for (int index = 0; index < 10; index++)
         {
             db::db_account::tab_user_account userAccountData;

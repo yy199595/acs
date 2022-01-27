@@ -7,7 +7,6 @@
 using namespace google::protobuf;
 namespace Sentry
 {
-    class NodeHelper;
     class ServiceProxy
     {
     public:
@@ -19,8 +18,6 @@ namespace Sentry
         bool RemoveAddress(const std::string &address);
 
         bool AllotServiceAddress(std::string &address);
-
-        bool RemoveServiceNode(const std::string & address);
 
         std::shared_ptr<ProxyClient> GetNode(const std::string & address);
 
@@ -42,8 +39,8 @@ namespace Sentry
         TaskComponent * mTaskComponent;
         class RpcComponent *mRpcComponent;
         std::queue<std::string> mAllAddress;
-        class RedisComponent * mRedisComponent;
         class RpcConfigComponent *mRpcConfigComponent;
+        std::queue<std::shared_ptr<TaskSource<bool>>> mWaitTaskQueue;
         std::unordered_map<std::string, std::shared_ptr<ProxyClient>> mServiceNodeMap;
     };
 }// namespace Sentry

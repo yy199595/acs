@@ -66,10 +66,10 @@ namespace Sentry
         {
             return nullptr;
         }
-        return this->WaitRedisMessageResponse();
+        return this->WaitRedisMessage();
     }
 
-    TaskSourceShared<RedisResponse> RedisClient::WaitRedisMessageResponse()
+    TaskSourceShared<RedisResponse> RedisClient::WaitRedisMessage()
     {
         this->mDataSize = 0;
         this->mResponse = std::make_shared<RedisResponse>();

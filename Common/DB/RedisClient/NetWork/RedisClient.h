@@ -27,7 +27,7 @@ namespace Sentry
         void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
 
     public:
-        TaskSourceShared<RedisResponse> WaitRedisMessageResponse();
+        TaskSourceShared<RedisResponse> WaitRedisMessage();
         TaskSourceShared<RedisResponse> InvokeCommand(std::shared_ptr<RedisRequest> command);
     private:
         void OnDecodeHead(std::iostream & readStream);

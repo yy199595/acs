@@ -43,7 +43,7 @@ namespace Sentry
             return false;
         }
         this->mMethodMap.emplace(name, method);
-        LOG_DEBUG("add new c++ service method", service,'.', name);
+        LOG_DEBUG("add new c++ service method [", service,'.', name, ']');
         return true;
     }
 

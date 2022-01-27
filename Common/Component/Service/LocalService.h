@@ -22,17 +22,21 @@ namespace Sentry
         bool LateAwake() final;
 
         void OnStart() final;
-        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
+
+    public:
+        void RemoveByAddress(const std::string & address);
+
     private:
         void Add(const RapidJsonReader & jsonReader);
         void Push(const RapidJsonReader & jsonReader);
-
-    private:
+        void Remove(const RapidJsonReader & jsonReader);
+        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         int mAreaId;
 		std::string mNodeName;
         class RedisComponent * mRedisComponent;
         class HttpClientComponent * mHttpComponent;
         class ServiceProxyComponent * mServiceComponent;
+        std::unordered_map<std::string, std::list<std::string>> mAddressMap;
     };
 }
