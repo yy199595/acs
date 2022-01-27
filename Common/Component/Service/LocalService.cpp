@@ -41,27 +41,36 @@ namespace Sentry
 
     void LocalService::Push(const RapidJsonReader &jsonReader)
     {
-        string ip;
-        int port = 0;
+        int areaId = 0;
+        LOG_CHECK_RET(jsonReader.TryGetValue("area_id", areaId));
+        if(areaId != 0 && areaId != this->mAreaId)
+        {
+            return;
+        }
+        std::string rpcAddress;
+        std::string httpAddress;
         std::vector<std::string> services;
-        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "ip", ip));
-        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "port", port));
         LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "service", services));
+        LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "address", rpcAddress));
+        LOG_CHECK_RET(jsonReader.TryGetValue("http", "address", httpAddress));
+
         for(const std::string & service : services)
         {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
-            serviceProxy->AddAddress(fmt::format("{0}:{1}", ip, port));
+            if(serviceProxy != nullptr)
+            {
+                serviceProxy->AddAddress(rpcAddress);
+            }
         }
         RapidJsonWriter jsonWriter;
-        LOG_CHECK_RET(this->GetServiceInfo(jsonWriter));
         if(this->GetServiceInfo(jsonWriter))
         {
-            LOG_CHECK_RET(jsonReader.TryGetValue("http", "ip", ip));
-            LOG_CHECK_RET(jsonReader.TryGetValue("http", "port", port));
-            string url = fmt::format("http://{0}:{1}/logic/service/push", ip, port);
-            if (this->mHttpComponent->Post(url, jsonWriter) != nullptr)
+            ElapsedTimer elapsedTimer;
+            string url = fmt::format("http://{0}/logic/service/push", httpAddress);
+            std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, jsonWriter);
+            if(httpResponse!= nullptr)
             {
-                LOG_INFO("post service to ", ip, ':', port, " successful");
+                LOG_INFO("post service to ", httpAddress, " successful [", elapsedTimer.GetMs(), "ms]");
             }
         }
     }
@@ -85,10 +94,14 @@ namespace Sentry
         const NetworkListener *httpListener = tcpServerComponent->GetListener("http");
         LOG_CHECK_RET_FALSE(rpcListener != nullptr && httpListener != nullptr);
 
+        const ListenConfig & rpcConfig = rpcListener->GetConfig();
+        const ListenConfig & httpConfig = httpListener->GetConfig();
+        const std::string rpcAddress = fmt::format("{0}:{1}", rpcConfig.Ip, rpcConfig.Port);
+        const std::string httpAddress = fmt::format("{0}:{1}",httpConfig.Ip, httpConfig.Port);
+
         jsonWriter.Add("rpc");
         jsonWriter.StartObject();
-        jsonWriter.Add("ip", rpcListener->GetConfig().Ip);
-        jsonWriter.Add("port", (int)rpcListener->GetConfig().Port);
+        jsonWriter.Add("address", rpcAddress);
 
         std::vector<std::string> tempArray;
         std::list<RpcService *> rpcServices;
@@ -100,11 +113,9 @@ namespace Sentry
         jsonWriter.Add("service", tempArray);
         jsonWriter.EndObject();
 
-
         jsonWriter.Add("http");
         jsonWriter.StartObject();
-        jsonWriter.Add("ip", httpListener->GetConfig().Ip);
-        jsonWriter.Add("port", httpListener->GetConfig().Port);
+        jsonWriter.Add("address", httpAddress);
         jsonWriter.EndObject();
 
         jsonWriter.Add("area_id", this->mAreaId);

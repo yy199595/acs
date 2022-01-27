@@ -125,6 +125,16 @@ namespace Sentry
         }
         return HttpStatus::CONTINUE;
     }
+
+    std::shared_ptr<RapidJsonReader> HttpAsyncResponse::ToJsonReader()
+    {
+        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
+        if(!jsonReader->TryParse(this->mContent))
+        {
+            return nullptr;
+        }
+        return jsonReader;
+    }
 }
 
 namespace Sentry
@@ -133,6 +143,16 @@ namespace Sentry
     {
         this->mContentLength = 0;
         this->mState = HttpDecodeState::FirstLine;
+    }
+
+    std::shared_ptr<RapidJsonReader> HttpHandlerRequest::ToJsonReader()
+    {
+        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
+        if(!jsonReader->TryParse(this->mContent))
+        {
+            return nullptr;
+        }
+        return jsonReader;
     }
 
     bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
@@ -231,20 +251,29 @@ namespace Sentry
 
 namespace Sentry
 {
-    void HttpHandlerResponse::AddValue(HttpStatus status)
-    {
-        std::ostream os(&this->mStreamBuffer);
-        os << HttpVersion << (int)status << HttpStatusToString(status) << "\r\n";
-        os << "\r\n";
-    }
-
-    void HttpHandlerResponse::AddValue(HttpStatus status, const std::string &content)
+    HttpHandlerResponse::HttpHandlerResponse(HttpStatus status)
     {
         std::ostream os(&this->mStreamBuffer);
         os << HttpVersion << ' ' << (int)status << ' ' << HttpStatusToString(status) << "\r\n";
+    }
+
+    void HttpHandlerResponse::AddValue(const std::string &content)
+    {
+        std::ostream os(&this->mStreamBuffer);
         os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
         os << "Content-Length: " << content.size()<< "\r\n";
         os << "\r\n";
         os.write(content.c_str(), content.size());
+    }
+
+    void HttpHandlerResponse::AddValue(RapidJsonWriter &jsonWriter)
+    {
+        std::string json;
+        std::ostream os(&this->mStreamBuffer);
+        assert(jsonWriter.WriterToStream(json));
+        os << "Content-Type: application/json; charset=utf-8" << "\r\n";
+        os << "Content-Length: " << json.size()<< "\r\n";
+        os << "\r\n";
+        os.write(json.c_str(), json.size());
     }
 }

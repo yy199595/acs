@@ -28,7 +28,7 @@ namespace Sentry
     void MysqlProxyComponent::OnComplete()
     {
         TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
-        taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
+        //taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
     }
 
 	void MysqlProxyComponent::AddUserData()

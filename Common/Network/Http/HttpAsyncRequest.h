@@ -55,6 +55,7 @@ namespace Sentry
     {
     public:
         virtual const std::string & GetContent() = 0;
+        virtual std::shared_ptr<RapidJsonReader> ToJsonReader() = 0;
         virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
 }
@@ -66,6 +67,7 @@ namespace Sentry
     public:
         HttpAsyncResponse();
     public:
+        std::shared_ptr<RapidJsonReader> ToJsonReader() final;
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() final { return this->mContent;}
@@ -91,6 +93,7 @@ namespace Sentry
     public:
         const std::string & GetUrl() { return this->mUrl;}
         const std::string & GetMethod() { return this->mMethod; }
+        std::shared_ptr<RapidJsonReader> ToJsonReader() final;
         const std::string & GetContent() final { return this->mContent; }
         bool GetHeadContent(const std::string & key, std::string & value);
     private:
@@ -109,8 +112,10 @@ namespace Sentry
     class HttpHandlerResponse : public IHttpStream
     {
     public:
-        void AddValue(HttpStatus status);
-        void AddValue(HttpStatus status, const std::string & content);
+        HttpHandlerResponse(HttpStatus code);
+    public:
+        void AddValue(const std::string & content);
+        void AddValue(RapidJsonWriter & jsonWriter);
         asio::streambuf & GetStream() final { return this->mStreamBuffer;}
     private:
         asio::streambuf mStreamBuffer;

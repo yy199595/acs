@@ -24,30 +24,28 @@ namespace Sentry
         return handlerRequest;
     }
 
-    bool HttpHandlerClient::SendResponse(HttpStatus status)
+    bool HttpHandlerClient::Response(HttpStatus code, RapidJsonWriter &jsonWriter)
     {
-        this->mResponseData.AddValue(status);
+        std::shared_ptr<HttpHandlerResponse> response(new HttpHandlerResponse(code));
+        response->AddValue(jsonWriter);
+        return this->Response(response);
+    }
+
+    bool HttpHandlerClient::Response(std::shared_ptr<HttpHandlerResponse> response)
+    {
         IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
-        netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
+        netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource, response);
         return taskSource->Await();
     }
 
-    bool HttpHandlerClient::SendResponse(HttpStatus status, const std::string &content)
+    void HttpHandlerClient::ResponseData(std::shared_ptr<TaskSource<bool>> taskSource,
+                                         std::shared_ptr<HttpHandlerResponse> response)
     {
-        this->mResponseData.AddValue(status, content);
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
-        std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
-        netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource);
-        return taskSource->Await();
-    }
-
-    void HttpHandlerClient::ResponseData(std::shared_ptr<TaskSource<bool>> taskSource)
-    {
+        asio::streambuf & streambuf = response->GetStream();
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-        asio::streambuf & streambuf = this->mResponseData.GetStream();
         std::shared_ptr<HttpHandlerClient> self = this->shared_from_this();
-        asio::async_write(tcpSocket, streambuf, [this, self, taskSource]
+        asio::async_write(tcpSocket, streambuf, [this, self, taskSource, response]
                 (const asio::error_code & code, size_t size)
         {
             if(code)

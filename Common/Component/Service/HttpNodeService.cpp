@@ -22,16 +22,15 @@ namespace Sentry
 
     XCode HttpNodeService::Push(const RapidJsonReader &jsonReader, RapidJsonWriter & response)
     {
-        string ip;
-        int port = 0;
+        std::string address;
         std::vector<std::string> services;
-        LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "ip", ip));
-        LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "port", port));
+        LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "address", address));
         LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "service", services));
         for(const std::string & service : services)
         {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
-            serviceProxy->AddAddress(fmt::format("{0}:{1}", ip, port));
+            LOG_THROW_ERROR(serviceProxy);
+            serviceProxy->AddAddress(address);
         }
         return XCode::Successful;
     }

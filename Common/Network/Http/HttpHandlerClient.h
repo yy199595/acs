@@ -15,15 +15,15 @@ class HttpHandlerClient : public std::enable_shared_from_this<HttpHandlerClient>
         HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy);
         ~HttpHandlerClient() {LOG_ERROR("delete http handler client => ", this->mSocket->GetAddress());}
     public:
-        bool SendResponse(HttpStatus status);
-        bool SendResponse(HttpStatus status, const std::string & content);
         std::shared_ptr<HttpHandlerRequest> ReadHandlerContent();
+        bool Response(std::shared_ptr<HttpHandlerResponse> response);
+        bool Response(HttpStatus code, RapidJsonWriter & jsonWriter);
+
     private:
-        void ResponseData(std::shared_ptr<TaskSource<bool>> taskSource);
+        void ResponseData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<HttpHandlerResponse> response);
         void ReadHttpData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<HttpHandlerRequest> handlerRequest);
     private:
         asio::streambuf mStreamBuffer;
-        HttpHandlerResponse mResponseData;
         std::shared_ptr<SocketProxy> mSocket;
     };
 }

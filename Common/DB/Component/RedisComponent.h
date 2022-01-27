@@ -2,6 +2,7 @@
 
 #include"Util/Guid.h"
 #include"Other/ElapsedTimer.h"
+#include"Util/JsonHelper.h"
 #include"Component/Component.h"
 #include"Coroutine/TaskComponent.h"
 #include"DB/RedisClient/NetWork/RedisClient.h"
@@ -43,6 +44,9 @@ namespace Sentry
         bool SubscribeChannel(const std::string & chanel);
 
         long long Publish(const std::string & channel, const std::string & message);
+
+        long long Publish(const std::string & channel, RapidJsonWriter & jsonWriter);
+
 
         template<typename ... Args>
         std::shared_ptr<RedisResponse> InvokeCommand(const std::string & cmd, Args && ... args)

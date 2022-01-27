@@ -206,6 +206,16 @@ namespace Sentry
         return this->InvokeCommand("PUBLISH", channel, message)->GetNumber();
     }
 
+    long long RedisComponent::Publish(const std::string &channel, RapidJsonWriter &jsonWriter)
+    {
+        std::string json;
+        if(jsonWriter.WriterToStream(json))
+        {
+            return this->Publish(channel, json);
+        }
+        return -1;
+    }
+
     void RedisComponent::CheckRedisClient()
     {
 

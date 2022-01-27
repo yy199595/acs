@@ -88,42 +88,51 @@ namespace Sentry
 
     void HttpClientComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
     {
-        ElapsedTimer elapsedTimer;
         std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->ReadHandlerContent();
         LOG_CHECK_RET(httpRequestData);
+#ifdef __DEBUG__
+        ElapsedTimer elapsedTimer;
         LOG_WARN(httpRequestData->GetMethod(), "  ", httpRequestData->GetUrl(), "  ", httpRequestData->GetContent());
-        //LOG_WARN(requestData->GetContent());
-
-        const std::string & url = httpRequestData->GetUrl();
+#endif
+        const std::string &url = httpRequestData->GetUrl();
         auto iter = this->mHttpConfigMap.find(url);
-        if(iter == this->mHttpConfigMap.end())
+        if (iter == this->mHttpConfigMap.end())
         {
-            httpClient->SendResponse(HttpStatus::NOT_FOUND);
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("code", (int) XCode::CallServiceNotFound);
+            jsonWriter.Add("error", fmt::format("not find url : [{0}]", url));
+            httpClient->Response(HttpStatus::OK, jsonWriter);
             return;
         }
-        const std::string & content = httpRequestData->GetContent();
-        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
-        if(!jsonReader->TryParse(content))
+        std::shared_ptr<RapidJsonReader> jsonReader = httpRequestData->ToJsonReader();
+        if (jsonReader == nullptr)
         {
-            httpClient->SendResponse(HttpStatus::BAD_REQUEST);
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("code", (int) XCode::ParseJsonFailure);
+            jsonWriter.Add("error", "parse json failure");
+            httpClient->Response(HttpStatus::OK, jsonWriter);
             return;
         }
-        HttpConfig * httpConfig = iter->second;
-        HttpService * httpService = this->GetComponent<HttpService>(httpConfig->mComponent);
-        if(httpService == nullptr)
-        {
-            httpClient->SendResponse(HttpStatus::NOT_FOUND);
-            return;
-        }
-        const std::string & method = httpConfig->mMethodName;
-        auto response = httpService->Invoke(method,jsonReader);
 
-        std::string json;
-        response->WriterToStream(json);
-        if(httpClient->SendResponse(HttpStatus::OK, json))
+        HttpConfig *httpConfig = iter->second;
+        HttpService *httpService = this->GetComponent<HttpService>(httpConfig->mComponent);
+        if (httpService == nullptr)
         {
-            LOG_INFO("http data response successful [", elapsedTimer.GetMs(), "ms]");
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("code", (int) XCode::CallServiceNotFound);
+            jsonWriter.Add("error", "not find handler component");
+            httpClient->Response(HttpStatus::OK, jsonWriter);
+            return;
         }
+        const std::string &method = httpConfig->mMethodName;
+        auto jsonResponse = httpService->Invoke(method, jsonReader);
+        if (jsonResponse != nullptr)
+        {
+            httpClient->Response(HttpStatus::OK, *jsonResponse);
+        }
+#ifdef __DEBUG__
+        LOG_INFO("http data response successful [", elapsedTimer.GetMs(), "ms]");
+#endif
     }
 
     std::shared_ptr<HttpAsyncResponse> HttpClientComponent::Get(const std::string &url, int timeout)
