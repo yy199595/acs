@@ -41,7 +41,6 @@ namespace Sentry
     public:
 		inline long long GetId() const { return this->mGameObjectId; }
         inline long long GetSocketId() const { return this->mSocketId; }
-
     private:
         long long mSocketId;
         long long mGameObjectId;

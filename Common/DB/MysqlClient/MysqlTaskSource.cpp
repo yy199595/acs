@@ -25,7 +25,7 @@ namespace Sentry
 
     bool MysqlTaskSource::Run()
     {
-        GKMysqlSocket *mysqlSocket = this->mMsqlComponent->GetMysqlSocket();
+        MysqlClient *mysqlSocket = this->mMsqlComponent->GetMysqlClient();
         if (mysqlSocket == nullptr)
         {
             this->mErrorString = "mysql socket is null";

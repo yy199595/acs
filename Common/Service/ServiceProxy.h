@@ -13,11 +13,12 @@ namespace Sentry
         explicit ServiceProxy(const std::string &name);
 
     public:
+        std::string AllotAddress(int ms = 5000);
+
         void AddAddress(const std::string &address);
 
         bool RemoveAddress(const std::string &address);
 
-        bool AllotServiceAddress(std::string &address);
 
         std::shared_ptr<ProxyClient> GetNode(const std::string & address);
 
@@ -35,11 +36,13 @@ namespace Sentry
     private:
         void Destory();
     private:
+        size_t mIndex;
         class App & mApp;
         std::string mServiceName;
         TaskComponent * mTaskComponent;
+        TimerComponent * mTimerComponent;
         class RpcComponent *mRpcComponent;
-        std::queue<std::string> mAllAddress;
+        std::vector<std::string> mAllAddress;
         class RpcConfigComponent *mRpcConfigComponent;
         std::queue<std::shared_ptr<TaskSource<bool>>> mWaitTaskQueue;
         std::unordered_map<std::string, std::shared_ptr<ProxyClient>> mServiceNodeMap;

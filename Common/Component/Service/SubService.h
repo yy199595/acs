@@ -26,8 +26,7 @@ namespace Sentry
             {
                 return false;
             }
-            JsonSubMethod<T> * jsonSubMethod = new JsonSubMethod<T>((T*)this, func);
-            this->mSubMethodMap.emplace(name, jsonSubMethod);
+            this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this, func));
             return true;
         }
 
@@ -39,12 +38,11 @@ namespace Sentry
             {
                 return false;
             }
-            ProtoSubMethod<T, T1> * subMethod = new ProtoSubMethod<T, T1>((T*)this, func);
-            this->mSubMethodMap.emplace(name, subMethod);
+            this->mSubMethodMap.emplace(name, std::make_shared<ProtoSubMethod<T, T1>>((T*)this, func));
             return true;
         }
     private:
-        std::unordered_map<std::string, SubMethod *> mSubMethodMap;
+        std::unordered_map<std::string, std::shared_ptr<SubMethod>> mSubMethodMap;
     };
 #define BIND_SUB_FUNCTION(func) LOG_CHECK_RET_FALSE(this->Bind(GetFunctionName(#func), &func))
 }

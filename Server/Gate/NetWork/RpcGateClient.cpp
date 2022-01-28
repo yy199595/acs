@@ -13,7 +13,7 @@ namespace Sentry
 {
     RpcGateClient::RpcGateClient(std::shared_ptr<SocketProxy> socket, SocketType type,
                                  GateClientComponent *component)
-        : RpcClient(socket, type), mProxyComponent(component)
+        : RpcClient(socket, type), mGateComponent(component)
     {
         this->mQps = 0;
         this->mCallCount = 0;
@@ -36,7 +36,7 @@ namespace Sentry
         std::cout << "receive player message count = " << this->mCallCount << std::endl;
         request->set_sock_id(this->GetSocketId());
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mProxyComponent, request);
+        mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
         return XCode::Successful;
     }
     
@@ -54,7 +54,7 @@ namespace Sentry
         }
         long long id = this->GetSocketId();
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mProxyComponent, id, code);
+        mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
     }
 
     void RpcGateClient::StartClose()

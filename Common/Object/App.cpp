@@ -14,8 +14,8 @@ namespace Sentry
 	App *App::mApp = nullptr;
 
 	App::App(ServerConfig * config) : Entity(0),
-                                      mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
-                                      mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
+        mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
+        mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		mApp = this;
 		this->mDelatime = 0;

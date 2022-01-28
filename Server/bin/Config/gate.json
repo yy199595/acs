@@ -1,8 +1,8 @@
 {
     "area_id": 1,
     "node_id": 1,
-    "fps": 30,
-    "node_name": "LogicServer",
+    "fps": 10,
+    "node_name": "GateServer",
     "log":
     {
         "save":1,
@@ -13,7 +13,7 @@
     "thread":
     {
         "task":1,
-        "network":2
+        "network":3
     },
     "path":
     {
@@ -25,20 +25,26 @@
         "ip":"10.10.14.104",
         "rpc":
         {
-            "port":7789,
+            "port":7790,
             "count":10000,
             "component":"RpcClientComponent"
         },
         "http":
         {
-            "port":81,
-            "count": 1000,
+            "port":82,
+            "count": 100,
             "component": "HttpClientComponent"
+        },
+        "gate":
+        {
+            "port":1995,
+            "count": 10000,
+            "component": "GateClientComponent"
         },
         "console":
         {
-            "port": 8081,
-            "count": 100,
+            "port": 8082,
+            "count": 1,
             "component" : "ConsoleComponent"
         }
     },
@@ -59,18 +65,19 @@
         "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "RedisComponent",
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
         "RpcClientComponent",
         "OperatorComponent",
+        "GateComponent",
+        "RedisComponent",
+        "GateClientComponent",
         "HttpClientComponent",
-        "ServiceProxyComponent",
-        "MysqlProxyComponent"
+        "ServiceProxyComponent"
     ],
     "service": [
+        "GateService",
         "LocalService",
-        "AccountService",
         "HttpNodeService"
     ],
     "white_list": [

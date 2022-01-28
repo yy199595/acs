@@ -31,7 +31,7 @@ namespace Sentry
     private:
         unsigned int mQps;
         unsigned int mCallCount;
-        GateClientComponent * mProxyComponent;
+        GateClientComponent * mGateComponent;
     };
 }
 

@@ -27,7 +27,7 @@ namespace Sentry
 
     void MysqlProxyComponent::OnComplete()
     {
-        TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
+        auto taskComponent = this->GetComponent<TaskComponent>();
         taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
     }
 
@@ -83,8 +83,8 @@ namespace Sentry
             LOG_ERROR("not find mysql service method ", func);
             return nullptr;
         }
-        std::string address;
-        if(!mysqlEntity->AllotServiceAddress(address))
+        std::string address = mysqlEntity->AllotAddress();
+        if(address.empty())
         {
             LOG_ERROR("allot MysqlService address failure", address);
             return nullptr;

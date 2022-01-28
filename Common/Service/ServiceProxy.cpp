@@ -11,7 +11,9 @@ namespace Sentry
 	ServiceProxy::ServiceProxy(const std::string & name)
 		: mServiceName(name), mApp(App::Get())
 	{
+        this->mIndex = 0;
         this->mTaskComponent = this->mApp.GetTaskComponent();
+        this->mTimerComponent = this->mApp.GetTimerComponent();
         this->mRpcComponent = this->mApp.GetComponent<RpcComponent>();
         LOG_CHECK_RET(this->mRpcConfigComponent = this->mApp.GetComponent<RpcConfigComponent>());
 	}
@@ -21,7 +23,7 @@ namespace Sentry
         auto iter = this->mServiceNodeMap.find(address);
         if(iter == this->mServiceNodeMap.end())
         {
-            this->mAllAddress.emplace(std::move(address));
+            this->mAllAddress.emplace_back(address);
             auto node = make_shared<ProxyClient>
                     (this->mServiceName, address);
             this->mServiceNodeMap.emplace(address, node);
@@ -55,38 +57,50 @@ namespace Sentry
         return iter != this->mServiceNodeMap.end() ? iter->second : nullptr;
     }
 
-    bool ServiceProxy::AllotServiceAddress(std::string &address)
+    std::string ServiceProxy::AllotAddress(int ms)
     {
-        if(this->mAllAddress.empty())
+        if (this->mAllAddress.empty())
         {
             std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+            auto OnTimerCallback = [taskSource]() {
+                if (!taskSource->IsComplete())
+                {
+                    taskSource->SetResult(false);
+                }
+            };
+
+            unsigned int timerId = this->mTimerComponent->AddTimer(
+                    ms, new LambdaMethod(std::move(OnTimerCallback)));
             this->mWaitTaskQueue.emplace(taskSource);
 #ifdef __DEBUG__
-            LOG_WARN("not find service wait for new service add");
+            LOG_WARN("wait new service");
 #endif
-            if(!taskSource->Await())
+            if (!taskSource->Await())
             {
-                return false;
+                return std::string();
             }
+            this->mTimerComponent->RemoveTimer(timerId);
         }
-        while(!this->mAllAddress.empty())
+
+        if (this->mIndex >= this->mAllAddress.size())
         {
-            const std::string arr = this->mAllAddress.front();
-            this->mAllAddress.pop();
-            std::shared_ptr<ProxyClient> serviceNode = this->GetNode(arr);
-            if (serviceNode != nullptr && serviceNode->IsConnected())
-            {
-                address = serviceNode->GetAddress();
-                this->mAllAddress.emplace(address);
-                return true;
-            }
-            LocalService *localService = this->mApp.GetComponent<LocalService>();
-            if (localService != nullptr)
-            {
-                localService->RemoveByAddress(arr);
-            }
+            this->mIndex = 0;
         }
-        return false;
+
+        const std::string &address = this->mAllAddress[this->mIndex];
+        std::shared_ptr<ProxyClient> serviceNode = this->GetNode(address);
+        if (serviceNode != nullptr && serviceNode->IsConnected())
+        {
+            this->mIndex++;
+            return address;
+        }
+        LocalService *localService = this->mApp.GetComponent<LocalService>();
+        if (localService != nullptr)
+        {
+            localService->RemoveByAddress(address);
+            this->mAllAddress.erase(this->mAllAddress.begin() + this->mIndex);
+        }
+        return std::string();
     }
 
 	std::shared_ptr<com::Rpc_Request> ServiceProxy::NewRequest(const std::string & method)
@@ -103,8 +117,8 @@ namespace Sentry
 
     std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const string &func)
     {
-        std::string address;
-        if(this->AllotServiceAddress(address))
+        std::string address = this->AllotAddress();
+        if(address.empty())
         {
             LOG_ERROR("allot service address failure : ", this->mServiceName);
             return nullptr;
@@ -114,8 +128,8 @@ namespace Sentry
 
     std::shared_ptr<RpcTaskSource> ServiceProxy::Call(const string &func, const Message &message)
     {
-        std::string address;
-        if (this->AllotServiceAddress(address))
+        std::string address = this->AllotAddress();
+        if (address.empty())
         {
             LOG_ERROR("allot service address failure : ", this->mServiceName);
             return nullptr;

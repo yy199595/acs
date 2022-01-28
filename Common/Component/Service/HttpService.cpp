@@ -15,9 +15,9 @@ namespace Sentry
             response->Add("code", (int)XCode::CallServiceNotFound);
             return response;
         }
-        HttpServiceMethod * httpServiceMethod = iter->second;
         try
         {
+            auto httpServiceMethod = iter->second;
             XCode code = httpServiceMethod->Invoke(request, response);
             response->Add("code", (int)code);
         }

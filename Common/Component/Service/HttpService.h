@@ -25,8 +25,8 @@ namespace Sentry
             {
                 return false;
             }
-            this->mHttpMethodMap.emplace(
-                    name, new HttpServiceJsonMethod1<T>((T*)this, std::move(func)));
+            this->mHttpMethodMap.emplace(name, std::make_shared<
+                    HttpServiceJsonMethod1<T>>((T*)this, std::move(func)));
             return true;
         }
 
@@ -38,13 +38,13 @@ namespace Sentry
             {
                 return false;
             }
-            this->mHttpMethodMap.emplace(
-                    name, new HttpServiceJsonMethod2<T>((T*)this, std::move(func)));
+            this->mHttpMethodMap.emplace(name, std::make_shared<
+                    HttpServiceJsonMethod2<T>>((T*)this, std::move(func)));
             return true;
         }
 
     private:
-        std::unordered_map<std::string, HttpServiceMethod *> mHttpMethodMap;
+        std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
     };
 #define BIND_HTTP_FUNCTION(func) LOG_CHECK_RET_FALSE(this->Bind(GetFunctionName(#func), &func))
 }

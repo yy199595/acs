@@ -47,12 +47,16 @@ namespace Sentry
 
         XCode code = taskSource->Await(sql);
 
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout << "[" << timer.GetMs() << "ms] sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        std::cout << "add sql time = [" << timer.GetMs() << "ms]" << std::endl;
 #endif
         if(code != XCode::Successful)
         {
             response.set_error(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+            LOG_INFO(sql);
+            LOG_ERROR(taskSource->GetErrorStr());
+#endif
             return code;
         }
         return XCode::Successful;
@@ -76,19 +80,20 @@ namespace Sentry
             return XCode::CallArgsError;
         }
 #ifdef __DEBUG__
-        ElapsedTimer elapsedTimer;
+        ElapsedTimer timer;
 #endif
 
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
         XCode code = taskSource->Await(sql);
 
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
 #endif
         if(code != XCode::Successful)
         {
 #ifdef __DEBUG__
+            LOG_INFO(sql);
             LOG_ERROR(taskSource->GetErrorStr());
 #endif
             response.set_error(taskSource->GetErrorStr());
@@ -110,18 +115,19 @@ namespace Sentry
             return XCode::CallArgsError;
         }
 #ifdef __DEBUG__
-        ElapsedTimer elapsedTimer;
+        ElapsedTimer timer;
 #endif
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
         XCode code = taskSource->Await(sql);
 
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout << "[" << elapsedTimer.GetMs() << "ms] sql = " << sql << std::endl;
+#ifdef __DEBUG__
+        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
 #endif
         if(code != XCode::Successful)
         {
 #ifdef __DEBUG__
+            LOG_INFO(sql);
             LOG_ERROR(taskSource->GetErrorStr());
 #endif
             response.set_error(taskSource->GetErrorStr());
@@ -137,7 +143,7 @@ namespace Sentry
             return XCode::CallArgsError;
         }
 #ifdef __DEBUG__
-      ElapsedTimer elapsedTimer;
+      ElapsedTimer timer;
 #endif
         std::string protoFullName;
         if(!this->mMysqlComponent->GetProtoByTable(request.tab(), protoFullName))
@@ -148,12 +154,13 @@ namespace Sentry
 
         XCode code = taskSource->Await(request.sql());
 
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout << "["<< elapsedTimer.GetMs() << "ms] sql = " << request.sql() << std::endl;
+#ifdef __DEBUG__
+        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
 #endif
         if (code != XCode::Successful)
         {
 #ifdef __DEBUG__
+            LOG_INFO(request.sql());
             LOG_ERROR(taskSource->GetErrorStr());
 #endif
             response.set_error(taskSource->GetErrorStr());
@@ -190,13 +197,15 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__ && __MYSQL_DEBUG_LOG__
-        std::cout << "sql = " << sql << std::endl;
+#ifdef __DEBUG__
+      ElapsedTimer timer;
 #endif
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
         XCode code = taskSource->Await(sql);
-
+#ifdef __DEBUG__
+        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
+#endif
         if (code != XCode::Successful)
         {
 #ifdef __DEBUG__

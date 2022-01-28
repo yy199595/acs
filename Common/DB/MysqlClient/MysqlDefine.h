@@ -21,5 +21,5 @@ namespace Sentry
     class MysqlComponent;
 
     typedef MYSQL_RES MysqlQueryResult;
-    typedef MYSQL GKMysqlSocket;
+    typedef MYSQL MysqlClient;
 }

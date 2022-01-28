@@ -21,12 +21,12 @@ namespace Sentry
 
     bool MysqlComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
         LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
+        LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
         return this->StartConnect() && this->InitMysqlTable();
     }
 
-    GKMysqlSocket *MysqlComponent::GetMysqlSocket()
+    MysqlClient *MysqlComponent::GetMysqlClient()
     {
         if(App::Get().IsMainThread())
         {
@@ -53,14 +53,14 @@ namespace Sentry
         return true;
     }
 
-	GKMysqlSocket * MysqlComponent::ConnectMysql()
+	MysqlClient * MysqlComponent::ConnectMysql()
 	{
 		const char *ip = this->mMysqlIp.c_str();
 		const unsigned short port = this->mMysqlPort;
 		const char *passWd = this->mDataBasePasswd.c_str();
 		const char *userName = this->mDataBaseUser.c_str();
 
-		GKMysqlSocket *mysqlSocket1 = mysql_init((MYSQL *)nullptr);
+		MysqlClient *mysqlSocket1 = mysql_init((MYSQL *)nullptr);
 		this->mMysqlSockt  = mysql_real_connect(mysqlSocket1, ip, userName, passWd, nullptr, port, nullptr,
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSockt == nullptr)
@@ -81,7 +81,7 @@ namespace Sentry
             TableOperator tableOperator(this->mMysqlSockt);
             auto messageDesc = desc->message_type(x);
 #ifdef __DEBUG__
-            this->DropTable(messageDesc->name());
+            //this->DropTable(messageDesc->name());
 #endif
             LOG_CHECK_RET_FALSE(tableOperator.InitDb(messageDesc->name()));
             for (int y = 0; y < messageDesc->nested_type_count(); y++)

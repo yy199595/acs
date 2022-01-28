@@ -8,7 +8,7 @@
 #endif
 namespace Sentry
 {
-	bool RpcService::AddMethod(ServiceMethod * method)
+	bool RpcService::AddMethod(std::shared_ptr<ServiceMethod> method)
     {
         auto *rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
         if (rpcConfigComponent == nullptr)
@@ -28,7 +28,6 @@ namespace Sentry
             auto iter = this->mLuaMethodMap.find(name);
             if(iter != this->mLuaMethodMap.end())
             {
-                delete iter->second;
                 this->mLuaMethodMap.erase(iter);
             }
             this->mLuaMethodMap.emplace(name, method);
@@ -47,7 +46,7 @@ namespace Sentry
         return true;
     }
 
-    ServiceMethod *RpcService::GetMethod(const std::string &name)
+    std::shared_ptr<ServiceMethod> RpcService::GetMethod(const std::string &name)
     {
         auto iter = this->mLuaMethodMap.find(name);
         if(iter != this->mLuaMethodMap.end())
@@ -60,7 +59,7 @@ namespace Sentry
 
     std::shared_ptr<com::Rpc_Response> RpcService::Invoke(const string &method, std::shared_ptr<com::Rpc_Request> request)
     {
-        ServiceMethod *serviceMethod = this->GetMethod(method);
+        auto serviceMethod = this->GetMethod(method);
         if (serviceMethod == nullptr)
         {
             return nullptr;

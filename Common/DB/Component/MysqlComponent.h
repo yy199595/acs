@@ -20,10 +20,9 @@ namespace Sentry
         ~MysqlComponent() final = default;
 
     public:
-        GKMysqlSocket *GetMysqlSocket();
-		GKMysqlSocket * ConnectMysql();
+		MysqlClient * ConnectMysql();
+        MysqlClient * GetMysqlClient();
     public:
-
         bool GetTableName(const std::string &pb, std::string &table);
 
         bool GetProtoByTable(const std::string & tab, std::string & proto);
@@ -50,12 +49,12 @@ namespace Sentry
         unsigned short mMysqlPort;     //端口号
         std::string mDataBaseUser;     //用户名
         std::string mDataBasePasswd; //密码
-        GKMysqlSocket *mMysqlSockt;
+        MysqlClient *mMysqlSockt;
         std::stringstream mSqlCommandStream;
         std::stringstream mSqlCommandStream2;
         std::unordered_map<std::string, std::string> mSqlProtoMap;
         std::unordered_map<std::string, std::string> mSqlTableMap;
-        std::unordered_map<std::thread::id, GKMysqlSocket *> mMysqlSocketMap; //线程id和 socket
+        std::unordered_map<std::thread::id, MysqlClient *> mMysqlSocketMap; //线程id和 socket
     private:
         class TaskComponent *mCorComponent;
         class ThreadPoolComponent *mTaskManager;

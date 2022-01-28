@@ -74,8 +74,8 @@ namespace Sentry
                 int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
                 auto config = configComponent
                         ->GetProtocolConfig(service + "." + method);
-                localService->AddMethod(new LuaServiceMethod(config, lua, idx));
                 LOG_INFO("add new lua service method : ", service, '.', method);
+                localService->AddMethod(std::make_shared<LuaServiceMethod>(config, lua, idx));
             }
             auto luaServiceComponent = dynamic_cast<LuaRpcService*>(localService);
             if(luaServiceComponent != nullptr && !luaServiceComponent->LateAwake())

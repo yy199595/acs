@@ -21,7 +21,7 @@ namespace Sentry
 		AddError,
 		InitError,
 		StartError,
-		ConfigError			
+		ConfigError
 	};
 }
 
@@ -37,99 +37,48 @@ namespace Sentry
 		explicit App(ServerConfig * config);
 		~App() final = default;
 	public:
-		const ServerConfig &GetConfig()
-		{
-			return *mConfig;
-		}
-
-		inline float GetDelaTime() const
-		{
-			return this->mDelatime;
-		}
-
-		inline long long GetStartTime() const
-		{
-			return this->mStartTime;
-		}
-
-		const std::string &GetServerName()
-		{
-			return this->mServerName;
-		}
-
+        static App &Get() { return *mApp; }
+        const ServerConfig &GetConfig() {return *mConfig; }
+		inline float GetDelaTime() const { return this->mDelatime;}
 		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
-
-		inline bool IsMainThread()
-		{
-			return std::this_thread::get_id() == this->mMainThreadId;
-		}
-
+		inline bool IsMainThread() { return std::this_thread::get_id() == this->mMainThreadId; }
 	public:
-		static App &Get()
-		{
-			return *mApp;
-		}
-	public:	
+        template<typename T>
+        void GetTypeComponents(std::list<T *> & components);
 		inline LoggerComponent * GetLogger() { return this->mLogComponent; }
         inline TaskComponent * GetTaskComponent() { return this->mTaskComponent; }
         inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
-
-        template<typename T>
-        void GetTypeComponents(std::list<T *> & components)
-        {
-            for(Component * component : this->mSceneComponents)
-            {
-                T * typeComponent = dynamic_cast<T*>(component);
-                if(typeComponent != nullptr)
-                {
-                    components.push_back(typeComponent);
-                }
-            }
-        }
 	private:
-		
 		bool InitComponent();
-
-		bool AddComponentFormConfig();
-
+        void StartComponent();
+        bool AddComponentFormConfig();
 		bool InitComponent(Component * component);
-
-		void StartComponent();
-
 	public:
-		
 		void Stop(ExitCode code);
-
 		int Run(int argc, char ** argv);
-
-	private:
-		void UpdateConsoleTitle();
 	private:
 		void LogicMainLoop();
-	private:
+        void UpdateConsoleTitle();
+    private:
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	private:
 		int mFps;
 		long long mStartTimer;
 		long long mSecondTimer;
+        long long mMainLoopStartTime;
 		long long mLogicUpdateInterval;
 	private:
 		bool mIsClose;
+        float mLogicFps;
+        float mDelatime;
 		long long mStartTime;
 		ServerConfig * mConfig;
 		std::string mServerName;
-		long long mLastUpdateTime;
+        long long mLogicRunCount;
+        long long mLastUpdateTime;
 	private:
-		float mLogicFps;
-		float mDelatime;
-	private:
-		long long mLogicRunCount;
-		long long mMainLoopStartTime;
-
-	private:
-		static App * mApp;
-	private:
+        static App * mApp;
         TaskComponent * mTaskComponent;
         LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
@@ -139,4 +88,17 @@ namespace Sentry
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate *> mLastFrameUpdateManager;
     };
+
+    template<typename T>
+    void App::GetTypeComponents(std::list<T *> &components)
+    {
+        for (Component *component: this->mSceneComponents)
+        {
+            T *typeComponent = dynamic_cast<T *>(component);
+            if (typeComponent != nullptr)
+            {
+                components.push_back(typeComponent);
+            }
+        }
+    }
 }// namespace Sentry
