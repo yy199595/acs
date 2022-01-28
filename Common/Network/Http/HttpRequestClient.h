@@ -13,7 +13,6 @@ namespace Sentry
     {
     public:
         HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy);
-        ~HttpRequestClient() {LOG_ERROR("delete http request client => ", this->mSocket->GetAddress());}
     public:
         std::shared_ptr<HttpAsyncResponse> Get(const std::string & url);
         std::shared_ptr<HttpAsyncResponse> Post(const std::string & url, const std::string & content);

@@ -13,7 +13,6 @@ class HttpHandlerClient : public std::enable_shared_from_this<HttpHandlerClient>
     {
     public:
         HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy);
-        ~HttpHandlerClient() {LOG_ERROR("delete http handler client => ", this->mSocket->GetAddress());}
     public:
         std::shared_ptr<HttpHandlerRequest> ReadHandlerContent();
         bool Response(std::shared_ptr<HttpHandlerResponse> response);

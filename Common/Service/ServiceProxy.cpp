@@ -9,11 +9,11 @@
 namespace Sentry
 {
 	ServiceProxy::ServiceProxy(const std::string & name)
-		: mServiceName(name)
+		: mServiceName(name), mApp(App::Get())
 	{
-        this->mTaskComponent = App::Get().GetTaskComponent();
-        this->mRpcComponent = App::Get().GetComponent<RpcComponent>();
-        LOG_CHECK_RET(this->mRpcConfigComponent = App::Get().GetComponent<RpcConfigComponent>());
+        this->mTaskComponent = this->mApp.GetTaskComponent();
+        this->mRpcComponent = this->mApp.GetComponent<RpcComponent>();
+        LOG_CHECK_RET(this->mRpcConfigComponent = this->mApp.GetComponent<RpcConfigComponent>());
 	}
 
     void ServiceProxy::AddAddress(const std::string &address)
@@ -80,7 +80,7 @@ namespace Sentry
                 this->mAllAddress.emplace(address);
                 return true;
             }
-            LocalService *localService = App::Get().GetComponent<LocalService>();
+            LocalService *localService = this->mApp.GetComponent<LocalService>();
             if (localService != nullptr)
             {
                 localService->RemoveByAddress(arr);

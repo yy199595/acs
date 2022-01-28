@@ -35,6 +35,7 @@ namespace Sentry
     private:
         void Destory();
     private:
+        class App & mApp;
         std::string mServiceName;
         TaskComponent * mTaskComponent;
         class RpcComponent *mRpcComponent;
