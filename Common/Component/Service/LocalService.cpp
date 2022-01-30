@@ -45,7 +45,20 @@ namespace Sentry
 
     void LocalService::Add(const RapidJsonReader &jsonReader)
     {
-
+        int areaId = 0;
+        std::string address;
+        std::string service;
+        LOG_CHECK_RET(jsonReader.TryGetValue("area_id", areaId));
+        LOG_CHECK_RET(jsonReader.TryGetValue("address", address));
+        LOG_CHECK_RET(jsonReader.TryGetValue("service", service));
+        if(areaId != 0 && areaId != this->mAreaId)
+        {
+            return;
+        }
+        auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
+        if (serviceProxy != nullptr) {
+            serviceProxy->AddAddress(address);
+        }
     }
 
     void LocalService::RemoveByAddress(const std::string &address)
