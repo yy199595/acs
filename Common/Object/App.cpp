@@ -1,8 +1,9 @@
 ﻿
 #include"App.h"
+#include"Service/RpcService.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 #ifdef __DEBUG__
 #include"Telnet/ConsoleComponent.h"
 #endif
@@ -26,47 +27,44 @@ namespace Sentry
 	}
 
 	bool App::AddComponentFormConfig()
-	{
+    {
         this->AddComponent<LoggerComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
+        this->mTimerComponent = this->GetComponent<TimerComponent>();
 #ifdef __DEBUG__
-      this->AddComponent<ConsoleComponent>();
+        this->AddComponent<ConsoleComponent>();
 #endif
 
-		std::vector<std::string> components;
-		if (!mConfig->GetValue("component", components))
-		{
-			LOG_ERROR("not find field : component");
-			return false;
-		}
+        std::vector<std::string> components;
+        if (!mConfig->GetValue("component", components)) {
+            LOG_ERROR("not find field : component");
+            return false;
+        }
 
-		if (!mConfig->GetValue("service", components))
-		{
-			LOG_ERROR("not find field : Service");
-			return false;
-		}
+        if (!mConfig->GetValue("service", components)) {
+            LOG_ERROR("not find field : Service");
+            return false;
+        }
 
-		for (const std::string & name : components)
-		{
-			if (!this->AddComponent(name))
-            {
+        for (const std::string &name: components)
+        {
+            if (!this->AddComponent(name)) {
                 LOG_FATAL("add ", name, " failure");
                 return false;
             }
             //LOG_DEBUG("add new component : " << name);
-		}
-		return true;
-	}
+        }
+        return true;
+    }
 
 	bool App::InitComponent()
 	{
 		// 初始化scene组件
-		this->GetComponents(this->mSceneComponents);
-		for (Component *component : mSceneComponents)
+        this->GetComponents(this->mSceneComponents);
+		for (Component *component : this->mSceneComponents)
 		{
 			if (!this->InitComponent(component))
 			{
@@ -120,13 +118,13 @@ namespace Sentry
                 LOG_DEBUG("load ", component->GetTypeName(), "data use time = ", elapsedTimer.GetMs(), "ms");
             }
         }
-        long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
-        LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
 
         for (Component *component: this->mSceneComponents)
         {
             component->OnComplete();
         }
+        long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
+        LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
     }
 
 	int App::Run(int argc, char ** argv)

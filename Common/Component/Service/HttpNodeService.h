@@ -19,7 +19,7 @@ namespace Sentry
         bool Awake() final;
         bool LateAwake() final;
     private:
-        class ServiceProxyComponent * mServiceComponent;
+        class ServiceMgrComponent * mServiceComponent;
     };
 }
 #endif //SENTRY_HTTPNODESERVICE_H

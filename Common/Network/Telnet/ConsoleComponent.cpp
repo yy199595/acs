@@ -2,6 +2,7 @@
 #include"Coroutine/TaskComponent.h"
 #include"Scene/OperatorComponent.h"
 #include"Service/RpcService.h"
+#include"Service/LocalService.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -77,23 +78,23 @@ namespace Sentry
         return true;
     }
 
-    bool ConsoleComponent::Start(const std::string &paramater, std::vector<std::string> &response)
+    bool ConsoleComponent::Start(const std::string &parameter, std::vector<std::string> &response)
     {
-        Component * component = this->GetComponent<Component>(paramater);
-        if(component != nullptr)
+        LocalService * localService = this->GetComponent<LocalService>();
+        if(localService == nullptr)
         {
             return false;
         }
-        return this->mEntity->AddComponent(paramater);
+        return localService->AddNewService(parameter);
     }
 
-    bool ConsoleComponent::Close(const std::string &paramater, std::vector<std::string> &response)
+    bool ConsoleComponent::Close(const std::string &parameter, std::vector<std::string> &response)
     {
         App::Get().Stop(ExitCode::Exit);
         return true;
     }
 
-    bool ConsoleComponent::Services(const std::string &paramater, std::vector<std::string> &response)
+    bool ConsoleComponent::Services(const std::string &parameter, std::vector<std::string> &response)
     {
         std::vector<Component *> components;
         this->GetComponents(components);
@@ -108,7 +109,7 @@ namespace Sentry
         return true;
     }
 
-    bool ConsoleComponent::Hotfix(const std::string &paramater, std::vector<std::string> &response)
+    bool ConsoleComponent::Hotfix(const std::string &parameter, std::vector<std::string> &response)
     {
         auto operComponent = this->GetComponent<OperatorComponent>();
         operComponent->StartHotfix();

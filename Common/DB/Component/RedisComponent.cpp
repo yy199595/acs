@@ -82,10 +82,12 @@ namespace Sentry
             return false;
         }
         std::string fileName;
-        Helper::Directory::GetDirAndFileName(path, content, fileName);
-        LOG_WARN(fileName, "  ", response->GetValue());
-        this->mLuaCommandMap.emplace(fileName,  response->GetValue());
-        return true;
+        if(Helper::Directory::GetDirAndFileName(path, content, fileName)) {
+            LOG_WARN(fileName, "  ", response->GetValue());
+            this->mLuaCommandMap.emplace(fileName, response->GetValue());
+            return true;
+        }
+        return false;
     }
 
     bool RedisComponent::GetLuaScript(const std::string &file, std::string &command)

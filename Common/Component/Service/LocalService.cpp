@@ -2,7 +2,7 @@
 #include"Object/App.h"
 #include"Service/RpcService.h"
 #include"Service/ServiceProxy.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Util/JsonHelper.h"
@@ -31,7 +31,15 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
         LOG_CHECK_RET_FALSE(this->mHttpComponent = this->GetComponent<HttpClientComponent>());
-        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
+        LOG_CHECK_RET_FALSE(this->mTcpServerComponent = this->GetComponent<TcpServerComponent>());
+        const NetworkListener *rpcListener = this->mTcpServerComponent->GetListener("rpc");
+        const NetworkListener *httpListener = this->mTcpServerComponent->GetListener("http");
+        LOG_CHECK_RET_FALSE(rpcListener && httpListener);
+        const ListenConfig & rpcListenerConfig = rpcListener->GetConfig();
+        const ListenConfig & httpListenerConfig = httpListener->GetConfig();
+        this->mRpcAddress = fmt::format("{0}:{1}", rpcListenerConfig.Ip, rpcListenerConfig.Port);
+        this->mHttpAddress = fmt::format("{0}:{1}", httpListenerConfig.Ip, httpListenerConfig.Port);
         return true;
     }
 
@@ -51,8 +59,7 @@ namespace Sentry
     {
         int areaId = 0;
         LOG_CHECK_RET(jsonReader.TryGetValue("area_id", areaId));
-        if(areaId != 0 && areaId != this->mAreaId)
-        {
+        if (areaId != 0 && areaId != this->mAreaId) {
             return;
         }
         std::string rpcAddress;
@@ -62,37 +69,80 @@ namespace Sentry
         LOG_CHECK_RET(jsonReader.TryGetValue("rpc", "address", rpcAddress));
         LOG_CHECK_RET(jsonReader.TryGetValue("http", "address", httpAddress));
 
-        for(const std::string & service : services)
-        {
+        for (const std::string &service: services) {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
-            if(serviceProxy != nullptr)
-            {
+            if (serviceProxy != nullptr) {
                 serviceProxy->AddAddress(rpcAddress);
             }
         }
+        this->mAddressMap.emplace(rpcAddress, services);
+
+        ElapsedTimer elapsedTimer;
         RapidJsonWriter jsonWriter;
-        if(this->GetServiceInfo(jsonWriter))
-        {
-            ElapsedTimer elapsedTimer;
-            string url = fmt::format("http://{0}/logic/service/push", httpAddress);
-            std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, jsonWriter);
-            if(httpResponse!= nullptr)
-            {
-                LOG_INFO("post service to ", httpAddress, " successful [", elapsedTimer.GetMs(), "ms]");
-            }
+        this->GetServiceInfo(jsonWriter);
+        string url = fmt::format("http://{0}/logic/service/push", httpAddress);
+        std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, jsonWriter);
+        if (httpResponse != nullptr) {
+            LOG_INFO("post service to ", httpAddress, " successful [", elapsedTimer.GetMs(), "ms]");
         }
+
     }
 
     void LocalService::OnStart() //通知其他服务器 我加入了
     {
         RapidJsonWriter jsonWriter;
-        if(this->GetServiceInfo(jsonWriter))
-        {
-            std::string jsonContent;
-            jsonWriter.WriterToStream(jsonContent);
-            long long number = this->mRedisComponent->Publish("LocalService.Push", jsonContent);
-            LOG_DEBUG("publish successful count = ", number);
+        this->GetServiceInfo(jsonWriter);
+        long long number = this->mRedisComponent->Publish("LocalService.Push", jsonWriter);
+        LOG_DEBUG("publish successful count = ", number);
+    }
+
+    void LocalService::OnDestory()
+    {
+        std::string jsonContent;
+        RapidJsonWriter jsonWriter;
+        auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
+        const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
+        LOG_CHECK_RET(rpcListener);
+        jsonWriter.Add("area_id", this->mAreaId);
+        const ListenConfig &rpcConfig = rpcListener->GetConfig();
+        jsonWriter.Add("address", fmt::format("{0}:{1}", rpcConfig.Ip, rpcConfig.Port));
+        long long number = this->mRedisComponent->Publish("LocalService.Remove", jsonWriter);
+        LOG_DEBUG("remove this form count = ", number);
+
+    }
+
+    bool LocalService::AddNewService(const std::string &service)
+    {
+        TaskComponent *taskComponent = this->GetComponent<TaskComponent>();
+        Component *component = this->GetComponent<Component>(service);
+        if (component != nullptr) {
+            return false;
         }
+        component = ComponentFactory::CreateComponent(service);
+        if (component == nullptr) {
+            return false;
+        }
+        if (!this->mEntity->AddComponent(service, component)|| !component->LateAwake()) {
+            return false;
+        }
+        taskComponent->Start([component, this]()
+        {
+            IStart *startComponent = dynamic_cast<IStart *>(component);
+            ILoadData *loadDataComponent = dynamic_cast<ILoadData *>(component);
+            if (startComponent != nullptr) {
+                startComponent->OnStart();
+            }
+            if (loadDataComponent != nullptr) {
+                loadDataComponent->OnLoadData();
+            }
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("area_id", this->mAreaId);
+            jsonWriter.Add("address", this->mRpcAddress);
+            jsonWriter.Add("service", component->GetTypeName());
+            this->mRedisComponent->Publish("LocalService.Add", jsonWriter);
+            LOG_INFO("start new service [", component->GetTypeName(), "] successful");
+        });
+        return true;
     }
 
     void LocalService::Remove(const RapidJsonReader &jsonReader)
@@ -113,21 +163,11 @@ namespace Sentry
         this->mAddressMap.erase(iter);
     }
 
-    bool LocalService::GetServiceInfo(RapidJsonWriter &jsonWriter)
+    void LocalService::GetServiceInfo(RapidJsonWriter &jsonWriter)
     {
-        auto tcpServerComponent = this->GetComponent<TcpServerComponent>();
-        const NetworkListener *rpcListener = tcpServerComponent->GetListener("rpc");
-        const NetworkListener *httpListener = tcpServerComponent->GetListener("http");
-        LOG_CHECK_RET_FALSE(rpcListener != nullptr && httpListener != nullptr);
-
-        const ListenConfig & rpcConfig = rpcListener->GetConfig();
-        const ListenConfig & httpConfig = httpListener->GetConfig();
-        const std::string rpcAddress = fmt::format("{0}:{1}", rpcConfig.Ip, rpcConfig.Port);
-        const std::string httpAddress = fmt::format("{0}:{1}",httpConfig.Ip, httpConfig.Port);
-
         jsonWriter.Add("rpc");
         jsonWriter.StartObject();
-        jsonWriter.Add("address", rpcAddress);
+        jsonWriter.Add("address", this->mRpcAddress);
 
         std::vector<std::string> tempArray;
         std::list<RpcService *> rpcServices;
@@ -141,11 +181,10 @@ namespace Sentry
 
         jsonWriter.Add("http");
         jsonWriter.StartObject();
-        jsonWriter.Add("address", httpAddress);
+        jsonWriter.Add("address", this->mHttpAddress);
         jsonWriter.EndObject();
 
         jsonWriter.Add("area_id", this->mAreaId);
         jsonWriter.Add("node_name", this->mNodeName);
-        return true;
     }
 }// namespace Sentry

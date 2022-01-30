@@ -5,7 +5,7 @@
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
 #include"Rpc/RpcComponent.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Other/StringFmt.h"
 #include"DB/MysqlClient/MysqlRpcTaskSource.h"
@@ -21,7 +21,7 @@ namespace Sentry
     {
         this->mCorComponent = App::Get().GetTaskComponent();
         this->mRpcComponent = this->GetComponent<RpcComponent>();
-        this->mServiceComponent = this->GetComponent<ServiceProxyComponent>();
+        this->mServiceComponent = this->GetComponent<ServiceMgrComponent>();
         return true;
     }
 

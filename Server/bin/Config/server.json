@@ -80,13 +80,12 @@
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent",
-        "ServiceProxyComponent",
+        "ServiceMgrComponent",
         "MysqlProxyComponent"
     ],
     "service": [
         "GateService",
         "LocalService",
-        "MysqlService",
         "AccountService",
         "HttpNodeService"
     ],

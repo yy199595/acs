@@ -3,7 +3,7 @@
 #include"Timer/TimerComponent.h"
 #include"Coroutine/TaskComponent.h"
 #include"Component/ClientComponent.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 #include"Scene/ThreadPoolComponent.h"
 #include"Http/Component/HttpClientComponent.h"
 using namespace Client;
@@ -18,7 +18,7 @@ int main(int argc, char ** argv)
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
     ComponentFactory::Add<HttpClientComponent>("HttpClientComponent");
     ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
-    ComponentFactory::Add<ServiceProxyComponent>("ServiceProxyComponent");
+    ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 
     try
     {

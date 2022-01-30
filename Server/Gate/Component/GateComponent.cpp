@@ -7,7 +7,7 @@
 #include"Service/ServiceProxy.h"
 #include"NetWork/RpcGateClient.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Component/Scene/ServiceProxyComponent.h"
+#include"Component/Scene/ServiceMgrComponent.h"
 #include"Task/RpcProxyTask.h"
 #include"Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -29,7 +29,7 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
-        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceProxyComponent>());
+        LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
         LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
         return true;
     }

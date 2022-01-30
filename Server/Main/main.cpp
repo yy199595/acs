@@ -16,7 +16,7 @@
 
 #include "Component/Scene/LuaServiceMgrComponent.h"
 #include <Rpc/RpcComponent.h>
-#include "Component/Scene/ServiceProxyComponent.h"
+#include "Component/Scene/ServiceMgrComponent.h"
 #include <Scene/ThreadPoolComponent.h>
 #include <Rpc/RpcClientComponent.h>
 #include <Service/AccountService.h>
@@ -37,7 +37,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcComponent>("RpcComponent");
-    ComponentFactory::Add<ServiceProxyComponent>("ServiceProxyComponent");
+    ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
     ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
 
 // common

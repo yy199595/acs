@@ -5,11 +5,11 @@
 namespace Sentry
 {
     class ServiceProxy;
-    class ServiceProxyComponent : public Component
+    class ServiceMgrComponent : public Component
     {
     public:
-        ServiceProxyComponent() = default;
-        ~ServiceProxyComponent() override = default;
+        ServiceMgrComponent() = default;
+        ~ServiceMgrComponent() override = default;
     protected:
         bool Awake() final;
         bool LateAwake() final;

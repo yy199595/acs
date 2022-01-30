@@ -1,11 +1,11 @@
 //
 // Created by 64658 on 2021/8/5.
 //
-#include "Object/App.h"
-#include "Thread/TaskThread.h"
-#include "HttpClientComponent.h"
-#include "Method/HttpServiceMethod.h"
-#include "Other/ProtoConfig.h"
+#include"Object/App.h"
+#include"Thread/TaskThread.h"
+#include"HttpClientComponent.h"
+#include"Method/HttpServiceMethod.h"
+#include"Other/ProtoConfig.h"
 #include"Other/ElapsedTimer.h"
 #include"Scene/LoggerComponent.h"
 #include"Scene/ThreadPoolComponent.h"
@@ -13,7 +13,6 @@
 #include"Http/HttpHandlerClient.h"
 #include"Util/FileHelper.h"
 #include"Service/HttpService.h"
-#include"Service/LocalService.h"
 namespace Sentry
 {
 
@@ -95,6 +94,7 @@ namespace Sentry
         LOG_WARN(httpRequestData->GetMethod(), "  ", httpRequestData->GetUrl(), "  ", httpRequestData->GetContent());
 #endif
         const std::string &url = httpRequestData->GetUrl();
+        const std::string &type = httpRequestData->GetMethod();
         auto iter = this->mHttpConfigMap.find(url);
         if (iter == this->mHttpConfigMap.end())
         {

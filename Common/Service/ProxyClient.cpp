@@ -4,7 +4,7 @@
 #include"ProxyClient.h"
 #include"Util/StringHelper.h"
 #include"Service/LocalService.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 #include"Service/ServiceProxy.h"
 namespace Sentry
 {
@@ -75,7 +75,7 @@ namespace Sentry
         {
             return true;
         }
-        ServiceProxyComponent *serviceComponent = App::Get().GetComponent<ServiceProxyComponent>();
+        ServiceMgrComponent *serviceComponent = App::Get().GetComponent<ServiceMgrComponent>();
         auto serviceEntity = serviceComponent->GetServiceProxy(this->mServiceName);
         if(serviceEntity != nullptr)
         {

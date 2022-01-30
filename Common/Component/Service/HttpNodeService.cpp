@@ -5,7 +5,7 @@
 #include"HttpNodeService.h"
 #include"Object/App.h"
 #include"Service/ServiceProxy.h"
-#include"Scene/ServiceProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
 namespace Sentry
 {
     bool HttpNodeService::Awake()
@@ -16,7 +16,7 @@ namespace Sentry
 
     bool HttpNodeService::LateAwake()
     {
-        this->mServiceComponent = this->GetComponent<ServiceProxyComponent>();
+        this->mServiceComponent = this->GetComponent<ServiceMgrComponent>();
         return true;
     }
 

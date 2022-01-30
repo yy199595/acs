@@ -6,12 +6,26 @@
 
 namespace Sentry
 {
+    WaitTaskSource::WaitTaskSource()
+    {
+        this->mTimerId = 0;
+        this->mTimerComponent = App::Get().GetTimerComponent();
+    }
+
+    WaitTaskSource::~WaitTaskSource()
+    {
+        if(this->mTimerId != 0)
+        {
+            this->mTimerComponent->RemoveTimer(this->mTimerId);
+        }
+    }
     void WaitTaskSource::WaitSecond(float s)
     {
         long long ms = s * 1000;
-        this->mTimerComponent = App::Get().GetTimerComponent();
-        this->mTimerComponent->AsyncWait(ms, &TaskSource<void>::SetResult, &mTaskSource);
+        this->mTimerId = this->mTimerComponent->AsyncWait(
+                ms, &TaskSource<void>::SetResult, &mTaskSource);
         this->mTaskSource.Await();
+        this->mTimerId = 0;
     }
 
     void WaitTaskSource::WaitFrame(int count)

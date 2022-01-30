@@ -3,7 +3,7 @@
 #include "Async/RpcTask/RpcTaskSource.h"
 #include <Timer/LuaSleepTimer.h>
 #include <Timer/TimerComponent.h>
-#include "Component/Scene/ServiceProxyComponent.h"
+#include "Component/Scene/ServiceMgrComponent.h"
 #include <Scene/LuaScriptComponent.h>
 
 #include <Service/ServiceProxy.h>

@@ -1,14 +1,14 @@
-#include"ServiceProxyComponent.h"
+#include"ServiceMgrComponent.h"
 #include"RpcConfigComponent.h"
 #include"Service/ServiceProxy.h"
 namespace Sentry
 {
-    bool ServiceProxyComponent::Awake()
+    bool ServiceMgrComponent::Awake()
     {
         return true;
     }
 
-    bool ServiceProxyComponent::LateAwake()
+    bool ServiceMgrComponent::LateAwake()
     {
         RpcConfigComponent * component = this->GetComponent<RpcConfigComponent>();
         if(component == nullptr)
@@ -25,7 +25,7 @@ namespace Sentry
         return true;
     }
 
-    std::shared_ptr<ServiceProxy> ServiceProxyComponent::GetServiceProxy(const std::string &name)
+    std::shared_ptr<ServiceProxy> ServiceMgrComponent::GetServiceProxy(const std::string &name)
     {
         auto iter = this->mServiceEntityMap.find(name);
         return iter != this->mServiceEntityMap.end() ? iter->second : nullptr;

@@ -8,7 +8,7 @@ namespace Sentry
 
     class TaskComponent;
 
-    class ServiceProxyComponent;
+    class ServiceMgrComponent;
 
     class LocalService : public SubService, public IStart
     {
@@ -23,20 +23,24 @@ namespace Sentry
 
         void OnStart() final;
 
+        void OnDestory() final;
     public:
+        bool AddNewService(const std::string & service);
         void RemoveByAddress(const std::string & address);
-
     private:
         void Add(const RapidJsonReader & jsonReader);
         void Push(const RapidJsonReader & jsonReader);
         void Remove(const RapidJsonReader & jsonReader);
-        bool GetServiceInfo(RapidJsonWriter & jsonWriter);
+        void GetServiceInfo(RapidJsonWriter & jsonWriter);
     private:
         int mAreaId;
 		std::string mNodeName;
+        std::string mRpcAddress;
+        std::string mHttpAddress;
         class RedisComponent * mRedisComponent;
         class HttpClientComponent * mHttpComponent;
-        class ServiceProxyComponent * mServiceComponent;
-        std::unordered_map<std::string, std::list<std::string>> mAddressMap;
+        class ServiceMgrComponent * mServiceComponent;
+        class TcpServerComponent * mTcpServerComponent;
+        std::unordered_map<std::string, std::vector<std::string>> mAddressMap;
     };
 }

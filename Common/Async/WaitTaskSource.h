@@ -10,11 +10,13 @@ namespace Sentry
     class WaitTaskSource
     {
     public:
-        WaitTaskSource() = default;
+        WaitTaskSource();
+        ~WaitTaskSource();
     public:
         void WaitSecond(float s);
         void WaitFrame(int count = 1);
     private:
+        unsigned int mTimerId;
         TaskSource<void> mTaskSource;
         TimerComponent * mTimerComponent;
     };
