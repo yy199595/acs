@@ -10,10 +10,10 @@
     {
         "network":1
     },
-    "gate":
+    "account":
     {
-        "ip": "10.10.14.104",
-        "port": 1995
+        "login": "http://127.0.0.1:80/logic/account/login",
+        "register": "http://127.0.0.1:80/logic/account/register"
     },
     "IsOpenRecoder": true,
     "ScriptPath":"./Script/",

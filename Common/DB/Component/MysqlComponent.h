@@ -19,6 +19,8 @@ namespace Sentry
 
         ~MysqlComponent() final = default;
 
+        bool LateAwake() final;
+
     public:
 		MysqlClient * ConnectMysql();
         MysqlClient * GetMysqlClient();
@@ -37,7 +39,7 @@ namespace Sentry
 
     protected:
         bool Awake() final;
-        bool LateAwake() final;
+
     private:
 
 		bool StartConnect();

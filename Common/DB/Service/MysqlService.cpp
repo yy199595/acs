@@ -1,14 +1,15 @@
-﻿#include "MysqlService.h"
-#include "Component/MysqlComponent.h"
-#include "Component/Scene/ThreadPoolComponent.h"
-#include "MysqlClient/MysqlTaskSource.h"
-#include "Object/App.h"
-#include "Pool/MessagePool.h"
+﻿#include"MysqlService.h"
+#include"Component/MysqlComponent.h"
+#include"Scene/ThreadPoolComponent.h"
+#include"MysqlClient/MysqlTaskSource.h"
+#include"Object/App.h"
+#include"Pool/MessagePool.h"
 #include"Other/ElapsedTimer.h"
 namespace Sentry
 {
     bool MysqlService::Awake()
     {
+        this->mMysqlComponent = nullptr;
 		BIND_RPC_FUNCTION(MysqlService::Add);
 		BIND_RPC_FUNCTION(MysqlService::Save);
 		BIND_RPC_FUNCTION(MysqlService::Query);
@@ -19,7 +20,13 @@ namespace Sentry
 
     bool MysqlService::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlComponent>());
+        this->mMysqlComponent = this->GetComponent<MysqlComponent>();
+        if(this->mMysqlComponent == nullptr)
+        {
+            this->mMysqlComponent = this->mEntity->GetOrAddComponent<MysqlComponent>();
+            LOG_CHECK_RET_FALSE(this->mMysqlComponent);
+            return this->mMysqlComponent->LateAwake();
+        }
         return true;
     }
 
@@ -68,7 +75,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-		Message * message = Helper::Proto::New(request.data());
+		Message * message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;
@@ -104,7 +111,7 @@ namespace Sentry
 
     XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
     {
-		Message * message = Helper::Proto::New(request.data());
+		Message * message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
 		{
 			return XCode::ParseMessageError;

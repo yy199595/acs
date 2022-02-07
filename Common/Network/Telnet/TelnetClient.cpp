@@ -11,13 +11,16 @@ namespace Sentry
 
     std::shared_ptr<TelnetContent> TelnetClient::ReadCommand()
     {
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TelnetContent> telnetContent(new TelnetContent());
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+#ifdef ONLY_MAIN_THREAD
+        this->ReadData(taskSource, telnetContent);
+#else
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&TelnetClient::ReadData, this, taskSource, telnetContent);
+#endif
 
         telnetContent->IsOk = taskSource->Await();
-
         return telnetContent;
     }
 
@@ -25,9 +28,13 @@ namespace Sentry
     {
         std::ostream os(&this->mSendBuffer);
         os << content << "\r\n";
-        IAsioThread &netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+#ifdef ONLY_MAIN_THREAD
+        this->ResponseData(taskSource);
+#else
+        IAsioThread &netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&TelnetClient::ResponseData, this, taskSource);
+#endif
         return taskSource->Await();
     }
 

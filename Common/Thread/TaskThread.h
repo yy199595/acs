@@ -86,7 +86,7 @@ namespace Sentry
             this->InvokeMethod(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
         }
     };
-
+#ifndef ONLY_MAIN_THREAD
     class NetWorkThread : public IAsioThread
     {
     public:
@@ -105,7 +105,7 @@ namespace Sentry
 		AsioContext * mAsioContext;
         DoubleQueue<StaticMethod *> mWaitInvokeMethod;
     };
-
+#endif
     class MainTaskScheduler : public IAsioThread
 	{
 	public:
@@ -122,4 +122,5 @@ namespace Sentry
         StaticMethod * mMainMethod;
         DoubleQueue<StaticMethod*> mTaskQueue;
 	};
+
 }// namespace Sentry

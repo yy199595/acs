@@ -65,7 +65,7 @@ namespace Sentry
                 telnetClient->Response(  stringstream1.str());
             }
         }
-        LOG_ERROR(telnetClient->GetAddress(), " debug complete");
+        LOG_ERROR("[console ]",telnetClient->GetAddress(), " disconnected");
     }
 
     bool ConsoleComponent::Help(const std::string &paramater, std::vector<std::string> &response)

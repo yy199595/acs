@@ -13,15 +13,15 @@ namespace Sentry
 
     std::shared_ptr<HttpHandlerRequest> HttpHandlerClient::ReadHandlerContent()
     {
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         std::shared_ptr<HttpHandlerRequest> handlerRequest(new HttpHandlerRequest());
+#ifdef ONLY_MAIN_THREAD
+        this->ReadHttpData(taskSource, handlerRequest);
+#else
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&HttpHandlerClient::ReadHttpData, this, taskSource, handlerRequest);
-        if(!taskSource->Await())
-        {
-            return nullptr;
-        }
-        return handlerRequest;
+#endif
+        return taskSource->Await() ? handlerRequest : nullptr;
     }
 
     bool HttpHandlerClient::Response(HttpStatus code, RapidJsonWriter &jsonWriter)
@@ -33,9 +33,13 @@ namespace Sentry
 
     bool HttpHandlerClient::Response(std::shared_ptr<HttpHandlerResponse> response)
     {
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+#ifdef ONLY_MAIN_THREAD
+        this->ResponseData(taskSource, response);
+#else
+        IAsioThread & netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&HttpHandlerClient::ResponseData, this, taskSource, response);
+#endif
         return taskSource->Await();
     }
 

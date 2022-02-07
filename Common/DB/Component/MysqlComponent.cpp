@@ -81,7 +81,7 @@ namespace Sentry
             TableOperator tableOperator(this->mMysqlSockt);
             auto messageDesc = desc->message_type(x);
 #ifdef __DEBUG__
-            //this->DropTable(messageDesc->name());
+            this->DropTable(messageDesc->name());
 #endif
             LOG_CHECK_RET_FALSE(tableOperator.InitDb(messageDesc->name()));
             for (int y = 0; y < messageDesc->nested_type_count(); y++)
@@ -203,10 +203,17 @@ namespace Sentry
         }
         this->mSqlCommandStream.str("");
         this->mSqlCommandStream2.str("");
+        std::vector<const FieldDescriptor *> messageFields;
         const Reflection *pReflection = messageData.GetReflection();
-        const Descriptor *pDescriptor = messageData.GetDescriptor();
+        //const Descriptor *pDescriptor = messageData.GetDescriptor();
+        pReflection->ListFields(messageData, &messageFields);
+
+        if(messageFields.empty())
+        {
+            return false;
+        }
         mSqlCommandStream << "update " << table << " set ";
-        const FieldDescriptor * firstFieldDesc = pDescriptor->FindFieldByNumber(1);
+        const FieldDescriptor * firstFieldDesc = messageFields[0];
         mSqlCommandStream2 << " where " << firstFieldDesc->name() << "=";
 
         if (firstFieldDesc->type() == FieldDescriptor::TYPE_STRING)
@@ -259,18 +266,30 @@ namespace Sentry
             return false;
         }
 
-        for(int index = 2; index < pDescriptor->field_count(); index++)
+        for(int index = 1; index < messageFields.size(); index++)
         {
-            auto fieldDesc = pDescriptor->FindFieldByNumber(index);
+            auto fieldDesc = messageFields[index];
             mSqlCommandStream << fieldDesc->name() << "=";
             switch (fieldDesc->type())
             {
                 case FieldDescriptor::Type::TYPE_BYTES:
                 case FieldDescriptor::Type::TYPE_STRING:
-                    mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+                {
+                    std::string value = pReflection->GetString(messageData, fieldDesc);
+                    if (value != fieldDesc->default_value_string())
+                    {
+                        mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+                    }
+                }
                     break;
                 case FieldDescriptor::Type::TYPE_INT64:
-                    mSqlCommandStream << pReflection->GetInt64(messageData, fieldDesc) << ",";
+                {
+                    long long value = pReflection->GetInt64(messageData, fieldDesc);
+                    if(value != fieldDesc->default_value_int64())
+                    {
+                        mSqlCommandStream << pReflection->GetInt64(messageData, fieldDesc) << ",";
+                    }
+                }
                     break;
                 case FieldDescriptor::Type::TYPE_UINT64:
                     mSqlCommandStream << pReflection->GetUInt64(messageData, fieldDesc) << ",";
@@ -307,13 +326,11 @@ namespace Sentry
         }
         mSqlCommandStream.str("");
         this->mSqlCommandStream << "select ";
-        const Descriptor *pDescriptor = messageData.GetDescriptor();
         const Reflection *pReflection = messageData.GetReflection();
-        const FieldDescriptor *firstFieldDesc = pDescriptor->FindFieldByNumber(1);
-        if (firstFieldDesc == nullptr)
-        {
-            return false;
-        }
+        const Descriptor *pDescriptor = messageData.GetDescriptor();
+        const FieldDescriptor *firstFieldDesc =  pDescriptor->FindFieldByNumber(1);
+
+        if(firstFieldDesc == nullptr) return false;
 
         for (int index = 0; index < pDescriptor->field_count(); index++)
         {

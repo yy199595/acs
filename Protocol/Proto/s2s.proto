@@ -91,3 +91,17 @@ message MysqlOper
         google.protobuf.Any Data = 1;
     }
 }
+
+message AddToGate
+{
+    message Request
+    {
+        int64 user_id = 1;
+    }
+    message Response
+    {
+        string gate_ip = 1;
+        int32 gate_port = 2;
+        string login_token = 3;
+    }
+}

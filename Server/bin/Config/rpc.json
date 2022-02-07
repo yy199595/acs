@@ -1,57 +1,4 @@
 {
-    "CenterHostService": {
-        "Add": {
-            "Id":101,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request": "s2s.NodeRegister.Request",
-            "Response":"s2s.NodeRegister.Response"
-        },
-        "Query": {
-            "Id":102,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.NodeQuery.Request",
-            "Response":"s2s.NodeQuery.Response"
-        },
-        "QueryHosts":{
-            "Id":103,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server",
-            "Response":"s2s.HostQuery.Response"
-        }
-    },
-    "LocalHostService": {
-        "Add": {
-            "Id":111,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.NodeInfo"
-        },
-        "Del": {
-            "Id":112,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"com.Int32Data"
-        },
-        "Hotfix":{
-            "Id":113,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server"
-        },
-        "ReLoadConfig":{
-            "Id":114,
-            "Async":false,
-            "Timeout":0,
-            "Type":"Server"
-        }
-    },
     "MysqlService": {
         "Add": {
             "Id":121,
@@ -105,6 +52,13 @@
             "Async": false,
             "Type":"Client",
             "Request": "c2s.ProxyLogin.Request"
+        },
+        "Allot": {
+            "Id": 412,
+            "Async": false,
+            "Type": "Server",
+            "Request": "s2s.AddToGate.Request",
+            "Response": "s2s.AddToGate.Response"
         }
     }
 }

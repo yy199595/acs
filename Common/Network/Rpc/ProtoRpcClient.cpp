@@ -15,32 +15,33 @@ namespace Sentry
 
 	void ProtoRpcClient::StartClose()
 	{
+#ifdef ONLY_MAIN_THREAD
+      this->OnClientError(XCode::NetActiveShutdown);
+#else
         this->mNetWorkThread.Invoke(&ProtoRpcClient::OnClientError, this, XCode::NetActiveShutdown);
+#endif
 	}
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Response> message)
     {
         std::shared_ptr<NetworkData> networkData(
                 new NetworkData(RPC_TYPE_RESPONSE, message));
-        if(this->mNetWorkThread.IsCurrentThread())
-        {
-            this->SendData(networkData);
-            return;
-        }
+#ifdef ONLY_MAIN_THREAD
+        this->SendData(networkData);
+#else
         this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
+#endif
     }
 
     void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Request> message)
     {
         std::shared_ptr<NetworkData> networkData(
                 new NetworkData(RPC_TYPE_REQUEST, message));
-        if(this->mNetWorkThread.IsCurrentThread())
-        {
-            this->SendData(networkData);
-            return;
-        }
+#ifdef ONLY_MAIN_THREAD
+        this->SendData(networkData);
+#else
         this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
-        return;
+#endif
     }
 
     void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
@@ -53,16 +54,20 @@ namespace Sentry
     }
 
 	void ProtoRpcClient::OnClientError(XCode code)
-	{
-        if(code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
+    {
+        if (code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
         {
             this->mSocketProxy->Close();
             return;
         }
         long long id = this->GetSocketId();
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+#ifdef ONLY_MAIN_THREAD
+        this->mTcpComponent->OnCloseSocket(id, code);
+#else
+        MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
-	}
+#endif
+    }
 
 	XCode ProtoRpcClient::OnRequest(const char * buffer, size_t size)
 	{
@@ -72,8 +77,13 @@ namespace Sentry
 			return XCode::ParseRequestDataError;
 		}
         requestData->set_socket_id(this->GetSocketId());
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+#ifdef ONLY_MAIN_THREAD
+    this->mTcpComponent->OnRequest(requestData);
+#else
+        MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
+#endif
+
 		return XCode::Successful;
 	}
 
@@ -84,8 +94,12 @@ namespace Sentry
 		{
 			return XCode::ParseResponseDataError;
 		}
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+#ifdef ONLY_MAIN_THREAD
+        this->mTcpComponent->OnResponse(responseData);
+#else
+        MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnResponse, mTcpComponent, responseData);
+#endif
 		return XCode::Successful;
 	}
 
@@ -107,7 +121,11 @@ namespace Sentry
             this->mConnectTaskSource->SetResult(code == XCode::Successful);
         }
         long long id = this->mSocketProxy->GetSocketId();
+#ifdef ONLY_MAIN_THREAD
+        this->mTcpComponent->OnConnectAfter(id, code);
+#else
         MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
         taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
+#endif
     }
 }

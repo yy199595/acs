@@ -24,16 +24,22 @@ namespace Sentry
     }
 
     std::shared_ptr<RedisResponse>
-    RedisComponent::Call(const std::string &tab, const std::string &func, std::vector<std::string> &args)
+    RedisComponent::Call(const std::string &func, std::vector<std::string> &args)
     {
         std::string script;
+        const size_t pos = func.find('.');
+        if(pos == std::string::npos)
+        {
+            return nullptr;
+        }
+        std::string tab = func.substr(0, pos);
         if(!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
         {
             LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
             return nullptr;
         }
         std::shared_ptr<RedisRequest> redisCmdRequest(new RedisRequest("EVALSHA"));
-        redisCmdRequest->InitParameter(script, (int) args.size() + 1, func);
+        redisCmdRequest->InitParameter(script, (int) args.size() + 1, func.substr(pos + 1));
         for(const std::string & val : args)
         {
             redisCmdRequest->AddParameter(val);
@@ -133,12 +139,19 @@ namespace Sentry
             LOG_CHECK_RET(this->LoadLuaScript(file));
             LOG_INFO("load redis script ", file, " successful");
         }
+#ifdef __DEBUG__
+        this->InvokeCommand("FLUSHALL")->IsOk();
+#endif
         this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
     }
 
     std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string & name)
     {
+#ifdef ONLY_MAIN_THREAD
+        IAsioThread &workThread = App::Get().GetTaskScheduler();
+#else
         IAsioThread &workThread = this->mThreadComponent->AllocateNetThread();
+#endif
         auto socketProxy = std::make_shared<SocketProxy>(workThread, name);
         auto redisCommandClient = std::make_shared<RedisClient>(socketProxy);
 

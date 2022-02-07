@@ -11,27 +11,30 @@ namespace Sentry
         int networkCount = 0;
         const ServerConfig & config = App::Get().GetConfig();
         config.GetValue("thread", "task", taskCount);
-        config.GetValue("thread", "network", networkCount);
-
+#ifndef ONLY_MAIN_THREAD
+        LOG_CHECK_RET_FALSE(config.GetValue("thread", "network", networkCount));
+#endif
         for (int index = 0; index < taskCount; index++)
         {
             mThreadArray.push_back(new TaskThread());
         }
-
+#ifndef ONLY_MAIN_THREAD
         for (int index = 0; index < networkCount; index++)
         {
             this->mNetThreads.push_back(new NetWorkThread());
         }
+#endif
         return true;
     }
 
     bool ThreadPoolComponent::LateAwake()
     {
+#ifndef ONLY_MAIN_THREAD
         for (auto taskThread: this->mNetThreads)
         {
             taskThread->Start();
         }
-
+#endif
         for (auto taskThread: this->mThreadArray)
         {
             taskThread->Start();
@@ -43,30 +46,29 @@ namespace Sentry
     {
         threads.clear();
         MainTaskScheduler & mainTask = App::Get().GetTaskScheduler();
+#ifndef ONLY_MAIN_THREAD
         for(const IThread * taskThread : this->mNetThreads)
         {
             threads.emplace_back(taskThread);
         }
+#endif
         for(const IThread * taskThread : this->mThreadArray)
         {
             threads.emplace_back(taskThread);
         }
         threads.emplace_back(&mainTask);
     }
-
+#ifndef ONLY_MAIN_THREAD
     IAsioThread & ThreadPoolComponent::AllocateNetThread()
     {
         std::lock_guard<std::mutex> lock(this->mLock);
-        if(this->mNetThreads.empty())
-        {
-            return App::Get().GetTaskScheduler();
-        }
         if (this->mIndex >= mNetThreads.size())
         {
             this->mIndex = 0;
         }
         return *(mNetThreads[this->mIndex++]);
     }
+#endif
 
 	bool ThreadPoolComponent::StartTask(TaskProxy * task)
 	{

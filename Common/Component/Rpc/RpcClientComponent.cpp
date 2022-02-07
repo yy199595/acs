@@ -148,7 +148,11 @@ namespace Sentry
         {
             return localSession;
         }
+#ifdef ONLY_MAIN_THREAD
+        IAsioThread & workThread = App::Get().GetTaskScheduler();
+#else
         IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
+#endif
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, name));
         localSession = make_shared<ProtoRpcClient>(this, socketProxy, SocketType::LocalSocket);
 

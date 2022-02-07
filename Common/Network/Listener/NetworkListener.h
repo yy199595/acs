@@ -22,12 +22,14 @@ namespace Sentry
 		NetworkListener(IAsioThread & thread, ListenConfig & config);
 		~NetworkListener();
 	public:
+        bool StartListen(ISocketListen * handler);
         bool IsOpen() { return this->mBindAcceptor->is_open(); }
         const ListenConfig & GetConfig() const { return this->mConfig;}
-		std::shared_ptr<TaskSource<bool>> StartListen(ISocketListen * handler);
 	private:
 		void ListenConnect();
+#ifndef ONLY_MAIN_THREAD
         void InitListener(std::shared_ptr<TaskSource<bool>> taskSource);
+#endif
     private:
         bool mIsListen;
         unsigned int mCorId;

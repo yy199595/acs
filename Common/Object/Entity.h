@@ -110,6 +110,11 @@ namespace Sentry
     inline T *Entity::GetOrAddComponent()
     {
         T *component = this->GetComponent<T>();
-        return component == nullptr ? this->AddComponent<T>() : component;
+        if(component == nullptr)
+        {
+            this->AddComponent<T>();
+            return this->GetComponent<T>();
+        }
+        return component;
     }
 }

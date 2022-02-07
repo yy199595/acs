@@ -6,6 +6,7 @@
 namespace Sentry
 {
 
+    class ServiceProxy;
     class RedisComponent;
     class MysqlProxyComponent;
     class AccountService : public HttpService
@@ -28,5 +29,7 @@ namespace Sentry
     private:
         RedisComponent *mRedisComponent;
         MysqlProxyComponent *mMysqlComponent;
+        db::db_account::tab_user_account mTempData;
+        std::shared_ptr<ServiceProxy> mGateService;
     };
 }// namespace Sentry

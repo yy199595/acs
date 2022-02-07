@@ -146,8 +146,12 @@ namespace Sentry
         {
             this->mIsConnect = true;
             LOG_CHECK_RET_FALSE(this->mSocketProxy);
+#ifdef ONLY_MAIN_THREAD
+            this->ConnectHandler(ip, port);
+#else
             IAsioThread &nThread = this->mSocketProxy->GetThread();
             nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port);
+#endif
             return true;
         }
         return false;

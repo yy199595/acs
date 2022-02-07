@@ -45,7 +45,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[19]
+  static const ::google::protobuf::internal::ParseTable schema[22]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -53,6 +53,15 @@ struct TableStruct_s2s_2eproto {
 };
 void AddDescriptors_s2s_2eproto();
 namespace s2s {
+class AddToGate;
+class AddToGateDefaultTypeInternal;
+extern AddToGateDefaultTypeInternal _AddToGate_default_instance_;
+class AddToGate_Request;
+class AddToGate_RequestDefaultTypeInternal;
+extern AddToGate_RequestDefaultTypeInternal _AddToGate_Request_default_instance_;
+class AddToGate_Response;
+class AddToGate_ResponseDefaultTypeInternal;
+extern AddToGate_ResponseDefaultTypeInternal _AddToGate_Response_default_instance_;
 class GroupConfigData;
 class GroupConfigDataDefaultTypeInternal;
 extern GroupConfigDataDefaultTypeInternal _GroupConfigData_default_instance_;
@@ -113,6 +122,9 @@ extern NodeRegister_ResponseDefaultTypeInternal _NodeRegister_Response_default_i
 }  // namespace s2s
 namespace google {
 namespace protobuf {
+template<> ::s2s::AddToGate* Arena::CreateMaybeMessage<::s2s::AddToGate>(Arena*);
+template<> ::s2s::AddToGate_Request* Arena::CreateMaybeMessage<::s2s::AddToGate_Request>(Arena*);
+template<> ::s2s::AddToGate_Response* Arena::CreateMaybeMessage<::s2s::AddToGate_Response>(Arena*);
 template<> ::s2s::GroupConfigData* Arena::CreateMaybeMessage<::s2s::GroupConfigData>(Arena*);
 template<> ::s2s::HostQuery* Arena::CreateMaybeMessage<::s2s::HostQuery>(Arena*);
 template<> ::s2s::HostQuery_Response* Arena::CreateMaybeMessage<::s2s::HostQuery_Response>(Arena*);
@@ -2376,6 +2388,368 @@ class MysqlOper :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
+// -------------------------------------------------------------------
+
+class AddToGate_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddToGate.Request) */ {
+ public:
+  AddToGate_Request();
+  virtual ~AddToGate_Request();
+
+  AddToGate_Request(const AddToGate_Request& from);
+
+  inline AddToGate_Request& operator=(const AddToGate_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddToGate_Request(AddToGate_Request&& from) noexcept
+    : AddToGate_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline AddToGate_Request& operator=(AddToGate_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddToGate_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddToGate_Request* internal_default_instance() {
+    return reinterpret_cast<const AddToGate_Request*>(
+               &_AddToGate_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    19;
+
+  void Swap(AddToGate_Request* other);
+  friend void swap(AddToGate_Request& a, AddToGate_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddToGate_Request* New() const final {
+    return CreateMaybeMessage<AddToGate_Request>(nullptr);
+  }
+
+  AddToGate_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddToGate_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddToGate_Request& from);
+  void MergeFrom(const AddToGate_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddToGate_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 user_id = 1;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.AddToGate.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 user_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddToGate_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddToGate.Response) */ {
+ public:
+  AddToGate_Response();
+  virtual ~AddToGate_Response();
+
+  AddToGate_Response(const AddToGate_Response& from);
+
+  inline AddToGate_Response& operator=(const AddToGate_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddToGate_Response(AddToGate_Response&& from) noexcept
+    : AddToGate_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline AddToGate_Response& operator=(AddToGate_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddToGate_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddToGate_Response* internal_default_instance() {
+    return reinterpret_cast<const AddToGate_Response*>(
+               &_AddToGate_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    20;
+
+  void Swap(AddToGate_Response* other);
+  friend void swap(AddToGate_Response& a, AddToGate_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddToGate_Response* New() const final {
+    return CreateMaybeMessage<AddToGate_Response>(nullptr);
+  }
+
+  AddToGate_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddToGate_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddToGate_Response& from);
+  void MergeFrom(const AddToGate_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddToGate_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string gate_ip = 1;
+  void clear_gate_ip();
+  static const int kGateIpFieldNumber = 1;
+  const ::std::string& gate_ip() const;
+  void set_gate_ip(const ::std::string& value);
+  #if LANG_CXX11
+  void set_gate_ip(::std::string&& value);
+  #endif
+  void set_gate_ip(const char* value);
+  void set_gate_ip(const char* value, size_t size);
+  ::std::string* mutable_gate_ip();
+  ::std::string* release_gate_ip();
+  void set_allocated_gate_ip(::std::string* gate_ip);
+
+  // string login_token = 3;
+  void clear_login_token();
+  static const int kLoginTokenFieldNumber = 3;
+  const ::std::string& login_token() const;
+  void set_login_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_login_token(::std::string&& value);
+  #endif
+  void set_login_token(const char* value);
+  void set_login_token(const char* value, size_t size);
+  ::std::string* mutable_login_token();
+  ::std::string* release_login_token();
+  void set_allocated_login_token(::std::string* login_token);
+
+  // int32 gate_port = 2;
+  void clear_gate_port();
+  static const int kGatePortFieldNumber = 2;
+  ::google::protobuf::int32 gate_port() const;
+  void set_gate_port(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.AddToGate.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr gate_ip_;
+  ::google::protobuf::internal::ArenaStringPtr login_token_;
+  ::google::protobuf::int32 gate_port_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddToGate :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddToGate) */ {
+ public:
+  AddToGate();
+  virtual ~AddToGate();
+
+  AddToGate(const AddToGate& from);
+
+  inline AddToGate& operator=(const AddToGate& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddToGate(AddToGate&& from) noexcept
+    : AddToGate() {
+    *this = ::std::move(from);
+  }
+
+  inline AddToGate& operator=(AddToGate&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddToGate& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddToGate* internal_default_instance() {
+    return reinterpret_cast<const AddToGate*>(
+               &_AddToGate_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    21;
+
+  void Swap(AddToGate* other);
+  friend void swap(AddToGate& a, AddToGate& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddToGate* New() const final {
+    return CreateMaybeMessage<AddToGate>(nullptr);
+  }
+
+  AddToGate* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddToGate>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddToGate& from);
+  void MergeFrom(const AddToGate& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddToGate* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef AddToGate_Request Request;
+  typedef AddToGate_Response Response;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:s2s.AddToGate)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
 // ===================================================================
 
 
@@ -3437,9 +3811,161 @@ inline void MysqlOper_Request::set_allocated_data(::google::protobuf::Any* data)
 
 // MysqlOper
 
+// -------------------------------------------------------------------
+
+// AddToGate_Request
+
+// int64 user_id = 1;
+inline void AddToGate_Request::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 AddToGate_Request::user_id() const {
+  // @@protoc_insertion_point(field_get:s2s.AddToGate.Request.user_id)
+  return user_id_;
+}
+inline void AddToGate_Request::set_user_id(::google::protobuf::int64 value) {
+  
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:s2s.AddToGate.Request.user_id)
+}
+
+// -------------------------------------------------------------------
+
+// AddToGate_Response
+
+// string gate_ip = 1;
+inline void AddToGate_Response::clear_gate_ip() {
+  gate_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AddToGate_Response::gate_ip() const {
+  // @@protoc_insertion_point(field_get:s2s.AddToGate.Response.gate_ip)
+  return gate_ip_.GetNoArena();
+}
+inline void AddToGate_Response::set_gate_ip(const ::std::string& value) {
+  
+  gate_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.AddToGate.Response.gate_ip)
+}
+#if LANG_CXX11
+inline void AddToGate_Response::set_gate_ip(::std::string&& value) {
+  
+  gate_ip_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.AddToGate.Response.gate_ip)
+}
+#endif
+inline void AddToGate_Response::set_gate_ip(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  gate_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.AddToGate.Response.gate_ip)
+}
+inline void AddToGate_Response::set_gate_ip(const char* value, size_t size) {
+  
+  gate_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.AddToGate.Response.gate_ip)
+}
+inline ::std::string* AddToGate_Response::mutable_gate_ip() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.AddToGate.Response.gate_ip)
+  return gate_ip_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AddToGate_Response::release_gate_ip() {
+  // @@protoc_insertion_point(field_release:s2s.AddToGate.Response.gate_ip)
+  
+  return gate_ip_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AddToGate_Response::set_allocated_gate_ip(::std::string* gate_ip) {
+  if (gate_ip != nullptr) {
+    
+  } else {
+    
+  }
+  gate_ip_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), gate_ip);
+  // @@protoc_insertion_point(field_set_allocated:s2s.AddToGate.Response.gate_ip)
+}
+
+// int32 gate_port = 2;
+inline void AddToGate_Response::clear_gate_port() {
+  gate_port_ = 0;
+}
+inline ::google::protobuf::int32 AddToGate_Response::gate_port() const {
+  // @@protoc_insertion_point(field_get:s2s.AddToGate.Response.gate_port)
+  return gate_port_;
+}
+inline void AddToGate_Response::set_gate_port(::google::protobuf::int32 value) {
+  
+  gate_port_ = value;
+  // @@protoc_insertion_point(field_set:s2s.AddToGate.Response.gate_port)
+}
+
+// string login_token = 3;
+inline void AddToGate_Response::clear_login_token() {
+  login_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AddToGate_Response::login_token() const {
+  // @@protoc_insertion_point(field_get:s2s.AddToGate.Response.login_token)
+  return login_token_.GetNoArena();
+}
+inline void AddToGate_Response::set_login_token(const ::std::string& value) {
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.AddToGate.Response.login_token)
+}
+#if LANG_CXX11
+inline void AddToGate_Response::set_login_token(::std::string&& value) {
+  
+  login_token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.AddToGate.Response.login_token)
+}
+#endif
+inline void AddToGate_Response::set_login_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.AddToGate.Response.login_token)
+}
+inline void AddToGate_Response::set_login_token(const char* value, size_t size) {
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.AddToGate.Response.login_token)
+}
+inline ::std::string* AddToGate_Response::mutable_login_token() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.AddToGate.Response.login_token)
+  return login_token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AddToGate_Response::release_login_token() {
+  // @@protoc_insertion_point(field_release:s2s.AddToGate.Response.login_token)
+  
+  return login_token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AddToGate_Response::set_allocated_login_token(::std::string* login_token) {
+  if (login_token != nullptr) {
+    
+  } else {
+    
+  }
+  login_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), login_token);
+  // @@protoc_insertion_point(field_set_allocated:s2s.AddToGate.Response.login_token)
+}
+
+// -------------------------------------------------------------------
+
+// AddToGate
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

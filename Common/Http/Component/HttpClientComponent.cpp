@@ -56,6 +56,8 @@ namespace Sentry
     {
         std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
 
+        auto response = this->Get(url);
+        //LOG_WARN(response->GetContent());
         //string url = "http://yjz199595.com/logic/service/push";
 
 //        std::string json;
@@ -137,7 +139,11 @@ namespace Sentry
 
     std::shared_ptr<HttpAsyncResponse> HttpClientComponent::Get(const std::string &url, int timeout)
     {
+#ifdef ONLY_MAIN_THREAD
+        IAsioThread &thread = App::Get().GetTaskScheduler();
+#else
         IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+#endif
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
         std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
         return httpAsyncClient->Get(url);
@@ -146,7 +152,11 @@ namespace Sentry
     std::shared_ptr<HttpAsyncResponse>
     HttpClientComponent::Post(const std::string &url, const std::string &data, int timeout)
     {
+#ifdef ONLY_MAIN_THREAD
+        IAsioThread &thread = App::Get().GetTaskScheduler();
+#else
         IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+#endif
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
         std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
         return httpAsyncClient->Post(url, data);

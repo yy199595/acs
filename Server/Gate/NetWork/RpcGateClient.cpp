@@ -35,8 +35,13 @@ namespace Sentry
         this->mQps += size;
         std::cout << "receive player message count = " << this->mCallCount << std::endl;
         request->set_sock_id(this->GetSocketId());
+#ifdef ONLY_MAIN_THREAD
+        this->mGateComponent->OnRequest(request);
+#else
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
         mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
+#endif
+
         return XCode::Successful;
     }
     
@@ -53,14 +58,23 @@ namespace Sentry
             return;
         }
         long long id = this->GetSocketId();
+#ifdef ONLY_MAIN_THREAD
+        this->mGateComponent->OnCloseSocket(id, code);
+#else
         MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
         mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
+#endif
+
     }
 
     void RpcGateClient::StartClose()
     {
         XCode code = XCode::NetActiveShutdown;
+#ifdef ONLY_MAIN_THREAD
+        this->OnClientError(code);
+#else
         this->mNetWorkThread.Invoke(&RpcGateClient::OnClientError, this, code);
+#endif
     }
 
 
@@ -69,12 +83,11 @@ namespace Sentry
         if(!this->IsOpen()) return false;
         std::shared_ptr<NetworkData> networkData(
                 new NetworkData(RPC_TYPE_REQUEST, message));
-        if(this->mNetWorkThread.IsCurrentThread())
-        {
-            this->SendData(networkData);
-            return true;
-        }
+#ifdef ONLY_MAIN_THREAD
+        this->SendData(networkData);
+#else
         this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+#endif
         return true;
     }
 
@@ -83,12 +96,11 @@ namespace Sentry
         if(!this->IsOpen()) return false;
         std::shared_ptr<NetworkData> networkData(
                 new NetworkData(RPC_TYPE_RESPONSE, message));
-        if(this->mNetWorkThread.IsCurrentThread())
-        {
-            this->SendData(networkData);
-            return true;
-        }
+#ifdef ONLY_MAIN_THREAD
+        this->SendData(networkData);
+#else
         this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+#endif
         return true;
     }
 

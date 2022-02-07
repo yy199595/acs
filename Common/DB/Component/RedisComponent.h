@@ -26,10 +26,6 @@ namespace Sentry
 	public:
 		RedisComponent() = default;
 		~RedisComponent() final = default;
-    public:
-        void ClearAllData();
-		bool CloseRedisSocket();
-
 	protected:
 		bool Awake() final;            //初始化管理器
 		bool LateAwake() final;                //初始化完成之后
@@ -60,19 +56,25 @@ namespace Sentry
 
 
         template<typename ... Args>
-        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, Args &&...args)
+        std::shared_ptr<RedisResponse> Call(const std::string & func, Args &&...args)
         {
             std::string script;
             int size = sizeof ...(Args) + 1;
+            const size_t pos = func.find('.');
+            if(pos == std::string::npos)
+            {
+                return nullptr;
+            }
+            std::string tab = func.substr(0, pos);
             if(!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
             {
                 LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
                 return nullptr;
             }
-            return this->InvokeCommand("EVALSHA",script, size, func, std::forward<Args>(args)...);
+            return this->InvokeCommand("EVALSHA",script, size, func.substr(pos + 1), std::forward<Args>(args)...);
         }
 
-        std::shared_ptr<RedisResponse> Call(const std::string & tab, const std::string & func, std::vector<std::string> & args);
+        std::shared_ptr<RedisResponse> Call(const std::string & func, std::vector<std::string> & args);
 
     private:
         bool LoadLuaScript(const std::string & path);

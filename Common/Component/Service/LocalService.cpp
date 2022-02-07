@@ -11,12 +11,6 @@
 #include"Http/HttpAsyncRequest.h"
 namespace Sentry
 {
-    struct NetAddressInfo
-    {
-        string Ip;
-        int Port;
-    };
-
     bool LocalService::Awake()
     {
         BIND_SUB_FUNCTION(LocalService::Add);

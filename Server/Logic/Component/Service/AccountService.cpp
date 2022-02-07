@@ -4,6 +4,8 @@
 #include <Util/MathHelper.h>
 #include "Component/RedisComponent.h"
 #include "Component/MysqlProxyComponent.h"
+#include"Scene/ServiceMgrComponent.h"
+#include"Service/ServiceProxy.h"
 #include"MysqlClient/MysqlRpcTaskSource.h"
 namespace Sentry
 {
@@ -20,11 +22,52 @@ namespace Sentry
     {
         this->mRedisComponent = this->GetComponent<RedisComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
+        auto serviceComponent = this->GetComponent<ServiceMgrComponent>();
+        this->mGateService = serviceComponent->GetServiceProxy("GateService");
         return true;
     }
 
     XCode AccountService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
     {
+        string account, password;
+        LOG_THROW_ERROR(request.TryGetValue("account", account));
+        LOG_THROW_ERROR(request.TryGetValue("password", password));
+
+        this->mTempData.Clear();
+        this->mTempData.set_account(account);
+        auto taskSource = this->mMysqlComponent->Query(this->mTempData);
+        if(taskSource->GetCode() != XCode::Successful)
+        {
+            return taskSource->GetCode();
+        }
+        auto userData = taskSource->GetData<db::db_account::tab_user_account>();
+        if(userData->password() != password)
+        {
+            return XCode::Failure;
+        }
+        std::string newToken = this->NewToken(account);
+
+        this->mTempData.set_token(newToken);
+        this->mTempData.set_account(account);
+        this->mTempData.set_lastlogin_time(Helper::Time::GetSecTimeStamp());
+        XCode code = this->mMysqlComponent->Save(this->mTempData)->GetCode();
+        if(code != XCode::Successful)
+        {
+            return code;
+        }
+        s2s::AddToGate_Request gateRequest;
+        gateRequest.set_user_id(this->mTempData.user_id());
+        const std::string address = this->mGateService->AllotAddress();
+        auto allotResponse = this->mGateService->Call("GateService.Allot", gateRequest);
+        if(allotResponse->AwaitCode() != XCode::Successful)
+        {
+            return allotResponse->AwaitCode();
+        }
+        auto responseData = allotResponse->AwaitData<s2s::AddToGate_Response>();
+
+        response.Add("token", newToken);
+        response.Add("gate_ip", responseData->gate_ip());
+        response.Add("gate_port", responseData->gate_port());
         return XCode::Successful;
     }
 
@@ -35,16 +78,19 @@ namespace Sentry
         LOG_THROW_ERROR(request.TryGetValue("account", user_account));
         LOG_THROW_ERROR(request.TryGetValue("password", user_password));
         LOG_THROW_ERROR(request.TryGetValue("phone_num", phoneNumber));
-        long long userId = this->mRedisComponent->AddCounter("UserId");
+        auto resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
+        if(resp->GetNumber() == 0)
+        {
+            return XCode::AccountAlreadyExists;
+        }
 
-        db::db_account::tab_user_account userAccountData;
-
-        userAccountData.set_user_id(userId);
-        userAccountData.set_account(user_account);
-        userAccountData.set_phone_num(phoneNumber);
-        userAccountData.set_password(user_password);
-        userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
-        return this->mMysqlComponent->Add(userAccountData)->GetCode();
+        this->mTempData.Clear();
+        this->mTempData.set_account(user_account);
+        this->mTempData.set_phone_num(phoneNumber);
+        this->mTempData.set_password(user_password);
+        this->mTempData.set_user_id(resp->GetNumber());
+        this->mTempData.set_register_time(Helper::Time::GetSecTimeStamp());
+        return this->mMysqlComponent->Add(this->mTempData)->GetCode();
     }
 
     const std::string AccountService::NewToken(const std::string & account)

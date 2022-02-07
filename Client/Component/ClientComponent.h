@@ -7,6 +7,7 @@ using namespace google::protobuf;
 namespace Sentry
 {
     class TimerComponent;
+    class HttpClientComponent;
     class ThreadPoolComponent;
 }
 namespace Client
@@ -50,6 +51,7 @@ namespace Client
         unsigned short mPort;
         TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
+        HttpClientComponent * mHttpComponent;
         std::shared_ptr<TcpRpcClient> mTcpClient;
         std::unordered_map<long long, std::shared_ptr<ClientRpcTask>> mRpcTasks;
     };

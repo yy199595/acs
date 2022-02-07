@@ -25,20 +25,39 @@ namespace Sentry
 		delete this->mBindAcceptor;
 	}
 
-	std::shared_ptr<TaskSource<bool>> NetworkListener::StartListen(ISocketListen * handler)
-	{
-		this->mListenHandler = handler;
+	bool NetworkListener::StartListen(ISocketListen * handler)
+    {
+        this->mListenHandler = handler;
+#ifdef ONLY_MAIN_THREAD
+        try
+        {
+            asio::io_service & io = this->mTaskThread.GetContext();
+            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
+            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+
+            this->mBindAcceptor->listen(this->mConfig.Count);
+            std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
+            io.post(std::bind(&NetworkListener::ListenConnect, this));
+            return true;
+        }
+        catch (std::system_error & err)
+        {
+            LOG_FATAL(fmt::format("listen {0}:{1} failure {2}",
+                                  this->mConfig.Ip, this->mConfig.Port, err.what()));
+            return false;
+        }
+#else
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         this->mTaskThread.Invoke(&NetworkListener::InitListener, this, taskSource);
-		return taskSource;
-	}
-
+        taskSource->Await();
+#endif
+    }
+#ifndef ONLY_MAIN_THREAD
     void NetworkListener::InitListener(std::shared_ptr<TaskSource<bool>> taskSource)
     {
         try
         {
             asio::io_service & io = this->mTaskThread.GetContext();
-            //asio::ip::make_address(this->mConfig.Ip)
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
@@ -54,24 +73,32 @@ namespace Sentry
                       this->mConfig.Ip, this->mConfig.Port, err.what()));
         }
     }
-
+#endif
 	void NetworkListener::ListenConnect()
 	{
+#ifdef ONLY_MAIN_THREAD
+        MainTaskScheduler & workThread = App::Get().GetTaskScheduler();
+#else
         IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
+#endif
         std::shared_ptr<AsioTcpSocket> tcpSocket(new AsioTcpSocket(workThread.GetContext()));
 		this->mBindAcceptor->async_accept(*tcpSocket,
 			[this, &workThread, tcpSocket](const asio::error_code & code)
 		{
 			if (!code)
-			{
+            {
                 std::shared_ptr<SocketProxy> socketProxy(
                         new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
                 socketProxy->RefreshState();
 #ifdef __DEBUG__
                 LOG_INFO('[', socketProxy->GetAddress(), "] connected to ", this->mConfig.Name);
-#endif // __DEBUG__
+#endif
+#ifdef ONLY_MAIN_THREAD
+                this->mListenHandler->OnListen(socketProxy);
+#else
                 this->mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
-			}
+#endif
+            }
 			AsioContext & context = this->mTaskThread.GetContext();
 			context.post(std::bind(&NetworkListener::ListenConnect, this));
 		});

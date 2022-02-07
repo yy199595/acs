@@ -72,7 +72,11 @@ namespace Sentry
                 LOG_ERROR("not find socket handler ", listenConfig->Handler);
                 return false;
             }
+#ifdef ONLY_MAIN_THREAD
+            IAsioThread &netThread = App::Get().GetTaskScheduler();
+#else
             IAsioThread &netThread = taskComponent->AllocateNetThread();
+#endif
             if (listenConfig->Port != 0)
             {
                 auto listener = new NetworkListener(netThread, *listenConfig);
@@ -90,7 +94,7 @@ namespace Sentry
             Component *component = this->GetComponent<Component>(config.Handler);
             if (auto handler = dynamic_cast<ISocketListen *>(component))
             {
-                if (listener->StartListen(handler)->Await())
+                if (listener->StartListen(handler))
                 {
                     const ListenConfig &config = listener->GetConfig();
                     LOG_DEBUG(config.Name, " listen ", config.Ip, ':', config.Port, " successful");

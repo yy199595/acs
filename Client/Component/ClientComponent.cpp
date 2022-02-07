@@ -5,6 +5,8 @@
 #include"Network/TcpRpcClient.h"
 #include"Network/ClientRpcTask.h"
 #include"Other/ElapsedTimer.h"
+#include"Http/HttpAsyncRequest.h"
+#include"Http/Component/HttpClientComponent.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -36,9 +38,6 @@ namespace Client
 
 	bool ClientComponent::Awake()
     {
-        const ServerConfig &config = App::Get().GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetValue("gate", "ip", this->mIp));
-        LOG_CHECK_RET_FALSE(config.GetValue("gate", "port", this->mPort));
         return true;
     }
 
@@ -46,11 +45,38 @@ namespace Client
     {
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
+        this->mHttpComponent = this->GetComponent<HttpClientComponent>();
         return true;
     }
 
 	void ClientComponent::OnStart()
 	{
+        std::string loginUrl;
+        std::string registerUrl;
+        const ServerConfig & config = App::Get().GetConfig();
+        config.GetValue("account", "login", loginUrl);
+        config.GetValue("account", "register", registerUrl);
+
+
+        RapidJsonWriter jsonWriter;
+        jsonWriter.Add("password", "199595yjz.");
+        jsonWriter.Add("account", "646585122@qq.com");
+        jsonWriter.Add("phone_num", (long long)13716061995);
+        auto registerResponse = this->mHttpComponent->Post(registerUrl, jsonWriter);
+        std::shared_ptr<RapidJsonReader> rapidJsonReader = registerResponse->ToJsonReader();
+
+
+        RapidJsonWriter loginJsonWriter;
+        loginJsonWriter.Add("password", "199595yjz.");
+        loginJsonWriter.Add("account","646585122@qq.com");
+        auto loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
+
+        std::shared_ptr<RapidJsonReader> loginJsonResponse = loginResponse->ToJsonReader();
+
+        loginJsonResponse->TryGetValue("gate_ip", this->mIp);
+        loginJsonResponse->TryGetValue("gate_port", this->mPort);
+        LOG_INFO(loginResponse->GetContent());
+
 		IAsioThread & netThread = App::Get().GetTaskScheduler();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
@@ -81,10 +107,6 @@ namespace Client
         {
             ElapsedTimer timer;
             //this->mTaskComponent->Sleep(10);
-            if(this->mTcpClient->SendToGate(requestMessage)->Await())
-            {
-                LOG_INFO("use time = ", timer.GetMs() , "ms");
-            }
         }
 	}
 	void ClientComponent::OnTimeout(long long rpcId)

@@ -31,13 +31,17 @@ namespace Sentry
         void Update();
 
 	public:
+#ifndef ONLY_MAIN_THREAD
         IAsioThread & AllocateNetThread();
+#endif
     private:
         size_t mIndex;
         std::mutex mLock;
         std::thread * mMonitorThread;
         std::vector<TaskThread *> mThreadArray;
+#ifndef ONLY_MAIN_THREAD
 		std::vector<NetWorkThread *> mNetThreads;
+#endif
 		NumberBuilder<unsigned int> mTaskNumberPool;       
     };
 }

@@ -81,6 +81,7 @@ namespace Sentry
     }
 }
 
+#ifndef ONLY_MAIN_THREAD
 namespace Sentry
 {
     NetWorkThread::NetWorkThread()
@@ -130,7 +131,7 @@ namespace Sentry
         }
     }
 }
-
+#endif
 namespace Sentry
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
