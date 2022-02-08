@@ -26,7 +26,7 @@ inline std::string FormatFileLine(const char * file, const int line)
 	fileName = fileName == nullptr ? file : fileName;
 	char buffer[100] = {};
 #ifdef _MSC_VER
-	size_t size = sprintf_s(buffer, "%s:%d", fileName, line);
+	size_t size = sprintf_s(buffer, "%s:%d  ", fileName, line);
 #else
 	size_t size = sprintf(buffer, "%s:%d  ", fileName, line);
 #endif // _MSC_VER
