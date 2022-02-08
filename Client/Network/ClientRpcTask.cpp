@@ -52,7 +52,7 @@ namespace Client
             this->mTaskComponent = App::Get().GetComponent<TaskComponent>();
             this->mClientComponent = App::Get().GetComponent<ClientComponent>();
             this->mTimerId = this->mClientComponent->AddRpcTask(this->shared_from_this(), 5000);
-            this->mTaskComponent->Yield(this->mCoroutineId);
+            this->mTaskComponent->YieldCoroutine(this->mCoroutineId);
             return true;
         }
         return false;

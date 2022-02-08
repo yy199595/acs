@@ -82,7 +82,7 @@ namespace Sentry
             return;
         }
         coroutine->mGroup = new CoroutineGroup(1);
-        this->Yield();
+        this->YieldCoroutine();
     }
 
     void TaskComponent::WhenAll(std::vector<TaskContext *> &coroutines)
@@ -97,7 +97,7 @@ namespace Sentry
         {
             coroutine->mGroup = group;
         }
-        this->Yield();
+        this->YieldCoroutine();
     }
 
 
@@ -107,7 +107,7 @@ namespace Sentry
         StaticMethod * sleepMethod = NewMethodProxy(
                 &TaskComponent::Resume, this, id);
         this->mTimerManager->AddTimer(ms, sleepMethod);
-        this->Yield();
+        this->YieldCoroutine();
     }
 
 	void TaskComponent::ResumeContext(TaskContext * co)
@@ -136,7 +136,7 @@ namespace Sentry
         }
     }
 
-	bool TaskComponent::Yield()
+	bool TaskComponent::YieldCoroutine()
 	{
         LOG_CHECK_RET_FALSE(this->mRunContext);
         LOG_CHECK_RET_FALSE(this->mRunContext->mState == CorState::Running);
@@ -168,12 +168,12 @@ namespace Sentry
 		return coroutine;
 	}
 
-	bool TaskComponent::Yield(unsigned int & mCorId)
+	bool TaskComponent::YieldCoroutine(unsigned int & mCorId)
     {
         if(this->mRunContext != nullptr)
         {
             mCorId = this->mRunContext->mCoroutineId;
-            return this->Yield();
+            return this->YieldCoroutine();
         }
         LOG_FATAL("not coroutine context");
         return false;

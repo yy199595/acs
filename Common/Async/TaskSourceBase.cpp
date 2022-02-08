@@ -31,7 +31,7 @@ namespace Sentry
         if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-            this->mTaskComponent->Yield(this->mCorId);
+            this->mTaskComponent->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;

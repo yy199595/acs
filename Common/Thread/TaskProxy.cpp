@@ -18,7 +18,7 @@ namespace Sentry
 
     bool CoroutineAsyncTask::AwaitInvoke()
     {
-        this->mCorComponent->Yield(this->mCorId);
+        this->mCorComponent->YieldCoroutine(this->mCorId);
         return true;
     }
 

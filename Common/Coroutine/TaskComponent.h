@@ -34,9 +34,9 @@ namespace Sentry
         }
         TaskContext * MakeContext(StaticMethod * func);
 	public:
-		bool Yield();
+		bool YieldCoroutine();
 
-		bool Yield(unsigned int & mCorId);
+		bool YieldCoroutine(unsigned int & mCorId);
 
 		void Sleep(long long ms);
 
