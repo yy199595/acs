@@ -57,6 +57,15 @@ namespace Sentry
         std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
 
         auto response = this->Get(url);
+
+        RapidJsonWriter jsonWriter;
+        jsonWriter.Add("RankId", 301000);
+        jsonWriter.Add("Start", 0);
+        jsonWriter.Add("End", 100);
+
+        auto response1 = this->Post("http://10.10.14.104:7683/logic/QueryRankData", jsonWriter);
+
+        LOG_WARN(response1->GetContent());
         //LOG_WARN(response->GetContent());
         //string url = "http://yjz199595.com/logic/service/push";
 

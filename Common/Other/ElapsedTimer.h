@@ -12,16 +12,16 @@ namespace Sentry
     public:
         ElapsedTimer() : mStartTime(Helper::Time::GetMilTimestamp()) { }
     public:
-        inline double GetMs() const;
+        inline long long GetMs() const;
         inline double GetSecond() const;
     private:
         const long long mStartTime;
     };
 
-    double ElapsedTimer::GetMs() const
+    long long ElapsedTimer::GetMs() const
     {
         long long nowTime = Helper::Time::GetMilTimestamp();
-        return (double)(nowTime - this->mStartTime);
+        return (nowTime - this->mStartTime);
     }
 
     double ElapsedTimer::GetSecond() const
