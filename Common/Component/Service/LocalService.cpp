@@ -16,8 +16,9 @@ namespace Sentry
         BIND_SUB_FUNCTION(LocalService::Add);
         BIND_SUB_FUNCTION(LocalService::Push);
         BIND_SUB_FUNCTION(LocalService::Remove);
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("area_id", this->mAreaId));
-        LOG_CHECK_RET_FALSE(App::Get().GetConfig().GetValue("node_name", this->mNodeName));
+        const ServerConfig & config = App::Get().GetConfig();
+        LOG_CHECK_RET_FALSE(config.GetValue("area_id", this->mAreaId));
+        LOG_CHECK_RET_FALSE(config.GetValue("node_name", this->mNodeName));
         return true;
     }
 
@@ -29,6 +30,7 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(this->mTcpServerComponent = this->GetComponent<TcpServerComponent>());
         const NetworkListener *rpcListener = this->mTcpServerComponent->GetListener("rpc");
         const NetworkListener *httpListener = this->mTcpServerComponent->GetListener("http");
+
         LOG_CHECK_RET_FALSE(rpcListener && httpListener);
         const ListenConfig & rpcListenerConfig = rpcListener->GetConfig();
         const ListenConfig & httpListenerConfig = httpListener->GetConfig();
@@ -92,7 +94,6 @@ namespace Sentry
         if (httpResponse != nullptr) {
             LOG_INFO("post service to ", httpAddress, " successful [", elapsedTimer.GetMs(), "ms]");
         }
-
     }
 
     void LocalService::OnStart() //通知其他服务器 我加入了
