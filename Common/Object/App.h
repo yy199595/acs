@@ -50,9 +50,11 @@ namespace Sentry
         inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
 	private:
 		bool InitComponent();
-        void StartComponent();
         bool AddComponentFormConfig();
 		bool InitComponent(Component * component);
+        void StartComponent(std::vector<Component *> components);
+    protected:
+        void OnAddComponent(Component *component) final;
 	public:
 		void Stop(ExitCode code);
 		int Run(int argc, char ** argv);
@@ -66,7 +68,6 @@ namespace Sentry
 		int mFps;
 		long long mStartTimer;
 		long long mSecondTimer;
-        long long mMainLoopStartTime;
 		long long mLogicUpdateInterval;
 	private:
 		bool mIsClose;
@@ -82,7 +83,8 @@ namespace Sentry
         TaskComponent * mTaskComponent;
         LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
-		std::vector<Component *> mSceneComponents;
+        std::queue<Component *> mNewComponents;
+        std::vector<Component *> mSceneComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;
 		std::vector<ISecondUpdate *> mSecondUpdateManagers;

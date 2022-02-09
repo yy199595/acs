@@ -96,7 +96,7 @@ namespace Sentry
         {
             return nullptr;
         }
-        return static_cast<T *>(component);
+        return dynamic_cast<T *>(component);
     }
 
     inline std::string GetFunctionName(const std::string func)

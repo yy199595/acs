@@ -63,16 +63,23 @@ namespace Sentry
 	bool App::InitComponent()
 	{
 		// 初始化scene组件
-        this->GetComponents(this->mSceneComponents);
-		for (Component *component : this->mSceneComponents)
-		{
-			if (!this->InitComponent(component))
-			{
+        while(!this->mNewComponents.empty())
+        {
+            Component * component = this->mNewComponents.front();
+            this->mNewComponents.pop();
+            if (!this->InitComponent(component))
+            {
                 LOG_FATAL("Init ", component->GetTypeName() ," failure");
-				return false;
-			}
-		}
-        this->mTaskComponent->Start(&App::StartComponent, this);
+                return false;
+            }
+        }
+
+        this->mTaskComponent->Start([this]()
+        {
+            this->StartComponent(this->mSceneComponents);
+            long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
+            LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
+        });
 		return true;
 	}
 
@@ -92,12 +99,18 @@ namespace Sentry
 		if (auto manager4 = dynamic_cast<ILastFrameUpdate *>(component)) {
             this->mLastFrameUpdateManager.push_back(manager4);
         }
+        this->mSceneComponents.emplace_back(component);
 		return true;
 	}
 
-	void App::StartComponent()
+    void App::OnAddComponent(Component *component)
     {
-        for (auto component: this->mSceneComponents)
+        this->mNewComponents.emplace(component);
+    }
+
+	void App::StartComponent(std::vector<Component *> components)
+    {
+        for (auto component: components)
         {
             auto startComponent = dynamic_cast<IStart *>(component);
             if (startComponent != nullptr)
@@ -106,10 +119,8 @@ namespace Sentry
                 startComponent->OnStart();
             }
         }
-        this->mMainLoopStartTime = Helper::Time::GetMilTimestamp();
-        LOG_DEBUG("start all component successful ......");
 
-        for (Component *component: this->mSceneComponents)
+        for (Component *component: components)
         {
             ElapsedTimer elapsedTimer;
             if (auto loadComponent = dynamic_cast<ILoadData *>(component))
@@ -119,12 +130,10 @@ namespace Sentry
             }
         }
 
-        for (Component *component: this->mSceneComponents)
+        for (Component *component: components)
         {
             component->OnComplete();
         }
-        long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
-        LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
     }
 
 	int App::Run(int argc, char ** argv)
@@ -168,7 +177,24 @@ namespace Sentry
 
 	void App::LogicMainLoop()
 	{
-		this->mStartTimer = Helper::Time::GetMilTimestamp();
+        if(!this->mNewComponents.empty())
+        {
+            std::vector<Component *> components;
+            while(!this->mNewComponents.empty())
+            {
+               Component * component = this->mNewComponents.front();
+                if(!this->InitComponent(component))
+                {
+                    LOG_ERROR("Init ", component->GetTypeName(), " failure");
+                    continue;
+                }
+                components.emplace_back(component);
+                this->mNewComponents.pop();
+            }
+            this->mTaskComponent->Start(&App::StartComponent, this, components);
+        }
+
+        this->mStartTimer = Helper::Time::GetMilTimestamp();
 		for (ISystemUpdate *component : this->mSystemUpdateManagers)
 		{
 			component->OnSystemUpdate();

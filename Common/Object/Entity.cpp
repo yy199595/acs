@@ -44,6 +44,7 @@ namespace Sentry
         {
             return false;
         }
+        this->OnAddComponent(component);
         this->mSortComponents.emplace_back(name);
 		this->mComponentMap.emplace(name, component);
 		return true;

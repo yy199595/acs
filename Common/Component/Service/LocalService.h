@@ -25,7 +25,7 @@ namespace Sentry
 
         void OnDestory() final;
     public:
-        bool AddNewService(const std::string & service);
+        bool AddComponent(const std::string & name);
         void RemoveByAddress(const std::string & address);
     private:
         void Add(const RapidJsonReader & jsonReader);

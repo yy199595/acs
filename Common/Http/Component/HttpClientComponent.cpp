@@ -94,7 +94,10 @@ namespace Sentry
         LOG_CHECK_RET(httpRequestData);
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
-        LOG_WARN(httpRequestData->GetMethod(), "  ", httpRequestData->GetUrl(), "  ", httpRequestData->GetContent());
+        LOG_INFO("==== http request handler ====");
+        LOG_INFO("url = ", httpRequestData->GetUrl());
+        LOG_INFO("type = ", httpRequestData->GetMethod());
+        LOG_INFO("message = ", httpRequestData->GetContent());
 #endif
         const std::string &url = httpRequestData->GetUrl();
         const std::string &type = httpRequestData->GetMethod();

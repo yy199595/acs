@@ -34,6 +34,8 @@ namespace Sentry
         template<typename T>
         inline T *GetOrAddComponent();
 
+    protected:
+       virtual void OnAddComponent(Component * component) { }
     public:
 		void OnDestory() override;
 

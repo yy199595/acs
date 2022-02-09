@@ -22,7 +22,7 @@
         "http": "./Config/http.json"
     },
     "listener": {
-        "ip":"127.0.0.1",
+        "ip":"10.10.14.104",
         "rpc":
         {
             "port":7788,

@@ -85,7 +85,7 @@ namespace Sentry
         {
             return false;
         }
-        return localService->AddNewService(parameter);
+        return localService->AddComponent(parameter);
     }
 
     bool ConsoleComponent::Close(const std::string &parameter, std::vector<std::string> &response)

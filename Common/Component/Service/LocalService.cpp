@@ -119,37 +119,22 @@ namespace Sentry
 
     }
 
-    bool LocalService::AddNewService(const std::string &service)
+    bool LocalService::AddComponent(const std::string &name)
     {
-        TaskComponent *taskComponent = this->GetComponent<TaskComponent>();
-        Component *component = this->GetComponent<Component>(service);
-        if (component != nullptr) {
-            return false;
-        }
-        component = ComponentFactory::CreateComponent(service);
-        if (component == nullptr) {
-            return false;
-        }
-        if (!this->mEntity->AddComponent(service, component)|| !component->LateAwake()) {
-            return false;
-        }
-        taskComponent->Start([component, this]()
+        Component *component = this->GetComponent<Component>(name);
+        if (component != nullptr || !this->mEntity->AddComponent(name))
         {
-            IStart *startComponent = dynamic_cast<IStart *>(component);
-            ILoadData *loadDataComponent = dynamic_cast<ILoadData *>(component);
-            if (startComponent != nullptr) {
-                startComponent->OnStart();
-            }
-            if (loadDataComponent != nullptr) {
-                loadDataComponent->OnLoadData();
-            }
+            return false;
+        }
+        if (this->GetComponent<RpcService>(name) != nullptr)
+        {
             RapidJsonWriter jsonWriter;
+            jsonWriter.Add("service", name);
             jsonWriter.Add("area_id", this->mAreaId);
             jsonWriter.Add("address", this->mRpcAddress);
-            jsonWriter.Add("service", component->GetTypeName());
             this->mRedisComponent->Publish("LocalService.Add", jsonWriter);
-            LOG_INFO("start new service [", component->GetTypeName(), "] successful");
-        });
+        }
+        LOG_INFO("start new component [", name, "] successful");
         return true;
     }
 

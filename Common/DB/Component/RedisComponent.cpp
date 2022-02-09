@@ -226,6 +226,11 @@ namespace Sentry
         std::string json;
         if(jsonWriter.WriterToStream(json))
         {
+#ifdef __DEBUG__
+            LOG_INFO("==== redis publish message ====");
+            LOG_INFO("channel = ", channel);
+            LOG_INFO("message = ", json);
+#endif
             return this->Publish(channel, json);
         }
         return -1;
@@ -296,16 +301,16 @@ namespace Sentry
             if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 &&
                 redisResponse->GetValue() == "message")
             {
-                const std::string &method = redisResponse->GetValue(1);
-                size_t pos = method.find('.');
+                const std::string &channel = redisResponse->GetValue(1);
+                size_t pos = channel.find('.');
                 if(pos != std::string::npos)
                 {
-                    string service = method.substr(0, pos);
-                    std::string funcName = method.substr(pos + 1);
+                    string service = channel.substr(0, pos);
+                    std::string funcName = channel.substr(pos + 1);
                     const std::string &message = redisResponse->GetValue(2);
 #ifdef __DEBUG__
                     LOG_DEBUG("========= subscribe message =============");
-                    LOG_DEBUG("func = ", service, '.', method);
+                    LOG_DEBUG("channel = ", channel);
                     LOG_DEBUG("message = ", message);
 #endif
                     auto subService = this->GetComponent<SubService>(service);
