@@ -85,6 +85,24 @@ int main(int argc, char **argv)
 {
     try
     {
+        asio::io_service io;
+        asio::ip::tcp::resolver resolver(io);
+        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
+        asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+        asio::ip::tcp::resolver::iterator end;
+
+        std::set<std::string> address;
+        while(iter != end)
+        {
+            tcp::endpoint ep = *iter++;
+            address.emplace(ep.address().to_string());
+        }
+
+        for(const std::string & add : address)
+        {
+            std::cout << add << std::endl;
+        }
+
         RegisterComponent();
         RegisterServiceComponent();
         const std::string path(argv[1]);
