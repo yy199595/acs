@@ -77,10 +77,10 @@ namespace Sentry
         long long mLogicRunCount;
         long long mLastUpdateTime;
 	private:
-        static App * mApp;
         TaskComponent * mTaskComponent;
         LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
+        static std::shared_ptr<App> mApp;
         std::vector<Component *> mSceneComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;

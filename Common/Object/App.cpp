@@ -12,13 +12,11 @@ using namespace std::chrono;
 
 namespace Sentry
 {
-	App *App::mApp = nullptr;
-
+	std::shared_ptr<App> App::mApp = nullptr;
 	App::App(ServerConfig * config) : Entity(0),
         mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
         mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
-		mApp = this;
 		this->mDelatime = 0;
 		this->mIsClose = false;
 		this->mLogicRunCount = 0;
@@ -132,6 +130,7 @@ namespace Sentry
 
 	int App::Run(int argc, char ** argv)
 	{
+        App::mApp = dynamic_pointer_cast<App>(this->shared_from_this());
         this->mConfig->GetValue("node_name", this->mServerName);
 		if (!this->AddComponentFormConfig())
 		{
