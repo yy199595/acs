@@ -6,6 +6,17 @@ using namespace std::chrono;
 
 namespace Helper
 {
+    int Time::ScaleTotalTime = 0;
+
+    void Time::SetScaleTotalTime(int second)
+    {
+        if (second == 0)
+        {
+            Time::ScaleTotalTime = 0;
+            return;
+        }
+        Time::ScaleTotalTime += second;
+    }
     std::string Time::GetDateStr(long long time)
     {
         char str[100] = {0};
@@ -19,13 +30,13 @@ namespace Helper
     long long Time::GetMilTimestamp()
     {
         auto tmp = system_clock::now().time_since_epoch();
-        return duration_cast<milliseconds>(tmp).count();
+        return duration_cast<milliseconds>(tmp).count() + Time::ScaleTotalTime * 1000;
     }
 
     long long Time::GetSecTimeStamp()
     {
         auto tmp = system_clock::now().time_since_epoch();
-        return duration_cast<seconds>(tmp).count();
+        return duration_cast<seconds>(tmp).count() + Time::ScaleTotalTime;
     }
 
     long long Time::GetMicTimeStamp()

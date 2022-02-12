@@ -97,7 +97,10 @@ namespace Sentry
         LOG_INFO("==== http request handler ====");
         LOG_INFO("url = ", httpRequestData->GetUrl());
         LOG_INFO("type = ", httpRequestData->GetMethod());
-        LOG_INFO("message = ", httpRequestData->GetContent());
+        if(!httpRequestData->GetContent().empty())
+        {
+            LOG_INFO("message = ", httpRequestData->GetContent());
+        }
 #endif
         const std::string &url = httpRequestData->GetUrl();
         const std::string &type = httpRequestData->GetMethod();

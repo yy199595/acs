@@ -53,8 +53,6 @@ namespace Sentry
         bool AddComponentFormConfig();
 		bool InitComponent(Component * component);
         void StartComponent(std::vector<Component *> components);
-    protected:
-        void OnAddComponent(Component *component) final;
 	public:
 		void Stop(ExitCode code);
 		int Run(int argc, char ** argv);
@@ -83,7 +81,6 @@ namespace Sentry
         TaskComponent * mTaskComponent;
         LoggerComponent * mLogComponent;
 		TimerComponent * mTimerComponent;
-        std::queue<Component *> mNewComponents;
         std::vector<Component *> mSceneComponents;
 		std::vector<IFrameUpdate *> mFrameUpdateManagers;
 		std::vector<ISystemUpdate *> mSystemUpdateManagers;

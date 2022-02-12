@@ -8,6 +8,10 @@ namespace Helper
 {
     namespace Time
     {
+        extern int ScaleTotalTime;
+
+        extern void SetScaleTotalTime(int second);
+
         extern std::string GetDateStr(long long time = 0);
 
         // 获取毫秒时间戳

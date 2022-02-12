@@ -63,17 +63,16 @@ namespace Sentry
 	bool App::InitComponent()
 	{
 		// 初始化scene组件
-        while(!this->mNewComponents.empty())
+        std::vector<Component *> components;
+        this->GetComponents(components);
+        for(Component * component : components)
         {
-            Component * component = this->mNewComponents.front();
-            this->mNewComponents.pop();
             if (!this->InitComponent(component))
             {
                 LOG_FATAL("Init ", component->GetTypeName() ," failure");
                 return false;
             }
         }
-
         this->mTaskComponent->Start([this]()
         {
             this->StartComponent(this->mSceneComponents);
@@ -102,11 +101,6 @@ namespace Sentry
         this->mSceneComponents.emplace_back(component);
 		return true;
 	}
-
-    void App::OnAddComponent(Component *component)
-    {
-        this->mNewComponents.emplace(component);
-    }
 
 	void App::StartComponent(std::vector<Component *> components)
     {
@@ -177,23 +171,6 @@ namespace Sentry
 
 	void App::LogicMainLoop()
 	{
-        if(!this->mNewComponents.empty())
-        {
-            std::vector<Component *> components;
-            while(!this->mNewComponents.empty())
-            {
-               Component * component = this->mNewComponents.front();
-                if(!this->InitComponent(component))
-                {
-                    LOG_ERROR("Init ", component->GetTypeName(), " failure");
-                    continue;
-                }
-                components.emplace_back(component);
-                this->mNewComponents.pop();
-            }
-            this->mTaskComponent->Start(&App::StartComponent, this, components);
-        }
-
         this->mStartTimer = Helper::Time::GetMilTimestamp();
 		for (ISystemUpdate *component : this->mSystemUpdateManagers)
 		{
