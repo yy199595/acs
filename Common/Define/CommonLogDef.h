@@ -93,10 +93,21 @@ inline std::string FormatFileLine(const char * file, const int line)
     if(!(obj)) { LOG_ERROR(#obj); return 0; }    \
 }
 
+#define LOG_CHECK_RET_NULL(obj){ \
+    if(!(obj)) { LOG_ERROR(#obj); return nullptr; }    \
+}
+
 #define LOG_THROW_ERROR(obj){ \
     if(!(obj))                \
     {              \
         LOG_ERROR(#obj);      \
         throw std::logic_error(#obj);\
         }    \
+}
+
+#define TryInvoke(obj, content){ \
+        if(obj)                  \
+        {                        \
+            content;             \
+        }\
 }

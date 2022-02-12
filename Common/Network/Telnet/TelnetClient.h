@@ -10,7 +10,7 @@ namespace Sentry
     public:
         bool IsOk;
         string Command;
-        std::string Paramater;
+        std::string Parameter;
     };
 }
 namespace Sentry

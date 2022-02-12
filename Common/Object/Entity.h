@@ -92,7 +92,7 @@ namespace Sentry
 		if (this->GetComponent<T>() == nullptr)
 		{			
 			Component * component = ComponentFactory::CreateComponent<T>();
-			return this->AddComponent(component->GetTypeName(), component);
+			return this->AddComponent(component->GetType()->Name, component);
 		}
 		return false;
 	}

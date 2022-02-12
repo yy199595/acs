@@ -119,13 +119,25 @@ namespace Sentry
 
     }
 
-    bool LocalService::AddComponent(const std::string &name)
+    bool LocalService::AddNewService(const std::string &name)
     {
         Component *component = this->GetComponent<Component>(name);
-        if (component != nullptr || !this->mEntity->AddComponent(name))
+        if(component != nullptr)
         {
             return false;
         }
+        component = ComponentFactory::CreateComponent(name);
+        if(component == nullptr || dynamic_cast<RpcService*>(component) == nullptr)
+        {
+            delete component;
+            return false;
+        }
+        if(!this->mEntity->AddComponent(name, component) || component->LateAwake())
+        {
+            this->mEntity->RemoveComponent(name);
+            return false;
+        }
+
         if (this->GetComponent<RpcService>(name) != nullptr)
         {
             RapidJsonWriter jsonWriter;

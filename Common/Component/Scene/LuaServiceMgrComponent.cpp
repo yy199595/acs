@@ -19,70 +19,51 @@ namespace Sentry
 
     }
 
+
 	bool LuaServiceMgrComponent::LateAwake()
 	{
-        LuaScriptComponent * luaComponent = nullptr;
-        RpcConfigComponent * configComponent = nullptr;
-        LOG_CHECK_RET_FALSE(luaComponent = this->GetComponent<LuaScriptComponent>());
-        LOG_CHECK_RET_FALSE(configComponent = this->GetComponent<RpcConfigComponent>());
-
-
-		lua_State * lua = luaComponent->GetLuaEnv();
+        LOG_THROW_ERROR(this->mLuaComponent = this->GetComponent<LuaScriptComponent>());
+        LOG_THROW_ERROR(this->mConfigComponent = this->GetComponent<RpcConfigComponent>());
 
 		std::vector<std::string> services;
-        App::Get().GetConfig().GetValue("service", services);
+        const ServerConfig & config = App::Get().GetConfig();
+        LOG_THROW_ERROR(config.GetValue("service", services));
 
 		for (std::string & service : services)
 		{
-			lua_getglobal(lua, service.c_str());
-			if (!lua_istable(lua, -1))
-			{
-				continue;
-			}
-			std::vector<std::string> methods;
-			if (!configComponent->GetMethods(service, methods))
-			{
-				continue;
-			}
-
-			auto localService = this->GetComponent<RpcService>(service);
-			if (localService == nullptr)
-			{
-				auto luaSerivce = new LuaRpcService();
-				if (App::Get().AddComponent(service, localService))
-                {
-                    LOG_ERROR("add service", service, "failure");
-                    return false;
-                }
-				if (!luaSerivce->Init(service) || !luaSerivce->InitService(service, lua))
-                {
-                    LOG_FATAL("Init lua service [", service, "] failure");
-                    return false;
-                }
-				localService = luaSerivce;
-			}
-
-			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-			for (std::string & method : methods)
+            auto luaService = this->GetComponent<RpcService>(service);
+            if(luaService != nullptr && !this->AddMethod(luaService))
             {
-                lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-                lua_getfield(lua, -1, method.c_str());
-                if (!lua_isfunction(lua, -1))
-                {
-                    continue;
-                }
-                int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
-                auto config = configComponent
-                        ->GetProtocolConfig(service + "." + method);
-                LOG_INFO("add new lua service method : ", service, '.', method);
-                localService->AddMethod(std::make_shared<LuaServiceMethod>(config, lua, idx));
-            }
-            auto luaServiceComponent = dynamic_cast<LuaRpcService*>(localService);
-            if(luaServiceComponent != nullptr && !luaServiceComponent->LateAwake())
-            {
+                LOG_ERROR(luaService->GetName(), " add lua method failure");
                 return false;
             }
 		}
-		return true;
+        return true;
 	}
 }
+
+    bool LuaServiceMgrComponent::AddMethod(RpcService *rpcService)
+    {
+        std::vector<std::string> methods;
+        if (!this->mConfigComponent->GetMethods(this->GetName(), methods))
+        {
+            return true;
+        }
+        lua_State * lua = this->mLuaComponent->GetLuaEnv();
+        int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
+        for (std::string & method : methods)
+        {
+            lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+            lua_getfield(lua, -1, method.c_str());
+            if (!lua_isfunction(lua, -1))
+            {
+                return false;
+            }
+            int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
+            auto config = this->mConfigComponent
+                    ->GetProtocolConfig(this->GetName() + "." + method);
+            LOG_INFO("add new lua service method : ", this->GetName(), '.', method);
+            rpcService->AddMethod(std::make_shared<LuaServiceMethod>(config, lua, idx));
+        }
+        return true;
+    }

@@ -38,8 +38,8 @@ namespace Sentry
 		~App() final = default;
 	public:
         static App &Get() { return *mApp; }
+        bool StartNewService(const std::string & name);
         const ServerConfig &GetConfig() {return *mConfig; }
-		inline float GetDelaTime() const { return this->mDelatime;}
 		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
 		inline bool IsMainThread() { return std::this_thread::get_id() == this->mMainThreadId; }
 	public:
@@ -52,7 +52,7 @@ namespace Sentry
 		bool InitComponent();
         bool AddComponentFormConfig();
 		bool InitComponent(Component * component);
-        void StartComponent(std::vector<Component *> components);
+        void StartComponent(Component * component);
 	public:
 		void Stop(ExitCode code);
 		int Run(int argc, char ** argv);
@@ -64,13 +64,12 @@ namespace Sentry
 		class MainTaskScheduler mTaskScheduler;
 	private:
 		int mFps;
+        float mDeltaTime;
 		long long mStartTimer;
 		long long mSecondTimer;
 		long long mLogicUpdateInterval;
 	private:
-		bool mIsClose;
         float mLogicFps;
-        float mDelatime;
 		long long mStartTime;
 		ServerConfig * mConfig;
 		std::string mServerName;

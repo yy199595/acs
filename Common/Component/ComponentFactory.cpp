@@ -54,8 +54,8 @@ namespace Sentry
                 components.pop();
                 if(component != nullptr)
                 {
+                    component->Init();
                     component->mType = type;
-                    component->Init(type->Name);
                     return component;
                 }
 			}
@@ -64,8 +64,8 @@ namespace Sentry
 		Component * component = type->New();
 		if (component != nullptr)
 		{
-			component->mType = type;
-			component->Init(type->Name);
+            component->Init();
+            component->mType = type;
 		}
 		return component;
 	}

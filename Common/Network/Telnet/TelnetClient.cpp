@@ -78,7 +78,7 @@ namespace Sentry
                                  if(pos != std::string::npos)
                                  {
                                      content->Command = lineData.substr(0, pos);
-                                     content->Paramater = lineData.substr(pos +1 );
+                                     content->Parameter = lineData.substr(pos + 1 );
                                  }
                                  taskSource->SetResult(true);
                                  return;

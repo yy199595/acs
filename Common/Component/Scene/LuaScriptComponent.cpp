@@ -186,7 +186,6 @@ namespace Sentry
         ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaTaskSource::SetResult);
 
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
-        ClassProxyHelper::PushMemberFunction<App>(this->mLuaEnv, "GetDelaTime", &App::GetDelaTime);     
 
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetDateStr", Helper::Time::GetDateStr);
         ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetDateString", Helper::Time::GetDateString);

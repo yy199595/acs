@@ -38,12 +38,11 @@ namespace Sentry
 			LOG_ERROR("add {0} failure", name);
 			return false;
 		}
-		component->mEntityId = mGameObjectId;
+        component->mName = name;
+        component->mEntityId = mGameObjectId;
         component->mEntity = this->shared_from_this();
-        if(!component->Awake())
-        {
-            return false;
-        }
+        
+        component->Awake();
         this->OnAddComponent(component);
         this->mSortComponents.emplace_back(name);
 		this->mComponentMap.emplace(name, component);

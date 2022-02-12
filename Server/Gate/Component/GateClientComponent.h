@@ -23,7 +23,7 @@ namespace Sentry
     public:
         std::shared_ptr<RpcGateClient> GetGateClient(long long sockId);
         bool SendToClient(long long sockId, std::shared_ptr<c2s::Rpc_Response> message);
-    protected:
+    public:
         bool Awake() final;
         bool LateAwake() final;
         void OnListen(std::shared_ptr<SocketProxy> socket) final;

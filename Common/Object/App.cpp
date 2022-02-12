@@ -1,6 +1,5 @@
 ﻿
 #include"App.h"
-#include"Service/RpcService.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Scene/ServiceMgrComponent.h"
@@ -17,12 +16,31 @@ namespace Sentry
         mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
         mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
-		this->mDelatime = 0;
-		this->mIsClose = false;
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
         this->mMainThreadId = std::this_thread::get_id();
 	}
+
+    bool App::StartNewService(const std::string &name)
+    {
+        LOG_CHECK_RET_FALSE(!this->GetComponentByName(name));
+        Component *component = ComponentFactory::CreateComponent(name);
+        if (dynamic_cast<RpcService *>(component) == nullptr) {
+            delete component;
+            return false;
+        }
+        if (!this->AddComponent(name, component)) {
+            delete component;
+            return false;
+        }
+        if (!this->InitComponent(component)) {
+            this->RemoveComponent(name);
+            return false;
+        }
+        this->StartComponent(component);
+        component->OnComplete();
+        return true;
+    }
 
 	bool App::AddComponentFormConfig()
     {
@@ -67,13 +85,20 @@ namespace Sentry
         {
             if (!this->InitComponent(component))
             {
-                LOG_FATAL("Init ", component->GetTypeName() ," failure");
+                LOG_FATAL("Init ", component->GetName() ," failure");
                 return false;
             }
         }
         this->mTaskComponent->Start([this]()
         {
-            this->StartComponent(this->mSceneComponents);
+            for(Component * component : this->mSceneComponents)
+            {
+                this->StartComponent(component);
+            }
+            for(Component * component : this->mSceneComponents)
+            {
+                component->OnComplete();
+            }
             long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
             LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
         });
@@ -81,50 +106,32 @@ namespace Sentry
 	}
 
 	bool App::InitComponent(Component * component)
-	{
-		LOG_CHECK_RET_FALSE(component->IsActive());
-		LOG_CHECK_RET_FALSE(component->LateAwake());
-		if (auto manager1 = dynamic_cast<IFrameUpdate *>(component)) {
-            this->mFrameUpdateManagers.push_back(manager1);
-        }
-		if (auto manager2 = dynamic_cast<ISystemUpdate *>(component)) {
-            this->mSystemUpdateManagers.push_back(manager2);
-        }
-		if (auto manager3 = dynamic_cast<ISecondUpdate *>(component)) {
-            this->mSecondUpdateManagers.push_back(manager3);
-        }
-		if (auto manager4 = dynamic_cast<ILastFrameUpdate *>(component)) {
-            this->mLastFrameUpdateManager.push_back(manager4);
-        }
-        this->mSceneComponents.emplace_back(component);
-		return true;
-	}
-
-	void App::StartComponent(std::vector<Component *> components)
     {
-        for (auto component: components)
-        {
-            auto startComponent = dynamic_cast<IStart *>(component);
-            if (startComponent != nullptr)
-            {
-                LOG_DEBUG("start component ", component->GetTypeName());
-                startComponent->OnStart();
-            }
+        LOG_CHECK_RET_FALSE(component->LateAwake());
+        auto manager1 = dynamic_cast<IFrameUpdate *>(component);
+        auto manager2 = dynamic_cast<ISystemUpdate *>(component);
+        auto manager3 = dynamic_cast<ISecondUpdate *>(component);
+        auto manager4 = dynamic_cast<ILastFrameUpdate *>(component);
+        TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
+        TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
+        TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
+        TryInvoke(manager4, this->mLastFrameUpdateManager.emplace_back(manager4));
+        this->mSceneComponents.emplace_back(component);
+        return true;
+    }
+
+	void App::StartComponent(Component * component)
+    {
+        auto startComponent = dynamic_cast<IStart *>(component);
+        if (startComponent != nullptr) {
+            LOG_DEBUG("start component ", component->GetName());
+            startComponent->OnStart();
         }
 
-        for (Component *component: components)
-        {
-            ElapsedTimer elapsedTimer;
-            if (auto loadComponent = dynamic_cast<ILoadData *>(component))
-            {
-                loadComponent->OnLoadData();
-                LOG_DEBUG("load ", component->GetTypeName(), "data use time = ", elapsedTimer.GetMs(), "ms");
-            }
-        }
-
-        for (Component *component: components)
-        {
-            component->OnComplete();
+        ElapsedTimer elapsedTimer;
+        if (auto loadComponent = dynamic_cast<ILoadData *>(component)) {
+            loadComponent->OnLoadData();
+            LOG_DEBUG("load ", component->GetName(), "data use time = ", elapsedTimer.GetMs(), "ms");
         }
     }
 
@@ -156,13 +163,12 @@ namespace Sentry
 	{
         if(this->mTaskComponent != nullptr)
         {
-            this->mTaskComponent->Start([this, code]()
+            std::shared_ptr<ElapsedTimer> timer(new ElapsedTimer());
+            this->mTaskComponent->Start([this, code, timer]()
             {
-                ElapsedTimer elapsedTimer;
                 this->OnDestory();
-                this->mIsClose = true;
                 this->mTaskScheduler.Stop();
-                LOG_WARN("close server successful [", elapsedTimer.GetMs(), "ms]");
+                LOG_WARN("close server successful [", timer->GetMs(), "ms]");
                 exit((int) code);
             });
         }
@@ -181,7 +187,7 @@ namespace Sentry
 			this->mLogicRunCount++;
 			for (IFrameUpdate *component : this->mFrameUpdateManagers)
 			{
-				component->OnFrameUpdate(this->mDelatime);
+				component->OnFrameUpdate(this->mDeltaTime);
 			}
 
 			if (this->mStartTimer - this->mSecondTimer >= 1000)

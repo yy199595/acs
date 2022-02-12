@@ -50,6 +50,7 @@ namespace Sentry
 			return this->mEntity;
 		}
 		inline Type * GetType() { return this->mType; }
+        inline const std::string & GetName() { return this->mName; }
 
 	public:
 		bool IsComponent() override
@@ -78,6 +79,7 @@ namespace Sentry
 		Component * GetByHash(size_t hash);
 	protected:
 		Type * mType;
+        std::string mName;
         long long mEntityId;
         std::shared_ptr<Entity> mEntity;
     };

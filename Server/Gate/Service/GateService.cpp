@@ -25,11 +25,23 @@ namespace Sentry
 
     bool GateService::LateAwake()
     {
-        TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
         LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-        LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateClientComponent>());
-        LOG_CHECK_RET_FALSE(this->mEntityComponent = this->GetComponent<EntityMgrComponent>());
+        TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
         LOG_CHECK_RET_FALSE(this->mGateListener = tcpServerComponent->GetListener("gate"));
+
+        this->mGateComponent = this->GetComponent<GateClientComponent>();
+        this->mEntityComponent = this->GetComponent<EntityMgrComponent>();
+        if(this->mGateComponent == nullptr)
+        {
+            this->mGateComponent = this->mEntity->GetOrAddComponent<GateClientComponent>();
+            LOG_CHECK_RET_FALSE(this->mGateComponent->LateAwake());
+        }
+
+        if(this->mEntityComponent == nullptr)
+        {
+            this->mEntityComponent = this->mEntity->GetOrAddComponent<EntityMgrComponent>();
+            LOG_CHECK_RET_FALSE(this->mEntityComponent->LateAwake());
+        }
         return true;
     }
 

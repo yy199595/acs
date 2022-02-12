@@ -14,14 +14,12 @@ namespace Sentry
         virtual ~Object();
 
     public:
-        bool Init(const std::string &name);
+        bool Init();
 
     public:
         inline bool IsActive() const { return this->mIsActive; }
 
         inline void SetActive(bool isActive) { this->mIsActive = isActive; }
-
-        inline const std::string &GetTypeName() { return this->mClassName; }
 
     public:
         virtual bool IsManager() { return false; }
@@ -34,6 +32,5 @@ namespace Sentry
 
     private:
         bool mIsActive;
-        std::string mClassName;
     };
 }// namespace Sentry

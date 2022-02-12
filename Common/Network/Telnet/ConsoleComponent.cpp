@@ -35,40 +35,42 @@ namespace Sentry
         while(telnetClient->IsOpen())
         {
             std::shared_ptr<TelnetContent> commandContent = telnetClient->ReadCommand();
-            LOG_WARN(commandContent->Command, "  ", commandContent->Paramater);
+            LOG_INFO("==== console command ====");
+            LOG_INFO("command = ", commandContent->Command);
+            LOG_INFO("parameter = ", commandContent->Parameter);
             if(commandContent->IsOk)
             {
-                std::stringstream stringstream1;
+                std::stringstream responseStream;
                 auto iter = this->mFunctionMap.find(commandContent->Command);
                 if(iter == this->mFunctionMap.end())
                 {
-                    stringstream1 << "\r\n" << "<CMD NOT>";
+                    responseStream << "\r\n" << "<CMD NOT>";
                 }
                 else
                 {
                     std::vector<std::string> response;
                     ConsoleFunction  function = iter->second;
-                    if(function(commandContent->Paramater, response))
+                    if(function(commandContent->Parameter, response))
                     {
                         for(const std::string & str : response)
                         {
-                            stringstream1 << "\r\n" << str;
+                            responseStream << "\r\n" << str;
                         }
-                        stringstream1 << "\r\n<CMD OK>";
+                        responseStream << "\r\n<CMD OK>";
                     }
                     else
                     {
-                        stringstream1 << "\r\n<CMD ERR>";
+                        responseStream << "\r\n<CMD ERR>";
                     }
                 }
-                std::string res = stringstream1.str();
-                telnetClient->Response(  stringstream1.str());
+                std::string res = responseStream.str();
+                telnetClient->Response(  responseStream.str());
             }
         }
         LOG_ERROR("[console ]",telnetClient->GetAddress(), " disconnected");
     }
 
-    bool ConsoleComponent::Help(const std::string &paramater, std::vector<std::string> &response)
+    bool ConsoleComponent::Help(const std::string &parameter, std::vector<std::string> &response)
     {
         auto iter = this->mFunctionMap.begin();
         for(; iter != this->mFunctionMap.end(); iter++)
@@ -85,7 +87,7 @@ namespace Sentry
         {
             return false;
         }
-        return localService->AddComponent(parameter);
+        return localService->AddNewService(parameter);
     }
 
     bool ConsoleComponent::Close(const std::string &parameter, std::vector<std::string> &response)

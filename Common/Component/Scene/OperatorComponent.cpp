@@ -33,7 +33,7 @@ namespace Sentry
             if(auto hotfix = dynamic_cast<IHotfix*>(component))
             {
                 hotfix->OnHotFix();
-                LOG_INFO(component->GetTypeName()," start hotfix");
+                LOG_INFO(component->GetName()," start hotfix");
             }
         }
     }
@@ -48,10 +48,10 @@ namespace Sentry
             {
                 if(!loadConfig->OnLoadConfig())
                 {
-                    LOG_ERROR(component->GetTypeName(), " load config error");
+                    LOG_ERROR(component->GetName(), " load config error");
                     return false;
                 }
-                LOG_INFO("{0} start hotfix", component->GetTypeName());
+                LOG_INFO("{0} start hotfix", component->GetName());
             }
         }
         return true;
@@ -80,7 +80,7 @@ namespace Sentry
         nextRefresh.tm_sec = 0;
         time_t nextTime = mktime(&nextRefresh) - time(nullptr);
         this->mTimerComponent->AsyncWait(nextTime * 1000, &OperatorComponent::StartRefreshDay, this,
-                                         component->GetTypeName());
+                                         component->GetName());
 #ifdef __DEBUG__
         int hour, min, second = 0;
         Helper::Time::GetHourMinSecond(nextTime, hour, min, second);

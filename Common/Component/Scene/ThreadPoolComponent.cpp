@@ -8,7 +8,6 @@ namespace Sentry
     {
         this->mIndex = 0;
         int taskCount = 0;
-        int networkCount = 0;
         const ServerConfig & config = App::Get().GetConfig();
         config.GetValue("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD

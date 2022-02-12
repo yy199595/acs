@@ -19,9 +19,7 @@ namespace Sentry
         ~RpcService() override = default;
 
     public:
-
-        virtual const std::string & GetName() { return this->GetTypeName();}
-
+        
         std::shared_ptr<com::Rpc_Response> Invoke(const std::string &method, std::shared_ptr<com::Rpc_Request> request);
 
     public:

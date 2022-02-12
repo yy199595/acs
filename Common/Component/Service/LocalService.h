@@ -18,14 +18,11 @@ namespace Sentry
 
     public:
         bool Awake() final;
-
         bool LateAwake() final;
-
         void OnStart() final;
-
         void OnDestory() final;
     public:
-        bool AddComponent(const std::string & name);
+        bool AddNewService(const std::string & service);
         void RemoveByAddress(const std::string & address);
     private:
         void Add(const RapidJsonReader & jsonReader);

@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include <Component/Component.h>
+#include"Service/RpcService.h"
 namespace Sentry
 {
     template<typename T>
@@ -13,6 +13,7 @@ namespace Sentry
         Component *New() final { return new T(); }
     };
 }
+
 namespace Sentry
 {
 	class ComponentFactory
@@ -21,6 +22,25 @@ namespace Sentry
 		template<typename T>
 		static bool Add(const std::string name)
 		{
+            if(std::is_base_of<RpcService, T>::value)
+            {
+                if(std::is_base_of<ISystemUpdate, T>::value)
+                {
+                    throw std::logic_error(name + " is in ISystemUpdate child class");
+                }
+                if(std::is_base_of<IFrameUpdate, T>::value)
+                {
+                    throw std::logic_error(name + " is in IFrameUpdate child class");
+                }
+                if(std::is_base_of<ISecondUpdate, T>::value)
+                {
+                    throw std::logic_error(name + " is in ISecondUpdate child class");
+                }
+                if(std::is_base_of<ILastFrameUpdate, T>::value)
+                {
+                    throw std::logic_error(name + " is in ILastFrameUpdate child class");
+                }
+            }
 			auto iter = mTypeInfoMap.find(name);
 			if (iter != mTypeInfoMap.end())
 			{

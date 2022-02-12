@@ -16,7 +16,6 @@ namespace Sentry
                     FirstLayerCount * std::pow(OtherLayerCount, index - 1);
             this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
         }
-
         return true;
     }
 

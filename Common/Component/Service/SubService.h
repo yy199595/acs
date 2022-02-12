@@ -16,7 +16,6 @@ namespace Sentry
     public:
         void GetSubMethods(std::vector<std::string> &methods);
         bool Publish(const std::string & func, const std::string & message);
-        virtual const std::string & GetName() { return this->GetTypeName(); }
     protected:
         template<typename T>
         bool Bind(std::string name, JsonSubFunction<T> func)

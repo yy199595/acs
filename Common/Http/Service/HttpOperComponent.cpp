@@ -28,8 +28,8 @@ namespace Sentry
             if(auto hotfix = dynamic_cast<IHotfix*>(component))
             {
                 hotfix->OnHotFix();
-                response.Add(component->GetTypeName().c_str());
-                LOG_DEBUG("========== {0} hotfix ===========", component->GetTypeName());
+                response.Add(component->GetName().c_str());
+                LOG_DEBUG("========== ", component->GetName(), " hotfix ===========");
             }
         }
         response.EndArray();
@@ -46,8 +46,8 @@ namespace Sentry
             if (auto configModule = dynamic_cast<ILoadConfig *>(component))
             {
                 configModule->OnLoadConfig();
-                response.Add(component->GetTypeName().c_str());
-                LOG_DEBUG("{0} load config", component->GetTypeName());
+                response.Add(component->GetName().c_str());
+                LOG_DEBUG("{0} load config", component->GetName());
             }
         }
         response.EndArray();
