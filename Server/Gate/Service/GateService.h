@@ -19,8 +19,15 @@ namespace Sentry
         XCode Ping();
         XCode Login(const c2s::ProxyLogin_Request & request);
         XCode Allot(const s2s::AddToGate_Request & request, s2s::AddToGate_Response & response);
+
     private:
+        void OnTokenTimeout(const std::string & token);
+    private:
+        class TimerComponent * mTimerComponent;
         class GateClientComponent * mGateComponent;
+        class EntityMgrComponent * mEntityComponent;
+        const class NetworkListener * mGateListener;
+        std::unordered_map<std::string, long long> mTokenMap;
     };
 
 }

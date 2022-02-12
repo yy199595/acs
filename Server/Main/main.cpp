@@ -1,31 +1,32 @@
 ﻿#ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
-#include "Object/App.h"
-#include <Scene/LuaScriptComponent.h>
-#include <Timer/TimerComponent.h>
-#include <Coroutine/TaskComponent.h>
-#include <Listener/TcpServerComponent.h>
-#include "MysqlComponent.h"
-#include <Scene/RpcConfigComponent.h>
-#include "RedisComponent.h"
-#include "MysqlProxyComponent.h"
-#include "Http/Component/HttpClientComponent.h"
+#include"Object/App.h"
+#include<Scene/LuaScriptComponent.h>
+#include<Timer/TimerComponent.h>
+#include<Coroutine/TaskComponent.h>
+#include<Listener/TcpServerComponent.h>
+#include"MysqlComponent.h"
+#include<Scene/RpcConfigComponent.h>
+#include"RedisComponent.h"
+#include"MysqlProxyComponent.h"
+#include"Scene/EntityMgrComponent.h"
+#include"Http/Component/HttpClientComponent.h"
 #include"Service/GateService.h"
-#include <Telnet/ConsoleComponent.h>
+#include<Telnet/ConsoleComponent.h>
 
-#include "Component/Scene/LuaServiceMgrComponent.h"
-#include <Rpc/RpcComponent.h>
-#include "Component/Scene/ServiceMgrComponent.h"
-#include <Scene/ThreadPoolComponent.h>
-#include <Rpc/RpcClientComponent.h>
-#include <Service/AccountService.h>
-#include "Component/Service/LocalService.h"
-#include <Scene/MonitorComponent.h>
-#include "Service/MysqlService.h"
-#include <Service/HttpLoginService.h>
-#include "Http/Service/HttpOperComponent.h"
-#include "Scene/OperatorComponent.h"
+#include"Component/Scene/LuaServiceMgrComponent.h"
+#include<Rpc/RpcComponent.h>
+#include"Component/Scene/ServiceMgrComponent.h"
+#include<Scene/ThreadPoolComponent.h>
+#include<Rpc/RpcClientComponent.h>
+#include<Service/AccountService.h>
+#include"Component/Service/LocalService.h"
+#include<Scene/MonitorComponent.h>
+#include"Service/MysqlService.h"
+#include<Service/HttpLoginService.h>
+#include"Http/Service/HttpOperComponent.h"
+#include"Scene/OperatorComponent.h"
 #include"Scene/LoggerComponent.h"
 #include"Component/GateComponent.h"
 #include"Component/GateClientComponent.h"
@@ -46,6 +47,7 @@ void RegisterComponent()
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
     ComponentFactory::Add<MonitorComponent>("MonitorComponent");
     ComponentFactory::Add<OperatorComponent>("OperatorComponent");
+    ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
     ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
 
 //server
@@ -85,29 +87,11 @@ int main(int argc, char **argv)
 {
     try
     {
-        asio::io_service io;
-        asio::ip::tcp::resolver resolver(io);
-        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
-        asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-        asio::ip::tcp::resolver::iterator end;
-
-        std::set<std::string> address;
-        while(iter != end)
-        {
-            tcp::endpoint ep = *iter++;
-            address.emplace(ep.address().to_string());
-        }
-
-        for(const std::string & add : address)
-        {
-            std::cout << add << std::endl;
-        }
-
         RegisterComponent();
         RegisterServiceComponent();
         const std::string path(argv[1]);
         ServerConfig * serverConfig = new ServerConfig(path);
-        return (new App(serverConfig))->Run(argc, argv);
+        return (std::make_shared<App>(serverConfig))->Run(argc, argv);
     }
     catch(std::logic_error & err)
     {

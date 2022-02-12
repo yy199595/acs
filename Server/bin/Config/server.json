@@ -80,7 +80,8 @@
         "GateClientComponent",
         "HttpClientComponent",
         "ServiceMgrComponent",
-        "MysqlProxyComponent"
+        "MysqlProxyComponent",
+        "EntityMgrComponent"
     ],
     "service": [
         "GateService",

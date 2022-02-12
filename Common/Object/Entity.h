@@ -4,7 +4,7 @@
 namespace Sentry
 {
     class Component;
-    class Entity : public Object
+    class Entity : public Object, public std::enable_shared_from_this<Entity>
     {
     public:
         Entity(long long id);

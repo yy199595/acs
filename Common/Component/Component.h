@@ -45,7 +45,7 @@ namespace Sentry
 			return this->mEntityId;
 		}
 
-		inline Entity * GetEntity()
+		inline std::shared_ptr<Entity> GetEntity()
 		{
 			return this->mEntity;
 		}
@@ -78,8 +78,8 @@ namespace Sentry
 		Component * GetByHash(size_t hash);
 	protected:
 		Type * mType;
-		Entity * mEntity;
         long long mEntityId;
+        std::shared_ptr<Entity> mEntity;
     };
 	template<typename T>
 	inline T * Component::GetComponent()

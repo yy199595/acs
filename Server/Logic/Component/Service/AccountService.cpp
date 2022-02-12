@@ -20,10 +20,10 @@ namespace Sentry
 
     bool AccountService::LateAwake()
     {
-        this->mRedisComponent = this->GetComponent<RedisComponent>();
-        this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
+        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
+        LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
         auto serviceComponent = this->GetComponent<ServiceMgrComponent>();
-        this->mGateService = serviceComponent->GetServiceProxy("GateService");
+        LOG_CHECK_RET_FALSE(this->mGateService = serviceComponent->GetServiceProxy("GateService"));
         return true;
     }
 
@@ -65,8 +65,8 @@ namespace Sentry
         }
         auto responseData = allotResponse->AwaitData<s2s::AddToGate_Response>();
 
-        response.Add("token", newToken);
         response.Add("gate_ip", responseData->gate_ip());
+        response.Add("token", responseData->login_token());
         response.Add("gate_port", responseData->gate_port());
         return XCode::Successful;
     }

@@ -4,11 +4,15 @@
 
 #include"GateService.h"
 #include"Object/App.h"
+#include"Util/MD5.h"
+#include"Util/Guid.h"
 #include"Service/ServiceProxy.h"
 #include"NetWork/RpcGateClient.h"
+#include"Scene/EntityMgrComponent.h"
 #include"Component/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
+
 namespace Sentry
 {
     bool GateService::Awake()
@@ -16,7 +20,16 @@ namespace Sentry
         BIND_RPC_FUNCTION(GateService::Ping);
         BIND_RPC_FUNCTION(GateService::Login);
         BIND_RPC_FUNCTION(GateService::Allot);
-        this->mGateComponent= this->GetComponent<GateClientComponent>();
+        return true;
+    }
+
+    bool GateService::LateAwake()
+    {
+        TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
+        LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateClientComponent>());
+        LOG_CHECK_RET_FALSE(this->mEntityComponent = this->GetComponent<EntityMgrComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateListener = tcpServerComponent->GetListener("gate"));
         return true;
     }
 
@@ -34,26 +47,44 @@ namespace Sentry
 
     XCode GateService::Login(const c2s::ProxyLogin_Request &request)
     {
+        auto iter = this->mTokenMap.find(request.token());
+        LOG_THROW_ERROR(iter != this->mTokenMap.end());
+
+        long long userId = iter->second;
+        long long socketId = this->GetCurSocketId();
+#ifdef __DEBUG__
+        LOG_DEBUG(userId, " player login to gate");
+#endif
+        std::shared_ptr<Entity> player(new Entity(userId, socketId));
+        LOG_THROW_ERROR(this->mEntityComponent->Add(player));
 		return XCode::Successful;
+    }
+
+    void GateService::OnTokenTimeout(const std::string &token)
+    {
+        auto iter = this->mTokenMap.find(token);
+        if(iter != this->mTokenMap.end())
+        {
+            this->mTokenMap.erase(iter);
+        }
     }
 
     XCode GateService::Allot(const s2s::AddToGate_Request &request, s2s::AddToGate_Response &response)
     {
-        TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
-        const NetworkListener * gateListener = tcpServerComponent->GetListener("gate");
-        if(gateListener == nullptr)
+        if(this->mEntityComponent->GetEntityCount() >= 10000)
         {
             return XCode::Failure;
         }
-        const ListenConfig & listenConfig = gateListener->GetConfig();
+        long long value = Helper::Guid::Create();
+        const ListenConfig & listenConfig = this->mGateListener->GetConfig();
+        std::string token = Helper::Md5::GetMd5(std::to_string(value));
 
+        this->mTokenMap.emplace(token, request.user_id());
+        this->mTimerComponent->AsyncWait(5000, &GateService::OnTokenTimeout, this, token);
+
+        response.set_login_token(token);
         response.set_gate_ip(listenConfig.Ip);
         response.set_gate_port(listenConfig.Port);
         return XCode::Successful;
-    }
-
-    bool GateService::LateAwake()
-    {
-        return true;
     }
 }
