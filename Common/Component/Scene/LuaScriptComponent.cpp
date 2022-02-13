@@ -8,7 +8,7 @@
 #include<Util/DirectoryHelper.h>
 #include<Util/FileHelper.h>
 #include<Util/MD5.h>
-#include"Async/LuaTaskSource.h"
+#include"Async/LuaServiceTaskSource.h"
 #include <Service/LuaRpcService.h>
 namespace Sentry
 {
@@ -44,6 +44,16 @@ namespace Sentry
         lua_xmove(this->mLuaEnv, coroutine, 1);
         lua_presume(coroutine, this->mLuaEnv, 0);
         return true;
+    }
+
+    void LuaScriptComponent::OnStart()
+    {
+        if(lua_getfunction(this->mLuaEnv, "Main", "Start"))
+        {
+            int ref = lua_ref(this->mLuaEnv);
+            this->Invoke(ref)->Await();
+            lua_unref(this->mLuaEnv, ref);
+        }
     }
 
 	bool LuaScriptComponent::LoadAllFile()
@@ -135,11 +145,11 @@ namespace Sentry
         if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
         {
             lua_pcall(mLuaEnv, 0, 1, errfunc);
-            //LOG_DEBUG("load lua script success path :" << filePath);
             lua_pop(mLuaEnv, 2);
+            LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
             return true;
         }
-        LOG_ERROR("load", filePath, "failure : ", lua_tostring(mLuaEnv, -1));
+        LOG_ERROR("load ", filePath, " failure : ", lua_tostring(mLuaEnv, -1));
         lua_pop(mLuaEnv, 1);
         return false;
     }
@@ -181,9 +191,14 @@ namespace Sentry
 
     void LuaScriptComponent::PushClassToLua()
     {
-        ClassProxyHelper::BeginRegister<LuaTaskSource>(this->mLuaEnv, "LuaTaskSource");
-        ClassProxyHelper::PushCtor<LuaTaskSource>(this->mLuaEnv);
-        ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaTaskSource::SetResult);
+        ClassProxyHelper::BeginRegister<LuaServiceTaskSource>(this->mLuaEnv, "LuaServiceTaskSource");
+        ClassProxyHelper::PushCtor<LuaServiceTaskSource>(this->mLuaEnv);
+        ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaServiceTaskSource::SetResult);
+
+
+        ClassProxyHelper::BeginRegister<TaskSource<void>>(this->mLuaEnv, "TaskSource");
+        ClassProxyHelper::PushCtor<TaskSource<void>>(this->mLuaEnv);
+        ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &TaskSource<void>::SetResult);
 
         ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
 
@@ -226,7 +241,24 @@ namespace Sentry
         lua_getglobal(this->mLuaEnv, "coroutine");
         lua_pushtablefunction(this->mLuaEnv, "sleep", CoroutineExtension::Sleep);
         lua_pushtablefunction(this->mLuaEnv, "start", CoroutineExtension::Start);
+    }
 
-
+    TaskSource<void> * LuaScriptComponent::Invoke(int ref)
+    {
+        if(!lua_getfunction(this->mLuaEnv,"coroutine", "call"))
+        {
+            return nullptr;
+        }
+        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+        if(!lua_isfunction(this->mLuaEnv, -1))
+        {
+            return nullptr;
+        }
+       if(lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
+       {
+           LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+           return nullptr;
+       }
+        return PtrProxy<TaskSource<void>>::Read(this->mLuaEnv, -1);
     }
 }

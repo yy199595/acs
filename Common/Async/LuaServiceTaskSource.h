@@ -5,13 +5,14 @@
 #ifndef GAMEKEEPER_LUATASKSOURCE_H
 #define GAMEKEEPER_LUATASKSOURCE_H
 #include"TaskSource.h"
+
 namespace Sentry
 {
-    class LuaTaskSource
+    class LuaServiceTaskSource
     {
     public:
-        LuaTaskSource();
-        ~LuaTaskSource() = default;
+        LuaServiceTaskSource();
+        ~LuaServiceTaskSource() = default;
     public:
         void SetResult(int code, std::string & json);
     public:

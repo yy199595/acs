@@ -31,7 +31,6 @@ private:
     int ref;
     lua_State * mLuaEnv;
     std::string mTableName;
-    std::unordered_map<std::string, int> mTypeInfoMap;
 };
 
 template<typename T>

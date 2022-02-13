@@ -1,12 +1,13 @@
 #pragma once
 
+#include"Async/TaskSource.h"
 #include<Component/Component.h>
 #include<Script/ClassProxyHelper.h>
 #include<Script/LuaTable.h>
 
 namespace Sentry
 {
-    class LuaScriptComponent : public Component
+    class LuaScriptComponent : public Component, public IStart
     {
     public:
         LuaScriptComponent() = default;
@@ -14,6 +15,8 @@ namespace Sentry
 		virtual ~LuaScriptComponent() = default;
 
     public:
+        TaskSource<void> * Invoke(int ref);
+
         struct lua_State *GetLuaEnv() { return this->mLuaEnv; }
 
     public:
@@ -27,6 +30,7 @@ namespace Sentry
         bool GetLuaFunction(const std::string & tab, const std::string & func);
     protected:
         bool Awake() final;
+        void OnStart() final;
         bool LateAwake() final;
         void OnDestory() final;
 

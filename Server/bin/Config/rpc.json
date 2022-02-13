@@ -1,7 +1,7 @@
 {
     "MysqlService": {
         "Add": {
-            "Id":121,
+            "Id":101,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
@@ -9,7 +9,7 @@
             "Response":"s2s.MysqlResponse"
         },
         "Save": {
-            "Id":122,
+            "Id":102,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
@@ -17,7 +17,7 @@
             "Response":"s2s.MysqlResponse"
         },
         "Delete": {
-            "Id":123,
+            "Id":103,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
@@ -25,7 +25,7 @@
             "Response":"s2s.MysqlResponse"
         },
         "Query": {
-            "Id":124,
+            "Id":104,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
@@ -33,7 +33,7 @@
             "Response":"s2s.MysqlResponse"
         },
         "Invoke":{
-            "Id":215,
+            "Id":105,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
@@ -43,22 +43,31 @@
     },
     "GateService": {
         "Ping": {
-            "Id": 410,
+            "Id": 201,
             "Async": false,
             "Type":"Client"
         },
         "Login": {
-            "Id": 411,
+            "Id": 202,
             "Async": false,
             "Type":"Client",
             "Request": "c2s.ProxyLogin.Request"
         },
         "Allot": {
-            "Id": 412,
+            "Id": 203,
             "Async": false,
             "Type": "Server",
             "Request": "s2s.AddToGate.Request",
             "Response": "s2s.AddToGate.Response"
         }
+    },
+    "ChatService": {
+      "Chat": {
+            "Id": 301,
+          "Async": false,
+          "Type": "Client",
+          "Request": "c2s.Chat.Request",
+          "Response": "c2s.Chat.Response"
+      }
     }
 }

@@ -1,11 +1,13 @@
 Main = {}
 function Main.Awake()
-   
+   return true
 end
 
 function Main.Start()
     
-    GameKeeper.Debug("+++++",coroutine.running())
+    Log.Debug("+++++",coroutine.running())
+
+    Sentry.Sleep(1500)
     
     -- local registerInfo = {}
     -- registerInfo.AreaId = 0

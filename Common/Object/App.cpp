@@ -2,7 +2,9 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
+#include"Service/LuaRpcService.h"
 #include"Scene/ServiceMgrComponent.h"
+#include"Scene/LuaScriptComponent.h"
 #ifdef __DEBUG__
 #include"Telnet/ConsoleComponent.h"
 #endif
@@ -67,13 +69,24 @@ namespace Sentry
 
         for (const std::string &name: components)
         {
-            if (!this->AddComponent(name)) {
+            if (!this->AddComponentByName(name)) {
                 LOG_FATAL("add ", name, " failure");
                 return false;
             }
             //LOG_DEBUG("add new component : " << name);
         }
         return true;
+    }
+
+    bool App::AddComponentByName(const std::string &name)
+    {
+        Component * component = ComponentFactory::CreateComponent(name);
+        if(component != nullptr)
+        {
+            return this->AddComponent(name, component);
+        }
+        LuaRpcService * luaRpcService = new LuaRpcService();
+        return this->AddComponent(name, luaRpcService);
     }
 
 	bool App::InitComponent()
@@ -107,7 +120,7 @@ namespace Sentry
 
 	bool App::InitComponent(Component * component)
     {
-        LOG_CHECK_RET_FALSE(component->LateAwake());
+        if(!component->LateAwake()) return false;
         auto manager1 = dynamic_cast<IFrameUpdate *>(component);
         auto manager2 = dynamic_cast<ISystemUpdate *>(component);
         auto manager3 = dynamic_cast<ISecondUpdate *>(component);
@@ -122,17 +135,12 @@ namespace Sentry
 
 	void App::StartComponent(Component * component)
     {
-        auto startComponent = dynamic_cast<IStart *>(component);
-        if (startComponent != nullptr) {
-            LOG_DEBUG("start component ", component->GetName());
-            startComponent->OnStart();
-        }
-
         ElapsedTimer elapsedTimer;
-        if (auto loadComponent = dynamic_cast<ILoadData *>(component)) {
-            loadComponent->OnLoadData();
-            LOG_DEBUG("load ", component->GetName(), "data use time = ", elapsedTimer.GetMs(), "ms");
-        }
+        auto startComponent = dynamic_cast<IStart *>(component);
+        auto loadComponent = dynamic_cast<ILoadData *>(component);
+        if (startComponent != nullptr) startComponent->OnStart();
+        if (loadComponent != nullptr) loadComponent->OnLoadData();
+        LOG_DEBUG("start ", component->GetName(), " use time = ", elapsedTimer.GetMs(), "ms");
     }
 
 	int App::Run(int argc, char ** argv)

@@ -2,15 +2,16 @@
 // Created by zmhy0073 on 2022/1/8.
 //
 
-#include"LuaTaskSource.h"
+#include"LuaServiceTaskSource.h"
 #include"Pool/MessagePool.h"
+
 namespace Sentry
 {
-    LuaTaskSource::LuaTaskSource()
+    LuaServiceTaskSource::LuaServiceTaskSource()
     {
         this->mCode = XCode::LuaCoroutineWait;
     }
-    XCode LuaTaskSource::Await()
+    XCode LuaServiceTaskSource::Await()
     {
         if(this->mCode == XCode::LuaCoroutineWait) {
             return this->mTaskSource.Await();
@@ -18,7 +19,7 @@ namespace Sentry
         return this->mCode;
     }
 
-    void LuaTaskSource::SetResult(int result, std::string & json)
+    void LuaServiceTaskSource::SetResult(int result, std::string & json)
     {
         this->mCode = (XCode) result;
         this->mJson = std::move(json);

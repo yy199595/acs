@@ -41,7 +41,7 @@ function Service.CallAsync(func, id, json)
         end
         return luaTaskSource:SetResult(error, StringUtil.Empty)
     end
-    local taskSource = LuaTaskSource.New();
+    local taskSource = LuaServiceTaskSource.New();
     coroutine.start(context, taskSource)
     return taskSource;
 end

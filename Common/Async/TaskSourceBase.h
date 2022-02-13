@@ -37,7 +37,6 @@ namespace Sentry
         unsigned int mCorId;
         long long mCreateTime;
         TaskComponent * mTaskComponent;
-        MainTaskScheduler & mTaskScheduler;
     };
 }
 

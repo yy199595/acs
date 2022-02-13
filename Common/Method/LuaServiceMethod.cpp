@@ -5,7 +5,7 @@
 #include"Scene/LuaScriptComponent.h"
 #include"Pool/MessagePool.h"
 #include"Scene/RpcConfigComponent.h"
-#include"Async/LuaTaskSource.h"
+#include"Async/LuaServiceTaskSource.h"
 namespace Sentry
 {
 
@@ -54,7 +54,7 @@ namespace Sentry
             LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
             return make_tuple(XCode::CallLuaFunctionFail, nullptr);
         }
-        LuaTaskSource * luaTaskSource = PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
+        LuaServiceTaskSource * luaTaskSource = PtrProxy<LuaServiceTaskSource>::Read(this->mLuaEnv, -1);
         if(luaTaskSource == nullptr)
         {
             return make_tuple(XCode::CallLuaFunctionFail, nullptr);

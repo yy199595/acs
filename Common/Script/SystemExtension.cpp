@@ -59,11 +59,11 @@ int SystemExtension::Sleep(lua_State *luaEnv)
 {
     long long ms = lua_tointeger(luaEnv, 1);
     lua_pushthread(luaEnv);
-    auto *pTimerManager = App::Get().GetComponent<TimerComponent>();
-    if (pTimerManager != nullptr)
+    auto *timerComponent = App::Get().GetComponent<TimerComponent>();
+    if (timerComponent != nullptr)
     {
         auto timer = LuaSleepTimer::Create(luaEnv, -1, ms);
-        //TODO pTimerManager->AsyncWait(pTimer);
+        timerComponent->AddTimer(timer);
     }
     return lua_yield(luaEnv, 1);
 }
@@ -84,7 +84,8 @@ int SystemExtension::AddTimer(lua_State *lua)
     {
         count = lua_tointeger(lua, 3);
     }
-    auto timerComponent = App::Get().GetComponent<TimerComponent>();
+    App & app = App::Get();
+    auto timerComponent = app.GetComponent<TimerComponent>();
     if (timerComponent != nullptr)
     {
         lua_pushvalue(lua, 1);

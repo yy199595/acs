@@ -41,8 +41,14 @@ namespace Sentry
         std::shared_ptr<LuaFunction> awakeFunction = luaTable.GetFunction("Awake");
         std::shared_ptr<LuaFunction> lateAwakeFunction = luaTable.GetFunction("LateAwake");
 
-        LOG_CHECK_RET_FALSE(awakeFunction != nullptr && !awakeFunction->Func<bool>());
-        LOG_CHECK_RET_FALSE(lateAwakeFunction != nullptr && !lateAwakeFunction->Func<bool>());
+        if(awakeFunction != nullptr)
+        {
+            LOG_CHECK_RET_FALSE(awakeFunction->Func<bool>());
+        }
+        if(lateAwakeFunction != nullptr)
+        {
+            LOG_CHECK_RET_FALSE(lateAwakeFunction->Func<bool>());
+        }
 
         std::vector<std::string> methods;
         this->mConfigComponent->GetMethods(this->GetName(), methods);
@@ -65,13 +71,13 @@ namespace Sentry
     {
         lua_getglobal(this->mLuaEnv, this->GetName().c_str());
         lua_getfield(this->mLuaEnv, -1, "OnStart");
-        if (lua_isfunction(this->mLuaEnv, -1))
+        if (!lua_isfunction(this->mLuaEnv, -1))
         {
             return;
         }
-        lua_State *coroutine = lua_newthread(this->mLuaEnv);
-        lua_pushvalue(this->mLuaEnv, -2);
-        lua_xmove(this->mLuaEnv, coroutine, 1);
-        lua_resume(coroutine, this->mLuaEnv, 0);
+        int ref = lua_ref(this->mLuaEnv);
+        this->mLuaComponent->Invoke(ref)->Await();
+        luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+        LOG_WARN("Invoke ", this->GetName(), " Start Coroutine")
     }
 }

@@ -39,6 +39,7 @@ namespace Sentry
 	public:
         static App &Get() { return *mApp; }
         bool StartNewService(const std::string & name);
+        bool AddComponentByName(const std::string & name);
         const ServerConfig &GetConfig() {return *mConfig; }
 		inline MainTaskScheduler & GetTaskScheduler() { return this->mTaskScheduler; }
 		inline bool IsMainThread() { return std::this_thread::get_id() == this->mMainThreadId; }

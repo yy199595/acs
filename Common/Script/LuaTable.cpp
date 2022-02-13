@@ -6,17 +6,7 @@ using namespace google::protobuf::util;
 LuaTable::LuaTable(lua_State *luaEnv, int ref, const std::string & name)
     : ref(ref), mLuaEnv(luaEnv), mTableName(name)
     {
-        lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
-        luaL_checktype(this->mLuaEnv, -1, LUA_TTABLE);
-        lua_pushnil(this->mLuaEnv);
 
-        while(lua_next(this->mLuaEnv, -1))
-        {
-            lua_pushvalue(this->mLuaEnv, -2);
-            const char * key = lua_tostring(this->mLuaEnv, -1);
-            this->mTypeInfoMap.emplace(std::string(key), lua_type(this->mLuaEnv, -2));
-            lua_pop(this->mLuaEnv, 1);
-        }
     }
 
 LuaTable::~LuaTable()
@@ -26,34 +16,24 @@ LuaTable::~LuaTable()
 
 std::shared_ptr<LuaFunction> LuaTable::GetFunction(const std::string &name)
 {
-    auto iter = this->mTypeInfoMap.find(name);
-    if (iter == this->mTypeInfoMap.end())
-    {
-        return nullptr;
-    }
-    if (iter->second != LUA_TFUNCTION)
-    {
-        return nullptr;
-    }
     lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
     lua_getfield(this->mLuaEnv, -1, name.c_str());
+    if(!lua_isfunction(this->mLuaEnv, -1))
+    {
+        return nullptr;
+    }
     int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
     return std::make_shared<LuaFunction>(this->mLuaEnv, ref);
 }
 
 std::shared_ptr<LuaTable> LuaTable::GetTable(const std::string &name)
 {
-    auto iter = this->mTypeInfoMap.find(name);
-    if(iter == this->mTypeInfoMap.end())
-    {
-        return nullptr;
-    }
-    if(iter->second != LUA_TTABLE)
-    {
-        return nullptr;
-    }
     lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
     lua_getfield(this->mLuaEnv, -1, name.c_str());
+    if(!lua_istable(this->mLuaEnv, -1))
+    {
+        return nullptr;
+    }
     return std::make_shared<LuaTable>(this->mLuaEnv, -1, name);
 }
 

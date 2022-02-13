@@ -162,25 +162,29 @@ namespace LuaAPIExtension
 
     int DebugLog(lua_State *luaEnv)
     {
-        LOG_DEBUG(GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get().GetLogger();
+        loggerComponent->AddLog(ELogType::debug, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugInfo(lua_State *luaEnv)
     {
-        LOG_INFO(GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get().GetLogger();
+        loggerComponent->AddLog(ELogType::info, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugError(lua_State *luaEnv)
     {
-        LOG_ERROR(GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get().GetLogger();
+        loggerComponent->AddLog(ELogType::err, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugWarning(lua_State *luaEnv)
     {
-        LOG_WARN(GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get().GetLogger();
+        loggerComponent->AddLog(ELogType::warn, GetLuaString(luaEnv));
         return 0;
     }
 }// namespace LuaAPIExtension

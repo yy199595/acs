@@ -85,6 +85,7 @@
     ],
     "service": [
         "GateService",
+        "ChatService",
         "LocalService",
         "MysqlService",
         "AccountService",

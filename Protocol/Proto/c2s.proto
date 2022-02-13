@@ -80,3 +80,18 @@ message GateLogout
 
     }
 }
+message Chat
+{
+    message Request
+    {
+
+    }
+    message Response
+    {
+
+    }
+    message Notice
+    {
+
+    }
+}

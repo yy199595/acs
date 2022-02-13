@@ -6,7 +6,6 @@
 namespace Sentry
 {
     TaskSourceBase::TaskSourceBase()
-            : mTaskScheduler(App::Get().GetTaskScheduler())
     {
         this->mCorId = 0;
         this->mState = TaskState::TaskReady;
@@ -17,11 +16,15 @@ namespace Sentry
 
     bool TaskSourceBase::ResumeTask(TaskState state)
     {
-        if (this->mState == TaskState::TaskAwait)
+        switch(this->mState)
         {
-            this->mState = state;
-            this->mTaskComponent->Resume(this->mCorId);
-            return true;
+            case TaskState::TaskReady:
+                this->mState = state;
+                return true;
+            case TaskState::TaskAwait:
+                this->mState = state;
+                this->mTaskComponent->Resume(this->mCorId);
+                return true;
         }
         return false;
     }
