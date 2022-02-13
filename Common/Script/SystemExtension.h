@@ -4,8 +4,6 @@
 
 namespace SystemExtension
 {
-    extern int Call(lua_State *luaEnv);
-
     extern int AddTimer(lua_State *lua);
 
     extern int RemoveTimer(lua_State *lua);
@@ -13,6 +11,10 @@ namespace SystemExtension
     extern int Sleep(lua_State *luaEnv);
 
     extern int GetApp(lua_State *luaEnv);
+
+    extern int Call(lua_State * luaEnv);
+
+    extern int Allot(lua_State * luaEnv);
 
     extern int GetManager(lua_State *luaEnv);
 

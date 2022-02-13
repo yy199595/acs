@@ -5,12 +5,22 @@
 #include <Timer/TimerComponent.h>
 #include "Component/Scene/ServiceMgrComponent.h"
 #include <Scene/LuaScriptComponent.h>
-
-#include <Service/ServiceProxy.h>
+#include"Service/ServiceProxy.h"
 using namespace Sentry;
 
 int SystemExtension::Call(lua_State *lua)
 {
+
+    return 0;
+}
+
+int SystemExtension::Allot(lua_State *luaEnv)
+{
+    App & app = App::Get();
+    luaL_checkstring(luaEnv, -1);
+    ServiceMgrComponent * serviceMgrComponent = app.GetComponent<ServiceMgrComponent>();
+    auto serviceProxy = serviceMgrComponent->GetServiceProxy(lua_tostring(luaEnv, -1));
+
 
     return 0;
 }
