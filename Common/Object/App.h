@@ -12,19 +12,6 @@
 using namespace std;
 using namespace asio::ip;
 
-
-namespace Sentry
-{
-	enum ExitCode
-	{
-		Exit,
-		AddError,
-		InitError,
-		StartError,
-		ConfigError
-	};
-}
-
 namespace Sentry
 {
 	class Manager;
@@ -51,12 +38,12 @@ namespace Sentry
         inline TimerComponent * GetTimerComponent() { return this->mTimerComponent; }
 	private:
 		bool InitComponent();
-        bool AddComponentFormConfig();
+        bool LoadComponent();
 		bool InitComponent(Component * component);
         void StartComponent(Component * component);
 	public:
-		void Stop(ExitCode code);
-		int Run(int argc, char ** argv);
+		int Run();
+		void Stop();
 	private:
 		void LogicMainLoop();
         void UpdateConsoleTitle();

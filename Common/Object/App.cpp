@@ -44,7 +44,7 @@ namespace Sentry
         return true;
     }
 
-	bool App::AddComponentFormConfig()
+	bool App::LoadComponent()
     {
         this->AddComponent<LoggerComponent>();
         this->mLogComponent = this->GetComponent<LoggerComponent>();
@@ -143,19 +143,13 @@ namespace Sentry
         LOG_DEBUG("start ", component->GetName(), " use time = ", elapsedTimer.GetMs(), "ms");
     }
 
-	int App::Run(int argc, char ** argv)
+	int App::Run()
 	{
+        IF_THROW_ERROR(this->mConfig->LoadConfig());
+        this->mServerName = this->mConfig->GetNodeName();
         App::mApp = dynamic_pointer_cast<App>(this->shared_from_this());
-        this->mConfig->GetValue("node_name", this->mServerName);
-		if (!this->AddComponentFormConfig())
-		{
-			return ExitCode::AddError;
-		}
-
-		if (!this->InitComponent())
-		{
-			return ExitCode::InitError;
-		}
+        IF_THROW_ERROR(this->LoadComponent());
+        IF_THROW_ERROR(this->InitComponent());
 
         this->mFps = 15;
 		mConfig->GetValue("fps", this->mFps);
@@ -167,17 +161,17 @@ namespace Sentry
 		return this->mTaskScheduler.Start();
 	}
 
-	void App::Stop(ExitCode code)
+	void App::Stop()
 	{
         if(this->mTaskComponent != nullptr)
         {
             std::shared_ptr<ElapsedTimer> timer(new ElapsedTimer());
-            this->mTaskComponent->Start([this, code, timer]()
+            this->mTaskComponent->Start([this, timer]()
             {
                 this->OnDestory();
                 this->mTaskScheduler.Stop();
                 LOG_WARN("close server successful [", timer->GetMs(), "ms]");
-                exit((int) code);
+                exit(-1);
             });
         }
 	}

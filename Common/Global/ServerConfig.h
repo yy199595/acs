@@ -1,17 +1,21 @@
 #pragma once
 
-#include <set>
-#include <vector>
-#include <unordered_map>
-#include <rapidjson/document.h>
-#include <Define/CommonTypeDef.h>
+#include<set>
+#include<vector>
+#include<unordered_map>
+#include"Util/JsonHelper.h"
+#include<Define/CommonTypeDef.h>
 
 namespace Sentry
 {
-    class ServerConfig
+    class ServerConfig : public RapidJsonReader
     {
     public:
         explicit ServerConfig(std::string  path);
+    public:
+        bool LoadConfig();
+        int GetNodeId() { return this->mNodeId; }
+        const std::string& GetNodeName() { return this->mNodeName; }
     public:
         bool HasValue(const std::string & k2) const;
 
@@ -41,9 +45,9 @@ namespace Sentry
 		rapidjson::Value *GetJsonValue(const std::string & k1) const;
 		rapidjson::Value *GetJsonValue(const std::string & k1, const std::string & k2) const;
 
-    private:
-        bool InitConfig();
     private:   
+        int mNodeId;
+        std::string mNodeName;
         const std::string mConfigPath;
         rapidjson::Document mConfigDocument;
         std::unordered_map<std::string, rapidjson::Document> mConfigMap;

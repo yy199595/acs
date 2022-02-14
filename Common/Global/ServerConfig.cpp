@@ -8,28 +8,32 @@ namespace Sentry
     ServerConfig::ServerConfig(std::string  path)
             : mConfigPath(std::move(path))
     {
+        this->mNodeId = 0;
+    }
+
+    bool ServerConfig::LoadConfig()
+    {
         std::string outString;
         if (!Helper::File::ReadTxtFile(this->mConfigPath, outString))
         {
             throw std::logic_error("not find config : " + mConfigPath);
+            return false;
         }
         mConfigDocument.Parse(outString.c_str(), outString.size());
         if (this->mConfigDocument.HasParseError())
         {
             throw std::logic_error("parse json : " + mConfigPath + " failure");
+            return false;
         }
-        this->InitConfig();
-    }
-
-    bool ServerConfig::InitConfig()
-    {
         auto iter = this->mConfigDocument.MemberBegin();
         for (; iter != this->mConfigDocument.MemberEnd(); iter++)
         {
             const std::string key = iter->name.GetString();
-            rapidjson::Value *value = &iter->value;
+            rapidjson::Value* value = &iter->value;
             this->mMapConfigData.emplace(key, value);
         }
+        IF_THROW_ERROR(this->GetValue("area_id", this->mNodeId));
+        IF_THROW_ERROR(this->GetValue("node_name", this->mNodeName));
         return true;
     }
 

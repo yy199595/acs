@@ -105,6 +105,13 @@ inline std::string FormatFileLine(const char * file, const int line)
         }    \
 }
 
+#define IF_THROW_ERROR(obj){ \
+    if(!(obj))                \
+    {              \
+        throw std::logic_error(#obj);\
+        }    \
+}
+
 #define TryInvoke(obj, content){ \
         if(obj)                  \
         {                        \

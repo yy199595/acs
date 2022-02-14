@@ -90,8 +90,7 @@ int main(int argc, char **argv)
         RegisterComponent();
         RegisterServiceComponent();
         const std::string path(argv[1]);
-        ServerConfig * serverConfig = new ServerConfig(path);
-        return (std::make_shared<App>(serverConfig))->Run(argc, argv);
+        return (std::make_shared<App>(new ServerConfig(path)))->Run();
     }
     catch(std::logic_error & err)
     {
