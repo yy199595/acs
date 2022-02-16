@@ -51,12 +51,11 @@ namespace Client
 
 	void ClientComponent::OnStart()
 	{
-        std::string loginUrl;
-        std::string registerUrl;
+        string host;
         const ServerConfig & config = App::Get().GetConfig();
-        config.GetValue("account", "login", loginUrl);
-        config.GetValue("account", "register", registerUrl);
-
+        config.GetValue("http", "account", host);
+        std::string loginUrl = host + "/logic/account/login";
+        std::string registerUrl = host + "/logic/account/register";
 
         RapidJsonWriter jsonWriter;
         jsonWriter.Add("password", "199595yjz.");

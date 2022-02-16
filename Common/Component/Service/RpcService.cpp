@@ -11,10 +11,7 @@ namespace Sentry
 	bool RpcService::AddMethod(std::shared_ptr<ServiceMethod> method)
     {
         auto *rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
-        if (rpcConfigComponent == nullptr)
-        {
-            return false;
-        }
+        LOG_CHECK_RET_FALSE(rpcConfigComponent);
         const std::string &name = method->GetName();
         const std::string &service = this->GetName();
         if (!rpcConfigComponent->HasServiceMethod(service, name))

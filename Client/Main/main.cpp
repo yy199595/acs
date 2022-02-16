@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
     {
         const std::string path(argv[1]);
         ServerConfig * serverConfig = new ServerConfig(path);
-        return (new App(serverConfig))->Run(argc, argv);
+        return std::make_shared<App>(serverConfig)->Run();
     }
     catch(std::logic_error & err)
     {

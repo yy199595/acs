@@ -68,6 +68,7 @@
     ],
     "component": [
         "RpcComponent",
+        "ConsoleComponent",
         "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",

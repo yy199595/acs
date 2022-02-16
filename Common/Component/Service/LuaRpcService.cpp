@@ -32,14 +32,14 @@ namespace Sentry
         this->mConfigComponent = this->GetComponent<RpcConfigComponent>();
         LOG_CHECK_RET_FALSE(this->mLuaComponent && this->mConfigComponent);
         LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
-
-        lua_getglobal(this->mLuaEnv, this->GetName().c_str());
-        LOG_CHECK_RET_FALSE(lua_istable(this->mLuaEnv, -1));
-
-        int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-        LuaTable luaTable(this->mLuaEnv, ref, this->GetName());
-        std::shared_ptr<LuaFunction> awakeFunction = luaTable.GetFunction("Awake");
-        std::shared_ptr<LuaFunction> lateAwakeFunction = luaTable.GetFunction("LateAwake");
+        std::shared_ptr<LuaTable> luaTable = LuaTable::Create(this->mLuaEnv, this->GetName());
+        if(luaTable == nullptr)
+        {
+            LOG_ERROR(this->GetName(), " is not lua table");
+            return false;
+        }
+        std::shared_ptr<LuaFunction> awakeFunction = luaTable->GetFunction("Awake");
+        std::shared_ptr<LuaFunction> lateAwakeFunction = luaTable->GetFunction("LateAwake");
 
         if(awakeFunction != nullptr)
         {
@@ -55,6 +55,7 @@ namespace Sentry
 
         for(const std::string & method : methods)
         {
+            int ref = luaTable->GetRef();
             lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
             lua_getfield(this->mLuaEnv, -1, method.c_str());
             LOG_CHECK_RET_FALSE(lua_isfunction(this->mLuaEnv, -1));

@@ -19,6 +19,7 @@ public:
     T GetMemberVariable(const char *name);
 
 public:
+    int GetRef() { return this->ref;}
     std::shared_ptr<LuaTable> GetTable(const std::string & name);
     std::shared_ptr<LuaFunction> GetFunction(const std::string & name);
 

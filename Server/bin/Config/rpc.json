@@ -63,7 +63,7 @@
     },
     "ChatService": {
       "Chat": {
-            "Id": 301,
+          "Id": 301,
           "Async": false,
           "Type": "Client",
           "Request": "c2s.Chat.Request",

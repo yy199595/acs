@@ -146,7 +146,7 @@ namespace Sentry
         {
             lua_pcall(mLuaEnv, 0, 1, errfunc);
             lua_pop(mLuaEnv, 2);
-            LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
+            //LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
             return true;
         }
         LOG_ERROR("load ", filePath, " failure : ", lua_tostring(mLuaEnv, -1));

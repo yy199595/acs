@@ -1,4 +1,5 @@
 {
+    "area_id": 0,
     "node_name": "Client",
     "fps": 30,
     "log":
@@ -10,10 +11,9 @@
     {
         "network":1
     },
-    "account":
+    "http":
     {
-        "login": "http://127.0.0.1:80/logic/account/login",
-        "register": "http://127.0.0.1:80/logic/account/register"
+        "account": "http://10.10.8.137:80"
     },
     "IsOpenRecoder": true,
     "ScriptPath":"./Script/",

@@ -52,25 +52,16 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-#ifdef __DEBUG__
-        this->AddComponent<ConsoleComponent>();
-#endif
 
         std::vector<std::string> components;
-        if (!mConfig->GetValue("component", components)) {
-            LOG_ERROR("not find field : component");
-            return false;
-        }
-
-        if (!mConfig->GetValue("service", components)) {
-            LOG_ERROR("not find field : Service");
-            return false;
-        }
+        IF_THROW_ERROR(this->mConfig->GetValue("component", components));
+        IF_THROW_ERROR(this->mConfig->GetValue("service", components));
 
         for (const std::string &name: components)
         {
-            if (!this->AddComponentByName(name)) {
-                LOG_FATAL("add ", name, " failure");
+            if (!this->AddComponentByName(name))
+            {
+                throw std::logic_error("add " + name + " failure");
                 return false;
             }
             //LOG_DEBUG("add new component : " << name);
