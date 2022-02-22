@@ -88,6 +88,12 @@ namespace Sentry
         this->mCorComponent->Start(&HttpClientComponent::HandlerHttpData, this, handlerClient);
     }
 
+    HttpConfig *HttpClientComponent::GetHttpConfig(const std::string &url)
+    {
+        auto iter = this->mHttpConfigMap.find(url);
+        return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
+    }
+
     void HttpClientComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->ReadHandlerContent();
@@ -103,14 +109,21 @@ namespace Sentry
         }
 #endif
         const std::string &url = httpRequestData->GetUrl();
-        const std::string &type = httpRequestData->GetMethod();
-        auto iter = this->mHttpConfigMap.find(url);
-        if (iter == this->mHttpConfigMap.end())
+        HttpConfig * httpConfig = this->GetHttpConfig(url);
+        if(httpConfig == nullptr)
         {
             RapidJsonWriter jsonWriter;
             jsonWriter.Add("code", (int) XCode::CallServiceNotFound);
             jsonWriter.Add("error", fmt::format("not find url : [{0}]", url));
-            httpClient->Response(HttpStatus::OK, jsonWriter);
+            httpClient->Response(HttpStatus::NOT_FOUND, jsonWriter);
+            return;
+        }
+
+        if(httpConfig->mType != httpRequestData->GetMethod())
+        {
+            RapidJsonWriter jsonWriter;
+            jsonWriter.Add("code", (int)XCode::HttpMethodNotFound);
+            httpClient->Response(HttpStatus::METHOD_NOT_ALLOWED, jsonWriter);
             return;
         }
         std::shared_ptr<RapidJsonReader> jsonReader = httpRequestData->ToJsonReader();
@@ -123,7 +136,6 @@ namespace Sentry
             return;
         }
 
-        HttpConfig *httpConfig = iter->second;
         HttpService *httpService = this->GetComponent<HttpService>(httpConfig->mComponent);
         if (httpService == nullptr)
         {

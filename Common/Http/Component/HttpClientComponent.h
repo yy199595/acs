@@ -40,6 +40,7 @@ namespace Sentry
 
     private:
         void Invoke(HttpRespSession *remoteRequest);
+        HttpConfig * GetHttpConfig(const std::string & url);
         void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
         class TaskComponent *mCorComponent;

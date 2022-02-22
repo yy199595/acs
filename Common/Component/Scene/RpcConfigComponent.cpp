@@ -70,7 +70,7 @@ namespace Sentry
                     protocolConfig.Request = jsonValue.GetString();
                     if(Helper::Proto::New(protocolConfig.Request) == nullptr)
                     {
-                        LOG_FATAL("create", protocolConfig.Request,"failure");
+                        LOG_FATAL("create ", protocolConfig.Request,"failure");
                         return false;
                     }
                 }

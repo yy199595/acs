@@ -51,7 +51,7 @@
             "Id": 202,
             "Async": false,
             "Type":"Client",
-            "Request": "c2s.ProxyLogin.Request"
+            "Request": "c2s.GateLogin.Request"
         },
         "Allot": {
             "Id": 203,
@@ -66,8 +66,7 @@
           "Id": 301,
           "Async": false,
           "Type": "Client",
-          "Request": "c2s.Chat.Request",
-          "Response": "c2s.Chat.Response"
+          "Request": "c2s.Chat.Request"
       }
     }
 }

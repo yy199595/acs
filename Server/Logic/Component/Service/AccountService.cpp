@@ -41,7 +41,7 @@ namespace Sentry
             return taskSource->GetCode();
         }
         auto userData = taskSource->GetData<db::db_account::tab_user_account>();
-        if(userData->password() != password)
+        if(userData == nullptr || userData->password() != password)
         {
             return XCode::Failure;
         }

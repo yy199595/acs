@@ -211,7 +211,11 @@ namespace Sentry
                     auto iter = this->mHeadMap.find("Content-Length");
                     if (iter == this->mHeadMap.end())
                     {
-                        return HttpStatus::LENGTH_REQUIRED;
+                        iter = this->mHeadMap.find("content-length");
+                        if(iter == this->mHeadMap.end())
+                        {
+                            return HttpStatus::LENGTH_REQUIRED;
+                        }
                     }
                     const std::string &str = iter->second;
                     this->mContentLength = std::stol(str);
