@@ -57,7 +57,7 @@ namespace Sentry
         return XCode::Failure;
     }
 
-    XCode GateService::Login(const c2s::ProxyLogin_Request &request)
+    XCode GateService::Login(const c2s::GateLogin::Request &request)
     {
         auto iter = this->mTokenMap.find(request.token());
         LOG_THROW_ERROR(iter != this->mTokenMap.end());

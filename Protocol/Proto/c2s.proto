@@ -61,35 +61,34 @@ message AccountRegister
     }
 }
 
-message ProxyLogin
+message GateLogin
 {
     message Request
     {
-        string Token = 1;
-    }
-}
-
-message GateLogout
-{
-    message Request
-    {
-
+        string token = 1;
     }
     message Response
     {
 
     }
 }
+
 message Chat
 {
+    enum Type
+    {
+        NONE = 0;
+        TEXT = 1;
+        IMAGE = 2;
+        VOICE = 3;
+    }
     message Request
     {
-
+        int64 user_id = 1;
+        string message = 2;
+        Chat.Type type = 3;
     }
-    message Response
-    {
 
-    }
     message Notice
     {
 

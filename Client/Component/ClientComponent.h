@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include<Component/Component.h>
-
+#include"Async/TaskSource.h"
+#include"Protocol/c2s.pb.h"
 using namespace Sentry;
 using namespace google::protobuf;
 
@@ -35,6 +36,9 @@ namespace Client
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
 
     public:
+        XCode Call(const std::string & name, std::shared_ptr<Message> response);
+        XCode Call(const std::string & name, const Message & message, std::shared_ptr<Message> response);
+    public:
         unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);
 
     protected:
@@ -53,6 +57,6 @@ namespace Client
         TimerComponent *mTimerComponent;
         HttpClientComponent * mHttpComponent;
         std::shared_ptr<TcpRpcClient> mTcpClient;
-        std::unordered_map<long long, std::shared_ptr<ClientRpcTask>> mRpcTasks;
+        std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>>> mRpcTasks;
     };
 }

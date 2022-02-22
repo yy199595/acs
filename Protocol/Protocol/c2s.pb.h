@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
@@ -42,7 +43,7 @@ struct TableStruct_c2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[19]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -77,24 +78,15 @@ extern Chat_NoticeDefaultTypeInternal _Chat_Notice_default_instance_;
 class Chat_Request;
 class Chat_RequestDefaultTypeInternal;
 extern Chat_RequestDefaultTypeInternal _Chat_Request_default_instance_;
-class Chat_Response;
-class Chat_ResponseDefaultTypeInternal;
-extern Chat_ResponseDefaultTypeInternal _Chat_Response_default_instance_;
-class GateLogout;
-class GateLogoutDefaultTypeInternal;
-extern GateLogoutDefaultTypeInternal _GateLogout_default_instance_;
-class GateLogout_Request;
-class GateLogout_RequestDefaultTypeInternal;
-extern GateLogout_RequestDefaultTypeInternal _GateLogout_Request_default_instance_;
-class GateLogout_Response;
-class GateLogout_ResponseDefaultTypeInternal;
-extern GateLogout_ResponseDefaultTypeInternal _GateLogout_Response_default_instance_;
-class ProxyLogin;
-class ProxyLoginDefaultTypeInternal;
-extern ProxyLoginDefaultTypeInternal _ProxyLogin_default_instance_;
-class ProxyLogin_Request;
-class ProxyLogin_RequestDefaultTypeInternal;
-extern ProxyLogin_RequestDefaultTypeInternal _ProxyLogin_Request_default_instance_;
+class GateLogin;
+class GateLoginDefaultTypeInternal;
+extern GateLoginDefaultTypeInternal _GateLogin_default_instance_;
+class GateLogin_Request;
+class GateLogin_RequestDefaultTypeInternal;
+extern GateLogin_RequestDefaultTypeInternal _GateLogin_Request_default_instance_;
+class GateLogin_Response;
+class GateLogin_ResponseDefaultTypeInternal;
+extern GateLogin_ResponseDefaultTypeInternal _GateLogin_Response_default_instance_;
 class Rpc;
 class RpcDefaultTypeInternal;
 extern RpcDefaultTypeInternal _Rpc_default_instance_;
@@ -119,12 +111,9 @@ template<> ::c2s::AccountRegister_Response* Arena::CreateMaybeMessage<::c2s::Acc
 template<> ::c2s::Chat* Arena::CreateMaybeMessage<::c2s::Chat>(Arena*);
 template<> ::c2s::Chat_Notice* Arena::CreateMaybeMessage<::c2s::Chat_Notice>(Arena*);
 template<> ::c2s::Chat_Request* Arena::CreateMaybeMessage<::c2s::Chat_Request>(Arena*);
-template<> ::c2s::Chat_Response* Arena::CreateMaybeMessage<::c2s::Chat_Response>(Arena*);
-template<> ::c2s::GateLogout* Arena::CreateMaybeMessage<::c2s::GateLogout>(Arena*);
-template<> ::c2s::GateLogout_Request* Arena::CreateMaybeMessage<::c2s::GateLogout_Request>(Arena*);
-template<> ::c2s::GateLogout_Response* Arena::CreateMaybeMessage<::c2s::GateLogout_Response>(Arena*);
-template<> ::c2s::ProxyLogin* Arena::CreateMaybeMessage<::c2s::ProxyLogin>(Arena*);
-template<> ::c2s::ProxyLogin_Request* Arena::CreateMaybeMessage<::c2s::ProxyLogin_Request>(Arena*);
+template<> ::c2s::GateLogin* Arena::CreateMaybeMessage<::c2s::GateLogin>(Arena*);
+template<> ::c2s::GateLogin_Request* Arena::CreateMaybeMessage<::c2s::GateLogin_Request>(Arena*);
+template<> ::c2s::GateLogin_Response* Arena::CreateMaybeMessage<::c2s::GateLogin_Response>(Arena*);
 template<> ::c2s::Rpc* Arena::CreateMaybeMessage<::c2s::Rpc>(Arena*);
 template<> ::c2s::Rpc_Request* Arena::CreateMaybeMessage<::c2s::Rpc_Request>(Arena*);
 template<> ::c2s::Rpc_Response* Arena::CreateMaybeMessage<::c2s::Rpc_Response>(Arena*);
@@ -133,6 +122,29 @@ template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena
 }  // namespace google
 namespace c2s {
 
+enum Chat_Type {
+  Chat_Type_NONE = 0,
+  Chat_Type_TEXT = 1,
+  Chat_Type_IMAGE = 2,
+  Chat_Type_VOICE = 3,
+  Chat_Type_Chat_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Chat_Type_Chat_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Chat_Type_IsValid(int value);
+const Chat_Type Chat_Type_Type_MIN = Chat_Type_NONE;
+const Chat_Type Chat_Type_Type_MAX = Chat_Type_VOICE;
+const int Chat_Type_Type_ARRAYSIZE = Chat_Type_Type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Chat_Type_descriptor();
+inline const ::std::string& Chat_Type_Name(Chat_Type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Chat_Type_descriptor(), value);
+}
+inline bool Chat_Type_Parse(
+    const ::std::string& name, Chat_Type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Chat_Type>(
+    Chat_Type_descriptor(), name, value);
+}
 // ===================================================================
 
 class ServerInfo :
@@ -1493,25 +1505,25 @@ class AccountRegister :
 };
 // -------------------------------------------------------------------
 
-class ProxyLogin_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.ProxyLogin.Request) */ {
+class GateLogin_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin.Request) */ {
  public:
-  ProxyLogin_Request();
-  virtual ~ProxyLogin_Request();
+  GateLogin_Request();
+  virtual ~GateLogin_Request();
 
-  ProxyLogin_Request(const ProxyLogin_Request& from);
+  GateLogin_Request(const GateLogin_Request& from);
 
-  inline ProxyLogin_Request& operator=(const ProxyLogin_Request& from) {
+  inline GateLogin_Request& operator=(const GateLogin_Request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ProxyLogin_Request(ProxyLogin_Request&& from) noexcept
-    : ProxyLogin_Request() {
+  GateLogin_Request(GateLogin_Request&& from) noexcept
+    : GateLogin_Request() {
     *this = ::std::move(from);
   }
 
-  inline ProxyLogin_Request& operator=(ProxyLogin_Request&& from) noexcept {
+  inline GateLogin_Request& operator=(GateLogin_Request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1523,34 +1535,34 @@ class ProxyLogin_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ProxyLogin_Request& default_instance();
+  static const GateLogin_Request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ProxyLogin_Request* internal_default_instance() {
-    return reinterpret_cast<const ProxyLogin_Request*>(
-               &_ProxyLogin_Request_default_instance_);
+  static inline const GateLogin_Request* internal_default_instance() {
+    return reinterpret_cast<const GateLogin_Request*>(
+               &_GateLogin_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     10;
 
-  void Swap(ProxyLogin_Request* other);
-  friend void swap(ProxyLogin_Request& a, ProxyLogin_Request& b) {
+  void Swap(GateLogin_Request* other);
+  friend void swap(GateLogin_Request& a, GateLogin_Request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ProxyLogin_Request* New() const final {
-    return CreateMaybeMessage<ProxyLogin_Request>(nullptr);
+  inline GateLogin_Request* New() const final {
+    return CreateMaybeMessage<GateLogin_Request>(nullptr);
   }
 
-  ProxyLogin_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ProxyLogin_Request>(arena);
+  GateLogin_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin_Request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ProxyLogin_Request& from);
-  void MergeFrom(const ProxyLogin_Request& from);
+  void CopyFrom(const GateLogin_Request& from);
+  void MergeFrom(const GateLogin_Request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1572,7 +1584,7 @@ class ProxyLogin_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ProxyLogin_Request* other);
+  void InternalSwap(GateLogin_Request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1588,7 +1600,7 @@ class ProxyLogin_Request :
 
   // accessors -------------------------------------------------------
 
-  // string Token = 1;
+  // string token = 1;
   void clear_token();
   static const int kTokenFieldNumber = 1;
   const ::std::string& token() const;
@@ -1602,7 +1614,7 @@ class ProxyLogin_Request :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
-  // @@protoc_insertion_point(class_scope:c2s.ProxyLogin.Request)
+  // @@protoc_insertion_point(class_scope:c2s.GateLogin.Request)
  private:
   class HasBitSetters;
 
@@ -1613,25 +1625,25 @@ class ProxyLogin_Request :
 };
 // -------------------------------------------------------------------
 
-class ProxyLogin :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.ProxyLogin) */ {
+class GateLogin_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin.Response) */ {
  public:
-  ProxyLogin();
-  virtual ~ProxyLogin();
+  GateLogin_Response();
+  virtual ~GateLogin_Response();
 
-  ProxyLogin(const ProxyLogin& from);
+  GateLogin_Response(const GateLogin_Response& from);
 
-  inline ProxyLogin& operator=(const ProxyLogin& from) {
+  inline GateLogin_Response& operator=(const GateLogin_Response& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  ProxyLogin(ProxyLogin&& from) noexcept
-    : ProxyLogin() {
+  GateLogin_Response(GateLogin_Response&& from) noexcept
+    : GateLogin_Response() {
     *this = ::std::move(from);
   }
 
-  inline ProxyLogin& operator=(ProxyLogin&& from) noexcept {
+  inline GateLogin_Response& operator=(GateLogin_Response&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1643,34 +1655,34 @@ class ProxyLogin :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const ProxyLogin& default_instance();
+  static const GateLogin_Response& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ProxyLogin* internal_default_instance() {
-    return reinterpret_cast<const ProxyLogin*>(
-               &_ProxyLogin_default_instance_);
+  static inline const GateLogin_Response* internal_default_instance() {
+    return reinterpret_cast<const GateLogin_Response*>(
+               &_GateLogin_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     11;
 
-  void Swap(ProxyLogin* other);
-  friend void swap(ProxyLogin& a, ProxyLogin& b) {
+  void Swap(GateLogin_Response* other);
+  friend void swap(GateLogin_Response& a, GateLogin_Response& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline ProxyLogin* New() const final {
-    return CreateMaybeMessage<ProxyLogin>(nullptr);
+  inline GateLogin_Response* New() const final {
+    return CreateMaybeMessage<GateLogin_Response>(nullptr);
   }
 
-  ProxyLogin* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ProxyLogin>(arena);
+  GateLogin_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin_Response>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ProxyLogin& from);
-  void MergeFrom(const ProxyLogin& from);
+  void CopyFrom(const GateLogin_Response& from);
+  void MergeFrom(const GateLogin_Response& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1692,7 +1704,7 @@ class ProxyLogin :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ProxyLogin* other);
+  void InternalSwap(GateLogin_Response* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1706,11 +1718,9 @@ class ProxyLogin :
 
   // nested types ----------------------------------------------------
 
-  typedef ProxyLogin_Request Request;
-
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.ProxyLogin)
+  // @@protoc_insertion_point(class_scope:c2s.GateLogin.Response)
  private:
   class HasBitSetters;
 
@@ -1720,25 +1730,25 @@ class ProxyLogin :
 };
 // -------------------------------------------------------------------
 
-class GateLogout_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogout.Request) */ {
+class GateLogin :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin) */ {
  public:
-  GateLogout_Request();
-  virtual ~GateLogout_Request();
+  GateLogin();
+  virtual ~GateLogin();
 
-  GateLogout_Request(const GateLogout_Request& from);
+  GateLogin(const GateLogin& from);
 
-  inline GateLogout_Request& operator=(const GateLogout_Request& from) {
+  inline GateLogin& operator=(const GateLogin& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  GateLogout_Request(GateLogout_Request&& from) noexcept
-    : GateLogout_Request() {
+  GateLogin(GateLogin&& from) noexcept
+    : GateLogin() {
     *this = ::std::move(from);
   }
 
-  inline GateLogout_Request& operator=(GateLogout_Request&& from) noexcept {
+  inline GateLogin& operator=(GateLogin&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1750,34 +1760,34 @@ class GateLogout_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const GateLogout_Request& default_instance();
+  static const GateLogin& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateLogout_Request* internal_default_instance() {
-    return reinterpret_cast<const GateLogout_Request*>(
-               &_GateLogout_Request_default_instance_);
+  static inline const GateLogin* internal_default_instance() {
+    return reinterpret_cast<const GateLogin*>(
+               &_GateLogin_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     12;
 
-  void Swap(GateLogout_Request* other);
-  friend void swap(GateLogout_Request& a, GateLogout_Request& b) {
+  void Swap(GateLogin* other);
+  friend void swap(GateLogin& a, GateLogin& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline GateLogout_Request* New() const final {
-    return CreateMaybeMessage<GateLogout_Request>(nullptr);
+  inline GateLogin* New() const final {
+    return CreateMaybeMessage<GateLogin>(nullptr);
   }
 
-  GateLogout_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateLogout_Request>(arena);
+  GateLogin* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateLogout_Request& from);
-  void MergeFrom(const GateLogout_Request& from);
+  void CopyFrom(const GateLogin& from);
+  void MergeFrom(const GateLogin& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1799,7 +1809,7 @@ class GateLogout_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(GateLogout_Request* other);
+  void InternalSwap(GateLogin* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1813,222 +1823,12 @@ class GateLogout_Request :
 
   // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.GateLogout.Request)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class GateLogout_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogout.Response) */ {
- public:
-  GateLogout_Response();
-  virtual ~GateLogout_Response();
-
-  GateLogout_Response(const GateLogout_Response& from);
-
-  inline GateLogout_Response& operator=(const GateLogout_Response& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  GateLogout_Response(GateLogout_Response&& from) noexcept
-    : GateLogout_Response() {
-    *this = ::std::move(from);
-  }
-
-  inline GateLogout_Response& operator=(GateLogout_Response&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const GateLogout_Response& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateLogout_Response* internal_default_instance() {
-    return reinterpret_cast<const GateLogout_Response*>(
-               &_GateLogout_Response_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    13;
-
-  void Swap(GateLogout_Response* other);
-  friend void swap(GateLogout_Response& a, GateLogout_Response& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline GateLogout_Response* New() const final {
-    return CreateMaybeMessage<GateLogout_Response>(nullptr);
-  }
-
-  GateLogout_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateLogout_Response>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateLogout_Response& from);
-  void MergeFrom(const GateLogout_Response& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GateLogout_Response* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
+  typedef GateLogin_Request Request;
+  typedef GateLogin_Response Response;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.GateLogout.Response)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class GateLogout :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogout) */ {
- public:
-  GateLogout();
-  virtual ~GateLogout();
-
-  GateLogout(const GateLogout& from);
-
-  inline GateLogout& operator=(const GateLogout& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  GateLogout(GateLogout&& from) noexcept
-    : GateLogout() {
-    *this = ::std::move(from);
-  }
-
-  inline GateLogout& operator=(GateLogout&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const GateLogout& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateLogout* internal_default_instance() {
-    return reinterpret_cast<const GateLogout*>(
-               &_GateLogout_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    14;
-
-  void Swap(GateLogout* other);
-  friend void swap(GateLogout& a, GateLogout& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline GateLogout* New() const final {
-    return CreateMaybeMessage<GateLogout>(nullptr);
-  }
-
-  GateLogout* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateLogout>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateLogout& from);
-  void MergeFrom(const GateLogout& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GateLogout* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  typedef GateLogout_Request Request;
-  typedef GateLogout_Response Response;
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.GateLogout)
+  // @@protoc_insertion_point(class_scope:c2s.GateLogin)
  private:
   class HasBitSetters;
 
@@ -2076,7 +1876,7 @@ class Chat_Request :
                &_Chat_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    13;
 
   void Swap(Chat_Request* other);
   friend void swap(Chat_Request& a, Chat_Request& b) {
@@ -2133,116 +1933,40 @@ class Chat_Request :
 
   // accessors -------------------------------------------------------
 
+  // string message = 2;
+  void clear_message();
+  static const int kMessageFieldNumber = 2;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
+  // int64 user_id = 1;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
+
+  // .c2s.Chat.Type type = 3;
+  void clear_type();
+  static const int kTypeFieldNumber = 3;
+  ::c2s::Chat_Type type() const;
+  void set_type(::c2s::Chat_Type value);
+
   // @@protoc_insertion_point(class_scope:c2s.Chat.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class Chat_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Chat.Response) */ {
- public:
-  Chat_Response();
-  virtual ~Chat_Response();
-
-  Chat_Response(const Chat_Response& from);
-
-  inline Chat_Response& operator=(const Chat_Response& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Chat_Response(Chat_Response&& from) noexcept
-    : Chat_Response() {
-    *this = ::std::move(from);
-  }
-
-  inline Chat_Response& operator=(Chat_Response&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const Chat_Response& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Chat_Response* internal_default_instance() {
-    return reinterpret_cast<const Chat_Response*>(
-               &_Chat_Response_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    16;
-
-  void Swap(Chat_Response* other);
-  friend void swap(Chat_Response& a, Chat_Response& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Chat_Response* New() const final {
-    return CreateMaybeMessage<Chat_Response>(nullptr);
-  }
-
-  Chat_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Chat_Response>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Chat_Response& from);
-  void MergeFrom(const Chat_Response& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Chat_Response* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.Chat.Response)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
+  ::google::protobuf::int64 user_id_;
+  int type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
 };
@@ -2286,7 +2010,7 @@ class Chat_Notice :
                &_Chat_Notice_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    14;
 
   void Swap(Chat_Notice* other);
   friend void swap(Chat_Notice& a, Chat_Notice& b) {
@@ -2391,7 +2115,7 @@ class Chat :
                &_Chat_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    15;
 
   void Swap(Chat* other);
   friend void swap(Chat& a, Chat& b) {
@@ -2447,8 +2171,37 @@ class Chat :
   // nested types ----------------------------------------------------
 
   typedef Chat_Request Request;
-  typedef Chat_Response Response;
   typedef Chat_Notice Notice;
+
+  typedef Chat_Type Type;
+  static const Type NONE =
+    Chat_Type_NONE;
+  static const Type TEXT =
+    Chat_Type_TEXT;
+  static const Type IMAGE =
+    Chat_Type_IMAGE;
+  static const Type VOICE =
+    Chat_Type_VOICE;
+  static inline bool Type_IsValid(int value) {
+    return Chat_Type_IsValid(value);
+  }
+  static const Type Type_MIN =
+    Chat_Type_Type_MIN;
+  static const Type Type_MAX =
+    Chat_Type_Type_MAX;
+  static const int Type_ARRAYSIZE =
+    Chat_Type_Type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Type_descriptor() {
+    return Chat_Type_descriptor();
+  }
+  static inline const ::std::string& Type_Name(Type value) {
+    return Chat_Type_Name(value);
+  }
+  static inline bool Type_Parse(const ::std::string& name,
+      Type* value) {
+    return Chat_Type_Parse(name, value);
+  }
 
   // accessors -------------------------------------------------------
 
@@ -3483,84 +3236,153 @@ inline void AccountRegister_Response::set_allocated_token(::std::string* token) 
 
 // -------------------------------------------------------------------
 
-// ProxyLogin_Request
+// GateLogin_Request
 
-// string Token = 1;
-inline void ProxyLogin_Request::clear_token() {
+// string token = 1;
+inline void GateLogin_Request::clear_token() {
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& ProxyLogin_Request::token() const {
-  // @@protoc_insertion_point(field_get:c2s.ProxyLogin.Request.Token)
+inline const ::std::string& GateLogin_Request::token() const {
+  // @@protoc_insertion_point(field_get:c2s.GateLogin.Request.token)
   return token_.GetNoArena();
 }
-inline void ProxyLogin_Request::set_token(const ::std::string& value) {
+inline void GateLogin_Request::set_token(const ::std::string& value) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_set:c2s.GateLogin.Request.token)
 }
 #if LANG_CXX11
-inline void ProxyLogin_Request::set_token(::std::string&& value) {
+inline void GateLogin_Request::set_token(::std::string&& value) {
   
   token_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.GateLogin.Request.token)
 }
 #endif
-inline void ProxyLogin_Request::set_token(const char* value) {
+inline void GateLogin_Request::set_token(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_set_char:c2s.GateLogin.Request.token)
 }
-inline void ProxyLogin_Request::set_token(const char* value, size_t size) {
+inline void GateLogin_Request::set_token(const char* value, size_t size) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_set_pointer:c2s.GateLogin.Request.token)
 }
-inline ::std::string* ProxyLogin_Request::mutable_token() {
+inline ::std::string* GateLogin_Request::mutable_token() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_mutable:c2s.GateLogin.Request.token)
   return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* ProxyLogin_Request::release_token() {
-  // @@protoc_insertion_point(field_release:c2s.ProxyLogin.Request.Token)
+inline ::std::string* GateLogin_Request::release_token() {
+  // @@protoc_insertion_point(field_release:c2s.GateLogin.Request.token)
   
   return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void ProxyLogin_Request::set_allocated_token(::std::string* token) {
+inline void GateLogin_Request::set_allocated_token(::std::string* token) {
   if (token != nullptr) {
     
   } else {
     
   }
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.ProxyLogin.Request.Token)
+  // @@protoc_insertion_point(field_set_allocated:c2s.GateLogin.Request.token)
 }
 
 // -------------------------------------------------------------------
 
-// ProxyLogin
+// GateLogin_Response
 
 // -------------------------------------------------------------------
 
-// GateLogout_Request
-
-// -------------------------------------------------------------------
-
-// GateLogout_Response
-
-// -------------------------------------------------------------------
-
-// GateLogout
+// GateLogin
 
 // -------------------------------------------------------------------
 
 // Chat_Request
 
-// -------------------------------------------------------------------
+// int64 user_id = 1;
+inline void Chat_Request::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Chat_Request::user_id() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Request.user_id)
+  return user_id_;
+}
+inline void Chat_Request::set_user_id(::google::protobuf::int64 value) {
+  
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:c2s.Chat.Request.user_id)
+}
 
-// Chat_Response
+// string message = 2;
+inline void Chat_Request::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Chat_Request::message() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Request.message)
+  return message_.GetNoArena();
+}
+inline void Chat_Request::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:c2s.Chat.Request.message)
+}
+#if LANG_CXX11
+inline void Chat_Request::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Chat.Request.message)
+}
+#endif
+inline void Chat_Request::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:c2s.Chat.Request.message)
+}
+inline void Chat_Request::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:c2s.Chat.Request.message)
+}
+inline ::std::string* Chat_Request::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:c2s.Chat.Request.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Chat_Request::release_message() {
+  // @@protoc_insertion_point(field_release:c2s.Chat.Request.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Chat_Request::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:c2s.Chat.Request.message)
+}
+
+// .c2s.Chat.Type type = 3;
+inline void Chat_Request::clear_type() {
+  type_ = 0;
+}
+inline ::c2s::Chat_Type Chat_Request::type() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Request.type)
+  return static_cast< ::c2s::Chat_Type >(type_);
+}
+inline void Chat_Request::set_type(::c2s::Chat_Type value) {
+  
+  type_ = value;
+  // @@protoc_insertion_point(field_set:c2s.Chat.Request.type)
+}
 
 // -------------------------------------------------------------------
 
@@ -3603,16 +3425,22 @@ inline void ProxyLogin_Request::set_allocated_token(::std::string* token) {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace c2s
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::c2s::Chat_Type> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::c2s::Chat_Type>() {
+  return ::c2s::Chat_Type_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

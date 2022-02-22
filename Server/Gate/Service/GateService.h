@@ -17,7 +17,7 @@ namespace Sentry
         bool LateAwake() final;
     private:
         XCode Ping();
-        XCode Login(const c2s::ProxyLogin_Request & request);
+        XCode Login(const c2s::GateLogin::Request & request);
         XCode Allot(const s2s::AddToGate_Request & request, s2s::AddToGate_Response & response);
 
     private:

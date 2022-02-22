@@ -43,7 +43,7 @@
         },
         "console":
         {
-            "port": 8080,
+            "port": 8088,
             "count": 1,
             "component" : "ConsoleComponent"
         }

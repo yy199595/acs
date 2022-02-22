@@ -34,6 +34,12 @@ namespace Client
         std::string json;
         util::MessageToJsonString(*t2, &json);
         LOG_WARN("response json = ", json);
+        auto iter = this->mRpcTasks.find(t2->rpc_id());
+        if(iter != this->mRpcTasks.end())
+        {
+            iter->second->SetResult(t2);
+            this->mRpcTasks.erase(iter);
+        }
     }
 
 	bool ClientComponent::Awake()
@@ -105,9 +111,44 @@ namespace Client
         while(this->mTcpClient->IsOpen())
         {
             ElapsedTimer timer;
-            //this->mTaskComponent->Sleep(10);
+            c2s::GateLogin gateLoginData;
+
+            //this->Call("GateService.Login", )
+
+
+            this->mTaskComponent->Sleep(10);
+
         }
 	}
+
+    XCode ClientComponent::Call(const std::string &name, std::shared_ptr<Message> response)
+    {
+        return XCode::Successful;
+    }
+
+    XCode ClientComponent::Call(const std::string &name, const Message &message, std::shared_ptr<Message> response)
+    {
+        std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
+        std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>> rpcTask(new TaskSource<std::shared_ptr<c2s::Rpc_Response>>());
+
+        requestMessage->set_method_name(name);
+        requestMessage->mutable_data()->CopyFrom(message);
+        requestMessage->set_rpc_id(rpcTask->GetTaskId());
+        this->mTcpClient->SendToGate(requestMessage);
+        this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
+        std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
+        if(responseData->code() != (int)XCode::Successful)
+        {
+            return (XCode)responseData->code();
+        }
+        const Any & any = responseData->data();
+        if(!any.UnpackTo(response.get()))
+        {
+            return XCode::ParseMessageError;
+        }
+        return XCode::Successful;
+    }
+
 	void ClientComponent::OnTimeout(long long rpcId)
 	{
 		auto iter = this->mRpcTasks.find(rpcId);
@@ -115,7 +156,7 @@ namespace Client
 		{
 			auto rpcTask = iter->second;
 			this->mRpcTasks.erase(iter);
-			rpcTask->OnResponse(nullptr);
+			rpcTask->SetResult(nullptr);
 		}
 	}
 }
