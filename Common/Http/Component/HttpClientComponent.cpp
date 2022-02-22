@@ -25,16 +25,15 @@ namespace Sentry
         if(config.GetValue("path", "http", path))
         {
             LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
-            auto iter = jsonDocument.MemberBegin();
-            for (; iter != jsonDocument.MemberEnd(); iter++)
+            for (auto iter = jsonDocument.MemberBegin(); iter != jsonDocument.MemberEnd(); iter++)
             {
                 HttpConfig *httpConfig = new HttpConfig();
-                httpConfig->mUrl = iter->name.GetString();
+                httpConfig->Url = iter->name.GetString();
                 const rapidjson::Value &jsonValue = iter->value;
-                httpConfig->mType = jsonValue["Type"].GetString();
-                httpConfig->mMethodName = jsonValue["Method"].GetString();
-                httpConfig->mComponent = jsonValue["Component"].GetString();
-                this->mHttpConfigMap.emplace(httpConfig->mUrl, httpConfig);
+                httpConfig->Type = jsonValue["Type"].GetString();
+                httpConfig->MethodName = jsonValue["Method"].GetString();
+                httpConfig->Component = jsonValue["Component"].GetString();
+                this->mHttpConfigMap.emplace(httpConfig->Url, httpConfig);
             }
         }
         return true;
@@ -88,7 +87,7 @@ namespace Sentry
         this->mCorComponent->Start(&HttpClientComponent::HandlerHttpData, this, handlerClient);
     }
 
-    HttpConfig *HttpClientComponent::GetHttpConfig(const std::string &url)
+    const HttpConfig *HttpClientComponent::GetHttpConfig(const std::string &url)
     {
         auto iter = this->mHttpConfigMap.find(url);
         return iter != this->mHttpConfigMap.end() ? iter->second : nullptr;
@@ -109,7 +108,7 @@ namespace Sentry
         }
 #endif
         const std::string &url = httpRequestData->GetUrl();
-        HttpConfig * httpConfig = this->GetHttpConfig(url);
+        const HttpConfig * httpConfig = this->GetHttpConfig(url);
         if(httpConfig == nullptr)
         {
             RapidJsonWriter jsonWriter;
@@ -119,7 +118,7 @@ namespace Sentry
             return;
         }
 
-        if(httpConfig->mType != httpRequestData->GetMethod())
+        if(httpConfig->Type != httpRequestData->GetMethod())
         {
             RapidJsonWriter jsonWriter;
             jsonWriter.Add("code", (int)XCode::HttpMethodNotFound);
@@ -136,7 +135,7 @@ namespace Sentry
             return;
         }
 
-        HttpService *httpService = this->GetComponent<HttpService>(httpConfig->mComponent);
+        HttpService *httpService = this->GetComponent<HttpService>(httpConfig->Component);
         if (httpService == nullptr)
         {
             RapidJsonWriter jsonWriter;
@@ -145,7 +144,7 @@ namespace Sentry
             httpClient->Response(HttpStatus::OK, jsonWriter);
             return;
         }
-        const std::string &method = httpConfig->mMethodName;
+        const std::string &method = httpConfig->MethodName;
         auto jsonResponse = httpService->Invoke(method, jsonReader);
         if (jsonResponse != nullptr)
         {

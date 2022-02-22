@@ -7,10 +7,10 @@ namespace Sentry
     class HttpConfig
     {
     public:
-        std::string mUrl;
-        std::string mType;
-        std::string mComponent;
-        std::string mMethodName;
+        std::string Url;
+        std::string Type;
+        std::string Component;
+        std::string MethodName;
     };
 }
 namespace Sentry
@@ -40,7 +40,7 @@ namespace Sentry
 
     private:
         void Invoke(HttpRespSession *remoteRequest);
-        HttpConfig * GetHttpConfig(const std::string & url);
+        const HttpConfig * GetHttpConfig(const std::string & url);
         void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
         class TaskComponent *mCorComponent;
