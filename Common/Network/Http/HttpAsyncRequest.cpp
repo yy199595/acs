@@ -190,6 +190,7 @@ namespace Sentry
                 {
                     size_t length = lineData.size() - pos - 2;
                     std::string key = lineData.substr(0, pos);
+                    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
                     std::string val = lineData.substr(pos + 1, length);
                     this->mHeadMap.insert(std::make_pair(key, val));
                 }
@@ -208,14 +209,10 @@ namespace Sentry
                 }
                 else if(this->mMethod == "POST")
                 {
-                    auto iter = this->mHeadMap.find("Content-Length");
+                    auto iter = this->mHeadMap.find("content-length");
                     if (iter == this->mHeadMap.end())
                     {
-                        iter = this->mHeadMap.find("content-length");
-                        if(iter == this->mHeadMap.end())
-                        {
-                            return HttpStatus::LENGTH_REQUIRED;
-                        }
+                        return HttpStatus::LENGTH_REQUIRED;
                     }
                     const std::string &str = iter->second;
                     this->mContentLength = std::stol(str);
