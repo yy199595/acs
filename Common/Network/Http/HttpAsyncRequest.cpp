@@ -6,7 +6,7 @@
 #include<regex>
 #include"Http.h"
 #include<iostream>
-#include<spdlog/fmt/fmt.h>
+#include"Util/StringHelper.h"
 namespace Sentry
 {
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
@@ -148,11 +148,7 @@ namespace Sentry
     std::shared_ptr<RapidJsonReader> HttpHandlerRequest::ToJsonReader()
     {
         std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
-        if(!jsonReader->TryParse(this->mContent))
-        {
-            return nullptr;
-        }
-        return jsonReader;
+        return jsonReader->TryParse(this->mContent) ? jsonReader : nullptr;
     }
 
     bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
@@ -190,7 +186,8 @@ namespace Sentry
                 {
                     size_t length = lineData.size() - pos - 2;
                     std::string key = lineData.substr(0, pos);
-                    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+                    Helper::String::Tolower(key);
                     std::string val = lineData.substr(pos + 1, length);
                     this->mHeadMap.insert(std::make_pair(key, val));
                 }

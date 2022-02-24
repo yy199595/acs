@@ -1,8 +1,8 @@
-﻿#include "StringHelper.h"
-#include "MD5.h"
-#include "MathHelper.h"
-#include <regex>
-#include <sstream>
+﻿#include"StringHelper.h"
+#include"MD5.h"
+#include"MathHelper.h"
+#include<regex>
+#include<sstream>
 namespace Helper
 {
     std::string String::EmptyStr = "";
@@ -10,6 +10,16 @@ namespace Helper
     const std::string & String::Empty()
     {
         return EmptyStr;
+    }
+
+    void String::Tolower(std::string &str)
+    {
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    }
+
+    void String::Toupper(std::string &str)
+    {
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     }
 
     void String::SplitString(const std::string &targetString, const std::string delim, std::vector<std::string> &ret)

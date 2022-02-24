@@ -10,6 +10,12 @@ namespace Helper
 
         extern const std::string & Empty();
 
+        //转大写
+        extern void Toupper(std::string & str);
+
+        //转小写
+        extern void Tolower(std::string & str);
+
         extern std::string CreateNewToken();
 
         extern void ClearBlank(std::string &input);
