@@ -17,6 +17,7 @@ namespace Sentry
         void OnListen(std::shared_ptr<SocketProxy> socket) final;
     private:
 
+        bool Offset(const std::string & parameter, std::vector<string> & response);
         bool Help(const std::string & parameter, std::vector<std::string> & response);
         bool Start(const std::string & parameter, std::vector<std::string> & response);
         bool Close(const std::string & parameter, std::vector<std::string> & response);

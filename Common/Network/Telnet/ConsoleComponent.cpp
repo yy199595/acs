@@ -13,6 +13,7 @@ namespace Sentry
         BIND_FUNC("close", ConsoleComponent::Close);
         BIND_FUNC("hotfix", ConsoleComponent::Hotfix);
         BIND_FUNC("start", ConsoleComponent::Start);
+        BIND_FUNC("offset", ConsoleComponent::Offset);
         BIND_FUNC("service", ConsoleComponent::Services);
         return true;
 	}
@@ -115,6 +116,14 @@ namespace Sentry
     {
         auto operComponent = this->GetComponent<OperatorComponent>();
         operComponent->StartHotfix();
+        return true;
+    }
+
+    bool ConsoleComponent::Offset(const string &parameter, vector<string> &response)
+    {
+        long long value = std::stoll(parameter);
+        Helper::Time::SetScaleTotalTime(value);
+        LOG_WARN("now time = ", Helper::Time::GetDateString());
         return true;
     }
 }

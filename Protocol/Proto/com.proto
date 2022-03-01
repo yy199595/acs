@@ -2,51 +2,56 @@
 syntax = "proto3";
 package com;
 import "google/protobuf/any.proto";
-message StringArray
+
+message Array
 {
-     repeated string array = 1;
+     message Int32
+     {
+          repeated int32 array = 1;
+     }
+     message Int64
+     {
+          repeated int64 array = 1;
+     }
+     message String
+     {
+          repeated string array = 1;
+     }
+     message Float
+     {
+          repeated float array = 1;
+     }
+     message Double
+     {
+          repeated double array = 1;
+     }
 }
 
-message Int32Array
+message Value
 {
-     repeated int32 array = 1;
-}
+     message Int32
+     {
+          int32 value = 1;
+     }
 
-message Int64Array
-{
-     repeated int64 array = 1;
-}
+     message Int64
+     {
+          int64 value = 1;
+     }
 
-message StringData
-{
-     string value = 1;
+     message Float
+     {
+          float value = 1;
+     }
+     message Double
+     {
+          double value = 1;
+     }
+     message Json
+     {
+          string json = 1;
+     }
 }
-
-message Int32Data
-{
-     int32 value = 1;
-}
-
-message Int64Data
-{
-     int64 value = 1;
-}
-
-message FloatData
-{
-     float value = 1;
-}
-
-message DoubleData
-{
-     double value = 1;
-}
-
-message StringMap
-{
-     map<string, string> dict = 1;
-}
-
 
 message Rpc
 {

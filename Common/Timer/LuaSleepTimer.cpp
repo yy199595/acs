@@ -20,15 +20,15 @@ namespace Sentry
         return new LuaSleepTimer(lua, ref, ms);
     }
 
-    bool LuaSleepTimer::Invoke()
+    void LuaSleepTimer::Invoke()
     {
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mRef);
         if (!lua_isthread(this->mLuaEnv, -1))
         {
-            return true;
+            LOG_ERROR("invoke lua sleep timer error");
+            return;
         }
         lua_State *co = lua_tothread(this->mLuaEnv, -1);
 		lua_presume(co, this->mLuaEnv, 0);
-        return true;
     }
 }// namespace Sentry

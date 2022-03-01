@@ -11,10 +11,9 @@ namespace Sentry
 			: TimerBase(ms), mFunc(func) {}
         ~DelayTimer() final { delete this->mFunc;}
 	public:
-		bool Invoke() final
+		void Invoke() final
 		{
 			this->mFunc->run();
-			return true;
 		}
 	private:
 		StaticMethod * mFunc;

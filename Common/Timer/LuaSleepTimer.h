@@ -15,7 +15,7 @@ namespace Sentry
         static LuaSleepTimer * Create(lua_State *lua, int index, long long ms);
 
     public:
-        bool Invoke() override;
+        void Invoke() override;
     private:
         int mRef;
         lua_State *mLuaEnv;

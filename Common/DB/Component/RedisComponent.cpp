@@ -241,10 +241,10 @@ namespace Sentry
 
     }
 
-    bool RedisComponent::SubscribeChannel(const std::string &chanel)
+    bool RedisComponent::SubscribeChannel(const std::string &channel)
     {
         std::shared_ptr<RedisRequest> request(new RedisRequest("SUBSCRIBE"));
-        request->AddParameter(std::move(chanel));
+        request->AddParameter(std::move(channel));
         auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
         return !response->HasError();
     }
@@ -262,7 +262,7 @@ namespace Sentry
                 const std::string &service = subService->GetName();
                 if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
                 {
-                    LOG_INFO("subscribe chanel [", fmt::format("{0}.{1}", service, name), "] successful");
+                    LOG_INFO("subscribe channel [", fmt::format("{0}.{1}", service, name), "] successful");
                 }
             }
         }

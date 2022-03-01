@@ -6,7 +6,7 @@ using namespace std::chrono;
 
 namespace Helper
 {
-    int Time::ScaleTotalTime = 0;
+    long long Time::ScaleTotalTime = 0;
 
     void Time::SetScaleTotalTime(int second)
     {

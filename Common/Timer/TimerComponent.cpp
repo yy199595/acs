@@ -85,14 +85,13 @@ namespace Sentry
                 auto iter = this->mTimerMap.find(id);
                 if (iter != this->mTimerMap.end())
                 {
-                    auto timer = iter->second;
-                    this->mTimerMap.erase(iter);
-                    if(timer->Invoke())
+                    TimerBase * timer = iter->second;
+                    if(timer != nullptr)
                     {
+                        iter->second->Invoke();
+                        this->mTimerMap.erase(iter);
                         delete timer;
-                        continue;
                     }
-                    this->AddTimerToWheel(timer);
                 }
             }
             for (size_t i = 1; i < this->mTimerLayers.size() && res; i++)
@@ -118,6 +117,11 @@ namespace Sentry
     {
         long long nowTime = Helper::Time::GetMilTimestamp();
         int tick = (timer->GetTargetTime() - nowTime) / this->TimerPrecision;
+        if(tick <= 0)
+        {
+            timer->Invoke();
+            return true;
+        }
         for (auto timerLayer : this->mTimerLayers)
         {
             if (timerLayer->AddTimer(tick, timer->mTimerId))
@@ -127,7 +131,7 @@ namespace Sentry
             }
         }
         delete timer;
-        LOG_ERROR("add timer {0} failure", timer->GetTimerId());
+        LOG_ERROR("add timer failure id = ", timer->GetTimerId());
         return false;
     }
 }// namespace Sentry

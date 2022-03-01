@@ -8,7 +8,7 @@ namespace Helper
 {
     namespace Time
     {
-        extern int ScaleTotalTime;
+        extern long long ScaleTotalTime;
 
         extern void SetScaleTotalTime(int second);
 

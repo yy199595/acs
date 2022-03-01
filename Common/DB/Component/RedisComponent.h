@@ -37,7 +37,7 @@ namespace Sentry
 	public:
         long long AddCounter(const std::string & key);
 
-        bool SubscribeChannel(const std::string & chanel);
+        bool SubscribeChannel(const std::string & channel);
 
         long long Publish(const std::string & channel, const std::string & message);
 
