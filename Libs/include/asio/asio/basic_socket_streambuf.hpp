@@ -530,7 +530,7 @@ protected:
       if (traits_type::eq_int_type(c, traits_type::eof()))
         return traits_type::not_eof(c);
 
-      // Add the new character to the output buffer.
+      // Save the new character to the output buffer.
       *pptr() = ch;
       pbump(1);
     }

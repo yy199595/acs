@@ -30,17 +30,15 @@ namespace Sentry
     XCode AccountService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
     {
         string account, password;
-        LOG_THROW_ERROR(request.TryGetValue("account", account));
-        LOG_THROW_ERROR(request.TryGetValue("password", password));
+        LOGIC_THROW_ERROR(request.TryGetValue("account", account));
+        LOGIC_THROW_ERROR(request.TryGetValue("password", password));
 
         this->mTempData.Clear();
         this->mTempData.set_account(account);
-        auto taskSource = this->mMysqlComponent->Query(this->mTempData);
-        if(taskSource->GetCode() != XCode::Successful)
-        {
-            return taskSource->GetCode();
-        }
-        auto userData = taskSource->GetData<db::db_account::tab_user_account>();
+
+        RapidJsonWriter queryJson;
+        queryJson.Add("account", account);
+        auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(queryJson);
         if(userData == nullptr || userData->password() != password)
         {
             return XCode::Failure;
@@ -49,8 +47,8 @@ namespace Sentry
 
         this->mTempData.set_token(newToken);
         this->mTempData.set_account(account);
-        this->mTempData.set_lastlogin_time(Helper::Time::GetSecTimeStamp());
-        XCode code = this->mMysqlComponent->Save(this->mTempData)->GetCode();
+        this->mTempData.set_last_login_time(Helper::Time::GetSecTimeStamp());
+        XCode code = this->mMysqlComponent->Save(this->mTempData);
         if(code != XCode::Successful)
         {
             return code;
@@ -75,9 +73,9 @@ namespace Sentry
     {
         long long phoneNumber = 0;
         string user_account, user_password;
-        LOG_THROW_ERROR(request.TryGetValue("account", user_account));
-        LOG_THROW_ERROR(request.TryGetValue("password", user_password));
-        LOG_THROW_ERROR(request.TryGetValue("phone_num", phoneNumber));
+        LOGIC_THROW_ERROR(request.TryGetValue("account", user_account));
+        LOGIC_THROW_ERROR(request.TryGetValue("password", user_password));
+        LOGIC_THROW_ERROR(request.TryGetValue("phone_num", phoneNumber));
         auto resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
         if(resp->GetNumber() == 0)
         {
@@ -90,7 +88,7 @@ namespace Sentry
         this->mTempData.set_password(user_password);
         this->mTempData.set_user_id(resp->GetNumber());
         this->mTempData.set_register_time(Helper::Time::GetSecTimeStamp());
-        return this->mMysqlComponent->Add(this->mTempData)->GetCode();
+        return this->mMysqlComponent->Add(this->mTempData);
     }
 
     const std::string AccountService::NewToken(const std::string & account)

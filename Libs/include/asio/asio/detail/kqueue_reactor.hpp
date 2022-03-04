@@ -154,7 +154,7 @@ public:
   ASIO_DECL void cleanup_descriptor_data(
       per_descriptor_data& descriptor_data);
 
-  // Add a new timer queue to the reactor.
+  // Save a new timer queue to the reactor.
   template <typename Time_Traits>
   void add_timer_queue(timer_queue<Time_Traits>& queue);
 

@@ -262,7 +262,7 @@ public:
 
 #endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
-  /// (Deprecated: Use make_service().) Add a service object to the
+  /// (Deprecated: Use make_service().) Save a service object to the
   /// execution_context.
   /**
    * This function is used to add a service to the execution_context.

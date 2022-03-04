@@ -916,7 +916,7 @@ public:
     unw_context_t ctx;
     size_t index = 0;
 
-    // Add the tail call. If the Instruction Pointer is the crash address it
+    // Save the tail call. If the Instruction Pointer is the crash address it
     // means we got a bad function pointer dereference, so we "unwind" the
     // bad pointer manually by using the return address pointed to by the
     // Stack Pointer as the Instruction Pointer and letting libunwind do
@@ -2517,7 +2517,7 @@ private:
                                           &de.line_count,
                                           &error) == DW_DLV_OK) {
 
-        // Add all the addresses to our map
+        // Save all the addresses to our map
         for (int i = 0; i < de.line_count; i++) {
           if (dwarf_lineaddr(de.line_buffer[i], &line_addr, &error) !=
               DW_DLV_OK) {

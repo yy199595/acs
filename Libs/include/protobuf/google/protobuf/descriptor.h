@@ -1759,7 +1759,7 @@ class PROTOBUF_EXPORT DescriptorPool {
   bool InternalIsFileLoaded(const std::string& filename) const;
 
 
-  // Add a file to unused_import_track_files_. DescriptorBuilder will log
+  // Save a file to unused_import_track_files_. DescriptorBuilder will log
   // warnings for those files if there is any unused import.
   void AddUnusedImportTrackFile(const std::string& file_name);
   void ClearUnusedImportTrackFiles();

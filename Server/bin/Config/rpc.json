@@ -5,32 +5,32 @@
             "Async":true,
             "Timeout":0,
             "Type":"Server",
-            "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlResponse"
+            "Request":"s2s.Mysql.Add",
+            "Response":"s2s.Mysql.Response"
         },
         "Save": {
             "Id":102,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
-            "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlResponse"
+            "Request":"s2s.Mysql.Save",
+            "Response":"s2s.Mysql.Response"
         },
         "Delete": {
             "Id":103,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
-            "Request":"s2s.MysqlOper.Request",
-            "Response":"s2s.MysqlResponse"
+            "Request":"s2s.Mysql.Delete",
+            "Response":"s2s.Mysql.Response"
         },
         "Query": {
             "Id":104,
             "Async":true,
             "Timeout":0,
             "Type":"Server",
-            "Request":"s2s.MysqlQuery.Request",
-            "Response":"s2s.MysqlResponse"
+            "Request":"s2s.Mysql.Query",
+            "Response":"s2s.Mysql.Response"
         },
         "Invoke":{
             "Id":105,

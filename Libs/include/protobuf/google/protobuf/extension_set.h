@@ -204,7 +204,7 @@ class PROTOBUF_EXPORT ExtensionSet {
 
   // =================================================================
 
-  // Add all fields which are currently present to the given vector.  This
+  // Save all fields which are currently present to the given vector.  This
   // is useful to implement Reflection::ListFields().
   void AppendToList(const Descriptor* containing_type,
                     const DescriptorPool* pool,
@@ -895,8 +895,8 @@ inline void ExtensionSet::AddString(int number, FieldType type,
 //                            ConstType value, ExtensionSet* set);
 //     static inline MutableType Mutable(int number, int index,
 //                                       ExtensionSet* set);
-//     static inline void Add(int number, ConstType value, ExtensionSet* set);
-//     static inline MutableType Add(int number, ExtensionSet* set);
+//     static inline void Save(int number, ConstType value, ExtensionSet* set);
+//     static inline MutableType Save(int number, ExtensionSet* set);
 //     This is used by the ExtensionIdentifier constructor to register
 //     the extension at dynamic initialization.
 //     template <typename ExtendeeT>

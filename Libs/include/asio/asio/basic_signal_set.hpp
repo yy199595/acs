@@ -335,7 +335,7 @@ public:
     return impl_.get_executor();
   }
 
-  /// Add a signal to a signal_set.
+  /// Save a signal to a signal_set.
   /**
    * This function adds the specified signal to the set. It has no effect if the
    * signal is already in the set.
@@ -351,7 +351,7 @@ public:
     asio::detail::throw_error(ec, "add");
   }
 
-  /// Add a signal to a signal_set.
+  /// Save a signal to a signal_set.
   /**
    * This function adds the specified signal to the set. It has no effect if the
    * signal is already in the set.

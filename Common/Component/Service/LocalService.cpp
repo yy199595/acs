@@ -144,7 +144,7 @@ namespace Sentry
             jsonWriter.Add("service", name);
             jsonWriter.Add("area_id", this->mAreaId);
             jsonWriter.Add("address", this->mRpcAddress);
-            this->mRedisComponent->Publish("LocalService.Add", jsonWriter);
+            this->mRedisComponent->Publish("LocalService.Save", jsonWriter);
         }
         LOG_INFO("start new component [", name, "] successful");
         return true;

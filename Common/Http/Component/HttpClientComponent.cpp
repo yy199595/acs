@@ -62,9 +62,9 @@ namespace Sentry
 
 //        std::string json;
 //        RapidJsonWriter jsonWriter;
-//        jsonWriter.Add("End", 100);
-//        jsonWriter.Add("Start", 0);
-//        jsonWriter.Add("RankId", 301000);
+//        jsonWriter.Save("End", 100);
+//        jsonWriter.Save("Start", 0);
+//        jsonWriter.Save("RankId", 301000);
 //
 //        jsonWriter.WriterToStream(json);
 //

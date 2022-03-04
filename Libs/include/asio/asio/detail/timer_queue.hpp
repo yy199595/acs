@@ -73,7 +73,7 @@ public:
   {
   }
 
-  // Add a new timer to the queue. Returns true if this is the timer that is
+  // Save a new timer to the queue. Returns true if this is the timer that is
   // earliest in the queue, in which case the reactor's event demultiplexing
   // function call may need to be interrupted and restarted.
   bool enqueue_timer(const time_type& time, per_timer_data& timer, wait_op* op)

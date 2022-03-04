@@ -2081,7 +2081,7 @@ namespace MultiThread
 #ifdef MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
 									debug::DebugLock lock(mutex);
 #endif
-									// Add the block back into the global free pool (and remove from block index)
+									// Save the block back into the global free pool (and remove from block index)
 									entry->value.store(nullptr, std::memory_order_relaxed);
 								}
 								this->parent->add_block_to_free_list(block);		// releases the above store

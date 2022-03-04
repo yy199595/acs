@@ -20,9 +20,7 @@ namespace Sentry
         ~MysqlRpcTaskSource() = default;
     public:
         XCode GetCode();
-        size_t GetDataSize();
-        template<typename T>
-        std::shared_ptr<T> GetData(size_t index = 0);
+        std::shared_ptr<s2s::Mysql::Response> GetResponse();
     public:
         int GetTimeout() final { return this->mTimeout;}
         long long GetRpcId() final { return mTaskSource.GetTaskId();}
@@ -31,25 +29,8 @@ namespace Sentry
         XCode mCode;
         const int mTimeout;
         RpcComponent * mRpcComponent;
-        TaskSource<std::shared_ptr<s2s::MysqlResponse>> mTaskSource;
+        TaskSource<std::shared_ptr<s2s::Mysql::Response>> mTaskSource;
     };
-
-    template<typename T>
-    std::shared_ptr<T> MysqlRpcTaskSource::GetData(size_t index)
-    {
-        auto response = this->mTaskSource.Await();
-        if(response == nullptr|| index < 0 || index >= response->datas_size())
-        {
-            return nullptr;
-        }
-        std::shared_ptr<T> data(new T());
-        const Any & any = response->datas(index);
-        if(any.Is<T>() && any.UnpackTo(data.get()))
-        {
-            return data;
-        }
-        return nullptr;
-    }
 }
 
 

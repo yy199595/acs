@@ -51,7 +51,7 @@ struct chrono_time_traits
     return clock_type::now();
   }
 
-  // Add a duration to a time.
+  // Save a duration to a time.
   static time_type add(const time_type& t, const duration_type& d)
   {
     const time_type epoch;

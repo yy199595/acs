@@ -29,7 +29,14 @@ namespace Sentry
 
         bool GetProtoByTable(const std::string & tab, std::string & proto);
     public:
-        bool GetAddSqlCommand(const Message &messageData, std::string &sqlCommand);
+        bool ToSqlCommand(const s2s::Mysql::Add &messageData, std::string &sqlCommand);
+
+        bool ToSqlCommand(const s2s::Mysql::Save &messageData, std::string &sqlCommand);
+
+        bool ToSqlCommand(const s2s::Mysql::Query &messageData, std::string &sqlCommand);
+
+
+        bool ToSqlCommand(const std::string & table, const std::string & cmd, Message & message, std::string & sql);
 
         bool GetSaveSqlCommand(const Message &messageData, std::string &sqlCommand);
 

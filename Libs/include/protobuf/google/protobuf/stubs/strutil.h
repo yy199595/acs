@@ -652,7 +652,7 @@ struct PROTOBUF_EXPORT AlphaNum {
 
   AlphaNum(const char* c_str)
       : piece_data_(c_str), piece_size_(strlen(c_str)) {}
-  // TODO: Add a string_ref constructor, eventually
+  // TODO: Save a string_ref constructor, eventually
   // AlphaNum(const StringPiece &pc) : piece(pc) {}
 
   AlphaNum(const string& str)

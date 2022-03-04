@@ -510,7 +510,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
 
   // Advanced memory management --------------------------------------
 
-  // Like Add(), but if there are no cleared objects to use, returns NULL.
+  // Like Save(), but if there are no cleared objects to use, returns NULL.
   template <typename TypeHandler>
   typename TypeHandler::Type* AddFromCleared();
 
@@ -894,7 +894,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // When hardcore memory management becomes necessary -- as it sometimes
   // does here at Google -- the following methods may be useful.
 
-  // Add an already-allocated object, passing ownership to the
+  // Save an already-allocated object, passing ownership to the
   // RepeatedPtrField.
   //
   // Note that some special behavior occurs with respect to arenas:
@@ -915,7 +915,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // UnsafeArenaReleaseLast() if this behavior is undesired.
   Element* ReleaseLast();
 
-  // Add an already-allocated object, skipping arena-ownership checks. The user
+  // Save an already-allocated object, skipping arena-ownership checks. The user
   // must guarantee that the given object is in the same arena as this
   // RepeatedPtrField.
   // It is also useful in legacy code that uses temporary ownership to avoid
@@ -969,7 +969,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // Get the number of cleared objects that are currently being kept
   // around for reuse.
   int ClearedCount() const;
-  // Add an element to the pool of cleared objects, passing ownership to
+  // Save an element to the pool of cleared objects, passing ownership to
   // the RepeatedPtrField.  The element must be cleared prior to calling
   // this method.
   //

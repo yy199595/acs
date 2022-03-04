@@ -50,7 +50,7 @@ struct time_traits<boost::posix_time::ptime>
 #endif // defined(BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK)
   }
 
-  /// Add a duration to a time.
+  /// Save a duration to a time.
   static time_type add(const time_type& t, const duration_type& d)
   {
     return t + d;

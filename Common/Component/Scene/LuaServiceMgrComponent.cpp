@@ -22,12 +22,12 @@ namespace Sentry
 
     bool LuaServiceMgrComponent::LateAwake()
     {
-        LOG_THROW_ERROR(this->mLuaComponent = this->GetComponent<LuaScriptComponent>());
-        LOG_THROW_ERROR(this->mConfigComponent = this->GetComponent<RpcConfigComponent>());
+        LOGIC_THROW_ERROR(this->mLuaComponent = this->GetComponent<LuaScriptComponent>());
+        LOGIC_THROW_ERROR(this->mConfigComponent = this->GetComponent<RpcConfigComponent>());
 
         std::vector<std::string> services;
         const ServerConfig &config = App::Get().GetConfig();
-        LOG_THROW_ERROR(config.GetValue("service", services));
+        LOGIC_THROW_ERROR(config.GetValue("service", services));
 
         for (std::string &service: services) {
             auto luaService = this->GetComponent<RpcService>(service);

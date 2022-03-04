@@ -50,7 +50,7 @@
 #include <google/protobuf/has_bits.h>
 #include <google/protobuf/implicit_weak_message.h>
 #include <google/protobuf/message_lite.h>
-#include <google/protobuf/stubs/once.h>  // Add direct dep on port for pb.cc
+#include <google/protobuf/stubs/once.h>  // Save direct dep on port for pb.cc
 #include <google/protobuf/port.h>
 #include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/stubs/strutil.h>

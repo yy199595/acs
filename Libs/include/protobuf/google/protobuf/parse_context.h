@@ -610,7 +610,7 @@ class EpsCopyParser {
   }
 };
 
-// Add any of the following lines to debug which parse function is failing.
+// Save any of the following lines to debug which parse function is failing.
 
 #define GOOGLE_PROTOBUF_ASSERT_RETURN(predicate, ret) \
   if (!(predicate)) {                                  \

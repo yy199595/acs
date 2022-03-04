@@ -45,14 +45,14 @@ namespace LuaScriptEvent
 #define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent, name)                                    \
     {                                                                                    \
         ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, name); \
-        helper.PushStaticFunction("Add", scriptEvent::Add);                              \
+        helper.PushStaticFunction("Save", scriptEvent::Add);                              \
         helper.PushStaticFunction("OnResponse", scriptEvent::Invoke);                        \
     }
 
 #define PUSH_LUA_SCRIPT_EVENT(lua, scriptEvent)                                                  \
     {                                                                                            \
         ClassProxyHelper<scriptEvent> helper = ClassProxyHelper<scriptEvent>(lua, #scriptEvent); \
-        helper.PushStaticFunction("Add", scriptEvent::Add);                                      \
+        helper.PushStaticFunction("Save", scriptEvent::Add);                                      \
         helper.PushStaticFunction("OnResponse", scriptEvent::Invoke);                                \
     }
 }// namespace LuaScriptEvent

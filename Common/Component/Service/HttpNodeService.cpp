@@ -24,12 +24,12 @@ namespace Sentry
     {
         std::string address;
         std::vector<std::string> services;
-        LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "address", address));
-        LOG_THROW_ERROR(jsonReader.TryGetValue("rpc", "service", services));
+        LOGIC_THROW_ERROR(jsonReader.TryGetValue("rpc", "address", address));
+        LOGIC_THROW_ERROR(jsonReader.TryGetValue("rpc", "service", services));
         for(const std::string & service : services)
         {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
-            LOG_THROW_ERROR(serviceProxy);
+            LOGIC_THROW_ERROR(serviceProxy);
             serviceProxy->AddAddress(address);
         }
         return XCode::Successful;

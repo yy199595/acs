@@ -1,5 +1,4 @@
 syntax = "proto3";
-package db;
 
 message db_account
 {
@@ -12,7 +11,7 @@ message db_account
         int64 phone_num = 5;     //手机号
         string device_mac = 6;  //设备id
         int64 register_time = 7;    //注册事件
-        int64 lastlogin_time = 8;   //上次登录时间
+        int64 last_login_time = 8;   //上次登录时间
         string token = 9;   //登陆令牌
     }
 

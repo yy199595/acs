@@ -137,7 +137,7 @@ public:
   // Destroy a signal_set implementation.
   ASIO_DECL void destroy(implementation_type& impl);
 
-  // Add a signal to a signal_set.
+  // Save a signal to a signal_set.
   ASIO_DECL asio::error_code add(implementation_type& impl,
       int signal_number, asio::error_code& ec);
 

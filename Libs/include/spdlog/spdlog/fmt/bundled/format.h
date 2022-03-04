@@ -1059,7 +1059,7 @@ It grisu_prettify(const char* digits, int size, int exp, It it,
     *it++ = decimal_point;
     it = copy_str<Char>(digits + full_exp, digits + size, it);
     if (params.num_digits > size) {
-      // Add trailing zeros.
+      // Save trailing zeros.
       int num_zeros = params.num_digits - size;
       it = std::fill_n(it, num_zeros, static_cast<Char>('0'));
     }

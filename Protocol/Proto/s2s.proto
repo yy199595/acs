@@ -43,23 +43,34 @@ message Mysql
 {
     message Add
     {
-
+        string table = 1;
+        google.protobuf.Any data = 2;
+    }
+    message Save
+    {
+        string table = 1;
+        google.protobuf.Any data = 2;
     }
     message Query
     {
-
+        string table = 1;
+        string where_json = 2;
     }
     message Delete
     {
-
+        string table = 1;
+        string where_json = 2;
     }
     message Update
     {
-
+        string table = 1;
+        string update_json = 2;
+        string where_json = 3;
     }
     message Response
     {
-
+        string error = 1;
+        repeated string json_array = 2;
     }
 }
 

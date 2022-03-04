@@ -60,7 +60,7 @@ namespace Sentry
     XCode GateService::Login(const c2s::GateLogin::Request &request)
     {
         auto iter = this->mTokenMap.find(request.token());
-        LOG_THROW_ERROR(iter != this->mTokenMap.end());
+        LOGIC_THROW_ERROR(iter != this->mTokenMap.end());
 
         long long userId = iter->second;
         long long socketId = this->GetCurSocketId();
@@ -68,7 +68,7 @@ namespace Sentry
         LOG_DEBUG(userId, " player login to gate");
 #endif
         std::shared_ptr<Entity> player(new Entity(userId, socketId));
-        LOG_THROW_ERROR(this->mEntityComponent->Add(player));
+        LOGIC_THROW_ERROR(this->mEntityComponent->Add(player));
 		return XCode::Successful;
     }
 

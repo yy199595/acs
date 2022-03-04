@@ -1,5 +1,6 @@
 ﻿#include "MysqlComponent.h"
 #include"Object/App.h"
+#include"Pool/MessagePool.h"
 #include"Coroutine/TaskComponent.h"
 #include"DB/MysqlClient/TableOperator.h"
 #include"Component/Scene/ThreadPoolComponent.h"
@@ -81,7 +82,7 @@ namespace Sentry
             TableOperator tableOperator(this->mMysqlSockt);
             auto messageDesc = desc->message_type(x);
 #ifdef __DEBUG__
-            //this->DropTable(messageDesc->name());
+            this->DropTable(messageDesc->name());
 #endif
             LOG_CHECK_RET_FALSE(tableOperator.InitDb(messageDesc->name()));
             for (int y = 0; y < messageDesc->nested_type_count(); y++)
@@ -136,18 +137,14 @@ namespace Sentry
         return true;
     }
 
-    bool MysqlComponent::GetAddSqlCommand(const Message &messageData, std::string &sqlCommand)
+    bool MysqlComponent::ToSqlCommand(const std::string &table, const std::string &cmd,
+                                     Message &message, std::string &sql)
     {
-        std::string table;
-        if(!this->GetTableByProto(messageData, table))
-        {
-            return false;
-        }
         this->mSqlCommandStream.str("");
         std::vector<const FieldDescriptor *> fieldList;
-        const Reflection *pReflection = messageData.GetReflection();
-        pReflection->ListFields(messageData, &fieldList);
-        mSqlCommandStream << "insert into " << table << "(";
+        const Reflection *pReflection = message.GetReflection();
+        pReflection->ListFields(message, &fieldList);
+        mSqlCommandStream << cmd << " into " << table << "(";
         for (size_t index = 0; index < fieldList.size(); index++)
         {
             if (index < fieldList.size() - 1)
@@ -165,32 +162,114 @@ namespace Sentry
             {
                 case FieldDescriptor::Type::TYPE_STRING:
                 case FieldDescriptor::Type::TYPE_BYTES:
-                    mSqlCommandStream << "'" << pReflection->GetString(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetString(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_INT32:
-                    mSqlCommandStream << "'" << pReflection->GetInt32(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetInt32(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_UINT32:
-                    mSqlCommandStream << "'" << pReflection->GetUInt32(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetUInt32(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_INT64:
-                    mSqlCommandStream << "'" << pReflection->GetInt64(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetInt64(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_UINT64:
-                    mSqlCommandStream << "'" << pReflection->GetUInt64(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetUInt64(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_FLOAT:
-                    mSqlCommandStream << "'" << pReflection->GetFloat(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetFloat(message, fieldDesc) << "',";
                     break;
                 case FieldDescriptor::Type::TYPE_DOUBLE:
-                    mSqlCommandStream << "'" << pReflection->GetDouble(messageData, fieldDesc) << "',";
+                    mSqlCommandStream << "'" << pReflection->GetDouble(message, fieldDesc) << "',";
                     break;
                 default:
                     return false;
             }
         }
-        sqlCommand = mSqlCommandStream.str();
-        sqlCommand[sqlCommand.size() - 1] = ')';
+        sql = mSqlCommandStream.str();
+        sql[sql.size() - 1] = ')';
+        return true;
+    }
+
+    bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Add &request, std::string &sqlCommand)
+    {
+        Message * message = Helper::Proto::NewByData(request.data());
+        if(message == nullptr)
+        {
+            return false;
+        }
+        const std::string & table = request.table();
+        return this->ToSqlCommand(table, "insert", *message, sqlCommand);
+    }
+
+    bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Save & request, std::string &sqlCommand)
+    {
+        Message * message = Helper::Proto::NewByData(request.data());
+        if(message == nullptr)
+        {
+            return false;
+        }
+        const std::string & table = request.table();
+        return this->ToSqlCommand(table, "replace", *message, sqlCommand);
+    }
+
+    bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Query &request, std::string &sqlCommand)
+    {
+        this->mSqlCommandStream.str("");
+        rapidjson::Document jsonDocument;
+        const std::string &json = request.where_json();
+        if (jsonDocument.Parse(json.c_str(), json.size()).HasParseError())
+        {
+            return false;
+        }
+        if (!jsonDocument.IsObject())
+        {
+            return false;
+        }
+        this->mSqlCommandStream << "select * from " << request.table();
+        if (jsonDocument.MemberCount() == 0)
+        {
+            sqlCommand = this->mSqlCommandStream.str();
+            return true;
+        }
+        size_t index = 0;
+        this->mSqlCommandStream << " where ";
+        auto iter = jsonDocument.MemberBegin();
+        for (; iter != jsonDocument.MemberEnd(); iter++, index++)
+        {
+            const char * key = iter->name.GetString();
+            const rapidjson::Value & jsonValue = iter->value;
+            if(jsonValue.IsString())
+            {
+                const char * str = jsonValue.GetString();
+                size_t size = jsonValue.GetStringLength();
+                this->mSqlCommandStream << key << "='" << std::string(str, size) << "'";
+            }
+            else if(jsonValue.IsInt())
+            {
+                int number = jsonValue.GetInt();
+                this->mSqlCommandStream << key << "="<<number;
+            }
+            else if(jsonValue.IsInt64())
+            {
+                long long number = jsonValue.GetInt64();
+                this->mSqlCommandStream << key << "="<<number;
+            }
+            else if(jsonValue.IsFloat())
+            {
+                float number = jsonValue.GetFloat();
+                this->mSqlCommandStream << key << "="<<number;
+            }
+            else if(jsonValue.IsDouble())
+            {
+                double number = jsonValue.GetDouble();
+                this->mSqlCommandStream << key << "="<<number;
+            }
+            if(index + 1 < jsonDocument.MemberCount()){
+                this->mSqlCommandStream << " and ";
+            }
+        }
+        sqlCommand = this->mSqlCommandStream.str();
         return true;
     }
 

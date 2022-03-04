@@ -29,7 +29,7 @@ public:
   // Constructor.
   ASIO_DECL timer_queue_set();
 
-  // Add a timer queue to the set.
+  // Save a timer queue to the set.
   ASIO_DECL void insert(timer_queue_base* q);
 
   // Remove a timer queue from the set.
