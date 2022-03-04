@@ -28,46 +28,33 @@ namespace Sentry
     void MysqlProxyComponent::OnComplete()
     {
         auto taskComponent = this->GetComponent<TaskComponent>();
-        //taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
+        taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
     }
 
 	void MysqlProxyComponent::AddUserData()
-	{
-		for (int index = 0; index < 10; index++)
+    {
+        db::db_account::tab_user_account userAccountData;
+        userAccountData.set_user_id(  10000);
+        userAccountData.set_device_mac("ios_qq");
+        userAccountData.set_account(  "646585122@qq.com");
+        userAccountData.set_token(Helper::String::CreateNewToken());
+        userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
+
+
+        std::shared_ptr<MysqlRpcTaskSource> taskSource = this->Add(userAccountData);
+        if (taskSource != nullptr && taskSource->GetCode() == XCode::Successful)
         {
-            db::db_account::tab_user_account userAccountData;
-            userAccountData.set_user_id(index + 10000);
-            userAccountData.set_account(std::to_string(index + 10000) + "@qq.com");
-            userAccountData.set_device_mac("ios_qq");
-            userAccountData.set_token(Helper::String::CreateNewToken());
-            userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
-
-
-            std::shared_ptr<MysqlRpcTaskSource> taskSource =  this->Add(userAccountData);
-            if(taskSource != nullptr && taskSource->GetCode() == XCode::Successful)
-            {
-                LOG_ERROR("add data successful ", index);
-            }
+            LOG_ERROR("add data successful ");
         }
+
         db::db_account_tab_user_account userAccount;
         userAccount.set_account("10000@qq.com");
-        std::shared_ptr<MysqlRpcTaskSource> taskSource = this->Query(userAccount);
-        if(taskSource != nullptr && taskSource->GetCode() == XCode::Successful)
+        std::shared_ptr<MysqlRpcTaskSource> taskSource1 = this->Query(userAccount);
+        if (taskSource1 != nullptr && taskSource1->GetCode() == XCode::Successful)
         {
 
         }
-
-        std::shared_ptr<MysqlRpcTaskSource> rpcTaskSource =this->Sort("db_account.tab_user_account", "user_id", 10, false);
-        if(rpcTaskSource != nullptr && rpcTaskSource->GetCode() == XCode::Successful)
-        {
-            size_t size = rpcTaskSource->GetDataSize();
-            for(size_t index = 0; index < size; index++)
-            {
-                auto data = rpcTaskSource->GetData<db::db_account_tab_user_account>(index);
-                LOG_WARN("json = ", Helper::Proto::ToJson(*data));
-            }
-        }
-	}
+    }
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
     {

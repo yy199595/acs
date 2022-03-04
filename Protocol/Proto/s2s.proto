@@ -39,6 +39,30 @@ message NodeRegister
     }
 }
 
+message Mysql
+{
+    message Add
+    {
+
+    }
+    message Query
+    {
+
+    }
+    message Delete
+    {
+
+    }
+    message Update
+    {
+
+    }
+    message Response
+    {
+
+    }
+}
+
 
 
 message NodeQuery

@@ -81,7 +81,7 @@ namespace Sentry
             TableOperator tableOperator(this->mMysqlSockt);
             auto messageDesc = desc->message_type(x);
 #ifdef __DEBUG__
-            this->DropTable(messageDesc->name());
+            //this->DropTable(messageDesc->name());
 #endif
             LOG_CHECK_RET_FALSE(tableOperator.InitDb(messageDesc->name()));
             for (int y = 0; y < messageDesc->nested_type_count(); y++)

@@ -51,7 +51,6 @@ namespace Sentry
 			if (type != nullptr)
 			{
 				std::queue<Component *> components;
-				mComponentPool.emplace(type->Hash, components);
 				mTypeInfoMap.insert(std::make_pair(type->Name, type));
 				mTypeInfoMap1.insert(std::make_pair(typeid(T).hash_code(), type));
 			}
@@ -81,8 +80,6 @@ namespace Sentry
 	private:
 		static std::unordered_map<size_t, Type *> mTypeInfoMap1;
 		static std::unordered_map<std::string, Type *> mTypeInfoMap;
-		static std::unordered_map<size_t, std::queue<Component *>> mComponentPool;
-
 	};
 
 	template<typename T>

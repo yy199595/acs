@@ -38,7 +38,7 @@ namespace Sentry
     std::shared_ptr<T> MysqlRpcTaskSource::GetData(size_t index)
     {
         auto response = this->mTaskSource.Await();
-        if(response == nullptr || index < 0 || index >= response->datas_size())
+        if(response == nullptr|| index < 0 || index >= response->datas_size())
         {
             return nullptr;
         }

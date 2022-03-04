@@ -162,7 +162,6 @@ namespace Sentry
                 this->OnDestory();
                 this->mTaskScheduler.Stop();
                 LOG_WARN("close server successful [", timer->GetMs(), "ms]");
-                exit(-1);
             });
         }
 	}

@@ -156,7 +156,11 @@ namespace Sentry
         LOG_CHECK_RET(jsonReader.TryGetValue("address", address));
 
         auto iter = this->mAddressMap.find(address);
-        LOG_CHECK_RET(iter != this->mAddressMap.end());
+        if(iter == this->mAddressMap.end())
+        {
+            LOG_WARN("not find address ", address);
+            return;
+        }
         for (const std::string &service: iter->second)
         {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);
