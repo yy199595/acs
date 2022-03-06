@@ -165,14 +165,14 @@ namespace Helper
         return nullptr;
     }
 
-    std::string Proto::ToJson(const Message &message)
+    const std::string Proto::ToJson(const Message &message)
     {
-        std::string json;
+        std::string json = "";
         if(util::MessageToJsonString(message, &json).ok())
         {
             return json;
         }
-        return std::string("");
+        return json;
     }
 
     bool Proto::GetJson(const Any &message, std::string &json)

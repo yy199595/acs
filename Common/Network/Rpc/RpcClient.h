@@ -15,7 +15,7 @@ namespace Sentry
 
     public:
         size_t GetByteSize();
-        bool WriteToBuffer(asio::streambuf & streamBuffer);
+        bool WriteToBuffer(std::string & streamBuffer);
     private:
         char mType;
         std::shared_ptr<Message> mMessage;
@@ -68,7 +68,7 @@ namespace Sentry
 		atomic_bool mIsConnect;
 		const SocketType mType;
 		long long mLastOperTime;
-        asio::streambuf mSendBuffer;
+        std::string mSendBuffer;
         char mReceiveBuffer[TCP_BUFFER_COUNT];
         std::queue<std::shared_ptr<NetworkData>> mWaitSendQueue;
 	};

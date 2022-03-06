@@ -67,6 +67,10 @@ message Mysql
         string update_json = 2;
         string where_json = 3;
     }
+    message Invoke
+    {
+        string sql = 1;
+    }
     message Response
     {
         string error = 1;
@@ -75,55 +79,11 @@ message Mysql
 }
 
 
-
-message NodeQuery
-{
-    message Request
-    {
-        int32 area_id = 1;
-        string service = 2;
-    }
-    message Response
-    {
-        repeated NodeInfo node_infos = 1;
-    }
-}
-
 message HostQuery
 {
     message Response
     {
         repeated string hosts = 1;
-    }
-}
-
-message MysqlResponse
-{
-    string error = 1;
-    repeated google.protobuf.Any datas = 2;
-}
-
-message MysqlQuery
-{
-    message Request
-    {
-        google.protobuf.Any data = 1;
-    }
-}
-message MysqlAnyOper
-{
-    message Request
-    {
-        string sql = 1;
-        string tab = 2;
-    }
-}
-
-message MysqlOper
-{
-    message Request
-    {
-        google.protobuf.Any Data = 1;
     }
 }
 

@@ -45,20 +45,14 @@ namespace Helper
         return duration_cast<microseconds>(tmp).count();
     }
 
-    long long Time::GetToDayZeroTime()
+    long long Time::GetNewTime(int day, int hour, int minute, int second)
     {
         time_t now = GetSecTimeStamp();
         struct tm *t = localtime(&now);
-        t->tm_hour = 0;
-        t->tm_min = 0;
-        t->tm_sec = 0;
-        return mktime(t) + _DaySecond;
-    }
-
-    long long Time::GetTomorrowZeroTime()
-    {
-        long long t = GetToDayZeroTime();
-        return t + _DaySecond;
+        t->tm_hour = hour;
+        t->tm_min = minute;
+        t->tm_sec = second;
+        return mktime(t) + _DaySecond * day;
     }
 
     void Time::GetHourMinSecond(const long long sec, int &hour, int &min, int &second)

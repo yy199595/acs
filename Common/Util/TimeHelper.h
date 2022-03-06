@@ -30,10 +30,7 @@ namespace Helper
         extern std::string GetYearMonthDayString();
 
         //获取今天零点时间戳
-        extern long long GetToDayZeroTime();
-
-        //获取明天零点时间戳
-        extern long long GetTomorrowZeroTime();
+        extern long long GetNewTime(int day = 0, int hour = 0, int minute = 0, int second = 0);
 
         // 获取十分秒
         extern void GetHourMinSecond(long long sec, int &hour, int &min, int &second);

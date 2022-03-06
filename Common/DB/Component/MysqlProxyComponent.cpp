@@ -50,17 +50,16 @@ namespace Sentry
         }
 
         RapidJsonWriter jsonWriter;
-//        jsonWriter.Add("account", "646585122@qq.com");
-//        jsonWriter.Add("user_id", 1000);
-        auto res = this->QueryAll<db_account::tab_user_account>(jsonWriter);
+        jsonWriter.Add("account", "1000@qq.com");
+        jsonWriter.Add("user_id", 1000);
+        auto res = this->QueryOnce<db_account::tab_user_account>(jsonWriter);
 
-        db_account::tab_user_account userAccount;
-        userAccount.set_account("10000@qq.com");
-        std::shared_ptr<MysqlRpcTaskSource> taskSource1 = this->Query(userAccount);
-        if (taskSource1 != nullptr && taskSource1->GetCode() == XCode::Successful)
-        {
 
-        }
+		RapidJsonWriter whereJson;
+		RapidJsonWriter updateJson;
+		whereJson.Add("account", "1000@qq.com");
+		updateJson.Add("phone_num", (long long)13716061997);
+		this->Update<db_account::tab_user_account>(updateJson, whereJson);
     }
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
@@ -110,82 +109,11 @@ namespace Sentry
         return mysqlRpcTaskSource;
     }
 
-    std::shared_ptr<MysqlRpcTaskSource>
-    MysqlProxyComponent::QueryData(const std::string &table, RapidJsonWriter &queryJson, RapidJsonWriter &whereJson)
+    std::shared_ptr<s2s::Mysql::Response> MysqlProxyComponent::Invoke(const std::string &sql)
     {
-        return nullptr;
-    }
-
-    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::DeleteData(const std::string &table, RapidJsonWriter &json)
-    {
-        return nullptr;
-    }
-
-    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Query(const Message &data)
-    {
-        auto requestMessage = this->NewMessage("Query");
-        if (requestMessage == nullptr) {
-            return nullptr;
-        }
-
-        this->mQueryRequest.Clear();
-        this->mQueryRequest.mutable_data()->PackFrom(data);
-        requestMessage->mutable_data()->PackFrom(this->mQueryRequest);
-        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
-
-        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
-        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
-#ifdef __DEBUG__
-        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
-#endif
-        return mysqlRpcTaskSource;
-    }
-
-    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Invoke(const std::string &tab, const std::string &sql)
-    {
-        auto requestMessage = this->NewMessage("Invoke");
-        if (requestMessage == nullptr) {
-            return nullptr;
-        }
-
-        this->mAnyOperRequest.Clear();
-        this->mAnyOperRequest.set_sql(sql);
-        this->mAnyOperRequest.set_tab(tab);
-        requestMessage->mutable_data()->PackFrom(this->mAnyOperRequest);
-        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
-
-        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
-        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
-#ifdef __DEBUG__
-        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
-#endif
-        return mysqlRpcTaskSource;
-    }
-
-    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Delete(const Message &data)
-    {
-        auto requestMessage = this->NewMessage("Delete");
-        if (requestMessage == nullptr) {
-            return nullptr;
-        }
-        this->mOperRequest.Clear();
-        this->mOperRequest.mutable_data()->PackFrom(data);
-        requestMessage->mutable_data()->PackFrom(this->mOperRequest);
-        std::shared_ptr<MysqlRpcTaskSource> mysqlRpcTaskSource(new MysqlRpcTaskSource());
-
-
-        this->mRpcComponent->AddRpcTask(mysqlRpcTaskSource);
-        requestMessage->set_rpc_id(mysqlRpcTaskSource->GetRpcId());
-#ifdef __DEBUG__
-        this->mRpcComponent->AddRpcInfo(mysqlRpcTaskSource->GetRpcId(), requestMessage->method_id());
-#endif
-        return mysqlRpcTaskSource;
-    }
-
-    std::shared_ptr<MysqlRpcTaskSource> MysqlProxyComponent::Sort(const std::string &tab, const std::string &field, int count, bool reverse)
-    {
-        const char * type = !reverse ? "ASC" : "DESC";
-        return this->Invoke(tab, fmt::format(
-                "select * from {0} ORDER BY {1} {2} LIMIT {3}", tab, field, type, count));
+        s2s::Mysql::Invoke request;
+        request.set_sql(sql);
+        auto taskSource = this->Call("Invoke", request);
+        return taskSource != nullptr ? taskSource->GetResponse() : nullptr;
     }
 }

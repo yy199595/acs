@@ -19,7 +19,7 @@ namespace Helper
 		static Message * NewByJson(const std::string & name, const char * json, size_t size,bool clone = false);
 
     public:
-        static std::string ToJson(const Message & message);
+        static const std::string ToJson(const Message & message);
     public:
         static bool GetJson(const Any & message, std::string & json);
         static bool GetJson(const Message & message, std::string & json);

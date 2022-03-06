@@ -133,7 +133,17 @@ namespace Sentry
             }
             if (response->has_data())
             {
-                LOG_DEBUG("json = ", Helper::Proto::ToJson(response->data()));
+                std::string fullName;
+                if(Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
+                {
+                    LOG_DEBUG("type = ", fullName);
+                    Message * message = Helper::Proto::New(fullName);
+                    if(message != nullptr && response->data().UnpackTo(message))
+                    {
+                        const std::string json = Helper::Proto::ToJson(*message);
+                        LOG_DEBUG("json = ", json);
+                    }
+                }
             }
             LOG_DEBUG("*********************************************");
         }
@@ -218,11 +228,6 @@ namespace Sentry
         {
             return false;
         }
-#ifdef __DEBUG__
-        LOG_DEBUG("=============== [send response] ===============");
-        LOG_DEBUG("json = ", Helper::Proto::ToJson(*message));
-        LOG_DEBUG("==============================================");
-#endif
         clientSession->SendToServer(message);
         return true;
     }

@@ -89,11 +89,31 @@ namespace Sentry
         LOG_DEBUG("[time] = [", elapsedTimer.GetMs(), "ms]");
         if (request->has_data())
         {
-            LOG_DEBUG("[request] = ", Helper::Proto::ToJson(request->data()));
+            std::string fullName;
+            if(Any::ParseAnyTypeUrl(request->data().type_url(), &fullName))
+            {
+                LOG_DEBUG("[type] = ", fullName);
+                Message * message = Helper::Proto::New(fullName);
+                if(message != nullptr && request->data().UnpackTo(message))
+                {
+                    std::string json = Helper::Proto::ToJson(*message);
+                    LOG_DEBUG("[request] = ", json);
+                }
+            }
         }
         if (response->has_data())
         {
-            LOG_DEBUG("[response] = ", Helper::Proto::ToJson(response->data()));
+            std::string fullName;
+            if(Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
+            {
+                LOG_DEBUG("[type] = ", fullName);
+                Message * message = Helper::Proto::New(fullName);
+                if(message != nullptr && response->data().UnpackTo(message))
+                {
+                    const std::string json = Helper::Proto::ToJson(*message);
+                    LOG_DEBUG("[response] = ", json);
+                }
+            }
         }
 #endif
         return response;

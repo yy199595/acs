@@ -64,27 +64,19 @@ namespace Sentry
         {
             return;
         }
-
-        time_t t = time(nullptr);
-        struct tm *pt = localtime(&t);
-        struct tm nextRefresh = *pt;
-        zeroRefresh->GetRefreshTime(nextRefresh.tm_hour, nextRefresh.tm_min);
-        if (pt->tm_hour > nextRefresh.tm_hour)
+        int hour, minute, second = 0;
+        zeroRefresh->GetRefreshTime(hour, minute);
+        long long nextTime = Helper::Time::GetNewTime(0, hour, minute);
+        if(Helper::Time::GetSecTimeStamp() - nextTime > 0)
         {
-            nextRefresh.tm_mday += 1;
+            nextTime = Helper::Time::GetNewTime(1, hour, minute);
         }
-        else if (pt->tm_hour == nextRefresh.tm_hour && pt->tm_min > nextRefresh.tm_min)
-        {
-            nextRefresh.tm_mday += 1;
-        }
-        nextRefresh.tm_sec = 0;
-        time_t nextTime = mktime(&nextRefresh) - time(nullptr);
-        this->mTimerComponent->AsyncWait(nextTime * 1000, &OperatorComponent::StartRefreshDay, this,
-                                         component->GetName());
+        long long ms = nextTime - Helper::Time::GetSecTimeStamp();
+        this->mTimerComponent->AsyncWait(ms * 1000, &OperatorComponent::StartRefreshDay,
+                                         this, component->GetName());
 #ifdef __DEBUG__
-        int hour, min, second = 0;
-        Helper::Time::GetHourMinSecond(nextTime, hour, min, second);
-        LOG_DEBUG("Refresh the new day after", hour, 'h', min, 'm', second, 's');
+        Helper::Time::GetHourMinSecond(ms, hour, minute, second);
+        LOG_DEBUG("Refresh the new day after [", hour, 'h', minute, 'm', second, "s]");
 #endif
     }
 

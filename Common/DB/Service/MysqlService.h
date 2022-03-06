@@ -20,11 +20,11 @@ namespace Sentry
 
         XCode Update(const s2s::Mysql::Update & request, s2s::Mysql::Response & response);
 
-        XCode Delete(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response);
+        XCode Delete(const s2s::Mysql::Delete &request, s2s::Mysql::Response &response);
 
         XCode Query(const s2s::Mysql::Query &request, s2s::Mysql::Response &response);
 
-        XCode Invoke(const s2s::MysqlAnyOper_Request & request, s2s::MysqlResponse & response);
+        XCode Invoke(const s2s::Mysql::Invoke & request, s2s::Mysql::Response & response);
     public:
         bool Awake() final;
 

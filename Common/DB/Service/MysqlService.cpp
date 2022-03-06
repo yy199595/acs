@@ -4,7 +4,6 @@
 #include"MysqlClient/MysqlTaskSource.h"
 #include"Object/App.h"
 #include"Pool/MessagePool.h"
-#include"Other/ElapsedTimer.h"
 namespace Sentry
 {
     bool MysqlService::Awake()
@@ -15,6 +14,7 @@ namespace Sentry
 		BIND_RPC_FUNCTION(MysqlService::Query);
 		BIND_RPC_FUNCTION(MysqlService::Delete);
 		BIND_RPC_FUNCTION(MysqlService::Invoke);
+		BIND_RPC_FUNCTION(MysqlService::Update);
         return true;
     }
 
@@ -78,65 +78,62 @@ namespace Sentry
     }
 
     XCode MysqlService::Update(const s2s::Mysql::Update &request, s2s::Mysql::Response &response)
-    {
-        return XCode::Successful;
-    }
+	{
+		LOGIC_THROW_ERROR(!request.table().empty());
+		LOGIC_THROW_ERROR(!request.where_json().empty());
 
-    XCode MysqlService::Delete(const s2s::MysqlOper_Request &request, s2s::MysqlResponse &response)
-    {
-		Message * message = Helper::Proto::NewByData(request.data());
-		if (message == nullptr)
+		std::string sql;
+		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
 		{
-			return XCode::ParseMessageError;
+			return XCode::CallArgsError;
 		}
+		std::shared_ptr<MysqlTaskSource> taskSource =
+			std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
+
+		XCode code = taskSource->Await(sql);
+		if (code != XCode::Successful)
+		{
+			response.set_error(taskSource->GetErrorStr());
+#ifdef __DEBUG__
+			LOG_INFO(sql);
+			LOG_ERROR(taskSource->GetErrorStr());
+#endif
+			return code;
+		}
+		return XCode::Successful;
+	}
+
+    XCode MysqlService::Delete(const s2s::Mysql::Delete &request, s2s::Mysql::Response &response)
+    {
+        LOGIC_THROW_ERROR(!request.table().empty());
+        LOGIC_THROW_ERROR(!request.where_json().empty());
+
         std::string sql;
-        if (!this->mMysqlComponent->GetDeleteSqlCommand(*message, sql))
-        {
+        if (!this->mMysqlComponent->ToSqlCommand(request, sql)) {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__
-        ElapsedTimer timer;
-#endif
-        std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+        std::shared_ptr<MysqlTaskSource> taskSource =
+            std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
 
         XCode code = taskSource->Await(sql);
-
-#ifdef __DEBUG__
-        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
-#endif
-        if(code != XCode::Successful)
+        if (code != XCode::Successful)
         {
+            response.set_error(taskSource->GetErrorStr());
 #ifdef __DEBUG__
             LOG_INFO(sql);
             LOG_ERROR(taskSource->GetErrorStr());
 #endif
-            response.set_error(taskSource->GetErrorStr());
             return code;
         }
         return XCode::Successful;
     }
 
-    XCode MysqlService::Invoke(const s2s::MysqlAnyOper_Request &request, s2s::MysqlResponse &response)
+    XCode MysqlService::Invoke(const s2s::Mysql::Invoke &request, s2s::Mysql::Response &response)
     {
-        if (request.sql().empty())
-        {
-            return XCode::CallArgsError;
-        }
-#ifdef __DEBUG__
-      ElapsedTimer timer;
-#endif
-        std::string protoFullName;
-        if(!this->mMysqlComponent->GetProtoByTable(request.tab(), protoFullName))
-        {
-            return XCode::CallArgsError;
-        }
+        LOGIC_THROW_ERROR(!request.sql().empty());
         std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
 
         XCode code = taskSource->Await(request.sql());
-
-#ifdef __DEBUG__
-        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
-#endif
         if (code != XCode::Successful)
         {
 #ifdef __DEBUG__
@@ -150,12 +147,7 @@ namespace Sentry
         std::string json;
         while (taskSource->GetQueryData(json))
         {
-            Message *message = Helper::Proto::NewByJson(protoFullName, json);
-            if (message == nullptr)
-            {
-                return XCode::JsonCastProtoFailure;
-            }
-            response.add_datas()->PackFrom(*message);
+            response.add_json_array(json);
         }
         return XCode::Successful;
     }
@@ -169,21 +161,12 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-#ifdef __DEBUG__
-      ElapsedTimer timer;
-#endif
         std::shared_ptr<MysqlTaskSource> taskSource
             = std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
 
         XCode code = taskSource->Await(sql);
-#ifdef __DEBUG__
-        std::cout << "save sql time = [" << timer.GetMs() << "ms]" << std::endl;
-#endif
         if (code != XCode::Successful)
         {
-#ifdef __DEBUG__
-            LOG_ERROR(taskSource->GetErrorStr());
-#endif
             response.set_error(taskSource->GetErrorStr());
             return code;
         }
@@ -193,6 +176,7 @@ namespace Sentry
         {
             response.add_json_array(json);
         }
+
         return XCode::Successful;
     }
 }// namespace Sentry

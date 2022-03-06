@@ -37,8 +37,16 @@
             "Async":true,
             "Timeout":0,
             "Type":"Server",
-            "Request":"s2s.MysqlAnyOper.Request",
-            "Response":"s2s.MysqlResponse"
+            "Request":"s2s.Mysql.Invoke",
+            "Response":"s2s.Mysql.Response"
+        },
+        "Update": {
+            "Id": 106,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Update",
+            "Response": "s2s.Mysql.Response"
         }
     },
     "GateService": {

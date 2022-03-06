@@ -16,14 +16,13 @@ namespace Sentry
         return this->mMessage->ByteSize() + sizeof(char) + sizeof(int);
     }
 
-    bool NetworkData::WriteToBuffer(asio::streambuf & streamBuffer)
+    bool NetworkData::WriteToBuffer(std::string & streamBuffer)
     {
+        streamBuffer.clear();
+        streamBuffer += this->mType;
         int body = this->mMessage->ByteSize();
-        std::ostream stream(&streamBuffer);
-
-        stream.write(&this->mType, 1);
-        stream.write((char *)&body, sizeof(int));
-        return this->mMessage->SerializeToOstream(&stream);
+        streamBuffer.append((char *) &body, sizeof(int));
+        return this->mMessage->AppendToString(&streamBuffer);
     }
 }
 
@@ -202,7 +201,9 @@ namespace Sentry
         message->WriteToBuffer(this->mSendBuffer);
         std::shared_ptr<RpcClient> self = this->shared_from_this();
         AsioTcpSocket & tcpSocket = this->mSocketProxy->GetSocket();
-        asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message]
+
+        size_t size = this->mSendBuffer.size();
+        tcpSocket.async_send(asio::buffer(this->mSendBuffer),[this, self, message]
                 (const asio::error_code & code, size_t size)
         {
             if (code)
