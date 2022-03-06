@@ -107,6 +107,7 @@ namespace Sentry
 		{
 			return false;
 		}
+		data.clear();
 		data = this->mQueryDatas.front();
 		this->mQueryDatas.pop();
 		return true;

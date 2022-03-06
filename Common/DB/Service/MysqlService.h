@@ -31,6 +31,7 @@ namespace Sentry
         bool LateAwake() final;
 
     private:
+		std::string mJson;
         class MysqlComponent *mMysqlComponent;
     };
 }// namespace Sentry

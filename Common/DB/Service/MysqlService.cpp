@@ -144,10 +144,9 @@ namespace Sentry
             return code;
         }
 
-        std::string json;
-        while (taskSource->GetQueryData(json))
+        while (taskSource->GetQueryData(this->mJson))
         {
-            response.add_json_array(json);
+            response.add_json_array(this->mJson);
         }
         return XCode::Successful;
     }
@@ -171,10 +170,9 @@ namespace Sentry
             return code;
         }
 
-        std::string json;
-        while (taskSource->GetQueryData(json))
+        while (taskSource->GetQueryData(this->mJson))
         {
-            response.add_json_array(json);
+            response.add_json_array(this->mJson);
         }
 
         return XCode::Successful;
