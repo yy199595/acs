@@ -305,7 +305,7 @@ namespace Sentry
 				this->mSqlCommandStream << " and ";
 			}
 		}
-
+		sqlCommand = this->mSqlCommandStream.str();
 		return true;
 	}
 

@@ -60,6 +60,10 @@ namespace Sentry
 		whereJson.Add("account", "1000@qq.com");
 		updateJson.Add("phone_num", (long long)13716061997);
 		this->Update<db_account::tab_user_account>(updateJson, whereJson);
+
+		RapidJsonWriter deleteJson;
+		deleteJson.Add("account", "1000@qq.com");
+		this->Delete<db_account::tab_user_account>(deleteJson);
     }
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
