@@ -76,7 +76,9 @@ namespace Sentry
                                          this, component->GetName());
 #ifdef __DEBUG__
         Helper::Time::GetHourMinSecond(ms, hour, minute, second);
-        LOG_DEBUG("Refresh the new day after [", hour, 'h', minute, 'm', second, "s]");
+		std::string str = fmt::format("refresh {0} new day after "
+									  "{1}小时{1}分{2}分", component->GetName(), hour, minute, second);
+		LOG_DEBUG(str);
 #endif
     }
 

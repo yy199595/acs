@@ -76,7 +76,6 @@
         "LuaScriptComponent",
         "LuaServiceMgrComponent",
         "RpcClientComponent",
-        "OperatorComponent",
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent",
