@@ -33,38 +33,42 @@ namespace Sentry
     }
 
 	void MysqlProxyComponent::AddUserData()
-    {
-        for(int index = 0; index<10;index++)
-        {
-            db_account::tab_user_account userAccountData;
-            userAccountData.set_user_id(10000 + index);
-            userAccountData.set_device_mac("ios_qq");
-            userAccountData.set_token(Helper::String::CreateNewToken());
-            userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
-            userAccountData.set_account(to_string(userAccountData.user_id()) + "@qq.com");
+	{
+		ElapsedTimer timer;
+		for (int index = 0; index < 100; index++)
+		{
+			db_account::tab_user_account userAccountData;
+			userAccountData.set_user_id(10000 + index);
+			userAccountData.set_device_mac("ios_qq");
+			std::string account = std::to_string((10000 + index)) + "@qq.com";
+			userAccountData.set_token(Helper::String::CreateNewToken());
+			userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
+			userAccountData.set_account(account);
 
-            if (this->Add(userAccountData) == XCode::Successful)
-            {
-                LOG_ERROR("add data successful ");
-            }
-        }
+			if (this->Add(userAccountData) == XCode::Successful)
+			{
+				LOG_ERROR("add data successful ");
+			}
 
-        RapidJsonWriter jsonWriter;
-        jsonWriter.Add("account", "1000@qq.com");
-        jsonWriter.Add("user_id", 1000);
-        auto res = this->QueryOnce<db_account::tab_user_account>(jsonWriter);
+			RapidJsonWriter jsonWriter;
+			jsonWriter.Add("account", account);
+			jsonWriter.Add("user_id", 1000);
+			auto res = this->QueryOnce<db_account::tab_user_account>(jsonWriter);
 
+			RapidJsonWriter whereJson;
+			RapidJsonWriter updateJson;
+			whereJson.Add("account", account);
+			updateJson.Add("phone_num", (long long)13716061997);
+			this->Update<db_account::tab_user_account>(updateJson, whereJson);
 
-		RapidJsonWriter whereJson;
-		RapidJsonWriter updateJson;
-		whereJson.Add("account", "1000@qq.com");
-		updateJson.Add("phone_num", (long long)13716061997);
-		this->Update<db_account::tab_user_account>(updateJson, whereJson);
+			RapidJsonWriter deleteJson;
+			deleteJson.Add("account", account);
+			//this->Delete<db_account::tab_user_account>(deleteJson);
 
-		RapidJsonWriter deleteJson;
-		deleteJson.Add("account", "1000@qq.com");
-		this->Delete<db_account::tab_user_account>(deleteJson);
-    }
+		}
+		LOG_ERROR("sql user time = ", timer.GetMs(), "ms");
+
+	}
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
     {

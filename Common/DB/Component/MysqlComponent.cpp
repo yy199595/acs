@@ -311,7 +311,7 @@ namespace Sentry
 
 	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Add& request, std::string& sqlCommand)
 	{
-		Message* message = Helper::Proto::NewByData(request.data());
+		std::shared_ptr<Message> message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
 		{
 			return false;
@@ -322,7 +322,7 @@ namespace Sentry
 
 	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Save& request, std::string& sqlCommand)
 	{
-		Message* message = Helper::Proto::NewByData(request.data());
+		std::shared_ptr<Message> message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
 		{
 			return false;

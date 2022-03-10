@@ -92,11 +92,12 @@ namespace Sentry
             std::string fullName;
             if(Any::ParseAnyTypeUrl(request->data().type_url(), &fullName))
             {
+				std::string json;
                 LOG_DEBUG("[type] = ", fullName);
-                Message * message = Helper::Proto::New(fullName);
-                if(message != nullptr && request->data().UnpackTo(message))
+				Helper::Proto::NewByData(request->data());
+                auto message = Helper::Proto::NewByData(request->data());
+                if(message != nullptr && Helper::Proto::GetJson(message, json))
                 {
-                    std::string json = Helper::Proto::ToJson(*message);
                     LOG_DEBUG("[request] = ", json);
                 }
             }
@@ -106,11 +107,11 @@ namespace Sentry
             std::string fullName;
             if(Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
             {
+				std::string json;
                 LOG_DEBUG("[type] = ", fullName);
-                Message * message = Helper::Proto::New(fullName);
-                if(message != nullptr && response->data().UnpackTo(message))
+                auto message = Helper::Proto::NewByData(response->data());
+                if(message != nullptr && Helper::Proto::GetJson(message, json))
                 {
-                    const std::string json = Helper::Proto::ToJson(*message);
                     LOG_DEBUG("[response] = ", json);
                 }
             }

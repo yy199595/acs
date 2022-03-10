@@ -113,43 +113,43 @@ namespace Sentry
     }
 
     void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
-    {
+	{
 #ifdef __DEBUG__
-        int methodId = 0;
-        long long costTime = 0;
-        long long rpcId = response->rpc_id();
-        this->mRpcComponent->GetRpcInfo(rpcId, methodId, costTime);
-        auto config = this->mProtoConfigComponent->GetProtocolConfig(methodId);
-        if (config != nullptr)
-        {
-            LOG_DEBUG("*****************[receive response]******************");
-            LOG_DEBUG("func = ", config->Service, '.', config->Method);
-            LOG_DEBUG("time = ", costTime, "ms");
+		int methodId = 0;
+		long long costTime = 0;
+		long long rpcId = response->rpc_id();
+		this->mRpcComponent->GetRpcInfo(rpcId, methodId, costTime);
+		auto config = this->mProtoConfigComponent->GetProtocolConfig(methodId);
+		if (config != nullptr)
+		{
+			LOG_DEBUG("*****************[receive response]******************");
+			LOG_DEBUG("func = ", config->Service, '.', config->Method);
+			LOG_DEBUG("time = ", costTime, "ms");
 
-            if(response->code() != (int)XCode::Successful)
-            {
-                auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
-                LOG_ERROR("code => ", codeConfig->Name, ':', codeConfig->Desc);
-            }
-            if (response->has_data())
-            {
-                std::string fullName;
-                if(Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
-                {
-                    LOG_DEBUG("type = ", fullName);
-                    Message * message = Helper::Proto::New(fullName);
-                    if(message != nullptr && response->data().UnpackTo(message))
-                    {
-                        const std::string json = Helper::Proto::ToJson(*message);
-                        LOG_DEBUG("json = ", json);
-                    }
-                }
-            }
-            LOG_DEBUG("*********************************************");
-        }
+			if (response->code() != (int)XCode::Successful)
+			{
+				auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
+				LOG_ERROR("code => ", codeConfig->Name, ':', codeConfig->Desc);
+			}
+			if (response->has_data())
+			{
+				std::string fullName;
+				if (Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
+				{
+					std::string json;
+					LOG_DEBUG("type = ", fullName);
+					std::shared_ptr<Message> message = Helper::Proto::NewByData(response->data());
+					if (message != nullptr && Helper::Proto::GetJson(message, json))
+					{
+						LOG_DEBUG("json = ", json);
+					}
+				}
+			}
+			LOG_DEBUG("*********************************************");
+		}
 #endif
-        this->mRpcComponent->OnResponse(response);
-    }
+		this->mRpcComponent->OnResponse(response);
+	}
 
     std::shared_ptr<ProtoRpcClient> RpcClientComponent::MakeSession(const std::string &name, const std::string & address)
 	{
@@ -210,11 +210,15 @@ namespace Sentry
             return false;
         }
 #ifdef __DEBUG__
+		std::string json;
         auto config = App::Get().GetComponent<RpcConfigComponent>()->
                 GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
         LOG_DEBUG("func = ", config->Service,'.', config->Method);
-        LOG_DEBUG("json = ", Helper::Proto::ToJson(*message));
+		if(Helper::Proto::GetJson(message, json))
+		{
+			LOG_DEBUG("json = ", json);
+		}
         LOG_DEBUG("==============================================");
 #endif
         clientSession->SendToServer(message);

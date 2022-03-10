@@ -37,8 +37,8 @@ namespace Sentry
 
         size_t size = 0;
         const char *str = lua_tolstring(this->mLuaEnv, -2, &size);
-        Message *message = Helper::Proto::NewByJson(name, str, size, true);
-        return make_tuple(XCode::Successful, std::shared_ptr<Message>(message));
+        std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, str, size);
+        return make_tuple(XCode::Successful, message);
     }
 
     tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::CallAsync(long long id, const std::string &json)
@@ -65,8 +65,8 @@ namespace Sentry
             return make_tuple(code, nullptr);
         }
         const std::string &response = luaTaskSource->GetJson();
-        Message *message = Helper::Proto::NewByJson(name, response, true);
-        return make_tuple(XCode::Successful, std::shared_ptr<Message>(message));
+        std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, response);
+        return make_tuple(XCode::Successful, message);
     }
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request & request, com::Rpc_Response & response)

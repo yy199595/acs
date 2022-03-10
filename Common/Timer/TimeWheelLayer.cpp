@@ -38,8 +38,9 @@ namespace Sentry
     bool TimeWheelLayer::MoveIndex(std::queue<long long> &timers)
     {
         std::queue<long long > & slotTimers = this->mTimerSlot[this->mCurIndex];
-        if(!slotTimers.empty()) {
-            std::swap(timers, slotTimers);
+        if(!slotTimers.empty())
+		{
+            timers = std::move(slotTimers);
         }
         if ((++this->mCurIndex) >= this->mMaxCount)
         {

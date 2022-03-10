@@ -1,9 +1,8 @@
 #include "MessagePool.h"
 namespace Helper
 {
-	std::unordered_map<std::string, Message *> Proto::mMessageMap;
-
-	Message * Proto::New(const Any & any)
+	std::unordered_map<std::string, const Message *> Proto::mMessageMap;
+	std::shared_ptr<Message> Proto::New(const Any & any)
     {
         std::string fullName;
         if(!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
@@ -13,48 +12,32 @@ namespace Helper
         return Proto::New(fullName);
     }
 
-    Message *Proto::NewByData(const Any &any, bool clone)
+	std::shared_ptr<Message> Proto::NewByData(const Any &any)
     {
         std::string fullName;
         if (!google::protobuf::Any::ParseAnyTypeUrl(any.type_url(), &fullName))
         {
             return nullptr;
         }
-        Message *message = Proto::New(fullName);
-        if (message != nullptr && any.UnpackTo(message))
+		std::shared_ptr<Message> message = Proto::New(fullName);
+        if (message != nullptr && any.UnpackTo(message.get()))
         {
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
             return message;
         }
         return nullptr;
     }
 
-    Message *Proto::NewByJson(const Any &any, const std::string &json,bool clone)
+	std::shared_ptr<Message> Proto::NewByJson(const Any &any, const std::string &json)
     {
-        Message * message = Proto::New(any);
-        if(message == nullptr)
+		std::shared_ptr<Message> message = Proto::New(any);
+        if(message != nullptr && util::JsonStringToMessage(json, message.get()).ok())
         {
-            return nullptr;
-        }
-        if(util::JsonStringToMessage(json, message).ok())
-        {
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
             return message;
         }
         return nullptr;
     }
 
-	Message * Proto::New(const std::string & name)
+	std::shared_ptr<Message> Proto::New(const std::string & name)
 	{
 		if (name.empty())
 		{
@@ -63,127 +46,62 @@ namespace Helper
 		auto iter = mMessageMap.find(name);
 		if (iter != mMessageMap.end())
 		{
-			Message * message = iter->second;
-			message->Clear();
-			return message;
+			const Message* message = iter->second;
+			return std::shared_ptr<Message>(message->New());
 		}
 
-		const DescriptorPool *pDescriptorPool = DescriptorPool::generated_pool();
-		const Descriptor *pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
+		const DescriptorPool* pDescriptorPool = DescriptorPool::generated_pool();
+		const Descriptor* pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
 		if (pDescriptor == nullptr)
 		{
 			return nullptr;
 		}
-		MessageFactory *factory = MessageFactory::generated_factory();
-		const Message *pMessage = factory->GetPrototype(pDescriptor);
-		Message * newMessage = pMessage->New();
-		if (newMessage != nullptr)
+		MessageFactory* factory = MessageFactory::generated_factory();
+		const Message* pMessage = factory->GetPrototype(pDescriptor);
+		if (pMessage != nullptr)
 		{
-			mMessageMap.emplace(name, newMessage);
-			return newMessage;
+			mMessageMap.emplace(name, pMessage);
+			return std::shared_ptr<Message>(pMessage->New());
 		}
 		return nullptr;
 	}
 
-	Message * Proto::NewByJson(const std::string & name, const std::string & json,bool clone)
+	std::shared_ptr<Message> Proto::NewByJson(const std::string & name, const std::string & json)
 	{
-		Message * message = New(name);
-		if (message == nullptr)
+		std::shared_ptr<Message> message = New(name);
+		if (message == nullptr && util::JsonStringToMessage(json, message.get()).ok())
 		{
-			return nullptr;
-		}
-        if(util::JsonStringToMessage(json, message).ok())
-        {
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
-            return message;
-        }
-		return nullptr;
-	}
-
-	Message * Proto::NewByJson(const std::string & name, const char * json, size_t size,bool clone)
-	{
-		Message * message = New(name);
-		if (message == nullptr)
-		{
-			return nullptr;
-		}
-		if (util::JsonStringToMessage(StringPiece(json, size), message).ok())
-		{
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
 			return message;
 		}
 		return nullptr;
 	}
 
-	Message * Proto::NewByData(const std::string & name, const std::string & data,bool clone)
+	std::shared_ptr<Message> Proto::NewByJson(const std::string & name, const char * json, size_t size)
 	{
-		Message * message = New(name);
-		if (message == nullptr)
+		std::shared_ptr<Message> message = New(name);
+		if (message != nullptr &&util::JsonStringToMessage(
+			StringPiece(json, size), message.get()).ok())
 		{
-			return nullptr;
+			return message;
 		}
-		if (message->ParseFromString(data))
-		{
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
-            return message;
-		}
-        return nullptr;
+		return nullptr;
 	}
 
-	Message * Proto::NewByData(const std::string & name, const char * json, size_t size,bool clone)
-    {
-        Message *message = New(name);
-        if (message == nullptr)
-        {
-            return nullptr;
-        }
-        if (message->ParseFromArray(json, size))
-        {
-            if(clone)
-            {
-                auto obj = message->New();
-                obj->CopyFrom(*message);
-                return obj;
-            }
-            return message;
-        }
-        return nullptr;
-    }
-
-    const std::string Proto::ToJson(const Message &message)
-    {
-        std::string json = "";
-        if(util::MessageToJsonString(message, &json).ok())
-        {
-            return json;
-        }
-        return json;
-    }
+	bool Proto::GetJson(std::shared_ptr<Message> message, std::string& json)
+	{
+		json.clear();
+		return util::MessageToJsonString(*message, &json).ok();
+	}
 
     bool Proto::GetJson(const Any &message, std::string &json)
     {
         json.clear();
-        Message * pb = Proto::New(message);
+		std::shared_ptr<Message> pb = Proto::NewByData(message);
         if(pb == nullptr)
         {
             return false;
         }
-        return message.UnpackTo(pb) && util::MessageToJsonString(*pb, &json).ok();
+        return message.UnpackTo(pb.get()) && util::MessageToJsonString(*pb, &json).ok();
     }
 
     bool Proto::GetJson(const Message &message, std::string &json)

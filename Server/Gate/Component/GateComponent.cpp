@@ -73,16 +73,24 @@ namespace Sentry
     }
 
     XCode GateComponent::OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response)
-    {
+	{
 #ifdef __DEBUG__
-        LOG_WARN("**********[client response]**********");
-        LOG_WARN("json = ", Helper::Proto::ToJson(*response));
-        LOG_WARN("*****************************************");
+		LOG_WARN("**********[client response]**********");
+		if (response->has_data())
+		{
+			std::string json;
+			std::shared_ptr<Message> message = Helper::Proto::NewByData(response->data());
+			if (message != nullptr && Helper::Proto::GetJson(message, json))
+			{
+				LOG_WARN("json = ", json);
+			}
+		}
+		LOG_WARN("*****************************************");
 #endif
-        if(this->mGateClientComponent->SendToClient(sockId, response))
-        {
-            return XCode::NetWorkError;
-        }
-        return XCode::Successful;
-    }
+		if (this->mGateClientComponent->SendToClient(sockId, response))
+		{
+			return XCode::NetWorkError;
+		}
+		return XCode::Successful;
+	}
 }

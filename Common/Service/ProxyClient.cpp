@@ -98,9 +98,6 @@ namespace Sentry
     void ProxyClient::PushMessage(std::shared_ptr<com::Rpc_Request> message)
     {
         this->mMessageQueue.emplace(message);
-#ifdef __DEBUG__
-        LOG_WARN("push to [", this->mAddress, "]");
-#endif
         if(this->mLoopTaskSource != nullptr)
         {
             this->mLoopTaskSource->SetResult();
