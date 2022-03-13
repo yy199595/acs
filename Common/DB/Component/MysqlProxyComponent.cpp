@@ -78,11 +78,11 @@ namespace Sentry
 				LOG_ERROR(index, "========================", t2 - t1);
 			}));
 
-			timerComponent->AddTimer(index * 120, new LambdaMethod([t1, index]()
-			{
-				long long t4 = Helper::Time::GetMilTimestamp();
-				LOG_WARN(index, "========================", t4 - t1);
-			}));
+//			timerComponent->AddTimer(index * 120, new LambdaMethod([t1, index]()
+//			{
+//				long long t4 = Helper::Time::GetMilTimestamp();
+//				LOG_WARN(index, "========================", t4 - t1);
+//			}));
 		}
 	}
 

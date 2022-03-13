@@ -33,11 +33,13 @@ namespace Sentry
     protected:
         bool Awake() final;
 
-		bool LateAwake() final;
+		bool LateAwake() final { return true; }
 
         void OnSystemUpdate() final;//处理系统事件
 
-        bool AddTimerToWheel(TimerBase * timer);
+		bool AddTimerToWheel(long long timerId);
+
+		bool AddTimerToWheel(TimerBase * timer);
 
     private:
         const int LayerCount = 5;

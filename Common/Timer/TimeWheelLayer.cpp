@@ -15,25 +15,28 @@ namespace Sentry
     }
 
     bool TimeWheelLayer::AddTimer(int tick, long long timerId)
-    {
-        if (tick >= this->mMin && tick < this->mMax)
-        {
-            int index = this->mMin == 0 ? tick
-                                          : (tick - this->mMin) / this->mMin;
+	{
+		if (tick >= this->mMin && tick < this->mMax)
+		{
+			int index = this->mMin == 0 ? tick
+										: (tick - this->mMin) / this->mMin;
 
-            if (index + this->mCurIndex < this->mMaxCount)
-            {
-                index += this->mCurIndex;
-                this->mTimerSlot[index].push(timerId);
-            } else
-            {
-                index = index + this->mCurIndex - this->mMaxCount;
-                this->mTimerSlot[index].push(timerId);
-            }
-            return true;
-        }
-        return false;
-    }
+			if (index + this->mCurIndex < this->mMaxCount)
+			{
+				index += this->mCurIndex;
+				this->mTimerSlot[index].push(timerId);
+				//printf("timer %lld add to layer = %d slot = %d\n", timerId, this->mLayerId, index);
+			}
+			else
+			{
+				index = index + this->mCurIndex - this->mMaxCount;
+				this->mTimerSlot[index].push(timerId);
+				//printf("timer %lld add to layer = %d slot = %d\n", timerId, this->mLayerId, index);
+			}
+			return true;
+		}
+		return false;
+	}
 
 	std::queue<long long> & TimeWheelLayer::GetTimerQueue()
 	{

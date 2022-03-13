@@ -20,15 +20,12 @@ namespace Sentry
         return true;
     }
 
-	bool TimerComponent::LateAwake()
-    {
-        this->mNextUpdateTime = Helper::Time::GetMilTimestamp();
-        return true;
-    }
-
     long long TimerComponent::AddTimer(TimerBase * timer)
     {
-        LOG_CHECK_FATAL(this->mNextUpdateTime > 0);
+		if(this->mNextUpdateTime == 0)
+		{
+			this->mNextUpdateTime = Helper::Time::GetMilTimestamp();
+		}
         if (timer == nullptr || !this->AddTimerToWheel(timer))
         {
             return 0;
@@ -66,62 +63,54 @@ namespace Sentry
     }
 
     void TimerComponent::OnSystemUpdate()
-    {
-        long long nowTime = Helper::Time::GetMilTimestamp();
-        long long subTime = nowTime - this->mNextUpdateTime;
-        const int tick = subTime / this->TimerPrecision;
+	{
+		long long nowTime = Helper::Time::GetMilTimestamp();
+		long long subTime = nowTime - this->mNextUpdateTime;
+		const int tick = subTime / this->TimerPrecision;
 
-        if(tick <= 0) return;
+		if (tick <= 0 || this->mNextUpdateTime == 0)
+		{
+			return;
+		}
 
+		this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
 
-        this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
-
-        for (size_t index = 0; index < tick; index++)
-        {
-            TimeWheelLayer *timerLayer = this->mTimerLayers[0];
-			std::queue<long long> & timerQueue = timerLayer->GetTimerQueue();
-            while (!timerQueue.empty())
-            {
-                auto id = timerQueue.front();
-				timerQueue.pop();
-                auto iter = this->mTimerMap.find(id);
-                if (iter != this->mTimerMap.end())
-                {
-                    TimerBase * timer = iter->second;
-                    if(timer != nullptr)
-                    {
-                        iter->second->Invoke();
-                        this->mTimerMap.erase(iter);
-                        delete timer;
-                    }
-                }
-            }
-			if(!timerLayer->MoveIndex())
+		for(int count = 0; count < tick; count++)
+		{
+			for (size_t index = 0; index < this->mTimerLayers.size(); index++)
 			{
-				return;
-			}
-            for (size_t i = 0;  i < this->mTimerLayers.size(); i++)
-            {
-                timerLayer = this->mTimerLayers[i];
-				timerQueue = timerLayer->GetTimerQueue();
-				LOG_DEBUG("layer index = ", i);
-                while (!timerQueue.empty())
-                {
-                    long long id = timerQueue.front();
-                    timerQueue.pop();
-                    auto timer = this->GetTimer(id);
-                    if(timer != nullptr)
-                    {
-                        this->AddTimerToWheel(timer);
-                    }
-                }
-				if(!timerLayer->MoveIndex())
+				TimeWheelLayer* timeWheelLayer = this->mTimerLayers[index];
+				std::queue<long long>& timerQueue = timeWheelLayer->GetTimerQueue();
+				while(!timerQueue.empty())
+				{
+					long long id = timerQueue.front();
+					this->AddTimerToWheel(id);
+					timerQueue.pop();
+				}
+				if(!timeWheelLayer->MoveIndex())
 				{
 					break;
 				}
 			}
-        }
-    }
+		}
+	}
+
+	bool TimerComponent::AddTimerToWheel(long long timerId)
+	{
+		auto iter = this->mTimerMap.find(timerId);
+		if(iter == this->mTimerMap.end())
+		{
+			return false;
+		}
+		TimerBase * timer = iter->second;
+		if(this->AddTimerToWheel(timer))
+		{
+			delete timer;
+			this->mTimerMap.erase(iter);
+			return true;
+		}
+		return false;
+	}
 
     bool TimerComponent::AddTimerToWheel(TimerBase * timer)
     {
