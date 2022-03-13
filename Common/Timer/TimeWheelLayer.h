@@ -12,8 +12,10 @@ namespace Sentry
     public:
         bool AddTimer(int tick, long long timerId);
 
-        bool MoveIndex();
+        bool JumpNextLayer();
 		std::queue<long long> & GetTimerQueue();
+		const int GetLayerId() { return this->mLayerId;}
+		const size_t GetLayerIndex() { return this->mCurIndex;}
     private:
         const int mMin;
         const int mMax;

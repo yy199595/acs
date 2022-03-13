@@ -18,20 +18,21 @@ namespace Sentry
 	{
 		if (tick >= this->mMin && tick < this->mMax)
 		{
-			int index = this->mMin == 0 ? tick
-										: (tick - this->mMin) / this->mMin;
+			int index = this->mMin == 0 ? tick : (tick - this->mMin) / this->mMin;
 
 			if (index + this->mCurIndex < this->mMaxCount)
 			{
 				index += this->mCurIndex;
 				this->mTimerSlot[index].push(timerId);
-				//printf("timer %lld add to layer = %d slot = %d\n", timerId, this->mLayerId, index);
+//				printf("[layer = %d] [tick = %d] [curIndex = %d] [slot = %d]\n",
+//					this->mLayerId, tick, this->mCurIndex, index);
 			}
 			else
 			{
 				index = index + this->mCurIndex - this->mMaxCount;
 				this->mTimerSlot[index].push(timerId);
-				//printf("timer %lld add to layer = %d slot = %d\n", timerId, this->mLayerId, index);
+//				printf("[layer = %d] [tick = %d] [curIndex = %d] [slot = %d]\n",
+//					this->mLayerId, tick, this->mCurIndex, index);
 			}
 			return true;
 		}
@@ -40,16 +41,15 @@ namespace Sentry
 
 	std::queue<long long> & TimeWheelLayer::GetTimerQueue()
 	{
-		return this->mTimerSlot[this->mCurIndex];
+		if(this->mCurIndex >= this->mMaxCount)
+		{
+			this->mCurIndex = 0;
+		}
+		return this->mTimerSlot[this->mCurIndex++];
 	}
 
-    bool TimeWheelLayer::MoveIndex()
+    bool TimeWheelLayer::JumpNextLayer()
     {
-        if ((++this->mCurIndex) >= this->mMaxCount)
-        {
-            this->mCurIndex = 0;
-            return true;
-        }
-        return false;
+        return this->mCurIndex >= this->mMaxCount;
     }
 }// namespace Sentry

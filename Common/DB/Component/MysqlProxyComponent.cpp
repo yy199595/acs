@@ -68,8 +68,8 @@ namespace Sentry
 
 		}
 		LOG_ERROR("sql user time = ", timer.GetMs(), "ms");
-
-		for (int index = 0; index < 1000; index++)
+		printf("========================================\n");
+		for (int index = 0; index < 100; index++)
 		{
 			long long t1 = Helper::Time::GetMilTimestamp();
 			timerComponent->AddTimer(index * 100, new LambdaMethod([t1, index]()
@@ -77,13 +77,8 @@ namespace Sentry
 				long long t2 = Helper::Time::GetMilTimestamp();
 				LOG_ERROR(index, "========================", t2 - t1);
 			}));
-
-//			timerComponent->AddTimer(index * 120, new LambdaMethod([t1, index]()
-//			{
-//				long long t4 = Helper::Time::GetMilTimestamp();
-//				LOG_WARN(index, "========================", t4 - t1);
-//			}));
 		}
+		printf("add timer successful\n");
 	}
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)

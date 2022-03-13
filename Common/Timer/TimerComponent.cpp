@@ -81,13 +81,38 @@ namespace Sentry
 			{
 				TimeWheelLayer* timeWheelLayer = this->mTimerLayers[index];
 				std::queue<long long>& timerQueue = timeWheelLayer->GetTimerQueue();
-				while(!timerQueue.empty())
+				if(timeWheelLayer->GetLayerId() == 0)
 				{
-					long long id = timerQueue.front();
-					this->AddTimerToWheel(id);
-					timerQueue.pop();
+					while(!timerQueue.empty())
+					{
+						long long id = timerQueue.front();
+						auto iter = this->mTimerMap.find(id);
+						if(iter != this->mTimerMap.end())
+						{
+							TimerBase * timerBase = iter->second;
+							if(timerBase != nullptr)
+							{
+								timerBase->Invoke();
+								delete timerBase;
+							}
+							this->mTimerMap.erase(iter);
+						}
+						timerQueue.pop();
+					}
 				}
-				if(!timeWheelLayer->MoveIndex())
+				else
+				{
+					printf("[layer = %d]  [index = %d] [count = %u]\n", timeWheelLayer->GetLayerId(), timeWheelLayer
+						->GetLayerIndex(), timerQueue.size());
+					while(!timerQueue.empty())
+					{
+						long long id = timerQueue.front();
+						this->AddTimerToWheel(id);
+						timerQueue.pop();
+					}
+
+				}
+				if(!timeWheelLayer->JumpNextLayer())
 				{
 					break;
 				}
@@ -103,13 +128,7 @@ namespace Sentry
 			return false;
 		}
 		TimerBase * timer = iter->second;
-		if(this->AddTimerToWheel(timer))
-		{
-			delete timer;
-			this->mTimerMap.erase(iter);
-			return true;
-		}
-		return false;
+		return this->AddTimerToWheel(timer);
 	}
 
     bool TimerComponent::AddTimerToWheel(TimerBase * timer)
