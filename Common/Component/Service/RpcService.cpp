@@ -3,7 +3,6 @@
 #include <Method/LuaServiceMethod.h>
 #include<Scene/RpcConfigComponent.h>
 #ifdef __DEBUG__
-#include"Other/ElapsedTimer.h"
 #include"Pool/MessagePool.h"
 #endif
 namespace Sentry
@@ -61,9 +60,6 @@ namespace Sentry
         {
             return nullptr;
         }
-#ifdef __DEBUG__
-        ElapsedTimer elapsedTimer;
-#endif
         std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
 
         response->set_rpc_id(request->rpc_id());
@@ -82,41 +78,6 @@ namespace Sentry
             response->set_code((int)XCode::ThrowError);
             response->set_error_str(logic_error.what());
         }
-
-#ifdef __DEBUG__
-        LOG_DEBUG("===============[rpc request]===============");
-        LOG_DEBUG("[func] =", this->GetName(), '.', method);
-        LOG_DEBUG("[time] = [", elapsedTimer.GetMs(), "ms]");
-        if (request->has_data())
-        {
-            std::string fullName;
-            if(Any::ParseAnyTypeUrl(request->data().type_url(), &fullName))
-            {
-				std::string json;
-                LOG_DEBUG("[type] = ", fullName);
-				Helper::Proto::NewByData(request->data());
-                auto message = Helper::Proto::NewByData(request->data());
-                if(message != nullptr && Helper::Proto::GetJson(message, json))
-                {
-                    LOG_DEBUG("[request] = ", json);
-                }
-            }
-        }
-        if (response->has_data())
-        {
-            std::string fullName;
-            if(Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
-            {
-				std::string json;
-                LOG_DEBUG("[type] = ", fullName);
-                auto message = Helper::Proto::NewByData(response->data());
-                if(message != nullptr && Helper::Proto::GetJson(message, json))
-                {
-                    LOG_DEBUG("[response] = ", json);
-                }
-            }
-        }
-#endif
         return response;
     }
 }

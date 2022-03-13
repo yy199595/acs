@@ -45,8 +45,8 @@ namespace Sentry
         const int OtherLayerCount = 32;
         const int FirstLayerCount = 256;
     private:
+		size_t mLayerIndex;
         long long mNextUpdateTime;
-        std::queue<long long> mTimers;
         std::vector<TimeWheelLayer *> mTimerLayers;
         std::unordered_map<long long, TimerBase *> mTimerMap;//所有timer的列表
     };

@@ -9,14 +9,11 @@ namespace Sentry
     {
     public:
         TimeWheelLayer(int layerId, int count, int min, int max);
-
-        ~TimeWheelLayer();
-
     public:
         bool AddTimer(int tick, long long timerId);
 
-        bool MoveIndex(std::queue<long long> &timers);
-
+        bool MoveIndex();
+		std::queue<long long> & GetTimerQueue();
     private:
         const int mMin;
         const int mMax;

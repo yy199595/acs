@@ -35,13 +35,13 @@ namespace Sentry
         return false;
     }
 
-    bool TimeWheelLayer::MoveIndex(std::queue<long long> &timers)
+	std::queue<long long> & TimeWheelLayer::GetTimerQueue()
+	{
+		return this->mTimerSlot[this->mCurIndex];
+	}
+
+    bool TimeWheelLayer::MoveIndex()
     {
-        std::queue<long long > & slotTimers = this->mTimerSlot[this->mCurIndex];
-        if(!slotTimers.empty())
-		{
-            timers = std::move(slotTimers);
-        }
         if ((++this->mCurIndex) >= this->mMaxCount)
         {
             this->mCurIndex = 0;

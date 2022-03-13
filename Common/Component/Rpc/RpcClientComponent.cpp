@@ -114,40 +114,6 @@ namespace Sentry
 
     void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-#ifdef __DEBUG__
-		int methodId = 0;
-		long long costTime = 0;
-		long long rpcId = response->rpc_id();
-		this->mRpcComponent->GetRpcInfo(rpcId, methodId, costTime);
-		auto config = this->mProtoConfigComponent->GetProtocolConfig(methodId);
-		if (config != nullptr)
-		{
-			LOG_DEBUG("*****************[receive response]******************");
-			LOG_DEBUG("func = ", config->Service, '.', config->Method);
-			LOG_DEBUG("time = ", costTime, "ms");
-
-			if (response->code() != (int)XCode::Successful)
-			{
-				auto codeConfig = mProtoConfigComponent->GetCodeConfig(response->code());
-				LOG_ERROR("code => ", codeConfig->Name, ':', codeConfig->Desc);
-			}
-			if (response->has_data())
-			{
-				std::string fullName;
-				if (Any::ParseAnyTypeUrl(response->data().type_url(), &fullName))
-				{
-					std::string json;
-					LOG_DEBUG("type = ", fullName);
-					std::shared_ptr<Message> message = Helper::Proto::NewByData(response->data());
-					if (message != nullptr && Helper::Proto::GetJson(message, json))
-					{
-						LOG_DEBUG("json = ", json);
-					}
-				}
-			}
-			LOG_DEBUG("*********************************************");
-		}
-#endif
 		this->mRpcComponent->OnResponse(response);
 	}
 

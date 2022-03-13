@@ -5,6 +5,7 @@ namespace Sentry
 {
     bool TimerComponent::Awake()
     {
+		this->mLayerIndex = 0;
 		this->mNextUpdateTime = 0;
         for (int index = 0; index < this->LayerCount; index++)
         {
@@ -74,14 +75,15 @@ namespace Sentry
 
 
         this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
-        for (int index = 0; index < tick; index++)
+
+        for (size_t index = 0; index < tick; index++)
         {
             TimeWheelLayer *timerLayer = this->mTimerLayers[0];
-            bool res = timerLayer->MoveIndex(this->mTimers);
-            while (!this->mTimers.empty())
+			std::queue<long long> & timerQueue = timerLayer->GetTimerQueue();
+            while (!timerQueue.empty())
             {
-                auto id = this->mTimers.front();
-                this->mTimers.pop();
+                auto id = timerQueue.front();
+				timerQueue.pop();
                 auto iter = this->mTimerMap.find(id);
                 if (iter != this->mTimerMap.end())
                 {
@@ -94,22 +96,30 @@ namespace Sentry
                     }
                 }
             }
-            for (size_t i = 1; i < this->mTimerLayers.size() && res; i++)
+			if(!timerLayer->MoveIndex())
+			{
+				return;
+			}
+            for (size_t i = 0;  i < this->mTimerLayers.size(); i++)
             {
                 timerLayer = this->mTimerLayers[i];
-                res = timerLayer->MoveIndex(this->mTimers);
-
-                while (!this->mTimers.empty())
+				timerQueue = timerLayer->GetTimerQueue();
+				LOG_DEBUG("layer index = ", i);
+                while (!timerQueue.empty())
                 {
-                    auto id = this->mTimers.front();
-                    this->mTimers.pop();
+                    long long id = timerQueue.front();
+                    timerQueue.pop();
                     auto timer = this->GetTimer(id);
                     if(timer != nullptr)
                     {
                         this->AddTimerToWheel(timer);
                     }
                 }
-            }
+				if(!timerLayer->MoveIndex())
+				{
+					break;
+				}
+			}
         }
     }
 

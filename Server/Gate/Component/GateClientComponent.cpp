@@ -51,20 +51,6 @@ namespace Sentry
 
     void GateClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request) //客户端调过来的
     {
-#ifdef __DEBUG__
-        LOG_DEBUG("**********[client request]**********");
-        LOG_DEBUG("func = ", request->method_name());
-		if(request->has_data())
-		{
-			std::string json;
-			std::shared_ptr<Message> message = Helper::Proto::NewByData(request->data());
-			if (message != nullptr && Helper::Proto::GetJson(message, json))
-			{
-				LOG_DEBUG("json = ", json);
-			}
-		}
-        LOG_DEBUG("*****************************************");
-#endif
         XCode code = this->mGateComponent->OnRequest(request);
         if(code != XCode::Successful)
         {
