@@ -12,10 +12,10 @@ namespace Sentry
 
         ~LuaSleepTimer() final { luaL_unref(mLuaEnv, LUA_REGISTRYINDEX, this->mRef); }
 
-        static LuaSleepTimer * Create(lua_State *lua, int index, long long ms);
+        static std::shared_ptr<LuaSleepTimer> Create(lua_State *lua, int index, long long ms);
 
     public:
-        void Invoke() override;
+        void Invoke(TimerState state = TimerState::Ok) override;
     private:
         int mRef;
         lua_State *mLuaEnv;

@@ -16,7 +16,7 @@ namespace Sentry
     {
         if(this->mTimerId != 0)
         {
-            this->mTimerComponent->RemoveTimer(this->mTimerId);
+			this->mTimerComponent->CancelTimer(this->mTimerId);
         }
     }
     void WaitTaskSource::WaitSecond(float s)

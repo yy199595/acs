@@ -10,17 +10,17 @@ namespace Sentry
         this->mLuaEnv = lua;
     }
 
-    LuaSleepTimer * LuaSleepTimer::Create(lua_State *lua, int index, long long ms)
+    std::shared_ptr<LuaSleepTimer> LuaSleepTimer::Create(lua_State *lua, int index, long long ms)
     {
         if (!lua_isthread(lua, index))
         {
             return nullptr;
         }
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-        return new LuaSleepTimer(lua, ref, ms);
+        return std::make_shared<LuaSleepTimer>(lua, ref, ms);
     }
 
-    void LuaSleepTimer::Invoke()
+    void LuaSleepTimer::Invoke(TimerState state)
     {
         lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mRef);
         if (!lua_isthread(this->mLuaEnv, -1))

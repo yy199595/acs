@@ -79,7 +79,7 @@ namespace Sentry
             {
                 return std::string();
             }
-            this->mTimerComponent->RemoveTimer(timerId);
+			this->mTimerComponent->CancelTimer(timerId);
         }
 
         if (this->mIndex >= this->mAllAddress.size())

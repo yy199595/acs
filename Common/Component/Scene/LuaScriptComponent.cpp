@@ -213,7 +213,7 @@ namespace Sentry
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Call", SystemExtension::Call);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Sleep", SystemExtension::Sleep);
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "AsyncWait", SystemExtension::AddTimer);
-        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "RemoveTimer", SystemExtension::RemoveTimer);
+        ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "CancelTimer", SystemExtension::RemoveTimer);
 
         ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "GetManager", SystemExtension::GetManager);
 

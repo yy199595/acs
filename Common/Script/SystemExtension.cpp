@@ -123,7 +123,7 @@ int SystemExtension::RemoveTimer(lua_State *lua)
         TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
         if (pTimerManager != nullptr)
         {
-            bool code = pTimerManager->RemoveTimer(id);
+            bool code = pTimerManager->CancelTimer(id);
             lua_pushboolean(lua, code);
             return 1;
         }

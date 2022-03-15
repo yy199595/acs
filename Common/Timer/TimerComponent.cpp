@@ -5,7 +5,6 @@ namespace Sentry
 {
     bool TimerComponent::Awake()
     {
-		this->mLayerIndex = 0;
 		this->mNextUpdateTime = 0;
         for (int index = 0; index < this->LayerCount; index++)
         {
@@ -20,7 +19,7 @@ namespace Sentry
         return true;
     }
 
-    long long TimerComponent::AddTimer(TimerBase * timer)
+    long long TimerComponent::AddTimer(std::shared_ptr<TimerBase> timer)
     {
 		if(this->mNextUpdateTime == 0)
 		{
@@ -41,25 +40,23 @@ namespace Sentry
 			delete func;
             return 0;
         }
-        return this->AddTimer(new DelayTimer(ms, func));
+        return this->AddTimer(std::make_shared<DelayTimer>(ms, func));
     }
 
-    bool TimerComponent::RemoveTimer(long long id)
+    bool TimerComponent::CancelTimer(long long id)
     {
         auto iter = this->mTimerMap.find(id);
         if (iter != this->mTimerMap.end())
         {
-            delete iter->second;
+			std::shared_ptr<TimerBase> timer = iter->second;
+			if(timer != nullptr)
+			{
+				timer->Invoke(TimerState::Cancel);
+			}
             this->mTimerMap.erase(iter);
             return true;
         }
         return false;
-    }
-
-    TimerBase * TimerComponent::GetTimer(long long id)
-    {
-        auto iter = this->mTimerMap.find(id);
-        return iter != this->mTimerMap.end() ? iter->second : nullptr;
     }
 
     void TimerComponent::OnSystemUpdate()
@@ -89,11 +86,10 @@ namespace Sentry
 						auto iter = this->mTimerMap.find(id);
 						if(iter != this->mTimerMap.end())
 						{
-							TimerBase * timerBase = iter->second;
+							auto timerBase = iter->second;
 							if(timerBase != nullptr)
 							{
 								timerBase->Invoke();
-								delete timerBase;
 							}
 							this->mTimerMap.erase(iter);
 						}
@@ -102,8 +98,6 @@ namespace Sentry
 				}
 				else
 				{
-					printf("[layer = %d]  [index = %d] [count = %u]\n", timeWheelLayer->GetLayerId(), timeWheelLayer
-						->GetLayerIndex(), timerQueue.size());
 					while(!timerQueue.empty())
 					{
 						long long id = timerQueue.front();
@@ -127,11 +121,11 @@ namespace Sentry
 		{
 			return false;
 		}
-		TimerBase * timer = iter->second;
+		auto timer = iter->second;
 		return this->AddTimerToWheel(timer);
 	}
 
-    bool TimerComponent::AddTimerToWheel(TimerBase * timer)
+    bool TimerComponent::AddTimerToWheel(std::shared_ptr<TimerBase> timer)
     {
         long long nowTime = Helper::Time::GetMilTimestamp();
         int tick = (timer->GetTargetTime() - nowTime) / this->TimerPrecision;
@@ -148,7 +142,6 @@ namespace Sentry
                 return true;
             }
         }
-        delete timer;
         LOG_ERROR("add timer failure id = ", timer->GetTimerId());
         return false;
     }
