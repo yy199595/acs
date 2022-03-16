@@ -34,6 +34,9 @@ namespace Sentry
         template<typename T>
         inline T *GetOrAddComponent();
 
+		template<typename T>
+		inline std::shared_ptr<T> Cast();
+
     protected:
        virtual void OnAddComponent(Component * component) { }
     public:
@@ -119,4 +122,10 @@ namespace Sentry
         }
         return component;
     }
+
+	template<typename T>
+	inline std::shared_ptr<T> Entity::Cast()
+	{
+		return std::dynamic_pointer_cast<T>(this->shared_from_this());
+	}
 }

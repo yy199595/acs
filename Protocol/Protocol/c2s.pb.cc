@@ -331,7 +331,7 @@ void InitDefaults_c2s_2eproto() {
 }
 
 ::google::protobuf::Metadata file_level_metadata_c2s_2eproto[16];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_c2s_2eproto[1];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_c2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_c2s_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -433,7 +433,6 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::Chat_Request, user_id_),
   PROTOBUF_FIELD_OFFSET(::c2s::Chat_Request, message_),
-  PROTOBUF_FIELD_OFFSET(::c2s::Chat_Request, type_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::Chat_Notice, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -460,8 +459,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 81, -1, sizeof(::c2s::GateLogin_Response)},
   { 86, -1, sizeof(::c2s::GateLogin)},
   { 91, -1, sizeof(::c2s::Chat_Request)},
-  { 99, -1, sizeof(::c2s::Chat_Notice)},
-  { 104, -1, sizeof(::c2s::Chat)},
+  { 98, -1, sizeof(::c2s::Chat_Notice)},
+  { 103, -1, sizeof(::c2s::Chat)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -508,16 +507,14 @@ const char descriptor_table_protodef_c2s_2eproto[] =
   "\022\017\n\007account\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\022\021\n\tl"
   "ogin_dev\030\003 \001(\t\032\031\n\010Response\022\r\n\005token\030\001 \001("
   "\t\"1\n\tGateLogin\032\030\n\007Request\022\r\n\005token\030\001 \001(\t"
-  "\032\n\n\010Response\"\215\001\n\004Chat\032I\n\007Request\022\017\n\007user"
-  "_id\030\001 \001(\003\022\017\n\007message\030\002 \001(\t\022\034\n\004type\030\003 \001(\016"
-  "2\016.c2s.Chat.Type\032\010\n\006Notice\"0\n\004Type\022\010\n\004NO"
-  "NE\020\000\022\010\n\004TEXT\020\001\022\t\n\005IMAGE\020\002\022\t\n\005VOICE\020\003b\006pr"
-  "oto3"
+  "\032\n\n\010Response\"=\n\004Chat\032+\n\007Request\022\017\n\007user_"
+  "id\030\001 \001(\003\022\017\n\007message\030\002 \001(\t\032\010\n\006Noticeb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_c2s_2eproto = {
   false, InitDefaults_c2s_2eproto, 
   descriptor_table_protodef_c2s_2eproto,
-  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 884,
+  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 803,
 };
 
 void AddDescriptors_c2s_2eproto() {
@@ -531,31 +528,6 @@ void AddDescriptors_c2s_2eproto() {
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_c2s_2eproto = []() { AddDescriptors_c2s_2eproto(); return true; }();
 namespace c2s {
-const ::google::protobuf::EnumDescriptor* Chat_Type_descriptor() {
-  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_c2s_2eproto);
-  return file_level_enum_descriptors_c2s_2eproto[0];
-}
-bool Chat_Type_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-      return true;
-    default:
-      return false;
-  }
-}
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const Chat_Type Chat::NONE;
-const Chat_Type Chat::TEXT;
-const Chat_Type Chat::IMAGE;
-const Chat_Type Chat::VOICE;
-const Chat_Type Chat::Type_MIN;
-const Chat_Type Chat::Type_MAX;
-const int Chat::Type_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 // ===================================================================
 
@@ -5064,7 +5036,6 @@ class Chat_Request::HasBitSetters {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Chat_Request::kUserIdFieldNumber;
 const int Chat_Request::kMessageFieldNumber;
-const int Chat_Request::kTypeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Chat_Request::Chat_Request()
@@ -5080,9 +5051,7 @@ Chat_Request::Chat_Request(const Chat_Request& from)
   if (from.message().size() > 0) {
     message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
   }
-  ::memcpy(&user_id_, &from.user_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
-    reinterpret_cast<char*>(&user_id_)) + sizeof(type_));
+  user_id_ = from.user_id_;
   // @@protoc_insertion_point(copy_constructor:c2s.Chat.Request)
 }
 
@@ -5090,9 +5059,7 @@ void Chat_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Chat_Request_c2s_2eproto.base);
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(type_));
+  user_id_ = PROTOBUF_LONGLONG(0);
 }
 
 Chat_Request::~Chat_Request() {
@@ -5120,9 +5087,7 @@ void Chat_Request::Clear() {
   (void) cached_has_bits;
 
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(type_));
+  user_id_ = PROTOBUF_LONGLONG(0);
   _internal_metadata_.Clear();
 }
 
@@ -5160,14 +5125,6 @@ const char* Chat_Request::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
-        break;
-      }
-      // .c2s.Chat.Type type = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
-        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_type(static_cast<::c2s::Chat_Type>(val));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -5232,20 +5189,6 @@ bool Chat_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // .c2s.Chat.Type type = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-          int value = 0;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_type(static_cast< ::c2s::Chat_Type >(value));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -5288,12 +5231,6 @@ void Chat_Request::SerializeWithCachedSizes(
       2, this->message(), output);
   }
 
-  // .c2s.Chat.Type type = 3;
-  if (this->type() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      3, this->type(), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -5321,12 +5258,6 @@ void Chat_Request::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->message(), target);
-  }
-
-  // .c2s.Chat.Type type = 3;
-  if (this->type() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      3, this->type(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -5364,12 +5295,6 @@ size_t Chat_Request::ByteSizeLong() const {
         this->user_id());
   }
 
-  // .c2s.Chat.Type type = 3;
-  if (this->type() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
-  }
-
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -5404,9 +5329,6 @@ void Chat_Request::MergeFrom(const Chat_Request& from) {
   if (from.user_id() != 0) {
     set_user_id(from.user_id());
   }
-  if (from.type() != 0) {
-    set_type(from.type());
-  }
 }
 
 void Chat_Request::CopyFrom(const ::google::protobuf::Message& from) {
@@ -5437,7 +5359,6 @@ void Chat_Request::InternalSwap(Chat_Request* other) {
   message_.Swap(&other->message_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(user_id_, other->user_id_);
-  swap(type_, other->type_);
 }
 
 ::google::protobuf::Metadata Chat_Request::GetMetadata() const {

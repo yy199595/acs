@@ -75,18 +75,10 @@ message GateLogin
 
 message Chat
 {
-    enum Type
-    {
-        NONE = 0;
-        TEXT = 1;
-        IMAGE = 2;
-        VOICE = 3;
-    }
     message Request
     {
         int64 user_id = 1;
         string message = 2;
-        Chat.Type type = 3;
     }
 
     message Notice

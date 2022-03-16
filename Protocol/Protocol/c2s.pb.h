@@ -30,7 +30,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
@@ -122,29 +121,6 @@ template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena
 }  // namespace google
 namespace c2s {
 
-enum Chat_Type {
-  Chat_Type_NONE = 0,
-  Chat_Type_TEXT = 1,
-  Chat_Type_IMAGE = 2,
-  Chat_Type_VOICE = 3,
-  Chat_Type_Chat_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
-  Chat_Type_Chat_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
-};
-bool Chat_Type_IsValid(int value);
-const Chat_Type Chat_Type_Type_MIN = Chat_Type_NONE;
-const Chat_Type Chat_Type_Type_MAX = Chat_Type_VOICE;
-const int Chat_Type_Type_ARRAYSIZE = Chat_Type_Type_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* Chat_Type_descriptor();
-inline const ::std::string& Chat_Type_Name(Chat_Type value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    Chat_Type_descriptor(), value);
-}
-inline bool Chat_Type_Parse(
-    const ::std::string& name, Chat_Type* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<Chat_Type>(
-    Chat_Type_descriptor(), name, value);
-}
 // ===================================================================
 
 class ServerInfo :
@@ -1953,12 +1929,6 @@ class Chat_Request :
   ::google::protobuf::int64 user_id() const;
   void set_user_id(::google::protobuf::int64 value);
 
-  // .c2s.Chat.Type type = 3;
-  void clear_type();
-  static const int kTypeFieldNumber = 3;
-  ::c2s::Chat_Type type() const;
-  void set_type(::c2s::Chat_Type value);
-
   // @@protoc_insertion_point(class_scope:c2s.Chat.Request)
  private:
   class HasBitSetters;
@@ -1966,7 +1936,6 @@ class Chat_Request :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr message_;
   ::google::protobuf::int64 user_id_;
-  int type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
 };
@@ -2172,36 +2141,6 @@ class Chat :
 
   typedef Chat_Request Request;
   typedef Chat_Notice Notice;
-
-  typedef Chat_Type Type;
-  static const Type NONE =
-    Chat_Type_NONE;
-  static const Type TEXT =
-    Chat_Type_TEXT;
-  static const Type IMAGE =
-    Chat_Type_IMAGE;
-  static const Type VOICE =
-    Chat_Type_VOICE;
-  static inline bool Type_IsValid(int value) {
-    return Chat_Type_IsValid(value);
-  }
-  static const Type Type_MIN =
-    Chat_Type_Type_MIN;
-  static const Type Type_MAX =
-    Chat_Type_Type_MAX;
-  static const int Type_ARRAYSIZE =
-    Chat_Type_Type_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  Type_descriptor() {
-    return Chat_Type_descriptor();
-  }
-  static inline const ::std::string& Type_Name(Type value) {
-    return Chat_Type_Name(value);
-  }
-  static inline bool Type_Parse(const ::std::string& name,
-      Type* value) {
-    return Chat_Type_Parse(name, value);
-  }
 
   // accessors -------------------------------------------------------
 
@@ -3370,20 +3309,6 @@ inline void Chat_Request::set_allocated_message(::std::string* message) {
   // @@protoc_insertion_point(field_set_allocated:c2s.Chat.Request.message)
 }
 
-// .c2s.Chat.Type type = 3;
-inline void Chat_Request::clear_type() {
-  type_ = 0;
-}
-inline ::c2s::Chat_Type Chat_Request::type() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Request.type)
-  return static_cast< ::c2s::Chat_Type >(type_);
-}
-inline void Chat_Request::set_type(::c2s::Chat_Type value) {
-  
-  type_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Chat.Request.type)
-}
-
 // -------------------------------------------------------------------
 
 // Chat_Notice
@@ -3429,18 +3354,6 @@ inline void Chat_Request::set_type(::c2s::Chat_Type value) {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace c2s
-
-namespace google {
-namespace protobuf {
-
-template <> struct is_proto_enum< ::c2s::Chat_Type> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::c2s::Chat_Type>() {
-  return ::c2s::Chat_Type_descriptor();
-}
-
-}  // namespace protobuf
-}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

@@ -41,6 +41,16 @@ namespace Sentry
         return true;
     }
 
+	void ThreadPoolComponent::OnDestory()
+	{
+		for(IThread * thread : this->mThreadArray)
+		{
+			thread->Stop();
+			delete thread;
+		}
+		this->mThreadArray.clear();
+	}
+
     void ThreadPoolComponent::GetAllThread(std::vector<const IThread *> &threads)
     {
         threads.clear();

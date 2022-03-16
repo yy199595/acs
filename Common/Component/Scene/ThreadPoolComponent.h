@@ -19,6 +19,7 @@ namespace Sentry
 
         bool LateAwake() final;
 
+		void OnDestory() final;
     public:
 
         bool StartTask(TaskProxy * taskAction);
@@ -26,9 +27,6 @@ namespace Sentry
         void GetAllThread(std::vector<const IThread *> & threads);
 
         const std::vector<TaskThread *> & GetThreads() { return this->mThreadArray;}
-
-    private:
-        void Update();
 
 	public:
 #ifndef ONLY_MAIN_THREAD

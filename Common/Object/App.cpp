@@ -140,9 +140,10 @@ namespace Sentry
 
 	int App::Run()
 	{
+		App::mApp = this->Cast<App>();
 		IF_THROW_ERROR(this->mConfig->LoadConfig());
 		this->mServerName = this->mConfig->GetNodeName();
-		App::mApp = dynamic_pointer_cast<App>(this->shared_from_this());
+
 		IF_THROW_ERROR(this->LoadComponent());
 		IF_THROW_ERROR(this->InitComponent());
 
