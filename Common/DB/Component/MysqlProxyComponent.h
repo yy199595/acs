@@ -49,7 +49,7 @@ namespace Sentry
 		XCode Delete(RapidJsonWriter& deleteJson);
 
 		template<typename T>
-		XCode Update(RapidJsonWriter & updateJson, RapidJsonWriter& whereJson);
+		XCode Update(RapidJsonWriter& updateJson, RapidJsonWriter& whereJson);
 
 		std::shared_ptr<s2s::Mysql::Response>
 		Invoke(const std::string& sql);
@@ -193,11 +193,11 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlProxyComponent::Update(RapidJsonWriter & updateJson, RapidJsonWriter& whereJson)
+	XCode MysqlProxyComponent::Update(RapidJsonWriter& updateJson, RapidJsonWriter& whereJson)
 	{
 		std::string whereJsonStr;
 		std::string updateJsonStr;
-		if(!whereJson.WriterToStream(whereJsonStr) || !updateJson.WriterToStream(updateJsonStr))
+		if (!whereJson.WriterToStream(whereJsonStr) || !updateJson.WriterToStream(updateJsonStr))
 		{
 			return XCode::CallArgsError;
 		}

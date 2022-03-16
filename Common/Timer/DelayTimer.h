@@ -13,7 +13,10 @@ namespace Sentry
 	public:
 		void Invoke(TimerState state) final
 		{
-			this->mFunc->run();
+			if(state == TimerState::Ok)
+			{
+				this->mFunc->run();
+			}
 		}
 	private:
 		StaticMethod * mFunc;

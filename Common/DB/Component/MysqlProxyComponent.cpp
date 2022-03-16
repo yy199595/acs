@@ -34,7 +34,7 @@ namespace Sentry
 	{
 		ElapsedTimer timer;
 		TimerComponent* timerComponent = this->GetComponent<TimerComponent>();
-		for (int index = 0; index < 1; index++)
+		for (int index = 0; index < 100; index++)
 		{
 			db_account::tab_user_account userAccountData;
 			userAccountData.set_user_id(10000 + index);
@@ -63,8 +63,12 @@ namespace Sentry
 			RapidJsonWriter deleteJson;
 			deleteJson.Add("account", account);
 			//this->Delete<db_account::tab_user_account>(deleteJson);
-
 		}
+		RapidJsonWriter queryJson;
+		auto res = this->QueryAll<db_account::tab_user_account>(queryJson);
+
+		LOG_ERROR("count = ", res.size());
+
 		LOG_ERROR("sql user time = ", timer.GetMs(), "ms");
 		printf("========================================\n");
 		for (int index = 0; index < 100; index++)
