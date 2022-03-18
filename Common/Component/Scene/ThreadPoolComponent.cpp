@@ -11,18 +11,17 @@ namespace Sentry
         const ServerConfig & config = App::Get().GetConfig();
         config.GetValue("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD
+		int networkCount = 1;
         LOG_CHECK_RET_FALSE(config.GetValue("thread", "network", networkCount));
-#endif
-        for (int index = 0; index < taskCount; index++)
-        {
-            mThreadArray.push_back(new TaskThread());
-        }
-#ifndef ONLY_MAIN_THREAD
         for (int index = 0; index < networkCount; index++)
         {
             this->mNetThreads.push_back(new NetWorkThread());
         }
 #endif
+		for (int index = 0; index < taskCount; index++)
+		{
+			mThreadArray.push_back(new TaskThread());
+		}
         return true;
     }
 

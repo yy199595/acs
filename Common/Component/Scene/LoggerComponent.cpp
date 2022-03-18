@@ -39,12 +39,17 @@ namespace Sentry
 		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
 		std::string logPath = fmt::format("{0}/{1}", this->mLogSavePath, Helper::Time::GetYearMonthDayString());
 #ifndef ONLY_MAIN_THREAD
+#ifdef __DEBUG__
+		spdlog::set_level(spdlog::level::level_enum::debug);
+		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>("All", logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+#else
 		this->mInfoLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mDebugLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mFatalLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Fatal", logPath + "/fatal.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mErrorLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Error", logPath + "/error.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mRecordLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Record", logPath + "/record.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mWarningLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+#endif
 #else
 #ifdef __DEBUG__
 		spdlog::set_level(spdlog::level::level_enum::debug);
