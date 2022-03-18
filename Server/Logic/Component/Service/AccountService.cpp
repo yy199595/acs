@@ -36,9 +36,8 @@ namespace Sentry
         this->mTempData.Clear();
         this->mTempData.set_account(account);
 
-        RapidJsonWriter queryJson;
-        queryJson.Add("account", account);
-        auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(queryJson);
+		string json = fmt::format("{account:{0}}", account);
+        auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(json);
         if(userData == nullptr || userData->password() != password)
         {
             return XCode::Failure;

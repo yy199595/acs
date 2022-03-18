@@ -2,6 +2,8 @@
 #include<sstream>
 #include<string>
 #include"CommonTypeDef.h"
+#include"spdlog/fmt/fmt.h"
+#include"spdlog/fmt/bundled/color.h"
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
@@ -32,12 +34,17 @@ inline std::string FormatFileLine(const char * file, const int line)
 #endif // _MSC_VER
 	return {buffer, size};
 }
+#define PRINT_COLOR_CONSOLE(color, format, ...) 	{ 						\
+                                             						\
+    const std::string f =  FormatFileLine(__FILE__, __LINE__);  	\
+	fmt::print(fg(color), f + format, __VA_ARGS__);		\
+}
 
 #define STD_ERROR_LOG(msg) std::cerr << FormatFileLine(__FILE__, __LINE__) << msg << std::endl;
 
 #define GK_LOG(type, f, ...)						\
-{												\
-	App::Get().GetLogger()->AddLog(type, f, __VA_ARGS__);	\
+{                                 \
+    }//App::Get().GetLogger()->AddLog(type, f, __VA_ARGS__);	\
 }												\
 
 #define LOG_INFO(...) \

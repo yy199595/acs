@@ -81,11 +81,18 @@ void RegisterServiceComponent()
     ComponentFactory::Add<HttpLoginService>("HttpLoginService");
     ComponentFactory::Add<HttpOperComponent>("HttpOperComponent");
 }
-
+#include"spdlog/fmt/bundled/color.h"
 
 int main(int argc, char **argv)
 {
-    try
+	PRINT_COLOR_CONSOLE(fmt::color::red, "{0}", "nihao");
+	fmt::print(fg(fmt::color::red),"Hello, {}!\n", "world");
+	fmt::print(fg(fmt::color::yellow),"Hello, {}!\n", "world");
+	fmt::print(fg(fmt::color::blue),"Hello, {}!\n", "world");
+	fmt::print(fg(fmt::color::green),"Hello, {}!\n", "world");
+	fmt::print(fg(fmt::color::white),"Hello, {}!\n", "world");
+
+	try
     {
         RegisterComponent();
         RegisterServiceComponent();

@@ -2,6 +2,7 @@
 #include "Pool/ObjectPool.h"
 #include"Protocol/s2s.pb.h"
 #include"Util/JsonHelper.h"
+#include"google/protobuf/util/json_util.h"
 #include"DB/MysqlClient/MysqlRpcTaskSource.h"
 namespace Sentry
 {
@@ -30,26 +31,22 @@ namespace Sentry
 		NewMessage(const std::string& name);
 	 public:
 		template<typename T>
-		XCode
-		Add(const T& data);
+		XCode Add(const T& data);
 
 		template<typename T>
-		XCode
-		Save(const T& data);
+		XCode Save(const T& data);
 
 		template<typename T>
-		std::shared_ptr<T>
-		QueryOnce(RapidJsonWriter& queryJson);
+		std::shared_ptr<T> QueryOnce(const std::string & queryJson);
 
 		template<typename T>
-		std::vector<std::shared_ptr<T>>
-		QueryAll(RapidJsonWriter& queryJson);
+		std::vector<std::shared_ptr<T>> QueryAll(const std::string & queryJson);
 
 		template<typename T>
-		XCode Delete(RapidJsonWriter& deleteJson);
+		XCode Delete(const std::string & deleteJson);
 
 		template<typename T>
-		XCode Update(RapidJsonWriter & updateJson, RapidJsonWriter& whereJson);
+		XCode Update(const std::string & updateJson, const std::string & whereJson);
 
 		std::shared_ptr<s2s::Mysql::Response>
 		Invoke(const std::string& sql);
@@ -89,18 +86,12 @@ namespace Sentry
 	}
 
 	template<typename T>
-	std::shared_ptr<T>
-	MysqlProxyComponent::QueryOnce(RapidJsonWriter& queryJson)
+	std::shared_ptr<T> MysqlProxyComponent::QueryOnce(const std::string & queryJson)
 	{
-		std::string json;
-		if (!queryJson.WriterToStream(json))
-		{
-			return nullptr;
-		}
 		std::shared_ptr<T> queryData(new T());
 
 		s2s::Mysql::Query request;
-		request.set_where_json(json);
+		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
 		auto taskSource = this->Call("Query", request);
 		if (taskSource == nullptr)
@@ -110,7 +101,7 @@ namespace Sentry
 		auto response = taskSource->GetResponse();
 		if (response != nullptr && response->json_array_size() > 0)
 		{
-			json = response->json_array(0);
+			const std::string & json = response->json_array(0);
 			util::Status status = util::JsonStringToMessage(json, queryData.get());
 			return status.ok() ? queryData : nullptr;
 		}
@@ -119,17 +110,12 @@ namespace Sentry
 
 	template<typename T>
 	std::vector<std::shared_ptr<T>>
-	MysqlProxyComponent::QueryAll(RapidJsonWriter& queryJson)
+	MysqlProxyComponent::QueryAll(const std::string & queryJson)
 	{
-		std::string json;
-		if (!queryJson.WriterToStream(json))
-		{
-			return std::vector<std::shared_ptr<T>>();
-		}
 		std::shared_ptr<T> queryData(new T());
 
 		s2s::Mysql::Query request;
-		request.set_where_json(json);
+		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
 		auto taskSource = this->Call("Query", request);
 		if (taskSource == nullptr)
@@ -140,7 +126,7 @@ namespace Sentry
 		auto response = taskSource->GetResponse();
 		for (int index = 0; index < response->json_array_size(); index++)
 		{
-			json = response->json_array(index);
+			const std::string & json = response->json_array(index);
 			std::shared_ptr<T> jsonData(new T());
 			if (util::JsonStringToMessage(json, jsonData.get()).ok())
 			{
@@ -151,18 +137,11 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode
-	MysqlProxyComponent::Delete(RapidJsonWriter& deleteJson)
+	XCode MysqlProxyComponent::Delete(const std::string& deleteJson)
 	{
-		std::string json;
 		std::shared_ptr<T> data(new T());
-		if (!deleteJson.WriterToStream(json))
-		{
-			return XCode::CallArgsError;
-		}
-
 		s2s::Mysql::Delete request;
-		request.set_where_json(json);
+		request.set_where_json(deleteJson);
 		request.set_table(data->GetTypeName());
 		auto taskSource = this->Call("Delete", request);
 		return taskSource == nullptr ? XCode::Failure : taskSource->GetCode();
@@ -193,19 +172,13 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlProxyComponent::Update(RapidJsonWriter & updateJson, RapidJsonWriter& whereJson)
+	XCode MysqlProxyComponent::Update(const std::string & updateJson, const std::string& whereJson)
 	{
-		std::string whereJsonStr;
-		std::string updateJsonStr;
-		if(!whereJson.WriterToStream(whereJsonStr) || !updateJson.WriterToStream(updateJsonStr))
-		{
-			return XCode::CallArgsError;
-		}
 		s2s::Mysql::Update request;
 		std::shared_ptr<T> data(new T());
 		request.set_table(data->GetTypeName());
-		request.set_where_json(whereJsonStr);
-		request.set_update_json(updateJsonStr);
+		request.set_where_json(whereJson);
+		request.set_update_json(updateJson);
 		auto response = this->Call("Update", request);
 		return response == nullptr ? XCode::Failure : response->GetCode();
 	}

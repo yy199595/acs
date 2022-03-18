@@ -3,7 +3,6 @@
 #include<unordered_map>
 #include<spdlog/spdlog.h>
 #include"Util/TimeHelper.h"
-#include"Other/StringFmt.h"
 #define LOG_FILE_MAX_SUM 10
 #define LOG_FILE_MAX_SIZE 1024 * 1024 * 100
 using namespace Helper;
@@ -17,7 +16,7 @@ namespace Sentry
 		~LoggerComponent() final = default;
 	public:
         template<typename ... Args>
-        void AddLog(ELogType type, Args &&... args);
+        void AddLog(ELogType type, const std::string & line, const std::string & format, Args &&... args);
 	protected:	
 		bool Awake() final;
         bool LateAwake() final;
@@ -34,7 +33,6 @@ namespace Sentry
 		int mLogSaveTime;
 		std::string mServerName;
 		std::string mLogSavePath;
-        static thread_local std::string mLogBuffer;
 #ifdef __DEBUG__
 		std::shared_ptr<spdlog::logger> mAllLog;
 #else
@@ -48,57 +46,59 @@ namespace Sentry
 	};
 
     template<typename ... Args>
-    void LoggerComponent::AddLog(ELogType type,  Args &&...args)
+    void LoggerComponent::AddLog(ELogType type, const std::string & line, const std::string & format,  Args &&...args)
     {
         switch (type)
         {
             case ELogType::info:
             {
+				std::string str;
+				fmt::format(format, std::forward<Args>(args)...);
 #ifdef __DEBUG__
-				this->mAllLog->info(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
-				this->AddInfoLog(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mAllLog->info(format, std::forward<Args>(args)...);
+				this->AddInfoLog(fmt::format(format, std::forward<Args>(args)...));
 #else
-				this->mInfoLog->info(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mInfoLog->info(format, std::forward<Args>(args)...);
 #endif
             }
                 break;
             case ELogType::debug:
             {
 #ifdef __DEBUG__
-				this->mAllLog->debug(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
-				this->AddDebugLog(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mAllLog->debug(format, std::forward<Args>(args)...);
+				this->AddDebugLog(fmt::format(format, std::forward<Args>(args)...));
 #else
-				this->mDebugLog->debug(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mDebugLog->debug(format, std::forward<Args>(args)...);
 #endif
             }
                 break;
             case ELogType::warn:
             {
 #ifdef __DEBUG__
-				this->mAllLog->warn(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
-				this->AddWarningLog(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mAllLog->warn(format, std::forward<Args>(args)...);
+				this->AddWarningLog(fmt::format(format, std::forward<Args>(args)...));
 #else
-				this->mWarningLog->warn(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
+				this->mWarningLog->warn(format, std::forward<Args>(args)...);
 #endif
             }
                 break;
             case ELogType::err:
             {
 #ifdef __DEBUG__
-				this->mAllLog->error(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
-				this->AddErrorLog(Fmt::Fotmat(mLogBuffer,std::forward<Args>(args)...));
+				this->mAllLog->error(format, std::forward<Args>(args)...);
+				this->AddErrorLog(fmt::format(format, std::forward<Args>(args)...));
 #else
-				this->mErrorLog->error(Fmt::Fotmat(mLogBuffer,std::forward<Args>(args) ...));
+				this->mErrorLog->error(format,std::forward<Args>(args) ...);
 #endif
                 break;
             }
             case ELogType::critical:
             {
 #ifdef __DEBUG__
-				this->mAllLog->critical(Fmt::Fotmat(mLogBuffer, std::forward<Args>(args)...));
-				this->AddFatalLog(Fmt::Fotmat(mLogBuffer,std::forward<Args>(args)...));
+				this->mAllLog->critical(format, std::forward<Args>(args)...);
+				this->AddFatalLog(fmt::format(format, std::forward<Args>(args)...));
 #else
-				this->mFatalLog->critical(Fmt::Fotmat(mLogBuffer,std::forward<Args>(args) ...));
+				this->mFatalLog->critical(format,std::forward<Args>(args) ...);
 #endif
             }
                 break;

@@ -6,7 +6,6 @@
 #include"Rpc/RpcComponent.h"
 #include"Scene/ServiceMgrComponent.h"
 #include"Other/ElapsedTimer.h"
-#include"Other/StringFmt.h"
 #include"DB/MysqlClient/MysqlRpcTaskSource.h"
 namespace Sentry
 {
@@ -52,17 +51,12 @@ namespace Sentry
 			RapidJsonWriter jsonWriter;
 			jsonWriter.Add("account", account);
 			jsonWriter.Add("user_id", 1000);
-			auto res = this->QueryOnce<db_account::tab_user_account>(jsonWriter);
 
-			RapidJsonWriter whereJson;
-			RapidJsonWriter updateJson;
-			whereJson.Add("account", account);
-			updateJson.Add("phone_num", (long long)13716061997);
-			this->Update<db_account::tab_user_account>(updateJson, whereJson);
-
-			RapidJsonWriter deleteJson;
-			deleteJson.Add("account", account);
-			//this->Delete<db_account::tab_user_account>(deleteJson);
+			std::string json;
+			if(jsonWriter.WriterToStream(json))
+			{
+				auto res = this->QueryOnce<db_account::tab_user_account>(json);
+			}
 
 		}
 		LOG_ERROR("sql user time = ", timer.GetMs(), "ms");
