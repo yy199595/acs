@@ -50,7 +50,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		LOG_WARN("drop db : ", db);
+		LOG_WARN("drop db : {0}", db);
 		return true;
 	}
 
@@ -69,7 +69,7 @@ namespace Sentry
 			LOG_ERROR("connect mysql failure ", ip, port, userName, passWd);
 			return nullptr;
 		}
-		LOG_INFO("connect mysql successful [", ip, ':', port, "]");
+		LOG_INFO("connect mysql successful [{}:{}]", ip, port);
 		return this->mMysqlSocket;
 	}
 

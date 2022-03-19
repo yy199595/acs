@@ -23,7 +23,7 @@ namespace Sentry
             }
             if (mysql_select_db(this->mMysqlSocket, db.c_str()) == 0)
             {
-                LOG_INFO("create db [", db, "] successful");
+                LOG_INFO("create db [{0}] successful", db);
                 return true;
             }
             return false;
@@ -42,7 +42,7 @@ namespace Sentry
                           mysql_error(this->mMysqlSocket));
                 return false;
             }
-            LOG_DEBUG("create new table ",typeDescriptor->name(),  " successful");
+            LOG_DEBUG("create new table {0} successful ",typeDescriptor->name());
         }
         else if (!this->UpdateMysqlTable(typeDescriptor))
         {

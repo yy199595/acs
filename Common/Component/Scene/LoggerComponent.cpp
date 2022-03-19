@@ -33,6 +33,53 @@ namespace Sentry
 		spdlog::drop_all();
 	}
 
+	void LoggerComponent::AddLog(spdlog::level::level_enum type, const std::string& log)
+	{
+		switch (type)
+		{
+		case spdlog::level::level_enum::info:
+#ifdef __DEBUG__
+			this->mAllLog->info(log);
+			LoggerComponent::AddInfoLog(log);
+#else
+
+#endif
+			break;
+		case spdlog::level::level_enum::debug:
+#ifdef __DEBUG__
+			LoggerComponent::AddDebugLog(log);
+			this->mAllLog->debug(log);
+#else
+
+#endif
+			break;
+		case spdlog::level::level_enum::warn:
+#ifdef __DEBUG__
+			this->mAllLog->warn(log);
+			LoggerComponent::AddWarningLog(log);
+#else
+
+#endif
+			break;
+		case spdlog::level::level_enum::err:
+#ifdef __DEBUG__
+			this->mAllLog->error(log);
+			LoggerComponent::AddErrorLog(log);
+#else
+
+#endif
+			break;
+		case spdlog::level::level_enum::critical:
+#ifdef __DEBUG__
+			this->mAllLog->critical(log);
+			LoggerComponent::AddFatalLog(log);
+#else
+
+#endif
+			break;
+		}
+	}
+
 	void LoggerComponent::CreateLogFile()
 	{
 		spdlog::shutdown();

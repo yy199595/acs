@@ -112,7 +112,7 @@ namespace Sentry
             if(nowTime - proxyClient->GetLastOperatorTime() >= 5)
             {
                 proxyClient->StartClose();
-                LOG_ERROR(sockId,  " logout ");
+                LOG_ERROR("{[0]} logout",  proxyClient->GetAddress());
                 return;
             }
         }

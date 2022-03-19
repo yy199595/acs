@@ -59,7 +59,7 @@ namespace Sentry
 			}
 
 		}
-		LOG_ERROR("sql user time = ", timer.GetMs(), "ms");
+		LOG_ERROR("sql user time = {0}ms", timer.GetMs());
 		printf("========================================\n");
 		for (int index = 0; index < 100; index++)
 		{
@@ -67,7 +67,7 @@ namespace Sentry
 			timerComponent->AddTimer(index * 100, new LambdaMethod([t1, index]()
 			{
 				long long t2 = Helper::Time::GetMilTimestamp();
-				LOG_ERROR(index, "========================", t2 - t1);
+				LOG_ERROR("index = {0} time = {1}", index, t2 - t1);
 			}));
 		}
 		printf("add timer successful\n");
@@ -84,19 +84,19 @@ namespace Sentry
         auto requestMessage = mysqlEntity->NewRequest(func);
         if(requestMessage == nullptr)
         {
-            LOG_ERROR("not find mysql service method ", func);
+            LOG_ERROR("not find mysql service method {0}", func);
             return nullptr;
         }
         std::string address = mysqlEntity->AllotAddress();
         if(address.empty())
         {
-            LOG_ERROR("allot MysqlService address failure", address);
+            LOG_ERROR("allot MysqlService address failure = {0}", address);
             return nullptr;
         }
         std::shared_ptr<ProxyClient> serviceNode = mysqlEntity->GetNode(address);
         if(serviceNode == nullptr)
         {
-            LOG_ERROR("not find node : ", address);
+            LOG_ERROR("not find node : {0}", address);
             return nullptr;
         }
         serviceNode->PushMessage(requestMessage);

@@ -27,18 +27,18 @@ namespace Sentry
                 this->mLuaMethodMap.erase(iter);
             }
             this->mLuaMethodMap.emplace(name, method);
-            LOG_DEBUG("add new lua service method [", service,'.', name, ']');
+            LOG_DEBUG("add new lua service method [{0}.{1}]", service, name);
             return true;
         }
 
         auto iter = this->mMethodMap.find(name);
         if (iter != this->mMethodMap.end())
         {
-            LOG_FATAL(this->GetName(), '.', name, " add failure");
+			LOG_FATAL("{0}.{1} add failure", this->GetName(), name);
             return false;
         }
         this->mMethodMap.emplace(name, method);
-        LOG_DEBUG("add new c++ service method [", service,'.', name, ']');
+        LOG_DEBUG("add new c++ service method [{0}.{1}]", service, name);
         return true;
     }
 

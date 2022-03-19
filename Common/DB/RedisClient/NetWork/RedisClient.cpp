@@ -97,7 +97,6 @@ namespace Sentry
     void RedisClient::OnClientError(const asio::error_code &code)
     {
         this->mIsOpen = false;
-        STD_ERROR_LOG(code.message());
         if(this->mRespTaskSource != nullptr)
         {
             std::move(this->mResponse);
@@ -198,7 +197,6 @@ namespace Sentry
                 this->mResponse->AddValue(RedisRespType::REDIS_STRING);
                 break;
             case '-': //错误
-                STD_ERROR_LOG(lineData);
                 this->mResponse->AddValue(lineData);
                 this->mResponse->AddValue(RedisRespType::REDIS_ERROR);
                 break;

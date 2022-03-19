@@ -51,6 +51,8 @@ namespace Sentry
 		}
 		inline Type * GetType() { return this->mType; }
         inline const std::string & GetName() { return this->mName; }
+		template<typename T>
+		inline T * Cast() { return dynamic_cast<T*>(this); }
 
 	public:
 		bool IsComponent() override

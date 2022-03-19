@@ -62,7 +62,7 @@ namespace Sentry
             int idx = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
             auto config = this->mConfigComponent
                     ->GetProtocolConfig(this->GetName() + "." + method);
-            LOG_INFO("add new lua service method : ", this->GetName(), '.', method);
+            LOG_INFO("add new lua service method : {0}.{1}", this->GetName(), method);
             this->AddMethod(std::make_shared<LuaServiceMethod>(config, this->mLuaEnv, idx));
         }
         return true;

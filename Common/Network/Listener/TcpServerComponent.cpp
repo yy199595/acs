@@ -97,7 +97,7 @@ namespace Sentry
                 if (listener->StartListen(handler))
                 {
                     const ListenConfig &config = listener->GetConfig();
-                    LOG_DEBUG(config.Name, " listen ", config.Ip, ':', config.Port, " successful");
+					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
                 }
             }
         }

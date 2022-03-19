@@ -61,7 +61,7 @@ namespace Sentry
         {
             rpcClient->StartReceive();
             const std::string &name = rpcClient->GetSocketProxy()->GetName();
-            LOG_INFO("[", name, " => ", address, "] start receive message");
+            LOG_INFO("[{0}=>{1}] ", name, address, "start receive message");
         }
 	}
 

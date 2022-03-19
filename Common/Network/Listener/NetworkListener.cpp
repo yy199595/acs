@@ -91,7 +91,7 @@ namespace Sentry
                         new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
                 socketProxy->RefreshState();
 #ifdef __DEBUG__
-                LOG_INFO('[', socketProxy->GetAddress(), "] connected to ", this->mConfig.Name);
+				LOG_INFO("[{0}] connect to {1}", socketProxy->GetAddress(), this->mConfig.Name);
 #endif
 #ifdef ONLY_MAIN_THREAD
                 this->mListenHandler->OnListen(socketProxy);

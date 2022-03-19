@@ -65,7 +65,7 @@ namespace Sentry
         long long userId = iter->second;
         long long socketId = this->GetCurSocketId();
 #ifdef __DEBUG__
-        LOG_DEBUG(userId, " player login to gate");
+        LOG_DEBUG("{0} player login to gate", userId);
 #endif
         std::shared_ptr<Entity> player(new Entity(userId, socketId));
         LOGIC_THROW_ERROR(this->mEntityComponent->Add(player));

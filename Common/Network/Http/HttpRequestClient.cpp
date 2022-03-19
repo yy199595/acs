@@ -79,7 +79,6 @@ namespace Sentry
             if(code)
             {
                 taskSource->SetResult(false);
-                STD_ERROR_LOG(code.message());
                 return;
             }
             switch(httpContent->OnReceiveData(this->mReadBuffer))
@@ -106,7 +105,6 @@ namespace Sentry
         {
             if(code)
             {
-                STD_ERROR_LOG(code.message());
                 taskSource->SetResult(false);
                 return;
             }
@@ -143,7 +141,6 @@ namespace Sentry
         {
             if(err)
             {
-                STD_ERROR_LOG(err.message() << " " << host << port);
                 taskSource->SetResult(XCode::HostResolverError);
                 return;
             }
@@ -153,7 +150,6 @@ namespace Sentry
             {
                 if(code)
                 {
-                    STD_ERROR_LOG(code.message());
                     taskSource->SetResult(XCode::HttpNetWorkError);
                     return;
                 }

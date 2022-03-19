@@ -2,8 +2,6 @@
 #include<sstream>
 #include<string>
 #include"CommonTypeDef.h"
-#include"spdlog/fmt/fmt.h"
-#include"spdlog/fmt/bundled/color.h"
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
@@ -25,56 +23,52 @@ inline std::string FormatFileLine(const char * file, const int line)
 			break;
 		}
 	}
-	fileName = fileName == nullptr ? file : fileName;
 	char buffer[100] = {};
+	fileName = fileName == nullptr ? file : fileName;
 #ifdef _MSC_VER
 	size_t size = sprintf_s(buffer, "%s:%d  ", fileName, line);
 #else
 	size_t size = sprintf(buffer, "%s:%d  ", fileName, line);
 #endif // _MSC_VER
-	return {buffer, size};
-}
-#define PRINT_COLOR_CONSOLE(color, format, ...) 	{ 						\
-                                             						\
-    const std::string f =  FormatFileLine(__FILE__, __LINE__);  	\
-	fmt::print(fg(color), f + format, __VA_ARGS__);		\
+	return std::string(buffer, size);
 }
 
-#define STD_ERROR_LOG(msg) std::cerr << FormatFileLine(__FILE__, __LINE__) << msg << std::endl;
+
 
 #define GK_LOG(type, f, ...)						\
-{                                 \
-    }//App::Get().GetLogger()->AddLog(type, f, __VA_ARGS__);	\
-}												\
+{                                 					\
+    f.append(fmt::format(__VA_ARGS__));				\
+    App::Get().GetLogger()->AddLog(type, f);		\
+}													\
 
 #define LOG_INFO(...) \
 {                             \
-       const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(Sentry::ELogType::info, f, __VA_ARGS__)        \
+		std::string f = FormatFileLine(__FILE__, __LINE__); \
+       	GK_LOG(spdlog::level::level_enum::info, f, __VA_ARGS__)        \
 }
 
 #define LOG_DEBUG(...) \
 {                             \
-       const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(Sentry::ELogType::debug, f, __VA_ARGS__)        \
+		std::string f = FormatFileLine(__FILE__, __LINE__); \
+       	GK_LOG(spdlog::level::level_enum::debug, f, __VA_ARGS__)        \
 }
 
 #define LOG_WARN(...) \
 {                             \
-       const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(Sentry::ELogType::warn, f, __VA_ARGS__)        \
+       	std::string f = FormatFileLine(__FILE__, __LINE__); \
+       	GK_LOG(spdlog::level::level_enum::warn, f, __VA_ARGS__)        \
 }
 
 #define LOG_ERROR(...) \
 {                                      \
-       const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(Sentry::ELogType::err, f, __VA_ARGS__)          \
+       	std::string f = FormatFileLine(__FILE__, __LINE__); \
+       	GK_LOG(spdlog::level::level_enum::err, f, __VA_ARGS__)          \
 }                              \
 
 #define LOG_FATAL(...) \
 {                                      \
-       const std::string f = FormatFileLine(__FILE__, __LINE__); \
-       GK_LOG(Sentry::ELogType::critical, f, __VA_ARGS__)          \
+       	std::string f = FormatFileLine(__FILE__, __LINE__); \
+       	GK_LOG(spdlog::level::level_enum::critical, f, __VA_ARGS__)          \
 }                              \
 
 

@@ -68,7 +68,6 @@ namespace Sentry
             self->mLastOperTime = Helper::Time::GetSecTimeStamp();
             if (code)
             {
-                STD_ERROR_LOG(code.message());
                 this->OnClientError(XCode::NetWorkError);
                 return;
             }
@@ -165,13 +164,12 @@ namespace Sentry
         std::shared_ptr<RpcClient> self = this->shared_from_this();
         auto address = asio::ip::make_address_v4(ip);
         asio::ip::tcp::endpoint endPoint(address, port);
-        LOG_DEBUG(this->mSocketProxy->GetName(), " start connect " , ip, ':', port);
+		LOG_DEBUG("{0} start connect {1}:{2}", this->mSocketProxy->GetName(), ip, port);
         nSocket.async_connect(endPoint, [self, this](const asio::error_code &err)
         {
             XCode code = XCode::Successful;
             if (err)
             {
-                STD_ERROR_LOG(err.message());
                 code = XCode::NetConnectFailure;
             }
             this->OnConnect(code);
@@ -209,7 +207,6 @@ namespace Sentry
             if (code)
             {
                 this->mSocketProxy->Close();
-                STD_ERROR_LOG(code.message());
                 this->OnClientError(XCode::NetWorkError);
                 this->OnSendData(XCode::NetWorkError, message);
                 while(!this->mWaitSendQueue.empty())

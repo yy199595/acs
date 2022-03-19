@@ -85,13 +85,6 @@ void RegisterServiceComponent()
 
 int main(int argc, char **argv)
 {
-	PRINT_COLOR_CONSOLE(fmt::color::red, "{0}", "nihao");
-	fmt::print(fg(fmt::color::red),"Hello, {}!\n", "world");
-	fmt::print(fg(fmt::color::yellow),"Hello, {}!\n", "world");
-	fmt::print(fg(fmt::color::blue),"Hello, {}!\n", "world");
-	fmt::print(fg(fmt::color::green),"Hello, {}!\n", "world");
-	fmt::print(fg(fmt::color::white),"Hello, {}!\n", "world");
-
 	try
     {
         RegisterComponent();
@@ -104,5 +97,4 @@ int main(int argc, char **argv)
         std::cerr << err.what() << std::endl;
         return -1;
     }
-    return -1;
 }

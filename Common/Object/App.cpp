@@ -93,7 +93,7 @@ namespace Sentry
 		{
 			if (!this->InitComponent(component))
 			{
-				LOG_FATAL("Init ", component->GetName(), " failure");
+				LOG_FATAL("Init {0} failure", component->GetName());
 				return false;
 			}
 		}
@@ -108,18 +108,21 @@ namespace Sentry
 				component->OnComplete();
 			}
 			long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
-			LOG_DEBUG("===== start ", this->mServerName, " successful [", t / 1000.0f, "]s =======");
+			LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
 		});
 		return true;
 	}
 
 	bool App::InitComponent(Component* component)
 	{
-		if (!component->LateAwake()) return false;
-		auto manager1 = dynamic_cast<IFrameUpdate*>(component);
-		auto manager2 = dynamic_cast<ISystemUpdate*>(component);
-		auto manager3 = dynamic_cast<ISecondUpdate*>(component);
-		auto manager4 = dynamic_cast<ILastFrameUpdate*>(component);
+		if (!component->LateAwake())
+		{
+			return false;
+		}
+		IFrameUpdate * manager1 = component->Cast<IFrameUpdate>();
+		ISystemUpdate * manager2 = component->Cast<ISystemUpdate>();
+		ISecondUpdate * manager3 = component->Cast<ISecondUpdate>();
+		ILastFrameUpdate * manager4 = component->Cast<ILastFrameUpdate>();
 		TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
 		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
@@ -131,11 +134,11 @@ namespace Sentry
 	void App::StartComponent(Component* component)
 	{
 		ElapsedTimer elapsedTimer;
-		auto startComponent = dynamic_cast<IStart*>(component);
-		auto loadComponent = dynamic_cast<ILoadData*>(component);
+		IStart * startComponent = component->Cast<IStart>();
+		ILoadData * loadComponent = component->Cast<ILoadData>();
 		if (startComponent != nullptr) startComponent->OnStart();
 		if (loadComponent != nullptr) loadComponent->OnLoadData();
-		LOG_DEBUG("start ", component->GetName(), " use time = ", elapsedTimer.GetMs(), "ms");
+		LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
 	}
 
 	int App::Run()
@@ -166,7 +169,7 @@ namespace Sentry
 			{
 				this->OnDestory();
 				this->mTaskScheduler.Stop();
-				LOG_WARN("close server successful [", timer->GetMs(), "ms]");
+				LOG_WARN("close server successful [{0}]ms", timer->GetMs());
 			});
 		}
 	}

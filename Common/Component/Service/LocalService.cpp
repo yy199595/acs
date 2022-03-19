@@ -92,7 +92,7 @@ namespace Sentry
         string url = fmt::format("http://{0}/logic/service/push", httpAddress);
         std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, jsonWriter);
         if (httpResponse != nullptr) {
-            LOG_INFO("post service to ", httpAddress, " successful [", elapsedTimer.GetMs(), "ms]");
+            LOG_INFO("post service to {0} successful {1}ms", httpAddress, elapsedTimer.GetMs());
         }
     }
 
@@ -101,7 +101,7 @@ namespace Sentry
         RapidJsonWriter jsonWriter;
         this->GetServiceInfo(jsonWriter);
         long long number = this->mRedisComponent->Publish("LocalService.Push", jsonWriter);
-        LOG_DEBUG("publish successful count = ", number);
+        LOG_DEBUG("publish successful count = {0}", number);
     }
 
     void LocalService::OnDestory()

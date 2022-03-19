@@ -52,7 +52,7 @@ namespace Sentry
         std::shared_ptr<RedisClient> redisClient = this->AllotRedisClient();
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
-        LOG_WARN("redis command name = ", redisClient->GetName());
+        LOG_WARN("redis command name = {0}", redisClient->GetName());
 #endif
         if (redisClient == nullptr)
         {
@@ -61,7 +61,7 @@ namespace Sentry
         }
         auto response = redisClient->InvokeCommand(request)->Await();
 #ifdef __DEBUG__
-        LOG_INFO("invoke redis command use time : ", elapsedTimer.GetMs(), "ms");
+        LOG_INFO("invoke redis command use time : {0}ms", elapsedTimer.GetMs());
 #endif
         if (!this->mWaitAllotClients.empty())
         {
@@ -128,7 +128,7 @@ namespace Sentry
             std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(name);
             if(redisClient == nullptr)
             {
-                LOG_ERROR("connect redis ", this->mRedisConfig.mIp, ':', this->mRedisConfig.mPort, " failure");
+                LOG_ERROR("connect redis {0}:{1} failure", this->mRedisConfig.mIp, this->mRedisConfig.mPort);
                 return;
             }
             this->mFreeClients.emplace(redisClient);
@@ -137,7 +137,7 @@ namespace Sentry
         for (const std::string &file: luaFiles)
         {
             LOG_CHECK_RET(this->LoadLuaScript(file));
-            LOG_INFO("load redis script ", file, " successful");
+            LOG_INFO("load redis script {0} successful", file);
         }
 #ifdef __DEBUG__
         this->InvokeCommand("FLUSHALL")->IsOk();
@@ -166,7 +166,7 @@ namespace Sentry
                     auto response = redisCommandClient->InvokeCommand(request)->Await();
                     if(!response->IsOk())
                     {
-                        LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
+                        LOG_ERROR("auth redis passwork error :{0}", this->mRedisConfig.mPassword);
                         return nullptr;
                     }
                 }
@@ -228,8 +228,8 @@ namespace Sentry
         {
 #ifdef __DEBUG__
             LOG_INFO("==== redis publish message ====");
-            LOG_INFO("channel = ", channel);
-            LOG_INFO("message = ", json);
+            LOG_INFO("channel = {0}", channel);
+            LOG_INFO("message = {0}", json);
 #endif
             return this->Publish(channel, json);
         }
@@ -262,7 +262,7 @@ namespace Sentry
                 const std::string &service = subService->GetName();
                 if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
                 {
-                    LOG_INFO("subscribe channel [", fmt::format("{0}.{1}", service, name), "] successful");
+                    LOG_INFO("subscribe channel {0}.{1} successful", service, name);
                 }
             }
         }
@@ -279,7 +279,7 @@ namespace Sentry
                 unsigned short port = this->mRedisConfig.mPort;
                 while (!this->mSubRedisClient->ConnectAsync(ip, port)->Await())
                 {
-                    LOG_ERROR("connect redis [", ip, ':', port, "] failure count = ", count++);
+                    LOG_ERROR("connect redis [{0}:{1}] failure count = {2}", ip, port, count++);
                     this->mTaskComponent->Sleep(3000);
                 }
                 if (!this->mRedisConfig.mPassword.empty())
@@ -289,7 +289,7 @@ namespace Sentry
                     auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
                     if (response == nullptr || response->IsOk())
                     {
-                        LOG_FATAL("auth redis passwd error", this->mRedisConfig.mPassword);
+                        LOG_FATAL("auth redis passwd error {0}", this->mRedisConfig.mPassword);
                         return;
                     }
                 }
@@ -310,8 +310,8 @@ namespace Sentry
                     const std::string &message = redisResponse->GetValue(2);
 #ifdef __DEBUG__
                     LOG_DEBUG("========= subscribe message =============");
-                    LOG_DEBUG("channel = ", channel);
-                    LOG_DEBUG("message = ", message);
+                    LOG_DEBUG("channel = {}", channel);
+                    LOG_DEBUG("message = {}", message);
 #endif
                     auto subService = this->GetComponent<SubService>(service);
                     if (subService != nullptr)

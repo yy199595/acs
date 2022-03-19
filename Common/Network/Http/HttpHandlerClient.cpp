@@ -54,7 +54,6 @@ namespace Sentry
         {
             if(code)
             {
-                STD_ERROR_LOG(code.message());
                 taskSource->SetResult(false);
                 return;
             }
@@ -71,7 +70,6 @@ namespace Sentry
                 {
                     if (code)
                     {
-                        STD_ERROR_LOG(code.message());
                         taskSource->SetResult(false);
                         return;
                     }

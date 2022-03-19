@@ -100,11 +100,11 @@ namespace Sentry
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
         LOG_INFO("==== http request handler ====");
-        LOG_INFO("url = ", httpRequestData->GetUrl());
-        LOG_INFO("type = ", httpRequestData->GetMethod());
+        LOG_INFO("url = {}", httpRequestData->GetUrl());
+        LOG_INFO("type = {}", httpRequestData->GetMethod());
         if(!httpRequestData->GetContent().empty())
         {
-            LOG_INFO("message = ", httpRequestData->GetContent());
+            LOG_INFO("message = {}", httpRequestData->GetContent());
         }
 #endif
         const std::string &url = httpRequestData->GetUrl();
@@ -151,7 +151,7 @@ namespace Sentry
             httpClient->Response(HttpStatus::OK, *jsonResponse);
         }
 #ifdef __DEBUG__
-        LOG_INFO("http data response successful [", elapsedTimer.GetMs(), "ms]");
+        LOG_INFO("http data response successful [{0}]ms", elapsedTimer.GetMs());
 #endif
     }
 

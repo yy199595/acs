@@ -24,11 +24,7 @@ namespace Sentry
         std::string ip;
         unsigned short port = 0;
         this->mIsConnected = true;
-        if(!Helper::String::ParseIpAddress(address, ip, port))
-        {
-            STD_ERROR_LOG("parse address error : " << address);
-            return false;
-        }
+		assert(Helper::String::ParseIpAddress(address, ip, port));
         this->mNetworkThread.Invoke(&TcpClient::ConnectByAddress, this, ip, port);
         return true;
     }
@@ -50,7 +46,6 @@ namespace Sentry
             if(code)
             {
                 this->mIsOpen = false;
-                STD_ERROR_LOG(code.message());
             }
             this->mIsConnected = false;
             this->OnConnect(code);
@@ -70,7 +65,6 @@ namespace Sentry
             if(error)
             {
                 this->mIsOpen = false;
-                STD_ERROR_LOG(error.message());
             }
             this->OnSendData(error, tag);
         });
