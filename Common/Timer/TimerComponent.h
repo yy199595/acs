@@ -30,7 +30,8 @@ namespace Sentry
 
 		bool LateAwake() final { return true; }
 
-        void OnSystemUpdate() final;//处理系统事件
+		void OnSystemUpdate();
+
 
 		bool AddTimerToWheel(long long timerId);
 
