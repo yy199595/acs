@@ -166,7 +166,7 @@ namespace Sentry
                     auto response = redisCommandClient->InvokeCommand(request)->Await();
                     if(!response->IsOk())
                     {
-                        LOG_ERROR("auth redis passwork error :{0}", this->mRedisConfig.mPassword);
+                        LOG_ERROR("auth redis password error :{0}", this->mRedisConfig.mPassword);
                         return nullptr;
                     }
                 }

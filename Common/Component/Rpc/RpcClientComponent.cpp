@@ -180,7 +180,7 @@ namespace Sentry
         auto config = App::Get().GetComponent<RpcConfigComponent>()->
                 GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
-        LOG_DEBUG("func = ", config->Service,'.', config->Method);
+        LOG_DEBUG("func = {0}.{1}", config->Service, config->Method);
 		if(Helper::Proto::GetJson(message, json))
 		{
 			LOG_DEBUG("json = ", json);
