@@ -36,7 +36,7 @@ namespace Sentry
                 }
                 this->mWaitTaskQueue.pop();
             }
-            LOG_WARN(this->mServiceName, " add new address [{0}]", address);
+            LOG_WARN("{0} add new address [{1}]", this->mServiceName, address);
         }
     }
 

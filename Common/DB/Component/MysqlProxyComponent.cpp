@@ -90,7 +90,7 @@ namespace Sentry
         std::string address = mysqlEntity->AllotAddress();
         if(address.empty())
         {
-            LOG_ERROR("allot MysqlService address failure = {0}", address);
+            LOG_ERROR("allot MysqlService address failure");
             return nullptr;
         }
         std::shared_ptr<ProxyClient> serviceNode = mysqlEntity->GetNode(address);
