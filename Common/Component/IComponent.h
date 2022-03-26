@@ -4,6 +4,7 @@
 #include"Protocol/c2s.pb.h"
 #include<Pool/StringPool.h>
 #include"XCode/XCode.h"
+#include"Json/JsonReader.h"
 namespace Sentry
 {
     class IStart
@@ -11,6 +12,14 @@ namespace Sentry
     public:
         virtual void OnStart() = 0;
     };
+
+	class IComplete
+	{
+	 public:
+		virtual void OnComplete() = 0;
+	};
+
+
 	class IFrameUpdate
 	{
 	public:
@@ -100,13 +109,13 @@ namespace Sentry
     class IJsonRequest
     {
     public:
-        virtual bool OnRequest(const class RapidJsonReader * message) = 0;
+        virtual bool OnRequest(const Json::Reader * message) = 0;
     };
 
     class IJsonResponse
     {
     public:
-        virtual bool OnResponse(const class RapidJsonReader * message) = 0;
+        virtual bool OnResponse(const Json::Reader * message) = 0;
     };
 
 

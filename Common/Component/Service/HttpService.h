@@ -15,7 +15,7 @@ namespace Sentry
         virtual ~HttpService() = default;
 
     public:
-        std::shared_ptr<RapidJsonWriter> Invoke(const std::string & name, std::shared_ptr<RapidJsonReader> request);
+        std::shared_ptr<Json::Writer> Invoke(const std::string & name, std::shared_ptr<Json::Reader> request);
     public:
         template<typename T>
         bool Bind(const std::string & name, HttpJsonMethod1<T> func)

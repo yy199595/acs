@@ -99,9 +99,9 @@ namespace Json
 	bool Reader::GetMember(const char* key, unsigned short& value) const
 	{
 		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
-		if(jsonValue != nullptr && jsonValue->IsInt())
+		if(jsonValue != nullptr && jsonValue->IsUint())
 		{
-			value = (unsigned short)jsonValue->GetInt();
+			value = (unsigned short)jsonValue->GetUint();
 			return true;
 		}
 		return false;
@@ -112,7 +112,7 @@ namespace Json
 		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
 		if(jsonValue != nullptr && jsonValue->IsInt64())
 		{
-			value = jsonValue->GetInt();
+			value = jsonValue->GetInt64();
 			return true;
 		}
 		return false;

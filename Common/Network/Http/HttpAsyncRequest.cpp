@@ -126,10 +126,10 @@ namespace Sentry
         return HttpStatus::CONTINUE;
     }
 
-    std::shared_ptr<RapidJsonReader> HttpAsyncResponse::ToJsonReader()
+    std::shared_ptr<Json::Reader> HttpAsyncResponse::ToJsonReader()
     {
-        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
-        if(!jsonReader->TryParse(this->mContent))
+        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+        if(!jsonReader->ParseJson(this->mContent))
         {
             return nullptr;
         }
@@ -145,10 +145,10 @@ namespace Sentry
         this->mState = HttpDecodeState::FirstLine;
     }
 
-    std::shared_ptr<RapidJsonReader> HttpHandlerRequest::ToJsonReader()
+    std::shared_ptr<Json::Reader> HttpHandlerRequest::ToJsonReader()
     {
-        std::shared_ptr<RapidJsonReader> jsonReader(new RapidJsonReader());
-        return jsonReader->TryParse(this->mContent) ? jsonReader : nullptr;
+        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+        return jsonReader->ParseJson(this->mContent) ? jsonReader : nullptr;
     }
 
     bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
@@ -264,11 +264,10 @@ namespace Sentry
         os.write(content.c_str(), content.size());
     }
 
-    void HttpHandlerResponse::AddValue(RapidJsonWriter &jsonWriter)
+    void HttpHandlerResponse::AddValue(Json::Writer &jsonWriter)
     {
-        std::string json;
         std::ostream os(&this->mStreamBuffer);
-        assert(jsonWriter.WriterToStream(json));
+		const std::string json = jsonWriter.ToJsonString();
         os << "Content-Type: application/json; charset=utf-8" << "\r\n";
         os << "Content-Length: " << json.size()<< "\r\n";
         os << "\r\n";

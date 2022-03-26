@@ -2,7 +2,7 @@
 #include"DB/Mysql/MysqlTaskSource.h"
 #include"Component/Mysql//MysqlComponent.h"
 #include"Component/Scene/ThreadPoolComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Pool/MessagePool.h"
 namespace Sentry
 {

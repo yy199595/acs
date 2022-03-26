@@ -5,26 +5,26 @@
 
 namespace Sentry
 {
-    std::shared_ptr<RapidJsonWriter> HttpService::Invoke(
-            const std::string &name, std::shared_ptr<RapidJsonReader> request)
+    std::shared_ptr<Json::Writer> HttpService::Invoke(
+            const std::string &name, std::shared_ptr<Json::Reader> request)
     {
-        std::shared_ptr<RapidJsonWriter> response(new RapidJsonWriter());
+        std::shared_ptr<Json::Writer> response(new Json::Writer());
         auto iter = this->mHttpMethodMap.find(name);
         if(iter == this->mHttpMethodMap.end())
         {
-            response->Add("code", (int)XCode::CallServiceNotFound);
+            response->AddMember("code", (int)XCode::CallServiceNotFound);
             return response;
         }
         try
         {
             auto httpServiceMethod = iter->second;
             XCode code = httpServiceMethod->Invoke(request, response);
-            response->Add("code", (int)code);
+            response->AddMember("code", (int)code);
         }
         catch(std::logic_error & logic_error)
         {
-            response->Add("error", logic_error.what());
-            response->Add("code", (int)XCode::ThrowError);
+            response->AddMember("error", logic_error.what());
+            response->AddMember("code", (int)XCode::ThrowError);
         }
         return response;
     }

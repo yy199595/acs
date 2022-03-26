@@ -4,7 +4,7 @@
 
 #include"RpcGateClient.h"
 #include"Protocol/c2s.pb.h"
-#include"Object/App.h"
+#include"App/App.h"
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"
 #endif

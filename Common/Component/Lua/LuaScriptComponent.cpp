@@ -4,7 +4,7 @@
 #include"Script/SystemExtension.h"
 #include"Script/CoroutineExtension.h"
 
-#include "Object/App.h"
+#include"App/App.h"
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
@@ -63,7 +63,7 @@ namespace Sentry
 	{
         std::vector<std::string> luaPaths;
         std::vector<std::string> luaFiles;
-		const ServerConfig & config = App::Get().GetConfig();
+		const ServerConfig & config = App::Get()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("lua_src", luaPaths));
         for(const std::string & path : luaPaths)
         {

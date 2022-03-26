@@ -1,6 +1,6 @@
 #include"EntityMgrComponent.h"
-#include"Object/App.h"
-#include"Object/Entity.h"
+#include"App/App.h"
+#include"Entity/Entity.h"
 namespace Sentry
 {
     bool EntityMgrComponent::Awake()
@@ -11,7 +11,7 @@ namespace Sentry
 
     bool EntityMgrComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
         return true;
     }
 

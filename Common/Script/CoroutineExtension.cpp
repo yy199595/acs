@@ -1,5 +1,5 @@
 #include "CoroutineExtension.h"
-#include "Object/App.h"
+#include "App/App.h"
 #include"Timer/LuaSleepTimer.h"
 using namespace Sentry;
 namespace CoroutineExtension
@@ -9,7 +9,7 @@ namespace CoroutineExtension
         lua_pushthread(lua);
         long long ms = lua_tointeger(lua, 1);
         auto timer = LuaSleepTimer::Create(lua, -1, ms);
-        auto timerComponent = App::Get().GetTimerComponent();
+        auto timerComponent = App::Get()->GetTimerComponent();
         lua_pushinteger(lua, timerComponent->AddTimer(timer));
         return lua_yield(lua, 0);
     }

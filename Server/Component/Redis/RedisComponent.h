@@ -2,7 +2,7 @@
 
 #include"Util/Guid.h"
 #include"Other/ElapsedTimer.h"
-#include"Util/JsonHelper.h"
+#include"Json/JsonWriter.h"
 #include"Component/Component.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"DB/Redis/RedisClient.h"
@@ -41,7 +41,7 @@ namespace Sentry
 
         long long Publish(const std::string & channel, const std::string & message);
 
-        long long Publish(const std::string & channel, RapidJsonWriter & jsonWriter);
+        long long Publish(const std::string & channel, Json::Writer & jsonWriter);
 
 
         template<typename ... Args>

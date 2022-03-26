@@ -1,5 +1,4 @@
 #include"TimeWheelLayer.h"
-#include"Object/App.h"
 #include"Define/CommonLogDef.h"
 namespace Sentry
 {

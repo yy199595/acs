@@ -3,7 +3,7 @@
 //
 
 #include"GateComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Service/ServiceProxy.h"
 #include"NetWork/RpcGateClient.h"
 #include"Component/Rpc/RpcConfigComponent.h"

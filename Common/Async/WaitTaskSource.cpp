@@ -9,7 +9,7 @@ namespace Sentry
     WaitTaskSource::WaitTaskSource()
     {
         this->mTimerId = 0;
-        this->mTimerComponent = App::Get().GetTimerComponent();
+        this->mTimerComponent = App::Get()->GetTimerComponent();
     }
 
     WaitTaskSource::~WaitTaskSource()

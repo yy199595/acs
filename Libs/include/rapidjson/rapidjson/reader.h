@@ -1756,7 +1756,7 @@ private:
         IterativeParsingErrorState,      // sink states at top
         IterativeParsingStartState,
 
-        // Object states
+        // Entity states
         IterativeParsingObjectInitialState,
         IterativeParsingMemberKeyState,
         IterativeParsingMemberValueState,

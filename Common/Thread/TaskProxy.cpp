@@ -1,5 +1,5 @@
 #include"TaskProxy.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/TimeHelper.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
@@ -13,7 +13,7 @@ namespace Sentry
     CoroutineAsyncTask::CoroutineAsyncTask()
     {
         this->mCorId = 0;
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
     }
 
     bool CoroutineAsyncTask::AwaitInvoke()

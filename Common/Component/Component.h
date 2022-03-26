@@ -2,15 +2,15 @@
 
 #include"IComponent.h"
 
-#include <XCode/XCode.h>
-#include<Object/Object.h>
-#include <Protocol/db.pb.h>
-#include <Protocol/c2s.pb.h>
-#include <Protocol/com.pb.h>
-#include <Protocol/s2s.pb.h>
-#include <Define/CommonLogDef.h>
-#include <Method/MethodProxy.h>
-#include <Define/CommonTypeDef.h>
+#include<XCode/XCode.h>
+#include<Entity/Object.h>
+#include<Protocol/db.pb.h>
+#include<Protocol/c2s.pb.h>
+#include<Protocol/com.pb.h>
+#include<Protocol/s2s.pb.h>
+#include<Define/CommonLogDef.h>
+#include<Method/MethodProxy.h>
+#include<Define/CommonTypeDef.h>
 using namespace google::protobuf;
 namespace Sentry
 {
@@ -65,7 +65,6 @@ namespace Sentry
         
         virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
 
-        virtual void OnComplete() { } //在所有组件的start load 都完成之后调用
 	protected:
 		template<typename T>
 		T * GetComponent();

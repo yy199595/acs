@@ -1,6 +1,6 @@
 #include"LuaServiceMethod.h"
 #include"Script/LuaInclude.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
@@ -13,8 +13,8 @@ namespace Sentry
 		:ServiceMethod(config->Method), mLuaEnv(lua), mIdx(idx)
 	{
         this->mProtoConfig = config;
-		this->mScriptComponent = App::Get().GetComponent<LuaScriptComponent>();
-		this->mRpcClientComponent = App::Get().GetComponent<RpcClientComponent>();
+		this->mScriptComponent = App::Get()->GetComponent<LuaScriptComponent>();
+		this->mRpcClientComponent = App::Get()->GetComponent<RpcClientComponent>();
 	}
 
     tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::Call(long long id, const std::string &json)

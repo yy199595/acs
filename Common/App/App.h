@@ -3,7 +3,7 @@
 #include"Define/CommonTypeDef.h"
 #include"Global/ServerConfig.h"
 #include"Util/TimeHelper.h"
-#include"Object/Entity.h"
+#include"Entity/Entity.h"
 #include"Global/ServerPath.h"
 #include"Thread/TaskThread.h"
 #include"Component/Timer/TimerComponent.h"
@@ -24,11 +24,10 @@ namespace Sentry
 		explicit App(ServerConfig* config);
 		~App() final = default;
 	 public:
-		static App& Get()
+		static std::shared_ptr<App> Get()
 		{
-			return *mApp;
+			return mApp;
 		}
-		bool StartNewService(const std::string& name);
 		bool AddComponentByName(const std::string& name);
 		const ServerConfig& GetConfig()
 		{

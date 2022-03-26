@@ -1,14 +1,13 @@
 ﻿#include"Component/Component.h"
 #include "Pool/ObjectPool.h"
 #include"Protocol/s2s.pb.h"
-#include"Util/JsonHelper.h"
 #include"google/protobuf/util/json_util.h"
 #include"DB/Mysql/MysqlRpcTaskSource.h"
 namespace Sentry
 {
 	class ServiceProxy;
 	class MysqlRpcTaskSource;
-	class MysqlProxyComponent : public Component
+	class MysqlProxyComponent : public Component, public IComplete
 	{
 	 public:
 		MysqlProxyComponent() = default;
@@ -22,8 +21,7 @@ namespace Sentry
 		bool
 		LateAwake() final;
 
-		void
-		OnComplete() final;
+		void OnComplete() final;
 	 private:
 		void
 		AddUserData();

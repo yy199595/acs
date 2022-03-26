@@ -1,5 +1,5 @@
 ﻿#include "MysqlComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"DB/Mysql/TableOperator.h"
 #include"Component/Coroutine/TaskComponent.h"
@@ -12,7 +12,7 @@ namespace Sentry
 		this->mMysqlPort = 0;
 		this->mTaskManager = nullptr;
 		this->mCorComponent = nullptr;
-		const ServerConfig& config = App::Get().GetConfig();
+		const ServerConfig& config = App::Get()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mMysqlIp));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mMysqlPort));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mDataBaseUser));
@@ -29,7 +29,7 @@ namespace Sentry
 
 	MysqlClient* MysqlComponent::GetMysqlClient()
 	{
-		if (App::Get().IsMainThread())
+		if (App::Get()->IsMainThread())
 		{
 			LOG_ERROR("try in main thread invoke sql");
 			return nullptr;

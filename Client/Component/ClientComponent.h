@@ -17,7 +17,7 @@ namespace Client
     class TcpRpcClient;
 
     class ClientComponent : public Component,
-                            public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>, public IStart
+                            public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>, public IComplete
     {
     public:
         ClientComponent();
@@ -44,11 +44,11 @@ namespace Client
     protected:
         bool Awake() final;
 
-        void OnStart() final;
-
         bool LateAwake() final;
 
-        void OnTimeout(long long rpcId);
+		void OnComplete() override;
+
+		void OnTimeout(long long rpcId);
 
     private:
         std::string mIp;

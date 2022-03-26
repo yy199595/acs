@@ -3,7 +3,7 @@
 //
 
 #include"GateService.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/MD5.h"
 #include"Util/Guid.h"
 #include"Service/ServiceProxy.h"

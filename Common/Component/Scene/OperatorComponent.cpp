@@ -3,7 +3,7 @@
 //
 #include"OperatorComponent.h"
 #include"Component/Timer/TimerComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 namespace Sentry
 {
     bool OperatorComponent::Awake()

@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2021/11/5.
 //
-#include"Object/App.h"
+#include"App/App.h"
 #include"HttpLoginService.h"
 #include"Util/DirectoryHelper.h"
 #include"Util/MD5.h"
@@ -17,15 +17,15 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpLoginService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
+    XCode HttpLoginService::Login(const Json::Reader &request, Json::Writer &response)
     {
         std::string account;
         std::string password;
-        if (!request.TryGetValue("account", account))
+        if (!request.GetMember("account", account))
         {
             return XCode::Failure;
         }
-        if (!request.TryGetValue("password", password))
+        if (!request.GetMember("password", password))
         {
             return XCode::Failure;
         }

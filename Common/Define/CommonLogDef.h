@@ -38,7 +38,7 @@ inline std::string FormatFileLine(const char * file, const int line)
 #define GK_LOG(type, f, ...)						\
 {                                 					\
     f.append(fmt::format(__VA_ARGS__));				\
-    App::Get().GetLogger()->AddLog(type, f);		\
+    App::Get()->GetLogger()->AddLog(type, f);		\
 }													\
 
 #define LOG_INFO(...) \

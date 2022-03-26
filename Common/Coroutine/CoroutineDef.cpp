@@ -1,7 +1,7 @@
 #include"CoroutineDef.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"TaskContext.h"
-#include"Object/App.h"
+#include"App/App.h"
 namespace Sentry
 {
 	TaskContextPool::~TaskContextPool()
@@ -73,7 +73,7 @@ namespace Sentry
 	CoroutineGroup::CoroutineGroup(size_t size)
     {
         this->mCount = size;
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
         this->mCoroutineId = this->mCorComponent->GetContextId();
     }
 

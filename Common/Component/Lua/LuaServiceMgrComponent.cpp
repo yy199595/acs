@@ -1,5 +1,5 @@
 #include"LuaServiceMgrComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Service/LuaRpcService.h"
 #include"Component/Lua/LuaScriptComponent.h"
@@ -26,7 +26,7 @@ namespace Sentry
         LOGIC_THROW_ERROR(this->mConfigComponent = this->GetComponent<RpcConfigComponent>());
 
         std::vector<std::string> services;
-        const ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get()->GetConfig();
         LOGIC_THROW_ERROR(config.GetMember("service", services));
 
         for (std::string &service: services) {

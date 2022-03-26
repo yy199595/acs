@@ -14,7 +14,7 @@ namespace Sentry
         HttpNodeService() = default;
         ~HttpNodeService() final = default;
     public:
-        XCode Push(const RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Push(const Json::Reader & request, Json::Writer & response);
     protected:
         bool Awake() final;
         bool LateAwake() final;

@@ -14,9 +14,9 @@ namespace Sentry
         this->mAddress = address;
         this->mServiceName = name;
         this->mState = NodeState::None;
-        this->mTaskComponent = App::Get().GetTaskComponent();
+        this->mTaskComponent = App::Get()->GetTaskComponent();
         this->mTaskComponent->Start(&ProxyClient::SendFromQueue, this);
-        this->mRpcCliemComponent = App::Get().GetComponent<RpcClientComponent>();
+        this->mRpcCliemComponent = App::Get()->GetComponent<RpcClientComponent>();
     }
 
     bool ProxyClient::IsConnected()
@@ -75,7 +75,7 @@ namespace Sentry
         {
             return true;
         }
-        ServiceMgrComponent *serviceComponent = App::Get().GetComponent<ServiceMgrComponent>();
+        ServiceMgrComponent *serviceComponent = App::Get()->GetComponent<ServiceMgrComponent>();
         auto serviceEntity = serviceComponent->GetServiceProxy(this->mServiceName);
         if(serviceEntity != nullptr)
         {

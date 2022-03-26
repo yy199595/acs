@@ -24,7 +24,7 @@ namespace Sentry
         return taskSource->Await() ? handlerRequest : nullptr;
     }
 
-    bool HttpHandlerClient::Response(HttpStatus code, RapidJsonWriter &jsonWriter)
+    bool HttpHandlerClient::Response(HttpStatus code, Json::Writer &jsonWriter)
     {
         std::shared_ptr<HttpHandlerResponse> response(new HttpHandlerResponse(code));
         response->AddValue(jsonWriter);

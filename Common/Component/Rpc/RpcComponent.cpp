@@ -2,7 +2,7 @@
 #include<Component/Service/RpcService.h>
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Rpc/RpcConfigComponent.h"
@@ -22,7 +22,7 @@ namespace Sentry
 
     bool RpcComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
         LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
         LOG_CHECK_RET_FALSE(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());

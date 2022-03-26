@@ -1,5 +1,5 @@
 ﻿#include"RpcService.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include<Component/Rpc/RpcConfigComponent.h>
 #ifdef __DEBUG__

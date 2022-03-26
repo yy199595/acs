@@ -1,8 +1,7 @@
 #include"MysqlTaskSource.h"
-#include"Object/App.h"
-#include"Util/JsonHelper.h"
+#include"App/App.h"
+#include"Json/JsonWriter.h"
 #include"Component/Mysql/MysqlComponent.h"
-#include"Component/Coroutine/TaskComponent.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
@@ -15,7 +14,8 @@ namespace Sentry
 	XCode MysqlTaskSource::Await(const std::string& sql)
 	{
 		this->mSqlCommand = std::move(sql);
-		auto threadComponent = App::Get().GetComponent<ThreadPoolComponent>();
+		std::shared_ptr<App> app = App::Get();
+		ThreadPoolComponent * threadComponent = app->GetComponent<ThreadPoolComponent>();
 		if (!threadComponent->StartTask(this))
 		{
 			return XCode::MysqlStartTaskFail;
@@ -64,7 +64,7 @@ namespace Sentry
 			}
 			if (rowCount == 1)
 			{
-				RapidJsonWriter jsonWrite;
+				Json::Writer jsonWrite;
 				MYSQL_ROW row = mysql_fetch_row(queryResult);
 				unsigned long* lengths = mysql_fetch_lengths(queryResult);
 				for (size_t index = 0; index < fieldNameVector.size(); index++)
@@ -72,16 +72,14 @@ namespace Sentry
 					MYSQL_FIELD* field = fieldNameVector[index];
 					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 				}
-				if (jsonWrite.WriterToStream(json))
-				{
-					this->mQueryDatas.push(json);
-				}
+				json = jsonWrite.ToJsonString();
+				this->mQueryDatas.push(json);
 			}
 			else
 			{
 				for (unsigned long count = 0; count < rowCount; count++)
 				{
-					RapidJsonWriter jsonWrite;
+					Json::Writer jsonWrite;
 					MYSQL_ROW row = mysql_fetch_row(queryResult);
 					unsigned long* lengths = mysql_fetch_lengths(queryResult);
 					for (size_t index = 0; index < fieldNameVector.size(); index++)
@@ -89,10 +87,8 @@ namespace Sentry
 						MYSQL_FIELD* field = fieldNameVector[index];
 						this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 					}
-					if (jsonWrite.WriterToStream(json))
-					{
-						this->mQueryDatas.push(json);
-					}
+					json = jsonWrite.ToJsonString();
+					this->mQueryDatas.push(json);
 				}
 			}
 			mysql_free_result(queryResult);
@@ -113,7 +109,7 @@ namespace Sentry
 		return true;
 	}
 
-	void MysqlTaskSource::WriteValue(RapidJsonWriter& jsonWriter, MYSQL_FIELD* field, const char* data, long size)
+	void MysqlTaskSource::WriteValue(Json::Writer& jsonWriter, MYSQL_FIELD* field, const char* data, long size)
 	{
 		switch (field->type)
 		{
@@ -122,7 +118,7 @@ namespace Sentry
 			this->mValue2 = std::atoll(data);
 			if (this->mValue2 != 0)
 			{
-				jsonWriter.Add(field->name, this->mValue2);
+				jsonWriter.AddMember(field->name, this->mValue2);
 			}
 			break;
 		case enum_field_types::MYSQL_TYPE_FLOAT:
@@ -130,12 +126,12 @@ namespace Sentry
 			this->mValue1 = std::atof(data);
 			if (this->mValue1 != 0)
 			{
-				jsonWriter.Add(field->name, this->mValue1);
+				jsonWriter.AddMember(field->name, this->mValue1);
 			}
 		default:
 			if (data != nullptr && size > 0)
 			{
-				jsonWriter.Add(field->name, data, size);
+				jsonWriter.AddMember(field->name, data, size);
 			}
 			break;
 		}

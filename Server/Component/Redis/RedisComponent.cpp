@@ -1,6 +1,6 @@
 ﻿#include"RedisComponent.h"
 
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
@@ -14,7 +14,7 @@ namespace Sentry
     {
         std::string path;
         this->mRedisConfig.mCount = 3;
-        const ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get()->GetConfig();
         config.GetMember("redis", "count", this->mRedisConfig.mCount);
         config.GetMember("redis", "lua", this->mRedisConfig.mLuaFilePath);
         config.GetMember("redis", "passwd", this->mRedisConfig.mPassword);
@@ -111,7 +111,7 @@ namespace Sentry
     {
         std::string path;
         std::vector<std::string> luaFiles;
-        App::Get().GetConfig().GetMember("redis", "lua", path);
+        App::Get()->GetConfig().GetMember("redis", "lua", path);
         Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
 
         this->mSubRedisClient = this->MakeRedisClient("Subscribe");
@@ -148,7 +148,7 @@ namespace Sentry
     std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string & name)
     {
 #ifdef ONLY_MAIN_THREAD
-        IAsioThread &workThread = App::Get().GetTaskScheduler();
+        IAsioThread &workThread = App::Get()->GetTaskScheduler();
 #else
         IAsioThread &workThread = this->mThreadComponent->AllocateNetThread();
 #endif
@@ -221,20 +221,16 @@ namespace Sentry
         return this->InvokeCommand("PUBLISH", channel, message)->GetNumber();
     }
 
-    long long RedisComponent::Publish(const std::string &channel, RapidJsonWriter &jsonWriter)
-    {
-        std::string json;
-        if(jsonWriter.WriterToStream(json))
-        {
+    long long RedisComponent::Publish(const std::string &channel, Json::Writer &jsonWriter)
+	{
+		std::string json = jsonWriter.ToJsonString();
 #ifdef __DEBUG__
-            LOG_INFO("==== redis publish message ====");
-            LOG_INFO("channel = {0}", channel);
-            LOG_INFO("message = {0}", json);
+		LOG_INFO("==== redis publish message ====");
+		LOG_INFO("channel = {0}", channel);
+		LOG_INFO("message = {0}", json);
 #endif
-            return this->Publish(channel, json);
-        }
-        return -1;
-    }
+		return this->Publish(channel, json);
+	}
 
     void RedisComponent::CheckRedisClient()
     {
@@ -252,7 +248,7 @@ namespace Sentry
     void RedisComponent::SubscribeMessage()
     {
         std::list<SubService *> components;
-        App::Get().GetTypeComponents<SubService>(components);
+        App::Get()->GetTypeComponents<SubService>(components);
         for (SubService *subService: components)
         {
             std::vector<std::string> methods;

@@ -1,6 +1,6 @@
 ﻿
 #include"RpcClientComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
 #include"Component/Rpc/RpcComponent.h"
@@ -38,7 +38,7 @@ namespace Sentry
                 this->mAddressClientMap.erase(iter1);
             }
 #ifdef __DEBUG__
-            auto component = App::Get().GetComponent<RpcConfigComponent>();
+            auto component = App::Get()->GetComponent<RpcConfigComponent>();
             LOG_ERROR(session->GetAddress(), " connected code =", component->GetCodeDesc(code));
 #endif
             this->mRpcClientMap.erase(iter);
@@ -124,7 +124,7 @@ namespace Sentry
             return localSession;
         }
 #ifdef ONLY_MAIN_THREAD
-        IAsioThread & workThread = App::Get().GetTaskScheduler();
+        IAsioThread & workThread = App::Get()->GetTaskScheduler();
 #else
         IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
 #endif
@@ -172,7 +172,7 @@ namespace Sentry
         }
 #ifdef __DEBUG__
 		std::string json;
-        auto config = App::Get().GetComponent<RpcConfigComponent>()->
+        auto config = App::Get()->GetComponent<RpcConfigComponent>()->
                 GetProtocolConfig(message->method_id());
         LOG_DEBUG("=============== [send request] ===============");
         LOG_DEBUG("func = {0}.{1}", config->Service, config->Method);

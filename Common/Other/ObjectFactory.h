@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <Object/Object.h>
-#include <Protocol/com.pb.h>
-#include <Protocol/s2s.pb.h>
+#include<Entity/Object.h>
+#include<Protocol/com.pb.h>
+#include<Protocol/s2s.pb.h>
 
 using namespace google::protobuf;
 namespace Sentry

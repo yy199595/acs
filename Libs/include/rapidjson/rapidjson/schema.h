@@ -484,7 +484,7 @@ public:
             validatorCount_++;
         }
 
-        // Object
+        // Entity
 
         const ValueType* properties = GetMember(value, GetPropertiesString());
         const ValueType* required = GetMember(value, GetRequiredString());

@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include"Json/JsonWriter.h"
 #include"Component/Service/SubService.h"
 using namespace com;
 namespace Sentry
@@ -25,10 +25,10 @@ namespace Sentry
         bool AddNewService(const std::string & service);
         void RemoveByAddress(const std::string & address);
     private:
-        void Add(const RapidJsonReader & jsonReader);
-        void Push(const RapidJsonReader & jsonReader);
-        void Remove(const RapidJsonReader & jsonReader);
-        void GetServiceInfo(RapidJsonWriter & jsonWriter);
+        void Add(const Json::Reader & jsonReader);
+        void Push(const Json::Reader & jsonReader);
+        void Remove(const Json::Reader & jsonReader);
+        void GetServiceInfo(Json::Writer & jsonWriter);
     private:
         int mAreaId;
 		std::string mNodeName;

@@ -1,6 +1,6 @@
 ﻿
 #include"ClientComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
 #include"Task/ClientRpcTask.h"
@@ -56,34 +56,34 @@ namespace Client
         return true;
     }
 
-	void ClientComponent::OnStart()
+	void ClientComponent::OnComplete()
 	{
         string host;
-        const ServerConfig & config = App::Get().GetConfig();
+        const ServerConfig & config = App::Get()->GetConfig();
         config.GetMember("http", "account", host);
         std::string loginUrl = host + "/logic/account/login";
         std::string registerUrl = host + "/logic/account/register";
 
-        RapidJsonWriter jsonWriter;
-        jsonWriter.Add("password", "199595yjz.");
-        jsonWriter.Add("account", "646585122@qq.com");
-        jsonWriter.Add("phone_num", (long long)13716061995);
+        Json::Writer jsonWriter;
+        jsonWriter.AddMember("password", "199595yjz.");
+        jsonWriter.AddMember("account", "646585122@qq.com");
+        jsonWriter.AddMember("phone_num", (long long)13716061995);
         auto registerResponse = this->mHttpComponent->Post(registerUrl, jsonWriter);
-        std::shared_ptr<RapidJsonReader> rapidJsonReader = registerResponse->ToJsonReader();
+        std::shared_ptr<Json::Reader> rapidJsonReader = registerResponse->ToJsonReader();
 
 
-        RapidJsonWriter loginJsonWriter;
-        loginJsonWriter.Add("password", "199595yjz.");
-        loginJsonWriter.Add("account","646585122@qq.com");
+        Json::Writer loginJsonWriter;
+        loginJsonWriter.AddMember("password", "199595yjz.");
+        loginJsonWriter.AddMember("account","646585122@qq.com");
         auto loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
 
-        std::shared_ptr<RapidJsonReader> loginJsonResponse = loginResponse->ToJsonReader();
+        std::shared_ptr<Json::Reader> loginJsonResponse = loginResponse->ToJsonReader();
 
-        loginJsonResponse->TryGetValue("gate_ip", this->mIp);
-        loginJsonResponse->TryGetValue("gate_port", this->mPort);
-        LOG_INFO(loginResponse->GetContent());
+        loginJsonResponse->GetMember("gate_ip", this->mIp);
+        loginJsonResponse->GetMember("gate_port", this->mPort);
+        std::string content = loginResponse->GetContent();
 
-		IAsioThread & netThread = App::Get().GetTaskScheduler();
+		IAsioThread & netThread = App::Get()->GetTaskScheduler();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 

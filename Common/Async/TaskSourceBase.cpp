@@ -11,7 +11,7 @@ namespace Sentry
         this->mState = TaskState::TaskReady;
         this->mTaskId = Helper::Guid::Create();
         this->mCreateTime = Helper::Time::GetMilTimestamp();
-        this->mTaskComponent = App::Get().GetTaskComponent();
+        this->mTaskComponent = App::Get()->GetTaskComponent();
     }
 
     bool TaskSourceBase::ResumeTask(TaskState state)

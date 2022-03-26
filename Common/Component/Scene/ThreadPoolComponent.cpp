@@ -1,6 +1,6 @@
 ﻿#include "ThreadPoolComponent.h"
 #include "Util/Guid.h"
-#include "Object/App.h"
+#include "App/App.h"
 #include "Method/MethodProxy.h"
 namespace Sentry
 {
@@ -8,7 +8,7 @@ namespace Sentry
     {
         this->mIndex = 0;
         int taskCount = 0;
-        const ServerConfig & config = App::Get().GetConfig();
+        const ServerConfig & config = App::Get()->GetConfig();
         config.GetMember("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
@@ -53,7 +53,7 @@ namespace Sentry
     void ThreadPoolComponent::GetAllThread(std::vector<const IThread *> &threads)
     {
         threads.clear();
-        MainTaskScheduler & mainTask = App::Get().GetTaskScheduler();
+        MainTaskScheduler & mainTask = App::Get()->GetTaskScheduler();
 #ifndef ONLY_MAIN_THREAD
         for(const IThread * taskThread : this->mNetThreads)
         {

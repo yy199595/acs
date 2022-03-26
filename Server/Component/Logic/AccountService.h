@@ -20,9 +20,9 @@ namespace Sentry
         bool LateAwake() final;
 
     private:
-        XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Login(const Json::Reader & request, Json::Writer & response);
 
-        XCode Register(const RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Register(const Json::Reader & request, Json::Writer & response);
 
     private:
         const std::string NewToken(const std::string & account);

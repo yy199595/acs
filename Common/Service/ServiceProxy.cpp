@@ -1,5 +1,5 @@
 ﻿#include"ServiceProxy.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include<Util/StringHelper.h>
 #include"Component/Rpc/RpcConfigComponent.h"
@@ -9,13 +9,13 @@
 namespace Sentry
 {
 	ServiceProxy::ServiceProxy(const std::string & name)
-		: mServiceName(name), mApp(App::Get())
+		: mServiceName(name)
 	{
         this->mIndex = 0;
-        this->mTaskComponent = this->mApp.GetTaskComponent();
-        this->mTimerComponent = this->mApp.GetTimerComponent();
-        this->mRpcComponent = this->mApp.GetComponent<RpcComponent>();
-        LOG_CHECK_RET(this->mRpcConfigComponent = this->mApp.GetComponent<RpcConfigComponent>());
+        this->mTaskComponent = App::Get()->GetTaskComponent();
+        this->mTimerComponent = App::Get()->GetTimerComponent();
+        this->mRpcComponent = App::Get()->GetComponent<RpcComponent>();
+        LOG_CHECK_RET(this->mRpcConfigComponent = App::Get()->GetComponent<RpcConfigComponent>());
 	}
 
     void ServiceProxy::AddAddress(const std::string &address)
@@ -94,7 +94,7 @@ namespace Sentry
             this->mIndex++;
             return address;
         }
-        LocalService *localService = this->mApp.GetComponent<LocalService>();
+        LocalService *localService = App::Get()->GetComponent<LocalService>();
         if (localService != nullptr)
         {
             localService->RemoveByAddress(address);

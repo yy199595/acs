@@ -3,7 +3,7 @@
 //
 
 #include"HttpNodeService.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Service/ServiceProxy.h"
 #include"Component/Scene/ServiceMgrComponent.h"
 namespace Sentry
@@ -20,12 +20,12 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpNodeService::Push(const RapidJsonReader &jsonReader, RapidJsonWriter & response)
+    XCode HttpNodeService::Push(const Json::Reader &jsonReader, Json::Writer & response)
     {
         std::string address;
         std::vector<std::string> services;
-        LOGIC_THROW_ERROR(jsonReader.TryGetValue("rpc", "address", address));
-        LOGIC_THROW_ERROR(jsonReader.TryGetValue("rpc", "service", services));
+        LOGIC_THROW_ERROR(jsonReader.GetMember("rpc", "address", address));
+        LOGIC_THROW_ERROR(jsonReader.GetMember("rpc", "service", services));
         for(const std::string & service : services)
         {
             auto serviceProxy = this->mServiceComponent->GetServiceProxy(service);

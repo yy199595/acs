@@ -1,5 +1,5 @@
 ﻿#include"TcpServerComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include<Thread/TaskThread.h>
 #include<Util/StringHelper.h>
 #include<Component/Scene/ThreadPoolComponent.h>
@@ -8,7 +8,7 @@ namespace Sentry
 {
     bool TcpServerComponent::Awake()
     {
-		const ServerConfig & config = App::Get().GetConfig();
+		const ServerConfig & config = App::Get()->GetConfig();
         config.GetMember("listener","ip", this->mHostIp);
 		const rapidjson::Value * jsonValue = config.GetJsonValue("listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
@@ -73,7 +73,7 @@ namespace Sentry
                 return false;
             }
 #ifdef ONLY_MAIN_THREAD
-            IAsioThread &netThread = App::Get().GetTaskScheduler();
+            IAsioThread &netThread = App::Get()->GetTaskScheduler();
 #else
             IAsioThread &netThread = taskComponent->AllocateNetThread();
 #endif

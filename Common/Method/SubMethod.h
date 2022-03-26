@@ -5,14 +5,14 @@
 #ifndef GAMEKEEPER_SUBMETHOD_H
 #define GAMEKEEPER_SUBMETHOD_H
 #include<iostream>
-#include"Util/JsonHelper.h"
+#include"Json/JsonReader.h"
 #include"Define/CommonLogDef.h"
 #include<google/protobuf/message.h>
 
 namespace Sentry
 {
     template<typename T>
-    using JsonSubFunction = void(T::*)(const RapidJsonReader & rapidJsonReader);
+    using JsonSubFunction = void(T::*)(const Json::Reader & rapidJsonReader);
 
     template<typename T, typename T1>
     using ProtoSubFuncrion = void(T::*)(const T & message);
@@ -32,8 +32,8 @@ namespace Sentry
     public:
         void OnPublish(const std::string &message) final
         {
-            RapidJsonReader rapidJsonReader;
-            if(!rapidJsonReader.TryParse(message))
+            Json::Reader rapidJsonReader;
+            if(!rapidJsonReader.ParseJson(message))
             {
                 std::cerr << "parse json error : json = " << message << std::endl;
                 return;

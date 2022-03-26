@@ -1,6 +1,6 @@
 ﻿#include "RpcConfigComponent.h"
 
-#include "Object/App.h"
+#include "App/App.h"
 #include "Util/FileHelper.h"
 #include "Util/StringHelper.h"
 #include "rapidjson/document.h"
@@ -23,7 +23,7 @@ namespace Sentry
         std::string md5;
         std::string rpcPath;
         rapidjson::Document jsonMapper;
-        const ServerConfig & config = App::Get().GetConfig();
+        const ServerConfig & config = App::Get()->GetConfig();
         LOG_CHECK_RET_FALSE(config.GetMember("path", "rpc", rpcPath));
         if (!Helper::File::ReadJsonFile(rpcPath, jsonMapper, md5))
         {
@@ -102,7 +102,7 @@ namespace Sentry
     {
         std::string path;
         std::vector<std::string> lines;
-        auto & config = App::Get().GetConfig();
+        auto & config = App::Get()->GetConfig();
         LOG_CHECK_RET_FALSE(config.GetMember("path", "code", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path , lines));
         std::vector<std::string> res;

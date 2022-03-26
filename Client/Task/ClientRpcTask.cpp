@@ -1,5 +1,5 @@
 #include"ClientRpcTask.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"Util/TimeHelper.h"
 #include"Component/ClientComponent.h"
@@ -17,7 +17,7 @@ namespace Client
         this->mState = TaskState::TaskReady;
         this->mRpcId = Helper::Guid::Create();
         this->mStartTime = Helper::Time::GetMilTimestamp();
-        this->mTaskComponent = App::Get().GetTaskComponent();
+        this->mTaskComponent = App::Get()->GetTaskComponent();
     }
 
 	void ClientRpcTask::OnResponse(const c2s::Rpc_Response * response)
@@ -48,8 +48,8 @@ namespace Client
         if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-            this->mTaskComponent = App::Get().GetComponent<TaskComponent>();
-            this->mClientComponent = App::Get().GetComponent<ClientComponent>();
+            this->mTaskComponent = App::Get()->GetTaskComponent();
+            this->mClientComponent = App::Get()->GetComponent<ClientComponent>();
             this->mTimerId = this->mClientComponent->AddRpcTask(this->shared_from_this(), 5000);
             this->mTaskComponent->YieldCoroutine(this->mCoroutineId);
             return true;

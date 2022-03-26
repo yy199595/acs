@@ -48,7 +48,7 @@ enum PointerParseErrorCode {
 
 //! Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator.
 /*!
-    This class implements RFC 6901 "JavaScript Object Notation (JSON) Pointer" 
+    This class implements RFC 6901 "JavaScript Entity Notation (JSON) Pointer"
     (https://tools.ietf.org/html/rfc6901).
 
     A JSON pointer is for identifying a specific value in a JSON document
@@ -471,7 +471,7 @@ public:
             else {
                 if (t->index == kPointerInvalidIndex) { // must be object name
                     if (!v->IsObject())
-                        v->SetObject(); // Change to Object
+                        v->SetObject(); // Change to Entity
                 }
                 else { // object name or array index
                     if (!v->IsArray() && !v->IsObject())

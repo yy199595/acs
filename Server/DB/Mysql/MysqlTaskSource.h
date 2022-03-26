@@ -1,17 +1,15 @@
 #pragma once
 #include<queue>
 #include"MysqlDefine.h"
+#include"Json/JsonWriter.h"
 #include"Async/TaskSource.h"
 #include"Thread/TaskProxy.h"
 namespace Sentry
 {
     class SqlTableConfig;
-
-    class RapidJsonWriter;
-
     class TaskComponent;
 
-    class MysqlTaskSource : public TaskProxy
+	class MysqlTaskSource : public TaskProxy
     {
     public:
         MysqlTaskSource(MysqlComponent * component);
@@ -28,7 +26,7 @@ namespace Sentry
         bool GetQueryData(std::string & data);
 
     private:
-        void WriteValue(RapidJsonWriter &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
+        void WriteValue(Json::Writer &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
     private:
         std::string mSqlCommand;
         std::string mErrorString;

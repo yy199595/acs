@@ -613,7 +613,7 @@ util::Status JsonStreamParser::ParseObjectMid(TokenType type) {
     return ReportUnknown("Expected , or } after key:value pair.");
   }
 
-  // Object is complete, advance past the comma and render the EndObject.
+  // Entity is complete, advance past the comma and render the EndObject.
   if (type == END_OBJECT) {
     Advance();
     ow_->EndObject();

@@ -37,7 +37,6 @@ namespace Sentry
         void Destory();
     private:
         size_t mIndex;
-        class App & mApp;
         std::string mServiceName;
         TaskComponent * mTaskComponent;
         TimerComponent * mTimerComponent;

@@ -17,7 +17,7 @@ namespace Sentry
         bool Awake() final;
         bool LateAwake() final;
     private:
-        XCode Login(const RapidJsonReader & request, RapidJsonWriter & response);
+        XCode Login(const Json::Reader & request, Json::Writer & response);
     };
 }
 #endif //GAMEKEEPER_HTTPLOGINSERVICE_H

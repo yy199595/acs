@@ -1,6 +1,7 @@
 #include "MysqlProxyComponent.h"
 
-#include"Object/App.h"
+#include"App/App.h"
+#include"Json/JsonWriter.h"
 #include"Service/ServiceProxy.h"
 #include"Util/StringHelper.h"
 #include"Component/Rpc/RpcComponent.h"
@@ -17,7 +18,7 @@ namespace Sentry
 
     bool MysqlProxyComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
         this->mRpcComponent = this->GetComponent<RpcComponent>();
         this->mServiceComponent = this->GetComponent<ServiceMgrComponent>();
         return true;
@@ -48,29 +49,13 @@ namespace Sentry
 				LOG_ERROR("add data successful ");
 			}
 
-			RapidJsonWriter jsonWriter;
-			jsonWriter.Add("account", account);
-			jsonWriter.Add("user_id", 1000);
+			Json::Writer jsonWriter;
+			jsonWriter.AddMember("account", account);
+			jsonWriter.AddMember("user_id", 1000);
 
-			std::string json;
-			if(jsonWriter.WriterToStream(json))
-			{
-				auto res = this->QueryOnce<db_account::tab_user_account>(json);
-			}
-
+			std::string json = jsonWriter.ToJsonString();
+			this->QueryOnce<db_account::tab_user_account>(json);
 		}
-		LOG_ERROR("sql user time = {0}ms", timer.GetMs());
-		printf("========================================\n");
-		for (int index = 0; index < 100; index++)
-		{
-			long long t1 = Helper::Time::GetMilTimestamp();
-			timerComponent->AddTimer(index * 100, new LambdaMethod([t1, index]()
-			{
-				long long t2 = Helper::Time::GetMilTimestamp();
-				LOG_ERROR("index = {0} time = {1}", index, t2 - t1);
-			}));
-		}
-		printf("add timer successful\n");
 	}
 
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)

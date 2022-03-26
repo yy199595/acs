@@ -1,7 +1,6 @@
 ﻿#include "luaExtension.h"
-#include "Object/App.h"
+#include "App/App.h"
 #include <Component/Component.h>
-#include <Object/Entity.h>
 #include <Util/StringHelper.h>
 #include"Util/DirectoryHelper.h"
 using namespace Sentry;
@@ -162,29 +161,29 @@ namespace LuaAPIExtension
 
     int DebugLog(lua_State *luaEnv)
     {
-        LoggerComponent * loggerComponent = App::Get().GetLogger();
-        //loggerComponent->AddLog(ELogType::debug, GetLuaString(luaEnv)); TODO
+        LoggerComponent * loggerComponent = App::Get()->GetLogger();
+        loggerComponent->AddLog(spdlog::level::debug, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugInfo(lua_State *luaEnv)
     {
-        LoggerComponent * loggerComponent = App::Get().GetLogger();
-        //loggerComponent->AddLog(ELogType::info, GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get()->GetLogger();
+        loggerComponent->AddLog(spdlog::level::info, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugError(lua_State *luaEnv)
     {
-        LoggerComponent * loggerComponent = App::Get().GetLogger();
-        //loggerComponent->AddLog(ELogType::err, GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get()->GetLogger();
+        loggerComponent->AddLog(spdlog::level::err, GetLuaString(luaEnv));
         return 0;
     }
 
     int DebugWarning(lua_State *luaEnv)
     {
-        LoggerComponent * loggerComponent = App::Get().GetLogger();
-        //loggerComponent->AddLog(ELogType::warn, GetLuaString(luaEnv));
+        LoggerComponent * loggerComponent = App::Get()->GetLogger();
+        loggerComponent->AddLog(spdlog::level::warn, GetLuaString(luaEnv));
         return 0;
     }
 }// namespace LuaAPIExtension

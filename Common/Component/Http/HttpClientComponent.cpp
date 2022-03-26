@@ -1,7 +1,7 @@
 //
 // Created by 64658 on 2021/8/5.
 //
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/FileHelper.h"
 #include"Thread/TaskThread.h"
 #include"HttpClientComponent.h"
@@ -21,7 +21,7 @@ namespace Sentry
         std::string path;
         this->mCorComponent = nullptr;
         rapidjson::Document jsonDocument;
-        const ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get()->GetConfig();
         if(config.GetMember("path", "http", path))
         {
             LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
@@ -41,7 +41,7 @@ namespace Sentry
 
     bool HttpClientComponent::LateAwake()
     {
-        this->mCorComponent = App::Get().GetTaskComponent();
+        this->mCorComponent = App::Get()->GetTaskComponent();
         this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
 
         std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
@@ -111,26 +111,26 @@ namespace Sentry
         const HttpConfig * httpConfig = this->GetHttpConfig(url);
         if(httpConfig == nullptr)
         {
-            RapidJsonWriter jsonWriter;
-            jsonWriter.Add("code", (int) XCode::CallServiceNotFound);
-            jsonWriter.Add("error", fmt::format("not find url : [{0}]", url));
+            Json::Writer jsonWriter;
+            jsonWriter.AddMember("code", (int) XCode::CallServiceNotFound);
+            jsonWriter.AddMember("error", fmt::format("not find url : [{0}]", url));
             httpClient->Response(HttpStatus::NOT_FOUND, jsonWriter);
             return;
         }
 
         if(httpConfig->Type != httpRequestData->GetMethod())
         {
-            RapidJsonWriter jsonWriter;
-            jsonWriter.Add("code", (int)XCode::HttpMethodNotFound);
+            Json::Writer jsonWriter;
+            jsonWriter.AddMember("code", (int)XCode::HttpMethodNotFound);
             httpClient->Response(HttpStatus::METHOD_NOT_ALLOWED, jsonWriter);
             return;
         }
-        std::shared_ptr<RapidJsonReader> jsonReader = httpRequestData->ToJsonReader();
+        std::shared_ptr<Json::Reader> jsonReader = httpRequestData->ToJsonReader();
         if (jsonReader == nullptr)
         {
-            RapidJsonWriter jsonWriter;
-            jsonWriter.Add("code", (int) XCode::ParseJsonFailure);
-            jsonWriter.Add("error", "parse json failure");
+            Json::Writer jsonWriter;
+            jsonWriter.AddMember("code", (int) XCode::ParseJsonFailure);
+            jsonWriter.AddMember("error", "parse json failure");
             httpClient->Response(HttpStatus::OK, jsonWriter);
             return;
         }
@@ -138,9 +138,9 @@ namespace Sentry
         HttpService *httpService = this->GetComponent<HttpService>(httpConfig->Component);
         if (httpService == nullptr)
         {
-            RapidJsonWriter jsonWriter;
-            jsonWriter.Add("code", (int) XCode::CallServiceNotFound);
-            jsonWriter.Add("error", "not find handler component");
+            Json::Writer jsonWriter;
+            jsonWriter.AddMember("code", (int) XCode::CallServiceNotFound);
+            jsonWriter.AddMember("error", "not find handler component");
             httpClient->Response(HttpStatus::OK, jsonWriter);
             return;
         }
@@ -158,7 +158,7 @@ namespace Sentry
     std::shared_ptr<HttpAsyncResponse> HttpClientComponent::Get(const std::string &url, int timeout)
     {
 #ifdef ONLY_MAIN_THREAD
-        IAsioThread &thread = App::Get().GetTaskScheduler();
+        IAsioThread &thread = App::Get()->GetTaskScheduler();
 #else
         IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
@@ -171,7 +171,7 @@ namespace Sentry
     HttpClientComponent::Post(const std::string &url, const std::string &data, int timeout)
     {
 #ifdef ONLY_MAIN_THREAD
-        IAsioThread &thread = App::Get().GetTaskScheduler();
+        IAsioThread &thread = App::Get()->GetTaskScheduler();
 #else
         IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
@@ -181,11 +181,9 @@ namespace Sentry
     }
 
     std::shared_ptr<HttpAsyncResponse>
-    HttpClientComponent::Post(const std::string &url, RapidJsonWriter &jsonWriter, int timeout)
+    HttpClientComponent::Post(const std::string &url, Json::Writer &jsonWriter, int timeout)
     {
-        std::string json;
-        jsonWriter.WriterToStream(json);
-        return this->Post(url, json);
+        return this->Post(url, jsonWriter.ToJsonString());
     }
 
     void HttpClientComponent::Invoke(HttpRespSession *remoteRequest)

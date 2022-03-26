@@ -6,9 +6,10 @@
 #define GAMEKEEPER_HTTPASYNCREQUEST_H
 #include<string>
 #include<asio.hpp>
-#include<Network/Http/Http.h>
 #include<unordered_map>
-#include"Util/JsonHelper.h"
+#include<Network/Http/Http.h>
+#include"Json/JsonWriter.h"
+#include"Json/JsonReader.h"
 namespace Sentry
 {
     class IHttpStream
@@ -55,7 +56,7 @@ namespace Sentry
     {
     public:
         virtual const std::string & GetContent() = 0;
-        virtual std::shared_ptr<RapidJsonReader> ToJsonReader() = 0;
+        virtual std::shared_ptr<Json::Reader> ToJsonReader() = 0;
         virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
 }
@@ -67,7 +68,7 @@ namespace Sentry
     public:
         HttpAsyncResponse();
     public:
-        std::shared_ptr<RapidJsonReader> ToJsonReader() final;
+        std::shared_ptr<Json::Reader> ToJsonReader() final;
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() final { return this->mContent;}
@@ -93,7 +94,7 @@ namespace Sentry
     public:
         const std::string & GetUrl() { return this->mUrl;}
         const std::string & GetMethod() { return this->mMethod; }
-        std::shared_ptr<RapidJsonReader> ToJsonReader() final;
+        std::shared_ptr<Json::Reader> ToJsonReader() final;
         const std::string & GetContent() final { return this->mContent; }
         bool GetHeadContent(const std::string & key, std::string & value);
     private:
@@ -115,7 +116,7 @@ namespace Sentry
         HttpHandlerResponse(HttpStatus code);
     public:
         void AddValue(const std::string & content);
-        void AddValue(RapidJsonWriter & jsonWriter);
+        void AddValue(Json::Writer & jsonWriter);
         asio::streambuf & GetStream() final { return this->mStreamBuffer;}
     private:
         asio::streambuf mStreamBuffer;

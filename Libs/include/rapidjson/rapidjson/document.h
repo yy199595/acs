@@ -783,10 +783,10 @@ public:
         a.value_.data_.f.flags = kArrayFlag;
     }
 
-    //! Constructor for Object.
+    //! Constructor for Entity.
     /*!
         \param o An object obtained by \c GetEntity().
-        \note \c Object is always pass-by-value.
+        \note \c Entity is always pass-by-value.
         \note the source object is moved into this value and the sourec object becomes empty.
     */
     GenericValue(Object o) RAPIDJSON_NOEXCEPT : data_(o.value_.data_) {
@@ -929,7 +929,7 @@ public:
     //! Equal-to operator
     /*!
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
-        \note Complexity is quadratic in Object's member number and linear for the rest (number of all values in the subtree and total lengths of all strings).
+        \note Complexity is quadratic in Entity's member number and linear for the rest (number of all values in the subtree and total lengths of all strings).
     */
     template <typename SourceAllocator>
     bool operator==(const GenericValue<Encoding, SourceAllocator>& rhs) const {
@@ -1088,7 +1088,7 @@ public:
 
     //@}
 
-    //!@name Object
+    //!@name Entity
     //@{
 
     //! Set this value as an empty object.

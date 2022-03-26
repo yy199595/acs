@@ -1,5 +1,5 @@
 ﻿#include"AccountService.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"Util/MD5.h"
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
@@ -28,24 +28,25 @@ namespace Sentry
         return true;
     }
 
-    XCode AccountService::Login(const RapidJsonReader &request, RapidJsonWriter &response)
+    XCode AccountService::Login(const Json::Reader &request, Json::Writer &response)
     {
         string account, password;
-        LOGIC_THROW_ERROR(request.TryGetValue("account", account));
-        LOGIC_THROW_ERROR(request.TryGetValue("password", password));
+        LOGIC_THROW_ERROR(request.GetMember("account", account));
+        LOGIC_THROW_ERROR(request.GetMember("password", password));
 
-		string json = fmt::format("{account:{}}", account);
-        auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(json);
+		Json::Writer json;
+		json.AddMember("account", account);
+        auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(json.ToJsonString());
         if(userData == nullptr || userData->password() != password)
         {
             return XCode::Failure;
         }
+		Json::Writer jsonWriter;
         std::string newToken = this->NewToken(account);
-		RapidJsonWriter jsonWriter;
-		jsonWriter.Add("token", newToken);
-		jsonWriter.Add("last_login_time", Helper::Time::GetSecTimeStamp());
+		jsonWriter.AddMember("token", newToken);
+		jsonWriter.AddMember("last_login_time", Helper::Time::GetSecTimeStamp());
 
-		string updateJson = jsonWriter.ToJson();
+		string updateJson = jsonWriter.ToJsonString();
 		db_account::tab_user_account userAccountInfo;
 
 		//this->mMysqlComponent->Update<db_account::tab_user_account>()
@@ -68,19 +69,19 @@ namespace Sentry
         }
         auto responseData = allotResponse->AwaitData<s2s::AddToGate_Response>();
 
-        response.Add("gate_ip", responseData->gate_ip());
-        response.Add("token", responseData->login_token());
-        response.Add("gate_port", responseData->gate_port());
+        response.AddMember("gate_ip", responseData->gate_ip());
+        response.AddMember("token", responseData->login_token());
+        response.AddMember("gate_port", responseData->gate_port());
         return XCode::Successful;
     }
 
-    XCode AccountService::Register(const RapidJsonReader &request, RapidJsonWriter &response)
+    XCode AccountService::Register(const Json::Reader &request, Json::Writer &response)
     {
         long long phoneNumber = 0;
         string user_account, user_password;
-        LOGIC_THROW_ERROR(request.TryGetValue("account", user_account));
-        LOGIC_THROW_ERROR(request.TryGetValue("password", user_password));
-        LOGIC_THROW_ERROR(request.TryGetValue("phone_num", phoneNumber));
+        LOGIC_THROW_ERROR(request.GetMember("account", user_account));
+        LOGIC_THROW_ERROR(request.GetMember("password", user_password));
+        LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
         auto resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
         if(resp->GetNumber() == 0)
         {

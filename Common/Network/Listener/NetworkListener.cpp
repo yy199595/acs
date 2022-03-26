@@ -1,5 +1,5 @@
 #include"NetworkListener.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include<Network/SocketProxy.h>
 #include<Method/MethodProxy.h>
 #include<Define/CommonLogDef.h>
@@ -10,12 +10,12 @@ namespace Sentry
 {
 	NetworkListener::NetworkListener(IAsioThread & t, ListenConfig & config)
 		: mTaskThread(t), mConfig(config),
-        mTaskScheduler(App::Get().GetTaskScheduler())
+        mTaskScheduler(App::Get()->GetTaskScheduler())
     {
         this->mIsListen = false;
         this->mBindAcceptor = nullptr;
         this->mListenHandler = nullptr;
-		mTaskComponent = App::Get().GetComponent<ThreadPoolComponent>();
+		mTaskComponent = App::Get()->GetComponent<ThreadPoolComponent>();
     }
 
 	NetworkListener::~NetworkListener()
@@ -77,7 +77,7 @@ namespace Sentry
 	void NetworkListener::ListenConnect()
 	{
 #ifdef ONLY_MAIN_THREAD
-        MainTaskScheduler & workThread = App::Get().GetTaskScheduler();
+        MainTaskScheduler & workThread = App::Get()->GetTaskScheduler();
 #else
         IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
 #endif

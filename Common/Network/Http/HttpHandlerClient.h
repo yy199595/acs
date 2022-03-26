@@ -7,6 +7,7 @@
 #include"HttpAsyncRequest.h"
 #include"Async/TaskSource.h"
 #include"Network/SocketProxy.h"
+#include"Json/JsonWriter.h"
 namespace Sentry
 {
 class HttpHandlerClient : public std::enable_shared_from_this<HttpHandlerClient>
@@ -16,7 +17,7 @@ class HttpHandlerClient : public std::enable_shared_from_this<HttpHandlerClient>
     public:
         std::shared_ptr<HttpHandlerRequest> ReadHandlerContent();
         bool Response(std::shared_ptr<HttpHandlerResponse> response);
-        bool Response(HttpStatus code, RapidJsonWriter & jsonWriter);
+        bool Response(HttpStatus code, Json::Writer & jsonWriter);
 
     private:
         void ResponseData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<HttpHandlerResponse> response);

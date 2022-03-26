@@ -7,7 +7,7 @@
 #include<XCode/XCode.h>
 #include"Util/Guid.h"
 #include"Util/TimeHelper.h"
-#include"Object/App.h"
+#include"App/App.h"
 namespace Sentry
 {
     enum class TaskState

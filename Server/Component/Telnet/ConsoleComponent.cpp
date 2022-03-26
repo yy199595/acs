@@ -93,7 +93,7 @@ namespace Sentry
 
     bool ConsoleComponent::Close(const std::string &parameter, std::vector<std::string> &response)
     {
-        App::Get().Stop();
+        App::Get()->Stop();
         return true;
     }
 

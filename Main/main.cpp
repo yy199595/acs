@@ -1,7 +1,7 @@
 ﻿#ifdef JE_MALLOC
 #include"jemalloc/jemalloc.h"
 #endif
-#include"Object/App.h"
+#include"App/App.h"
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"

@@ -3,7 +3,7 @@
 //
 
 #include"GateClientComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"NetWork/RpcGateClient.h"
 #include"GateComponent.h"
 #include"Component/Rpc/RpcComponent.h"
@@ -25,7 +25,7 @@ namespace Sentry
 
     bool GateClientComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get().GetTimerComponent());
+        LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
         LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
         return true;
@@ -42,7 +42,7 @@ namespace Sentry
             std::shared_ptr<RpcGateClient> gateClient(
                     new RpcGateClient(socket, SocketType::RemoteSocket, this));
 #ifdef __DEBUG__
-            LOG_INFO("new player connect proxy component ip : ", ip);
+            LOG_INFO("new player connect gate ip = [{0}]", ip);
 #endif
             gateClient->StartReceive();
             this->mGateClientMap.emplace(id, gateClient);
@@ -56,7 +56,7 @@ namespace Sentry
         {
             std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
-            auto configCom = App::Get().GetComponent<RpcConfigComponent>();
+			RpcConfigComponent * configCom = this->GetComponent<RpcConfigComponent>();
             LOG_ERROR("player call", request->method_name(), "failure error = ", configCom->GetCodeDesc(code));
 #endif
             responseMessage->set_code((int)code);
@@ -71,7 +71,7 @@ namespace Sentry
         if(iter != this->mGateClientMap.end())
         {
 #ifdef __DEBUG__
-            auto configCom = App::Get().GetComponent<RpcConfigComponent>();
+			RpcConfigComponent * configCom = this->GetComponent<RpcConfigComponent>();
             LOG_WARN("remove player session code = ", configCom->GetCodeDesc(code));
 #endif
             this->mGateClientMap.erase(iter);

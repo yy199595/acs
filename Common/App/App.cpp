@@ -24,30 +24,6 @@ namespace Sentry
 		this->mMainThreadId = std::this_thread::get_id();
 	}
 
-	bool App::StartNewService(const std::string& name)
-	{
-		LOG_CHECK_RET_FALSE(!this->GetComponentByName(name));
-		Component* component = ComponentFactory::CreateComponent(name);
-		if (dynamic_cast<RpcService*>(component) == nullptr)
-		{
-			delete component;
-			return false;
-		}
-		if (!this->AddComponent(name, component))
-		{
-			delete component;
-			return false;
-		}
-		if (!this->InitComponent(component))
-		{
-			this->RemoveComponent(name);
-			return false;
-		}
-		this->StartComponent(component);
-		component->OnComplete();
-		return true;
-	}
-
 	bool App::LoadComponent()
 	{
 		this->AddComponent<LoggerComponent>();
@@ -106,7 +82,11 @@ namespace Sentry
 			}
 			for (Component* component : this->mSceneComponents)
 			{
-				component->OnComplete();
+				IComplete * complete = component->Cast<IComplete>();
+				if(complete != nullptr)
+				{
+					complete->OnComplete();
+				}
 			}
 			long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
 			LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);

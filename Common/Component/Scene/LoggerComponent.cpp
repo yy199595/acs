@@ -1,5 +1,5 @@
 #include"LoggerComponent.h"
-#include"Object/App.h"
+#include"App/App.h"
 #include"spdlog/async.h"
 #include"spdlog/sinks/stdout_color_sinks.h"
 #include"spdlog/sinks/rotating_file_sink.h"
@@ -10,7 +10,7 @@ namespace Sentry
 	// 单线程  st  多线程  mt
 	bool LoggerComponent::Awake()
     {
-        const ServerConfig &config = App::Get().GetConfig();
+        const ServerConfig &config = App::Get()->GetConfig();
         LOG_CHECK_RET_FALSE(config.GetMember("node_name", this->mServerName));
         LOG_CHECK_RET_FALSE(config.GetMember("log", "path", this->mLogSavePath));
         LOG_CHECK_RET_FALSE(config.GetMember("log", "save", this->mLogSaveTime));

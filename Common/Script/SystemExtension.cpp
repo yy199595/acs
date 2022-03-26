@@ -1,5 +1,5 @@
 ﻿#include "SystemExtension.h"
-#include "Object/App.h"
+#include "App/App.h"
 #include "Async/RpcTask/RpcTaskSource.h"
 #include <Timer/LuaSleepTimer.h>
 #include "Component/Timer/TimerComponent.h"
@@ -16,19 +16,17 @@ int SystemExtension::Call(lua_State *lua)
 
 int SystemExtension::Allot(lua_State *luaEnv)
 {
-    App & app = App::Get();
     luaL_checkstring(luaEnv, -1);
-    ServiceMgrComponent * serviceMgrComponent = app.GetComponent<ServiceMgrComponent>();
+    ServiceMgrComponent * serviceMgrComponent = App::Get()->GetComponent<ServiceMgrComponent>();
     auto serviceProxy = serviceMgrComponent->GetServiceProxy(lua_tostring(luaEnv, -1));
-
 
     return 0;
 }
 
 int SystemExtension::GetApp(lua_State *luaEnv)
 {
-    App * app = &App::Get();
-    LuaParameter::Write<App *>(luaEnv, app);
+    std::shared_ptr<App> app = App::Get();
+    LuaParameter::Write<std::shared_ptr<App>>(luaEnv, app);
     return 1;
 }
 
@@ -36,8 +34,8 @@ int SystemExtension::GetManager(lua_State *luaEnv)
 {
     if (lua_isstring(luaEnv, -1))
     {
-        App &app = App::Get();
-        const std::string name = lua_tostring(luaEnv, -1);
+		std::shared_ptr<App> app = App::Get();
+		const std::string name = lua_tostring(luaEnv, -1);
         //TODO
         PtrProxy<Manager>::Write(luaEnv, nullptr);
         if (lua_getglobal(luaEnv, name.c_str()) && lua_istable(luaEnv, -1))
@@ -69,7 +67,7 @@ int SystemExtension::Sleep(lua_State *luaEnv)
 {
     long long ms = lua_tointeger(luaEnv, 1);
     lua_pushthread(luaEnv);
-    auto *timerComponent = App::Get().GetComponent<TimerComponent>();
+    TimerComponent *timerComponent = App::Get()->GetComponent<TimerComponent>();
     if (timerComponent != nullptr)
     {
         auto timer = LuaSleepTimer::Create(luaEnv, -1, ms);
@@ -94,8 +92,8 @@ int SystemExtension::AddTimer(lua_State *lua)
     {
         count = lua_tointeger(lua, 3);
     }
-    App & app = App::Get();
-    auto timerComponent = app.GetComponent<TimerComponent>();
+	std::shared_ptr<App> app = App::Get();
+	TimerComponent * timerComponent = app->GetTimerComponent();
     if (timerComponent != nullptr)
     {
         lua_pushvalue(lua, 1);
@@ -120,7 +118,7 @@ int SystemExtension::RemoveTimer(lua_State *lua)
     if (lua_isinteger(lua, 1))
     {
         long long id = lua_tointeger(lua, 1);
-        TimerComponent *pTimerManager = App::Get().GetComponent<TimerComponent>();
+        TimerComponent *pTimerManager = App::Get()->GetTimerComponent();
         if (pTimerManager != nullptr)
         {
             bool code = pTimerManager->CancelTimer(id);
