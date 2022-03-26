@@ -5,7 +5,7 @@ end
 
 function Main.Start()
     
-    Log.Debug("+++++",coroutine.running())
+    print("===========")
 
     Sentry.Sleep(1500)
     

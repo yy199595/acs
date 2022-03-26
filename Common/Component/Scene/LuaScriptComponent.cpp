@@ -33,7 +33,10 @@ namespace Sentry
                 LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
                 return false;
             }
-            return (bool) lua_toboolean(this->mLuaEnv, -1);
+			if(!(bool) lua_toboolean(this->mLuaEnv, -1))
+			{
+				return false;
+			}
         }
         if (!lua_getfunction(this->mLuaEnv, "Main", "Start"))
         {

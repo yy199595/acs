@@ -30,8 +30,6 @@ namespace Sentry
 	protected:
         bool Awake() final;
         bool LateAwake() final;
-		void OnDestory() final;
-
 	public:
 		bool CloseSession(long long id);
         bool Send(long long id, std::shared_ptr<com::Rpc_Request> message);
@@ -39,7 +37,6 @@ namespace Sentry
 	private:
         class RpcComponent * mRpcComponent;
         class ThreadPoolComponent * mTaskComponent;
-        class RpcConfigComponent * mProtoConfigComponent;
         std::unordered_map<std::string, long long> mAddressClientMap;
         std::unordered_map<long long, std::shared_ptr<ProtoRpcClient>> mRpcClientMap;
 	};

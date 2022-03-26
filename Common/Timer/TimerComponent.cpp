@@ -139,7 +139,7 @@ namespace Sentry
                 return true;
             }
         }
-        LOG_ERROR("add timer failure id = ", timer->GetTimerId());
+        LOG_ERROR("add timer failure id = {0}", timer->GetTimerId());
         return false;
     }
 }// namespace Sentry

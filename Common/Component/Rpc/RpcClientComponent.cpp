@@ -16,14 +16,12 @@ namespace Sentry
     {
         this->mRpcComponent = nullptr;
         this->mTaskComponent = nullptr;
-        this->mProtoConfigComponent = nullptr;
         return true;
     }
     bool RpcClientComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
         LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
-        LOG_CHECK_RET_FALSE(this->mProtoConfigComponent = this->GetComponent<RpcConfigComponent>());
         return true;
     }
 
@@ -136,11 +134,7 @@ namespace Sentry
 		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
 		return localSession;
 	}
-
-    void RpcClientComponent::OnDestory()
-    {
-    }
-
+	
     std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(long long id)
     {
         auto iter = this->mRpcClientMap.find(id);
