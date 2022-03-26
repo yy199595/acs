@@ -1,7 +1,7 @@
 ﻿#include"RpcService.h"
 #include"Object/App.h"
-#include <Method/LuaServiceMethod.h>
-#include<Scene/RpcConfigComponent.h>
+#include"Method/LuaServiceMethod.h"
+#include<Component/Rpc/RpcConfigComponent.h>
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
 #endif

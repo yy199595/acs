@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include<memory>
-#include<Method/SubMethod.h>
-#include<Component/Component.h>
-#include<Method/ServiceMethod.h>
+#include"Method/SubMethod.h"
+#include"Component/Component.h"
+#include"Method/ServiceMethod.h"
 
 using namespace std;
 using namespace com;

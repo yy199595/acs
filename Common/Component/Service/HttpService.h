@@ -4,7 +4,7 @@
 
 #ifndef SENTRY_HTTPSERVICE_H
 #define SENTRY_HTTPSERVICE_H
-#include"Component.h"
+#include"Component/Component.h"
 #include"Method/HttpServiceMethod.h"
 namespace Sentry
 {

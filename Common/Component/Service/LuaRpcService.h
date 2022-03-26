@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 
-#include<Script/LuaInclude.h>
-#include"Service/RpcService.h"
+#include"Script/LuaInclude.h"
+#include"Component/Service/RpcService.h"
 
 class LuaTable;
 namespace Sentry

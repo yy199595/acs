@@ -3,8 +3,8 @@
 //
 #include"ProxyClient.h"
 #include"Util/StringHelper.h"
-#include"Service/LocalService.h"
-#include"Scene/ServiceMgrComponent.h"
+#include"Component/Logic/LocalService.h"
+#include"Component/Scene/ServiceMgrComponent.h"
 #include"Service/ServiceProxy.h"
 namespace Sentry
 {

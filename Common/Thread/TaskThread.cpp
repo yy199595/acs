@@ -1,7 +1,8 @@
 ﻿#include "TaskThread.h"
-#include <Scene/ThreadPoolComponent.h>
-#include <Method/MethodProxy.h>
 #include"Util/TimeHelper.h"
+#include"Method/MethodProxy.h"
+#include"Component/Scene/ThreadPoolComponent.h"
+
 using namespace std::chrono;
 
 namespace Sentry

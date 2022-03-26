@@ -57,6 +57,6 @@ namespace Client
         TimerComponent *mTimerComponent;
         HttpClientComponent * mHttpComponent;
         std::shared_ptr<TcpRpcClient> mTcpClient;
-        std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>>> mRpcTasks;
+        //std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>>> mRpcTasks;
     };
 }

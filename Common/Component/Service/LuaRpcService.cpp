@@ -1,8 +1,9 @@
 ﻿#include"LuaRpcService.h"
-#include<Method/LuaServiceMethod.h>
-#include<Scene/RpcConfigComponent.h>
 #include"Script/LuaTable.h"
-#include"Scene/LuaScriptComponent.h"
+#include"Method/LuaServiceMethod.h"
+#include"Component/Lua/LuaScriptComponent.h"
+#include"Component/Rpc//RpcConfigComponent.h"
+
 namespace Sentry
 {
     LuaRpcService::LuaRpcService()

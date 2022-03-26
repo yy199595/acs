@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2021/11/19.
 //
 #include"OperatorComponent.h"
-#include"Timer/TimerComponent.h"
+#include"Component/Timer/TimerComponent.h"
 #include"Object/App.h"
 namespace Sentry
 {

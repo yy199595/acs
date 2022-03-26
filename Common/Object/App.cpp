@@ -2,11 +2,11 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Service/LuaRpcService.h"
-#include"Scene/ServiceMgrComponent.h"
-#include"Scene/LuaScriptComponent.h"
+#include"Component/Service/LuaRpcService.h"
+#include"Component/Scene/ServiceMgrComponent.h"
+#include"Component/Lua/LuaScriptComponent.h"
 #ifdef __DEBUG__
-#include"Telnet/ConsoleComponent.h"
+#include"Component/Telnet/ConsoleComponent.h"
 #endif
 using namespace Sentry;
 using namespace std::chrono;
@@ -58,8 +58,8 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
-		IF_THROW_ERROR(this->mConfig->GetValue("component", components));
-		IF_THROW_ERROR(this->mConfig->GetValue("service", components));
+		IF_THROW_ERROR(this->mConfig->GetMember("component", components));
+		IF_THROW_ERROR(this->mConfig->GetMember("service", components));
 
 		for (const std::string& name : components)
 		{
@@ -152,7 +152,7 @@ namespace Sentry
 		IF_THROW_ERROR(this->InitComponent());
 
 		this->mFps = 15;
-		mConfig->GetValue("fps", this->mFps);
+		mConfig->GetMember("fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = Helper::Time::GetMilTimestamp();
 		this->mSecondTimer = Helper::Time::GetMilTimestamp();

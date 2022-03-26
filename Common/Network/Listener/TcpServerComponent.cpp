@@ -1,40 +1,40 @@
 ﻿#include"TcpServerComponent.h"
 #include"Object/App.h"
-#include<Util/StringHelper.h>
-#include<Scene/ThreadPoolComponent.h>
 #include<Thread/TaskThread.h>
-#include<Listener/NetworkListener.h>
+#include<Util/StringHelper.h>
+#include<Component/Scene/ThreadPoolComponent.h>
+#include<Network/Listener/NetworkListener.h>
 namespace Sentry
 {
     bool TcpServerComponent::Awake()
     {
 		const ServerConfig & config = App::Get().GetConfig();
-		config.GetValue("white_list", this->mWhiteList);
-        config.GetValue("listener","ip", this->mHostIp);
-		rapidjson::Value * jsonValue = config.GetJsonValue("listener");
+        config.GetMember("listener","ip", this->mHostIp);
+		const rapidjson::Value * jsonValue = config.GetJsonValue("listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
 			return false;
 		}
-        auto iter = jsonValue->MemberBegin();
-		for ( ;iter != jsonValue->MemberEnd(); iter++)
+		std::unordered_map<std::string, const rapidjson::Value *> listeners;
+		config.GetMember("listener", listeners);
+		for(auto iter = listeners.begin(); iter != listeners.end(); iter++)
 		{
-			if (!iter->value.IsObject())
+			const rapidjson::Value & jsonObject = *iter->second;
+			if(jsonObject.IsObject())
 			{
-				continue;
+				ListenConfig* listenConfig = new ListenConfig();
+				listenConfig->Port = 0;
+				listenConfig->Ip = this->mHostIp;
+				if (jsonObject.HasMember("port"))
+				{
+					listenConfig->Port = jsonObject["port"].GetUint();
+					listenConfig->Count = jsonObject["count"].GetInt();
+				}
+				listenConfig->Name = iter->first;
+				listenConfig->Handler = jsonObject["component"].GetString();;
+				listenConfig->mAddress = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
+				this->mListenerConfigs.emplace_back(listenConfig);
 			}
-            ListenConfig * listenConfig = new ListenConfig();
-            listenConfig->Port = 0;
-            listenConfig->Ip = this->mHostIp;
-            if(iter->value.HasMember("port"))
-            {
-                listenConfig->Port = iter->value["port"].GetUint();
-                listenConfig->Count = iter->value["count"].GetInt();
-            }
-            listenConfig->Name = iter->name.GetString();
-            listenConfig->Handler = iter->value["component"].GetString();;
-            listenConfig->mAddress = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
-            this->mListenerConfigs.emplace_back(listenConfig);
 		}
 		return true;
     }

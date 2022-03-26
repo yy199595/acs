@@ -1,6 +1,6 @@
 #include"ServiceMgrComponent.h"
-#include"RpcConfigComponent.h"
 #include"Service/ServiceProxy.h"
+#include"Component/Rpc/RpcConfigComponent.h"
 namespace Sentry
 {
     bool ServiceMgrComponent::Awake()

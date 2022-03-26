@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Component/Component.h>
+#include"Component/Component.h"
 
 namespace Sentry
 {

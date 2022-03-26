@@ -6,7 +6,7 @@
 #include"MonitorComponent.h"
 #include"Util/TimeHelper.h"
 #include"Object/App.h"
-#include"Scene/ThreadPoolComponent.h"
+#include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
     bool MonitorComponent::Awake()

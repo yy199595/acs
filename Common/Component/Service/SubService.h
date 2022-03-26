@@ -1,7 +1,7 @@
 //
 // Created by yjz on 2022/1/22.
 //
-#include"Component.h"
+#include"Component/Component.h"
 #include"Method/SubMethod.h"
 #ifndef SENTRY_REDISSUBSERVICE_H
 #define SENTRY_REDISSUBSERVICE_H

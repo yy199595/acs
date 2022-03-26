@@ -115,11 +115,11 @@ namespace Sentry
 
     bool RapidJsonWriter::SaveJsonToFile(const char *path)
     {
-        std::ofstream savefile(path, ios::out | ios::binary);
-        if (savefile.is_open())
+        std::ofstream os(path, ios::out | ios::binary);
+        if (os.is_open())
         {
-            this->WriterToStream(savefile);
-            savefile.close();
+            this->WriterToStream(os);
+            os.close();
             return true;
         }
         return false;
@@ -150,8 +150,8 @@ namespace Sentry
         {
             os.clear();
             const char *str = this->mStringBuf.GetString();
-            const size_t lenght = this->mStringBuf.GetSize();
-            os.append(str, lenght);
+            const size_t length = this->mStringBuf.GetSize();
+            os.append(str, length);
             return true;
         }
         return false;
@@ -161,6 +161,20 @@ namespace Sentry
     {
         return mJsonWriter.Key(key);
     }
+	const std::string RapidJsonWriter::ToJson()
+	{
+		if (this->mJsonWriter.EndObject())
+		{
+			const char *str = this->mStringBuf.GetString();
+			const size_t length = this->mStringBuf.GetSize();
+			return std::string(str, length);
+		}
+		return std::string();
+	}
+	void RapidJsonWriter::Clear()
+	{
+
+	}
 }// namespace Sentry
 
 namespace Sentry

@@ -1,8 +1,8 @@
 ﻿#include "RpcTaskSource.h"
 #include"Object/App.h"
-#include"Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcComponent.h"
 #ifdef __DEBUG__
-#include"Scene/RpcConfigComponent.h"
+#include"Component/Rpc/RpcConfigComponent.h"
 #endif
 namespace Sentry
 {

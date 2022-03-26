@@ -1,7 +1,7 @@
 #pragma once
 
 #include<istream>
-#include<SocketProxy.h>
+#include<Network/SocketProxy.h>
 #include<Async/TaskSource.h>
 namespace Sentry
 {

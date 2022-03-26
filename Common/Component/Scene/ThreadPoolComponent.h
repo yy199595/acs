@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include<Component/Component.h>
-#include <Thread/TaskThread.h>
-#include <Other/MultiThreadQueue.h>
-#include <Util/NumberBuilder.h>
+#include"Component/Component.h"
+#include "Thread/TaskThread.h"
+#include "Other/MultiThreadQueue.h"
+#include "Util/NumberBuilder.h"
 namespace Sentry
 {
     class TaskProxy;

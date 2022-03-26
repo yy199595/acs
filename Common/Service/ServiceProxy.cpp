@@ -2,10 +2,10 @@
 #include"Object/App.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include<Util/StringHelper.h>
-#include<Scene/RpcConfigComponent.h>
-#include"Rpc/RpcComponent.h"
-#include"Service/LocalService.h"
-#include"DB/Component/RedisComponent.h"
+#include"Component/Rpc/RpcConfigComponent.h"
+#include"Component/Rpc/RpcComponent.h"
+#include"Component/Logic/LocalService.h"
+#include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
 	ServiceProxy::ServiceProxy(const std::string & name)

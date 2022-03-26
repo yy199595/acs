@@ -4,8 +4,8 @@
 
 #ifndef SENTRY_HTTPNODESERVICE_H
 #define SENTRY_HTTPNODESERVICE_H
-#include"Component.h"
-#include"Service/HttpService.h"
+#include"Component/Component.h"
+#include"Component/Service/HttpService.h"
 namespace Sentry
 {
     class HttpNodeService : public HttpService

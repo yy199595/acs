@@ -1,6 +1,6 @@
 ﻿#include"ProtoRpcClient.h"
 #include"Object/App.h"
-#include<Rpc/RpcClientComponent.h>
+#include<Component/Rpc/RpcClientComponent.h>
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif

@@ -6,9 +6,9 @@
 #include"Object/Entity.h"
 #include"Global/ServerPath.h"
 #include"Thread/TaskThread.h"
-#include"Timer/TimerComponent.h"
-#include"Scene/LoggerComponent.h"
-#include"Coroutine/TaskComponent.h"
+#include"Component/Timer/TimerComponent.h"
+#include"Component/Scene/LoggerComponent.h"
+#include"Component/Coroutine/TaskComponent.h"
 using namespace std;
 using namespace asio::ip;
 

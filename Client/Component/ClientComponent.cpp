@@ -1,12 +1,13 @@
 ﻿
-#include"Object/App.h"
 #include"ClientComponent.h"
+#include"Object/App.h"
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
-#include"Network/ClientRpcTask.h"
+#include"Task/ClientRpcTask.h"
 #include"Other/ElapsedTimer.h"
-#include"Http/HttpAsyncRequest.h"
-#include"Http/Component/HttpClientComponent.h"
+#include"Network/Http/HttpAsyncRequest.h"
+#include"Component/Http/HttpClientComponent.h"
+#include"google/protobuf/util/json_util.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -18,7 +19,7 @@ namespace Client
 	unsigned int ClientComponent::AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms)
 	{
 		long long rpcId = task->GetRpcTaskId();
-		this->mRpcTasks.emplace(rpcId, task);
+		//this->mRpcTasks.emplace(rpcId, task);
 		return ms > 0 ? this->mTimerComponent->AsyncWait(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
 	}
 
@@ -34,12 +35,12 @@ namespace Client
         std::string json;
         util::MessageToJsonString(*t2, &json);
         LOG_WARN("response json = ", json);
-        auto iter = this->mRpcTasks.find(t2->rpc_id());
-        if(iter != this->mRpcTasks.end())
-        {
-            iter->second->SetResult(t2);
-            this->mRpcTasks.erase(iter);
-        }
+//        auto iter = this->mRpcTasks.find(t2->rpc_id());
+//        if(iter != this->mRpcTasks.end())
+//        {
+//            iter->second->SetResult(t2);
+//            this->mRpcTasks.erase(iter);
+//        }
     }
 
 	bool ClientComponent::Awake()
@@ -59,7 +60,7 @@ namespace Client
 	{
         string host;
         const ServerConfig & config = App::Get().GetConfig();
-        config.GetValue("http", "account", host);
+        config.GetMember("http", "account", host);
         std::string loginUrl = host + "/logic/account/login";
         std::string registerUrl = host + "/logic/account/register";
 
@@ -135,7 +136,7 @@ namespace Client
         requestMessage->mutable_data()->CopyFrom(message);
         requestMessage->set_rpc_id(rpcTask->GetTaskId());
         this->mTcpClient->SendToGate(requestMessage);
-        this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
+        //this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
         std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
         if(responseData->code() != (int)XCode::Successful)
         {
@@ -151,12 +152,12 @@ namespace Client
 
 	void ClientComponent::OnTimeout(long long rpcId)
 	{
-		auto iter = this->mRpcTasks.find(rpcId);
-		if (iter != this->mRpcTasks.end())
-		{
-			auto rpcTask = iter->second;
-			this->mRpcTasks.erase(iter);
-			rpcTask->SetResult(nullptr);
-		}
+//		auto iter = this->mRpcTasks.find(rpcId);
+//		if (iter != this->mRpcTasks.end())
+//		{
+//			auto rpcTask = iter->second;
+//			this->mRpcTasks.erase(iter);
+//			rpcTask->SetResult(nullptr);
+//		}
 	}
 }

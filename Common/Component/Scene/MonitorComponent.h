@@ -4,7 +4,7 @@
 
 #ifndef GameKeeper_DEAMONCOMPONENT_H
 #define GameKeeper_DEAMONCOMPONENT_H
-#include "Component.h"
+#include "Component/Component.h"
 namespace Sentry
 {
     class MonitorComponent : public Component

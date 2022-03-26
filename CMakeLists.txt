@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1.3)
+
 project(Sentry)
 if(MSVC)
     enable_language(C CXX ASM_MASM)
@@ -17,7 +18,6 @@ file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 
 set(CMAKE_CXX_STANDARD 11)
-set(PROJECT_COMMON_DIR ${PROJECT_SOURCE_DIR})
 if(MSVC)
     add_compile_options(/W4 /fp:fast /EHsc)
     add_link_options(/SAFESEH:NO)
@@ -61,5 +61,69 @@ macro(source_group_by_dir dir source_files)
     endif(MSVC)
 endmacro(source_group_by_dir)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/Server)
-add_subdirectory(${PROJECT_SOURCE_DIR}/Client)
+PROJECT(Server)
+
+#第三方库包含
+
+include_directories(Libs/include/rapidjson)
+include_directories(Libs/include/protobuf)
+include_directories(Libs/include/asio)
+include_directories(Libs/include/lua5.3)
+include_directories(Libs/include/mysql)
+include_directories(Libs/include/spdlog)
+include_directories(Libs/include/jemalloc)
+#公共组件
+
+
+include_directories(Server/Gate)
+include_directories(Server/Logic)
+include_directories(${PROJECT_SOURCE_DIR}/Common)
+include_directories(${PROJECT_SOURCE_DIR}/Protocol)
+include_directories(${PROJECT_SOURCE_DIR}/Server)
+include_directories(${PROJECT_SOURCE_DIR}/Client)
+
+file(GLOB_RECURSE GateSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.cc")
+file(GLOB_RECURSE MainSource "./Main/*.h" "./Main/*.cpp" "./Main/*.hpp" "./Main/*.cc")
+file(GLOB_RECURSE LogicSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.cc")
+
+LINK_DIRECTORIES(Libs/lib)
+
+SET(CMAKE_BUILD_TYPE "Debug")
+list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource} ${GateSource})
+
+
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    message("use [ccache]")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif ()
+
+ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles})
+
+if(MSVC)
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+    foreach(file_name ${AsmFiles})
+        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
+    endforeach()
+
+    foreach(file_name ${CommonFiles})
+        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
+    endforeach()
+
+    foreach(file_name ${ServerFiles})
+        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
+    endforeach()
+    message("build int windows")
+    TARGET_LINK_LIBRARIES(Sentry Lua53 libprotobufd libmysql mysqlclient)
+elseif(APPLE)
+    message("build in macos")
+    TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient yassl dl)
+else()
+    message("build in linux")
+    TARGET_LINK_LIBRARIES(Sentry Lua53 jemalloc protobuf pthread mysqlclient yassl dl)
+endif()
+SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+

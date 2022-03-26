@@ -5,7 +5,7 @@
 #include<Define/CommonLogDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
-#include<Scene/ThreadPoolComponent.h>
+#include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
 	NetworkListener::NetworkListener(IAsioThread & t, ListenConfig & config)

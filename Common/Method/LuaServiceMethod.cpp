@@ -1,10 +1,10 @@
 #include"LuaServiceMethod.h"
 #include"Script/LuaInclude.h"
 #include"Object/App.h"
-#include"Rpc/RpcClientComponent.h"
-#include"Scene/LuaScriptComponent.h"
 #include"Pool/MessagePool.h"
-#include"Scene/RpcConfigComponent.h"
+#include"Component/Rpc/RpcClientComponent.h"
+#include"Component/Lua/LuaScriptComponent.h"
+#include"Component/Rpc/RpcConfigComponent.h"
 #include"Async/LuaServiceTaskSource.h"
 namespace Sentry
 {

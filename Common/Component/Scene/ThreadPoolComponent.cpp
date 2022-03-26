@@ -1,7 +1,7 @@
 ﻿#include "ThreadPoolComponent.h"
-#include <Util/Guid.h>
+#include "Util/Guid.h"
 #include "Object/App.h"
-#include <Method/MethodProxy.h>
+#include "Method/MethodProxy.h"
 namespace Sentry
 {
 	bool ThreadPoolComponent::Awake()
@@ -9,7 +9,7 @@ namespace Sentry
         this->mIndex = 0;
         int taskCount = 0;
         const ServerConfig & config = App::Get().GetConfig();
-        config.GetValue("thread", "task", taskCount);
+        config.GetMember("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
         LOG_CHECK_RET_FALSE(config.GetValue("thread", "network", networkCount));

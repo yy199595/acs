@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICEMETHOD_H
 #define GAMEKEEPER_HTTPSERVICEMETHOD_H
-#include<Http/Http.h>
+#include<Network/Http/Http.h>
 #include<Util/JsonHelper.h>
 #include<Util/TimeHelper.h>
 namespace Sentry

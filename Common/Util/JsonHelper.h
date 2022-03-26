@@ -15,6 +15,7 @@ namespace Sentry
 
         ~RapidJsonWriter() = default;
 
+
     public:
         bool Add(const char *key);
 
@@ -41,6 +42,9 @@ namespace Sentry
         bool Add(const char *key, const google::protobuf::Message &value);
 
     public:
+
+		void Clear();
+
         bool StartArray(const char *key);
 
 		bool StartObject();
@@ -60,6 +64,7 @@ namespace Sentry
 
         virtual bool WriterToStream(std::ostream &os);
 
+		const std::string ToJson();
     protected:
         rapidjson::StringBuffer mStringBuf;
         rapidjson::Writer<rapidjson::StringBuffer> mJsonWriter;

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include<Component/Component.h>
-#include<Script/LuaTable.h>
-#include<Other/MultiThreadQueue.h>
+#include"Component/Component.h"
+#include"Script/LuaTable.h"
+#include"Other/MultiThreadQueue.h"
 #include"Network/Rpc/ProtoRpcClient.h"
 #include"Pool/AllotorPool.h"
 namespace Sentry

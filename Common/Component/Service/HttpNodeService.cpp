@@ -5,7 +5,7 @@
 #include"HttpNodeService.h"
 #include"Object/App.h"
 #include"Service/ServiceProxy.h"
-#include"Scene/ServiceMgrComponent.h"
+#include"Component/Scene/ServiceMgrComponent.h"
 namespace Sentry
 {
     bool HttpNodeService::Awake()

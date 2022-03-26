@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_HTTPREQUESTCLIENT_H
 #define GAMEKEEPER_HTTPREQUESTCLIENT_H
-#include<SocketProxy.h>
+#include"Network/SocketProxy.h"
 #include<Async/TaskSource.h>
 #include"HttpAsyncRequest.h"
 namespace Sentry
