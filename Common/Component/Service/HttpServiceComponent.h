@@ -8,18 +8,18 @@
 #include "Method/HttpServiceMethod.h"
 namespace Sentry
 {
-    class HttpServiceComponent : public Component
-    {
-    public:
-        HttpServiceComponent() = default;
-        ~HttpServiceComponent() override;
-    public:
-        HttpServiceMethod * GetMethod(const std::string & path);
-    protected:
-        bool Awake() override;
+	class HttpServiceComponent : public Component
+	{
+	 public:
+		HttpServiceComponent() = default;
+		~HttpServiceComponent() override;
+	 public:
+		HttpServiceMethod* GetMethod(const std::string& path);
+	 protected:
+		bool Awake() override;
 
-    private:
-        std::unordered_map<std::string, HttpServiceMethod *> mMethodMap;
-    };
+	 private:
+		std::unordered_map<std::string, HttpServiceMethod*> mMethodMap;
+	};
 }
 #endif //GAMEKEEPER_HTTPSERVICECOMPONENT_H

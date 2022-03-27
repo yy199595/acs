@@ -109,17 +109,6 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlComponent::GetProtoByTable(const std::string& tab, std::string& proto)
-	{
-		auto iter = this->mSqlTableMap.find(tab);
-		if (iter == this->mSqlTableMap.end())
-		{
-			return false;
-		}
-		proto = iter->second;
-		return true;
-	}
-
 	bool MysqlComponent::StartConnect()
 	{
 		const std::vector<TaskThread*>& threadTasks = this->mTaskManager->GetThreads();

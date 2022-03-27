@@ -8,7 +8,7 @@ namespace Json
 	Writer::Writer(bool isObj)
 		: mIsObject(isObj), mJsonWriter(this->mStringBuf)
 	{
-		if(this->mIsObject)
+		if (this->mIsObject)
 		{
 			this->mJsonWriter.StartObject();
 			return;
@@ -62,11 +62,11 @@ namespace Json
 	}
 	bool Writer::AddMember(const char* key, const std::vector<int>& value)
 	{
-		if(!this->StartArray(key))
+		if (!this->StartArray(key))
 		{
 			return false;
 		}
-		for(const int member : value)
+		for (const int member : value)
 		{
 			this->mJsonWriter.Int(member);
 		}
@@ -74,8 +74,8 @@ namespace Json
 	}
 	bool Writer::AddMember(const char* key, const std::vector<long long int>& value)
 	{
-		if(!this->StartArray(key)) return false;
-		for(const long long member : value)
+		if (!this->StartArray(key)) return false;
+		for (const long long member : value)
 		{
 			this->mJsonWriter.Int64(member);
 		}
@@ -83,8 +83,8 @@ namespace Json
 	}
 	bool Writer::AddMember(const char* key, const std::vector<std::string>& value)
 	{
-		if(!this->StartArray(key)) return false;
-		for(const std::string & member : value)
+		if (!this->StartArray(key)) return false;
+		for (const std::string& member : value)
 		{
 			this->mJsonWriter.String(member.c_str(), member.size());
 		}
@@ -118,7 +118,7 @@ namespace Json
 	}
 	const std::string Writer::ToJsonString()
 	{
-		if(this->mJsonWriter.IsComplete())
+		if (this->mJsonWriter.IsComplete())
 		{
 			const char* str = this->mStringBuf.GetString();
 			const size_t size = this->mStringBuf.GetSize();
@@ -138,7 +138,7 @@ namespace Json
 		}
 		return std::string();
 	}
-	bool Writer::AddMember(const char* key, const char * str, size_t size)
+	bool Writer::AddMember(const char* key, const char* str, size_t size)
 	{
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.String(str, size);
@@ -148,9 +148,9 @@ namespace Json
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.String(str);
 	}
-	size_t Writer::WriterStream(std::ostream & os)
+	size_t Writer::WriterStream(std::ostream& os)
 	{
-		if(this->mJsonWriter.IsComplete())
+		if (this->mJsonWriter.IsComplete())
 		{
 			const char* str = this->mStringBuf.GetString();
 			const size_t size = this->mStringBuf.GetSize();
@@ -175,7 +175,7 @@ namespace Json
 	}
 	size_t Writer::GetJsonSize()
 	{
-		if(this->mJsonWriter.IsComplete())
+		if (this->mJsonWriter.IsComplete())
 		{
 			return this->mStringBuf.GetSize();
 		}
@@ -189,7 +189,7 @@ namespace Json
 		}
 		return 0;
 	}
-	bool Writer::AddMember(const char * key, XCode code)
+	bool Writer::AddMember(const char* key, XCode code)
 	{
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.Int((int)code);

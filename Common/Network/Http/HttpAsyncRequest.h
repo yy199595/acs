@@ -86,41 +86,53 @@ namespace Sentry
 
 namespace Sentry
 {
-    class HttpHandlerRequest : public IHttpContent
-    {
-    public:
-        HttpHandlerRequest();
-    public:
-        HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
-    public:
-        const std::string & GetUrl() { return this->mUrl;}
-        const std::string & GetMethod() { return this->mMethod; }
-        std::shared_ptr<Json::Reader> ToJsonReader() final;
-        const std::string & GetContent() final { return this->mContent; }
-        bool GetHeadContent(const std::string & key, std::string & value);
-    private:
-        std::string mUrl;
-        std::string mMethod;
-        std::string mContent;
-        std::string mVersion;
-        HttpDecodeState mState;
-        size_t mContentLength;
-        std::unordered_map<std::string, std::string> mHeadMap;
-    };
+	class HttpHandlerRequest : public IHttpContent
+	{
+	 public:
+		HttpHandlerRequest();
+	 public:
+		HttpStatus OnReceiveData(asio::streambuf& streamBuffer) final;
+	 public:
+		const std::string& GetUrl()
+		{
+			return this->mUrl;
+		}
+		const std::string& GetMethod()
+		{
+			return this->mMethod;
+		}
+		std::shared_ptr<Json::Reader> ToJsonReader() final;
+		const std::string& GetContent() final
+		{
+			return this->mContent;
+		}
+		bool GetHeadContent(const std::string& key, std::string& value);
+	 private:
+		std::string mUrl;
+		std::string mMethod;
+		std::string mContent;
+		std::string mVersion;
+		HttpDecodeState mState;
+		size_t mContentLength;
+		std::unordered_map<std::string, std::string> mHeadMap;
+	};
 }
 
 namespace Sentry
 {
-    class HttpHandlerResponse : public IHttpStream
-    {
-    public:
-        HttpHandlerResponse(HttpStatus code);
-    public:
-        void AddValue(const std::string & content);
-        void AddValue(Json::Writer & jsonWriter);
-        asio::streambuf & GetStream() final { return this->mStreamBuffer;}
-    private:
-        asio::streambuf mStreamBuffer;
-    };
+	class HttpHandlerResponse : public IHttpStream
+	{
+	 public:
+		HttpHandlerResponse(HttpStatus code);
+	 public:
+		void AddValue(const std::string& content);
+		void AddValue(Json::Writer& jsonWriter);
+		asio::streambuf& GetStream() final
+		{
+			return this->mStreamBuffer;
+		}
+	 private:
+		asio::streambuf mStreamBuffer;
+	};
 }
 #endif //GAMEKEEPER_HTTPASYNCREQUEST_H

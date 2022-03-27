@@ -33,11 +33,11 @@ namespace Sentry
 	class Entity;
 	class Component : public Object
 	{
-	public:
+	 public:
 		Component();
 		~Component() override = default;
 
-	public:
+	 public:
 		friend class Entity;
 		friend class ComponentFactory;
 		inline long long GetEntityId() const
@@ -49,64 +49,71 @@ namespace Sentry
 		{
 			return this->mEntity;
 		}
-		inline Type * GetType() { return this->mType; }
-        inline const std::string & GetName() { return this->mName; }
+		inline Type* GetType()
+		{
+			return this->mType;
+		}
+		inline const std::string& GetName()
+		{
+			return this->mName;
+		}
 		template<typename T>
-		inline T * Cast() { return dynamic_cast<T*>(this); }
+		inline T* Cast()
+		{
+			return dynamic_cast<T*>(this);
+		}
 
-	public:
+	 public:
 		bool IsComponent() override
 		{
 			return true;
 		}
-	public:
+	 public:
 
 		virtual bool Awake() = 0; //组件创建的时候调用
-        
-        virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
 
-	protected:
+		virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
+
+	 protected:
 		template<typename T>
-		T * GetComponent();
+		T* GetComponent();
 
-        template<typename T>
-        T * GetComponent(const std::string & name);
+		template<typename T>
+		T* GetComponent(const std::string& name);
 
-        void GetComponents(std::vector<Component *> & components);
+		void GetComponents(std::vector<Component*>& components);
 
-        Component * GetByName(const std::string & name);
+		Component* GetByName(const std::string& name);
 
-	private:
-		Component * GetByHash(size_t hash);
-	protected:
-		Type * mType;
-        std::string mName;
-        long long mEntityId;
-        std::shared_ptr<Entity> mEntity;
-    };
+	 private:
+		Component* GetByHash(size_t hash);
+	 protected:
+		Type* mType;
+		std::string mName;
+		long long mEntityId;
+		std::shared_ptr<Entity> mEntity;
+	};
 	template<typename T>
-	inline T * Component::GetComponent()
+	inline T* Component::GetComponent()
 	{
 		const size_t hash = typeid(T).hash_code();
 		return static_cast<T*>(this->GetByHash(hash));
 	}
 
-    template<typename T>
-    inline T * Component::GetComponent(const std::string & name)
-    {
-        Component *component = this->GetByName(name);
-        if (component == nullptr)
-        {
-            return nullptr;
-        }
-        return dynamic_cast<T *>(component);
-    }
+	template<typename T>
+	inline T* Component::GetComponent(const std::string& name)
+	{
+		Component* component = this->GetByName(name);
+		if (component == nullptr)
+		{
+			return nullptr;
+		}
+		return dynamic_cast<T*>(component);
+	}
 
-    inline std::string GetFunctionName(const std::string func)
-    {
-        size_t pos = func.find("::");
-        return func.substr(pos + 2);
-    }
-
-
+	inline std::string GetFunctionName(const std::string func)
+	{
+		size_t pos = func.find("::");
+		return func.substr(pos + 2);
+	}
 }

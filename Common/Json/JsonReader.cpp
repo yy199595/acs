@@ -404,12 +404,12 @@ namespace Json
 {
 	bool Reader::GetMember(std::vector<int>& value) const
 	{
-		if(this->mJsonDocument.IsArray())
+		if (this->mJsonDocument.IsArray())
 		{
 			auto jsonArray = this->mJsonDocument.GetArray();
-			for(int index = 0; index < jsonArray.Size(); index++)
+			for (int index = 0; index < jsonArray.Size(); index++)
 			{
-				if(!jsonArray[index].IsInt())
+				if (!jsonArray[index].IsInt())
 				{
 					return false;
 				}
@@ -422,12 +422,12 @@ namespace Json
 
 	bool Reader::GetMember(std::vector<long long>& value) const
 	{
-		if(this->mJsonDocument.IsArray())
+		if (this->mJsonDocument.IsArray())
 		{
 			auto jsonArray = this->mJsonDocument.GetArray();
-			for(int index = 0; index < jsonArray.Size(); index++)
+			for (int index = 0; index < jsonArray.Size(); index++)
 			{
-				if(!jsonArray[index].IsInt64())
+				if (!jsonArray[index].IsInt64())
 				{
 					return false;
 				}
@@ -440,16 +440,16 @@ namespace Json
 
 	bool Reader::GetMember(std::vector<std::string>& value) const
 	{
-		if(this->mJsonDocument.IsArray())
+		if (this->mJsonDocument.IsArray())
 		{
 			auto jsonArray = this->mJsonDocument.GetArray();
-			for(int index = 0; index < jsonArray.Size(); index++)
+			for (int index = 0; index < jsonArray.Size(); index++)
 			{
-				if(!jsonArray[index].IsString())
+				if (!jsonArray[index].IsString())
 				{
 					return false;
 				}
-				const char * str = jsonArray[index].GetString();
+				const char* str = jsonArray[index].GetString();
 				const size_t size = jsonArray[index].GetStringLength();
 				value.emplace_back(str, size);
 			}
@@ -459,8 +459,8 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, unsigned short& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
-		if(jsonValue != nullptr && jsonValue->IsUint())
+		const rapidjson::Value* jsonValue = this->GetJsonValue(k1, k2);
+		if (jsonValue != nullptr && jsonValue->IsUint())
 		{
 			value = (unsigned short)jsonValue->GetUint();
 			return true;

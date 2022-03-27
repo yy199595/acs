@@ -6,27 +6,27 @@
 namespace Sentry
 {
 	TaskContext::TaskContext()
-    {
-        memset(this, 0, (sizeof(TaskContext)));
-    }
+	{
+		memset(this, 0, (sizeof(TaskContext)));
+	}
 
-    void TaskContext::Invoke()
-    {
-        this->mFunction->run();
-        if(this->mGroup != nullptr)
-        {
-            this->mGroup->FinishAny();
-        }
-        delete this->mFunction;
-        this->mGroup = nullptr;
-        this->mFunction = nullptr;
-        this->mState = CorState::Finish;
-    }
+	void TaskContext::Invoke()
+	{
+		this->mFunction->run();
+		if (this->mGroup != nullptr)
+		{
+			this->mGroup->FinishAny();
+		}
+		delete this->mFunction;
+		this->mGroup = nullptr;
+		this->mFunction = nullptr;
+		this->mState = CorState::Finish;
+	}
 	TaskContext::~TaskContext()
 	{
-        if(this->mStack.p)
-        {
-            free(this->mStack.p);
-        }
+		if (this->mStack.p)
+		{
+			free(this->mStack.p);
+		}
 	}
 }

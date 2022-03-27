@@ -11,106 +11,105 @@
 #include"Component/Gate/GateClientComponent.h"
 namespace Sentry
 {
-    RpcGateClient::RpcGateClient(std::shared_ptr<SocketProxy> socket, SocketType type,
-                                 GateClientComponent *component)
-        : RpcClient(socket, type), mGateComponent(component)
-    {
-        this->mQps = 0;
-        this->mCallCount = 0;
-    }
+	RpcGateClient::RpcGateClient(std::shared_ptr<SocketProxy> socket, SocketType type,
+		GateClientComponent* component)
+		: RpcClient(socket, type), mGateComponent(component)
+	{
+		this->mQps = 0;
+		this->mCallCount = 0;
+	}
 
-    void RpcGateClient::OnConnect(XCode code)
-    {
+	void RpcGateClient::OnConnect(XCode code)
+	{
 
-    }
+	}
 
-    XCode RpcGateClient::OnRequest(const char *buffer, size_t size)
-    {
-        std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-        if (!request->ParseFromArray(buffer, (int)size))
-        {
-            return XCode::ParseRequestDataError;
-        }
-        this->mCallCount++;
-        this->mQps += size;
-        std::cout << "receive player message count = " << this->mCallCount << std::endl;
-        request->set_sock_id(this->GetSocketId());
+	XCode RpcGateClient::OnRequest(const char* buffer, size_t size)
+	{
+		std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
+		if (!request->ParseFromArray(buffer, (int)size))
+		{
+			return XCode::ParseRequestDataError;
+		}
+		this->mCallCount++;
+		this->mQps += size;
+		std::cout << "receive player message count = " << this->mCallCount << std::endl;
+		request->set_sock_id(this->GetSocketId());
 #ifdef ONLY_MAIN_THREAD
-        this->mGateComponent->OnRequest(request);
+		this->mGateComponent->OnRequest(request);
 #else
-        MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
+		MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
+		mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
 
-        return XCode::Successful;
-    }
-    
-    XCode RpcGateClient::OnResponse(const char *buffer, size_t size) //不处理response消息
-    {
-        return XCode::UnKnowPacket;
-    }
+		return XCode::Successful;
+	}
 
-    void RpcGateClient::OnClientError(XCode code)
-    {
-        if(code == XCode::NetActiveShutdown)
-        {
-            this->mSocketProxy->Close();
-            return;
-        }
-        long long id = this->GetSocketId();
+	XCode RpcGateClient::OnResponse(const char* buffer, size_t size) //不处理response消息
+	{
+		return XCode::UnKnowPacket;
+	}
+
+	void RpcGateClient::OnClientError(XCode code)
+	{
+		if (code == XCode::NetActiveShutdown)
+		{
+			this->mSocketProxy->Close();
+			return;
+		}
+		long long id = this->GetSocketId();
 #ifdef ONLY_MAIN_THREAD
-        this->mGateComponent->OnCloseSocket(id, code);
+		this->mGateComponent->OnCloseSocket(id, code);
 #else
-        MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
-        mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
+		MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
+		mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
 #endif
 
-    }
+	}
 
-    void RpcGateClient::StartClose()
-    {
-        XCode code = XCode::NetActiveShutdown;
+	void RpcGateClient::StartClose()
+	{
+		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
-        this->OnClientError(code);
+		this->OnClientError(code);
 #else
-        this->mNetWorkThread.Invoke(&RpcGateClient::OnClientError, this, code);
+		this->mNetWorkThread.Invoke(&RpcGateClient::OnClientError, this, code);
 #endif
-    }
+	}
 
-
-    bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
-    {
-        if(!this->IsOpen()) return false;
-        std::shared_ptr<NetworkData> networkData(
-                new NetworkData(RPC_TYPE_REQUEST, message));
+	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
+	{
+		if (!this->IsOpen()) return false;
+		std::shared_ptr<NetworkData> networkData(
+			new NetworkData(RPC_TYPE_REQUEST, message));
 #ifdef ONLY_MAIN_THREAD
-        this->SendData(networkData);
+		this->SendData(networkData);
 #else
-        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
 #endif
-        return true;
-    }
+		return true;
+	}
 
-    bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
-    {
-        if(!this->IsOpen()) return false;
-        std::shared_ptr<NetworkData> networkData(
-                new NetworkData(RPC_TYPE_RESPONSE, message));
+	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
+	{
+		if (!this->IsOpen()) return false;
+		std::shared_ptr<NetworkData> networkData(
+			new NetworkData(RPC_TYPE_RESPONSE, message));
 #ifdef ONLY_MAIN_THREAD
-        this->SendData(networkData);
+		this->SendData(networkData);
 #else
-        this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
 #endif
-        return true;
-    }
+		return true;
+	}
 
-    void RpcGateClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
-    {
+	void RpcGateClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
+	{
 #ifdef __DEBUG__
-        if(code != XCode::Successful)
-        {
+		if (code != XCode::Successful)
+		{
 
-        }
+		}
 #endif
-    }
+	}
 }

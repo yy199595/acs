@@ -20,33 +20,33 @@ namespace Json
 	 public:
 		bool StartArray();
 		bool StartObject();
-		bool StartArray(const char * key);
-		bool StartObject(const char * key);
+		bool StartArray(const char* key);
+		bool StartObject(const char* key);
 	 public:
 		bool EndArray();
 		bool EndObject();
 	 public:
-		bool AddMember(const char * key, XCode code);
+		bool AddMember(const char* key, XCode code);
 	 public:
-		bool AddMember(const char * key, int value);
-		bool AddMember(const char * key, bool value);
-		bool AddMember(const char * key, short value);
-		bool AddMember(const char * key, float value);
-		bool AddMember(const char * key, double value);
-		bool AddMember(const char * key, long long value);
-		bool AddMember(const char * key, const char * str);
-		bool AddMember(const char * key, unsigned int value);
-		bool AddMember(const char * key, unsigned short value);
-		bool AddMember(const char * key, const char * str, size_t size);
+		bool AddMember(const char* key, int value);
+		bool AddMember(const char* key, bool value);
+		bool AddMember(const char* key, short value);
+		bool AddMember(const char* key, float value);
+		bool AddMember(const char* key, double value);
+		bool AddMember(const char* key, long long value);
+		bool AddMember(const char* key, const char* str);
+		bool AddMember(const char* key, unsigned int value);
+		bool AddMember(const char* key, unsigned short value);
+		bool AddMember(const char* key, const char* str, size_t size);
 	 public:
-		bool AddMember(const char * key, const std::string & value);
-		bool AddMember(const char * key, const std::vector<int> & value);
-		bool AddMember(const char * key, const std::vector<long long> & value);
-		bool AddMember(const char * key, const std::vector<std::string> & value);
+		bool AddMember(const char* key, const std::string& value);
+		bool AddMember(const char* key, const std::vector<int>& value);
+		bool AddMember(const char* key, const std::vector<long long>& value);
+		bool AddMember(const char* key, const std::vector<std::string>& value);
 	 public:
 		size_t GetJsonSize();
 		const std::string ToJsonString();
-		size_t WriterStream(std::ostream & os);
+		size_t WriterStream(std::ostream& os);
 	 private:
 		const bool mIsObject;
 		rapidjson::StringBuffer mStringBuf;

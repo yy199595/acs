@@ -10,24 +10,24 @@ namespace Sentry
 {
 	class LoggerComponent : public Component, public IZeroRefresh
 	{
-	public:
+	 public:
 		LoggerComponent() = default;
 		~LoggerComponent() final = default;
-	public:
-        void AddLog(spdlog::level::level_enum type, const std::string & log);
-	protected:	
+	 public:
+		void AddLog(spdlog::level::level_enum type, const std::string& log);
+	 protected:
 		bool Awake() final;
-        bool LateAwake() final;
+		bool LateAwake() final;
 		void OnDestory() final;
 		void OnZeroRefresh() final;
-	private:
+	 private:
 		void CreateLogFile();
-		static void AddInfoLog(const std::string & log);
-		static void AddErrorLog(const std::string & log);
-		static void AddDebugLog(const std::string & log);
-		static void AddFatalLog(const std::string & log);
-		static void AddWarningLog(const std::string & log);
-	private:
+		static void AddInfoLog(const std::string& log);
+		static void AddErrorLog(const std::string& log);
+		static void AddDebugLog(const std::string& log);
+		static void AddFatalLog(const std::string& log);
+		static void AddWarningLog(const std::string& log);
+	 private:
 		int mLogSaveTime;
 		std::string mServerName;
 		std::string mLogSavePath;

@@ -6,31 +6,48 @@
 
 namespace Sentry
 {
-    class Object
-    {
-    public:
-        Object();
+	class Object
+	{
+	 public:
+		Object();
 
-        virtual ~Object();
+		virtual ~Object();
 
-    public:
-        bool Init();
+	 public:
+		bool Init();
 
-    public:
-        inline bool IsActive() const { return this->mIsActive; }
+	 public:
+		inline bool IsActive() const
+		{
+			return this->mIsActive;
+		}
 
-        inline void SetActive(bool isActive) { this->mIsActive = isActive; }
+		inline void SetActive(bool isActive)
+		{
+			this->mIsActive = isActive;
+		}
 
-    public:
-        virtual bool IsManager() { return false; }
+	 public:
+		virtual bool IsManager()
+		{
+			return false;
+		}
 
-        virtual bool IsComponent() { return false; }
+		virtual bool IsComponent()
+		{
+			return false;
+		}
 
-        virtual bool IsGameObject() { return false; }
+		virtual bool IsGameObject()
+		{
+			return false;
+		}
 
-        virtual void OnDestory() {}
+		virtual void OnDestory()
+		{
+		}
 
-    private:
-        bool mIsActive;
-    };
+	 private:
+		bool mIsActive;
+	};
 }// namespace Sentry

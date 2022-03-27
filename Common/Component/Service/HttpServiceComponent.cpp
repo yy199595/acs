@@ -6,28 +6,28 @@
 
 namespace Sentry
 {
-    HttpServiceComponent::~HttpServiceComponent() noexcept
-    {
-        auto iter = this->mMethodMap.begin();
-        for (; iter != this->mMethodMap.end(); iter++)
-        {
-            delete iter->second;
-        }
-        this->mMethodMap.clear();
-    }
+	HttpServiceComponent::~HttpServiceComponent() noexcept
+	{
+		auto iter = this->mMethodMap.begin();
+		for (; iter != this->mMethodMap.end(); iter++)
+		{
+			delete iter->second;
+		}
+		this->mMethodMap.clear();
+	}
 
-    bool HttpServiceComponent::Awake()
-    {
-        return true;
-    }
+	bool HttpServiceComponent::Awake()
+	{
+		return true;
+	}
 
-    HttpServiceMethod *HttpServiceComponent::GetMethod(const std::string &path)
-    {
-        auto iter = this->mMethodMap.find(path);
-        if(iter == this->mMethodMap.end())
-        {
-            return nullptr;
-        }
-        return iter->second;
-    }
+	HttpServiceMethod* HttpServiceComponent::GetMethod(const std::string& path)
+	{
+		auto iter = this->mMethodMap.find(path);
+		if (iter == this->mMethodMap.end())
+		{
+			return nullptr;
+		}
+		return iter->second;
+	}
 }

@@ -6,21 +6,21 @@
 #include<Network/Listener/NetworkListener.h>
 namespace Sentry
 {
-    bool TcpServerComponent::Awake()
-    {
-		const ServerConfig & config = App::Get()->GetConfig();
-        config.GetMember("listener","ip", this->mHostIp);
-		const rapidjson::Value * jsonValue = config.GetJsonValue("listener");
+	bool TcpServerComponent::Awake()
+	{
+		const ServerConfig& config = App::Get()->GetConfig();
+		config.GetMember("listener", "ip", this->mHostIp);
+		const rapidjson::Value* jsonValue = config.GetJsonValue("listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
 			return false;
 		}
-		std::unordered_map<std::string, const rapidjson::Value *> listeners;
+		std::unordered_map<std::string, const rapidjson::Value*> listeners;
 		config.GetMember("listener", listeners);
-		for(auto iter = listeners.begin(); iter != listeners.end(); iter++)
+		for (auto iter = listeners.begin(); iter != listeners.end(); iter++)
 		{
-			const rapidjson::Value & jsonObject = *iter->second;
-			if(jsonObject.IsObject())
+			const rapidjson::Value& jsonObject = *iter->second;
+			if (jsonObject.IsObject())
 			{
 				ListenConfig* listenConfig = new ListenConfig();
 				listenConfig->Port = 0;
@@ -37,69 +37,69 @@ namespace Sentry
 			}
 		}
 		return true;
-    }
+	}
 
-    const NetworkListener *TcpServerComponent::GetListener(const std::string &name)
-    {
-        for(auto listener : this->mListeners)
-        {
-            if(listener->GetConfig().Name == name)
-            {
-                return listener;
-            }
-        }
-        return nullptr;
-    }
+	const NetworkListener* TcpServerComponent::GetListener(const std::string& name)
+	{
+		for (auto listener : this->mListeners)
+		{
+			if (listener->GetConfig().Name == name)
+			{
+				return listener;
+			}
+		}
+		return nullptr;
+	}
 
-    void TcpServerComponent::GetListeners(std::vector<const NetworkListener *> &listeners)
-    {
-        listeners.clear();
-        for(auto listener : this->mListeners)
-        {
-            listeners.emplace_back(listener);
-        }
-    }
+	void TcpServerComponent::GetListeners(std::vector<const NetworkListener*>& listeners)
+	{
+		listeners.clear();
+		for (auto listener : this->mListeners)
+		{
+			listeners.emplace_back(listener);
+		}
+	}
 
-    bool TcpServerComponent::LateAwake()
-    {
-        auto taskComponent = this->GetComponent<ThreadPoolComponent>();
-        for(auto listenConfig : this->mListenerConfigs)
-        {
-            Component *component = this->GetComponent<Component>(listenConfig->Handler);
-            auto socketHandler = dynamic_cast<ISocketListen *>(component);
-            if (socketHandler == nullptr)
-            {
-                LOG_ERROR("not find socket handler ", listenConfig->Handler);
-                return false;
-            }
+	bool TcpServerComponent::LateAwake()
+	{
+		auto taskComponent = this->GetComponent<ThreadPoolComponent>();
+		for (auto listenConfig : this->mListenerConfigs)
+		{
+			Component* component = this->GetComponent<Component>(listenConfig->Handler);
+			auto socketHandler = dynamic_cast<ISocketListen*>(component);
+			if (socketHandler == nullptr)
+			{
+				LOG_ERROR("not find socket handler ", listenConfig->Handler);
+				return false;
+			}
 #ifdef ONLY_MAIN_THREAD
-            IAsioThread &netThread = App::Get()->GetTaskScheduler();
+			IAsioThread& netThread = App::Get()->GetTaskScheduler();
 #else
-            IAsioThread &netThread = taskComponent->AllocateNetThread();
+			IAsioThread &netThread = taskComponent->AllocateNetThread();
 #endif
-            if (listenConfig->Port != 0)
-            {
-                auto listener = new NetworkListener(netThread, *listenConfig);
-                this->mListeners.push_back(listener);
-            }
-        }
-        return true;
-    }
+			if (listenConfig->Port != 0)
+			{
+				auto listener = new NetworkListener(netThread, *listenConfig);
+				this->mListeners.push_back(listener);
+			}
+		}
+		return true;
+	}
 
-    void TcpServerComponent::OnStart()
-    {
-        for (auto listener : this->mListeners)
-        {
-            const ListenConfig &config = listener->GetConfig();
-            Component *component = this->GetComponent<Component>(config.Handler);
-            if (auto handler = dynamic_cast<ISocketListen *>(component))
-            {
-                if (listener->StartListen(handler))
-                {
-                    const ListenConfig &config = listener->GetConfig();
+	void TcpServerComponent::OnStart()
+	{
+		for (auto listener : this->mListeners)
+		{
+			const ListenConfig& config = listener->GetConfig();
+			Component* component = this->GetComponent<Component>(config.Handler);
+			if (auto handler = dynamic_cast<ISocketListen*>(component))
+			{
+				if (listener->StartListen(handler))
+				{
+					const ListenConfig& config = listener->GetConfig();
 					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
-                }
-            }
-        }
-    }
+				}
+			}
+		}
+	}
 }

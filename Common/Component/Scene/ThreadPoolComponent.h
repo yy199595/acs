@@ -6,40 +6,43 @@
 #include "Util/NumberBuilder.h"
 namespace Sentry
 {
-    class TaskProxy;
+	class TaskProxy;
 
-    class ThreadPoolComponent : public Component
-    {
-    public:
-        ThreadPoolComponent() = default;
-        ~ThreadPoolComponent() final = default;
+	class ThreadPoolComponent : public Component
+	{
+	 public:
+		ThreadPoolComponent() = default;
+		~ThreadPoolComponent() final = default;
 
-    public:
-        bool Awake() final;
+	 public:
+		bool Awake() final;
 
-        bool LateAwake() final;
+		bool LateAwake() final;
 
 		void OnDestory() final;
-    public:
+	 public:
 
-        bool StartTask(TaskProxy * taskAction);
+		bool StartTask(TaskProxy* taskAction);
 
-        void GetAllThread(std::vector<const IThread *> & threads);
+		void GetAllThread(std::vector<const IThread*>& threads);
 
-        const std::vector<TaskThread *> & GetThreads() { return this->mThreadArray;}
+		const std::vector<TaskThread*>& GetThreads()
+		{
+			return this->mThreadArray;
+		}
 
-	public:
+	 public:
 #ifndef ONLY_MAIN_THREAD
-        IAsioThread & AllocateNetThread();
+		IAsioThread & AllocateNetThread();
 #endif
-    private:
-        size_t mIndex;
-        std::mutex mLock;
-        std::thread * mMonitorThread;
-        std::vector<TaskThread *> mThreadArray;
+	 private:
+		size_t mIndex;
+		std::mutex mLock;
+		std::thread* mMonitorThread;
+		std::vector<TaskThread*> mThreadArray;
 #ifndef ONLY_MAIN_THREAD
 		std::vector<NetWorkThread *> mNetThreads;
 #endif
-		NumberBuilder<unsigned int> mTaskNumberPool;       
-    };
+		NumberBuilder<unsigned int> mTaskNumberPool;
+	};
 }

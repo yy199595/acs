@@ -42,14 +42,14 @@ namespace Sentry
 	class TaskComponent;
 	class CoroutineGroup
 	{
-	public:
+	 public:
 		explicit CoroutineGroup(size_t count);
-        ~CoroutineGroup() = default;
-    public:
-        void FinishAny();
-	private:
-        size_t mCount;
+		~CoroutineGroup() = default;
+	 public:
+		void FinishAny();
+	 private:
+		size_t mCount;
 		unsigned int mCoroutineId;
-		TaskComponent * mCorComponent;
+		TaskComponent* mCorComponent;
 	};
 }

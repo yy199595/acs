@@ -8,18 +8,18 @@
 #include"Component/Service/HttpService.h"
 namespace Sentry
 {
-    class HttpNodeService : public HttpService
-    {
-    public:
-        HttpNodeService() = default;
-        ~HttpNodeService() final = default;
-    public:
-        XCode Push(const Json::Reader & request, Json::Writer & response);
-    protected:
-        bool Awake() final;
-        bool LateAwake() final;
-    private:
-        class ServiceMgrComponent * mServiceComponent;
-    };
+	class HttpNodeService : public HttpService
+	{
+	 public:
+		HttpNodeService() = default;
+		~HttpNodeService() final = default;
+	 public:
+		XCode Push(const Json::Reader& request, Json::Writer& response);
+	 protected:
+		bool Awake() final;
+		bool LateAwake() final;
+	 private:
+		class ServiceMgrComponent* mServiceComponent;
+	};
 }
 #endif //SENTRY_HTTPNODESERVICE_H

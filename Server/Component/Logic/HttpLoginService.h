@@ -7,17 +7,17 @@
 #include"Component/Service/HttpServiceComponent.h"
 namespace Sentry
 {
-    class HttpLoginService : public HttpServiceComponent
-    {
-    public:
-        HttpLoginService() = default;
-        ~HttpLoginService() final = default;
+	class HttpLoginService : public HttpServiceComponent
+	{
+	 public:
+		HttpLoginService() = default;
+		~HttpLoginService() final = default;
 
-    protected:
-        bool Awake() final;
-        bool LateAwake() final;
-    private:
-        XCode Login(const Json::Reader & request, Json::Writer & response);
-    };
+	 protected:
+		bool Awake() final;
+		bool LateAwake() final;
+	 private:
+		XCode Login(const Json::Reader& request, Json::Writer& response);
+	};
 }
 #endif //GAMEKEEPER_HTTPLOGINSERVICE_H

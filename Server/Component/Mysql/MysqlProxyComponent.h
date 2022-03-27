@@ -29,16 +29,16 @@ namespace Sentry
 		XCode Save(const T& data);
 
 		template<typename T>
-		std::shared_ptr<T> QueryOnce(const std::string & queryJson);
+		std::shared_ptr<T> QueryOnce(const std::string& queryJson);
 
 		template<typename T>
-		std::vector<std::shared_ptr<T>> QueryAll(const std::string & queryJson);
+		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson);
 
 		template<typename T>
-		XCode Delete(const std::string & deleteJson);
+		XCode Delete(const std::string& deleteJson);
 
 		template<typename T>
-		XCode Update(const std::string & updateJson, const std::string & whereJson);
+		XCode Update(const std::string& updateJson, const std::string& whereJson);
 
 		std::shared_ptr<s2s::Mysql::Response>
 		Invoke(const std::string& sql);
@@ -78,7 +78,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	std::shared_ptr<T> MysqlProxyComponent::QueryOnce(const std::string & queryJson)
+	std::shared_ptr<T> MysqlProxyComponent::QueryOnce(const std::string& queryJson)
 	{
 		std::shared_ptr<T> queryData(new T());
 
@@ -93,7 +93,7 @@ namespace Sentry
 		auto response = taskSource->GetResponse();
 		if (response != nullptr && response->json_array_size() > 0)
 		{
-			const std::string & json = response->json_array(0);
+			const std::string& json = response->json_array(0);
 			util::Status status = util::JsonStringToMessage(json, queryData.get());
 			return status.ok() ? queryData : nullptr;
 		}
@@ -102,7 +102,7 @@ namespace Sentry
 
 	template<typename T>
 	std::vector<std::shared_ptr<T>>
-	MysqlProxyComponent::QueryAll(const std::string & queryJson)
+	MysqlProxyComponent::QueryAll(const std::string& queryJson)
 	{
 		std::shared_ptr<T> queryData(new T());
 
@@ -118,7 +118,7 @@ namespace Sentry
 		auto response = taskSource->GetResponse();
 		for (int index = 0; index < response->json_array_size(); index++)
 		{
-			const std::string & json = response->json_array(index);
+			const std::string& json = response->json_array(index);
 			std::shared_ptr<T> jsonData(new T());
 			if (util::JsonStringToMessage(json, jsonData.get()).ok())
 			{
@@ -164,7 +164,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlProxyComponent::Update(const std::string & updateJson, const std::string& whereJson)
+	XCode MysqlProxyComponent::Update(const std::string& updateJson, const std::string& whereJson)
 	{
 		s2s::Mysql::Update request;
 		std::shared_ptr<T> data(new T());

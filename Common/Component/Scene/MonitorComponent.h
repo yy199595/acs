@@ -7,20 +7,20 @@
 #include "Component/Component.h"
 namespace Sentry
 {
-    class MonitorComponent : public Component
-    {
-    public:
-        MonitorComponent() = default;
-        ~MonitorComponent() final = default;
-    protected:
-        bool Awake() final;
-        bool LateAwake() final;
-    private:
-        void Update();
-    private:
-        bool mIsClose;
-        std::thread * mThread;		
-        ThreadPoolComponent * mTaskComponent;
-    };
+	class MonitorComponent : public Component
+	{
+	 public:
+		MonitorComponent() = default;
+		~MonitorComponent() final = default;
+	 protected:
+		bool Awake() final;
+		bool LateAwake() final;
+	 private:
+		void Update();
+	 private:
+		bool mIsClose;
+		std::thread* mThread;
+		ThreadPoolComponent* mTaskComponent;
+	};
 }
 #endif //GameKeeper_DEAMONCOMPONENT_H

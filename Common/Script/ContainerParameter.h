@@ -320,38 +320,39 @@ namespace ContainerParameter
 // map指针
 namespace ContainerParameter
 {
-    template<typename Key, typename Value>
-    struct ContainerStruct<std::map<Key, Value> *> {
-        // 注意释放内存
-        static std::map<Key, Value> *Read(lua_State *lua, int index)
-        {
+	template<typename Key, typename Value>
+	struct ContainerStruct<std::map<Key, Value>*>
+	{
+		// 注意释放内存
+		static std::map<Key, Value>* Read(lua_State* lua, int index)
+		{
 			assert(lua_istable(lua, index));
-			std::map<Key, Value> *ret = new std::map<Key, Value>();
-            lua_pushnil(lua);
-            while (lua_next(lua, index) != 0)
-            {
-                lua_type(lua, -1);
-                const Key key = LuaParameter::Read<Key>(lua, -2);
-                const Value value = LuaParameter::Read<Value>(lua, -1);
-                ret->insert(std::make_pair(key, value));
-                lua_pop(lua, 1);
-            }
-            return ret;
-        }
+			std::map<Key, Value>* ret = new std::map<Key, Value>();
+			lua_pushnil(lua);
+			while (lua_next(lua, index) != 0)
+			{
+				lua_type(lua, -1);
+				const Key key = LuaParameter::Read<Key>(lua, -2);
+				const Value value = LuaParameter::Read<Value>(lua, -1);
+				ret->insert(std::make_pair(key, value));
+				lua_pop(lua, 1);
+			}
+			return ret;
+		}
 
-        static void Write(lua_State *lua, std::map<Key, Value> *data)
-        {
-            lua_newtable(lua);
-            int top = lua_gettop(lua);
-            typedef typename std::map<Key, Value>::iterator MapIterator;
-            MapIterator iter = data->begin();
-            for (; iter != data->end(); iter++)
-            {
-                LuaParameter::Write<Key>(lua, iter->first);
-                LuaParameter::Write<Value>(lua, iter->second);
-                lua_settable(lua, -3);
-            }
-            lua_settop(lua, top);
-        }
-    };
+		static void Write(lua_State* lua, std::map<Key, Value>* data)
+		{
+			lua_newtable(lua);
+			int top = lua_gettop(lua);
+			typedef typename std::map<Key, Value>::iterator MapIterator;
+			MapIterator iter = data->begin();
+			for (; iter != data->end(); iter++)
+			{
+				LuaParameter::Write<Key>(lua, iter->first);
+				LuaParameter::Write<Value>(lua, iter->second);
+				lua_settable(lua, -3);
+			}
+			lua_settop(lua, top);
+		}
+	};
 }// namespace ContainerParameter

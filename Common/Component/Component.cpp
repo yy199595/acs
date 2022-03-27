@@ -5,13 +5,13 @@ namespace Sentry
 	Component::Component()
 		: mEntity(nullptr)
 	{
-        this->mEntityId = 0;
-        this->mType = nullptr;
+		this->mEntityId = 0;
+		this->mType = nullptr;
 	}
-	
-	Component * Component::GetByHash(size_t hash)
+
+	Component* Component::GetByHash(size_t hash)
 	{
-		Type * type = ComponentFactory::GetType(hash);
+		Type* type = ComponentFactory::GetType(hash);
 		if (type == nullptr)
 		{
 			return nullptr;
@@ -19,14 +19,13 @@ namespace Sentry
 		return this->mEntity->GetComponentByName(type->Name);
 	}
 
-    Component *Component::GetByName(const std::string &name)
-    {
-        return this->mEntity->GetComponentByName(name);
-    }
+	Component* Component::GetByName(const std::string& name)
+	{
+		return this->mEntity->GetComponentByName(name);
+	}
 
-    void Component::GetComponents(std::vector<Component *> &components)
-    {
-        this->mEntity->GetComponents(components);
-    }
-
+	void Component::GetComponents(std::vector<Component*>& components)
+	{
+		this->mEntity->GetComponents(components);
+	}
 }

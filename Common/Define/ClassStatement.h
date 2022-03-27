@@ -11,8 +11,8 @@ public:
 namespace Sentry
 {
 	template<typename T>
-	inline bool GetTypeName(std::string & name) 
-	{ 
+	inline bool GetTypeName(std::string& name)
+	{
 		if (TypeReflection<T>::Value)
 		{
 			name.assign(TypeReflection<T>::Name);

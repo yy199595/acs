@@ -8,26 +8,32 @@
 
 namespace Sentry
 {
-    class RpcComponent;
-    class GateComponent;
-    class RpcProxyTask : public IRpcTask
-    {
-    public:
-        RpcProxyTask();
-        ~RpcProxyTask() = default;
-    public:
-        void InitProxyTask(long long rpcId, long long sockId,
-                           GateComponent * component, RpcComponent * rpcComponent );
-        long long GetRpcId() final { return this->mTaskRpcId; }
-    protected:
-        int GetTimeout() final { return 0;}
-        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
-    private:
-        long long mRpcId;
-        long long mSockId;
-        long long mTaskRpcId;
-        GateComponent * mGateComponent;
-    };
+	class RpcComponent;
+	class GateComponent;
+	class RpcProxyTask : public IRpcTask
+	{
+	 public:
+		RpcProxyTask();
+		~RpcProxyTask() = default;
+	 public:
+		void InitProxyTask(long long rpcId, long long sockId,
+			GateComponent* component, RpcComponent* rpcComponent);
+		long long GetRpcId() final
+		{
+			return this->mTaskRpcId;
+		}
+	 protected:
+		int GetTimeout() final
+		{
+			return 0;
+		}
+		void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
+	 private:
+		long long mRpcId;
+		long long mSockId;
+		long long mTaskRpcId;
+		GateComponent* mGateComponent;
+	};
 }
 
 

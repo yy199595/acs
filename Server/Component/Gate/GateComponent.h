@@ -9,25 +9,25 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class GateComponent : public Component,
-                          public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>
-    {
-    public:
-        GateComponent() = default;
-        ~GateComponent() final = default;
-    protected:
-        bool Awake() final;
-        bool LateAwake() final;
-    public:
-        XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
-        XCode OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response) final;
-    private:
-        std::string mProtoName;
-        class RpcComponent * mRpcComponent;
-        class ServiceMgrComponent * mServiceComponent;
-        class RpcConfigComponent * mRpcConfigComponent;
-        class GateClientComponent * mGateClientComponent;
-    };
+	class GateComponent : public Component,
+						  public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+	{
+	 public:
+		GateComponent() = default;
+		~GateComponent() final = default;
+	 protected:
+		bool Awake() final;
+		bool LateAwake() final;
+	 public:
+		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
+		XCode OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response) final;
+	 private:
+		std::string mProtoName;
+		class RpcComponent* mRpcComponent;
+		class ServiceMgrComponent* mServiceComponent;
+		class RpcConfigComponent* mRpcConfigComponent;
+		class GateClientComponent* mGateClientComponent;
+	};
 }
 
 

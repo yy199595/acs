@@ -267,28 +267,28 @@ namespace Sentry
 
 namespace Sentry
 {
-    HttpHandlerResponse::HttpHandlerResponse(HttpStatus status)
-    {
-        std::ostream os(&this->mStreamBuffer);
-        os << HttpVersion << ' ' << (int)status << ' ' << HttpStatusToString(status) << "\r\n";
-    }
+	HttpHandlerResponse::HttpHandlerResponse(HttpStatus status)
+	{
+		std::ostream os(&this->mStreamBuffer);
+		os << HttpVersion << ' ' << (int)status << ' ' << HttpStatusToString(status) << "\r\n";
+	}
 
-    void HttpHandlerResponse::AddValue(const std::string &content)
-    {
-        std::ostream os(&this->mStreamBuffer);
-        os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
-        os << "Content-Length: " << content.size()<< "\r\n";
-        os << "\r\n";
-        os.write(content.c_str(), content.size());
-    }
+	void HttpHandlerResponse::AddValue(const std::string& content)
+	{
+		std::ostream os(&this->mStreamBuffer);
+		os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
+		os << "Content-Length: " << content.size() << "\r\n";
+		os << "\r\n";
+		os.write(content.c_str(), content.size());
+	}
 
-    void HttpHandlerResponse::AddValue(Json::Writer &jsonWriter)
-    {
-        std::ostream os(&this->mStreamBuffer);
+	void HttpHandlerResponse::AddValue(Json::Writer& jsonWriter)
+	{
+		std::ostream os(&this->mStreamBuffer);
 		const std::string json = jsonWriter.ToJsonString();
-        os << "Content-Type: application/json; charset=utf-8" << "\r\n";
-        os << "Content-Length: " << json.size()<< "\r\n";
-        os << "\r\n";
-        os.write(json.c_str(), json.size());
-    }
+		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
+		os << "Content-Length: " << json.size() << "\r\n";
+		os << "\r\n";
+		os.write(json.c_str(), json.size());
+	}
 }

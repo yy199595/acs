@@ -81,8 +81,8 @@ namespace Sentry
 			}
 			for (Component* component : this->mSceneComponents)
 			{
-				IComplete * complete = component->Cast<IComplete>();
-				if(complete != nullptr)
+				IComplete* complete = component->Cast<IComplete>();
+				if (complete != nullptr)
 				{
 					complete->OnComplete();
 				}
@@ -99,10 +99,10 @@ namespace Sentry
 		{
 			return false;
 		}
-		IFrameUpdate * manager1 = component->Cast<IFrameUpdate>();
-		ISystemUpdate * manager2 = component->Cast<ISystemUpdate>();
-		ISecondUpdate * manager3 = component->Cast<ISecondUpdate>();
-		ILastFrameUpdate * manager4 = component->Cast<ILastFrameUpdate>();
+		IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
+		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
+		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
+		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
 		TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
 		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
@@ -114,8 +114,8 @@ namespace Sentry
 	void App::StartComponent(Component* component)
 	{
 		ElapsedTimer elapsedTimer;
-		IStart * startComponent = component->Cast<IStart>();
-		ILoadData * loadComponent = component->Cast<ILoadData>();
+		IStart* startComponent = component->Cast<IStart>();
+		ILoadData* loadComponent = component->Cast<ILoadData>();
 		if (startComponent != nullptr) startComponent->OnStart();
 		if (loadComponent != nullptr) loadComponent->OnLoadData();
 		LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());

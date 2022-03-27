@@ -26,10 +26,6 @@ namespace Sentry
 		MysqlClient* ConnectMysql();
 		MysqlClient* GetMysqlClient();
 	 public:
-		bool GetTableName(const std::string& pb, std::string& table);
-
-		bool GetProtoByTable(const std::string& tab, std::string& proto);
-	 public:
 		bool ToSqlCommand(const s2s::Mysql::Add& messageData, std::string& sqlCommand);
 
 		bool ToSqlCommand(const s2s::Mysql::Save& messageData, std::string& sqlCommand);

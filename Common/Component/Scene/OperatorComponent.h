@@ -7,26 +7,26 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class OperatorComponent : public Component
-    {
-    public:
-        OperatorComponent() = default;
-        ~OperatorComponent() final = default;
+	class OperatorComponent : public Component
+	{
+	 public:
+		OperatorComponent() = default;
+		~OperatorComponent() final = default;
 
-    protected:
-        bool Awake() final;
-        bool LateAwake() final;
-        void StartRefreshDay(const std::string & component);
-    public:
-        void StartHotfix();
-        bool StartLoadConfig();
+	 protected:
+		bool Awake() final;
+		bool LateAwake() final;
+		void StartRefreshDay(const std::string& component);
+	 public:
+		void StartHotfix();
+		bool StartLoadConfig();
 
-    private:
-        void AddRefreshTimer(Component * component);
+	 private:
+		void AddRefreshTimer(Component* component);
 
-    private:
-        unsigned int mRefreshTimerId;
-        class TimerComponent * mTimerComponent;
-    };
+	 private:
+		unsigned int mRefreshTimerId;
+		class TimerComponent* mTimerComponent;
+	};
 }
 #endif //GAMEKEEPER_OPERATORCOMPONENT_H

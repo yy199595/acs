@@ -22,10 +22,10 @@ namespace Json
 		{
 			return this->mJson;
 		}
-		bool ParseJson(const std::string & json);
+		bool ParseJson(const std::string& json);
 		bool ParseJson(const char* json, const size_t size);
 	 public:
-		bool GetMember(const char * key, XCode & code) const;
+		bool GetMember(const char* key, XCode& code) const;
 		bool GetMember(const char* key, int& value) const;
 		bool GetMember(const char* key, bool& value) const;
 		bool GetMember(const char* key, short& value) const;
@@ -34,7 +34,7 @@ namespace Json
 		bool GetMember(const char* key, long long& value) const;
 		bool GetMember(const char* key, unsigned int& value) const;
 		bool GetMember(const char* key, std::string& value) const;
-		bool GetMember(const char* key, unsigned short & value) const;
+		bool GetMember(const char* key, unsigned short& value) const;
 		bool GetMember(const char* key, std::vector<int>& value) const;
 		bool GetMember(const char* key, std::vector<long long>& value) const;
 		bool GetMember(const char* key, std::vector<std::string>& value) const;
@@ -52,13 +52,13 @@ namespace Json
 		bool GetMember(const char* k1, const char* k2, std::vector<long long>& value) const;
 		bool GetMember(const char* k1, const char* k2, std::vector<std::string>& value) const;
 	 public:
-		bool GetMember(const char * k1, std::vector<const rapidjson::Value *> & value) const;
-		bool GetMember(const char * k1, std::unordered_map<std::string, const rapidjson::Value *> & value) const;
+		bool GetMember(const char* k1, std::vector<const rapidjson::Value*>& value) const;
+		bool GetMember(const char* k1, std::unordered_map<std::string, const rapidjson::Value*>& value) const;
 
 	 public:
-		bool GetMember(std::vector<int> & value) const;
-		bool GetMember(std::vector<long long> & value) const;
-		bool GetMember(std::vector<std::string> & value) const;
+		bool GetMember(std::vector<int>& value) const;
+		bool GetMember(std::vector<long long>& value) const;
+		bool GetMember(std::vector<std::string>& value) const;
 
 	 public:
 		const rapidjson::Value* GetJsonValue(const char* key) const;

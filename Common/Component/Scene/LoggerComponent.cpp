@@ -9,19 +9,19 @@ namespace Sentry
 {
 	// 单线程  st  多线程  mt
 	bool LoggerComponent::Awake()
-    {
-        const ServerConfig &config = App::Get()->GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetMember("node_name", this->mServerName));
-        LOG_CHECK_RET_FALSE(config.GetMember("log", "path", this->mLogSavePath));
-        LOG_CHECK_RET_FALSE(config.GetMember("log", "save", this->mLogSaveTime));
-        this->CreateLogFile();
-        return true;
-    }
+	{
+		const ServerConfig& config = App::Get()->GetConfig();
+		LOG_CHECK_RET_FALSE(config.GetMember("node_name", this->mServerName));
+		LOG_CHECK_RET_FALSE(config.GetMember("log", "path", this->mLogSavePath));
+		LOG_CHECK_RET_FALSE(config.GetMember("log", "save", this->mLogSaveTime));
+		this->CreateLogFile();
+		return true;
+	}
 
-    bool LoggerComponent::LateAwake()
-    {
-        return true;
-    }
+	bool LoggerComponent::LateAwake()
+	{
+		return true;
+	}
 
 	void LoggerComponent::OnZeroRefresh()
 	{
@@ -100,7 +100,8 @@ namespace Sentry
 #else
 #ifdef __DEBUG__
 		spdlog::set_level(spdlog::level::level_enum::debug);
-		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>("All", logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>("All",
+			logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #else
 		this->mInfoLog = spdlog::rotating_logger_st<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mDebugLog = spdlog::rotating_logger_st<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
@@ -113,7 +114,7 @@ namespace Sentry
 #endif
 	}
 
-	void LoggerComponent::AddInfoLog(const std::string & log)
+	void LoggerComponent::AddInfoLog(const std::string& log)
 	{
 #ifdef _WIN32
 		std::string time = Helper::Time::GetDateString();
@@ -127,9 +128,9 @@ namespace Sentry
 #endif
 	}
 
-	void LoggerComponent::AddErrorLog(const std::string & log)
+	void LoggerComponent::AddErrorLog(const std::string& log)
 	{
-		
+
 #ifdef _WIN32
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -141,7 +142,7 @@ namespace Sentry
 #endif
 	}
 
-	void LoggerComponent::AddDebugLog(const std::string & log)
+	void LoggerComponent::AddDebugLog(const std::string& log)
 	{
 
 #ifdef _WIN32
@@ -155,8 +156,8 @@ namespace Sentry
 #endif
 	}
 
-	void LoggerComponent::AddFatalLog(const std::string & log)
-	{		
+	void LoggerComponent::AddFatalLog(const std::string& log)
+	{
 #ifdef _WIN32
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -167,16 +168,16 @@ namespace Sentry
 		std::string time = Helper::Time::GetDateString();
 		printf("%s%s [Fatal  ] %s\e[0m\n", "\e[35m", time.c_str(), log.c_str());
 #endif
-        StackTrace st;
-        st.load_here(64);
-        Printer p;
-        p.color_mode = ColorMode::always;
-        p.print(st, stderr);
+		StackTrace st;
+		st.load_here(64);
+		Printer p;
+		p.color_mode = ColorMode::always;
+		p.print(st, stderr);
 	}
 
-	void LoggerComponent::AddWarningLog(const std::string & log)
-	{		
-		
+	void LoggerComponent::AddWarningLog(const std::string& log)
+	{
+
 #ifdef _WIN32
 		std::string time = Helper::Time::GetDateString();
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),

@@ -71,19 +71,19 @@ namespace Sentry
 namespace Sentry
 {
 	CoroutineGroup::CoroutineGroup(size_t size)
-    {
-        this->mCount = size;
-        this->mCorComponent = App::Get()->GetTaskComponent();
-        this->mCoroutineId = this->mCorComponent->GetContextId();
-    }
+	{
+		this->mCount = size;
+		this->mCorComponent = App::Get()->GetTaskComponent();
+		this->mCoroutineId = this->mCorComponent->GetContextId();
+	}
 
-    void CoroutineGroup::FinishAny()
-    {
-        this->mCount--;
-        if(this->mCount == 0)
-        {
-            this->mCorComponent->Resume(this->mCoroutineId);
-            delete this;
-        }
-    }
+	void CoroutineGroup::FinishAny()
+	{
+		this->mCount--;
+		if (this->mCount == 0)
+		{
+			this->mCorComponent->Resume(this->mCoroutineId);
+			delete this;
+		}
+	}
 }
