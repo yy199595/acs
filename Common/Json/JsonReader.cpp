@@ -44,6 +44,17 @@ namespace Json
 		return iter != this->mJsonDocument.MemberEnd() ? &iter->value : nullptr;
 	}
 
+	bool Reader::GetMember(const char* key, XCode& code) const
+	{
+		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		if(jsonValue != nullptr && jsonValue->IsInt())
+		{
+			code = (XCode)jsonValue->GetInt();
+			return true;
+		}
+		return false;
+	}
+
 	bool Reader::GetMember(const char* key, int& value) const
 	{
 		const rapidjson::Value * jsonValue = this->GetJsonValue(key);

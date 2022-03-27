@@ -1,25 +1,25 @@
-﻿#include"AccountService.h"
+﻿#include"HttpUserService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
+#include"Service/ServiceProxy.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql//MysqlProxyComponent.h"
 #include"Component/Scene/ServiceMgrComponent.h"
-#include"Service/ServiceProxy.h"
-#include"DB/Mysql/MysqlRpcTaskSource.h"
+
 namespace Sentry
 {
-    bool AccountService::Awake()
+    bool HttpUserService::Awake()
     {
         this->mRedisComponent = nullptr;
         this->mMysqlComponent = nullptr;
-        BIND_HTTP_FUNCTION(AccountService::Login);
-        BIND_HTTP_FUNCTION(AccountService::Register);
+        BIND_HTTP_FUNCTION(HttpUserService::Login);
+        BIND_HTTP_FUNCTION(HttpUserService::Register);
 		return true;
     }
 
-    bool AccountService::LateAwake()
+    bool HttpUserService::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
         LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
@@ -28,7 +28,7 @@ namespace Sentry
         return true;
     }
 
-    XCode AccountService::Login(const Json::Reader &request, Json::Writer &response)
+    XCode HttpUserService::Login(const Json::Reader &request, Json::Writer &response)
     {
         string account, password;
         LOGIC_THROW_ERROR(request.GetMember("account", account));
@@ -75,7 +75,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode AccountService::Register(const Json::Reader &request, Json::Writer &response)
+    XCode HttpUserService::Register(const Json::Reader &request, Json::Writer &response)
     {
         long long phoneNumber = 0;
         string user_account, user_password;
@@ -97,7 +97,7 @@ namespace Sentry
         return this->mMysqlComponent->Add(userAccountInfo);
     }
 
-    const std::string AccountService::NewToken(const std::string & account)
+    const std::string HttpUserService::NewToken(const std::string & account)
     {
         char buffer[100] = {0};
         int number = Helper::Math::Random<int>();

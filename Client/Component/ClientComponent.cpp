@@ -58,68 +58,7 @@ namespace Client
 
 	void ClientComponent::OnComplete()
 	{
-        string host;
-        const ServerConfig & config = App::Get()->GetConfig();
-        config.GetMember("http", "account", host);
-        std::string loginUrl = host + "/logic/account/login";
-        std::string registerUrl = host + "/logic/account/register";
-
-        Json::Writer jsonWriter;
-        jsonWriter.AddMember("password", "199595yjz.");
-        jsonWriter.AddMember("account", "646585122@qq.com");
-        jsonWriter.AddMember("phone_num", (long long)13716061995);
-        auto registerResponse = this->mHttpComponent->Post(registerUrl, jsonWriter);
-        std::shared_ptr<Json::Reader> rapidJsonReader = registerResponse->ToJsonReader();
-
-
-        Json::Writer loginJsonWriter;
-        loginJsonWriter.AddMember("password", "199595yjz.");
-        loginJsonWriter.AddMember("account","646585122@qq.com");
-        auto loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
-
-        std::shared_ptr<Json::Reader> loginJsonResponse = loginResponse->ToJsonReader();
-
-        loginJsonResponse->GetMember("gate_ip", this->mIp);
-        loginJsonResponse->GetMember("gate_port", this->mPort);
-        std::string content = loginResponse->GetContent();
-
-		IAsioThread & netThread = App::Get()->GetTaskScheduler();
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
-		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
-
-        int count = 0;
-        while(!this->mTcpClient->ConnectAsync(this->mIp, this->mPort)->Await())
-        {
-            LOG_ERROR("connect server failure count = ", ++count);
-            this->mTaskComponent->Sleep(1000);
-        }
-
-		this->mTcpClient->StartReceive();
-		LOG_DEBUG("connect server successful");
-
-        std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-		const std::string method = "AccountService.Register";
-
-		c2s::AccountRegister_Request registerRequest;
-        registerRequest.set_account("112233@qq.com");
-        registerRequest.set_password("==================");
-
-
-		requestMessage->set_rpc_id(1);
-		requestMessage->set_method_name(method);
-		requestMessage->mutable_data()->PackFrom(registerRequest);
-
-        while(this->mTcpClient->IsOpen())
-        {
-            ElapsedTimer timer;
-            c2s::GateLogin gateLoginData;
-
-            //this->Call("GateService.Login", )
-
-
-            this->mTaskComponent->Sleep(10);
-
-        }
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}
 
     XCode ClientComponent::Call(const std::string &name, std::shared_ptr<Message> response)
@@ -159,5 +98,92 @@ namespace Client
 //			this->mRpcTasks.erase(iter);
 //			rpcTask->SetResult(nullptr);
 //		}
+	}
+	void ClientComponent::StartClient()
+	{
+		this->mTaskComponent->Sleep(2000);
+
+		std::string loginUrl;
+		std::string registerUrl;
+		std::string userAccount = "646585122@qq.com";
+		std::string userPassword = "199595yjz.";
+		long long userPhoneNumber = 13716061995;
+		const ServerConfig& config = App::Get()->GetConfig();
+		LOG_CHECK_RET(config.GetMember("url", "login", loginUrl));
+		LOG_CHECK_RET(config.GetMember("url", "register", registerUrl));
+
+		Json::Writer jsonWriter;
+		jsonWriter.AddMember("password", userPassword);
+		jsonWriter.AddMember("account", userAccount);
+		jsonWriter.AddMember("phone_num", userPhoneNumber);
+		std::shared_ptr<HttpAsyncResponse> registerResponse = this->mHttpComponent->Post(registerUrl, jsonWriter);
+		std::shared_ptr<Json::Reader> registerReader = registerResponse->ToJsonReader();
+
+		XCode code = XCode::Successful;
+		LOG_CHECK_FATAL(registerReader->GetMember("code", code));
+		if(code != XCode::Successful)
+		{
+			std::string error;
+			registerReader->GetMember("error", error);
+			LOG_WARN("register {0} failure error = {1}", userAccount, error);
+		}
+		else
+		{
+			LOG_DEBUG("register {0} successful", userAccount);
+		}
+
+		Json::Writer loginJsonWriter;
+		loginJsonWriter.AddMember("account", userAccount);
+		loginJsonWriter.AddMember("password", userPassword);
+		std::shared_ptr<HttpAsyncResponse> loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
+
+		std::shared_ptr<Json::Reader> loginJsonResponse = loginResponse->ToJsonReader();
+		LOG_CHECK_FATAL(registerReader->GetMember("code", code));
+		if(code != XCode::Successful)
+		{
+			std::string error;
+			registerReader->GetMember("error", error);
+			LOG_ERROR("login account {0} failure error = {1}", userAccount, error);
+			return;
+		}
+		LOG_DEBUG("{0} login successful", userAccount);
+		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_ip", this->mIp));
+		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_port", this->mPort));
+
+		std::string content = loginResponse->GetContent();
+		IAsioThread& netThread = App::Get()->GetTaskScheduler();
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
+		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
+
+		int count = 0;
+		while (!this->mTcpClient->ConnectAsync(this->mIp, this->mPort)->Await())
+		{
+			LOG_ERROR("connect server failure count = ", ++count);
+			this->mTaskComponent->Sleep(1000);
+		}
+
+		this->mTcpClient->StartReceive();
+		LOG_DEBUG("connect {0}:{1} successful", this->mIp, this->mPort);
+		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
+		const std::string method = "HttpUserService.Register";
+
+		c2s::AccountRegister_Request registerRequest;
+		registerRequest.set_account("112233@qq.com");
+		registerRequest.set_password("==================");
+
+		requestMessage->set_rpc_id(1);
+		requestMessage->set_method_name(method);
+		requestMessage->mutable_data()->PackFrom(registerRequest);
+
+		while (this->mTcpClient->IsOpen())
+		{
+			ElapsedTimer timer;
+			c2s::GateLogin gateLoginData;
+
+			//this->Call("GateService.Login", )
+
+			this->mTaskComponent->Sleep(10);
+
+		}
 	}
 }

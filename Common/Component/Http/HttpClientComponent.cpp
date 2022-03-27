@@ -33,6 +33,10 @@ namespace Sentry
                 httpConfig->Type = jsonValue["Type"].GetString();
                 httpConfig->MethodName = jsonValue["Method"].GetString();
                 httpConfig->Component = jsonValue["Component"].GetString();
+				if(jsonValue.HasMember("Content"))
+				{
+					httpConfig->Content = jsonValue["Content"].GetString();
+				}
                 this->mHttpConfigMap.emplace(httpConfig->Url, httpConfig);
             }
         }
@@ -97,63 +101,67 @@ namespace Sentry
     {
         std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->ReadHandlerContent();
         LOG_CHECK_RET(httpRequestData);
-#ifdef __DEBUG__
-        ElapsedTimer elapsedTimer;
-        LOG_INFO("==== http request handler ====");
-        LOG_INFO("url = {}", httpRequestData->GetUrl());
-        LOG_INFO("type = {}", httpRequestData->GetMethod());
-        if(!httpRequestData->GetContent().empty())
-        {
-            LOG_INFO("message = {}", httpRequestData->GetContent());
-        }
-#endif
+
+		std::string host;
         const std::string &url = httpRequestData->GetUrl();
         const HttpConfig * httpConfig = this->GetHttpConfig(url);
-        if(httpConfig == nullptr)
-        {
-            Json::Writer jsonWriter;
-            jsonWriter.AddMember("code", (int) XCode::CallServiceNotFound);
-            jsonWriter.AddMember("error", fmt::format("not find url : [{0}]", url));
-            httpClient->Response(HttpStatus::NOT_FOUND, jsonWriter);
-            return;
-        }
-
-        if(httpConfig->Type != httpRequestData->GetMethod())
-        {
-            Json::Writer jsonWriter;
-            jsonWriter.AddMember("code", (int)XCode::HttpMethodNotFound);
-            httpClient->Response(HttpStatus::METHOD_NOT_ALLOWED, jsonWriter);
-            return;
-        }
-        std::shared_ptr<Json::Reader> jsonReader = httpRequestData->ToJsonReader();
-        if (jsonReader == nullptr)
-        {
-            Json::Writer jsonWriter;
-            jsonWriter.AddMember("code", (int) XCode::ParseJsonFailure);
-            jsonWriter.AddMember("error", "parse json failure");
-            httpClient->Response(HttpStatus::OK, jsonWriter);
-            return;
-        }
-
-        HttpService *httpService = this->GetComponent<HttpService>(httpConfig->Component);
-        if (httpService == nullptr)
-        {
-            Json::Writer jsonWriter;
-            jsonWriter.AddMember("code", (int) XCode::CallServiceNotFound);
-            jsonWriter.AddMember("error", "not find handler component");
-            httpClient->Response(HttpStatus::OK, jsonWriter);
-            return;
-        }
-        const std::string &method = httpConfig->MethodName;
-        auto jsonResponse = httpService->Invoke(method, jsonReader);
-        if (jsonResponse != nullptr)
-        {
-            httpClient->Response(HttpStatus::OK, *jsonResponse);
-        }
+		httpRequestData->GetHeadContent("host",  host);
 #ifdef __DEBUG__
-        LOG_INFO("http data response successful [{0}]ms", elapsedTimer.GetMs());
+		ElapsedTimer elapsedTimer;
+		LOG_INFO("http://{0}{1}", host, url);
+		std::shared_ptr<Json::Writer> jsonResponse = this->Invoke(httpConfig, httpRequestData);
+#endif
+		if(jsonResponse != nullptr)
+		{
+			httpClient->Response(HttpStatus::OK, *jsonResponse);
+		}
+#ifdef __DEBUG__
+		LOG_INFO("==== http request handler ====");
+		LOG_INFO("url = {}", httpRequestData->GetUrl());
+		LOG_INFO("type = {}", httpRequestData->GetMethod());
+		LOG_INFO("time = {}ms", elapsedTimer.GetMs());
+		if(!httpRequestData->GetContent().empty())
+		{
+			LOG_INFO("request = {}", httpRequestData->GetContent());
+		}
+		LOG_INFO("response = {}", jsonResponse->ToJsonString());
 #endif
     }
+
+	std::shared_ptr<Json::Writer> HttpClientComponent::Invoke(const HttpConfig* httpConfig, std::shared_ptr<HttpHandlerRequest> content)
+	{
+		std::shared_ptr<Json::Writer> jsonWriter(new Json::Writer());
+		if (httpConfig == nullptr)
+		{
+			jsonWriter->AddMember("code", XCode::CallServiceNotFound);
+			jsonWriter->AddMember("error", fmt::format("not find url : {0}", content->GetUrl()));
+			return jsonWriter;
+		}
+
+		if (httpConfig->Type != content->GetMethod())
+		{
+			jsonWriter->AddMember("code", XCode::HttpMethodNotFound);
+			jsonWriter->AddMember("error", fmt::format("user {0} call", httpConfig->Type));
+			return jsonWriter;
+		}
+
+		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+		if (!jsonReader->ParseJson(content->GetContent()))
+		{
+			jsonWriter->AddMember("code", XCode::ParseJsonFailure);
+			jsonWriter->AddMember("error", "json parse error");
+			return jsonWriter;
+		}
+		HttpService* httpService = this->GetComponent<HttpService>(httpConfig->Component);
+		if (httpService == nullptr)
+		{
+			jsonWriter->AddMember("code", XCode::CallServiceNotFound);
+			jsonWriter->AddMember("error", "not find handler component");
+			return jsonWriter;
+		}
+		const std::string& method = httpConfig->MethodName;
+		return httpService->Invoke(method, jsonReader);
+	}
 
     std::shared_ptr<HttpAsyncResponse> HttpClientComponent::Get(const std::string &url, int timeout)
     {
@@ -184,18 +192,5 @@ namespace Sentry
     HttpClientComponent::Post(const std::string &url, Json::Writer &jsonWriter, int timeout)
     {
         return this->Post(url, jsonWriter.ToJsonString());
-    }
-
-    void HttpClientComponent::Invoke(HttpRespSession *remoteRequest)
-    {			
-//		 HttpRequestHandler * requestHandler = remoteRequest->GetReuqestHandler();
-//		 const HttpServiceConfig * httpConfig = requestHandler->GetHttpConfig();
-//		 if (requestHandler != nullptr)
-//		 {
-//			 const std::string & method = httpConfig->Method;
-//			 const std::string & service = httpConfig->Service;
-//			 auto httpMethod = this->GetHttpMethod(service, method);
-//			 requestHandler->SetResponseCode(httpMethod->OnResponse(remoteRequest));
-//		 }
     }
 }

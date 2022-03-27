@@ -6,6 +6,8 @@
 #define _JSONWRITER_H_
 #include<string>
 #include<vector>
+#include<ostream>
+#include"XCode/XCode.h"
 #include<rapidjson/writer.h>
 #include<rapidjson/document.h>
 #include<rapidjson/stringbuffer.h>
@@ -24,6 +26,8 @@ namespace Json
 		bool EndArray();
 		bool EndObject();
 	 public:
+		bool AddMember(const char * key, XCode code);
+	 public:
 		bool AddMember(const char * key, int value);
 		bool AddMember(const char * key, bool value);
 		bool AddMember(const char * key, short value);
@@ -40,7 +44,9 @@ namespace Json
 		bool AddMember(const char * key, const std::vector<long long> & value);
 		bool AddMember(const char * key, const std::vector<std::string> & value);
 	 public:
+		size_t GetJsonSize();
 		const std::string ToJsonString();
+		size_t WriterStream(std::ostream & os);
 	 private:
 		const bool mIsObject;
 		rapidjson::StringBuffer mStringBuf;

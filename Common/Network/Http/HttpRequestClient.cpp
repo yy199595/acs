@@ -30,11 +30,12 @@ namespace Sentry
         this->ConnectHost(host, port, taskSource);
         if(taskSource->Await() != XCode::Successful)
         {
-            LOG_ERROR("connect http host ", host, ':', port, " failure");
+            LOG_ERROR("connect http host [{0}:{1}] failure", host, port);
             return nullptr;
         }
-        LOG_INFO("connect http host ", host, ':', port, " successful");
-        std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
+		LOG_DEBUG("connect http host [{0}:{1}] successful", host, port);
+
+		std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
         this->SendByStream(httpRequest,sendTaskSource);
 
         if(!sendTaskSource->Await())
@@ -121,6 +122,15 @@ namespace Sentry
         }
         return this->Request(httpRequest);
     }
+	std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const string& url, Json::Writer& content)
+	{
+		auto httpRequest = std::make_shared<HttpAsyncRequest>();
+		if(!httpRequest->Post(url, content))
+		{
+			return nullptr;
+		}
+		return this->Request(httpRequest);
+	}
 
     void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port, std::shared_ptr<TaskSource<XCode>> taskSource)
     {

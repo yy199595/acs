@@ -21,9 +21,10 @@
         "code": "./XCode/XCode.csv",
         "http": "./Config/http.json"
     },
-    "http":
+    "url":
     {
-        "account": "http://127.0.0.1:80"
+        "login": "http://127.0.0.1:80/logic/account/login",
+        "register": "http://127.0.0.1:80/logic/account/register"
     },
     "listener": {
         "ip":"127.0.0.1",
@@ -93,7 +94,7 @@
         "ChatService",
         "LocalService",
         "MysqlService",
-        "AccountService",
+        "HttpUserService",
         "HttpNodeService"
     ],
     "white_list": [

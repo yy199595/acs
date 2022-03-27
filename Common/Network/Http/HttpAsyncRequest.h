@@ -25,7 +25,8 @@ namespace Sentry
     {
     public:
         bool Get(const std::string & url);
-        bool Post(const std::string & url, const std::string & content);
+		bool Post(const std::string & url, Json::Writer & json);
+		bool Post(const std::string & url, const std::string & content);
 
     public:
         const std::string & GetHost() { return this->mHost;}

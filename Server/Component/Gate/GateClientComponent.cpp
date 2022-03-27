@@ -41,9 +41,7 @@ namespace Sentry
         {
             std::shared_ptr<RpcGateClient> gateClient(
                     new RpcGateClient(socket, SocketType::RemoteSocket, this));
-#ifdef __DEBUG__
-            LOG_INFO("new player connect gate ip = [{0}]", ip);
-#endif
+
             gateClient->StartReceive();
             this->mGateClientMap.emplace(id, gateClient);
         }

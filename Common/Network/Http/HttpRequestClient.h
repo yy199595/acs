@@ -15,7 +15,8 @@ namespace Sentry
         HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy);
     public:
         std::shared_ptr<HttpAsyncResponse> Get(const std::string & url);
-        std::shared_ptr<HttpAsyncResponse> Post(const std::string & url, const std::string & content);
+		std::shared_ptr<HttpAsyncResponse> Post(const std::string & url, Json::Writer & json);
+		std::shared_ptr<HttpAsyncResponse> Post(const std::string & url, const std::string & content);
     private:
         std::shared_ptr<HttpAsyncResponse> Request(std::shared_ptr<HttpAsyncRequest> request);
         void SendByStream(std::shared_ptr<IHttpStream> httpStream, std::shared_ptr<TaskSource<bool>> taskSource);

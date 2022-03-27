@@ -50,14 +50,32 @@ namespace Sentry
         }
         std::ostream os(&this->mSendStream);
         os << "POST " << this->mPath << " " << HttpVersion << "\r\n";
-        os << "Host: " << this->mHost << ":" << this->mPort << "\r\n";
+        os << "Host:" << this->mHost << ":" << this->mPort << "\r\n";
         os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
-        os << "Content-Length: " << content.size()<< "\r\n";
+        os << "Content-Length:" << content.size()<< "\r\n";
         os << "Accept: */*\r\n";
-        os << "Connection: close\r\n\r\n";
+        os << "Connection:close\r\n\r\n";
         os.write(content.c_str(), content.size());
         return true;
     }
+	bool HttpAsyncRequest::Post(const std::string& url, Json::Writer & json)
+	{
+		if(!this->ParseUrl(url))
+		{
+			return false;
+		}
+		size_t length = json.GetJsonSize();
+
+		std::ostream os(&this->mSendStream);
+		os << "POST " << this->mPath << " " << HttpVersion << "\r\n";
+		os << "Host: " << this->mHost << ":" << this->mPort << "\r\n";
+		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
+		os << "Content-Length: " << length<< "\r\n";
+		os << "Accept: */*\r\n";
+		os << "Connection: close\r\n\r\n";
+		return json.WriterStream(os);
+
+	}
 
 }
 

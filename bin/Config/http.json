@@ -3,18 +3,21 @@
     {
         "Type": "POST",
         "Method":"Register",
-        "Component":"AccountService"
+        "Content": "application/json",
+        "Component":"HttpUserService"
     },
     "/logic/account/login":
     {
         "Type": "POST",
         "Method":"Login",
-        "Component":"AccountService"
+        "Content": "application/json",
+        "Component":"HttpUserService"
     },
     "/logic/service/push":
     {
         "Type": "POST",
         "Method": "Push",
+        "Content": "application/json",
         "Component": "HttpNodeService"
     }
 }

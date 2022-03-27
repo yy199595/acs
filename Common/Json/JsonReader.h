@@ -6,6 +6,7 @@
 #define _JSONREADER_H_
 #include<string>
 #include<vector>
+#include"XCode/XCode.h"
 #include<unordered_map>
 #include"rapidjson/document.h"
 namespace Json
@@ -24,6 +25,7 @@ namespace Json
 		bool ParseJson(const std::string & json);
 		bool ParseJson(const char* json, const size_t size);
 	 public:
+		bool GetMember(const char * key, XCode & code) const;
 		bool GetMember(const char* key, int& value) const;
 		bool GetMember(const char* key, bool& value) const;
 		bool GetMember(const char* key, short& value) const;

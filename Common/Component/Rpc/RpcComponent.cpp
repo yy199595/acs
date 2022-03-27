@@ -121,6 +121,7 @@ namespace Sentry
             auto rpcTask = iter->second;
             this->mRpcTasks.erase(iter);
             rpcTask->OnResponse(nullptr);
+			LOG_ERROR("{0} time out", rpcTask->GetRpcId());
         }
 #ifdef __DEBUG__
         int methodId = 0;

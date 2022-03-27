@@ -9,11 +9,11 @@ namespace Sentry
     class ServiceProxy;
     class RedisComponent;
     class MysqlProxyComponent;
-    class AccountService : public HttpService
+    class HttpUserService : public HttpService
     {
     public:
-        AccountService() = default;
-        ~AccountService()  final = default;
+        HttpUserService() = default;
+        ~HttpUserService()  final = default;
 
     protected:
         bool Awake() final;

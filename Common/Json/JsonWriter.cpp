@@ -118,6 +118,12 @@ namespace Json
 	}
 	const std::string Writer::ToJsonString()
 	{
+		if(this->mJsonWriter.IsComplete())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			return std::string(str, size);
+		}
 		if (this->mIsObject && this->mJsonWriter.EndObject())
 		{
 			const char* str = this->mStringBuf.GetString();
@@ -141,5 +147,51 @@ namespace Json
 	{
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.String(str);
+	}
+	size_t Writer::WriterStream(std::ostream & os)
+	{
+		if(this->mJsonWriter.IsComplete())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.write(str, size);
+			return size;
+		}
+		if (this->mIsObject && this->mJsonWriter.EndObject())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.write(str, size);
+			return size;
+		}
+		else if (this->mJsonWriter.EndArray())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.write(str, size);
+			return size;
+		}
+		return 0;
+	}
+	size_t Writer::GetJsonSize()
+	{
+		if(this->mJsonWriter.IsComplete())
+		{
+			return this->mStringBuf.GetSize();
+		}
+		if (this->mIsObject && this->mJsonWriter.EndObject())
+		{
+			return this->mStringBuf.GetSize();
+		}
+		else if (this->mJsonWriter.EndArray())
+		{
+			return this->mStringBuf.GetSize();
+		}
+		return 0;
+	}
+	bool Writer::AddMember(const char * key, XCode code)
+	{
+		return this->mJsonWriter.String(key)
+			   && this->mJsonWriter.Int((int)code);
 	}
 }

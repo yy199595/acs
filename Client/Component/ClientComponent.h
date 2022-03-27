@@ -35,6 +35,9 @@ namespace Client
 
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
 
+	 private:
+		void StartClient();
+
     public:
         XCode Call(const std::string & name, std::shared_ptr<Message> response);
         XCode Call(const std::string & name, const Message & message, std::shared_ptr<Message> response);
