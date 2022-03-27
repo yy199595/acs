@@ -37,8 +37,11 @@ namespace Sentry
         {
             std::shared_ptr<TelnetContent> commandContent = telnetClient->ReadCommand();
             LOG_INFO("==== console command ====");
-            LOG_INFO("command = ", commandContent->Command);
-            LOG_INFO("parameter = ", commandContent->Parameter);
+            LOG_INFO("command = {}", commandContent->Command);
+			if(!commandContent->Parameter.empty())
+			{
+				LOG_INFO("parameter = {}", commandContent->Parameter);
+			}
             if(commandContent->IsOk)
             {
                 std::stringstream responseStream;

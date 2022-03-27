@@ -38,14 +38,6 @@ namespace Sentry
 				return false;
 			}
         }
-        if (!lua_getfunction(this->mLuaEnv, "Main", "Start"))
-        {
-            return false;
-        }
-        lua_State *coroutine = lua_newthread(this->mLuaEnv);
-        lua_pushvalue(this->mLuaEnv, -2);
-        lua_xmove(this->mLuaEnv, coroutine, 1);
-        lua_presume(coroutine, this->mLuaEnv, 0);
         return true;
     }
 

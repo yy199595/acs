@@ -18,6 +18,7 @@ namespace ContainerParameter
     template<typename T>
     inline T Read(lua_State *lua, int index)
     {
+		assert(lua_istable(lua, index));
         return ContainerStruct<T>::Read(lua, index);
     }
 
@@ -35,7 +36,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::vector<T>> {
         static std::vector<T> Read(lua_State *lua, int index)
         {
-            std::vector<T> ret;
+			assert(lua_istable(lua, index));
+			std::vector<T> ret;
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -99,7 +101,8 @@ namespace ContainerParameter
         //读的时候注意释放内存
         static std::shared_ptr<std::vector<T>> Read(lua_State *lua, int index)
         {
-            std::vector<T> *ret = new std::vector<T>();
+			assert(lua_istable(lua, index));
+			std::vector<T> *ret = new std::vector<T>();
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -133,7 +136,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::unordered_map<Key, Value>> {
         static std::unordered_map<Key, Value> Read(lua_State *lua, int index)
         {
-            std::unordered_map<Key, Value> ret;
+			assert(lua_istable(lua, index));
+			std::unordered_map<Key, Value> ret;
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -169,7 +173,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::unordered_map<Key, Value> &> {
         static std::unordered_map<Key, Value> &Read(lua_State *lua, int index)
         {
-            std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
+			assert(lua_istable(lua, index));
+			std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
             lua_pushnil(lua);
             while (lua_next(lua, index - 1) != 0)
             {
@@ -206,7 +211,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::unordered_map<Key, Value> *> {
         static std::unordered_map<Key, Value> *Read(lua_State *lua, int index)
         {
-            std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
+			assert(lua_istable(lua, index));
+			std::unordered_map<Key, Value> *ret = new std::unordered_map<Key, Value>();
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -243,7 +249,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::map<Key, Value>> {
         static std::map<Key, Value> Read(lua_State *lua, int index)
         {
-            std::map<Key, Value> ret;
+			assert(lua_istable(lua, index));
+			std::map<Key, Value> ret;
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -279,7 +286,8 @@ namespace ContainerParameter
     struct ContainerStruct<std::map<Key, Value> &> {
         static std::map<Key, Value> &Read(lua_State *lua, int index)
         {
-            std::map<Key, Value> *ret = new std::map<Key, Value>();
+			assert(lua_istable(lua, index));
+			std::map<Key, Value> *ret = new std::map<Key, Value>();
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {
@@ -317,7 +325,8 @@ namespace ContainerParameter
         // 注意释放内存
         static std::map<Key, Value> *Read(lua_State *lua, int index)
         {
-            std::map<Key, Value> *ret = new std::map<Key, Value>();
+			assert(lua_istable(lua, index));
+			std::map<Key, Value> *ret = new std::map<Key, Value>();
             lua_pushnil(lua);
             while (lua_next(lua, index) != 0)
             {

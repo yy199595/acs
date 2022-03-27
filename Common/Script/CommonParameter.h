@@ -18,69 +18,67 @@ namespace CommonParameter
 
 namespace CommonParameter
 {
-    template<>
-    inline int Read(lua_State *lua, int index)
+    template<> inline int Read(lua_State *lua, int index)
     {
+		assert(lua_isinteger(lua, index));
         return lua_tointeger(lua, index);
     }
 
-    template<>
-    inline bool Read(lua_State *lua, int index)
+    template<> inline bool Read(lua_State *lua, int index)
     {
-        return (bool) lua_toboolean(lua, index);
+		assert(lua_isboolean(lua, index));
+		return (bool) lua_toboolean(lua, index);
     }
 
-    template<>
-    inline unsigned int Read(lua_State *lua, int index)
+    template<> inline unsigned int Read(lua_State *lua, int index)
     {
-        return lua_tointeger(lua, index);
+		assert(lua_isinteger(lua, index));
+		return lua_tointeger(lua, index);
     }
 
-    template<>
-    inline long long Read(lua_State *lua, int index)
+    template<> inline long long Read(lua_State *lua, int index)
     {
-        return lua_tointeger(lua, index);
+		assert(lua_isinteger(lua, index));
+		return lua_tointeger(lua, index);
+    }
+	template<> inline unsigned long long Read(lua_State *lua, int index)
+    {
+		assert(lua_isinteger(lua, index));
+		return lua_tointeger(lua, index);
     }
 
-    template<>
-    inline unsigned long long Read(lua_State *lua, int index)
+    template<> inline float Read(lua_State *lua, int index)
     {
-        return lua_tointeger(lua, index);
+		assert(lua_isnumber(lua, index));
+		return lua_tonumber(lua, index);
     }
 
-    template<>
-    inline float Read(lua_State *lua, int index)
+    template<> inline double Read(lua_State *lua, int index)
     {
-        return lua_tonumber(lua, index);
-    }
-
-    template<>
-    inline double Read(lua_State *lua, int index)
-    {
-        return lua_tonumber(lua, index);
+		assert(lua_isnumber(lua, index));
+		return lua_tonumber(lua, index);
     }
 
 
-    template<>
-    inline const char *Read(lua_State *lua, int index)
+    template<> inline const char *Read(lua_State *lua, int index)
     {
-        return lua_tostring(lua, index);
+		assert(lua_isstring(lua, index));
+		return lua_tostring(lua, index);
     }
 
-    template<>
-    inline short Read(lua_State *lua, int index)
+    template<> inline short Read(lua_State *lua, int index)
     {
-        return lua_tointeger(lua, index);
+		assert(lua_isinteger(lua, index));
+		return lua_tointeger(lua, index);
     }
 
-    template<>
-    inline unsigned short Read(lua_State *lua, int index)
+    template<> inline unsigned short Read(lua_State *lua, int index)
     {
-        return lua_tointeger(lua, index);
+		assert(lua_isinteger(lua, index));
+		return lua_tointeger(lua, index);
     }
 
-    template<>
-    inline void Read(lua_State *lua, int index)
+    template<> inline void Read(lua_State *lua, int index)
     {}
 
     template<>
@@ -88,9 +86,9 @@ namespace CommonParameter
     {
         size_t size = 0;
         static std::string data = "";
-        data.clear();
+		assert(lua_isstring(lua, index));
         const char * str = lua_tolstring(lua, index, &size);
-        data.append(str, size);
+        data.assign(str, size);
         return data;
     }
 
@@ -99,7 +97,8 @@ namespace CommonParameter
     {
         size_t size = 0;
         static std::string str = "";
-        str.assign(lua_tolstring(lua, index, &size), size);
+		assert(lua_isstring(lua, index));
+		str.assign(lua_tolstring(lua, index, &size), size);
         return str;
     }
 
@@ -107,7 +106,8 @@ namespace CommonParameter
     inline std::string Read(lua_State *lua, int index)
     {
         size_t size = 0;
-        const char *p = lua_tolstring(lua, index, &size);
+		assert(lua_isstring(lua, index));
+		const char *p = lua_tolstring(lua, index, &size);
         return std::string(p, size);
     }
 }// namespace CommonParameter

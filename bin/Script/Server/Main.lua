@@ -4,11 +4,10 @@ function Main.Awake()
 end
 
 function Main.Start()
-    
-    print("===========")
 
+    Log.Error("star main lua")
     Sentry.Sleep(1500)
-    
+
     -- local registerInfo = {}
     -- registerInfo.AreaId = 0
     -- registerInfo.NodeId = 1

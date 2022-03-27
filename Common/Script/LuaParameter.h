@@ -82,6 +82,7 @@ namespace LuaParameter
     inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, T>::type
     Read(lua_State *lua, int index)
     {
+		assert(lua_isfunction(lua, index));
         return FunctionParameter::Read<T>(lua, index);
     }
 
@@ -98,7 +99,8 @@ namespace LuaParameter
     inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, T>::type
     Read(lua_State *lua, int index)
     {
-        return ProtocParameter::Read<T>(lua, index);
+		assert(lua_istable(lua, index));
+		return ProtocParameter::Read<T>(lua, index);
     }
 
     template<typename T>
@@ -116,7 +118,8 @@ namespace LuaParameter
     inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, T>::type
     Read(lua_State *lua, int index)
     {
-        return UserDataParameter::Read<T>(lua, index);
+		assert(lua_isuserdata(lua, index));
+		return UserDataParameter::Read<T>(lua, index);
     }
 
     template<typename T>

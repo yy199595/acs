@@ -72,7 +72,6 @@ namespace Sentry
 				LOG_FATAL("Init {0} failure", component->GetName());
 				return false;
 			}
-			LOG_DEBUG("Init {0} successful", component->GetName());
 		}
 		this->mTaskComponent->Start([this]()
 		{
