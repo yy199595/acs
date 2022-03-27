@@ -101,7 +101,7 @@ namespace Client
 	}
 	void ClientComponent::StartClient()
 	{
-		this->mTaskComponent->Sleep(2000);
+		//this->mTaskComponent->Sleep(2000);
 
 		std::string loginUrl;
 		std::string registerUrl;

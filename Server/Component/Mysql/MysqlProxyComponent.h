@@ -7,7 +7,7 @@ namespace Sentry
 {
 	class ServiceProxy;
 	class MysqlRpcTaskSource;
-	class MysqlProxyComponent : public Component, public IComplete
+	class MysqlProxyComponent : public Component
 	{
 	 public:
 		MysqlProxyComponent() = default;
@@ -15,16 +15,10 @@ namespace Sentry
 		~MysqlProxyComponent() final = default;
 
 	 protected:
-		bool
-		Awake() final;
+		bool Awake() final;
 
-		bool
-		LateAwake() final;
-
-		void OnComplete() final;
+		bool LateAwake() final;
 	 private:
-		void
-		AddUserData();
 		std::shared_ptr<com::Rpc_Request>
 		NewMessage(const std::string& name);
 	 public:

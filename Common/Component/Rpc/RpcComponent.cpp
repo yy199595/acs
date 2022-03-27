@@ -8,6 +8,7 @@
 #include"Component/Rpc/RpcConfigComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
+#include"Json/JsonWriter.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 namespace Sentry
 {
@@ -39,6 +40,7 @@ namespace Sentry
             return XCode::NotFoundRpcConfig;
         }
 
+
         const std::string &service = protocolConfig->Service;
         auto logicService = this->GetComponent<RpcService>(service);
         if (logicService == nullptr)
@@ -46,6 +48,16 @@ namespace Sentry
             LOG_ERROR("call service not exist : [", service , "]");
             return XCode::CallServiceNotFound;
         }
+#ifdef __DEBUG__
+		std::string json = "";
+		LOG_DEBUG("==============[request]==============");
+		LOG_DEBUG("func = {0}.{1}", protocolConfig->Service, protocolConfig->Method);
+		if(request->has_data() && Helper::Proto::GetJson(request->data(), json))
+		{
+			LOG_DEBUG("json = {}", json);
+		}
+		LOG_DEBUG("=====================================");
+#endif
 
         if (!protocolConfig->IsAsync)
         {
@@ -74,8 +86,27 @@ namespace Sentry
             LOG_WARN("not find rpc task : ", rpcId)
             return XCode::Failure;
         }
-        auto rpcTask = iter->second;
-        this->mRpcTasks.erase(iter);
+		auto rpcTask = iter->second;
+#ifdef __DEBUG__
+		int methodId = 0;
+		long long time = 0;
+		if(this->GetRpcInfo(rpcId, methodId, time))
+		{
+			std::string json = "";
+			RpcConfigComponent * configComponent = this->GetComponent<RpcConfigComponent>();
+			const ProtoConfig * protoConfig = configComponent->GetProtocolConfig(methodId);
+
+			LOG_DEBUG("*************[response]*************");
+			LOG_DEBUG("func = {0}.{1}", protoConfig->Service, protoConfig->Method);
+			LOG_DEBUG("time = {0}ms", time);
+			if(response->has_data() && Helper::Proto::GetJson(response->data(), json))
+			{
+				LOG_DEBUG("json = {}", json);
+			}
+			LOG_DEBUG("************************************");
+		}
+#endif
+		this->mRpcTasks.erase(iter);
         rpcTask->OnResponse(response);
         return XCode::Successful;
     }

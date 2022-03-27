@@ -24,40 +24,6 @@ namespace Sentry
         return true;
     }
 
-    void MysqlProxyComponent::OnComplete()
-    {
-        auto taskComponent = this->GetComponent<TaskComponent>();
-        taskComponent->Start(&MysqlProxyComponent::AddUserData, this);
-    }
-
-	void MysqlProxyComponent::AddUserData()
-	{
-		ElapsedTimer timer;
-		TimerComponent* timerComponent = this->GetComponent<TimerComponent>();
-		for (int index = 0; index < 1; index++)
-		{
-			db_account::tab_user_account userAccountData;
-			userAccountData.set_user_id(10000 + index);
-			userAccountData.set_device_mac("ios_qq");
-			std::string account = std::to_string((10000 + index)) + "@qq.com";
-			userAccountData.set_token(Helper::String::CreateNewToken());
-			userAccountData.set_register_time(Helper::Time::GetSecTimeStamp());
-			userAccountData.set_account(account);
-
-			if (this->Add(userAccountData) == XCode::Successful)
-			{
-				LOG_ERROR("add data successful ");
-			}
-
-			Json::Writer jsonWriter;
-			jsonWriter.AddMember("account", account);
-			jsonWriter.AddMember("user_id", 1000);
-
-			std::string json = jsonWriter.ToJsonString();
-			this->QueryOnce<db_account::tab_user_account>(json);
-		}
-	}
-
     std::shared_ptr<com::Rpc_Request> MysqlProxyComponent::NewMessage(const std::string &name)
     {
         auto mysqlEntity = this->mServiceComponent->GetServiceProxy("MysqlService");
