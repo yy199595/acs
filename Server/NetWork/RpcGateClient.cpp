@@ -38,7 +38,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnRequest(request);
 #else
-		MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
 		mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
 
@@ -61,7 +61,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnCloseSocket(id, code);
 #else
-		MainTaskScheduler &mainTaskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
 		mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
 #endif
 
