@@ -64,7 +64,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnCloseSocket(id, code);
 #else
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
 #endif
 	}
@@ -80,7 +80,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnRequest(requestData);
 #else
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
 #endif
 
@@ -97,7 +97,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnResponse(responseData);
 #else
-		MainTaskScheduler & taskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&RpcClientComponent::OnResponse, mTcpComponent, responseData);
 #endif
 		return XCode::Successful;
@@ -124,7 +124,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnConnectAfter(id, code);
 #else
-		MainTaskScheduler &taskScheduler = App::Get().GetTaskScheduler();
+		MainTaskScheduler &taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
 #endif
 	}

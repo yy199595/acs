@@ -12,7 +12,7 @@ namespace Sentry
 		config.GetMember("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
-		LOG_CHECK_RET_FALSE(config.GetValue("thread", "network", networkCount));
+		LOG_CHECK_RET_FALSE(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{
 			this->mNetThreads.push_back(new NetWorkThread());
