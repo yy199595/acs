@@ -1,13 +1,20 @@
 #pragma once
 
-#include"Async/TaskSource.h"
+#include"Async/LuaTaskSource.h"
 #include"Component/Component.h"
 #include"Script/ClassProxyHelper.h"
 #include"Script/LuaTable.h"
 
 namespace Sentry
 {
-	class LuaScriptComponent : public Component, public IStart
+
+	class ILuaRegister
+	{
+	 public:
+		virtual void OnLuaRegister(lua_State * lua) = 0;
+	};
+
+	class LuaScriptComponent : public Component, public IStart, public ILuaRegister
 	{
 	 public:
 		LuaScriptComponent() = default;
@@ -15,7 +22,8 @@ namespace Sentry
 		virtual ~LuaScriptComponent() = default;
 
 	 public:
-		TaskSource<void>* Invoke(int ref);
+		LuaTaskSource * Call(int ref);
+		LuaTaskSource * Call(const char * tab, const char * func);
 
 		struct lua_State* GetLuaEnv()
 		{
@@ -26,11 +34,6 @@ namespace Sentry
 		template<typename T>
 		bool PushGlobalPoint(const std::string name, T* data);
 
-		inline std::string GetMainPath()
-		{
-			return this->mMainLuaPath;
-		}
-
 	 public:
 		bool GetLuaTable(const std::string& name);
 		bool GetLuaFunction(const std::string& tab, const std::string& func);
@@ -39,6 +42,7 @@ namespace Sentry
 		void OnStart() final;
 		bool LateAwake() final;
 		void OnDestory() final;
+		void OnLuaRegister(lua_State * lua) final;
 
 	 private:
 		bool LoadAllFile();
@@ -49,19 +53,7 @@ namespace Sentry
 
 		bool LoadLuaScript(const std::string filePath);
 	 private:
-
-		void OnPushGlobalObject();
-
-		void PushClassToLua();
-
-	 private:
-		void RegisterExtension();
-
-	 private:
-		std::string mMainLuaPath;
 		struct lua_State* mLuaEnv;
-		const static std::string mName;
-		std::vector<std::string> mRequirePaths;
 		std::unordered_map<std::string, int> mGlobalRefMap;
 		std::unordered_map<std::string, std::string> mLuaFileMd5s;
 	};
@@ -69,10 +61,10 @@ namespace Sentry
 	template<typename T>
 	inline bool LuaScriptComponent::PushGlobalPoint(const std::string name, T* data)
 	{
-		const char* mateName = ClassNameProxy::GetLuaClassName<T>();
+		const char* mateName = Lua::ClassNameProxy::GetLuaClassName<T>();
 		if (mateName != nullptr)
 		{
-			PtrProxy<T>::Write(mLuaEnv, data);
+			Lua::PtrProxy<T>::Write(mLuaEnv, data);
 			lua_getglobal(mLuaEnv, mateName);
 			if (lua_istable(mLuaEnv, -1))
 			{

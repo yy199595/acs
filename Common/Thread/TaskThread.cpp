@@ -75,7 +75,7 @@ namespace Sentry
             while(this->mWaitInvokeTask.Pop(task))
             {
                 task->Run();
-                this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+                this->mLastOperTime = Helper::Time::GetNowSecTime();
             }
             this->HangUp();
         }
@@ -126,9 +126,9 @@ namespace Sentry
             {
                 taskMethod->run();
                 delete taskMethod;
-                this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+                this->mLastOperTime = Helper::Time::GetNowSecTime();
             }
-            this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+            this->mLastOperTime = Helper::Time::GetNowSecTime();
         }
     }
 }
@@ -169,7 +169,7 @@ namespace Sentry
 			task->run();
 			delete task;
 		}
-        this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+        this->mLastOperTime = Helper::Time::GetNowSecTime();
     }
 	
 	void MainTaskScheduler::InvokeMethod(StaticMethod * task)

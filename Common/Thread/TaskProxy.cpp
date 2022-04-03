@@ -7,7 +7,7 @@ namespace Sentry
     TaskProxy::TaskProxy()
     {
 		this->mTaskId = 0;
-        this->mStartTime = Helper::Time::GetMilTimestamp();
+        this->mStartTime = Helper::Time::GetNowMilTime();
     }
 
     CoroutineAsyncTask::CoroutineAsyncTask()

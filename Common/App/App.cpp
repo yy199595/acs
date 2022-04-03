@@ -16,7 +16,7 @@ namespace Sentry
 	std::shared_ptr<App> App::mApp = nullptr;
 	App::App(ServerConfig* config)
 		: Entity(0),
-		  mConfig(config), mStartTime(Helper::Time::GetMilTimestamp()),
+		  mConfig(config), mStartTime(Helper::Time::GetNowMilTime()),
 		  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		this->mLogicRunCount = 0;
@@ -87,7 +87,7 @@ namespace Sentry
 					complete->OnComplete();
 				}
 			}
-			long long t = Helper::Time::GetMilTimestamp() - this->mStartTime;
+			long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
 			LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
 		});
 		return true;
@@ -133,9 +133,9 @@ namespace Sentry
 		this->mFps = 15;
 		mConfig->GetMember("fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
-		this->mStartTime = Helper::Time::GetMilTimestamp();
-		this->mSecondTimer = Helper::Time::GetMilTimestamp();
-		this->mLastUpdateTime = Helper::Time::GetMilTimestamp();
+		this->mStartTime = Helper::Time::GetNowMilTime();
+		this->mSecondTimer = Helper::Time::GetNowMilTime();
+		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
 
 		return this->mTaskScheduler.Start();
 	}
@@ -156,7 +156,7 @@ namespace Sentry
 
 	void App::LogicMainLoop()
 	{
-		this->mStartTimer = Helper::Time::GetMilTimestamp();
+		this->mStartTimer = Helper::Time::GetNowMilTime();
 		for (ISystemUpdate* component : this->mSystemUpdateManagers)
 		{
 			component->OnSystemUpdate();
@@ -177,20 +177,20 @@ namespace Sentry
 				{
 					component->OnSecondUpdate();
 				}
-				this->mSecondTimer = Helper::Time::GetMilTimestamp();
+				this->mSecondTimer = Helper::Time::GetNowMilTime();
 			}
 
 			for (ILastFrameUpdate* component : this->mLastFrameUpdateManager)
 			{
 				component->OnLastFrameUpdate();
 			}
-			this->mStartTimer = mLastUpdateTime = Helper::Time::GetMilTimestamp();
+			this->mStartTimer = mLastUpdateTime = Helper::Time::GetNowMilTime();
 		}
 	}
 
 	void App::UpdateConsoleTitle()
 	{
-		long long nowTime = Helper::Time::GetMilTimestamp();
+		long long nowTime = Helper::Time::GetNowMilTime();
 		float seconds = (nowTime - this->mSecondTimer) / 1000.0f;
 		this->mLogicFps = (float)this->mLogicRunCount / seconds;
 #ifdef _WIN32

@@ -31,7 +31,7 @@ namespace Sentry
 		while (!this->mIsClose)
 		{
 			std::this_thread::sleep_for(std::chrono::seconds(10));
-			long long nowTime = Helper::Time::GetSecTimeStamp();
+			long long nowTime = Helper::Time::GetNowSecTime();
 			for (const IThread* taskThread : threads)
 			{
 				if (taskThread->IsWork() && nowTime - taskThread->GetLastOperTime() >= 10)

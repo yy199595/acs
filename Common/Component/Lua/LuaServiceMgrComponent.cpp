@@ -51,7 +51,7 @@ namespace Sentry
 		lua_State* lua = this->mLuaComponent->GetLuaEnv();
 		for (std::string& method : methods)
 		{
-			if (!lua_getfunction(lua, name.c_str(), method.c_str()))
+			if (!Lua::lua_getfunction(lua, name.c_str(), method.c_str()))
 			{
 				continue;
 			}

@@ -10,23 +10,33 @@
 #include"Util/MD5.h"
 #include"Async/LuaServiceTaskSource.h"
 #include"Component/Service/LuaRpcService.h"
+#include"Async/LuaTaskSource.h"
+
+using namespace Lua;
 namespace Sentry
 {
 	bool LuaScriptComponent::Awake()
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
-
-		this->PushClassToLua();
-		this->RegisterExtension();
 		return this->LoadAllFile();
 	}
 
 	bool LuaScriptComponent::LateAwake()
 	{
+		std::vector<Component *> components;
+		this->GetComponents(components);
 
-		this->OnPushGlobalObject();
-		if (lua_getfunction(this->mLuaEnv, "Main", "Awake"))
+		for(Component * component : components)
+		{
+			ILuaRegister * luaRegister = component->Cast<ILuaRegister>();
+			if(luaRegister != nullptr)
+			{
+				luaRegister->OnLuaRegister(this->mLuaEnv);
+			}
+		}
+
+		if (Lua::lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{
 			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
 			{
@@ -41,13 +51,25 @@ namespace Sentry
 		return true;
 	}
 
+	void LuaScriptComponent::OnLuaRegister(lua_State * lua)
+	{
+		Lua::ClassProxyHelper::BeginRegister<LuaTaskSource>(lua, "LuaTaskSource");
+		Lua::ClassProxyHelper::PushCtor<LuaTaskSource>(lua);
+		Lua::ClassProxyHelper::PushStaticExtensionFunction(lua, "LuaTaskSource", "SetResult", LuaTaskSource::SetResult);
+
+		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateStr", Helper::Time::GetDateStr);
+		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateString", Helper::Time::GetDateString);
+		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetNowSecTime", Helper::Time::GetNowSecTime);
+		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetNowMilTime", Helper::Time::GetNowMilTime);
+		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetYearMonthDayString",Helper::Time::GetYearMonthDayString);
+
+	}
+
 	void LuaScriptComponent::OnStart()
 	{
-		if (lua_getfunction(this->mLuaEnv, "Main", "Start"))
+		if(this->Call("Main", "Start")->Await<bool>())
 		{
-			int ref = lua_ref(this->mLuaEnv);
-			this->Invoke(ref)->Await();
-			lua_unref(this->mLuaEnv, ref);
+
 		}
 	}
 
@@ -184,65 +206,7 @@ namespace Sentry
 		lua_setfield(mLuaEnv, -3, "path");
 	}
 
-	void LuaScriptComponent::PushClassToLua()
-	{
-		ClassProxyHelper::BeginRegister<LuaServiceTaskSource>(this->mLuaEnv, "LuaServiceTaskSource");
-		ClassProxyHelper::PushCtor<LuaServiceTaskSource>(this->mLuaEnv);
-		ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &LuaServiceTaskSource::SetResult);
-
-		ClassProxyHelper::BeginRegister<TaskSource<void>>(this->mLuaEnv, "TaskSource");
-		ClassProxyHelper::PushCtor<TaskSource<void>>(this->mLuaEnv);
-		ClassProxyHelper::PushMemberFunction(this->mLuaEnv, "SetResult", &TaskSource<void>::SetResult);
-
-		ClassProxyHelper::BeginRegister<App>(this->mLuaEnv, "App");
-
-		ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetDateStr", Helper::Time::GetDateStr);
-		ClassProxyHelper::PushStaticFunction(this
-			->mLuaEnv, "Helper::Time", "GetDateString", Helper::Time::GetDateString);
-		ClassProxyHelper::PushStaticFunction(this
-			->mLuaEnv, "Helper::Time", "GetSecTimeStamp", Helper::Time::GetSecTimeStamp);
-		ClassProxyHelper::PushStaticFunction(this
-			->mLuaEnv, "Helper::Time", "GetMilTimestamp", Helper::Time::GetMilTimestamp);
-		//ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetMicTimeStamp", Helper::Time::GetMicTimeStamp);
-		ClassProxyHelper::PushStaticFunction(this->mLuaEnv, "Helper::Time", "GetYearMonthDayString",
-			Helper::Time::GetYearMonthDayString);
-
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Call", SystemExtension::Call);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Sleep", SystemExtension::Sleep);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "AsyncWait", SystemExtension::AddTimer);
-		ClassProxyHelper::PushStaticExtensionFunction(this
-			->mLuaEnv, "Sentry", "CancelTimer", SystemExtension::RemoveTimer);
-
-		ClassProxyHelper::PushStaticExtensionFunction(this
-			->mLuaEnv, "Sentry", "GetManager", SystemExtension::GetManager);
-
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Debug", LuaAPIExtension::DebugLog);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Warning", LuaAPIExtension::DebugWarning);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Error", LuaAPIExtension::DebugError);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Log", "Info", LuaAPIExtension::DebugInfo);
-
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "coroutine", "sleep", CoroutineExtension::Sleep);
-	}
-
-	void LuaScriptComponent::OnPushGlobalObject()
-	{
-
-	}
-
-	void LuaScriptComponent::RegisterExtension()
-	{
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Log", LuaAPIExtension::DebugLog);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Info", LuaAPIExtension::DebugInfo);
-		ClassProxyHelper::PushStaticExtensionFunction(this->mLuaEnv, "Sentry", "Error", LuaAPIExtension::DebugError);
-		ClassProxyHelper::PushStaticExtensionFunction(this
-			->mLuaEnv, "Sentry", "Warning", LuaAPIExtension::DebugWarning);
-
-		lua_getglobal(this->mLuaEnv, "coroutine");
-		lua_pushtablefunction(this->mLuaEnv, "sleep", CoroutineExtension::Sleep);
-		lua_pushtablefunction(this->mLuaEnv, "start", CoroutineExtension::Start);
-	}
-
-	TaskSource<void>* LuaScriptComponent::Invoke(int ref)
+	LuaTaskSource * LuaScriptComponent::Call(int ref)
 	{
 		if (!lua_getfunction(this->mLuaEnv, "coroutine", "call"))
 		{
@@ -258,6 +222,28 @@ namespace Sentry
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 			return nullptr;
 		}
-		return PtrProxy<TaskSource<void>>::Read(this->mLuaEnv, -1);
+		return PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
+	}
+
+	LuaTaskSource* LuaScriptComponent::Call(const char* tab, const char* func)
+	{
+		if (!lua_getfunction(this->mLuaEnv, "coroutine", "call"))
+		{
+			return nullptr;
+		}
+		if(!lua_getfunction(this->mLuaEnv, tab, func))
+		{
+			return nullptr;
+		}
+		if (!lua_isfunction(this->mLuaEnv, -1))
+		{
+			return nullptr;
+		}
+		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
+		{
+			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			return nullptr;
+		}
+		return PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
 	}
 }

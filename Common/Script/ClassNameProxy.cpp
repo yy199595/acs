@@ -1,6 +1,9 @@
 #include "ClassNameProxy.h"
 
-namespace ClassNameProxy
+namespace Lua
 {
-    std::unordered_map<size_t, ClassRegisterInfo *> classNameMap = {};
+	namespace ClassNameProxy
+	{
+		std::unordered_map<size_t, ClassRegisterInfo*> classNameMap = {};
+	}
 }

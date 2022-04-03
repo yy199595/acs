@@ -2,9 +2,12 @@
 
 #include <Script/LuaInclude.h>
 
-namespace CoroutineExtension
+namespace Lua
 {
-    extern int Sleep(lua_State *lua);
+	namespace CoroutineExtension
+	{
+		extern int Sleep(lua_State* lua);
 
-    extern int Start(lua_State *lua);
-}// namespace CoroutineExtension
+		extern int Start(lua_State* lua);
+	}// namespace CoroutineExtension
+}

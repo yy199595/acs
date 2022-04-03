@@ -59,10 +59,10 @@ namespace Sentry
 	{
 		if (this->mNextUpdateTime == 0)
 		{
-			this->mNextUpdateTime = Helper::Time::GetMilTimestamp();
+			this->mNextUpdateTime = Helper::Time::GetNowMilTime();
 			return;
 		}
-		long long nowTime = Helper::Time::GetMilTimestamp();
+		long long nowTime = Helper::Time::GetNowMilTime();
 		long long subTime = nowTime - this->mNextUpdateTime;
 		const int tick = subTime / this->TimerPrecision;
 
@@ -124,7 +124,7 @@ namespace Sentry
 
 	bool TimerComponent::AddTimerToWheel(std::shared_ptr<TimerBase> timer)
 	{
-		long long nowTime = Helper::Time::GetMilTimestamp();
+		long long nowTime = Helper::Time::GetNowMilTime();
 		int tick = (timer->GetTargetTime() - nowTime) / this->TimerPrecision;
 		if (tick <= 0)
 		{

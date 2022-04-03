@@ -10,7 +10,7 @@ namespace Sentry
     class ElapsedTimer
     {
     public:
-        ElapsedTimer() : mStartTime(Helper::Time::GetMilTimestamp()) { }
+        ElapsedTimer() : mStartTime(Helper::Time::GetNowMilTime()) { }
     public:
         inline long long GetMs() const;
         inline double GetSecond() const;
@@ -20,13 +20,13 @@ namespace Sentry
 
     long long ElapsedTimer::GetMs() const
     {
-        long long nowTime = Helper::Time::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetNowMilTime();
         return (nowTime - this->mStartTime);
     }
 
     double ElapsedTimer::GetSecond() const
     {
-        long long nowTime = Helper::Time::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetNowMilTime();
         return (nowTime - this->mStartTime) / 1000.0f;
     }
 

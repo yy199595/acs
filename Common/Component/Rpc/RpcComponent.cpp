@@ -125,7 +125,7 @@ namespace Sentry
 	{
 		RpcTaskInfo taskInfo;
 		taskInfo.MethodId = methodId;
-		taskInfo.Time = Helper::Time::GetMilTimestamp();
+		taskInfo.Time = Helper::Time::GetNowMilTime();
 		this->mRpcInfoMap.emplace(rpcId, taskInfo);
 	}
 
@@ -137,7 +137,7 @@ namespace Sentry
 			return false;
 		}
 		methodId = iter->second.MethodId;
-		time = Helper::Time::GetMilTimestamp() - iter->second.Time;
+		time = Helper::Time::GetNowMilTime() - iter->second.Time;
 		this->mRpcInfoMap.erase(iter);
 		return true;
 	}

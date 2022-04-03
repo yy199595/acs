@@ -79,6 +79,7 @@
         "TcpServerComponent",
         "RedisComponent",
         "LuaScriptComponent",
+        "LuaRegisterComponent",
         "LuaServiceMgrComponent",
         "RpcClientComponent",
         "GateComponent",

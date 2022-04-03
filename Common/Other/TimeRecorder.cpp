@@ -8,7 +8,7 @@ namespace Sentry
 {
     TimeRecorder::TimeRecorder()
     {
-        this->mLastClearTime = Helper::Time::GetMilTimestamp();
+        this->mLastClearTime = Helper::Time::GetNowMilTime();
     }
 
     CostTimeInfo *TimeRecorder::GetLatencyInfo()
@@ -25,7 +25,7 @@ namespace Sentry
 
     void TimeRecorder::AddCostTimeInfo(const std::string &func, long long lastTime)
     {
-        long long nowTime = Helper::Time::GetMilTimestamp();
+        long long nowTime = Helper::Time::GetNowMilTime();
         auto iter = this->mCallFuncInfoMap.find(func);
         if (iter == this->mCallFuncInfoMap.end())
         {
@@ -70,7 +70,7 @@ namespace Sentry
             CostTimeInfo &pLatencyInfo = iter.second;
             pLatencyInfo.Clear();
         }
-        this->mLastClearTime = Helper::Time::GetMilTimestamp();
+        this->mLastClearTime = Helper::Time::GetNowMilTime();
     }
 
     bool TimeRecorder::SaveDataToFile(const std::string path)

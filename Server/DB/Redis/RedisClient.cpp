@@ -43,7 +43,7 @@ namespace Sentry
 
     TaskSourceShared<RedisResponse> RedisClient::InvokeCommand(std::shared_ptr<RedisRequest> command)
     {
-        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
+        this->mLastOperatorTime = Helper::Time::GetNowSecTime();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
 
         std::iostream io(&this->mSendDataBuffer);
@@ -182,7 +182,7 @@ namespace Sentry
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mDataCount = 0;
-        this->mLastOperatorTime = Helper::Time::GetSecTimeStamp();
+        this->mLastOperatorTime = Helper::Time::GetNowSecTime();
         this->mRespTaskSource->SetResult(std::move(this->mResponse));
         std::move(this->mRespTaskSource);
     }

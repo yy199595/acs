@@ -45,7 +45,7 @@ namespace Sentry
 		Json::Writer jsonWriter;
 		std::string newToken = this->NewToken(account);
 		jsonWriter.AddMember("token", newToken);
-		jsonWriter.AddMember("last_login_time", Helper::Time::GetSecTimeStamp());
+		jsonWriter.AddMember("last_login_time", Helper::Time::GetNowSecTime());
 
 		string updateJson = jsonWriter.ToJsonString();
 		db_account::tab_user_account userAccountInfo;
@@ -53,7 +53,7 @@ namespace Sentry
 
 		userAccountInfo.set_token(newToken);
 		userAccountInfo.set_account(account);
-		userAccountInfo.set_last_login_time(Helper::Time::GetSecTimeStamp());
+		userAccountInfo.set_last_login_time(Helper::Time::GetNowSecTime());
 		XCode code = this->mMysqlComponent->Save(userAccountInfo);
 		if (code != XCode::Successful)
 		{
@@ -93,7 +93,7 @@ namespace Sentry
 		userAccountInfo.set_phone_num(phoneNumber);
 		userAccountInfo.set_password(user_password);
 		userAccountInfo.set_user_id(resp->GetNumber());
-		userAccountInfo.set_register_time(Helper::Time::GetSecTimeStamp());
+		userAccountInfo.set_register_time(Helper::Time::GetNowSecTime());
 		return this->mMysqlComponent->Add(userAccountInfo);
 	}
 
@@ -101,7 +101,7 @@ namespace Sentry
 	{
 		char buffer[100] = { 0 };
 		int number = Helper::Math::Random<int>();
-		long long now = Helper::Time::GetSecTimeStamp();
+		long long now = Helper::Time::GetNowSecTime();
 		return Helper::Md5::GetMd5(fmt::format("{0}:{1}:{2}", account, now, number));
 	}
 }// namespace Sentry

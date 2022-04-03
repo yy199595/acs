@@ -37,7 +37,7 @@ namespace Sentry
 		this->mIsConnect = false;
 		this->mIsCanSendData = true;
 		this->mSocketId = socket->GetSocketId();
-		this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
 
 	void RpcClient::Clear()
@@ -49,7 +49,7 @@ namespace Sentry
 
 	void RpcClient::StartReceive()
 	{
-		this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		if (mNetWorkThread.IsCurrentThread())
 		{
 			this->ReceiveHead();
@@ -66,7 +66,7 @@ namespace Sentry
 		std::shared_ptr<RpcClient> self = this->shared_from_this();
 		auto cb = [self, this](const asio::error_code& code, const std::size_t t)
 		{
-			self->mLastOperTime = Helper::Time::GetSecTimeStamp();
+			self->mLastOperTime = Helper::Time::GetNowSecTime();
 			if (code)
 			{
 				this->OnClientError(XCode::NetWorkError);
@@ -105,7 +105,7 @@ namespace Sentry
 			}
 			messageBuffer = new char[size];
 		}
-		this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& nSocket = this->mSocketProxy->GetSocket();
 		std::shared_ptr<RpcClient> self = this->shared_from_this();
 
@@ -225,7 +225,7 @@ namespace Sentry
 					this->SendData(this->mWaitSendQueue.front());
 					this->mWaitSendQueue.pop();
 				}
-				this->mLastOperTime = Helper::Time::GetSecTimeStamp();
+				this->mLastOperTime = Helper::Time::GetNowSecTime();
 			}
 		});
 	}

@@ -67,11 +67,11 @@ namespace Sentry
 		int hour, minute, second = 0;
 		zeroRefresh->GetRefreshTime(hour, minute);
 		long long nextTime = Helper::Time::GetNewTime(0, hour, minute);
-		if (Helper::Time::GetSecTimeStamp() - nextTime > 0)
+		if (Helper::Time::GetNowSecTime() - nextTime > 0)
 		{
 			nextTime = Helper::Time::GetNewTime(1, hour, minute);
 		}
-		long long ms = nextTime - Helper::Time::GetSecTimeStamp();
+		long long ms = nextTime - Helper::Time::GetNowSecTime();
 		this->mTimerComponent->AsyncWait(ms * 1000, &OperatorComponent::StartRefreshDay,
 			this, component->GetName());
 #ifdef __DEBUG__

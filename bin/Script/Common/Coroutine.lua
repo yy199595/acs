@@ -10,13 +10,14 @@ function coroutine.start(func, ...)
 end
 
 function coroutine.call(func)
-    local luaTaskSource = TaskSource.New()
+    local luaTaskSource = LuaTaskSource.New()
     coroutine.start(function(taskSource)
-        local state, error = pcall(func)
+        local state, ret = pcall(func)
+        print(state, ret)
         if not state then
-            Log.Error(error)
+            Log.Error(ret)
         end
-        taskSource:SetResult()
+        taskSource:SetResult(ret)
     end, luaTaskSource)
     return luaTaskSource
 end

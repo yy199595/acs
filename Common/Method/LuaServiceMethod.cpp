@@ -19,13 +19,13 @@ namespace Sentry
 
 	tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::Call(long long id, const std::string& json)
 	{
-		lua_getfunction(this->mLuaEnv, "Service", "Call");
+		Lua::lua_getfunction(this->mLuaEnv, "Service", "Call");
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 		if (!lua_isfunction(this->mLuaEnv, -1))
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
-		LuaParameter::WriteArgs(this->mLuaEnv, id, json);
+		Lua::Parameter::WriteArgs(this->mLuaEnv, id, json);
 		if (lua_pcall(this->mLuaEnv, 3, 2, 0) != 0)
 		{
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
@@ -46,7 +46,7 @@ namespace Sentry
 
 	tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::CallAsync(long long id, const std::string& json)
 	{
-		lua_getfunction(this->mLuaEnv, "Service", "CallAsync");
+		Lua::lua_getfunction(this->mLuaEnv, "Service", "CallAsync");
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 		if (!lua_isfunction(this->mLuaEnv, -1))
 		{
@@ -59,7 +59,7 @@ namespace Sentry
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
-		LuaServiceTaskSource* luaTaskSource = PtrProxy<LuaServiceTaskSource>::Read(this->mLuaEnv, -1);
+		LuaServiceTaskSource* luaTaskSource = Lua::PtrProxy<LuaServiceTaskSource>::Read(this->mLuaEnv, -1);
 		if (luaTaskSource == nullptr)
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);

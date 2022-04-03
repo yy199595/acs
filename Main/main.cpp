@@ -31,6 +31,8 @@
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/Service/HttpNodeService.h"
 #include"Component/ClientComponent.h"
+
+#include"Component/Lua/LuaRegisterComponent.h"
 using namespace Sentry;
 using namespace Client;
 
@@ -68,7 +70,8 @@ void RegisterComponent()
     ComponentFactory::Add<HttpClientComponent>("HttpClientComponent");
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
-    ComponentFactory::Add<LuaServiceMgrComponent>("LuaServiceMgrComponent");
+	ComponentFactory::Add<LuaRegisterComponent>("LuaRegisterComponent");
+	ComponentFactory::Add<LuaServiceMgrComponent>("LuaServiceMgrComponent");
 	//client
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
 }

@@ -106,7 +106,7 @@ namespace Sentry
 		auto proxyClient = this->GetGateClient(sockId);
 		if (proxyClient != nullptr)
 		{
-			long long nowTime = Helper::Time::GetSecTimeStamp();
+			long long nowTime = Helper::Time::GetNowSecTime();
 			if (nowTime - proxyClient->GetLastOperatorTime() >= 5)
 			{
 				proxyClient->StartClose();

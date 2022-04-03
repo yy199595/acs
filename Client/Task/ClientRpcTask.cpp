@@ -16,7 +16,7 @@ namespace Client
         this->mClientComponent = nullptr;
         this->mState = TaskState::TaskReady;
         this->mRpcId = Helper::Guid::Create();
-        this->mStartTime = Helper::Time::GetMilTimestamp();
+        this->mStartTime = Helper::Time::GetNowMilTime();
         this->mTaskComponent = App::Get()->GetTaskComponent();
     }
 
@@ -35,7 +35,7 @@ namespace Client
 			{
 				this->mMessage = Helper::Proto::NewByData(response->data());
 			}
-			long long t1 = Helper::Time::GetMilTimestamp();
+			long long t1 = Helper::Time::GetNowMilTime();
 			float second = (t1 - this->mStartTime) / 1000.0f;
 			LOG_INFO("call ", this->mMethod, " successful time = ", second, "s");
 		}

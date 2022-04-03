@@ -15,10 +15,10 @@ namespace Helper
         extern std::string GetDateStr(long long time = 0);
 
         // 获取毫秒时间戳
-        extern long long GetMilTimestamp();
+        extern long long GetNowMilTime();
 
         // 获取秒级时间戳
-        extern long long GetSecTimeStamp();
+        extern long long GetNowSecTime();
 
         // 获取微妙级时间戳
         extern long long GetMicTimeStamp();
