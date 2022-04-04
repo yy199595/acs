@@ -5,9 +5,6 @@
 #include"Component/Service/LuaRpcService.h"
 #include"Component/Scene/ServiceMgrComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#ifdef __DEBUG__
-#include"Component/Telnet/ConsoleComponent.h"
-#endif
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -75,20 +72,27 @@ namespace Sentry
 		}
 		this->mTaskComponent->Start([this]()
 		{
-			for (Component* component : this->mSceneComponents)
+			try
 			{
-				this->StartComponent(component);
-			}
-			for (Component* component : this->mSceneComponents)
-			{
-				IComplete* complete = component->Cast<IComplete>();
-				if (complete != nullptr)
+				for (Component* component : this->mSceneComponents)
 				{
-					complete->OnComplete();
+					this->StartComponent(component);
 				}
+				for (Component* component : this->mSceneComponents)
+				{
+					IComplete* complete = component->Cast<IComplete>();
+					if (complete != nullptr)
+					{
+						complete->OnComplete();
+					}
+				}
+				long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
+				LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
 			}
-			long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-			LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
+			catch (std::logic_error & error)
+			{
+				LOG_ERROR(error.what());
+			}
 		});
 		return true;
 	}

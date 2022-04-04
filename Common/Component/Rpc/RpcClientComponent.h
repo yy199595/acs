@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"Component/Component.h"
-#include"Script/LuaTable.h"
+#include"Script/Table.h"
 #include"Other/MultiThreadQueue.h"
 #include"Network/Rpc/ProtoRpcClient.h"
 #include"Pool/AllotorPool.h"

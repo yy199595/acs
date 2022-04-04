@@ -1,14 +1,10 @@
 ﻿#include"LuaScriptComponent.h"
 #include"Script/luadebug.h"
-#include"Script/luaExtension.h"
-#include"Script/SystemExtension.h"
-#include"Script/CoroutineExtension.h"
 
 #include"App/App.h"
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
-#include"Async/LuaServiceTaskSource.h"
 #include"Component/Service/LuaRpcService.h"
 #include"Async/LuaTaskSource.h"
 
@@ -24,31 +20,20 @@ namespace Sentry
 
 	bool LuaScriptComponent::LateAwake()
 	{
-		std::vector<Component *> components;
+		std::vector<Component*> components;
 		this->GetComponents(components);
 
-		for(Component * component : components)
+		for (Component* component : components)
 		{
-			ILuaRegister * luaRegister = component->Cast<ILuaRegister>();
-			if(luaRegister != nullptr)
+			ILuaRegister* luaRegister = component->Cast<ILuaRegister>();
+			if (luaRegister != nullptr)
 			{
 				luaRegister->OnLuaRegister(this->mLuaEnv);
 			}
 		}
 
-		if (Lua::lua_getfunction(this->mLuaEnv, "Main", "Awake"))
-		{
-			if (lua_pcall(this->mLuaEnv, 0, 0, 0) != 0)
-			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-				return false;
-			}
-			if (!(bool)lua_toboolean(this->mLuaEnv, -1))
-			{
-				return false;
-			}
-		}
-		return true;
+		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
+		return luaFunction != nullptr && luaFunction->Func<bool>();
 	}
 
 	void LuaScriptComponent::OnLuaRegister(lua_State * lua)
@@ -67,9 +52,10 @@ namespace Sentry
 
 	void LuaScriptComponent::OnStart()
 	{
-		if(this->Call("Main", "Start")->Await<bool>())
+		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
+		if(luaTaskSource != nullptr && !luaTaskSource->Await<bool>())
 		{
-
+			throw std::logic_error("return false");
 		}
 	}
 
@@ -204,46 +190,5 @@ namespace Sentry
 #endif
 		lua_pushlstring(mLuaEnv, pathBuffer, size);
 		lua_setfield(mLuaEnv, -3, "path");
-	}
-
-	LuaTaskSource * LuaScriptComponent::Call(int ref)
-	{
-		if (!lua_getfunction(this->mLuaEnv, "coroutine", "call"))
-		{
-			return nullptr;
-		}
-		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-		if (!lua_isfunction(this->mLuaEnv, -1))
-		{
-			return nullptr;
-		}
-		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
-		{
-			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-			return nullptr;
-		}
-		return PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
-	}
-
-	LuaTaskSource* LuaScriptComponent::Call(const char* tab, const char* func)
-	{
-		if (!lua_getfunction(this->mLuaEnv, "coroutine", "call"))
-		{
-			return nullptr;
-		}
-		if(!lua_getfunction(this->mLuaEnv, tab, func))
-		{
-			return nullptr;
-		}
-		if (!lua_isfunction(this->mLuaEnv, -1))
-		{
-			return nullptr;
-		}
-		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != 0)
-		{
-			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-			return nullptr;
-		}
-		return PtrProxy<LuaTaskSource>::Read(this->mLuaEnv, -1);
 	}
 }

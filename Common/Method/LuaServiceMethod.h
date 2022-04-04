@@ -22,7 +22,5 @@ namespace Sentry
 		int mIdx;
 		lua_State* mLuaEnv;
 		const ProtoConfig* mProtoConfig;
-		class LuaScriptComponent* mScriptComponent;
-		class RpcClientComponent* mRpcClientComponent;
 	};
 }

@@ -45,10 +45,9 @@ namespace Lua
 				assert(lua_istable(lua, index));
 				std::vector<T> ret;
 				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
+				while (lua_next(lua, -2) != 0)
 				{
-					const T value = Parameter::Read<T>(lua, -1);
-					ret.push_back(value);
+					ret.emplace_back(Parameter::Read<T>(lua, -1));
 					lua_pop(lua, 1);
 				}
 				return ret;
@@ -180,20 +179,9 @@ namespace Lua
 		template<typename Key, typename Value>
 		struct ContainerStruct<std::unordered_map<Key, Value>&>
 		{
-			static std::unordered_map<Key, Value>& Read(lua_State* lua, int index)
+			static std::unordered_map<Key, Value> Read(lua_State* lua, int index)
 			{
-				assert(lua_istable(lua, index));
-				std::unordered_map<Key, Value>* ret = new std::unordered_map<Key, Value>();
-				lua_pushnil(lua);
-				while (lua_next(lua, index - 1) != 0)
-				{
-					lua_type(lua, -1);
-					const Key key = Parameter::Read<Key>(lua, -2);
-					const Value value = Parameter::Read<Value>(lua, -1);
-					ret->insert(std::make_pair(key, value));
-					lua_pop(lua, 1);
-				}
-				return *ret;
+				assert(false);
 			}
 
 			static void Write(lua_State* lua, std::unordered_map<Key, Value>& data)
@@ -219,20 +207,9 @@ namespace Lua
 		template<typename Key, typename Value>
 		struct ContainerStruct<std::unordered_map<Key, Value>*>
 		{
-			static std::unordered_map<Key, Value>* Read(lua_State* lua, int index)
+			static std::unordered_map<Key, Value> Read(lua_State* lua, int index)
 			{
-				assert(lua_istable(lua, index));
-				std::unordered_map<Key, Value>* ret = new std::unordered_map<Key, Value>();
-				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
-				{
-					lua_type(lua, -1);
-					const Key key = Parameter::Read<Key>(lua, -2);
-					const Value value = Parameter::Read<Value>(lua, -1);
-					ret->insert(std::make_pair(key, value));
-					lua_pop(lua, 1);
-				}
-				return ret;
+				assert(false);
 			}
 
 			static void Write(lua_State* lua, std::unordered_map<Key, Value>* data)

@@ -126,6 +126,9 @@ Encode = function(val, stack)
 end
 
 function Json.ToString(val)
+    for i, v in pairs(val) do
+        print(i, v)
+    end
     return (Encode(val))
 end
 

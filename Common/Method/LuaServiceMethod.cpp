@@ -1,5 +1,5 @@
 #include"LuaServiceMethod.h"
-#include"Script/LuaInclude.h"
+#include"Script/Function.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"Component/Rpc/RpcClientComponent.h"
@@ -13,15 +13,11 @@ namespace Sentry
 		: ServiceMethod(config->Method), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mProtoConfig = config;
-		this->mScriptComponent = App::Get()->GetComponent<LuaScriptComponent>();
-		this->mRpcClientComponent = App::Get()->GetComponent<RpcClientComponent>();
 	}
 
 	tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::Call(long long id, const std::string& json)
 	{
-		Lua::lua_getfunction(this->mLuaEnv, "Service", "Call");
-		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-		if (!lua_isfunction(this->mLuaEnv, -1))
+		if(!Lua::Function::Get(this->mLuaEnv, "Service", "Call"))
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
@@ -46,9 +42,7 @@ namespace Sentry
 
 	tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::CallAsync(long long id, const std::string& json)
 	{
-		Lua::lua_getfunction(this->mLuaEnv, "Service", "CallAsync");
-		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-		if (!lua_isfunction(this->mLuaEnv, -1))
+		if(!Lua::Function::Get(this->mLuaEnv, "Service", "Call"))
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}

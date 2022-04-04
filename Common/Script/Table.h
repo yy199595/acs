@@ -1,33 +1,34 @@
 #pragma once
 
 #include<Define/CommonLogDef.h>
-#include<Script/LuaFunction.h>
+#include<Script/Function.h>
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 
 namespace Lua
 {
-	class LuaTable
+	class Table
 	{
 	 public:
-		LuaTable(lua_State* luaEnv, int ref, const std::string& name);
+		Table(lua_State* luaEnv, int ref, const std::string& name);
 
-		~LuaTable();
+		~Table();
 
 	 public:
-		static std::shared_ptr<LuaTable> Create(lua_State* luaEnv, const std::string& name);
+		static std::shared_ptr<Table> Create(lua_State* luaEnv, const std::string& name);
 
 	 public:
 		template<typename T>
-		T GetMemberVariable(const char* name);
+		T GetMember(const char* name);
 
 	 public:
 		int GetRef()
 		{
 			return this->ref;
 		}
-		std::shared_ptr<LuaTable> GetTable(const std::string& name);
-		std::shared_ptr<LuaFunction> GetFunction(const std::string& name);
+		std::string ToJson();
+		std::shared_ptr<Table> GetTable(const std::string& name);
+		std::shared_ptr<Function> GetFunction(const std::string& name);
 
 		bool Serialization(Message& message);
 
@@ -40,7 +41,7 @@ namespace Lua
 	};
 
 	template<typename T>
-	T LuaTable::GetMemberVariable(const char* name)
+	T Table::GetMember(const char* name)
 	{
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
 		if (lua_istable(this->mLuaEnv, -1))

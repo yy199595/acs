@@ -3,16 +3,17 @@
 #include"App/App.h"
 #include<Define/CommonLogDef.h>
 #include"Script/LuaParameter.h"
+#include"Async/LuaTaskSource.h"
 using namespace Sentry;
 
 namespace Lua
 {
-	class LuaFunction
+	class Function
 	{
 	 public:
-		LuaFunction(lua_State* luaEvn, int ref);
+		Function(lua_State* luaEvn, int ref);
 
-		~LuaFunction()
+		~Function()
 		{
 			luaL_unref(luaEnv, LUA_REGISTRYINDEX, this->ref);
 		}
@@ -22,9 +23,9 @@ namespace Lua
 		{
 			return this->ref;
 		}
-		static std::shared_ptr<LuaFunction> Create(lua_State* luaEnv, const std::string& name);
+		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& name);
 
-		static std::shared_ptr<LuaFunction>
+		static std::shared_ptr<Function>
 		Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
 
 	 public:
@@ -35,18 +36,27 @@ namespace Lua
 		template<typename... Args>
 		void Action(Args... args);
 
+
+
 		inline int GetFunctionRef() const
 		{
 			return this->ref;
 		}
 
+	 public:
+		static bool Get(lua_State * lua, const char * tab, const char * func);
+		static LuaTaskSource * Call(lua_State * lua, int ref);
+		static LuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
+
 	 private:
 		int ref;
 		lua_State* luaEnv;
+	 private:
+		static std::unordered_map<std::string, int> mRefFunctions;
 	};
 
 	template<typename... Args>
-	inline void LuaFunction::Action(Args... args)
+	inline void Function::Action(Args... args)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
 		Parameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);
@@ -57,7 +67,7 @@ namespace Lua
 	}
 
 	template<typename Ret, typename... Args>
-	inline Ret LuaFunction::Func(Args... args)
+	inline Ret Function::Func(Args... args)
 	{
 		lua_rawgeti(this->luaEnv, LUA_REGISTRYINDEX, this->ref);
 		Parameter::WriteArgs<Args...>(this->luaEnv, std::forward<Args>(args)...);

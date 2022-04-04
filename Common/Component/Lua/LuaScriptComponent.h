@@ -3,8 +3,7 @@
 #include"Async/LuaTaskSource.h"
 #include"Component/Component.h"
 #include"Script/ClassProxyHelper.h"
-#include"Script/LuaTable.h"
-
+#include"Script/Table.h"
 namespace Sentry
 {
 
@@ -20,10 +19,6 @@ namespace Sentry
 		LuaScriptComponent() = default;
 
 		virtual ~LuaScriptComponent() = default;
-
-	 public:
-		LuaTaskSource * Call(int ref);
-		LuaTaskSource * Call(const char * tab, const char * func);
 
 		struct lua_State* GetLuaEnv()
 		{
