@@ -27,7 +27,7 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		TcpServerComponent* tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		LOG_CHECK_RET_FALSE(this->mGateListener = tcpServerComponent->GetListener("gate"));
+		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("gate"));
 
 		this->mGateComponent = this->GetComponent<GateClientComponent>();
 		this->mEntityComponent = this->GetComponent<EntityMgrComponent>();
@@ -88,15 +88,16 @@ namespace Sentry
 			return XCode::Failure;
 		}
 		long long value = Helper::Guid::Create();
-		const ListenConfig& listenConfig = this->mGateListener->GetConfig();
+		TcpServerComponent* tcpServerComponent = this->GetComponent<TcpServerComponent>();
+		const ListenConfig * listenConfig = tcpServerComponent->GetTcpConfig("gate");
 		std::string token = Helper::Md5::GetMd5(std::to_string(value));
 
 		this->mTokenMap.emplace(token, request.user_id());
 		this->mTimerComponent->AsyncWait(5000, &GateService::OnTokenTimeout, this, token);
 
 		response.set_login_token(token);
-		response.set_gate_ip(listenConfig.Ip);
-		response.set_gate_port(listenConfig.Port);
+		response.set_gate_ip(listenConfig->Ip);
+		response.set_gate_port(listenConfig->Port);
 		return XCode::Successful;
 	}
 }

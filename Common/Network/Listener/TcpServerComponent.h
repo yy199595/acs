@@ -18,8 +18,9 @@ namespace Sentry
 		{
 			return this->mHostIp;
 		}
-		const NetworkListener* GetListener(const std::string& name);
-		void GetListeners(std::vector<const NetworkListener*>& listeners);
+		const ListenConfig * GetTcpConfig(const std::string & name);
+		void GetListenConfigs(std::vector<const ListenConfig*>& configs);
+		std::string GetTcpAddress(const std::string & name);
 	 protected:
 		bool Awake() final;
 		bool LateAwake() final;

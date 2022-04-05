@@ -42,6 +42,7 @@ namespace Sentry
 		Lua::ClassProxyHelper::PushCtor<LuaTaskSource>(lua);
 		Lua::ClassProxyHelper::PushStaticExtensionFunction(lua, "LuaTaskSource", "SetResult", LuaTaskSource::SetResult);
 
+		ClassProxyHelper::BeginNewTable(lua, "Time");
 		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateStr", Helper::Time::GetDateStr);
 		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateString", Helper::Time::GetDateString);
 		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetNowSecTime", Helper::Time::GetNowSecTime);
@@ -144,10 +145,10 @@ namespace Sentry
 	bool LuaScriptComponent::LoadLuaScript(const std::string filePath)
 	{
 		lua_pushcclosure(mLuaEnv, LuaDebug::onError, 0);
-		int errfunc = lua_gettop(mLuaEnv);
+		int top = lua_gettop(mLuaEnv);
 		if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
 		{
-			lua_pcall(mLuaEnv, 0, 1, errfunc);
+			lua_pcall(mLuaEnv, 0, 1, top);
 			lua_pop(mLuaEnv, 2);
 			//LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
 			return true;

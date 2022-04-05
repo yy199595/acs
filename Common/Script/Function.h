@@ -23,10 +23,10 @@ namespace Lua
 		{
 			return this->ref;
 		}
+		
 		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& name);
 
-		static std::shared_ptr<Function>
-		Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
+		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
 
 	 public:
 

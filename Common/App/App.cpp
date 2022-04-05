@@ -206,4 +206,40 @@ namespace Sentry
 #endif
 		this->mLogicRunCount = 0;
 	}
+
+	void App::OnAddComponent(Component* component)
+	{
+		RpcService * rpcService = component->Cast<RpcService>();
+		if(rpcService != nullptr)
+		{
+			std::vector<Component *> components;
+			this->GetComponents(components);
+			for(Component * component1 : components)
+			{
+				ILocalService<RpcService> * localService = component1->Cast<ILocalService<RpcService>>();
+				if(localService != nullptr)
+				{
+					localService->OnAddService(rpcService);
+				}
+			}
+		}
+	}
+
+	void App::OnDelComponent(Component* component)
+	{
+		RpcService * rpcService = component->Cast<RpcService>();
+		if(rpcService != nullptr)
+		{
+			std::vector<Component *> components;
+			this->GetComponents(components);
+			for(Component * component1 : components)
+			{
+				ILocalService<RpcService> * localService = component1->Cast<ILocalService<RpcService>>();
+				if(localService != nullptr)
+				{
+					localService->OnDelService(rpcService);
+				}
+			}
+		}
+	}
 }

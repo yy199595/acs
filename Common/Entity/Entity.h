@@ -38,9 +38,8 @@ namespace Sentry
 		inline std::shared_ptr<T> Cast();
 
 	 protected:
-		virtual void OnAddComponent(Component* component)
-		{
-		}
+		virtual void OnAddComponent(Component* component) { }
+		virtual void OnDelComponent(Component * component) { }
 	 public:
 		void OnDestory() override;
 

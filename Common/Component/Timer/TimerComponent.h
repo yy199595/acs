@@ -18,7 +18,6 @@ namespace Sentry
 		template<typename F, typename O, typename ... Args>
 		unsigned int AsyncWait(unsigned int ms, F&& f, O* o, Args&& ... args)
 		{
-
 			StaticMethod* methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);

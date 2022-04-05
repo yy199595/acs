@@ -56,6 +56,9 @@ namespace Sentry
 		{
 			return this->mTimerComponent;
 		}
+	 protected:
+		void OnAddComponent(Component *component) final;
+		void OnDelComponent(Component *component) final;
 	 private:
 		bool InitComponent();
 		bool LoadComponent();

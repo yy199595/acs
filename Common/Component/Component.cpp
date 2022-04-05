@@ -1,5 +1,5 @@
 #include"Component.h"
-#include<Entity/Entity.h>
+#include<App/App.h>
 namespace Sentry
 {
 	Component::Component()
@@ -7,6 +7,7 @@ namespace Sentry
 	{
 		this->mEntityId = 0;
 		this->mType = nullptr;
+		this->mApp = App::Get();
 	}
 
 	Component* Component::GetByHash(size_t hash)

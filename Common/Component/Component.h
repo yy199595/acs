@@ -14,6 +14,7 @@
 using namespace google::protobuf;
 namespace Sentry
 {
+	class App;
 	class Component;
 	class Type
 	{
@@ -85,13 +86,17 @@ namespace Sentry
 
 		Component* GetByName(const std::string& name);
 
+		std::shared_ptr<App> GetApp() { return mApp;}
+
 	 private:
 		Component* GetByHash(size_t hash);
 	 protected:
 		Type* mType;
 		std::string mName;
 		long long mEntityId;
+		std::shared_ptr<App> mApp;
 		std::shared_ptr<Entity> mEntity;
+
 	};
 	template<typename T>
 	inline T* Component::GetComponent()

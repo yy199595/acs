@@ -4,13 +4,15 @@
 using namespace com;
 namespace Sentry
 {
+	class RpcService;
+
 	class RpcComponent;
 
 	class TaskComponent;
 
 	class ServiceMgrComponent;
 
-	class LocalService : public SubService, public IStart
+	class LocalService : public SubService, public IStart, public ILocalService<RpcService>
 	{
 	 public:
 		LocalService() = default;
@@ -24,6 +26,9 @@ namespace Sentry
 	 public:
 		bool AddNewService(const std::string& service);
 		void RemoveByAddress(const std::string& address);
+	 protected:
+		void OnAddService(RpcService *component) final;
+		void OnDelService(RpcService *component) final;
 	 private:
 		void Add(const Json::Reader& jsonReader);
 		void Push(const Json::Reader& jsonReader);
@@ -31,13 +36,10 @@ namespace Sentry
 		void GetServiceInfo(Json::Writer& jsonWriter);
 	 private:
 		int mAreaId;
+		bool mIsStartComplete;
 		std::string mNodeName;
-		std::string mRpcAddress;
-		std::string mHttpAddress;
 		class RedisComponent* mRedisComponent;
 		class HttpClientComponent* mHttpComponent;
-		class ServiceMgrComponent* mServiceComponent;
-		class TcpServerComponent* mTcpServerComponent;
-		std::unordered_map<std::string, std::vector<std::string>> mAddressMap;
+		std::vector<IRemoteService *> mRemoteListeners;
 	};
 }

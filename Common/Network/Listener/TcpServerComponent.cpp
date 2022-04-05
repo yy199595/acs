@@ -39,24 +39,24 @@ namespace Sentry
 		return true;
 	}
 
-	const NetworkListener* TcpServerComponent::GetListener(const std::string& name)
+	const ListenConfig* TcpServerComponent::GetTcpConfig(const std::string& name)
 	{
-		for (auto listener : this->mListeners)
+		for (ListenConfig * listenerConfig : this->mListenerConfigs)
 		{
-			if (listener->GetConfig().Name == name)
+			if (listenerConfig->Name == name)
 			{
-				return listener;
+				return listenerConfig;
 			}
 		}
 		return nullptr;
 	}
 
-	void TcpServerComponent::GetListeners(std::vector<const NetworkListener*>& listeners)
+	void TcpServerComponent::GetListenConfigs(std::vector<const ListenConfig*>& configs)
 	{
-		listeners.clear();
-		for (auto listener : this->mListeners)
+		configs.clear();
+		for (ListenConfig * listenerConfig : this->mListenerConfigs)
 		{
-			listeners.emplace_back(listener);
+			configs.emplace_back(listenerConfig);
 		}
 	}
 
@@ -101,5 +101,14 @@ namespace Sentry
 				}
 			}
 		}
+	}
+	std::string TcpServerComponent::GetTcpAddress(const string& name)
+	{
+		const ListenConfig * listenConfig = this->GetTcpConfig(name);
+		if(listenConfig == nullptr)
+		{
+			return std::string();
+		}
+		return fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
 	}
 }

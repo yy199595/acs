@@ -93,6 +93,7 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				component->OnDestory();
+				this->OnDelComponent(component);
 				component->SetActive(false);
 				ComponentFactory::DestoryComponent(component);
 				return true;

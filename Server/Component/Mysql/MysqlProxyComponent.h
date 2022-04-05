@@ -19,8 +19,7 @@ namespace Sentry
 
 		bool LateAwake() final;
 	 private:
-		std::shared_ptr<com::Rpc_Request>
-		NewMessage(const std::string& name);
+		std::shared_ptr<com::Rpc_Request> NewMessage(const std::string& name);
 	 public:
 		template<typename T>
 		XCode Add(const T& data);
@@ -40,15 +39,13 @@ namespace Sentry
 		template<typename T>
 		XCode Update(const std::string& updateJson, const std::string& whereJson);
 
-		std::shared_ptr<s2s::Mysql::Response>
-		Invoke(const std::string& sql);
+		std::shared_ptr<s2s::Mysql::Response> Invoke(const std::string& sql);
 
 		template<typename T>
 		std::vector<std::shared_ptr<T>> Sort(const std::string& field, int count, bool reverse = false);
 
 	 private:
-		std::shared_ptr<MysqlRpcTaskSource>
-		Call(const std::string& func, const Message& data);
+		std::shared_ptr<MysqlRpcTaskSource> Call(const std::string& func, const Message& data);
 	 private:
 		class RpcComponent* mRpcComponent;
 		class TaskComponent* mCorComponent;

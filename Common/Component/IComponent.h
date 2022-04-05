@@ -7,6 +7,7 @@
 #include"Json/JsonReader.h"
 namespace Sentry
 {
+	class Component;
 	class IStart
 	{
 	 public:
@@ -70,6 +71,21 @@ namespace Sentry
 			hour = 0;
 			min = 0;
 		}
+	};
+
+	class IRemoteService
+	{
+	 public:
+		virtual void OnServiceExit(const std::string & address) = 0;
+		virtual void OnServiceJoin(const std::string & name, const std::string & address) = 0;
+	};
+
+	template<typename T>
+	class ILocalService
+	{
+	 public:
+		virtual void OnAddService(T * component) = 0;
+		virtual void OnDelService(T * component) = 0;
 	};
 
 	template<typename T1, typename T2>

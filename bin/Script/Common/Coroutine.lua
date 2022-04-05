@@ -4,9 +4,10 @@ function coroutine.wakeup(cor, ...)
     return ret
 end
 
-function coroutine.start(func, ...)
-    local cor = coroutine.create(func)
-    return coroutine.wakeup(cor, ...)
+function coroutine.sleep(ms)
+    local co = coroutine.running()
+    Timer.AddTimer(ms, co)
+    coroutine.yield()
 end
 
 function coroutine.call(func)

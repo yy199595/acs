@@ -1,7 +1,6 @@
 ﻿#include "SystemExtension.h"
 #include "App/App.h"
 #include "Async/RpcTask/RpcTaskSource.h"
-#include "Timer/LuaSleepTimer.h"
 #include "Component/Timer/TimerComponent.h"
 #include "Component/Scene/ServiceMgrComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
@@ -67,15 +66,7 @@ namespace Lua
 
 	int SystemExtension::Sleep(lua_State* luaEnv)
 	{
-		long long ms = lua_tointeger(luaEnv, 1);
-		lua_pushthread(luaEnv);
-		TimerComponent* timerComponent = App::Get()->GetComponent<TimerComponent>();
-		if (timerComponent != nullptr)
-		{
-			auto timer = LuaSleepTimer::Create(luaEnv, -1, ms);
-			timerComponent->AddTimer(timer);
-		}
-		return lua_yield(luaEnv, 1);
+
 	}
 
 	int SystemExtension::AddTimer(lua_State* lua)

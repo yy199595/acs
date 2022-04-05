@@ -18,8 +18,7 @@ namespace Sentry
         void AddAddress(const std::string &address);
 
         bool RemoveAddress(const std::string &address);
-
-
+		
         std::shared_ptr<ProxyClient> GetNode(const std::string & address);
 
         std::shared_ptr<com::Rpc_Request> NewRequest(const std::string &method);

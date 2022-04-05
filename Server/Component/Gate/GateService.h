@@ -26,7 +26,6 @@ namespace Sentry
 		class TimerComponent* mTimerComponent;
 		class GateClientComponent* mGateComponent;
 		class EntityMgrComponent* mEntityComponent;
-		const class NetworkListener* mGateListener;
 		std::unordered_map<std::string, long long> mTokenMap;
 	};
 
