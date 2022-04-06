@@ -14,11 +14,6 @@ namespace Sentry
 	{
 	public:
 		LocalRpcService() = default;
-
-	public:
-		std::shared_ptr<ServiceNode> GetNode() final;
-		std::shared_ptr<ServiceNode> GetNode(const std::string &address) final;
-
 	public:
 		void AddNodeAddress(const std::string &address) final;
 		void DelNodeAddress(const std::string &address) final;
