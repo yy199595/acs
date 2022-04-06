@@ -1,6 +1,6 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/Service/RpcService.h"
+#include"Component/Service/RpcServiceBase.h"
 #include"Component/Logic/LocalService.h"
 #include"Component/Coroutine/TaskComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
@@ -104,10 +104,10 @@ namespace Sentry
 	{
 		std::vector<Component*> components;
 		this->GetComponents(components);
-		RpcService* serviceComponent = nullptr;
+		RpcServiceBase* serviceComponent = nullptr;
 		for (Component* component : components)
 		{
-			if (serviceComponent = dynamic_cast<RpcService*>(component))
+			if (serviceComponent = dynamic_cast<RpcServiceBase*>(component))
 			{
 				response.emplace_back(serviceComponent->GetName());
 			}

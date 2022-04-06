@@ -30,7 +30,7 @@ namespace Sentry
 
 		for (std::string& service : services)
 		{
-			auto luaService = this->GetComponent<RpcService>(service);
+			auto luaService = this->GetComponent<RpcServiceBase>(service);
 			if (luaService != nullptr && !this->AddMethod(luaService))
 			{
 				LOG_ERROR(luaService->GetName(), " add lua method failure");
@@ -40,7 +40,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaServiceMgrComponent::AddMethod(RpcService* rpcService)
+	bool LuaServiceMgrComponent::AddMethod(RpcServiceBase* rpcService)
 	{
 		std::vector<std::string> methods;
 		const std::string& name = rpcService->GetName();

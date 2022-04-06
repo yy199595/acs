@@ -5,7 +5,7 @@
 #include"Other/MultiThreadQueue.h"
 namespace Sentry
 {
-	class RpcService;
+	class RpcServiceBase;
 
 	class LuaRpcService;
 
@@ -20,8 +20,7 @@ namespace Sentry
 #endif
 
 	class IRpcTask;
-	class RpcComponent : public Component,
-						 public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
+	class RpcComponent : public Component, public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
 	{
 	 public:
 		RpcComponent() = default;
@@ -37,8 +36,9 @@ namespace Sentry
 		bool Awake() final;
 		bool LateAwake() final;
 	 public:
-		XCode OnRequest(std::shared_ptr<com::Rpc_Request> request) final;
-		XCode OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
+		XCode OnRemoteRequest(std::shared_ptr<com::Rpc_Request> request) final;
+		XCode OnRemoteResponse(std::shared_ptr<com::Rpc_Response> response) final;
+		XCode OnLocalRequest(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response> response) final;
 	 private:
 		void OnTaskTimeout(long long rpcId);
 	 private:

@@ -45,10 +45,12 @@ namespace Sentry
     protected:
         int GetTimeout() final { return this->mTimeout;}
         void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
+
     public:
         XCode AwaitCode();
         template<typename T>
         std::shared_ptr<T> AwaitData();
+		std::shared_ptr<com::Rpc_Response> Await();
     private:
         const int mTimeout;
         RpcComponent * mRpcComponent;

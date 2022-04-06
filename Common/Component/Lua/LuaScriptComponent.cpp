@@ -106,42 +106,6 @@ namespace Sentry
 		}
 	}
 
-	bool LuaScriptComponent::GetLuaTable(const std::string& name)
-	{
-		auto iter = this->mGlobalRefMap.find(name);
-		if (iter != this->mGlobalRefMap.end())
-		{
-			int ref = iter->second;
-			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-			return (bool)lua_istable(this->mLuaEnv, -1);
-		}
-		lua_getglobal(this->mLuaEnv, name.c_str());
-		if (lua_istable(this->mLuaEnv, -1))
-		{
-			int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-			this->mGlobalRefMap.emplace(name, ref);
-			return true;
-		}
-		return false;
-	}
-
-	bool LuaScriptComponent::GetLuaFunction(const std::string& tab, const std::string& func)
-	{
-		if (!this->GetLuaTable(tab))
-		{
-			return false;
-		}
-		lua_getfield(this->mLuaEnv, -1, func.c_str());
-		if (lua_isfunction(this->mLuaEnv, -1))
-		{
-			int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-			const std::string name = fmt::format("{0}.{1}", tab, func);
-			this->mGlobalRefMap.emplace(name, ref);
-			return true;
-		}
-		return false;
-	}
-
 	bool LuaScriptComponent::LoadLuaScript(const std::string filePath)
 	{
 		lua_pushcclosure(mLuaEnv, LuaDebug::onError, 0);
@@ -156,40 +120,5 @@ namespace Sentry
 		LOG_ERROR("load ", filePath, " failure : ", lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
 		return false;
-	}
-
-	void LuaScriptComponent::ClearRequirePath()
-	{
-		std::string path = "";
-		lua_getglobal(mLuaEnv, "package");
-		lua_pushlstring(mLuaEnv, path.c_str(), path.size());
-		lua_setfield(mLuaEnv, -3, "path");
-	}
-
-	void LuaScriptComponent::AddRequirePath(const std::string path)
-	{
-		std::vector<std::string> luaFiles;
-		if (Helper::Directory::GetFilePaths(path, "*.lua", luaFiles))
-		{
-			for (std::string& file : luaFiles)
-			{
-				this->LoadLuaScript(file);
-			}
-		}
-		lua_getglobal(mLuaEnv, "package");
-		lua_getfield(mLuaEnv, -1, "path");
-		std::string nRequestPath = lua_tostring(mLuaEnv, -1);
-		if (nRequestPath.find(path) != std::string::npos)
-		{
-			return;
-		}
-		char pathBuffer[4096] = { 0 };
-#ifdef _MSC_VER
-		size_t size = sprintf_s(pathBuffer, "%s;%s/?.lua", nRequestPath.c_str(), path.c_str());
-#else
-		size_t size = sprintf(pathBuffer, "%s;%s/?.lua", nRequestPath.c_str(), path.c_str());
-#endif
-		lua_pushlstring(mLuaEnv, pathBuffer, size);
-		lua_setfield(mLuaEnv, -3, "path");
 	}
 }

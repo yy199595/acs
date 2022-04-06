@@ -35,4 +35,9 @@ namespace Sentry
         }
         return (XCode) response->code();
     }
+
+	std::shared_ptr<com::Rpc_Response> RpcTaskSource::Await()
+	{
+		return this->mTaskSource.Await();
+	}
 }

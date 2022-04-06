@@ -1,15 +1,21 @@
-﻿#include"RpcService.h"
+//
+// Created by mac on 2022/4/6.
+//
+
+#include"LocalRpcService.h"
 #include"App/App.h"
-#include"Method/LuaServiceMethod.h"
-#include<Component/Rpc/RpcConfigComponent.h>
-#ifdef __DEBUG__
-#include"Pool/MessagePool.h"
-#endif
+#include"Component/Rpc/RpcConfigComponent.h"
 namespace Sentry
 {
-	bool RpcService::AddMethod(std::shared_ptr<ServiceMethod> method)
+	bool LocalRpcService::Awake()
 	{
-		auto* rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
+		const std::string & name = this->GetName();
+		this->mLocalNode = std::make_shared<ServiceNode>(name);
+		return true;
+	}
+	bool LocalRpcService::AddMethod(std::shared_ptr<ServiceMethod> method)
+	{
+		RpcConfigComponent * rpcConfigComponent = this->GetComponent<RpcConfigComponent>();
 		LOG_CHECK_RET_FALSE(rpcConfigComponent);
 		const std::string& name = method->GetName();
 		const std::string& service = this->GetName();
@@ -42,7 +48,36 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<ServiceMethod> RpcService::GetMethod(const std::string& name)
+	std::shared_ptr<ServiceNode> LocalRpcService::GetNode()
+	{
+		return nullptr;
+	}
+
+	std::shared_ptr<ServiceNode> LocalRpcService::GetNode(const std::string& address)
+	{
+		auto iter = this->mRemoteNodes.find(address);
+		return iter != this->mRemoteNodes.end() ? iter->second : nullptr;
+	}
+
+	void LocalRpcService::AddNodeAddress(const std::string& address)
+	{
+		if(this->GetNode(address) == nullptr)
+		{
+			std::shared_ptr<ServiceNode> serviceNode(new ServiceNode(this->GetName(), address));
+			this->mRemoteNodes.emplace(address, serviceNode);
+		}
+	}
+
+	void LocalRpcService::DelNodeAddress(const std::string& address)
+	{
+		auto iter = this->mRemoteNodes.find(address);
+		if(iter != this->mRemoteNodes.end())
+		{
+			this->mRemoteNodes.erase(iter);
+		}
+	}
+
+	std::shared_ptr<ServiceMethod> LocalRpcService::GetMethod(const std::string& name)
 	{
 		auto iter = this->mLuaMethodMap.find(name);
 		if (iter != this->mLuaMethodMap.end())
@@ -53,8 +88,7 @@ namespace Sentry
 		return iter1 != this->mMethodMap.end() ? iter1->second : nullptr;
 	}
 
-	std::shared_ptr<com::Rpc_Response>
-	RpcService::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
+	std::shared_ptr<com::Rpc_Response> LocalRpcService::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
 	{
 		auto serviceMethod = this->GetMethod(method);
 		if (serviceMethod == nullptr)

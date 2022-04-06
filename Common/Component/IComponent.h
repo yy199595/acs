@@ -106,8 +106,9 @@ namespace Sentry
 	class IProtoRpc
 	{
 	 public:
-		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnResponse(std::shared_ptr<T2> response) = 0;
+		virtual XCode OnRemoteRequest(std::shared_ptr<T1> request) = 0;
+		virtual XCode OnRemoteResponse(std::shared_ptr<T2> response) = 0;
+		virtual XCode OnLocalRequest(std::shared_ptr<T1> request, std::shared_ptr<T2> response) = 0;
 	};
 
 	template<typename T1, typename T2>

@@ -1,29 +1,30 @@
-﻿#pragma once
+//
+// Created by mac on 2022/4/6.
+//
 
-#include<memory>
+#ifndef SERVER_LOCALRPCSERVICE_H
+#define SERVER_LOCALRPCSERVICE_H
+#include"RpcServiceBase.h"
 #include"Method/SubMethod.h"
-#include"Component/Component.h"
 #include"Method/ServiceMethod.h"
-
-using namespace std;
-using namespace com;
 
 namespace Sentry
 {
-	class ServiceMethod;
-	class RpcService : public Component
+	class LocalRpcService : public RpcServiceBase
 	{
-	 public:
-		RpcService() = default;
+	public:
+		LocalRpcService() = default;
 
-		~RpcService() override = default;
+	public:
+		std::shared_ptr<ServiceNode> GetNode() final;
+		std::shared_ptr<ServiceNode> GetNode(const std::string &address) final;
 
-	 public:
-
-		std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
-
-	 public:
+	public:
+		void AddNodeAddress(const std::string &address) final;
+		void DelNodeAddress(const std::string &address) final;
+	public:
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
+		std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
 
 		long long GetCurSocketId() const
 		{
@@ -35,7 +36,10 @@ namespace Sentry
 			this->mCurSocketId = socketId;
 		}
 
-	 protected:
+	protected:
+
+		bool Awake() final;
+
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType1<T> func)
 		{
@@ -84,14 +88,16 @@ namespace Sentry
 			return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this, func));
 		}
 
-	 private:
+	private:
 		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
 
-	 private:
+	private:
 		long long mCurSocketId;
+		std::shared_ptr<ServiceNode> mLocalNode;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
+		std::unordered_map<std::string, std::shared_ptr<ServiceNode>> mRemoteNodes;
 	};
 #define BIND_RPC_FUNCTION(func) LOG_CHECK_RET_FALSE(this->Bind(GetFunctionName(#func), &func))
-
 }
+#endif //SERVER_LOCALRPCSERVICE_H

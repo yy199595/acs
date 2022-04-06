@@ -1381,7 +1381,7 @@ void RepeatedField<Element>::Reserve(int new_size) {
   int old_total_size = total_size_;
   total_size_ = new_size;
   ptr_.elements = new_rep->elements;
-  // OnResponse placement-new on newly allocated elements. We shouldn't have to do
+  // OnRemoteResponse placement-new on newly allocated elements. We shouldn't have to do
   // this, since Element is supposed to be POD, but a previous version of this
   // code allocated storage with "new Element[size]" and some code uses
   // RepeatedField with non-POD types, relying on constructor invocation. If

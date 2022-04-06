@@ -209,14 +209,14 @@ namespace Sentry
 
 	void App::OnAddComponent(Component* component)
 	{
-		RpcService * rpcService = component->Cast<RpcService>();
+		RpcServiceBase * rpcService = component->Cast<RpcServiceBase>();
 		if(rpcService != nullptr)
 		{
 			std::vector<Component *> components;
 			this->GetComponents(components);
 			for(Component * component1 : components)
 			{
-				ILocalService<RpcService> * localService = component1->Cast<ILocalService<RpcService>>();
+				ILocalService<RpcServiceBase> * localService = component1->Cast<ILocalService<RpcServiceBase>>();
 				if(localService != nullptr)
 				{
 					localService->OnAddService(rpcService);
@@ -227,14 +227,14 @@ namespace Sentry
 
 	void App::OnDelComponent(Component* component)
 	{
-		RpcService * rpcService = component->Cast<RpcService>();
+		RpcServiceBase * rpcService = component->Cast<RpcServiceBase>();
 		if(rpcService != nullptr)
 		{
 			std::vector<Component *> components;
 			this->GetComponents(components);
 			for(Component * component1 : components)
 			{
-				ILocalService<RpcService> * localService = component1->Cast<ILocalService<RpcService>>();
+				ILocalService<RpcServiceBase> * localService = component1->Cast<ILocalService<RpcServiceBase>>();
 				if(localService != nullptr)
 				{
 					localService->OnDelService(rpcService);

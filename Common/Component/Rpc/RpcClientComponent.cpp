@@ -96,7 +96,7 @@ namespace Sentry
 	void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		long long socketId = request->socket_id();
-		XCode code = this->mRpcComponent->OnRequest(request);
+		XCode code = this->mRpcComponent->OnRemoteRequest(request);
 		if (code != XCode::Successful)
 		{
 			std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
@@ -113,7 +113,7 @@ namespace Sentry
 
 	void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-		this->mRpcComponent->OnResponse(response);
+		this->mRpcComponent->OnRemoteResponse(response);
 	}
 
 	std::shared_ptr<ProtoRpcClient> RpcClientComponent::MakeSession(const std::string& name, const std::string& address)
