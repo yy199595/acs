@@ -1,5 +1,5 @@
 ﻿#include"RpcComponent.h"
-#include<Component/Service/RpcServiceBase.h>
+#include<Component/RpcService/LocalServerRpc.h>
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
@@ -31,7 +31,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode RpcComponent::OnRemoteRequest(std::shared_ptr<com::Rpc_Request> request)
+	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		unsigned short methodId = request->method_id();
 		const ProtoConfig* protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
@@ -41,7 +41,7 @@ namespace Sentry
 		}
 
 		const std::string& service = protocolConfig->Service;
-		auto logicService = this->GetComponent<RpcServiceBase>(service);
+		LocalServerRpc * logicService = this->GetComponent<LocalServerRpc>(service);
 		if (logicService == nullptr)
 		{
 			LOG_ERROR("call service not exist : [", service, "]");
@@ -76,7 +76,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode RpcComponent::OnRemoteResponse(std::shared_ptr<com::Rpc_Response> response)
+	XCode RpcComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
 		long long rpcId = response->rpc_id();
 		auto iter = this->mRpcTasks.find(rpcId);
@@ -165,10 +165,5 @@ namespace Sentry
 			}
 		}
 #endif
-	}
-
-	XCode RpcComponent::OnLocalRequest(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response> response)
-	{
-		return XCode::CommandArgsError;
 	}
 }// namespace Sentry

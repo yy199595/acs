@@ -2,8 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Component/Service/LuaRpcService.h"
-#include"Component/Scene/ServiceMgrComponent.h"
+#include"Component/RpcService/LuaRpcService.h"
 #include"Component/Lua/LuaScriptComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
@@ -209,14 +208,14 @@ namespace Sentry
 
 	void App::OnAddComponent(Component* component)
 	{
-		RpcServiceBase * rpcService = component->Cast<RpcServiceBase>();
+		RpcServiceComponent * rpcService = component->Cast<RpcServiceComponent>();
 		if(rpcService != nullptr)
 		{
 			std::vector<Component *> components;
 			this->GetComponents(components);
 			for(Component * component1 : components)
 			{
-				ILocalService<RpcServiceBase> * localService = component1->Cast<ILocalService<RpcServiceBase>>();
+				ILocalService<RpcServiceComponent> * localService = component1->Cast<ILocalService<RpcServiceComponent>>();
 				if(localService != nullptr)
 				{
 					localService->OnAddService(rpcService);
@@ -227,14 +226,14 @@ namespace Sentry
 
 	void App::OnDelComponent(Component* component)
 	{
-		RpcServiceBase * rpcService = component->Cast<RpcServiceBase>();
+		RpcServiceComponent * rpcService = component->Cast<RpcServiceComponent>();
 		if(rpcService != nullptr)
 		{
 			std::vector<Component *> components;
 			this->GetComponents(components);
 			for(Component * component1 : components)
 			{
-				ILocalService<RpcServiceBase> * localService = component1->Cast<ILocalService<RpcServiceBase>>();
+				ILocalService<RpcServiceComponent> * localService = component1->Cast<ILocalService<RpcServiceComponent>>();
 				if(localService != nullptr)
 				{
 					localService->OnDelService(rpcService);

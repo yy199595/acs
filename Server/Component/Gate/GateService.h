@@ -4,10 +4,10 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/Service/RpcServiceBase.h"
+#include"Component/RpcService/LocalServerRpc.h"
 namespace Sentry
 {
-	class GateService : public RpcServiceBase
+	class GateService : public LocalServerRpc
 	{
 	 public:
 		GateService() = default;
@@ -18,8 +18,6 @@ namespace Sentry
 	 private:
 		XCode Ping();
 		XCode Login(const c2s::GateLogin::Request& request);
-		XCode Allot(const s2s::AddToGate_Request& request, s2s::AddToGate_Response& response);
-
 	 private:
 		void OnTokenTimeout(const std::string& token);
 	 private:

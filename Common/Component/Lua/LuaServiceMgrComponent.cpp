@@ -1,7 +1,7 @@
 #include"LuaServiceMgrComponent.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
-#include"Component/Service/LuaRpcService.h"
+#include"Component/RpcService/LuaRpcService.h"
 #include"Component/Lua/LuaScriptComponent.h"
 #include"Component/Rpc/RpcConfigComponent.h"
 #include"Util/DirectoryHelper.h"
@@ -30,8 +30,8 @@ namespace Sentry
 
 		for (std::string& service : services)
 		{
-			auto luaService = this->GetComponent<RpcServiceBase>(service);
-			if (luaService != nullptr && !this->AddMethod(luaService))
+			LocalServerRpc * luaService = this->GetComponent<LocalServerRpc>(service);
+			if (luaService != nullptr && !this->AddLuaMethod(luaService))
 			{
 				LOG_ERROR(luaService->GetName(), " add lua method failure");
 				return false;
@@ -40,7 +40,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaServiceMgrComponent::AddMethod(RpcServiceBase* rpcService)
+	bool LuaServiceMgrComponent::AddLuaMethod(LocalServerRpc* rpcService)
 	{
 		std::vector<std::string> methods;
 		const std::string& name = rpcService->GetName();
@@ -56,9 +56,9 @@ namespace Sentry
 				continue;
 			}
 			int idx = luaL_ref(lua, LUA_REGISTRYINDEX);
-			auto config = this->mConfigComponent
-				->GetProtocolConfig(name + "." + method);
-			if (!rpcService->AddMethod(std::make_shared<LuaServiceMethod>(config, lua, idx)))
+			auto config = this->mConfigComponent->GetProtocolConfig(name + "." + method);
+
+			if (!rpcService->AddMethod(rpcService->GetName(), std::make_shared<LuaServiceMethod>(config, lua, idx)))
 			{
 				return false;
 			}

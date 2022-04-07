@@ -6,7 +6,6 @@
 #include"App/App.h"
 #include"Util/MD5.h"
 #include"Util/Guid.h"
-#include"Service/ServiceProxy.h"
 #include"NetWork/RpcGateClient.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Gate/GateClientComponent.h"
@@ -19,7 +18,6 @@ namespace Sentry
 	{
 		BIND_RPC_FUNCTION(GateService::Ping);
 		BIND_RPC_FUNCTION(GateService::Login);
-		BIND_RPC_FUNCTION(GateService::Allot);
 		return true;
 	}
 
@@ -47,28 +45,13 @@ namespace Sentry
 
 	XCode GateService::Ping()
 	{
-		long long sockId = this->GetCurSocketId();
-		auto gateClient = this->mGateComponent->GetGateClient(sockId);
-		if (gateClient != nullptr)
-		{
-			LOG_WARN("{0} ping", gateClient->GetAddress());
-			return XCode::Successful;
-		}
+
 		return XCode::Failure;
 	}
 
 	XCode GateService::Login(const c2s::GateLogin::Request& request)
 	{
-		auto iter = this->mTokenMap.find(request.token());
-		LOGIC_THROW_ERROR(iter != this->mTokenMap.end());
 
-		long long userId = iter->second;
-		long long socketId = this->GetCurSocketId();
-#ifdef __DEBUG__
-		LOG_DEBUG("{0} player login to gate", userId);
-#endif
-		std::shared_ptr<Entity> player(new Entity(userId, socketId));
-		LOGIC_THROW_ERROR(this->mEntityComponent->Add(player));
 		return XCode::Successful;
 	}
 
@@ -79,25 +62,5 @@ namespace Sentry
 		{
 			this->mTokenMap.erase(iter);
 		}
-	}
-
-	XCode GateService::Allot(const s2s::AddToGate_Request& request, s2s::AddToGate_Response& response)
-	{
-		if (this->mEntityComponent->GetEntityCount() >= 10000)
-		{
-			return XCode::Failure;
-		}
-		long long value = Helper::Guid::Create();
-		TcpServerComponent* tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		const ListenConfig * listenConfig = tcpServerComponent->GetTcpConfig("gate");
-		std::string token = Helper::Md5::GetMd5(std::to_string(value));
-
-		this->mTokenMap.emplace(token, request.user_id());
-		this->mTimerComponent->AsyncWait(5000, &GateService::OnTokenTimeout, this, token);
-
-		response.set_login_token(token);
-		response.set_gate_ip(listenConfig->Ip);
-		response.set_gate_port(listenConfig->Port);
-		return XCode::Successful;
 	}
 }

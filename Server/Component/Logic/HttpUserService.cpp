@@ -3,10 +3,8 @@
 #include"Util/MD5.h"
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
-#include"Service/ServiceProxy.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql//MysqlProxyComponent.h"
-#include"Component/Scene/ServiceMgrComponent.h"
 
 namespace Sentry
 {
@@ -23,8 +21,6 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
-		auto serviceComponent = this->GetComponent<ServiceMgrComponent>();
-		LOG_CHECK_RET_FALSE(this->mGateService = serviceComponent->GetServiceProxy("GateService"));
 		return true;
 	}
 
@@ -61,17 +57,6 @@ namespace Sentry
 		}
 		s2s::AddToGate_Request gateRequest;
 		gateRequest.set_user_id(userAccountInfo.user_id());
-		const std::string address = this->mGateService->AllotAddress();
-		auto allotResponse = this->mGateService->Call("GateService.Allot", gateRequest);
-		if (allotResponse->AwaitCode() != XCode::Successful)
-		{
-			return allotResponse->AwaitCode();
-		}
-		auto responseData = allotResponse->AwaitData<s2s::AddToGate_Response>();
-
-		response.AddMember("gate_ip", responseData->gate_ip());
-		response.AddMember("token", responseData->login_token());
-		response.AddMember("gate_port", responseData->gate_port());
 		return XCode::Successful;
 	}
 

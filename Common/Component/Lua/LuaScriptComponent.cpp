@@ -5,7 +5,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
-#include"Component/Service/LuaRpcService.h"
+#include"Component/RpcService/LuaRpcService.h"
 #include"Async/LuaTaskSource.h"
 
 using namespace Lua;

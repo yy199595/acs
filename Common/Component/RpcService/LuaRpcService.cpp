@@ -17,18 +17,19 @@ namespace Sentry
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LuaRpcService::Awake()
-	{
-		return true;
-	}
-
 	void LuaRpcService::OnHotFix()
 	{
 
 	}
 
+	bool LuaRpcService::Awake()
+	{
+		return true;
+	}
+
 	bool LuaRpcService::LateAwake()
 	{
+		LOG_CHECK_RET_FALSE(LocalServerRpc::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		this->mConfigComponent = this->GetComponent<RpcConfigComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaComponent && this->mConfigComponent);
@@ -64,7 +65,7 @@ namespace Sentry
 			auto config = this->mConfigComponent
 				->GetProtocolConfig(this->GetName() + "." + method);
 			LOG_INFO("add new lua service method : {0}.{1}", this->GetName(), method);
-			this->AddMethod(std::make_shared<LuaServiceMethod>(config, this->mLuaEnv, idx));
+			this->AddMethod(this->GetName(), std::make_shared<LuaServiceMethod>(config, this->mLuaEnv, idx));
 		}
 		return true;
 	}
@@ -78,4 +79,5 @@ namespace Sentry
 			LOG_WARN("Invoke ", this->GetName(), " Start Coroutine")
 		}
 	}
+
 }

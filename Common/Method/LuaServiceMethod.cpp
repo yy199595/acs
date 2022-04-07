@@ -9,8 +9,8 @@
 namespace Sentry
 {
 
-	LuaServiceMethod::LuaServiceMethod(const ProtoConfig* config, lua_State* lua, int idx)
-		: ServiceMethod(config->Method), mLuaEnv(lua), mIdx(idx)
+	LuaServiceMethod::LuaServiceMethod(const std::string& service, const std::string& func, lua_State* lua)
+		: ServiceMethod(func), mLuaEnv(lua), mIdx(idx)
 	{
 		this->mProtoConfig = config;
 	}

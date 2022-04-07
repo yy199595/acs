@@ -1,15 +1,13 @@
 ﻿#pragma once
 
-
+#include"LocalServerRpc.h"
 #include"Script/LuaInclude.h"
-#include"Component/Service/RpcServiceBase.h"
 
-class LuaTable;
 namespace Sentry
 {
 	class LuaScriptComponent;
 
-	class LuaRpcService : public RpcServiceBase, public IStart, public IHotfix
+	class LuaRpcService : public LocalServerRpc, public IStart, public IHotfix
 	{
 	 public:
 		LuaRpcService();

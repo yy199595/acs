@@ -27,29 +27,32 @@
         "register": "http://127.0.0.1:80/logic/account/register"
     },
     "listener": {
-        "ip":"127.0.0.1",
         "rpc":
         {
             "port":7788,
             "count":10000,
+            "ip": "127.0.0.1",
             "component":"RpcClientComponent"
         },
         "http":
         {
             "port":80,
             "count": 1000,
+            "ip": "127.0.0.1",
             "component": "HttpClientComponent"
         },
         "gate":
         {
             "port":1995,
             "count": 10000,
+            "ip": "127.0.0.1",
             "component": "GateClientComponent"
         },
         "console":
         {
             "port": 8088,
-            "count": 1,
+            "count": 100,
+            "ip": "127.0.0.1",
             "component" : "ConsoleComponent"
         }
     },
@@ -85,7 +88,6 @@
         "GateComponent",
         "GateClientComponent",
         "HttpClientComponent",
-        "ServiceMgrComponent",
         "MysqlProxyComponent",
         "EntityMgrComponent",
         "ClientComponent"

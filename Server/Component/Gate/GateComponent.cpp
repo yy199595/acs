@@ -4,10 +4,8 @@
 
 #include"GateComponent.h"
 #include"App/App.h"
-#include"Service/ServiceProxy.h"
 #include"NetWork/RpcGateClient.h"
 #include"Component/Rpc/RpcConfigComponent.h"
-#include"Component/Scene/ServiceMgrComponent.h"
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -19,7 +17,6 @@ namespace Sentry
 {
 	bool GateComponent::Awake()
 	{
-		this->mServiceComponent = nullptr;
 		this->mRpcConfigComponent = nullptr;
 		this->mGateClientComponent = nullptr;
 		return true;
@@ -29,7 +26,6 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
-		LOG_CHECK_RET_FALSE(this->mServiceComponent = this->GetComponent<ServiceMgrComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
@@ -43,34 +39,36 @@ namespace Sentry
 			return XCode::NotFoundRpcConfig;
 		}
 
+		RpcServiceComponent * rpcServiceComponent = this->GetComponent<RpcServiceComponent>(config->Service);
+
 		//TODO
-		auto serviceEntity = this->mServiceComponent->GetServiceProxy(config->Service);
-
-		if (!config->Request.empty())
-		{
-			if (!request->has_data()) //没有正确的消息体
-			{
-				return XCode::CallArgsError;
-			}
-			this->mProtoName.clear();
-			if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName))
-			{
-				if (this->mProtoName != config->Request) //请求的消息不正确
-				{
-					return XCode::CallArgsError;
-				}
-			}
-		}
-
-		// 分配地址
-		auto requestMessage = serviceEntity->NewRequest(request->method_name());
-		std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
-		if (request->has_data())
-		{
-			requestMessage->mutable_data()->CopyFrom(request->data());
-		}
-		requestMessage->set_rpc_id(proxyTask->GetRpcId());
-		proxyTask->InitProxyTask(request->rpc_id(), request->sock_id(), this, this->mRpcComponent);
+//		auto serviceEntity = this->mServiceComponent->GetServiceProxy(config->Service);
+//
+//		if (!config->Request.empty())
+//		{
+//			if (!request->has_data()) //没有正确的消息体
+//			{
+//				return XCode::CallArgsError;
+//			}
+//			this->mProtoName.clear();
+//			if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName))
+//			{
+//				if (this->mProtoName != config->Request) //请求的消息不正确
+//				{
+//					return XCode::CallArgsError;
+//				}
+//			}
+//		}
+//
+//		// 分配地址
+//		auto requestMessage = serviceEntity->NewRequest(request->method_name());
+//		std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
+//		if (request->has_data())
+//		{
+//			requestMessage->mutable_data()->CopyFrom(request->data());
+//		}
+//		requestMessage->set_rpc_id(proxyTask->GetRpcId());
+//		proxyTask->InitProxyTask(request->rpc_id(), request->sock_id(), this, this->mRpcComponent);
 		return XCode::Successful;
 	}
 

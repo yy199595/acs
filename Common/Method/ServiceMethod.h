@@ -48,9 +48,6 @@ namespace Sentry
 		}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual void SetSocketId(long long id)
-		{
-		};
 		virtual XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) = 0;
 		const std::string& GetName()
 		{
@@ -74,10 +71,6 @@ namespace Sentry
 		{
 		}
 	 public:
-		void SetSocketId(long long id) override
-		{
-			_o->SetCurSocketId(id);
-		};
 
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
@@ -113,10 +106,6 @@ namespace Sentry
 		{
 		}
 	 public:
-		void SetSocketId(long long id) override
-		{
-			_o->SetCurSocketId(id);
-		};
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
 			if (!request.data().template Is<T1>())
@@ -164,10 +153,6 @@ namespace Sentry
 		{
 		}
 	 public:
-		void SetSocketId(long long id) override
-		{
-			_o->SetCurSocketId(id);
-		};
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
 			if (!request.data().Is<T1>())
@@ -225,10 +210,6 @@ namespace Sentry
 		{
 		}
 	 public:
-		void SetSocketId(long long id) override
-		{
-			_o->SetCurSocketId(id);
-		};
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
 			if (this->mHasUserId && request.user_id() == 0)

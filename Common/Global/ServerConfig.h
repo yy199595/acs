@@ -16,6 +16,10 @@ namespace Sentry
         bool LoadConfig();
         int GetNodeId() { return this->mNodeId; }
         const std::string& GetNodeName() { return this->mNodeName; }
+
+	public:
+		std::string GetRpcAddress() const;
+		std::string GetHttpAddress() const;
     private:   
         int mNodeId;
         std::string mNodeName;

@@ -2,9 +2,7 @@
 #include "App/App.h"
 #include "Async/RpcTask/RpcTaskSource.h"
 #include "Component/Timer/TimerComponent.h"
-#include "Component/Scene/ServiceMgrComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Service/ServiceProxy.h"
 using namespace Sentry;
 
 namespace Lua
@@ -18,9 +16,6 @@ namespace Lua
 	int SystemExtension::Allot(lua_State* luaEnv)
 	{
 		luaL_checkstring(luaEnv, -1);
-		ServiceMgrComponent* serviceMgrComponent = App::Get()->GetComponent<ServiceMgrComponent>();
-		auto serviceProxy = serviceMgrComponent->GetServiceProxy(lua_tostring(luaEnv, -1));
-
 		return 0;
 	}
 

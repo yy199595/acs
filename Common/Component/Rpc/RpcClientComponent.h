@@ -26,7 +26,7 @@ namespace Sentry
 	 public:
 		std::shared_ptr<ProtoRpcClient> GetSession(long long id);
 		std::shared_ptr<ProtoRpcClient> GetSession(const std::string& address);
-		std::shared_ptr<ProtoRpcClient> MakeSession(const std::string& name, const std::string& address);
+		std::shared_ptr<ProtoRpcClient> GetOrCreateSession(const std::string& name, const std::string& address);
 	 protected:
 		bool Awake() final;
 		bool LateAwake() final;

@@ -12,7 +12,7 @@ namespace Sentry
 		~LuaServiceMgrComponent() final = default;
 
 	 public:
-		bool AddMethod(class RpcService* rpcService);
+		bool AddLuaMethod(class LocalServerRpc* rpcService);
 	 protected:
 		bool Awake() final;
 		void OnHotFix() final;

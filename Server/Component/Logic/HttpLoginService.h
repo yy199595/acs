@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_HTTPLOGINSERVICE_H
 #define GAMEKEEPER_HTTPLOGINSERVICE_H
-#include"Component/Service/HttpServiceComponent.h"
+#include"Component/HttpService/HttpServiceComponent.h"
 namespace Sentry
 {
 	class HttpLoginService : public HttpServiceComponent

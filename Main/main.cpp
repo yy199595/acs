@@ -17,7 +17,6 @@
 #include<Component/Telnet/ConsoleComponent.h>
 #include"Component/Lua/LuaServiceMgrComponent.h"
 #include<Component/Rpc/RpcComponent.h>
-#include"Component/Scene/ServiceMgrComponent.h"
 #include<Component/Scene/ThreadPoolComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
@@ -29,7 +28,7 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
-#include"Component/Service/HttpNodeService.h"
+#include"Component/HttpService/HttpNodeService.h"
 #include"Component/ClientComponent.h"
 
 #include"Component/Lua/LuaRegisterComponent.h"
@@ -40,7 +39,6 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcComponent>("RpcComponent");
-    ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
     ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
 
 // common

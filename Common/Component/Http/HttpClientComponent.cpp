@@ -12,7 +12,7 @@
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Component/Service/HttpService.h"
+#include"Component/HttpService/HttpService.h"
 namespace Sentry
 {
 

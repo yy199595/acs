@@ -4,8 +4,6 @@
 #include"ProxyClient.h"
 #include"Util/StringHelper.h"
 #include"Component/Logic/LocalService.h"
-#include"Component/Scene/ServiceMgrComponent.h"
-#include"Service/ServiceProxy.h"
 namespace Sentry
 {
     ProxyClient::ProxyClient(const std::string &name, const std::string &address)
@@ -23,8 +21,8 @@ namespace Sentry
     {
         if (this->mNodeClient == nullptr)
         {
-            this->mNodeClient = this->mRpcCliemComponent->MakeSession
-                    (this->mServiceName, this->mAddress);
+            this->mNodeClient = this->mRpcCliemComponent->GetOrCreateSession
+					(this->mServiceName, this->mAddress);
         }
         if (this->mNodeClient->IsOpen())
         {
@@ -74,12 +72,6 @@ namespace Sentry
         if (count <= 3)
         {
             return true;
-        }
-        ServiceMgrComponent *serviceComponent = App::Get()->GetComponent<ServiceMgrComponent>();
-        auto serviceEntity = serviceComponent->GetServiceProxy(this->mServiceName);
-        if(serviceEntity != nullptr)
-        {
-            return serviceEntity->RemoveAddress(this->mAddress);
         }
         return false;
     }

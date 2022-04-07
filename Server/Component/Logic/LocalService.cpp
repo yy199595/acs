@@ -1,8 +1,6 @@
 ﻿#include"LocalService.h"
 #include"App/App.h"
-#include"Component/Service/RpcServiceBase.h"
-#include"Service/ServiceProxy.h"
-#include"Component/Scene/ServiceMgrComponent.h"
+#include"Component/RpcService/LocalServerRpc.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Component/Redis/RedisComponent.h"
@@ -28,26 +26,13 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(this->mHttpComponent = this->GetComponent<HttpClientComponent>());
 
 		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		ServiceMgrComponent * serviceMgrComponent = this->GetComponent<ServiceMgrComponent>();
-		LOG_CHECK_RET_FALSE(tcpServerComponent != nullptr && serviceMgrComponent != nullptr);
+		LOG_CHECK_RET_FALSE(tcpServerComponent != nullptr);
 
 		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("rpc"));
 		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("http"));
-
-		std::vector<Component *> components;
-		this->GetApp()->GetComponents(components);
-		for(Component * component : components)
-		{
-			IRemoteService * serviceListen = component->Cast<IRemoteService>();
-			if(serviceListen != nullptr)
-			{
-				this->mRemoteListeners.emplace_back(serviceListen);
-			}
-		}
-		return !this->mRemoteListeners.empty();
 	}
 
-	void LocalService::OnAddService(RpcServiceBase* component)
+	void LocalService::OnAddService(LocalServerRpc* component)
 	{
 		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
 		if(this->mIsStartComplete)
@@ -60,7 +45,7 @@ namespace Sentry
 		}
 	}
 
-	void LocalService::OnDelService(RpcServiceBase* component)
+	void LocalService::OnDelService(LocalServerRpc* component)
 	{
 
 	}
@@ -77,9 +62,10 @@ namespace Sentry
 		{
 			return;
 		}
-		for(IRemoteService * serviceListen : this->mRemoteListeners)
+		RpcServiceComponent * rpcServiceComponent = this->GetComponent<RpcServiceComponent>(service);
+		if(rpcServiceComponent != nullptr)
 		{
-			serviceListen->OnServiceJoin(service, address);
+			rpcServiceComponent->AddRemoteAddress(address);
 		}
 	}
 
@@ -105,11 +91,12 @@ namespace Sentry
 		LOG_CHECK_RET(jsonReader.GetMember("rpc", "address", rpcAddress));
 		LOG_CHECK_RET(jsonReader.GetMember("http", "address", httpAddress));
 
-		for(IRemoteService * serviceListen : this->mRemoteListeners)
+		for(const std::string & service : services)
 		{
-			for(const std::string & service : services)
+			RpcServiceComponent* rpcServiceComponent = this->GetComponent<RpcServiceComponent>(service);
+			if (rpcServiceComponent != nullptr)
 			{
-				serviceListen->OnServiceJoin(service, rpcAddress);
+				rpcServiceComponent->AddRemoteAddress(rpcAddress);
 			}
 		}
 
@@ -154,7 +141,7 @@ namespace Sentry
 			return false;
 		}
 		component = ComponentFactory::CreateComponent(name);
-		if (component == nullptr || dynamic_cast<RpcServiceBase*>(component) == nullptr)
+		if (component == nullptr || dynamic_cast<RpcServiceComponent*>(component) == nullptr)
 		{
 			delete component;
 			return false;
@@ -172,10 +159,13 @@ namespace Sentry
 	{
 		std::string address;
 		LOG_CHECK_RET(jsonReader.GetMember("address", address));
-		for(IRemoteService * serviceListen : this->mRemoteListeners)
-		{
-			serviceListen->OnServiceExit(address);
-		}
+
+		// TODO
+//		RpcServiceComponent* rpcServiceComponent = this->GetComponent<RpcServiceComponent>(service);
+//		if(rpcServiceComponent != nullptr)
+//		{
+//			rpcServiceComponent->DelRemoteAddress(address);
+//		}
 	}
 
 	void LocalService::GetServiceInfo(Json::Writer& jsonWriter)
@@ -188,9 +178,9 @@ namespace Sentry
 		jsonWriter.AddMember("address", rpcAddress);
 
 		std::vector<std::string> tempArray;
-		std::list<RpcServiceBase*> rpcServices;
+		std::list<RpcServiceComponent*> rpcServices;
 		App::Get()->GetTypeComponents(rpcServices);
-		for (RpcServiceBase* rpcService : rpcServices)
+		for (RpcServiceComponent* rpcService : rpcServices)
 		{
 			tempArray.emplace_back(rpcService->GetName());
 		}

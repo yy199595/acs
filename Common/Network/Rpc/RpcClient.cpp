@@ -141,6 +141,8 @@ namespace Sentry
 
 	bool RpcClient::StartConnect(const std::string& ip, unsigned short port)
 	{
+		assert(!ip.empty());
+		assert(port != 0);
 		if (this->IsCanConnection())
 		{
 			this->mIsConnect = true;

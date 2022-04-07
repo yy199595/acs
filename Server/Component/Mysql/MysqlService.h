@@ -1,11 +1,11 @@
 #pragma once
 
 #include"Protocol/s2s.pb.h"
-#include"Component/Service/RpcServiceBase.h"
+#include"Component/RpcService/LocalServerRpc.h"
 
 namespace Sentry
 {
-	class MysqlService : public RpcServiceBase
+	class MysqlService : public LocalServerRpc
 	{
 	 public:
 		MysqlService() = default;

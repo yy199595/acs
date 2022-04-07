@@ -49,7 +49,6 @@ namespace Sentry
 	 private:
 		class RpcComponent* mRpcComponent;
 		class TaskComponent* mCorComponent;
-		class ServiceMgrComponent* mServiceComponent;
 	};
 
 	template<typename T>

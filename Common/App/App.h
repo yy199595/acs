@@ -16,7 +16,7 @@ namespace Sentry
 {
 	class Manager;
 
-	class RpcServiceBase;
+	class RpcServiceComponent;
 	class MainTaskScheduler;
 	class App : public Entity
 	{

@@ -73,13 +73,6 @@ namespace Sentry
 		}
 	};
 
-	class IRemoteService
-	{
-	 public:
-		virtual void OnServiceExit(const std::string & address) = 0;
-		virtual void OnServiceJoin(const std::string & name, const std::string & address) = 0;
-	};
-
 	template<typename T>
 	class ILocalService
 	{
@@ -106,9 +99,8 @@ namespace Sentry
 	class IProtoRpc
 	{
 	 public:
-		virtual XCode OnRemoteRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnRemoteResponse(std::shared_ptr<T2> response) = 0;
-		virtual XCode OnLocalRequest(std::shared_ptr<T1> request, std::shared_ptr<T2> response) = 0;
+		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
+		virtual XCode OnResponse(std::shared_ptr<T2> response) = 0;
 	};
 
 	template<typename T1, typename T2>

@@ -8,7 +8,7 @@ namespace Sentry
 	class LuaServiceMethod : public ServiceMethod
 	{
 	 public:
-		LuaServiceMethod(const ProtoConfig* config, lua_State* lua, int idx);
+		LuaServiceMethod(const std::string & service, const std::string & func, lua_State* lua);
 	 public:
 		bool IsLuaMethod() final
 		{
@@ -19,8 +19,8 @@ namespace Sentry
 		tuple<XCode, std::shared_ptr<Message>> Call(long long id, const std::string& json);
 		tuple<XCode, std::shared_ptr<Message>> CallAsync(long long id, const std::string& json);
 	 private:
-		int mIdx;
 		lua_State* mLuaEnv;
-		const ProtoConfig* mProtoConfig;
+		const std::string mService;
+		const std::string mFunction;
 	};
 }

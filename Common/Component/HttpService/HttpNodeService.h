@@ -5,7 +5,7 @@
 #ifndef SENTRY_HTTPNODESERVICE_H
 #define SENTRY_HTTPNODESERVICE_H
 #include"Component/Component.h"
-#include"Component/Service/HttpService.h"
+#include"HttpService.h"
 namespace Sentry
 {
 	class HttpNodeService : public HttpService
@@ -18,8 +18,6 @@ namespace Sentry
 	 protected:
 		bool Awake() final;
 		bool LateAwake() final;
-	 private:
-		class ServiceMgrComponent* mServiceComponent;
 	};
 }
 #endif //SENTRY_HTTPNODESERVICE_H
