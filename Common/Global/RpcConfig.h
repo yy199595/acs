@@ -1,8 +1,11 @@
 ﻿#pragma once
-#include"XCode/XCode.h"
-#include"Other/ProtoConfig.h"
+
+#include<vector>
 #include<shared_mutex>
 #include<unordered_map>
+
+#include"XCode/XCode.h"
+#include"Other/ProtoConfig.h"
 namespace Sentry
 {
 	struct CodeConfig
