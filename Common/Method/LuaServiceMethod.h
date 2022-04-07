@@ -20,7 +20,6 @@ namespace Sentry
 		tuple<XCode, std::shared_ptr<Message>> CallAsync(long long id, const std::string& json);
 	 private:
 		lua_State* mLuaEnv;
-		const std::string mService;
-		const std::string mFunction;
+		std::string mFunction;
 	};
 }

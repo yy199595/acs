@@ -5,7 +5,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Component/Service/SubService.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClient.h"
 namespace Sentry

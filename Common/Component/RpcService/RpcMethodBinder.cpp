@@ -3,15 +3,14 @@
 //
 #include"RpcMethodBinder.h"
 #include"App/App.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 namespace Sentry
 {
 	bool RpcMethodBinder::AddMethod(std::string service, std::shared_ptr<ServiceMethod> method)
 	{
-		RpcConfigComponent * rpcConfigComponent = App::Get()->GetComponent<RpcConfigComponent>();
-		LOG_CHECK_RET_FALSE(rpcConfigComponent);
+		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
 		const std::string& name = method->GetName();
-		if (!rpcConfigComponent->HasServiceMethod(service, name))
+		if (!rpcConfig.HasServiceMethod(service, name))
 		{
 			LOG_FATAL(service, '.', name, " add failure");
 			return false;

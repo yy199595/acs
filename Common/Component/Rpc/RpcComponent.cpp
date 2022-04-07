@@ -5,7 +5,7 @@
 #include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"Method/LuaServiceMethod.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Json/JsonWriter.h"
@@ -16,7 +16,6 @@ namespace Sentry
 	{
 		this->mCorComponent = nullptr;
 		this->mTimerComponent = nullptr;
-		this->mPpcConfigComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 		return true;
 	}
@@ -26,7 +25,6 @@ namespace Sentry
 		this->mCorComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->mPpcConfigComponent = this->GetComponent<RpcConfigComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
 		return true;
 	}
@@ -34,7 +32,8 @@ namespace Sentry
 	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		unsigned short methodId = request->method_id();
-		const ProtoConfig* protocolConfig = this->mPpcConfigComponent->GetProtocolConfig(methodId);
+		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		const ProtoConfig* protocolConfig = rpcConfig.GetProtocolConfig(methodId);
 		if (protocolConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -92,8 +91,8 @@ namespace Sentry
 		if (this->GetRpcInfo(rpcId, methodId, time))
 		{
 			std::string json = "";
-			RpcConfigComponent* configComponent = this->GetComponent<RpcConfigComponent>();
-			const ProtoConfig* protoConfig = configComponent->GetProtocolConfig(methodId);
+			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+			const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(methodId);
 
 			LOG_DEBUG("*************[response]*************");
 			LOG_DEBUG("func = {0}.{1}", protoConfig->Service, protoConfig->Method);
@@ -158,7 +157,8 @@ namespace Sentry
 		long long costTime = 0;
 		if (this->GetRpcInfo(rpcId, methodId, costTime))
 		{
-			auto config = this->mPpcConfigComponent->GetProtocolConfig(methodId);
+			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+			const ProtoConfig* config = rpcConfig.GetProtocolConfig(methodId);
 			if (config != nullptr)
 			{
 				LOG_ERROR("call ", config->Service, '.', config->Method, " time out");

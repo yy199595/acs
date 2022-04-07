@@ -8,14 +8,13 @@
 
 #include<Network/Listener/TcpServerComponent.h>
 #include"Component/Mysql/MysqlComponent.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Http/HttpClientComponent.h"
 #include"Component/Gate/GateService.h"
 #include<Component/Telnet/ConsoleComponent.h>
-#include"Component/Lua/LuaServiceMgrComponent.h"
 #include<Component/Rpc/RpcComponent.h>
 #include<Component/Scene/ThreadPoolComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
@@ -39,8 +38,6 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcComponent>("RpcComponent");
-    ComponentFactory::Add<RpcConfigComponent>("RpcConfigComponent");
-
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
@@ -69,7 +66,6 @@ void RegisterComponent()
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
 	ComponentFactory::Add<LuaRegisterComponent>("LuaRegisterComponent");
-	ComponentFactory::Add<LuaServiceMgrComponent>("LuaServiceMgrComponent");
 	//client
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
 }

@@ -10,9 +10,7 @@ namespace Sentry
 
 	class TaskComponent;
 
-	class ServiceMgrComponent;
-
-	class LocalService : public SubService, public IStart, public ILocalService<LocalServerRpc>
+	class LocalService : public SubService, public IComplete, public IServiceChange
 	{
 	 public:
 		LocalService() = default;
@@ -21,8 +19,8 @@ namespace Sentry
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnStart() final;
 		void OnDestory() final;
+		void OnComplete() final;
 	 public:
 		bool AddNewService(const std::string& service);
 		void RemoveByAddress(const std::string& address);

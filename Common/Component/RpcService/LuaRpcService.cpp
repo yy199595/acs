@@ -1,8 +1,9 @@
 ﻿#include"LuaRpcService.h"
 #include"Script/Table.h"
+#include"Script/Function.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Rpc//RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 
 namespace Sentry
 {
@@ -19,7 +20,8 @@ namespace Sentry
 
 	void LuaRpcService::OnHotFix()
 	{
-
+		this->mMethodMap.clear();
+		this->mLuaMethodMap.clear();
 	}
 
 	bool LuaRpcService::Awake()
@@ -31,8 +33,6 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(LocalServerRpc::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-		this->mConfigComponent = this->GetComponent<RpcConfigComponent>();
-		LOG_CHECK_RET_FALSE(this->mLuaComponent && this->mConfigComponent);
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
 		std::shared_ptr<Lua::Table> luaTable = Lua::Table::Create(this->mLuaEnv, this->GetName());
 		if (luaTable == nullptr)
@@ -40,32 +40,35 @@ namespace Sentry
 			LOG_ERROR(this->GetName(), " is not lua table");
 			return false;
 		}
-		std::shared_ptr<Lua::Function> awakeFunction = luaTable->GetFunction("Awake");
-		std::shared_ptr<Lua::Function> lateAwakeFunction = luaTable->GetFunction("LateAwake");
-
-		if (awakeFunction != nullptr)
+		const char * tab = this->GetName().c_str();
+		if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
 		{
-			LOG_CHECK_RET_FALSE(awakeFunction->Func<bool>());
+			return Lua::Function::Invoke<bool>(this->mLuaEnv);
 		}
-		if (lateAwakeFunction != nullptr)
+		if(Lua::Function::Get(this->mLuaEnv, tab, "LateAwake"))
 		{
-			LOG_CHECK_RET_FALSE(lateAwakeFunction->Func<bool>());
+			return Lua::Function::Invoke<bool>(this->mLuaEnv);
 		}
 
 		std::vector<std::string> methods;
-		this->mConfigComponent->GetMethods(this->GetName(), methods);
+
+		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		rpcConfig.GetMethods(this->GetName(), methods);
 
 		for (const std::string& method : methods)
 		{
-			int ref = luaTable->GetRef();
-			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
-			lua_getfield(this->mLuaEnv, -1, method.c_str());
-			LOG_CHECK_RET_FALSE(lua_isfunction(this->mLuaEnv, -1));
-			int idx = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-			auto config = this->mConfigComponent
-				->GetProtocolConfig(this->GetName() + "." + method);
-			LOG_INFO("add new lua service method : {0}.{1}", this->GetName(), method);
-			this->AddMethod(this->GetName(), std::make_shared<LuaServiceMethod>(config, this->mLuaEnv, idx));
+			const char * func = method.c_str();
+			if(!Lua::Function::Get(this->mLuaEnv, tab, func))
+			{
+				LOG_ERROR("not find rpc method = [{0}.{1}]", tab, func);
+				return false;
+			}
+			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
+			const ProtoConfig * config = rpcConfig.GetProtocolConfig(fullName);
+
+			std::shared_ptr<LuaServiceMethod> luaServiceMethod(
+				new LuaServiceMethod(config->Service, config->Method, this->mLuaEnv));
+			this->AddMethod(this->GetName(), luaServiceMethod);
 		}
 		return true;
 	}

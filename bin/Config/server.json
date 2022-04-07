@@ -77,13 +77,11 @@
     "component": [
         "RpcComponent",
         "ConsoleComponent",
-        "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
         "RedisComponent",
         "LuaScriptComponent",
         "LuaRegisterComponent",
-        "LuaServiceMgrComponent",
         "RpcClientComponent",
         "GateComponent",
         "GateClientComponent",

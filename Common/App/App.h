@@ -6,6 +6,7 @@
 #include"Entity/Entity.h"
 #include"Global/ServerPath.h"
 #include"Thread/TaskThread.h"
+#include"Global/RpcConfig.h"
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
@@ -28,15 +29,23 @@ namespace Sentry
 		{
 			return mApp;
 		}
-		bool AddComponentByName(const std::string& name);
 		const ServerConfig& GetConfig()
 		{
 			return *mConfig;
+		}
+		const RpcConfig& GetRpcConfig()
+		{
+			return this->mRpcConfig;
 		}
 		inline MainTaskScheduler& GetTaskScheduler()
 		{
 			return this->mTaskScheduler;
 		}
+
+	 public:
+
+		bool AddComponentByName(const std::string& name);
+
 		inline bool IsMainThread()
 		{
 			return std::this_thread::get_id() == this->mMainThreadId;
@@ -57,10 +66,9 @@ namespace Sentry
 			return this->mTimerComponent;
 		}
 	 protected:
-		void OnAddComponent(Component *component) final;
-		void OnDelComponent(Component *component) final;
+		void OnAddComponent(Component* component) final;
+		void OnDelComponent(Component* component) final;
 	 private:
-		bool InitComponent();
 		bool LoadComponent();
 		bool InitComponent(Component* component);
 		void StartComponent(Component* component);
@@ -69,13 +77,16 @@ namespace Sentry
 		void Stop();
 	 private:
 		void LogicMainLoop();
+		bool StartNewComponent();
 		void UpdateConsoleTitle();
 	 private:
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	 private:
 		int mFps;
+		bool mIsComplete;
 		float mDeltaTime;
+		RpcConfig mRpcConfig;
 		long long mStartTimer;
 		long long mSecondTimer;
 		long long mLogicUpdateInterval;
@@ -91,6 +102,7 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
+		std::queue<Component *> mNewComponents;
 		std::vector<Component*> mSceneComponents;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;

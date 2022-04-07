@@ -20,6 +20,5 @@ namespace Sentry
 	 private:
 		lua_State* mLuaEnv;
 		class LuaScriptComponent* mLuaComponent;
-		class RpcConfigComponent* mConfigComponent;
 	};
 }// namespace Sentry

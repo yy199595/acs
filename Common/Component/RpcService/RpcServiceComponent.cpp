@@ -1,7 +1,7 @@
 ﻿#include"RpcServiceComponent.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
-#include<Component/Rpc/RpcConfigComponent.h>
+#include"Global/RpcConfig.h"
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
 #endif
@@ -34,15 +34,15 @@ namespace Sentry
 	bool RpcServiceComponent::LateAwake()
 	{
 		this->mRpcComponent = this->GetComponent<RpcComponent>();
-		this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>();
 		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
 		return true;
 	}
 
 	std::shared_ptr<com::Rpc::Request> RpcServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
+		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
 		string name = fmt::format("{0}.{1}", this->GetName(), func);
-		const ProtoConfig * protoConfig = this->mRpcConfigComponent->GetProtocolConfig(name);
+		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(name);
 		if(protoConfig == nullptr)
 		{
 			LOG_ERROR("not find rpc config : {0}", name);

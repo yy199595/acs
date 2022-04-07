@@ -45,9 +45,12 @@ namespace Lua
 
 	 public:
 		static bool Get(lua_State * lua, const char * tab, const char * func);
+	 public:
 		static LuaTaskSource * Call(lua_State * lua, int ref);
 		static LuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
-
+	 public:
+		template<typename T>
+		static T Invoke(lua_State * lua);
 	 private:
 		int ref;
 		lua_State* luaEnv;
@@ -76,6 +79,15 @@ namespace Lua
 			throw std::logic_error(lua_tostring(luaEnv, -1));
 		}
 		return Parameter::Read<Ret>(this->luaEnv, -1);
+	}
+	template<typename T>
+	T Function::Invoke(lua_State* lua)
+	{
+		if (lua_pcall(lua, 0, 1, 0) != 0)
+		{
+			luaL_error(lua, lua_tostring(lua, -1));
+		}
+		return Parameter::Read<T>(lua, -1);
 	}
 }
 

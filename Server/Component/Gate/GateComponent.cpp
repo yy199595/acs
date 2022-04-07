@@ -5,7 +5,7 @@
 #include"GateComponent.h"
 #include"App/App.h"
 #include"NetWork/RpcGateClient.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
@@ -17,7 +17,6 @@ namespace Sentry
 {
 	bool GateComponent::Awake()
 	{
-		this->mRpcConfigComponent = nullptr;
 		this->mGateClientComponent = nullptr;
 		return true;
 	}
@@ -25,14 +24,14 @@ namespace Sentry
 	bool GateComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
-		LOG_CHECK_RET_FALSE(this->mRpcConfigComponent = this->GetComponent<RpcConfigComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		auto config = this->mRpcConfigComponent->GetProtocolConfig(request->method_name());
+		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
 		if (config == nullptr)
 		{
 			LOG_ERROR("call function ", request->method_name(), " not find");

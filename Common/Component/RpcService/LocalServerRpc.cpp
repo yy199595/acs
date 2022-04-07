@@ -4,7 +4,7 @@
 
 #include"LocalServerRpc.h"
 #include"App/App.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 namespace Sentry
 {
 	std::shared_ptr<com::Rpc_Response> LocalServerRpc::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)

@@ -2,7 +2,7 @@
 #include"App/App.h"
 #include"Component/Rpc/RpcComponent.h"
 #ifdef __DEBUG__
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #endif
 namespace Sentry
 {

@@ -73,12 +73,12 @@ namespace Sentry
 		}
 	};
 
-	template<typename T>
-	class ILocalService
+
+	class IServiceChange
 	{
 	 public:
-		virtual void OnAddService(T * component) = 0;
-		virtual void OnDelService(T * component) = 0;
+		virtual void OnAddService(class LocalServerRpc * component) = 0;
+		virtual void OnDelService(class LocalServerRpc * component) = 0;
 	};
 
 	template<typename T1, typename T2>

@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "XCode/XCode.h"
-#include "Component/Component.h"
-#include "Other/ProtoConfig.h"
-#include <shared_mutex>
+#include"XCode/XCode.h"
+#include"Other/ProtoConfig.h"
+#include<shared_mutex>
+#include<unordered_map>
 namespace Sentry
 {
 	struct CodeConfig
@@ -12,21 +12,17 @@ namespace Sentry
 		std::string Name;
 		std::string Desc;
 	};
-	class RpcConfigComponent : public Component, public ILoadConfig
+	class RpcConfig
 	{
 	 public:
-		RpcConfigComponent() = default;
-		~RpcConfigComponent() override = default;
-
-	 protected:
-		bool Awake() final;
-		bool LateAwake() final;
-		bool OnLoadConfig() final;
+		RpcConfig() = default;
+		~RpcConfig() = default;
 	 public:
+		bool LoadConfig(const std::string & path);
 		bool HasService(const std::string& service);
 		void GetServices(std::vector<std::string>& services);
-		bool HasServiceMethod(const std::string& service, const std::string& method);
-		bool GetMethods(const std::string& service, std::vector<std::string>& methods);
+		bool HasServiceMethod(const std::string& service, const std::string& method) const;
+		bool GetMethods(const std::string& service, std::vector<std::string>& methods) const;
 	 public:
 		const CodeConfig* GetCodeConfig(int code) const;
 		const ProtoConfig* GetProtocolConfig(int methodId) const;
@@ -34,13 +30,12 @@ namespace Sentry
 
 #ifdef __DEBUG__
 		void DebugCode(XCode code);
-		std::string GetCodeDesc(XCode code);
+		std::string GetCodeDesc(XCode code) const;
 #endif
 	 private:
 		bool LoadCodeConfig();
 	 private:
-		std::mutex mLock;
-		std::string mConfigFileMd5;
+		std::string mPath;
 		std::unordered_map<int, CodeConfig> mCodeDescMap;
 		std::unordered_map<int, ProtoConfig> mProtocolIdMap;
 		std::unordered_map<std::string, ProtoConfig> mProtocolNameMap;

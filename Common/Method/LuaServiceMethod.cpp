@@ -4,15 +4,15 @@
 #include"Pool/MessagePool.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Rpc/RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #include"Async/LuaServiceTaskSource.h"
 namespace Sentry
 {
 
 	LuaServiceMethod::LuaServiceMethod(const std::string& service, const std::string& func, lua_State* lua)
-		: ServiceMethod(func), mLuaEnv(lua), mIdx(idx)
+		: ServiceMethod(func), mLuaEnv(lua)
 	{
-		this->mProtoConfig = config;
+		this->mFunction = fmt::format("{0}.{1}", service, func);
 	}
 
 	tuple<XCode, std::shared_ptr<Message>> LuaServiceMethod::Call(long long id, const std::string& json)
@@ -21,22 +21,28 @@ namespace Sentry
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
+		const RpcConfig & config = App::Get()->GetRpcConfig();
+		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		if(protoConfig == nullptr)
+		{
+			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
+		}
 		Lua::Parameter::WriteArgs(this->mLuaEnv, id, json);
 		if (lua_pcall(this->mLuaEnv, 3, 2, 0) != 0)
 		{
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
+		const std::string & response = protoConfig->Response;
 		XCode code = (XCode)lua_tointeger(this->mLuaEnv, -1);
-		const std::string& name = this->mProtoConfig->Response;
-		if (code != XCode::Successful || name.empty())
+		if (code != XCode::Successful || response.empty())
 		{
 			return make_tuple(code, nullptr);
 		}
 
 		size_t size = 0;
 		const char* str = lua_tolstring(this->mLuaEnv, -2, &size);
-		std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, str, size);
+		std::shared_ptr<Message> message = Helper::Proto::NewByJson(response, str, size);
 		return make_tuple(XCode::Successful, message);
 	}
 
@@ -58,8 +64,15 @@ namespace Sentry
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
+
 		XCode code = luaTaskSource->Await();
-		const std::string& name = this->mProtoConfig->Response;
+		const RpcConfig & config = App::Get()->GetRpcConfig();
+		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		if(protoConfig == nullptr)
+		{
+			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
+		}
+		const std::string& name = protoConfig->Response;
 		if (code != XCode::Successful || name.empty())
 		{
 			return make_tuple(code, nullptr);
@@ -71,12 +84,18 @@ namespace Sentry
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request& request, com::Rpc_Response& response)
 	{
+		const RpcConfig & config = App::Get()->GetRpcConfig();
+		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		if(protoConfig == nullptr)
+		{
+			return XCode::NotFoundRpcConfig;
+		}
 		std::string json;
 		if (request.has_data() && !Helper::Proto::GetJson(request.data(), json))
 		{
 			return XCode::ProtoCastJsonFailure;
 		}
-		auto luaResponse = this->mProtoConfig->IsAsync
+		auto luaResponse = protoConfig->IsAsync
 						   ? this->CallAsync(request.user_id(), json) : this->Call(request.user_id(), json);
 		if (std::get<1>(luaResponse) != nullptr)
 		{

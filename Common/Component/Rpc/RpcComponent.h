@@ -44,7 +44,6 @@ namespace Sentry
 		class TaskComponent* mCorComponent;
 		class TimerComponent* mTimerComponent;
 		class RpcClientComponent* mRpcClientComponent;
-		class RpcConfigComponent* mPpcConfigComponent;
 #ifdef __DEBUG__
 		std::unordered_map<long long, RpcTaskInfo> mRpcInfoMap;
 #endif

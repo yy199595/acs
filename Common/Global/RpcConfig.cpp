@@ -1,4 +1,4 @@
-﻿#include "RpcConfigComponent.h"
+﻿#include "RpcConfig.h"
 
 #include "App/App.h"
 #include "Util/FileHelper.h"
@@ -8,35 +8,16 @@
 #include "google/protobuf/util/json_util.h"
 namespace Sentry
 {
-	bool RpcConfigComponent::Awake()
+	bool RpcConfig::LoadConfig(const std::string & path)
 	{
-		return this->OnLoadConfig();
-	}
-
-	bool RpcConfigComponent::LateAwake()
-	{
-		return true;
-	}
-
-	bool RpcConfigComponent::OnLoadConfig()
-	{
-		std::string md5;
-		std::string rpcPath;
 		rapidjson::Document jsonMapper;
-		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("path", "rpc", rpcPath));
-		if (!Helper::File::ReadJsonFile(rpcPath, jsonMapper, md5))
+		if (!Helper::File::ReadJsonFile(path, jsonMapper))
 		{
-			LOG_FATAL("not find file ", rpcPath);
+			LOG_FATAL("not find file ", path);
 			return false;///
-		}
-		if (this->mConfigFileMd5 == md5)
-		{
-			return true;
 		}
 
 		this->mServiceMap.clear();
-		this->mConfigFileMd5 = md5;
 		this->mProtocolNameMap.clear();
 		auto iter1 = jsonMapper.MemberBegin();
 		for (; iter1 != jsonMapper.MemberEnd(); iter1++)
@@ -98,7 +79,7 @@ namespace Sentry
 		return this->LoadCodeConfig();
 	}
 
-	bool RpcConfigComponent::LoadCodeConfig()
+	bool RpcConfig::LoadCodeConfig()
 	{
 		std::string path;
 		std::vector<std::string> lines;
@@ -123,25 +104,25 @@ namespace Sentry
 		return true;
 	}
 
-	const ProtoConfig* RpcConfigComponent::GetProtocolConfig(int methodId) const
+	const ProtoConfig* RpcConfig::GetProtocolConfig(int methodId) const
 	{
 		auto iter = this->mProtocolIdMap.find(methodId);
 		return iter != this->mProtocolIdMap.end() ? &iter->second : nullptr;
 	}
 
-	const CodeConfig* RpcConfigComponent::GetCodeConfig(int code) const
+	const CodeConfig* RpcConfig::GetCodeConfig(int code) const
 	{
 		auto iter = this->mCodeDescMap.find(code);
 		return iter != this->mCodeDescMap.end() ? &iter->second : nullptr;
 	}
 
-	bool RpcConfigComponent::HasService(const std::string& service)
+	bool RpcConfig::HasService(const std::string& service)
 	{
 		auto iter = this->mServiceMap.find(service);
 		return iter != this->mServiceMap.end();
 	}
 
-	void RpcConfigComponent::GetServices(std::vector<std::string>& services)
+	void RpcConfig::GetServices(std::vector<std::string>& services)
 	{
 		auto iter = this->mServiceMap.begin();
 		for (; iter != this->mServiceMap.end(); iter++)
@@ -150,7 +131,7 @@ namespace Sentry
 		}
 	}
 #ifdef __DEBUG__
-	void RpcConfigComponent::DebugCode(XCode code)
+	void RpcConfig::DebugCode(XCode code)
 	{
 		auto iter = this->mCodeDescMap.find((int)code);
 		if (iter != this->mCodeDescMap.end())
@@ -159,7 +140,7 @@ namespace Sentry
 		}
 	}
 
-	std::string RpcConfigComponent::GetCodeDesc(XCode code)
+	std::string RpcConfig::GetCodeDesc(XCode code) const
 	{
 		auto iter = this->mCodeDescMap.find((int)code);
 		if (iter != this->mCodeDescMap.end())
@@ -171,7 +152,7 @@ namespace Sentry
 
 #endif
 
-	bool RpcConfigComponent::HasServiceMethod(const std::string& service, const std::string& method)
+	bool RpcConfig::HasServiceMethod(const std::string& service, const std::string& method) const
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())
@@ -188,7 +169,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool RpcConfigComponent::GetMethods(const std::string& service, std::vector<std::string>& methods)
+	bool RpcConfig::GetMethods(const std::string& service, std::vector<std::string>& methods) const
 	{
 		auto iter = this->mServiceMap.find(service);
 		if (iter == this->mServiceMap.end())
@@ -202,7 +183,7 @@ namespace Sentry
 		return true;
 	}
 
-	const ProtoConfig* RpcConfigComponent::GetProtocolConfig(const std::string& fullName) const
+	const ProtoConfig* RpcConfig::GetProtocolConfig(const std::string& fullName) const
 	{
 		auto iter = this->mProtocolNameMap.find(fullName);
 		return iter != this->mProtocolNameMap.end() ? &iter->second : nullptr;

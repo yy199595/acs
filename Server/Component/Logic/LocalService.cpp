@@ -30,6 +30,7 @@ namespace Sentry
 
 		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("rpc"));
 		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("http"));
+		return true;
 	}
 
 	void LocalService::OnAddService(LocalServerRpc* component)
@@ -111,11 +112,11 @@ namespace Sentry
 		}
 	}
 
-	void LocalService::OnStart() //通知其他服务器 我加入了
+	void LocalService::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer jsonWriter;
 		this->mIsStartComplete = true;
-		this->GetServiceInfo(jsonWriter);
+		jsonWriter.AddMember("http", this->GetApp()->GetConfig().GetHttpAddress());
 		long long number = this->mRedisComponent->Publish("LocalService.Push", jsonWriter);
 		LOG_DEBUG("publish successful count = {0}", number);
 	}
@@ -170,17 +171,15 @@ namespace Sentry
 
 	void LocalService::GetServiceInfo(Json::Writer& jsonWriter)
 	{
-		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		const std::string rpcAddress = tcpServerComponent->GetTcpAddress("rpc");
-		const std::string httpAddress = tcpServerComponent->GetTcpAddress("http");
+		const ServerConfig & serverConfig = this->GetApp()->GetConfig();
 
 		jsonWriter.StartObject("rpc");
-		jsonWriter.AddMember("address", rpcAddress);
+		jsonWriter.AddMember("address", serverConfig.GetRpcAddress());
 
 		std::vector<std::string> tempArray;
-		std::list<RpcServiceComponent*> rpcServices;
+		std::list<LocalServerRpc*> rpcServices;
 		App::Get()->GetTypeComponents(rpcServices);
-		for (RpcServiceComponent* rpcService : rpcServices)
+		for (LocalServerRpc * rpcService : rpcServices)
 		{
 			tempArray.emplace_back(rpcService->GetName());
 		}
@@ -188,7 +187,7 @@ namespace Sentry
 		jsonWriter.EndObject();
 
 		jsonWriter.StartObject("http");
-		jsonWriter.AddMember("address", httpAddress);
+		jsonWriter.AddMember("address", serverConfig.GetHttpAddress());
 		jsonWriter.EndObject();
 
 		jsonWriter.AddMember("area_id", this->mAreaId);

@@ -11,7 +11,7 @@
 #include"Util/StringHelper.h"
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
-#include"Component/Rpc//RpcConfigComponent.h"
+#include"Global/RpcConfig.h"
 #endif
 namespace Sentry
 {
@@ -54,8 +54,8 @@ namespace Sentry
 		{
 			std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
-			RpcConfigComponent* configCom = this->GetComponent<RpcConfigComponent>();
-			LOG_ERROR("player call", request->method_name(), "failure error = ", configCom->GetCodeDesc(code));
+			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
+			LOG_ERROR("player call", request->method_name(), "failure error = ", configCom.GetCodeDesc(code));
 #endif
 			responseMessage->set_code((int)code);
 			responseMessage->set_rpc_id(request->rpc_id());
@@ -69,8 +69,8 @@ namespace Sentry
 		if (iter != this->mGateClientMap.end())
 		{
 #ifdef __DEBUG__
-			RpcConfigComponent* configCom = this->GetComponent<RpcConfigComponent>();
-			LOG_WARN("remove player session code = ", configCom->GetCodeDesc(code));
+			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
+			LOG_WARN("remove player session code = ", configCom.GetCodeDesc(code));
 #endif
 			this->mGateClientMap.erase(iter);
 		}

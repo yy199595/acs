@@ -60,7 +60,6 @@ namespace Sentry
 	 protected:
 		class RpcComponent * mRpcComponent;
 		std::vector<std::string> mRemoteAddressMap;
-		class RpcConfigComponent * mRpcConfigComponent;
 		class RpcClientComponent * mRpcClientComponent;
 	};
 
