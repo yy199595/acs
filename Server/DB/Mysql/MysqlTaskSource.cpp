@@ -1,12 +1,12 @@
 #include"MysqlTaskSource.h"
 #include"App/App.h"
 #include"Json/JsonWriter.h"
-#include"Component/Mysql/MysqlComponent.h"
+#include"Component/Mysql/MysqlHelper.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
-	MysqlTaskSource::MysqlTaskSource(MysqlComponent* component)
-		: mMsqlComponent(component)
+	MysqlTaskSource::MysqlTaskSource(MysqlHelper & component)
+		: mHelper(component)
 	{
 
 	}
@@ -14,8 +14,7 @@ namespace Sentry
 	XCode MysqlTaskSource::Await(const std::string& sql)
 	{
 		this->mSqlCommand = std::move(sql);
-		std::shared_ptr<App> app = App::Get();
-		ThreadPoolComponent * threadComponent = app->GetComponent<ThreadPoolComponent>();
+		ThreadPoolComponent * threadComponent = App::Get()->GetComponent<ThreadPoolComponent>();
 		if (!threadComponent->StartTask(this))
 		{
 			return XCode::MysqlStartTaskFail;
@@ -36,7 +35,7 @@ namespace Sentry
 
 	bool MysqlTaskSource::Run()
 	{
-		MysqlClient* mysqlSocket = this->mMsqlComponent->GetMysqlClient();
+		MysqlClient* mysqlSocket = this->mHelper.GetMysqlClient();
 		if (mysqlSocket == nullptr)
 		{
 			this->mErrorString = "mysql socket is null";

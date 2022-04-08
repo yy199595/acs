@@ -42,13 +42,13 @@ namespace Sentry
 
 	public:
 
-		virtual XCode Call(const std::string & address, const std::string& func, long long userId);
+		virtual XCode Call(const std::string& func, long long userId);
 
-		virtual XCode Call(const std::string & address, const std::string& func, long long userId, const Message& message);
+		virtual XCode Call(const std::string& func, long long userId, const Message& message);
 
-		virtual XCode Call(const std::string & address, const std::string& func, long long userId, std::shared_ptr<Message> response);
+		virtual XCode Call(const std::string& func, long long userId, std::shared_ptr<Message> response);
 
-		virtual XCode Call(const std::string & address, const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response);
+		virtual XCode Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response);
 
 	 protected:
 		bool LateAwake() override;
@@ -61,6 +61,8 @@ namespace Sentry
 		class RpcComponent * mRpcComponent;
 		std::vector<std::string> mRemoteAddressMap;
 		class RpcClientComponent * mRpcClientComponent;
+	private:
+		std::unordered_map<long long, std::string> mUserAddressMap;
 	};
 
 }

@@ -21,9 +21,6 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnComplete() final;
-	 public:
-		bool AddNewService(const std::string& service);
-		void RemoveByAddress(const std::string& address);
 	 protected:
 		void OnAddService(LocalServerRpc *component) final;
 		void OnDelService(LocalServerRpc *component) final;

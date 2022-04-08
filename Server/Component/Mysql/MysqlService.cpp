@@ -1,6 +1,5 @@
 ﻿#include"MysqlService.h"
 #include"DB/Mysql/MysqlTaskSource.h"
-#include"Component/Mysql//MysqlComponent.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
@@ -8,25 +7,17 @@ namespace Sentry
 {
 	bool MysqlService::Awake()
 	{
-		this->mMysqlComponent = nullptr;
 		BIND_RPC_FUNCTION(MysqlService::Add);
 		BIND_RPC_FUNCTION(MysqlService::Save);
 		BIND_RPC_FUNCTION(MysqlService::Query);
 		BIND_RPC_FUNCTION(MysqlService::Delete);
 		BIND_RPC_FUNCTION(MysqlService::Invoke);
 		BIND_RPC_FUNCTION(MysqlService::Update);
-		return true;
+		return this->mHelper.StartConnect();
 	}
 
 	bool MysqlService::LateAwake()
 	{
-		this->mMysqlComponent = this->GetComponent<MysqlComponent>();
-		if (this->mMysqlComponent == nullptr)
-		{
-			this->mMysqlComponent = this->mEntity->GetOrAddComponent<MysqlComponent>();
-			LOG_CHECK_RET_FALSE(this->mMysqlComponent);
-			return this->mMysqlComponent->LateAwake();
-		}
 		return true;
 	}
 
@@ -36,11 +27,11 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.table().empty());
 
 		std::string sql;
-		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
+		if (!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mHelper));
 
 		XCode code = taskSource->Await(sql);
 		if (code != XCode::Successful)
@@ -57,12 +48,12 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.table().empty());
 
 		std::string sql;
-		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
+		if (!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
 		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
+			std::make_shared<MysqlTaskSource>(this->mHelper);
 
 		XCode code = taskSource->Await(sql);
 		if (code != XCode::Successful)
@@ -83,12 +74,12 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.where_json().empty());
 
 		std::string sql;
-		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
+		if (!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
 		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
+			std::make_shared<MysqlTaskSource>(this->mHelper);
 
 		XCode code = taskSource->Await(sql);
 		if (code != XCode::Successful)
@@ -109,12 +100,12 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.where_json().empty());
 
 		std::string sql;
-		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
+		if (!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
 		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
+			std::make_shared<MysqlTaskSource>(this->mHelper);
 
 		XCode code = taskSource->Await(sql);
 		if (code != XCode::Successful)
@@ -132,7 +123,7 @@ namespace Sentry
 	XCode MysqlService::Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response)
 	{
 		LOGIC_THROW_ERROR(!request.sql().empty());
-		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mMysqlComponent));
+		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mHelper));
 
 		XCode code = taskSource->Await(request.sql());
 		if (code != XCode::Successful)
@@ -157,12 +148,12 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.table().empty());
 		LOGIC_THROW_ERROR(!request.where_json().empty());
 		std::string sql;
-		if (!this->mMysqlComponent->ToSqlCommand(request, sql))
+		if (!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
 		std::shared_ptr<MysqlTaskSource> taskSource
-			= std::make_shared<MysqlTaskSource>(this->mMysqlComponent);
+			= std::make_shared<MysqlTaskSource>(this->mHelper);
 
 		XCode code = taskSource->Await(sql);
 		if (code != XCode::Successful)

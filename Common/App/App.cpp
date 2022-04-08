@@ -3,7 +3,6 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/RpcService/LuaRpcService.h"
-#include"Component/Lua/LuaScriptComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -71,6 +70,7 @@ namespace Sentry
 	{
 		if (!component->LateAwake())
 		{
+			LOG_ERROR("{0} late awake ",component->GetName());
 			return false;
 		}
 		IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
@@ -216,6 +216,7 @@ namespace Sentry
 				LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
 			}
 		});
+		return true;
 	}
 
 	void App::UpdateConsoleTitle()

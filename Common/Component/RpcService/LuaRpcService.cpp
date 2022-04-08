@@ -65,10 +65,7 @@ namespace Sentry
 			}
 			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
 			const ProtoConfig * config = rpcConfig.GetProtocolConfig(fullName);
-
-			std::shared_ptr<LuaServiceMethod> luaServiceMethod(
-				new LuaServiceMethod(config->Service, config->Method, this->mLuaEnv));
-			this->AddMethod(this->GetName(), luaServiceMethod);
+			this->AddMethod(std::make_shared<LuaServiceMethod>(config->Service, config->Method, this->mLuaEnv));
 		}
 		return true;
 	}

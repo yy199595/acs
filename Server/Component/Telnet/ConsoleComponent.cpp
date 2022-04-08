@@ -86,12 +86,7 @@ namespace Sentry
 
 	bool ConsoleComponent::Start(const std::string& parameter, std::vector<std::string>& response)
 	{
-		LocalService* localService = this->GetComponent<LocalService>();
-		if (localService == nullptr)
-		{
-			return false;
-		}
-		return localService->AddNewService(parameter);
+
 	}
 
 	bool ConsoleComponent::Close(const std::string& parameter, std::vector<std::string>& response)

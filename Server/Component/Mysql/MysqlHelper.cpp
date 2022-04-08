@@ -1,33 +1,12 @@
-﻿#include "MysqlComponent.h"
+﻿#include "MysqlHelper.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
 #include"DB/Mysql/TableOperator.h"
-#include"Component/Coroutine/TaskComponent.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
 namespace Sentry
 {
-	bool MysqlComponent::Awake()
-	{
-		this->mMysqlPort = 0;
-		this->mTaskManager = nullptr;
-		this->mCorComponent = nullptr;
-		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mMysqlIp));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mMysqlPort));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mDataBaseUser));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mDataBasePasswd));
-		return true;
-	}
-
-	bool MysqlComponent::LateAwake()
-	{
-		LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->mTaskManager = this->GetComponent<ThreadPoolComponent>());
-		return this->StartConnect() && this->InitMysqlTable();
-	}
-
-	MysqlClient* MysqlComponent::GetMysqlClient()
+	MysqlClient* MysqlHelper::GetMysqlClient()
 	{
 		if (App::Get()->IsMainThread())
 		{
@@ -39,7 +18,7 @@ namespace Sentry
 		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
 	}
 
-	bool MysqlComponent::DropTable(const std::string& db)
+	bool MysqlHelper::DropTable(const std::string& db)
 	{
 		const std::string sql = "drop database " + db;
 		if (mysql_select_db(this->mMysqlSocket, db.c_str()) != 0)
@@ -54,7 +33,7 @@ namespace Sentry
 		return true;
 	}
 
-	MysqlClient* MysqlComponent::ConnectMysql()
+	MysqlClient* MysqlHelper::ConnectMysql()
 	{
 		const char* ip = this->mMysqlIp.c_str();
 		const unsigned short port = this->mMysqlPort;
@@ -73,7 +52,7 @@ namespace Sentry
 		return this->mMysqlSocket;
 	}
 
-	bool MysqlComponent::InitMysqlTable()
+	bool MysqlHelper::InitMysqlTable()
 	{
 		auto descriptorPool = google::protobuf::DescriptorPool::generated_pool();
 		auto desc = descriptorPool->FindFileByName("db.proto");
@@ -94,28 +73,25 @@ namespace Sentry
 				this->mSqlProtoMap.emplace(desc->full_name(), table);
 			}
 		}
-		return true;
+		return this->InitMysqlTable();
 	}
 
-	bool MysqlComponent::GetTableByProto(const Message& message, std::string& db)
+	bool MysqlHelper::StartConnect()
 	{
-		const std::string& name = message.GetTypeName();
-		auto iter = this->mSqlProtoMap.find(name);
-		if (iter == this->mSqlProtoMap.end())
-		{
-			return false;
-		}
-		db = iter->second;
-		return true;
-	}
 
-	bool MysqlComponent::StartConnect()
-	{
-		const std::vector<TaskThread*>& threadTasks = this->mTaskManager->GetThreads();
-		LOG_CHECK_RET_FALSE(threadTasks.size() > 0);
-		for (TaskThread* taskThread : threadTasks)
+		this->mMysqlPort = 0;
+		const ServerConfig& config = App::Get()->GetConfig();
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mMysqlIp));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mMysqlPort));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mDataBaseUser));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mDataBasePasswd));
+
+		ThreadPoolComponent * threadPoolComponent = App::Get()->GetComponent<ThreadPoolComponent>();
+
+		LOG_CHECK_RET_FALSE(threadPoolComponent->GetThreads().size() > 0);
+		for (TaskThread* taskThread : threadPoolComponent->GetThreads())
 		{
-			auto mysqlSocket = this->ConnectMysql();
+			MysqlClient * mysqlSocket = this->ConnectMysql();
 			if (mysqlSocket == nullptr)
 			{
 				return false;
@@ -125,7 +101,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlComponent::ToSqlCommand(const std::string& table, const std::string& cmd,
+	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
 		Message& message, std::string& sql)
 	{
 		this->mSqlCommandStream.str("");
@@ -179,7 +155,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Update& messageData, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const s2s::Mysql::Update& messageData, std::string& sqlCommand)
 	{
 		rapidjson::Document whereJsonDocument;
 		rapidjson::Document updateJsonDocument;
@@ -231,7 +207,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlComponent::WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue)
+	bool MysqlHelper::WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue)
 	{
 		if (jsonValue.IsString())
 		{
@@ -267,7 +243,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Delete& messageData, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const s2s::Mysql::Delete& messageData, std::string& sqlCommand)
 	{
 		rapidjson::Document jsonDocument;
 		const std::string& json = messageData.where_json();
@@ -298,7 +274,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Add& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const s2s::Mysql::Add& request, std::string& sqlCommand)
 	{
 		std::shared_ptr<Message> message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
@@ -309,7 +285,7 @@ namespace Sentry
 		return this->ToSqlCommand(table, "insert", *message, sqlCommand);
 	}
 
-	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Save& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const s2s::Mysql::Save& request, std::string& sqlCommand)
 	{
 		std::shared_ptr<Message> message = Helper::Proto::NewByData(request.data());
 		if (message == nullptr)
@@ -320,7 +296,7 @@ namespace Sentry
 		return this->ToSqlCommand(table, "replace", *message, sqlCommand);
 	}
 
-	bool MysqlComponent::ToSqlCommand(const s2s::Mysql::Query& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const s2s::Mysql::Query& request, std::string& sqlCommand)
 	{
 		this->mSqlCommandStream.str("");
 		rapidjson::Document jsonDocument;

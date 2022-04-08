@@ -7,7 +7,6 @@
 #include"Component/Lua/LuaScriptComponent.h"
 
 #include<Network/Listener/TcpServerComponent.h>
-#include"Component/Mysql/MysqlComponent.h"
 #include"Global/RpcConfig.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
@@ -58,7 +57,6 @@ void RegisterComponent()
 
 // db
     ComponentFactory::Add<RedisComponent>("RedisComponent");
-    ComponentFactory::Add<MysqlComponent>("MysqlComponent");
     ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
 
 //http

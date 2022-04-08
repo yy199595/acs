@@ -23,8 +23,7 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<RedisResponse>
-	RedisComponent::Call(const std::string& func, std::vector<std::string>& args)
+	std::shared_ptr<RedisResponse> RedisComponent::Call(const std::string& func, std::vector<std::string>& args)
 	{
 		std::string script;
 		const size_t pos = func.find('.');

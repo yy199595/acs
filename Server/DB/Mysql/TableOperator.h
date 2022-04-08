@@ -2,7 +2,7 @@
 
 #include<string>
 #include"rapidjson/document.h"
-#include"Component/Mysql/MysqlComponent.h"
+#include"Component/Mysql/MysqlHelper.h"
 namespace Sentry
 {
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include"Protocol/s2s.pb.h"
+#include"Component/Mysql/MysqlHelper.h"
 #include"Component/RpcService/LocalServerRpc.h"
 
 namespace Sentry
@@ -12,8 +13,7 @@ namespace Sentry
 
 		~MysqlService() final = default;
 
-	 public:
-
+	private:
 		XCode Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response);
 
 		XCode Save(const s2s::Mysql::Save& request, s2s::Mysql::Response& response);
@@ -32,6 +32,6 @@ namespace Sentry
 
 	 private:
 		std::string mJson;
-		class MysqlComponent* mMysqlComponent;
+		MysqlHelper mHelper;
 	};
 }// namespace Sentry

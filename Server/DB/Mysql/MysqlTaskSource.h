@@ -12,7 +12,7 @@ namespace Sentry
 	class MysqlTaskSource : public TaskProxy
     {
     public:
-        MysqlTaskSource(MysqlComponent * component);
+        MysqlTaskSource(MysqlHelper & component);
 
         ~MysqlTaskSource() final = default;
 
@@ -28,10 +28,10 @@ namespace Sentry
     private:
         void WriteValue(Json::Writer &jsonWriter, MYSQL_FIELD *field, const char *data, long size);
     private:
+		MysqlHelper & mHelper;
         std::string mSqlCommand;
         std::string mErrorString;
         TaskSource<XCode> mTaskSource;
-        MysqlComponent * mMsqlComponent;
         std::queue<std::string> mQueryDatas;
     private:
         double mValue1;

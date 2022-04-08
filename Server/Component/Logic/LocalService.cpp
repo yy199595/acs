@@ -70,13 +70,6 @@ namespace Sentry
 		}
 	}
 
-	void LocalService::RemoveByAddress(const std::string& address)
-	{
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("address", address);
-		this->mRedisComponent->Publish("LocalService.Remove", jsonWriter);
-	}
-
 	void LocalService::Push(const Json::Reader& jsonReader)
 	{
 		int areaId = 0;
@@ -132,28 +125,6 @@ namespace Sentry
 		jsonWriter.AddMember("area_id", this->mAreaId);
 		LOG_DEBUG("remove this form count = ", this->mRedisComponent->Publish("LocalService.Remove", jsonWriter));
 
-	}
-
-	bool LocalService::AddNewService(const std::string& name)
-	{
-		Component* component = this->GetComponent<Component>(name);
-		if (component != nullptr)
-		{
-			return false;
-		}
-		component = ComponentFactory::CreateComponent(name);
-		if (component == nullptr || dynamic_cast<RpcServiceComponent*>(component) == nullptr)
-		{
-			delete component;
-			return false;
-		}
-		if (!this->mEntity->AddComponent(name, component) || component->LateAwake())
-		{
-			this->mEntity->RemoveComponent(name);
-			return false;
-		}
-		LOG_INFO("start new component [", name, "] successful");
-		return true;
 	}
 
 	void LocalService::Remove(const Json::Reader& jsonReader)
