@@ -15,10 +15,11 @@ namespace Sentry
 	bool OperatorComponent::LateAwake()
 	{
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		std::vector<Component*> components;
-		this->GetComponents(components);
-		for (Component* component : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
+			Component * component = this->GetComponent<Component>(name);
 			this->AddRefreshTimer(component);
 		}
 		return true;
@@ -26,33 +27,34 @@ namespace Sentry
 
 	void OperatorComponent::StartHotfix()
 	{
-		std::vector<Component*> components;
-		this->GetComponents(components);
-		for (Component* component : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
-			if (auto hotfix = dynamic_cast<IHotfix*>(component))
+			IHotfix* hotfixComponent = this->GetComponent<IHotfix>(name);
+			if(hotfixComponent != nullptr)
 			{
-				hotfix->OnHotFix();
-				LOG_INFO(component->GetName(), " start hotfix");
+				hotfixComponent->OnHotFix();
 			}
 		}
 	}
 
 	bool OperatorComponent::StartLoadConfig()
 	{
-		std::vector<Component*> components;
-		this->GetComponents(components);
-		for (Component* component : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
-			if (auto loadConfig = dynamic_cast<ILoadConfig*>(component))
+			ILoadConfig* loadComponent = this->GetComponent<ILoadConfig>(name);
+			if(loadComponent != nullptr)
 			{
-				if (!loadConfig->OnLoadConfig())
+				if(!loadComponent->OnLoadConfig())
 				{
-					LOG_ERROR(component->GetName(), " load config error");
+					LOG_ERROR("{0} load config error", name);
 					return false;
 				}
-				LOG_INFO("{0} start hotfix", component->GetName());
 			}
+			LOG_INFO("{0} start hotfix", name);
 		}
 		return true;
 	}

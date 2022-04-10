@@ -15,7 +15,7 @@ namespace Sentry
 		virtual ~SubService() = default;
 	 public:
 		void GetSubMethods(std::vector<std::string>& methods);
-		bool Publish(const std::string& func, const std::string& message);
+		bool Publish(const std::string& func, const Json::Reader & jsonReader);
 	 protected:
 		template<typename T>
 		bool Bind(std::string name, JsonSubFunction<T> func)
@@ -26,18 +26,6 @@ namespace Sentry
 				return false;
 			}
 			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this, func));
-			return true;
-		}
-
-		template<typename T, typename T1>
-		bool Bind(std::string name, ProtoSubFuncrion<T, T1> func)
-		{
-			auto iter = this->mSubMethodMap.find(name);
-			if (iter != this->mSubMethodMap.end())
-			{
-				return false;
-			}
-			this->mSubMethodMap.emplace(name, std::make_shared<ProtoSubMethod<T, T1>>((T*)this, func));
 			return true;
 		}
 	 private:

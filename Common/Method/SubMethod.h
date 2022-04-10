@@ -19,7 +19,7 @@ namespace Sentry
 	class SubMethod
 	{
 	 public:
-		virtual void OnPublish(const std::string& message) = 0;
+		virtual void OnPublish(const Json::Reader & jsonReader) = 0;
 	};
 
 	template<typename T>
@@ -32,43 +32,13 @@ namespace Sentry
 		}
 
 	 public:
-		void OnPublish(const std::string& message) final
+		void OnPublish(const Json::Reader & jsonReader) final
 		{
-			Json::Reader rapidJsonReader;
-			if (!rapidJsonReader.ParseJson(message))
-			{
-				std::cerr << "parse json error : json = " << message << std::endl;
-				return;
-			}
-			(this->mObj->*mFunction)(rapidJsonReader);
+			(this->mObj->*mFunction)(jsonReader);
 		}
 	 private:
 		T* mObj;
 		JsonSubFunction<T> mFunction;
-	};
-
-	template<typename T, typename T1>
-	class ProtoSubMethod : public SubMethod
-	{
-	 public:
-		ProtoSubMethod(T* obj, ProtoSubFuncrion<T, T1> func)
-			: mObj(obj), mFunction(func)
-		{
-		}
-	 public:
-		void OnPublish(const std::string& message) final
-		{
-			T data;
-			if (!data.ParseFromString(message))
-			{
-				std::cerr << "parse proto error " << std::endl;
-				return;
-			}
-			(this->mObj->*mFunction)(data);
-		}
-	 private:
-		T* mObj;
-		ProtoSubFuncrion<T, T1> mFunction;
 	};
 }
 #endif //GAMEKEEPER_SUBMETHOD_H

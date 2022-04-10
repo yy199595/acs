@@ -38,7 +38,7 @@ namespace Sentry
 			return XCode::NotFoundRpcConfig;
 		}
 
-		RpcServiceComponent * rpcServiceComponent = this->GetComponent<RpcServiceComponent>(config->Service);
+		RpcServiceNode * rpcServiceComponent = this->GetComponent<RpcServiceNode>(config->Service);
 
 		//TODO
 //		auto serviceEntity = this->mServiceComponent->GetServiceProxy(config->Service);

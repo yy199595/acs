@@ -25,8 +25,4 @@ namespace Sentry
 		return this->mEntity->GetComponentByName(name);
 	}
 
-	void Component::GetComponents(std::vector<Component*>& components)
-	{
-		this->mEntity->GetComponents(components);
-	}
 }

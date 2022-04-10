@@ -26,7 +26,6 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
-#include"Component/HttpService/HttpNodeService.h"
 #include"Component/ClientComponent.h"
 
 #include"Component/Lua/LuaRegisterComponent.h"
@@ -74,10 +73,8 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalService>("LocalService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<HttpUserService>("HttpUserService");
-    ComponentFactory::Add<HttpNodeService>("HttpNodeService");
     ComponentFactory::Add<HttpLoginService>("HttpLoginService");
 }
-#include"spdlog/fmt/bundled/color.h"
 
 int main(int argc, char **argv)
 {

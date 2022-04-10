@@ -37,13 +37,13 @@ namespace Sentry
 		template<typename T>
 		inline std::shared_ptr<T> Cast();
 
-	 protected:
-		virtual void OnAddComponent(Component* component) { }
-		virtual void OnDelComponent(Component * component) { }
 	 public:
 		void OnDestory() override;
 
-		void GetComponents(std::vector<Component*>& components) const;
+		void GetComponents(std::vector<std::string>& components) const;
+	 protected:
+		virtual void OnAddComponent(Component * component) {}
+		virtual void OnDelComponent(Component * component) {}
 	 public:
 		inline long long GetId() const
 		{
@@ -91,7 +91,7 @@ namespace Sentry
 		if (iter != this->mComponentMap.end())
 		{
 			Component* component = iter->second;
-			return static_cast<T*>(component);
+			return dynamic_cast<T*>(component);
 		}
 		return nullptr;
 	}

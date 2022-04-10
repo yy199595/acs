@@ -1,8 +1,8 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/RpcServiceComponent.h"
-#include"Component/Logic/LocalService.h"
+#include"Component/RpcService/RpcServiceNode.h"
 #include"Component/Coroutine/TaskComponent.h"
+#include"Component/RpcService/LocalServerRpc.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -71,7 +71,7 @@ namespace Sentry
 				telnetClient->Response(responseStream.str());
 			}
 		}
-		LOG_ERROR("[console ]", telnetClient->GetAddress(), " disconnected");
+		LOG_ERROR("[console ] {0} disconnected", telnetClient->GetAddress());
 	}
 
 	bool ConsoleComponent::Help(const std::string& parameter, std::vector<std::string>& response)
@@ -86,7 +86,7 @@ namespace Sentry
 
 	bool ConsoleComponent::Start(const std::string& parameter, std::vector<std::string>& response)
 	{
-
+		return this->GetApp()->StartNewService(parameter);
 	}
 
 	bool ConsoleComponent::Close(const std::string& parameter, std::vector<std::string>& response)
@@ -97,14 +97,13 @@ namespace Sentry
 
 	bool ConsoleComponent::Services(const std::string& parameter, std::vector<std::string>& response)
 	{
-		std::vector<Component*> components;
-		this->GetComponents(components);
-		RpcServiceComponent* serviceComponent = nullptr;
-		for (Component* component : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
-			if (serviceComponent = dynamic_cast<RpcServiceComponent*>(component))
+			if(this->GetComponent<LocalServerRpc>(name) != nullptr)
 			{
-				response.emplace_back(serviceComponent->GetName());
+				response.emplace_back(name);
 			}
 		}
 		return true;

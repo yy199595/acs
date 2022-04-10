@@ -48,7 +48,7 @@ namespace Sentry
 		return true;
 	}
 
-	void Entity::GetComponents(std::vector<Component*>& components) const
+	void Entity::GetComponents(std::vector<std::string>& components) const
 	{
 		components.clear();
 		for (const std::string& name : this->mSortComponents)
@@ -56,7 +56,7 @@ namespace Sentry
 			Component* component = this->GetComponent<Component>(name);
 			if (component != nullptr)
 			{
-				components.emplace_back(component);
+				components.emplace_back(component->GetName());
 			}
 		}
 	}
@@ -93,8 +93,8 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				component->OnDestory();
-				this->OnDelComponent(component);
 				component->SetActive(false);
+				this->OnDelComponent(component);
 				ComponentFactory::DestoryComponent(component);
 				return true;
 			}

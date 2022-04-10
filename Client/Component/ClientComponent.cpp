@@ -56,7 +56,7 @@ namespace Client
         return true;
     }
 
-	void ClientComponent::OnComplete()
+	void ClientComponent::OnAllServiceStart()
 	{
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}

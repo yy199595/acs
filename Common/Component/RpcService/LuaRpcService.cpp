@@ -51,7 +51,6 @@ namespace Sentry
 		}
 
 		std::vector<std::string> methods;
-
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
 		rpcConfig.GetMethods(this->GetName(), methods);
 

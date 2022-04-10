@@ -28,11 +28,12 @@ namespace Sentry
 		void Add(const Json::Reader& jsonReader);
 		void Push(const Json::Reader& jsonReader);
 		void Remove(const Json::Reader& jsonReader);
-		void GetServiceInfo(Json::Writer& jsonWriter);
+	 private:
+		void GetServiceInfo(Json::Writer & jsonWriter);
 	 private:
 		int mAreaId;
-		bool mIsStartComplete;
 		std::string mNodeName;
+		std::string mRpcAddress;
 		class RedisComponent* mRedisComponent;
 		class HttpClientComponent* mHttpComponent;
 	};

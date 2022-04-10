@@ -27,9 +27,7 @@ namespace Sentry
 		XCode Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response);
 	 public:
 		bool Awake() final;
-
 		bool LateAwake() final;
-
 	 private:
 		std::string mJson;
 		MysqlHelper mHelper;

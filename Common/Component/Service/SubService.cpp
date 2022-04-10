@@ -14,12 +14,12 @@ namespace Sentry
 		}
 	}
 
-	bool SubService::Publish(const std::string& func, const std::string& message)
+	bool SubService::Publish(const std::string& func, const Json::Reader & jsonReader)
 	{
 		auto iter = this->mSubMethodMap.find(func);
 		if (iter != this->mSubMethodMap.end())
 		{
-			iter->second->OnPublish(message);
+			iter->second->OnPublish(jsonReader);
 			return true;
 		}
 		return false;

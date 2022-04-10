@@ -40,17 +40,27 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
-		IF_THROW_ERROR(this->mConfig->GetMember("component", components));
 		IF_THROW_ERROR(this->mConfig->GetMember("service", components));
+		IF_THROW_ERROR(this->mConfig->GetMember("component", components));
 
-		for (const std::string& name : components)
+		for(const std::string & name : components)
 		{
 			if (!this->AddComponentByName(name))
 			{
 				throw std::logic_error("add " + name + " failure");
 				return false;
 			}
-			//LOG_DEBUG("add new component : " << name);
+		}
+		components.clear();
+		this->mRpcConfig.GetServices(components);
+		for(const std::string & name : components)
+		{
+			Component * component = this->GetComponent<RpcServiceNode>(name);
+			if(component == nullptr)
+			{
+				this->AddComponent(name, new RpcServiceNode());
+				LOG_INFO("add remote service : [{0}]", name);
+			}
 		}
 		return true;
 	}
@@ -66,11 +76,24 @@ namespace Sentry
 		return this->AddComponent(name, luaRpcService);
 	}
 
+	void App::OnAddComponent(Component* component)
+	{
+		if(component != nullptr)
+		{
+			this->mNewComponents.push(component);
+		}
+	}
+
+	void App::OnDelComponent(Component* component)
+	{
+
+	}
+
 	bool App::InitComponent(Component* component)
 	{
 		if (!component->LateAwake())
 		{
-			LOG_ERROR("{0} late awake ",component->GetName());
+			LOG_ERROR("{0} late awake ", component->GetName());
 			return false;
 		}
 		IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
@@ -81,7 +104,6 @@ namespace Sentry
 		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
 		TryInvoke(manager4, this->mLastFrameUpdateManager.emplace_back(manager4));
-		this->mSceneComponents.emplace_back(component);
 		return true;
 	}
 
@@ -96,12 +118,15 @@ namespace Sentry
 		LocalServerRpc * localServerRpc = component->Cast<LocalServerRpc>();
 		if(localServerRpc != nullptr && this->mIsComplete)
 		{
-			std::list<IServiceChange*> components;
-			this->GetTypeComponents<IServiceChange>(components);
-			for (auto iter = components.begin(); iter != components.end(); iter++)
+			std::vector<std::string> components;
+			this->GetComponents(components);
+			for(const std::string & name : components)
 			{
-				IServiceChange* serviceChange = *iter;
-				serviceChange->OnAddService(localServerRpc);
+				IServiceChange * serviceChange = this->GetComponent<IServiceChange>(name);
+				if(serviceChange != nullptr)
+				{
+					serviceChange->OnAddService(localServerRpc);
+				}
 			}
 		}
 
@@ -123,7 +148,7 @@ namespace Sentry
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
-
+		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return this->mTaskScheduler.Start();
 	}
 
@@ -178,45 +203,69 @@ namespace Sentry
 
 	bool App::StartNewComponent()
 	{
-		if (this->mNewComponents.empty())
+		if(this->mNewComponents.empty())
 		{
-			return true;
+			return false;
 		}
-		std::vector<Component*> components;
-		while (!this->mNewComponents.empty())
+		std::vector<std::string> components;
+		while(!this->mNewComponents.empty())
 		{
-			Component* component = this->mNewComponents.front();
+			Component * component = this->mNewComponents.front();
+			LOG_CHECK_RET_FALSE(this->InitComponent(component));
+
 			this->mNewComponents.pop();
-			if (!this->InitComponent(component))
-			{
-				return false;
-			}
-			components.emplace_back(component);
+			components.emplace_back(component->GetName());
 		}
 		this->mTaskComponent->Start([components, this]()
 		{
-			for (Component* component : components)
+			for(const std::string & name : components)
 			{
-				this->StartComponent(component);
+				Component* component = this->GetComponent<Component>(name);
+				if(component != nullptr)
+				{
+					this->StartComponent(component);
+				}
 			}
-
-			for (Component* component : components)
+			for(const std::string & name : components)
 			{
-				IComplete* complete = component->Cast<IComplete>();
-				if (complete != nullptr)
+				IComplete* complete = this->GetComponent<IComplete>(name);
+				if(complete != nullptr)
 				{
 					complete->OnComplete();
 				}
 			}
-
-			if(!this->mIsComplete)
-			{
-				this->mIsComplete = true;
-				long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-				LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
-			}
+			this->mIsComplete = true;
 		});
 		return true;
+	}
+
+	void App::WaitAllServiceStart()
+	{
+		std::vector<std::string> components;
+		this->GetComponents(components);
+		for (const std::string& name : components)
+		{
+			int count = 0;
+			RpcServiceNode* rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
+			while (rpcServiceNode != nullptr && !rpcServiceNode->IsStartComplete())
+			{
+				this->mTaskComponent->Sleep(1000);
+				LOG_WARN("wait {0} start [count = {1}]", name, ++count);
+				rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
+			}
+		}
+		components.clear();
+		this->GetComponents(components);
+		for (const std::string& name : components)
+		{
+			IComplete* complete = this->GetComponent<IComplete>(name);
+			if (complete != nullptr)
+			{
+				complete->OnAllServiceStart();
+			}
+		}
+		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
+		LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
 	}
 
 	void App::UpdateConsoleTitle()
@@ -234,13 +283,18 @@ namespace Sentry
 		this->mLogicRunCount = 0;
 	}
 
-	void App::OnAddComponent(Component* component)
+	bool App::StartNewService(const std::string& name)
 	{
-		this->mNewComponents.emplace(component);
-	}
-
-	void App::OnDelComponent(Component* component)
-	{
-
+		RpcServiceNode* rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
+		if (rpcServiceNode->Cast<LocalServerRpc>() == nullptr)
+		{
+			Component* newComponent = rpcServiceNode->Copy(name);
+			if (newComponent != nullptr)
+			{
+				this->RemoveComponent(name);
+				return this->AddComponent(name, newComponent);
+			}
+		}
+		return false;
 	}
 }

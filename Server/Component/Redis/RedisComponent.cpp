@@ -15,6 +15,7 @@ namespace Sentry
 		std::string path;
 		this->mRedisConfig.mCount = 3;
 		const ServerConfig& config = App::Get()->GetConfig();
+		this->mRpcAddress = config.GetRpcAddress();
 		config.GetMember("redis", "count", this->mRedisConfig.mCount);
 		config.GetMember("redis", "lua", this->mRedisConfig.mLuaFilePath);
 		config.GetMember("redis", "passwd", this->mRedisConfig.mPassword);
@@ -150,7 +151,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
 #else
-		IAsioThread &workThread = this->mThreadComponent->AllocateNetThread();
+		IAsioThread& workThread = this->mThreadComponent->AllocateNetThread();
 #endif
 		auto socketProxy = std::make_shared<SocketProxy>(workThread, name);
 		auto redisCommandClient = std::make_shared<RedisClient>(socketProxy);
@@ -220,6 +221,12 @@ namespace Sentry
 		return this->InvokeCommand("PUBLISH", channel, message)->GetNumber();
 	}
 
+	long long RedisComponent::Publish(const std::string address, const string& func, Json::Writer& jsonWriter)
+	{
+		jsonWriter.AddMember("func", func);
+		return this->Publish(address, jsonWriter);
+	}
+
 	long long RedisComponent::Publish(const std::string& channel, Json::Writer& jsonWriter)
 	{
 		std::string json = jsonWriter.ToJsonString();
@@ -246,21 +253,26 @@ namespace Sentry
 
 	void RedisComponent::SubscribeMessage()
 	{
-		std::list<SubService*> components;
-		App::Get()->GetTypeComponents<SubService>(components);
-		for (SubService* subService : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
-			std::vector<std::string> methods;
-			subService->GetSubMethods(methods);
-			for (const std::string& name : methods)
+			SubService * subService = this->GetComponent<SubService>(name);
+			if(subService != nullptr)
 			{
-				const std::string& service = subService->GetName();
-				if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
+				std::vector<std::string> methods;
+				subService->GetSubMethods(methods);
+				for (const std::string& name : methods)
 				{
-					LOG_INFO("subscribe channel {0}.{1} successful", service, name);
+					const std::string& service = subService->GetName();
+					if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
+					{
+						LOG_INFO("subscribe channel {0}.{1} successful", service, name);
+					}
 				}
 			}
 		}
+		this->SubscribeChannel(this->mRpcAddress);
 	}
 
 	void RedisComponent::StartPubSub()
@@ -297,22 +309,47 @@ namespace Sentry
 				redisResponse->GetValue() == "message")
 			{
 				const std::string& channel = redisResponse->GetValue(1);
-				size_t pos = channel.find('.');
-				if (pos != std::string::npos)
+				const std::string& message = redisResponse->GetValue(2);
+				std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+
+				if (!jsonReader->ParseJson(message))
 				{
-					string service = channel.substr(0, pos);
-					std::string funcName = channel.substr(pos + 1);
-					const std::string& message = redisResponse->GetValue(2);
-#ifdef __DEBUG__
-					LOG_DEBUG("========= subscribe message =============");
-					LOG_DEBUG("channel = {}", channel);
-					LOG_DEBUG("message = {}", message);
-#endif
-					auto subService = this->GetComponent<SubService>(service);
-					if (subService != nullptr)
+					LOG_ERROR("parse sub message error");
+					continue;
+				}
+
+				std::string service;
+				std::string funcName;
+				if (channel == this->mRpcAddress)
+				{
+					std::string fullName;
+					jsonReader->GetMember("func", fullName);
+					size_t pos = fullName.find('.');
+					if (pos != std::string::npos)
 					{
-						subService->Publish(funcName, message);
+						service = fullName.substr(0, pos);
+						funcName = fullName.substr(pos + 1);
 					}
+				}
+				else
+				{
+					size_t pos = channel.find('.');
+					if (pos != std::string::npos)
+					{
+						service = channel.substr(0, pos);
+						funcName = channel.substr(pos + 1);
+					}
+				}
+
+#ifdef __DEBUG__
+				LOG_DEBUG("========= subscribe message =============");
+				LOG_DEBUG("channel = {}", channel);
+				LOG_DEBUG("message = {}", message);
+#endif
+				SubService* subService = this->GetComponent<SubService>(service);
+				if (subService != nullptr)
+				{
+					subService->Publish(funcName, *jsonReader);
 				}
 			}
 		}
@@ -329,4 +366,5 @@ namespace Sentry
 	{
 		return this->InvokeCommand("INCR", key)->GetNumber();
 	}
+
 }

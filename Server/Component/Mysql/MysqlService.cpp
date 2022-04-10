@@ -13,12 +13,13 @@ namespace Sentry
 		BIND_RPC_FUNCTION(MysqlService::Delete);
 		BIND_RPC_FUNCTION(MysqlService::Invoke);
 		BIND_RPC_FUNCTION(MysqlService::Update);
-		return this->mHelper.StartConnect();
+		return true;
 	}
 
 	bool MysqlService::LateAwake()
 	{
-		return true;
+		RpcServiceNode::LateAwake();
+		return this->mHelper.StartConnect();
 	}
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response)

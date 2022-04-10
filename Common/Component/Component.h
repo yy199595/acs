@@ -71,9 +71,9 @@ namespace Sentry
 		}
 	 public:
 
-		virtual bool Awake() = 0; //组件创建的时候调用
+		virtual bool Awake() { return true;}; //组件创建的时候调用
 
-		virtual bool LateAwake() = 0; // 所有组件加载完成之后调用
+		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 
 	 protected:
 		template<typename T>
@@ -81,8 +81,6 @@ namespace Sentry
 
 		template<typename T>
 		T* GetComponent(const std::string& name);
-
-		void GetComponents(std::vector<Component*>& components);
 
 		Component* GetByName(const std::string& name);
 

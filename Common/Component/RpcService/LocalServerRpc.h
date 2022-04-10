@@ -4,18 +4,16 @@
 
 #ifndef SERVER_LOCALSERVERRPC_H
 #define SERVER_LOCALSERVERRPC_H
-#include"RpcServiceComponent.h"
+#include"RpcServiceNode.h"
 #include"Method/ServiceMethod.h"
 #include"Component/Lua/LuaScriptComponent.h"
 namespace Sentry
 {
-	class LocalServerRpc : public RpcServiceComponent, public ILuaRegister
+	class LocalServerRpc : public RpcServiceNode, public ILuaRegister
 	{
 	public:
 		LocalServerRpc() = default;
-	protected:
-		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
-		bool AddMethod(std::shared_ptr<ServiceMethod> method);
+	 protected:
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType1<T> func);
 
@@ -40,8 +38,13 @@ namespace Sentry
 		template<typename T, typename T1>
 		bool Bind(std::string name, ServiceMethodType44<T, T1> func);
 
+		bool AddMethod(std::shared_ptr<ServiceMethod> method);
+
+		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
+
 	public:
 		void OnLuaRegister(lua_State *lua) final;
+		//bool IsStartComplete() { return true; }
 		std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
 	protected:
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;

@@ -105,21 +105,20 @@ namespace Sentry
 
 	std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync(const std::string& ip, unsigned short port)
 	{
-		if (!this->StartConnect(ip, port))
-		{
-			return nullptr;
-		}
-		this->mConnectTaskSource = std::make_shared<TaskSource<bool>>();
-		return this->mConnectTaskSource;
+		this->StartConnect(ip, port);
+		std::shared_ptr<TaskSource<bool>> taskSource = std::make_shared<TaskSource<bool>>();
+		this->mConnectTasks.emplace_back(taskSource);
+		return taskSource;
 	}
 
 	void ProtoRpcClient::OnConnect(XCode code)
 	{
 		this->mConnectCount++;
-		if (this->mConnectTaskSource != nullptr)
+		for(std::shared_ptr<TaskSource<bool>> taskSource : this->mConnectTasks)
 		{
-			this->mConnectTaskSource->SetResult(code == XCode::Successful);
+			taskSource->SetResult(code == XCode::Successful);
 		}
+		this->mConnectTasks.clear();
 		long long id = this->mSocketProxy->GetSocketId();
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnConnectAfter(id, code);

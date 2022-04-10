@@ -49,7 +49,7 @@ namespace Client
 
         bool LateAwake() final;
 
-		void OnComplete() override;
+		void OnAllServiceStart() override;
 
 		void OnTimeout(long long rpcId);
 

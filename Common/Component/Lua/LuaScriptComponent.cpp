@@ -20,13 +20,12 @@ namespace Sentry
 
 	bool LuaScriptComponent::LateAwake()
 	{
-		std::vector<Component*> components;
-		this->GetComponents(components);
-
-		for (Component* component : components)
+		std::vector<std::string> components;
+		this->GetApp()->GetComponents(components);
+		for(const std::string & name : components)
 		{
-			ILuaRegister* luaRegister = component->Cast<ILuaRegister>();
-			if (luaRegister != nullptr)
+			ILuaRegister* luaRegister = this->GetApp()->GetComponent<ILuaRegister>(name);
+			if(luaRegister != nullptr)
 			{
 				luaRegister->OnLuaRegister(this->mLuaEnv);
 			}

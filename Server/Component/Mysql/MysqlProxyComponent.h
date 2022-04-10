@@ -18,8 +18,6 @@ namespace Sentry
 		bool Awake() final;
 
 		bool LateAwake() final;
-	 private:
-		std::shared_ptr<com::Rpc_Request> NewMessage(const std::string& name);
 	 public:
 		template<typename T>
 		XCode Add(const T& data);
@@ -45,21 +43,18 @@ namespace Sentry
 		std::vector<std::shared_ptr<T>> Sort(const std::string& field, int count, bool reverse = false);
 
 	 private:
-		std::shared_ptr<MysqlRpcTaskSource> Call(const std::string& func, const Message& data);
-	 private:
-		class RpcComponent* mRpcComponent;
-		class TaskComponent* mCorComponent;
+		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response);
 	};
 
 	template<typename T>
-	XCode
-	MysqlProxyComponent::Add(const T& data)
+	XCode MysqlProxyComponent::Add(const T& data)
 	{
 		s2s::Mysql::Add request;
 		request.set_table(data.GetTypeName());
 		request.mutable_data()->PackFrom(data);
-		auto taskSource = this->Call("Add", request);
-		return taskSource != nullptr ? taskSource->GetCode() : XCode::Failure;
+		std::shared_ptr<s2s::Mysql::Response>
+		    response = std::make_shared<s2s::Mysql::Response>();
+		return this->Call("Add", request, response);
 	}
 
 	template<typename T>
@@ -69,8 +64,9 @@ namespace Sentry
 		s2s::Mysql::Save request;
 		request.set_table(data.GetTypeName());
 		request.mutable_data()->PackFrom(data);
-		auto taskSource = this->Call("Save", request);
-		return taskSource == nullptr ? XCode::Failure : taskSource->GetCode();
+		std::shared_ptr<s2s::Mysql::Response>
+			response = std::make_shared<s2s::Mysql::Response>();
+		return  this->Call("Save", request, response);
 	}
 
 	template<typename T>
@@ -81,12 +77,13 @@ namespace Sentry
 		s2s::Mysql::Query request;
 		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
-		auto taskSource = this->Call("Query", request);
-		if (taskSource == nullptr)
+
+		std::shared_ptr<s2s::Mysql::Response>
+			response = std::make_shared<s2s::Mysql::Response>();
+		if(this->Call("Query", request, response) != XCode::Successful)
 		{
 			return nullptr;
 		}
-		auto response = taskSource->GetResponse();
 		if (response != nullptr && response->json_array_size() > 0)
 		{
 			const std::string& json = response->json_array(0);
@@ -97,21 +94,21 @@ namespace Sentry
 	}
 
 	template<typename T>
-	std::vector<std::shared_ptr<T>>
-	MysqlProxyComponent::QueryAll(const std::string& queryJson)
+	std::vector<std::shared_ptr<T>>MysqlProxyComponent::QueryAll(const std::string& queryJson)
 	{
 		std::shared_ptr<T> queryData(new T());
 
 		s2s::Mysql::Query request;
 		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
-		auto taskSource = this->Call("Query", request);
-		if (taskSource == nullptr)
+
+		std::shared_ptr<s2s::Mysql::Response>
+			response = std::make_shared<s2s::Mysql::Response>();
+		if(this->Call("Query", request, response) != XCode::Successful)
 		{
-			return std::vector<std::shared_ptr<T>>();;
+			return std::vector<std::shared_ptr<T>>();
 		}
 		std::vector<std::shared_ptr<T>> respArray;
-		auto response = taskSource->GetResponse();
 		for (int index = 0; index < response->json_array_size(); index++)
 		{
 			const std::string& json = response->json_array(index);
@@ -129,10 +126,12 @@ namespace Sentry
 	{
 		std::shared_ptr<T> data(new T());
 		s2s::Mysql::Delete request;
-		request.set_where_json(deleteJson);
 		request.set_table(data->GetTypeName());
-		auto taskSource = this->Call("Delete", request);
-		return taskSource == nullptr ? XCode::Failure : taskSource->GetCode();
+		request.set_where_json(deleteJson);
+
+		std::shared_ptr<s2s::Mysql::Response>
+			response = std::make_shared<s2s::Mysql::Response>();
+		return this->Call("Delete", request, response);
 	}
 
 	template<typename T>
@@ -167,7 +166,9 @@ namespace Sentry
 		request.set_table(data->GetTypeName());
 		request.set_where_json(whereJson);
 		request.set_update_json(updateJson);
-		auto response = this->Call("Update", request);
-		return response == nullptr ? XCode::Failure : response->GetCode();
+
+		std::shared_ptr<s2s::Mysql::Response>
+			response = std::make_shared<s2s::Mysql::Response>();
+		return this->Call("Update", request, response);
 	}
 }

@@ -88,7 +88,7 @@ namespace Sentry
 
 	void TcpServerComponent::OnStart()
 	{
-		for (auto listener : this->mListeners)
+		for (NetworkListener * listener : this->mListeners)
 		{
 			const ListenConfig& config = listener->GetConfig();
 			Component* component = this->GetComponent<Component>(config.Handler);

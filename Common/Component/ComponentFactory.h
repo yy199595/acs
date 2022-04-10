@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include"Component/RpcService/RpcServiceComponent.h"
+#include"Component/RpcService/RpcServiceNode.h"
 namespace Sentry
 {
     template<typename T>
@@ -22,7 +22,7 @@ namespace Sentry
 		template<typename T>
 		static bool Add(const std::string name)
 		{
-			if (std::is_base_of<RpcServiceComponent, T>::value)
+			if (std::is_base_of<RpcServiceNode, T>::value)
 			{
 				if (std::is_base_of<ISystemUpdate, T>::value)
 				{

@@ -17,7 +17,7 @@ namespace Sentry
 {
 	class Manager;
 
-	class RpcServiceComponent;
+	class RpcServiceNode;
 	class MainTaskScheduler;
 	class App : public Entity
 	{
@@ -44,15 +44,12 @@ namespace Sentry
 
 	 public:
 
-		bool AddComponentByName(const std::string& name);
-
 		inline bool IsMainThread()
 		{
 			return std::this_thread::get_id() == this->mMainThreadId;
 		}
+		bool StartNewService(const std::string & name);
 	 public:
-		template<typename T>
-		void GetTypeComponents(std::list<T*>& components);
 		inline LoggerComponent* GetLogger()
 		{
 			return this->mLogComponent;
@@ -65,13 +62,14 @@ namespace Sentry
 		{
 			return this->mTimerComponent;
 		}
-	 protected:
-		void OnAddComponent(Component* component) final;
-		void OnDelComponent(Component* component) final;
 	 private:
 		bool LoadComponent();
 		bool InitComponent(Component* component);
 		void StartComponent(Component* component);
+		bool AddComponentByName(const std::string& name);
+	 protected:
+		void OnAddComponent(Component *component) final;
+		void OnDelComponent(Component *component) final;
 	 public:
 		int Run();
 		void Stop();
@@ -79,12 +77,13 @@ namespace Sentry
 		void LogicMainLoop();
 		bool StartNewComponent();
 		void UpdateConsoleTitle();
+		void WaitAllServiceStart();
 	 private:
+		bool mIsComplete;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	 private:
 		int mFps;
-		bool mIsComplete;
 		float mDeltaTime;
 		RpcConfig mRpcConfig;
 		long long mStartTimer;
@@ -103,23 +102,9 @@ namespace Sentry
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
 		std::queue<Component *> mNewComponents;
-		std::vector<Component*> mSceneComponents;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
 	};
-
-	template<typename T>
-	void App::GetTypeComponents(std::list<T*>& components)
-	{
-		for (Component* component : this->mSceneComponents)
-		{
-			T* typeComponent = dynamic_cast<T*>(component);
-			if (typeComponent != nullptr)
-			{
-				components.push_back(typeComponent);
-			}
-		}
-	}
 }// namespace Sentry

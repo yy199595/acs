@@ -94,9 +94,7 @@
         "GateService",
         "ChatService",
         "LocalService",
-        "MysqlService",
-        "HttpUserService",
-        "HttpNodeService"
+        "HttpUserService"
     ],
     "white_list": [
         "127.0.0.1"

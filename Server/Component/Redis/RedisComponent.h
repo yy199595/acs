@@ -43,6 +43,8 @@ namespace Sentry
 
 		long long Publish(const std::string& channel, Json::Writer& jsonWriter);
 
+		long long Publish(const std::string address, const std::string& func, Json::Writer& jsonWriter);
+
 		template<typename ... Args>
 		std::shared_ptr<RedisResponse> InvokeCommand(const std::string& cmd, Args&& ... args)
 		{
@@ -80,6 +82,7 @@ namespace Sentry
 		bool GetLuaScript(const std::string& file, std::string& command);
 		std::shared_ptr<RedisClient> MakeRedisClient(const std::string& name);
 	 private:
+		std::string mRpcAddress;
 		RedisConfig mRedisConfig;
 		TaskComponent* mTaskComponent;
 		ThreadPoolComponent* mThreadComponent;

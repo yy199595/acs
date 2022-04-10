@@ -27,6 +27,6 @@ namespace Sentry
 	 private:
 		int mConnectCount;
 		RpcClientComponent* mTcpComponent;
-		std::shared_ptr<TaskSource<bool>> mConnectTaskSource;
+		std::vector<std::shared_ptr<TaskSource<bool>>> mConnectTasks;
 	};
 }// namespace Sentry

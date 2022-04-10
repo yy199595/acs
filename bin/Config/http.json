@@ -13,11 +13,10 @@
         "Content": "application/json",
         "Component":"HttpUserService"
     },
-    "/logic/service/push":
+    "/logic/service/query":
     {
-        "Type": "POST",
-        "Method": "Push",
-        "Content": "application/json",
+        "Type": "GET",
+        "Method": "Query",
         "Component": "HttpNodeService"
     }
 }

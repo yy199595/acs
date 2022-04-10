@@ -21,10 +21,11 @@ namespace Sentry
 		long long id = gameObject->GetId();
 		auto iter = this->mGameObjects.find(id);
 		LOG_CHECK_RET_FALSE(iter == this->mGameObjects.end());
-		std::vector<Component*> components;
+		std::vector<std::string> components;
 		gameObject->GetComponents(components);
-		for (Component* component : components)
+		for (const std::string& name : components)
 		{
+			Component* component = gameObject->GetComponent<Component>(name);
 			if (!component->LateAwake())
 			{
 				LOG_ERROR("Init", component->GetName(), "failure");
@@ -95,19 +96,23 @@ namespace Sentry
 	{
 		auto gameObject = this->Find(objectId);
 		LOG_CHECK_RET(gameObject);
-		std::vector<Component*> components;
+		std::vector<std::string> components;
 		gameObject->GetComponents(components);
-		for (Component* component : components)
+		for (const std::string & name : components)
 		{
-			IStart* start = dynamic_cast<IStart*>(component);
-			ILoadData* loadData = dynamic_cast<ILoadData*>(component);
-			if (start != nullptr)
+			Component * component = gameObject->GetComponent<Component>(name);
+			if(component != nullptr)
 			{
-				start->OnStart();
-			}
-			if (loadData != nullptr)
-			{
-				loadData->OnLoadData();
+				IStart * start = component->Cast<IStart>();
+				if(start != nullptr)
+				{
+					start->OnStart();
+				}
+				ILoadData * loadData = component->Cast<ILoadData>();
+				if(loadData != nullptr)
+				{
+					loadData->OnLoadData();
+				}
 			}
 		}
 	}

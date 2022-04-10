@@ -5,9 +5,12 @@
 #include"LocalServerRpc.h"
 #include"App/App.h"
 #include"Global/RpcConfig.h"
+#include"Method/LuaServiceMethod.h"
+#include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry
 {
+
 	bool LocalServerRpc::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
 		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
@@ -87,13 +90,19 @@ namespace Sentry
 		}
 		return response;
 	}
-
 	void LocalServerRpc::OnLuaRegister(lua_State* lua)
 	{
+		const char* tab = this->GetName().c_str();
 		auto iter = this->mMethodMap.begin();
-		for(; iter != this->mMethodMap.end(); iter++)
+		for (; iter != this->mMethodMap.end(); iter++)
 		{
-			const std::string & name = iter->first;
+			const std::string& name = iter->first;
+			if (Lua::Function::Get(lua, tab, name.c_str()))
+			{
+				std::shared_ptr<LuaServiceMethod> luaServiceMethod
+					= std::make_shared<LuaServiceMethod>(this->GetName(), name, lua);
+				this->mLuaMethodMap.emplace(name, luaServiceMethod);
+			}
 		}
 	}
 }

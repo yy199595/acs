@@ -33,7 +33,7 @@ namespace Sentry
 		Json::Writer json;
 		json.AddMember("account", account);
 		std::string whereJson = json.ToJsonString();
-		auto userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(whereJson);
+		std::shared_ptr<db_account::tab_user_account> userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(whereJson);
 		if (userData == nullptr || userData->password() != password)
 		{
 			return XCode::Failure;

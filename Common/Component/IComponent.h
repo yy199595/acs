@@ -17,7 +17,8 @@ namespace Sentry
 	class IComplete
 	{
 	 public:
-		virtual void OnComplete() = 0;
+		virtual void OnComplete() { };
+		virtual void OnAllServiceStart() { }
 	};
 
 	class IFrameUpdate
