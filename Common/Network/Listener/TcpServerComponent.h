@@ -7,7 +7,7 @@ namespace Sentry
 	struct ListenConfig;
 	class NetworkListener;
 	class RpcClientComponent;
-	class TcpServerComponent : public Component, public IStart
+	class TcpServerComponent : public Component, public IComplete
 	{
 	 public:
 		TcpServerComponent() = default;
@@ -24,7 +24,7 @@ namespace Sentry
 	 protected:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnStart() final;
+		void OnAllServiceStart() final;
 	 private:
 		std::string mHostIp;
 		std::set<std::string> mWhiteList;    //白名单

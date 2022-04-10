@@ -86,7 +86,7 @@ namespace Sentry
 		return true;
 	}
 
-	void TcpServerComponent::OnStart()
+	void TcpServerComponent::OnAllServiceStart()
 	{
 		for (NetworkListener * listener : this->mListeners)
 		{
