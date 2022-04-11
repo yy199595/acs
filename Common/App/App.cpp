@@ -178,14 +178,6 @@ namespace Sentry
 			this->mNewComponents.pop();
 			components.emplace_back(component->GetName());
 		}
-		for(const std::string & name : components)
-		{
-			Component* component = this->GetComponent<Component>(name);
-			if(component != nullptr)
-			{
-				this->StartComponent(component);
-			}
-		}
 		std::vector<std::string> allComponents;
 		this->GetComponents(allComponents);
 
@@ -193,17 +185,20 @@ namespace Sentry
 		{
 			Component* newComponent = this->GetComponent<Component>(name);
 			IComplete * complete = newComponent->Cast<IComplete>();
-
+			LocalServerRpc * localServerRpc = newComponent->Cast<LocalServerRpc>();
 			if(complete != nullptr)
 			{
 				complete->OnComplete();
 			}
-			for (const std::string& name: allComponents)
+			if(localServerRpc != nullptr)
 			{
-				IServiceChange* serviceChange = this->GetComponent<IServiceChange>(name);
-				if (serviceChange != nullptr)
+				for (const std::string& name : allComponents)
 				{
-					serviceChange->OnAddService(localServerRpc);
+					IServiceChange* serviceChange = this->GetComponent<IServiceChange>(name);
+					if (serviceChange != nullptr)
+					{
+						serviceChange->OnAddService(localServerRpc);
+					}
 				}
 			}
 		}

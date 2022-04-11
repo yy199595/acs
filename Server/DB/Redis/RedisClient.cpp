@@ -100,6 +100,7 @@ namespace Sentry
         if(this->mRespTaskSource != nullptr)
         {
             std::move(this->mResponse);
+			printf("%s\n", code.message().c_str());
             this->OnComplete();
         }
         asio::error_code err;
@@ -111,6 +112,7 @@ namespace Sentry
         if (code)
         {
             this->OnClientError(code);
+			printf("%s\n", code.message().c_str());
             return;
         }
         std::iostream readStream(&this->mRecvDataBuffer);

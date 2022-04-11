@@ -42,6 +42,7 @@ namespace Sentry
             this->mBindAcceptor->listen(this->mConfig.Count);
             std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
             io.post(std::bind(&NetworkListener::ListenConnect, this));
+			this->mIsListen = true;
             return true;
         }
         catch (std::system_error & err)

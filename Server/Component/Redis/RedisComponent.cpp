@@ -153,8 +153,8 @@ namespace Sentry
 #else
 		IAsioThread& workThread = this->mThreadComponent->AllocateNetThread();
 #endif
-		auto socketProxy = std::make_shared<SocketProxy>(workThread, name);
-		auto redisCommandClient = std::make_shared<RedisClient>(socketProxy);
+		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, name);
+		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy);
 
 		for (size_t index = 0; index < 3; index++)
 		{
@@ -164,13 +164,14 @@ namespace Sentry
 				{
 					std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
 					request->AddParameter(this->mRedisConfig.mPassword);
-					auto response = redisCommandClient->InvokeCommand(request)->Await();
-					if (!response->IsOk())
+					auto responseTask = redisCommandClient->InvokeCommand(request);
+					if (!responseTask->Await()->IsOk())
 					{
 						LOG_ERROR("auth redis password error :{0}", this->mRedisConfig.mPassword);
 						return nullptr;
 					}
 				}
+				LOG_INFO("connect redis successful");
 				return redisCommandClient;
 			}
 		}
