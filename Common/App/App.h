@@ -64,12 +64,10 @@ namespace Sentry
 		}
 	 private:
 		bool LoadComponent();
+		void StartAllComponent();
 		bool InitComponent(Component* component);
 		void StartComponent(Component* component);
 		bool AddComponentByName(const std::string& name);
-	 protected:
-		void OnAddComponent(Component *component) final;
-		void OnDelComponent(Component *component) final;
 	 public:
 		int Run();
 		void Stop();
@@ -79,7 +77,6 @@ namespace Sentry
 		void UpdateConsoleTitle();
 		void WaitAllServiceStart();
 	 private:
-		bool mIsComplete;
 		std::thread::id mMainThreadId;
 		class MainTaskScheduler mTaskScheduler;
 	 private:

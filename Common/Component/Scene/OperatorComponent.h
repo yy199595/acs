@@ -14,7 +14,6 @@ namespace Sentry
 		~OperatorComponent() final = default;
 
 	 protected:
-		bool Awake() final;
 		bool LateAwake() final;
 		void StartRefreshDay(const std::string& component);
 	 public:

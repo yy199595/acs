@@ -3,11 +3,12 @@
 #include"Component/RpcService/RpcServiceNode.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/RpcService/LocalServerRpc.h"
+#include"Network/Listener/TcpServerComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
 {
-	bool ConsoleComponent::Awake()
+	bool ConsoleComponent::LateAwake()
 	{
 		BIND_FUNC("help", ConsoleComponent::Help);
 		BIND_FUNC("close", ConsoleComponent::Close);
@@ -15,13 +16,14 @@ namespace Sentry
 		BIND_FUNC("start", ConsoleComponent::Start);
 		BIND_FUNC("offset", ConsoleComponent::Offset);
 		BIND_FUNC("service", ConsoleComponent::Services);
+		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		return true;
 	}
 
-	bool ConsoleComponent::LateAwake()
+	void ConsoleComponent::OnStart()
 	{
-		this->mTaskComponent = this->GetComponent<TaskComponent>();
-		return true;
+		TcpServerComponent * tcpComponent = this->GetComponent<TcpServerComponent>();
+		LOG_CHECK_RET(tcpComponent->StartListen("console"));
 	}
 
 	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)

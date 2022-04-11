@@ -8,19 +8,13 @@ using namespace backward;
 namespace Sentry
 {
 	// 单线程  st  多线程  mt
-	bool LoggerComponent::Awake()
+	void LoggerComponent::Awake()
 	{
 		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("node_name", this->mServerName));
-		LOG_CHECK_RET_FALSE(config.GetMember("log", "path", this->mLogSavePath));
-		LOG_CHECK_RET_FALSE(config.GetMember("log", "save", this->mLogSaveTime));
+		LOG_CHECK_RET(config.GetMember("node_name", this->mServerName));
+		LOG_CHECK_RET(config.GetMember("log", "path", this->mLogSavePath));
+		LOG_CHECK_RET(config.GetMember("log", "save", this->mLogSaveTime));
 		this->CreateLogFile();
-		return true;
-	}
-
-	bool LoggerComponent::LateAwake()
-	{
-		return true;
 	}
 
 	void LoggerComponent::OnZeroRefresh()

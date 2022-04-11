@@ -21,10 +21,15 @@ namespace Sentry
 		const ListenConfig * GetTcpConfig(const std::string & name);
 		void GetListenConfigs(std::vector<const ListenConfig*>& configs);
 		std::string GetTcpAddress(const std::string & name);
+
+	public:
+		bool StartListen(const std::string & name);
 	 protected:
-		bool Awake() final;
 		bool LateAwake() final;
 		void OnAllServiceStart() final;
+
+	private:
+		bool LoadServerConfig();
 	 private:
 		std::string mHostIp;
 		std::set<std::string> mWhiteList;    //白名单

@@ -15,11 +15,6 @@
 #endif
 namespace Sentry
 {
-	bool GateComponent::Awake()
-	{
-		this->mGateClientComponent = nullptr;
-		return true;
-	}
 
 	bool GateComponent::LateAwake()
 	{

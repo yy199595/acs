@@ -16,7 +16,7 @@ namespace Sentry
 		~HttpUserService() final = default;
 
 	 protected:
-		bool Awake() final;
+		void Awake() final;
 		bool LateAwake() final;
 
 	 private:

@@ -8,19 +8,19 @@
 #include"Network/Http/HttpAsyncRequest.h"
 namespace Sentry
 {
-	bool LocalService::Awake()
+	void LocalService::Awake()
 	{
-		BIND_SUB_FUNCTION(LocalService::Add);
-		BIND_SUB_FUNCTION(LocalService::Push);
-		BIND_SUB_FUNCTION(LocalService::Remove);
-		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
-		return true;
+		this->Bind("Add", &LocalService::Add);
+		this->Bind("Push", &LocalService::Push);
+		this->Bind("Remove", &LocalService::Remove);
 	}
 
 	bool LocalService::LateAwake()
 	{
+		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
+		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
+		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
+
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mHttpComponent = this->GetComponent<HttpClientComponent>());
 		return true;
@@ -63,17 +63,15 @@ namespace Sentry
 	{
 		std::string address;
 		std::vector<std::string> nodeServices;
-		jsonReader.GetMember("rpc", address);
 		jsonReader.GetMember("service", nodeServices);
 		for(const std::string & service : nodeServices)
 		{
-			RpcServiceNode * rpcServiceNode = this->GetComponent<RpcServiceNode>(service);
-			if(rpcServiceNode == nullptr)
+			jsonReader.GetMember("rpc", address);
+			LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(service);
+			if(localServerRpc != nullptr)
 			{
-				rpcServiceNode = new RpcServiceNode();
-				this->mEntity->AddComponent(service, rpcServiceNode);
+				localServerRpc->AddAddress(address);
 			}
-			rpcServiceNode->AddAddress(address);
 		}
 
 		bool isResponse = false;
@@ -126,7 +124,7 @@ namespace Sentry
 		for(const std::string & name : components)
 		{
 			LocalServerRpc * localServerRpc = this->GetApp()->GetComponent<LocalServerRpc>(name);
-			if(localServerRpc != nullptr)
+			if(localServerRpc != nullptr && localServerRpc->IsStartService())
 			{
 				tempArray.emplace_back(name);
 			}

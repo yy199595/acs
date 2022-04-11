@@ -3,12 +3,6 @@
 #include"Entity/Entity.h"
 namespace Sentry
 {
-	bool EntityMgrComponent::Awake()
-	{
-		this->mCorComponent = nullptr;
-		return true;
-	}
-
 	bool EntityMgrComponent::LateAwake()
 	{
 		this->mCorComponent = App::Get()->GetTaskComponent();

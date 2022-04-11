@@ -15,7 +15,6 @@ namespace Sentry
 		  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		this->mLogicRunCount = 0;
-		this->mIsComplete = false;
 		this->mTimerComponent = nullptr;
 		this->mMainThreadId = std::this_thread::get_id();
 	}
@@ -40,8 +39,10 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
-		IF_THROW_ERROR(this->mConfig->GetMember("service", components));
-		IF_THROW_ERROR(this->mConfig->GetMember("component", components));
+		this->mRpcConfig.GetServices(components);
+		this->mConfig->GetMember("sub", components);
+		this->mConfig->GetMember("http", components);
+		this->mConfig->GetMember("component", components);
 
 		for(const std::string & name : components)
 		{
@@ -49,17 +50,6 @@ namespace Sentry
 			{
 				throw std::logic_error("add " + name + " failure");
 				return false;
-			}
-		}
-		components.clear();
-		this->mRpcConfig.GetServices(components);
-		for(const std::string & name : components)
-		{
-			Component * component = this->GetComponent<RpcServiceNode>(name);
-			if(component == nullptr)
-			{
-				this->AddComponent(name, new RpcServiceNode());
-				LOG_INFO("add remote service : [{0}]", name);
 			}
 		}
 		return true;
@@ -76,19 +66,6 @@ namespace Sentry
 		return this->AddComponent(name, luaRpcService);
 	}
 
-	void App::OnAddComponent(Component* component)
-	{
-		if(component != nullptr)
-		{
-			this->mNewComponents.push(component);
-		}
-	}
-
-	void App::OnDelComponent(Component* component)
-	{
-
-	}
-
 	bool App::InitComponent(Component* component)
 	{
 		if (!component->LateAwake())
@@ -96,6 +73,7 @@ namespace Sentry
 			LOG_ERROR("{0} late awake ", component->GetName());
 			return false;
 		}
+
 		IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
@@ -109,28 +87,16 @@ namespace Sentry
 
 	void App::StartComponent(Component* component)
 	{
-		ElapsedTimer elapsedTimer;
-		IStart* startComponent = component->Cast<IStart>();
-		ILoadData* loadComponent = component->Cast<ILoadData>();
-		if (startComponent != nullptr) startComponent->OnStart();
-		if (loadComponent != nullptr) loadComponent->OnLoadData();
-
 		LocalServerRpc * localServerRpc = component->Cast<LocalServerRpc>();
-		if(localServerRpc != nullptr && this->mIsComplete)
+		if(localServerRpc == nullptr || localServerRpc->IsStartService())
 		{
-			std::vector<std::string> components;
-			this->GetComponents(components);
-			for(const std::string & name : components)
-			{
-				IServiceChange * serviceChange = this->GetComponent<IServiceChange>(name);
-				if(serviceChange != nullptr)
-				{
-					serviceChange->OnAddService(localServerRpc);
-				}
-			}
+			ElapsedTimer elapsedTimer;
+			IStart* startComponent = component->Cast<IStart>();
+			ILoadData* loadComponent = component->Cast<ILoadData>();
+			if (startComponent != nullptr) startComponent->OnStart();
+			if (loadComponent != nullptr) loadComponent->OnLoadData();
+			LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
 		}
-
-		LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
 	}
 
 	int App::Run()
@@ -148,7 +114,6 @@ namespace Sentry
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
-		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return this->mTaskScheduler.Start();
 	}
 
@@ -177,7 +142,6 @@ namespace Sentry
 		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
 		{
 			this->mLogicRunCount++;
-			this->StartNewComponent();
 			for (IFrameUpdate* component : this->mFrameUpdateManagers)
 			{
 				component->OnFrameUpdate(this->mDeltaTime);
@@ -201,41 +165,77 @@ namespace Sentry
 		}
 	}
 
-	bool App::StartNewComponent()
+	void App::StartAllComponent()
 	{
-		if(this->mNewComponents.empty())
-		{
-			return false;
-		}
 		std::vector<std::string> components;
 		while(!this->mNewComponents.empty())
 		{
 			Component * component = this->mNewComponents.front();
-			LOG_CHECK_RET_FALSE(this->InitComponent(component));
-
+			if(component != nullptr)
+			{
+				this->StartComponent(component);
+			}
 			this->mNewComponents.pop();
 			components.emplace_back(component->GetName());
 		}
-		this->mTaskComponent->Start([components, this]()
+		for(const std::string & name : components)
 		{
-			for(const std::string & name : components)
+			Component* component = this->GetComponent<Component>(name);
+			if(component != nullptr)
 			{
-				Component* component = this->GetComponent<Component>(name);
-				if(component != nullptr)
+				this->StartComponent(component);
+			}
+		}
+		std::vector<std::string> allComponents;
+		this->GetComponents(allComponents);
+
+		for(const std::string & name : components)
+		{
+			Component* newComponent = this->GetComponent<Component>(name);
+			IComplete * complete = newComponent->Cast<IComplete>();
+
+			if(complete != nullptr)
+			{
+				complete->OnComplete();
+			}
+			for (const std::string& name: allComponents)
+			{
+				IServiceChange* serviceChange = this->GetComponent<IServiceChange>(name);
+				if (serviceChange != nullptr)
 				{
-					this->StartComponent(component);
+					serviceChange->OnAddService(localServerRpc);
 				}
 			}
-			for(const std::string & name : components)
+		}
+	}
+
+	bool App::StartNewComponent()
+	{
+		std::vector<std::string> components;
+		this->GetComponents(components);
+		for(const std::string & name : components)
+		{
+			Component * component = this->GetComponent<Component>(name);
+			if(component != nullptr && !this->InitComponent(component))
 			{
-				IComplete* complete = this->GetComponent<IComplete>(name);
-				if(complete != nullptr)
-				{
-					complete->OnComplete();
-				}
+				return false;
 			}
-			this->mIsComplete = true;
-		});
+			this->mNewComponents.push(component);
+		}
+		components.clear();
+		this->mConfig->GetMember("rpc", components);
+		for(const std::string & name : components)
+		{
+			LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(name);
+			if(localServerRpc != nullptr && !localServerRpc->LoadServiceMethod())
+			{
+				LOG_ERROR("{0} load service method failure", name);
+				return false;
+			}
+			LOG_INFO("{0} load service method successful", name);
+		}
+		this->mTaskComponent->Start(&App::StartAllComponent, this);
+		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return true;
 	}
 
@@ -246,16 +246,13 @@ namespace Sentry
 		for (const std::string& name : components)
 		{
 			int count = 0;
-			RpcServiceNode* rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
+			LocalServerRpc* rpcServiceNode = this->GetComponent<LocalServerRpc>(name);
 			while (rpcServiceNode != nullptr && !rpcServiceNode->IsStartComplete())
 			{
 				this->mTaskComponent->Sleep(1000);
 				LOG_WARN("wait {0} start [count = {1}]", name, ++count);
-				rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
 			}
 		}
-		components.clear();
-		this->GetComponents(components);
 		for (const std::string& name : components)
 		{
 			IComplete* complete = this->GetComponent<IComplete>(name);
@@ -285,14 +282,24 @@ namespace Sentry
 
 	bool App::StartNewService(const std::string& name)
 	{
-		RpcServiceNode* rpcServiceNode = this->GetComponent<RpcServiceNode>(name);
-		if (rpcServiceNode->Cast<LocalServerRpc>() == nullptr)
+		LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
+		if(localServerRpc != nullptr)
 		{
-			Component* newComponent = rpcServiceNode->Copy(name);
-			if (newComponent != nullptr)
+			if(localServerRpc->IsStartService())
 			{
-				this->RemoveComponent(name);
-				return this->AddComponent(name, newComponent);
+				return true;
+			}
+			if(localServerRpc->LoadServiceMethod())
+			{
+				this->mTaskComponent->Start([localServerRpc, this]()
+				{
+					this->StartComponent(localServerRpc);
+					std::vector<std::string> components;
+					this->GetComponents(components);
+
+					LOG_DEBUG("start new service {0}", localServerRpc->GetName());
+				});
+				return true;
 			}
 		}
 		return false;

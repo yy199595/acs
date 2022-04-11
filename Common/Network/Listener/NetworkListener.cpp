@@ -27,6 +27,10 @@ namespace Sentry
 
 	bool NetworkListener::StartListen(ISocketListen * handler)
     {
+		if(this->mIsListen)
+		{
+			return true;
+		}
         this->mListenHandler = handler;
 #ifdef ONLY_MAIN_THREAD
         try
@@ -65,6 +69,7 @@ namespace Sentry
             std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
             io.post(std::bind(&NetworkListener::ListenConnect, this));
             taskSource->SetResult(true);
+			this->mIsListen = true;
         }
         catch (std::system_error & err)
         {

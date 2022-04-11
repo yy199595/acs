@@ -13,13 +13,13 @@ namespace Sentry
 		GateService() = default;
 		~GateService() final = default;
 	 protected:
-		bool Awake() final;
 		bool LateAwake() final;
 	 private:
 		XCode Ping();
 		XCode Login(const c2s::GateLogin::Request& request);
 	 private:
 		void OnTokenTimeout(const std::string& token);
+		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		class TimerComponent* mTimerComponent;
 		class GateClientComponent* mGateComponent;

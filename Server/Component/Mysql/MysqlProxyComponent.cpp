@@ -4,16 +4,6 @@
 #include"Component/Mysql/MysqlService.h"
 namespace Sentry
 {
-	bool MysqlProxyComponent::Awake()
-	{
-		return true;
-	}
-
-	bool MysqlProxyComponent::LateAwake()
-	{
-		return true;
-	}
-
 	XCode MysqlProxyComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
 	{
 		std::string address;

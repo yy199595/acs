@@ -12,12 +12,11 @@
 #include"Async/RpcTask/RpcTaskSource.h"
 namespace Sentry
 {
-	bool RpcComponent::Awake()
+	void RpcComponent::Awake()
 	{
 		this->mCorComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
-		return true;
 	}
 
 	bool RpcComponent::LateAwake()

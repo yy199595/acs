@@ -13,7 +13,7 @@ namespace Sentry
 		MonitorComponent() = default;
 		~MonitorComponent() final = default;
 	 protected:
-		bool Awake() final;
+		void Awake() final;
 		bool LateAwake() final;
 	 private:
 		void Update();

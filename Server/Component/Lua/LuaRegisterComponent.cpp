@@ -10,11 +10,6 @@
 #include"Script/Coroutine/LuaCoroutine.h"
 namespace Sentry
 {
-	bool Sentry::LuaRegisterComponent::Awake()
-	{
-		this->mLuaComponent = nullptr;
-		return true;
-	}
 	bool LuaRegisterComponent::LateAwake()
 	{
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();

@@ -27,11 +27,11 @@ namespace Sentry
 		RedisComponent() = default;
 		~RedisComponent() final = default;
 	 protected:
-		bool Awake() final;            //初始化管理器
 		bool LateAwake() final;                //初始化完成之后
 		void OnStart() override;
 	 private:
 		void StartPubSub();
+		bool LoadRedisConfig();
 		void SubscribeMessage();
 		void CheckRedisClient();
 	 public:

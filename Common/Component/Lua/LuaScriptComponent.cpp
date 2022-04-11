@@ -11,16 +11,17 @@
 using namespace Lua;
 namespace Sentry
 {
-	bool LuaScriptComponent::Awake()
+	void LuaScriptComponent::Awake()
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
-		return this->LoadAllFile();
+		this->LoadAllFile();
 	}
 
 	bool LuaScriptComponent::LateAwake()
 	{
 		std::vector<std::string> components;
+		LOG_CHECK_RET_FALSE(this->LoadAllFile());
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{
@@ -30,7 +31,6 @@ namespace Sentry
 				luaRegister->OnLuaRegister(this->mLuaEnv);
 			}
 		}
-
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
 		return luaFunction != nullptr && luaFunction->Func<bool>();
 	}

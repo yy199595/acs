@@ -14,10 +14,6 @@ namespace Sentry
 
 		~MysqlProxyComponent() final = default;
 
-	 protected:
-		bool Awake() final;
-
-		bool LateAwake() final;
 	 public:
 		template<typename T>
 		XCode Add(const T& data);

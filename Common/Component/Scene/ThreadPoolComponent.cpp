@@ -4,7 +4,7 @@
 #include "Method/MethodProxy.h"
 namespace Sentry
 {
-	bool ThreadPoolComponent::Awake()
+	void ThreadPoolComponent::Awake()
 	{
 		this->mIndex = 0;
 		int taskCount = 0;
@@ -12,7 +12,7 @@ namespace Sentry
 		config.GetMember("thread", "task", taskCount);
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
-		LOG_CHECK_RET_FALSE(config.GetMember("thread", "network", networkCount));
+		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{
 			this->mNetThreads.push_back(new NetWorkThread());
@@ -22,7 +22,6 @@ namespace Sentry
 		{
 			mThreadArray.push_back(new TaskThread());
 		}
-		return true;
 	}
 
 	bool ThreadPoolComponent::LateAwake()

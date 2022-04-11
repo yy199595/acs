@@ -71,7 +71,7 @@ namespace Sentry
 		}
 	 public:
 
-		virtual bool Awake() { return true;}; //组件创建的时候调用
+		virtual void Awake() { }; //组件创建的时候调用
 
 		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 

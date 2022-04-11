@@ -15,7 +15,6 @@ namespace Sentry
 		LuaRegisterComponent() = default;
 		~LuaRegisterComponent() = default;
 	 public:
-		bool Awake() final;
 		bool LateAwake() final;
 		void OnLuaRegister(lua_State *lua) final;
 	 private:

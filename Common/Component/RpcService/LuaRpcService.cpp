@@ -18,16 +18,31 @@ namespace Sentry
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	void LuaRpcService::OnHotFix()
+	bool LuaRpcService::OnInitService(ServiceMethodRegister & methodRegister)
 	{
-		this->mMethodMap.clear();
-		this->mLuaMethodMap.clear();
-	}
+		std::vector<std::string> methods;
+		const char * tab = this->GetName().c_str();
+		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		rpcConfig.GetMethods(this->GetName(), methods);
 
-	bool LuaRpcService::Awake()
-	{
+		for (const std::string& method : methods)
+		{
+			const char * func = method.c_str();
+			if(!Lua::Function::Get(this->mLuaEnv, tab, func))
+			{
+				LOG_ERROR("not find rpc method = [{0}.{1}]", tab, func);
+				return false;
+			}
+			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
+			const ProtoConfig * config = rpcConfig.GetProtocolConfig(fullName);
+			if(!methodRegister.AddMethod(std::make_shared<LuaServiceMethod>(config->Service, config->Method, this->mLuaEnv)))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
+
 
 	bool LuaRpcService::LateAwake()
 	{
@@ -43,28 +58,11 @@ namespace Sentry
 		const char * tab = this->GetName().c_str();
 		if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
 		{
-			return Lua::Function::Invoke<bool>(this->mLuaEnv);
+			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
 		}
 		if(Lua::Function::Get(this->mLuaEnv, tab, "LateAwake"))
 		{
-			return Lua::Function::Invoke<bool>(this->mLuaEnv);
-		}
-
-		std::vector<std::string> methods;
-		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-		rpcConfig.GetMethods(this->GetName(), methods);
-
-		for (const std::string& method : methods)
-		{
-			const char * func = method.c_str();
-			if(!Lua::Function::Get(this->mLuaEnv, tab, func))
-			{
-				LOG_ERROR("not find rpc method = [{0}.{1}]", tab, func);
-				return false;
-			}
-			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
-			const ProtoConfig * config = rpcConfig.GetProtocolConfig(fullName);
-			this->AddMethod(std::make_shared<LuaServiceMethod>(config->Service, config->Method, this->mLuaEnv));
+			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
 		}
 		return true;
 	}

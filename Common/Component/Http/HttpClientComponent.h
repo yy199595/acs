@@ -27,7 +27,7 @@ namespace Sentry
 		HttpClientComponent() = default;
 		~HttpClientComponent() final = default;
 	 public:
-		bool Awake() final;
+		void Awake() final;
 		bool LateAwake() final;
 		void OnLoadData() final;
 	 public:

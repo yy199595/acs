@@ -10,7 +10,7 @@
 #include"DB/Redis/RedisClient.h"
 namespace Sentry
 {
-	bool RedisComponent::Awake()
+	bool RedisComponent::LoadRedisConfig()
 	{
 		std::string path;
 		this->mRedisConfig.mCount = 3;
@@ -208,7 +208,7 @@ namespace Sentry
 				auto response = redisClient->InvokeCommand(request)->Await();
 				if (!response->IsOk())
 				{
-					LOG_ERROR("auth redis passwork error : ", this->mRedisConfig.mPassword);
+					LOG_ERROR("auth redis password error : ", this->mRedisConfig.mPassword);
 					return nullptr;
 				}
 			}
@@ -357,6 +357,7 @@ namespace Sentry
 
 	bool RedisComponent::LateAwake()
 	{
+		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
 		return true;

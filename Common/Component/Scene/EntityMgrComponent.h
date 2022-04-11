@@ -11,7 +11,6 @@ namespace Sentry
 		EntityMgrComponent() = default;
 		~EntityMgrComponent() final = default;
 	 public:
-		bool Awake() final;
 		bool LateAwake() final;
 	 public:
 		std::shared_ptr<Entity> Find(long long userId);

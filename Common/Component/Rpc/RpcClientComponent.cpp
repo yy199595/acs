@@ -13,11 +13,10 @@
 #endif
 namespace Sentry
 {
-	bool RpcClientComponent::Awake()
+	void RpcClientComponent::Awake()
 	{
 		this->mRpcComponent = nullptr;
 		this->mTaskComponent = nullptr;
-		return true;
 	}
 	bool RpcClientComponent::LateAwake()
 	{

@@ -32,8 +32,6 @@ namespace Sentry
 
 		~RpcServiceNode() override = default;
 	 public:
-		Component * Copy(const std::string & name);
-	 public:
 		virtual XCode Call(const std::string& address, const std::string& func);
 
 		virtual XCode Call(const std::string& address, const std::string& func, const Message& message);

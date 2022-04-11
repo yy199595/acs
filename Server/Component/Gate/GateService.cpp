@@ -14,19 +14,10 @@
 
 namespace Sentry
 {
-	bool GateService::Awake()
+	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
-		BIND_RPC_FUNCTION(GateService::Ping);
-		BIND_RPC_FUNCTION(GateService::Login);
-		return true;
-	}
-
-	bool GateService::LateAwake()
-	{
-		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-		TcpServerComponent* tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		LOG_CHECK_RET_FALSE(tcpServerComponent->GetTcpConfig("gate"));
-
+		methodRegister.Bind("Ping", &GateService::Ping);
+		methodRegister.Bind("Login", &GateService::Login);
 		this->mGateComponent = this->GetComponent<GateClientComponent>();
 		this->mEntityComponent = this->GetComponent<EntityMgrComponent>();
 		if (this->mGateComponent == nullptr)
@@ -43,9 +34,15 @@ namespace Sentry
 		return true;
 	}
 
+	bool GateService::LateAwake()
+	{
+		LOG_CHECK_RET_FALSE(this->GetComponent<GateClientComponent>());
+		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
+		return true;
+	}
+
 	XCode GateService::Ping()
 	{
-
 		return XCode::Failure;
 	}
 

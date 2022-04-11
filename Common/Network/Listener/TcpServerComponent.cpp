@@ -6,7 +6,7 @@
 #include<Network/Listener/NetworkListener.h>
 namespace Sentry
 {
-	bool TcpServerComponent::Awake()
+	bool TcpServerComponent::LoadServerConfig()
 	{
 		const ServerConfig& config = App::Get()->GetConfig();
 		config.GetMember("listener", "ip", this->mHostIp);
@@ -62,11 +62,11 @@ namespace Sentry
 
 	bool TcpServerComponent::LateAwake()
 	{
-		auto taskComponent = this->GetComponent<ThreadPoolComponent>();
+		LOG_CHECK_RET_FALSE(this->LoadServerConfig());
+		ThreadPoolComponent * taskComponent = this->GetComponent<ThreadPoolComponent>();
 		for (auto listenConfig : this->mListenerConfigs)
 		{
-			Component* component = this->GetComponent<Component>(listenConfig->Handler);
-			auto socketHandler = dynamic_cast<ISocketListen*>(component);
+			ISocketListen* socketHandler = this->GetComponent<ISocketListen>(listenConfig->Handler);
 			if (socketHandler == nullptr)
 			{
 				LOG_ERROR("not find socket handler ", listenConfig->Handler);
@@ -91,10 +91,10 @@ namespace Sentry
 		for (NetworkListener * listener : this->mListeners)
 		{
 			const ListenConfig& config = listener->GetConfig();
-			Component* component = this->GetComponent<Component>(config.Handler);
-			if (auto handler = dynamic_cast<ISocketListen*>(component))
+			ISocketListen* listenerHandler = this->GetComponent<ISocketListen>(config.Handler);
+			if(listenerHandler != nullptr)
 			{
-				if (listener->StartListen(handler))
+				if (listener->StartListen(listenerHandler))
 				{
 					const ListenConfig& config = listener->GetConfig();
 					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
@@ -110,5 +110,24 @@ namespace Sentry
 			return std::string();
 		}
 		return fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
+	}
+
+	bool TcpServerComponent::StartListen(const string& name)
+	{
+		for (NetworkListener * listener : this->mListeners)
+		{
+			const ListenConfig& config = listener->GetConfig();
+			ISocketListen* listenerHandler = this->GetComponent<ISocketListen>(config.Handler);
+			if(listenerHandler != nullptr && config.Name == name)
+			{
+				if (listener->StartListen(listenerHandler))
+				{
+					const ListenConfig& config = listener->GetConfig();
+					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

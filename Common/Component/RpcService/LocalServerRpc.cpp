@@ -11,14 +11,13 @@
 namespace Sentry
 {
 
-	bool LocalServerRpc::AddMethod(std::shared_ptr<ServiceMethod> method)
+	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
-		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
 		const std::string & name = method->GetName();
-		const std::string & service = this->GetName();
-		if (!rpcConfig.HasServiceMethod(service, name))
+		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
+		if (!rpcConfig.HasServiceMethod(this->mService, name))
 		{
-			LOG_FATAL(service, '.', name, " add failure");
+			LOG_FATAL("{0}.{1} add failure", this->mService, name);
 			return false;
 		}
 
@@ -30,22 +29,22 @@ namespace Sentry
 				this->mLuaMethodMap.erase(iter);
 			}
 			this->mLuaMethodMap.emplace(name, method);
-			LOG_DEBUG("add new lua service method [{0}.{1}]", service, name);
+			LOG_DEBUG("add new lua service method [{0}.{1}]", this->mService, name);
 			return true;
 		}
 
 		auto iter = this->mMethodMap.find(name);
 		if (iter != this->mMethodMap.end())
 		{
-			LOG_FATAL("{0}.{1} add failure", service, name);
+			LOG_FATAL("{0}.{1} add failure", this->mService, name);
 			return false;
 		}
 		this->mMethodMap.emplace(name, method);
-		LOG_DEBUG("add new c++ service method [{0}.{1}]", service, name);
+		LOG_DEBUG("add new c++ service method [{0}.{1}]", this->mService, name);
 		return true;
 	}
 
-	std::shared_ptr<ServiceMethod> LocalServerRpc::GetMethod(const string& name)
+	std::shared_ptr<ServiceMethod> ServiceMethodRegister::GetMethod(const string& name)
 	{
 		auto iter = this->mLuaMethodMap.find(name);
 		if(iter != this->mLuaMethodMap.end())
@@ -59,13 +58,38 @@ namespace Sentry
 		}
 		return nullptr;
 	}
+
+	bool ServiceMethodRegister::LoadLuaMethod(lua_State* lua)
+	{
+		this->mLuaMethodMap.clear();
+		const char* tab = this->mService.c_str();
+		auto iter = this->mMethodMap.begin();
+		for (; iter != this->mMethodMap.end(); iter++)
+		{
+			const std::string& name = iter->first;
+			if (Lua::Function::Get(lua, tab, name.c_str()))
+			{
+				std::shared_ptr<LuaServiceMethod> luaServiceMethod
+						= std::make_shared<LuaServiceMethod>(this->mService, name, lua);
+				this->mLuaMethodMap.emplace(name, luaServiceMethod);
+			}
+		}
+		return true;
+	}
+
+	ServiceMethodRegister::ServiceMethodRegister(const string& service)
+		: mService(service)
+	{
+
+	}
 }
 
 namespace Sentry
 {
 	std::shared_ptr<com::Rpc_Response> LocalServerRpc::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
 	{
-		auto serviceMethod = this->GetMethod(method);
+		assert(this->IsStartService());
+		auto serviceMethod = this->mMethodRegister->GetMethod(method);
 		if (serviceMethod == nullptr)
 		{
 			return nullptr;
@@ -90,19 +114,23 @@ namespace Sentry
 		}
 		return response;
 	}
-	void LocalServerRpc::OnLuaRegister(lua_State* lua)
+
+	bool LocalServerRpc::LoadServiceMethod()
 	{
-		const char* tab = this->GetName().c_str();
-		auto iter = this->mMethodMap.begin();
-		for (; iter != this->mMethodMap.end(); iter++)
+		if(this->mMethodRegister == nullptr)
 		{
-			const std::string& name = iter->first;
-			if (Lua::Function::Get(lua, tab, name.c_str()))
+			this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName());
+			if(!this->OnInitService(*this->mMethodRegister))
 			{
-				std::shared_ptr<LuaServiceMethod> luaServiceMethod
-					= std::make_shared<LuaServiceMethod>(this->GetName(), name, lua);
-				this->mLuaMethodMap.emplace(name, luaServiceMethod);
+				return false;
 			}
 		}
+		LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		if(luaScriptComponent != nullptr)
+		{
+			lua_State * lua = luaScriptComponent->GetLuaEnv();
+			return this->mMethodRegister->LoadLuaMethod(lua);
+		}
+		return true;
 	}
 }

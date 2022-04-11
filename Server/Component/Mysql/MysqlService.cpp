@@ -5,20 +5,13 @@
 #include"Pool/MessagePool.h"
 namespace Sentry
 {
-	bool MysqlService::Awake()
+	bool MysqlService::OnInitService(ServiceMethodRegister & methodRegister)
 	{
-		BIND_RPC_FUNCTION(MysqlService::Add);
-		BIND_RPC_FUNCTION(MysqlService::Save);
-		BIND_RPC_FUNCTION(MysqlService::Query);
-		BIND_RPC_FUNCTION(MysqlService::Delete);
-		BIND_RPC_FUNCTION(MysqlService::Invoke);
-		BIND_RPC_FUNCTION(MysqlService::Update);
-		return true;
-	}
-
-	bool MysqlService::LateAwake()
-	{
-		RpcServiceNode::LateAwake();
+		methodRegister.Bind("Add", &MysqlService::Add);
+		methodRegister.Bind("Save", &MysqlService::Save);
+		methodRegister.Bind("Query", &MysqlService::Query);
+		methodRegister.Bind("Delete", &MysqlService::Delete);
+		methodRegister.Bind("Invoke", &MysqlService::Invoke);
 		return this->mHelper.StartConnect();
 	}
 
@@ -167,7 +160,6 @@ namespace Sentry
 		{
 			response.add_json_array(this->mJson);
 		}
-
 		return XCode::Successful;
 	}
 }// namespace Sentry

@@ -7,16 +7,15 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 
-	class LuaRpcService : public LocalServerRpc, public IStart, public IHotfix
+	class LuaRpcService : public LocalServerRpc, public IStart
 	{
 	 public:
 		LuaRpcService();
 		~LuaRpcService() override;
 	 public:
-		bool Awake() final;
 		void OnStart() final;
-		void OnHotFix() final;
 		bool LateAwake() final;
+		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		lua_State* mLuaEnv;
 		class LuaScriptComponent* mLuaComponent;

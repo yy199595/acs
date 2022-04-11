@@ -39,21 +39,6 @@ namespace Sentry
 		return true;
 	}
 
-	Component* RpcServiceNode::Copy(const std::string& name)
-	{
-		Component * component = ComponentFactory::CreateComponent(name);
-		LocalServerRpc * localServerRpc = component->Cast<LocalServerRpc>();
-		if(localServerRpc == nullptr)
-		{
-			return nullptr;
-		}
-		localServerRpc->mRpcComponent = this->mRpcComponent;
-		localServerRpc->mUserAddressMap = this->mUserAddressMap;
-		localServerRpc->mRemoteAddressList = this->mRemoteAddressList;
-		localServerRpc->mRpcClientComponent = this->mRpcClientComponent;
-		return localServerRpc;
-	}
-
 	std::shared_ptr<com::Rpc::Request> RpcServiceNode::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
@@ -217,6 +202,7 @@ namespace Sentry
 
 	void RpcServiceNode::AddAddress(const string& address)
 	{
+		assert(!address.empty());
 		this->mRemoteAddressList.insert(address);
 		LOG_ERROR("{0} add address {1}", this->GetName(), address);
 	}

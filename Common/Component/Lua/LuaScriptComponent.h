@@ -25,7 +25,7 @@ namespace Sentry
 			return this->mLuaEnv;
 		}
 	 protected:
-		bool Awake() final;
+		void Awake() final;
 		void OnStart() final;
 		bool LateAwake() final;
 		void OnDestory() final;

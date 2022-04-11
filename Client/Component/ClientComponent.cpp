@@ -43,11 +43,6 @@ namespace Client
 //        }
     }
 
-	bool ClientComponent::Awake()
-    {
-        return true;
-    }
-
     bool ClientComponent::LateAwake()
     {
         this->mTaskComponent = this->GetComponent<TaskComponent>();

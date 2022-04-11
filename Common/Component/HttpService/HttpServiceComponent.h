@@ -15,9 +15,6 @@ namespace Sentry
 		~HttpServiceComponent() override;
 	 public:
 		HttpServiceMethod* GetMethod(const std::string& path);
-	 protected:
-		bool Awake() override;
-
 	 private:
 		std::unordered_map<std::string, HttpServiceMethod*> mMethodMap;
 	};

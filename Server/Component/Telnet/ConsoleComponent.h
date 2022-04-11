@@ -5,15 +5,15 @@ namespace Sentry
 {
 	class TelnetClient;
 	using ConsoleFunction = std::function<bool(const std::string&, std::vector<std::string>&)>;
-	class ConsoleComponent : public Component, public ISocketListen
+	class ConsoleComponent : public Component, public ISocketListen, public IStart
 	{
 	 public:
 		ConsoleComponent() = default;
 		~ConsoleComponent() final = default;
 
 	 public:
-		bool Awake() final;
 		bool LateAwake() final;
+		void OnStart() final;
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
 

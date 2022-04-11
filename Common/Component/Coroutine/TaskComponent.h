@@ -49,7 +49,7 @@ namespace Sentry
 		void WhenAll(std::vector<TaskContext*>& coroutines);
 
 	 protected:
-		bool Awake() final;
+		void Awake() final;
 
 		bool LateAwake() final;
 

@@ -6,12 +6,6 @@
 #include"App/App.h"
 namespace Sentry
 {
-	bool OperatorComponent::Awake()
-	{
-		this->mTimerComponent = nullptr;
-		return true;
-	}
-
 	bool OperatorComponent::LateAwake()
 	{
 		this->mTimerComponent = this->GetComponent<TimerComponent>();

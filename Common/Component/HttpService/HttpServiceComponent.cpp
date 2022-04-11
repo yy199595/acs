@@ -16,11 +16,6 @@ namespace Sentry
 		this->mMethodMap.clear();
 	}
 
-	bool HttpServiceComponent::Awake()
-	{
-		return true;
-	}
-
 	HttpServiceMethod* HttpServiceComponent::GetMethod(const std::string& path)
 	{
 		auto iter = this->mMethodMap.find(path);

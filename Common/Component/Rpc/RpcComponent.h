@@ -33,7 +33,7 @@ namespace Sentry
 		bool GetRpcInfo(long long rpcId, int& methodId, long long& time);
 #endif
 	 protected:
-		bool Awake() final;
+		void Awake() final;
 		bool LateAwake() final;
 	 public:
 		XCode OnRequest(std::shared_ptr<com::Rpc_Request> request) final;

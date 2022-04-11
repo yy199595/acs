@@ -15,7 +15,7 @@ namespace Sentry
 		~ThreadPoolComponent() final = default;
 
 	 public:
-		bool Awake() final;
+		void Awake() final;
 
 		bool LateAwake() final;
 

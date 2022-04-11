@@ -8,17 +8,16 @@
 
 namespace Sentry
 {
-	bool HttpUserService::Awake()
+	void HttpUserService::Awake()
 	{
 		this->mRedisComponent = nullptr;
 		this->mMysqlComponent = nullptr;
-		BIND_HTTP_FUNCTION(HttpUserService::Login);
-		BIND_HTTP_FUNCTION(HttpUserService::Register);
-		return true;
 	}
 
 	bool HttpUserService::LateAwake()
 	{
+		BIND_HTTP_FUNCTION(HttpUserService::Login);
+		BIND_HTTP_FUNCTION(HttpUserService::Register);
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
 		return true;

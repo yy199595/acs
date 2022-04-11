@@ -16,7 +16,7 @@
 namespace Sentry
 {
 
-	bool HttpClientComponent::Awake()
+	void HttpClientComponent::Awake()
 	{
 		std::string path;
 		this->mCorComponent = nullptr;
@@ -24,7 +24,7 @@ namespace Sentry
 		const ServerConfig& config = App::Get()->GetConfig();
 		if (config.GetMember("path", "http", path))
 		{
-			LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
+			LOG_CHECK_RET(Helper::File::ReadJsonFile(path, jsonDocument));
 			for (auto iter = jsonDocument.MemberBegin(); iter != jsonDocument.MemberEnd(); iter++)
 			{
 				HttpConfig* httpConfig = new HttpConfig();
@@ -40,7 +40,6 @@ namespace Sentry
 				this->mHttpConfigMap.emplace(httpConfig->Url, httpConfig);
 			}
 		}
-		return true;
 	}
 
 	bool HttpClientComponent::LateAwake()

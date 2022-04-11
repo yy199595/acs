@@ -45,7 +45,6 @@ namespace Client
         unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);
 
     protected:
-        bool Awake() final;
 
         bool LateAwake() final;
 

@@ -9,12 +9,11 @@
 #include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
-	bool MonitorComponent::Awake()
+	void MonitorComponent::Awake()
 	{
 		this->mIsClose = false;
 		this->mThread = nullptr;
 		this->mTaskComponent = nullptr;
-		return true;
 	}
 
 	bool MonitorComponent::LateAwake()

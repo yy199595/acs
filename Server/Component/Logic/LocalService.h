@@ -17,7 +17,7 @@ namespace Sentry
 		~LocalService() override = default;
 
 	 public:
-		bool Awake() final;
+		void Awake() final;
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnComplete() final;

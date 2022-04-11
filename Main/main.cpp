@@ -21,7 +21,6 @@
 #include"Component/Logic/LocalService.h"
 #include<Component/Scene/MonitorComponent.h>
 #include"Component/Mysql/MysqlService.h"
-#include"Component/Logic/HttpLoginService.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
@@ -73,7 +72,6 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalService>("LocalService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<HttpUserService>("HttpUserService");
-    ComponentFactory::Add<HttpLoginService>("HttpLoginService");
 }
 
 int main(int argc, char **argv)

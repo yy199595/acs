@@ -16,7 +16,6 @@ namespace Sentry
 		GateComponent() = default;
 		~GateComponent() final = default;
 	 protected:
-		bool Awake() final;
 		bool LateAwake() final;
 	 public:
 		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
