@@ -9,10 +9,11 @@ using namespace std::chrono;
 namespace Sentry
 {
 	std::shared_ptr<App> App::mApp = nullptr;
+
 	App::App(ServerConfig* config)
-		: Entity(0),
-		  mConfig(config), mStartTime(Helper::Time::GetNowMilTime()),
-		  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
+			: Entity(0),
+			  mConfig(config), mStartTime(Helper::Time::GetNowMilTime()),
+			  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
 	{
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
@@ -22,11 +23,11 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if(!this->mConfig->GetMember("path", "rpc", path))
+		if (!this->mConfig->GetMember("path", "rpc", path))
 		{
 			throw std::logic_error("not find rpc config");
 		}
-		if(!this->mRpcConfig.LoadConfig(path))
+		if (!this->mRpcConfig.LoadConfig(path))
 		{
 			throw std::logic_error("load rpc config error");
 		}
@@ -39,16 +40,45 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 
 		std::vector<std::string> components;
-		this->mRpcConfig.GetServices(components);
-		this->mConfig->GetMember("sub", components);
-		this->mConfig->GetMember("http", components);
-		this->mConfig->GetMember("component", components);
-
-		for(const std::string & name : components)
+		if (this->mConfig->GetMember("component", components)) //添加组件
 		{
-			if (!this->AddComponentByName(name))
+			for (const std::string& name: components)
 			{
-				throw std::logic_error("add " + name + " failure");
+				if (this->GetComponentByName(name) != nullptr)
+				{
+					LOG_ERROR("add {0} failure", name);
+					return false;
+				}
+				if (!this->AddComponentByName(name))
+				{
+					LOG_ERROR("add {0} failure", name);
+					return false;
+				}
+			}
+		}
+		components.clear();
+		if (this->mConfig->GetMember("service", components)) //添加所有服务
+		{
+			for (const std::string& name: components)
+			{
+				if (this->GetComponentByName(name) != nullptr)
+				{
+					LOG_ERROR("add {0} failure", name);
+					return false;
+				}
+				if (!this->AddComponentByName(name))
+				{
+					LuaRpcService* luaRpcService = new LuaRpcService();
+					return this->AddComponent(name, luaRpcService);
+				}
+			}
+		}
+		this->GetComponents(components);
+		for (const std::string& name: components)
+		{
+			Component* component = this->GetComponentByName(name);
+			if (!this->InitComponent(component))
+			{
 				return false;
 			}
 		}
@@ -83,20 +113,6 @@ namespace Sentry
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
 		TryInvoke(manager4, this->mLastFrameUpdateManager.emplace_back(manager4));
 		return true;
-	}
-
-	void App::StartComponent(Component* component)
-	{
-		LocalServerRpc * localServerRpc = component->Cast<LocalServerRpc>();
-		if(localServerRpc == nullptr || localServerRpc->IsStartService())
-		{
-			ElapsedTimer elapsedTimer;
-			IStart* startComponent = component->Cast<IStart>();
-			ILoadData* loadComponent = component->Cast<ILoadData>();
-			if (startComponent != nullptr) startComponent->OnStart();
-			if (loadComponent != nullptr) loadComponent->OnLoadData();
-			LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
-		}
 	}
 
 	int App::Run()
@@ -134,7 +150,7 @@ namespace Sentry
 	void App::LogicMainLoop()
 	{
 		this->mStartTimer = Helper::Time::GetNowMilTime();
-		for (ISystemUpdate* component : this->mSystemUpdateManagers)
+		for (ISystemUpdate* component: this->mSystemUpdateManagers)
 		{
 			component->OnSystemUpdate();
 		}
@@ -142,7 +158,7 @@ namespace Sentry
 		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
 		{
 			this->mLogicRunCount++;
-			for (IFrameUpdate* component : this->mFrameUpdateManagers)
+			for (IFrameUpdate* component: this->mFrameUpdateManagers)
 			{
 				component->OnFrameUpdate(this->mDeltaTime);
 			}
@@ -150,14 +166,14 @@ namespace Sentry
 			if (this->mStartTimer - this->mSecondTimer >= 1000)
 			{
 				this->UpdateConsoleTitle();
-				for (ISecondUpdate* component : this->mSecondUpdateManagers)
+				for (ISecondUpdate* component: this->mSecondUpdateManagers)
 				{
 					component->OnSecondUpdate();
 				}
 				this->mSecondTimer = Helper::Time::GetNowMilTime();
 			}
 
-			for (ILastFrameUpdate* component : this->mLastFrameUpdateManager)
+			for (ILastFrameUpdate* component: this->mLastFrameUpdateManager)
 			{
 				component->OnLastFrameUpdate();
 			}
@@ -168,37 +184,40 @@ namespace Sentry
 	void App::StartAllComponent()
 	{
 		std::vector<std::string> components;
-		while(!this->mNewComponents.empty())
+		this->GetComponents(components);
+		for (const std::string& name: components)
 		{
-			Component * component = this->mNewComponents.front();
-			if(component != nullptr)
+			Component* component = this->GetComponentByName(name);
+			if (component != nullptr)
 			{
-				this->StartComponent(component);
-			}
-			this->mNewComponents.pop();
-			components.emplace_back(component->GetName());
-		}
-		std::vector<std::string> allComponents;
-		this->GetComponents(allComponents);
-
-		for(const std::string & name : components)
-		{
-			Component* newComponent = this->GetComponent<Component>(name);
-			IComplete * complete = newComponent->Cast<IComplete>();
-			LocalServerRpc * localServerRpc = newComponent->Cast<LocalServerRpc>();
-			if(complete != nullptr)
-			{
-				complete->OnComplete();
-			}
-			if(localServerRpc != nullptr)
-			{
-				for (const std::string& name : allComponents)
+				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
+				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
-					IServiceChange* serviceChange = this->GetComponent<IServiceChange>(name);
-					if (serviceChange != nullptr)
-					{
-						serviceChange->OnAddService(localServerRpc);
-					}
+					continue;
+				}
+				ElapsedTimer elapsedTimer;
+				IStart* startComponent = component->Cast<IStart>();
+				ILoadData* loadComponent = component->Cast<ILoadData>();
+				if (startComponent != nullptr) startComponent->OnStart();
+				if (loadComponent != nullptr) loadComponent->OnLoadData();
+				LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
+			}
+		}
+
+		for (const std::string& name: components)
+		{
+			Component* component = this->GetComponentByName(name);
+			if (component != nullptr)
+			{
+				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
+				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
+				{
+					continue;
+				}
+				IComplete* complete = component->Cast<IComplete>();
+				if (complete != nullptr)
+				{
+					complete->OnComplete();
 				}
 			}
 		}
@@ -207,22 +226,11 @@ namespace Sentry
 	bool App::StartNewComponent()
 	{
 		std::vector<std::string> components;
-		this->GetComponents(components);
-		for(const std::string & name : components)
+		this->mConfig->GetMember("start", components);
+		for (const std::string& name: components)
 		{
-			Component * component = this->GetComponent<Component>(name);
-			if(component != nullptr && !this->InitComponent(component))
-			{
-				return false;
-			}
-			this->mNewComponents.push(component);
-		}
-		components.clear();
-		this->mConfig->GetMember("rpc", components);
-		for(const std::string & name : components)
-		{
-			LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(name);
-			if(localServerRpc != nullptr && !localServerRpc->LoadServiceMethod())
+			LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
+			if (localServerRpc != nullptr && !localServerRpc->LoadService())
 			{
 				LOG_ERROR("{0} load service method failure", name);
 				return false;
@@ -238,17 +246,17 @@ namespace Sentry
 	{
 		std::vector<std::string> components;
 		this->GetComponents(components);
-		for (const std::string& name : components)
+		for (const std::string& name: components)
 		{
 			int count = 0;
-			LocalServerRpc* rpcServiceNode = this->GetComponent<LocalServerRpc>(name);
-			while (rpcServiceNode != nullptr && !rpcServiceNode->IsStartComplete())
+			LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
+			while (localServerRpc != nullptr && !localServerRpc->IsStartService())
 			{
 				this->mTaskComponent->Sleep(1000);
 				LOG_WARN("wait {0} start [count = {1}]", name, ++count);
 			}
 		}
-		for (const std::string& name : components)
+		for (const std::string& name: components)
 		{
 			IComplete* complete = this->GetComponent<IComplete>(name);
 			if (complete != nullptr)
@@ -277,26 +285,24 @@ namespace Sentry
 
 	bool App::StartNewService(const std::string& name)
 	{
-		LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
-		if(localServerRpc != nullptr)
+		Component* component = this->GetComponentByName(name);
+		IServiceBase* serviceBase = component->Cast<IServiceBase>();
+		if (serviceBase == nullptr || serviceBase->IsStartService())
 		{
-			if(localServerRpc->IsStartService())
-			{
-				return true;
-			}
-			if(localServerRpc->LoadServiceMethod())
-			{
-				this->mTaskComponent->Start([localServerRpc, this]()
-				{
-					this->StartComponent(localServerRpc);
-					std::vector<std::string> components;
-					this->GetComponents(components);
-
-					LOG_DEBUG("start new service {0}", localServerRpc->GetName());
-				});
-				return true;
-			}
+			return false;
 		}
-		return false;
+		if (!serviceBase->LoadService())
+		{
+			return false;
+		}
+		IStart* start = component->Cast<IStart>();
+		ILoadData* loadData = component->Cast<ILoadData>();
+		IComplete* complete = component->Cast<IComplete>();
+
+		if (start != nullptr) start->OnStart();
+		if (loadData != nullptr) loadData->OnLoadData();
+		if (complete != nullptr) complete->OnComplete();
+
+		return true;
 	}
 }

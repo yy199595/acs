@@ -3,7 +3,7 @@
 //
 #include"ProxyClient.h"
 #include"Util/StringHelper.h"
-#include"Component/Logic/LocalService.h"
+#include"Component/Logic/LocalSubService.h"
 namespace Sentry
 {
     ProxyClient::ProxyClient(const std::string &name, const std::string &address)

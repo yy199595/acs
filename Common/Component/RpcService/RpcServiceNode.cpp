@@ -200,14 +200,14 @@ namespace Sentry
 		}
 	}
 
-	void RpcServiceNode::AddAddress(const string& address)
+	void RpcServiceNode::OnAddAddress(const std::string& address)
 	{
 		assert(!address.empty());
 		this->mRemoteAddressList.insert(address);
-		LOG_ERROR("{0} add address {1}", this->GetName(), address);
+		LOG_ERROR("{0} add address {1}", this->GetName(), std::string(address));
 	}
 
-	void RpcServiceNode::DelAddress(const string& address)
+	void RpcServiceNode::OnDelAddress(const std::string& address)
 	{
 		auto iter = this->mRemoteAddressList.find(address);
 		if(iter != this->mRemoteAddressList.end())

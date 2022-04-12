@@ -66,7 +66,6 @@ namespace Sentry
 		bool LoadComponent();
 		void StartAllComponent();
 		bool InitComponent(Component* component);
-		void StartComponent(Component* component);
 		bool AddComponentByName(const std::string& name);
 	 public:
 		int Run();
@@ -98,7 +97,6 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
-		std::queue<Component *> mNewComponents;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;

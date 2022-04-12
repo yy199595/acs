@@ -25,7 +25,7 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class ProtoRpcClient;
-	class RpcServiceNode : public Component
+	class RpcServiceNode : public Component, public IServiceBase
 	{
 	 public:
 		RpcServiceNode() = default;
@@ -54,14 +54,14 @@ namespace Sentry
 		bool LateAwake() override;
 		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
+
+	protected:
+		void OnAddAddress(const std::string &address) final;
+		void OnDelAddress(const std::string &address) final;
 	 public:
 		void AddEntity(long long id);
 		void DelEntity(long long id);
 		bool AllotAddress(std::string& address);
-		void AddAddress(const std::string& address);
-		void DelAddress(const std::string& address);
-	 public:
-		virtual bool IsStartComplete() { return !this->mRemoteAddressList.empty();}
 	 protected:
 		bool GetEntityAddress(long long id, std::string& address);
 	 protected:

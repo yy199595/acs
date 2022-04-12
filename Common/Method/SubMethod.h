@@ -6,6 +6,7 @@
 #define GAMEKEEPER_SUBMETHOD_H
 #include<iostream>
 #include"Json/JsonReader.h"
+#include"Json/JsonWriter.h"
 #include"Define/CommonLogDef.h"
 #include<google/protobuf/message.h>
 
@@ -14,8 +15,9 @@ namespace Sentry
 	template<typename T>
 	using JsonSubFunction = void (T::*)(const Json::Reader& rapidJsonReader);
 
-	template<typename T, typename T1>
-	using ProtoSubFuncrion = void (T::*)(const T& message);
+	template<typename T>
+	using JsonSubFunction2 = void (T::*)(const Json::Reader& rapidJsonReader, Json::Writer & jsonWriter);
+
 	class SubMethod
 	{
 	 public:
@@ -29,6 +31,7 @@ namespace Sentry
 		JsonSubMethod(T* obj, JsonSubFunction<T> func)
 			: mObj(obj), mFunction(func)
 		{
+
 		}
 
 	 public:

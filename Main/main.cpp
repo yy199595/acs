@@ -18,7 +18,7 @@
 #include<Component/Scene/ThreadPoolComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
-#include"Component/Logic/LocalService.h"
+#include"Component/Logic/LocalSubService.h"
 #include<Component/Scene/MonitorComponent.h>
 #include"Component/Mysql/MysqlService.h"
 #include"Component/Scene/OperatorComponent.h"
@@ -69,7 +69,7 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
-    ComponentFactory::Add<LocalService>("LocalService");
+    ComponentFactory::Add<LocalSubService>("LocalSubService");
     ComponentFactory::Add<MysqlService>("MysqlService");
     ComponentFactory::Add<HttpUserService>("HttpUserService");
 }

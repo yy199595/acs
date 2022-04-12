@@ -115,7 +115,7 @@ namespace Sentry
 		return response;
 	}
 
-	bool LocalServerRpc::LoadServiceMethod()
+	bool LocalServerRpc::LoadService()
 	{
 		if(this->mMethodRegister == nullptr)
 		{

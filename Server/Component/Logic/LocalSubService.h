@@ -10,20 +10,20 @@ namespace Sentry
 
 	class TaskComponent;
 
-	class LocalService : public SubService, public IComplete, public IServiceChange
+	class LocalSubService : public SubService, public IComplete, public IServiceChange
 	{
 	 public:
-		LocalService() = default;
-		~LocalService() override = default;
+		LocalSubService() = default;
+		~LocalSubService() override = default;
 
 	 public:
-		void Awake() final;
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnComplete() final;
 	 protected:
 		void OnAddService(LocalServerRpc *component) final;
 		void OnDelService(LocalServerRpc *component) final;
+		bool OnInitService(SubServiceRegister &methodRegister) final;
 	 private:
 		void Add(const Json::Reader& jsonReader);
 		void Push(const Json::Reader& jsonReader);
@@ -34,7 +34,5 @@ namespace Sentry
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
-		class RedisComponent* mRedisComponent;
-		class HttpClientComponent* mHttpComponent;
 	};
 }

@@ -1,46 +1,43 @@
-﻿#include"LocalService.h"
+﻿#include"LocalSubService.h"
 #include"App/App.h"
 #include"Component/RpcService/LocalServerRpc.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
-#include"Component/Redis/RedisComponent.h"
-#include"Component/Http/HttpClientComponent.h"
 #include"Network/Http/HttpAsyncRequest.h"
 namespace Sentry
 {
-	void LocalService::Awake()
+	bool LocalSubService::OnInitService(SubServiceRegister& methodRegister)
 	{
-		this->Bind("Add", &LocalService::Add);
-		this->Bind("Push", &LocalService::Push);
-		this->Bind("Remove", &LocalService::Remove);
-	}
-
-	bool LocalService::LateAwake()
-	{
-		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
-
-		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
-		LOG_CHECK_RET_FALSE(this->mHttpComponent = this->GetComponent<HttpClientComponent>());
+		methodRegister.Bind("Add", &LocalSubService::Add);
+		methodRegister.Bind("Push", &LocalSubService::Push);
+		methodRegister.Bind("Remove", &LocalSubService::Remove);
 		return true;
 	}
 
-	void LocalService::OnAddService(LocalServerRpc* component)
+	bool LocalSubService::LateAwake()
+	{
+		LOG_CHECK_RET_FALSE(SubService::LateAwake());
+		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
+		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
+		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
+		return true;
+	}
+
+	void LocalSubService::OnAddService(LocalServerRpc* component)
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("area_id", this->mAreaId);
 		jsonWriter.AddMember("address", this->mRpcAddress);
 		jsonWriter.AddMember("service", component->GetName());
-		this->mRedisComponent->Publish("LocalService.Add", jsonWriter);
+		LOG_CHECK_RET(this->Publish("LocalSubService.Add", jsonWriter));
 	}
 
-	void LocalService::OnDelService(LocalServerRpc* component)
+	void LocalSubService::OnDelService(LocalServerRpc* component)
 	{
 
 	}
 
-	void LocalService::Add(const Json::Reader& jsonReader)
+	void LocalSubService::Add(const Json::Reader& jsonReader)
 	{
 		int areaId = 0;
 		std::string address;
@@ -52,25 +49,25 @@ namespace Sentry
 		{
 			return;
 		}
-		RpcServiceNode * rpcServiceComponent = this->GetComponent<RpcServiceNode>(service);
-		if(rpcServiceComponent != nullptr)
+		IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
+		if(serviceBase != nullptr)
 		{
-			rpcServiceComponent->AddAddress(address);
+			serviceBase->OnAddAddress(address);
 		}
 	}
 
-	void LocalService::Push(const Json::Reader& jsonReader)
+	void LocalSubService::Push(const Json::Reader& jsonReader)
 	{
 		std::string address;
 		std::vector<std::string> nodeServices;
+		jsonReader.GetMember("rpc", address);
 		jsonReader.GetMember("service", nodeServices);
 		for(const std::string & service : nodeServices)
 		{
-			jsonReader.GetMember("rpc", address);
-			LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(service);
-			if(localServerRpc != nullptr)
+			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
+			if(serviceBase != nullptr)
 			{
-				localServerRpc->AddAddress(address);
+				serviceBase->OnAddAddress(address);
 			}
 		}
 
@@ -84,17 +81,18 @@ namespace Sentry
 			for(const std::string & name : components)
 			{
 				LocalServerRpc * localServerRpc = this->GetApp()->GetComponent<LocalServerRpc>(name);
-				if(localServerRpc != nullptr)
+				if(localServerRpc != nullptr && localServerRpc->IsStartService())
 				{
 					nodeServices.emplace_back(name);
 				}
 			}
 			jsonWriter.AddMember("service", nodeServices);
-			this->mRedisComponent->Publish(address, "LocalService.Push", jsonWriter);
+			jsonWriter.AddMember("rpc", this->mRpcAddress);
+			this->Publish(address, "LocalSubService.Push", jsonWriter);
 		}
 	}
 
-	void LocalService::GetServiceInfo(Json::Writer& jsonWriter)
+	void LocalSubService::GetServiceInfo(Json::Writer& jsonWriter)
 	{
 		const ServerConfig & config = this->GetApp()->GetConfig();
 
@@ -115,7 +113,7 @@ namespace Sentry
 		jsonWriter.EndObject();
 	}
 
-	void LocalService::OnComplete()//通知其他服务器 我加入了
+	void LocalSubService::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer jsonWriter;
 		std::vector<std::string> tempArray;
@@ -134,11 +132,11 @@ namespace Sentry
 		jsonWriter.AddMember("rpc", address);
 		jsonWriter.AddMember("response", true);
 		jsonWriter.AddMember("service", tempArray);
-		long long number = this->mRedisComponent->Publish("LocalService.Push", jsonWriter);
+		long long number = this->Publish("LocalSubService.Push", jsonWriter);
 		LOG_DEBUG("publish successful count = {0}", number);
 	}
 
-	void LocalService::OnDestory()
+	void LocalSubService::OnDestory()
 	{
 		std::string jsonContent;
 		Json::Writer jsonWriter;
@@ -147,11 +145,11 @@ namespace Sentry
 
 		jsonWriter.AddMember("address", address);
 		jsonWriter.AddMember("area_id", this->mAreaId);
-		LOG_DEBUG("remove this form count = ", this->mRedisComponent->Publish("LocalService.Remove", jsonWriter));
+		LOG_DEBUG("remove this form count = ", this->Publish("LocalSubService.Remove", jsonWriter));
 
 	}
 
-	void LocalService::Remove(const Json::Reader& jsonReader)
+	void LocalSubService::Remove(const Json::Reader& jsonReader)
 	{
 		std::string address;
 		LOG_CHECK_RET(jsonReader.GetMember("address", address));

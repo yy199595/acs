@@ -74,6 +74,15 @@ namespace Sentry
 		}
 	};
 
+	class IServiceBase
+	{
+	public:
+		virtual bool LoadService() = 0;
+		virtual bool IsStartService() = 0;
+		virtual void OnDelAddress(const std::string & address) { }
+		virtual void OnAddAddress(const std::string & address) { };
+	};
+
 
 	class IServiceChange
 	{

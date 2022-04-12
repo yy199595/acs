@@ -90,15 +90,20 @@
         "EntityMgrComponent",
         "ClientComponent"
     ],
-    "rpc": [
+    "service":
+    [
         "GateService",
-        "ChatService"
+        "ChatService",
+        "MysqlService",
+        "HttpUserService",
+        "LocalSubService"
     ],
-    "http": [
-        "HttpUserService"
-    ],
-    "sub": [
-        "LocalService"
+    "start":
+    [
+        "GateService",
+        "ChatService",
+        "HttpUserService",
+        "LocalSubService"
     ],
     "white_list": [
         "127.0.0.1"
