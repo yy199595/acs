@@ -45,7 +45,7 @@ namespace Lua
 		{
 			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
 			lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-			mRefFunctions.emplace(func, ref);
+			mRefFunctions.emplace(name, ref);
 			return true;
 		}
 		return false;

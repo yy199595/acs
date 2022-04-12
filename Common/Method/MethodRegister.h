@@ -14,7 +14,7 @@ namespace Sentry
 	class ServiceMethodRegister
 	{
 	public:
-		ServiceMethodRegister(const std::string & name);
+		ServiceMethodRegister(const std::string & name, void * o);
 	public:
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType1<T> func);
@@ -47,6 +47,7 @@ namespace Sentry
 
 
 	private:
+		void * mObj;
 		const std::string mService;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
@@ -55,49 +56,49 @@ namespace Sentry
 	template<typename T>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType1<T> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T>
 	bool ServiceMethodRegister::Bind( std::string name, ServiceMethodType11<T> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType2<T, T1> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType22<T, T1> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1, typename T2>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType3<T, T1, T2> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1, typename T2>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType33<T, T1, T2> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType4<T, T1> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
 	}
 
 	template<typename T, typename T1>
 	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType44<T, T1> func)
 	{
-		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this, func));
+		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
 	}
 }
 
@@ -106,6 +107,8 @@ namespace Sentry
 {
 	class SubServiceRegister
 	{
+	 public:
+		SubServiceRegister(void * o) : mObj(o) {}
 	public:
 		template<typename T>
 		bool Bind(std::string name, JsonSubFunction<T> func)
@@ -115,7 +118,7 @@ namespace Sentry
 			{
 				return false;
 			}
-			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this, func));
+			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this->mObj, func));
 			return true;
 		}
 
@@ -123,6 +126,7 @@ namespace Sentry
 		void GetMethods(std::vector<std::string>& methods);
 		std::shared_ptr<SubMethod> GetMethod(const std::string & func);
 	private:
+		void * mObj;
 		std::unordered_map<std::string, std::shared_ptr<SubMethod>> mSubMethodMap;
 	};
 }
@@ -132,6 +136,7 @@ namespace Sentry
 	class HttpServiceRegister
 	{
 	 public:
+		HttpServiceRegister(void * o) : mObj(o) { }
 		std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
 	 public:
 		template<typename T>
@@ -143,7 +148,7 @@ namespace Sentry
 				return false;
 			}
 			this->mHttpMethodMap.emplace(name, std::make_shared<
-				HttpServiceJsonMethod1<T>>((T*)this, std::move(func)));
+				HttpServiceJsonMethod1<T>>((T*)this->mObj, std::move(func)));
 			return true;
 		}
 
@@ -156,11 +161,12 @@ namespace Sentry
 				return false;
 			}
 			this->mHttpMethodMap.emplace(name, std::make_shared<
-				HttpServiceJsonMethod2<T>>((T*)this, std::move(func)));
+				HttpServiceJsonMethod2<T>>((T*)this->mObj, std::move(func)));
 			return true;
 		}
 
 	 private:
+		void * mObj;
 		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
 	};
 }

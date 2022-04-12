@@ -353,7 +353,7 @@ namespace Sentry
 				SubService* subService = this->GetComponent<SubService>(service);
 				if (subService != nullptr)
 				{
-					//subService->Invoke(funcName, *jsonReader);
+					subService->Invoke(funcName, *jsonReader);
 				}
 			}
 		}

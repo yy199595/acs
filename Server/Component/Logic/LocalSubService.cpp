@@ -58,10 +58,11 @@ namespace Sentry
 	void LocalSubService::Push(const Json::Reader& jsonReader)
 	{
 		std::string address;
-		std::vector<std::string> nodeServices;
+		std::vector<std::string> services;
 		jsonReader.GetMember("rpc", address);
-		jsonReader.GetMember("service", nodeServices);
-		for(const std::string & service : nodeServices)
+		jsonReader.GetMember("service", services);
+		std::shared_ptr<App> app  = App::Get();
+		for(const std::string & service : services)
 		{
 			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
 			if(serviceBase != nullptr)
@@ -70,10 +71,10 @@ namespace Sentry
 			}
 		}
 
+		services.clear();
 		bool isResponse = false;
 		if(jsonReader.GetMember("response", isResponse) && isResponse)
 		{
-			nodeServices.clear();
 			Json::Writer jsonWriter;
 			std::vector<std::string> components;
 			this->GetApp()->GetComponents(components);
@@ -82,10 +83,10 @@ namespace Sentry
 				LocalServerRpc * localServerRpc = this->GetApp()->GetComponent<LocalServerRpc>(name);
 				if(localServerRpc != nullptr && localServerRpc->IsStartService())
 				{
-					nodeServices.emplace_back(name);
+					services.emplace_back(name);
 				}
 			}
-			jsonWriter.AddMember("service", nodeServices);
+			jsonWriter.AddMember("service", services);
 			jsonWriter.AddMember("rpc", this->mRpcAddress);
 			this->Publish(address, "LocalSubService.Push", jsonWriter);
 		}

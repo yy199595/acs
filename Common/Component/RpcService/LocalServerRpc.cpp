@@ -70,15 +70,15 @@ namespace Sentry
 			if (Lua::Function::Get(lua, tab, name.c_str()))
 			{
 				std::shared_ptr<LuaServiceMethod> luaServiceMethod
-						= std::make_shared<LuaServiceMethod>(this->mService, name, lua);
+					= std::make_shared<LuaServiceMethod>(this->mService, name, lua);
 				this->mLuaMethodMap.emplace(name, luaServiceMethod);
 			}
 		}
 		return true;
 	}
 
-	ServiceMethodRegister::ServiceMethodRegister(const string& service)
-		: mService(service)
+	ServiceMethodRegister::ServiceMethodRegister(const string& service, void * o)
+		: mService(service), mObj(o)
 	{
 
 	}
@@ -119,7 +119,7 @@ namespace Sentry
 	{
 		if(this->mMethodRegister == nullptr)
 		{
-			this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName());
+			this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
 			if(!this->OnInitService(*this->mMethodRegister))
 			{
 				return false;

@@ -54,7 +54,7 @@ namespace Sentry
 
 	bool SubService::LoadService()
 	{
-		this->mServiceRegister = std::make_shared<SubServiceRegister>();
+		this->mServiceRegister = std::make_shared<SubServiceRegister>(this);
 		return this->OnInitService(*this->mServiceRegister);
 	}
 

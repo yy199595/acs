@@ -29,7 +29,7 @@ namespace Sentry
 	}
 	bool HttpService::LoadService()
 	{
-		this->mServiceRegister = std::make_shared<HttpServiceRegister>();
+		this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
 		return this->OnInitService(*this->mServiceRegister);
 	}
 }

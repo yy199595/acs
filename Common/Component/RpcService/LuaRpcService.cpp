@@ -60,7 +60,7 @@ namespace Sentry
 		{
 			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
 		}
-		if(Lua::Function::Get(this->mLuaEnv, tab, "LateAwake"))
+		if(Lua::lua_getfunction(this->mLuaEnv, tab, "LateAwake"))
 		{
 			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
 		}
