@@ -13,7 +13,7 @@ namespace Sentry
 		rapidjson::Document jsonMapper;
 		if (!Helper::File::ReadJsonFile(path, jsonMapper))
 		{
-			LOG_FATAL("not find file ", path);
+			LOG_FATAL("not find file " << path);
 			return false;///
 		}
 
@@ -51,7 +51,7 @@ namespace Sentry
 					protocolConfig.Request = jsonValue.GetString();
 					if (Helper::Proto::New(protocolConfig.Request) == nullptr)
 					{
-						LOG_FATAL("create ", protocolConfig.Request, " failure");
+						LOG_FATAL("create " << protocolConfig.Request << " failure");
 						return false;
 					}
 				}
@@ -63,7 +63,7 @@ namespace Sentry
 					protocolConfig.Response = jsonValue.GetString();
 					if (Helper::Proto::New(protocolConfig.Response) == nullptr)
 					{
-						LOG_FATAL("create", protocolConfig.Response, "failure");
+						LOG_FATAL("create " << protocolConfig.Response << "failure");
 						return false;
 					}
 				}
@@ -136,7 +136,7 @@ namespace Sentry
 		auto iter = this->mCodeDescMap.find((int)code);
 		if (iter != this->mCodeDescMap.end())
 		{
-			LOG_ERROR("code = ", iter->second.Name, ':', iter->second.Desc);
+			LOG_ERROR("code = " << iter->second.Name << ':' << iter->second.Desc);
 		}
 	}
 

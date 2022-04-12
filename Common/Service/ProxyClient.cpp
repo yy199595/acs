@@ -38,7 +38,7 @@ namespace Sentry
                 return true;
             }
             this->mTaskComponent->Sleep(1000);
-            LOG_ERROR("connect ", this->mAddress, " failure count = ", index);
+            LOG_ERROR("connect " << this->mAddress << " failure count = " << index);
         }
         return false;
     }

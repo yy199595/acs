@@ -33,9 +33,10 @@ namespace Sentry
 			return nullptr;
 		}
 		std::string tab = func.substr(0, pos);
-		if (!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
+		std::string file = fmt::format("{0}.lua", tab);
+		if (!this->GetLuaScript(file, script))
 		{
-			LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
+			LOG_ERROR("not find redis script " << file);
 			return nullptr;
 		}
 		std::shared_ptr<RedisRequest> redisCmdRequest(new RedisRequest("EVALSHA"));
@@ -52,7 +53,7 @@ namespace Sentry
 		std::shared_ptr<RedisClient> redisClient = this->AllotRedisClient();
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
-		LOG_WARN("redis command name = {0}", redisClient->GetName());
+		LOG_WARN("redis command name = " << redisClient->GetName());
 #endif
 		if (redisClient == nullptr)
 		{
@@ -61,7 +62,7 @@ namespace Sentry
 		}
 		auto response = redisClient->InvokeCommand(request)->Await();
 #ifdef __DEBUG__
-		LOG_INFO("invoke redis command use time : {0}ms", elapsedTimer.GetMs());
+		LOG_INFO("invoke redis command use time << " << elapsedTimer.GetMs() << " ms");
 #endif
 		if (!this->mWaitAllotClients.empty())
 		{
@@ -81,7 +82,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		auto response = this->InvokeCommand("script", "load", content);
+		std::shared_ptr<RedisResponse> response = this->InvokeCommand("script", "load", content);
 		if (response->HasError())
 		{
 			LOG_ERROR(response->GetValue());
@@ -90,7 +91,7 @@ namespace Sentry
 		std::string fileName;
 		if (Helper::Directory::GetDirAndFileName(path, content, fileName))
 		{
-			LOG_WARN(fileName, "  ", response->GetValue());
+			LOG_WARN(fileName << "  " << response->GetValue());
 			this->mLuaCommandMap.emplace(fileName, response->GetValue());
 			return true;
 		}
@@ -118,7 +119,6 @@ namespace Sentry
 		this->mSubRedisClient = this->MakeRedisClient("Subscribe");
 		if (this->mSubRedisClient != nullptr)
 		{
-			this->SubscribeMessage();
 			LOG_DEBUG("subscribe redis client connect successful");
 			this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 		}
@@ -129,7 +129,9 @@ namespace Sentry
 			std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(name);
 			if (redisClient == nullptr)
 			{
-				LOG_ERROR("connect redis {0}:{1} failure", this->mRedisConfig.mIp, this->mRedisConfig.mPort);
+				std::string address = fmt::format("{0}:{1}",
+					this->mRedisConfig.mIp, this->mRedisConfig.mPort);
+				LOG_ERROR("connect redis " << address << " failure");
 				return;
 			}
 			this->mFreeClients.emplace(redisClient);
@@ -138,7 +140,7 @@ namespace Sentry
 		for (const std::string& file : luaFiles)
 		{
 			LOG_CHECK_RET(this->LoadLuaScript(file));
-			LOG_INFO("load redis script {0} successful", file);
+			LOG_INFO("load redis script " << file << " successful");
 		}
 #ifdef __DEBUG__
 		this->InvokeCommand("FLUSHALL")->IsOk();
@@ -167,7 +169,7 @@ namespace Sentry
 					auto responseTask = redisCommandClient->InvokeCommand(request);
 					if (!responseTask->Await()->IsOk())
 					{
-						LOG_ERROR("auth redis password error :{0}", this->mRedisConfig.mPassword);
+						LOG_ERROR("auth redis password error " << this->mRedisConfig.mPassword);
 						return nullptr;
 					}
 				}
@@ -209,7 +211,7 @@ namespace Sentry
 				auto response = redisClient->InvokeCommand(request)->Await();
 				if (!response->IsOk())
 				{
-					LOG_ERROR("auth redis password error : ", this->mRedisConfig.mPassword);
+					LOG_ERROR("auth redis password error : " << this->mRedisConfig.mPassword);
 					return nullptr;
 				}
 			}
@@ -233,8 +235,8 @@ namespace Sentry
 		std::string json = jsonWriter.ToJsonString();
 #ifdef __DEBUG__
 		LOG_INFO("==== redis publish message ====");
-		LOG_INFO("channel = {0}", channel);
-		LOG_INFO("message = {0}", json);
+		LOG_INFO("channel = " << channel);
+		LOG_INFO("message = " << json);
 #endif
 		return this->Publish(channel, json);
 	}
@@ -259,7 +261,7 @@ namespace Sentry
 		for(const std::string & name : components)
 		{
 			SubService * subService = this->GetComponent<SubService>(name);
-			if(subService != nullptr)
+			if(subService != nullptr && subService->IsStartService())
 			{
 				std::vector<std::string> methods;
 				subService->GetSubMethods(methods);
@@ -268,7 +270,7 @@ namespace Sentry
 					const std::string& service = subService->GetName();
 					if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
 					{
-						LOG_INFO("subscribe channel {0}.{1} successful", service, name);
+						LOG_INFO("subscribe channel " << service << '.' << name << "successful");
 					}
 				}
 			}
@@ -278,6 +280,7 @@ namespace Sentry
 
 	void RedisComponent::StartPubSub()
 	{
+		this->SubscribeMessage();
 		while (this->mSubRedisClient)
 		{
 			if (!this->mSubRedisClient->IsOpen())
@@ -287,17 +290,18 @@ namespace Sentry
 				unsigned short port = this->mRedisConfig.mPort;
 				while (!this->mSubRedisClient->ConnectAsync(ip, port)->Await())
 				{
-					LOG_ERROR("connect redis [{0}:{1}] failure count = {2}", ip, port, count++);
+					std::string address = fmt::format("{0}:{1}", ip, port);
+					LOG_ERROR("connect redis " << address << " failure count = " << count++);
 					this->mTaskComponent->Sleep(3000);
 				}
 				if (!this->mRedisConfig.mPassword.empty())
 				{
 					std::shared_ptr<RedisRequest> request(new RedisRequest("AUTH"));
 					request->AddParameter(this->mRedisConfig.mPassword);
-					auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
+					std::shared_ptr<RedisResponse> response = this->mSubRedisClient->InvokeCommand(request)->Await();
 					if (response == nullptr || response->IsOk())
 					{
-						LOG_FATAL("auth redis passwd error {0}", this->mRedisConfig.mPassword);
+						LOG_FATAL("auth redis passwd error " << this->mRedisConfig.mPassword);
 						return;
 					}
 				}
@@ -305,9 +309,8 @@ namespace Sentry
 				LOG_DEBUG("subscribe redis client connect successful");
 			}
 
-			auto redisResponse = this->mSubRedisClient->WaitRedisMessage()->Await();
-			if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 &&
-				redisResponse->GetValue() == "message")
+			std::shared_ptr<RedisResponse> redisResponse = this->mSubRedisClient->WaitRedisMessage()->Await();
+			if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 && redisResponse->GetValue() == "message")
 			{
 				const std::string& channel = redisResponse->GetValue(1);
 				const std::string& message = redisResponse->GetValue(2);
@@ -344,13 +347,13 @@ namespace Sentry
 
 #ifdef __DEBUG__
 				LOG_DEBUG("========= subscribe message =============");
-				LOG_DEBUG("channel = {}", channel);
-				LOG_DEBUG("message = {}", message);
+				LOG_DEBUG("channel = " << channel);
+				LOG_DEBUG("message = " << message);
 #endif
 				SubService* subService = this->GetComponent<SubService>(service);
 				if (subService != nullptr)
 				{
-					subService->Invoke(funcName, *jsonReader);
+					//subService->Invoke(funcName, *jsonReader);
 				}
 			}
 		}

@@ -46,7 +46,7 @@ namespace Sentry
 		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(name);
 		if(protoConfig == nullptr)
 		{
-			LOG_ERROR("not find rpc config : {0}", name);
+			LOG_ERROR("not find rpc config : " << name);
 			return nullptr;
 		}
 		std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
@@ -204,7 +204,7 @@ namespace Sentry
 	{
 		assert(!address.empty());
 		this->mRemoteAddressList.insert(address);
-		LOG_ERROR("{0} add address {1}", this->GetName(), std::string(address));
+		LOG_ERROR(this->GetName() << " add address " << address);
 	}
 
 	void RpcServiceNode::OnDelAddress(const std::string& address)
@@ -213,7 +213,7 @@ namespace Sentry
 		if(iter != this->mRemoteAddressList.end())
 		{
 			this->mRemoteAddressList.erase(iter);
-			LOG_WARN("{0} delete address {1}", this->GetName(), address);
+			LOG_WARN("{0} delete address " << this->GetName() << '.' << address);
 		}
 	}
 }

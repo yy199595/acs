@@ -18,12 +18,12 @@ namespace Sentry
             if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
             {
                 const char *err = mysql_error(mMysqlSocket);
-                LOG_ERROR("create db {0} failure : {1}", db , err);
+                LOG_ERROR("create db " << db << " failure : " << err);
                 return false;
             }
             if (mysql_select_db(this->mMysqlSocket, db.c_str()) == 0)
             {
-                LOG_INFO("create db [{0}] successful", db);
+                LOG_INFO("create db " << db << " successful");
                 return true;
             }
             return false;
@@ -38,11 +38,11 @@ namespace Sentry
         {
             if (!this->CreateMysqlTable(typeDescriptor))
             {
-                LOG_ERROR("create new table", typeDescriptor->name(), "failure",
-                          mysql_error(this->mMysqlSocket));
+                LOG_ERROR("create new table" << typeDescriptor->name() << "failure"
+                          << mysql_error(this->mMysqlSocket));
                 return false;
             }
-            LOG_DEBUG("create new table {0} successful ",typeDescriptor->name());
+            LOG_DEBUG("create new table {0} successful " << typeDescriptor->name());
         }
         else if (!this->UpdateMysqlTable(typeDescriptor))
         {
@@ -84,11 +84,11 @@ namespace Sentry
             {
                 if (!this->AddNewField(descriptor->name(), fileDesc))
                 {
-                    LOG_ERROR("[mysql error ] {0}", mysql_error(this->mMysqlSocket));
-                    LOG_ERROR("add field {0} to {1} failure", fileDesc->name(), descriptor->name());
+                    LOG_ERROR("[mysql error ] " << mysql_error(this->mMysqlSocket));
+                    LOG_ERROR("add field " << fileDesc->name() << " to " << descriptor->name() << " failure");
                     return false;
                 }
-                LOG_DEBUG("add field {0} to {1} successful", fileDesc->name() , descriptor->name());
+                LOG_DEBUG("add field " << fileDesc->name() << " to " << descriptor->name() << " successful");
             }
         }
         return true;
@@ -131,7 +131,7 @@ namespace Sentry
             LOG_ERROR(mysql_error(mMysqlSocket));
             return false;
         }
-        LOG_INFO("\n{0}", sql);
+        LOG_INFO(sql);
         return true;
     }
 

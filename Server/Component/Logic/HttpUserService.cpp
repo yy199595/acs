@@ -16,10 +16,15 @@ namespace Sentry
 
 	bool HttpUserService::LateAwake()
 	{
-		BIND_HTTP_FUNCTION(HttpUserService::Login);
-		BIND_HTTP_FUNCTION(HttpUserService::Register);
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
+		return HttpService::LateAwake();
+	}
+
+	bool HttpUserService::OnInitService(HttpServiceRegister& serviceRegister)
+	{
+		serviceRegister.Bind("Login", &HttpUserService::Login);
+		serviceRegister.Bind("Register", &HttpUserService::Register);
 		return true;
 	}
 
@@ -66,7 +71,8 @@ namespace Sentry
 		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
-		auto resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
+		this->mRedisComponent = this->GetComponent<RedisComponent>();
+		std::shared_ptr<RedisResponse> resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
 		if (resp->GetNumber() == 0)
 		{
 			return XCode::AccountAlreadyExists;

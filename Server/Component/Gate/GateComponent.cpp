@@ -29,7 +29,7 @@ namespace Sentry
 		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
 		if (config == nullptr)
 		{
-			LOG_ERROR("call function ", request->method_name(), " not find");
+			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
 
@@ -76,7 +76,7 @@ namespace Sentry
 			std::shared_ptr<Message> message = Helper::Proto::NewByData(response->data());
 			if (message != nullptr && Helper::Proto::GetJson(message, json))
 			{
-				LOG_WARN("json = ", json);
+				LOG_WARN("json = " << json);
 			}
 		}
 		LOG_WARN("*****************************************");

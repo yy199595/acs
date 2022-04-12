@@ -66,9 +66,10 @@ namespace Sentry
 				return nullptr;
 			}
 			std::string tab = func.substr(0, pos);
-			if (!this->GetLuaScript(fmt::format("{0}.lua", tab), script))
+			std::string file = fmt::format("{0}.lua", tab);
+			if (!this->GetLuaScript(file, script))
 			{
-				LOG_ERROR("not find redis script ", fmt::format("{0}.lua", tab));
+				LOG_ERROR("not find redis script " << tab << ".lua");
 				return nullptr;
 			}
 			return this->InvokeCommand("EVALSHA", script, size, func.substr(pos + 1), std::forward<Args>(args)...);

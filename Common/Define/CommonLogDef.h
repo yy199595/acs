@@ -34,40 +34,41 @@ inline std::string FormatFileLine(const char * file, const int line)
 }
 
 
-#define GK_LOG(type, f, ...)						\
-{                                 					\
-    f.append(fmt::format(__VA_ARGS__));				\
-    App::Get()->GetLogger()->AddLog(type, f);		\
+#define GK_LOG(type, f, content)						\
+{                                     \
+	std::stringstream ss;                \
+	ss << f << content;\
+    App::Get()->GetLogger()->AddLog(type, ss.str());		\
 }													\
 
-#define LOG_INFO(...) \
+#define LOG_INFO(content) \
 {                             \
 		std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::info, f, __VA_ARGS__)        \
+       	GK_LOG(spdlog::level::level_enum::info, f, content)        \
 }
 
-#define LOG_DEBUG(...) \
+#define LOG_DEBUG(content) \
 {                             \
 		std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::debug, f, __VA_ARGS__)        \
+       	GK_LOG(spdlog::level::level_enum::debug, f, content)        \
 }
 
-#define LOG_WARN(...) \
+#define LOG_WARN(content) \
 {                             \
        	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::warn, f, __VA_ARGS__)        \
+       	GK_LOG(spdlog::level::level_enum::warn, f, content)        \
 }
 
-#define LOG_ERROR(...) \
+#define LOG_ERROR(content) \
 {                                      \
        	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::err, f, __VA_ARGS__)          \
+       	GK_LOG(spdlog::level::level_enum::err, f, content)          \
 }                              \
 
-#define LOG_FATAL(...) \
+#define LOG_FATAL(content) \
 {                                      \
        	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::critical, f, __VA_ARGS__)          \
+       	GK_LOG(spdlog::level::level_enum::critical, f, content)          \
 }                              \
 
 

@@ -39,10 +39,10 @@ namespace Sentry
 		{
 			std::shared_ptr<TelnetContent> commandContent = telnetClient->ReadCommand();
 			LOG_INFO("==== console command ====");
-			LOG_INFO("command = {}", commandContent->Command);
+			LOG_INFO("command = " << commandContent->Command);
 			if (!commandContent->Parameter.empty())
 			{
-				LOG_INFO("parameter = {}", commandContent->Parameter);
+				LOG_INFO("parameter = " << commandContent->Parameter);
 			}
 			if (commandContent->IsOk)
 			{
@@ -73,7 +73,7 @@ namespace Sentry
 				telnetClient->Response(responseStream.str());
 			}
 		}
-		LOG_ERROR("[console ] {0} disconnected", telnetClient->GetAddress());
+		LOG_ERROR("[console ] " << telnetClient->GetAddress() << " disconnected");
 	}
 
 	bool ConsoleComponent::Help(const std::string& parameter, std::vector<std::string>& response)
@@ -122,7 +122,7 @@ namespace Sentry
 	{
 		long long value = std::stoll(parameter);
 		Helper::Time::SetScaleTotalTime(value);
-		LOG_WARN("now time = ", Helper::Time::GetDateString());
+		LOG_WARN("now time = " << Helper::Time::GetDateString());
 		return true;
 	}
 }

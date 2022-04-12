@@ -58,6 +58,7 @@ namespace Sentry
 	protected:
 		void OnAddAddress(const std::string &address) final;
 		void OnDelAddress(const std::string &address) final;
+		bool IsStartComplete() final { return !this->mRemoteAddressList.empty(); }
 	 public:
 		void AddEntity(long long id);
 		void DelEntity(long long id);

@@ -26,7 +26,7 @@ namespace Client
 		if (response == nullptr)
 		{
 			this->mCode = XCode::CallTimeout;
-			LOG_INFO("call ", this->mMethod, " call time out");
+			LOG_INFO("call " << this->mMethod << " call time out");
 		}
 		else
 		{
@@ -37,7 +37,7 @@ namespace Client
 			}
 			long long t1 = Helper::Time::GetNowMilTime();
 			float second = (t1 - this->mStartTime) / 1000.0f;
-			LOG_INFO("call ", this->mMethod, " successful time = ", second, "s");
+			LOG_INFO("call " << this->mMethod << " successful time = " << second << "s");
 		}
         this->mState = TaskState::TaskFinish;
         this->mTaskComponent->Resume(this->mCoroutineId);

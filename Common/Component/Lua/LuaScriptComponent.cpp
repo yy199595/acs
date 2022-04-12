@@ -69,7 +69,7 @@ namespace Sentry
 		{
 			if (!Helper::Directory::GetFilePaths(path, "*.lua", luaFiles))
 			{
-				LOG_ERROR("load", path, "lua file failure");
+				LOG_ERROR("load" << path << " lua file failure");
 				return false;
 			}
 		}
@@ -116,7 +116,7 @@ namespace Sentry
 			//LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
 			return true;
 		}
-		LOG_ERROR("load ", filePath, " failure : ", lua_tostring(mLuaEnv, -1));
+		LOG_ERROR("load "<< filePath << " failure : " << lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
 		return false;
 	}

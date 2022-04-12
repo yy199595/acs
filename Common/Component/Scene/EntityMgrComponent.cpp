@@ -22,7 +22,7 @@ namespace Sentry
 			Component* component = gameObject->GetComponent<Component>(name);
 			if (!component->LateAwake())
 			{
-				LOG_ERROR("Init", component->GetName(), "failure");
+				LOG_ERROR("Init" << component->GetName() << "failure");
 				return false;
 			}
 		}

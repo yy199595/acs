@@ -44,11 +44,11 @@ namespace Sentry
 			{
 				if(!loadComponent->OnLoadConfig())
 				{
-					LOG_ERROR("{0} load config error", name);
+					LOG_ERROR(name << " load config error");
 					return false;
 				}
 			}
-			LOG_INFO("{0} start hotfix", name);
+			LOG_INFO(name << " start hotfix");
 		}
 		return true;
 	}

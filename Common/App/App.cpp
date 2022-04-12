@@ -46,12 +46,12 @@ namespace Sentry
 			{
 				if (this->GetComponentByName(name) != nullptr)
 				{
-					LOG_ERROR("add {0} failure", name);
+					LOG_ERROR("add " << name << " failure");
 					return false;
 				}
 				if (!this->AddComponentByName(name))
 				{
-					LOG_ERROR("add {0} failure", name);
+					LOG_ERROR("add" << name << " failure");
 					return false;
 				}
 			}
@@ -63,7 +63,7 @@ namespace Sentry
 			{
 				if (this->GetComponentByName(name) != nullptr)
 				{
-					LOG_ERROR("add {0} failure", name);
+					LOG_ERROR("add " << name << " failure");
 					return false;
 				}
 				if (!this->AddComponentByName(name))
@@ -100,7 +100,7 @@ namespace Sentry
 	{
 		if (!component->LateAwake())
 		{
-			LOG_ERROR("{0} late awake ", component->GetName());
+			LOG_ERROR(component->GetName() << " late awake ");
 			return false;
 		}
 
@@ -142,7 +142,7 @@ namespace Sentry
 			{
 				this->OnDestory();
 				this->mTaskScheduler.Stop();
-				LOG_WARN("close server successful [{0}]ms", timer->GetMs());
+				LOG_WARN("close server successful " << timer->GetMs() << " ms");
 			});
 		}
 	}
@@ -200,7 +200,7 @@ namespace Sentry
 				ILoadData* loadComponent = component->Cast<ILoadData>();
 				if (startComponent != nullptr) startComponent->OnStart();
 				if (loadComponent != nullptr) loadComponent->OnLoadData();
-				LOG_DEBUG("start {0} user time = {1} ms", component->GetName(), elapsedTimer.GetMs());
+				LOG_DEBUG("start" << component->GetName() << " user time = " << elapsedTimer.GetMs() << " ms");
 			}
 		}
 
@@ -229,13 +229,13 @@ namespace Sentry
 		this->mConfig->GetMember("start", components);
 		for (const std::string& name: components)
 		{
-			LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
+			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
 			if (localServerRpc != nullptr && !localServerRpc->LoadService())
 			{
-				LOG_ERROR("{0} load service method failure", name);
+				LOG_ERROR(name << " load service method failure");
 				return false;
 			}
-			LOG_INFO("{0} load service method successful", name);
+			LOG_INFO(name << " load service method successful");
 		}
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
 		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
@@ -249,11 +249,11 @@ namespace Sentry
 		for (const std::string& name: components)
 		{
 			int count = 0;
-			LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(name);
-			while (localServerRpc != nullptr && !localServerRpc->IsStartService())
+			IServiceBase* serviceBase = this->GetComponent<IServiceBase>(name);
+			while (serviceBase != nullptr && !serviceBase->IsStartComplete())
 			{
 				this->mTaskComponent->Sleep(1000);
-				LOG_WARN("wait {0} start [count = {1}]", name, ++count);
+				LOG_WARN("wait " << name << " start count = " << ++count);
 			}
 		}
 		for (const std::string& name: components)
@@ -265,7 +265,7 @@ namespace Sentry
 			}
 		}
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-		LOG_DEBUG("===== start {0} successful [{1}]s ===========", this->mServerName, t / 1000.0f);
+		LOG_DEBUG("===== start server successful [" << t / 1000.0f << "]s ===========");
 	}
 
 	void App::UpdateConsoleTitle()

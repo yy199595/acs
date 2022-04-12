@@ -30,7 +30,7 @@ namespace Sentry
 			const char * func = method.c_str();
 			if(!Lua::Function::Get(this->mLuaEnv, tab, func))
 			{
-				LOG_ERROR("not find rpc method = [{0}.{1}]", tab, func);
+				LOG_ERROR("not find rpc method = [" << tab <<'.' << func << ']');
 				return false;
 			}
 			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
@@ -52,7 +52,7 @@ namespace Sentry
 		std::shared_ptr<Lua::Table> luaTable = Lua::Table::Create(this->mLuaEnv, this->GetName());
 		if (luaTable == nullptr)
 		{
-			LOG_ERROR(this->GetName(), " is not lua table");
+			LOG_ERROR(this->GetName() << " is not lua table");
 			return false;
 		}
 		const char * tab = this->GetName().c_str();
@@ -73,7 +73,7 @@ namespace Sentry
 		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");
 		if(luaTaskSource != nullptr && luaTaskSource->Await<bool>())
 		{
-			LOG_WARN("Invoke ", this->GetName(), " Start Coroutine")
+			LOG_WARN("Invoke " << this->GetName() << " Start Coroutine")
 		}
 	}
 

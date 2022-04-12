@@ -42,16 +42,16 @@ namespace Sentry
 		LocalServerRpc * logicService = this->GetComponent<LocalServerRpc>(service);
 		if (logicService == nullptr)
 		{
-			LOG_ERROR("call service not exist : [", service, "]");
+			LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;
 		}
 #ifdef __DEBUG__
 		std::string json = "";
 		LOG_DEBUG("==============[request]==============");
-		LOG_DEBUG("func = {0}.{1}", protocolConfig->Service, protocolConfig->Method);
+		LOG_DEBUG("func = " << protocolConfig->Service << "." << protocolConfig->Method);
 		if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
 		{
-			LOG_DEBUG("json = {}", json);
+			LOG_DEBUG("json = " << json);
 		}
 		LOG_DEBUG("=====================================");
 #endif
@@ -80,7 +80,7 @@ namespace Sentry
 		auto iter = this->mRpcTasks.find(rpcId);
 		if (iter == this->mRpcTasks.end())
 		{
-			LOG_WARN("not find rpc task : ", rpcId)
+			LOG_WARN("not find rpc task : "<< rpcId)
 			return XCode::Failure;
 		}
 		auto rpcTask = iter->second;
@@ -94,11 +94,11 @@ namespace Sentry
 			const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(methodId);
 
 			LOG_DEBUG("*************[response]*************");
-			LOG_DEBUG("func = {0}.{1}", protoConfig->Service, protoConfig->Method);
-			LOG_DEBUG("time = {0}ms", time);
+			LOG_DEBUG("func = " << protoConfig->Service << '.' << protoConfig->Method);
+			LOG_DEBUG("time = " << time << " ms");
 			if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
 			{
-				LOG_DEBUG("json = {}", json);
+				LOG_DEBUG("json = " << json);
 			}
 			LOG_DEBUG("************************************");
 		}
@@ -149,7 +149,6 @@ namespace Sentry
 			auto rpcTask = iter->second;
 			this->mRpcTasks.erase(iter);
 			rpcTask->OnResponse(nullptr);
-			LOG_ERROR("{0} time out", rpcTask->GetRpcId());
 		}
 #ifdef __DEBUG__
 		int methodId = 0;
@@ -160,7 +159,7 @@ namespace Sentry
 			const ProtoConfig* config = rpcConfig.GetProtocolConfig(methodId);
 			if (config != nullptr)
 			{
-				LOG_ERROR("call ", config->Service, '.', config->Method, " time out");
+				LOG_ERROR("call " << config->Service << '.' << config->Method << " time out");
 			}
 		}
 #endif

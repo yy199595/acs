@@ -27,14 +27,14 @@ namespace Client
     {
         std::string json;
         util::MessageToJsonString(*t1, &json);
-        LOG_ERROR("request json = ", json);
+        LOG_ERROR("request json = " << json);
     }
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc_Response> t2)
     {
         std::string json;
         util::MessageToJsonString(*t2, &json);
-        LOG_WARN("response json = ", json);
+        LOG_WARN("response json = " << json);
 //        auto iter = this->mRpcTasks.find(t2->rpc_id());
 //        if(iter != this->mRpcTasks.end())
 //        {
@@ -120,11 +120,11 @@ namespace Client
 		{
 			std::string error;
 			registerReader->GetMember("error", error);
-			LOG_WARN("register {0} failure error = {1}", userAccount, error);
+			LOG_WARN("register " << userAccount << " failure error = " << error);
 		}
 		else
 		{
-			LOG_DEBUG("register {0} successful", userAccount);
+			LOG_DEBUG("register " << userAccount << " successful");
 		}
 
 		Json::Writer loginJsonWriter;
@@ -138,10 +138,10 @@ namespace Client
 		{
 			std::string error;
 			registerReader->GetMember("error", error);
-			LOG_ERROR("login account {0} failure error = {1}", userAccount, error);
+			LOG_ERROR("login account " << userAccount << " failure error = " << error);
 			return;
 		}
-		LOG_DEBUG("{0} login successful", userAccount);
+		LOG_DEBUG(userAccount << " login successful");
 		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_ip", this->mIp));
 		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_port", this->mPort));
 
@@ -153,12 +153,12 @@ namespace Client
 		int count = 0;
 		while (!this->mTcpClient->ConnectAsync(this->mIp, this->mPort)->Await())
 		{
-			LOG_ERROR("connect server failure count = ", ++count);
+			LOG_ERROR("connect server failure count = " << ++count);
 			this->mTaskComponent->Sleep(1000);
 		}
 
 		this->mTcpClient->StartReceive();
-		LOG_DEBUG("connect {0}:{1} successful", this->mIp, this->mPort);
+		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 		const std::string method = "HttpUserService.Register";
 

@@ -34,7 +34,7 @@ namespace Sentry
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			LOG_ERROR("add {0} failure", name);
+			LOG_ERROR("add " << name << " failure");
 			return false;
 		}
 		component->mName = name;

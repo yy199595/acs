@@ -69,7 +69,7 @@ namespace Sentry
 			ISocketListen* socketHandler = this->GetComponent<ISocketListen>(listenConfig->Handler);
 			if (socketHandler == nullptr)
 			{
-				LOG_ERROR("not find socket handler ", listenConfig->Handler);
+				LOG_ERROR("not find socket handler " << listenConfig->Handler);
 				return false;
 			}
 #ifdef ONLY_MAIN_THREAD
@@ -97,7 +97,7 @@ namespace Sentry
 				if (listener->StartListen(listenerHandler))
 				{
 					const ListenConfig& config = listener->GetConfig();
-					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
+					LOG_DEBUG(config.Name << " listen " << config.Ip << ":" << config.Port << " successful");
 				}
 			}
 		}
@@ -123,7 +123,7 @@ namespace Sentry
 				if (listener->StartListen(listenerHandler))
 				{
 					const ListenConfig& config = listener->GetConfig();
-					LOG_DEBUG("{0} listen {1}:{2} successful", config.Name, config.Ip, config.Port);
+					LOG_DEBUG(config.Name << " listen " << config.Ip << ":" << config.Port << " successful");
 					return true;
 				}
 			}

@@ -108,7 +108,7 @@ namespace Sentry
 		httpRequestData->GetHeadContent("host", host);
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
-		LOG_INFO("http://{0}{1}", host, url);
+		LOG_INFO("http://" << host << url);
 		std::shared_ptr<Json::Writer> jsonResponse = this->Invoke(httpConfig, httpRequestData);
 #endif
 		if (jsonResponse != nullptr)
@@ -117,19 +117,18 @@ namespace Sentry
 		}
 #ifdef __DEBUG__
 		LOG_INFO("==== http request handler ====");
-		LOG_INFO("url = {}", httpRequestData->GetUrl());
-		LOG_INFO("type = {}", httpRequestData->GetMethod());
-		LOG_INFO("time = {}ms", elapsedTimer.GetMs());
+		LOG_INFO("url = " << httpRequestData->GetUrl());
+		LOG_INFO("type = " << httpRequestData->GetMethod());
+		LOG_INFO("time = " << elapsedTimer.GetMs() << " ms");
 		if (!httpRequestData->GetContent().empty())
 		{
-			LOG_INFO("request = {}", httpRequestData->GetContent());
+			LOG_INFO("request = " << httpRequestData->GetContent());
 		}
-		LOG_INFO("response = {}", jsonResponse->ToJsonString());
+		LOG_INFO("response = " << jsonResponse->ToJsonString());
 #endif
 	}
 
-	std::shared_ptr<Json::Writer>
-	HttpClientComponent::Invoke(const HttpConfig* httpConfig, std::shared_ptr<HttpHandlerRequest> content)
+	std::shared_ptr<Json::Writer> HttpClientComponent::Invoke(const HttpConfig* httpConfig, std::shared_ptr<HttpHandlerRequest> content)
 	{
 		std::shared_ptr<Json::Writer> jsonWriter(new Json::Writer());
 		if (httpConfig == nullptr)

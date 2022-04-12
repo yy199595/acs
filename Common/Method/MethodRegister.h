@@ -127,6 +127,44 @@ namespace Sentry
 	};
 }
 
+namespace Sentry
+{
+	class HttpServiceRegister
+	{
+	 public:
+		std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
+	 public:
+		template<typename T>
+		bool Bind(const std::string& name, HttpJsonMethod1<T> func)
+		{
+			auto iter = this->mHttpMethodMap.find(name);
+			if (iter != this->mHttpMethodMap.end())
+			{
+				return false;
+			}
+			this->mHttpMethodMap.emplace(name, std::make_shared<
+				HttpServiceJsonMethod1<T>>((T*)this, std::move(func)));
+			return true;
+		}
+
+		template<typename T>
+		bool Bind(const std::string& name, HttpJsonMethod2<T> func)
+		{
+			auto iter = this->mHttpMethodMap.find(name);
+			if (iter != this->mHttpMethodMap.end())
+			{
+				return false;
+			}
+			this->mHttpMethodMap.emplace(name, std::make_shared<
+				HttpServiceJsonMethod2<T>>((T*)this, std::move(func)));
+			return true;
+		}
+
+	 private:
+		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
+	};
+}
+
 
 
 #endif //SERVER_METHODREGISTER_H

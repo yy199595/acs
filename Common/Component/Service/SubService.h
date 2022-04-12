@@ -19,11 +19,12 @@ namespace Sentry
 		void GetSubMethods(std::vector<std::string>& methods);
 		bool Invoke(const std::string& func, const Json::Reader & jsonReader);
 	public:
+		bool IsStartComplete() final { return true; }
 		bool Publish(const std::string & func, Json::Writer & jsonWriter);
+		bool IsStartService() { return this->mServiceRegister != nullptr; }
 		bool Publish(const std::string & address, const std::string & func, Json::Writer & jsonWriter);
 	protected:
 		bool LateAwake() override;
-		bool IsStartService() { return this->mServiceRegister != nullptr; }
 		virtual bool OnInitService(SubServiceRegister & methodRegister) = 0;
 	public:
 		bool LoadService() final;

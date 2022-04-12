@@ -1,9 +1,8 @@
 ﻿#include"LocalSubService.h"
 #include"App/App.h"
-#include"Component/RpcService/LocalServerRpc.h"
-#include"Network/Listener/NetworkListener.h"
-#include"Network/Listener/TcpServerComponent.h"
 #include"Network/Http/HttpAsyncRequest.h"
+#include"Component/RpcService/LocalServerRpc.h"
+#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool LocalSubService::OnInitService(SubServiceRegister& methodRegister)
@@ -133,19 +132,16 @@ namespace Sentry
 		jsonWriter.AddMember("response", true);
 		jsonWriter.AddMember("service", tempArray);
 		long long number = this->Publish("LocalSubService.Push", jsonWriter);
-		LOG_DEBUG("publish successful count = {0}", number);
+		LOG_DEBUG("publish successful count = " << number);
 	}
 
 	void LocalSubService::OnDestory()
 	{
 		std::string jsonContent;
 		Json::Writer jsonWriter;
-		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		const std::string address = tcpServerComponent->GetTcpAddress("rpc");
-
-		jsonWriter.AddMember("address", address);
 		jsonWriter.AddMember("area_id", this->mAreaId);
-		LOG_DEBUG("remove this form count = ", this->Publish("LocalSubService.Remove", jsonWriter));
+		jsonWriter.AddMember("address", this->mRpcAddress);
+		LOG_DEBUG("remove this form count = " << this->Publish("LocalSubService.Remove", jsonWriter));
 
 	}
 

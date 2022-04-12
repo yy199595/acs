@@ -102,6 +102,7 @@
     [
         "GateService",
         "ChatService",
+        "MysqlService",
         "HttpUserService",
         "LocalSubService"
     ],

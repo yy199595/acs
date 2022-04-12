@@ -17,7 +17,7 @@ namespace Sentry
 		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
 		if (!rpcConfig.HasServiceMethod(this->mService, name))
 		{
-			LOG_FATAL("{0}.{1} add failure", this->mService, name);
+			LOG_FATAL(this->mService << "." << name << " add failure");
 			return false;
 		}
 
@@ -29,18 +29,18 @@ namespace Sentry
 				this->mLuaMethodMap.erase(iter);
 			}
 			this->mLuaMethodMap.emplace(name, method);
-			LOG_DEBUG("add new lua service method [{0}.{1}]", this->mService, name);
+			LOG_DEBUG("add new lua service method " << this->mService << '.' << name);
 			return true;
 		}
 
 		auto iter = this->mMethodMap.find(name);
 		if (iter != this->mMethodMap.end())
 		{
-			LOG_FATAL("{0}.{1} add failure", this->mService, name);
+			LOG_FATAL(this->mService << "." << name << " add failure");
 			return false;
 		}
 		this->mMethodMap.emplace(name, method);
-		LOG_DEBUG("add new c++ service method [{0}.{1}]", this->mService, name);
+		LOG_DEBUG("add new c++ service method [" << this->mService <<'.' << name << ']');
 		return true;
 	}
 

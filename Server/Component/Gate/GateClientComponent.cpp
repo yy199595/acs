@@ -54,7 +54,7 @@ namespace Sentry
 			std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
 			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
-			LOG_ERROR("player call", request->method_name(), "failure error = ", configCom.GetCodeDesc(code));
+			LOG_ERROR("player call" << request->method_name() << "failure error = " << configCom.GetCodeDesc(code));
 #endif
 			responseMessage->set_code((int)code);
 			responseMessage->set_rpc_id(request->rpc_id());
@@ -69,7 +69,7 @@ namespace Sentry
 		{
 #ifdef __DEBUG__
 			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
-			LOG_WARN("remove player session code = ", configCom.GetCodeDesc(code));
+			LOG_WARN("remove player session code = " << configCom.GetCodeDesc(code));
 #endif
 			this->mGateClientMap.erase(iter);
 		}
@@ -109,7 +109,7 @@ namespace Sentry
 			if (nowTime - proxyClient->GetLastOperatorTime() >= 5)
 			{
 				proxyClient->StartClose();
-				LOG_ERROR("{[0]} logout", proxyClient->GetAddress());
+				LOG_ERROR(proxyClient->GetAddress() << " logout");
 				return;
 			}
 		}

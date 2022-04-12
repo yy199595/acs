@@ -29,7 +29,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		LOG_WARN("drop db : {0}", db);
+		LOG_WARN("drop db : " << db);
 		return true;
 	}
 
@@ -45,10 +45,10 @@ namespace Sentry
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSocket == nullptr)
 		{
-			LOG_ERROR("connect mysql failure ", ip, port, userName, passWd);
+			LOG_ERROR("connect mysql failure " << ip << port << userName << passWd);
 			return nullptr;
 		}
-		LOG_INFO("connect mysql successful [{}:{}]", ip, port);
+		LOG_INFO("connect mysql successful " << ip << ':' << port);
 		return this->mMysqlSocket;
 	}
 

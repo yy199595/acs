@@ -38,7 +38,7 @@ namespace Sentry
 			}
 #ifdef __DEBUG__
 			const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
-			LOG_ERROR(session->GetAddress(), " connected code =", rpcConfig.GetCodeDesc(code));
+			LOG_ERROR(session->GetAddress() << " connected code " << rpcConfig.GetCodeDesc(code));
 #endif
 			this->mRpcClientMap.erase(iter);
 		}
@@ -51,15 +51,9 @@ namespace Sentry
 
 		auto rpcClient = iter->second;
 		const std::string& address = rpcClient->GetAddress();
-		if (code != XCode::Successful)
-		{
-			LOG_ERROR("connect ", address, " failure");
-		}
-		else
+		if (code == XCode::Successful)
 		{
 			rpcClient->StartReceive();
-			const std::string& name = rpcClient->GetSocketProxy()->GetName();
-			LOG_INFO("[{0}=>{1}] ", name, address, "start receive message");
 		}
 	}
 
@@ -174,10 +168,10 @@ namespace Sentry
 		auto config = App::Get()->GetRpcConfig().
 			GetProtocolConfig(message->method_id());
 		LOG_DEBUG("=============== [send request] ===============");
-		LOG_DEBUG("func = {0}.{1}", config->Service, config->Method);
+		LOG_DEBUG("func = " << config->Service << "."<< config->Method);
 		if (Helper::Proto::GetJson(message, json))
 		{
-			LOG_DEBUG("json = ", json);
+			LOG_DEBUG("json = " << json);
 		}
 		LOG_DEBUG("==============================================");
 #endif
