@@ -12,7 +12,7 @@ namespace Sentry
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
 		methodRegister.Bind("Invoke", &MysqlService::Invoke);
-		return this->mHelper.StartConnect();
+		return true; //this->mHelper.StartConnect();
 	}
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response)

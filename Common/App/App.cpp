@@ -273,7 +273,7 @@ namespace Sentry
 	{
 		long long nowTime = Helper::Time::GetNowMilTime();
 		float seconds = (nowTime - this->mSecondTimer) / 1000.0f;
-		this->mLogicFps = (float)this->mLogicRunCount / seconds;
+		//this->mLogicFps = (float)this->mLogicRunCount / seconds;
 #ifdef _WIN32
 		char buffer[100] = {0};
 		sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
@@ -286,22 +286,23 @@ namespace Sentry
 
 	bool App::StartNewService(const std::string& name)
 	{
-		Component* component = this->GetComponentByName(name);
-		IServiceBase* serviceBase = component->Cast<IServiceBase>();
-		if (serviceBase == nullptr || serviceBase->IsStartService())
+		if(this->IsMainThread())
 		{
-			return false;
-		}
-		if (!serviceBase->LoadService())
-		{
-			return false;
-		}
-		IStart* start = component->Cast<IStart>();
-		IComplete* complete = component->Cast<IComplete>();
+			Component* component = this->GetComponentByName(name);
+			IServiceBase* serviceBase = component->Cast<IServiceBase>();
+			if (serviceBase != nullptr && !serviceBase->IsStartService())
+			{
+				LOG_CHECK_RET_FALSE(serviceBase->LoadService());
 
-		if (start != nullptr) start->OnStart();
-		if (complete != nullptr) complete->OnComplete();
+				IStart* start = component->Cast<IStart>();
+				IComplete* complete = component->Cast<IComplete>();
 
-		return true;
+				if (start != nullptr) start->OnStart();
+				if (complete != nullptr) complete->OnComplete();
+
+				return true;
+			}
+		}
+		return false;
 	}
 }

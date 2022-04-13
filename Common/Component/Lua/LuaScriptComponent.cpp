@@ -5,7 +5,6 @@
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
-#include"Component/RpcService/LuaRpcService.h"
 #include"Async/LuaTaskSource.h"
 
 using namespace Lua;
@@ -15,7 +14,6 @@ namespace Sentry
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
-		this->LoadAllFile();
 	}
 
 	bool LuaScriptComponent::LateAwake()

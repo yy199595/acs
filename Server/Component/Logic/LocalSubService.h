@@ -21,8 +21,8 @@ namespace Sentry
 		void OnDestory() final;
 		void OnComplete() final;
 	 protected:
-		void OnAddService(LocalServerRpc *component) final;
-		void OnDelService(LocalServerRpc *component) final;
+		void OnAddService(Component *component) final;
+		void OnDelService(Component *component) final;
 		bool OnInitService(SubServiceRegister &methodRegister) final;
 	 private:
 		void Add(const Json::Reader& jsonReader);

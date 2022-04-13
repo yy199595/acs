@@ -22,7 +22,7 @@ namespace Sentry
 		return true;
 	}
 
-	void LocalSubService::OnAddService(LocalServerRpc* component)
+	void LocalSubService::OnAddService(Component* component)
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("area_id", this->mAreaId);
@@ -31,7 +31,7 @@ namespace Sentry
 		LOG_CHECK_RET(this->Publish("LocalSubService.Add", jsonWriter));
 	}
 
-	void LocalSubService::OnDelService(LocalServerRpc* component)
+	void LocalSubService::OnDelService(Component* component)
 	{
 
 	}

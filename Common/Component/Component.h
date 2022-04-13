@@ -54,6 +54,7 @@ namespace Sentry
 		{
 			return this->mType;
 		}
+
 		inline const std::string& GetName()
 		{
 			return this->mName;
@@ -62,6 +63,12 @@ namespace Sentry
 		inline T* Cast()
 		{
 			return dynamic_cast<T*>(this);
+		}
+
+		template<typename T>
+		inline bool Is()
+		{
+			return this->mType->Hash == typeid(T).hash_code();
 		}
 
 	 public:
