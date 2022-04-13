@@ -116,11 +116,16 @@ namespace Sentry
 		App::Get()->GetConfig().GetMember("redis", "lua", path);
 		Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
 
+		std::string address = fmt::format("{0}:{1}",
+				this->mRedisConfig.mIp, this->mRedisConfig.mPort);
+
 		this->mSubRedisClient = this->MakeRedisClient("Subscribe");
-		if (this->mSubRedisClient != nullptr)
+		while(this->mSubRedisClient == nullptr)
 		{
-			LOG_DEBUG("subscribe redis client connect successful");
-			this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
+			LOG_ERROR("connect redis " << address << " failure");
+			this->mTaskComponent->Sleep(1000);
+			this->mSubRedisClient = this->MakeRedisClient("Subscribe");
+
 		}
 
 		for (size_t index = 0; index < this->mRedisConfig.mCount; index++)
@@ -129,9 +134,7 @@ namespace Sentry
 			std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(name);
 			if (redisClient == nullptr)
 			{
-				std::string address = fmt::format("{0}:{1}",
-					this->mRedisConfig.mIp, this->mRedisConfig.mPort);
-				LOG_ERROR("connect redis " << address << " failure");
+				LOG_FATAL("connect redis " << address << " failure");
 				return;
 			}
 			this->mFreeClients.emplace(redisClient);
@@ -145,6 +148,7 @@ namespace Sentry
 #ifdef __DEBUG__
 		this->InvokeCommand("FLUSHALL")->IsOk();
 #endif
+		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
 	}
 
@@ -157,6 +161,7 @@ namespace Sentry
 #endif
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, name);
 		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy);
+		LOG_INFO("start connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "]");
 
 		for (size_t index = 0; index < 3; index++)
 		{

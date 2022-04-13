@@ -190,17 +190,17 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
+				IStart* startComponent = component->Cast<IStart>();
 				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
 				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
 					continue;
 				}
-				ElapsedTimer elapsedTimer;
-				IStart* startComponent = component->Cast<IStart>();
-				ILoadData* loadComponent = component->Cast<ILoadData>();
-				if (startComponent != nullptr) startComponent->OnStart();
-				if (loadComponent != nullptr) loadComponent->OnLoadData();
-				LOG_DEBUG("start" << component->GetName() << " user time = " << elapsedTimer.GetMs() << " ms");
+				if(startComponent != nullptr)
+				{
+					startComponent->OnStart();
+					LOG_DEBUG("start" << component->GetName());
+				}
 			}
 		}
 
@@ -214,6 +214,7 @@ namespace Sentry
 				{
 					continue;
 				}
+
 				IComplete* complete = component->Cast<IComplete>();
 				if (complete != nullptr)
 				{
@@ -296,11 +297,9 @@ namespace Sentry
 			return false;
 		}
 		IStart* start = component->Cast<IStart>();
-		ILoadData* loadData = component->Cast<ILoadData>();
 		IComplete* complete = component->Cast<IComplete>();
 
 		if (start != nullptr) start->OnStart();
-		if (loadData != nullptr) loadData->OnLoadData();
 		if (complete != nullptr) complete->OnComplete();
 
 		return true;

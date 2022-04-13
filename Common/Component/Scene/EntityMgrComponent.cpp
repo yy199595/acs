@@ -102,11 +102,6 @@ namespace Sentry
 				{
 					start->OnStart();
 				}
-				ILoadData * loadData = component->Cast<ILoadData>();
-				if(loadData != nullptr)
-				{
-					loadData->OnLoadData();
-				}
 			}
 		}
 	}

@@ -55,36 +55,6 @@ namespace Sentry
 		return true;
 	}
 
-	void HttpClientComponent::OnLoadData()
-	{
-		//std::string url = "http://langrens.oss-cn-shenzhen.aliyuncs.com/res/area/city-config.json";
-
-		//auto response = this->Get(url);
-
-		//LOG_WARN(response->GetContent());
-		//string url = "http://yjz199595.com/logic/service/push";
-
-//        std::string json;
-//        RapidJsonWriter jsonWriter;
-//        jsonWriter.Save("End", 100);
-//        jsonWriter.Save("Start", 0);
-//        jsonWriter.Save("RankId", 301000);
-//
-//        jsonWriter.WriterToStream(json);
-//
-//        ElapsedTimer elapsedTimer;
-//        IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
-//        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
-//        std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
-//
-//        auto response = httpAsyncClient->Post("http://127.0.0.1:80/logic/account/login", json);
-//        if (response != nullptr && response->GetHttpCode() == HttpStatus::OK)
-//        {
-//            LOG_ERROR(response->GetContent(), " time = [", elapsedTimer.GetMs(), "ms]");
-//        }
-
-	}
-
 	void HttpClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(socket));

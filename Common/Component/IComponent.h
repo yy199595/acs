@@ -51,12 +51,6 @@ namespace Sentry
 		virtual void OnHotFix() = 0;
 	};
 
-	class ILoadData
-	{
-	 public:
-		virtual void OnLoadData() = 0;
-	};
-
 	class ILoadConfig
 	{
 	 public:

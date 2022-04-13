@@ -21,7 +21,7 @@ namespace Sentry
 	class HttpHandlerClient;
 	class HttpAsyncResponse;
 	class HttpHandlerRequest;
-	class HttpClientComponent : public Component, public ISocketListen, public ILoadData
+	class HttpClientComponent : public Component, public ISocketListen
 	{
 	 public:
 		HttpClientComponent() = default;
@@ -29,7 +29,6 @@ namespace Sentry
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
-		void OnLoadData() final;
 	 public:
 		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url, int timeout = 5);
 
