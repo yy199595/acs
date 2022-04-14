@@ -106,6 +106,7 @@ inline std::string FormatFileLine(const char * file, const int line)
         }    \
 }
 
+
 #define IF_THROW_ERROR(obj){ \
     if(!(obj))                \
     {              \

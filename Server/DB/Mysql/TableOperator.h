@@ -14,7 +14,7 @@ namespace Sentry
     class TableOperator
     {
     public:
-        TableOperator(MysqlClient *socket);
+        TableOperator(MysqlSocket *socket);
 
     public:
         bool InitDb(const std::string & name);
@@ -29,6 +29,6 @@ namespace Sentry
         bool AddNewField(const std::string& table, const FieldDescriptor *fieldDesc);
 
     private:
-        MysqlClient *mMysqlSocket;
+        MysqlSocket *mMysqlSocket;
     };
 }

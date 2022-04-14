@@ -5,6 +5,7 @@
 #include"Pool/MessagePool.h"
 namespace Sentry
 {
+
 	bool MysqlService::OnInitService(ServiceMethodRegister & methodRegister)
 	{
 		methodRegister.Bind("Add", &MysqlService::Add);
@@ -12,7 +13,37 @@ namespace Sentry
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
 		methodRegister.Bind("Invoke", &MysqlService::Invoke);
-		return true; //this->mHelper.StartConnect();
+
+		const ServerConfig & config = this->GetApp()->GetConfig();
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mConfig.mPort));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mConfig.mUser));
+		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mConfig.mPassword));
+
+		unsigned int count = std::thread::hardware_concurrency();
+		this->GetApp()->GetConfig().GetMember("mysql", "count", count);
+
+		for (unsigned int index = 0; index < count; index++)
+		{
+			std::shared_ptr<MysqlClient> mysqlClient(new MysqlClient(this->mConfig));
+			this->mMysqlClients.emplace_back(mysqlClient);
+		}
+		return !this->mMysqlClients.empty();
+	}
+
+	void MysqlService::OnStart()
+	{
+		std::string address = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
+		for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
+		{
+			if(mysqlClient->Start() != 0)
+			{
+				LOG_ERROR("connect mysql [" << address << "] failure");
+				std::logic_error(fmt::format("connect mysql [{0}] failure", address));
+				return;
+			}
+			LOG_INFO("connect mysql [" << address << "] successful");
+		}
 	}
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response)
@@ -25,13 +56,14 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mHelper));
-
-		XCode code = taskSource->Await(sql);
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+		XCode code = mysqlClient->Invoke(sql, response);
 		if (code != XCode::Successful)
 		{
-			response.set_error(taskSource->GetErrorStr());
-			return code;
+#ifdef __DEBUG__
+			LOG_INFO(sql);
+			LOG_ERROR(response.error());
+#endif
 		}
 		return XCode::Successful;
 	}
@@ -46,18 +78,14 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mHelper);
-
-		XCode code = taskSource->Await(sql);
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+		XCode code = mysqlClient->Invoke(sql, response);
 		if (code != XCode::Successful)
 		{
-			response.set_error(taskSource->GetErrorStr());
 #ifdef __DEBUG__
 			LOG_INFO(sql);
-			LOG_ERROR(taskSource->GetErrorStr());
+			LOG_ERROR(response.error());
 #endif
-			return code;
 		}
 		return XCode::Successful;
 	}
@@ -72,18 +100,14 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mHelper);
-
-		XCode code = taskSource->Await(sql);
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+		XCode code = mysqlClient->Invoke(sql, response);
 		if (code != XCode::Successful)
 		{
-			response.set_error(taskSource->GetErrorStr());
 #ifdef __DEBUG__
 			LOG_INFO(sql);
-			LOG_ERROR(taskSource->GetErrorStr());
+			LOG_ERROR(response.error());
 #endif
-			return code;
 		}
 		return XCode::Successful;
 	}
@@ -98,18 +122,14 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource =
-			std::make_shared<MysqlTaskSource>(this->mHelper);
-
-		XCode code = taskSource->Await(sql);
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+		XCode code = mysqlClient->Invoke(sql, response);
 		if (code != XCode::Successful)
 		{
-			response.set_error(taskSource->GetErrorStr());
 #ifdef __DEBUG__
 			LOG_INFO(sql);
-			LOG_ERROR(taskSource->GetErrorStr());
+			LOG_ERROR(response.error());
 #endif
-			return code;
 		}
 		return XCode::Successful;
 	}
@@ -117,22 +137,14 @@ namespace Sentry
 	XCode MysqlService::Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response)
 	{
 		LOGIC_THROW_ERROR(!request.sql().empty());
-		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(this->mHelper));
-
-		XCode code = taskSource->Await(request.sql());
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+		XCode code = mysqlClient->Invoke(request.sql(), response);
 		if (code != XCode::Successful)
 		{
 #ifdef __DEBUG__
 			LOG_INFO(request.sql());
-			LOG_ERROR(taskSource->GetErrorStr());
+			LOG_ERROR(response.error());
 #endif
-			response.set_error(taskSource->GetErrorStr());
-			return code;
-		}
-
-		while (taskSource->GetQueryData(this->mJson))
-		{
-			response.add_json_array(this->mJson);
 		}
 		return XCode::Successful;
 	}
@@ -141,24 +153,20 @@ namespace Sentry
 	{
 		LOGIC_THROW_ERROR(!request.table().empty());
 		LOGIC_THROW_ERROR(!request.where_json().empty());
+		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+
 		std::string sql;
-		if (!this->mHelper.ToSqlCommand(request, sql))
+		if(!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlTaskSource> taskSource
-			= std::make_shared<MysqlTaskSource>(this->mHelper);
-
-		XCode code = taskSource->Await(sql);
+		XCode code = mysqlClient->Invoke(sql, response);
 		if (code != XCode::Successful)
 		{
-			response.set_error(taskSource->GetErrorStr());
-			return code;
-		}
-
-		while (taskSource->GetQueryData(this->mJson))
-		{
-			response.add_json_array(this->mJson);
+#ifdef __DEBUG__
+			LOG_INFO(sql);
+			LOG_ERROR(response.error());
+#endif
 		}
 		return XCode::Successful;
 	}

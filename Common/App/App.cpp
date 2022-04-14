@@ -199,7 +199,7 @@ namespace Sentry
 				if(startComponent != nullptr)
 				{
 					startComponent->OnStart();
-					LOG_DEBUG("start" << component->GetName());
+					LOG_DEBUG("start " << component->GetName());
 				}
 			}
 		}
@@ -286,21 +286,23 @@ namespace Sentry
 
 	bool App::StartNewService(const std::string& name)
 	{
-		if(this->IsMainThread())
+		Component* component = this->GetComponentByName(name);
+		IServiceBase* serviceBase = component->Cast<IServiceBase>();
+		if (serviceBase != nullptr && !serviceBase->IsStartService())
 		{
-			Component* component = this->GetComponentByName(name);
-			IServiceBase* serviceBase = component->Cast<IServiceBase>();
-			if (serviceBase != nullptr && !serviceBase->IsStartService())
+			LOG_CHECK_RET_FALSE(serviceBase->LoadService());
+
+			IStart* start = component->Cast<IStart>();
+			IComplete* complete = component->Cast<IComplete>();
+			try
 			{
-				LOG_CHECK_RET_FALSE(serviceBase->LoadService());
-
-				IStart* start = component->Cast<IStart>();
-				IComplete* complete = component->Cast<IComplete>();
-
 				if (start != nullptr) start->OnStart();
 				if (complete != nullptr) complete->OnComplete();
-
 				return true;
+			}
+			catch (std::logic_error & error)
+			{
+				return false;
 			}
 		}
 		return false;

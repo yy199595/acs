@@ -1,53 +1,31 @@
 #include"MysqlTaskSource.h"
-#include"App/App.h"
 #include"Json/JsonWriter.h"
 #include"Component/Mysql/MysqlHelper.h"
-#include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
-	MysqlTaskSource::MysqlTaskSource(MysqlHelper & component)
-		: mHelper(component)
+	MysqlTaskSource::MysqlTaskSource(const std::string & sql)
+		: mSqlCommand(sql)
 	{
 
 	}
 
-	XCode MysqlTaskSource::Await(const std::string& sql)
+	XCode MysqlTaskSource::Await(s2s::Mysql::Response & response)
 	{
-		this->mSqlCommand = std::move(sql);
-		ThreadPoolComponent * threadComponent = App::Get()->GetComponent<ThreadPoolComponent>();
-		if (!threadComponent->StartTask(this))
+		if (this->mTaskSource.Await() == XCode::Successful)
 		{
-			return XCode::MysqlStartTaskFail;
+			response.CopyFrom(this->mResponse);
+			return XCode::Successful;
 		}
-		XCode code = this->mTaskSource.Await();
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_ERROR(sql);
-#endif
-			return code;
-		}
-#ifdef __DEBUG__
-		LOG_INFO(sql);
-#endif
-		return XCode::Successful;
+		return XCode::MysqlInvokeFailure;
 	}
 
-	bool MysqlTaskSource::Run()
+	void MysqlTaskSource::Run(MysqlSocket* mysqlSocket)
 	{
-		MysqlClient* mysqlSocket = this->mHelper.GetMysqlClient();
-		if (mysqlSocket == nullptr)
-		{
-			this->mErrorString = "mysql socket is null";
-			this->mTaskSource.SetResult(XCode::MysqlSocketIsNull);
-			return true;
-		}
-
 		if (mysql_real_query(mysqlSocket, mSqlCommand.c_str(), mSqlCommand.size()) != 0)
 		{
-			this->mErrorString = mysql_error(mysqlSocket);
+			this->mResponse.set_error(mysql_error(mysqlSocket));
 			this->mTaskSource.SetResult(XCode::MysqlInvokeFailure);
-			return true;
+			return;
 		}
 		MysqlQueryResult* queryResult = mysql_store_result(mysqlSocket);
 		if (queryResult != nullptr)
@@ -71,8 +49,7 @@ namespace Sentry
 					MYSQL_FIELD* field = fieldNameVector[index];
 					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 				}
-				json = jsonWrite.ToJsonString();
-				this->mQueryDatas.push(json);
+				this->mResponse.add_json_array(jsonWrite.ToJsonString());
 			}
 			else
 			{
@@ -86,26 +63,12 @@ namespace Sentry
 						MYSQL_FIELD* field = fieldNameVector[index];
 						this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
 					}
-					json = jsonWrite.ToJsonString();
-					this->mQueryDatas.push(json);
+					this->mResponse.add_json_array(jsonWrite.ToJsonString());
 				}
 			}
 			mysql_free_result(queryResult);
 		}
 		this->mTaskSource.SetResult(XCode::Successful);
-		return true;
-	}
-
-	bool MysqlTaskSource::GetQueryData(std::string& data)
-	{
-		if (this->mQueryDatas.empty())
-		{
-			return false;
-		}
-		data.clear();
-		data = this->mQueryDatas.front();
-		this->mQueryDatas.pop();
-		return true;
 	}
 
 	void MysqlTaskSource::WriteValue(Json::Writer& jsonWriter, MYSQL_FIELD* field, const char* data, long size)
@@ -114,19 +77,17 @@ namespace Sentry
 		{
 		case enum_field_types::MYSQL_TYPE_LONG:
 		case enum_field_types::MYSQL_TYPE_LONGLONG:
-			this->mValue2 = std::atoll(data);
-			if (this->mValue2 != 0)
-			{
-				jsonWriter.AddMember(field->name, this->mValue2);
-			}
+		{
+			long long value1 = std::atoll(data);
+			jsonWriter.AddMember(field->name, value1);
+		}
 			break;
 		case enum_field_types::MYSQL_TYPE_FLOAT:
 		case enum_field_types::MYSQL_TYPE_DOUBLE:
-			this->mValue1 = std::atof(data);
-			if (this->mValue1 != 0)
-			{
-				jsonWriter.AddMember(field->name, this->mValue1);
-			}
+		{
+			double value2 = std::atof(data);
+			jsonWriter.AddMember(field->name, value2);
+		}
 		default:
 			if (data != nullptr && size > 0)
 			{

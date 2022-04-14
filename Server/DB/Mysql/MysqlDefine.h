@@ -21,5 +21,17 @@ namespace Sentry
     class MysqlHelper;
 
     typedef MYSQL_RES MysqlQueryResult;
-    typedef MYSQL MysqlClient;
+    typedef MYSQL MysqlSocket;
+}
+
+namespace Sentry
+{
+	class MysqlConfig
+	{
+	public:
+		std::string mIp;
+		unsigned int mPort;
+		std::string mUser;
+		std::string mPassword;
+	};
 }

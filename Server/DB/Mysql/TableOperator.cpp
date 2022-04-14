@@ -5,7 +5,7 @@
 
 namespace Sentry
 {
-    TableOperator::TableOperator(MysqlClient *socket)
+    TableOperator::TableOperator(MysqlSocket *socket)
     {
         this->mMysqlSocket = socket;
     }

@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	MysqlClient* MysqlHelper::GetMysqlClient()
+	MysqlSocket* MysqlHelper::GetMysqlClient()
 	{
 		if (App::Get()->IsMainThread())
 		{
@@ -33,14 +33,14 @@ namespace Sentry
 		return true;
 	}
 
-	MysqlClient* MysqlHelper::ConnectMysql()
+	MysqlSocket* MysqlHelper::ConnectMysql()
 	{
 		const char* ip = this->mMysqlIp.c_str();
 		const unsigned short port = this->mMysqlPort;
 		const char* passWd = this->mDataBasePasswd.c_str();
 		const char* userName = this->mDataBaseUser.c_str();
 
-		MysqlClient* mysqlSocket1 = mysql_init((MYSQL*)nullptr);
+		MysqlSocket* mysqlSocket1 = mysql_init((MYSQL*)nullptr);
 		this->mMysqlSocket = mysql_real_connect(mysqlSocket1, ip, userName, passWd, nullptr, port, nullptr,
 			CLIENT_MULTI_STATEMENTS);
 		if (this->mMysqlSocket == nullptr)
@@ -91,7 +91,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(threadPoolComponent->GetThreads().size() > 0);
 		for (TaskThread* taskThread : threadPoolComponent->GetThreads())
 		{
-			MysqlClient * mysqlSocket = this->ConnectMysql();
+			MysqlSocket * mysqlSocket = this->ConnectMysql();
 			if (mysqlSocket == nullptr)
 			{
 				return false;

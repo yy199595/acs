@@ -18,7 +18,7 @@ namespace Sentry
 		MysqlHelper() = default;
 	 public:
 		bool StartConnect();
-		MysqlClient* GetMysqlClient();
+		MysqlSocket* GetMysqlClient();
 	 public:
 		bool ToSqlCommand(const s2s::Mysql::Add& messageData, std::string& sqlCommand);
 
@@ -37,18 +37,18 @@ namespace Sentry
 
 	 private:
 		bool InitMysqlTable();
-		MysqlClient* ConnectMysql();
+		MysqlSocket* ConnectMysql();
 		bool DropTable(const std::string& db);
 	 private:
 		std::string mMysqlIp;         //ip地址
 		unsigned short mMysqlPort;     //端口号
 		std::string mDataBaseUser;     //用户名
 		std::string mDataBasePasswd; //密码
-		MysqlClient* mMysqlSocket;
+		MysqlSocket* mMysqlSocket;
 		std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
 		std::unordered_map<std::string, std::string> mSqlProtoMap;
 		std::unordered_map<std::string, std::string> mSqlTableMap;
-		std::unordered_map<std::thread::id, MysqlClient*> mMysqlSocketMap; //线程id和 socket
+		std::unordered_map<std::thread::id, MysqlSocket*> mMysqlSocketMap; //线程id和 socket
 	};
 }
