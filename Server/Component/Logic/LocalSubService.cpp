@@ -24,11 +24,15 @@ namespace Sentry
 
 	void LocalSubService::OnAddService(Component* component)
 	{
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("area_id", this->mAreaId);
-		jsonWriter.AddMember("address", this->mRpcAddress);
-		jsonWriter.AddMember("service", component->GetName());
-		LOG_CHECK_RET(this->Publish("LocalSubService.Add", jsonWriter));
+		if(component->Cast<IServiceBase>() != nullptr)
+		{
+			Json::Writer jsonWriter;
+			jsonWriter.AddMember("area_id", this->mAreaId);
+			jsonWriter.AddMember("address", this->mRpcAddress);
+			jsonWriter.AddMember("service", component->GetName());
+			LOG_DEBUG("publish " << component->GetName() << " to all server");
+			LOG_CHECK_RET(this->Publish("LocalSubService.Add", jsonWriter));
+		}
 	}
 
 	void LocalSubService::OnDelService(Component* component)
@@ -61,7 +65,6 @@ namespace Sentry
 		std::vector<std::string> services;
 		jsonReader.GetMember("rpc", address);
 		jsonReader.GetMember("service", services);
-		std::shared_ptr<App> app  = App::Get();
 		for(const std::string & service : services)
 		{
 			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);

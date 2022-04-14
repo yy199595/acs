@@ -13,7 +13,7 @@ namespace Sentry
 		LuaRpcService();
 		~LuaRpcService() override;
 	 public:
-		void OnStart() final;
+		bool OnStart() final;
 		bool LateAwake() final;
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:

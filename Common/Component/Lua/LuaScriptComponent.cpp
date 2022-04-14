@@ -48,13 +48,10 @@ namespace Sentry
 
 	}
 
-	void LuaScriptComponent::OnStart()
+	bool LuaScriptComponent::OnStart()
 	{
-		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
-		if(luaTaskSource != nullptr && !luaTaskSource->Await<bool>())
-		{
-			throw std::logic_error("return false");
-		}
+		LuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
+		return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
 	}
 
 	bool LuaScriptComponent::LoadAllFile()

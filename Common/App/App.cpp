@@ -198,8 +198,13 @@ namespace Sentry
 				}
 				if(startComponent != nullptr)
 				{
-					startComponent->OnStart();
-					LOG_DEBUG("start " << component->GetName());
+					ElapsedTimer timer;
+					if(!startComponent->OnStart())
+					{
+						throw std::logic_error(fmt::format(
+							"start {0} failure", component->GetName()));
+					}
+					LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
 				}
 			}
 		}
@@ -253,7 +258,7 @@ namespace Sentry
 			IServiceBase* serviceBase = this->GetComponent<IServiceBase>(name);
 			while (serviceBase != nullptr && !serviceBase->IsStartComplete())
 			{
-				this->mTaskComponent->Sleep(1000);
+				this->mTaskComponent->Sleep(2000);
 				LOG_WARN("wait " << name << " start count = " << ++count);
 			}
 		}
@@ -286,6 +291,7 @@ namespace Sentry
 
 	bool App::StartNewService(const std::string& name)
 	{
+		ElapsedTimer timer;
 		Component* component = this->GetComponentByName(name);
 		IServiceBase* serviceBase = component->Cast<IServiceBase>();
 		if (serviceBase != nullptr && !serviceBase->IsStartService())
@@ -294,17 +300,32 @@ namespace Sentry
 
 			IStart* start = component->Cast<IStart>();
 			IComplete* complete = component->Cast<IComplete>();
-			try
+			if (start != nullptr && !start->OnStart())
 			{
-				if (start != nullptr) start->OnStart();
-				if (complete != nullptr) complete->OnComplete();
-				return true;
-			}
-			catch (std::logic_error & error)
-			{
+				LOG_FATAL("start " << name << " failure");
 				return false;
 			}
+			if (complete != nullptr)
+			{
+				complete->OnComplete();
+			}
+			this->OnAddNewService(component);
+			LOG_INFO("start " << name << " user time " << timer.GetMs() << " ms");
+			return true;
 		}
 		return false;
+	}
+	void App::OnAddNewService(Component* component)
+	{
+		std::vector<std::string> components;
+		this->GetComponents(components);
+		for(const std::string & name : components)
+		{
+			IServiceChange * serviceChange = this->GetComponent<IServiceChange>(name);
+			if(serviceChange != nullptr)
+			{
+				serviceChange->OnAddService(component);
+			}
+		}
 	}
 }

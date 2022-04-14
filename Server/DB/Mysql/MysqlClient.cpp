@@ -43,12 +43,23 @@ namespace Sentry
 
 	void MysqlClient::Update()
 	{
-		std::shared_ptr<MysqlTaskSource> taskSource;
-		if(!this->mTaskQueue.try_dequeue(taskSource))
+		std::shared_ptr<MysqlAsyncTask> taskSource;
+		while (this->mTaskQueue.try_dequeue(taskSource))
 		{
-			this->HangUp();
+			taskSource->Run(this->mMysqlSocket);
 		}
-		taskSource->Run(this->mMysqlSocket);
+		this->HangUp();
+	}
+
+	XCode MysqlClient::InitTable(const std::string& pb)
+	{
+		std::shared_ptr<MysqlTableTaskSource> tableTaskSource(new MysqlTableTaskSource());
+		if (!this->mTaskQueue.enqueue(tableTaskSource))
+		{
+			return XCode::MysqlInitTaskFail;
+		}
+		this->mThreadVariable.notify_one();
+		return tableTaskSource->InitMysqlTable(pb);
 	}
 
 	XCode MysqlClient::Invoke(const std::string& sql, s2s::Mysql::Response & response)
@@ -61,4 +72,5 @@ namespace Sentry
 		this->mThreadVariable.notify_one();
 		return taskSource->Await(response);
 	}
+
 }

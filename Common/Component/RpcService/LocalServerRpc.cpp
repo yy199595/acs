@@ -29,7 +29,7 @@ namespace Sentry
 				this->mLuaMethodMap.erase(iter);
 			}
 			this->mLuaMethodMap.emplace(name, method);
-			LOG_DEBUG("add new lua service method " << this->mService << '.' << name);
+			LOG_DEBUG("add new lua service method [" << this->mService << '.' << name << "]");
 			return true;
 		}
 

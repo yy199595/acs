@@ -8,6 +8,7 @@
 #include"MysqlTaskSource.h"
 #include"Thread/TaskThread.h"
 #include"Define/ThreadQueue.h"
+#include"MysqlTableTaskSource.h"
 namespace Sentry
 {
 	class MysqlClient : public IThread
@@ -15,18 +16,18 @@ namespace Sentry
 	public:
 		MysqlClient(MysqlConfig & config);
 	public:
+		XCode InitTable(const std::string & pb);
 		XCode Invoke(const std::string & sql, s2s::Mysql::Response & response);
-	public:
+	 public:
 		int Start() final;
 		void Update() final;
 
 	private:
-		std::mutex mTaskLock;
 		std::thread * mThread;
 		std::atomic_bool mIsClose;
 		const MysqlConfig & mConfig;
 		MysqlSocket * mMysqlSocket;
-		MultiThread::ConcurrentQueue<std::shared_ptr<MysqlTaskSource>> mTaskQueue;
+		MultiThread::ConcurrentQueue<std::shared_ptr<MysqlAsyncTask>> mTaskQueue;
 	};
 }
 

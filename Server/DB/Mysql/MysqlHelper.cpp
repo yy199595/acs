@@ -1,106 +1,11 @@
 ﻿#include "MysqlHelper.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
-#include"DB/Mysql/TableOperator.h"
+#include"DB/Mysql/MysqlTableTaskSource.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
 namespace Sentry
 {
-	MysqlSocket* MysqlHelper::GetMysqlClient()
-	{
-		if (App::Get()->IsMainThread())
-		{
-			LOG_ERROR("try in main thread invoke sql");
-			return nullptr;
-		}
-		auto id = std::this_thread::get_id();
-		auto iter = this->mMysqlSocketMap.find(id);
-		return iter != this->mMysqlSocketMap.end() ? iter->second : nullptr;
-	}
-
-	bool MysqlHelper::DropTable(const std::string& db)
-	{
-		const std::string sql = "drop database " + db;
-		if (mysql_select_db(this->mMysqlSocket, db.c_str()) != 0)
-		{
-			return false;
-		}
-		if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.size()) != 0)
-		{
-			return false;
-		}
-		LOG_WARN("drop db : " << db);
-		return true;
-	}
-
-	MysqlSocket* MysqlHelper::ConnectMysql()
-	{
-		const char* ip = this->mMysqlIp.c_str();
-		const unsigned short port = this->mMysqlPort;
-		const char* passWd = this->mDataBasePasswd.c_str();
-		const char* userName = this->mDataBaseUser.c_str();
-
-		MysqlSocket* mysqlSocket1 = mysql_init((MYSQL*)nullptr);
-		this->mMysqlSocket = mysql_real_connect(mysqlSocket1, ip, userName, passWd, nullptr, port, nullptr,
-			CLIENT_MULTI_STATEMENTS);
-		if (this->mMysqlSocket == nullptr)
-		{
-			LOG_ERROR("connect mysql failure " << ip << port << userName << passWd);
-			return nullptr;
-		}
-		LOG_INFO("connect mysql successful " << ip << ':' << port);
-		return this->mMysqlSocket;
-	}
-
-	bool MysqlHelper::InitMysqlTable()
-	{
-		auto descriptorPool = google::protobuf::DescriptorPool::generated_pool();
-		auto desc = descriptorPool->FindFileByName("db.proto");
-		for (int x = 0; x < desc->message_type_count(); x++)
-		{
-			TableOperator tableOperator(this->mMysqlSocket);
-			auto messageDesc = desc->message_type(x);
-#ifdef __DEBUG__
-			this->DropTable(messageDesc->name());
-#endif
-			LOG_CHECK_RET_FALSE(tableOperator.InitDb(messageDesc->name()));
-			for (int y = 0; y < messageDesc->nested_type_count(); y++)
-			{
-				auto desc = messageDesc->nested_type(y);
-				LOG_CHECK_RET_FALSE(tableOperator.InitTable(desc));
-				const std::string table = messageDesc->name() + "." + desc->name();
-				this->mSqlTableMap.emplace(table, desc->full_name());
-				this->mSqlProtoMap.emplace(desc->full_name(), table);
-			}
-		}
-		return this->InitMysqlTable();
-	}
-
-	bool MysqlHelper::StartConnect()
-	{
-
-		this->mMysqlPort = 0;
-		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mMysqlIp));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mMysqlPort));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mDataBaseUser));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mDataBasePasswd));
-
-		ThreadPoolComponent * threadPoolComponent = App::Get()->GetComponent<ThreadPoolComponent>();
-
-		LOG_CHECK_RET_FALSE(threadPoolComponent->GetThreads().size() > 0);
-		for (TaskThread* taskThread : threadPoolComponent->GetThreads())
-		{
-			MysqlSocket * mysqlSocket = this->ConnectMysql();
-			if (mysqlSocket == nullptr)
-			{
-				return false;
-			}
-			this->mMysqlSocketMap.emplace(taskThread->GetThreadId(), mysqlSocket);
-		}
-		return true;
-	}
-
 	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
 		Message& message, std::string& sql)
 	{

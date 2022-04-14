@@ -67,14 +67,11 @@ namespace Sentry
 		return true;
 	}
 
-	void LuaRpcService::OnStart()
+	bool LuaRpcService::OnStart()
 	{
 		const char * tab = this->GetName().c_str();
 		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");
-		if(luaTaskSource != nullptr && luaTaskSource->Await<bool>())
-		{
-			LOG_WARN("Invoke " << this->GetName() << " Start Coroutine")
-		}
+		return(luaTaskSource == nullptr || luaTaskSource->Await<bool>());
 	}
 
 }

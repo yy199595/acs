@@ -4,7 +4,7 @@
 #include"Util/Guid.h"
 #include"rapidjson/document.h"
 #include"DB/Mysql/MysqlDefine.h"
-#include<Protocol/s2s.pb.h>
+#include"Protocol/s2s.pb.h"
 using namespace google::protobuf;
 namespace Sentry
 {
@@ -16,9 +16,6 @@ namespace Sentry
 	{
 	 public:
 		MysqlHelper() = default;
-	 public:
-		bool StartConnect();
-		MysqlSocket* GetMysqlClient();
 	 public:
 		bool ToSqlCommand(const s2s::Mysql::Add& messageData, std::string& sqlCommand);
 
@@ -36,19 +33,7 @@ namespace Sentry
 		bool WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue);
 
 	 private:
-		bool InitMysqlTable();
-		MysqlSocket* ConnectMysql();
-		bool DropTable(const std::string& db);
-	 private:
-		std::string mMysqlIp;         //ip地址
-		unsigned short mMysqlPort;     //端口号
-		std::string mDataBaseUser;     //用户名
-		std::string mDataBasePasswd; //密码
-		MysqlSocket* mMysqlSocket;
 		std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
-		std::unordered_map<std::string, std::string> mSqlProtoMap;
-		std::unordered_map<std::string, std::string> mSqlTableMap;
-		std::unordered_map<std::thread::id, MysqlSocket*> mMysqlSocketMap; //线程id和 socket
 	};
 }

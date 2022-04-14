@@ -13,7 +13,7 @@ namespace Sentry
 
 	 public:
 		bool LateAwake() final;
-		void OnStart() final;
+		bool OnStart() final;
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
 

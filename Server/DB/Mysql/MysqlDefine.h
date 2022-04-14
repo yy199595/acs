@@ -34,4 +34,10 @@ namespace Sentry
 		std::string mUser;
 		std::string mPassword;
 	};
+
+	class MysqlAsyncTask
+	{
+	 public:
+		virtual void Run(MysqlSocket * mysql) = 0;
+	};
 }

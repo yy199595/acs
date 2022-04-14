@@ -26,7 +26,7 @@ namespace Sentry
 		}
 	 protected:
 		void Awake() final;
-		void OnStart() final;
+		bool OnStart() final;
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnLuaRegister(lua_State * lua) final;

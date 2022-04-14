@@ -14,10 +14,6 @@ namespace Sentry
 		~TcpServerComponent() final = default;
 
 	 public:
-		const std::string& GetHostIp() const
-		{
-			return this->mHostIp;
-		}
 		const ListenConfig * GetTcpConfig(const std::string & name);
 		void GetListenConfigs(std::vector<const ListenConfig*>& configs);
 		std::string GetTcpAddress(const std::string & name);
@@ -31,7 +27,6 @@ namespace Sentry
 	private:
 		bool LoadServerConfig();
 	 private:
-		std::string mHostIp;
 		std::set<std::string> mWhiteList;    //白名单
 		std::vector<ListenConfig*> mListenerConfigs;
 		std::vector<NetworkListener*> mListeners;

@@ -2,7 +2,7 @@
 
 #include"Protocol/s2s.pb.h"
 #include"DB/Mysql/MysqlClient.h"
-#include"Component/Mysql/MysqlHelper.h"
+#include"DB/Mysql/MysqlHelper.h"
 #include"Component/RpcService/LocalServerRpc.h"
 
 namespace Sentry
@@ -28,7 +28,7 @@ namespace Sentry
 		XCode Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response);
 
 	protected:
-		void OnStart() final;
+		bool OnStart() final;
 		bool OnInitService(ServiceMethodRegister & methodRegister);
 	 private:
 		std::string mJson;

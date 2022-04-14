@@ -60,9 +60,9 @@ namespace Sentry
 			LOG_ERROR("allot redis client failure");
 			return nullptr;
 		}
-		auto response = redisClient->InvokeCommand(request)->Await();
+		std::shared_ptr<RedisResponse> response = redisClient->InvokeCommand(request)->Await();
 #ifdef __DEBUG__
-		LOG_INFO("invoke redis command use time << " << elapsedTimer.GetMs() << " ms");
+		LOG_INFO("invoke redis command use time [" << elapsedTimer.GetMs() << "ms]");
 #endif
 		if (!this->mWaitAllotClients.empty())
 		{
@@ -109,7 +109,7 @@ namespace Sentry
 		return false;
 	}
 
-	void RedisComponent::OnStart()
+	bool RedisComponent::OnStart()
 	{
 		std::string path;
 		std::vector<std::string> luaFiles;
@@ -135,21 +135,23 @@ namespace Sentry
 			if (redisClient == nullptr)
 			{
 				LOG_FATAL("connect redis " << address << " failure");
-				return;
+				return false;
 			}
 			this->mFreeClients.emplace(redisClient);
 		}
 
 		for (const std::string& file : luaFiles)
 		{
-			LOG_CHECK_RET(this->LoadLuaScript(file));
+			LOG_CHECK_RET_FALSE(this->LoadLuaScript(file));
 			LOG_INFO("load redis script " << file << " successful");
 		}
 #ifdef __DEBUG__
 		this->InvokeCommand("FLUSHALL")->IsOk();
 #endif
+		this->SubscribeMessage();
 		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
+		return true;
 	}
 
 	std::shared_ptr<RedisClient> RedisComponent::MakeRedisClient(const std::string& name)
@@ -161,7 +163,6 @@ namespace Sentry
 #endif
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, name);
 		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy);
-		LOG_INFO("start connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "]");
 
 		for (size_t index = 0; index < 3; index++)
 		{
@@ -178,9 +179,10 @@ namespace Sentry
 						return nullptr;
 					}
 				}
-				LOG_INFO("connect redis successful");
+				LOG_INFO("connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "] successful");
 				return redisCommandClient;
 			}
+			LOG_ERROR("connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "] failure");
 		}
 		return nullptr;
 	}
@@ -275,7 +277,7 @@ namespace Sentry
 					const std::string& service = subService->GetName();
 					if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
 					{
-						LOG_INFO("subscribe channel " << service << '.' << name << "successful");
+						LOG_INFO("subscribe channel [" << service << '.' << name << "] successful");
 					}
 				}
 			}
@@ -285,7 +287,6 @@ namespace Sentry
 
 	void RedisComponent::StartPubSub()
 	{
-		this->SubscribeMessage();
 		while (this->mSubRedisClient)
 		{
 			if (!this->mSubRedisClient->IsOpen())

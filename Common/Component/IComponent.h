@@ -11,7 +11,7 @@ namespace Sentry
 	class IStart
 	{
 	 public:
-		virtual void OnStart() = 0;
+		virtual bool OnStart() = 0;
 	};
 
 	class IComplete

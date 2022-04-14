@@ -9,7 +9,6 @@ namespace Sentry
 	bool TcpServerComponent::LoadServerConfig()
 	{
 		const ServerConfig& config = App::Get()->GetConfig();
-		config.GetMember("listener", "ip", this->mHostIp);
 		const rapidjson::Value* jsonValue = config.GetJsonValue("listener");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
@@ -23,14 +22,11 @@ namespace Sentry
 			if (jsonObject.IsObject())
 			{
 				ListenConfig* listenConfig = new ListenConfig();
-				listenConfig->Port = 0;
-				listenConfig->Ip = this->mHostIp;
-				if (jsonObject.HasMember("port"))
-				{
-					listenConfig->Port = jsonObject["port"].GetUint();
-					listenConfig->Count = jsonObject["count"].GetInt();
-				}
+
 				listenConfig->Name = iter->first;
+				listenConfig->Ip = jsonObject["ip"].GetString();
+				listenConfig->Port = jsonObject["port"].GetUint();
+				listenConfig->Count = jsonObject["count"].GetInt();
 				listenConfig->Handler = jsonObject["component"].GetString();;
 				listenConfig->mAddress = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
 				this->mListenerConfigs.emplace_back(listenConfig);
@@ -97,7 +93,7 @@ namespace Sentry
 				if (listener->StartListen(listenerHandler))
 				{
 					const ListenConfig& config = listener->GetConfig();
-					LOG_DEBUG(config.Name << " listen " << config.Ip << ":" << config.Port << " successful");
+					LOG_DEBUG(config.Name << " listen " << config.mAddress << " successful");
 				}
 			}
 		}

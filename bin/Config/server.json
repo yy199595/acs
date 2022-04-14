@@ -57,6 +57,7 @@
         }
     },
     "mysql": {
+        "count": 2,
         "ip": "114.115.167.51",
         "port": 3306,
         "user": "yjz",
@@ -66,7 +67,7 @@
         "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
-        "count": 5,
+        "count": 2,
         "lua": "./Script/RedisCommand",
         "passwd": "199595yjz."
     },
@@ -87,8 +88,7 @@
         "GateClientComponent",
         "HttpClientComponent",
         "MysqlProxyComponent",
-        "EntityMgrComponent",
-        "ClientComponent"
+        "EntityMgrComponent"
     ],
     "service":
     [
@@ -102,6 +102,7 @@
     [
         "GateService",
         "ChatService",
+        "MysqlService",
         "HttpUserService",
         "LocalSubService"
     ],

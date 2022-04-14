@@ -1,6 +1,6 @@
 #include"MysqlTaskSource.h"
 #include"Json/JsonWriter.h"
-#include"Component/Mysql/MysqlHelper.h"
+#include"MysqlHelper.h"
 namespace Sentry
 {
 	MysqlTaskSource::MysqlTaskSource(const std::string & sql)

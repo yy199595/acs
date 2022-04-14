@@ -31,7 +31,7 @@ namespace Sentry
 		return !this->mMysqlClients.empty();
 	}
 
-	void MysqlService::OnStart()
+	bool MysqlService::OnStart()
 	{
 		std::string address = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
 		for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
@@ -39,11 +39,11 @@ namespace Sentry
 			if(mysqlClient->Start() != 0)
 			{
 				LOG_ERROR("connect mysql [" << address << "] failure");
-				std::logic_error(fmt::format("connect mysql [{0}] failure", address));
-				return;
+				return false;
 			}
 			LOG_INFO("connect mysql [" << address << "] successful");
 		}
+		return this->mMysqlClients[0]->InitTable("db.proto") == XCode::Successful;
 	}
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response)

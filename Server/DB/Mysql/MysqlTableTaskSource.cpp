@@ -1,27 +1,53 @@
-﻿#include"TableOperator.h"
+﻿#include"MysqlTableTaskSource.h"
 #include"fstream"
 #include"App/App.h"
 #include"Protocol/db.pb.h"
 
 namespace Sentry
 {
-    TableOperator::TableOperator(MysqlSocket *socket)
-    {
-        this->mMysqlSocket = socket;
-    }
+	void MysqlTableTaskSource::Run(MysqlSocket* mysql)
+	{
+		const DescriptorPool * descriptorPool = google::protobuf::DescriptorPool::generated_pool();
+		const FileDescriptor * desc = descriptorPool->FindFileByName(this->mName);
+		for (int x = 0; x < desc->message_type_count(); x++)
+		{
+			const Descriptor * messageDesc = desc->message_type(x);
+			if(!this->InitDb(mysql, messageDesc->name()))
+			{
+				this->mTaskSource.SetResult(XCode::Failure);
+				return;
+			}
+			for (int y = 0; y < messageDesc->nested_type_count(); y++)
+			{
+				const Descriptor * desc = messageDesc->nested_type(y);
+				if(desc == nullptr || !this->InitTable(mysql, desc))
+				{
+					this->mTaskSource.SetResult(XCode::Failure);
+					return;
+				}
+			}
+		}
+		this->mTaskSource.SetResult(XCode::Successful);
+	}
 
-    bool TableOperator::InitDb(const std::string &db)
+	XCode MysqlTableTaskSource::InitMysqlTable(const std::string& name)
+	{
+		this->mName = name;
+		return this->mTaskSource.Await();
+	}
+
+    bool MysqlTableTaskSource::InitDb(MysqlSocket * mysql, const std::string &db)
     {
-        if (mysql_select_db(this->mMysqlSocket, db.c_str()) != 0)
+        if (mysql_select_db(mysql, db.c_str()) != 0)
         {
             const std::string sql = "CREATE DATABASE " + db;
-            if (mysql_real_query(mMysqlSocket, sql.c_str(), sql.length()) != 0)
+            if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
             {
-                const char *err = mysql_error(mMysqlSocket);
+                const char *err = mysql_error(mysql);
                 LOG_ERROR("create db " << db << " failure : " << err);
                 return false;
             }
-            if (mysql_select_db(this->mMysqlSocket, db.c_str()) == 0)
+            if (mysql_select_db(mysql, db.c_str()) == 0)
             {
                 LOG_INFO("create db " << db << " successful");
                 return true;
@@ -31,36 +57,35 @@ namespace Sentry
         return true;
     }
 
-    bool TableOperator::InitTable(const Descriptor *typeDescriptor)
+    bool MysqlTableTaskSource::InitTable(MysqlSocket * mysql, const Descriptor *typeDescriptor)
     {
         std::string sql = "desc " + typeDescriptor->name();
-        if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
+        if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
         {
-            if (!this->CreateMysqlTable(typeDescriptor))
+            if (!this->CreateMysqlTable(mysql, typeDescriptor))
             {
-                LOG_ERROR("create new table" << typeDescriptor->name() << "failure"
-                          << mysql_error(this->mMysqlSocket));
+                LOG_ERROR("create new table" << typeDescriptor->name() << "failure" << mysql_error(mysql));
                 return false;
             }
             LOG_DEBUG("create new table {0} successful " << typeDescriptor->name());
         }
-        else if (!this->UpdateMysqlTable(typeDescriptor))
+        else if (!this->UpdateMysqlTable(mysql, typeDescriptor))
         {
             return false;
         }
         return true;
     }
 
-    bool TableOperator::UpdateMysqlTable(const Descriptor *descriptor)
+    bool MysqlTableTaskSource::UpdateMysqlTable(MysqlSocket * mysql, const Descriptor *descriptor)
     {
-        MysqlQueryResult *queryResult = mysql_store_result(this->mMysqlSocket);
+        MysqlQueryResult *queryResult = mysql_store_result(mysql);
         if (queryResult == nullptr)
         {
             return false;
         }
         std::set<std::string> fieldSet;
         unsigned long rowCount = mysql_num_rows(queryResult);
-        unsigned int fieldCount = mysql_field_count(mMysqlSocket);
+        unsigned int fieldCount = mysql_field_count(mysql);
         for (unsigned long count = 0; count < rowCount; count++)
         {
             MYSQL_ROW row = mysql_fetch_row(queryResult);
@@ -82,19 +107,19 @@ namespace Sentry
             auto iter = fieldSet.find(fileDesc->name());
             if (iter == fieldSet.end())
             {
-                if (!this->AddNewField(descriptor->name(), fileDesc))
+                if (!this->AddNewField(mysql, descriptor->name(), fileDesc))
                 {
-                    LOG_ERROR("[mysql error ] " << mysql_error(this->mMysqlSocket));
-                    LOG_ERROR("add field " << fileDesc->name() << " to " << descriptor->name() << " failure");
+                    std::cerr <<"[mysql error ] " << mysql_error(mysql) << std::endl;
+					std::cerr << "add field " << fileDesc->name() << " to " << descriptor->name() << " failure" << std::endl;
                     return false;
                 }
-                LOG_DEBUG("add field " << fileDesc->name() << " to " << descriptor->name() << " successful");
+                std::cout << "add field " << fileDesc->name() << " to " << descriptor->name() << " successful" << std::endl;
             }
         }
         return true;
     }
 
-    bool TableOperator::AddNewField(const std::string &table, const FieldDescriptor *fieldDesc)
+    bool MysqlTableTaskSource::AddNewField(MysqlSocket * mysql, const std::string &table, const FieldDescriptor *fieldDesc)
     {
         std::stringstream sqlStream;
         sqlStream << "alter table " << table << " add " << fieldDesc->name();
@@ -126,16 +151,16 @@ namespace Sentry
                 return false;
         }
         const std::string sql = sqlStream.str();
-        if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
+        if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
         {
-            LOG_ERROR(mysql_error(mMysqlSocket));
-            return false;
+			std::cerr << "mysql error " << mysql_error(mysql) << std::endl;
+			return false;
         }
         LOG_INFO(sql);
         return true;
     }
 
-    bool TableOperator::CreateMysqlTable(const Descriptor *descriptor)
+    bool MysqlTableTaskSource::CreateMysqlTable(MysqlSocket * mysql, const Descriptor *descriptor)
     {
         std::stringstream sqlCommand;
         sqlCommand << "create table `" << descriptor->name() << "`(\n";
@@ -182,9 +207,9 @@ namespace Sentry
         sqlCommand << "PRIMARY KEY (`" << fileDesc->name() << "`)";
         sqlCommand << ")ENGINE=InnoDB DEFAULT CHARSET = utf8;";
         const std::string sql = sqlCommand.str();
-        if (mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.length()) != 0)
+        if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
         {
-            LOG_ERROR(mysql_error(mMysqlSocket));
+            std::cerr << "mysql error : %s\n" << mysql_error(mysql) << std::endl;
             return false;
         }
         return true;

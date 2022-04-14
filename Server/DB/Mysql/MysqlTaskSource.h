@@ -5,13 +5,14 @@
 #include"Async/TaskSource.h"
 namespace Sentry
 {
+
     class TaskComponent;
-	class MysqlTaskSource
+	class MysqlTaskSource : public MysqlAsyncTask
     {
     public:
         explicit MysqlTaskSource(const std::string & sql);
     public:
-		void Run(MysqlSocket * mysql);
+		void Run(MysqlSocket * mysql) final;
         XCode Await(s2s::Mysql::Response & response);
     private:
         void WriteValue(Json::Writer &jsonWriter, MYSQL_FIELD *field, const char *data, long size);

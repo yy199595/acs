@@ -66,6 +66,7 @@ namespace Sentry
 		bool LoadComponent();
 		void StartAllComponent();
 		bool InitComponent(Component* component);
+		void OnAddNewService(Component * component);
 		bool AddComponentByName(const std::string& name);
 	 public:
 		int Run();
