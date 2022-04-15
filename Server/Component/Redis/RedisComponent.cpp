@@ -53,7 +53,7 @@ namespace Sentry
 		std::shared_ptr<RedisClient> redisClient = this->AllotRedisClient();
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
-		LOG_WARN("redis command name = " << redisClient->GetName());
+		LOG_WARN("redis command name = " << request->ToJson());
 #endif
 		if (redisClient == nullptr)
 		{
@@ -125,7 +125,6 @@ namespace Sentry
 			LOG_ERROR("connect redis " << address << " failure");
 			return false;
 		}
-		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 
 		for (size_t index = 0; index < this->mRedisConfig.mCount; index++)
 		{
@@ -147,6 +146,8 @@ namespace Sentry
 #ifdef __DEBUG__
 		this->InvokeCommand("FLUSHALL")->IsOk();
 #endif
+		this->SubscribeMessage();
+		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
 		return true;
 	}
@@ -284,7 +285,6 @@ namespace Sentry
 
 	void RedisComponent::StartPubSub()
 	{
-		this->SubscribeMessage();
 		while (this->mSubRedisClient)
 		{
 			if (!this->mSubRedisClient->IsOpen())

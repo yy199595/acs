@@ -34,6 +34,7 @@ namespace Sentry
         template<typename ... Args>
         void InitParameter(Args &&... args);
     public:
+		const std::string ToJson();
         void AddParameter(int value);
         void AddParameter(long long value);
         void AddParameter(const Message & message);

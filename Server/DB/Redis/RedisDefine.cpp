@@ -4,6 +4,7 @@
 
 #include"RedisDefine.h"
 #include"Pool/MessagePool.h"
+#include"Json/JsonWriter.h"
 namespace Sentry
 {
     RedisRequest::RedisRequest(const std::string &cmd)
@@ -47,6 +48,18 @@ namespace Sentry
             readStream << "$" << parameter.size() << "\r\n" << parameter << "\r\n";
         }
     }
+
+	const std::string RedisRequest::ToJson()
+	{
+		Json::Writer jsonWriter;
+		jsonWriter.StartArray(this->mCommand.c_str());
+		for(const std::string & str : this->mParameters)
+		{
+			jsonWriter.AddMember(str);
+		}
+		jsonWriter.EndArray();
+		return jsonWriter.ToJsonString();
+	}
 }
 
 namespace Sentry

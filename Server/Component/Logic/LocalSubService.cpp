@@ -119,7 +119,7 @@ namespace Sentry
 	void LocalSubService::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer jsonWriter;
-		std::vector<std::string> tempArray;
+		jsonWriter.StartArray("service");
 		std::vector<std::string> components;
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
@@ -127,14 +127,13 @@ namespace Sentry
 			LocalServerRpc * localServerRpc = this->GetApp()->GetComponent<LocalServerRpc>(name);
 			if(localServerRpc != nullptr && localServerRpc->IsStartService())
 			{
-				tempArray.emplace_back(name);
+				jsonWriter.AddMember(name);
 			}
 		}
-		const std::string & address = this->GetApp()->GetConfig().GetRpcAddress();
 
-		jsonWriter.AddMember("rpc", address);
+		jsonWriter.EndArray();
 		jsonWriter.AddMember("response", true);
-		jsonWriter.AddMember("service", tempArray);
+		jsonWriter.AddMember("rpc", this->mRpcAddress);
 		long long number = this->Publish("LocalSubService.Push", jsonWriter);
 		LOG_DEBUG("publish successful count = " << number);
 	}

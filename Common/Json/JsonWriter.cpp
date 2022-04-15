@@ -194,4 +194,9 @@ namespace Json
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.Int((int)code);
 	}
+
+	bool Writer::AddMember(const std::string& value)
+	{
+		return this->mJsonWriter.String(value.c_str(), value.size());
+	}
 }
