@@ -72,15 +72,6 @@ namespace Sentry
 		{
 			return component;
 		}
-
-		auto iter = this->mComponentMap.begin();
-		for (; iter != this->mComponentMap.end(); iter++)
-		{
-			if (component = dynamic_cast<T*>(iter->second))
-			{
-				return component;
-			}
-		}
 		return nullptr;
 	}
 

@@ -33,7 +33,7 @@ namespace Sentry
 			return true;
 		}
 
-		void OnSystemUpdate();
+		void OnSystemUpdate() final;
 
 		bool AddTimerToWheel(long long timerId);
 

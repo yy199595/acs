@@ -21,7 +21,7 @@ namespace Sentry
 	public:
 		bool IsStartComplete() final { return true; }
 		bool Publish(const std::string & func, Json::Writer & jsonWriter);
-		bool IsStartService() { return this->mServiceRegister != nullptr; }
+		bool IsStartService() final { return this->mServiceRegister != nullptr; }
 		bool Publish(const std::string & address, const std::string & func, Json::Writer & jsonWriter);
 	protected:
 		bool LateAwake() override;

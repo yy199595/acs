@@ -209,21 +209,20 @@ namespace Sentry
 			}
 		}
 
+		LOG_WARN("start all component complete");
 		for (const std::string& name: components)
 		{
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
 				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
-				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
+				if (localServerRpc == nullptr || localServerRpc->IsStartService())
 				{
-					continue;
-				}
-
-				IComplete* complete = component->Cast<IComplete>();
-				if (complete != nullptr)
-				{
-					complete->OnComplete();
+					IComplete* complete = component->Cast<IComplete>();
+					if (complete != nullptr)
+					{
+						complete->OnComplete();
+					}
 				}
 			}
 		}

@@ -120,7 +120,7 @@ namespace Sentry
 				this->mRedisConfig.mIp, this->mRedisConfig.mPort);
 
 		this->mSubRedisClient = this->MakeRedisClient("Subscribe");
-		while(this->mSubRedisClient == nullptr)
+		if(this->mSubRedisClient == nullptr)
 		{
 			LOG_ERROR("connect redis " << address << " failure");
 			return false;

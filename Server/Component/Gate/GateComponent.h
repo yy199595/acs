@@ -1,5 +1,4 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-member-init"
+
 //
 // Created by mac on 2021/11/28.
 //
@@ -9,7 +8,7 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class GateComponent : public Component,
+	class GateComponent final : public Component,
 						  public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>
 	{
 	 public:
@@ -29,5 +28,3 @@ namespace Sentry
 
 
 #endif //GAMEKEEPER_PROTOPROXYCOMPONENT_H
-
-#pragma clang diagnostic pop
