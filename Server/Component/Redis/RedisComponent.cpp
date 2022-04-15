@@ -123,10 +123,9 @@ namespace Sentry
 		while(this->mSubRedisClient == nullptr)
 		{
 			LOG_ERROR("connect redis " << address << " failure");
-			this->mTaskComponent->Sleep(1000);
-			this->mSubRedisClient = this->MakeRedisClient("Subscribe");
-
+			return false;
 		}
+		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 
 		for (size_t index = 0; index < this->mRedisConfig.mCount; index++)
 		{
@@ -148,8 +147,6 @@ namespace Sentry
 #ifdef __DEBUG__
 		this->InvokeCommand("FLUSHALL")->IsOk();
 #endif
-		this->SubscribeMessage();
-		this->mTaskComponent->Start(&RedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&RedisComponent::CheckRedisClient, this);
 		return true;
 	}
@@ -287,6 +284,7 @@ namespace Sentry
 
 	void RedisComponent::StartPubSub()
 	{
+		this->SubscribeMessage();
 		while (this->mSubRedisClient)
 		{
 			if (!this->mSubRedisClient->IsOpen())

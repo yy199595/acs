@@ -57,7 +57,6 @@
         }
     },
     "mysql": {
-        "count": 2,
         "ip": "114.115.167.51",
         "port": 3306,
         "user": "yjz",
@@ -67,7 +66,7 @@
         "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
-        "count": 2,
+        "count": 4,
         "lua": "./Script/RedisCommand",
         "passwd": "199595yjz."
     },
