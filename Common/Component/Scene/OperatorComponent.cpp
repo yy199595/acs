@@ -70,12 +70,6 @@ namespace Sentry
 		long long ms = nextTime - Helper::Time::GetNowSecTime();
 		this->mTimerComponent->AsyncWait(ms * 1000, &OperatorComponent::StartRefreshDay,
 			this, component->GetName());
-#ifdef __DEBUG__
-		Helper::Time::GetHourMinSecond(ms, hour, minute, second);
-		std::string str = fmt::format("refresh {0} new day after "
-									  "{1}小时{1}分{2}分", component->GetName(), hour, minute, second);
-		LOG_DEBUG(str);
-#endif
 	}
 
 	void OperatorComponent::StartRefreshDay(const std::string& name)

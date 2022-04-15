@@ -52,7 +52,7 @@ namespace Lua
 
 	bool Table::Serialization(std::string& outString)
 	{
-
+		return true;
 	}
 
 	bool Table::Serialization(Message& message)
