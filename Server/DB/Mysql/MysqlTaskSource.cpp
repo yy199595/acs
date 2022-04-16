@@ -3,20 +3,15 @@
 #include"MysqlHelper.h"
 namespace Sentry
 {
-	MysqlTaskSource::MysqlTaskSource(const std::string & sql)
-		: mSqlCommand(sql)
+	MysqlTaskSource::MysqlTaskSource(const std::string & sql, s2s::Mysql::Response & response)
+		: mSqlCommand(sql), mResponse(response)
 	{
 
 	}
 
-	XCode MysqlTaskSource::Await(s2s::Mysql::Response & response)
+	XCode MysqlTaskSource::Await()
 	{
-		if (this->mTaskSource.Await() == XCode::Successful)
-		{
-			response.CopyFrom(this->mResponse);
-			return XCode::Successful;
-		}
-		return XCode::MysqlInvokeFailure;
+		return this->mTaskSource.Await();
 	}
 
 	void MysqlTaskSource::Run(MysqlSocket* mysqlSocket)

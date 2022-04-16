@@ -53,24 +53,32 @@ namespace Sentry
 
 	XCode MysqlClient::InitTable(const std::string& pb)
 	{
-		std::shared_ptr<MysqlTableTaskSource> tableTaskSource(new MysqlTableTaskSource());
+		std::shared_ptr<MysqlTableTaskSource> tableTaskSource
+			= std::make_shared<MysqlTableTaskSource>(pb);
 		if (!this->mTaskQueue.enqueue(tableTaskSource))
 		{
 			return XCode::MysqlInitTaskFail;
 		}
 		this->mThreadVariable.notify_one();
-		return tableTaskSource->InitMysqlTable(pb);
+		return tableTaskSource->Await();
 	}
 
 	XCode MysqlClient::Invoke(const std::string& sql, s2s::Mysql::Response & response)
 	{
-		std::shared_ptr<MysqlTaskSource> taskSource(new MysqlTaskSource(sql));
-		if(!this->mTaskQueue.enqueue(taskSource))
+		std::shared_ptr<MysqlTaskSource> taskSource
+			= std::make_shared<MysqlTaskSource>(sql, response);
+		if (!this->mTaskQueue.enqueue(taskSource))
 		{
 			return XCode::MysqlInitTaskFail;
 		}
 		this->mThreadVariable.notify_one();
-		return taskSource->Await(response);
+		XCode code = taskSource->Await();
+		if (code != XCode::Successful)
+		{
+			LOG_ERROR(sql);
+			LOG_ERROR(response.error());
+		}
+		return XCode::Successful;
 	}
 
 }

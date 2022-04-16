@@ -16,9 +16,10 @@ namespace Sentry
 
 	bool HttpUserService::LateAwake()
 	{
+		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
-		return HttpService::LateAwake();
+		return true;
 	}
 
 	bool HttpUserService::OnInitService(HttpServiceRegister& serviceRegister)

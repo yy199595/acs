@@ -1,7 +1,4 @@
-﻿#ifdef JE_MALLOC
-#include"jemalloc/jemalloc.h"
-#endif
-#include"App/App.h"
+﻿#include"App/App.h"
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
@@ -11,7 +8,7 @@
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"
-#include"Component/Http/HttpClientComponent.h"
+#include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include<Component/Telnet/ConsoleComponent.h>
 #include<Component/Rpc/RpcComponent.h>
@@ -58,7 +55,7 @@ void RegisterComponent()
     ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
 
 //http
-    ComponentFactory::Add<HttpClientComponent>("HttpClientComponent");
+    ComponentFactory::Add<HttpComponent>("HttpComponent");
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
 	ComponentFactory::Add<LuaRegisterComponent>("LuaRegisterComponent");

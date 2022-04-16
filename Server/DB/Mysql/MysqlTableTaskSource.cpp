@@ -5,6 +5,11 @@
 
 namespace Sentry
 {
+	MysqlTableTaskSource::MysqlTableTaskSource(const std::string& name)
+		: mName(name)
+	{
+
+	}
 	void MysqlTableTaskSource::Run(MysqlSocket* mysql)
 	{
 		const DescriptorPool * descriptorPool = google::protobuf::DescriptorPool::generated_pool();
@@ -30,10 +35,15 @@ namespace Sentry
 		this->mTaskSource.SetResult(XCode::Successful);
 	}
 
-	XCode MysqlTableTaskSource::InitMysqlTable(const std::string& name)
+	XCode MysqlTableTaskSource::Await()
 	{
-		this->mName = name;
-		return this->mTaskSource.Await();
+		XCode code = this->mTaskSource.Await();
+		if(code != XCode::Successful)
+		{
+			LOG_ERROR(this->mError);
+			return code;
+		}
+		return XCode::Successful;
 	}
 
     bool MysqlTableTaskSource::InitDb(MysqlSocket * mysql, const std::string &db)
@@ -43,16 +53,10 @@ namespace Sentry
             const std::string sql = "CREATE DATABASE " + db;
             if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
             {
-                const char *err = mysql_error(mysql);
-                LOG_ERROR("create db " << db << " failure : " << err);
+				this->mError = mysql_error(mysql);
                 return false;
             }
-            if (mysql_select_db(mysql, db.c_str()) == 0)
-            {
-                LOG_INFO("create db " << db << " successful");
-                return true;
-            }
-            return false;
+            return mysql_select_db(mysql, db.c_str()) == 0;
         }
         return true;
     }
@@ -64,10 +68,9 @@ namespace Sentry
         {
             if (!this->CreateMysqlTable(mysql, typeDescriptor))
             {
-                LOG_ERROR("create new table" << typeDescriptor->name() << "failure" << mysql_error(mysql));
                 return false;
             }
-            LOG_DEBUG("create new table {0} successful " << typeDescriptor->name());
+            std::cout <<"create new table {0} successful " << typeDescriptor->name() << std::endl;
         }
         else if (!this->UpdateMysqlTable(mysql, typeDescriptor))
         {
@@ -109,8 +112,7 @@ namespace Sentry
             {
                 if (!this->AddNewField(mysql, descriptor->name(), fileDesc))
                 {
-                    std::cerr <<"[mysql error ] " << mysql_error(mysql) << std::endl;
-					std::cerr << "add field " << fileDesc->name() << " to " << descriptor->name() << " failure" << std::endl;
+					this->mError = mysql_error(mysql);
                     return false;
                 }
                 std::cout << "add field " << fileDesc->name() << " to " << descriptor->name() << " successful" << std::endl;
@@ -153,7 +155,7 @@ namespace Sentry
         const std::string sql = sqlStream.str();
         if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
         {
-			std::cerr << "mysql error " << mysql_error(mysql) << std::endl;
+			this->mError = mysql_error(mysql);
 			return false;
         }
         LOG_INFO(sql);
@@ -163,8 +165,20 @@ namespace Sentry
     bool MysqlTableTaskSource::CreateMysqlTable(MysqlSocket * mysql, const Descriptor *descriptor)
     {
         std::stringstream sqlCommand;
+		const FieldDescriptor *fileDesc = descriptor->FindFieldByNumber(1);
+		switch(fileDesc->type())
+		{
+		case FieldDescriptor::TYPE_INT32:
+		case FieldDescriptor::TYPE_INT64:
+		case FieldDescriptor::TYPE_UINT32:
+		case FieldDescriptor::TYPE_UINT64:
+		case FieldDescriptor::TYPE_STRING:
+			break;
+		default:
+			this->mError = fmt::format("[{0}.{1}] type error", descriptor->name(),  fileDesc->name());
+			return false;
+		}
         sqlCommand << "create table `" << descriptor->name() << "`(\n";
-        const FieldDescriptor *fileDesc = descriptor->FindFieldByNumber(1);
         for (int index = 1; index <= descriptor->field_count(); index++)
         {
             fileDesc = descriptor->FindFieldByNumber(index);
@@ -200,16 +214,18 @@ namespace Sentry
                     sqlCommand << "BLOB(64) DEFAULT NULL,\n";
                     break;
                 default:
-                    return false;
+					this->mError = fmt::format("[{0}.{1}] type error", descriptor->name(),  fileDesc->name());
+				return false;
             }
         }
         fileDesc = descriptor->FindFieldByNumber(1);
-        sqlCommand << "PRIMARY KEY (`" << fileDesc->name() << "`)";
+		sqlCommand << "UNIQUE KEY (`" << fileDesc->name() << "`),\n";
+		sqlCommand << "PRIMARY KEY (`" << fileDesc->name() << "`)";
         sqlCommand << ")ENGINE=InnoDB DEFAULT CHARSET = utf8;";
         const std::string sql = sqlCommand.str();
         if (mysql_real_query(mysql, sql.c_str(), sql.length()) != 0)
         {
-            std::cerr << "mysql error : %s\n" << mysql_error(mysql) << std::endl;
+			this->mError = mysql_error(mysql);
             return false;
         }
         return true;

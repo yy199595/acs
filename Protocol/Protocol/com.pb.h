@@ -1514,7 +1514,7 @@ class Value :
 // -------------------------------------------------------------------
 
 class Rpc_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Component.Rpc.Request) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Rpc.Request) */ {
  public:
   Rpc_Request();
   virtual ~Rpc_Request();
@@ -1641,7 +1641,7 @@ class Rpc_Request :
   ::google::protobuf::int32 method_id() const;
   void set_method_id(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:com.Component.Rpc.Request)
+  // @@protoc_insertion_point(class_scope:com.Rpc.Request)
  private:
   class HasBitSetters;
 
@@ -1657,7 +1657,7 @@ class Rpc_Request :
 // -------------------------------------------------------------------
 
 class Rpc_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Component.Rpc.Response) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Rpc.Response) */ {
  public:
   Rpc_Response();
   virtual ~Rpc_Response();
@@ -1792,7 +1792,7 @@ class Rpc_Response :
   ::google::protobuf::int32 code() const;
   void set_code(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:com.Component.Rpc.Response)
+  // @@protoc_insertion_point(class_scope:com.Rpc.Response)
  private:
   class HasBitSetters;
 
@@ -1808,7 +1808,7 @@ class Rpc_Response :
 // -------------------------------------------------------------------
 
 class Rpc :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Component.Rpc) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Rpc) */ {
  public:
   Rpc();
   virtual ~Rpc();
@@ -1905,7 +1905,7 @@ class Rpc :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.Component.Rpc)
+  // @@protoc_insertion_point(class_scope:com.Rpc)
  private:
   class HasBitSetters;
 
@@ -2275,13 +2275,13 @@ inline void Rpc_Request::clear_user_id() {
   user_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Request::user_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Request.user_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.user_id)
   return user_id_;
 }
 inline void Rpc_Request::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Request.user_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.user_id)
 }
 
 // int64 rpc_id = 2;
@@ -2289,13 +2289,13 @@ inline void Rpc_Request::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Request::rpc_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Request.rpc_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.rpc_id)
   return rpc_id_;
 }
 inline void Rpc_Request::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Request.rpc_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.rpc_id)
 }
 
 // int32 method_id = 3;
@@ -2303,13 +2303,13 @@ inline void Rpc_Request::clear_method_id() {
   method_id_ = 0;
 }
 inline ::google::protobuf::int32 Rpc_Request::method_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Request.method_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.method_id)
   return method_id_;
 }
 inline void Rpc_Request::set_method_id(::google::protobuf::int32 value) {
   
   method_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Request.method_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.method_id)
 }
 
 // int64 socket_id = 4;
@@ -2317,13 +2317,13 @@ inline void Rpc_Request::clear_socket_id() {
   socket_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Request::socket_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Request.socket_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.socket_id)
   return socket_id_;
 }
 inline void Rpc_Request::set_socket_id(::google::protobuf::int64 value) {
   
   socket_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Request.socket_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.socket_id)
 }
 
 // .google.protobuf.Any Data = 5;
@@ -2332,12 +2332,12 @@ inline bool Rpc_Request::has_data() const {
 }
 inline const ::google::protobuf::Any& Rpc_Request::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Request.Data)
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.Data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* Rpc_Request::release_data() {
-  // @@protoc_insertion_point(field_release:com.Component.Rpc.Request.Data)
+  // @@protoc_insertion_point(field_release:com.Rpc.Request.Data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -2349,7 +2349,7 @@ inline ::google::protobuf::Any* Rpc_Request::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:com.Component.Rpc.Request.Data)
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Request.Data)
   return data_;
 }
 inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
@@ -2368,7 +2368,7 @@ inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:com.Component.Rpc.Request.Data)
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Request.Data)
 }
 
 // -------------------------------------------------------------------
@@ -2380,13 +2380,13 @@ inline void Rpc_Response::clear_code() {
   code_ = 0;
 }
 inline ::google::protobuf::int32 Rpc_Response::code() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Response.code)
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.code)
   return code_;
 }
 inline void Rpc_Response::set_code(::google::protobuf::int32 value) {
   
   code_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Response.code)
+  // @@protoc_insertion_point(field_set:com.Rpc.Response.code)
 }
 
 // int64 rpc_id = 2;
@@ -2394,13 +2394,13 @@ inline void Rpc_Response::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Response::rpc_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Response.rpc_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.rpc_id)
   return rpc_id_;
 }
 inline void Rpc_Response::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Response.rpc_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Response.rpc_id)
 }
 
 // int64 user_id = 3;
@@ -2408,13 +2408,13 @@ inline void Rpc_Response::clear_user_id() {
   user_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Response::user_id() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Response.user_id)
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.user_id)
   return user_id_;
 }
 inline void Rpc_Response::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Response.user_id)
+  // @@protoc_insertion_point(field_set:com.Rpc.Response.user_id)
 }
 
 // string error_str = 4;
@@ -2422,41 +2422,41 @@ inline void Rpc_Response::clear_error_str() {
   error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& Rpc_Response::error_str() const {
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.error_str)
   return error_str_.GetNoArena();
 }
 inline void Rpc_Response::set_error_str(const ::std::string& value) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set:com.Rpc.Response.error_str)
 }
 #if LANG_CXX11
 inline void Rpc_Response::set_error_str(::std::string&& value) {
   
   error_str_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Response.error_str)
 }
 #endif
 inline void Rpc_Response::set_error_str(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_char:com.Rpc.Response.error_str)
 }
 inline void Rpc_Response::set_error_str(const char* value, size_t size) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Response.error_str)
 }
 inline ::std::string* Rpc_Response::mutable_error_str() {
   
-  // @@protoc_insertion_point(field_mutable:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Response.error_str)
   return error_str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Rpc_Response::release_error_str() {
-  // @@protoc_insertion_point(field_release:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_release:com.Rpc.Response.error_str)
   
   return error_str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2467,7 +2467,7 @@ inline void Rpc_Response::set_allocated_error_str(::std::string* error_str) {
     
   }
   error_str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error_str);
-  // @@protoc_insertion_point(field_set_allocated:com.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Response.error_str)
 }
 
 // .google.protobuf.Any Data = 5;
@@ -2476,12 +2476,12 @@ inline bool Rpc_Response::has_data() const {
 }
 inline const ::google::protobuf::Any& Rpc_Response::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:com.Component.Rpc.Response.Data)
+  // @@protoc_insertion_point(field_get:com.Rpc.Response.Data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* Rpc_Response::release_data() {
-  // @@protoc_insertion_point(field_release:com.Component.Rpc.Response.Data)
+  // @@protoc_insertion_point(field_release:com.Rpc.Response.Data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -2493,7 +2493,7 @@ inline ::google::protobuf::Any* Rpc_Response::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:com.Component.Rpc.Response.Data)
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Response.Data)
   return data_;
 }
 inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
@@ -2512,12 +2512,12 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:com.Component.Rpc.Response.Data)
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Response.Data)
 }
 
 // -------------------------------------------------------------------
 
-// Component.Rpc
+// Rpc
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop

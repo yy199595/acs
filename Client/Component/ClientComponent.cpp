@@ -6,8 +6,11 @@
 #include"Task/ClientRpcTask.h"
 #include"Other/ElapsedTimer.h"
 #include"Network/Http/HttpAsyncRequest.h"
-#include"Component/Http/HttpClientComponent.h"
+#include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
+
+
+#include"Component/Logic/HttpUserService.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -47,12 +50,20 @@ namespace Client
     {
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-        this->mHttpComponent = this->GetComponent<HttpClientComponent>();
+        this->mHttpComponent = this->GetComponent<HttpComponent>();
         return true;
     }
 
 	void ClientComponent::OnAllServiceStart()
 	{
+		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
+
+		Json::Writer jsonWriter;
+		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+		if(httpUserService->Post("logic/account/login", jsonWriter, jsonReader) == XCode::Successful)
+		{
+
+		}
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}
 

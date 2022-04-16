@@ -266,7 +266,7 @@ class ServerInfo :
 // -------------------------------------------------------------------
 
 class Rpc_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Component.Rpc.Request) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Request) */ {
  public:
   Rpc_Request();
   virtual ~Rpc_Request();
@@ -401,7 +401,7 @@ class Rpc_Request :
   ::google::protobuf::uint32 message_idx() const;
   void set_message_idx(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Component.Rpc.Request)
+  // @@protoc_insertion_point(class_scope:c2s.Rpc.Request)
  private:
   class HasBitSetters;
 
@@ -417,7 +417,7 @@ class Rpc_Request :
 // -------------------------------------------------------------------
 
 class Rpc_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Component.Rpc.Response) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Response) */ {
  public:
   Rpc_Response();
   virtual ~Rpc_Response();
@@ -552,7 +552,7 @@ class Rpc_Response :
   ::google::protobuf::int32 code() const;
   void set_code(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Component.Rpc.Response)
+  // @@protoc_insertion_point(class_scope:c2s.Rpc.Response)
  private:
   class HasBitSetters;
 
@@ -568,7 +568,7 @@ class Rpc_Response :
 // -------------------------------------------------------------------
 
 class Rpc :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Component.Rpc) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc) */ {
  public:
   Rpc();
   virtual ~Rpc();
@@ -665,7 +665,7 @@ class Rpc :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.Component.Rpc)
+  // @@protoc_insertion_point(class_scope:c2s.Rpc)
  private:
   class HasBitSetters;
 
@@ -2292,13 +2292,13 @@ inline void Rpc_Request::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Request::rpc_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Request.rpc_id)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.rpc_id)
   return rpc_id_;
 }
 inline void Rpc_Request::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Request.rpc_id)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.rpc_id)
 }
 
 // int64 sock_id = 2;
@@ -2306,13 +2306,13 @@ inline void Rpc_Request::clear_sock_id() {
   sock_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Request::sock_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Request.sock_id)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.sock_id)
   return sock_id_;
 }
 inline void Rpc_Request::set_sock_id(::google::protobuf::int64 value) {
   
   sock_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Request.sock_id)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.sock_id)
 }
 
 // string method_name = 3;
@@ -2320,41 +2320,41 @@ inline void Rpc_Request::clear_method_name() {
   method_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& Rpc_Request::method_name() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.method_name)
   return method_name_.GetNoArena();
 }
 inline void Rpc_Request::set_method_name(const ::std::string& value) {
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.method_name)
 }
 #if LANG_CXX11
 inline void Rpc_Request::set_method_name(::std::string&& value) {
   
   method_name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Request.method_name)
 }
 #endif
 inline void Rpc_Request::set_method_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Request.method_name)
 }
 inline void Rpc_Request::set_method_name(const char* value, size_t size) {
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Request.method_name)
 }
 inline ::std::string* Rpc_Request::mutable_method_name() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.method_name)
   return method_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Rpc_Request::release_method_name() {
-  // @@protoc_insertion_point(field_release:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.method_name)
   
   return method_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2365,7 +2365,7 @@ inline void Rpc_Request::set_allocated_method_name(::std::string* method_name) {
     
   }
   method_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), method_name);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Component.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.method_name)
 }
 
 // uint32 message_idx = 4;
@@ -2373,13 +2373,13 @@ inline void Rpc_Request::clear_message_idx() {
   message_idx_ = 0u;
 }
 inline ::google::protobuf::uint32 Rpc_Request::message_idx() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Request.message_idx)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.message_idx)
   return message_idx_;
 }
 inline void Rpc_Request::set_message_idx(::google::protobuf::uint32 value) {
   
   message_idx_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Request.message_idx)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.message_idx)
 }
 
 // .google.protobuf.Any data = 5;
@@ -2388,12 +2388,12 @@ inline bool Rpc_Request::has_data() const {
 }
 inline const ::google::protobuf::Any& Rpc_Request::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Request.data)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* Rpc_Request::release_data() {
-  // @@protoc_insertion_point(field_release:c2s.Component.Rpc.Request.data)
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -2405,7 +2405,7 @@ inline ::google::protobuf::Any* Rpc_Request::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:c2s.Component.Rpc.Request.data)
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.data)
   return data_;
 }
 inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
@@ -2424,7 +2424,7 @@ inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:c2s.Component.Rpc.Request.data)
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.data)
 }
 
 // -------------------------------------------------------------------
@@ -2436,13 +2436,13 @@ inline void Rpc_Response::clear_code() {
   code_ = 0;
 }
 inline ::google::protobuf::int32 Rpc_Response::code() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Response.code)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.code)
   return code_;
 }
 inline void Rpc_Response::set_code(::google::protobuf::int32 value) {
   
   code_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Response.code)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.code)
 }
 
 // int64 rpc_id = 2;
@@ -2450,13 +2450,13 @@ inline void Rpc_Response::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Response::rpc_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Response.rpc_id)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.rpc_id)
   return rpc_id_;
 }
 inline void Rpc_Response::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Response.rpc_id)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.rpc_id)
 }
 
 // int64 sock_id = 3;
@@ -2464,13 +2464,13 @@ inline void Rpc_Response::clear_sock_id() {
   sock_id_ = PROTOBUF_LONGLONG(0);
 }
 inline ::google::protobuf::int64 Rpc_Response::sock_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Response.sock_id)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.sock_id)
   return sock_id_;
 }
 inline void Rpc_Response::set_sock_id(::google::protobuf::int64 value) {
   
   sock_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Response.sock_id)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.sock_id)
 }
 
 // string error_str = 4;
@@ -2478,41 +2478,41 @@ inline void Rpc_Response::clear_error_str() {
   error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& Rpc_Response::error_str() const {
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.error_str)
   return error_str_.GetNoArena();
 }
 inline void Rpc_Response::set_error_str(const ::std::string& value) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.error_str)
 }
 #if LANG_CXX11
 inline void Rpc_Response::set_error_str(::std::string&& value) {
   
   error_str_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Response.error_str)
 }
 #endif
 inline void Rpc_Response::set_error_str(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Response.error_str)
 }
 inline void Rpc_Response::set_error_str(const char* value, size_t size) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Response.error_str)
 }
 inline ::std::string* Rpc_Response::mutable_error_str() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.error_str)
   return error_str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Rpc_Response::release_error_str() {
-  // @@protoc_insertion_point(field_release:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.error_str)
   
   return error_str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2523,7 +2523,7 @@ inline void Rpc_Response::set_allocated_error_str(::std::string* error_str) {
     
   }
   error_str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error_str);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Component.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.error_str)
 }
 
 // .google.protobuf.Any data = 5;
@@ -2532,12 +2532,12 @@ inline bool Rpc_Response::has_data() const {
 }
 inline const ::google::protobuf::Any& Rpc_Response::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:c2s.Component.Rpc.Response.data)
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* Rpc_Response::release_data() {
-  // @@protoc_insertion_point(field_release:c2s.Component.Rpc.Response.data)
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -2549,7 +2549,7 @@ inline ::google::protobuf::Any* Rpc_Response::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:c2s.Component.Rpc.Response.data)
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.data)
   return data_;
 }
 inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
@@ -2568,12 +2568,12 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:c2s.Component.Rpc.Response.data)
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.data)
 }
 
 // -------------------------------------------------------------------
 
-// Component.Rpc
+// Rpc
 
 // -------------------------------------------------------------------
 

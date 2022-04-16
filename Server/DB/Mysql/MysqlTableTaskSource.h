@@ -10,12 +10,13 @@ namespace Sentry
     根据protobuf文件创建sql表
     如果字段没有会更新字段
     */
-	class MysqlTableTaskSource : public MysqlAsyncTask
+	class MysqlTableTaskSource final : public MysqlAsyncTask
     {
 	 public:
-		void Run(MysqlSocket *mysql) final;
+		MysqlTableTaskSource(const std::string & name);
 	 public:
-		XCode InitMysqlTable(const std::string & name);
+		XCode Await() final;
+		void Run(MysqlSocket *mysql) final;
     private:
 		bool InitDb(MysqlSocket * mysql, const std::string & name);
 		bool InitTable(MysqlSocket * mysql, const Descriptor * descriptor);
@@ -23,7 +24,8 @@ namespace Sentry
         bool UpdateMysqlTable(MysqlSocket * mysql, const Descriptor * descriptor);
 		bool AddNewField(MysqlSocket * mysql, const std::string& table, const FieldDescriptor *fieldDesc);
 	 private:
-		std::string mName;
+		std::string mError;
+		const std::string mName;
 		TaskSource<XCode> mTaskSource;
     };
 }

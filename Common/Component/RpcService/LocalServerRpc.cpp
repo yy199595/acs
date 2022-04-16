@@ -133,4 +133,65 @@ namespace Sentry
 		}
 		return true;
 	}
+
+	void LocalServerRpc::AddEntity(long long id)
+	{
+		std::string address;
+		if(this->AllotAddress(address))
+		{
+			auto iter = this->mUserAddressMap.find(id);
+			if(iter != this->mUserAddressMap.end())
+			{
+				this->mUserAddressMap.erase(iter);
+			}
+			this->mUserAddressMap.emplace(id, address);
+		}
+	}
+
+	void LocalServerRpc::DelEntity(long long id)
+	{
+
+	}
+
+	bool LocalServerRpc::AllotAddress(string& address)
+	{
+		if(this->mRemoteAddressList.empty())
+		{
+			return false;
+		}
+		auto iter = this->mRemoteAddressList.begin();
+		for(; iter != this->mRemoteAddressList.end(); iter++)
+		{
+			address = *iter;
+			return true;
+		}
+		return false;
+	}
+
+	void LocalServerRpc::OnDelAddress(const string& address)
+	{
+		auto iter = this->mRemoteAddressList.find(address);
+		if(iter != this->mRemoteAddressList.end())
+		{
+			this->mRemoteAddressList.erase(iter);
+			LOG_WARN("{0} delete address " << this->GetName() << '.' << address);
+		}
+	}
+	void LocalServerRpc::OnAddAddress(const string& address)
+	{
+		assert(!address.empty());
+		this->mRemoteAddressList.insert(address);
+		LOG_ERROR(this->GetName() << " add address " << address);
+	}
+	bool LocalServerRpc::GetEntityAddress(long long int id, string& address)
+	{
+		auto iter = this->mUserAddressMap.find(id);
+		if(iter != this->mUserAddressMap.end())
+		{
+			address = iter->second;
+			return true;
+		}
+		return false;
+	}
+
 }

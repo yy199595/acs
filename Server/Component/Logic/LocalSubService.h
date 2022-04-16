@@ -34,5 +34,6 @@ namespace Sentry
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
+		std::string mHttpService;
 	};
 }

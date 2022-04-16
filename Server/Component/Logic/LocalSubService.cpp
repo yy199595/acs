@@ -1,6 +1,7 @@
 ﻿#include"LocalSubService.h"
 #include"App/App.h"
 #include"Network/Http/HttpAsyncRequest.h"
+#include"Component/HttpService/HttpService.h"
 #include"Component/RpcService/LocalServerRpc.h"
 #include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
@@ -17,6 +18,7 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(SubService::LateAwake());
 		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
+		this->mHttpService = this->GetApp()->GetConfig().GetHttpAddress();
 		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
 		return true;
@@ -61,16 +63,27 @@ namespace Sentry
 
 	void LocalSubService::Push(const Json::Reader& jsonReader)
 	{
-		std::string address;
+		std::string rpcAddress;
+		std::string httpAddress;
 		std::vector<std::string> services;
-		jsonReader.GetMember("rpc", address);
+		jsonReader.GetMember("rpc", rpcAddress);
+		jsonReader.GetMember("http", httpAddress);
 		jsonReader.GetMember("service", services);
 		for(const std::string & service : services)
 		{
-			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
-			if(serviceBase != nullptr)
+			Component * component = this->GetByName(service);
+			if(component != nullptr)
 			{
-				serviceBase->OnAddAddress(address);
+				HttpService * httpService = component->Cast<HttpService>();
+				LocalServerRpc * localServerRpc = component->Cast<LocalServerRpc>();
+				if(httpService != nullptr && !httpAddress.empty())
+				{
+					httpService->OnAddAddress(httpAddress);
+				}
+				if(localServerRpc != nullptr && !rpcAddress.empty())
+				{
+					localServerRpc->OnAddAddress(rpcAddress);
+				}
 			}
 		}
 
@@ -91,7 +104,7 @@ namespace Sentry
 			}
 			jsonWriter.AddMember("service", services);
 			jsonWriter.AddMember("rpc", this->mRpcAddress);
-			this->Publish(address, "LocalSubService.Push", jsonWriter);
+			this->Publish(rpcAddress, "LocalSubService.Push", jsonWriter);
 		}
 	}
 
@@ -124,8 +137,8 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{
-			LocalServerRpc * localServerRpc = this->GetApp()->GetComponent<LocalServerRpc>(name);
-			if(localServerRpc != nullptr && localServerRpc->IsStartService())
+			IServiceBase * localService = this->GetApp()->GetComponent<IServiceBase>(name);
+			if(localService != nullptr && localService->IsStartService())
 			{
 				jsonWriter.AddMember(name);
 			}
@@ -134,6 +147,7 @@ namespace Sentry
 		jsonWriter.EndArray();
 		jsonWriter.AddMember("response", true);
 		jsonWriter.AddMember("rpc", this->mRpcAddress);
+		jsonWriter.AddMember("http", this->mHttpService);
 		long long number = this->Publish("LocalSubService.Push", jsonWriter);
 		LOG_DEBUG("publish successful count = " << number);
 	}
@@ -145,7 +159,6 @@ namespace Sentry
 		jsonWriter.AddMember("area_id", this->mAreaId);
 		jsonWriter.AddMember("address", this->mRpcAddress);
 		LOG_DEBUG("remove this form count = " << this->Publish("LocalSubService.Remove", jsonWriter));
-
 	}
 
 	void LocalSubService::Remove(const Json::Reader& jsonReader)
@@ -154,7 +167,7 @@ namespace Sentry
 		LOG_CHECK_RET(jsonReader.GetMember("address", address));
 
 		// TODO
-//		RpcServiceNode* rpcServiceComponent = this->GetComponent<RpcServiceNode>(service);
+//		RpcServiceBase* rpcServiceComponent = this->GetComponent<RpcServiceBase>(service);
 //		if(rpcServiceComponent != nullptr)
 //		{
 //			rpcServiceComponent->DelRemoteAddress(address);

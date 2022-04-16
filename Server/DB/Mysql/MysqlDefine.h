@@ -38,6 +38,7 @@ namespace Sentry
 	class MysqlAsyncTask
 	{
 	 public:
+		virtual XCode Await() = 0;
 		virtual void Run(MysqlSocket * mysql) = 0;
 	};
 }

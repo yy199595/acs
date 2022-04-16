@@ -1,20 +1,19 @@
 ﻿#include"MysqlService.h"
-#include"DB/Mysql/MysqlTaskSource.h"
-#include"Component/Scene/ThreadPoolComponent.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
+#include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
 
 	bool MysqlService::OnInitService(ServiceMethodRegister & methodRegister)
 	{
+		const ServerConfig & config = this->GetApp()->GetConfig();
 		methodRegister.Bind("Add", &MysqlService::Add);
 		methodRegister.Bind("Save", &MysqlService::Save);
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
 		methodRegister.Bind("Invoke", &MysqlService::Invoke);
 
-		const ServerConfig & config = this->GetApp()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mConfig.mPort));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mConfig.mUser));
@@ -46,6 +45,11 @@ namespace Sentry
 		return this->mMysqlClients[0]->InitTable("db.proto") == XCode::Successful;
 	}
 
+	std::shared_ptr<MysqlClient> MysqlService::GetMysqlClient()
+	{
+		return this->mMysqlClients[0];
+	}
+
 	XCode MysqlService::Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response)
 	{
 		LOGIC_THROW_ERROR(request.has_data());
@@ -56,16 +60,7 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
-		XCode code = mysqlClient->Invoke(sql, response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(sql);
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(sql, response);
 	}
 
 	XCode MysqlService::Save(const s2s::Mysql::Save& request, s2s::Mysql::Response& response)
@@ -78,16 +73,7 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
-		XCode code = mysqlClient->Invoke(sql, response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(sql);
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(sql, response);
 	}
 
 	XCode MysqlService::Update(const s2s::Mysql::Update& request, s2s::Mysql::Response& response)
@@ -100,16 +86,7 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
-		XCode code = mysqlClient->Invoke(sql, response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(sql);
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(sql, response);
 	}
 
 	XCode MysqlService::Delete(const s2s::Mysql::Delete& request, s2s::Mysql::Response& response)
@@ -122,52 +99,25 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
-		XCode code = mysqlClient->Invoke(sql, response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(sql);
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(sql, response);
 	}
 
 	XCode MysqlService::Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response)
 	{
 		LOGIC_THROW_ERROR(!request.sql().empty());
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
-		XCode code = mysqlClient->Invoke(request.sql(), response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(request.sql());
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(request.sql(), response);
 	}
 
 	XCode MysqlService::Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response)
 	{
 		LOGIC_THROW_ERROR(!request.table().empty());
 		LOGIC_THROW_ERROR(!request.where_json().empty());
-		std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
 
 		std::string sql;
 		if(!this->mHelper.ToSqlCommand(request, sql))
 		{
 			return XCode::CallArgsError;
 		}
-		XCode code = mysqlClient->Invoke(sql, response);
-		if (code != XCode::Successful)
-		{
-#ifdef __DEBUG__
-			LOG_INFO(sql);
-			LOG_ERROR(response.error());
-#endif
-		}
-		return XCode::Successful;
+		return this->GetMysqlClient()->Invoke(sql, response);
 	}
 }// namespace Sentry

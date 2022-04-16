@@ -39,7 +39,7 @@
             "port":80,
             "count": 1000,
             "ip": "127.0.0.1",
-            "component": "HttpClientComponent"
+            "component": "HttpComponent"
         },
         "gate":
         {
@@ -76,6 +76,7 @@
     ],
     "component": [
         "RpcComponent",
+        "HttpComponent",
         "ConsoleComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
@@ -85,9 +86,9 @@
         "RpcClientComponent",
         "GateComponent",
         "GateClientComponent",
-        "HttpClientComponent",
         "MysqlProxyComponent",
-        "EntityMgrComponent"
+        "EntityMgrComponent",
+        "ClientComponent"
     ],
     "service":
     [
