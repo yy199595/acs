@@ -8,9 +8,6 @@
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
-
-
-#include"Component/Logic/HttpUserService.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -56,14 +53,6 @@ namespace Client
 
 	void ClientComponent::OnAllServiceStart()
 	{
-		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
-
-		Json::Writer jsonWriter;
-		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		if(httpUserService->Post("logic/account/login", jsonWriter, jsonReader) == XCode::Successful)
-		{
-
-		}
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}
 
@@ -143,6 +132,7 @@ namespace Client
 		loginJsonWriter.AddMember("password", userPassword);
 		std::shared_ptr<HttpAsyncResponse> loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
 
+		LOG_WARN("login response = " << loginResponse->GetContent());
 		std::shared_ptr<Json::Reader> loginJsonResponse = loginResponse->ToJsonReader();
 		LOG_CHECK_FATAL(registerReader->GetMember("code", code));
 		if(code != XCode::Successful)
@@ -152,9 +142,10 @@ namespace Client
 			LOG_ERROR("login account " << userAccount << " failure error = " << error);
 			return;
 		}
+		std::string gateAddress;
 		LOG_DEBUG(userAccount << " login successful");
-		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_ip", this->mIp));
-		LOG_CHECK_RET(loginJsonResponse->GetMember("gate_port", this->mPort));
+		LOG_CHECK_RET(loginJsonResponse->GetMember("data","address", gateAddress));
+		Helper::String::ParseIpAddress(gateAddress, this->mIp, this->mPort);
 
 		std::string content = loginResponse->GetContent();
 		IAsioThread& netThread = App::Get()->GetTaskScheduler();

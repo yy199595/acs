@@ -10,7 +10,6 @@
 
 namespace Sentry
 {
-
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
 		const std::string & name = method->GetName();
@@ -89,12 +88,14 @@ namespace Sentry
 	std::shared_ptr<com::Rpc_Response> LocalServerRpc::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
 	{
 		assert(this->IsStartService());
-		auto serviceMethod = this->mMethodRegister->GetMethod(method);
+		std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
+		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(method);
 		if (serviceMethod == nullptr)
 		{
+			response->set_code((int)XCode::CallServiceNotFound);
+			LOG_ERROR("not find [" << this->GetName() << "." << method << "]");
 			return nullptr;
 		}
-		std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
 
 		response->set_rpc_id(request->rpc_id());
 		response->set_user_id(request->user_id());
@@ -134,18 +135,15 @@ namespace Sentry
 		return true;
 	}
 
-	void LocalServerRpc::AddEntity(long long id)
+	void LocalServerRpc::AddEntity(long long id, const std::string & address)
 	{
-		std::string address;
-		if(this->AllotAddress(address))
+		auto iter = this->mUserAddressMap.find(id);
+		if (iter != this->mUserAddressMap.end())
 		{
-			auto iter = this->mUserAddressMap.find(id);
-			if(iter != this->mUserAddressMap.end())
-			{
-				this->mUserAddressMap.erase(iter);
-			}
-			this->mUserAddressMap.emplace(id, address);
+			this->mUserAddressMap.erase(iter);
 		}
+		LOG_INFO(this->GetName() << " add " << id << " address = " << address);
+		this->mUserAddressMap.emplace(id, address);
 	}
 
 	void LocalServerRpc::DelEntity(long long id)
@@ -153,16 +151,15 @@ namespace Sentry
 
 	}
 
-	bool LocalServerRpc::AllotAddress(string& address)
+	bool LocalServerRpc::AllotAddress(string& address) const
 	{
 		if(this->mRemoteAddressList.empty())
 		{
 			return false;
 		}
-		auto iter = this->mRemoteAddressList.begin();
-		for(; iter != this->mRemoteAddressList.end(); iter++)
+		for(const std::string & str : this->mRemoteAddressList)
 		{
-			address = *iter;
+			address = str;
 			return true;
 		}
 		return false;

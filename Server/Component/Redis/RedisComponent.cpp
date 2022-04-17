@@ -318,49 +318,62 @@ namespace Sentry
 			{
 				const std::string& channel = redisResponse->GetValue(1);
 				const std::string& message = redisResponse->GetValue(2);
-				std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-
-				if (!jsonReader->ParseJson(message))
-				{
-					LOG_ERROR("parse sub message error");
-					continue;
-				}
-
-				std::string service;
-				std::string funcName;
-				if (channel == this->mRpcAddress)
-				{
-					std::string fullName;
-					jsonReader->GetMember("func", fullName);
-					size_t pos = fullName.find('.');
-					if (pos != std::string::npos)
-					{
-						service = fullName.substr(0, pos);
-						funcName = fullName.substr(pos + 1);
-					}
-				}
-				else
-				{
-					size_t pos = channel.find('.');
-					if (pos != std::string::npos)
-					{
-						service = channel.substr(0, pos);
-						funcName = channel.substr(pos + 1);
-					}
-				}
-
 #ifdef __DEBUG__
 				LOG_DEBUG("========= subscribe message =============");
 				LOG_DEBUG("channel = " << channel);
 				LOG_DEBUG("message = " << message);
 #endif
-				SubService* subService = this->GetComponent<SubService>(service);
-				if (subService != nullptr)
+				if (!this->HandlerSubMessage(channel, message))
 				{
-					subService->Invoke(funcName, *jsonReader);
+					LOG_FATAL(channel << " handler failure");
 				}
 			}
 		}
+	}
+
+	bool RedisComponent::HandlerSubMessage(const std::string& channel, const std::string & message)
+	{
+		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+		if (!jsonReader->ParseJson(message))
+		{
+			LOG_ERROR("parse sub message error");
+			return false;
+		}
+
+		std::string service;
+		std::string funcName;
+		if (channel == this->mRpcAddress)
+		{
+			std::string fullName;
+			jsonReader->GetMember("func", fullName);
+			size_t pos = fullName.find('.');
+			if (pos == std::string::npos)
+			{
+				LOG_ERROR(fullName << " parse error");
+				return false;
+			}
+			service = fullName.substr(0, pos);
+			funcName = fullName.substr(pos + 1);
+		}
+		else
+		{
+			size_t pos = channel.find('.');
+			if (pos == std::string::npos)
+			{
+				LOG_ERROR(channel << " parse error");
+				return false;
+			}
+			service = channel.substr(0, pos);
+			funcName = channel.substr(pos + 1);
+		}
+
+		SubService* subService = this->GetComponent<SubService>(service);
+		if (subService == nullptr)
+		{
+			LOG_ERROR("not find " << service);
+			return false;
+		}
+		return subService->Invoke(funcName, *jsonReader);
 	}
 
 	bool RedisComponent::LateAwake()

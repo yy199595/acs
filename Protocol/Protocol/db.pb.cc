@@ -24,10 +24,6 @@ class db_account_tab_user_login_infoDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<db_account_tab_user_login_info> _instance;
 } _db_account_tab_user_login_info_default_instance_;
-class db_account_tb_testDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<db_account_tb_test> _instance;
-} _db_account_tb_test_default_instance_;
 class db_accountDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<db_account> _instance;
@@ -60,20 +56,6 @@ static void InitDefaultsdb_account_tab_user_login_info_db_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_db_account_tab_user_login_info_db_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsdb_account_tab_user_login_info_db_2eproto}, {}};
 
-static void InitDefaultsdb_account_tb_test_db_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_db_account_tb_test_default_instance_;
-    new (ptr) ::db_account_tb_test();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::db_account_tb_test::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_db_account_tb_test_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsdb_account_tb_test_db_2eproto}, {}};
-
 static void InitDefaultsdb_account_db_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -91,11 +73,10 @@ static void InitDefaultsdb_account_db_2eproto() {
 void InitDefaults_db_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_db_account_tab_user_account_db_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_db_account_tab_user_login_info_db_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_db_account_tb_test_db_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_db_account_db_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_db_2eproto[4];
+::google::protobuf::Metadata file_level_metadata_db_2eproto[3];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_db_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_db_2eproto = nullptr;
 
@@ -122,13 +103,6 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
   PROTOBUF_FIELD_OFFSET(::db_account_tab_user_login_info, user_id_),
   PROTOBUF_FIELD_OFFSET(::db_account_tab_user_login_info, account_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::db_account_tb_test, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::db_account_tb_test, value_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tb_test, value2_),
-  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::db_account, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -137,38 +111,35 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::db_account_tab_user_account)},
   { 14, -1, sizeof(::db_account_tab_user_login_info)},
-  { 21, -1, sizeof(::db_account_tb_test)},
-  { 28, -1, sizeof(::db_account)},
+  { 21, -1, sizeof(::db_account)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_tab_user_account_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_tab_user_login_info_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_tb_test_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_db_2eproto = {
   {}, AddDescriptors_db_2eproto, "db.proto", schemas,
   file_default_instances, TableStruct_db_2eproto::offsets,
-  file_level_metadata_db_2eproto, 4, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
+  file_level_metadata_db_2eproto, 3, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
 };
 
 const char descriptor_table_protodef_db_2eproto[] =
-  "\n\010db.proto\"\260\002\n\ndb_account\032\276\001\n\020tab_user_a"
+  "\n\010db.proto\"\206\002\n\ndb_account\032\276\001\n\020tab_user_a"
   "ccount\022\017\n\007account\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\003"
   "\022\020\n\010password\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\021\n\t"
   "phone_num\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rr"
   "egister_time\030\007 \001(\003\022\027\n\017last_login_time\030\010 "
   "\001(\003\022\r\n\005token\030\t \001(\t\0327\n\023tab_user_login_inf"
-  "o\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\t\032(\n\007t"
-  "b_test\022\r\n\005value\030\001 \001(\002\022\016\n\006value2\030\002 \001(\tb\006p"
-  "roto3"
+  "o\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\tb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 325,
+  "db.proto", &assign_descriptors_table_db_2eproto, 283,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -1291,346 +1262,6 @@ void db_account_tab_user_login_info::InternalSwap(db_account_tab_user_login_info
 
 // ===================================================================
 
-void db_account_tb_test::InitAsDefaultInstance() {
-}
-class db_account_tb_test::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int db_account_tb_test::kValueFieldNumber;
-const int db_account_tb_test::kValue2FieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-db_account_tb_test::db_account_tb_test()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:db_account.tb_test)
-}
-db_account_tb_test::db_account_tb_test(const db_account_tb_test& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  value2_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.value2().size() > 0) {
-    value2_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value2_);
-  }
-  value_ = from.value_;
-  // @@protoc_insertion_point(copy_constructor:db_account.tb_test)
-}
-
-void db_account_tb_test::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_db_account_tb_test_db_2eproto.base);
-  value2_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  value_ = 0;
-}
-
-db_account_tb_test::~db_account_tb_test() {
-  // @@protoc_insertion_point(destructor:db_account.tb_test)
-  SharedDtor();
-}
-
-void db_account_tb_test::SharedDtor() {
-  value2_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void db_account_tb_test::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const db_account_tb_test& db_account_tb_test::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_db_account_tb_test_db_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void db_account_tb_test::Clear() {
-// @@protoc_insertion_point(message_clear_start:db_account.tb_test)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  value2_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  value_ = 0;
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* db_account_tb_test::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<db_account_tb_test*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // float value = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 13) goto handle_unusual;
-        msg->set_value(::google::protobuf::io::UnalignedLoad<float>(ptr));
-        ptr += sizeof(float);
-        break;
-      }
-      // string value2 = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tb_test.value2");
-        object = msg->mutable_value2();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool db_account_tb_test::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:db_account.tb_test)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // float value = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (13 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &value_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string value2 = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_value2()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->value2().data(), static_cast<int>(this->value2().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tb_test.value2"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:db_account.tb_test)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:db_account.tb_test)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void db_account_tb_test::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:db_account.tb_test)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // float value = 1;
-  if (this->value() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(1, this->value(), output);
-  }
-
-  // string value2 = 2;
-  if (this->value2().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->value2().data(), static_cast<int>(this->value2().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tb_test.value2");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->value2(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:db_account.tb_test)
-}
-
-::google::protobuf::uint8* db_account_tb_test::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:db_account.tb_test)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // float value = 1;
-  if (this->value() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(1, this->value(), target);
-  }
-
-  // string value2 = 2;
-  if (this->value2().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->value2().data(), static_cast<int>(this->value2().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tb_test.value2");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->value2(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:db_account.tb_test)
-  return target;
-}
-
-size_t db_account_tb_test::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:db_account.tb_test)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string value2 = 2;
-  if (this->value2().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->value2());
-  }
-
-  // float value = 1;
-  if (this->value() != 0) {
-    total_size += 1 + 4;
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void db_account_tb_test::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:db_account.tb_test)
-  GOOGLE_DCHECK_NE(&from, this);
-  const db_account_tb_test* source =
-      ::google::protobuf::DynamicCastToGenerated<db_account_tb_test>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db_account.tb_test)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:db_account.tb_test)
-    MergeFrom(*source);
-  }
-}
-
-void db_account_tb_test::MergeFrom(const db_account_tb_test& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:db_account.tb_test)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.value2().size() > 0) {
-
-    value2_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value2_);
-  }
-  if (from.value() != 0) {
-    set_value(from.value());
-  }
-}
-
-void db_account_tb_test::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:db_account.tb_test)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void db_account_tb_test::CopyFrom(const db_account_tb_test& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:db_account.tb_test)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool db_account_tb_test::IsInitialized() const {
-  return true;
-}
-
-void db_account_tb_test::Swap(db_account_tb_test* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void db_account_tb_test::InternalSwap(db_account_tb_test* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  value2_.Swap(&other->value2_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(value_, other->value_);
-}
-
-::google::protobuf::Metadata db_account_tb_test::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
-  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
 void db_account::InitAsDefaultInstance() {
 }
 class db_account::HasBitSetters {
@@ -1846,9 +1477,6 @@ template<> PROTOBUF_NOINLINE ::db_account_tab_user_account* Arena::CreateMaybeMe
 }
 template<> PROTOBUF_NOINLINE ::db_account_tab_user_login_info* Arena::CreateMaybeMessage< ::db_account_tab_user_login_info >(Arena* arena) {
   return Arena::CreateInternal< ::db_account_tab_user_login_info >(arena);
-}
-template<> PROTOBUF_NOINLINE ::db_account_tb_test* Arena::CreateMaybeMessage< ::db_account_tb_test >(Arena* arena) {
-  return Arena::CreateInternal< ::db_account_tb_test >(arena);
 }
 template<> PROTOBUF_NOINLINE ::db_account* Arena::CreateMaybeMessage< ::db_account >(Arena* arena) {
   return Arena::CreateInternal< ::db_account >(arena);

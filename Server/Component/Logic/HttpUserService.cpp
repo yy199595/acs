@@ -3,6 +3,7 @@
 #include"Util/MD5.h"
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
+#include"Component/Gate/GateService.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql//MysqlProxyComponent.h"
 
@@ -17,6 +18,7 @@ namespace Sentry
 	bool HttpUserService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
+		this->mGateService = this->GetComponent<GateService>();
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
 		return true;
@@ -38,9 +40,12 @@ namespace Sentry
 		Json::Writer json;
 		json.AddMember("account", account);
 		std::string whereJson = json.ToJsonString();
-		std::shared_ptr<db_account::tab_user_account> userData = this->mMysqlComponent->QueryOnce<db_account::tab_user_account>(whereJson);
+		std::shared_ptr<db_account::tab_user_account> userData = this->mMysqlComponent
+			->QueryOnce<db_account::tab_user_account>(whereJson);
 		if (userData == nullptr || userData->password() != password)
 		{
+			LOG_ERROR(account << " login failure password error");
+			response.AddMember("error", "user password error");
 			return XCode::Failure;
 		}
 		Json::Writer jsonWriter;
@@ -49,30 +54,30 @@ namespace Sentry
 		jsonWriter.AddMember("last_login_time", Helper::Time::GetNowSecTime());
 
 		string updateJson = jsonWriter.ToJsonString();
-		db_account::tab_user_account userAccountInfo;
 		this->mMysqlComponent->Update<db_account::tab_user_account>(updateJson, whereJson);
 
-		userAccountInfo.set_token(newToken);
-		userAccountInfo.set_account(account);
-		userAccountInfo.set_last_login_time(Helper::Time::GetNowSecTime());
-		XCode code = this->mMysqlComponent->Save(userAccountInfo);
-		if (code != XCode::Successful)
+
+		std::string address;
+		if (!this->mGateService->AllotAddress(address))
 		{
-			return code;
+			return XCode::AddressAllotFailure;
 		}
-		s2s::AddToGate_Request gateRequest;
-		gateRequest.set_user_id(userAccountInfo.user_id());
-		return XCode::Successful;
+		s2s::AddressAllot::Request allotRequest;
+		response.AddMember("address", address);
+
+		allotRequest.set_login_token(newToken);
+		allotRequest.set_user_id(userData->user_id());
+		return this->mGateService->Call(address, "Allot", allotRequest);
 	}
 
 	XCode HttpUserService::Register(const Json::Reader& request, Json::Writer& response)
 	{
 		long long phoneNumber = 0;
 		string user_account, user_password;
+		this->mRedisComponent = this->GetComponent<RedisComponent>();
 		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
-		this->mRedisComponent = this->GetComponent<RedisComponent>();
 		std::shared_ptr<RedisResponse> resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
 		if (resp->GetNumber() == 0)
 		{

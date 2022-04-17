@@ -20,9 +20,4 @@ message db_account
         int64 user_id = 1;
         string account = 2;
     }
-    message tb_test
-    {
-        float value = 1;
-        string value2 = 2;
-    }
 }

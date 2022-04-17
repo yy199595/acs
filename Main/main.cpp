@@ -25,6 +25,8 @@
 #include"Component/ClientComponent.h"
 
 #include"Component/Lua/LuaRegisterComponent.h"
+
+#include"Component/Logic/UserSubService.h"
 using namespace Sentry;
 using namespace Client;
 
@@ -66,9 +68,10 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
+	ComponentFactory::Add<MysqlService>("MysqlService");
+	ComponentFactory::Add<UserSubService>("UserSubService");
     ComponentFactory::Add<LocalSubService>("LocalSubService");
-    ComponentFactory::Add<MysqlService>("MysqlService");
-    ComponentFactory::Add<HttpUserService>("HttpUserService");
+	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
 
 int main(int argc, char **argv)

@@ -22,17 +22,29 @@ namespace Sentry
 	{
 		if(this->mRedisComponent != nullptr)
 		{
-			return this->mRedisComponent->Publish(func, jsonWriter) > 0;
+			string channel = fmt::format("{0}.{1}", this->GetName(), func);
+			if(this->mRedisComponent->Publish(channel, jsonWriter) ==0)
+			{
+				LOG_ERROR("publish [" << channel << "] error");
+				return false;
+			}
+			return true;
 		}
 		return false;
 	}
 
 	bool SubService::Publish(const std::string& address, const std::string& func, Json::Writer& jsonWriter)
 	{
-		if(this->mRedisComponent != nullptr)
+		if (this->mRedisComponent != nullptr)
 		{
-			jsonWriter.AddMember("func", func);
-			return this->mRedisComponent->Publish(address, jsonWriter) > 0;
+			string channel = fmt::format("{0}.{1}", this->GetName(), func);
+			jsonWriter.AddMember("func", channel);
+			if (this->mRedisComponent->Publish(address, jsonWriter) == 0)
+			{
+				LOG_ERROR("publish [" << address << "] error");
+				return false;
+			}
+			return true;
 		}
 		return false;
 	}

@@ -82,6 +82,7 @@ namespace Sentry
 		std::shared_ptr<RedisClient> AllotRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
 		std::shared_ptr<RedisClient> MakeRedisClient(const std::string& name);
+		bool HandlerSubMessage(const std::string & channel, const std::string & message);
 	 private:
 		std::string mRpcAddress;
 		RedisConfig mRedisConfig;

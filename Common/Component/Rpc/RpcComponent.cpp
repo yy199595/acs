@@ -68,7 +68,7 @@ namespace Sentry
 		{
 			long long socketId = request->socket_id();
 			const std::string& method = protocolConfig->Method;
-			auto response = logicService->Invoke(method, request);
+			std::shared_ptr<com::Rpc::Response> response = logicService->Invoke(method, request);
 			this->mRpcClientComponent->Send(socketId, response);
 		});
 		return XCode::Successful;

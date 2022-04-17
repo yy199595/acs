@@ -63,10 +63,9 @@
         },
         "Allot": {
             "Id": 203,
-            "Async": false,
+            "Async": true,
             "Type": "Server",
-            "Request": "s2s.AddToGate.Request",
-            "Response": "s2s.AddToGate.Response"
+            "Request": "s2s.AddressAllot.Request"
         }
     },
     "ChatService": {

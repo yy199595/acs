@@ -48,6 +48,15 @@ namespace Sentry
 		return true;
 	}
 
+	void Entity::GetComponents(std::vector<Component*>& components) const
+	{
+		auto iter = this->mComponentMap.begin();
+		for(;iter != this->mComponentMap.end(); iter++)
+		{
+			components.emplace_back(iter->second);
+		}
+	}
+
 	void Entity::GetComponents(std::vector<std::string>& components) const
 	{
 		components.clear();

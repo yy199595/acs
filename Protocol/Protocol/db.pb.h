@@ -41,7 +41,7 @@ struct TableStruct_db_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[4]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -57,15 +57,11 @@ extern db_account_tab_user_accountDefaultTypeInternal _db_account_tab_user_accou
 class db_account_tab_user_login_info;
 class db_account_tab_user_login_infoDefaultTypeInternal;
 extern db_account_tab_user_login_infoDefaultTypeInternal _db_account_tab_user_login_info_default_instance_;
-class db_account_tb_test;
-class db_account_tb_testDefaultTypeInternal;
-extern db_account_tb_testDefaultTypeInternal _db_account_tb_test_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::db_account* Arena::CreateMaybeMessage<::db_account>(Arena*);
 template<> ::db_account_tab_user_account* Arena::CreateMaybeMessage<::db_account_tab_user_account>(Arena*);
 template<> ::db_account_tab_user_login_info* Arena::CreateMaybeMessage<::db_account_tab_user_login_info>(Arena*);
-template<> ::db_account_tb_test* Arena::CreateMaybeMessage<::db_account_tb_test>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 
@@ -406,133 +402,6 @@ class db_account_tab_user_login_info :
 };
 // -------------------------------------------------------------------
 
-class db_account_tb_test :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db_account.tb_test) */ {
- public:
-  db_account_tb_test();
-  virtual ~db_account_tb_test();
-
-  db_account_tb_test(const db_account_tb_test& from);
-
-  inline db_account_tb_test& operator=(const db_account_tb_test& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  db_account_tb_test(db_account_tb_test&& from) noexcept
-    : db_account_tb_test() {
-    *this = ::std::move(from);
-  }
-
-  inline db_account_tb_test& operator=(db_account_tb_test&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const db_account_tb_test& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const db_account_tb_test* internal_default_instance() {
-    return reinterpret_cast<const db_account_tb_test*>(
-               &_db_account_tb_test_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  void Swap(db_account_tb_test* other);
-  friend void swap(db_account_tb_test& a, db_account_tb_test& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline db_account_tb_test* New() const final {
-    return CreateMaybeMessage<db_account_tb_test>(nullptr);
-  }
-
-  db_account_tb_test* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<db_account_tb_test>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const db_account_tb_test& from);
-  void MergeFrom(const db_account_tb_test& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(db_account_tb_test* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string value2 = 2;
-  void clear_value2();
-  static const int kValue2FieldNumber = 2;
-  const ::std::string& value2() const;
-  void set_value2(const ::std::string& value);
-  #if LANG_CXX11
-  void set_value2(::std::string&& value);
-  #endif
-  void set_value2(const char* value);
-  void set_value2(const char* value, size_t size);
-  ::std::string* mutable_value2();
-  ::std::string* release_value2();
-  void set_allocated_value2(::std::string* value2);
-
-  // float value = 1;
-  void clear_value();
-  static const int kValueFieldNumber = 1;
-  float value() const;
-  void set_value(float value);
-
-  // @@protoc_insertion_point(class_scope:db_account.tb_test)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr value2_;
-  float value_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_db_2eproto;
-};
-// -------------------------------------------------------------------
-
 class db_account :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db_account) */ {
  public:
@@ -571,7 +440,7 @@ class db_account :
                &_db_account_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(db_account* other);
   friend void swap(db_account& a, db_account& b) {
@@ -628,7 +497,6 @@ class db_account :
 
   typedef db_account_tab_user_account tab_user_account;
   typedef db_account_tab_user_login_info tab_user_login_info;
-  typedef db_account_tb_test tb_test;
 
   // accessors -------------------------------------------------------
 
@@ -1045,84 +913,11 @@ inline void db_account_tab_user_login_info::set_allocated_account(::std::string*
 
 // -------------------------------------------------------------------
 
-// db_account_tb_test
-
-// float value = 1;
-inline void db_account_tb_test::clear_value() {
-  value_ = 0;
-}
-inline float db_account_tb_test::value() const {
-  // @@protoc_insertion_point(field_get:db_account.tb_test.value)
-  return value_;
-}
-inline void db_account_tb_test::set_value(float value) {
-  
-  value_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tb_test.value)
-}
-
-// string value2 = 2;
-inline void db_account_tb_test::clear_value2() {
-  value2_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& db_account_tb_test::value2() const {
-  // @@protoc_insertion_point(field_get:db_account.tb_test.value2)
-  return value2_.GetNoArena();
-}
-inline void db_account_tb_test::set_value2(const ::std::string& value) {
-  
-  value2_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tb_test.value2)
-}
-#if LANG_CXX11
-inline void db_account_tb_test::set_value2(::std::string&& value) {
-  
-  value2_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tb_test.value2)
-}
-#endif
-inline void db_account_tb_test::set_value2(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  value2_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tb_test.value2)
-}
-inline void db_account_tb_test::set_value2(const char* value, size_t size) {
-  
-  value2_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tb_test.value2)
-}
-inline ::std::string* db_account_tb_test::mutable_value2() {
-  
-  // @@protoc_insertion_point(field_mutable:db_account.tb_test.value2)
-  return value2_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* db_account_tb_test::release_value2() {
-  // @@protoc_insertion_point(field_release:db_account.tb_test.value2)
-  
-  return value2_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void db_account_tb_test::set_allocated_value2(::std::string* value2) {
-  if (value2 != nullptr) {
-    
-  } else {
-    
-  }
-  value2_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value2);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tb_test.value2)
-}
-
-// -------------------------------------------------------------------
-
 // db_account
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

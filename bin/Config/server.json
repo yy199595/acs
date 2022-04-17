@@ -57,6 +57,7 @@
         }
     },
     "mysql": {
+        "count": 1,
         "ip": "114.115.167.51",
         "port": 3306,
         "user": "yjz",
@@ -66,7 +67,7 @@
         "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
-        "count": 4,
+        "count": 1,
         "lua": "./Script/RedisCommand",
         "passwd": "199595yjz."
     },
@@ -95,6 +96,7 @@
         "GateService",
         "ChatService",
         "MysqlService",
+        "UserSubService",
         "HttpUserService",
         "LocalSubService"
     ],
@@ -103,6 +105,7 @@
         "GateService",
         "ChatService",
         "MysqlService",
+        "UserSubService",
         "HttpUserService",
         "LocalSubService"
     ],

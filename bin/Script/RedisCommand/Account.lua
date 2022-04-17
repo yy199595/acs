@@ -6,7 +6,7 @@ Account.AddNewUser = function(keys)
     if ret == 0 then
         return 0
     end
-    return redis.call("INCR", "user_id");
+    return redis.call("INCR", "user_id") + 1995;
 end
 local args = {}
 for index = 2, #KEYS do

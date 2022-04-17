@@ -52,12 +52,13 @@ XCode =
 	RedisInvokeFailure = 49,--Redis命令执行失败
 	AccountAlreadyExists = 50,--账号已经存在
 	AccountNotExists = 51,--账号不存在
-	HttpTaskStarFail = 52,--Http任务启动失败
-	HttpUrlParseError = 53,--HttpUrl解析失败
-	HostResolverError = 54,--Host主机没发现
-	HttpNetWorkError = 55,--Http网络错误
-	HttpResponseError = 56,--Http服务器返回错误
-	HttpMethodNotFound = 57,--Http方法没发现
-	HttpHeadParseFailure = 58--Http协议头解析失败
+	AddressAllotFailure = 52,--服务分配失败
+	HttpTaskStarFail = 53,--Http任务启动失败
+	HttpUrlParseError = 54,--HttpUrl解析失败
+	HostResolverError = 55,--Host主机没发现
+	HttpNetWorkError = 56,--Http网络错误
+	HttpResponseError = 57,--Http服务器返回错误
+	HttpMethodNotFound = 58,--Http方法没发现
+	HttpHeadParseFailure = 59--Http协议头解析失败
 }
 return XCode

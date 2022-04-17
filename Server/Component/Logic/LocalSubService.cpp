@@ -104,7 +104,7 @@ namespace Sentry
 			}
 			jsonWriter.AddMember("service", services);
 			jsonWriter.AddMember("rpc", this->mRpcAddress);
-			this->Publish(rpcAddress, "LocalSubService.Push", jsonWriter);
+			this->Publish(rpcAddress, "Push", jsonWriter);
 		}
 	}
 
@@ -148,7 +148,7 @@ namespace Sentry
 		jsonWriter.AddMember("response", true);
 		jsonWriter.AddMember("rpc", this->mRpcAddress);
 		jsonWriter.AddMember("http", this->mHttpService);
-		long long number = this->Publish("LocalSubService.Push", jsonWriter);
+		long long number = this->Publish("Push", jsonWriter);
 		LOG_DEBUG("publish successful count = " << number);
 	}
 

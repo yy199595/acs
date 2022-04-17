@@ -11,6 +11,7 @@ namespace Sentry
 		methodRegister.Bind("Add", &MysqlService::Add);
 		methodRegister.Bind("Save", &MysqlService::Save);
 		methodRegister.Bind("Query", &MysqlService::Query);
+		methodRegister.Bind("Update", &MysqlService::Update);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
 		methodRegister.Bind("Invoke", &MysqlService::Invoke);
 

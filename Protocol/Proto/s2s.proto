@@ -2,44 +2,7 @@ syntax = "proto3";
 package s2s;
 import "google/protobuf/any.proto";
 
-message Listener
-{
-    string name = 1;
-    uint32 port = 2;
-}
-
-message NodeInfo
-{
-    int32 area_id = 1;   //区服id
-    int32 node_id = 2;   //节点id
-    string server_ip = 3;
-    string server_name = 4;  //服务器名字
-    repeated string services = 5;   //服务名列表
-    map<string, int32> listeners = 6; //所有监听器
-}
-
-message GroupConfigData
-{
-    uint32 group_id = 1;     //组id
-    int64 open_time = 2;     // 开启时间
-    string token = 3;       //验证token
-    string group_name = 4;
-}
-
-message NodeRegister
-{
-    message Request
-    {
-        NodeInfo node_info = 1;
-    }
-    message Response
-    {
-        int32 node_id = 1;
-        GroupConfigData group_data = 2;
-    }
-}
-
-message Mysql
+message Mysql //mysql操作
 {
     message Add
     {
@@ -78,25 +41,13 @@ message Mysql
     }
 }
 
+//网关
 
-message HostQuery
-{
-    message Response
-    {
-        repeated string hosts = 1;
-    }
-}
-
-message AddToGate
+message AddressAllot
 {
     message Request
     {
         int64 user_id = 1;
-    }
-    message Response
-    {
-        string gate_ip = 1;
-        int32 gate_port = 2;
-        string login_token = 3;
+        string login_token = 2;
     }
 }
