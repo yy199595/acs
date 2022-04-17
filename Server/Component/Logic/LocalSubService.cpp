@@ -108,27 +108,6 @@ namespace Sentry
 		}
 	}
 
-	void LocalSubService::GetServiceInfo(Json::Writer& jsonWriter)
-	{
-		const ServerConfig & config = this->GetApp()->GetConfig();
-
-
-		jsonWriter.StartObject("rpc");
-		jsonWriter.AddMember("address", config.GetRpcAddress());
-
-		jsonWriter.EndObject();
-
-		jsonWriter.StartObject("http");
-		jsonWriter.AddMember("address", config.GetHttpAddress());
-
-		jsonWriter.EndObject();
-
-
-		jsonWriter.StartArray("sub");
-
-		jsonWriter.EndObject();
-	}
-
 	void LocalSubService::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer jsonWriter;

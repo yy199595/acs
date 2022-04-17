@@ -29,8 +29,6 @@ namespace Sentry
 		void Push(const Json::Reader& jsonReader);
 		void Remove(const Json::Reader& jsonReader);
 	 private:
-		void GetServiceInfo(Json::Writer & jsonWriter);
-	 private:
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
