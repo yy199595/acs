@@ -44,6 +44,8 @@ MysqlInitTaskFail	Mysql初始化失败
 MysqlSocketIsNull	Mysql连接是空
 MysqlSelectDbFailure	Mysql选择数据库失败
 MysqlInvokeFailure	Mysql执行sql语句失败
+SaveToMysqlFailure	保存数据到Mysql失败
+SaveToRedisFailure	保存数据到Redis失败
 RedisNotInCoroutine	Redis没有协程上下文
 RedisStartTaskFail	Redis任务启动失败
 RedisSocketIsNull	Redis连接是空

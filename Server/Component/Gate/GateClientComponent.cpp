@@ -43,6 +43,7 @@ namespace Sentry
 
 			gateClient->StartReceive();
 			this->mGateClientMap.emplace(id, gateClient);
+			this->mGateComponent->OnConnect(socket->GetSocketId());
 		}
 	}
 

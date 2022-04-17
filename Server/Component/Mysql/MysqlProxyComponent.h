@@ -15,14 +15,11 @@ namespace Sentry
 		~MysqlProxyComponent() final = default;
 
 	 public:
-		template<typename T>
-		XCode Add(const T& data);
+		XCode Add(const Message & data);
 
-		template<typename T>
-		XCode Save(const T& data);
+		XCode Save(const Message & data);
 
-		template<typename T>
-		std::shared_ptr<T> QueryOnce(const std::string& queryJson);
+		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response);
 
 		template<typename T>
 		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson);
@@ -41,53 +38,6 @@ namespace Sentry
 	 private:
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response);
 	};
-
-	template<typename T>
-	XCode MysqlProxyComponent::Add(const T& data)
-	{
-		s2s::Mysql::Add request;
-		request.set_table(data.GetTypeName());
-		request.mutable_data()->PackFrom(data);
-		std::shared_ptr<s2s::Mysql::Response>
-		    response = std::make_shared<s2s::Mysql::Response>();
-		return this->Call("Add", request, response);
-	}
-
-	template<typename T>
-	XCode
-	MysqlProxyComponent::Save(const T& data)
-	{
-		s2s::Mysql::Save request;
-		request.set_table(data.GetTypeName());
-		request.mutable_data()->PackFrom(data);
-		std::shared_ptr<s2s::Mysql::Response>
-			response = std::make_shared<s2s::Mysql::Response>();
-		return  this->Call("Save", request, response);
-	}
-
-	template<typename T>
-	std::shared_ptr<T> MysqlProxyComponent::QueryOnce(const std::string& queryJson)
-	{
-		std::shared_ptr<T> queryData(new T());
-
-		s2s::Mysql::Query request;
-		request.set_where_json(queryJson);
-		request.set_table(queryData->GetTypeName());
-
-		std::shared_ptr<s2s::Mysql::Response>
-			response = std::make_shared<s2s::Mysql::Response>();
-		if(this->Call("Query", request, response) != XCode::Successful)
-		{
-			return nullptr;
-		}
-		if (response != nullptr && response->json_array_size() > 0)
-		{
-			const std::string& json = response->json_array(0);
-			util::Status status = util::JsonStringToMessage(json, queryData.get());
-			return status.ok() ? queryData : nullptr;
-		}
-		return nullptr;
-	}
 
 	template<typename T>
 	std::vector<std::shared_ptr<T>>MysqlProxyComponent::QueryAll(const std::string& queryJson)

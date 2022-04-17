@@ -51,8 +51,14 @@ namespace Sentry
 
 	XCode GateService::Login(const c2s::GateLogin::Request& request)
 	{
-
-		return XCode::Successful;
+		const std::string & token = request.token();
+		auto iter = this->mTokenMap.find(token);
+		if(iter != this->mTokenMap.end())
+		{
+			this->mTokenMap.erase(iter);
+			return XCode::Successful;
+		}
+		return XCode::Failure;
 	}
 
 	XCode GateService::Allot(const s2s::AddressAllot::Request& request)
@@ -84,4 +90,5 @@ namespace Sentry
 			this->mTokenMap.erase(iter);
 		}
 	}
+
 }

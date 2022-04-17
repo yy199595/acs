@@ -68,13 +68,12 @@ namespace Sentry
         void AddValue(RedisRespType type);
         void AddValue(const std::string & data);
         void AddValue(const char * str, size_t size);
+	 public:
         const std::string & GetValue(size_t index = 0);
-
+		long long GetNumber() { return this->mNumber; }
+		RedisRespType GetType() { return this->mType; }
+		size_t GetArraySize() { return this->mArray.size();}
         bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
-    public:
-        long long GetNumber() { return this->mNumber; }
-        RedisRespType GetType() { return this->mType; }
-        size_t GetArraySize() { return this->mArray.size();}
     private:
         long long mNumber;
         RedisRespType mType;

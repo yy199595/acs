@@ -5,14 +5,14 @@
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Redis/RedisComponent.h"
-#include"Component/Mysql//MysqlProxyComponent.h"
+#include"Component/Mysql/MysqlProxyComponent.h"
 
 namespace Sentry
 {
 	void HttpUserService::Awake()
 	{
-		this->mRedisComponent = nullptr;
 		this->mMysqlComponent = nullptr;
+		this->mRedisComponent = nullptr;
 	}
 
 	bool HttpUserService::LateAwake()
@@ -37,12 +37,19 @@ namespace Sentry
 		LOGIC_THROW_ERROR(request.GetMember("account", account));
 		LOGIC_THROW_ERROR(request.GetMember("password", password));
 
-		Json::Writer json;
-		json.AddMember("account", account);
-		std::string whereJson = json.ToJsonString();
-		std::shared_ptr<db_account::tab_user_account> userData = this->mMysqlComponent
-			->QueryOnce<db_account::tab_user_account>(whereJson);
-		if (userData == nullptr || userData->password() != password)
+
+		Json::Writer queryJson;
+		queryJson.AddMember("account", account);
+		const std::string whereJson = queryJson.ToJsonString();
+		std::shared_ptr<db_account::tab_user_account> userAccount =
+			std::make_shared<db_account::tab_user_account>();
+		XCode code = this->mMysqlComponent->QueryOnce(whereJson, userAccount);
+		if(code != XCode::Successful)
+		{
+			return code;
+		}
+
+		if (userAccount->password() != password)
 		{
 			LOG_ERROR(account << " login failure password error");
 			response.AddMember("error", "user password error");
@@ -66,7 +73,7 @@ namespace Sentry
 		response.AddMember("address", address);
 
 		allotRequest.set_login_token(newToken);
-		allotRequest.set_user_id(userData->user_id());
+		allotRequest.set_user_id(userAccount->user_id());
 		return this->mGateService->Call(address, "Allot", allotRequest);
 	}
 
@@ -78,18 +85,16 @@ namespace Sentry
 		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
-		std::shared_ptr<RedisResponse> resp = this->mRedisComponent->Call("Account.AddNewUser", user_account);
-		if (resp->GetNumber() == 0)
-		{
-			return XCode::AccountAlreadyExists;
-		}
+
+		long long userId = Helper::Guid::Create();
+		long long nowTime = Helper::Time::GetNowSecTime();
 		db_account::tab_user_account userAccountInfo;
 
+		userAccountInfo.set_user_id(userId);
+		userAccountInfo.set_register_time(nowTime);
 		userAccountInfo.set_account(user_account);
 		userAccountInfo.set_phone_num(phoneNumber);
 		userAccountInfo.set_password(user_password);
-		userAccountInfo.set_user_id(resp->GetNumber());
-		userAccountInfo.set_register_time(Helper::Time::GetNowSecTime());
 		return this->mMysqlComponent->Add(userAccountInfo);
 	}
 

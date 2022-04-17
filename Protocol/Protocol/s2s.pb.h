@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +56,12 @@ extern AddressAllotDefaultTypeInternal _AddressAllot_default_instance_;
 class AddressAllot_Request;
 class AddressAllot_RequestDefaultTypeInternal;
 extern AddressAllot_RequestDefaultTypeInternal _AddressAllot_Request_default_instance_;
+class GateLogin;
+class GateLoginDefaultTypeInternal;
+extern GateLoginDefaultTypeInternal _GateLogin_default_instance_;
+class GateLogin_Request;
+class GateLogin_RequestDefaultTypeInternal;
+extern GateLogin_RequestDefaultTypeInternal _GateLogin_Request_default_instance_;
 class Mysql;
 class MysqlDefaultTypeInternal;
 extern MysqlDefaultTypeInternal _Mysql_default_instance_;
@@ -85,6 +91,8 @@ namespace google {
 namespace protobuf {
 template<> ::s2s::AddressAllot* Arena::CreateMaybeMessage<::s2s::AddressAllot>(Arena*);
 template<> ::s2s::AddressAllot_Request* Arena::CreateMaybeMessage<::s2s::AddressAllot_Request>(Arena*);
+template<> ::s2s::GateLogin* Arena::CreateMaybeMessage<::s2s::GateLogin>(Arena*);
+template<> ::s2s::GateLogin_Request* Arena::CreateMaybeMessage<::s2s::GateLogin_Request>(Arena*);
 template<> ::s2s::Mysql* Arena::CreateMaybeMessage<::s2s::Mysql>(Arena*);
 template<> ::s2s::Mysql_Add* Arena::CreateMaybeMessage<::s2s::Mysql_Add>(Arena*);
 template<> ::s2s::Mysql_Delete* Arena::CreateMaybeMessage<::s2s::Mysql_Delete>(Arena*);
@@ -1387,6 +1395,233 @@ class AddressAllot :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
+// -------------------------------------------------------------------
+
+class GateLogin_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.GateLogin.Request) */ {
+ public:
+  GateLogin_Request();
+  virtual ~GateLogin_Request();
+
+  GateLogin_Request(const GateLogin_Request& from);
+
+  inline GateLogin_Request& operator=(const GateLogin_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GateLogin_Request(GateLogin_Request&& from) noexcept
+    : GateLogin_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline GateLogin_Request& operator=(GateLogin_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GateLogin_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GateLogin_Request* internal_default_instance() {
+    return reinterpret_cast<const GateLogin_Request*>(
+               &_GateLogin_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(GateLogin_Request* other);
+  friend void swap(GateLogin_Request& a, GateLogin_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GateLogin_Request* New() const final {
+    return CreateMaybeMessage<GateLogin_Request>(nullptr);
+  }
+
+  GateLogin_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GateLogin_Request& from);
+  void MergeFrom(const GateLogin_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GateLogin_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string login_token = 1;
+  void clear_login_token();
+  static const int kLoginTokenFieldNumber = 1;
+  const ::std::string& login_token() const;
+  void set_login_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_login_token(::std::string&& value);
+  #endif
+  void set_login_token(const char* value);
+  void set_login_token(const char* value, size_t size);
+  ::std::string* mutable_login_token();
+  ::std::string* release_login_token();
+  void set_allocated_login_token(::std::string* login_token);
+
+  // @@protoc_insertion_point(class_scope:s2s.GateLogin.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr login_token_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class GateLogin :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.GateLogin) */ {
+ public:
+  GateLogin();
+  virtual ~GateLogin();
+
+  GateLogin(const GateLogin& from);
+
+  inline GateLogin& operator=(const GateLogin& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GateLogin(GateLogin&& from) noexcept
+    : GateLogin() {
+    *this = ::std::move(from);
+  }
+
+  inline GateLogin& operator=(GateLogin&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GateLogin& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GateLogin* internal_default_instance() {
+    return reinterpret_cast<const GateLogin*>(
+               &_GateLogin_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(GateLogin* other);
+  friend void swap(GateLogin& a, GateLogin& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GateLogin* New() const final {
+    return CreateMaybeMessage<GateLogin>(nullptr);
+  }
+
+  GateLogin* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GateLogin>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GateLogin& from);
+  void MergeFrom(const GateLogin& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GateLogin* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef GateLogin_Request Request;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:s2s.GateLogin)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
 // ===================================================================
 
 
@@ -2243,9 +2478,74 @@ inline void AddressAllot_Request::set_allocated_login_token(::std::string* login
 
 // AddressAllot
 
+// -------------------------------------------------------------------
+
+// GateLogin_Request
+
+// string login_token = 1;
+inline void GateLogin_Request::clear_login_token() {
+  login_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GateLogin_Request::login_token() const {
+  // @@protoc_insertion_point(field_get:s2s.GateLogin.Request.login_token)
+  return login_token_.GetNoArena();
+}
+inline void GateLogin_Request::set_login_token(const ::std::string& value) {
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.GateLogin.Request.login_token)
+}
+#if LANG_CXX11
+inline void GateLogin_Request::set_login_token(::std::string&& value) {
+  
+  login_token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.GateLogin.Request.login_token)
+}
+#endif
+inline void GateLogin_Request::set_login_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.GateLogin.Request.login_token)
+}
+inline void GateLogin_Request::set_login_token(const char* value, size_t size) {
+  
+  login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.GateLogin.Request.login_token)
+}
+inline ::std::string* GateLogin_Request::mutable_login_token() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.GateLogin.Request.login_token)
+  return login_token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GateLogin_Request::release_login_token() {
+  // @@protoc_insertion_point(field_release:s2s.GateLogin.Request.login_token)
+  
+  return login_token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GateLogin_Request::set_allocated_login_token(::std::string* login_token) {
+  if (login_token != nullptr) {
+    
+  } else {
+    
+  }
+  login_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), login_token);
+  // @@protoc_insertion_point(field_set_allocated:s2s.GateLogin.Request.login_token)
+}
+
+// -------------------------------------------------------------------
+
+// GateLogin
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

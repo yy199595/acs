@@ -27,6 +27,7 @@
 #include"Component/Lua/LuaRegisterComponent.h"
 
 #include"Component/Logic/UserSubService.h"
+#include"Component/Common/DataMgrComponent.h"
 using namespace Sentry;
 using namespace Client;
 
@@ -39,7 +40,8 @@ void RegisterComponent()
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
     ComponentFactory::Add<MonitorComponent>("MonitorComponent");
-    ComponentFactory::Add<OperatorComponent>("OperatorComponent");
+	ComponentFactory::Add<DataMgrComponent>("DataMgrComponent");
+	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
     ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
 

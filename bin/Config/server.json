@@ -79,6 +79,7 @@
         "RpcComponent",
         "HttpComponent",
         "ConsoleComponent",
+        "DataMgrComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
         "RedisComponent",

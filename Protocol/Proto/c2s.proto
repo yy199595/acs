@@ -29,47 +29,11 @@ message Rpc
     }
 }
 
-message AccountLogin
-{
-    message Request
-    {
-        string account = 1;
-        string token = 2;
-        string passwrod = 3;   // 密码
-        string login_dev = 4; //登陆设备
-    }
-    message Response
-    {
-        string token = 1;  //重新生成的token
-        string gate_token = 2;  //登陆网关的token
-        int64 last_logintime = 4;    // 上次登陆时间
-        repeated ServerInfo server_infos = 5;    //服务器列表
-    }
-}
-
-message AccountRegister
-{
-    message Request
-    {
-        string account = 1;
-        string password = 2;
-        string login_dev = 3;
-    }
-    message Response
-    {
-        string token = 1;
-    }
-}
-
 message GateLogin
 {
     message Request
     {
         string token = 1;
-    }
-    message Response
-    {
-
     }
 }
 

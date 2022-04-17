@@ -7,18 +7,17 @@
 #include"Component/RpcService/LocalServerRpc.h"
 namespace Sentry
 {
-	class GateService : public LocalServerRpc
+	class GateService final : public LocalServerRpc
 	{
 	 public:
 		GateService() = default;
 		~GateService() final = default;
-	 protected:
-		bool LateAwake() final;
 	 private:
 		XCode Ping();
 		XCode Login(const c2s::GateLogin::Request& request);
 		XCode Allot(const s2s::AddressAllot::Request & request);
 	 private:
+		bool LateAwake() final;
 		void OnTokenTimeout(const std::string& token);
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:

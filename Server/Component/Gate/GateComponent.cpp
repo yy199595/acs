@@ -9,6 +9,8 @@
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
+#include"Component/Gate/GateService.h"
+#include"Component/RpcService/LocalServerRpc.h"
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
@@ -18,51 +20,39 @@ namespace Sentry
 
 	bool GateComponent::LateAwake()
 	{
+		this->mTaskComponent = this->GetApp()->GetTaskComponent();
+		LOG_CHECK_RET_FALSE(this->mGateService = this->GetComponent<GateService>());
 		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
 
+	void GateComponent::OnConnect(long long sockId)
+	{
+		std::shared_ptr<RequestTaskQueueSource> taskQueueSource =
+			std::make_shared<RequestTaskQueueSource>();
+
+		this->mClientTasks[sockId] = taskQueueSource;
+		this->mTaskComponent->Start(&GateComponent::OnClientRequest, this, sockId);
+	}
+
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
+		const long long socketId = request->sock_id();
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
 		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
 		if (config == nullptr)
 		{
+			this->mGateClientComponent->StartClose(socketId);
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
-
-		RpcServiceBase * rpcServiceComponent = this->GetComponent<RpcServiceBase>(config->Service);
-
-		//TODO
-//		auto serviceEntity = this->mServiceComponent->GetServiceProxy(config->Service);
-//
-//		if (!config->Request.empty())
-//		{
-//			if (!request->has_data()) //没有正确的消息体
-//			{
-//				return XCode::CallArgsError;
-//			}
-//			this->mProtoName.clear();
-//			if (Any::ParseAnyTypeUrl(request->data().type_url(), &mProtoName))
-//			{
-//				if (this->mProtoName != config->Request) //请求的消息不正确
-//				{
-//					return XCode::CallArgsError;
-//				}
-//			}
-//		}
-//
-//		// 分配地址
-//		auto requestMessage = serviceEntity->NewRequest(request->method_name());
-//		std::shared_ptr<RpcProxyTask> proxyTask(new RpcProxyTask());
-//		if (request->has_data())
-//		{
-//			requestMessage->mutable_data()->CopyFrom(request->data());
-//		}
-//		requestMessage->set_rpc_id(proxyTask->GetRpcId());
-//		proxyTask->InitProxyTask(request->rpc_id(), request->sock_id(), this, this->mRpcComponent);
+		auto iter = this->mClientTasks.find(request->sock_id());
+		if(iter != this->mClientTasks.end())
+		{
+			std::shared_ptr<RequestTaskQueueSource> taskQueueSource = iter->second;
+			taskQueueSource->AddResult(request);
+		}
 		return XCode::Successful;
 	}
 
@@ -86,5 +76,21 @@ namespace Sentry
 			return XCode::NetWorkError;
 		}
 		return XCode::Successful;
+	}
+
+	void GateComponent::OnClientRequest(long long id)
+	{
+		auto iter = this->mClientTasks.find(id);
+		if(iter != this->mClientTasks.end())
+		{
+			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+			std::shared_ptr<RequestTaskQueueSource> taskQueueSource = iter->second;
+			while(taskQueueSource != nullptr)
+			{
+				std::shared_ptr<c2s::Rpc::Request> request = taskQueueSource->Await();
+				const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
+
+			}
+		}
 	}
 }

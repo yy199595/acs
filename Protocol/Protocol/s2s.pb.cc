@@ -58,6 +58,14 @@ class AddressAllotDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<AddressAllot> _instance;
 } _AddressAllot_default_instance_;
+class GateLogin_RequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<GateLogin_Request> _instance;
+} _GateLogin_Request_default_instance_;
+class GateLoginDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<GateLogin> _instance;
+} _GateLogin_default_instance_;
 }  // namespace s2s
 static void InitDefaultsMysql_Add_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -201,6 +209,34 @@ static void InitDefaultsAddressAllot_s2s_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_AddressAllot_s2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAddressAllot_s2s_2eproto}, {}};
 
+static void InitDefaultsGateLogin_Request_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_GateLogin_Request_default_instance_;
+    new (ptr) ::s2s::GateLogin_Request();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::GateLogin_Request::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_GateLogin_Request_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsGateLogin_Request_s2s_2eproto}, {}};
+
+static void InitDefaultsGateLogin_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_GateLogin_default_instance_;
+    new (ptr) ::s2s::GateLogin();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::GateLogin::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_GateLogin_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsGateLogin_s2s_2eproto}, {}};
+
 void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Add_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Save_s2s_2eproto.base);
@@ -212,9 +248,11 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_AddressAllot_Request_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_AddressAllot_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_GateLogin_Request_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_GateLogin_s2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2eproto[10];
+::google::protobuf::Metadata file_level_metadata_s2s_2eproto[12];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2eproto = nullptr;
 
@@ -285,6 +323,17 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::GateLogin_Request, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::GateLogin_Request, login_token_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::GateLogin, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::s2s::Mysql_Add)},
@@ -297,6 +346,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 49, -1, sizeof(::s2s::Mysql)},
   { 54, -1, sizeof(::s2s::AddressAllot_Request)},
   { 61, -1, sizeof(::s2s::AddressAllot)},
+  { 66, -1, sizeof(::s2s::GateLogin_Request)},
+  { 72, -1, sizeof(::s2s::GateLogin)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -310,12 +361,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_AddressAllot_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_AddressAllot_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_GateLogin_Request_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_GateLogin_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2eproto = {
   {}, AddDescriptors_s2s_2eproto, "s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2eproto::offsets,
-  file_level_metadata_s2s_2eproto, 10, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
+  file_level_metadata_s2s_2eproto, 12, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2eproto[] =
@@ -330,12 +383,13 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "\003 \001(\t\032\025\n\006Invoke\022\013\n\003sql\030\001 \001(\t\032-\n\010Response"
   "\022\r\n\005error\030\001 \001(\t\022\022\n\njson_array\030\002 \003(\t\"\?\n\014A"
   "ddressAllot\032/\n\007Request\022\017\n\007user_id\030\001 \001(\003\022"
-  "\023\n\013login_token\030\002 \001(\tb\006proto3"
+  "\023\n\013login_token\030\002 \001(\t\"+\n\tGateLogin\032\036\n\007Req"
+  "uest\022\023\n\013login_token\030\001 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 468,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 513,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -3695,6 +3749,512 @@ void AddressAllot::InternalSwap(AddressAllot* other) {
 }
 
 
+// ===================================================================
+
+void GateLogin_Request::InitAsDefaultInstance() {
+}
+class GateLogin_Request::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int GateLogin_Request::kLoginTokenFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+GateLogin_Request::GateLogin_Request()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.GateLogin.Request)
+}
+GateLogin_Request::GateLogin_Request(const GateLogin_Request& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  login_token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.login_token().size() > 0) {
+    login_token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_token_);
+  }
+  // @@protoc_insertion_point(copy_constructor:s2s.GateLogin.Request)
+}
+
+void GateLogin_Request::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_GateLogin_Request_s2s_2eproto.base);
+  login_token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+GateLogin_Request::~GateLogin_Request() {
+  // @@protoc_insertion_point(destructor:s2s.GateLogin.Request)
+  SharedDtor();
+}
+
+void GateLogin_Request::SharedDtor() {
+  login_token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void GateLogin_Request::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const GateLogin_Request& GateLogin_Request::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_GateLogin_Request_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void GateLogin_Request::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.GateLogin.Request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  login_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* GateLogin_Request::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<GateLogin_Request*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string login_token = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.GateLogin.Request.login_token");
+        object = msg->mutable_login_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool GateLogin_Request::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.GateLogin.Request)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string login_token = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_login_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->login_token().data(), static_cast<int>(this->login_token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.GateLogin.Request.login_token"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.GateLogin.Request)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.GateLogin.Request)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void GateLogin_Request::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.GateLogin.Request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string login_token = 1;
+  if (this->login_token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->login_token().data(), static_cast<int>(this->login_token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.GateLogin.Request.login_token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->login_token(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.GateLogin.Request)
+}
+
+::google::protobuf::uint8* GateLogin_Request::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.GateLogin.Request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string login_token = 1;
+  if (this->login_token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->login_token().data(), static_cast<int>(this->login_token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.GateLogin.Request.login_token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->login_token(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.GateLogin.Request)
+  return target;
+}
+
+size_t GateLogin_Request::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.GateLogin.Request)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string login_token = 1;
+  if (this->login_token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->login_token());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void GateLogin_Request::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.GateLogin.Request)
+  GOOGLE_DCHECK_NE(&from, this);
+  const GateLogin_Request* source =
+      ::google::protobuf::DynamicCastToGenerated<GateLogin_Request>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.GateLogin.Request)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.GateLogin.Request)
+    MergeFrom(*source);
+  }
+}
+
+void GateLogin_Request::MergeFrom(const GateLogin_Request& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.GateLogin.Request)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.login_token().size() > 0) {
+
+    login_token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_token_);
+  }
+}
+
+void GateLogin_Request::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.GateLogin.Request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GateLogin_Request::CopyFrom(const GateLogin_Request& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.GateLogin.Request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GateLogin_Request::IsInitialized() const {
+  return true;
+}
+
+void GateLogin_Request::Swap(GateLogin_Request* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void GateLogin_Request::InternalSwap(GateLogin_Request* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  login_token_.Swap(&other->login_token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata GateLogin_Request::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void GateLogin::InitAsDefaultInstance() {
+}
+class GateLogin::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+GateLogin::GateLogin()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.GateLogin)
+}
+GateLogin::GateLogin(const GateLogin& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:s2s.GateLogin)
+}
+
+void GateLogin::SharedCtor() {
+}
+
+GateLogin::~GateLogin() {
+  // @@protoc_insertion_point(destructor:s2s.GateLogin)
+  SharedDtor();
+}
+
+void GateLogin::SharedDtor() {
+}
+
+void GateLogin::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const GateLogin& GateLogin::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_GateLogin_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void GateLogin::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.GateLogin)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* GateLogin::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<GateLogin*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool GateLogin::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.GateLogin)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.GateLogin)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.GateLogin)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void GateLogin::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.GateLogin)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.GateLogin)
+}
+
+::google::protobuf::uint8* GateLogin::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.GateLogin)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.GateLogin)
+  return target;
+}
+
+size_t GateLogin::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.GateLogin)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void GateLogin::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.GateLogin)
+  GOOGLE_DCHECK_NE(&from, this);
+  const GateLogin* source =
+      ::google::protobuf::DynamicCastToGenerated<GateLogin>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.GateLogin)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.GateLogin)
+    MergeFrom(*source);
+  }
+}
+
+void GateLogin::MergeFrom(const GateLogin& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.GateLogin)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void GateLogin::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.GateLogin)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GateLogin::CopyFrom(const GateLogin& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.GateLogin)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GateLogin::IsInitialized() const {
+  return true;
+}
+
+void GateLogin::Swap(GateLogin* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void GateLogin::InternalSwap(GateLogin* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata GateLogin::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace s2s
 namespace google {
@@ -3728,6 +4288,12 @@ template<> PROTOBUF_NOINLINE ::s2s::AddressAllot_Request* Arena::CreateMaybeMess
 }
 template<> PROTOBUF_NOINLINE ::s2s::AddressAllot* Arena::CreateMaybeMessage< ::s2s::AddressAllot >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::AddressAllot >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::GateLogin_Request* Arena::CreateMaybeMessage< ::s2s::GateLogin_Request >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::GateLogin_Request >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::GateLogin* Arena::CreateMaybeMessage< ::s2s::GateLogin >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::GateLogin >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

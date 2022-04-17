@@ -27,8 +27,8 @@ namespace Sentry
 	 private:
 		const std::string NewToken(const std::string& account);
 	 private:
-		RedisComponent* mRedisComponent;
 		class GateService * mGateService;
-		MysqlProxyComponent* mMysqlComponent;
+		class RedisComponent * mRedisComponent;
+		class MysqlProxyComponent * mMysqlComponent;
 	};
 }// namespace Sentry

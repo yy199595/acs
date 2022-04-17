@@ -14,9 +14,7 @@ namespace Sentry
 	{
 	public:
 		LocalServerRpc() = default;
-
 	protected:
-		bool GetEntityAddress(long long id, std::string& address) final;
 		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
 	 public:
 		void DelEntity(long long id);
@@ -25,6 +23,7 @@ namespace Sentry
 		bool AllotAddress(std::string& address) const;
 		void OnAddAddress(const std::string &address) final;
 		void OnDelAddress(const std::string &address) final;
+		bool GetEntityAddress(long long id, std::string& address) final;
 		bool IsStartComplete() final { return !this->mRemoteAddressList.empty(); }
 	public:
 		bool LoadService() final;
