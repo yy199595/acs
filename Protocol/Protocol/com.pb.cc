@@ -392,7 +392,7 @@ const ::google::protobuf::uint32 TableStruct_com_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, user_id_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, rpc_id_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, method_id_),
-  PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, socket_id_),
+  PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, address_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, _internal_metadata_),
@@ -460,18 +460,18 @@ const char descriptor_table_protodef_com_2eproto[] =
   "\022\r\n\005array\030\001 \003(\001\"~\n\005Value\032\026\n\005Int32\022\r\n\005val"
   "ue\030\001 \001(\005\032\026\n\005Int64\022\r\n\005value\030\001 \001(\003\032\026\n\005Floa"
   "t\022\r\n\005value\030\001 \001(\002\032\027\n\006Double\022\r\n\005value\030\001 \001("
-  "\001\032\024\n\004Json\022\014\n\004json\030\001 \001(\t\"\355\001\n\003Rpc\032t\n\007Reque"
+  "\001\032\024\n\004Json\022\014\n\004json\030\001 \001(\t\"\353\001\n\003Rpc\032r\n\007Reque"
   "st\022\017\n\007user_id\030\001 \001(\003\022\016\n\006rpc_id\030\002 \001(\003\022\021\n\tm"
-  "ethod_id\030\003 \001(\005\022\021\n\tsocket_id\030\004 \001(\003\022\"\n\004Dat"
-  "a\030\005 \001(\0132\024.google.protobuf.Any\032p\n\010Respons"
-  "e\022\014\n\004code\030\001 \001(\005\022\016\n\006rpc_id\030\002 \001(\003\022\017\n\007user_"
-  "id\030\003 \001(\003\022\021\n\terror_str\030\004 \001(\t\022\"\n\004Data\030\005 \001("
-  "\0132\024.google.protobuf.Anyb\006proto3"
+  "ethod_id\030\003 \001(\005\022\017\n\007address\030\004 \001(\t\022\"\n\004Data\030"
+  "\005 \001(\0132\024.google.protobuf.Any\032p\n\010Response\022"
+  "\014\n\004code\030\001 \001(\005\022\016\n\006rpc_id\030\002 \001(\003\022\017\n\007user_id"
+  "\030\003 \001(\003\022\021\n\terror_str\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132"
+  "\024.google.protobuf.Anyb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_com_2eproto = {
   false, InitDefaults_com_2eproto, 
   descriptor_table_protodef_com_2eproto,
-  "com.proto", &assign_descriptors_table_com_2eproto, 551,
+  "com.proto", &assign_descriptors_table_com_2eproto, 549,
 };
 
 void AddDescriptors_com_2eproto() {
@@ -3742,7 +3742,7 @@ void Rpc_Request::clear_data() {
 const int Rpc_Request::kUserIdFieldNumber;
 const int Rpc_Request::kRpcIdFieldNumber;
 const int Rpc_Request::kMethodIdFieldNumber;
-const int Rpc_Request::kSocketIdFieldNumber;
+const int Rpc_Request::kAddressFieldNumber;
 const int Rpc_Request::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -3755,6 +3755,10 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.address().size() > 0) {
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
   if (from.has_data()) {
     data_ = new ::google::protobuf::Any(*from.data_);
   } else {
@@ -3769,6 +3773,7 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
 void Rpc_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Request_com_2eproto.base);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&method_id_) -
       reinterpret_cast<char*>(&data_)) + sizeof(method_id_));
@@ -3780,6 +3785,7 @@ Rpc_Request::~Rpc_Request() {
 }
 
 void Rpc_Request::SharedDtor() {
+  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
 
@@ -3798,6 +3804,7 @@ void Rpc_Request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
   }
@@ -3842,11 +3849,20 @@ const char* Rpc_Request::_InternalParse(const char* begin, const char* end, void
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // int64 socket_id = 4;
+      // string address = 4;
       case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
-        msg->set_socket_id(::google::protobuf::internal::ReadVarint(&ptr));
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("com.Rpc.Request.address");
+        object = msg->mutable_address();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       // .google.protobuf.Any Data = 5;
@@ -3877,6 +3893,10 @@ const char* Rpc_Request::_InternalParse(const char* begin, const char* end, void
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -3931,13 +3951,15 @@ bool Rpc_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // int64 socket_id = 4;
+      // string address = 4;
       case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &socket_id_)));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_address()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->address().data(), static_cast<int>(this->address().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "com.Rpc.Request.address"));
         } else {
           goto handle_unusual;
         }
@@ -3997,9 +4019,14 @@ void Rpc_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->method_id(), output);
   }
 
-  // int64 socket_id = 4;
-  if (this->socket_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->socket_id(), output);
+  // string address = 4;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Request.address");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->address(), output);
   }
 
   // .google.protobuf.Any Data = 5;
@@ -4036,9 +4063,15 @@ void Rpc_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->method_id(), target);
   }
 
-  // int64 socket_id = 4;
-  if (this->socket_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->socket_id(), target);
+  // string address = 4;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Request.address");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->address(), target);
   }
 
   // .google.protobuf.Any Data = 5;
@@ -4069,6 +4102,13 @@ size_t Rpc_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // string address = 4;
+  if (this->address().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->address());
+  }
+
   // .google.protobuf.Any Data = 5;
   if (this->has_data()) {
     total_size += 1 +
@@ -4088,13 +4128,6 @@ size_t Rpc_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->rpc_id());
-  }
-
-  // int64 socket_id = 4;
-  if (this->socket_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->socket_id());
   }
 
   // int32 method_id = 3;
@@ -4131,6 +4164,10 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.address().size() > 0) {
+
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
   if (from.has_data()) {
     mutable_data()->::google::protobuf::Any::MergeFrom(from.data());
   }
@@ -4139,9 +4176,6 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   }
   if (from.rpc_id() != 0) {
     set_rpc_id(from.rpc_id());
-  }
-  if (from.socket_id() != 0) {
-    set_socket_id(from.socket_id());
   }
   if (from.method_id() != 0) {
     set_method_id(from.method_id());
@@ -4173,10 +4207,11 @@ void Rpc_Request::Swap(Rpc_Request* other) {
 void Rpc_Request::InternalSwap(Rpc_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(data_, other->data_);
   swap(user_id_, other->user_id_);
   swap(rpc_id_, other->rpc_id_);
-  swap(socket_id_, other->socket_id_);
   swap(method_id_, other->method_id_);
 }
 

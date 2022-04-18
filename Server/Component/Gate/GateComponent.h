@@ -21,16 +21,13 @@ namespace Sentry
 	 public:
 		void OnConnect(long long sockId) final;
 		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
-		XCode OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response) final;
-	 private:
-		void OnClientRequest(long long sockId);
+		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
 	 private:
 		class GateService * mGateService;
 		class RpcComponent* mRpcComponent;
 		class TaskComponent * mTaskComponent;
 		class GateClientComponent* mGateClientComponent;
 		std::unordered_map<long long, long long> mClientMap;
-		std::unordered_map<long long, std::shared_ptr<RequestTaskQueueSource>> mClientTasks;
 	};
 }
 

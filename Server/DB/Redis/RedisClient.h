@@ -17,7 +17,7 @@ namespace Sentry
     public:
         bool IsOpen() const { return this->mIsOpen; }
         long long GetLastOperatorTime() { return this->mLastOperatorTime;}
-        const std::string & GetName() { return this->mSocket->GetName(); }
+        //const std::string & GetName() { return this->mSocket->GetName(); }
         std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
 
     private:

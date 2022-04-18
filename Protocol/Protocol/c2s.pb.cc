@@ -16,7 +16,6 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_c2s_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ServerInfo_c2s_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fany_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Any_google_2fprotobuf_2fany_2eproto;
 namespace c2s {
 class ServerInfoDefaultTypeInternal {
@@ -35,38 +34,10 @@ class RpcDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Rpc> _instance;
 } _Rpc_default_instance_;
-class AccountLogin_RequestDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountLogin_Request> _instance;
-} _AccountLogin_Request_default_instance_;
-class AccountLogin_ResponseDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountLogin_Response> _instance;
-} _AccountLogin_Response_default_instance_;
-class AccountLoginDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountLogin> _instance;
-} _AccountLogin_default_instance_;
-class AccountRegister_RequestDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountRegister_Request> _instance;
-} _AccountRegister_Request_default_instance_;
-class AccountRegister_ResponseDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountRegister_Response> _instance;
-} _AccountRegister_Response_default_instance_;
-class AccountRegisterDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AccountRegister> _instance;
-} _AccountRegister_default_instance_;
 class GateLogin_RequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<GateLogin_Request> _instance;
 } _GateLogin_Request_default_instance_;
-class GateLogin_ResponseDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<GateLogin_Response> _instance;
-} _GateLogin_Response_default_instance_;
 class GateLoginDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<GateLogin> _instance;
@@ -142,91 +113,6 @@ static void InitDefaultsRpc_c2s_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_Rpc_c2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsRpc_c2s_2eproto}, {}};
 
-static void InitDefaultsAccountLogin_Request_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountLogin_Request_default_instance_;
-    new (ptr) ::c2s::AccountLogin_Request();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountLogin_Request::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_AccountLogin_Request_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAccountLogin_Request_c2s_2eproto}, {}};
-
-static void InitDefaultsAccountLogin_Response_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountLogin_Response_default_instance_;
-    new (ptr) ::c2s::AccountLogin_Response();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountLogin_Response::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_AccountLogin_Response_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsAccountLogin_Response_c2s_2eproto}, {
-      &scc_info_ServerInfo_c2s_2eproto.base,}};
-
-static void InitDefaultsAccountLogin_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountLogin_default_instance_;
-    new (ptr) ::c2s::AccountLogin();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountLogin::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_AccountLogin_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAccountLogin_c2s_2eproto}, {}};
-
-static void InitDefaultsAccountRegister_Request_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountRegister_Request_default_instance_;
-    new (ptr) ::c2s::AccountRegister_Request();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountRegister_Request::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_AccountRegister_Request_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAccountRegister_Request_c2s_2eproto}, {}};
-
-static void InitDefaultsAccountRegister_Response_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountRegister_Response_default_instance_;
-    new (ptr) ::c2s::AccountRegister_Response();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountRegister_Response::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_AccountRegister_Response_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAccountRegister_Response_c2s_2eproto}, {}};
-
-static void InitDefaultsAccountRegister_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_AccountRegister_default_instance_;
-    new (ptr) ::c2s::AccountRegister();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::AccountRegister::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_AccountRegister_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAccountRegister_c2s_2eproto}, {}};
-
 static void InitDefaultsGateLogin_Request_c2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -240,20 +126,6 @@ static void InitDefaultsGateLogin_Request_c2s_2eproto() {
 
 ::google::protobuf::internal::SCCInfo<0> scc_info_GateLogin_Request_c2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsGateLogin_Request_c2s_2eproto}, {}};
-
-static void InitDefaultsGateLogin_Response_c2s_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::c2s::_GateLogin_Response_default_instance_;
-    new (ptr) ::c2s::GateLogin_Response();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::c2s::GateLogin_Response::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_GateLogin_Response_c2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsGateLogin_Response_c2s_2eproto}, {}};
 
 static void InitDefaultsGateLogin_c2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -316,21 +188,14 @@ void InitDefaults_c2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_Request_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_Response_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountLogin_Request_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountLogin_Response_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountLogin_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountRegister_Request_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountRegister_Response_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_AccountRegister_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_GateLogin_Request_c2s_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_GateLogin_Response_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_GateLogin_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Chat_Request_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Chat_Notice_c2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Chat_c2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_c2s_2eproto[16];
+::google::protobuf::Metadata file_level_metadata_c2s_2eproto[9];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_c2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_c2s_2eproto = nullptr;
 
@@ -349,7 +214,7 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, rpc_id_),
-  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, sock_id_),
+  PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, address_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, method_name_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, message_idx_),
   PROTOBUF_FIELD_OFFSET(::c2s::Rpc_Request, data_),
@@ -369,58 +234,11 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Request, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Request, account_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Request, token_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Request, passwrod_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Request, login_dev_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Response, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Response, token_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Response, gate_token_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Response, last_logintime_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin_Response, server_infos_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountLogin, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Request, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Request, account_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Request, password_),
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Request, login_dev_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Response, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister_Response, token_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::AccountRegister, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::GateLogin_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::GateLogin_Request, token_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::c2s::GateLogin_Response, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::GateLogin, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -449,18 +267,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 8, -1, sizeof(::c2s::Rpc_Request)},
   { 18, -1, sizeof(::c2s::Rpc_Response)},
   { 28, -1, sizeof(::c2s::Rpc)},
-  { 33, -1, sizeof(::c2s::AccountLogin_Request)},
-  { 42, -1, sizeof(::c2s::AccountLogin_Response)},
-  { 51, -1, sizeof(::c2s::AccountLogin)},
-  { 56, -1, sizeof(::c2s::AccountRegister_Request)},
-  { 64, -1, sizeof(::c2s::AccountRegister_Response)},
-  { 70, -1, sizeof(::c2s::AccountRegister)},
-  { 75, -1, sizeof(::c2s::GateLogin_Request)},
-  { 81, -1, sizeof(::c2s::GateLogin_Response)},
-  { 86, -1, sizeof(::c2s::GateLogin)},
-  { 91, -1, sizeof(::c2s::Chat_Request)},
-  { 98, -1, sizeof(::c2s::Chat_Notice)},
-  { 103, -1, sizeof(::c2s::Chat)},
+  { 33, -1, sizeof(::c2s::GateLogin_Request)},
+  { 39, -1, sizeof(::c2s::GateLogin)},
+  { 44, -1, sizeof(::c2s::Chat_Request)},
+  { 51, -1, sizeof(::c2s::Chat_Notice)},
+  { 56, -1, sizeof(::c2s::Chat)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -468,14 +279,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_Rpc_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_Rpc_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_Rpc_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountLogin_Request_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountLogin_Response_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountLogin_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountRegister_Request_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountRegister_Response_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_AccountRegister_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_GateLogin_Request_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_GateLogin_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_GateLogin_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_Chat_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::c2s::_Chat_Notice_default_instance_),
@@ -485,36 +289,27 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_c2s_2eproto = {
   {}, AddDescriptors_c2s_2eproto, "c2s.proto", schemas,
   file_default_instances, TableStruct_c2s_2eproto::offsets,
-  file_level_metadata_c2s_2eproto, 16, file_level_enum_descriptors_c2s_2eproto, file_level_service_descriptors_c2s_2eproto,
+  file_level_metadata_c2s_2eproto, 9, file_level_enum_descriptors_c2s_2eproto, file_level_service_descriptors_c2s_2eproto,
 };
 
 const char descriptor_table_protodef_c2s_2eproto[] =
   "\n\tc2s.proto\022\003c2s\032\031google/protobuf/any.pr"
   "oto\"J\n\nServerInfo\022\021\n\tserver_id\030\001 \001(\t\022\023\n\013"
   "server_name\030\002 \001(\t\022\024\n\014server_state\030\003 \001(\005\""
-  "\361\001\n\003Rpc\032x\n\007Request\022\016\n\006rpc_id\030\001 \001(\003\022\017\n\007so"
-  "ck_id\030\002 \001(\003\022\023\n\013method_name\030\003 \001(\t\022\023\n\013mess"
+  "\361\001\n\003Rpc\032x\n\007Request\022\016\n\006rpc_id\030\001 \001(\003\022\017\n\007ad"
+  "dress\030\002 \001(\t\022\023\n\013method_name\030\003 \001(\t\022\023\n\013mess"
   "age_idx\030\004 \001(\r\022\"\n\004data\030\005 \001(\0132\024.google.pro"
   "tobuf.Any\032p\n\010Response\022\014\n\004code\030\001 \001(\005\022\016\n\006r"
   "pc_id\030\002 \001(\003\022\017\n\007sock_id\030\003 \001(\003\022\021\n\terror_st"
   "r\030\004 \001(\t\022\"\n\004data\030\005 \001(\0132\024.google.protobuf."
-  "Any\"\314\001\n\014AccountLogin\032N\n\007Request\022\017\n\007accou"
-  "nt\030\001 \001(\t\022\r\n\005token\030\002 \001(\t\022\020\n\010passwrod\030\003 \001("
-  "\t\022\021\n\tlogin_dev\030\004 \001(\t\032l\n\010Response\022\r\n\005toke"
-  "n\030\001 \001(\t\022\022\n\ngate_token\030\002 \001(\t\022\026\n\016last_logi"
-  "ntime\030\004 \001(\003\022%\n\014server_infos\030\005 \003(\0132\017.c2s."
-  "ServerInfo\"m\n\017AccountRegister\032\?\n\007Request"
-  "\022\017\n\007account\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\022\021\n\tl"
-  "ogin_dev\030\003 \001(\t\032\031\n\010Response\022\r\n\005token\030\001 \001("
-  "\t\"1\n\tGateLogin\032\030\n\007Request\022\r\n\005token\030\001 \001(\t"
-  "\032\n\n\010Response\"=\n\004Chat\032+\n\007Request\022\017\n\007user_"
-  "id\030\001 \001(\003\022\017\n\007message\030\002 \001(\t\032\010\n\006Noticeb\006pro"
-  "to3"
+  "Any\"%\n\tGateLogin\032\030\n\007Request\022\r\n\005token\030\001 \001"
+  "(\t\"=\n\004Chat\032+\n\007Request\022\017\n\007user_id\030\001 \001(\003\022\017"
+  "\n\007message\030\002 \001(\t\032\010\n\006Noticeb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_c2s_2eproto = {
   false, InitDefaults_c2s_2eproto, 
   descriptor_table_protodef_c2s_2eproto,
-  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 803,
+  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 473,
 };
 
 void AddDescriptors_c2s_2eproto() {
@@ -967,7 +762,7 @@ void Rpc_Request::clear_data() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Rpc_Request::kRpcIdFieldNumber;
-const int Rpc_Request::kSockIdFieldNumber;
+const int Rpc_Request::kAddressFieldNumber;
 const int Rpc_Request::kMethodNameFieldNumber;
 const int Rpc_Request::kMessageIdxFieldNumber;
 const int Rpc_Request::kDataFieldNumber;
@@ -982,6 +777,10 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.address().size() > 0) {
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
   method_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.method_name().size() > 0) {
     method_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.method_name_);
@@ -1000,6 +799,7 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
 void Rpc_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Request_c2s_2eproto.base);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   method_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&data_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&message_idx_) -
@@ -1012,6 +812,7 @@ Rpc_Request::~Rpc_Request() {
 }
 
 void Rpc_Request::SharedDtor() {
+  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   method_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
@@ -1031,6 +832,7 @@ void Rpc_Request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   method_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
@@ -1062,11 +864,20 @@ const char* Rpc_Request::_InternalParse(const char* begin, const char* end, void
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // int64 sock_id = 2;
+      // string address = 2;
       case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_sock_id(::google::protobuf::internal::ReadVarint(&ptr));
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("c2s.Rpc.Request.address");
+        object = msg->mutable_address();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       // string method_name = 3;
@@ -1152,13 +963,15 @@ bool Rpc_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // int64 sock_id = 2;
+      // string address = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &sock_id_)));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_address()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->address().data(), static_cast<int>(this->address().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "c2s.Rpc.Request.address"));
         } else {
           goto handle_unusual;
         }
@@ -1236,9 +1049,14 @@ void Rpc_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->rpc_id(), output);
   }
 
-  // int64 sock_id = 2;
-  if (this->sock_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->sock_id(), output);
+  // string address = 2;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "c2s.Rpc.Request.address");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->address(), output);
   }
 
   // string method_name = 3;
@@ -1280,9 +1098,15 @@ void Rpc_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->rpc_id(), target);
   }
 
-  // int64 sock_id = 2;
-  if (this->sock_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->sock_id(), target);
+  // string address = 2;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "c2s.Rpc.Request.address");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->address(), target);
   }
 
   // string method_name = 3;
@@ -1329,6 +1153,13 @@ size_t Rpc_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // string address = 2;
+  if (this->address().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->address());
+  }
+
   // string method_name = 3;
   if (this->method_name().size() > 0) {
     total_size += 1 +
@@ -1348,13 +1179,6 @@ size_t Rpc_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->rpc_id());
-  }
-
-  // int64 sock_id = 2;
-  if (this->sock_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->sock_id());
   }
 
   // uint32 message_idx = 4;
@@ -1391,6 +1215,10 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.address().size() > 0) {
+
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
   if (from.method_name().size() > 0) {
 
     method_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.method_name_);
@@ -1400,9 +1228,6 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   }
   if (from.rpc_id() != 0) {
     set_rpc_id(from.rpc_id());
-  }
-  if (from.sock_id() != 0) {
-    set_sock_id(from.sock_id());
   }
   if (from.message_idx() != 0) {
     set_message_idx(from.message_idx());
@@ -1434,11 +1259,12 @@ void Rpc_Request::Swap(Rpc_Request* other) {
 void Rpc_Request::InternalSwap(Rpc_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   method_name_.Swap(&other->method_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(data_, other->data_);
   swap(rpc_id_, other->rpc_id_);
-  swap(sock_id_, other->sock_id_);
   swap(message_idx_, other->message_idx_);
 }
 
@@ -2163,2155 +1989,6 @@ void Rpc::InternalSwap(Rpc* other) {
 
 // ===================================================================
 
-void AccountLogin_Request::InitAsDefaultInstance() {
-}
-class AccountLogin_Request::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AccountLogin_Request::kAccountFieldNumber;
-const int AccountLogin_Request::kTokenFieldNumber;
-const int AccountLogin_Request::kPasswrodFieldNumber;
-const int AccountLogin_Request::kLoginDevFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountLogin_Request::AccountLogin_Request()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountLogin.Request)
-}
-AccountLogin_Request::AccountLogin_Request(const AccountLogin_Request& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.account().size() > 0) {
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.token().size() > 0) {
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  passwrod_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.passwrod().size() > 0) {
-    passwrod_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.passwrod_);
-  }
-  login_dev_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.login_dev().size() > 0) {
-    login_dev_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_dev_);
-  }
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountLogin.Request)
-}
-
-void AccountLogin_Request::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_AccountLogin_Request_c2s_2eproto.base);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  passwrod_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-AccountLogin_Request::~AccountLogin_Request() {
-  // @@protoc_insertion_point(destructor:c2s.AccountLogin.Request)
-  SharedDtor();
-}
-
-void AccountLogin_Request::SharedDtor() {
-  account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  passwrod_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void AccountLogin_Request::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountLogin_Request& AccountLogin_Request::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountLogin_Request_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountLogin_Request::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountLogin.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  passwrod_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountLogin_Request::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountLogin_Request*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string account = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Request.account");
-        object = msg->mutable_account();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string token = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Request.token");
-        object = msg->mutable_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string passwrod = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Request.passwrod");
-        object = msg->mutable_passwrod();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string login_dev = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Request.login_dev");
-        object = msg->mutable_login_dev();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountLogin_Request::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountLogin.Request)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string account = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_account()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->account().data(), static_cast<int>(this->account().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Request.account"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string token = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_token()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->token().data(), static_cast<int>(this->token().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Request.token"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string passwrod = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_passwrod()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->passwrod().data(), static_cast<int>(this->passwrod().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Request.passwrod"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string login_dev = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_login_dev()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Request.login_dev"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountLogin.Request)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountLogin.Request)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountLogin_Request::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountLogin.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.account");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->account(), output);
-  }
-
-  // string token = 2;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.token");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->token(), output);
-  }
-
-  // string passwrod = 3;
-  if (this->passwrod().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->passwrod().data(), static_cast<int>(this->passwrod().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.passwrod");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->passwrod(), output);
-  }
-
-  // string login_dev = 4;
-  if (this->login_dev().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.login_dev");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->login_dev(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountLogin.Request)
-}
-
-::google::protobuf::uint8* AccountLogin_Request::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountLogin.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.account");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->account(), target);
-  }
-
-  // string token = 2;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.token");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->token(), target);
-  }
-
-  // string passwrod = 3;
-  if (this->passwrod().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->passwrod().data(), static_cast<int>(this->passwrod().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.passwrod");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->passwrod(), target);
-  }
-
-  // string login_dev = 4;
-  if (this->login_dev().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Request.login_dev");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->login_dev(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountLogin.Request)
-  return target;
-}
-
-size_t AccountLogin_Request::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountLogin.Request)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->account());
-  }
-
-  // string token = 2;
-  if (this->token().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->token());
-  }
-
-  // string passwrod = 3;
-  if (this->passwrod().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->passwrod());
-  }
-
-  // string login_dev = 4;
-  if (this->login_dev().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->login_dev());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountLogin_Request::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountLogin.Request)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountLogin_Request* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountLogin_Request>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountLogin.Request)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountLogin.Request)
-    MergeFrom(*source);
-  }
-}
-
-void AccountLogin_Request::MergeFrom(const AccountLogin_Request& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountLogin.Request)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.account().size() > 0) {
-
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  if (from.token().size() > 0) {
-
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  if (from.passwrod().size() > 0) {
-
-    passwrod_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.passwrod_);
-  }
-  if (from.login_dev().size() > 0) {
-
-    login_dev_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_dev_);
-  }
-}
-
-void AccountLogin_Request::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountLogin.Request)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountLogin_Request::CopyFrom(const AccountLogin_Request& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountLogin.Request)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountLogin_Request::IsInitialized() const {
-  return true;
-}
-
-void AccountLogin_Request::Swap(AccountLogin_Request* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountLogin_Request::InternalSwap(AccountLogin_Request* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  account_.Swap(&other->account_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  passwrod_.Swap(&other->passwrod_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  login_dev_.Swap(&other->login_dev_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-}
-
-::google::protobuf::Metadata AccountLogin_Request::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void AccountLogin_Response::InitAsDefaultInstance() {
-}
-class AccountLogin_Response::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AccountLogin_Response::kTokenFieldNumber;
-const int AccountLogin_Response::kGateTokenFieldNumber;
-const int AccountLogin_Response::kLastLogintimeFieldNumber;
-const int AccountLogin_Response::kServerInfosFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountLogin_Response::AccountLogin_Response()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountLogin.Response)
-}
-AccountLogin_Response::AccountLogin_Response(const AccountLogin_Response& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      server_infos_(from.server_infos_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.token().size() > 0) {
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  gate_token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.gate_token().size() > 0) {
-    gate_token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.gate_token_);
-  }
-  last_logintime_ = from.last_logintime_;
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountLogin.Response)
-}
-
-void AccountLogin_Response::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_AccountLogin_Response_c2s_2eproto.base);
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  gate_token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  last_logintime_ = PROTOBUF_LONGLONG(0);
-}
-
-AccountLogin_Response::~AccountLogin_Response() {
-  // @@protoc_insertion_point(destructor:c2s.AccountLogin.Response)
-  SharedDtor();
-}
-
-void AccountLogin_Response::SharedDtor() {
-  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  gate_token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void AccountLogin_Response::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountLogin_Response& AccountLogin_Response::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountLogin_Response_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountLogin_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  server_infos_.Clear();
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  gate_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  last_logintime_ = PROTOBUF_LONGLONG(0);
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountLogin_Response::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountLogin_Response*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string token = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Response.token");
-        object = msg->mutable_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string gate_token = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountLogin.Response.gate_token");
-        object = msg->mutable_gate_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // int64 last_logintime = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
-        msg->set_last_logintime(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // repeated .c2s.ServerInfo server_infos = 5;
-      case 5: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::c2s::ServerInfo::_InternalParse;
-          object = msg->add_server_infos();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountLogin_Response::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountLogin.Response)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string token = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_token()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->token().data(), static_cast<int>(this->token().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Response.token"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string gate_token = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_gate_token()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->gate_token().data(), static_cast<int>(this->gate_token().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountLogin.Response.gate_token"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int64 last_logintime = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &last_logintime_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated .c2s.ServerInfo server_infos = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_server_infos()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountLogin.Response)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountLogin.Response)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountLogin_Response::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Response.token");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->token(), output);
-  }
-
-  // string gate_token = 2;
-  if (this->gate_token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->gate_token().data(), static_cast<int>(this->gate_token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Response.gate_token");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->gate_token(), output);
-  }
-
-  // int64 last_logintime = 4;
-  if (this->last_logintime() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->last_logintime(), output);
-  }
-
-  // repeated .c2s.ServerInfo server_infos = 5;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->server_infos_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5,
-      this->server_infos(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountLogin.Response)
-}
-
-::google::protobuf::uint8* AccountLogin_Response::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Response.token");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->token(), target);
-  }
-
-  // string gate_token = 2;
-  if (this->gate_token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->gate_token().data(), static_cast<int>(this->gate_token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountLogin.Response.gate_token");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->gate_token(), target);
-  }
-
-  // int64 last_logintime = 4;
-  if (this->last_logintime() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->last_logintime(), target);
-  }
-
-  // repeated .c2s.ServerInfo server_infos = 5;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->server_infos_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        5, this->server_infos(static_cast<int>(i)), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountLogin.Response)
-  return target;
-}
-
-size_t AccountLogin_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountLogin.Response)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated .c2s.ServerInfo server_infos = 5;
-  {
-    unsigned int count = static_cast<unsigned int>(this->server_infos_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->server_infos(static_cast<int>(i)));
-    }
-  }
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->token());
-  }
-
-  // string gate_token = 2;
-  if (this->gate_token().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->gate_token());
-  }
-
-  // int64 last_logintime = 4;
-  if (this->last_logintime() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->last_logintime());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountLogin_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountLogin.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountLogin_Response* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountLogin_Response>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountLogin.Response)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountLogin.Response)
-    MergeFrom(*source);
-  }
-}
-
-void AccountLogin_Response::MergeFrom(const AccountLogin_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountLogin.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  server_infos_.MergeFrom(from.server_infos_);
-  if (from.token().size() > 0) {
-
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  if (from.gate_token().size() > 0) {
-
-    gate_token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.gate_token_);
-  }
-  if (from.last_logintime() != 0) {
-    set_last_logintime(from.last_logintime());
-  }
-}
-
-void AccountLogin_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountLogin.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountLogin_Response::CopyFrom(const AccountLogin_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountLogin.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountLogin_Response::IsInitialized() const {
-  return true;
-}
-
-void AccountLogin_Response::Swap(AccountLogin_Response* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountLogin_Response::InternalSwap(AccountLogin_Response* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&server_infos_)->InternalSwap(CastToBase(&other->server_infos_));
-  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  gate_token_.Swap(&other->gate_token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(last_logintime_, other->last_logintime_);
-}
-
-::google::protobuf::Metadata AccountLogin_Response::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void AccountLogin::InitAsDefaultInstance() {
-}
-class AccountLogin::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountLogin::AccountLogin()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountLogin)
-}
-AccountLogin::AccountLogin(const AccountLogin& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountLogin)
-}
-
-void AccountLogin::SharedCtor() {
-}
-
-AccountLogin::~AccountLogin() {
-  // @@protoc_insertion_point(destructor:c2s.AccountLogin)
-  SharedDtor();
-}
-
-void AccountLogin::SharedDtor() {
-}
-
-void AccountLogin::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountLogin& AccountLogin::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountLogin_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountLogin::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountLogin)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountLogin::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountLogin*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      default: {
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountLogin::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountLogin)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountLogin)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountLogin)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountLogin::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountLogin)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountLogin)
-}
-
-::google::protobuf::uint8* AccountLogin::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountLogin)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountLogin)
-  return target;
-}
-
-size_t AccountLogin::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountLogin)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountLogin::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountLogin)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountLogin* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountLogin>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountLogin)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountLogin)
-    MergeFrom(*source);
-  }
-}
-
-void AccountLogin::MergeFrom(const AccountLogin& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountLogin)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-}
-
-void AccountLogin::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountLogin)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountLogin::CopyFrom(const AccountLogin& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountLogin)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountLogin::IsInitialized() const {
-  return true;
-}
-
-void AccountLogin::Swap(AccountLogin* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountLogin::InternalSwap(AccountLogin* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata AccountLogin::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void AccountRegister_Request::InitAsDefaultInstance() {
-}
-class AccountRegister_Request::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AccountRegister_Request::kAccountFieldNumber;
-const int AccountRegister_Request::kPasswordFieldNumber;
-const int AccountRegister_Request::kLoginDevFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountRegister_Request::AccountRegister_Request()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountRegister.Request)
-}
-AccountRegister_Request::AccountRegister_Request(const AccountRegister_Request& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.account().size() > 0) {
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  password_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.password().size() > 0) {
-    password_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.password_);
-  }
-  login_dev_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.login_dev().size() > 0) {
-    login_dev_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_dev_);
-  }
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountRegister.Request)
-}
-
-void AccountRegister_Request::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_AccountRegister_Request_c2s_2eproto.base);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-AccountRegister_Request::~AccountRegister_Request() {
-  // @@protoc_insertion_point(destructor:c2s.AccountRegister.Request)
-  SharedDtor();
-}
-
-void AccountRegister_Request::SharedDtor() {
-  account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void AccountRegister_Request::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountRegister_Request& AccountRegister_Request::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountRegister_Request_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountRegister_Request::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountRegister.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  login_dev_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountRegister_Request::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountRegister_Request*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string account = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountRegister.Request.account");
-        object = msg->mutable_account();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string password = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountRegister.Request.password");
-        object = msg->mutable_password();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string login_dev = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountRegister.Request.login_dev");
-        object = msg->mutable_login_dev();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountRegister_Request::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountRegister.Request)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string account = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_account()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->account().data(), static_cast<int>(this->account().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountRegister.Request.account"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string password = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_password()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->password().data(), static_cast<int>(this->password().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountRegister.Request.password"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string login_dev = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_login_dev()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountRegister.Request.login_dev"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountRegister.Request)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountRegister.Request)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountRegister_Request::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountRegister.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.account");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->account(), output);
-  }
-
-  // string password = 2;
-  if (this->password().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->password().data(), static_cast<int>(this->password().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.password");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->password(), output);
-  }
-
-  // string login_dev = 3;
-  if (this->login_dev().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.login_dev");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->login_dev(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountRegister.Request)
-}
-
-::google::protobuf::uint8* AccountRegister_Request::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountRegister.Request)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.account");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->account(), target);
-  }
-
-  // string password = 2;
-  if (this->password().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->password().data(), static_cast<int>(this->password().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.password");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->password(), target);
-  }
-
-  // string login_dev = 3;
-  if (this->login_dev().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->login_dev().data(), static_cast<int>(this->login_dev().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Request.login_dev");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->login_dev(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountRegister.Request)
-  return target;
-}
-
-size_t AccountRegister_Request::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountRegister.Request)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string account = 1;
-  if (this->account().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->account());
-  }
-
-  // string password = 2;
-  if (this->password().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->password());
-  }
-
-  // string login_dev = 3;
-  if (this->login_dev().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->login_dev());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountRegister_Request::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountRegister.Request)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountRegister_Request* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountRegister_Request>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountRegister.Request)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountRegister.Request)
-    MergeFrom(*source);
-  }
-}
-
-void AccountRegister_Request::MergeFrom(const AccountRegister_Request& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountRegister.Request)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.account().size() > 0) {
-
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  if (from.password().size() > 0) {
-
-    password_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.password_);
-  }
-  if (from.login_dev().size() > 0) {
-
-    login_dev_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.login_dev_);
-  }
-}
-
-void AccountRegister_Request::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountRegister.Request)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountRegister_Request::CopyFrom(const AccountRegister_Request& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountRegister.Request)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountRegister_Request::IsInitialized() const {
-  return true;
-}
-
-void AccountRegister_Request::Swap(AccountRegister_Request* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountRegister_Request::InternalSwap(AccountRegister_Request* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  account_.Swap(&other->account_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  password_.Swap(&other->password_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  login_dev_.Swap(&other->login_dev_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-}
-
-::google::protobuf::Metadata AccountRegister_Request::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void AccountRegister_Response::InitAsDefaultInstance() {
-}
-class AccountRegister_Response::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AccountRegister_Response::kTokenFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountRegister_Response::AccountRegister_Response()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountRegister.Response)
-}
-AccountRegister_Response::AccountRegister_Response(const AccountRegister_Response& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.token().size() > 0) {
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountRegister.Response)
-}
-
-void AccountRegister_Response::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_AccountRegister_Response_c2s_2eproto.base);
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-AccountRegister_Response::~AccountRegister_Response() {
-  // @@protoc_insertion_point(destructor:c2s.AccountRegister.Response)
-  SharedDtor();
-}
-
-void AccountRegister_Response::SharedDtor() {
-  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void AccountRegister_Response::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountRegister_Response& AccountRegister_Response::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountRegister_Response_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountRegister_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountRegister.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountRegister_Response::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountRegister_Response*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string token = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.AccountRegister.Response.token");
-        object = msg->mutable_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountRegister_Response::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountRegister.Response)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string token = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_token()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->token().data(), static_cast<int>(this->token().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.AccountRegister.Response.token"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountRegister.Response)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountRegister.Response)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountRegister_Response::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountRegister.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Response.token");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->token(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountRegister.Response)
-}
-
-::google::protobuf::uint8* AccountRegister_Response::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountRegister.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.AccountRegister.Response.token");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->token(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountRegister.Response)
-  return target;
-}
-
-size_t AccountRegister_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountRegister.Response)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string token = 1;
-  if (this->token().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->token());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountRegister_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountRegister.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountRegister_Response* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountRegister_Response>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountRegister.Response)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountRegister.Response)
-    MergeFrom(*source);
-  }
-}
-
-void AccountRegister_Response::MergeFrom(const AccountRegister_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountRegister.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.token().size() > 0) {
-
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-}
-
-void AccountRegister_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountRegister.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountRegister_Response::CopyFrom(const AccountRegister_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountRegister.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountRegister_Response::IsInitialized() const {
-  return true;
-}
-
-void AccountRegister_Response::Swap(AccountRegister_Response* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountRegister_Response::InternalSwap(AccountRegister_Response* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-}
-
-::google::protobuf::Metadata AccountRegister_Response::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void AccountRegister::InitAsDefaultInstance() {
-}
-class AccountRegister::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-AccountRegister::AccountRegister()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.AccountRegister)
-}
-AccountRegister::AccountRegister(const AccountRegister& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:c2s.AccountRegister)
-}
-
-void AccountRegister::SharedCtor() {
-}
-
-AccountRegister::~AccountRegister() {
-  // @@protoc_insertion_point(destructor:c2s.AccountRegister)
-  SharedDtor();
-}
-
-void AccountRegister::SharedDtor() {
-}
-
-void AccountRegister::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const AccountRegister& AccountRegister::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_AccountRegister_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void AccountRegister::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.AccountRegister)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* AccountRegister::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<AccountRegister*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      default: {
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool AccountRegister::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.AccountRegister)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.AccountRegister)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.AccountRegister)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void AccountRegister::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.AccountRegister)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.AccountRegister)
-}
-
-::google::protobuf::uint8* AccountRegister::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.AccountRegister)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.AccountRegister)
-  return target;
-}
-
-size_t AccountRegister::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.AccountRegister)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void AccountRegister::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.AccountRegister)
-  GOOGLE_DCHECK_NE(&from, this);
-  const AccountRegister* source =
-      ::google::protobuf::DynamicCastToGenerated<AccountRegister>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.AccountRegister)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.AccountRegister)
-    MergeFrom(*source);
-  }
-}
-
-void AccountRegister::MergeFrom(const AccountRegister& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.AccountRegister)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-}
-
-void AccountRegister::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.AccountRegister)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void AccountRegister::CopyFrom(const AccountRegister& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.AccountRegister)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool AccountRegister::IsInitialized() const {
-  return true;
-}
-
-void AccountRegister::Swap(AccountRegister* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AccountRegister::InternalSwap(AccountRegister* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata AccountRegister::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
 void GateLogin_Request::InitAsDefaultInstance() {
 }
 class GateLogin_Request::HasBitSetters {
@@ -4602,215 +2279,6 @@ void GateLogin_Request::InternalSwap(GateLogin_Request* other) {
 }
 
 ::google::protobuf::Metadata GateLogin_Request::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
-  return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void GateLogin_Response::InitAsDefaultInstance() {
-}
-class GateLogin_Response::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-GateLogin_Response::GateLogin_Response()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:c2s.GateLogin.Response)
-}
-GateLogin_Response::GateLogin_Response(const GateLogin_Response& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:c2s.GateLogin.Response)
-}
-
-void GateLogin_Response::SharedCtor() {
-}
-
-GateLogin_Response::~GateLogin_Response() {
-  // @@protoc_insertion_point(destructor:c2s.GateLogin.Response)
-  SharedDtor();
-}
-
-void GateLogin_Response::SharedDtor() {
-}
-
-void GateLogin_Response::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const GateLogin_Response& GateLogin_Response::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_GateLogin_Response_c2s_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void GateLogin_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:c2s.GateLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* GateLogin_Response::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<GateLogin_Response*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      default: {
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool GateLogin_Response::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:c2s.GateLogin.Response)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
-success:
-  // @@protoc_insertion_point(parse_success:c2s.GateLogin.Response)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:c2s.GateLogin.Response)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void GateLogin_Response::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:c2s.GateLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:c2s.GateLogin.Response)
-}
-
-::google::protobuf::uint8* GateLogin_Response::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:c2s.GateLogin.Response)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:c2s.GateLogin.Response)
-  return target;
-}
-
-size_t GateLogin_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:c2s.GateLogin.Response)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void GateLogin_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:c2s.GateLogin.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  const GateLogin_Response* source =
-      ::google::protobuf::DynamicCastToGenerated<GateLogin_Response>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:c2s.GateLogin.Response)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:c2s.GateLogin.Response)
-    MergeFrom(*source);
-  }
-}
-
-void GateLogin_Response::MergeFrom(const GateLogin_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:c2s.GateLogin.Response)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-}
-
-void GateLogin_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:c2s.GateLogin.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void GateLogin_Response::CopyFrom(const GateLogin_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:c2s.GateLogin.Response)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool GateLogin_Response::IsInitialized() const {
-  return true;
-}
-
-void GateLogin_Response::Swap(GateLogin_Response* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void GateLogin_Response::InternalSwap(GateLogin_Response* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata GateLogin_Response::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_c2s_2eproto);
   return ::file_level_metadata_c2s_2eproto[kIndexInFileMessages];
 }
@@ -5801,29 +3269,8 @@ template<> PROTOBUF_NOINLINE ::c2s::Rpc_Response* Arena::CreateMaybeMessage< ::c
 template<> PROTOBUF_NOINLINE ::c2s::Rpc* Arena::CreateMaybeMessage< ::c2s::Rpc >(Arena* arena) {
   return Arena::CreateInternal< ::c2s::Rpc >(arena);
 }
-template<> PROTOBUF_NOINLINE ::c2s::AccountLogin_Request* Arena::CreateMaybeMessage< ::c2s::AccountLogin_Request >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountLogin_Request >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::AccountLogin_Response* Arena::CreateMaybeMessage< ::c2s::AccountLogin_Response >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountLogin_Response >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::AccountLogin* Arena::CreateMaybeMessage< ::c2s::AccountLogin >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountLogin >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::AccountRegister_Request* Arena::CreateMaybeMessage< ::c2s::AccountRegister_Request >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountRegister_Request >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::AccountRegister_Response* Arena::CreateMaybeMessage< ::c2s::AccountRegister_Response >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountRegister_Response >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::AccountRegister* Arena::CreateMaybeMessage< ::c2s::AccountRegister >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::AccountRegister >(arena);
-}
 template<> PROTOBUF_NOINLINE ::c2s::GateLogin_Request* Arena::CreateMaybeMessage< ::c2s::GateLogin_Request >(Arena* arena) {
   return Arena::CreateInternal< ::c2s::GateLogin_Request >(arena);
-}
-template<> PROTOBUF_NOINLINE ::c2s::GateLogin_Response* Arena::CreateMaybeMessage< ::c2s::GateLogin_Response >(Arena* arena) {
-  return Arena::CreateInternal< ::c2s::GateLogin_Response >(arena);
 }
 template<> PROTOBUF_NOINLINE ::c2s::GateLogin* Arena::CreateMaybeMessage< ::c2s::GateLogin >(Arena* arena) {
   return Arena::CreateInternal< ::c2s::GateLogin >(arena);

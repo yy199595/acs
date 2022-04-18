@@ -14,7 +14,7 @@ message Rpc
     message Request
     {
         int64 rpc_id = 1;
-        int64 sock_id = 2;
+        string address = 2;
         string method_name = 3;
         uint32 message_idx = 4;
         google.protobuf.Any data = 5;

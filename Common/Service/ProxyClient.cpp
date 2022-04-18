@@ -63,8 +63,7 @@ namespace Sentry
                 this->mNodeClient->SendToServer(requestMessage);
             }
         }
-        long long id = this->mNodeClient->GetSocketId();
-        this->mRpcCliemComponent->StartClose(id);
+        this->mRpcCliemComponent->StartClose(this->mNodeClient->GetAddress());
     }
 
     bool ProxyClient::OnConnectFailure(int count)

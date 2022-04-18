@@ -32,31 +32,24 @@ namespace Sentry
 		std::shared_ptr<RequestTaskQueueSource> taskQueueSource =
 			std::make_shared<RequestTaskQueueSource>();
 
-		this->mClientTasks[sockId] = taskQueueSource;
-		this->mTaskComponent->Start(&GateComponent::OnClientRequest, this, sockId);
 	}
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		const long long socketId = request->sock_id();
+		const std::string &address = request->address();
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
 		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
 		if (config == nullptr)
 		{
-			this->mGateClientComponent->StartClose(socketId);
+			this->mGateClientComponent->StartClose(address);
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
-		auto iter = this->mClientTasks.find(request->sock_id());
-		if(iter != this->mClientTasks.end())
-		{
-			std::shared_ptr<RequestTaskQueueSource> taskQueueSource = iter->second;
-			taskQueueSource->AddResult(request);
-		}
+
 		return XCode::Successful;
 	}
 
-	XCode GateComponent::OnResponse(long long sockId, std::shared_ptr<c2s::Rpc_Response> response)
+	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response)
 	{
 #ifdef __DEBUG__
 		LOG_WARN("**********[client response]**********");
@@ -71,26 +64,10 @@ namespace Sentry
 		}
 		LOG_WARN("*****************************************");
 #endif
-		if (this->mGateClientComponent->SendToClient(sockId, response))
+		if (this->mGateClientComponent->SendToClient(address, response))
 		{
 			return XCode::NetWorkError;
 		}
 		return XCode::Successful;
-	}
-
-	void GateComponent::OnClientRequest(long long id)
-	{
-		auto iter = this->mClientTasks.find(id);
-		if(iter != this->mClientTasks.end())
-		{
-			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-			std::shared_ptr<RequestTaskQueueSource> taskQueueSource = iter->second;
-			while(taskQueueSource != nullptr)
-			{
-				std::shared_ptr<c2s::Rpc::Request> request = taskQueueSource->Await();
-				const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
-
-			}
-		}
 	}
 }

@@ -1608,6 +1608,20 @@ class Rpc_Request :
 
   // accessors -------------------------------------------------------
 
+  // string address = 4;
+  void clear_address();
+  static const int kAddressFieldNumber = 4;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
   // .google.protobuf.Any Data = 5;
   bool has_data() const;
   void clear_data();
@@ -1629,12 +1643,6 @@ class Rpc_Request :
   ::google::protobuf::int64 rpc_id() const;
   void set_rpc_id(::google::protobuf::int64 value);
 
-  // int64 socket_id = 4;
-  void clear_socket_id();
-  static const int kSocketIdFieldNumber = 4;
-  ::google::protobuf::int64 socket_id() const;
-  void set_socket_id(::google::protobuf::int64 value);
-
   // int32 method_id = 3;
   void clear_method_id();
   static const int kMethodIdFieldNumber = 3;
@@ -1646,10 +1654,10 @@ class Rpc_Request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 rpc_id_;
-  ::google::protobuf::int64 socket_id_;
   ::google::protobuf::int32 method_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
@@ -2312,18 +2320,57 @@ inline void Rpc_Request::set_method_id(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Request.method_id)
 }
 
-// int64 socket_id = 4;
-inline void Rpc_Request::clear_socket_id() {
-  socket_id_ = PROTOBUF_LONGLONG(0);
+// string address = 4;
+inline void Rpc_Request::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::google::protobuf::int64 Rpc_Request::socket_id() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Request.socket_id)
-  return socket_id_;
+inline const ::std::string& Rpc_Request::address() const {
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.address)
+  return address_.GetNoArena();
 }
-inline void Rpc_Request::set_socket_id(::google::protobuf::int64 value) {
+inline void Rpc_Request::set_address(const ::std::string& value) {
   
-  socket_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Rpc.Request.socket_id)
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.address)
+}
+#if LANG_CXX11
+inline void Rpc_Request::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Request.address)
+}
+#endif
+inline void Rpc_Request::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Rpc.Request.address)
+}
+inline void Rpc_Request::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Request.address)
+}
+inline ::std::string* Rpc_Request::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Request.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Rpc_Request::release_address() {
+  // @@protoc_insertion_point(field_release:com.Rpc.Request.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Rpc_Request::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Request.address)
 }
 
 // .google.protobuf.Any Data = 5;

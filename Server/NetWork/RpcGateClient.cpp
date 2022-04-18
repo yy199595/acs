@@ -34,7 +34,7 @@ namespace Sentry
 		this->mCallCount++;
 		this->mQps += size;
 		std::cout << "receive player message count = " << this->mCallCount << std::endl;
-		request->set_sock_id(this->GetSocketId());
+		request->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnRequest(request);
 #else
@@ -57,12 +57,12 @@ namespace Sentry
 			this->mSocketProxy->Close();
 			return;
 		}
-		long long id = this->GetSocketId();
+		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mGateComponent->OnCloseSocket(id, code);
+		this->mGateComponent->OnCloseSocket(address, code);
 #else
 		MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
-		mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, id, code);
+		mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, address, code);
 #endif
 
 	}

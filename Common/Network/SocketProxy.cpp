@@ -3,19 +3,20 @@
 #include<spdlog/fmt/fmt.h>
 namespace Sentry
 {
-	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& name, std::shared_ptr<AsioTcpSocket> socket)
-		: mNetThread(thread), mName(name)
+	SocketProxy::SocketProxy(IAsioThread& thread)
+		: mNetThread(thread)
 	{
+		AsioContext& context = this->mNetThread.GetContext();
+		this->mSocket = std::make_shared<AsioTcpSocket>(context);
+	}
+
+	SocketProxy::SocketProxy(IAsioThread& thread, std::shared_ptr<AsioTcpSocket> socket)
+		: mNetThread(thread)
+	{
+		asio::error_code code;
 		this->mSocket = socket;
 		this->mIsOpen = socket->is_open();
 		this->mSocketId = Helper::ThreadGuid::Create();
-
-	}
-
-	void SocketProxy::RefreshState()
-	{
-		asio::error_code code;
-		this->mIsOpen = this->mSocket->is_open();
 		auto endPoint = this->mSocket->remote_endpoint(code);
 		if (this->mIsOpen && !code)
 		{
@@ -25,13 +26,14 @@ namespace Sentry
 		}
 	}
 
-	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& name)
-		: mNetThread(thread), mName(name)
+	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& ip, unsigned short port)
+			: mNetThread(thread)
 	{
 		this->mIsOpen = false;
 		this->mSocketId = Helper::ThreadGuid::Create();
 		AsioContext& context = this->mNetThread.GetContext();
 		this->mSocket = std::make_shared<AsioTcpSocket>(context);
+		this->mAddress = fmt::format("{0}:{1}", ip, port);
 	}
 
 	void SocketProxy::Close()

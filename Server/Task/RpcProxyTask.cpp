@@ -41,6 +41,6 @@ namespace Sentry
 				responseMessage->mutable_data()->CopyFrom(response->data());
 			}
 		}
-		this->mGateComponent->OnResponse(this->mSockId, responseMessage);
+		//this->mGateComponent->OnResponse(this->mSockId, responseMessage);
 	}
 }

@@ -94,8 +94,7 @@ namespace Sentry
 			if (!code)
             {
                 std::shared_ptr<SocketProxy> socketProxy(
-                        new SocketProxy(workThread, this->mConfig.Name, tcpSocket));
-                socketProxy->RefreshState();
+                        new SocketProxy(workThread, tcpSocket));
 #ifdef __DEBUG__
 				LOG_INFO(socketProxy->GetAddress() << " connect to " << this->mConfig.Name);
 #endif

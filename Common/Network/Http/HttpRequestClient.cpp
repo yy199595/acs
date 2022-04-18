@@ -7,8 +7,8 @@
 namespace Sentry
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy)
+		: mSocket(socketProxy)
     {
-        this->mSocket = socketProxy;
     }
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Get(const std::string &url)
@@ -164,7 +164,6 @@ namespace Sentry
                     return;
                 }
                 connectTimer->cancel();
-                this->mSocket->RefreshState();
                 taskSource->SetResult(XCode::Successful);
             });
         });

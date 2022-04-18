@@ -9,12 +9,12 @@ namespace Sentry
 	class SocketProxy
 	{
 	 public:
-		SocketProxy(IAsioThread& thread, const std::string& name);
-		SocketProxy(IAsioThread& thread, const std::string& name, std::shared_ptr<AsioTcpSocket> socket);
+		SocketProxy(IAsioThread& thread);
+		SocketProxy(IAsioThread& thread, std::shared_ptr<AsioTcpSocket> socket);
+		SocketProxy(IAsioThread& thread, const std::string & ip, unsigned short port);
 		~SocketProxy() = default;
 	 public:
 		void Close();
-		void RefreshState();
 		bool IsOpen()
 		{
 			return this->mIsOpen;
@@ -31,10 +31,6 @@ namespace Sentry
 		{
 			return this->mSocketId;
 		}
-		const std::string& GetName() const
-		{
-			return this->mName;
-		}
 		const std::string& GetAddress()
 		{
 			return this->mAddress;
@@ -46,7 +42,6 @@ namespace Sentry
 	 private:
 		long long mSocketId;
 		std::string mAddress;
-		const std::string mName;
 		std::atomic_bool mIsOpen;
 		IAsioThread& mNetThread;
 		std::shared_ptr<AsioTcpSocket> mSocket;

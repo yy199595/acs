@@ -33,6 +33,12 @@ namespace Sentry
 	template<typename T, typename T1>
 	using ServiceMethodType44 = XCode(T::*)(long long, T1 &);
 
+	template<typename T, typename T1>
+	using ServiceMethodType5 = XCode(T::*)(const std::string & address, const T1 &);
+
+//	template<typename T, typename T1, typename T2>
+//	using ServiceMethodType55 = XCode(T::*)(const std::string & address, const T1 &, T2 &);
+
 }// namespace Sentry
 
 
@@ -242,5 +248,36 @@ namespace Sentry
 		bool mHasUserId;
 		ServiceMethodType4<T, T1> _func;
 		ServiceMethodType44<T, T1> _objfunc;
+	};
+
+
+	template<typename T, typename T1>
+	class ServiceMethod5 : public ServiceMethod
+	{
+	public:
+		ServiceMethod5(const std::string name, T* o, ServiceMethodType5<T, T1> func)
+				: ServiceMethod(name), _o(o), _func(func)
+		{
+
+		}
+
+	public:
+		bool IsLuaMethod() override
+		{
+			return false;
+		};
+		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		{
+			std::shared_ptr<T1> requestData(new T1());
+			if(request.has_data() && request.data().Is<T1>())
+			{
+				return (_o->*_func)(request.address(), *requestData);
+			}
+			return XCode::CallArgsError;
+		}
+
+	private:
+		T* _o;
+		ServiceMethodType5<T, T1> _func;
 	};
 }

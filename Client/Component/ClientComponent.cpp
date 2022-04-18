@@ -56,6 +56,17 @@ namespace Client
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}
 
+	XCode ClientComponent::Call(const string& name, const Message& request)
+	{
+		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
+
+		requestMessage->set_rpc_id(100);
+		requestMessage->set_method_name(name);
+		requestMessage->mutable_data()->PackFrom(request);
+		this->mTcpClient->SendToGate(requestMessage);
+		return XCode::Failure;
+	}
+
     XCode ClientComponent::Call(const std::string &name, std::shared_ptr<Message> response)
     {
         return XCode::Successful;
@@ -149,7 +160,7 @@ namespace Client
 
 		std::string content = loginResponse->GetContent();
 		IAsioThread& netThread = App::Get()->GetTaskScheduler();
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, "Client"));
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, this->mIp, this->mPort));
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
 		int count = 0;
@@ -162,22 +173,13 @@ namespace Client
 		this->mTcpClient->StartReceive();
 		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-		const std::string method = "HttpUserService.Register";
-
-		c2s::AccountRegister_Request registerRequest;
-		registerRequest.set_account("112233@qq.com");
-		registerRequest.set_password("==================");
-
-		requestMessage->set_rpc_id(1);
-		requestMessage->set_method_name(method);
-		requestMessage->mutable_data()->PackFrom(registerRequest);
 
 		while (this->mTcpClient->IsOpen())
 		{
 			ElapsedTimer timer;
-			c2s::GateLogin gateLoginData;
+			c2s::GateLogin::Request loginRequest;
 
-			//this->Call("GateService.Login", )
+			this->Call("GateService.Login", loginRequest);
 
 			this->mTaskComponent->Sleep(10);
 

@@ -25,32 +25,26 @@ namespace Sentry
 		return true;
 	}
 
-	void RpcClientComponent::OnCloseSocket(long long socketId, XCode code)
+	void RpcClientComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
-		auto iter = this->mRpcClientMap.find(socketId);
+		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
 		{
-			std::shared_ptr<ProtoRpcClient> session = iter->second;
-			auto iter1 = this->mAddressClientMap.find(session->GetAddress());
-			if (iter1 != this->mAddressClientMap.end())
-			{
-				this->mAddressClientMap.erase(iter1);
-			}
+			this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
 			const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
-			LOG_ERROR(session->GetAddress() << " connected code " << rpcConfig.GetCodeDesc(code));
+			LOG_ERROR(address << " connected code " << rpcConfig.GetCodeDesc(code));
 #endif
-			this->mRpcClientMap.erase(iter);
 		}
 	}
 
-	void RpcClientComponent::OnConnectAfter(long long id, XCode code)
+	void RpcClientComponent::OnConnectAfter(const std::string & address, XCode code)
 	{
-		auto iter = this->mRpcClientMap.find(id);
+		assert(!address.empty());
+		auto iter = this->mRpcClientMap.find(address);
 		LOG_CHECK_RET(iter != this->mRpcClientMap.end());
 
 		auto rpcClient = iter->second;
-		const std::string& address = rpcClient->GetAddress();
 		if (code == XCode::Successful)
 		{
 			rpcClient->StartReceive();
@@ -60,21 +54,22 @@ namespace Sentry
 	void RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		// 判断是不是服务器根据 白名单
-		long long id = socket->GetSocketId();
-		auto iter = this->mRpcClientMap.find(id);
+		const std::string & address = socket->GetAddress();
+		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
 		{
 			std::shared_ptr<ProtoRpcClient> tcpSession(
 				new ProtoRpcClient(this, socket, SocketType::RemoteSocket));
 
 			tcpSession->StartReceive();
-			this->mRpcClientMap.emplace(id, tcpSession);
+			assert(!address.empty());
+			this->mRpcClientMap.emplace(address, tcpSession);
 		}
 	}
 
-	void RpcClientComponent::StartClose(long long id)
+	void RpcClientComponent::StartClose(const std::string & address)
 	{
-		auto iter = this->mRpcClientMap.find(id);
+		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
 		{
 			auto rpcClient = iter->second;
@@ -88,7 +83,7 @@ namespace Sentry
 
 	void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
-		long long socketId = request->socket_id();
+		const std::string & address = request->address();
 		XCode code = this->mRpcComponent->OnRequest(request);
 		if (code != XCode::Successful)
 		{
@@ -97,9 +92,9 @@ namespace Sentry
 			response->set_code((int)code);
 			response->set_rpc_id(request->rpc_id());
 			response->set_user_id(request->user_id());
-			if (!this->Send(socketId, response))
+			if (!this->Send(address, response))
 			{
-				this->OnSendFailure(socketId, response);
+				this->OnSendFailure(address, response);
 			}
 		}
 	}
@@ -121,44 +116,33 @@ namespace Sentry
 #else
 		IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
 #endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, name));
+		std::string ip;
+		unsigned short port = 0;
+		if(!Helper::String::ParseIpAddress(address, ip, port))
+		{
+			return nullptr;
+		}
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
 		localSession = make_shared<ProtoRpcClient>(this, socketProxy, SocketType::LocalSocket);
 
-		this->mAddressClientMap.emplace(address, socketProxy->GetSocketId());
-		this->mRpcClientMap.emplace(socketProxy->GetSocketId(), localSession);
+		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
-	}
-
-	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(long long id)
-	{
-		auto iter = this->mRpcClientMap.find(id);
-		return iter != this->mRpcClientMap.end() ? iter->second : nullptr;
 	}
 
 	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(const std::string& address)
 	{
-		auto iter = this->mAddressClientMap.find(address);
-		if (iter == this->mAddressClientMap.end())
+		auto iter = this->mRpcClientMap.find(address);
+		if (iter == this->mRpcClientMap.end())
 		{
 			return nullptr;
 		}
-		return this->GetSession(iter->second);
+		return iter->second;
 	}
 
-	bool RpcClientComponent::CloseSession(long long id)
-	{
-		auto iter = this->mRpcClientMap.find(id);
-		if (iter != this->mRpcClientMap.end())
-		{
-			iter->second->StartClose();
-			return true;
-		}
-		return false;
-	}
 
-	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Request> message)
+	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Request> message)
 	{
-		auto clientSession = this->GetSession(id);
+		auto clientSession = this->GetSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{
 			return false;
@@ -179,11 +163,12 @@ namespace Sentry
 		return true;
 	}
 
-	bool RpcClientComponent::Send(long long id, std::shared_ptr<com::Rpc_Response> message)
+	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
 	{
-		auto clientSession = this->GetSession(id);
+		auto clientSession = this->GetSession(address);
 		if (clientSession == nullptr || message == nullptr)
 		{
+			LOG_ERROR("send message to [" << address << "] failure");
 			return false;
 		}
 		clientSession->SendToServer(message);

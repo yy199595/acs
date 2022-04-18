@@ -89,6 +89,9 @@ namespace Sentry
 	{
 		assert(this->IsStartService());
 		std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
+
+		response->set_rpc_id(request->rpc_id());
+		response->set_user_id(request->user_id());
 		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(method);
 		if (serviceMethod == nullptr)
 		{
@@ -97,8 +100,6 @@ namespace Sentry
 			return nullptr;
 		}
 
-		response->set_rpc_id(request->rpc_id());
-		response->set_user_id(request->user_id());
 		try
 		{
 			XCode code = serviceMethod->Invoke(*request, *response);

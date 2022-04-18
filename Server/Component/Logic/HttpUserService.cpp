@@ -4,6 +4,7 @@
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
+#include"Component/Logic/UserSubService.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 
@@ -74,7 +75,20 @@ namespace Sentry
 
 		allotRequest.set_login_token(newToken);
 		allotRequest.set_user_id(userAccount->user_id());
-		return this->mGateService->Call(address, "Allot", allotRequest);
+		if(this->mGateService->Call(address, "Allot", allotRequest) == XCode::Successful)
+		{
+			UserSubService * userSubService = this->GetComponent<UserSubService>();
+
+			Json::Writer jsonWriter;
+			jsonWriter.AddMember("address", address);
+			jsonWriter.AddMember("service", "GateService");
+			jsonWriter.AddMember("user_id", userAccount->user_id());
+			if (userSubService->Publish("AddUser", jsonWriter))
+			{
+				return XCode::Successful;
+			}
+		}
+		return XCode::AddressAllotFailure;
 	}
 
 	XCode HttpUserService::Register(const Json::Reader& request, Json::Writer& response)

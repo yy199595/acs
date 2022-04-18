@@ -17,28 +17,67 @@ namespace Sentry
 		ServiceMethodRegister(const std::string & name, void * o);
 	public:
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType1<T> func);
+		bool Bind(std::string name, ServiceMethodType1<T> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T>
-		bool Bind(std::string name, ServiceMethodType11<T> func);
+		bool Bind(std::string name, ServiceMethodType11<T> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType2<T, T1> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType2<T, T1> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType22<T, T1> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType22<T, T1> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1, typename T2>
-		bool Bind(std::string name, ServiceMethodType3<T, T1, T2> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value
+			&& std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType3<T, T1, T2> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1, typename T2>
-		bool Bind(std::string name, ServiceMethodType33<T, T1, T2> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value
+			&& std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType33<T, T1, T2> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType4<T, T1> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType4<T, T1> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
+		}
 
 		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType44<T, T1> func);
+		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		Bind(std::string name, ServiceMethodType44<T, T1> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
+		}
+
+		template<typename T, typename T1>
+		bool BindAddress(std::string name, ServiceMethodType5<T, T1> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
+			return true;
+		}
 
 	public:
 		bool LoadLuaMethod(lua_State *lua);
@@ -53,53 +92,12 @@ namespace Sentry
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
 	};
 
-	template<typename T>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType1<T> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T>
-	bool ServiceMethodRegister::Bind( std::string name, ServiceMethodType11<T> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod1<T>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType2<T, T1> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType22<T, T1> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod2<T, T1>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1, typename T2>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType3<T, T1, T2> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1, typename T2>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType33<T, T1, T2> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod3<T, T1, T2>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType4<T, T1> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
-	}
-
-	template<typename T, typename T1>
-	bool ServiceMethodRegister::Bind(std::string name, ServiceMethodType44<T, T1> func)
-	{
-		return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, (T*)this->mObj, func));
-	}
+//	template<typename T, typename T1, typename T2>
+//	inline typename std::enable_if<std::is_same<T1, std::string>::value && std::is_base_of<Message, T2>::value, bool>::type
+//	ServiceMethodRegister::Bind(std::string name, ServiceMethodType3<T, T1, T2> func)
+//	{
+//		return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
+//	}
 }
 
 

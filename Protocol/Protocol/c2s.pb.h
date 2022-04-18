@@ -42,7 +42,7 @@ struct TableStruct_c2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[16]
+  static const ::google::protobuf::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -50,24 +50,6 @@ struct TableStruct_c2s_2eproto {
 };
 void AddDescriptors_c2s_2eproto();
 namespace c2s {
-class AccountLogin;
-class AccountLoginDefaultTypeInternal;
-extern AccountLoginDefaultTypeInternal _AccountLogin_default_instance_;
-class AccountLogin_Request;
-class AccountLogin_RequestDefaultTypeInternal;
-extern AccountLogin_RequestDefaultTypeInternal _AccountLogin_Request_default_instance_;
-class AccountLogin_Response;
-class AccountLogin_ResponseDefaultTypeInternal;
-extern AccountLogin_ResponseDefaultTypeInternal _AccountLogin_Response_default_instance_;
-class AccountRegister;
-class AccountRegisterDefaultTypeInternal;
-extern AccountRegisterDefaultTypeInternal _AccountRegister_default_instance_;
-class AccountRegister_Request;
-class AccountRegister_RequestDefaultTypeInternal;
-extern AccountRegister_RequestDefaultTypeInternal _AccountRegister_Request_default_instance_;
-class AccountRegister_Response;
-class AccountRegister_ResponseDefaultTypeInternal;
-extern AccountRegister_ResponseDefaultTypeInternal _AccountRegister_Response_default_instance_;
 class Chat;
 class ChatDefaultTypeInternal;
 extern ChatDefaultTypeInternal _Chat_default_instance_;
@@ -83,9 +65,6 @@ extern GateLoginDefaultTypeInternal _GateLogin_default_instance_;
 class GateLogin_Request;
 class GateLogin_RequestDefaultTypeInternal;
 extern GateLogin_RequestDefaultTypeInternal _GateLogin_Request_default_instance_;
-class GateLogin_Response;
-class GateLogin_ResponseDefaultTypeInternal;
-extern GateLogin_ResponseDefaultTypeInternal _GateLogin_Response_default_instance_;
 class Rpc;
 class RpcDefaultTypeInternal;
 extern RpcDefaultTypeInternal _Rpc_default_instance_;
@@ -101,18 +80,11 @@ extern ServerInfoDefaultTypeInternal _ServerInfo_default_instance_;
 }  // namespace c2s
 namespace google {
 namespace protobuf {
-template<> ::c2s::AccountLogin* Arena::CreateMaybeMessage<::c2s::AccountLogin>(Arena*);
-template<> ::c2s::AccountLogin_Request* Arena::CreateMaybeMessage<::c2s::AccountLogin_Request>(Arena*);
-template<> ::c2s::AccountLogin_Response* Arena::CreateMaybeMessage<::c2s::AccountLogin_Response>(Arena*);
-template<> ::c2s::AccountRegister* Arena::CreateMaybeMessage<::c2s::AccountRegister>(Arena*);
-template<> ::c2s::AccountRegister_Request* Arena::CreateMaybeMessage<::c2s::AccountRegister_Request>(Arena*);
-template<> ::c2s::AccountRegister_Response* Arena::CreateMaybeMessage<::c2s::AccountRegister_Response>(Arena*);
 template<> ::c2s::Chat* Arena::CreateMaybeMessage<::c2s::Chat>(Arena*);
 template<> ::c2s::Chat_Notice* Arena::CreateMaybeMessage<::c2s::Chat_Notice>(Arena*);
 template<> ::c2s::Chat_Request* Arena::CreateMaybeMessage<::c2s::Chat_Request>(Arena*);
 template<> ::c2s::GateLogin* Arena::CreateMaybeMessage<::c2s::GateLogin>(Arena*);
 template<> ::c2s::GateLogin_Request* Arena::CreateMaybeMessage<::c2s::GateLogin_Request>(Arena*);
-template<> ::c2s::GateLogin_Response* Arena::CreateMaybeMessage<::c2s::GateLogin_Response>(Arena*);
 template<> ::c2s::Rpc* Arena::CreateMaybeMessage<::c2s::Rpc>(Arena*);
 template<> ::c2s::Rpc_Request* Arena::CreateMaybeMessage<::c2s::Rpc_Request>(Arena*);
 template<> ::c2s::Rpc_Response* Arena::CreateMaybeMessage<::c2s::Rpc_Response>(Arena*);
@@ -360,6 +332,20 @@ class Rpc_Request :
 
   // accessors -------------------------------------------------------
 
+  // string address = 2;
+  void clear_address();
+  static const int kAddressFieldNumber = 2;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
   // string method_name = 3;
   void clear_method_name();
   static const int kMethodNameFieldNumber = 3;
@@ -389,12 +375,6 @@ class Rpc_Request :
   ::google::protobuf::int64 rpc_id() const;
   void set_rpc_id(::google::protobuf::int64 value);
 
-  // int64 sock_id = 2;
-  void clear_sock_id();
-  static const int kSockIdFieldNumber = 2;
-  ::google::protobuf::int64 sock_id() const;
-  void set_sock_id(::google::protobuf::int64 value);
-
   // uint32 message_idx = 4;
   void clear_message_idx();
   static const int kMessageIdxFieldNumber = 4;
@@ -406,10 +386,10 @@ class Rpc_Request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
   ::google::protobuf::internal::ArenaStringPtr method_name_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 rpc_id_;
-  ::google::protobuf::int64 sock_id_;
   ::google::protobuf::uint32 message_idx_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
@@ -675,812 +655,6 @@ class Rpc :
 };
 // -------------------------------------------------------------------
 
-class AccountLogin_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountLogin.Request) */ {
- public:
-  AccountLogin_Request();
-  virtual ~AccountLogin_Request();
-
-  AccountLogin_Request(const AccountLogin_Request& from);
-
-  inline AccountLogin_Request& operator=(const AccountLogin_Request& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountLogin_Request(AccountLogin_Request&& from) noexcept
-    : AccountLogin_Request() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountLogin_Request& operator=(AccountLogin_Request&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountLogin_Request& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountLogin_Request* internal_default_instance() {
-    return reinterpret_cast<const AccountLogin_Request*>(
-               &_AccountLogin_Request_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    4;
-
-  void Swap(AccountLogin_Request* other);
-  friend void swap(AccountLogin_Request& a, AccountLogin_Request& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountLogin_Request* New() const final {
-    return CreateMaybeMessage<AccountLogin_Request>(nullptr);
-  }
-
-  AccountLogin_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountLogin_Request>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountLogin_Request& from);
-  void MergeFrom(const AccountLogin_Request& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountLogin_Request* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string account = 1;
-  void clear_account();
-  static const int kAccountFieldNumber = 1;
-  const ::std::string& account() const;
-  void set_account(const ::std::string& value);
-  #if LANG_CXX11
-  void set_account(::std::string&& value);
-  #endif
-  void set_account(const char* value);
-  void set_account(const char* value, size_t size);
-  ::std::string* mutable_account();
-  ::std::string* release_account();
-  void set_allocated_account(::std::string* account);
-
-  // string token = 2;
-  void clear_token();
-  static const int kTokenFieldNumber = 2;
-  const ::std::string& token() const;
-  void set_token(const ::std::string& value);
-  #if LANG_CXX11
-  void set_token(::std::string&& value);
-  #endif
-  void set_token(const char* value);
-  void set_token(const char* value, size_t size);
-  ::std::string* mutable_token();
-  ::std::string* release_token();
-  void set_allocated_token(::std::string* token);
-
-  // string passwrod = 3;
-  void clear_passwrod();
-  static const int kPasswrodFieldNumber = 3;
-  const ::std::string& passwrod() const;
-  void set_passwrod(const ::std::string& value);
-  #if LANG_CXX11
-  void set_passwrod(::std::string&& value);
-  #endif
-  void set_passwrod(const char* value);
-  void set_passwrod(const char* value, size_t size);
-  ::std::string* mutable_passwrod();
-  ::std::string* release_passwrod();
-  void set_allocated_passwrod(::std::string* passwrod);
-
-  // string login_dev = 4;
-  void clear_login_dev();
-  static const int kLoginDevFieldNumber = 4;
-  const ::std::string& login_dev() const;
-  void set_login_dev(const ::std::string& value);
-  #if LANG_CXX11
-  void set_login_dev(::std::string&& value);
-  #endif
-  void set_login_dev(const char* value);
-  void set_login_dev(const char* value, size_t size);
-  ::std::string* mutable_login_dev();
-  ::std::string* release_login_dev();
-  void set_allocated_login_dev(::std::string* login_dev);
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountLogin.Request)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr account_;
-  ::google::protobuf::internal::ArenaStringPtr token_;
-  ::google::protobuf::internal::ArenaStringPtr passwrod_;
-  ::google::protobuf::internal::ArenaStringPtr login_dev_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AccountLogin_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountLogin.Response) */ {
- public:
-  AccountLogin_Response();
-  virtual ~AccountLogin_Response();
-
-  AccountLogin_Response(const AccountLogin_Response& from);
-
-  inline AccountLogin_Response& operator=(const AccountLogin_Response& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountLogin_Response(AccountLogin_Response&& from) noexcept
-    : AccountLogin_Response() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountLogin_Response& operator=(AccountLogin_Response&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountLogin_Response& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountLogin_Response* internal_default_instance() {
-    return reinterpret_cast<const AccountLogin_Response*>(
-               &_AccountLogin_Response_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    5;
-
-  void Swap(AccountLogin_Response* other);
-  friend void swap(AccountLogin_Response& a, AccountLogin_Response& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountLogin_Response* New() const final {
-    return CreateMaybeMessage<AccountLogin_Response>(nullptr);
-  }
-
-  AccountLogin_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountLogin_Response>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountLogin_Response& from);
-  void MergeFrom(const AccountLogin_Response& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountLogin_Response* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // repeated .c2s.ServerInfo server_infos = 5;
-  int server_infos_size() const;
-  void clear_server_infos();
-  static const int kServerInfosFieldNumber = 5;
-  ::c2s::ServerInfo* mutable_server_infos(int index);
-  ::google::protobuf::RepeatedPtrField< ::c2s::ServerInfo >*
-      mutable_server_infos();
-  const ::c2s::ServerInfo& server_infos(int index) const;
-  ::c2s::ServerInfo* add_server_infos();
-  const ::google::protobuf::RepeatedPtrField< ::c2s::ServerInfo >&
-      server_infos() const;
-
-  // string token = 1;
-  void clear_token();
-  static const int kTokenFieldNumber = 1;
-  const ::std::string& token() const;
-  void set_token(const ::std::string& value);
-  #if LANG_CXX11
-  void set_token(::std::string&& value);
-  #endif
-  void set_token(const char* value);
-  void set_token(const char* value, size_t size);
-  ::std::string* mutable_token();
-  ::std::string* release_token();
-  void set_allocated_token(::std::string* token);
-
-  // string gate_token = 2;
-  void clear_gate_token();
-  static const int kGateTokenFieldNumber = 2;
-  const ::std::string& gate_token() const;
-  void set_gate_token(const ::std::string& value);
-  #if LANG_CXX11
-  void set_gate_token(::std::string&& value);
-  #endif
-  void set_gate_token(const char* value);
-  void set_gate_token(const char* value, size_t size);
-  ::std::string* mutable_gate_token();
-  ::std::string* release_gate_token();
-  void set_allocated_gate_token(::std::string* gate_token);
-
-  // int64 last_logintime = 4;
-  void clear_last_logintime();
-  static const int kLastLogintimeFieldNumber = 4;
-  ::google::protobuf::int64 last_logintime() const;
-  void set_last_logintime(::google::protobuf::int64 value);
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountLogin.Response)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::c2s::ServerInfo > server_infos_;
-  ::google::protobuf::internal::ArenaStringPtr token_;
-  ::google::protobuf::internal::ArenaStringPtr gate_token_;
-  ::google::protobuf::int64 last_logintime_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AccountLogin :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountLogin) */ {
- public:
-  AccountLogin();
-  virtual ~AccountLogin();
-
-  AccountLogin(const AccountLogin& from);
-
-  inline AccountLogin& operator=(const AccountLogin& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountLogin(AccountLogin&& from) noexcept
-    : AccountLogin() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountLogin& operator=(AccountLogin&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountLogin& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountLogin* internal_default_instance() {
-    return reinterpret_cast<const AccountLogin*>(
-               &_AccountLogin_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    6;
-
-  void Swap(AccountLogin* other);
-  friend void swap(AccountLogin& a, AccountLogin& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountLogin* New() const final {
-    return CreateMaybeMessage<AccountLogin>(nullptr);
-  }
-
-  AccountLogin* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountLogin>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountLogin& from);
-  void MergeFrom(const AccountLogin& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountLogin* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  typedef AccountLogin_Request Request;
-  typedef AccountLogin_Response Response;
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountLogin)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AccountRegister_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountRegister.Request) */ {
- public:
-  AccountRegister_Request();
-  virtual ~AccountRegister_Request();
-
-  AccountRegister_Request(const AccountRegister_Request& from);
-
-  inline AccountRegister_Request& operator=(const AccountRegister_Request& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountRegister_Request(AccountRegister_Request&& from) noexcept
-    : AccountRegister_Request() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountRegister_Request& operator=(AccountRegister_Request&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountRegister_Request& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountRegister_Request* internal_default_instance() {
-    return reinterpret_cast<const AccountRegister_Request*>(
-               &_AccountRegister_Request_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    7;
-
-  void Swap(AccountRegister_Request* other);
-  friend void swap(AccountRegister_Request& a, AccountRegister_Request& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountRegister_Request* New() const final {
-    return CreateMaybeMessage<AccountRegister_Request>(nullptr);
-  }
-
-  AccountRegister_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountRegister_Request>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountRegister_Request& from);
-  void MergeFrom(const AccountRegister_Request& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountRegister_Request* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string account = 1;
-  void clear_account();
-  static const int kAccountFieldNumber = 1;
-  const ::std::string& account() const;
-  void set_account(const ::std::string& value);
-  #if LANG_CXX11
-  void set_account(::std::string&& value);
-  #endif
-  void set_account(const char* value);
-  void set_account(const char* value, size_t size);
-  ::std::string* mutable_account();
-  ::std::string* release_account();
-  void set_allocated_account(::std::string* account);
-
-  // string password = 2;
-  void clear_password();
-  static const int kPasswordFieldNumber = 2;
-  const ::std::string& password() const;
-  void set_password(const ::std::string& value);
-  #if LANG_CXX11
-  void set_password(::std::string&& value);
-  #endif
-  void set_password(const char* value);
-  void set_password(const char* value, size_t size);
-  ::std::string* mutable_password();
-  ::std::string* release_password();
-  void set_allocated_password(::std::string* password);
-
-  // string login_dev = 3;
-  void clear_login_dev();
-  static const int kLoginDevFieldNumber = 3;
-  const ::std::string& login_dev() const;
-  void set_login_dev(const ::std::string& value);
-  #if LANG_CXX11
-  void set_login_dev(::std::string&& value);
-  #endif
-  void set_login_dev(const char* value);
-  void set_login_dev(const char* value, size_t size);
-  ::std::string* mutable_login_dev();
-  ::std::string* release_login_dev();
-  void set_allocated_login_dev(::std::string* login_dev);
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountRegister.Request)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr account_;
-  ::google::protobuf::internal::ArenaStringPtr password_;
-  ::google::protobuf::internal::ArenaStringPtr login_dev_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AccountRegister_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountRegister.Response) */ {
- public:
-  AccountRegister_Response();
-  virtual ~AccountRegister_Response();
-
-  AccountRegister_Response(const AccountRegister_Response& from);
-
-  inline AccountRegister_Response& operator=(const AccountRegister_Response& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountRegister_Response(AccountRegister_Response&& from) noexcept
-    : AccountRegister_Response() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountRegister_Response& operator=(AccountRegister_Response&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountRegister_Response& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountRegister_Response* internal_default_instance() {
-    return reinterpret_cast<const AccountRegister_Response*>(
-               &_AccountRegister_Response_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    8;
-
-  void Swap(AccountRegister_Response* other);
-  friend void swap(AccountRegister_Response& a, AccountRegister_Response& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountRegister_Response* New() const final {
-    return CreateMaybeMessage<AccountRegister_Response>(nullptr);
-  }
-
-  AccountRegister_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountRegister_Response>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountRegister_Response& from);
-  void MergeFrom(const AccountRegister_Response& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountRegister_Response* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string token = 1;
-  void clear_token();
-  static const int kTokenFieldNumber = 1;
-  const ::std::string& token() const;
-  void set_token(const ::std::string& value);
-  #if LANG_CXX11
-  void set_token(::std::string&& value);
-  #endif
-  void set_token(const char* value);
-  void set_token(const char* value, size_t size);
-  ::std::string* mutable_token();
-  ::std::string* release_token();
-  void set_allocated_token(::std::string* token);
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountRegister.Response)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr token_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class AccountRegister :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.AccountRegister) */ {
- public:
-  AccountRegister();
-  virtual ~AccountRegister();
-
-  AccountRegister(const AccountRegister& from);
-
-  inline AccountRegister& operator=(const AccountRegister& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  AccountRegister(AccountRegister&& from) noexcept
-    : AccountRegister() {
-    *this = ::std::move(from);
-  }
-
-  inline AccountRegister& operator=(AccountRegister&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const AccountRegister& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AccountRegister* internal_default_instance() {
-    return reinterpret_cast<const AccountRegister*>(
-               &_AccountRegister_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    9;
-
-  void Swap(AccountRegister* other);
-  friend void swap(AccountRegister& a, AccountRegister& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline AccountRegister* New() const final {
-    return CreateMaybeMessage<AccountRegister>(nullptr);
-  }
-
-  AccountRegister* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AccountRegister>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AccountRegister& from);
-  void MergeFrom(const AccountRegister& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(AccountRegister* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  typedef AccountRegister_Request Request;
-  typedef AccountRegister_Response Response;
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.AccountRegister)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
 class GateLogin_Request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin.Request) */ {
  public:
@@ -1519,7 +693,7 @@ class GateLogin_Request :
                &_GateLogin_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    4;
 
   void Swap(GateLogin_Request* other);
   friend void swap(GateLogin_Request& a, GateLogin_Request& b) {
@@ -1601,111 +775,6 @@ class GateLogin_Request :
 };
 // -------------------------------------------------------------------
 
-class GateLogin_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin.Response) */ {
- public:
-  GateLogin_Response();
-  virtual ~GateLogin_Response();
-
-  GateLogin_Response(const GateLogin_Response& from);
-
-  inline GateLogin_Response& operator=(const GateLogin_Response& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  GateLogin_Response(GateLogin_Response&& from) noexcept
-    : GateLogin_Response() {
-    *this = ::std::move(from);
-  }
-
-  inline GateLogin_Response& operator=(GateLogin_Response&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const GateLogin_Response& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateLogin_Response* internal_default_instance() {
-    return reinterpret_cast<const GateLogin_Response*>(
-               &_GateLogin_Response_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    11;
-
-  void Swap(GateLogin_Response* other);
-  friend void swap(GateLogin_Response& a, GateLogin_Response& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline GateLogin_Response* New() const final {
-    return CreateMaybeMessage<GateLogin_Response>(nullptr);
-  }
-
-  GateLogin_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateLogin_Response>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateLogin_Response& from);
-  void MergeFrom(const GateLogin_Response& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GateLogin_Response* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:c2s.GateLogin.Response)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_c2s_2eproto;
-};
-// -------------------------------------------------------------------
-
 class GateLogin :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateLogin) */ {
  public:
@@ -1744,7 +813,7 @@ class GateLogin :
                &_GateLogin_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    5;
 
   void Swap(GateLogin* other);
   friend void swap(GateLogin& a, GateLogin& b) {
@@ -1800,7 +869,6 @@ class GateLogin :
   // nested types ----------------------------------------------------
 
   typedef GateLogin_Request Request;
-  typedef GateLogin_Response Response;
 
   // accessors -------------------------------------------------------
 
@@ -1852,7 +920,7 @@ class Chat_Request :
                &_Chat_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    6;
 
   void Swap(Chat_Request* other);
   friend void swap(Chat_Request& a, Chat_Request& b) {
@@ -1979,7 +1047,7 @@ class Chat_Notice :
                &_Chat_Notice_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    7;
 
   void Swap(Chat_Notice* other);
   friend void swap(Chat_Notice& a, Chat_Notice& b) {
@@ -2084,7 +1152,7 @@ class Chat :
                &_Chat_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    8;
 
   void Swap(Chat* other);
   friend void swap(Chat& a, Chat& b) {
@@ -2301,18 +1369,57 @@ inline void Rpc_Request::set_rpc_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:c2s.Rpc.Request.rpc_id)
 }
 
-// int64 sock_id = 2;
-inline void Rpc_Request::clear_sock_id() {
-  sock_id_ = PROTOBUF_LONGLONG(0);
+// string address = 2;
+inline void Rpc_Request::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::google::protobuf::int64 Rpc_Request::sock_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.sock_id)
-  return sock_id_;
+inline const ::std::string& Rpc_Request::address() const {
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.address)
+  return address_.GetNoArena();
 }
-inline void Rpc_Request::set_sock_id(::google::protobuf::int64 value) {
+inline void Rpc_Request::set_address(const ::std::string& value) {
   
-  sock_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.sock_id)
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.address)
+}
+#if LANG_CXX11
+inline void Rpc_Request::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Request.address)
+}
+#endif
+inline void Rpc_Request::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Request.address)
+}
+inline void Rpc_Request::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Request.address)
+}
+inline ::std::string* Rpc_Request::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Rpc_Request::release_address() {
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Rpc_Request::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.address)
 }
 
 // string method_name = 3;
@@ -2577,604 +1684,6 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
 
 // -------------------------------------------------------------------
 
-// AccountLogin_Request
-
-// string account = 1;
-inline void AccountLogin_Request::clear_account() {
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Request::account() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Request.account)
-  return account_.GetNoArena();
-}
-inline void AccountLogin_Request::set_account(const ::std::string& value) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Request.account)
-}
-#if LANG_CXX11
-inline void AccountLogin_Request::set_account(::std::string&& value) {
-  
-  account_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Request.account)
-}
-#endif
-inline void AccountLogin_Request::set_account(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Request.account)
-}
-inline void AccountLogin_Request::set_account(const char* value, size_t size) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Request.account)
-}
-inline ::std::string* AccountLogin_Request::mutable_account() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Request.account)
-  return account_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Request::release_account() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Request.account)
-  
-  return account_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Request::set_allocated_account(::std::string* account) {
-  if (account != nullptr) {
-    
-  } else {
-    
-  }
-  account_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), account);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Request.account)
-}
-
-// string token = 2;
-inline void AccountLogin_Request::clear_token() {
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Request::token() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Request.token)
-  return token_.GetNoArena();
-}
-inline void AccountLogin_Request::set_token(const ::std::string& value) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Request.token)
-}
-#if LANG_CXX11
-inline void AccountLogin_Request::set_token(::std::string&& value) {
-  
-  token_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Request.token)
-}
-#endif
-inline void AccountLogin_Request::set_token(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Request.token)
-}
-inline void AccountLogin_Request::set_token(const char* value, size_t size) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Request.token)
-}
-inline ::std::string* AccountLogin_Request::mutable_token() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Request.token)
-  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Request::release_token() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Request.token)
-  
-  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Request::set_allocated_token(::std::string* token) {
-  if (token != nullptr) {
-    
-  } else {
-    
-  }
-  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Request.token)
-}
-
-// string passwrod = 3;
-inline void AccountLogin_Request::clear_passwrod() {
-  passwrod_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Request::passwrod() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Request.passwrod)
-  return passwrod_.GetNoArena();
-}
-inline void AccountLogin_Request::set_passwrod(const ::std::string& value) {
-  
-  passwrod_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Request.passwrod)
-}
-#if LANG_CXX11
-inline void AccountLogin_Request::set_passwrod(::std::string&& value) {
-  
-  passwrod_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Request.passwrod)
-}
-#endif
-inline void AccountLogin_Request::set_passwrod(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  passwrod_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Request.passwrod)
-}
-inline void AccountLogin_Request::set_passwrod(const char* value, size_t size) {
-  
-  passwrod_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Request.passwrod)
-}
-inline ::std::string* AccountLogin_Request::mutable_passwrod() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Request.passwrod)
-  return passwrod_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Request::release_passwrod() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Request.passwrod)
-  
-  return passwrod_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Request::set_allocated_passwrod(::std::string* passwrod) {
-  if (passwrod != nullptr) {
-    
-  } else {
-    
-  }
-  passwrod_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), passwrod);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Request.passwrod)
-}
-
-// string login_dev = 4;
-inline void AccountLogin_Request::clear_login_dev() {
-  login_dev_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Request::login_dev() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Request.login_dev)
-  return login_dev_.GetNoArena();
-}
-inline void AccountLogin_Request::set_login_dev(const ::std::string& value) {
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Request.login_dev)
-}
-#if LANG_CXX11
-inline void AccountLogin_Request::set_login_dev(::std::string&& value) {
-  
-  login_dev_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Request.login_dev)
-}
-#endif
-inline void AccountLogin_Request::set_login_dev(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Request.login_dev)
-}
-inline void AccountLogin_Request::set_login_dev(const char* value, size_t size) {
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Request.login_dev)
-}
-inline ::std::string* AccountLogin_Request::mutable_login_dev() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Request.login_dev)
-  return login_dev_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Request::release_login_dev() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Request.login_dev)
-  
-  return login_dev_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Request::set_allocated_login_dev(::std::string* login_dev) {
-  if (login_dev != nullptr) {
-    
-  } else {
-    
-  }
-  login_dev_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), login_dev);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Request.login_dev)
-}
-
-// -------------------------------------------------------------------
-
-// AccountLogin_Response
-
-// string token = 1;
-inline void AccountLogin_Response::clear_token() {
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Response::token() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Response.token)
-  return token_.GetNoArena();
-}
-inline void AccountLogin_Response::set_token(const ::std::string& value) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Response.token)
-}
-#if LANG_CXX11
-inline void AccountLogin_Response::set_token(::std::string&& value) {
-  
-  token_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Response.token)
-}
-#endif
-inline void AccountLogin_Response::set_token(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Response.token)
-}
-inline void AccountLogin_Response::set_token(const char* value, size_t size) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Response.token)
-}
-inline ::std::string* AccountLogin_Response::mutable_token() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Response.token)
-  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Response::release_token() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Response.token)
-  
-  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Response::set_allocated_token(::std::string* token) {
-  if (token != nullptr) {
-    
-  } else {
-    
-  }
-  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Response.token)
-}
-
-// string gate_token = 2;
-inline void AccountLogin_Response::clear_gate_token() {
-  gate_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountLogin_Response::gate_token() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Response.gate_token)
-  return gate_token_.GetNoArena();
-}
-inline void AccountLogin_Response::set_gate_token(const ::std::string& value) {
-  
-  gate_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Response.gate_token)
-}
-#if LANG_CXX11
-inline void AccountLogin_Response::set_gate_token(::std::string&& value) {
-  
-  gate_token_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountLogin.Response.gate_token)
-}
-#endif
-inline void AccountLogin_Response::set_gate_token(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  gate_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountLogin.Response.gate_token)
-}
-inline void AccountLogin_Response::set_gate_token(const char* value, size_t size) {
-  
-  gate_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountLogin.Response.gate_token)
-}
-inline ::std::string* AccountLogin_Response::mutable_gate_token() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Response.gate_token)
-  return gate_token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountLogin_Response::release_gate_token() {
-  // @@protoc_insertion_point(field_release:c2s.AccountLogin.Response.gate_token)
-  
-  return gate_token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountLogin_Response::set_allocated_gate_token(::std::string* gate_token) {
-  if (gate_token != nullptr) {
-    
-  } else {
-    
-  }
-  gate_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), gate_token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountLogin.Response.gate_token)
-}
-
-// int64 last_logintime = 4;
-inline void AccountLogin_Response::clear_last_logintime() {
-  last_logintime_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 AccountLogin_Response::last_logintime() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Response.last_logintime)
-  return last_logintime_;
-}
-inline void AccountLogin_Response::set_last_logintime(::google::protobuf::int64 value) {
-  
-  last_logintime_ = value;
-  // @@protoc_insertion_point(field_set:c2s.AccountLogin.Response.last_logintime)
-}
-
-// repeated .c2s.ServerInfo server_infos = 5;
-inline int AccountLogin_Response::server_infos_size() const {
-  return server_infos_.size();
-}
-inline void AccountLogin_Response::clear_server_infos() {
-  server_infos_.Clear();
-}
-inline ::c2s::ServerInfo* AccountLogin_Response::mutable_server_infos(int index) {
-  // @@protoc_insertion_point(field_mutable:c2s.AccountLogin.Response.server_infos)
-  return server_infos_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::c2s::ServerInfo >*
-AccountLogin_Response::mutable_server_infos() {
-  // @@protoc_insertion_point(field_mutable_list:c2s.AccountLogin.Response.server_infos)
-  return &server_infos_;
-}
-inline const ::c2s::ServerInfo& AccountLogin_Response::server_infos(int index) const {
-  // @@protoc_insertion_point(field_get:c2s.AccountLogin.Response.server_infos)
-  return server_infos_.Get(index);
-}
-inline ::c2s::ServerInfo* AccountLogin_Response::add_server_infos() {
-  // @@protoc_insertion_point(field_add:c2s.AccountLogin.Response.server_infos)
-  return server_infos_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::c2s::ServerInfo >&
-AccountLogin_Response::server_infos() const {
-  // @@protoc_insertion_point(field_list:c2s.AccountLogin.Response.server_infos)
-  return server_infos_;
-}
-
-// -------------------------------------------------------------------
-
-// AccountLogin
-
-// -------------------------------------------------------------------
-
-// AccountRegister_Request
-
-// string account = 1;
-inline void AccountRegister_Request::clear_account() {
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountRegister_Request::account() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountRegister.Request.account)
-  return account_.GetNoArena();
-}
-inline void AccountRegister_Request::set_account(const ::std::string& value) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountRegister.Request.account)
-}
-#if LANG_CXX11
-inline void AccountRegister_Request::set_account(::std::string&& value) {
-  
-  account_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountRegister.Request.account)
-}
-#endif
-inline void AccountRegister_Request::set_account(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountRegister.Request.account)
-}
-inline void AccountRegister_Request::set_account(const char* value, size_t size) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountRegister.Request.account)
-}
-inline ::std::string* AccountRegister_Request::mutable_account() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountRegister.Request.account)
-  return account_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountRegister_Request::release_account() {
-  // @@protoc_insertion_point(field_release:c2s.AccountRegister.Request.account)
-  
-  return account_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountRegister_Request::set_allocated_account(::std::string* account) {
-  if (account != nullptr) {
-    
-  } else {
-    
-  }
-  account_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), account);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountRegister.Request.account)
-}
-
-// string password = 2;
-inline void AccountRegister_Request::clear_password() {
-  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountRegister_Request::password() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountRegister.Request.password)
-  return password_.GetNoArena();
-}
-inline void AccountRegister_Request::set_password(const ::std::string& value) {
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountRegister.Request.password)
-}
-#if LANG_CXX11
-inline void AccountRegister_Request::set_password(::std::string&& value) {
-  
-  password_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountRegister.Request.password)
-}
-#endif
-inline void AccountRegister_Request::set_password(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountRegister.Request.password)
-}
-inline void AccountRegister_Request::set_password(const char* value, size_t size) {
-  
-  password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountRegister.Request.password)
-}
-inline ::std::string* AccountRegister_Request::mutable_password() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountRegister.Request.password)
-  return password_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountRegister_Request::release_password() {
-  // @@protoc_insertion_point(field_release:c2s.AccountRegister.Request.password)
-  
-  return password_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountRegister_Request::set_allocated_password(::std::string* password) {
-  if (password != nullptr) {
-    
-  } else {
-    
-  }
-  password_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), password);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountRegister.Request.password)
-}
-
-// string login_dev = 3;
-inline void AccountRegister_Request::clear_login_dev() {
-  login_dev_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountRegister_Request::login_dev() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountRegister.Request.login_dev)
-  return login_dev_.GetNoArena();
-}
-inline void AccountRegister_Request::set_login_dev(const ::std::string& value) {
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountRegister.Request.login_dev)
-}
-#if LANG_CXX11
-inline void AccountRegister_Request::set_login_dev(::std::string&& value) {
-  
-  login_dev_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountRegister.Request.login_dev)
-}
-#endif
-inline void AccountRegister_Request::set_login_dev(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountRegister.Request.login_dev)
-}
-inline void AccountRegister_Request::set_login_dev(const char* value, size_t size) {
-  
-  login_dev_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountRegister.Request.login_dev)
-}
-inline ::std::string* AccountRegister_Request::mutable_login_dev() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountRegister.Request.login_dev)
-  return login_dev_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountRegister_Request::release_login_dev() {
-  // @@protoc_insertion_point(field_release:c2s.AccountRegister.Request.login_dev)
-  
-  return login_dev_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountRegister_Request::set_allocated_login_dev(::std::string* login_dev) {
-  if (login_dev != nullptr) {
-    
-  } else {
-    
-  }
-  login_dev_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), login_dev);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountRegister.Request.login_dev)
-}
-
-// -------------------------------------------------------------------
-
-// AccountRegister_Response
-
-// string token = 1;
-inline void AccountRegister_Response::clear_token() {
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& AccountRegister_Response::token() const {
-  // @@protoc_insertion_point(field_get:c2s.AccountRegister.Response.token)
-  return token_.GetNoArena();
-}
-inline void AccountRegister_Response::set_token(const ::std::string& value) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.AccountRegister.Response.token)
-}
-#if LANG_CXX11
-inline void AccountRegister_Response::set_token(::std::string&& value) {
-  
-  token_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.AccountRegister.Response.token)
-}
-#endif
-inline void AccountRegister_Response::set_token(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.AccountRegister.Response.token)
-}
-inline void AccountRegister_Response::set_token(const char* value, size_t size) {
-  
-  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.AccountRegister.Response.token)
-}
-inline ::std::string* AccountRegister_Response::mutable_token() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.AccountRegister.Response.token)
-  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* AccountRegister_Response::release_token() {
-  // @@protoc_insertion_point(field_release:c2s.AccountRegister.Response.token)
-  
-  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void AccountRegister_Response::set_allocated_token(::std::string* token) {
-  if (token != nullptr) {
-    
-  } else {
-    
-  }
-  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.AccountRegister.Response.token)
-}
-
-// -------------------------------------------------------------------
-
-// AccountRegister
-
-// -------------------------------------------------------------------
-
 // GateLogin_Request
 
 // string token = 1;
@@ -3229,10 +1738,6 @@ inline void GateLogin_Request::set_allocated_token(::std::string* token) {
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
   // @@protoc_insertion_point(field_set_allocated:c2s.GateLogin.Request.token)
 }
-
-// -------------------------------------------------------------------
-
-// GateLogin_Response
 
 // -------------------------------------------------------------------
 
@@ -3320,20 +1825,6 @@ inline void Chat_Request::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

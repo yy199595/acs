@@ -283,7 +283,7 @@ namespace Sentry
 		sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
 		SetConsoleTitle(buffer);
 #else
-		LOG_INFO("fps = " << this->mLogicFps);
+		//LOG_INFO("fps = " << this->mLogicFps);
 #endif
 		this->mLogicRunCount = 0;
 	}

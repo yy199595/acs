@@ -60,12 +60,12 @@ namespace Sentry
 			this->mSocketProxy->Close();
 			return;
 		}
-		long long id = this->GetSocketId();
+		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mTcpComponent->OnCloseSocket(id, code);
+		this->mTcpComponent->OnCloseSocket(address, code);
 #else
 		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, id, code);
+		taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, address, code);
 #endif
 	}
 
@@ -76,7 +76,7 @@ namespace Sentry
 		{
 			return XCode::ParseRequestDataError;
 		}
-		requestData->set_socket_id(this->GetSocketId());
+		requestData->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnRequest(requestData);
 #else
@@ -119,12 +119,12 @@ namespace Sentry
 			taskSource->SetResult(code == XCode::Successful);
 		}
 		this->mConnectTasks.clear();
-		long long id = this->mSocketProxy->GetSocketId();
+		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mTcpComponent->OnConnectAfter(id, code);
+		this->mTcpComponent->OnConnectAfter(address, code);
 #else
 		MainTaskScheduler &taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, id, code);
+		taskScheduler.Invoke(&RpcClientComponent::OnConnectAfter, this->mTcpComponent, address, code);
 #endif
 	}
 }

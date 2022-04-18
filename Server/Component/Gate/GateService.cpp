@@ -16,8 +16,8 @@ namespace Sentry
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.Bind("Ping", &GateService::Ping);
-		methodRegister.Bind("Login", &GateService::Login);
 		methodRegister.Bind("Allot", &GateService::Allot);
+		methodRegister.BindAddress("Login", &GateService::Login);
 		this->mGateComponent = this->GetComponent<GateClientComponent>();
 		this->mEntityComponent = this->GetComponent<EntityMgrComponent>();
 		if (this->mGateComponent == nullptr)
@@ -49,7 +49,7 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	XCode GateService::Login(const c2s::GateLogin::Request& request)
+	XCode GateService::Login(const std::string & address, const c2s::GateLogin::Request& request)
 	{
 		const std::string & token = request.token();
 		auto iter = this->mTokenMap.find(token);
@@ -70,16 +70,8 @@ namespace Sentry
 		{
 			this->mTokenMap.erase(iter);
 		}
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("user_id", userId);
-		jsonWriter.AddMember("service", "GateService");
-		jsonWriter.AddMember("address", this->mRpcAddress);
-		if (this->mUserService->Publish("AddUser", jsonWriter))
-		{
-			this->mTokenMap.emplace(token, userId);
-			return XCode::Successful;
-		}
-		return XCode::AddressAllotFailure;
+		this->mTokenMap.emplace(token, userId);
+		return XCode::Successful;
 	}
 
 	void GateService::OnTokenTimeout(const std::string& token)

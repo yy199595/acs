@@ -25,11 +25,11 @@ namespace Client
         ~ClientComponent() final = default;
 
     public:
-        void StartClose(long long id) final {};
+        void StartClose(const std::string & address) final {};
 
-        void OnCloseSocket(long long id, XCode code) final {};
+        void OnCloseSocket(const std::string & address, XCode code) final {};
 
-        void OnConnectAfter(long long id, XCode code) final {}
+        void OnConnectAfter(const std::string & address, XCode code) final {}
 
         void OnRequest(std::shared_ptr<c2s::Rpc_Request> t1) final;
 
@@ -39,7 +39,8 @@ namespace Client
 		void StartClient();
 
     public:
-        XCode Call(const std::string & name, std::shared_ptr<Message> response);
+		XCode Call(const std::string & name, const Message & request);
+		XCode Call(const std::string & name, std::shared_ptr<Message> response);
         XCode Call(const std::string & name, const Message & message, std::shared_ptr<Message> response);
     public:
         unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);

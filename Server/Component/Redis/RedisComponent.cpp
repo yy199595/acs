@@ -159,7 +159,10 @@ namespace Sentry
 #else
 		IAsioThread& workThread = this->mThreadComponent->AllocateNetThread();
 #endif
-		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, name);
+		const std::string & ip = this->mRedisConfig.mIp;
+		unsigned short port = this->mRedisConfig.mPort;
+		string address = fmt::format("{0}:{1}", ip, port);
+		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
 		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy);
 
 		for (size_t index = 0; index < 3; index++)
@@ -177,10 +180,10 @@ namespace Sentry
 						return nullptr;
 					}
 				}
-				LOG_INFO("connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "] successful");
+				LOG_INFO("connect redis [" << address << "] successful");
 				return redisCommandClient;
 			}
-			LOG_ERROR("connect redis [" << this->mRedisConfig.mIp << ':' << this->mRedisConfig.mPort << "] failure");
+			LOG_ERROR("connect redis [" << address << "] failure");
 		}
 		return nullptr;
 	}

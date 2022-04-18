@@ -60,7 +60,7 @@ message Rpc
           int64 user_id = 1;
           int64 rpc_id = 2;
           int32 method_id = 3;
-          int64 socket_id = 4;
+          string address = 4;
           google.protobuf.Any Data = 5;
      }
      message Response

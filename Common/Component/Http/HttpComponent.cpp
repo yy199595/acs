@@ -140,7 +140,8 @@ namespace Sentry
 #else
 		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+		//TODO
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
 		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 		return httpAsyncClient->Get(url);
 	}
@@ -153,7 +154,7 @@ namespace Sentry
 #else
 		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, "HttpRequest"));
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
 		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 		return httpAsyncClient->Post(url, data);
 	}

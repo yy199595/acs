@@ -32,8 +32,8 @@ namespace Sentry
 
 	void GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
-		long long id = socket->GetSocketId();
-		auto iter = this->mGateClientMap.find(id);
+		const std::string & address = socket->GetAddress();
+		auto iter = this->mGateClientMap.find(address);
 		LOG_CHECK_RET(iter == this->mGateClientMap.end());
 		const std::string ip = socket->GetSocket().remote_endpoint().address().to_string();
 		if (this->mBlackList.find(ip) == this->mBlackList.end())
@@ -42,7 +42,7 @@ namespace Sentry
 				new RpcGateClient(socket, SocketType::RemoteSocket, this));
 
 			gateClient->StartReceive();
-			this->mGateClientMap.emplace(id, gateClient);
+			this->mGateClientMap.emplace(address, gateClient);
 			this->mGateComponent->OnConnect(socket->GetSocketId());
 		}
 	}
@@ -59,13 +59,13 @@ namespace Sentry
 #endif
 			responseMessage->set_code((int)code);
 			responseMessage->set_rpc_id(request->rpc_id());
-			this->SendToClient(request->sock_id(), responseMessage);
+			this->SendToClient(request->address(), responseMessage);
 		}
 	}
 
-	void GateClientComponent::OnCloseSocket(long long id, XCode code)
+	void GateClientComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
-		auto iter = this->mGateClientMap.find(id);
+		auto iter = this->mGateClientMap.find(address);
 		if (iter != this->mGateClientMap.end())
 		{
 #ifdef __DEBUG__
@@ -76,9 +76,9 @@ namespace Sentry
 		}
 	}
 
-	bool GateClientComponent::SendToClient(long long sockId, std::shared_ptr<c2s::Rpc_Response> message)
+	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message)
 	{
-		auto proxyClient = this->GetGateClient(sockId);
+		auto proxyClient = this->GetGateClient(address);
 		if (proxyClient == nullptr)
 		{
 			return false;
@@ -86,24 +86,24 @@ namespace Sentry
 		return proxyClient->SendToClient(message);
 	}
 
-	std::shared_ptr<RpcGateClient> GateClientComponent::GetGateClient(long long int sockId)
+	std::shared_ptr<RpcGateClient> GateClientComponent::GetGateClient(const std::string & address)
 	{
-		auto iter = this->mGateClientMap.find(sockId);
+		auto iter = this->mGateClientMap.find(address);
 		return iter != this->mGateClientMap.end() ? iter->second : nullptr;
 	}
 
-	void GateClientComponent::StartClose(long long int id)
+	void GateClientComponent::StartClose(const std::string & address)
 	{
-		auto proxyClient = this->GetGateClient(id);
+		auto proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			proxyClient->StartClose();
 		}
 	}
 
-	void GateClientComponent::CheckPlayerLogout(long long sockId)
+	void GateClientComponent::CheckPlayerLogout(const std::string & address)
 	{
-		auto proxyClient = this->GetGateClient(sockId);
+		auto proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			long long nowTime = Helper::Time::GetNowSecTime();
@@ -114,6 +114,6 @@ namespace Sentry
 				return;
 			}
 		}
-		this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, sockId);
+		this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, address);
 	}
 }

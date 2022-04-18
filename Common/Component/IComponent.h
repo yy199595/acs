@@ -90,12 +90,12 @@ namespace Sentry
 	class IRpc
 	{
 	 public:
-		virtual void StartClose(long long id) = 0;
 		virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
 		virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
-		virtual void OnCloseSocket(long long id, XCode code) = 0;
-		virtual void OnConnectAfter(long long id, XCode code) = 0;
-		virtual void OnSendFailure(long long id, std::shared_ptr<google::protobuf::Message> message)
+		virtual void StartClose(const std::string & address) = 0;
+		virtual void OnCloseSocket(const std::string & address, XCode code) = 0;
+		virtual void OnConnectAfter(const std::string & address, XCode code) {};
+		virtual void OnSendFailure(const std::string & address, std::shared_ptr<google::protobuf::Message> message)
 		{
 		}
 	};
@@ -114,7 +114,7 @@ namespace Sentry
 	 public:
 		virtual void OnConnect(long long sockId)  { }
 		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnResponse(long long sockId, const std::shared_ptr<T2> response) = 0;
+		virtual XCode OnResponse(const std::string &, const std::shared_ptr<T2> response) = 0;
 	};
 
 	class IProtoResponse

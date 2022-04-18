@@ -48,6 +48,7 @@ namespace Sentry
 #ifdef __DEBUG__
 		std::string json = "";
 		LOG_DEBUG("==============[request]==============");
+		LOG_DEBUG("address = " << request->address());
 		LOG_DEBUG("func = " << protocolConfig->Service << "." << protocolConfig->Method);
 		if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
 		{
@@ -58,18 +59,16 @@ namespace Sentry
 
 		if (!protocolConfig->IsAsync)
 		{
-			long long socketId = request->socket_id();
 			const std::string& method = protocolConfig->Method;
 			auto response = logicService->Invoke(method, request);
-			this->mRpcClientComponent->Send(socketId, response);
+			this->mRpcClientComponent->Send(request->address(), response);
 			return XCode::Successful;
 		}
 		this->mCorComponent->Start([request, this, logicService, protocolConfig]()
 		{
-			long long socketId = request->socket_id();
 			const std::string& method = protocolConfig->Method;
 			std::shared_ptr<com::Rpc::Response> response = logicService->Invoke(method, request);
-			this->mRpcClientComponent->Send(socketId, response);
+			this->mRpcClientComponent->Send(request->address(), response);
 		});
 		return XCode::Successful;
 	}

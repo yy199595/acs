@@ -167,7 +167,8 @@ namespace Sentry
 		std::shared_ptr<RpcClient> self = this->shared_from_this();
 		auto address = asio::ip::make_address_v4(ip);
 		asio::ip::tcp::endpoint endPoint(address, port);
-		LOG_DEBUG(this->mSocketProxy->GetName() << " start connect " << ip << ':' << port);
+
+		LOG_DEBUG("start connect " << ip << ':' << port);
 		nSocket.async_connect(endPoint, [self, this](const asio::error_code& err)
 		{
 			XCode code = XCode::Successful;
@@ -177,10 +178,6 @@ namespace Sentry
 			}
 			this->OnConnect(code);
 			this->mIsConnect = false;
-			if (code == XCode::Successful)
-			{
-				this->mSocketProxy->RefreshState();
-			}
 		});
 	}
 

@@ -14,9 +14,9 @@ namespace Sentry
 		~GateService() final = default;
 	 private:
 		XCode Ping();
-		XCode Login(const c2s::GateLogin::Request& request);
 		XCode Allot(const s2s::AddressAllot::Request & request);
-	 private:
+		XCode Login(const std::string & address,const c2s::GateLogin::Request& request);
+	private:
 		bool LateAwake() final;
 		void OnTokenTimeout(const std::string& token);
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
