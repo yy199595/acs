@@ -35,15 +35,14 @@ namespace Sentry
 		const std::string & address = socket->GetAddress();
 		auto iter = this->mGateClientMap.find(address);
 		LOG_CHECK_RET(iter == this->mGateClientMap.end());
-		const std::string ip = socket->GetSocket().remote_endpoint().address().to_string();
-		if (this->mBlackList.find(ip) == this->mBlackList.end())
+		if (this->mBlackList.find(socket->GetIp()) == this->mBlackList.end())
 		{
 			std::shared_ptr<RpcGateClient> gateClient(
 				new RpcGateClient(socket, SocketType::RemoteSocket, this));
 
 			gateClient->StartReceive();
+			this->mGateComponent->OnConnect(address);
 			this->mGateClientMap.emplace(address, gateClient);
-			this->mGateComponent->OnConnect(socket->GetSocketId());
 		}
 	}
 
@@ -52,14 +51,11 @@ namespace Sentry
 		XCode code = this->mGateComponent->OnRequest(request);
 		if (code != XCode::Successful)
 		{
-			std::shared_ptr<c2s::Rpc_Response> responseMessage(new c2s::Rpc_Response());
 #ifdef __DEBUG__
 			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
 			LOG_ERROR("player call" << request->method_name() << "failure error = " << configCom.GetCodeDesc(code));
 #endif
-			responseMessage->set_code((int)code);
-			responseMessage->set_rpc_id(request->rpc_id());
-			this->SendToClient(request->address(), responseMessage);
+			this->StartClose(request->address());
 		}
 	}
 
@@ -115,5 +111,30 @@ namespace Sentry
 			}
 		}
 		this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, address);
+	}
+
+	bool GateClientComponent::AddNewUser(const std::string& address, long long userId)
+	{
+		auto iter = this->mGateClientMap.find(address);
+		if(iter == this->mGateClientMap.end())
+		{
+			LOG_ERROR("not find user address = [" << address << "]");
+			return false;
+		}
+		auto iter1 = this->mUserAddressMap.find(address);
+		if(iter1 != this->mUserAddressMap.end())
+		{
+			LOG_ERROR("user [" << userId << "] have login");
+			return false;
+		}
+		this->mUserAddressMap.emplace(address, userId);
+		LOG_DEBUG(userId << " add to gate [" << address << "]");
+		return true;
+	}
+
+	long long GateClientComponent::GetUserId(const std::string& address)
+	{
+		auto iter = this->mUserAddressMap.find(address);
+		return iter != this->mUserAddressMap.end() ? iter->second : 0;
 	}
 }

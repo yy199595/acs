@@ -59,6 +59,7 @@
             "Id": 202,
             "Async": false,
             "Type":"Client",
+            "Forward": false,
             "Request": "c2s.GateLogin.Request"
         },
         "Allot": {

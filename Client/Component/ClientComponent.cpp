@@ -153,31 +153,35 @@ namespace Client
 			LOG_ERROR("login account " << userAccount << " failure error = " << error);
 			return;
 		}
+		std::string loginToken;
 		std::string gateAddress;
 		LOG_DEBUG(userAccount << " login successful");
+		LOG_CHECK_RET(loginJsonResponse->GetMember("data","token", loginToken));
 		LOG_CHECK_RET(loginJsonResponse->GetMember("data","address", gateAddress));
 		Helper::String::ParseIpAddress(gateAddress, this->mIp, this->mPort);
 
 		std::string content = loginResponse->GetContent();
 		IAsioThread& netThread = App::Get()->GetTaskScheduler();
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(netThread, this->mIp, this->mPort));
+		std::shared_ptr<SocketProxy> socketProxy =
+			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
 		int count = 0;
-		while (!this->mTcpClient->ConnectAsync(this->mIp, this->mPort)->Await())
+		while (!this->mTcpClient->ConnectAsync()->Await())
 		{
 			LOG_ERROR("connect server failure count = " << ++count);
-			this->mTaskComponent->Sleep(1000);
+			this->mTaskComponent->Sleep(3000);
 		}
 
 		this->mTcpClient->StartReceive();
 		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
-		while (this->mTcpClient->IsOpen())
+		while (this->mTcpClient->GetSocketProxy()->IsOpen())
 		{
 			ElapsedTimer timer;
 			c2s::GateLogin::Request loginRequest;
+			loginRequest.set_token(loginToken);
 
 			this->Call("GateService.Login", loginRequest);
 

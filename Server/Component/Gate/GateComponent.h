@@ -19,13 +19,14 @@ namespace Sentry
 	 protected:
 		bool LateAwake() final;
 	 public:
-		void OnConnect(long long sockId) final;
+		void OnConnect(const std::string & address) final;
 		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
 		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
 	 private:
-		class GateService * mGateService;
-		class RpcComponent* mRpcComponent;
+		void OnNotLogin(std::shared_ptr<c2s::Rpc_Request> request);
+	 private:
 		class TaskComponent * mTaskComponent;
+		class RpcClientComponent * mRpcClientComponent;
 		class GateClientComponent* mGateClientComponent;
 		std::unordered_map<long long, long long> mClientMap;
 	};

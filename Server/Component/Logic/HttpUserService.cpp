@@ -38,14 +38,13 @@ namespace Sentry
 		LOGIC_THROW_ERROR(request.GetMember("account", account));
 		LOGIC_THROW_ERROR(request.GetMember("password", password));
 
-
 		Json::Writer queryJson;
 		queryJson.AddMember("account", account);
 		const std::string whereJson = queryJson.ToJsonString();
 		std::shared_ptr<db_account::tab_user_account> userAccount =
 			std::make_shared<db_account::tab_user_account>();
 		XCode code = this->mMysqlComponent->QueryOnce(whereJson, userAccount);
-		if(code != XCode::Successful)
+		if (code != XCode::Successful)
 		{
 			return code;
 		}
@@ -64,27 +63,26 @@ namespace Sentry
 		string updateJson = jsonWriter.ToJsonString();
 		this->mMysqlComponent->Update<db_account::tab_user_account>(updateJson, whereJson);
 
-
 		std::string address;
 		if (!this->mGateService->AllotAddress(address))
 		{
 			return XCode::AddressAllotFailure;
 		}
 		s2s::AddressAllot::Request allotRequest;
-		response.AddMember("address", address);
-
 		allotRequest.set_login_token(newToken);
 		allotRequest.set_user_id(userAccount->user_id());
-		if(this->mGateService->Call(address, "Allot", allotRequest) == XCode::Successful)
+		std::shared_ptr<s2s::AddressAllot::Response> allotResponse(new s2s::AddressAllot::Response());
+		if (this->mGateService->Call(address, "Allot", allotRequest, allotResponse) == XCode::Successful)
 		{
-			UserSubService * userSubService = this->GetComponent<UserSubService>();
 
 			Json::Writer jsonWriter;
 			jsonWriter.AddMember("address", address);
 			jsonWriter.AddMember("service", "GateService");
 			jsonWriter.AddMember("user_id", userAccount->user_id());
-			if (userSubService->Publish("AddUser", jsonWriter))
+			if (this->GetComponent<UserSubService>()->Publish("AddUser", jsonWriter))
 			{
+				response.AddMember("token", newToken);
+				response.AddMember("address", allotResponse->address());
 				return XCode::Successful;
 			}
 		}

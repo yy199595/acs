@@ -54,6 +54,10 @@ class AddressAllot_RequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<AddressAllot_Request> _instance;
 } _AddressAllot_Request_default_instance_;
+class AddressAllot_ResponseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<AddressAllot_Response> _instance;
+} _AddressAllot_Response_default_instance_;
 class AddressAllotDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<AddressAllot> _instance;
@@ -187,6 +191,20 @@ static void InitDefaultsAddressAllot_Request_s2s_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_AddressAllot_Request_s2s_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAddressAllot_Request_s2s_2eproto}, {}};
 
+static void InitDefaultsAddressAllot_Response_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_AddressAllot_Response_default_instance_;
+    new (ptr) ::s2s::AddressAllot_Response();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::AddressAllot_Response::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_AddressAllot_Response_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAddressAllot_Response_s2s_2eproto}, {}};
+
 static void InitDefaultsAddressAllot_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -211,10 +229,11 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_AddressAllot_Request_s2s_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_AddressAllot_Response_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_AddressAllot_s2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2eproto[10];
+::google::protobuf::Metadata file_level_metadata_s2s_2eproto[11];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2eproto = nullptr;
 
@@ -281,6 +300,12 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::s2s::AddressAllot_Request, user_id_),
   PROTOBUF_FIELD_OFFSET(::s2s::AddressAllot_Request, login_token_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::AddressAllot_Response, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::AddressAllot_Response, address_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::AddressAllot, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -296,7 +321,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 42, -1, sizeof(::s2s::Mysql_Response)},
   { 49, -1, sizeof(::s2s::Mysql)},
   { 54, -1, sizeof(::s2s::AddressAllot_Request)},
-  { 61, -1, sizeof(::s2s::AddressAllot)},
+  { 61, -1, sizeof(::s2s::AddressAllot_Response)},
+  { 67, -1, sizeof(::s2s::AddressAllot)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -309,13 +335,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_AddressAllot_Request_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_AddressAllot_Response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_AddressAllot_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2eproto = {
   {}, AddDescriptors_s2s_2eproto, "s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2eproto::offsets,
-  file_level_metadata_s2s_2eproto, 10, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
+  file_level_metadata_s2s_2eproto, 11, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2eproto[] =
@@ -328,14 +355,15 @@ const char descriptor_table_protodef_s2s_2eproto[] =
   "\022\n\nwhere_json\030\002 \001(\t\032@\n\006Update\022\r\n\005table\030\001"
   " \001(\t\022\023\n\013update_json\030\002 \001(\t\022\022\n\nwhere_json\030"
   "\003 \001(\t\032\025\n\006Invoke\022\013\n\003sql\030\001 \001(\t\032-\n\010Response"
-  "\022\r\n\005error\030\001 \001(\t\022\022\n\njson_array\030\002 \003(\t\"\?\n\014A"
+  "\022\r\n\005error\030\001 \001(\t\022\022\n\njson_array\030\002 \003(\t\"\\\n\014A"
   "ddressAllot\032/\n\007Request\022\017\n\007user_id\030\001 \001(\003\022"
-  "\023\n\013login_token\030\002 \001(\tb\006proto3"
+  "\023\n\013login_token\030\002 \001(\t\032\033\n\010Response\022\017\n\007addr"
+  "ess\030\001 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 468,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 497,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -3488,6 +3516,303 @@ void AddressAllot_Request::InternalSwap(AddressAllot_Request* other) {
 
 // ===================================================================
 
+void AddressAllot_Response::InitAsDefaultInstance() {
+}
+class AddressAllot_Response::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int AddressAllot_Response::kAddressFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+AddressAllot_Response::AddressAllot_Response()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.AddressAllot.Response)
+}
+AddressAllot_Response::AddressAllot_Response(const AddressAllot_Response& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.address().size() > 0) {
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
+  // @@protoc_insertion_point(copy_constructor:s2s.AddressAllot.Response)
+}
+
+void AddressAllot_Response::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_AddressAllot_Response_s2s_2eproto.base);
+  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+AddressAllot_Response::~AddressAllot_Response() {
+  // @@protoc_insertion_point(destructor:s2s.AddressAllot.Response)
+  SharedDtor();
+}
+
+void AddressAllot_Response::SharedDtor() {
+  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void AddressAllot_Response::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const AddressAllot_Response& AddressAllot_Response::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_AddressAllot_Response_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void AddressAllot_Response::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.AddressAllot.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* AddressAllot_Response::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<AddressAllot_Response*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string address = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.AddressAllot.Response.address");
+        object = msg->mutable_address();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool AddressAllot_Response::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.AddressAllot.Response)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string address = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_address()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->address().data(), static_cast<int>(this->address().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.AddressAllot.Response.address"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.AddressAllot.Response)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.AddressAllot.Response)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void AddressAllot_Response::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.AddressAllot.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string address = 1;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.AddressAllot.Response.address");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->address(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.AddressAllot.Response)
+}
+
+::google::protobuf::uint8* AddressAllot_Response::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.AddressAllot.Response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string address = 1;
+  if (this->address().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->address().data(), static_cast<int>(this->address().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.AddressAllot.Response.address");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->address(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.AddressAllot.Response)
+  return target;
+}
+
+size_t AddressAllot_Response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.AddressAllot.Response)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string address = 1;
+  if (this->address().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->address());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void AddressAllot_Response::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.AddressAllot.Response)
+  GOOGLE_DCHECK_NE(&from, this);
+  const AddressAllot_Response* source =
+      ::google::protobuf::DynamicCastToGenerated<AddressAllot_Response>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.AddressAllot.Response)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.AddressAllot.Response)
+    MergeFrom(*source);
+  }
+}
+
+void AddressAllot_Response::MergeFrom(const AddressAllot_Response& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.AddressAllot.Response)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.address().size() > 0) {
+
+    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
+  }
+}
+
+void AddressAllot_Response::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.AddressAllot.Response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void AddressAllot_Response::CopyFrom(const AddressAllot_Response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.AddressAllot.Response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool AddressAllot_Response::IsInitialized() const {
+  return true;
+}
+
+void AddressAllot_Response::Swap(AddressAllot_Response* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void AddressAllot_Response::InternalSwap(AddressAllot_Response* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata AddressAllot_Response::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void AddressAllot::InitAsDefaultInstance() {
 }
 class AddressAllot::HasBitSetters {
@@ -3725,6 +4050,9 @@ template<> PROTOBUF_NOINLINE ::s2s::Mysql* Arena::CreateMaybeMessage< ::s2s::Mys
 }
 template<> PROTOBUF_NOINLINE ::s2s::AddressAllot_Request* Arena::CreateMaybeMessage< ::s2s::AddressAllot_Request >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::AddressAllot_Request >(arena);
+}
+template<> PROTOBUF_NOINLINE ::s2s::AddressAllot_Response* Arena::CreateMaybeMessage< ::s2s::AddressAllot_Response >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::AddressAllot_Response >(arena);
 }
 template<> PROTOBUF_NOINLINE ::s2s::AddressAllot* Arena::CreateMaybeMessage< ::s2s::AddressAllot >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::AddressAllot >(arena);

@@ -25,7 +25,7 @@ namespace Sentry
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
 		std::shared_ptr<ProtoRpcClient> GetSession(const std::string& address);
-		std::shared_ptr<ProtoRpcClient> GetOrCreateSession(const std::string& name, const std::string& address);
+		std::shared_ptr<ProtoRpcClient> GetOrCreateSession(const std::string& address);
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;

@@ -73,7 +73,7 @@ namespace Sentry
 		if (iter != this->mRpcClientMap.end())
 		{
 			auto rpcClient = iter->second;
-			if (rpcClient->IsOpen())
+			if (rpcClient->GetSocketProxy()->IsOpen())
 			{
 				rpcClient->StartClose();
 			}
@@ -104,9 +104,9 @@ namespace Sentry
 		this->mRpcComponent->OnResponse(response);
 	}
 
-	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetOrCreateSession(const std::string& name, const std::string& address)
+	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetOrCreateSession(const std::string& address)
 	{
-		auto localSession = this->GetSession(address);
+		std::shared_ptr<ProtoRpcClient> localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -118,10 +118,7 @@ namespace Sentry
 #endif
 		std::string ip;
 		unsigned short port = 0;
-		if(!Helper::String::ParseIpAddress(address, ip, port))
-		{
-			return nullptr;
-		}
+		assert(Helper::String::ParseIpAddress(address, ip, port));
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
 		localSession = make_shared<ProtoRpcClient>(this, socketProxy, SocketType::LocalSocket);
 

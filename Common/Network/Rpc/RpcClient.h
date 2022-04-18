@@ -35,18 +35,6 @@ namespace Sentry
 		{
 			return this->mIsConnect;
 		}
-		inline const std::string& GetIp() const
-		{
-			return this->mIp;
-		}
-		inline long long GetSocketId() const
-		{
-			return this->mSocketId;
-		}
-		inline bool IsOpen() const
-		{
-			return this->mSocketProxy->IsOpen();
-		}
 		std::shared_ptr<SocketProxy> GetSocketProxy() const
 		{
 			return this->mSocketProxy;
@@ -62,15 +50,15 @@ namespace Sentry
 		{
 			return this->mType;
 		}
-		bool StartConnect(const std::string& ip, unsigned short port);
+		bool StartConnect();
 		long long GetLastOperatorTime() const
 		{
 			return this->mLastOperTime;
 		}
 	 private:
 		void ReceiveHead();
+		void ConnectHandler();
 		void ReceiveBody(char type, size_t size);
-		void ConnectHandler(const std::string& ip, unsigned short port);
 	 protected:
 		virtual void OnConnect(XCode code) = 0;
 		virtual void OnClientError(XCode code) = 0;
@@ -85,10 +73,7 @@ namespace Sentry
 		IAsioThread& mNetWorkThread;
 		std::shared_ptr<SocketProxy> mSocketProxy;
 	 private:
-		std::string mIp;
 		bool mIsCanSendData;
-		unsigned short mPort;
-		long long mSocketId;
 		atomic_bool mIsConnect;
 		const SocketType mType;
 		long long mLastOperTime;

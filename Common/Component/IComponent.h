@@ -112,7 +112,7 @@ namespace Sentry
 	class IClientRpc
 	{
 	 public:
-		virtual void OnConnect(long long sockId)  { }
+		virtual void OnConnect(const std::string & address)  { }
 		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
 		virtual XCode OnResponse(const std::string &, const std::shared_ptr<T2> response) = 0;
 	};

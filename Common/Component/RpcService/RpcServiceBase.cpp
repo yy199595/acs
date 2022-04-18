@@ -86,6 +86,7 @@ namespace Sentry
 
 	XCode RpcServiceBase::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
+		assert(response != nullptr);
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
 		if(rpcRequest == nullptr)
 		{
@@ -106,6 +107,7 @@ namespace Sentry
 	XCode RpcServiceBase::Call(const std::string & address, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
+		assert(response != nullptr);
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, &message);
 		if(rpcRequest == nullptr)
 		{
@@ -123,36 +125,36 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
+	std::shared_ptr<ProtoRpcClient> RpcServiceBase::GetClient(const std::string& address)
+	{
+		std::shared_ptr<ProtoRpcClient> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
+		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
+		{
+			return rpcClient;
+		}
+		for(size_t index = 0; index < 3; index++)
+		{
+			LOG_DEBUG(this->GetName() << " start connect [" << address << "]");
+			if(rpcClient->ConnectAsync()->Await())
+			{
+				LOG_DEBUG(this->GetName() << " connect [" << address << "] successful");
+				return rpcClient;
+			}
+			App::Get()->GetTaskComponent()->Sleep(1000);
+		}
+		return nullptr;
+	}
+
 	std::shared_ptr<com::Rpc::Response> RpcServiceBase::StartCall(const std::string & address,
 			std::shared_ptr<com::Rpc::Request> request)
 	{
-		std::shared_ptr<ProtoRpcClient> rpcClient = this->mRpcClientComponent->GetOrCreateSession("rpc", address);
-
-		if(rpcClient == nullptr)
+		std::shared_ptr<ProtoRpcClient> rpcClient = this->GetClient(address);
+		if (rpcClient == nullptr)
 		{
 			return nullptr;
 		}
-
-		if(!rpcClient->IsOpen())
-		{
-			std::string ip;
-			unsigned short port = 0;
-			Helper::String::ParseIpAddress(address, ip, port);
-			for(size_t index = 0; index < 3; index++)
-			{
-				if(rpcClient->ConnectAsync(ip, port)->Await())
-				{
-					break;
-				}
-				App::Get()->GetTaskComponent()->Sleep(2000);
-			}
-			if(!rpcClient->IsOpen())
-			{
-				return nullptr;
-			}
-		}
-		std::shared_ptr<RpcTaskSource> taskSource(new RpcTaskSource());
-
+		std::shared_ptr<RpcTaskSource> taskSource =
+			std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
 		this->mRpcComponent->AddRpcTask(taskSource);
 #ifdef __DEBUG__
@@ -197,10 +199,10 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode RpcServiceBase::Call(const std::string& func, long long userId,
-			std::shared_ptr<Message> response)
+	XCode RpcServiceBase::Call(const std::string& func, long long userId, std::shared_ptr<Message> response)
 	{
 		std::string address;
+		assert(response != nullptr);
 		if(this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
@@ -225,6 +227,7 @@ namespace Sentry
 	XCode RpcServiceBase::Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response)
 	{
 		std::string address;
+		assert(response != nullptr);
 		if(this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;

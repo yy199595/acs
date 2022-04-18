@@ -33,16 +33,13 @@ namespace Sentry
 		  mContext(socket->GetContext()),
 		  mNetWorkThread(socket->GetThread())
 	{
-		this->mIp.clear();
 		this->mIsConnect = false;
 		this->mIsCanSendData = true;
-		this->mSocketId = socket->GetSocketId();
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
 
 	void RpcClient::Clear()
 	{
-		this->mSocketId = 0;
 		this->mLastOperTime = 0;
 		this->mSocketProxy->Close();
 	}
@@ -70,6 +67,7 @@ namespace Sentry
 			if (code)
 			{
 				this->OnClientError(XCode::NetWorkError);
+				std::cerr << FormatFileLine(__FILE__, __LINE__) << code.message() << std::endl;
 				return;
 			}
 
@@ -116,6 +114,7 @@ namespace Sentry
 			{
 				this->mSocketProxy->Close();
 				this->OnClientError(XCode::NetWorkError);
+				std::cerr << FormatFileLine(__FILE__, __LINE__) << error_code.message() << std::endl;
 				return;
 			}
 			switch (type)
@@ -139,42 +138,39 @@ namespace Sentry
 		nSocket.async_read_some(asio::buffer(messageBuffer, size), std::move(cb));
 	}
 
-	bool RpcClient::StartConnect(const std::string& ip, unsigned short port)
+	bool RpcClient::StartConnect()
 	{
-		assert(!ip.empty());
-		assert(port != 0);
 		if (this->IsCanConnection())
 		{
 			this->mIsConnect = true;
 			LOG_CHECK_RET_FALSE(this->mSocketProxy);
 #ifdef ONLY_MAIN_THREAD
-			this->ConnectHandler(ip, port);
+			this->ConnectHandler();
 #else
 			IAsioThread &nThread = this->mSocketProxy->GetThread();
-			nThread.Invoke(&RpcClient::ConnectHandler, this, ip, port);
+			nThread.Invoke(&RpcClient::ConnectHandler, this);
 #endif
 			return true;
 		}
 		return false;
 	}
 
-	void RpcClient::ConnectHandler(const std::string& ip, unsigned short port)
+	void RpcClient::ConnectHandler()
 	{
-		this->mIp = ip;
-		this->mPort = port;
 		assert(this->mNetWorkThread.IsCurrentThread());
 		AsioTcpSocket& nSocket = this->mSocketProxy->GetSocket();
 		std::shared_ptr<RpcClient> self = this->shared_from_this();
-		auto address = asio::ip::make_address_v4(ip);
-		asio::ip::tcp::endpoint endPoint(address, port);
+		address_v4 address = asio::ip::make_address_v4(this->mSocketProxy->GetIp());
+		asio::ip::tcp::endpoint endPoint(address, this->mSocketProxy->GetPort());
 
-		LOG_DEBUG("start connect " << ip << ':' << port);
+		LOG_DEBUG("start connect " << this->mSocketProxy->GetAddress());
 		nSocket.async_connect(endPoint, [self, this](const asio::error_code& err)
 		{
 			XCode code = XCode::Successful;
 			if (err)
 			{
 				code = XCode::NetConnectFailure;
+				std::cerr << FormatFileLine(__FILE__, __LINE__) << err.message() << std::endl;
 			}
 			this->OnConnect(code);
 			this->mIsConnect = false;
@@ -184,7 +180,7 @@ namespace Sentry
 	bool RpcClient::IsCanConnection()
 	{
 		return this->GetSocketType() == SocketType::LocalSocket
-			   && !this->IsOpen() && !this->mIsConnect;
+			   && !this->mSocketProxy->IsOpen() && !this->mIsConnect;
 	}
 
 	void RpcClient::SendData(std::shared_ptr<NetworkData> message)
@@ -214,6 +210,7 @@ namespace Sentry
 					this->OnSendData(XCode::NetWorkError, this->mWaitSendQueue.front());
 					this->mWaitSendQueue.pop();
 				}
+				std::cerr << FormatFileLine(__FILE__, __LINE__) << code.message() << std::endl;
 			}
 			else
 			{

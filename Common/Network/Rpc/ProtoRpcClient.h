@@ -15,9 +15,9 @@ namespace Sentry
 		~ProtoRpcClient() override = default;
 	 public:
 		void StartClose();
+		std::shared_ptr<TaskSource<bool>> ConnectAsync();
 		void SendToServer(std::shared_ptr<com::Rpc_Request> message);
 		void SendToServer(std::shared_ptr<com::Rpc_Response> message);
-		std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string& ip, unsigned short port);
 	 protected:
 		void OnConnect(XCode code) final;
 		void OnClientError(XCode code) final;
@@ -27,6 +27,6 @@ namespace Sentry
 	 private:
 		int mConnectCount;
 		RpcClientComponent* mTcpComponent;
-		std::vector<std::shared_ptr<TaskSource<bool>>> mConnectTasks;
+		std::queue<std::shared_ptr<TaskSource<bool>>> mConnectTasks;
 	};
 }// namespace Sentry

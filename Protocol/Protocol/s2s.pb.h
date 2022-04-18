@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[11]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +56,9 @@ extern AddressAllotDefaultTypeInternal _AddressAllot_default_instance_;
 class AddressAllot_Request;
 class AddressAllot_RequestDefaultTypeInternal;
 extern AddressAllot_RequestDefaultTypeInternal _AddressAllot_Request_default_instance_;
+class AddressAllot_Response;
+class AddressAllot_ResponseDefaultTypeInternal;
+extern AddressAllot_ResponseDefaultTypeInternal _AddressAllot_Response_default_instance_;
 class Mysql;
 class MysqlDefaultTypeInternal;
 extern MysqlDefaultTypeInternal _Mysql_default_instance_;
@@ -85,6 +88,7 @@ namespace google {
 namespace protobuf {
 template<> ::s2s::AddressAllot* Arena::CreateMaybeMessage<::s2s::AddressAllot>(Arena*);
 template<> ::s2s::AddressAllot_Request* Arena::CreateMaybeMessage<::s2s::AddressAllot_Request>(Arena*);
+template<> ::s2s::AddressAllot_Response* Arena::CreateMaybeMessage<::s2s::AddressAllot_Response>(Arena*);
 template<> ::s2s::Mysql* Arena::CreateMaybeMessage<::s2s::Mysql>(Arena*);
 template<> ::s2s::Mysql_Add* Arena::CreateMaybeMessage<::s2s::Mysql_Add>(Arena*);
 template<> ::s2s::Mysql_Delete* Arena::CreateMaybeMessage<::s2s::Mysql_Delete>(Arena*);
@@ -1282,6 +1286,126 @@ class AddressAllot_Request :
 };
 // -------------------------------------------------------------------
 
+class AddressAllot_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddressAllot.Response) */ {
+ public:
+  AddressAllot_Response();
+  virtual ~AddressAllot_Response();
+
+  AddressAllot_Response(const AddressAllot_Response& from);
+
+  inline AddressAllot_Response& operator=(const AddressAllot_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddressAllot_Response(AddressAllot_Response&& from) noexcept
+    : AddressAllot_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline AddressAllot_Response& operator=(AddressAllot_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddressAllot_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddressAllot_Response* internal_default_instance() {
+    return reinterpret_cast<const AddressAllot_Response*>(
+               &_AddressAllot_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(AddressAllot_Response* other);
+  friend void swap(AddressAllot_Response& a, AddressAllot_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddressAllot_Response* New() const final {
+    return CreateMaybeMessage<AddressAllot_Response>(nullptr);
+  }
+
+  AddressAllot_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddressAllot_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddressAllot_Response& from);
+  void MergeFrom(const AddressAllot_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddressAllot_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string address = 1;
+  void clear_address();
+  static const int kAddressFieldNumber = 1;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // @@protoc_insertion_point(class_scope:s2s.AddressAllot.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class AddressAllot :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddressAllot) */ {
  public:
@@ -1320,7 +1444,7 @@ class AddressAllot :
                &_AddressAllot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(AddressAllot* other);
   friend void swap(AddressAllot& a, AddressAllot& b) {
@@ -1376,6 +1500,7 @@ class AddressAllot :
   // nested types ----------------------------------------------------
 
   typedef AddressAllot_Request Request;
+  typedef AddressAllot_Response Response;
 
   // accessors -------------------------------------------------------
 
@@ -2241,11 +2366,70 @@ inline void AddressAllot_Request::set_allocated_login_token(::std::string* login
 
 // -------------------------------------------------------------------
 
+// AddressAllot_Response
+
+// string address = 1;
+inline void AddressAllot_Response::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AddressAllot_Response::address() const {
+  // @@protoc_insertion_point(field_get:s2s.AddressAllot.Response.address)
+  return address_.GetNoArena();
+}
+inline void AddressAllot_Response::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.AddressAllot.Response.address)
+}
+#if LANG_CXX11
+inline void AddressAllot_Response::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.AddressAllot.Response.address)
+}
+#endif
+inline void AddressAllot_Response::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.AddressAllot.Response.address)
+}
+inline void AddressAllot_Response::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.AddressAllot.Response.address)
+}
+inline ::std::string* AddressAllot_Response::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.AddressAllot.Response.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AddressAllot_Response::release_address() {
+  // @@protoc_insertion_point(field_release:s2s.AddressAllot.Response.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AddressAllot_Response::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:s2s.AddressAllot.Response.address)
+}
+
+// -------------------------------------------------------------------
+
 // AddressAllot
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

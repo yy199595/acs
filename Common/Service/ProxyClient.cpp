@@ -22,18 +22,15 @@ namespace Sentry
         if (this->mNodeClient == nullptr)
         {
             this->mNodeClient = this->mRpcCliemComponent->GetOrCreateSession
-					(this->mServiceName, this->mAddress);
+					(this->mAddress);
         }
-        if (this->mNodeClient->IsOpen())
+        if (this->mNodeClient->GetSocketProxy()->IsOpen())
         {
             return true;
         }
-        std::string ip;
-        unsigned short port = 0;
-        Helper::String::ParseIpAddress(this->mAddress, ip, port);
         for (int index = 0; index < 3; index++)
         {
-            if(this->mNodeClient->ConnectAsync(ip, port)->Await())
+            if(this->mNodeClient->ConnectAsync()->Await())
             {
                 return true;
             }

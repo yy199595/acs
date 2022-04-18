@@ -15,34 +15,17 @@ namespace Sentry
 		~SocketProxy() = default;
 	 public:
 		void Close();
-		bool IsOpen()
-		{
-			return this->mIsOpen;
-		}
-		AsioTcpSocket& GetSocket()
-		{
-			return *mSocket;
-		}
-		IAsioThread& GetThread()
-		{
-			return this->mNetThread;
-		}
-		long long GetSocketId() const
-		{
-			return this->mSocketId;
-		}
-		const std::string& GetAddress()
-		{
-			return this->mAddress;
-		}
-		AsioContext& GetContext()
-		{
-			return this->mNetThread.GetContext();
-		}
+		unsigned short GetPort() { return this->mPort;}
+		inline std::string & GetIp() { return this->mIp;}
+		inline AsioTcpSocket& GetSocket() { return *mSocket;}
+		inline bool IsOpen() { return this->mSocket->is_open(); }
+		inline IAsioThread& GetThread() { return this->mNetThread; }
+		inline const std::string& GetAddress() { return this->mAddress; }
+		inline AsioContext& GetContext() { return this->mNetThread.GetContext(); }
 	 private:
-		long long mSocketId;
+		std::string mIp;
+		unsigned short mPort;
 		std::string mAddress;
-		std::atomic_bool mIsOpen;
 		IAsioThread& mNetThread;
 		std::shared_ptr<AsioTcpSocket> mSocket;
 	};

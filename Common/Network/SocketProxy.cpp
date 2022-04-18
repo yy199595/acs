@@ -15,22 +15,20 @@ namespace Sentry
 	{
 		asio::error_code code;
 		this->mSocket = socket;
-		this->mIsOpen = socket->is_open();
-		this->mSocketId = Helper::ThreadGuid::Create();
 		auto endPoint = this->mSocket->remote_endpoint(code);
-		if (this->mIsOpen && !code)
+		if (this->mSocket->is_open() && !code)
 		{
-			unsigned int port = endPoint.port();
-			std::string ip = endPoint.address().to_string();
-			this->mAddress = fmt::format("{0}:{1}", ip, port);
+			this->mPort = endPoint.port();
+			this->mIp = endPoint.address().to_string();
+			this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
 		}
 	}
 
 	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& ip, unsigned short port)
 			: mNetThread(thread)
 	{
-		this->mIsOpen = false;
-		this->mSocketId = Helper::ThreadGuid::Create();
+		this->mIp = ip;
+		this->mPort = port;
 		AsioContext& context = this->mNetThread.GetContext();
 		this->mSocket = std::make_shared<AsioTcpSocket>(context);
 		this->mAddress = fmt::format("{0}:{1}", ip, port);
@@ -38,9 +36,8 @@ namespace Sentry
 
 	void SocketProxy::Close()
 	{
-		if (this->mIsOpen)
+		if (this->mSocket->is_open())
 		{
-			this->mIsOpen = false;
 			asio::error_code code;
 			this->mSocket->close(code);
 		}

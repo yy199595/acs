@@ -10,7 +10,8 @@
 #include"Component/Logic/UserSubService.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Gate/GateClientComponent.h"
-
+#include"Network/Listener/NetworkListener.h"
+#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
@@ -19,18 +20,18 @@ namespace Sentry
 		methodRegister.Bind("Allot", &GateService::Allot);
 		methodRegister.BindAddress("Login", &GateService::Login);
 		this->mGateComponent = this->GetComponent<GateClientComponent>();
-		this->mEntityComponent = this->GetComponent<EntityMgrComponent>();
 		if (this->mGateComponent == nullptr)
 		{
 			this->mGateComponent = this->mEntity->GetOrAddComponent<GateClientComponent>();
 			LOG_CHECK_RET_FALSE(this->mGateComponent->LateAwake());
 		}
-
-		if (this->mEntityComponent == nullptr)
+		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
+		const ListenConfig * listenConfig = tcpServerComponent->GetTcpConfig("gate");
+		if(listenConfig == nullptr)
 		{
-			this->mEntityComponent = this->mEntity->GetOrAddComponent<EntityMgrComponent>();
-			LOG_CHECK_RET_FALSE(this->mEntityComponent->LateAwake());
+			return false;
 		}
+		this->mGateAddress = listenConfig->mAddress;
 		return true;
 	}
 
@@ -38,7 +39,6 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(LocalServerRpc::LateAwake());
 		LOG_CHECK_RET_FALSE(this->GetComponent<GateClientComponent>());
-		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
 		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserSubService>());
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return true;
@@ -55,13 +55,17 @@ namespace Sentry
 		auto iter = this->mTokenMap.find(token);
 		if(iter != this->mTokenMap.end())
 		{
+			long long userId = iter->second;
 			this->mTokenMap.erase(iter);
-			return XCode::Successful;
+			if(this->mGateComponent->AddNewUser(address, userId))
+			{
+				return XCode::Successful;
+			}
 		}
 		return XCode::Failure;
 	}
 
-	XCode GateService::Allot(const s2s::AddressAllot::Request& request)
+	XCode GateService::Allot(const s2s::AddressAllot::Request& request, s2s::AddressAllot::Response & response)
 	{
 		long long userId = request.user_id();
 		const std::string& token = request.login_token();
@@ -71,6 +75,7 @@ namespace Sentry
 			this->mTokenMap.erase(iter);
 		}
 		this->mTokenMap.emplace(token, userId);
+		response.set_address(this->mGateAddress);
 		return XCode::Successful;
 	}
 

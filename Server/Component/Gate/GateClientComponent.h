@@ -21,6 +21,9 @@ namespace Sentry
 		void OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
 		void OnResponse(std::shared_ptr<c2s::Rpc_Response> response) final {}
 	 public:
+		long long GetUserId(const std::string & address);
+		bool AddNewUser(const std::string & address, long long userId);
+	 public:
 		std::shared_ptr<RpcGateClient> GetGateClient(const std::string & address);
 		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message);
 	 public:
@@ -34,6 +37,7 @@ namespace Sentry
 		class RpcComponent* mRpcComponent;
 		class GateComponent* mGateComponent;
 		class TimerComponent* mTimerComponent;
+		std::unordered_map<std::string, long long> mUserAddressMap;
 		std::unordered_map<std::string, std::shared_ptr<RpcGateClient>> mGateClientMap;
 	};
 }

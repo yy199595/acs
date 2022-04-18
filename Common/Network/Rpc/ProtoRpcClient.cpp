@@ -48,7 +48,6 @@ namespace Sentry
 	{
 		if (code != XCode::Successful)
 		{
-			long long id = this->GetSocketId();
 			MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
 		}
 	}
@@ -103,22 +102,24 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync(const std::string& ip, unsigned short port)
+	std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync()
 	{
-		this->StartConnect(ip, port);
-		std::shared_ptr<TaskSource<bool>> taskSource = std::make_shared<TaskSource<bool>>();
-		this->mConnectTasks.emplace_back(taskSource);
+		std::shared_ptr<TaskSource<bool>> taskSource
+			= std::make_shared<TaskSource<bool>>();
+		this->mConnectTasks.emplace(taskSource);
+		this->StartConnect();
 		return taskSource;
 	}
 
 	void ProtoRpcClient::OnConnect(XCode code)
 	{
 		this->mConnectCount++;
-		for(std::shared_ptr<TaskSource<bool>> taskSource : this->mConnectTasks)
+		bool res = code == XCode::Successful;
+		while(!this->mConnectTasks.empty())
 		{
-			taskSource->SetResult(code == XCode::Successful);
+			this->mConnectTasks.front()->SetResult(res);
+			this->mConnectTasks.pop();
 		}
-		this->mConnectTasks.clear();
 		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnConnectAfter(address, code);

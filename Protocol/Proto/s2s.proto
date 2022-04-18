@@ -50,4 +50,8 @@ message AddressAllot
         int64 user_id = 1;
         string login_token = 2;
     }
+    message Response
+    {
+        string address = 1;
+    }
 }

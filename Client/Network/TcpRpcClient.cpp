@@ -22,9 +22,9 @@ namespace Client
 
     }
 
-    std::shared_ptr<TaskSource<bool>> TcpRpcClient::ConnectAsync(const std::string &ip, unsigned short port)
+    std::shared_ptr<TaskSource<bool>> TcpRpcClient::ConnectAsync()
     {
-        if(!this->StartConnect(ip, port))
+        if(!this->StartConnect())
         {
             return nullptr;
         }

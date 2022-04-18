@@ -14,8 +14,8 @@ namespace Client
 	public:
 		TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
-        std::shared_ptr<TaskSource<bool>> SendToGate(std::shared_ptr<c2s::Rpc_Request> request);
-        std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
+		std::shared_ptr<TaskSource<bool>> ConnectAsync();
+		std::shared_ptr<TaskSource<bool>> SendToGate(std::shared_ptr<c2s::Rpc_Request> request);
 	protected:
         void OnConnect(XCode code) final;
         void OnClientError(XCode code) final;
