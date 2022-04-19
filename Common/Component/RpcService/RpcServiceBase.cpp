@@ -42,21 +42,24 @@ namespace Sentry
 
 	std::shared_ptr<com::Rpc::Request> RpcServiceBase::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
-		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
 		string name = fmt::format("{0}.{1}", this->GetName(), func);
-		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(name);
-		if(protoConfig == nullptr)
+		const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(name);
+		if (protoConfig == nullptr)
 		{
 			LOG_ERROR("not find rpc config : " << name);
 			return nullptr;
 		}
-		std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
+		std::shared_ptr<com::Rpc::Request> request
+			= std::make_shared<com::Rpc::Request>();
+
 		request->set_user_id(userId);
 		request->set_method_id(protoConfig->MethodId);
-		if(message != nullptr)
+		if(message == nullptr)
 		{
-			request->mutable_data()->PackFrom(*message);
+			return request;
 		}
+		request->mutable_data()->PackFrom(*message);
 		return request;
 	}
 }

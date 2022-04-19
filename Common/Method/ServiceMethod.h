@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include<Other/ObjectFactory.h>
-#include<Pool/ObjectPool.h>
 #include<Protocol/com.pb.h>
 #include<XCode/XCode.h>
 #include<google/protobuf/any.h>

@@ -4,7 +4,6 @@
 #include"Script/Table.h"
 #include"Other/MultiThreadQueue.h"
 #include"Network/Rpc/ProtoRpcClient.h"
-#include"Pool/AllotorPool.h"
 namespace Sentry
 {
 	// 管理所有session
