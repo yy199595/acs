@@ -35,6 +35,7 @@ namespace Sentry
 	bool RpcServiceBase::LateAwake()
 	{
 		this->mRpcComponent = this->GetComponent<RpcComponent>();
+		this->mLocalAddress = this->GetApp()->GetConfig().GetRpcAddress();
 		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
 		return true;
 	}
@@ -148,6 +149,15 @@ namespace Sentry
 	std::shared_ptr<com::Rpc::Response> RpcServiceBase::StartCall(const std::string & address,
 			std::shared_ptr<com::Rpc::Request> request)
 	{
+		if(address == this->mLocalAddress)
+		{
+			std::shared_ptr<com::Rpc::Response> response =
+					std::make_shared<com::Rpc::Response>();
+			if (this->OnCallLocal(request, response))
+			{
+				return response;
+			}
+		}
 		std::shared_ptr<ProtoRpcClient> rpcClient = this->GetClient(address);
 		if (rpcClient == nullptr)
 		{

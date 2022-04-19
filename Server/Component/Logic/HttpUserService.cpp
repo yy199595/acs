@@ -4,7 +4,7 @@
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
-#include"Component/Logic/UserSubService.h"
+#include"Component/Service/UserSubService.h"
 #include"Component/Redis/RedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 
@@ -74,12 +74,7 @@ namespace Sentry
 		std::shared_ptr<s2s::AddressAllot::Response> allotResponse(new s2s::AddressAllot::Response());
 		if (this->mGateService->Call(address, "Allot", allotRequest, allotResponse) == XCode::Successful)
 		{
-
-			Json::Writer jsonWriter;
-			jsonWriter.AddMember("address", address);
-			jsonWriter.AddMember("service", "GateService");
-			jsonWriter.AddMember("user_id", userAccount->user_id());
-			if (this->GetComponent<UserSubService>()->Publish("AddUser", jsonWriter))
+			if(this->mGateService->AddEntity(userAccount->user_id(), address, true))
 			{
 				response.AddMember("token", newToken);
 				response.AddMember("address", allotResponse->address());

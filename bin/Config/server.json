@@ -68,7 +68,9 @@
         "port": 6379,
         "timeout": 3,
         "count": 1,
-        "lua": "./Script/RedisCommand",
+        "lua": [
+            "./Config/user.lua"
+        ],
         "passwd": "199595yjz."
     },
     "lua_src": [

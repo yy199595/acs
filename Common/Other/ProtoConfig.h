@@ -7,7 +7,8 @@ namespace Sentry
     class ProtoConfig
     {
     public:
-        int Timeout;
+		bool Auth;
+		int Timeout;
         bool IsAsync;
         int MethodId;
 		std::string Type;
@@ -15,5 +16,6 @@ namespace Sentry
         std::string Service;
         std::string Request;
         std::string Response;
-    };
+		std::string FullName;
+	};
 }// namespace Sentry

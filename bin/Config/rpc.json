@@ -53,17 +53,11 @@
         "Ping": {
             "Id": 201,
             "Async": false,
-            "Type":"Client"
-        },
-        "Login": {
-            "Id": 202,
-            "Async": false,
             "Type":"Client",
-            "Forward": false,
-            "Request": "c2s.GateLogin.Request"
+            "Auth": true
         },
         "Allot": {
-            "Id": 203,
+            "Id": 202,
             "Async": true,
             "Type": "Server",
             "Request": "s2s.AddressAllot.Request"

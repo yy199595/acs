@@ -36,11 +36,16 @@ namespace Sentry
 				}
 				ProtoConfig protocolConfig;
 				protocolConfig.Timeout = 0;
+				protocolConfig.Auth = true;
 				protocolConfig.Service = service;
 				protocolConfig.Method = iter2->name.GetString();
 				protocolConfig.MethodId = iter2->value["Id"].GetInt();
 				protocolConfig.IsAsync = iter2->value["Async"].GetBool();
 				protocolConfig.Type = iter2->value["Type"].GetString();
+				if(iter2->value.HasMember("Auth"))
+				{
+					protocolConfig.Auth = iter2->value["Auth"].GetBool();
+				}
 				if (iter2->value.HasMember("Timeout"))
 				{
 					protocolConfig.Timeout = iter2->value["Timeout"].GetInt();

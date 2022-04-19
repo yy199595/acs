@@ -14,7 +14,6 @@ function coroutine.call(func)
     local luaTaskSource = LuaTaskSource.New()
     coroutine.start(function(taskSource)
         local state, ret = pcall(func)
-        print(state, ret)
         if not state then
             Log.Error(ret)
         end

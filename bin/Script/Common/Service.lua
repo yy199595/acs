@@ -3,27 +3,29 @@ Service = {}
 
 function Service.Call(func, id, json)
 
-    local tab = #json > 0 and Json.ToObject(json) or nil
-    local state, error, response = pcall(func, id, tab)
+    Log.Info(func, id, json)
+    local tab = Json.ToObject(json)
+    local state, code, response = pcall(func, id, tab)
 
     if not state then
-        Log.Error(error)
+        Log.Error(code)
         return XCode.CallLuaFunctionFail
     end
-    assert(type(error) == 'number')
+    print(state, code, response)
+    assert(type(code) == 'number')
     assert(type(response) == 'table' or type(response) == 'nil')
 
-    if error ~= XCode.Successful then
+    if code ~= XCode.Successful then
         return code
     end
-    return code, Json.ToObject(response)
+    return code, response ~= nil and Json.ToObject(response) or nil
 end
 
 function Service.CallAsync(func, id, json)
 
-    print(coroutine.running())
+    Log.Info(id, json)
     local context = function(luaTaskSource)
-        local tab = #json > 0 and Json.ToObject(json) or nil
+        local tab = Json.ToObject(json)
         local state, error, response = pcall(func, id, tab)
         if not state then
             Log.Error(error)

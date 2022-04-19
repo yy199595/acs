@@ -7,8 +7,9 @@
 #include"Util/MD5.h"
 #include"Util/Guid.h"
 #include"NetWork/RpcGateClient.h"
-#include"Component/Logic/UserSubService.h"
+#include"Component/Service/UserSubService.h"
 #include"Component/Scene/EntityMgrComponent.h"
+#include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Listener/TcpServerComponent.h"
@@ -18,13 +19,9 @@ namespace Sentry
 	{
 		methodRegister.Bind("Ping", &GateService::Ping);
 		methodRegister.Bind("Allot", &GateService::Allot);
-		methodRegister.BindAddress("Login", &GateService::Login);
-		this->mGateComponent = this->GetComponent<GateClientComponent>();
-		if (this->mGateComponent == nullptr)
-		{
-			this->mGateComponent = this->mEntity->GetOrAddComponent<GateClientComponent>();
-			LOG_CHECK_RET_FALSE(this->mGateComponent->LateAwake());
-		}
+		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
+		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
+
 		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
 		const ListenConfig * listenConfig = tcpServerComponent->GetTcpConfig("gate");
 		if(listenConfig == nullptr)
@@ -44,24 +41,8 @@ namespace Sentry
 		return true;
 	}
 
-	XCode GateService::Ping()
+	XCode GateService::Ping(long long userId)
 	{
-		return XCode::Failure;
-	}
-
-	XCode GateService::Login(const std::string & address, const c2s::GateLogin::Request& request)
-	{
-		const std::string & token = request.token();
-		auto iter = this->mTokenMap.find(token);
-		if(iter != this->mTokenMap.end())
-		{
-			long long userId = iter->second;
-			this->mTokenMap.erase(iter);
-			if(this->mGateComponent->AddNewUser(address, userId))
-			{
-				return XCode::Successful;
-			}
-		}
 		return XCode::Failure;
 	}
 
@@ -69,23 +50,11 @@ namespace Sentry
 	{
 		long long userId = request.user_id();
 		const std::string& token = request.login_token();
-		auto iter = this->mTokenMap.find(token);
-		if (iter != this->mTokenMap.end())
+		if(this->mGateComponent->AddUserToken(token, userId))
 		{
-			this->mTokenMap.erase(iter);
+			response.set_address(this->mGateAddress);
+			return XCode::Successful;
 		}
-		this->mTokenMap.emplace(token, userId);
-		response.set_address(this->mGateAddress);
-		return XCode::Successful;
+		return XCode::Failure;
 	}
-
-	void GateService::OnTokenTimeout(const std::string& token)
-	{
-		auto iter = this->mTokenMap.find(token);
-		if (iter != this->mTokenMap.end())
-		{
-			this->mTokenMap.erase(iter);
-		}
-	}
-
 }

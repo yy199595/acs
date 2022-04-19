@@ -1,6 +1,6 @@
 
-local Account = {}
-Account.AddNewUser = function(keys)
+local user = {}
+user.add = function(keys)
     local account = keys[1]
     local ret = redis.call("SADD", "user_account", account)
     if ret == 0 then
@@ -13,4 +13,4 @@ for index = 2, #KEYS do
     table.insert(args, KEYS[index])
 end
 
-return Account[KEYS[1]](args)
+return user[KEYS[1]](args)

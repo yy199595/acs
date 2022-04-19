@@ -7,6 +7,7 @@
 #include"Global/RpcConfig.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Lua/LuaScriptComponent.h"
+#include"Component/Service/UserSubService.h"
 
 namespace Sentry
 {
@@ -85,6 +86,12 @@ namespace Sentry
 
 namespace Sentry
 {
+	bool LocalServerRpc::LateAwake()
+	{
+		this->mUserService = this->GetComponent<UserSubService>();
+		return RpcServiceBase::LateAwake();
+	}
+
 	std::shared_ptr<com::Rpc_Response> LocalServerRpc::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
 	{
 		assert(this->IsStartService());
@@ -136,18 +143,27 @@ namespace Sentry
 		return true;
 	}
 
-	void LocalServerRpc::AddEntity(long long id, const std::string & address)
+	bool LocalServerRpc::AddEntity(long long id, const std::string & address, bool publish)
 	{
-		auto iter = this->mUserAddressMap.find(id);
-		if (iter != this->mUserAddressMap.end())
+		if(!publish)
 		{
-			this->mUserAddressMap.erase(iter);
+			auto iter = this->mUserAddressMap.find(id);
+			if (iter != this->mUserAddressMap.end())
+			{
+				this->mUserAddressMap.erase(iter);
+			}
+			LOG_INFO(this->GetName() << " add " << id << " address = " << address);
+			this->mUserAddressMap.emplace(id, address);
+			return true;
 		}
-		LOG_INFO(this->GetName() << " add " << id << " address = " << address);
-		this->mUserAddressMap.emplace(id, address);
+		Json::Writer jsonWriter;
+		jsonWriter.AddMember("user_id", id);
+		jsonWriter.AddMember("address", address);
+		jsonWriter.AddMember("service", "GateService");
+		return this->mUserService->Publish("AddUser", jsonWriter);
 	}
 
-	void LocalServerRpc::DelEntity(long long id)
+	bool LocalServerRpc::DelEntity(long long id, bool publish)
 	{
 
 	}

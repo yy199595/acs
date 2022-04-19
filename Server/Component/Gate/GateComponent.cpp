@@ -16,6 +16,7 @@
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
 #endif
+#include"Component/Service/UserSubService.h"
 namespace Sentry
 {
 
@@ -37,6 +38,11 @@ namespace Sentry
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
 		const std::string &address = request->address();
+		long long userId = this->mGateClientComponent->GetUserId(address);
+		if(userId == 0)
+		{
+			return this->Auth(request);
+		}
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
 		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
 		if (config == nullptr || config->Type != "Client")
@@ -44,66 +50,78 @@ namespace Sentry
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
+		if(!config->Request.empty())
+		{
+			if(!request->has_data())
+			{
+				return XCode::CallArgsError;
+			}
+			std::string fullName;
+			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &fullName)
+				|| fullName != config->Request)
+			{
+				return XCode::CallArgsError;
+			}
+		}
+		else if(request->has_data())
+		{
+			return XCode::CallArgsError;
+		}
 
-		long long userId = this->mGateClientComponent->GetUserId(address);
 #ifdef __DEBUG__
+		std::string json;
 		LOG_INFO("========== client request ==========");
 		LOG_INFO("func = " << request->method_name());
 		LOG_INFO("address = " << request->address());
 		LOG_INFO("userid = " << userId);
-		if(request->has_data())
+		if(request->has_data() && Helper::Proto::GetJson(request->data(), json))
 		{
-			std::string json;
-			Helper::Proto::GetJson(request->data(), json);
 			LOG_INFO("json = " << json);
 		}
 #endif
-		LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(config->Service);
-		if(localServerRpc == nullptr)
+		if(this->GetComponent<LocalServerRpc>(config->Service) == nullptr)
 		{
 			return XCode::CallServiceNotFound;
 		}
-		std::shared_ptr<com::Rpc::Request> clientRequest =
-			std::make_shared<com::Rpc::Request>();
-
-		clientRequest->set_user_id(userId);
-		clientRequest->set_rpc_id(request->rpc_id());
-		clientRequest->set_address(request->address());
-		clientRequest->mutable_data()->CopyFrom(request->data());
-
-		std::string json1;
-		Helper::Proto::GetJson(clientRequest->data(), json1);
-
-		if(userId == 0) //未登录
-		{
-			if(!localServerRpc->IsStartService())
-			{
-				return XCode::CallServiceNotFound;
-			}
-
-			std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
-			std::shared_ptr<com::Rpc::Response> response = localServerRpc->Invoke(config->Method, clientRequest);
-
-			if(response != nullptr)
-			{
-				clientResponse->set_code(response->code());
-				clientResponse->set_rpc_id(clientResponse->rpc_id());
-				clientResponse->mutable_data()->CopyFrom(response->data());
-				this->mGateClientComponent->SendToClient(address, clientResponse);
-			}
-			return XCode::Successful;
-		}
-		std::string serviceAddress;
-		if(!localServerRpc->GetEntityAddress(userId,serviceAddress))
-		{
-			return XCode::CallServiceNotFound;
-		}
-		this->mRpcClientComponent->Send(serviceAddress, clientRequest);
+		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, userId, request);
 		return XCode::Successful;
 	}
 
-	void GateComponent::OnNotLogin(std::shared_ptr<c2s::Rpc_Request> request)
+	bool GateComponent::AddUserToken(const std::string& token, long long userId)
 	{
+		auto iter = this->mUserTokens.find(token);
+		if(iter == this->mUserTokens.end())
+		{
+			this->mUserTokens.emplace(token, userId);
+			return true;
+		}
+		return false;
+	}
+
+	XCode GateComponent::Auth(const std::shared_ptr<c2s::Rpc::Request> request)
+	{
+		c2s::GateLogin::Request loginRequest;
+		if (!request->has_data() || !request->data().Is<c2s::GateLogin::Request>()
+			|| !request->mutable_data()->UnpackTo(&loginRequest))
+		{
+			return XCode::CallArgsError;
+		}
+		const std::string& token = loginRequest.token();
+		auto iter = this->mUserTokens.find(token);
+		if (iter == this->mUserTokens.end())
+		{
+			return XCode::Failure;
+		}
+		long long userId = iter->second;
+		this->mUserTokens.erase(iter);
+		LOG_INFO(userId << " login gate successful");
+		this->mGateClientComponent->AddNewUser(request->address(), userId);
+		std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
+
+		clientResponse->set_rpc_id(request->rpc_id());
+		clientResponse->set_code((int)XCode::Successful);
+		this->mGateClientComponent->SendToClient(request->address(), clientResponse);
+		return XCode::Successful;
 
 	}
 
@@ -114,8 +132,7 @@ namespace Sentry
 		if (response->has_data())
 		{
 			std::string json;
-			std::shared_ptr<Message> message = Helper::Proto::NewByData(response->data());
-			if (message != nullptr && Helper::Proto::GetJson(message, json))
+			if ( Helper::Proto::GetJson(response->data(), json))
 			{
 				LOG_WARN("json = " << json);
 			}
@@ -127,5 +144,40 @@ namespace Sentry
 			return XCode::NetWorkError;
 		}
 		return XCode::Successful;
+	}
+
+	void GateComponent::OnUserRequest(long long userId, std::shared_ptr<c2s::Rpc::Request> request)
+	{
+		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
+		const ProtoConfig* config = rpcConfig.GetProtocolConfig(request->method_name());
+		if (config == nullptr)
+		{
+			return;
+		}
+		std::string address;
+		LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(config->Service);
+		if (!localServerRpc->GetEntityAddress(userId, address))
+		{
+			localServerRpc->AllotAddress(address);
+			if(!localServerRpc->AddEntity(userId, address, true))
+			{
+				LOG_ERROR(userId << " publish failure");
+				return;
+			}
+		}
+		std::shared_ptr<com::Rpc::Request> requestData(new com::Rpc::Request());
+		requestData->set_user_id(userId);
+		requestData->set_method_id(config->MethodId);
+		requestData->mutable_data()->PackFrom(request->data());
+		std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
+		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, requestData);
+		if(responseData != nullptr)
+		{
+			clientResponse->set_rpc_id(request->rpc_id());
+			clientResponse->set_code(responseData->code());
+			clientResponse->set_error_str(responseData->error_str());
+			clientResponse->mutable_data()->PackFrom(responseData->data());
+			this->mGateClientComponent->SendToClient(request->address(), clientResponse);
+		}
 	}
 }

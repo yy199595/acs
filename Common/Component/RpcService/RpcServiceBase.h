@@ -50,16 +50,18 @@ namespace Sentry
 
 		virtual XCode Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response);
 
+	public:
+		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 	 protected:
 		bool LateAwake() override;
-		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
-		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
-	 protected:
 		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
+		virtual bool OnCallLocal(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response>) = 0;
+		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
+	protected:
 		std::shared_ptr<ProtoRpcClient> GetClient(const std::string & address);
 	 protected:
+		std::string mLocalAddress;
 		class RpcComponent* mRpcComponent;
 		class RpcClientComponent* mRpcClientComponent;
-	 private:
 	};
 }

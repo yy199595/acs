@@ -53,7 +53,7 @@ namespace Sentry
 		{
 #ifdef __DEBUG__
 			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
-			LOG_ERROR("player call" << request->method_name() << "failure error = " << configCom.GetCodeDesc(code));
+			LOG_ERROR("player call " << request->method_name() << " failure error = " << configCom.GetCodeDesc(code));
 #endif
 			this->StartClose(request->address());
 		}

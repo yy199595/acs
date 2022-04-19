@@ -39,13 +39,14 @@ namespace Lua
 		{
 			int ref = iter->second;
 			lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-			return lua_iscfunction(lua, -1);
+			return lua_isfunction(lua, -1);
 		}
 		if(lua_getfunction(lua, tab, func))
 		{
 			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
 			lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 			mRefFunctions.emplace(name, ref);
+			printf("add lua function : %s.%s\n", tab, func);
 			return true;
 		}
 		return false;

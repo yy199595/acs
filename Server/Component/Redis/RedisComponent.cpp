@@ -78,10 +78,7 @@ namespace Sentry
 	bool RedisComponent::LoadLuaScript(const std::string& path)
 	{
 		std::string content;
-		if (!Helper::File::ReadTxtFile(path, content))
-		{
-			return false;
-		}
+		LOG_CHECK_RET_FALSE(Helper::File::ReadTxtFile(path, content));
 		std::shared_ptr<RedisResponse> response = this->InvokeCommand("script", "load", content);
 		if (response->HasError())
 		{
@@ -111,10 +108,8 @@ namespace Sentry
 
 	bool RedisComponent::OnStart()
 	{
-		std::string path;
 		std::vector<std::string> luaFiles;
-		App::Get()->GetConfig().GetMember("redis", "lua", path);
-		Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
+		this->GetApp()->GetConfig().GetMember("redis", "lua", luaFiles);
 
 		std::string address = fmt::format("{0}:{1}",
 				this->mRedisConfig.mIp, this->mRedisConfig.mPort);

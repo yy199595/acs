@@ -27,6 +27,12 @@ namespace Sentry
 		{
 			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
 		}
+		const char * tab = protoConfig->Service.c_str();
+		const char * func = protoConfig->Method.c_str();
+		if(!Lua::Function::Get(this->mLuaEnv, tab, func))
+		{
+			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
+		}
 		Lua::Parameter::WriteArgs(this->mLuaEnv, id, json);
 		if (lua_pcall(this->mLuaEnv, 3, 2, 0) != 0)
 		{

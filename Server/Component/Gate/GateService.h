@@ -12,20 +12,19 @@ namespace Sentry
 	 public:
 		GateService() = default;
 		~GateService() final = default;
-	 private:
-		XCode Ping();
-		XCode Login(const std::string & address,const c2s::GateLogin::Request& request);
+	public:
+		XCode Ping(long long userId);
+	private:
 		XCode Allot(const s2s::AddressAllot::Request & request, s2s::AddressAllot::Response & response);
 	 private:
 		bool LateAwake() final;
-		void OnTokenTimeout(const std::string& token);
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		std::string mGateAddress;
 		class UserSubService * mUserService;
 		class TimerComponent* mTimerComponent;
-		class GateClientComponent* mGateComponent;
-		std::unordered_map<std::string, long long> mTokenMap;
+		class GateComponent * mGateComponent;
+		class GateClientComponent* mGateClientComponent;
 	};
 
 }

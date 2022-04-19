@@ -16,19 +16,22 @@ namespace Sentry
 	 public:
 		GateComponent() = default;
 		~GateComponent() final = default;
-	 protected:
-		bool LateAwake() final;
 	 public:
 		void OnConnect(const std::string & address) final;
 		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
+		bool AddUserToken(const std::string & token, long long userId);
 		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
-	 private:
-		void OnNotLogin(std::shared_ptr<c2s::Rpc_Request> request);
+
+	private:
+		void OnUserRequest(long long userId, std::shared_ptr<c2s::Rpc::Request> request);
+	private:
+		bool LateAwake() final;
+		XCode Auth(const std::shared_ptr<c2s::Rpc::Request> request);
 	 private:
 		class TaskComponent * mTaskComponent;
 		class RpcClientComponent * mRpcClientComponent;
 		class GateClientComponent* mGateClientComponent;
-		std::unordered_map<long long, long long> mClientMap;
+		std::unordered_map<std::string, long long> mUserTokens;
 	};
 }
 

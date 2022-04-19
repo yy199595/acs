@@ -26,7 +26,7 @@
 
 #include"Component/Lua/LuaRegisterComponent.h"
 
-#include"Component/Logic/UserSubService.h"
+#include"Component/Service/UserSubService.h"
 #include"Component/Common/DataMgrComponent.h"
 using namespace Sentry;
 using namespace Client;

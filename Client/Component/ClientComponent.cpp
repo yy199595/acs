@@ -34,7 +34,14 @@ namespace Client
     {
         std::string json;
         util::MessageToJsonString(*t2, &json);
-        LOG_WARN("response json = " << json);
+
+		LOG_WARN("response json = " << json);
+		auto iter = this->mRpcTasks.find(t2->rpc_id());
+		if(iter != this->mRpcTasks.end())
+		{
+			iter->second->SetResult(t2);
+			this->mRpcTasks.erase(iter);
+		}
 //        auto iter = this->mRpcTasks.find(t2->rpc_id());
 //        if(iter != this->mRpcTasks.end())
 //        {
@@ -56,6 +63,22 @@ namespace Client
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
 	}
 
+	XCode ClientComponent::Call(const std::string& name)
+	{
+		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
+
+		requestMessage->set_rpc_id(100);
+		requestMessage->set_method_name(name);
+		this->mTcpClient->SendToGate(requestMessage);
+
+		TaskSourceShared<c2s::Rpc::Response> taskSource
+				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
+		this->mRpcTasks.emplace(100, taskSource);
+		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
+
+		return (XCode)response->code();
+	}
+
 	XCode ClientComponent::Call(const string& name, const Message& request)
 	{
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
@@ -64,7 +87,13 @@ namespace Client
 		requestMessage->set_method_name(name);
 		requestMessage->mutable_data()->PackFrom(request);
 		this->mTcpClient->SendToGate(requestMessage);
-		return XCode::Failure;
+
+		TaskSourceShared<c2s::Rpc::Response> taskSource
+				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
+		this->mRpcTasks.emplace(100, taskSource);
+		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
+
+		return (XCode)response->code();
 	}
 
     XCode ClientComponent::Call(const std::string &name, std::shared_ptr<Message> response)
@@ -177,13 +206,19 @@ namespace Client
 		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
+		c2s::GateLogin::Request loginRequest;
+		loginRequest.set_token(loginToken);
+		if(this->Call("GateService.Login", loginRequest) != XCode::Successful)
+		{
+			return;
+		}
+
+		this->Call("GateService.Ping");
+
 		while (this->mTcpClient->GetSocketProxy()->IsOpen())
 		{
 			ElapsedTimer timer;
-			c2s::GateLogin::Request loginRequest;
-			loginRequest.set_token(loginToken);
 
-			this->Call("GateService.Login", loginRequest);
 
 			this->mTaskComponent->Sleep(10);
 
