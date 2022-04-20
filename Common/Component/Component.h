@@ -32,6 +32,7 @@ namespace Sentry
 namespace Sentry
 {
 	class Entity;
+	class ServerConfig;
 	class Component : public Object
 	{
 	 public:
@@ -92,6 +93,8 @@ namespace Sentry
 		Component* GetByName(const std::string& name);
 
 		std::shared_ptr<App> GetApp() { return mApp;}
+
+		const ServerConfig & GetConfig();
 
 	 private:
 		Component* GetByHash(size_t hash);

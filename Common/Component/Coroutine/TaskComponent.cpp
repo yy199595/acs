@@ -47,32 +47,8 @@ namespace Sentry
 
 	bool TaskComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mTimerManager = this->GetComponent<TimerComponent>());
-//        this->Start([this]() {
-//            ElapsedTimer timer;
-//            std::vector<TaskContext *> tasks;
-//            for (int index = 0; index < 100; index++) {
-//                tasks.push_back(this->Start(&TaskComponent::Test, this, index));
-//            }
-//            this->WhenAll(tasks);
-//            LOG_ERROR("use time = " << timer.GetSecond() << "s");
-//        });
+		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return true;
-	}
-
-	void TaskComponent::Test(int index)
-	{
-		ElapsedTimer timer;
-		for (int x = 0; x < 10; x++)
-		{
-			this->Sleep(10 + 5 * index + x);
-			this->Start([this, x]()
-			{
-				this->Sleep(100 + x * 100);
-				//LOG_ERROR(__FUNCTION__ << "  " << __LINE__);
-			});
-		}
-		//LOG_WARN("[" << index << "] use time = " << timer.GetSecond() << "s");
 	}
 
 	void TaskComponent::WhenAny(TaskContext* coroutine)
@@ -106,7 +82,7 @@ namespace Sentry
 		unsigned int id = this->mRunContext->mCoroutineId;
 		StaticMethod* sleepMethod = NewMethodProxy(
 			&TaskComponent::Resume, this, id);
-		this->mTimerManager->AddTimer(ms, sleepMethod);
+		this->mTimerComponent->AddTimer(ms, sleepMethod);
 		this->YieldCoroutine();
 	}
 
@@ -138,8 +114,8 @@ namespace Sentry
 
 	bool TaskComponent::YieldCoroutine()
 	{
-		LOG_CHECK_RET_FALSE(this->mRunContext);
-		LOG_CHECK_RET_FALSE(this->mRunContext->mState == CorState::Running);
+		assert(this->mRunContext);
+		assert(this->mRunContext->mState == CorState::Running);
 
 		this->mRunContext->mSwitchCount++;
 		this->mRunContext->mState = CorState::Suspend;

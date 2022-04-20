@@ -10,8 +10,9 @@ namespace Sentry
 		int Count = 0;
 		std::string Ip;
 		std::string Name;
+		std::string Token;
 		std::string Handler;
-		std::string mAddress;
+		std::string Address;
 		unsigned short Port = 0;
 	};
 
@@ -19,7 +20,7 @@ namespace Sentry
 	class NetworkListener
 	{
 	 public:
-		NetworkListener(IAsioThread& thread, ListenConfig& config);
+		NetworkListener(IAsioThread& thread, const ListenConfig& config);
 		~NetworkListener();
 	 public:
 		bool StartListen(ISocketListen* handler);
@@ -39,8 +40,8 @@ namespace Sentry
 	 private:
 		bool mIsListen;
 		unsigned int mCorId;
-		ListenConfig mConfig;
 		IAsioThread& mTaskThread;
+		const ListenConfig & mConfig;
 		AsioTcpAcceptor* mBindAcceptor;
 		ISocketListen* mListenHandler;
 		ThreadPoolComponent* mTaskComponent;

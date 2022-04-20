@@ -12,15 +12,12 @@ namespace Sentry
 {
 	bool RedisComponent::LoadRedisConfig()
 	{
-		std::string path;
 		this->mRedisConfig.mCount = 3;
-		const ServerConfig& config = App::Get()->GetConfig();
-		this->mRpcAddress = config.GetRpcAddress();
-		config.GetMember("redis", "count", this->mRedisConfig.mCount);
-		config.GetMember("redis", "lua", this->mRedisConfig.mLuaFilePath);
-		config.GetMember("redis", "passwd", this->mRedisConfig.mPassword);
-		LOG_CHECK_RET_FALSE(config.GetMember("redis", "ip", this->mRedisConfig.mIp));
-		LOG_CHECK_RET_FALSE(config.GetMember("redis", "port", this->mRedisConfig.mPort));
+		this->GetConfig().GetMember("redis", "count", this->mRedisConfig.mCount);
+		this->GetConfig().GetMember("redis", "lua", this->mRedisConfig.mLuaFilePath);
+		this->GetConfig().GetMember("redis", "passwd", this->mRedisConfig.mPassword);
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis", "ip", this->mRedisConfig.mIp));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis", "port", this->mRedisConfig.mPort));
 		return true;
 	}
 

@@ -22,8 +22,6 @@ namespace Sentry
 		~RpcConfig() = default;
 	 public:
 		bool LoadConfig(const std::string & path);
-		bool HasService(const std::string& service);
-		void GetServices(std::vector<std::string>& services);
 		bool HasServiceMethod(const std::string& service, const std::string& method) const;
 		bool GetMethods(const std::string& service, std::vector<std::string>& methods) const;
 	 public:

@@ -74,6 +74,10 @@ class Rpc_ResponseDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Rpc_Response> _instance;
 } _Rpc_Response_default_instance_;
+class Rpc_AuthDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<Rpc_Auth> _instance;
+} _Rpc_Auth_default_instance_;
 class RpcDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Rpc> _instance;
@@ -277,6 +281,20 @@ static void InitDefaultsRpc_Response_com_2eproto() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsRpc_Response_com_2eproto}, {
       &scc_info_Any_google_2fprotobuf_2fany_2eproto.base,}};
 
+static void InitDefaultsRpc_Auth_com_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::com::_Rpc_Auth_default_instance_;
+    new (ptr) ::com::Rpc_Auth();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::com::Rpc_Auth::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_Rpc_Auth_com_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsRpc_Auth_com_2eproto}, {}};
+
 static void InitDefaultsRpc_com_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -306,10 +324,11 @@ void InitDefaults_com_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Value_com_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_Request_com_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_Response_com_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Rpc_Auth_com_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Rpc_com_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_com_2eproto[15];
+::google::protobuf::Metadata file_level_metadata_com_2eproto[16];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_com_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_com_2eproto = nullptr;
 
@@ -405,6 +424,12 @@ const ::google::protobuf::uint32 TableStruct_com_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, error_str_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Response, data_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::com::Rpc_Auth, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::com::Rpc_Auth, token_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com::Rpc, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -425,7 +450,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 65, -1, sizeof(::com::Value)},
   { 70, -1, sizeof(::com::Rpc_Request)},
   { 80, -1, sizeof(::com::Rpc_Response)},
-  { 90, -1, sizeof(::com::Rpc)},
+  { 90, -1, sizeof(::com::Rpc_Auth)},
+  { 96, -1, sizeof(::com::Rpc)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -443,13 +469,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::com::_Value_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::com::_Rpc_Request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::com::_Rpc_Response_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::com::_Rpc_Auth_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::com::_Rpc_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_com_2eproto = {
   {}, AddDescriptors_com_2eproto, "com.proto", schemas,
   file_default_instances, TableStruct_com_2eproto::offsets,
-  file_level_metadata_com_2eproto, 15, file_level_enum_descriptors_com_2eproto, file_level_service_descriptors_com_2eproto,
+  file_level_metadata_com_2eproto, 16, file_level_enum_descriptors_com_2eproto, file_level_service_descriptors_com_2eproto,
 };
 
 const char descriptor_table_protodef_com_2eproto[] =
@@ -460,18 +487,19 @@ const char descriptor_table_protodef_com_2eproto[] =
   "\022\r\n\005array\030\001 \003(\001\"~\n\005Value\032\026\n\005Int32\022\r\n\005val"
   "ue\030\001 \001(\005\032\026\n\005Int64\022\r\n\005value\030\001 \001(\003\032\026\n\005Floa"
   "t\022\r\n\005value\030\001 \001(\002\032\027\n\006Double\022\r\n\005value\030\001 \001("
-  "\001\032\024\n\004Json\022\014\n\004json\030\001 \001(\t\"\353\001\n\003Rpc\032r\n\007Reque"
+  "\001\032\024\n\004Json\022\014\n\004json\030\001 \001(\t\"\202\002\n\003Rpc\032r\n\007Reque"
   "st\022\017\n\007user_id\030\001 \001(\003\022\016\n\006rpc_id\030\002 \001(\003\022\021\n\tm"
   "ethod_id\030\003 \001(\005\022\017\n\007address\030\004 \001(\t\022\"\n\004Data\030"
   "\005 \001(\0132\024.google.protobuf.Any\032p\n\010Response\022"
   "\014\n\004code\030\001 \001(\005\022\016\n\006rpc_id\030\002 \001(\003\022\017\n\007user_id"
   "\030\003 \001(\003\022\021\n\terror_str\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132"
-  "\024.google.protobuf.Anyb\006proto3"
+  "\024.google.protobuf.Any\032\025\n\004Auth\022\r\n\005token\030\001"
+  " \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_com_2eproto = {
   false, InitDefaults_com_2eproto, 
   descriptor_table_protodef_com_2eproto,
-  "com.proto", &assign_descriptors_table_com_2eproto, 549,
+  "com.proto", &assign_descriptors_table_com_2eproto, 572,
 };
 
 void AddDescriptors_com_2eproto() {
@@ -4727,6 +4755,303 @@ void Rpc_Response::InternalSwap(Rpc_Response* other) {
 
 // ===================================================================
 
+void Rpc_Auth::InitAsDefaultInstance() {
+}
+class Rpc_Auth::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Rpc_Auth::kTokenFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+Rpc_Auth::Rpc_Auth()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:com.Rpc.Auth)
+}
+Rpc_Auth::Rpc_Auth(const Rpc_Auth& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.token().size() > 0) {
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  // @@protoc_insertion_point(copy_constructor:com.Rpc.Auth)
+}
+
+void Rpc_Auth::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_Rpc_Auth_com_2eproto.base);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+Rpc_Auth::~Rpc_Auth() {
+  // @@protoc_insertion_point(destructor:com.Rpc.Auth)
+  SharedDtor();
+}
+
+void Rpc_Auth::SharedDtor() {
+  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void Rpc_Auth::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Rpc_Auth& Rpc_Auth::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_Rpc_Auth_com_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Rpc_Auth::Clear() {
+// @@protoc_insertion_point(message_clear_start:com.Rpc.Auth)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* Rpc_Auth::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<Rpc_Auth*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string token = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("com.Rpc.Auth.token");
+        object = msg->mutable_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool Rpc_Auth::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:com.Rpc.Auth)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string token = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->token().data(), static_cast<int>(this->token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "com.Rpc.Auth.token"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:com.Rpc.Auth)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:com.Rpc.Auth)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void Rpc_Auth::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:com.Rpc.Auth)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string token = 1;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Auth.token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->token(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:com.Rpc.Auth)
+}
+
+::google::protobuf::uint8* Rpc_Auth::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:com.Rpc.Auth)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string token = 1;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Auth.token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->token(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:com.Rpc.Auth)
+  return target;
+}
+
+size_t Rpc_Auth::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:com.Rpc.Auth)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string token = 1;
+  if (this->token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->token());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Rpc_Auth::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:com.Rpc.Auth)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Rpc_Auth* source =
+      ::google::protobuf::DynamicCastToGenerated<Rpc_Auth>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com.Rpc.Auth)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:com.Rpc.Auth)
+    MergeFrom(*source);
+  }
+}
+
+void Rpc_Auth::MergeFrom(const Rpc_Auth& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:com.Rpc.Auth)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.token().size() > 0) {
+
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+}
+
+void Rpc_Auth::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:com.Rpc.Auth)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Rpc_Auth::CopyFrom(const Rpc_Auth& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:com.Rpc.Auth)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Rpc_Auth::IsInitialized() const {
+  return true;
+}
+
+void Rpc_Auth::Swap(Rpc_Auth* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void Rpc_Auth::InternalSwap(Rpc_Auth* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata Rpc_Auth::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_com_2eproto);
+  return ::file_level_metadata_com_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void Rpc::InitAsDefaultInstance() {
 }
 class Rpc::HasBitSetters {
@@ -4979,6 +5304,9 @@ template<> PROTOBUF_NOINLINE ::com::Rpc_Request* Arena::CreateMaybeMessage< ::co
 }
 template<> PROTOBUF_NOINLINE ::com::Rpc_Response* Arena::CreateMaybeMessage< ::com::Rpc_Response >(Arena* arena) {
   return Arena::CreateInternal< ::com::Rpc_Response >(arena);
+}
+template<> PROTOBUF_NOINLINE ::com::Rpc_Auth* Arena::CreateMaybeMessage< ::com::Rpc_Auth >(Arena* arena) {
+  return Arena::CreateInternal< ::com::Rpc_Auth >(arena);
 }
 template<> PROTOBUF_NOINLINE ::com::Rpc* Arena::CreateMaybeMessage< ::com::Rpc >(Arena* arena) {
   return Arena::CreateInternal< ::com::Rpc >(arena);

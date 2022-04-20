@@ -60,7 +60,7 @@ namespace Sentry
 		void OnSecondUpdate() final;
 
 	 public:
-
+		void RunTask(tb_context_t context);
 		TaskContext* GetContext(unsigned int id);
 
 		unsigned int GetContextId() const
@@ -68,21 +68,16 @@ namespace Sentry
 			return this->mRunContext == nullptr ? 0 :
 				   this->mRunContext->mCoroutineId;
 		}
-
-		void RunTask(tb_context_t context);
-
 	 private:
-		void Test(int index);
 		void SaveStack(unsigned int id);
 		void ResumeContext(TaskContext* co);
-	 private:
-		class TimerComponent* mTimerManager;
-		std::queue<unsigned int> mLastQueues;
 	 private:
 		TaskContextPool mCorPool;
 		tb_context_t mMainContext;
 		TaskContext* mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
+		std::queue<unsigned int> mLastQueues;
+		class TimerComponent* mTimerComponent;
 		DoubleQueue<unsigned int> mResumeContexts;
 	};
 }

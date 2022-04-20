@@ -42,7 +42,7 @@ struct TableStruct_com_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[15]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -71,6 +71,9 @@ extern Array_StringDefaultTypeInternal _Array_String_default_instance_;
 class Rpc;
 class RpcDefaultTypeInternal;
 extern RpcDefaultTypeInternal _Rpc_default_instance_;
+class Rpc_Auth;
+class Rpc_AuthDefaultTypeInternal;
+extern Rpc_AuthDefaultTypeInternal _Rpc_Auth_default_instance_;
 class Rpc_Request;
 class Rpc_RequestDefaultTypeInternal;
 extern Rpc_RequestDefaultTypeInternal _Rpc_Request_default_instance_;
@@ -105,6 +108,7 @@ template<> ::com::Array_Int32* Arena::CreateMaybeMessage<::com::Array_Int32>(Are
 template<> ::com::Array_Int64* Arena::CreateMaybeMessage<::com::Array_Int64>(Arena*);
 template<> ::com::Array_String* Arena::CreateMaybeMessage<::com::Array_String>(Arena*);
 template<> ::com::Rpc* Arena::CreateMaybeMessage<::com::Rpc>(Arena*);
+template<> ::com::Rpc_Auth* Arena::CreateMaybeMessage<::com::Rpc_Auth>(Arena*);
 template<> ::com::Rpc_Request* Arena::CreateMaybeMessage<::com::Rpc_Request>(Arena*);
 template<> ::com::Rpc_Response* Arena::CreateMaybeMessage<::com::Rpc_Response>(Arena*);
 template<> ::com::Value* Arena::CreateMaybeMessage<::com::Value>(Arena*);
@@ -1815,6 +1819,126 @@ class Rpc_Response :
 };
 // -------------------------------------------------------------------
 
+class Rpc_Auth :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Rpc.Auth) */ {
+ public:
+  Rpc_Auth();
+  virtual ~Rpc_Auth();
+
+  Rpc_Auth(const Rpc_Auth& from);
+
+  inline Rpc_Auth& operator=(const Rpc_Auth& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Rpc_Auth(Rpc_Auth&& from) noexcept
+    : Rpc_Auth() {
+    *this = ::std::move(from);
+  }
+
+  inline Rpc_Auth& operator=(Rpc_Auth&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Rpc_Auth& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Rpc_Auth* internal_default_instance() {
+    return reinterpret_cast<const Rpc_Auth*>(
+               &_Rpc_Auth_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    14;
+
+  void Swap(Rpc_Auth* other);
+  friend void swap(Rpc_Auth& a, Rpc_Auth& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Rpc_Auth* New() const final {
+    return CreateMaybeMessage<Rpc_Auth>(nullptr);
+  }
+
+  Rpc_Auth* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Rpc_Auth>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Rpc_Auth& from);
+  void MergeFrom(const Rpc_Auth& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Rpc_Auth* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string token = 1;
+  void clear_token();
+  static const int kTokenFieldNumber = 1;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // @@protoc_insertion_point(class_scope:com.Rpc.Auth)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Rpc :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Rpc) */ {
  public:
@@ -1853,7 +1977,7 @@ class Rpc :
                &_Rpc_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(Rpc* other);
   friend void swap(Rpc& a, Rpc& b) {
@@ -1910,6 +2034,7 @@ class Rpc :
 
   typedef Rpc_Request Request;
   typedef Rpc_Response Response;
+  typedef Rpc_Auth Auth;
 
   // accessors -------------------------------------------------------
 
@@ -2564,11 +2689,70 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
 
 // -------------------------------------------------------------------
 
+// Rpc_Auth
+
+// string token = 1;
+inline void Rpc_Auth::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Rpc_Auth::token() const {
+  // @@protoc_insertion_point(field_get:com.Rpc.Auth.token)
+  return token_.GetNoArena();
+}
+inline void Rpc_Auth::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Rpc.Auth.token)
+}
+#if LANG_CXX11
+inline void Rpc_Auth::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Auth.token)
+}
+#endif
+inline void Rpc_Auth::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Rpc.Auth.token)
+}
+inline void Rpc_Auth::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Auth.token)
+}
+inline ::std::string* Rpc_Auth::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Auth.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Rpc_Auth::release_token() {
+  // @@protoc_insertion_point(field_release:com.Rpc.Auth.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Rpc_Auth::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Auth.token)
+}
+
+// -------------------------------------------------------------------
+
 // Rpc
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

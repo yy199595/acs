@@ -1,5 +1,6 @@
 ﻿#include"LocalSubService.h"
 #include"App/App.h"
+#include"Network/Listener/NetworkListener.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/HttpService/HttpService.h"
 #include"Component/RpcService/LocalServerRpc.h"
@@ -17,23 +18,38 @@ namespace Sentry
 	bool LocalSubService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(SubService::LateAwake());
-		this->mRpcAddress = this->GetApp()->GetConfig().GetRpcAddress();
-		this->mHttpService = this->GetApp()->GetConfig().GetHttpAddress();
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("area_id", this->mAreaId));
-		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetMember("node_name", this->mNodeName));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
 		return true;
 	}
 
 	void LocalSubService::OnAddService(Component* component)
 	{
-		if(component->Cast<IServiceBase>() != nullptr)
+		if(component->Cast<LocalServerRpc>() != nullptr)
 		{
-			Json::Writer jsonWriter;
-			jsonWriter.AddMember("area_id", this->mAreaId);
-			jsonWriter.AddMember("address", this->mRpcAddress);
-			jsonWriter.AddMember("service", component->GetName());
-			LOG_DEBUG("publish " << component->GetName() << " to all server");
-			LOG_CHECK_RET(this->Publish("LocalSubService.Add", jsonWriter));
+			std::string address;
+			if(this->GetConfig().GetListenerAddress("rpc", address))
+			{
+				Json::Writer jsonWriter;
+				jsonWriter.AddMember("address", address);
+				jsonWriter.AddMember("area_id", this->mAreaId);
+				jsonWriter.AddMember("service", component->GetName());
+				LOG_CHECK_RET(this->Publish("Add", jsonWriter));
+				LOG_DEBUG("publish " << component->GetName() << " to all server");
+			}
+		}
+		else if(component->Cast<HttpService>() != nullptr)
+		{
+			std::string address;
+			if(this->GetConfig().GetListenerAddress("http", address))
+			{
+				Json::Writer jsonWriter;
+				jsonWriter.AddMember("address", address);
+				jsonWriter.AddMember("area_id", this->mAreaId);
+				jsonWriter.AddMember("service", component->GetName());
+				LOG_CHECK_RET(this->Publish("Add", jsonWriter));
+				LOG_DEBUG("publish " << component->GetName() << " to all server");
+			}
 		}
 	}
 
@@ -63,11 +79,17 @@ namespace Sentry
 
 	void LocalSubService::Push(const Json::Reader& jsonReader)
 	{
+		std::string rpcToken;
+		std::string httpToken;
 		std::string rpcAddress;
 		std::string httpAddress;
 		std::vector<std::string> services;
-		jsonReader.GetMember("rpc", rpcAddress);
-		jsonReader.GetMember("http", httpAddress);
+		jsonReader.GetMember("rpc", "token", rpcToken);
+		jsonReader.GetMember("rpc", "address", rpcAddress);
+
+		jsonReader.GetMember("http", "token", httpToken);
+		jsonReader.GetMember("http", "address", httpAddress);
+
 		jsonReader.GetMember("service", services);
 		for(const std::string & service : services)
 		{
@@ -102,14 +124,21 @@ namespace Sentry
 					services.emplace_back(name);
 				}
 			}
+			const ListenConfig * rpcConfig = this->GetConfig().GetListen("rpc");
+
+			jsonWriter.StartObject("rpc");
+			jsonWriter.AddMember("token", rpcConfig->Token);
+			jsonWriter.AddMember("address", rpcConfig->Address);
+			jsonWriter.EndObject();
+
 			jsonWriter.AddMember("service", services);
-			jsonWriter.AddMember("rpc", this->mRpcAddress);
 			this->Publish(rpcAddress, "Push", jsonWriter);
 		}
 	}
 
 	void LocalSubService::OnComplete()//通知其他服务器 我加入了
 	{
+
 		Json::Writer jsonWriter;
 		jsonWriter.StartArray("service");
 		std::vector<std::string> components;
@@ -122,22 +151,34 @@ namespace Sentry
 				jsonWriter.AddMember(name);
 			}
 		}
-
 		jsonWriter.EndArray();
+		const ListenConfig * rpcConfig = this->GetConfig().GetListen("rpc");
+		const ListenConfig * httpConfig = this->GetConfig().GetListen("http");
+		jsonWriter.StartObject("rpc");
+		jsonWriter.AddMember("token", rpcConfig->Token);
+		jsonWriter.AddMember("address", rpcConfig->Address);
+		jsonWriter.EndObject();
+
+		jsonWriter.StartObject("http");
+		jsonWriter.AddMember("token", httpConfig->Token);
+		jsonWriter.AddMember("address", httpConfig->Address);
+		jsonWriter.EndObject();
+
 		jsonWriter.AddMember("response", true);
-		jsonWriter.AddMember("rpc", this->mRpcAddress);
-		jsonWriter.AddMember("http", this->mHttpService);
 		long long number = this->Publish("Push", jsonWriter);
 		LOG_DEBUG("publish successful count = " << number);
 	}
 
 	void LocalSubService::OnDestory()
 	{
-		std::string jsonContent;
+		std::string address;
 		Json::Writer jsonWriter;
-		jsonWriter.AddMember("area_id", this->mAreaId);
-		jsonWriter.AddMember("address", this->mRpcAddress);
-		LOG_DEBUG("remove this form count = " << this->Publish("LocalSubService.Remove", jsonWriter));
+		if(this->GetConfig().GetListenerAddress("rpc", address))
+		{
+			jsonWriter.AddMember("address", address);
+			jsonWriter.AddMember("area_id", this->mAreaId);
+			LOG_DEBUG("remove this form count = " << this->Publish("Remove", jsonWriter));
+		}
 	}
 
 	void LocalSubService::Remove(const Json::Reader& jsonReader)

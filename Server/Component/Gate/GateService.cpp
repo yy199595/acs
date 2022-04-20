@@ -21,14 +21,7 @@ namespace Sentry
 		methodRegister.Bind("Allot", &GateService::Allot);
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
-
-		TcpServerComponent * tcpServerComponent = this->GetComponent<TcpServerComponent>();
-		const ListenConfig * listenConfig = tcpServerComponent->GetTcpConfig("gate");
-		if(listenConfig == nullptr)
-		{
-			return false;
-		}
-		this->mGateAddress = listenConfig->mAddress;
+		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetListenerAddress("gate", this->mGateAddress));
 		return true;
 	}
 

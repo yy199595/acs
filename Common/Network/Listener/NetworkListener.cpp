@@ -8,7 +8,7 @@
 #include"Component/Scene/ThreadPoolComponent.h"
 namespace Sentry
 {
-	NetworkListener::NetworkListener(IAsioThread & t, ListenConfig & config)
+	NetworkListener::NetworkListener(IAsioThread & t, const ListenConfig & config)
 		: mTaskThread(t), mConfig(config),
         mTaskScheduler(App::Get()->GetTaskScheduler())
     {

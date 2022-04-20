@@ -35,9 +35,8 @@ namespace Sentry
 	bool RpcServiceBase::LateAwake()
 	{
 		this->mRpcComponent = this->GetComponent<RpcComponent>();
-		this->mLocalAddress = this->GetApp()->GetConfig().GetRpcAddress();
 		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
-		return true;
+		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
 	}
 
 	std::shared_ptr<com::Rpc::Request> RpcServiceBase::NewRpcRequest(const std::string& func, long long userId, const Message* message)

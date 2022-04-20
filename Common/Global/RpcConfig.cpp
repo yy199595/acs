@@ -121,21 +121,6 @@ namespace Sentry
 		auto iter = this->mCodeDescMap.find(code);
 		return iter != this->mCodeDescMap.end() ? &iter->second : nullptr;
 	}
-
-	bool RpcConfig::HasService(const std::string& service)
-	{
-		auto iter = this->mServiceMap.find(service);
-		return iter != this->mServiceMap.end();
-	}
-
-	void RpcConfig::GetServices(std::vector<std::string>& services)
-	{
-		auto iter = this->mServiceMap.begin();
-		for (; iter != this->mServiceMap.end(); iter++)
-		{
-			services.push_back(iter->first);
-		}
-	}
 #ifdef __DEBUG__
 	void RpcConfig::DebugCode(XCode code)
 	{

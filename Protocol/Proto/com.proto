@@ -71,4 +71,8 @@ message Rpc
           string error_str = 4;
           google.protobuf.Any Data = 5;
      }
+     message Auth
+     {
+          string token = 1;
+     }
 }
