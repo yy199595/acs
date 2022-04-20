@@ -9,7 +9,6 @@
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
-#include"Component/Gate/GateService.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/RpcService/LocalServerRpc.h"
 #ifdef __DEBUG__
@@ -23,16 +22,27 @@ namespace Sentry
 	bool GateComponent::LateAwake()
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
+		this->mTimerComponent = this->GetApp()->GetTimerComponent();
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
 
-	void GateComponent::OnConnect(const std::string &)
+	void GateComponent::OnConnect(const std::string & address)
 	{
-		std::shared_ptr<RequestTaskQueueSource> taskQueueSource =
-			std::make_shared<RequestTaskQueueSource>();
+		unsigned int timerId = this->mTimerComponent->AsyncWait(5000,
+				&GateComponent::OnSocketTimeout, this, address);
+		this->mSocketTimers.emplace(address, timerId);
+	}
 
+	void GateComponent::OnSocketTimeout(const std::string & address)
+	{
+		auto iter = this->mSocketTimers.find(address);
+		if(iter != this->mSocketTimers.end())
+		{
+			this->mSocketTimers.erase(iter);
+			this->mGateClientComponent->StartClose(address);
+		}
 	}
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
@@ -107,6 +117,8 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 		const std::string& token = loginRequest.token();
+		const std::string & address = request->address();
+
 		auto iter = this->mUserTokens.find(token);
 		if (iter == this->mUserTokens.end())
 		{
@@ -114,13 +126,22 @@ namespace Sentry
 		}
 		long long userId = iter->second;
 		this->mUserTokens.erase(iter);
+
+		auto iter1 = this->mSocketTimers.find(address);
+		if(iter1 != this->mSocketTimers.end())
+		{
+			unsigned int id = iter1->second;
+			this->mSocketTimers.erase(iter1);
+			this->mTimerComponent->CancelTimer(id);
+		}
+
 		LOG_INFO(userId << " login gate successful");
 		this->mGateClientComponent->AddNewUser(request->address(), userId);
 		std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
 
 		clientResponse->set_rpc_id(request->rpc_id());
 		clientResponse->set_code((int)XCode::Successful);
-		this->mGateClientComponent->SendToClient(request->address(), clientResponse);
+		this->mGateClientComponent->SendToClient(address, clientResponse);
 		return XCode::Successful;
 
 	}

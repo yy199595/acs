@@ -26,12 +26,15 @@ namespace Sentry
 		void OnUserRequest(long long userId, std::shared_ptr<c2s::Rpc::Request> request);
 	private:
 		bool LateAwake() final;
+		void OnSocketTimeout(const std::string & address);
 		XCode Auth(const std::shared_ptr<c2s::Rpc::Request> request);
 	 private:
 		class TaskComponent * mTaskComponent;
+		class TimerComponent * mTimerComponent;
 		class RpcClientComponent * mRpcClientComponent;
 		class GateClientComponent* mGateClientComponent;
 		std::unordered_map<std::string, long long> mUserTokens;
+		std::unordered_map<std::string, unsigned int> mSocketTimers;
 	};
 }
 
