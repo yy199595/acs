@@ -35,7 +35,7 @@ namespace Client
         std::string json;
         util::MessageToJsonString(*t2, &json);
 
-		LOG_WARN("response json = " << json);
+		//LOG_WARN("response json = " << json);
 		auto iter = this->mRpcTasks.find(t2->rpc_id());
 		if(iter != this->mRpcTasks.end())
 		{
@@ -213,11 +213,12 @@ namespace Client
 			return;
 		}
 
-		this->Call("GateService.Ping");
 
 		while (this->mTcpClient->GetSocketProxy()->IsOpen())
 		{
 			ElapsedTimer timer;
+			this->Call("GateService.Ping");
+			LOG_ERROR("user time = [" << timer.GetMs() << "ms]");
 
 
 			this->mTaskComponent->Sleep(10);
