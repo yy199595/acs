@@ -54,7 +54,7 @@ namespace Sentry
 #else
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         this->mTaskThread.Invoke(&NetworkListener::InitListener, this, taskSource);
-        taskSource->Await();
+        return taskSource->Await();
 #endif
     }
 #ifndef ONLY_MAIN_THREAD

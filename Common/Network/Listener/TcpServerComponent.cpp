@@ -33,7 +33,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 			IAsioThread& netThread = App::Get()->GetTaskScheduler();
 #else
-			IAsioThread &netThread = taskComponent->AllocateNetThread();
+			ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
+			IAsioThread &netThread = threadPoolComponent->AllocateNetThread();
 #endif
 			if (listenConfig->Port != 0)
 			{
@@ -76,6 +77,7 @@ namespace Sentry
 					LOG_DEBUG(config.Name << " listen " << config.Ip << ":" << config.Port << " successful");
 					return true;
 				}
+				return false;
 			}
 		}
 		return false;

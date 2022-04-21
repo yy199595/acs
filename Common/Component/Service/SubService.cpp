@@ -41,7 +41,8 @@ namespace Sentry
 			jsonWriter.AddMember("func", channel);
 			if (this->mRedisComponent->Publish(address, jsonWriter) == 0)
 			{
-				LOG_ERROR("publish [" << address << "] error");
+				LOG_ERROR("publish [" << address
+					<< "]  [" << channel << "] error");
 				return false;
 			}
 			return true;

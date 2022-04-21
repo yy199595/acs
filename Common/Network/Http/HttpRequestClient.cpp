@@ -52,11 +52,11 @@ namespace Sentry
         netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port, taskSource);
         if(taskSource->Await() != XCode::Successful)
         {
-            LOG_ERROR("connect http host {0}:{1} failure", host, port);
+            LOG_ERROR("connect http host " << host << ":" << port << " failure");
             return nullptr;
         }
-        LOG_INFO("connect http host {0}:{1} successful", host, port);
-        std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
+		LOG_INFO("connect http host " << host << ":" << port << " successful");
+		std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
         netWorkThread.Invoke(&HttpRequestClient::SendByStream, this, httpRequest, sendTaskSource);
         if(!sendTaskSource->Await())
         {

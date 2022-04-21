@@ -18,7 +18,7 @@ namespace Sentry
 		this->GetConfig().GetMember("redis", "passwd", this->mRedisConfig.mPassword);
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis", "ip", this->mRedisConfig.mIp));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis", "port", this->mRedisConfig.mPort));
-		return true;
+		return this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 	}
 
 	std::shared_ptr<RedisResponse> RedisComponent::Call(const std::string& func, std::vector<std::string>& args)
@@ -248,19 +248,26 @@ namespace Sentry
 
 	bool RedisComponent::SubscribeChannel(const std::string& channel)
 	{
+		LOG_CHECK_RET_FALSE(!channel.empty());
 		std::shared_ptr<RedisRequest> request(new RedisRequest("SUBSCRIBE"));
 		request->AddParameter(std::move(channel));
-		auto response = this->mSubRedisClient->InvokeCommand(request)->Await();
-		return !response->HasError();
+		std::shared_ptr<RedisResponse> response = this->mSubRedisClient->InvokeCommand(request)->Await();
+		if(!response->HasError())
+		{
+			LOG_INFO("subscribe channel [" << channel << "] successful");
+			return true;
+		}
+		LOG_INFO("subscribe channel [" << channel << "] failure : " << response->GetValue());
+		return false;
 	}
 
 	void RedisComponent::SubscribeMessage()
 	{
-		std::vector<std::string> components;
+		std::vector<Component *> components;
 		this->GetApp()->GetComponents(components);
-		for(const std::string & name : components)
+		for(Component * component : components)
 		{
-			SubService * subService = this->GetComponent<SubService>(name);
+			SubService * subService = component->Cast<SubService>();
 			if(subService != nullptr && subService->IsStartService())
 			{
 				std::vector<std::string> methods;
@@ -268,10 +275,7 @@ namespace Sentry
 				for (const std::string& name : methods)
 				{
 					const std::string& service = subService->GetName();
-					if (this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
-					{
-						LOG_INFO("subscribe channel [" << service << '.' << name << "] successful");
-					}
+					this->SubscribeChannel(fmt::format("{0}.{1}", service, name));
 				}
 			}
 		}
