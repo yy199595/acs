@@ -52,7 +52,7 @@
     "GateService": {
         "Ping": {
             "Id": 201,
-            "Async": false,
+            "Async": true,
             "Type":"Client",
             "Auth": true
         },

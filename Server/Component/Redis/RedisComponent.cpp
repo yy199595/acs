@@ -58,9 +58,9 @@ namespace Sentry
 			return nullptr;
 		}
 		std::shared_ptr<RedisResponse> response = redisClient->InvokeCommand(request)->Await();
-#ifdef __DEBUG__
-		LOG_INFO("invoke redis command use time [" << elapsedTimer.GetMs() << "ms]");
-#endif
+//#ifdef __DEBUG__
+//		LOG_INFO("invoke redis command use time [" << elapsedTimer.GetMs() << "ms]");
+//#endif
 		if (!this->mWaitAllotClients.empty())
 		{
 			auto taskClient = this->mWaitAllotClients.front();

@@ -1,6 +1,7 @@
 {
     "area_id": 1,
-    "fps": 10,
+    "node_id": 1,
+    "fps": 30,
     "node_name": "DataServer",
     "log":
     {
@@ -11,7 +12,7 @@
     },
     "thread":
     {
-        "task":4,
+        "task":1,
         "network":2
     },
     "path":
@@ -21,50 +22,57 @@
         "http": "./Config/http.json"
     },
     "listener": {
-        "ip":"127.0.0.1",
         "rpc":
         {
-            "port":7789,
+            "port":7787,
             "count":10000,
+            "ip": "127.0.0.1",
             "component":"RpcClientComponent"
-        },
-        "http":
-        {
-            "port": 80,
-            "count": 100,
-            "component": "HttpClientComponent"
         }
     },
     "mysql": {
-        "ip": "8.136.213.239",
+        "count": 1,
+        "ip": "114.115.167.51",
         "port": 3306,
         "user": "yjz",
         "passwd": "199595yjz."
     },
     "redis": {
-        "ip": "8.136.213.239",
+        "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
-        "count": 5,
-        "lua": "./Script/RedisCommand",
+        "count": 1,
+        "lua": [
+            "./Config/user.lua"
+        ],
         "passwd": "199595yjz."
     },
+    "lua_src": [
+        "./Script/Common/",
+        "./Script/Server/"
+    ],
     "component": [
+        "RpcComponent",
+        "DataMgrComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "MysqlComponent",
-        "RedisComponent",
-        "RpcComponent",
         "RpcClientComponent",
-        "OperatorComponent",
-        "RpcConfigComponent",
-        "HttpClientComponent",
-        "ServiceProxyComponent"
+        "LuaScriptComponent",
+        "RedisComponent"
     ],
-    "service": [
-        "LocalService",
+    "service":
+    [
+        "GateService",
+        "ChatService",
         "MysqlService",
-        "HttpNodeService"
+        "UserSubService",
+        "HttpUserService",
+        "LocalSubService"
+    ],
+    "start":
+    [
+        "MysqlService",
+        "LocalSubService"
     ],
     "white_list": [
         "127.0.0.1"

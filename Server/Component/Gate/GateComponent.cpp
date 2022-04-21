@@ -78,17 +78,17 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 
-#ifdef __DEBUG__
-		std::string json;
-		LOG_INFO("========== client request ==========");
-		LOG_INFO("func = " << request->method_name());
-		LOG_INFO("address = " << request->address());
-		LOG_INFO("userid = " << userId);
-		if(request->has_data() && Helper::Proto::GetJson(request->data(), json))
-		{
-			LOG_INFO("json = " << json);
-		}
-#endif
+//#ifdef __DEBUG__
+//		std::string json;
+//		LOG_INFO("========== client request ==========");
+//		LOG_INFO("func = " << request->method_name());
+//		LOG_INFO("address = " << request->address());
+//		LOG_INFO("userid = " << userId);
+//		if(request->has_data() && Helper::Proto::GetJson(request->data(), json))
+//		{
+//			LOG_INFO("json = " << json);
+//		}
+//#endif
 		if(this->GetComponent<LocalServerRpc>(config->Service) == nullptr)
 		{
 			return XCode::CallServiceNotFound;

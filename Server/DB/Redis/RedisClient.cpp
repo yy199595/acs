@@ -209,7 +209,7 @@ namespace Sentry
             case '$': //二进制字符串
                 this->mDataSize = std::stoi(lineData);
                 this->mResponse->AddValue(RedisRespType::REDIS_BIN_STRING);
-                return 1;
+                return this->mDataSize <= 0 ? 0 : 1;
             case '*': //数组
                 this->mResponse->AddValue(RedisRespType::REDIS_ARRAY);
                 return std::stoi(lineData);

@@ -45,17 +45,17 @@ namespace Sentry
 			LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;
 		}
-#ifdef __DEBUG__
-		std::string json = "";
-		LOG_DEBUG("==============[request]==============");
-		LOG_DEBUG("address = " << request->address());
-		LOG_DEBUG("func = " << protocolConfig->Service << "." << protocolConfig->Method);
-		if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
-		{
-			LOG_DEBUG("json = " << json);
-		}
-		LOG_DEBUG("=====================================");
-#endif
+//#ifdef __DEBUG__
+//		std::string json = "";
+//		LOG_DEBUG("==============[request]==============");
+//		LOG_DEBUG("address = " << request->address());
+//		LOG_DEBUG("func = " << protocolConfig->Service << "." << protocolConfig->Method);
+//		if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
+//		{
+//			LOG_DEBUG("json = " << json);
+//		}
+//		LOG_DEBUG("=====================================");
+//#endif
 
 		if (!protocolConfig->IsAsync)
 		{
@@ -83,25 +83,25 @@ namespace Sentry
 			return XCode::Failure;
 		}
 		auto rpcTask = iter->second;
-#ifdef __DEBUG__
-		int methodId = 0;
-		long long time = 0;
-		if (this->GetRpcInfo(rpcId, methodId, time))
-		{
-			std::string json = "";
-			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-			const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(methodId);
-
-			LOG_DEBUG("*************[response]*************");
-			LOG_DEBUG("func = " << protoConfig->Service << '.' << protoConfig->Method);
-			LOG_DEBUG("time = " << time << " ms");
-			if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
-			{
-				LOG_DEBUG("json = " << json);
-			}
-			LOG_DEBUG("************************************");
-		}
-#endif
+//#ifdef __DEBUG__
+//		int methodId = 0;
+//		long long time = 0;
+//		if (this->GetRpcInfo(rpcId, methodId, time))
+//		{
+//			std::string json = "";
+//			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+//			const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(methodId);
+//
+//			LOG_DEBUG("*************[response]*************");
+//			LOG_DEBUG("func = " << protoConfig->Service << '.' << protoConfig->Method);
+//			LOG_DEBUG("time = " << time << " ms");
+//			if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
+//			{
+//				LOG_DEBUG("json = " << json);
+//			}
+//			LOG_DEBUG("************************************");
+//		}
+//#endif
 		this->mRpcTasks.erase(iter);
 		rpcTask->OnResponse(response);
 		return XCode::Successful;

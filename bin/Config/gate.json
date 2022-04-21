@@ -1,7 +1,7 @@
 {
     "area_id": 1,
     "node_id": 1,
-    "fps": 10,
+    "fps": 30,
     "node_name": "GateServer",
     "log":
     {
@@ -13,7 +13,7 @@
     "thread":
     {
         "task":1,
-        "network":3
+        "network":2
     },
     "path":
     {
@@ -22,38 +22,29 @@
         "http": "./Config/http.json"
     },
     "listener": {
-        "ip":"10.10.14.104",
         "rpc":
         {
-            "port":7790,
+            "port":7788,
             "count":10000,
+            "ip": "127.0.0.1",
             "component":"RpcClientComponent"
-        },
-        "http":
-        {
-            "port":82,
-            "count": 100,
-            "component": "HttpClientComponent"
         },
         "gate":
         {
             "port":1995,
             "count": 10000,
+            "ip": "127.0.0.1",
             "component": "GateClientComponent"
-        },
-        "console":
-        {
-            "port": 8082,
-            "count": 1,
-            "component" : "ConsoleComponent"
         }
     },
     "redis": {
-        "ip": "8.136.213.239",
+        "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
-        "count": 5,
-        "lua": "./Script/RedisCommand",
+        "count": 1,
+        "lua": [
+            "./Config/user.lua"
+        ],
         "passwd": "199595yjz."
     },
     "lua_src": [
@@ -62,23 +53,28 @@
     ],
     "component": [
         "RpcComponent",
-        "RpcConfigComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "LuaScriptComponent",
-        "LuaServiceMgrComponent",
-        "RpcClientComponent",
-        "OperatorComponent",
-        "GateComponent",
         "RedisComponent",
-        "GateClientComponent",
-        "HttpClientComponent",
-        "ServiceProxyComponent"
+        "LuaScriptComponent",
+        "RpcClientComponent",
+        "GateComponent",
+        "GateClientComponent"
     ],
-    "service": [
+    "service":
+    [
         "GateService",
-        "LocalService",
-        "HttpNodeService"
+        "ChatService",
+        "MysqlService",
+        "UserSubService",
+        "HttpUserService",
+        "LocalSubService"
+    ],
+    "start":
+    [
+        "GateService",
+        "UserSubService",
+        "LocalSubService"
     ],
     "white_list": [
         "127.0.0.1"

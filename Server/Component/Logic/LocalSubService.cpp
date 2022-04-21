@@ -154,15 +154,21 @@ namespace Sentry
 		jsonWriter.EndArray();
 		const ListenConfig * rpcConfig = this->GetConfig().GetListen("rpc");
 		const ListenConfig * httpConfig = this->GetConfig().GetListen("http");
-		jsonWriter.StartObject("rpc");
-		jsonWriter.AddMember("token", rpcConfig->Token);
-		jsonWriter.AddMember("address", rpcConfig->Address);
-		jsonWriter.EndObject();
+		if(rpcConfig != nullptr)
+		{
+			jsonWriter.StartObject("rpc");
+			jsonWriter.AddMember("token", rpcConfig->Token);
+			jsonWriter.AddMember("address", rpcConfig->Address);
+			jsonWriter.EndObject();
+		}
 
-		jsonWriter.StartObject("http");
-		jsonWriter.AddMember("token", httpConfig->Token);
-		jsonWriter.AddMember("address", httpConfig->Address);
-		jsonWriter.EndObject();
+		if(httpConfig != nullptr)
+		{
+			jsonWriter.StartObject("http");
+			jsonWriter.AddMember("token", httpConfig->Token);
+			jsonWriter.AddMember("address", httpConfig->Address);
+			jsonWriter.EndObject();
+		}
 
 		jsonWriter.AddMember("response", true);
 		long long number = this->Publish("Push", jsonWriter);

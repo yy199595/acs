@@ -21,7 +21,6 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
 		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
-		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
 		return true;
 	}
 
@@ -29,6 +28,7 @@ namespace Sentry
 	{
 		serviceRegister.Bind("Login", &HttpUserService::Login);
 		serviceRegister.Bind("Register", &HttpUserService::Register);
+		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
 		return true;
 	}
 

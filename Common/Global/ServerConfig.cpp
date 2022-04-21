@@ -29,7 +29,7 @@ namespace Sentry
 		}
 
 		IF_THROW_ERROR(this->GetJsonValue("listener", "rpc"));
-		IF_THROW_ERROR(this->GetJsonValue("listener", "http"));
+		//IF_THROW_ERROR(this->GetJsonValue("listener", "http"));
         IF_THROW_ERROR(this->GetMember("area_id", this->mNodeId));
         IF_THROW_ERROR(this->GetMember("node_name", this->mNodeName));
 
