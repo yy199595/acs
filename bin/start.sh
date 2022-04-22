@@ -1,0 +1,1 @@
+screen -dms 'yjz.sentry' "./Sentry ./Config/server/json"

@@ -226,6 +226,7 @@ namespace Sentry
 				}
 			}
 		}
+		this->WaitAllServiceStart();
 	}
 
 	bool App::StartNewComponent()
@@ -237,13 +238,13 @@ namespace Sentry
 			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
 			if (localServerRpc != nullptr && !localServerRpc->LoadService())
 			{
-				LOG_ERROR(name << " load service method failure");
+				LOG_ERROR(name << " load failure");
 				return false;
 			}
-			LOG_INFO(name << " load service method successful");
+			LOG_INFO(name << " load successful");
 		}
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
+		//this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return true;
 	}
 

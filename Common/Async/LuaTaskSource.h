@@ -9,7 +9,7 @@
 #include"Script/LuaParameter.h"
 namespace Sentry
 {
-	class LuaTaskSource : public TaskSourceBase
+	class LuaTaskSource final : public TaskSourceBase
 	{
 	 public:
 		explicit LuaTaskSource();

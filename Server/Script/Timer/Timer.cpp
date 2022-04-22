@@ -6,32 +6,26 @@
 #include"App/App.h"
 #include<memory>
 #include"Script/Function.h"
+#include"Timer/DelayTimer.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace Sentry;
+
 namespace Lua
 {
 	int Timer::AddTimer(lua_State* lua)
 	{
-//		int ms = Lua::Parameter::Read<int>(lua, 1);
-//		lua_pushvalue(lua, 2);
-//		if(!lua_isfunction(lua, -1))
-//		{
-//			luaL_error(lua, "add timer type = [%s]", luaL_typename(lua, -1));
-//			return 0;
-//		}
-//		int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-//		std::function<void(void)> callback = [lua, ref]()
-//		{
-//			lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
-//			if (lua_pcall(lua, 0, 0, 0) != 0)
-//			{
-//				luaL_error(lua, "[call function ] = %s", lua_tostring(lua, -1));
-//			}
-//			luaL_unref(lua, LUA_REGISTRYINDEX, ref);
-//		};
-//		TimerComponent* timerComponent = App::Get()->GetComponent<TimerComponent>();
-//		long long timerId = timerComponent->AddTimer(ms, new LambdaMethod(std::move(callback)));
-//		Lua::Parameter::Write<long long>(lua, timerId);
+		int ms = Lua::Parameter::Read<int>(lua, 1);
+		lua_pushvalue(lua, 2);
+		if(!lua_isfunction(lua, -1))
+		{
+			luaL_error(lua, "add timer type = [%s]", luaL_typename(lua, -1));
+			return 0;
+		}
+		int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
+		std::shared_ptr<LuaTimer> luaTimer(new LuaTimer(ms, ref, lua));
+		TimerComponent* timerComponent = App::Get()->GetTimerComponent();
+		unsigned int timerId = timerComponent->AddTimer(luaTimer);
+		Lua::Parameter::Write<unsigned int>(lua, timerId);
 		return 1;
 	}
 

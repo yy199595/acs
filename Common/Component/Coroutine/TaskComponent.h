@@ -12,7 +12,7 @@
 
 namespace Sentry
 {
-	class TaskComponent : public Component,
+	class TaskComponent final : public Component,
 						  public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
 	{
 	 public:

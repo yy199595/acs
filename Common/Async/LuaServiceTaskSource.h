@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-    class LuaServiceTaskSource
+    class LuaServiceTaskSource final
     {
     public:
         LuaServiceTaskSource();

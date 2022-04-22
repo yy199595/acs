@@ -5,7 +5,7 @@
 #include"Method/MethodProxy.h"
 namespace Sentry
 {
-	class TimerComponent : public Component, public ISystemUpdate
+	class TimerComponent final : public Component, public ISystemUpdate
 	{
 	 public:
 		TimerComponent() = default;

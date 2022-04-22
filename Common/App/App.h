@@ -19,7 +19,7 @@ namespace Sentry
 
 	class RpcServiceBase;
 	class MainTaskScheduler;
-	class App : public Entity
+	class App final : public Entity
 	{
 	 public:
 		explicit App(ServerConfig* config);

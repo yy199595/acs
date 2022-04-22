@@ -33,7 +33,6 @@ namespace Sentry
 		}
 		this->mCallCount++;
 		this->mQps += size;
-		std::cout << "receive player message count = " << this->mCallCount << std::endl;
 		request->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnRequest(request);
@@ -47,6 +46,7 @@ namespace Sentry
 
 	XCode RpcGateClient::OnResponse(const char* buffer, size_t size) //不处理response消息
 	{
+		this->OnClientError(XCode::NetActiveShutdown);
 		return XCode::UnKnowPacket;
 	}
 
