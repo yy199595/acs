@@ -30,7 +30,7 @@ namespace Client
         LOG_ERROR("request json = " << json);
     }
 
-    void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc_Response> t2)
+    void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)
     {
         std::string json;
         util::MessageToJsonString(*t2, &json);

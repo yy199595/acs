@@ -17,7 +17,7 @@ namespace Client
     class TcpRpcClient;
 
     class ClientComponent : public Component,
-                            public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>, public IComplete
+ 		public IRpc<c2s::Rpc::Request, c2s::Rpc::Response>, public IComplete
     {
     public:
         ClientComponent();

@@ -31,7 +31,6 @@ namespace Sentry
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
-		class RpcClientComponent * mRpcClientComponent;
 		class GateClientComponent* mGateClientComponent;
 		std::unordered_map<std::string, long long> mUserTokens;
 		std::unordered_map<std::string, unsigned int> mSocketTimers;

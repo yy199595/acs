@@ -182,7 +182,7 @@ namespace Sentry
 	XCode RpcServiceBase::Call(const std::string& func, long long userId)
 	{
 		std::string address;
-		if(this->GetEntityAddress(userId, address))
+		if(!this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -198,7 +198,7 @@ namespace Sentry
 	XCode RpcServiceBase::Call(const std::string& func, long long userId, const Message& message)
 	{
 		std::string address;
-		if(this->GetEntityAddress(userId, address))
+		if(!this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -215,7 +215,7 @@ namespace Sentry
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(this->GetEntityAddress(userId, address))
+		if(!this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -240,7 +240,7 @@ namespace Sentry
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(this->GetEntityAddress(userId, address))
+		if(!this->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}

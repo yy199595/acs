@@ -61,6 +61,18 @@
             "Async": true,
             "Type": "Server",
             "Request": "s2s.AddressAllot.Request"
+        },
+        "CallClient": {
+            "Id": 203,
+            "Async": false,
+            "Type": "Server",
+            "Request": "c2s.Rpc.Call"
+        },
+        "BroadCast": {
+            "Id": 204,
+            "Async": false,
+            "Type": "Server",
+            "Request": "c2s.Rpc.Call"
         }
     },
     "ChatService": {

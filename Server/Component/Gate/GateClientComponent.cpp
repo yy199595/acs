@@ -151,13 +151,30 @@ namespace Sentry
 			return false;
 		}
 		this->mUserAddressMap.emplace(address, userId);
+		this->mClientAddressMap.emplace(userId, address);
 		LOG_DEBUG(userId << " add to gate [" << address << "]");
 		return true;
 	}
 
-	long long GateClientComponent::GetUserId(const std::string& address)
+	bool GateClientComponent::GetUserId(const std::string& address, long long& userId)
 	{
 		auto iter = this->mUserAddressMap.find(address);
-		return iter != this->mUserAddressMap.end() ? iter->second : 0;
+		if(iter != this->mUserAddressMap.end())
+		{
+			userId = iter->second;
+			return true;
+		}
+		return false;
+	}
+
+	bool GateClientComponent::GetUserAddress(long long userId, std::string& address)
+	{
+		auto iter = this->mClientAddressMap.find(userId);
+		if(iter != this->mClientAddressMap.end())
+		{
+			address = iter->second;
+			return true;
+		}
+		return false;
 	}
 }

@@ -23,7 +23,6 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
@@ -47,9 +46,9 @@ namespace Sentry
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
+		long long userId = 0;
 		const std::string &address = request->address();
-		long long userId = this->mGateClientComponent->GetUserId(address);
-		if(userId == 0)
+		if(!this->mGateClientComponent->GetUserId(address, userId))
 		{
 			return this->Auth(request);
 		}

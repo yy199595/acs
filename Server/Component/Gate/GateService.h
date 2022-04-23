@@ -12,16 +12,16 @@ namespace Sentry
 	 public:
 		GateService() = default;
 		~GateService() final = default;
-	public:
-		XCode Ping(long long userId);
+	 public:
+		void GetAllAddress(std::vector<std::string> & gateAddress);
 	private:
+		XCode Ping(long long userId);
+		XCode CallClient(long long userId, c2s::Rpc::Call & request);
+		XCode BroadCast(const s2s::GateBroadCast::Request & request);
 		XCode Allot(const s2s::AddressAllot::Request & request, s2s::AddressAllot::Response & response);
 	 private:
 		bool LateAwake() final;
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
-	 public:
-		void BroadCast(const std::string & func);
-		void BroadCast(const std::string & func, const Message & message);
 	 private:
 		std::string mGateAddress;
 		class UserSubService * mUserService;
