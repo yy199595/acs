@@ -62,8 +62,7 @@ namespace Sentry
 	 protected:
 		virtual void OnConnect(XCode code) = 0;
 		virtual void OnClientError(XCode code) = 0;
-		virtual XCode OnRequest(const char* buffer, size_t size) = 0;
-		virtual XCode OnResponse(const char* buffer, size_t size) = 0;
+		virtual bool OnReceiveMessage(char type, const char * buffer, size_t size) = 0;
 		virtual void OnSendData(XCode code, std::shared_ptr<NetworkData> message) = 0;
 	 protected:
 		bool IsCanConnection();

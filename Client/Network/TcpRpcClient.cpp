@@ -42,26 +42,45 @@ namespace Client
         std::move(this->mConnectTask)->SetResult(code == XCode::Successful);
     }
 
-	XCode TcpRpcClient::OnRequest(const char * buffer, size_t size)
+	bool TcpRpcClient::OnReceiveMessage(char type, const char* buffer, size_t size)
+	{
+		switch(type)
+		{
+		case RPC_TYPE_REQUEST:
+			return this->OnRequest(buffer, size);
+		case RPC_TYPE_RESPONSE:
+			return this->OnResponse(buffer, size);
+		case RPC_TYPE_CALL_CLIENT:
+			return this->OnCall(buffer, size);
+		}
+		return false;
+	}
+
+	bool TcpRpcClient::OnCall(const char* buffer, size_t size)
+	{
+		return true;
+	}
+
+	bool TcpRpcClient::OnRequest(const char * buffer, size_t size)
     {
         std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
         if (!request->ParseFromArray(buffer, size))
         {
-            return XCode::ParseMessageError;
+            return false;
         }
         this->mClientComponent->OnRequest(request);
-        return XCode::Successful;
+        return true;
     }
 
-	XCode TcpRpcClient::OnResponse(const char * buffer, size_t size)
+	bool TcpRpcClient::OnResponse(const char * buffer, size_t size)
     {
         std::shared_ptr<c2s::Rpc_Response> response(new c2s::Rpc_Response());
         if (!response->ParseFromArray(buffer, size))
         {
-            return XCode::ParseMessageError;
+            return false;
         }
         this->mClientComponent->OnResponse(response);
-        return XCode::Successful;
+        return true;
     }
 
 }

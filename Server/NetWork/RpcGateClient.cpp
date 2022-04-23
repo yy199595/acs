@@ -24,30 +24,28 @@ namespace Sentry
 
 	}
 
-	XCode RpcGateClient::OnRequest(const char* buffer, size_t size)
+	bool RpcGateClient::OnReceiveMessage(char type, const char* buffer, size_t size)
 	{
-		std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-		if (!request->ParseFromArray(buffer, (int)size))
+		if(type == RPC_TYPE_REQUEST)
 		{
-			return XCode::ParseRequestDataError;
-		}
-		this->mCallCount++;
-		this->mQps += size;
-		request->set_address(this->GetAddress());
+			std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
+			if (!request->ParseFromArray(buffer, (int)size))
+			{
+				return false;
+			}
+			this->mCallCount++;
+			this->mQps += size;
+			request->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
-		this->mGateComponent->OnRequest(request);
+			this->mGateComponent->OnRequest(request);
 #else
-		MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
-		mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
+			MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
+			mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
 
-		return XCode::Successful;
-	}
-
-	XCode RpcGateClient::OnResponse(const char* buffer, size_t size) //不处理response消息
-	{
-		this->OnClientError(XCode::NetActiveShutdown);
-		return XCode::UnKnowPacket;
+			return true;
+		}
+		return false;
 	}
 
 	void RpcGateClient::OnClientError(XCode code)

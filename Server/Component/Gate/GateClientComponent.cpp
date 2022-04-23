@@ -66,7 +66,7 @@ namespace Sentry
 		{
 #ifdef __DEBUG__
 			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
-			LOG_WARN("remove player session code = " << configCom.GetCodeDesc(code));
+			LOG_WARN("remove " << address  << " code = " << configCom.GetCodeDesc(code));
 #endif
 			this->mGateClientMap.erase(iter);
 		}

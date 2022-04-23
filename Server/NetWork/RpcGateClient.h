@@ -31,8 +31,7 @@ namespace Sentry
 	 protected:
 		void OnConnect(XCode code) final;
 		void OnClientError(XCode code) final;
-		XCode OnRequest(const char* buffer, size_t size) final;
-		XCode OnResponse(const char* buffer, size_t size) final;
+		bool OnReceiveMessage(char type, const char *buffer, size_t size) final;
 		void OnSendData(XCode code, std::shared_ptr<NetworkData> message) final;
 	 private:
 		unsigned int mQps;

@@ -68,12 +68,25 @@ namespace Sentry
 #endif
 	}
 
-	XCode ProtoRpcClient::OnRequest(const char* buffer, size_t size)
+	bool ProtoRpcClient::OnReceiveMessage(char type, const char* buffer, size_t size)
+	{
+		switch(type)
+		{
+		case RPC_TYPE_REQUEST:
+			return this->OnRequest(buffer, size);
+		case RPC_TYPE_RESPONSE:
+
+			return this->OnResponse(buffer, size);
+		}
+		return false;
+	}
+
+	bool ProtoRpcClient::OnRequest(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
 		if (!requestData->ParseFromArray(buffer, size))
 		{
-			return XCode::ParseRequestDataError;
+			return false;
 		}
 		requestData->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
@@ -83,15 +96,15 @@ namespace Sentry
 		taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
 #endif
 
-		return XCode::Successful;
+		return true;
 	}
 
-	XCode ProtoRpcClient::OnResponse(const char* buffer, size_t size)
+	bool ProtoRpcClient::OnResponse(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
 		if (!responseData->ParseFromArray(buffer, size))
 		{
-			return XCode::ParseResponseDataError;
+			return false;
 		}
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnResponse(responseData);
@@ -99,7 +112,7 @@ namespace Sentry
 		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&RpcClientComponent::OnResponse, mTcpComponent, responseData);
 #endif
-		return XCode::Successful;
+		return true;
 	}
 
 	std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync()

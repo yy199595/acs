@@ -74,18 +74,7 @@ namespace Sentry
 			int length = 0;
 			char type = self->mReceiveBuffer[0];
 			memcpy(&length, self->mReceiveBuffer + sizeof(char), sizeof(int));
-
-			switch (type)
-			{
-			case RPC_TYPE_REQUEST:
-			case RPC_TYPE_RESPONSE:
-				this->ReceiveBody(type, length);
-				break;
-			default:
-				this->mSocketProxy->Close();
-				this->OnClientError(XCode::UnKnowPacket);
-				break;
-			}
+			this->ReceiveBody(type, length);
 		};
 		socket.async_read_some(asio::buffer(this->mReceiveBuffer, count), std::move(cb));
 	}
@@ -117,23 +106,19 @@ namespace Sentry
 				std::cerr << FormatFileLine(__FILE__, __LINE__) << error_code.message() << std::endl;
 				return;
 			}
-			switch (type)
+			if(!this->OnReceiveMessage(type, messageBuffer, size))
 			{
-			case RPC_TYPE_REQUEST:
-				this->OnRequest(messageBuffer, size);
-				break;
-			case RPC_TYPE_RESPONSE:
-				this->OnResponse(messageBuffer, size);
-				break;
-			default:
-				assert(false);
-				break;
+				this->mSocketProxy->Close();
+				this->OnClientError(XCode::UnKnowPacket);
+			}
+			else
+			{
+				mContext.post(std::bind(&RpcClient::ReceiveHead, this));
 			}
 			if (messageBuffer != this->mReceiveBuffer)
 			{
 				delete[] messageBuffer;
 			}
-			mContext.post(std::bind(&RpcClient::ReceiveHead, this));
 		};
 		nSocket.async_read_some(asio::buffer(messageBuffer, size), std::move(cb));
 	}
