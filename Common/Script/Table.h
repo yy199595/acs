@@ -15,6 +15,7 @@ namespace Lua
 		~Table();
 
 	 public:
+		static bool Get(lua_State * lua, const std::string & name);
 		static std::shared_ptr<Table> Create(lua_State* luaEnv, const std::string& name);
 
 	 public:

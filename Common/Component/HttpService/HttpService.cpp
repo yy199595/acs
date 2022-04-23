@@ -20,31 +20,15 @@ namespace Sentry
 		LOG_INFO("add new http url " << this->mUrl);
 	}
 
-	std::shared_ptr<Json::Writer> HttpService::Invoke(
-		const std::string& name, std::shared_ptr<Json::Reader> request)
+	XCode HttpService::Invoke(
+		const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response)
 	{
-		std::shared_ptr<Json::Writer> response(new Json::Writer());
-
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
 		if(method == nullptr)
 		{
-			response->AddMember("code", (int)XCode::CallServiceNotFound);
-			return response;
+			return XCode::CallServiceNotFound;
 		}
-		try
-		{
-			response->StartObject("data");
-			XCode code = method->Invoke(request, response);
-			response->EndObject();
-			response->AddMember("code", (int)code);
-		}
-		catch (std::logic_error& logic_error)
-		{
-			response->EndObject();
-			response->AddMember("error", logic_error.what());
-			response->AddMember("code", (int)XCode::ThrowError);
-		}
-		return response;
+		return method->Invoke(request, response);
 	}
 	bool HttpService::LoadService()
 	{

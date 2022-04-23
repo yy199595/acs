@@ -37,7 +37,7 @@ namespace Client
 
 	 private:
 		void StartClient();
-
+		bool GetClient(const std::string & account, const std::string & passwd);
     public:
 		XCode Call(const std::string & name);
 		XCode Call(const std::string & name, const Message & request);

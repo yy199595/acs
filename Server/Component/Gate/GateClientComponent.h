@@ -23,8 +23,10 @@ namespace Sentry
 	 public:
 		long long GetUserId(const std::string & address);
 		bool AddNewUser(const std::string & address, long long userId);
-	 public:
 		std::shared_ptr<RpcGateClient> GetGateClient(const std::string & address);
+	 public:
+		void SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message);
+		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc::Call> message);
 		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message);
 	 public:
 		void Awake() final;

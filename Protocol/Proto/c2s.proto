@@ -27,6 +27,11 @@ message Rpc
         string error_str = 4;
         google.protobuf.Any data = 5;
     }
+    message Call
+    {
+        string func = 1;
+        google.protobuf.Any data = 2;
+    }
 }
 
 message GateLogin

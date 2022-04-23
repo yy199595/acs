@@ -19,6 +19,9 @@ namespace Sentry
 	 private:
 		bool LateAwake() final;
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
+	 public:
+		void BroadCast(const std::string & func);
+		void BroadCast(const std::string & func, const Message & message);
 	 private:
 		std::string mGateAddress;
 		class UserSubService * mUserService;

@@ -26,7 +26,7 @@ namespace Sentry
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 	 public:
 		void OnAddAddress(const std::string &address) final;
-		std::shared_ptr<Json::Writer> Invoke(const std::string& name, std::shared_ptr<Json::Reader> request);
+		XCode Invoke(const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response);
 	 private:
 		std::string mUrl;
 		class HttpComponent * mHttpComponent;

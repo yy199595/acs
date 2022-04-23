@@ -77,14 +77,14 @@ namespace Sentry
 #endif
 	}
 
-	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Request> message)
+	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
 	{
 		if(!this->GetSocketProxy()->IsOpen())
 		{
 			return false;
 		}
 		std::shared_ptr<NetworkData> networkData(
-			new NetworkData(RPC_TYPE_REQUEST, message));
+			new NetworkData(RPC_TYPE_CALL_CLIENT, message));
 #ifdef ONLY_MAIN_THREAD
 		this->SendData(networkData);
 #else

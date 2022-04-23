@@ -115,7 +115,7 @@ namespace Sentry
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const std::string &url, const std::string & content)
     {
-        auto httpRequest = std::make_shared<HttpAsyncRequest>();
+        std::shared_ptr<HttpAsyncRequest> httpRequest = std::make_shared<HttpAsyncRequest>();
         if(!httpRequest->Post(url, content))
         {
             return nullptr;

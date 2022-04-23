@@ -42,7 +42,7 @@ struct TableStruct_c2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[9]
+  static const ::google::protobuf::internal::ParseTable schema[10]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -68,6 +68,9 @@ extern GateLogin_RequestDefaultTypeInternal _GateLogin_Request_default_instance_
 class Rpc;
 class RpcDefaultTypeInternal;
 extern RpcDefaultTypeInternal _Rpc_default_instance_;
+class Rpc_Call;
+class Rpc_CallDefaultTypeInternal;
+extern Rpc_CallDefaultTypeInternal _Rpc_Call_default_instance_;
 class Rpc_Request;
 class Rpc_RequestDefaultTypeInternal;
 extern Rpc_RequestDefaultTypeInternal _Rpc_Request_default_instance_;
@@ -86,6 +89,7 @@ template<> ::c2s::Chat_Request* Arena::CreateMaybeMessage<::c2s::Chat_Request>(A
 template<> ::c2s::GateLogin* Arena::CreateMaybeMessage<::c2s::GateLogin>(Arena*);
 template<> ::c2s::GateLogin_Request* Arena::CreateMaybeMessage<::c2s::GateLogin_Request>(Arena*);
 template<> ::c2s::Rpc* Arena::CreateMaybeMessage<::c2s::Rpc>(Arena*);
+template<> ::c2s::Rpc_Call* Arena::CreateMaybeMessage<::c2s::Rpc_Call>(Arena*);
 template<> ::c2s::Rpc_Request* Arena::CreateMaybeMessage<::c2s::Rpc_Request>(Arena*);
 template<> ::c2s::Rpc_Response* Arena::CreateMaybeMessage<::c2s::Rpc_Response>(Arena*);
 template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena*);
@@ -547,6 +551,136 @@ class Rpc_Response :
 };
 // -------------------------------------------------------------------
 
+class Rpc_Call :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Call) */ {
+ public:
+  Rpc_Call();
+  virtual ~Rpc_Call();
+
+  Rpc_Call(const Rpc_Call& from);
+
+  inline Rpc_Call& operator=(const Rpc_Call& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Rpc_Call(Rpc_Call&& from) noexcept
+    : Rpc_Call() {
+    *this = ::std::move(from);
+  }
+
+  inline Rpc_Call& operator=(Rpc_Call&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Rpc_Call& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Rpc_Call* internal_default_instance() {
+    return reinterpret_cast<const Rpc_Call*>(
+               &_Rpc_Call_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(Rpc_Call* other);
+  friend void swap(Rpc_Call& a, Rpc_Call& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Rpc_Call* New() const final {
+    return CreateMaybeMessage<Rpc_Call>(nullptr);
+  }
+
+  Rpc_Call* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Rpc_Call>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Rpc_Call& from);
+  void MergeFrom(const Rpc_Call& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Rpc_Call* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string func = 1;
+  void clear_func();
+  static const int kFuncFieldNumber = 1;
+  const ::std::string& func() const;
+  void set_func(const ::std::string& value);
+  #if LANG_CXX11
+  void set_func(::std::string&& value);
+  #endif
+  void set_func(const char* value);
+  void set_func(const char* value, size_t size);
+  ::std::string* mutable_func();
+  ::std::string* release_func();
+  void set_allocated_func(::std::string* func);
+
+  // .google.protobuf.Any data = 2;
+  bool has_data() const;
+  void clear_data();
+  static const int kDataFieldNumber = 2;
+  const ::google::protobuf::Any& data() const;
+  ::google::protobuf::Any* release_data();
+  ::google::protobuf::Any* mutable_data();
+  void set_allocated_data(::google::protobuf::Any* data);
+
+  // @@protoc_insertion_point(class_scope:c2s.Rpc.Call)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr func_;
+  ::google::protobuf::Any* data_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Rpc :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc) */ {
  public:
@@ -585,7 +719,7 @@ class Rpc :
                &_Rpc_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(Rpc* other);
   friend void swap(Rpc& a, Rpc& b) {
@@ -642,6 +776,7 @@ class Rpc :
 
   typedef Rpc_Request Request;
   typedef Rpc_Response Response;
+  typedef Rpc_Call Call;
 
   // accessors -------------------------------------------------------
 
@@ -693,7 +828,7 @@ class GateLogin_Request :
                &_GateLogin_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(GateLogin_Request* other);
   friend void swap(GateLogin_Request& a, GateLogin_Request& b) {
@@ -813,7 +948,7 @@ class GateLogin :
                &_GateLogin_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(GateLogin* other);
   friend void swap(GateLogin& a, GateLogin& b) {
@@ -920,7 +1055,7 @@ class Chat_Request :
                &_Chat_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(Chat_Request* other);
   friend void swap(Chat_Request& a, Chat_Request& b) {
@@ -1047,7 +1182,7 @@ class Chat_Notice :
                &_Chat_Notice_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(Chat_Notice* other);
   friend void swap(Chat_Notice& a, Chat_Notice& b) {
@@ -1152,7 +1287,7 @@ class Chat :
                &_Chat_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(Chat* other);
   friend void swap(Chat& a, Chat& b) {
@@ -1680,6 +1815,108 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
 
 // -------------------------------------------------------------------
 
+// Rpc_Call
+
+// string func = 1;
+inline void Rpc_Call::clear_func() {
+  func_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Rpc_Call::func() const {
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Call.func)
+  return func_.GetNoArena();
+}
+inline void Rpc_Call::set_func(const ::std::string& value) {
+  
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:c2s.Rpc.Call.func)
+}
+#if LANG_CXX11
+inline void Rpc_Call::set_func(::std::string&& value) {
+  
+  func_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Call.func)
+}
+#endif
+inline void Rpc_Call::set_func(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Call.func)
+}
+inline void Rpc_Call::set_func(const char* value, size_t size) {
+  
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Call.func)
+}
+inline ::std::string* Rpc_Call::mutable_func() {
+  
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Call.func)
+  return func_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Rpc_Call::release_func() {
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Call.func)
+  
+  return func_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Rpc_Call::set_allocated_func(::std::string* func) {
+  if (func != nullptr) {
+    
+  } else {
+    
+  }
+  func_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), func);
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Call.func)
+}
+
+// .google.protobuf.Any data = 2;
+inline bool Rpc_Call::has_data() const {
+  return this != internal_default_instance() && data_ != nullptr;
+}
+inline const ::google::protobuf::Any& Rpc_Call::data() const {
+  const ::google::protobuf::Any* p = data_;
+  // @@protoc_insertion_point(field_get:c2s.Rpc.Call.data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
+}
+inline ::google::protobuf::Any* Rpc_Call::release_data() {
+  // @@protoc_insertion_point(field_release:c2s.Rpc.Call.data)
+  
+  ::google::protobuf::Any* temp = data_;
+  data_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Any* Rpc_Call::mutable_data() {
+  
+  if (data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Call.data)
+  return data_;
+}
+inline void Rpc_Call::set_allocated_data(::google::protobuf::Any* data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
+  }
+  if (data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  data_ = data;
+  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Call.data)
+}
+
+// -------------------------------------------------------------------
+
 // Rpc
 
 // -------------------------------------------------------------------
@@ -1825,6 +2062,8 @@ inline void Chat_Request::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

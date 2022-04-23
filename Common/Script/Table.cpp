@@ -84,4 +84,9 @@ namespace Lua
 		}
 		return std::string();
 	}
+	bool Table::Get(lua_State * lua, const std::string & name)
+	{
+		lua_getglobal(lua, name.c_str());
+		return lua_istable(lua, -1);
+	}
 }

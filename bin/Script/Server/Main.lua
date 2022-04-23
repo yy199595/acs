@@ -17,10 +17,10 @@ function Main.Start()
     Log.Error("star main lua")
     local t1 = Time.GetNowSecTime();
     coroutine.sleep(1000)
-    Timer.AddTimer(5000, function()
-        local t2 = Time.GetNowSecTime();
-        print("&&&&&&&&&&&&&&&&&&&&&", t2 - t1)
-    end)
+    --Timer.AddTimer(5000, function()
+    --    local t2 = Time.GetNowSecTime();
+    --    print("&&&&&&&&&&&&&&&&&&&&&", t2 - t1)
+    --end)
 
     --Sentry.Sleep(1500)
     return true

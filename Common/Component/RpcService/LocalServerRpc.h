@@ -33,10 +33,10 @@ namespace Sentry
 		std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
 	 private:
 		class UserSubService * mUserService;
-		class RedisComponent * mRedisComponent;
-		std::set<std::string> mRemoteAddressList;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 		std::unordered_map<long long, std::string> mUserAddressMap;
+	 protected:
+		std::set<std::string> mRemoteAddressList;
 	};
 }
 #endif //SERVER_LOCALSERVERRPC_H

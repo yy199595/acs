@@ -92,8 +92,12 @@ namespace Sentry
 		{
 			return this->AddComponent(name, component);
 		}
-		LuaRpcService* luaRpcService = new LuaRpcService();
-		return this->AddComponent(name, luaRpcService);
+		if(this->GetComponent<LuaScriptComponent>() != nullptr)
+		{
+			LuaRpcService* luaRpcService = new LuaRpcService();
+			return this->AddComponent(name, luaRpcService);
+		}
+		return false;
 	}
 
 	bool App::InitComponent(Component* component)
@@ -226,7 +230,7 @@ namespace Sentry
 				}
 			}
 		}
-		this->WaitAllServiceStart();
+		//this->WaitAllServiceStart();
 	}
 
 	bool App::StartNewComponent()
@@ -244,7 +248,7 @@ namespace Sentry
 			LOG_INFO(name << " load successful");
 		}
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		//this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
+		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return true;
 	}
 

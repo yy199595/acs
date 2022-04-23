@@ -55,3 +55,25 @@ message AddressAllot
         string address = 1;
     }
 }
+
+message GateBroadCast
+{
+    message Request
+    {
+        string func = 1;
+        google.protobuf.Any data = 2;
+    }
+    message Response
+    {
+        int32 count = 1;
+    }
+}
+
+message CallClient
+{
+    message Request
+    {
+        string func = 1;
+        google.protobuf.Any data = 2;
+    }
+}

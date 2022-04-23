@@ -21,11 +21,7 @@
         "code": "./XCode/XCode.csv",
         "http": "./Config/http.json"
     },
-    "url":
-    {
-        "login": "http://127.0.0.1:80/logic/account/login",
-        "register": "http://127.0.0.1:80/logic/account/register"
-    },
+    "url": "http://127.0.0.1:80/",
     "listener": {
         "rpc":
         {

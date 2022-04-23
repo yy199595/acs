@@ -74,12 +74,35 @@ namespace Sentry
 
 	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message)
 	{
-		auto proxyClient = this->GetGateClient(address);
+		std::shared_ptr<RpcGateClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient == nullptr)
 		{
 			return false;
 		}
 		return proxyClient->SendToClient(message);
+	}
+
+	void GateClientComponent::SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message)
+	{
+		auto iter = this->mGateClientMap.begin();
+		for(;iter != this->mGateClientMap.end(); iter++)
+		{
+			std::shared_ptr<RpcGateClient> proxyClient = iter->second;
+			if(proxyClient != nullptr)
+			{
+				proxyClient->SendToClient(message);
+			}
+		}
+	}
+
+	bool GateClientComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::Rpc::Call> message)
+	{
+		std::shared_ptr<RpcGateClient> gateClient = this->GetGateClient(address);
+		if(gateClient != nullptr)
+		{
+			return gateClient->SendToClient(message);
+		}
+		return false;
 	}
 
 	std::shared_ptr<RpcGateClient> GateClientComponent::GetGateClient(const std::string & address)
@@ -90,7 +113,7 @@ namespace Sentry
 
 	void GateClientComponent::StartClose(const std::string & address)
 	{
-		auto proxyClient = this->GetGateClient(address);
+		std::shared_ptr<RpcGateClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			proxyClient->StartClose();
@@ -99,7 +122,7 @@ namespace Sentry
 
 	void GateClientComponent::CheckPlayerLogout(const std::string & address)
 	{
-		auto proxyClient = this->GetGateClient(address);
+		std::shared_ptr<RpcGateClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			long long nowTime = Helper::Time::GetNowSecTime();

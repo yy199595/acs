@@ -6,10 +6,9 @@
 #include"App/App.h"
 #include"Util/MD5.h"
 #include"NetWork/RpcGateClient.h"
+#include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Service/UserSubService.h"
-#include"Component/Scene/EntityMgrComponent.h"
-#include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 
@@ -50,5 +49,31 @@ namespace Sentry
 			return XCode::Successful;
 		}
 		return XCode::Failure;
+	}
+}
+
+namespace Sentry
+{
+	void GateService::BroadCast(const std::string& func)
+	{
+		std::shared_ptr<s2s::GateBroadCast::Request> request
+			= std::make_shared<s2s::GateBroadCast::Request>();
+		request->set_func(func);
+		for(const std::string & address : this->mRemoteAddressList)
+		{
+			this->Call(address, "BroadCast", *request);
+		}
+	}
+
+	void GateService::BroadCast(const std::string& func, const Message& message)
+	{
+		std::shared_ptr<s2s::GateBroadCast::Request> request
+			= std::make_shared<s2s::GateBroadCast::Request>();
+		request->set_func(func);
+		request->mutable_data()->PackFrom(message);
+		for(const std::string & address : this->mRemoteAddressList)
+		{
+			this->Call(address, "BroadCast", *request);
+		}
 	}
 }

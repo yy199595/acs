@@ -4,10 +4,10 @@
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClient.h"
 #include"Task/ClientRpcTask.h"
-#include"Other/ElapsedTimer.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
+#include"Component/Logic/HttpUserService.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -134,63 +134,65 @@ namespace Client
 //			rpcTask->SetResult(nullptr);
 //		}
 	}
+
 	void ClientComponent::StartClient()
 	{
-		//this->mTaskComponent->Sleep(2000);
+		if(!this->GetClient("646585122@qq.com", "199595yjz."))
+		{
+			LOG_ERROR("client error");
+			return;
+		}
+		while(this->mTcpClient->GetSocketProxy()->IsOpen())
+		{
+			this->Call("GateService.Ping");
+		}
+	}
 
-		std::string loginUrl;
-		std::string registerUrl;
-		std::string userAccount = "646585122@qq.com";
-		std::string userPassword = "199595yjz.";
+
+	bool ClientComponent::GetClient(const std::string& account, const std::string& passwd)
+	{
+		//this->mTaskComponent->Sleep(2000);
+		std::string url;
 		long long userPhoneNumber = 13716061995;
-		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET(config.GetMember("url", "login", loginUrl));
-		LOG_CHECK_RET(config.GetMember("url", "register", registerUrl));
+		this->GetConfig().GetMember("url", url);
 
 		Json::Writer jsonWriter;
-		jsonWriter.AddMember("password", userPassword);
-		jsonWriter.AddMember("account", userAccount);
+		jsonWriter.AddMember("password", passwd);
+		jsonWriter.AddMember("account", account);
 		jsonWriter.AddMember("phone_num", userPhoneNumber);
-		std::shared_ptr<HttpAsyncResponse> registerResponse = this->mHttpComponent->Post(registerUrl, jsonWriter);
-		std::shared_ptr<Json::Reader> registerReader = registerResponse->ToJsonReader();
+		std::shared_ptr<Json::Reader> registerResponse(new Json::Reader());
 
-		XCode code = XCode::Successful;
-		LOG_CHECK_FATAL(registerReader->GetMember("code", code));
-		if(code != XCode::Successful)
+		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
+		if(httpUserService->Post("logic/account/register", jsonWriter, registerResponse) != XCode::Successful)
 		{
 			std::string error;
-			registerReader->GetMember("error", error);
-			LOG_WARN("register " << userAccount << " failure error = " << error);
+			registerResponse->GetMember("error", error);
+			LOG_WARN("register " << account << " failure error = " << error);
 		}
 		else
 		{
-			LOG_DEBUG("register " << userAccount << " successful");
+			LOG_DEBUG("register " << account << " successful");
 		}
 
 		Json::Writer loginJsonWriter;
-		loginJsonWriter.AddMember("account", userAccount);
-		loginJsonWriter.AddMember("password", userPassword);
-		std::shared_ptr<HttpAsyncResponse> loginResponse = this->mHttpComponent->Post(loginUrl, loginJsonWriter);
-
-		LOG_WARN("login response = " << loginResponse->GetContent());
-		std::shared_ptr<Json::Reader> loginJsonResponse = loginResponse->ToJsonReader();
-		LOG_CHECK_FATAL(registerReader->GetMember("code", code));
-		if(code != XCode::Successful)
+		loginJsonWriter.AddMember("account", account);
+		loginJsonWriter.AddMember("password", passwd);
+		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
+		if(httpUserService->Post("logic/account/login", loginJsonWriter, loginResponse) != XCode::Successful)
 		{
 			std::string error;
-			registerReader->GetMember("error", error);
-			LOG_ERROR("login account " << userAccount << " failure error = " << error);
-			return;
+			loginResponse->GetMember("error", error);
+			LOG_ERROR("login account " << account << " failure error = " << error);
+			return false;
 		}
+
 		std::string loginToken;
 		std::string gateAddress;
-		LOG_DEBUG(userAccount << " login successful");
-		LOG_CHECK_RET(loginJsonResponse->GetMember("data","token", loginToken));
-		LOG_CHECK_RET(loginJsonResponse->GetMember("data","address", gateAddress));
+		loginResponse->GetMember("data","token", loginToken);
+		loginResponse->GetMember("data","address", gateAddress);
 		Helper::String::ParseIpAddress(gateAddress, this->mIp, this->mPort);
 
-		std::string content = loginResponse->GetContent();
-		IAsioThread& netThread = App::Get()->GetTaskScheduler();
+		IAsioThread& netThread = this->GetApp()->GetTaskScheduler();
 		std::shared_ptr<SocketProxy> socketProxy =
 			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
 		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
@@ -210,19 +212,8 @@ namespace Client
 		loginRequest.set_token(loginToken);
 		if(this->Call("GateService.Login", loginRequest) != XCode::Successful)
 		{
-			return;
+			return false;
 		}
-
-
-		while (this->mTcpClient->GetSocketProxy()->IsOpen())
-		{
-			ElapsedTimer timer;
-			this->Call("GateService.Ping");
-			LOG_ERROR("user time = [" << timer.GetMs() << "ms]");
-
-
-			this->mTaskComponent->Sleep(10);
-
-		}
+		return true;
 	}
 }

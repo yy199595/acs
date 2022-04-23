@@ -22,7 +22,7 @@ namespace Sentry
 		{
 			return this->mQps;
 		}
-		bool SendToClient(std::shared_ptr<c2s::Rpc_Request> message);
+		bool SendToClient(std::shared_ptr<c2s::Rpc::Call> message);
 		bool SendToClient(std::shared_ptr<c2s::Rpc_Response> message);
 		unsigned int GetCallCount() const
 		{

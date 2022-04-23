@@ -41,7 +41,7 @@ namespace Sentry
 	 private:
 		const HttpConfig* GetHttpConfig(const std::string& url);
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
-		std::shared_ptr<Json::Writer> Invoke(const HttpConfig* config, std::shared_ptr<HttpHandlerRequest> content);
+		XCode Invoke(const HttpConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
 	 private:
 		class TaskComponent* mCorComponent;
 		class ThreadPoolComponent* mThreadComponent;
