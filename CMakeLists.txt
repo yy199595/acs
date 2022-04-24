@@ -83,7 +83,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Server)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
 
 file(GLOB_RECURSE GateSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.cc")
-file(GLOB_RECURSE MainSource "./Main/*.h" "./Main/*.cpp" "./Main/*.hpp" "./Main/*.cc")
+file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 file(GLOB_RECURSE LogicSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.cc")
 
 LINK_DIRECTORIES(Libs/lib)
