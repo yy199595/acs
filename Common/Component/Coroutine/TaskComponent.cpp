@@ -155,15 +155,10 @@ namespace Sentry
 		return false;
 	}
 
-	TaskContext* TaskComponent::GetContext(unsigned int id)
-	{
-		return this->mCorPool.Get(id);
-	}
-
 	void TaskComponent::SaveStack(unsigned int id)
 	{
 		if (id == 0) return;
-		TaskContext* coroutine = this->GetContext(id);
+		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
 			return;
@@ -186,8 +181,12 @@ namespace Sentry
 		this->mResumeContexts.Swap();
 		while (this->mResumeContexts.Pop(contextId))
 		{
-			TaskContext* logicCoroutine = this->GetContext(contextId);
-			LOG_CHECK_RET(logicCoroutine);
+			TaskContext* logicCoroutine = this->mCorPool.Get(contextId);
+			if(logicCoroutine == nullptr)
+			{
+				LOG_FATAL("not find task context : " << contextId);
+				continue;
+			}
 			if (logicCoroutine->mState == CorState::Ready
 				|| logicCoroutine->mState == CorState::Suspend)
 			{
@@ -202,7 +201,7 @@ namespace Sentry
 		while (!this->mLastQueues.empty())
 		{
 			unsigned int id = this->mLastQueues.front();
-			TaskContext* coroutine = this->GetContext(id);
+			TaskContext* coroutine = this->mCorPool.Get(id);
 			if (coroutine != nullptr)
 			{
 				this->mResumeContexts.Push(id);

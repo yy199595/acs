@@ -53,8 +53,7 @@
         "Ping": {
             "Id": 201,
             "Async": true,
-            "Type":"Client",
-            "Auth": true
+            "Type":"Client"
         },
         "Allot": {
             "Id": 202,

@@ -61,7 +61,6 @@ namespace Sentry
 
 	 public:
 		void RunTask(tb_context_t context);
-		TaskContext* GetContext(unsigned int id);
 
 		unsigned int GetContextId() const
 		{

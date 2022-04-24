@@ -40,22 +40,22 @@ namespace Lua
 
 		int DebugLog(lua_State* luaEnv)
 		{
-			LoggerComponent* loggerComponent = App::Get()->GetLogger();
-			loggerComponent->AddLog(spdlog::level::debug, GetLuaString(luaEnv));
+			const std::string log = GetLuaString(luaEnv);
+			App::Get()->GetLogger()->AddLog(spdlog::level::debug, log);
 			return 0;
 		}
 
 		int DebugInfo(lua_State* luaEnv)
 		{
-			LoggerComponent* loggerComponent = App::Get()->GetLogger();
-			loggerComponent->AddLog(spdlog::level::info, GetLuaString(luaEnv));
+			const std::string log = GetLuaString(luaEnv);
+			App::Get()->GetLogger()->AddLog(spdlog::level::info, log);
 			return 0;
 		}
 
 		int DebugError(lua_State* luaEnv)
 		{
-			LoggerComponent* loggerComponent = App::Get()->GetLogger();
-			loggerComponent->AddLog(spdlog::level::err, GetLuaString(luaEnv));
+			const std::string log = GetLuaString(luaEnv);
+			App::Get()->GetLogger()->AddLog(spdlog::level::err, log);
 			return 0;
 		}
 
