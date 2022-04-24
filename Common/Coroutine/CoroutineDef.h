@@ -7,8 +7,8 @@
 #include <Util/NumberBuilder.h>
 #include<Method/MethodProxy.h>
 #include"Context/context.h"
-#define STACK_SIZE 1024 * 20
-#define SHARED_STACK_NUM 2 //共享栈个数
+#define STACK_SIZE 1024 * 1024
+#define SHARED_STACK_NUM 8 //共享栈个数
 #define COR_POOL_COUNT 100
 
 
