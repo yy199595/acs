@@ -165,7 +165,7 @@ namespace Sentry
 
 	bool LocalServerRpc::DelEntity(long long id, bool publish)
 	{
-
+		return true;
 	}
 
 	bool LocalServerRpc::AllotAddress(string& address) const
