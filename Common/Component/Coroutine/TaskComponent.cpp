@@ -1,7 +1,9 @@
 ﻿#include"TaskComponent.h"
 #include"App/App.h"
 #include"Util/Guid.h"
+#ifdef JE_MALLOC
 #include<jemalloc/jemalloc.h>
+#endif
 #include"Coroutine/TaskContext.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace std::chrono;
