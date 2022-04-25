@@ -1,6 +1,7 @@
 ﻿#include"TaskComponent.h"
 #include"App/App.h"
 #include"Util/Guid.h"
+#include<jemalloc/jemalloc.h>
 #include"Coroutine/TaskContext.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace std::chrono;
@@ -166,8 +167,13 @@ namespace Sentry
 		size_t size = top - (char*)coroutine->mContext;
 		if (coroutine->mStack.size < size)
 		{
+#ifdef JE_MALLOC
+			je_free(coroutine->mStack.p);
+			coroutine->mStack.p = (char *)je_malloc(size);
+#else
 			free(coroutine->mStack.p);
 			coroutine->mStack.p = (char*)malloc(size);
+#endif
 			//LOG_INFO("context size = " << size);
 			assert(coroutine->mStack.p);
 		}
