@@ -1,18 +1,17 @@
 ﻿#include"TaskComponent.h"
 #include"App/App.h"
 #include"Util/Guid.h"
-#include"Other/ElapsedTimer.h"
 #include"Coroutine/TaskContext.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace std::chrono;
 namespace Sentry
 {
-	void MainEntry(tb_context_from_t parame)
+	void MainEntry(tb_context_from_t context)
 	{
-		auto taskComponent = (TaskComponent*)parame.priv;
+		auto taskComponent = (TaskComponent*)context.priv;
 		if (taskComponent != nullptr)
 		{
-			taskComponent->RunTask(parame.ctx);
+			taskComponent->RunTask(context.ctx);
 		}
 	}
 
@@ -169,6 +168,7 @@ namespace Sentry
 		{
 			free(coroutine->mStack.p);
 			coroutine->mStack.p = (char*)malloc(size);
+			//LOG_INFO("context size = " << size);
 			assert(coroutine->mStack.p);
 		}
 		coroutine->mStack.size = size;

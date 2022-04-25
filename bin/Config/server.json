@@ -21,7 +21,7 @@
         "code": "./XCode/XCode.csv",
         "http": "./Config/http.json"
     },
-    "url": "http://127.0.0.1:80/",
+    "url": "http://127.0.0.1:80",
     "listener": {
         "rpc":
         {
@@ -88,8 +88,8 @@
         "GateClientComponent",
         "MysqlProxyComponent",
         "EntityMgrComponent",
-        "ClientComponent",
-        "GateProxyComponent"
+        "GateProxyComponent",
+        "ClientComponent"
     ],
     "service":
     [

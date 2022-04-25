@@ -15,9 +15,6 @@ namespace Sentry
 	 public:
 		HttpService() = default;
 		virtual ~HttpService() = default;
-	 public:
-		XCode Get(const std::string & path, std::shared_ptr<Json::Reader> response);
-		XCode Post(const std::string & path, Json::Writer & json, std::shared_ptr<Json::Reader> response);
 	 protected:
 		bool LoadService() final;
 		bool LateAwake() override;

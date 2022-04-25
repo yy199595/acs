@@ -49,7 +49,7 @@ namespace Sentry
 		gateProxyComponent->Call(userId, "TaskComponent.Update");
 		DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();
 		std::shared_ptr<db_account::tab_user_account> userAccount(new db_account::tab_user_account());
-		return dataMgrComponent->Get(1996, userAccount);
+		return dataMgrComponent->Get(userId, userAccount);
 	}
 
 	XCode GateService::CallClient(long long userId, c2s::Rpc::Call& request)

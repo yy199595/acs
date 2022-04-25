@@ -36,7 +36,8 @@ namespace Client
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
 
 	 private:
-		void StartClient();
+		void StartClient(const std::string & account);
+		std::shared_ptr<TcpRpcClient> GetCurrentRpcClient();
 		bool GetClient(const std::string & account, const std::string & passwd);
     public:
 		XCode Call(const std::string & name);
@@ -60,7 +61,8 @@ namespace Client
         TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
         HttpComponent * mHttpComponent;
-        std::shared_ptr<TcpRpcClient> mTcpClient;
+        //std::shared_ptr<TcpRpcClient> mTcpClient;
+		std::unordered_map<unsigned int, std::shared_ptr<TcpRpcClient>> mClients;
         std::unordered_map<long long, TaskSourceShared<c2s::Rpc::Response>> mRpcTasks;
     };
 }

@@ -11,8 +11,7 @@
 namespace Client
 {
 	ClientComponent::ClientComponent()
-	{		
-		this->mTcpClient = nullptr;
+	{
         this->mTimerComponent = nullptr;
 	}
 
@@ -60,20 +59,29 @@ namespace Client
 
 	void ClientComponent::OnAllServiceStart()
 	{
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this);
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585129@qq.com"));
 	}
 
 	XCode ClientComponent::Call(const std::string& name)
 	{
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
-		requestMessage->set_rpc_id(100);
 		requestMessage->set_method_name(name);
-		this->mTcpClient->SendToGate(requestMessage);
 
 		TaskSourceShared<c2s::Rpc::Response> taskSource
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
-		this->mRpcTasks.emplace(100, taskSource);
+
+		requestMessage->set_rpc_id(taskSource->GetTaskId());
+		this->GetCurrentRpcClient()->SendToGate(requestMessage);
+		this->mRpcTasks.emplace(taskSource->GetTaskId(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
 
 		return (XCode)response->code();
@@ -83,14 +91,15 @@ namespace Client
 	{
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
-		requestMessage->set_rpc_id(100);
-		requestMessage->set_method_name(name);
-		requestMessage->mutable_data()->PackFrom(request);
-		this->mTcpClient->SendToGate(requestMessage);
-
 		TaskSourceShared<c2s::Rpc::Response> taskSource
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
-		this->mRpcTasks.emplace(100, taskSource);
+
+		requestMessage->set_method_name(name);
+		requestMessage->mutable_data()->PackFrom(request);
+		requestMessage->set_rpc_id(taskSource->GetTaskId());
+		this->GetCurrentRpcClient()->SendToGate(requestMessage);
+
+		this->mRpcTasks.emplace(requestMessage->rpc_id(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
 
 		return (XCode)response->code();
@@ -107,10 +116,11 @@ namespace Client
         std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>> rpcTask(new TaskSource<std::shared_ptr<c2s::Rpc_Response>>());
 
         requestMessage->set_method_name(name);
-        requestMessage->mutable_data()->CopyFrom(message);
         requestMessage->set_rpc_id(rpcTask->GetTaskId());
-        this->mTcpClient->SendToGate(requestMessage);
-        //this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
+		requestMessage->mutable_data()->CopyFrom(message);
+
+		this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
+		this->GetCurrentRpcClient()->SendToGate(requestMessage);
         std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
         if(responseData->code() != (int)XCode::Successful)
         {
@@ -135,14 +145,22 @@ namespace Client
 //		}
 	}
 
-	void ClientComponent::StartClient()
+	std::shared_ptr<TcpRpcClient> ClientComponent::GetCurrentRpcClient()
 	{
-		if(!this->GetClient("646585122@qq.com", "199595yjz."))
+		unsigned int contextId = this->mTaskComponent->GetContextId();
+		auto iter = this->mClients.find(contextId);
+		return iter != this->mClients.end() ? iter->second : nullptr;
+	}
+
+	void ClientComponent::StartClient(const std::string & account)
+	{
+		if(!this->GetClient(account, "199595yjz."))
 		{
-			LOG_ERROR("client error");
+			LOG_ERROR(account << " login error");
 			return;
 		}
-		while(this->mTcpClient->GetSocketProxy()->IsOpen())
+		LOG_ERROR(account << " login successful");
+		while(this->GetCurrentRpcClient()->GetSocketProxy()->IsOpen())
 		{
 			this->Call("GateService.Ping");
 		}
@@ -160,10 +178,11 @@ namespace Client
 		jsonWriter.AddMember("password", passwd);
 		jsonWriter.AddMember("account", account);
 		jsonWriter.AddMember("phone_num", userPhoneNumber);
+		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
 		std::shared_ptr<Json::Reader> registerResponse(new Json::Reader());
-
-		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
-		if(httpUserService->Post("logic/account/register", jsonWriter, registerResponse) != XCode::Successful)
+		const std::string login_url = fmt::format("{0}/logic/account/login", url);
+		const std::string register_url = fmt::format("{0}/logic/account/register", url);
+		if(this->mHttpComponent->PostJson(register_url, jsonWriter, registerResponse) != XCode::Successful)
 		{
 			std::string error;
 			registerResponse->GetMember("error", error);
@@ -174,15 +193,8 @@ namespace Client
 			LOG_DEBUG("register " << account << " successful");
 		}
 
-		Json::Writer loginJsonWriter;
-		loginJsonWriter.AddMember("account", account);
-		loginJsonWriter.AddMember("password", passwd);
-		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
-		if(httpUserService->Post("logic/account/login", loginJsonWriter, loginResponse) != XCode::Successful)
+		if(this->mHttpComponent->PostJson(login_url, jsonWriter, loginResponse) != XCode::Successful)
 		{
-			std::string error;
-			loginResponse->GetMember("error", error);
-			LOG_ERROR("login account " << account << " failure error = " << error);
 			return false;
 		}
 
@@ -195,25 +207,23 @@ namespace Client
 		IAsioThread& netThread = this->GetApp()->GetTaskScheduler();
 		std::shared_ptr<SocketProxy> socketProxy =
 			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
-		this->mTcpClient = std::make_shared<TcpRpcClient>(socketProxy, this);
+		std::shared_ptr<TcpRpcClient> tcpRpcClient = std::make_shared<TcpRpcClient>(socketProxy, this);
 
 		int count = 0;
-		while (!this->mTcpClient->ConnectAsync()->Await())
+		while (!tcpRpcClient->ConnectAsync()->Await())
 		{
 			LOG_ERROR("connect server failure count = " << ++count);
 			this->mTaskComponent->Sleep(3000);
 		}
 
-		this->mTcpClient->StartReceive();
+		tcpRpcClient->StartReceive();
+		unsigned int id = this->mTaskComponent->GetContextId();
+		this->mClients.emplace(id, tcpRpcClient);
 		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
 		c2s::GateLogin::Request loginRequest;
 		loginRequest.set_token(loginToken);
-		if(this->Call("GateService.Login", loginRequest) != XCode::Successful)
-		{
-			return false;
-		}
-		return true;
+		return this->Call("GateService.Login", loginRequest) == XCode::Successful;
 	}
 }

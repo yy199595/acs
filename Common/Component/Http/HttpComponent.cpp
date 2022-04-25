@@ -46,12 +46,6 @@ namespace Sentry
 	{
 		this->mCorComponent = App::Get()->GetTaskComponent();
 		this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
-
-		std::string url1 = "http://v.juhe.cn/telecode/to_telecodes.php";
-		this->mCorComponent->Start([this, url1]()
-		{
-
-		});
 		return true;
 	}
 
@@ -169,9 +163,39 @@ namespace Sentry
 		return httpAsyncClient->Post(url, data);
 	}
 
-	std::shared_ptr<HttpAsyncResponse>
-	HttpComponent::Post(const std::string& url, Json::Writer& jsonWriter, int timeout)
+	XCode HttpComponent::PostJson(const string& url, Json::Writer& json, std::shared_ptr<Json::Reader> response)
 	{
-		return this->Post(url, jsonWriter.ToJsonString());
+		std::string requestJson = json.ToJsonString();
+		std::shared_ptr<HttpAsyncResponse> httpResponse = this->Post(url, requestJson);
+		if(httpResponse == nullptr)
+		{
+			Json::Writer jsonWriter;
+			LOG_ERROR(url << " request net work error");
+			jsonWriter.AddMember("code", XCode::HttpNetWorkError);
+			jsonWriter.AddMember("error", "connect http server failure");
+			response->ParseJson(jsonWriter.ToJsonString());
+			return XCode::NetWorkError;
+		}
+		const std::string & content = httpResponse->GetContent();
+		LOG_INFO("========== http request ========== ");
+		LOG_INFO("request = " << requestJson);
+		LOG_INFO("response = " << content);
+		if(!response->ParseJson(content))
+		{
+			Json::Writer jsonWriter;
+			LOG_ERROR("parse " << content << " error ");
+			jsonWriter.AddMember("code", XCode::ParseJsonFailure);
+			jsonWriter.AddMember("error", "parse response json error");
+			return XCode::ParseJsonFailure;
+		}
+		XCode code = XCode::Successful;
+		response->GetMember("code", code);
+		return code;
 	}
+
+	XCode HttpComponent::GetJson(const string& url, std::shared_ptr<Json::Reader> response)
+	{
+		return XCode::CommandArgsError;
+	}
+
 }

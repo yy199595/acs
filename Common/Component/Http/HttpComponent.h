@@ -1,6 +1,7 @@
 
 #pragma once
 #include"Json/JsonWriter.h"
+#include"Json/JsonReader.h"
 #include"Component/Component.h"
 namespace Sentry
 {
@@ -34,7 +35,9 @@ namespace Sentry
 
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, int timeout = 5);
 
-		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, Json::Writer& jsonWriter, int timeout = 5);
+	public:
+		XCode GetJson(const std::string & url, std::shared_ptr<Json::Reader> response);
+		XCode PostJson(const std::string & url, Json::Writer & json, std::shared_ptr<Json::Reader> response);
 
 	 public:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
