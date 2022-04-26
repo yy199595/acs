@@ -49,8 +49,7 @@ namespace Sentry
 	{
 		std::shared_ptr<RedisClient> redisClient = this->AllotRedisClient();
 #ifdef __DEBUG__
-		ElapsedTimer elapsedTimer;
-		LOG_WARN("redis command name = " << request->ToJson());
+		//LOG_WARN("redis command name = " << request->ToJson());
 #endif
 		if (redisClient == nullptr)
 		{
@@ -58,6 +57,11 @@ namespace Sentry
 			return nullptr;
 		}
 		std::shared_ptr<RedisResponse> response = redisClient->InvokeCommand(request)->Await();
+		if(response->HasError())
+		{
+			LOG_ERROR(request->ToJson());
+			LOG_ERROR(response->GetValue());
+		}
 //#ifdef __DEBUG__
 //		LOG_INFO("invoke redis command use time [" << elapsedTimer.GetMs() << "ms]");
 //#endif
@@ -379,6 +383,7 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
+		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
 		return true;
 	}
@@ -386,6 +391,53 @@ namespace Sentry
 	long long RedisComponent::AddCounter(const string& key)
 	{
 		return this->InvokeCommand("INCR", key)->GetNumber();
+	}
+
+	bool RedisComponent::Lock(const string& key)
+	{
+		std::shared_ptr<RedisResponse> response = this->Call("lock.lock", key);
+		if(response->IsOk())
+		{
+			LOG_DEBUG("redis lock " << key << " get successful");
+			this->mLockTimers[key] = this->mTimerComponent->AsyncWait(4000, &RedisComponent::OnLockTimeout, this, key);
+			return true;
+		}
+		//LOG_WARN("redis lock " << key << " get failure");
+		return false;
+	}
+
+	bool RedisComponent::UnLock(const string& key)
+	{
+		this->Call("lock.unlock", key);
+		auto iter = this->mLockTimers.find(key);
+		if(iter != this->mLockTimers.end())
+		{
+			unsigned int id = iter->second;
+			this->mLockTimers.erase(iter);
+			this->mTimerComponent->CancelTimer(id);
+		}
+		LOG_DEBUG("redis lock " << key << " unlock");
+		return true;
+	}
+
+	void RedisComponent::OnLockTimeout(const std::string& key)
+	{
+		auto iter = this->mLockTimers.find(key);
+		if(iter != this->mLockTimers.end())
+		{
+			this->mLockTimers.erase(iter);
+			this->mTaskComponent->Start([this, key]()
+			{
+				std::shared_ptr<RedisResponse> response = this->InvokeCommand("SETEX", key, 5, 1);
+				if(response->IsOk())
+				{
+					LOG_WARN("redis lock " << key << " delay successful");
+					this->mLockTimers[key] = this->mTimerComponent->AsyncWait(4000, &RedisComponent::OnLockTimeout, this, key);
+					return ;
+				}
+				LOG_ERROR("redis lock " << key << " delay failure");
+			});
+		}
 	}
 
 }

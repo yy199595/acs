@@ -12,6 +12,8 @@ add_definitions(-D __DEBUG__)
 
 if(MSVC)
     message("当前win平台,不使用jemalloc")
+elseif(APPLE)
+    message("当前mac平台,不使用jemalloc")
 else()
     add_definitions(-D JE_MALLOC)
 endif()

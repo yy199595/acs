@@ -25,14 +25,23 @@ namespace Sentry
 		unsigned short port = 0;
 		this->mIsConnected = true;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
+
+#ifdef ONLY_MAIN_THREAD
+		this->ConnectByAddress(ip, port);
+#else
 		this->mNetworkThread.Invoke(&TcpClient::ConnectByAddress, this, ip, port);
+#endif
 		return true;
 	}
 
 	void TcpClient::StartReceive()
 	{
 		this->mIsOpen = true;
+#ifdef ONLY_MAIN_THREAD
+		this->BeginReceive();
+#else
 		this->mNetworkThread.Invoke(&TcpClient::BeginReceive, this);
+#endif
 	}
 
 	void TcpClient::ConnectByAddress(const std::string& ip, unsigned short port)

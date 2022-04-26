@@ -34,6 +34,9 @@ namespace Sentry
 		bool LoadRedisConfig();
 		void SubscribeMessage();
 		void CheckRedisClient();
+	public:
+		bool Lock(const std::string & key);
+		bool UnLock(const std::string & key);
 	 public:
 		long long AddCounter(const std::string& key);
 
@@ -72,13 +75,15 @@ namespace Sentry
 				LOG_ERROR("not find redis script " << tab << ".lua");
 				return nullptr;
 			}
-			return this->InvokeCommand("EVALSHA", script, size, func.substr(pos + 1), std::forward<Args>(args)...);
+			string method = func.substr(pos + 1);
+			return this->InvokeCommand("EVALSHA", script, size, method, std::forward<Args>(args)...);
 		}
 
 		std::shared_ptr<RedisResponse> Call(const std::string& func, std::vector<std::string>& args);
 
 	 private:
 		bool LoadLuaScript(const std::string& path);
+		void OnLockTimeout(const std::string & name);
 		std::shared_ptr<RedisClient> AllotRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
 		std::shared_ptr<RedisClient> MakeRedisClient(const std::string& name);
@@ -87,11 +92,13 @@ namespace Sentry
 		std::string mRpcAddress;
 		RedisConfig mRedisConfig;
 		TaskComponent* mTaskComponent;
+		TimerComponent * mTimerComponent;
 		ThreadPoolComponent* mThreadComponent;
 		std::shared_ptr<RedisClient> mSubRedisClient;
 		std::queue<std::shared_ptr<RedisClient>> mFreeClients;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::queue<TaskSourceShared<RedisClient>> mWaitAllotClients;
+		std::unordered_map<std::string, unsigned int> mLockTimers; //分布式锁的续命定时器
 		//std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

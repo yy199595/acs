@@ -65,7 +65,8 @@
         "timeout": 3,
         "count": 1,
         "lua": [
-            "./Config/user.lua"
+            "./redis/user.lua",
+            "./redis/lock.lua"
         ],
         "passwd": "199595yjz."
     },

@@ -220,9 +220,9 @@ namespace Sentry
 
 	void TaskComponent::OnSecondUpdate()
 	{
-		/*size_t size = this->mCorPool.GetMemorySize();
-		double memory = size / (1024.0f * 1024);
-		LOG_WARN("使用内存" << memory << "mb" << "  协程总数 ：" << mCorPool.GetCorCount()
-			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());*/
+//		size_t size = this->mCorPool.GetMemorySize();
+//		double memory = size / (1024.0f * 1024);
+//		LOG_WARN("使用内存" << memory << "mb" << "  协程总数 ：" << mCorPool.GetCorCount()
+//			<< "平均使用内存 ：" << size / mCorPool.GetCorCount());
 	}
 }

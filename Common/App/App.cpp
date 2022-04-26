@@ -230,7 +230,6 @@ namespace Sentry
 				}
 			}
 		}
-		//this->WaitAllServiceStart();
 	}
 
 	bool App::StartNewComponent()

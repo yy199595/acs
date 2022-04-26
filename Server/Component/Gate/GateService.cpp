@@ -12,7 +12,7 @@
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Component/Gate/GateProxyComponent.h"
-
+#include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
@@ -45,11 +45,20 @@ namespace Sentry
 
 	XCode GateService::Ping(long long userId)
 	{
-		GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
-		gateProxyComponent->Call(userId, "TaskComponent.Update");
-		DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();
-		std::shared_ptr<db_account::tab_user_account> userAccount(new db_account::tab_user_account());
-		return dataMgrComponent->Get(userId, userAccount);
+		RedisComponent * redisComponent = this->GetComponent<RedisComponent>();
+		if(redisComponent->Lock("Ping"))
+		{
+			LOG_DEBUG(userId << " get redis lock successful");
+			this->GetApp()->GetTaskComponent()->Sleep(5000);
+			GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
+			gateProxyComponent->Call(userId, "TaskComponent.Update");
+			DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();
+			std::shared_ptr<db_account::tab_user_account> userAccount(new db_account::tab_user_account());
+			redisComponent->UnLock("Ping");
+			return dataMgrComponent->Get(userId, userAccount);
+		}
+		//LOG_ERROR(userId << " get redis lock failure");
+		return XCode::Failure;
 	}
 
 	XCode GateService::CallClient(long long userId, c2s::Rpc::Call& request)
