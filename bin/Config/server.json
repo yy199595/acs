@@ -59,15 +59,23 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
-    "redis": {
+    "redis.main": {
+        "name": "main",
         "ip": "114.115.167.51",
         "port": 6379,
         "timeout": 3,
         "count": 1,
         "lua": [
-            "./redis/user.lua",
             "./redis/lock.lua"
         ],
+        "passwd": "199595yjz."
+    },
+    "redis.data": {
+        "name": "data",
+        "ip": "114.115.167.51",
+        "port": 6379,
+        "timeout": 3,
+        "count": 1,
         "passwd": "199595yjz."
     },
     "lua_src": [

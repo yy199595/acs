@@ -15,7 +15,7 @@ if(MSVC)
 elseif(APPLE)
     message("当前mac平台,不使用jemalloc")
 else()
-    add_definitions(-D JE_MALLOC)
+    #add_definitions(-D JE_MALLOC)
 endif()
 
 add_definitions(-D ASIO_STANDALONE)

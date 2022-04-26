@@ -79,5 +79,17 @@ namespace Sentry
         RedisRespType mType;
         std::vector<std::string> mArray;
     };
+
+	struct RedisConfig
+	{
+	 public:
+		int mCount;
+		std::string mIp;
+		unsigned short mPort;
+		std::string mAddress;
+		std::string mPassword;
+		std::vector<std::string> mLuaFiles;
+	};
+
 }
 

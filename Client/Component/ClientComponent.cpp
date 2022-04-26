@@ -59,13 +59,13 @@ namespace Client
 
 	void ClientComponent::OnAllServiceStart()
 	{
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585129@qq.com"));
 	}

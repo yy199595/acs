@@ -13,13 +13,13 @@ namespace Sentry
     class RedisClient : std::enable_shared_from_this<RedisClient>
     {
     public:
-        RedisClient(std::shared_ptr<SocketProxy> socket);
+        RedisClient(std::shared_ptr<SocketProxy> socket, RedisConfig & config);
     public:
+		bool StartConnect();
         bool IsOpen() const { return this->mIsOpen; }
-        long long GetLastOperatorTime() { return this->mLastOperatorTime;}
+		bool LoadLuaScript(const std::string & path, std::string & key);
+		long long GetLastOperatorTime() { return this->mLastOperatorTime;}
         //const std::string & GetName() { return this->mSocket->GetName(); }
-        std::shared_ptr<TaskSource<bool>> ConnectAsync(const std::string & ip, unsigned short port);
-
     private:
         void OnComplete();
         void StartReceive();
@@ -36,6 +36,7 @@ namespace Sentry
         void OnDecodeBinString(std::iostream & readStream);
         int OnReceiveFirstLine(char type, const std::string & lineData);
     private:
+		RedisConfig & mConfig;
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
         std::shared_ptr<RedisResponse> mResponse;
@@ -44,8 +45,6 @@ namespace Sentry
         int mDataSize;
         int mLineCount;
         int mDataCount;
-        std::string mIp;
-        unsigned short mPort;
         std::atomic_bool mIsOpen;
         IAsioThread & mNetworkThread;
         asio::streambuf mRecvDataBuffer;

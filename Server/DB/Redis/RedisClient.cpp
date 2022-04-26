@@ -3,30 +3,40 @@
 //
 #include"RedisClient.h"
 #include"Pool/MessagePool.h"
+#include"Util/FileHelper.h"
 namespace Sentry
 {
-    RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket)
-        : mNetworkThread(socket->GetThread())
+    RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket, RedisConfig & config)
+        : mNetworkThread(socket->GetThread()), mConfig(config)
     {
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mSocket = socket;
     }
 
-    std::shared_ptr<TaskSource<bool>> RedisClient::ConnectAsync(const std::string &ip, unsigned short port)
+    bool RedisClient::StartConnect()
     {
-        this->mIp = ip;
-        this->mPort = port;
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
         this->mNetworkThread.Invoke(&RedisClient::ConnectRedis, this, taskSource);
-        return taskSource;
+        if(!taskSource->Await())
+		{
+			return false;
+		}
+		if(!this->mConfig.mPassword.empty())
+		{
+			std::shared_ptr<RedisRequest> auth =
+				std::make_shared<RedisRequest>("AUTH");
+			auth->AddParameter(this->mConfig.mPassword);
+			return this->InvokeCommand(auth)->Await()->IsOk();
+		}
+		return true;
     }
 
     void RedisClient::ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource)
     {
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-        auto address = asio::ip::make_address_v4(this->mIp);
-        asio::ip::tcp::endpoint endPoint(address, this->mPort);
+        auto address = asio::ip::make_address_v4(this->mConfig.mIp);
+        asio::ip::tcp::endpoint endPoint(address, this->mConfig.mPort);
         tcpSocket.async_connect(endPoint, [taskSource, this]
                 (const asio::error_code &code) {
             if (code)
@@ -216,4 +226,31 @@ namespace Sentry
         }
         return 0;
     }
+	bool RedisClient::LoadLuaScript(const string& path, std::string & key)
+	{
+		std::string content;
+		if(!Helper::File::ReadTxtFile(path, content))
+		{
+			LOG_ERROR("read " << path << " failure");
+			return false;
+		}
+		std::shared_ptr<RedisRequest> redisRequest(new RedisRequest("script"));
+
+		redisRequest->AddParameter("load");
+		redisRequest->AddParameter(content);
+		auto redisTask = this->InvokeCommand(redisRequest);
+		if(redisTask == nullptr)
+		{
+			LOG_ERROR("load " << path << " failure");
+			return false;
+		}
+		std::shared_ptr<RedisResponse> response = redisTask->Await();
+		if (response->HasError())
+		{
+			LOG_ERROR(response->GetValue());
+			return false;
+		}
+		key = response->GetValue();
+		return true;
+	}
 }

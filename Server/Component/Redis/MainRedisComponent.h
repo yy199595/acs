@@ -1,27 +1,17 @@
 ﻿#pragma once
 
 #include"Util/Guid.h"
-#include"Other/ElapsedTimer.h"
 #include"Json/JsonWriter.h"
+#include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
-#include"Component/Coroutine/TaskComponent.h"
 #include"DB/Redis/RedisClient.h"
+#include"Component/Coroutine/TaskComponent.h"
 using namespace Sentry;
 namespace Sentry
 {
 	class ThreadPoolComponent;
 
-	struct RedisConfig
-	{
-	 public:
-		int mCount;
-		std::string mIp;
-		unsigned short mPort;
-		std::string mPassword;
-		std::string mLuaFilePath;
-	};
-
-	class MainRedisComponent : public Component, public IStart
+	class MainRedisComponent final : public Component, public IStart
 	{
 	 public:
 		MainRedisComponent() = default;
@@ -39,19 +29,16 @@ namespace Sentry
 		bool UnLock(const std::string & key);
 	 public:
 		long long AddCounter(const std::string& key);
-
 		bool SubscribeChannel(const std::string& channel);
-
-		long long Publish(const std::string& channel, const std::string& message);
-
 		long long Publish(const std::string& channel, Json::Writer& jsonWriter);
-
+		long long Publish(const std::string& channel, const std::string& message);
 		long long Publish(const std::string address, const std::string& func, Json::Writer& jsonWriter);
-
+	 public:
 		template<typename ... Args>
 		std::shared_ptr<RedisResponse> InvokeCommand(const std::string& cmd, Args&& ... args)
 		{
-			std::shared_ptr<RedisRequest> request(new RedisRequest(cmd));
+			std::shared_ptr<RedisRequest> request =
+				std::make_shared<RedisRequest>(cmd);
 			request->InitParameter(std::forward<Args>(args) ...);
 			return this->InvokeCommand(request);
 		}
@@ -82,23 +69,20 @@ namespace Sentry
 		std::shared_ptr<RedisResponse> Call(const std::string& func, std::vector<std::string>& args);
 
 	 private:
-		bool LoadLuaScript(const std::string& path);
 		void OnLockTimeout(const std::string & name);
+		std::shared_ptr<RedisClient> MakeRedisClient();
 		std::shared_ptr<RedisClient> AllotRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
-		std::shared_ptr<RedisClient> MakeRedisClient(const std::string& name);
 		bool HandlerSubMessage(const std::string & channel, const std::string & message);
 	 private:
+		RedisConfig mConfig;
 		std::string mRpcAddress;
-		RedisConfig mRedisConfig;
 		TaskComponent* mTaskComponent;
 		TimerComponent * mTimerComponent;
-		ThreadPoolComponent* mThreadComponent;
 		std::shared_ptr<RedisClient> mSubRedisClient;
 		std::queue<std::shared_ptr<RedisClient>> mFreeClients;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::queue<TaskSourceShared<RedisClient>> mWaitAllotClients;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
-		//std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

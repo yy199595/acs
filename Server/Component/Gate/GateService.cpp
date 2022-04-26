@@ -48,7 +48,7 @@ namespace Sentry
 		MainRedisComponent * redisComponent = this->GetComponent<MainRedisComponent>();
 		if(redisComponent->Lock("Ping"))
 		{
-			LOG_DEBUG(userId << " get redis lock successful");
+			LOG_ERROR(userId << " get redis lock successful");
 			this->GetApp()->GetTaskComponent()->Sleep(5000);
 			GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
 			gateProxyComponent->Call(userId, "TaskComponent.Update");
@@ -57,7 +57,7 @@ namespace Sentry
 			redisComponent->UnLock("Ping");
 			return dataMgrComponent->Get(userId, userAccount);
 		}
-		//LOG_ERROR(userId << " get redis lock failure");
+		LOG_WARN(userId << " get redis lock failure");
 		return XCode::Failure;
 	}
 
