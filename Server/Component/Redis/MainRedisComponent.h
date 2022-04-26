@@ -21,11 +21,11 @@ namespace Sentry
 		std::string mLuaFilePath;
 	};
 
-	class RedisComponent : public Component, public IStart
+	class MainRedisComponent : public Component, public IStart
 	{
 	 public:
-		RedisComponent() = default;
-		~RedisComponent() final = default;
+		MainRedisComponent() = default;
+		~MainRedisComponent() final = default;
 	 protected:
 		bool LateAwake() final;                //初始化完成之后
 		bool OnStart() override;
@@ -98,7 +98,7 @@ namespace Sentry
 		std::queue<std::shared_ptr<RedisClient>> mFreeClients;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::queue<TaskSourceShared<RedisClient>> mWaitAllotClients;
-		std::unordered_map<std::string, unsigned int> mLockTimers; //分布式锁的续命定时器
+		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
 		//std::unordered_map<std::thread::id, redisContext *> mRedisContextMap;
 	};
 }

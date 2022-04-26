@@ -22,8 +22,8 @@ namespace Sentry
     void WaitTaskSource::WaitSecond(float s)
     {
         long long ms = s * 1000;
-        this->mTimerId = this->mTimerComponent->AsyncWait(
-                ms, &TaskSource<void>::SetResult, &mTaskSource);
+        this->mTimerId = this->mTimerComponent->DelayCall(
+				ms, &TaskSource<void>::SetResult, &mTaskSource);
         this->mTaskSource.Await();
         this->mTimerId = 0;
     }

@@ -5,7 +5,7 @@
 
 #include<Network/Listener/TcpServerComponent.h>
 #include"Global/RpcConfig.h"
-#include"Component/Redis/RedisComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
@@ -57,7 +57,7 @@ void RegisterComponent()
 	ComponentFactory::Add<GateProxyComponent>("GateProxyComponent");
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
-    ComponentFactory::Add<RedisComponent>("RedisComponent");
+    ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
     ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
 
 //http

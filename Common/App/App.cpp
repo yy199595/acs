@@ -51,7 +51,7 @@ namespace Sentry
 				}
 				if (!this->AddComponentByName(name))
 				{
-					LOG_ERROR("add" << name << " failure");
+					LOG_ERROR("add " << name << " failure");
 					return false;
 				}
 			}

@@ -141,4 +141,10 @@ namespace Sentry
 		LOG_ERROR("add timer failure id = " << timer->GetTimerId());
 		return false;
 	}
+
+	long long TimerComponent::DelayCall(float second, std::function<void()>&& callback)
+	{
+		LambdaMethod * lambdaMethod = new LambdaMethod(std::move(callback));
+		return this->AddTimer(second * 1000, lambdaMethod);
+	}
 }// namespace Sentry

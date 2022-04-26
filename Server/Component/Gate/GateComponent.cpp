@@ -29,7 +29,7 @@ namespace Sentry
 
 	void GateComponent::OnConnect(const std::string & address)
 	{
-		unsigned int timerId = this->mTimerComponent->AsyncWait(5000,
+		unsigned int timerId = this->mTimerComponent->DelayCall(5000,
 				&GateComponent::OnSocketTimeout, this, address);
 		this->mSocketTimers.emplace(address, timerId);
 	}

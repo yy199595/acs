@@ -81,7 +81,7 @@
         "DataMgrComponent",
         "ThreadPoolComponent",
         "TcpServerComponent",
-        "RedisComponent",
+        "MainRedisComponent",
         "LuaScriptComponent",
         "LuaRegisterComponent",
         "RpcClientComponent",

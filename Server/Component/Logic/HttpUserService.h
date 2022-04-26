@@ -7,7 +7,7 @@ namespace Sentry
 {
 
 	class ServiceProxy;
-	class RedisComponent;
+	class MainRedisComponent;
 	class MysqlProxyComponent;
 	class HttpUserService : public HttpService
 	{
@@ -28,7 +28,7 @@ namespace Sentry
 		const std::string NewToken(const std::string& account);
 	 private:
 		class GateService * mGateService;
-		class RedisComponent * mRedisComponent;
+		class MainRedisComponent * mRedisComponent;
 		class MysqlProxyComponent * mMysqlComponent;
 	};
 }// namespace Sentry

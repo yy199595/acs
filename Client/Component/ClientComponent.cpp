@@ -19,7 +19,7 @@ namespace Client
 	{
 		long long rpcId = task->GetRpcTaskId();
 		//this->mRpcTasks.emplace(rpcId, task);
-		return ms > 0 ? this->mTimerComponent->AsyncWait(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
+		return ms > 0 ? this->mTimerComponent->DelayCall(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
 	}
 
     void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> t1)

@@ -5,7 +5,7 @@
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Service/UserSubService.h"
-#include"Component/Redis/RedisComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 
 namespace Sentry
@@ -20,7 +20,7 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
-		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
+		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<MainRedisComponent>());
 		return true;
 	}
 
@@ -88,7 +88,7 @@ namespace Sentry
 	{
 		long long phoneNumber = 0;
 		string user_account, user_password;
-		this->mRedisComponent = this->GetComponent<RedisComponent>();
+		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));

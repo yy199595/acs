@@ -30,7 +30,7 @@ namespace Sentry
 		bool LoadService() final;
 		void OnAddAddress(const std::string &address) final;
 	private:
-		class RedisComponent * mRedisComponent;
+		class MainRedisComponent * mRedisComponent;
 		std::shared_ptr<SubServiceRegister> mServiceRegister;
 	};
 }

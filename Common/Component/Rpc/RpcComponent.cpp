@@ -113,8 +113,8 @@ namespace Sentry
 		this->mRpcTasks.emplace(rpcId, task);
 		if (task->GetTimeout() > 0)
 		{
-			this->mTimerComponent->AsyncWait(
-				task->GetTimeout(), &RpcComponent::OnTaskTimeout, this, rpcId);
+			this->mTimerComponent->DelayCall(
+					task->GetTimeout(), &RpcComponent::OnTaskTimeout, this, rpcId);
 		}
 	}
 #ifdef __DEBUG__

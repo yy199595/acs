@@ -15,12 +15,14 @@ namespace Sentry
 	 public:
 		bool CancelTimer(long long id);
 
+		long long DelayCall(float second, std::function<void(void)> && callback);
+
 		template<typename F, typename O, typename ... Args>
-		unsigned int AsyncWait(unsigned int ms, F&& f, O* o, Args&& ... args)
+		long long DelayCall(float second, F&& f, O* o, Args&& ... args)
 		{
 			StaticMethod* methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
-			return this->AddTimer(ms, methodProxy);
+			return this->AddTimer(second * 1000, methodProxy);
 		}
 		long long AddTimer(std::shared_ptr<TimerBase> timer);
 		long long AddTimer(unsigned int ms, StaticMethod* func);

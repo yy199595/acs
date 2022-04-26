@@ -12,7 +12,7 @@
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Component/Gate/GateProxyComponent.h"
-#include"Component/Redis/RedisComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
@@ -45,7 +45,7 @@ namespace Sentry
 
 	XCode GateService::Ping(long long userId)
 	{
-		RedisComponent * redisComponent = this->GetComponent<RedisComponent>();
+		MainRedisComponent * redisComponent = this->GetComponent<MainRedisComponent>();
 		if(redisComponent->Lock("Ping"))
 		{
 			LOG_DEBUG(userId << " get redis lock successful");

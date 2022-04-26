@@ -2,12 +2,12 @@
 // Created by yjz on 2022/1/22.
 //
 #include"SubService.h"
-#include"Component/Redis/RedisComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
 	bool SubService::LateAwake()
 	{
-		this->mRedisComponent = this->GetComponent<RedisComponent>();
+		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		return true;
 	}
 	void SubService::GetSubMethods(std::vector<std::string>& methods)

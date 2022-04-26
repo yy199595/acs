@@ -133,7 +133,7 @@ namespace Sentry
 				return;
 			}
 		}
-		this->mTimerComponent->AsyncWait(5000, &GateClientComponent::CheckPlayerLogout, this, address);
+		this->mTimerComponent->DelayCall(5000, &GateClientComponent::CheckPlayerLogout, this, address);
 	}
 
 	bool GateClientComponent::AddNewUser(const std::string& address, long long userId)

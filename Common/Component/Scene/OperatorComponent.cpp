@@ -68,8 +68,8 @@ namespace Sentry
 			nextTime = Helper::Time::GetNewTime(1, hour, minute);
 		}
 		long long ms = nextTime - Helper::Time::GetNowSecTime();
-		this->mTimerComponent->AsyncWait(ms * 1000, &OperatorComponent::StartRefreshDay,
-			this, component->GetName());
+		this->mTimerComponent->DelayCall(ms * 1000, &OperatorComponent::StartRefreshDay,
+				this, component->GetName());
 	}
 
 	void OperatorComponent::StartRefreshDay(const std::string& name)
