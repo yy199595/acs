@@ -6,7 +6,7 @@
 #include"Util/FileHelper.h"
 namespace Sentry
 {
-    RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket, RedisConfig & config)
+    RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config)
         : mNetworkThread(socket->GetThread()), mConfig(config)
     {
         this->mDataSize = 0;
@@ -23,11 +23,11 @@ namespace Sentry
 		{
 			return false;
 		}
-		if(!this->mConfig.mPassword.empty())
+		if(!this->mConfig->Password.empty())
 		{
 			std::shared_ptr<RedisRequest> auth =
 				std::make_shared<RedisRequest>("AUTH");
-			auth->AddParameter(this->mConfig.mPassword);
+			auth->AddParameter(this->mConfig->Password);
 			return this->Run(auth)->IsOk();
 		}
 		return true;
@@ -36,8 +36,8 @@ namespace Sentry
     void RedisClient::ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource)
     {
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-        auto address = asio::ip::make_address_v4(this->mConfig.mIp);
-        asio::ip::tcp::endpoint endPoint(address, this->mConfig.mPort);
+        auto address = asio::ip::make_address_v4(this->mConfig->Ip);
+        asio::ip::tcp::endpoint endPoint(address, this->mConfig->Port);
         tcpSocket.async_connect(endPoint, [taskSource, this]
                 (const asio::error_code &code) {
             if (code)

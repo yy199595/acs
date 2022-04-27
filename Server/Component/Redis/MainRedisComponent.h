@@ -39,7 +39,6 @@ namespace Sentry
 		std::shared_ptr<RedisResponse> Call(const std::string& func, Args&& ...args)
 		{
 			std::string script;
-			int size = sizeof ...(Args) + 1;
 			const size_t pos = func.find('.');
 			if (pos == std::string::npos)
 			{
@@ -53,20 +52,17 @@ namespace Sentry
 				return nullptr;
 			}
 			string method = func.substr(pos + 1);
-			return this->mRedisClient->Run("EVALSHA", script, size, method, std::forward<Args>(args)...);
+			return this->mRedisClient->Call(script, method, std::forward<Args>(args)...);
 		}
-
-		std::shared_ptr<RedisResponse> Call(const std::string& func, std::vector<std::string>& args);
-
 	 private:
 		void OnLockTimeout(const std::string & name);
 		std::shared_ptr<RedisClient> MakeRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
 		bool HandlerSubMessage(const std::string & channel, const std::string & message);
 	 private:
-		RedisConfig mConfig;
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
+		const struct RedisConfig * mConfig;
 		TimerComponent * mTimerComponent;
 		std::shared_ptr<RedisClient> mRedisClient;
 		std::shared_ptr<RedisClient> mSubRedisClient;

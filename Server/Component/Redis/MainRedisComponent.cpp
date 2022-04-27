@@ -16,44 +16,14 @@ namespace Sentry
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
+		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 		return true;
 	}
 	bool MainRedisComponent::LoadRedisConfig()
 	{
-		this->mConfig.mCount = 3;
-		this->GetConfig().GetMember("redis.main", "count", this->mConfig.mCount);
-		this->GetConfig().GetMember("redis.main", "lua", this->mConfig.mLuaFiles);
-		this->GetConfig().GetMember("redis.main", "passwd", this->mConfig.mPassword);
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis.main", "ip", this->mConfig.mIp));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis.main", "port", this->mConfig.mPort));
-		this->mConfig.mAddress = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
-		return this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
+		this->mConfig = this->GetConfig().GetRedisConfig("main");
+		return this->mConfig != nullptr;
 	}
-
-	std::shared_ptr<RedisResponse> MainRedisComponent::Call(const std::string& func, std::vector<std::string>& args)
-	{
-		std::string script;
-		const size_t pos = func.find('.');
-		if (pos == std::string::npos)
-		{
-			return nullptr;
-		}
-		std::string tab = func.substr(0, pos);
-		std::string file = fmt::format("{0}.lua", tab);
-		if (!this->GetLuaScript(file, script))
-		{
-			LOG_ERROR("not find redis script " << file);
-			return nullptr;
-		}
-		std::shared_ptr<RedisRequest> redisCmdRequest(new RedisRequest("EVALSHA"));
-		redisCmdRequest->InitParameter(script, (int)args.size() + 1, func.substr(pos + 1));
-		for (const std::string& val : args)
-		{
-			redisCmdRequest->AddParameter(val);
-		}
-		return this->mRedisClient->Run(redisCmdRequest);
-	}
-
 
 	bool MainRedisComponent::GetLuaScript(const std::string& file, std::string& command)
 	{
@@ -70,16 +40,16 @@ namespace Sentry
 	{
 		this->mRedisClient = this->MakeRedisClient();
 		this->mSubRedisClient = this->MakeRedisClient();
-		if(this->mSubRedisClient == nullptr || this->mRedisClient == nullptr)
+		if (this->mSubRedisClient == nullptr || this->mRedisClient == nullptr)
 		{
-			LOG_ERROR("connect redis " << this->mConfig.mAddress << " failure");
+			LOG_ERROR("connect redis " << this->mConfig->Address << " failure");
 			return false;
 		}
 
-		for (const std::string& path : this->mConfig.mLuaFiles)
+		for (const std::string& path: this->mConfig->LuaFiles)
 		{
 			std::string key;
-			if(!this->mRedisClient->LoadLuaScript(path, key))
+			if (!this->mRedisClient->LoadLuaScript(path, key))
 			{
 				return false;
 			}
@@ -94,7 +64,7 @@ namespace Sentry
 		}
 #ifdef __DEBUG__
 		//this->Run("FLUSHALL")->IsOk();
-		this->mRedisClient->Run(std::make_shared<RedisRequest>("FLUSHALL"))->IsOk();
+		this->mRedisClient->Run("FLUSHALL")->IsOk();
 #endif
 		this->SubscribeMessage();
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
@@ -110,17 +80,17 @@ namespace Sentry
 		ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
-		const std::string & ip = this->mConfig.mIp;
-		unsigned short port = this->mConfig.mPort;
+		const std::string & ip = this->mConfig->Ip;
+		unsigned short port = this->mConfig->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
 		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, this->mConfig);
 
 		while(!redisCommandClient->StartConnect())
 		{
-			LOG_ERROR("connect redis [" << this->mConfig.mAddress << "] failure");
+			LOG_ERROR(this->mConfig->Name << " connect redis [" << this->mConfig->Address << "] failure");
 			this->mTaskComponent->Sleep(3000);
 		}
-		LOG_INFO("connect redis [" << this->mConfig.mAddress << "] successful");
+		LOG_INFO(this->mConfig->Name << " connect redis [" << this->mConfig->Address << "] successful");
 		return redisCommandClient;
 	}
 
@@ -158,7 +128,7 @@ namespace Sentry
 
 	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
 	{
-		LOG_CHECK_RET_FALSE(!channel.empty());
+		assert(!channel.empty());
 		std::shared_ptr<RedisRequest> request(new RedisRequest("SUBSCRIBE"));
 		request->AddParameter(std::move(channel));
 		std::shared_ptr<RedisResponse> response = this->mSubRedisClient->Run(request);
@@ -201,7 +171,7 @@ namespace Sentry
 				int count = 0;
 				while(!this->mSubRedisClient->StartConnect())
 				{
-					LOG_ERROR("connect redis " << this->mConfig.mAddress << " failure count = " << count++);
+					LOG_ERROR("connect redis " << this->mConfig->Address << " failure count = " << count++);
 					this->mTaskComponent->Sleep(3000);
 				}
 				this->SubscribeMessage();

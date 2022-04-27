@@ -59,24 +59,25 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
-    "redis.main": {
-        "name": "main",
-        "ip": "114.115.167.51",
-        "port": 6379,
-        "timeout": 3,
-        "count": 1,
-        "lua": [
-            "./redis/lock.lua"
-        ],
-        "passwd": "199595yjz."
-    },
-    "redis.data": {
-        "name": "data",
-        "ip": "114.115.167.51",
-        "port": 6379,
-        "timeout": 3,
-        "count": 1,
-        "passwd": "199595yjz."
+    "redis":
+    {
+        "main": {
+            "ip": "114.115.167.51",
+            "port": 6379,
+            "timeout": 3,
+            "count": 1,
+            "lua": [
+                "./redis/lock.lua"
+            ],
+            "passwd": "199595yjz."
+        },
+        "data": {
+            "ip": "114.115.167.51",
+            "port": 6379,
+            "timeout": 3,
+            "count": 1,
+            "passwd": "199595yjz."
+        }
     },
     "lua_src": [
         "./Script/Common/",
@@ -98,10 +99,8 @@
         "MysqlProxyComponent",
         "EntityMgrComponent",
         "GateProxyComponent",
-        "ClientComponent"
-    ],
-    "service":
-    [
+        "DataRedisComponent",
+        "ClientComponent",
         "GateService",
         "ChatService",
         "MysqlService",

@@ -8,32 +8,33 @@ namespace Sentry
 {
 	bool DataRedisComponent::LateAwake()
 	{
-		this->mConfig.mCount = 3;
-		this->mTaskComponent = this->GetComponent<TaskComponent>();
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->GetConfig().GetRedisConfigs(this->mRedisConfigs);
 		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
-		this->GetConfig().GetMember("redis.data", "count", this->mConfig.mCount);
-		this->GetConfig().GetMember("redis.data", "lua", this->mConfig.mLuaFiles);
-		this->GetConfig().GetMember("redis.data", "passwd", this->mConfig.mPassword);
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis.data", "ip", this->mConfig.mIp));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("redis.data", "port", this->mConfig.mPort));
-		return true;
+		return this->mRedisConfigs.size() >= 2;
 	}
 
 	bool DataRedisComponent::OnStart()
 	{
-		for(int index = 0; index < this->mConfig.mCount; index++)
+		for (const RedisConfig* config: this->mRedisConfigs)
 		{
-			std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient();
-			if(redisClient == nullptr)
+			if (config->Name == "main")
 			{
-				return false;
+				continue;
 			}
-			this->mFreeClients.emplace(redisClient);
+			for (int index = 0; index < config->Count; index++)
+			{
+				std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(config);
+				if (redisClient == nullptr)
+				{
+					return false;
+				}
+				this->mFreeClients.emplace(redisClient);
+			}
 		}
 		return true;
 	}
-	std::shared_ptr<RedisClient> DataRedisComponent::MakeRedisClient()
+
+	std::shared_ptr<RedisClient> DataRedisComponent::MakeRedisClient(const RedisConfig * config)
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
@@ -41,21 +42,18 @@ namespace Sentry
 		ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
-		const std::string & ip = this->mConfig.mIp;
-		unsigned short port = this->mConfig.mPort;
+		const std::string & ip = config->Ip;
+		unsigned short port = config->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
-		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, this->mConfig);
+		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, config);
 
 		while(!redisCommandClient->StartConnect())
 		{
-			LOG_ERROR("connect redis [" << this->mConfig.mAddress << "] failure");
+			LOG_ERROR(config->Name << " connect redis [" << config->Address << "] failure");
 			this->mTaskComponent->Sleep(3000);
 		}
-		LOG_INFO("connect redis [" << this->mConfig.mAddress << "] successful");
+		LOG_INFO(config->Name << " connect redis [" << config->Address << "] successful");
 		return redisCommandClient;
 	}
-	std::shared_ptr<RedisResponse> DataRedisComponent::Invoke(const string& cmd, vector<std::string>& parameter)
-	{
-		return nullptr;
-	}
+
 }

@@ -11,16 +11,16 @@
 
 namespace Sentry
 {
+	struct RedisConfig;
     class RedisClient : std::enable_shared_from_this<RedisClient>
     {
     public:
-        RedisClient(std::shared_ptr<SocketProxy> socket, RedisConfig & config);
+        RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
     public:
 		bool StartConnect();
         bool IsOpen() const { return this->mIsOpen; }
 		bool LoadLuaScript(const std::string & path, std::string & key);
 		long long GetLastOperatorTime() { return this->mLastOperatorTime;}
-        //const std::string & GetName() { return this->mSocket->GetName(); }
     private:
         void OnComplete();
         void StartReceive();
@@ -33,6 +33,9 @@ namespace Sentry
 
 		template<typename ... Args>
 		std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ...args);
+
+		template<typename ... Args>
+		std::shared_ptr<RedisResponse> Call(const std::string & key, const std::string & method,  Args&& ...args);
     private:
         void OnDecodeHead(std::iostream & readStream);
         void OnDecodeArray(std::iostream & readStream);
@@ -40,7 +43,7 @@ namespace Sentry
         void OnDecodeBinString(std::iostream & readStream);
         int OnReceiveFirstLine(char type, const std::string & lineData);
     private:
-		RedisConfig & mConfig;
+		const RedisConfig * mConfig;
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
 		std::shared_ptr<CoroutineLock> mLock;
@@ -64,6 +67,13 @@ namespace Sentry
 				= std::make_shared<RedisRequest>(cmd);
 		request->InitParameter(std::forward<Args>(args)...);
 		return this->Run(request);
+	}
+
+	template<typename... Args>
+	std::shared_ptr<RedisResponse> RedisClient::Call(const string& key, const std::string & method, Args &&... args)
+	{
+		int size = sizeof ...(Args) + 1;
+		return this->Run("EVALSHA", key, size, method, std::forward<Args>(args)...);
 	}
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

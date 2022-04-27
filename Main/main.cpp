@@ -29,6 +29,7 @@
 #include"Component/Service/UserSubService.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 
 using namespace Sentry;
 using namespace Client;
@@ -58,7 +59,8 @@ void RegisterComponent()
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
-    ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
+	ComponentFactory::Add<DataRedisComponent>("DataRedisComponent");
+	ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");

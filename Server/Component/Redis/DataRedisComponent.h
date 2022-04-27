@@ -8,6 +8,7 @@
 #include"DB/Redis/RedisClient.h"
 namespace Sentry
 {
+	struct RedisConfig;
 	class DataRedisComponent final : public Component, public IStart
 	{
 	 public:
@@ -17,15 +18,26 @@ namespace Sentry
 		bool OnStart() final;
 		bool LateAwake() final;
 	 public:
-		std::shared_ptr<RedisResponse> Invoke(const std::string & cmd, std::vector<std::string> & parameter);
+		template<typename ... Args>
+		std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args && ... args);
 	 private:
-		std::shared_ptr<RedisClient> MakeRedisClient();
-	 private:
-		RedisConfig mConfig;
+		std::shared_ptr<RedisClient> MakeRedisClient(const RedisConfig * config);
+	private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
+		std::vector<const RedisConfig *> mRedisConfigs;
 		std::queue<std::shared_ptr<RedisClient>> mFreeClients;
 	};
+
+	template<typename... Args>
+	std::shared_ptr<RedisResponse> DataRedisComponent::Run(const string& cmd, Args&& ... args)
+	{
+		assert(!this->mFreeClients.empty());
+		std::shared_ptr<RedisClient> redisClient = this->mFreeClients.front();
+		this->mFreeClients.pop();
+		this->mFreeClients.push(redisClient);
+		return redisClient->template Run(cmd, std::forward<Args>(args) ...);
+	}
 }
 
 #endif //_DATAREDISCOMPONENT_H_

@@ -51,28 +51,16 @@ namespace Sentry
 				}
 				if (!this->AddComponentByName(name))
 				{
-					LOG_ERROR("add " << name << " failure");
-					return false;
-				}
-			}
-		}
-		components.clear();
-		if (this->mConfig->GetMember("service", components)) //添加所有服务
-		{
-			for (const std::string& name: components)
-			{
-				if (this->GetComponentByName(name) != nullptr)
-				{
-					LOG_ERROR("add " << name << " failure");
-					return false;
-				}
-				if (!this->AddComponentByName(name))
-				{
 					LuaRpcService* luaRpcService = new LuaRpcService();
-					return this->AddComponent(name, luaRpcService);
+					if(!this->AddComponent(name, luaRpcService))
+					{
+						LOG_ERROR("add " << name << " failure");
+						return false;
+					}
 				}
 			}
 		}
+
 		this->GetComponents(components);
 		for (const std::string& name: components)
 		{
