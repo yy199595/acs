@@ -62,14 +62,14 @@
     "redis":
     {
         "main": {
-            "ip": "114.115.167.51",
+            "ip": "127.0.0.1",
             "port": 6379,
             "timeout": 3,
             "count": 1,
             "lua": [
-                "./redis/lock.lua"
-            ],
-            "passwd": "199595yjz."
+                "./redis/lock.lua",
+                "./redis/json.lua"
+            ]
         },
         "data": {
             "ip": "114.115.167.51",

@@ -19,7 +19,7 @@ namespace Sentry
 		void Awake() final;
 		void OnDestory() final;
 		void OnZeroRefresh() final;
-	 private:
+	public:
 		void CreateLogFile();
 		static void AddInfoLog(const std::string& log);
 		static void AddErrorLog(const std::string& log);

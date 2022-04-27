@@ -12,13 +12,13 @@
 namespace Sentry
 {
 	struct RedisConfig;
-    class RedisClient : std::enable_shared_from_this<RedisClient>
+    class RedisClient final : std::enable_shared_from_this<RedisClient>
     {
     public:
         RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
     public:
 		bool StartConnect();
-        bool IsOpen() const { return this->mIsOpen; }
+        bool IsOpen() const { return this->mSocket->IsOpen(); }
 		bool LoadLuaScript(const std::string & path, std::string & key);
 		long long GetLastOperatorTime() { return this->mLastOperatorTime;}
     private:
@@ -28,52 +28,32 @@ namespace Sentry
         void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
 
     public:
-        std::shared_ptr<RedisResponse> WaitRedisMessage();
-		std::shared_ptr<RedisResponse> Run(std::shared_ptr<RedisRequest> command);
 
-		template<typename ... Args>
-		std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ...args);
+		XCode WaitRedisResponse(std::shared_ptr<RedisResponse> response);
 
-		template<typename ... Args>
-		std::shared_ptr<RedisResponse> Call(const std::string & key, const std::string & method,  Args&& ...args);
+		XCode Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response);
+
     private:
         void OnDecodeHead(std::iostream & readStream);
         void OnDecodeArray(std::iostream & readStream);
-        void OnClientError(const asio::error_code & code);
         void OnDecodeBinString(std::iostream & readStream);
-        int OnReceiveFirstLine(char type, const std::string & lineData);
-    private:
+		int OnReceiveFirstLine(char type, const std::string & lineData);
+		void SendCommand(std::shared_ptr<RedisRequest> request, std::shared_ptr<TaskSource<XCode>> taskSource);
+	private:
 		const RedisConfig * mConfig;
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
 		std::shared_ptr<CoroutineLock> mLock;
         std::shared_ptr<RedisResponse> mResponse;
-        TaskSourceShared<RedisResponse> mRespTaskSource;
+		std::shared_ptr<TaskSource<XCode>> mReadTaskSource;
     private:
         int mDataSize;
         int mLineCount;
         int mDataCount;
-        std::atomic_bool mIsOpen;
         IAsioThread & mNetworkThread;
         asio::streambuf mRecvDataBuffer;
         asio::streambuf mSendDataBuffer;
         std::shared_ptr<SocketProxy> mSocket;
     };
-
-	template<typename... Args>
-	std::shared_ptr<RedisResponse> RedisClient::Run(const string& cmd, Args &&... args)
-	{
-		std::shared_ptr<RedisRequest> request
-				= std::make_shared<RedisRequest>(cmd);
-		request->InitParameter(std::forward<Args>(args)...);
-		return this->Run(request);
-	}
-
-	template<typename... Args>
-	std::shared_ptr<RedisResponse> RedisClient::Call(const string& key, const std::string & method, Args &&... args)
-	{
-		int size = sizeof ...(Args) + 1;
-		return this->Run("EVALSHA", key, size, method, std::forward<Args>(args)...);
-	}
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

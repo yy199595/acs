@@ -41,6 +41,7 @@ inline std::string FormatFileLine(const char * file, const int line)
     App::Get()->GetLogger()->AddLog(type, ss.str());		\
 }													\
 
+
 #define LOG_INFO(content) \
 {                             \
 		std::string f = FormatFileLine(__FILE__, __LINE__); \
@@ -119,4 +120,11 @@ inline std::string FormatFileLine(const char * file, const int line)
         {                        \
             content;             \
         }\
+}
+
+#define CONSOLE_LOG_ERROR(content){ \
+	std::string f = FormatFileLine(__FILE__, __LINE__); \
+	std::stringstream ss;                \
+	ss << f << content;                \
+	LoggerComponent::AddErrorLog(ss.str());\
 }

@@ -36,7 +36,7 @@ namespace Sentry
 		std::shared_ptr<RedisClient> redisClient = this->mFreeClients.front();
 		this->mFreeClients.pop();
 		this->mFreeClients.push(redisClient);
-		return redisClient->template Run(cmd, std::forward<Args>(args) ...);
+		return redisClient->Run(cmd, std::forward<Args>(args) ...);
 	}
 }
 

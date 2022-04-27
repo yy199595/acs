@@ -22,6 +22,7 @@ namespace Sentry
         this->mParameters.emplace_back(std::to_string(value));
     }
 
+
     void RedisRequest::AddParameter(const Message &message)
     {
         std::string json;
@@ -31,7 +32,7 @@ namespace Sentry
 
     void RedisRequest::AddParameter(const std::string &value)
     {
-        this->mParameters.emplace_back(std::move(value));
+        this->mParameters.emplace_back(value);
     }
 
     void RedisRequest::GetCommand(std::iostream &readStream) const
@@ -93,7 +94,7 @@ namespace Sentry
 
     void RedisResponse::AddValue(const std::string &data)
     {
-        this->mArray.emplace_back(std::move(data));
+        this->mArray.emplace_back(data);
     }
 
     void RedisResponse::AddValue(const char *str, size_t size)

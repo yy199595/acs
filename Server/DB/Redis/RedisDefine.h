@@ -31,15 +31,22 @@ namespace Sentry
     public:
         void GetCommand(std::iostream & readStream) const;
 
+		template<typename ... Args>
+		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
+
+		template<typename ... Args>
+		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & method, Args &&... args);
+
         template<typename ... Args>
         void InitParameter(Args &&... args);
     public:
 		const std::string ToJson();
         void AddParameter(int value);
         void AddParameter(long long value);
-        void AddParameter(const Message & message);
+		void AddParameter(const Message & message);
         void AddParameter(const std::string & value);
-    private:
+		//void AddParameter(const std::string && value);
+	private:
         void Encode() {}
 
         template<typename T, typename... Args>
@@ -52,6 +59,25 @@ namespace Sentry
         std::string mCommand;
         std::list<std::string> mParameters;
     };
+
+	template<typename ... Args>
+	std::shared_ptr<RedisRequest> RedisRequest::Make(const std::string& cmd, Args&& ... args)
+	{
+		std::shared_ptr<RedisRequest> request
+				= std::make_shared<RedisRequest>(cmd);
+		request->InitParameter(std::forward<Args>(args)...);
+		return request;
+	}
+
+	template<typename ... Args>
+	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const std::string& key, const std::string & method, Args && ... args)
+	{
+		int size = sizeof ...(Args) + 1;
+		std::shared_ptr<RedisRequest> request
+				= std::make_shared<RedisRequest>("EVALSHA");
+		request->InitParameter(key, size, method, std::forward<Args>(args)...);
+		return request;
+	}
 
     template<typename ... Args>
     void RedisRequest::InitParameter(Args &&...args)
