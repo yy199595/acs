@@ -61,6 +61,10 @@ namespace Sentry
 
     XCode RedisClient::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
 	{
+		if(!this->mSocket->IsOpen())
+		{
+			return XCode::NetWorkError;
+		}
 		AutoCoroutineLock lock(this->mLock);
 		this->mLastOperatorTime = Helper::Time::GetNowSecTime();
 		std::shared_ptr<TaskSource<XCode>> sendTaskSource(new TaskSource<XCode>());
@@ -82,6 +86,10 @@ namespace Sentry
 
      XCode RedisClient::WaitRedisResponse(std::shared_ptr<RedisResponse> response)
     {
+		if(!this->mSocket->IsOpen())
+		{
+			return XCode::NetWorkError;
+		}
         this->mDataSize = 0;
         this->mResponse = response;
         this->mReadTaskSource = std::make_shared<TaskSource<XCode>>();
