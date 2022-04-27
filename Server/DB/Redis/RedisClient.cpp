@@ -12,7 +12,8 @@ namespace Sentry
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mSocket = socket;
-    }
+		this->mLock = std::make_shared<CoroutineLock>();
+	}
 
     bool RedisClient::StartConnect()
     {
@@ -27,7 +28,7 @@ namespace Sentry
 			std::shared_ptr<RedisRequest> auth =
 				std::make_shared<RedisRequest>("AUTH");
 			auth->AddParameter(this->mConfig.mPassword);
-			return this->InvokeCommand(auth)->Await()->IsOk();
+			return this->Run(auth)->IsOk();
 		}
 		return true;
     }
@@ -51,8 +52,9 @@ namespace Sentry
         });
     }
 
-    TaskSourceShared<RedisResponse> RedisClient::InvokeCommand(std::shared_ptr<RedisRequest> command)
+    std::shared_ptr<RedisResponse> RedisClient::Run(std::shared_ptr<RedisRequest> command)
     {
+		AutoCoroutineLock lock(this->mLock);
         this->mLastOperatorTime = Helper::Time::GetNowSecTime();
         std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
 
@@ -79,13 +81,13 @@ namespace Sentry
         return this->WaitRedisMessage();
     }
 
-    TaskSourceShared<RedisResponse> RedisClient::WaitRedisMessage()
+    std::shared_ptr<RedisResponse> RedisClient::WaitRedisMessage()
     {
         this->mDataSize = 0;
         this->mResponse = std::make_shared<RedisResponse>();
         this->mRespTaskSource = make_shared<TaskSource<std::shared_ptr<RedisResponse>>>();
         this->mNetworkThread.Invoke(&RedisClient::StartReceive, this);
-        return mRespTaskSource;
+        return mRespTaskSource->Await();
     }
 
     void RedisClient::StartReceive()
@@ -238,13 +240,12 @@ namespace Sentry
 
 		redisRequest->AddParameter("load");
 		redisRequest->AddParameter(content);
-		auto redisTask = this->InvokeCommand(redisRequest);
-		if(redisTask == nullptr)
+		std::shared_ptr<RedisResponse> response = this->Run(redisRequest);
+		if(response == nullptr)
 		{
-			LOG_ERROR("load " << path << " failure");
+			LOG_ERROR("load " << path << " failure net error");
 			return false;
 		}
-		std::shared_ptr<RedisResponse> response = redisTask->Await();
 		if (response->HasError())
 		{
 			LOG_ERROR(response->GetValue());

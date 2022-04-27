@@ -34,16 +34,6 @@ namespace Sentry
 		long long Publish(const std::string& channel, const std::string& message);
 		long long Publish(const std::string address, const std::string& func, Json::Writer& jsonWriter);
 	 public:
-		template<typename ... Args>
-		std::shared_ptr<RedisResponse> InvokeCommand(const std::string& cmd, Args&& ... args)
-		{
-			std::shared_ptr<RedisRequest> request =
-				std::make_shared<RedisRequest>(cmd);
-			request->InitParameter(std::forward<Args>(args) ...);
-			return this->InvokeCommand(request);
-		}
-
-		std::shared_ptr<RedisResponse> InvokeCommand(std::shared_ptr<RedisRequest> request);
 
 		template<typename ... Args>
 		std::shared_ptr<RedisResponse> Call(const std::string& func, Args&& ...args)
@@ -63,7 +53,7 @@ namespace Sentry
 				return nullptr;
 			}
 			string method = func.substr(pos + 1);
-			return this->InvokeCommand("EVALSHA", script, size, method, std::forward<Args>(args)...);
+			return this->mRedisClient->Run("EVALSHA", script, size, method, std::forward<Args>(args)...);
 		}
 
 		std::shared_ptr<RedisResponse> Call(const std::string& func, std::vector<std::string>& args);
@@ -71,7 +61,6 @@ namespace Sentry
 	 private:
 		void OnLockTimeout(const std::string & name);
 		std::shared_ptr<RedisClient> MakeRedisClient();
-		std::shared_ptr<RedisClient> AllotRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
 		bool HandlerSubMessage(const std::string & channel, const std::string & message);
 	 private:
@@ -79,8 +68,8 @@ namespace Sentry
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
 		TimerComponent * mTimerComponent;
+		std::shared_ptr<RedisClient> mRedisClient;
 		std::shared_ptr<RedisClient> mSubRedisClient;
-		std::queue<std::shared_ptr<RedisClient>> mFreeClients;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::queue<TaskSourceShared<RedisClient>> mWaitAllotClients;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器

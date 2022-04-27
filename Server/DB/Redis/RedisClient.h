@@ -7,6 +7,7 @@
 #include"Network/SocketProxy.h"
 #include"Async/TaskSource.h"
 #include"DB/Redis/RedisDefine.h"
+#include"Coroutine/CoroutineLock.h"
 
 namespace Sentry
 {
@@ -27,8 +28,11 @@ namespace Sentry
         void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
 
     public:
-        TaskSourceShared<RedisResponse> WaitRedisMessage();
-        TaskSourceShared<RedisResponse> InvokeCommand(std::shared_ptr<RedisRequest> command);
+        std::shared_ptr<RedisResponse> WaitRedisMessage();
+		std::shared_ptr<RedisResponse> Run(std::shared_ptr<RedisRequest> command);
+
+		template<typename ... Args>
+		std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ...args);
     private:
         void OnDecodeHead(std::iostream & readStream);
         void OnDecodeArray(std::iostream & readStream);
@@ -39,6 +43,7 @@ namespace Sentry
 		RedisConfig & mConfig;
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
+		std::shared_ptr<CoroutineLock> mLock;
         std::shared_ptr<RedisResponse> mResponse;
         TaskSourceShared<RedisResponse> mRespTaskSource;
     private:
@@ -51,5 +56,14 @@ namespace Sentry
         asio::streambuf mSendDataBuffer;
         std::shared_ptr<SocketProxy> mSocket;
     };
+
+	template<typename... Args>
+	std::shared_ptr<RedisResponse> RedisClient::Run(const string& cmd, Args &&... args)
+	{
+		std::shared_ptr<RedisRequest> request
+				= std::make_shared<RedisRequest>(cmd);
+		request->InitParameter(std::forward<Args>(args)...);
+		return this->Run(request);
+	}
 }
 #endif //GAMEKEEPER_REDISCLIENT_H
