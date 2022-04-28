@@ -23,7 +23,7 @@ namespace Sentry
 			}
 			for (int index = 0; index < config->Count; index++)
 			{
-				std::shared_ptr<RedisClient> redisClient = this->MakeRedisClient(config);
+				std::shared_ptr<RedisClientContext> redisClient = this->MakeRedisClient(config);
 				if (redisClient == nullptr)
 				{
 					return false;
@@ -34,7 +34,7 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<RedisClient> DataRedisComponent::MakeRedisClient(const RedisConfig * config)
+	std::shared_ptr<RedisClientContext> DataRedisComponent::MakeRedisClient(const RedisConfig * config)
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
@@ -45,7 +45,7 @@ namespace Sentry
 		const std::string& ip = config->Ip;
 		unsigned short port = config->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
-		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, config);
+		std::shared_ptr<RedisClientContext> redisCommandClient = std::make_shared<RedisClientContext>(socketProxy, config);
 
 		XCode code = redisCommandClient->StartConnect();
 		if (code == XCode::RedisAuthFailure)

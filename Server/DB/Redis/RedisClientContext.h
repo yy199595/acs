@@ -12,10 +12,10 @@
 namespace Sentry
 {
 	struct RedisConfig;
-    class RedisClient final : std::enable_shared_from_this<RedisClient>
+    class RedisClientContext final : std::enable_shared_from_this<RedisClientContext>
     {
     public:
-        RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
+        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
     public:
 		XCode StartConnect();
         bool IsOpen() const { return this->mSocket->IsOpen(); }

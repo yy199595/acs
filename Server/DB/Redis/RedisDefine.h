@@ -35,8 +35,8 @@ namespace Sentry
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
-		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & func,
-				std::list<std::string> & keys, std::list<std::string> & values);
+		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key,
+			const std::string & func, std::unordered_map<std::string, std::string> & parameters);
 
         template<typename ... Args>
         void InitParameter(Args &&... args);
@@ -57,7 +57,7 @@ namespace Sentry
         }
     private:
         std::string mCommand;
-        std::list<std::shared_ptr<RedisAny>> mParameters;
+        std::vector<std::string> mParameters;
     };
 
 	template<typename ... Args>
@@ -85,15 +85,14 @@ namespace Sentry
         void AddValue(const std::string & data);
         void AddValue(const char * str, size_t size);
 	 public:
-		long long GetNumber() { return this->mNumber; }
+		long long GetNumber(size_t index = 0);
 		RedisRespType GetType() { return this->mType; }
 		size_t GetArraySize() { return this->mArray.size();}
 		bool GetString(std::string & value, size_t index = 0);
 		bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
     private:
-        long long mNumber;
         RedisRespType mType;
-        std::vector<std::string> mArray;
+        std::vector<std::shared_ptr<RedisAny>> mArray;
     };
 
 }

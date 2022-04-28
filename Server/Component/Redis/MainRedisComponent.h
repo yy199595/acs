@@ -4,7 +4,7 @@
 #include"Json/JsonWriter.h"
 #include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
-#include"DB/Redis/RedisClient.h"
+#include"DB/Redis/RedisClientContext.h"
 #include"Component/Coroutine/TaskComponent.h"
 using namespace Sentry;
 namespace Sentry
@@ -35,7 +35,7 @@ namespace Sentry
 		long long Publish(const std::string address, const std::string& func, Json::Writer& jsonWriter);
 	 private:
 		void OnLockTimeout(const std::string & name);
-		std::shared_ptr<RedisClient> MakeRedisClient();
+		std::shared_ptr<RedisClientContext> MakeRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
 		bool HandlerSubMessage(const std::string & channel, const std::string & message);
 	 private:
@@ -43,8 +43,8 @@ namespace Sentry
 		TaskComponent* mTaskComponent;
 		const struct RedisConfig * mConfig;
 		TimerComponent * mTimerComponent;
-		std::shared_ptr<RedisClient> mRedisClient;
-		std::shared_ptr<RedisClient> mSubRedisClient;
+		std::shared_ptr<RedisClientContext> mRedisClient;
+		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
 	};

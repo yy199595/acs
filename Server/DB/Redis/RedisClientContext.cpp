@@ -1,13 +1,13 @@
 //
 // Created by zmhy0073 on 2022/1/15.
 //
-#include"RedisClient.h"
+#include"RedisClientContext.h"
 #include"Pool/MessagePool.h"
 #include"Util/FileHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 namespace Sentry
 {
-    RedisClient::RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config)
+    RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config)
         : mNetworkThread(socket->GetThread()), mConfig(config)
     {
         this->mDataSize = 0;
@@ -17,7 +17,7 @@ namespace Sentry
 		this->mCommandLock = std::make_shared<CoroutineLock>();
 	}
 
-    XCode RedisClient::StartConnect()
+    XCode RedisClientContext::StartConnect()
     {
 		AutoCoroutineLock lock(this->mConnectLock);
 		if(this->mSocket->IsOpen())
@@ -28,7 +28,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectRedis(taskSource);
 #else
-		this->mNetworkThread.Invoke(&RedisClient::ConnectRedis, this, taskSource);
+		this->mNetworkThread.Invoke(&RedisClientContext::ConnectRedis, this, taskSource);
 #endif
 		XCode code = taskSource->Await();
 		if(code == XCode::Successful && !this->mConfig->Password.empty())
@@ -44,7 +44,7 @@ namespace Sentry
 		return code;
     }
 
-    void RedisClient::ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource)
+    void RedisClientContext::ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource)
     {
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
         auto address = asio::ip::make_address_v4(this->mConfig->Ip);
@@ -63,7 +63,7 @@ namespace Sentry
         });
     }
 
-    XCode RedisClient::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
+    XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
 	{
 		if(!this->mSocket->IsOpen())
 		{
@@ -79,7 +79,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->SendCommand(command, sendTaskSource);
 #else
-		this->mNetworkThread.Invoke(&RedisClient::SendCommand, this, command, sendTaskSource);
+		this->mNetworkThread.Invoke(&RedisClientContext::SendCommand, this, command, sendTaskSource);
 #endif
 		if (sendTaskSource->Await() != XCode::Successful)
 		{
@@ -98,7 +98,7 @@ namespace Sentry
 		return code;
 	}
 
-     XCode RedisClient::WaitRedisResponse(std::shared_ptr<RedisResponse> response)
+     XCode RedisClientContext::WaitRedisResponse(std::shared_ptr<RedisResponse> response)
     {
 		if(!this->mSocket->IsOpen())
 		{
@@ -110,12 +110,12 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->StartReceive();
 #else
-		this->mNetworkThread.Invoke(&RedisClient::StartReceive, this);
+		this->mNetworkThread.Invoke(&RedisClientContext::StartReceive, this);
 #endif
         return mReadTaskSource->Await();
     }
 
-    void RedisClient::StartReceive()
+    void RedisClientContext::StartReceive()
     {
         assert(this->mResponse);
         assert(this->mReadTaskSource);
@@ -126,12 +126,12 @@ namespace Sentry
             return;
         }
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-        auto cb = std::bind(&RedisClient::OnReceive, this, args1, args2);
+        auto cb = std::bind(&RedisClientContext::OnReceive, this, args1, args2);
         asio::async_read(tcpSocket, this->mRecvDataBuffer,
                          asio::transfer_at_least(1), std::move(cb));
     }
 
-    void RedisClient::OnReceive(const asio::error_code &code, size_t size)
+    void RedisClientContext::OnReceive(const asio::error_code &code, size_t size)
     {
         if (code)
         {
@@ -153,13 +153,18 @@ namespace Sentry
                 this->OnDecodeArray(readStream);
                 break;
         }
+		if(this->mLineCount >= this->mDataCount)
+		{
+			this->OnComplete();
+			return;
+		}
 		if(!this->mReadTaskSource->IsComplete())
 		{
 			this->StartReceive();
 		}
     }
 
-    void RedisClient::OnDecodeHead(std::iostream &readStream)
+    void RedisClientContext::OnDecodeHead(std::iostream &readStream)
     {
         std::string lineData;
         char type = readStream.get();
@@ -174,7 +179,7 @@ namespace Sentry
         }
     }
 
-    void RedisClient::OnDecodeBinString(std::iostream &readStream)
+    void RedisClientContext::OnDecodeBinString(std::iostream &readStream)
     {
         if(this->mRecvDataBuffer.size() >= this->mDataSize)
         {
@@ -184,27 +189,32 @@ namespace Sentry
             this->mLineCount++;
             this->mDataSize = 0;
             readStream.ignore(2);
-            if(this->mLineCount >= this->mDataCount)
-            {
-                this->OnComplete();
-            }
         }
     }
 
-    void RedisClient::OnDecodeArray(std::iostream &readStream)
+    void RedisClientContext::OnDecodeArray(std::iostream &readStream)
     {
-        if (this->mRecvDataBuffer.size() > 0 && this->mDataSize == 0) {
+        if (this->mRecvDataBuffer.size() > 0)
+		{
             std::string lineData;
             char type = readStream.get();
-            if (type == '$' && std::getline(readStream, lineData)) {
+            if (type == '$' && std::getline(readStream, lineData))
+			{
                 lineData.pop_back();
                 this->mDataSize = std::stoi(lineData);
-            }
+				this->OnDecodeBinString(readStream);
+			}
+			else if(type == ':' && std::getline(readStream, lineData))
+			{
+				lineData.pop_back();
+				this->mLineCount++;
+				this->mResponse->AddValue(std::stoll(lineData));
+				//readStream.ignore(2);
+			}
         }
-        this->OnDecodeBinString(readStream);
     }
 
-    void RedisClient::OnComplete()
+    void RedisClientContext::OnComplete()
     {
         this->mDataSize = 0;
         this->mLineCount = 0;
@@ -213,7 +223,7 @@ namespace Sentry
 		this->mReadTaskSource->SetResult(XCode::Successful);
     }
 
-    int RedisClient::OnReceiveFirstLine(char type, const std::string &lineData)
+    int RedisClientContext::OnReceiveFirstLine(char type, const std::string &lineData)
     {
         switch(type)
         {
@@ -240,7 +250,7 @@ namespace Sentry
         }
         return 0;
     }
-	bool RedisClient::LoadLuaScript(const string& path, std::string & key)
+	bool RedisClientContext::LoadLuaScript(const string& path, std::string & key)
 	{
 		std::string content;
 		if(!Helper::File::ReadTxtFile(path, content))
@@ -264,7 +274,7 @@ namespace Sentry
 		return response->GetString(key);
 	}
 
-	void RedisClient::SendCommand(std::shared_ptr<RedisRequest> request, std::shared_ptr<TaskSource<XCode>> taskSource)
+	void RedisClientContext::SendCommand(std::shared_ptr<RedisRequest> request, std::shared_ptr<TaskSource<XCode>> taskSource)
 	{
 		std::iostream io(&this->mSendDataBuffer);
 		request->GetCommand(io);

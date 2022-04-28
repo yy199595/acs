@@ -7,7 +7,7 @@
 #include"Component/Service/SubService.h"
 #include"Global/RpcConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
-#include"DB/Redis/RedisClient.h"
+#include"DB/Redis/RedisClientContext.h"
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
@@ -92,7 +92,7 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<RedisClient> MainRedisComponent::MakeRedisClient()
+	std::shared_ptr<RedisClientContext> MainRedisComponent::MakeRedisClient()
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
@@ -104,7 +104,7 @@ namespace Sentry
 		const std::string & ip = this->mConfig->Ip;
 		unsigned short port = this->mConfig->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
-		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, this->mConfig);
+		std::shared_ptr<RedisClientContext> redisCommandClient = std::make_shared<RedisClientContext>(socketProxy, this->mConfig);
 
 		XCode code = redisCommandClient->StartConnect();
 		if(code == XCode::RedisAuthFailure)
@@ -323,14 +323,15 @@ namespace Sentry
 			LOG_ERROR("not find redis script lock.lua");
 			return false;
 		}
-		Json::Writer jsonWriter;
-		std::list<std::string> keys{ "key", "time" };
-		std::list<std::string> values{ key, std::to_string(5) };
+		std::unordered_map<std::string, std::string> parateters
+			{
+				std::make_pair("key", key),
+				std::make_pair("time", "5")
+			};
 		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", keys, values);
+		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", parateters);
 		if (this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
 		{
-			LOG_ERROR("redis socket error get redis lock failure");
 			return false;
 		}
 		//LOG_DEBUG("redis lock " << key << " get successful");
@@ -340,6 +341,24 @@ namespace Sentry
 
 	bool MainRedisComponent::UnLock(const string& key)
 	{
+		std::string tag;
+		if (!this->GetLuaScript("lock.lua", tag))
+		{
+			LOG_ERROR("not find redis script lock.lua");
+			return false;
+		}
+		std::unordered_map<std::string, std::string> parateters
+			{
+				std::make_pair("key", key),
+				std::make_pair("time", "5")
+			};
+		std::shared_ptr<RedisResponse> response1(new RedisResponse());
+		std::shared_ptr<RedisRequest> request1 = RedisRequest::MakeLua(tag, "unlock", parateters);
+		if (this->mRedisClient->Run(request1, response1) != XCode::Successful || !response1->IsOk())
+		{
+
+		}
+
 		auto iter = this->mLockTimers.find(key);
 		if(iter != this->mLockTimers.end())
 		{
