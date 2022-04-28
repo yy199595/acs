@@ -2,6 +2,7 @@
 #include<list>
 #include<string>
 #include<vector>
+#include"RedisAny.h"
 #include"XCode/XCode.h"
 #include"Json/JsonWriter.h"
 #include"google/protobuf/message.h"
@@ -10,40 +11,14 @@ using namespace google::protobuf;
 #define REDIS_SAVE_JSON
 namespace Sentry
 {
-    enum class RedisRespType
-    {
-        REDIS_NONE,
-        REDIS_STRING,
-        REDIS_ERROR,
-        REDIS_NUMBER,
-        REDIS_ARRAY,
-        REDIS_BIN_STRING,
-
-    };
-	class RedisValue
+	enum class RedisRespType
 	{
-	public:
-		virtual bool IsLong() = 0;
-		virtual bool IsString() = 0;
-		virtual std::string & GetValue() = 0;
-	};
-
-	class RedisStringType : public RedisValue
-	{
-	public:
-		RedisStringType(const std::string & value);
-		RedisStringType(const char * str, size_t size);
-	public:
-		bool IsLong() final { return false; }
-		bool IsString() final { return true;}
-		std::string & GetValue() final { return this->mValue;}
-	private:
-		std::string mValue;
-	};
-
-	class RedisLongType : public RedisValue
-	{
-	private:
+		REDIS_NONE,
+		REDIS_STRING,
+		REDIS_ERROR,
+		REDIS_NUMBER,
+		REDIS_ARRAY,
+		REDIS_BIN_STRING,
 
 	};
 }
@@ -82,7 +57,7 @@ namespace Sentry
         }
     private:
         std::string mCommand;
-        std::list<std::string> mParameters;
+        std::list<std::shared_ptr<RedisAny>> mParameters;
     };
 
 	template<typename ... Args>

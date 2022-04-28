@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"RpcGateClient.h"
+#include"GateRpcClientContext.h"
 #include"Protocol/c2s.pb.h"
 #include"App/App.h"
 #ifdef __DEBUG__
@@ -11,20 +11,20 @@
 #include"Component/Gate/GateClientComponent.h"
 namespace Sentry
 {
-	RpcGateClient::RpcGateClient(std::shared_ptr<SocketProxy> socket, SocketType type,
+	GateRpcClientContext::GateRpcClientContext(std::shared_ptr<SocketProxy> socket, SocketType type,
 		GateClientComponent* component)
-		: RpcClient(socket, type), mGateComponent(component)
+		: RpcClientContext(socket, type), mGateComponent(component)
 	{
 		this->mQps = 0;
 		this->mCallCount = 0;
 	}
 
-	void RpcGateClient::OnConnect(XCode code)
+	void GateRpcClientContext::OnConnect(XCode code)
 	{
 
 	}
 
-	bool RpcGateClient::OnReceiveMessage(char type, const char* buffer, size_t size)
+	bool GateRpcClientContext::OnReceiveMessage(char type, const char* buffer, size_t size)
 	{
 		if(type == RPC_TYPE_REQUEST)
 		{
@@ -48,7 +48,7 @@ namespace Sentry
 		return false;
 	}
 
-	void RpcGateClient::OnClientError(XCode code)
+	void GateRpcClientContext::OnClientError(XCode code)
 	{
 		if (code == XCode::NetActiveShutdown)
 		{
@@ -65,17 +65,17 @@ namespace Sentry
 
 	}
 
-	void RpcGateClient::StartClose()
+	void GateRpcClientContext::StartClose()
 	{
 		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->OnClientError(code);
 #else
-		this->mNetWorkThread.Invoke(&RpcGateClient::OnClientError, this, code);
+		this->mNetWorkThread.Invoke(&GateRpcClientContext::OnClientError, this, code);
 #endif
 	}
 
-	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
+	bool GateRpcClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
 	{
 		if(!this->GetSocketProxy()->IsOpen())
 		{
@@ -86,12 +86,12 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->SendData(networkData);
 #else
-		this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&GateRpcClientContext::SendData, this, networkData);
 #endif
 		return true;
 	}
 
-	bool RpcGateClient::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
+	bool GateRpcClientContext::SendToClient(std::shared_ptr<c2s::Rpc_Response> message)
 	{
 		if(!this->GetSocketProxy()->IsOpen())
 		{
@@ -102,12 +102,12 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->SendData(networkData);
 #else
-		this->mNetWorkThread.Invoke(&RpcGateClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&GateRpcClientContext::SendData, this, networkData);
 #endif
 		return true;
 	}
 
-	void RpcGateClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
+	void GateRpcClientContext::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
 	{
 #ifdef __DEBUG__
 		if (code != XCode::Successful)

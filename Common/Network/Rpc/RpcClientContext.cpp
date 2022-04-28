@@ -1,4 +1,4 @@
-#include"RpcClient.h"
+#include"RpcClientContext.h"
 #include"App/App.h"
 #include"Util/TimeHelper.h"
 #include<iostream>
@@ -28,7 +28,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	RpcClient::RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type)
+	RpcClientContext::RpcClientContext(std::shared_ptr<SocketProxy> socket, SocketType type)
 		: mType(type), mSocketProxy(socket),
 		  mContext(socket->GetContext()),
 		  mNetWorkThread(socket->GetThread())
@@ -38,13 +38,13 @@ namespace Sentry
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
 
-	void RpcClient::Clear()
+	void RpcClientContext::Clear()
 	{
 		this->mLastOperTime = 0;
 		this->mSocketProxy->Close();
 	}
 
-	void RpcClient::StartReceive()
+	void RpcClientContext::StartReceive()
 	{
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		if (mNetWorkThread.IsCurrentThread())
@@ -52,15 +52,15 @@ namespace Sentry
 			this->ReceiveHead();
 			return;
 		}
-		mNetWorkThread.Invoke(&RpcClient::ReceiveHead, this);
+		mNetWorkThread.Invoke(&RpcClientContext::ReceiveHead, this);
 	}
 
-	void RpcClient::ReceiveHead()
+	void RpcClientContext::ReceiveHead()
 	{
 		assert(this->mNetWorkThread.IsCurrentThread());
 		const size_t count = sizeof(int) + sizeof(char);
 		AsioTcpSocket& socket = this->mSocketProxy->GetSocket();
-		std::shared_ptr<RpcClient> self = this->shared_from_this();
+		std::shared_ptr<RpcClientContext> self = this->shared_from_this();
 		auto cb = [self, this](const asio::error_code& code, const std::size_t t)
 		{
 			self->mLastOperTime = Helper::Time::GetNowSecTime();
@@ -79,7 +79,7 @@ namespace Sentry
 		socket.async_read_some(asio::buffer(this->mReceiveBuffer, count), std::move(cb));
 	}
 
-	void RpcClient::ReceiveBody(char type, size_t size)
+	void RpcClientContext::ReceiveBody(char type, size_t size)
 	{
 		char* messageBuffer = this->mReceiveBuffer;
 		if (size > TCP_BUFFER_COUNT)
@@ -94,7 +94,7 @@ namespace Sentry
 		}
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& nSocket = this->mSocketProxy->GetSocket();
-		std::shared_ptr<RpcClient> self = this->shared_from_this();
+		std::shared_ptr<RpcClientContext> self = this->shared_from_this();
 
 		auto cb = [self, this, messageBuffer, type]
 			(const asio::error_code& error_code, const size_t size)
@@ -113,7 +113,7 @@ namespace Sentry
 			}
 			else
 			{
-				mContext.post(std::bind(&RpcClient::ReceiveHead, this));
+				mContext.post(std::bind(&RpcClientContext::ReceiveHead, this));
 			}
 			if (messageBuffer != this->mReceiveBuffer)
 			{
@@ -123,7 +123,7 @@ namespace Sentry
 		nSocket.async_read_some(asio::buffer(messageBuffer, size), std::move(cb));
 	}
 
-	bool RpcClient::StartConnect()
+	bool RpcClientContext::StartConnect()
 	{
 		if (this->IsCanConnection())
 		{
@@ -133,18 +133,18 @@ namespace Sentry
 			this->ConnectHandler();
 #else
 			IAsioThread &nThread = this->mSocketProxy->GetThread();
-			nThread.Invoke(&RpcClient::ConnectHandler, this);
+			nThread.Invoke(&RpcClientContext::ConnectHandler, this);
 #endif
 			return true;
 		}
 		return false;
 	}
 
-	void RpcClient::ConnectHandler()
+	void RpcClientContext::ConnectHandler()
 	{
 		assert(this->mNetWorkThread.IsCurrentThread());
 		AsioTcpSocket& nSocket = this->mSocketProxy->GetSocket();
-		std::shared_ptr<RpcClient> self = this->shared_from_this();
+		std::shared_ptr<RpcClientContext> self = this->shared_from_this();
 		address_v4 address = asio::ip::make_address_v4(this->mSocketProxy->GetIp());
 		asio::ip::tcp::endpoint endPoint(address, this->mSocketProxy->GetPort());
 
@@ -162,13 +162,13 @@ namespace Sentry
 		});
 	}
 
-	bool RpcClient::IsCanConnection()
+	bool RpcClientContext::IsCanConnection()
 	{
 		return this->GetSocketType() == SocketType::LocalSocket
 			   && !this->mSocketProxy->IsOpen() && !this->mIsConnect;
 	}
 
-	void RpcClient::SendData(std::shared_ptr<NetworkData> message)
+	void RpcClientContext::SendData(std::shared_ptr<NetworkData> message)
 	{
 		assert(this->mNetWorkThread.IsCurrentThread());
 		if (!this->mIsCanSendData)
@@ -178,7 +178,7 @@ namespace Sentry
 		}
 		this->mIsCanSendData = false;
 		message->WriteToBuffer(this->mSendBuffer);
-		std::shared_ptr<RpcClient> self = this->shared_from_this();
+		std::shared_ptr<RpcClientContext> self = this->shared_from_this();
 		AsioTcpSocket& tcpSocket = this->mSocketProxy->GetSocket();
 
 		size_t size = this->mSendBuffer.size();

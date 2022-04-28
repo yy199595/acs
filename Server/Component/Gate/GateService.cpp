@@ -5,7 +5,7 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"NetWork/RpcGateClient.h"
+#include"NetWork/GateRpcClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Service/UserSubService.h"

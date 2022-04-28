@@ -2,14 +2,14 @@
 #include"XCode/XCode.h"
 #include"Protocol/c2s.pb.h"
 #include"Async/TaskSource.h"
-#include"Network/Rpc/RpcClient.h"
+#include"Network/Rpc/RpcClientContext.h"
 
 
 using namespace Sentry;
 namespace Client
 {
 	class ClientComponent;
-    class TcpRpcClient : public RpcClient
+    class TcpRpcClient : public RpcClientContext
 	{
 	public:
 		TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component);

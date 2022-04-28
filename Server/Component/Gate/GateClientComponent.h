@@ -7,7 +7,7 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class RpcGateClient;
+	class GateRpcClientContext;
 	class GateClientComponent : public Component, public ISocketListen,
 								public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>
 	{
@@ -24,7 +24,7 @@ namespace Sentry
 		bool AddNewUser(const std::string & address, long long userId);
 		bool GetUserId(const std::string & address, long long & userId);
 		bool GetUserAddress(long long userId, std::string & address);
-		std::shared_ptr<RpcGateClient> GetGateClient(const std::string & address);
+		std::shared_ptr<GateRpcClientContext> GetGateClient(const std::string & address);
 	 public:
 		void SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message);
 		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc::Call> message);
@@ -42,7 +42,7 @@ namespace Sentry
 		class TimerComponent* mTimerComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
 		std::unordered_map<long long, std::string> mClientAddressMap;
-		std::unordered_map<std::string, std::shared_ptr<RpcGateClient>> mGateClientMap;
+		std::unordered_map<std::string, std::shared_ptr<GateRpcClientContext>> mGateClientMap;
 	};
 }
 

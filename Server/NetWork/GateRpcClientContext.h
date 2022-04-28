@@ -5,16 +5,16 @@
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
 
-#include"Network/Rpc/RpcClient.h"
+#include"Network/Rpc/RpcClientContext.h"
 using namespace google::protobuf;
 namespace Sentry
 {
 	class GateClientComponent;
-	class RpcGateClient : public RpcClient
+	class GateRpcClientContext : public RpcClientContext
 	{
 	 public:
-		RpcGateClient(std::shared_ptr<SocketProxy> socket, SocketType type, GateClientComponent* component);
-		~RpcGateClient() final = default;
+		GateRpcClientContext(std::shared_ptr<SocketProxy> socket, SocketType type, GateClientComponent* component);
+		~GateRpcClientContext() final = default;
 
 	 public:
 		void StartClose();

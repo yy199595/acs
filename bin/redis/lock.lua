@@ -1,11 +1,10 @@
 local lock = {}
 lock.lock = function(tab)
-    print(tab.key, tab.time)
     if redis.call("SETNX", tab.key, 1) == 0 then
         print("redis lock " .. tab.key .. "set faulure")
         return 0
     end
-    return redis.call("SETEX", key, tab.time, 1)
+    return redis.call("SETEX", tab.key, tonumber(tab.time), 1)
 end
 
 lock.unlock = function(key)

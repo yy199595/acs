@@ -5,7 +5,7 @@ constexpr size_t HeadCount = sizeof(char) + sizeof(int);
 namespace Client
 {
 	TcpRpcClient::TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
-        : RpcClient(socket, SocketType::LocalSocket)
+        : RpcClientContext(socket, SocketType::LocalSocket)
 	{
 		this->mClientComponent = component;
 	}

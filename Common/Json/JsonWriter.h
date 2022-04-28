@@ -27,6 +27,7 @@ namespace Json
 		bool EndObject();
 
 	public:
+		bool AddMember(long long value);
 		bool AddMember(const std::string & value);
 	 public:
 		bool AddMember(const char* key, XCode code);

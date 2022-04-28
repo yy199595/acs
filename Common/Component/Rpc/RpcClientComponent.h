@@ -3,7 +3,7 @@
 #include"Component/Component.h"
 #include"Script/Table.h"
 #include"Other/MultiThreadQueue.h"
-#include"Network/Rpc/ProtoRpcClient.h"
+#include"Network/Rpc/ServerRpcClientContext.h"
 namespace Sentry
 {
 	// 管理所有session
@@ -23,8 +23,8 @@ namespace Sentry
 	 protected:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
-		std::shared_ptr<ProtoRpcClient> GetSession(const std::string& address);
-		std::shared_ptr<ProtoRpcClient> GetOrCreateSession(const std::string& address);
+		std::shared_ptr<ServerRpcClientContext> GetSession(const std::string& address);
+		std::shared_ptr<ServerRpcClientContext> GetOrCreateSession(const std::string& address);
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;
@@ -35,6 +35,6 @@ namespace Sentry
 	 private:
 		class RpcComponent* mRpcComponent;
 		class ThreadPoolComponent* mTaskComponent;
-		std::unordered_map<std::string, std::shared_ptr<ProtoRpcClient>> mRpcClientMap;
+		std::unordered_map<std::string, std::shared_ptr<ServerRpcClientContext>> mRpcClientMap;
 	};
 }

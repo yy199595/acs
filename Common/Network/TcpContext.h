@@ -9,10 +9,10 @@
 #include<asio/coroutine.hpp>
 namespace Sentry
 {
-	class TcpClient
+	class TcpContext
 	{
 	 public:
-		TcpClient(std::shared_ptr<SocketProxy> socket, SocketType type);
+		TcpContext(std::shared_ptr<SocketProxy> socket, SocketType type);
 	 public:
 		void StartReceive();
 		bool IsOpen() const

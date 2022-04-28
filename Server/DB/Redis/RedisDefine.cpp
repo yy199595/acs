@@ -15,12 +15,14 @@ namespace Sentry
 
     void RedisRequest::AddParameter(int value)
     {
-        this->mParameters.emplace_back(std::to_string(value));
+		std::shared_ptr<RedisAny> data(new RedisLong(value));
+        this->mParameters.emplace_back(data);
     }
 
     void RedisRequest::AddParameter(long long value)
     {
-        this->mParameters.emplace_back(std::to_string(value));
+		std::shared_ptr<RedisAny> data(new RedisLong(value));
+		this->mParameters.emplace_back(data);
     }
 
 
@@ -33,7 +35,8 @@ namespace Sentry
 
     void RedisRequest::AddParameter(const std::string &value)
     {
-        this->mParameters.emplace_back(value);
+		std::shared_ptr<RedisAny> data(new RedisString(value));
+		this->mParameters.emplace_back(data);
     }
 
     void RedisRequest::GetCommand(std::iostream &readStream) const
@@ -45,9 +48,9 @@ namespace Sentry
         }
         readStream << "*" << this->mParameters.size() + 1 << "\r\n";
         readStream << "$" << this->mCommand.size() << "\r\n" << this->mCommand << "\r\n";
-        for(const std::string & parameter : this->mParameters)
+        for(std::shared_ptr<RedisAny> parameter : this->mParameters)
         {
-            readStream << "$" << parameter.size() << "\r\n" << parameter << "\r\n";
+			parameter->Write(readStream);
         }
     }
 
@@ -55,9 +58,18 @@ namespace Sentry
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.StartArray(this->mCommand.c_str());
-		for(const std::string & str : this->mParameters)
+		for(std::shared_ptr<RedisAny> redisAny : this->mParameters)
 		{
-			jsonWriter.AddMember(str);
+			if(redisAny->IsLong())
+			{
+				long long value = std::dynamic_pointer_cast<RedisLong>(redisAny)->GetValue();
+				jsonWriter.AddMember(value);
+			}
+			else if(redisAny->IsString())
+			{
+				const std::string & str =std::dynamic_pointer_cast<RedisString>(redisAny)->GetValue();
+				jsonWriter.AddMember(str);
+			}
 		}
 		jsonWriter.EndArray();
 		return jsonWriter.ToJsonString();

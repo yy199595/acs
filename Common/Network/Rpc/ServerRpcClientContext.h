@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include"RpcClient.h"
+#include"RpcClientContext.h"
 #include"Protocol/com.pb.h"
 #include"Async/TaskSource.h"
 #include"Coroutine/CoroutineLock.h"
@@ -9,11 +9,11 @@ using namespace google::protobuf;
 namespace Sentry
 {
 	class RpcClientComponent;
-	class ProtoRpcClient : public RpcClient
+	class ServerRpcClientContext : public RpcClientContext
 	{
 	 public:
-		explicit ProtoRpcClient(RpcClientComponent* component, std::shared_ptr<SocketProxy> socket, SocketType type);
-		~ProtoRpcClient() override = default;
+		explicit ServerRpcClientContext(RpcClientComponent* component, std::shared_ptr<SocketProxy> socket, SocketType type);
+		~ServerRpcClientContext() override = default;
 	 public:
 		void StartClose();
 		bool ConnectAsync();

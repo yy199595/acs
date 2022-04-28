@@ -128,9 +128,9 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	std::shared_ptr<ProtoRpcClient> RpcServiceBase::GetClient(const std::string& address)
+	std::shared_ptr<ServerRpcClientContext> RpcServiceBase::GetClient(const std::string& address)
 	{
-		std::shared_ptr<ProtoRpcClient> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
+		std::shared_ptr<ServerRpcClientContext> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
 		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
 		{
 			return rpcClient;
@@ -160,7 +160,7 @@ namespace Sentry
 				return response;
 			}
 		}
-		std::shared_ptr<ProtoRpcClient> rpcClient = this->GetClient(address);
+		std::shared_ptr<ServerRpcClientContext> rpcClient = this->GetClient(address);
 		if (rpcClient == nullptr)
 		{
 			return nullptr;

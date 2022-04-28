@@ -24,7 +24,7 @@ namespace Sentry
 namespace Sentry
 {
 	class ServiceMethod;
-	class ProtoRpcClient;
+	class ServerRpcClientContext;
 	class RpcServiceBase : public Component, public IServiceBase
 	{
 	 public:
@@ -58,7 +58,7 @@ namespace Sentry
 		virtual bool OnCallLocal(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response>) = 0;
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
 	protected:
-		std::shared_ptr<ProtoRpcClient> GetClient(const std::string & address);
+		std::shared_ptr<ServerRpcClientContext> GetClient(const std::string & address);
 	 protected:
 		std::string mLocalAddress;
 		class RpcComponent* mRpcComponent;

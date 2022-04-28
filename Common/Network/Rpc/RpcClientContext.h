@@ -24,11 +24,11 @@ namespace Sentry
 
 namespace Sentry
 {
-	class RpcClient : public std::enable_shared_from_this<RpcClient>
+	class RpcClientContext : public std::enable_shared_from_this<RpcClientContext>
 	{
 	 public:
-		explicit RpcClient(std::shared_ptr<SocketProxy> socket, SocketType type);
-		virtual ~RpcClient() = default;
+		explicit RpcClientContext(std::shared_ptr<SocketProxy> socket, SocketType type);
+		virtual ~RpcClientContext() = default;
 	 public:
 		void StartReceive();
 		inline bool IsConnected()

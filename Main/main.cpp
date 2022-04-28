@@ -79,6 +79,7 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalSubService>("LocalSubService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
+#include"Any/Any.h"
 
 int main(int argc, char **argv)
 {

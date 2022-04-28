@@ -58,8 +58,8 @@ namespace Sentry
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
 		{
-			std::shared_ptr<ProtoRpcClient> tcpSession(
-				new ProtoRpcClient(this, socket, SocketType::RemoteSocket));
+			std::shared_ptr<ServerRpcClientContext> tcpSession(
+				new ServerRpcClientContext(this, socket, SocketType::RemoteSocket));
 
 			tcpSession->StartReceive();
 			assert(!address.empty());
@@ -104,9 +104,9 @@ namespace Sentry
 		this->mRpcComponent->OnResponse(response);
 	}
 
-	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetOrCreateSession(const std::string& address)
+	std::shared_ptr<ServerRpcClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)
 	{
-		std::shared_ptr<ProtoRpcClient> localSession = this->GetSession(address);
+		std::shared_ptr<ServerRpcClientContext> localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -120,13 +120,13 @@ namespace Sentry
 		unsigned short port = 0;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
-		localSession = make_shared<ProtoRpcClient>(this, socketProxy, SocketType::LocalSocket);
+		localSession = make_shared<ServerRpcClientContext>(this, socketProxy, SocketType::LocalSocket);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
 	}
 
-	std::shared_ptr<ProtoRpcClient> RpcClientComponent::GetSession(const std::string& address)
+	std::shared_ptr<ServerRpcClientContext> RpcClientComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())

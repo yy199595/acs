@@ -4,7 +4,7 @@
 
 #include"GateComponent.h"
 #include"App/App.h"
-#include"NetWork/RpcGateClient.h"
+#include"NetWork/GateRpcClientContext.h"
 #include"Global/RpcConfig.h"
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcComponent.h"

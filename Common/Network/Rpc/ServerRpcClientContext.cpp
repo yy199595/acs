@@ -1,4 +1,4 @@
-﻿#include"ProtoRpcClient.h"
+﻿#include"ServerRpcClientContext.h"
 #include"App/App.h"
 #include<Component/Rpc/RpcClientComponent.h>
 #ifdef __DEBUG__
@@ -6,46 +6,46 @@
 #endif
 namespace Sentry
 {
-	ProtoRpcClient::ProtoRpcClient(RpcClientComponent* component,
+	ServerRpcClientContext::ServerRpcClientContext(RpcClientComponent* component,
 		std::shared_ptr<SocketProxy> socket, SocketType type)
-		: RpcClient(socket, type), mTcpComponent(component)
+		: RpcClientContext(socket, type), mTcpComponent(component)
 	{
 		this->mConnectCount = 0;
 		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
 
-	void ProtoRpcClient::StartClose()
+	void ServerRpcClientContext::StartClose()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->OnClientError(XCode::NetActiveShutdown);
 #else
-		this->mNetWorkThread.Invoke(&ProtoRpcClient::OnClientError, this, XCode::NetActiveShutdown);
+		this->mNetWorkThread.Invoke(&ServerRpcClientContext::OnClientError, this, XCode::NetActiveShutdown);
 #endif
 	}
 
-	void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Response> message)
+	void ServerRpcClientContext::SendToServer(std::shared_ptr<com::Rpc_Response> message)
 	{
 		std::shared_ptr<NetworkData> networkData(
 			new NetworkData(RPC_TYPE_RESPONSE, message));
 #ifdef ONLY_MAIN_THREAD
 		this->SendData(networkData);
 #else
-		this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&ServerRpcClientContext::SendData, this, networkData);
 #endif
 	}
 
-	void ProtoRpcClient::SendToServer(std::shared_ptr<com::Rpc_Request> message)
+	void ServerRpcClientContext::SendToServer(std::shared_ptr<com::Rpc_Request> message)
 	{
 		std::shared_ptr<NetworkData> networkData(
 			new NetworkData(RPC_TYPE_REQUEST, message));
 #ifdef ONLY_MAIN_THREAD
 		this->SendData(networkData);
 #else
-		this->mNetWorkThread.Invoke(&ProtoRpcClient::SendData, this, networkData);
+		this->mNetWorkThread.Invoke(&ServerRpcClientContext::SendData, this, networkData);
 #endif
 	}
 
-	void ProtoRpcClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
+	void ServerRpcClientContext::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
 	{
 		if (code != XCode::Successful)
 		{
@@ -53,7 +53,7 @@ namespace Sentry
 		}
 	}
 
-	void ProtoRpcClient::OnClientError(XCode code)
+	void ServerRpcClientContext::OnClientError(XCode code)
 	{
 		if (code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
 		{
@@ -69,7 +69,7 @@ namespace Sentry
 #endif
 	}
 
-	bool ProtoRpcClient::OnReceiveMessage(char type, const char* buffer, size_t size)
+	bool ServerRpcClientContext::OnReceiveMessage(char type, const char* buffer, size_t size)
 	{
 		switch(type)
 		{
@@ -82,7 +82,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool ProtoRpcClient::OnRequest(const char* buffer, size_t size)
+	bool ServerRpcClientContext::OnRequest(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
 		if (!requestData->ParseFromArray(buffer, size))
@@ -100,7 +100,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ProtoRpcClient::OnResponse(const char* buffer, size_t size)
+	bool ServerRpcClientContext::OnResponse(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
 		if (!responseData->ParseFromArray(buffer, size))
@@ -116,7 +116,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ProtoRpcClient::ConnectAsync()
+	bool ServerRpcClientContext::ConnectAsync()
 	{
 		AutoCoroutineLock lock(this->mConnectLock);
 		if(this->mSocketProxy->IsOpen())
@@ -128,7 +128,7 @@ namespace Sentry
 		return mConnectTask->Await() == XCode::Successful;
 	}
 
-	void ProtoRpcClient::OnConnect(XCode code)
+	void ServerRpcClientContext::OnConnect(XCode code)
 	{
 		this->mConnectCount++;
 		this->mConnectTask->SetResult(code);
