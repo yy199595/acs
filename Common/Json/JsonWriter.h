@@ -50,6 +50,7 @@ namespace Json
 		size_t GetJsonSize();
 		const std::string ToJsonString();
 		size_t WriterStream(std::ostream& os);
+		bool GetDocument(rapidjson::Document & jsonDocument);
 	 private:
 		const bool mIsObject;
 		rapidjson::StringBuffer mStringBuf;

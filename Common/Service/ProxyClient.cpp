@@ -30,7 +30,7 @@ namespace Sentry
         }
         for (int index = 0; index < 3; index++)
         {
-            if(this->mNodeClient->ConnectAsync()->Await())
+            if(this->mNodeClient->ConnectAsync())
             {
                 return true;
             }

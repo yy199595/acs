@@ -46,11 +46,10 @@ MysqlSelectDbFailure	Mysql选择数据库失败
 MysqlInvokeFailure	Mysql执行sql语句失败
 SaveToMysqlFailure	保存数据到Mysql失败
 SaveToRedisFailure	保存数据到Redis失败
-RedisNotInCoroutine	Redis没有协程上下文
-RedisStartTaskFail	Redis任务启动失败
-RedisSocketIsNull	Redis连接是空
+RedisAuthFailure	Redis用户验证失败
+RedisSocketError	Redis网络错误
 RedisReplyIsNull	Redis回复是空
-RedisInvokeFailure	Redis命令执行失败
+RedisInvokeError	Redis命令执行失败
 AccountAlreadyExists	账号已经存在
 AccountNotExists	账号不存在
 AddressAllotFailure	服务分配失败

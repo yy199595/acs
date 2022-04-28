@@ -138,12 +138,12 @@ namespace Sentry
 		for(size_t index = 0; index < 3; index++)
 		{
 			LOG_DEBUG(this->GetName() << " start connect [" << address << "]");
-			if(rpcClient->ConnectAsync()->Await())
+			if(rpcClient->ConnectAsync())
 			{
 				LOG_DEBUG(this->GetName() << " connect [" << address << "] successful");
 				return rpcClient;
 			}
-			App::Get()->GetTaskComponent()->Sleep(1000);
+			this->GetApp()->GetTaskComponent()->Sleep(1000);
 		}
 		return nullptr;
 	}

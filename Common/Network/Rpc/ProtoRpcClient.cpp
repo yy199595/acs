@@ -11,6 +11,7 @@ namespace Sentry
 		: RpcClient(socket, type), mTcpComponent(component)
 	{
 		this->mConnectCount = 0;
+		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
 
 	void ProtoRpcClient::StartClose()
@@ -115,24 +116,22 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<TaskSource<bool>> ProtoRpcClient::ConnectAsync()
+	bool ProtoRpcClient::ConnectAsync()
 	{
-		std::shared_ptr<TaskSource<bool>> taskSource
-			= std::make_shared<TaskSource<bool>>();
-		this->mConnectTasks.emplace(taskSource);
+		AutoCoroutineLock lock(this->mConnectLock);
+		if(this->mSocketProxy->IsOpen())
+		{
+			return true;
+		}
 		this->StartConnect();
-		return taskSource;
+		this->mConnectTask = std::make_shared<TaskSource<XCode>>();
+		return mConnectTask->Await() == XCode::Successful;
 	}
 
 	void ProtoRpcClient::OnConnect(XCode code)
 	{
 		this->mConnectCount++;
-		bool res = code == XCode::Successful;
-		while(!this->mConnectTasks.empty())
-		{
-			this->mConnectTasks.front()->SetResult(res);
-			this->mConnectTasks.pop();
-		}
+		this->mConnectTask->SetResult(code);
 		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnConnectAfter(address, code);

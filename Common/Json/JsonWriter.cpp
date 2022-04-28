@@ -199,4 +199,27 @@ namespace Json
 	{
 		return this->mJsonWriter.String(value.c_str(), value.size());
 	}
+
+	bool Writer::GetDocument(rapidjson::Document& jsonDocument)
+	{
+		if (this->mJsonWriter.IsComplete())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			return !jsonDocument.Parse(str, size).HasParseError();
+		}
+		if (this->mIsObject && this->mJsonWriter.EndObject())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			return !jsonDocument.Parse(str, size).HasParseError();
+		}
+		else if (this->mJsonWriter.EndArray())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			return !jsonDocument.Parse(str, size).HasParseError();
+		}
+		return false;
+	}
 }

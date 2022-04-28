@@ -9,10 +9,10 @@ namespace Sentry
 	{
 	 public:
 		MysqlProxyComponent() = default;
-
 		~MysqlProxyComponent() final = default;
+		MysqlProxyComponent(const MysqlProxyComponent &) = delete;
 
-	 public:
+	public:
 		XCode Add(const Message & data);
 
 		XCode Save(const Message & data);
@@ -34,7 +34,10 @@ namespace Sentry
 		std::vector<std::shared_ptr<T>> Sort(const std::string& field, int count, bool reverse = false);
 
 	 private:
+		bool LateAwake() final;
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response);
+	private:
+		class MysqlService * mMysqlService;
 	};
 
 	template<typename T>

@@ -8,8 +8,9 @@
 namespace Sentry
 {
     RedisRequest::RedisRequest(const std::string &cmd)
+		: mCommand(cmd)
     {
-        this->mCommand = std::move(cmd);
+
     }
 
     void RedisRequest::AddParameter(int value)
@@ -102,8 +103,40 @@ namespace Sentry
         this->mArray.emplace_back(str, size);
     }
 
-    const std::string &RedisResponse::GetValue(size_t index)
-    {
-        return this->mArray[index];
-    }
+	bool RedisResponse::GetString(string& value, size_t index)
+	{
+		if(index < 0 || index >= this->mArray.size())
+		{
+			return false;
+		}
+		value.clear();
+		value = this->mArray[index];
+		return true;
+	}
+}
+
+namespace Sentry
+{
+	std::shared_ptr<RedisRequest>
+	RedisRequest::MakeLua(const std::string& tag, const std::string& func,
+			std::list<std::string>& keys, std::list<std::string>& values)
+	{
+		std::shared_ptr<RedisRequest> request
+				= std::make_shared<RedisRequest>("EVALSHA");
+
+		request->AddParameter(tag);
+		request->AddParameter((int)keys.size() + 1);
+		request->AddParameter("func");
+		for (const std::string& key: keys)
+		{
+			request->AddParameter(key);
+		}
+
+		request->AddParameter(func);
+		for (const std::string& val: values)
+		{
+			request->AddParameter(val);
+		}
+		return request;
+	}
 }

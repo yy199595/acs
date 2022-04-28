@@ -19,7 +19,7 @@ else()
 endif()
 
 add_definitions(-D ASIO_STANDALONE)
-#add_definitions(-D ONLY_MAIN_THREAD)
+add_definitions(-D ONLY_MAIN_THREAD)
 file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc")
 file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "Protocol/*.cc")
 

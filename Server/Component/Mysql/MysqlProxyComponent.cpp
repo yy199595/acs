@@ -4,6 +4,11 @@
 #include"Component/Mysql/MysqlService.h"
 namespace Sentry
 {
+	bool MysqlProxyComponent::LateAwake()
+	{
+		this->mMysqlService = this->GetComponent<MysqlService>();
+		return this->mMysqlService != nullptr;
+	}
 	XCode MysqlProxyComponent::Add(const Message& data)
 	{
 		s2s::Mysql::Add request;
@@ -28,12 +33,11 @@ namespace Sentry
 	XCode MysqlProxyComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
 	{
 		std::string address;
-		LocalServerRpc * mysqlService = this->GetComponent<LocalServerRpc>("MysqlService");
-		if(mysqlService == nullptr || !mysqlService->AllotAddress(address))
+		if(!this->mMysqlService->AllotAddress(address))
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return mysqlService->Call(address, func, data, response);
+		return this->mMysqlService->Call(address, func, data, response);
 	}
 
 	std::shared_ptr<s2s::Mysql::Response> MysqlProxyComponent::Invoke(const std::string& sql)

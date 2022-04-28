@@ -7,11 +7,11 @@ namespace Sentry
 	class Entity : public Object, public std::enable_shared_from_this<Entity>
 	{
 	 public:
-		Entity(long long id);
+		explicit Entity(long long id);
+		explicit Entity(long long id, long long socketId);
 
-		Entity(long long id, long long socketId);
-
-		~Entity() override = default;
+		Entity(const Entity &) = delete;
+		virtual ~Entity() override = default;
 	 public:
 		template<typename T>
 		inline bool AddComponent();

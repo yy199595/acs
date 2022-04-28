@@ -237,6 +237,7 @@ function luaJson.ToTable(str)
 end
 
 function luaJson.ToJson(tab)
+    print("tab = ", tab)
     local str = "{"
     for k, v in pairs(tab) do
         if type(v) == "string" then

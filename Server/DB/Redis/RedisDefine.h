@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include"XCode/XCode.h"
+#include"Json/JsonWriter.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 
@@ -19,23 +20,48 @@ namespace Sentry
         REDIS_BIN_STRING,
 
     };
+	class RedisValue
+	{
+	public:
+		virtual bool IsLong() = 0;
+		virtual bool IsString() = 0;
+		virtual std::string & GetValue() = 0;
+	};
+
+	class RedisStringType : public RedisValue
+	{
+	public:
+		RedisStringType(const std::string & value);
+		RedisStringType(const char * str, size_t size);
+	public:
+		bool IsLong() final { return false; }
+		bool IsString() final { return true;}
+		std::string & GetValue() final { return this->mValue;}
+	private:
+		std::string mValue;
+	};
+
+	class RedisLongType : public RedisValue
+	{
+	private:
+
+	};
 }
 
 namespace Sentry
 {
-    class RedisRequest
+	class RedisRequest
     {
     public:
         RedisRequest(const std::string & cmd);
-
     public:
         void GetCommand(std::iostream & readStream) const;
 
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
-		template<typename ... Args>
-		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & method, Args &&... args);
+		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & func,
+				std::list<std::string> & keys, std::list<std::string> & values);
 
         template<typename ... Args>
         void InitParameter(Args &&... args);
@@ -45,7 +71,6 @@ namespace Sentry
         void AddParameter(long long value);
 		void AddParameter(const Message & message);
         void AddParameter(const std::string & value);
-		//void AddParameter(const std::string && value);
 	private:
         void Encode() {}
 
@@ -69,16 +94,6 @@ namespace Sentry
 		return request;
 	}
 
-	template<typename ... Args>
-	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const std::string& key, const std::string & method, Args && ... args)
-	{
-		int size = sizeof ...(Args) + 1;
-		std::shared_ptr<RedisRequest> request
-				= std::make_shared<RedisRequest>("EVALSHA");
-		request->InitParameter(key, size, method, std::forward<Args>(args)...);
-		return request;
-	}
-
     template<typename ... Args>
     void RedisRequest::InitParameter(Args &&...args)
     {
@@ -95,11 +110,11 @@ namespace Sentry
         void AddValue(const std::string & data);
         void AddValue(const char * str, size_t size);
 	 public:
-        const std::string & GetValue(size_t index = 0);
 		long long GetNumber() { return this->mNumber; }
 		RedisRespType GetType() { return this->mType; }
 		size_t GetArraySize() { return this->mArray.size();}
-        bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
+		bool GetString(std::string & value, size_t index = 0);
+		bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
     private:
         long long mNumber;
         RedisRespType mType;

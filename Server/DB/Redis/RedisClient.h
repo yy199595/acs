@@ -17,7 +17,7 @@ namespace Sentry
     public:
         RedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
     public:
-		bool StartConnect();
+		XCode StartConnect();
         bool IsOpen() const { return this->mSocket->IsOpen(); }
 		bool LoadLuaScript(const std::string & path, std::string & key);
 		long long GetLastOperatorTime() { return this->mLastOperatorTime;}
@@ -25,8 +25,7 @@ namespace Sentry
         void OnComplete();
         void StartReceive();
         void OnReceive(const asio::error_code & code, size_t size);
-        void ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource);
-
+        void ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource);
     public:
 
 		XCode WaitRedisResponse(std::shared_ptr<RedisResponse> response);
@@ -43,8 +42,9 @@ namespace Sentry
 		const RedisConfig * mConfig;
         char mReadTempBuffer[10240];
         long long mLastOperatorTime;
-		std::shared_ptr<CoroutineLock> mLock;
         std::shared_ptr<RedisResponse> mResponse;
+		std::shared_ptr<CoroutineLock> mConnectLock; //连接锁
+		std::shared_ptr<CoroutineLock> mCommandLock; //命令锁
 		std::shared_ptr<TaskSource<XCode>> mReadTaskSource;
     private:
         int mDataSize;

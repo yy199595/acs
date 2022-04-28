@@ -24,14 +24,11 @@ namespace Sentry
 		XCode Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response);
 
 		XCode Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response);
-
-	protected:
+	 private:
 		bool OnStart() final;
+		std::shared_ptr<MysqlClient> GetMysqlClient();
 		bool OnInitService(ServiceMethodRegister & methodRegister);
 	 private:
-		std::shared_ptr<MysqlClient> GetMysqlClient();
-	 private:
-		std::string mJson;
 		MysqlConfig mConfig;
 		MysqlHelper mHelper;
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;

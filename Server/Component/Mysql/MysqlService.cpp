@@ -7,7 +7,6 @@ namespace Sentry
 
 	bool MysqlService::OnInitService(ServiceMethodRegister & methodRegister)
 	{
-		const ServerConfig & config = this->GetApp()->GetConfig();
 		methodRegister.Bind("Add", &MysqlService::Add);
 		methodRegister.Bind("Save", &MysqlService::Save);
 		methodRegister.Bind("Query", &MysqlService::Query);
@@ -15,6 +14,7 @@ namespace Sentry
 		methodRegister.Bind("Delete", &MysqlService::Delete);
 		methodRegister.Bind("Invoke", &MysqlService::Invoke);
 
+		const ServerConfig & config = this->GetApp()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mConfig.mPort));
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mConfig.mUser));

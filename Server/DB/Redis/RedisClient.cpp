@@ -13,35 +13,38 @@ namespace Sentry
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mSocket = socket;
-		this->mLock = std::make_shared<CoroutineLock>();
+		this->mConnectLock = std::make_shared<CoroutineLock>();
+		this->mCommandLock = std::make_shared<CoroutineLock>();
 	}
 
-    bool RedisClient::StartConnect()
+    XCode RedisClient::StartConnect()
     {
-        std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+		AutoCoroutineLock lock(this->mConnectLock);
+		if(this->mSocket->IsOpen())
+		{
+			return XCode::Successful;
+		}
+		std::shared_ptr<TaskSource<XCode>> taskSource(new TaskSource<XCode>());
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectRedis(taskSource);
 #else
 		this->mNetworkThread.Invoke(&RedisClient::ConnectRedis, this, taskSource);
 #endif
-        if(!taskSource->Await())
-		{
-			return false;
-		}
-		if(!this->mConfig->Password.empty())
+		XCode code = taskSource->Await();
+		if(code == XCode::Successful && !this->mConfig->Password.empty())
 		{
 			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
 			std::shared_ptr<RedisRequest> request = RedisRequest::Make("AUTH", this->mConfig->Password);
 			if(this->Run(request, response) != XCode::Successful)
 			{
-				return false;
+				return XCode::RedisSocketError;
 			}
-			return response->IsOk();
+			return response->IsOk() ? XCode::Successful : XCode::RedisAuthFailure;
 		}
-		return true;
+		return code;
     }
 
-    void RedisClient::ConnectRedis(std::shared_ptr<TaskSource<bool>> taskSource)
+    void RedisClient::ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource)
     {
         AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
         auto address = asio::ip::make_address_v4(this->mConfig->Ip);
@@ -50,12 +53,13 @@ namespace Sentry
                 (const asio::error_code &code) {
             if (code)
             {
+				this->mSocket->Close();
+				taskSource->SetResult(XCode::RedisSocketError);
 				CONSOLE_LOG_ERROR(code.message());
-				taskSource->SetResult(false);
                 return;
             }
             this->mLineCount = 0;
-            taskSource->SetResult(true);
+            taskSource->SetResult(XCode::Successful);
         });
     }
 
@@ -65,7 +69,7 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		AutoCoroutineLock lock(this->mLock);
+		AutoCoroutineLock lock(this->mCommandLock);
 		this->mLastOperatorTime = Helper::Time::GetNowSecTime();
 		std::shared_ptr<TaskSource<XCode>> sendTaskSource(new TaskSource<XCode>());
 #ifdef __DEBUG__
@@ -73,7 +77,7 @@ namespace Sentry
 		LOG_WARN(json);
 #endif
 #ifdef ONLY_MAIN_THREAD
-		this->SendCommand(command, taskSource);
+		this->SendCommand(command, sendTaskSource);
 #else
 		this->mNetworkThread.Invoke(&RedisClient::SendCommand, this, command, sendTaskSource);
 #endif
@@ -81,7 +85,17 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		return this->WaitRedisResponse(response);
+		XCode code = this->WaitRedisResponse(response);
+		if(code == XCode::Successful && response->HasError())
+		{
+			std::string error;
+			if(response->GetString(error))
+			{
+				LOG_ERROR(error);
+			}
+			return XCode::RedisInvokeError;
+		}
+		return code;
 	}
 
      XCode RedisClient::WaitRedisResponse(std::shared_ptr<RedisResponse> response)
@@ -121,6 +135,7 @@ namespace Sentry
     {
         if (code)
         {
+			this->mSocket->Close();
 			CONSOLE_LOG_ERROR(code.message());
 			this->mReadTaskSource->SetResult(XCode::NetWorkError);
 			return;
@@ -240,13 +255,13 @@ namespace Sentry
 			LOG_ERROR("redis net work error load script failure");
 			return false;
 		}
-		if(response->HasError())
+		std::string error;
+		if(response->HasError() && response->GetString(error))
 		{
-			LOG_ERROR(response->GetValue());
+			LOG_ERROR(error);
 			return false;
 		}
-		key = response->GetValue();
-		return true;
+		return response->GetString(key);
 	}
 
 	void RedisClient::SendCommand(std::shared_ptr<RedisRequest> request, std::shared_ptr<TaskSource<XCode>> taskSource)
@@ -259,6 +274,7 @@ namespace Sentry
 		{
 			if(code)
 			{
+				this->mSocket->Close();
 				CONSOLE_LOG_ERROR(code.message());
 				taskSource->SetResult(XCode::NetWorkError);
 				return;

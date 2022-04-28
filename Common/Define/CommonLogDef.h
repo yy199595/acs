@@ -128,3 +128,10 @@ inline std::string FormatFileLine(const char * file, const int line)
 	ss << f << content;                \
 	LoggerComponent::AddErrorLog(ss.str());\
 }
+
+#define CONSOLE_LOG_FATAL(content){ \
+	std::string f = FormatFileLine(__FILE__, __LINE__); \
+	std::stringstream ss;                \
+	ss << f << content;                \
+	LoggerComponent::AddFatalLog(ss.str());\
+}

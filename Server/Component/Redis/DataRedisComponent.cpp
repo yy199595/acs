@@ -42,15 +42,23 @@ namespace Sentry
 		ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
-		const std::string & ip = config->Ip;
+		const std::string& ip = config->Ip;
 		unsigned short port = config->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
 		std::shared_ptr<RedisClient> redisCommandClient = std::make_shared<RedisClient>(socketProxy, config);
 
-		while(!redisCommandClient->StartConnect())
+		XCode code = redisCommandClient->StartConnect();
+		if (code == XCode::RedisAuthFailure)
+		{
+			LOG_ERROR(config->Address << " auth failure");
+			return nullptr;
+		}
+
+		while (code != XCode::Successful)
 		{
 			LOG_ERROR(config->Name << " connect redis [" << config->Address << "] failure");
 			this->mTaskComponent->Sleep(3000);
+			code = redisCommandClient->StartConnect();
 		}
 		LOG_INFO(config->Name << " connect redis [" << config->Address << "] successful");
 		return redisCommandClient;
