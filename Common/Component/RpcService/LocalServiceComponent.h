@@ -2,18 +2,18 @@
 // Created by mac on 2022/4/6.
 //
 
-#ifndef SERVER_LOCALSERVERRPC_H
-#define SERVER_LOCALSERVERRPC_H
-#include"RpcServiceBase.h"
+#ifndef SERVER_LOCALSERVICECOMPONENT_H
+#define SERVER_LOCALSERVICECOMPONENT_H
+#include"RemoteServiceComponent.h"
 #include"Method/MethodRegister.h"
 #include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry
 {
-	class LocalServerRpc : public RpcServiceBase
+	class LocalServiceComponent : public RemoteServiceComponent
 	{
 	public:
-		LocalServerRpc() = default;
+		LocalServiceComponent() = default;
 	protected:
 		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
 		bool OnCallLocal(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response>) override { return false;}
@@ -39,4 +39,4 @@ namespace Sentry
 		std::set<std::string> mRemoteAddressList;
 	};
 }
-#endif //SERVER_LOCALSERVERRPC_H
+#endif //SERVER_LOCALSERVICECOMPONENT_H

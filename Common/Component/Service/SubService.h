@@ -17,7 +17,7 @@ namespace Sentry
 		virtual ~SubService() = default;
 	 public:
 		void GetSubMethods(std::vector<std::string>& methods);
-		bool Invoke(const std::string& func, const Json::Reader & jsonReader);
+		XCode Invoke(const std::string& func, const Json::Reader & jsonReader, Json::Writer & response);
 	public:
 		bool IsStartComplete() final { return true; }
 		bool Publish(const std::string & func, Json::Writer & jsonWriter);

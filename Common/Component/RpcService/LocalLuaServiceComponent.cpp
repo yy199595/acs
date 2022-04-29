@@ -1,4 +1,4 @@
-﻿#include"LuaRpcService.h"
+﻿#include"LocalLuaServiceComponent.h"
 #include"Script/Table.h"
 #include"Script/Function.h"
 #include"Method/LuaServiceMethod.h"
@@ -7,18 +7,18 @@
 
 namespace Sentry
 {
-	LuaRpcService::LuaRpcService()
+	LocalLuaServiceComponent::LocalLuaServiceComponent()
 		: mLuaEnv(nullptr)
 	{
 
 	}
 
-	LuaRpcService::~LuaRpcService()
+	LocalLuaServiceComponent::~LocalLuaServiceComponent()
 	{
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LuaRpcService::OnInitService(ServiceMethodRegister & methodRegister)
+	bool LocalLuaServiceComponent::OnInitService(ServiceMethodRegister & methodRegister)
 	{
 		std::vector<std::string> methods;
 		const char * tab = this->GetName().c_str();
@@ -44,9 +44,9 @@ namespace Sentry
 	}
 
 
-	bool LuaRpcService::LateAwake()
+	bool LocalLuaServiceComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalServerRpc::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
 		std::shared_ptr<Lua::Table> luaTable = Lua::Table::Create(this->mLuaEnv, this->GetName());
@@ -67,7 +67,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaRpcService::OnStart()
+	bool LocalLuaServiceComponent::OnStart()
 	{
 		const char * tab = this->GetName().c_str();
 		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");

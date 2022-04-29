@@ -2,7 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Component/RpcService/LuaRpcService.h"
+#include"Component/RpcService/LocalLuaServiceComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -51,7 +51,7 @@ namespace Sentry
 				}
 				if (!this->AddComponentByName(name))
 				{
-					LuaRpcService* luaRpcService = new LuaRpcService();
+					LocalLuaServiceComponent* luaRpcService = new LocalLuaServiceComponent();
 					if(!this->AddComponent(name, luaRpcService))
 					{
 						LOG_ERROR("add " << name << " failure");
@@ -82,7 +82,7 @@ namespace Sentry
 		}
 		if(this->GetComponent<LuaScriptComponent>() != nullptr)
 		{
-			LuaRpcService* luaRpcService = new LuaRpcService();
+			LocalLuaServiceComponent* luaRpcService = new LocalLuaServiceComponent();
 			return this->AddComponent(name, luaRpcService);
 		}
 		return false;
@@ -183,7 +183,7 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				IStart* startComponent = component->Cast<IStart>();
-				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
+				LocalServiceComponent* localServerRpc = component->Cast<LocalServiceComponent>();
 				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
 					continue;
@@ -207,7 +207,7 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
-				LocalServerRpc* localServerRpc = component->Cast<LocalServerRpc>();
+				LocalServiceComponent* localServerRpc = component->Cast<LocalServiceComponent>();
 				if (localServerRpc == nullptr || localServerRpc->IsStartService())
 				{
 					IComplete* complete = component->Cast<IComplete>();

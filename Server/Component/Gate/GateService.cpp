@@ -30,7 +30,7 @@ namespace Sentry
 
 	bool GateService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalServerRpc::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return true;
 	}

@@ -13,15 +13,15 @@
 namespace Sentry
 {
 	template<typename T>
-	using JsonSubFunction = void (T::*)(const Json::Reader& rapidJsonReader);
+	using JsonSubFunction = XCode(T::*)(const Json::Reader& rapidJsonReader);
 
 	template<typename T>
-	using JsonSubFunction2 = void (T::*)(const Json::Reader& rapidJsonReader, Json::Writer & jsonWriter);
+	using JsonSubFunction2 = XCode(T::*)(const Json::Reader& rapidJsonReader, Json::Writer & jsonWriter);
 
 	class SubMethod
 	{
 	 public:
-		virtual void OnPublish(const Json::Reader & jsonReader) = 0;
+		virtual XCode OnPublish(const Json::Reader & jsonReader, Json::Writer & response) = 0;
 	};
 
 	template<typename T>
@@ -29,19 +29,31 @@ namespace Sentry
 	{
 	 public:
 		JsonSubMethod(T* obj, JsonSubFunction<T> func)
-			: mObj(obj), mFunction(func)
-		{
-
-		}
-
+			: mObj(obj), mFunction(func) { }
 	 public:
-		void OnPublish(const Json::Reader & jsonReader) final
+		XCode OnPublish(const Json::Reader & jsonReader, Json::Writer & response) final
 		{
-			(this->mObj->*mFunction)(jsonReader);
+			return (this->mObj->*mFunction)(jsonReader);
 		}
 	 private:
 		T* mObj;
 		JsonSubFunction<T> mFunction;
+	};
+
+	template<typename T>
+	class JsonSubMethod2 : public SubMethod
+	{
+	public:
+		JsonSubMethod2(T* obj, JsonSubFunction2<T> func)
+				: mObj(obj), mFunction(func) { }
+	public:
+		XCode OnPublish(const Json::Reader &jsonReader, Json::Writer &response)final
+		{
+			return (this->mObj->*mFunction)(jsonReader, response);
+		}
+	private:
+		T* mObj;
+		JsonSubFunction2<T> mFunction;
 	};
 }
 #endif //GAMEKEEPER_SUBMETHOD_H

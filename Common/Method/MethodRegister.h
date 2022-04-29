@@ -119,6 +119,17 @@ namespace Sentry
 			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this->mObj, func));
 			return true;
 		}
+		template<typename T>
+		bool Bind(std::string name, JsonSubFunction2<T> func)
+		{
+			auto iter = this->mSubMethodMap.find(name);
+			if (iter != this->mSubMethodMap.end())
+			{
+				return false;
+			}
+			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod2<T>>((T*)this->mObj, func));
+			return true;
+		}
 
 	public:
 		void GetMethods(std::vector<std::string>& methods);

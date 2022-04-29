@@ -5,9 +5,9 @@
 #include"Other/MultiThreadQueue.h"
 namespace Sentry
 {
-	class RpcServiceBase;
+	class RemoteServiceComponent;
 
-	class LuaRpcService;
+	class LocalLuaServiceComponent;
 
 	class ServiceMethod;
 

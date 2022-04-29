@@ -30,8 +30,8 @@ namespace Sentry
     public:
         RedisRequest(const std::string & cmd);
     public:
+		const std::string ToJson() const;
         void GetCommand(std::iostream & readStream) const;
-
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
@@ -40,8 +40,7 @@ namespace Sentry
 
         template<typename ... Args>
         void InitParameter(Args &&... args);
-    public:
-		const std::string ToJson();
+	private:
         void AddParameter(int value);
         void AddParameter(long long value);
 		void AddParameter(const Message & message);
@@ -57,7 +56,7 @@ namespace Sentry
         }
     private:
         std::string mCommand;
-        std::vector<std::string> mParameters;
+        std::list<std::string> mParameters;
     };
 
 	template<typename ... Args>
@@ -77,9 +76,10 @@ namespace Sentry
 
     class RedisResponse
     {
+	public:
+		RedisResponse();
     public:
         bool IsOk();
-        RedisResponse();
         void AddValue(long long value);
         void AddValue(RedisRespType type);
         void AddValue(const std::string & data);

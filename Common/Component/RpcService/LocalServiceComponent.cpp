@@ -2,7 +2,7 @@
 // Created by mac on 2022/4/6.
 //
 
-#include"LocalServerRpc.h"
+#include"LocalServiceComponent.h"
 #include"App/App.h"
 #include"Global/RpcConfig.h"
 #include"Method/LuaServiceMethod.h"
@@ -86,13 +86,13 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool LocalServerRpc::LateAwake()
+	bool LocalServiceComponent::LateAwake()
 	{
 		this->mUserService = this->GetComponent<UserSubService>();
-		return RpcServiceBase::LateAwake();
+		return RemoteServiceComponent::LateAwake();
 	}
 
-	std::shared_ptr<com::Rpc_Response> LocalServerRpc::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
+	std::shared_ptr<com::Rpc_Response> LocalServiceComponent::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
 	{
 		assert(this->IsStartService());
 		std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
@@ -124,7 +124,7 @@ namespace Sentry
 		return response;
 	}
 
-	bool LocalServerRpc::LoadService()
+	bool LocalServiceComponent::LoadService()
 	{
 		if(this->mMethodRegister == nullptr)
 		{
@@ -143,7 +143,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalServerRpc::AddEntity(long long id, const std::string & address, bool publish)
+	bool LocalServiceComponent::AddEntity(long long id, const std::string & address, bool publish)
 	{
 		if(!publish)
 		{
@@ -159,16 +159,29 @@ namespace Sentry
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("user_id", id);
 		jsonWriter.AddMember("address", address);
-		jsonWriter.AddMember("service", "GateService");
+		jsonWriter.AddMember("service", this->GetName());
 		return this->mUserService->Publish("AddUser", jsonWriter);
 	}
 
-	bool LocalServerRpc::DelEntity(long long id, bool publish)
+	bool LocalServiceComponent::DelEntity(long long id, bool publish)
 	{
-		return true;
+		if(!publish)
+		{
+			auto iter = this->mUserAddressMap.find(id);
+			if (iter != this->mUserAddressMap.end())
+			{
+				this->mUserAddressMap.erase(iter);
+			}
+			LOG_INFO(this->GetName() << " del " << id);
+			return true;
+		}
+		Json::Writer jsonWriter;
+		jsonWriter.AddMember("user_id", id);
+		jsonWriter.AddMember("service", this->GetName());
+		return this->mUserService->Publish("DelUser", jsonWriter);
 	}
 
-	bool LocalServerRpc::AllotAddress(string& address) const
+	bool LocalServiceComponent::AllotAddress(string& address) const
 	{
 		if(this->mRemoteAddressList.empty())
 		{
@@ -182,7 +195,7 @@ namespace Sentry
 		return false;
 	}
 
-	void LocalServerRpc::OnDelAddress(const string& address)
+	void LocalServiceComponent::OnDelAddress(const string& address)
 	{
 		auto iter = this->mRemoteAddressList.find(address);
 		if(iter != this->mRemoteAddressList.end())
@@ -191,13 +204,13 @@ namespace Sentry
 			LOG_WARN("{0} delete address " << this->GetName() << '.' << address);
 		}
 	}
-	void LocalServerRpc::OnAddAddress(const string& address)
+	void LocalServiceComponent::OnAddAddress(const string& address)
 	{
 		assert(!address.empty());
 		this->mRemoteAddressList.insert(address);
 		LOG_ERROR(this->GetName() << " add address " << address);
 	}
-	bool LocalServerRpc::GetEntityAddress(long long int id, string& address)
+	bool LocalServiceComponent::GetEntityAddress(long long int id, string& address)
 	{
 		auto iter = this->mUserAddressMap.find(id);
 		if(iter != this->mUserAddressMap.end())

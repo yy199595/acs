@@ -10,7 +10,7 @@
 #include"Component/Rpc/RpcComponent.h"
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
-#include"Component/RpcService/LocalServerRpc.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
@@ -88,7 +88,7 @@ namespace Sentry
 //			LOG_INFO("json = " << json);
 //		}
 //#endif
-		if(this->GetComponent<LocalServerRpc>(config->Service) == nullptr)
+		if(this->GetComponent<LocalServiceComponent>(config->Service) == nullptr)
 		{
 			return XCode::CallServiceNotFound;
 		}
@@ -175,7 +175,7 @@ namespace Sentry
 			return;
 		}
 		std::string address;
-		LocalServerRpc* localServerRpc = this->GetComponent<LocalServerRpc>(config->Service);
+		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
 		if (!localServerRpc->GetEntityAddress(userId, address))
 		{
 			localServerRpc->AllotAddress(address);

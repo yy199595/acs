@@ -46,7 +46,6 @@ namespace Lua
 			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
 			lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
 			mRefFunctions.emplace(name, ref);
-			printf("add lua function : %s.%s\n", tab, func);
 			return true;
 		}
 		return false;

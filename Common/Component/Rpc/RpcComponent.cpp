@@ -1,5 +1,5 @@
 ﻿#include"RpcComponent.h"
-#include<Component/RpcService/LocalServerRpc.h>
+#include<Component/RpcService/LocalServiceComponent.h>
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
@@ -39,7 +39,7 @@ namespace Sentry
 		}
 
 		const std::string& service = protocolConfig->Service;
-		LocalServerRpc * logicService = this->GetComponent<LocalServerRpc>(service);
+		LocalServiceComponent * logicService = this->GetComponent<LocalServiceComponent>(service);
 		if (logicService == nullptr)
 		{
 			LOG_ERROR("call service not exist : [" << service << "]");

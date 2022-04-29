@@ -73,8 +73,8 @@ namespace Sentry
 		this->mLastOperatorTime = Helper::Time::GetNowSecTime();
 		std::shared_ptr<TaskSource<XCode>> sendTaskSource(new TaskSource<XCode>());
 #ifdef __DEBUG__
-		std::string json = command->ToJson();
-		LOG_WARN(json);
+//		std::string json = command->ToJson();
+//		LOG_WARN(json);
 #endif
 #ifdef ONLY_MAIN_THREAD
 		this->SendCommand(command, sendTaskSource);

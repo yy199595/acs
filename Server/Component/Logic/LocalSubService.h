@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include"Json/JsonWriter.h"
+#include"XCode/XCode.h"
 #include"Component/Service/SubService.h"
 using namespace com;
 namespace Sentry
 {
-	class LocalServerRpc;
+	class LocalServiceComponent;
 
 	class RpcComponent;
 
@@ -25,10 +25,10 @@ namespace Sentry
 		void OnDelService(Component *component) final;
 		bool OnInitService(SubServiceRegister &methodRegister) final;
 	 private:
-		void Add(const Json::Reader& jsonReader);
-		void Push(const Json::Reader& jsonReader);
-		void Remove(const Json::Reader& jsonReader);
-	 private:
+		XCode Add(const Json::Reader& jsonReader);
+		XCode Remove(const Json::Reader& jsonReader);
+		XCode Push(const Json::Reader& jsonReader, Json::Writer & response);
+	private:
 		int mAreaId;
 		std::string mNodeName;
 	};

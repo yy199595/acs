@@ -3,7 +3,7 @@
 //
 
 #include"UserSubService.h"
-#include"Component/RpcService/LocalServerRpc.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
 	bool UserSubService::OnInitService(SubServiceRegister& methodRegister)
@@ -19,7 +19,7 @@ namespace Sentry
 		std::string service = "";
 		jsonReader.GetMember("user_id", userId);
 		jsonReader.GetMember("service", service);
-		LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(service);
+		LocalServiceComponent * localServerRpc = this->GetComponent<LocalServiceComponent>(service);
 		if(localServerRpc != nullptr)
 		{
 			localServerRpc->DelEntity(userId);
@@ -34,7 +34,7 @@ namespace Sentry
 		jsonReader.GetMember("user_id", userId);
 		jsonReader.GetMember("address", address);
 		jsonReader.GetMember("service", service);
-		LocalServerRpc * localServerRpc = this->GetComponent<LocalServerRpc>(service);
+		LocalServiceComponent * localServerRpc = this->GetComponent<LocalServiceComponent>(service);
 		if(localServerRpc != nullptr)
 		{
 			localServerRpc->AddEntity(userId, address);

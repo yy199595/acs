@@ -25,12 +25,12 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class ServerRpcClientContext;
-	class RpcServiceBase : public Component, public IServiceBase
+	class RemoteServiceComponent : public Component, public IServiceBase
 	{
 	 public:
-		RpcServiceBase() = default;
+		RemoteServiceComponent() = default;
 
-		~RpcServiceBase() override = default;
+		~RemoteServiceComponent() override = default;
 	 public:
 		virtual XCode Call(const std::string& address, const std::string& func);
 

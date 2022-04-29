@@ -3,11 +3,11 @@
 #include"Protocol/s2s.pb.h"
 #include"DB/Mysql/MysqlClient.h"
 #include"DB/Mysql/MysqlHelper.h"
-#include"Component/RpcService/LocalServerRpc.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 
 namespace Sentry
 {
-	class MysqlService : public LocalServerRpc, public IStart
+	class MysqlService : public LocalServiceComponent, public IStart
 	{
 	 public:
 		MysqlService() = default;

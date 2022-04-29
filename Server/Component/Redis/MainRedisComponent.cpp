@@ -73,20 +73,7 @@ namespace Sentry
 			LOG_INFO("load redis script " << path << " successful");
 		}
 
-		auto iter = this->mLuaCommandMap.begin();
-		for(; iter != this->mLuaCommandMap.end(); iter++)
-		{
-			const std::string & file = iter->first;
-			const std::string & value = iter->second;
-			std::shared_ptr<RedisResponse> response(new RedisResponse());
-			std::shared_ptr<RedisRequest> request = RedisRequest::Make("HSET", "lua", file, value);
-			if(this->mRedisClient->Run(request, response) != XCode::Successful)
-			{
-				return false;
-			}
-		}
-
-		this->SubscribeMessage();
+		LOG_CHECK_RET_FALSE(this->SubscribeMessage());
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
 		return true;
@@ -177,16 +164,11 @@ namespace Sentry
 			LOG_ERROR("redis net work error sub " << channel << " failure");
 			return false;
 		}
-		if(response->GetNumber() > 0)
-		{
-			LOG_INFO("subscribe channel [" << channel << "] successful");
-			return true;
-		}
-		LOG_ERROR("subscribe channel [" << channel << "] failure : " << response->GetNumber());
-		return false;
+		LOG_INFO("subscribe channel [" << channel << "] successful");
+		return true;
 	}
 
-	void MainRedisComponent::SubscribeMessage()
+	bool MainRedisComponent::SubscribeMessage()
 	{
 		std::vector<Component *> components;
 		this->GetApp()->GetComponents(components);
@@ -200,11 +182,14 @@ namespace Sentry
 				for (const std::string& name : methods)
 				{
 					const std::string& service = subService->GetName();
-					this->SubscribeChannel(fmt::format("{0}.{1}", service, name));
+					if(!this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
+					{
+						return false;
+					}
 				}
 			}
 		}
-		this->SubscribeChannel(this->mRpcAddress);
+		return this->SubscribeChannel(this->mRpcAddress);
 	}
 
 	void MainRedisComponent::StartPubSub()
@@ -232,76 +217,83 @@ namespace Sentry
 			}
 			std::shared_ptr<RedisResponse> redisResponse(new RedisResponse());
 			XCode code = this->mSubRedisClient->WaitRedisResponse(redisResponse);
-			if (code != XCode::Successful)
+			if (code != XCode::Successful || redisResponse->HasError())
 			{
 				LOG_FATAL("sub redis client error");
 				continue;
 			}
 
 			std::string type;
-			if (!redisResponse->HasError() && redisResponse->GetArraySize() == 3 &&
-				redisResponse->GetString(type) && type == "message")
+			if (redisResponse->GetArraySize() == 3 && redisResponse->GetString(type) && type == "message")
 			{
 				std::string channel, message;
 				redisResponse->GetString(channel, 1);
 				redisResponse->GetString(message, 2);
-#ifdef __DEBUG__
-				LOG_DEBUG("========= subscribe message =============");
-				LOG_DEBUG("channel = " << channel);
-				LOG_DEBUG("message = " << message);
-#endif
-				if (!this->HandlerSubMessage(channel, message))
+				if (message[0] == '+') //请求
 				{
-					LOG_FATAL(channel << " handler failure");
+					XCode code = XCode::ParseJsonFailure;
+					std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
+					std::shared_ptr<com::Sub::Request> request(new com::Sub::Request());
+					std::shared_ptr<com::Sub::Response> response(new com::Sub::Response());
+					if (request->ParseFromArray(message.c_str() + 1, message.size() - 1))
+					{
+						response->set_rpc_id(request->rpc_id());
+						code = this->OnRequest(*request, *jsonResponse);
+					}
+					std::string result = "-";
+					response->set_code((int)code);
+					response->set_json(jsonResponse->ToJsonString());
+					if (response->AppendPartialToString(&result))
+					{
+						this->Publish(request->channel(), result);
+					}
+				}
+				else if (message[0] == '-') //回复
+				{
+					std::shared_ptr<com::Sub::Response> response(new com::Sub::Response());
+					if (response->ParseFromArray(message.c_str() + 1, message.size() - 1))
+					{
+						this->OnResponse(*response);
+					}
+				}
+				else if(message[0] == '=') // 广播
+				{
+
 				}
 			}
 		}
 
 	}
 
-	bool MainRedisComponent::HandlerSubMessage(const std::string& channel, const std::string & message)
+	XCode MainRedisComponent::OnRequest(const com::Sub::Request& request, Json::Writer& response)
 	{
-		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		if (!jsonReader->ParseJson(message))
-		{
-			LOG_ERROR("parse sub message error");
-			return false;
-		}
 
-		std::string service;
-		std::string funcName;
-		if (channel == this->mRpcAddress)
-		{
-			std::string fullName;
-			jsonReader->GetMember("func", fullName);
-			size_t pos = fullName.find('.');
-			if (pos == std::string::npos)
-			{
-				LOG_ERROR(fullName << " parse error");
-				return false;
-			}
-			service = fullName.substr(0, pos);
-			funcName = fullName.substr(pos + 1);
-		}
-		else
-		{
-			size_t pos = channel.find('.');
-			if (pos == std::string::npos)
-			{
-				LOG_ERROR(channel << " parse error");
-				return false;
-			}
-			service = channel.substr(0, pos);
-			funcName = channel.substr(pos + 1);
-		}
+	}
 
+	XCode MainRedisComponent::OnResponse(com::Sub::Response& response)
+	{
+
+	}
+
+
+	XCode MainRedisComponent::HandlerSubMessage(std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer>& response)
+	{
+		std::string fullName;
+		request->GetMember("func", fullName);
+		size_t pos = fullName.find('.');
+		if (pos == std::string::npos)
+		{
+			LOG_ERROR(fullName << " parse error");
+			return XCode::CallFunctionNotExist;
+		}
+		std::string service = fullName.substr(0, pos);
+		std::string funcName = fullName.substr(pos + 1);
 		SubService* subService = this->GetComponent<SubService>(service);
 		if (subService == nullptr)
 		{
-			LOG_ERROR("not find " << service);
-			return false;
+			return XCode::CallServiceNotFound;
 		}
-		return subService->Invoke(funcName, *jsonReader);
+		return subService->Invoke(funcName, *request, *response);
 	}
 
 	long long MainRedisComponent::AddCounter(const string& key)

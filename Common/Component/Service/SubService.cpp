@@ -52,10 +52,7 @@ namespace Sentry
 
 	bool SubService::Invoke(const std::string& func, const Json::Reader & jsonReader)
 	{
-		if(this->mServiceRegister == nullptr)
-		{
-			return false;
-		}
+		LOG_CHECK_RET_FALSE(this->IsStartService());
 		std::shared_ptr<SubMethod> subMethod = this->mServiceRegister->GetMethod(func);
 		if(subMethod != nullptr)
 		{
@@ -64,6 +61,27 @@ namespace Sentry
 		}
 		return false;
 	}
+
+	XCode SubService::Invoke(const std::string& func, const Json::Reader& jsonReader, Json::Writer& response)
+	{
+		if(!this->IsStartService())
+		{
+			return XCode::CallServiceNotFound;
+		}
+		std::shared_ptr<SubMethod> subMethod = this->mServiceRegister->GetMethod(func);
+		if(subMethod == nullptr)
+		{
+			return XCode::CallFunctionNotExist;
+		}
+		if(subMethod != nullptr)
+		{
+			subMethod->OnPublish(jsonReader, response);
+			return true;
+		}
+		return false;
+	}
+
+
 
 	bool SubService::LoadService()
 	{

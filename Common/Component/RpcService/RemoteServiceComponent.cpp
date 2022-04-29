@@ -1,4 +1,4 @@
-﻿#include"RpcServiceBase.h"
+﻿#include"RemoteServiceComponent.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/RpcConfig.h"
@@ -9,7 +9,7 @@
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/Rpc/RpcComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
-#include"Component/RpcService/LocalServerRpc.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 
 namespace Sentry
 {
@@ -32,14 +32,14 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool RpcServiceBase::LateAwake()
+	bool RemoteServiceComponent::LateAwake()
 	{
 		this->mRpcComponent = this->GetComponent<RpcComponent>();
 		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
 	}
 
-	std::shared_ptr<com::Rpc::Request> RpcServiceBase::NewRpcRequest(const std::string& func, long long userId, const Message* message)
+	std::shared_ptr<com::Rpc::Request> RemoteServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
 		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
 		string name = fmt::format("{0}.{1}", this->GetName(), func);
@@ -65,7 +65,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode RpcServiceBase::Call(const std::string & address, const string& func)
+	XCode RemoteServiceComponent::Call(const std::string & address, const string& func)
 	{
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
 		if(rpcRequest == nullptr)
@@ -76,7 +76,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode RpcServiceBase::Call(const std::string & address, const string& func, const Message& message)
+	XCode RemoteServiceComponent::Call(const std::string & address, const string& func, const Message& message)
 	{
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, &message);
 		if(rpcRequest == nullptr)
@@ -87,7 +87,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode RpcServiceBase::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
+	XCode RemoteServiceComponent::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
@@ -107,7 +107,7 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	XCode RpcServiceBase::Call(const std::string & address, const string& func, const Message& message,
+	XCode RemoteServiceComponent::Call(const std::string & address, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
@@ -128,7 +128,7 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	std::shared_ptr<ServerRpcClientContext> RpcServiceBase::GetClient(const std::string& address)
+	std::shared_ptr<ServerRpcClientContext> RemoteServiceComponent::GetClient(const std::string& address)
 	{
 		std::shared_ptr<ServerRpcClientContext> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
 		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
@@ -148,7 +148,7 @@ namespace Sentry
 		return nullptr;
 	}
 
-	std::shared_ptr<com::Rpc::Response> RpcServiceBase::StartCall(const std::string & address,
+	std::shared_ptr<com::Rpc::Response> RemoteServiceComponent::StartCall(const std::string & address,
 			std::shared_ptr<com::Rpc::Request> request)
 	{
 		if(address == this->mLocalAddress)
@@ -179,7 +179,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode RpcServiceBase::Call(const std::string& func, long long userId)
+	XCode RemoteServiceComponent::Call(const std::string& func, long long userId)
 	{
 		std::string address;
 		if(!this->GetEntityAddress(userId, address))
@@ -195,7 +195,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode RpcServiceBase::Call(const std::string& func, long long userId, const Message& message)
+	XCode RemoteServiceComponent::Call(const std::string& func, long long userId, const Message& message)
 	{
 		std::string address;
 		if(!this->GetEntityAddress(userId, address))
@@ -211,7 +211,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode RpcServiceBase::Call(const std::string& func, long long userId, std::shared_ptr<Message> response)
+	XCode RemoteServiceComponent::Call(const std::string& func, long long userId, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);
@@ -236,7 +236,7 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	XCode RpcServiceBase::Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response)
+	XCode RemoteServiceComponent::Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);

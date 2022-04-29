@@ -1,8 +1,8 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/RpcServiceBase.h"
+#include"Component/RpcService/RemoteServiceComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
-#include"Component/RpcService/LocalServerRpc.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 #include"Network/Listener/TcpServerComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
@@ -103,7 +103,7 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{
-			if(this->GetComponent<LocalServerRpc>(name) != nullptr)
+			if(this->GetComponent<LocalServiceComponent>(name) != nullptr)
 			{
 				response.emplace_back(name);
 			}

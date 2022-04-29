@@ -118,6 +118,11 @@ namespace Json
 		return false;
 	}
 
+	bool Reader::HasMember(const char* key)
+	{
+		return this->GetJsonValue(key) != nullptr;
+	}
+
 	bool Reader::GetMember(const char* key, long long& value) const
 	{
 		const rapidjson::Value * jsonValue = this->GetJsonValue(key);

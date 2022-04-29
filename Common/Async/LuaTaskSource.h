@@ -9,6 +9,7 @@
 #include"Script/LuaParameter.h"
 namespace Sentry
 {
+	// 在c++中等待lua完成
 	class LuaTaskSource final : public TaskSourceBase
 	{
 	 public:

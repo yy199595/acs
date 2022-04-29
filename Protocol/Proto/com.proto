@@ -76,3 +76,21 @@ message Rpc
           string token = 1;
      }
 }
+
+message Sub
+{
+     message Request
+     {
+          string func = 1;
+          int64 rpc_id = 2;
+          string channel = 3;
+          string json = 4;
+     }
+     message Response
+     {
+          int32 code = 1;
+          int64 rpc_id = 2;
+          string error = 3;
+          string json = 4;
+     }
+}

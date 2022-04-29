@@ -52,7 +52,7 @@ namespace Sentry
 		}
     }
 
-	const std::string RedisRequest::ToJson()
+	const std::string RedisRequest::ToJson() const
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.StartArray(this->mCommand.c_str());
