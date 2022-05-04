@@ -1,44 +1,45 @@
 {
     "MysqlService": {
         "Add": {
-            "Id":101,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.Mysql.Add",
-            "Response":"s2s.Mysql.Response"
+            "Id": 101,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Add",
+            "Response": "s2s.Mysql.Response",
+            "Channel": "RpcClientComponent"
         },
         "Save": {
-            "Id":102,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.Mysql.Save",
-            "Response":"s2s.Mysql.Response"
+            "Id": 102,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Save",
+            "Response": "s2s.Mysql.Response"
         },
         "Delete": {
-            "Id":103,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.Mysql.Delete",
-            "Response":"s2s.Mysql.Response"
+            "Id": 103,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Delete",
+            "Response": "s2s.Mysql.Response"
         },
         "Query": {
-            "Id":104,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.Mysql.Query",
-            "Response":"s2s.Mysql.Response"
+            "Id": 104,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Query",
+            "Response": "s2s.Mysql.Response"
         },
-        "Invoke":{
-            "Id":105,
-            "Async":true,
-            "Timeout":0,
-            "Type":"Server",
-            "Request":"s2s.Mysql.Invoke",
-            "Response":"s2s.Mysql.Response"
+        "Invoke": {
+            "Id": 105,
+            "Async": true,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request": "s2s.Mysql.Invoke",
+            "Response": "s2s.Mysql.Response"
         },
         "Update": {
             "Id": 106,
@@ -49,37 +50,61 @@
             "Response": "s2s.Mysql.Response"
         }
     },
+    "LocalSubService": {
+        "Add": {
+            "Id": 201,
+            "Async": false,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request":"sub.Add.Request"
+        },
+        "Push": {
+            "Id": 301,
+            "Async": false,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request":"sub.Push.Request",
+            "Response": "sub.Push.Response"
+        },
+        "Remove": {
+            "Id": 401,
+            "Async": false,
+            "Timeout": 0,
+            "Type": "Server",
+            "Request":"sub.Del.Request"
+        }
+    },
     "GateService": {
         "Ping": {
-            "Id": 201,
+            "Id": 1001,
             "Async": true,
-            "Type":"Client"
+            "Type": "Client"
         },
         "Allot": {
-            "Id": 202,
+            "Id": 1002,
             "Async": true,
             "Type": "Server",
             "Request": "s2s.AddressAllot.Request"
         },
         "CallClient": {
-            "Id": 203,
+            "Id": 1003,
             "Async": false,
             "Type": "Server",
             "Request": "c2s.Rpc.Call"
         },
         "BroadCast": {
-            "Id": 204,
+            "Id": 1004,
             "Async": false,
             "Type": "Server",
             "Request": "c2s.Rpc.Call"
         }
     },
     "ChatService": {
-      "Chat": {
-          "Id": 301,
-          "Async": false,
-          "Type": "Client",
-          "Request": "c2s.Chat.Request"
-      }
+        "Chat": {
+            "Id": 2001,
+            "Async": false,
+            "Type": "Client",
+            "Request": "c2s.Chat.Request"
+        }
     }
 }

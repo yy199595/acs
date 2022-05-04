@@ -6,6 +6,7 @@
 #include"App/App.h"
 #include"Global/RpcConfig.h"
 #include"Method/LuaServiceMethod.h"
+#include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
 #include"Component/Service/UserSubService.h"
 
@@ -89,39 +90,34 @@ namespace Sentry
 	bool LocalServiceComponent::LateAwake()
 	{
 		this->mUserService = this->GetComponent<UserSubService>();
+		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
 		return RemoteServiceComponent::LateAwake();
 	}
 
-	std::shared_ptr<com::Rpc_Response> LocalServiceComponent::Invoke(const string& method, std::shared_ptr<com::Rpc_Request> request)
+	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<Rpc_Request> request,
+	    std::shared_ptr<Rpc_Response> response)
 	{
 		assert(this->IsStartService());
-		std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
-
 		response->set_rpc_id(request->rpc_id());
 		response->set_user_id(request->user_id());
-		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(method);
+
+		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
 		if (serviceMethod == nullptr)
 		{
 			response->set_code((int)XCode::CallServiceNotFound);
-			LOG_ERROR("not find [" << this->GetName() << "." << method << "]");
-			return nullptr;
+			LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
+			return XCode::CallServiceNotFound;
 		}
 
 		try
 		{
-			XCode code = serviceMethod->Invoke(*request, *response);
-			if (request->rpc_id() == 0)
-			{
-				return nullptr;
-			}
-			response->set_code((int)code);
+			return serviceMethod->Invoke(*request, *response);
 		}
 		catch (std::logic_error& logic_error)
 		{
-			response->set_code((int)XCode::ThrowError);
 			response->set_error_str(logic_error.what());
+			return XCode::ThrowError;
 		}
-		return response;
 	}
 
 	bool LocalServiceComponent::LoadService()
@@ -156,11 +152,7 @@ namespace Sentry
 			this->mUserAddressMap.emplace(id, address);
 			return true;
 		}
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("user_id", id);
-		jsonWriter.AddMember("address", address);
-		jsonWriter.AddMember("service", this->GetName());
-		return this->mUserService->Publish("AddUser", jsonWriter);
+		return true;
 	}
 
 	bool LocalServiceComponent::DelEntity(long long id, bool publish)
@@ -175,10 +167,7 @@ namespace Sentry
 			LOG_INFO(this->GetName() << " del " << id);
 			return true;
 		}
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("user_id", id);
-		jsonWriter.AddMember("service", this->GetName());
-		return this->mUserService->Publish("DelUser", jsonWriter);
+		return true;
 	}
 
 	bool LocalServiceComponent::AllotAddress(string& address) const
@@ -219,6 +208,44 @@ namespace Sentry
 			return true;
 		}
 		return false;
+	}
+
+	XCode LocalServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
+	{
+		return this->Send(address, request);
+	}
+
+	XCode LocalServiceComponent::Send(const string& address, std::shared_ptr<com::Rpc::Request> request)
+	{
+		std::shared_ptr<ServerRpcClientContext> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
+		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
+		{
+			rpcClient->SendToServer(request);
+			return XCode::Successful;
+		}
+		for(size_t index = 0; index < 3; index++)
+		{
+			LOG_DEBUG(this->GetName() << " start connect [" << address << "]");
+			if(rpcClient->ConnectAsync())
+			{
+				LOG_DEBUG(this->GetName() << " connect [" << address << "] successful");
+				rpcClient->SendToServer(request);
+				return XCode::Successful;
+			}
+			this->GetApp()->GetTaskComponent()->Sleep(1000);
+		}
+		return XCode::NetWorkError;
+	}
+
+	XCode LocalServiceComponent::Send(const std::string& address, std::shared_ptr<Rpc_Response> message)
+	{
+		std::shared_ptr<ServerRpcClientContext> clientContext = this->mRpcClientComponent->GetSession(address);
+		if(clientContext == nullptr || !clientContext->GetSocketProxy()->IsOpen())
+		{
+			return XCode::NetWorkError;
+		}
+		clientContext->SendToServer(message);
+		return XCode::Successful;
 	}
 
 }

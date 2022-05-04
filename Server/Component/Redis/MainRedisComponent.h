@@ -22,7 +22,6 @@ namespace Sentry
 	 private:
 		void StartPubSub();
 		bool LoadRedisConfig();
-		bool SubscribeMessage();
 		void CheckRedisClient();
 	public:
 		bool Lock(const std::string & key);
@@ -30,26 +29,19 @@ namespace Sentry
 	 public:
 		long long AddCounter(const std::string& key);
 		bool SubscribeChannel(const std::string& channel);
-		long long Publish(const std::string& channel, Json::Writer& jsonWriter);
+		void GetAllChannel(std::vector<std::string> & chanels);
 		long long Publish(const std::string& channel, const std::string& message);
-		long long Publish(const std::string address, const std::string& func, Json::Writer& jsonWriter);
-
-	public:
-		XCode Call(const std::string & address, const std::string & func, const Json::Writer & request, std::shared_ptr<Json::Reader> response);
-
-	private:
-		XCode OnResponse(com::Sub::Response & response);
-		XCode OnRequest(const com::Sub::Request & request, Json::Writer & response);
 	 private:
 		void OnLockTimeout(const std::string & name);
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
 		bool GetLuaScript(const std::string& file, std::string& command);
-		XCode HandlerSubMessage(std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> & response);
 	 private:
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
-		const struct RedisConfig * mConfig;
 		TimerComponent * mTimerComponent;
+		class RpcComponent * mRpcComponent;
+		const struct RedisConfig * mConfig;
+		class RedisSubComponent * mSubComponent;
 		std::shared_ptr<RedisClientContext> mRedisClient;
 		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;

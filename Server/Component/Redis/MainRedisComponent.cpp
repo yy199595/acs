@@ -4,17 +4,21 @@
 #include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
-#include"Component/Service/SubService.h"
+#include"Component/Service/RedisSubService.h"
 #include"Global/RpcConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
+#include"Component/Redis/RedisSubComponent.h"
+#include"Component/Rpc/RpcComponent.h"
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
+		this->mRpcComponent = this->GetComponent<RpcComponent>();
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->mSubComponent = this->GetComponent<RedisSubComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
 		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 		return true;
@@ -73,7 +77,7 @@ namespace Sentry
 			LOG_INFO("load redis script " << path << " successful");
 		}
 
-		LOG_CHECK_RET_FALSE(this->SubscribeMessage());
+		LOG_CHECK_RET_FALSE(this->SubscribeChannel(this->mRpcAddress));
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
 		return true;
@@ -123,23 +127,6 @@ namespace Sentry
 		return response->GetNumber();
 	}
 
-	long long MainRedisComponent::Publish(const std::string address, const string& func, Json::Writer& jsonWriter)
-	{
-		jsonWriter.AddMember("func", func);
-		return this->Publish(address, jsonWriter);
-	}
-
-	long long MainRedisComponent::Publish(const std::string& channel, Json::Writer& jsonWriter)
-	{
-		std::string json = jsonWriter.ToJsonString();
-#ifdef __DEBUG__
-		LOG_INFO("==== redis publish message ====");
-		LOG_INFO("channel = " << channel);
-		LOG_INFO("message = " << json);
-#endif
-		return this->Publish(channel, json);
-	}
-
 	void MainRedisComponent::CheckRedisClient()
 	{
 		while(this->mSubRedisClient != nullptr)
@@ -168,30 +155,6 @@ namespace Sentry
 		return true;
 	}
 
-	bool MainRedisComponent::SubscribeMessage()
-	{
-		std::vector<Component *> components;
-		this->GetApp()->GetComponents(components);
-		for(Component * component : components)
-		{
-			SubService * subService = component->Cast<SubService>();
-			if(subService != nullptr && subService->IsStartService())
-			{
-				std::vector<std::string> methods;
-				subService->GetSubMethods(methods);
-				for (const std::string& name : methods)
-				{
-					const std::string& service = subService->GetName();
-					if(!this->SubscribeChannel(fmt::format("{0}.{1}", service, name)))
-					{
-						return false;
-					}
-				}
-			}
-		}
-		return this->SubscribeChannel(this->mRpcAddress);
-	}
-
 	void MainRedisComponent::StartPubSub()
 	{
 		while (this->mSubRedisClient)
@@ -212,7 +175,7 @@ namespace Sentry
 					this->mTaskComponent->Sleep(3000);
 					code = this->mSubRedisClient->StartConnect();
 				}
-				this->SubscribeMessage();
+				this->SubscribeChannel(this->mRpcAddress);
 				LOG_DEBUG("subscribe redis client connect successful");
 			}
 			std::shared_ptr<RedisResponse> redisResponse(new RedisResponse());
@@ -231,69 +194,47 @@ namespace Sentry
 				redisResponse->GetString(message, 2);
 				if (message[0] == '+') //请求
 				{
-					XCode code = XCode::ParseJsonFailure;
-					std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
-					std::shared_ptr<com::Sub::Request> request(new com::Sub::Request());
-					std::shared_ptr<com::Sub::Response> response(new com::Sub::Response());
-					if (request->ParseFromArray(message.c_str() + 1, message.size() - 1))
+					const char * data = message.c_str() + 1;
+					const size_t size = message.size() - 1;
+					std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
+					if(!request->ParseFromArray(data, size))
 					{
-						response->set_rpc_id(request->rpc_id());
-						code = this->OnRequest(*request, *jsonResponse);
+						LOG_ERROR("parse message error");
+						continue;
 					}
-					std::string result = "-";
-					response->set_code((int)code);
-					response->set_json(jsonResponse->ToJsonString());
-					if (response->AppendPartialToString(&result))
-					{
-						this->Publish(request->channel(), result);
-					}
+					this->mRpcComponent->OnRequest(request);
 				}
 				else if (message[0] == '-') //回复
 				{
-					std::shared_ptr<com::Sub::Response> response(new com::Sub::Response());
-					if (response->ParseFromArray(message.c_str() + 1, message.size() - 1))
+					const char * data = message.c_str() + 1;
+					const size_t size = message.size() - 1;
+					std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+					if(!response->ParseFromArray(data, size))
 					{
-						this->OnResponse(*response);
+						LOG_ERROR("parse message error");
+						continue;
 					}
-				}
-				else if(message[0] == '=') // 广播
-				{
-
+					this->mRpcComponent->OnResponse(response);
 				}
 			}
 		}
-
 	}
 
-	XCode MainRedisComponent::OnRequest(const com::Sub::Request& request, Json::Writer& response)
+	void MainRedisComponent::GetAllChannel(std::vector<std::string>& chanels)
 	{
-
-	}
-
-	XCode MainRedisComponent::OnResponse(com::Sub::Response& response)
-	{
-
-	}
-
-
-	XCode MainRedisComponent::HandlerSubMessage(std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer>& response)
-	{
-		std::string fullName;
-		request->GetMember("func", fullName);
-		size_t pos = fullName.find('.');
-		if (pos == std::string::npos)
+		std::shared_ptr<RedisResponse> response(new RedisResponse());
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBSUB", "CHANNELS");
+		if(this->mRedisClient->Run(request, response) == XCode::Successful)
 		{
-			LOG_ERROR(fullName << " parse error");
-			return XCode::CallFunctionNotExist;
+			for(size_t index = 0; index < response->GetArraySize(); index++)
+			{
+				std::string channel;
+				if(response->GetString(channel, index))
+				{
+					chanels.emplace_back(channel);
+				}
+			}
 		}
-		std::string service = fullName.substr(0, pos);
-		std::string funcName = fullName.substr(pos + 1);
-		SubService* subService = this->GetComponent<SubService>(service);
-		if (subService == nullptr)
-		{
-			return XCode::CallServiceNotFound;
-		}
-		return subService->Invoke(funcName, *request, *response);
 	}
 
 	long long MainRedisComponent::AddCounter(const string& key)

@@ -8,28 +8,12 @@ using namespace com;
 
 namespace Sentry
 {
-	class ServiceRecord
-	{
-	 public:
-		ServiceRecord();
-	 public:
-		long long GetWeight();
-		void OnCall(long long ms);
-	 private:
-		long long mCallCount;
-		long long mStartTime;
-	};
-}
-
-namespace Sentry
-{
 	class ServiceMethod;
 	class ServerRpcClientContext;
-	class RemoteServiceComponent : public Component, public IServiceBase
+	class RemoteServiceComponent : public Component
 	{
 	 public:
 		RemoteServiceComponent() = default;
-
 		~RemoteServiceComponent() override = default;
 	 public:
 		virtual XCode Call(const std::string& address, const std::string& func);
@@ -55,13 +39,10 @@ namespace Sentry
 	 protected:
 		bool LateAwake() override;
 		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
-		virtual bool OnCallLocal(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response>) = 0;
+		virtual XCode SendRequest(const std::string & address, std::shared_ptr<com::Rpc::Request> request) = 0;
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
-	protected:
-		std::shared_ptr<ServerRpcClientContext> GetClient(const std::string & address);
 	 protected:
 		std::string mLocalAddress;
 		class RpcComponent* mRpcComponent;
-		class RpcClientComponent* mRpcClientComponent;
 	};
 }

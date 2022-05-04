@@ -5,6 +5,7 @@
 #include"Component/HttpService/HttpService.h"
 #include"Component/RpcService/LocalServiceComponent.h"
 #include"Network/Listener/TcpServerComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
 	bool LocalSubService::OnInitService(SubServiceRegister& methodRegister)
@@ -17,40 +18,37 @@ namespace Sentry
 
 	bool LocalSubService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(SubService::LateAwake());
+		LOG_CHECK_RET_FALSE(RedisSubService::LateAwake());
+		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetListenerAddress("http", this->mHttpAddress));
 		return true;
 	}
 
 	void LocalSubService::OnAddService(Component* component)
 	{
-		if(component->Cast<LocalServiceComponent>() != nullptr)
+		HttpService * httpService = component->Cast<HttpService>();
+		RedisSubService * redisSubService = component->Cast<RedisSubService>();
+		LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+
+		sub::Add::Request request;
+		request.set_area_id(this->mAreaId);
+		request.set_service(component->GetName());
+		if(httpService != nullptr)
 		{
-			std::string address;
-			if(this->GetConfig().GetListenerAddress("rpc", address))
-			{
-				Json::Writer jsonWriter;
-				jsonWriter.AddMember("address", address);
-				jsonWriter.AddMember("area_id", this->mAreaId);
-				jsonWriter.AddMember("service", component->GetName());
-				LOG_CHECK_RET(this->Publish("Add", jsonWriter));
-				LOG_DEBUG("publish " << component->GetName() << " to all server");
-			}
+			request.set_address(this->mHttpAddress);
 		}
-		else if(component->Cast<HttpService>() != nullptr)
+		else if(redisSubService != nullptr)
 		{
-			std::string address;
-			if(this->GetConfig().GetListenerAddress("http", address))
-			{
-				Json::Writer jsonWriter;
-				jsonWriter.AddMember("address", address);
-				jsonWriter.AddMember("area_id", this->mAreaId);
-				jsonWriter.AddMember("service", component->GetName());
-				LOG_CHECK_RET(this->Publish("Add", jsonWriter));
-				LOG_DEBUG("publish " << component->GetName() << " to all server");
-			}
+			request.set_address(this->mRpcAddress);
 		}
+		else if(localService != nullptr)
+		{
+			request.set_address(this->mRpcAddress);
+		}
+		//TODO
 	}
 
 	void LocalSubService::OnDelService(Component* component)
@@ -58,135 +56,96 @@ namespace Sentry
 
 	}
 
-	XCode LocalSubService::Add(const Json::Reader& jsonReader)
+	XCode LocalSubService::Add(const sub::Add::Request& jsonReader)
 	{
-		int areaId = 0;
-		std::string address, service;
-		LOGIC_THROW_ERROR(jsonReader.GetMember("area_id", areaId));
-		LOGIC_THROW_ERROR(jsonReader.GetMember("address", address));
-		LOGIC_THROW_ERROR(jsonReader.GetMember("service", service));
-		if (areaId != 0 && areaId != this->mAreaId)
-		{
-			return XCode::Successful;
-		}
-		IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
-		if(serviceBase != nullptr)
-		{
-			serviceBase->OnAddAddress(address);
-		}
 		return XCode::Successful;
 	}
 
-	XCode LocalSubService::Push(const Json::Reader& jsonReader, Json::Writer & response)
+	XCode LocalSubService::Push(const sub::Push::Request& request, sub::Push::Response& response)
 	{
-		std::string httpToken;
-		std::string rpcAddress;
-		std::string httpAddress;
-		std::vector<std::string> services;
-		LOGIC_THROW_ERROR(jsonReader.GetMember("service", services));
-		LOGIC_THROW_ERROR(jsonReader.GetMember("http", "token", httpToken));
-		LOGIC_THROW_ERROR(jsonReader.GetMember("rpc", "address", rpcAddress));
-		LOGIC_THROW_ERROR(jsonReader.GetMember("http", "address", httpAddress));
 
-		for (const std::string& service: services)
+		for(const std::string & service : request.rpc().service())
 		{
-			Component* component = this->GetByName(service);
-			if (component != nullptr)
+			LocalServiceComponent * localService = this->GetComponent<LocalServiceComponent>(service);
+			if(localService == nullptr)
 			{
-				HttpService* httpService = component->Cast<HttpService>();
-				LocalServiceComponent* localServerRpc = component->Cast<LocalServiceComponent>();
-				if (httpService != nullptr && !httpAddress.empty())
-				{
-					httpService->OnAddAddress(httpAddress);
-				}
-				if (localServerRpc != nullptr && !rpcAddress.empty())
-				{
-					localServerRpc->OnAddAddress(rpcAddress);
-				}
+				return XCode::CallServiceNotFound;
 			}
+			localService->OnAddAddress(request.rpc().address());
 		}
 
-		services.clear();
-		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
-		for (const std::string& name: components)
+		for(const std::string & service : request.http().service())
 		{
-			LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(name);
-			if (localServerRpc != nullptr && localServerRpc->IsStartService())
+			HttpService* httpService = this->GetComponent<HttpService>(service);
+			if(httpService == nullptr)
 			{
-				services.emplace_back(name);
+				return XCode::CallServiceNotFound;
+			}
+			httpService->OnAddAddress(request.http().address());
+		}
+
+		std::vector<Component *> components;
+		this->GetApp()->GetComponents(components);
+		for(Component * component : components)
+		{
+			HttpService * httpService = component->Cast<HttpService>();
+			LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+			if(httpService != nullptr)
+			{
+				response.mutable_http()->add_service(httpService->GetName());
+			}
+			if(localService != nullptr)
+			{
+				response.mutable_rpc()->add_service(localService->GetName());
 			}
 		}
 		const ListenConfig* rpcConfig = this->GetConfig().GetListen("rpc");
-
-		response.StartObject("rpc");
-		response.AddMember("token", rpcConfig->Token);
-		response.AddMember("address", rpcConfig->Address);
-		response.EndObject();
-		response.AddMember("service", services);
+		const ListenConfig* httpConfig = this->GetConfig().GetListen("http");
+		response.mutable_rpc()->set_address(rpcConfig->Address);
+		response.mutable_http()->set_address(httpConfig->Address);
+		return XCode::Successful;
 	}
 
 	void LocalSubService::OnComplete()//通知其他服务器 我加入了
 	{
+		sub::Push::Request request;
+		request.mutable_rpc()->set_address(this->mRpcAddress);
+		request.mutable_http()->set_address(this->mHttpAddress);
 
-		Json::Writer jsonWriter;
-		jsonWriter.StartArray("service");
-		std::vector<std::string> components;
+		std::vector<Component *> components;
 		this->GetApp()->GetComponents(components);
-		for(const std::string & name : components)
+		for(Component * component : components)
 		{
-			IServiceBase * localService = this->GetApp()->GetComponent<IServiceBase>(name);
-			if(localService != nullptr && localService->IsStartService())
+			HttpService * httpService = component->Cast<HttpService>();
+			LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+			if(httpService != nullptr)
 			{
-				jsonWriter.AddMember(name);
+				request.mutable_http()->add_service(component->GetName());
+			}
+			else if(localService != nullptr)
+			{
+				request.mutable_rpc()->add_service(component->GetName());
 			}
 		}
-		jsonWriter.EndArray();
-		const ListenConfig * rpcConfig = this->GetConfig().GetListen("rpc");
-		const ListenConfig * httpConfig = this->GetConfig().GetListen("http");
-		if(rpcConfig != nullptr)
+		std::vector<std::string> channels;
+		this->mRedisComponent->GetAllChannel(channels);
+		for(const std::string & address : channels)
 		{
-			jsonWriter.StartObject("rpc");
-			jsonWriter.AddMember("token", rpcConfig->Token);
-			jsonWriter.AddMember("address", rpcConfig->Address);
-			jsonWriter.EndObject();
+			std::shared_ptr<sub::Push::Response> response(new sub::Push::Response());
+			if(this->Call(address, "Push", request, response) == XCode::Successful)
+			{
+				LOG_FATAL("push all service successful");
+			}
 		}
-
-		if(httpConfig != nullptr)
-		{
-			jsonWriter.StartObject("http");
-			jsonWriter.AddMember("token", httpConfig->Token);
-			jsonWriter.AddMember("address", httpConfig->Address);
-			jsonWriter.EndObject();
-		}
-
-		jsonWriter.AddMember("response", true);
-		long long number = this->Publish("Push", jsonWriter);
-		LOG_DEBUG("publish successful count = " << number);
 	}
 
 	void LocalSubService::OnDestory()
 	{
-		std::string address;
-		Json::Writer jsonWriter;
-		if(this->GetConfig().GetListenerAddress("rpc", address))
-		{
-			jsonWriter.AddMember("address", address);
-			jsonWriter.AddMember("area_id", this->mAreaId);
-			LOG_DEBUG("remove this form count = " << this->Publish("Remove", jsonWriter));
-		}
+
 	}
 
-	XCode LocalSubService::Remove(const Json::Reader& jsonReader)
+	XCode LocalSubService::Remove(const sub::Del::Request& jsonReader)
 	{
-		std::string address;
-		LOGIC_THROW_ERROR(jsonReader.GetMember("address", address));
 
-		// TODO
-//		RemoteServiceComponent* rpcServiceComponent = this->GetComponent<RemoteServiceComponent>(service);
-//		if(rpcServiceComponent != nullptr)
-//		{
-//			rpcServiceComponent->DelRemoteAddress(address);
-//		}
 	}
 }// namespace Sentry

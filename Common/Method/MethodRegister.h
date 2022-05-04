@@ -9,6 +9,7 @@
 #include"ServiceMethod.h"
 #include"HttpServiceMethod.h"
 #include"Script/LuaInclude.h"
+
 namespace Sentry
 {
 	class ServiceMethodRegister
@@ -108,26 +109,26 @@ namespace Sentry
 	 public:
 		SubServiceRegister(void * o) : mObj(o) {}
 	public:
-		template<typename T>
-		bool Bind(std::string name, JsonSubFunction<T> func)
+		template<typename T, typename T1>
+		bool Bind(std::string name, SubFunction<T, T1> func)
 		{
 			auto iter = this->mSubMethodMap.find(name);
 			if (iter != this->mSubMethodMap.end())
 			{
 				return false;
 			}
-			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T>>((T*)this->mObj, func));
+			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T, T1>>((T*)this->mObj, func));
 			return true;
 		}
-		template<typename T>
-		bool Bind(std::string name, JsonSubFunction2<T> func)
+		template<typename T, typename T1, typename T2>
+		bool Bind(std::string name, SubFunction2<T, T1, T2> func)
 		{
 			auto iter = this->mSubMethodMap.find(name);
 			if (iter != this->mSubMethodMap.end())
 			{
 				return false;
 			}
-			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod2<T>>((T*)this->mObj, func));
+			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod2<T, T1, T2>>((T*)this->mObj, func));
 			return true;
 		}
 

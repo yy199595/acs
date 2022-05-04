@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
-#include"Component/Service/SubService.h"
+#include"Protocol/sub.pb.h"
+#include"Component/Service/RedisSubService.h"
 using namespace com;
 namespace Sentry
 {
@@ -10,7 +11,7 @@ namespace Sentry
 
 	class TaskComponent;
 
-	class LocalSubService : public SubService, public IComplete, public IServiceChange
+	class LocalSubService : public RedisSubService, public IComplete, public IServiceChange
 	{
 	 public:
 		LocalSubService() = default;
@@ -25,11 +26,14 @@ namespace Sentry
 		void OnDelService(Component *component) final;
 		bool OnInitService(SubServiceRegister &methodRegister) final;
 	 private:
-		XCode Add(const Json::Reader& jsonReader);
-		XCode Remove(const Json::Reader& jsonReader);
-		XCode Push(const Json::Reader& jsonReader, Json::Writer & response);
+		XCode Add(const sub::Add::Request& jsonReader);
+		XCode Remove(const sub::Del::Request& jsonReader);
+		XCode Push(const sub::Push::Request& jsonReader, sub::Push::Response & response);
 	private:
 		int mAreaId;
 		std::string mNodeName;
+		std::string mRpcAddress;
+		std::string mHttpAddress;
+		class MainRedisComponent * mRedisComponent;
 	};
 }

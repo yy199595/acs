@@ -8,34 +8,12 @@
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/Rpc/RpcComponent.h"
-#include"Component/Rpc/RpcClientComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
-
-namespace Sentry
-{
-	ServiceRecord::ServiceRecord()
-	{
-		this->mCallCount = 0;
-		this->mStartTime = 0;
-	}
-
-	void ServiceRecord::OnCall(long long ms)
-	{
-		this->mCallCount++;
-		this->mStartTime += ms;
-	}
-	long long ServiceRecord::GetWeight()
-	{
-		return this->mStartTime / this->mCallCount;
-	}
-}
 
 namespace Sentry
 {
 	bool RemoteServiceComponent::LateAwake()
 	{
 		this->mRpcComponent = this->GetComponent<RpcComponent>();
-		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
 	}
 
@@ -107,6 +85,7 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
+
 	XCode RemoteServiceComponent::Call(const std::string & address, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
@@ -128,43 +107,9 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	std::shared_ptr<ServerRpcClientContext> RemoteServiceComponent::GetClient(const std::string& address)
-	{
-		std::shared_ptr<ServerRpcClientContext> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
-		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
-		{
-			return rpcClient;
-		}
-		for(size_t index = 0; index < 3; index++)
-		{
-			LOG_DEBUG(this->GetName() << " start connect [" << address << "]");
-			if(rpcClient->ConnectAsync())
-			{
-				LOG_DEBUG(this->GetName() << " connect [" << address << "] successful");
-				return rpcClient;
-			}
-			this->GetApp()->GetTaskComponent()->Sleep(1000);
-		}
-		return nullptr;
-	}
-
 	std::shared_ptr<com::Rpc::Response> RemoteServiceComponent::StartCall(const std::string & address,
 			std::shared_ptr<com::Rpc::Request> request)
 	{
-		if(address == this->mLocalAddress)
-		{
-			std::shared_ptr<com::Rpc::Response> response =
-					std::make_shared<com::Rpc::Response>();
-			if (this->OnCallLocal(request, response))
-			{
-				return response;
-			}
-		}
-		std::shared_ptr<ServerRpcClientContext> rpcClient = this->GetClient(address);
-		if (rpcClient == nullptr)
-		{
-			return nullptr;
-		}
 		std::shared_ptr<RpcTaskSource> taskSource =
 			std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
@@ -172,7 +117,14 @@ namespace Sentry
 #ifdef __DEBUG__
 		this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), request->method_id());
 #endif
-		rpcClient->SendToServer(request);
+		XCode code = this->SendRequest(address, request);
+		if(code != XCode::Successful)
+		{
+			std::shared_ptr<com::Rpc::Response> response =
+				std::make_shared<com::Rpc::Response>();
+			response->set_code(int(code));
+			return response;
+		}
 		return taskSource->Await();
 	}
 }

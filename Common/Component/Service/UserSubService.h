@@ -4,11 +4,11 @@
 
 #ifndef _USERSUBSERVICE_H_
 #define _USERSUBSERVICE_H_
-#include"Component/Service/SubService.h"
+#include"Component/Service/RedisSubService.h"
 
 namespace Sentry
 {
-	class UserSubService : public SubService
+	class UserSubService : public RedisSubService
 	{
 	 public:
 		UserSubService() = default;

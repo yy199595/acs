@@ -10,13 +10,17 @@
 
 namespace Sentry
 {
-	class LocalServiceComponent : public RemoteServiceComponent
+	class LocalServiceComponent : public RemoteServiceComponent,
+		public ICallService<com::Rpc::Request, com::Rpc::Response>
 	{
 	public:
 		LocalServiceComponent() = default;
 	protected:
 		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
-		bool OnCallLocal(std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<com::Rpc::Response>) override { return false;}
+		XCode Send(const std::string &func, std::shared_ptr<Rpc_Request> message) final;
+		XCode Send(const std::string &func, std::shared_ptr<Rpc_Response> message) final;
+		XCode SendRequest(const std::string &address, std::shared_ptr<com::Rpc::Request> request) final;
+		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response) final;
 	public:
 		bool DelEntity(long long id, bool publish = false);
 		bool AddEntity(long long id, const std::string & address, bool publish = false);
@@ -30,9 +34,10 @@ namespace Sentry
 		bool LoadService() final;
 		bool LateAwake() override;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
+		//std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
 	 private:
 		class UserSubService * mUserService;
+		class RpcClientComponent * mRpcClientComponent;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 		std::unordered_map<long long, std::string> mUserAddressMap;
 	 protected:

@@ -8,8 +8,6 @@ namespace Sentry
 {
 	bool UserSubService::OnInitService(SubServiceRegister& methodRegister)
 	{
-		methodRegister.Bind("AddUser", &UserSubService::AddUser);
-		methodRegister.Bind("DelUser", &UserSubService::DelUser);
 		return true;
 	}
 

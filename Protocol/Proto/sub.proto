@@ -1,0 +1,43 @@
+
+syntax = "proto3";
+package sub;
+
+message ServiceInfo
+{
+    string address = 1;
+    repeated string service = 2;
+}
+
+message Push
+{
+  message Request
+  {
+      int32 area_id = 1;
+      ServiceInfo rpc = 2;
+      ServiceInfo http = 3;
+  }
+  message Response
+  {
+    ServiceInfo rpc = 1;
+    ServiceInfo http = 2;
+  }
+}
+
+message Add
+{
+  message Request
+  {
+    int32 area_id = 1;
+    string address = 2;
+    string service = 3;
+  }
+}
+
+message Del
+{
+  message Request
+  {
+    string address = 1;
+    string service = 2;
+  }
+}

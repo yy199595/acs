@@ -3,7 +3,6 @@
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
-#include"Pool/MessagePool.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/RpcConfig.h"
 #include"Component/Rpc/RpcClientComponent.h"
@@ -39,36 +38,29 @@ namespace Sentry
 		}
 
 		const std::string& service = protocolConfig->Service;
-		LocalServiceComponent * logicService = this->GetComponent<LocalServiceComponent>(service);
+		typedef ICallService<com::Rpc::Request, com::Rpc::Response> CallService;
+		CallService * logicService = this->GetComponent<CallService>(service);
 		if (logicService == nullptr)
 		{
 			LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;
 		}
-//#ifdef __DEBUG__
-//		std::string json = "";
-//		LOG_DEBUG("==============[request]==============");
-//		LOG_DEBUG("address = " << request->address());
-//		LOG_DEBUG("func = " << protocolConfig->Service << "." << protocolConfig->Method);
-//		if (request->has_data() && Helper::Proto::GetJson(request->data(), json))
-//		{
-//			LOG_DEBUG("json = " << json);
-//		}
-//		LOG_DEBUG("=====================================");
-//#endif
+		std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+		response->set_rpc_id(request->rpc_id());
+		response->set_user_id(request->user_id());
 
 		if (!protocolConfig->IsAsync)
 		{
-			const std::string& method = protocolConfig->Method;
-			auto response = logicService->Invoke(method, request);
-			this->mRpcClientComponent->Send(request->address(), response);
-			return XCode::Successful;
+			const std::string& func = protocolConfig->Method;
+			response->set_code((int)logicService->Invoke(func, request, response));
+			return logicService->Send(request->address(), response);
 		}
-		this->mCorComponent->Start([request, this, logicService, protocolConfig]()
+
+		this->mCorComponent->Start([request, this, logicService, protocolConfig, response]()
 		{
-			const std::string& method = protocolConfig->Method;
-			std::shared_ptr<com::Rpc::Response> response = logicService->Invoke(method, request);
-			this->mRpcClientComponent->Send(request->address(), response);
+			const std::string& func = protocolConfig->Method;
+			response->set_code((int)logicService->Invoke(func, request, response));
+			logicService->Send(request->address(), response);
 		});
 		return XCode::Successful;
 	}
