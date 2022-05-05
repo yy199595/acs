@@ -97,7 +97,7 @@ namespace Sentry
 
     bool RedisResponse::IsOk()
     {
-        if (this->HasError() && this->mArray.empty())
+        if (this->HasError() || this->mArray.empty())
         {
             return false;
         }

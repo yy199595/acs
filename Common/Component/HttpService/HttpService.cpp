@@ -70,7 +70,7 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		LOG_INFO("[POST] " << url <<"request = " << json << " response = " << httpResponse->GetContent());
+		LOG_INFO("[POST] " << url <<" request = " << json << " response = " << httpResponse->GetContent());
 		if(!response->ParseJson(httpResponse->GetContent()))
 		{
 			return XCode::ParseJsonFailure;

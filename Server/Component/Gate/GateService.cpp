@@ -49,7 +49,7 @@ namespace Sentry
 		if(redisComponent->Lock("Ping"))
 		{
 			LOG_ERROR(userId << " get redis lock successful");
-			this->GetApp()->GetTaskComponent()->Sleep(5000);
+			//this->GetApp()->GetTaskComponent()->Sleep(5000);
 			GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
 			gateProxyComponent->Call(userId, "TaskComponent.Update");
 			DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();
