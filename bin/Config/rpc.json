@@ -50,7 +50,7 @@
             "Response": "s2s.Mysql.Response"
         }
     },
-    "LocalSubService": {
+    "RegistryService": {
         "Add": {
             "Id": 201,
             "Async": false,
@@ -66,7 +66,7 @@
             "Request":"sub.Push.Request",
             "Response": "sub.Push.Response"
         },
-        "Remove": {
+        "Del": {
             "Id": 401,
             "Async": false,
             "Timeout": 0,

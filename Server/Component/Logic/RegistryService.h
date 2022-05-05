@@ -11,11 +11,11 @@ namespace Sentry
 
 	class TaskComponent;
 
-	class LocalSubService : public RedisSubService, public IComplete, public IServiceChange
+	class RegistryService : public RedisSubService, public IComplete, public IServiceChange
 	{
 	 public:
-		LocalSubService() = default;
-		~LocalSubService() override = default;
+		RegistryService() = default;
+		~RegistryService() override = default;
 
 	 public:
 		bool LateAwake() final;
@@ -26,9 +26,9 @@ namespace Sentry
 		void OnDelService(Component *component) final;
 		bool OnInitService(SubServiceRegister &methodRegister) final;
 	 private:
-		XCode Add(const sub::Add::Request& jsonReader);
-		XCode Remove(const sub::Del::Request& jsonReader);
-		XCode Push(const sub::Push::Request& jsonReader, sub::Push::Response & response);
+		XCode Add(const sub::Add::Request& request);
+		XCode Del(const sub::Del::Request& request);
+		XCode Push(const sub::Push::Request& request, sub::Push::Response & response);
 	private:
 		int mAreaId;
 		std::string mNodeName;

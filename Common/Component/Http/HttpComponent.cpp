@@ -144,14 +144,12 @@ namespace Sentry
 #else
 		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
-		//TODO
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
 		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
 		return httpAsyncClient->Get(url);
 	}
 
-	std::shared_ptr<HttpAsyncResponse>
-	HttpComponent::Post(const std::string& url, const std::string& data, int timeout)
+	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, int timeout)
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
@@ -160,42 +158,18 @@ namespace Sentry
 #endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
 		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
-		return httpAsyncClient->Post(url, data);
-	}
-
-	XCode HttpComponent::PostJson(const string& url, Json::Writer& json, std::shared_ptr<Json::Reader> response)
-	{
-		std::string requestJson = json.ToJsonString();
-		std::shared_ptr<HttpAsyncResponse> httpResponse = this->Post(url, requestJson);
-		if(httpResponse == nullptr)
+		std::shared_ptr<HttpAsyncResponse> httpAsyncResponse = httpAsyncClient->Post(url, data);
+		if(httpAsyncResponse == nullptr)
 		{
-			Json::Writer jsonWriter;
-			LOG_ERROR(url << " request net work error");
-			jsonWriter.AddMember("code", XCode::HttpNetWorkError);
-			jsonWriter.AddMember("error", "connect http server failure");
-			response->ParseJson(jsonWriter.ToJsonString());
-			return XCode::NetWorkError;
+			LOG_FATAL(url << " net work error");
+			return nullptr;
 		}
-		const std::string & content = httpResponse->GetContent();
-		LOG_INFO("========== http request ========== ");
-		LOG_INFO("request = " << requestJson);
-		LOG_INFO("response = " << content);
-		if(!response->ParseJson(content))
+		if(httpAsyncResponse->GetHttpCode() != HttpStatus::OK)
 		{
-			Json::Writer jsonWriter;
-			LOG_ERROR("parse " << content << " error ");
-			jsonWriter.AddMember("code", XCode::ParseJsonFailure);
-			jsonWriter.AddMember("error", "parse response json error");
-			return XCode::ParseJsonFailure;
+			const char * err = HttpStatusToString(httpAsyncResponse->GetHttpCode());
+			LOG_FATAL("http error = " << err);
+			return nullptr;
 		}
-		XCode code = XCode::Successful;
-		response->GetMember("code", code);
-		return code;
+		return httpAsyncResponse;
 	}
-
-	XCode HttpComponent::GetJson(const string& url, std::shared_ptr<Json::Reader> response)
-	{
-		return XCode::CommandArgsError;
-	}
-
 }

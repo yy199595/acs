@@ -20,8 +20,8 @@ namespace Sentry
 		LOG_INFO("add new http url " << this->mUrl);
 	}
 
-	XCode HttpService::Invoke(
-		const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response)
+	XCode HttpService::Invoke(const std::string& name, std::shared_ptr<Json::Reader> request,
+			std::shared_ptr<Json::Writer> response)
 	{
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
 		if(method == nullptr)
@@ -34,5 +34,48 @@ namespace Sentry
 	{
 		this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
 		return this->OnInitService(*this->mServiceRegister);
+	}
+
+	XCode HttpService::Get(const std::string& path, std::shared_ptr<Json::Reader> response)
+	{
+		if(this->mUrl.empty())
+		{
+			return XCode::NetWorkError;
+		}
+		const std::string url = fmt::format("%s%s", this->mUrl, path);
+		std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Get(url);
+		if(httpResponse == nullptr)
+		{
+			return XCode::NetWorkError;
+		}
+		LOG_INFO("[GET] " << url << " response = " << httpResponse->GetContent());
+		if(!response->ParseJson(httpResponse->GetContent()))
+		{
+			return XCode::ParseJsonFailure;
+		}
+		XCode code = XCode::Failure;
+		return response->GetMember("code", code) ? code : XCode::Failure;
+	}
+
+	XCode HttpService::Post(const std::string& path, Json::Writer& request, std::shared_ptr<Json::Reader> response)
+	{
+		if(this->mUrl.empty())
+		{
+			return XCode::NetWorkError;
+		}
+		const std::string json = request.ToJsonString();
+		const std::string url = fmt::format("{0}{1}", this->mUrl, path);
+		std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, json);
+		if(httpResponse == nullptr)
+		{
+			return XCode::NetWorkError;
+		}
+		LOG_INFO("[POST] " << url <<"request = " << json << " response = " << httpResponse->GetContent());
+		if(!response->ParseJson(httpResponse->GetContent()))
+		{
+			return XCode::ParseJsonFailure;
+		}
+		XCode code = XCode::Failure;
+		return response->GetMember("code", code) ? code : XCode::Failure;
 	}
 }

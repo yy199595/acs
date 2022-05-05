@@ -1,4 +1,4 @@
-﻿#include"LocalSubService.h"
+﻿#include"RegistryService.h"
 #include"App/App.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Http/HttpAsyncRequest.h"
@@ -8,15 +8,15 @@
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
-	bool LocalSubService::OnInitService(SubServiceRegister& methodRegister)
+	bool RegistryService::OnInitService(SubServiceRegister& methodRegister)
 	{
-		methodRegister.Bind("Add", &LocalSubService::Add);
-		methodRegister.Bind("Push", &LocalSubService::Push);
-		methodRegister.Bind("Remove", &LocalSubService::Remove);
+		methodRegister.Bind("Add", &RegistryService::Add);
+		methodRegister.Bind("Del", &RegistryService::Del);
+		methodRegister.Bind("Push", &RegistryService::Push);
 		return true;
 	}
 
-	bool LocalSubService::LateAwake()
+	bool RegistryService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(RedisSubService::LateAwake());
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
@@ -27,7 +27,7 @@ namespace Sentry
 		return true;
 	}
 
-	void LocalSubService::OnAddService(Component* component)
+	void RegistryService::OnAddService(Component* component)
 	{
 		HttpService * httpService = component->Cast<HttpService>();
 		RedisSubService * redisSubService = component->Cast<RedisSubService>();
@@ -51,19 +51,18 @@ namespace Sentry
 		//TODO
 	}
 
-	void LocalSubService::OnDelService(Component* component)
+	void RegistryService::OnDelService(Component* component)
 	{
 
 	}
 
-	XCode LocalSubService::Add(const sub::Add::Request& jsonReader)
+	XCode RegistryService::Add(const sub::Add::Request& jsonReader)
 	{
 		return XCode::Successful;
 	}
 
-	XCode LocalSubService::Push(const sub::Push::Request& request, sub::Push::Response& response)
+	XCode RegistryService::Push(const sub::Push::Request& request, sub::Push::Response& response)
 	{
-
 		for(const std::string & service : request.rpc().service())
 		{
 			LocalServiceComponent * localService = this->GetComponent<LocalServiceComponent>(service);
@@ -106,7 +105,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	void LocalSubService::OnComplete()//通知其他服务器 我加入了
+	void RegistryService::OnComplete()//通知其他服务器 我加入了
 	{
 		sub::Push::Request request;
 		request.mutable_rpc()->set_address(this->mRpcAddress);
@@ -132,20 +131,38 @@ namespace Sentry
 		for(const std::string & address : channels)
 		{
 			std::shared_ptr<sub::Push::Response> response(new sub::Push::Response());
-			if(this->Call(address, "Push", request, response) == XCode::Successful)
+			if(this->Call(address, "Push", request, response) != XCode::Successful)
 			{
-				LOG_FATAL("push all service successful");
+				LOG_ERROR("[" << address << "] push all service failure");
+				continue;
+			}
+			LOG_INFO("[" << address << "] push all service successful");
+			for(const std::string & service : response->rpc().service())
+			{
+				IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
+				serviceBase->OnAddAddress(response->rpc().address());
+			}
+			for(const std::string & service : response->http().service())
+			{
+				IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
+				serviceBase->OnAddAddress(response->http().address());
 			}
 		}
 	}
 
-	void LocalSubService::OnDestory()
+	void RegistryService::OnDestory()
 	{
 
 	}
 
-	XCode LocalSubService::Remove(const sub::Del::Request& jsonReader)
+	XCode RegistryService::Del(const sub::Del::Request& request)
 	{
-
+		IServiceBase * serviceBase = this->GetComponent<IServiceBase>(request.service());
+		if(serviceBase != nullptr)
+		{
+			serviceBase->OnDelAddress(request.address());
+			return XCode::Successful;
+		}
+		return XCode::Failure;
 	}
 }// namespace Sentry

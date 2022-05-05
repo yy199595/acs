@@ -21,7 +21,6 @@ namespace Sentry
 	private:
 		bool mIsLock;
 		std::queue<unsigned int> mWaitTasks;
-
 		class TaskComponent* mTaskComponent;
 	};
 

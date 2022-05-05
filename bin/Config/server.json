@@ -107,7 +107,7 @@
         "MysqlService",
         "UserSubService",
         "HttpUserService",
-        "LocalSubService"
+        "RegistryService"
     ],
     "start":
     [
@@ -116,7 +116,7 @@
         "MysqlService",
         "UserSubService",
         "HttpUserService",
-        "LocalSubService"
+        "RegistryService"
     ],
     "white_list": [
         "127.0.0.1"

@@ -171,6 +171,7 @@ namespace Client
 	bool ClientComponent::GetClient(const std::string& account, const std::string& passwd)
 	{
 		//this->mTaskComponent->Sleep(2000);
+		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
 		std::string url;
 		long long userPhoneNumber = 13716061995;
 		this->GetConfig().GetMember("url", url);
@@ -179,23 +180,26 @@ namespace Client
 		jsonWriter.AddMember("password", passwd);
 		jsonWriter.AddMember("account", account);
 		jsonWriter.AddMember("phone_num", userPhoneNumber);
+
 		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
 		std::shared_ptr<Json::Reader> registerResponse(new Json::Reader());
-		const std::string login_url = fmt::format("{0}/logic/account/login", url);
-		const std::string register_url = fmt::format("{0}/logic/account/register", url);
-		if(this->mHttpComponent->PostJson(register_url, jsonWriter, registerResponse) != XCode::Successful)
+
+		if(httpUserService->Post("logic/account/register", jsonWriter, registerResponse) != XCode::Successful)
 		{
 			std::string error;
-			registerResponse->GetMember("error", error);
-			LOG_WARN("register " << account << " failure error = " << error);
+			if(registerResponse->GetMember("error", error))
+			{
+				LOG_ERROR("register error = " << error);
+			}
+			return false;
 		}
-		else
+		if(httpUserService->Post("logic/account/login", jsonWriter, loginResponse) != XCode::Successful)
 		{
-			LOG_DEBUG("register " << account << " successful");
-		}
-
-		if(this->mHttpComponent->PostJson(login_url, jsonWriter, loginResponse) != XCode::Successful)
-		{
+			std::string error;
+			if(loginResponse->GetMember("error", error))
+			{
+				LOG_ERROR("login error = " << error);
+			}
 			return false;
 		}
 
