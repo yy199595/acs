@@ -5,6 +5,7 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
+#include"Util/MathHelper.h"
 #include"NetWork/GateRpcClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
@@ -48,8 +49,9 @@ namespace Sentry
 		MainRedisComponent * redisComponent = this->GetComponent<MainRedisComponent>();
 		if(redisComponent->Lock("Ping"))
 		{
-			LOG_ERROR(userId << " get redis lock successful");
-			//this->GetApp()->GetTaskComponent()->Sleep(5000);
+			int time = Helper::Math::Random<int>(1000, 9000);
+			LOG_ERROR(userId << " get redis lock successful time = " << time);
+			this->GetApp()->GetTaskComponent()->Sleep(time);
 			GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
 			gateProxyComponent->Call(userId, "TaskComponent.Update");
 			DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();

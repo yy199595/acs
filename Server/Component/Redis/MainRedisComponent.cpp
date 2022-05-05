@@ -259,7 +259,7 @@ namespace Sentry
 		std::unordered_map<std::string, std::string> parateters
 			{
 				std::make_pair("key", key),
-				std::make_pair("time", "5")
+				std::make_pair("time", "10")
 			};
 		std::shared_ptr<RedisResponse> response(new RedisResponse());
 		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", parateters);
@@ -268,28 +268,17 @@ namespace Sentry
 			return false;
 		}
 		//LOG_DEBUG("redis lock " << key << " get successful");
-		this->mLockTimers[key] = this->mTimerComponent->DelayCall(4.5f, &MainRedisComponent::OnLockTimeout, this, key);
+		this->mLockTimers[key] = this->mTimerComponent->DelayCall(9.5f, &MainRedisComponent::OnLockTimeout, this, key);
 		return true;
 	}
 
 	bool MainRedisComponent::UnLock(const string& key)
 	{
-		std::string tag;
-		if (!this->GetLuaScript("lock.lua", tag))
-		{
-			LOG_ERROR("not find redis script lock.lua");
-			return false;
-		}
-		std::unordered_map<std::string, std::string> parateters
-			{
-				std::make_pair("key", key),
-				std::make_pair("time", "5")
-			};
 		std::shared_ptr<RedisResponse> response1(new RedisResponse());
-		std::shared_ptr<RedisRequest> request1 = RedisRequest::MakeLua(tag, "unlock", parateters);
-		if (this->mRedisClient->Run(request1, response1) != XCode::Successful || !response1->IsOk())
+		std::shared_ptr<RedisRequest> request1 = RedisRequest::Make( "DEL", key);
+		if (this->mRedisClient->Run(request1, response1) != XCode::Successful)
 		{
-
+			return false;
 		}
 
 		auto iter = this->mLockTimers.find(key);
@@ -299,13 +288,6 @@ namespace Sentry
 			this->mLockTimers.erase(iter);
 			this->mTimerComponent->CancelTimer(id);
 		}
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("DEL", key);
-		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-		if(this->mRedisClient->Run(request, response) != XCode::Successful)
-		{
-			return false;
-		}
-		LOG_DEBUG("redis lock " << key << " unlock");
 		return true;
 	}
 
@@ -318,10 +300,10 @@ namespace Sentry
 			this->mTaskComponent->Start([this, key]()
 			{
 				std::shared_ptr<RedisResponse> response(new RedisResponse());
-				std::shared_ptr<RedisRequest> request = RedisRequest::Make("SETEX", key, 5, 1);
+				std::shared_ptr<RedisRequest> request = RedisRequest::Make("SETEX", key, 10, 1);
 				if(this->mRedisClient->Run(request, response) == XCode::Successful && response->IsOk())
 				{
-					this->mLockTimers[key] = this->mTimerComponent->DelayCall(4.5f, &MainRedisComponent::OnLockTimeout,
+					this->mLockTimers[key] = this->mTimerComponent->DelayCall(9.5f, &MainRedisComponent::OnLockTimeout,
 							this, key);
 					return;
 				}
