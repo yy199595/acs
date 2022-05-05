@@ -9,7 +9,7 @@ namespace Sentry
 	class ServiceProxy;
 	class MainRedisComponent;
 	class MysqlProxyComponent;
-	class HttpUserService : public HttpService
+	class HttpUserService : public HttpService, public IComplete
 	{
 	 public:
 		HttpUserService() = default;
@@ -18,6 +18,7 @@ namespace Sentry
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;
+		void OnAllServiceStart() final;
 		bool OnInitService(HttpServiceRegister &serviceRegister) final;
 	 private:
 		XCode Login(const Json::Reader& request, Json::Writer& response);

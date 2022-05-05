@@ -77,6 +77,7 @@ namespace Sentry
 		{
 			LOG_ERROR(sql);
 			LOG_ERROR(response.error());
+			return code;
 		}
 		return XCode::Successful;
 	}

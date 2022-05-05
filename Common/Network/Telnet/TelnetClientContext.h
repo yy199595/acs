@@ -16,11 +16,11 @@ namespace Sentry
 namespace Sentry
 {
 	class ConsoleComponent;
-	class TelnetClient
+	class TelnetClientContext
 	{
 	 public:
-		explicit TelnetClient(std::shared_ptr<SocketProxy> socketProxy);
-		~TelnetClient() = default;
+		explicit TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy);
+		~TelnetClientContext() = default;
 	 public:
 		bool Response(const std::string& content);
 		std::shared_ptr<TelnetContent> ReadCommand();

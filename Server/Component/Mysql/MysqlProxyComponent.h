@@ -17,6 +17,9 @@ namespace Sentry
 
 		XCode Save(const Message & data);
 
+		template<typename T>
+		XCode SetIndex(const std::string & field);
+
 		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response);
 
 		template<typename T>
@@ -117,5 +120,15 @@ namespace Sentry
 		std::shared_ptr<s2s::Mysql::Response>
 			response = std::make_shared<s2s::Mysql::Response>();
 		return this->Call("Update", request, response);
+	}
+
+	template<typename T>
+	XCode MysqlProxyComponent::SetIndex(const std::string& field)
+	{
+		s2s::Mysql::Invoke request;
+		std::unique_ptr<T> data(new T());
+		std::shared_ptr<s2s::Mysql::Response> response(new s2s::Mysql::Response());
+		request.set_sql(fmt::format("CREATE INDEX {0} ON {1} ({2});",field,  data->GetTypeName(), field));
+		return this->Call("Invoke", request, response);
 	}
 }

@@ -38,8 +38,9 @@ namespace Sentry
 	 public:
 		Component();
 		~Component() override = default;
+		Component(const Component &) = delete;
 
-	 public:
+	public:
 		friend class Entity;
 		friend class ComponentFactory;
 		inline long long GetEntityId() const

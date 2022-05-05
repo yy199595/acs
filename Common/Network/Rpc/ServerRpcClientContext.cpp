@@ -76,7 +76,6 @@ namespace Sentry
 		case RPC_TYPE_REQUEST:
 			return this->OnRequest(buffer, size);
 		case RPC_TYPE_RESPONSE:
-
 			return this->OnResponse(buffer, size);
 		}
 		return false;

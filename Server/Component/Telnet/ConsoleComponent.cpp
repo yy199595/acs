@@ -28,11 +28,11 @@ namespace Sentry
 
 	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
-		std::shared_ptr<TelnetClient> telnetClient(new TelnetClient(socket));
+		std::shared_ptr<TelnetClientContext> telnetClient(new TelnetClientContext(socket));
 		this->mTaskComponent->Start(&ConsoleComponent::HandleConsoleClient, this, telnetClient);
 	}
 
-	void ConsoleComponent::HandleConsoleClient(std::shared_ptr<TelnetClient> telnetClient)
+	void ConsoleComponent::HandleConsoleClient(std::shared_ptr<TelnetClientContext> telnetClient)
 	{
 		telnetClient->Response("welcome to sentry server");
 		while (telnetClient->IsOpen())

@@ -1,9 +1,9 @@
 #pragma once
 #include "Component/Component.h"
-#include "Network/Telnet/TelnetClient.h"
+#include "Network/Telnet/TelnetClientContext.h"
 namespace Sentry
 {
-	class TelnetClient;
+	class TelnetClientContext;
 	using ConsoleFunction = std::function<bool(const std::string&, std::vector<std::string>&)>;
 	class ConsoleComponent : public Component, public ISocketListen, public IStart
 	{
@@ -24,7 +24,7 @@ namespace Sentry
 		bool Hotfix(const std::string& parameter, std::vector<std::string>& response);
 		bool Services(const std::string& parameter, std::vector<std::string>& response);
 	 private:
-		void HandleConsoleClient(std::shared_ptr<TelnetClient> telnetClient);
+		void HandleConsoleClient(std::shared_ptr<TelnetClientContext> telnetClient);
 	 private:
 		class TaskComponent* mTaskComponent;
 		std::unordered_map<std::string, ConsoleFunction> mFunctionMap;

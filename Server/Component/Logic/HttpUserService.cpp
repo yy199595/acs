@@ -32,6 +32,17 @@ namespace Sentry
 		return true;
 	}
 
+	void HttpUserService::OnAllServiceStart()
+	{
+		XCode code = this->mMysqlComponent->SetIndex<db_account::tab_user_account>("user_id");
+		if(code == XCode::Successful)
+		{
+			LOG_INFO("db_account.tab_user_account set index [user_id] successful");
+			return;
+		}
+		LOG_ERROR("db_account.tab_user_account set index [user_id] failure");
+	}
+
 	XCode HttpUserService::Login(const Json::Reader& request, Json::Writer& response)
 	{
 		string account, password;
@@ -112,4 +123,5 @@ namespace Sentry
 		long long now = Helper::Time::GetNowSecTime();
 		return Helper::Md5::GetMd5(fmt::format("{0}:{1}:{2}", account, now, number));
 	}
+
 }// namespace Sentry
