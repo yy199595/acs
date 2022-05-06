@@ -85,7 +85,6 @@
         "./Script/Server/"
     ],
     "component": [
-        "RpcComponent",
         "HttpComponent",
         "ConsoleComponent",
         "DataMgrComponent",
@@ -95,6 +94,7 @@
         "LuaScriptComponent",
         "LuaRegisterComponent",
         "RpcClientComponent",
+        "RpcHandlerComponent",
         "GateComponent",
         "GateClientComponent",
         "MysqlProxyComponent",

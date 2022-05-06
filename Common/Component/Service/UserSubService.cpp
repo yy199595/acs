@@ -6,7 +6,7 @@
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	bool UserSubService::OnInitService(SubServiceRegister& methodRegister)
+	bool UserSubService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
 		return true;
 	}

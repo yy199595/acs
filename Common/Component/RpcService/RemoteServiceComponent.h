@@ -39,10 +39,14 @@ namespace Sentry
 	 protected:
 		bool LateAwake() override;
 		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
-		virtual XCode SendRequest(const std::string & address, std::shared_ptr<com::Rpc::Request> request) = 0;
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
-	 protected:
+	private:
+		XCode SendRequest(const std::string & address, std::shared_ptr<com::Rpc::Request> request);
+
+	protected:
 		std::string mLocalAddress;
-		class RpcComponent* mRpcComponent;
+		class RpcHandlerComponent* mRpcComponent;
+		class MainRedisComponent * mRedisComponent;
+		class RpcClientComponent * mClientComponent;
 	};
 }

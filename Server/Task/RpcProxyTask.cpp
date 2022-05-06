@@ -3,7 +3,7 @@
 //
 
 #include"RpcProxyTask.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Gate/GateComponent.h"
 namespace Sentry
 {
@@ -16,7 +16,7 @@ namespace Sentry
 	}
 
 	void RpcProxyTask::InitProxyTask(long long rpcId, long long sockId, GateComponent* component,
-		RpcComponent* rpcComponent)
+		RpcHandlerComponent* rpcComponent)
 	{
 		this->mRpcId = rpcId;
 		this->mSockId = sockId;

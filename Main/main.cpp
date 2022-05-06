@@ -11,7 +11,7 @@
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include<Component/Telnet/ConsoleComponent.h>
-#include<Component/Rpc/RpcComponent.h>
+#include<Component/Rpc/RpcHandlerComponent.h>
 #include<Component/Scene/ThreadPoolComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
@@ -37,7 +37,7 @@ using namespace Client;
 void RegisterComponent()
 {
 // rpc
-    ComponentFactory::Add<RpcComponent>("RpcComponent");
+    ComponentFactory::Add<RpcHandlerComponent>("RpcHandlerComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");

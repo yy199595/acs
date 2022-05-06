@@ -37,9 +37,9 @@ namespace Sentry
 		void CheckPlayerLogout(const std::string & address);
 	 private:
 		std::set<std::string> mBlackList;
-		class RpcComponent* mRpcComponent;
 		class GateComponent* mGateComponent;
 		class TimerComponent* mTimerComponent;
+		class RpcHandlerComponent* mRpcComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
 		std::unordered_map<long long, std::string> mClientAddressMap;
 		std::unordered_map<std::string, std::shared_ptr<GateRpcClientContext>> mGateClientMap;

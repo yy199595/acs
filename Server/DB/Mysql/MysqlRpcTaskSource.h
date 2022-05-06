@@ -11,7 +11,7 @@
 using namespace google::protobuf;
 namespace Sentry
 {
-    class RpcComponent;
+    class RpcHandlerComponent;
     class MysqlRpcTaskSource : public IRpcTask
     {
     public:
@@ -28,7 +28,7 @@ namespace Sentry
     private:
         XCode mCode;
         const int mTimeout;
-        RpcComponent * mRpcComponent;
+        RpcHandlerComponent * mRpcComponent;
         TaskSource<std::shared_ptr<s2s::Mysql::Response>> mTaskSource;
     };
 }

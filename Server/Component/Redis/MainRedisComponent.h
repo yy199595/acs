@@ -39,9 +39,9 @@ namespace Sentry
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
 		TimerComponent * mTimerComponent;
-		class RpcComponent * mRpcComponent;
 		const struct RedisConfig * mConfig;
 		class RedisSubComponent * mSubComponent;
+		class RpcHandlerComponent * mRpcComponent;
 		std::shared_ptr<RedisClientContext> mRedisClient;
 		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;

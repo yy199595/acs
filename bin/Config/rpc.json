@@ -5,6 +5,7 @@
             "Async": true,
             "Timeout": 0,
             "Type": "Server",
+            "CallWay": "Net",
             "Request": "s2s.Mysql.Add",
             "Response": "s2s.Mysql.Response",
             "Channel": "RpcClientComponent"
@@ -13,6 +14,7 @@
             "Id": 102,
             "Async": true,
             "Timeout": 0,
+            "CallWay": "Net",
             "Type": "Server",
             "Request": "s2s.Mysql.Save",
             "Response": "s2s.Mysql.Response"
@@ -21,6 +23,7 @@
             "Id": 103,
             "Async": true,
             "Timeout": 0,
+            "CallWay": "Net",
             "Type": "Server",
             "Request": "s2s.Mysql.Delete",
             "Response": "s2s.Mysql.Response"
@@ -29,6 +32,7 @@
             "Id": 104,
             "Async": true,
             "Timeout": 0,
+            "CallWay": "Net",
             "Type": "Server",
             "Request": "s2s.Mysql.Query",
             "Response": "s2s.Mysql.Response"
@@ -37,6 +41,7 @@
             "Id": 105,
             "Async": true,
             "Timeout": 0,
+            "CallWay": "Net",
             "Type": "Server",
             "Request": "s2s.Mysql.Invoke",
             "Response": "s2s.Mysql.Response"
@@ -45,6 +50,7 @@
             "Id": 106,
             "Async": true,
             "Timeout": 0,
+            "CallWay": "Net",
             "Type": "Server",
             "Request": "s2s.Mysql.Update",
             "Response": "s2s.Mysql.Response"
@@ -55,6 +61,7 @@
             "Id": 201,
             "Async": false,
             "Timeout": 0,
+            "CallWay": "Sub",
             "Type": "Server",
             "Request":"sub.Add.Request"
         },
@@ -62,6 +69,7 @@
             "Id": 301,
             "Async": false,
             "Timeout": 0,
+            "CallWay": "Sub",
             "Type": "Server",
             "Request":"sub.Push.Request",
             "Response": "sub.Push.Response"
@@ -70,6 +78,7 @@
             "Id": 401,
             "Async": false,
             "Timeout": 0,
+            "CallWay": "Sub",
             "Type": "Server",
             "Request":"sub.Del.Request"
         }
@@ -78,24 +87,28 @@
         "Ping": {
             "Id": 1001,
             "Async": true,
-            "Type": "Client"
+            "Type": "Client",
+            "CallWay": "Net"
         },
         "Allot": {
             "Id": 1002,
             "Async": true,
             "Type": "Server",
+            "CallWay": "Net",
             "Request": "s2s.AddressAllot.Request"
         },
         "CallClient": {
             "Id": 1003,
             "Async": false,
             "Type": "Server",
+            "CallWay": "Net",
             "Request": "c2s.Rpc.Call"
         },
         "BroadCast": {
             "Id": 1004,
             "Async": false,
             "Type": "Server",
+            "CallWay": "Net",
             "Request": "c2s.Rpc.Call"
         }
     },
@@ -104,6 +117,7 @@
             "Id": 2001,
             "Async": false,
             "Type": "Client",
+            "CallWay": "Net",
             "Request": "c2s.Chat.Request"
         }
     }

@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-	class RpcComponent;
+	class RpcHandlerComponent;
 	class GateComponent;
 	class RpcProxyTask : public IRpcTask
 	{
@@ -17,7 +17,7 @@ namespace Sentry
 		~RpcProxyTask() = default;
 	 public:
 		void InitProxyTask(long long rpcId, long long sockId,
-			GateComponent* component, RpcComponent* rpcComponent);
+			GateComponent* component, RpcHandlerComponent* rpcComponent);
 		long long GetRpcId() final
 		{
 			return this->mTaskRpcId;

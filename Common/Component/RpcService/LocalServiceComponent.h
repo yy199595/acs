@@ -17,9 +17,6 @@ namespace Sentry
 		LocalServiceComponent() = default;
 	protected:
 		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
-		XCode Send(const std::string &func, std::shared_ptr<Rpc_Request> message) final;
-		XCode Send(const std::string &func, std::shared_ptr<Rpc_Response> message) final;
-		XCode SendRequest(const std::string &address, std::shared_ptr<com::Rpc::Request> request) final;
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response) final;
 	public:
 		bool DelEntity(long long id, bool publish = false);

@@ -82,8 +82,6 @@ namespace Sentry
 	class ICallService : public IServiceBase
 	{
 	 public:
-		virtual XCode Send(const std::string & address, std::shared_ptr<T1> message) = 0;
-		virtual XCode Send(const std::string & address, std::shared_ptr<T2> message) = 0;
 		virtual XCode Invoke(const std::string & func, std::shared_ptr<T1>, std::shared_ptr<T2> response) = 0;
 	};
 

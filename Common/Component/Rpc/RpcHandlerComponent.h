@@ -18,13 +18,12 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-
 	class IRpcTask;
-	class RpcComponent : public Component, public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
+	class RpcHandlerComponent : public Component, public IProtoRpc<com::Rpc_Request, com::Rpc_Response>
 	{
 	 public:
-		RpcComponent() = default;
-		~RpcComponent() final = default;
+		RpcHandlerComponent() = default;
+		~RpcHandlerComponent() final = default;
 
 	 public:
 		void AddRpcTask(std::shared_ptr<IRpcTask> task);
@@ -43,6 +42,7 @@ namespace Sentry
 	 private:
 		class TaskComponent* mCorComponent;
 		class TimerComponent* mTimerComponent;
+		class MainRedisComponent * mRedisComponent;
 		class RpcClientComponent* mRpcClientComponent;
 #ifdef __DEBUG__
 		std::unordered_map<long long, RpcTaskInfo> mRpcInfoMap;

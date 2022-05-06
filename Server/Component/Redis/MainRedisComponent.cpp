@@ -1,25 +1,21 @@
 ﻿#include"MainRedisComponent.h"
 
 #include"App/App.h"
-#include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
-#include"Component/Service/RedisSubService.h"
 #include"Global/RpcConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
-#include"Component/Redis/RedisSubComponent.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
-		this->mRpcComponent = this->GetComponent<RpcComponent>();
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mSubComponent = this->GetComponent<RedisSubComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
+		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
 		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 		return true;
 	}

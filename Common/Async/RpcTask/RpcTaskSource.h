@@ -36,7 +36,7 @@ namespace Sentry
         lua_State *mCoroutine;
     };
 
-    class RpcComponent;
+    class RpcHandlerComponent;
     class RpcTaskSource : public IRpcTask
     {
     public:
@@ -53,7 +53,7 @@ namespace Sentry
 		std::shared_ptr<com::Rpc_Response> Await();
     private:
         const int mTimeout;
-        RpcComponent * mRpcComponent;
+        RpcHandlerComponent * mRpcComponent;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
     template<typename T>

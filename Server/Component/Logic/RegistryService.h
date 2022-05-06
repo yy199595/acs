@@ -1,17 +1,17 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
 #include"Protocol/sub.pb.h"
-#include"Component/Service/RedisSubService.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 using namespace com;
 namespace Sentry
 {
 	class LocalServiceComponent;
 
-	class RpcComponent;
+	class RpcHandlerComponent;
 
 	class TaskComponent;
 
-	class RegistryService : public RedisSubService, public IComplete, public IServiceChange
+	class RegistryService : public LocalServiceComponent, public IComplete, public IServiceChange
 	{
 	 public:
 		RegistryService() = default;
@@ -24,7 +24,7 @@ namespace Sentry
 	 protected:
 		void OnAddService(Component *component) final;
 		void OnDelService(Component *component) final;
-		bool OnInitService(SubServiceRegister &methodRegister) final;
+		bool OnInitService(ServiceMethodRegister &methodRegister) ;
 	 private:
 		XCode Add(const sub::Add::Request& request);
 		XCode Del(const sub::Del::Request& request);

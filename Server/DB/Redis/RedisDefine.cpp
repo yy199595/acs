@@ -109,14 +109,14 @@ namespace Sentry
 	{
 		if(index < 0 || index >= this->mArray.size())
 		{
-			return false;
+			return -1;
 		}
 		if(!this->mArray[index]->IsLong())
 		{
-			return false;
+			return -1;
 		}
 		std::shared_ptr<RedisLong> redisLong = std::dynamic_pointer_cast<RedisLong>(this->mArray[index]);
-		return redisLong == nullptr ? 0 : redisLong->GetValue();
+		return redisLong == nullptr ? -1 : redisLong->GetValue();
 	}
 
     void RedisResponse::AddValue(long long value)

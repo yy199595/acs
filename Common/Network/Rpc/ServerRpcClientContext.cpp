@@ -130,6 +130,7 @@ namespace Sentry
 	void ServerRpcClientContext::OnConnect(XCode code)
 	{
 		this->mConnectCount++;
+		assert(this->mConnectTask);
 		this->mConnectTask->SetResult(code);
 		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD

@@ -4,11 +4,10 @@
 
 #ifndef _USERSUBSERVICE_H_
 #define _USERSUBSERVICE_H_
-#include"Component/Service/RedisSubService.h"
-
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class UserSubService : public RedisSubService
+	class UserSubService : public LocalServiceComponent
 	{
 	 public:
 		UserSubService() = default;
@@ -17,7 +16,7 @@ namespace Sentry
 		void DelUser(const Json::Reader & jsonReader);
 		void AddUser(const Json::Reader & jsonReader);
 	 protected:
-		bool OnInitService(SubServiceRegister &methodRegister) ;
+		bool OnInitService(ServiceMethodRegister &methodRegister)final;
 	 private:
 		class RedisComponent * mRedisComponent;
 	};

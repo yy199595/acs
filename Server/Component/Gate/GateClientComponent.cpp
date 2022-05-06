@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"NetWork/GateRpcClientContext.h"
 #include"GateComponent.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"Pool/MessagePool.h"
@@ -25,7 +25,7 @@ namespace Sentry
 	bool GateClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
-		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
+		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcHandlerComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		return true;
 	}

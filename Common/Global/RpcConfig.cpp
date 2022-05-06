@@ -42,9 +42,14 @@ namespace Sentry
 				protocolConfig.MethodId = iter2->value["Id"].GetInt();
 				protocolConfig.IsAsync = iter2->value["Async"].GetBool();
 				protocolConfig.Type = iter2->value["Type"].GetString();
+				protocolConfig.FullName = fmt::format("{0}.{1}", service, protocolConfig.Method);
 				if(iter2->value.HasMember("Auth"))
 				{
 					protocolConfig.Auth = iter2->value["Auth"].GetBool();
+				}
+				if(iter2->value.HasMember("CallWay"))
+				{
+					protocolConfig.CallWay = iter2->value["CallWay"].GetString();
 				}
 				if (iter2->value.HasMember("Timeout"))
 				{

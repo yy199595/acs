@@ -210,42 +210,4 @@ namespace Sentry
 		return false;
 	}
 
-	XCode LocalServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
-	{
-		return this->Send(address, request);
-	}
-
-	XCode LocalServiceComponent::Send(const string& address, std::shared_ptr<com::Rpc::Request> request)
-	{
-		std::shared_ptr<ServerRpcClientContext> rpcClient = this->mRpcClientComponent->GetOrCreateSession(address);
-		if(rpcClient != nullptr && rpcClient->GetSocketProxy()->IsOpen())
-		{
-			rpcClient->SendToServer(request);
-			return XCode::Successful;
-		}
-		for(size_t index = 0; index < 3; index++)
-		{
-			LOG_DEBUG(this->GetName() << " start connect [" << address << "]");
-			if(rpcClient->ConnectAsync())
-			{
-				LOG_DEBUG(this->GetName() << " connect [" << address << "] successful");
-				rpcClient->SendToServer(request);
-				return XCode::Successful;
-			}
-			this->GetApp()->GetTaskComponent()->Sleep(1000);
-		}
-		return XCode::NetWorkError;
-	}
-
-	XCode LocalServiceComponent::Send(const std::string& address, std::shared_ptr<Rpc_Response> message)
-	{
-		std::shared_ptr<ServerRpcClientContext> clientContext = this->mRpcClientComponent->GetSession(address);
-		if(clientContext == nullptr || !clientContext->GetSocketProxy()->IsOpen())
-		{
-			return XCode::NetWorkError;
-		}
-		clientContext->SendToServer(message);
-		return XCode::Successful;
-	}
-
 }

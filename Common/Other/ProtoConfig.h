@@ -12,7 +12,8 @@ namespace Sentry
         bool IsAsync;
         int MethodId;
 		std::string Type;
-        std::string Method;
+		std::string CallWay;
+		std::string Method;
         std::string Service;
         std::string Request;
         std::string Response;

@@ -1,4 +1,4 @@
-﻿#include"RpcComponent.h"
+﻿#include"RpcHandlerComponent.h"
 #include<Component/RpcService/LocalServiceComponent.h>
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
@@ -9,25 +9,27 @@
 #include"Other/ElapsedTimer.h"
 #include"Json/JsonWriter.h"
 #include"Async/RpcTask/RpcTaskSource.h"
+#include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
-	void RpcComponent::Awake()
+	void RpcHandlerComponent::Awake()
 	{
 		this->mCorComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 	}
 
-	bool RpcComponent::LateAwake()
+	bool RpcHandlerComponent::LateAwake()
 	{
 		this->mCorComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
 		return true;
 	}
 
-	XCode RpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
+	XCode RpcHandlerComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		unsigned short methodId = request->method_id();
 		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
@@ -53,19 +55,43 @@ namespace Sentry
 		{
 			const std::string& func = protocolConfig->Method;
 			response->set_code((int)logicService->Invoke(func, request, response));
-			return logicService->Send(request->address(), response);
+			if(protocolConfig->CallWay == "Sub")
+			{
+				std::string message = "-";
+				if(response->AppendToString(&message))
+				{
+					const std::string & channel = request->address();
+					long long num = this->mRedisComponent->Publish(channel, message);
+					return num == 1 ? XCode::Successful : XCode::SendMessageFail;
+				}
+				return XCode::SerializationFailure;
+			}
+			this->mRpcClientComponent->Send(request->address(), response);
+			return XCode::Successful;
 		}
 
 		this->mCorComponent->Start([request, this, logicService, protocolConfig, response]()
 		{
 			const std::string& func = protocolConfig->Method;
 			response->set_code((int)logicService->Invoke(func, request, response));
-			logicService->Send(request->address(), response);
+			if(protocolConfig->CallWay == "Sub")
+			{
+				std::string message = "-";
+				if(response->AppendToString(&message))
+				{
+					const std::string & channel = request->address();
+					long long num = this->mRedisComponent->Publish(channel, message);
+					return num == 1 ? XCode::Successful : XCode::SendMessageFail;
+				}
+				return XCode::SerializationFailure;
+			}
+			this->mRpcClientComponent->Send(request->address(), response);
+			return XCode::Successful;
 		});
 		return XCode::Successful;
 	}
 
-	XCode RpcComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
+	XCode RpcHandlerComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
 		long long rpcId = response->rpc_id();
 		auto iter = this->mRpcTasks.find(rpcId);
@@ -99,18 +125,18 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	void RpcComponent::AddRpcTask(std::shared_ptr<IRpcTask> task)
+	void RpcHandlerComponent::AddRpcTask(std::shared_ptr<IRpcTask> task)
 	{
 		long long rpcId = task->GetRpcId();
 		this->mRpcTasks.emplace(rpcId, task);
 		if (task->GetTimeout() > 0)
 		{
 			this->mTimerComponent->DelayCall(
-					task->GetTimeout(), &RpcComponent::OnTaskTimeout, this, rpcId);
+					task->GetTimeout(), &RpcHandlerComponent::OnTaskTimeout, this, rpcId);
 		}
 	}
 #ifdef __DEBUG__
-	void RpcComponent::AddRpcInfo(long long rpcId, int methodId)
+	void RpcHandlerComponent::AddRpcInfo(long long rpcId, int methodId)
 	{
 		RpcTaskInfo taskInfo;
 		taskInfo.MethodId = methodId;
@@ -118,7 +144,7 @@ namespace Sentry
 		this->mRpcInfoMap.emplace(rpcId, taskInfo);
 	}
 
-	bool RpcComponent::GetRpcInfo(long long int rpcId, int& methodId, long long int& time)
+	bool RpcHandlerComponent::GetRpcInfo(long long int rpcId, int& methodId, long long int& time)
 	{
 		auto iter = this->mRpcInfoMap.find(rpcId);
 		if (iter == this->mRpcInfoMap.end())
@@ -132,7 +158,7 @@ namespace Sentry
 	}
 #endif
 
-	void RpcComponent::OnTaskTimeout(long long int rpcId)
+	void RpcHandlerComponent::OnTaskTimeout(long long int rpcId)
 	{
 		auto iter = this->mRpcTasks.find(rpcId);
 		if (iter != this->mRpcTasks.end())

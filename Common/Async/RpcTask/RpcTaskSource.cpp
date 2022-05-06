@@ -1,6 +1,6 @@
 ﻿#include "RpcTaskSource.h"
 #include"App/App.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
 #ifdef __DEBUG__
 #include"Global/RpcConfig.h"
 #endif

@@ -8,7 +8,7 @@
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
-	bool RegistryService::OnInitService(SubServiceRegister& methodRegister)
+	bool RegistryService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.Bind("Add", &RegistryService::Add);
 		methodRegister.Bind("Del", &RegistryService::Del);
@@ -18,7 +18,7 @@ namespace Sentry
 
 	bool RegistryService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(RedisSubService::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
@@ -30,7 +30,6 @@ namespace Sentry
 	void RegistryService::OnAddService(Component* component)
 	{
 		HttpService * httpService = component->Cast<HttpService>();
-		RedisSubService * redisSubService = component->Cast<RedisSubService>();
 		LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
 
 		sub::Add::Request request;
@@ -39,10 +38,6 @@ namespace Sentry
 		if(httpService != nullptr)
 		{
 			request.set_address(this->mHttpAddress);
-		}
-		else if(redisSubService != nullptr)
-		{
-			request.set_address(this->mRpcAddress);
 		}
 		else if(localService != nullptr)
 		{

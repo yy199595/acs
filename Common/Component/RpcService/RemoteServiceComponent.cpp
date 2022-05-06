@@ -7,13 +7,17 @@
 #endif
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/RpcClientComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
 
 namespace Sentry
 {
 	bool RemoteServiceComponent::LateAwake()
 	{
-		this->mRpcComponent = this->GetComponent<RpcComponent>();
+		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
+		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
+		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
 	}
 
@@ -126,6 +130,40 @@ namespace Sentry
 			return response;
 		}
 		return taskSource->Await();
+	}
+
+	XCode RemoteServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
+	{
+		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
+		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(request->method_id());
+		LOG_INFO("start call " << protoConfig->FullName);
+		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
+		{
+			std::string message = "+";
+			if(request->AppendToString(&message))
+			{
+				long long num = this->mRedisComponent->Publish(address, message);
+				return num == 1 ? XCode::Successful : XCode::NetWorkError;
+			}
+			return XCode::SerializationFailure;
+		}
+		std::shared_ptr<ServerRpcClientContext> clientContext = this->mClientComponent->GetOrCreateSession(address);
+		if(clientContext->GetSocketProxy()->IsOpen())
+		{
+			clientContext->SendToServer(request);
+			return XCode::Successful;
+		}
+		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
+		for(size_t index = 0; index < 3; index++)
+		{
+			if(clientContext->ConnectAsync())
+			{
+				clientContext->SendToServer(request);
+				return XCode::Successful;
+			}
+			taskComponent->Sleep(3000);
+		}
+		return XCode::NetWorkError;
 	}
 }
 

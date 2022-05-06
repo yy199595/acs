@@ -50,7 +50,6 @@ namespace Sentry
 		{
 			return this->mType;
 		}
-		bool StartConnect();
 		long long GetLastOperatorTime() const
 		{
 			return this->mLastOperTime;
@@ -60,6 +59,7 @@ namespace Sentry
 		void ConnectHandler();
 		void ReceiveBody(char type, size_t size);
 	 protected:
+		bool StartConnect();
 		virtual void OnConnect(XCode code) = 0;
 		virtual void OnClientError(XCode code) = 0;
 		virtual bool OnReceiveMessage(char type, const char * buffer, size_t size) = 0;

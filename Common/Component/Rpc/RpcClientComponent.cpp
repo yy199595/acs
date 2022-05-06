@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
-#include"Component/Rpc/RpcComponent.h"
+#include"Component/Rpc/RpcHandlerComponent.h"
 #include"Global/RpcConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
@@ -20,7 +20,7 @@ namespace Sentry
 	}
 	bool RpcClientComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcComponent>());
+		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcHandlerComponent>());
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
 		return true;
 	}
@@ -162,8 +162,8 @@ namespace Sentry
 
 	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
 	{
-		auto clientSession = this->GetSession(address);
-		if (clientSession == nullptr || message == nullptr)
+		std::shared_ptr<ServerRpcClientContext> clientSession = this->GetSession(address);
+		if (clientSession == nullptr || message == nullptr || !clientSession->GetSocketProxy()->IsOpen())
 		{
 			LOG_ERROR("send message to [" << address << "] failure");
 			return false;
