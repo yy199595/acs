@@ -14,12 +14,12 @@ namespace Sentry
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
+		LOG_CHECK_RET(this->LoadAllFile());
 	}
 
 	bool LuaScriptComponent::LateAwake()
 	{
 		std::vector<std::string> components;
-		LOG_CHECK_RET_FALSE(this->LoadAllFile());
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{

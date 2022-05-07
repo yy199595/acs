@@ -19,10 +19,10 @@ namespace Sentry
 		template<typename ... Args>
 		std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args && ... args);
 	public:
+		std::shared_ptr<RedisClientContext> GetRedisClient();
 		const std::string & GetName() { return this->mConfig->Name;}
 		const std::string & GetAddress() { return this->mConfig->Address;}
 	private:
-		std::shared_ptr<RedisClientContext> GetRedisClient();
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
 	private:
 		const RedisConfig * mConfig;

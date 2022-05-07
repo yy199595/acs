@@ -17,6 +17,9 @@ namespace Sentry
 	 public:
 		bool OnStart() final;
 		bool LateAwake() final;
+
+	public:
+		std::shared_ptr<RedisClientContext> GetRedisClient(const std::string & name);
 	private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;

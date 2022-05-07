@@ -136,7 +136,7 @@ namespace Sentry
 	{
 		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
 		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(request->method_id());
-		LOG_INFO("start call " << protoConfig->FullName);
+		//LOG_INFO("start call " << protoConfig->FullName);
 		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
 		{
 			std::string message = "+";

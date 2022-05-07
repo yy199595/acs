@@ -6,7 +6,7 @@
 #include"Component/Component.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Coroutine/TaskComponent.h"
-using namespace Sentry;
+
 namespace Sentry
 {
 	class ThreadPoolComponent;
@@ -24,7 +24,7 @@ namespace Sentry
 		bool LoadRedisConfig();
 		void CheckRedisClient();
 	public:
-		bool Lock(const std::string & key);
+		bool Lock(const std::string & key, int timeout = 10);
 		bool UnLock(const std::string & key);
 	 public:
 		long long AddCounter(const std::string& key);
@@ -32,8 +32,8 @@ namespace Sentry
 		void GetAllChannel(std::vector<std::string> & chanels);
 		long long Publish(const std::string& channel, const std::string& message);
 	 private:
-		void OnLockTimeout(const std::string & name);
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
+		void OnLockTimeout(const std::string & name, int timeout);
 		bool GetLuaScript(const std::string& file, std::string& command);
 	 private:
 		std::string mRpcAddress;
@@ -47,5 +47,22 @@ namespace Sentry
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
 		std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<Json::Reader>>>> mPublishTasks;
+	};
+}
+
+namespace Sentry
+{
+	class AutoRedisLock
+	{
+	public:
+		AutoRedisLock(MainRedisComponent * component, const std::string & key);
+		AutoRedisLock(const AutoRedisLock &) = delete;
+		~AutoRedisLock();
+	public:
+		bool IsLock() { return this->mIsLock;}
+	private:
+		bool mIsLock;
+		const std::string mKey;
+		MainRedisComponent * mRedisComponent;
 	};
 }

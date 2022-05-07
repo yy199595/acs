@@ -10,18 +10,17 @@
 
 namespace Sentry
 {
-	class LocalServiceComponent : public RemoteServiceComponent,
-		public ICallService<com::Rpc::Request, com::Rpc::Response>
+	class LocalServiceComponent : public RemoteServiceComponent, public IServiceBase
 	{
 	public:
 		LocalServiceComponent() = default;
 	protected:
 		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
-		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response) final;
 	public:
 		bool DelEntity(long long id, bool publish = false);
 		bool AddEntity(long long id, const std::string & address, bool publish = false);
-	 public:
+		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response);
+	public:
 		bool AllotAddress(std::string& address) const;
 		void OnAddAddress(const std::string &address) final;
 		void OnDelAddress(const std::string &address) final;
@@ -31,7 +30,6 @@ namespace Sentry
 		bool LoadService() final;
 		bool LateAwake() override;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		//std::shared_ptr<com::Rpc_Response> Invoke(const std::string& method, std::shared_ptr<com::Rpc_Request> request);
 	 private:
 		class UserSubService * mUserService;
 		class RpcClientComponent * mRpcClientComponent;

@@ -78,13 +78,6 @@ namespace Sentry
 		virtual void OnAddAddress(const std::string & address) { };
 	};
 
-	template<typename T1, typename T2>
-	class ICallService : public IServiceBase
-	{
-	 public:
-		virtual XCode Invoke(const std::string & func, std::shared_ptr<T1>, std::shared_ptr<T2> response) = 0;
-	};
-
 	class IServiceChange
 	{
 	 public:

@@ -40,8 +40,7 @@ namespace Sentry
 		}
 
 		const std::string& service = protocolConfig->Service;
-		typedef ICallService<com::Rpc::Request, com::Rpc::Response> CallService;
-		CallService * logicService = this->GetComponent<CallService>(service);
+		LocalServiceComponent * logicService = this->GetComponent<LocalServiceComponent>(service);
 		if (logicService == nullptr)
 		{
 			LOG_ERROR("call service not exist : [" << service << "]");

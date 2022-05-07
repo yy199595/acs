@@ -46,20 +46,17 @@ namespace Sentry
 
 	XCode GateService::Ping(long long userId)
 	{
-		MainRedisComponent * redisComponent = this->GetComponent<MainRedisComponent>();
-		if(redisComponent->Lock("Ping"))
+		MainRedisComponent* redisComponent = this->GetComponent<MainRedisComponent>();
+		AutoRedisLock autoRedisLock(redisComponent, "Ping");
+		if (autoRedisLock.IsLock())
 		{
-			int time = Helper::Math::Random<int>(1000, 9000);
-			LOG_ERROR(userId << " get redis lock successful time = " << time);
-			this->GetApp()->GetTaskComponent()->Sleep(time);
-			GateProxyComponent * gateProxyComponent = this->GetComponent<GateProxyComponent>();
+			LOG_ERROR(userId << " get redis lock successful");
+			GateProxyComponent* gateProxyComponent = this->GetComponent<GateProxyComponent>();
 			gateProxyComponent->Call(userId, "TaskComponent.Update");
-			DataMgrComponent * dataMgrComponent = this->GetComponent<DataMgrComponent>();
+			DataMgrComponent* dataMgrComponent = this->GetComponent<DataMgrComponent>();
 			std::shared_ptr<db_account::tab_user_account> userAccount(new db_account::tab_user_account());
-			redisComponent->UnLock("Ping");
 			return dataMgrComponent->Get(userId, userAccount);
 		}
-		LOG_WARN(userId << " get redis lock failure");
 		return XCode::Failure;
 	}
 

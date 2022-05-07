@@ -7,6 +7,23 @@
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
+
+namespace Sentry
+{
+	AutoRedisLock::AutoRedisLock(MainRedisComponent* component, const std::string& key)
+		: mRedisComponent(component), mKey(key)
+	{
+		this->mIsLock = this->mRedisComponent->Lock(key);
+	}
+	AutoRedisLock::~AutoRedisLock()
+	{
+		if(this->mIsLock)
+		{
+			this->mRedisComponent->UnLock(this->mKey);
+		}
+	}
+}
+
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
@@ -244,7 +261,7 @@ namespace Sentry
 		return response->GetNumber();
 	}
 
-	bool MainRedisComponent::Lock(const string& key)
+	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{
 		std::string tag;
 		if (!this->GetLuaScript("lock.lua", tag))
@@ -255,7 +272,7 @@ namespace Sentry
 		std::unordered_map<std::string, std::string> parateters
 			{
 				std::make_pair("key", key),
-				std::make_pair("time", "10")
+				std::make_pair("time", std::to_string(timeout))
 			};
 		std::shared_ptr<RedisResponse> response(new RedisResponse());
 		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", parateters);
@@ -263,8 +280,9 @@ namespace Sentry
 		{
 			return false;
 		}
-		//LOG_DEBUG("redis lock " << key << " get successful");
-		this->mLockTimers[key] = this->mTimerComponent->DelayCall(9.5f, &MainRedisComponent::OnLockTimeout, this, key);
+		LOG_DEBUG("redis lock " << key << " get successful");
+		this->mLockTimers[key] = this->mTimerComponent->DelayCall(
+				(float)timeout - 0.5f, &MainRedisComponent::OnLockTimeout, this, key, timeout);
 		return true;
 	}
 
@@ -284,23 +302,24 @@ namespace Sentry
 			this->mLockTimers.erase(iter);
 			this->mTimerComponent->CancelTimer(id);
 		}
+		LOG_INFO(key << " unlock successful");
 		return true;
 	}
 
-	void MainRedisComponent::OnLockTimeout(const std::string& key)
+	void MainRedisComponent::OnLockTimeout(const std::string& key, int timeout)
 	{
 		auto iter = this->mLockTimers.find(key);
 		if (iter != this->mLockTimers.end())
 		{
 			this->mLockTimers.erase(iter);
-			this->mTaskComponent->Start([this, key]()
+			this->mTaskComponent->Start([this, key, timeout]()
 			{
 				std::shared_ptr<RedisResponse> response(new RedisResponse());
 				std::shared_ptr<RedisRequest> request = RedisRequest::Make("SETEX", key, 10, 1);
 				if(this->mRedisClient->Run(request, response) == XCode::Successful && response->IsOk())
 				{
-					this->mLockTimers[key] = this->mTimerComponent->DelayCall(9.5f, &MainRedisComponent::OnLockTimeout,
-							this, key);
+					this->mLockTimers[key] = this->mTimerComponent->DelayCall(
+							(float)timeout - 0.5f, &MainRedisComponent::OnLockTimeout,this, key, timeout);
 					return;
 				}
 				LOG_ERROR("redis lock " << key << " delay failure");

@@ -22,12 +22,22 @@ namespace Sentry
 				continue;
 			}
 			std::shared_ptr<RedisInstance> redisInstance(new RedisInstance(config));
-			if(!redisInstance->StartConnect())
+			if (!redisInstance->StartConnect())
 			{
 				return false;
 			}
 			this->mRedisInsts.emplace(config->Name, redisInstance);
 		}
 		return true;
+	}
+
+	std::shared_ptr<RedisClientContext> DataRedisComponent::GetRedisClient(const std::string& name)
+	{
+		auto iter = this->mRedisInsts.find(name);
+		if (iter == this->mRedisInsts.end())
+		{
+			return nullptr;
+		}
+		return iter->second->GetRedisClient();
 	}
 }

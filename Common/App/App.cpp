@@ -2,6 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
+#include"Script/Table.h"
 #include"Component/RpcService/LocalLuaServiceComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
@@ -51,12 +52,7 @@ namespace Sentry
 				}
 				if (!this->AddComponentByName(name))
 				{
-					LocalLuaServiceComponent* luaRpcService = new LocalLuaServiceComponent();
-					if(!this->AddComponent(name, luaRpcService))
-					{
-						LOG_ERROR("add " << name << " failure");
-						return false;
-					}
+					return false;
 				}
 			}
 		}
@@ -80,11 +76,16 @@ namespace Sentry
 		{
 			return this->AddComponent(name, component);
 		}
-		if(this->GetComponent<LuaScriptComponent>() != nullptr)
+		LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		if(luaScriptComponent != nullptr)
 		{
-			LocalLuaServiceComponent* luaRpcService = new LocalLuaServiceComponent();
-			return this->AddComponent(name, luaRpcService);
+			lua_State * luaState = luaScriptComponent->GetLuaEnv();
+			if(Lua::Table::Get(luaState, name))
+			{
+				return this->AddComponent(name, new LocalLuaServiceComponent());
+			}
 		}
+		// 其他语言
 		return false;
 	}
 
