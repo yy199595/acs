@@ -156,7 +156,7 @@ namespace Sentry
 		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
 		for(size_t index = 0; index < 3; index++)
 		{
-			if(clientContext->ConnectAsync())
+			if(clientContext->StartConnectAsync())
 			{
 				clientContext->SendToServer(request);
 				return XCode::Successful;

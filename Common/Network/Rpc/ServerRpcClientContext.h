@@ -16,7 +16,7 @@ namespace Sentry
 		~ServerRpcClientContext() override = default;
 	 public:
 		void StartClose();
-		bool ConnectAsync();
+		bool StartConnectAsync();
 		void SendToServer(std::shared_ptr<com::Rpc_Request> message);
 		void SendToServer(std::shared_ptr<com::Rpc_Response> message);
 	 protected:

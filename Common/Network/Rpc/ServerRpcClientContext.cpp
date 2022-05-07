@@ -115,7 +115,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerRpcClientContext::ConnectAsync()
+	bool ServerRpcClientContext::StartConnectAsync()
 	{
 		AutoCoroutineLock lock(this->mConnectLock);
 		if(this->mSocketProxy->IsOpen())
