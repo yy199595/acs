@@ -16,32 +16,32 @@ namespace Json
 	{
 		const char * str = json.c_str();
 		const size_t size = json.size();
-		this->mJsonDocument.Parse(str, size);
+		this->Parse(str, size);
 	}
 	Reader::Reader(const char* json, const size_t size)
 		: mJson(json, size)
 	{
-		this->mJsonDocument.Parse(json, size);
+		this->Parse(json, size);
 	}
 
 	bool Reader::ParseJson(const std::string& json)
 	{
 		const char * str = json.c_str();
 		const size_t size = json.size();
-		this->mJsonDocument.Parse(str, size);
-		return !this->mJsonDocument.HasParseError();
+		this->Parse(str, size);
+		return !this->HasParseError();
 	}
 
 	bool Reader::ParseJson(const char* json, const size_t size)
 	{
-		this->mJsonDocument.Parse(json, size);
-		return !this->mJsonDocument.HasParseError();
+		this->Parse(json, size);
+		return !this->HasParseError();
 	}
 
 	const rapidjson::Value* Reader::GetJsonValue(const char* key) const
 	{
-		auto iter = this->mJsonDocument.FindMember(key);
-		return iter != this->mJsonDocument.MemberEnd() ? &iter->value : nullptr;
+		auto iter = this->FindMember(key);
+		return iter != this->MemberEnd() ? &iter->value : nullptr;
 	}
 
 	bool Reader::GetMember(const char* key, XCode& code) const
@@ -252,8 +252,8 @@ namespace Json
 {
 	const rapidjson::Value* Reader::GetJsonValue(const char* k1, const char* k2) const
 	{
-		auto iter = this->mJsonDocument.FindMember(k1);
-		if(iter == this->mJsonDocument.MemberEnd() || !iter->value.IsObject())
+		auto iter = this->FindMember(k1);
+		if(iter == this->MemberEnd() || !iter->value.IsObject())
 		{
 			return nullptr;
 		}
@@ -409,9 +409,9 @@ namespace Json
 {
 	bool Reader::GetMember(std::vector<int>& value) const
 	{
-		if (this->mJsonDocument.IsArray())
+		if (this->IsArray())
 		{
-			auto jsonArray = this->mJsonDocument.GetArray();
+			auto jsonArray = this->GetArray();
 			for (int index = 0; index < jsonArray.Size(); index++)
 			{
 				if (!jsonArray[index].IsInt())
@@ -427,9 +427,9 @@ namespace Json
 
 	bool Reader::GetMember(std::vector<long long>& value) const
 	{
-		if (this->mJsonDocument.IsArray())
+		if (this->IsArray())
 		{
-			auto jsonArray = this->mJsonDocument.GetArray();
+			auto jsonArray = this->GetArray();
 			for (int index = 0; index < jsonArray.Size(); index++)
 			{
 				if (!jsonArray[index].IsInt64())
@@ -445,9 +445,9 @@ namespace Json
 
 	bool Reader::GetMember(std::vector<std::string>& value) const
 	{
-		if (this->mJsonDocument.IsArray())
+		if (this->IsArray())
 		{
-			auto jsonArray = this->mJsonDocument.GetArray();
+			auto jsonArray = this->GetArray();
 			for (int index = 0; index < jsonArray.Size(); index++)
 			{
 				if (!jsonArray[index].IsString())

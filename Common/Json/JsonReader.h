@@ -11,7 +11,7 @@
 #include"rapidjson/document.h"
 namespace Json
 {
-	class Reader
+	class Reader : public rapidjson::Document
 	{
 	 public:
 		Reader();
@@ -67,7 +67,7 @@ namespace Json
 		const rapidjson::Value* GetJsonValue(const char* k1, const char* k2) const;
 	 private:
 		std::string mJson;
-		rapidjson::Document mJsonDocument;
+		//rapidjson::Document mJsonDocument;
 	};
 }
 

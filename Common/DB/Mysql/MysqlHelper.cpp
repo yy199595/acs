@@ -224,7 +224,24 @@ namespace Sentry
 		{
 			const char* key = iter->name.GetString();
 			const rapidjson::Value& jsonValue = iter->value;
-			this->mSqlCommandStream << key << "=";
+			switch(key[0])
+			{
+			case '$': // >
+				this->mSqlCommandStream << key + 1 << ">";
+				break;
+			case '%': // <
+				this->mSqlCommandStream << key + 1 << "<";
+				break;
+			case '&': //>=
+				this->mSqlCommandStream << key + 1 << ">=";
+				break;
+			case '*': //<=
+				this->mSqlCommandStream << key + 1 << "<=";
+				break;
+			default:
+				this->mSqlCommandStream << key + 1 << "=";
+				break;
+			}
 			if (!this->WriterToStream(this->mSqlCommandStream, jsonValue))
 			{
 				return false;

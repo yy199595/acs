@@ -153,17 +153,14 @@ namespace Sentry
 			clientContext->SendToServer(request);
 			return XCode::Successful;
 		}
-		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
-		for(size_t index = 0; index < 3; index++)
+		int count = 0;
+		while(!clientContext->StartConnectAsync())
 		{
-			if(clientContext->StartConnectAsync())
-			{
-				clientContext->SendToServer(request);
-				return XCode::Successful;
-			}
-			taskComponent->Sleep(3000);
+			LOG_ERROR("connect [" << address << "] failure count = " << count++);
+			this->GetApp()->GetTaskComponent()->Sleep(3000);
 		}
-		return XCode::NetWorkError;
+		clientContext->SendToServer(request);
+		return XCode::Successful;
 	}
 }
 
