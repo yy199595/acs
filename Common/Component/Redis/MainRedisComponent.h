@@ -28,6 +28,8 @@ namespace Sentry
 		bool UnLock(const std::string & key);
 	 public:
 		long long AddCounter(const std::string& key);
+		long long SubCounter(const std::string & key);
+	 public:
 		bool SubscribeChannel(const std::string& channel);
 		void GetAllChannel(std::vector<std::string> & chanels);
 		long long Publish(const std::string& channel, const std::string& message);

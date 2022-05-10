@@ -163,7 +163,7 @@ namespace Client
 		while(this->GetCurrentRpcClient()->GetSocketProxy()->IsOpen())
 		{
 			this->Call("GateService.Ping");
-			this->mTaskComponent->Sleep(3000);
+			//this->mTaskComponent->Sleep(1000);
 		}
 	}
 

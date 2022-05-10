@@ -261,6 +261,17 @@ namespace Sentry
 		return response->GetNumber();
 	}
 
+	long long MainRedisComponent::SubCounter(const std::string& key)
+	{
+		std::shared_ptr<RedisResponse> response(new RedisResponse());
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("DECR", key);
+		if(this->mRedisClient->Run(request, response) != XCode::Successful)
+		{
+			return 0;
+		}
+		return response->GetNumber();
+	}
+
 	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{
 		std::string tag;
@@ -292,6 +303,7 @@ namespace Sentry
 		std::shared_ptr<RedisRequest> request1 = RedisRequest::Make( "DEL", key);
 		if (this->mRedisClient->Run(request1, response1) != XCode::Successful)
 		{
+			LOG_ERROR("unlock " << key << " failure");
 			return false;
 		}
 
