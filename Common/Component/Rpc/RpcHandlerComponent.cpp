@@ -4,7 +4,7 @@
 #include"Util/StringHelper.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Json/JsonWriter.h"
@@ -32,14 +32,14 @@ namespace Sentry
 	XCode RpcHandlerComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		unsigned short methodId = request->method_id();
-		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-		const ProtoConfig* protocolConfig = rpcConfig.GetProtocolConfig(methodId);
-		if (protocolConfig == nullptr)
+		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig* rpcInterfaceConfig = rpcConfig.GetInterfaceConfig(methodId);
+		if (rpcInterfaceConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
 		}
 
-		const std::string& service = protocolConfig->Service;
+		const std::string& service = rpcInterfaceConfig->Service;
 		LocalServiceComponent * logicService = this->GetComponent<LocalServiceComponent>(service);
 		if (logicService == nullptr)
 		{
@@ -50,11 +50,11 @@ namespace Sentry
 		response->set_rpc_id(request->rpc_id());
 		response->set_user_id(request->user_id());
 
-		if (!protocolConfig->IsAsync)
+		if (!rpcInterfaceConfig->IsAsync)
 		{
-			const std::string& func = protocolConfig->Method;
+			const std::string& func = rpcInterfaceConfig->Method;
 			response->set_code((int)logicService->Invoke(func, request, response));
-			if(protocolConfig->CallWay == "Sub")
+			if(rpcInterfaceConfig->CallWay == "Sub")
 			{
 				std::string message = "-";
 				if(response->AppendToString(&message))
@@ -69,11 +69,11 @@ namespace Sentry
 			return XCode::Successful;
 		}
 
-		this->mCorComponent->Start([request, this, logicService, protocolConfig, response]()
+		this->mCorComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
 		{
-			const std::string& func = protocolConfig->Method;
+			const std::string& func = rpcInterfaceConfig->Method;
 			response->set_code((int)logicService->Invoke(func, request, response));
-			if(protocolConfig->CallWay == "Sub")
+			if(rpcInterfaceConfig->CallWay == "Sub")
 			{
 				std::string message = "-";
 				if(response->AppendToString(&message))
@@ -106,8 +106,8 @@ namespace Sentry
 //		if (this->GetRpcInfo(rpcId, methodId, time))
 //		{
 //			std::string json = "";
-//			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-//			const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(methodId);
+//			const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
+//			const InterfaceConfig* protoConfig = rpcConfig.GetInterfaceConfig(methodId);
 //
 //			LOG_DEBUG("*************[response]*************");
 //			LOG_DEBUG("func = " << protoConfig->Service << '.' << protoConfig->Method);
@@ -171,8 +171,8 @@ namespace Sentry
 		long long costTime = 0;
 		if (this->GetRpcInfo(rpcId, methodId, costTime))
 		{
-			const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-			const ProtoConfig* config = rpcConfig.GetProtocolConfig(methodId);
+			const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
+			const InterfaceConfig* config = rpcConfig.GetInterfaceConfig(methodId);
 			if (config != nullptr)
 			{
 				LOG_ERROR("call " << config->Service << '.' << config->Method << " time out");

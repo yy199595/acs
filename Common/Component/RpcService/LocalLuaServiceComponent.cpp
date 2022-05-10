@@ -3,7 +3,7 @@
 #include"Script/Function.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 
 namespace Sentry
 {
@@ -22,7 +22,7 @@ namespace Sentry
 	{
 		std::vector<std::string> methods;
 		const char * tab = this->GetName().c_str();
-		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
+		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
 		rpcConfig.GetMethods(this->GetName(), methods);
 
 		for (const std::string& method : methods)
@@ -34,7 +34,7 @@ namespace Sentry
 				return false;
 			}
 			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
-			const ProtoConfig * config = rpcConfig.GetProtocolConfig(fullName);
+			const InterfaceConfig * config = rpcConfig.GetInterfaceConfig(fullName);
 			if(!methodRegister.AddMethod(std::make_shared<LuaServiceMethod>(config->Service, config->Method, this->mLuaEnv)))
 			{
 				return false;

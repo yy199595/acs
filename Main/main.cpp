@@ -4,7 +4,7 @@
 #include"Component/Lua/LuaScriptComponent.h"
 
 #include<Network/Listener/TcpServerComponent.h>
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"

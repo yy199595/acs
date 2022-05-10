@@ -4,7 +4,7 @@
 #include"Pool/MessagePool.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Async/LuaServiceTaskSource.h"
 namespace Sentry
 {
@@ -21,8 +21,8 @@ namespace Sentry
 		{
 			return make_tuple(XCode::CallLuaFunctionFail, nullptr);
 		}
-		const RpcConfig & config = App::Get()->GetRpcConfig();
-		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		const ServiceConfig & config = App::Get()->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = config.GetInterfaceConfig(this->mFunction);
 		if(protoConfig == nullptr)
 		{
 			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
@@ -72,8 +72,8 @@ namespace Sentry
 		}
 
 		XCode code = luaTaskSource->Await();
-		const RpcConfig & config = App::Get()->GetRpcConfig();
-		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		const ServiceConfig & config = App::Get()->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = config.GetInterfaceConfig(this->mFunction);
 		if(protoConfig == nullptr)
 		{
 			return make_tuple(XCode::NotFoundRpcConfig, nullptr);
@@ -90,8 +90,8 @@ namespace Sentry
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request& request, com::Rpc_Response& response)
 	{
-		const RpcConfig & config = App::Get()->GetRpcConfig();
-		const ProtoConfig * protoConfig = config.GetProtocolConfig(this->mFunction);
+		const ServiceConfig & config = App::Get()->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = config.GetInterfaceConfig(this->mFunction);
 		if(protoConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;

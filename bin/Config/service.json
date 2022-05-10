@@ -83,6 +83,21 @@
             "Request":"sub.Del.Request"
         }
     },
+    "UserSubService": {
+
+    },
+    "HttpUserService": {
+        "Login": {
+            "Type": "POST",
+            "Content": "application/json",
+            "Path": "/logic/account/login"
+        },
+        "Register": {
+            "Type": "POST",
+            "Content": "application/json",
+            "Path": "/logic/account/register"
+        }
+    },
     "GateService": {
         "Ping": {
             "Id": 1001,

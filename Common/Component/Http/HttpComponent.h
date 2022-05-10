@@ -36,13 +36,10 @@ namespace Sentry
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, int timeout = 5);
 	 public:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
-	 private:
-		const HttpConfig* GetHttpConfig(const std::string& url);
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
-		XCode Invoke(const HttpConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
+		XCode Invoke(const HttpInterfaceConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
 	 private:
 		class TaskComponent* mCorComponent;
 		class ThreadPoolComponent* mThreadComponent;
-		std::unordered_map<std::string, HttpConfig*> mHttpConfigMap;
 	};
 }

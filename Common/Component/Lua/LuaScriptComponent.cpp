@@ -59,7 +59,7 @@ namespace Sentry
 		std::vector<std::string> luaPaths;
 		std::vector<std::string> luaFiles;
 		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("lua_src", luaPaths));
+		LOG_CHECK_RET_FALSE(config.GetMember("lua", luaPaths));
 		for (const std::string& path : luaPaths)
 		{
 			if (!Helper::Directory::GetFilePaths(path, "*.lua", luaFiles))

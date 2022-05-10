@@ -3,6 +3,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/Table.h"
+#include"Component/Lua/LuaScriptComponent.h"
 #include"Component/RpcService/LocalLuaServiceComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
@@ -24,36 +25,36 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if (!this->mConfig->GetMember("path", "rpc", path))
+		if (!this->mConfig->GetMember("path", "service", path)
+			|| !this->mRpcConfig.LoadConfig(path))
 		{
-			throw std::logic_error("not find rpc config");
-		}
-		if (!this->mRpcConfig.LoadConfig(path))
-		{
-			throw std::logic_error("load rpc config error");
+			throw std::logic_error("load service config failure");
 		}
 
-		this->AddComponent<LoggerComponent>();
-		this->mLogComponent = this->GetComponent<LoggerComponent>();
-		LOG_CHECK_RET_FALSE(this->AddComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
-		this->mTaskComponent = this->GetComponent<TaskComponent>();
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
+		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
+		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 
 		std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件
 		{
 			for (const std::string& name: components)
 			{
-				if (this->GetComponentByName(name) != nullptr)
+				if (!this->AddComponentByName(name))
 				{
 					LOG_ERROR("add " << name << " failure");
 					return false;
 				}
-				if (!this->AddComponentByName(name))
-				{
-					return false;
-				}
+			}
+		}
+		std::vector<std::string> services;
+		this->mRpcConfig.GetService(services);
+		for (const std::string& name: services)
+		{
+			if (!this->AddComponentByName(name))
+			{
+				LOG_ERROR("add " << name << " failure");
+				return false;
 			}
 		}
 
@@ -224,7 +225,7 @@ namespace Sentry
 	bool App::StartNewComponent()
 	{
 		std::vector<std::string> components;
-		this->mConfig->GetMember("start", components);
+		this->mConfig->GetMember("service", components);
 		for (const std::string& name: components)
 		{
 			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);

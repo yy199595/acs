@@ -17,9 +17,8 @@
     },
     "path":
     {
-        "rpc": "./Config/rpc.json",
         "code": "./XCode/XCode.csv",
-        "http": "./Config/http.json"
+        "service": "./Config/service.json"
     },
     "url": "http://127.0.0.1:80",
     "listener": {
@@ -81,7 +80,7 @@
             "passwd": "199595yjz."
         }
     },
-    "lua_src": [
+    "lua": [
         "./Script/Common/",
         "./Script/Server/"
     ],
@@ -102,15 +101,9 @@
         "EntityMgrComponent",
         "GateProxyComponent",
         "DataRedisComponent",
-        "ClientComponent",
-        "GateService",
-        "ChatService",
-        "MysqlService",
-        "UserSubService",
-        "HttpUserService",
-        "RegistryService"
+        "ClientComponent"
     ],
-    "start":
+    "service":
     [
         "GateService",
         "ChatService",

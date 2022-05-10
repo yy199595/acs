@@ -5,7 +5,7 @@
 #include"GateComponent.h"
 #include"App/App.h"
 #include"NetWork/GateRpcClientContext.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"GateClientComponent.h"
@@ -52,8 +52,8 @@ namespace Sentry
 		{
 			return this->Auth(request);
 		}
-		const RpcConfig & rpcConfig = this->GetApp()->GetRpcConfig();
-		const ProtoConfig * config = rpcConfig.GetProtocolConfig(request->method_name());
+		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig * config = rpcConfig.GetInterfaceConfig(request->method_name());
 		if (config == nullptr || config->Type != "Client")
 		{
 			LOG_ERROR("call function " << request->method_name() << " not find");
@@ -168,8 +168,8 @@ namespace Sentry
 
 	void GateComponent::OnUserRequest(long long userId, std::shared_ptr<c2s::Rpc::Request> request)
 	{
-		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
-		const ProtoConfig* config = rpcConfig.GetProtocolConfig(request->method_name());
+		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig* config = rpcConfig.GetInterfaceConfig(request->method_name());
 		if (config == nullptr)
 		{
 			return;
@@ -187,7 +187,7 @@ namespace Sentry
 		}
 		std::shared_ptr<com::Rpc::Request> requestData(new com::Rpc::Request());
 		requestData->set_user_id(userId);
-		requestData->set_method_id(config->MethodId);
+		requestData->set_method_id(config->InterfaceId);
 		requestData->mutable_data()->PackFrom(request->data());
 		std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
 		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, requestData);

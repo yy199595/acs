@@ -1,7 +1,7 @@
 ﻿#include"RemoteServiceComponent.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
 #endif
@@ -23,9 +23,9 @@ namespace Sentry
 
 	std::shared_ptr<com::Rpc::Request> RemoteServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
-		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
+		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
 		string name = fmt::format("{0}.{1}", this->GetName(), func);
-		const ProtoConfig* protoConfig = rpcConfig.GetProtocolConfig(name);
+		const RpcInterfaceConfig * protoConfig = rpcConfig.GetInterfaceConfig(name);
 		if (protoConfig == nullptr)
 		{
 			LOG_ERROR("not find rpc config : " << name);
@@ -35,7 +35,7 @@ namespace Sentry
 			= std::make_shared<com::Rpc::Request>();
 
 		request->set_user_id(userId);
-		request->set_method_id(protoConfig->MethodId);
+		request->set_method_id(protoConfig->InterfaceId);
 		if(message == nullptr)
 		{
 			return request;
@@ -134,8 +134,8 @@ namespace Sentry
 
 	XCode RemoteServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
 	{
-		const RpcConfig& rpcConfig = this->GetApp()->GetRpcConfig();
-		const ProtoConfig * protoConfig = rpcConfig.GetProtocolConfig(request->method_id());
+		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = serviceConfig.GetInterfaceConfig(request->method_id());
 		//LOG_INFO("start call " << protoConfig->FullName);
 		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
 		{
@@ -156,8 +156,8 @@ namespace Sentry
 		int count = 0;
 		while(!clientContext->StartConnectAsync())
 		{
-			LOG_ERROR("connect [" << address << "] failure count = " << count++);
 			this->GetApp()->GetTaskComponent()->Sleep(3000);
+			LOG_ERROR("connect [" << address << "] failure count = " << count++);
 		}
 		clientContext->SendToServer(request);
 		return XCode::Successful;

@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"

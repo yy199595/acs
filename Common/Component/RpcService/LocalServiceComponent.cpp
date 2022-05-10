@@ -4,7 +4,7 @@
 
 #include"LocalServiceComponent.h"
 #include"App/App.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Method/LuaServiceMethod.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
@@ -15,7 +15,7 @@ namespace Sentry
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
 		const std::string & name = method->GetName();
-		const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
+		const ServiceConfig & rpcConfig = App::Get()->GetServiceConfig();
 		if (!rpcConfig.HasServiceMethod(this->mService, name))
 		{
 			LOG_FATAL(this->mService << "." << name << " add failure");

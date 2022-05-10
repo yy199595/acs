@@ -239,7 +239,7 @@ namespace Sentry
 				this->mSqlCommandStream << key + 1 << "<=";
 				break;
 			default:
-				this->mSqlCommandStream << key + 1 << "=";
+				this->mSqlCommandStream << key << "=";
 				break;
 			}
 			if (!this->WriterToStream(this->mSqlCommandStream, jsonValue))

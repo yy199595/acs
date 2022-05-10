@@ -4,7 +4,7 @@ struct lua_State;
 namespace Sentry
 {
 
-	class ProtoConfig;
+	class InterfaceConfig;
 	class LuaServiceMethod : public ServiceMethod
 	{
 	 public:

@@ -11,7 +11,7 @@
 #include"Util/StringHelper.h"
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #endif
 namespace Sentry
 {
@@ -52,7 +52,7 @@ namespace Sentry
 		if (code != XCode::Successful)
 		{
 #ifdef __DEBUG__
-			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
+			const ServiceConfig & configCom = this->GetApp()->GetServiceConfig();
 			LOG_ERROR("player call " << request->method_name() << " failure error = " << configCom.GetCodeDesc(code));
 #endif
 			this->StartClose(request->address());
@@ -65,7 +65,7 @@ namespace Sentry
 		if (iter != this->mGateClientMap.end())
 		{
 #ifdef __DEBUG__
-			const RpcConfig & configCom = this->GetApp()->GetRpcConfig();
+			const ServiceConfig & configCom = this->GetApp()->GetServiceConfig();
 			LOG_WARN("remove " << address  << " code = " << configCom.GetCodeDesc(code));
 #endif
 			this->mGateClientMap.erase(iter);

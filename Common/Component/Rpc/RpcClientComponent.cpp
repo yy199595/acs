@@ -4,7 +4,7 @@
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 
 #ifdef __DEBUG__
@@ -32,7 +32,7 @@ namespace Sentry
 		{
 			this->mRpcClientMap.erase(iter);
 #ifdef __DEBUG__
-			const RpcConfig & rpcConfig = App::Get()->GetRpcConfig();
+			const ServiceConfig & rpcConfig = App::Get()->GetServiceConfig();
 			LOG_ERROR(address << " connected code " << rpcConfig.GetCodeDesc(code));
 #endif
 		}
@@ -146,8 +146,8 @@ namespace Sentry
 		}
 #ifdef __DEBUG__
 		std::string json;
-		auto config = App::Get()->GetRpcConfig().
-			GetProtocolConfig(message->method_id());
+		auto config = App::Get()->GetServiceConfig().
+				GetInterfaceConfig(message->method_id());
 		LOG_DEBUG("=============== [send request] ===============");
 		LOG_DEBUG("func = " << config->Service << "."<< config->Method);
 		if (Helper::Proto::GetJson(message, json))

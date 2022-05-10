@@ -6,7 +6,7 @@
 #include"Entity/Entity.h"
 #include"Global/ServerPath.h"
 #include"Thread/TaskThread.h"
-#include"Global/RpcConfig.h"
+#include"Global/ServiceConfig.h"
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
@@ -31,7 +31,7 @@ namespace Sentry
 		{
 			return *mConfig;
 		}
-		const RpcConfig& GetRpcConfig()
+		const ServiceConfig& GetServiceConfig()
 		{
 			return this->mRpcConfig;
 		}
@@ -80,7 +80,7 @@ namespace Sentry
 	 private:
 		int mFps;
 		float mDeltaTime;
-		RpcConfig mRpcConfig;
+		ServiceConfig mRpcConfig;
 		long long mStartTimer;
 		long long mSecondTimer;
 		long long mLogicUpdateInterval;
