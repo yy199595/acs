@@ -8,7 +8,7 @@
 #include"Method/LuaServiceMethod.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Service/UserSubService.h"
+#include"Component/Service/UserInfoSyncService.h"
 
 namespace Sentry
 {
@@ -87,13 +87,11 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool LocalServiceComponent::LateAwake()
+	void LocalServiceComponent::Awake()
 	{
-		this->mUserService = this->GetComponent<UserSubService>();
-		this->mRpcClientComponent = this->GetComponent<RpcClientComponent>();
-		return RemoteServiceComponent::LateAwake();
+		this->mIndex = 0;
+		this->mAddressList.clear();
 	}
-
 	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<Rpc_Request> request,
 	    std::shared_ptr<Rpc_Response> response)
 	{
@@ -139,46 +137,34 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalServiceComponent::AddEntity(long long id, const std::string & address, bool publish)
+	bool LocalServiceComponent::AddEntity(long long id, const std::string & address)
 	{
-		if(!publish)
-		{
-			auto iter = this->mUserAddressMap.find(id);
-			if (iter != this->mUserAddressMap.end())
-			{
-				this->mUserAddressMap.erase(iter);
-			}
-			LOG_INFO(this->GetName() << " add " << id << " address = " << address);
-			this->mUserAddressMap.emplace(id, address);
-			return true;
-		}
+		this->mUserAddressMap[id] = address;
+		LOG_INFO(this->GetName() << " add " << id << " address = " << address);
 		return true;
 	}
 
-	bool LocalServiceComponent::DelEntity(long long id, bool publish)
+	bool LocalServiceComponent::DelEntity(long long id)
 	{
-		if(!publish)
+		auto iter = this->mUserAddressMap.find(id);
+		if (iter != this->mUserAddressMap.end())
 		{
-			auto iter = this->mUserAddressMap.find(id);
-			if (iter != this->mUserAddressMap.end())
-			{
-				this->mUserAddressMap.erase(iter);
-			}
+			this->mUserAddressMap.erase(iter);
 			LOG_INFO(this->GetName() << " del " << id);
 			return true;
 		}
 		return true;
 	}
 
-	bool LocalServiceComponent::AllotAddress(string& address) const
+	bool LocalServiceComponent::AllotAddress(string& address)
 	{
-		if(this->mRemoteAddressList.empty())
+		if(!this->mAddressList.empty())
 		{
-			return false;
-		}
-		for(const std::string & str : this->mRemoteAddressList)
-		{
-			address = str;
+			address = this->mAddressList[this->mIndex++];
+			if(this->mIndex >= this->mAddressList.size())
+			{
+				this->mIndex = 0;
+			}
 			return true;
 		}
 		return false;
@@ -186,18 +172,22 @@ namespace Sentry
 
 	void LocalServiceComponent::OnDelAddress(const string& address)
 	{
-		auto iter = this->mRemoteAddressList.find(address);
-		if(iter != this->mRemoteAddressList.end())
+		auto iter = std::find_if(this->mAddressList.begin(), this->mAddressList.end(), address);
+		if(iter != this->mAddressList.end())
 		{
-			this->mRemoteAddressList.erase(iter);
+			this->mAddressList.erase(iter);
 			LOG_WARN("{0} delete address " << this->GetName() << '.' << address);
 		}
 	}
 	void LocalServiceComponent::OnAddAddress(const string& address)
 	{
 		assert(!address.empty());
-		this->mRemoteAddressList.insert(address);
-		LOG_ERROR(this->GetName() << " add address " << address);
+		auto iter = std::find_if(this->mAddressList.begin(), this->mAddressList.end(), address);
+		if(iter == this->mAddressList.end())
+		{
+			this->mAddressList.emplace_back(address);
+			LOG_ERROR(this->GetName() << " add address " << address);
+		}
 	}
 	bool LocalServiceComponent::GetEntityAddress(long long int id, string& address)
 	{

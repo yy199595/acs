@@ -41,3 +41,22 @@ message Del
     string service = 2;
   }
 }
+
+message AddUser
+{
+  message Request
+  {
+    int64 user_id = 1;
+    string address = 2;
+    string service = 3;
+  }
+}
+
+message DelUser
+{
+  message Request
+  {
+    int64 user_id = 1;
+    string service = 3;
+  }
+}

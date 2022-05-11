@@ -9,7 +9,7 @@
 #include"NetWork/GateRpcClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
-#include"Component/Service/UserSubService.h"
+#include"Component/Service/UserInfoSyncService.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Component/Gate/GateProxyComponent.h"
@@ -22,7 +22,7 @@ namespace Sentry
 		methodRegister.Bind("Allot", &GateService::Allot);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
-		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserSubService>());
+		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserInfoSyncService>());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetListenerAddress("gate", this->mGateAddress));

@@ -26,7 +26,7 @@
 
 #include"Component/Lua/LuaRegisterComponent.h"
 
-#include"Component/Service/UserSubService.h"
+#include"Component/Service/UserInfoSyncService.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
@@ -75,7 +75,7 @@ void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
-	ComponentFactory::Add<UserSubService>("UserSubService");
+	ComponentFactory::Add<UserInfoSyncService>("UserInfoSyncService");
     ComponentFactory::Add<RegistryService>("RegistryService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }

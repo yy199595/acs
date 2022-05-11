@@ -41,7 +41,7 @@ struct TableStruct_sub_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[8]
+  static const ::google::protobuf::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -52,12 +52,24 @@ namespace sub {
 class Add;
 class AddDefaultTypeInternal;
 extern AddDefaultTypeInternal _Add_default_instance_;
+class AddUser;
+class AddUserDefaultTypeInternal;
+extern AddUserDefaultTypeInternal _AddUser_default_instance_;
+class AddUser_Request;
+class AddUser_RequestDefaultTypeInternal;
+extern AddUser_RequestDefaultTypeInternal _AddUser_Request_default_instance_;
 class Add_Request;
 class Add_RequestDefaultTypeInternal;
 extern Add_RequestDefaultTypeInternal _Add_Request_default_instance_;
 class Del;
 class DelDefaultTypeInternal;
 extern DelDefaultTypeInternal _Del_default_instance_;
+class DelUser;
+class DelUserDefaultTypeInternal;
+extern DelUserDefaultTypeInternal _DelUser_default_instance_;
+class DelUser_Request;
+class DelUser_RequestDefaultTypeInternal;
+extern DelUser_RequestDefaultTypeInternal _DelUser_Request_default_instance_;
 class Del_Request;
 class Del_RequestDefaultTypeInternal;
 extern Del_RequestDefaultTypeInternal _Del_Request_default_instance_;
@@ -77,8 +89,12 @@ extern ServiceInfoDefaultTypeInternal _ServiceInfo_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::sub::Add* Arena::CreateMaybeMessage<::sub::Add>(Arena*);
+template<> ::sub::AddUser* Arena::CreateMaybeMessage<::sub::AddUser>(Arena*);
+template<> ::sub::AddUser_Request* Arena::CreateMaybeMessage<::sub::AddUser_Request>(Arena*);
 template<> ::sub::Add_Request* Arena::CreateMaybeMessage<::sub::Add_Request>(Arena*);
 template<> ::sub::Del* Arena::CreateMaybeMessage<::sub::Del>(Arena*);
+template<> ::sub::DelUser* Arena::CreateMaybeMessage<::sub::DelUser>(Arena*);
+template<> ::sub::DelUser_Request* Arena::CreateMaybeMessage<::sub::DelUser_Request>(Arena*);
 template<> ::sub::Del_Request* Arena::CreateMaybeMessage<::sub::Del_Request>(Arena*);
 template<> ::sub::Push* Arena::CreateMaybeMessage<::sub::Push>(Arena*);
 template<> ::sub::Push_Request* Arena::CreateMaybeMessage<::sub::Push_Request>(Arena*);
@@ -1087,6 +1103,489 @@ class Del :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sub_2eproto;
 };
+// -------------------------------------------------------------------
+
+class AddUser_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.AddUser.Request) */ {
+ public:
+  AddUser_Request();
+  virtual ~AddUser_Request();
+
+  AddUser_Request(const AddUser_Request& from);
+
+  inline AddUser_Request& operator=(const AddUser_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddUser_Request(AddUser_Request&& from) noexcept
+    : AddUser_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline AddUser_Request& operator=(AddUser_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddUser_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddUser_Request* internal_default_instance() {
+    return reinterpret_cast<const AddUser_Request*>(
+               &_AddUser_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(AddUser_Request* other);
+  friend void swap(AddUser_Request& a, AddUser_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddUser_Request* New() const final {
+    return CreateMaybeMessage<AddUser_Request>(nullptr);
+  }
+
+  AddUser_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddUser_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddUser_Request& from);
+  void MergeFrom(const AddUser_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddUser_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string address = 2;
+  void clear_address();
+  static const int kAddressFieldNumber = 2;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // string service = 3;
+  void clear_service();
+  static const int kServiceFieldNumber = 3;
+  const ::std::string& service() const;
+  void set_service(const ::std::string& value);
+  #if LANG_CXX11
+  void set_service(::std::string&& value);
+  #endif
+  void set_service(const char* value);
+  void set_service(const char* value, size_t size);
+  ::std::string* mutable_service();
+  ::std::string* release_service();
+  void set_allocated_service(::std::string* service);
+
+  // int64 user_id = 1;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:sub.AddUser.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  ::google::protobuf::internal::ArenaStringPtr service_;
+  ::google::protobuf::int64 user_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sub_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddUser :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.AddUser) */ {
+ public:
+  AddUser();
+  virtual ~AddUser();
+
+  AddUser(const AddUser& from);
+
+  inline AddUser& operator=(const AddUser& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AddUser(AddUser&& from) noexcept
+    : AddUser() {
+    *this = ::std::move(from);
+  }
+
+  inline AddUser& operator=(AddUser&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AddUser& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddUser* internal_default_instance() {
+    return reinterpret_cast<const AddUser*>(
+               &_AddUser_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(AddUser* other);
+  friend void swap(AddUser& a, AddUser& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddUser* New() const final {
+    return CreateMaybeMessage<AddUser>(nullptr);
+  }
+
+  AddUser* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AddUser>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AddUser& from);
+  void MergeFrom(const AddUser& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddUser* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef AddUser_Request Request;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:sub.AddUser)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sub_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DelUser_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.DelUser.Request) */ {
+ public:
+  DelUser_Request();
+  virtual ~DelUser_Request();
+
+  DelUser_Request(const DelUser_Request& from);
+
+  inline DelUser_Request& operator=(const DelUser_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DelUser_Request(DelUser_Request&& from) noexcept
+    : DelUser_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline DelUser_Request& operator=(DelUser_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DelUser_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DelUser_Request* internal_default_instance() {
+    return reinterpret_cast<const DelUser_Request*>(
+               &_DelUser_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(DelUser_Request* other);
+  friend void swap(DelUser_Request& a, DelUser_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DelUser_Request* New() const final {
+    return CreateMaybeMessage<DelUser_Request>(nullptr);
+  }
+
+  DelUser_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DelUser_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DelUser_Request& from);
+  void MergeFrom(const DelUser_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DelUser_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string service = 3;
+  void clear_service();
+  static const int kServiceFieldNumber = 3;
+  const ::std::string& service() const;
+  void set_service(const ::std::string& value);
+  #if LANG_CXX11
+  void set_service(::std::string&& value);
+  #endif
+  void set_service(const char* value);
+  void set_service(const char* value, size_t size);
+  ::std::string* mutable_service();
+  ::std::string* release_service();
+  void set_allocated_service(::std::string* service);
+
+  // int64 user_id = 1;
+  void clear_user_id();
+  static const int kUserIdFieldNumber = 1;
+  ::google::protobuf::int64 user_id() const;
+  void set_user_id(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:sub.DelUser.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr service_;
+  ::google::protobuf::int64 user_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sub_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DelUser :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.DelUser) */ {
+ public:
+  DelUser();
+  virtual ~DelUser();
+
+  DelUser(const DelUser& from);
+
+  inline DelUser& operator=(const DelUser& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DelUser(DelUser&& from) noexcept
+    : DelUser() {
+    *this = ::std::move(from);
+  }
+
+  inline DelUser& operator=(DelUser&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DelUser& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DelUser* internal_default_instance() {
+    return reinterpret_cast<const DelUser*>(
+               &_DelUser_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(DelUser* other);
+  friend void swap(DelUser& a, DelUser& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DelUser* New() const final {
+    return CreateMaybeMessage<DelUser>(nullptr);
+  }
+
+  DelUser* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DelUser>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DelUser& from);
+  void MergeFrom(const DelUser& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DelUser* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef DelUser_Request Request;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:sub.DelUser)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sub_2eproto;
+};
 // ===================================================================
 
 
@@ -1692,9 +2191,220 @@ inline void Del_Request::set_allocated_service(::std::string* service) {
 
 // Del
 
+// -------------------------------------------------------------------
+
+// AddUser_Request
+
+// int64 user_id = 1;
+inline void AddUser_Request::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 AddUser_Request::user_id() const {
+  // @@protoc_insertion_point(field_get:sub.AddUser.Request.user_id)
+  return user_id_;
+}
+inline void AddUser_Request::set_user_id(::google::protobuf::int64 value) {
+  
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:sub.AddUser.Request.user_id)
+}
+
+// string address = 2;
+inline void AddUser_Request::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AddUser_Request::address() const {
+  // @@protoc_insertion_point(field_get:sub.AddUser.Request.address)
+  return address_.GetNoArena();
+}
+inline void AddUser_Request::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:sub.AddUser.Request.address)
+}
+#if LANG_CXX11
+inline void AddUser_Request::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:sub.AddUser.Request.address)
+}
+#endif
+inline void AddUser_Request::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:sub.AddUser.Request.address)
+}
+inline void AddUser_Request::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:sub.AddUser.Request.address)
+}
+inline ::std::string* AddUser_Request::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:sub.AddUser.Request.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AddUser_Request::release_address() {
+  // @@protoc_insertion_point(field_release:sub.AddUser.Request.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AddUser_Request::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:sub.AddUser.Request.address)
+}
+
+// string service = 3;
+inline void AddUser_Request::clear_service() {
+  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AddUser_Request::service() const {
+  // @@protoc_insertion_point(field_get:sub.AddUser.Request.service)
+  return service_.GetNoArena();
+}
+inline void AddUser_Request::set_service(const ::std::string& value) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:sub.AddUser.Request.service)
+}
+#if LANG_CXX11
+inline void AddUser_Request::set_service(::std::string&& value) {
+  
+  service_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:sub.AddUser.Request.service)
+}
+#endif
+inline void AddUser_Request::set_service(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:sub.AddUser.Request.service)
+}
+inline void AddUser_Request::set_service(const char* value, size_t size) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:sub.AddUser.Request.service)
+}
+inline ::std::string* AddUser_Request::mutable_service() {
+  
+  // @@protoc_insertion_point(field_mutable:sub.AddUser.Request.service)
+  return service_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AddUser_Request::release_service() {
+  // @@protoc_insertion_point(field_release:sub.AddUser.Request.service)
+  
+  return service_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AddUser_Request::set_allocated_service(::std::string* service) {
+  if (service != nullptr) {
+    
+  } else {
+    
+  }
+  service_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service);
+  // @@protoc_insertion_point(field_set_allocated:sub.AddUser.Request.service)
+}
+
+// -------------------------------------------------------------------
+
+// AddUser
+
+// -------------------------------------------------------------------
+
+// DelUser_Request
+
+// int64 user_id = 1;
+inline void DelUser_Request::clear_user_id() {
+  user_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 DelUser_Request::user_id() const {
+  // @@protoc_insertion_point(field_get:sub.DelUser.Request.user_id)
+  return user_id_;
+}
+inline void DelUser_Request::set_user_id(::google::protobuf::int64 value) {
+  
+  user_id_ = value;
+  // @@protoc_insertion_point(field_set:sub.DelUser.Request.user_id)
+}
+
+// string service = 3;
+inline void DelUser_Request::clear_service() {
+  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DelUser_Request::service() const {
+  // @@protoc_insertion_point(field_get:sub.DelUser.Request.service)
+  return service_.GetNoArena();
+}
+inline void DelUser_Request::set_service(const ::std::string& value) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:sub.DelUser.Request.service)
+}
+#if LANG_CXX11
+inline void DelUser_Request::set_service(::std::string&& value) {
+  
+  service_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:sub.DelUser.Request.service)
+}
+#endif
+inline void DelUser_Request::set_service(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:sub.DelUser.Request.service)
+}
+inline void DelUser_Request::set_service(const char* value, size_t size) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:sub.DelUser.Request.service)
+}
+inline ::std::string* DelUser_Request::mutable_service() {
+  
+  // @@protoc_insertion_point(field_mutable:sub.DelUser.Request.service)
+  return service_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DelUser_Request::release_service() {
+  // @@protoc_insertion_point(field_release:sub.DelUser.Request.service)
+  
+  return service_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DelUser_Request::set_allocated_service(::std::string* service) {
+  if (service != nullptr) {
+    
+  } else {
+    
+  }
+  service_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service);
+  // @@protoc_insertion_point(field_set_allocated:sub.DelUser.Request.service)
+}
+
+// -------------------------------------------------------------------
+
+// DelUser
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -15,7 +15,7 @@
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
 #endif
-#include"Component/Service/UserSubService.h"
+#include"Component/Service/UserInfoSyncService.h"
 namespace Sentry
 {
 
@@ -176,9 +176,8 @@ namespace Sentry
 		}
 		std::string address;
 		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
-		if (!localServerRpc->GetEntityAddress(userId, address))
+		if (!localServerRpc->GetEntityAddress(userId, address) && localServerRpc->AllotAddress(address))
 		{
-			localServerRpc->AllotAddress(address);
 			if(!localServerRpc->AddEntity(userId, address, true))
 			{
 				LOG_ERROR(userId << " publish failure");
