@@ -178,11 +178,7 @@ namespace Sentry
 		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
 		if (!localServerRpc->GetEntityAddress(userId, address) && localServerRpc->AllotAddress(address))
 		{
-			if(!localServerRpc->AddEntity(userId, address, true))
-			{
-				LOG_ERROR(userId << " publish failure");
-				return;
-			}
+			//TODO
 		}
 		std::shared_ptr<com::Rpc::Request> requestData(new com::Rpc::Request());
 		requestData->set_user_id(userId);

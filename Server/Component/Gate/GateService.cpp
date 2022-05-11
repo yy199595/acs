@@ -22,8 +22,8 @@ namespace Sentry
 		methodRegister.Bind("Allot", &GateService::Allot);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
-		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserInfoSyncService>());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
+		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserInfoSyncService>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		LOG_CHECK_RET_FALSE(this->GetApp()->GetConfig().GetListenerAddress("gate", this->mGateAddress));
 		return true;
@@ -34,14 +34,6 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return true;
-	}
-
-	void GateService::GetAllAddress(std::vector<std::string>& gateAddress)
-	{
-		for(const std::string & address : this->mRemoteAddressList)
-		{
-			gateAddress.emplace_back(address);
-		}
 	}
 
 	XCode GateService::Ping(long long userId)

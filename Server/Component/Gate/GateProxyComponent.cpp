@@ -32,11 +32,11 @@ namespace Sentry
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
-		std::vector<std::string> gateAddress;
-		this->mGateService->GetAllAddress(gateAddress);
-		for(const std::string & address : gateAddress)
+		std::list<std::string> addAddress;
+		this->mGateService->GetAllAddress(addAddress);
+		for(const std::string & address : addAddress)
 		{
-			return this->mGateService->Call(address,"CallClient", request);
+			this->mGateService->Call(address,"CallClient", request);
 		}
 		return XCode::Successful;
 	}
@@ -45,10 +45,10 @@ namespace Sentry
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
-		std::vector<std::string> gateAddress;
+		std::list<std::string> allAddress;
 		request.mutable_data()->PackFrom(message);
-		this->mGateService->GetAllAddress(gateAddress);
-		for(const std::string & address : gateAddress)
+		this->mGateService->GetAllAddress(allAddress);
+		for(const std::string & address : allAddress)
 		{
 			return this->mGateService->Call(address,"CallClient", request);
 		}

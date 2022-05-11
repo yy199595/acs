@@ -172,22 +172,29 @@ namespace Sentry
 
 	void LocalServiceComponent::OnDelAddress(const string& address)
 	{
-		auto iter = std::find_if(this->mAddressList.begin(), this->mAddressList.end(), address);
-		if(iter != this->mAddressList.end())
+		auto iter = this->mAddressList.begin();
+		for(; iter != this->mAddressList.end();iter++)
 		{
-			this->mAddressList.erase(iter);
-			LOG_WARN("{0} delete address " << this->GetName() << '.' << address);
+			if(*iter == address)
+			{
+				this->mAddressList.erase(iter);
+				LOG_WARN(this->GetName() << "delete address " << address);
+				return;
+			}
 		}
 	}
 	void LocalServiceComponent::OnAddAddress(const string& address)
 	{
 		assert(!address.empty());
-		auto iter = std::find_if(this->mAddressList.begin(), this->mAddressList.end(), address);
-		if(iter == this->mAddressList.end())
+		for(const std::string & item : this->mAddressList)
 		{
-			this->mAddressList.emplace_back(address);
-			LOG_ERROR(this->GetName() << " add address " << address);
+			if(item == address)
+			{
+				return;
+			}
 		}
+		this->mAddressList.emplace_back(address);
+		LOG_ERROR(this->GetName() << " add address " << address);
 	}
 	bool LocalServiceComponent::GetEntityAddress(long long int id, string& address)
 	{
@@ -198,6 +205,14 @@ namespace Sentry
 			return true;
 		}
 		return false;
+	}
+	void LocalServiceComponent::GetAllAddress(list<std::string>& allAddress)
+	{
+		allAddress.clear();
+		for(const std::string & address : this->mAddressList)
+		{
+			allAddress.emplace_back(address);
+		}
 	}
 
 }

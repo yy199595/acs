@@ -12,8 +12,6 @@ namespace Sentry
 	 public:
 		GateService() = default;
 		~GateService() final = default;
-	 public:
-		void GetAllAddress(std::vector<std::string> & gateAddress);
 	private:
 		XCode Ping(long long userId);
 		XCode CallClient(long long userId, c2s::Rpc::Call & request);
@@ -24,9 +22,9 @@ namespace Sentry
 		bool OnInitService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		std::string mGateAddress;
-		class UserSubService * mUserService;
 		class TimerComponent* mTimerComponent;
 		class GateComponent * mGateComponent;
+		class UserInfoSyncService * mUserService;
 		class GateClientComponent* mGateClientComponent;
 	};
 

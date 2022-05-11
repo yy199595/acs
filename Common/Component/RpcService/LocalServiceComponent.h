@@ -23,6 +23,7 @@ namespace Sentry
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response);
 	public:
 		bool AllotAddress(std::string& address);
+		void GetAllAddress(std::list<std::string> & allAddress);
 	public:
 		void OnAddAddress(const std::string &address) final;
 		void OnDelAddress(const std::string &address) final;
