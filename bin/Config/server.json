@@ -108,9 +108,9 @@
         "GateService",
         "ChatService",
         "MysqlService",
-        "UserSubService",
         "HttpUserService",
-        "RegistryService"
+        "RegistryService",
+        "UserInfoSyncService"
     ],
     "white_list": [
         "127.0.0.1"

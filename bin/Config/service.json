@@ -83,7 +83,7 @@
             "Request":"sub.Del.Request"
         }
     },
-    "UserSubService": {
+    "UserInfoSyncService": {
 
     },
     "HttpUserService": {
