@@ -35,6 +35,9 @@ namespace Sentry
 		virtual XCode Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response);
 
 	public:
+		XCode PublishEvent(const std::string & eveId);
+		XCode PublishEvent(const std::string & eveId, const Message & message);
+	public:
 		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 	 protected:
 		bool LateAwake() override;

@@ -20,10 +20,12 @@ namespace Sentry
 	public:
 		bool DelEntity(long long id);
 		bool AddEntity(long long id, const std::string & address);
+		XCode Invoke(std::shared_ptr<eve::Publish> context);
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response);
 	public:
 		bool AllotAddress(std::string& address);
-		void GetAllAddress(std::list<std::string> & allAddress);
+		bool GetSubEvents(std::list<std::string> & eventIds) const;
+		void GetAllAddress(std::list<std::string> & allAddress) const;
 	public:
 		void OnAddAddress(const std::string &address) final;
 		void OnDelAddress(const std::string &address) final;

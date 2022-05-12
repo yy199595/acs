@@ -31,9 +31,10 @@ namespace Sentry
 		long long SubCounter(const std::string & key);
 	 public:
 		bool SubscribeChannel(const std::string& channel);
-		void GetAllChannel(std::vector<std::string> & chanels);
+		void GetAllAddress(std::vector<std::string> & chanels);
 		long long Publish(const std::string& channel, const std::string& message);
 	 private:
+		bool SubEvent();
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
 		void OnLockTimeout(const std::string & name, int timeout);
 		bool GetLuaScript(const std::string& file, std::string& command);
@@ -48,6 +49,7 @@ namespace Sentry
 		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
+		std::unordered_map<std::string, std::list<std::string>> mEventMap;
 		std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<Json::Reader>>>> mPublishTasks;
 	};
 }

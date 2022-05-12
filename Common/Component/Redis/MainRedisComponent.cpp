@@ -4,10 +4,11 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Global/ServiceConfig.h"
+#include"Protocol/eve.pb.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
-
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
 	AutoRedisLock::AutoRedisLock(MainRedisComponent* component, const std::string& key)
@@ -90,9 +91,41 @@ namespace Sentry
 			LOG_INFO("load redis script " << path << " successful");
 		}
 
-		LOG_CHECK_RET_FALSE(this->SubscribeChannel(this->mRpcAddress));
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
+		return true;
+	}
+
+	bool MainRedisComponent::SubEvent()
+	{
+		if(!this->SubscribeChannel(this->mRpcAddress))
+		{
+			return false;
+		}
+		std::vector<Component *> components;
+		this->GetApp()->GetComponents(components);
+		for(Component * component : components)
+		{
+			std::list<std::string> eventIds;
+			LocalServiceComponent * localServiceComponent = component->Cast<LocalServiceComponent>();
+			if(localServiceComponent != nullptr && localServiceComponent->GetSubEvents(eventIds))
+			{
+				for(const std::string & eveId : eventIds)
+				{
+					if(!this->SubscribeChannel(eveId))
+					{
+						return false;
+					}
+					auto iter = this->mEventMap.find(eveId);
+					if(iter == this->mEventMap.end())
+					{
+						std::list<std::string> services;
+						this->mEventMap.emplace(eveId, services);
+					}
+					this->mEventMap[eveId].emplace_back(localServiceComponent->GetName());
+				}
+			}
+		}
 		return true;
 	}
 
@@ -135,7 +168,7 @@ namespace Sentry
 		if(this->mRedisClient->Run(request, response) != XCode::Successful)
 		{
 			LOG_ERROR("redis net work error publish error");
-			return 0;
+			return -1;
 		}
 		return response->GetNumber();
 	}
@@ -229,14 +262,37 @@ namespace Sentry
 					}
 					this->mRpcComponent->OnResponse(response);
 				}
+				else if(message[0] == '*') //事件
+				{
+					const char * data = message.c_str() + 1;
+					const size_t size = message.size() - 1;
+					std::shared_ptr<eve::Publish> publishData(new eve::Publish());
+					if(!publishData->ParseFromArray(data, size))
+					{
+						LOG_ERROR("parse message error");
+						continue;
+					}
+					auto iter = this->mEventMap.find(publishData->eve_id());
+					if(iter != this->mEventMap.end())
+					{
+						for(const std::string & service : iter->second)
+						{
+							LocalServiceComponent * localServiceComponent = this->GetComponent<LocalServiceComponent>(service);
+							if(localServiceComponent != nullptr && localServiceComponent->Invoke(publishData) != XCode::Successful)
+							{
+								LOG_ERROR("publish event  failure service = " << service);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 
-	void MainRedisComponent::GetAllChannel(std::vector<std::string>& chanels)
+	void MainRedisComponent::GetAllAddress(std::vector<std::string>& chanels)
 	{
 		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBSUB", "CHANNELS");
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBSUB", "CHANNELS", "*:*");
 		if(this->mRedisClient->Run(request, response) == XCode::Successful)
 		{
 			for(size_t index = 0; index < response->GetArraySize(); index++)

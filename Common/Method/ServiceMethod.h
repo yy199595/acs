@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include<Other/ObjectFactory.h>
 #include<Protocol/com.pb.h>
+#include"Protocol/eve.pb.h"
 #include<XCode/XCode.h>
 #include<google/protobuf/any.h>
 #include<google/protobuf/any.pb.h>
@@ -35,10 +36,76 @@ namespace Sentry
 	template<typename T, typename T1>
 	using ServiceMethodType5 = XCode(T::*)(const std::string & address, const T1 &);
 
+	template<typename T>
+	using EventMethodType1 = void(T::*)();
+	template<typename T, typename T1>
+	using EventMethodType2 = void(T::*)(const T1 & content);
+
 //	template<typename T, typename T1, typename T2>
 //	using ServiceMethodType55 = XCode(T::*)(const std::string & address, const T1 &, T2 &);
 
 }// namespace Sentry
+
+
+namespace Sentry
+{
+	class EventMethod
+	{
+	public:
+		explicit EventMethod(const std::string & id)
+			: mEveId(id) {}
+
+	public:
+		virtual bool Run(const eve::Publish & data) = 0;
+		const std::string & GetEveId() { return this->mEveId;}
+	private:
+		const std::string mEveId;
+	};
+
+	template<typename T>
+	class EventMethod1 final : public EventMethod
+	{
+	public:
+		explicit EventMethod1(const std::string & id, T * o, EventMethodType1<T> methodType1)
+			: EventMethod(id), mObj(o), mFunc(methodType1) {}
+
+	public:
+		bool Run(const eve::Publish & data)
+		{
+			(this->mObj->*this->mFunc)();
+			return true;
+		}
+	private:
+		T * mObj;
+		EventMethodType1<T> mFunc;
+	};
+
+	template<typename T, typename T1>
+	class EventMethod2 final : public EventMethod
+	{
+	public:
+		explicit EventMethod2(const std::string & id, T * o, EventMethodType2<T, T1> methodType)
+				: EventMethod(id), mObj(o), mFunc(methodType) {}
+
+	public:
+		bool Run(const eve::Publish & data)
+		{
+			if(data.has_data() && data.data().Is<T1>())
+			{
+				std::shared_ptr<T1> t(new T1());
+				if(data.data().UnpackTo(t.get()))
+				{
+					(this->mObj->*this->mFunc)();
+					return true;
+				}
+			}
+			return false;
+		}
+	private:
+		T * mObj;
+		EventMethodType2<T, T1> mFunc;
+	};
+}
 
 
 namespace Sentry
@@ -48,9 +115,7 @@ namespace Sentry
 	{
 	 public:
 		explicit ServiceMethod(std::string name)
-			: mName(std::move(name))
-		{
-		}
+			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
 		virtual XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) = 0;

@@ -111,6 +111,39 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
+	XCode RemoteServiceComponent::PublishEvent(const std::string& eveId)
+	{
+		std::string data = "*";
+		eve::Publish publishData;
+		publishData.set_eve_id(eveId);
+		if(!publishData.AppendToString(&data))
+		{
+			return XCode::SerializationFailure;
+		}
+		if(this->mRedisComponent->Publish(eveId, data) < 0)
+		{
+			return XCode::NetWorkError;
+		}
+		return XCode::Successful;
+	}
+
+	XCode RemoteServiceComponent::PublishEvent(const std::string& eveId, const Message& message)
+	{
+		std::string data = "*";
+		eve::Publish publishData;
+		publishData.set_eve_id(eveId);
+		publishData.mutable_data()->PackFrom(message);
+		if(!publishData.AppendToString(&data))
+		{
+			return XCode::SerializationFailure;
+		}
+		if(this->mRedisComponent->Publish(eveId, data) < 0)
+		{
+			return XCode::NetWorkError;
+		}
+		return XCode::Successful;
+	}
+
 	std::shared_ptr<com::Rpc::Response> RemoteServiceComponent::StartCall(const std::string & address,
 			std::shared_ptr<com::Rpc::Request> request)
 	{

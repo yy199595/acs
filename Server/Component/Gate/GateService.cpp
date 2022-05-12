@@ -22,6 +22,7 @@ namespace Sentry
 		methodRegister.Bind("Allot", &GateService::Allot);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
+
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserInfoSyncService>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());

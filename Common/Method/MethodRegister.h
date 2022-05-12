@@ -77,20 +77,46 @@ namespace Sentry
 		bool BindAddress(std::string name, ServiceMethodType5<T, T1> func)
 		{
 			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
+		}
+
+	public:
+		template<typename T>
+		bool Sub(const std::string & id, EventMethodType1<T> func)
+		{
+			auto iter = this->mEventMethodMap.find(id);
+			if(iter != this->mEventMethodMap.end())
+			{
+				return false;
+			}
+			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod1<T>>(id, func));
+			return true;
+		}
+
+		template<typename T, typename T1>
+		bool Sub(const std::string & id, EventMethodType2<T, T1> func)
+		{
+			auto iter = this->mEventMethodMap.find(id);
+			if(iter != this->mEventMethodMap.end())
+			{
+				return false;
+			}
+			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T, T1>>(id, func));
 			return true;
 		}
 
 	public:
 		bool LoadLuaMethod(lua_State *lua);
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
+		void GetSubEvent(std::list<std::string> & eventIds) const;
+		std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
 		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
-
-
 	private:
 		void * mObj;
 		const std::string mService;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
+		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
+
 	};
 
 //	template<typename T, typename T1, typename T2>

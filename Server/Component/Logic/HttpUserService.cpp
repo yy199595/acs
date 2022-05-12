@@ -85,12 +85,7 @@ namespace Sentry
 		std::shared_ptr<s2s::AddressAllot::Response> allotResponse(new s2s::AddressAllot::Response());
 		if (this->mGateService->Call(address, "Allot", allotRequest, allotResponse) == XCode::Successful)
 		{
-			if(this->mGateService->AddEntity(userAccount->user_id(), address, true))
-			{
-				response.AddMember("token", newToken);
-				response.AddMember("address", allotResponse->address());
-				return XCode::Successful;
-			}
+			//TODO
 		}
 		return XCode::AddressAllotFailure;
 	}

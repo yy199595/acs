@@ -2,6 +2,8 @@
 // Created by mac on 2022/4/6.
 //
 
+#include <Method/MethodRegister.h>
+
 #include"LocalServiceComponent.h"
 #include"App/App.h"
 #include"Global/ServiceConfig.h"
@@ -82,6 +84,21 @@ namespace Sentry
 		: mService(service), mObj(o)
 	{
 
+	}
+
+	std::shared_ptr<EventMethod> ServiceMethodRegister::GetEvent(const string& eveId)
+	{
+		auto iter = this->mEventMethodMap.find(eveId);
+		return iter != this->mEventMethodMap.end() ? iter->second : nullptr;
+	}
+
+	void ServiceMethodRegister::GetSubEvent(list<std::string>& events) const
+	{
+		auto iter = this->mEventMethodMap.begin();
+		for(; iter != this->mEventMethodMap.end(); iter++)
+		{
+			events.emplace_back(iter->first);
+		}
 	}
 }
 
@@ -206,13 +223,34 @@ namespace Sentry
 		}
 		return false;
 	}
-	void LocalServiceComponent::GetAllAddress(list<std::string>& allAddress)
+	void LocalServiceComponent::GetAllAddress(list<std::string>& allAddress) const
 	{
 		allAddress.clear();
 		for(const std::string & address : this->mAddressList)
 		{
 			allAddress.emplace_back(address);
 		}
+	}
+
+	XCode LocalServiceComponent::Invoke(std::shared_ptr<eve::Publish> context)
+	{
+		const string& eveId = context->eve_id();
+		std::shared_ptr<EventMethod> eventMethod = this->mMethodRegister->GetEvent(eveId);
+		if(eventMethod == nullptr)
+		{
+			return XCode::Failure;
+		}
+		return eventMethod->Run(*context) ? XCode::Successful : XCode::Failure;
+	}
+
+	bool LocalServiceComponent::GetSubEvents(list<std::string>& eventIds) const
+	{
+		if(this->mMethodRegister != nullptr)
+		{
+			this->mMethodRegister->GetSubEvent(eventIds);
+			return true;
+		}
+		return false;
 	}
 
 }

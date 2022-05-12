@@ -122,7 +122,7 @@ namespace Sentry
 			}
 		}
 		std::vector<std::string> channels;
-		this->mRedisComponent->GetAllChannel(channels);
+		this->mRedisComponent->GetAllAddress(channels);
 		for(const std::string & address : channels)
 		{
 			std::shared_ptr<sub::Push::Response> response(new sub::Push::Response());
