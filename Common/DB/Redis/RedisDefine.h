@@ -56,7 +56,7 @@ namespace Sentry
         }
     private:
         std::string mCommand;
-        std::vector<std::string> mParameters;
+        std::list<std::string> mParameters;
     };
 
 	template<typename ... Args>
@@ -74,10 +74,21 @@ namespace Sentry
 		static_assert(sizeof...(Args) % 2 == 0);
 		std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>("EVALSHA");
 		RedisRequest::InitParameter(request, key, (int)size / 2 + 1, "func", func, std::forward<Args>(args)...);
-
-		for (size_t index = 3; index < request->mParameters.size() - 1; index += 2)
+		if(sizeof...(Args) > 2)
 		{
-			std::swap(request->mParameters[index], request->mParameters[index + 1]);
+			size_t index = 0;
+			auto iter = request->mParameters.begin();
+			for (; iter != request->mParameters.end(); index++)
+			{
+				const std::string& str = *iter;
+				if (index >= 3 && index % 2 == 1)
+				{
+					request->mParameters.emplace_back(str);
+					iter = request->mParameters.erase(iter++);
+					continue;
+				}
+				iter++;
+			}
 		}
 		return request;
 	}
@@ -85,7 +96,6 @@ namespace Sentry
     template<typename ... Args>
     void RedisRequest::InitParameter(std::shared_ptr<RedisRequest> self, Args &&...args)
     {
-		self->mParameters.reserve(sizeof...(Args));
 		RedisRequest::Encode(self, std::forward<Args>(args)...);
     }
 
