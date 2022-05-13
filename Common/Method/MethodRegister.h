@@ -78,44 +78,15 @@ namespace Sentry
 		{
 			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
 		}
-
-	public:
-		template<typename T>
-		bool Sub(const std::string & id, EventMethodType1<T> func)
-		{
-			auto iter = this->mEventMethodMap.find(id);
-			if(iter != this->mEventMethodMap.end())
-			{
-				return false;
-			}
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod1<T>>(id, func));
-			return true;
-		}
-
-		template<typename T, typename T1>
-		bool Sub(const std::string & id, EventMethodType2<T, T1> func)
-		{
-			auto iter = this->mEventMethodMap.find(id);
-			if(iter != this->mEventMethodMap.end())
-			{
-				return false;
-			}
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T, T1>>(id, func));
-			return true;
-		}
-
 	public:
 		bool LoadLuaMethod(lua_State *lua);
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
-		void GetSubEvent(std::list<std::string> & eventIds) const;
-		std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
 		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
 	private:
 		void * mObj;
 		const std::string mService;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
-		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
 
 	};
 
@@ -130,40 +101,41 @@ namespace Sentry
 
 namespace Sentry
 {
-	class SubServiceRegister
+	class ServiceEventRegister
 	{
-	 public:
-		SubServiceRegister(void * o) : mObj(o) {}
 	public:
-		template<typename T, typename T1>
-		bool Bind(std::string name, SubFunction<T, T1> func)
+		ServiceEventRegister(const std::string& name, void* o)
+			: mObj(o), mService(name) {}
+	public:
+		template<typename T>
+		bool Sub(const std::string & id, EventMethodType1<T> func)
 		{
-			auto iter = this->mSubMethodMap.find(name);
-			if (iter != this->mSubMethodMap.end())
+			auto iter = this->mEventMethodMap.find(id);
+			if(iter != this->mEventMethodMap.end())
 			{
 				return false;
 			}
-			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod<T, T1>>((T*)this->mObj, func));
-			return true;
-		}
-		template<typename T, typename T1, typename T2>
-		bool Bind(std::string name, SubFunction2<T, T1, T2> func)
-		{
-			auto iter = this->mSubMethodMap.find(name);
-			if (iter != this->mSubMethodMap.end())
-			{
-				return false;
-			}
-			this->mSubMethodMap.emplace(name, std::make_shared<JsonSubMethod2<T, T1, T2>>((T*)this->mObj, func));
+			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod1<T>>(id, (T*)this->mObj, func));
 			return true;
 		}
 
-	public:
-		void GetMethods(std::vector<std::string>& methods);
-		std::shared_ptr<SubMethod> GetMethod(const std::string & func);
+		template<typename T>
+		bool Sub(const std::string & id, EventMethodType2<T> func)
+		{
+			auto iter = this->mEventMethodMap.find(id);
+			if(iter != this->mEventMethodMap.end())
+			{
+				return false;
+			}
+			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T>>(id, (T*)this->mObj, func));
+			return true;
+		}
+		std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
+		const size_t GetEventSize() { return this->mEventMethodMap.size();}
 	private:
 		void * mObj;
-		std::unordered_map<std::string, std::shared_ptr<SubMethod>> mSubMethodMap;
+		const std::string mService;
+		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
 	};
 }
 

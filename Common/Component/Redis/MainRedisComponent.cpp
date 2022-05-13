@@ -37,6 +37,7 @@ namespace Sentry
 		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 		return true;
 	}
+
 	bool MainRedisComponent::LoadRedisConfig()
 	{
 		this->mConfig = this->GetConfig().GetRedisConfig("main");
@@ -68,7 +69,7 @@ namespace Sentry
 		//this->Run("FLUSHALL")->IsOk();
 		std::shared_ptr<RedisRequest> request = RedisRequest::Make("FLUSHALL");
 		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-		if(this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
+		if (this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
 		{
 			return false;
 		}
@@ -91,6 +92,7 @@ namespace Sentry
 			LOG_INFO("load redis script " << path << " successful");
 		}
 
+		LOG_CHECK_RET_FALSE(this->SubEvent());
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
 		return true;
@@ -98,31 +100,20 @@ namespace Sentry
 
 	bool MainRedisComponent::SubEvent()
 	{
-		if(!this->SubscribeChannel(this->mRpcAddress))
+		if (!this->SubscribeChannel(this->mRpcAddress))
 		{
 			return false;
 		}
-		std::vector<Component *> components;
+		std::vector<Component*> components;
 		this->GetApp()->GetComponents(components);
-		for(Component * component : components)
+		for (Component* component: components)
 		{
-			std::list<std::string> eventIds;
-			LocalServiceComponent * localServiceComponent = component->Cast<LocalServiceComponent>();
-			if(localServiceComponent != nullptr && localServiceComponent->GetSubEvents(eventIds))
+			LocalServiceComponent* localServiceComponent = component->Cast<LocalServiceComponent>();
+			if (localServiceComponent != nullptr && localServiceComponent->LoadEvent())
 			{
-				for(const std::string & eveId : eventIds)
+				if (!this->SubscribeChannel(localServiceComponent->GetName()))
 				{
-					if(!this->SubscribeChannel(eveId))
-					{
-						return false;
-					}
-					auto iter = this->mEventMap.find(eveId);
-					if(iter == this->mEventMap.end())
-					{
-						std::list<std::string> services;
-						this->mEventMap.emplace(eveId, services);
-					}
-					this->mEventMap[eveId].emplace_back(localServiceComponent->GetName());
+					return false;
 				}
 			}
 		}
@@ -138,19 +129,20 @@ namespace Sentry
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
 		size_t count = 0;
-		const std::string & ip = this->mConfig->Ip;
+		const std::string& ip = this->mConfig->Ip;
 		unsigned short port = this->mConfig->Port;
 		std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(workThread, ip, port);
-		std::shared_ptr<RedisClientContext> redisCommandClient = std::make_shared<RedisClientContext>(socketProxy, this->mConfig);
+		std::shared_ptr<RedisClientContext> redisCommandClient = std::make_shared<RedisClientContext>(socketProxy,
+				this->mConfig);
 
 		XCode code = redisCommandClient->StartConnect();
-		if(code == XCode::RedisAuthFailure)
+		if (code == XCode::RedisAuthFailure)
 		{
 			LOG_ERROR("redis auth failure");
 			return nullptr;
 		}
 
-		while(code != XCode::Successful)
+		while (code != XCode::Successful)
 		{
 			LOG_ERROR(this->mConfig->Name << " connect redis ["
 										  << this->mConfig->Address << "] failure count = " << count++);
@@ -165,7 +157,7 @@ namespace Sentry
 	{
 		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
 		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBLISH", channel, message);
-		if(this->mRedisClient->Run(request, response) != XCode::Successful)
+		if (this->mRedisClient->Run(request, response) != XCode::Successful)
 		{
 			LOG_ERROR("redis net work error publish error");
 			return -1;
@@ -175,12 +167,12 @@ namespace Sentry
 
 	void MainRedisComponent::CheckRedisClient()
 	{
-		while(this->mSubRedisClient != nullptr)
+		while (this->mSubRedisClient != nullptr)
 		{
 			this->mTaskComponent->Sleep(5000);
 			std::shared_ptr<RedisRequest> request = RedisRequest::Make("HGET", "lua", "json.lua");
 			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-			if(this->mRedisClient->Run(request, response) != XCode::Successful)
+			if (this->mRedisClient->Run(request, response) != XCode::Successful)
 			{
 
 			}
@@ -192,7 +184,7 @@ namespace Sentry
 		assert(!channel.empty());
 		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
 		std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
-		if(this->mSubRedisClient->Run(request, response) != XCode::Successful)
+		if (this->mSubRedisClient->Run(request, response) != XCode::Successful)
 		{
 			LOG_ERROR("redis net work error sub " << channel << " failure");
 			return false;
@@ -240,10 +232,10 @@ namespace Sentry
 				redisResponse->GetString(message, 2);
 				if (message[0] == '+') //请求
 				{
-					const char * data = message.c_str() + 1;
+					const char* data = message.c_str() + 1;
 					const size_t size = message.size() - 1;
 					std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
-					if(!request->ParseFromArray(data, size))
+					if (!request->ParseFromArray(data, size))
 					{
 						LOG_ERROR("parse message error");
 						continue;
@@ -252,41 +244,41 @@ namespace Sentry
 				}
 				else if (message[0] == '-') //回复
 				{
-					const char * data = message.c_str() + 1;
+					const char* data = message.c_str() + 1;
 					const size_t size = message.size() - 1;
 					std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
-					if(!response->ParseFromArray(data, size))
+					if (!response->ParseFromArray(data, size))
 					{
 						LOG_ERROR("parse message error");
 						continue;
 					}
 					this->mRpcComponent->OnResponse(response);
 				}
-				else if(message[0] == '*') //事件
+				else if (message[0] == '*') //事件
 				{
-					const char * data = message.c_str() + 1;
+					const char* data = message.c_str() + 1;
 					const size_t size = message.size() - 1;
-					std::shared_ptr<eve::Publish> publishData(new eve::Publish());
-					if(!publishData->ParseFromArray(data, size))
-					{
-						LOG_ERROR("parse message error");
-						continue;
-					}
-					auto iter = this->mEventMap.find(publishData->eve_id());
-					if(iter != this->mEventMap.end())
-					{
-						for(const std::string & service : iter->second)
-						{
-							LocalServiceComponent * localServiceComponent = this->GetComponent<LocalServiceComponent>(service);
-							if(localServiceComponent != nullptr && localServiceComponent->Invoke(publishData) != XCode::Successful)
-							{
-								LOG_ERROR("publish event  failure service = " << service);
-							}
-						}
-					}
+					this->TriggerEvent(channel, data, size);
 				}
 			}
 		}
+	}
+
+	bool MainRedisComponent::TriggerEvent(const std::string& channel, const char* str, size_t size)
+	{
+		LocalServiceComponent * localServiceComponent=  this->GetComponent<LocalServiceComponent>(channel);
+		if(localServiceComponent == nullptr)
+		{
+			return false;
+		}
+		std::string eveId;
+		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+		if(!jsonReader->ParseJson(str, size) || !jsonReader->GetMember("eveId", eveId))
+		{
+			return false;
+		}
+		localServiceComponent->Invoke(eveId, jsonReader);
+		return true;
 	}
 
 	void MainRedisComponent::GetAllAddress(std::vector<std::string>& chanels)
@@ -336,13 +328,8 @@ namespace Sentry
 			LOG_ERROR("not find redis script lock.lua");
 			return false;
 		}
-		std::unordered_map<std::string, std::string> parateters
-			{
-				std::make_pair("key", key),
-				std::make_pair("time", std::to_string(timeout))
-			};
 		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", parateters);
+		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", "key", key, "time", timeout);
 		if (this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
 		{
 			return false;
@@ -394,5 +381,4 @@ namespace Sentry
 			});
 		}
 	}
-
 }

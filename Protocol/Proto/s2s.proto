@@ -43,7 +43,7 @@ message Mysql //mysql操作
 
 //网关
 
-message AddressAllot
+message Allot
 {
     message Request
     {

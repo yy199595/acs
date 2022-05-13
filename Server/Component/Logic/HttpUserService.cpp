@@ -45,7 +45,8 @@ namespace Sentry
 
 	XCode HttpUserService::Login(const Json::Reader& request, Json::Writer& response)
 	{
-		string account, password;
+		std::string ip, account, password;
+		LOGIC_THROW_ERROR(request.GetMember("ip", ip));
 		LOGIC_THROW_ERROR(request.GetMember("account", account));
 		LOGIC_THROW_ERROR(request.GetMember("password", password));
 
@@ -79,13 +80,19 @@ namespace Sentry
 		{
 			return XCode::AddressAllotFailure;
 		}
-		s2s::AddressAllot::Request allotRequest;
+		s2s::Allot::Request allotRequest;
 		allotRequest.set_login_token(newToken);
 		allotRequest.set_user_id(userAccount->user_id());
-		std::shared_ptr<s2s::AddressAllot::Response> allotResponse(new s2s::AddressAllot::Response());
+		std::shared_ptr<s2s::Allot::Response> allotResponse(new s2s::Allot::Response());
 		if (this->mGateService->Call(address, "Allot", allotRequest, allotResponse) == XCode::Successful)
 		{
-			//TODO
+			if (this->mRedisComponent->CallLua("user", "set", "token", newToken, "user_id",
+					userAccount->user_id(), "time", 30) != nullptr)
+			{
+				response.AddMember("token", newToken);
+				response.AddMember("address", allotResponse->address());
+				return XCode::Successful;
+			}
 		}
 		return XCode::AddressAllotFailure;
 	}

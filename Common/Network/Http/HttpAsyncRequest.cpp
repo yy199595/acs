@@ -143,30 +143,15 @@ namespace Sentry
         }
         return HttpStatus::CONTINUE;
     }
-
-    std::shared_ptr<Json::Reader> HttpAsyncResponse::ToJsonReader()
-    {
-        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-        if(!jsonReader->ParseJson(this->mContent))
-        {
-            return nullptr;
-        }
-        return jsonReader;
-    }
 }
 
 namespace Sentry
 {
-    HttpHandlerRequest::HttpHandlerRequest()
+    HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
         this->mContentLength = 0;
+		this->mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
-    }
-
-    std::shared_ptr<Json::Reader> HttpHandlerRequest::ToJsonReader()
-    {
-        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-        return jsonReader->ParseJson(this->mContent) ? jsonReader : nullptr;
     }
 
     bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
@@ -186,7 +171,7 @@ namespace Sentry
         if(this->mState == HttpDecodeState::FirstLine)
         {
             this->mState = HttpDecodeState::HeadLine;
-            io >> this->mMethod >> this->mUrl >> this->mVersion;
+            io >> this->mMethod >> this->mPath >> this->mVersion;
             io.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
@@ -214,11 +199,11 @@ namespace Sentry
             {
                 if(this->mMethod == "GET")
                 {
-                    size_t pos = this->mUrl.find("?");
+                    size_t pos = this->mPath.find("?");
                     if(pos != std::string::npos)
                     {
-                        this->mContent = mUrl.substr(pos + 1);
-                        this->mUrl = this->mUrl.substr(0, pos);
+                        this->mContent = mPath.substr(pos + 1);
+                        this->mPath = this->mPath.substr(0, pos);
                         return HttpStatus::OK;
                     }
                 }

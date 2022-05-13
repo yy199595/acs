@@ -13,8 +13,9 @@ namespace Sentry
 
 	std::shared_ptr<HttpHandlerRequest> HttpHandlerClient::ReadHandlerContent()
 	{
+		const std::string & address = this->mSocket->GetAddress();
 		std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
-		std::shared_ptr<HttpHandlerRequest> handlerRequest(new HttpHandlerRequest());
+		std::shared_ptr<HttpHandlerRequest> handlerRequest(new HttpHandlerRequest(address));
 #ifdef ONLY_MAIN_THREAD
 		this->ReadHttpData(taskSource, handlerRequest);
 #else

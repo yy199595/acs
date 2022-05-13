@@ -53,7 +53,6 @@ namespace Client
     {
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-        this->mHttpComponent = this->GetComponent<HttpComponent>();
         return true;
     }
 
@@ -226,7 +225,7 @@ namespace Client
 		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
-		c2s::GateLogin::Request loginRequest;
+		c2s::GateAuth::Request loginRequest;
 		loginRequest.set_token(loginToken);
 		return this->Call("GateService.Login", loginRequest) == XCode::Successful;
 	}

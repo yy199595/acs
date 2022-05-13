@@ -5,7 +5,7 @@
 #include<XCode/XCode.h>
 #include<google/protobuf/any.h>
 #include<google/protobuf/any.pb.h>
-
+#include"Json/JsonReader.h"
 #include <utility>
 namespace Sentry
 {
@@ -37,9 +37,9 @@ namespace Sentry
 	using ServiceMethodType5 = XCode(T::*)(const std::string & address, const T1 &);
 
 	template<typename T>
-	using EventMethodType1 = void(T::*)();
-	template<typename T, typename T1>
-	using EventMethodType2 = void(T::*)(const T1 & content);
+	using EventMethodType1 = bool(T::*)();
+	template<typename T>
+	using EventMethodType2 = bool(T::*)(const Json::Reader & content);
 
 //	template<typename T, typename T1, typename T2>
 //	using ServiceMethodType55 = XCode(T::*)(const std::string & address, const T1 &, T2 &);
@@ -56,7 +56,7 @@ namespace Sentry
 			: mEveId(id) {}
 
 	public:
-		virtual bool Run(const eve::Publish & data) = 0;
+		virtual bool Run(std::shared_ptr<Json::Reader> json) = 0;
 		const std::string & GetEveId() { return this->mEveId;}
 	private:
 		const std::string mEveId;
@@ -70,40 +70,34 @@ namespace Sentry
 			: EventMethod(id), mObj(o), mFunc(methodType1) {}
 
 	public:
-		bool Run(const eve::Publish & data)
+		bool Run(std::shared_ptr<Json::Reader> json)
 		{
-			(this->mObj->*this->mFunc)();
-			return true;
+			return (this->mObj->*this->mFunc)();
 		}
 	private:
 		T * mObj;
 		EventMethodType1<T> mFunc;
 	};
 
-	template<typename T, typename T1>
+	template<typename T>
 	class EventMethod2 final : public EventMethod
 	{
 	public:
-		explicit EventMethod2(const std::string & id, T * o, EventMethodType2<T, T1> methodType)
+		explicit EventMethod2(const std::string & id, T * o, EventMethodType2<T> methodType)
 				: EventMethod(id), mObj(o), mFunc(methodType) {}
 
 	public:
-		bool Run(const eve::Publish & data)
+		bool Run(std::shared_ptr<Json::Reader> json)
 		{
-			if(data.has_data() && data.data().Is<T1>())
+			if(json == nullptr)
 			{
-				std::shared_ptr<T1> t(new T1());
-				if(data.data().UnpackTo(t.get()))
-				{
-					(this->mObj->*this->mFunc)();
-					return true;
-				}
+				return false;
 			}
-			return false;
+			return (this->mObj->*this->mFunc)(*json);
 		}
 	private:
 		T * mObj;
-		EventMethodType2<T, T1> mFunc;
+		EventMethodType2<T> mFunc;
 	};
 }
 

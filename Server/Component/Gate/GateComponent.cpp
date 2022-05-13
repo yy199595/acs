@@ -15,7 +15,7 @@
 #include"Pool/MessagePool.h"
 #include"google/protobuf/util/json_util.h"
 #endif
-#include"Component/Service/UserInfoSyncService.h"
+#include"GateService.h"
 namespace Sentry
 {
 
@@ -46,12 +46,6 @@ namespace Sentry
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		long long userId = 0;
-		const std::string &address = request->address();
-		if(!this->mGateClientComponent->GetUserId(address, userId))
-		{
-			return this->Auth(request);
-		}
 		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
 		const RpcInterfaceConfig * config = rpcConfig.GetInterfaceConfig(request->method_name());
 		if (config == nullptr || config->Type != "Client")
@@ -59,38 +53,21 @@ namespace Sentry
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
-		if(!config->Request.empty())
+		if(!config->Request.empty() && !request->has_data())
 		{
-			if(!request->has_data())
-			{
-				return XCode::CallArgsError;
-			}
-			std::string fullName;
-			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &fullName)
-				|| fullName != config->Request)
-			{
-				return XCode::CallArgsError;
-			}
+			return XCode::CallArgsError;
 		}
-		else if(request->has_data())
+		std::string fullName;
+		if(!Any::ParseAnyTypeUrl(request->data().type_url(), &fullName) || fullName != config->Request)
 		{
 			return XCode::CallArgsError;
 		}
 
-//#ifdef __DEBUG__
-//		std::string json;
-//		LOG_INFO("========== client request ==========");
-//		LOG_INFO("func = " << request->method_name());
-//		LOG_INFO("address = " << request->address());
-//		LOG_INFO("userid = " << userId);
-//		if(request->has_data() && Helper::Proto::GetJson(request->data(), json))
-//		{
-//			LOG_INFO("json = " << json);
-//		}
-//#endif
-		if(this->GetComponent<LocalServiceComponent>(config->Service) == nullptr)
+		long long userId = 0;
+		const std::string &address = request->address();
+		if(!this->mGateClientComponent->GetUserId(address, userId))
 		{
-			return XCode::CallServiceNotFound;
+			return this->Auth(request);
 		}
 		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, userId, request);
 		return XCode::Successful;
@@ -109,40 +86,25 @@ namespace Sentry
 
 	XCode GateComponent::Auth(const std::shared_ptr<c2s::Rpc::Request> request)
 	{
-		c2s::GateLogin::Request loginRequest;
-		if (!request->has_data() || !request->data().Is<c2s::GateLogin::Request>()
-			|| !request->mutable_data()->UnpackTo(&loginRequest))
-		{
-			return XCode::CallArgsError;
-		}
-		const std::string& token = loginRequest.token();
-		const std::string & address = request->address();
-
-		auto iter = this->mUserTokens.find(token);
-		if (iter == this->mUserTokens.end())
-		{
-			return XCode::Failure;
-		}
-		long long userId = iter->second;
-		this->mUserTokens.erase(iter);
-
-		auto iter1 = this->mSocketTimers.find(address);
-		if(iter1 != this->mSocketTimers.end())
-		{
-			unsigned int id = iter1->second;
-			this->mSocketTimers.erase(iter1);
-			this->mTimerComponent->CancelTimer(id);
-		}
-
-		LOG_INFO(userId << " login gate successful");
-		this->mGateClientComponent->AddNewUser(request->address(), userId);
+		//TODO
+		//this->mGateClientComponent->AddNewUser(request->address(), userId);
 		std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
 
 		clientResponse->set_rpc_id(request->rpc_id());
 		clientResponse->set_code((int)XCode::Successful);
-		this->mGateClientComponent->SendToClient(address, clientResponse);
+		this->mGateClientComponent->SendToClient(request->address(), clientResponse);
+		this->mTaskComponent->Start([this]()
+		{
+			std::string address;
+			Json::Writer jsonWriter;
+			if(this->GetConfig().GetListenerAddress("rpc", address))
+			{
+				jsonWriter.AddMember("user_id", 0);
+				jsonWriter.AddMember("address", address);
+				return this->GetComponent<GateService>()->PublishEvent("user_join_event", jsonWriter);
+			}
+		});
 		return XCode::Successful;
-
 	}
 
 	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response)

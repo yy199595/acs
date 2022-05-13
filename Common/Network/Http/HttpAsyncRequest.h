@@ -57,7 +57,6 @@ namespace Sentry
     {
     public:
         virtual const std::string & GetContent() = 0;
-        virtual std::shared_ptr<Json::Reader> ToJsonReader() = 0;
         virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
 }
@@ -69,7 +68,6 @@ namespace Sentry
     public:
         HttpAsyncResponse();
     public:
-        std::shared_ptr<Json::Reader> ToJsonReader() final;
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() final { return this->mContent;}
@@ -89,29 +87,21 @@ namespace Sentry
 	class HttpHandlerRequest : public IHttpContent
 	{
 	 public:
-		HttpHandlerRequest();
+		HttpHandlerRequest(const std::string & address);
 	 public:
 		HttpStatus OnReceiveData(asio::streambuf& streamBuffer) final;
 	 public:
-		const std::string& GetUrl()
-		{
-			return this->mUrl;
-		}
-		const std::string& GetMethod()
-		{
-			return this->mMethod;
-		}
-		std::shared_ptr<Json::Reader> ToJsonReader() final;
-		const std::string& GetContent() final
-		{
-			return this->mContent;
-		}
+		const std::string& GetPath() { return this->mPath; }
+		const std::string& GetMethod() { return this->mMethod; }
+		const std::string& GetAddress() { return this->mAddress; }
+		const std::string& GetContent() final { return this->mContent; }
 		bool GetHeadContent(const std::string& key, std::string& value);
 	 private:
-		std::string mUrl;
+		std::string mPath;
 		std::string mMethod;
 		std::string mContent;
 		std::string mVersion;
+		std::string mAddress;
 		HttpDecodeState mState;
 		size_t mContentLength;
 		std::unordered_map<std::string, std::string> mHeadMap;

@@ -15,8 +15,8 @@ namespace Sentry
 
 	bool UserInfoSyncService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
-		methodRegister.Bind("AddUser", &UserInfoSyncService::AddUser);
-		methodRegister.Bind("DelUser", &UserInfoSyncService::DelUser);
+		//methodRegister.Bind("AddUser", &UserInfoSyncService::AddUser);
+		//methodRegister.Bind("DelUser", &UserInfoSyncService::DelUser);
 		return true;
 	}
 
@@ -28,7 +28,6 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		logicService->DelEntity(request.user_id());
 		return XCode::Successful;
 	}
 
@@ -40,7 +39,6 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		logicService->AddEntity(request.user_id(), request.address());
 		return XCode::Successful;
 	}
 }

@@ -2,6 +2,7 @@
 
 #include<memory>
 #include"Protocol/c2s.pb.h"
+#include"Json/JsonWriter.h"
 #include"Component/Component.h"
 using namespace std;
 using namespace com;
@@ -36,7 +37,7 @@ namespace Sentry
 
 	public:
 		XCode PublishEvent(const std::string & eveId);
-		XCode PublishEvent(const std::string & eveId, const Message & message);
+		XCode PublishEvent(const std::string & eveId, Json::Writer & message);
 	public:
 		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 	 protected:

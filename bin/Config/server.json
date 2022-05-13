@@ -67,7 +67,7 @@
             "count": 1,
             "lua": [
                 "./redis/lock.lua",
-                "./redis/json.lua"
+                "./redis/user.lua"
             ],
             "passwd": "199595yjz."
         },

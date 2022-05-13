@@ -110,7 +110,8 @@
             "Async": true,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "s2s.AddressAllot.Request"
+            "Request": "s2s.Allot.Request",
+            "Response": "s2s.Allot.Response"
         },
         "CallClient": {
             "Id": 1003,
@@ -125,6 +126,13 @@
             "Type": "Server",
             "CallWay": "Net",
             "Request": "c2s.Rpc.Call"
+        },
+        "Auth": {
+            "Id": 1005,
+            "Async": true,
+            "Type": "Server",
+            "CallWay": "Net",
+            "Request":"c2s.GateAuth.Request"
         }
     },
     "ChatService": {

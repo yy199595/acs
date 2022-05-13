@@ -63,29 +63,6 @@ namespace Sentry
 		jsonWriter.EndArray();
 		return jsonWriter.ToJsonString();
 	}
-
-	std::shared_ptr<RedisRequest>
-	RedisRequest::MakeLua(const std::string& key, const std::string& func,
-		std::unordered_map<std::string, std::string>& parameters)
-	{
-		std::shared_ptr<RedisRequest> request
-			= std::make_shared<RedisRequest>("EVALSHA");
-		request->AddParameter(key);
-		size_t size = parameters.size() + 1;
-		request->AddParameter((int)size);
-		request->AddParameter("func");
-		for(auto iter = parameters.begin(); iter != parameters.end(); iter++)
-		{
-			request->AddParameter(iter->first);
-		}
-		request->AddParameter(func);
-
-		for(auto iter = parameters.begin(); iter != parameters.end(); iter++)
-		{
-			request->AddParameter(iter->second);
-		}
-		return request;
-	}
 }
 
 namespace Sentry

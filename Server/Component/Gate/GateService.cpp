@@ -5,7 +5,6 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"Util/MathHelper.h"
 #include"NetWork/GateRpcClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
@@ -16,13 +15,18 @@
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
+	bool GateService::OnInitEvent(ServiceEventRegister& methodRegister)
+	{
+		return this->SubUserEvent();
+	}
+
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.Bind("Ping", &GateService::Ping);
+		methodRegister.Bind("Auth", &GateService::Auth);
 		methodRegister.Bind("Allot", &GateService::Allot);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
-
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mUserService = this->GetComponent<UserInfoSyncService>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
@@ -72,7 +76,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::Allot(const s2s::AddressAllot::Request& request, s2s::AddressAllot::Response & response)
+	XCode GateService::Allot(const s2s::Allot::Request& request, s2s::Allot::Response & response)
 	{
 		long long userId = request.user_id();
 		const std::string& token = request.login_token();
@@ -90,5 +94,10 @@ namespace Sentry
 		message->mutable_data()->PackFrom(request.data());
 		this->mGateClientComponent->SendToAllClient(message);
 		return XCode::Successful;
+	}
+
+	XCode GateService::Auth(const c2s::GateAuth::Request & request)
+	{
+
 	}
 }

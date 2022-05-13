@@ -8,6 +8,7 @@
 #include"Method/HttpServiceMethod.h"
 #include"Other/InterfaceConfig.h"
 #include"Other/ElapsedTimer.h"
+#include"Util/StringHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"Network//Http/HttpRequestClient.h"
@@ -41,12 +42,11 @@ namespace Sentry
 		LOG_CHECK_RET(httpRequestData);
 
 		std::string host;
-		const std::string& url = httpRequestData->GetUrl();
+		const std::string& url = httpRequestData->GetPath();
 		const ServiceConfig & serviceConfig = this->GetApp()->GetServiceConfig();
 		const HttpInterfaceConfig* httpConfig =serviceConfig.GetHttpIterfaceConfig(url);
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
-		LOG_INFO("http://" << host << url);
 #endif
 		XCode code = this->Invoke(httpConfig, httpRequestData, jsonResponse);
 
@@ -54,7 +54,7 @@ namespace Sentry
 		httpClient->Response(HttpStatus::OK, *jsonResponse);
 #ifdef __DEBUG__
 		LOG_INFO("==== http request handler ====");
-		LOG_INFO("url = " << httpRequestData->GetUrl());
+		LOG_INFO("url = " << httpRequestData->GetPath());
 		LOG_INFO("type = " << httpRequestData->GetMethod());
 		LOG_INFO("time = " << elapsedTimer.GetMs() << " ms");
 		if (!httpRequestData->GetContent().empty())
@@ -71,7 +71,7 @@ namespace Sentry
 		std::shared_ptr<Json::Writer> jsonWriter(new Json::Writer());
 		if (httpConfig == nullptr)
 		{
-			jsonWriter->AddMember("error", fmt::format("not find url : {0}", content->GetUrl()));
+			jsonWriter->AddMember("error", fmt::format("not find url : {0}", content->GetPath()));
 			return XCode::CallServiceNotFound;
 		}
 
@@ -87,6 +87,10 @@ namespace Sentry
 			jsonWriter->AddMember("error", "json parse error");
 			return XCode::ParseJsonFailure;
 		}
+		std::string ip;
+		unsigned short port = 0;
+		Helper::String::ParseIpAddress(content->GetAddress(), ip, port);
+		jsonReader->AddMember("ip", rapidjson::StringRef(ip.c_str()), jsonReader->GetAllocator());
 		HttpService* httpService = this->GetComponent<HttpService>(httpConfig->Service);
 		if (httpService == nullptr)
 		{

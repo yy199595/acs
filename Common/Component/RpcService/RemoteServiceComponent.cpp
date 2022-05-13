@@ -114,30 +114,16 @@ namespace Sentry
 	XCode RemoteServiceComponent::PublishEvent(const std::string& eveId)
 	{
 		std::string data = "*";
-		eve::Publish publishData;
-		publishData.set_eve_id(eveId);
-		if(!publishData.AppendToString(&data))
-		{
-			return XCode::SerializationFailure;
-		}
-		if(this->mRedisComponent->Publish(eveId, data) < 0)
-		{
-			return XCode::NetWorkError;
-		}
-		return XCode::Successful;
+		Json::Writer jsonWriter;
+		return this->PublishEvent(eveId, jsonWriter);
 	}
 
-	XCode RemoteServiceComponent::PublishEvent(const std::string& eveId, const Message& message)
+	XCode RemoteServiceComponent::PublishEvent(const std::string& eveId, Json::Writer& message)
 	{
 		std::string data = "*";
-		eve::Publish publishData;
-		publishData.set_eve_id(eveId);
-		publishData.mutable_data()->PackFrom(message);
-		if(!publishData.AppendToString(&data))
-		{
-			return XCode::SerializationFailure;
-		}
-		if(this->mRedisComponent->Publish(eveId, data) < 0)
+		message.AddMember("eveId", eveId);
+		data.append(message.ToJsonString());
+		if(this->mRedisComponent->Publish(this->GetName(), data) < 0)
 		{
 			return XCode::NetWorkError;
 		}

@@ -35,43 +35,58 @@ namespace Sentry
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
-		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key,
-			const std::string & func, std::unordered_map<std::string, std::string> & parameters);
+		template<typename ... Args>
+		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & func, Args &&... args);
 
         template<typename ... Args>
-        void InitParameter(Args &&... args);
+        static void InitParameter(std::shared_ptr<RedisRequest> self, Args &&... args);
 	private:
         void AddParameter(int value);
         void AddParameter(long long value);
 		void AddParameter(const Message & message);
         void AddParameter(const std::string & value);
 	private:
-        void Encode() {}
+        static void Encode(std::shared_ptr<RedisRequest> self) {}
 
         template<typename T, typename... Args>
-        inline void Encode(const T &t, Args... args)
+        static void Encode(std::shared_ptr<RedisRequest> self, const T &t, Args... args)
         {
-            this->AddParameter(t);
-            this->Encode(std::forward<Args>(args)...);
+            self->AddParameter(t);
+			RedisRequest::Encode(self, std::forward<Args>(args)...);
         }
     private:
         std::string mCommand;
-        std::list<std::string> mParameters;
+        std::vector<std::string> mParameters;
     };
 
 	template<typename ... Args>
 	std::shared_ptr<RedisRequest> RedisRequest::Make(const std::string& cmd, Args&& ... args)
 	{
-		std::shared_ptr<RedisRequest> request
-				= std::make_shared<RedisRequest>(cmd);
-		request->InitParameter(std::forward<Args>(args)...);
+		std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+		RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+		return request;
+	}
+
+	template<typename... Args>
+	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const string& key, const string& func, Args&& ... args)
+	{
+		const size_t size = sizeof...(Args);
+		static_assert(sizeof...(Args) % 2 == 0);
+		std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>("EVALSHA");
+		RedisRequest::InitParameter(request, key, (int)size / 2 + 1, "func", func, std::forward<Args>(args)...);
+
+		for (size_t index = 3; index < request->mParameters.size() - 1; index += 2)
+		{
+			std::swap(request->mParameters[index], request->mParameters[index + 1]);
+		}
 		return request;
 	}
 
     template<typename ... Args>
-    void RedisRequest::InitParameter(Args &&...args)
+    void RedisRequest::InitParameter(std::shared_ptr<RedisRequest> self, Args &&...args)
     {
-        this->Encode(std::forward<Args>(args)...);
+		self->mParameters.reserve(sizeof...(Args));
+		RedisRequest::Encode(self, std::forward<Args>(args)...);
     }
 
     class RedisResponse

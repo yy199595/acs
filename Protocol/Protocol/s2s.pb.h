@@ -50,15 +50,15 @@ struct TableStruct_s2s_2eproto {
 };
 void AddDescriptors_s2s_2eproto();
 namespace s2s {
-class AddressAllot;
-class AddressAllotDefaultTypeInternal;
-extern AddressAllotDefaultTypeInternal _AddressAllot_default_instance_;
-class AddressAllot_Request;
-class AddressAllot_RequestDefaultTypeInternal;
-extern AddressAllot_RequestDefaultTypeInternal _AddressAllot_Request_default_instance_;
-class AddressAllot_Response;
-class AddressAllot_ResponseDefaultTypeInternal;
-extern AddressAllot_ResponseDefaultTypeInternal _AddressAllot_Response_default_instance_;
+class Allot;
+class AllotDefaultTypeInternal;
+extern AllotDefaultTypeInternal _Allot_default_instance_;
+class Allot_Request;
+class Allot_RequestDefaultTypeInternal;
+extern Allot_RequestDefaultTypeInternal _Allot_Request_default_instance_;
+class Allot_Response;
+class Allot_ResponseDefaultTypeInternal;
+extern Allot_ResponseDefaultTypeInternal _Allot_Response_default_instance_;
 class CallClient;
 class CallClientDefaultTypeInternal;
 extern CallClientDefaultTypeInternal _CallClient_default_instance_;
@@ -101,9 +101,9 @@ extern Mysql_UpdateDefaultTypeInternal _Mysql_Update_default_instance_;
 }  // namespace s2s
 namespace google {
 namespace protobuf {
-template<> ::s2s::AddressAllot* Arena::CreateMaybeMessage<::s2s::AddressAllot>(Arena*);
-template<> ::s2s::AddressAllot_Request* Arena::CreateMaybeMessage<::s2s::AddressAllot_Request>(Arena*);
-template<> ::s2s::AddressAllot_Response* Arena::CreateMaybeMessage<::s2s::AddressAllot_Response>(Arena*);
+template<> ::s2s::Allot* Arena::CreateMaybeMessage<::s2s::Allot>(Arena*);
+template<> ::s2s::Allot_Request* Arena::CreateMaybeMessage<::s2s::Allot_Request>(Arena*);
+template<> ::s2s::Allot_Response* Arena::CreateMaybeMessage<::s2s::Allot_Response>(Arena*);
 template<> ::s2s::CallClient* Arena::CreateMaybeMessage<::s2s::CallClient>(Arena*);
 template<> ::s2s::CallClient_Request* Arena::CreateMaybeMessage<::s2s::CallClient_Request>(Arena*);
 template<> ::s2s::GateBroadCast* Arena::CreateMaybeMessage<::s2s::GateBroadCast>(Arena*);
@@ -1179,25 +1179,25 @@ class Mysql :
 };
 // -------------------------------------------------------------------
 
-class AddressAllot_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddressAllot.Request) */ {
+class Allot_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot.Request) */ {
  public:
-  AddressAllot_Request();
-  virtual ~AddressAllot_Request();
+  Allot_Request();
+  virtual ~Allot_Request();
 
-  AddressAllot_Request(const AddressAllot_Request& from);
+  Allot_Request(const Allot_Request& from);
 
-  inline AddressAllot_Request& operator=(const AddressAllot_Request& from) {
+  inline Allot_Request& operator=(const Allot_Request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AddressAllot_Request(AddressAllot_Request&& from) noexcept
-    : AddressAllot_Request() {
+  Allot_Request(Allot_Request&& from) noexcept
+    : Allot_Request() {
     *this = ::std::move(from);
   }
 
-  inline AddressAllot_Request& operator=(AddressAllot_Request&& from) noexcept {
+  inline Allot_Request& operator=(Allot_Request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1209,34 +1209,34 @@ class AddressAllot_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AddressAllot_Request& default_instance();
+  static const Allot_Request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AddressAllot_Request* internal_default_instance() {
-    return reinterpret_cast<const AddressAllot_Request*>(
-               &_AddressAllot_Request_default_instance_);
+  static inline const Allot_Request* internal_default_instance() {
+    return reinterpret_cast<const Allot_Request*>(
+               &_Allot_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     8;
 
-  void Swap(AddressAllot_Request* other);
-  friend void swap(AddressAllot_Request& a, AddressAllot_Request& b) {
+  void Swap(Allot_Request* other);
+  friend void swap(Allot_Request& a, Allot_Request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AddressAllot_Request* New() const final {
-    return CreateMaybeMessage<AddressAllot_Request>(nullptr);
+  inline Allot_Request* New() const final {
+    return CreateMaybeMessage<Allot_Request>(nullptr);
   }
 
-  AddressAllot_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AddressAllot_Request>(arena);
+  Allot_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Allot_Request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AddressAllot_Request& from);
-  void MergeFrom(const AddressAllot_Request& from);
+  void CopyFrom(const Allot_Request& from);
+  void MergeFrom(const Allot_Request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1258,7 +1258,7 @@ class AddressAllot_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AddressAllot_Request* other);
+  void InternalSwap(Allot_Request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1294,7 +1294,7 @@ class AddressAllot_Request :
   ::google::protobuf::int64 user_id() const;
   void set_user_id(::google::protobuf::int64 value);
 
-  // @@protoc_insertion_point(class_scope:s2s.AddressAllot.Request)
+  // @@protoc_insertion_point(class_scope:s2s.Allot.Request)
  private:
   class HasBitSetters;
 
@@ -1306,25 +1306,25 @@ class AddressAllot_Request :
 };
 // -------------------------------------------------------------------
 
-class AddressAllot_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddressAllot.Response) */ {
+class Allot_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot.Response) */ {
  public:
-  AddressAllot_Response();
-  virtual ~AddressAllot_Response();
+  Allot_Response();
+  virtual ~Allot_Response();
 
-  AddressAllot_Response(const AddressAllot_Response& from);
+  Allot_Response(const Allot_Response& from);
 
-  inline AddressAllot_Response& operator=(const AddressAllot_Response& from) {
+  inline Allot_Response& operator=(const Allot_Response& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AddressAllot_Response(AddressAllot_Response&& from) noexcept
-    : AddressAllot_Response() {
+  Allot_Response(Allot_Response&& from) noexcept
+    : Allot_Response() {
     *this = ::std::move(from);
   }
 
-  inline AddressAllot_Response& operator=(AddressAllot_Response&& from) noexcept {
+  inline Allot_Response& operator=(Allot_Response&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1336,34 +1336,34 @@ class AddressAllot_Response :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AddressAllot_Response& default_instance();
+  static const Allot_Response& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AddressAllot_Response* internal_default_instance() {
-    return reinterpret_cast<const AddressAllot_Response*>(
-               &_AddressAllot_Response_default_instance_);
+  static inline const Allot_Response* internal_default_instance() {
+    return reinterpret_cast<const Allot_Response*>(
+               &_Allot_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     9;
 
-  void Swap(AddressAllot_Response* other);
-  friend void swap(AddressAllot_Response& a, AddressAllot_Response& b) {
+  void Swap(Allot_Response* other);
+  friend void swap(Allot_Response& a, Allot_Response& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AddressAllot_Response* New() const final {
-    return CreateMaybeMessage<AddressAllot_Response>(nullptr);
+  inline Allot_Response* New() const final {
+    return CreateMaybeMessage<Allot_Response>(nullptr);
   }
 
-  AddressAllot_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AddressAllot_Response>(arena);
+  Allot_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Allot_Response>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AddressAllot_Response& from);
-  void MergeFrom(const AddressAllot_Response& from);
+  void CopyFrom(const Allot_Response& from);
+  void MergeFrom(const Allot_Response& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1385,7 +1385,7 @@ class AddressAllot_Response :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AddressAllot_Response* other);
+  void InternalSwap(Allot_Response* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1415,7 +1415,7 @@ class AddressAllot_Response :
   ::std::string* release_address();
   void set_allocated_address(::std::string* address);
 
-  // @@protoc_insertion_point(class_scope:s2s.AddressAllot.Response)
+  // @@protoc_insertion_point(class_scope:s2s.Allot.Response)
  private:
   class HasBitSetters;
 
@@ -1426,25 +1426,25 @@ class AddressAllot_Response :
 };
 // -------------------------------------------------------------------
 
-class AddressAllot :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.AddressAllot) */ {
+class Allot :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot) */ {
  public:
-  AddressAllot();
-  virtual ~AddressAllot();
+  Allot();
+  virtual ~Allot();
 
-  AddressAllot(const AddressAllot& from);
+  Allot(const Allot& from);
 
-  inline AddressAllot& operator=(const AddressAllot& from) {
+  inline Allot& operator=(const Allot& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AddressAllot(AddressAllot&& from) noexcept
-    : AddressAllot() {
+  Allot(Allot&& from) noexcept
+    : Allot() {
     *this = ::std::move(from);
   }
 
-  inline AddressAllot& operator=(AddressAllot&& from) noexcept {
+  inline Allot& operator=(Allot&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1456,34 +1456,34 @@ class AddressAllot :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const AddressAllot& default_instance();
+  static const Allot& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AddressAllot* internal_default_instance() {
-    return reinterpret_cast<const AddressAllot*>(
-               &_AddressAllot_default_instance_);
+  static inline const Allot* internal_default_instance() {
+    return reinterpret_cast<const Allot*>(
+               &_Allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     10;
 
-  void Swap(AddressAllot* other);
-  friend void swap(AddressAllot& a, AddressAllot& b) {
+  void Swap(Allot* other);
+  friend void swap(Allot& a, Allot& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AddressAllot* New() const final {
-    return CreateMaybeMessage<AddressAllot>(nullptr);
+  inline Allot* New() const final {
+    return CreateMaybeMessage<Allot>(nullptr);
   }
 
-  AddressAllot* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<AddressAllot>(arena);
+  Allot* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Allot>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const AddressAllot& from);
-  void MergeFrom(const AddressAllot& from);
+  void CopyFrom(const Allot& from);
+  void MergeFrom(const Allot& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1505,7 +1505,7 @@ class AddressAllot :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(AddressAllot* other);
+  void InternalSwap(Allot* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1519,12 +1519,12 @@ class AddressAllot :
 
   // nested types ----------------------------------------------------
 
-  typedef AddressAllot_Request Request;
-  typedef AddressAllot_Response Response;
+  typedef Allot_Request Request;
+  typedef Allot_Response Response;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:s2s.AddressAllot)
+  // @@protoc_insertion_point(class_scope:s2s.Allot)
  private:
   class HasBitSetters;
 
@@ -2902,135 +2902,135 @@ Mysql_Response::mutable_json_array() {
 
 // -------------------------------------------------------------------
 
-// AddressAllot_Request
+// Allot_Request
 
 // int64 user_id = 1;
-inline void AddressAllot_Request::clear_user_id() {
+inline void Allot_Request::clear_user_id() {
   user_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 AddressAllot_Request::user_id() const {
-  // @@protoc_insertion_point(field_get:s2s.AddressAllot.Request.user_id)
+inline ::google::protobuf::int64 Allot_Request::user_id() const {
+  // @@protoc_insertion_point(field_get:s2s.Allot.Request.user_id)
   return user_id_;
 }
-inline void AddressAllot_Request::set_user_id(::google::protobuf::int64 value) {
+inline void Allot_Request::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
-  // @@protoc_insertion_point(field_set:s2s.AddressAllot.Request.user_id)
+  // @@protoc_insertion_point(field_set:s2s.Allot.Request.user_id)
 }
 
 // string login_token = 2;
-inline void AddressAllot_Request::clear_login_token() {
+inline void Allot_Request::clear_login_token() {
   login_token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& AddressAllot_Request::login_token() const {
-  // @@protoc_insertion_point(field_get:s2s.AddressAllot.Request.login_token)
+inline const ::std::string& Allot_Request::login_token() const {
+  // @@protoc_insertion_point(field_get:s2s.Allot.Request.login_token)
   return login_token_.GetNoArena();
 }
-inline void AddressAllot_Request::set_login_token(const ::std::string& value) {
+inline void Allot_Request::set_login_token(const ::std::string& value) {
   
   login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_set:s2s.Allot.Request.login_token)
 }
 #if LANG_CXX11
-inline void AddressAllot_Request::set_login_token(::std::string&& value) {
+inline void Allot_Request::set_login_token(::std::string&& value) {
   
   login_token_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Request.login_token)
 }
 #endif
-inline void AddressAllot_Request::set_login_token(const char* value) {
+inline void Allot_Request::set_login_token(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_set_char:s2s.Allot.Request.login_token)
 }
-inline void AddressAllot_Request::set_login_token(const char* value, size_t size) {
+inline void Allot_Request::set_login_token(const char* value, size_t size) {
   
   login_token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Request.login_token)
 }
-inline ::std::string* AddressAllot_Request::mutable_login_token() {
+inline ::std::string* Allot_Request::mutable_login_token() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_mutable:s2s.Allot.Request.login_token)
   return login_token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* AddressAllot_Request::release_login_token() {
-  // @@protoc_insertion_point(field_release:s2s.AddressAllot.Request.login_token)
+inline ::std::string* Allot_Request::release_login_token() {
+  // @@protoc_insertion_point(field_release:s2s.Allot.Request.login_token)
   
   return login_token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AddressAllot_Request::set_allocated_login_token(::std::string* login_token) {
+inline void Allot_Request::set_allocated_login_token(::std::string* login_token) {
   if (login_token != nullptr) {
     
   } else {
     
   }
   login_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), login_token);
-  // @@protoc_insertion_point(field_set_allocated:s2s.AddressAllot.Request.login_token)
+  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Request.login_token)
 }
 
 // -------------------------------------------------------------------
 
-// AddressAllot_Response
+// Allot_Response
 
 // string address = 1;
-inline void AddressAllot_Response::clear_address() {
+inline void Allot_Response::clear_address() {
   address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& AddressAllot_Response::address() const {
-  // @@protoc_insertion_point(field_get:s2s.AddressAllot.Response.address)
+inline const ::std::string& Allot_Response::address() const {
+  // @@protoc_insertion_point(field_get:s2s.Allot.Response.address)
   return address_.GetNoArena();
 }
-inline void AddressAllot_Response::set_address(const ::std::string& value) {
+inline void Allot_Response::set_address(const ::std::string& value) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_set:s2s.Allot.Response.address)
 }
 #if LANG_CXX11
-inline void AddressAllot_Response::set_address(::std::string&& value) {
+inline void Allot_Response::set_address(::std::string&& value) {
   
   address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Response.address)
 }
 #endif
-inline void AddressAllot_Response::set_address(const char* value) {
+inline void Allot_Response::set_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_set_char:s2s.Allot.Response.address)
 }
-inline void AddressAllot_Response::set_address(const char* value, size_t size) {
+inline void Allot_Response::set_address(const char* value, size_t size) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Response.address)
 }
-inline ::std::string* AddressAllot_Response::mutable_address() {
+inline ::std::string* Allot_Response::mutable_address() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_mutable:s2s.Allot.Response.address)
   return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* AddressAllot_Response::release_address() {
-  // @@protoc_insertion_point(field_release:s2s.AddressAllot.Response.address)
+inline ::std::string* Allot_Response::release_address() {
+  // @@protoc_insertion_point(field_release:s2s.Allot.Response.address)
   
   return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AddressAllot_Response::set_allocated_address(::std::string* address) {
+inline void Allot_Response::set_allocated_address(::std::string* address) {
   if (address != nullptr) {
     
   } else {
     
   }
   address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:s2s.AddressAllot.Response.address)
+  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Response.address)
 }
 
 // -------------------------------------------------------------------
 
-// AddressAllot
+// Allot
 
 // -------------------------------------------------------------------
 

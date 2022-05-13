@@ -86,19 +86,10 @@ namespace Sentry
 
 	}
 
-	std::shared_ptr<EventMethod> ServiceMethodRegister::GetEvent(const string& eveId)
+	std::shared_ptr<EventMethod> ServiceEventRegister::GetEvent(const string& eveId)
 	{
 		auto iter = this->mEventMethodMap.find(eveId);
 		return iter != this->mEventMethodMap.end() ? iter->second : nullptr;
-	}
-
-	void ServiceMethodRegister::GetSubEvent(list<std::string>& events) const
-	{
-		auto iter = this->mEventMethodMap.begin();
-		for(; iter != this->mEventMethodMap.end(); iter++)
-		{
-			events.emplace_back(iter->first);
-		}
 	}
 }
 
@@ -109,6 +100,39 @@ namespace Sentry
 		this->mIndex = 0;
 		this->mAddressList.clear();
 	}
+
+	bool LocalServiceComponent::SubUserEvent()
+	{
+		return this->mEventRegister->Sub("user_join_event", &LocalServiceComponent::OnUserJoin)
+			   && this->mEventRegister->Sub("user_exit_event", &LocalServiceComponent::OnUserExit);
+	}
+
+	bool LocalServiceComponent::OnUserJoin(const Json::Reader& jsonReader)
+	{
+		std::string address;
+		long long userId = 0;
+		LOG_CHECK_RET_FALSE(jsonReader.GetMember("user_id", userId));
+		LOG_CHECK_RET_FALSE(jsonReader.GetMember("address", address));
+
+		this->mUserAddressMap[userId] = address;
+		LOG_INFO(this->GetName() << " add " << userId << " address = " << address);
+		return true;
+	}
+
+	bool LocalServiceComponent::OnUserExit(const Json::Reader& jsonReader)
+	{
+		long long userId = 0;
+		LOG_CHECK_RET_FALSE(jsonReader.GetMember("user_id", userId));
+		auto iter = this->mUserAddressMap.find(userId);
+		if (iter != this->mUserAddressMap.end())
+		{
+			this->mUserAddressMap.erase(iter);
+			LOG_INFO(this->GetName() << " del " << userId);
+			return true;
+		}
+		return true;
+	}
+
 	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<Rpc_Request> request,
 	    std::shared_ptr<Rpc_Response> response)
 	{
@@ -137,38 +161,16 @@ namespace Sentry
 
 	bool LocalServiceComponent::LoadService()
 	{
-		if(this->mMethodRegister == nullptr)
+		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
+		if (!this->OnInitService(*this->mMethodRegister))
 		{
-			this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
-			if(!this->OnInitService(*this->mMethodRegister))
-			{
-				return false;
-			}
+			return false;
 		}
-		LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-		if(luaScriptComponent != nullptr)
+		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		if (luaScriptComponent != nullptr)
 		{
-			lua_State * lua = luaScriptComponent->GetLuaEnv();
+			lua_State* lua = luaScriptComponent->GetLuaEnv();
 			return this->mMethodRegister->LoadLuaMethod(lua);
-		}
-		return true;
-	}
-
-	bool LocalServiceComponent::AddEntity(long long id, const std::string & address)
-	{
-		this->mUserAddressMap[id] = address;
-		LOG_INFO(this->GetName() << " add " << id << " address = " << address);
-		return true;
-	}
-
-	bool LocalServiceComponent::DelEntity(long long id)
-	{
-		auto iter = this->mUserAddressMap.find(id);
-		if (iter != this->mUserAddressMap.end())
-		{
-			this->mUserAddressMap.erase(iter);
-			LOG_INFO(this->GetName() << " del " << id);
-			return true;
 		}
 		return true;
 	}
@@ -223,6 +225,7 @@ namespace Sentry
 		}
 		return false;
 	}
+
 	void LocalServiceComponent::GetAllAddress(list<std::string>& allAddress) const
 	{
 		allAddress.clear();
@@ -232,25 +235,24 @@ namespace Sentry
 		}
 	}
 
-	XCode LocalServiceComponent::Invoke(std::shared_ptr<eve::Publish> context)
+	XCode LocalServiceComponent::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)
 	{
-		const string& eveId = context->eve_id();
-		std::shared_ptr<EventMethod> eventMethod = this->mMethodRegister->GetEvent(eveId);
+		std::shared_ptr<EventMethod> eventMethod = this->mEventRegister->GetEvent(eveId);
 		if(eventMethod == nullptr)
 		{
 			return XCode::Failure;
 		}
-		return eventMethod->Run(*context) ? XCode::Successful : XCode::Failure;
+		return eventMethod->Run(json) ? XCode::Successful : XCode::Failure;
 	}
 
-	bool LocalServiceComponent::GetSubEvents(list<std::string>& eventIds) const
+	bool LocalServiceComponent::LoadEvent()
 	{
-		if(this->mMethodRegister != nullptr)
+		this->mEventRegister = std::make_shared<ServiceEventRegister>(this->GetName(), this);
+		if(!this->OnInitEvent(*this->mEventRegister))
 		{
-			this->mMethodRegister->GetSubEvent(eventIds);
-			return true;
+			return false;
 		}
-		return false;
+		return this->mEventRegister->GetEventSize() > 0;
 	}
 
 }
