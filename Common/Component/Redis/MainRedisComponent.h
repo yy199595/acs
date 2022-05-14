@@ -26,10 +26,9 @@ namespace Sentry
 	public:
 		bool Lock(const std::string & key, int timeout = 10);
 		bool UnLock(const std::string & key);
-
 	public:
-		template<typename ... Args>
-		std::shared_ptr<RedisResponse> CallLua(const std::string& tab, const std::string & func, Args && ... args);
+		bool CallLua(const std::string & fullName, Json::Writer & request);
+		bool CallLua(const std::string & fullName, Json::Writer & request, std::shared_ptr<Json::Reader> response);
 	 public:
 		long long AddCounter(const std::string& key);
 		long long SubCounter(const std::string & key);
@@ -44,6 +43,7 @@ namespace Sentry
 		bool GetLuaScript(const std::string& file, std::string& command);
 		bool TriggerEvent(const std::string & channel, const char * str, size_t size);
 	private:
+		std::string mResString;
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
 		TimerComponent * mTimerComponent;
@@ -55,24 +55,6 @@ namespace Sentry
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
 		std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<Json::Reader>>>> mPublishTasks;
 	};
-
-	template<typename ... Args>
-	std::shared_ptr<RedisResponse> MainRedisComponent::CallLua(const std::string& tab, const std::string & func, Args&& ...args)
-	{
-		std::string tag;
-		if (!this->GetLuaScript(fmt::format("{0}.lua", tab), tag))
-		{
-			LOG_ERROR("not find redis script lock.lua");
-			return nullptr;
-		}
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, std::forward<Args>(args)...);
-		if (this->mRedisClient->Run(request, response) != XCode::Successful)
-		{
-			return nullptr;
-		}
-		return response;
-	}
 }
 
 namespace Sentry

@@ -4,7 +4,6 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Global/ServiceConfig.h"
-#include"Protocol/eve.pb.h"
 #include"Component/Scene/ThreadPoolComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
@@ -322,15 +321,10 @@ namespace Sentry
 
 	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{
-		std::string tag;
-		if (!this->GetLuaScript("lock.lua", tag))
-		{
-			LOG_ERROR("not find redis script lock.lua");
-			return false;
-		}
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, "lock", "key", key, "time", timeout);
-		if (this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
+		Json::Writer jsonWriter;
+		jsonWriter.AddMember("key", key);
+		jsonWriter.AddMember("time", timeout);
+		if(!this->CallLua("lock.lock", jsonWriter))
 		{
 			return false;
 		}
@@ -380,5 +374,37 @@ namespace Sentry
 				LOG_ERROR("redis lock " << key << " delay failure");
 			});
 		}
+	}
+
+	bool MainRedisComponent::CallLua(const std::string& fullName, Json::Writer& json)
+	{
+		std::shared_ptr<Json::Reader> response(new Json::Reader());
+		return this->CallLua(fullName, json, response);
+	}
+
+	bool MainRedisComponent::CallLua(const std::string& fullName, Json::Writer& json, std::shared_ptr<Json::Reader> response)
+	{
+		std::string tag;
+		size_t pos = fullName.find('.');
+		assert(pos != std::string::npos);
+		std::string tab = fullName.substr(0, pos);
+		std::string func = fullName.substr(pos + 1);
+		if (!this->GetLuaScript(fmt::format("{0}.lua", tab), tag))
+		{
+			LOG_ERROR("not find redis script lock.lua");
+			return false;
+		}
+		std::shared_ptr<RedisResponse> response1(new RedisResponse());
+		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, json);
+		if (this->mRedisClient->Run(request, response1) != XCode::Successful)
+		{
+			return false;
+		}
+		if(!response1->GetString(this->mResString) || !response->ParseJson(this->mResString))
+		{
+			return false;
+		}
+		bool res = false;
+		return response->GetMember("res", res) && res;
 	}
 }

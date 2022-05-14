@@ -29,6 +29,7 @@ namespace Sentry
 	{
 		this->mIp = ip;
 		this->mPort = port;
+		assert(!this->mIp.empty() && this->mPort > 0);
 		AsioContext& context = this->mNetThread.GetContext();
 		this->mSocket = std::make_shared<AsioTcpSocket>(context);
 		this->mAddress = fmt::format("{0}:{1}", ip, port);

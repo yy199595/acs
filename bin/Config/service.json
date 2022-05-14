@@ -105,13 +105,12 @@
             "Type": "Client",
             "CallWay": "Net"
         },
-        "Allot": {
+        "QueryAddress": {
             "Id": 1002,
-            "Async": true,
+            "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "s2s.Allot.Request",
-            "Response": "s2s.Allot.Response"
+            "Response": "com.Type.String"
         },
         "CallClient": {
             "Id": 1003,
@@ -130,7 +129,7 @@
         "Auth": {
             "Id": 1005,
             "Async": true,
-            "Type": "Server",
+            "Type": "Client",
             "CallWay": "Net",
             "Request":"c2s.GateAuth.Request"
         }

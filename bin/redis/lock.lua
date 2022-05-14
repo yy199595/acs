@@ -1,13 +1,15 @@
 local lock = {}
-lock.lock = function(tab)
-    if redis.call("SETNX", tab.key, 1) == 0 then
-        return 0
+lock.lock = function(request)
+    if redis.call("SETNX", request.key, 1) == 0 then
+        return false
     end
-    return redis.call("EXPIRE", tab.key, tonumber(tab.time))
+    redis.call("EXPIRE", request.key, request.time)
+    return true
 end
 
-for i, v in ipairs(KEYS) do
-    tab[v] = ARGV[i]
-end
+local func = KEYS[1]
+local response = {}
+local request = cjson.decode(ARGV[1])
+response.res = lock[func](request)
 
-return lock[tab.func](tab)
+return cjson.encode(response)

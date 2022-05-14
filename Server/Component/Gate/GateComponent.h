@@ -17,23 +17,17 @@ namespace Sentry
 		GateComponent() = default;
 		~GateComponent() final = default;
 	 public:
-		void OnConnect(const std::string & address) final;
 		XCode OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
-		bool AddUserToken(const std::string & token, long long userId);
 		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
-
-	private:
-		void OnUserRequest(long long userId, std::shared_ptr<c2s::Rpc::Request> request);
 	private:
 		bool LateAwake() final;
-		void OnSocketTimeout(const std::string & address);
-		XCode Auth(const std::shared_ptr<c2s::Rpc::Request> request);
+		void OnUserRequest(std::shared_ptr<c2s::Rpc::Request> request);
+		XCode HandlerRequest(std::shared_ptr<c2s::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response);
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
+		class MainRedisComponent * mRedisComponent;
 		class GateClientComponent* mGateClientComponent;
-		std::unordered_map<std::string, long long> mUserTokens;
-		std::unordered_map<std::string, unsigned int> mSocketTimers;
 	};
 }
 

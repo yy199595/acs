@@ -27,30 +27,37 @@ message Array
      }
 }
 
-message Value
+message Type
 {
-     message Int32
-     {
-          int32 value = 1;
-     }
 
-     message Int64
-     {
-          int64 value = 1;
-     }
+  message Int32
+  {
+    int32 value = 1;
+  }
 
-     message Float
-     {
-          float value = 1;
-     }
-     message Double
-     {
-          double value = 1;
-     }
-     message Json
-     {
-          string json = 1;
-     }
+  message Int64
+  {
+    int64 value = 1;
+  }
+
+  message Float
+  {
+    float value = 1;
+  }
+
+  message Double
+  {
+    double value = 1;
+  }
+
+  message Json
+  {
+    string json = 1;
+  }
+  message String
+  {
+    string str = 1;
+  }
 }
 
 message Rpc

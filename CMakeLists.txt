@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.3)
 
-project(Sentry)
+project(Sentry CXX C)
 if(MSVC)
     enable_language(C CXX ASM_MASM)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
@@ -12,12 +12,13 @@ add_definitions(-D __DEBUG__)
 
 add_definitions(-D ASIO_STANDALONE)
 add_definitions(-D ONLY_MAIN_THREAD)
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc")
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc" "Common/*.h" "Common/*.c")
 file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "Protocol/*.cc")
 
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 if(MSVC)
     add_compile_options(/W4 /fp:fast /EHsc)
     add_link_options(/SAFESEH:NO)

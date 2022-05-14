@@ -80,21 +80,22 @@ namespace Sentry
 		{
 			return XCode::AddressAllotFailure;
 		}
-		s2s::Allot::Request allotRequest;
-		allotRequest.set_login_token(newToken);
-		allotRequest.set_user_id(userAccount->user_id());
-		std::shared_ptr<s2s::Allot::Response> allotResponse(new s2s::Allot::Response());
-		if (this->mGateService->Call(address, "Allot", allotRequest, allotResponse) == XCode::Successful)
+		std::shared_ptr<com::Type::String> gateAddress(new com::Type::String());
+		if (this->mGateService->Call(address, "QueryAddress", gateAddress) != XCode::Successful)
 		{
-			if (this->mRedisComponent->CallLua("user", "set", "token", newToken, "user_id",
-					userAccount->user_id(), "time", 30) != nullptr)
-			{
-				response.AddMember("token", newToken);
-				response.AddMember("address", allotResponse->address());
-				return XCode::Successful;
-			}
+			return XCode::AddressAllotFailure;
 		}
-		return XCode::AddressAllotFailure;
+		Json::Writer tokenJson;
+		tokenJson.AddMember("time", 30);
+		tokenJson.AddMember("token", newToken);
+		tokenJson.AddMember("user_id", userAccount->user_id());
+		if (this->mRedisComponent->CallLua("user.set_token", tokenJson))
+		{
+			response.AddMember("token", newToken);
+			response.AddMember("address", gateAddress->str());
+			return XCode::Successful;
+		}
+		return XCode::Failure;
 	}
 
 	XCode HttpUserService::Register(const Json::Reader& request, Json::Writer& response)

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include<Other/ObjectFactory.h>
 #include<Protocol/com.pb.h>
-#include"Protocol/eve.pb.h"
 #include<XCode/XCode.h>
 #include<google/protobuf/any.h>
 #include<google/protobuf/any.pb.h>

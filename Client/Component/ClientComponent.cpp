@@ -58,14 +58,14 @@ namespace Client
 
 	void ClientComponent::OnAllServiceStart()
 	{
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
+//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585129@qq.com"));
 	}
 
@@ -207,6 +207,7 @@ namespace Client
 		loginResponse->GetMember("data","address", gateAddress);
 		Helper::String::ParseIpAddress(gateAddress, this->mIp, this->mPort);
 
+		assert(!this->mIp.empty() && this->mPort > 0);
 		IAsioThread& netThread = this->GetApp()->GetTaskScheduler();
 		std::shared_ptr<SocketProxy> socketProxy =
 			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
@@ -227,6 +228,6 @@ namespace Client
 
 		c2s::GateAuth::Request loginRequest;
 		loginRequest.set_token(loginToken);
-		return this->Call("GateService.Login", loginRequest) == XCode::Successful;
+		return this->Call("GateService.Auth", loginRequest) == XCode::Successful;
 	}
 }
