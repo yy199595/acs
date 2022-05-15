@@ -5,6 +5,7 @@
 #ifndef _PROTOPOOL_H_
 #define _PROTOPOOL_H_
 #include<queue>
+#include<memory>
 namespace Sentry
 {
 	template<typename T, size_t MaxSize>
