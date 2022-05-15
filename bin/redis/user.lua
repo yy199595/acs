@@ -30,7 +30,8 @@ user.set_state = function(request, response)
         local data = {}
         data.eveId = "user_exit_event"
         data.user_id = request.user_id
-        local services = redis.call("HEGTALL", request.user_id)
+        local key = tostring(request.user_id)
+        local services = redis.call("HEGTALL", key)
         local json = cjson.decode(data)
         for service, _ in ipairs(services) do
             redis.call("PUBLISH", service, json)
@@ -46,20 +47,22 @@ user.get_state = function(request, response)
 end
 
 user.set_address = function(request, response)
-    local data = {}
-    data.eveId = "user_join_event"
-    data.user_id = request.user_id
-    data.address = request.address
 
-    redis.call("HSET", request.user_id, request.service, request.address)
-    redis.call("PUBLISH", request.service, cjson.encode(data))
+    request.eveId = "user_join_event"
+    request.user_id = request.user_id
+    request.address = request.address
+    request.service = request.service
+    local key = tostring(request.user_id)
+    redis.call("HSET", key, request.service, request.address)
+    redis.call("PUBLISH", request.service, cjson.encode(request))
     return true
 end
 
 user.get_address = function(request, response)
     local state = redis.call("HGET", "user_state", request.user_id)
     if tonumber(state) >= 1 then
-        response.address = redis.call("HGET", request.service, request.user_id)
+        local key = tostring(request.user_id)
+        response.address = redis.call("HGET", key, request.service)
         return true
     end
     return false

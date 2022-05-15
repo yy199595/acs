@@ -36,6 +36,9 @@ namespace Sentry
 	using ServiceMethodType5 = XCode(T::*)(const std::string & address, const T1 &);
 
 	template<typename T>
+	using ServiceMethodType6 = XCode(T::*)(const std::string & address);
+
+	template<typename T>
 	using EventMethodType1 = bool(T::*)();
 	template<typename T>
 	using EventMethodType2 = bool(T::*)(const Json::Reader & content);
@@ -139,8 +142,12 @@ namespace Sentry
 		{
 			if (this->mHasUserId)
 			{
-				return request.user_id() == 0 ?
-					   XCode::NotFindUser : (_o->*_objfunc)(request.user_id());
+				assert(request.user_id() != 0);
+				if (request.user_id() == 0)
+				{
+					return XCode::NotFindUser;
+				}
+				return (_o->*_objfunc)(request.user_id());
 			}
 			return (_o->*_func)();
 		}
@@ -171,12 +178,14 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
-			if (!request.data().template Is<T1>())
+			assert(request.data().Is<T1>());
+			if (!request.data().Is<T1>())
 			{
 				return XCode::CallArgsError;
 			}
 			if (this->mHasUserId && request.user_id() == 0)
 			{
+				assert(request.user_id() != 0);
 				return XCode::NotFindUser;
 			}
 			std::shared_ptr<T1> requestData(new T1());
@@ -218,6 +227,7 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
+			assert(request.data().Is<T1>());
 			if (!request.data().Is<T1>())
 			{
 				return XCode::CallTypeError;
@@ -229,6 +239,7 @@ namespace Sentry
 			}
 			if (this->mHasUserId && request.user_id() == 0)
 			{
+				assert(request.user_id() != 0);
 				return XCode::NotFindUser;
 			}
 			std::shared_ptr<T2> responseData(new T2());
@@ -277,6 +288,7 @@ namespace Sentry
 		{
 			if (this->mHasUserId && request.user_id() == 0)
 			{
+				assert(request.user_id() != 0);
 				return XCode::NotFindUser;
 			}
 			std::shared_ptr<T1> responseData(new T1());
@@ -323,11 +335,14 @@ namespace Sentry
 		{
 			return false;
 		};
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
 		{
+			assert(request.has_data());
+			assert(request.data().Is<T1>());
 			std::shared_ptr<T1> requestData(new T1());
 			if(request.has_data() && request.data().Is<T1>())
 			{
+				request.data().UnpackTo(requestData.get());
 				return (_o->*_func)(request.address(), *requestData);
 			}
 			return XCode::CallArgsError;
@@ -336,5 +351,30 @@ namespace Sentry
 	private:
 		T* _o;
 		ServiceMethodType5<T, T1> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod6 : public ServiceMethod
+	{
+	 public:
+		ServiceMethod6(const std::string name, T* o, ServiceMethodType6<T> func)
+			: ServiceMethod(name), _o(o), _func(func)
+		{
+
+		}
+
+	 public:
+		bool IsLuaMethod() override
+		{
+			return false;
+		};
+		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
+		{
+			assert(!request.address().empty());
+			return (_o->*_func)(request.address());
+		}
+	 private:
+		T* _o;
+		ServiceMethodType6<T> _func;
 	};
 }

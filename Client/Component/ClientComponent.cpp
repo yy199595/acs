@@ -34,19 +34,15 @@ namespace Client
         std::string json;
         util::MessageToJsonString(*t2, &json);
 
-		//LOG_WARN("response json = " << json);
+		LOG_WARN("response json = " << json);
 		auto iter = this->mRpcTasks.find(t2->rpc_id());
 		if(iter != this->mRpcTasks.end())
 		{
 			iter->second->SetResult(t2);
 			this->mRpcTasks.erase(iter);
+			return;
 		}
-//        auto iter = this->mRpcTasks.find(t2->rpc_id());
-//        if(iter != this->mRpcTasks.end())
-//        {
-//            iter->second->SetResult(t2);
-//            this->mRpcTasks.erase(iter);
-//        }
+		LOG_ERROR("not find rpc task id = " << t2->rpc_id());
     }
 
     bool ClientComponent::LateAwake()
@@ -74,12 +70,11 @@ namespace Client
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
 
 		requestMessage->set_method_name(name);
-
 		TaskSourceShared<c2s::Rpc::Response> taskSource
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
 
 		requestMessage->set_rpc_id(taskSource->GetTaskId());
-		this->GetCurrentRpcClient()->SendToGate(requestMessage);
+		this->GetCurrentRpcClient()->Send(requestMessage);
 		this->mRpcTasks.emplace(taskSource->GetTaskId(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
 
@@ -94,9 +89,9 @@ namespace Client
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
 
 		requestMessage->set_method_name(name);
-		requestMessage->mutable_data()->PackFrom(request);
 		requestMessage->set_rpc_id(taskSource->GetTaskId());
-		this->GetCurrentRpcClient()->SendToGate(requestMessage);
+		requestMessage->mutable_data()->PackFrom(request);
+		this->GetCurrentRpcClient()->Send(requestMessage);
 
 		this->mRpcTasks.emplace(requestMessage->rpc_id(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
@@ -119,7 +114,7 @@ namespace Client
 		requestMessage->mutable_data()->CopyFrom(message);
 
 		this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
-		this->GetCurrentRpcClient()->SendToGate(requestMessage);
+		this->GetCurrentRpcClient()->Send(requestMessage);
         std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
         if(responseData->code() != (int)XCode::Successful)
         {
@@ -162,7 +157,12 @@ namespace Client
 		while(this->GetCurrentRpcClient()->GetSocketProxy()->IsOpen())
 		{
 			this->Call("GateService.Ping");
-			//this->mTaskComponent->Sleep(1000);
+			//LOG_ERROR("%%%%%%%%%%%%%%%%%%%%");
+			this->mTaskComponent->Sleep(1000);
+
+			c2s::Chat::Request chatMessage;
+			chatMessage.set_message("hello");
+			this->Call("ChatService.Chat", chatMessage);
 		}
 	}
 

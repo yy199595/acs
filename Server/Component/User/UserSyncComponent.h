@@ -18,8 +18,8 @@ namespace Sentry
 		long long GetUserId(const std::string & token);
 		long long AddNewUser(const std::string & account);
 		bool SetToken(const std::string & token, long long userId, int time);
-		const std::string GetUserAddress(long long userId, const std::string & service);
-		bool SetUserAddress(long long userId, const std::string & service, const std::string & address);
+		const std::string GetAddress(long long userId, const std::string & service);
+		bool SeAddress(long long userId, const std::string & service, const std::string & address);
 	 public:
 		bool LateAwake() final;
 	 private:

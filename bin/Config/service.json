@@ -137,7 +137,7 @@
     "ChatService": {
         "Chat": {
             "Id": 2001,
-            "Async": false,
+            "Async": true,
             "Type": "Client",
             "CallWay": "Net",
             "Request": "c2s.Chat.Request"

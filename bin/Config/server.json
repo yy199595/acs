@@ -92,7 +92,6 @@
         "TcpServerComponent",
         "MainRedisComponent",
         "LuaScriptComponent",
-        "LuaRegisterComponent",
         "RpcClientComponent",
         "RpcHandlerComponent",
         "GateComponent",

@@ -169,12 +169,6 @@ namespace Sentry
 		while (this->mSubRedisClient != nullptr)
 		{
 			this->mTaskComponent->Sleep(5000);
-			std::shared_ptr<RedisRequest> request = RedisRequest::Make("HGET", "lua", "json.lua");
-			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-			if (this->mRedisClient->Run(request, response) != XCode::Successful)
-			{
-
-			}
 		}
 	}
 
@@ -229,53 +223,51 @@ namespace Sentry
 				std::string channel, message;
 				redisResponse->GetString(channel, 1);
 				redisResponse->GetString(message, 2);
-				if (message[0] == '+') //请求
+				if(!this->HandlerEvent(channel, message))
 				{
-					const char* data = message.c_str() + 1;
-					const size_t size = message.size() - 1;
-					std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
-					if (!request->ParseFromArray(data, size))
-					{
-						LOG_ERROR("parse message error");
-						continue;
-					}
-					this->mRpcComponent->OnRequest(request);
-				}
-				else if (message[0] == '-') //回复
-				{
-					const char* data = message.c_str() + 1;
-					const size_t size = message.size() - 1;
-					std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
-					if (!response->ParseFromArray(data, size))
-					{
-						LOG_ERROR("parse message error");
-						continue;
-					}
-					this->mRpcComponent->OnResponse(response);
-				}
-				else if (message[0] == '*') //事件
-				{
-					const char* data = message.c_str() + 1;
-					const size_t size = message.size() - 1;
-					this->TriggerEvent(channel, data, size);
+					LOG_ERROR("handler " << channel << " error");
 				}
 			}
 		}
 	}
 
-	bool MainRedisComponent::TriggerEvent(const std::string& channel, const char* str, size_t size)
+	bool MainRedisComponent::HandlerEvent(const std::string& channel, const std::string& message)
 	{
-		LocalServiceComponent * localServiceComponent=  this->GetComponent<LocalServiceComponent>(channel);
-		if(localServiceComponent == nullptr)
+		if (message[0] == '+') //请求
+		{
+			const char* data = message.c_str() + 1;
+			const size_t size = message.size() - 1;
+			std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
+			if (!request->ParseFromArray(data, size))
+			{
+				LOG_ERROR("parse message error");
+				return false;
+			}
+			this->mRpcComponent->OnRequest(request);
+			return true;
+		}
+		else if (message[0] == '-') //回复
+		{
+			const char* data = message.c_str() + 1;
+			const size_t size = message.size() - 1;
+			std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+			if (!response->ParseFromArray(data, size))
+			{
+				LOG_ERROR("parse message error");
+				return false;
+			}
+			this->mRpcComponent->OnResponse(response);
+			return true;
+		}
+		LocalServiceComponent* localServiceComponent = this->GetComponent<LocalServiceComponent>(channel);
+		if (localServiceComponent == nullptr)
 		{
 			return false;
 		}
 		std::string eveId;
 		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		if(!jsonReader->ParseJson(str, size) || !jsonReader->GetMember("eveId", eveId))
-		{
-			return false;
-		}
+		LOG_CHECK_RET_FALSE(jsonReader->ParseJson(message));
+		LOG_CHECK_RET_FALSE(jsonReader->GetMember("eveId", eveId));
 		localServiceComponent->Invoke(eveId, jsonReader);
 		return true;
 	}

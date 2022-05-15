@@ -14,6 +14,7 @@ namespace Sentry
         LuaServiceTaskSource();
         ~LuaServiceTaskSource() = default;
     public:
+		void SetError(const std::string & error);
         void SetResult(int code, std::string & json);
     public:
         XCode Await();

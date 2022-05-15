@@ -16,8 +16,8 @@ namespace Sentry
 		}
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) final;
 	 private:
-		tuple<XCode, std::shared_ptr<Message>> Call(long long id, const std::string& json);
-		tuple<XCode, std::shared_ptr<Message>> CallAsync(long long id, const std::string& json);
+		XCode Call(long long id, const std::string& json, com::Rpc::Response & response);
+		XCode CallAsync(long long id, const std::string& json, com::Rpc::Response & response);
 	 private:
 		lua_State* mLuaEnv;
 		std::string mFunction;

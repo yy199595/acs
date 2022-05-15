@@ -30,9 +30,6 @@ namespace Sentry
 		class TimerComponent * mTimerComponent;
 		class UserSyncComponent * mUserSyncComponent;
 		class GateClientComponent* mGateClientComponent;
-		ProtoPool<com::Rpc::Request, 100> mRequestPool;
-		ProtoPool<com::Rpc::Response, 100> mResponsePool;
-		ProtoPool<c2s::Rpc::Response, 100> mCliResponsePool;
 	};
 }
 

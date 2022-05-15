@@ -4,6 +4,7 @@
 #include"Protocol/c2s.pb.h"
 #include"XCode/XCode.h"
 #include"Json/JsonReader.h"
+#include"Script/ClassProxyHelper.h"
 namespace Sentry
 {
 	class Component;
@@ -42,6 +43,12 @@ namespace Sentry
 	{
 	 public:
 		virtual void OnLastFrameUpdate() = 0;
+	};
+
+	class ILuaRegister
+	{
+	 public:
+		virtual void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) = 0;
 	};
 
 	class IHotfix

@@ -69,7 +69,7 @@ namespace Helper
 	std::shared_ptr<Message> Proto::NewByJson(const std::string & name, const std::string & json)
 	{
 		std::shared_ptr<Message> message = New(name);
-		if (message == nullptr && util::JsonStringToMessage(json, message.get()).ok())
+		if (message != nullptr && util::JsonStringToMessage(json, message.get()).ok())
 		{
 			return message;
 		}

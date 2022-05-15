@@ -32,25 +32,26 @@ namespace Sentry
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig * config = rpcConfig.GetInterfaceConfig(request->method_name());
+		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig* config = rpcConfig.GetInterfaceConfig(request->method_name());
 		if (config == nullptr || config->Type != "Client")
 		{
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
 
-		if(!config->Request.empty())
+		if (!config->Request.empty())
 		{
 			std::string fullName;
-			if(!request->has_data() || !Any::ParseAnyTypeUrl(
+			if (!request->has_data() || !Any::ParseAnyTypeUrl(
 				request->data().type_url(), &fullName) || fullName != config->Request)
 			{
 				return XCode::CallArgsError;
 			}
 		}
 
-		std::shared_ptr<com::Rpc::Request> userRequest = this->mRequestPool.Pop();
+		std::shared_ptr<com::Rpc::Request> userRequest =
+			std::make_shared<com::Rpc::Request>();
 		userRequest->set_rpc_id(request->rpc_id());
 		userRequest->set_address(request->address());
 		userRequest->set_method_id(config->InterfaceId);
@@ -75,22 +76,23 @@ namespace Sentry
 		long long userId = 0;
 		LOG_DEBUG("========== client request ==========");
 		LOG_DEBUG("func = " << config->FullName);
+		LOG_DEBUG("rpc = " << request->rpc_id());
 		if (this->mGateClientComponent->GetUserId(request->address(), userId))
 		{
 			LOG_DEBUG("userId = " << userId);
 		}
-		if (request->has_data()  && Proto::GetJson(request->data(), json))
+		if (request->has_data() && Proto::GetJson(request->data(), json))
 		{
 			LOG_DEBUG("json = " << json);
 		}
 		LOG_DEBUG("=====================================");
 #endif
-		std::shared_ptr<c2s::Rpc::Response> response = this->mCliResponsePool.Pop();
+		std::shared_ptr<c2s::Rpc::Response> response =
+			std::make_shared<c2s::Rpc::Response>();
+		response->set_rpc_id(request->rpc_id());
 		XCode code = this->HandlerRequest(config, request, response);
 		if (code != XCode::Successful)
 		{
-			this->mRequestPool.Push(request);
-			this->mCliResponsePool.Push(response);
 			this->mGateClientComponent->StartClose(request->address());
 			return;
 		}
@@ -103,9 +105,7 @@ namespace Sentry
 		}
 		LOG_WARN("*****************************************");
 #endif
-		response->set_rpc_id(request->rpc_id());
 		this->mGateClientComponent->SendToClient(request->address(), response);
-		this->mRequestPool.Push(request);
 	}
 
 	XCode GateComponent::HandlerRequest(const RpcInterfaceConfig * config,
@@ -119,12 +119,11 @@ namespace Sentry
 			{
 				return XCode::CallServiceNotFound;
 			}
-			std::shared_ptr<com::Rpc::Response> rpcResponse = this->mResponsePool.Pop();
+			std::shared_ptr<com::Rpc::Response> rpcResponse = std::make_shared<com::Rpc::Response>();
 			XCode code = gateService->Invoke(config->Method, request, rpcResponse);
 			if(code == XCode::Successful)
 			{
 				response->mutable_data()->CopyFrom(rpcResponse->data());
-				this->mResponsePool.Push(rpcResponse);
 				return XCode::Successful;
 			}
 			return XCode::NetActiveShutdown;
@@ -133,13 +132,14 @@ namespace Sentry
 		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
 		if (!localServerRpc->GetEntityAddress(userId, address))
 		{
-			address = this->mUserSyncComponent->GetUserAddress(userId, config->Service);
+			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
 			if (address.empty() && localServerRpc->AllotAddress(address)
-				&& this->mUserSyncComponent->SetUserAddress(userId, config->Service, address))
+				&& this->mUserSyncComponent->SeAddress(userId, config->Service, address))
 			{
 				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}
 		}
+		request->set_user_id(userId);
 		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, request);
 		if (responseData != nullptr)
 		{

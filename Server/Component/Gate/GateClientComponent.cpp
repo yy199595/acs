@@ -79,6 +79,11 @@ namespace Sentry
 		{
 			return false;
 		}
+//		std::string json;
+//		if(util::MessageToJsonString(*message, &json).ok())
+//		{
+//			LOG_INFO("send to client [" << address << "] json =" << json);
+//		}
 		return proxyClient->SendToClient(message);
 	}
 
@@ -152,7 +157,7 @@ namespace Sentry
 		}
 		this->mUserAddressMap.emplace(address, userId);
 		this->mClientAddressMap.emplace(userId, address);
-		LOG_DEBUG(userId << " add to gate [" << address << "]");
+		LOG_DEBUG(userId << " add to gate address = " << "[" << address << "]");
 		return true;
 	}
 

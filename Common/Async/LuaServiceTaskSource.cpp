@@ -19,6 +19,13 @@ namespace Sentry
         return this->mCode;
     }
 
+	void LuaServiceTaskSource::SetError(const std::string& error)
+	{
+		this->mCode = XCode::CallLuaFunctionFail;
+		this->mJson = std::move(error);
+		this->mTaskSource.SetResult(this->mCode);
+	}
+
     void LuaServiceTaskSource::SetResult(int result, std::string & json)
     {
         this->mCode = (XCode) result;

@@ -50,6 +50,23 @@ namespace Lua
 				return PtrProxy<T>::Read(lua, index);
 			}
 
+			static int WriteObj(lua_State * lua, T * obj, const char * meta)
+			{
+				if(obj == nullptr || meta == nullptr)
+				{
+					return 0;
+				}
+				size_t size = sizeof(PtrProxy<T>);
+				new(lua_newuserdata(lua, size))PtrProxy<T>(obj);
+				lua_getglobal(lua, meta);
+				if (lua_istable(lua, -1))
+				{
+					lua_setmetatable(lua, -2);
+					return 1;
+				}
+				return 0;
+			}
+
 			static void Write(lua_State* lua, T* data)
 			{
 				const char* typeName = ClassNameProxy::GetLuaClassName<T>();

@@ -78,6 +78,13 @@ namespace Sentry
 		{
 			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
 		}
+
+		template<typename T>
+		bool BindAddress(std::string name, ServiceMethodType6<T> func)
+		{
+			return this->AddMethod(std::make_shared<ServiceMethod6<T>>(name, (T*)this->mObj, func));
+		}
+
 	public:
 		bool LoadLuaMethod(lua_State *lua);
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);

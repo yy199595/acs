@@ -11,11 +11,11 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class ServerRpcClientContext;
-	class RemoteServiceComponent : public Component
+	class CallServiceComponent : public Component
 	{
 	 public:
-		RemoteServiceComponent() = default;
-		~RemoteServiceComponent() override = default;
+		CallServiceComponent() = default;
+		~CallServiceComponent() override = default;
 	 public:
 		virtual XCode Call(const std::string& address, const std::string& func);
 
@@ -39,10 +39,10 @@ namespace Sentry
 		XCode PublishEvent(const std::string & eveId);
 		XCode PublishEvent(const std::string & eveId, Json::Writer & message);
 	public:
+		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
 		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 	 protected:
 		bool LateAwake() override;
-		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
 	private:
 		XCode SendRequest(const std::string & address, std::shared_ptr<com::Rpc::Request> request);

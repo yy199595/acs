@@ -6,14 +6,7 @@
 #include"Script/Table.h"
 namespace Sentry
 {
-
-	class ILuaRegister
-	{
-	 public:
-		virtual void OnLuaRegister(lua_State * lua) = 0;
-	};
-
-	class LuaScriptComponent : public Component, public IStart, public ILuaRegister
+	class LuaScriptComponent : public Component, public IStart
 	{
 	 public:
 		LuaScriptComponent() = default;
@@ -29,8 +22,6 @@ namespace Sentry
 		bool OnStart() final;
 		bool LateAwake() final;
 		void OnDestory() final;
-		void OnLuaRegister(lua_State * lua) final;
-
 	 private:
 		bool LoadAllFile();
 		bool LoadLuaScript(const std::string filePath);

@@ -14,56 +14,62 @@ namespace Lua
 	class ClassProxyHelper
 	{
 	 public:
+		ClassProxyHelper(lua_State * lua, const std::string & name);
+	 public:
 		template<typename T>
-		static void BeginRegister(lua_State* lua, const char* name);
+		void BeginRegister();
+
+		template<typename T>
+		void PushObject(T * obj);
 
 		template<typename T, typename ... Args>
-		static void PushCtor(lua_State* lua);
+		void PushCtor();
 
 		template<typename T, typename Base>
-		static void PushBaseClass(lua_State* lua);
+		void PushBaseClass();
 
 		template<typename T, typename Ret, typename ... Args>
-		static void PushMemberFunction(lua_State* lua, const char* name, Ret(T::*func)(Args ...));
+		void PushMemberFunction(const char* name, Ret(T::*func)(Args ...));
 
 		template<typename T, typename Ret, typename ... Args>
-		static void PushMemberFunction(lua_State* lua, const char* name, Ret(T::*func)(Args ...) const);
+		void PushMemberFunction(const char* name, Ret(T::*func)(Args ...) const);
 
 		template<typename T, typename BC, typename Ret, typename ... Args>
-		static void PushBaseMemberFunction(lua_State* lua, const char* name, Ret(BC::*func)(Args ...));
+		void PushBaseMemberFunction(const char* name, Ret(BC::*func)(Args ...));
 
-		template<typename T>
-		static void PushExtensionFunction(lua_State* lua, const char* name, lua_CFunction func);
+		void PushExtensionFunction(const char* name, lua_CFunction func);
 
-		static void PushGlobalExtensionFunction(lua_State* lua, const char* name, lua_CFunction func);
+		 void PushGlobalExtensionFunction(const char* name, lua_CFunction func);
 
 	 public:
 
-		static void BeginNewTable(lua_State* lua, const char* table);
+		void BeginNewTable();
 
-		static void
-		PushStaticExtensionFunction(lua_State* lua, const char* table, const char* name, lua_CFunction func);
+		void PushStaticExtensionFunction(const char* name, lua_CFunction func);
 
 		template<typename Ret, typename ... Args>
-		static void PushStaticFunction(lua_State* lua, const char* table, const char* name, Ret(* func)(Args ...));
+		void PushStaticFunction(const char* name, Ret(* func)(Args ...));
+
+	 private:
+		lua_State  * mLua;
+		const std::string mName;
 	};
 
 	template<typename T, typename ... Args>
-	void ClassProxyHelper::PushCtor(lua_State* luaEnv)
+	void ClassProxyHelper::PushCtor()
 	{
-		const char* name = ClassNameProxy::GetLuaClassName<T>();
-		lua_getglobal(luaEnv, name);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, "New");
-			lua_pushcclosure(luaEnv, CtorFunction::PushCtor<T, Args ...>, 0);
-			lua_settable(luaEnv, -3);
+			lua_pushstring(this->mLua, "New");
+			lua_pushcclosure(this->mLua, CtorFunction::PushCtor<T, Args ...>, 0);
+			lua_settable(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 
 	template<typename T, typename Base>
-	inline void ClassProxyHelper::PushBaseClass(lua_State* luaEnv)
+	inline void ClassProxyHelper::PushBaseClass()
 	{
 		if (!ClassNameProxy::HasRegisterClass<Base>())
 		{
@@ -79,106 +85,115 @@ namespace Lua
 	}
 
 	template<typename T>
-	void ClassProxyHelper::BeginRegister(lua_State* luaEnv, const char* name)
+	void ClassProxyHelper::BeginRegister()
 	{
-		lua_getglobal(luaEnv, name);
-		if (lua_isnil(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_isnil(this->mLua, -1))
 		{
-			lua_newtable(luaEnv);
+			lua_newtable(this->mLua);
 			{
-				lua_pushstring(luaEnv, "__index");
-				lua_pushcclosure(luaEnv, ClassMateProxy::OnMateTableGet<T>, 0);
-				lua_rawset(luaEnv, -3);
+				lua_pushstring(this->mLua, "__index");
+				lua_pushcclosure(this->mLua, ClassMateProxy::OnMateTableGet<T>, 0);
+				lua_rawset(this->mLua, -3);
 
-				lua_pushstring(luaEnv, "__gc");
-				lua_pushcclosure(luaEnv, ClassMateProxy::OnDestory<T>, 0);
-				lua_rawset(luaEnv, -3);
+				lua_pushstring(this->mLua, "__gc");
+				lua_pushcclosure(this->mLua, ClassMateProxy::OnDestory<T>, 0);
+				lua_rawset(this->mLua, -3);
 
-				lua_pushstring(luaEnv, "__name");
-				lua_pushstring(luaEnv, name);
-				lua_rawset(luaEnv, -3);
+				lua_pushstring(this->mLua, "__name");
+				lua_pushstring(this->mLua, this->mName.c_str());
+				lua_rawset(this->mLua, -3);
 
 			}
-			lua_setglobal(luaEnv, name);
-			ClassNameProxy::OnClassRegister<T>(name);
+			lua_setglobal(this->mLua, this->mName.c_str());
 		}
+		ClassNameProxy::OnClassRegister<T>(this->mName);
 	}
 
-	template<typename T>
-	inline void ClassProxyHelper::PushExtensionFunction(lua_State* luaEnv, const char* funcName, lua_CFunction func)
+	inline void ClassProxyHelper::PushExtensionFunction(const char* funcName, lua_CFunction func)
 	{
-		const char* name = ClassNameProxy::GetLuaClassName<T>();
-		lua_getglobal(luaEnv, name);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, funcName);
-			lua_pushcfunction(luaEnv, func);
-			lua_rawset(luaEnv, -3);
+			lua_pushstring(this->mLua, funcName);
+			lua_pushcfunction(this->mLua, func);
+			lua_rawset(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 
 	template<typename T, typename Ret, typename ... Args>
-	void ClassProxyHelper::PushMemberFunction(lua_State* luaEnv, const char* name, Ret(T::*func)(Args ...))
+	void ClassProxyHelper::PushMemberFunction(const char* name, Ret(T::*func)(Args ...))
 	{
 		const char* className = ClassNameProxy::GetLuaClassName<T>();
 		typedef Ret(T::*MemberFunctionType)(Args ...);
-		lua_getglobal(luaEnv, className);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, className);
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, name);
-			new(lua_newuserdata(luaEnv, sizeof(MemberFunctionType))) MemberFunctionType(func);
-			lua_pushcclosure(luaEnv, MemberFunction::MemberFuncProxy<T, Ret, Args...>::Invoke, 1);
-			lua_settable(luaEnv, -3);
+			lua_pushstring(this->mLua, name);
+			new(lua_newuserdata(this->mLua, sizeof(MemberFunctionType))) MemberFunctionType(func);
+			lua_pushcclosure(this->mLua, MemberFunction::MemberFuncProxy<T, Ret, Args...>::Invoke, 1);
+			lua_settable(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 
 	template<typename T, typename Ret, typename ...Args>
-	inline void ClassProxyHelper::PushMemberFunction(lua_State* luaEnv, const char* name, Ret(T::* func)(Args...) const)
+	inline void ClassProxyHelper::PushMemberFunction(const char* name, Ret(T::* func)(Args...) const)
 	{
 		const char* className = ClassNameProxy::GetLuaClassName<T>();
 		typedef Ret(T::*MemberFunctionType)(Args ...) const;
-		lua_getglobal(luaEnv, className);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, className);
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, name);
-			new(lua_newuserdata(luaEnv, sizeof(MemberFunctionType))) MemberFunctionType(func);
-			lua_pushcclosure(luaEnv, MemberFunction::MemberFuncProxy<T, Ret, Args...>::Invoke, 1);
-			lua_settable(luaEnv, -3);
+			lua_pushstring(this->mLua, name);
+			new(lua_newuserdata(this->mLua, sizeof(MemberFunctionType))) MemberFunctionType(func);
+			lua_pushcclosure(this->mLua, MemberFunction::MemberFuncProxy<T, Ret, Args...>::Invoke, 1);
+			lua_settable(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 
 	template<typename T, typename BC, typename Ret, typename ...Args>
-	inline void ClassProxyHelper::PushBaseMemberFunction(lua_State* luaEnv, const char* name, Ret(BC::* func)(Args...))
+	inline void ClassProxyHelper::PushBaseMemberFunction(const char* name, Ret(BC::* func)(Args...))
 	{
 		const char* className = ClassNameProxy::GetLuaClassName<T>();
 		typedef Ret(BC::*MemberFunctionType)(Args ...);
-		lua_getglobal(luaEnv, className);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, className);
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, name);
-			new(lua_newuserdata(luaEnv, sizeof(MemberFunctionType))) MemberFunctionType(func);
-			lua_pushcclosure(luaEnv, MemberFunction::MemberFuncProxy<BC, Ret, Args...>::Invoke, 1);
-			lua_settable(luaEnv, -3);
+			lua_pushstring(this->mLua, name);
+			new(lua_newuserdata(this->mLua, sizeof(MemberFunctionType))) MemberFunctionType(func);
+			lua_pushcclosure(this->mLua, MemberFunction::MemberFuncProxy<BC, Ret, Args...>::Invoke, 1);
+			lua_settable(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 
 	template<typename Ret, typename ... Args>
-	void
-	ClassProxyHelper::PushStaticFunction(lua_State* luaEnv, const char* table, const char* name, Ret(* func)(Args ...))
+	void ClassProxyHelper::PushStaticFunction(const char* name, Ret(* func)(Args ...))
 	{
 		typedef Ret(* StaticFunctionType)(Args ...);
-		lua_getglobal(luaEnv, table);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, name);
-			new(lua_newuserdata(luaEnv, sizeof(StaticFunctionType))) StaticFunctionType(func);
-			lua_pushcclosure(luaEnv, StaticFunction::StaticFuncProxy<Ret, Args ...>::Invoke, 1);
-			lua_settable(luaEnv, -3);
+			lua_pushstring(this->mLua, name);
+			new(lua_newuserdata(this->mLua, sizeof(StaticFunctionType))) StaticFunctionType(func);
+			lua_pushcclosure(this->mLua, StaticFunction::StaticFuncProxy<Ret, Args ...>::Invoke, 1);
+			lua_settable(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
+	}
+	template<typename T>
+	void ClassProxyHelper::PushObject(T * obj)
+	{
+		size_t size = sizeof(PtrProxy<T>);
+		new(lua_newuserdata(this->mLua, size))PtrProxy<T>(obj);
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
+		{
+			lua_setmetatable(this->mLua, -2);
+		}
+		lua_setglobal(this->mLua, this->mName.c_str());
 	}
 }

@@ -13,7 +13,7 @@ namespace Sentry
 		GateService() = default;
 		~GateService() final = default;
 	 private:
-		XCode Ping(long long userId);
+		XCode Ping(const std::string & address);
 		XCode QueryAddress(com::Type::String & response);
 		XCode CallClient(long long userId, c2s::Rpc::Call & request);
 		XCode BroadCast(const s2s::GateBroadCast::Request & request);

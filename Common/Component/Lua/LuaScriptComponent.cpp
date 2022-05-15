@@ -6,6 +6,11 @@
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
 #include"Async/LuaTaskSource.h"
+#include"Async/LuaServiceTaskSource.h"
+#include"Script/Extension/App/LuaApp.h"
+#include"Script/Extension/Timer/Timer.h"
+#include"Script/Extension/Log/LuaLogger.h"
+#include"Script/Extension/Coroutine/LuaCoroutine.h"
 
 using namespace Lua;
 namespace Sentry
@@ -21,31 +26,57 @@ namespace Sentry
 	{
 		std::vector<std::string> components;
 		this->GetApp()->GetComponents(components);
-		for(const std::string & name : components)
+		for (const std::string& name : components)
 		{
-			ILuaRegister* luaRegister = this->GetApp()->GetComponent<ILuaRegister>(name);
-			if(luaRegister != nullptr)
+			ILuaRegister* luaRegisterComponent = this->GetApp()->GetComponent<ILuaRegister>(name);
+			if (luaRegisterComponent != nullptr)
 			{
-				luaRegister->OnLuaRegister(this->mLuaEnv);
+				Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
+				luaRegisterComponent->OnLuaRegister(luaRegister);
 			}
 		}
+
+		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
+		luaRegister0.BeginNewTable();
+		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
+
+		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "LuaTaskSource");
+		luaRegister1.BeginRegister<LuaTaskSource>();
+		luaRegister1.PushCtor<LuaTaskSource>();
+		luaRegister1.PushStaticExtensionFunction("SetResult", LuaTaskSource::SetResult);
+
+		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
+		luaRegister2.BeginRegister<LuaServiceTaskSource>();
+		luaRegister2.PushCtor<LuaServiceTaskSource>();
+		luaRegister2.PushMemberFunction("SetError", &LuaServiceTaskSource::SetError);
+		luaRegister2.PushMemberFunction("SetResult", &LuaServiceTaskSource::SetResult);
+
+		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
+		luaRegister3.BeginNewTable();
+		luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
+		luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
+		luaRegister3.PushStaticFunction("GetNowSecTime", Helper::Time::GetNowSecTime);
+		luaRegister3.PushStaticFunction("GetNowMilTime", Helper::Time::GetNowMilTime);
+		luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
+
+		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
+		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
+		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
+
+		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Log");
+		luaRegister5.BeginNewTable();
+		luaRegister5.PushExtensionFunction("Info", Lua::Log::DebugInfo);
+		luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
+		luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
+		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
+
+		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Timer");
+		luaRegister6.BeginNewTable();
+		luaRegister6.PushExtensionFunction("AddTimer", Lua::Timer::AddTimer);
+		luaRegister6.PushExtensionFunction("CancelTimer", Lua::Timer::CancelTimer);
+
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
 		return luaFunction != nullptr && luaFunction->Func<bool>();
-	}
-
-	void LuaScriptComponent::OnLuaRegister(lua_State * lua)
-	{
-		Lua::ClassProxyHelper::BeginRegister<LuaTaskSource>(lua, "LuaTaskSource");
-		Lua::ClassProxyHelper::PushCtor<LuaTaskSource>(lua);
-		Lua::ClassProxyHelper::PushStaticExtensionFunction(lua, "LuaTaskSource", "SetResult", LuaTaskSource::SetResult);
-
-		ClassProxyHelper::BeginNewTable(lua, "Time");
-		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateStr", Helper::Time::GetDateStr);
-		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetDateString", Helper::Time::GetDateString);
-		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetNowSecTime", Helper::Time::GetNowSecTime);
-		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetNowMilTime", Helper::Time::GetNowMilTime);
-		ClassProxyHelper::PushStaticFunction(lua, "Time", "GetYearMonthDayString",Helper::Time::GetYearMonthDayString);
-
 	}
 
 	bool LuaScriptComponent::OnStart()

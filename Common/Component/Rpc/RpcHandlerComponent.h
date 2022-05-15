@@ -5,7 +5,7 @@
 #include"Other/MultiThreadQueue.h"
 namespace Sentry
 {
-	class RemoteServiceComponent;
+	class CallServiceComponent;
 
 	class LocalLuaServiceComponent;
 

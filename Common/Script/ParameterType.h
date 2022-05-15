@@ -96,13 +96,13 @@ namespace Lua
 		};
 
 		template<>
-		struct IsCommonParameter<std::string&>
+		struct IsCommonParameter<const std::string &>
 		{
 			constexpr static bool value = true;
 		};
 
 		template<>
-		struct IsCommonParameter<const std::string&>
+		struct IsCommonParameter<std::string&>
 		{
 			constexpr static bool value = true;
 		};

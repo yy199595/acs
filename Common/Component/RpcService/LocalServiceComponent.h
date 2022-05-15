@@ -4,13 +4,13 @@
 
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
-#include"RemoteServiceComponent.h"
+#include"CallServiceComponent.h"
 #include"Method/MethodRegister.h"
 #include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry
 {
-	class LocalServiceComponent : public RemoteServiceComponent, public IServiceBase
+	class LocalServiceComponent : public CallServiceComponent, public IServiceBase
 	{
 	public:
 		LocalServiceComponent() = default;

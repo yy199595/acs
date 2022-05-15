@@ -13,8 +13,6 @@ for i = 1, 10 do
 end
 
 function Main.Start()
-
-    Log.Error("star main lua")
     local t1 = Time.GetNowSecTime();
     coroutine.sleep(1000)
     --Timer.AddTimer(5000, function()

@@ -1112,9 +1112,9 @@ class Chat_Request :
 
   // accessors -------------------------------------------------------
 
-  // string message = 2;
+  // string message = 3;
   void clear_message();
-  static const int kMessageFieldNumber = 2;
+  static const int kMessageFieldNumber = 3;
   const ::std::string& message() const;
   void set_message(const ::std::string& value);
   #if LANG_CXX11
@@ -1132,6 +1132,12 @@ class Chat_Request :
   ::google::protobuf::int64 user_id() const;
   void set_user_id(::google::protobuf::int64 value);
 
+  // int32 msg_type = 2;
+  void clear_msg_type();
+  static const int kMsgTypeFieldNumber = 2;
+  ::google::protobuf::int32 msg_type() const;
+  void set_msg_type(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:c2s.Chat.Request)
  private:
   class HasBitSetters;
@@ -1139,6 +1145,7 @@ class Chat_Request :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr message_;
   ::google::protobuf::int64 user_id_;
+  ::google::protobuf::int32 msg_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
 };
@@ -1239,11 +1246,33 @@ class Chat_Notice :
 
   // accessors -------------------------------------------------------
 
+  // string message = 2;
+  void clear_message();
+  static const int kMessageFieldNumber = 2;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
+  // int32 msg_type = 1;
+  void clear_msg_type();
+  static const int kMsgTypeFieldNumber = 1;
+  ::google::protobuf::int32 msg_type() const;
+  void set_msg_type(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:c2s.Chat.Notice)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
+  ::google::protobuf::int32 msg_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
 };
@@ -1998,7 +2027,21 @@ inline void Chat_Request::set_user_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:c2s.Chat.Request.user_id)
 }
 
-// string message = 2;
+// int32 msg_type = 2;
+inline void Chat_Request::clear_msg_type() {
+  msg_type_ = 0;
+}
+inline ::google::protobuf::int32 Chat_Request::msg_type() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Request.msg_type)
+  return msg_type_;
+}
+inline void Chat_Request::set_msg_type(::google::protobuf::int32 value) {
+  
+  msg_type_ = value;
+  // @@protoc_insertion_point(field_set:c2s.Chat.Request.msg_type)
+}
+
+// string message = 3;
 inline void Chat_Request::clear_message() {
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2054,6 +2097,73 @@ inline void Chat_Request::set_allocated_message(::std::string* message) {
 // -------------------------------------------------------------------
 
 // Chat_Notice
+
+// int32 msg_type = 1;
+inline void Chat_Notice::clear_msg_type() {
+  msg_type_ = 0;
+}
+inline ::google::protobuf::int32 Chat_Notice::msg_type() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Notice.msg_type)
+  return msg_type_;
+}
+inline void Chat_Notice::set_msg_type(::google::protobuf::int32 value) {
+  
+  msg_type_ = value;
+  // @@protoc_insertion_point(field_set:c2s.Chat.Notice.msg_type)
+}
+
+// string message = 2;
+inline void Chat_Notice::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Chat_Notice::message() const {
+  // @@protoc_insertion_point(field_get:c2s.Chat.Notice.message)
+  return message_.GetNoArena();
+}
+inline void Chat_Notice::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:c2s.Chat.Notice.message)
+}
+#if LANG_CXX11
+inline void Chat_Notice::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:c2s.Chat.Notice.message)
+}
+#endif
+inline void Chat_Notice::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:c2s.Chat.Notice.message)
+}
+inline void Chat_Notice::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:c2s.Chat.Notice.message)
+}
+inline ::std::string* Chat_Notice::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:c2s.Chat.Notice.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Chat_Notice::release_message() {
+  // @@protoc_insertion_point(field_release:c2s.Chat.Notice.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Chat_Notice::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:c2s.Chat.Notice.message)
+}
 
 // -------------------------------------------------------------------
 

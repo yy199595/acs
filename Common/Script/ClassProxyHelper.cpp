@@ -2,38 +2,43 @@
 
 namespace Lua
 {
-	void ClassProxyHelper::PushGlobalExtensionFunction(lua_State* lua, const char* name, lua_CFunction func)
+	ClassProxyHelper::ClassProxyHelper(lua_State* lua, const std::string& name)
+		: mLua(lua), mName(name)
 	{
-		lua_pushcfunction(lua, func);
-		lua_setglobal(lua, name);
+
 	}
 
-	void ClassProxyHelper::BeginNewTable(lua_State* lua, const char* table)
+	void ClassProxyHelper::PushGlobalExtensionFunction(const char* name, lua_CFunction func)
 	{
-		lua_getglobal(lua, table);
-		if (lua_isnil(lua, -1))
+		lua_pushcfunction(this->mLua, func);
+		lua_setglobal(this->mLua, name);
+	}
+
+	void ClassProxyHelper::BeginNewTable()
+	{
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_isnil(this->mLua, -1))
 		{
-			lua_newtable(lua);
-			lua_setglobal(lua, table);
+			lua_newtable(this->mLua);
+			lua_setglobal(this->mLua, this->mName.c_str());
 		}
 	}
 
-	void ClassProxyHelper::PushStaticExtensionFunction(lua_State* luaEnv, const char* table, const char* name,
-		lua_CFunction func)
+	void ClassProxyHelper::PushStaticExtensionFunction(const char* name, lua_CFunction func)
 	{
-		lua_getglobal(luaEnv, table);
-		if (lua_isnil(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_isnil(this->mLua, -1))
 		{
-			lua_newtable(luaEnv);
-			lua_setglobal(luaEnv, table);
+			lua_newtable(this->mLua);
+			lua_setglobal(this->mLua, this->mName.c_str());
 		}
-		lua_getglobal(luaEnv, table);
-		if (lua_istable(luaEnv, -1))
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
 		{
-			lua_pushstring(luaEnv, name);
-			lua_pushcfunction(luaEnv, func);
-			lua_rawset(luaEnv, -3);
+			lua_pushstring(this->mLua, name);
+			lua_pushcfunction(this->mLua, func);
+			lua_rawset(this->mLua, -3);
 		}
-		lua_pop(luaEnv, 1);
+		lua_pop(this->mLua, 1);
 	}
 }

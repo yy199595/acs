@@ -3,7 +3,9 @@
 //
 
 #include"GateProxyComponent.h"
+#include"Pool/MessagePool.h"
 #include"Component/Gate/GateService.h"
+#include"Script/LuaParameter.h"
 namespace Sentry
 {
 	bool GateProxyComponent::LateAwake()
@@ -28,6 +30,29 @@ namespace Sentry
 		return this->mGateService->Call("CallClient", userId, request);
 	}
 
+	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string pb, const std::string& json)
+	{
+		std::string address;
+		if(this->mGateService->GetEntityAddress(userId, address))
+		{
+			return XCode::NotFindUser;
+		}
+		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
+		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
+		if(message == nullptr)
+		{
+			return XCode::JsonCastProtoFailure;
+		}
+		std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
+		request->set_func(func);
+		request->mutable_data()->PackFrom(*message);
+		taskComponent->Start([userId, request, this]()
+		{
+			this->mGateService->Call("CallClient", userId, request);
+		});
+		return XCode::Successful;
+	}
+
 	XCode GateProxyComponent::BroadCast(const std::string& func)
 	{
 		c2s::Rpc::Call request;
@@ -43,15 +68,45 @@ namespace Sentry
 
 	XCode GateProxyComponent::BroadCast(const std::string& func, const Message& message)
 	{
-		c2s::Rpc::Call request;
+		s2s::GateBroadCast::Request request;
 		request.set_func(func);
 		std::list<std::string> allAddress;
 		request.mutable_data()->PackFrom(message);
 		this->mGateService->GetAllAddress(allAddress);
 		for(const std::string & address : allAddress)
 		{
-			return this->mGateService->Call(address,"CallClient", request);
+			this->mGateService->Call(address,"BroadCast", request);
 		}
 		return XCode::Successful;
+	}
+
+	XCode GateProxyComponent::LuaBroadCast(const std::string func, const std::string pb, const std::string& json)
+	{
+		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
+		if(message == nullptr)
+		{
+			return XCode::JsonCastProtoFailure;
+		}
+		std::shared_ptr<s2s::GateBroadCast::Request> request(new s2s::GateBroadCast::Request());
+		request->set_func(func);
+		request->mutable_data()->PackFrom(*message);
+		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
+		taskComponent->Start([request, this]()
+		{
+			std::list<std::string> allAddress;
+			this->mGateService->GetAllAddress(allAddress);
+			for(const std::string & address : allAddress)
+			{
+				this->mGateService->Call(address,"BroadCast", request);
+			}
+		});
+		return XCode::Successful;
+	}
+
+	void GateProxyComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)
+	{
+		luaRegister.BeginRegister<GateProxyComponent>();
+		luaRegister.PushMemberFunction("Call", &GateProxyComponent::LuaCall);
+		luaRegister.PushMemberFunction("BroadCast", &GateProxyComponent::LuaBroadCast);
 	}
 }

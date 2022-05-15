@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include"Util/Guid.h"
+#include"Pool/ProtoPool.h"
 #include"Json/JsonWriter.h"
 #include"Other/ElapsedTimer.h"
 #include"Component/Component.h"
@@ -41,7 +42,7 @@ namespace Sentry
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
 		void OnLockTimeout(const std::string & name, int timeout);
 		bool GetLuaScript(const std::string& file, std::string& command);
-		bool TriggerEvent(const std::string & channel, const char * str, size_t size);
+		bool HandlerEvent(const std::string & channel, const std::string & message);
 	private:
 		std::string mResString;
 		std::string mRpcAddress;

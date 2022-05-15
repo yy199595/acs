@@ -23,9 +23,6 @@
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/ClientComponent.h"
-
-#include"Component/Lua/LuaRegisterComponent.h"
-
 #include"Component/Service/UserInfoSyncService.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
@@ -67,7 +64,6 @@ void RegisterComponent()
     ComponentFactory::Add<HttpComponent>("HttpComponent");
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
-	ComponentFactory::Add<LuaRegisterComponent>("LuaRegisterComponent");
 	//client
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
 }

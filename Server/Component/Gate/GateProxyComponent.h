@@ -5,22 +5,24 @@
 #ifndef _GATEPROXYCOMPONENT_H_
 #define _GATEPROXYCOMPONENT_H_
 #include"Component/Component.h"
-
 namespace Sentry
 {
-	class GateProxyComponent final : public Component
+	class GateProxyComponent final : public Component, public ILuaRegister
 	{
 	 public:
 		GateProxyComponent() = default;
 		~GateProxyComponent() = default;
-	 private:
-		bool LateAwake() final;
 	 public:
 		XCode Call(long long userId, const std::string & func);
 		XCode Call(long long UserId, const std::string & func, const Message & message);
+		XCode LuaCall(long long userId, const std::string func, const std::string pb, const std::string & json);
 	 public:
 		XCode BroadCast(const std::string & func);
 		XCode BroadCast(const std::string & func, const Message & message);
+		XCode LuaBroadCast(const std::string func, const std::string pb, const std::string & json);
+	 protected:
+		bool LateAwake() final;
+		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
 		class GateService * mGateService;
 	};

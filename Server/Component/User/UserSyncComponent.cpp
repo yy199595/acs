@@ -68,14 +68,14 @@ namespace Sentry
 		return this->mRedisComponent->CallLua("user.set_state", jsonWrite);
 	}
 
-	const std::string UserSyncComponent::GetUserAddress(long long userId, const std::string& service)
+	const std::string UserSyncComponent::GetAddress(long long userId, const std::string& service)
 	{
 		std::string address;
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("user_id", userId);
 		jsonWrite.AddMember("service", service);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(this->mRedisComponent->CallLua("user.set_address", jsonWrite, response)
+		if(this->mRedisComponent->CallLua("user.get_address", jsonWrite, response)
 			&& response->GetMember("address", address))
 		{
 
@@ -83,12 +83,12 @@ namespace Sentry
 		return address;
 	}
 
-	bool UserSyncComponent::SetUserAddress(long long userId, const std::string& service, const std::string& address)
+	bool UserSyncComponent::SeAddress(long long userId, const std::string& service, const std::string& address)
 	{
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("user_id", userId);
 		jsonWrite.AddMember("service", service);
 		jsonWrite.AddMember("address", address);
-		return this->mRedisComponent->CallLua("user.get_address", jsonWrite);
+		return this->mRedisComponent->CallLua("user.set_address", jsonWrite);
 	}
 }

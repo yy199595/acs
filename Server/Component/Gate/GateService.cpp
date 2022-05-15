@@ -22,7 +22,7 @@ namespace Sentry
 
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
-		methodRegister.Bind("Ping", &GateService::Ping);
+		methodRegister.BindAddress("Ping", &GateService::Ping);
 		methodRegister.BindAddress("Auth", &GateService::Auth);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
@@ -41,20 +41,9 @@ namespace Sentry
 		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);
 	}
 
-	XCode GateService::Ping(long long userId)
+	XCode GateService::Ping(const std::string & address)
 	{
-		MainRedisComponent* redisComponent = this->GetComponent<MainRedisComponent>();
-		if(redisComponent->Lock("Ping"))
-		{
-			LOG_ERROR(userId << " get redis lock successful");
-			GateProxyComponent* gateProxyComponent = this->GetComponent<GateProxyComponent>();
-			gateProxyComponent->Call(userId, "TaskComponent.Update");
-			DataMgrComponent* dataMgrComponent = this->GetComponent<DataMgrComponent>();
-			std::shared_ptr<db_account::tab_user_account> userAccount(new db_account::tab_user_account());
-			redisComponent->UnLock("Ping");
-			return dataMgrComponent->Get(userId, userAccount);
-		}
-		LOG_WARN(userId << " get redis lock failure");
+		LOG_ERROR(address << " ping gate server");
 		return XCode::Failure;
 	}
 
@@ -106,7 +95,7 @@ namespace Sentry
 		{
 			this->mSyncComponent->SetUserState(userId, 1);
 			this->mGateClientComponent->AddNewUser(address, userId);
-			this->mSyncComponent->SetUserAddress(userId, this->GetName(), this->mAddress);
+			this->mSyncComponent->SeAddress(userId, this->GetName(), this->mAddress);
 			return XCode::Successful;
 		}
 		return XCode::Failure;

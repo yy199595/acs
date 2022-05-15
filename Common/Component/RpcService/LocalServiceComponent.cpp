@@ -64,17 +64,20 @@ namespace Sentry
 
 	bool ServiceMethodRegister::LoadLuaMethod(lua_State* lua)
 	{
-		this->mLuaMethodMap.clear();
-		const char* tab = this->mService.c_str();
-		auto iter = this->mMethodMap.begin();
-		for (; iter != this->mMethodMap.end(); iter++)
+		std::vector<std::string> methods;
+		App::Get()->GetServiceConfig().GetMethods(this->mService, methods);
+		for(const std::string & name : methods)
 		{
-			const std::string& name = iter->first;
+			const char * tab = this->mService.c_str();
 			if (Lua::Function::Get(lua, tab, name.c_str()))
 			{
 				std::shared_ptr<LuaServiceMethod> luaServiceMethod
 					= std::make_shared<LuaServiceMethod>(this->mService, name, lua);
 				this->mLuaMethodMap.emplace(name, luaServiceMethod);
+			}
+			else if(this->GetMethod(name) == nullptr)
+			{
+				return false;
 			}
 		}
 		return true;
