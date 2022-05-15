@@ -24,17 +24,11 @@ namespace Sentry
 	 public:
 		RpcHandlerComponent() = default;
 		~RpcHandlerComponent() final = default;
-
-	 public:
-		void AddRpcTask(std::shared_ptr<IRpcTask> task);
-#ifdef __DEBUG__
-		void AddRpcInfo(long long rpcId, int methodId);
-		bool GetRpcInfo(long long rpcId, int& methodId, long long& time);
-#endif
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;
 	 public:
+		void AddRpcTask(std::shared_ptr<IRpcTask> task);
 		XCode OnRequest(std::shared_ptr<com::Rpc_Request> request) final;
 		XCode OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
 	 private:

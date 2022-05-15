@@ -396,6 +396,9 @@ namespace Sentry
 		}
 		std::shared_ptr<RedisResponse> response1(new RedisResponse());
 		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, json);
+#ifdef __DEBUG__
+		LOG_INFO(fullName << " json = " << json.ToJsonString());
+#endif
 		if (this->mRedisClient->Run(request, response1) != XCode::Successful)
 		{
 			return false;

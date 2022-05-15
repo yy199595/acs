@@ -13,14 +13,15 @@ namespace Sentry
 	void HttpUserService::Awake()
 	{
 		this->mMysqlComponent = nullptr;
-		this->mRedisComponent = nullptr;
+		this->mUserSyncComponent = nullptr;
 	}
 
 	bool HttpUserService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
-		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<MainRedisComponent>());
+		this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
+		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
 		return true;
 	}
 
@@ -85,29 +86,27 @@ namespace Sentry
 		{
 			return XCode::AddressAllotFailure;
 		}
-		Json::Writer tokenJson;
-		tokenJson.AddMember("time", 30);
-		tokenJson.AddMember("token", newToken);
-		tokenJson.AddMember("user_id", userAccount->user_id());
-		if (this->mRedisComponent->CallLua("user.set_token", tokenJson))
+		if(this->mUserSyncComponent->SetToken(newToken, userAccount->user_id(), 30))
 		{
 			response.AddMember("token", newToken);
 			response.AddMember("address", gateAddress->str());
 			return XCode::Successful;
 		}
-		return XCode::Failure;
+		return XCode::RedisSocketError;
 	}
 
 	XCode HttpUserService::Register(const Json::Reader& request, Json::Writer& response)
 	{
 		long long phoneNumber = 0;
 		string user_account, user_password;
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
-
-		long long userId = Helper::Guid::Create();
+		long long userId = this->mUserSyncComponent->AddNewUser(user_account);
+		if(userId == 0)
+		{
+			return XCode::RedisSocketError;
+		}
 		long long nowTime = Helper::Time::GetNowSecTime();
 		db_account::tab_user_account userAccountInfo;
 

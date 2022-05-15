@@ -133,8 +133,8 @@ namespace Sentry
 		return true;
 	}
 
-	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<Rpc_Request> request,
-	    std::shared_ptr<Rpc_Response> response)
+	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
+	    std::shared_ptr<com::Rpc::Response> response)
 	{
 		assert(this->IsStartService());
 		response->set_rpc_id(request->rpc_id());

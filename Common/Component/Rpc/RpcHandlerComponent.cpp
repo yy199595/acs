@@ -99,26 +99,7 @@ namespace Sentry
 			LOG_WARN("not find rpc task : "<< rpcId)
 			return XCode::Failure;
 		}
-		auto rpcTask = iter->second;
-//#ifdef __DEBUG__
-//		int methodId = 0;
-//		long long time = 0;
-//		if (this->GetRpcInfo(rpcId, methodId, time))
-//		{
-//			std::string json = "";
-//			const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
-//			const InterfaceConfig* protoConfig = rpcConfig.GetInterfaceConfig(methodId);
-//
-//			LOG_DEBUG("*************[response]*************");
-//			LOG_DEBUG("func = " << protoConfig->Service << '.' << protoConfig->Method);
-//			LOG_DEBUG("time = " << time << " ms");
-//			if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
-//			{
-//				LOG_DEBUG("json = " << json);
-//			}
-//			LOG_DEBUG("************************************");
-//		}
-//#endif
+		std::shared_ptr<IRpcTask> rpcTask = iter->second;
 		this->mRpcTasks.erase(iter);
 		rpcTask->OnResponse(response);
 		return XCode::Successful;
@@ -130,32 +111,10 @@ namespace Sentry
 		this->mRpcTasks.emplace(rpcId, task);
 		if (task->GetTimeout() > 0)
 		{
-			this->mTimerComponent->DelayCall(
-					task->GetTimeout(), &RpcHandlerComponent::OnTaskTimeout, this, rpcId);
+			this->mTimerComponent->DelayCall(task->GetTimeout(),
+				&RpcHandlerComponent::OnTaskTimeout, this, rpcId);
 		}
 	}
-#ifdef __DEBUG__
-	void RpcHandlerComponent::AddRpcInfo(long long rpcId, int methodId)
-	{
-		RpcTaskInfo taskInfo;
-		taskInfo.MethodId = methodId;
-		taskInfo.Time = Helper::Time::GetNowMilTime();
-		this->mRpcInfoMap.emplace(rpcId, taskInfo);
-	}
-
-	bool RpcHandlerComponent::GetRpcInfo(long long int rpcId, int& methodId, long long int& time)
-	{
-		auto iter = this->mRpcInfoMap.find(rpcId);
-		if (iter == this->mRpcInfoMap.end())
-		{
-			return false;
-		}
-		methodId = iter->second.MethodId;
-		time = Helper::Time::GetNowMilTime() - iter->second.Time;
-		this->mRpcInfoMap.erase(iter);
-		return true;
-	}
-#endif
 
 	void RpcHandlerComponent::OnTaskTimeout(long long int rpcId)
 	{
@@ -166,18 +125,5 @@ namespace Sentry
 			this->mRpcTasks.erase(iter);
 			rpcTask->OnResponse(nullptr);
 		}
-#ifdef __DEBUG__
-		int methodId = 0;
-		long long costTime = 0;
-		if (this->GetRpcInfo(rpcId, methodId, costTime))
-		{
-			const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
-			const InterfaceConfig* config = rpcConfig.GetInterfaceConfig(methodId);
-			if (config != nullptr)
-			{
-				LOG_ERROR("call " << config->Service << '.' << config->Method << " time out");
-			}
-		}
-#endif
 	}
 }// namespace Sentry

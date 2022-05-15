@@ -17,6 +17,7 @@
 #endif
 #include"GateService.h"
 #include"Component/Redis/MainRedisComponent.h"
+#include"Component/User/UserSyncComponent.h"
 namespace Sentry
 {
 
@@ -24,7 +25,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
+		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
@@ -38,6 +39,7 @@ namespace Sentry
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
+
 		if(!config->Request.empty())
 		{
 			std::string fullName;
@@ -47,24 +49,18 @@ namespace Sentry
 				return XCode::CallArgsError;
 			}
 		}
-		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, request);
+
+		std::shared_ptr<com::Rpc::Request> userRequest = this->mRequestPool.Pop();
+		userRequest->set_rpc_id(request->rpc_id());
+		userRequest->set_address(request->address());
+		userRequest->set_method_id(config->InterfaceId);
+		userRequest->mutable_data()->CopyFrom(request->data());
+		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, config, userRequest);
 		return XCode::Successful;
 	}
 
 	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response)
 	{
-#ifdef __DEBUG__
-		LOG_WARN("**********[client response]**********");
-		if (response->has_data())
-		{
-			std::string json;
-			if ( Helper::Proto::GetJson(response->data(), json))
-			{
-				LOG_WARN("json = " << json);
-			}
-		}
-		LOG_WARN("*****************************************");
-#endif
 		if (this->mGateClientComponent->SendToClient(address, response))
 		{
 			return XCode::NetWorkError;
@@ -72,67 +68,84 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	void GateComponent::OnUserRequest(std::shared_ptr<c2s::Rpc::Request> request)
+	void GateComponent::OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request)
 	{
-		std::shared_ptr<c2s::Rpc::Response> response
-			= std::make_shared<c2s::Rpc::Response>();
-		XCode code = this->HandlerRequest(request, response);
-		if (code == XCode::NetActiveShutdown)
+#ifdef __RPC_DEBUG_LOG__
+		std::string json;
+		long long userId = 0;
+		LOG_DEBUG("========== client request ==========");
+		LOG_DEBUG("func = " << config->FullName);
+		if (this->mGateClientComponent->GetUserId(request->address(), userId))
 		{
+			LOG_DEBUG("userId = " << userId);
+		}
+		if (request->has_data()  && Proto::GetJson(request->data(), json))
+		{
+			LOG_DEBUG("json = " << json);
+		}
+		LOG_DEBUG("=====================================");
+#endif
+		std::shared_ptr<c2s::Rpc::Response> response = this->mCliResponsePool.Pop();
+		XCode code = this->HandlerRequest(config, request, response);
+		if (code != XCode::Successful)
+		{
+			this->mRequestPool.Push(request);
+			this->mCliResponsePool.Push(response);
 			this->mGateClientComponent->StartClose(request->address());
 			return;
 		}
-		response->set_code((int)code);
+#ifdef __RPC_DEBUG_LOG__
+		LOG_WARN("********** client response**********");
+		LOG_DEBUG("func = " << config->FullName);
+		if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
+		{
+			LOG_WARN("json = " << json);
+		}
+		LOG_WARN("*****************************************");
+#endif
 		response->set_rpc_id(request->rpc_id());
 		this->mGateClientComponent->SendToClient(request->address(), response);
+		this->mRequestPool.Push(request);
 	}
 
-	XCode GateComponent::HandlerRequest(std::shared_ptr<c2s::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response)
+	XCode GateComponent::HandlerRequest(const RpcInterfaceConfig * config,
+		std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response)
 	{
 		long long userId = 0;
-		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig* config = rpcConfig.GetInterfaceConfig(request->method_name());
 		if (!this->mGateClientComponent->GetUserId(request->address(), userId)) //没有验证
 		{
 			GateService* gateService = this->GetComponent<GateService>(config->Service);
-			std::shared_ptr<c2s::GateAuth::Request> loginRequest(new c2s::GateAuth::Request());
-			if (gateService != nullptr && gateService->IsStartService() && request->data().UnpackTo(loginRequest.get()))
+			if (gateService == nullptr || !gateService->IsStartService())
 			{
-				loginRequest->set_address(request->address());
-				return gateService->Auth(*loginRequest);
+				return XCode::CallServiceNotFound;
+			}
+			std::shared_ptr<com::Rpc::Response> rpcResponse = this->mResponsePool.Pop();
+			XCode code = gateService->Invoke(config->Method, request, rpcResponse);
+			if(code == XCode::Successful)
+			{
+				response->mutable_data()->CopyFrom(rpcResponse->data());
+				this->mResponsePool.Push(rpcResponse);
+				return XCode::Successful;
 			}
 			return XCode::NetActiveShutdown;
 		}
 		std::string address;
-		std::shared_ptr<com::Rpc::Request> requestData(new com::Rpc::Request());
 		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
 		if (!localServerRpc->GetEntityAddress(userId, address))
 		{
-			Json::Writer getJson;
-			getJson.AddMember("user_id", userId);
-			getJson.AddMember("service", config->Service);
-			std::shared_ptr<Json::Reader> getResponse(new Json::Reader());
-			if (!this->mRedisComponent->CallLua("user.get_address",
-				getJson, getResponse) || !getResponse->GetMember("address", address))
+			address = this->mUserSyncComponent->GetUserAddress(userId, config->Service);
+			if (address.empty() && localServerRpc->AllotAddress(address)
+				&& this->mUserSyncComponent->SetUserAddress(userId, config->Service, address))
 			{
-				if (localServerRpc->AllotAddress(address))
-				{
-					Json::Writer setJson;
-					setJson.AddMember("user_id", userId);
-					setJson.AddMember("address", address);
-					setJson.AddMember("service", config->Service);
-					this->mRedisComponent->CallLua("user.set_address", setJson);
-				}
+				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}
 		}
-		requestData->set_user_id(userId);
-		requestData->set_method_id(config->InterfaceId);
-		requestData->mutable_data()->PackFrom(request->data());
-		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, requestData);
+		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, request);
 		if (responseData != nullptr)
 		{
-			response->mutable_data()->PackFrom(responseData->data());
-			return (XCode)responseData->code();
+			response->set_code(responseData->code());
+			response->mutable_data()->CopyFrom(responseData->data());
+			return XCode::Successful;
 		}
 		return XCode::NetWorkError;
 	}

@@ -21,7 +21,7 @@ namespace Sentry
 		virtual bool OnInitEvent(ServiceEventRegister & methodRegister) { return true;};
 	public:
 		XCode Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json);
-		XCode Invoke(const std::string &func, std::shared_ptr<Rpc_Request>, std::shared_ptr<Rpc_Response> response);
+		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response);
 	public:
 		bool AllotAddress(std::string& address);
 		void GetAllAddress(std::list<std::string> & allAddress) const;

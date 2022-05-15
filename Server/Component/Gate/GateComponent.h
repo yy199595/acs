@@ -7,7 +7,9 @@
 #define GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #include"Component/Component.h"
 #include"Async/TaskSource.h"
+#include"Pool/ProtoPool.h"
 #include"Task/RequestTaskQueueSource.h"
+
 namespace Sentry
 {
 	class GateComponent final : public Component,
@@ -21,13 +23,16 @@ namespace Sentry
 		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
 	private:
 		bool LateAwake() final;
-		void OnUserRequest(std::shared_ptr<c2s::Rpc::Request> request);
-		XCode HandlerRequest(std::shared_ptr<c2s::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response);
+		void OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request);
+		XCode HandlerRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response);
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
-		class MainRedisComponent * mRedisComponent;
+		class UserSyncComponent * mUserSyncComponent;
 		class GateClientComponent* mGateClientComponent;
+		ProtoPool<com::Rpc::Request, 100> mRequestPool;
+		ProtoPool<com::Rpc::Response, 100> mResponsePool;
+		ProtoPool<c2s::Rpc::Response, 100> mCliResponsePool;
 	};
 }
 

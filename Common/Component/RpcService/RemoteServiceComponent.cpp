@@ -137,9 +137,6 @@ namespace Sentry
 			std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
 		this->mRpcComponent->AddRpcTask(taskSource);
-#ifdef __DEBUG__
-		this->mRpcComponent->AddRpcInfo(taskSource->GetRpcId(), request->method_id());
-#endif
 		XCode code = this->SendRequest(address, request);
 		if(code != XCode::Successful)
 		{

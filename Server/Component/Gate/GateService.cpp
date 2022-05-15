@@ -8,10 +8,10 @@
 #include"NetWork/GateRpcClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
-#include"Component/Service/UserInfoSyncService.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Network/Listener/NetworkListener.h"
 #include"Component/Gate/GateProxyComponent.h"
+#include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
@@ -23,7 +23,7 @@ namespace Sentry
 	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.Bind("Ping", &GateService::Ping);
-		methodRegister.Bind("Auth", &GateService::Auth);
+		methodRegister.BindAddress("Auth", &GateService::Auth);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
@@ -36,9 +36,9 @@ namespace Sentry
 	bool GateService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
-		this->GetConfig().GetListenerAddress("rpc", this->mAddress);
+		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-		return true;
+		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);
 	}
 
 	XCode GateService::Ping(long long userId)
@@ -96,29 +96,19 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::Auth(const c2s::GateAuth::Request & request)
+	XCode GateService::Auth(const std::string & address, const c2s::GateAuth::Request & request)
 	{
 		Json::Writer jsonWriter1;
-		std::string userIdStr = "";
+		LOGIC_THROW_ERROR(!request.token().empty());
 		jsonWriter1.AddMember("token", request.token());
-		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->CallLua("user.get_token", jsonWriter1,
-			response) || !response->GetMember("user_id", userIdStr))
+		long long userId = this->mSyncComponent->GetUserId(request.token());
+		if (userId != 0)
 		{
-			return XCode::Failure;
+			this->mSyncComponent->SetUserState(userId, 1);
+			this->mGateClientComponent->AddNewUser(address, userId);
+			this->mSyncComponent->SetUserAddress(userId, this->GetName(), this->mAddress);
+			return XCode::Successful;
 		}
-		Json::Writer jsonWriter2;
-		long long userId = std::stoll(userIdStr);
-		jsonWriter2.AddMember("user_id", userId);
-		jsonWriter2.AddMember("address", this->mAddress);
-		jsonWriter2.AddMember("service", this->GetName());
-		this->mRedisComponent->CallLua("user.set_address", jsonWriter2);
-
-		Json::Writer jsonWriter3;
-		jsonWriter3.AddMember("state", 1);
-		jsonWriter3.AddMember("user_id", userId);
-		this->mRedisComponent->CallLua("user.set_state", jsonWriter3);
-		return this->mGateClientComponent->AddNewUser(request.address(), userId)
-			   ? XCode::Successful : XCode::Failure;
+		return XCode::Failure;
 	}
 }

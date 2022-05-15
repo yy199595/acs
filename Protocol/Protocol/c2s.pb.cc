@@ -266,7 +266,6 @@ const ::google::protobuf::uint32 TableStruct_c2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::c2s::GateAuth_Request, token_),
-  PROTOBUF_FIELD_OFFSET(::c2s::GateAuth_Request, address_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::c2s::GateAuth, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -297,10 +296,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 28, -1, sizeof(::c2s::Rpc_Call)},
   { 35, -1, sizeof(::c2s::Rpc)},
   { 40, -1, sizeof(::c2s::GateAuth_Request)},
-  { 47, -1, sizeof(::c2s::GateAuth)},
-  { 52, -1, sizeof(::c2s::Chat_Request)},
-  { 59, -1, sizeof(::c2s::Chat_Notice)},
-  { 64, -1, sizeof(::c2s::Chat)},
+  { 46, -1, sizeof(::c2s::GateAuth)},
+  { 51, -1, sizeof(::c2s::Chat_Request)},
+  { 58, -1, sizeof(::c2s::Chat_Notice)},
+  { 63, -1, sizeof(::c2s::Chat)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -333,15 +332,15 @@ const char descriptor_table_protodef_c2s_2eproto[] =
   "pc_id\030\002 \001(\003\022\017\n\007sock_id\030\003 \001(\003\022\021\n\terror_st"
   "r\030\004 \001(\t\022\"\n\004data\030\005 \001(\0132\024.google.protobuf."
   "Any\0328\n\004Call\022\014\n\004func\030\001 \001(\t\022\"\n\004data\030\002 \001(\0132"
-  "\024.google.protobuf.Any\"5\n\010GateAuth\032)\n\007Req"
-  "uest\022\r\n\005token\030\001 \001(\t\022\017\n\007address\030\002 \001(\t\"=\n\004"
-  "Chat\032+\n\007Request\022\017\n\007user_id\030\001 \001(\003\022\017\n\007mess"
-  "age\030\002 \001(\t\032\010\n\006Noticeb\006proto3"
+  "\024.google.protobuf.Any\"$\n\010GateAuth\032\030\n\007Req"
+  "uest\022\r\n\005token\030\001 \001(\t\"=\n\004Chat\032+\n\007Request\022\017"
+  "\n\007user_id\030\001 \001(\003\022\017\n\007message\030\002 \001(\t\032\010\n\006Noti"
+  "ceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_c2s_2eproto = {
   false, InitDefaults_c2s_2eproto, 
   descriptor_table_protodef_c2s_2eproto,
-  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 547,
+  "c2s.proto", &assign_descriptors_table_c2s_2eproto, 530,
 };
 
 void AddDescriptors_c2s_2eproto() {
@@ -2399,7 +2398,6 @@ class GateAuth_Request::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GateAuth_Request::kTokenFieldNumber;
-const int GateAuth_Request::kAddressFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GateAuth_Request::GateAuth_Request()
@@ -2415,10 +2413,6 @@ GateAuth_Request::GateAuth_Request(const GateAuth_Request& from)
   if (from.token().size() > 0) {
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.address().size() > 0) {
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
   // @@protoc_insertion_point(copy_constructor:c2s.GateAuth.Request)
 }
 
@@ -2426,7 +2420,6 @@ void GateAuth_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_GateAuth_Request_c2s_2eproto.base);
   token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 GateAuth_Request::~GateAuth_Request() {
@@ -2436,7 +2429,6 @@ GateAuth_Request::~GateAuth_Request() {
 
 void GateAuth_Request::SharedDtor() {
   token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void GateAuth_Request::SetCachedSize(int size) const {
@@ -2455,7 +2447,6 @@ void GateAuth_Request::Clear() {
   (void) cached_has_bits;
 
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -2479,22 +2470,6 @@ const char* GateAuth_Request::_InternalParse(const char* begin, const char* end,
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("c2s.GateAuth.Request.token");
         object = msg->mutable_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string address = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("c2s.GateAuth.Request.address");
-        object = msg->mutable_address();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -2553,21 +2528,6 @@ bool GateAuth_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // string address = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_address()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->address().data(), static_cast<int>(this->address().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "c2s.GateAuth.Request.address"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2605,16 +2565,6 @@ void GateAuth_Request::SerializeWithCachedSizes(
       1, this->token(), output);
   }
 
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.GateAuth.Request.address");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->address(), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2637,17 +2587,6 @@ void GateAuth_Request::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->token(), target);
-  }
-
-  // string address = 2;
-  if (this->address().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->address().data(), static_cast<int>(this->address().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "c2s.GateAuth.Request.address");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->address(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2676,13 +2615,6 @@ size_t GateAuth_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->token());
-  }
-
-  // string address = 2;
-  if (this->address().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->address());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -2716,10 +2648,6 @@ void GateAuth_Request::MergeFrom(const GateAuth_Request& from) {
 
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
-  if (from.address().size() > 0) {
-
-    address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
-  }
 }
 
 void GateAuth_Request::CopyFrom(const ::google::protobuf::Message& from) {
@@ -2748,8 +2676,6 @@ void GateAuth_Request::InternalSwap(GateAuth_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 

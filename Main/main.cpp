@@ -30,7 +30,7 @@
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
-
+#include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
 using namespace Client;
 
@@ -42,16 +42,17 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-    ComponentFactory::Add<MonitorComponent>("MonitorComponent");
+	ComponentFactory::Add<MonitorComponent>("MonitorComponent");
 	ComponentFactory::Add<DataMgrComponent>("DataMgrComponent");
+	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
     ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
 
 //server
+	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
     ComponentFactory::Add<RpcClientComponent>("RpcClientComponent");
-    ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
 
 // gate
     ComponentFactory::Add<GateComponent>("GateComponent");

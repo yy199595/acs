@@ -2,7 +2,6 @@
 #include<Thread/TaskThread.h>
 #include<Protocol/com.pb.h>
 #include"Protocol/c2s.pb.h"
-#include<Pool/StringPool.h>
 #include"XCode/XCode.h"
 #include"Json/JsonReader.h"
 namespace Sentry

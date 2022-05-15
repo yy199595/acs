@@ -39,7 +39,6 @@ message GateAuth
     message Request
     {
         string token = 1;
-        string address = 2;
     }
 }
 

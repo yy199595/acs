@@ -2,7 +2,6 @@
 #include<mutex>
 #include<Define/CommonLogDef.h>
 #include<Thread/TaskThread.h>
-#include<Pool/StringPool.h>
 
 namespace Sentry
 {

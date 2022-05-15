@@ -899,27 +899,12 @@ class GateAuth_Request :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
-  // string address = 2;
-  void clear_address();
-  static const int kAddressFieldNumber = 2;
-  const ::std::string& address() const;
-  void set_address(const ::std::string& value);
-  #if LANG_CXX11
-  void set_address(::std::string&& value);
-  #endif
-  void set_address(const char* value);
-  void set_address(const char* value, size_t size);
-  ::std::string* mutable_address();
-  ::std::string* release_address();
-  void set_allocated_address(::std::string* address);
-
   // @@protoc_insertion_point(class_scope:c2s.GateAuth.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr token_;
-  ::google::protobuf::internal::ArenaStringPtr address_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2eproto;
 };
@@ -1989,59 +1974,6 @@ inline void GateAuth_Request::set_allocated_token(::std::string* token) {
   }
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
   // @@protoc_insertion_point(field_set_allocated:c2s.GateAuth.Request.token)
-}
-
-// string address = 2;
-inline void GateAuth_Request::clear_address() {
-  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& GateAuth_Request::address() const {
-  // @@protoc_insertion_point(field_get:c2s.GateAuth.Request.address)
-  return address_.GetNoArena();
-}
-inline void GateAuth_Request::set_address(const ::std::string& value) {
-  
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.GateAuth.Request.address)
-}
-#if LANG_CXX11
-inline void GateAuth_Request::set_address(::std::string&& value) {
-  
-  address_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.GateAuth.Request.address)
-}
-#endif
-inline void GateAuth_Request::set_address(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.GateAuth.Request.address)
-}
-inline void GateAuth_Request::set_address(const char* value, size_t size) {
-  
-  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.GateAuth.Request.address)
-}
-inline ::std::string* GateAuth_Request::mutable_address() {
-  
-  // @@protoc_insertion_point(field_mutable:c2s.GateAuth.Request.address)
-  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* GateAuth_Request::release_address() {
-  // @@protoc_insertion_point(field_release:c2s.GateAuth.Request.address)
-  
-  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void GateAuth_Request::set_allocated_address(::std::string* address) {
-  if (address != nullptr) {
-    
-  } else {
-    
-  }
-  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:c2s.GateAuth.Request.address)
 }
 
 // -------------------------------------------------------------------

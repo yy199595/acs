@@ -101,6 +101,7 @@
         "EntityMgrComponent",
         "GateProxyComponent",
         "DataRedisComponent",
+        "UserSyncComponent",
         "ClientComponent"
     ],
     "service":

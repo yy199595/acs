@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include"Protocol/c2s.pb.h"
+#include"Component/User/UserSyncComponent.h"
 #include"Component/HttpService/HttpService.h"
 #define USER_ID_START 7788
 namespace Sentry
@@ -29,7 +30,7 @@ namespace Sentry
 		const std::string NewToken(const std::string& account);
 	 private:
 		class GateService * mGateService;
-		class MainRedisComponent * mRedisComponent;
+		UserSyncComponent * mUserSyncComponent;
 		class MysqlProxyComponent * mMysqlComponent;
 	};
 }// namespace Sentry
