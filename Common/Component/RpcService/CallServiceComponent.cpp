@@ -34,13 +34,17 @@ namespace Sentry
 		std::shared_ptr<com::Rpc::Request> request
 			= std::make_shared<com::Rpc::Request>();
 
+		if(!protoConfig->Request.empty())
+		{
+			if(message == nullptr)
+			{
+				LOG_ERROR("call " << protoConfig->FullName << " args error");
+				return nullptr;
+			}
+			request->mutable_data()->PackFrom(*message);
+		}
 		request->set_user_id(userId);
 		request->set_method_id(protoConfig->InterfaceId);
-		if(message == nullptr)
-		{
-			return request;
-		}
-		request->mutable_data()->PackFrom(*message);
 		return request;
 	}
 }
@@ -180,7 +184,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode CallServiceComponent::Call(const std::string& func, long long userId)
+	XCode CallServiceComponent::Call(long long userId, const std::string& func)
 	{
 		std::string address;
 		if(!this->GetEntityAddress(userId, address))
@@ -196,7 +200,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode CallServiceComponent::Call(const std::string& func, long long userId, const Message& message)
+	XCode CallServiceComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
 		std::string address;
 		if(!this->GetEntityAddress(userId, address))
@@ -212,7 +216,7 @@ namespace Sentry
 		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
 	}
 
-	XCode CallServiceComponent::Call(const std::string& func, long long userId, std::shared_ptr<Message> response)
+	XCode CallServiceComponent::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);
@@ -237,7 +241,7 @@ namespace Sentry
 		return (XCode)rpcResponse->code();
 	}
 
-	XCode CallServiceComponent::Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response)
+	XCode CallServiceComponent::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);

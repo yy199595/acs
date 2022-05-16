@@ -27,13 +27,13 @@ namespace Sentry
 
 	 public:
 
-		virtual XCode Call(const std::string& func, long long userId);
+		virtual XCode Call(long long userId, const std::string& func);
 
-		virtual XCode Call(const std::string& func, long long userId, const Message& message);
+		virtual XCode Call(long long userId, const std::string& func, const Message& message);
 
-		virtual XCode Call(const std::string& func, long long userId, std::shared_ptr<Message> response);
+		virtual XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
 
-		virtual XCode Call(const std::string& func, long long userId, const Message& message, std::shared_ptr<Message> response);
+		virtual XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
 
 	public:
 		XCode PublishEvent(const std::string & eveId);

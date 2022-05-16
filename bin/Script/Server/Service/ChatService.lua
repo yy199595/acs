@@ -8,6 +8,6 @@ ChatService.Chat = function(id, request, response)
     local chatMessage = {}
     chatMessage.msg_type = request.msg_type
     chatMessage.message = request.message
-    gateComponent:BroadCast("ChatComponent.Chat", "c2s.Chat.Notice", Json.ToString(chatMessage))
+    gateComponent:BroadCast("ChatComponent.Chat", "c2s.Chat.Notice", Json.Encode(chatMessage))
     return 0
 end

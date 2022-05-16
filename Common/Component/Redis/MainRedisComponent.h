@@ -39,6 +39,9 @@ namespace Sentry
 		long long Publish(const std::string& channel, const std::string& message);
 	private:
 		bool SubEvent();
+#ifdef __DEBUG__
+		void StartDebugRedis();
+#endif
 		std::shared_ptr<RedisClientContext> MakeRedisClient();
 		void OnLockTimeout(const std::string & name, int timeout);
 		bool GetLuaScript(const std::string& file, std::string& command);
@@ -51,6 +54,9 @@ namespace Sentry
 		const struct RedisConfig * mConfig;
 		class RpcHandlerComponent * mRpcComponent;
 		std::shared_ptr<RedisClientContext> mRedisClient;
+#ifdef __DEBUG__
+		std::shared_ptr<RedisClientContext> mDebugClient;
+#endif
 		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器

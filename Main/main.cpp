@@ -77,9 +77,10 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
 #include"Any/Any.h"
-
+#include"Json/hpack.hpp"
 int main(int argc, char **argv)
 {
+	HPACK::encoder_t encoder;
 	try
     {
         RegisterComponent();

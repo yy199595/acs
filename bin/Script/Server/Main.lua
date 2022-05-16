@@ -1,3 +1,5 @@
+
+
 Main = {}
 function Main.Awake()
    return true
@@ -8,11 +10,20 @@ Person.age = 10
 Person.name = "xiaoming"
 Person.arr = {}
 
+
+
 for i = 1, 10 do
     table.insert(Person.arr, i)
 end
 
+function Main.Awake()
+
+    print(Json.Encode, Json.Decode)
+    return true
+end
+
 function Main.Start()
+
     local t1 = Time.GetNowSecTime();
     coroutine.sleep(1000)
     --Timer.AddTimer(5000, function()

@@ -21,21 +21,6 @@ namespace Sentry
         virtual void OnResponse(std::shared_ptr<com::Rpc_Response> response) = 0;
     };
 
-    class LuaRpcTaskSource : public IRpcTask
-    {
-    public:
-        LuaRpcTaskSource(lua_State *lua, lua_State *coroutine);
-    public:
-        int GetTimeout() final { return 0;}
-        long long GetRpcId() final { return this->mRpcId;}
-        void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
-    private:
-        int ref;
-        long long mRpcId;
-        lua_State * mluaEnv;
-        lua_State *mCoroutine;
-    };
-
     class RpcHandlerComponent;
     class RpcTaskSource : public IRpcTask
     {
@@ -47,24 +32,10 @@ namespace Sentry
         void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
 
     public:
-        XCode AwaitCode();
-        template<typename T>
-        std::shared_ptr<T> AwaitData();
 		std::shared_ptr<com::Rpc_Response> Await();
     private:
         const int mTimeout;
         RpcHandlerComponent * mRpcComponent;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
-    template<typename T>
-    std::shared_ptr<T> RpcTaskSource::AwaitData()
-    {
-        auto response = mTaskSource.Await();
-        if(response == nullptr || !response->has_data() || !response->data().Is<T>())
-        {
-            return nullptr;
-        }
-        std::shared_ptr<T> data = std::make_shared<T>();
-        return response->data().UnpackTo(data.get()) ? data : nullptr;
-    }
 }

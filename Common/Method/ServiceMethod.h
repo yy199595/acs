@@ -140,16 +140,11 @@ namespace Sentry
 
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
-			if (this->mHasUserId)
+			if (!this->mHasUserId)
 			{
-				assert(request.user_id() != 0);
-				if (request.user_id() == 0)
-				{
-					return XCode::NotFindUser;
-				}
-				return (_o->*_objfunc)(request.user_id());
+				return (_o->*_func)();
 			}
-			return (_o->*_func)();
+			return (_o->*_objfunc)(request.user_id());
 		}
 
 		bool IsLuaMethod() override
@@ -178,26 +173,13 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
-			assert(request.data().Is<T1>());
-			if (!request.data().Is<T1>())
-			{
-				return XCode::CallArgsError;
-			}
-			if (this->mHasUserId && request.user_id() == 0)
-			{
-				assert(request.user_id() != 0);
-				return XCode::NotFindUser;
-			}
 			std::shared_ptr<T1> requestData(new T1());
-			if (!request.data().UnpackTo(requestData.get()))
+			request.data().UnpackTo(requestData.get());
+			if (!this->mHasUserId)
 			{
-				return XCode::CallArgsError;
+				return (_o->*_func)(*requestData);
 			}
-			if (this->mHasUserId)
-			{
-				return (_o->*_objfunc)(request.user_id(), *requestData);
-			}
-			return (_o->*_func)(*requestData);
+			return (_o->*_objfunc)(request.user_id(), *requestData);
 		}
 		bool IsLuaMethod() override
 		{
@@ -227,21 +209,8 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
-			assert(request.data().Is<T1>());
-			if (!request.data().Is<T1>())
-			{
-				return XCode::CallTypeError;
-			}
 			std::shared_ptr<T1> requestData(new T1());
-			if (!request.data().UnpackTo(requestData.get()))
-			{
-				return XCode::CallTypeError;
-			}
-			if (this->mHasUserId && request.user_id() == 0)
-			{
-				assert(request.user_id() != 0);
-				return XCode::NotFindUser;
-			}
+			request.data().UnpackTo(requestData.get());
 			std::shared_ptr<T2> responseData(new T2());
 			if (this->mHasUserId)
 			{
@@ -286,11 +255,6 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
 		{
-			if (this->mHasUserId && request.user_id() == 0)
-			{
-				assert(request.user_id() != 0);
-				return XCode::NotFindUser;
-			}
 			std::shared_ptr<T1> responseData(new T1());
 			if (this->mHasUserId)
 			{
@@ -337,15 +301,9 @@ namespace Sentry
 		};
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
 		{
-			assert(request.has_data());
-			assert(request.data().Is<T1>());
 			std::shared_ptr<T1> requestData(new T1());
-			if(request.has_data() && request.data().Is<T1>())
-			{
-				request.data().UnpackTo(requestData.get());
-				return (_o->*_func)(request.address(), *requestData);
-			}
-			return XCode::CallArgsError;
+			request.data().UnpackTo(requestData.get());
+			return (_o->*_func)(request.address(), *requestData);
 		}
 
 	private:

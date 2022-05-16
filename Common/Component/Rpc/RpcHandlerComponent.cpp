@@ -38,6 +38,23 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
+		if(!rpcInterfaceConfig->Request.empty())
+		{
+			if(!request->has_data())
+			{
+				LOG_ERROR("call " << rpcInterfaceConfig->FullName << " not proto data"
+					<< " need proto type " << rpcInterfaceConfig->Request);
+				return XCode::CallArgsError;
+			}
+			std::string fullName;
+			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &fullName)
+				|| rpcInterfaceConfig->Request != fullName)
+			{
+				LOG_ERROR("call " << rpcInterfaceConfig->FullName << " need "
+					<< rpcInterfaceConfig->FullName << " but use " << fullName);
+				return XCode::CallArgsError;
+			}
+		}
 
 		const std::string& service = rpcInterfaceConfig->Service;
 		LocalServiceComponent * logicService = this->GetComponent<LocalServiceComponent>(service);

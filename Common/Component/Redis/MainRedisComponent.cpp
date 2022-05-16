@@ -57,6 +57,7 @@ namespace Sentry
 	bool MainRedisComponent::OnStart()
 	{
 		this->mRedisClient = this->MakeRedisClient();
+		this->mDebugClient = this->MakeRedisClient();
 		this->mSubRedisClient = this->MakeRedisClient();
 		if (this->mSubRedisClient == nullptr || this->mRedisClient == nullptr)
 		{
@@ -92,10 +93,56 @@ namespace Sentry
 		}
 
 		LOG_CHECK_RET_FALSE(this->SubEvent());
+#ifdef __DEBUG__
+		this->mTaskComponent->Start(&MainRedisComponent::StartDebugRedis, this);
+#endif
 		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
 		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
 		return true;
 	}
+#ifdef __DEBUG__
+	void MainRedisComponent::StartDebugRedis()
+	{
+		std::shared_ptr<RedisResponse> response(new RedisResponse());
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("MONITOR");
+		if(this->mDebugClient->Run(request, response) != XCode::Successful)
+		{
+			LOG_ERROR("debug redis error");
+			return;
+		}
+		while(this->mDebugClient != nullptr)
+		{
+			if(!this->mDebugClient->IsOpen())
+			{
+				int count = 0;
+				XCode code = this->mDebugClient->StartConnect();
+				if (code == XCode::RedisAuthFailure)
+				{
+					LOG_FATAL("debug client auth failure");
+					return;
+				}
+				while (code != XCode::Successful)
+				{
+					LOG_ERROR("debug client connect redis "
+							<< this->mConfig->Address << " failure count = " << count++);
+					this->mTaskComponent->Sleep(3000);
+					code = this->mDebugClient->StartConnect();
+				}
+				this->SubscribeChannel(this->mRpcAddress);
+				LOG_DEBUG("debug redis client connect successful");
+			}
+			std::shared_ptr<RedisResponse> debugResponse(new RedisResponse());
+			if(this->mDebugClient->WaitRedisResponse(debugResponse) == XCode::Successful)
+			{
+				std::string content;
+				if(debugResponse->GetString(content))
+				{
+					LOG_DEBUG("[redis command] = " << content);
+				}
+			}
+		}
+	}
+#endif
 
 	bool MainRedisComponent::SubEvent()
 	{

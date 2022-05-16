@@ -124,7 +124,7 @@
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "c2s.Rpc.Call"
+            "Request": "s2s.GateBroadCast.Request"
         },
         "Auth": {
             "Id": 1005,

@@ -59,12 +59,10 @@ namespace Lua
 	{
 		message.Clear();
 		std::string mMessageBuffer;
-		if (!this->Serialization(mMessageBuffer))
-		{
-			return false;
-		}
+		this->Serialization(mMessageBuffer);
 		return JsonStringToMessage(mMessageBuffer, &message).ok();
 	}
+
 	std::string Table::ToJson()
 	{
 		if(Lua::Function::Get(this->mLuaEnv, "Json", "ToString"))

@@ -19,7 +19,7 @@ namespace Sentry
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
-		return this->mGateService->Call("CallClient", userId, request);
+		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
 	XCode GateProxyComponent::Call(long long userId, const std::string& func, const Message& message)
@@ -27,7 +27,7 @@ namespace Sentry
 		c2s::Rpc::Call request;
 		request.set_func(func);
 		request.mutable_data()->PackFrom(message);
-		return this->mGateService->Call("CallClient", userId, request);
+		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
 	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string pb, const std::string& json)
@@ -37,18 +37,19 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
 		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
 		if(message == nullptr)
 		{
 			return XCode::JsonCastProtoFailure;
 		}
 		std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
+		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
+
 		request->set_func(func);
 		request->mutable_data()->PackFrom(*message);
 		taskComponent->Start([userId, request, this]()
 		{
-			this->mGateService->Call("CallClient", userId, request);
+			this->mGateService->Call(userId, "CallClient", request);
 		});
 		return XCode::Successful;
 	}
@@ -87,17 +88,20 @@ namespace Sentry
 		{
 			return XCode::JsonCastProtoFailure;
 		}
-		std::shared_ptr<s2s::GateBroadCast::Request> request(new s2s::GateBroadCast::Request());
-		request->set_func(func);
-		request->mutable_data()->PackFrom(*message);
+
 		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
-		taskComponent->Start([request, this]()
+		taskComponent->Start([this, func, message]()
 		{
 			std::list<std::string> allAddress;
-			this->mGateService->GetAllAddress(allAddress);
-			for(const std::string & address : allAddress)
+			if(this->mGateService->GetAllAddress(allAddress))
 			{
-				this->mGateService->Call(address,"BroadCast", request);
+				s2s::GateBroadCast::Request request;
+				request.set_func(func);
+				request.mutable_data()->PackFrom(*message);
+				for (const std::string& address: allAddress)
+				{
+					this->mGateService->Call(address, "BroadCast", request);
+				}
 			}
 		});
 		return XCode::Successful;

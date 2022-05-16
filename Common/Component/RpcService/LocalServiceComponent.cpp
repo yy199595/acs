@@ -229,13 +229,14 @@ namespace Sentry
 		return false;
 	}
 
-	void LocalServiceComponent::GetAllAddress(list<std::string>& allAddress) const
+	bool LocalServiceComponent::GetAllAddress(list<std::string>& allAddress) const
 	{
 		allAddress.clear();
 		for(const std::string & address : this->mAddressList)
 		{
 			allAddress.emplace_back(address);
 		}
+		return !allAddress.empty();
 	}
 
 	XCode LocalServiceComponent::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)

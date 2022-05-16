@@ -4,7 +4,6 @@
 #include "ContainerParameter.h"
 #include "FunctionParameter.h"
 #include "LuaInclude.h"
-#include "ProtocParameter.h"
 #include "UserDataParameter.h"
 
 namespace Parameter
@@ -107,24 +106,6 @@ namespace Lua
 		inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, void>::type
 		Write(lua_State* lua, T data)
 		{
-		}
-	}// namespace Parameter
-
-	namespace Parameter
-	{
-		template<typename T>
-		inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, T>::type
-		Read(lua_State* lua, int index)
-		{
-			assert(lua_istable(lua, index));
-			return ProtocParameter::Read<T>(lua, index);
-		}
-
-		template<typename T>
-		inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, void>::type
-		Write(lua_State* lua, T data)
-		{
-			ProtocParameter::Write<T>(lua, data);
 		}
 	}// namespace Parameter
 

@@ -24,6 +24,7 @@ namespace Sentry
 		void OnDestory() final;
 	 private:
 		bool LoadAllFile();
+		bool LoadSoFile(const std::string & path);
 		bool LoadLuaScript(const std::string filePath);
 	 private:
 		struct lua_State* mLuaEnv;
