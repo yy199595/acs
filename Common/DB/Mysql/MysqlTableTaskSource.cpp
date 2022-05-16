@@ -2,7 +2,7 @@
 #include"fstream"
 #include"App/App.h"
 #include"Protocol/db.pb.h"
-
+using namespace google::protobuf;
 namespace Sentry
 {
 	MysqlTableTaskSource::MysqlTableTaskSource(const std::string& name)
@@ -12,7 +12,7 @@ namespace Sentry
 	}
 	void MysqlTableTaskSource::Run(MysqlSocket* mysql)
 	{
-		const DescriptorPool * descriptorPool = google::protobuf::DescriptorPool::generated_pool();
+		const DescriptorPool * descriptorPool = DescriptorPool::generated_pool();
 		const FileDescriptor * desc = descriptorPool->FindFileByName(this->mName);
 		for (int x = 0; x < desc->message_type_count(); x++)
 		{

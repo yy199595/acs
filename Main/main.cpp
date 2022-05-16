@@ -23,7 +23,6 @@
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/ClientComponent.h"
-#include"Component/Service/UserInfoSyncService.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
@@ -72,15 +71,12 @@ void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
-	ComponentFactory::Add<UserInfoSyncService>("UserInfoSyncService");
     ComponentFactory::Add<RegistryService>("RegistryService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
-#include"Any/Any.h"
-#include"Json/hpack.hpp"
+
 int main(int argc, char **argv)
 {
-	HPACK::encoder_t encoder;
 	try
     {
         RegisterComponent();

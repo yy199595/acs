@@ -4,7 +4,6 @@
 #include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
-#include"Component/Service/UserInfoSyncService.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/Mysql/MysqlProxyComponent.h"
 

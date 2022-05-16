@@ -10,7 +10,6 @@
 #include"Method/LuaServiceMethod.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Service/UserInfoSyncService.h"
 
 namespace Sentry
 {

@@ -109,8 +109,7 @@
         "ChatService",
         "MysqlService",
         "HttpUserService",
-        "RegistryService",
-        "UserInfoSyncService"
+        "RegistryService"
     ],
     "white_list": [
         "127.0.0.1"
