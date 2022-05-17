@@ -83,9 +83,9 @@ namespace Sentry
 			}
 		}
 
-		if (jsonValue.HasMember("Response"))
+		if (jsonValue.HasMember("Writer"))
 		{
-			rpcInterfaceConfig->Response = jsonValue["Response"].GetString();
+			rpcInterfaceConfig->Response = jsonValue["Writer"].GetString();
 			if (Helper::Proto::New(rpcInterfaceConfig->Response) == nullptr)
 			{
 				LOG_FATAL("create [" << rpcInterfaceConfig->Response << "] failure");

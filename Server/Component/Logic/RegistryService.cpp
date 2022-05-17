@@ -8,7 +8,7 @@
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
-	bool RegistryService::OnInitService(ServiceMethodRegister& methodRegister)
+	bool RegistryService::OnStartService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.Bind("Add", &RegistryService::Add);
 		methodRegister.Bind("Del", &RegistryService::Del);

@@ -40,6 +40,6 @@ namespace Sentry
 		XCode Invoke(const HttpInterfaceConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
 	 private:
 		class TaskComponent* mCorComponent;
-		class ThreadPoolComponent* mThreadComponent;
+		class NetThreadComponent* mThreadComponent;
 	};
 }

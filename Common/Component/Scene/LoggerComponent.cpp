@@ -24,6 +24,20 @@ namespace Sentry
 
 	void LoggerComponent::OnDestory()
 	{
+		this->SaveAllLog();
+	}
+
+	void LoggerComponent::SaveAllLog()
+	{
+#ifdef __DEBUG__
+		this->mAllLog->flush();
+#else
+		this->mInfoLog->flush();
+		this->mDebugLog->flush();
+		this->mErrorLog->flush();
+		this->mFatalLog->flush();
+		this->mWarningLog->flush();
+#endif
 		spdlog::drop_all();
 	}
 
@@ -36,7 +50,7 @@ namespace Sentry
 			this->mAllLog->info(log);
 			LoggerComponent::AddInfoLog(log);
 #else
-
+			this->mInfoLog->info(log);
 #endif
 			break;
 		case spdlog::level::level_enum::debug:
@@ -44,7 +58,7 @@ namespace Sentry
 			LoggerComponent::AddDebugLog(log);
 			this->mAllLog->debug(log);
 #else
-
+			this->mDebugLog->debug(log);
 #endif
 			break;
 		case spdlog::level::level_enum::warn:
@@ -52,7 +66,7 @@ namespace Sentry
 			this->mAllLog->warn(log);
 			LoggerComponent::AddWarningLog(log);
 #else
-
+			this->mWarningLog->warn(log);
 #endif
 			break;
 		case spdlog::level::level_enum::err:
@@ -60,7 +74,7 @@ namespace Sentry
 			this->mAllLog->error(log);
 			LoggerComponent::AddErrorLog(log);
 #else
-
+			this->mErrorLog->error(log);
 #endif
 			break;
 		case spdlog::level::level_enum::critical:
@@ -68,7 +82,7 @@ namespace Sentry
 			this->mAllLog->critical(log);
 			LoggerComponent::AddFatalLog(log);
 #else
-
+			this->mFatalLog->critical(log);
 #endif
 			break;
 		}
@@ -88,7 +102,6 @@ namespace Sentry
 		this->mDebugLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mFatalLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Fatal", logPath + "/fatal.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mErrorLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Error", logPath + "/error.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mRecordLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Record", logPath + "/record.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 		this->mWarningLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 #else

@@ -20,7 +20,7 @@ namespace Sentry
 		return this->SubUserEvent();
 	}
 
-	bool GateService::OnInitService(ServiceMethodRegister& methodRegister)
+	bool GateService::OnStartService(ServiceMethodRegister& methodRegister)
 	{
 		methodRegister.BindAddress("Ping", &GateService::Ping);
 		methodRegister.BindAddress("Auth", &GateService::Auth);

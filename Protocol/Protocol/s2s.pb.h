@@ -924,7 +924,7 @@ class Mysql_Invoke :
 // -------------------------------------------------------------------
 
 class Mysql_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mysql.Response) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mysql.Writer) */ {
  public:
   Mysql_Response();
   virtual ~Mysql_Response();
@@ -1054,7 +1054,7 @@ class Mysql_Response :
   ::std::string* release_error();
   void set_allocated_error(::std::string* error);
 
-  // @@protoc_insertion_point(class_scope:s2s.Mysql.Response)
+  // @@protoc_insertion_point(class_scope:s2s.Mysql.Writer)
  private:
   class HasBitSetters;
 
@@ -1307,7 +1307,7 @@ class Allot_Request :
 // -------------------------------------------------------------------
 
 class Allot_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot.Response) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot.Writer) */ {
  public:
   Allot_Response();
   virtual ~Allot_Response();
@@ -1415,7 +1415,7 @@ class Allot_Response :
   ::std::string* release_address();
   void set_allocated_address(::std::string* address);
 
-  // @@protoc_insertion_point(class_scope:s2s.Allot.Response)
+  // @@protoc_insertion_point(class_scope:s2s.Allot.Writer)
  private:
   class HasBitSetters;
 
@@ -1665,7 +1665,7 @@ class GateBroadCast_Request :
 // -------------------------------------------------------------------
 
 class GateBroadCast_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.GateBroadCast.Response) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.GateBroadCast.Writer) */ {
  public:
   GateBroadCast_Response();
   virtual ~GateBroadCast_Response();
@@ -1765,7 +1765,7 @@ class GateBroadCast_Response :
   ::google::protobuf::int32 count() const;
   void set_count(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(class_scope:s2s.GateBroadCast.Writer)
  private:
   class HasBitSetters;
 
@@ -2779,41 +2779,41 @@ inline void Mysql_Response::clear_error() {
   error_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& Mysql_Response::error() const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_get:s2s.Mysql.Writer.error)
   return error_.GetNoArena();
 }
 inline void Mysql_Response::set_error(const ::std::string& value) {
   
   error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_set:s2s.Mysql.Writer.error)
 }
 #if LANG_CXX11
 inline void Mysql_Response::set_error(::std::string&& value) {
   
   error_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Mysql.Writer.error)
 }
 #endif
 inline void Mysql_Response::set_error(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Writer.error)
 }
 inline void Mysql_Response::set_error(const char* value, size_t size) {
   
   error_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Writer.error)
 }
 inline ::std::string* Mysql_Response::mutable_error() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Writer.error)
   return error_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Mysql_Response::release_error() {
-  // @@protoc_insertion_point(field_release:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_release:s2s.Mysql.Writer.error)
   
   return error_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2824,7 +2824,7 @@ inline void Mysql_Response::set_allocated_error(::std::string* error) {
     
   }
   error_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error);
-  // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Response.error)
+  // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Writer.error)
 }
 
 // repeated string json_array = 2;
@@ -2835,64 +2835,64 @@ inline void Mysql_Response::clear_json_array() {
   json_array_.Clear();
 }
 inline const ::std::string& Mysql_Response::json_array(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_get:s2s.Mysql.Writer.json_array)
   return json_array_.Get(index);
 }
 inline ::std::string* Mysql_Response::mutable_json_array(int index) {
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Writer.json_array)
   return json_array_.Mutable(index);
 }
 inline void Mysql_Response::set_json_array(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_set:s2s.Mysql.Writer.json_array)
   json_array_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
 inline void Mysql_Response::set_json_array(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_set:s2s.Mysql.Writer.json_array)
   json_array_.Mutable(index)->assign(std::move(value));
 }
 #endif
 inline void Mysql_Response::set_json_array(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   json_array_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Writer.json_array)
 }
 inline void Mysql_Response::set_json_array(int index, const char* value, size_t size) {
   json_array_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Writer.json_array)
 }
 inline ::std::string* Mysql_Response::add_json_array() {
-  // @@protoc_insertion_point(field_add_mutable:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_add_mutable:s2s.Mysql.Writer.json_array)
   return json_array_.Add();
 }
 inline void Mysql_Response::add_json_array(const ::std::string& value) {
   json_array_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_add:s2s.Mysql.Writer.json_array)
 }
 #if LANG_CXX11
 inline void Mysql_Response::add_json_array(::std::string&& value) {
   json_array_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_add:s2s.Mysql.Writer.json_array)
 }
 #endif
 inline void Mysql_Response::add_json_array(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   json_array_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_add_char:s2s.Mysql.Writer.json_array)
 }
 inline void Mysql_Response::add_json_array(const char* value, size_t size) {
   json_array_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_add_pointer:s2s.Mysql.Writer.json_array)
 }
 inline const ::google::protobuf::RepeatedPtrField<::std::string>&
 Mysql_Response::json_array() const {
-  // @@protoc_insertion_point(field_list:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_list:s2s.Mysql.Writer.json_array)
   return json_array_;
 }
 inline ::google::protobuf::RepeatedPtrField<::std::string>*
 Mysql_Response::mutable_json_array() {
-  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Response.json_array)
+  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Writer.json_array)
   return &json_array_;
 }
 
@@ -2980,41 +2980,41 @@ inline void Allot_Response::clear_address() {
   address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& Allot_Response::address() const {
-  // @@protoc_insertion_point(field_get:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_get:s2s.Allot.Writer.address)
   return address_.GetNoArena();
 }
 inline void Allot_Response::set_address(const ::std::string& value) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_set:s2s.Allot.Writer.address)
 }
 #if LANG_CXX11
 inline void Allot_Response::set_address(::std::string&& value) {
   
   address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Writer.address)
 }
 #endif
 inline void Allot_Response::set_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_set_char:s2s.Allot.Writer.address)
 }
 inline void Allot_Response::set_address(const char* value, size_t size) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Writer.address)
 }
 inline ::std::string* Allot_Response::mutable_address() {
   
-  // @@protoc_insertion_point(field_mutable:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_mutable:s2s.Allot.Writer.address)
   return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Allot_Response::release_address() {
-  // @@protoc_insertion_point(field_release:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_release:s2s.Allot.Writer.address)
   
   return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3025,7 +3025,7 @@ inline void Allot_Response::set_allocated_address(::std::string* address) {
     
   }
   address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Response.address)
+  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Writer.address)
 }
 
 // -------------------------------------------------------------------
@@ -3143,13 +3143,13 @@ inline void GateBroadCast_Response::clear_count() {
   count_ = 0;
 }
 inline ::google::protobuf::int32 GateBroadCast_Response::count() const {
-  // @@protoc_insertion_point(field_get:s2s.GateBroadCast.Response.count)
+  // @@protoc_insertion_point(field_get:s2s.GateBroadCast.Writer.count)
   return count_;
 }
 inline void GateBroadCast_Response::set_count(::google::protobuf::int32 value) {
   
   count_ = value;
-  // @@protoc_insertion_point(field_set:s2s.GateBroadCast.Response.count)
+  // @@protoc_insertion_point(field_set:s2s.GateBroadCast.Writer.count)
 }
 
 // -------------------------------------------------------------------

@@ -24,7 +24,7 @@ namespace Sentry
 	 protected:
 		void OnAddService(Component *component) final;
 		void OnDelService(Component *component) final;
-		bool OnInitService(ServiceMethodRegister &methodRegister) ;
+		bool OnStartService(ServiceMethodRegister &methodRegister) ;
 	 private:
 		XCode Add(const sub::Add::Request& request);
 		XCode Del(const sub::Del::Request& request);

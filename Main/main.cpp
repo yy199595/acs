@@ -12,7 +12,7 @@
 #include"Component/Gate/GateService.h"
 #include<Component/Telnet/ConsoleComponent.h>
 #include<Component/Rpc/RpcHandlerComponent.h>
-#include<Component/Scene/ThreadPoolComponent.h>
+#include<Component/Scene/NetThreadComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
 #include"Component/Logic/RegistryService.h"
@@ -43,7 +43,7 @@ void RegisterComponent()
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
-    ComponentFactory::Add<ThreadPoolComponent>("ThreadPoolComponent");
+    ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");

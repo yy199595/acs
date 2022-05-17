@@ -20,7 +20,6 @@ namespace Sentry
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
-		this->LoadSoFile("/Users/mac/yjz/Sentry/Libs/lib");
 		LOG_CHECK_RET(this->LoadAllFile());
 	}
 
@@ -129,28 +128,6 @@ namespace Sentry
 					mLuaFileMd5s[name] = md5;
 					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
 				}
-			}
-		}
-		return true;
-	}
-
-	bool LuaScriptComponent::LoadSoFile(const std::string& loadPath)
-	{
-		lua_getglobal(this->mLuaEnv, "package");
-		if (lua_istable(this->mLuaEnv, -1))
-		{
-			lua_getfield(this->mLuaEnv, -1, "cpath");
-			if (lua_isstring(this->mLuaEnv, -1))
-			{
-				const char * packagePath = lua_tostring(this->mLuaEnv, -1);
-				char buffer[2048] = { 0 };
-#ifdef defined(__WIN32__)
-				size_t size = sprintf_s(buffer, "%s;%s", packagePath, path.c_str());
-#else
-				size_t size = sprintf(buffer, "%s;%s/?.so", packagePath, loadPath.c_str());
-#endif
-				lua_pushlstring(this->mLuaEnv, buffer, size);
-				lua_setfield(this->mLuaEnv, -3, "cpath");
 			}
 		}
 		return true;

@@ -6,7 +6,7 @@
 #include"MonitorComponent.h"
 #include"Util/TimeHelper.h"
 #include"App/App.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	void MonitorComponent::Awake()
@@ -18,7 +18,7 @@ namespace Sentry
 
 	bool MonitorComponent::LateAwake()
 	{
-		this->mTaskComponent = this->GetComponent<ThreadPoolComponent>();
+		this->mTaskComponent = this->GetComponent<NetThreadComponent>();
 		this->mThread = new std::thread(&MonitorComponent::Update, this);
 		return true;
 	}

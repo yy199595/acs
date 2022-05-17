@@ -18,7 +18,7 @@ namespace Sentry
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LocalLuaServiceComponent::OnInitService(ServiceMethodRegister & methodRegister)
+	bool LocalLuaServiceComponent::OnStartService(ServiceMethodRegister & methodRegister)
 	{
 		std::vector<std::string> methods;
 		const char * tab = this->GetName().c_str();

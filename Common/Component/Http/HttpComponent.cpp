@@ -10,7 +10,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/StringHelper.h"
 #include"Component/Scene/LoggerComponent.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Network/Http/HttpHandlerClient.h"
 #include"Component/HttpService/HttpService.h"
@@ -25,7 +25,7 @@ namespace Sentry
 	bool HttpComponent::LateAwake()
 	{
 		this->mCorComponent = App::Get()->GetTaskComponent();
-		this->mThreadComponent = this->GetComponent<ThreadPoolComponent>();
+		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
 		return true;
 	}
 
@@ -37,21 +37,23 @@ namespace Sentry
 
 	void HttpComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
-		std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
-		std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->ReadHandlerContent();
-		LOG_CHECK_RET(httpRequestData);
-
+		std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->Read();
+		if(httpRequestData == nullptr)
+		{
+			return;
+		}
 		std::string host;
 		const std::string& url = httpRequestData->GetPath();
-		const ServiceConfig & serviceConfig = this->GetApp()->GetServiceConfig();
-		const HttpInterfaceConfig* httpConfig =serviceConfig.GetHttpIterfaceConfig(url);
+		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
+		const HttpInterfaceConfig* httpConfig = serviceConfig.GetHttpIterfaceConfig(url);
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
 #endif
+		std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
 		XCode code = this->Invoke(httpConfig, httpRequestData, jsonResponse);
 
 		jsonResponse->AddMember("code", code);
-		httpClient->Response(HttpStatus::OK, *jsonResponse);
+		httpClient->Writer(HttpStatus::OK, *jsonResponse);
 #ifdef __DEBUG__
 		LOG_INFO("==== http request handler ====");
 		LOG_INFO("url = " << httpRequestData->GetPath());
@@ -68,23 +70,22 @@ namespace Sentry
 	XCode HttpComponent::Invoke(const HttpInterfaceConfig* httpConfig, std::shared_ptr<HttpHandlerRequest> content,
 		std::shared_ptr<Json::Writer> response)
 	{
-		std::shared_ptr<Json::Writer> jsonWriter(new Json::Writer());
 		if (httpConfig == nullptr)
 		{
-			jsonWriter->AddMember("error", fmt::format("not find url : {0}", content->GetPath()));
+			response->AddMember("error", fmt::format("not find url : {0}", content->GetPath()));
 			return XCode::CallServiceNotFound;
 		}
 
 		if (httpConfig->Type != content->GetMethod())
 		{
-			jsonWriter->AddMember("error", fmt::format("user {0} call", httpConfig->Type));
+			response->AddMember("error", fmt::format("user {0} call", httpConfig->Type));
 			return XCode::HttpMethodNotFound;
 		}
 
 		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
 		if (!jsonReader->ParseJson(content->GetContent()))
 		{
-			jsonWriter->AddMember("error", "json parse error");
+			response->AddMember("error", "json parse error");
 			return XCode::ParseJsonFailure;
 		}
 		std::string ip;
@@ -94,7 +95,7 @@ namespace Sentry
 		HttpService* httpService = this->GetComponent<HttpService>(httpConfig->Service);
 		if (httpService == nullptr)
 		{
-			jsonWriter->AddMember("error", "not find handler component");
+			response->AddMember("error", "not find handler component");
 			return XCode::CallServiceNotFound;
 		}
 		const std::string& method = httpConfig->Method;

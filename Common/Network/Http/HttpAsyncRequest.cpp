@@ -9,6 +9,12 @@
 #include"Util/StringHelper.h"
 namespace Sentry
 {
+	HttpAsyncRequest::HttpAsyncRequest(const std::string& method)
+		: mMethod(method)
+	{
+
+	}
+
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
     {
         std::cmatch what;
@@ -28,55 +34,90 @@ namespace Sentry
         return false;
     }
 
-    bool HttpAsyncRequest::Get(const std::string &url)
-    {
-        if(!this->ParseUrl(url))
-        {
-            return false;
-        }
-        std::ostream os(&this->mSendStream);
-        os << "GET " << this->mPath << " " << HttpVersion << "\r\n";
-        os << "Host: " << this->mHost << "\r\n";
-        os << "Accept: */*\r\n";
-        os << "Connection: close\r\n\r\n";
-        return true;
-    }
-
-    bool HttpAsyncRequest::Post(const std::string &url, const std::string &content)
-    {
-        if(!this->ParseUrl(url))
-        {
-            return false;
-        }
-        std::ostream os(&this->mSendStream);
-        os << "POST " << this->mPath << " " << HttpVersion << "\r\n";
-        os << "Host:" << this->mHost << ":" << this->mPort << "\r\n";
-        os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
-        os << "Content-Length:" << content.size()<< "\r\n";
-        os << "Accept: */*\r\n";
-        os << "Connection:close\r\n\r\n";
-        os.write(content.c_str(), content.size());
-        return true;
-    }
-	bool HttpAsyncRequest::Post(const std::string& url, Json::Writer & json)
+	bool HttpAsyncRequest::AddHead(const std::string& key, int value)
 	{
-		if(!this->ParseUrl(url))
+		auto iter = this->mHeadMap.find(key);
+		if(iter != this->mHeadMap.end())
 		{
 			return false;
 		}
-		size_t length = json.GetJsonSize();
+		this->mHeadMap.emplace(key, std::to_string(value));
+		return true;
+	}
 
+	bool HttpAsyncRequest::AddHead(const std::string& key, const std::string& value)
+	{
+		auto iter = this->mHeadMap.find(key);
+		if(iter != this->mHeadMap.end())
+		{
+			return false;
+		}
+		this->mHeadMap.emplace(key, value);
+		return true;
+	}
+
+	asio::streambuf& HttpAsyncRequest::GetStream()
+	{
 		std::ostream os(&this->mSendStream);
-		os << "POST " << this->mPath << " " << HttpVersion << "\r\n";
-		os << "Host: " << this->mHost << ":" << this->mPort << "\r\n";
-		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
-		os << "Content-Length: " << length<< "\r\n";
-		os << "Accept: */*\r\n";
+		os << this->mMethod << " " << this->mPath << " " << HttpVersion << "\r\n";
+		os << "Host:" << this->mHost << "\r\n";
+		for(auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			const std::string & value = iter->second;
+			os << key << ':' << value << "\r\n";
+		}
 		os << "Connection: close\r\n\r\n";
-		return json.WriterStream(os);
+		this->WriteBody(os);
+		return this->mSendStream;
+	}
+}
+
+
+namespace Sentry
+{
+	HttpGetRequest::HttpGetRequest()
+		: HttpAsyncRequest("GET")
+	{
 
 	}
 
+	void HttpGetRequest::WriteBody(std::ostream& os)
+	{
+
+	}
+
+	std::shared_ptr<HttpGetRequest> HttpGetRequest::Create(const std::string& url)
+	{
+		std::shared_ptr<HttpGetRequest> request(new HttpGetRequest());
+		return request->ParseUrl(url) ? request : nullptr;
+	}
+}
+
+namespace Sentry
+{
+	HttpPostRequest::HttpPostRequest()
+		: HttpAsyncRequest("POST")
+	{
+
+	}
+
+	void HttpPostRequest::AddBody(const std::string& content)
+	{
+		this->mBody = content;
+		this->AddHead("content-length", (int)content.size());
+	}
+
+	void HttpPostRequest::WriteBody(std::ostream& os)
+	{
+		os.write(this->mBody.c_str(), this->mBody.size());
+	}
+
+	std::shared_ptr<HttpPostRequest> HttpPostRequest::Create(const std::string& url)
+	{
+		std::shared_ptr<HttpPostRequest> request(new HttpPostRequest());
+		return request->ParseUrl(url) ? request : nullptr;
+	}
 }
 
 namespace Sentry
@@ -111,19 +152,19 @@ namespace Sentry
                 {
                     size_t length = lineData.size() - pos - 2;
                     std::string key = lineData.substr(0, pos);
+					Helper::String::Tolower(key);
                     std::string val = lineData.substr(pos + 1, length);
                     this->mHeadMap.insert(std::make_pair(key, val));
                 }
             }
             if(this->mState == HttpDecodeState::Content)
             {
-                auto iter = this->mHeadMap.find("Content-Length");
-                if (iter == this->mHeadMap.end())
-                {
-                    return HttpStatus::LENGTH_REQUIRED;
-                }
-                const std::string &str = iter->second;
-                this->mContentLength = std::stol(str);
+				std::string len;
+				if(!this->GetHead("content-length", len))
+				{
+					return HttpStatus::LENGTH_REQUIRED;
+				}
+                this->mContentLength = std::stol(len);
             }
         }
         if(this->mState == HttpDecodeState::Content)
@@ -143,6 +184,17 @@ namespace Sentry
         }
         return HttpStatus::CONTINUE;
     }
+
+	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value)
+	{
+		auto iter = this->mHeadMap.find(key);
+		if(iter != this->mHeadMap.end())
+		{
+			value = iter->second;
+			return true;
+		}
+		return false;
+	}
 }
 
 namespace Sentry
@@ -209,13 +261,12 @@ namespace Sentry
                 }
                 else if(this->mMethod == "POST")
                 {
-                    auto iter = this->mHeadMap.find("content-length");
-                    if (iter == this->mHeadMap.end())
-                    {
-                        return HttpStatus::LENGTH_REQUIRED;
-                    }
-                    const std::string &str = iter->second;
-                    this->mContentLength = std::stol(str);
+					std::string len;
+					if(!this->GetHeadContent("content-length", len))
+					{
+						return HttpStatus::LENGTH_REQUIRED;
+					}
+                    this->mContentLength = std::stol(len);
                     if(this->mContentLength <= 0)
                     {
                         return HttpStatus::LENGTH_REQUIRED;
@@ -252,25 +303,21 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpHandlerResponse::HttpHandlerResponse(HttpStatus status)
+	void HttpHandlerResponse::Write(HttpStatus code, const std::string& content)
 	{
 		std::ostream os(&this->mStreamBuffer);
-		os << HttpVersion << ' ' << (int)status << ' ' << HttpStatusToString(status) << "\r\n";
-	}
-
-	void HttpHandlerResponse::AddValue(const std::string& content)
-	{
-		std::ostream os(&this->mStreamBuffer);
+		os << HttpVersion << ' ' << (int)code << ' ' << HttpStatusToString(code) << "\r\n";
 		os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
 		os << "Content-Length: " << content.size() << "\r\n";
 		os << "\r\n";
 		os.write(content.c_str(), content.size());
 	}
 
-	void HttpHandlerResponse::AddValue(Json::Writer& jsonWriter)
+	void HttpHandlerResponse::Write(HttpStatus code, Json::Writer& jsonWriter)
 	{
 		std::ostream os(&this->mStreamBuffer);
 		const std::string json = jsonWriter.ToJsonString();
+		os << HttpVersion << ' ' << (int)code << ' ' << HttpStatusToString(code) << "\r\n";
 		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
 		os << "Content-Length: " << json.size() << "\r\n";
 		os << "\r\n";

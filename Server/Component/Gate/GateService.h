@@ -21,7 +21,7 @@ namespace Sentry
 	 private:
 		bool LateAwake() final;
 		bool OnInitEvent(ServiceEventRegister &methodRegister) final;
-		bool OnInitService(ServiceMethodRegister & methodRegister) final;
+		bool OnStartService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		std::string mAddress;
 		class GateComponent * mGateComponent;

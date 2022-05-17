@@ -1197,7 +1197,7 @@ const int Push_Response::kHttpFieldNumber;
 Push_Response::Push_Response()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:sub.Push.Response)
+  // @@protoc_insertion_point(constructor:sub.Push.Writer)
 }
 Push_Response::Push_Response(const Push_Response& from)
   : ::google::protobuf::Message(),
@@ -1213,7 +1213,7 @@ Push_Response::Push_Response(const Push_Response& from)
   } else {
     http_ = nullptr;
   }
-  // @@protoc_insertion_point(copy_constructor:sub.Push.Response)
+  // @@protoc_insertion_point(copy_constructor:sub.Push.Writer)
 }
 
 void Push_Response::SharedCtor() {
@@ -1225,7 +1225,7 @@ void Push_Response::SharedCtor() {
 }
 
 Push_Response::~Push_Response() {
-  // @@protoc_insertion_point(destructor:sub.Push.Response)
+  // @@protoc_insertion_point(destructor:sub.Push.Writer)
   SharedDtor();
 }
 
@@ -1244,7 +1244,7 @@ const Push_Response& Push_Response::default_instance() {
 
 
 void Push_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:sub.Push.Response)
+// @@protoc_insertion_point(message_clear_start:sub.Push.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -1323,7 +1323,7 @@ bool Push_Response::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:sub.Push.Response)
+  // @@protoc_insertion_point(parse_start:sub.Push.Writer)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -1363,10 +1363,10 @@ bool Push_Response::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:sub.Push.Response)
+  // @@protoc_insertion_point(parse_success:sub.Push.Writer)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:sub.Push.Response)
+  // @@protoc_insertion_point(parse_failure:sub.Push.Writer)
   return false;
 #undef DO_
 }
@@ -1374,7 +1374,7 @@ failure:
 
 void Push_Response::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:sub.Push.Response)
+  // @@protoc_insertion_point(serialize_start:sub.Push.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1394,12 +1394,12 @@ void Push_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:sub.Push.Response)
+  // @@protoc_insertion_point(serialize_end:sub.Push.Writer)
 }
 
 ::google::protobuf::uint8* Push_Response::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:sub.Push.Response)
+  // @@protoc_insertion_point(serialize_to_array_start:sub.Push.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1421,12 +1421,12 @@ void Push_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:sub.Push.Response)
+  // @@protoc_insertion_point(serialize_to_array_end:sub.Push.Writer)
   return target;
 }
 
 size_t Push_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:sub.Push.Response)
+// @@protoc_insertion_point(message_byte_size_start:sub.Push.Writer)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1458,22 +1458,22 @@ size_t Push_Response::ByteSizeLong() const {
 }
 
 void Push_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:sub.Push.Response)
+// @@protoc_insertion_point(generalized_merge_from_start:sub.Push.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   const Push_Response* source =
       ::google::protobuf::DynamicCastToGenerated<Push_Response>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:sub.Push.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:sub.Push.Writer)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:sub.Push.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:sub.Push.Writer)
     MergeFrom(*source);
   }
 }
 
 void Push_Response::MergeFrom(const Push_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:sub.Push.Response)
+// @@protoc_insertion_point(class_specific_merge_from_start:sub.Push.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -1488,14 +1488,14 @@ void Push_Response::MergeFrom(const Push_Response& from) {
 }
 
 void Push_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:sub.Push.Response)
+// @@protoc_insertion_point(generalized_copy_from_start:sub.Push.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Push_Response::CopyFrom(const Push_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:sub.Push.Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:sub.Push.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);

@@ -2,7 +2,7 @@
 #include"App/App.h"
 #include<Thread/TaskThread.h>
 #include<Util/StringHelper.h>
-#include<Component/Scene/ThreadPoolComponent.h>
+#include<Component/Scene/NetThreadComponent.h>
 #include<Network/Listener/NetworkListener.h>
 namespace Sentry
 {
@@ -33,7 +33,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 			IAsioThread& netThread = App::Get()->GetTaskScheduler();
 #else
-			ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
+			NetThreadComponent * threadPoolComponent = this->GetComponent<NetThreadComponent>();
 			IAsioThread &netThread = threadPoolComponent->AllocateNetThread();
 #endif
 			if (listenConfig->Port != 0)

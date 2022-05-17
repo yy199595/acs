@@ -5,7 +5,7 @@
 #include<Define/CommonLogDef.h>
 #include<Thread/TaskThread.h>
 #include<Component/IComponent.h>
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	NetworkListener::NetworkListener(IAsioThread & t, const ListenConfig & config)
@@ -15,7 +15,7 @@ namespace Sentry
         this->mIsListen = false;
         this->mBindAcceptor = nullptr;
         this->mListenHandler = nullptr;
-		mTaskComponent = App::Get()->GetComponent<ThreadPoolComponent>();
+		mTaskComponent = App::Get()->GetComponent<NetThreadComponent>();
     }
 
 	NetworkListener::~NetworkListener()

@@ -35,7 +35,6 @@ namespace Sentry
 		std::shared_ptr<com::Rpc_Response> Await();
     private:
         const int mTimeout;
-        RpcHandlerComponent * mRpcComponent;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
 }

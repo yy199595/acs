@@ -14,6 +14,7 @@ namespace Sentry
 		LoggerComponent() = default;
 		~LoggerComponent() final = default;
 	 public:
+		void SaveAllLog();
 		void AddLog(spdlog::level::level_enum type, const std::string& log);
 	 protected:
 		void Awake() final;
@@ -26,6 +27,7 @@ namespace Sentry
 		static void AddDebugLog(const std::string& log);
 		static void AddFatalLog(const std::string& log);
 		static void AddWarningLog(const std::string& log);
+
 	 private:
 		int mLogSaveTime;
 		std::string mServerName;
@@ -37,7 +39,6 @@ namespace Sentry
 		std::shared_ptr<spdlog::logger> mDebugLog;
 		std::shared_ptr<spdlog::logger> mErrorLog;
 		std::shared_ptr<spdlog::logger> mFatalLog;
-		std::shared_ptr<spdlog::logger> mRecordLog;
 		std::shared_ptr<spdlog::logger> mWarningLog;
 #endif
 	};

@@ -27,7 +27,7 @@ namespace Sentry
 	 private:
 		bool OnStart() final;
 		std::shared_ptr<MysqlClient> GetMysqlClient();
-		bool OnInitService(ServiceMethodRegister & methodRegister);
+		bool OnStartService(ServiceMethodRegister & methodRegister);
 	 private:
 		MysqlConfig mConfig;
 		MysqlHelper mHelper;

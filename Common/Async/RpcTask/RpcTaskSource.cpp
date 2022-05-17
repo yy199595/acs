@@ -4,8 +4,6 @@
 #include"Global/ServiceConfig.h"
 #endif
 
-
-
 namespace Sentry
 {
     void RpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)

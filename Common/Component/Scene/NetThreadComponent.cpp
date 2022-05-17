@@ -1,10 +1,10 @@
-﻿#include "ThreadPoolComponent.h"
+﻿#include "NetThreadComponent.h"
 #include "Util/Guid.h"
 #include "App/App.h"
 #include "Method/MethodProxy.h"
 namespace Sentry
 {
-	void ThreadPoolComponent::Awake()
+	void NetThreadComponent::Awake()
 	{
 		this->mIndex = 0;
 		int taskCount = 0;
@@ -24,7 +24,7 @@ namespace Sentry
 		}
 	}
 
-	bool ThreadPoolComponent::LateAwake()
+	bool NetThreadComponent::LateAwake()
 	{
 #ifndef ONLY_MAIN_THREAD
 		for (auto taskThread: this->mNetThreads)
@@ -39,7 +39,7 @@ namespace Sentry
 		return true;
 	}
 
-	void ThreadPoolComponent::OnDestory()
+	void NetThreadComponent::OnDestory()
 	{
 		for (IThread* thread : this->mThreadArray)
 		{
@@ -49,7 +49,7 @@ namespace Sentry
 		this->mThreadArray.clear();
 	}
 
-	void ThreadPoolComponent::GetAllThread(std::vector<const IThread*>& threads)
+	void NetThreadComponent::GetAllThread(std::vector<const IThread*>& threads)
 	{
 		threads.clear();
 		MainTaskScheduler& mainTask = App::Get()->GetTaskScheduler();
@@ -66,7 +66,7 @@ namespace Sentry
 		threads.emplace_back(&mainTask);
 	}
 #ifndef ONLY_MAIN_THREAD
-	IAsioThread & ThreadPoolComponent::AllocateNetThread()
+	IAsioThread & NetThreadComponent::AllocateNetThread()
 	{
 		std::lock_guard<std::mutex> lock(this->mLock);
 		if (this->mIndex >= mNetThreads.size())
@@ -77,7 +77,7 @@ namespace Sentry
 	}
 #endif
 
-	bool ThreadPoolComponent::StartTask(TaskProxy* task)
+	bool NetThreadComponent::StartTask(TaskProxy* task)
 	{
 		if (task == nullptr)
 		{

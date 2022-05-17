@@ -20,7 +20,7 @@ namespace Sentry
 	 private:
 		bool mIsClose;
 		std::thread* mThread;
-		ThreadPoolComponent* mTaskComponent;
+		NetThreadComponent* mTaskComponent;
 	};
 }
 #endif //GameKeeper_DEAMONCOMPONENT_H

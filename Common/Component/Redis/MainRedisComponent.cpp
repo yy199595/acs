@@ -4,7 +4,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
@@ -31,7 +31,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
+		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
 		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
 		return true;
@@ -57,7 +57,9 @@ namespace Sentry
 	bool MainRedisComponent::OnStart()
 	{
 		this->mRedisClient = this->MakeRedisClient();
+#ifdef __DEBUG__
 		this->mDebugClient = this->MakeRedisClient();
+#endif
 		this->mSubRedisClient = this->MakeRedisClient();
 		if (this->mSubRedisClient == nullptr || this->mRedisClient == nullptr)
 		{
@@ -171,7 +173,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
 #else
-		ThreadPoolComponent * threadPoolComponent = this->GetComponent<ThreadPoolComponent>();
+		NetThreadComponent * threadPoolComponent = this->GetComponent<NetThreadComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
 		size_t count = 0;

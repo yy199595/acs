@@ -24,7 +24,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool HttpUserService::OnInitService(HttpServiceRegister& serviceRegister)
+	bool HttpUserService::OnStartService(HttpServiceRegister& serviceRegister)
 	{
 		serviceRegister.Bind("Login", &HttpUserService::Login);
 		serviceRegister.Bind("Register", &HttpUserService::Register);

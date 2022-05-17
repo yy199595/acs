@@ -44,7 +44,7 @@ namespace Sentry
 		const ListenConfig & mConfig;
 		AsioTcpAcceptor* mBindAcceptor;
 		ISocketListen* mListenHandler;
-		ThreadPoolComponent* mTaskComponent;
+		NetThreadComponent* mTaskComponent;
 		class MainTaskScheduler& mTaskScheduler;
 	};
 }

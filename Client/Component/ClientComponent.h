@@ -9,7 +9,7 @@ namespace Sentry
 {
     class TimerComponent;
     class HttpComponent;
-    class ThreadPoolComponent;
+    class NetThreadComponent;
 }
 namespace Client
 {

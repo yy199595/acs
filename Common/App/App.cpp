@@ -14,8 +14,8 @@ namespace Sentry
 
 	App::App(ServerConfig* config)
 			: Entity(0),
-			  mConfig(config), mStartTime(Helper::Time::GetNowMilTime()),
-			  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this))
+			  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this)),
+			  mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
 	{
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
@@ -28,7 +28,8 @@ namespace Sentry
 		if (!this->mConfig->GetMember("path", "service", path)
 			|| !this->mRpcConfig.LoadConfig(path))
 		{
-			throw std::logic_error("load service config failure");
+			CONSOLE_LOG_ERROR("load service config failure");
+			return false;
 		}
 
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
@@ -42,7 +43,7 @@ namespace Sentry
 			{
 				if (!this->AddComponentByName(name))
 				{
-					LOG_ERROR("add " << name << " failure");
+					CONSOLE_LOG_ERROR("add " << name << " failure");
 					return false;
 				}
 			}
@@ -53,7 +54,7 @@ namespace Sentry
 		{
 			if (!this->AddComponentByName(name))
 			{
-				LOG_ERROR("add " << name << " failure");
+				CONSOLE_LOG_ERROR("add " << name << " failure");
 				return false;
 			}
 		}
@@ -64,6 +65,7 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (!this->InitComponent(component))
 			{
+				CONSOLE_LOG_ERROR("Init " << name << " failure");
 				return false;
 			}
 		}
@@ -75,16 +77,23 @@ namespace Sentry
 		Component* component = ComponentFactory::CreateComponent(name);
 		if (component != nullptr)
 		{
-			return this->AddComponent(name, component);
+			if(!this->AddComponent(name, component))
+			{
+				CONSOLE_LOG_ERROR("add component " << name << " failure");
+				return false;
+			}
+			return true;
 		}
 		LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
 		if(luaScriptComponent != nullptr)
 		{
 			lua_State * luaState = luaScriptComponent->GetLuaEnv();
-			if(Lua::Table::Get(luaState, name))
+			if(!Lua::Table::Get(luaState, name))
 			{
-				return this->AddComponent(name, new LocalLuaServiceComponent());
+				CONSOLE_LOG_ERROR("not find lua table : " << name);
+				return false;
 			}
+			return this->AddComponent(name, new LocalLuaServiceComponent());
 		}
 		// 其他语言
 		return false;
@@ -115,9 +124,16 @@ namespace Sentry
 		IF_THROW_ERROR(this->mConfig->LoadConfig());
 		this->mServerName = this->mConfig->GetNodeName();
 
-		IF_THROW_ERROR(this->LoadComponent());
-		IF_THROW_ERROR(this->StartNewComponent());
-
+		if(!this->LoadComponent())
+		{
+			this->GetLogger()->SaveAllLog();
+			return -1;
+		}
+		if(!this->StartNewComponent())
+		{
+			this->GetLogger()->SaveAllLog();
+			return -2;
+		}
 		this->mFps = 15;
 		mConfig->GetMember("fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
@@ -229,7 +245,7 @@ namespace Sentry
 		for (const std::string& name: components)
 		{
 			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
-			if (localServerRpc != nullptr && !localServerRpc->LoadService())
+			if (localServerRpc != nullptr && !localServerRpc->StartService())
 			{
 				LOG_ERROR(name << " load failure");
 				return false;
@@ -289,7 +305,7 @@ namespace Sentry
 		IServiceBase* serviceBase = component->Cast<IServiceBase>();
 		if (serviceBase != nullptr && !serviceBase->IsStartService())
 		{
-			LOG_CHECK_RET_FALSE(serviceBase->LoadService());
+			LOG_CHECK_RET_FALSE(serviceBase->StartService());
 
 			IStart* start = component->Cast<IStart>();
 			IComplete* complete = component->Cast<IComplete>();
@@ -310,11 +326,11 @@ namespace Sentry
 	}
 	void App::OnAddNewService(Component* component)
 	{
-		std::vector<std::string> components;
+		std::vector<Component *> components;
 		this->GetComponents(components);
-		for(const std::string & name : components)
+		for(Component * component1 : components)
 		{
-			IServiceChange * serviceChange = this->GetComponent<IServiceChange>(name);
+			IServiceChange * serviceChange = component1->Cast<IServiceChange>();
 			if(serviceChange != nullptr)
 			{
 				serviceChange->OnAddService(component);

@@ -3,13 +3,13 @@
 //
 
 #include"DataRedisComponent.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	bool DataRedisComponent::LateAwake()
 	{
 		this->GetConfig().GetRedisConfigs(this->mRedisConfigs);
-		LOG_CHECK_RET_FALSE(this->GetComponent<ThreadPoolComponent>());
+		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
 		return this->mRedisConfigs.size() >= 2;
 	}
 

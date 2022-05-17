@@ -23,25 +23,55 @@ namespace Sentry
 {
     class HttpAsyncRequest : public IHttpStream
     {
+	public:
+		HttpAsyncRequest(const std::string&  method);
+	public:
+		bool AddHead(const std::string & key, int value);
+		bool AddHead(const std::string & key, const std::string & value);
     public:
-        bool Get(const std::string & url);
-		bool Post(const std::string & url, Json::Writer & json);
-		bool Post(const std::string & url, const std::string & content);
-
-    public:
-        const std::string & GetHost() { return this->mHost;}
+		asio::streambuf & GetStream()  final;
+		const std::string & GetHost() { return this->mHost;}
         const std::string & GetPort() { return this->mPort;}
-        asio::streambuf & GetStream()  final { return this->mSendStream;}
-    private:
-        bool ParseUrl(const std::string & url);
-    private:
-        std::string mUrl;
+	protected:
+		bool ParseUrl(const std::string & url);
+		virtual void WriteBody(std::ostream & os) = 0;
+	private:
         std::string mHost;
         std::string mPort;
         std::string mPath;
+		const std::string mMethod;
         asio::streambuf mSendStream;
         std::unordered_map<std::string, std::string> mHeadMap;
     };
+}
+
+namespace Sentry
+{
+	class HttpGetRequest : public HttpAsyncRequest
+	{
+	public:
+		HttpGetRequest();
+	public:
+		static std::shared_ptr<HttpGetRequest> Create(const std::string & url);
+	protected:
+		void WriteBody(std::ostream & os) final;
+	};
+}
+
+namespace Sentry
+{
+	class HttpPostRequest : public HttpAsyncRequest
+	{
+	public:
+		HttpPostRequest();
+	public:
+		void AddBody(const std::string & content);
+		static std::shared_ptr<HttpPostRequest> Create(const std::string & url);
+	protected:
+		void WriteBody(std::ostream & os) final;
+	private:
+		std::string mBody;
+	};
 }
 
 namespace Sentry
@@ -71,6 +101,8 @@ namespace Sentry
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() final { return this->mContent;}
+	public:
+		bool GetHead(const std::string & key, std::string & value);
     private:
         int mHttpCode;
         std::string mContent;
@@ -113,14 +145,11 @@ namespace Sentry
 	class HttpHandlerResponse : public IHttpStream
 	{
 	 public:
-		HttpHandlerResponse(HttpStatus code);
+		HttpHandlerResponse() = default;
 	 public:
-		void AddValue(const std::string& content);
-		void AddValue(Json::Writer& jsonWriter);
-		asio::streambuf& GetStream() final
-		{
-			return this->mStreamBuffer;
-		}
+		void Write(HttpStatus code, Json::Writer & content);
+		void Write(HttpStatus code, const std::string & content);
+		asio::streambuf& GetStream() final { return this->mStreamBuffer; }
 	 private:
 		asio::streambuf mStreamBuffer;
 	};

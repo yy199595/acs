@@ -15,7 +15,7 @@ namespace Sentry
 	 public:
 		bool OnStart() final;
 		bool LateAwake() final;
-		bool OnInitService(ServiceMethodRegister & methodRegister) final;
+		bool OnStartService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		lua_State* mLuaEnv;
 		class LuaScriptComponent* mLuaComponent;

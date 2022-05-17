@@ -17,7 +17,8 @@ namespace Sentry
 	protected:
 		void Awake();
 		bool SubUserEvent();
-		virtual bool OnInitService(ServiceMethodRegister & methodRegister) = 0;
+		virtual void OnCloseService() { }
+		virtual bool OnStartService(ServiceMethodRegister & methodRegister) = 0;
 		virtual bool OnInitEvent(ServiceEventRegister & methodRegister) { return true;};
 	public:
 		XCode Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json);
@@ -32,7 +33,8 @@ namespace Sentry
 		bool IsStartComplete() final { return !this->mAddressList.empty(); }
 	public:
 		bool LoadEvent();
-		bool LoadService() final;
+		bool StartService() final;
+		bool CloseService() final;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
 	private:
 		bool OnUserJoin(const Json::Reader & jsonReader);

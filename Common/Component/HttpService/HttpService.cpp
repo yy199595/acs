@@ -30,10 +30,10 @@ namespace Sentry
 		}
 		return method->Invoke(request, response);
 	}
-	bool HttpService::LoadService()
+	bool HttpService::StartService()
 	{
 		this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
-		return this->OnInitService(*this->mServiceRegister);
+		return this->OnStartService(*this->mServiceRegister);
 	}
 
 	XCode HttpService::Get(const std::string& path, std::shared_ptr<Json::Reader> response)
@@ -77,5 +77,10 @@ namespace Sentry
 		}
 		XCode code = XCode::Failure;
 		return response->GetMember("code", code) ? code : XCode::Failure;
+	}
+
+	bool HttpService::CloseService()
+	{
+		return false;
 	}
 }

@@ -20,7 +20,7 @@ namespace Sentry
 		void Awake() final;
 		bool LateAwake() final;
 		void OnAllServiceStart() final;
-		bool OnInitService(HttpServiceRegister &serviceRegister) final;
+		bool OnStartService(HttpServiceRegister &serviceRegister) final;
 	 private:
 		XCode Login(const Json::Reader& request, Json::Writer& response);
 

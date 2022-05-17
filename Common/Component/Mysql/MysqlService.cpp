@@ -1,11 +1,11 @@
 ﻿#include"MysqlService.h"
 #include"App/App.h"
 #include"Pool/MessagePool.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 
-	bool MysqlService::OnInitService(ServiceMethodRegister & methodRegister)
+	bool MysqlService::OnStartService(ServiceMethodRegister & methodRegister)
 	{
 		methodRegister.Bind("Add", &MysqlService::Add);
 		methodRegister.Bind("Save", &MysqlService::Save);

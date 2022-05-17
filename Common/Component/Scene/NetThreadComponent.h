@@ -8,11 +8,11 @@ namespace Sentry
 {
 	class TaskProxy;
 
-	class ThreadPoolComponent : public Component
+	class NetThreadComponent : public Component
 	{
 	 public:
-		ThreadPoolComponent() = default;
-		~ThreadPoolComponent() final = default;
+		NetThreadComponent() = default;
+		~NetThreadComponent() final = default;
 
 	 public:
 		void Awake() final;

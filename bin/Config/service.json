@@ -83,9 +83,6 @@
             "Request":"sub.Del.Request"
         }
     },
-    "UserInfoSyncService": {
-
-    },
     "HttpUserService": {
         "Login": {
             "Type": "POST",

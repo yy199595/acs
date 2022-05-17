@@ -4,7 +4,7 @@
 namespace Sentry
 {
 
-    class ThreadPoolComponent;
+    class NetThreadComponent;
     class TaskComponent;
 
     class TaskProxy
@@ -13,7 +13,7 @@ namespace Sentry
         TaskProxy();
         virtual ~TaskProxy() = default;
     public:
-		friend class ThreadPoolComponent;
+		friend class NetThreadComponent;
         virtual bool Run() = 0; //在线程池执行的任务
 		virtual void RunFinish() { };
 	public:

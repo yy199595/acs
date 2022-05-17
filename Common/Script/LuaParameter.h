@@ -61,7 +61,6 @@ namespace Lua
 		inline typename std::enable_if<std::is_enum<T>::value, void>::type
 		Write(lua_State* lua, T data)
 		{
-			typedef typename ConstParameter::ConstProxy<T>::Type Type;
 			CommonParameter::Write<int>(lua, (int)data);
 		}
 
@@ -69,7 +68,7 @@ namespace Lua
 		inline typename std::enable_if<std::is_enum<T>::value, T>::type
 		Read(lua_State* lua, int index)
 		{
-			return CommonParameter::Read<int>(lua, index);
+			return (T)CommonParameter::Read<int>(lua, index);
 		}
 	}// namespace Parameter
 

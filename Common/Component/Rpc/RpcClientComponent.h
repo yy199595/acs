@@ -34,7 +34,7 @@ namespace Sentry
 		bool Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message);
 	 private:
 		class RpcHandlerComponent* mRpcComponent;
-		class ThreadPoolComponent* mTaskComponent;
+		class NetThreadComponent* mTaskComponent;
 		std::unordered_map<std::string, std::shared_ptr<ServerRpcClientContext>> mRpcClientMap;
 	};
 }

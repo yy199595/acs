@@ -20,10 +20,11 @@ namespace Sentry
 		XCode Get(const std::string & path, std::shared_ptr<Json::Reader> response);
 		XCode Post(const std::string & path, Json::Writer & json, std::shared_ptr<Json::Reader> response);
 	 protected:
-		bool LoadService() final;
+		bool StartService() final;
+		bool CloseService() final;
 		bool LateAwake() override;
 		bool IsStartComplete() final { return true; }
-		virtual bool OnInitService(HttpServiceRegister & serviceRegister) = 0;
+		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 	 public:
 		void OnAddAddress(const std::string &address) final;

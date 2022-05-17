@@ -10,7 +10,7 @@
 
 namespace Sentry
 {
-	class ThreadPoolComponent;
+	class NetThreadComponent;
 
 	class MainRedisComponent final : public Component, public IStart
 	{
@@ -60,7 +60,6 @@ namespace Sentry
 		std::shared_ptr<RedisClientContext> mSubRedisClient;
 		std::unordered_map<std::string, std::string> mLuaCommandMap;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
-		std::unordered_map<long long, std::shared_ptr<TaskSource<std::shared_ptr<Json::Reader>>>> mPublishTasks;
 	};
 }
 

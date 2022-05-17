@@ -135,6 +135,7 @@ namespace Sentry
 		return true;
 	}
 
+
 	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
 	    std::shared_ptr<com::Rpc::Response> response)
 	{
@@ -161,10 +162,10 @@ namespace Sentry
 		}
 	}
 
-	bool LocalServiceComponent::LoadService()
+	bool LocalServiceComponent::StartService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
-		if (!this->OnInitService(*this->mMethodRegister))
+		if (!this->OnStartService(*this->mMethodRegister))
 		{
 			return false;
 		}
@@ -175,6 +176,16 @@ namespace Sentry
 			return this->mMethodRegister->LoadLuaMethod(lua);
 		}
 		return true;
+	}
+
+	bool LocalServiceComponent::CloseService()
+	{
+		if(this->IsStartService())
+		{
+			std::move(this->mMethodRegister);
+			return true;
+		}
+		return false;
 	}
 
 	bool LocalServiceComponent::AllotAddress(string& address)

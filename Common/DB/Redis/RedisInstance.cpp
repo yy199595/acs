@@ -3,7 +3,7 @@
 //
 
 #include "RedisInstance.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	RedisInstance::RedisInstance(const RedisConfig * config)
@@ -32,7 +32,7 @@ namespace Sentry
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
 #else
 
-		ThreadPoolComponent * threadPoolComponent = App::Get()->GetComponent<ThreadPoolComponent>();
+		NetThreadComponent * threadPoolComponent = App::Get()->GetComponent<NetThreadComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
 		const std::string& ip = this->mConfig->Ip;

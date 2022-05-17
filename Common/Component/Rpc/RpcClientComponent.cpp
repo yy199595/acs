@@ -5,7 +5,7 @@
 #include"Network/SocketProxy.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 
 #ifdef __DEBUG__
 #include"Pool/MessagePool.h"
@@ -21,7 +21,7 @@ namespace Sentry
 	bool RpcClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcHandlerComponent>());
-		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<ThreadPoolComponent>());
+		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<NetThreadComponent>());
 		return true;
 	}
 

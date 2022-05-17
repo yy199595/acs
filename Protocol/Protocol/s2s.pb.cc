@@ -2755,7 +2755,7 @@ const int Mysql_Response::kJsonArrayFieldNumber;
 Mysql_Response::Mysql_Response()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:s2s.Mysql.Response)
+  // @@protoc_insertion_point(constructor:s2s.Mysql.Writer)
 }
 Mysql_Response::Mysql_Response(const Mysql_Response& from)
   : ::google::protobuf::Message(),
@@ -2766,7 +2766,7 @@ Mysql_Response::Mysql_Response(const Mysql_Response& from)
   if (from.error().size() > 0) {
     error_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_);
   }
-  // @@protoc_insertion_point(copy_constructor:s2s.Mysql.Response)
+  // @@protoc_insertion_point(copy_constructor:s2s.Mysql.Writer)
 }
 
 void Mysql_Response::SharedCtor() {
@@ -2776,7 +2776,7 @@ void Mysql_Response::SharedCtor() {
 }
 
 Mysql_Response::~Mysql_Response() {
-  // @@protoc_insertion_point(destructor:s2s.Mysql.Response)
+  // @@protoc_insertion_point(destructor:s2s.Mysql.Writer)
   SharedDtor();
 }
 
@@ -2794,7 +2794,7 @@ const Mysql_Response& Mysql_Response::default_instance() {
 
 
 void Mysql_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(message_clear_start:s2s.Mysql.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -2839,7 +2839,7 @@ const char* Mysql_Response::_InternalParse(const char* begin, const char* end, v
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Response.json_array");
+          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Writer.json_array");
           object = msg->add_json_array();
           if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
             parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -2880,7 +2880,7 @@ bool Mysql_Response::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:s2s.Mysql.Response)
+  // @@protoc_insertion_point(parse_start:s2s.Mysql.Writer)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -2894,7 +2894,7 @@ bool Mysql_Response::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->error().data(), static_cast<int>(this->error().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.Mysql.Response.error"));
+            "s2s.Mysql.Writer.error"));
         } else {
           goto handle_unusual;
         }
@@ -2910,7 +2910,7 @@ bool Mysql_Response::MergePartialFromCodedStream(
             this->json_array(this->json_array_size() - 1).data(),
             static_cast<int>(this->json_array(this->json_array_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.Mysql.Response.json_array"));
+            "s2s.Mysql.Writer.json_array"));
         } else {
           goto handle_unusual;
         }
@@ -2929,10 +2929,10 @@ bool Mysql_Response::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:s2s.Mysql.Response)
+  // @@protoc_insertion_point(parse_success:s2s.Mysql.Writer)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:s2s.Mysql.Response)
+  // @@protoc_insertion_point(parse_failure:s2s.Mysql.Writer)
   return false;
 #undef DO_
 }
@@ -2940,7 +2940,7 @@ failure:
 
 void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:s2s.Mysql.Response)
+  // @@protoc_insertion_point(serialize_start:s2s.Mysql.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -2949,7 +2949,7 @@ void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->error().data(), static_cast<int>(this->error().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Response.error");
+      "s2s.Mysql.Writer.error");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->error(), output);
   }
@@ -2959,7 +2959,7 @@ void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->json_array(i).data(), static_cast<int>(this->json_array(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Response.json_array");
+      "s2s.Mysql.Writer.json_array");
     ::google::protobuf::internal::WireFormatLite::WriteString(
       2, this->json_array(i), output);
   }
@@ -2968,12 +2968,12 @@ void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:s2s.Mysql.Response)
+  // @@protoc_insertion_point(serialize_end:s2s.Mysql.Writer)
 }
 
 ::google::protobuf::uint8* Mysql_Response::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:s2s.Mysql.Response)
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.Mysql.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -2982,7 +2982,7 @@ void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->error().data(), static_cast<int>(this->error().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Response.error");
+      "s2s.Mysql.Writer.error");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->error(), target);
@@ -2993,7 +2993,7 @@ void Mysql_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->json_array(i).data(), static_cast<int>(this->json_array(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Response.json_array");
+      "s2s.Mysql.Writer.json_array");
     target = ::google::protobuf::internal::WireFormatLite::
       WriteStringToArray(2, this->json_array(i), target);
   }
@@ -3002,12 +3002,12 @@ void Mysql_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:s2s.Mysql.Response)
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.Mysql.Writer)
   return target;
 }
 
 size_t Mysql_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(message_byte_size_start:s2s.Mysql.Writer)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3040,22 +3040,22 @@ size_t Mysql_Response::ByteSizeLong() const {
 }
 
 void Mysql_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.Mysql.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   const Mysql_Response* source =
       ::google::protobuf::DynamicCastToGenerated<Mysql_Response>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Mysql.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Mysql.Writer)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Mysql.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Mysql.Writer)
     MergeFrom(*source);
   }
 }
 
 void Mysql_Response::MergeFrom(const Mysql_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Mysql.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -3069,14 +3069,14 @@ void Mysql_Response::MergeFrom(const Mysql_Response& from) {
 }
 
 void Mysql_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.Mysql.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Mysql_Response::CopyFrom(const Mysql_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Mysql.Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Mysql.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -3670,7 +3670,7 @@ const int Allot_Response::kAddressFieldNumber;
 Allot_Response::Allot_Response()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:s2s.Allot.Response)
+  // @@protoc_insertion_point(constructor:s2s.Allot.Writer)
 }
 Allot_Response::Allot_Response(const Allot_Response& from)
   : ::google::protobuf::Message(),
@@ -3680,7 +3680,7 @@ Allot_Response::Allot_Response(const Allot_Response& from)
   if (from.address().size() > 0) {
     address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
   }
-  // @@protoc_insertion_point(copy_constructor:s2s.Allot.Response)
+  // @@protoc_insertion_point(copy_constructor:s2s.Allot.Writer)
 }
 
 void Allot_Response::SharedCtor() {
@@ -3690,7 +3690,7 @@ void Allot_Response::SharedCtor() {
 }
 
 Allot_Response::~Allot_Response() {
-  // @@protoc_insertion_point(destructor:s2s.Allot.Response)
+  // @@protoc_insertion_point(destructor:s2s.Allot.Writer)
   SharedDtor();
 }
 
@@ -3708,7 +3708,7 @@ const Allot_Response& Allot_Response::default_instance() {
 
 
 void Allot_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:s2s.Allot.Response)
+// @@protoc_insertion_point(message_clear_start:s2s.Allot.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -3735,7 +3735,7 @@ const char* Allot_Response::_InternalParse(const char* begin, const char* end, v
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("s2s.Allot.Response.address");
+        ctx->extra_parse_data().SetFieldName("s2s.Allot.Writer.address");
         object = msg->mutable_address();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -3774,7 +3774,7 @@ bool Allot_Response::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:s2s.Allot.Response)
+  // @@protoc_insertion_point(parse_start:s2s.Allot.Writer)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -3788,7 +3788,7 @@ bool Allot_Response::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->address().data(), static_cast<int>(this->address().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.Allot.Response.address"));
+            "s2s.Allot.Writer.address"));
         } else {
           goto handle_unusual;
         }
@@ -3807,10 +3807,10 @@ bool Allot_Response::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:s2s.Allot.Response)
+  // @@protoc_insertion_point(parse_success:s2s.Allot.Writer)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:s2s.Allot.Response)
+  // @@protoc_insertion_point(parse_failure:s2s.Allot.Writer)
   return false;
 #undef DO_
 }
@@ -3818,7 +3818,7 @@ failure:
 
 void Allot_Response::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:s2s.Allot.Response)
+  // @@protoc_insertion_point(serialize_start:s2s.Allot.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3827,7 +3827,7 @@ void Allot_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->address().data(), static_cast<int>(this->address().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Allot.Response.address");
+      "s2s.Allot.Writer.address");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->address(), output);
   }
@@ -3836,12 +3836,12 @@ void Allot_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:s2s.Allot.Response)
+  // @@protoc_insertion_point(serialize_end:s2s.Allot.Writer)
 }
 
 ::google::protobuf::uint8* Allot_Response::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:s2s.Allot.Response)
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.Allot.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -3850,7 +3850,7 @@ void Allot_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->address().data(), static_cast<int>(this->address().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Allot.Response.address");
+      "s2s.Allot.Writer.address");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->address(), target);
@@ -3860,12 +3860,12 @@ void Allot_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:s2s.Allot.Response)
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.Allot.Writer)
   return target;
 }
 
 size_t Allot_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:s2s.Allot.Response)
+// @@protoc_insertion_point(message_byte_size_start:s2s.Allot.Writer)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3890,22 +3890,22 @@ size_t Allot_Response::ByteSizeLong() const {
 }
 
 void Allot_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:s2s.Allot.Response)
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.Allot.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   const Allot_Response* source =
       ::google::protobuf::DynamicCastToGenerated<Allot_Response>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Allot.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Allot.Writer)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Allot.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Allot.Writer)
     MergeFrom(*source);
   }
 }
 
 void Allot_Response::MergeFrom(const Allot_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Allot.Response)
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Allot.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -3918,14 +3918,14 @@ void Allot_Response::MergeFrom(const Allot_Response& from) {
 }
 
 void Allot_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:s2s.Allot.Response)
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.Allot.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Allot_Response::CopyFrom(const Allot_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Allot.Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Allot.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -4546,14 +4546,14 @@ const int GateBroadCast_Response::kCountFieldNumber;
 GateBroadCast_Response::GateBroadCast_Response()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(constructor:s2s.GateBroadCast.Writer)
 }
 GateBroadCast_Response::GateBroadCast_Response(const GateBroadCast_Response& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   count_ = from.count_;
-  // @@protoc_insertion_point(copy_constructor:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(copy_constructor:s2s.GateBroadCast.Writer)
 }
 
 void GateBroadCast_Response::SharedCtor() {
@@ -4561,7 +4561,7 @@ void GateBroadCast_Response::SharedCtor() {
 }
 
 GateBroadCast_Response::~GateBroadCast_Response() {
-  // @@protoc_insertion_point(destructor:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(destructor:s2s.GateBroadCast.Writer)
   SharedDtor();
 }
 
@@ -4578,7 +4578,7 @@ const GateBroadCast_Response& GateBroadCast_Response::default_instance() {
 
 
 void GateBroadCast_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(message_clear_start:s2s.GateBroadCast.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -4628,7 +4628,7 @@ bool GateBroadCast_Response::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(parse_start:s2s.GateBroadCast.Writer)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -4659,10 +4659,10 @@ bool GateBroadCast_Response::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(parse_success:s2s.GateBroadCast.Writer)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(parse_failure:s2s.GateBroadCast.Writer)
   return false;
 #undef DO_
 }
@@ -4670,7 +4670,7 @@ failure:
 
 void GateBroadCast_Response::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(serialize_start:s2s.GateBroadCast.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -4683,12 +4683,12 @@ void GateBroadCast_Response::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(serialize_end:s2s.GateBroadCast.Writer)
 }
 
 ::google::protobuf::uint8* GateBroadCast_Response::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.GateBroadCast.Writer)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -4701,12 +4701,12 @@ void GateBroadCast_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.GateBroadCast.Writer)
   return target;
 }
 
 size_t GateBroadCast_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(message_byte_size_start:s2s.GateBroadCast.Writer)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4731,22 +4731,22 @@ size_t GateBroadCast_Response::ByteSizeLong() const {
 }
 
 void GateBroadCast_Response::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.GateBroadCast.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   const GateBroadCast_Response* source =
       ::google::protobuf::DynamicCastToGenerated<GateBroadCast_Response>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.GateBroadCast.Writer)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.GateBroadCast.Response)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.GateBroadCast.Writer)
     MergeFrom(*source);
   }
 }
 
 void GateBroadCast_Response::MergeFrom(const GateBroadCast_Response& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.GateBroadCast.Writer)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -4758,14 +4758,14 @@ void GateBroadCast_Response::MergeFrom(const GateBroadCast_Response& from) {
 }
 
 void GateBroadCast_Response::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.GateBroadCast.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void GateBroadCast_Response::CopyFrom(const GateBroadCast_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:s2s.GateBroadCast.Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.GateBroadCast.Writer)
   if (&from == this) return;
   Clear();
   MergeFrom(from);

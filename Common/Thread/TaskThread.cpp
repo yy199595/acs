@@ -1,7 +1,7 @@
 ﻿#include "TaskThread.h"
 #include"Util/TimeHelper.h"
 #include"Method/MethodProxy.h"
-#include"Component/Scene/ThreadPoolComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 
 using namespace std::chrono;
 

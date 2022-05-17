@@ -17,15 +17,17 @@ namespace Sentry
     bool TaskSourceBase::ResumeTask(TaskState state)
     {
         switch(this->mState)
-        {
-            case TaskState::TaskReady:
-                this->mState = state;
-                return true;
-            case TaskState::TaskAwait:
-                this->mState = state;
-                this->mTaskComponent->Resume(this->mCorId);
-                return true;
-        }
+		{
+		case TaskState::TaskReady:
+			this->mState = state;
+			return true;
+		case TaskState::TaskAwait:
+			this->mState = state;
+			this->mTaskComponent->Resume(this->mCorId);
+			return true;
+		case TaskState::TaskFinish:
+			break;
+		}
         return false;
     }
 

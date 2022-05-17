@@ -37,7 +37,7 @@ namespace Sentry
 	{
 	 public:
 		StaticMethod0(F&& f, T* o)
-			: _func(std::forward<F>(f)), _o(o)
+			: _o(o), _func(std::forward<F>(f))
 		{
 		}
 
@@ -54,11 +54,11 @@ namespace Sentry
 	};
 
 	template<typename F, typename T, typename P>
-	class StaticMethod1 : public StaticMethod
+	class StaticMethod1 final : public StaticMethod
 	{
 	 public:
 		StaticMethod1(F&& f, T* o, P&& p)
-			: _func(std::forward<F>(f)), _o(o), _p(std::forward<P>(p))
+			: _o(o), _func(std::forward<F>(f)), _p(std::forward<P>(p))
 		{
 		}
 
@@ -80,7 +80,7 @@ namespace Sentry
 	{
 	 public:
 		StaticMethod2(F&& f, T* o, P1&& p1, P2&& p2)
-			: _func(std::forward<F>(f)), _o(o), _p1(std::forward<P1>(p1)),
+			: _o(o), _func(std::forward<F>(f)), _p1(std::forward<P1>(p1)),
 			  _p2(std::forward<P2>(p2))
 		{
 
@@ -105,7 +105,7 @@ namespace Sentry
 	{
 	 public:
 		StaticMethod3(F&& f, T* o, P1&& p1, P2&& p2, P3&& p3)
-			: _func(std::forward<F>(f)), _o(o), _p1(std::forward<P1>(p1)),
+			: _o(o), _func(std::forward<F>(f)), _p1(std::forward<P1>(p1)),
 			  _p2(std::forward<P2>(p2)), _p3(std::forward<P3>(p3))
 		{
 

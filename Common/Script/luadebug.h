@@ -34,8 +34,6 @@ namespace Lua
 				}
 			}
 		}
-		(L, 0);
-
 		return 0;
 	}
 

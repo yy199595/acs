@@ -9,23 +9,23 @@ namespace Sentry
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy)
 		: mSocket(socketProxy)
     {
+
     }
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Get(const std::string &url)
-    {
-        auto httpRequest = std::make_shared<HttpAsyncRequest>();
-        if (!httpRequest->Get(std::move(url)))
-        {
-            return nullptr;
-        }
-        return this->Request(httpRequest);
-    }
+	{
+		std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
+		if(httpRequest == nullptr)
+		{
+			return nullptr;
+		}
+		return this->Request(httpRequest);
+	}
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest)
     {
         const std::string & host = httpRequest->GetHost();
         const std::string & port = httpRequest->GetPort();
-        std::shared_ptr<TaskSource<XCode>> taskSource(new TaskSource<XCode>);
 #ifdef ONLY_MAIN_THREAD
         this->ConnectHost(host, port, taskSource);
         if(taskSource->Await() != XCode::Successful)
@@ -49,122 +49,128 @@ namespace Sentry
         return recvTaskSource->Await() ? httpContent : nullptr;
 #else
         IAsioThread & netWorkThread = this->mSocket->GetThread();
-        netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port, taskSource);
-        if(taskSource->Await() != XCode::Successful)
+		this->mConnectTask = std::make_shared<TaskSource<bool>>();
+        netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port);
+        if(!this->mConnectTask->Await())
         {
-            LOG_ERROR("connect http host " << host << ":" << port << " failure");
+            CONSOLE_LOG_ERROR("connect http host " << host << ":" << port << " failure");
             return nullptr;
         }
+		this->mWriteTask = std::make_shared<TaskSource<bool>>();
 		LOG_INFO("connect http host " << host << ":" << port << " successful");
-		std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
-        netWorkThread.Invoke(&HttpRequestClient::SendByStream, this, httpRequest, sendTaskSource);
-        if(!sendTaskSource->Await())
+        netWorkThread.Invoke(&HttpRequestClient::SendByStream, this, httpRequest);
+        if(!this->mWriteTask->Await())
         {
-            LOG_ERROR("send http get request failure");
+			CONSOLE_LOG_ERROR("send http get request failure");
             return nullptr;
         }
+		this->mReadTask = std::make_shared<TaskSource<bool>>();
         std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
-        std::shared_ptr<TaskSource<bool>> recvTaskSource(new TaskSource<bool>);
-        netWorkThread.Invoke(&HttpRequestClient::ReceiveHttpContent, this, recvTaskSource, httpContent);
-        return recvTaskSource->Await() ? httpContent : nullptr;
+        netWorkThread.Invoke(&HttpRequestClient::ReceiveHttpContent, this, httpContent);
+        return this->mReadTask->Await() ? httpContent : nullptr;
 #endif
     }
 
-    void HttpRequestClient::ReceiveHttpContent(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<IHttpContent> httpContent)
+    void HttpRequestClient::ReceiveHttpContent(std::shared_ptr<IHttpContent> httpContent)
     {
         AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
         asio::async_read(tcpSocket, this->mReadBuffer,
-                         asio::transfer_at_least(1),[this, taskSource, httpContent]
+                         asio::transfer_at_least(1),[this, httpContent]
             (const asio::error_code & code, size_t size)
         {
             if(code)
             {
-                taskSource->SetResult(false);
+				CONSOLE_LOG_ERROR(code.message());
+                this->mReadTask->SetResult(false);
                 return;
             }
             switch(httpContent->OnReceiveData(this->mReadBuffer))
             {
                 case HttpStatus::OK:
-                    taskSource->SetResult(true);
+					this->mReadTask->SetResult(true);
                     break;
                 case HttpStatus::CONTINUE:
-                    this->ReceiveHttpContent(taskSource, httpContent);
+                    this->ReceiveHttpContent(httpContent);
                     break;
                 default:
-                    taskSource->SetResult(false);
+					this->mReadTask->SetResult(false);
                     break;
             }
         });
     }
 
-    void HttpRequestClient::SendByStream(std::shared_ptr<IHttpStream> httpStream, std::shared_ptr<TaskSource<bool>> taskSource)
+    void HttpRequestClient::SendByStream(std::shared_ptr<IHttpStream> httpStream)
     {
         asio::streambuf & stream = httpStream->GetStream();
         AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-        asio::async_write(tcpSocket, stream, [this, taskSource]
+        asio::async_write(tcpSocket, stream, [this]
             (const asio::error_code & code, size_t size)
         {
             if(code)
             {
-                taskSource->SetResult(false);
+                this->mWriteTask->SetResult(false);
                 return;
             }
-            taskSource->SetResult(true);
+            this->mWriteTask->SetResult(true);
         });
     }
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const std::string &url, const std::string & content)
     {
-        std::shared_ptr<HttpAsyncRequest> httpRequest = std::make_shared<HttpAsyncRequest>();
-        if(!httpRequest->Post(url, content))
-        {
-            return nullptr;
-        }
-        return this->Request(httpRequest);
-    }
-	std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const string& url, Json::Writer& content)
-	{
-		auto httpRequest = std::make_shared<HttpAsyncRequest>();
-		if(!httpRequest->Post(url, content))
+        std::shared_ptr<HttpPostRequest> httpRequest = HttpPostRequest::Create(url);
+		if(httpRequest == nullptr)
 		{
 			return nullptr;
 		}
+        httpRequest->AddBody(content);
+        return this->Request(httpRequest);
+    }
+
+	std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const string& url, Json::Writer& content)
+	{
+		std::shared_ptr<HttpPostRequest> httpRequest = HttpPostRequest::Create(url);
+		if(httpRequest == nullptr)
+		{
+			return nullptr;
+		}
+		httpRequest->AddHead("Content-Type", "application/json");
+		httpRequest->AddBody(content.ToJsonString());
 		return this->Request(httpRequest);
 	}
 
-    void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port, std::shared_ptr<TaskSource<XCode>> taskSource)
+    void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port)
     {
         AsioContext & context = this->mSocket->GetContext();
         std::shared_ptr<asio::system_timer> connectTimer(new asio::system_timer(context, std::chrono::seconds(5)));
-        connectTimer->async_wait([this, taskSource](const asio::error_code & code)
+        connectTimer->async_wait([this](const asio::error_code & code)
         {
             if(!code)
             {
                 this->mSocket->Close();
-                taskSource->SetResult(XCode::NetTimeout);
+                this->mConnectTask->SetResult(false);
             }
         });
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
-        resolver->async_resolve(*query, [this, resolver, query, taskSource, connectTimer, port, host]
+        resolver->async_resolve(*query, [this, resolver, query, connectTimer, port, host]
             (const asio::error_code &err, asio::ip::tcp::resolver::iterator iterator)
         {
             if(err)
             {
-                taskSource->SetResult(XCode::HostResolverError);
+				this->mConnectTask->SetResult(false);
                 return;
             }
             AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-            asio::async_connect(tcpSocket, iterator, [taskSource, this, connectTimer]
+            asio::async_connect(tcpSocket, iterator, [this, connectTimer]
                 (const asio::error_code & code, asio::ip::tcp::resolver::iterator iter)
             {
                 if(code)
                 {
-                    taskSource->SetResult(XCode::HttpNetWorkError);
-                    return;
+					this->mConnectTask->SetResult(false);
+					return;
                 }
                 connectTimer->cancel();
-                taskSource->SetResult(XCode::Successful);
+				this->mConnectTask->SetResult(true);
             });
         });
     }

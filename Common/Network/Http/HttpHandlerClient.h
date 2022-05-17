@@ -15,17 +15,18 @@ namespace Sentry
 	 public:
 		HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy);
 	 public:
-		std::shared_ptr<HttpHandlerRequest> ReadHandlerContent();
-		bool Response(std::shared_ptr<HttpHandlerResponse> response);
-		bool Response(HttpStatus code, Json::Writer& jsonWriter);
-
+		std::shared_ptr<HttpHandlerRequest> Read();
+		bool Writer(HttpStatus code, Json::Writer& jsonWriter);
 	 private:
-		void ResponseData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<HttpHandlerResponse> response);
-		void
-		ReadHttpData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<HttpHandlerRequest> handlerRequest);
+		void ReadData();
+		void WriteData();
 	 private:
 		asio::streambuf mStreamBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
+		std::shared_ptr<TaskSource<bool>> mReadTask;
+		std::shared_ptr<TaskSource<bool>> mWriteTask;
+		std::shared_ptr<HttpHandlerRequest> mHttpRequest;
+		std::shared_ptr<HttpHandlerResponse> mHttpResponse;
 	};
 }
 #endif //GAMEKEEPER_HTTPHANDLERCLIENT_H

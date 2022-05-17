@@ -12,7 +12,7 @@ namespace Sentry
 		this->mLua = nullptr;
 	}
 
-	LuaTaskSource::~LuaTaskSource() noexcept
+	LuaTaskSource::~LuaTaskSource()
 	{
 		lua_unref(this->mLua, this->ref);
 	}
