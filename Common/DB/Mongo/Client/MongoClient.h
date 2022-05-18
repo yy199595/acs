@@ -7,16 +7,18 @@
 #include"asio.hpp"
 #include"MongoProto.h"
 #include"Network/SocketProxy.h"
-
-namespace Sentry
+#include"Network/TcpContext.h"
+namespace Mongo
 {
-	class MongoClientContext : public std::enable_shared_from_this<MongoClientContext>
+	class MongoClientContext : public Tcp::TcpContext
 	{
-	public:
+	 public:
 		MongoClientContext(std::shared_ptr<SocketProxy> scoket);
-
-	public:
-
+	 protected:
+		size_t GetRecvSize() final { return 1024 * 100; }
+		void OnError(const asio::error_code& error) final;
+		void OnConnect(const asio::error_code& error) final;
+		bool OnRecvMessage(const char* message, size_t size) final;
 	};
 }
 

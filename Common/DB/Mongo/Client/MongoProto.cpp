@@ -4,9 +4,9 @@
 
 #include "MongoProto.h"
 
-namespace Sentry
+namespace Mongo
 {
-	Mongo::MongoRequest::MongoRequest(int opcode)
+	MongoRequest::MongoRequest(int opcode)
 	{
 		this->header.requestID = 0;
 		this->header.responseTo = 0;
@@ -14,12 +14,8 @@ namespace Sentry
 		this->header.messageLength = 0;
 	}
 
-	void Mongo::MongoRequest::Write(std::ostream& os, int value)
-	{
-		os.write((char *)&value, sizeof(int));
-	}
 
-	void Mongo::MongoRequest::Write(std::ostream & os,minibson::document& document)
+	void MongoRequest::WriteBson(std::ostream & os,minibson::document& document)
 	{
 		size_t size = document.get_serialized_size();
 		std::unique_ptr<char []> buffer(new char[size]);
@@ -27,12 +23,7 @@ namespace Sentry
 		os.write(buffer.get(), size);
 	}
 
-	void Mongo::MongoRequest::Write(std::ostream& os, const std::string& value)
-	{
-		os.write(value.c_str(), value.size());
-	}
-
-	void Mongo::MongoRequest::Serialize(std::ostream& os)
+	bool MongoRequest::Serailize(std::ostream& os)
 	{
 		this->header.messageLength = sizeof(this->header) + this->GetLength();
 		this->Write(os, this->header.messageLength);
@@ -40,31 +31,32 @@ namespace Sentry
 		this->Write(os, this->header.responseTo);
 		this->Write(os, this->header.opCode);
 		this->OnWriter(os);
+		return true;
 	}
 }
 
-namespace Sentry
+namespace Mongo
 {
-	Mongo::MongoUpdateRequest::MongoUpdateRequest()
+	MongoUpdateRequest::MongoUpdateRequest()
 		: MongoRequest(OP_UPDATE)
 	{
 		this->flag = 0;
 		this->zero = 0;
 	}
 
-	int Mongo::MongoUpdateRequest::GetLength()
+	int MongoUpdateRequest::GetLength()
 	{
 		return sizeof(this->zero) + this->collectionName.size()
 		 + sizeof(this->flag) + this->selector.get_serialized_size()
 		  + this->update.get_serialized_size();
 	}
 
-	void Mongo::MongoUpdateRequest::OnWriter(std::ostream& os)
+	void MongoUpdateRequest::OnWriter(std::ostream& os)
 	{
 		this->Write(os, this->zero);
 		this->Write(os, this->collectionName);
 		this->Write(os, this->flag);
-		this->Write(os, this->selector);
-		this->Write(os, this->update);
+		this->WriteBson(os, this->selector);
+		this->WriteBson(os, this->update);
 	}
 }

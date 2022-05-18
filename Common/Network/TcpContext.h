@@ -6,37 +6,41 @@
 #define GAMEKEEPER_TCPCLIENT_H
 #include"XCode/XCode.h"
 #include"SocketProxy.h"
-#include<asio/coroutine.hpp>
-namespace Sentry
+#include"Proto/ProtoMessage.h"
+#define TCP_RECEIVE_MAX_SIZE 1024 * 20
+using namespace Sentry;
+namespace Tcp
 {
-	class TcpContext
+ 	class TcpContext : public std::enable_shared_from_this<TcpContext>
 	{
 	 public:
-		TcpContext(std::shared_ptr<SocketProxy> socket, SocketType type);
+		TcpContext(std::shared_ptr<SocketProxy> socket);
+		virtual ~TcpContext();
 	 public:
+		bool IsOpen() { return this->mSocket->IsOpen();}
+		const std::string & GetAddress() { return this->mSocket->GetAddress();}
+	 protected:
 		void StartReceive();
-		bool IsOpen() const
-		{
-			return this->mIsOpen;
-		}
+		void StartConnect();
+		void SendProtoMessage(std::shared_ptr<ProtoMessage> message);
 	 protected:
-		virtual void BeginReceive() = 0;
-		virtual void OnConnect(const asio::error_code& err) = 0;
-		virtual void OnSendData(const asio::error_code& err, int tag) = 0;
-	 protected:
-		bool StartConnect(const std::string& address);
-		bool SendDataByArray(const char* buffer, size_t size, int tag = 0);
+		virtual size_t GetRecvSize() = 0;
+		virtual void OnError(const asio::error_code & error) = 0;
+		virtual void OnConnect(const asio::error_code & error) = 0;
+		virtual bool OnRecvMessage(const char * message, size_t size) = 0;
 	 private:
-		void ConnectByAddress(const std::string& ip, unsigned short port);
+		void Connect();
+		void ReceiveHead();
+		void ReceiveBody(int size);
+		void Send(std::shared_ptr<ProtoMessage> message);
 	 protected:
-		std::string mAddress;
 		AsioContext& mContext;
 		IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-		SocketType mSocketType;
-		std::atomic_bool mIsOpen;
-		std::atomic_bool mIsConnected; //是否正在连接
+		char * mRecvBuffer;
+		size_t mRecvMaxSize;
+		asio::streambuf mSendBuffer;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H
