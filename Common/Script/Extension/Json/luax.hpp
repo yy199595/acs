@@ -4,7 +4,7 @@
 #include <cmath>
 #include <lua.h>
 #include <lauxlib.h>
-
+#include <limits>
 namespace luax {
 	inline void setfuncs(lua_State* L, const luaL_Reg* funcs) {
 #if LUA_VERSION_NUM >= 502 // LUA 5.2 or above
@@ -33,7 +33,7 @@ namespace luax {
 
     }
 
-	inline bool isinteger(lua_State* L, int idx, int64_t* out = NULL)
+	inline bool isinteger(lua_State* L, int idx, long long* out = NULL)
 	{
 #if LUA_VERSION_NUM >= 503
 		if (lua_isinteger(L, idx)) // but it maybe not detect all integers.
@@ -50,7 +50,7 @@ namespace luax {
 				&& intpart <= std::numeric_limits<lua_Integer>::max())
 			{
 				if (out)
-					*out = static_cast<int64_t>(intpart);
+					*out = static_cast<long long>(intpart);
 				return true;
 			}
 		}
