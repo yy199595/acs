@@ -4,27 +4,28 @@
 
 #ifndef _DATAREDISCOMPONENT_H_
 #define _DATAREDISCOMPONENT_H_
-#include"Component/Component.h"
-#include"DB/Redis/RedisInstance.h"
+#include"RedisBaseComponent.h"
+#include"DB/Redis/RedisNode.h"
 namespace Sentry
 {
 	struct RedisConfig;
-	class DataRedisComponent final : public Component, public IStart
+	class DataRedisComponent final : public RedisBaseComponent, public IStart, public ISecondUpdate
 	{
 	 public:
 		DataRedisComponent() = default;
 		~DataRedisComponent() = default;
-	 public:
+	protected:
 		bool OnStart() final;
 		bool LateAwake() final;
-
+		void OnSecondUpdate() final;
 	public:
-		std::shared_ptr<RedisClientContext> GetRedisClient(const std::string & name);
+		std::shared_ptr<RedisClientContext> GetClient(const std::string & name) final;
 	private:
+		size_t mTick;
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
 		std::vector<const RedisConfig *> mRedisConfigs;
-		std::unordered_map<std::string, std::shared_ptr<RedisInstance>> mRedisInsts;
+		std::unordered_map<std::string, std::shared_ptr<RedisNode>> mRedisNodes;
 	};
 }
 

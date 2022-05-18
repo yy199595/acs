@@ -63,7 +63,7 @@ namespace Sentry
         });
     }
 
-    XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
+	XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command)
 	{
 		if(!this->mSocket->IsOpen())
 		{
@@ -77,7 +77,12 @@ namespace Sentry
 #else
 		this->mNetworkThread.Invoke(&RedisClientContext::SendCommand, this, command, sendTaskSource);
 #endif
-		if (sendTaskSource->Await() != XCode::Successful)
+		return sendTaskSource->Await();
+	}
+
+    XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
+	{
+		if(this->Run(command) != XCode::Successful)
 		{
 			return XCode::NetWorkError;
 		}

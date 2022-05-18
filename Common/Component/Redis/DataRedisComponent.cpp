@@ -3,11 +3,13 @@
 //
 
 #include"DataRedisComponent.h"
+#include"Util/TimeHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	bool DataRedisComponent::LateAwake()
 	{
+		this->mTick = 0;
 		this->GetConfig().GetRedisConfigs(this->mRedisConfigs);
 		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
 		return this->mRedisConfigs.size() >= 2;
@@ -17,27 +19,55 @@ namespace Sentry
 	{
 		for (const RedisConfig* config: this->mRedisConfigs)
 		{
-			if (config->Name == "main")
+			std::vector<std::shared_ptr<RedisClientContext>> redisArray;
+			if (config->Name != "main")
 			{
-				continue;
+				std::shared_ptr<RedisNode> redisNode(new RedisNode(config));
+				std::shared_ptr<RedisClientContext> redisClientContext = this->MakeRedisClient(config);
+				if (redisClientContext == nullptr)
+				{
+					LOG_ERROR("connect redis [" << config->Name << " " << config->Address << "] failure");
+					return false;
+				}
+				this->mRedisNodes.emplace(config->Name, redisNode);
+				this->mRedisNodes[config->Name]->AddClient(redisClientContext);
 			}
-			std::shared_ptr<RedisInstance> redisInstance(new RedisInstance(config));
-			if (!redisInstance->StartConnect())
-			{
-				return false;
-			}
-			this->mRedisInsts.emplace(config->Name, redisInstance);
 		}
 		return true;
 	}
 
-	std::shared_ptr<RedisClientContext> DataRedisComponent::GetRedisClient(const std::string& name)
+	void DataRedisComponent::OnSecondUpdate()
 	{
-		auto iter = this->mRedisInsts.find(name);
-		if (iter == this->mRedisInsts.end())
+		this->mTick++;
+		if(this->mTick >= 30)
+		{
+			long long now = Time::GetNowSecTime();
+			auto iter = this->mRedisNodes.begin();
+			for(; iter != this->mRedisNodes.end(); iter++)
+			{
+				iter->second->CheckAllClient(now);
+			}
+			this->mTick = 0;
+		}
+	}
+
+	std::shared_ptr<RedisClientContext> DataRedisComponent::GetClient(const std::string& name)
+	{
+		auto iter = this->mRedisNodes.find(name);
+		if (iter == this->mRedisNodes.end())
 		{
 			return nullptr;
 		}
-		return iter->second->GetRedisClient();
+		std::shared_ptr<RedisNode> redisNode = iter->second;
+		std::shared_ptr<RedisClientContext> redisClientContext = redisNode->GetFreeClient();
+		if(redisClientContext == nullptr)
+		{
+			redisClientContext = this->MakeRedisClient(redisNode->GetConfig());
+			if(redisClientContext != nullptr)
+			{
+				redisNode->AddClient(redisClientContext);
+			}
+		}
+		return redisClientContext;
 	}
 }

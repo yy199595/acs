@@ -22,13 +22,16 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
+#ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
+using namespace Client;
+#endif
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateProxyComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
-using namespace Client;
+
 
 void RegisterComponent()
 {
@@ -63,8 +66,9 @@ void RegisterComponent()
     ComponentFactory::Add<HttpComponent>("HttpComponent");
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
-	//client
+#ifdef __ENABLE_CLIENT__
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
+#endif
 }
 
 void RegisterServiceComponent()

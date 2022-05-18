@@ -137,4 +137,10 @@ namespace Sentry
 		value = redisString->GetValue();
 		return true;
 	}
+
+	void RedisResponse::Clear()
+	{
+		this->mArray.clear();
+		this->mType = RedisRespType::REDIS_NONE;
+	}
 }

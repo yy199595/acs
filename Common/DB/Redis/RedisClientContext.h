@@ -19,6 +19,7 @@ namespace Sentry
     public:
 		XCode StartConnect();
         bool IsOpen() const { return this->mSocket->IsOpen(); }
+		bool IsUse() const { return this->mCommandLock->IsLock(); }
 		bool LoadLuaScript(const std::string & path, std::string & key);
 		long long GetLastOperatorTime() { return this->mLastOperatorTime;}
     private:
@@ -28,8 +29,8 @@ namespace Sentry
         void ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource);
     public:
 
+		XCode Run(std::shared_ptr<RedisRequest> command);
 		XCode WaitRedisResponse(std::shared_ptr<RedisResponse> response);
-
 		XCode Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response);
 
     private:

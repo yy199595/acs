@@ -78,6 +78,7 @@ namespace Sentry
 		RedisResponse();
     public:
         bool IsOk();
+		void Clear();
         void AddValue(long long value);
         void AddValue(RedisRespType type);
         void AddValue(const std::string & data);

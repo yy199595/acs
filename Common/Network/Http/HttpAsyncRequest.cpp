@@ -174,7 +174,7 @@ namespace Sentry
             while(size > 0)
             {
                 this->mContent.append(buffer, size);
-                if(this->mContent.size() == this->mContentLength)
+                if(this->mContent.size() >= this->mContentLength)
                 {
                     this->mState = HttpDecodeState::Finish;
                     return HttpStatus::OK;
@@ -315,12 +315,12 @@ namespace Sentry
 
 	void HttpHandlerResponse::Write(HttpStatus code, Json::Writer& jsonWriter)
 	{
+		size_t size = jsonWriter.GetJsonSize();
 		std::ostream os(&this->mStreamBuffer);
-		const std::string json = jsonWriter.ToJsonString();
 		os << HttpVersion << ' ' << (int)code << ' ' << HttpStatusToString(code) << "\r\n";
 		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
-		os << "Content-Length: " << json.size() << "\r\n";
+		os << "Content-Length: " << size << "\r\n";
 		os << "\r\n";
-		os.write(json.c_str(), json.size());
+		jsonWriter.WriterStream(os);
 	}
 }

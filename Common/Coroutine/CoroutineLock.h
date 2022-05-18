@@ -18,6 +18,8 @@ namespace Sentry
 
 		void UnLock();
 
+	public:
+		bool IsLock() const { return this->mIsLock;}
 	private:
 		bool mIsLock;
 		std::queue<unsigned int> mWaitTasks;
