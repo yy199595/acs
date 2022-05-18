@@ -103,7 +103,7 @@ include_directories(Libs/include/lua5.3)
 include_directories(Libs/include/mysql)
 include_directories(Libs/include/spdlog)
 include_directories(Libs/include/jemalloc)
-include_directories(Libs/include/simdjson)
+include_directories(Libs/include/bson)
 #公共组件
 
 
@@ -162,7 +162,7 @@ if(MSVC)
 elseif(APPLE)
     message("当前为mac平台")
     add_definitions(-D __SYSTEM_MAC__)
-    TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient)
+    TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient bson-static-1.0)
 else()
     message("当前为linux平台")
     add_definitions(-D __SYSTEM_LINUX__)

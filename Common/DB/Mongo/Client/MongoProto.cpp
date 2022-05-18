@@ -1,0 +1,70 @@
+//
+// Created by mac on 2022/5/18.
+//
+
+#include "MongoProto.h"
+
+namespace Sentry
+{
+	Mongo::MongoRequest::MongoRequest(int opcode)
+	{
+		this->header.requestID = 0;
+		this->header.responseTo = 0;
+		this->header.opCode = opcode;
+		this->header.messageLength = 0;
+	}
+
+	void Mongo::MongoRequest::Write(std::ostream& os, int value)
+	{
+		os.write((char *)&value, sizeof(int));
+	}
+
+	void Mongo::MongoRequest::Write(std::ostream & os,minibson::document& document)
+	{
+		size_t size = document.get_serialized_size();
+		std::unique_ptr<char []> buffer(new char[size]);
+		document.serialize(buffer.get(), size);
+		os.write(buffer.get(), size);
+	}
+
+	void Mongo::MongoRequest::Write(std::ostream& os, const std::string& value)
+	{
+		os.write(value.c_str(), value.size());
+	}
+
+	void Mongo::MongoRequest::Serialize(std::ostream& os)
+	{
+		this->header.messageLength = sizeof(this->header) + this->GetLength();
+		this->Write(os, this->header.messageLength);
+		this->Write(os, this->header.requestID);
+		this->Write(os, this->header.responseTo);
+		this->Write(os, this->header.opCode);
+		this->OnWriter(os);
+	}
+}
+
+namespace Sentry
+{
+	Mongo::MongoUpdateRequest::MongoUpdateRequest()
+		: MongoRequest(OP_UPDATE)
+	{
+		this->flag = 0;
+		this->zero = 0;
+	}
+
+	int Mongo::MongoUpdateRequest::GetLength()
+	{
+		return sizeof(this->zero) + this->collectionName.size()
+		 + sizeof(this->flag) + this->selector.get_serialized_size()
+		  + this->update.get_serialized_size();
+	}
+
+	void Mongo::MongoUpdateRequest::OnWriter(std::ostream& os)
+	{
+		this->Write(os, this->zero);
+		this->Write(os, this->collectionName);
+		this->Write(os, this->flag);
+		this->Write(os, this->selector);
+		this->Write(os, this->update);
+	}
+}
