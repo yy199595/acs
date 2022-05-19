@@ -47,6 +47,37 @@ namespace Sentry
 
 namespace Sentry
 {
+	template<typename T>
+	class PtrTaskSource : public TaskSourceBase
+	{
+	 public:
+		std::shared_ptr<T> Await();
+		bool SetResult(std::shared_ptr<T> data);
+	 private:
+		std::shared_ptr<T> mData;
+	};
+
+	template<typename T>
+	bool PtrTaskSource<T>::SetResult(std::shared_ptr<T> data)
+	{
+		if(this->ResumeTask())
+		{
+			this->mData = data;
+			return true;
+		}
+		return false;
+	}
+
+	template<typename T>
+	std::shared_ptr<T> PtrTaskSource<T>::Await()
+	{
+		this->YieldTask();
+		return this->mData;
+	}
+}
+
+namespace Sentry
+{
     template<> class TaskSource<void> : public TaskSourceBase
     {
     public:

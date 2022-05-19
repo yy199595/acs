@@ -32,7 +32,7 @@ namespace Sentry
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> responseMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
-		this->SendData(networkData);
+		this->Send(responseMessage);
 #else
 		this->mNetworkThread.Invoke(&ServerRpcClientContext::Send, this, responseMessage);
 #endif

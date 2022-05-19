@@ -45,7 +45,7 @@ namespace Sentry
 
 	bool MainRedisComponent::OnStart()
 	{
-#if defined(__DEBUG__) && defined(__REDIS_DEBUG__)
+#if __REDIS_DEBUG__
 		this->mDebugClient = this->MakeRedisClient(this->mConfig);
 #endif
 		this->mRedisClient = this->MakeRedisClient(this->mConfig);
@@ -69,6 +69,7 @@ namespace Sentry
 		{
 			if(!this->LoadLuaScript("", path))
 			{
+				LOG_ERROR("load " << path << " failure");
 				return false;
 			}
 		}

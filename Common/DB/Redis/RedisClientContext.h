@@ -41,12 +41,12 @@ namespace Sentry
 	private:
 		const RedisConfig * mConfig;
         char mReadTempBuffer[10240];
+		TaskSource<XCode> mReadTaskSource;
+		TaskSource<XCode> mSendTaskSource;
+		TaskSource<XCode> mConnectTaskSource;
         std::shared_ptr<RedisResponse> mResponse;
 		std::shared_ptr<CoroutineLock> mConnectLock; //连接锁
 		std::shared_ptr<CoroutineLock> mCommandLock; //命令锁
-		std::shared_ptr<TaskSource<XCode>> mReadTaskSource;
-		std::shared_ptr<TaskSource<XCode>> mSendTaskSource;
-		std::shared_ptr<TaskSource<XCode>> mConnectTaskSource;
     private:
         int mDataSize;
         int mLineCount;

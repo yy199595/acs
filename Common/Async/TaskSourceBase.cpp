@@ -14,6 +14,14 @@ namespace Sentry
         this->mTaskComponent = App::Get()->GetTaskComponent();
     }
 
+	void TaskSourceBase::Clear()
+	{
+		this->mCorId = 0;
+		this->mState = TaskState::TaskReady;
+		this->mTaskId = Helper::Guid::Create();
+		this->mCreateTime = Helper::Time::GetNowMilTime();
+	}
+
     bool TaskSourceBase::ResumeTask(TaskState state)
     {
         switch(this->mState)

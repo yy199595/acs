@@ -24,13 +24,13 @@ namespace Sentry
 		{
 			return XCode::Successful;
 		}
-		this->mConnectTaskSource = std::make_shared<TaskSource<XCode>>();
+		this->mConnectTaskSource.Clear();
 #ifdef ONLY_MAIN_THREAD
-		this->ConnectRedis(taskSource);
+		this->Connect();
 #else
 		this->mNetworkThread.Invoke(&RedisClientContext::Connect, this);
 #endif
-		XCode code = std::move(this->mConnectTaskSource)->Await();
+		XCode code = this->mConnectTaskSource.Await();
 		if(code == XCode::Successful && !this->mConfig->Password.empty())
 		{
 			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
@@ -51,10 +51,10 @@ namespace Sentry
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(error.message());
 #endif
-			this->mConnectTaskSource->SetResult(XCode::NetConnectFailure);
+			this->mConnectTaskSource.SetResult(XCode::NetConnectFailure);
 			return;
 		}
-		this->mConnectTaskSource->SetResult(XCode::Successful);
+		this->mConnectTaskSource.SetResult(XCode::Successful);
 	}
 
 	XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command)
@@ -64,13 +64,13 @@ namespace Sentry
 			return XCode::NetWorkError;
 		}
 		AutoCoroutineLock lock(this->mCommandLock);
-		this->mSendTaskSource = std::make_shared<TaskSource<XCode>>();
+		this->mSendTaskSource.Clear();
 #ifdef ONLY_MAIN_THREAD
-		this->SendCommand(command, sendTaskSource);
+		this->Send(command);
 #else
 		this->mNetworkThread.Invoke(&RedisClientContext::Send, this, command);
 #endif
-		return std::move(this->mSendTaskSource)->Await();
+		return this->mSendTaskSource.Await();
 	}
 
     XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
@@ -100,19 +100,18 @@ namespace Sentry
 		}
         this->mDataSize = 0;
         this->mResponse = response;
-        this->mReadTaskSource = std::make_shared<TaskSource<XCode>>();
+		this->mReadTaskSource.Clear();
 #ifdef ONLY_MAIN_THREAD
 		this->StartReceive();
 #else
 		this->mNetworkThread.Invoke(&RedisClientContext::StartReceive, this);
 #endif
-        return mReadTaskSource->Await();
+        return mReadTaskSource.Await();
     }
 
     void RedisClientContext::StartReceive()
     {
         assert(this->mResponse);
-        assert(this->mReadTaskSource);
         if(this->mRecvDataBuffer.size() > this->mDataSize)
         {
             asio::error_code code;
@@ -131,7 +130,7 @@ namespace Sentry
         {
 			this->mSocket->Close();
 			CONSOLE_LOG_ERROR(code.message());
-			this->mReadTaskSource->SetResult(XCode::NetWorkError);
+			this->mReadTaskSource.SetResult(XCode::NetWorkError);
 			return;
         }
         std::iostream readStream(&this->mRecvDataBuffer);
@@ -152,7 +151,7 @@ namespace Sentry
 			this->OnComplete();
 			return;
 		}
-		if(!this->mReadTaskSource->IsComplete())
+		if(!this->mReadTaskSource.IsComplete())
 		{
 			this->StartReceive();
 		}
@@ -213,7 +212,7 @@ namespace Sentry
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mDataCount = 0;
-		this->mReadTaskSource->SetResult(XCode::Successful);
+		this->mReadTaskSource.SetResult(XCode::Successful);
     }
 
     int RedisClientContext::OnReceiveFirstLine(char type, const std::string &lineData)
@@ -269,15 +268,14 @@ namespace Sentry
 
 	void RedisClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
-		assert(this->mSendTaskSource);
 		if(code)
 		{
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
-			this->mSendTaskSource->SetResult(XCode::NetWorkError);
+			this->mSendTaskSource.SetResult(XCode::NetWorkError);
 			return;
 		}
-		this->mSendTaskSource->SetResult(XCode::Successful);
+		this->mSendTaskSource.SetResult(XCode::Successful);
 	}
 }

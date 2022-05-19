@@ -98,7 +98,7 @@ namespace Sentry
 	{
 		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
-		this->OnClientError(code);
+		this->CloseSocket(code);
 #else
 		this->mNetworkThread.Invoke(&GateRpcClientContext::CloseSocket, this, code);
 #endif
@@ -113,7 +113,7 @@ namespace Sentry
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_REQUEST, message);
 #ifdef ONLY_MAIN_THREAD
-		this->SendData(requestMessage);
+		this->Send(requestMessage);
 #else
 		this->mNetworkThread.Invoke(&GateRpcClientContext::Send, this, requestMessage);
 #endif
@@ -129,7 +129,7 @@ namespace Sentry
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
-		this->SendData(networkData);
+		this->Send(requestMessage);
 #else
 		this->mNetworkThread.Invoke(&GateRpcClientContext::Send, this, requestMessage);
 #endif

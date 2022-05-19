@@ -23,11 +23,11 @@ namespace Sentry
         explicit TaskSourceBase();
         virtual ~TaskSourceBase() = default;
     public:
+		void Clear();
         TaskState GetState() const { return this->mState; }
         long long GetTaskId() const { return this->mTaskId;}
         long long GetCreateTime() const { return this->mCreateTime;}
         bool IsComplete() { return this->mState == TaskState::TaskFinish;}
-
     protected:
         bool YieldTask();
         bool ResumeTask(TaskState state = TaskState::TaskFinish);

@@ -27,10 +27,10 @@ namespace Mongo
 		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
+		TaskSource<bool> mWriteTask;
+		TaskSource<bool> mConnectTask;
 		std::shared_ptr<CoroutineLock> mWriteLock;
 		std::shared_ptr<CoroutineLock> mConnectLock;
-		std::shared_ptr<TaskSource<bool>> mWriteTask;
-		std::shared_ptr<TaskSource<bool>> mConnectTask;
 	};
 }
 

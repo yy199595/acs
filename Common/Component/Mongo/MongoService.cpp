@@ -19,8 +19,12 @@ namespace Sentry
 
 	bool MongoService::OnStart()
 	{
+#ifdef ONLY_MAIN_THREAD
+		IAsioThread& asioThread = this->GetApp()->GetTaskScheduler();
+#else
 		NetThreadComponent* threadComponent = this->GetComponent<NetThreadComponent>();
 		IAsioThread& asioThread = threadComponent->AllocateNetThread();
+#endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(asioThread, "127.0.0.1", 27017));
 		std::shared_ptr<Mongo::MongoClientContext> mongoClientContext(new Mongo::MongoClientContext(socketProxy));
 		if (mongoClientContext->StartConnect())
@@ -29,7 +33,7 @@ namespace Sentry
 		}
 
 		std::shared_ptr<Mongo::MongoInsertRequest> insertRequest
-				= std::make_shared<Mongo::MongoInsertRequest>();
+			= std::make_shared<Mongo::MongoInsertRequest>();
 		insertRequest->header.responseTo = 1;
 		insertRequest->collectionName = "db.test";
 		insertRequest->document.set("_id", 100);

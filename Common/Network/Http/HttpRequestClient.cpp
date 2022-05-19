@@ -39,30 +39,30 @@ namespace Sentry
     {
         const std::string & host = httpRequest->GetHost();
         const std::string & port = httpRequest->GetPort();
+		this->mConnectTask = std::make_shared<TaskSource<bool>>();
 #ifdef ONLY_MAIN_THREAD
-        this->ConnectHost(host, port, taskSource);
-        if(taskSource->Await() != XCode::Successful)
+        this->ConnectHost(host, port);
+        if(!this->mConnectTask->Await())
         {
             LOG_ERROR("connect http host" << host << ":" << port <<  " failure");
             return nullptr;
         }
 		LOG_DEBUG("connect http host " << host << ":" << port << " successful");
 
-		std::shared_ptr<TaskSource<bool>> sendTaskSource(new TaskSource<bool>);
-        this->SendByStream(httpRequest,sendTaskSource);
+		this->mWriteTask = std::make_shared<TaskSource<bool>>();
+		this->Send(httpRequest);
 
-        if(!sendTaskSource->Await())
+        if(!this->mWriteTask->Await())
         {
             LOG_ERROR("send http get request failure");
             return nullptr;
         }
-        std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
-        std::shared_ptr<TaskSource<bool>> recvTaskSource(new TaskSource<bool>);
-        this->ReceiveHttpContent(recvTaskSource, httpContent);
-        return recvTaskSource->Await() ? httpContent : nullptr;
+		this->mReadTask = std::make_shared<TaskSource<bool>>();
+		std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
+        this->ReceiveHttpContent(httpContent);
+        return this->mReadTask->Await() ? httpContent : nullptr;
 #else
         IAsioThread & netWorkThread = this->mSocket->GetThread();
-		this->mConnectTask = std::make_shared<TaskSource<bool>>();
         netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port);
         if(!this->mConnectTask->Await())
         {

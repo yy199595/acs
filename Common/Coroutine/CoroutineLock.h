@@ -12,13 +12,9 @@ namespace Sentry
 	{
 	public:
 		CoroutineLock();
-
 	public:
 		void Lock();
-
 		void UnLock();
-
-	public:
 		bool IsLock() const { return this->mIsLock;}
 	private:
 		bool mIsLock;
