@@ -7,8 +7,8 @@
 namespace Sentry
 {
 	HttpHandlerClient::HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy)
+		: Tcp::TcpContext(socketProxy)
 	{
-		this->mSocket = socketProxy;
 		this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
 		this->mHttpRequest = std::make_shared<HttpHandlerRequest>(socketProxy->GetAddress());
 	}
@@ -30,29 +30,12 @@ namespace Sentry
 		this->mHttpResponse->Write(code, jsonWriter);
 		this->mWriteTask = std::make_shared<TaskSource<bool>>();
 #ifdef ONLY_MAIN_THREAD
-		this->WriteData();
+		this->Send(this->mHttpResponse);
 #else
 		IAsioThread& netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpHandlerClient::WriteData, this);
+		netWorkThread.Invoke(&HttpHandlerClient::Send, this, this->mHttpResponse);
 #endif
 		return this->mWriteTask->Await();
-	}
-
-	void HttpHandlerClient::WriteData()
-	{
-		asio::streambuf& streambuf = this->mHttpResponse->GetStream();
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		std::shared_ptr<HttpHandlerClient> self = this->shared_from_this();
-		asio::async_write(tcpSocket, streambuf, [this, self]
-			(const asio::error_code& code, size_t size)
-		{
-			if (code)
-			{
-				this->mWriteTask->SetResult(false);
-				return;
-			}
-			this->mWriteTask->SetResult(true);
-		});
 	}
 
 	void HttpHandlerClient::ReadData()
@@ -80,5 +63,18 @@ namespace Sentry
 					break;
 				}
 			});
+	}
+
+	void HttpHandlerClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
+	{
+		if(code)
+		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(code.message());
+#endif
+			this->mWriteTask->SetResult(false);
+			return;
+		}
+		this->mWriteTask->SetResult(true);
 	}
 }

@@ -8,9 +8,10 @@
 #include"Async/TaskSource.h"
 #include"Network/SocketProxy.h"
 #include"Json/JsonWriter.h"
+#include"Network/TcpContext.h"
 namespace Sentry
 {
-	class HttpHandlerClient : public std::enable_shared_from_this<HttpHandlerClient>
+	class HttpHandlerClient final : public Tcp::TcpContext
 	{
 	 public:
 		HttpHandlerClient(std::shared_ptr<SocketProxy> socketProxy);
@@ -19,10 +20,10 @@ namespace Sentry
 		bool Writer(HttpStatus code, Json::Writer& jsonWriter);
 	 private:
 		void ReadData();
-		void WriteData();
+	protected:
+		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		asio::streambuf mStreamBuffer;
-		std::shared_ptr<SocketProxy> mSocket;
 		std::shared_ptr<TaskSource<bool>> mReadTask;
 		std::shared_ptr<TaskSource<bool>> mWriteTask;
 		std::shared_ptr<HttpHandlerRequest> mHttpRequest;

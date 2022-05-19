@@ -7,21 +7,14 @@
 #include<string>
 #include<asio.hpp>
 #include<unordered_map>
-#include<Network/Http/Http.h>
 #include"Json/JsonWriter.h"
 #include"Json/JsonReader.h"
-namespace Sentry
-{
-    class IHttpStream
-    {
-    public:
-        virtual asio::streambuf & GetStream() = 0;
-    };
-}
+#include<Network/Http/Http.h>
+#include"Network/Proto/ProtoMessage.h"
 
 namespace Sentry
 {
-    class HttpAsyncRequest : public IHttpStream
+	class HttpAsyncRequest : public Tcp::ProtoMessage
     {
 	public:
 		HttpAsyncRequest(const std::string&  method);
@@ -29,7 +22,7 @@ namespace Sentry
 		bool AddHead(const std::string & key, int value);
 		bool AddHead(const std::string & key, const std::string & value);
     public:
-		asio::streambuf & GetStream()  final;
+		bool Serailize(std::ostream &os) final;
 		const std::string & GetHost() { return this->mHost;}
         const std::string & GetPort() { return this->mPort;}
 	protected:
@@ -142,16 +135,19 @@ namespace Sentry
 
 namespace Sentry
 {
-	class HttpHandlerResponse : public IHttpStream
+	class HttpHandlerResponse : public Tcp::ProtoMessage
 	{
 	 public:
 		HttpHandlerResponse() = default;
 	 public:
+		bool Serailize(std::ostream &os) final;
 		void Write(HttpStatus code, Json::Writer & content);
 		void Write(HttpStatus code, const std::string & content);
-		asio::streambuf& GetStream() final { return this->mStreamBuffer; }
-	 private:
-		asio::streambuf mStreamBuffer;
+		bool AddHead(const std::string & key, const std::string & value);
+	private:
+		HttpStatus mCode;
+		std::string mContent;
+		std::unordered_map<std::string, std::string> mHeadMap;
 	};
 }
 #endif //GAMEKEEPER_HTTPASYNCREQUEST_H

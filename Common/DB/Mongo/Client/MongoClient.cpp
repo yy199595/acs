@@ -27,4 +27,15 @@ namespace Mongo
 
 	}
 
+	bool MongoClientContext::StartConnect()
+	{
+		this->mConnectTask = std::make_shared<TaskSource<bool>>();
+#ifdef ONLY_MAIN_THREAD
+		this->Connect();
+#else
+		this->mNetworkThread.Invoke(&MongoClientContext::Connect, this);
+#endif
+		return this->mConnectTask->Await();
+	}
+
 }

@@ -23,8 +23,14 @@ namespace Tcp
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	 protected:
 		void SetBufferCount(int count, int maxCount);
-		virtual void OnConnect(const asio::error_code & error) = 0;
-		virtual bool OnRecvMessage(const asio::error_code & code, const char * message, size_t size) = 0;
+		virtual void OnConnect(const asio::error_code & error)
+		{
+			throw std::logic_error("%%%%%%%%%%%%%%%");
+		}
+		virtual bool OnRecvMessage(const asio::error_code & code, const char * message, size_t size)
+		{
+			throw std::logic_error("***********");
+		}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) = 0;
 	protected:
 		void Connect();

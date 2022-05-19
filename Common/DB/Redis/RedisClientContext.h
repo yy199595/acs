@@ -28,7 +28,6 @@ namespace Sentry
         void OnReceive(const asio::error_code & code, size_t size);
 	protected:
 		void OnConnect(const asio::error_code &error) final;
-		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	public:
 		XCode Run(std::shared_ptr<RedisRequest> command);

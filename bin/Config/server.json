@@ -58,6 +58,13 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
+    "mongo":{
+        "count": 1,
+        "ip": "10.10.14.104",
+        "port": 27017,
+        "user": "yjz",
+        "passwd": "199595yjz."
+    },
     "redis":
     {
         "main": {

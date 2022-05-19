@@ -7,10 +7,23 @@
 namespace Sentry
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy)
-		: mSocket(socketProxy)
+		: Tcp::TcpContext(socketProxy)
     {
 
     }
+
+	void HttpRequestClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
+	{
+		if(code)
+		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(code.message());
+#endif
+			this->mWriteTask->SetResult(false);
+			return;
+		}
+		this->mWriteTask->SetResult(true);
+	}
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Get(const std::string &url)
 	{
@@ -58,7 +71,7 @@ namespace Sentry
         }
 		this->mWriteTask = std::make_shared<TaskSource<bool>>();
 		LOG_INFO("connect http host " << host << ":" << port << " successful");
-        netWorkThread.Invoke(&HttpRequestClient::SendByStream, this, httpRequest);
+        netWorkThread.Invoke(&HttpRequestClient::Send, this, httpRequest);
         if(!this->mWriteTask->Await())
         {
 			CONSOLE_LOG_ERROR("send http get request failure");
@@ -99,22 +112,6 @@ namespace Sentry
         });
     }
 
-    void HttpRequestClient::SendByStream(std::shared_ptr<IHttpStream> httpStream)
-    {
-        asio::streambuf & stream = httpStream->GetStream();
-        AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-        asio::async_write(tcpSocket, stream, [this]
-            (const asio::error_code & code, size_t size)
-        {
-            if(code)
-            {
-                this->mWriteTask->SetResult(false);
-                return;
-            }
-            this->mWriteTask->SetResult(true);
-        });
-    }
-
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Post(const std::string &url, const std::string & content)
     {
         std::shared_ptr<HttpPostRequest> httpRequest = HttpPostRequest::Create(url);
@@ -133,8 +130,8 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		httpRequest->AddHead("Content-Type", "application/json");
 		httpRequest->AddBody(content.ToJsonString());
+		httpRequest->AddHead("Content-Type", "application/json");
 		return this->Request(httpRequest);
 	}
 

@@ -148,6 +148,33 @@ namespace Json
 		return this->mJsonWriter.String(key)
 			   && this->mJsonWriter.String(str);
 	}
+
+	size_t Writer::WriterStream(std::string& os)
+	{
+		if (this->mJsonWriter.IsComplete())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.append(str, size);
+			return size;
+		}
+		if (this->mIsObject && this->mJsonWriter.EndObject())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.append(str, size);
+			return size;
+		}
+		else if (this->mJsonWriter.EndArray())
+		{
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
+			os.append(str, size);
+			return size;
+		}
+		return 0;
+	}
+
 	size_t Writer::WriterStream(std::ostream& os)
 	{
 		if (this->mJsonWriter.IsComplete())

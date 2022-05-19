@@ -56,9 +56,8 @@ namespace Sentry
 		return true;
 	}
 
-	asio::streambuf& HttpAsyncRequest::GetStream()
+	bool HttpAsyncRequest::Serailize(std::ostream& os)
 	{
-		std::ostream os(&this->mSendStream);
 		os << this->mMethod << " " << this->mPath << " " << HttpVersion << "\r\n";
 		os << "Host:" << this->mHost << "\r\n";
 		for(auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
@@ -69,7 +68,7 @@ namespace Sentry
 		}
 		os << "Connection: close\r\n\r\n";
 		this->WriteBody(os);
-		return this->mSendStream;
+		return true;
 	}
 }
 
@@ -303,24 +302,44 @@ namespace Sentry
 
 namespace Sentry
 {
+	bool HttpHandlerResponse::Serailize(std::ostream& os)
+	{
+		os << HttpVersion << ' ' << (int)this->mCode << ' ' << HttpStatusToString(this->mCode) << "\r\n";
+		for(auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			const std::string & value = iter->second;
+			os << key << ":" << value << "\r\n";
+		}
+		os << "\r\n";
+		os.write(this->mContent.c_str(), this->mContent.size());
+		return true;
+	}
+
+	bool HttpHandlerResponse::AddHead(const std::string& key, const std::string& value)
+	{
+		auto iter = this->mHeadMap.find(key);
+		if(iter != this->mHeadMap.end())
+		{
+			return false;
+		}
+		this->mHeadMap.emplace(key, value);
+		return true;
+	}
+
 	void HttpHandlerResponse::Write(HttpStatus code, const std::string& content)
 	{
-		std::ostream os(&this->mStreamBuffer);
-		os << HttpVersion << ' ' << (int)code << ' ' << HttpStatusToString(code) << "\r\n";
-		os << "Content-Type: text/plain; charset=utf-8" << "\r\n";
-		os << "Content-Length: " << content.size() << "\r\n";
-		os << "\r\n";
-		os.write(content.c_str(), content.size());
+		this->mCode = code;
+		this->mContent = content;
+		this->AddHead("Content-Type", "text/plain; charset=utf-8");
+		this->AddHead("Content-Length", std::to_string(content.size()));
 	}
 
 	void HttpHandlerResponse::Write(HttpStatus code, Json::Writer& jsonWriter)
 	{
-		size_t size = jsonWriter.GetJsonSize();
-		std::ostream os(&this->mStreamBuffer);
-		os << HttpVersion << ' ' << (int)code << ' ' << HttpStatusToString(code) << "\r\n";
-		os << "Content-Type: application/json; charset=utf-8" << "\r\n";
-		os << "Content-Length: " << size << "\r\n";
-		os << "\r\n";
-		jsonWriter.WriterStream(os);
+		this->mCode = code;
+		jsonWriter.WriterStream(this->mContent);
+		this->AddHead("Content-Type", "application/json; charset=utf-8");
+		this->AddHead("Content-Length", std::to_string(this->mContent.size()));
 	}
 }

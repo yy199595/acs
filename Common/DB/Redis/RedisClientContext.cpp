@@ -267,11 +267,6 @@ namespace Sentry
 		return response->GetString(key);
 	}
 
-	bool RedisClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
-	{
-
-	}
-
 	void RedisClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		assert(this->mSendTaskSource);
