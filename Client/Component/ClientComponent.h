@@ -29,8 +29,6 @@ namespace Client
 
         void OnCloseSocket(const std::string & address, XCode code) final {};
 
-        void OnConnectAfter(const std::string & address, XCode code) final {}
-
         void OnRequest(std::shared_ptr<c2s::Rpc_Request> t1) final;
 
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;

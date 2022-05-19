@@ -1,61 +1,72 @@
 #include"TcpRpcClient.h"
 #include"Component/ClientComponent.h"
-#include<iostream>
-constexpr size_t HeadCount = sizeof(char) + sizeof(int);
+#include"Network/Proto/RpcProtoMessage.h"
 namespace Client
 {
 	TcpRpcClient::TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
-        : RpcClientContext(socket, SocketType::LocalSocket)
+        : Tcp::TcpContext(socket)
 	{
 		this->mClientComponent = component;
+		this->SetBufferCount(2048, 2048);
 	}
 
-	void TcpRpcClient::Send(std::shared_ptr<c2s::Rpc_Request> request)
+	void TcpRpcClient::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		std::shared_ptr<NetworkData> networkData =
-			std::make_shared<NetworkData>(RPC_TYPE_REQUEST, request);
+		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
+			std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_CLIENT_REQUEST, request);
 #ifdef ONLY_MAIN_THREAD
-		this->SendData(networkData);
+		this->Send(networkData);
 #else
-		this->mNetWorkThread.Invoke(&TcpRpcClient::SendData, this, networkData);
+		this->mNetworkThread.Invoke(&TcpRpcClient::Send, this, networkData);
 #endif
 	}
 
-    void TcpRpcClient::OnClientError(XCode code)
-    {
-
-    }
 
     std::shared_ptr<TaskSource<bool>> TcpRpcClient::ConnectAsync()
     {
-        if(!this->StartConnect())
-        {
-            return nullptr;
-        }
-        this->mConnectTask = std::make_shared<TaskSource<bool>>();
+		this->mConnectTask = std::make_shared<TaskSource<bool>>();
+#ifdef ONLY_MAIN_THREAD
+		this->Connect();
+#else
+		this->mNetworkThread.Invoke(&TcpRpcClient::Connect, this);
+#endif
         return this->mConnectTask;
     }
 
-    void TcpRpcClient::OnSendData(XCode code, std::shared_ptr<NetworkData> message)
+    void TcpRpcClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
 
     }
 
-    void TcpRpcClient::OnConnect(XCode code)
+    void TcpRpcClient::OnConnect(const asio::error_code& error)
     {
-        std::move(this->mConnectTask)->SetResult(code == XCode::Successful);
-    }
-
-	bool TcpRpcClient::OnReceiveMessage(char type, const char* buffer, size_t size)
-	{
-		switch(type)
+		if(error)
 		{
-		case RPC_TYPE_REQUEST:
-			return this->OnRequest(buffer, size);
-		case RPC_TYPE_RESPONSE:
-			return this->OnResponse(buffer, size);
-		case RPC_TYPE_CALL_CLIENT:
-			return this->OnCall(buffer, size);
+			this->mConnectTask->SetResult(false);
+			return;
+		}
+		this->mConnectTask->SetResult(true);
+    }
+
+	bool TcpRpcClient::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
+	{
+		if(code)
+		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(code.message());
+#endif
+			return false;
+		}
+		size_t length = size - 1;
+		const char * str = message + 1;
+		switch((RPC_TYPE)message[0])
+		{
+		case RPC_TYPE::RPC_TYPE_REQUEST:
+			return this->OnRequest(str, length);
+		case RPC_TYPE::RPC_TYPE_RESPONSE:
+			return this->OnResponse(str, length);
+		case RPC_TYPE::RPC_TYPE_CALL_CLIENT:
+			return this->OnCall(str, length);
 		}
 		return false;
 	}
@@ -63,6 +74,15 @@ namespace Client
 	bool TcpRpcClient::OnCall(const char* buffer, size_t size)
 	{
 		return true;
+	}
+
+	void TcpRpcClient::StartReceive()
+	{
+#ifdef ONLY_MAIN_THREAD
+		this->ReceiveHead();
+#else
+		this->mNetworkThread.Invoke(&TcpRpcClient::ReceiveHead, this);
+#endif
 	}
 
 	bool TcpRpcClient::OnRequest(const char * buffer, size_t size)

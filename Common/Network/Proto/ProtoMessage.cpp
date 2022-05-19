@@ -13,7 +13,9 @@ namespace Tcp
 
 	void ProtoMessage::Write(std::ostream& os, int value)
 	{
-		os.write((char *)&value, sizeof(value));
+		char buffer[sizeof(int)] = { 0 };
+		memcpy(buffer, &value, sizeof(int));
+		os.write(buffer, sizeof(int));
 	}
 
 	void ProtoMessage::Write(std::ostream& os, const std::string& value)

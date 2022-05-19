@@ -2,37 +2,23 @@
 // Created by yjz on 2022/5/18.
 //
 
-#include "RpcProtoMessage.h"
+#include"RpcProtoMessage.h"
 #include"Network/Rpc.h"
-
-namespace Rpc
+namespace Tcp
 {
-	RpcRequestMessage::RpcRequestMessage(std::shared_ptr<com::Rpc::Request> message)
-		: mMessage(message)
+	namespace Rpc
 	{
+		RpcProtoMessage::RpcProtoMessage(RPC_TYPE type, std::shared_ptr<Message> message)
+				:mType(type), mMessage(message)
+		{
 
-	}
+		}
 
-	bool RpcRequestMessage::Serailize(std::ostream& os)
-	{
-		this->Write(os, this->mMessage->ByteSize());
-		this->Write(os, (char)RPC_TYPE_REQUEST);
-		return this->mMessage->SerializePartialToOstream(&os);
-	}
-}
-
-namespace Rpc
-{
-	RpcResponseMessage::RpcResponseMessage(std::shared_ptr<com::Rpc::Response> message)
-		: mMessage(message)
-	{
-
-	}
-
-	bool RpcResponseMessage::Serailize(std::ostream& os)
-	{
-		this->Write(os, this->mMessage->ByteSize());
-		this->Write(os, (char)RPC_TYPE_REQUEST);
-		return this->mMessage->SerializePartialToOstream(&os);
+		bool RpcProtoMessage::Serailize(std::ostream& os)
+		{
+			this->Write(os, this->mMessage->ByteSize() + 1);
+			this->Write(os, (char)this->mType);
+			return this->mMessage->SerializePartialToOstream(&os);
+		}
 	}
 }

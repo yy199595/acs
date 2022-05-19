@@ -8,6 +8,8 @@
 #include"MongoProto.h"
 #include"Network/SocketProxy.h"
 #include"Network/TcpContext.h"
+
+using namespace Tcp;
 namespace Mongo
 {
 	class MongoClientContext : public Tcp::TcpContext
@@ -15,10 +17,9 @@ namespace Mongo
 	 public:
 		MongoClientContext(std::shared_ptr<SocketProxy> scoket);
 	 protected:
-		size_t GetRecvSize() final { return 1024 * 100; }
-		void OnError(const asio::error_code& error) final;
-		void OnConnect(const asio::error_code& error) final;
-		bool OnRecvMessage(const char* message, size_t size) final;
+		void OnConnect(const asio::error_code &error) final;
+		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;
+		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	};
 }
 

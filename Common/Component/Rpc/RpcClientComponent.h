@@ -15,7 +15,6 @@ namespace Sentry
 		~RpcClientComponent() override = default;
 	 public:
 		void StartClose(const std::string & address) final;
-		void OnConnectAfter(const std::string & address, XCode code) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
 		void OnRequest(std::shared_ptr<com::Rpc_Request> request) final;
 		void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;

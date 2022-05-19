@@ -38,7 +38,7 @@ namespace Sentry
 		if (this->mBlackList.find(socket->GetIp()) == this->mBlackList.end())
 		{
 			std::shared_ptr<GateRpcClientContext> gateClient(
-				new GateRpcClientContext(socket, SocketType::RemoteSocket, this));
+				new GateRpcClientContext(socket, this));
 
 			gateClient->StartReceive();
 			this->mGateComponent->OnConnect(address);
@@ -131,7 +131,7 @@ namespace Sentry
 		if (proxyClient != nullptr)
 		{
 			long long nowTime = Helper::Time::GetNowSecTime();
-			if (nowTime - proxyClient->GetLastOperatorTime() >= 5)
+			if (nowTime - proxyClient->GetLastOperTime() >= 5)
 			{
 				proxyClient->StartClose();
 				LOG_ERROR(proxyClient->GetAddress() << " logout");

@@ -17,7 +17,6 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-		void OnConnectAfter(const std::string & address, XCode code) final {}
 		void OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
 		void OnResponse(std::shared_ptr<c2s::Rpc_Response> response) final {}
 	 public:

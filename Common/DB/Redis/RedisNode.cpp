@@ -22,7 +22,7 @@ namespace Sentry
 		auto iter = this->mClients.begin();
 		for(; iter != this->mClients.end();)
 		{
-			if(nowTime - (*iter)->GetLastOperatorTime() >= 60) // 60秒未使用
+			if(nowTime - (*iter)->GetLastOperTime() >= 60) // 60秒未使用
 			{
 				iter = this->mClients.erase(iter++);
 				LOG_WARN(this->mConfig->Name << " remove free client");

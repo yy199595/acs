@@ -5,28 +5,22 @@
 #ifndef _RPCPROTOMESSAGE_H_
 #define _RPCPROTOMESSAGE_H_
 #include"ProtoMessage.h"
-
-namespace Rpc
+#include"Network/Rpc.h"
+using namespace google::protobuf;
+namespace Tcp
 {
-	class RpcRequestMessage final : public Tcp::ProtoMessage
+	namespace Rpc
 	{
-	 public:
-		RpcRequestMessage(std::shared_ptr<com::Rpc::Request> message);
-	 protected:
-		bool Serailize(std::ostream& os) final;
-	 private:
-		std::shared_ptr<com::Rpc::Request> mMessage;
-	};
-
-	class RpcResponseMessage final : public Tcp::ProtoMessage
-	{
-	 public:
-		RpcResponseMessage(std::shared_ptr<com::Rpc::Response> message);
-	 protected:
-		bool Serailize(std::ostream& os) final;
-	 private:
-		std::shared_ptr<com::Rpc::Response> mMessage;
-	};
+		class RpcProtoMessage final : public Tcp::ProtoMessage
+		{
+		public:
+			RpcProtoMessage(RPC_TYPE type, std::shared_ptr<Message> message);
+			bool Serailize(std::ostream &os) final;
+		private:
+			RPC_TYPE mType;
+			std::shared_ptr<Message> mMessage;
+		};
+	}
 }
 
 #endif //_RPCPROTOMESSAGE_H_

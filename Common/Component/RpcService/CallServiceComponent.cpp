@@ -166,7 +166,7 @@ namespace Sentry
 			return XCode::SerializationFailure;
 		}
 		std::shared_ptr<ServerRpcClientContext> clientContext = this->mClientComponent->GetOrCreateSession(address);
-		if(clientContext->GetSocketProxy()->IsOpen())
+		if(clientContext->IsOpen())
 		{
 			clientContext->SendToServer(request);
 			return XCode::Successful;

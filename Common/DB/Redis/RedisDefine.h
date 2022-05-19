@@ -6,6 +6,7 @@
 #include"XCode/XCode.h"
 #include"Json/JsonWriter.h"
 #include"google/protobuf/message.h"
+#include"Network/Proto/ProtoMessage.h"
 using namespace google::protobuf;
 
 #define REDIS_SAVE_JSON
@@ -25,13 +26,13 @@ namespace Sentry
 
 namespace Sentry
 {
-	class RedisRequest
+	class RedisRequest : public Tcp::ProtoMessage
     {
     public:
         RedisRequest(const std::string & cmd);
     public:
 		const std::string ToJson() const;
-        void GetCommand(std::iostream & readStream) const;
+		bool Serailize(std::ostream &os) final;
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 

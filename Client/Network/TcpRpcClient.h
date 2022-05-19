@@ -2,28 +2,29 @@
 #include"XCode/XCode.h"
 #include"Protocol/c2s.pb.h"
 #include"Async/TaskSource.h"
-#include"Network/Rpc/RpcClientContext.h"
+#include"Network/TcpContext.h"
 
 
 using namespace Sentry;
+using namespace Tcp;
 namespace Client
 {
 	class ClientComponent;
-    class TcpRpcClient : public RpcClientContext
+	class TcpRpcClient : public Tcp::TcpContext
 	{
 	public:
 		TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
+		void StartReceive();
 		std::shared_ptr<TaskSource<bool>> ConnectAsync();
-		void Send(std::shared_ptr<c2s::Rpc_Request> request);
+		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
 	protected:
-        void OnConnect(XCode code) final;
-        void OnClientError(XCode code) final;
+		void OnConnect(const asio::error_code &error) final;
+		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;
+		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 		bool OnCall(const char * buffer, size_t size);
         bool OnRequest(const char * buffer, size_t size);
 		bool OnResponse(const char * buffer, size_t size);
-		bool OnReceiveMessage(char type, const char *buffer, size_t size) final;
-        void OnSendData(XCode code, std::shared_ptr<NetworkData> message) final;
     private:
         char mRecvBuffer[4096];
         ClientComponent * mClientComponent;

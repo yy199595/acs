@@ -16,19 +16,17 @@ namespace Tcp
 	 public:
 		TcpContext(std::shared_ptr<SocketProxy> socket);
 		virtual ~TcpContext();
-	 public:
+
+	public:
 		bool IsOpen() { return this->mSocket->IsOpen();}
+		long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	 protected:
-		void StartReceive();
-		void StartConnect();
-		void SendProtoMessage(std::shared_ptr<ProtoMessage> message);
-	 protected:
-		virtual size_t GetRecvSize() = 0;
-		virtual void OnError(const asio::error_code & error) = 0;
+		void SetBufferCount(int count, int maxCount);
 		virtual void OnConnect(const asio::error_code & error) = 0;
-		virtual bool OnRecvMessage(const char * message, size_t size) = 0;
-	 private:
+		virtual bool OnRecvMessage(const asio::error_code & code, const char * message, size_t size) = 0;
+		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) = 0;
+	protected:
 		void Connect();
 		void ReceiveHead();
 		void ReceiveBody(int size);
@@ -38,8 +36,10 @@ namespace Tcp
 		IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
+		int mBufferCount;
 		char * mRecvBuffer;
-		size_t mRecvMaxSize;
+		int mBufferMaxCount;
+		long long mLastOperTime;
 		asio::streambuf mSendBuffer;
 	};
 }

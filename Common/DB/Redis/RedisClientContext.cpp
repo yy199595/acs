@@ -8,7 +8,7 @@
 namespace Sentry
 {
     RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config)
-        : mNetworkThread(socket->GetThread()), mConfig(config)
+        : Tcp::TcpContext(socket), mConfig(config)
     {
         this->mDataSize = 0;
         this->mLineCount = 0;
@@ -24,13 +24,13 @@ namespace Sentry
 		{
 			return XCode::Successful;
 		}
-		std::shared_ptr<TaskSource<XCode>> taskSource(new TaskSource<XCode>());
+		this->mConnectTaskSource = std::make_shared<TaskSource<XCode>>();
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectRedis(taskSource);
 #else
-		this->mNetworkThread.Invoke(&RedisClientContext::ConnectRedis, this, taskSource);
+		this->mNetworkThread.Invoke(&RedisClientContext::Connect, this);
 #endif
-		XCode code = taskSource->Await();
+		XCode code = std::move(this->mConnectTaskSource)->Await();
 		if(code == XCode::Successful && !this->mConfig->Password.empty())
 		{
 			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
@@ -44,24 +44,18 @@ namespace Sentry
 		return code;
     }
 
-    void RedisClientContext::ConnectRedis(std::shared_ptr<TaskSource<XCode>> taskSource)
-    {
-        AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-        auto address = asio::ip::make_address_v4(this->mConfig->Ip);
-        asio::ip::tcp::endpoint endPoint(address, this->mConfig->Port);
-        tcpSocket.async_connect(endPoint, [taskSource, this]
-                (const asio::error_code &code) {
-            if (code)
-            {
-				this->mSocket->Close();
-				taskSource->SetResult(XCode::RedisSocketError);
-				CONSOLE_LOG_ERROR(code.message());
-                return;
-            }
-            this->mLineCount = 0;
-            taskSource->SetResult(XCode::Successful);
-        });
-    }
+	void RedisClientContext::OnConnect(const asio::error_code& error)
+	{
+		if(error)
+		{
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(error.message());
+#endif
+			this->mConnectTaskSource->SetResult(XCode::NetConnectFailure);
+			return;
+		}
+		this->mConnectTaskSource->SetResult(XCode::Successful);
+	}
 
 	XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command)
 	{
@@ -70,14 +64,13 @@ namespace Sentry
 			return XCode::NetWorkError;
 		}
 		AutoCoroutineLock lock(this->mCommandLock);
-		this->mLastOperatorTime = Helper::Time::GetNowSecTime();
-		std::shared_ptr<TaskSource<XCode>> sendTaskSource(new TaskSource<XCode>());
+		this->mSendTaskSource = std::make_shared<TaskSource<XCode>>();
 #ifdef ONLY_MAIN_THREAD
 		this->SendCommand(command, sendTaskSource);
 #else
-		this->mNetworkThread.Invoke(&RedisClientContext::SendCommand, this, command, sendTaskSource);
+		this->mNetworkThread.Invoke(&RedisClientContext::Send, this, command);
 #endif
-		return sendTaskSource->Await();
+		return std::move(this->mSendTaskSource)->Await();
 	}
 
     XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
@@ -220,7 +213,6 @@ namespace Sentry
         this->mDataSize = 0;
         this->mLineCount = 0;
         this->mDataCount = 0;
-        this->mLastOperatorTime = Helper::Time::GetNowSecTime();
 		this->mReadTaskSource->SetResult(XCode::Successful);
     }
 
@@ -275,22 +267,22 @@ namespace Sentry
 		return response->GetString(key);
 	}
 
-	void RedisClientContext::SendCommand(std::shared_ptr<RedisRequest> request, std::shared_ptr<TaskSource<XCode>> taskSource)
+	bool RedisClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
 	{
-		std::iostream io(&this->mSendDataBuffer);
-		request->GetCommand(io);
-		AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-		asio::async_write(tcpSocket, this->mSendDataBuffer, [this, taskSource]
-				(const asio::error_code & code, size_t size)
+
+	}
+
+	void RedisClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	{
+		assert(this->mSendTaskSource);
+		if(code)
 		{
-			if(code)
-			{
-				this->mSocket->Close();
-				CONSOLE_LOG_ERROR(code.message());
-				taskSource->SetResult(XCode::NetWorkError);
-				return;
-			}
-			taskSource->SetResult(XCode::Successful);
-		});
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(code.message());
+#endif
+			this->mSendTaskSource->SetResult(XCode::NetWorkError);
+			return;
+		}
+		this->mSendTaskSource->SetResult(XCode::Successful);
 	}
 }

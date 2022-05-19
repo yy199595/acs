@@ -74,7 +74,7 @@ namespace Client
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
 
 		requestMessage->set_rpc_id(taskSource->GetTaskId());
-		this->GetCurrentRpcClient()->Send(requestMessage);
+		this->GetCurrentRpcClient()->SendToServer(requestMessage);
 		this->mRpcTasks.emplace(taskSource->GetTaskId(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
 
@@ -91,7 +91,7 @@ namespace Client
 		requestMessage->set_method_name(name);
 		requestMessage->set_rpc_id(taskSource->GetTaskId());
 		requestMessage->mutable_data()->PackFrom(request);
-		this->GetCurrentRpcClient()->Send(requestMessage);
+		this->GetCurrentRpcClient()->SendToServer(requestMessage);
 
 		this->mRpcTasks.emplace(requestMessage->rpc_id(), taskSource);
 		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
@@ -114,7 +114,7 @@ namespace Client
 		requestMessage->mutable_data()->CopyFrom(message);
 
 		this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
-		this->GetCurrentRpcClient()->Send(requestMessage);
+		this->GetCurrentRpcClient()->SendToServer(requestMessage);
         std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
         if(responseData->code() != (int)XCode::Successful)
         {
@@ -154,7 +154,7 @@ namespace Client
 			return;
 		}
 		LOG_ERROR(account << " login successful");
-		while(this->GetCurrentRpcClient()->GetSocketProxy()->IsOpen())
+		while(this->GetCurrentRpcClient()->IsOpen())
 		{
 			this->Call("GateService.Ping");
 			//LOG_ERROR("%%%%%%%%%%%%%%%%%%%%");

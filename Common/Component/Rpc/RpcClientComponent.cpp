@@ -38,31 +38,18 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnConnectAfter(const std::string & address, XCode code)
-	{
-		assert(!address.empty());
-		auto iter = this->mRpcClientMap.find(address);
-		LOG_CHECK_RET(iter != this->mRpcClientMap.end());
-
-		auto rpcClient = iter->second;
-		if (code == XCode::Successful)
-		{
-			rpcClient->StartReceive();
-		}
-	}
-
 	void RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		// 判断是不是服务器根据 白名单
-		const std::string & address = socket->GetAddress();
+		const std::string& address = socket->GetAddress();
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
 		{
-			std::shared_ptr<ServerRpcClientContext> tcpSession(
-				new ServerRpcClientContext(this, socket, SocketType::RemoteSocket));
+			assert(!address.empty());
+			std::shared_ptr<ServerRpcClientContext> tcpSession
+					= std::make_shared<ServerRpcClientContext>(this, socket);
 
 			tcpSession->StartReceive();
-			assert(!address.empty());
 			this->mRpcClientMap.emplace(address, tcpSession);
 		}
 	}
@@ -73,7 +60,7 @@ namespace Sentry
 		if (iter != this->mRpcClientMap.end())
 		{
 			auto rpcClient = iter->second;
-			if (rpcClient->GetSocketProxy()->IsOpen())
+			if (rpcClient->IsOpen())
 			{
 				rpcClient->StartClose();
 			}
@@ -94,7 +81,7 @@ namespace Sentry
 			response->set_user_id(request->user_id());
 			if (!this->Send(address, response))
 			{
-				this->OnSendFailure(address, response);
+
 			}
 		}
 	}
@@ -120,7 +107,7 @@ namespace Sentry
 		unsigned short port = 0;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
-		localSession = make_shared<ServerRpcClientContext>(this, socketProxy, SocketType::LocalSocket);
+		localSession = make_shared<ServerRpcClientContext>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
@@ -163,7 +150,7 @@ namespace Sentry
 	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
 	{
 		std::shared_ptr<ServerRpcClientContext> clientSession = this->GetSession(address);
-		if (clientSession == nullptr || message == nullptr || !clientSession->GetSocketProxy()->IsOpen())
+		if (clientSession == nullptr || message == nullptr || !clientSession->IsOpen())
 		{
 			LOG_ERROR("send message to [" << address << "] failure");
 			return false;

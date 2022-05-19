@@ -100,10 +100,6 @@ namespace Sentry
 		virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
 		virtual void StartClose(const std::string & address) = 0;
 		virtual void OnCloseSocket(const std::string & address, XCode code) = 0;
-		virtual void OnConnectAfter(const std::string & address, XCode code) {};
-		virtual void OnSendFailure(const std::string & address, std::shared_ptr<google::protobuf::Message> message)
-		{
-		}
 	};
 
 	template<typename T1, typename T2>
