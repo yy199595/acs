@@ -60,3 +60,25 @@ namespace Mongo
 		this->WriteBson(os, this->update);
 	}
 }
+
+namespace Mongo
+{
+	MongoInsertRequest::MongoInsertRequest()
+		: MongoRequest(OP_INSERT)
+	{
+
+	}
+
+	void MongoInsertRequest::OnWriter(std::ostream& os)
+	{
+		this->Write(os, this->zero);
+		this->Write(os, this->collectionName);
+		this->WriteBson(os, this->document);
+	}
+
+	int MongoInsertRequest::GetLength()
+	{
+		return sizeof(this->zero) + this->collectionName.size()
+			 + this->document.get_serialized_size();
+	}
+}

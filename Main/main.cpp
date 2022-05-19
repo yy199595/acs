@@ -22,6 +22,7 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
+#include"Component/Mongo/MongoService.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -75,7 +76,8 @@ void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
-    ComponentFactory::Add<RegistryService>("RegistryService");
+	ComponentFactory::Add<MongoService>("MongoService");
+	ComponentFactory::Add<RegistryService>("RegistryService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
 #include<DB/Mongo/Bson/minibson.hpp>

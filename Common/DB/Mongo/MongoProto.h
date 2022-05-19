@@ -42,7 +42,7 @@ namespace Mongo
 		MongoHead header;
 	};
 
-	class MongoUpdateRequest : MongoRequest
+	class MongoUpdateRequest : public MongoRequest
 	{
 	 public:
 		MongoUpdateRequest();
@@ -55,6 +55,19 @@ namespace Mongo
 		int flag;
 		minibson::document selector;
 		minibson::document update;
+	};
+
+	class MongoInsertRequest : public MongoRequest
+	{
+	public:
+		MongoInsertRequest();
+	protected:
+		int GetLength() final;
+		void OnWriter(std::ostream& os) final;
+	public:
+		int zero;
+		std::string collectionName;
+		minibson::document document;
 	};
 }
 
