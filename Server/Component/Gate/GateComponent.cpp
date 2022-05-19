@@ -4,7 +4,7 @@
 
 #include"GateComponent.h"
 #include"App/App.h"
-#include"NetWork/GateRpcClientContext.h"
+#include"NetWork/GateClientContext.h"
 #include"Global/ServiceConfig.h"
 #include"Task/RpcProxyTask.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
@@ -129,7 +129,7 @@ namespace Sentry
 			return XCode::NetActiveShutdown;
 		}
 		std::string address;
-		LocalServiceComponent* localServerRpc = this->GetComponent<LocalServiceComponent>(config->Service);
+		ServiceComponent* localServerRpc = this->GetComponent<ServiceComponent>(config->Service);
 		if (!localServerRpc->GetEntityAddress(userId, address))
 		{
 			address = this->mUserSyncComponent->GetAddress(userId, config->Service);

@@ -29,6 +29,9 @@ namespace Mongo
 
 	bool MongoClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
 	{
+#ifdef __NET_ERROR_LOG__
+		CONSOLE_LOG_ERROR(code.message());
+#endif
 		return true;
 	}
 

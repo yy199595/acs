@@ -16,7 +16,7 @@ namespace Sentry
 	{
 		if(code)
 		{
-#ifdef __DEBUG__
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->mWriteTask->SetResult(false);

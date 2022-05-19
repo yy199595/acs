@@ -1,4 +1,4 @@
-﻿#include"ServerRpcClientContext.h"
+﻿#include"ServerClientContext.h"
 #include"App/App.h"
 #include"Network/Rpc.h"
 #include"Network/Proto/RpcProtoMessage.h"
@@ -9,7 +9,7 @@
 #endif
 namespace Sentry
 {
-	ServerRpcClientContext::ServerRpcClientContext(RpcClientComponent* component,
+	ServerClientContext::ServerClientContext(RpcClientComponent* component,
 		std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket), mTcpComponent(component)
 	{
@@ -18,43 +18,43 @@ namespace Sentry
 		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
 
-	void ServerRpcClientContext::StartClose()
+	void ServerClientContext::StartClose()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
-		this->mNetworkThread.Invoke(&ServerRpcClientContext::CloseSocket, this, XCode::NetActiveShutdown);
+		this->mNetworkThread.Invoke(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown);
 #endif
 	}
 
-	void ServerRpcClientContext::SendToServer(std::shared_ptr<com::Rpc_Response> message)
+	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Response> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> responseMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(responseMessage);
 #else
-		this->mNetworkThread.Invoke(&ServerRpcClientContext::Send, this, responseMessage);
+		this->mNetworkThread.Invoke(&ServerClientContext::Send, this, responseMessage);
 #endif
 	}
 
-	void ServerRpcClientContext::SendToServer(std::shared_ptr<com::Rpc_Request> message)
+	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Request> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_REQUEST,message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&ServerRpcClientContext::Send, this, requestMessage);
+		this->mNetworkThread.Invoke(&ServerClientContext::Send, this, requestMessage);
 #endif
 	}
 
-	void ServerRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void ServerClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 
 	}
 
-	void ServerRpcClientContext::CloseSocket(XCode code)
+	void ServerClientContext::CloseSocket(XCode code)
 	{
 		if (code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
 		{
@@ -70,11 +70,11 @@ namespace Sentry
 #endif
 	}
 
-	bool ServerRpcClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
+	bool ServerClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
 	{
 		if (code || message == nullptr || size == 0)
 		{
-#ifdef __DEBUG__
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->CloseSocket(XCode::NetWorkError);
@@ -90,7 +90,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool ServerRpcClientContext::OnRequest(const char* buffer, size_t size)
+	bool ServerClientContext::OnRequest(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
 		if (!requestData->ParseFromArray(buffer, size))
@@ -111,12 +111,12 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerRpcClientContext::OnResponse(const char* buffer, size_t size)
+	bool ServerClientContext::OnResponse(const char* buffer, size_t size)
 	{
 		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
 		if (!responseData->ParseFromArray(buffer, size))
 		{
-#ifdef __DEBUG__
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR("parse server response message error");
 #endif
 			return false;
@@ -130,7 +130,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerRpcClientContext::StartConnectAsync()
+	bool ServerClientContext::StartConnectAsync()
 	{
 		AutoCoroutineLock lock(this->mConnectLock);
 		if(this->mSocket->IsOpen())
@@ -140,22 +140,22 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Connect();
 #else
-		this->mNetworkThread.Invoke(&ServerRpcClientContext::Connect, this);
+		this->mNetworkThread.Invoke(&ServerClientContext::Connect, this);
 #endif
 		this->mConnectTask = std::make_shared<TaskSource<XCode>>();
 		return mConnectTask->Await() == XCode::Successful;
 	}
 
-	void ServerRpcClientContext::StartReceive()
+	void ServerClientContext::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead();
 #else
-		this->mNetworkThread.Invoke(&ServerRpcClientContext::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveHead, this);
 #endif
 	}
 
-	void ServerRpcClientContext::OnConnect(const asio::error_code& error)
+	void ServerClientContext::OnConnect(const asio::error_code& error)
 	{
 		this->mConnectCount++;
 		XCode code = XCode::Successful;

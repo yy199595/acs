@@ -46,8 +46,8 @@ namespace Sentry
 		if (iter == this->mRpcClientMap.end())
 		{
 			assert(!address.empty());
-			std::shared_ptr<ServerRpcClientContext> tcpSession
-					= std::make_shared<ServerRpcClientContext>(this, socket);
+			std::shared_ptr<ServerClientContext> tcpSession
+					= std::make_shared<ServerClientContext>(this, socket);
 
 			tcpSession->StartReceive();
 			this->mRpcClientMap.emplace(address, tcpSession);
@@ -91,9 +91,9 @@ namespace Sentry
 		this->mRpcComponent->OnResponse(response);
 	}
 
-	std::shared_ptr<ServerRpcClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)
+	std::shared_ptr<ServerClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)
 	{
-		std::shared_ptr<ServerRpcClientContext> localSession = this->GetSession(address);
+		std::shared_ptr<ServerClientContext> localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -107,13 +107,13 @@ namespace Sentry
 		unsigned short port = 0;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
-		localSession = make_shared<ServerRpcClientContext>(this, socketProxy);
+		localSession = make_shared<ServerClientContext>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
 	}
 
-	std::shared_ptr<ServerRpcClientContext> RpcClientComponent::GetSession(const std::string& address)
+	std::shared_ptr<ServerClientContext> RpcClientComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
@@ -149,7 +149,7 @@ namespace Sentry
 
 	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
 	{
-		std::shared_ptr<ServerRpcClientContext> clientSession = this->GetSession(address);
+		std::shared_ptr<ServerClientContext> clientSession = this->GetSession(address);
 		if (clientSession == nullptr || message == nullptr || !clientSession->IsOpen())
 		{
 			LOG_ERROR("send message to [" << address << "] failure");

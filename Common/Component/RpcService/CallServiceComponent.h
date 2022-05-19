@@ -10,7 +10,7 @@ using namespace com;
 namespace Sentry
 {
 	class ServiceMethod;
-	class ServerRpcClientContext;
+	class ServerClientContext;
 	class CallServiceComponent : public Component
 	{
 	 public:

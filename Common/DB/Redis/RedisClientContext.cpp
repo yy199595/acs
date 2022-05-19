@@ -129,7 +129,9 @@ namespace Sentry
         if (code)
         {
 			this->mSocket->Close();
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
+#endif
 			this->mReadTaskSource.SetResult(XCode::NetWorkError);
 			return;
         }

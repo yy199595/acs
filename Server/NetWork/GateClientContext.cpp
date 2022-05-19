@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"GateRpcClientContext.h"
+#include"GateClientContext.h"
 #include"Protocol/c2s.pb.h"
 #include"App/App.h"
 #ifdef __DEBUG__
@@ -14,7 +14,7 @@
 using namespace Tcp::Rpc;
 namespace Sentry
 {
-	GateRpcClientContext::GateRpcClientContext(std::shared_ptr<SocketProxy> socket,
+	GateClientContext::GateClientContext(std::shared_ptr<SocketProxy> socket,
 		GateClientComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
@@ -23,20 +23,20 @@ namespace Sentry
 		this->SetBufferCount(2048, 2048);
 	}
 
-	void GateRpcClientContext::StartReceive()
+	void GateClientContext::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead();
 #else
-		this->mNetworkThread.Invoke(&GateRpcClientContext::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&GateClientContext::ReceiveHead, this);
 #endif
 	}
 
-	bool GateRpcClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
+	bool GateClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
 	{
 		if(code)
 		{
-#ifdef __DEBUG__
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->CloseSocket(XCode::NetReceiveFailure);
@@ -65,7 +65,7 @@ namespace Sentry
 		return false;
 	}
 
-	void GateRpcClientContext::CloseSocket(XCode code)
+	void GateClientContext::CloseSocket(XCode code)
 	{
 		if (code == XCode::NetActiveShutdown)
 		{
@@ -82,11 +82,11 @@ namespace Sentry
 
 	}
 
-	void GateRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void GateClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code)
 		{
-#ifdef __DEBUG__
+#ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->CloseSocket(XCode::SendMessageFail);
@@ -94,17 +94,17 @@ namespace Sentry
 		}
 	}
 
-	void GateRpcClientContext::StartClose()
+	void GateClientContext::StartClose()
 	{
 		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
-		this->mNetworkThread.Invoke(&GateRpcClientContext::CloseSocket, this, code);
+		this->mNetworkThread.Invoke(&GateClientContext::CloseSocket, this, code);
 #endif
 	}
 
-	bool GateRpcClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
+	bool GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
 	{
 		if (!this->IsOpen())
 		{
@@ -115,12 +115,12 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&GateRpcClientContext::Send, this, requestMessage);
+		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
 		return true;
 	}
 
-	bool GateRpcClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Response> message)
+	bool GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Response> message)
 	{
 		if(!this->IsOpen())
 		{
@@ -131,7 +131,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&GateRpcClientContext::Send, this, requestMessage);
+		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
 		return true;
 	}

@@ -7,7 +7,7 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 
-	class LocalLuaServiceComponent : public LocalServiceComponent, public IStart
+	class LocalLuaServiceComponent : public ServiceComponent, public IStart
 	{
 	 public:
 		LocalLuaServiceComponent();

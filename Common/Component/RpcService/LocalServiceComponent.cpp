@@ -97,19 +97,19 @@ namespace Sentry
 
 namespace Sentry
 {
-	void LocalServiceComponent::Awake()
+	void ServiceComponent::Awake()
 	{
 		this->mIndex = 0;
 		this->mAddressList.clear();
 	}
 
-	bool LocalServiceComponent::SubUserEvent()
+	bool ServiceComponent::SubUserEvent()
 	{
-		return this->mEventRegister->Sub("user_join_event", &LocalServiceComponent::OnUserJoin)
-			   && this->mEventRegister->Sub("user_exit_event", &LocalServiceComponent::OnUserExit);
+		return this->mEventRegister->Sub("user_join_event", &ServiceComponent::OnUserJoin)
+			   && this->mEventRegister->Sub("user_exit_event", &ServiceComponent::OnUserExit);
 	}
 
-	bool LocalServiceComponent::OnUserJoin(const Json::Reader& jsonReader)
+	bool ServiceComponent::OnUserJoin(const Json::Reader& jsonReader)
 	{
 		std::string address;
 		long long userId = 0;
@@ -121,7 +121,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalServiceComponent::OnUserExit(const Json::Reader& jsonReader)
+	bool ServiceComponent::OnUserExit(const Json::Reader& jsonReader)
 	{
 		long long userId = 0;
 		LOG_CHECK_RET_FALSE(jsonReader.GetMember("user_id", userId));
@@ -136,7 +136,7 @@ namespace Sentry
 	}
 
 
-	XCode LocalServiceComponent::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
+	XCode ServiceComponent::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
 	    std::shared_ptr<com::Rpc::Response> response)
 	{
 		assert(this->IsStartService());
@@ -162,7 +162,7 @@ namespace Sentry
 		}
 	}
 
-	bool LocalServiceComponent::StartService()
+	bool ServiceComponent::StartService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
 		if (!this->OnStartService(*this->mMethodRegister))
@@ -178,7 +178,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalServiceComponent::CloseService()
+	bool ServiceComponent::CloseService()
 	{
 		if(this->IsStartService())
 		{
@@ -188,7 +188,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool LocalServiceComponent::AllotAddress(string& address)
+	bool ServiceComponent::AllotAddress(string& address)
 	{
 		if(!this->mAddressList.empty())
 		{
@@ -202,7 +202,7 @@ namespace Sentry
 		return false;
 	}
 
-	void LocalServiceComponent::OnDelAddress(const string& address)
+	void ServiceComponent::OnDelAddress(const string& address)
 	{
 		auto iter = this->mAddressList.begin();
 		for(; iter != this->mAddressList.end();iter++)
@@ -215,7 +215,7 @@ namespace Sentry
 			}
 		}
 	}
-	void LocalServiceComponent::OnAddAddress(const string& address)
+	void ServiceComponent::OnAddAddress(const string& address)
 	{
 		assert(!address.empty());
 		for(const std::string & item : this->mAddressList)
@@ -228,7 +228,7 @@ namespace Sentry
 		this->mAddressList.emplace_back(address);
 		LOG_ERROR(this->GetName() << " add address " << address);
 	}
-	bool LocalServiceComponent::GetEntityAddress(long long int id, string& address)
+	bool ServiceComponent::GetEntityAddress(long long int id, string& address)
 	{
 		auto iter = this->mUserAddressMap.find(id);
 		if(iter != this->mUserAddressMap.end())
@@ -239,7 +239,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool LocalServiceComponent::GetAllAddress(list<std::string>& allAddress) const
+	bool ServiceComponent::GetAllAddress(list<std::string>& allAddress) const
 	{
 		allAddress.clear();
 		for(const std::string & address : this->mAddressList)
@@ -249,7 +249,7 @@ namespace Sentry
 		return !allAddress.empty();
 	}
 
-	XCode LocalServiceComponent::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)
+	XCode ServiceComponent::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)
 	{
 		std::shared_ptr<EventMethod> eventMethod = this->mEventRegister->GetEvent(eveId);
 		if(eventMethod == nullptr)
@@ -259,7 +259,7 @@ namespace Sentry
 		return eventMethod->Run(json) ? XCode::Successful : XCode::Failure;
 	}
 
-	bool LocalServiceComponent::LoadEvent()
+	bool ServiceComponent::LoadEvent()
 	{
 		this->mEventRegister = std::make_shared<ServiceEventRegister>(this->GetName(), this);
 		if(!this->OnInitEvent(*this->mEventRegister))

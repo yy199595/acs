@@ -126,7 +126,7 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for (Component* component: components)
 		{
-			LocalServiceComponent* localServiceComponent = component->Cast<LocalServiceComponent>();
+			ServiceComponent* localServiceComponent = component->Cast<ServiceComponent>();
 			if (localServiceComponent != nullptr && localServiceComponent->LoadEvent())
 			{
 				if (!this->SubscribeChannel(localServiceComponent->GetName()))
@@ -251,7 +251,7 @@ namespace Sentry
 			this->mRpcComponent->OnResponse(response);
 			return true;
 		}
-		LocalServiceComponent* localServiceComponent = this->GetComponent<LocalServiceComponent>(channel);
+		ServiceComponent* localServiceComponent = this->GetComponent<ServiceComponent>(channel);
 		if (localServiceComponent == nullptr)
 		{
 			return false;

@@ -5,7 +5,7 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"NetWork/GateRpcClientContext.h"
+#include"NetWork/GateClientContext.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateClientComponent.h"
@@ -35,7 +35,7 @@ namespace Sentry
 
 	bool GateService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
+		LOG_CHECK_RET_FALSE(ServiceComponent::LateAwake());
 		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);

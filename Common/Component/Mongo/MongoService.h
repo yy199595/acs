@@ -8,7 +8,7 @@
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class MongoService final : public LocalServiceComponent, public IStart
+	class MongoService final : public ServiceComponent, public IStart
 	{
 	public:
 		MongoService() = default;

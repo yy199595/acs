@@ -7,7 +7,7 @@
 
 namespace Sentry
 {
-	class MysqlService : public LocalServiceComponent, public IStart
+	class MysqlService : public ServiceComponent, public IStart
 	{
 	 public:
 		MysqlService() = default;

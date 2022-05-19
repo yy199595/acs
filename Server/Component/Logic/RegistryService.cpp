@@ -18,7 +18,7 @@ namespace Sentry
 
 	bool RegistryService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalServiceComponent::LateAwake());
+		LOG_CHECK_RET_FALSE(ServiceComponent::LateAwake());
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
@@ -30,7 +30,7 @@ namespace Sentry
 	void RegistryService::OnAddService(Component* component)
 	{
 		HttpService * httpService = component->Cast<HttpService>();
-		LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+		ServiceComponent * localService = component->Cast<ServiceComponent>();
 
 		sub::Add::Request request;
 		request.set_area_id(this->mAreaId);
@@ -60,7 +60,7 @@ namespace Sentry
 	{
 		for(const std::string & service : request.rpc().service())
 		{
-			LocalServiceComponent * localService = this->GetComponent<LocalServiceComponent>(service);
+			ServiceComponent * localService = this->GetComponent<ServiceComponent>(service);
 			if(localService == nullptr)
 			{
 				return XCode::CallServiceNotFound;
@@ -83,7 +83,7 @@ namespace Sentry
 		for(Component * component : components)
 		{
 			HttpService * httpService = component->Cast<HttpService>();
-			LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+			ServiceComponent * localService = component->Cast<ServiceComponent>();
 			if(httpService != nullptr)
 			{
 				response.mutable_http()->add_service(httpService->GetName());
@@ -111,7 +111,7 @@ namespace Sentry
 		for(Component * component : components)
 		{
 			HttpService * httpService = component->Cast<HttpService>();
-			LocalServiceComponent * localService = component->Cast<LocalServiceComponent>();
+			ServiceComponent * localService = component->Cast<ServiceComponent>();
 			if(httpService != nullptr)
 			{
 				request.mutable_http()->add_service(component->GetName());

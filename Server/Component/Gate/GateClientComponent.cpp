@@ -4,7 +4,7 @@
 
 #include"GateClientComponent.h"
 #include"App/App.h"
-#include"NetWork/GateRpcClientContext.h"
+#include"NetWork/GateClientContext.h"
 #include"GateComponent.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #ifdef __DEBUG__
@@ -37,8 +37,8 @@ namespace Sentry
 		LOG_CHECK_RET(iter == this->mGateClientMap.end());
 		if (this->mBlackList.find(socket->GetIp()) == this->mBlackList.end())
 		{
-			std::shared_ptr<GateRpcClientContext> gateClient(
-				new GateRpcClientContext(socket, this));
+			std::shared_ptr<GateClientContext> gateClient(
+				new GateClientContext(socket, this));
 
 			gateClient->StartReceive();
 			this->mGateComponent->OnConnect(address);
@@ -74,7 +74,7 @@ namespace Sentry
 
 	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message)
 	{
-		std::shared_ptr<GateRpcClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
 		if (proxyClient == nullptr)
 		{
 			return false;
@@ -92,7 +92,7 @@ namespace Sentry
 		auto iter = this->mGateClientMap.begin();
 		for(;iter != this->mGateClientMap.end(); iter++)
 		{
-			std::shared_ptr<GateRpcClientContext> proxyClient = iter->second;
+			std::shared_ptr<GateClientContext> proxyClient = iter->second;
 			if(proxyClient != nullptr)
 			{
 				proxyClient->SendToClient(message);
@@ -102,7 +102,7 @@ namespace Sentry
 
 	bool GateClientComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::Rpc::Call> message)
 	{
-		std::shared_ptr<GateRpcClientContext> gateClient = this->GetGateClient(address);
+		std::shared_ptr<GateClientContext> gateClient = this->GetGateClient(address);
 		if(gateClient != nullptr)
 		{
 			return gateClient->SendToClient(message);
@@ -110,7 +110,7 @@ namespace Sentry
 		return false;
 	}
 
-	std::shared_ptr<GateRpcClientContext> GateClientComponent::GetGateClient(const std::string & address)
+	std::shared_ptr<GateClientContext> GateClientComponent::GetGateClient(const std::string & address)
 	{
 		auto iter = this->mGateClientMap.find(address);
 		return iter != this->mGateClientMap.end() ? iter->second : nullptr;
@@ -118,7 +118,7 @@ namespace Sentry
 
 	void GateClientComponent::StartClose(const std::string & address)
 	{
-		std::shared_ptr<GateRpcClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			proxyClient->StartClose();
@@ -127,7 +127,7 @@ namespace Sentry
 
 	void GateClientComponent::CheckPlayerLogout(const std::string & address)
 	{
-		std::shared_ptr<GateRpcClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			long long nowTime = Helper::Time::GetNowSecTime();

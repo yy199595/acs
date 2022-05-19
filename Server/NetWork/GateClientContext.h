@@ -11,11 +11,11 @@ using namespace google::protobuf;
 namespace Sentry
 {
 	class GateClientComponent;
-	class GateRpcClientContext : public TcpContext
+ 	class GateClientContext : public Tcp::TcpContext
 	{
 	 public:
-		GateRpcClientContext(std::shared_ptr<SocketProxy> socket, GateClientComponent* component);
-		~GateRpcClientContext() final = default;
+		GateClientContext(std::shared_ptr<SocketProxy> socket, GateClientComponent* component);
+		~GateClientContext() final = default;
 	 public:
 		void StartClose();
 		void StartReceive();

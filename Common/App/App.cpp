@@ -201,7 +201,7 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				IStart* startComponent = component->Cast<IStart>();
-				LocalServiceComponent* localServerRpc = component->Cast<LocalServiceComponent>();
+				ServiceComponent* localServerRpc = component->Cast<ServiceComponent>();
 				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
 					continue;
@@ -225,7 +225,7 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
-				LocalServiceComponent* localServerRpc = component->Cast<LocalServiceComponent>();
+				ServiceComponent* localServerRpc = component->Cast<ServiceComponent>();
 				if (localServerRpc == nullptr || localServerRpc->IsStartService())
 				{
 					IComplete* complete = component->Cast<IComplete>();
