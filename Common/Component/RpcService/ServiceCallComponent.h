@@ -11,11 +11,11 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class ServerClientContext;
-	class CallServiceComponent : public Component
+	class ServiceCallComponent : public Component
 	{
 	 public:
-		CallServiceComponent() = default;
-		~CallServiceComponent() override = default;
+		ServiceCallComponent() = default;
+		~ServiceCallComponent() override = default;
 	 public:
 		virtual XCode Call(const std::string& address, const std::string& func);
 

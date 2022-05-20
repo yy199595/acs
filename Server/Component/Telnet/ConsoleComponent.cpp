@@ -1,6 +1,6 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/CallServiceComponent.h"
+#include"Component/RpcService/ServiceCallComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
 #include"Network/Listener/TcpServerComponent.h"

@@ -15,7 +15,7 @@ using namespace asio::ip;
 
 namespace Sentry
 {
-	class CallServiceComponent;
+	class ServiceCallComponent;
 	class ServiceComponent;
 	class MainTaskScheduler;
 	class App final : public Entity
