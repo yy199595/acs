@@ -10,6 +10,7 @@ namespace Sentry
 		: mConfig(config), IThread("Mysql"), mThread(nullptr)
 	{
 		this->mThread = nullptr;
+		this->mLock = std::make_shared<CoroutineLock>();
 	}
 
 	int MysqlClient::Start()
@@ -25,6 +26,9 @@ namespace Sentry
 			MysqlSocket* mysqlSocket1 = mysql_init((MYSQL*)nullptr);
 			this->mMysqlSocket = mysql_real_connect(mysqlSocket1, ip, user, password,
 					nullptr, port, nullptr,CLIENT_MULTI_STATEMENTS);
+
+			int value = 1;
+			mysql_options(mysqlSocket1, MYSQL_OPT_RECONNECT, &value); // 自动重连
 			if (this->mMysqlSocket == nullptr)
 			{
 				taskSource->SetResult(-1);
@@ -43,10 +47,10 @@ namespace Sentry
 
 	void MysqlClient::Update()
 	{
-		std::shared_ptr<MysqlAsyncTask> taskSource;
-		while (this->mTaskQueue.try_dequeue(taskSource))
+		if(this->mCurTask != nullptr)
 		{
-			taskSource->Run(this->mMysqlSocket);
+			this->mCurTask->Run(this->mMysqlSocket);
+			this->mCurTask = nullptr;
 		}
 		this->HangUp();
 	}
@@ -55,31 +59,19 @@ namespace Sentry
 	{
 		std::shared_ptr<MysqlTableTaskSource> tableTaskSource
 			= std::make_shared<MysqlTableTaskSource>(pb);
-		if (!this->mTaskQueue.enqueue(tableTaskSource))
-		{
-			return XCode::MysqlInitTaskFail;
-		}
-		this->mThreadVariable.notify_one();
-		return tableTaskSource->Await();
+		return this->Start(tableTaskSource);
 	}
 
-	XCode MysqlClient::Invoke(const std::string& sql, s2s::Mysql::Response & response)
+	XCode MysqlClient::Start(std::shared_ptr<MysqlAsyncTask> task)
 	{
-		std::shared_ptr<MysqlTaskSource> taskSource
-			= std::make_shared<MysqlTaskSource>(sql, response);
-		if (!this->mTaskQueue.enqueue(taskSource))
+		XCode code = task->Init();
+		if(code != XCode::Successful)
 		{
-			return XCode::MysqlInitTaskFail;
-		}
-		this->mThreadVariable.notify_one();
-		XCode code = taskSource->Await();
-		if (code != XCode::Successful)
-		{
-			LOG_ERROR(sql);
-			LOG_ERROR(response.error());
 			return code;
 		}
-		return XCode::Successful;
+		AutoCoroutineLock lock(this->mLock);
+		this->mCurTask = task;
+		this->mThreadVariable.notify_one();
+		return task->Await();
 	}
-
 }

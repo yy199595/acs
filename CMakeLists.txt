@@ -16,12 +16,24 @@ option(__RPC_DEBUG_LOG__ "打印rpc日志" ON)
 option(__REDIS_DEBUG__ "开始redis调试" OFF)
 option(ONLY_MAIN_THREAD "启用单线程模式" ON)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
+option(__ENABLE_MYSQL__ "是否使用mysql" ON)
+option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
 
 if(ONLY_MAIN_THREAD)
     message("当前网络为单线程模型")
     add_definitions(-D ONLY_MAIN_THREAD)
 else()
     message("当前网络为多线程模型")
+endif()
+
+if(__ENABLE_MYSQL__)
+    message("启用mysql数据库")
+    add_definitions(-D __ENABLE_MYSQL__)
+endif()
+
+if(__ENABLE_MONGODB__)
+    message("启用mongodb数据库")
+    add_definitions(-D __ENABLE_MONGODB__)
 endif()
 
 if(__DEBUG__)
@@ -47,11 +59,6 @@ if(__DEBUG__)
         add_definitions(-D __ENABLE_CLIENT__)
     endif()
 endif()
-
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc" "Common/*.h" "Common/*.c")
-file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "Protocol/*.cc")
-
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 11)
@@ -106,17 +113,19 @@ include_directories(Libs/include/rapidjson)
 include_directories(Libs/include/protobuf)
 include_directories(Libs/include/asio)
 include_directories(Libs/include/lua5.3)
-include_directories(Libs/include/mysql)
+if(__ENABLE_MYSQL__)
+    include_directories(Libs/include/mysql)
+endif()
 include_directories(Libs/include/spdlog)
 include_directories(Libs/include/jemalloc)
-include_directories(Libs/include/bson)
+include_directories(Libs/include/libbson/bson)
+include_directories(Libs/include/mongo/mongoc)
 #公共组件
 
 
 include_directories(Server/Gate)
 include_directories(Server/Logic)
 include_directories(${PROJECT_SOURCE_DIR}/Common)
-include_directories(${PROJECT_SOURCE_DIR}/Common/DB/Mongo)
 include_directories(${PROJECT_SOURCE_DIR}/Protocol)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
 
@@ -125,10 +134,11 @@ if (__ENABLE_CLIENT__)
     file(GLOB_RECURSE LogicSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.cc")
 endif()
 
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc" "Common/*.h" "Common/*.c")
+file(GLOB_RECURSE ProtocolSrc "Protocol/*.h" "Protocol/*.cpp" "Protocol/*.hpp" "Protocol/*.cc")
+
 file(GLOB_RECURSE GateSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.cc")
 file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
-
-
 
 LINK_DIRECTORIES(Libs/lib)
 
@@ -138,13 +148,14 @@ else()
     SET(CMAKE_BUILD_TYPE "Release")
 endif()
 
-list(APPEND ServerFiles ${DBSource} ${MainSource} ${LogicSource} ${GateSource})
+list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
+list(APPEND ServerFiles ${MainSource} ${LogicSource} ${GateSource})
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     message("使用 ccache 作为编译缓存")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif ()
+endif()
 
 ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles})
 
@@ -168,7 +179,8 @@ if(MSVC)
 elseif(APPLE)
     message("当前为mac平台")
     add_definitions(-D __SYSTEM_MAC__)
-    TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient)
+    #TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient)
+    TARGET_LINK_LIBRARIES(Sentry Lua53 protobuf pthread mysqlclient bson-static-1.0 mongoc-static-1.0)
 else()
     message("当前为linux平台")
     add_definitions(-D __SYSTEM_LINUX__)

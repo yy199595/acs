@@ -7,30 +7,29 @@
 
 namespace Sentry
 {
-	class MysqlService : public ServiceComponent, public IStart
+	class MysqlService : public LocalRpcServiceBase, public IStart
 	{
 	 public:
 		MysqlService() = default;
 		~MysqlService() final = default;
 	private:
-		XCode Add(const s2s::Mysql::Add& request, s2s::Mysql::Response& response);
+		XCode Add(const s2s::Mysql::Add& request);
 
-		XCode Save(const s2s::Mysql::Save& request, s2s::Mysql::Response& response);
+		XCode Save(const s2s::Mysql::Save& request);
 
-		XCode Update(const s2s::Mysql::Update& request, s2s::Mysql::Response& response);
+		XCode Update(const s2s::Mysql::Update& request);
 
-		XCode Delete(const s2s::Mysql::Delete& request, s2s::Mysql::Response& response);
+		XCode Delete(const s2s::Mysql::Delete& request);
 
 		XCode Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response);
 
-		XCode Invoke(const s2s::Mysql::Invoke& request, s2s::Mysql::Response& response);
 	 private:
 		bool OnStart() final;
-		std::shared_ptr<MysqlClient> GetMysqlClient();
+		std::shared_ptr<MysqlClient> GetMysqlClient(long long flag = 0);
 		bool OnStartService(ServiceMethodRegister & methodRegister);
 	 private:
+		size_t mIndex;
 		MysqlConfig mConfig;
-		MysqlHelper mHelper;
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
 	};
 }// namespace Sentry

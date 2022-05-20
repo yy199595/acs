@@ -115,7 +115,6 @@
         "GateService",
         "ChatService",
         "MysqlService",
-        "MongoService",
         "HttpUserService",
         "RegistryService"
     ],

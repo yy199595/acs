@@ -35,7 +35,7 @@ namespace Sentry
 
 	bool GateService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(ServiceComponent::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalRpcServiceBase::LateAwake());
 		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);

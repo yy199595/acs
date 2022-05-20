@@ -382,7 +382,7 @@ class Push_Request :
 // -------------------------------------------------------------------
 
 class Push_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.Push.Writer) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:sub.Push.Response) */ {
  public:
   Push_Response();
   virtual ~Push_Response();
@@ -494,7 +494,7 @@ class Push_Response :
   ::sub::ServiceInfo* mutable_http();
   void set_allocated_http(::sub::ServiceInfo* http);
 
-  // @@protoc_insertion_point(class_scope:sub.Push.Writer)
+  // @@protoc_insertion_point(class_scope:sub.Push.Response)
  private:
   class HasBitSetters;
 
@@ -1855,12 +1855,12 @@ inline void Push_Response::clear_rpc() {
 }
 inline const ::sub::ServiceInfo& Push_Response::rpc() const {
   const ::sub::ServiceInfo* p = rpc_;
-  // @@protoc_insertion_point(field_get:sub.Push.Writer.rpc)
+  // @@protoc_insertion_point(field_get:sub.Push.Response.rpc)
   return p != nullptr ? *p : *reinterpret_cast<const ::sub::ServiceInfo*>(
       &::sub::_ServiceInfo_default_instance_);
 }
 inline ::sub::ServiceInfo* Push_Response::release_rpc() {
-  // @@protoc_insertion_point(field_release:sub.Push.Writer.rpc)
+  // @@protoc_insertion_point(field_release:sub.Push.Response.rpc)
   
   ::sub::ServiceInfo* temp = rpc_;
   rpc_ = nullptr;
@@ -1872,7 +1872,7 @@ inline ::sub::ServiceInfo* Push_Response::mutable_rpc() {
     auto* p = CreateMaybeMessage<::sub::ServiceInfo>(GetArenaNoVirtual());
     rpc_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:sub.Push.Writer.rpc)
+  // @@protoc_insertion_point(field_mutable:sub.Push.Response.rpc)
   return rpc_;
 }
 inline void Push_Response::set_allocated_rpc(::sub::ServiceInfo* rpc) {
@@ -1891,7 +1891,7 @@ inline void Push_Response::set_allocated_rpc(::sub::ServiceInfo* rpc) {
     
   }
   rpc_ = rpc;
-  // @@protoc_insertion_point(field_set_allocated:sub.Push.Writer.rpc)
+  // @@protoc_insertion_point(field_set_allocated:sub.Push.Response.rpc)
 }
 
 // .sub.ServiceInfo http = 2;
@@ -1906,12 +1906,12 @@ inline void Push_Response::clear_http() {
 }
 inline const ::sub::ServiceInfo& Push_Response::http() const {
   const ::sub::ServiceInfo* p = http_;
-  // @@protoc_insertion_point(field_get:sub.Push.Writer.http)
+  // @@protoc_insertion_point(field_get:sub.Push.Response.http)
   return p != nullptr ? *p : *reinterpret_cast<const ::sub::ServiceInfo*>(
       &::sub::_ServiceInfo_default_instance_);
 }
 inline ::sub::ServiceInfo* Push_Response::release_http() {
-  // @@protoc_insertion_point(field_release:sub.Push.Writer.http)
+  // @@protoc_insertion_point(field_release:sub.Push.Response.http)
   
   ::sub::ServiceInfo* temp = http_;
   http_ = nullptr;
@@ -1923,7 +1923,7 @@ inline ::sub::ServiceInfo* Push_Response::mutable_http() {
     auto* p = CreateMaybeMessage<::sub::ServiceInfo>(GetArenaNoVirtual());
     http_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:sub.Push.Writer.http)
+  // @@protoc_insertion_point(field_mutable:sub.Push.Response.http)
   return http_;
 }
 inline void Push_Response::set_allocated_http(::sub::ServiceInfo* http) {
@@ -1942,7 +1942,7 @@ inline void Push_Response::set_allocated_http(::sub::ServiceInfo* http) {
     
   }
   http_ = http;
-  // @@protoc_insertion_point(field_set_allocated:sub.Push.Writer.http)
+  // @@protoc_insertion_point(field_set_allocated:sub.Push.Response.http)
 }
 
 // -------------------------------------------------------------------

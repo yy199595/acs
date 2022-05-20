@@ -5,13 +5,13 @@
 using namespace com;
 namespace Sentry
 {
-	class ServiceComponent;
+	class LocalRpcServiceBase;
 
 	class RpcHandlerComponent;
 
 	class TaskComponent;
 
-	class RegistryService : public ServiceComponent, public IComplete, public IServiceChange
+	class RegistryService : public LocalRpcServiceBase, public IComplete, public IServiceChange
 	{
 	 public:
 		RegistryService() = default;

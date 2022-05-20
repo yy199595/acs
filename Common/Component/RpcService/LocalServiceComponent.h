@@ -10,10 +10,10 @@
 
 namespace Sentry
 {
-	class ServiceComponent : public ServiceCallComponent, public IServiceBase
+	class LocalRpcServiceBase : public ServiceCallComponent, public IServiceBase
 	{
 	public:
-		ServiceComponent() = default;
+		LocalRpcServiceBase() = default;
 	protected:
 		void Awake();
 		bool SubUserEvent();

@@ -71,7 +71,8 @@ void RegisterComponent()
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
 #endif
 }
-
+#include"bson.h"
+#include"mongoc.h"
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");

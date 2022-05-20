@@ -97,19 +97,19 @@ namespace Sentry
 
 namespace Sentry
 {
-	void ServiceComponent::Awake()
+	void LocalRpcServiceBase::Awake()
 	{
 		this->mIndex = 0;
 		this->mAddressList.clear();
 	}
 
-	bool ServiceComponent::SubUserEvent()
+	bool LocalRpcServiceBase::SubUserEvent()
 	{
-		return this->mEventRegister->Sub("user_join_event", &ServiceComponent::OnUserJoin)
-			   && this->mEventRegister->Sub("user_exit_event", &ServiceComponent::OnUserExit);
+		return this->mEventRegister->Sub("user_join_event", &LocalRpcServiceBase::OnUserJoin)
+			   && this->mEventRegister->Sub("user_exit_event", &LocalRpcServiceBase::OnUserExit);
 	}
 
-	bool ServiceComponent::OnUserJoin(const Json::Reader& jsonReader)
+	bool LocalRpcServiceBase::OnUserJoin(const Json::Reader& jsonReader)
 	{
 		std::string address;
 		long long userId = 0;
@@ -121,7 +121,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServiceComponent::OnUserExit(const Json::Reader& jsonReader)
+	bool LocalRpcServiceBase::OnUserExit(const Json::Reader& jsonReader)
 	{
 		long long userId = 0;
 		LOG_CHECK_RET_FALSE(jsonReader.GetMember("user_id", userId));
@@ -136,7 +136,7 @@ namespace Sentry
 	}
 
 
-	XCode ServiceComponent::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
+	XCode LocalRpcServiceBase::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
 	    std::shared_ptr<com::Rpc::Response> response)
 	{
 		assert(this->IsStartService());
@@ -162,7 +162,7 @@ namespace Sentry
 		}
 	}
 
-	bool ServiceComponent::StartService()
+	bool LocalRpcServiceBase::StartService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this->GetName(), this);
 		if (!this->OnStartService(*this->mMethodRegister))
@@ -178,7 +178,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServiceComponent::CloseService()
+	bool LocalRpcServiceBase::CloseService()
 	{
 		if(this->IsStartService())
 		{
@@ -188,7 +188,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool ServiceComponent::AllotAddress(string& address)
+	bool LocalRpcServiceBase::AllotAddress(string& address)
 	{
 		if(!this->mAddressList.empty())
 		{
@@ -202,7 +202,7 @@ namespace Sentry
 		return false;
 	}
 
-	void ServiceComponent::OnDelAddress(const string& address)
+	void LocalRpcServiceBase::OnDelAddress(const string& address)
 	{
 		auto iter = this->mAddressList.begin();
 		for(; iter != this->mAddressList.end();iter++)
@@ -215,7 +215,7 @@ namespace Sentry
 			}
 		}
 	}
-	void ServiceComponent::OnAddAddress(const string& address)
+	void LocalRpcServiceBase::OnAddAddress(const string& address)
 	{
 		assert(!address.empty());
 		for(const std::string & item : this->mAddressList)
@@ -228,7 +228,7 @@ namespace Sentry
 		this->mAddressList.emplace_back(address);
 		LOG_ERROR(this->GetName() << " add address " << address);
 	}
-	bool ServiceComponent::GetEntityAddress(long long int id, string& address)
+	bool LocalRpcServiceBase::GetEntityAddress(long long int id, string& address)
 	{
 		auto iter = this->mUserAddressMap.find(id);
 		if(iter != this->mUserAddressMap.end())
@@ -239,7 +239,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool ServiceComponent::GetAllAddress(list<std::string>& allAddress) const
+	bool LocalRpcServiceBase::GetAllAddress(list<std::string>& allAddress) const
 	{
 		allAddress.clear();
 		for(const std::string & address : this->mAddressList)
@@ -249,7 +249,7 @@ namespace Sentry
 		return !allAddress.empty();
 	}
 
-	XCode ServiceComponent::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)
+	XCode LocalRpcServiceBase::Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json)
 	{
 		std::shared_ptr<EventMethod> eventMethod = this->mEventRegister->GetEvent(eveId);
 		if(eventMethod == nullptr)
@@ -259,7 +259,7 @@ namespace Sentry
 		return eventMethod->Run(json) ? XCode::Successful : XCode::Failure;
 	}
 
-	bool ServiceComponent::LoadEvent()
+	bool LocalRpcServiceBase::LoadEvent()
 	{
 		this->mEventRegister = std::make_shared<ServiceEventRegister>(this->GetName(), this);
 		if(!this->OnInitEvent(*this->mEventRegister))

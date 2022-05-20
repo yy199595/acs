@@ -6,33 +6,34 @@ message Mysql //mysql操作
 {
     message Add
     {
-        string table = 1;
-        google.protobuf.Any data = 2;
+        int64 flag = 1;
+        string table = 2;
+        google.protobuf.Any data = 3;
     }
     message Save
     {
-        string table = 1;
-        google.protobuf.Any data = 2;
+        int64 flag = 1;
+        string table = 2;
+        google.protobuf.Any data = 3;
     }
     message Query
     {
-        string table = 1;
-        string where_json = 2;
+        int64 flag = 1;
+        string table = 2;
+        string where_json = 3;
     }
     message Delete
     {
-        string table = 1;
-        string where_json = 2;
+        int64 flag = 1;
+        string table = 2;
+        string where_json = 3;
     }
     message Update
     {
-        string table = 1;
-        string update_json = 2;
-        string where_json = 3;
-    }
-    message Invoke
-    {
-        string sql = 1;
+        int64 flag = 1;
+        string table = 2;
+        string update_json = 3;
+        string where_json = 4;
     }
     message Response
     {

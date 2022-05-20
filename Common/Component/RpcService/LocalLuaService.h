@@ -7,11 +7,11 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 
-	class LocalLuaServiceComponent : public ServiceComponent, public IStart
+	class LocalLuaService : public LocalRpcServiceBase, public IStart
 	{
 	 public:
-		LocalLuaServiceComponent();
-		~LocalLuaServiceComponent() override;
+		LocalLuaService();
+		~LocalLuaService() override;
 	 public:
 		bool OnStart() final;
 		bool LateAwake() final;

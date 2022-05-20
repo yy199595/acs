@@ -166,8 +166,7 @@ namespace Sentry
 		size_t size = top - (char*)coroutine->mContext;
 		if (coroutine->mStack.size < size)
 		{
-			free(coroutine->mStack.p);
-			coroutine->mStack.p = (char*)malloc(size);
+			coroutine->mStack.p = (char*)realloc(coroutine->mStack.p, size);
 			assert(coroutine->mStack.p);
 		}
 		coroutine->mStack.size = size;

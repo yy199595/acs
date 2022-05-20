@@ -12,8 +12,8 @@ namespace Lua
 	{
 		luaL_checkstring(lua, -1);
 		const char* name = lua_tostring(lua, -1);
-		ServiceComponent* localServiceComponent = App::Get()->GetComponent<ServiceComponent>(name);
-		return UserDataParameter::UserDataStruct<ServiceComponent*>::WriteObj(lua, localServiceComponent, name);
+		LocalRpcServiceBase* localServiceComponent = App::Get()->GetComponent<LocalRpcServiceBase>(name);
+		return UserDataParameter::UserDataStruct<LocalRpcServiceBase*>::WriteObj(lua, localServiceComponent, name);
 	}
 	int LuaApp::GetComponent(lua_State* lua)
 	{

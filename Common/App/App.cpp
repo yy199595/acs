@@ -4,7 +4,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/Table.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/RpcService/LocalLuaServiceComponent.h"
+#include"Component/RpcService/LocalLuaService.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -93,7 +93,7 @@ namespace Sentry
 				CONSOLE_LOG_ERROR("not find lua table : " << name);
 				return false;
 			}
-			return this->AddComponent(name, new LocalLuaServiceComponent());
+			return this->AddComponent(name, new LocalLuaService());
 		}
 		// 其他语言
 		return false;
@@ -201,7 +201,7 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				IStart* startComponent = component->Cast<IStart>();
-				ServiceComponent* localServerRpc = component->Cast<ServiceComponent>();
+				LocalRpcServiceBase* localServerRpc = component->Cast<LocalRpcServiceBase>();
 				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
 					continue;
@@ -225,7 +225,7 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
-				ServiceComponent* localServerRpc = component->Cast<ServiceComponent>();
+				LocalRpcServiceBase* localServerRpc = component->Cast<LocalRpcServiceBase>();
 				if (localServerRpc == nullptr || localServerRpc->IsStartService())
 				{
 					IComplete* complete = component->Cast<IComplete>();

@@ -57,9 +57,10 @@ namespace Tcp
 		tcpSocket.async_read_some(asio::buffer(this->mRecvBuffer, sizeof(int)),
 			[this, self](const asio::error_code & code, size_t size)
 			{
-				assert(size > 0);
-				if(code)
+				//assert(size > 0);
+				if(code || size == 0)
 				{
+					printf("code = %s\n", code.message().c_str());
 					this->OnRecvMessage(code, nullptr, 0);
 					return;
 				}

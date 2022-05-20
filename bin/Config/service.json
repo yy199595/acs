@@ -6,9 +6,7 @@
             "Timeout": 0,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "s2s.Mysql.Add",
-            "Response": "s2s.Mysql.Response",
-            "Channel": "RpcClientComponent"
+            "Request": "s2s.Mysql.Add"
         },
         "Save": {
             "Id": 102,
@@ -16,8 +14,7 @@
             "Timeout": 0,
             "CallWay": "Net",
             "Type": "Server",
-            "Request": "s2s.Mysql.Save",
-            "Response": "s2s.Mysql.Response"
+            "Request": "s2s.Mysql.Save"
         },
         "Delete": {
             "Id": 103,
@@ -25,8 +22,7 @@
             "Timeout": 0,
             "CallWay": "Net",
             "Type": "Server",
-            "Request": "s2s.Mysql.Delete",
-            "Response": "s2s.Mysql.Response"
+            "Request": "s2s.Mysql.Delete"
         },
         "Query": {
             "Id": 104,
@@ -37,23 +33,13 @@
             "Request": "s2s.Mysql.Query",
             "Response": "s2s.Mysql.Response"
         },
-        "Invoke": {
+        "Update": {
             "Id": 105,
             "Async": true,
             "Timeout": 0,
             "CallWay": "Net",
             "Type": "Server",
-            "Request": "s2s.Mysql.Invoke",
-            "Response": "s2s.Mysql.Response"
-        },
-        "Update": {
-            "Id": 106,
-            "Async": true,
-            "Timeout": 0,
-            "CallWay": "Net",
-            "Type": "Server",
-            "Request": "s2s.Mysql.Update",
-            "Response": "s2s.Mysql.Response"
+            "Request": "s2s.Mysql.Update"
         }
     },
     "RegistryService": {

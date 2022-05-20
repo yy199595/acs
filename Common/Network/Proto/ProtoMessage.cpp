@@ -14,7 +14,11 @@ namespace Tcp
 	void ProtoMessage::Write(std::ostream& os, int value)
 	{
 		char buffer[sizeof(int)] = { 0 };
-		memcpy(buffer, &value, sizeof(int));
+		buffer[0] = value & 0xff;
+		buffer[1] = (value >> 8) & 0xff;
+		buffer[2] = (value >> 16) & 0xff;
+		buffer[3] = (value >> 24) & 0xff;
+		//memcpy(buffer, &value, sizeof(int));
 		os.write(buffer, sizeof(int));
 	}
 

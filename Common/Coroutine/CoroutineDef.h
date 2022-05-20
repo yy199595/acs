@@ -8,7 +8,11 @@
 #include<Method/MethodProxy.h>
 #include"Context/context.h"
 #define STACK_SIZE 1024 * 1024
-#define SHARED_STACK_NUM 8 //共享栈个数
+#ifdef __DEBUG__
+	#define SHARED_STACK_NUM 1 //共享栈个数
+#else
+	#define SHARED_STACK_NUM 8 //共享栈个数
+#endif
 #define COR_POOL_COUNT 100
 
 

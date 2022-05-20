@@ -7,7 +7,7 @@ namespace Sentry
 {
 	class ServiceCallComponent;
 
-	class LocalLuaServiceComponent;
+	class LocalLuaService;
 
 	class ServiceMethod;
 
