@@ -7,15 +7,15 @@
 namespace Sentry
 {
 	MysqlClient::MysqlClient(MysqlConfig & config)
-		: mConfig(config), IThread("Mysql")
+		: mConfig(config), IThread("Mysql"),
+		mThread(new thread(std::bind(&MysqlClient::Update, this)))
 	{
-
+		this->mThread->detach();
 	}
 
 	int MysqlClient::Start()
 	{
 		int value = 1;
-		printf("start connect mysql ....\n");
 		unsigned short port = this->mConfig.mPort;
 		const char* ip = this->mConfig.mIp.c_str();
 		const char* user = this->mConfig.mUser.c_str();
@@ -24,13 +24,7 @@ namespace Sentry
 		this->mMysqlSocket = mysql_real_connect(mysqlSocket1, ip, user, password,
 			nullptr, port, nullptr, CLIENT_MULTI_STATEMENTS);
 		mysql_options(mysqlSocket1, MYSQL_OPT_RECONNECT, &value); // 自动重连
-		if(this->mMysqlSocket != nullptr)
-		{
-			this->mThread = new std::thread(std::bind(&MysqlClient::Update, this));
-			this->mThread->detach();
-			return 0;
-		}
-		return -1;
+		return this->mMysqlSocket != nullptr ? 0 : -1;
 	}
 
 
@@ -46,6 +40,7 @@ namespace Sentry
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
+		CONSOLE_LOG_FATAL("close mysql thread");
 	}
 
 	XCode MysqlClient::Start(std::shared_ptr<MysqlAsyncTask> task)

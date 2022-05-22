@@ -7,14 +7,14 @@ namespace Sentry
     class NetThreadComponent;
     class TaskComponent;
 
-    class TaskProxy
+    class IThreadTask
     {
     public:
-        TaskProxy();
-        virtual ~TaskProxy() = default;
+        IThreadTask();
+        virtual ~IThreadTask() = default;
     public:
 		friend class NetThreadComponent;
-        virtual bool Run() = 0; //在线程池执行的任务
+        virtual void Run() = 0; //在线程池执行的任务
 		virtual void RunFinish() { };
 	public:
 		long long GetTaskId() const { return this->mTaskId; }
@@ -24,7 +24,7 @@ namespace Sentry
         unsigned int mTaskId;
     };
 
-    class CoroutineAsyncTask : public TaskProxy
+    class CoroutineAsyncTask : public IThreadTask
     {
     public:
         CoroutineAsyncTask();
@@ -37,18 +37,17 @@ namespace Sentry
     };
 
 	template<typename T>
-	class FucntionTask : public TaskProxy
+	class FucntionTask : public IThreadTask
 	{
 	public:
 		typedef void(T::*TaskFunc)();
 		FucntionTask(TaskFunc && func, T * o) :
 			_o(o), _func(std::forward<TaskFunc>(func)) { }
 	public:
-		bool Run() final 
+		void Run() final
 		{ 
 			(_o->*_func)(); 
 			delete this;
-			return false; 
 		}
 		void RunFinish() { }
 	private:

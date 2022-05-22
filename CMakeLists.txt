@@ -139,6 +139,7 @@ include_directories(Libs/include/mongo/mongoc)
 include_directories(Server/Gate)
 include_directories(Server/Logic)
 include_directories(${PROJECT_SOURCE_DIR}/Common)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Amy)
 include_directories(${PROJECT_SOURCE_DIR}/Protocol)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
 

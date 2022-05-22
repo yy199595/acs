@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-#include "TaskProxy.h"
+#include"IThreadTask.h"
 #include<condition_variable>
 #include<mutex>
 #include<queue>
 #include<thread>
 #include<atomic>
+#include"Define/ThreadQueue.h"
 #include<Define/CommonLogDef.h>
 #include<Method/MethodProxy.h>
 #include<Other/DoubleQueue.h>
@@ -65,13 +66,12 @@ namespace Sentry
     public:
 		int Start() final;
 
-        void AddTask(TaskProxy * task);
+        void AddTask(std::shared_ptr<IThreadTask> task);
 	private:
 		void Update() final;
     private:
 		std::thread * mThread;
-        ThreadState mTaskState;
-        DoubleQueue<TaskProxy *> mWaitInvokeTask;
+        MultiThread::ConcurrentQueue<std::shared_ptr<IThreadTask>> mWaitInvokeTask;
     };
 
     class IAsioThread : public IThread

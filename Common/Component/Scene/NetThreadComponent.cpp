@@ -77,7 +77,7 @@ namespace Sentry
 	}
 #endif
 
-	bool NetThreadComponent::StartTask(TaskProxy* task)
+	bool NetThreadComponent::StartTask(std::shared_ptr<IThreadTask> task)
 	{
 		if (task == nullptr)
 		{

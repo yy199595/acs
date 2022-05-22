@@ -12,7 +12,7 @@
 #include<memory>
 #include<unordered_map>
 #include"XCode/XCode.h"
-#include"Thread/TaskProxy.h"
+#include"Thread/IThreadTask.h"
 
 using namespace std;
 using namespace Sentry;

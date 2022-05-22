@@ -25,7 +25,6 @@ namespace Sentry
 		void Update() final;
 	 private:
 		std::thread* mThread;
-		std::atomic_bool mIsClose;
 		MysqlSocket* mMysqlSocket;
 		const MysqlConfig& mConfig;
 		MultiThread::ConcurrentQueue<std::shared_ptr<MysqlAsyncTask>> mTaskQueue;

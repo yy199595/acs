@@ -34,11 +34,9 @@ namespace Sentry
 namespace Sentry
 {
     TaskThread::TaskThread()
-        : IThread("task")
+        : IThread("task"),
+		mThread(new std::thread(std::bind(&TaskThread::Update, this)))
     {
-        this->mTaskState = Idle;
-		this->mThread = nullptr;
-        this->mThread = new std::thread(std::bind(&TaskThread::Update, this));
         this->mThread->detach();
     }
 
@@ -49,15 +47,14 @@ namespace Sentry
 		return 0;
 	}
 
-	void TaskThread::AddTask(TaskProxy * task)
+	void TaskThread::AddTask(std::shared_ptr<IThreadTask> task)
     {
         if(!this->mIsWork)
         {
             this->mIsWork = true;
             this->mThreadVariable.notify_one();
         }
-        this->mWaitInvokeTask.Push(task);
-        this->mTaskState = ThreadState::Run;
+        this->mWaitInvokeTask.enqueue(task);
     }
 
     void TaskThread::Update()
@@ -65,14 +62,13 @@ namespace Sentry
         this->mThreadId = std::this_thread::get_id();
 
         this->HangUp();
-        TaskProxy *task = nullptr;
+        std::shared_ptr<IThreadTask> task;
         while(!this->mIsClose)
         {
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeTask.SwapQueueData();
 #endif
-            this->mWaitInvokeTask.Swap();
-            while(this->mWaitInvokeTask.Pop(task))
+            while(this->mWaitInvokeTask.try_dequeue(task))
             {
                 task->Run();
                 this->mLastOperTime = Helper::Time::GetNowSecTime();

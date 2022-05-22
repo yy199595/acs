@@ -126,6 +126,7 @@ namespace Sentry
 				response->mutable_data()->CopyFrom(rpcResponse->data());
 				return XCode::Successful;
 			}
+			LOG_ERROR(rpcRequest->address() << " auth failure");
 			return XCode::NetActiveShutdown;
 		}
 		std::string address;

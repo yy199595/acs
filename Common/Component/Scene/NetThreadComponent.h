@@ -6,7 +6,7 @@
 #include "Util/NumberBuilder.h"
 namespace Sentry
 {
-	class TaskProxy;
+	class IThreadTask;
 
 	class NetThreadComponent : public Component
 	{
@@ -22,7 +22,7 @@ namespace Sentry
 		void OnDestory() final;
 	 public:
 
-		bool StartTask(TaskProxy* taskAction);
+		bool StartTask(std::shared_ptr<IThreadTask> taskAction);
 
 		void GetAllThread(std::vector<const IThread*>& threads);
 

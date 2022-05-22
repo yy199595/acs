@@ -1,10 +1,10 @@
-#include"TaskProxy.h"
+#include"IThreadTask.h"
 #include"App/App.h"
 #include"Util/TimeHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-    TaskProxy::TaskProxy()
+    IThreadTask::IThreadTask()
     {
 		this->mTaskId = 0;
         this->mStartTime = Helper::Time::GetNowMilTime();

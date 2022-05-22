@@ -31,6 +31,7 @@ using namespace Client;
 #include"Component/Gate/GateProxyComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
+#include"amy.hpp"
 using namespace Sentry;
 
 
@@ -84,6 +85,19 @@ int main(int argc, char **argv)
 {
 	try
     {
+//		asio::io_context io;
+//		asio::error_code code;
+//		const std::string database = "";
+//		amy::auth_info authInfo("yjz", "199595yjz.");
+//		asio::ip::tcp::endpoint endpoint(asio::ip::make_address("114.115.167.51"), 3306);
+//		amy::connector mysqlConnector(io);
+//		mysqlConnector.connect(endpoint, authInfo, database, amy::default_flags, code);
+//
+//		mysqlConnector.async_query("select * from db_account.tab_user_account",
+//			[](const asio::error_code & error, amy::result_set resultSet1)
+//			{
+//
+//			});
         RegisterComponent();
         RegisterServiceComponent();
         const std::string path(argv[1]);
