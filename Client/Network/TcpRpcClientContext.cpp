@@ -61,19 +61,12 @@ namespace Client
 		const char * str = message + 1;
 		switch((RPC_TYPE)message[0])
 		{
-		case RPC_TYPE::RPC_TYPE_REQUEST:
+		case RPC_TYPE::RPC_TYPE_CALL_CLIENT:
 			return this->OnRequest(str, length);
 		case RPC_TYPE::RPC_TYPE_RESPONSE:
 			return this->OnResponse(str, length);
-		case RPC_TYPE::RPC_TYPE_CALL_CLIENT:
-			return this->OnCall(str, length);
 		}
 		return false;
-	}
-
-	bool TcpRpcClientContext::OnCall(const char* buffer, size_t size)
-	{
-		return true;
 	}
 
 	void TcpRpcClientContext::StartReceive()
@@ -87,9 +80,10 @@ namespace Client
 
 	bool TcpRpcClientContext::OnRequest(const char * buffer, size_t size)
     {
-        std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
+        std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
         if (!request->ParseFromArray(buffer, size))
         {
+			CONSOLE_LOG_ERROR("parse request message error");
             return false;
         }
         this->mClientComponent->OnRequest(request);
@@ -101,7 +95,8 @@ namespace Client
         std::shared_ptr<c2s::Rpc_Response> response(new c2s::Rpc_Response());
         if (!response->ParseFromArray(buffer, size))
         {
-            return false;
+			CONSOLE_LOG_ERROR("parse response message error");
+			return false;
         }
         this->mClientComponent->OnResponse(response);
         return true;

@@ -17,18 +17,26 @@ namespace Sentry
 		for (int x = 0; x < desc->message_type_count(); x++)
 		{
 			const Descriptor * messageDesc = desc->message_type(x);
-			if(!this->InitDb(mysql, messageDesc->name()))
+			if(messageDesc != nullptr)
 			{
-				this->mTaskSource.SetResult(XCode::Failure);
-				return;
-			}
-			for (int y = 0; y < messageDesc->nested_type_count(); y++)
-			{
-				const Descriptor * desc = messageDesc->nested_type(y);
-				if(desc == nullptr || !this->InitTable(mysql, desc))
+				std::cout << "start init database " << messageDesc->name() << std::endl;
+				if (!this->InitDb(mysql, messageDesc->name()))
 				{
 					this->mTaskSource.SetResult(XCode::Failure);
 					return;
+				}
+				for (int y = 0; y < messageDesc->nested_type_count(); y++)
+				{
+					const Descriptor* desc = messageDesc->nested_type(y);
+					if (desc != nullptr)
+					{
+						std::cout << "start init table " << desc->name() << std::endl;
+						if (!this->InitTable(mysql, desc))
+						{
+							this->mTaskSource.SetResult(XCode::Failure);
+							return;
+						}
+					}
 				}
 			}
 		}

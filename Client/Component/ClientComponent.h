@@ -17,7 +17,7 @@ namespace Client
     class TcpRpcClientContext;
 
     class ClientComponent : public Component,
- 		public IRpc<c2s::Rpc::Request, c2s::Rpc::Response>, public IComplete
+ 		public IRpc<c2s::Rpc::Call, c2s::Rpc::Response>, public IComplete
     {
     public:
         ClientComponent();
@@ -29,7 +29,7 @@ namespace Client
 
         void OnCloseSocket(const std::string & address, XCode code) final {};
 
-        void OnRequest(std::shared_ptr<c2s::Rpc_Request> t1) final;
+        void OnRequest(std::shared_ptr<c2s::Rpc::Call> t1) final;
 
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
 

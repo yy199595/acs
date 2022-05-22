@@ -4,6 +4,7 @@
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClientContext.h"
 #include"Task/ClientRpcTask.h"
+#include"Pool/MessagePool.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -22,12 +23,19 @@ namespace Client
 		return ms > 0 ? this->mTimerComponent->DelayCall(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
 	}
 
-    void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> t1)
+    void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc::Call> t1)
     {
+#ifdef __CLIENT_RPC_DEBUG_LOG__
         std::string json;
-        util::MessageToJsonString(*t1, &json);
-        LOG_ERROR("request json = " << json);
-    }
+		LOG_INFO("========== call client ==========");
+		LOG_INFO("func = " << t1->func());
+		if(Helper::Proto::GetJson(t1->data(), json))
+		{
+			LOG_INFO("json = " << json);
+		}
+		LOG_INFO("=================================");
+#endif
+	}
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)
     {

@@ -21,7 +21,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mConfig.mPassword));
 
 		unsigned int count = std::thread::hardware_concurrency();
-		this->GetApp()->GetConfig().GetMember("mysql", "count", count);
+		this->GetConfig().GetMember("mysql", "count", count);
 
 		for (unsigned int index = 0; index < count; index++)
 		{
@@ -42,7 +42,9 @@ namespace Sentry
 			}
 			LOG_INFO("connect mysql [" << address << "] successful");
 		}
-		return this->GetMysqlClient()->InitTable("db.proto") == XCode::Successful;
+		std::shared_ptr<MysqlTableTaskSource> tableTaskSource
+			= std::make_shared<MysqlTableTaskSource>("db.proto");
+		return this->GetMysqlClient()->Start(tableTaskSource) == XCode::Successful;
 	}
 
 	std::shared_ptr<MysqlClient> MysqlService::GetMysqlClient(long long flag)

@@ -19,7 +19,6 @@ namespace Client
 		std::shared_ptr<TaskSource<bool>> ConnectAsync();
 		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
 	protected:
-		bool OnCall(const char * buffer, size_t size);
 		bool OnRequest(const char * buffer, size_t size);
 		bool OnResponse(const char * buffer, size_t size);
 		void OnConnect(const asio::error_code &error) final;

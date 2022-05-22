@@ -7,19 +7,17 @@
 namespace Sentry
 {
 	MysqlClient::MysqlClient(MysqlConfig & config)
-		: mConfig(config), IThread("Mysql"), mThread(nullptr)
+		: mConfig(config), IThread("Mysql")
 	{
-		this->mLock = std::make_shared<CoroutineLock>();
-		this->mThread = new std::thread(std::bind(&MysqlClient::Update, this));
-		this->mThread->detach();
+
 	}
 
 	int MysqlClient::Start()
 	{
 		int value = 1;
+		printf("start connect mysql ....\n");
 		unsigned short port = this->mConfig.mPort;
 		const char* ip = this->mConfig.mIp.c_str();
-		this->mThreadId = std::this_thread::get_id();
 		const char* user = this->mConfig.mUser.c_str();
 		const char* password = this->mConfig.mPassword.c_str();
 		MysqlSocket* mysqlSocket1 = mysql_init((MYSQL*)nullptr);
@@ -28,7 +26,8 @@ namespace Sentry
 		mysql_options(mysqlSocket1, MYSQL_OPT_RECONNECT, &value); // 自动重连
 		if(this->mMysqlSocket != nullptr)
 		{
-			this->mThreadVariable.notify_one();
+			this->mThread = new std::thread(std::bind(&MysqlClient::Update, this));
+			this->mThread->detach();
 			return 0;
 		}
 		return -1;
@@ -37,23 +36,16 @@ namespace Sentry
 
 	void MysqlClient::Update()
 	{
-		this->HangUp();
-		while(!this->mIsClose && this->mMysqlSocket)
+		this->mThreadId = std::this_thread::get_id();
+		while(!this->mIsClose)
 		{
-			if(this->mCurTask != nullptr)
+			std::shared_ptr<MysqlAsyncTask> mysqlAsyncTask;
+			if(this->mTaskQueue.try_dequeue(mysqlAsyncTask))
 			{
-				this->mCurTask->Run(this->mMysqlSocket);
-				this->mCurTask = nullptr;
+				mysqlAsyncTask->Run(this->mMysqlSocket);
 			}
-			this->HangUp();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
-	}
-
-	XCode MysqlClient::InitTable(const std::string& pb)
-	{
-		std::shared_ptr<MysqlTableTaskSource> tableTaskSource
-			= std::make_shared<MysqlTableTaskSource>(pb);
-		return this->Start(tableTaskSource);
 	}
 
 	XCode MysqlClient::Start(std::shared_ptr<MysqlAsyncTask> task)
@@ -63,9 +55,7 @@ namespace Sentry
 		{
 			return code;
 		}
-		AutoCoroutineLock lock(this->mLock);
-		this->mCurTask = task;
-		this->mThreadVariable.notify_one();
+		this->mTaskQueue.enqueue(task);
 		return task->Await();
 	}
 }

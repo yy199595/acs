@@ -62,6 +62,7 @@ namespace Sentry
 
 			return true;
 		}
+		LOG_FATAL("client unknow message");
 		return false;
 	}
 
@@ -111,7 +112,7 @@ namespace Sentry
 			return false;
 		}
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_REQUEST, message);
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_CALL_CLIENT, message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else

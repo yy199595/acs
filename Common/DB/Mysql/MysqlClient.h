@@ -10,28 +10,25 @@
 #include"Thread/TaskThread.h"
 #include"Define/ThreadQueue.h"
 #include"MysqlTableTaskSource.h"
+#include"Define/ThreadQueue.h"
 #include"Coroutine/CoroutineLock.h"
 namespace Sentry
 {
 	class MysqlClient : public IThread
 	{
-	public:
-		MysqlClient(MysqlConfig & config);
-	public:
-		XCode InitTable(const std::string & pb);
+	 public:
+		MysqlClient(MysqlConfig& config);
+	 public:
 		XCode Start(std::shared_ptr<MysqlAsyncTask> task);
 	 public:
 		int Start() final;
 		void Update() final;
 	 private:
-		 bool Connect();
-	private:
-		std::thread * mThread;
+		std::thread* mThread;
 		std::atomic_bool mIsClose;
-		const MysqlConfig & mConfig;
-		MysqlSocket * mMysqlSocket;
-		std::shared_ptr<CoroutineLock> mLock;
-		std::shared_ptr<MysqlAsyncTask> mCurTask;
+		MysqlSocket* mMysqlSocket;
+		const MysqlConfig& mConfig;
+		MultiThread::ConcurrentQueue<std::shared_ptr<MysqlAsyncTask>> mTaskQueue;
 	};
 }
 #endif //SERVER_MYSQLCLIENT_H
