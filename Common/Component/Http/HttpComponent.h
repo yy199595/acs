@@ -22,6 +22,7 @@ namespace Sentry
 	class HttpHandlerClient;
 	class HttpAsyncResponse;
 	class HttpHandlerRequest;
+	class HttpRequestClient;
 	class HttpComponent : public Component, public ISocketListen
 	{
 	 public:
@@ -31,15 +32,16 @@ namespace Sentry
 		void Awake() final;
 		bool LateAwake() final;
 	 public:
-		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url, int timeout = 5);
-
-		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, int timeout = 5);
+		std::shared_ptr<HttpRequestClient> CreateClient();
+		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url, float second = 15.0f);
+		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
 	 public:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
 		XCode Invoke(const HttpInterfaceConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
 	 private:
-		class TaskComponent* mCorComponent;
+		TimerComponent * mTimeComponent;
+		class TaskComponent* mTaskComponent;
 		class NetThreadComponent* mThreadComponent;
 	};
 }

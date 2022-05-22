@@ -23,6 +23,8 @@ namespace Sentry
 	 public:
 		int Start() final;
 		void Update() final;
+	 private:
+		 bool Connect();
 	private:
 		std::thread * mThread;
 		std::atomic_bool mIsClose;

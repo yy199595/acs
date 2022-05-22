@@ -109,10 +109,10 @@ namespace Sentry
 	}
 
 	XCode GateComponent::HandlerRequest(const RpcInterfaceConfig * config,
-		std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response)
+		std::shared_ptr<com::Rpc::Request> rpcRequest, std::shared_ptr<c2s::Rpc::Response> response)
 	{
 		long long userId = 0;
-		if (!this->mGateClientComponent->GetUserId(request->address(), userId)) //没有验证
+		if (!this->mGateClientComponent->GetUserId(rpcRequest->address(), userId)) //没有验证
 		{
 			GateService* gateService = this->GetComponent<GateService>(config->Service);
 			if (gateService == nullptr || !gateService->IsStartService())
@@ -120,8 +120,8 @@ namespace Sentry
 				return XCode::CallServiceNotFound;
 			}
 			std::shared_ptr<com::Rpc::Response> rpcResponse = std::make_shared<com::Rpc::Response>();
-			XCode code = gateService->Invoke(config->Method, request, rpcResponse);
-			if(code == XCode::Successful)
+			XCode code = gateService->Invoke(config->Method, rpcRequest, rpcResponse);
+			if (code == XCode::Successful)
 			{
 				response->mutable_data()->CopyFrom(rpcResponse->data());
 				return XCode::Successful;
@@ -139,14 +139,17 @@ namespace Sentry
 				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}
 		}
-		request->set_user_id(userId);
-		std::shared_ptr<com::Rpc::Response> responseData = localServerRpc->StartCall(address, request);
-		if (responseData != nullptr)
+		rpcRequest->set_user_id(userId);
+		std::shared_ptr<Message> rpcResponse = config->Response.empty()
+											   ? nullptr : Helper::Proto::New(config->Response);
+
+		XCode code = localServerRpc->Call(address, rpcRequest, rpcResponse);
+
+		response->set_code((int)code);
+		if (code == XCode::Successful && rpcResponse != nullptr)
 		{
-			response->set_code(responseData->code());
-			response->mutable_data()->CopyFrom(responseData->data());
-			return XCode::Successful;
+			response->mutable_data()->PackFrom(*rpcResponse);
 		}
-		return XCode::NetWorkError;
+		return XCode::Successful;
 	}
 }

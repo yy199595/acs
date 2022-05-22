@@ -19,15 +19,12 @@ namespace Sentry
 		std::shared_ptr<HttpAsyncResponse> Request(std::shared_ptr<HttpAsyncRequest> request);
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& content);
 	private:
-		void ReceiveHttpContent( std::shared_ptr<IHttpContent> httpContent);
 		void ConnectHost(const std::string& host, const std::string& port);
+		void ReceiveHttpContent( std::shared_ptr<IHttpContent> httpContent);
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-		std::string mUrl;
+		TaskSource<bool> mHttpTask;
 		asio::streambuf mReadBuffer;
-		std::shared_ptr<TaskSource<bool>> mReadTask;
-		std::shared_ptr<TaskSource<bool>> mWriteTask;
-		std::shared_ptr<TaskSource<bool>> mConnectTask;
 	};
 }
 #endif //GAMEKEEPER_HTTPREQUESTCLIENT_H

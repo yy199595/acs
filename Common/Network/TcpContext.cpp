@@ -60,7 +60,6 @@ namespace Tcp
 				//assert(size > 0);
 				if(code || size == 0)
 				{
-					printf("code = %s\n", code.message().c_str());
 					this->OnRecvMessage(code, nullptr, 0);
 					return;
 				}

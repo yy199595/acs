@@ -18,7 +18,16 @@ namespace Sentry
 		}
 		XCode MysqlCommandTask::Await()
 		{
-			return this->mTaskSource.Await();
+			TimerComponent * timerComponent = App::Get()->GetTimerComponent();
+			long long timerId = timerComponent->DelayCall(5.0f, [this]()
+			{
+				LOG_ERROR("[sql timeout] = " << this->mCommand)
+				this->mTaskSource.SetResult(XCode::CallTimeout);
+			});
+			XCode code = this->mTaskSource.Await();
+			timerComponent->CancelTimer(timerId);
+			LOG_DEBUG("[sql successful] = " << this->mCommand)
+			return code;
 		}
 
 		void MysqlCommandTask::Run(MysqlSocket* mysqlSocket)
@@ -70,6 +79,7 @@ namespace Sentry
 			std::vector<MYSQL_FIELD*> fieldNameVector;
 			unsigned long rowCount = mysql_num_rows(queryResult);
 			unsigned int fieldCount = mysql_field_count(mysqlSocket);
+			fieldNameVector.reserve(fieldCount);
 			for (unsigned int index = 0; index < fieldCount; index++)
 			{
 				MYSQL_FIELD* field = mysql_fetch_field(queryResult);
@@ -152,6 +162,14 @@ namespace Sentry
 		bool MysqlDeleteCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
 		{
 			return helper.ToSqlCommand(this->mRequest, sql);
+		}
+	}
+
+	namespace Mysql
+	{
+		bool MysqlIndexCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		{
+			return true;
 		}
 	}
 }

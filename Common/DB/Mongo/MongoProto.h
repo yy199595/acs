@@ -69,6 +69,27 @@ namespace Mongo
 		std::string collectionName;
 		minibson::document document;
 	};
+
+	class MongoLateError : public Tcp::ProtoMessage
+	{
+	 public:
+		bool Serailize(std::ostream& os) final;
+	};
+
+	class MongoQueryRequest : public MongoRequest
+	{
+	 public:
+		MongoQueryRequest();
+	 protected:
+		int GetLength() final;
+		void OnWriter(std::ostream& os) final;
+	 public:
+		int flag;
+		std::string collectionName;
+		int numberToSkip;
+		int numberToReturn;
+		minibson::document document;
+	};
 }
 
 

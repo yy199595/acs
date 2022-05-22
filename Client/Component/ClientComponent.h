@@ -14,7 +14,7 @@ namespace Sentry
 namespace Client
 {
     class ClientRpcTask;
-    class TcpRpcClient;
+    class TcpRpcClientContext;
 
     class ClientComponent : public Component,
  		public IRpc<c2s::Rpc::Request, c2s::Rpc::Response>, public IComplete
@@ -35,7 +35,7 @@ namespace Client
 
 	 private:
 		void StartClient(const std::string & account);
-		std::shared_ptr<TcpRpcClient> GetCurrentRpcClient();
+		std::shared_ptr<TcpRpcClientContext> GetCurrentRpcClient();
 		bool GetClient(const std::string & account, const std::string & passwd);
     public:
 		XCode Call(const std::string & name);
@@ -59,8 +59,8 @@ namespace Client
         TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
         HttpComponent * mHttpComponent;
-        //std::shared_ptr<TcpRpcClient> mTcpClient;
-		std::unordered_map<unsigned int, std::shared_ptr<TcpRpcClient>> mClients;
+        //std::shared_ptr<TcpRpcClientContext> mTcpClient;
+		std::unordered_map<unsigned int, std::shared_ptr<TcpRpcClientContext>> mClients;
         std::unordered_map<long long, TaskSourceShared<c2s::Rpc::Response>> mRpcTasks;
     };
 }

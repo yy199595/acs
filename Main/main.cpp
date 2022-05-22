@@ -71,8 +71,7 @@ void RegisterComponent()
 	ComponentFactory::Add<ClientComponent>("ClientComponent");
 #endif
 }
-#include"bson.h"
-#include"mongoc.h"
+
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<GateService>("GateService");
@@ -81,25 +80,10 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<RegistryService>("RegistryService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
-#include<DB/Mongo/Bson/minibson.hpp>
 int main(int argc, char **argv)
 {
 	try
     {
-		Json::Writer json;
-		json.AddMember("name", "xiaoming");
-		json.AddMember("age", 20);
-		std::string s = json.ToJsonString();
-
-		size_t s1 = s.size();
-		char buffer[1024] = {0};
-		minibson::document document;
-		document.set("name", "xiaoming");
-		document.set("age", 20);
-
-		size_t size = document.get_serialized_size();
-		document.serialize(buffer, 1024);
-
         RegisterComponent();
         RegisterServiceComponent();
         const std::string path(argv[1]);

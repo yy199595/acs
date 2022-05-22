@@ -17,6 +17,11 @@ namespace Sentry
 		this->mCommandLock = std::make_shared<CoroutineLock>();
 	}
 
+	RedisClientContext::~RedisClientContext() noexcept
+	{
+		LOG_WARN("remove redis client " << this->mConfig->Name << "[" << this->mConfig->Address << "]");
+	}
+
     XCode RedisClientContext::StartConnect()
     {
 		AutoCoroutineLock lock(this->mConnectLock);
@@ -75,7 +80,18 @@ namespace Sentry
 
     XCode RedisClientContext::Run(std::shared_ptr<RedisRequest> command, std::shared_ptr<RedisResponse> response)
 	{
-		if(this->Run(command) != XCode::Successful)
+		if(!this->mSocket->IsOpen())
+		{
+			return XCode::NetWorkError;
+		}
+		AutoCoroutineLock lock(this->mCommandLock);
+		this->mSendTaskSource.Clear();
+#ifdef ONLY_MAIN_THREAD
+		this->Send(command);
+#else
+		this->mNetworkThread.Invoke(&RedisClientContext::Send, this, command);
+#endif
+		if(this->mSendTaskSource.Await() != XCode::Successful)
 		{
 			return XCode::NetWorkError;
 		}

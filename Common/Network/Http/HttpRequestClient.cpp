@@ -19,10 +19,10 @@ namespace Sentry
 #ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
-			this->mWriteTask->SetResult(false);
+			this->mHttpTask.SetResult(false);
 			return;
 		}
-		this->mWriteTask->SetResult(true);
+		this->mHttpTask.SetResult(true);
 	}
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Get(const std::string &url)
@@ -39,28 +39,28 @@ namespace Sentry
     {
         const std::string & host = httpRequest->GetHost();
         const std::string & port = httpRequest->GetPort();
-		this->mConnectTask = std::make_shared<TaskSource<bool>>();
 #ifdef ONLY_MAIN_THREAD
-        this->ConnectHost(host, port);
-        if(!this->mConnectTask->Await())
+		this->ConnectHost(host, port);
+        if(!this->mHttpTask.Await())
         {
             LOG_ERROR("connect http host" << host << ":" << port <<  " failure");
             return nullptr;
         }
 		LOG_DEBUG("connect http host " << host << ":" << port << " successful");
-
-		this->mWriteTask = std::make_shared<TaskSource<bool>>();
+		this->mHttpTask.Clear();
 		this->Send(httpRequest);
 
-        if(!this->mWriteTask->Await())
+        if(!this->mHttpTask.Await())
         {
             LOG_ERROR("send http get request failure");
             return nullptr;
         }
-		this->mReadTask = std::make_shared<TaskSource<bool>>();
+		this->mHttpTask.Clear();
+		LOG_WARN("send http data to " << host << ":" << port << " successful");
 		std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
         this->ReceiveHttpContent(httpContent);
-        return this->mReadTask->Await() ? httpContent : nullptr;
+		LOG_ERROR("recv http data from " << host << ":" << port << " successful");
+		return this->mHttpTask.Await() ? httpContent : nullptr;
 #else
         IAsioThread & netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port);
@@ -94,20 +94,21 @@ namespace Sentry
             if(code)
             {
 				CONSOLE_LOG_ERROR(code.message());
-                this->mReadTask->SetResult(false);
+                this->mHttpTask.SetResult(false);
                 return;
             }
             switch(httpContent->OnReceiveData(this->mReadBuffer))
             {
                 case HttpStatus::OK:
-					this->mReadTask->SetResult(true);
+					this->mHttpTask.SetResult(true);
                     break;
                 case HttpStatus::CONTINUE:
                     this->ReceiveHttpContent(httpContent);
                     break;
                 default:
-					this->mReadTask->SetResult(false);
-                    break;
+					this->mHttpTask.SetResult(false);
+					CONSOLE_LOG_ERROR("http unknow error");
+				break;
             }
         });
     }
@@ -137,37 +138,28 @@ namespace Sentry
 
     void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port)
     {
+		this->mHttpTask.Clear();
         AsioContext & context = this->mSocket->GetContext();
-        std::shared_ptr<asio::system_timer> connectTimer(new asio::system_timer(context, std::chrono::seconds(5)));
-        connectTimer->async_wait([this](const asio::error_code & code)
-        {
-            if(!code)
-            {
-                this->mSocket->Close();
-                this->mConnectTask->SetResult(false);
-            }
-        });
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
-        resolver->async_resolve(*query, [this, resolver, query, connectTimer, port, host]
+        resolver->async_resolve(*query, [this, resolver, query, port, host]
             (const asio::error_code &err, asio::ip::tcp::resolver::iterator iterator)
         {
             if(err)
             {
-				this->mConnectTask->SetResult(false);
+				this->mHttpTask.SetResult(false);
                 return;
             }
             AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-            asio::async_connect(tcpSocket, iterator, [this, connectTimer]
+            asio::async_connect(tcpSocket, iterator, [this]
                 (const asio::error_code & code, asio::ip::tcp::resolver::iterator iter)
             {
                 if(code)
                 {
-					this->mConnectTask->SetResult(false);
+					this->mHttpTask.SetResult(false);
 					return;
                 }
-                connectTimer->cancel();
-				this->mConnectTask->SetResult(true);
+				this->mHttpTask.SetResult(true);
             });
         });
     }

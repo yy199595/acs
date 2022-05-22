@@ -1,44 +1,44 @@
-#include"TcpRpcClient.h"
+#include"TcpRpcClientContext.h"
 #include"Component/ClientComponent.h"
 #include"Network/Proto/RpcProtoMessage.h"
 namespace Client
 {
-	TcpRpcClient::TcpRpcClient(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
+	TcpRpcClientContext::TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
         : Tcp::TcpContext(socket)
 	{
 		this->mClientComponent = component;
 		this->SetBufferCount(2048, 2048);
 	}
 
-	void TcpRpcClient::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
+	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
 			std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_CLIENT_REQUEST, request);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(networkData);
 #else
-		this->mNetworkThread.Invoke(&TcpRpcClient::Send, this, networkData);
+		this->mNetworkThread.Invoke(&TcpRpcClientContext::Send, this, networkData);
 #endif
 	}
 
 
-    std::shared_ptr<TaskSource<bool>> TcpRpcClient::ConnectAsync()
+    std::shared_ptr<TaskSource<bool>> TcpRpcClientContext::ConnectAsync()
     {
 		this->mConnectTask = std::make_shared<TaskSource<bool>>();
 #ifdef ONLY_MAIN_THREAD
 		this->Connect();
 #else
-		this->mNetworkThread.Invoke(&TcpRpcClient::Connect, this);
+		this->mNetworkThread.Invoke(&TcpRpcClientContext::Connect, this);
 #endif
         return this->mConnectTask;
     }
 
-    void TcpRpcClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+    void TcpRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
 
     }
 
-    void TcpRpcClient::OnConnect(const asio::error_code& error)
+    void TcpRpcClientContext::OnConnect(const asio::error_code& error)
     {
 		if(error)
 		{
@@ -48,7 +48,7 @@ namespace Client
 		this->mConnectTask->SetResult(true);
     }
 
-	bool TcpRpcClient::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
+	bool TcpRpcClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
 	{
 		if(code)
 		{
@@ -71,21 +71,21 @@ namespace Client
 		return false;
 	}
 
-	bool TcpRpcClient::OnCall(const char* buffer, size_t size)
+	bool TcpRpcClientContext::OnCall(const char* buffer, size_t size)
 	{
 		return true;
 	}
 
-	void TcpRpcClient::StartReceive()
+	void TcpRpcClientContext::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead();
 #else
-		this->mNetworkThread.Invoke(&TcpRpcClient::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveHead, this);
 #endif
 	}
 
-	bool TcpRpcClient::OnRequest(const char * buffer, size_t size)
+	bool TcpRpcClientContext::OnRequest(const char * buffer, size_t size)
     {
         std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
         if (!request->ParseFromArray(buffer, size))
@@ -96,7 +96,7 @@ namespace Client
         return true;
     }
 
-	bool TcpRpcClient::OnResponse(const char * buffer, size_t size)
+	bool TcpRpcClientContext::OnResponse(const char * buffer, size_t size)
     {
         std::shared_ptr<c2s::Rpc_Response> response(new c2s::Rpc_Response());
         if (!response->ParseFromArray(buffer, size))

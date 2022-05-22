@@ -21,7 +21,7 @@ namespace Mongo
 		MongoClientContext(std::shared_ptr<SocketProxy> scoket);
 	public:
 		bool StartConnect();
-		void SendMongoCommand(std::shared_ptr<MongoRequest> request);
+		void SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	 protected:
 		void OnConnect(const asio::error_code &error) final;
 		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;

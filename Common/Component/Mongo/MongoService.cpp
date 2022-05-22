@@ -25,19 +25,23 @@ namespace Sentry
 		NetThreadComponent* threadComponent = this->GetComponent<NetThreadComponent>();
 		IAsioThread& asioThread = threadComponent->AllocateNetThread();
 #endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(asioThread, "127.0.0.1", 27017));
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(asioThread, "114.115.167.51", 27017));
 		std::shared_ptr<Mongo::MongoClientContext> mongoClientContext(new Mongo::MongoClientContext(socketProxy));
 		if (mongoClientContext->StartConnect())
 		{
 			LOG_DEBUG("连接mongo成功");
 
 			std::shared_ptr<Mongo::MongoInsertRequest> insertRequest
-					= std::make_shared<Mongo::MongoInsertRequest>();
+				= std::make_shared<Mongo::MongoInsertRequest>();
 			insertRequest->collectionName = "db.test";
 			insertRequest->document.set("age", 20);
 			insertRequest->document.set("_id", 100);
 			insertRequest->document.set("name", "xiaoming");
 			mongoClientContext->SendMongoCommand(insertRequest);
+
+			std::shared_ptr<Mongo::MongoLateError> lateError
+				= std::make_shared<Mongo::MongoLateError>();
+			mongoClientContext->SendMongoCommand(lateError);
 		}
 		return true;
 	}

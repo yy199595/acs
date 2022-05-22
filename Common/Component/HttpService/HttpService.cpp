@@ -48,7 +48,9 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
+#ifdef __HTTP_DEBUG_LOG__
 		LOG_INFO("[GET] " << url << " response = " << httpResponse->GetContent());
+#endif
 		if(!response->ParseJson(httpResponse->GetContent()))
 		{
 			return XCode::ParseJsonFailure;
@@ -63,7 +65,11 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		const std::string json = request.ToJsonString();
+		std::string json;
+		if(!request.WriterStream(json))
+		{
+			return XCode::ParseJsonFailure;
+		}
 		const std::string url = fmt::format("{0}{1}", this->mUrl, path);
 		std::shared_ptr<HttpAsyncResponse> httpResponse = this->mHttpComponent->Post(url, json);
 		if(httpResponse == nullptr)

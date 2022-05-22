@@ -24,6 +24,7 @@ namespace Mongo
 			this->mConnectTask.SetResult(false);
 			return;
 		}
+		this->ReceiveHead();
 		this->mConnectTask.SetResult(true);
 	}
 
@@ -64,7 +65,7 @@ namespace Mongo
 		return this->mConnectTask.Await();
 	}
 
-	void MongoClientContext::SendMongoCommand(std::shared_ptr<MongoRequest> request)
+	void MongoClientContext::SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
 	{
 		AutoCoroutineLock lock(this->mWriteLock);
 #ifdef ONLY_MAIN_THREAD
@@ -80,7 +81,7 @@ namespace Mongo
 		}
 		LOG_DEBUG("send mongo command successful");
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead();
+		//this->ReceiveHead();
 #else
 		this->mNetworkThread.Invoke(&MongoClientContext::ReceiveHead, this);
 #endif

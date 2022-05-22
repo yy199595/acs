@@ -18,6 +18,7 @@ namespace Sentry
     {
     public:
         RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
+		~RedisClientContext();
     public:
 		XCode StartConnect();
 		bool IsUse() const { return this->mCommandLock->IsLock(); }

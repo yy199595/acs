@@ -104,6 +104,20 @@ namespace Sentry
 			const s2s::Mysql::Delete & mRequest;
 		};
 	}
+
+	namespace Mysql
+	{
+		class MysqlIndexCommandTask : public MysqlCommandTask
+		{
+		 public:
+			MysqlIndexCommandTask(const s2s::Mysql::Index & request)
+				: mRequest(request) {}
+		 public:
+			bool GetCommand(MysqlHelper & helper, std::string & sql) final;
+		 private:
+			const s2s::Mysql::Index & mRequest;
+		};
+	}
 }
 
 

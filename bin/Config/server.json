@@ -60,7 +60,7 @@
     },
     "mongo":{
         "count": 1,
-        "ip": "10.10.14.104",
+        "ip": "114.115.167.51",
         "port": 27017,
         "user": "yjz",
         "passwd": "199595yjz."
@@ -68,7 +68,7 @@
     "redis":
     {
         "main": {
-            "ip": "127.0.0.1",
+            "ip": "114.115.167.51",
             "port": 6379,
             "timeout": 3,
             "count": 1,
@@ -76,7 +76,7 @@
                 "./redis/lock.lua",
                 "./redis/user.lua"
             ],
-            "passwd": ""
+            "passwd": "199595yjz."
         },
         "data": {
             "ip": "114.115.167.51",
@@ -115,6 +115,7 @@
         "GateService",
         "ChatService",
         "MysqlService",
+        "MongoService",
         "HttpUserService",
         "RegistryService"
     ],

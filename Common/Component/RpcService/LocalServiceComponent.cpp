@@ -31,7 +31,7 @@ namespace Sentry
 				this->mLuaMethodMap.erase(iter);
 			}
 			this->mLuaMethodMap.emplace(name, method);
-			LOG_DEBUG("add new lua service method [" << this->mService << '.' << name << "]");
+			//LOG_DEBUG("add new lua service method [" << this->mService << '.' << name << "]");
 			return true;
 		}
 
@@ -42,7 +42,7 @@ namespace Sentry
 			return false;
 		}
 		this->mMethodMap.emplace(name, method);
-		LOG_DEBUG("add new c++ service method [" << this->mService <<'.' << name << ']');
+		//LOG_DEBUG("add new c++ service method [" << this->mService <<'.' << name << ']');
 		return true;
 	}
 
@@ -226,7 +226,7 @@ namespace Sentry
 			}
 		}
 		this->mAddressList.emplace_back(address);
-		LOG_ERROR(this->GetName() << " add address " << address);
+		LOG_INFO(this->GetName() << " add address " << address);
 	}
 	bool LocalRpcServiceBase::GetEntityAddress(long long int id, string& address)
 	{

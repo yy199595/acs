@@ -58,8 +58,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
+		return this->Call(address, rpcRequest, nullptr);
 	}
 
 	XCode ServiceCallComponent::Call(const std::string & address, const string& func, const Message& message)
@@ -69,8 +68,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
+		return this->Call(address, rpcRequest, nullptr);
 	}
 
 	XCode ServiceCallComponent::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
@@ -81,16 +79,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		if(rpcResponse == nullptr)
-		{
-			return XCode::NetWorkError;
-		}
-		if(rpcResponse->code() == (int)XCode::Successful && rpcResponse->has_data())
-		{
-			rpcResponse->mutable_data()->UnpackTo(response.get());
-		}
-		return (XCode)rpcResponse->code();
+		return this->Call(address, rpcRequest, response);
 	}
 
 
@@ -103,16 +92,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		if(rpcResponse == nullptr)
-		{
-			return XCode::NetWorkError;
-		}
-		if(rpcResponse->code() == (int)XCode::Successful && rpcResponse->has_data())
-		{
-			rpcResponse->mutable_data()->UnpackTo(response.get());
-		}
-		return (XCode)rpcResponse->code();
+		return this->Call(address, rpcRequest, response);
 	}
 
 	XCode ServiceCallComponent::PublishEvent(const std::string& eveId)
@@ -132,22 +112,58 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	std::shared_ptr<com::Rpc::Response> ServiceCallComponent::StartCall(const std::string & address,
-			std::shared_ptr<com::Rpc::Request> request)
+	XCode ServiceCallComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
 	{
-		std::shared_ptr<RpcTaskSource> taskSource =
-			std::make_shared<RpcTaskSource>();
+		std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
-		this->mRpcComponent->AddRpcTask(taskSource);
 		XCode code = this->SendRequest(address, request);
+#ifdef __RPC_DEBUG_LOG__
+		std::string json;
+		ElapsedTimer elapsedTimer;
+		const ServiceConfig & config = this->GetApp()->GetServiceConfig();
+		const RpcInterfaceConfig * rpcConfig = config.GetInterfaceConfig(request->method_id());
+		LOG_DEBUG("=============== server request ===============");
+		LOG_DEBUG("func = " << rpcConfig->FullName);
+		LOG_DEBUG("address = " << address);
+		if(Helper::Proto::GetJson(request->data(), json))
+		{
+			LOG_DEBUG("request = " << json);
+		}
+		LOG_DEBUG("================================================");
+#endif
 		if(code != XCode::Successful)
 		{
-			std::shared_ptr<com::Rpc::Response> response =
-				std::make_shared<com::Rpc::Response>();
-			response->set_code(int(code));
-			return response;
+			return code;
 		}
-		return taskSource->Await();
+		this->mRpcComponent->AddRpcTask(taskSource);
+		std::shared_ptr<com::Rpc::Response> responsedata = taskSource->Await();
+		if(responsedata == nullptr)
+		{
+#ifdef __RPC_DEBUG_LOG__
+			LOG_ERROR(rpcConfig->FullName << " time out");
+#endif
+			return XCode::CallTimeout;
+		}
+#ifdef __RPC_DEBUG_LOG__
+		LOG_INFO("=============== server response ===============");
+		LOG_INFO("func = " << rpcConfig->FullName);
+		LOG_INFO("address = " << address);
+		LOG_INFO("time = " << elapsedTimer.GetSecond() << "s")
+		if(Helper::Proto::GetJson(responsedata->data(), json))
+		{
+			LOG_INFO("request = " << json);
+		}
+		LOG_INFO("================================================");
+#endif
+		if(responsedata->code() == (int)XCode::Successful && response != nullptr)
+		{
+			if(responsedata->has_data())
+			{
+				responsedata->mutable_data()->UnpackTo(response.get());
+				return XCode::Successful;
+			}
+		}
+		return (XCode)responsedata->code();
 	}
 
 	XCode ServiceCallComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
@@ -196,8 +212,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
+		return this->Call(address, rpcRequest, nullptr);
 	}
 
 	XCode ServiceCallComponent::Call(long long userId, const std::string& func, const Message& message)
@@ -212,8 +227,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		return rpcResponse != nullptr ? (XCode)rpcResponse->code() : XCode::NetWorkError;
+		return this->Call(address, rpcRequest, nullptr);
 	}
 
 	XCode ServiceCallComponent::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
@@ -229,16 +243,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		if(rpcResponse == nullptr)
-		{
-			return XCode::NetWorkError;
-		}
-		if(rpcResponse->code() == (int)XCode::Successful && rpcResponse->has_data())
-		{
-			rpcResponse->mutable_data()->UnpackTo(response.get());
-		}
-		return (XCode)rpcResponse->code();
+		return this->Call(address, rpcRequest, response);
 	}
 
 	XCode ServiceCallComponent::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
@@ -254,16 +259,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::shared_ptr<com::Rpc::Response> rpcResponse = this->StartCall(address, rpcRequest);
-		if(rpcResponse == nullptr)
-		{
-			return XCode::NetWorkError;
-		}
-		if(rpcResponse->code() == (int)XCode::Successful && rpcResponse->has_data())
-		{
-			rpcResponse->mutable_data()->UnpackTo(response.get());
-		}
-		return (XCode)rpcResponse->code();
+		return this->Call(address, rpcRequest, response);
 	}
 
 }

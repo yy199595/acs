@@ -2,7 +2,7 @@
 #include"ClientComponent.h"
 #include"App/App.h"
 #include<Util/StringHelper.h>
-#include"Network/TcpRpcClient.h"
+#include"Network/TcpRpcClientContext.h"
 #include"Task/ClientRpcTask.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
@@ -54,25 +54,24 @@ namespace Client
 
 	void ClientComponent::OnAllServiceStart()
 	{
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
+		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
 		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585129@qq.com"));
 	}
 
 	XCode ClientComponent::Call(const std::string& name)
 	{
 		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-
-		requestMessage->set_method_name(name);
 		TaskSourceShared<c2s::Rpc::Response> taskSource
 				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
 
+		requestMessage->set_method_name(name);
 		requestMessage->set_rpc_id(taskSource->GetTaskId());
 		this->GetCurrentRpcClient()->SendToServer(requestMessage);
 		this->mRpcTasks.emplace(taskSource->GetTaskId(), taskSource);
@@ -139,7 +138,7 @@ namespace Client
 //		}
 	}
 
-	std::shared_ptr<TcpRpcClient> ClientComponent::GetCurrentRpcClient()
+	std::shared_ptr<TcpRpcClientContext> ClientComponent::GetCurrentRpcClient()
 	{
 		unsigned int contextId = this->mTaskComponent->GetContextId();
 		auto iter = this->mClients.find(contextId);
@@ -158,7 +157,7 @@ namespace Client
 		{
 			this->Call("GateService.Ping");
 			//LOG_ERROR("%%%%%%%%%%%%%%%%%%%%");
-			this->mTaskComponent->Sleep(1000);
+			this->mTaskComponent->Sleep(100);
 
 			c2s::Chat::Request chatMessage;
 			chatMessage.set_message("hello");
@@ -183,6 +182,10 @@ namespace Client
 		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
 		std::shared_ptr<Json::Reader> registerResponse(new Json::Reader());
 
+		long long timerId = this->mTimerComponent->DelayCall(5.0f, [account]()
+		{
+			LOG_ERROR(account << " register time out");
+		});
 		if(httpUserService->Post("logic/account/register", jsonWriter, registerResponse) != XCode::Successful)
 		{
 			std::string error;
@@ -191,6 +194,8 @@ namespace Client
 				LOG_ERROR("register error = " << error);
 			}
 		}
+		LOG_ERROR(account << " start login");
+		this->mTimerComponent->CancelTimer(timerId);
 		if(httpUserService->Post("logic/account/login", jsonWriter, loginResponse) != XCode::Successful)
 		{
 			std::string error;
@@ -211,7 +216,7 @@ namespace Client
 		IAsioThread& netThread = this->GetApp()->GetTaskScheduler();
 		std::shared_ptr<SocketProxy> socketProxy =
 			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
-		std::shared_ptr<TcpRpcClient> tcpRpcClient = std::make_shared<TcpRpcClient>(socketProxy, this);
+		std::shared_ptr<TcpRpcClientContext> tcpRpcClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
 
 		int count = 0;
 		while (!tcpRpcClient->ConnectAsync()->Await())

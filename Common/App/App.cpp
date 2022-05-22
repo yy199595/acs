@@ -209,11 +209,16 @@ namespace Sentry
 				if(startComponent != nullptr)
 				{
 					ElapsedTimer timer;
+					long long timeId = this->mTimerComponent->DelayCall(5.0f, [component]()
+					{
+						LOG_FATAL(component->GetName() << " start time out");
+					});
 					if(!startComponent->OnStart())
 					{
 						throw std::logic_error(fmt::format(
 							"start {0} failure", component->GetName()));
 					}
+					this->mTimerComponent->CancelTimer(timeId);
 					LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
 				}
 			}
@@ -250,7 +255,6 @@ namespace Sentry
 				LOG_ERROR(name << " load failure");
 				return false;
 			}
-			LOG_INFO(name << " load successful");
 		}
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
 		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);

@@ -96,6 +96,7 @@ namespace Sentry
 		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
 		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
 		long long userId = this->mUserSyncComponent->AddNewUser(user_account);
+		LOG_DEBUG(user_account << " start register ....");
 		if(userId == 0)
 		{
 			return XCode::RedisSocketError;

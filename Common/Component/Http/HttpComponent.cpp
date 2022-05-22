@@ -24,15 +24,18 @@ namespace Sentry
 
 	bool HttpComponent::LateAwake()
 	{
-		this->mCorComponent = App::Get()->GetTaskComponent();
+		this->mTaskComponent = this->GetApp()->GetTaskComponent();
+		this->mTimeComponent = this->GetApp()->GetTimerComponent();
+#ifdef ONLY_MAIN_THREAD
 		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
+#endif
 		return true;
 	}
 
 	void HttpComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(socket));
-		this->mCorComponent->Start(&HttpComponent::HandlerHttpData, this, handlerClient);
+		this->mTaskComponent->Start(&HttpComponent::HandlerHttpData, this, handlerClient);
 	}
 
 	void HttpComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
@@ -46,7 +49,7 @@ namespace Sentry
 		const std::string& url = httpRequestData->GetPath();
 		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
 		const HttpInterfaceConfig* httpConfig = serviceConfig.GetHttpIterfaceConfig(url);
-#ifdef __DEBUG__
+#ifdef __HTTP_DEBUG_LOG__
 		ElapsedTimer elapsedTimer;
 #endif
 		std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
@@ -54,7 +57,7 @@ namespace Sentry
 
 		jsonResponse->AddMember("code", code);
 		httpClient->Writer(HttpStatus::OK, *jsonResponse);
-#ifdef __DEBUG__
+#ifdef __HTTP_DEBUG_LOG__
 		LOG_INFO("==== http request handler ====");
 		LOG_INFO("url = " << httpRequestData->GetPath());
 		LOG_INFO("type = " << httpRequestData->GetMethod());
@@ -115,7 +118,7 @@ namespace Sentry
 		}
 	}
 
-	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, int timeout)
+	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
@@ -123,20 +126,42 @@ namespace Sentry
 		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
-		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
-		return httpAsyncClient->Get(url);
+		return std::make_shared<HttpRequestClient>(socketProxy);
 	}
 
-	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, int timeout)
+	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, float second)
 	{
-#ifdef ONLY_MAIN_THREAD
-		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
-#else
-		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
-#endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
-		std::shared_ptr<HttpRequestClient> httpAsyncClient(new HttpRequestClient(socketProxy));
+		long long timerId = this->mTimeComponent->DelayCall(second, [this, url]()
+		{
+			LOG_ERROR("get " << url << " timeout");
+		});
+		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
+		std::shared_ptr<HttpAsyncResponse> httpResponse = httpAsyncClient->Get(url);
+		this->mTimeComponent->CancelTimer(timerId);
+		if(httpResponse == nullptr)
+		{
+			LOG_FATAL(url << " net work error");
+			return nullptr;
+		}
+		if(httpResponse->GetHttpCode() != HttpStatus::OK)
+		{
+			const char * err = HttpStatusToString(httpResponse->GetHttpCode());
+			LOG_FATAL("http error = " << err);
+			return nullptr;
+		}
+		return httpResponse;
+	}
+
+	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
+	{
+		long long timerId = this->mTimeComponent->DelayCall(second, [this, url]()
+		{
+			LOG_ERROR("post " << url << " timeout");
+		});
+		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 		std::shared_ptr<HttpAsyncResponse> httpAsyncResponse = httpAsyncClient->Post(url, data);
+		LOG_WARN("post " << url << " successful request = " << data);
+		this->mTimeComponent->CancelTimer(timerId);
 		if(httpAsyncResponse == nullptr)
 		{
 			LOG_FATAL(url << " net work error");

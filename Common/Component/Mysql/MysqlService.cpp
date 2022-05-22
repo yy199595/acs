@@ -25,8 +25,7 @@ namespace Sentry
 
 		for (unsigned int index = 0; index < count; index++)
 		{
-			std::shared_ptr<MysqlClient> mysqlClient(new MysqlClient(this->mConfig));
-			this->mMysqlClients.emplace_back(mysqlClient);
+			this->mMysqlClients.emplace_back(std::make_shared<MysqlClient>(this->mConfig));
 		}
 		return !this->mMysqlClients.empty();
 	}
@@ -43,7 +42,7 @@ namespace Sentry
 			}
 			LOG_INFO("connect mysql [" << address << "] successful");
 		}
-		return this->mMysqlClients[0]->InitTable("db.proto") == XCode::Successful;
+		return this->GetMysqlClient()->InitTable("db.proto") == XCode::Successful;
 	}
 
 	std::shared_ptr<MysqlClient> MysqlService::GetMysqlClient(long long flag)

@@ -9,12 +9,12 @@ namespace Sentry
 		this->mMysqlService = this->GetComponent<MysqlService>();
 		return this->mMysqlService != nullptr;
 	}
-	XCode MysqlProxyComponent::Add(const Message& data, long long flage)
+	XCode MysqlProxyComponent::Add(const Message& message, long long flage)
 	{
 		s2s::Mysql::Add request;
 		request.set_flag(flage);
-		request.mutable_data()->PackFrom(data);
-		request.set_table(data.GetTypeName());
+		request.mutable_data()->PackFrom(message);
+		request.set_table(message.GetTypeName());
 		return this->Call("Add", request);
 	}
 

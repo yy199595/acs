@@ -17,8 +17,23 @@ for i = 1, 10 do
 end
 
 function Main.Awake()
+    local t1 = Time.GetNowMilTime()
+    for i = 1, 100000 do
+        local s1 = Bson.Encode(Person)
+        local b1 = Bson.Decode(s1)
+    end
+    local t2 = Time.GetNowMilTime()
+    print("bson = ", t2 - t1)
+    for i = 1, 100000 do
+        local s2 = Json.Encode(Person)
+        local b2 = Json.Decode(s2)
+    end
+    local t3 = Time.GetNowMilTime()
+    print("json = ", t3 - t2)
 
-    print(Json.Encode, Json.Decode)
+    for k, v in pairs(Bson) do
+        print(k, " = ", v)
+    end
     return true
 end
 

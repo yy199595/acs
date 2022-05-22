@@ -30,23 +30,32 @@ namespace Sentry
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
-	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string pb, const std::string& json)
+	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string proto, const std::string& json)
 	{
 		std::string address;
 		if(this->mGateService->GetEntityAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
-		if(message == nullptr)
-		{
-			return XCode::JsonCastProtoFailure;
-		}
 		std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
-		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
 
 		request->set_func(func);
-		request->mutable_data()->PackFrom(*message);
+		if(proto == "json")
+		{
+			com::Type::Json jsonData;
+			jsonData.set_json(json);
+			request->mutable_data()->PackFrom(jsonData);
+		}
+		else
+		{
+			std::shared_ptr<Message> message = Helper::Proto::NewByJson(proto, json);
+			if(message == nullptr)
+			{
+				return XCode::JsonCastProtoFailure;
+			}
+			request->mutable_data()->PackFrom(*message);
+		}
+		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
 		taskComponent->Start([userId, request, this]()
 		{
 			this->mGateService->Call(userId, "CallClient", request);

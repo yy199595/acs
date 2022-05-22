@@ -40,7 +40,7 @@ namespace Sentry
 		XCode PublishEvent(const std::string & eveId, Json::Writer & message);
 	public:
 		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
-		std::shared_ptr<com::Rpc::Response> StartCall(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
+		XCode Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 	 protected:
 		bool LateAwake() override;
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);

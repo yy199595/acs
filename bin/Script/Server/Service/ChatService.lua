@@ -2,7 +2,7 @@
 ChatService = {}
 
 ChatService.Chat = function(id, request, response)
-    coroutine.sleep(2000)
+   -- coroutine.sleep(2000)
     local gateComponent = App.GetComponent("GateProxyComponent")
 
     local chatMessage = {}

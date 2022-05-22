@@ -74,7 +74,6 @@ namespace Sentry
 #ifdef __DEBUG__
 		LOG_INFO(fullName << " json = " << json.ToJsonString());
 #endif
-
 		if (redisClientContext->Run(request, response1) != XCode::Successful)
 		{
 			return false;
