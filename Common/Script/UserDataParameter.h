@@ -23,10 +23,10 @@ namespace Lua
 		template<typename T>
 		struct UserDataStruct<T&>
 		{
-			static T& Read(lua_State* lua, int index)
-			{
-				return T();
-			}
+//			static T& Read(lua_State* lua, int index)
+//			{
+//				return T();
+//			}
 
 			static void Write(lua_State* lua, T& data)
 			{

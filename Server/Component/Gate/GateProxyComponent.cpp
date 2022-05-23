@@ -30,7 +30,7 @@ namespace Sentry
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
-	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string proto, const std::string& json)
+	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string proto, const std::string& content)
 	{
 		std::string address;
 		if(this->mGateService->GetEntityAddress(userId, address))
@@ -42,13 +42,13 @@ namespace Sentry
 		request->set_func(func);
 		if(proto == "json")
 		{
-			com::Type::Json jsonData;
-			jsonData.set_json(json);
-			request->mutable_data()->PackFrom(jsonData);
+			com::Type::Json message;
+			message.set_json(content);
+			request->mutable_data()->PackFrom(message);
 		}
 		else
 		{
-			std::shared_ptr<Message> message = Helper::Proto::NewByJson(proto, json);
+			std::shared_ptr<Message> message = Helper::Proto::NewByJson(proto, content);
 			if(message == nullptr)
 			{
 				return XCode::JsonCastProtoFailure;

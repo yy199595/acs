@@ -5,12 +5,12 @@
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
 #include"Script/LuaInclude.h"
-
+#include"Component/RpcService/ServiceCallComponent.h"
 namespace Lua
 {
 	namespace Service
 	{
-		int QueryAddress(lua_State * lua);
+		int Call(lua_State * lua);
 	}
 }
 
