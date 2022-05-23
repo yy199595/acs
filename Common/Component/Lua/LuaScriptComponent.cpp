@@ -82,14 +82,14 @@ namespace Sentry
 		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
 		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
 
-		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
-		luaRegister8.BeginNewTable();
-		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
-		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
-		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
-		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
-		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
-		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
+//		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
+//		luaRegister8.BeginNewTable();
+//		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
+//		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
+//		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
+//		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
+//		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
+//		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
 
 
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");

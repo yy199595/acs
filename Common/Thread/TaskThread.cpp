@@ -132,11 +132,9 @@ namespace Sentry
 namespace Sentry
 {
 	MainTaskScheduler::MainTaskScheduler(StaticMethod * method)
-		: IAsioThread("main"), mMainMethod(method)
+		:IAsioThread("main"), mMainMethod(method)
 	{
 		this->mThreadId = std::this_thread::get_id();
-        this->mAsioContext = new AsioContext(1);
-        this->mAsioWork = new AsioWork(*this->mAsioContext);
 	}
 
 	int MainTaskScheduler::Start()
@@ -153,17 +151,18 @@ namespace Sentry
 
 	void MainTaskScheduler::Update()
 	{
-        mAsioContext->poll();
+        this->poll();
 		this->mMainMethod->run();
 		StaticMethod * task = nullptr;
 #ifdef __THREAD_LOCK__
 		this->mTaskQueue.SwapQueueData();
 #endif
         this->mTaskQueue.Swap();
-		while (this->mTaskQueue.Pop(task))
+		while (this->mTaskQueue.Pop(task) && task != nullptr)
 		{
 			task->run();
 			delete task;
+			task = nullptr;
 		}
         this->mLastOperTime = Helper::Time::GetNowSecTime();
     }

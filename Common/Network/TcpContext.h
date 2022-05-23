@@ -38,7 +38,6 @@ namespace Tcp
 		void ReceiveBody(int size);
 		void Send(std::shared_ptr<ProtoMessage> message);
 	 protected:
-		AsioContext& mContext;
 		IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:

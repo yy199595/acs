@@ -20,7 +20,7 @@ namespace Sentry
 		inline bool IsOpen() { return this->mSocket->is_open(); }
 		inline IAsioThread& GetThread() { return this->mNetThread; }
 		inline const std::string& GetAddress() { return this->mAddress; }
-		inline AsioContext& GetContext() { return this->mNetThread.GetContext(); }
+		//inline AsioContext& GetContext() { return this->mNetThread.GetContext(); }
 	 private:
 		std::string mIp;
 		unsigned short mPort;

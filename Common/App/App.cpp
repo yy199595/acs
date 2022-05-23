@@ -14,12 +14,13 @@ namespace Sentry
 
 	App::App(ServerConfig* config)
 			: Entity(0),
-			  mTaskScheduler(NewMethodProxy(&App::LogicMainLoop, this)),
 			  mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
 	{
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
 		this->mMainThreadId = std::this_thread::get_id();
+		StaticMethod * staticMethod = NewMethodProxy(&App::LogicMainLoop, this);
+		this->mTaskScheduler = std::make_shared<MainTaskScheduler>(staticMethod);
 	}
 
 	bool App::LoadComponent()
@@ -140,7 +141,7 @@ namespace Sentry
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
-		return this->mTaskScheduler.Start();
+		return this->mTaskScheduler->Start();
 	}
 
 	void App::Stop()
@@ -151,7 +152,7 @@ namespace Sentry
 			this->mTaskComponent->Start([this, timer]()
 			{
 				this->OnDestory();
-				this->mTaskScheduler.Stop();
+				this->mTaskScheduler->Stop();
 				LOG_WARN("close server successful " << timer->GetMs() << " ms");
 			});
 		}

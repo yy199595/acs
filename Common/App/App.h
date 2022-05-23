@@ -38,7 +38,7 @@ namespace Sentry
 		}
 		inline MainTaskScheduler& GetTaskScheduler()
 		{
-			return this->mTaskScheduler;
+			return *mTaskScheduler;
 		}
 
 	 public:
@@ -77,7 +77,7 @@ namespace Sentry
 		void WaitAllServiceStart();
 	 private:
 		std::thread::id mMainThreadId;
-		class MainTaskScheduler mTaskScheduler;
+		std::shared_ptr<MainTaskScheduler> mTaskScheduler;
 	 private:
 		int mFps;
 		float mDeltaTime;

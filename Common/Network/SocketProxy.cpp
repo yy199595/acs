@@ -6,8 +6,8 @@ namespace Sentry
 	SocketProxy::SocketProxy(IAsioThread& thread)
 		: mNetThread(thread)
 	{
-		AsioContext& context = this->mNetThread.GetContext();
-		this->mSocket = std::make_shared<AsioTcpSocket>(context);
+		//AsioContext& context = this->mNetThread.GetContext();
+		this->mSocket = std::make_shared<AsioTcpSocket>(this->mNetThread);
 	}
 
 	SocketProxy::SocketProxy(IAsioThread& thread, std::shared_ptr<AsioTcpSocket> socket)
@@ -30,9 +30,8 @@ namespace Sentry
 		this->mIp = ip;
 		this->mPort = port;
 		assert(!this->mIp.empty() && this->mPort > 0);
-		AsioContext& context = this->mNetThread.GetContext();
-		this->mSocket = std::make_shared<AsioTcpSocket>(context);
 		this->mAddress = fmt::format("{0}:{1}", ip, port);
+		this->mSocket = std::make_shared<AsioTcpSocket>(this->mNetThread);
 	}
 
 	void SocketProxy::Close()

@@ -74,17 +74,20 @@ namespace Sentry
         MultiThread::ConcurrentQueue<std::shared_ptr<IThreadTask>> mWaitInvokeTask;
     };
 
-    class IAsioThread : public IThread
+	class IAsioThread : public asio::io_context, public IThread
     {
     public:
-        using IThread::IThread;
-        virtual AsioContext & GetContext() = 0;
+        IAsioThread(std::string name) :
+				IThread(name), asio::io_context(1), mWork(*this) {}
+        //virtual AsioContext & GetContext() = 0;
         virtual void InvokeMethod(StaticMethod * task) = 0;
     public:
         template<typename F, typename T, typename ... Args>
         void Invoke(F && f, T * o, Args &&... args) {
             this->InvokeMethod(NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
         }
+	private:
+		asio::io_context::work mWork;
     };
 #ifndef ONLY_MAIN_THREAD
     class NetWorkThread : public IAsioThread
@@ -113,12 +116,12 @@ namespace Sentry
 	public:
 		int Start() final;
 		void InvokeMethod(StaticMethod * method) final;
-        AsioContext & GetContext() final { return *mAsioContext; }
+       // AsioContext & GetContext() final { return *mAsioContext; }
 	private:
 		void Update() final;
 	private:
-        AsioWork * mAsioWork;
-        AsioContext * mAsioContext;
+        //AsioWork * mAsioWork;
+        //AsioContext * mAsioContext;
         StaticMethod * mMainMethod;
         DoubleQueue<StaticMethod*> mTaskQueue;
 	};

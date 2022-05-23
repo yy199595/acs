@@ -10,7 +10,7 @@
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket)
-		: mContext(socket->GetContext()), mNetworkThread(socket->GetThread())
+		: mNetworkThread(socket->GetThread())
 	{
 		this->mSocket = socket;
 		this->mLastOperTime = 0;
@@ -94,7 +94,7 @@ namespace Tcp
 			{
 				if(this->OnRecvMessage(code, bufer, size))
 				{
-					this->mContext.post(std::bind(&TcpContext::ReceiveHead, this));
+					this->mNetworkThread.post(std::bind(&TcpContext::ReceiveHead, this));
 				}
 				if(bufer != this->mRecvBuffer)
 				{

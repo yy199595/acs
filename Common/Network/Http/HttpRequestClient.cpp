@@ -139,7 +139,7 @@ namespace Sentry
     void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port)
     {
 		this->mHttpTask.Clear();
-        AsioContext & context = this->mSocket->GetContext();
+        AsioContext & context = this->mSocket->GetThread();
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
         resolver->async_resolve(*query, [this, resolver, query, port, host]
