@@ -42,6 +42,8 @@ namespace Sentry
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;
+#ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
+#endif
 	};
 }

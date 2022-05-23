@@ -62,13 +62,12 @@ namespace Sentry
     {
         try
         {
-            asio::io_service & io = this->mTaskThread.GetContext();
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
-            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+            this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread, endPoint);
 
             this->mBindAcceptor->listen(this->mConfig.Count);
             std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
-            io.post(std::bind(&NetworkListener::ListenConnect, this));
+            this->mTaskThread.post(std::bind(&NetworkListener::ListenConnect, this));
             taskSource->SetResult(true);
 			this->mIsListen = true;
         }

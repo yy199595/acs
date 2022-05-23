@@ -16,7 +16,6 @@
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
 #include"Component/Logic/RegistryService.h"
-#include<Component/Scene/MonitorComponent.h>
 #include"Component/Mysql/MysqlService.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
@@ -43,7 +42,6 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-	ComponentFactory::Add<MonitorComponent>("MonitorComponent");
 	ComponentFactory::Add<DataMgrComponent>("DataMgrComponent");
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");

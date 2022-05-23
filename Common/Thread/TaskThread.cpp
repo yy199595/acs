@@ -1,6 +1,8 @@
 ﻿#include "TaskThread.h"
 #include"Util/TimeHelper.h"
 #include"Method/MethodProxy.h"
+#include<memory>
+#include<utility>
 #include"Component/Scene/NetThreadComponent.h"
 
 using namespace std::chrono;
@@ -82,12 +84,10 @@ namespace Sentry
 namespace Sentry
 {
     NetWorkThread::NetWorkThread()
-        : IAsioThread("net"), mAsioContext(nullptr)
-    {
-		this->mAsioContext = new AsioContext(1);
-		this->mAsioWork = new AsioWork(*this->mAsioContext);
-        this->mThread = new std::thread(std::bind(&NetWorkThread::Update, this));
-        this->mThread->detach();
+        : IAsioThread("net"),
+		  mThread(new std::thread(std::bind(&NetWorkThread::Update, this)))
+	{
+		this->mThread->detach();
     }
 
 	int NetWorkThread::Start()
@@ -112,19 +112,19 @@ namespace Sentry
         std::chrono::milliseconds time(1);
         while(!this->mIsClose)
         {
-            std::this_thread::sleep_for(time);
-            this->mAsioContext->poll(err);                  
+            this->poll(err);
 #ifdef __THREAD_LOCK__
             this->mWaitInvokeMethod.SwapQueueData();
 #endif
             this->mWaitInvokeMethod.Swap();
-            while (this->mWaitInvokeMethod.Pop(taskMethod))
+            while (this->mWaitInvokeMethod.Pop(taskMethod) && taskMethod != nullptr)
             {
                 taskMethod->run();
                 delete taskMethod;
+				taskMethod = nullptr;
                 this->mLastOperTime = Helper::Time::GetNowSecTime();
             }
-            this->mLastOperTime = Helper::Time::GetNowSecTime();
+			std::this_thread::sleep_for(time);
         }
     }
 }

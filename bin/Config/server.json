@@ -76,7 +76,7 @@
                 "./redis/lock.lua",
                 "./redis/user.lua"
             ],
-            "passwd": ""
+            "passwd": "199595yjz."
         },
         "data": {
             "ip": "114.115.167.51",

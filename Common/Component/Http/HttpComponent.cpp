@@ -26,7 +26,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimeComponent = this->GetApp()->GetTimerComponent();
-#ifdef ONLY_MAIN_THREAD
+#ifndef ONLY_MAIN_THREAD
 		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
 #endif
 		return true;

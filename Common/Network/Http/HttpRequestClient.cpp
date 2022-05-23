@@ -64,23 +64,23 @@ namespace Sentry
 #else
         IAsioThread & netWorkThread = this->mSocket->GetThread();
         netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this, host, port);
-        if(!this->mConnectTask->Await())
+        if(!this->mHttpTask.Await())
         {
             CONSOLE_LOG_ERROR("connect http host " << host << ":" << port << " failure");
             return nullptr;
         }
-		this->mWriteTask = std::make_shared<TaskSource<bool>>();
+		this->mHttpTask.Clear();
 		LOG_INFO("connect http host " << host << ":" << port << " successful");
         netWorkThread.Invoke(&HttpRequestClient::Send, this, httpRequest);
-        if(!this->mWriteTask->Await())
+        if(!this->mHttpTask.Await())
         {
 			CONSOLE_LOG_ERROR("send http get request failure");
             return nullptr;
         }
-		this->mReadTask = std::make_shared<TaskSource<bool>>();
+		this->mHttpTask.Clear();
         std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
         netWorkThread.Invoke(&HttpRequestClient::ReceiveHttpContent, this, httpContent);
-        return this->mReadTask->Await() ? httpContent : nullptr;
+        return this->mHttpTask.Await() ? httpContent : nullptr;
 #endif
     }
 
@@ -138,7 +138,6 @@ namespace Sentry
 
     void HttpRequestClient::ConnectHost(const std::string & host, const std::string & port)
     {
-		this->mHttpTask.Clear();
         AsioContext & context = this->mSocket->GetThread();
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));

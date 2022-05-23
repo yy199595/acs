@@ -97,17 +97,12 @@ namespace Sentry
         explicit NetWorkThread();
     public:
 		int Start() final;
-
 		void InvokeMethod(StaticMethod * task) final;
-
-		AsioContext & GetContext() final { return *mAsioContext; }
 	protected:
 		void Update() final;
     private:
-		AsioWork * mAsioWork;
-		std::thread * mThread;
-		AsioContext * mAsioContext;
-        DoubleQueue<StaticMethod *> mWaitInvokeMethod;
+		std::unique_ptr<std::thread> mThread;
+		DoubleQueue<StaticMethod *> mWaitInvokeMethod;
     };
 #endif
     class MainTaskScheduler : public IAsioThread
@@ -117,12 +112,9 @@ namespace Sentry
 	public:
 		int Start() final;
 		void InvokeMethod(StaticMethod * method) final;
-       // AsioContext & GetContext() final { return *mAsioContext; }
 	private:
 		void Update() final;
 	private:
-        //AsioWork * mAsioWork;
-        //AsioContext * mAsioContext;
         StaticMethod * mMainMethod;
         DoubleQueue<StaticMethod*> mTaskQueue;
 	};
