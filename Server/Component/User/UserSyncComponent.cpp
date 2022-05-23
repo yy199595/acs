@@ -41,6 +41,7 @@ namespace Sentry
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->CallLua("user.get_token", jsonWrite, response))
 		{
+			LOG_ERROR("gen user by token failure " << token);
 			return 0;
 		}
 		long long userId = 0;

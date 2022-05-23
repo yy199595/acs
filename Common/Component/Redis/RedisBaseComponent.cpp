@@ -7,11 +7,6 @@
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-	const RedisConfig* RedisBaseComponent::LoadRedisConfig(const std::string& name)
-	{
-		return this->GetConfig().GetRedisConfig(name);
-	}
-
 	std::shared_ptr<RedisClientContext> RedisBaseComponent::MakeRedisClient(const RedisConfig* config)
 	{
 #ifdef ONLY_MAIN_THREAD
@@ -50,7 +45,7 @@ namespace Sentry
 		return this->CallLua(fullName, request, response, redis);
 	}
 
-	bool RedisBaseComponent::CallLua(const std::string& fullName, Json::Writer& json,
+	bool RedisBaseComponent::CallLua(const std::string& fullName, Json::Writer& parameter,
 			std::shared_ptr<Json::Reader> response, const std::string redis)
 	{
 		size_t pos = fullName.find('.');
@@ -70,19 +65,27 @@ namespace Sentry
 			return false;
 		}
 		std::shared_ptr<RedisResponse> response1(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, json);
-#ifdef __DEBUG__
-		LOG_INFO(fullName << " json = " << json.ToJsonString());
-#endif
+		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, parameter);
 		if (redisClientContext->Run(request, response1) != XCode::Successful)
 		{
 			return false;
 		}
+
 		std::string responseJson;
 		if(!response1->GetString(responseJson) || !response->ParseJson(responseJson))
 		{
 			return false;
 		}
+#ifdef __REDIS_DEBUG__
+		std::string json;
+		LOG_INFO("=========== call redis lua ===========");
+		LOG_INFO("func = " << fullName);
+		if(parameter.WriterStream(json))
+		{
+			LOG_INFO("request = " << json);
+		}
+		LOG_INFO("response = " << responseJson);
+#endif
 		bool res = false;
 		return response->GetMember("res", res) && res;
 	}

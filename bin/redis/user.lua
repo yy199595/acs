@@ -16,8 +16,8 @@ end
 
 user.get_token = function(request, response)
     local user_id = redis.call("GET", request.token)
-    print(type(user_id), tonumber(user_id))
     if user_id ~= nil then
+        print(type(user_id), tonumber(user_id))
         redis.call("DEL", request.token)
         response.user_id = tonumber(user_id)
         return true
@@ -71,8 +71,5 @@ end
 local func = KEYS[1]
 local response = {}
 local request = cjson.decode(ARGV[1])
-print(func, "request = ", ARGV[1])
 response.res = user[func](request, response)
-local responseJson = cjson.encode(response)
-print("response = ", responseJson)
-return responseJson
+return cjson.encode(response)

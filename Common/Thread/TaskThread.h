@@ -70,7 +70,8 @@ namespace Sentry
 	private:
 		void Update() final;
     private:
-		std::thread * mThread;
+		//std::thread * mThread;
+		std::unique_ptr<std::thread> mThread;
         MultiThread::ConcurrentQueue<std::shared_ptr<IThreadTask>> mWaitInvokeTask;
     };
 

@@ -93,7 +93,11 @@ int main(int argc, char **argv)
 //		amy::connector mysqlConnector(io);
 //		mysqlConnector.connect(endpoint, authInfo, database, amy::default_flags, code);
 //
-//		mysqlConnector.async_query("select * from db_account.tab_user_account",
+//		amy::async_execute(mysqlConnector, "", []()
+//		{
+//
+//		});
+//		mysqlConnector.async_query_result("select * from db_account.tab_user_account",
 //			[](const asio::error_code & error, amy::result_set resultSet1)
 //			{
 //

@@ -27,7 +27,7 @@ namespace Sentry
 		XCode Register(const Json::Reader& request, Json::Writer& response);
 
 	 private:
-		const std::string NewToken(const std::string& account);
+		void NewToken(const std::string& account, std::string & token);
 	 private:
 		class GateService * mGateService;
 		UserSyncComponent * mUserSyncComponent;

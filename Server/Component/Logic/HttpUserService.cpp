@@ -61,8 +61,9 @@ namespace Sentry
 			response.AddMember("error", "user password error");
 			return XCode::Failure;
 		}
+		std::string newToken;
 		Json::Writer jsonWriter;
-		std::string newToken = this->NewToken(account);
+		this->NewToken(account, newToken);
 		jsonWriter.AddMember("token", newToken);
 		jsonWriter.AddMember("last_login_time", Helper::Time::GetNowSecTime());
 
@@ -112,12 +113,10 @@ namespace Sentry
 		return this->mMysqlComponent->Add(userAccountInfo);
 	}
 
-	const std::string HttpUserService::NewToken(const std::string& account)
+	void HttpUserService::NewToken(const std::string& account, std::string & token)
 	{
-		char buffer[100] = { 0 };
-		int number = Helper::Math::Random<int>();
-		long long now = Helper::Time::GetNowSecTime();
-		return Helper::Md5::GetMd5(fmt::format("{0}:{1}:{2}", account, now, number));
+		std::string nowTime = Helper::Time::GetDateString();
+		token = Helper::Md5::GetMd5(fmt::format("{0}:{1}", account, nowTime));
 	}
 
 }// namespace Sentry

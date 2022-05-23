@@ -22,7 +22,6 @@ namespace Sentry
 				std::shared_ptr<Json::Reader> response, const std::string redis = "");
 
 	protected:
-		const RedisConfig* LoadRedisConfig(const std::string& name);
 		bool LoadLuaScript(const std::string & redis, const std::string & path);
 		std::shared_ptr<RedisClientContext> MakeRedisClient(const RedisConfig* config);
 
