@@ -2,6 +2,10 @@
 
 Main = {}
 function Main.Awake()
+    for i, v in pairs(ServiceCallComponent) do
+        print(i, v)
+    end
+    Log.Error(ServiceCallComponent)
    return true
 end
 
@@ -14,11 +18,6 @@ Person.arr = {}
 
 for i = 1, 10 do
     table.insert(Person.arr, i)
-end
-
-function Main.Awake()
-
-    return true
 end
 
 function Main.Start()

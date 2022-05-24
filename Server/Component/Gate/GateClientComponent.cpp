@@ -79,11 +79,6 @@ namespace Sentry
 		{
 			return false;
 		}
-//		std::string json;
-//		if(util::MessageToJsonString(*message, &json).ok())
-//		{
-//			LOG_INFO("send to client [" << address << "] json =" << json);
-//		}
 		return proxyClient->SendToClient(message);
 	}
 

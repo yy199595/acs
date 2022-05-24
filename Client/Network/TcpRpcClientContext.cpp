@@ -66,6 +66,7 @@ namespace Client
 		case RPC_TYPE::RPC_TYPE_RESPONSE:
 			return this->OnResponse(str, length);
 		}
+		CONSOLE_LOG_FATAL("unknow message type");
 		return false;
 	}
 
@@ -92,7 +93,7 @@ namespace Client
 
 	bool TcpRpcClientContext::OnResponse(const char * buffer, size_t size)
     {
-        std::shared_ptr<c2s::Rpc_Response> response(new c2s::Rpc_Response());
+        std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
         if (!response->ParseFromArray(buffer, size))
         {
 			CONSOLE_LOG_ERROR("parse response message error");

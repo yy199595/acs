@@ -11,9 +11,11 @@
 #include"Script/Extension/Timer/Timer.h"
 #include"Script/Extension/Log/LuaLogger.h"
 #include"Script/Extension/Json/Json.h"
+#include"Script/Extension/Service/LuaService.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
-
+#include"Component/RpcService/ServiceCallComponent.h"
 #include"Script/Extension/Bson/bson.h"
+
 using namespace Lua;
 namespace Sentry
 {
@@ -28,7 +30,7 @@ namespace Sentry
 	{
 		std::vector<std::string> components;
 		this->GetApp()->GetComponents(components);
-		for (const std::string& name : components)
+		for (const std::string& name: components)
 		{
 			ILuaRegister* luaRegisterComponent = this->GetApp()->GetComponent<ILuaRegister>(name);
 			if (luaRegisterComponent != nullptr)
@@ -40,6 +42,7 @@ namespace Sentry
 
 		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
 		luaRegister0.BeginNewTable();
+		luaRegister0.PushExtensionFunction("GetService", Lua::LuaApp::GetService);
 		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "LuaTaskSource");
@@ -82,18 +85,17 @@ namespace Sentry
 		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
 		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
 
-//		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
-//		luaRegister8.BeginNewTable();
-//		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
-//		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
-//		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
-//		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
-//		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
-//		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
-
+		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
+		luaRegister8.BeginNewTable();
+		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
+		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
+		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
+		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
+		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
+		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
 
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
-		if(luaFunction != nullptr)
+		if (luaFunction != nullptr)
 		{
 			luaFunction->Action();
 		}

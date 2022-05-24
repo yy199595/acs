@@ -37,4 +37,17 @@ namespace Sentry
         const int mTimeout;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
+
+	class LuaRpcTaskSource
+	{
+	public:
+		LuaRpcTaskSource(lua_State * lua);
+		~LuaRpcTaskSource();
+	public:
+		bool Yield();
+		void SetResult(XCode code,const com::Rpc::Response & response);
+	private:
+		int mRef;
+		lua_State * mLua;
+	};
 }

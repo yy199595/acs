@@ -1,6 +1,5 @@
 #include "DirectoryHelper.h"
-#include <regex>
-#ifdef _WIN32
+#ifdef __OS_WIN__
 #include <direct.h>
 #include <io.h>
 #include <windows.h>
@@ -13,7 +12,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-#ifdef _WIN32
+#ifdef __OS_WIN__
 #define MakeDirectory(path) _mkdir(path.c_str())
 #else
 #define MakeDirectory(path) mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IXOTH)
@@ -40,7 +39,7 @@ namespace Helper
 
     bool DeleteDir(const std::string dir)
     {
-#ifdef _WIN32
+#ifdef __OS_WIN__
         return _rmdir(dir.c_str()) != -1;
 #else
         return rmdir(dir.c_str()) != -1;
@@ -49,7 +48,7 @@ namespace Helper
 
     bool DirectorIsExist(const std::string dir)
     {
-#ifdef _WIN32
+#ifdef __OS_WIN__
         return _access(dir.c_str(), 0) == 0;
 #else
         return access(dir.c_str(), F_OK) == 0;
@@ -58,7 +57,7 @@ namespace Helper
 
     bool GetFilePaths(const std::string path, std::vector<std::string> &paths)
     {
-#ifdef _WIN32
+#ifdef __OS_WIN__
         char newpath[PATH_MAX_LENGHT] = {0};
         sprintf_s(newpath, "%s/*.*", path.c_str());
         WIN32_FIND_DATA findFileData;
@@ -127,7 +126,7 @@ namespace Helper
             }
         }
         return closedir(dir) != -1;
-#endif// !_WIN32
+#endif
     }
     bool GetFilePaths(const std::string path, std::string format, std::vector<std::string> &paths)
     {

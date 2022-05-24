@@ -71,7 +71,7 @@ namespace Sentry
 
 	void GateComponent::OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request)
 	{
-#if (defined __RPC_DEBUG_LOG__) && defined(__DEBUG__)
+#if __RPC_DEBUG_LOG__
 		std::string json;
 		long long userId = 0;
 		LOG_DEBUG("========== client request ==========");
@@ -96,7 +96,7 @@ namespace Sentry
 			this->mGateClientComponent->StartClose(request->address());
 			return;
 		}
-#if (defined __RPC_DEBUG_LOG__) && defined(__DEBUG__)
+#if __RPC_DEBUG_LOG__
 		LOG_WARN("********** client response**********");
 		LOG_DEBUG("func = " << config->FullName);
 		if (response->has_data() && Helper::Proto::GetJson(response->data(), json))

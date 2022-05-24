@@ -7,6 +7,7 @@
 #endif
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
+#include"Script/Extension/Service/LuaService.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
@@ -19,6 +20,11 @@ namespace Sentry
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
+	}
+
+	void ServiceCallComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
 	}
 
 	std::shared_ptr<com::Rpc::Request> ServiceCallComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)

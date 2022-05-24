@@ -11,7 +11,7 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class ServerClientContext;
-	class ServiceCallComponent : public Component
+	class ServiceCallComponent : public Component, public ILuaRegister
 	{
 	 public:
 		ServiceCallComponent() = default;
@@ -26,13 +26,14 @@ namespace Sentry
 		XCode Call(long long userId, const std::string& func, const Message& message);
 		XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
 		XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
-	 public:
+	public:
 		bool LateAwake() override;
 		XCode PublishEvent(const std::string& eveId);
 		XCode PublishEvent(const std::string& eveId, Json::Writer& message);
 		virtual bool GetEntityAddress(long long id, std::string& address) = 0;
 		XCode Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 	 private:
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
 		XCode SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
 		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
 	 protected:

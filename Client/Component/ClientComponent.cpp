@@ -165,11 +165,13 @@ namespace Client
 		{
 			this->Call("GateService.Ping");
 			//LOG_ERROR("%%%%%%%%%%%%%%%%%%%%");
-			this->mTaskComponent->Sleep(100);
 
 			c2s::Chat::Request chatMessage;
 			chatMessage.set_message("hello");
 			this->Call("ChatService.Chat", chatMessage);
+
+			this->mTaskComponent->Sleep(10000);
+
 		}
 	}
 
