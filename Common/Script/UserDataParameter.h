@@ -58,7 +58,8 @@ namespace Lua
 				}
 				size_t size = sizeof(PtrProxy<T>);
 				new(lua_newuserdata(lua, size))PtrProxy<T>(obj);
-				if (lua_getglobal(lua, meta) && lua_istable(lua, -1))
+				lua_getglobal(lua, meta);
+				if (lua_istable(lua, -1))
 				{
 					lua_setmetatable(lua, -2);
 					return 1;

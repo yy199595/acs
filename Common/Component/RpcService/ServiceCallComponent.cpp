@@ -24,6 +24,7 @@ namespace Sentry
 
 	void ServiceCallComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
+		luaRegister.BeginRegister<ServiceCallComponent>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
 	}
 

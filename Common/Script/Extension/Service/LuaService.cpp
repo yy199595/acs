@@ -31,7 +31,7 @@ namespace Lua
 		}
 		else if (lua_isstring(lua, 2)) //address
 		{
-			address.append(lua_tostring(lua, 1));
+			address.append(lua_tostring(lua, 2));
 		}
 		if (!lua_isstring(lua, 3))
 		{

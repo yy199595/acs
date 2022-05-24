@@ -2,10 +2,9 @@
 
 Main = {}
 function Main.Awake()
-    for i, v in pairs(ServiceCallComponent) do
+    for i, v in pairs(_G) do
         print(i, v)
     end
-    Log.Error(ServiceCallComponent)
    return true
 end
 

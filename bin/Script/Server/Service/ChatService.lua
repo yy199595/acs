@@ -3,7 +3,7 @@ ChatService = {}
 
 ChatService.Chat = function(id, request, response)
    -- coroutine.sleep(2000)
-    local mysqlService = App.GetService("GateService")
+    local mysqlService = App.GetComponent("GateService")
     Log.Error(mysqlService)
     local code = mysqlService:Call("127.0.0.1:7788", "Ping")
     local gateComponent = App.GetComponent("GateProxyComponent")
