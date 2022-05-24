@@ -188,7 +188,7 @@ endif()
 
 if(MSVC) #创建vs目录
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    list(CxxFiles ${AsmFiles} ${CommonFiles} ${ServerFiles})
+    list(APPEND CxxFiles ${AsmFiles} ${CommonFiles} ${ServerFiles})
     foreach(file_name ${CxxFiles})
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
