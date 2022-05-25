@@ -95,7 +95,7 @@ namespace values {
 		}
 
 		Value NumberValue(lua_State* L, int idx) {
-			long long integer;
+			int64_t integer;
 			return luax::isinteger(L, idx, &integer) ? Value(integer) : Value(lua_tonumber(L, idx));
 		}
 
