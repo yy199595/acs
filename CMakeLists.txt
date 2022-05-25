@@ -20,12 +20,18 @@ option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
-option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
+option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
+option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" ON)
 option(__CLIENT_RPC_DEBUG_LOG__, "开启客户端rpc日志" ON)
 
 if(__ENABLE_JEMALLOC__)
     message("启用jemalloc管理内存")
     add_definitions(-D __ENABLE_JEMALLOC__)
+endif()
+
+if(__ENABLE_MIMALLOC__)
+    message("启用mimalloc管理内存")
+    add_definitions(-D __ENABLE_MIMALLOC__)
 endif()
 
 if(ONLY_MAIN_THREAD)
@@ -136,10 +142,7 @@ if(__ENABLE_MYSQL__)
 endif()
 include_directories(Libs/include/spdlog)
 include_directories(Libs/include/jemalloc)
-
-include_directories(Libs/include/bson)
-include_directories(Libs/include/bson/bson)
-include_directories(Libs/include/mongo/mongoc)
+include_directories(Libs/include/mimalloc)
 #公共组件
 
 
@@ -184,6 +187,10 @@ list(APPEND StaticLibs Lua53)
 
 if(__ENABLE_JEMALLOC__)
     list(APPEND StaticLibs jemalloc)
+endif()
+
+if(__ENABLE_MIMALLOC__)
+    list(APPEND StaticLibs mimalloc)
 endif()
 
 if(MSVC) #创建vs目录
