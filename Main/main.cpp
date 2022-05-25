@@ -32,7 +32,6 @@ using namespace Client;
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
 
-
 void RegisterComponent()
 {
 // rpc
