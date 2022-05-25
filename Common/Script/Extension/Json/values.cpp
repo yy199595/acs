@@ -94,9 +94,11 @@ namespace values {
 			}
 		}
 
-		Value NumberValue(lua_State* L, int idx) {
+		Value NumberValue(lua_State* L, int idx)
+		{
 			int64_t integer;
-			return luax::isinteger(L, idx, &integer) ? Value(integer) : Value(lua_tonumber(L, idx));
+			return luax::isinteger(L, idx, &integer) ?
+				   rapidjson::Value(integer) : rapidjson::Value(lua_tonumber(L, idx));
 		}
 
 		Value StringValue(lua_State* L, int idx, Allocator& allocator) {
