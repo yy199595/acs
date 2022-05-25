@@ -20,7 +20,6 @@ namespace Sentry
 		XCode Auth(const std::string & address, const c2s::GateAuth::Request & request);
 	 private:
 		bool LateAwake() final;
-		bool OnInitEvent(ServiceEventRegister &methodRegister) final;
 		bool OnStartService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		std::string mAddress;

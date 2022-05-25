@@ -14,7 +14,7 @@ namespace Sentry
 		return true;
 	}
 
-	void HttpService::OnAddAddress(const string& address)
+	void HttpService::AddAddress(const string& address)
 	{
 		this->mUrl = fmt::format("http://{0}/", address);
 		LOG_INFO("add new http url " << this->mUrl);

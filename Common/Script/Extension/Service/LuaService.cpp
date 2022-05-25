@@ -4,6 +4,9 @@
 
 #include"LuaService.h"
 #include"App/App.h"
+#include"Util/StringHelper.h"
+#include"Pool/MessagePool.h"
+#include"Script/Extension/Json/Json.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 using namespace Sentry;
 namespace Lua
@@ -16,22 +19,22 @@ namespace Lua
 			return 0;
 		}
 		std::string address;
+		long long userId = 0;
 		std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
-		ServiceCallComponent* callComponent = (ServiceCallComponent*)lua_touserdata(lua, 1);
+		ServiceCallComponent* callComponent = UserDataParameter::Read<ServiceCallComponent*>(lua, 1);
 		if (lua_isinteger(lua, 2)) //userId
 		{
-			long long userId = lua_tointeger(lua, 2);
-			if (!callComponent->GetEntityAddress(userId, address))
-			{
-				lua_pushinteger(lua, (int)XCode::NotFindUser);
-				luaL_error(lua, "not find user service address %lld", userId);
-				return 1;
-			}
+			userId = lua_tointeger(lua, 2);
 			request->set_user_id(userId);
 		}
 		else if (lua_isstring(lua, 2)) //address
 		{
 			address.append(lua_tostring(lua, 2));
+		}
+		if (address.empty() && userId == 0)
+		{
+			luaL_error(lua, "first muset userId or address");
+			return 0;
 		}
 		if (!lua_isstring(lua, 3))
 		{
@@ -50,29 +53,47 @@ namespace Lua
 		}
 		if (!rpcInterfaceConfig->Request.empty())
 		{
-			if (!lua_isstring(lua, 4))
+			if (!lua_istable(lua, 4))
 			{
 				lua_pushinteger(lua, (int)XCode::CallArgsError);
-				luaL_error(lua, "call %s request json should %s", fullName.c_str(),
+				luaL_error(lua, "call %s request tabe should %s", fullName.c_str(),
 						rpcInterfaceConfig->Request.c_str());
 				return 1;
 			}
+			lua_pushcfunction(lua, Lua::Json::Encode);
+			lua_pushvalue(lua, 4);
+			if(lua_pcall(lua, 1, 1, 0) != 0)
+			{
+				luaL_error(lua, lua_tostring(lua, -1));
+				return 0;
+			}
+			size_t size = 0;
+			const char * json = lua_tolstring(lua, -1, &size);
+			const std::string & name = rpcInterfaceConfig->Request;
+			std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, json, size);
+			if(message == nullptr)
+			{
+				luaL_error(lua, "lua table to %s failure", name.c_str());
+				return 0;
+			}
+			request->mutable_data()->PackFrom(*message);
+		}
+		std::shared_ptr<Message> response;
+		if(!rpcInterfaceConfig->Response.empty())
+		{
+			response = Helper::Proto::New(rpcInterfaceConfig->Response);
 		}
 		lua_pushthread(lua);
+		request->set_method_id(rpcInterfaceConfig->InterfaceId);
+		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
 		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
-		if(!luaRpcTaskSource->Yield())
+		taskComponent->Start([lua, request, response, address, luaRpcTaskSource, callComponent, userId]()
 		{
-			luaL_error(lua, "not lua coroutine context");
-			return 0;
-		}
-		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
-		taskComponent->Start([lua, request, address, luaRpcTaskSource, callComponent]()
-		{
-			std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
-			XCode code = callComponent->Call(address, request, response);
-			luaRpcTaskSource->SetResult(code, *response);
+			XCode code = address.empty() ? callComponent->Call(userId, request, response)
+										 : callComponent->Call(address, request, response);
+			luaRpcTaskSource->SetResult(code, response);
 		});
-		return 0;
+		return luaRpcTaskSource->Yield();
 	}
 
 	int Service::AllotAddress(lua_State* lua)

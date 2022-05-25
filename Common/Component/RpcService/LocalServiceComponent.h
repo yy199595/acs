@@ -15,36 +15,16 @@ namespace Sentry
 	public:
 		LocalRpcServiceBase() = default;
 	protected:
-		void Awake();
-		bool SubUserEvent();
 		virtual void OnCloseService() { }
 		virtual bool OnStartService(ServiceMethodRegister & methodRegister) = 0;
-		virtual bool OnInitEvent(ServiceEventRegister & methodRegister) { return true;};
 	public:
-		XCode Invoke(const std::string & eveId, std::shared_ptr<Json::Reader> json);
-		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response);
-	public:
-		bool AllotAddress(std::string& address);
-		bool GetAllAddress(std::list<std::string> & allAddress) const;
-	public:
-		void OnAddAddress(const std::string &address) final;
-		void OnDelAddress(const std::string &address) final;
-		bool GetEntityAddress(long long id, std::string& address) final;
-		bool IsStartComplete() final { return !this->mAddressList.empty(); }
-	public:
-		bool LoadEvent();
 		bool StartService() final;
 		bool CloseService() final;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
+		bool IsStartComplete() final { return this->GetAddressCount() > 0; }
+		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response);
 	private:
-		bool OnUserJoin(const Json::Reader & jsonReader);
-		bool OnUserExit(const Json::Reader & jsonReader);
-	private:
-		size_t mIndex;
-		std::vector<std::string> mAddressList;
-		std::shared_ptr<ServiceEventRegister> mEventRegister;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
-		std::unordered_map<long long, std::string> mUserAddressMap;
 	};
 }
 #endif //SERVER_LOCALSERVICECOMPONENT_H

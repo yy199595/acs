@@ -74,11 +74,6 @@ namespace Sentry
 		}
 
 	 public:
-		bool IsComponent() override
-		{
-			return true;
-		}
-	 public:
 
 		virtual void Awake() { }; //组件创建的时候调用
 

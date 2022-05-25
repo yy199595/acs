@@ -4,6 +4,7 @@
 #include"Protocol/c2s.pb.h"
 #include"XCode/XCode.h"
 #include"Json/JsonReader.h"
+#include"Json/JsonWriter.h"
 #include"Script/ClassProxyHelper.h"
 namespace Sentry
 {
@@ -81,8 +82,6 @@ namespace Sentry
 		virtual bool CloseService() = 0;
 		virtual bool IsStartService() = 0;
 		virtual bool IsStartComplete() = 0;
-		virtual void OnDelAddress(const std::string & address) { }
-		virtual void OnAddAddress(const std::string & address) { };
 	};
 
 	class IServiceChange

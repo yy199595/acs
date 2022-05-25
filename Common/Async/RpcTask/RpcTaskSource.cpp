@@ -36,35 +36,32 @@ namespace Sentry
 		}
 	}
 
-	bool LuaRpcTaskSource::Yield()
+	int LuaRpcTaskSource::Yield()
 	{
-		if(this->mRef != 0)
+		if(this->mRef == 0)
 		{
-			lua_yield(this->mLua, 0);
-			return true;
+			luaL_error(this->mLua, "not lua coroutine context yield failure");
+			return 0;
 		}
-		return false;
+		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaRpcTaskSource::SetResult(XCode code, const com::Rpc::Response & response)
+	void LuaRpcTaskSource::SetResult(XCode code, std::shared_ptr<Message> response)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		if(lua_isthread(this->mLua, this->mRef))
+		lua_State* coroutine = lua_tothread(this->mLua, -1);
+		lua_pushinteger(this->mLua, (int)code);
+		if (code == XCode::Successful && response != nullptr)
 		{
-			lua_State * coroutine = lua_tothread(this->mLua, -1);
-			lua_pushinteger(this->mLua, (int)code);
-			if(code == XCode::Successful && response.has_data())
+			std::string json;
+			if (Proto::GetJson(response, json))
 			{
-				std::string json;
-				if(Proto::GetJson(response.data(), json))
-				{
-					rapidjson::extend::StringStream s(json.c_str(), json.size());
-					values::pushDecoded(this->mLua, s);
-					lua_presume(coroutine, this->mLua, 2);
-					return;
-				}
+				rapidjson::extend::StringStream s(json.c_str(), json.size());
+				values::pushDecoded(this->mLua, s);
+				lua_presume(coroutine, this->mLua, 2);
+				return;
 			}
-			lua_presume(coroutine, this->mLua, 1);
 		}
+		lua_presume(coroutine, this->mLua, 1);
 	}
 }

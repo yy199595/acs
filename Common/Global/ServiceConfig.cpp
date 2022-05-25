@@ -82,6 +82,15 @@ namespace Sentry
 				return false;
 			}
 		}
+		if (jsonValue.HasMember("Response"))
+		{
+			rpcInterfaceConfig->Response = jsonValue["Response"].GetString();
+			if (Helper::Proto::New(rpcInterfaceConfig->Response) == nullptr)
+			{
+				LOG_FATAL("create " << rpcInterfaceConfig->Response << " failure");
+				return false;
+			}
+		}
 
 		if (jsonValue.HasMember("Writer"))
 		{

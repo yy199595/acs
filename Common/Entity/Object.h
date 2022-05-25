@@ -28,24 +28,7 @@ namespace Sentry
 		}
 
 	 public:
-		virtual bool IsManager()
-		{
-			return false;
-		}
-
-		virtual bool IsComponent()
-		{
-			return false;
-		}
-
-		virtual bool IsGameObject()
-		{
-			return false;
-		}
-
-		virtual void OnDestory()
-		{
-		}
+		virtual void OnDestory() { }
 
 	 private:
 		bool mIsActive;

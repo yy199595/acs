@@ -3,7 +3,7 @@
 #include"Network/Listener/NetworkListener.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/HttpService/HttpService.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/ServiceCallComponent.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
@@ -30,7 +30,7 @@ namespace Sentry
 	void RegistryService::OnAddService(Component* component)
 	{
 		HttpService * httpService = component->Cast<HttpService>();
-		LocalRpcServiceBase * localService = component->Cast<LocalRpcServiceBase>();
+		ServiceCallComponent * localService = component->Cast<ServiceCallComponent>();
 
 		sub::Add::Request request;
 		request.set_area_id(this->mAreaId);
@@ -60,12 +60,12 @@ namespace Sentry
 	{
 		for(const std::string & service : request.rpc().service())
 		{
-			LocalRpcServiceBase * localService = this->GetComponent<LocalRpcServiceBase>(service);
+			ServiceCallComponent * localService = this->GetComponent<ServiceCallComponent>(service);
 			if(localService == nullptr)
 			{
 				return XCode::CallServiceNotFound;
 			}
-			localService->OnAddAddress(request.rpc().address());
+			localService->AddAddress(request.rpc().address());
 		}
 
 		for(const std::string & service : request.http().service())
@@ -75,7 +75,7 @@ namespace Sentry
 			{
 				return XCode::CallServiceNotFound;
 			}
-			httpService->OnAddAddress(request.http().address());
+			httpService->AddAddress(request.http().address());
 		}
 
 		std::vector<Component *> components;
@@ -84,11 +84,11 @@ namespace Sentry
 		{
 			HttpService * httpService = component->Cast<HttpService>();
 			LocalRpcServiceBase * localService = component->Cast<LocalRpcServiceBase>();
-			if(httpService != nullptr)
+			if(httpService != nullptr && httpService->IsStartService())
 			{
 				response.mutable_http()->add_service(httpService->GetName());
 			}
-			if(localService != nullptr)
+			if(localService != nullptr && localService->IsStartService())
 			{
 				response.mutable_rpc()->add_service(localService->GetName());
 			}
@@ -111,7 +111,7 @@ namespace Sentry
 		for(Component * component : components)
 		{
 			HttpService * httpService = component->Cast<HttpService>();
-			LocalRpcServiceBase * localService = component->Cast<LocalRpcServiceBase>();
+			ServiceCallComponent * localService = component->Cast<ServiceCallComponent>();
 			if(httpService != nullptr)
 			{
 				request.mutable_http()->add_service(component->GetName());
@@ -134,13 +134,13 @@ namespace Sentry
 			LOG_INFO("[" << address << "] push all service successful");
 			for(const std::string & service : response->rpc().service())
 			{
-				IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
-				serviceBase->OnAddAddress(response->rpc().address());
+				ServiceCallComponent * serviceBase = this->GetComponent<ServiceCallComponent>(service);
+				serviceBase->AddAddress(response->rpc().address());
 			}
 			for(const std::string & service : response->http().service())
 			{
-				IServiceBase * serviceBase = this->GetComponent<IServiceBase>(service);
-				serviceBase->OnAddAddress(response->http().address());
+				HttpService * serviceBase = this->GetComponent<HttpService>(service);
+				serviceBase->AddAddress(response->http().address());
 			}
 		}
 	}
@@ -152,12 +152,7 @@ namespace Sentry
 
 	XCode RegistryService::Del(const sub::Del::Request& request)
 	{
-		IServiceBase * serviceBase = this->GetComponent<IServiceBase>(request.service());
-		if(serviceBase != nullptr)
-		{
-			serviceBase->OnDelAddress(request.address());
-			return XCode::Successful;
-		}
+
 		return XCode::Failure;
 	}
 }// namespace Sentry

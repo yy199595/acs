@@ -44,8 +44,8 @@ namespace Sentry
 		LuaRpcTaskSource(lua_State * lua);
 		~LuaRpcTaskSource();
 	public:
-		bool Yield();
-		void SetResult(XCode code,const com::Rpc::Response & response);
+		int Yield();
+		void SetResult(XCode code, std::shared_ptr<Message> response);
 	private:
 		int mRef;
 		lua_State * mLua;

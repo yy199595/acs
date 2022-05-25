@@ -7,7 +7,7 @@
 #include"Component/Scene/NetThreadComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
 	AutoRedisLock::AutoRedisLock(MainRedisComponent* component, const std::string& key)
@@ -126,8 +126,8 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for (Component* component: components)
 		{
-			LocalRpcServiceBase* localServiceComponent = component->Cast<LocalRpcServiceBase>();
-			if (localServiceComponent != nullptr && localServiceComponent->LoadEvent())
+			NetEventComponent* localServiceComponent = component->Cast<NetEventComponent>();
+			if (localServiceComponent != nullptr && localServiceComponent->StartRegisterEvent())
 			{
 				if (!this->SubscribeChannel(localServiceComponent->GetName()))
 				{
@@ -251,7 +251,7 @@ namespace Sentry
 			this->mRpcComponent->OnResponse(response);
 			return true;
 		}
-		LocalRpcServiceBase* localServiceComponent = this->GetComponent<LocalRpcServiceBase>(channel);
+		NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
 		if (localServiceComponent == nullptr)
 		{
 			return false;

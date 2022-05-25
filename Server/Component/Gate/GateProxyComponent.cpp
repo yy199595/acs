@@ -33,7 +33,7 @@ namespace Sentry
 	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string proto, const std::string& content)
 	{
 		std::string address;
-		if(this->mGateService->GetEntityAddress(userId, address))
+		if(this->mGateService->GetUserAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -67,12 +67,8 @@ namespace Sentry
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
-		std::list<std::string> addAddress;
-		this->mGateService->GetAllAddress(addAddress);
-		for(const std::string & address : addAddress)
-		{
-			this->mGateService->Call(address,"CallClient", request);
-		}
+		//TODO
+
 		return XCode::Successful;
 	}
 
@@ -82,36 +78,24 @@ namespace Sentry
 		request.set_func(func);
 		std::list<std::string> allAddress;
 		request.mutable_data()->PackFrom(message);
-		this->mGateService->GetAllAddress(allAddress);
-		for(const std::string & address : allAddress)
-		{
-			this->mGateService->Call(address,"BroadCast", request);
-		}
-		return XCode::Successful;
+		return this->mGateService->Send("BroadCast", request);
 	}
 
 	XCode GateProxyComponent::LuaBroadCast(const std::string func, const std::string pb, const std::string& json)
 	{
 		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
-		if(message == nullptr)
+		if (message == nullptr)
 		{
 			return XCode::JsonCastProtoFailure;
 		}
 
-		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
+		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
 		taskComponent->Start([this, func, message]()
 		{
-			std::list<std::string> allAddress;
-			if(this->mGateService->GetAllAddress(allAddress))
-			{
-				s2s::GateBroadCast::Request request;
-				request.set_func(func);
-				request.mutable_data()->PackFrom(*message);
-				for (const std::string& address: allAddress)
-				{
-					this->mGateService->Call(address, "BroadCast", request);
-				}
-			}
+			s2s::GateBroadCast::Request request;
+			request.set_func(func);
+			request.mutable_data()->PackFrom(*message);
+			this->mGateService->Send("BroadCast", request);
 		});
 		return XCode::Successful;
 	}

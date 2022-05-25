@@ -15,10 +15,6 @@
 #include"Component/Redis/MainRedisComponent.h"
 namespace Sentry
 {
-	bool GateService::OnInitEvent(ServiceEventRegister& methodRegister)
-	{
-		return this->SubUserEvent();
-	}
 
 	bool GateService::OnStartService(ServiceMethodRegister& methodRegister)
 	{
@@ -28,7 +24,6 @@ namespace Sentry
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
-		LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<MainRedisComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
@@ -95,7 +90,7 @@ namespace Sentry
 		{
 			this->mSyncComponent->SetUserState(userId, 1);
 			this->mGateClientComponent->AddNewUser(address, userId);
-			this->mSyncComponent->SeAddress(userId, this->GetName(), this->mAddress);
+			this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress);
 			return XCode::Successful;
 		}
 		return XCode::Failure;

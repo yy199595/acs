@@ -84,7 +84,7 @@ namespace Sentry
 		return address;
 	}
 
-	bool UserSyncComponent::SeAddress(long long userId, const std::string& service, const std::string& address)
+	bool UserSyncComponent::SetAddress(long long userId, const std::string& service, const std::string& address)
 	{
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("user_id", userId);

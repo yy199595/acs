@@ -131,11 +131,10 @@ namespace Sentry
 		}
 		std::string address;
 		LocalRpcServiceBase* localServerRpc = this->GetComponent<LocalRpcServiceBase>(config->Service);
-		if (!localServerRpc->GetEntityAddress(userId, address))
+		if (!localServerRpc->GetUserAddress(userId, address))
 		{
 			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
-			if (address.empty() && localServerRpc->AllotAddress(address)
-				&& this->mUserSyncComponent->SeAddress(userId, config->Service, address))
+			if (address.empty() && localServerRpc->AllotAddress(userId, address))
 			{
 				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}

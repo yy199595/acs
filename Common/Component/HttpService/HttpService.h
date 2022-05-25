@@ -25,9 +25,9 @@ namespace Sentry
 		bool LateAwake() override;
 		bool IsStartComplete() final { return true; }
 		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
-		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 	 public:
-		void OnAddAddress(const std::string &address) final;
+		void AddAddress(const std::string &address);
+		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response);
 	 private:
 		std::string mUrl;

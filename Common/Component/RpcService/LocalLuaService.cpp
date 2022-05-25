@@ -46,7 +46,7 @@ namespace Sentry
 
 	bool LocalLuaService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalRpcServiceBase::LateAwake());
+		LOG_CHECK_RET_FALSE(ServiceCallComponent::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
 		std::shared_ptr<Lua::Table> luaTable = Lua::Table::Create(this->mLuaEnv, this->GetName());
