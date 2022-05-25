@@ -20,7 +20,7 @@ option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
-option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" ON)
+option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
 option(__CLIENT_RPC_DEBUG_LOG__, "开启客户端rpc日志" ON)
 
 if(__ENABLE_JEMALLOC__)

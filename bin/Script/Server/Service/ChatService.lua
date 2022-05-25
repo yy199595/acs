@@ -6,6 +6,8 @@ ChatService.Chat = function(id, request, response)
     local mysqlService = App.GetComponent("MysqlService")
 
     local request = {}
+
+
     request.table = "db_account.tab_user_account"
     request.where_json = Json.Encode({user_id = 1996})
     local code, response = mysqlService:Call("127.0.0.1:7788", "Query", request)
