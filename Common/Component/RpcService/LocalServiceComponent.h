@@ -21,7 +21,7 @@ namespace Sentry
 		bool StartService() final;
 		bool CloseService() final;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		bool IsStartComplete() final { return this->GetAddressCount() > 0; }
+		bool IsStartComplete() final { return this->GetAddressSize() > 0; }
 		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response);
 	private:
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;

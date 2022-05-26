@@ -69,8 +69,6 @@
             "Request":"sub.Del.Request"
         }
     },
-    "MongoService": {
-    },
     "HttpUserService": {
         "Login": {
             "Type": "POST",
@@ -90,7 +88,7 @@
             "Type": "Client",
             "CallWay": "Net"
         },
-        "QueryAddress": {
+        "QueryListener": {
             "Id": 1002,
             "Async": false,
             "Type": "Server",
@@ -117,6 +115,19 @@
             "Type": "Client",
             "CallWay": "Net",
             "Request":"c2s.GateAuth.Request"
+        },
+        "SaveAddress": {
+            "Id": 105,
+            "Async": false,
+            "Type": "Server",
+            "Request": "s2s.Allot.Save"
+        },
+        "QueryAddress": {
+            "Id": 106,
+            "Async": false,
+            "Type": "Server",
+            "Request": "com.Type.String",
+            "Response": "com.Type.String"
         }
     },
     "ChatService": {

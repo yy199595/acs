@@ -4,6 +4,19 @@ namespace Lua
 {
 	namespace ClassMateProxy
 	{
+		inline int OnMetaTable(lua_State * lua)
+		{
+			const char* field = lua_tostring(lua, 2);
+			if (lua_getmetatable(lua, 1) != 0 && lua_istable(lua, -1))
+			{
+				lua_getfield(lua, -1, field);
+				if (!lua_isnil(lua, -1))
+				{
+					return 1;
+				}
+			}
+			return 0;
+		}
 		template<typename T>
 		inline int OnMateTableGet(lua_State* lua)
 		{

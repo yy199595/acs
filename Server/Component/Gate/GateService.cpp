@@ -22,7 +22,9 @@ namespace Sentry
 		methodRegister.BindAddress("Auth", &GateService::Auth);
 		methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
+		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
+		methodRegister.Bind("QueryListener", &GateService::QueryListener);
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
@@ -60,7 +62,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::QueryAddress(com::Type::String& response)
+	XCode GateService::QueryListener(com::Type::String& response)
 	{
 		std::string address;
 		if (this->GetConfig().GetListenerAddress("gate", address))
@@ -69,6 +71,29 @@ namespace Sentry
 			return XCode::Successful;
 		}
 		return XCode::Failure;
+	}
+
+	XCode GateService::QueryAddress(long long userId, const com::Type::String& request, com::Type::String& response)
+	{
+		std::string address;
+		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(request.str());
+		if(component == nullptr || !component->GetUserAddress(userId, address))
+		{
+			return XCode::Failure;
+		}
+		response.set_str(address);
+		return XCode::Successful;
+	}
+
+	XCode GateService::SaveAddress(long long userId, const s2s::Allot::Save& request)
+	{
+		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(request.service());
+		if(component == nullptr || !component->HasAddress(request.address()))
+		{
+			return XCode::Failure;
+		}
+		component->AddUserAddress(userId, request.address());
+		return XCode::Successful;
 	}
 
 	XCode GateService::BroadCast(const s2s::GateBroadCast::Request& request)
@@ -90,7 +115,7 @@ namespace Sentry
 		{
 			this->mSyncComponent->SetUserState(userId, 1);
 			this->mGateClientComponent->AddNewUser(address, userId);
-			this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress);
+			this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
 			return XCode::Successful;
 		}
 		return XCode::Failure;

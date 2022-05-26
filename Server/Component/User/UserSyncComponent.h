@@ -4,10 +4,10 @@
 
 #ifndef _USERSYNCCOMPONENT_H_
 #define _USERSYNCCOMPONENT_H_
-#include"Component/Component.h"
+#include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
-	class UserSyncComponent final : public Component
+	class UserSyncComponent final : public NetEventComponent
 	{
 	 public:
 		UserSyncComponent() = default;
@@ -19,10 +19,14 @@ namespace Sentry
 		long long AddNewUser(const std::string & account);
 		bool SetToken(const std::string & token, long long userId, int time);
 		const std::string GetAddress(long long userId, const std::string & service);
-		bool SetAddress(long long userId, const std::string & service, const std::string & address);
-	 public:
+		bool SetAddress(long long userId, const std::string & service, const std::string & address, bool broadcast = false);
+	private:
 		bool LateAwake() final;
-	 private:
+		bool OnRegisterEvent(NetEventRegistry &eventRegister) final;
+	private:
+		bool OnUserJoin(const Json::Reader & json);
+		bool OnUserExit(const Json::Reader & json);
+	private:
 		class MainRedisComponent * mRedisComponent;
 	};
 }

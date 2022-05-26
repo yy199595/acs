@@ -2,9 +2,7 @@
 
 Main = {}
 function Main.Awake()
-    for i, v in pairs(_G) do
-        print(i, v)
-    end
+   
    return true
 end
 

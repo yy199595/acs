@@ -4,7 +4,7 @@
 
 #ifndef _GATEPROXYCOMPONENT_H_
 #define _GATEPROXYCOMPONENT_H_
-#include"Component/Component.h"
+#include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
 	class GateProxyComponent final : public Component, public ILuaRegister

@@ -51,20 +51,6 @@
             "component" : "ConsoleComponent"
         }
     },
-    "mysql": {
-        "count": 1,
-        "ip": "114.115.167.51",
-        "port": 3306,
-        "user": "yjz",
-        "passwd": "199595yjz."
-    },
-    "mongo":{
-        "count": 1,
-        "ip": "114.115.167.51",
-        "port": 27017,
-        "user": "yjz",
-        "passwd": "199595yjz."
-    },
     "redis":
     {
         "main": {
@@ -114,8 +100,6 @@
     [
         "GateService",
         "ChatService",
-        "MysqlService",
-        "MongoService",
         "HttpUserService",
         "RegistryService"
     ],

@@ -1,5 +1,6 @@
 
 local user = {}
+local channel = "UserSyncComponent"
 user.add_user = function(request, response)
     if redis.call("SADD", "user_account", request.account) == 0 then
         return false
@@ -25,17 +26,14 @@ user.get_token = function(request, response)
     return false
 end
 
-user.set_state = function(request, response)
-    if request.state <= 0 then --离线
+user.set_state = function(request)
+    if request.state == 0 then --离线
         local data = {}
         data.eveId = "user_exit_event"
         data.user_id = request.user_id
         local key = tostring(request.user_id)
-        local services = redis.call("HEGTALL", key)
-        local json = cjson.decode(data)
-        for service, _ in ipairs(services) do
-            redis.call("PUBLISH", service, json)
-        end
+        data.services = redis.call("HEGTALL", key)
+        redis.call(channel, cjson.decode(data))
     end
     redis.call("HSET", "user_state", request.user_id, request.state)
     return true
@@ -46,7 +44,7 @@ user.get_state = function(request, response)
     return true
 end
 
-user.set_address = function(request, response)
+user.set_address = function(request)
 
     request.eveId = "user_join_event"
     request.user_id = request.user_id
@@ -54,7 +52,12 @@ user.set_address = function(request, response)
     request.service = request.service
     local key = tostring(request.user_id)
     redis.call("HSET", key, request.service, request.address)
-    redis.call("PUBLISH", request.service, cjson.encode(request))
+
+    if request.broadcast == true then --广播给所有的服务
+        redis.call("PUBLISH", request.service, cjson.encode(request))
+    else  -- 只通知目标服务
+        redis.call("PUBLISH", request.address, cjson.encode(request))
+    end
     return true
 end
 

@@ -271,14 +271,12 @@ const ::google::protobuf::uint32 TableStruct_sub_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::sub::Push_Request, area_id_),
   PROTOBUF_FIELD_OFFSET(::sub::Push_Request, rpc_),
-  PROTOBUF_FIELD_OFFSET(::sub::Push_Request, http_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::sub::Push_Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::sub::Push_Response, rpc_),
-  PROTOBUF_FIELD_OFFSET(::sub::Push_Response, http_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::sub::Push, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -338,16 +336,16 @@ const ::google::protobuf::uint32 TableStruct_sub_2eproto::offsets[] PROTOBUF_SEC
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::sub::ServiceInfo)},
   { 7, -1, sizeof(::sub::Push_Request)},
-  { 15, -1, sizeof(::sub::Push_Response)},
-  { 22, -1, sizeof(::sub::Push)},
-  { 27, -1, sizeof(::sub::Add_Request)},
-  { 35, -1, sizeof(::sub::Add)},
-  { 40, -1, sizeof(::sub::Del_Request)},
-  { 47, -1, sizeof(::sub::Del)},
-  { 52, -1, sizeof(::sub::AddUser_Request)},
-  { 60, -1, sizeof(::sub::AddUser)},
-  { 65, -1, sizeof(::sub::DelUser_Request)},
-  { 72, -1, sizeof(::sub::DelUser)},
+  { 14, -1, sizeof(::sub::Push_Response)},
+  { 20, -1, sizeof(::sub::Push)},
+  { 25, -1, sizeof(::sub::Add_Request)},
+  { 33, -1, sizeof(::sub::Add)},
+  { 38, -1, sizeof(::sub::Del_Request)},
+  { 45, -1, sizeof(::sub::Del)},
+  { 50, -1, sizeof(::sub::AddUser_Request)},
+  { 58, -1, sizeof(::sub::AddUser)},
+  { 63, -1, sizeof(::sub::DelUser_Request)},
+  { 70, -1, sizeof(::sub::DelUser)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -373,23 +371,21 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_sub_2eproto[] =
   "\n\tsub.proto\022\003sub\"/\n\013ServiceInfo\022\017\n\007addre"
-  "ss\030\001 \001(\t\022\017\n\007service\030\002 \003(\t\"\254\001\n\004Push\032Y\n\007Re"
-  "quest\022\017\n\007area_id\030\001 \001(\005\022\035\n\003rpc\030\002 \001(\0132\020.su"
-  "b.ServiceInfo\022\036\n\004http\030\003 \001(\0132\020.sub.Servic"
-  "eInfo\032I\n\010Response\022\035\n\003rpc\030\001 \001(\0132\020.sub.Ser"
-  "viceInfo\022\036\n\004http\030\002 \001(\0132\020.sub.ServiceInfo"
-  "\"C\n\003Add\032<\n\007Request\022\017\n\007area_id\030\001 \001(\005\022\017\n\007a"
-  "ddress\030\002 \001(\t\022\017\n\007service\030\003 \001(\t\"2\n\003Del\032+\n\007"
-  "Request\022\017\n\007address\030\001 \001(\t\022\017\n\007service\030\002 \001("
-  "\t\"G\n\007AddUser\032<\n\007Request\022\017\n\007user_id\030\001 \001(\003"
-  "\022\017\n\007address\030\002 \001(\t\022\017\n\007service\030\003 \001(\t\"6\n\007De"
-  "lUser\032+\n\007Request\022\017\n\007user_id\030\001 \001(\003\022\017\n\007ser"
-  "vice\030\003 \001(\tb\006proto3"
+  "ss\030\001 \001(\t\022\017\n\007service\030\002 \003(\t\"l\n\004Push\0329\n\007Req"
+  "uest\022\017\n\007area_id\030\001 \001(\005\022\035\n\003rpc\030\002 \001(\0132\020.sub"
+  ".ServiceInfo\032)\n\010Response\022\035\n\003rpc\030\001 \001(\0132\020."
+  "sub.ServiceInfo\"C\n\003Add\032<\n\007Request\022\017\n\007are"
+  "a_id\030\001 \001(\005\022\017\n\007address\030\002 \001(\t\022\017\n\007service\030\003"
+  " \001(\t\"2\n\003Del\032+\n\007Request\022\017\n\007address\030\001 \001(\t\022"
+  "\017\n\007service\030\002 \001(\t\"G\n\007AddUser\032<\n\007Request\022\017"
+  "\n\007user_id\030\001 \001(\003\022\017\n\007address\030\002 \001(\t\022\017\n\007serv"
+  "ice\030\003 \001(\t\"6\n\007DelUser\032+\n\007Request\022\017\n\007user_"
+  "id\030\001 \001(\003\022\017\n\007service\030\003 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_sub_2eproto = {
   false, InitDefaults_sub_2eproto, 
   descriptor_table_protodef_sub_2eproto,
-  "sub.proto", &assign_descriptors_table_sub_2eproto, 498,
+  "sub.proto", &assign_descriptors_table_sub_2eproto, 433,
 };
 
 void AddDescriptors_sub_2eproto() {
@@ -773,27 +769,19 @@ void ServiceInfo::InternalSwap(ServiceInfo* other) {
 void Push_Request::InitAsDefaultInstance() {
   ::sub::_Push_Request_default_instance_._instance.get_mutable()->rpc_ = const_cast< ::sub::ServiceInfo*>(
       ::sub::ServiceInfo::internal_default_instance());
-  ::sub::_Push_Request_default_instance_._instance.get_mutable()->http_ = const_cast< ::sub::ServiceInfo*>(
-      ::sub::ServiceInfo::internal_default_instance());
 }
 class Push_Request::HasBitSetters {
  public:
   static const ::sub::ServiceInfo& rpc(const Push_Request* msg);
-  static const ::sub::ServiceInfo& http(const Push_Request* msg);
 };
 
 const ::sub::ServiceInfo&
 Push_Request::HasBitSetters::rpc(const Push_Request* msg) {
   return *msg->rpc_;
 }
-const ::sub::ServiceInfo&
-Push_Request::HasBitSetters::http(const Push_Request* msg) {
-  return *msg->http_;
-}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Push_Request::kAreaIdFieldNumber;
 const int Push_Request::kRpcFieldNumber;
-const int Push_Request::kHttpFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Push_Request::Push_Request()
@@ -809,11 +797,6 @@ Push_Request::Push_Request(const Push_Request& from)
     rpc_ = new ::sub::ServiceInfo(*from.rpc_);
   } else {
     rpc_ = nullptr;
-  }
-  if (from.has_http()) {
-    http_ = new ::sub::ServiceInfo(*from.http_);
-  } else {
-    http_ = nullptr;
   }
   area_id_ = from.area_id_;
   // @@protoc_insertion_point(copy_constructor:sub.Push.Request)
@@ -834,7 +817,6 @@ Push_Request::~Push_Request() {
 
 void Push_Request::SharedDtor() {
   if (this != internal_default_instance()) delete rpc_;
-  if (this != internal_default_instance()) delete http_;
 }
 
 void Push_Request::SetCachedSize(int size) const {
@@ -856,10 +838,6 @@ void Push_Request::Clear() {
     delete rpc_;
   }
   rpc_ = nullptr;
-  if (GetArenaNoVirtual() == nullptr && http_ != nullptr) {
-    delete http_;
-  }
-  http_ = nullptr;
   area_id_ = 0;
   _internal_metadata_.Clear();
 }
@@ -891,19 +869,6 @@ const char* Push_Request::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::sub::ServiceInfo::_InternalParse;
         object = msg->mutable_rpc();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
-        break;
-      }
-      // .sub.ServiceInfo http = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::sub::ServiceInfo::_InternalParse;
-        object = msg->mutable_http();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -964,17 +929,6 @@ bool Push_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // .sub.ServiceInfo http = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_http()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1013,12 +967,6 @@ void Push_Request::SerializeWithCachedSizes(
       2, HasBitSetters::rpc(this), output);
   }
 
-  // .sub.ServiceInfo http = 3;
-  if (this->has_http()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, HasBitSetters::http(this), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1042,13 +990,6 @@ void Push_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         2, HasBitSetters::rpc(this), target);
-  }
-
-  // .sub.ServiceInfo http = 3;
-  if (this->has_http()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        3, HasBitSetters::http(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1077,13 +1018,6 @@ size_t Push_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *rpc_);
-  }
-
-  // .sub.ServiceInfo http = 3;
-  if (this->has_http()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *http_);
   }
 
   // int32 area_id = 1;
@@ -1123,9 +1057,6 @@ void Push_Request::MergeFrom(const Push_Request& from) {
   if (from.has_rpc()) {
     mutable_rpc()->::sub::ServiceInfo::MergeFrom(from.rpc());
   }
-  if (from.has_http()) {
-    mutable_http()->::sub::ServiceInfo::MergeFrom(from.http());
-  }
   if (from.area_id() != 0) {
     set_area_id(from.area_id());
   }
@@ -1157,7 +1088,6 @@ void Push_Request::InternalSwap(Push_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(rpc_, other->rpc_);
-  swap(http_, other->http_);
   swap(area_id_, other->area_id_);
 }
 
@@ -1172,26 +1102,18 @@ void Push_Request::InternalSwap(Push_Request* other) {
 void Push_Response::InitAsDefaultInstance() {
   ::sub::_Push_Response_default_instance_._instance.get_mutable()->rpc_ = const_cast< ::sub::ServiceInfo*>(
       ::sub::ServiceInfo::internal_default_instance());
-  ::sub::_Push_Response_default_instance_._instance.get_mutable()->http_ = const_cast< ::sub::ServiceInfo*>(
-      ::sub::ServiceInfo::internal_default_instance());
 }
 class Push_Response::HasBitSetters {
  public:
   static const ::sub::ServiceInfo& rpc(const Push_Response* msg);
-  static const ::sub::ServiceInfo& http(const Push_Response* msg);
 };
 
 const ::sub::ServiceInfo&
 Push_Response::HasBitSetters::rpc(const Push_Response* msg) {
   return *msg->rpc_;
 }
-const ::sub::ServiceInfo&
-Push_Response::HasBitSetters::http(const Push_Response* msg) {
-  return *msg->http_;
-}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Push_Response::kRpcFieldNumber;
-const int Push_Response::kHttpFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Push_Response::Push_Response()
@@ -1208,20 +1130,13 @@ Push_Response::Push_Response(const Push_Response& from)
   } else {
     rpc_ = nullptr;
   }
-  if (from.has_http()) {
-    http_ = new ::sub::ServiceInfo(*from.http_);
-  } else {
-    http_ = nullptr;
-  }
   // @@protoc_insertion_point(copy_constructor:sub.Push.Response)
 }
 
 void Push_Response::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Push_Response_sub_2eproto.base);
-  ::memset(&rpc_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&http_) -
-      reinterpret_cast<char*>(&rpc_)) + sizeof(http_));
+  rpc_ = nullptr;
 }
 
 Push_Response::~Push_Response() {
@@ -1231,7 +1146,6 @@ Push_Response::~Push_Response() {
 
 void Push_Response::SharedDtor() {
   if (this != internal_default_instance()) delete rpc_;
-  if (this != internal_default_instance()) delete http_;
 }
 
 void Push_Response::SetCachedSize(int size) const {
@@ -1253,10 +1167,6 @@ void Push_Response::Clear() {
     delete rpc_;
   }
   rpc_ = nullptr;
-  if (GetArenaNoVirtual() == nullptr && http_ != nullptr) {
-    delete http_;
-  }
-  http_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -1280,19 +1190,6 @@ const char* Push_Response::_InternalParse(const char* begin, const char* end, vo
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::sub::ServiceInfo::_InternalParse;
         object = msg->mutable_rpc();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
-        break;
-      }
-      // .sub.ServiceInfo http = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::sub::ServiceInfo::_InternalParse;
-        object = msg->mutable_http();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1340,17 +1237,6 @@ bool Push_Response::MergePartialFromCodedStream(
         break;
       }
 
-      // .sub.ServiceInfo http = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_http()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1384,12 +1270,6 @@ void Push_Response::SerializeWithCachedSizes(
       1, HasBitSetters::rpc(this), output);
   }
 
-  // .sub.ServiceInfo http = 2;
-  if (this->has_http()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, HasBitSetters::http(this), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1408,13 +1288,6 @@ void Push_Response::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         1, HasBitSetters::rpc(this), target);
-  }
-
-  // .sub.ServiceInfo http = 2;
-  if (this->has_http()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        2, HasBitSetters::http(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1443,13 +1316,6 @@ size_t Push_Response::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *rpc_);
-  }
-
-  // .sub.ServiceInfo http = 2;
-  if (this->has_http()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *http_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1482,9 +1348,6 @@ void Push_Response::MergeFrom(const Push_Response& from) {
   if (from.has_rpc()) {
     mutable_rpc()->::sub::ServiceInfo::MergeFrom(from.rpc());
   }
-  if (from.has_http()) {
-    mutable_http()->::sub::ServiceInfo::MergeFrom(from.http());
-  }
 }
 
 void Push_Response::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1513,7 +1376,6 @@ void Push_Response::InternalSwap(Push_Response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(rpc_, other->rpc_);
-  swap(http_, other->http_);
 }
 
 ::google::protobuf::Metadata Push_Response::GetMetadata() const {

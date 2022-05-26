@@ -48,7 +48,7 @@ namespace Sentry
 		return false;
 	}
 
-	size_t ServiceCallComponent::GetAddressCount()
+	size_t ServiceCallComponent::GetAddressSize()
 	{
 		return this->mAllAddress.size();
 	}
@@ -78,24 +78,6 @@ namespace Sentry
 			{
 				return true;
 			}
-		}
-		return false;
-	}
-
-	bool ServiceCallComponent::AllotAddress(long long userId, std::string& address)
-	{
-		if(!this->GetUserAddress(userId, address))
-		{
-			if(!this->AllotAddress(address))
-			{
-				return false;
-			}
-		}
-		if(!address.empty() && this->HasAddress(address))
-		{
-			this->mUserAddress.emplace(userId, address);
-			this->mSyncComponent->SetAddress(userId, this->GetName(), address);
-			return true;
 		}
 		return false;
 	}
@@ -281,6 +263,7 @@ namespace Sentry
 		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
 		{
 			std::string message = "+";
+			request->set_address(this->mLocalAddress);
 			if(request->AppendToString(&message))
 			{
 				long long num = this->mRedisComponent->Publish(address, message);
@@ -369,8 +352,25 @@ namespace Sentry
 		return this->Call(address, rpcRequest, response);
 	}
 
-	bool ServiceCallComponent::OnRegisterEvent(NetEventRegister& eventRegister)
+	bool ServiceCallComponent::DelUserAddress(long long id)
 	{
+		auto iter = this->mUserAddress.find(id);
+		if(iter != this->mUserAddress.end())
+		{
+			this->mUserAddress.erase(iter);
+			return true;
+		}
 		return false;
+	}
+
+	bool ServiceCallComponent::AddUserAddress(long long id, const std::string& address)
+	{
+		auto iter = this->mUserAddress.find(id);
+		if(iter != this->mUserAddress.end())
+		{
+			return false;
+		}
+		this->mUserAddress.emplace(id, address);
+		return true;
 	}
 }

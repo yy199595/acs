@@ -97,7 +97,7 @@ namespace Sentry
 			return this->AddComponent(name, new LocalLuaService());
 		}
 		// 其他语言
-		return false;
+		return true;
 	}
 
 	bool App::InitComponent(Component* component)

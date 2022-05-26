@@ -4,8 +4,9 @@
 
 #ifndef SERVER_NETEVENTCOMPONENT_H
 #define SERVER_NETEVENTCOMPONENT_H
+#include"Method/EventMethod.h"
 #include"Component/Component.h"
-#include"Method/MethodRegister.h"
+
 namespace Sentry
 {
 	class NetEventComponent : public Component
@@ -19,10 +20,10 @@ namespace Sentry
 		bool PublishEvent(const std::string & id, Json::Writer & json);
 		bool Invoke(const std::string & id, std::shared_ptr<Json::Reader> json);
 	protected:
-		virtual bool OnRegisterEvent(NetEventRegister & eventRegister) = 0;
+		virtual bool OnRegisterEvent(NetEventRegistry & eventRegister) = 0;
 	private:
+		NetEventRegistry mEventRegistry;
 		class MainRedisComponent * mRedisComponent;
-		std::shared_ptr<NetEventRegister> mEventRegister;
 	};
 }
 

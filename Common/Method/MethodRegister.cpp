@@ -83,12 +83,6 @@ namespace Sentry
 	{
 
 	}
-
-	std::shared_ptr<EventMethod> NetEventRegister::GetEvent(const string& eveId)
-	{
-		auto iter = this->mEventMethodMap.find(eveId);
-		return iter != this->mEventMethodMap.end() ? iter->second : nullptr;
-	}
 }
 
 namespace Sentry

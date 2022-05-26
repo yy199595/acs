@@ -2,7 +2,7 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "node_name": "DataServer",
+    "node_name": "Data",
     "log":
     {
         "save":1,
@@ -17,9 +17,8 @@
     },
     "path":
     {
-        "rpc": "./Config/rpc.json",
         "code": "./XCode/XCode.csv",
-        "http": "./Config/http.json"
+        "service": "./Config/service.json"
     },
     "listener": {
         "rpc":
@@ -37,42 +36,31 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
-    "redis": {
-        "ip": "114.115.167.51",
-        "port": 6379,
-        "timeout": 3,
-        "count": 1,
-        "lua": [
-            "./Config/user.lua"
-        ],
-        "passwd": "199595yjz."
+    "redis":
+    {
+        "main": {
+            "ip": "114.115.167.51",
+            "port": 6379,
+            "timeout": 3,
+            "count": 1,
+            "lua": [
+                "./redis/lock.lua",
+                "./redis/user.lua"
+            ],
+            "passwd": "199595yjz."
+        }
     },
-    "lua_src": [
-        "./Script/Common/",
-        "./Script/Server/"
-    ],
     "component": [
-        "RpcComponent",
-        "DataMgrComponent",
-        "ThreadPoolComponent",
+        "NetThreadComponent",
         "TcpServerComponent",
+        "MainRedisComponent",
         "RpcClientComponent",
-        "LuaScriptComponent",
-        "RedisComponent"
+        "RpcHandlerComponent"
     ],
     "service":
     [
-        "GateService",
-        "ChatService",
         "MysqlService",
-        "UserSubService",
-        "HttpUserService",
-        "LocalSubService"
-    ],
-    "start":
-    [
-        "MysqlService",
-        "LocalSubService"
+        "RegistryService"
     ],
     "white_list": [
         "127.0.0.1"

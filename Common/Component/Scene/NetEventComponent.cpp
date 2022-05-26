@@ -9,18 +9,20 @@ namespace Sentry
 	bool NetEventComponent::StartRegisterEvent()
 	{
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
-		this->mEventRegister = std::make_shared<NetEventRegister>( this);
-		return this->OnRegisterEvent(*this->mEventRegister) && this->mEventRegister->GetEventSize() > 0;
+		if(this->OnRegisterEvent(this->mEventRegistry))
+		{
+			if(this->mEventRegistry.GetEventSize() > 0)
+			{
+				return this->mRedisComponent->SubscribeChannel(this->GetName());
+			}
+		}
+		return false;
 	}
 
 	bool NetEventComponent::Invoke(const std::string& id, std::shared_ptr<Json::Reader> json)
 	{
-		std::shared_ptr<EventMethod> eventMethod = this->mEventRegister->GetEvent(id);
-		if(eventMethod == nullptr)
-		{
-			return false;
-		}
-		return eventMethod->Run(json);
+		std::shared_ptr<EventMethod> eventMethod = this->mEventRegistry.GetEvent(id);
+		return eventMethod != nullptr && eventMethod->Run(json);
 	}
 
 	bool NetEventComponent::PublishEvent(const std::string& id, Json::Writer& json)

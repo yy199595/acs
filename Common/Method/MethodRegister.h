@@ -114,48 +114,6 @@ namespace Sentry
 //	}
 }
 
-
-namespace Sentry
-{
-	class NetEventRegister
-	{
-	public:
-		NetEventRegister(Component * component)
-			: mComponent(component) {}
-	public:
-		template<typename T>
-		bool Sub(const std::string & id, EventMethodType1<T> func)
-		{
-			auto iter = this->mEventMethodMap.find(id);
-			if(iter != this->mEventMethodMap.end())
-			{
-				return false;
-			}
-			T * component = this->mComponent->Cast<T>();
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod1<T>>(id, component, func));
-			return true;
-		}
-
-		template<typename T>
-		bool Sub(const std::string & id, EventMethodType2<T> func)
-		{
-			auto iter = this->mEventMethodMap.find(id);
-			if(iter != this->mEventMethodMap.end())
-			{
-				return false;
-			}
-			T * component = this->mComponent->Cast<T>();
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T>>(id, component, func));
-			return true;
-		}
-		std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
-		const size_t GetEventSize() { return this->mEventMethodMap.size();}
-	private:
-		Component * mComponent;
-		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
-	};
-}
-
 namespace Sentry
 {
 	class HttpServiceRegister

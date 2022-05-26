@@ -14,11 +14,13 @@ namespace Sentry
 		~GateService() final = default;
 	 private:
 		XCode Ping(const std::string & address);
-		XCode QueryAddress(com::Type::String & response);
+		XCode QueryListener(com::Type::String & response);
 		XCode CallClient(long long userId, c2s::Rpc::Call & request);
 		XCode BroadCast(const s2s::GateBroadCast::Request & request);
+		XCode SaveAddress(long long userId, const s2s::Allot::Save &request);
 		XCode Auth(const std::string & address, const c2s::GateAuth::Request & request);
-	 private:
+		XCode QueryAddress(long long userId, const com::Type::String &request, com::Type::String & response); //查询玩家服务地址
+	private:
 		bool LateAwake() final;
 		bool OnStartService(ServiceMethodRegister & methodRegister) final;
 	 private:

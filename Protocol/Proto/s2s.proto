@@ -58,7 +58,13 @@ message Allot
     }
     message Response
     {
-        string address = 1;
+        string address = 1; //网关地址
+    }
+
+    message Save
+    {
+        string service = 1;
+        string address = 2;
     }
 }
 

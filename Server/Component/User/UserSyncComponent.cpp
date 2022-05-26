@@ -84,12 +84,48 @@ namespace Sentry
 		return address;
 	}
 
-	bool UserSyncComponent::SetAddress(long long userId, const std::string& service, const std::string& address)
+	bool UserSyncComponent::SetAddress(long long userId, const std::string& service, const std::string& address, bool broadcast)
 	{
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("user_id", userId);
 		jsonWrite.AddMember("service", service);
 		jsonWrite.AddMember("address", address);
+		jsonWrite.AddMember("broadcast", broadcast);
 		return this->mRedisComponent->CallLua("user.set_address", jsonWrite);
+	}
+
+	bool UserSyncComponent::OnRegisterEvent(NetEventRegistry& eventRegister)
+	{
+		return eventRegister.Sub("user_join_event", &UserSyncComponent::OnUserJoin, this)
+			   && eventRegister.Sub("user_exit_event", &UserSyncComponent::OnUserExit, this);
+	}
+
+	bool UserSyncComponent::OnUserJoin(const Json::Reader& json)
+	{
+		std::string address;
+		std::string service;
+		long long userId = 0;
+		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
+		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
+		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
+		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(service);
+		return component != nullptr && component->AddUserAddress(userId, address);
+	}
+
+	bool UserSyncComponent::OnUserExit(const Json::Reader& json)
+	{
+		long long userId = 0;
+		std::vector<std::string> services;
+		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
+		LOG_CHECK_RET_FALSE(json.GetMember("services", services));
+		for(const std::string & service : services)
+		{
+			ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(service);
+			if(component != nullptr && component->DelUserAddress(userId))
+			{
+				LOG_INFO("remove " << userId << " form " << service);
+			}
+		}
+		return true;
 	}
 }

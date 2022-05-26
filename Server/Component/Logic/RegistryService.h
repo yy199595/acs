@@ -1,22 +1,18 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
 #include"Protocol/sub.pb.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/Component.h"
 using namespace com;
 namespace Sentry
 {
-	class LocalRpcServiceBase;
-
-	class RpcHandlerComponent;
 
 	class TaskComponent;
-
-	class RegistryService : public LocalRpcServiceBase, public IComplete, public IServiceChange
+	class RpcHandlerComponent;
+	class RegistryService : public Component, public IComplete, public IServiceChange
 	{
 	 public:
 		RegistryService() = default;
 		~RegistryService() override = default;
-
 	 public:
 		bool LateAwake() final;
 		void OnDestory() final;
@@ -24,7 +20,6 @@ namespace Sentry
 	 protected:
 		void OnAddService(Component *component) final;
 		void OnDelService(Component *component) final;
-		bool OnStartService(ServiceMethodRegister &methodRegister) ;
 	 private:
 		XCode Add(const sub::Add::Request& request);
 		XCode Del(const sub::Del::Request& request);
@@ -33,7 +28,6 @@ namespace Sentry
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
-		std::string mHttpAddress;
 		class MainRedisComponent * mRedisComponent;
 	};
 }

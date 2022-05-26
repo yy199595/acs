@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[16]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -59,6 +59,9 @@ extern Allot_RequestDefaultTypeInternal _Allot_Request_default_instance_;
 class Allot_Response;
 class Allot_ResponseDefaultTypeInternal;
 extern Allot_ResponseDefaultTypeInternal _Allot_Response_default_instance_;
+class Allot_Save;
+class Allot_SaveDefaultTypeInternal;
+extern Allot_SaveDefaultTypeInternal _Allot_Save_default_instance_;
 class CallClient;
 class CallClientDefaultTypeInternal;
 extern CallClientDefaultTypeInternal _CallClient_default_instance_;
@@ -104,6 +107,7 @@ namespace protobuf {
 template<> ::s2s::Allot* Arena::CreateMaybeMessage<::s2s::Allot>(Arena*);
 template<> ::s2s::Allot_Request* Arena::CreateMaybeMessage<::s2s::Allot_Request>(Arena*);
 template<> ::s2s::Allot_Response* Arena::CreateMaybeMessage<::s2s::Allot_Response>(Arena*);
+template<> ::s2s::Allot_Save* Arena::CreateMaybeMessage<::s2s::Allot_Save>(Arena*);
 template<> ::s2s::CallClient* Arena::CreateMaybeMessage<::s2s::CallClient>(Arena*);
 template<> ::s2s::CallClient_Request* Arena::CreateMaybeMessage<::s2s::CallClient_Request>(Arena*);
 template<> ::s2s::GateBroadCast* Arena::CreateMaybeMessage<::s2s::GateBroadCast>(Arena*);
@@ -1476,6 +1480,141 @@ class Allot_Response :
 };
 // -------------------------------------------------------------------
 
+class Allot_Save :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot.Save) */ {
+ public:
+  Allot_Save();
+  virtual ~Allot_Save();
+
+  Allot_Save(const Allot_Save& from);
+
+  inline Allot_Save& operator=(const Allot_Save& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Allot_Save(Allot_Save&& from) noexcept
+    : Allot_Save() {
+    *this = ::std::move(from);
+  }
+
+  inline Allot_Save& operator=(Allot_Save&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Allot_Save& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Allot_Save* internal_default_instance() {
+    return reinterpret_cast<const Allot_Save*>(
+               &_Allot_Save_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(Allot_Save* other);
+  friend void swap(Allot_Save& a, Allot_Save& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Allot_Save* New() const final {
+    return CreateMaybeMessage<Allot_Save>(nullptr);
+  }
+
+  Allot_Save* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Allot_Save>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Allot_Save& from);
+  void MergeFrom(const Allot_Save& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Allot_Save* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string service = 1;
+  void clear_service();
+  static const int kServiceFieldNumber = 1;
+  const ::std::string& service() const;
+  void set_service(const ::std::string& value);
+  #if LANG_CXX11
+  void set_service(::std::string&& value);
+  #endif
+  void set_service(const char* value);
+  void set_service(const char* value, size_t size);
+  ::std::string* mutable_service();
+  ::std::string* release_service();
+  void set_allocated_service(::std::string* service);
+
+  // string address = 2;
+  void clear_address();
+  static const int kAddressFieldNumber = 2;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // @@protoc_insertion_point(class_scope:s2s.Allot.Save)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr service_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Allot :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Allot) */ {
  public:
@@ -1514,7 +1653,7 @@ class Allot :
                &_Allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(Allot* other);
   friend void swap(Allot& a, Allot& b) {
@@ -1571,6 +1710,7 @@ class Allot :
 
   typedef Allot_Request Request;
   typedef Allot_Response Response;
+  typedef Allot_Save Save;
 
   // accessors -------------------------------------------------------
 
@@ -1622,7 +1762,7 @@ class GateBroadCast_Request :
                &_GateBroadCast_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(GateBroadCast_Request* other);
   friend void swap(GateBroadCast_Request& a, GateBroadCast_Request& b) {
@@ -1752,7 +1892,7 @@ class GateBroadCast_Response :
                &_GateBroadCast_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(GateBroadCast_Response* other);
   friend void swap(GateBroadCast_Response& a, GateBroadCast_Response& b) {
@@ -1864,7 +2004,7 @@ class GateBroadCast :
                &_GateBroadCast_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(GateBroadCast* other);
   friend void swap(GateBroadCast& a, GateBroadCast& b) {
@@ -1972,7 +2112,7 @@ class CallClient_Request :
                &_CallClient_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(CallClient_Request* other);
   friend void swap(CallClient_Request& a, CallClient_Request& b) {
@@ -2102,7 +2242,7 @@ class CallClient :
                &_CallClient_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(CallClient* other);
   friend void swap(CallClient& a, CallClient& b) {
@@ -3203,6 +3343,116 @@ inline void Allot_Response::set_allocated_address(::std::string* address) {
 
 // -------------------------------------------------------------------
 
+// Allot_Save
+
+// string service = 1;
+inline void Allot_Save::clear_service() {
+  service_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Allot_Save::service() const {
+  // @@protoc_insertion_point(field_get:s2s.Allot.Save.service)
+  return service_.GetNoArena();
+}
+inline void Allot_Save::set_service(const ::std::string& value) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.Allot.Save.service)
+}
+#if LANG_CXX11
+inline void Allot_Save::set_service(::std::string&& value) {
+  
+  service_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Save.service)
+}
+#endif
+inline void Allot_Save::set_service(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.Allot.Save.service)
+}
+inline void Allot_Save::set_service(const char* value, size_t size) {
+  
+  service_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Save.service)
+}
+inline ::std::string* Allot_Save::mutable_service() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.Allot.Save.service)
+  return service_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Allot_Save::release_service() {
+  // @@protoc_insertion_point(field_release:s2s.Allot.Save.service)
+  
+  return service_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Allot_Save::set_allocated_service(::std::string* service) {
+  if (service != nullptr) {
+    
+  } else {
+    
+  }
+  service_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), service);
+  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Save.service)
+}
+
+// string address = 2;
+inline void Allot_Save::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Allot_Save::address() const {
+  // @@protoc_insertion_point(field_get:s2s.Allot.Save.address)
+  return address_.GetNoArena();
+}
+inline void Allot_Save::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.Allot.Save.address)
+}
+#if LANG_CXX11
+inline void Allot_Save::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Allot.Save.address)
+}
+#endif
+inline void Allot_Save::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.Allot.Save.address)
+}
+inline void Allot_Save::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.Allot.Save.address)
+}
+inline ::std::string* Allot_Save::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.Allot.Save.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Allot_Save::release_address() {
+  // @@protoc_insertion_point(field_release:s2s.Allot.Save.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Allot_Save::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:s2s.Allot.Save.address)
+}
+
+// -------------------------------------------------------------------
+
 // Allot
 
 // -------------------------------------------------------------------
@@ -3438,6 +3688,8 @@ inline void CallClient_Request::set_allocated_data(::google::protobuf::Any* data
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

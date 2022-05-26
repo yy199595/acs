@@ -14,12 +14,10 @@ message Push
   {
       int32 area_id = 1;
       ServiceInfo rpc = 2;
-      ServiceInfo http = 3;
   }
   message Response
   {
     ServiceInfo rpc = 1;
-    ServiceInfo http = 2;
   }
 }
 

@@ -127,12 +127,14 @@ namespace Sentry
 		for (Component* component: components)
 		{
 			NetEventComponent* localServiceComponent = component->Cast<NetEventComponent>();
-			if (localServiceComponent != nullptr && localServiceComponent->StartRegisterEvent())
+			if (localServiceComponent != nullptr)
 			{
-				if (!this->SubscribeChannel(localServiceComponent->GetName()))
+				if(!localServiceComponent->StartRegisterEvent())
 				{
+					LOG_INFO(component->GetName() << " start listen event failure");
 					return false;
 				}
+				LOG_INFO(component->GetName() << " start listen event successful");
 			}
 		}
 		return true;
@@ -156,6 +158,7 @@ namespace Sentry
 
 	void MainRedisComponent::CheckRedisClient()
 	{
+#ifndef __DEBUG__
 		while (this->mSubRedisClient != nullptr)
 		{
 			this->mTaskComponent->Sleep(1000);
@@ -165,6 +168,7 @@ namespace Sentry
 
 			}
 		}
+#endif
 	}
 
 	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
@@ -235,6 +239,7 @@ namespace Sentry
 				LOG_ERROR("parse message error");
 				return false;
 			}
+			assert(!request->address().empty());
 			this->mRpcComponent->OnRequest(request);
 			return true;
 		}
@@ -251,17 +256,21 @@ namespace Sentry
 			this->mRpcComponent->OnResponse(response);
 			return true;
 		}
-		NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
-		if (localServiceComponent == nullptr)
+		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+		if (!jsonReader->ParseJson(message))
 		{
 			return false;
 		}
+		NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
+		if(localServiceComponent == nullptr)
+		{
+			std::string service;
+			LOG_CHECK_RET_FALSE(jsonReader->GetMember("service", service));
+			localServiceComponent = this->GetComponent<NetEventComponent>(service);
+		}
 		std::string eveId;
-		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		LOG_CHECK_RET_FALSE(jsonReader->ParseJson(message));
 		LOG_CHECK_RET_FALSE(jsonReader->GetMember("eveId", eveId));
-		localServiceComponent->Invoke(eveId, jsonReader);
-		return true;
+		return localServiceComponent != nullptr && localServiceComponent->Invoke(eveId, jsonReader);
 	}
 
 	void MainRedisComponent::GetAllAddress(std::vector<std::string>& chanels)

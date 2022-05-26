@@ -353,15 +353,6 @@ class Push_Request :
   ::sub::ServiceInfo* mutable_rpc();
   void set_allocated_rpc(::sub::ServiceInfo* rpc);
 
-  // .sub.ServiceInfo http = 3;
-  bool has_http() const;
-  void clear_http();
-  static const int kHttpFieldNumber = 3;
-  const ::sub::ServiceInfo& http() const;
-  ::sub::ServiceInfo* release_http();
-  ::sub::ServiceInfo* mutable_http();
-  void set_allocated_http(::sub::ServiceInfo* http);
-
   // int32 area_id = 1;
   void clear_area_id();
   static const int kAreaIdFieldNumber = 1;
@@ -374,7 +365,6 @@ class Push_Request :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::sub::ServiceInfo* rpc_;
-  ::sub::ServiceInfo* http_;
   ::google::protobuf::int32 area_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sub_2eproto;
@@ -485,22 +475,12 @@ class Push_Response :
   ::sub::ServiceInfo* mutable_rpc();
   void set_allocated_rpc(::sub::ServiceInfo* rpc);
 
-  // .sub.ServiceInfo http = 2;
-  bool has_http() const;
-  void clear_http();
-  static const int kHttpFieldNumber = 2;
-  const ::sub::ServiceInfo& http() const;
-  ::sub::ServiceInfo* release_http();
-  ::sub::ServiceInfo* mutable_http();
-  void set_allocated_http(::sub::ServiceInfo* http);
-
   // @@protoc_insertion_point(class_scope:sub.Push.Response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::sub::ServiceInfo* rpc_;
-  ::sub::ServiceInfo* http_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sub_2eproto;
 };
@@ -1788,57 +1768,6 @@ inline void Push_Request::set_allocated_rpc(::sub::ServiceInfo* rpc) {
   // @@protoc_insertion_point(field_set_allocated:sub.Push.Request.rpc)
 }
 
-// .sub.ServiceInfo http = 3;
-inline bool Push_Request::has_http() const {
-  return this != internal_default_instance() && http_ != nullptr;
-}
-inline void Push_Request::clear_http() {
-  if (GetArenaNoVirtual() == nullptr && http_ != nullptr) {
-    delete http_;
-  }
-  http_ = nullptr;
-}
-inline const ::sub::ServiceInfo& Push_Request::http() const {
-  const ::sub::ServiceInfo* p = http_;
-  // @@protoc_insertion_point(field_get:sub.Push.Request.http)
-  return p != nullptr ? *p : *reinterpret_cast<const ::sub::ServiceInfo*>(
-      &::sub::_ServiceInfo_default_instance_);
-}
-inline ::sub::ServiceInfo* Push_Request::release_http() {
-  // @@protoc_insertion_point(field_release:sub.Push.Request.http)
-  
-  ::sub::ServiceInfo* temp = http_;
-  http_ = nullptr;
-  return temp;
-}
-inline ::sub::ServiceInfo* Push_Request::mutable_http() {
-  
-  if (http_ == nullptr) {
-    auto* p = CreateMaybeMessage<::sub::ServiceInfo>(GetArenaNoVirtual());
-    http_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:sub.Push.Request.http)
-  return http_;
-}
-inline void Push_Request::set_allocated_http(::sub::ServiceInfo* http) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete http_;
-  }
-  if (http) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      http = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, http, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  http_ = http;
-  // @@protoc_insertion_point(field_set_allocated:sub.Push.Request.http)
-}
-
 // -------------------------------------------------------------------
 
 // Push_Response
@@ -1892,57 +1821,6 @@ inline void Push_Response::set_allocated_rpc(::sub::ServiceInfo* rpc) {
   }
   rpc_ = rpc;
   // @@protoc_insertion_point(field_set_allocated:sub.Push.Response.rpc)
-}
-
-// .sub.ServiceInfo http = 2;
-inline bool Push_Response::has_http() const {
-  return this != internal_default_instance() && http_ != nullptr;
-}
-inline void Push_Response::clear_http() {
-  if (GetArenaNoVirtual() == nullptr && http_ != nullptr) {
-    delete http_;
-  }
-  http_ = nullptr;
-}
-inline const ::sub::ServiceInfo& Push_Response::http() const {
-  const ::sub::ServiceInfo* p = http_;
-  // @@protoc_insertion_point(field_get:sub.Push.Response.http)
-  return p != nullptr ? *p : *reinterpret_cast<const ::sub::ServiceInfo*>(
-      &::sub::_ServiceInfo_default_instance_);
-}
-inline ::sub::ServiceInfo* Push_Response::release_http() {
-  // @@protoc_insertion_point(field_release:sub.Push.Response.http)
-  
-  ::sub::ServiceInfo* temp = http_;
-  http_ = nullptr;
-  return temp;
-}
-inline ::sub::ServiceInfo* Push_Response::mutable_http() {
-  
-  if (http_ == nullptr) {
-    auto* p = CreateMaybeMessage<::sub::ServiceInfo>(GetArenaNoVirtual());
-    http_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:sub.Push.Response.http)
-  return http_;
-}
-inline void Push_Response::set_allocated_http(::sub::ServiceInfo* http) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete http_;
-  }
-  if (http) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      http = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, http, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  http_ = http;
-  // @@protoc_insertion_point(field_set_allocated:sub.Push.Response.http)
 }
 
 // -------------------------------------------------------------------

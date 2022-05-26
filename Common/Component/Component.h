@@ -9,7 +9,7 @@
 #include<Protocol/com.pb.h>
 #include<Protocol/s2s.pb.h>
 #include<Define/CommonLogDef.h>
-#include<Method/MethodProxy.h>
+#include<Method/EventMethod.h>
 #include<Define/CommonTypeDef.h>
 using namespace google::protobuf;
 namespace Sentry
@@ -79,7 +79,7 @@ namespace Sentry
 
 		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 
-	 protected:
+	protected:
 		template<typename T>
 		T* GetComponent();
 
@@ -94,13 +94,13 @@ namespace Sentry
 
 	 private:
 		Component* GetByHash(size_t hash);
-	 protected:
+	private:
 		Type* mType;
 		std::string mName;
 		long long mEntityId;
 		std::shared_ptr<App> mApp;
+		NetEventRegistry mEventRegistry;
 		std::shared_ptr<Entity> mEntity;
-
 	};
 	template<typename T>
 	inline T* Component::GetComponent()

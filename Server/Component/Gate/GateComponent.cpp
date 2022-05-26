@@ -16,6 +16,7 @@
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"GateService.h"
+#include"GateProxyComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
 namespace Sentry
@@ -134,8 +135,10 @@ namespace Sentry
 		if (!localServerRpc->GetUserAddress(userId, address))
 		{
 			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
-			if (address.empty() && localServerRpc->AllotAddress(userId, address))
+			if (localServerRpc->HasAddress(address) || localServerRpc->AllotAddress(address))
 			{
+				localServerRpc->AddUserAddress(userId, address);
+				this->mUserSyncComponent->SetAddress(userId, config->Service, address);
 				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}
 		}

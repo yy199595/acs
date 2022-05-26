@@ -76,7 +76,7 @@ namespace Sentry
 			return XCode::AddressAllotFailure;
 		}
 		std::shared_ptr<com::Type::String> gateAddress(new com::Type::String());
-		if (this->mGateService->Call(address, "QueryAddress", gateAddress) != XCode::Successful)
+		if (this->mGateService->Call(address, "QueryListener", gateAddress) != XCode::Successful)
 		{
 			return XCode::AddressAllotFailure;
 		}
