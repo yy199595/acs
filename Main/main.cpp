@@ -15,7 +15,7 @@
 #include<Component/Scene/NetThreadComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/HttpUserService.h"
-#include"Component/Logic/RegistryService.h"
+#include"Component/Logic/ServiceMgrComponent.h"
 #include"Component/Mysql/MysqlService.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
@@ -74,7 +74,7 @@ void RegisterServiceComponent()
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
 	ComponentFactory::Add<MongoService>("MongoService");
-	ComponentFactory::Add<RegistryService>("RegistryService");
+	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
 int main(int argc, char **argv)
