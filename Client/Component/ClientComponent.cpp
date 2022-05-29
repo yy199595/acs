@@ -55,7 +55,8 @@ namespace Client
 
     bool ClientComponent::LateAwake()
     {
-        this->mTaskComponent = this->GetComponent<TaskComponent>();
+		this->mHttpComponent = this->GetComponent<HttpComponent>();
+		this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
         return true;
     }
@@ -178,8 +179,6 @@ namespace Client
 
 	bool ClientComponent::GetClient(const std::string& account, const std::string& passwd)
 	{
-		//this->mTaskComponent->Sleep(2000);
-		HttpUserService * httpUserService = this->GetComponent<HttpUserService>();
 		std::string url;
 		long long userPhoneNumber = 13716061995;
 		this->GetConfig().GetMember("url", url);
@@ -190,29 +189,19 @@ namespace Client
 		jsonWriter.AddMember("phone_num", userPhoneNumber);
 
 		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
-		std::shared_ptr<Json::Reader> registerResponse(new Json::Reader());
-
 		long long timerId = this->mTimerComponent->DelayCall(5.0f, [account]()
 		{
 			LOG_ERROR(account << " register time out");
 		});
-		if(httpUserService->Post("logic/account/register", jsonWriter, registerResponse) != XCode::Successful)
-		{
-			std::string error;
-			if(registerResponse->GetMember("error", error))
-			{
-				LOG_ERROR("register error = " << error);
-			}
-		}
-		LOG_ERROR(account << " start login");
+		std::string registerData;
+		jsonWriter.WriterStream(registerData);
+		string url2 = url + "/logic/account/login";
+		string url1 = url + "/logic/account/register";
+		std::shared_ptr<HttpAsyncResponse> response1 = this->mHttpComponent->Post(url1, registerData);
+		std::shared_ptr<HttpAsyncResponse> response2 = this->mHttpComponent->Post(url2, registerData);
 		this->mTimerComponent->CancelTimer(timerId);
-		if(httpUserService->Post("logic/account/login", jsonWriter, loginResponse) != XCode::Successful)
+		if(response2 == nullptr || !loginResponse->ParseJson(response2->GetContent()))
 		{
-			std::string error;
-			if(loginResponse->GetMember("error", error))
-			{
-				LOG_ERROR("login error = " << error);
-			}
 			return false;
 		}
 

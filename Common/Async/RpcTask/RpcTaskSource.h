@@ -7,6 +7,7 @@
 #include<tuple>
 #include"Async/TaskSource.h"
 #ifdef __DEBUG__
+#include"Script/LuaParameter.h"
 #include"Other/ElapsedTimer.h"
 #endif
 using namespace com;
@@ -45,9 +46,20 @@ namespace Sentry
 		~LuaRpcTaskSource();
 	public:
 		int Yield();
+		void SetResult();
+		template<typename T>
+		void SetResult(T result);
 		void SetResult(XCode code, std::shared_ptr<Message> response);
 	private:
 		int mRef;
 		lua_State * mLua;
 	};
+
+	template<typename T>
+	void LuaRpcTaskSource::SetResult(T result)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		Lua::Parameter::Write(this->mLua, result);
+		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 1);
+	}
 }

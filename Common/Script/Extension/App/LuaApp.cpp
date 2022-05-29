@@ -4,17 +4,17 @@
 
 #include"LuaApp.h"
 #include"App/App.h"
-#include"Component/RpcService/ServiceCallComponent.h"
+#include"Component/RpcService/ServiceComponent.h"
 using namespace Sentry;
 namespace Lua
 {
 	int LuaApp::GetService(lua_State* lua)
 	{
 		luaL_checkstring(lua, -1);
-		const char * meta = "ServiceCallComponent";
+		const char * meta = "ServiceComponent";
 		const char* name = lua_tostring(lua, -1);
-		ServiceCallComponent* localServiceComponent = App::Get()->GetComponent<ServiceCallComponent>(name);
-		return UserDataParameter::UserDataStruct<ServiceCallComponent*>::WriteObj(lua, localServiceComponent, meta);
+		ServiceComponent* localServiceComponent = App::Get()->GetComponent<ServiceComponent>(name);
+		return UserDataParameter::UserDataStruct<ServiceComponent*>::WriteObj(lua, localServiceComponent, meta);
 	}
 	int LuaApp::GetComponent(lua_State* lua)
 	{

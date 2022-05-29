@@ -4,15 +4,8 @@
 #include <Component/Component.h>
 namespace Sentry
 {
-	Entity::Entity(long long id)
-		: mGameObjectId(id), mSocketId(0)
+	Entity::Entity(long long id) : mGameObjectId(id)
 	{
-	}
-
-	Entity::Entity(long long id, long long socketId)
-		: mGameObjectId(id), mSocketId(socketId)
-	{
-
 	}
 
 	bool Entity::AddComponent(const std::string& name)

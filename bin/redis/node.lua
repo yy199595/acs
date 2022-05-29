@@ -1,42 +1,61 @@
 local node = {}
 
-function node.add(request, response)
-    for _, service in ipairs(request.services) do
-        redis.call("SADD", service, request.address)
-    end
-    return true
-end
+function node.register(request) --注册服务
+    local json = cjson.encode(request)
+    print("json = ", json)
+    redis.call("SET", request.address, json)
+    redis.call("EXPIRE", request.address, 10)
 
-function node.query(request, response)
-    response.services = redis.call("SMEMBERS", request.service)
+    local message = cjson.encode({
+        eveId = "node_register",
+        address = request.address,
+        services = request.services
+    })
+    redis.call("PUBLISH", "ServiceMgrComponent", message)
     return true
-end
-
-local has_address = function(array_list, address)
-    for _, value in ipairs(array_list) do
-        if value == address then
-            return true
-        end
-    end
-    return false
 end
 
 function node.refresh(request, response)
-    response.all_address = {}
-    local array_list = redis.call("PUBSUB", "CHANNELS", "*:*")
-    local address_list = redis.call("SMEMBERS", request.service)
-
-    for _, address in ipairs(address_list) do
-        if has_address(array_list, address) then
-            table.insert(response.all_address, address)
-        end
+    response.services = {}
+    local list = redis.call("KEYS", "*:*")
+    for _, address in ipairs(list) do
+        local json = redis.call("GET", address)
+        table.insert(response.services, json)
     end
+    redis.call("EXPIRE", request.address, 10)
     return true
 end
 
-function node.remove(request)
-    redis.call("SREM", request.service, request.address)
-    return true
+function node.add(request) --添加一个新服务
+    local json = redis.call("GET", request.address)
+    local nodeInfo = cjson.decode(json)
+    table.insert(nodeInfo.services, request.address)
+    redis.call("SET", request.address, nodeInfo)
+    local message =  {
+        eveId = "service_add",
+        address = request.address,
+        service = request.service
+    }
+    redis.call("PUBLISH", "ServiceMgrComponent", cjson.encode(message))
+end
+
+function node.del(request)
+    local json = redis.call("GET", request.address)
+    local nodeInfo = cjson.decode(json)
+    for index = 1, #nodeInfo.services do
+        if nodeInfo.services[index] == request.service then
+            table.remove(nodeInfo.services, index)
+            break
+        end
+    end
+    redis.call("SET", request.address, cjson.encode(nodeInfo))
+
+    local message =  {
+        eveId = "service_del",
+        address = request.address,
+        service = request.service
+    }
+    redis.call("PUBLISH", "ServiceMgrComponent", cjson.encode(message))
 end
 
 local func = KEYS[1]

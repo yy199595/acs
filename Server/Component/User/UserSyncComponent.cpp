@@ -108,8 +108,8 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(service);
-		return component != nullptr && component->AddUserAddress(userId, address);
+		ServiceComponent * component = this->GetComponent<ServiceComponent>(service);
+		return component != nullptr && component->GetAddressProxy().AddUserAddress(userId, address);
 	}
 
 	bool UserSyncComponent::OnUserExit(const Json::Reader& json)
@@ -120,8 +120,8 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("services", services));
 		for(const std::string & service : services)
 		{
-			ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(service);
-			if(component != nullptr && component->DelUserAddress(userId))
+			ServiceComponent * component = this->GetComponent<ServiceComponent>(service);
+			if(component != nullptr && component->GetAddressProxy().DelUserAddress(userId))
 			{
 				LOG_INFO("remove " << userId << " form " << service);
 			}

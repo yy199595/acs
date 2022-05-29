@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
 #include"Protocol/sub.pb.h"
-#include"Component/Component.h"
+#include"Component/Scene/NetEventComponent.h"
 using namespace com;
 namespace Sentry
 {
 
 	class TaskComponent;
 	class RpcHandlerComponent;
-	class ServiceMgrComponent : public Component, public IComplete, public IServiceChange
+	class ServiceMgrComponent : public NetEventComponent, public IComplete, public IServiceChange
 	{
 	 public:
 		ServiceMgrComponent() = default;
@@ -17,13 +17,21 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnComplete() final;
-	 protected:
+	 private:
+		bool RefreshService();
 		void OnAddService(Component *component) final;
 		void OnDelService(Component *component) final;
-	private:
+	 private:
+		bool OnServiceAdd(const Json::Reader & json);
+		bool OnServiceDel(const Json::Reader & json);
+		bool OnNodeRegister(const Json::Reader & json);
+		bool OnRegisterEvent(NetEventRegistry &eventRegister) final;
+	 private:
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
+		std::vector<std::string> mServices;
+		std::vector<std::string> mJsonMessages;
 		class MainRedisComponent * mRedisComponent;
 	};
 }

@@ -15,52 +15,23 @@ using namespace asio::ip;
 
 namespace Sentry
 {
-	class ServiceCallComponent;
-	class LocalRpcServiceBase;
 	class MainTaskScheduler;
+	class ServiceComponent;
+
 	class App final : public Entity
 	{
 	 public:
 		explicit App(ServerConfig* config);
 		~App() final = default;
 	 public:
-		static std::shared_ptr<App> Get()
-		{
-			return mApp;
-		}
-		const ServerConfig& GetConfig()
-		{
-			return *mConfig;
-		}
-		const ServiceConfig& GetServiceConfig()
-		{
-			return this->mRpcConfig;
-		}
-		inline MainTaskScheduler& GetTaskScheduler()
-		{
-			return *mTaskScheduler;
-		}
-
-	 public:
-
-		inline bool IsMainThread()
-		{
-			return std::this_thread::get_id() == this->mMainThreadId;
-		}
 		bool StartNewService(const std::string & name);
-	 public:
-		inline LoggerComponent* GetLogger()
-		{
-			return this->mLogComponent;
-		}
-		inline TaskComponent* GetTaskComponent()
-		{
-			return this->mTaskComponent;
-		}
-		inline TimerComponent* GetTimerComponent()
-		{
-			return this->mTimerComponent;
-		}
+		static std::shared_ptr<App> Get() { return mApp; }
+		const ServerConfig& GetConfig() { return *mConfig; }
+		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
+		const ServiceConfig& GetServiceConfig() { return this->mRpcConfig; }
+		inline MainTaskScheduler& GetTaskScheduler() { return *mTaskScheduler; }
+		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
+		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 	 private:
 		bool LoadComponent();
 		void StartAllComponent();
@@ -76,14 +47,11 @@ namespace Sentry
 		void UpdateConsoleTitle();
 		void WaitAllServiceStart();
 	 private:
-		std::thread::id mMainThreadId;
-		std::shared_ptr<MainTaskScheduler> mTaskScheduler;
-	 private:
 		int mFps;
 		float mDeltaTime;
-		ServiceConfig mRpcConfig;
 		long long mStartTimer;
 		long long mSecondTimer;
+		ServiceConfig mRpcConfig;
 		long long mLogicUpdateInterval;
 	 private:
 		float mLogicFps;
@@ -98,8 +66,10 @@ namespace Sentry
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
+		std::shared_ptr<MainTaskScheduler> mTaskScheduler;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
+		std::unordered_map<std::string, ServiceComponent*> mSeviceMap;
 	};
 }// namespace Sentry

@@ -84,6 +84,13 @@ namespace Sentry
 		virtual bool IsStartComplete() = 0;
 	};
 
+	template<typename T1, typename T2>
+	class IService : public IServiceBase
+	{
+	 public:
+		virtual XCode Invoke(const std::string &, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
+	};
+
 	class IServiceChange
 	{
 	 public:
@@ -116,24 +123,6 @@ namespace Sentry
 		virtual void OnConnect(const std::string & address)  { }
 		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
 		virtual XCode OnResponse(const std::string &, const std::shared_ptr<T2> response) = 0;
-	};
-
-	class IProtoResponse
-	{
-	 public:
-		virtual bool OnResponse(const com::Rpc_Response* message) = 0;
-	};
-
-	class IJsonRequest
-	{
-	 public:
-		virtual bool OnRequest(const Json::Reader* message) = 0;
-	};
-
-	class IJsonResponse
-	{
-	 public:
-		virtual bool OnResponse(const Json::Reader* message) = 0;
 	};
 
 	class SocketProxy;

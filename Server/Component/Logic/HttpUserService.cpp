@@ -17,7 +17,7 @@ namespace Sentry
 
 	bool HttpUserService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(HttpService::LateAwake());
+		LOG_CHECK_RET_FALSE(LoclHttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
 		this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
 		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
@@ -71,7 +71,7 @@ namespace Sentry
 		this->mMysqlComponent->Update<db_account::tab_user_account>(updateJson, whereJson);
 
 		std::string address;
-		if (!this->mGateService->AllotAddress(address))
+		if (!this->mGateService->GetAddressProxy().GetAddress(address))
 		{
 			return XCode::AddressAllotFailure;
 		}

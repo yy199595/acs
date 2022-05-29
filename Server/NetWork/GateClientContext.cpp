@@ -43,7 +43,7 @@ namespace Sentry
 			return false;
 		}
 
-		if((RPC_TYPE)message[0] == RPC_TYPE::RPC_TYPE_CLIENT_REQUEST)
+		if((MESSAGE_TYPE)message[0] == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
 		{
 			std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
 			if (!request->ParseFromArray(message + 1, (int)size - 1))
@@ -112,7 +112,7 @@ namespace Sentry
 			return false;
 		}
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_CALL_CLIENT, message);
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CALL_CLIENT, message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
@@ -128,7 +128,7 @@ namespace Sentry
 			return false;
 		}
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_RESPONSE, message);
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else

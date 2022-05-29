@@ -64,4 +64,9 @@ namespace Sentry
 		}
 		lua_presume(coroutine, this->mLua, 1);
 	}
+	void LuaRpcTaskSource::SetResult()
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 1);
+	}
 }

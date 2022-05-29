@@ -8,7 +8,7 @@ namespace Tcp
 {
 	namespace Rpc
 	{
-		RpcProtoMessage::RpcProtoMessage(RPC_TYPE type, std::shared_ptr<Message> message)
+		RpcProtoMessage::RpcProtoMessage(MESSAGE_TYPE type, std::shared_ptr<Message> message)
 				:mType(type), mMessage(message)
 		{
 

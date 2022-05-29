@@ -36,6 +36,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RpcHandlerComponent>("RpcHandlerComponent");
+	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
@@ -74,7 +75,6 @@ void RegisterServiceComponent()
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
 	ComponentFactory::Add<MongoService>("MongoService");
-	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
 }
 int main(int argc, char **argv)

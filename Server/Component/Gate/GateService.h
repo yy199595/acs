@@ -7,7 +7,7 @@
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class GateService final : public LocalRpcServiceBase
+	class GateService final : public LocalRpcService
 	{
 	 public:
 		GateService() = default;

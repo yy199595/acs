@@ -30,7 +30,7 @@ namespace Sentry
 	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Response> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> responseMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_RESPONSE, message);
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(responseMessage);
 #else
@@ -41,7 +41,7 @@ namespace Sentry
 	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Request> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_REQUEST,message);
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_REQUEST,message);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
@@ -80,11 +80,11 @@ namespace Sentry
 			this->CloseSocket(XCode::NetWorkError);
 			return false;
 		}
-		switch ((RPC_TYPE)message[0])
+		switch ((MESSAGE_TYPE)message[0])
 		{
-		case RPC_TYPE::RPC_TYPE_REQUEST:
+		case MESSAGE_TYPE::MSG_RPC_REQUEST:
 			return this->OnRequest(message + 1, size - 1);
-		case RPC_TYPE::RPC_TYPE_RESPONSE:
+		case MESSAGE_TYPE::MSG_RPC_RESPONSE:
 			return this->OnResponse(message + 1, size - 1);
 		}
 		return false;

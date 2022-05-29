@@ -60,7 +60,8 @@
             "count": 1,
             "lua": [
                 "./redis/lock.lua",
-                "./redis/user.lua"
+                "./redis/user.lua",
+                "./redis/node.lua"
             ],
             "passwd": "199595yjz."
         },
@@ -94,14 +95,14 @@
         "GateProxyComponent",
         "DataRedisComponent",
         "UserSyncComponent",
+        "ServiceMgrComponent",
         "ClientComponent"
     ],
     "service":
     [
         "GateService",
         "ChatService",
-        "HttpUserService",
-        "RegistryService"
+        "HttpUserService"
     ],
     "white_list": [
         "127.0.0.1"

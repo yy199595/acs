@@ -13,7 +13,7 @@
 #include"Script/Extension/Json/Json.h"
 #include"Script/Extension/Service/LuaService.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
-#include"Component/RpcService/ServiceCallComponent.h"
+#include"Component/RpcService/ServiceComponent.h"
 #include"Script/Extension/Bson/bson.h"
 
 using namespace Lua;

@@ -131,13 +131,14 @@ namespace Sentry
 			return XCode::NetActiveShutdown;
 		}
 		std::string address;
-		LocalRpcServiceBase* localServerRpc = this->GetComponent<LocalRpcServiceBase>(config->Service);
-		if (!localServerRpc->GetUserAddress(userId, address))
+		LocalRpcService* localServerRpc = this->GetComponent<LocalRpcService>(config->Service);
+		AddressProxy & serviceAddressProxy = localServerRpc->GetAddressProxy();
+		if (!serviceAddressProxy.GetUserAddress(userId, address))
 		{
 			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
-			if (localServerRpc->HasAddress(address) || localServerRpc->AllotAddress(address))
+			if (serviceAddressProxy.HasAddress(address) || serviceAddressProxy.GetAddress(address))
 			{
-				localServerRpc->AddUserAddress(userId, address);
+				localServerRpc->GetAddressProxy().AddUserAddress(userId, address);
 				this->mUserSyncComponent->SetAddress(userId, config->Service, address);
 				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
 			}

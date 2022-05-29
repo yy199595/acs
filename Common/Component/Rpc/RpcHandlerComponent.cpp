@@ -57,7 +57,7 @@ namespace Sentry
 		}
 
 		const std::string& service = rpcInterfaceConfig->Service;
-		LocalRpcServiceBase * logicService = this->GetComponent<LocalRpcServiceBase>(service);
+		LocalRpcService * logicService = this->GetComponent<LocalRpcService>(service);
 		if (logicService == nullptr)
 		{
 			LOG_ERROR("call service not exist : [" << service << "]");

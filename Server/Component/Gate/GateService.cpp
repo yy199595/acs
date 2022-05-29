@@ -32,7 +32,7 @@ namespace Sentry
 
 	bool GateService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LocalRpcServiceBase::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalRpcService::LateAwake());
 		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);
@@ -76,8 +76,8 @@ namespace Sentry
 	XCode GateService::QueryAddress(long long userId, const com::Type::String& request, com::Type::String& response)
 	{
 		std::string address;
-		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(request.str());
-		if(component == nullptr || !component->GetUserAddress(userId, address))
+		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.str());
+		if(component == nullptr || !component->GetAddressProxy().GetUserAddress(userId, address))
 		{
 			return XCode::Failure;
 		}
@@ -87,12 +87,12 @@ namespace Sentry
 
 	XCode GateService::SaveAddress(long long userId, const s2s::Allot::Save& request)
 	{
-		ServiceCallComponent * component = this->GetComponent<ServiceCallComponent>(request.service());
-		if(component == nullptr || !component->HasAddress(request.address()))
+		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.service());
+		if(component == nullptr || !component->GetAddressProxy().HasAddress(request.address()))
 		{
 			return XCode::Failure;
 		}
-		component->AddUserAddress(userId, request.address());
+		component->GetAddressProxy().AddUserAddress(userId, request.address());
 		return XCode::Successful;
 	}
 

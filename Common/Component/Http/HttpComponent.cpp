@@ -13,7 +13,7 @@
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Component/HttpService/HttpService.h"
+#include"Component/HttpService/LoclHttpService.h"
 namespace Sentry
 {
 
@@ -95,7 +95,7 @@ namespace Sentry
 		unsigned short port = 0;
 		Helper::String::ParseIpAddress(content->GetAddress(), ip, port);
 		jsonReader->AddMember("ip", rapidjson::StringRef(ip.c_str()), jsonReader->GetAllocator());
-		HttpService* httpService = this->GetComponent<HttpService>(httpConfig->Service);
+		LoclHttpService* httpService = this->GetComponent<LoclHttpService>(httpConfig->Service);
 		if (httpService == nullptr)
 		{
 			response->AddMember("error", "not find handler component");

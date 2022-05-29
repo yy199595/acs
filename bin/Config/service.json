@@ -42,33 +42,6 @@
             "Request": "s2s.Mysql.Update"
         }
     },
-    "RegistryService": {
-        "Add": {
-            "Id": 201,
-            "Async": false,
-            "Timeout": 0,
-            "CallWay": "Sub",
-            "Type": "Server",
-            "Request":"sub.Add.Request"
-        },
-        "Push": {
-            "Id": 301,
-            "Async": false,
-            "Timeout": 0,
-            "CallWay": "Sub",
-            "Type": "Server",
-            "Request":"sub.Push.Request",
-            "Response": "sub.Push.Response"
-        },
-        "Del": {
-            "Id": 401,
-            "Async": false,
-            "Timeout": 0,
-            "CallWay": "Sub",
-            "Type": "Server",
-            "Request":"sub.Del.Request"
-        }
-    },
     "HttpUserService": {
         "Login": {
             "Type": "POST",

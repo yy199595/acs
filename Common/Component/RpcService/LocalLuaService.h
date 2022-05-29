@@ -1,23 +1,30 @@
 ﻿#pragma once
 
-#include"LocalServiceComponent.h"
+
 #include"Script/LuaInclude.h"
+#include"ServiceComponent.h"
 
 namespace Sentry
 {
 	class LuaScriptComponent;
-
-	class LocalLuaService : public LocalRpcServiceBase, public IStart
+	class ServiceMethodRegister;
+	class LocalLuaService : public ServiceComponent, public IStart
 	{
 	 public:
 		LocalLuaService();
 		~LocalLuaService() override;
-	 public:
+	 protected:
 		bool OnStart() final;
 		bool LateAwake() final;
-		bool OnStartService(ServiceMethodRegister & methodRegister) final;
+	 public:
+		bool StartService() final;
+		bool CloseService() final;
+		bool IsStartService() final { return this->mMethodRegister != nullptr; }
+		XCode Invoke(const std::string& name, std::shared_ptr<com::Rpc::Request> request,
+			std::shared_ptr<com::Rpc::Response> response) final;
 	 private:
 		lua_State* mLuaEnv;
 		class LuaScriptComponent* mLuaComponent;
+		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
 }// namespace Sentry

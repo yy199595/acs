@@ -14,10 +14,10 @@ namespace Tcp
 		class RpcProtoMessage final : public Tcp::ProtoMessage
 		{
 		public:
-			RpcProtoMessage(RPC_TYPE type, std::shared_ptr<Message> message);
+			RpcProtoMessage(MESSAGE_TYPE type, std::shared_ptr<Message> message);
 			bool Serailize(std::ostream &os) final;
 		private:
-			RPC_TYPE mType;
+			MESSAGE_TYPE mType;
 			std::shared_ptr<Message> mMessage;
 		};
 	}

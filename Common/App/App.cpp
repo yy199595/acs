@@ -18,7 +18,6 @@ namespace Sentry
 	{
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
-		this->mMainThreadId = std::this_thread::get_id();
 		StaticMethod * staticMethod = NewMethodProxy(&App::LogicMainLoop, this);
 		this->mTaskScheduler = std::make_shared<MainTaskScheduler>(staticMethod);
 	}
@@ -202,7 +201,7 @@ namespace Sentry
 			if (component != nullptr)
 			{
 				IStart* startComponent = component->Cast<IStart>();
-				LocalRpcServiceBase* localServerRpc = component->Cast<LocalRpcServiceBase>();
+				IServiceBase* localServerRpc = component->Cast<IServiceBase>();
 				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
 				{
 					continue;
@@ -231,7 +230,7 @@ namespace Sentry
 			Component* component = this->GetComponentByName(name);
 			if (component != nullptr)
 			{
-				LocalRpcServiceBase* localServerRpc = component->Cast<LocalRpcServiceBase>();
+				IServiceBase* localServerRpc = component->Cast<IServiceBase>();
 				if (localServerRpc == nullptr || localServerRpc->IsStartService())
 				{
 					IComplete* complete = component->Cast<IComplete>();

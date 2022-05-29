@@ -1,4 +1,4 @@
-﻿#include"ServiceCallComponent.h"
+﻿#include"ServiceComponent.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/ServiceConfig.h"
@@ -11,99 +11,27 @@
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/User/UserSyncComponent.h"
-namespace Sentry
-{
-	bool ServiceCallComponent::AllotAddress(std::string& address)
-	{
-		if(this->mAllAddress.empty())
-		{
-			return false;
-		}
-		address = this->mAllAddress[0];
-		return true;
-	}
-
-	bool ServiceCallComponent::AddAddress(const std::string& address)
-	{
-		if(!this->HasAddress(address))
-		{
-			this->mAllAddress.emplace_back(address);
-			return true;
-		}
-		return false;
-	}
-
-	bool ServiceCallComponent::DelAddress(const std::string& address)
-	{
-		auto iter = this->mAllAddress.begin();
-		for(;iter != this->mAllAddress.end(); iter++)
-		{
-			if((*iter) == address)
-			{
-				this->mAllAddress.erase(iter);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	size_t ServiceCallComponent::GetAddressSize()
-	{
-		return this->mAllAddress.size();
-	}
-
-	bool ServiceCallComponent::GetUserAddress(long long id, std::string& address)
-	{
-		auto iter = this->mUserAddress.find(id);
-		if(iter != this->mUserAddress.end())
-		{
-			address = iter->second;
-			return true;
-		}
-		address = this->mSyncComponent->GetAddress(id, this->GetName());
-		if(!address.empty() && this->HasAddress(address))
-		{
-			this->mUserAddress.emplace(id, address);
-			return true;
-		}
-		return false;
-	}
-
-	bool ServiceCallComponent::HasAddress(const std::string& address)
-	{
-		for(const std::string & add : this->mAllAddress)
-		{
-			if(add == address)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-}
 
 namespace Sentry
 {
-	bool ServiceCallComponent::LateAwake()
+	bool ServiceComponent::LateAwake()
 	{
-		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
 	}
 
-	void ServiceCallComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void ServiceComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<ServiceCallComponent>();
+		luaRegister.BeginRegister<ServiceComponent>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
 	}
 
-	std::shared_ptr<com::Rpc::Request> ServiceCallComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)
+	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message* message)
 	{
 		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
-		string name = fmt::format("{0}.{1}", this->GetName(), func);
+		const string name = fmt::format("{0}.{1}", this->GetName(), func);
 		const RpcInterfaceConfig * protoConfig = rpcConfig.GetInterfaceConfig(name);
 		if (protoConfig == nullptr)
 		{
@@ -130,7 +58,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode ServiceCallComponent::Send(const std::string& func, const Message& message)
+	XCode ServiceComponent::Send(const std::string& func, const Message& message)
 	{
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
 		if(rpcRequest == nullptr)
@@ -147,7 +75,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode ServiceCallComponent::Call(const std::string & address, const string& func)
+	XCode ServiceComponent::Call(const std::string & address, const string& func)
 	{
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
 		if(rpcRequest == nullptr)
@@ -157,7 +85,7 @@ namespace Sentry
 		return this->Call(address, rpcRequest, nullptr);
 	}
 
-	XCode ServiceCallComponent::Call(const std::string & address, const string& func, const Message& message)
+	XCode ServiceComponent::Call(const std::string & address, const string& func, const Message& message)
 	{
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, &message);
 		if(rpcRequest == nullptr)
@@ -167,7 +95,7 @@ namespace Sentry
 		return this->Call(address, rpcRequest, nullptr);
 	}
 
-	XCode ServiceCallComponent::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
 		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, nullptr);
@@ -179,7 +107,7 @@ namespace Sentry
 	}
 
 
-	XCode ServiceCallComponent::Call(const std::string & address, const string& func, const Message& message,
+	XCode ServiceComponent::Call(const std::string & address, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
@@ -191,17 +119,17 @@ namespace Sentry
 		return this->Call(address, rpcRequest, response);
 	}
 
-	XCode ServiceCallComponent::Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
 	{
 		std::string address;
-		if(!this->GetUserAddress(userId, address))
+		if(!this->mAddressProxy.GetAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
 		return this->Call(address, request, response);
 	}
 
-	XCode ServiceCallComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
 	{
 		std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
@@ -255,7 +183,7 @@ namespace Sentry
 		return (XCode)responsedata->code();
 	}
 
-	XCode ServiceCallComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
+	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
 	{
 		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
 		const RpcInterfaceConfig * protoConfig = serviceConfig.GetInterfaceConfig(request->method_id());
@@ -290,10 +218,10 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode ServiceCallComponent::Call(long long userId, const std::string& func)
+	XCode ServiceComponent::Call(long long userId, const std::string& func)
 	{
 		std::string address;
-		if(!this->GetUserAddress(userId, address))
+		if(!this->mAddressProxy.GetAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -305,10 +233,10 @@ namespace Sentry
 		return this->Call(address, rpcRequest, nullptr);
 	}
 
-	XCode ServiceCallComponent::Call(long long userId, const std::string& func, const Message& message)
+	XCode ServiceComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
 		std::string address;
-		if(!this->GetUserAddress(userId, address))
+		if(!this->mAddressProxy.GetAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -320,11 +248,11 @@ namespace Sentry
 		return this->Call(address, rpcRequest, nullptr);
 	}
 
-	XCode ServiceCallComponent::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(!this->GetUserAddress(userId, address))
+		if(!this->mAddressProxy.GetAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -336,11 +264,11 @@ namespace Sentry
 		return this->Call(address, rpcRequest, response);
 	}
 
-	XCode ServiceCallComponent::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(!this->GetUserAddress(userId, address))
+		if(!this->mAddressProxy.GetAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -350,27 +278,5 @@ namespace Sentry
 			return XCode::NotFoundRpcConfig;
 		}
 		return this->Call(address, rpcRequest, response);
-	}
-
-	bool ServiceCallComponent::DelUserAddress(long long id)
-	{
-		auto iter = this->mUserAddress.find(id);
-		if(iter != this->mUserAddress.end())
-		{
-			this->mUserAddress.erase(iter);
-			return true;
-		}
-		return false;
-	}
-
-	bool ServiceCallComponent::AddUserAddress(long long id, const std::string& address)
-	{
-		auto iter = this->mUserAddress.find(id);
-		if(iter != this->mUserAddress.end())
-		{
-			return false;
-		}
-		this->mUserAddress.emplace(id, address);
-		return true;
 	}
 }

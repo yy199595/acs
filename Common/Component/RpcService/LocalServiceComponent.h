@@ -4,16 +4,16 @@
 
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
-#include"ServiceCallComponent.h"
+#include"ServiceComponent.h"
 #include"Method/MethodRegister.h"
 #include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry
 {
-	class LocalRpcServiceBase : public ServiceCallComponent, public IServiceBase
+	class LocalRpcService : public ServiceComponent
 	{
 	public:
-		LocalRpcServiceBase() = default;
+		LocalRpcService() = default;
 	protected:
 		virtual void OnCloseService() { }
 		virtual bool OnStartService(ServiceMethodRegister & methodRegister) = 0;
@@ -21,8 +21,7 @@ namespace Sentry
 		bool StartService() final;
 		bool CloseService() final;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		bool IsStartComplete() final { return this->GetAddressSize() > 0; }
-		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response);
+		XCode Invoke(const std::string &func, std::shared_ptr<com::Rpc::Request>, std::shared_ptr<com::Rpc::Response> response) final;
 	private:
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};

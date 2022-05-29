@@ -8,8 +8,6 @@ namespace Sentry
 	{
 	 public:
 		explicit Entity(long long id);
-		explicit Entity(long long id, long long socketId);
-
 		Entity(const Entity &) = delete;
 		virtual ~Entity() override = default;
 	 public:
@@ -49,12 +47,7 @@ namespace Sentry
 		{
 			return this->mGameObjectId;
 		}
-		inline long long GetSocketId() const
-		{
-			return this->mSocketId;
-		}
 	 private:
-		long long mSocketId;
 		long long mGameObjectId;
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, Component*> mComponentMap;

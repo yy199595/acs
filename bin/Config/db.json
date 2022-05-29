@@ -45,7 +45,8 @@
             "count": 1,
             "lua": [
                 "./redis/lock.lua",
-                "./redis/user.lua"
+                "./redis/user.lua",
+                "./redis/node.lua"
             ],
             "passwd": "199595yjz."
         }
@@ -55,12 +56,12 @@
         "TcpServerComponent",
         "MainRedisComponent",
         "RpcClientComponent",
-        "RpcHandlerComponent"
+        "RpcHandlerComponent",
+        "ServiceMgrComponent"
     ],
     "service":
     [
-        "MysqlService",
-        "RegistryService"
+        "MysqlService"
     ],
     "white_list": [
         "127.0.0.1"

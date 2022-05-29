@@ -56,15 +56,6 @@ namespace Sentry
 			return false;
 		}
 
-#ifdef __DEBUG__
-		//this->Run("FLUSHALL")->IsOk();
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("FLUSHALL");
-		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-		if (this->mRedisClient->Run(request, response) != XCode::Successful || !response->IsOk())
-		{
-			return false;
-		}
-#endif
 		for (const std::string& path: this->mConfig->LuaFiles)
 		{
 			if(!this->LoadLuaScript("", path))
@@ -221,7 +212,7 @@ namespace Sentry
 				redisResponse->GetString(message, 2);
 				if(!this->HandlerEvent(channel, message))
 				{
-					LOG_ERROR("handler " << channel << " error");
+					LOG_ERROR("handler " << channel << " error : " << message);
 				}
 			}
 		}

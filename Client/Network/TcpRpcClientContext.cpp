@@ -13,7 +13,7 @@ namespace Client
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
-			std::make_shared<Tcp::Rpc::RpcProtoMessage>(RPC_TYPE::RPC_TYPE_CLIENT_REQUEST, request);
+			std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(networkData);
 #else
@@ -59,11 +59,11 @@ namespace Client
 		}
 		size_t length = size - 1;
 		const char * str = message + 1;
-		switch((RPC_TYPE)message[0])
+		switch((MESSAGE_TYPE)message[0])
 		{
-		case RPC_TYPE::RPC_TYPE_CALL_CLIENT:
+		case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
 			return this->OnRequest(str, length);
-		case RPC_TYPE::RPC_TYPE_RESPONSE:
+		case MESSAGE_TYPE::MSG_RPC_RESPONSE:
 			return this->OnResponse(str, length);
 		}
 		CONSOLE_LOG_FATAL("unknow message type");

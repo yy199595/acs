@@ -1,6 +1,6 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/ServiceCallComponent.h"
+#include"Component/RpcService/ServiceComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
 #include"Network/Listener/TcpServerComponent.h"
@@ -103,7 +103,7 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{
-			if(this->GetComponent<LocalRpcServiceBase>(name) != nullptr)
+			if(this->GetComponent<LocalRpcService>(name) != nullptr)
 			{
 				response.emplace_back(name);
 			}
