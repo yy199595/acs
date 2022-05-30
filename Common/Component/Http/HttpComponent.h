@@ -17,13 +17,12 @@ namespace Sentry
 }
 namespace Sentry
 {
-	class HttpRespSession;
 	class HttpServiceMethod;
 	class HttpHandlerClient;
 	class HttpAsyncResponse;
 	class HttpHandlerRequest;
 	class HttpRequestClient;
-	class HttpComponent : public Component, public ISocketListen
+	class HttpComponent : public Component, public ISocketListen, public ILuaRegister
 	{
 	 public:
 		HttpComponent() = default;
@@ -37,6 +36,7 @@ namespace Sentry
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
 	 public:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
 		XCode Invoke(const HttpInterfaceConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
 	 private:

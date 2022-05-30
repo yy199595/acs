@@ -91,25 +91,28 @@ namespace Sentry
                          asio::transfer_at_least(1),[this, httpContent]
             (const asio::error_code & code, size_t size)
         {
-            if(code)
+			if(code == asio::error::eof)
+			{
+				this->mHttpTask.SetResult(true);
+				return;
+			}
+            else if(code)
             {
 				CONSOLE_LOG_ERROR(code.message());
                 this->mHttpTask.SetResult(false);
-                return;
             }
-            switch(httpContent->OnReceiveData(this->mReadBuffer))
-            {
-                case HttpStatus::OK:
+			else
+			{
+				switch (httpContent->OnReceiveData(this->mReadBuffer))
+				{
+				case HttpStatus::OK:
 					this->mHttpTask.SetResult(true);
-                    break;
-                case HttpStatus::CONTINUE:
-                    this->ReceiveHttpContent(httpContent);
-                    break;
-                default:
-					this->mHttpTask.SetResult(false);
-					CONSOLE_LOG_ERROR("http unknow error");
-				break;
-            }
+					break;
+				case HttpStatus::CONTINUE:
+					this->ReceiveHttpContent(httpContent);
+					break;
+				}
+			}
         });
     }
 

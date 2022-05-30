@@ -21,7 +21,18 @@ end
 
 function Main.Start()
 
-    local t1 = Time.GetNowSecTime();
+    local t1 = Time.GetNowMilTime();
+    local httpComponent = App.GetComponent("HttpComponent")
+    local info = {
+        city = "北京",
+        key = "17b541d4fc517e3a29b4636ac2f9a74a"
+    }
+    local content = httpComponent:Post("http://apis.juhe.cn/simpleWeather/query", Json.Encode(info))
+    for k, v in pairs(content.head) do
+        Log.Error(k, v)
+    end
+    Log.Error("time = ", Time.GetNowMilTime() - t1)
+
     coroutine.sleep(1.5)
     --Timer.AddTimer(5000, function()
     --    local t2 = Time.GetNowSecTime();

@@ -49,6 +49,7 @@ namespace Sentry
 		void SetResult();
 		template<typename T>
 		void SetResult(T result);
+		void SetJson(const std::string & json);
 		void SetResult(XCode code, std::shared_ptr<Message> response);
 	private:
 		int mRef;
@@ -59,7 +60,8 @@ namespace Sentry
 	void LuaRpcTaskSource::SetResult(T result)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		Lua::Parameter::Write(this->mLua, result);
-		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 1);
+		lua_presume(coroutine, this->mLua, 1);
 	}
 }

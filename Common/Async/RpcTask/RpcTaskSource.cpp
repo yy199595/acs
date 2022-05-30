@@ -56,8 +56,7 @@ namespace Sentry
 			std::string json;
 			if (Proto::GetJson(response, json))
 			{
-				rapidjson::extend::StringStream s(json.c_str(), json.size());
-				values::pushDecoded(this->mLua, s);
+				values::pushDecoded(this->mLua, json.c_str(), json.size());
 				lua_presume(coroutine, this->mLua, 2);
 				return;
 			}
@@ -67,6 +66,14 @@ namespace Sentry
 	void LuaRpcTaskSource::SetResult()
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 1);
+		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 0);
+	}
+	void LuaRpcTaskSource::SetJson(const string& json)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		lua_State* coroutine = lua_tothread(this->mLua, -1);
+		values::pushDecoded(this->mLua, json.c_str(), json.size());
+		lua_presume(coroutine, this->mLua, 1);
+
 	}
 }

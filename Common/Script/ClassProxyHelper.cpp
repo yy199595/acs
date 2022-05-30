@@ -46,4 +46,9 @@ namespace Lua
 		}
 		lua_pop(this->mLua, 1);
 	}
+
+	ClassProxyHelper ClassProxyHelper::Clone(const string& name)
+	{
+		return ClassProxyHelper(this->mLua, name);
+	}
 }

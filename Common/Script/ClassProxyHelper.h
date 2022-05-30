@@ -39,11 +39,13 @@ namespace Lua
 
 		void PushExtensionFunction(const char* name, lua_CFunction func);
 
-		 void PushGlobalExtensionFunction(const char* name, lua_CFunction func);
+		void PushGlobalExtensionFunction(const char* name, lua_CFunction func);
 
 	 public:
 
 		void BeginNewTable();
+
+		ClassProxyHelper Clone(const std::string & name);
 
 		void PushStaticExtensionFunction(const char* name, lua_CFunction func);
 
@@ -51,7 +53,7 @@ namespace Lua
 		void PushStaticFunction(const char* name, Ret(* func)(Args ...));
 
 	 private:
-		lua_State  * mLua;
+		lua_State * mLua;
 		const std::string mName;
 	};
 

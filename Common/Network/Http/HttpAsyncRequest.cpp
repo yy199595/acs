@@ -156,15 +156,6 @@ namespace Sentry
                     this->mHeadMap.insert(std::make_pair(key, val));
                 }
             }
-            if(this->mState == HttpDecodeState::Content)
-            {
-				std::string len;
-				if(!this->GetHead("content-length", len))
-				{
-					return HttpStatus::LENGTH_REQUIRED;
-				}
-                this->mContentLength = std::stol(len);
-            }
         }
         if(this->mState == HttpDecodeState::Content)
         {
@@ -173,11 +164,6 @@ namespace Sentry
             while(size > 0)
             {
                 this->mContent.append(buffer, size);
-                if(this->mContent.size() >= this->mContentLength)
-                {
-                    this->mState = HttpDecodeState::Finish;
-                    return HttpStatus::OK;
-                }
                 size = io.readsome(buffer, 256);
             }
         }
@@ -193,6 +179,21 @@ namespace Sentry
 			return true;
 		}
 		return false;
+	}
+	bool HttpAsyncResponse::ToJson(std::string & json)
+	{
+		Json::Writer jsonWriter;
+		jsonWriter.StartObject("head");
+		auto iter = this->mHeadMap.begin();
+		for(; iter!= this->mHeadMap.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			const std::string & value = iter->second;
+			jsonWriter.AddMember(key.c_str(), value);
+		}
+		jsonWriter.EndObject();
+		jsonWriter.AddMember("data", this->mContent);
+		return jsonWriter.WriterStream(json);
 	}
 }
 

@@ -17,7 +17,7 @@ namespace Sentry
 	class HttpAsyncRequest : public Tcp::ProtoMessage
     {
 	public:
-		HttpAsyncRequest(const std::string&  method);
+		HttpAsyncRequest(const std::string& method);
 	public:
 		bool AddHead(const std::string & key, int value);
 		bool AddHead(const std::string & key, const std::string & value);
@@ -95,6 +95,7 @@ namespace Sentry
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() final { return this->mContent;}
 	public:
+		bool ToJson(std::string & json);
 		bool GetHead(const std::string & key, std::string & value);
     private:
         int mHttpCode;

@@ -13,6 +13,7 @@
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Network/Http/HttpHandlerClient.h"
+#include"Script/Extension/Http/LuaHttp.h"
 #include"Component/HttpService/LoclHttpService.h"
 namespace Sentry
 {
@@ -140,7 +141,7 @@ namespace Sentry
 		this->mTimeComponent->CancelTimer(timerId);
 		if(httpResponse == nullptr)
 		{
-			LOG_FATAL(url << " net work error");
+			LOG_ERROR(url << " net work error");
 			return nullptr;
 		}
 		if(httpResponse->GetHttpCode() != HttpStatus::OK)
@@ -150,6 +151,13 @@ namespace Sentry
 			return nullptr;
 		}
 		return httpResponse;
+	}
+
+	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.BeginRegister<HttpComponent>();
+		luaRegister.PushExtensionFunction("Get", Lua::Http::Get);
+		luaRegister.PushExtensionFunction("Post", Lua::Http::Post);
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
