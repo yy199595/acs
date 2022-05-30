@@ -111,10 +111,12 @@ namespace Sentry
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
 		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
+		ServiceComponent * serviceComponent = component->Cast<ServiceComponent>();
 		TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
 		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
 		TryInvoke(manager4, this->mLastFrameUpdateManager.emplace_back(manager4));
+		TryInvoke(serviceComponent, this->mSeviceMap.emplace(component->GetName(), serviceComponent));
 		return true;
 	}
 
@@ -284,7 +286,7 @@ namespace Sentry
 			}
 		}
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-		LOG_DEBUG("===== start server successful [" << t / 1000.0f << "]s ===========");
+		LOG_DEBUG("===== start " << this->mServerName << " successful [" << t / 1000.0f << "]s ===========");
 	}
 
 	void App::UpdateConsoleTitle()
@@ -340,5 +342,27 @@ namespace Sentry
 				serviceChange->OnAddService(component);
 			}
 		}
+	}
+
+	ServiceComponent* App::GetService(const std::string& name)
+	{
+		auto iter = this->mSeviceMap.find(name);
+		if(iter != this->mSeviceMap.end())
+		{
+			return iter->second;
+		}
+		return nullptr;
+	}
+
+	bool App::GetServices(std::vector<ServiceComponent*>& services)
+	{
+		services.clear();
+		auto iter = this->mSeviceMap.begin();
+		services.reserve(this->mSeviceMap.size());
+		for(; iter != this->mSeviceMap.end(); iter++)
+		{
+			services.emplace_back(iter->second);
+		}
+		return !services.empty();
 	}
 }

@@ -14,10 +14,10 @@ namespace Sentry
 	class AddressProxy final
 	{
 	 public:
+		void Clear() { this->mAllAddress.clear();}
 		bool DelAddress(const std::string & address);
 		bool HasAddress(const std::string & address);
 		void AddAddress(const std::string & address);
-		void AddAddress(std::vector<std::string> & list);
 	 public:
 		bool DelUserAddress(long long userId);
 		bool GetUserAddress(long long userId, std::string & address);

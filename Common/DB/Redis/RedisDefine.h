@@ -30,6 +30,7 @@ namespace Sentry
     {
     public:
         RedisRequest(const std::string & cmd);
+		~RedisRequest() { }
     public:
 		const std::string ToJson() const;
 		bool Serailize(std::ostream &os) final;
@@ -77,6 +78,7 @@ namespace Sentry
     {
 	public:
 		RedisResponse();
+		~RedisResponse();
     public:
         bool IsOk();
 		void Clear();
@@ -92,7 +94,7 @@ namespace Sentry
 		bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
     private:
         RedisRespType mType;
-        std::vector<std::shared_ptr<RedisAny>> mArray;
+        std::vector<RedisAny *> mArray;
     };
 
 }

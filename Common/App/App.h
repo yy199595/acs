@@ -41,7 +41,9 @@ namespace Sentry
 	 public:
 		int Run();
 		void Stop();
-	 private:
+		ServiceComponent * GetService(const std::string & name);
+		bool GetServices(std::vector<ServiceComponent *> & services);
+	private:
 		void LogicMainLoop();
 		bool StartNewComponent();
 		void UpdateConsoleTitle();

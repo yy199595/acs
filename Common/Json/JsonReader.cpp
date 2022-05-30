@@ -200,6 +200,7 @@ namespace Json
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
+			value.reserve(jsonArray.Size());
 			for(size_t index = 0; index < jsonArray.Size(); index++)
 			{
 				const rapidjson::Value & data = jsonArray[index];

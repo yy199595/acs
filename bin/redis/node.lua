@@ -1,28 +1,30 @@
 local node = {}
 
-function node.register(request) --注册服务
+function node.register(request, response) --注册服务
     local json = cjson.encode(request)
     print("json = ", json)
     redis.call("SET", request.address, json)
-    redis.call("EXPIRE", request.address, 10)
+    redis.call("EXPIRE", request.address, 15)
 
     local message = cjson.encode({
         eveId = "node_register",
         address = request.address,
         services = request.services
     })
+    response.nodes = redis.call("KEYS", "*:*")
     redis.call("PUBLISH", "ServiceMgrComponent", message)
     return true
 end
 
+function node.query(request, response)
+    assert(type(request.address) == "string")
+    response.json = redis.call("GET", request.address)
+    return true
+end
+
 function node.refresh(request, response)
-    response.services = {}
-    local list = redis.call("KEYS", "*:*")
-    for _, address in ipairs(list) do
-        local json = redis.call("GET", address)
-        table.insert(response.services, json)
-    end
-    redis.call("EXPIRE", request.address, 10)
+    redis.call("EXPIRE", request.address, 15)
+    response.nodes = redis.call("KEYS", "*:*")
     return true
 end
 

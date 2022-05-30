@@ -57,8 +57,8 @@ namespace Sentry
 		}
 
 		const std::string& service = rpcInterfaceConfig->Service;
-		LocalRpcService * logicService = this->GetComponent<LocalRpcService>(service);
-		if (logicService == nullptr)
+		ServiceComponent * logicService = this->GetApp()->GetService(service);
+		if (logicService == nullptr || !logicService->IsStartService())
 		{
 			LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;

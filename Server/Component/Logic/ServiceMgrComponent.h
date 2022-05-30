@@ -25,11 +25,14 @@ namespace Sentry
 		bool OnServiceAdd(const Json::Reader & json);
 		bool OnServiceDel(const Json::Reader & json);
 		bool OnNodeRegister(const Json::Reader & json);
+		void RemoveAddress(const std::string & address);
+		bool QueryNodeInfo(const std::string & address);
 		bool OnRegisterEvent(NetEventRegistry &eventRegister) final;
 	 private:
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
+		std::set<std::string> mAllAddress;
 		std::vector<std::string> mServices;
 		std::vector<std::string> mJsonMessages;
 		class MainRedisComponent * mRedisComponent;

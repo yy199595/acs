@@ -2,7 +2,9 @@
 
 Main = {}
 function Main.Awake()
-   
+    for i, v in pairs(ChatService) do
+        print(i, v)
+    end
    return true
 end
 
@@ -20,7 +22,7 @@ end
 function Main.Start()
 
     local t1 = Time.GetNowSecTime();
-    coroutine.sleep(1000)
+    coroutine.sleep(1.5)
     --Timer.AddTimer(5000, function()
     --    local t2 = Time.GetNowSecTime();
     --    print("&&&&&&&&&&&&&&&&&&&&&", t2 - t1)

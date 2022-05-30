@@ -16,14 +16,6 @@ namespace Sentry
 		}
 	}
 
-	void AddressProxy::AddAddress(std::vector<std::string>& list)
-	{
-		this->mAllAddress.clear();
-		for(const std::string & address : list)
-		{
-			this->AddAddress(address);
-		}
-	}
 
 	bool AddressProxy::HasAddress(const std::string& address)
 	{

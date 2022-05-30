@@ -131,7 +131,7 @@ namespace Sentry
 			return XCode::NetActiveShutdown;
 		}
 		std::string address;
-		LocalRpcService* localServerRpc = this->GetComponent<LocalRpcService>(config->Service);
+		ServiceComponent* localServerRpc = this->GetApp()->GetService(config->Service);
 		AddressProxy & serviceAddressProxy = localServerRpc->GetAddressProxy();
 		if (!serviceAddressProxy.GetUserAddress(userId, address))
 		{

@@ -80,13 +80,23 @@ namespace Sentry
         this->mType = RedisRespType::REDIS_NONE;
     }
 
+	RedisResponse::~RedisResponse()
+	{
+		for(RedisAny * redisAny : this->mArray)
+		{
+			delete redisAny;
+		}
+		this->mArray.clear();
+	}
+
     bool RedisResponse::IsOk()
     {
-        if (this->HasError() || this->mArray.empty())
+        if (this->HasError() || this->mArray.empty()
+			|| !this->mArray.front()->IsString())
         {
             return false;
         }
-		std::shared_ptr<RedisString> redisString = std::dynamic_pointer_cast<RedisString>(this->mArray.front());
+		RedisString * redisString = (RedisString*)this->mArray.front();
 		return redisString != nullptr && redisString->GetValue() == "OK";
     }
 
@@ -100,13 +110,13 @@ namespace Sentry
 		{
 			return -1;
 		}
-		std::shared_ptr<RedisLong> redisLong = std::dynamic_pointer_cast<RedisLong>(this->mArray[index]);
+		RedisLong * redisLong = (RedisLong*)this->mArray[index];
 		return redisLong == nullptr ? -1 : redisLong->GetValue();
 	}
 
     void RedisResponse::AddValue(long long value)
     {
-		this->mArray.emplace_back(std::make_shared<RedisLong>(value));
+		this->mArray.emplace_back(new RedisLong(value));
     }
 
     void RedisResponse::AddValue(RedisRespType type)
@@ -116,12 +126,12 @@ namespace Sentry
 
     void RedisResponse::AddValue(const std::string &data)
     {
-        this->mArray.emplace_back(std::make_shared<RedisString>(data));
+        this->mArray.emplace_back(new RedisString(data));
     }
 
     void RedisResponse::AddValue(const char *str, size_t size)
     {
-        this->mArray.emplace_back(std::make_shared<RedisString>(str, size));
+        this->mArray.emplace_back(new RedisString(str, size));
     }
 
 	bool RedisResponse::GetString(string& value, size_t index)
@@ -134,8 +144,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		std::shared_ptr<RedisString> redisString = std::dynamic_pointer_cast<RedisString>(this->mArray[index]);
-		value = redisString->GetValue();
+		value = ((RedisString*)this->mArray[index])->GetValue();
 		return true;
 	}
 
