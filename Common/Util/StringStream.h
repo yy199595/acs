@@ -69,7 +69,7 @@ public:
 
     void operator>>(double &data) { data = std::atof(this->stringBuffer.c_str()); }
 
-    std::string Serialize() { return this->stringBuffer; }
+   const std::string & Serialize() { return this->stringBuffer; }
 
     void Clear() { this->stringBuffer = ""; }
 

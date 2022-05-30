@@ -56,18 +56,24 @@ namespace Helper
         }
     }
 
-    std::string String::GetFileName(const std::string &path)
+    bool String::GetFileName(const std::string &path, std::string & name)
     {
         size_t pos = path.find_last_of('\\');
         if (pos != std::string::npos)
         {
-            return path.substr(pos + 1, path.size());
+            name = path.substr(pos + 1, path.size());
+			return true;
         }
         pos = path.find_last_of('/');
-        return path.substr(pos + 1, path.size());
+		if(pos != std::string::npos)
+		{
+			name = path.substr(pos + 1, path.size());
+			return true;
+		}
+		return false;
     }
 
-    std::string String::FormatJson(const std::string &json)
+    void String::FormatJson(const std::string &json, std::string & format)
     {
         auto getLevelStr = [](int level, std::string &str) {
             for (int i = 0; i < level; i++)
@@ -77,7 +83,6 @@ namespace Helper
         };
 
         int level = 0;
-        std::string format;
         for (string::size_type index = 0; index < json.size(); index++)
         {
             char c = json[index];
@@ -111,7 +116,6 @@ namespace Helper
                     break;
             }
         }
-        return format;
     }
 
     std::string String::RandomString(size_t size)

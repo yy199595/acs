@@ -22,9 +22,9 @@ namespace Helper
 
         extern std::string RandomString(size_t size = 64);
 
-        extern std::string GetFileName(const std::string &path);
+        extern bool GetFileName(const std::string &path, std::string & name);
 
-        extern std::string FormatJson(const std::string &json);
+        extern void FormatJson(const std::string &json, std::string & format);
 
         extern bool ParseIpAddress(const std::string &address, std::string &ip, unsigned short &port);
 
