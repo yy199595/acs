@@ -4,10 +4,10 @@
 
 #ifndef GAMEKEEPER_TASKSOURCE_H
 #define GAMEKEEPER_TASKSOURCE_H
-#include"TaskSourceBase.h"
+#include"WaitTaskSourceBase.h"
 namespace Sentry
 {
-    class LoopTaskSource : public TaskSourceBase
+    class LoopTaskSource : public WaitTaskSourceBase
     {
     public:
         void Await() {this->YieldTask();}
@@ -15,7 +15,7 @@ namespace Sentry
     };
 
     template<typename T>
-    class TaskSource : public TaskSourceBase
+    class TaskSource : public WaitTaskSourceBase
     {
     public:
         const T & Await();
@@ -48,7 +48,7 @@ namespace Sentry
 namespace Sentry
 {
 	template<typename T>
-	class PtrTaskSource : public TaskSourceBase
+	class PtrTaskSource : public WaitTaskSourceBase
 	{
 	 public:
 		std::shared_ptr<T> Await();
@@ -78,7 +78,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    template<> class TaskSource<void> : public TaskSourceBase
+    template<> class TaskSource<void> : public WaitTaskSourceBase
     {
     public:
         void Await() {this->YieldTask();}
@@ -101,7 +101,7 @@ namespace Sentry
 namespace Sentry
 {
     template<typename T>
-    class TaskSource<std::shared_ptr<T>> : public TaskSourceBase
+    class TaskSource<std::shared_ptr<T>> : public WaitTaskSourceBase
     {
     public:
         std::shared_ptr<T> Await();

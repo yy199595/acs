@@ -2,24 +2,24 @@
 // Created by mac on 2022/3/31.
 //
 
-#include "LuaTaskSource.h"
+#include "WaitLuaTaskSource.h"
 #include"Script/UserDataParameter.h"
 namespace Sentry
 {
-	LuaTaskSource::LuaTaskSource()
+	WaitLuaTaskSource::WaitLuaTaskSource()
 	{
 		this->ref = 0;
 		this->mLua = nullptr;
 	}
 
-	LuaTaskSource::~LuaTaskSource()
+	WaitLuaTaskSource::~WaitLuaTaskSource()
 	{
 		lua_unref(this->mLua, this->ref);
 	}
 
-	int LuaTaskSource::SetResult(lua_State* lua)
+	int WaitLuaTaskSource::SetResult(lua_State* lua)
 	{
-		LuaTaskSource* luaTaskSource = Lua::PtrProxy<LuaTaskSource>::Read(lua, 1);
+		WaitLuaTaskSource* luaTaskSource = Lua::PtrProxy<WaitLuaTaskSource>::Read(lua, 1);
 
 		if(luaTaskSource != nullptr && luaTaskSource->ResumeTask())
 		{

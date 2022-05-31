@@ -5,7 +5,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
-#include"Async/LuaTaskSource.h"
+#include"Async/Lua/WaitLuaTaskSource.h"
 #include"Async/LuaServiceTaskSource.h"
 #include"Script/Extension/App/LuaApp.h"
 #include"Script/Extension/Timer/Timer.h"
@@ -45,10 +45,10 @@ namespace Sentry
 		luaRegister0.PushExtensionFunction("GetService", Lua::LuaApp::GetService);
 		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
-		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "LuaTaskSource");
-		luaRegister1.BeginRegister<LuaTaskSource>();
-		luaRegister1.PushCtor<LuaTaskSource>();
-		luaRegister1.PushStaticExtensionFunction("SetResult", LuaTaskSource::SetResult);
+		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
+		luaRegister1.BeginRegister<WaitLuaTaskSource>();
+		luaRegister1.PushCtor<WaitLuaTaskSource>();
+		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
 
 		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
 		luaRegister2.BeginRegister<LuaServiceTaskSource>();
@@ -104,8 +104,26 @@ namespace Sentry
 
 	bool LuaScriptComponent::OnStart()
 	{
-		LuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
+		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
 		return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
+	}
+
+	void LuaScriptComponent::OnComplete()
+	{
+		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Complete");
+		if(luaTaskSource != nullptr)
+		{
+			luaTaskSource->Await<void>();
+		}
+	}
+
+	void LuaScriptComponent::OnAllServiceStart()
+	{
+		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "AllServiceStart");
+		if(luaTaskSource != nullptr)
+		{
+			luaTaskSource->Await<void>();
+		}
 	}
 
 	bool LuaScriptComponent::LoadAllFile()

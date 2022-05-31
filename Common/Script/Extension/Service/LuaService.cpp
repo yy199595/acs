@@ -7,7 +7,7 @@
 #include"Util/StringHelper.h"
 #include"Pool/MessagePool.h"
 #include"Script/Extension/Json/Json.h"
-#include"Async/RpcTask/RpcTaskSource.h"
+#include"Async/Lua/LuaWaitTaskSource.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -86,14 +86,14 @@ namespace Lua
 		lua_pushthread(lua);
 		request->set_method_id(rpcInterfaceConfig->InterfaceId);
 		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
+		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
 		taskComponent->Start([lua, request, response, address, luaRpcTaskSource, callComponent, userId]()
 		{
 			XCode code = address.empty() ? callComponent->Call(userId, request, response)
 										 : callComponent->Call(address, request, response);
 			luaRpcTaskSource->SetResult(code, response);
 		});
-		return luaRpcTaskSource->Yield();
+		return luaRpcTaskSource->Await();
 	}
 
 	int Service::AllotAddress(lua_State* lua)

@@ -20,7 +20,6 @@
         "code": "./XCode/XCode.csv",
         "service": "./Config/service.json"
     },
-    "url": "http://127.0.0.1:80",
     "listener": {
         "rpc":
         {
@@ -83,7 +82,8 @@
     },
     "lua": [
         "./Script/Common/",
-        "./Script/Server/"
+        "./Script/Server/",
+        "./Script/Client"
     ],
     "component": [
         "HttpComponent",

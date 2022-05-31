@@ -148,12 +148,11 @@ namespace Sentry
 											   ? nullptr : Helper::Proto::New(config->Response);
 
 		XCode code = localServerRpc->Call(address, rpcRequest, rpcResponse);
-
-		response->set_code((int)code);
 		if (code == XCode::Successful && rpcResponse != nullptr)
 		{
 			response->mutable_data()->PackFrom(*rpcResponse);
 		}
+		response->set_code((int)code);
 		return XCode::Successful;
 	}
 }

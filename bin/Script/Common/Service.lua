@@ -19,7 +19,6 @@ function Service.Call(func, id, json)
 end
 
 function Service.CallAsync(func, id, json)
-    Log.Warning(func, id, json)
     local context = function(luaTaskSource)
         local response = {}
         local request = Json.Decode(json)

@@ -8,7 +8,7 @@
 #include"Protocol/c2s.pb.h"
 namespace Sentry
 {
-	class RequestTaskQueueSource : public TaskSourceBase
+	class RequestTaskQueueSource : public WaitTaskSourceBase
 	{
 	 public:
 		std::shared_ptr<c2s::Rpc::Request> Await();

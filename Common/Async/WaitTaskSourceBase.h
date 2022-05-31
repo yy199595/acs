@@ -17,11 +17,11 @@ namespace Sentry
         TaskFinish,
     };
 
-    class TaskSourceBase
+    class WaitTaskSourceBase
     {
     public:
-        explicit TaskSourceBase();
-        virtual ~TaskSourceBase() = default;
+        explicit WaitTaskSourceBase();
+        virtual ~WaitTaskSourceBase() = default;
     public:
 		void Clear();
         TaskState GetState() const { return this->mState; }

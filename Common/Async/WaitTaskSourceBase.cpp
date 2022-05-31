@@ -1,11 +1,11 @@
 //
 // Created by yjz on 2022/1/5.
 //
-#include"TaskSourceBase.h"
+#include"WaitTaskSourceBase.h"
 
 namespace Sentry
 {
-    TaskSourceBase::TaskSourceBase()
+    WaitTaskSourceBase::WaitTaskSourceBase()
     {
         this->mCorId = 0;
         this->mState = TaskState::TaskReady;
@@ -14,7 +14,7 @@ namespace Sentry
         this->mTaskComponent = App::Get()->GetTaskComponent();
     }
 
-	void TaskSourceBase::Clear()
+	void WaitTaskSourceBase::Clear()
 	{
 		this->mCorId = 0;
 		this->mState = TaskState::TaskReady;
@@ -22,7 +22,7 @@ namespace Sentry
 		this->mCreateTime = Helper::Time::GetNowMilTime();
 	}
 
-    bool TaskSourceBase::ResumeTask(TaskState state)
+    bool WaitTaskSourceBase::ResumeTask(TaskState state)
     {
         switch(this->mState)
 		{
@@ -39,7 +39,7 @@ namespace Sentry
         return false;
     }
 
-    bool TaskSourceBase::YieldTask()
+    bool WaitTaskSourceBase::YieldTask()
     {
         if(this->mState == TaskState::TaskReady)
         {

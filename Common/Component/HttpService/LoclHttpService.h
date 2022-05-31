@@ -24,7 +24,6 @@ namespace Sentry
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response) final;
 	 private:
-		std::string mUrl;
 		std::shared_ptr<HttpServiceRegister> mServiceRegister;
 	};
 }

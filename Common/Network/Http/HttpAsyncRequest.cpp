@@ -117,6 +117,12 @@ namespace Sentry
 		std::shared_ptr<HttpPostRequest> request(new HttpPostRequest());
 		return request->ParseUrl(url) ? request : nullptr;
 	}
+
+	void HttpPostRequest::AddBody(const char* data, size_t size)
+	{
+		this->mBody.append(data, size);
+		this->AddHead("content-length", size);
+	}
 }
 
 namespace Sentry

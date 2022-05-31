@@ -4,14 +4,8 @@ function coroutine.wakeup(cor, ...)
     return ret
 end
 
-function coroutine.sleep(ms)
-    local co = coroutine.running()
-    Timer.AddTimer(ms, co)
-    coroutine.yield()
-end
-
 function coroutine.call(func)
-    local luaTaskSource = LuaTaskSource.New()
+    local luaTaskSource = WaitLuaTaskSource.New()
     coroutine.start(function(taskSource)
         local state, ret = pcall(func)
         if not state then

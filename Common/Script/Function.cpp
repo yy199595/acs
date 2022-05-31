@@ -51,7 +51,7 @@ namespace Lua
 		return false;
 	}
 
-	LuaTaskSource* Function::Call(lua_State * lua, int ref)
+	WaitLuaTaskSource* Function::Call(lua_State * lua, int ref)
 	{
 		if(!Lua::Function::Get(lua, "coroutine", "call"))
 		{
@@ -67,10 +67,10 @@ namespace Lua
 			LOG_ERROR(lua_tostring(lua, -1));
 			return nullptr;
 		}
-		return PtrProxy<LuaTaskSource>::Read(lua, -1);
+		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
 	}
 
-	LuaTaskSource* Function::Call(lua_State* lua, const char* tab, const char* func)
+	WaitLuaTaskSource* Function::Call(lua_State* lua, const char* tab, const char* func)
 	{
 		if(!Lua::Function::Get(lua, "coroutine", "call"))
 		{
@@ -85,6 +85,6 @@ namespace Lua
 			LOG_ERROR(lua_tostring(lua, -1));
 			return nullptr;
 		}
-		return PtrProxy<LuaTaskSource>::Read(lua, -1);
+		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
 	}
 }

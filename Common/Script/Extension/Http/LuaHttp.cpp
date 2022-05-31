@@ -5,9 +5,10 @@
 #include"LuaHttp.h"
 #include"App/App.h"
 #include"Script/UserDataParameter.h"
-#include"Async/RpcTask/RpcTaskSource.h"
+#include"Async/Lua/LuaWaitTaskSource.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
+#include"Network/Http/HttpRequestClient.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -24,14 +25,22 @@ namespace Lua
 			luaL_error(lua, "url must string point");
 		}
 		size_t size = 0;
-		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
+		const char * str = lua_tolstring(lua, 2, &size);
 		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
-		std::shared_ptr<std::string> url(new std::string(lua_tolstring(lua, 2, &size), size));
-		taskComponent->Start([luaRpcTaskSource, httpComponent, url, lua]()
+		std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(std::string(str, size));
+		if(getRequest == nullptr)
+		{
+			luaL_error(lua, "parse get url : [%s] failure", str);
+			return 0;
+		}
+
+		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
+		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
+		taskComponent->Start([luaRpcTaskSource, httpComponent, getRequest]()
 		{
 			std::string json;
-			std::shared_ptr<HttpAsyncResponse> httpResponse = httpComponent->Get(*url);
+			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
+			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(getRequest);
 			if (httpResponse != nullptr && httpResponse->ToJson(json))
 			{
 				luaRpcTaskSource->SetJson(json);
@@ -39,7 +48,7 @@ namespace Lua
 			}
 			luaRpcTaskSource->SetResult();
 		});
-		return luaRpcTaskSource->Yield();
+		return luaRpcTaskSource->Await();
 	}
 
 	int Http::Post(lua_State* lua)
@@ -62,22 +71,29 @@ namespace Lua
 		}
 
 		size_t size = 0;
+		const char * str = lua_tolstring(lua, 2, &size);
 		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
+		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
-		std::shared_ptr<std::string> url(new std::string(lua_tolstring(lua, 2, &size), size));
-		std::shared_ptr<std::string> data(new std::string(lua_tolstring(lua, 3, &size), size));
-		taskComponent->Start([luaRpcTaskSource, httpComponent, url, data, lua]()
+		std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(std::string(str, size));
+		if(postRequest == nullptr)
+		{
+			luaL_error(lua, "parse post url : [%s] failure", str);
+			return 0;
+		}
+		postRequest->AddBody(lua_tolstring(lua, 3, &size), size);
+		taskComponent->Start([luaWaitTaskSource, httpComponent, postRequest]()
 		{
 			std::string json;
-			std::shared_ptr<HttpAsyncResponse> httpResponse = httpComponent->Post(*url, *data);
+			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
+			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(postRequest);
 			if (httpResponse != nullptr && httpResponse->ToJson(json))
 			{
-				luaRpcTaskSource->SetJson(json);
+				luaWaitTaskSource->SetJson(json);
 				return;
 			}
-			luaRpcTaskSource->SetResult();
+			luaWaitTaskSource->SetResult();
 		});
-		return luaRpcTaskSource->Yield();
+		return luaWaitTaskSource->Await();
 	}
 }

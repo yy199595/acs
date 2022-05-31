@@ -38,30 +38,4 @@ namespace Sentry
         const int mTimeout;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
-
-	class LuaRpcTaskSource
-	{
-	public:
-		LuaRpcTaskSource(lua_State * lua);
-		~LuaRpcTaskSource();
-	public:
-		int Yield();
-		void SetResult();
-		template<typename T>
-		void SetResult(T result);
-		void SetJson(const std::string & json);
-		void SetResult(XCode code, std::shared_ptr<Message> response);
-	private:
-		int mRef;
-		lua_State * mLua;
-	};
-
-	template<typename T>
-	void LuaRpcTaskSource::SetResult(T result)
-	{
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		Lua::Parameter::Write(this->mLua, result);
-		lua_presume(coroutine, this->mLua, 1);
-	}
 }

@@ -9,7 +9,8 @@ namespace Sentry
 {
     class TimerComponent;
     class HttpComponent;
-    class NetThreadComponent;
+	class LuaScriptComponent;
+	class NetThreadComponent;
 }
 namespace Client
 {
@@ -17,7 +18,7 @@ namespace Client
     class TcpRpcClientContext;
 
     class ClientComponent : public Component,
- 		public IRpc<c2s::Rpc::Call, c2s::Rpc::Response>, public IComplete
+							public IRpc<c2s::Rpc::Call, c2s::Rpc::Response>, public IComplete, public ILuaRegister
     {
     public:
         ClientComponent();
@@ -33,15 +34,9 @@ namespace Client
 
         void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
 
-	 private:
-		void StartClient(const std::string & account);
-		std::shared_ptr<TcpRpcClientContext> GetCurrentRpcClient();
-		bool GetClient(const std::string & account, const std::string & passwd);
     public:
-		XCode Call(const std::string & name);
-		XCode Call(const std::string & name, const Message & request);
-		XCode Call(const std::string & name, std::shared_ptr<Message> response);
-        XCode Call(const std::string & name, const Message & message, std::shared_ptr<Message> response);
+		bool StartConnect(const std::string & ip, unsigned short port);
+		std::shared_ptr<c2s::Rpc::Response> Call(std::shared_ptr<c2s::Rpc::Request> request);
     public:
         unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);
 
@@ -53,14 +48,12 @@ namespace Client
 
 		void OnTimeout(long long rpcId);
 
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
     private:
-        std::string mIp;
         unsigned short mPort;
-        TaskComponent * mTaskComponent;
         TimerComponent *mTimerComponent;
-        HttpComponent * mHttpComponent;
-        //std::shared_ptr<TcpRpcClientContext> mTcpClient;
-		std::unordered_map<unsigned int, std::shared_ptr<TcpRpcClientContext>> mClients;
+		LuaScriptComponent * mLuaComponent;
+        std::shared_ptr<TcpRpcClientContext> mTcpClient;
         std::unordered_map<long long, TaskSourceShared<c2s::Rpc::Response>> mRpcTasks;
     };
 }

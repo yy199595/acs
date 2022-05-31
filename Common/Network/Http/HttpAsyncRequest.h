@@ -59,6 +59,7 @@ namespace Sentry
 		HttpPostRequest();
 	public:
 		void AddBody(const std::string & content);
+		void AddBody(const char * data, size_t size);
 		static std::shared_ptr<HttpPostRequest> Create(const std::string & url);
 	protected:
 		void WriteBody(std::ostream & os) final;

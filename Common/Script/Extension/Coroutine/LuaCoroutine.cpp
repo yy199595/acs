@@ -1,9 +1,10 @@
 #include"LuaCoroutine.h"
 #include"App/App.h"
 #include"Define/CommonLogDef.h"
-#include"Async/RpcTask/RpcTaskSource.h"
+#include"Async/Lua/LuaWaitTaskSource.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace Sentry;
+#define Await(task) task->Await()
 namespace Lua
 {
 	int Coroutine::Sleep(lua_State* lua)
@@ -16,13 +17,12 @@ namespace Lua
 		lua_pushthread(lua);
 		float second = lua_tonumber(lua, 1);
 		TimerComponent * timerComponent = App::Get()->GetTimerComponent();
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
-		long long id = timerComponent->DelayCall(second, [luaRpcTaskSource]()
+		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
+		timerComponent->DelayCall(second, [luaRpcTaskSource]()
 		{
 			luaRpcTaskSource->SetResult();
 		});
-		lua_pushinteger(lua, id);
-		return luaRpcTaskSource->Yield();
+		return Await(luaRpcTaskSource);
 	}
 
 	int Coroutine::Start(lua_State* lua)

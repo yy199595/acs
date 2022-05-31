@@ -2,19 +2,19 @@
 // Created by mac on 2022/3/31.
 //
 
-#ifndef SERVER_LUATASKSOURCE_H
-#define SERVER_LUATASKSOURCE_H
+#ifndef SERVER_WAITLUATASKSOURCE_H
+#define SERVER_WAITLUATASKSOURCE_H
 #include"Async/TaskSource.h"
 #include"Script/LuaInclude.h"
 #include"Script/LuaParameter.h"
 namespace Sentry
 {
 	// 在c++中等待lua完成
-	class LuaTaskSource final : public TaskSourceBase
+	class WaitLuaTaskSource final : public WaitTaskSourceBase
 	{
 	 public:
-		explicit LuaTaskSource();
-		~LuaTaskSource();
+		explicit WaitLuaTaskSource();
+		~WaitLuaTaskSource();
 	public:
 		template<typename T> T Await();
 		static int SetResult(lua_State * lua);
@@ -24,11 +24,11 @@ namespace Sentry
 	};
 
 	template<typename T>
-	T LuaTaskSource::Await()
+	T WaitLuaTaskSource::Await()
 	{
 		this->YieldTask();
 		lua_rawgeti(mLua, LUA_REGISTRYINDEX, ref);
 		return Lua::Parameter::Read<T>(this->mLua, -1);
 	}
 }
-#endif //SERVER_LUATASKSOURCE_H
+#endif //SERVER_WAITLUATASKSOURCE_H

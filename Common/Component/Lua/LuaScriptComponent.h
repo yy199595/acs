@@ -1,12 +1,12 @@
 #pragma once
 
-#include"Async/LuaTaskSource.h"
+#include"Async/Lua/WaitLuaTaskSource.h"
 #include"Component/Component.h"
 #include"Script/ClassProxyHelper.h"
 #include"Script/Table.h"
 namespace Sentry
 {
-	class LuaScriptComponent : public Component, public IStart
+	class LuaScriptComponent : public Component, public IStart, public IComplete
 	{
 	 public:
 		LuaScriptComponent() = default;
@@ -22,6 +22,8 @@ namespace Sentry
 		bool OnStart() final;
 		bool LateAwake() final;
 		void OnDestory() final;
+		void OnComplete() final;
+		void OnAllServiceStart() final;
 	 private:
 		bool LoadAllFile();
 		bool LoadLuaScript(const std::string filePath);

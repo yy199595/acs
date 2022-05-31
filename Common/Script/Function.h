@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include<Define/CommonLogDef.h>
 #include"Script/LuaParameter.h"
-#include"Async/LuaTaskSource.h"
+#include"Async/Lua/WaitLuaTaskSource.h"
 using namespace Sentry;
 
 namespace Lua
@@ -46,8 +46,8 @@ namespace Lua
 	 public:
 		static bool Get(lua_State * lua, const char * tab, const char * func);
 	 public:
-		static LuaTaskSource * Call(lua_State * lua, int ref);
-		static LuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
+		static WaitLuaTaskSource * Call(lua_State * lua, int ref);
+		static WaitLuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
 	 public:
 		template<typename T>
 		static T Invoke(lua_State * lua);

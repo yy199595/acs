@@ -101,7 +101,7 @@ namespace Sentry
 	bool LocalLuaService::OnStart()
 	{
 		const char * tab = this->GetName().c_str();
-		LuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");
+		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");
 		return(luaTaskSource == nullptr || luaTaskSource->Await<bool>());
 	}
 	bool LocalLuaService::CloseService()

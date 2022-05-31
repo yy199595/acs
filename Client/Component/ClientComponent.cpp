@@ -4,11 +4,12 @@
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClientContext.h"
 #include"Task/ClientRpcTask.h"
-#include"Pool/MessagePool.h"
-#include"Network/Http/HttpAsyncRequest.h"
+#include"Script/Client.h"
+
 #include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
-#include"Component/Logic/HttpUserService.h"
+#include"Component/Lua/LuaScriptComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -35,6 +36,7 @@ namespace Client
 		}
 		LOG_INFO("=================================");
 #endif
+
 	}
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)
@@ -55,86 +57,44 @@ namespace Client
 
     bool ClientComponent::LateAwake()
     {
-		this->mHttpComponent = this->GetComponent<HttpComponent>();
-		this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-        return true;
+		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
+		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
+		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(luaState, "Client", "Awake");
+		if (luaFunction != nullptr)
+		{
+			luaFunction->Action();
+		}
+		return true;
     }
 
 	void ClientComponent::OnAllServiceStart()
 	{
-		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585121@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585122@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585123@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585124@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585125@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585126@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585127@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585128@qq.com"));
-//		this->mTaskComponent->Start(&ClientComponent::StartClient, this, std::string("646585129@qq.com"));
+		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
+		if(!Lua::Function::Get(luaState, "coroutine", "start"))
+		{
+			return;
+		}
+		Lua::lua_getfunction(luaState, "Client", "Start");
+		if (!lua_isfunction(luaState, -1))
+		{
+			return;
+		}
+		if (lua_pcall(luaState, 1, 0, 0) != 0)
+		{
+			LOG_ERROR(lua_tostring(luaState, -1));
+		}
 	}
 
-	XCode ClientComponent::Call(const std::string& name)
+	std::shared_ptr<c2s::Rpc::Response> ClientComponent::Call(std::shared_ptr<c2s::Rpc::Request> request)
 	{
-		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-		TaskSourceShared<c2s::Rpc::Response> taskSource
-				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
-
-		requestMessage->set_method_name(name);
-		requestMessage->set_rpc_id(taskSource->GetTaskId());
-		this->GetCurrentRpcClient()->SendToServer(requestMessage);
-		this->mRpcTasks.emplace(taskSource->GetTaskId(), taskSource);
-		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
-
-		return (XCode)response->code();
-	}
-
-	XCode ClientComponent::Call(const string& name, const Message& request)
-	{
-		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-
-		TaskSourceShared<c2s::Rpc::Response> taskSource
-				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc::Response>>>();
-
-		requestMessage->set_method_name(name);
-		requestMessage->set_rpc_id(taskSource->GetTaskId());
-		requestMessage->mutable_data()->PackFrom(request);
-		this->GetCurrentRpcClient()->SendToServer(requestMessage);
-
-		this->mRpcTasks.emplace(requestMessage->rpc_id(), taskSource);
-		std::shared_ptr<c2s::Rpc::Response> response = taskSource->Await();
-
-		return (XCode)response->code();
-	}
-
-    XCode ClientComponent::Call(const std::string &name, std::shared_ptr<Message> response)
-    {
-        return XCode::Successful;
-    }
-
-    XCode ClientComponent::Call(const std::string &name, const Message &message, std::shared_ptr<Message> response)
-    {
-        std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-        std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>> rpcTask(new TaskSource<std::shared_ptr<c2s::Rpc_Response>>());
-
-        requestMessage->set_method_name(name);
-        requestMessage->set_rpc_id(rpcTask->GetTaskId());
-		requestMessage->mutable_data()->CopyFrom(message);
-
+		std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>> rpcTask
+				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc_Response>>>();
+		request->set_rpc_id(rpcTask->GetTaskId());
 		this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
-		this->GetCurrentRpcClient()->SendToServer(requestMessage);
-        std::shared_ptr<c2s::Rpc_Response> responseData = rpcTask->Await();
-        if(responseData->code() != (int)XCode::Successful)
-        {
-            return (XCode)responseData->code();
-        }
-        const Any & any = responseData->data();
-        if(!any.UnpackTo(response.get()))
-        {
-            return XCode::ParseMessageError;
-        }
-        return XCode::Successful;
-    }
+		this->mTcpClient->SendToServer(request);
+		return rpcTask->Await();
+	}
 
 	void ClientComponent::OnTimeout(long long rpcId)
 	{
@@ -147,91 +107,27 @@ namespace Client
 //		}
 	}
 
-	std::shared_ptr<TcpRpcClientContext> ClientComponent::GetCurrentRpcClient()
+	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
-		unsigned int contextId = this->mTaskComponent->GetContextId();
-		auto iter = this->mClients.find(contextId);
-		return iter != this->mClients.end() ? iter->second : nullptr;
+#ifdef ONLY_MAIN_THREAD
+		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
+#else
+		IAsioThread& thread = this->GetComponent<NetThreadComponent>()->AllocateNetThread();
+#endif
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, ip, port));
+		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
+		if(this->mTcpClient->ConnectAsync()->Await())
+		{
+			this->mTcpClient->StartReceive();
+			return true;
+		}
+		return false;
 	}
 
-	void ClientComponent::StartClient(const std::string & account)
+	void ClientComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		if(!this->GetClient(account, "199595yjz."))
-		{
-			LOG_ERROR(account << " login error");
-			return;
-		}
-		LOG_ERROR(account << " login successful");
-		while(this->GetCurrentRpcClient()->IsOpen())
-		{
-			this->Call("GateService.Ping");
-			//LOG_ERROR("%%%%%%%%%%%%%%%%%%%%");
-
-			c2s::Chat::Request chatMessage;
-			chatMessage.set_message("hello");
-			this->Call("ChatService.Chat", chatMessage);
-
-			this->mTaskComponent->Sleep(10000);
-
-		}
-	}
-
-
-	bool ClientComponent::GetClient(const std::string& account, const std::string& passwd)
-	{
-		std::string url;
-		long long userPhoneNumber = 13716061995;
-		this->GetConfig().GetMember("url", url);
-
-		Json::Writer jsonWriter;
-		jsonWriter.AddMember("password", passwd);
-		jsonWriter.AddMember("account", account);
-		jsonWriter.AddMember("phone_num", userPhoneNumber);
-
-		std::shared_ptr<Json::Reader> loginResponse(new Json::Reader());
-		long long timerId = this->mTimerComponent->DelayCall(5.0f, [account]()
-		{
-			LOG_ERROR(account << " register time out");
-		});
-		std::string registerData;
-		jsonWriter.WriterStream(registerData);
-		string url2 = url + "/logic/account/login";
-		string url1 = url + "/logic/account/register";
-		std::shared_ptr<HttpAsyncResponse> response1 = this->mHttpComponent->Post(url1, registerData);
-		std::shared_ptr<HttpAsyncResponse> response2 = this->mHttpComponent->Post(url2, registerData);
-		this->mTimerComponent->CancelTimer(timerId);
-		if(response2 == nullptr || !loginResponse->ParseJson(response2->GetContent()))
-		{
-			return false;
-		}
-
-		std::string loginToken;
-		std::string gateAddress;
-		loginResponse->GetMember("data","token", loginToken);
-		loginResponse->GetMember("data","address", gateAddress);
-		Helper::String::ParseIpAddress(gateAddress, this->mIp, this->mPort);
-
-		assert(!this->mIp.empty() && this->mPort > 0);
-		IAsioThread& netThread = this->GetApp()->GetTaskScheduler();
-		std::shared_ptr<SocketProxy> socketProxy =
-			std::make_shared<SocketProxy>(netThread, this->mIp, this->mPort);
-		std::shared_ptr<TcpRpcClientContext> tcpRpcClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
-
-		int count = 0;
-		while (!tcpRpcClient->ConnectAsync()->Await())
-		{
-			LOG_ERROR("connect server failure count = " << ++count);
-			this->mTaskComponent->Sleep(3000);
-		}
-
-		tcpRpcClient->StartReceive();
-		unsigned int id = this->mTaskComponent->GetContextId();
-		this->mClients.emplace(id, tcpRpcClient);
-		LOG_DEBUG("connect " << this->mIp << ':' << this->mPort << " successful");
-		std::shared_ptr<c2s::Rpc_Request> requestMessage(new c2s::Rpc_Request());
-
-		c2s::GateAuth::Request loginRequest;
-		loginRequest.set_token(loginToken);
-		return this->Call("GateService.Auth", loginRequest) == XCode::Successful;
+		luaRegister.BeginRegister<ClientComponent>();
+		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);
+		luaRegister.PushExtensionFunction("StartConnect", Lua::ClientEx::StartConnect);
 	}
 }
