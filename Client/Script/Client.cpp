@@ -23,6 +23,11 @@ namespace Lua
 		if(lua_isuserdata(lua, 3))
 		{
 			std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 3);
+			if(message == nullptr)
+			{
+				luaL_error(lua, "read message type error");
+				return 0;
+			}
 			request->mutable_data()->PackFrom(*message);
 		}
 		request->set_method_name(func);
