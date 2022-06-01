@@ -30,35 +30,26 @@ namespace Sentry
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
-	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, const std::string proto, const std::string& content)
+	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
 		std::string address;
-		if(this->mGateService->GetAddressProxy().GetUserAddress(userId, address))
+		if (!this->mGateService->GetAddressProxy().GetAddress(userId, address))
 		{
+			LOG_ERROR("not find user gate address : " << userId);
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
+		std::shared_ptr<c2s::Rpc::Call> callInfo(new c2s::Rpc::Call());
+		callInfo->set_func(func);
+		callInfo->mutable_data()->PackFrom(*message);
 
-		request->set_func(func);
-		if(proto == "json")
+		if(this->mGateService->SocketIsOpen(address))
 		{
-			com::Type::Json message;
-			message.set_json(content);
-			request->mutable_data()->PackFrom(message);
+			return this->mGateService->Send(userId, "CallClient", *callInfo);
 		}
-		else
+		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
+		taskComponent->Start([callInfo, this, address, userId]()
 		{
-			std::shared_ptr<Message> message = Helper::Proto::NewByJson(proto, content);
-			if(message == nullptr)
-			{
-				return XCode::JsonCastProtoFailure;
-			}
-			request->mutable_data()->PackFrom(*message);
-		}
-		TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
-		taskComponent->Start([userId, request, this]()
-		{
-			this->mGateService->Call(userId, "CallClient", request);
+			this->mGateService->Send(userId, "CallClient", *callInfo);
 		});
 		return XCode::Successful;
 	}
@@ -81,14 +72,8 @@ namespace Sentry
 		return this->mGateService->Send("BroadCast", request);
 	}
 
-	XCode GateProxyComponent::LuaBroadCast(const std::string func, const std::string pb, const std::string& json)
+	XCode GateProxyComponent::LuaBroadCast(const std::string func, std::shared_ptr<Message> message)
 	{
-		std::shared_ptr<Message> message = Helper::Proto::NewByJson(pb, json);
-		if (message == nullptr)
-		{
-			return XCode::JsonCastProtoFailure;
-		}
-
 		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
 		taskComponent->Start([this, func, message]()
 		{

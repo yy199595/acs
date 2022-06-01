@@ -21,6 +21,7 @@ function LoginComponent.Register(account, passwd, phoneNum)
         Log.Info("register ", account, " successful")
         return true
     end
+    Log.Info("register ", account, " failure")
     return false
 end
 
@@ -38,5 +39,6 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         Log.Error(account, " login failure ")
         return nil
     end
+    Log.Info(account, " login successful")
     return response.data
 end

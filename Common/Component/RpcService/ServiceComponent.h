@@ -20,6 +20,9 @@ namespace Sentry
 		virtual ~ServiceComponent() override = default;
 	 public:
 		XCode Send(const std::string& func, const Message & message);
+		XCode Send(long long userId, const std::string& func, const Message & message);
+		XCode Send(const std::string & address, const std::string& func, const Message & message);
+	 public:
 		XCode Call(const std::string& address, const std::string& func);
 		XCode Call(const std::string& address, const std::string& func, const Message& message);
 		XCode Call(const std::string& address, const std::string& func, std::shared_ptr<Message> response);
@@ -32,13 +35,15 @@ namespace Sentry
 		XCode Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 		XCode Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 	public:
+		bool SocketIsOpen(const std::string & address);
 		AddressProxy & GetAddressProxy() { return this->mAddressProxy;}
 		bool IsStartComplete() final{return this->mAddressProxy.GetSize() > 0; };
+		XCode SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
+		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId);
+		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message& message);
 	 protected:
 		bool LateAwake() override;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
-		XCode SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
-		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message* message);
 	private:
 		std::string mLocalAddress;
 		AddressProxy mAddressProxy;

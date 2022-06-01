@@ -20,7 +20,6 @@ namespace Sentry
 		void AddAddress(const std::string & address);
 	 public:
 		bool DelUserAddress(long long userId);
-		bool GetUserAddress(long long userId, std::string & address);
 		bool AddUserAddress(long long userId, const std::string & address);
 	 public:
 		bool GetAddress(std::string & address);

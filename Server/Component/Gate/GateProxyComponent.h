@@ -15,11 +15,12 @@ namespace Sentry
 	 public:
 		XCode Call(long long userId, const std::string & func);
 		XCode Call(long long UserId, const std::string & func, const Message & message);
-		XCode LuaCall(long long userId, const std::string func, const std::string pb, const std::string & json);
 	 public:
 		XCode BroadCast(const std::string & func);
 		XCode BroadCast(const std::string & func, const Message & message);
-		XCode LuaBroadCast(const std::string func, const std::string pb, const std::string & json);
+	 private:
+		XCode LuaBroadCast(const std::string func, std::shared_ptr<Message> message);
+		XCode LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;

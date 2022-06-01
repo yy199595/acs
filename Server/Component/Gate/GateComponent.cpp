@@ -133,7 +133,7 @@ namespace Sentry
 		std::string address;
 		ServiceComponent* localServerRpc = this->GetApp()->GetService(config->Service);
 		AddressProxy & serviceAddressProxy = localServerRpc->GetAddressProxy();
-		if (!serviceAddressProxy.GetUserAddress(userId, address))
+		if (!serviceAddressProxy.GetAddress(userId, address))
 		{
 			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
 			if (serviceAddressProxy.HasAddress(address) || serviceAddressProxy.GetAddress(address))

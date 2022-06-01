@@ -63,14 +63,19 @@ namespace Sentry
 			LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;
 		}
-		std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
-		response->set_rpc_id(request->rpc_id());
-		response->set_user_id(request->user_id());
-
+		std::shared_ptr<com::Rpc::Response> response = std::make_shared<com::Rpc::Response>();
 		if (!rpcInterfaceConfig->IsAsync)
 		{
 			const std::string& func = rpcInterfaceConfig->Method;
-			response->set_code((int)logicService->Invoke(func, request, response));
+			XCode code = logicService->Invoke(func, request, response);
+			if(request->rpc_id() == 0)
+			{
+				return XCode::Successful;
+			}
+			response->set_code((int)code);
+			response->set_rpc_id(request->rpc_id());
+			response->set_user_id(request->user_id());
+
 			if(rpcInterfaceConfig->CallWay == "Sub")
 			{
 				std::string message = "-";
@@ -89,7 +94,15 @@ namespace Sentry
 		this->mCorComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
 		{
 			const std::string& func = rpcInterfaceConfig->Method;
-			response->set_code((int)logicService->Invoke(func, request, response));
+			XCode code = logicService->Invoke(func, request, response);
+			if(request->rpc_id() == 0)
+			{
+				return XCode::Successful;
+			}
+			response->set_code((int)code);
+			response->set_rpc_id(request->rpc_id());
+			response->set_user_id(request->user_id());
+
 			if(rpcInterfaceConfig->CallWay == "Sub")
 			{
 				std::string message = "-";

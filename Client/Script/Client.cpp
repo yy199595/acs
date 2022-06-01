@@ -4,6 +4,7 @@
 
 #include"Client.h"
 #include"App/App.h"
+#include"Other/ElapsedTimer.h"
 #include"Script/LuaParameter.h"
 #include "Async/Lua/LuaWaitTaskSource.h"
 #include"Component/ClientComponent.h"
@@ -17,8 +18,8 @@ namespace Lua
 	{
 		lua_pushthread(lua);
 		ClientComponent * clientComponent = UserDataParameter::Read<ClientComponent*>(lua, 1);
-		std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<c2s::Rpc::Request> request(new c2s::Rpc::Request());
+		const std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 		if(lua_isuserdata(lua, 3))
 		{
@@ -32,8 +33,9 @@ namespace Lua
 		}
 		request->set_method_name(func);
 		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
-		taskComponent->Start([request, clientComponent, luaWaitTaskSource]()
+		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()
 		{
+			ElapsedTimer elapsedTimer;
 			std::shared_ptr<c2s::Rpc::Response> response = clientComponent->Call(request);
 			if(response == nullptr)
 			{
@@ -47,6 +49,7 @@ namespace Lua
 				message = Helper::Proto::NewByData(response->data());
 			}
 			luaWaitTaskSource->SetResult(code, message);
+			LOG_DEBUG("call " << func << " user time = [" << elapsedTimer.GetMs() << "ms]");
 		});
 		return luaWaitTaskSource->Await();
 	}

@@ -77,7 +77,7 @@ namespace Sentry
 	{
 		std::string address;
 		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.str());
-		if(component == nullptr || !component->GetAddressProxy().GetUserAddress(userId, address))
+		if(component == nullptr || !component->GetAddressProxy().GetAddress(userId, address))
 		{
 			return XCode::Failure;
 		}

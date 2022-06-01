@@ -38,6 +38,6 @@ function Client.Start()
         msg_type = 1,  message = "nihaoa"
     })
 
-    local code = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", chatMessage)
+    local code = clientComponent:Call("ChatService.Chat", chatMessage)
     Log.Error("code = ", code)
 end

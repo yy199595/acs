@@ -16,31 +16,19 @@ namespace Sentry
 	XCode LocalRpcService::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
 	    std::shared_ptr<com::Rpc::Response> response)
 	{
-		if(!this->IsStartService())
+		if (!this->IsStartService())
 		{
 			LOG_ERROR(this->GetName() << " is not start");
 			return XCode::CallServiceNotFound;
 		}
-		response->set_rpc_id(request->rpc_id());
-		response->set_user_id(request->user_id());
 
 		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
 		if (serviceMethod == nullptr)
 		{
-			response->set_code((int)XCode::CallServiceNotFound);
 			LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
 			return XCode::CallServiceNotFound;
 		}
-
-		try
-		{
-			return serviceMethod->Invoke(*request, *response);
-		}
-		catch (std::logic_error& logic_error)
-		{
-			response->set_error_str(logic_error.what());
-			return XCode::ThrowError;
-		}
+		return serviceMethod->Invoke(*request, *response);
 	}
 
 	bool LocalRpcService::StartService()

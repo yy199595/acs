@@ -64,17 +64,6 @@ namespace Sentry
 		return true;
 	}
 
-	bool AddressProxy::GetUserAddress(long long userId, std::string& address)
-	{
-		auto iter = this->mUserAddress.find(userId);
-		if(iter != this->mUserAddress.end())
-		{
-			address = iter->second;
-			return true;
-		}
-		return false;
-	}
-
 	bool AddressProxy::DelUserAddress(long long userId)
 	{
 		auto iter = this->mUserAddress.find(userId);
