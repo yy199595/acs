@@ -148,14 +148,6 @@ namespace Lua
 		inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, void>::type
 		Write(lua_State* lua, T data);
 
-		template<typename T>
-		inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, T>::type
-		Read(lua_State* lua, int index);
-
-		template<typename T>
-		inline typename std::enable_if<ProtocParameter::IsProtocParameter<T>::value, void>::type
-		Write(lua_State* lua, T data);
-
 		template<typename T, typename... Args>
 		inline void Encode(lua_State* lua, const T& t, Args... args);
 

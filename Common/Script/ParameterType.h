@@ -264,39 +264,6 @@ namespace Lua
 		};
 	}// namespace ConstParameter
 
-	namespace ProtocParameter
-	{
-		template<typename T>
-		struct IsProtocParameter
-		{
-			constexpr static bool value = std::is_base_of<google::protobuf::Message, T>::value;
-		};
-
-		template<typename T>
-		struct IsProtocParameter<const T>
-		{
-			constexpr static bool value = false;
-		};
-
-		template<typename T>
-		struct IsProtocParameter<T*>
-		{
-			constexpr static bool value = std::is_base_of<google::protobuf::Message, T>::value;
-		};
-
-		template<typename T>
-		struct IsProtocParameter<T&>
-		{
-			constexpr static bool value = std::is_base_of<google::protobuf::Message, T>::value;
-		};
-
-		template<typename T>
-		struct IsProtocParameter<std::shared_ptr<T>>
-		{
-			constexpr static bool value = std::is_base_of<google::protobuf::Message, T>::value;
-		};
-	}// namespace ProtocParameter
-
 // 自定义数据类型
 	namespace UserDataParameter
 	{
@@ -307,7 +274,6 @@ namespace Lua
 				!FunctionParameter::IsFunctionParameter<T>::value &&
 				!ContainerParameter::IsContainerParameter<T>::value &&
 				!CommonParameter::IsCommonParameter<T>::value &&
-				!ProtocParameter::IsProtocParameter<T>::value &&
 				!ConstParameter::IsConstParameter<T>::value &&
 				!std::is_enum<T>::value;
 		};

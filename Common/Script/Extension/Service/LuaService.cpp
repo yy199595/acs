@@ -49,31 +49,20 @@ namespace Lua
 		if (rpcInterfaceConfig == nullptr)
 		{
 			lua_pushinteger(lua, (int)XCode::NotFoundRpcConfig);
-			return 1;
+			return 0;
 		}
 		if (!rpcInterfaceConfig->Request.empty())
 		{
-			if (!lua_istable(lua, 4))
+			if (!lua_isuserdata(lua, 4))
 			{
 				lua_pushinteger(lua, (int)XCode::CallArgsError);
-				luaL_error(lua, "call %s request tabe should %s", fullName.c_str(),
+				luaL_error(lua, "call %s request message should %s", fullName.c_str(),
 						rpcInterfaceConfig->Request.c_str());
-				return 1;
-			}
-			lua_pushcfunction(lua, Lua::Json::Encode);
-			lua_pushvalue(lua, 4);
-			if(lua_pcall(lua, 1, 1, 0) != 0)
-			{
-				luaL_error(lua, lua_tostring(lua, -1));
 				return 0;
 			}
-			size_t size = 0;
-			const char * json = lua_tolstring(lua, -1, &size);
-			const std::string & name = rpcInterfaceConfig->Request;
-			std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, json, size);
+			std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 4);
 			if(message == nullptr)
 			{
-				luaL_error(lua, "lua table to %s failure", name.c_str());
 				return 0;
 			}
 			request->mutable_data()->PackFrom(*message);

@@ -9,7 +9,6 @@
 #include"Component/ClientComponent.h"
 #include"Pool/MessagePool.h"
 #include"Util/StringHelper.h"
-#include"Script/Extension/Json/Encoder.h"
 using namespace Client;
 using namespace Sentry;
 namespace Lua
@@ -21,18 +20,9 @@ namespace Lua
 		std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<c2s::Rpc::Request> request(new c2s::Rpc::Request());
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-		if(lua_isstring(lua, 3) && lua_istable(lua, 4))
+		if(lua_isuserdata(lua, 3))
 		{
-			StringBuffer s;
-			Encoder encode(lua, 4);
-			encode.encode(lua, &s, 4);
-			const char * name = lua_tostring(lua, 3);
-			std::shared_ptr<Message> message = Helper::Proto::NewByJson(name, s.GetString(), s.GetLength());
-			if(message == nullptr)
-			{
-				luaL_error(lua, "create message [%s] error", name);
-				return 0;
-			}
+			std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 3);
 			request->mutable_data()->PackFrom(*message);
 		}
 		request->set_method_name(func);

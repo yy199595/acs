@@ -98,19 +98,17 @@ namespace Lua
 
 			static void Write(lua_State* lua, shared_ptr<T> data)
 			{
+				size_t size = sizeof(SharedPtrProxy<T>);
+				new(lua_newuserdata(lua, size))SharedPtrProxy<T>(data);
 				const char* typeName = ClassNameProxy::GetLuaClassName<T>();
-				if (data != nullptr && typeName != nullptr)
+				if (typeName != nullptr)
 				{
-					size_t size = sizeof(SharedPtrProxy<T>);
-					new(lua_newuserdata(lua, size))SharedPtrProxy<T>(data);
 					lua_getglobal(lua, typeName);
 					if (lua_istable(lua, -1))
 					{
 						lua_setmetatable(lua, -2);
-						return;
 					}
 				}
-				lua_pushnil(lua);
 			}
 		};
 	}
