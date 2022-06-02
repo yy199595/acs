@@ -6,7 +6,6 @@
 #include"AddressProxy.h"
 #include"Component/Component.h"
 using namespace std;
-using namespace com;
 
 namespace Sentry
 {

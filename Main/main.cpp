@@ -22,6 +22,7 @@
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/Mongo/MongoService.h"
+#include"Component/Scene/MessageComponent.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -46,6 +47,7 @@ void RegisterComponent()
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
+    ComponentFactory::Add<MessageComponent>("MessageComponent");
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");

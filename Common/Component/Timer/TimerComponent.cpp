@@ -1,6 +1,7 @@
 ﻿#include"TimerComponent.h"
 #include"Timer/DelayTimer.h"
 #include"App/App.h"
+#include"Script/Extension/Timer/Timer.h"
 namespace Sentry
 {
 	void TimerComponent::Awake()
@@ -37,6 +38,13 @@ namespace Sentry
 		}
 		return this->AddTimer(std::make_shared<DelayTimer>(ms, func));
 	}
+
+    void TimerComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
+    {
+        luaRegister.BeginRegister<TimerComponent>();
+        luaRegister.PushExtensionFunction("AddTimer", Lua::Timer::AddTimer);
+        luaRegister.PushExtensionFunction("CancelTimer", Lua::Timer::CancelTimer);
+    }
 
 	bool TimerComponent::CancelTimer(long long id)
 	{

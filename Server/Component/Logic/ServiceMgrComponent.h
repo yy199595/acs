@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
-#include"Protocol/sub.pb.h"
 #include"Component/Scene/NetEventComponent.h"
 using namespace com;
 namespace Sentry

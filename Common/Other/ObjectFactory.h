@@ -1,10 +1,6 @@
 ﻿#pragma once
 
 #include<Entity/Object.h>
-#include<Protocol/com.pb.h>
-#include<Protocol/s2s.pb.h>
-
-using namespace google::protobuf;
 namespace Sentry
 {
     template<typename T>

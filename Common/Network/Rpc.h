@@ -6,9 +6,6 @@
 #define GameKeeper_MESSAGESTREAM_H
 #include <Define/CommonLogDef.h>
 #include <Define/CommonTypeDef.h>
-#include <Protocol/com.pb.h>
-#include <Protocol/c2s.pb.h>
-#include <queue>
 
 enum class MESSAGE_TYPE
 {

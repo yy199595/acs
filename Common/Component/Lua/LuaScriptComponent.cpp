@@ -8,10 +8,8 @@
 #include"Async/Lua/WaitLuaTaskSource.h"
 #include"Async/LuaServiceTaskSource.h"
 #include"Script/Extension/App/LuaApp.h"
-#include"Script/Extension/Timer/Timer.h"
 #include"Script/Extension/Log/LuaLogger.h"
 #include"Script/Extension/Json/Json.h"
-#include"Script/Extension/Service/LuaService.h"
 #include"Script/Extension/Message/Message.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 #include"Component/RpcService/ServiceComponent.h"
@@ -75,11 +73,6 @@ namespace Sentry
 		luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
 		luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
 		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
-
-		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Timer");
-		luaRegister6.BeginNewTable();
-		luaRegister6.PushExtensionFunction("AddTimer", Lua::Timer::AddTimer);
-		luaRegister6.PushExtensionFunction("CancelTimer", Lua::Timer::CancelTimer);
 
 		Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "Json");
 		luaRegister7.BeginNewTable();

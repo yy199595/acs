@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include"Network/TcpContext.h"
-#include"Protocol/com.pb.h"
 #include"Async/TaskSource.h"
 #include"Coroutine/CoroutineLock.h"
 #include<google/protobuf/message.h>

@@ -5,7 +5,7 @@
 #include"Method/MethodProxy.h"
 namespace Sentry
 {
-	class TimerComponent final : public Component, public ISystemUpdate
+    class TimerComponent final : public Component, public ISystemUpdate, public ILuaRegister
 	{
 	 public:
 		TimerComponent() = default;
@@ -41,7 +41,9 @@ namespace Sentry
 
 		bool AddTimerToWheel(std::shared_ptr<TimerBase> timer);
 
-	 private:
+        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+
+    private:
 		const int LayerCount = 5;
 		const int TimerPrecision = 20;
 		const int OtherLayerCount = 32;

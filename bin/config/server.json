@@ -6,7 +6,7 @@
     "log":
     {
         "save":1,
-        "path":"./Log",
+        "path":"./log",
         "hour":0,
         "min":0
     },
@@ -17,8 +17,9 @@
     },
     "path":
     {
+        "proto": "./proto",
         "code": "./XCode/XCode.csv",
-        "service": "./Config/service.json"
+        "service": "./config/service.json"
     },
     "listener": {
         "rpc":
@@ -87,6 +88,7 @@
     ],
     "component": [
         "HttpComponent",
+        "MessageComponent",
         "ConsoleComponent",
         "DataMgrComponent",
         "NetThreadComponent",

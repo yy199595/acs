@@ -1,6 +1,5 @@
 #pragma once
 
-#include"Protocol/s2s.pb.h"
 #include"DB/Mysql/MysqlClient.h"
 #include"DB/Mysql/MysqlHelper.h"
 #include"Component/RpcService/LocalServiceComponent.h"

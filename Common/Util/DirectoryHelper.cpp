@@ -163,7 +163,18 @@ namespace Helper
 		return true;
 	}
 
-	bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName)
+    bool GetFileName(const std::string & fullName, std::string & fileName)
+    {
+            size_t pos = fullName.find_last_of("/\\");
+            if (pos == std::string::npos)
+            {
+                return false;
+            }
+            fileName = fullName.substr(pos + 1);
+        return true;
+    }
+
+        bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName)
     {
        /* std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
         std::regex nRegex(pattern);

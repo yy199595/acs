@@ -18,6 +18,8 @@ namespace Helper
 
         extern bool GetDirByPath(const std::string path, std::string &director);
 
+        extern bool GetFileName(const std::string & fullName, std::string & fileName);
+        
         extern bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName);
     }// namespace DirectoryHelper
 }

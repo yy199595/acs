@@ -11,7 +11,7 @@ namespace Sentry
         Helper::Directory::GetDirByPath(argv[0], this->mWorkPath);
 
         this->mLogsPath = this->mWorkPath + "Logs/";
-        this->mConfigPath = this->mWorkPath + "Config/";
+        this->mConfigPath = this->mWorkPath + "config/";
         this->mDownloadPath = this->mWorkPath + "Download/";
     }
 }

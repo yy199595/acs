@@ -47,7 +47,7 @@ for index, content in ipairs(file_content) do
     end
 end
 
-local lua_write = io.output("../Script/Common/XCode.lua")
+local lua_write = io.output("../script/Common/XCode.lua")
 local cpp_write = io.output("../../Protocol/XCode/XCode.h")
 local csharp_write = io.output("./XCode.cs")
 
