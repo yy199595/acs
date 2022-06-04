@@ -40,13 +40,27 @@
     "HttpUserService": {
         "Login": {
             "Type": "POST",
+            "Async": true,
             "Content": "application/json",
             "Path": "/logic/account/login"
         },
         "Register": {
             "Type": "POST",
+            "Async": true,
             "Content": "application/json",
             "Path": "/logic/account/register"
+        }
+    },
+    "HttpSourceService": {
+        "Files": {
+            "Type": "GET",
+            "Async": false,
+            "Path": "/source/file/files"
+        },
+        "Download": {
+            "Type": "GET",
+            "Async": false,
+            "Path": "/source/file/download"
         }
     },
     "GateService": {

@@ -35,9 +35,8 @@ namespace Sentry
 	 private:
 		std::string mTempMethod;
 		std::string mTempService;
-		class TaskComponent* mCorComponent;
+		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
-		class MainRedisComponent * mRedisComponent;
 		class RpcClientComponent* mRpcClientComponent;
 		std::unordered_map<long long, std::shared_ptr<IRpcTask>> mRpcTasks;
 	};

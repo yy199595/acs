@@ -12,15 +12,15 @@ namespace Sentry
 	{
 		this->mConfig = nullptr;
 	}
-	XCode LocalHttpService::Invoke(const std::string& name, std::shared_ptr<Json::Reader> request,
-			std::shared_ptr<Json::Writer> response)
+	XCode LocalHttpService::Invoke(const std::string& name,
+		std::shared_ptr<HttpHandlerRequest> request, std::shared_ptr<HttpHandlerResponse> response)
 	{
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
 		if(method == nullptr)
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return method->Invoke(request, response);
+		return method->Invoke(*request, *response);
 	}
 	bool LocalHttpService::StartService()
 	{

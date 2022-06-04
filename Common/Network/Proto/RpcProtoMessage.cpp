@@ -14,11 +14,12 @@ namespace Tcp
 
 		}
 
-		bool RpcProtoMessage::Serailize(std::ostream& os)
+		int RpcProtoMessage::Serailize(std::ostream& os)
 		{
 			this->Write(os, this->mMessage->ByteSize() + 1);
 			this->Write(os, (char)this->mType);
-			return this->mMessage->SerializePartialToOstream(&os);
+			this->mMessage->SerializePartialToOstream(&os);
+			return 0;
 		}
 	}
 }

@@ -38,12 +38,12 @@ namespace Sentry
 		this->mParameters.emplace_back(value);
     }
 
-    bool RedisRequest::Serailize(std::ostream& readStream)
+    int RedisRequest::Serailize(std::ostream& readStream)
     {
         if(this->mParameters.empty())
         {
             readStream << this->mCommand << "\r\n";
-            return true;
+            return 0;
         }
         readStream << "*" << this->mParameters.size() + 1 << "\r\n";
         readStream << "$" << this->mCommand.size() << "\r\n" << this->mCommand << "\r\n";
@@ -51,7 +51,7 @@ namespace Sentry
         {
 			readStream << '$' << parameter.size() << "\r\n" << parameter << "\r\n";
 		}
-		return true;
+		return 0;
     }
 
 	const std::string RedisRequest::ToJson() const

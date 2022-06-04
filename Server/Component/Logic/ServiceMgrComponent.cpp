@@ -13,7 +13,7 @@ namespace Sentry
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetListener("rpc", this->mRpcAddress));
 		return true;
 	}
 

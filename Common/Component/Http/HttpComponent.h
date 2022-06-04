@@ -38,13 +38,14 @@ namespace Sentry
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
-		XCode Invoke(const HttpInterfaceConfig* config, std::shared_ptr<HttpHandlerRequest> content, std::shared_ptr<Json::Writer> response);
+		void ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient);
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;
 #ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
 #endif
+		std::set<std::shared_ptr<HttpHandlerClient>> mHttpClients;
 		std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
 	};
 }

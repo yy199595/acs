@@ -33,7 +33,7 @@ namespace Mongo
 	 public:
 		MongoRequest(int opcode);
 	 public:
-		bool Serailize(std::ostream& os) final;
+		int Serailize(std::ostream& os) final;
 		void WriteBson(std::ostream& os, minibson::document& document);
 	 protected:
 		virtual int GetLength() = 0;
@@ -73,7 +73,7 @@ namespace Mongo
 	class MongoLateError : public Tcp::ProtoMessage
 	{
 	 public:
-		bool Serailize(std::ostream& os) final;
+		int Serailize(std::ostream& os) final;
 	};
 
 	class MongoQueryRequest : public MongoRequest

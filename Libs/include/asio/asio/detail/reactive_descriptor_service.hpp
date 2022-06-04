@@ -243,7 +243,7 @@ public:
     p.v = p.p = 0;
   }
 
-  // Write some data to the descriptor.
+  // WriteString some data to the descriptor.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
       const ConstBufferSequence& buffers, asio::error_code& ec)

@@ -351,7 +351,7 @@ public:
     ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
-  /// Write some data to the pipe.
+  /// WriteString some data to the pipe.
   /**
    * This function is used to write data to the pipe. The function call will
    * block until one or more bytes of the data has been written successfully,
@@ -388,7 +388,7 @@ public:
     return s;
   }
 
-  /// Write some data to the pipe.
+  /// WriteString some data to the pipe.
   /**
    * This function is used to write data to the pipe. The function call will
    * block until one or more bytes of the data has been written successfully,

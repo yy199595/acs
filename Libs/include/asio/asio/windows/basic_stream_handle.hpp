@@ -170,7 +170,7 @@ public:
   }
 #endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
-  /// Write some data to the handle.
+  /// WriteFile some data to the handle.
   /**
    * This function is used to write data to the stream handle. The function call
    * will block until one or more bytes of the data has been written
@@ -207,7 +207,7 @@ public:
     return s;
   }
 
-  /// Write some data to the handle.
+  /// WriteString some data to the handle.
   /**
    * This function is used to write data to the stream handle. The function call
    * will block until one or more bytes of the data has been written

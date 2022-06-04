@@ -177,7 +177,7 @@ public:
   }
 #endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
-  /// Write some data to the descriptor.
+  /// WriteString some data to the descriptor.
   /**
    * This function is used to write data to the stream descriptor. The function
    * call will block until one or more bytes of the data has been written
@@ -214,7 +214,7 @@ public:
     return s;
   }
 
-  /// Write some data to the descriptor.
+  /// WriteString some data to the descriptor.
   /**
    * This function is used to write data to the stream descriptor. The function
    * call will block until one or more bytes of the data has been written

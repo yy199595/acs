@@ -24,7 +24,7 @@ namespace Mongo
 		os.write(buffer.get(), size);
 	}
 
-	bool MongoRequest::Serailize(std::ostream& os)
+	int MongoRequest::Serailize(std::ostream& os)
 	{
 		int len = sizeof(MongoHead);
 		int bson = this->GetLength();
@@ -34,14 +34,14 @@ namespace Mongo
 		this->Write(os, this->header.responseTo);
 		this->Write(os, this->header.opCode);
 		this->OnWriter(os);
-		return true;
+		return 0;
 	}
 
-	bool MongoLateError::Serailize(std::ostream& os)
+	int MongoLateError::Serailize(std::ostream& os)
 	{
 		const std::string str = "getLastError";
 		this->Write(os, str);
-		return true;
+		return 0;
 	}
 }
 

@@ -106,16 +106,20 @@ namespace Tcp
 	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
 	{
 		std::ostream os(&this->mSendBuffer);
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
-		if (message->Serailize(os))
+		const int length = message->Serailize(os);
+		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
+			(const asio::error_code& code, size_t size)
 		{
-			AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-			std::shared_ptr<TcpContext> self = this->shared_from_this();
-			asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message]
-				(const asio::error_code& code, size_t size)
+			if(length > 0)
 			{
-				this->OnSendMessage(code, message);
-			});
-		}
+				this->Send(message);
+				return;
+			}
+			this->OnSendMessage(code, message);
+		});
+
+		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
 }

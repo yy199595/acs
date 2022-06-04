@@ -8,6 +8,7 @@ namespace Sentry
     {
     public:
 		int Timeout;
+		bool IsAsync;
 		std::string Method;
         std::string Service;
 	public:
@@ -18,7 +19,6 @@ namespace Sentry
 	class RpcInterfaceConfig final : public InterfaceConfig
 	{
 	public:
-		bool IsAsync;
 		std::string Type;
 		std::string CallWay;
 		std::string Request;

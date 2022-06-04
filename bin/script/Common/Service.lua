@@ -1,7 +1,5 @@
 
-Service = {}
-
-function Service.Call(func, id, request, taskSource)
+function RpcCall(func, id, request, taskSource)
     local context = function(luaTaskSource)
         local state, error, response = pcall(func, id, request)
         if not state then
@@ -12,5 +10,14 @@ function Service.Call(func, id, request, taskSource)
         end
     end
     coroutine.start(context, taskSource)
-    return taskSource;
+end
+
+function HttpCall(func, request, response, taskSource)
+    local content = function(luaTaskSource)
+        local state, error = pcall(func, id, request, response)
+        if not state then
+            Log.Error(error)
+        end
+    end
+    coroutine.start(context, taskSource)
 end

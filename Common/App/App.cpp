@@ -25,7 +25,7 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if (!this->mConfig->GetMember("path", "service", path))
+		if (!this->mConfig->GetPath("service", path))
 		{
 			CONSOLE_LOG_ERROR("not find serice config");
 			return false;
@@ -359,11 +359,7 @@ namespace Sentry
 	ServiceComponent* App::GetService(const std::string& name)
 	{
 		auto iter = this->mSeviceMap.find(name);
-		if(iter != this->mSeviceMap.end())
-		{
-			return iter->second;
-		}
-		return nullptr;
+		return iter != this->mSeviceMap.end() ? iter->second : nullptr;
 	}
 
 	bool App::GetServices(std::vector<ServiceComponent*>& services)

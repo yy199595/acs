@@ -51,93 +51,55 @@ namespace Sentry
 
 	void HttpComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
-		std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(socket));
-		this->mTaskComponent->Start(&HttpComponent::HandlerHttpData, this, handlerClient);
+		const std::string & address = socket->GetAddress();
+
+		std::shared_ptr<HttpHandlerClient> handlerClient =
+			std::make_shared<HttpHandlerClient>(this, socket);
+
+		handlerClient->StartReceive();
+		this->mHttpClients.insert(handlerClient);
 	}
 
 	void HttpComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
-		std::shared_ptr<HttpHandlerRequest> httpRequestData = httpClient->Read();
-		if(httpRequestData == nullptr)
-		{
-			return;
-		}
-		std::string host;
-		const std::string& path = httpRequestData->GetPath();
+		std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
+		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+
+		const std::string& path = request->GetPath();
 		auto iter = this->mHttpConfigs.find(path);
 		if(iter == this->mHttpConfigs.end())
 		{
+			this->ClosetHttpClient(httpClient);
 			LOG_ERROR("not find http config : " << path);
 			return;
 		}
 		const HttpInterfaceConfig* httpConfig = iter->second;
-#ifdef __HTTP_DEBUG_LOG__
-		ElapsedTimer elapsedTimer;
-#endif
-		std::shared_ptr<Json::Writer> jsonResponse(new Json::Writer());
-		XCode code = this->Invoke(httpConfig, httpRequestData, jsonResponse);
-
-		jsonResponse->AddMember("code", code);
-		httpClient->Writer(HttpStatus::OK, *jsonResponse);
-#ifdef __HTTP_DEBUG_LOG__
-		LOG_INFO("==== http request handler ====");
-		LOG_INFO("url = " << httpRequestData->GetPath());
-		LOG_INFO("type = " << httpRequestData->GetMethod());
-		LOG_INFO("time = " << elapsedTimer.GetMs() << " ms");
-		if (!httpRequestData->GetContent().empty())
+		if(httpConfig->Type != request->GetMethod())
 		{
-			LOG_INFO("request = " << httpRequestData->GetContent());
+			this->ClosetHttpClient(httpClient);
+			return;
 		}
-		LOG_INFO("response = " << jsonResponse->ToJsonString());
-#endif
-	}
-
-	XCode HttpComponent::Invoke(const HttpInterfaceConfig* httpConfig, std::shared_ptr<HttpHandlerRequest> content,
-		std::shared_ptr<Json::Writer> response)
-	{
-		if (httpConfig == nullptr)
-		{
-			response->AddMember("error", fmt::format("not find url : {0}", content->GetPath()));
-			return XCode::CallServiceNotFound;
-		}
-
-		if (httpConfig->Type != content->GetMethod())
-		{
-			response->AddMember("error", fmt::format("user {0} call", httpConfig->Type));
-			return XCode::HttpMethodNotFound;
-		}
-
-		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		if (!jsonReader->ParseJson(content->GetContent()))
-		{
-			response->AddMember("error", "json parse error");
-			return XCode::ParseJsonFailure;
-		}
-		std::string ip;
-		unsigned short port = 0;
-		Helper::String::ParseIpAddress(content->GetAddress(), ip, port);
-		jsonReader->AddMember("ip", rapidjson::StringRef(ip.c_str()), jsonReader->GetAllocator());
 		LocalHttpService* httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
-		if (httpService == nullptr)
+		if(httpService == nullptr || !httpService->IsStartService())
 		{
-			response->AddMember("error", "not find handler component");
-			return XCode::CallServiceNotFound;
+			this->ClosetHttpClient(httpClient);
+			return;
 		}
-		const std::string& method = httpConfig->Method;
-
-		try
+		if(!httpConfig->IsAsync)
 		{
-			response->StartObject("data");
-			XCode code = httpService->Invoke(method, jsonReader, response);
-			response->EndObject();
-			return code;
+			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
+			{
+				httpClient->StartWriter();
+			}
+			return;
 		}
-		catch(std::logic_error & logic_error)
+		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
 		{
-			response->EndObject();
-			response->AddMember("error", logic_error.what());
-			return XCode::ThrowError;
-		}
+			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
+			{
+				httpClient->StartWriter();
+			}
+		});
 	}
 
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
@@ -179,6 +141,11 @@ namespace Sentry
 		luaRegister.BeginRegister<HttpComponent>();
 		luaRegister.PushExtensionFunction("Get", Lua::Http::Get);
 		luaRegister.PushExtensionFunction("Post", Lua::Http::Post);
+
+		Lua::ClassProxyHelper classProxyHelper = luaRegister.Clone("HttpHandlerResponse");
+		classProxyHelper.BeginRegister<HttpHandlerResponse>();
+		classProxyHelper.PushMemberFunction("AddHead", &HttpHandlerResponse::AddHead);
+		classProxyHelper.PushMemberFunction("WriteString", &HttpHandlerResponse::WriteString);
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
@@ -203,5 +170,14 @@ namespace Sentry
 			return nullptr;
 		}
 		return httpAsyncResponse;
+	}
+	void HttpComponent::ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient)
+	{
+		auto iter = this->mHttpClients.find(httpClient);
+		if(iter != this->mHttpClients.end())
+		{
+			this->mHttpClients.erase(iter);
+			LOG_DEBUG("remove http address : " << httpClient->GetAddress());
+		}
 	}
 }

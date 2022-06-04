@@ -23,3 +23,5 @@ ChatService.Test = function(id, request)
     Log.Error(id, Json.Encode(request))
     return XCode.Successful, request
 end
+
+return ChatService

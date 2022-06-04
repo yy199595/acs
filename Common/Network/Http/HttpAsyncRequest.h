@@ -6,6 +6,7 @@
 #define GAMEKEEPER_HTTPASYNCREQUEST_H
 #include<string>
 #include<asio.hpp>
+#include<fstream>
 #include<unordered_map>
 #include"Json/JsonWriter.h"
 #include"Json/JsonReader.h"
@@ -22,7 +23,7 @@ namespace Sentry
 		bool AddHead(const std::string & key, int value);
 		bool AddHead(const std::string & key, const std::string & value);
     public:
-		bool Serailize(std::ostream &os) final;
+		int Serailize(std::ostream &os) final;
 		const std::string & GetHost() { return this->mHost;}
         const std::string & GetPort() { return this->mPort;}
 	protected:
@@ -80,7 +81,7 @@ namespace Sentry
     class IHttpContent
     {
     public:
-        virtual const std::string & GetContent() = 0;
+        virtual const std::string & GetContent() const = 0;
         virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
 }
@@ -94,7 +95,7 @@ namespace Sentry
     public:
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
-        const std::string & GetContent() final { return this->mContent;}
+        const std::string & GetContent() const final { return this->mContent;}
 	public:
 		bool ToJson(std::string & json);
 		bool GetHead(const std::string & key, std::string & value);
@@ -118,11 +119,11 @@ namespace Sentry
 	 public:
 		HttpStatus OnReceiveData(asio::streambuf& streamBuffer) final;
 	 public:
-		const std::string& GetPath() { return this->mPath; }
-		const std::string& GetMethod() { return this->mMethod; }
-		const std::string& GetAddress() { return this->mAddress; }
-		const std::string& GetContent() final { return this->mContent; }
-		bool GetHeadContent(const std::string& key, std::string& value);
+		const std::string& GetPath() const { return this->mPath; }
+		const std::string& GetMethod() const { return this->mMethod; }
+		const std::string& GetAddress() const { return this->mAddress; }
+		const std::string& GetContent() const final { return this->mContent; }
+		bool GetHeadContent(const std::string& key, std::string& value) const;
 	 private:
 		std::string mPath;
 		std::string mMethod;
@@ -130,7 +131,6 @@ namespace Sentry
 		std::string mVersion;
 		std::string mAddress;
 		HttpDecodeState mState;
-		size_t mContentLength;
 		std::unordered_map<std::string, std::string> mHeadMap;
 	};
 }
@@ -140,15 +140,21 @@ namespace Sentry
 	class HttpHandlerResponse : public Tcp::ProtoMessage
 	{
 	 public:
-		HttpHandlerResponse() = default;
+		HttpHandlerResponse();
+		~HttpHandlerResponse();
 	 public:
-		bool Serailize(std::ostream &os) final;
-		void Write(HttpStatus code, Json::Writer & content);
-		void Write(HttpStatus code, const std::string & content);
-		bool AddHead(const std::string & key, const std::string & value);
-	private:
+		void SetCode(HttpStatus code);
+		void WriteFile(std::fstream * fs);
+		void WriteString(const std::string & content);
+		bool AddHead(const char * key, const std::string & value);
+	 private:
+		int Serailize(std::ostream &os) final;
+	 private:
+		size_t mCount;
 		HttpStatus mCode;
+		size_t mContentSize;
 		std::string mContent;
+		std::fstream * mFstream;
 		std::unordered_map<std::string, std::string> mHeadMap;
 	};
 }

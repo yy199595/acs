@@ -2,6 +2,7 @@
 
 Main = {}
 function Main.Awake()
+    table.print(ServerConfig)
     local messageComponent = App.GetComponent("MessageComponent")
     messageComponent:Load("./proto");
     messageComponent:Import("test.proto")
@@ -10,17 +11,6 @@ function Main.Awake()
         print("--------------------")
     end)
    return true
-end
-
-Person = {}
-Person.age = 10
-Person.name = "xiaoming"
-Person.arr = {}
-
-
-
-for i = 1, 10 do
-    table.insert(Person.arr, i)
 end
 
 function Main.Start()

@@ -23,7 +23,7 @@ namespace Sentry
     class ServerConfig : public Json::Reader
     {
     public:
-        explicit ServerConfig(std::string  path);
+        explicit ServerConfig(int argc, char ** argv);
     public:
         bool LoadConfig();
         int GetNodeId() { return this->mNodeId; }
@@ -32,11 +32,20 @@ namespace Sentry
 		const RedisConfig * GetRedisConfig(const std::string & name) const;
 		void GetRedisConfigs(std::vector<const RedisConfig *> & configs) const;
 		void GetListeners(std::vector<const ListenConfig *> & listeners) const;
-		bool GetListenerAddress(const std::string & name, std::string & address) const;
-    private:   
+		bool GetListener(const std::string & name, std::string & address) const;
+	 public:
+		const std::string & GetContent() const { return this->mContent;}
+		bool GetPath(const std::string & name, std::string & path) const;
+		const std::string & GetExename() const { return this->mExePath;}
+		const std::string & GetWorkPath() const { return this->mWrokDir; }
+    private:
         int mNodeId;
+		std::string mContent;
+		std::string mExePath;
+		std::string mWrokDir;
         std::string mNodeName;
-        const std::string mConfigPath;
+		std::string mConfigPath;
+		std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig *> mListens;
 		std::unordered_map<std::string, RedisConfig> mRedisConfigs;
     };

@@ -405,7 +405,7 @@ public:
         this->impl_.get_implementation(), offset, whence, ec);
   }
 
-  /// Write some data to the file.
+  /// WriteFile some data to the file.
   /**
    * This function is used to write data to the stream file. The function call
    * will block until one or more bytes of the data has been written
@@ -441,7 +441,7 @@ public:
     return s;
   }
 
-  /// Write some data to the file.
+  /// WriteString some data to the file.
   /**
    * This function is used to write data to the stream file. The function call
    * will block until one or more bytes of the data has been written

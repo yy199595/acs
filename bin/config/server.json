@@ -3,13 +3,6 @@
     "node_id": 1,
     "fps": 30,
     "node_name": "Server",
-    "log":
-    {
-        "save":1,
-        "path":"./log",
-        "hour":0,
-        "min":0
-    },
     "thread":
     {
         "task":1,
@@ -17,9 +10,11 @@
     },
     "path":
     {
-        "proto": "./proto",
-        "code": "./XCode/XCode.csv",
-        "service": "./config/service.json"
+        "log": "log",
+        "proto": "proto",
+        "source" : "source",
+        "code": "XCode/XCode.csv",
+        "service": "config/service.json"
     },
     "listener": {
         "rpc":
@@ -66,9 +61,9 @@
             "timeout": 3,
             "count": 1,
             "lua": [
-                "./redis/lock.lua",
-                "./redis/user.lua",
-                "./redis/node.lua"
+                "redis/lock.lua",
+                "redis/user.lua",
+                "redis/node.lua"
             ],
             "passwd": "199595yjz."
         },
@@ -82,9 +77,9 @@
         }
     },
     "lua": [
-        "./Script/Common/",
-        "./Script/Server/",
-        "./Script/Client"
+        "Script/Common",
+        "Script/Server",
+        "Script/Client"
     ],
     "component": [
         "HttpComponent",
@@ -112,7 +107,8 @@
         "GateService",
         "ChatService",
         "MysqlService",
-        "HttpUserService"
+        "HttpUserService",
+        "HttpSourceService"
     ],
     "white_list": [
         "127.0.0.1"

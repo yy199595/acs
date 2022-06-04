@@ -45,7 +45,7 @@
 // custom message parsing or serialization procedures.
 //
 // CodedOutputStream example:
-//   // Write some data to "myfile".  First we write a 4-byte "magic number"
+//   // WriteString some data to "myfile".  First we write a 4-byte "magic number"
 //   // to identify the file type, then write a length-delimited string.  The
 //   // string is composed of a varint giving the length followed by the raw
 //   // bytes.
@@ -701,7 +701,7 @@ class PROTOBUF_EXPORT CodedInputStream {
 //
 // Most methods of CodedOutputStream which return a bool return false if an
 // underlying I/O error occurs.  Once such a failure occurs, the
-// CodedOutputStream is broken and is no longer useful. The Write* methods do
+// CodedOutputStream is broken and is no longer useful. The WriteString* methods do
 // not return the stream status, but will invalidate the stream if an error
 // occurs. The client can probe HadError() to determine the status.
 //
@@ -782,7 +782,7 @@ class PROTOBUF_EXPORT CodedOutputStream {
   // is called.
   inline uint8* GetDirectBufferForNBytesAndAdvance(int size);
 
-  // Write raw bytes, copying them from the given buffer.
+  // WriteString raw bytes, copying them from the given buffer.
   void WriteRaw(const void* buffer, int size);
   // Like WriteRaw()  but will try to write aliased data if aliasing is
   // turned on.
@@ -798,7 +798,7 @@ class PROTOBUF_EXPORT CodedOutputStream {
   void WriteString(const std::string& str);
   // Like WriteString()  but writing directly to the target array.
   static uint8* WriteStringToArray(const std::string& str, uint8* target);
-  // Write the varint-encoded size of str followed by str.
+  // WriteString the varint-encoded size of str followed by str.
   static uint8* WriteStringWithSizeToArray(const std::string& str, uint8* target);
 
 
@@ -813,22 +813,22 @@ class PROTOBUF_EXPORT CodedOutputStream {
   // remains live until all of the data has been consumed from the stream.
   void EnableAliasing(bool enabled);
 
-  // Write a 32-bit little-endian integer.
+  // WriteString a 32-bit little-endian integer.
   void WriteLittleEndian32(uint32 value);
   // Like WriteLittleEndian32()  but writing directly to the target array.
   static uint8* WriteLittleEndian32ToArray(uint32 value, uint8* target);
-  // Write a 64-bit little-endian integer.
+  // WriteString a 64-bit little-endian integer.
   void WriteLittleEndian64(uint64 value);
   // Like WriteLittleEndian64()  but writing directly to the target array.
   static uint8* WriteLittleEndian64ToArray(uint64 value, uint8* target);
 
-  // Write an unsigned integer with Varint encoding.  Writing a 32-bit value
+  // WriteString an unsigned integer with Varint encoding.  Writing a 32-bit value
   // is equivalent to casting it to uint64 and writing it as a 64-bit value,
   // but may be more efficient.
   void WriteVarint32(uint32 value);
   // Like WriteVarint32()  but writing directly to the target array.
   static uint8* WriteVarint32ToArray(uint32 value, uint8* target);
-  // Write an unsigned integer with Varint encoding.
+  // WriteString an unsigned integer with Varint encoding.
   void WriteVarint64(uint64 value);
   // Like WriteVarint64()  but writing directly to the target array.
   static uint8* WriteVarint64ToArray(uint64 value, uint8* target);

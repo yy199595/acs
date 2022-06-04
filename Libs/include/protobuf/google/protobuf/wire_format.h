@@ -148,7 +148,7 @@ class PROTOBUF_EXPORT WireFormat {
                                              UnknownFieldSet* unknown_fields,
                                              RepeatedField<int>* values);
 
-  // Write the contents of an UnknownFieldSet to the output.
+  // WriteString the contents of an UnknownFieldSet to the output.
   static void SerializeUnknownFields(const UnknownFieldSet& unknown_fields,
                                      io::CodedOutputStream* output);
   // Same as above, except writing directly to the provided buffer.

@@ -155,7 +155,7 @@ public:
     return ec;
   }
 
-  // Write the given data. Returns the number of bytes sent.
+  // WriteString the given data. Returns the number of bytes sent.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
       const ConstBufferSequence& buffers, asio::error_code& ec)

@@ -61,7 +61,7 @@ namespace Sentry
 
 		std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLuaEnv));
 
-		if(!Lua::Function::Get(this->mLuaEnv, "Service", "Call"))
+		if(!Lua::Function::Get(this->mLuaEnv, "RpcCall"))
 		{
 			return XCode::Failure;
 		}
@@ -85,7 +85,7 @@ namespace Sentry
 		{
 			return code;
 		}
-		int ref = luaTaskSource->GetTable();
+		int ref = luaTaskSource->GetRef();
 		if(!protoConfig->Response.empty() && ref != 0)
 		{
 			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);

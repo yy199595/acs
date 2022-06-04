@@ -17,7 +17,7 @@ namespace Sentry
 		static int SetResult(lua_State * lua);
     public:
         XCode Await();
-		int GetTable() { return this->mRef;}
+		int GetRef() { return this->mRef;}
     private:
 		int mRef;
         XCode mCode;

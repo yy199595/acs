@@ -44,6 +44,7 @@ namespace Lua
 		}
 
 	 public:
+		static bool Get(lua_State * lua, const char * func);
 		static bool Get(lua_State * lua, const char * tab, const char * func);
 	 public:
 		static WaitLuaTaskSource * Call(lua_State * lua, int ref);

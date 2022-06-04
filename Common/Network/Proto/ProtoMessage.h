@@ -13,7 +13,7 @@ namespace Tcp
 	{
 	 public:
 		ProtoMessage() = default;
-		virtual bool Serailize(std::ostream & os) = 0;
+		virtual int Serailize(std::ostream & os) = 0; //返回剩余要发送的字节数
 	 protected:
 		void Write(std::ostream & os, char cc);
 		void Write(std::ostream & os, int value);

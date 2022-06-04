@@ -30,10 +30,10 @@ namespace Parameter
 //		return Parameter::Read<Type>(lua, index);
 //	}
 //	template<typename T>
-//	inline typename std::enable_if<ConstParameter::IsConstParameter<T>::value, void>::type Write(lua_State * lua, T data)
+//	inline typename std::enable_if<ConstParameter::IsConstParameter<T>::value, void>::type WriteString(lua_State * lua, T data)
 //	{
 //		typedef ConstParameter::ConstProxy<T>::Type Type;
-//		Parameter::Write<Type>(lua, data);
+//		Parameter::WriteString<Type>(lua, data);
 //	}
 //}
 

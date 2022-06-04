@@ -351,7 +351,7 @@ std::size_t sync_write(int d, state_type state, const buf* bufs,
     return 0;
   }
 
-  // Write some data.
+  // WriteString some data.
   for (;;)
   {
     // Try to complete the operation without blocking.
@@ -390,7 +390,7 @@ std::size_t sync_write1(int d, state_type state, const void* data,
     return 0;
   }
 
-  // Write some data.
+  // WriteString some data.
   for (;;)
   {
     // Try to complete the operation without blocking.
@@ -418,7 +418,7 @@ bool non_blocking_write(int d, const buf* bufs, std::size_t count,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = ::writev(d, bufs, static_cast<int>(count));
     get_last_error(ec, bytes < 0);
 
@@ -449,7 +449,7 @@ bool non_blocking_write1(int d, const void* data, std::size_t size,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = ::write(d, data, size);
     get_last_error(ec, bytes < 0);
 
@@ -731,7 +731,7 @@ bool non_blocking_write_at(int d, uint64_t offset,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteFile some data.
     signed_size_type bytes = ::pwritev(d,
         bufs, static_cast<int>(count), offset);
     get_last_error(ec, bytes < 0);
@@ -764,7 +764,7 @@ bool non_blocking_write_at1(int d, uint64_t offset,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = ::pwrite(d, data, size, offset);
     get_last_error(ec, bytes < 0);
 

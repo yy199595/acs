@@ -1,6 +1,5 @@
 HofixHelper = {}
 HofixHelper.hofixModules = {}
-local this = HofixHelper
 
 function HofixHelper.LoadModuleByName(moduleName)
     local oldModule = package.loaded[moduleName] or {}
@@ -13,7 +12,7 @@ function HofixHelper.LoadModuleByName(moduleName)
         end
     end
     package[moduleName] = oldModule
-    SoEasy.Info("load " .. moduleName .. " Successful")
+    Log.Info("load " .. moduleName .. " Successful")
     return oldModule
 end
 return HofixHelper

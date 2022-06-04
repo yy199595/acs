@@ -13,7 +13,7 @@
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 #include"Component/RpcService/ServiceComponent.h"
 #include"Script/Extension/Bson/bson.h"
-
+#include"Script/Extension/Json/Encoder.h"
 using namespace Lua;
 namespace Sentry
 {
@@ -37,9 +37,16 @@ namespace Sentry
 				luaRegisterComponent->OnLuaRegister(luaRegister);
 			}
 		}
+		const std::string & json = this->GetConfig().GetContent();
+		values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
+		lua_setglobal(this->mLuaEnv, "ServerConfig");
+
+		Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
+		luaRegister.BeginNewTable();
+		lua_getglobal(this->mLuaEnv, "ServerConfig");
 
 		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
-		luaRegister0.BeginNewTable();
+		luaRegister0.BeginRegister<App>();
 		luaRegister0.PushExtensionFunction("GetService", Lua::LuaApp::GetService);
 		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
@@ -125,7 +132,8 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(config.GetMember("lua", luaPaths));
 		for (const std::string& path : luaPaths)
 		{
-			if (!Helper::Directory::GetFilePaths(path, "*.lua", luaFiles))
+			const std::string fullPath = config.GetWorkPath() + path;
+			if (!Helper::Directory::GetFilePaths(fullPath, "*.lua", luaFiles))
 			{
 				LOG_ERROR("load" << path << " lua file failure");
 				return false;

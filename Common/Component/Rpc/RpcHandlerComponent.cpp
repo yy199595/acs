@@ -1,5 +1,4 @@
 ﻿#include"RpcHandlerComponent.h"
-#include<Component/RpcService/LocalServiceComponent.h>
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
@@ -14,17 +13,16 @@ namespace Sentry
 {
 	void RpcHandlerComponent::Awake()
 	{
-		this->mCorComponent = nullptr;
+		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 	}
 
 	bool RpcHandlerComponent::LateAwake()
 	{
-		this->mCorComponent = App::Get()->GetTaskComponent();
+		this->mTaskComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
-		LOG_CHECK_RET_FALSE(this->mCorComponent = this->GetComponent<TaskComponent>());
+		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
 		return true;
 	}
@@ -80,24 +78,12 @@ namespace Sentry
 			response->set_code((int)code);
 			response->set_rpc_id(request->rpc_id());
 			response->set_user_id(request->user_id());
-
-			if(rpcInterfaceConfig->CallWay == "Sub")
-			{
-				std::string message = "-";
-				if(response->AppendToString(&message))
-				{
-					const std::string & channel = request->address();
-					long long num = this->mRedisComponent->Publish(channel, message);
-					return num == 1 ? XCode::Successful : XCode::SendMessageFail;
-				}
-				return XCode::SerializationFailure;
-			}
 			this->mRpcClientComponent->Send(request->address(), response);
 			LOG_INFO("call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
 			return XCode::Successful;
 		}
 
-		this->mCorComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
+		this->mTaskComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
 		{
 			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
@@ -109,18 +95,6 @@ namespace Sentry
 			response->set_code((int)code);
 			response->set_rpc_id(request->rpc_id());
 			response->set_user_id(request->user_id());
-
-			if(rpcInterfaceConfig->CallWay == "Sub")
-			{
-				std::string message = "-";
-				if(response->AppendToString(&message))
-				{
-					const std::string & channel = request->address();
-					long long num = this->mRedisComponent->Publish(channel, message);
-					return num == 1 ? XCode::Successful : XCode::SendMessageFail;
-				}
-				return XCode::SerializationFailure;
-			}
 			this->mRpcClientComponent->Send(request->address(), response);
 			LOG_INFO("async call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
 			return XCode::Successful;

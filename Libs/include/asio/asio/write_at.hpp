@@ -37,7 +37,7 @@ namespace asio {
  */
 /*@{*/
 
-/// Write all of the supplied data at the specified offset before returning.
+/// WriteString all of the supplied data at the specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -80,7 +80,7 @@ template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers);
 
-/// Write all of the supplied data at the specified offset before returning.
+/// WriteString all of the supplied data at the specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -125,7 +125,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
     asio::error_code& ec);
 
-/// Write a certain amount of data at a specified offset before returning.
+/// WriteString a certain amount of data at a specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -180,7 +180,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition);
 
-/// Write a certain amount of data at a specified offset before returning.
+/// WriteString a certain amount of data at a specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -231,7 +231,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
 #if !defined(ASIO_NO_EXTENSIONS)
 #if !defined(ASIO_NO_IOSTREAM)
 
-/// Write all of the supplied data at the specified offset before returning.
+/// WriteString all of the supplied data at the specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -264,7 +264,7 @@ template <typename SyncRandomAccessWriteDevice, typename Allocator>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b);
 
-/// Write all of the supplied data at the specified offset before returning.
+/// WriteString all of the supplied data at the specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -298,7 +298,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b,
     asio::error_code& ec);
 
-/// Write a certain amount of data at a specified offset before returning.
+/// WriteString a certain amount of data at a specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the
@@ -341,7 +341,7 @@ template <typename SyncRandomAccessWriteDevice, typename Allocator,
 std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
     basic_streambuf<Allocator>& b, CompletionCondition completion_condition);
 
-/// Write a certain amount of data at a specified offset before returning.
+/// WriteString a certain amount of data at a specified offset before returning.
 /**
  * This function is used to write a certain number of bytes of data to a random
  * access device at a specified offset. The call will block until one of the

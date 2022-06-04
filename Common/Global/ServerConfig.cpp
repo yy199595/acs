@@ -8,24 +8,22 @@
 #include"Network/Listener/NetworkListener.h"
 namespace Sentry
 {
-    ServerConfig::ServerConfig(std::string  path)
-            : mConfigPath(std::move(path))
+    ServerConfig::ServerConfig(int argc, char ** argv)
     {
         this->mNodeId = 0;
+		this->mConfigPath = argv[1];
+		Helper::Directory::GetDirAndFileName(argv[0], this->mWrokDir, this->mExePath);
     }
 
     bool ServerConfig::LoadConfig()
 	{
-		std::string outString;
-		if (!Helper::File::ReadTxtFile(this->mConfigPath, outString))
+		if (!Helper::File::ReadTxtFile(this->mConfigPath, this->mContent))
 		{
 			throw std::logic_error("not find config : " + mConfigPath);
-			return false;
 		}
-		if (!this->ParseJson(outString))
+		if (!this->ParseJson(this->mContent))
 		{
 			throw std::logic_error("parse json : " + mConfigPath + " failure");
-			return false;
 		}
 
 		IF_THROW_ERROR(this->GetJsonValue("listener", "rpc"));
@@ -57,6 +55,18 @@ namespace Sentry
 			}
 		}
 
+		if (this->HasMember("path") && (*this)["path"].IsObject())
+		{
+			const rapidjson::Value & jsonObject = (*this)["path"];
+			auto iter1 = jsonObject.MemberBegin();
+			for(; iter1 != jsonObject.MemberEnd(); iter1++)
+			{
+				const std::string key(iter1->name.GetString());
+				const std::string value(iter1->value.GetString());
+				this->mPaths.emplace(key, this->mWrokDir + value);
+			}
+		}
+
 		std::unordered_map<std::string, const rapidjson::Value*> redisConfigs;
 		IF_THROW_ERROR(this->GetMember("redis", redisConfigs));
 		for (auto iter = redisConfigs.begin(); iter != redisConfigs.end(); iter++)
@@ -77,12 +87,12 @@ namespace Sentry
 			{
 				redisConfig.Password = jsonObject["passwd"].GetString();
 			}
-			if (jsonObject.HasMember("lua"))
+			if (jsonObject.HasMember("lua") && jsonObject["lua"].IsArray())
 			{
 				for (int index = 0; index < jsonObject["lua"].Size(); index++)
 				{
 					std::string lua = jsonObject["lua"][index].GetString();
-					redisConfig.LuaFiles.emplace_back(lua);
+					redisConfig.LuaFiles.emplace_back(this->mWrokDir + lua);
 				}
 			}
 			redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
@@ -101,7 +111,7 @@ namespace Sentry
 		}
 	}
 
-	bool ServerConfig::GetListenerAddress(const std::string& name, std::string& address) const
+	bool ServerConfig::GetListener(const std::string& name, std::string& address) const
 	{
 		auto iter = this->mListens.find(name);
 		if(iter != this->mListens.end())
@@ -131,5 +141,15 @@ namespace Sentry
 		{
 			configs.emplace_back(&iter->second);
 		}
+	}
+	bool ServerConfig::GetPath(const string& name, string& path) const
+	{
+		auto iter = this->mPaths.find(name);
+		if(iter != this->mPaths.end())
+		{
+			path = iter->second;
+			return true;
+		}
+		return false;
 	}
 }

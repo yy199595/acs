@@ -33,7 +33,7 @@ namespace Sentry
 		~RedisRequest() { }
     public:
 		const std::string ToJson() const;
-		bool Serailize(std::ostream &os) final;
+		int Serailize(std::ostream &os) final;
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 

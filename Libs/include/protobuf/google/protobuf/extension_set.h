@@ -448,7 +448,7 @@ class PROTOBUF_EXPORT ExtensionSet {
                        const Message* containing_type,
                        UnknownFieldSet* unknown_fields);
 
-  // Write all extension fields with field numbers in the range
+  // WriteString all extension fields with field numbers in the range
   //   [start_field_number, end_field_number)
   // to the output stream, using the cached sizes computed when ByteSize() was
   // last called.  Note that the range bounds are inclusive-exclusive.

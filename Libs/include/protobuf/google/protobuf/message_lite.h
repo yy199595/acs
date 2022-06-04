@@ -318,13 +318,13 @@ class PROTOBUF_EXPORT MessageLite {
   // Methods for serializing in protocol buffer format.  Most of these
   // are just simple wrappers around ByteSize() and SerializeWithCachedSizes().
 
-  // Write a protocol buffer of this message to the given output.  Returns
+  // WriteString a protocol buffer of this message to the given output.  Returns
   // false on a write error.  If the message is missing required fields,
   // this may GOOGLE_CHECK-fail.
   bool SerializeToCodedStream(io::CodedOutputStream* output) const;
   // Like SerializeToCodedStream(), but allows missing required fields.
   bool SerializePartialToCodedStream(io::CodedOutputStream* output) const;
-  // Write the message to the given zero-copy output stream.  All required
+  // WriteString the message to the given zero-copy output stream.  All required
   // fields must be set.
   bool SerializeToZeroCopyStream(io::ZeroCopyOutputStream* output) const;
   // Like SerializeToZeroCopyStream(), but allows missing required fields.

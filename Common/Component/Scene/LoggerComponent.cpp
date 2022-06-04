@@ -11,9 +11,10 @@ namespace Sentry
 	void LoggerComponent::Awake()
 	{
 		const ServerConfig& config = App::Get()->GetConfig();
-		LOG_CHECK_RET(config.GetMember("node_name", this->mServerName));
-		LOG_CHECK_RET(config.GetMember("log", "path", this->mLogSavePath));
-		LOG_CHECK_RET(config.GetMember("log", "save", this->mLogSaveTime));
+
+		this->mLogSaveTime = 3;
+		config.GetPath("log", this->mLogSavePath);
+		config.GetMember("node_name", this->mServerName);
 		this->CreateLogFile();
 	}
 

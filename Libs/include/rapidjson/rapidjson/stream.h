@@ -49,7 +49,7 @@ concept Stream {
     //! \return The begin writer pointer.
     Ch* PutBegin();
 
-    //! Write a character.
+    //! WriteString a character.
     void Put(Ch c);
 
     //! Flush the buffer.
@@ -86,7 +86,7 @@ inline void PutReserve(Stream& stream, size_t count) {
     (void)count;
 }
 
-//! Write character to a stream, presuming buffer is reserved.
+//! WriteString character to a stream, presuming buffer is reserved.
 template<typename Stream>
 inline void PutUnsafe(Stream& stream, typename Stream::Ch c) {
     stream.Put(c);
@@ -195,7 +195,7 @@ struct GenericInsituStringStream {
     Ch Take() { return *src_++; }
     size_t Tell() { return static_cast<size_t>(src_ - head_); }
 
-    // Write
+    // WriteString
     void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
 
     Ch* PutBegin() { return dst_ = src_; }

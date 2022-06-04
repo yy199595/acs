@@ -792,7 +792,7 @@ public:
         initiate_async_receive(this), handler, buffers, flags);
   }
 
-  /// Write some data to the socket.
+  /// WriteString some data to the socket.
   /**
    * This function is used to write data to the stream socket. The function call
    * will block until one or more bytes of the data has been written
@@ -829,7 +829,7 @@ public:
     return s;
   }
 
-  /// Write some data to the socket.
+  /// WriteString some data to the socket.
   /**
    * This function is used to write data to the stream socket. The function call
    * will block until one or more bytes of the data has been written

@@ -33,7 +33,7 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
-		this->GetConfig().GetListenerAddress("rpc", this->mRpcAddress);
+		this->GetConfig().GetListener("rpc", this->mRpcAddress);
 		return true;
 	}
 

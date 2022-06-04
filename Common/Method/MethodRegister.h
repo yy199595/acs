@@ -105,13 +105,6 @@ namespace Sentry
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
 
 	};
-
-//	template<typename T, typename T1, typename T2>
-//	inline typename std::enable_if<std::is_same<T1, std::string>::value && std::is_base_of<Message, T2>::value, bool>::type
-//	ServiceMethodRegister::Bind(std::string name, ServiceMethodType3<T, T1, T2> func)
-//	{
-//		return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, (T*)this->mObj, func));
-//	}
 }
 
 namespace Sentry
@@ -123,7 +116,7 @@ namespace Sentry
 		std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
 	 public:
 		template<typename T>
-		bool Bind(const std::string& name, HttpJsonMethod1<T> func)
+		bool Bind(const std::string& name, HttpJsonMethod<T> func)
 		{
 			auto iter = this->mHttpMethodMap.find(name);
 			if (iter != this->mHttpMethodMap.end())
@@ -131,23 +124,9 @@ namespace Sentry
 				return false;
 			}
 			T * component = this->mComponent->Cast<T>();
-			this->mHttpMethodMap.emplace(name, std::make_shared<HttpServiceJsonMethod1<T>>(component, std::move(func)));
+			this->mHttpMethodMap.emplace(name, std::make_shared<CppHttpServiceMethod<T>>(component, std::move(func)));
 			return true;
 		}
-
-		template<typename T>
-		bool Bind(const std::string& name, HttpJsonMethod2<T> func)
-		{
-			auto iter = this->mHttpMethodMap.find(name);
-			if (iter != this->mHttpMethodMap.end())
-			{
-				return false;
-			}
-			T * component = this->mComponent->Cast<T>();
-			this->mHttpMethodMap.emplace(name, std::make_shared<HttpServiceJsonMethod2<T>>(component, std::move(func)));
-			return true;
-		}
-
 	 private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;

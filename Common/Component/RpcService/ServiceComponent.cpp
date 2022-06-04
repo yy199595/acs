@@ -23,7 +23,7 @@ namespace Sentry
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
-		return this->GetConfig().GetListenerAddress("rpc", this->mLocalAddress);
+		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}
 
 	void ServiceComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)

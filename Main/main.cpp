@@ -23,6 +23,7 @@
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/Scene/MessageComponent.h"
+#include"Component/Logic/HttpSourceService.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -78,6 +79,7 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<MysqlService>("MysqlService");
 	ComponentFactory::Add<MongoService>("MongoService");
 	ComponentFactory::Add<HttpUserService>("HttpUserService");
+	ComponentFactory::Add<HttpSourceService>("HttpSourceService");
 }
 int main(int argc, char **argv)
 {
@@ -85,8 +87,7 @@ int main(int argc, char **argv)
     {
         RegisterComponent();
         RegisterServiceComponent();
-        const std::string path(argv[1]);
-        return (std::make_shared<App>(new ServerConfig(path)))->Run();
+        return (std::make_shared<App>(new ServerConfig(argc, argv)))->Run();
     }
     catch(std::logic_error & err)
     {

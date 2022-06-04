@@ -592,7 +592,7 @@ public:
     ASIO_SYNC_OP_VOID_RETURN(ec);
   }
 
-  /// Write some data to the serial port.
+  /// WriteString some data to the serial port.
   /**
    * This function is used to write data to the serial port. The function call
    * will block until one or more bytes of the data has been written
@@ -629,7 +629,7 @@ public:
     return s;
   }
 
-  /// Write some data to the serial port.
+  /// WriteString some data to the serial port.
   /**
    * This function is used to write data to the serial port. The function call
    * will block until one or more bytes of the data has been written

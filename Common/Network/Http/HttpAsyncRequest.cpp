@@ -56,7 +56,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool HttpAsyncRequest::Serailize(std::ostream& os)
+	int HttpAsyncRequest::Serailize(std::ostream& os)
 	{
 		os << this->mMethod << " " << this->mPath << " " << HttpVersion << "\r\n";
 		os << "Host:" << this->mHost << "\r\n";
@@ -68,7 +68,7 @@ namespace Sentry
 		}
 		os << "Connection: close\r\n\r\n";
 		this->WriteBody(os);
-		return true;
+		return 0;
 	}
 }
 
@@ -207,12 +207,11 @@ namespace Sentry
 {
     HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
-        this->mContentLength = 0;
 		this->mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
     }
 
-    bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value)
+    bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value) const
     {
         auto iter = this->mHeadMap.find(key);
         if(iter != this->mHeadMap.end())
@@ -233,73 +232,51 @@ namespace Sentry
             io.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
-        {
-            std::string lineData;
-            while(std::getline(io, lineData))
-            {
-                if(lineData == "\r")
-                {
-                    this->mState = HttpDecodeState::Content;
-                    break;
-                }
-                size_t pos = lineData.find(":");
-                if (pos != std::string::npos)
-                {
-                    size_t length = lineData.size() - pos - 2;
-                    std::string key = lineData.substr(0, pos);
+		{
+			std::string lineData;
+			while (std::getline(io, lineData))
+			{
+				if (lineData == "\r")
+				{
+					this->mState = HttpDecodeState::Content;
+					break;
+				}
+				size_t pos = lineData.find(":");
+				if (pos != std::string::npos)
+				{
+					size_t length = lineData.size() - pos - 2;
+					std::string key = lineData.substr(0, pos);
 
-                    Helper::String::Tolower(key);
-                    std::string val = lineData.substr(pos + 1, length);
-                    this->mHeadMap.insert(std::make_pair(key, val));
-                }
-            }
-            if(this->mState == HttpDecodeState::Content)
-            {
-                if(this->mMethod == "GET")
-                {
-                    size_t pos = this->mPath.find("?");
-                    if(pos != std::string::npos)
-                    {
-                        this->mContent = mPath.substr(pos + 1);
-                        this->mPath = this->mPath.substr(0, pos);
-                        return HttpStatus::OK;
-                    }
-                }
-                else if(this->mMethod == "POST")
-                {
-					std::string len;
-					if(!this->GetHeadContent("content-length", len))
+					Helper::String::Tolower(key);
+					std::string val = lineData.substr(pos + 1, length);
+					this->mHeadMap.insert(std::make_pair(key, val));
+				}
+			}
+			if (this->mState == HttpDecodeState::Content)
+			{
+				if (this->mMethod == "GET")
+				{
+					size_t pos = this->mPath.find("?");
+					if (pos != std::string::npos)
 					{
-						return HttpStatus::LENGTH_REQUIRED;
+						this->mContent = mPath.substr(pos + 1);
+						this->mPath = this->mPath.substr(0, pos);
 					}
-                    this->mContentLength = std::stol(len);
-                    if(this->mContentLength <= 0)
-                    {
-                        return HttpStatus::LENGTH_REQUIRED;
-                    }
-                }
-                else
-                {
-                    return HttpStatus::METHOD_NOT_ALLOWED;
-                }
-            }
-        }
+					return HttpStatus::OK;
+				}
+				else if (this->mMethod != "POST")
+				{
+					return HttpStatus::BAD_REQUEST;
+				}
+			}
+		}
         if(this->mState == HttpDecodeState::Content)
         {
-            if(this->mContentLength == 0)
-            {
-                return HttpStatus::OK;
-            }
             char buffer[256] = { 0 };
             size_t size = io.readsome(buffer, 256);
             while(size > 0)
             {
                 this->mContent.append(buffer, size);
-                if(this->mContent.size() == this->mContentLength)
-                {
-                    this->mState = HttpDecodeState::Finish;
-                    return HttpStatus::OK;
-                }
                 size = io.readsome(buffer, 256);
             }
         }
@@ -309,21 +286,59 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool HttpHandlerResponse::Serailize(std::ostream& os)
+	HttpHandlerResponse::HttpHandlerResponse()
 	{
-		os << HttpVersion << ' ' << (int)this->mCode << ' ' << HttpStatusToString(this->mCode) << "\r\n";
-		for(auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
-		{
-			const std::string & key = iter->first;
-			const std::string & value = iter->second;
-			os << key << ":" << value << "\r\n";
-		}
-		os << "\r\n";
-		os.write(this->mContent.c_str(), this->mContent.size());
-		return true;
+		this->mCount = 0;
+		this->mContentSize = 0;
+		this->mFstream = nullptr;
+		this->mCode = HttpStatus::OK;
 	}
 
-	bool HttpHandlerResponse::AddHead(const std::string& key, const std::string& value)
+	HttpHandlerResponse::~HttpHandlerResponse()
+	{
+		if(this->mFstream != nullptr)
+		{
+			this->mFstream->close();
+			delete this->mFstream;
+		}
+	}
+
+	int HttpHandlerResponse::Serailize(std::ostream& os)
+	{
+		if(this->mCount == 0)
+		{
+			if(this->mFstream == nullptr)
+			{
+				this->mContentSize = this->mContent.size();
+			}
+			this->AddHead("Content-Legth", std::to_string(this->mContentSize));
+			os << HttpVersion << ' ' << (int)this->mCode << ' ' << HttpStatusToString(this->mCode) << "\r\n";
+			for (auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
+			{
+				const std::string& key = iter->first;
+				const std::string& value = iter->second;
+				os << key << ":" << value << "\r\n";
+			}
+			os << "\r\n";
+		}
+		this->mCount++;
+		if(this->mFstream != nullptr)
+		{
+			char buffer[512] = { 0 };
+			this->mFstream->read(buffer, 512);
+			if(this->mFstream->gcount() > 0)
+			{
+				printf("count = %d\n", this->mCount);
+				os.write(buffer, this->mFstream->gcount());
+				return this->mContentSize - this->mFstream->gcount();
+			}
+			return 0;
+		}
+		os.write(this->mContent.c_str(), this->mContent.size());
+		return 0;
+	}
+
+	bool HttpHandlerResponse::AddHead(const char * key, const std::string& value)
 	{
 		auto iter = this->mHeadMap.find(key);
 		if(iter != this->mHeadMap.end())
@@ -334,19 +349,21 @@ namespace Sentry
 		return true;
 	}
 
-	void HttpHandlerResponse::Write(HttpStatus code, const std::string& content)
+	void HttpHandlerResponse::SetCode(HttpStatus code)
 	{
 		this->mCode = code;
-		this->mContent = content;
-		this->AddHead("Content-Type", "text/plain; charset=utf-8");
-		this->AddHead("Content-Length", std::to_string(content.size()));
 	}
 
-	void HttpHandlerResponse::Write(HttpStatus code, Json::Writer& jsonWriter)
+	void HttpHandlerResponse::WriteString(const std::string& content)
 	{
-		this->mCode = code;
-		jsonWriter.WriterStream(this->mContent);
-		this->AddHead("Content-Type", "application/json; charset=utf-8");
-		this->AddHead("Content-Length", std::to_string(this->mContent.size()));
+		this->mContent.append(content);
+	}
+
+	void HttpHandlerResponse::WriteFile(std::fstream * ofstream)
+	{
+		this->mFstream = ofstream;
+		this->mFstream->seekg(0, this->mFstream->end);
+		this->mContentSize = ofstream->tellg();
+		this->mFstream->seekp(0, this->mFstream->beg);
 	}
 }

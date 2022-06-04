@@ -72,7 +72,11 @@ namespace Sentry
 			serviceConfog.Service = this->mName;
 			serviceConfog.Type = jsonValue["Type"].GetString();
 			serviceConfog.Path = jsonValue["Path"].GetString();
-			serviceConfog.Content = jsonValue["Content"].GetString();
+			serviceConfog.IsAsync = jsonValue["Async"].GetBool();
+			if(jsonValue.HasMember("Content"))
+			{
+				serviceConfog.Content = jsonValue["Content"].GetString();
+			}
 			this->mConfigs.emplace(serviceConfog.Method, serviceConfog);
 		}
 		return true;

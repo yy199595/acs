@@ -51,6 +51,21 @@ namespace Lua
 		return false;
 	}
 
+	bool Function::Get(lua_State* lua, const char* func)
+	{
+		if(lua_getglobal(lua, func))
+		{
+			if(lua_isfunction(lua, -1))
+			{
+				int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
+				lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+				mRefFunctions.emplace(func, ref);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	WaitLuaTaskSource* Function::Call(lua_State * lua, int ref)
 	{
 		if(!Lua::Function::Get(lua, "coroutine", "call"))

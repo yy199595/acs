@@ -35,7 +35,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(LocalRpcService::LateAwake());
 		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-		return this->GetConfig().GetListenerAddress("rpc", this->mAddress);
+		return this->GetConfig().GetListener("rpc", this->mAddress);
 	}
 
 	XCode GateService::Ping(const std::string & address)
@@ -65,7 +65,7 @@ namespace Sentry
 	XCode GateService::QueryListener(com::Type::String& response)
 	{
 		std::string address;
-		if (this->GetConfig().GetListenerAddress("gate", address))
+		if (this->GetConfig().GetListener("gate", address))
 		{
 			response.set_str(address);
 			return XCode::Successful;

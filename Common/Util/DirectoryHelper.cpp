@@ -187,7 +187,7 @@ namespace Helper
 		{
 			return false;
 		}
-        director = path.substr(0, pos);
+        director = path.substr(0, pos + 1);
         fileName = path.substr(pos + 1);
         return true;
     }

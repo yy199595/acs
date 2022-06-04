@@ -335,7 +335,7 @@ public:
   {
   }
 
-  /// Write some data to the handle at the specified offset.
+  /// WriteFile some data to the handle at the specified offset.
   /**
    * This function is used to write data to the random-access handle. The
    * function call will block until one or more bytes of the data has been
@@ -374,7 +374,7 @@ public:
     return s;
   }
 
-  /// Write some data to the handle at the specified offset.
+  /// WriteString some data to the handle at the specified offset.
   /**
    * This function is used to write data to the random-access handle. The
    * function call will block until one or more bytes of the data has been

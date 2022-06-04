@@ -180,7 +180,7 @@ public:
       const tracked_handler& h, const char* op_name,
       const asio::error_code& ec, std::size_t bytes_transferred);
 
-  // Write a line of output.
+  // WriteString a line of output.
   ASIO_DECL static void write_line(const char* format, ...);
 
 private:

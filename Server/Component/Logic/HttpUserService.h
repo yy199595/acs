@@ -6,8 +6,6 @@
 #define USER_ID_START 7788
 namespace Sentry
 {
-
-	class ServiceProxy;
 	class MainRedisComponent;
 	class MysqlProxyComponent;
 	class HttpUserService : public LocalHttpService, public IComplete
@@ -22,9 +20,9 @@ namespace Sentry
 		void OnAllServiceStart() final;
 		bool OnStartService(HttpServiceRegister &serviceRegister) final;
 	 private:
-		XCode Login(const Json::Reader& request, Json::Writer& response);
+		XCode Login(const HttpHandlerRequest& request, HttpHandlerResponse& response);
 
-		XCode Register(const Json::Reader& request, Json::Writer& response);
+		XCode Register(const HttpHandlerRequest& request, HttpHandlerResponse& response);
 
 	 private:
 		void NewToken(const std::string& account, std::string & token);

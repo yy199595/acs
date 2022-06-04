@@ -138,12 +138,12 @@ public:
       ASIO_MOVE_ARG(WriteHandler) handler
         ASIO_DEFAULT_COMPLETION_TOKEN(executor_type));
 
-  /// Write the given data to the stream. Returns the number of bytes written.
+  /// WriteString the given data to the stream. Returns the number of bytes written.
   /// Throws an exception on failure.
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers);
 
-  /// Write the given data to the stream. Returns the number of bytes written,
+  /// WriteString the given data to the stream. Returns the number of bytes written,
   /// or 0 if an error occurred and the error handler did not throw.
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,

@@ -37,7 +37,7 @@ namespace asio {
  */
 /*@{*/
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -79,7 +79,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type = 0);
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -122,7 +122,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -176,7 +176,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -225,7 +225,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
 
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -262,7 +262,7 @@ std::size_t write(SyncWriteStream& s,
       !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
     >::type = 0);
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -300,7 +300,7 @@ std::size_t write(SyncWriteStream& s,
       !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -348,7 +348,7 @@ std::size_t write(SyncWriteStream& s,
       !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -400,7 +400,7 @@ std::size_t write(SyncWriteStream& s,
 #if !defined(ASIO_NO_EXTENSIONS)
 #if !defined(ASIO_NO_IOSTREAM)
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -429,7 +429,7 @@ std::size_t write(SyncWriteStream& s,
 template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b);
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -459,7 +459,7 @@ template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
     asio::error_code& ec);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -499,7 +499,7 @@ template <typename SyncWriteStream, typename Allocator,
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
     CompletionCondition completion_condition);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -544,7 +544,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
 #endif // !defined(ASIO_NO_EXTENSIONS)
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -577,7 +577,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type = 0);
 
-/// Write all of the supplied data to a stream before returning.
+/// WriteString all of the supplied data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -611,7 +611,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:
@@ -655,7 +655,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type = 0);
 
-/// Write a certain amount of data to a stream before returning.
+/// WriteString a certain amount of data to a stream before returning.
 /**
  * This function is used to write a certain number of bytes of data to a stream.
  * The call will block until one of the following conditions is true:

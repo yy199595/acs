@@ -15,7 +15,7 @@ namespace Tcp
 		{
 		public:
 			RpcProtoMessage(MESSAGE_TYPE type, std::shared_ptr<Message> message);
-			bool Serailize(std::ostream &os) final;
+			int Serailize(std::ostream &os) final;
 		private:
 			MESSAGE_TYPE mType;
 			std::shared_ptr<Message> mMessage;

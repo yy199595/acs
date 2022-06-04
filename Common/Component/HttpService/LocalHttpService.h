@@ -8,9 +8,10 @@
 #include"Component/Component.h"
 #include"Method/MethodRegister.h"
 #include"Global/ServiceConfig.h"
+#include"Network/Http/HttpAsyncRequest.h"
 namespace Sentry
 {
-	class LocalHttpService : public Component, public IService<Json::Reader, Json::Writer>
+	class LocalHttpService : public Component, public IService<HttpHandlerRequest, HttpHandlerResponse>
 	{
 	 public:
 		LocalHttpService();
@@ -24,7 +25,7 @@ namespace Sentry
 	 public:
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		const HttpServiceConfig & GetServiceConfig() const { return *this->mConfig; }
-		XCode Invoke(const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response) final;
+		XCode Invoke(const std::string & name, std::shared_ptr<HttpHandlerRequest>, std::shared_ptr<HttpHandlerResponse>) final;
 	 private:
 		HttpServiceConfig * mConfig;
 		std::shared_ptr<HttpServiceRegister> mServiceRegister;

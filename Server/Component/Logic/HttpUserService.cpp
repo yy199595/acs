@@ -1,7 +1,6 @@
 ﻿#include"HttpUserService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"Util/MathHelper.h"
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Redis/MainRedisComponent.h"
@@ -37,12 +36,12 @@ namespace Sentry
 
 	}
 
-	XCode HttpUserService::Login(const Json::Reader& request, Json::Writer& response)
+	XCode HttpUserService::Login(const HttpHandlerRequest& request, HttpHandlerResponse& response)
 	{
-		std::string ip, account, password;
-		LOGIC_THROW_ERROR(request.GetMember("ip", ip));
-		LOGIC_THROW_ERROR(request.GetMember("account", account));
-		LOGIC_THROW_ERROR(request.GetMember("password", password));
+		std::string account, password;
+		Json::Reader jsonRead(request.GetContent());
+		LOGIC_THROW_ERROR(jsonRead.GetMember("account", account));
+		LOGIC_THROW_ERROR(jsonRead.GetMember("password", password));
 
 		Json::Writer queryJson;
 		queryJson.AddMember("account", account);
@@ -58,7 +57,7 @@ namespace Sentry
 		if (userAccount->password() != password)
 		{
 			LOG_ERROR(account << " login failure password error");
-			response.AddMember("error", "user password error");
+			response.WriteString("user password error");
 			return XCode::Failure;
 		}
 		std::string newToken;
@@ -66,9 +65,7 @@ namespace Sentry
 		this->NewToken(account, newToken);
 		jsonWriter.AddMember("token", newToken);
 		jsonWriter.AddMember("last_login_time", Helper::Time::GetNowSecTime());
-
-		string updateJson = jsonWriter.ToJsonString();
-		this->mMysqlComponent->Update<db_account::tab_user_account>(updateJson, whereJson);
+		this->mMysqlComponent->Update<db_account::tab_user_account>(jsonWriter.ToJsonString(), whereJson);
 
 		std::string address;
 		if (!this->mGateService->GetAddressProxy().GetAddress(address))
@@ -82,20 +79,23 @@ namespace Sentry
 		}
 		if(this->mUserSyncComponent->SetToken(newToken, userAccount->user_id(), 30))
 		{
-			response.AddMember("token", newToken);
-			response.AddMember("address", gateAddress->str());
+			Json::Writer jsonResponse;
+			jsonResponse.AddMember("token", newToken);
+			jsonResponse.AddMember("address", gateAddress->str());
+			response.WriteString(jsonResponse.ToJsonString());
 			return XCode::Successful;
 		}
 		return XCode::RedisSocketError;
 	}
 
-	XCode HttpUserService::Register(const Json::Reader& request, Json::Writer& response)
+	XCode HttpUserService::Register(const HttpHandlerRequest& request, HttpHandlerResponse& response)
 	{
 		long long phoneNumber = 0;
 		string user_account, user_password;
-		LOGIC_THROW_ERROR(request.GetMember("account", user_account));
-		LOGIC_THROW_ERROR(request.GetMember("password", user_password));
-		LOGIC_THROW_ERROR(request.GetMember("phone_num", phoneNumber));
+		Json::Reader jsonRead(request.GetContent());
+		LOGIC_THROW_ERROR(jsonRead.GetMember("account", user_account));
+		LOGIC_THROW_ERROR(jsonRead.GetMember("password", user_password));
+		LOGIC_THROW_ERROR(jsonRead.GetMember("phone_num", phoneNumber));
 		long long userId = this->mUserSyncComponent->AddNewUser(user_account);
 		LOG_DEBUG(user_account << " start register ....");
 		if(userId == 0)

@@ -1532,7 +1532,7 @@ bool non_blocking_send(socket_type s,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = socket_ops::send(s, bufs, count, flags, ec);
 
     // Check if operation succeeded.
@@ -1563,7 +1563,7 @@ bool non_blocking_send1(socket_type s,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = socket_ops::send1(s, data, size, flags, ec);
 
     // Check if operation succeeded.
@@ -1676,7 +1676,7 @@ size_t sync_sendto(socket_type s, state_type state, const buf* bufs,
     return 0;
   }
 
-  // Write some data.
+  // WriteString some data.
   for (;;)
   {
     // Try to complete the operation without blocking.
@@ -1709,7 +1709,7 @@ size_t sync_sendto1(socket_type s, state_type state, const void* data,
     return 0;
   }
 
-  // Write some data.
+  // WriteString some data.
   for (;;)
   {
     // Try to complete the operation without blocking.
@@ -1741,7 +1741,7 @@ bool non_blocking_sendto(socket_type s,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = socket_ops::sendto(
         s, bufs, count, flags, addr, addrlen, ec);
 
@@ -1774,7 +1774,7 @@ bool non_blocking_sendto1(socket_type s,
 {
   for (;;)
   {
-    // Write some data.
+    // WriteString some data.
     signed_size_type bytes = socket_ops::sendto1(
         s, data, size, flags, addr, addrlen, ec);
 
