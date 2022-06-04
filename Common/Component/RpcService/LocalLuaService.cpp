@@ -21,25 +21,26 @@ namespace Sentry
 	bool LocalLuaService::StartService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
-		std::vector<std::string> methods;
-		const char * tab = this->GetName().c_str();
-		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
-		rpcConfig.GetMethods(this->GetName(), methods);
 
-		for (const std::string& method : methods)
+		std::vector<const RpcInterfaceConfig *> rpcInterConfigs;
+		const RpcServiceConfig & rpcServiceConfig = this->GetServiceConfig();
+		rpcServiceConfig.GetConfigs(rpcInterConfigs);
+
+		for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{
-			const char * func = method.c_str();
-			if(!Lua::Function::Get(this->mLuaEnv, tab, func))
+			const char* func = rpcInterfaceConfig->Method.c_str();
+			const char * tab = rpcInterfaceConfig->Service.c_str();
+			if (!Lua::Function::Get(this->mLuaEnv, tab, func))
 			{
-				LOG_ERROR("not find rpc method = [" << tab <<'.' << func << ']');
+				LOG_ERROR("not find rpc method = [" << tab << '.' << func << ']');
 				return false;
 			}
-			string fullName = fmt::format("{0}.{1}", this->GetName(), method);
-			const InterfaceConfig * config = rpcConfig.GetInterfaceConfig(fullName);
-			if(!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>(config->Service, config->Method, this->mLuaEnv)))
+			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>(
+				rpcInterfaceConfig->Service, rpcInterfaceConfig->Method, this->mLuaEnv)))
 			{
 				return false;
 			}
+
 		}
 		return true;
 	}
@@ -62,16 +63,7 @@ namespace Sentry
 			LOG_ERROR("not find lua [" << this->GetName() << "." << name << "]");
 			return XCode::CallServiceNotFound;
 		}
-
-		try
-		{
-			return serviceMethod->Invoke(*request, *response);
-		}
-		catch (std::logic_error& logic_error)
-		{
-			response->set_error_str(logic_error.what());
-			return XCode::ThrowError;
-		}
+		return serviceMethod->Invoke(*request, *response);
 	}
 
 
@@ -88,10 +80,6 @@ namespace Sentry
 		}
 		const char * tab = this->GetName().c_str();
 		if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
-		{
-			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
-		}
-		if(Lua::lua_getfunction(this->mLuaEnv, tab, "LateAwake"))
 		{
 			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
 		}

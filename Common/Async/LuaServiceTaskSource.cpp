@@ -3,14 +3,24 @@
 //
 
 #include"LuaServiceTaskSource.h"
-#include"Pool/MessagePool.h"
-
+#include"Script/UserDataParameter.h"
 namespace Sentry
 {
-    LuaServiceTaskSource::LuaServiceTaskSource()
+    LuaServiceTaskSource::LuaServiceTaskSource(lua_State * lua)
     {
+		this->mRef = 0;
+		this->mLua = lua;
         this->mCode = XCode::LuaCoroutineWait;
     }
+
+	LuaServiceTaskSource::~LuaServiceTaskSource()
+	{
+		if(this->mRef != 0)
+		{
+			luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		}
+	}
+
     XCode LuaServiceTaskSource::Await()
     {
         if(this->mCode == XCode::LuaCoroutineWait) {
@@ -19,17 +29,15 @@ namespace Sentry
         return this->mCode;
     }
 
-	void LuaServiceTaskSource::SetError(const std::string& error)
+	int LuaServiceTaskSource::SetResult(lua_State* lua)
 	{
-		this->mCode = XCode::CallLuaFunctionFail;
-		this->mJson = std::move(error);
-		this->mTaskSource.SetResult(this->mCode);
+		std::shared_ptr<LuaServiceTaskSource> luaServiceTaskSource =
+			Lua::UserDataParameter::Read<std::shared_ptr<LuaServiceTaskSource>>(lua, 1);
+		luaServiceTaskSource->mCode = (XCode)lua_tointeger(lua, 2);
+		if(luaServiceTaskSource->mCode == XCode::Successful && lua_istable(lua, 3))
+		{
+			luaServiceTaskSource->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+		}
+		luaServiceTaskSource->mTaskSource.SetResult(luaServiceTaskSource->mCode);
 	}
-
-    void LuaServiceTaskSource::SetResult(int result, std::string & json)
-    {
-        this->mCode = (XCode) result;
-        this->mJson = std::move(json);
-        this->mTaskSource.SetResult(this->mCode);
-    }
 }

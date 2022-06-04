@@ -11,14 +11,14 @@
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
-#ifdef __DEBUG__
-#include"Pool/MessagePool.h"
+#ifdef __RPC_DEBUG_LOG__
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"GateService.h"
 #include"GateProxyComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
+#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Scene/MessageComponent.h"
 namespace Sentry
 {
 
@@ -26,6 +26,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
+		this->mMsgComponent = this->GetComponent<MessageComponent>();
 		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
@@ -33,11 +34,22 @@ namespace Sentry
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig* config = rpcConfig.GetInterfaceConfig(request->method_name());
-		if (config == nullptr || config->Type != "Client")
+		std::string method;
+		std::string service;
+		if(!RpcServiceConfig::ParseFunName(request->method_name(), service, method))
 		{
 			LOG_ERROR("call function " << request->method_name() << " not find");
+			return XCode::NotFoundRpcConfig;
+		}
+		ServiceComponent* localServerRpc = this->GetApp()->GetService(service);
+		if(localServerRpc == nullptr)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		const RpcServiceConfig & rpcServiceConfig = localServerRpc->GetServiceConfig();
+		const RpcInterfaceConfig* config = rpcServiceConfig.GetConfig(method);
+		if(config == nullptr)
+		{
 			return XCode::NotFoundRpcConfig;
 		}
 
@@ -53,9 +65,10 @@ namespace Sentry
 
 		std::shared_ptr<com::Rpc::Request> userRequest =
 			std::make_shared<com::Rpc::Request>();
+
+		userRequest->set_func(config->FullName);
 		userRequest->set_rpc_id(request->rpc_id());
 		userRequest->set_address(request->address());
-		userRequest->set_method_id(config->InterfaceId);
 		userRequest->mutable_data()->CopyFrom(request->data());
 		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, config, userRequest);
 		return XCode::Successful;
@@ -72,22 +85,6 @@ namespace Sentry
 
 	void GateComponent::OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request)
 	{
-#if __RPC_DEBUG_LOG__
-		std::string json;
-		long long userId = 0;
-		LOG_DEBUG("========== client request ==========");
-		LOG_DEBUG("func = " << config->FullName);
-		LOG_DEBUG("rpc = " << request->rpc_id());
-		if (this->mGateClientComponent->GetUserId(request->address(), userId))
-		{
-			LOG_DEBUG("userId = " << userId);
-		}
-		if (request->has_data() && Proto::GetJson(request->data(), json))
-		{
-			LOG_DEBUG("json = " << json);
-		}
-		LOG_DEBUG("=====================================");
-#endif
 		std::shared_ptr<c2s::Rpc::Response> response =
 			std::make_shared<c2s::Rpc::Response>();
 		response->set_rpc_id(request->rpc_id());
@@ -97,15 +94,6 @@ namespace Sentry
 			this->mGateClientComponent->StartClose(request->address());
 			return;
 		}
-#if __RPC_DEBUG_LOG__
-		LOG_WARN("********** client response**********");
-		LOG_DEBUG("func = " << config->FullName);
-		if (response->has_data() && Helper::Proto::GetJson(response->data(), json))
-		{
-			LOG_WARN("json = " << json);
-		}
-		LOG_WARN("*****************************************");
-#endif
 		this->mGateClientComponent->SendToClient(request->address(), response);
 	}
 
@@ -145,7 +133,7 @@ namespace Sentry
 		}
 		rpcRequest->set_user_id(userId);
 		std::shared_ptr<Message> rpcResponse = config->Response.empty()
-											   ? nullptr : Helper::Proto::New(config->Response);
+											   ? nullptr : this->mMsgComponent->New(config->Response);
 
 		XCode code = localServerRpc->Call(address, rpcRequest, rpcResponse);
 		if (code == XCode::Successful && rpcResponse != nullptr)

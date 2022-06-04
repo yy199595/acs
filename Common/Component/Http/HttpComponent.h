@@ -45,5 +45,6 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
 #endif
+		std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
 	};
 }

@@ -1,92 +1,98 @@
 #include"LuaServiceMethod.h"
 #include"Script/Function.h"
 #include"App/App.h"
-#include"Pool/MessagePool.h"
 #include"Global/ServiceConfig.h"
 #include"Async/LuaServiceTaskSource.h"
+#include"Component/Scene/MessageComponent.h"
+#include<google/protobuf/util/json_util.h>
+#include<Script/Extension/Coroutine/LuaCoroutine.h>
 namespace Sentry
 {
 
 	LuaServiceMethod::LuaServiceMethod(const std::string& service, const std::string& func, lua_State* lua)
 		: ServiceMethod(func), mLuaEnv(lua)
 	{
-		this->mFunction = fmt::format("{0}.{1}", service, func);
+		this->mFunction = func;
+		this->mServiceCompoent = App::Get()->GetService(service);
+		this->mMsgComponent = App::Get()->GetComponent<MessageComponent>();
 	}
 
-	XCode LuaServiceMethod::Call(long long id, const std::string& json, com::Rpc::Response & response)
+	XCode LuaServiceMethod::Call(long long id, std::shared_ptr<Message> request, com::Rpc::Response & response)
 	{
-		if(!Lua::Function::Get(this->mLuaEnv, "Service", "Call"))
-		{
-			return XCode::CallLuaFunctionFail;
-		}
-		const ServiceConfig & config = App::Get()->GetServiceConfig();
-		const RpcInterfaceConfig * protoConfig = config.GetInterfaceConfig(this->mFunction);
+		const RpcServiceConfig & rpcServiceConfig = this->mServiceCompoent->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = rpcServiceConfig.GetConfig(this->mFunction);
 		if(protoConfig == nullptr || !Lua::Function::Get(this->mLuaEnv,
 			protoConfig->Service.c_str(), protoConfig->Method.c_str()))
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		Lua::Parameter::WriteArgs(this->mLuaEnv, id, json);
-		if (lua_pcall(this->mLuaEnv, 3, 2, 0) != 0)
+		int count = 1;
+		lua_pushinteger(this->mLuaEnv, id);
+		if(request != nullptr)
+		{
+			count++;
+			this->mMsgComponent->Write(this->mLuaEnv, *request);
+		}
+		if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
 		{
 			response.set_error_str(lua_tostring(this->mLuaEnv, -1));
 			LOG_ERROR("[" << protoConfig->FullName << "] " << response.error_str());
 			return XCode::CallLuaFunctionFail;
 		}
 		const std::string & res = protoConfig->Response;
-		XCode code = (XCode)lua_tointeger(this->mLuaEnv, -1);
+		XCode code = (XCode)lua_tointeger(this->mLuaEnv, -2);
 		if (code != XCode::Successful || res.empty())
 		{
 			return code;
 		}
-
-		size_t size = 0;
-		const char* str = lua_tolstring(this->mLuaEnv, -2, &size);
-		std::shared_ptr<Message> message = Helper::Proto::NewByJson(res, str, size);
+		std::shared_ptr<Message> message = this->mMsgComponent->Read(this->mLuaEnv, res, -1);
 		if(message == nullptr)
 		{
-			LOG_ERROR("res json = " << std::string(str, size));
-			return XCode::JsonCastProtoFailure;
+			return XCode::CreateProtoFailure;
 		}
 		response.mutable_data()->PackFrom(*message);
 		return XCode::Successful;
 	}
 
-	XCode LuaServiceMethod::CallAsync(long long id, const std::string& json, com::Rpc::Response & response)
+	XCode LuaServiceMethod::CallAsync(long long id, std::shared_ptr<Message> message, com::Rpc::Response & response)
 	{
-		if(!Lua::Function::Get(this->mLuaEnv, "Service", "CallAsync"))
+		const RpcServiceConfig & rpcServiceConfig = this->mServiceCompoent->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = rpcServiceConfig.GetConfig(this->mFunction);
+
+		std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLuaEnv));
+
+		if(!Lua::Function::Get(this->mLuaEnv, "Service", "Call"))
 		{
-			return XCode::CallLuaFunctionFail;
+			return XCode::Failure;
 		}
-		const ServiceConfig & config = App::Get()->GetServiceConfig();
-		const RpcInterfaceConfig * protoConfig = config.GetInterfaceConfig(this->mFunction);
+
 		if(protoConfig == nullptr || !Lua::Function::Get(this->mLuaEnv,
 			protoConfig->Service.c_str(), protoConfig->Method.c_str()))
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		Lua::Parameter::WriteArgs(this->mLuaEnv, id, json);
-		if (lua_pcall(this->mLuaEnv, 3, 1, 0) != 0)
+		lua_pushinteger(this->mLuaEnv, id);
+		this->mMsgComponent->Write(this->mLuaEnv, *message);
+		Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
+		if (lua_pcall(this->mLuaEnv, 4, 1, 0) != 0)
 		{
 			response.set_error_str(lua_tostring(this->mLuaEnv, -1));
 			LOG_ERROR("call lua " << protoConfig->FullName << " " << response.error_str());
 			return XCode::CallLuaFunctionFail;
 		}
-		LuaServiceTaskSource* luaTaskSource = Lua::PtrProxy<LuaServiceTaskSource>::Read(this->mLuaEnv, -1);
-
 		XCode code = luaTaskSource->Await();
 		if(code != XCode::Successful)
 		{
-			response.set_error_str(luaTaskSource->GetJson());
 			return code;
 		}
-		if(!protoConfig->Response.empty())
+		int ref = luaTaskSource->GetTable();
+		if(!protoConfig->Response.empty() && ref != 0)
 		{
-			std::shared_ptr<Message> message = Helper::Proto::NewByJson(
-				protoConfig->Response, luaTaskSource->GetJson());
+			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
+			std::shared_ptr<Message> message = this->mMsgComponent->Read(
+				this->mLuaEnv, protoConfig->Response, -1);
 			if (message == nullptr)
 			{
-				LOG_ERROR("res json = " << luaTaskSource->GetJson());
 				return XCode::JsonCastProtoFailure;
 			}
 			response.mutable_data()->PackFrom(*message);
@@ -96,18 +102,25 @@ namespace Sentry
 
 	XCode LuaServiceMethod::Invoke(const com::Rpc_Request& request, com::Rpc_Response& response)
 	{
-		const ServiceConfig& config = App::Get()->GetServiceConfig();
-		const RpcInterfaceConfig* protoConfig = config.GetInterfaceConfig(this->mFunction);
+		const RpcServiceConfig & rpcServiceConfig = this->mServiceCompoent->GetServiceConfig();
+		const RpcInterfaceConfig * protoConfig = rpcServiceConfig.GetConfig(this->mFunction);
 		if (protoConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		std::string json;
-		if (request.has_data() && !Helper::Proto::GetJson(request.data(), json))
+		std::shared_ptr<Message> message;
+		if (request.has_data())
 		{
-			return XCode::ProtoCastJsonFailure;
+			message = this->mMsgComponent->New(request.data());
+			if(message == nullptr)
+			{
+				return XCode::ProtoCastJsonFailure;
+			}
 		}
-		return protoConfig->IsAsync ? this->CallAsync(request.user_id(),
-			json, response) : this->Call(request.user_id(), json, response);
+		if(!protoConfig->IsAsync)
+		{
+			return this->Call(request.user_id(), message, response);
+		}
+		return this->CallAsync(request.user_id(), message, response);
 	}
 }

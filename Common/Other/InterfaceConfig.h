@@ -19,7 +19,6 @@ namespace Sentry
 	{
 	public:
 		bool IsAsync;
-		int InterfaceId;
 		std::string Type;
 		std::string CallWay;
 		std::string Request;

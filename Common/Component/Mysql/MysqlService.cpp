@@ -1,6 +1,5 @@
 ﻿#include"MysqlService.h"
 #include"App/App.h"
-#include"Pool/MessagePool.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {

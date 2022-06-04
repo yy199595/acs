@@ -6,3 +6,32 @@ message Test
     string address = 1;
     repeated string service = 2;
 }
+
+message Test1
+{
+
+}
+
+message Rpc
+{
+    message Request
+    {
+        string name = 1;
+        int64 user_id = 2;
+        int64 rpc_id = 3;
+        message Call
+        {
+            string name = 1;
+            message Notice
+            {
+                int32 methodId = 1;
+            }
+        }
+    }
+    message Response
+    {
+        string name = 1;
+        int64 user_id = 2;
+        int64 rpc_id = 3;
+    }
+}

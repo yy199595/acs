@@ -5,6 +5,7 @@
 #ifndef SERVER_MESSAGECOMPONENT_H
 #define SERVER_MESSAGECOMPONENT_H
 #include"Component/Component.h"
+#include<google/protobuf/dynamic_message.h>
 #include<google/protobuf/compiler/importer.h>
 namespace Sentry
 {
@@ -28,19 +29,29 @@ namespace Sentry
     class MessageComponent final : public Component, public ILuaRegister
     {
     public:
-        MessageComponent() = default;
+        MessageComponent();
         ~MessageComponent() = default;
     public:
         std::shared_ptr<Message> New(const Any & any);
         std::shared_ptr<Message> New(const std::string & name);
         std::shared_ptr<Message> New(const std::string & name, const std::string & json);
-    private:
+		std::shared_ptr<Message> New(const std::string & name, const char * json, size_t size);
+	 public:
+		bool Write(lua_State * lua, const Message & message);
+		std::shared_ptr<Message> Read(lua_State * lua, const std::string & name, int index);
+	 private:
+		void LoopMessage(const Descriptor * descriptor);
         const Message * FindMessage(const std::string & name);
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-        bool Load(const std::string path, std::vector<std::string> protos);
-    private:
+	 public:
+        bool Load(const std::string & path);
+		bool Import(const std::string & proto);
+	 private:
+		compiler::Importer * mImporter;
+		compiler::DiskSourceTree * mSourceTree;
+		DynamicMessageFactory * mDynamicMessageFactory;
+		std::vector<DynamicMessageFactory *> mDynamicMessageFactorys;
         std::unordered_map<std::string, const Message *> mMessageMap;
-        std::unordered_map<std::string, const FileDescriptor *> mFileDescripors;
     };
 }
 

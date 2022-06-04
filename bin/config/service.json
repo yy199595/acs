@@ -1,7 +1,6 @@
 {
     "MysqlService": {
         "Add": {
-            "Id": 101,
             "Async": true,
             "Timeout": 0,
             "Type": "Server",
@@ -9,7 +8,6 @@
             "Request": "s2s.Mysql.Add"
         },
         "Save": {
-            "Id": 102,
             "Async": true,
             "Timeout": 0,
             "CallWay": "Net",
@@ -17,7 +15,6 @@
             "Request": "s2s.Mysql.Save"
         },
         "Delete": {
-            "Id": 103,
             "Async": true,
             "Timeout": 0,
             "CallWay": "Net",
@@ -25,7 +22,6 @@
             "Request": "s2s.Mysql.Delete"
         },
         "Query": {
-            "Id": 104,
             "Async": true,
             "Timeout": 0,
             "CallWay": "Net",
@@ -34,7 +30,6 @@
             "Response": "s2s.Mysql.Response"
         },
         "Update": {
-            "Id": 105,
             "Async": true,
             "Timeout": 0,
             "CallWay": "Net",
@@ -56,47 +51,40 @@
     },
     "GateService": {
         "Ping": {
-            "Id": 1001,
             "Async": true,
             "Type": "Client",
             "CallWay": "Net"
         },
         "QueryListener": {
-            "Id": 1002,
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
             "Response": "com.Type.String"
         },
         "CallClient": {
-            "Id": 1003,
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
             "Request": "c2s.Rpc.Call"
         },
         "BroadCast": {
-            "Id": 1004,
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
             "Request": "s2s.GateBroadCast.Request"
         },
         "Auth": {
-            "Id": 1005,
             "Async": true,
             "Type": "Client",
             "CallWay": "Net",
             "Request":"c2s.GateAuth.Request"
         },
         "SaveAddress": {
-            "Id": 105,
             "Async": false,
             "Type": "Server",
             "Request": "s2s.Allot.Save"
         },
         "QueryAddress": {
-            "Id": 106,
             "Async": false,
             "Type": "Server",
             "Request": "com.Type.String",
@@ -105,11 +93,17 @@
     },
     "ChatService": {
         "Chat": {
-            "Id": 2001,
-            "Async": false,
+            "Async": true,
             "Type": "Client",
             "CallWay": "Net",
             "Request": "c2s.Chat.Request"
+        },
+        "Test": {
+            "Async": false,
+            "Type": "Client",
+            "CallWay": "Net",
+            "Request": "lua.Test",
+            "Response": "lua.Test"
         }
     }
 }

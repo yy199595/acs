@@ -435,7 +435,7 @@ const ::google::protobuf::uint32 TableStruct_com_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, user_id_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, rpc_id_),
-  PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, method_id_),
+  PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, func_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, address_),
   PROTOBUF_FIELD_OFFSET(::com::Rpc_Request, data_),
   ~0u,  // no _has_bits_
@@ -515,18 +515,18 @@ const char descriptor_table_protodef_com_2eproto[] =
   "ue\030\001 \001(\005\032\026\n\005Int64\022\r\n\005value\030\001 \001(\003\032\026\n\005Floa"
   "t\022\r\n\005value\030\001 \001(\002\032\027\n\006Double\022\r\n\005value\030\001 \001("
   "\001\032\024\n\004Json\022\014\n\004json\030\001 \001(\t\032\025\n\006String\022\013\n\003str"
-  "\030\001 \001(\t\"\202\002\n\003Rpc\032r\n\007Request\022\017\n\007user_id\030\001 \001"
-  "(\003\022\016\n\006rpc_id\030\002 \001(\003\022\021\n\tmethod_id\030\003 \001(\005\022\017\n"
-  "\007address\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132\024.google.pr"
-  "otobuf.Any\032p\n\010Response\022\014\n\004code\030\001 \001(\005\022\016\n\006"
-  "rpc_id\030\002 \001(\003\022\017\n\007user_id\030\003 \001(\003\022\021\n\terror_s"
-  "tr\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132\024.google.protobuf"
-  ".Any\032\025\n\004Auth\022\r\n\005token\030\001 \001(\tb\006proto3"
+  "\030\001 \001(\t\"\375\001\n\003Rpc\032m\n\007Request\022\017\n\007user_id\030\001 \001"
+  "(\003\022\016\n\006rpc_id\030\002 \001(\003\022\014\n\004func\030\003 \001(\t\022\017\n\007addr"
+  "ess\030\004 \001(\t\022\"\n\004Data\030\005 \001(\0132\024.google.protobu"
+  "f.Any\032p\n\010Response\022\014\n\004code\030\001 \001(\005\022\016\n\006rpc_i"
+  "d\030\002 \001(\003\022\017\n\007user_id\030\003 \001(\003\022\021\n\terror_str\030\004 "
+  "\001(\t\022\"\n\004Data\030\005 \001(\0132\024.google.protobuf.Any\032"
+  "\025\n\004Auth\022\r\n\005token\030\001 \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_com_2eproto = {
   false, InitDefaults_com_2eproto, 
   descriptor_table_protodef_com_2eproto,
-  "com.proto", &assign_descriptors_table_com_2eproto, 595,
+  "com.proto", &assign_descriptors_table_com_2eproto, 590,
 };
 
 void AddDescriptors_com_2eproto() {
@@ -4093,7 +4093,7 @@ void Rpc_Request::clear_data() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Rpc_Request::kUserIdFieldNumber;
 const int Rpc_Request::kRpcIdFieldNumber;
-const int Rpc_Request::kMethodIdFieldNumber;
+const int Rpc_Request::kFuncFieldNumber;
 const int Rpc_Request::kAddressFieldNumber;
 const int Rpc_Request::kDataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -4107,6 +4107,10 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  func_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.func().size() > 0) {
+    func_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.func_);
+  }
   address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.address().size() > 0) {
     address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
@@ -4117,18 +4121,19 @@ Rpc_Request::Rpc_Request(const Rpc_Request& from)
     data_ = nullptr;
   }
   ::memcpy(&user_id_, &from.user_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&method_id_) -
-    reinterpret_cast<char*>(&user_id_)) + sizeof(method_id_));
+    static_cast<size_t>(reinterpret_cast<char*>(&rpc_id_) -
+    reinterpret_cast<char*>(&user_id_)) + sizeof(rpc_id_));
   // @@protoc_insertion_point(copy_constructor:com.Rpc.Request)
 }
 
 void Rpc_Request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Rpc_Request_com_2eproto.base);
+  func_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   address_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&data_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&method_id_) -
-      reinterpret_cast<char*>(&data_)) + sizeof(method_id_));
+      reinterpret_cast<char*>(&rpc_id_) -
+      reinterpret_cast<char*>(&data_)) + sizeof(rpc_id_));
 }
 
 Rpc_Request::~Rpc_Request() {
@@ -4137,6 +4142,7 @@ Rpc_Request::~Rpc_Request() {
 }
 
 void Rpc_Request::SharedDtor() {
+  func_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   address_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
@@ -4156,14 +4162,15 @@ void Rpc_Request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  func_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
   }
   data_ = nullptr;
   ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&method_id_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(method_id_));
+      reinterpret_cast<char*>(&rpc_id_) -
+      reinterpret_cast<char*>(&user_id_)) + sizeof(rpc_id_));
   _internal_metadata_.Clear();
 }
 
@@ -4194,11 +4201,20 @@ const char* Rpc_Request::_InternalParse(const char* begin, const char* end, void
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // int32 method_id = 3;
+      // string func = 3;
       case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
-        msg->set_method_id(::google::protobuf::internal::ReadVarint(&ptr));
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("com.Rpc.Request.func");
+        object = msg->mutable_func();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       // string address = 4;
@@ -4290,13 +4306,15 @@ bool Rpc_Request::MergePartialFromCodedStream(
         break;
       }
 
-      // int32 method_id = 3;
+      // string func = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &method_id_)));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_func()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->func().data(), static_cast<int>(this->func().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "com.Rpc.Request.func"));
         } else {
           goto handle_unusual;
         }
@@ -4366,9 +4384,14 @@ void Rpc_Request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->rpc_id(), output);
   }
 
-  // int32 method_id = 3;
-  if (this->method_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->method_id(), output);
+  // string func = 3;
+  if (this->func().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->func().data(), static_cast<int>(this->func().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Request.func");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->func(), output);
   }
 
   // string address = 4;
@@ -4410,9 +4433,15 @@ void Rpc_Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->rpc_id(), target);
   }
 
-  // int32 method_id = 3;
-  if (this->method_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->method_id(), target);
+  // string func = 3;
+  if (this->func().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->func().data(), static_cast<int>(this->func().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "com.Rpc.Request.func");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->func(), target);
   }
 
   // string address = 4;
@@ -4454,6 +4483,13 @@ size_t Rpc_Request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // string func = 3;
+  if (this->func().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->func());
+  }
+
   // string address = 4;
   if (this->address().size() > 0) {
     total_size += 1 +
@@ -4480,13 +4516,6 @@ size_t Rpc_Request::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->rpc_id());
-  }
-
-  // int32 method_id = 3;
-  if (this->method_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->method_id());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -4516,6 +4545,10 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.func().size() > 0) {
+
+    func_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.func_);
+  }
   if (from.address().size() > 0) {
 
     address_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.address_);
@@ -4528,9 +4561,6 @@ void Rpc_Request::MergeFrom(const Rpc_Request& from) {
   }
   if (from.rpc_id() != 0) {
     set_rpc_id(from.rpc_id());
-  }
-  if (from.method_id() != 0) {
-    set_method_id(from.method_id());
   }
 }
 
@@ -4559,12 +4589,13 @@ void Rpc_Request::Swap(Rpc_Request* other) {
 void Rpc_Request::InternalSwap(Rpc_Request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  func_.Swap(&other->func_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   address_.Swap(&other->address_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(data_, other->data_);
   swap(user_id_, other->user_id_);
   swap(rpc_id_, other->rpc_id_);
-  swap(method_id_, other->method_id_);
 }
 
 ::google::protobuf::Metadata Rpc_Request::GetMetadata() const {

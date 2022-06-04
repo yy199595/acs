@@ -31,9 +31,18 @@ namespace Sentry
 
 	XCode RpcHandlerComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
-		unsigned short methodId = request->method_id();
-		const ServiceConfig & rpcConfig = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig* rpcInterfaceConfig = rpcConfig.GetInterfaceConfig(methodId);
+		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
+		{
+			return XCode::NotFoundRpcConfig;
+		}
+		ServiceComponent * logicService = this->GetApp()->GetService(this->mTempService);
+		if (logicService == nullptr || !logicService->IsStartService())
+		{
+			LOG_ERROR("call service not exist : [" << this->mTempService << "]");
+			return XCode::CallServiceNotFound;
+		}
+		const RpcServiceConfig & rpcServiceConfig = logicService->GetServiceConfig();
+		const RpcInterfaceConfig* rpcInterfaceConfig = rpcServiceConfig.GetConfig(this->mTempMethod);
 		if (rpcInterfaceConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -57,15 +66,11 @@ namespace Sentry
 		}
 
 		const std::string& service = rpcInterfaceConfig->Service;
-		ServiceComponent * logicService = this->GetApp()->GetService(service);
-		if (logicService == nullptr || !logicService->IsStartService())
-		{
-			LOG_ERROR("call service not exist : [" << service << "]");
-			return XCode::CallServiceNotFound;
-		}
+
 		std::shared_ptr<com::Rpc::Response> response = std::make_shared<com::Rpc::Response>();
 		if (!rpcInterfaceConfig->IsAsync)
 		{
+			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
 			if(request->rpc_id() == 0)
@@ -88,11 +93,13 @@ namespace Sentry
 				return XCode::SerializationFailure;
 			}
 			this->mRpcClientComponent->Send(request->address(), response);
+			LOG_INFO("call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
 			return XCode::Successful;
 		}
 
 		this->mCorComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
 		{
+			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
 			if(request->rpc_id() == 0)
@@ -115,6 +122,7 @@ namespace Sentry
 				return XCode::SerializationFailure;
 			}
 			this->mRpcClientComponent->Send(request->address(), response);
+			LOG_INFO("async call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
 			return XCode::Successful;
 		});
 		return XCode::Successful;

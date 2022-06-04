@@ -2,7 +2,6 @@
 // Created by zmhy0073 on 2022/1/15.
 //
 #include"RedisClientContext.h"
-#include"Pool/MessagePool.h"
 #include"Util/FileHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 namespace Sentry

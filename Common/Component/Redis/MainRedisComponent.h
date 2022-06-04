@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include"Util/Guid.h"
-#include"Pool/ProtoPool.h"
 #include"Json/JsonWriter.h"
 #include"Other/ElapsedTimer.h"
 #include"RedisBaseComponent.h"

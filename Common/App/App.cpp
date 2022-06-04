@@ -2,7 +2,7 @@
 #include"App.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Script/Table.h"
+#include"Util/FileHelper.h"
 #include"Component/Lua/LuaScriptComponent.h"
 #include"Component/RpcService/LocalLuaService.h"
 using namespace Sentry;
@@ -25,10 +25,16 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if (!this->mConfig->GetMember("path", "service", path)
-			|| !this->mRpcConfig.LoadConfig(path))
+		if (!this->mConfig->GetMember("path", "service", path))
 		{
-			CONSOLE_LOG_ERROR("load service config failure");
+			CONSOLE_LOG_ERROR("not find serice config");
+			return false;
+		}
+
+		rapidjson::Document jsonDocument;
+		if(!Helper::File::ReadJsonFile(path, jsonDocument))
+		{
+			CONSOLE_LOG_ERROR("load service [" << path << "] error");
 			return false;
 		}
 
@@ -48,13 +54,19 @@ namespace Sentry
 				}
 			}
 		}
-		std::vector<std::string> services;
-		this->mRpcConfig.GetService(services);
-		for (const std::string& name: services)
+		auto iter = jsonDocument.MemberBegin();
+		for(;iter != jsonDocument.MemberEnd(); iter++)
 		{
+			const std::string name(iter->name.GetString());
 			if (!this->AddComponentByName(name))
 			{
 				CONSOLE_LOG_ERROR("add " << name << " failure");
+				return false;
+			}
+			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(name);
+			if(serviceBase == nullptr || !serviceBase->LoadConfig(iter->value))
+			{
+				CONSOLE_LOG_ERROR("load " << name << " config error");
 				return false;
 			}
 		}

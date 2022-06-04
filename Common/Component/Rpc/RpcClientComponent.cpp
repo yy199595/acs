@@ -8,8 +8,8 @@
 #include"Component/Scene/NetThreadComponent.h"
 
 #ifdef __DEBUG__
-#include"Pool/MessagePool.h"
 #include"Async/RpcTask/RpcTaskSource.h"
+#include<google/protobuf/util/json_util.h>
 #endif
 namespace Sentry
 {
@@ -31,10 +31,7 @@ namespace Sentry
 		if (iter != this->mRpcClientMap.end())
 		{
 			this->mRpcClientMap.erase(iter);
-#ifdef __DEBUG__
-			const ServiceConfig & rpcConfig = App::Get()->GetServiceConfig();
-			LOG_ERROR(address << " connected code " << rpcConfig.GetCodeDesc(code));
-#endif
+			LOG_WARN("close server address : " << address);
 		}
 	}
 
@@ -131,18 +128,6 @@ namespace Sentry
 		{
 			return false;
 		}
-#ifdef __DEBUG__
-		std::string json;
-		auto config = App::Get()->GetServiceConfig().
-				GetInterfaceConfig(message->method_id());
-		LOG_DEBUG("=============== [send request] ===============");
-		LOG_DEBUG("func = " << config->Service << "."<< config->Method);
-		if (Helper::Proto::GetJson(message, json))
-		{
-			LOG_DEBUG("json = " << json);
-		}
-		LOG_DEBUG("==============================================");
-#endif
 		clientSession->SendToServer(message);
 		return true;
 	}

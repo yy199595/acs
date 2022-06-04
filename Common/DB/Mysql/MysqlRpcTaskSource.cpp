@@ -3,7 +3,6 @@
 //
 
 #include"MysqlRpcTaskSource.h"
-#include"Pool/MessagePool.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 namespace Sentry
 {

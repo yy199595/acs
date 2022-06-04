@@ -3,8 +3,8 @@
 //
 
 #include"LuaWaitTaskSource.h"
-#include"Pool/MessagePool.h"
 #include"Script/Extension/Json/values.hpp"
+#include<google/protobuf/util/json_util.h>
 namespace Sentry
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
@@ -41,7 +41,7 @@ namespace Sentry
 		if (code == XCode::Successful && response != nullptr)
 		{
 			std::string json;
-			if (Proto::GetJson(response, json))
+			if(util::MessageToJsonString(*response, &json).ok())
 			{
 				values::pushDecoded(this->mLua, json.c_str(), json.size());
 				lua_presume(coroutine, this->mLua, 2);

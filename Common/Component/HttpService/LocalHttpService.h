@@ -7,23 +7,26 @@
 #include"Json/JsonReader.h"
 #include"Component/Component.h"
 #include"Method/MethodRegister.h"
-
+#include"Global/ServiceConfig.h"
 namespace Sentry
 {
-	class LoclHttpService : public Component, public IService<Json::Reader, Json::Writer>
+	class LocalHttpService : public Component, public IService<Json::Reader, Json::Writer>
 	{
 	 public:
-		LoclHttpService() = default;
-		virtual ~LoclHttpService() = default;
+		LocalHttpService();
+		virtual ~LocalHttpService() = default;
 	 protected:
 		bool StartService() final;
 		bool CloseService() final;
 		bool IsStartComplete() final { return true; }
+		bool LoadConfig(const rapidjson::Value & json) final;
 		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
 	 public:
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
+		const HttpServiceConfig & GetServiceConfig() const { return *this->mConfig; }
 		XCode Invoke(const std::string& name, std::shared_ptr<Json::Reader> request, std::shared_ptr<Json::Writer> response) final;
 	 private:
+		HttpServiceConfig * mConfig;
 		std::shared_ptr<HttpServiceRegister> mServiceRegister;
 	};
 }

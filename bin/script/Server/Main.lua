@@ -3,8 +3,8 @@
 Main = {}
 function Main.Awake()
     local messageComponent = App.GetComponent("MessageComponent")
-    messageComponent:Load("./proto", {"test.proto"});
-    messageComponent:New("lua.Test", {})
+    messageComponent:Load("./proto");
+    messageComponent:Import("test.proto")
     local timerComponent = App.GetComponent("TimerComponent")
     timerComponent:AddTimer(2000, function()
         print("--------------------")

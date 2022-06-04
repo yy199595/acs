@@ -33,13 +33,12 @@ namespace Sentry
 	 private:
 		void OnTaskTimeout(long long rpcId);
 	 private:
+		std::string mTempMethod;
+		std::string mTempService;
 		class TaskComponent* mCorComponent;
 		class TimerComponent* mTimerComponent;
 		class MainRedisComponent * mRedisComponent;
 		class RpcClientComponent* mRpcClientComponent;
-#ifdef __DEBUG__
-		std::unordered_map<long long, RpcTaskInfo> mRpcInfoMap;
-#endif
 		std::unordered_map<long long, std::shared_ptr<IRpcTask>> mRpcTasks;
 	};
 }

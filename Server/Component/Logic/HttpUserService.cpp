@@ -17,7 +17,7 @@ namespace Sentry
 
 	bool HttpUserService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(LoclHttpService::LateAwake());
+		LOG_CHECK_RET_FALSE(LocalHttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
 		this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
 		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();

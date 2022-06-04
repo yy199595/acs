@@ -82,6 +82,7 @@ namespace Sentry
 		virtual bool CloseService() = 0;
 		virtual bool IsStartService() = 0;
 		virtual bool IsStartComplete() = 0;
+		virtual bool LoadConfig(const rapidjson::Value & json) = 0;
 	};
 
 	template<typename T1, typename T2>

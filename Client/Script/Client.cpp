@@ -4,12 +4,12 @@
 
 #include"Client.h"
 #include"App/App.h"
+#include"Util/StringHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Script/LuaParameter.h"
-#include "Async/Lua/LuaWaitTaskSource.h"
 #include"Component/ClientComponent.h"
-#include"Pool/MessagePool.h"
-#include"Util/StringHelper.h"
+#include "Async/Lua/LuaWaitTaskSource.h"
+#include"Component/Scene/MessageComponent.h"
 using namespace Client;
 using namespace Sentry;
 namespace Lua
@@ -46,10 +46,11 @@ namespace Lua
 			XCode code = (XCode)response->code();
 			if(code == XCode::Successful && response->has_data())
 			{
-				message = Helper::Proto::NewByData(response->data());
+				MessageComponent * messageComponent = App::Get()->GetComponent<MessageComponent>();
+				message = messageComponent->New(response->data());
 			}
 			luaWaitTaskSource->SetResult(code, message);
-			LOG_DEBUG("call " << func << " user time = [" << elapsedTimer.GetMs() << "ms]");
+			LOG_DEBUG("client call " << func << " user time = [" << elapsedTimer.GetMs() << "ms]");
 		});
 		return luaWaitTaskSource->Await();
 	}

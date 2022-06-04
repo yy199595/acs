@@ -3,9 +3,8 @@
 //
 
 #include"RedisDefine.h"
-#include"Pool/MessagePool.h"
 #include"Json/JsonWriter.h"
-
+#include<google/protobuf/util/json_util.h>
 namespace Sentry
 {
     RedisRequest::RedisRequest(const std::string &cmd)
@@ -28,8 +27,10 @@ namespace Sentry
     void RedisRequest::AddParameter(const Message &message)
     {
         std::string json;
-        Helper::Proto::GetJson(message, json);
-        this->AddParameter(json);
+		if(util::MessageToJsonString(message, &json).ok())
+		{
+			this->AddParameter(json);
+		}
     }
 
     void RedisRequest::AddParameter(const std::string &value)

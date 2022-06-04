@@ -5,11 +5,12 @@
 #include"Network/TcpRpcClientContext.h"
 #include"Task/ClientRpcTask.h"
 #include"Script/Client.h"
-
+#include"Script/Extension/Message/Message.h"
 #include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/Lua/LuaScriptComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
+
 namespace Client
 {
 	ClientComponent::ClientComponent()
@@ -41,10 +42,6 @@ namespace Client
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)
     {
-        std::string json;
-        util::MessageToJsonString(*t2, &json);
-
-		LOG_WARN("response json = " << json);
 		auto iter = this->mRpcTasks.find(t2->rpc_id());
 		if(iter != this->mRpcTasks.end())
 		{
@@ -60,6 +57,30 @@ namespace Client
         this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
+
+		s2s::Mysql::Response response;
+		response.set_error("112233");
+		response.add_json_array("11223344");
+		response.add_json_array("55667788");
+
+		com::Rpc::Request request;
+		request.set_user_id(1234);
+		request.set_address("127.0.0.1");
+		request.mutable_data()->PackFrom(response);
+
+		Lua::lua_getfunction(luaState, "Client", "Test");
+		MessageComponent * messageComponent = this->GetComponent<MessageComponent>();
+
+		MessageDecoder messageDecoder(luaState, messageComponent);
+		messageDecoder.Decode(request);
+
+
+		if(lua_pcall(luaState, 1, 0, 0) != 0)
+		{
+			LOG_ERROR(lua_tostring(luaState, -1));
+		}
+
+
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(luaState, "Client", "Awake");
 		if (luaFunction != nullptr)
 		{

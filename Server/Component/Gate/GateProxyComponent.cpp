@@ -3,7 +3,6 @@
 //
 
 #include"GateProxyComponent.h"
-#include"Pool/MessagePool.h"
 #include"Component/Gate/GateService.h"
 #include"Script/LuaParameter.h"
 namespace Sentry

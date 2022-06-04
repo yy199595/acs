@@ -10,7 +10,6 @@
 #include"Script/Extension/App/LuaApp.h"
 #include"Script/Extension/Log/LuaLogger.h"
 #include"Script/Extension/Json/Json.h"
-#include"Script/Extension/Message/Message.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 #include"Component/RpcService/ServiceComponent.h"
 #include"Script/Extension/Bson/bson.h"
@@ -51,9 +50,7 @@ namespace Sentry
 
 		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
 		luaRegister2.BeginRegister<LuaServiceTaskSource>();
-		luaRegister2.PushCtor<LuaServiceTaskSource>();
-		luaRegister2.PushMemberFunction("SetError", &LuaServiceTaskSource::SetError);
-		luaRegister2.PushMemberFunction("SetResult", &LuaServiceTaskSource::SetResult);
+		luaRegister2.PushExtensionFunction("SetResult", LuaServiceTaskSource::SetResult);
 
 		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
 		luaRegister3.BeginNewTable();
@@ -87,11 +84,6 @@ namespace Sentry
 		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
 		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
 		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
-
-		Lua::ClassProxyHelper luaRegister9(this->mLuaEnv, "Message");
-		luaRegister9.BeginNewTable();
-		luaRegister9.PushExtensionFunction("New", Lua::MessageEx::New);
-
 
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
 		if (luaFunction != nullptr)

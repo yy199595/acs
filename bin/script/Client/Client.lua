@@ -1,13 +1,18 @@
 
 Client = {}
+local messageComponent
 function Client.Awake()
-
-    local msg = Message.New("c2s.GateAuth.Request", {
+    messageComponent = App.GetComponent("MessageComponent")
+    local msg = messageComponent:New("c2s.GateAuth.Request", {
         token = "112233"
     })
     print(msg, type(msg))
 
     LoginComponent.Awake()
+end
+
+function Client.Test(tab)
+    print(Json.Encode(tab))
 end
 
 local account = "yjz1995"
@@ -28,16 +33,24 @@ function Client.Start()
     end
     Log.Debug("connect [" , loginInfo.address, "] successful")
 
-    local authMessage = Message.New("c2s.GateAuth.Request", {
+    local authMessage = messageComponent:New("c2s.GateAuth.Request", {
         token = loginInfo.token
     })
 
     clientComponent:Call("GateService.Auth", authMessage)
 
-    local chatMessage = Message.New("c2s.Chat.Request",{
-        msg_type = 1,  message = "nihaoa"
-    })
 
-    local code = clientComponent:Call("ChatService.Chat", chatMessage)
-    Log.Error("code = ", code)
+    while true do
+
+        local testtMessage = messageComponent:New("lua.Test",{
+            address = "127.0.0.1:7799",  service =
+            {
+                "LoginComponent",
+                "RegisterComponent"
+            }
+        })
+
+        local code, res = clientComponent:Call("ChatService.Test", testtMessage)
+        Log.Error("code = ", code, Json.Encode(res))
+    end
 end

@@ -5,9 +5,9 @@
 #include"LuaService.h"
 #include"App/App.h"
 #include"Util/StringHelper.h"
-#include"Pool/MessagePool.h"
 #include"Script/Extension/Json/Json.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
+#include"Component/Scene/MessageComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -42,10 +42,9 @@ namespace Lua
 			luaL_error(lua, "not find service function");
 			return 1;
 		}
-		std::string func = lua_tostring(lua, 3);
-		const ServiceConfig& serviceConfig = App::Get()->GetServiceConfig();
-		std::string fullName = fmt::format("{0}.{1}", callComponent->GetName(), func);
-		const RpcInterfaceConfig* rpcInterfaceConfig = serviceConfig.GetInterfaceConfig(fullName);
+		std::string method = lua_tostring(lua, 3);
+		const RpcServiceConfig & rpcServiceConfig = callComponent->GetServiceConfig();
+		const RpcInterfaceConfig* rpcInterfaceConfig = rpcServiceConfig.GetConfig(method);
 		if (rpcInterfaceConfig == nullptr)
 		{
 			lua_pushinteger(lua, (int)XCode::NotFoundRpcConfig);
@@ -56,7 +55,7 @@ namespace Lua
 			if (!lua_isuserdata(lua, 4))
 			{
 				lua_pushinteger(lua, (int)XCode::CallArgsError);
-				luaL_error(lua, "call %s request message should %s", fullName.c_str(),
+				luaL_error(lua, "call %s request message should %s", rpcInterfaceConfig->FullName.c_str(),
 						rpcInterfaceConfig->Request.c_str());
 				return 0;
 			}
@@ -70,10 +69,11 @@ namespace Lua
 		std::shared_ptr<Message> response;
 		if(!rpcInterfaceConfig->Response.empty())
 		{
-			response = Helper::Proto::New(rpcInterfaceConfig->Response);
+			MessageComponent * messageComponent = App::Get()->GetComponent<MessageComponent>();
+			response = messageComponent->New(rpcInterfaceConfig->Response);
 		}
 		lua_pushthread(lua);
-		request->set_method_id(rpcInterfaceConfig->InterfaceId);
+		request->set_func(rpcInterfaceConfig->FullName);
 		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
 		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
 		taskComponent->Start([lua, request, response, address, luaRpcTaskSource, callComponent, userId]()

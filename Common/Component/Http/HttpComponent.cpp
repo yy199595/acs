@@ -14,7 +14,7 @@
 #include"Network//Http/HttpRequestClient.h"
 #include"Network/Http/HttpHandlerClient.h"
 #include"Script/Extension/Http/LuaHttp.h"
-#include"Component/HttpService/LoclHttpService.h"
+#include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
 
@@ -30,6 +30,22 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
 #endif
+		std::vector<Component *> components;
+		this->GetApp()->GetComponents(components);
+		for(Component * component : components)
+		{
+			LocalHttpService * localHttpService = component->Cast<LocalHttpService>();
+			if(localHttpService != nullptr)
+			{
+				std::vector<const HttpInterfaceConfig *> httpInterConfigs;
+				localHttpService->GetServiceConfig().GetConfigs(httpInterConfigs);
+				for(const HttpInterfaceConfig * httpInterfaceConfig : httpInterConfigs)
+				{
+					this->mHttpConfigs.emplace(httpInterfaceConfig->Path, httpInterfaceConfig);
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -47,9 +63,14 @@ namespace Sentry
 			return;
 		}
 		std::string host;
-		const std::string& url = httpRequestData->GetPath();
-		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
-		const HttpInterfaceConfig* httpConfig = serviceConfig.GetHttpIterfaceConfig(url);
+		const std::string& path = httpRequestData->GetPath();
+		auto iter = this->mHttpConfigs.find(path);
+		if(iter == this->mHttpConfigs.end())
+		{
+			LOG_ERROR("not find http config : " << path);
+			return;
+		}
+		const HttpInterfaceConfig* httpConfig = iter->second;
 #ifdef __HTTP_DEBUG_LOG__
 		ElapsedTimer elapsedTimer;
 #endif
@@ -96,7 +117,7 @@ namespace Sentry
 		unsigned short port = 0;
 		Helper::String::ParseIpAddress(content->GetAddress(), ip, port);
 		jsonReader->AddMember("ip", rapidjson::StringRef(ip.c_str()), jsonReader->GetAllocator());
-		LoclHttpService* httpService = this->GetComponent<LoclHttpService>(httpConfig->Service);
+		LocalHttpService* httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
 		if (httpService == nullptr)
 		{
 			response->AddMember("error", "not find handler component");

@@ -3,7 +3,6 @@
 #include<vector>
 #include<shared_mutex>
 #include<unordered_map>
-
 #include"XCode/XCode.h"
 #include<rapidjson/document.h>
 #include"Other/InterfaceConfig.h"
@@ -16,39 +15,56 @@ namespace Sentry
 		std::string Name;
 		std::string Desc;
 	};
-	class ServiceConfig
+
+	template<typename T>
+	class IServiceConfig
 	{
 	 public:
-		ServiceConfig() = default;
-		~ServiceConfig() = default;
+		IServiceConfig(const std::string & name) : mName(name) {}
 	 public:
-		bool LoadConfig(const std::string & path);
-		void GetService(std::vector<std::string> & services);
-		bool HasServiceMethod(const std::string& service, const std::string& method) const;
+		const T * GetConfig(const std::string & name) const;
+		void GetConfigs(std::vector<const T *> & configs) const;
+		virtual bool OnLoadConfig(const rapidjson::Value & json) = 0;
 	 public:
-		const CodeConfig* GetCodeConfig(int code) const;
-		const RpcInterfaceConfig* GetInterfaceConfig(int methodId) const;
-		const RpcInterfaceConfig* GetInterfaceConfig(const std::string& fullName) const;
-		const HttpInterfaceConfig * GetHttpIterfaceConfig(const std::string & path) const;
-		void GetMethods(const std::string & service, std::vector<std::string> & methods) const;
-
-#ifdef __DEBUG__
-		void DebugCode(XCode code);
-		std::string GetCodeDesc(XCode code) const;
-#endif
-	 private:
-		bool LoadCodeConfig();
-		bool LoadRpcInterface(const std::string & service, const std::string & method, const rapidjson::Value & jsonValue);
-		bool LoadHttpInterface(const std::string & service, const std::string & method, const rapidjson::Value & jsonValue);
-	private:
-		std::string mPath;
-		std::vector<std::string> mServices;
-		std::unordered_map<int, CodeConfig> mCodeDescMap;
-		std::unordered_map<int, RpcInterfaceConfig *> mRpcIdMap;
-		std::unordered_map<std::string, RpcInterfaceConfig *> mRpcNameMap;
-		std::unordered_map<std::string, HttpInterfaceConfig *> mHttpPathMap;
-		std::unordered_map<std::string, std::vector<std::string>> mMethods;
+		const std::string & GetName() const { return this->mName; }
+	 protected:
+		const std::string mName;
+		std::unordered_map<std::string, T> mConfigs;
 	};
 
-#define GKDebugCode(code) { App::Get().GetComponent<RpcConfigComponent>()->DebugCode(code); }
+	template<typename T>
+	const T* IServiceConfig<T>::GetConfig(const std::string& name) const
+	{
+		auto iter = this->mConfigs.find(name);
+		return iter != this->mConfigs.end() ? &iter->second : nullptr;
+	}
+
+	template<typename T>
+	void IServiceConfig<T>::GetConfigs(std::vector<const T*>& configs) const
+	{
+		auto iter = this->mConfigs.begin();
+		for(; iter != this->mConfigs.end(); iter++)
+		{
+			configs.emplace_back(&iter->second);
+		}
+	}
+
+ 	class RpcServiceConfig :  public IServiceConfig<RpcInterfaceConfig>
+	{
+	 public:
+		using IServiceConfig::IServiceConfig;
+	 public:
+		bool OnLoadConfig(const rapidjson::Value &json) final;
+	 public:
+		static bool ParseFunName(const std::string & func, std::string & service, std::string & method);
+	};
+
+	class HttpServiceConfig : public IServiceConfig<HttpInterfaceConfig>
+	{
+	 public:
+		using IServiceConfig::IServiceConfig;
+	 public:
+		bool OnLoadConfig(const rapidjson::Value &json) final;
+	 private:
+	};
 }// namespace Sentry

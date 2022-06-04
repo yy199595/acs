@@ -11,17 +11,17 @@ namespace Sentry
     class LuaServiceTaskSource final
     {
     public:
-        LuaServiceTaskSource();
-        ~LuaServiceTaskSource() = default;
+        LuaServiceTaskSource(lua_State * lua);
+        ~LuaServiceTaskSource();
     public:
-		void SetError(const std::string & error);
-        void SetResult(int code, std::string & json);
+		static int SetResult(lua_State * lua);
     public:
         XCode Await();
-        const std::string & GetJson() { return this->mJson;}
+		int GetTable() { return this->mRef;}
     private:
+		int mRef;
         XCode mCode;
-        std::string mJson;
+		lua_State * mLua;
         TaskSource<XCode> mTaskSource;
     };
 }

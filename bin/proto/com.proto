@@ -66,7 +66,7 @@ message Rpc
      {
           int64 user_id = 1;
           int64 rpc_id = 2;
-          int32 method_id = 3;
+          string func = 3;
           string address = 4;
           google.protobuf.Any Data = 5;
      }

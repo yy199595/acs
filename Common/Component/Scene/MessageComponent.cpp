@@ -30,31 +30,73 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool MessageComponent::Load(const std::string path, std::vector<std::string> protos)
+	MessageComponent::MessageComponent()
+	{
+		this->mImporter = nullptr;
+		this->mSourceTree = nullptr;
+	}
+    bool MessageComponent::Load(const std::string & path)
     {
         ImportError importError;
-        compiler::DiskSourceTree sourceTree;
-        sourceTree.MapPath("", path);
-        compiler::Importer importer(&sourceTree, &importError);
+		this->mMessageMap.clear();
+		for(DynamicMessageFactory * messageFactory : this->mDynamicMessageFactorys)
+		{
+			delete messageFactory;
+		}
+		delete this->mImporter;
+		delete this->mSourceTree;
+		this->mDynamicMessageFactorys.clear();
+		this->mDynamicMessageFactory = nullptr;
+
+		this->mSourceTree = new compiler::DiskSourceTree();
+        this->mSourceTree->MapPath("", path);
+        this->mImporter = new compiler::Importer(this->mSourceTree, &importError);
         if (importError.HasError())
         {
             LOG_ERROR("load proto message [" << path << "] error");
             return false;
         }
-
-        for (const std::string &fileName: protos)
-        {
-            const FileDescriptor *fileDescriptor = importer.Import(fileName);
-            if (fileDescriptor == nullptr)
-            {
-                LOG_ERROR("import [" << fileName << "] error");
-                return false;
-            }
-            LOG_INFO("import [" << fileName << "] successful");
-            this->mFileDescripors.emplace(fileName, fileDescriptor);
-        }
         return true;
     }
+
+	bool MessageComponent::Import(const std::string& fileName)
+	{
+		const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
+		if (fileDescriptor == nullptr)
+		{
+			LOG_ERROR("import [" << fileName << "] error");
+			return false;
+		}
+		LOG_INFO("import [" << fileName << "] successful");
+		this->mDynamicMessageFactory = new DynamicMessageFactory(fileDescriptor->pool());
+		for(int x = 0; x < fileDescriptor->message_type_count(); x++)
+		{
+			const Descriptor * descriptor = fileDescriptor->message_type(x);
+			this->LoopMessage(descriptor);
+			if(descriptor->field_count() > 0)
+			{
+				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor);
+				this->mMessageMap.emplace(message->GetTypeName(), message);
+			}
+		}
+		this->mDynamicMessageFactorys.emplace_back(mDynamicMessageFactory);
+		return true;
+	}
+
+	void MessageComponent::LoopMessage(const Descriptor* descriptor)
+	{
+		for(int y = 0; y < descriptor->nested_type_count(); y++)
+		{
+			auto descriptor1 = descriptor->nested_type(y);
+			this->LoopMessage(descriptor1);
+			if(descriptor1->field_count() > 0)
+			{
+				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor1);
+				this->mMessageMap.emplace(message->GetTypeName(), message);
+			}
+			LOG_INFO("load protobuf message  [" << descriptor1->full_name() << "]");
+		}
+	}
 
     std::shared_ptr<Message> MessageComponent::New(const Any &any)
     {
@@ -64,9 +106,8 @@ namespace Sentry
             return nullptr;
         }
         std::shared_ptr<Message> message = this->New(fullName);
-        if(message != nullptr)
+        if(message != nullptr && any.UnpackTo(message.get()))
         {
-            message->CopyFrom(any);
             return message;
         }
         return nullptr;
@@ -93,6 +134,16 @@ namespace Sentry
         return nullptr;
     }
 
+	std::shared_ptr<Message> MessageComponent::New(const string& name, const char* json, size_t size)
+	{
+		std::shared_ptr<Message> message = this->New(name);
+		if(message != nullptr && util::JsonStringToMessage(StringPiece(json, size), message.get()).ok())
+		{
+			return message;
+		}
+		return nullptr;
+	}
+
     const Message * MessageComponent::FindMessage(const std::string &name)
     {
         auto iter1 = this->mMessageMap.find(name);
@@ -115,24 +166,6 @@ namespace Sentry
             }
             return nullptr;
         }
-
-        //动态查找
-        auto iter = this->mFileDescripors.begin();
-        for(; iter != this->mFileDescripors.end(); iter++)
-        {
-            const FileDescriptor * fileDescriptor = iter->second;
-            const Descriptor * descriptor = fileDescriptor->FindMessageTypeByName(name);
-            if(descriptor != nullptr)
-            {
-                DynamicMessageFactory factory(fileDescriptor->pool());
-                const Message * message = factory.GetPrototype(descriptor);
-                if(message != nullptr)
-                {
-                    this->mMessageMap.emplace(name, message);
-                    return message;
-                }
-            }
-        }
         return nullptr;
     }
 
@@ -140,6 +173,21 @@ namespace Sentry
     {
         luaRegister.BeginRegister<MessageComponent>();
         luaRegister.PushMemberFunction("Load", &MessageComponent::Load);
-        luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
-    }
+		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
+		luaRegister.PushMemberFunction("Import", &MessageComponent::Import);
+		luaRegister.PushExtensionFunction("Decode", &Lua::MessageEx::Decode);
+		luaRegister.PushExtensionFunction("NewJson", &Lua::MessageEx::NewJson);
+	}
+
+	bool MessageComponent::Write(lua_State* lua, const Message& message)
+	{
+		MessageDecoder messageDecoder(lua, this);
+		return messageDecoder.Decode(message);
+	}
+	std::shared_ptr<Message> MessageComponent::Read(lua_State* lua, const std::string& name, int index)
+	{
+		MessageEncoder messageEncoder(lua, this);
+		return messageEncoder.Encode(name, index);
+	}
+
 }

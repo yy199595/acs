@@ -10,14 +10,17 @@ namespace Sentry
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
-		const std::string & name = method->GetName();
-		const ServiceConfig & rpcConfig = App::Get()->GetServiceConfig();
-		if (!rpcConfig.HasServiceMethod(this->mComponent->GetName(), name))
+		ServiceComponent * serviceComponent = this->mComponent->Cast<ServiceComponent>();
+		if(serviceComponent == nullptr)
 		{
-			LOG_FATAL(this->mComponent->GetName() << "." << name << " add failure");
 			return false;
 		}
-
+		const RpcServiceConfig & rpcServiceConfig = serviceComponent->GetServiceConfig();
+		if(!rpcServiceConfig.GetConfig(method->GetName()))
+		{
+			return false;
+		}
+		const std::string & name = method->GetName();
 		if (method->IsLuaMethod())
 		{
 			auto iter = this->mLuaMethodMap.find(name);
@@ -60,17 +63,26 @@ namespace Sentry
 	{
 		std::vector<std::string> methods;
 		const std::string & service = this->mComponent->GetName();
-		App::Get()->GetServiceConfig().GetMethods(service, methods);
-		for(const std::string & name : methods)
+		ServiceComponent * serviceComponent = this->mComponent->Cast<ServiceComponent>();
+		if(serviceComponent == nullptr)
 		{
-			const char * tab = this->mComponent->GetName().c_str();
-			if (Lua::Function::Get(lua, tab, name.c_str()))
+			return false;
+		}
+		std::vector<const RpcInterfaceConfig *> rpcInterfaceConfigs;
+		const RpcServiceConfig & rpcServiceConfig = serviceComponent->GetServiceConfig();
+		rpcServiceConfig.GetConfigs(rpcInterfaceConfigs);
+
+		for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterfaceConfigs)
+		{
+			const char* tab = rpcInterfaceConfig->Service.c_str();
+			const char * func = rpcInterfaceConfig->Method.c_str();
+			if (Lua::Function::Get(lua, tab, func))
 			{
 				std::shared_ptr<LuaServiceMethod> luaServiceMethod
-						= std::make_shared<LuaServiceMethod>(service, name, lua);
-				this->mLuaMethodMap.emplace(name, luaServiceMethod);
+					= std::make_shared<LuaServiceMethod>(service, rpcInterfaceConfig->Method, lua);
+				this->mLuaMethodMap.emplace(rpcInterfaceConfig->Method, luaServiceMethod);
 			}
-			else if(this->GetMethod(name) == nullptr)
+			else if (this->GetMethod(rpcInterfaceConfig->Method) == nullptr)
 			{
 				return false;
 			}

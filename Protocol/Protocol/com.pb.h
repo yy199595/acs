@@ -1737,6 +1737,20 @@ class Rpc_Request :
 
   // accessors -------------------------------------------------------
 
+  // string func = 3;
+  void clear_func();
+  static const int kFuncFieldNumber = 3;
+  const ::std::string& func() const;
+  void set_func(const ::std::string& value);
+  #if LANG_CXX11
+  void set_func(::std::string&& value);
+  #endif
+  void set_func(const char* value);
+  void set_func(const char* value, size_t size);
+  ::std::string* mutable_func();
+  ::std::string* release_func();
+  void set_allocated_func(::std::string* func);
+
   // string address = 4;
   void clear_address();
   static const int kAddressFieldNumber = 4;
@@ -1772,22 +1786,16 @@ class Rpc_Request :
   ::google::protobuf::int64 rpc_id() const;
   void set_rpc_id(::google::protobuf::int64 value);
 
-  // int32 method_id = 3;
-  void clear_method_id();
-  static const int kMethodIdFieldNumber = 3;
-  ::google::protobuf::int32 method_id() const;
-  void set_method_id(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:com.Rpc.Request)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr func_;
   ::google::protobuf::internal::ArenaStringPtr address_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 rpc_id_;
-  ::google::protobuf::int32 method_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -2613,18 +2621,57 @@ inline void Rpc_Request::set_rpc_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:com.Rpc.Request.rpc_id)
 }
 
-// int32 method_id = 3;
-inline void Rpc_Request::clear_method_id() {
-  method_id_ = 0;
+// string func = 3;
+inline void Rpc_Request::clear_func() {
+  func_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::google::protobuf::int32 Rpc_Request::method_id() const {
-  // @@protoc_insertion_point(field_get:com.Rpc.Request.method_id)
-  return method_id_;
+inline const ::std::string& Rpc_Request::func() const {
+  // @@protoc_insertion_point(field_get:com.Rpc.Request.func)
+  return func_.GetNoArena();
 }
-inline void Rpc_Request::set_method_id(::google::protobuf::int32 value) {
+inline void Rpc_Request::set_func(const ::std::string& value) {
   
-  method_id_ = value;
-  // @@protoc_insertion_point(field_set:com.Rpc.Request.method_id)
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Rpc.Request.func)
+}
+#if LANG_CXX11
+inline void Rpc_Request::set_func(::std::string&& value) {
+  
+  func_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Rpc.Request.func)
+}
+#endif
+inline void Rpc_Request::set_func(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Rpc.Request.func)
+}
+inline void Rpc_Request::set_func(const char* value, size_t size) {
+  
+  func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Rpc.Request.func)
+}
+inline ::std::string* Rpc_Request::mutable_func() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Rpc.Request.func)
+  return func_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Rpc_Request::release_func() {
+  // @@protoc_insertion_point(field_release:com.Rpc.Request.func)
+  
+  return func_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Rpc_Request::set_allocated_func(::std::string* func) {
+  if (func != nullptr) {
+    
+  } else {
+    
+  }
+  func_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), func);
+  // @@protoc_insertion_point(field_set_allocated:com.Rpc.Request.func)
 }
 
 // string address = 4;

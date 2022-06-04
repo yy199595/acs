@@ -1,8 +1,8 @@
 #include"ClientRpcTask.h"
 #include"App/App.h"
-#include"Pool/MessagePool.h"
 #include"Util/TimeHelper.h"
 #include"Component/ClientComponent.h"
+#include"Component/Scene/MessageComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 namespace Client
 {
@@ -33,7 +33,8 @@ namespace Client
 			this->mCode = (XCode)response->code();
 			if (this->mCode == XCode::Successful && response->has_data())
 			{
-				this->mMessage = Helper::Proto::NewByData(response->data());
+				MessageComponent * messageComponent = App::Get()->GetComponent<MessageComponent>();
+				this->mMessage = messageComponent->New(response->data());
 			}
 			long long t1 = Helper::Time::GetNowMilTime();
 			float second = (t1 - this->mStartTime) / 1000.0f;

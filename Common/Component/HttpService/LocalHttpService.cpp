@@ -1,14 +1,18 @@
 //
 // Created by yjz on 2022/1/23.
 //
-#include"LoclHttpService.h"
+#include"LocalHttpService.h"
 #include"App/App.h"
 #include"spdlog/fmt/fmt.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 namespace Sentry
 {
-	XCode LoclHttpService::Invoke(const std::string& name, std::shared_ptr<Json::Reader> request,
+	LocalHttpService::LocalHttpService()
+	{
+		this->mConfig = nullptr;
+	}
+	XCode LocalHttpService::Invoke(const std::string& name, std::shared_ptr<Json::Reader> request,
 			std::shared_ptr<Json::Writer> response)
 	{
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
@@ -18,14 +22,22 @@ namespace Sentry
 		}
 		return method->Invoke(request, response);
 	}
-	bool LoclHttpService::StartService()
+	bool LocalHttpService::StartService()
 	{
 		this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
 		return this->OnStartService(*this->mServiceRegister);
 	}
 
-	bool LoclHttpService::CloseService()
+	bool LocalHttpService::CloseService()
 	{
 		return false;
+	}
+	bool LocalHttpService::LoadConfig(const rapidjson::Value& json)
+	{
+		if(this->mConfig == nullptr)
+		{
+			this->mConfig = new HttpServiceConfig(this->GetName());
+		}
+		return this->mConfig->OnLoadConfig(json);
 	}
 }

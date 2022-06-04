@@ -2,7 +2,7 @@
 
 #include"Protocol/c2s.pb.h"
 #include"Component/User/UserSyncComponent.h"
-#include"Component/HttpService/LoclHttpService.h"
+#include"Component/HttpService/LocalHttpService.h"
 #define USER_ID_START 7788
 namespace Sentry
 {
@@ -10,7 +10,7 @@ namespace Sentry
 	class ServiceProxy;
 	class MainRedisComponent;
 	class MysqlProxyComponent;
-	class HttpUserService : public LoclHttpService, public IComplete
+	class HttpUserService : public LocalHttpService, public IComplete
 	{
 	 public:
 		HttpUserService() = default;

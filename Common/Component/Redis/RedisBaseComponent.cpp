@@ -124,9 +124,8 @@ namespace Sentry
 		{
 			return false;
 		}
-		LOG_WARN(fileName << "  " << key);
 		this->mLuaMap.emplace(fileName, key);
-		LOG_INFO(redis << "load redis script " << path << " successful");
+		LOG_INFO(redis << "load redis script [" << path << "] successful");
 		return true;
 	}
 }

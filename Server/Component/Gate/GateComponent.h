@@ -7,7 +7,6 @@
 #define GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #include"Component/Component.h"
 #include"Async/TaskSource.h"
-#include"Pool/ProtoPool.h"
 #include"Task/RequestTaskQueueSource.h"
 
 namespace Sentry
@@ -28,6 +27,7 @@ namespace Sentry
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
+		class MessageComponent * mMsgComponent;
 		class UserSyncComponent * mUserSyncComponent;
 		class GateClientComponent* mGateClientComponent;
 	};

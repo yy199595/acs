@@ -2,20 +2,24 @@
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/ServiceConfig.h"
-#ifdef __DEBUG__
-#include"Pool/MessagePool.h"
-#endif
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Script/Extension/Service/LuaService.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
-
+#ifdef __RPC_DEBUG_LOG__
+#include<google/protobuf/util/json_util.h>
+#endif
 namespace Sentry
 {
+	ServiceComponent::ServiceComponent()
+	{
+		this->mConfig = nullptr;
+	}
 	bool ServiceComponent::LateAwake()
 	{
+		assert(this->mConfig);
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
@@ -30,15 +34,14 @@ namespace Sentry
 
 	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId)
 	{
-		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
-		const string name = fmt::format("{0}.{1}", this->GetName(), func);
-		const RpcInterfaceConfig* protoConfig = rpcConfig.GetInterfaceConfig(name);
-		if (protoConfig == nullptr)
+		const RpcInterfaceConfig * interfaceConfig = this->mConfig->GetConfig(func);
+		if (interfaceConfig == nullptr)
 		{
-			LOG_ERROR("not find rpc config : " << name);
+			LOG_ERROR("not find rpc config : "
+				<< fmt::format("{0}.{1}", this->GetName(), func));
 			return nullptr;
 		}
-		if(!protoConfig->Request.empty())
+		if(!interfaceConfig->Request.empty())
 		{
 			return nullptr;
 		}
@@ -46,18 +49,17 @@ namespace Sentry
 			= std::make_shared<com::Rpc::Request>();
 
 		request->set_user_id(userId);
-		request->set_method_id(protoConfig->InterfaceId);
+		request->set_func(interfaceConfig->FullName);
 		return request;
 	}
 
 	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message& message)
 	{
-		const ServiceConfig& rpcConfig = this->GetApp()->GetServiceConfig();
-		const string name = fmt::format("{0}.{1}", this->GetName(), func);
-		const RpcInterfaceConfig* protoConfig = rpcConfig.GetInterfaceConfig(name);
+		const RpcInterfaceConfig* protoConfig = this->mConfig->GetConfig(func);
 		if (protoConfig == nullptr)
 		{
-			LOG_ERROR("not find rpc config : " << name);
+			LOG_ERROR("not find rpc config : "
+				<< fmt::format("{0}.{1}", this->GetName(), func));
 			return nullptr;
 		}
 		std::shared_ptr<com::Rpc::Request> request
@@ -65,7 +67,7 @@ namespace Sentry
 
 		request->set_user_id(userId);
 		request->mutable_data()->PackFrom(message);
-		request->set_method_id(protoConfig->InterfaceId);
+		request->set_func(protoConfig->FullName);
 		return request;
 	}
 
@@ -173,45 +175,16 @@ namespace Sentry
 	{
 		std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
-		XCode code = this->SendRequest(address, request);
-#ifdef __RPC_DEBUG_LOG__
-		std::string json;
-		ElapsedTimer elapsedTimer;
-		const ServiceConfig & config = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig * rpcConfig = config.GetInterfaceConfig(request->method_id());
-		LOG_DEBUG("=============== server request ===============");
-		LOG_DEBUG("func = " << rpcConfig->FullName);
-		LOG_DEBUG("address = " << address);
-		if(Helper::Proto::GetJson(request->data(), json))
+		if(this->SendRequest(address, request) != XCode::Successful)
 		{
-			LOG_DEBUG("request = " << json);
-		}
-		LOG_DEBUG("================================================");
-#endif
-		if(code != XCode::Successful)
-		{
-			return code;
+			return XCode::NetWorkError;
 		}
 		this->mRpcComponent->AddRpcTask(taskSource);
 		std::shared_ptr<com::Rpc::Response> responsedata = taskSource->Await();
 		if(responsedata == nullptr)
 		{
-#ifdef __RPC_DEBUG_LOG__
-			LOG_ERROR(rpcConfig->FullName << " time out");
-#endif
 			return XCode::CallTimeout;
 		}
-#ifdef __RPC_DEBUG_LOG__
-		LOG_INFO("=============== server response ===============");
-		LOG_INFO("func = " << rpcConfig->FullName);
-		LOG_INFO("address = " << address);
-		LOG_INFO("time = " << elapsedTimer.GetSecond() << "s")
-		if(Helper::Proto::GetJson(responsedata->data(), json))
-		{
-			LOG_INFO("response = " << json);
-		}
-		LOG_INFO("================================================");
-#endif
 		if(responsedata->code() == (int)XCode::Successful && response != nullptr)
 		{
 			if(responsedata->has_data())
@@ -225,20 +198,20 @@ namespace Sentry
 
 	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
 	{
-		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
-		const RpcInterfaceConfig * protoConfig = serviceConfig.GetInterfaceConfig(request->method_id());
-		//LOG_INFO("start call " << protoConfig->FullName);
-		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
-		{
-			std::string message = "+";
-			request->set_address(this->mLocalAddress);
-			if(request->AppendToString(&message))
-			{
-				long long num = this->mRedisComponent->Publish(address, message);
-				return num == 1 ? XCode::Successful : XCode::NetWorkError;
-			}
-			return XCode::SerializationFailure;
-		}
+//		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
+//		const RpcInterfaceConfig * protoConfig = serviceConfig.GetInterfaceConfig(request->method_id());
+//		//LOG_INFO("start call " << protoConfig->FullName);
+//		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
+//		{
+//			std::string message = "+";
+//			request->set_address(this->mLocalAddress);
+//			if(request->AppendToString(&message))
+//			{
+//				long long num = this->mRedisComponent->Publish(address, message);
+//				return num == 1 ? XCode::Successful : XCode::NetWorkError;
+//			}
+//			return XCode::SerializationFailure;
+//		}
 		std::shared_ptr<ServerClientContext> clientContext = this->mClientComponent->GetOrCreateSession(address);
 		if(clientContext->IsOpen())
 		{
@@ -250,6 +223,10 @@ namespace Sentry
 		{
 			this->GetApp()->GetTaskComponent()->Sleep(3000);
 			LOG_ERROR("connect [" << address << "] failure count = " << count++);
+			if(count >= 10)
+			{
+				return XCode::NetWorkError;
+			}
 		}
 		clientContext->SendToServer(request);
 		return XCode::Successful;
@@ -323,5 +300,13 @@ namespace Sentry
 	{
 		std::shared_ptr<ServerClientContext> clientContext = this->mClientComponent->GetSession(address);
 		return clientContext != nullptr && clientContext->IsOpen();
+	}
+	bool ServiceComponent::LoadConfig(const rapidjson::Value& json)
+	{
+		if(this->mConfig == nullptr)
+		{
+			this->mConfig = new RpcServiceConfig(this->GetName());
+		}
+		return this->mConfig->OnLoadConfig(json);
 	}
 }

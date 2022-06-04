@@ -28,7 +28,6 @@ namespace Sentry
 		static std::shared_ptr<App> Get() { return mApp; }
 		const ServerConfig& GetConfig() { return *mConfig; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
-		const ServiceConfig& GetServiceConfig() { return this->mRpcConfig; }
 		inline MainTaskScheduler& GetTaskScheduler() { return *mTaskScheduler; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
@@ -53,7 +52,6 @@ namespace Sentry
 		float mDeltaTime;
 		long long mStartTimer;
 		long long mSecondTimer;
-		ServiceConfig mRpcConfig;
 		long long mLogicUpdateInterval;
 	 private:
 		float mLogicFps;
