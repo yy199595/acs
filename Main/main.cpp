@@ -6,7 +6,7 @@
 #include<Network/Listener/TcpServerComponent.h>
 #include"Global/ServiceConfig.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/Mysql/MysqlProxyComponent.h"
+#include"Component/Mysql/MysqlAgentComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
@@ -29,7 +29,7 @@
 using namespace Client;
 #endif
 #include"Component/Common/DataMgrComponent.h"
-#include"Component/Gate/GateProxyComponent.h"
+#include"Component/Gate/GateAgentComponent.h"
 #include"Component/Redis/DataRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
@@ -57,12 +57,12 @@ void RegisterComponent()
 
 // gate
     ComponentFactory::Add<GateComponent>("GateComponent");
-	ComponentFactory::Add<GateProxyComponent>("GateProxyComponent");
+	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
 	ComponentFactory::Add<DataRedisComponent>("DataRedisComponent");
-	ComponentFactory::Add<MysqlProxyComponent>("MysqlProxyComponent");
+	ComponentFactory::Add<MysqlAgentComponent>("MysqlAgentComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");

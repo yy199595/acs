@@ -7,7 +7,7 @@
 namespace Sentry
 {
 	class MainRedisComponent;
-	class MysqlProxyComponent;
+	class MysqlAgentComponent;
 	class HttpUserService : public LocalHttpService, public IComplete
 	{
 	 public:
@@ -29,6 +29,6 @@ namespace Sentry
 	 private:
 		class GateService * mGateService;
 		UserSyncComponent * mUserSyncComponent;
-		class MysqlProxyComponent * mMysqlComponent;
+		class MysqlAgentComponent * mMysqlComponent;
 	};
 }// namespace Sentry

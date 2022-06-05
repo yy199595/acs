@@ -4,12 +4,12 @@
 namespace Sentry
 {
 	class MysqlRpcTaskSource;
-	class MysqlProxyComponent : public Component
+	class MysqlAgentComponent : public Component
 	{
 	 public:
-		MysqlProxyComponent() = default;
-		~MysqlProxyComponent() final = default;
-		MysqlProxyComponent(const MysqlProxyComponent &) = delete;
+		MysqlAgentComponent() = default;
+		~MysqlAgentComponent() final = default;
+		MysqlAgentComponent(const MysqlAgentComponent &) = delete;
 
 	public:
 		XCode Add(const Message & data, long long flag = 0);
@@ -35,7 +35,7 @@ namespace Sentry
 	};
 
 	template<typename T>
-	std::vector<std::shared_ptr<T>>MysqlProxyComponent::QueryAll(const std::string& queryJson, long long flag)
+	std::vector<std::shared_ptr<T>>MysqlAgentComponent::QueryAll(const std::string& queryJson, long long flag)
 	{
 		std::shared_ptr<T> queryData(new T());
 
@@ -64,7 +64,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlProxyComponent::Delete(const std::string& deleteJson, long long flag)
+	XCode MysqlAgentComponent::Delete(const std::string& deleteJson, long long flag)
 	{
 		s2s::Mysql::Delete request;
 		request.set_flag(flag);
@@ -75,7 +75,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlProxyComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
+	XCode MysqlAgentComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
 	{
 		s2s::Mysql::Update request;
 		std::shared_ptr<T> data(new T());

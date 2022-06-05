@@ -52,7 +52,6 @@ namespace Sentry
 		RpcServiceConfig * mConfig;
 		std::vector<std::string> mAllAddress;
 		class RpcHandlerComponent* mRpcComponent;
-		class MainRedisComponent* mRedisComponent;
 		class RpcClientComponent* mClientComponent;
 	};
 }

@@ -4,7 +4,7 @@
 #include"Json/JsonWriter.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/Mysql/MysqlProxyComponent.h"
+#include"Component/Mysql/MysqlAgentComponent.h"
 
 namespace Sentry
 {
@@ -18,7 +18,7 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(LocalHttpService::LateAwake());
 		this->mGateService = this->GetComponent<GateService>();
-		this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>();
+		this->mMysqlComponent = this->GetComponent<MysqlAgentComponent>();
 		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
 		return true;
 	}
@@ -27,7 +27,7 @@ namespace Sentry
 	{
 		serviceRegister.Bind("Login", &HttpUserService::Login);
 		serviceRegister.Bind("Register", &HttpUserService::Register);
-		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlProxyComponent>());
+		LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlAgentComponent>());
 		return true;
 	}
 
@@ -51,6 +51,7 @@ namespace Sentry
 		XCode code = this->mMysqlComponent->QueryOnce(whereJson, userAccount);
 		if (code != XCode::Successful)
 		{
+			response.WriteString("query user data error");
 			return code;
 		}
 
@@ -100,6 +101,7 @@ namespace Sentry
 		LOG_DEBUG(user_account << " start register ....");
 		if(userId == 0)
 		{
+			response.WriteString("the user already exists");
 			return XCode::RedisSocketError;
 		}
 		long long nowTime = Helper::Time::GetNowSecTime();

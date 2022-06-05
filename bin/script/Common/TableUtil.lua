@@ -32,3 +32,12 @@ function table.print(t)
     end
     print()
 end
+
+function table.find(tab, value)
+    for i, v in ipairs(tab) do
+        if v == value then
+            return i, v
+        end
+    end
+    return nil
+end

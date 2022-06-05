@@ -36,7 +36,7 @@ namespace Sentry
 		void StartAllComponent();
 		bool InitComponent(Component* component);
 		void OnAddNewService(Component * component);
-		bool AddComponentByName(const std::string& name);
+		Component * CreateComponent(const std::string& name, const std::string & lang);
 	 public:
 		int Run();
 		void Stop();

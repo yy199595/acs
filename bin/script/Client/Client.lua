@@ -21,12 +21,6 @@ local phoneNum = 13716061995
 
 function Client.Start()
 
-
-    local httpComponent = App.GetComponent("HttpComponent")
-    local response = httpComponent:Get("http://127.0.0.1:80/source/file/files")
-    print(response.data)
-    local code = httpComponent:Download("http://127.0.0.1:80/source/file/download?2022-06-04/all.log", "./log/hello.log")
-
     local clientComponent = App.GetComponent("ClientComponent")
 
     LoginComponent.Register(account, password, phoneNum)

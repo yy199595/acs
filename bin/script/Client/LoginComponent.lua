@@ -16,7 +16,10 @@ function LoginComponent.Register(account, passwd, phoneNum)
     local url = "http://127.0.0.1:80/logic/account/register"
     local jsonObject = httpComponent:Post(url, Json.Encode(registerInfo))
     local response = Json.Decode(jsonObject.data)
-    Log.Warning(jsonObject.data)
+    if response == nil then
+        Log.Error(jsonObject.data)
+        return false
+    end
     if response.code == XCode.Successful then
         Log.Info("register ", account, " successful")
         return true
@@ -34,7 +37,10 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
     local url = "http://127.0.0.1:80/logic/account/login"
     local jsonObject = httpComponent:Post(url, Json.Encode(loginInfo))
     local response = Json.Decode(jsonObject.data)
-    Log.Warning(jsonObject.data)
+    if response == nil then
+        Log.Error(jsonObject.data)
+        return nil
+    end
     if response.code ~= XCode.Successful then
         Log.Error(account, " login failure ")
         return nil

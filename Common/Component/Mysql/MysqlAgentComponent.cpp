@@ -1,15 +1,15 @@
-#include "MysqlProxyComponent.h"
+#include "MysqlAgentComponent.h"
 
 #include"Util/StringHelper.h"
 #include"Component/Mysql/MysqlService.h"
 namespace Sentry
 {
-	bool MysqlProxyComponent::LateAwake()
+	bool MysqlAgentComponent::LateAwake()
 	{
 		this->mMysqlService = this->GetComponent<MysqlService>();
 		return this->mMysqlService != nullptr;
 	}
-	XCode MysqlProxyComponent::Add(const Message& message, long long flage)
+	XCode MysqlAgentComponent::Add(const Message& message, long long flage)
 	{
 		s2s::Mysql::Add request;
 		request.set_flag(flage);
@@ -18,7 +18,7 @@ namespace Sentry
 		return this->Call("Add", request);
 	}
 
-	XCode MysqlProxyComponent::Save(const Message & data, long long flag)
+	XCode MysqlAgentComponent::Save(const Message & data, long long flag)
 	{
 		s2s::Mysql::Save request;
 		request.set_flag(flag);
@@ -28,7 +28,7 @@ namespace Sentry
 	}
 
 
-	XCode MysqlProxyComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
+	XCode MysqlAgentComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
 	{
 		std::string address;
 		if(!this->mMysqlService->GetAddressProxy().GetAddress(address))
@@ -42,7 +42,7 @@ namespace Sentry
 		return this->mMysqlService->Call(address, func, data, response);
 	}
 
-	XCode MysqlProxyComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
+	XCode MysqlAgentComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
 	{
 		s2s::Mysql::Query request;
 		request.set_flag(flag);

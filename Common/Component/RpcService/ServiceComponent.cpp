@@ -7,7 +7,6 @@
 #include"Script/Extension/Service/LuaService.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
 #endif
@@ -21,7 +20,6 @@ namespace Sentry
 	{
 		assert(this->mConfig);
 		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}

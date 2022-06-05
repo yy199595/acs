@@ -2,26 +2,26 @@
 // Created by yjz on 2022/4/23.
 //
 
-#include"GateProxyComponent.h"
+#include"GateAgentComponent.h"
 #include"Component/Gate/GateService.h"
 #include"Script/LuaParameter.h"
 namespace Sentry
 {
-	bool GateProxyComponent::LateAwake()
+	bool GateAgentComponent::LateAwake()
 	{
 		this->mGateService = this->GetComponent<GateService>();
 		return true;
 	}
 
 
-	XCode GateProxyComponent::Call(long long userId, const std::string& func)
+	XCode GateAgentComponent::Call(long long userId, const std::string& func)
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
-	XCode GateProxyComponent::Call(long long userId, const std::string& func, const Message& message)
+	XCode GateAgentComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
@@ -29,7 +29,7 @@ namespace Sentry
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
-	XCode GateProxyComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
+	XCode GateAgentComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
 		std::string address;
 		if (!this->mGateService->GetAddressProxy().GetAddress(userId, address))
@@ -57,7 +57,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateProxyComponent::BroadCast(const std::string& func)
+	XCode GateAgentComponent::BroadCast(const std::string& func)
 	{
 		c2s::Rpc::Call request;
 		request.set_func(func);
@@ -66,7 +66,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateProxyComponent::BroadCast(const std::string& func, const Message& message)
+	XCode GateAgentComponent::BroadCast(const std::string& func, const Message& message)
 	{
 		s2s::GateBroadCast::Request request;
 		request.set_func(func);
@@ -75,7 +75,7 @@ namespace Sentry
 		return this->mGateService->Send("BroadCast", request);
 	}
 
-	XCode GateProxyComponent::LuaBroadCast(const std::string func, std::shared_ptr<Message> message)
+	XCode GateAgentComponent::LuaBroadCast(const std::string func, std::shared_ptr<Message> message)
 	{
 		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
 		taskComponent->Start([this, func, message]()
@@ -88,10 +88,10 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	void GateProxyComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)
+	void GateAgentComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)
 	{
-		luaRegister.BeginRegister<GateProxyComponent>();
-		luaRegister.PushMemberFunction("Call", &GateProxyComponent::LuaCall);
-		luaRegister.PushMemberFunction("BroadCast", &GateProxyComponent::LuaBroadCast);
+		luaRegister.BeginRegister<GateAgentComponent>();
+		luaRegister.PushMemberFunction("Call", &GateAgentComponent::LuaCall);
+		luaRegister.PushMemberFunction("BroadCast", &GateAgentComponent::LuaBroadCast);
 	}
 }

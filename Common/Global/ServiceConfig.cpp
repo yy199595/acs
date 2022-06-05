@@ -15,28 +15,31 @@ namespace Sentry
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
-			RpcInterfaceConfig serviceConfog;
-			const char * name = iter->name.GetString();
 			const rapidjson::Value & jsonValue = iter->value;
+			if(jsonValue.IsObject())
+			{
+				RpcInterfaceConfig serviceConfog;
+				const char* name = iter->name.GetString();
 
-			serviceConfog.Method = name;
-			serviceConfog.Service = this->mName;
-			serviceConfog.Type = jsonValue["Type"].GetString();
-			serviceConfog.IsAsync = jsonValue["Async"].GetBool();
-			if(jsonValue.HasMember("Request"))
-			{
-				serviceConfog.Request = jsonValue["Request"].GetString();
+				serviceConfog.Method = name;
+				serviceConfog.Service = this->mName;
+				serviceConfog.Type = jsonValue["Type"].GetString();
+				serviceConfog.IsAsync = jsonValue["Async"].GetBool();
+				if (jsonValue.HasMember("Request"))
+				{
+					serviceConfog.Request = jsonValue["Request"].GetString();
+				}
+				if (jsonValue.HasMember("Response"))
+				{
+					serviceConfog.Response = jsonValue["Response"].GetString();
+				}
+				if (jsonValue.HasMember("CallWay"))
+				{
+					serviceConfog.CallWay = jsonValue["CallWay"].GetString();
+				}
+				serviceConfog.FullName = fmt::format("{0}.{1}", this->mName, name);
+				this->mConfigs.emplace(name, serviceConfog);
 			}
-			if(jsonValue.HasMember("Response"))
-			{
-				serviceConfog.Response = jsonValue["Response"].GetString();
-			}
-			if(jsonValue.HasMember("CallWay"))
-			{
-				serviceConfog.CallWay = jsonValue["CallWay"].GetString();
-			}
-			serviceConfog.FullName = fmt::format("{0}.{1}", this->mName, name);
-			this->mConfigs.emplace(name, serviceConfog);
 		}
 		return true;
 	}
@@ -64,20 +67,23 @@ namespace Sentry
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
-			HttpInterfaceConfig serviceConfog;
-			const char * name = iter->name.GetString();
 			const rapidjson::Value & jsonValue = iter->value;
-
-			serviceConfog.Method = name;
-			serviceConfog.Service = this->mName;
-			serviceConfog.Type = jsonValue["Type"].GetString();
-			serviceConfog.Path = jsonValue["Path"].GetString();
-			serviceConfog.IsAsync = jsonValue["Async"].GetBool();
-			if(jsonValue.HasMember("Content"))
+			if(jsonValue.IsObject())
 			{
-				serviceConfog.Content = jsonValue["Content"].GetString();
+				HttpInterfaceConfig serviceConfog;
+				const char* name = iter->name.GetString();
+
+				serviceConfog.Method = name;
+				serviceConfog.Service = this->mName;
+				serviceConfog.Type = jsonValue["Type"].GetString();
+				serviceConfog.Path = jsonValue["Path"].GetString();
+				serviceConfog.IsAsync = jsonValue["Async"].GetBool();
+				if (jsonValue.HasMember("Content"))
+				{
+					serviceConfog.Content = jsonValue["Content"].GetString();
+				}
+				this->mConfigs.emplace(serviceConfog.Method, serviceConfog);
 			}
-			this->mConfigs.emplace(serviceConfog.Method, serviceConfog);
 		}
 		return true;
 	}

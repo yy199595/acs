@@ -2,16 +2,16 @@
 // Created by yjz on 2022/4/23.
 //
 
-#ifndef _GATEPROXYCOMPONENT_H_
-#define _GATEPROXYCOMPONENT_H_
+#ifndef _GATEAGENTCOMPONENT_H_
+#define _GATEAGENTCOMPONENT_H_
 #include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
-	class GateProxyComponent final : public Component, public ILuaRegister
+	class GateAgentComponent final : public Component, public ILuaRegister
 	{
 	 public:
-		GateProxyComponent() = default;
-		~GateProxyComponent() = default;
+		GateAgentComponent() = default;
+		~GateAgentComponent() = default;
 	 public:
 		XCode Call(long long userId, const std::string & func);
 		XCode Call(long long UserId, const std::string & func, const Message & message);
@@ -29,4 +29,4 @@ namespace Sentry
 	};
 }
 
-#endif //_GATEPROXYCOMPONENT_H_
+#endif //_GATEAGENTCOMPONENT_H_

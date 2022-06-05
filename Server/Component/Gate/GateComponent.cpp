@@ -15,7 +15,7 @@
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"GateService.h"
-#include"GateProxyComponent.h"
+#include"GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/Scene/MessageComponent.h"

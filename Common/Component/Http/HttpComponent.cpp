@@ -86,22 +86,13 @@ namespace Sentry
 		}
 		if(!httpConfig->IsAsync)
 		{
-			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
-			{
-				httpClient->StartWriter();
-				return;
-			}
-			this->ClosetHttpClient(httpClient);
-			return;
+			httpService->Invoke(httpConfig->Method, request, response);
+			httpClient->StartWriter();
 		}
-		this->mTaskComponent->Start([this, httpService, httpClient, httpConfig, request, response]()
+		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
 		{
-			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
-			{
-				httpClient->StartWriter();
-				return;
-			}
-			this->ClosetHttpClient(httpClient);
+			httpService->Invoke(httpConfig->Method, request, response);
+			httpClient->StartWriter();
 		});
 	}
 

@@ -23,7 +23,7 @@ namespace Sentry
 		void OnSecondUpdate() final;
 	 private:
 		class MainRedisComponent * mRedisComponent;
-		class MysqlProxyComponent * mMysqlComponent;
+		class MysqlAgentComponent * mMysqlComponent;
 	};
 }
 

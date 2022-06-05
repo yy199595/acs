@@ -5,6 +5,7 @@
 #include"Util/FileHelper.h"
 #include"Component/Lua/LuaScriptComponent.h"
 #include"Component/RpcService/LocalLuaService.h"
+#include"Component/RpcService/ServiceAgentComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -47,7 +48,8 @@ namespace Sentry
 		{
 			for (const std::string& name: components)
 			{
-				if (!this->AddComponentByName(name))
+				Component * component = this->CreateComponent(name, "cpp");
+				if(component == nullptr || !this->AddComponent(name, component))
 				{
 					CONSOLE_LOG_ERROR("add " << name << " failure");
 					return false;
@@ -57,13 +59,16 @@ namespace Sentry
 		auto iter = jsonDocument.MemberBegin();
 		for(;iter != jsonDocument.MemberEnd(); iter++)
 		{
+			const rapidjson::Value & josnValue = iter->value;
+			std::string lang(josnValue["Lang"].GetString());
 			const std::string name(iter->name.GetString());
-			if (!this->AddComponentByName(name))
+			Component * component = this->CreateComponent(name, lang);
+			if(component == nullptr || !this->AddComponent(name, component))
 			{
 				CONSOLE_LOG_ERROR("add " << name << " failure");
 				return false;
 			}
-			IServiceBase * serviceBase = this->GetComponent<IServiceBase>(name);
+			IServiceBase * serviceBase =component->Cast<IServiceBase>();
 			if(serviceBase == nullptr || !serviceBase->LoadConfig(iter->value))
 			{
 				CONSOLE_LOG_ERROR("load " << name << " config error");
@@ -84,31 +89,15 @@ namespace Sentry
 		return true;
 	}
 
-	bool App::AddComponentByName(const std::string& name)
+	Component * App::CreateComponent(const std::string& name, const std::string& lang)
 	{
-		Component* component = ComponentFactory::CreateComponent(name);
-		if (component != nullptr)
-		{
-			if(!this->AddComponent(name, component))
-			{
-				CONSOLE_LOG_ERROR("add component " << name << " failure");
-				return false;
-			}
-			return true;
+		if(lang == "cpp"){
+			return ComponentFactory::CreateComponent(name);
 		}
-		LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-		if(luaScriptComponent != nullptr)
-		{
-			lua_State * luaState = luaScriptComponent->GetLuaEnv();
-			if(!Lua::Table::Get(luaState, name))
-			{
-				CONSOLE_LOG_ERROR("not find lua table : " << name);
-				return false;
-			}
-			return this->AddComponent(name, new LocalLuaService());
+		if(lang == "lua"){
+			return this->GetComponent<LuaScriptComponent>()->CreateService(name);
 		}
-		// 其他语言
-		return true;
+		return new ServiceAgentComponent(); //其他语言
 	}
 
 	bool App::InitComponent(Component* component)

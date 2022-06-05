@@ -1,5 +1,6 @@
 {
     "MysqlService": {
+        "Lang": "cpp",
         "Add": {
             "Async": true,
             "Timeout": 0,
@@ -38,6 +39,7 @@
         }
     },
     "HttpUserService": {
+        "Lang": "cpp",
         "Login": {
             "Type": "POST",
             "Async": true,
@@ -52,6 +54,7 @@
         }
     },
     "HttpSourceService": {
+        "Lang": "cpp",
         "Files": {
             "Type": "GET",
             "Async": false,
@@ -64,6 +67,7 @@
         }
     },
     "GateService": {
+        "Lang": "cpp",
         "Ping": {
             "Async": true,
             "Type": "Client",
@@ -106,6 +110,7 @@
         }
     },
     "ChatService": {
+        "Lang": "lua",
         "Chat": {
             "Async": true,
             "Type": "Client",
