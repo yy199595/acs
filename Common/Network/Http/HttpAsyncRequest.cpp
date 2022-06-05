@@ -183,21 +183,14 @@ namespace Sentry
 		if (this->mState == HttpDecodeState::Content)
 		{
 			char buffer[256] = { 0 };
-			size_t size = io.readsome(buffer, 256);
-			while (size > 0)
+			while (io.readsome(buffer, 256) > 0)
 			{
 				if (this->mFstream != nullptr)
 				{
-					this->mFstream->write(buffer, size);
-					if(this->mContentLength > 0)
-					{
-						printf("down load file : %f\n", this->mFstream->tellg() / (float)this->mContentLength);
-					}
-					size = io.readsome(buffer, 256);
+					this->mFstream->write(buffer, io.gcount());
 					continue;
 				}
 				this->mContent.append(buffer, io.gcount());
-				size = io.readsome(buffer, 256);
 			}
 		}
 		return HttpStatus::CONTINUE;
@@ -355,7 +348,6 @@ namespace Sentry
 			this->mFstream->read(buffer, 512);
 			if(this->mFstream->gcount() > 0)
 			{
-				printf("count = %d\n", this->mCount);
 				os.write(buffer, this->mFstream->gcount());
 				return this->mContentSize - this->mFstream->gcount();
 			}

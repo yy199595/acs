@@ -33,7 +33,7 @@ namespace Sentry
 	{
 		std::fstream * fs = new std::fstream ();
 		const string path = fmt::format(
-			"{0}/{1}", this->mSourcePath, request.GetContent());
+			"{0}{1}", this->mSourcePath, request.GetContent());
 		fs->open(path, std::ios::binary | std::ios::in);
 		if(fs->is_open())
 		{
