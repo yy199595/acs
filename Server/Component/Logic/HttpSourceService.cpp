@@ -9,6 +9,7 @@ namespace Sentry
 {
 	bool HttpSourceService::OnStartService(HttpServiceRegister& serviceRegister)
 	{
+		this->GetConfig().GetPath("source", this->mSourcePath);
 		serviceRegister.Bind("Files", &HttpSourceService::Files);
 		serviceRegister.Bind("Download", &HttpSourceService::Download);
 		return true;
@@ -16,16 +17,14 @@ namespace Sentry
 
 	XCode HttpSourceService::Files(const HttpHandlerRequest& request, HttpHandlerResponse& response)
 	{
-		std::string path;
 		std::vector<std::string> files;
-		this->GetConfig().GetPath("source", path);
-		const std::string & workPath = this->GetConfig().GetWorkPath();
-		if(Helper::Directory::GetFilePaths(path, files))
+		if(!Helper::Directory::GetFilePaths(this->mSourcePath, files))
 		{
-			for(const std::string & file : files)
-			{
-				response.WriteString(file.substr(workPath.size()) + "\n");
-			}
+			return XCode::Failure;
+		}
+		for(const std::string & file : files)
+		{
+			response.WriteString(file.substr(this->mSourcePath.size()) + "\n");
 		}
 		return XCode::Successful;
 	}
@@ -33,12 +32,16 @@ namespace Sentry
 	XCode HttpSourceService::Download(const HttpHandlerRequest& request, HttpHandlerResponse& response)
 	{
 		std::fstream * fs = new std::fstream ();
-		const std::string & workPath = this->GetConfig().GetWorkPath();
-		fs->open(workPath + request.GetContent(), std::ios::binary | std::ios::in | std::ios::out);
+		const string path = fmt::format(
+			"{0}/{1}", this->mSourcePath, request.GetContent());
+		fs->open(path, std::ios::binary | std::ios::in);
 		if(fs->is_open())
 		{
 			response.WriteFile(fs);
+			return XCode::Successful;
 		}
-		return XCode::Successful;
+		delete fs;
+		LOG_ERROR("open " << path << " error");
+		return XCode::Failure;
 	}
 }

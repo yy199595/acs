@@ -17,6 +17,8 @@ namespace Sentry
 	 private:
 		XCode Files(const HttpHandlerRequest& request, HttpHandlerResponse& response);
 		XCode Download(const HttpHandlerRequest& request, HttpHandlerResponse& response);
+	 private:
+		std::string mSourcePath;
 	};
 }
 

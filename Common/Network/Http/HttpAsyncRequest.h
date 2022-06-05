@@ -91,7 +91,8 @@ namespace Sentry
     class HttpAsyncResponse : public IHttpContent
     {
     public:
-        HttpAsyncResponse();
+		HttpAsyncResponse(std::fstream * fs);
+		~HttpAsyncResponse();
     public:
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
@@ -103,10 +104,11 @@ namespace Sentry
         int mHttpCode;
         std::string mContent;
         std::string mVersion;
-        std::string mHttpError;
+		size_t mContentLength;
+		std::string mHttpError;
         HttpDecodeState mState;
-        size_t mContentLength;
-        std::unordered_map<std::string, std::string> mHeadMap;
+		std::fstream * mFstream;
+		std::unordered_map<std::string, std::string> mHeadMap;
     };
 }
 

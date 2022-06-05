@@ -16,9 +16,9 @@ namespace Sentry
 	 public:
 		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url);
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, Json::Writer& json);
-		std::shared_ptr<HttpAsyncResponse> Request(std::shared_ptr<HttpAsyncRequest> request);
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& content);
-	private:
+		std::shared_ptr<HttpAsyncResponse> Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs = nullptr);
+	 private:
 		void ConnectHost(const std::string& host, const std::string& port);
 		void ReceiveHttpContent( std::shared_ptr<IHttpContent> httpContent);
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;

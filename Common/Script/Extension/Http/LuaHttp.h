@@ -11,6 +11,7 @@ namespace Lua
 	{
 		extern int Get(lua_State* lua);
 		extern int Post(lua_State* lua);
+		extern int Download(lua_State* lua);
 	}
 }
 

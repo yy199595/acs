@@ -32,6 +32,7 @@ namespace Sentry
 		bool LateAwake() final;
 	 public:
 		std::shared_ptr<HttpRequestClient> CreateClient();
+		XCode Download(const std::string & url, const std::string & path);
 		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url, float second = 15.0f);
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
 	 public:

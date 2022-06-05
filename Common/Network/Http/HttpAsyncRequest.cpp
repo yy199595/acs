@@ -20,7 +20,8 @@ namespace Sentry
         std::cmatch what;
         std::string protocol;
         std::regex pattern("(http|https)://([^/ :]+):?([^/ ]*)(/.*)?");
-        if (std::regex_match(url.c_str(), what, pattern)) {
+        if (std::regex_match(url.c_str(), what, pattern))
+		{
             this->mHost = std::string(what[2].first, what[2].second);
             this->mPath = std::string(what[4].first, what[4].second);
             protocol = std::string(what[1].first, what[1].second);
@@ -127,54 +128,80 @@ namespace Sentry
 
 namespace Sentry
 {
-    HttpAsyncResponse::HttpAsyncResponse()
-    {
-        this->mHttpCode = 0;
-        this->mContentLength = 0;
-        this->mState = HttpDecodeState::FirstLine;
-    }
+	HttpAsyncResponse::HttpAsyncResponse(std::fstream* fs)
+	{
+		this->mHttpCode = 0;
+		this->mFstream = fs;
+		this->mContentLength = 0;
+		this->mState = HttpDecodeState::FirstLine;
+	}
+
+	HttpAsyncResponse::~HttpAsyncResponse()
+	{
+		if(this->mFstream != nullptr)
+		{
+			this->mFstream->close();
+			delete this->mFstream;
+		}
+	}
+
     HttpStatus HttpAsyncResponse::OnReceiveData(asio::streambuf &streamBuffer)
-    {
-        std::iostream io(&streamBuffer);
-        if(this->mState == HttpDecodeState::FirstLine)
-        {
-            this->mState = HttpDecodeState::HeadLine;
-            io >> this->mVersion >> this->mHttpCode >> this->mHttpError;
-            io.ignore(2); //放弃\r\n
-        }
-        if(this->mState == HttpDecodeState::HeadLine)
-        {
-            std::string lineData;
-            while(std::getline(io, lineData))
-            {
-                if(lineData == "\r")
-                {
-                    this->mState = HttpDecodeState::Content;
-                    break;
-                }
-                size_t pos = lineData.find(':');
-                if (pos != std::string::npos)
-                {
-                    size_t length = lineData.size() - pos - 2;
-                    std::string key = lineData.substr(0, pos);
+	{
+		std::iostream io(&streamBuffer);
+		if (this->mState == HttpDecodeState::FirstLine)
+		{
+			this->mState = HttpDecodeState::HeadLine;
+			io >> this->mVersion >> this->mHttpCode >> this->mHttpError;
+			io.ignore(2); //放弃\r\n
+		}
+		if (this->mState == HttpDecodeState::HeadLine)
+		{
+			std::string lineData;
+			while (std::getline(io, lineData))
+			{
+				if (lineData == "\r")
+				{
+					this->mState = HttpDecodeState::Content;
+					break;
+				}
+				size_t pos = lineData.find(':');
+				if (pos != std::string::npos)
+				{
+					size_t length = lineData.size() - pos - 2;
+					std::string key = lineData.substr(0, pos);
 					Helper::String::Tolower(key);
-                    std::string val = lineData.substr(pos + 1, length);
-                    this->mHeadMap.insert(std::make_pair(key, val));
-                }
-            }
-        }
-        if(this->mState == HttpDecodeState::Content)
-        {
-            char buffer[256] = { 0 };
-            size_t size = io.readsome(buffer, 256);
-            while(size > 0)
-            {
-                this->mContent.append(buffer, size);
-                size = io.readsome(buffer, 256);
-            }
-        }
-        return HttpStatus::CONTINUE;
-    }
+					std::string val = lineData.substr(pos + 1, length);
+					this->mHeadMap.insert(std::make_pair(key, val));
+				}
+			}
+			std::string length;
+			if(this->GetHead("content-length", length))
+			{
+				this->mContentLength = std::stoi(length);
+			}
+		}
+		if (this->mState == HttpDecodeState::Content)
+		{
+			char buffer[256] = { 0 };
+			size_t size = io.readsome(buffer, 256);
+			while (size > 0)
+			{
+				if (this->mFstream != nullptr)
+				{
+					this->mFstream->write(buffer, size);
+					if(this->mContentLength > 0)
+					{
+						printf("down load file : %f\n", this->mFstream->tellg() / (float)this->mContentLength);
+					}
+					size = io.readsome(buffer, 256);
+					continue;
+				}
+				this->mContent.append(buffer, io.gcount());
+				size = io.readsome(buffer, 256);
+			}
+		}
+		return HttpStatus::CONTINUE;
+	}
 
 	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value)
 	{
@@ -311,7 +338,7 @@ namespace Sentry
 			{
 				this->mContentSize = this->mContent.size();
 			}
-			this->AddHead("Content-Legth", std::to_string(this->mContentSize));
+			this->AddHead("content-length", std::to_string(this->mContentSize));
 			os << HttpVersion << ' ' << (int)this->mCode << ' ' << HttpStatusToString(this->mCode) << "\r\n";
 			for (auto iter = this->mHeadMap.begin(); iter != this->mHeadMap.end(); iter++)
 			{

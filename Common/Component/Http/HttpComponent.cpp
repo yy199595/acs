@@ -9,6 +9,7 @@
 #include"Other/InterfaceConfig.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/StringHelper.h"
+#include"Util/DirectoryHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
@@ -90,15 +91,19 @@ namespace Sentry
 			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
 			{
 				httpClient->StartWriter();
+				return;
 			}
+			this->ClosetHttpClient(httpClient);
 			return;
 		}
-		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
+		this->mTaskComponent->Start([this, httpService, httpClient, httpConfig, request, response]()
 		{
 			if(httpService->Invoke(httpConfig->Method, request, response) == XCode::Successful)
 			{
 				httpClient->StartWriter();
+				return;
 			}
+			this->ClosetHttpClient(httpClient);
 		});
 	}
 
@@ -141,11 +146,39 @@ namespace Sentry
 		luaRegister.BeginRegister<HttpComponent>();
 		luaRegister.PushExtensionFunction("Get", Lua::Http::Get);
 		luaRegister.PushExtensionFunction("Post", Lua::Http::Post);
+		luaRegister.PushExtensionFunction("Download", Lua::Http::Download);
 
 		Lua::ClassProxyHelper classProxyHelper = luaRegister.Clone("HttpHandlerResponse");
 		classProxyHelper.BeginRegister<HttpHandlerResponse>();
 		classProxyHelper.PushMemberFunction("AddHead", &HttpHandlerResponse::AddHead);
 		classProxyHelper.PushMemberFunction("WriteString", &HttpHandlerResponse::WriteString);
+	}
+
+	XCode HttpComponent::Download(const string& url, const string& path)
+	{
+		if(!Helper::Directory::MakeDir(path))
+		{
+			return XCode::Failure;
+		}
+
+		std::fstream * fs = new std::fstream();
+		fs->open(path, std::ios::binary | std::ios::in | std::ios::out);
+		if(!fs->is_open())
+		{
+			delete fs;
+			return XCode::Failure;
+		}
+		std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
+		if(httpRequest == nullptr)
+		{
+			return XCode::HttpUrlParseError;
+		}
+		std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
+		if(requestClient->Request(httpRequest, fs) != nullptr)
+		{
+			return XCode::Successful;
+		}
+		return XCode::NetWorkError;
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
@@ -180,4 +213,5 @@ namespace Sentry
 			LOG_DEBUG("remove http address : " << httpClient->GetAddress());
 		}
 	}
+
 }

@@ -35,7 +35,7 @@ namespace Sentry
 		return this->Request(httpRequest);
 	}
 
-    std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest)
+    std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, std::fstream * fs)
     {
         const std::string & host = httpRequest->GetHost();
         const std::string & port = httpRequest->GetPort();
@@ -78,7 +78,7 @@ namespace Sentry
             return nullptr;
         }
 		this->mHttpTask.Clear();
-        std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
+        std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse(fs));
         netWorkThread.Invoke(&HttpRequestClient::ReceiveHttpContent, this, httpContent);
         return this->mHttpTask.Await() ? httpContent : nullptr;
 #endif
