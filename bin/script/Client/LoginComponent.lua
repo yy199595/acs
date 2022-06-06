@@ -3,6 +3,7 @@ LoginComponent = {}
 local httpComponent
 function LoginComponent.Awake()
     httpComponent = App.GetComponent("HttpComponent")
+    return httpComponent ~= nil
 end
 
 function LoginComponent.Register(account, passwd, phoneNum)

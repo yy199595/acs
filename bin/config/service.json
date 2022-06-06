@@ -42,28 +42,15 @@
         "Type": "http",
         "Login": {
             "Type": "POST",
-            "Async": false,
+            "Async": true,
             "Content": "application/json",
             "Path": "/logic/account/login"
         },
         "Register": {
             "Type": "POST",
-            "Async": false,
+            "Async": true,
             "Content": "application/json",
             "Path": "/logic/account/register"
-        }
-    },
-    "HttpSourceService": {
-        "Type": "http",
-        "Files": {
-            "Type": "GET",
-            "Async": false,
-            "Path": "/source/file/files"
-        },
-        "Download": {
-            "Type": "GET",
-            "Async": false,
-            "Path": "/source/file/download"
         }
     },
     "GateService": {

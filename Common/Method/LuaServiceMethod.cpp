@@ -54,10 +54,8 @@ namespace Sentry
 		{
 			return code;
 		}
-		int ref = luaTaskSource->GetRef();
-		if(!this->mConfig->Response.empty() && ref != 0)
+		if(!this->mConfig->Response.empty() && luaTaskSource->GetRef())
 		{
-			lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, ref);
 			std::shared_ptr<Message> message = this->mMsgComponent->Read(
 				this->mLuaEnv, this->mConfig->Response, -1);
 			if (message == nullptr)

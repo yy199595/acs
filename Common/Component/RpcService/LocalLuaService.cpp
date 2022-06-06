@@ -77,11 +77,6 @@ namespace Sentry
             LOG_ERROR(this->GetName() << " is not lua table");
             return false;
         }
-		const char * tab = this->GetName().c_str();
-		if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
-		{
-			LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(this->mLuaEnv));
-		}
 		return true;
 	}
 

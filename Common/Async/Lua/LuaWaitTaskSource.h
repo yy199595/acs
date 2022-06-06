@@ -4,8 +4,12 @@
 
 #ifndef SERVER_LUAWAITTASKSOURCE_H
 #define SERVER_LUAWAITTASKSOURCE_H
+
+#include"XCode/XCode.h"
 #include"Script/LuaInclude.h"
-#include"Async/RpcTask/RpcTaskSource.h"
+#include"Script/LuaParameter.h"
+#include"google/protobuf/message.h"
+using namespace google::protobuf;
 namespace Sentry
 {
 	// 在lua中等待c++协程

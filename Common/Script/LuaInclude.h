@@ -95,7 +95,7 @@ namespace Lua
     int code = lua_resume(cor, lua, args); \
     if(code != 0 && code != LUA_YIELD) \
     {    \
-        LOG_ERROR(lua_tostring(cor, -1))\
+        luaL_error(lua, lua_tostring(cor, -1));\
     } \
 }\
 

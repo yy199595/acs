@@ -3,6 +3,7 @@
 #include"Util/FileHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
+#include"Component/Scene/MessageComponent.h"
 #include"Component/RpcService/LocalLuaService.h"
 #include"Component/RpcService/ServiceAgentComponent.h"
 using namespace Sentry;
@@ -41,6 +42,7 @@ namespace Sentry
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
+		this->mMessageComponent = this->GetOrAddComponent<MessageComponent>();
 
 		std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件

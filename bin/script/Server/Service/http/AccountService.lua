@@ -1,24 +1,27 @@
 
 AccountService = {}
-local mysqlComponent
+
 local messageComponent
 function AccountService.Awake()
     messageComponent = App.GetComponent("MessageComponent")
-    mysqlComponent = App.GetComponent("MysqlAgentComponent")
-    return true
+    return messageComponent ~= nil
 end
 
 function AccountService.Register(request)
     local requestInfo = Json.Decode(request.data)
-    local registerInfo = messageComponent:New("db_account.tab_user_account",{
-        user_id = 123456,
+    return MysqlComponent.Add("db_account.tab_user_account", {
+        user_id = Guid.Create(),
+        register_time = os.time(),
         account = requestInfo.account,
         password = requestInfo.password,
-        phone_num = requestInfo.phone_num
+        phone_num = requestInfo.phone_num,
     })
-    local code = mysqlComponent:Add(registerInfo)
 end
 
 function AccountService.Login(request)
-
+    local loginInfo = Json.Decode(request.data)
+    local userInfo = MysqlComponent.QueryOnce("db_account.tab_user_account",{
+        account = loginInfo.account
+    })
+    table.print(loginInfo)
 end

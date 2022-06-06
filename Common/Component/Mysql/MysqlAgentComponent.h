@@ -4,7 +4,7 @@
 namespace Sentry
 {
 	class MysqlRpcTaskSource;
-    class MysqlAgentComponent final : public Component, public ILuaRegister
+    class MysqlAgentComponent final : public Component
 	{
 	 public:
 		MysqlAgentComponent() = default;
@@ -33,7 +33,6 @@ namespace Sentry
 
     private:
 		bool LateAwake() final;
-        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response = nullptr);
 	private:
 		class MysqlService * mMysqlService;

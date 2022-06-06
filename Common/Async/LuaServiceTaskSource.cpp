@@ -29,6 +29,16 @@ namespace Sentry
         return this->mCode;
     }
 
+	bool LuaServiceTaskSource::GetRef()
+	{
+		if(this->mRef != 0)
+		{
+			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+			return true;
+		}
+		return false;
+	}
+
 	int LuaServiceTaskSource::SetResult(lua_State* lua)
 	{
 		std::shared_ptr<LuaServiceTaskSource> luaServiceTaskSource =

@@ -5,10 +5,7 @@
 #include<Protocol/com.pb.h>
 #include"Coroutine/CoroutineDef.h"
 #include"Async/TaskSource.h"
-#ifdef __DEBUG__
-#include"Script/LuaParameter.h"
-#include"Other/ElapsedTimer.h"
-#endif
+#include"Async/Lua/LuaWaitTaskSource.h"
 using namespace com;
 using namespace google::protobuf;
 namespace Sentry
@@ -21,7 +18,6 @@ namespace Sentry
         virtual void OnResponse(std::shared_ptr<com::Rpc_Response> response) = 0;
     };
 
-    class RpcHandlerComponent;
     class RpcTaskSource : public IRpcTask
     {
     public:
@@ -37,4 +33,19 @@ namespace Sentry
         const int mTimeout;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
+
+	class LuaRpcTaskSource : public IRpcTask
+	{
+	 public:
+		LuaRpcTaskSource(lua_State * lua);
+	 public:
+		int Await() { return this->mTask.Await(); }
+		long long GetRpcId() final { return this->mTaskId; }
+	 private:
+		int GetTimeout() final { return 0;}
+		void OnResponse(std::shared_ptr<com::Rpc::Response> response) final;
+	 private:
+		long long mTaskId;
+		LuaWaitTaskSource mTask;
+	};
 }

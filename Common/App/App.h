@@ -17,7 +17,7 @@ namespace Sentry
 {
 	class MainTaskScheduler;
 	class ServiceComponent;
-
+	class MessageComponent;
 	class App final : public Entity
 	{
 	 public:
@@ -31,12 +31,12 @@ namespace Sentry
 		inline MainTaskScheduler& GetTaskScheduler() { return *mTaskScheduler; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
+		inline MessageComponent * GetMsgComponent() { return this->mMessageComponent; }
 	 private:
 		bool LoadComponent();
 		void StartAllComponent();
 		bool InitComponent(Component* component);
 		void OnAddNewService(Component * component);
-		Component * CreateComponent(const std::string& name, const std::string & lang);
 	 public:
 		int Run();
 		void Stop();
@@ -65,6 +65,7 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
+		MessageComponent * mMessageComponent;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::shared_ptr<MainTaskScheduler> mTaskScheduler;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;

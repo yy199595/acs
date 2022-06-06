@@ -1,10 +1,11 @@
 //
 // Created by mac on 2022/5/31.
 //
-
+#include"App/App.h"
 #include"LuaWaitTaskSource.h"
 #include"Script/Extension/Json/values.hpp"
 #include<google/protobuf/util/json_util.h>
+#include"Component/Scene/MessageComponent.h"
 namespace Sentry
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
@@ -40,13 +41,10 @@ namespace Sentry
 		lua_pushinteger(this->mLua, (int)code);
 		if (code == XCode::Successful && response != nullptr)
 		{
-			std::string json;
-			if(util::MessageToJsonString(*response, &json).ok())
-			{
-				values::pushDecoded(this->mLua, json.c_str(), json.size());
-				lua_presume(coroutine, this->mLua, 2);
-				return;
-			}
+			MessageComponent * messageComponent = App::Get()->GetMsgComponent();
+			messageComponent->Write(this->mLua, *response);
+			lua_presume(coroutine, this->mLua, 2);
+			return;
 		}
 		lua_presume(coroutine, this->mLua, 1);
 	}

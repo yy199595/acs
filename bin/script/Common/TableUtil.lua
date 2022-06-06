@@ -34,7 +34,7 @@ function table.print(t)
 end
 
 function table.find(tab, value)
-    for i, v in ipairs(tab) do
+    for i, v in pairs(tab) do
         if v == value then
             return i, v
         end

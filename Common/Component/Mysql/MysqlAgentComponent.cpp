@@ -2,7 +2,6 @@
 
 #include"Util/StringHelper.h"
 #include"Component/Mysql/MysqlService.h"
-#include"Script/Extension/Mysql/LuaMysql.h"
 
 namespace Sentry
 {
@@ -90,14 +89,4 @@ namespace Sentry
 		}
 		return XCode::Successful;
 	}
-
-    void MysqlAgentComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
-    {
-        luaRegister.BeginRegister<MysqlAgentComponent>();
-        luaRegister.PushExtensionFunction("Add", Lua::Mysql::Add);
-        luaRegister.PushExtensionFunction("Save", Lua::Mysql::Save);
-        luaRegister.PushExtensionFunction("Delete", Lua::Mysql::Delete);
-        luaRegister.PushExtensionFunction("Update", Lua::Mysql::Update);
-        luaRegister.PushExtensionFunction("QueryOnce", Lua::Mysql::QueryOnce);
-    }
 }

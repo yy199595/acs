@@ -28,6 +28,7 @@ namespace Sentry
 	{
 		luaRegister.BeginRegister<ServiceComponent>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
+		luaRegister.PushExtensionFunction("GetAddress", Lua::Service::GetAddress);
 	}
 
 	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId)
@@ -171,13 +172,14 @@ namespace Sentry
 
 	XCode ServiceComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
 	{
-		std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>();
+		std::shared_ptr<RpcTaskSource> taskSource =
+			std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
+		this->mRpcComponent->AddRpcTask(taskSource);
 		if(this->SendRequest(address, request) != XCode::Successful)
 		{
 			return XCode::NetWorkError;
 		}
-		this->mRpcComponent->AddRpcTask(taskSource);
 		std::shared_ptr<com::Rpc::Response> responsedata = taskSource->Await();
 		if(responsedata == nullptr)
 		{
@@ -196,38 +198,43 @@ namespace Sentry
 
 	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
 	{
-//		const ServiceConfig& serviceConfig = this->GetApp()->GetServiceConfig();
-//		const RpcInterfaceConfig * protoConfig = serviceConfig.GetInterfaceConfig(request->method_id());
-//		//LOG_INFO("start call " << protoConfig->FullName);
-//		if(protoConfig->CallWay == "Sub") //通过redis 的发布订阅发送
-//		{
-//			std::string message = "+";
-//			request->set_address(this->mLocalAddress);
-//			if(request->AppendToString(&message))
-//			{
-//				long long num = this->mRedisComponent->Publish(address, message);
-//				return num == 1 ? XCode::Successful : XCode::NetWorkError;
-//			}
-//			return XCode::SerializationFailure;
-//		}
 		std::shared_ptr<ServerClientContext> clientContext = this->mClientComponent->GetOrCreateSession(address);
 		if(clientContext->IsOpen())
 		{
 			clientContext->SendToServer(request);
 			return XCode::Successful;
 		}
-		int count = 0;
-		while(!clientContext->StartConnectAsync())
+		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
+		if(taskComponent->GetContextId() ==0)
 		{
-			this->GetApp()->GetTaskComponent()->Sleep(3000);
-			LOG_ERROR("connect [" << address << "] failure count = " << count++);
-			if(count >= 10)
+			taskComponent->Start([clientContext, taskComponent, address, request]()
 			{
-				return XCode::NetWorkError;
-			}
+				for (int count = 0; count < 10; count++)
+				{
+					if (clientContext->StartConnectAsync())
+					{
+						clientContext->SendToServer(request);
+						LOG_ERROR("connect [" << address << "] successful count = " << count++);
+						return;
+					}
+					taskComponent->Sleep(3000);
+					LOG_ERROR("connect [" << address << "] failure count = " << count++);
+				}
+			});
+			return XCode::Successful;
 		}
-		clientContext->SendToServer(request);
-		return XCode::Successful;
+		for (int count = 0; count < 10; count++)
+		{
+			if (clientContext->StartConnectAsync())
+			{
+				clientContext->SendToServer(request);
+				LOG_INFO("connect [" << address << "] successful count = " << count++);
+				return XCode::Successful;
+			}
+			taskComponent->Sleep(3000);
+			LOG_ERROR("connect [" << address << "] failure count = " << count++);
+		}
+		return XCode::NetWorkError;
 	}
 }
 

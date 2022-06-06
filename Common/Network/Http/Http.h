@@ -66,7 +66,6 @@
   XX(508, LOOP_DETECTED,                   Loop Detected)                   \
   XX(510, NOT_EXTENDED,                    Not Extended)                    \
   XX(511, NETWORK_AUTHENTICATION_REQUIRED, Network Authentication Required) \
-
 /**
  * @brief HTTP状态枚举
  */
@@ -96,7 +95,5 @@ enum HttpMethodType
 };
 
 #define HttpVersion "HTTP/1.0"
-#define HttpHeadMaxCount 2048
-#define HttpPostMaxCount 10240
 
-#endif //GameKeeper_HTTP_H
+#endif

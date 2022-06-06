@@ -5,6 +5,7 @@
 #include"Util/DirectoryHelper.h"
 #include"Util/FileHelper.h"
 #include"Util/MD5.h"
+#include"Util/Guid.h"
 #include"Async/Lua/WaitLuaTaskSource.h"
 #include"Async/LuaServiceTaskSource.h"
 #include"Script/Extension/App/LuaApp.h"
@@ -78,6 +79,10 @@ namespace Sentry
 		luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
 		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
 
+		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
+		luaRegister6.BeginNewTable();
+		luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
+
 		Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "Json");
 		luaRegister7.BeginNewTable();
 		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
@@ -92,23 +97,31 @@ namespace Sentry
 		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
 		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
 
-		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(this->mLuaEnv, "Main", "Awake");
-		if (luaFunction != nullptr)
+		if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{
-			luaFunction->Action();
+			if(lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
+			{
+				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+				LOG_ERROR("invoke " << "Main" << ".Awake" << " error");
+				return false;
+			}
 		}
 		return true;
 	}
 
 	bool LuaScriptComponent::OnStart()
 	{
-		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
-		return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
+		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
+		if(luaTaskSource != nullptr)
+		{
+			return luaTaskSource->Await<bool>();
+		}
+		return true;
 	}
 
 	void LuaScriptComponent::OnComplete()
 	{
-		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Complete");
+		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Complete");
 		if(luaTaskSource != nullptr)
 		{
 			luaTaskSource->Await<void>();
@@ -117,7 +130,7 @@ namespace Sentry
 
 	void LuaScriptComponent::OnAllServiceStart()
 	{
-		WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "AllServiceStart");
+		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "AllServiceStart");
 		if(luaTaskSource != nullptr)
 		{
 			luaTaskSource->Await<void>();
