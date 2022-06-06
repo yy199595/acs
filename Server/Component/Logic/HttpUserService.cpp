@@ -51,14 +51,14 @@ namespace Sentry
 		XCode code = this->mMysqlComponent->QueryOnce(whereJson, userAccount);
 		if (code != XCode::Successful)
 		{
-			response.WriteString("query user data error");
+			response.AddHead("error", "query user data error");
 			return code;
 		}
 
 		if (userAccount->password() != password)
 		{
 			LOG_ERROR(account << " login failure password error");
-			response.WriteString("user password error");
+			response.AddHead("error", "user password error");
 			return XCode::Failure;
 		}
 		std::string newToken;
@@ -101,7 +101,7 @@ namespace Sentry
 		LOG_DEBUG(user_account << " start register ....");
 		if(userId == 0)
 		{
-			response.WriteString("the user already exists");
+			response.AddHead("error", "the user already exists");
 			return XCode::RedisSocketError;
 		}
 		long long nowTime = Helper::Time::GetNowSecTime();

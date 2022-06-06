@@ -38,12 +38,39 @@ namespace Sentry
 		{
 			return false;
 		}
+        std::vector<const RpcInterfaceConfig *> rpcInterfaceConfigs;
+        this->GetServiceConfig().GetConfigs(rpcInterfaceConfigs);
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+
 		if (luaScriptComponent != nullptr)
 		{
-			lua_State* lua = luaScriptComponent->GetLuaEnv();
-			return this->mMethodRegister->LoadLuaMethod(lua);
+            lua_State * lua = luaScriptComponent->GetLuaEnv();
+            for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterfaceConfigs)
+            {
+                const char* tab = rpcInterfaceConfig->Service.c_str();
+                const char * func = rpcInterfaceConfig->Method.c_str();
+                if (Lua::Function::Get(lua, tab, func))
+                {
+                    std::shared_ptr<LuaServiceMethod> luaServiceMethod
+                            = std::make_shared<LuaServiceMethod>(rpcInterfaceConfig, lua);
+                    this->mMethodRegister->AddMethod(luaServiceMethod);
+                }
+                else if (this->mMethodRegister->GetMethod(rpcInterfaceConfig->Method) == nullptr)
+                {
+                    return false;
+                }
+            }
 		}
+
+        for(const RpcInterfaceConfig * config : rpcInterfaceConfigs)
+        {
+            if(this->mMethodRegister->GetMethod(config->Method) == nullptr)
+            {
+                LOG_ERROR("not register " << config->FullName);
+                return false;
+            }
+        }
+
 		return true;
 	}
 

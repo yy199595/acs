@@ -4,7 +4,7 @@
 namespace Sentry
 {
 	class MysqlRpcTaskSource;
-	class MysqlAgentComponent : public Component
+    class MysqlAgentComponent final : public Component, public ILuaRegister
 	{
 	 public:
 		MysqlAgentComponent() = default;
@@ -18,17 +18,22 @@ namespace Sentry
 
 		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response, long long flag = 0);
 
-		template<typename T>
+        template<typename T>
 		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson, long long flag = 0);
 
 		template<typename T>
 		XCode Delete(const std::string& deleteJson, long long flag = 0);
 
-		template<typename T>
+        XCode Delete(const std::string & table, const std::string& deleteJson, long long flag = 0);
+
+        template<typename T>
 		XCode Update(const std::string& updateJson, const std::string& whereJson, long long flag = 0);
 
-	 private:
+        XCode Update(const std::string & table, const std::string& updateJson, const std::string& whereJson, long long flag = 0);
+
+    private:
 		bool LateAwake() final;
+        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response = nullptr);
 	private:
 		class MysqlService * mMysqlService;
@@ -66,24 +71,14 @@ namespace Sentry
 	template<typename T>
 	XCode MysqlAgentComponent::Delete(const std::string& deleteJson, long long flag)
 	{
-		s2s::Mysql::Delete request;
-		request.set_flag(flag);
-		std::shared_ptr<T> data(new T());
-		request.set_table(data->GetTypeName());
-		request.set_where_json(deleteJson);
-		return this->Call("Delete", request);
+        T data;
+        return this->Delete(data.GetTypeName(), deleteJson, flag);
 	}
 
 	template<typename T>
 	XCode MysqlAgentComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
 	{
-		s2s::Mysql::Update request;
-		std::shared_ptr<T> data(new T());
-		request.set_table(data->GetTypeName());
-
-		request.set_flag(flag);
-		request.set_where_json(whereJson);
-		request.set_update_json(updateJson);
-		return this->Call("Update", request);
+        T data;
+        return this->Update(data.GetTypeName(), whereJson, updateJson, flag);
 	}
 }

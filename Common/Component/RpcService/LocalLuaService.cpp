@@ -35,8 +35,8 @@ namespace Sentry
 				LOG_ERROR("not find rpc method = [" << tab << '.' << func << ']');
 				return false;
 			}
-			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>(
-				rpcInterfaceConfig->Service, rpcInterfaceConfig->Method, this->mLuaEnv)))
+			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>
+			        (rpcInterfaceConfig, this->mLuaEnv)))
 			{
 				return false;
 			}
@@ -72,12 +72,11 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(ServiceComponent::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
-		std::shared_ptr<Lua::Table> luaTable = Lua::Table::Create(this->mLuaEnv, this->GetName());
-		if (luaTable == nullptr)
-		{
-			LOG_ERROR(this->GetName() << " is not lua table");
-			return false;
-		}
+        if(!Lua::Table::Get(this->mLuaEnv, this->GetName()))
+        {
+            LOG_ERROR(this->GetName() << " is not lua table");
+            return false;
+        }
 		const char * tab = this->GetName().c_str();
 		if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
 		{

@@ -6,12 +6,15 @@
 #include"spdlog/fmt/fmt.h"
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
+#include"Component/Lua/LuaScriptComponent.h"
+#include"Method/LuaHttpServiceMethod.h"
 namespace Sentry
 {
 	LocalHttpService::LocalHttpService()
 	{
 		this->mConfig = nullptr;
 	}
+
 	XCode LocalHttpService::Invoke(const std::string& name,
 		std::shared_ptr<HttpHandlerRequest> request, std::shared_ptr<HttpHandlerResponse> response)
 	{
@@ -23,10 +26,42 @@ namespace Sentry
 		return method->Invoke(*request, *response);
 	}
 	bool LocalHttpService::StartService()
-	{
-		this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
-		return this->OnStartService(*this->mServiceRegister);
-	}
+    {
+        this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
+        if (!this->OnStartService(*this->mServiceRegister))
+        {
+            return false;
+        }
+
+        std::vector<const HttpInterfaceConfig *> configs;
+        this->GetServiceConfig().GetConfigs(configs);
+        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+        for(const HttpInterfaceConfig * config : configs)
+        {
+            const char * tab = config->Service.c_str();
+            const char * method = config->Method.c_str();
+            lua_State * luaEnv = luaComponent->GetLuaEnv();
+            if(Lua::Function::Get(luaEnv,tab, method))
+            {
+                std::shared_ptr<LuaHttpServiceMethod> luaHttpServiceMethod =
+                        std::make_shared<LuaHttpServiceMethod>(config, luaEnv);
+                if(!this->mServiceRegister->AddMethod(luaHttpServiceMethod))
+                {
+                    return false;
+                }
+            }
+        }
+
+        for(const HttpInterfaceConfig * config : configs)
+        {
+            if(this->mServiceRegister->GetMethod(config->Method) == nullptr)
+            {
+                LOG_ERROR("not register method " << config->Service << "." << config->Method);
+                return false;
+            }
+        }
+        return true;
+    }
 
 	bool LocalHttpService::CloseService()
 	{

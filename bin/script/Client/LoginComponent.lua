@@ -15,17 +15,14 @@ function LoginComponent.Register(account, passwd, phoneNum)
     }
     local url = "http://127.0.0.1:80/logic/account/register"
     local jsonObject = httpComponent:Post(url, Json.Encode(registerInfo))
-    local response = Json.Decode(jsonObject.data)
-    if response == nil then
-        Log.Error(jsonObject.data)
+
+    if jsonObject.head.code ~= XCode.Successful then
+        Log.Error(account, "register error : ", jsonObject.head.error)
         return false
     end
-    if response.code == XCode.Successful then
-        Log.Info("register ", account, " successful")
-        return true
-    end
-    Log.Info("register ", account, " failure")
-    return false
+    Log.Info("register ", account, " successful")
+
+    return Json.Decode(jsonObject.data)
 end
 
 function LoginComponent.Login(account, passwd) -- 获取gate地址
@@ -36,15 +33,12 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
     }
     local url = "http://127.0.0.1:80/logic/account/login"
     local jsonObject = httpComponent:Post(url, Json.Encode(loginInfo))
-    local response = Json.Decode(jsonObject.data)
-    if response == nil then
-        Log.Error(jsonObject.data)
-        return nil
-    end
-    if response.code ~= XCode.Successful then
-        Log.Error(account, " login failure ")
+
+    if jsonObject.head.code ~= XCode.Successful then
+        Log.Error(account, " login error : ", jsonObject.head.error)
         return nil
     end
     Log.Info(account, " login successful")
-    return response.data
+
+    return Json.Decode(jsonObject.data)
 end

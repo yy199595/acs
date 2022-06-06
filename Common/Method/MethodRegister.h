@@ -96,7 +96,6 @@ namespace Sentry
 		}
 
 	public:
-		bool LoadLuaMethod(lua_State *lua);
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
 		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
 	private:
@@ -124,13 +123,18 @@ namespace Sentry
 				return false;
 			}
 			T * component = this->mComponent->Cast<T>();
-			this->mHttpMethodMap.emplace(name, std::make_shared<CppHttpServiceMethod<T>>(component, std::move(func)));
-			return true;
+            std::shared_ptr<HttpServiceMethod> httpServiceMethod =
+                    std::make_shared<CppHttpServiceMethod<T>>(name, component, std::move(func));
+			return this->AddMethod(httpServiceMethod);
 		}
+
+    public:
+        bool AddMethod(std::shared_ptr<HttpServiceMethod> method);
 	 private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
-	};
+        std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mLuaHttpMethodMap;
+    };
 }
 
 

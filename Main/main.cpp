@@ -24,6 +24,8 @@
 #include"Component/Mongo/MongoService.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
+#include"Component/RpcService/LocalLuaService.h"
+#include"Component/HttpService/LocalLuaHttpService.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -75,6 +77,8 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
+    ComponentFactory::Add<LocalLuaService>("rpc");
+    ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
 	ComponentFactory::Add<MongoService>("MongoService");

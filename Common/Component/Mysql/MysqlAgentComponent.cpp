@@ -2,6 +2,8 @@
 
 #include"Util/StringHelper.h"
 #include"Component/Mysql/MysqlService.h"
+#include"Script/Extension/Mysql/LuaMysql.h"
+
 namespace Sentry
 {
 	bool MysqlAgentComponent::LateAwake()
@@ -26,6 +28,26 @@ namespace Sentry
 		request.mutable_data()->PackFrom(data);
 		return  this->Call("Save", request);
 	}
+
+    XCode MysqlAgentComponent::Delete(const std::string &table, const std::string &deleteJson, long long flag)
+    {
+        s2s::Mysql::Delete request;
+        request.set_table(table);
+        request.set_where_json(deleteJson);
+        return this->Call("Delete", request);
+    }
+
+    XCode MysqlAgentComponent::Update(const std::string &table, const std::string &updateJson,
+                                      const std::string &whereJson, long long flag)
+    {
+        s2s::Mysql::Update request;
+
+        request.set_flag(flag);
+        request.set_table(table);
+        request.set_where_json(whereJson);
+        request.set_update_json(updateJson);
+        return this->Call("Update", request);
+    }
 
 
 	XCode MysqlAgentComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
@@ -68,4 +90,14 @@ namespace Sentry
 		}
 		return XCode::Successful;
 	}
+
+    void MysqlAgentComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
+    {
+        luaRegister.BeginRegister<MysqlAgentComponent>();
+        luaRegister.PushExtensionFunction("Add", Lua::Mysql::Add);
+        luaRegister.PushExtensionFunction("Save", Lua::Mysql::Save);
+        luaRegister.PushExtensionFunction("Delete", Lua::Mysql::Delete);
+        luaRegister.PushExtensionFunction("Update", Lua::Mysql::Update);
+        luaRegister.PushExtensionFunction("QueryOnce", Lua::Mysql::QueryOnce);
+    }
 }

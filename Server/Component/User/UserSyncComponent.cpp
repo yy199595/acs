@@ -4,6 +4,7 @@
 
 #include"UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
 	bool UserSyncComponent::LateAwake()

@@ -8,7 +8,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Json/JsonWriter.h"
 #include"Async/RpcTask/RpcTaskSource.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
 	void RpcHandlerComponent::Awake()

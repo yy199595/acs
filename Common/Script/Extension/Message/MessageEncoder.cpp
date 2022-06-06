@@ -195,6 +195,16 @@ namespace Sentry
 		case FieldDescriptor::CPPTYPE_MESSAGE:
 		{
 			Message* submessage = reflection->AddMessage(&message, field);
+            if(submessage->GetTypeName() == "google.protobuf.Any")
+            {
+                std::shared_ptr<Message> message = Lua::SharedPtrProxy<Message>::Read(this->mLua, 1);
+                if(message == nullptr)
+                {
+                    return false;
+                }
+                static_cast<Any*>(submessage)->PackFrom(*message);
+                return true;
+            }
 			if(!this->EncoddeMessage(*submessage, field->message_type(), index))
 			{
 				return false;

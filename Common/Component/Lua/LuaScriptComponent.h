@@ -6,7 +6,6 @@
 #include"Script/Table.h"
 namespace Sentry
 {
-	class LocalLuaService;
 	class LuaScriptComponent : public Component, public IStart, public IComplete
 	{
 	 public:
@@ -15,7 +14,6 @@ namespace Sentry
 		virtual ~LuaScriptComponent() = default;
 
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
-		LocalLuaService * CreateService(const std::string & name);
 	 protected:
 		void Awake() final;
 		bool OnStart() final;

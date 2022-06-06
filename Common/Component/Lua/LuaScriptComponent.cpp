@@ -14,7 +14,6 @@
 #include"Component/RpcService/ServiceComponent.h"
 #include"Script/Extension/Bson/bson.h"
 #include"Script/Extension/Json/Encoder.h"
-#include"Component/RpcService/LocalLuaService.h"
 using namespace Lua;
 namespace Sentry
 {
@@ -186,14 +185,5 @@ namespace Sentry
 		LOG_ERROR("load "<< filePath << " failure : " << lua_tostring(mLuaEnv, -1));
 		lua_pop(mLuaEnv, 1);
 		return false;
-	}
-	LocalLuaService* LuaScriptComponent::CreateService(const string& name)
-	{
-		if(!Lua::Table::Get(this->mLuaEnv, name))
-		{
-			CONSOLE_LOG_ERROR("not find lua table : " << name);
-			return nullptr;
-		}
-		return new LocalLuaService();
 	}
 }

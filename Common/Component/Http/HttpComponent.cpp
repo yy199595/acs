@@ -59,39 +59,58 @@ namespace Sentry
 		this->mHttpClients.insert(handlerClient);
 	}
 
+    const HttpInterfaceConfig *HttpComponent::OnHandler(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    {
+        const std::string& path = request.GetPath();
+        auto iter = this->mHttpConfigs.find(path);
+        if(iter == this->mHttpConfigs.end())
+        {
+            response.SetCode(HttpStatus::NOT_FOUND);
+            return nullptr;
+        }
+        const HttpInterfaceConfig* httpConfig = iter->second;
+        if(httpConfig->Type != request.GetMethod())
+        {
+            response.SetCode(HttpStatus::METHOD_NOT_ALLOWED);
+            return nullptr;
+        }
+        return iter->second;
+
+    }
+
 	void HttpComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
 		std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
 		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
-		const std::string& path = request->GetPath();
-		auto iter = this->mHttpConfigs.find(path);
-		if(iter == this->mHttpConfigs.end())
-		{
-			this->ClosetHttpClient(httpClient);
-			LOG_ERROR("not find http config : " << path);
-			return;
-		}
-		const HttpInterfaceConfig* httpConfig = iter->second;
-		if(httpConfig->Type != request->GetMethod())
-		{
-			this->ClosetHttpClient(httpClient);
-			return;
-		}
+		const HttpInterfaceConfig* httpConfig = this->OnHandler(*request, *response);
+        if(httpConfig == nullptr)
+        {
+            httpClient->StartWriter();
+            return;
+        }
+
 		LocalHttpService* httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
 		if(httpService == nullptr || !httpService->IsStartService())
 		{
-			this->ClosetHttpClient(httpClient);
+			response->AddHead("error", "service not start");
+            response->AddHead("code", (int)XCode::CallFunctionNotExist);
+            httpClient->StartWriter();
 			return;
 		}
 		if(!httpConfig->IsAsync)
 		{
-			httpService->Invoke(httpConfig->Method, request, response);
+			XCode code = httpService->Invoke(httpConfig->Method, request, response);
+
+            response->AddHead("code", (int)code);
 			httpClient->StartWriter();
+            return;
 		}
 		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
 		{
-			httpService->Invoke(httpConfig->Method, request, response);
+			XCode code = httpService->Invoke(httpConfig->Method, request, response);
+
+            response->AddHead("code", (int)code);
 			httpClient->StartWriter();
 		});
 	}
@@ -136,11 +155,6 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Get", Lua::Http::Get);
 		luaRegister.PushExtensionFunction("Post", Lua::Http::Post);
 		luaRegister.PushExtensionFunction("Download", Lua::Http::Download);
-
-		Lua::ClassProxyHelper classProxyHelper = luaRegister.Clone("HttpHandlerResponse");
-		classProxyHelper.BeginRegister<HttpHandlerResponse>();
-		classProxyHelper.PushMemberFunction("AddHead", &HttpHandlerResponse::AddHead);
-		classProxyHelper.PushMemberFunction("WriteString", &HttpHandlerResponse::WriteString);
 	}
 
 	XCode HttpComponent::Download(const string& url, const string& path)

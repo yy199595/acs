@@ -22,6 +22,7 @@ namespace Sentry
 	class HttpAsyncResponse;
 	class HttpHandlerRequest;
 	class HttpRequestClient;
+    class HttpHandlerResponse;
 	class HttpComponent : public Component, public ISocketListen, public ILuaRegister
 	{
 	 public:
@@ -40,6 +41,9 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
 		void ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient);
+
+    private:
+        const HttpInterfaceConfig * OnHandler(const HttpHandlerRequest & requets, HttpHandlerResponse & response);
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;

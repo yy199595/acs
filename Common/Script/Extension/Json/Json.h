@@ -11,7 +11,9 @@ namespace Lua
 	{
 		extern int Encode(lua_State * lua);
 		extern int Decode(lua_State * lua);
-	};
+        extern void Write(lua_State * lua, const std::string & json);
+        extern void Read(lua_State * lua, int index, std::string * json);
+    };
 }
 
 #endif //SERVER_JSON_H

@@ -3,47 +3,41 @@
     "node_id": 1,
     "fps": 30,
     "node_name": "Server",
-    "thread":
-    {
-        "task":1,
-        "network":2
+    "thread": {
+        "task": 1,
+        "network": 2
     },
-    "path":
-    {
+    "path": {
         "log": "log",
         "proto": "proto",
-        "source" : "source",
+        "source": "source",
         "code": "XCode/XCode.csv",
         "service": "config/service.json"
     },
     "listener": {
-        "rpc":
-        {
-            "port":7788,
-            "count":10000,
+        "rpc": {
+            "port": 7788,
+            "count": 10000,
             "ip": "127.0.0.1",
-            "component":"RpcClientComponent"
+            "component": "RpcClientComponent"
         },
-        "http":
-        {
-            "port":80,
+        "http": {
+            "port": 80,
             "count": 1000,
             "ip": "127.0.0.1",
             "component": "HttpComponent"
         },
-        "gate":
-        {
-            "port":1995,
+        "gate": {
+            "port": 1995,
             "count": 10000,
             "ip": "127.0.0.1",
             "component": "GateClientComponent"
         },
-        "console":
-        {
+        "console": {
             "port": 8088,
             "count": 100,
             "ip": "127.0.0.1",
-            "component" : "ConsoleComponent"
+            "component": "ConsoleComponent"
         }
     },
     "mysql": {
@@ -53,8 +47,7 @@
         "user": "yjz",
         "passwd": "199595yjz."
     },
-    "redis":
-    {
+    "redis": {
         "main": {
             "ip": "114.115.167.51",
             "port": 6379,
@@ -102,12 +95,13 @@
         "ServiceMgrComponent",
         "ClientComponent"
     ],
-    "service":
-    [
+    "service.rpc": [
         "GateService",
         "ChatService",
-        "MysqlService",
-        "HttpUserService",
+        "MysqlService"
+    ],
+    "service.http": [
+        "AccountService",
         "HttpSourceService"
     ],
     "white_list": [

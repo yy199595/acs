@@ -263,10 +263,7 @@ namespace Sentry
 		}
 
 	 public:
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
+		bool IsLuaMethod() override { return false; };
 		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
 		{
 			assert(!request.address().empty());

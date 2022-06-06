@@ -31,7 +31,7 @@ function Client.Start()
         Log.Error("connect [" , loginInfo, "] failure")
         return
     end
-    Log.Debug("connect [" , loginInfo.address, "] successful")
+    Log.Debug("connect h t t[" , loginInfo.address, "] successful")
 
     local authMessage = messageComponent:New("c2s.GateAuth.Request", {
         token = loginInfo.token

@@ -1,6 +1,6 @@
 {
     "MysqlService": {
-        "Lang": "cpp",
+        "Type": "rpc",
         "Add": {
             "Async": true,
             "Timeout": 0,
@@ -38,23 +38,23 @@
             "Request": "s2s.Mysql.Update"
         }
     },
-    "HttpUserService": {
-        "Lang": "cpp",
+    "AccountService": {
+        "Type": "http",
         "Login": {
             "Type": "POST",
-            "Async": true,
+            "Async": false,
             "Content": "application/json",
             "Path": "/logic/account/login"
         },
         "Register": {
             "Type": "POST",
-            "Async": true,
+            "Async": false,
             "Content": "application/json",
             "Path": "/logic/account/register"
         }
     },
     "HttpSourceService": {
-        "Lang": "cpp",
+        "Type": "http",
         "Files": {
             "Type": "GET",
             "Async": false,
@@ -67,7 +67,7 @@
         }
     },
     "GateService": {
-        "Lang": "cpp",
+        "Type": "rpc",
         "Ping": {
             "Async": true,
             "Type": "Client",
@@ -110,7 +110,7 @@
         }
     },
     "ChatService": {
-        "Lang": "lua",
+        "Type": "rpc",
         "Chat": {
             "Async": true,
             "Type": "Client",

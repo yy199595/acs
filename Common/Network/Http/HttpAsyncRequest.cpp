@@ -206,7 +206,7 @@ namespace Sentry
 		}
 		return false;
 	}
-	bool HttpAsyncResponse::ToJson(std::string & json)
+	bool HttpAsyncResponse::ToJson(std::string & json) const
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.StartObject("head");
@@ -231,7 +231,18 @@ namespace Sentry
         this->mState = HttpDecodeState::FirstLine;
     }
 
-    bool HttpHandlerRequest::GetHeadContent(const std::string &key, std::string &value) const
+    bool HttpHandlerRequest::GetHead(const std::string &key, int &value) const
+    {
+        auto iter = this->mHeadMap.find(key);
+        if(iter != this->mHeadMap.end())
+        {
+            value = std::stoi(iter->second);
+            return true;
+        }
+        return false;
+    }
+
+    bool HttpHandlerRequest::GetHead(const std::string &key, std::string &value) const
     {
         auto iter = this->mHeadMap.find(key);
         if(iter != this->mHeadMap.end())
@@ -240,6 +251,26 @@ namespace Sentry
             return true;
         }
         return false;
+    }
+
+    bool HttpHandlerRequest::ToJson(std::string &json) const
+    {
+        Json::Writer jsonWriter;
+        jsonWriter.AddMember("path", this->mPath);
+        jsonWriter.AddMember("version", this->mVersion);
+        jsonWriter.AddMember("address", this->mAddress);
+        jsonWriter.AddMember("data", this->mContent);
+        jsonWriter.StartObject("head");
+
+        auto iter = this->mHeadMap.begin();
+        for(; iter != this->mHeadMap.end(); iter++)
+        {
+            const std::string & key = iter->first;
+            const std::string & value = iter->second;
+            jsonWriter.AddMember(key.c_str(), value);
+        }
+        jsonWriter.EndObject();
+        return jsonWriter.WriterStream(json);
     }
 
     HttpStatus HttpHandlerRequest::OnReceiveData(asio::streambuf &streamBuffer)
@@ -357,6 +388,11 @@ namespace Sentry
 		return 0;
 	}
 
+    bool HttpHandlerResponse::AddHead(const char *key, int value)
+    {
+        return this->AddHead(key, std::to_string(value));
+    }
+
 	bool HttpHandlerResponse::AddHead(const char * key, const std::string& value)
 	{
 		auto iter = this->mHeadMap.find(key);
@@ -374,9 +410,16 @@ namespace Sentry
 	}
 
 	void HttpHandlerResponse::WriteString(const std::string& content)
-	{
-		this->mContent.append(content);
-	}
+    {
+        this->mContentSize += content.size();
+        this->mContent.append(content);
+    }
+
+    void HttpHandlerResponse::WriteString(const char *content, size_t size)
+    {
+        this->mContentSize += size;
+        this->mContent.append(content, size);
+    }
 
 	void HttpHandlerResponse::WriteFile(std::fstream * ofstream)
 	{

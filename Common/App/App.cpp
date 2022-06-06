@@ -1,9 +1,8 @@
 ﻿
 #include"App.h"
+#include"Util/FileHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
-#include"Util/FileHelper.h"
-#include"Component/Lua/LuaScriptComponent.h"
 #include"Component/RpcService/LocalLuaService.h"
 #include"Component/RpcService/ServiceAgentComponent.h"
 using namespace Sentry;
@@ -48,7 +47,7 @@ namespace Sentry
 		{
 			for (const std::string& name: components)
 			{
-				Component * component = this->CreateComponent(name, "cpp");
+				Component * component = ComponentFactory::CreateComponent(name);
 				if(component == nullptr || !this->AddComponent(name, component))
 				{
 					CONSOLE_LOG_ERROR("add " << name << " failure");
@@ -60,9 +59,17 @@ namespace Sentry
 		for(;iter != jsonDocument.MemberEnd(); iter++)
 		{
 			const rapidjson::Value & josnValue = iter->value;
-			std::string lang(josnValue["Lang"].GetString());
-			const std::string name(iter->name.GetString());
-			Component * component = this->CreateComponent(name, lang);
+            const std::string name(iter->name.GetString());
+            std::string type(josnValue["Type"].GetString());
+            Component* component = ComponentFactory::CreateComponent(name);
+            if(component == nullptr)
+            {
+                component = ComponentFactory::CreateComponent(type);
+                if(component == nullptr && type == "rpc")
+                {
+                    component = new ServiceAgentComponent();
+                }
+            }
 			if(component == nullptr || !this->AddComponent(name, component))
 			{
 				CONSOLE_LOG_ERROR("add " << name << " failure");
@@ -87,17 +94,6 @@ namespace Sentry
 			}
 		}
 		return true;
-	}
-
-	Component * App::CreateComponent(const std::string& name, const std::string& lang)
-	{
-		if(lang == "cpp"){
-			return ComponentFactory::CreateComponent(name);
-		}
-		if(lang == "lua"){
-			return this->GetComponent<LuaScriptComponent>()->CreateService(name);
-		}
-		return new ServiceAgentComponent(); //其他语言
 	}
 
 	bool App::InitComponent(Component* component)
@@ -249,8 +245,9 @@ namespace Sentry
 	bool App::StartNewComponent()
 	{
 		std::vector<std::string> components;
-		this->mConfig->GetMember("service", components);
-		for (const std::string& name: components)
+		this->mConfig->GetMember("service.rpc", components);
+        this->mConfig->GetMember("service.http", components);
+        for (const std::string& name: components)
 		{
 			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
 			if (localServerRpc != nullptr && !localServerRpc->StartService())

@@ -6,6 +6,7 @@
 #include"LuaServiceMethod.h"
 #include"Script/Function.h"
 #include"App/App.h"
+#include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
@@ -59,37 +60,6 @@ namespace Sentry
 		return nullptr;
 	}
 
-	bool ServiceMethodRegister::LoadLuaMethod(lua_State* lua)
-	{
-		std::vector<std::string> methods;
-		const std::string & service = this->mComponent->GetName();
-		ServiceComponent * serviceComponent = this->mComponent->Cast<ServiceComponent>();
-		if(serviceComponent == nullptr)
-		{
-			return false;
-		}
-		std::vector<const RpcInterfaceConfig *> rpcInterfaceConfigs;
-		const RpcServiceConfig & rpcServiceConfig = serviceComponent->GetServiceConfig();
-		rpcServiceConfig.GetConfigs(rpcInterfaceConfigs);
-
-		for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterfaceConfigs)
-		{
-			const char* tab = rpcInterfaceConfig->Service.c_str();
-			const char * func = rpcInterfaceConfig->Method.c_str();
-			if (Lua::Function::Get(lua, tab, func))
-			{
-				std::shared_ptr<LuaServiceMethod> luaServiceMethod
-					= std::make_shared<LuaServiceMethod>(service, rpcInterfaceConfig->Method, lua);
-				this->mLuaMethodMap.emplace(rpcInterfaceConfig->Method, luaServiceMethod);
-			}
-			else if (this->GetMethod(rpcInterfaceConfig->Method) == nullptr)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	ServiceMethodRegister::ServiceMethodRegister(Component * component)
 			: mComponent(component)
 	{
@@ -101,7 +71,34 @@ namespace Sentry
 {
 	std::shared_ptr<HttpServiceMethod> HttpServiceRegister::GetMethod(const string& name)
 	{
-		auto iter = this->mHttpMethodMap.find(name);
-		return iter != this->mHttpMethodMap.end() ? iter->second : nullptr;
+        auto iter = this->mLuaHttpMethodMap.find(name);
+        if(iter != this->mLuaHttpMethodMap.end())
+        {
+            return iter->second;
+        }
+		auto iter1 = this->mHttpMethodMap.find(name);
+		return iter1 != this->mHttpMethodMap.end() ? iter1->second : nullptr;
 	}
+
+    bool HttpServiceRegister::AddMethod(std::shared_ptr<HttpServiceMethod> method)
+    {
+        const std::string & name = method->GetName();
+        if(method->IsLuaMethod())
+        {
+            auto iter = this->mLuaHttpMethodMap.find(name);
+            if(iter != this->mLuaHttpMethodMap.end())
+            {
+                return false;
+            }
+            this->mLuaHttpMethodMap.emplace(name, method);
+            return true;
+        }
+        auto iter1 = this->mHttpMethodMap.find(name);
+        if(iter1 != this->mHttpMethodMap.end())
+        {
+            return false;
+        }
+        this->mHttpMethodMap.emplace(name, method);
+        return true;
+    }
 }

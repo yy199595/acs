@@ -1,0 +1,16 @@
+{
+	"/app/account/login": {
+		"Service": "",
+		"Method": "",
+		"Async": false,
+		"Content": "",
+		"Type": "POST"
+	},
+	"/app/account/register": {
+		"Component": "",
+		"Method": "",
+		"Async": false,
+		"Content": "",
+		"Type": "POST"
+	}
+}

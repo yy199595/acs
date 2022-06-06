@@ -81,6 +81,7 @@ namespace Sentry
     class IHttpContent
     {
     public:
+        virtual bool ToJson(std::string & json) const = 0;
         virtual const std::string & GetContent() const = 0;
         virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
@@ -98,7 +99,7 @@ namespace Sentry
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() const final { return this->mContent;}
 	public:
-		bool ToJson(std::string & json);
+		bool ToJson(std::string & json) const final;
 		bool GetHead(const std::string & key, std::string & value);
     private:
         int mHttpCode;
@@ -119,13 +120,17 @@ namespace Sentry
 	 public:
 		HttpHandlerRequest(const std::string & address);
 	 public:
+        bool ToJson(std::string &json) const final;
 		HttpStatus OnReceiveData(asio::streambuf& streamBuffer) final;
 	 public:
 		const std::string& GetPath() const { return this->mPath; }
 		const std::string& GetMethod() const { return this->mMethod; }
 		const std::string& GetAddress() const { return this->mAddress; }
 		const std::string& GetContent() const final { return this->mContent; }
-		bool GetHeadContent(const std::string& key, std::string& value) const;
+
+    public:
+        bool GetHead(const std::string& key, int & value) const;
+        bool GetHead(const std::string& key, std::string& value) const;
 	 private:
 		std::string mPath;
 		std::string mMethod;
@@ -148,7 +153,10 @@ namespace Sentry
 		void SetCode(HttpStatus code);
 		void WriteFile(std::fstream * fs);
 		void WriteString(const std::string & content);
-		bool AddHead(const char * key, const std::string & value);
+        void WriteString(const char * content, size_t size);
+    public:
+        bool AddHead(const char * key, int value);
+        bool AddHead(const char * key, const std::string & value);
 	 private:
 		int Serailize(std::ostream &os) final;
 	 private:

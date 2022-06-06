@@ -7,6 +7,19 @@
 #include"Encoder.h"
 namespace Lua
 {
+    void Json::Read(lua_State *lua, int index, std::string *json)
+    {
+        StringBuffer s;
+        Encoder encode(lua, index);
+        encode.encode(lua, &s, index);
+        json->append(s.GetString(), s.GetLength());
+    }
+
+    void Json::Write(lua_State *lua, const std::string &json)
+    {
+        values::pushDecoded(lua, json.c_str(), json.size());
+    }
+
 	int Json::Encode(lua_State* lua)
 	{
 		try{

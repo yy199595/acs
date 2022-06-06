@@ -16,20 +16,28 @@ namespace Sentry
 
 	class HttpServiceMethod
 	{
+    public:
+        HttpServiceMethod(const std::string & name) : mName(name) { }
 	 public:
+        virtual bool IsLuaMethod() const = 0;
+        const std::string & GetName() const { return this->mName; }
 		virtual XCode Invoke(const HttpHandlerRequest & request, HttpHandlerResponse & response) = 0;
+
+    private:
+        const std::string mName;
 	};
 
 	template<typename T>
 	class CppHttpServiceMethod : public HttpServiceMethod
 	{
 	 public:
-		CppHttpServiceMethod(T* o, HttpJsonMethod<T> func)
-			: mObj(o), mFunction(std::move(func))
+		CppHttpServiceMethod(const std::string & name, T* o, HttpJsonMethod<T> func)
+			: HttpServiceMethod(name), mObj(o), mFunction(std::move(func))
 		{
 		}
 
 	 public:
+        bool IsLuaMethod() const { return false; }
 		XCode Invoke(const HttpHandlerRequest & request, HttpHandlerResponse & response)
 		{
 			return (this->mObj->*mFunction)(request, response);
