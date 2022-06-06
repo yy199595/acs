@@ -132,7 +132,6 @@ namespace Sentry
 	{
 		this->mHttpCode = 0;
 		this->mFstream = fs;
-		this->mContentLength = 0;
 		this->mState = HttpDecodeState::FirstLine;
 	}
 
@@ -150,8 +149,10 @@ namespace Sentry
 		std::iostream io(&streamBuffer);
 		if (this->mState == HttpDecodeState::FirstLine)
 		{
+			std::string version;
 			this->mState = HttpDecodeState::HeadLine;
-			io >> this->mVersion >> this->mHttpCode >> this->mHttpError;
+			io >> version >> this->mHttpCode >> this->mHttpError;
+			this->mHttpData.set_version(version);
 			io.ignore(2); //放弃\r\n
 		}
 		if (this->mState == HttpDecodeState::HeadLine)
@@ -171,13 +172,8 @@ namespace Sentry
 					std::string key = lineData.substr(0, pos);
 					Helper::String::Tolower(key);
 					std::string val = lineData.substr(pos + 1, length);
-					this->mHeadMap.insert(std::make_pair(key, val));
+					this->mHttpData.mutable_head()->insert({key, val});
 				}
-			}
-			std::string length;
-			if(this->GetHead("content-length", length))
-			{
-				this->mContentLength = std::stoi(length);
 			}
 		}
 		if (this->mState == HttpDecodeState::Content)
@@ -190,7 +186,7 @@ namespace Sentry
 					this->mFstream->write(buffer, io.gcount());
 					continue;
 				}
-				this->mContent.append(buffer, io.gcount());
+				this->mHttpData.mutable_data()->append(buffer, io.gcount());
 			}
 		}
 		return HttpStatus::CONTINUE;
@@ -198,28 +194,13 @@ namespace Sentry
 
 	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value)
 	{
-		auto iter = this->mHeadMap.find(key);
-		if(iter != this->mHeadMap.end())
+		auto iter = this->mHttpData.head().find(key);
+		if(iter != this->mHttpData.head().end())
 		{
 			value = iter->second;
 			return true;
 		}
 		return false;
-	}
-	bool HttpAsyncResponse::ToJson(std::string & json) const
-	{
-		Json::Writer jsonWriter;
-		jsonWriter.StartObject("head");
-		auto iter = this->mHeadMap.begin();
-		for(; iter!= this->mHeadMap.end(); iter++)
-		{
-			const std::string & key = iter->first;
-			const std::string & value = iter->second;
-			jsonWriter.AddMember(key.c_str(), value);
-		}
-		jsonWriter.EndObject();
-		jsonWriter.AddMember("data", this->mContent);
-		return jsonWriter.WriterStream(json);
 	}
 }
 
@@ -227,50 +208,30 @@ namespace Sentry
 {
     HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
-		this->mAddress = address;
+		this->mHttpData.set_address(address);
         this->mState = HttpDecodeState::FirstLine;
     }
 
     bool HttpHandlerRequest::GetHead(const std::string &key, int &value) const
     {
-        auto iter = this->mHeadMap.find(key);
-        if(iter != this->mHeadMap.end())
-        {
-            value = std::stoi(iter->second);
-            return true;
-        }
-        return false;
+		auto iter = this->mHttpData.head().find(key);
+		if(iter != this->mHttpData.head().end())
+		{
+			value = std::stoi(iter->second);
+			return true;
+		}
+		return false;
     }
 
     bool HttpHandlerRequest::GetHead(const std::string &key, std::string &value) const
     {
-        auto iter = this->mHeadMap.find(key);
-        if(iter != this->mHeadMap.end())
-        {
-            value = iter->second;
-            return true;
-        }
-        return false;
-    }
-
-    bool HttpHandlerRequest::ToJson(std::string &json) const
-    {
-        Json::Writer jsonWriter;
-        jsonWriter.AddMember("path", this->mPath);
-        jsonWriter.AddMember("version", this->mVersion);
-        jsonWriter.AddMember("address", this->mAddress);
-        jsonWriter.AddMember("data", this->mContent);
-        jsonWriter.StartObject("head");
-
-        auto iter = this->mHeadMap.begin();
-        for(; iter != this->mHeadMap.end(); iter++)
-        {
-            const std::string & key = iter->first;
-            const std::string & value = iter->second;
-            jsonWriter.AddMember(key.c_str(), value);
-        }
-        jsonWriter.EndObject();
-        return jsonWriter.WriterStream(json);
+		auto iter = this->mHttpData.head().find(key);
+		if(iter != this->mHttpData.head().end())
+		{
+			value = iter->second;
+			return true;
+		}
+		return false;
     }
 
     HttpStatus HttpHandlerRequest::OnReceiveData(asio::streambuf &streamBuffer)
@@ -278,9 +239,14 @@ namespace Sentry
         std::iostream io(&streamBuffer);
         if(this->mState == HttpDecodeState::FirstLine)
         {
+			std::string method, version;
             this->mState = HttpDecodeState::HeadLine;
-            io >> this->mMethod >> this->mPath >> this->mVersion;
-            io.ignore(2); //去掉\r\n
+            io >> method >> this->mUrl >> version;
+
+			this->mHttpData.set_method(method);
+			this->mHttpData.set_version(version);
+
+			io.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
 		{
@@ -300,25 +266,26 @@ namespace Sentry
 
 					Helper::String::Tolower(key);
 					std::string val = lineData.substr(pos + 1, length);
-					this->mHeadMap.insert(std::make_pair(key, val));
+					this->mHttpData.mutable_head()->insert({key, val});
 				}
 			}
 			if (this->mState == HttpDecodeState::Content)
 			{
-				if (this->mMethod == "GET")
+				if (this->GetMethod() == "GET")
 				{
-					size_t pos = this->mPath.find("?");
+					size_t pos = this->mUrl.find("?");
 					if (pos != std::string::npos)
 					{
-						this->mContent = mPath.substr(pos + 1);
-						this->mPath = this->mPath.substr(0, pos);
+						this->mHttpData.set_data(this->mUrl.substr(pos + 1));
+						this->mHttpData.set_path(this->mUrl.substr(0, pos));
 					}
 					return HttpStatus::OK;
 				}
-				else if (this->mMethod != "POST")
+				else if (this->GetMethod() != "POST")
 				{
 					return HttpStatus::BAD_REQUEST;
 				}
+				this->mHttpData.set_path(this->mUrl);
 			}
 		}
         if(this->mState == HttpDecodeState::Content)
@@ -327,7 +294,7 @@ namespace Sentry
             size_t size = io.readsome(buffer, 256);
             while(size > 0)
             {
-                this->mContent.append(buffer, size);
+                this->mHttpData.mutable_data()->append(buffer, size);
                 size = io.readsome(buffer, 256);
             }
         }

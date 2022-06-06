@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
@@ -42,7 +45,7 @@ struct TableStruct_com_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[17]
+  static const ::google::protobuf::internal::ParseTable schema[20]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -68,6 +71,15 @@ extern Array_Int64DefaultTypeInternal _Array_Int64_default_instance_;
 class Array_String;
 class Array_StringDefaultTypeInternal;
 extern Array_StringDefaultTypeInternal _Array_String_default_instance_;
+class Http;
+class HttpDefaultTypeInternal;
+extern HttpDefaultTypeInternal _Http_default_instance_;
+class Http_Data;
+class Http_DataDefaultTypeInternal;
+extern Http_DataDefaultTypeInternal _Http_Data_default_instance_;
+class Http_Data_HeadEntry_DoNotUse;
+class Http_Data_HeadEntry_DoNotUseDefaultTypeInternal;
+extern Http_Data_HeadEntry_DoNotUseDefaultTypeInternal _Http_Data_HeadEntry_DoNotUse_default_instance_;
 class Rpc;
 class RpcDefaultTypeInternal;
 extern RpcDefaultTypeInternal _Rpc_default_instance_;
@@ -110,6 +122,9 @@ template<> ::com::Array_Float* Arena::CreateMaybeMessage<::com::Array_Float>(Are
 template<> ::com::Array_Int32* Arena::CreateMaybeMessage<::com::Array_Int32>(Arena*);
 template<> ::com::Array_Int64* Arena::CreateMaybeMessage<::com::Array_Int64>(Arena*);
 template<> ::com::Array_String* Arena::CreateMaybeMessage<::com::Array_String>(Arena*);
+template<> ::com::Http* Arena::CreateMaybeMessage<::com::Http>(Arena*);
+template<> ::com::Http_Data* Arena::CreateMaybeMessage<::com::Http_Data>(Arena*);
+template<> ::com::Http_Data_HeadEntry_DoNotUse* Arena::CreateMaybeMessage<::com::Http_Data_HeadEntry_DoNotUse>(Arena*);
 template<> ::com::Rpc* Arena::CreateMaybeMessage<::com::Rpc>(Arena*);
 template<> ::com::Rpc_Auth* Arena::CreateMaybeMessage<::com::Rpc_Auth>(Arena*);
 template<> ::com::Rpc_Request* Arena::CreateMaybeMessage<::com::Rpc_Request>(Arena*);
@@ -2179,6 +2194,333 @@ class Rpc :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
+// -------------------------------------------------------------------
+
+class Http_Data_HeadEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<Http_Data_HeadEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<Http_Data_HeadEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  Http_Data_HeadEntry_DoNotUse();
+  Http_Data_HeadEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const Http_Data_HeadEntry_DoNotUse& other);
+  static const Http_Data_HeadEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const Http_Data_HeadEntry_DoNotUse*>(&_Http_Data_HeadEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
+class Http_Data :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Http.Data) */ {
+ public:
+  Http_Data();
+  virtual ~Http_Data();
+
+  Http_Data(const Http_Data& from);
+
+  inline Http_Data& operator=(const Http_Data& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Http_Data(Http_Data&& from) noexcept
+    : Http_Data() {
+    *this = ::std::move(from);
+  }
+
+  inline Http_Data& operator=(Http_Data&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Http_Data& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Http_Data* internal_default_instance() {
+    return reinterpret_cast<const Http_Data*>(
+               &_Http_Data_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    18;
+
+  void Swap(Http_Data* other);
+  friend void swap(Http_Data& a, Http_Data& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Http_Data* New() const final {
+    return CreateMaybeMessage<Http_Data>(nullptr);
+  }
+
+  Http_Data* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Http_Data>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Http_Data& from);
+  void MergeFrom(const Http_Data& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Http_Data* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+
+  // accessors -------------------------------------------------------
+
+  // map<string, string> head = 6;
+  int head_size() const;
+  void clear_head();
+  static const int kHeadFieldNumber = 6;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      head() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_head();
+
+  // string path = 1;
+  void clear_path();
+  static const int kPathFieldNumber = 1;
+  const ::std::string& path() const;
+  void set_path(const ::std::string& value);
+  #if LANG_CXX11
+  void set_path(::std::string&& value);
+  #endif
+  void set_path(const char* value);
+  void set_path(const char* value, size_t size);
+  ::std::string* mutable_path();
+  ::std::string* release_path();
+  void set_allocated_path(::std::string* path);
+
+  // string method = 2;
+  void clear_method();
+  static const int kMethodFieldNumber = 2;
+  const ::std::string& method() const;
+  void set_method(const ::std::string& value);
+  #if LANG_CXX11
+  void set_method(::std::string&& value);
+  #endif
+  void set_method(const char* value);
+  void set_method(const char* value, size_t size);
+  ::std::string* mutable_method();
+  ::std::string* release_method();
+  void set_allocated_method(::std::string* method);
+
+  // string version = 3;
+  void clear_version();
+  static const int kVersionFieldNumber = 3;
+  const ::std::string& version() const;
+  void set_version(const ::std::string& value);
+  #if LANG_CXX11
+  void set_version(::std::string&& value);
+  #endif
+  void set_version(const char* value);
+  void set_version(const char* value, size_t size);
+  ::std::string* mutable_version();
+  ::std::string* release_version();
+  void set_allocated_version(::std::string* version);
+
+  // string address = 4;
+  void clear_address();
+  static const int kAddressFieldNumber = 4;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // string data = 5;
+  void clear_data();
+  static const int kDataFieldNumber = 5;
+  const ::std::string& data() const;
+  void set_data(const ::std::string& value);
+  #if LANG_CXX11
+  void set_data(::std::string&& value);
+  #endif
+  void set_data(const char* value);
+  void set_data(const char* value, size_t size);
+  ::std::string* mutable_data();
+  ::std::string* release_data();
+  void set_allocated_data(::std::string* data);
+
+  // @@protoc_insertion_point(class_scope:com.Http.Data)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      Http_Data_HeadEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > head_;
+  ::google::protobuf::internal::ArenaStringPtr path_;
+  ::google::protobuf::internal::ArenaStringPtr method_;
+  ::google::protobuf::internal::ArenaStringPtr version_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  ::google::protobuf::internal::ArenaStringPtr data_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Http :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.Http) */ {
+ public:
+  Http();
+  virtual ~Http();
+
+  Http(const Http& from);
+
+  inline Http& operator=(const Http& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Http(Http&& from) noexcept
+    : Http() {
+    *this = ::std::move(from);
+  }
+
+  inline Http& operator=(Http&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Http& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Http* internal_default_instance() {
+    return reinterpret_cast<const Http*>(
+               &_Http_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    19;
+
+  void Swap(Http* other);
+  friend void swap(Http& a, Http& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Http* New() const final {
+    return CreateMaybeMessage<Http>(nullptr);
+  }
+
+  Http* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Http>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Http& from);
+  void MergeFrom(const Http& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Http* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef Http_Data Data;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:com.Http)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
 // ===================================================================
 
 
@@ -2977,9 +3319,308 @@ inline void Rpc_Auth::set_allocated_token(::std::string* token) {
 
 // Rpc
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// Http_Data
+
+// string path = 1;
+inline void Http_Data::clear_path() {
+  path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Http_Data::path() const {
+  // @@protoc_insertion_point(field_get:com.Http.Data.path)
+  return path_.GetNoArena();
+}
+inline void Http_Data::set_path(const ::std::string& value) {
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Http.Data.path)
+}
+#if LANG_CXX11
+inline void Http_Data::set_path(::std::string&& value) {
+  
+  path_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Http.Data.path)
+}
+#endif
+inline void Http_Data::set_path(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Http.Data.path)
+}
+inline void Http_Data::set_path(const char* value, size_t size) {
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Http.Data.path)
+}
+inline ::std::string* Http_Data::mutable_path() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Http.Data.path)
+  return path_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Http_Data::release_path() {
+  // @@protoc_insertion_point(field_release:com.Http.Data.path)
+  
+  return path_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Http_Data::set_allocated_path(::std::string* path) {
+  if (path != nullptr) {
+    
+  } else {
+    
+  }
+  path_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), path);
+  // @@protoc_insertion_point(field_set_allocated:com.Http.Data.path)
+}
+
+// string method = 2;
+inline void Http_Data::clear_method() {
+  method_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Http_Data::method() const {
+  // @@protoc_insertion_point(field_get:com.Http.Data.method)
+  return method_.GetNoArena();
+}
+inline void Http_Data::set_method(const ::std::string& value) {
+  
+  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Http.Data.method)
+}
+#if LANG_CXX11
+inline void Http_Data::set_method(::std::string&& value) {
+  
+  method_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Http.Data.method)
+}
+#endif
+inline void Http_Data::set_method(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Http.Data.method)
+}
+inline void Http_Data::set_method(const char* value, size_t size) {
+  
+  method_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Http.Data.method)
+}
+inline ::std::string* Http_Data::mutable_method() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Http.Data.method)
+  return method_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Http_Data::release_method() {
+  // @@protoc_insertion_point(field_release:com.Http.Data.method)
+  
+  return method_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Http_Data::set_allocated_method(::std::string* method) {
+  if (method != nullptr) {
+    
+  } else {
+    
+  }
+  method_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), method);
+  // @@protoc_insertion_point(field_set_allocated:com.Http.Data.method)
+}
+
+// string version = 3;
+inline void Http_Data::clear_version() {
+  version_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Http_Data::version() const {
+  // @@protoc_insertion_point(field_get:com.Http.Data.version)
+  return version_.GetNoArena();
+}
+inline void Http_Data::set_version(const ::std::string& value) {
+  
+  version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Http.Data.version)
+}
+#if LANG_CXX11
+inline void Http_Data::set_version(::std::string&& value) {
+  
+  version_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Http.Data.version)
+}
+#endif
+inline void Http_Data::set_version(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Http.Data.version)
+}
+inline void Http_Data::set_version(const char* value, size_t size) {
+  
+  version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Http.Data.version)
+}
+inline ::std::string* Http_Data::mutable_version() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Http.Data.version)
+  return version_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Http_Data::release_version() {
+  // @@protoc_insertion_point(field_release:com.Http.Data.version)
+  
+  return version_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Http_Data::set_allocated_version(::std::string* version) {
+  if (version != nullptr) {
+    
+  } else {
+    
+  }
+  version_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), version);
+  // @@protoc_insertion_point(field_set_allocated:com.Http.Data.version)
+}
+
+// string address = 4;
+inline void Http_Data::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Http_Data::address() const {
+  // @@protoc_insertion_point(field_get:com.Http.Data.address)
+  return address_.GetNoArena();
+}
+inline void Http_Data::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Http.Data.address)
+}
+#if LANG_CXX11
+inline void Http_Data::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Http.Data.address)
+}
+#endif
+inline void Http_Data::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Http.Data.address)
+}
+inline void Http_Data::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Http.Data.address)
+}
+inline ::std::string* Http_Data::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Http.Data.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Http_Data::release_address() {
+  // @@protoc_insertion_point(field_release:com.Http.Data.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Http_Data::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:com.Http.Data.address)
+}
+
+// string data = 5;
+inline void Http_Data::clear_data() {
+  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Http_Data::data() const {
+  // @@protoc_insertion_point(field_get:com.Http.Data.data)
+  return data_.GetNoArena();
+}
+inline void Http_Data::set_data(const ::std::string& value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.Http.Data.data)
+}
+#if LANG_CXX11
+inline void Http_Data::set_data(::std::string&& value) {
+  
+  data_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.Http.Data.data)
+}
+#endif
+inline void Http_Data::set_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.Http.Data.data)
+}
+inline void Http_Data::set_data(const char* value, size_t size) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.Http.Data.data)
+}
+inline ::std::string* Http_Data::mutable_data() {
+  
+  // @@protoc_insertion_point(field_mutable:com.Http.Data.data)
+  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Http_Data::release_data() {
+  // @@protoc_insertion_point(field_release:com.Http.Data.data)
+  
+  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Http_Data::set_allocated_data(::std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
+  // @@protoc_insertion_point(field_set_allocated:com.Http.Data.data)
+}
+
+// map<string, string> head = 6;
+inline int Http_Data::head_size() const {
+  return head_.size();
+}
+inline void Http_Data::clear_head() {
+  head_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+Http_Data::head() const {
+  // @@protoc_insertion_point(field_map:com.Http.Data.head)
+  return head_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+Http_Data::mutable_head() {
+  // @@protoc_insertion_point(field_mutable_map:com.Http.Data.head)
+  return head_.MutableMap();
+}
+
+// -------------------------------------------------------------------
+
+// Http
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

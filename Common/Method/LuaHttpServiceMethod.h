@@ -23,7 +23,6 @@ namespace Sentry
         XCode CallAsync(HttpHandlerResponse & response);
     private:
         lua_State * mLua;
-        std::string mJson;
         const HttpInterfaceConfig * mConfig;
     };
 }

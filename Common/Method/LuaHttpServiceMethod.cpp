@@ -6,6 +6,7 @@
 #include"Script/Function.h"
 #include"Script/Extension/Json/Json.h"
 #include"Async/LuaServiceTaskSource.h"
+#include"Component/Scene/MessageComponent.h"
 namespace Sentry
 {
     LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpInterfaceConfig *config, lua_State *lua)
@@ -28,13 +29,8 @@ namespace Sentry
             response.AddHead("error", "call function not existe");
             return XCode::CallFunctionNotExist;
         }
-        this->mJson.clear();
-        if(!request.ToJson(this->mJson))
-        {
-            response.AddHead("error", "cast json error");
-            return XCode::Failure;
-        }
-        Lua::Json::Write(this->mLua, this->mJson);
+		MessageComponent * messageComponent = App::Get()->GetMsgComponent();
+		messageComponent->Write(this->mLua, request.GetData());
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
@@ -54,9 +50,9 @@ namespace Sentry
         }
         if(lua_istable(this->mLua, -1))
         {
-            this->mJson.clear();
-            Lua::Json::Read(this->mLua, -1, &mJson);
-            response.WriteString(this->mJson);
+            std::string json;
+            Lua::Json::Read(this->mLua, -1, &json);
+            response.WriteString(json);
             return XCode::Successful;
         }
         response.WriteString("unknow error");
@@ -88,9 +84,9 @@ namespace Sentry
 			}
 			if (lua_istable(this->mLua, -1))
 			{
-				this->mJson.clear();
-				Lua::Json::Read(this->mLua, -1, &mJson);
-				response.WriteString(this->mJson);
+				std::string json;
+				Lua::Json::Read(this->mLua, -1, &json);
+				response.WriteString(json);
 				return XCode::Successful;
 			}
 		}

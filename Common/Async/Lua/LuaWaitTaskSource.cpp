@@ -53,11 +53,11 @@ namespace Sentry
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 0);
 	}
-	void LuaWaitTaskSource::SetJson(const string& json)
+	void LuaWaitTaskSource::SetMessage(const Message& message)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		values::pushDecoded(this->mLua, json.c_str(), json.size());
+		App::Get()->GetMsgComponent()->Write(this->mLua, message);
 		lua_presume(coroutine, this->mLua, 1);
 
 	}

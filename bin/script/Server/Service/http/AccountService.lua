@@ -8,6 +8,7 @@ function AccountService.Awake()
 end
 
 function AccountService.Register(request)
+    table.print(request)
     local requestInfo = Json.Decode(request.data)
     return MysqlComponent.Add("db_account.tab_user_account", {
         user_id = Guid.Create(),

@@ -28,7 +28,7 @@ namespace Sentry
 		template<typename T>
 		void SetResult(T result);
 
-		void SetJson(const std::string& json);
+		void SetMessage(const Message & message);
 
 		void SetResult(XCode code, std::shared_ptr <Message> response);
 

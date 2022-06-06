@@ -11,6 +11,7 @@
 #include"Json/JsonWriter.h"
 #include"Json/JsonReader.h"
 #include<Network/Http/Http.h>
+#include"Protocol/com.pb.h"
 #include"Network/Proto/ProtoMessage.h"
 
 namespace Sentry
@@ -81,9 +82,9 @@ namespace Sentry
     class IHttpContent
     {
     public:
-        virtual bool ToJson(std::string & json) const = 0;
         virtual const std::string & GetContent() const = 0;
-        virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
+		virtual const com::Http::Data & GetData() const = 0;
+		virtual HttpStatus OnReceiveData(asio::streambuf & streamBuffer) = 0;
     };
 }
 
@@ -97,19 +98,16 @@ namespace Sentry
     public:
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
-        const std::string & GetContent() const final { return this->mContent;}
+        const std::string & GetContent() const final { return this->mHttpData.data();}
 	public:
-		bool ToJson(std::string & json) const final;
 		bool GetHead(const std::string & key, std::string & value);
+		const com::Http::Data & GetData() const final { return this->mHttpData;}
     private:
         int mHttpCode;
-        std::string mContent;
-        std::string mVersion;
-		size_t mContentLength;
 		std::string mHttpError;
         HttpDecodeState mState;
 		std::fstream * mFstream;
-		std::unordered_map<std::string, std::string> mHeadMap;
+		com::Http::Data mHttpData;
     };
 }
 
@@ -120,25 +118,20 @@ namespace Sentry
 	 public:
 		HttpHandlerRequest(const std::string & address);
 	 public:
-        bool ToJson(std::string &json) const final;
 		HttpStatus OnReceiveData(asio::streambuf& streamBuffer) final;
 	 public:
-		const std::string& GetPath() const { return this->mPath; }
-		const std::string& GetMethod() const { return this->mMethod; }
-		const std::string& GetAddress() const { return this->mAddress; }
-		const std::string& GetContent() const final { return this->mContent; }
-
+		const std::string& GetPath() const { return this->mHttpData.path(); }
+		const com::Http::Data & GetData() const final { return this->mHttpData;}
+		const std::string& GetMethod() const { return this->mHttpData.method(); }
+		const std::string& GetAddress() const { return this->mHttpData.address(); }
+		const std::string& GetContent() const final { return this->mHttpData.data(); }
     public:
         bool GetHead(const std::string& key, int & value) const;
         bool GetHead(const std::string& key, std::string& value) const;
 	 private:
-		std::string mPath;
-		std::string mMethod;
-		std::string mContent;
-		std::string mVersion;
-		std::string mAddress;
+		std::string mUrl;
 		HttpDecodeState mState;
-		std::unordered_map<std::string, std::string> mHeadMap;
+		com::Http::Data mHttpData;
 	};
 }
 

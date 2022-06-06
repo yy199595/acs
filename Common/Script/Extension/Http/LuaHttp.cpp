@@ -10,6 +10,7 @@
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 #include"Network/Http/HttpRequestClient.h"
+#include"Component/Scene/MessageComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -42,9 +43,9 @@ namespace Lua
 			std::string json;
 			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(getRequest);
-			if (httpResponse != nullptr && httpResponse->ToJson(json))
+			if (httpResponse != nullptr)
 			{
-				luaRpcTaskSource->SetJson(json);
+				luaRpcTaskSource->SetMessage(httpResponse->GetData());
 				return;
 			}
 			luaRpcTaskSource->SetResult();
@@ -88,9 +89,9 @@ namespace Lua
 			std::string json;
 			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(postRequest);
-			if (httpResponse != nullptr && httpResponse->ToJson(json))
+			if (httpResponse != nullptr)
 			{
-				luaWaitTaskSource->SetJson(json);
+				luaWaitTaskSource->SetMessage(httpResponse->GetData());
 				return;
 			}
 			luaWaitTaskSource->SetResult();
