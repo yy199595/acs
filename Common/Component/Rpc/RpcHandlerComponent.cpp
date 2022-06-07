@@ -105,19 +105,15 @@ namespace Sentry
 	XCode RpcHandlerComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
 		long long rpcId = response->rpc_id();
-		auto iter = this->mRpcTasks.find(rpcId);
-		if (iter == this->mRpcTasks.end())
-		{
-			LOG_WARN("not find rpc task : "<< rpcId)
-			return XCode::Failure;
-		}
-		std::shared_ptr<IRpcTask> rpcTask = iter->second;
-		this->mRpcTasks.erase(iter);
-		rpcTask->OnResponse(response);
-		return XCode::Successful;
+        std::shared_ptr<IRpcTask<com::Rpc::Response>> task = this->GetRpcTask(rpcId);
+        if(task != nullptr)
+        {
+            task->OnResponse(response);
+        }
+        return XCode::Successful;
 	}
 
-	void RpcHandlerComponent::AddRpcTask(std::shared_ptr<IRpcTask> task)
+	void RpcHandlerComponent::AddRpcTask(std::shared_ptr<IRpcTask<com::Rpc::Response>> task)
 	{
 		long long rpcId = task->GetRpcId();
 		this->mRpcTasks.emplace(rpcId, task);
@@ -128,14 +124,24 @@ namespace Sentry
 		}
 	}
 
+    std::shared_ptr<IRpcTask<com::Rpc::Response>> RpcHandlerComponent::GetRpcTask(long long rpcId)
+    {
+        auto iter = this->mRpcTasks.find(rpcId);
+        if (iter != this->mRpcTasks.end())
+        {
+            std::shared_ptr<IRpcTask<com::Rpc::Response>> task = iter->second;
+            this->mRpcTasks.erase(iter);
+            return task;
+        }
+        return nullptr;
+    }
+
 	void RpcHandlerComponent::OnTaskTimeout(long long int rpcId)
 	{
-		auto iter = this->mRpcTasks.find(rpcId);
-		if (iter != this->mRpcTasks.end())
-		{
-			auto rpcTask = iter->second;
-			this->mRpcTasks.erase(iter);
-			rpcTask->OnResponse(nullptr);
-		}
+        std::shared_ptr<IRpcTask<com::Rpc::Response>> task = this->GetRpcTask(rpcId);
+        if(task != nullptr)
+        {
+            task->OnResponse(nullptr);
+        }
 	}
 }// namespace Sentry

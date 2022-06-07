@@ -10,15 +10,16 @@ using namespace com;
 using namespace google::protobuf;
 namespace Sentry
 {
-    class IRpcTask : public std::enable_shared_from_this<IRpcTask>
+    template<typename T>
+    class IRpcTask : public std::enable_shared_from_this<IRpcTask<T>>
     {
     public:
         virtual int GetTimeout() = 0;
         virtual long long GetRpcId() = 0;
-        virtual void OnResponse(std::shared_ptr<com::Rpc_Response> response) = 0;
+        virtual void OnResponse(std::shared_ptr<T> response) = 0;
     };
 
-    class RpcTaskSource : public IRpcTask
+    class RpcTaskSource : public IRpcTask<com::Rpc::Response>
     {
     public:
         RpcTaskSource(float timeout = 0) : mTimeout(timeout * 1000) { }
@@ -34,7 +35,7 @@ namespace Sentry
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
 
-	class LuaRpcTaskSource : public IRpcTask
+	class LuaRpcTaskSource :  public IRpcTask<com::Rpc::Response>
 	{
 	 public:
 		LuaRpcTaskSource(lua_State * lua);

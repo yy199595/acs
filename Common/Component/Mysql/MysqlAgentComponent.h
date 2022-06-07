@@ -1,9 +1,7 @@
 ﻿#include"Component/Component.h"
 #include"google/protobuf/util/json_util.h"
-#include"DB/Mysql/MysqlRpcTaskSource.h"
 namespace Sentry
 {
-	class MysqlRpcTaskSource;
     class MysqlAgentComponent final : public Component
 	{
 	 public:
