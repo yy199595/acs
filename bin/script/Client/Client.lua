@@ -17,7 +17,7 @@ end
 
 local account = "yjz1995"
 local password = "123456"
-local phoneNum = 13716061995
+--local phoneNum = 13716061995
 
 function Client.Start()
 
