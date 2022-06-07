@@ -53,11 +53,11 @@ namespace Sentry
 			return std::vector<std::shared_ptr<T>>();
 		}
 		std::vector<std::shared_ptr<T>> respArray;
-		for (int index = 0; index < response->json_array_size(); index++)
+		for (int index = 0; index < response->datas_size(); index++)
 		{
-			const std::string& json = response->json_array(index);
 			std::shared_ptr<T> jsonData(new T());
-			if (util::JsonStringToMessage(json, jsonData.get()).ok())
+			const Any& any = response->datas(index);
+			if(any.UnpackTo(jsonData.get()))
 			{
 				respArray.emplace_back(jsonData);
 			}

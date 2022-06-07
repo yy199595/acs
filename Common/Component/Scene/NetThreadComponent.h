@@ -30,6 +30,6 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		std::vector<NetWorkThread *> mNetThreads;
 #endif
-		NumberBuilder<unsigned int> mTaskNumberPool;
+		Util::NumberBuilder<unsigned int> mTaskNumberPool;
 	};
 }

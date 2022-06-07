@@ -109,7 +109,7 @@ namespace Sentry
 		LOGIC_THROW_ERROR(!request.where_json().empty());
 
 		std::shared_ptr<Mysql::MysqlQueryCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response);
+				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response, response);
 		return this->GetMysqlClient()->Start(commandTask);
 	}
 }// namespace Sentry

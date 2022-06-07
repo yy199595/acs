@@ -58,29 +58,6 @@ namespace Client
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
 
-		s2s::Mysql::Response response;
-		response.set_error("112233");
-		response.add_json_array("11223344");
-		response.add_json_array("55667788");
-
-		com::Rpc::Request request;
-		request.set_user_id(1234);
-		request.set_address("127.0.0.1");
-		request.mutable_data()->PackFrom(response);
-
-		Lua::lua_getfunction(luaState, "Client", "Test");
-		MessageComponent * messageComponent = this->GetComponent<MessageComponent>();
-
-		MessageDecoder messageDecoder(luaState, messageComponent);
-		messageDecoder.Decode(request);
-
-
-		if(lua_pcall(luaState, 1, 0, 0) != 0)
-		{
-			LOG_ERROR(lua_tostring(luaState, -1));
-		}
-
-
 		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(luaState, "Client", "Awake");
 		if (luaFunction != nullptr)
 		{

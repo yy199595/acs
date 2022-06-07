@@ -7,169 +7,252 @@ namespace Sentry
 {
 	namespace Mysql
 	{
-		XCode MysqlCommandTask::Init()
-		{
-			MysqlHelper mysqlHelper;
-			if(!this->GetCommand(mysqlHelper, this->mCommand))
-			{
-				return XCode::CallArgsError;
-			}
-			return XCode::Successful;
-		}
 		XCode MysqlCommandTask::Await()
 		{
 			TimerComponent * timerComponent = App::Get()->GetTimerComponent();
 			long long timerId = timerComponent->DelayCall(5.0f, [this]()
 			{
-				LOG_ERROR("[sql timeout] = " << this->mCommand)
 				this->mTaskSource.SetResult(XCode::CallTimeout);
 			});
 			XCode code = this->mTaskSource.Await();
 			timerComponent->CancelTimer(timerId);
-			LOG_DEBUG("[sql successful] = " << this->mCommand)
 			return code;
+		}
+
+		bool MysqlCommandTask::Invoke(const std::string& sql, std::string& error)
+		{
+			if(mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.size()) != 0)
+			{
+				error.append(mysql_error(this->mMysqlSocket));
+				return false;
+			}
+			return true;
+		}
+
+		MysqlQueryResult* MysqlCommandTask::InvokeQuery(const std::string& sql, std::string& eror)
+		{
+			if(mysql_real_query(this->mMysqlSocket, sql.c_str(), sql.size()) != 0)
+			{
+				eror.append(mysql_error(this->mMysqlSocket));
+				return nullptr;
+			}
+			MysqlQueryResult * mysqlQueryResult = mysql_store_result(this->mMysqlSocket);
+			if(mysqlQueryResult != nullptr)
+			{
+				this->mResults.push(mysqlQueryResult);
+				return mysqlQueryResult;
+			}
+			return nullptr;
 		}
 
 		void MysqlCommandTask::Run(MysqlSocket* mysqlSocket)
 		{
-			const char * sql = this->mCommand.c_str();
-			const size_t size = this->mCommand.size();
-			if(mysql_real_query(mysqlSocket, sql, size) != 0)
+			this->mMysqlSocket = mysqlSocket;
+			this->mTaskSource.SetResult(this->OnInvoke());
+
+			while(!this->mResults.empty())
 			{
-				this->mError.append(mysql_error(mysqlSocket));
-				this->mTaskSource.SetResult(XCode::MysqlInvokeFailure);
-				return;
+				mysql_free_result(this->mResults.front());
+				this->mResults.pop();
 			}
-			MysqlQueryResult* queryResult = mysql_store_result(mysqlSocket);
-			if (queryResult != nullptr)
+		}
+	}
+
+	namespace Mysql
+	{
+		bool MysqlAddCommandTask::Init()
+		{
+			MysqlHelper helper;
+			this->mError.clear();
+			this->mCommand.clear();
+			return helper.ToSqlCommand(this->mRequest, this->mCommand);
+		}
+
+		XCode MysqlAddCommandTask::OnInvoke()
+		{
+			if(this->Invoke(this->mCommand, this->mError))
 			{
-				this->OnComplete(mysqlSocket, queryResult);
-				mysql_free_result(queryResult);
+				CONSOLE_LOG_ERROR(this->mError);
+				CONSOLE_LOG_ERROR(this->mCommand);
+				return XCode::MysqlInvokeFailure;
 			}
-			this->mTaskSource.SetResult(XCode::Successful);
+			return XCode::Successful;
 		}
 	}
 
 	namespace Mysql
 	{
-		bool MysqlAddCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		bool MysqlSaveCommandTask::Init()
 		{
-			return helper.ToSqlCommand(this->mRequest, sql);
+			MysqlHelper helper;
+			this->mError.clear();
+			this->mCommand.clear();
+			return helper.ToSqlCommand(this->mRequest, this->mCommand);
+		}
+
+		XCode MysqlSaveCommandTask::OnInvoke()
+		{
+			if(this->Invoke(this->mCommand, this->mError))
+			{
+				CONSOLE_LOG_ERROR(this->mError);
+				CONSOLE_LOG_ERROR(this->mCommand);
+				return XCode::MysqlInvokeFailure;
+			}
+			return XCode::Successful;
 		}
 	}
 
 	namespace Mysql
 	{
-		bool MysqlSaveCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		bool MysqlQueryCommandTask::Init()
 		{
-			return helper.ToSqlCommand(this->mRequest, sql);
+			MysqlHelper mysqlHelper;
+			return mysqlHelper.ToSqlCommand(this->mRequest, this->mCommand);
 		}
 
-	}
-
-	namespace Mysql
-	{
-		bool MysqlQueryCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		XCode MysqlQueryCommandTask::OnInvoke()
 		{
-			return helper.ToSqlCommand(this->mRequest, sql);
-		}
-
-		void MysqlQueryCommandTask::OnComplete(MysqlSocket* mysqlSocket, MysqlQueryResult* queryResult)
-		{
-			std::vector<MYSQL_FIELD*> fieldNameVector;
+			MysqlQueryResult  * queryResult = this->InvokeQuery(this->mCommand, this->mError);
+			if(queryResult == nullptr)
+			{
+				return XCode::MysqlInvokeFailure;
+			}
 			unsigned long rowCount = mysql_num_rows(queryResult);
-			unsigned int fieldCount = mysql_field_count(mysqlSocket);
-			fieldNameVector.reserve(fieldCount);
+			unsigned int fieldCount = mysql_field_count(this->GetMysqlSocket());
+			std::unique_ptr<MYSQL_FIELD *[]> fieldNameVector(new MYSQL_FIELD*[fieldCount]);
 			for (unsigned int index = 0; index < fieldCount; index++)
 			{
-				MYSQL_FIELD* field = mysql_fetch_field(queryResult);
-				fieldNameVector.push_back(field);
+				fieldNameVector[index] = mysql_fetch_field(queryResult);
 			}
-			std::string json;
-			if (rowCount == 1)
+			for (unsigned long count = 0; count < rowCount; count++)
 			{
-				Json::Writer jsonWrite;
 				MYSQL_ROW row = mysql_fetch_row(queryResult);
 				unsigned long* lengths = mysql_fetch_lengths(queryResult);
-				for (size_t index = 0; index < fieldNameVector.size(); index++)
+				for (size_t index = 0; index < fieldCount; index++)
 				{
+					this->mTempMessage.Clear();
 					MYSQL_FIELD* field = fieldNameVector[index];
-					this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
-				}
-				if(jsonWrite.WriterStream(json))
-				{
-					this->mResponse.add_json_array(json);
-				}
-			}
-			else
-			{
-				for (unsigned long count = 0; count < rowCount; count++)
-				{
-					Json::Writer jsonWrite;
-					MYSQL_ROW row = mysql_fetch_row(queryResult);
-					unsigned long* lengths = mysql_fetch_lengths(queryResult);
-					for (size_t index = 0; index < fieldNameVector.size(); index++)
+					if(this->WriteValue(field, row[index], (int)lengths[index]))
 					{
-						MYSQL_FIELD* field = fieldNameVector[index];
-						this->WriteValue(jsonWrite, field, row[index], (int)lengths[index]);
-					}
-					if(jsonWrite.WriterStream(json))
-					{
-						this->mResponse.add_json_array(json);
+						Any * any = this->mResponse.add_datas();
+						any->PackFrom(this->mTempMessage);
 					}
 				}
 			}
+			return XCode::Successful;
 		}
 
-		void MysqlQueryCommandTask::WriteValue(Json::Writer& jsonWriter,
-				MYSQL_FIELD* field, const char* data, long size)
+		bool MysqlQueryCommandTask::WriteValue(MYSQL_FIELD* field, const char* data, long size)
 		{
+			const Descriptor * descriptor = this->mTempMessage.GetDescriptor();
+			const FieldDescriptor * fieldDescriptor = descriptor->FindFieldByName(field->name);
+			if(fieldDescriptor == nullptr)
+			{
+				return false;
+			}
+			const Reflection * reflection = this->mTempMessage.GetReflection();
 			switch (field->type)
 			{
 			case enum_field_types::MYSQL_TYPE_LONG:
-			case enum_field_types::MYSQL_TYPE_LONGLONG:
-			{
-				long long value1 = std::atoll(data);
-				jsonWriter.AddMember(field->name, value1);
-			}
-				break;
-			case enum_field_types::MYSQL_TYPE_FLOAT:
-			case enum_field_types::MYSQL_TYPE_DOUBLE:
-			{
-				double value2 = std::atof(data);
-				jsonWriter.AddMember(field->name, value2);
-			}
-			default:
-				if (data != nullptr && size > 0)
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_INT32)
 				{
-					jsonWriter.AddMember(field->name, data, size);
+					int number = std::atoi(data);
+					reflection->SetInt32(&this->mTempMessage, fieldDescriptor, number);
+					return true;
 				}
-				break;
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_UINT32)
+				{
+					unsigned int number = (unsigned int)std::atol(data);
+					reflection->SetUInt32(&this->mTempMessage, fieldDescriptor, number);
+					return true;
+				}
+				return false;
+			case enum_field_types::MYSQL_TYPE_LONGLONG:
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_INT64)
+				{
+					long long number = std::atoll(data);
+					reflection->SetInt64(&this->mTempMessage, fieldDescriptor, number);
+					return true;
+				}
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_UINT64)
+				{
+					unsigned long long number = (unsigned long long)std::atoll(data);
+					reflection->SetUInt64(&this->mTempMessage, fieldDescriptor, number);
+					return true;
+				}
+				return false;
+			case enum_field_types::MYSQL_TYPE_FLOAT:
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_FLOAT)
+				{
+					float number = (float)std::atof(data);
+					reflection->SetFloat(&this->mTempMessage, fieldDescriptor, number);
+					return true;
+				}
+				return false;
+			case enum_field_types::MYSQL_TYPE_DOUBLE:
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_DOUBLE)
+				{
+					double number = std::atof(data);
+					reflection->SetDouble(&this->mTempMessage, fieldDescriptor, number);
+					return true;
+				}
+				return false;
+			case enum_field_types::MYSQL_TYPE_STRING:
+			case enum_field_types::MYSQL_TYPE_VAR_STRING:
+				if (fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_STRING
+					|| fieldDescriptor->cpp_type() == FieldDescriptor::TYPE_BYTES)
+				{
+					reflection->SetString(&this->mTempMessage,
+						fieldDescriptor, std::string(data, size));
+					return true;
+				}
+				else if(fieldDescriptor->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE)
+				{
+
+				}
+				return false;
 			}
+			return false;
 		}
 	}
 
 	namespace Mysql
 	{
-		bool MysqlUpdateCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		bool MysqlUpdateCommandTask::Init()
 		{
-			return helper.ToSqlCommand(this->mRequest, sql);
+			MysqlHelper helper;
+			return helper.ToSqlCommand(this->mRequest, this->mCommand);
+		}
+
+		XCode MysqlUpdateCommandTask::OnInvoke()
+		{
+			if(!this->Invoke(this->mCommand, this->mError))
+			{
+				CONSOLE_LOG_ERROR(this->mError);
+				CONSOLE_LOG_ERROR(this->mCommand);
+				return XCode::MysqlInvokeFailure;
+			}
+			return XCode::Successful;
 		}
 	}
 
 	namespace Mysql
 	{
-		bool MysqlDeleteCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		bool MysqlDeleteCommandTask::Init()
 		{
-			return helper.ToSqlCommand(this->mRequest, sql);
+			MysqlHelper helper;
+			return helper.ToSqlCommand(this->mRequest, this->mCommand);
 		}
-	}
 
-	namespace Mysql
-	{
-		bool MysqlIndexCommandTask::GetCommand(MysqlHelper& helper, std::string& sql)
+		XCode MysqlDeleteCommandTask::OnInvoke()
 		{
-			return true;
+			if(!this->Invoke(this->mCommand, this->mError))
+			{
+				CONSOLE_LOG_ERROR(this->mError);
+				CONSOLE_LOG_ERROR(this->mCommand);
+				return XCode::MysqlInvokeFailure;
+			}
+			return XCode::Successful;
 		}
 	}
 }

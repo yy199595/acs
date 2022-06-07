@@ -43,15 +43,10 @@ message Mysql //mysql操作
         string update_json = 3;
         string where_json = 4;
     }
-    message Index
-    {
-        string table = 1;
-        string field = 2;
-    }
     message Response
     {
         string error = 1;
-        repeated string json_array = 2;
+        repeated google.protobuf.Any datas = 2;
     }
 }
 

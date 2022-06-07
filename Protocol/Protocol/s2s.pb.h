@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[18]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -89,9 +89,6 @@ extern Mysql_CreateDefaultTypeInternal _Mysql_Create_default_instance_;
 class Mysql_Delete;
 class Mysql_DeleteDefaultTypeInternal;
 extern Mysql_DeleteDefaultTypeInternal _Mysql_Delete_default_instance_;
-class Mysql_Index;
-class Mysql_IndexDefaultTypeInternal;
-extern Mysql_IndexDefaultTypeInternal _Mysql_Index_default_instance_;
 class Mysql_Query;
 class Mysql_QueryDefaultTypeInternal;
 extern Mysql_QueryDefaultTypeInternal _Mysql_Query_default_instance_;
@@ -120,7 +117,6 @@ template<> ::s2s::Mysql* Arena::CreateMaybeMessage<::s2s::Mysql>(Arena*);
 template<> ::s2s::Mysql_Add* Arena::CreateMaybeMessage<::s2s::Mysql_Add>(Arena*);
 template<> ::s2s::Mysql_Create* Arena::CreateMaybeMessage<::s2s::Mysql_Create>(Arena*);
 template<> ::s2s::Mysql_Delete* Arena::CreateMaybeMessage<::s2s::Mysql_Delete>(Arena*);
-template<> ::s2s::Mysql_Index* Arena::CreateMaybeMessage<::s2s::Mysql_Index>(Arena*);
 template<> ::s2s::Mysql_Query* Arena::CreateMaybeMessage<::s2s::Mysql_Query>(Arena*);
 template<> ::s2s::Mysql_Response* Arena::CreateMaybeMessage<::s2s::Mysql_Response>(Arena*);
 template<> ::s2s::Mysql_Save* Arena::CreateMaybeMessage<::s2s::Mysql_Save>(Arena*);
@@ -1042,141 +1038,6 @@ class Mysql_Update :
 };
 // -------------------------------------------------------------------
 
-class Mysql_Index :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mysql.Index) */ {
- public:
-  Mysql_Index();
-  virtual ~Mysql_Index();
-
-  Mysql_Index(const Mysql_Index& from);
-
-  inline Mysql_Index& operator=(const Mysql_Index& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Mysql_Index(Mysql_Index&& from) noexcept
-    : Mysql_Index() {
-    *this = ::std::move(from);
-  }
-
-  inline Mysql_Index& operator=(Mysql_Index&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const Mysql_Index& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Mysql_Index* internal_default_instance() {
-    return reinterpret_cast<const Mysql_Index*>(
-               &_Mysql_Index_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    6;
-
-  void Swap(Mysql_Index* other);
-  friend void swap(Mysql_Index& a, Mysql_Index& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Mysql_Index* New() const final {
-    return CreateMaybeMessage<Mysql_Index>(nullptr);
-  }
-
-  Mysql_Index* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Mysql_Index>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Mysql_Index& from);
-  void MergeFrom(const Mysql_Index& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Mysql_Index* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string table = 1;
-  void clear_table();
-  static const int kTableFieldNumber = 1;
-  const ::std::string& table() const;
-  void set_table(const ::std::string& value);
-  #if LANG_CXX11
-  void set_table(::std::string&& value);
-  #endif
-  void set_table(const char* value);
-  void set_table(const char* value, size_t size);
-  ::std::string* mutable_table();
-  ::std::string* release_table();
-  void set_allocated_table(::std::string* table);
-
-  // string field = 2;
-  void clear_field();
-  static const int kFieldFieldNumber = 2;
-  const ::std::string& field() const;
-  void set_field(const ::std::string& value);
-  #if LANG_CXX11
-  void set_field(::std::string&& value);
-  #endif
-  void set_field(const char* value);
-  void set_field(const char* value, size_t size);
-  ::std::string* mutable_field();
-  ::std::string* release_field();
-  void set_allocated_field(::std::string* field);
-
-  // @@protoc_insertion_point(class_scope:s2s.Mysql.Index)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr table_;
-  ::google::protobuf::internal::ArenaStringPtr field_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_s2s_2eproto;
-};
-// -------------------------------------------------------------------
-
 class Mysql_Response :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mysql.Response) */ {
  public:
@@ -1215,7 +1076,7 @@ class Mysql_Response :
                &_Mysql_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(Mysql_Response* other);
   friend void swap(Mysql_Response& a, Mysql_Response& b) {
@@ -1272,27 +1133,17 @@ class Mysql_Response :
 
   // accessors -------------------------------------------------------
 
-  // repeated string json_array = 2;
-  int json_array_size() const;
-  void clear_json_array();
-  static const int kJsonArrayFieldNumber = 2;
-  const ::std::string& json_array(int index) const;
-  ::std::string* mutable_json_array(int index);
-  void set_json_array(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_json_array(int index, ::std::string&& value);
-  #endif
-  void set_json_array(int index, const char* value);
-  void set_json_array(int index, const char* value, size_t size);
-  ::std::string* add_json_array();
-  void add_json_array(const ::std::string& value);
-  #if LANG_CXX11
-  void add_json_array(::std::string&& value);
-  #endif
-  void add_json_array(const char* value);
-  void add_json_array(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& json_array() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_json_array();
+  // repeated .google.protobuf.Any datas = 2;
+  int datas_size() const;
+  void clear_datas();
+  static const int kDatasFieldNumber = 2;
+  ::google::protobuf::Any* mutable_datas(int index);
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
+      mutable_datas();
+  const ::google::protobuf::Any& datas(int index) const;
+  ::google::protobuf::Any* add_datas();
+  const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+      datas() const;
 
   // string error = 1;
   void clear_error();
@@ -1313,7 +1164,7 @@ class Mysql_Response :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> json_array_;
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any > datas_;
   ::google::protobuf::internal::ArenaStringPtr error_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
@@ -1358,7 +1209,7 @@ class Mysql :
                &_Mysql_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(Mysql* other);
   friend void swap(Mysql& a, Mysql& b) {
@@ -1419,7 +1270,6 @@ class Mysql :
   typedef Mysql_Query Query;
   typedef Mysql_Delete Delete;
   typedef Mysql_Update Update;
-  typedef Mysql_Index Index;
   typedef Mysql_Response Response;
 
   // accessors -------------------------------------------------------
@@ -1472,7 +1322,7 @@ class Allot_Request :
                &_Allot_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(Allot_Request* other);
   friend void swap(Allot_Request& a, Allot_Request& b) {
@@ -1599,7 +1449,7 @@ class Allot_Response :
                &_Allot_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(Allot_Response* other);
   friend void swap(Allot_Response& a, Allot_Response& b) {
@@ -1719,7 +1569,7 @@ class Allot_Save :
                &_Allot_Save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(Allot_Save* other);
   friend void swap(Allot_Save& a, Allot_Save& b) {
@@ -1854,7 +1704,7 @@ class Allot :
                &_Allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(Allot* other);
   friend void swap(Allot& a, Allot& b) {
@@ -1963,7 +1813,7 @@ class GateBroadCast_Request :
                &_GateBroadCast_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    12;
 
   void Swap(GateBroadCast_Request* other);
   friend void swap(GateBroadCast_Request& a, GateBroadCast_Request& b) {
@@ -2093,7 +1943,7 @@ class GateBroadCast_Response :
                &_GateBroadCast_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(GateBroadCast_Response* other);
   friend void swap(GateBroadCast_Response& a, GateBroadCast_Response& b) {
@@ -2205,7 +2055,7 @@ class GateBroadCast :
                &_GateBroadCast_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    14;
 
   void Swap(GateBroadCast* other);
   friend void swap(GateBroadCast& a, GateBroadCast& b) {
@@ -2313,7 +2163,7 @@ class CallClient_Request :
                &_CallClient_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    15;
 
   void Swap(CallClient_Request* other);
   friend void swap(CallClient_Request& a, CallClient_Request& b) {
@@ -2443,7 +2293,7 @@ class CallClient :
                &_CallClient_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    16;
 
   void Swap(CallClient* other);
   friend void swap(CallClient& a, CallClient& b) {
@@ -3477,116 +3327,6 @@ inline void Mysql_Update::set_allocated_where_json(::std::string* where_json) {
 
 // -------------------------------------------------------------------
 
-// Mysql_Index
-
-// string table = 1;
-inline void Mysql_Index::clear_table() {
-  table_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Mysql_Index::table() const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Index.table)
-  return table_.GetNoArena();
-}
-inline void Mysql_Index::set_table(const ::std::string& value) {
-  
-  table_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Index.table)
-}
-#if LANG_CXX11
-inline void Mysql_Index::set_table(::std::string&& value) {
-  
-  table_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.Mysql.Index.table)
-}
-#endif
-inline void Mysql_Index::set_table(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  table_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Index.table)
-}
-inline void Mysql_Index::set_table(const char* value, size_t size) {
-  
-  table_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Index.table)
-}
-inline ::std::string* Mysql_Index::mutable_table() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Index.table)
-  return table_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Mysql_Index::release_table() {
-  // @@protoc_insertion_point(field_release:s2s.Mysql.Index.table)
-  
-  return table_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Mysql_Index::set_allocated_table(::std::string* table) {
-  if (table != nullptr) {
-    
-  } else {
-    
-  }
-  table_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), table);
-  // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Index.table)
-}
-
-// string field = 2;
-inline void Mysql_Index::clear_field() {
-  field_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Mysql_Index::field() const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Index.field)
-  return field_.GetNoArena();
-}
-inline void Mysql_Index::set_field(const ::std::string& value) {
-  
-  field_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Index.field)
-}
-#if LANG_CXX11
-inline void Mysql_Index::set_field(::std::string&& value) {
-  
-  field_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.Mysql.Index.field)
-}
-#endif
-inline void Mysql_Index::set_field(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  field_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Index.field)
-}
-inline void Mysql_Index::set_field(const char* value, size_t size) {
-  
-  field_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Index.field)
-}
-inline ::std::string* Mysql_Index::mutable_field() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Index.field)
-  return field_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Mysql_Index::release_field() {
-  // @@protoc_insertion_point(field_release:s2s.Mysql.Index.field)
-  
-  return field_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Mysql_Index::set_allocated_field(::std::string* field) {
-  if (field != nullptr) {
-    
-  } else {
-    
-  }
-  field_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), field);
-  // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Index.field)
-}
-
-// -------------------------------------------------------------------
-
 // Mysql_Response
 
 // string error = 1;
@@ -3642,73 +3382,31 @@ inline void Mysql_Response::set_allocated_error(::std::string* error) {
   // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Response.error)
 }
 
-// repeated string json_array = 2;
-inline int Mysql_Response::json_array_size() const {
-  return json_array_.size();
+// repeated .google.protobuf.Any datas = 2;
+inline int Mysql_Response::datas_size() const {
+  return datas_.size();
 }
-inline void Mysql_Response::clear_json_array() {
-  json_array_.Clear();
+inline ::google::protobuf::Any* Mysql_Response::mutable_datas(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Response.datas)
+  return datas_.Mutable(index);
 }
-inline const ::std::string& Mysql_Response::json_array(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Response.json_array)
-  return json_array_.Get(index);
+inline ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
+Mysql_Response::mutable_datas() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Response.datas)
+  return &datas_;
 }
-inline ::std::string* Mysql_Response::mutable_json_array(int index) {
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Response.json_array)
-  return json_array_.Mutable(index);
+inline const ::google::protobuf::Any& Mysql_Response::datas(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.Mysql.Response.datas)
+  return datas_.Get(index);
 }
-inline void Mysql_Response::set_json_array(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Response.json_array)
-  json_array_.Mutable(index)->assign(value);
+inline ::google::protobuf::Any* Mysql_Response::add_datas() {
+  // @@protoc_insertion_point(field_add:s2s.Mysql.Response.datas)
+  return datas_.Add();
 }
-#if LANG_CXX11
-inline void Mysql_Response::set_json_array(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Response.json_array)
-  json_array_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void Mysql_Response::set_json_array(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  json_array_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Response.json_array)
-}
-inline void Mysql_Response::set_json_array(int index, const char* value, size_t size) {
-  json_array_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Response.json_array)
-}
-inline ::std::string* Mysql_Response::add_json_array() {
-  // @@protoc_insertion_point(field_add_mutable:s2s.Mysql.Response.json_array)
-  return json_array_.Add();
-}
-inline void Mysql_Response::add_json_array(const ::std::string& value) {
-  json_array_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Response.json_array)
-}
-#if LANG_CXX11
-inline void Mysql_Response::add_json_array(::std::string&& value) {
-  json_array_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Response.json_array)
-}
-#endif
-inline void Mysql_Response::add_json_array(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  json_array_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:s2s.Mysql.Response.json_array)
-}
-inline void Mysql_Response::add_json_array(const char* value, size_t size) {
-  json_array_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:s2s.Mysql.Response.json_array)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-Mysql_Response::json_array() const {
-  // @@protoc_insertion_point(field_list:s2s.Mysql.Response.json_array)
-  return json_array_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-Mysql_Response::mutable_json_array() {
-  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Response.json_array)
-  return &json_array_;
+inline const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+Mysql_Response::datas() const {
+  // @@protoc_insertion_point(field_list:s2s.Mysql.Response.datas)
+  return datas_;
 }
 
 // -------------------------------------------------------------------
@@ -4190,8 +3888,6 @@ inline void CallClient_Request::set_allocated_data(::google::protobuf::Any* data
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
