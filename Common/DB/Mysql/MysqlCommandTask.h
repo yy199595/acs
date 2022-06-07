@@ -16,15 +16,16 @@ namespace Sentry
 			MysqlCommandTask() = default;
 			virtual ~MysqlCommandTask() = default;
 		public:
-			XCode Init() final;
 			XCode Await() final;
 			const std::string & GetError() { return this->mError;}
 			const std::string & GetSql() { return this->mCommand;}
-		protected:
-			void Run(MysqlSocket* mysql) final;
-			virtual bool GetCommand(MysqlHelper & helper, std::string & sql) = 0;
+        private:
+            void Run(MysqlSocket* mysql) final;
+        protected:
+            virtual XCode OnInvoke(std::string & error) = 0;
+			//virtual bool GetCommand(MysqlHelper & helper, std::string & sql) = 0;
 			virtual void OnComplete(MysqlSocket* mysql, MysqlQueryResult * result) {};
-		private:
+        protected:
 			std::string mError;
 			std::string mCommand;
 			TaskSource<XCode> mTaskSource;

@@ -1,6 +1,6 @@
 #pragma once
 #include <Define/CommonTypeDef.h>
-namespace Sentry
+namespace Util
 {
     template<typename T>
     class NumberBuilder

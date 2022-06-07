@@ -41,6 +41,6 @@ namespace Sentry
 	 public:
 		virtual XCode Await() = 0;
 		virtual void Run(MysqlSocket * mysql) = 0;
-		virtual XCode Init() { return XCode::Successful;}
+		virtual bool Init() { return true;}
 	};
 }

@@ -4,6 +4,14 @@ import "google/protobuf/any.proto";
 
 message Mysql //mysql操作
 {
+    message Create
+    {
+        string db = 1; //库
+        string tab = 2;  //表
+        string proto = 3; //对应的pb协议
+        repeated string indexs = 4; //索引
+        repeated string keys = 5; //主键
+    }
     message Add
     {
         int64 flag = 1;

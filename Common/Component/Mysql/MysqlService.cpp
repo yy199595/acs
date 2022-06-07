@@ -60,6 +60,11 @@ namespace Sentry
 		return this->mMysqlClients[index];
 	}
 
+    XCode MysqlService::Create(const s2s::Mysql::Create &request)
+    {
+
+    }
+
 	XCode MysqlService::Add(const s2s::Mysql::Add& request)
 	{
 		LOGIC_THROW_ERROR(request.has_data());

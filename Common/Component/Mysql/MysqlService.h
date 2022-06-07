@@ -12,7 +12,8 @@ namespace Sentry
 		MysqlService() = default;
 		~MysqlService() final = default;
 	private:
-		XCode Add(const s2s::Mysql::Add& request);
+
+        XCode Add(const s2s::Mysql::Add& request);
 
 		XCode Save(const s2s::Mysql::Save& request);
 
@@ -20,7 +21,9 @@ namespace Sentry
 
 		XCode Delete(const s2s::Mysql::Delete& request);
 
-		XCode Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response);
+        XCode Create(const s2s::Mysql::Create& request);
+
+        XCode Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response);
 
 	 private:
 		bool OnStart() final;

@@ -36,7 +36,7 @@ namespace Sentry
 		TaskContext * Get(unsigned int id);
 	private:
         std::queue<TaskContext *> mCorPool;
-        NumberBuilder<unsigned int> mNumPool;
+        Util::NumberBuilder<unsigned int> mNumPool;
         std::unordered_map<unsigned int , TaskContext *> mCorMap;
     };
 }

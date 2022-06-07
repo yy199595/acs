@@ -18,6 +18,10 @@
 
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fany_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Any_google_2fprotobuf_2fany_2eproto;
 namespace s2s {
+class Mysql_CreateDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<Mysql_Create> _instance;
+} _Mysql_Create_default_instance_;
 class Mysql_AddDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Mysql_Add> _instance;
@@ -87,6 +91,20 @@ class CallClientDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<CallClient> _instance;
 } _CallClient_default_instance_;
 }  // namespace s2s
+static void InitDefaultsMysql_Create_s2s_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::s2s::_Mysql_Create_default_instance_;
+    new (ptr) ::s2s::Mysql_Create();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::s2s::Mysql_Create::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_Mysql_Create_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsMysql_Create_s2s_2eproto}, {}};
+
 static void InitDefaultsMysql_Add_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -330,6 +348,7 @@ static void InitDefaultsCallClient_s2s_2eproto() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCallClient_s2s_2eproto}, {}};
 
 void InitDefaults_s2s_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Create_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Add_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Save_s2s_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Mysql_Query_s2s_2eproto.base);
@@ -349,11 +368,21 @@ void InitDefaults_s2s_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_CallClient_s2s_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2eproto[17];
+::google::protobuf::Metadata file_level_metadata_s2s_2eproto[18];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, db_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, tab_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, proto_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, indexs_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, keys_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Add, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -471,26 +500,28 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::s2s::Mysql_Add)},
-  { 8, -1, sizeof(::s2s::Mysql_Save)},
-  { 16, -1, sizeof(::s2s::Mysql_Query)},
-  { 24, -1, sizeof(::s2s::Mysql_Delete)},
-  { 32, -1, sizeof(::s2s::Mysql_Update)},
-  { 41, -1, sizeof(::s2s::Mysql_Index)},
-  { 48, -1, sizeof(::s2s::Mysql_Response)},
-  { 55, -1, sizeof(::s2s::Mysql)},
-  { 60, -1, sizeof(::s2s::Allot_Request)},
-  { 67, -1, sizeof(::s2s::Allot_Response)},
-  { 73, -1, sizeof(::s2s::Allot_Save)},
-  { 80, -1, sizeof(::s2s::Allot)},
-  { 85, -1, sizeof(::s2s::GateBroadCast_Request)},
-  { 92, -1, sizeof(::s2s::GateBroadCast_Response)},
-  { 98, -1, sizeof(::s2s::GateBroadCast)},
-  { 103, -1, sizeof(::s2s::CallClient_Request)},
-  { 110, -1, sizeof(::s2s::CallClient)},
+  { 0, -1, sizeof(::s2s::Mysql_Create)},
+  { 10, -1, sizeof(::s2s::Mysql_Add)},
+  { 18, -1, sizeof(::s2s::Mysql_Save)},
+  { 26, -1, sizeof(::s2s::Mysql_Query)},
+  { 34, -1, sizeof(::s2s::Mysql_Delete)},
+  { 42, -1, sizeof(::s2s::Mysql_Update)},
+  { 51, -1, sizeof(::s2s::Mysql_Index)},
+  { 58, -1, sizeof(::s2s::Mysql_Response)},
+  { 65, -1, sizeof(::s2s::Mysql)},
+  { 70, -1, sizeof(::s2s::Allot_Request)},
+  { 77, -1, sizeof(::s2s::Allot_Response)},
+  { 83, -1, sizeof(::s2s::Allot_Save)},
+  { 90, -1, sizeof(::s2s::Allot)},
+  { 95, -1, sizeof(::s2s::GateBroadCast_Request)},
+  { 102, -1, sizeof(::s2s::GateBroadCast_Response)},
+  { 108, -1, sizeof(::s2s::GateBroadCast)},
+  { 113, -1, sizeof(::s2s::CallClient_Request)},
+  { 120, -1, sizeof(::s2s::CallClient)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_Create_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_Add_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_Save_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::s2s::_Mysql_Query_default_instance_),
@@ -513,12 +544,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2eproto = {
   {}, AddDescriptors_s2s_2eproto, "s2s.proto", schemas,
   file_default_instances, TableStruct_s2s_2eproto::offsets,
-  file_level_metadata_s2s_2eproto, 17, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
+  file_level_metadata_s2s_2eproto, 18, file_level_enum_descriptors_s2s_2eproto, file_level_service_descriptors_s2s_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2eproto[] =
   "\n\ts2s.proto\022\003s2s\032\031google/protobuf/any.pr"
-  "oto\"\263\003\n\005Mysql\032F\n\003Add\022\014\n\004flag\030\001 \001(\003\022\r\n\005ta"
+  "oto\"\203\004\n\005Mysql\032N\n\006Create\022\n\n\002db\030\001 \001(\t\022\013\n\003t"
+  "ab\030\002 \001(\t\022\r\n\005proto\030\003 \001(\t\022\016\n\006indexs\030\004 \003(\t\022"
+  "\014\n\004keys\030\005 \003(\t\032F\n\003Add\022\014\n\004flag\030\001 \001(\003\022\r\n\005ta"
   "ble\030\002 \001(\t\022\"\n\004data\030\003 \001(\0132\024.google.protobu"
   "f.Any\032G\n\004Save\022\014\n\004flag\030\001 \001(\003\022\r\n\005table\030\002 \001"
   "(\t\022\"\n\004data\030\003 \001(\0132\024.google.protobuf.Any\0328"
@@ -541,7 +574,7 @@ const char descriptor_table_protodef_s2s_2eproto[] =
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 798,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 878,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -555,6 +588,585 @@ void AddDescriptors_s2s_2eproto() {
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_s2s_2eproto = []() { AddDescriptors_s2s_2eproto(); return true; }();
 namespace s2s {
+
+// ===================================================================
+
+void Mysql_Create::InitAsDefaultInstance() {
+}
+class Mysql_Create::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Mysql_Create::kDbFieldNumber;
+const int Mysql_Create::kTabFieldNumber;
+const int Mysql_Create::kProtoFieldNumber;
+const int Mysql_Create::kIndexsFieldNumber;
+const int Mysql_Create::kKeysFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+Mysql_Create::Mysql_Create()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:s2s.Mysql.Create)
+}
+Mysql_Create::Mysql_Create(const Mysql_Create& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      indexs_(from.indexs_),
+      keys_(from.keys_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  db_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.db().size() > 0) {
+    db_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.db_);
+  }
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  proto_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.proto().size() > 0) {
+    proto_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.proto_);
+  }
+  // @@protoc_insertion_point(copy_constructor:s2s.Mysql.Create)
+}
+
+void Mysql_Create::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_Mysql_Create_s2s_2eproto.base);
+  db_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  proto_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+Mysql_Create::~Mysql_Create() {
+  // @@protoc_insertion_point(destructor:s2s.Mysql.Create)
+  SharedDtor();
+}
+
+void Mysql_Create::SharedDtor() {
+  db_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  proto_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void Mysql_Create::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Mysql_Create& Mysql_Create::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_Mysql_Create_s2s_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Mysql_Create::Clear() {
+// @@protoc_insertion_point(message_clear_start:s2s.Mysql.Create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  indexs_.Clear();
+  keys_.Clear();
+  db_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  proto_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* Mysql_Create::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<Mysql_Create*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string db = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.db");
+        object = msg->mutable_db();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string tab = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.tab");
+        object = msg->mutable_tab();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string proto = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.proto");
+        object = msg->mutable_proto();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // repeated string indexs = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.indexs");
+          object = msg->add_indexs();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
+        break;
+      }
+      // repeated string keys = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.keys");
+          object = msg->add_keys();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool Mysql_Create::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:s2s.Mysql.Create)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string db = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_db()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->db().data(), static_cast<int>(this->db().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.db"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string tab = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tab()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tab().data(), static_cast<int>(this->tab().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.tab"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string proto = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_proto()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->proto().data(), static_cast<int>(this->proto().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.proto"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated string indexs = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_indexs()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->indexs(this->indexs_size() - 1).data(),
+            static_cast<int>(this->indexs(this->indexs_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.indexs"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated string keys = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_keys()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->keys(this->keys_size() - 1).data(),
+            static_cast<int>(this->keys(this->keys_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.keys"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:s2s.Mysql.Create)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:s2s.Mysql.Create)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void Mysql_Create::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:s2s.Mysql.Create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string db = 1;
+  if (this->db().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->db().data(), static_cast<int>(this->db().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.db");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->db(), output);
+  }
+
+  // string tab = 2;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.tab");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->tab(), output);
+  }
+
+  // string proto = 3;
+  if (this->proto().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->proto().data(), static_cast<int>(this->proto().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.proto");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->proto(), output);
+  }
+
+  // repeated string indexs = 4;
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.indexs");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->indexs(i), output);
+  }
+
+  // repeated string keys = 5;
+  for (int i = 0, n = this->keys_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->keys(i).data(), static_cast<int>(this->keys(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.keys");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->keys(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:s2s.Mysql.Create)
+}
+
+::google::protobuf::uint8* Mysql_Create::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:s2s.Mysql.Create)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string db = 1;
+  if (this->db().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->db().data(), static_cast<int>(this->db().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.db");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->db(), target);
+  }
+
+  // string tab = 2;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.tab");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->tab(), target);
+  }
+
+  // string proto = 3;
+  if (this->proto().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->proto().data(), static_cast<int>(this->proto().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.proto");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->proto(), target);
+  }
+
+  // repeated string indexs = 4;
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.indexs");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(4, this->indexs(i), target);
+  }
+
+  // repeated string keys = 5;
+  for (int i = 0, n = this->keys_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->keys(i).data(), static_cast<int>(this->keys(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.keys");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(5, this->keys(i), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:s2s.Mysql.Create)
+  return target;
+}
+
+size_t Mysql_Create::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:s2s.Mysql.Create)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string indexs = 4;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->indexs_size());
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->indexs(i));
+  }
+
+  // repeated string keys = 5;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->keys_size());
+  for (int i = 0, n = this->keys_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->keys(i));
+  }
+
+  // string db = 1;
+  if (this->db().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->db());
+  }
+
+  // string tab = 2;
+  if (this->tab().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tab());
+  }
+
+  // string proto = 3;
+  if (this->proto().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->proto());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Mysql_Create::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:s2s.Mysql.Create)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Mysql_Create* source =
+      ::google::protobuf::DynamicCastToGenerated<Mysql_Create>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:s2s.Mysql.Create)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:s2s.Mysql.Create)
+    MergeFrom(*source);
+  }
+}
+
+void Mysql_Create::MergeFrom(const Mysql_Create& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:s2s.Mysql.Create)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  indexs_.MergeFrom(from.indexs_);
+  keys_.MergeFrom(from.keys_);
+  if (from.db().size() > 0) {
+
+    db_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.db_);
+  }
+  if (from.tab().size() > 0) {
+
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  if (from.proto().size() > 0) {
+
+    proto_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.proto_);
+  }
+}
+
+void Mysql_Create::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:s2s.Mysql.Create)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Mysql_Create::CopyFrom(const Mysql_Create& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:s2s.Mysql.Create)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Mysql_Create::IsInitialized() const {
+  return true;
+}
+
+void Mysql_Create::Swap(Mysql_Create* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void Mysql_Create::InternalSwap(Mysql_Create* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  indexs_.InternalSwap(CastToBase(&other->indexs_));
+  keys_.InternalSwap(CastToBase(&other->keys_));
+  db_.Swap(&other->db_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  proto_.Swap(&other->proto_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata Mysql_Create::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2eproto);
+  return ::file_level_metadata_s2s_2eproto[kIndexInFileMessages];
+}
+
 
 // ===================================================================
 
@@ -6290,6 +6902,9 @@ void CallClient::InternalSwap(CallClient* other) {
 }  // namespace s2s
 namespace google {
 namespace protobuf {
+template<> PROTOBUF_NOINLINE ::s2s::Mysql_Create* Arena::CreateMaybeMessage< ::s2s::Mysql_Create >(Arena* arena) {
+  return Arena::CreateInternal< ::s2s::Mysql_Create >(arena);
+}
 template<> PROTOBUF_NOINLINE ::s2s::Mysql_Add* Arena::CreateMaybeMessage< ::s2s::Mysql_Add >(Arena* arena) {
   return Arena::CreateInternal< ::s2s::Mysql_Add >(arena);
 }
